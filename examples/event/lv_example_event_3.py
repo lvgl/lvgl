@@ -17,7 +17,7 @@ def event_cb(e):
 # Demonstrate event bubbling
 #
 
-cont = lv.obj(lv.scr_act())
+cont = lv.obj(lv.screen_active())
 cont.set_size(290, 200)
 cont.center()
 cont.set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)

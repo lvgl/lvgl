@@ -12,7 +12,7 @@ void lv_example_flex_2(void)
     lv_style_set_flex_main_place(&style, LV_FLEX_ALIGN_SPACE_EVENLY);
     lv_style_set_layout(&style, LV_LAYOUT_FLEX);
 
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, 300, 220);
     lv_obj_center(cont);
     lv_obj_add_style(cont, &style, 0);

@@ -19,7 +19,7 @@ extern "C" {
 #include "ime/lv_example_ime_pinyin.h"
 #include "imgfont/lv_example_imgfont.h"
 #include "monkey/lv_example_monkey.h"
-#include "msg/lv_example_msg.h"
+#include "observer/lv_example_observer.h"
 #include "snapshot/lv_example_snapshot.h"
 
 /*********************

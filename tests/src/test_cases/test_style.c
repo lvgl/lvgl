@@ -12,7 +12,7 @@ static void obj_set_height_helper(void * obj, int32_t height)
 void test_gradient_vertical_misalignment(void)
 {
     /* Tests gradient caching as the height of widget changes.*/
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_style_bg_grad_dir(obj, LV_GRAD_DIR_VER, 0);
     lv_obj_set_style_bg_grad_color(obj, lv_color_hex(0xff0000), 0);
     lv_obj_set_style_bg_color(obj, lv_color_hex(0x00ff00), 0);
@@ -80,7 +80,7 @@ LV_STYLE_CONST_INIT(const_style, const_style_props);
 
 void test_const_style(void)
 {
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_add_style(obj, &const_style, LV_PART_MAIN);
     TEST_ASSERT_EQUAL(51, lv_obj_get_style_width(obj, LV_PART_MAIN));
     TEST_ASSERT_EQUAL(50, lv_obj_get_style_height(obj, LV_PART_MAIN));
@@ -99,7 +99,7 @@ void test_style_replacement(void)
     lv_style_set_bg_color(&style_blue, lv_color_hex(0x0000ff));
 
     /*Create object with style*/
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_add_style(obj, &style_red, LV_PART_MAIN);
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_MAIN));
 

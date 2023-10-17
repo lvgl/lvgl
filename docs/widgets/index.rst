@@ -27,7 +27,6 @@ Widgets
     line
     list
     menu
-    meter
     msgbox
     roller
     scale

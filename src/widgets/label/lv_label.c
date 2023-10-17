@@ -66,7 +66,8 @@ const lv_obj_class_t lv_label_class = {
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_label_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "label",
 };
 
 /**********************
@@ -185,8 +186,8 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     lv_label_t * label = (lv_label_t *)obj;
 
     /*Delete the old animation (if exists)*/
-    lv_anim_del(obj, set_ofs_x_anim);
-    lv_anim_del(obj, set_ofs_y_anim);
+    lv_anim_delete(obj, set_ofs_x_anim);
+    lv_anim_delete(obj, set_ofs_y_anim);
     label->offset.x = 0;
     label->offset.y = 0;
 
@@ -659,7 +660,7 @@ static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     label->dot.tmp_ptr   = NULL;
     label->dot_tmp_alloc = 0;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_label_set_long_mode(obj, LV_LABEL_LONG_WRAP);
     lv_label_set_text(obj, LV_LABEL_DEFAULT_TEXT);
 
@@ -952,7 +953,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
         else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(obj, set_ofs_x_anim);
+            lv_anim_delete(obj, set_ofs_x_anim);
             label->offset.x = 0;
         }
 
@@ -990,7 +991,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
         else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(obj, set_ofs_y_anim);
+            lv_anim_delete(obj, set_ofs_y_anim);
             label->offset.y = 0;
         }
     }
@@ -1046,7 +1047,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
         else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(obj, set_ofs_x_anim);
+            lv_anim_delete(obj, set_ofs_x_anim);
             label->offset.x = 0;
         }
 
@@ -1071,7 +1072,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         }
         else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(obj, set_ofs_y_anim);
+            lv_anim_delete(obj, set_ofs_y_anim);
             label->offset.y = 0;
         }
     }

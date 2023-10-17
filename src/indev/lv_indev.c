@@ -80,10 +80,10 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_INDEV
-    #define INDEV_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_INDEV
+    #define LV_TRACE_INDEV(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define INDEV_TRACE(...)
+    #define LV_TRACE_INDEV(...)
 #endif
 
 /**********************
@@ -123,7 +123,7 @@ void lv_indev_delete(lv_indev_t * indev)
 {
     LV_ASSERT_NULL(indev);
     /*Clean up the read timer first*/
-    if(indev->read_timer) lv_timer_del(indev->read_timer);
+    if(indev->read_timer) lv_timer_delete(indev->read_timer);
     /*Remove the input device from the list*/
     _lv_ll_remove(indev_ll_head, indev);
     /*Free the memory of the input device*/
@@ -159,7 +159,7 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
     }
 
     if(indev->read_cb) {
-        INDEV_TRACE("calling indev_read_cb");
+        LV_TRACE_INDEV("calling indev_read_cb");
         indev->read_cb(indev, data);
     }
     else {
@@ -177,7 +177,7 @@ void lv_indev_read(lv_indev_t * indev_p)
 {
     if(!indev_p) return;
 
-    INDEV_TRACE("begin");
+    LV_TRACE_INDEV("begin");
 
     indev_act = indev_p;
 
@@ -234,7 +234,7 @@ void lv_indev_read(lv_indev_t * indev_p)
     indev_act     = NULL;
     indev_obj_act = NULL;
 
-    INDEV_TRACE("finished");
+    LV_TRACE_INDEV("finished");
     LV_PROFILER_END;
 }
 
@@ -364,7 +364,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     indev->cursor = cur_obj;
     lv_obj_set_parent(indev->cursor, lv_display_get_layer_sys(indev->disp));
     lv_obj_set_pos(indev->cursor, indev->pointer.act_point.x, indev->pointer.act_point.y);
-    lv_obj_clear_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(indev->cursor, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING);
 }
 
@@ -801,7 +801,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                     if(lv_group_get_obj_count(g) > 1) {
                         LV_LOG_INFO("toggling edit mode");
                         lv_group_set_editing(g, lv_group_get_editing(g) ? false : true); /*Toggle edit mode on long press*/
-                        lv_obj_clear_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
+                        lv_obj_remove_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
                     }
                 }
                 /*If not editable then just send a long press Call the ancestor's event handler*/
@@ -875,7 +875,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                     if(indev_reset_check(i)) return;
                 }
                 else {
-                    lv_obj_clear_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
+                    lv_obj_remove_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
                 }
             }
             /*If the focused object is editable and now in navigate mode then on enter switch edit
@@ -1201,7 +1201,7 @@ static lv_obj_t * pointer_search_obj(lv_display_t * disp, lv_point_t * p)
     if(indev_obj_act) return indev_obj_act;
 
     /* Search the object in the active screen */
-    indev_obj_act = lv_indev_search_obj(lv_display_get_scr_act(disp), p);
+    indev_obj_act = lv_indev_search_obj(lv_display_get_screen_act(disp), p);
     if(indev_obj_act) return indev_obj_act;
 
     indev_obj_act = lv_indev_search_obj(lv_display_get_layer_bottom(disp), p);

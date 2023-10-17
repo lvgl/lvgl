@@ -1,131 +1,56 @@
 #include "../../lv_examples.h"
-//TODO should be a chart feature
-#if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES && 0
-
-static lv_obj_t * chart1;
-static lv_chart_series_t * ser1;
-static lv_chart_series_t * ser2;
-
-static void draw_event_cb(lv_event_t * e)
-{
-    lv_obj_t * obj = lv_event_get_target(e);
-
-    /*Add the faded area before the lines are drawn*/
-    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
-    if(base_dsc->part == LV_PART_ITEMS) {
-        /*Add a line mask that keeps the area below the line*/
-        lv_draw_mask_line_param_t line_mask_param;
-        lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y,
-                                      LV_DRAW_MASK_LINE_SIDE_BOTTOM);
-        int16_t line_mask_id = lv_draw_mask_add(&line_mask_param, NULL);
-
-        /*Add a fade effect: transparent bottom covering top*/
-        lv_coord_t h = lv_obj_get_height(obj);
-        lv_draw_mask_fade_param_t fade_mask_param;
-        lv_draw_mask_fade_init(&fade_mask_param, &obj->coords, LV_OPA_COVER, obj->coords.y1 + h / 8, LV_OPA_TRANSP,
-                               obj->coords.y2);
-        int16_t fade_mask_id = lv_draw_mask_add(&fade_mask_param, NULL);
-
-        /*Draw a rectangle that will be affected by the mask*/
-        lv_draw_rect_dsc_t draw_rect_dsc;
-        lv_draw_rect_dsc_init(&draw_rect_dsc);
-        draw_rect_dsc.bg_opa = LV_OPA_20;
-        draw_rect_dsc.bg_color = dsc->line_dsc->color;
-
-        lv_area_t a;
-        a.x1 = dsc->p1->x;
-        a.x2 = dsc->p2->x - 1;
-        a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
-        a.y2 = obj->coords.y2;
-        lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
-
-        /*Remove the masks*/
-        lv_draw_mask_free_param(&line_mask_param);
-        lv_draw_mask_free_param(&fade_mask_param);
-        lv_draw_mask_remove_id(line_mask_id);
-        lv_draw_mask_remove_id(fade_mask_id);
-    }
-    /*Hook the division lines too*/
-    else if(dsc->part == LV_PART_MAIN) {
-        if(dsc->line_dsc == NULL || dsc->p1 == NULL || dsc->p2 == NULL) return;
-
-        /*Vertical line*/
-        if(dsc->p1->x == dsc->p2->x) {
-            dsc->line_dsc->color  = lv_palette_lighten(LV_PALETTE_GREY, 1);
-            if(dsc->id == 3) {
-                dsc->line_dsc->width  = 2;
-                dsc->line_dsc->dash_gap  = 0;
-                dsc->line_dsc->dash_width  = 0;
-            }
-            else {
-                dsc->line_dsc->width = 1;
-                dsc->line_dsc->dash_gap  = 6;
-                dsc->line_dsc->dash_width  = 6;
-            }
-        }
-        /*Horizontal line*/
-        else {
-            if(dsc->id == 2) {
-                dsc->line_dsc->width  = 2;
-                dsc->line_dsc->dash_gap  = 0;
-                dsc->line_dsc->dash_width  = 0;
-            }
-            else {
-                dsc->line_dsc->width = 2;
-                dsc->line_dsc->dash_gap  = 6;
-                dsc->line_dsc->dash_width  = 6;
-            }
-
-            if(dsc->id == 1  || dsc->id == 3) {
-                dsc->line_dsc->color  = lv_palette_main(LV_PALETTE_GREEN);
-            }
-            else {
-                dsc->line_dsc->color  = lv_palette_lighten(LV_PALETTE_GREY, 1);
-            }
-        }
-    }
-}
-
-static void add_data(lv_timer_t * timer)
-{
-    LV_UNUSED(timer);
-    static uint32_t cnt = 0;
-    lv_chart_set_next_value(chart1, ser1, lv_rand(20, 90));
-
-    if(cnt % 4 == 0) lv_chart_set_next_value(chart1, ser2, lv_rand(40, 60));
-
-    cnt++;
-}
+#if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 /**
- * Add a faded area effect to the line chart and make some division lines ticker
+ * Use lv_scale to add ticks to a scrollable chart
  */
 void lv_example_chart_2(void)
 {
-    /*Create a chart1*/
-    chart1 = lv_chart_create(lv_scr_act());
-    lv_obj_set_size(chart1, 200, 150);
-    lv_obj_center(chart1);
-    lv_chart_set_type(chart1, LV_CHART_TYPE_LINE);   /*Show lines and points too*/
+    /*Create a container*/
+    lv_obj_t * main_cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(main_cont, 200, 150);
+    lv_obj_center(main_cont);
 
-    lv_chart_set_div_line_count(chart1, 5, 7);
+    /*Create a transparent wrapper for the chart and the scale.
+     *Set a large width, to make it scrollable on the main container*/
+    lv_obj_t * wrapper = lv_obj_create(main_cont);
+    lv_obj_remove_style_all(wrapper);
+    lv_obj_set_size(wrapper, lv_pct(300), lv_pct(100));
+    lv_obj_set_flex_flow(wrapper, LV_FLEX_FLOW_COLUMN);
 
-    lv_obj_add_event(chart1, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_flag(chart1, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    /*Create a chart on the wrapper
+     *Set it's width to 100% to fill the large wrapper*/
+    lv_obj_t * chart = lv_chart_create(wrapper);
+    lv_obj_set_width(chart, lv_pct(100));
+    lv_obj_set_flex_grow(chart, 1);
+    lv_chart_set_type(chart, LV_CHART_TYPE_BAR);
+    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 100);
+    lv_chart_set_range(chart, LV_CHART_AXIS_SECONDARY_Y, 0, 400);
+    lv_chart_set_point_count(chart, 12);
+    lv_obj_set_style_radius(chart, 0, 0);
 
-    lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_CIRCULAR);
+    /*Create a scale also with 100% width*/
+    lv_obj_t * scale_bottom = lv_scale_create(wrapper);
+    lv_scale_set_mode(scale_bottom, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_obj_set_size(scale_bottom, lv_pct(100), 25);
+    lv_scale_set_total_tick_count(scale_bottom, 12);
+    lv_scale_set_major_tick_every(scale_bottom, 1);
+    lv_obj_set_style_pad_hor(scale_bottom, lv_chart_get_first_point_center_offset(chart), 0);
+
+    static const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec", NULL};
+    lv_scale_set_text_src(scale_bottom, month);
+
     /*Add two data series*/
-    ser1 = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
-    ser2 = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_SECONDARY_Y);
+    lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_lighten(LV_PALETTE_GREEN, 2), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_darken(LV_PALETTE_GREEN, 2), LV_CHART_AXIS_PRIMARY_Y);
 
+    /*Set the next points on 'ser1'*/
     uint32_t i;
-    for(i = 0; i < 10; i++) {
-        lv_chart_set_next_value(chart1, ser1, lv_rand(20, 90));
-        lv_chart_set_next_value(chart1, ser2, lv_rand(30, 70));
+    for(i = 0; i < 12; i++) {
+        lv_chart_set_next_value(chart, ser1, lv_rand(10, 60));
+        lv_chart_set_next_value(chart, ser2, lv_rand(50, 90));
     }
-
-    lv_timer_create(add_data, 200, NULL);
+    lv_chart_refresh(chart); /*Required after direct set*/
 }
 
 #endif

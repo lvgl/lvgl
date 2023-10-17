@@ -24,7 +24,7 @@ def button_event_handler(e,fe_quick_access_obj):
         if button.has_state(lv.STATE.CHECKED) :
             fe_quick_access_obj.add_flag(lv.obj.FLAG.HIDDEN)
         else :
-            fe_quick_access_obj.clear_flag(lv.obj.FLAG.HIDDEN)
+            fe_quick_access_obj.remove_flag(lv.obj.FLAG.HIDDEN)
 
 def dd_event_handler(e, file_explorer):
 
@@ -43,7 +43,7 @@ def dd_event_handler(e, file_explorer):
             # print("set sort to KIND")
             file_explorer.explorer_set_sort(lv.EXPLORER_SORT.KIND)
 
-file_explorer = lv.file_explorer(lv.scr_act())
+file_explorer = lv.file_explorer(lv.screen_active())
 
 if LV_USE_FS_WIN32 :
     file_explorer.explorer_open_dir("D:")

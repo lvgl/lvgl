@@ -83,7 +83,7 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_imgbtn_state_t state, const void * 
 
 
 /**
- * Use this function instead of `lv_obj_add/clear_state` to set a state manually
+ * Use this function instead of `lv_obj_add/remove_state` to set a state manually
  * @param imgbtn pointer to an image button object
  * @param state  the new state
  */

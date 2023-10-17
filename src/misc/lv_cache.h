@@ -121,6 +121,11 @@ typedef void (*lv_cache_release_cb)(lv_cache_entry_t * entry);
  */
 typedef void (*lv_cache_set_max_size_cb)(size_t size);
 
+/**
+ * Empty the cache.
+ */
+typedef void (*lv_cache_empty_cb)(void);
+
 typedef struct {
     lv_cache_add_cb add_cb;
     lv_cache_find_cb find_cb;
@@ -128,6 +133,7 @@ typedef struct {
     lv_cache_get_data_cb get_data_cb;
     lv_cache_release_cb release_cb;
     lv_cache_set_max_size_cb set_max_size_cb;
+    lv_cache_empty_cb empty_cb;
 
     lv_mutex_t mutex;
     size_t max_size;
@@ -142,6 +148,12 @@ typedef struct {
  * Initialize the cache module
  */
 void _lv_cache_init(void);
+
+/**
+ * Set new cache manager
+ * @param manager   the new cache manager with callback functions set
+ */
+void lv_cache_set_manager(lv_cache_manager_t * manager);
 
 /**
  * Add a new entry to the cache with the given size.

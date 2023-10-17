@@ -42,7 +42,7 @@ def scroll_event_cb(e):
 # Translate the object as they scroll
 #
 
-cont = lv.obj(lv.scr_act())
+cont = lv.obj(lv.screen_active())
 cont.set_size(200, 200)
 cont.center()
 cont.set_flex_flow(lv.FLEX_FLOW.COLUMN)

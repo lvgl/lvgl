@@ -38,7 +38,8 @@ const lv_obj_class_t lv_image_class = {
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_image_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "image",
 };
 
 /**********************
@@ -421,7 +422,7 @@ static void lv_image_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     img->pivot.y   = LV_PCT(50);
     img->obj_size_mode = LV_IMAGE_SIZE_MODE_VIRTUAL;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
 
     LV_TRACE_OBJ_CREATE("finished");

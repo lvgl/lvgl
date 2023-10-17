@@ -5,11 +5,11 @@ def set_angle(obj, v):
 # Create an arc which acts as a loader.
 #
 # Create an Arc
-arc = lv.arc(lv.scr_act())
+arc = lv.arc(lv.screen_active())
 arc.set_rotation(270)
 arc.set_bg_angles(0, 360)
 arc.remove_style(None, lv.PART.KNOB)   # Be sure the knob is not displayed
-arc.clear_flag(lv.obj.FLAG.CLICKABLE)  #To not allow adjusting by click
+arc.remove_flag(lv.obj.FLAG.CLICKABLE)  #To not allow adjusting by click
 arc.center()
 
 a = lv.anim_t()

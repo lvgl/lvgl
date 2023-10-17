@@ -28,7 +28,7 @@ label_dsc.text = "Some text on text canvas"
 cbuf = bytearray(_CANVAS_WIDTH * _CANVAS_HEIGHT * 4)
 # cbuf2 = bytearray(_CANVAS_WIDTH * _CANVAS_HEIGHT * 4)
 
-canvas = lv.canvas(lv.scr_act())
+canvas = lv.canvas(lv.screen_active())
 canvas.set_buffer(cbuf, _CANVAS_WIDTH, _CANVAS_HEIGHT, lv.COLOR_FORMAT.NATIVE)
 canvas.center()
 canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)

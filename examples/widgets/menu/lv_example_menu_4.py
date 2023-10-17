@@ -16,7 +16,7 @@ def float_button_event_cb(e):
     menu.set_load_page_event(cont, sub_page)
 
 # Create a menu object
-menu = lv.menu(lv.scr_act())
+menu = lv.menu(lv.screen_active())
 menu.set_size(320, 240)
 menu.center()
 
@@ -37,7 +37,7 @@ menu.set_load_page_event(cont, sub_page)
 
 menu.set_page(main_page)
 
-float_button = lv.button(lv.scr_act())
+float_button = lv.button(lv.screen_active())
 float_button.set_size(50, 50)
 float_button.add_flag(lv.obj.FLAG.FLOATING)
 float_button.align(lv.ALIGN.BOTTOM_RIGHT, -10, -10)

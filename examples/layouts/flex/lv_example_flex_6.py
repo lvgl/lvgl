@@ -3,7 +3,7 @@
 # Also demonstrate how horizontal scrolling works with RTL.
 #
 
-cont = lv.obj(lv.scr_act())
+cont = lv.obj(lv.screen_active())
 cont.set_style_base_dir(lv.BASE_DIR.RTL,0)
 cont.set_size(300, 220)
 cont.center()

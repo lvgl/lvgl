@@ -13,7 +13,7 @@ class NewTheme(lv.theme_t):
         self.style_button.set_border_width(3)
 
         # This theme is based on active theme
-        th_act = lv.theme_get_from_obj(lv.scr_act())
+        th_act = lv.theme_get_from_obj(lv.screen_active())
         # This theme will be applied only after base theme is applied
         self.set_parent(th_act)
 
@@ -25,7 +25,7 @@ class ExampleStyle_14:
         # Extending the current theme
         #
 
-        button = lv.button(lv.scr_act())
+        button = lv.button(lv.screen_active())
         button.align(lv.ALIGN.TOP_MID, 0, 20)
 
         label = lv.label(button)
@@ -33,7 +33,7 @@ class ExampleStyle_14:
 
         self.new_theme_init_and_set()
 
-        button = lv.button(lv.scr_act())
+        button = lv.button(lv.screen_active())
         button.align(lv.ALIGN.BOTTOM_MID, 0, -20)
 
         label = lv.label(button)

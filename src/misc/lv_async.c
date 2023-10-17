@@ -80,7 +80,7 @@ lv_result_t lv_async_call_cancel(lv_async_cb_t async_xcb, void * user_data)
 
             /*Match user function callback and user data*/
             if(info->cb == async_xcb && info->user_data == user_data) {
-                lv_timer_del(timer);
+                lv_timer_delete(timer);
                 lv_free(info);
                 res = LV_RESULT_OK;
             }
@@ -101,7 +101,7 @@ static void lv_async_timer_cb(lv_timer_t * timer)
     /*Save the info because an lv_async_call_cancel might delete it in the callback*/
     lv_async_info_t * info = (lv_async_info_t *)timer->user_data;
     lv_async_info_t info_save = *info;
-    lv_timer_del(timer);
+    lv_timer_delete(timer);
     lv_free(info);
 
     info_save.cb(info_save.user_data);

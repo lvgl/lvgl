@@ -10,7 +10,7 @@ lv_event_code_t exp_evt_code;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     btnm = lv_buttonmatrix_create(active_screen);
     TEST_ASSERT_NOT_NULL(btnm);
     event_triggered = false;

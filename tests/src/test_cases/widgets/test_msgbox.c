@@ -31,7 +31,7 @@ static const char * buttons_txts[] = {"Apply", "Cancel", NULL};
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
 }
 
 void tearDown(void)

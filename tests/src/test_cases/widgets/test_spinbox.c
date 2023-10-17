@@ -17,7 +17,7 @@ static const uint8_t SPINBOX_DECIMAL_POSITION = 1U;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     spinbox_negative_min_range = lv_spinbox_create(active_screen);
     spinbox_zero_min_range = lv_spinbox_create(active_screen);
     spinbox_events = lv_spinbox_create(active_screen);
@@ -33,9 +33,9 @@ void tearDown(void)
 {
     lv_group_remove_obj(spinbox_events);
 
-    lv_obj_del(spinbox_negative_min_range);
-    lv_obj_del(spinbox_zero_min_range);
-    lv_obj_del(spinbox_events);
+    lv_obj_delete(spinbox_negative_min_range);
+    lv_obj_delete(spinbox_zero_min_range);
+    lv_obj_delete(spinbox_events);
 
     lv_obj_clean(active_screen);
 }

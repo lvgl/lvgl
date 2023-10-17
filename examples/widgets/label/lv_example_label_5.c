@@ -19,7 +19,7 @@ void lv_example_label_5(void)
     lv_style_init(&label_style);
     lv_style_set_anim(&label_style, &animation_template);
 
-    lv_obj_t * label1 = lv_label_create(lv_scr_act());
+    lv_obj_t * label1 = lv_label_create(lv_screen_active());
     lv_label_set_long_mode(label1, LV_LABEL_LONG_SCROLL_CIRCULAR);      /*Circular scroll*/
     lv_obj_set_width(label1, 150);
     lv_label_set_text(label1, "It is a circularly scrolling text. ");

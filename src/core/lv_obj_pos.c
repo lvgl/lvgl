@@ -835,8 +835,8 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     /*Invalidate the object only if it belongs to the current or previous or one of the layers'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
     lv_display_t * disp   = lv_obj_get_disp(obj_scr);
-    if(obj_scr != lv_display_get_scr_act(disp) &&
-       obj_scr != lv_display_get_scr_prev(disp) &&
+    if(obj_scr != lv_display_get_screen_act(disp) &&
+       obj_scr != lv_display_get_screen_prev(disp) &&
        obj_scr != lv_display_get_layer_bottom(disp) &&
        obj_scr != lv_display_get_layer_top(disp) &&
        obj_scr != lv_display_get_layer_sys(disp)) {

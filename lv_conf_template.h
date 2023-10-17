@@ -31,9 +31,10 @@
  *=========================*/
 
 /* Possible values
- * - LV_STDLIB_BUILTIN: LVGL's built in implementation
- * - LV_STDLIB_CLIB:    Standard C functions, like malloc, strlen, etc
- * - LV_STDLIB_CUSTOM:  Implement the functions externally
+ * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
+ * - LV_STDLIB_CLIB:        Standard C functions, like malloc, strlen, etc
+ * - LV_STDLIB_MICROPYTHON: MicroPython implementation
+ * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
 #define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN
 #define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
@@ -168,6 +169,10 @@
      *0: Disable print timestamp*/
     #define LV_LOG_USE_TIMESTAMP 1
 
+    /*1: Print file and line number of the log;
+     *0: Do not print file and line number of the log*/
+    #define LV_LOG_USE_FILE_LINE 1
+
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #define LV_LOG_TRACE_MEM        1
     #define LV_LOG_TRACE_TIMER      1
@@ -177,7 +182,7 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
-	#define LV_LOG_TRACE_MSG		1
+    #define LV_LOG_TRACE_CACHE      1
 
 #endif  /*LV_USE_LOG*/
 
@@ -262,9 +267,14 @@
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
 #define LV_COLOR_MIX_ROUND_OFS 0
 
-
 /* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
-#define  LV_OBJ_STYLE_CACHE 1
+#define LV_OBJ_STYLE_CACHE 0
+
+/* Add `id` field to `lv_obj_t` */
+#define LV_USE_OBJ_ID 0
+
+/* Use lvgl builtin method for obj ID */
+#define LV_USE_OBJ_ID_BUILTIN 0
 
 /*=====================
  *  COMPILER SETTINGS
@@ -579,6 +589,9 @@
 /*LODEPNG decoder library*/
 #define LV_USE_LODEPNG 0
 
+/*PNG decoder(libpng) library*/
+#define LV_USE_LIBPNG 0
+
 /*BMP decoder library*/
 #define LV_USE_BMP 0
 
@@ -686,8 +699,8 @@
     #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
 #endif
 
-/*1: Enable a published subscriber based messaging system */
-#define LV_USE_MSG 0
+/*1: Enable an observer pattern implementation*/
+#define LV_USE_OBSERVER 0
 
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
@@ -729,18 +742,23 @@
     #define LV_SDL_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
     #define LV_SDL_BUF_COUNT       1   /*1 or 2*/
     #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
-    #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
+    #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL windows are closed*/
 #endif
 
 /*Driver for /dev/fb*/
 #define LV_USE_LINUX_FBDEV      0
 #if LV_USE_LINUX_FBDEV
     #define LV_LINUX_FBDEV_BSD           0
-    #define LV_LINUX_FBDEV_NUTTX         0
     #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
     #define LV_LINUX_FBDEV_BUFFER_COUNT  0
     #define LV_LINUX_FBDEV_BUFFER_SIZE   60
 #endif
+
+/*Use Nuttx to open window and handle touchscreen*/
+#define LV_USE_NUTTX    0
+
+/*Use Nuttx custom init API to open window and handle touchscreen*/
+#define LV_USE_NUTTX_CUSTOM_INIT    0
 
 /*Driver for /dev/lcd*/
 #define LV_USE_NUTTX_LCD      0
@@ -749,14 +767,14 @@
     #define LV_NUTTX_LCD_BUFFER_SIZE     60
 #endif
 
+/*Driver for /dev/input*/
+#define LV_USE_NUTTX_TOUCHSCREEN    0
+
 /*Driver for /dev/dri/card*/
 #define LV_USE_LINUX_DRM        0
 
 /*Interface for TFT_eSPI*/
 #define LV_USE_TFT_ESPI         0
-
-/*Driver for /dev/input*/
-#define LV_USE_NUTTX_TOUCHSCREEN    0
 
 /*==================
 * EXAMPLES

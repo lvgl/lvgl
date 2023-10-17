@@ -37,7 +37,7 @@ static lv_obj_t * list;
  **********************/
 void lv_demo_scroll(void)
 {
-    lv_obj_t * panel = lv_obj_create(lv_scr_act());
+    lv_obj_t * panel = lv_obj_create(lv_screen_active());
     lv_obj_set_style_shadow_width(panel, 16, 0);
     lv_obj_set_style_shadow_ofs_y(panel, 8, 0);
     lv_obj_set_style_shadow_ofs_x(panel, 4, 0);
@@ -94,8 +94,8 @@ static lv_obj_t * switch_create(lv_obj_t * parent, const char * title, lv_obj_fl
         lv_obj_add_flag(list, flag);
     }
     else {
-        lv_obj_clear_state(sw, LV_STATE_CHECKED);
-        lv_obj_clear_flag(list, flag);
+        lv_obj_remove_state(sw, LV_STATE_CHECKED);
+        lv_obj_remove_flag(list, flag);
     }
 
     return cont;
@@ -107,7 +107,7 @@ static void generic_swicth_event_cb(lv_event_t * e)
     lv_obj_flag_t flag = (lv_obj_flag_t)((lv_uintptr_t)lv_event_get_user_data(e));
 
     if(lv_obj_has_state(sw, LV_STATE_CHECKED)) lv_obj_add_flag(list, flag);
-    else lv_obj_clear_flag(list, flag);
+    else lv_obj_remove_flag(list, flag);
 }
 
 #endif

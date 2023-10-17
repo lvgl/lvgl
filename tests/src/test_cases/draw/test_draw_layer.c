@@ -6,14 +6,14 @@
 void setUp(void)
 {
     /* Function run before every test */
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
 }
 
 void tearDown(void)
 {
     /* Function run after every test */
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 }
 
 
@@ -22,7 +22,7 @@ static const char * lorem_ipsum =
 
 static lv_obj_t * create_test_obj(const char * text, bool simple)
 {
-    lv_obj_t * obj = lv_button_create(lv_scr_act());
+    lv_obj_t * obj = lv_button_create(lv_screen_active());
     lv_obj_set_size(obj, 120, 80);
 
     if(simple) {

@@ -19,7 +19,7 @@ class LvExampleAnim_3():
 
         self.p1 = 0
         self.p2 = 0
-        self.cont = lv.obj(lv.scr_act())
+        self.cont = lv.obj(lv.screen_active())
         self.cont.set_style_pad_all(2, lv.PART.MAIN)
         self.cont.set_style_pad_column(10, lv.PART.MAIN)
         self.cont.set_style_pad_row(10, lv.PART.MAIN)
@@ -42,7 +42,7 @@ class LvExampleAnim_3():
         self.anim_obj = lv.obj(par)
         self.anim_obj.set_size(30, 30)
         self.anim_obj.set_align(lv.ALIGN.TOP_LEFT)
-        self.anim_obj.clear_flag(lv.obj.FLAG.SCROLLABLE)
+        self.anim_obj.remove_flag(lv.obj.FLAG.SCROLLABLE)
         self.anim_obj.set_style_bg_color(lv.palette_main(lv.PALETTE.RED), lv.PART.MAIN)
         self.anim_obj.set_grid_cell(lv.GRID_ALIGN.START, 0, 1,lv.GRID_ALIGN.START, 0, 1)
 

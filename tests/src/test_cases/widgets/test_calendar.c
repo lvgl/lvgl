@@ -27,7 +27,7 @@ static lv_obj_t * calendar = NULL;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     calendar = lv_calendar_create(active_screen);
 }
 

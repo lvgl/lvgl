@@ -5,7 +5,7 @@ def event_handler(e):
         print("Button {:d} clicked".format(obj.get_index()))
 
 
-win = lv.win(lv.scr_act())
+win = lv.win(lv.screen_active())
 button1 = win.add_button(lv.SYMBOL.LEFT, 40)
 button1.add_event(event_handler, lv.EVENT.ALL, None)
 win.add_title("A title")

@@ -40,7 +40,8 @@ const lv_obj_class_t lv_tabview_class = {
     .width_def = LV_PCT(100),
     .height_def = LV_PCT(100),
     .base_class = &lv_obj_class,
-    .instance_size = sizeof(lv_tabview_t)
+    .instance_size = sizeof(lv_tabview_t),
+    .name = "tabview",
 };
 
 typedef struct {
@@ -264,7 +265,7 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
     }
     lv_obj_add_flag(cont, LV_OBJ_FLAG_SCROLL_ONE);
-    lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_remove_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 }
 
 static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)

@@ -17,7 +17,7 @@ static lv_obj_t * empty_label;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     label = lv_label_create(active_screen);
     long_label = lv_label_create(active_screen);
     long_label_multiline = lv_label_create(active_screen);
@@ -30,10 +30,10 @@ void setUp(void)
 
 void tearDown(void)
 {
-    lv_obj_del(label);
-    lv_obj_del(long_label);
-    lv_obj_del(long_label_multiline);
-    lv_obj_del(empty_label);
+    lv_obj_delete(label);
+    lv_obj_delete(long_label);
+    lv_obj_delete(long_label_multiline);
+    lv_obj_delete(empty_label);
 }
 
 void test_label_creation(void)

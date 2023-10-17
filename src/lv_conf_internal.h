@@ -75,9 +75,10 @@
  *=========================*/
 
 /* Possible values
- * - LV_STDLIB_BUILTIN: LVGL's built in implementation
- * - LV_STDLIB_CLIB:    Standard C functions, like malloc, strlen, etc
- * - LV_STDLIB_CUSTOM:  Implement the functions externally
+ * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
+ * - LV_STDLIB_CLIB:        Standard C functions, like malloc, strlen, etc
+ * - LV_STDLIB_MICROPYTHON: MicroPython implementation
+ * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
 #ifndef LV_USE_STDLIB_MALLOC
     #ifdef CONFIG_LV_USE_STDLIB_MALLOC
@@ -400,6 +401,20 @@
         #endif
     #endif
 
+    /*1: Print file and line number of the log;
+     *0: Do not print file and line number of the log*/
+    #ifndef LV_LOG_USE_FILE_LINE
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LOG_USE_FILE_LINE
+                #define LV_LOG_USE_FILE_LINE CONFIG_LV_LOG_USE_FILE_LINE
+            #else
+                #define LV_LOG_USE_FILE_LINE 0
+            #endif
+        #else
+            #define LV_LOG_USE_FILE_LINE 1
+        #endif
+    #endif
+
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #ifndef LV_LOG_TRACE_MEM
         #ifdef _LV_KCONFIG_PRESENT
@@ -489,17 +504,17 @@
             #define LV_LOG_TRACE_ANIM       1
         #endif
     #endif
-	#ifndef LV_LOG_TRACE_MSG
-	    #ifdef _LV_KCONFIG_PRESENT
-	        #ifdef CONFIG_LV_LOG_TRACE_MSG
-	            #define LV_LOG_TRACE_MSG CONFIG_LV_LOG_TRACE_MSG
-	        #else
-	            #define LV_LOG_TRACE_MSG 0
-	        #endif
-	    #else
-	        #define LV_LOG_TRACE_MSG		1
-	    #endif
-	#endif
+    #ifndef LV_LOG_TRACE_CACHE
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LOG_TRACE_CACHE
+                #define LV_LOG_TRACE_CACHE CONFIG_LV_LOG_TRACE_CACHE
+            #else
+                #define LV_LOG_TRACE_CACHE 0
+            #endif
+        #else
+            #define LV_LOG_TRACE_CACHE      1
+        #endif
+    #endif
 
 #endif  /*LV_USE_LOG*/
 
@@ -718,17 +733,30 @@
     #endif
 #endif
 
-
 /* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
 #ifndef LV_OBJ_STYLE_CACHE
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_OBJ_STYLE_CACHE
-            #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
-        #else
-            #define LV_OBJ_STYLE_CACHE 0
-        #endif
+    #ifdef CONFIG_LV_OBJ_STYLE_CACHE
+        #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
     #else
-        #define  LV_OBJ_STYLE_CACHE 1
+        #define LV_OBJ_STYLE_CACHE 0
+    #endif
+#endif
+
+/* Add `id` field to `lv_obj_t` */
+#ifndef LV_USE_OBJ_ID
+    #ifdef CONFIG_LV_USE_OBJ_ID
+        #define LV_USE_OBJ_ID CONFIG_LV_USE_OBJ_ID
+    #else
+        #define LV_USE_OBJ_ID 0
+    #endif
+#endif
+
+/* Use lvgl builtin method for obj ID */
+#ifndef LV_USE_OBJ_ID_BUILTIN
+    #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
+        #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+    #else
+        #define LV_USE_OBJ_ID_BUILTIN 0
     #endif
 #endif
 
@@ -1943,6 +1971,15 @@
     #endif
 #endif
 
+/*PNG decoder(libpng) library*/
+#ifndef LV_USE_LIBPNG
+    #ifdef CONFIG_LV_USE_LIBPNG
+        #define LV_USE_LIBPNG CONFIG_LV_USE_LIBPNG
+    #else
+        #define LV_USE_LIBPNG 0
+    #endif
+#endif
+
 /*BMP decoder library*/
 #ifndef LV_USE_BMP
     #ifdef CONFIG_LV_USE_BMP
@@ -2240,12 +2277,12 @@
     #endif
 #endif
 
-/*1: Enable a published subscriber based messaging system */
-#ifndef LV_USE_MSG
-    #ifdef CONFIG_LV_USE_MSG
-        #define LV_USE_MSG CONFIG_LV_USE_MSG
+/*1: Enable an observer pattern implementation*/
+#ifndef LV_USE_OBSERVER
+    #ifdef CONFIG_LV_USE_OBSERVER
+        #define LV_USE_OBSERVER CONFIG_LV_USE_OBSERVER
     #else
-        #define LV_USE_MSG 0
+        #define LV_USE_OBSERVER 0
     #endif
 #endif
 
@@ -2391,7 +2428,7 @@
                 #define LV_SDL_DIRECT_EXIT 0
             #endif
         #else
-            #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
+            #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL windows are closed*/
         #endif
     #endif
 #endif
@@ -2410,13 +2447,6 @@
             #define LV_LINUX_FBDEV_BSD CONFIG_LV_LINUX_FBDEV_BSD
         #else
             #define LV_LINUX_FBDEV_BSD           0
-        #endif
-    #endif
-    #ifndef LV_LINUX_FBDEV_NUTTX
-        #ifdef CONFIG_LV_LINUX_FBDEV_NUTTX
-            #define LV_LINUX_FBDEV_NUTTX CONFIG_LV_LINUX_FBDEV_NUTTX
-        #else
-            #define LV_LINUX_FBDEV_NUTTX         0
         #endif
     #endif
     #ifndef LV_LINUX_FBDEV_RENDER_MODE
@@ -2439,6 +2469,24 @@
         #else
             #define LV_LINUX_FBDEV_BUFFER_SIZE   60
         #endif
+    #endif
+#endif
+
+/*Use Nuttx to open window and handle touchscreen*/
+#ifndef LV_USE_NUTTX
+    #ifdef CONFIG_LV_USE_NUTTX
+        #define LV_USE_NUTTX CONFIG_LV_USE_NUTTX
+    #else
+        #define LV_USE_NUTTX    0
+    #endif
+#endif
+
+/*Use Nuttx custom init API to open window and handle touchscreen*/
+#ifndef LV_USE_NUTTX_CUSTOM_INIT
+    #ifdef CONFIG_LV_USE_NUTTX_CUSTOM_INIT
+        #define LV_USE_NUTTX_CUSTOM_INIT CONFIG_LV_USE_NUTTX_CUSTOM_INIT
+    #else
+        #define LV_USE_NUTTX_CUSTOM_INIT    0
     #endif
 #endif
 
@@ -2467,6 +2515,15 @@
     #endif
 #endif
 
+/*Driver for /dev/input*/
+#ifndef LV_USE_NUTTX_TOUCHSCREEN
+    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+    #else
+        #define LV_USE_NUTTX_TOUCHSCREEN    0
+    #endif
+#endif
+
 /*Driver for /dev/dri/card*/
 #ifndef LV_USE_LINUX_DRM
     #ifdef CONFIG_LV_USE_LINUX_DRM
@@ -2482,15 +2539,6 @@
         #define LV_USE_TFT_ESPI CONFIG_LV_USE_TFT_ESPI
     #else
         #define LV_USE_TFT_ESPI         0
-    #endif
-#endif
-
-/*Driver for /dev/input*/
-#ifndef LV_USE_NUTTX_TOUCHSCREEN
-    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
-        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
-    #else
-        #define LV_USE_NUTTX_TOUCHSCREEN    0
     #endif
 #endif
 

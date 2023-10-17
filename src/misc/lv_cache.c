@@ -42,6 +42,25 @@ void _lv_cache_init(void)
     lv_mutex_init(&_cache_manager.mutex);
 }
 
+void lv_cache_set_manager(lv_cache_manager_t * manager)
+{
+    LV_ASSERT(_cache_manager.locked);
+    if(manager == NULL) return;
+
+    if(_cache_manager.empty_cb != NULL) _cache_manager.empty_cb();
+    else if(_cache_manager.set_max_size_cb != NULL) _cache_manager.set_max_size_cb(0);
+
+    _cache_manager.add_cb = manager->add_cb;
+    _cache_manager.find_cb = manager->find_cb;
+    _cache_manager.invalidate_cb = manager->invalidate_cb;
+    _cache_manager.get_data_cb = manager->get_data_cb;
+    _cache_manager.release_cb = manager->release_cb;
+    _cache_manager.set_max_size_cb = manager->set_max_size_cb;
+    _cache_manager.empty_cb = manager->empty_cb;
+
+    if(_cache_manager.set_max_size_cb != NULL) _cache_manager.set_max_size_cb(_cache_manager.max_size);
+}
+
 lv_cache_entry_t * lv_cache_add(size_t size)
 {
     LV_ASSERT(_cache_manager.locked);
@@ -57,7 +76,6 @@ lv_cache_entry_t * lv_cache_find(const void * src_ptr, lv_cache_src_type_t src_t
 
     return _cache_manager.find_cb(src_ptr, src_type, param1, param2);
 }
-
 
 void lv_cache_invalidate(lv_cache_entry_t * entry)
 {

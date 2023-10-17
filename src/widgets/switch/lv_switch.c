@@ -58,7 +58,8 @@ const lv_obj_class_t lv_switch_class = {
     .height_def = (4 * LV_DPI_DEF) / 17,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_switch_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "switch",
 };
 
 /**********************
@@ -90,7 +91,7 @@ static void lv_switch_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     sw->anim_state = LV_SWITCH_ANIM_STATE_INV;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
@@ -102,7 +103,7 @@ static void lv_switch_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_UNUSED(class_p);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    lv_anim_del(sw, NULL);
+    lv_anim_delete(sw, NULL);
 }
 
 static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
@@ -247,7 +248,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
         uint32_t anim_dur = (anim_dur_full * LV_ABS(anim_start - anim_end)) / LV_SWITCH_ANIM_STATE_END;
 
         /*Stop the previous animation if it exists*/
-        lv_anim_del(sw, NULL);
+        lv_anim_delete(sw, NULL);
 
         lv_anim_t a;
         lv_anim_init(&a);

@@ -35,16 +35,10 @@ extern "C" {
 void lv_init(void);
 
 
-#if LV_ENABLE_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-
 /**
  * Deinit the 'lv' library
- * Currently only implemented when not using custom allocators,
- * or using custom 'lv_global'.
  */
 void lv_deinit(void);
-
-#endif
 
 /**
  * Returns whether the 'lv' library is currently initialized

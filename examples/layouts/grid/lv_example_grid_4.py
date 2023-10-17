@@ -9,7 +9,7 @@ row_dsc = [40, 40, 40, lv.GRID_TEMPLATE_LAST]
 # Add space between the columns and move the rows to the bottom (end)
 
 # Create a container with grid
-cont = lv.obj(lv.scr_act())
+cont = lv.obj(lv.screen_active())
 cont.set_grid_align(lv.GRID_ALIGN.SPACE_BETWEEN, lv.GRID_ALIGN.END)
 cont.set_grid_dsc_array(col_dsc, row_dsc)
 cont.set_size(300, 220)

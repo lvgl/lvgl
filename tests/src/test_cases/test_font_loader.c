@@ -64,7 +64,7 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 
     lv_font_free(font_1_bin);
     lv_font_free(font_2_bin);
@@ -78,7 +78,7 @@ static void common(void)
     compare_fonts(&font_3, font_3_bin);
 
     /* create labels for testing */
-    lv_obj_t * scr = lv_scr_act();
+    lv_obj_t * scr = lv_screen_active();
     lv_obj_t * label1 = lv_label_create(scr);
     lv_obj_t * label2 = lv_label_create(scr);
     lv_obj_t * label3 = lv_label_create(scr);

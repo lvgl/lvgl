@@ -132,7 +132,7 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
  * Delete a lv_timer
  * @param timer pointer to an lv_timer
  */
-void lv_timer_del(lv_timer_t * timer);
+void lv_timer_delete(lv_timer_t * timer);
 
 /**
  * Pause/resume a timer.
@@ -168,6 +168,13 @@ void lv_timer_ready(lv_timer_t * timer);
  * @param repeat_count -1 : infinity;  0 : stop ;  n>0: residual times
  */
 void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count);
+
+/**
+ * Set custom parameter to the lv_timer.
+ * @param timer pointer to a lv_timer.
+ * @param user_data custom parameter
+ */
+void lv_timer_set_user_data(lv_timer_t * timer, void * user_data);
 
 /**
  * Reset a lv_timer.

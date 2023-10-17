@@ -30,7 +30,7 @@ def ta_event_cb(e):
 #
 # Create the text area
 
-ta = lv.textarea(lv.scr_act())
+ta = lv.textarea(lv.screen_active())
 ta.add_event(ta_event_cb, lv.EVENT.VALUE_CHANGED, None)
 ta.set_accepted_chars("0123456789:")
 ta.set_max_length(5)
@@ -39,7 +39,7 @@ ta.set_text("")
 ta.add_state(lv.STATE.FOCUSED)
 
 # Create a keyboard
-kb = lv.keyboard(lv.scr_act())
+kb = lv.keyboard(lv.screen_active())
 kb.set_size(lv.pct(100), lv.pct(50))
 kb.set_mode(lv.keyboard.MODE.NUMBER)
 kb.set_textarea(ta)

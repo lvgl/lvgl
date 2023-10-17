@@ -5,7 +5,7 @@ import display_driver
 bg_color = lv.palette_lighten(lv.PALETTE.LIGHT_BLUE, 5)
 fg_color = lv.palette_darken(lv.PALETTE.BLUE, 4)
 
-barcode = lv.barcode(lv.scr_act())
+barcode = lv.barcode(lv.screen_active())
 barcode.set_height(50)
 barcode.center()
 

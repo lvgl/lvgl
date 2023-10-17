@@ -9,13 +9,13 @@ def slider_event_cb(e):
 #
 
 # Create a slider in the center of the display
-slider = lv.slider(lv.scr_act())
+slider = lv.slider(lv.screen_active())
 slider.set_width(200)                                              # Set the width
 slider.center()                                                    # Align to the center of the parent (screen)
 slider.add_event(slider_event_cb, lv.EVENT.VALUE_CHANGED, None) # Assign an event function
 
 # Create a label above the slider
-label = lv.label(lv.scr_act())
+label = lv.label(lv.screen_active())
 label.set_text("0")
 label.align_to(slider, lv.ALIGN.OUT_TOP_MID, 0, -15)               # Align below the slider
 

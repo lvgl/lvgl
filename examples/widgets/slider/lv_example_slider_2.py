@@ -35,7 +35,7 @@ style_pressed_color.init()
 style_pressed_color.set_bg_color(lv.palette_darken(lv.PALETTE.CYAN, 2))
 
 # Create a slider and add the style
-slider = lv.slider(lv.scr_act())
+slider = lv.slider(lv.screen_active())
 slider.remove_style_all()                   # Remove the styles coming from the theme
 
 slider.add_style(style_main, lv.PART.MAIN)

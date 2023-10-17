@@ -1,5 +1,5 @@
 /**
- * @file lv_image_cache.c
+ * @file lv_cache_builtin.c
  *
  */
 
@@ -25,14 +25,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
 static lv_cache_entry_t * add_cb(size_t size);
 static lv_cache_entry_t * find_cb(const void * src, lv_cache_src_type_t src_type, uint32_t param1, uint32_t param2);
 static void invalidate_cb(lv_cache_entry_t * entry);
 static const void * get_data_cb(lv_cache_entry_t * entry);
 static void release_cb(lv_cache_entry_t * entry);
 static void set_max_size_cb(size_t new_size);
-static bool drop_yougest(void);
+static void empty_cb(void);
+static bool drop_youngest(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -41,6 +41,11 @@ static bool drop_yougest(void);
 /**********************
  *      MACROS
  **********************/
+#if LV_USE_LOG && LV_LOG_TRACE_CACHE
+    #define LV_TRACE_CACHE(...) LV_LOG_TRACE(__VA_ARGS__)
+#else
+    #define LV_TRACE_CACHE(...)
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -48,17 +53,17 @@ static bool drop_yougest(void);
 
 void _lv_cache_builtin_init(void)
 {
-    lv_memzero(&_cache_manager, sizeof(lv_cache_manager_t));
+    lv_memzero(&dsc, sizeof(lv_cache_builtin_dsc_t));
+    _lv_ll_init(&dsc.entry_ll, sizeof(lv_cache_entry_t));
+
     _cache_manager.add_cb = add_cb;
     _cache_manager.find_cb = find_cb;
     _cache_manager.invalidate_cb = invalidate_cb;
     _cache_manager.get_data_cb = get_data_cb;
     _cache_manager.release_cb = release_cb;
     _cache_manager.set_max_size_cb = set_max_size_cb;
-
-    _lv_ll_init(&dsc.entry_ll, sizeof(lv_cache_entry_t));
+    _cache_manager.empty_cb = empty_cb;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -73,7 +78,7 @@ static lv_cache_entry_t * add_cb(size_t size)
     if(!temporary) {
         /*Keep dropping items until there is enough space*/
         while(dsc.cur_size + size > _cache_manager.max_size) {
-            bool ret = drop_yougest();
+            bool ret = drop_youngest();
 
             /*No item could be dropped.
              *It can happen because the usage_count of the remaining items are not zero.*/
@@ -82,37 +87,36 @@ static lv_cache_entry_t * add_cb(size_t size)
                 break;
             }
         }
-
     }
 
-    lv_cache_entry_t * e = _lv_ll_ins_head(&dsc.entry_ll);
-    lv_memzero(e, sizeof(lv_cache_entry_t));
-    e->data_size = size;
-    e->weight = 1;
-    e->temporary = temporary;
+    lv_cache_entry_t * entry = _lv_ll_ins_head(&dsc.entry_ll);
+    lv_memzero(entry, sizeof(lv_cache_entry_t));
+    entry->data_size = size;
+    entry->weight = 1;
+    entry->temporary = temporary;
 
     if(temporary) {
-        LV_LOG_USER("cache add temporary: %"LV_PRIu32, (uint32_t)size);
+        LV_TRACE_CACHE("Add temporary cache: %lu bytes", (unsigned long)size);
     }
     else {
-        LV_LOG_USER("cache add: %"LV_PRIu32, (uint32_t)size);
+        LV_TRACE_CACHE("Add cache: %lu bytes", (unsigned long)size);
         dsc.cur_size += size;
     }
 
-    return e;
+    return entry;
 }
 
 static lv_cache_entry_t * find_cb(const void * src, lv_cache_src_type_t src_type, uint32_t param1, uint32_t param2)
 {
-    lv_cache_entry_t * e = _lv_ll_get_head(&dsc.entry_ll);
-    while(e) {
-        if(param1 == e->param1 && param2 == e->param2 && src_type == e->src_type &&
-           ((src_type == LV_CACHE_SRC_TYPE_PTR && src == e->src) ||
-            (src_type == LV_CACHE_SRC_TYPE_STR && strcmp(src, e->src) == 0))) {
-            return e;
+    lv_cache_entry_t * entry = _lv_ll_get_head(&dsc.entry_ll);
+    while(entry) {
+        if(param1 == entry->param1 && param2 == entry->param2 && src_type == entry->src_type &&
+           ((src_type == LV_CACHE_SRC_TYPE_PTR && src == entry->src) ||
+            (src_type == LV_CACHE_SRC_TYPE_STR && strcmp(src, entry->src) == 0))) {
+            return entry;
         }
 
-        e = _lv_ll_get_next(&dsc.entry_ll, e);
+        entry = _lv_ll_get_next(&dsc.entry_ll, entry);
     }
 
     return NULL;
@@ -123,7 +127,7 @@ static void invalidate_cb(lv_cache_entry_t * entry)
     if(entry == NULL) return;
 
     dsc.cur_size -= entry->data_size;
-    LV_LOG_USER("cache drop %"LV_PRIu32, (uint32_t)entry->data_size);
+    LV_TRACE_CACHE("Drop cache: %u bytes", (uint32_t)entry->data_size);
 
     if(entry->free_src) lv_free((void *)entry->src);
     if(entry->free_data) lv_draw_buf_free((void *)entry->data);
@@ -164,7 +168,7 @@ static void release_cb(lv_cache_entry_t * entry)
 static void set_max_size_cb(size_t new_size)
 {
     while(dsc.cur_size > new_size) {
-        bool ret = drop_yougest();
+        bool ret = drop_youngest();
 
         /*No item could be dropped.
          *It can happen because the usage_count of the remaining items are not zero.*/
@@ -172,23 +176,32 @@ static void set_max_size_cb(size_t new_size)
     }
 }
 
-static bool drop_yougest(void)
+static void empty_cb(void)
 {
+    lv_cache_entry_t * entry_to_drop = NULL;
+    lv_cache_entry_t * entry = _lv_ll_get_head(&dsc.entry_ll);
+    while(entry) {
+        entry_to_drop = entry;
+        entry = _lv_ll_get_next(&dsc.entry_ll, entry);
+        invalidate_cb(entry_to_drop);
+    }
+}
 
+static bool drop_youngest(void)
+{
     int32_t life_min = INT32_MAX;
-    lv_cache_entry_t * e_min = NULL;
+    lv_cache_entry_t * entry_to_drop = NULL;
 
-    lv_cache_entry_t * e = _lv_ll_get_head(&dsc.entry_ll);
-    while(e) {
-        if(e->life < life_min && e->usage_count == 0) e_min = e;
-        e = _lv_ll_get_next(&dsc.entry_ll, e);
+    lv_cache_entry_t * entry = _lv_ll_get_head(&dsc.entry_ll);
+    while(entry) {
+        if(entry->life < life_min && entry->usage_count == 0) entry_to_drop = entry;
+        entry = _lv_ll_get_next(&dsc.entry_ll, entry);
     }
 
-    if(e_min == NULL) {
+    if(entry_to_drop == NULL) {
         return false;
     }
 
-    invalidate_cb(e_min);
+    invalidate_cb(entry_to_drop);
     return true;
-
 }

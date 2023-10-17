@@ -39,21 +39,24 @@ const lv_obj_class_t lv_msgbox_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_DPI_DEF * 2,
     .height_def = LV_SIZE_CONTENT,
-    .instance_size = sizeof(lv_msgbox_t)
+    .instance_size = sizeof(lv_msgbox_t),
+    .name = "msgbox",
 };
 
 const lv_obj_class_t lv_msgbox_content_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
-    .instance_size = sizeof(lv_obj_t)
+    .instance_size = sizeof(lv_obj_t),
+    .name = "msgbox-content",
 };
 
 const lv_obj_class_t lv_msgbox_backdrop_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
     .height_def = LV_PCT(100),
-    .instance_size = sizeof(lv_obj_t)
+    .instance_size = sizeof(lv_obj_t),
+    .name = "msgbox-backdrop",
 };
 
 /**********************
@@ -74,7 +77,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
         parent = lv_obj_class_create_obj(&lv_msgbox_backdrop_class, lv_layer_top());
         LV_ASSERT_MALLOC(parent);
         lv_obj_class_init_obj(parent);
-        lv_obj_clear_flag(parent, LV_OBJ_FLAG_IGNORE_LAYOUT);
+        lv_obj_remove_flag(parent, LV_OBJ_FLAG_IGNORE_LAYOUT);
         lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
     }
 
@@ -194,14 +197,14 @@ const char * lv_msgbox_get_active_button_text(lv_obj_t * mbox)
 
 void lv_msgbox_close(lv_obj_t * mbox)
 {
-    if(lv_obj_has_flag(mbox, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_del(lv_obj_get_parent(mbox));
-    else lv_obj_del(mbox);
+    if(lv_obj_has_flag(mbox, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_delete(lv_obj_get_parent(mbox));
+    else lv_obj_delete(mbox);
 }
 
 void lv_msgbox_close_async(lv_obj_t * dialog)
 {
-    if(lv_obj_has_flag(dialog, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_del_async(lv_obj_get_parent(dialog));
-    else lv_obj_del_async(dialog);
+    if(lv_obj_has_flag(dialog, LV_MSGBOX_FLAG_AUTO_PARENT)) lv_obj_delete_async(lv_obj_get_parent(dialog));
+    else lv_obj_delete_async(dialog);
 }
 
 /**********************

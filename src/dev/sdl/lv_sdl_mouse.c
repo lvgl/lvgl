@@ -95,6 +95,9 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
             win_id = event->tfinger.windowID;
 #endif
             break;
+        case SDL_WINDOWEVENT:
+            win_id = event->window.windowID;
+            break;
         default:
             return;
     }
@@ -119,9 +122,17 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
     uint8_t zoom = lv_sdl_window_get_zoom(disp);
 
     switch(event->type) {
+        case SDL_WINDOWEVENT:
+            if(event->window.event == SDL_WINDOWEVENT_LEAVE) {
+                indev_dev->left_button_down = false;
+            }
+            break;
         case SDL_MOUSEBUTTONUP:
             if(event->button.button == SDL_BUTTON_LEFT)
                 indev_dev->left_button_down = false;
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            indev_dev->left_button_down = false;
             break;
         case SDL_MOUSEBUTTONDOWN:
             if(event->button.button == SDL_BUTTON_LEFT) {

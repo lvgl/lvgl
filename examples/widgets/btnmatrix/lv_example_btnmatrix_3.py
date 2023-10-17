@@ -45,7 +45,7 @@ style_button.set_radius(0)
 
 map = [lv.SYMBOL.LEFT,"1","2", "3", "4", "5",lv.SYMBOL.RIGHT, ""]
 
-buttonm = lv.buttonmatrix(lv.scr_act())
+buttonm = lv.buttonmatrix(lv.screen_active())
 buttonm.set_map(map)
 buttonm.add_style(style_bg, 0)
 buttonm.add_style(style_button, lv.PART.ITEMS)

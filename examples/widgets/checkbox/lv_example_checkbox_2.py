@@ -21,7 +21,7 @@ class LV_Example_Checkbox_2:
         self.style_radio_chk.init()
         self.style_radio_chk.set_bg_image_src(None)
 
-        self.cont1 = lv.obj(lv.scr_act())
+        self.cont1 = lv.obj(lv.screen_active())
         self.cont1.set_flex_flow(lv.FLEX_FLOW.COLUMN)
         self.cont1.set_size(lv.pct(40), lv.pct(80))
         self.cont1.add_event(self.radio_event_handler, lv.EVENT.CLICKED, None)
@@ -34,7 +34,7 @@ class LV_Example_Checkbox_2:
         #lv_obj_add_state(lv_obj_get_child(self.cont1, 0), LV_STATE_CHECKED);
         self.cont1.get_child(0).add_state(lv.STATE.CHECKED)
 
-        self.cont2 = lv.obj(lv.scr_act())
+        self.cont2 = lv.obj(lv.screen_active())
         self.cont2.set_flex_flow(lv.FLEX_FLOW.COLUMN)
         self.cont2.set_size(lv.pct(40), lv.pct(80))
         self.cont2.set_x(lv.pct(50))
@@ -61,7 +61,7 @@ class LV_Example_Checkbox_2:
         if act_cb == cont:
             return
 
-        old_cb.clear_state(lv.STATE.CHECKED)          # Uncheck the previous radio button
+        old_cb.remove_state(lv.STATE.CHECKED)          # Uncheck the previous radio button
         act_cb.add_state(lv.STATE.CHECKED)            # Uncheck the current radio button
 
         if cont == self.cont1:

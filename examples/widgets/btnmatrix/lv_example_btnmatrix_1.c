@@ -21,7 +21,7 @@ static const char * btnm_map[] = {"1", "2", "3", "4", "5", "\n",
 
 void lv_example_buttonmatrix_1(void)
 {
-    lv_obj_t * btnm1 = lv_buttonmatrix_create(lv_scr_act());
+    lv_obj_t * btnm1 = lv_buttonmatrix_create(lv_screen_active());
     lv_buttonmatrix_set_map(btnm1, btnm_map);
     lv_buttonmatrix_set_button_width(btnm1, 10, 2);        /*Make "Action1" twice as wide as "Action2"*/
     lv_buttonmatrix_set_button_ctrl(btnm1, 10, LV_BUTTONMATRIX_CTRL_CHECKABLE);

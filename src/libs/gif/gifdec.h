@@ -42,7 +42,7 @@ typedef struct _gd_GIF {
     void (*application)(struct _gd_GIF * gif, char id[8], char auth[3]);
     uint16_t fx, fy, fw, fh;
     uint8_t bgindex;
-    uint8_t * canvas, *frame;
+    uint8_t * canvas, * frame;
 } gd_GIF;
 
 gd_GIF * gd_open_gif_file(const char * fname);

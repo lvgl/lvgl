@@ -107,7 +107,7 @@ Architecture
 ~~~~~~~~~~~~
 
 - |uncheck| Add more feature to key presses (long press, release, etc).
-- |uncheck| `lv_img_set_src()` use “type-aware” parameter and rework image decoders.
+- |uncheck| `lv_image_set_src()` use “type-aware” parameter and rework image decoders.
   (see `here <https://github.com/lvgl/lvgl/tree/arch/img-decode-rework>`__)
 - |uncheck| `C++ binding <https://github.com/lvgl/lv_binding_cpp>`__
 - |uncheck| Markup language #2428

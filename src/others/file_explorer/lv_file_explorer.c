@@ -53,7 +53,8 @@ const lv_obj_class_t lv_file_explorer_class = {
     .width_def      = LV_SIZE_CONTENT,
     .height_def     = LV_SIZE_CONTENT,
     .instance_size  = sizeof(lv_file_explorer_t),
-    .base_class     = &lv_obj_class
+    .base_class     = &lv_obj_class,
+    .name = "file-explorer",
 };
 
 /**********************
@@ -285,7 +286,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*The area displayed above the file browse list(head)*/
     explorer->head_area = lv_obj_create(explorer->browser_area);
     lv_obj_set_size(explorer->head_area, LV_PCT(100), LV_PCT(14));
-    lv_obj_clear_flag(explorer->head_area, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(explorer->head_area, LV_OBJ_FLAG_SCROLLABLE);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
     /*Two lists of quick access bar*/

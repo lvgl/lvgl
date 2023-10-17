@@ -1,13 +1,14 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "lv_test_helpers.h"
 
 #include "unity/unity.h"
 
 void setUp(void)
 {
     /* Function run before every test */
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
 }
 
 void tearDown(void)
@@ -55,11 +56,11 @@ static void draw_triangles(lv_layer_t * layer, lv_draw_triangle_dsc_t * dsc, uin
 
 void test_draw_triangle(void)
 {
-    static uint8_t canvas_buf[760 * 440 * 4];
+    static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(768, 4) * 440 * 4];
 
 
-    lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, canvas_buf, 760, 440, LV_COLOR_FORMAT_ARGB8888);
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+    lv_canvas_set_buffer(canvas, canvas_buf, 768, 440, LV_COLOR_FORMAT_ARGB8888);
 
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_RED, 2), LV_OPA_50);
 

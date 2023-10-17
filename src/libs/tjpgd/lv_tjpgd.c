@@ -3,44 +3,6 @@
  *
  */
 
-/*----------------------------------------------------------------------------------------------------------------------------------
-/    Added normal JPG support [7/10/2020]
-/    ----------
-/    SJPEG is a custom created modified JPEG file format for small embedded platforms.
-/    It will contain multiple JPEG fragments all embedded into a single file with a custom header.
-/    This makes JPEG decoding easier using any JPEG library. Overall file size will be almost
-/    similar to the parent jpeg file. We can generate sjpeg from any jpeg using a python script
-/    provided along with this project.
-/                                                                                     (by vinodstanur | 2020 )
-/    SJPEG FILE STRUCTURE
-/    --------------------------------------------------------------------------------------------------------------------------------
-/    Bytes                       |   Value                                                                                           |
-/    --------------------------------------------------------------------------------------------------------------------------------
-/
-/    0 - 7                       |   "_SJPG__" followed by '\0'
-/
-/    8 - 13                      |   "V1.00" followed by '\0'       [VERSION OF SJPG FILE for future compatibiliby]
-/
-/    14 - 15                     |   X_RESOLUTION (width)            [little endian]
-/
-/    16 - 17                     |   Y_RESOLUTION (height)           [little endian]
-/
-/    18 - 19                     |   TOTAL_FRAMES inside sjpeg       [little endian]
-/
-/    20 - 21                     |   JPEG BLOCK WIDTH (16 normally)  [little endian]
-/
-/    22 - [(TOTAL_FRAMES*2 )]    |   SIZE OF EACH JPEG SPLIT FRAGMENTS   (FRAME_INFO_ARRAY)
-/
-/   SJPEG data                   |   Each JPEG frame can be extracted from SJPEG data by parsing the FRAME_INFO_ARRAY one time.
-/
-/----------------------------------------------------------------------------------------------------------------------------------
-/                   JPEG DECODER
-/                   ------------
-/   We are using TJpgDec - Tiny JPEG Decompressor library from ELM-CHAN for decoding each split-jpeg fragments.
-/   The tjpgd.c and tjpgd.h is not modified and those are used as it is. So if any update comes for the tiny-jpeg,
-/   just replace those files with updated files.
-/---------------------------------------------------------------------------------------------------------------------------------*/
-
 /*********************
  *      INCLUDES
  *********************/
@@ -250,9 +212,9 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     my = jd->msy * 8;         /* Size of the MCU (pixel) */
     if(decoded_area->y1 == LV_COORD_MIN) {
         decoded_area->y1 = 0;
-        decoded_area->y2 = 7;
-        decoded_area->x1 = 0 - mx;
-        decoded_area->x2 = 7 - mx;
+        decoded_area->y2 = my - 1;
+        decoded_area->x1 = -mx;
+        decoded_area->x2 = -1;
         jd->scale = 0;
         jd->dcv[2] = jd->dcv[1] = jd->dcv[0] = 0;   /* Initialize DC values */
         dsc->img_data = jd->workbuf;
@@ -266,21 +228,25 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
 
     if(decoded_area->x1 >= jd->width) {
         decoded_area->x1 = 0;
-        decoded_area->x2 = 7;
+        decoded_area->x2 = mx - 1;
         decoded_area->y1 += my;
         decoded_area->y2 += my;
     }
 
+    /* Process restart interval if enabled */
     JRESULT rc;
-    if(jd->nrst && jd->rst++ == jd->nrst) {     /* Process restart interval if enabled */
+    if(jd->nrst && jd->rst++ == jd->nrst) {
         rc = jd_restart(jd, jd->rsc++);
         if(rc != JDR_OK) return rc;
         jd->rst = 1;
     }
-    rc = jd_mcu_load(jd);                  /* Load an MCU (decompress huffman coded stream, dequantize and apply IDCT) */
+
+    /* Load an MCU (decompress huffman coded stream, dequantize and apply IDCT) */
+    rc = jd_mcu_load(jd);
     if(rc != JDR_OK) return rc;
-    rc = jd_mcu_output(jd, NULL, decoded_area->x1,
-                       decoded_area->y1); /* Output the MCU (YCbCr to RGB, scaling and output) */
+
+    /* Output the MCU (YCbCr to RGB, scaling and output) */
+    rc = jd_mcu_output(jd, NULL, decoded_area->x1, decoded_area->y1);
     if(rc != JDR_OK) return rc;
 
     return LV_RESULT_OK;

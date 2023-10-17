@@ -32,10 +32,10 @@ static bool event_is_bubbled(lv_event_t * e);
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_EVENT
-    #define EVENT_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_EVENT
+    #define LV_TRACE_EVENT(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define EVENT_TRACE(...)
+    #define LV_TRACE_EVENT(...)
 #endif
 
 /**********************
@@ -122,6 +122,23 @@ bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index)
     LV_ASSERT_NULL(obj);
     if(obj->spec_attr == NULL) return false;
     return lv_event_remove(&obj->spec_attr->event_list, index);
+}
+
+bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
+{
+    LV_ASSERT_NULL(obj);
+
+    uint32_t event_cnt = lv_obj_get_event_count(obj);
+    uint32_t i;
+    for(i = 0; i < event_cnt; i++) {
+        lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
+        if(dsc->cb == event_cb) {
+            lv_obj_remove_event(obj, i);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e)
@@ -287,7 +304,7 @@ lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
 
 static lv_result_t event_send_core(lv_event_t * e)
 {
-    EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
+    LV_TRACE_EVENT("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
 
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();

@@ -229,7 +229,7 @@ You can do this in the following way:
 .. code:: c
 
    /*Delete the original display refresh timer*/
-   lv_timer_del(disp->refr_timer);
+   lv_timer_delete(disp->refr_timer);
    disp->refr_timer = NULL;
 
 

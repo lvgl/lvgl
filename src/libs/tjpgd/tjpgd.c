@@ -199,8 +199,8 @@ static JRESULT create_huffman_tbl(  /* 0:OK, !0:Failed */
 {
     unsigned int i, j, b, cls, num;
     size_t np;
-    uint8_t d, *pb, *pd;
-    uint16_t hc, *ph;
+    uint8_t d, * pb, * pd;
+    uint16_t hc, * ph;
 
 
     while(ndata) {  /* Process all tables in the segment */
@@ -343,7 +343,7 @@ static int huffext(     /* >=0: decoded data, <0: error code */
     } while(bl);
 
 #else
-    const uint8_t * hb, *hd;
+    const uint8_t * hb, * hd;
     const uint16_t * hc;
     unsigned int nc, bl, wbit = jd->dbit % 32;
     uint32_t w = jd->wreg & ((1UL << wbit) - 1);
@@ -833,7 +833,7 @@ JRESULT jd_mcu_output(
     const int CVACC = (sizeof(int) > 2) ? 1024 : 128;   /* Adaptive accuracy for both 16-/32-bit systems */
     unsigned int ix, iy, mx, my, rx, ry;
     int yy, cb, cr;
-    jd_yuv_t * py, *pc;
+    jd_yuv_t * py, * pc;
     uint8_t * pix;
     JRECT rect;
 
@@ -892,7 +892,7 @@ JRESULT jd_mcu_output(
     /* Squeeze up pixel table if a part of MCU is to be truncated */
     mx >>= jd->scale;
     if(rx < mx) {   /* Is the MCU spans rigit edge? */
-        uint8_t * s, *d;
+        uint8_t * s, * d;
         unsigned int xi, yi;
 
         s = d = (uint8_t *)jd->workbuf;
@@ -911,7 +911,7 @@ JRESULT jd_mcu_output(
     /* Convert RGB888 to RGB565 if needed */
     if(JD_FORMAT == 1) {
         uint8_t * s = (uint8_t *)jd->workbuf;
-        uint16_t w, *d = (uint16_t *)s;
+        uint16_t w, * d = (uint16_t *)s;
         unsigned int n = rx * ry;
 
         do {

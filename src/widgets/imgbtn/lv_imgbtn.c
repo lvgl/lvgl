@@ -36,11 +36,13 @@ static void update_src_info(lv_imgbtn_src_info_t * info, const void * src);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_imgbtn_class = {
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_imgbtn_t),
     .constructor_cb = lv_imgbtn_constructor,
     .event_cb = lv_imgbtn_event,
+    .name = "imgbtn",
 };
 
 /**********************
@@ -105,7 +107,7 @@ void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
         obj_state |= LV_STATE_CHECKED;
     }
 
-    lv_obj_clear_state(obj, LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_DISABLED);
+    lv_obj_remove_state(obj, LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_DISABLED);
     lv_obj_add_state(obj, obj_state);
 
     refr_image(obj);

@@ -46,7 +46,7 @@ void lv_example_buttonmatrix_3(void)
 
     static const char * map[] = {LV_SYMBOL_LEFT, "1", "2", "3", "4", "5", LV_SYMBOL_RIGHT, ""};
 
-    lv_obj_t * btnm = lv_buttonmatrix_create(lv_scr_act());
+    lv_obj_t * btnm = lv_buttonmatrix_create(lv_screen_active());
     lv_buttonmatrix_set_map(btnm, map);
     lv_obj_add_style(btnm, &style_bg, 0);
     lv_obj_add_style(btnm, &style_btn, LV_PART_ITEMS);

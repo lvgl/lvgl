@@ -31,7 +31,7 @@ static void float_button_event_cb(lv_event_t * e)
 void lv_example_menu_4(void)
 {
     /*Create a menu object*/
-    menu = lv_menu_create(lv_scr_act());
+    menu = lv_menu_create(lv_screen_active());
     lv_obj_set_size(menu, lv_display_get_horizontal_resolution(NULL), lv_display_get_vertical_resolution(NULL));
     lv_obj_center(menu);
 
@@ -56,7 +56,7 @@ void lv_example_menu_4(void)
     lv_menu_set_page(menu, main_page);
 
     /*Create floating btn*/
-    lv_obj_t * float_btn = lv_button_create(lv_scr_act());
+    lv_obj_t * float_btn = lv_button_create(lv_screen_active());
     lv_obj_set_size(float_btn, 50, 50);
     lv_obj_add_flag(float_btn, LV_OBJ_FLAG_FLOATING);
     lv_obj_align(float_btn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);

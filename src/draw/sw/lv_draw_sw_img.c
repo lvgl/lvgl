@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_img.c
+ * @file lv_draw_sw_img.c
  *
  */
 
@@ -52,15 +52,16 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 
     /*It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
      *In this case just return. */
-    if(layer_to_draw->draw_buf.buf == NULL) return;
+    if(layer_to_draw->buf == NULL) return;
 
     lv_image_dsc_t img_dsc;
-    img_dsc.header.w = layer_to_draw->draw_buf.width;
-    img_dsc.header.h = layer_to_draw->draw_buf.height;
-    img_dsc.header.cf = layer_to_draw->draw_buf.color_format;
-    img_dsc.header.stride = lv_draw_buf_get_stride(&layer_to_draw->draw_buf);
+    img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
+    img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
+    img_dsc.header.cf = layer_to_draw->color_format;
+    img_dsc.header.stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer_to_draw->buf_area),
+                                                        layer_to_draw->color_format);
     img_dsc.header.always_zero = 0;
-    img_dsc.data = lv_draw_buf_get_buf(&layer_to_draw->draw_buf);
+    img_dsc.data = lv_draw_buf_align(layer_to_draw->buf, layer_to_draw->color_format);
 
     lv_draw_image_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));
@@ -89,7 +90,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 #if LV_USE_LAYER_DEBUG
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_fill_dsc_init(&fill_dsc);
-    fill_dsc.color = lv_color_hex(layer_to_draw->draw_buf.color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
+    fill_dsc.color = lv_color_hex(layer_to_draw->draw_color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
     fill_dsc.opa = LV_OPA_20;
     lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
 
@@ -283,44 +284,50 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             if(cf == LV_COLOR_FORMAT_RGB888 || cf == LV_COLOR_FORMAT_XRGB8888) cf_final = LV_COLOR_FORMAT_ARGB8888;
             if(cf == LV_COLOR_FORMAT_RGB565) cf_final = LV_COLOR_FORMAT_RGB565A8;
         }
-
+        uint8_t * tmp_buf;
         uint32_t px_size = lv_color_format_get_size(cf_final);
-        uint32_t max_buf_size = MAX_BUF_SIZE / px_size;
-        uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
-        uint32_t buf_h;
-        if(buf_stride * blend_h <= max_buf_size) buf_h = blend_h;
-        else buf_h = max_buf_size / buf_stride;    /*Round to full lines*/
+        lv_coord_t buf_h;
+        if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
+            uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565);
+            buf_stride += blend_w;          /*For the A8 part which is not stride aligned*/
+            buf_h = MAX_BUF_SIZE / buf_stride;
+            if(buf_h > blend_h) buf_h = blend_h;
+            tmp_buf = lv_draw_buf_malloc(buf_stride * buf_h, LV_COLOR_FORMAT_RGB565A8);
+        }
+        else {
+            uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
+            buf_h = MAX_BUF_SIZE / buf_stride;
+            if(buf_h > blend_h) buf_h = blend_h;
+            tmp_buf = lv_draw_buf_malloc(buf_stride * buf_h, cf_final);
+        }
 
-        uint32_t buf_size = buf_stride * buf_h;
-        uint8_t * tmp_buf = lv_malloc(buf_size);
-        blend_dsc.src_buf = tmp_buf;
+        uint8_t * tmp_buf_aligned = lv_draw_buf_align(tmp_buf, cf_final);
+        blend_dsc.src_buf = tmp_buf_aligned;
         blend_dsc.src_color_format = cf_final;
         lv_coord_t y_last = blend_area.y2;
         blend_area.y2 = blend_area.y1 + buf_h - 1;
 
         blend_dsc.src_area = &blend_area;
         if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
+            /*RGB565A8 images will blended as RGB565 + mask
+             *Therefore the stride can be different. */
             blend_dsc.src_stride = lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565);
-        }
-        else {
-            blend_dsc.src_stride = buf_stride;
-        }
-
-
-        if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
-            blend_dsc.mask_buf =  tmp_buf + lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565) * buf_h;
+            blend_dsc.mask_buf =  tmp_buf_aligned + lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565) * buf_h;
             blend_dsc.mask_area = &blend_area;
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
         }
-
-        if(blend_dsc.src_color_format == LV_COLOR_FORMAT_A8) {
+        else if(cf_final == LV_COLOR_FORMAT_A8) {
             blend_dsc.mask_buf = blend_dsc.src_buf;
             blend_dsc.mask_area = &blend_area;
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             blend_dsc.color = draw_dsc->recolor;
             blend_dsc.src_buf = NULL;
         }
+        else {
+            blend_dsc.src_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
+        }
+
 
         while(blend_area.y1 <= y_last) {
             /*Apply transformations if any or separate the channels*/
@@ -328,8 +335,8 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             lv_area_copy(&relative_area, &blend_area);
             lv_area_move(&relative_area, -img_coords->x1, -img_coords->y1);
             if(transformed) {
-                lv_draw_sw_transform(draw_unit, &relative_area, src_buf, src_w, src_h,
-                                     draw_dsc, sup, cf, tmp_buf);
+                lv_draw_sw_transform(draw_unit, &relative_area, src_buf, src_w, src_h, img_stride,
+                                     draw_dsc, sup, cf, tmp_buf_aligned);
             }
             else if(draw_dsc->recolor_opa >= LV_OPA_MIN) {
                 lv_coord_t h = lv_area_get_height(&relative_area);
@@ -337,7 +344,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                     const uint8_t * rgb_src_buf = src_buf + blend_dsc.src_stride * relative_area.y1 + relative_area.x1 * 2;
                     const uint8_t * a_src_buf = src_buf + blend_dsc.src_stride * src_h + blend_dsc.src_stride / 2 * relative_area.y1 +
                                                 relative_area.x1;
-                    uint8_t * rgb_dest_buf = tmp_buf;
+                    uint8_t * rgb_dest_buf = tmp_buf_aligned;
                     uint8_t * a_dest_buf = (uint8_t *)blend_dsc.mask_buf;
                     lv_coord_t i;
                     for(i = 0; i < h; i++) {
@@ -345,13 +352,13 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                         lv_memcpy(a_dest_buf, a_src_buf, blend_w);
                         rgb_src_buf += blend_dsc.src_stride;
                         a_src_buf += blend_dsc.src_stride / 2;
-                        rgb_dest_buf += blend_w * 2;
+                        rgb_dest_buf +=  blend_w * 2;
                         a_dest_buf += blend_w;
                     }
                 }
                 else if(cf_final != LV_COLOR_FORMAT_A8) {
                     const uint8_t * src_buf_tmp = src_buf + blend_dsc.src_stride * relative_area.y1 + relative_area.x1 * px_size;
-                    uint8_t * dest_buf_tmp = tmp_buf;
+                    uint8_t * dest_buf_tmp = tmp_buf_aligned;
                     lv_coord_t i;
                     for(i = 0; i < h; i++) {
                         lv_memcpy(dest_buf_tmp, src_buf_tmp, blend_w * px_size);
@@ -371,7 +378,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                     c_mult[0] = (color.blue >> 3) * mix;
                     c_mult[1] = (color.green >> 2) * mix;
                     c_mult[2] = (color.red >> 3) * mix;
-                    uint16_t * buf16 = (uint16_t *)tmp_buf;
+                    uint16_t * buf16 = (uint16_t *)tmp_buf_aligned;
                     lv_coord_t i;
                     lv_coord_t size = lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565) / 2 * lv_area_get_height(&blend_area);
                     for(i = 0; i < size; i++) {
@@ -387,7 +394,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                     c_mult[0] = color.blue * mix;
                     c_mult[1] = color.green * mix;
                     c_mult[2] = color.red * mix;
-                    uint8_t * tmp_buf_2 = tmp_buf;
+                    uint8_t * tmp_buf_2 = tmp_buf_aligned;
                     for(i = 0; i < size * px_size; i += px_size) {
                         tmp_buf_2[i + 0] = (c_mult[0] + (tmp_buf_2[i + 0] * mix_inv)) >> 8;
                         tmp_buf_2[i + 1] = (c_mult[1] + (tmp_buf_2[i + 1] * mix_inv)) >> 8;
@@ -405,13 +412,13 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             if(blend_area.y2 > y_last) {
                 blend_area.y2 = y_last;
                 if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
-                    blend_dsc.mask_buf =  tmp_buf + lv_draw_buf_width_to_stride(blend_w,
-                                                                                LV_COLOR_FORMAT_RGB565) * lv_area_get_height(&blend_area);
+                    blend_dsc.mask_buf =  tmp_buf_aligned + lv_draw_buf_width_to_stride(blend_w,
+                                                                                        LV_COLOR_FORMAT_RGB565) * lv_area_get_height(&blend_area);
                 }
             }
         }
 
-        lv_free(tmp_buf);
+        lv_draw_buf_free(tmp_buf);
     }
 }
 

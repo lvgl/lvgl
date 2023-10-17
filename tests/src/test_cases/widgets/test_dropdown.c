@@ -12,38 +12,38 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 }
 void test_dropdown_create_delete(void)
 {
-    lv_dropdown_create(lv_scr_act());
-    TEST_ASSERT_EQUAL(2, lv_obj_get_child_cnt(lv_scr_act()));
+    lv_dropdown_create(lv_screen_active());
+    TEST_ASSERT_EQUAL(2, lv_obj_get_child_cnt(lv_screen_active()));
 
-    lv_obj_t * dd2 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd2 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd2, 200, 0);
-    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
+    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_screen_active()));
     TEST_ASSERT_FALSE(lv_dropdown_is_open(dd2));
     lv_dropdown_open(dd2);
-    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
+    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_screen_active()));
     TEST_ASSERT_TRUE(lv_dropdown_is_open(dd2));
     lv_dropdown_open(dd2);    /*Try to open again*/
-    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
+    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_screen_active()));
 
-    lv_obj_t * dd3 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd3 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd3, 400, 0);
-    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_scr_act()));
+    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_screen_active()));
     lv_dropdown_open(dd3);
-    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_scr_act()));
+    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_screen_active()));
     lv_dropdown_close(dd3);
-    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_scr_act()));
+    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_screen_active()));
     lv_dropdown_close(dd3);   /*Try to close again*/
-    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_scr_act()));
+    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_screen_active()));
 
-    lv_obj_del(dd2);
-    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_scr_act()));
+    lv_obj_delete(dd2);
+    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_screen_active()));
 
-    lv_obj_clean(lv_scr_act());
-    TEST_ASSERT_EQUAL(0, lv_obj_get_child_cnt(lv_scr_act()));
+    lv_obj_clean(lv_screen_active());
+    TEST_ASSERT_EQUAL(0, lv_obj_get_child_cnt(lv_screen_active()));
 
 }
 
@@ -53,7 +53,7 @@ void test_dropdown_set_options(void)
     lv_mem_monitor_t m1;
     lv_mem_monitor(&m1);
 
-    lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
     TEST_ASSERT_EQUAL_STRING("Option 1\nOption 2\nOption 3", lv_dropdown_get_options(dd1));
     TEST_ASSERT_EQUAL(3, lv_dropdown_get_option_cnt(dd1));
 
@@ -106,7 +106,7 @@ void test_dropdown_set_options(void)
     TEST_ASSERT_EQUAL_STRING("", lv_dropdown_get_options(dd1));
     TEST_ASSERT_EQUAL(0, lv_dropdown_get_option_cnt(dd1));
 
-    lv_obj_del(dd1);
+    lv_obj_delete(dd1);
 
     lv_mem_monitor_t m2;
     lv_mem_monitor(&m2);
@@ -115,7 +115,7 @@ void test_dropdown_set_options(void)
 
 void test_dropdown_select(void)
 {
-    lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
     lv_dropdown_set_selected(dd1, 2);
 
     TEST_ASSERT_EQUAL(2, lv_dropdown_get_selected(dd1));
@@ -136,8 +136,8 @@ void test_dropdown_select(void)
 
 void test_dropdown_click(void)
 {
-    lv_obj_clean(lv_scr_act());
-    lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
+    lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
     lv_obj_update_layout(dd1);
 
     TEST_ASSERT_FALSE(lv_dropdown_is_open(dd1));
@@ -160,18 +160,18 @@ static void dd_event(lv_event_t * e)
 
 void test_dropdown_keypad(void)
 {
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 
     lv_group_t * g = lv_group_create();
     lv_indev_set_group(lv_test_keypad_indev, g);
 
-    lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd1, 20, 20);
     lv_dropdown_set_options(dd1, "1\n2\n3\n4\n5\n6\n7\n8");
     lv_group_add_obj(g, dd1);
     lv_obj_add_event(dd1, dd_event, LV_EVENT_VALUE_CHANGED, NULL);
 
-    lv_obj_t * dd2 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd2 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd2, 300, 20);
     lv_group_add_obj(g, dd2);
 
@@ -257,24 +257,24 @@ void test_dropdown_keypad(void)
     TEST_ASSERT_NOT_NULL(lv_dropdown_get_list(dd2));
 
     lv_indev_set_group(lv_test_keypad_indev, NULL);
-    lv_group_del(g);
+    lv_group_delete(g);
 }
 
 
 void test_dropdown_encoder(void)
 {
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 
     lv_group_t * g = lv_group_create();
     lv_indev_set_group(lv_test_encoder_indev, g);
 
-    lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd1, 20, 20);
     lv_dropdown_set_options(dd1, "1\n2\n3\n4\n5\n6\n7\n8");
     lv_group_add_obj(g, dd1);
     lv_obj_add_event(dd1, dd_event, LV_EVENT_VALUE_CHANGED, NULL);
 
-    lv_obj_t * dd2 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd2 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd2, 300, 20);
     lv_group_add_obj(g, dd2);
 
@@ -314,19 +314,19 @@ void test_dropdown_encoder(void)
     TEST_ASSERT_TRUE(lv_dropdown_is_open(dd2));
 
     lv_indev_set_group(lv_test_encoder_indev, NULL);
-    lv_group_del(g);
+    lv_group_delete(g);
 }
 
 
 void test_dropdown_render_1(void)
 {
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 
-    lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd1, 10, 10);
     lv_dropdown_set_selected(dd1, 1);
 
-    lv_obj_t * dd2 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd2 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd2, 200, 10);
     lv_obj_set_width(dd2, 200);
     lv_dropdown_set_selected(dd2, 2);
@@ -335,7 +335,7 @@ void test_dropdown_render_1(void)
     lv_dropdown_set_selected_highlight(dd2, false);
     TEST_ASSERT_FALSE(lv_dropdown_get_selected_highlight(dd2));
 
-    lv_obj_t * dd3 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd3 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_style_pad_hor(dd3, 5, 0);
     lv_obj_set_style_pad_ver(dd3, 20, 0);
     lv_obj_set_pos(dd3, 500, 150);
@@ -366,28 +366,28 @@ void test_dropdown_render_1(void)
 
 void test_dropdown_render_2(void)
 {
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
     LV_IMAGE_DECLARE(test_image_caret_down);
-    lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
     lv_dropdown_set_text(dd1, "Short");
     lv_dropdown_set_options(dd1, "1\n2");
     lv_dropdown_set_symbol(dd1, &test_image_caret_down);
     lv_dropdown_open(dd1);
 
-    lv_obj_t * dd2 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd2 = lv_dropdown_create(lv_screen_active());
     lv_dropdown_set_text(dd2, "Go Up");
     lv_dropdown_set_options(dd2, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15");
     lv_dropdown_set_symbol(dd2, NULL);
     lv_obj_align(dd2, LV_ALIGN_LEFT_MID, 150, 50);
     lv_dropdown_open(dd2);
 
-    lv_obj_t * dd3 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd3 = lv_dropdown_create(lv_screen_active());
     lv_dropdown_set_text(dd3, "Limit Down");
     lv_dropdown_set_options(dd3, "1aaaaaaaaaaaaaaaa\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15");
     lv_obj_align(dd3, LV_ALIGN_LEFT_MID, 300, -10);
     lv_dropdown_open(dd3);
 
-    lv_obj_t * dd4 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd4 = lv_dropdown_create(lv_screen_active());
     lv_dropdown_set_text(dd4, "Limit Top");
     lv_dropdown_set_options(dd4, "1aaaaaaaaaaaaaaaa\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15");
     lv_obj_align(dd4, LV_ALIGN_LEFT_MID, 450, 10);
@@ -395,7 +395,7 @@ void test_dropdown_render_2(void)
     lv_dropdown_set_symbol(dd4, LV_SYMBOL_UP);
     lv_dropdown_open(dd4);
 
-    lv_obj_t * dd5 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd5 = lv_dropdown_create(lv_screen_active());
     lv_dropdown_set_text(dd5, "Go Down");
     lv_dropdown_set_options(dd5, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15");
     lv_dropdown_set_dir(dd5, LV_DIR_TOP);
@@ -403,7 +403,7 @@ void test_dropdown_render_2(void)
     lv_obj_align(dd5, LV_ALIGN_LEFT_MID, 650, -200);
     lv_dropdown_open(dd5);
 
-    lv_obj_t * dd6 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd6 = lv_dropdown_create(lv_screen_active());
     lv_dropdown_set_text(dd6, "Right");
     lv_dropdown_set_options(dd6, "1aaa\n2aa\n3aa");
     lv_dropdown_set_dir(dd6, LV_DIR_RIGHT);
@@ -412,7 +412,7 @@ void test_dropdown_render_2(void)
     lv_dropdown_open(dd6);
     lv_obj_set_style_text_align(lv_dropdown_get_list(dd6), LV_TEXT_ALIGN_RIGHT, 0);
 
-    lv_obj_t * dd7 = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd7 = lv_dropdown_create(lv_screen_active());
     lv_dropdown_set_text(dd7, "Left");
     lv_dropdown_set_options(dd7, "1aaa\n2\n3");
     lv_dropdown_set_dir(dd7, LV_DIR_LEFT);
@@ -426,25 +426,25 @@ void test_dropdown_render_2(void)
 /* See #2893 */
 void test_dropdown_should_list_on_top(void)
 {
-    lv_obj_t * cont1 = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont1 = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont1, 200, 100);
 
     lv_obj_t * dd = lv_dropdown_create(cont1);
 
-    lv_obj_t * cont2 = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont2 = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont2, 200, 100);
     lv_obj_set_pos(cont2, 0, 100);
 
     lv_dropdown_open(dd);
     lv_obj_t * list = lv_dropdown_get_list(dd);
-    TEST_ASSERT_EQUAL_PTR(lv_scr_act(), lv_obj_get_parent(list));
+    TEST_ASSERT_EQUAL_PTR(lv_screen_active(), lv_obj_get_parent(list));
     TEST_ASSERT_EQUAL_INT(2, lv_obj_get_index(list));
 }
 
 /* See #4191 */
 void test_dropdown_get_options_should_check_lengths(void)
 {
-    lv_obj_t * dd = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dd = lv_dropdown_create(lv_screen_active());
     lv_dropdown_set_options(dd, "abc\nab");
     TEST_ASSERT_EQUAL_INT(1, lv_dropdown_get_option_index(dd, "ab"));
 

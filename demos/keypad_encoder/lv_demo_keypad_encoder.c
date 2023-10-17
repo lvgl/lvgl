@@ -66,7 +66,7 @@ void lv_demo_keypad_encoder(void)
         }
     }
 
-    tv = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, LV_DPI_DEF / 3);
+    tv = lv_tabview_create(lv_screen_active(), LV_DIR_TOP, LV_DPI_DEF / 3);
 
     t1 = lv_tabview_add_tab(tv, "Selectors");
     t2 = lv_tabview_add_tab(tv, "Text input");
@@ -153,7 +153,7 @@ static void text_input_create(lv_obj_t * parent)
     lv_textarea_set_one_line(ta2, true);
     lv_textarea_set_placeholder_text(ta2, "Type something");
 
-    lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
+    lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
 
     lv_obj_add_event(ta1, ta_event_cb, LV_EVENT_ALL, kb);
@@ -205,7 +205,7 @@ static void ta_event_cb(lv_event_t * e)
 
     if(code == LV_EVENT_CLICKED && indev_type == LV_INDEV_TYPE_ENCODER) {
         lv_keyboard_set_textarea(kb, ta);
-        lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
         lv_group_focus_obj(kb);
         lv_group_set_editing(lv_obj_get_group(kb), kb);
         lv_obj_set_height(tv, LV_VER_RES / 2);

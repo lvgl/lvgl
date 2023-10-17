@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_rect.c
+ * @file lv_draw_sw_border.c
  *
  */
 

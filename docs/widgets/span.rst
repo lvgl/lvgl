@@ -99,7 +99,7 @@ too.
 lines
 -----
 
-Use :cpp:expr:`lv_spangroup_set_lines(spangroup, 10)` to set the maximum number
+Use :cpp:expr:`lv_spangroup_set_max_lines(spangroup, 10)` to set the maximum number
 of lines to be displayed in LV_SPAN_MODE_BREAK mode, negative values
 indicate no limit.
 

@@ -6,7 +6,7 @@
  */
 void lv_example_scale_3(void)
 {
-    lv_obj_t * scale = lv_scale_create(lv_scr_act());
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
     lv_obj_set_size(scale, 150, 150);
     lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
     lv_obj_set_style_bg_opa(scale, LV_OPA_COVER, 0);

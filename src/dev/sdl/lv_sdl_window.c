@@ -153,7 +153,7 @@ void lv_sdl_quit()
 {
     if(inited) {
         SDL_Quit();
-        lv_timer_del(event_handler_timer);
+        lv_timer_delete(event_handler_timer);
         inited = false;
     }
 }
@@ -236,7 +236,7 @@ static void sdl_event_handler(lv_timer_t * t)
         }
         if(event.type == SDL_QUIT) {
             SDL_Quit();
-            lv_timer_del(event_handler_timer);
+            lv_timer_delete(event_handler_timer);
             inited = false;
 #if LV_SDL_DIRECT_EXIT
             exit(0);

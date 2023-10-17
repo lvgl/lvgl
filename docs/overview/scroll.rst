@@ -98,7 +98,7 @@ Scrollable
 ----------
 
 It's possible to make an object non-scrollable with
-:cpp:expr:`lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE)`.
+:cpp:expr:`lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE)`.
 
 Non-scrollable objects can still propagate the scrolling (chain) to
 their parents.

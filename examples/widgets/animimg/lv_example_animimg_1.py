@@ -36,7 +36,7 @@ anim_images[2] = lv.image_dsc_t({
   'data': anim003_data
 })
 
-animimage0 = lv.animimg(lv.scr_act())
+animimage0 = lv.animimg(lv.screen_active())
 animimage0.center()
 animimage0.set_src(anim_images, 3)
 animimage0.set_duration(1000)

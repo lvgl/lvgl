@@ -22,7 +22,7 @@ void lv_example_gridnav_3(void)
     /*It's assumed that the default group is set and
      *there is a keyboard indev*/
 
-    lv_obj_t * cont_main = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont_main = lv_obj_create(lv_screen_active());
     lv_gridnav_add(cont_main, LV_GRIDNAV_CTRL_ROLLOVER | LV_GRIDNAV_CTRL_SCROLL_FIRST);
 
     /*Only the container needs to be in a group*/

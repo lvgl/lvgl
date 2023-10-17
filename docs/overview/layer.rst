@@ -18,7 +18,7 @@ its children.
 
    /*Create a screen*/
    lv_obj_t * scr = lv_obj_create(NULL, NULL);
-   lv_scr_load(scr);          /*Load the screen*/
+   lv_screen_load(scr);          /*Load the screen*/
 
    /*Create 2 buttons*/
    lv_obj_t * btn1 = lv_btn_create(scr, NULL);         /*Create a button on the screen*/
@@ -36,7 +36,7 @@ its children.
    lv_label_set_text(label2, "Button 2");              /*Set the text of the label*/
 
    /*Delete the second label*/
-   lv_obj_del(label2);
+   lv_obj_delete(label2);
 
 Change order
 ************
@@ -60,7 +60,7 @@ Top and sys layers
 LVGL uses two special layers named ``layer_top`` and ``layer_sys``. Both
 are visible and common on all screens of a display. **They are not,
 however, shared among multiple physical displays.** The ``layer_top`` is
-always on top of the default screen (:cpp:func:`lv_scr_act`), and
+always on top of the default screen (:cpp:func:`lv_screen_active`), and
 ``layer_sys`` is on top of ``layer_top``.
 
 The ``layer_top`` can be used by the user to create some content visible

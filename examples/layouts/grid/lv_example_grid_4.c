@@ -13,7 +13,7 @@ void lv_example_grid_4(void)
     /*Add space between the columns and move the rows to the bottom (end)*/
 
     /*Create a container with grid*/
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_grid_align(cont, LV_GRID_ALIGN_SPACE_BETWEEN, LV_GRID_ALIGN_END);
     lv_obj_set_grid_dsc_array(cont, col_dsc, row_dsc);
     lv_obj_set_size(cont, 300, 220);

@@ -96,7 +96,7 @@ the object non-clickable:
 .. code:: c
 
    lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
-   lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+   lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 
 Advanced hit test
 -----------------

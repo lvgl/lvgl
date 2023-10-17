@@ -6,8 +6,8 @@
 void setUp(void)
 {
     /* Function run before every test */
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
 }
 
 void tearDown(void)
@@ -24,13 +24,13 @@ static void create_rects(lv_style_t * style, const char * name, lv_opa_t opa)
 
     char buf[64];
 
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
     uint32_t ri;
     for(ri = 0; ri < sizeof(r) / sizeof(r[0]); ri++) {
 
         uint32_t si;
         for(si = 0; si < sizeof(w) / sizeof(w[0]); si++) {
-            lv_obj_t * obj = lv_obj_create(lv_scr_act());
+            lv_obj_t * obj = lv_obj_create(lv_screen_active());
             lv_obj_remove_style_all(obj);
             lv_obj_add_style(obj, style, 0);
             lv_obj_set_style_radius(obj, r[ri], 0);

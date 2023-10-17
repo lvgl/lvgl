@@ -47,7 +47,8 @@ const lv_obj_class_t lv_templ_class = {
     .instance_size = sizeof(lv_templ_t),
     .group_def = LV_OBJ_CLASS_GROUP_DEF_INHERIT,
     .editable = LV_OBJ_CLASS_EDITABLE_INHERIT,
-    .base_class = &lv_templ_class
+    .base_class = &lv_templ_class,
+    .name = "templ",
 };
 
 /**********************

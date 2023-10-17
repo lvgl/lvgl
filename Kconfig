@@ -55,12 +55,14 @@ menu "LVGL configuration"
 			bool "Use cache to speed up getting object style properties"
 			default y
 
-		config LV_COLOR_CHROMA_KEY_HEX
-			hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
-			range 0x000000 0xFFFFFF
-			default 0x00FF00
-			help
-				See misc/lv_color.h for some color values examples.
+		config LV_USE_OBJ_ID
+			bool "Add id field to obj."
+			default n
+
+		config LV_USE_OBJ_ID_BUILTIN
+			bool "Use builtin method to deal with obj ID"
+			default n
+
 	endmenu
 
 	menu "Memory settings"
@@ -360,6 +362,11 @@ menu "LVGL configuration"
 
 			config LV_LOG_USE_TIMESTAMP
 				bool "Enable print timestamp"
+				default y
+				depends on LV_USE_LOG
+
+			config LV_LOG_USE_FILE_LINE
+				bool "Enable print file and line number"
 				default y
 				depends on LV_USE_LOG
 
@@ -1011,6 +1018,9 @@ menu "LVGL configuration"
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
 
+		config LV_USE_LIBPNG
+			bool "PNG decoder(libpng) library"
+
 		config LV_USE_BMP
 			bool "BMP decoder library"
 
@@ -1178,10 +1188,6 @@ menu "LVGL configuration"
 			bool "Use BSD flavored framebuffer device"
 			depends on LV_USE_LINUX_FBDEV
 			default n
-		config LV_LINUX_FBDEV_NUTTX
-			bool "Use NuttX flavored framebuffer device"
-			depends on LV_USE_LINUX_FBDEV
-			default n
 
 		choice
 			prompt "Framebuffer device render mode"
@@ -1235,8 +1241,18 @@ menu "LVGL configuration"
 			depends on LV_USE_LINUX_FBDEV && LV_LINUX_FBDEV_CUSTOM_BUFFER
 			default 60
 
+		config LV_USE_NUTTX
+			bool "Use Nuttx to open window and handle touchscreen"
+			default n
+
+		config LV_USE_NUTTX_CUSTOM_INIT
+			bool "Use Custom Nuttx init API to open window and handle touchscreen"
+			depends on LV_USE_NUTTX
+			default n
+
 		config LV_USE_NUTTX_LCD
 			bool "Use NuttX LCD device"
+			depends on LV_USE_NUTTX
 			default n
 
 		choice
@@ -1267,16 +1283,17 @@ menu "LVGL configuration"
 			depends on LV_USE_NUTTX_LCD && LV_NUTTX_LCD_CUSTOM_BUFFER
 			default 60
 
+		config LV_USE_NUTTX_TOUCHSCREEN
+			bool "Use NuttX touchscreen driver"
+			depends on LV_USE_NUTTX
+			default n
+
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"
 			default n
 
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
-			default n
-
-		config LV_USE_NUTTX_TOUCHSCREEN
-			bool "Use NuttX touchscreen driver"
 			default n
 	endmenu
 

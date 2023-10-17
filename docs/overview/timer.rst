@@ -35,7 +35,7 @@ For example:
      /*Do something with LVGL*/
      if(something_happened) {
        something_happened = false;
-       lv_btn_create(lv_scr_act(), NULL);
+       lv_btn_create(lv_screen_active(), NULL);
      }
    }
 
@@ -102,7 +102,7 @@ For example:
      /*Free some resources related to `scr`*/
 
      /*Finally delete the screen*/
-     lv_obj_del(scr);
+     lv_obj_delete(scr);
    }
 
    ...
@@ -110,12 +110,12 @@ For example:
    /*Do something with the object on the current screen*/
 
    /*Delete screen on next call of `lv_timer_handler`, not right now.*/
-   lv_async_call(my_screen_clean_up, lv_scr_act());
+   lv_async_call(my_screen_clean_up, lv_screen_active());
 
    /*The screen is still valid so you can do other things with it*/
 
 If you just want to delete an object and don't need to clean anything up
-in ``my_screen_cleanup`` you could just use :cpp:func:`lv_obj_del_async` which
+in ``my_screen_cleanup`` you could just use :cpp:func:`lv_obj_delete_async` which
 will delete the object on the next call to :cpp:func:`lv_timer_handler`.
 
 API

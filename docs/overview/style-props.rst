@@ -1960,7 +1960,7 @@ Ext. draw No
 bg_img_src
 ~~~~~~~~~~
 
-Set a background image. Can be a pointer to :cpp:struct:`lv_img_dsc_t`, a path to
+Set a background image. Can be a pointer to :cpp:struct:`lv_image_dsc_t`, a path to
 a file or an ``LV_SYMBOL_...``
 
 .. raw:: html
@@ -3782,7 +3782,7 @@ arc_img_src
 
 Set an image from which the arc will be masked out. It's useful to
 display complex effects on the arcs. Can be a pointer to
-:cpp:struct:`lv_img_dsc_t` or a path to a file
+:cpp:struct:`lv_image_dsc_t` or a path to a file
 
 .. raw:: html
 

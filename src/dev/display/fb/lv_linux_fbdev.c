@@ -22,8 +22,6 @@
     #include <sys/time.h>
     #include <sys/consio.h>
     #include <sys/fbio.h>
-#elif LV_LINUX_FBDEV_NUTTX
-    #include <nuttx/video/fb.h>
 #else
     #include <linux/fb.h>
 #endif /* LV_LINUX_FBDEV_BSD */
@@ -130,13 +128,11 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     }
     LV_LOG_INFO("The framebuffer device was opened successfully");
 
-#if !LV_LINUX_FBDEV_NUTTX
     /* Make sure that the display is on.*/
     if(ioctl(dsc->fbfd, FBIOBLANK, FB_BLANK_UNBLANK) != 0) {
         perror("ioctl(FBIOBLANK)");
         /* Don't return. Some framebuffer drivers like efifb or simplefb don't implement FBIOBLANK.*/
     }
-#endif /* !LV_LINUX_FBDEV_NUTTX */
 
 #if LV_LINUX_FBDEV_BSD
     struct fbtype fb;
@@ -255,16 +251,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
             color_p += w * px_size;
         }
     }
-
-#if LV_LINUX_FBDEV_NUTTX && defined(CONFIG_FB_UPDATE)
-    /*May be some direct update command is required*/
-    struct fb_area_s fb_area;
-    fb_area.x = area->x1;
-    fb_area.y = area->y1;
-    fb_area.w = lv_area_get_width(area);
-    fb_area.h = lv_area_get_height(area);
-    ioctl(dsc->fbfd, FBIO_UPDATE, (unsigned long)((uintptr_t)&fb_area));
-#endif
 
     lv_display_flush_ready(disp);
 }

@@ -63,6 +63,18 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Call lv_demo_xxx.
+ * @param   info the information which contains demo name and parameters
+ *               needs by lv_demo_xxx.
+ * @size    size of information.
+ */
+bool lv_demos_create(char * info[], int size);
+
+/**
+ * Show help for lv_demos.
+ */
+void lv_demos_show_help(void);
 
 /**********************
  *      MACROS

@@ -59,7 +59,7 @@ LV_ARC
    import PikaStdLib
    mem = PikaStdLib.MemChecker()
    # Create an Arc
-   arc = lv.arc(lv.scr_act())
+   arc = lv.arc(lv.screen_active())
    arc.set_end_angle(200)
    arc.set_size(150, 150)
    arc.center()
@@ -75,7 +75,7 @@ LV_BAR
    import pika_lvgl as lv
    import PikaStdLib
    mem = PikaStdLib.MemChecker()
-   bar1 = lv.bar(lv.scr_act())
+   bar1 = lv.bar(lv.screen_active())
    bar1.set_size(200, 20)
    bar1.center()
    bar1.set_value(70, lv.ANIM.OFF)
@@ -97,9 +97,9 @@ LV_BTN
    def event_cb_2(evt):
        print('in evt2')
        print('mem used now: %0.2f kB' % (mem.getNow()))
-   btn1 = lv.btn(lv.scr_act())
+   btn1 = lv.btn(lv.screen_active())
    btn1.align(lv.ALIGN.TOP_MID, 0, 10)
-   btn2 = lv.btn(lv.scr_act())
+   btn2 = lv.btn(lv.screen_active())
    btn2.align(lv.ALIGN.TOP_MID, 0, 50)
    btn1.add_event(event_cb_1, lv.EVENT.CLICKED, 0)
    btn2.add_event(event_cb_2, lv.EVENT.CLICKED, 0)
@@ -115,18 +115,18 @@ LV_CHECKBOX
    import pika_lvgl as lv
    import PikaStdLib
    mem = PikaStdLib.MemChecker()
-   cb = lv.checkbox(lv.scr_act())
+   cb = lv.checkbox(lv.screen_active())
    cb.set_text("Apple")
    cb.align(lv.ALIGN.TOP_LEFT, 0 ,0)
-   cb = lv.checkbox(lv.scr_act())
+   cb = lv.checkbox(lv.screen_active())
    cb.set_text("Banana")
    cb.add_state(lv.STATE.CHECKED)
    cb.align(lv.ALIGN.TOP_LEFT, 0 ,30)
-   cb = lv.checkbox(lv.scr_act())
+   cb = lv.checkbox(lv.screen_active())
    cb.set_text("Lemon")
    cb.add_state(lv.STATE.DISABLED)
    cb.align(lv.ALIGN.TOP_LEFT, 0 ,60)
-   cb = lv.checkbox(lv.scr_act())
+   cb = lv.checkbox(lv.screen_active())
    cb.add_state(lv.STATE.CHECKED | lv.STATE.DISABLED)
    cb.set_text("Melon")
    cb.align(lv.ALIGN.TOP_LEFT, 0 ,90)

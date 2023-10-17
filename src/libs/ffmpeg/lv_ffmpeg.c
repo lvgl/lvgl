@@ -88,11 +88,13 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p, lv_obj_t
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_ffmpeg_player_class = {
     .constructor_cb = lv_ffmpeg_player_constructor,
     .destructor_cb = lv_ffmpeg_player_destructor,
     .instance_size = sizeof(lv_ffmpeg_player_t),
-    .base_class = &lv_image_class
+    .base_class = &lv_image_class,
+    .name = "ffmpeg-player",
 };
 
 /**********************
@@ -833,7 +835,7 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
     if(player->timer) {
-        lv_timer_del(player->timer);
+        lv_timer_delete(player->timer);
         player->timer = NULL;
     }
 

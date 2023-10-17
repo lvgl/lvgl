@@ -134,8 +134,15 @@ typedef struct _lv_draw_unit_t {
 
 typedef struct _lv_layer_t  {
 
-    lv_draw_buf_t draw_buf;
-    lv_point_t draw_buf_ofs;
+    /** The unaligned buffer where drawing will happen*/
+    void * buf_unaligned;
+
+    /** The aligned buffer, result of lv_draw_buf_align(layer->buf_unaligned)*/
+    void * buf;
+
+    uint32_t buf_stride;
+    lv_area_t buf_area;
+    lv_color_format_t color_format;
 
     /**
      * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
@@ -224,15 +231,21 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
  */
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area);
 
-
-void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area);
-
 /**
  * Try to allocate a buffer for the layer.
  * @param layer             pointer to a layer
  * @return                  pointer to the allocated aligned buffer or NULL on failure
  */
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
+
+/**
+ * Got to a pixel at X and Y coordinate on a layer
+ * @param layer             pointer to a layer
+ * @param x                 the target X coordinate
+ * @param y                 the target X coordinate
+ * @return                  `buf` offset to point to the given X and Y coordinate
+ */
+void * lv_draw_layer_go_to_xy(lv_layer_t * layer, lv_coord_t x, lv_coord_t y);
 
 /**********************
  *  GLOBAL VARIABLES

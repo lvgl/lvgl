@@ -107,7 +107,7 @@ lv_group_t * lv_group_create(void);
  * Delete a group object
  * @param group     pointer to a group
  */
-void lv_group_del(lv_group_t * group);
+void lv_group_delete(lv_group_t * group);
 
 /**
  * Set a default group. New object are added to this group if it's enabled in their class with `add_to_def_group = true`
@@ -258,6 +258,18 @@ bool lv_group_get_wrap(lv_group_t * group);
  * @return              number of objects in the group
  */
 uint32_t lv_group_get_obj_count(lv_group_t * group);
+
+/**
+ * Get the number of groups
+ * @return              number of groups
+ */
+uint32_t lv_group_get_count(void);
+
+/**
+ * Get a group by its index
+ * @return              pointer to the group
+ */
+lv_group_t  * lv_group_by_index(uint32_t index);
 
 /**********************
  *      MACROS

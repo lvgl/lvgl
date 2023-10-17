@@ -23,7 +23,7 @@ static void drag_event_handler(lv_event_t * e)
 void lv_example_obj_2(void)
 {
     lv_obj_t * obj;
-    obj = lv_obj_create(lv_scr_act());
+    obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 150, 100);
     lv_obj_add_event(obj, drag_event_handler, LV_EVENT_PRESSING, NULL);
 

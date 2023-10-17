@@ -57,13 +57,15 @@ const lv_obj_class_t lv_roller_class = {
     .instance_size = sizeof(lv_roller_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "roller",
 };
 
 const lv_obj_class_t lv_roller_label_class  = {
     .event_cb = lv_roller_label_event,
     .instance_size = sizeof(lv_label_t),
-    .base_class = &lv_label_class
+    .base_class = &lv_label_class,
+    .name = "roller-label",
 };
 
 /**********************
@@ -179,7 +181,7 @@ void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t a
             uint32_t act_opt = roller->sel_opt_id - current_page * real_option_cnt;
             int32_t sel_opt_signed = sel_opt;
             /*Huge jump? Probably from last to first or first to last option.*/
-            if((uint32_t)LV_ABS((int16_t)act_opt - sel_opt) > real_option_cnt / 2) {
+            if((uint32_t)LV_ABS((int16_t)(act_opt - sel_opt)) > real_option_cnt / 2) {
                 if(act_opt > sel_opt) sel_opt_signed += real_option_cnt;
                 else sel_opt_signed -= real_option_cnt;
             }
@@ -311,8 +313,8 @@ static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     roller->sel_opt_id = 0;
     roller->sel_opt_id_ori = 0;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
 
     LV_LOG_INFO("begin");
     lv_obj_t * label = lv_obj_class_create_obj(&lv_roller_label_class, obj);
@@ -353,7 +355,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_PRESSED) {
         roller->moved = 0;
-        lv_anim_del(get_label(obj), set_y_anim);
+        lv_anim_delete(get_label(obj), set_y_anim);
     }
     else if(code == LV_EVENT_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
@@ -655,7 +657,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     const lv_coord_t new_y = mid_y1 - sel_y1;
 
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
-        lv_anim_del(label, set_y_anim);
+        lv_anim_delete(label, set_y_anim);
         lv_obj_set_y(label, new_y);
     }
     else {

@@ -37,6 +37,9 @@ bool lv_test_assert_image_eq(const char * fn_ref);
 #  define TEST_ASSERT_EQUAL_COLOR32(c1, c2)                   TEST_ASSERT_TRUE(lv_color32_eq(c1, c2))
 #  define TEST_ASSERT_EQUAL_COLOR32_MESSAGE(c1, c2, msg)      TEST_ASSERT_TRUE(lv_color32_eq(c1, c2), msg)
 
+
+#  define TEST_ASSERT_MEM_LEAK_LESS_THAN(prev_usage, threshold)  TEST_ASSERT_LESS_THAN(threshold, LV_ABS((int64_t)(prev_usage) - (int64_t)lv_test_get_free_mem()));
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

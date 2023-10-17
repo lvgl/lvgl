@@ -35,6 +35,7 @@
  **********************/
 static void lv_refr_join_area(void);
 static void refr_invalid_areas(void);
+static void refr_sync_areas(void);
 static void refr_area(const lv_area_t * area_p);
 static void refr_area_part(lv_layer_t * layer);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
@@ -51,10 +52,10 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_DISP_REFR
-    #define REFR_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_DISP_REFR
+    #define LV_TRACE_REFR(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define REFR_TRACE(...)
+    #define LV_TRACE_REFR(...)
 #endif
 
 /**********************
@@ -319,7 +320,7 @@ lv_display_t * _lv_refr_get_disp_refreshing(void)
 void _lv_display_refr_timer(lv_timer_t * tmr)
 {
     LV_PROFILER_BEGIN;
-    REFR_TRACE("begin");
+    LV_TRACE_REFR("begin");
 
     if(tmr) {
         disp_refr = tmr->user_data;
@@ -367,7 +368,7 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
     }
 
     lv_refr_join_area();
-
+    refr_sync_areas();
     refr_invalid_areas();
 
     if(disp_refr->inv_p == 0) goto refr_finish;
@@ -383,23 +384,13 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
     /*We need to wait for ready here to not mess up the active screen*/
     while(disp_refr->flushing);
 
-    /*The buffers are already swapped.
-     *So the active buffer is the off screen buffer where LVGL will render*/
-    void * buf_off_screen = disp_refr->buf_act;
-    void * buf_on_screen = disp_refr->buf_act == disp_refr->buf_1
-                           ? disp_refr->buf_2
-                           : disp_refr->buf_1;
-
-    lv_coord_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp_refr),
-                                                    lv_display_get_color_format(disp_refr));
     uint32_t i;
     for(i = 0; i < disp_refr->inv_p; i++) {
-        if(disp_refr->inv_area_joined[i]) continue;
-        lv_draw_buf_copy(
-            buf_off_screen, stride, &disp_refr->inv_areas[i],
-            buf_on_screen, stride, &disp_refr->inv_areas[i],
-            disp_refr->color_format
-        );
+        if(disp_refr->inv_area_joined[i])
+            continue;
+
+        lv_area_t * sync_area = _lv_ll_ins_tail(&disp_refr->sync_areas);
+        *sync_area = disp_refr->inv_areas[i];
     }
 
 refr_clean_up:
@@ -416,7 +407,7 @@ refr_finish:
 
     lv_display_send_event(disp_refr, LV_EVENT_REFR_FINISH, NULL);
 
-    REFR_TRACE("finished");
+    LV_TRACE_REFR("finished");
     LV_PROFILER_END;
 }
 
@@ -459,6 +450,85 @@ static void lv_refr_join_area(void)
             }
         }
     }
+}
+
+/**
+ * Refresh the sync areas
+ */
+static void refr_sync_areas(void)
+{
+    /*Do not sync if not direct or double buffered*/
+    if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT) return;
+
+    /*Do not sync if not double buffered*/
+    if(!lv_display_is_double_buffered(disp_refr)) return;
+
+    /*Do not sync if no sync areas*/
+    if(_lv_ll_is_empty(&disp_refr->sync_areas)) return;
+
+    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
+    /*We need to wait for ready here to not mess up the active screen*/
+    while(disp_refr->flushing) {}
+
+    /*The buffers are already swapped.
+     *So the active buffer is the off screen buffer where LVGL will render*/
+    void * buf_off_screen = disp_refr->buf_act;
+    void * buf_on_screen = disp_refr->buf_act == disp_refr->buf_1
+                           ? disp_refr->buf_2
+                           : disp_refr->buf_1;
+
+    /*Get stride for buffer copy*/
+    lv_coord_t stride = lv_draw_buf_width_to_stride(
+                            lv_display_get_horizontal_resolution(disp_refr),
+                            lv_display_get_color_format(disp_refr));
+
+    /*Iterate through invalidated areas to see if sync area should be copied*/
+    uint16_t i;
+    int8_t j;
+    lv_area_t res[4] = {0};
+    int8_t res_c;
+    lv_area_t * sync_area, * new_area, * next_area;
+    for(i = 0; i < disp_refr->inv_p; i++) {
+        /*Skip joined areas*/
+        if(disp_refr->inv_area_joined[i]) continue;
+
+        /*Iterate over sync areas*/
+        sync_area = _lv_ll_get_head(&disp_refr->sync_areas);
+        while(sync_area != NULL) {
+            /*Get next sync area*/
+            next_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area);
+
+            /*Remove intersect of redraw area from sync area and get remaining areas*/
+            res_c = _lv_area_diff(res, sync_area, &disp_refr->inv_areas[i]);
+
+            /*New sub areas created after removing intersect*/
+            if(res_c != -1) {
+                /*Replace old sync area with new areas*/
+                for(j = 0; j < res_c; j++) {
+                    new_area = _lv_ll_ins_prev(&disp_refr->sync_areas, sync_area);
+                    *new_area = res[j];
+                }
+                _lv_ll_remove(&disp_refr->sync_areas, sync_area);
+                lv_free(sync_area);
+            }
+
+            /*Move on to next sync area*/
+            sync_area = next_area;
+        }
+    }
+
+    /*Copy sync areas (if any remaining)*/
+    for(sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
+        sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
+        lv_draw_buf_copy(
+            buf_off_screen, stride, sync_area,
+            buf_on_screen, stride, sync_area,
+            lv_display_get_color_format(disp_refr)
+        );
+    }
+
+    /*Clear sync areas*/
+    _lv_ll_clear(&disp_refr->sync_areas);
 }
 
 /**
@@ -507,15 +577,15 @@ static void refr_invalid_areas(void)
 static void refr_area(const lv_area_t * area_p)
 {
     lv_layer_t * layer = disp_refr->layer_head;
-    layer->draw_buf.buf = disp_refr->buf_act;
+    layer->buf = disp_refr->buf_act;
 
     /*With full refresh just redraw directly into the buffer*/
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
     if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        layer->draw_buf.width = lv_display_get_horizontal_resolution(disp_refr);
-        layer->draw_buf.height = lv_display_get_vertical_resolution(disp_refr);
-        layer->draw_buf_ofs.x = 0;
-        layer->draw_buf_ofs.y = 0;
+        layer->buf_area.x1 = 0;
+        layer->buf_area.y1 = 0;
+        layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
+        layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
         lv_area_t disp_area;
         lv_area_set(&disp_area, 0, 0, lv_display_get_horizontal_resolution(disp_refr) - 1,
                     lv_display_get_vertical_resolution(disp_refr) - 1);
@@ -551,11 +621,8 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = row + max_row - 1;
-        layer->draw_buf.buf = disp_refr->buf_act;
-        layer->draw_buf.width = lv_area_get_width(&sub_area);
-        layer->draw_buf.height = max_row;
-        layer->draw_buf_ofs.x = sub_area.x1;
-        layer->draw_buf_ofs.y = sub_area.y1;
+        layer->buf = disp_refr->buf_act;
+        layer->buf_area = sub_area;
         layer->clip_area = sub_area;
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
@@ -570,11 +637,8 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = y2;
-        layer->draw_buf.buf = disp_refr->buf_act;
-        layer->draw_buf.width = lv_area_get_width(&sub_area);
-        layer->draw_buf.height = lv_area_get_height(&sub_area);
-        layer->draw_buf_ofs.x = sub_area.x1;
-        layer->draw_buf_ofs.y = sub_area.y1;
+        layer->buf = disp_refr->buf_act;
+        layer->buf_area = sub_area;
         layer->clip_area = sub_area;
         disp_refr->last_part = 1;
         refr_area_part(layer);
@@ -592,14 +656,15 @@ static void refr_area_part(lv_layer_t * layer)
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
-        lv_draw_buf_clear(&layer->draw_buf, &disp_refr->refreshed_area);
+        uint32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+        lv_draw_buf_clear(layer->buf, stride, layer->color_format, &disp_refr->refreshed_area);
     }
 
     lv_obj_t * top_act_scr = NULL;
     lv_obj_t * top_prev_scr = NULL;
 
     /*Get the most top object which is not covered by others*/
-    top_act_scr = lv_refr_get_top_obj(&layer->clip_area, lv_display_get_scr_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(&layer->clip_area, lv_display_get_screen_act(disp_refr));
     if(disp_refr->prev_scr) {
         top_prev_scr = lv_refr_get_top_obj(&layer->clip_area, disp_refr->prev_scr);
     }
@@ -688,7 +753,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     /*Normally always will be a top_obj (at least the screen)
      *but in special cases (e.g. if the screen has alpha) it won't.
      *In this case use the screen directly*/
-    if(top_obj == NULL) top_obj = lv_display_get_scr_act(disp_refr);
+    if(top_obj == NULL) top_obj = lv_display_get_screen_act(disp_refr);
     if(top_obj == NULL) return;  /*Shouldn't happen*/
 
     /*Refresh the top object and its children*/
@@ -839,8 +904,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 
             lv_draw_image_dsc_t layer_draw_dsc;
             lv_draw_image_dsc_init(&layer_draw_dsc);
-            layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->draw_buf_ofs.x;
-            layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->draw_buf_ofs.y;
+            layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->buf_area.x1;
+            layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->buf_area.y1;
 
             layer_draw_dsc.opa = opa;
             layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, 0);
@@ -930,10 +995,10 @@ static void draw_buf_flush(lv_display_t * disp)
         /*Rotate the buffer to the display's native orientation if necessary*/
         if(disp->rotation != LV_DISPLAY_ROTATION_0 && disp->sw_rotate) {
             LV_LOG_WARN("SW rotation is not supported now");
-            call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf.buf);
+            call_flush_cb(disp, &disp->refreshed_area, layer->buf);
         }
         else {
-            call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf.buf);
+            call_flush_cb(disp, &disp->refreshed_area, layer->buf);
         }
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
@@ -950,9 +1015,8 @@ static void draw_buf_flush(lv_display_t * disp)
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     LV_PROFILER_BEGIN;
-    REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer",
-               (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2,
-               (void *)px_map);
+    LV_TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer",
+                  (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2, (void *)px_map);
 
     lv_area_t offset_area = {
         .x1 = area->x1 + disp->offset_x,

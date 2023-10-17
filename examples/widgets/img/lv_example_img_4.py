@@ -27,7 +27,7 @@ style.set_bg_opa(lv.OPA.COVER)
 style.set_image_recolor_opa(lv.OPA.COVER)
 style.set_image_recolor(lv.color_black())
 
-image = lv.image(lv.scr_act())
+image = lv.image(lv.screen_active())
 image.add_style(style, 0)
 image.set_src(image_skew_strip)
 image.set_size(150, 100)

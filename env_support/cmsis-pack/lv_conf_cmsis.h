@@ -230,7 +230,8 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
-	#define LV_LOG_TRACE_MSG		1
+    #define LV_LOG_TRACE_MSG        1
+    #define LV_LOG_TRACE_CACHE      1
 
 #endif  /*LV_USE_LOG*/
 
@@ -480,8 +481,6 @@
 #define LV_USE_CHART      1
 
 #define LV_USE_CHECKBOX   1
-
-#define LV_USE_COLORWHEEL 1
 
 #define LV_USE_DROPDOWN   1   /*Requires: lv_label*/
 

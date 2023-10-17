@@ -60,6 +60,7 @@ static lv_obj_t * get_label(const lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_dropdown_class = {
     .constructor_cb = lv_dropdown_constructor,
     .destructor_cb = lv_dropdown_destructor,
@@ -69,7 +70,8 @@ const lv_obj_class_t lv_dropdown_class = {
     .instance_size = sizeof(lv_dropdown_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "dropdown",
 };
 
 const lv_obj_class_t lv_dropdownlist_class = {
@@ -77,7 +79,8 @@ const lv_obj_class_t lv_dropdownlist_class = {
     .destructor_cb = lv_dropdownlist_destructor,
     .event_cb = lv_dropdown_list_event,
     .instance_size = sizeof(lv_dropdown_list_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "dropdown-list",
 };
 
 
@@ -410,8 +413,10 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
     while(start[0] != '\0') {
         for(char_i = 0; (start[char_i] != '\n') && (start[char_i] != '\0'); char_i++);
 
-        if(option_len == char_i &&
-           memcmp(start, option, option_len) == 0) return opt_i; /*cannot match exactly unless they are the same length*/
+        if(option_len == char_i && memcmp(start, option, LV_MIN(option_len, char_i)) == 0) {
+            return opt_i;
+        }
+
         start = &start[char_i];
         if(start[0] == '\n') start++;
         char_i = 0;
@@ -456,7 +461,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_obj_add_state(dropdown_obj, LV_STATE_CHECKED);
     lv_obj_set_parent(dropdown->list, lv_obj_get_screen(dropdown_obj));
     lv_obj_move_to_index(dropdown->list, -1);
-    lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
     /*To allow styling the list*/
     lv_obj_send_event(dropdown_obj, LV_EVENT_READY, NULL);
@@ -549,7 +554,7 @@ void lv_dropdown_close(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_obj_clear_state(obj, LV_STATE_CHECKED);
+    lv_obj_remove_state(obj, LV_STATE_CHECKED);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
@@ -616,7 +621,7 @@ static void lv_dropdown_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     if(dropdown->list) {
-        lv_obj_del(dropdown->list);
+        lv_obj_delete(dropdown->list);
         dropdown->list = NULL;
     }
 
@@ -631,8 +636,8 @@ static void lv_dropdownlist_constructor(const lv_obj_class_t * class_p, lv_obj_t
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
 

@@ -145,9 +145,9 @@ void pika_lvgl_PALETTE___init__(PikaObj* self) {
     obj_setInt(self, "NONE", LV_PALETTE_NONE);
 }
 
-PikaObj* pika_lvgl_scr_act(PikaObj* self) {
+PikaObj* pika_lvgl_screen_act(PikaObj* self) {
     PikaObj* new_obj = newNormalObj(New_TinyObj);
-    lv_obj_t* lv_obj = lv_scr_act();
+    lv_obj_t* lv_obj = lv_screen_active();
     obj_setPtr(new_obj, "lv_obj", lv_obj);
     return new_obj;
 }
