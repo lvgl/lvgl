@@ -14,7 +14,7 @@ static void sample_push_click(lv_event_t * e);
 
 static void sample_pop_click(lv_event_t * e);
 
-static void sample_container_del(lv_event_t * e);
+static void sample_container_delete(lv_event_t * e);
 
 static void sample_fragment_inc_click(lv_event_t * e);
 
@@ -35,7 +35,7 @@ static lv_obj_t * container = NULL;
 
 void lv_example_fragment_2(void)
 {
-    lv_obj_t * root = lv_obj_create(lv_scr_act());
+    lv_obj_t * root = lv_obj_create(lv_screen_active());
     lv_obj_set_size(root, LV_PCT(100), LV_PCT(100));
     lv_obj_set_layout(root, LV_LAYOUT_GRID);
     static const lv_coord_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
@@ -45,11 +45,11 @@ void lv_example_fragment_2(void)
     lv_obj_remove_style_all(container);
     lv_obj_set_grid_cell(container, LV_GRID_ALIGN_STRETCH, 0, 2, LV_GRID_ALIGN_STRETCH, 0, 1);
 
-    lv_obj_t * push_btn = lv_btn_create(root);
+    lv_obj_t * push_btn = lv_button_create(root);
     lv_obj_t * push_label = lv_label_create(push_btn);
     lv_label_set_text(push_label, "Push");
 
-    lv_obj_t * pop_btn = lv_btn_create(root);
+    lv_obj_t * pop_btn = lv_button_create(root);
     lv_obj_t * pop_label = lv_label_create(pop_btn);
     lv_label_set_text(pop_label, "Pop");
     lv_obj_set_grid_cell(push_btn, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
@@ -57,7 +57,7 @@ void lv_example_fragment_2(void)
 
     lv_fragment_manager_t * manager = lv_fragment_manager_create(NULL);
     /* Clean up the fragment manager before objects in containers got deleted */
-    lv_obj_add_event(root, sample_container_del, LV_EVENT_DELETE, manager);
+    lv_obj_add_event(root, sample_container_delete, LV_EVENT_DELETE, manager);
 
     int depth = 0;
     lv_fragment_t * fragment = lv_fragment_create(&sample_cls, &depth);
@@ -89,7 +89,7 @@ static lv_obj_t * sample_fragment_create_obj(lv_fragment_t * self, lv_obj_t * pa
     fragment->label = label;
     lv_label_set_text_fmt(label, "The button has been pressed %d times", fragment->counter);
 
-    lv_obj_t * inc_btn = lv_btn_create(content);
+    lv_obj_t * inc_btn = lv_button_create(content);
     lv_obj_t * inc_label = lv_label_create(inc_btn);
     lv_label_set_text(inc_label, "+1");
     lv_obj_add_event(inc_btn, sample_fragment_inc_click, LV_EVENT_CLICKED, fragment);
@@ -111,10 +111,10 @@ static void sample_pop_click(lv_event_t * e)
     lv_fragment_manager_pop(manager);
 }
 
-static void sample_container_del(lv_event_t * e)
+static void sample_container_delete(lv_event_t * e)
 {
     lv_fragment_manager_t * manager = (lv_fragment_manager_t *) lv_event_get_user_data(e);
-    lv_fragment_manager_del(manager);
+    lv_fragment_manager_delete(manager);
 }
 
 static void sample_fragment_inc_click(lv_event_t * e)

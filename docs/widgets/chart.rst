@@ -35,8 +35,6 @@ Parts and Styles
 -  :cpp:enumerator:`LV_PART_CURSOR` *Line* properties are used to style the cursors.
    ``width``, ``height``, ``bg_color`` and ``radius`` are used to set
    the appearance of points.
--  :cpp:enumerator:`LV_PART_TICKS` *Line* and *Text* style properties are used to
-   style the ticks
 
 Usage
 *****
@@ -263,7 +261,7 @@ Events
 
    -  :cpp:enumerator:`LV_CHART_DRAW_PART_TICK_LABEL` Used on tick lines and labels.
 
-      -  ``part``: :cpp:enumerator:`LV_PART_TICKS`
+      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
       -  ``id``: axis
       -  ``value``: value of the tick
       -  ``text``: ``value`` converted to decimal or ``NULL`` for minor

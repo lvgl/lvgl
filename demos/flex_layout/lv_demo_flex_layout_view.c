@@ -69,7 +69,7 @@ void view_create(lv_obj_t * par, view_t * ui)
     lv_obj_set_style_shadow_color(obj, lv_color_hex3(0xaaa), 0);
     lv_obj_set_style_shadow_width(obj, 20, 0);
     lv_obj_set_style_shadow_ofs_y(obj, 2, 0);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(
         obj,
@@ -114,7 +114,7 @@ void view_create(lv_obj_t * par, view_t * ui)
 
 static lv_obj_t * btn_create(lv_obj_t * par, const char * str, lv_color_t color)
 {
-    lv_obj_t * btn = lv_btn_create(par);
+    lv_obj_t * btn = lv_button_create(par);
     lv_obj_set_width(btn, lv_pct(30));
     lv_obj_set_height(btn, 30);
     lv_obj_set_style_border_width(btn, 0, LV_PART_MAIN);

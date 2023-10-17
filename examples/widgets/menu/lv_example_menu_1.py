@@ -1,5 +1,5 @@
 # Create a menu object
-menu = lv.menu(lv.scr_act())
+menu = lv.menu(lv.screen_active())
 menu.set_size(320, 240)
 menu.center()
 

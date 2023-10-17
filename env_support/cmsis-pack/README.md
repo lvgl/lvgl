@@ -151,7 +151,7 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
     - \#define LV_USE_FS_POSIX 0
     - \#define LV_USE_FS_WIN32 0
     - \#define LV_USE_FS_FATFS 0
-    - \#define LV_USE_PNG 0
+    - \#define LV_USE_LODEPNG 0
     - \#define LV_USE_BMP 0
     - \#define LV_USE_SJPG 0
     - \#define LV_USE_GIF 0
@@ -167,6 +167,8 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
     - LV_USE_SDL
 
     - LV_USE_LINUX_FBDEV
+
+    - LV_USE_NUTTX_FBDEV
 
     - LV_USE_LINUX_DRM
 

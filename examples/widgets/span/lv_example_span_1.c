@@ -12,7 +12,7 @@ void lv_example_span_1(void)
     lv_style_set_border_color(&style, lv_palette_main(LV_PALETTE_ORANGE));
     lv_style_set_pad_all(&style, 2);
 
-    lv_obj_t * spans = lv_spangroup_create(lv_scr_act());
+    lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     lv_obj_set_width(spans, 300);
     lv_obj_set_height(spans, 300);
     lv_obj_center(spans);

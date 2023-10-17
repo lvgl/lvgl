@@ -9,13 +9,13 @@
  */
 void lv_example_canvas_2(void)
 {
-    lv_obj_set_style_bg_color(lv_scr_act(), lv_palette_lighten(LV_PALETTE_RED, 5), 0);
+    lv_obj_set_style_bg_color(lv_screen_active(), lv_palette_lighten(LV_PALETTE_RED, 5), 0);
 
     /*Create a buffer for the canvas*/
     static uint8_t cbuf[CANVAS_WIDTH * CANVAS_HEIGHT * 4];
 
     /*Create a canvas and initialize its palette*/
-    lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
     lv_obj_center(canvas);
 

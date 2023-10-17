@@ -11,8 +11,8 @@
 #include "lv_obj.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
-#include "../disp/lv_disp.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display.h"
+#include "../display/lv_display_private.h"
 #include "../misc/lv_anim.h"
 #include "../misc/lv_async.h"
 #include "../core/lv_global.h"
@@ -23,6 +23,8 @@
 #define MY_CLASS &lv_obj_class
 #define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
+#define OBJ_DUMP_STRING_LEN 128
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -30,9 +32,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_obj_del_async_cb(void * obj);
-static void obj_del_core(lv_obj_t * obj);
+static void lv_obj_delete_async_cb(void * obj);
+static void obj_delete_core(lv_obj_t * obj);
 static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data);
+static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, lv_coord_t depth);
 
 /**********************
  *  STATIC VARIABLES
@@ -46,29 +49,32 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_obj_del(lv_obj_t * obj)
+void lv_obj_delete(lv_obj_t * obj)
 {
+    if(obj->is_deleting)
+        return;
+
     LV_LOG_TRACE("begin (delete %p)", (void *)obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
 
     lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par) {
+    if(par && !par->is_deleting) {
         lv_obj_scrollbar_invalidate(par);
     }
 
-    lv_disp_t * disp = NULL;
-    bool act_scr_del = false;
+    lv_display_t * disp = NULL;
+    bool act_screen_del = false;
     if(par == NULL) {
         disp = lv_obj_get_disp(obj);
         if(!disp) return;   /*Shouldn't happen*/
-        if(disp->act_scr == obj) act_scr_del = true;
+        if(disp->act_scr == obj) act_screen_del = true;
     }
 
-    obj_del_core(obj);
+    obj_delete_core(obj);
 
     /*Call the ancestor's event handler to the parent to notify it about the child delete*/
-    if(par) {
+    if(par && !par->is_deleting) {
         lv_obj_update_layout(par);
         lv_obj_readjust_scroll(par, LV_ANIM_OFF);
         lv_obj_scrollbar_invalidate(par);
@@ -77,7 +83,7 @@ void lv_obj_del(lv_obj_t * obj)
     }
 
     /*Handle if the active screen was deleted*/
-    if(act_scr_del) {
+    if(act_screen_del) {
         LV_LOG_WARN("the active screen was deleted");
         disp->act_scr = NULL;
     }
@@ -88,14 +94,14 @@ void lv_obj_del(lv_obj_t * obj)
 
 void lv_obj_clean(lv_obj_t * obj)
 {
-    LV_LOG_TRACE("begin (delete %p)", (void *)obj);
+    LV_LOG_TRACE("begin (clean %p)", (void *)obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_invalidate(obj);
 
     lv_obj_t * child = lv_obj_get_child(obj, 0);
     while(child) {
-        obj_del_core(child);
+        obj_delete_core(child);
         child = lv_obj_get_child(obj, 0);
     }
     /*Just to remove scroll animations if any*/
@@ -107,10 +113,10 @@ void lv_obj_clean(lv_obj_t * obj)
 
     LV_ASSERT_MEM_INTEGRITY();
 
-    LV_LOG_TRACE("finished (delete %p)", (void *)obj);
+    LV_LOG_TRACE("finished (clean %p)", (void *)obj);
 }
 
-void lv_obj_del_delayed(lv_obj_t * obj, uint32_t delay_ms)
+void lv_obj_delete_delayed(lv_obj_t * obj, uint32_t delay_ms)
 {
     lv_anim_t a;
     lv_anim_init(&a);
@@ -118,19 +124,19 @@ void lv_obj_del_delayed(lv_obj_t * obj, uint32_t delay_ms)
     lv_anim_set_exec_cb(&a, NULL);
     lv_anim_set_time(&a, 1);
     lv_anim_set_delay(&a, delay_ms);
-    lv_anim_set_ready_cb(&a, lv_obj_del_anim_ready_cb);
+    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);
 }
 
-void lv_obj_del_anim_ready_cb(lv_anim_t * a)
+void lv_obj_delete_anim_ready_cb(lv_anim_t * a)
 {
-    lv_obj_del(a->var);
+    lv_obj_delete(a->var);
 }
 
-void lv_obj_del_async(lv_obj_t * obj)
+void lv_obj_delete_async(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_async_call(lv_obj_del_async_cb, obj);
+    lv_async_call(lv_obj_delete_async_cb, obj);
 }
 
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
@@ -279,7 +285,7 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
     return (lv_obj_t *)act_par;
 }
 
-lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
+lv_display_t * lv_obj_get_disp(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -288,7 +294,7 @@ lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
     if(obj->parent == NULL) scr = obj;  /*`obj` is a screen*/
     else scr = lv_obj_get_screen(obj);  /*get the screen of `obj`*/
 
-    lv_disp_t * d;
+    lv_display_t * d;
     lv_ll_t * disp_head = disp_ll_p;
     _LV_LL_READ(disp_head, d) {
         uint32_t i;
@@ -329,6 +335,13 @@ lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t id)
     else return obj->spec_attr->children[id];
 }
 
+lv_obj_t * lv_obj_get_sibling(const lv_obj_t * obj, int32_t id)
+{
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    return lv_obj_get_child(parent, (int32_t)lv_obj_get_index(obj) + id);
+}
+
+
 uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -356,27 +369,55 @@ void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * use
     walk_core(start_obj, cb, user_data);
 }
 
+void lv_obj_dump_tree(lv_obj_t * start_obj)
+{
+    if(start_obj == NULL) {
+        lv_display_t * disp = lv_display_get_next(NULL);
+        while(disp) {
+            uint32_t i;
+            for(i = 0; i < disp->screen_cnt; i++) {
+                dump_tree_core(disp->screens[i], 0);
+            }
+            disp = lv_display_get_next(disp);
+        }
+    }
+    else {
+        dump_tree_core(start_obj, 0);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_del_async_cb(void * obj)
+static void lv_obj_delete_async_cb(void * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_obj_del(obj);
+    lv_obj_delete(obj);
 }
 
-static void obj_del_core(lv_obj_t * obj)
+static void obj_delete_core(lv_obj_t * obj)
 {
+    if(obj->is_deleting)
+        return;
+
+    obj->is_deleting = true;
+
     /*Let the user free the resources used in `LV_EVENT_DELETE`*/
-    lv_res_t res = lv_obj_send_event(obj, LV_EVENT_DELETE, NULL);
-    if(res == LV_RES_INV) return;
+    lv_result_t res = lv_obj_send_event(obj, LV_EVENT_DELETE, NULL);
+    if(res == LV_RESULT_INVALID) {
+        obj->is_deleting = false;
+        return;
+    }
+
+    /*Clean registered event_cb*/
+    if(obj->spec_attr) lv_event_remove_all(&(obj->spec_attr->event_list));
 
     /*Recursively delete the children*/
     lv_obj_t * child = lv_obj_get_child(obj, 0);
     while(child) {
-        obj_del_core(child);
+        obj_delete_core(child);
         child = lv_obj_get_child(obj, 0);
     }
 
@@ -402,9 +443,9 @@ static void obj_del_core(lv_obj_t * obj)
     }
 
     /*Delete all pending async del-s*/
-    lv_res_t async_cancel_res = LV_RES_OK;
-    while(async_cancel_res == LV_RES_OK) {
-        async_cancel_res = lv_async_call_cancel(lv_obj_del_async_cb, obj);
+    lv_result_t async_cancel_res = LV_RESULT_OK;
+    while(async_cancel_res == LV_RESULT_OK) {
+        async_cancel_res = lv_async_call_cancel(lv_obj_delete_async_cb, obj);
     }
 
     /*All children deleted. Now clean up the object specific data*/
@@ -412,7 +453,7 @@ static void obj_del_core(lv_obj_t * obj)
 
     /*Remove the screen for the screen list*/
     if(obj->parent == NULL) {
-        lv_disp_t * disp = lv_obj_get_disp(obj);
+        lv_display_t * disp = lv_obj_get_disp(obj);
         uint32_t i;
         /*Find the screen in the list*/
         for(i = 0; i < disp->screen_cnt; i++) {
@@ -448,13 +489,13 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
     lv_obj_tree_walk_res_t res = LV_OBJ_TREE_WALK_NEXT;
 
     if(obj == NULL) {
-        lv_disp_t * disp = lv_disp_get_next(NULL);
+        lv_display_t * disp = lv_display_get_next(NULL);
         while(disp) {
             uint32_t i;
             for(i = 0; i < disp->screen_cnt; i++) {
                 walk_core(disp->screens[i], cb, user_data);
             }
-            disp = lv_disp_get_next(disp);
+            disp = lv_display_get_next(disp);
         }
         return LV_OBJ_TREE_WALK_END;    /*The value doesn't matter as it wasn't called recursively*/
     }
@@ -471,4 +512,33 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
         }
     }
     return LV_OBJ_TREE_WALK_NEXT;
+}
+
+static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, lv_coord_t depth)
+{
+    lv_obj_tree_walk_res_t res;
+    const char * id;
+
+#if LV_USE_OBJ_ID
+    char buf[OBJ_DUMP_STRING_LEN];
+    id = lv_obj_stringify_id(obj, buf, sizeof(buf));
+    if(id == NULL) id = "obj0";
+#else
+    id = "obj0";
+#endif
+
+    /*id of `obj0` is an invalid id for builtin id*/
+    LV_LOG_USER("parent:%p, obj:%p, id:%s;", (void *)(obj ? obj->parent : NULL), (void *)obj, id);
+
+    if(obj && obj->spec_attr && obj->spec_attr->child_cnt) {
+        for(uint32_t i = 0; i < obj->spec_attr->child_cnt; i++) {
+            res = dump_tree_core(lv_obj_get_child(obj, i), depth + 1);
+            if(res == LV_OBJ_TREE_WALK_END)
+                break;
+        }
+        return LV_OBJ_TREE_WALK_NEXT;
+    }
+    else {
+        return LV_OBJ_TREE_WALK_END;
+    }
 }

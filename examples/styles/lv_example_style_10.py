@@ -28,7 +28,7 @@ style_pr.set_border_color(lv.palette_darken(lv.PALETTE.RED, 3))
 style_pr.set_transition(trans_pr)
 
 # Create an object with the new style_pr
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.add_style(style_def, 0)
 obj.add_style(style_pr, lv.STATE.PRESSED)
 

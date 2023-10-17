@@ -8,7 +8,7 @@
  *********************/
 #include "lv_draw.h"
 #include "sw/lv_draw_sw.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "../core/lv_refr.h"
 #include "../stdlib/lv_string.h"
@@ -94,15 +94,6 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 
     lv_draw_global_info_t * info = &_draw_info;
 
-    /*Let the draw units set their preference score*/
-    t->preference_score = 100;
-    t->preferred_draw_unit_id = 0;
-    lv_draw_unit_t * u = info->unit_head;
-    while(u) {
-        if(u->evaluate_cb) u->evaluate_cb(u, t);
-        u = u->next;
-    }
-
     /*Send LV_EVENT_DRAW_TASK_ADDED and dispatch only on the "main" draw_task
      *and not on the draw tasks added in the event.
      *Sending LV_EVENT_DRAW_TASK_ADDED events might cause recursive event sends
@@ -113,8 +104,28 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
         if(base_dsc->obj && lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
             lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
         }
+
+        /*Let the draw units set their preference score*/
+        t->preference_score = 100;
+        t->preferred_draw_unit_id = 0;
+        lv_draw_unit_t * u = info->unit_head;
+        while(u) {
+            if(u->evaluate_cb) u->evaluate_cb(u, t);
+            u = u->next;
+        }
+
         lv_draw_dispatch();
         info->task_running = false;
+    }
+    else {
+        /*Let the draw units set their preference score*/
+        t->preference_score = 100;
+        t->preferred_draw_unit_id = 0;
+        lv_draw_unit_t * u = info->unit_head;
+        while(u) {
+            if(u->evaluate_cb) u->evaluate_cb(u, t);
+            u = u->next;
+        }
     }
 }
 
@@ -122,7 +133,7 @@ void lv_draw_dispatch(void)
 {
     LV_PROFILER_BEGIN;
     bool one_taken = false;
-    lv_disp_t * disp = lv_disp_get_next(NULL);
+    lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
         lv_layer_t * layer = disp->layer_head;
         while(layer) {
@@ -134,12 +145,12 @@ void lv_draw_dispatch(void)
         if(!one_taken) {
             lv_draw_dispatch_request();
         }
-        disp = lv_disp_get_next(disp);
+        disp = lv_display_get_next(disp);
     }
     LV_PROFILER_END;
 }
 
-bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
+bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
 {
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
@@ -152,16 +163,17 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
 
             /*If it was layer drawing free the layer too*/
             if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-                lv_draw_img_dsc_t * draw_img_dsc = t->draw_dsc;
-                lv_layer_t * layer_drawn = (lv_layer_t *)draw_img_dsc->src;
+                lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
+                lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
 
-                if(lv_draw_buf_get_buf(&layer_drawn->draw_buf)) {
-                    uint32_t layer_size_byte = layer_drawn->draw_buf.height * lv_draw_buf_width_to_stride(layer_drawn->draw_buf.width,
-                                                                                                          layer_drawn->draw_buf.color_format);
+                if(layer_drawn->buf) {
+                    int32_t h = lv_area_get_height(&layer_drawn->buf_area);
+                    int32_t w = lv_area_get_width(&layer_drawn->buf_area);
+                    uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer_drawn->color_format);
 
                     _draw_info.used_memory_for_layers_kb -= layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
                     LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
-                    lv_draw_buf_free(&layer_drawn->draw_buf);
+                    lv_draw_buf_free(layer_drawn->buf_unaligned);
                 }
 
                 /*Remove the layer from  the display's*/
@@ -204,7 +216,7 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
         lv_draw_task_t * t_src = layer->parent->draw_task_head;
         while(t_src) {
             if(t_src->type == LV_DRAW_TASK_TYPE_LAYER && t_src->state == LV_DRAW_TASK_STATE_WAITING) {
-                lv_draw_img_dsc_t * draw_dsc = t_src->draw_dsc;
+                lv_draw_image_dsc_t * draw_dsc = t_src->draw_dsc;
                 if(draw_dsc->src == layer) {
                     t_src->state = LV_DRAW_TASK_STATE_QUEUED;
                     lv_draw_dispatch_request();
@@ -217,9 +229,11 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
     /*Assign draw tasks to the draw_units*/
     else {
         bool layer_ok = true;
-        if(layer->draw_buf.buf == NULL) {
-            uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
-                                                                                            layer->draw_buf.color_format);
+        if(layer->buf == NULL) {
+            int32_t h = lv_area_get_height(&layer->buf_area);
+            int32_t w = lv_area_get_width(&layer->buf_area);
+            uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
+
             uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
             if(_draw_info.used_memory_for_layers_kb + kb > LV_LAYER_MAX_MEMORY_USAGE) {
                 layer_ok = false;
@@ -269,8 +283,8 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     LV_PROFILER_BEGIN;
     /*If the first task is screen sized, there cannot be independent areas*/
     if(layer->draw_task_head) {
-        lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
-        lv_coord_t ver_res = lv_disp_get_ver_res(_lv_refr_get_disp_refreshing());
+        lv_coord_t hor_res = lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
+        lv_coord_t ver_res = lv_display_get_vertical_resolution(_lv_refr_get_disp_refreshing());
         lv_draw_task_t * t = layer->draw_task_head;
         if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
            t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
@@ -298,17 +312,16 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp = _lv_refr_get_disp_refreshing();
     lv_layer_t * new_layer = lv_malloc(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
     if(new_layer == NULL) return NULL;
     lv_memzero(new_layer, sizeof(lv_layer_t));
 
-    lv_draw_buf_init(&new_layer->draw_buf, lv_area_get_width(area), lv_area_get_height(area), color_format);
-    new_layer->draw_buf_ofs.x = area->x1;
-    new_layer->draw_buf_ofs.y = area->y1;
     new_layer->parent = parent_layer;
     new_layer->clip_area = *area;
+    new_layer->buf_area = *area;
+    new_layer->color_format = color_format;
 
     if(disp->layer_head) {
         lv_layer_t * tail = disp->layer_head;
@@ -322,41 +335,42 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     return new_layer;
 }
 
-void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area)
-{
-    area->x1 = 0;
-    area->y1 = 0;
-    area->x2 = layer->draw_buf.width - 1;
-    area->y2 = layer->draw_buf.height - 1;
-    lv_area_move(area, layer->draw_buf_ofs.x, layer->draw_buf_ofs.y);
-}
-
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
     /*If the buffer of the layer is not allocated yet, allocate it now*/
-    if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
-        uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
-                                                                                        layer->draw_buf.color_format);
+    if(layer->buf == NULL) {
+        int32_t h = lv_area_get_height(&layer->buf_area);
+        int32_t w = lv_area_get_width(&layer->buf_area);
+        int32_t stride = lv_draw_buf_width_to_stride(w, layer->color_format);
+        uint32_t layer_size_byte = h * stride;
+        layer->buf_unaligned = lv_draw_buf_malloc(layer_size_byte, layer->color_format);
 
-        lv_draw_buf_malloc(&layer->draw_buf);
-        if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
+        if(layer->buf_unaligned == NULL) {
             LV_LOG_WARN("Allocating %"LV_PRIu32" bytes of layer buffer failed. Try later", layer_size_byte);
             return NULL;
         }
+
+        layer->buf = lv_draw_buf_align(layer->buf_unaligned, layer->color_format);
 
         uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
         _draw_info.used_memory_for_layers_kb += kb;
         LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
 
 
-        if(lv_color_format_has_alpha(layer->draw_buf.color_format)) {
-            lv_draw_buf_clear(&layer->draw_buf, NULL);
+        if(lv_color_format_has_alpha(layer->color_format)) {
+            lv_draw_buf_clear(layer->buf, stride, layer->color_format, &layer->buf_area);
         }
     }
 
-    return lv_draw_buf_get_buf(&layer->draw_buf);
+    return lv_draw_buf_align(layer->buf, layer->color_format);
 }
 
+void * lv_draw_layer_go_to_xy(lv_layer_t * layer, lv_coord_t x, lv_coord_t y)
+{
+    uint32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+    return lv_draw_buf_go_to_xy(layer->buf, stride, layer->color_format, x, y);
+
+}
 
 /**********************
  *   STATIC FUNCTIONS

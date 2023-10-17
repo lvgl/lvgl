@@ -13,7 +13,7 @@ void lv_example_canvas_6(void)
     static uint8_t cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, CANVAS_HEIGHT)];
 
     /*Create a canvas and initialize its palette*/
-    lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_NATIVE);
     lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
     lv_obj_center(canvas);
@@ -21,14 +21,14 @@ void lv_example_canvas_6(void)
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
-    LV_IMG_DECLARE(img_star);
-    lv_draw_img_dsc_t dsc;
-    lv_draw_img_dsc_init(&dsc);
+    LV_IMAGE_DECLARE(img_star);
+    lv_draw_image_dsc_t dsc;
+    lv_draw_image_dsc_init(&dsc);
     dsc.src = &img_star;
 
     lv_area_t coords = {10, 10, 10 + img_star.header.w - 1, 10 + img_star.header.h - 1};
 
-    lv_draw_img(&layer, &dsc, &coords);
+    lv_draw_image(&layer, &dsc, &coords);
 
     lv_canvas_finish_layer(canvas, &layer);
 

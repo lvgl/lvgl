@@ -130,7 +130,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_slider_knob_map[] = {
 #endif
 };
 
-lv_img_dsc_t img_lv_demo_music_slider_knob = {
+lv_image_dsc_t img_lv_demo_music_slider_knob = {
     .header.always_zero = 0,
     .header.w = 36,
     .header.h = 38,

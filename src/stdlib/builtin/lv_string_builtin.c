@@ -39,10 +39,10 @@
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_MEM
-    #define MEM_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_MEM
+    #define LV_TRACE_MEM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define MEM_TRACE(...)
+    #define LV_TRACE_MEM(...)
 #endif
 
 #define _COPY(d, s) *d = *s; d++; s++;

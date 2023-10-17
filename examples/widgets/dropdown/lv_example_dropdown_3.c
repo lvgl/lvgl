@@ -15,7 +15,7 @@ static void event_cb(lv_event_t * e)
 void lv_example_dropdown_3(void)
 {
     /*Create a drop down list*/
-    lv_obj_t * dropdown = lv_dropdown_create(lv_scr_act());
+    lv_obj_t * dropdown = lv_dropdown_create(lv_screen_active());
     lv_obj_align(dropdown, LV_ALIGN_TOP_LEFT, 10, 10);
     lv_dropdown_set_options(dropdown, "New project\n"
                             "New file\n"
@@ -30,9 +30,9 @@ void lv_example_dropdown_3(void)
     lv_dropdown_set_text(dropdown, "Menu");
 
     /*Use a custom image as down icon and flip it when the list is opened*/
-    LV_IMG_DECLARE(img_caret_down)
+    LV_IMAGE_DECLARE(img_caret_down)
     lv_dropdown_set_symbol(dropdown, &img_caret_down);
-    lv_obj_set_style_transform_angle(dropdown, 1800, LV_PART_INDICATOR | LV_STATE_CHECKED);
+    lv_obj_set_style_transform_rotation(dropdown, 1800, LV_PART_INDICATOR | LV_STATE_CHECKED);
 
     /*In a menu we don't need to show the last clicked item*/
     lv_dropdown_set_selected_highlight(dropdown, false);

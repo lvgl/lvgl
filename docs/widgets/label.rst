@@ -97,6 +97,17 @@ the Label widget only allows manual text selection with
 :cpp:expr:`lv_label_get_text_selection_start(label, start_char_index)` and
 :cpp:expr:`lv_label_get_text_selection_start(label, end_char_index)`.
 
+
+Text alignment
+--------------
+
+To horizontally align the lines of a label the `text_align` style property can be used with 
+:cpp:expr:`lv_obj_set_style_text_align()` or :cpp:expr:`lv_style_set_text_align()`
+Note that it has a visible effect only if
+
+- the label widget's width is larger than the width of the longest line of the text
+- the text has multiple lines with non equal line length
+
 Very long texts
 ---------------
 

@@ -12,7 +12,7 @@
 #include "../../misc/lv_math.h"
 #include "../../draw/lv_draw.h"
 #include "../../core/lv_refr.h"
-#include "../../disp/lv_disp.h"
+#include "../../display/lv_display.h"
 #include "../../draw/sw/lv_draw_sw.h"
 #include "../../stdlib/lv_string.h"
 
@@ -34,11 +34,13 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_canvas_class = {
     .constructor_cb = lv_canvas_constructor,
     .destructor_cb = lv_canvas_destructor,
     .instance_size = sizeof(lv_canvas_t),
-    .base_class = &lv_img_class
+    .base_class = &lv_image_class,
+    .name = "canvas",
 };
 
 /**********************
@@ -71,11 +73,14 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     canvas->dsc.header.cf = cf;
     canvas->dsc.header.w  = w;
     canvas->dsc.header.h  = h;
+    canvas->dsc.header.stride  = lv_draw_buf_width_to_stride(w, cf); /*Let LVGL calculate it automatically*/
     canvas->dsc.data      = buf;
     canvas->dsc.data_size = w * h * lv_color_format_get_size(cf);
 
-    lv_img_set_src(obj, &canvas->dsc);
-    lv_img_cache_invalidate_src(&canvas->dsc);
+    lv_image_set_src(obj, &canvas->dsc);
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(&canvas->dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 }
 
 void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa)
@@ -139,7 +144,7 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t id, lv_color32_t c)
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-    lv_img_buf_set_palette(&canvas->dsc, id, c);
+    lv_image_buf_set_palette(&canvas->dsc, id, c);
     lv_obj_invalidate(obj);
 }
 
@@ -179,7 +184,7 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
                 break;
             }
         case LV_COLOR_FORMAT_A8: {
-                lv_color_t alpha_color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
+                lv_color_t alpha_color = lv_obj_get_style_image_recolor(obj, LV_PART_MAIN);
                 ret.red = alpha_color.red;
                 ret.green = alpha_color.green;
                 ret.blue = alpha_color.blue;
@@ -194,7 +199,7 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     return ret;
 }
 
-lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * obj)
+lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -233,15 +238,17 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_img_dsc_t * dsc = lv_canvas_get_img(obj);
+    lv_image_dsc_t * dsc = lv_canvas_get_image(obj);
 
     uint32_t x;
     uint32_t y;
 
+    uint32_t stride = lv_draw_buf_width_to_stride(dsc->header.w, dsc->header.cf);
+
     if(dsc->header.cf == LV_COLOR_FORMAT_RGB565) {
         uint16_t c16 = lv_color_to_u16(color);
         for(y = 0; y < dsc->header.h; y++) {
-            uint16_t * buf16 = (uint16_t *)(dsc->data + y * dsc->header.w * 2);
+            uint16_t * buf16 = (uint16_t *)(dsc->data + y * stride);
             for(x = 0; x < dsc->header.w; x++) {
                 buf16[x] = c16;
             }
@@ -254,7 +261,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
             c32 |= opa << 24;
         }
         for(y = 0; y < dsc->header.h; y++) {
-            uint32_t * buf32 = (uint32_t *)(dsc->data + y * dsc->header.w * 4);
+            uint32_t * buf32 = (uint32_t *)(dsc->data + y * stride);
             for(x = 0; x < dsc->header.w; x++) {
                 buf32[x] = c32;
             }
@@ -262,7 +269,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     }
     else if(dsc->header.cf == LV_COLOR_FORMAT_RGB888) {
         for(y = 0; y < dsc->header.h; y++) {
-            uint8_t * buf8 = (uint8_t *)(dsc->data + y * dsc->header.w * 3);
+            uint8_t * buf8 = (uint8_t *)(dsc->data + y * stride);
             for(x = 0; x < dsc->header.w * 3; x += 3) {
                 buf8[x + 0] = color.blue;
                 buf8[x + 1] = color.green;
@@ -288,12 +295,13 @@ void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
     LV_ASSERT_NULL(canvas);
     LV_ASSERT_NULL(layer);
 
-    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
+    lv_image_dsc_t * dsc = lv_canvas_get_image(canvas);
     lv_area_t canvas_area = {0, 0, dsc->header.w - 1,  dsc->header.h - 1};
     lv_memzero(layer, sizeof(*layer));
 
-    lv_draw_buf_init(&layer->draw_buf, dsc->header.w, dsc->header.h, dsc->header.cf);
-    layer->draw_buf.buf = (uint8_t *)dsc->data;
+    layer->buf = lv_draw_buf_align((uint8_t *)dsc->data, dsc->header.cf);
+    layer->color_format = dsc->header.cf;
+    layer->buf_area = canvas_area;
     layer->clip_area = canvas_area;
 }
 
@@ -324,7 +332,7 @@ static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     canvas->dsc.data_size          = 0;
     canvas->dsc.data               = NULL;
 
-    lv_img_set_src(obj, &canvas->dsc);
+    lv_image_set_src(obj, &canvas->dsc);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -335,7 +343,10 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    lv_img_cache_invalidate_src(&canvas->dsc);
+
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(&canvas->dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 }
 
 

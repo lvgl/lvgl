@@ -44,10 +44,10 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_ANIM
-    #define TRACE_ANIM(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_ANIM
+    #define LV_TRACE_ANIM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define TRACE_ANIM(...)
+    #define LV_TRACE_ANIM(...)
 #endif
 
 
@@ -77,10 +77,10 @@ void lv_anim_init(lv_anim_t * a)
 
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
 {
-    TRACE_ANIM("begin");
+    LV_TRACE_ANIM("begin");
 
     /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
-    if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*exec_cb == NULL would delete all animations of var*/
+    if(a->exec_cb != NULL) lv_anim_delete(a->var, a->exec_cb); /*exec_cb == NULL would delete all animations of var*/
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = _lv_ll_ins_head(anim_ll_p);
@@ -108,7 +108,7 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
      *It's important if it happens in a ready callback. (see `anim_timer`)*/
     anim_mark_list_change();
 
-    TRACE_ANIM("finished");
+    LV_TRACE_ANIM("finished");
     return new_anim;
 }
 
@@ -133,32 +133,32 @@ uint32_t lv_anim_get_playtime(lv_anim_t * a)
     return playtime;
 }
 
-bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
+bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
-    lv_anim_t * a_next;
-    bool del = false;
+    bool del_any = false;
     a        = _lv_ll_get_head(anim_ll_p);
     while(a != NULL) {
-        /*'a' might be deleted, so get the next object while 'a' is valid*/
-        a_next = _lv_ll_get_next(anim_ll_p, a);
-
+        bool del = false;
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
             _lv_ll_remove(anim_ll_p, a);
             if(a->deleted_cb != NULL) a->deleted_cb(a);
             lv_free(a);
             anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
                                        the linked list*/
+            del_any = true;
             del = true;
         }
 
-        a = a_next;
+        /*Always start from the head on delete, because we don't know
+         *how `anim_ll_p` was changes in `a->deleted_cb` */
+        a = del ? _lv_ll_get_head(anim_ll_p) : _lv_ll_get_next(anim_ll_p, a);
     }
 
-    return del;
+    return del_any;
 }
 
-void lv_anim_del_all(void)
+void lv_anim_delete_all(void)
 {
     _lv_ll_clear(anim_ll_p);
     anim_mark_list_change();
@@ -331,7 +331,7 @@ static void anim_timer(lv_timer_t * param)
     while(a != NULL) {
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
         a->last_timer_run = lv_tick_get();
-        /*It can be set by `lv_anim_del()` typically in `end_cb`. If set then an animation delete
+        /*It can be set by `lv_anim_delete()` typically in `end_cb`. If set then an animation delete
          * happened in `anim_ready_handler` which could make this linked list reading corrupt
          * because the list is changed meanwhile
          */

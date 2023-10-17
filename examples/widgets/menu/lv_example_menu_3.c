@@ -4,14 +4,14 @@
 void lv_example_menu_3(void)
 {
     /*Create a menu object*/
-    lv_obj_t * menu = lv_menu_create(lv_scr_act());
-    lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
+    lv_obj_t * menu = lv_menu_create(lv_screen_active());
+    lv_obj_set_size(menu, lv_display_get_horizontal_resolution(NULL), lv_display_get_vertical_resolution(NULL));
     lv_obj_center(menu);
 
     /*Modify the header*/
-    lv_obj_t * back_btn = lv_menu_get_main_header_back_btn(menu);
-    lv_obj_t * back_btn_label = lv_label_create(back_btn);
-    lv_label_set_text(back_btn_label, "Back");
+    lv_obj_t * back_btn = lv_menu_get_main_header_back_button(menu);
+    lv_obj_t * back_button_label = lv_label_create(back_btn);
+    lv_label_set_text(back_button_label, "Back");
 
     lv_obj_t * cont;
     lv_obj_t * label;

@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_draw.h"
 #include "../misc/lv_bidi.h"
-#include "../misc/lv_txt.h"
+#include "../misc/lv_text.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_style.h"
 
@@ -79,6 +79,7 @@ typedef enum {
 
 typedef struct {
     const uint8_t * bitmap;
+    uint8_t * _bitmap_buf_unaligned;
     uint8_t * bitmap_buf;
     uint32_t _bitmap_buf_size;
     lv_draw_letter_bitmap_format_t format;

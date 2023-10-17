@@ -6,7 +6,7 @@ class LV_Example_Event_4:
         #
         self.size = 0
         self.size_dec = False
-        self.cont = lv.obj(lv.scr_act())
+        self.cont = lv.obj(lv.screen_active())
         self.cont.set_size(200, 200)
         self.cont.center()
         self.cont.add_event(self.event_cb, lv.EVENT.DRAW_TASK_ADDED, None)

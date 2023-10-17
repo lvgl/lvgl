@@ -110,11 +110,11 @@ void * lv_monkey_get_user_data(lv_monkey_t * monkey)
     return monkey->user_data;
 }
 
-void lv_monkey_del(lv_monkey_t * monkey)
+void lv_monkey_delete(lv_monkey_t * monkey)
 {
     LV_ASSERT_NULL(monkey);
 
-    lv_timer_del(monkey->timer);
+    lv_timer_delete(monkey->timer);
     lv_indev_delete(monkey->indev);
     lv_free(monkey);
 }

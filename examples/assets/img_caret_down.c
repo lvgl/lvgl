@@ -6,11 +6,11 @@
     #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_IMG_CARET_DOWN
-    #define LV_ATTRIBUTE_IMG_IMG_CARET_DOWN
+#ifndef LV_ATTRIBUTE_IMAGE_IMG_CARET_DOWN
+    #define LV_ATTRIBUTE_IMAGE_IMG_CARET_DOWN
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_CARET_DOWN uint8_t img_caret_down_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_CARET_DOWN uint8_t img_caret_down_map[] = {
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
     /*Pixel format: Blue: 2 bit, Green: 3 bit, Red: 3 bit, Alpha 8 bit */
     0x49, 0x00, 0x49, 0x04, 0x25, 0x08, 0x25, 0x08, 0x25, 0x08, 0x25, 0x08, 0x25, 0x08, 0x25, 0x08, 0x25, 0x08, 0x25, 0x08, 0x25, 0x08, 0x49, 0x08, 0x92, 0x00,
@@ -46,7 +46,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_CARET
 #endif
 };
 
-const lv_img_dsc_t img_caret_down = {
+const lv_image_dsc_t img_caret_down = {
     .header.always_zero = 0,
     .header.w = 13,
     .header.h = 8,

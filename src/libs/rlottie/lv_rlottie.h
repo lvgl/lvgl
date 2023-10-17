@@ -34,10 +34,10 @@ typedef enum {
 /** definition in lottieanimation_capi.c */
 struct Lottie_Animation_S;
 typedef struct {
-    lv_img_t img_ext;
+    lv_image_t img_ext;
     struct Lottie_Animation_S * animation;
     lv_timer_t * task;
-    lv_img_dsc_t imgdsc;
+    lv_image_dsc_t imgdsc;
     size_t total_frames;
     size_t current_frame;
     size_t framerate;

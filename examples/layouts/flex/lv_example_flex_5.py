@@ -9,7 +9,7 @@ def column_gap_anim(obj, v):
 # Demonstrate the effect of column and row gap style properties
 #
 
-cont = lv.obj(lv.scr_act())
+cont = lv.obj(lv.screen_active())
 cont.set_size(300, 220)
 cont.center()
 cont.set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)

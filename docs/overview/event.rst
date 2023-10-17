@@ -5,11 +5,11 @@ Events
 ======
 
 Events are triggered in LVGL when something happens which might be
-interesting to the user, e.g. when an object: 
+interesting to the user, e.g. when an object:
 
-- is clicked 
+- is clicked
 - is scrolled
-- has its value changed 
+- has its value changed
 - is redrawn, etc.
 
 Add events to the object
@@ -20,7 +20,7 @@ In practice, it looks like this:
 
 .. code:: c
 
-   lv_obj_t * btn = lv_btn_create(lv_scr_act());
+   lv_obj_t * btn = lv_btn_create(lv_screen_active());
    lv_obj_add_event(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
 
    ...
@@ -132,7 +132,7 @@ Other events
 -  :cpp:enumerator:`LV_EVENT_STYLE_CHANGED`: Object's style has changed
 -  :cpp:enumerator:`LV_EVENT_BASE_DIR_CHANGED`: The base dir has changed
 -  :cpp:enumerator:`LV_EVENT_GET_SELF_SIZE`: Get the internal size of a widget
--  :cpp:enumerator:`LV_EVENT_SCREEN_UNLOAD_START`: A screen unload started, fired immediately when lv_scr_load/lv_scr_load_anim is called
+-  :cpp:enumerator:`LV_EVENT_SCREEN_UNLOAD_START`: A screen unload started, fired immediately when lv_screen_load/lv_screen_load_anim is called
 -  :cpp:enumerator:`LV_EVENT_SCREEN_LOAD_START`: A screen load started, fired when the screen change delay is expired
 -  :cpp:enumerator:`LV_EVENT_SCREEN_LOADED`: A screen was loaded, called when all animations are finished
 -  :cpp:enumerator:`LV_EVENT_SCREEN_UNLOADED`: A screen was unloaded, called when all animations are finished
@@ -174,18 +174,18 @@ Refresh event
 -------------
 
 :cpp:enumerator:`LV_EVENT_REFRESH` is a special event because it's designed to let the
-user notify an object to refresh itself. Some examples: 
+user notify an object to refresh itself. Some examples:
 
-- notify a label to refresh its text according to one or more variables (e.g. current time) 
-- refresh a label when the language changes 
-- enable a button if some conditions are met (e.g. the correct PIN is entered) 
+- notify a label to refresh its text according to one or more variables (e.g. current time)
+- refresh a label when the language changes
+- enable a button if some conditions are met (e.g. the correct PIN is entered)
 - add/remove styles to/from an object if a limit is exceeded, etc
 
 Fields of lv_event_t
 ********************
 
 :cpp:type:`lv_event_t` is the only parameter passed to the event callback and it
-contains all data about the event. The following values can be gotten from it: 
+contains all data about the event. The following values can be gotten from it:
 
 - :cpp:expr:`lv_event_get_code(e)`: get the event code
 - :cpp:expr:`lv_event_get_current_target(e)`: get the object to which an event was sent. I.e. the object whose event handler is being called.

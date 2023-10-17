@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_arc.c
+ * @file lv_draw_sw_arc.c
  *
  */
 
@@ -124,8 +124,8 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         blend_dsc.color = dsc->color;
     }
     else {
-        lv_img_decoder_dsc_t decoder_dsc;
-        lv_img_decoder_open(&decoder_dsc, dsc->img_src, dsc->color, 0);
+        lv_image_decoder_dsc_t decoder_dsc;
+        lv_image_decoder_open(&decoder_dsc, dsc->img_src, dsc->color, 0);
         img_area.x1 = 0;
         img_area.y1 = 0;
         img_area.x2 = decoder_dsc.header.w - 1;
@@ -135,7 +135,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         blend_dsc.src_area = &img_area;
         blend_dsc.src_buf = decoder_dsc.img_data;
         blend_dsc.src_color_format = decoder_dsc.header.cf;
-        blend_dsc.src_stride = decoder_dsc.header.cf;
+        blend_dsc.src_stride = decoder_dsc.header.stride;
     }
 
 
@@ -172,8 +172,20 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, blend_area.y1, blend_w);
 
         if(dsc->rounded) {
-            add_circle(circle_mask, &blend_area, &round_area_1, mask_buf, width);
-            add_circle(circle_mask, &blend_area, &round_area_2, mask_buf, width);
+            if(blend_area.y1 >= round_area_1.y1 && blend_area.y1 <= round_area_1.y2) {
+                if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
+                    lv_memset(mask_buf, 0x00, blend_w);
+                    blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+                }
+                add_circle(circle_mask, &blend_area, &round_area_1, mask_buf, width);
+            }
+            if(blend_area.y1 >= round_area_2.y1 && blend_area.y1 <= round_area_2.y2) {
+                if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
+                    lv_memset(mask_buf, 0x00, blend_w);
+                    blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+                }
+                add_circle(circle_mask, &blend_area, &round_area_2, mask_buf, width);
+            }
         }
 
         lv_draw_sw_blend(draw_unit, &blend_dsc);
@@ -261,4 +273,4 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness
 }
 
 #endif /*LV_DRAW_SW_COMPLEX*/
-#endif /*LV_USE_DRAW_SW_ARC*/
+#endif /*LV_USE_DRAW_SW*/

@@ -18,8 +18,8 @@ static void event_cb(lv_event_t * e)
     lv_snprintf(buf, sizeof(buf), "%d", (int)lv_bar_get_value(obj));
 
     lv_point_t txt_size;
-    lv_txt_get_size(&txt_size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-                    label_dsc.flag);
+    lv_text_get_size(&txt_size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+                     label_dsc.flag);
 
     lv_area_t txt_area;
     txt_area.x1 = 0;
@@ -51,7 +51,7 @@ static void event_cb(lv_event_t * e)
  */
 void lv_example_bar_6(void)
 {
-    lv_obj_t * bar = lv_bar_create(lv_scr_act());
+    lv_obj_t * bar = lv_bar_create(lv_screen_active());
     lv_obj_set_size(bar, 200, 20);
     lv_obj_center(bar);
     lv_obj_add_event(bar, event_cb, LV_EVENT_DRAW_MAIN_END, NULL);

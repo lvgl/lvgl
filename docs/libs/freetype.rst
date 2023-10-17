@@ -12,11 +12,11 @@ First, Download FreeType from `here <https://sourceforge.net/projects/freetype/f
 
 There are two ways to use FreeType: ### For UNIX For UNIX systems, it is
 recommended to use the way of compiling and installing libraries. -
-Enter the FreeType source code directory. 
+Enter the FreeType source code directory.
 
-- ``make`` 
+- ``make``
 - ``sudo make install``
-- Add include path: ``/usr/include/freetype2`` (for GCC: ``-I/usr/include/freetype2 -L/usr/local/lib``) 
+- Add include path: ``/usr/include/freetype2`` (for GCC: ``-I/usr/include/freetype2 -L/usr/local/lib``)
 - Link library: ``freetype`` (for GCC: ``-L/usr/local/lib -lfreetype``)
 
 For Embedded Devices
@@ -58,11 +58,11 @@ Usage
 
 Enable :c:macro:`LV_USE_FREETYPE` in ``lv_conf.h``.
 
-Cache configuration: 
+Cache configuration:
 
 - :c:macro:`LV_FREETYPE_CACHE_SIZE` Maximum memory(Bytes) used to cache font bitmap, outline, character maps, etc.
-  :Note: This value does not include the memory used by ``FT_Face`` and ``FT_Size`` objects 
-- :c:macro:`LV_FREETYPE_CACHE_FT_FACES`: Maximum open number of ``FT_Face`` objects. 
+  :Note: This value does not include the memory used by ``FT_Face`` and ``FT_Size`` objects
+- :c:macro:`LV_FREETYPE_CACHE_FT_FACES`: Maximum open number of ``FT_Face`` objects.
 - :c:macro:`LV_FREETYPE_CACHE_FT_SIZES`: Maximum open number of ``FT_Size`` objects.
 
 When you are sure that all the used font sizes will not be greater than
@@ -78,7 +78,7 @@ interface, you can enable :c:macro:`LV_FREETYPE_USE_LVGL_PORT` in
 ``lv_conf.h``, convenient for unified management.
 
 The font style supports *Italic* and **Bold** fonts processed by
-software, and can be set with reference to the following values: 
+software, and can be set with reference to the following values:
 
 - :c:enumerator:`LV_FREETYPE_FONT_STYLE_NORMAL`: Default style.
 - :c:enumerator:`LV_FREETYPE_FONT_STYLE_ITALIC`: Italic style.
@@ -88,7 +88,7 @@ They can be combined.eg:
 :c:expr:`LV_FREETYPE_FONT_STYLE_BOLD | LV_FREETYPE_FONT_STYLE_ITALIC`.
 
 Use the :c:expr:`lv_freetype_font_create()` function to create a font. To
-delete a font, use :c:expr:`lv_freetype_font_del()`. For more detailed usage,
+delete a font, use :c:expr:`lv_freetype_font_delete()`. For more detailed usage,
 please refer to example code.
 
 Example

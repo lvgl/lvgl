@@ -15,13 +15,13 @@ void test_snapshot_should_not_leak_memory(void)
     uint32_t final_available_memory = 0;
     lv_mem_monitor_t monitor;
 
-    lv_img_dsc_t * snapshots[NUM_SNAPSHOTS] = {NULL};
+    lv_image_dsc_t * snapshots[NUM_SNAPSHOTS] = {NULL};
 
     lv_mem_monitor(&monitor);
     initial_available_memory = monitor.free_size;
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
-        snapshots[idx] = lv_snapshot_take(lv_scr_act(), LV_COLOR_FORMAT_NATIVE_WITH_ALPHA);
+        snapshots[idx] = lv_snapshot_take(lv_screen_active(), LV_COLOR_FORMAT_NATIVE_WITH_ALPHA);
         TEST_ASSERT_NOT_NULL(snapshots[idx]);
     }
 

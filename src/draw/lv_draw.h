@@ -16,10 +16,10 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 #include "../misc/lv_style.h"
-#include "../misc/lv_txt.h"
+#include "../misc/lv_text.h"
 #include "../misc/lv_profiler.h"
-#include "lv_img_decoder.h"
-#include "lv_img_cache.h"
+#include "../misc/lv_cache.h"
+#include "lv_image_decoder.h"
 #include "../osal/lv_os.h"
 #include "lv_draw_buf.h"
 
@@ -32,8 +32,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_draw_img_dsc_t;
-struct _lv_disp_t;
+struct _lv_draw_image_dsc_t;
+struct _lv_display_t;
 
 typedef enum {
     LV_DRAW_TASK_TYPE_FILL,
@@ -134,8 +134,15 @@ typedef struct _lv_draw_unit_t {
 
 typedef struct _lv_layer_t  {
 
-    lv_draw_buf_t draw_buf;
-    lv_point_t draw_buf_ofs;
+    /** The unaligned buffer where drawing will happen*/
+    void * buf_unaligned;
+
+    /** The aligned buffer, result of lv_draw_buf_align(layer->buf_unaligned)*/
+    void * buf;
+
+    uint32_t buf_stride;
+    lv_area_t buf_area;
+    lv_color_format_t color_format;
 
     /**
      * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
@@ -170,10 +177,10 @@ typedef struct {
     uint32_t used_memory_for_layers_kb;
 #if LV_USE_OS
     lv_thread_sync_t sync;
-    lv_mutex_t circle_cache_mutex;
 #else
     int dispatch_req;
 #endif
+    lv_mutex_t circle_cache_mutex;
     bool task_running;
 } lv_draw_global_info_t;
 
@@ -196,7 +203,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t);
 
 void lv_draw_dispatch(void);
 
-bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer);
+bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer);
 
 /**
  * Wait for a new dispatch request.
@@ -224,15 +231,21 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
  */
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area);
 
-
-void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area);
-
 /**
  * Try to allocate a buffer for the layer.
  * @param layer             pointer to a layer
  * @return                  pointer to the allocated aligned buffer or NULL on failure
  */
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
+
+/**
+ * Got to a pixel at X and Y coordinate on a layer
+ * @param layer             pointer to a layer
+ * @param x                 the target X coordinate
+ * @param y                 the target X coordinate
+ * @return                  `buf` offset to point to the given X and Y coordinate
+ */
+void * lv_draw_layer_go_to_xy(lv_layer_t * layer, lv_coord_t x, lv_coord_t y);
 
 /**********************
  *  GLOBAL VARIABLES
@@ -247,7 +260,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
  *********************/
 #include "lv_draw_rect.h"
 #include "lv_draw_label.h"
-#include "lv_draw_img.h"
+#include "lv_draw_image.h"
 #include "lv_draw_arc.h"
 #include "lv_draw_line.h"
 #include "lv_draw_triangle.h"

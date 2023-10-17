@@ -4,7 +4,7 @@
 static void event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
         lv_calendar_date_t date;
@@ -16,7 +16,7 @@ static void event_handler(lv_event_t * e)
 
 void lv_example_calendar_1(void)
 {
-    lv_obj_t  * calendar = lv_calendar_create(lv_scr_act());
+    lv_obj_t  * calendar = lv_calendar_create(lv_screen_active());
     lv_obj_set_size(calendar, 185, 185);
     lv_obj_align(calendar, LV_ALIGN_CENTER, 0, 27);
     lv_obj_add_event(calendar, event_handler, LV_EVENT_ALL, NULL);

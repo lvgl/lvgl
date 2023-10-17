@@ -147,7 +147,10 @@ typedef uint8_t lv_color_format_t;
 #endif /*DOXYGEN*/
 
 #define LV_COLOR_FORMAT_IS_INDEXED(cf) ((cf) >= LV_COLOR_FORMAT_I1 && (cf) <= LV_COLOR_FORMAT_I8)
-
+#define LV_COLOR_INDEXED_PALETTE_SIZE(cf) ((cf) == LV_COLOR_FORMAT_I1 ? 2 :\
+                                           (cf) == LV_COLOR_FORMAT_I2 ? 4 :\
+                                           (cf) == LV_COLOR_FORMAT_I4 ? 16 :\
+                                           (cf) == LV_COLOR_FORMAT_I8 ? 256 : 0)
 
 /**********************
  * MACROS
@@ -163,15 +166,22 @@ typedef uint8_t lv_color_format_t;
  **********************/
 
 /**
- * Get the pixel size of a color format in bits
- * @param src_cf a color format (`LV_IMG_CF_...`)
- * @return the pixel size in bits
+ * Get the pixel size of a color format in bytes
+ * @param src_cf a color format (`LV_COLOR_FORMAT_...`)
+ * @return the pixel size in bytes
  */
 uint8_t lv_color_format_get_size(lv_color_format_t src_cf);
 
 /**
+ * Get the pixel size of a color format in bits, bpp
+ * @param src_cf a color format (`LV_COLOR_FORMAT_...`)
+ * @return the pixel size in bits
+ */
+uint8_t lv_color_format_get_bpp(lv_color_format_t cf);
+
+/**
  * Check if a color format has alpha channel or not
- * @param src_cf a color format (`LV_IMG_CF_...`)
+ * @param src_cf a color format (`LV_IMAGE_CF_...`)
  * @return true: has alpha channel; false: doesn't have alpha channel
  */
 bool lv_color_format_has_alpha(lv_color_format_t src_cf);
@@ -285,12 +295,15 @@ static inline lv_color_t lv_color_black(void)
     return lv_color_make(0x00, 0x00, 0x00);
 }
 
+
 /**********************
  *      MACROS
  **********************/
 
 #include "lv_palette.h"
 #include "lv_color_op.h"
+
+extern const lv_color_filter_dsc_t lv_color_filter_shade;
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -7,10 +7,10 @@ def value_changed_event_cb(e,label):
     # Rotate the label to the current position of the arc
     arc.rotate_obj_to_angle(label, 25)
 
-label = lv.label(lv.scr_act())
+label = lv.label(lv.screen_active())
 
 # Create an Arc
-arc = lv.arc(lv.scr_act())
+arc = lv.arc(lv.screen_active())
 arc.set_size(150, 150)
 arc.set_rotation(135)
 arc.set_bg_angles(0, 270)

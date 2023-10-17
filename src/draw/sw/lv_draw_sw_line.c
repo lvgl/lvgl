@@ -229,6 +229,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
             if(dash_cnt > dsc->dash_width) {
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_TRANSP;
             }
+            else {
+                blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_FULL_COVER;
+            }
 
             if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
                 dash_cnt = 0;
@@ -303,7 +306,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
     lv_draw_sw_mask_line_param_t mask_top_param;
     lv_draw_sw_mask_line_param_t mask_bottom_param;
 
-    void * masks[5] = {&mask_left_param, &mask_right_param, NULL, NULL, NULL};
+    void * masks[5] = {&mask_left_param, & mask_right_param, NULL, NULL, NULL};
 
 
     if(flat) {
@@ -346,7 +349,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
 
     /*Draw the background line by line*/
     int32_t h;
-    uint32_t hor_res = (uint32_t)lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
+    uint32_t hor_res = (uint32_t)lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
     size_t mask_buf_size = LV_MIN(lv_area_get_size(&blend_area), hor_res);
     lv_opa_t * mask_buf = lv_malloc(mask_buf_size);
 

@@ -13,11 +13,11 @@
 #include "../../core/lv_group.h"
 #include "../../indev/lv_indev.h"
 #include "../../indev/lv_indev_private.h"
-#include "../../disp/lv_disp.h"
+#include "../../display/lv_display.h"
 #include "../../draw/lv_draw.h"
 #include "../../stdlib/lv_string.h"
 #include "../../misc/lv_math.h"
-#include "../img/lv_img.h"
+#include "../image/lv_image.h"
 
 /*********************
  *      DEFINES
@@ -50,7 +50,8 @@ const lv_obj_class_t lv_slider_class = {
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_slider_t),
-    .base_class = &lv_bar_class
+    .base_class = &lv_bar_class,
+    .name = "slider",
 };
 
 /**********************
@@ -91,8 +92,8 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     slider->dragging = 0U;
     slider->left_knob_focus = 0U;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_set_ext_click_area(obj, LV_DPX(8));
 }
@@ -101,11 +102,11 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
 
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -177,11 +178,11 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_SIZE_CHANGED) {
         if(is_slider_horizontal(obj)) {
             lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
         }
         else {
             lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
         }
         lv_obj_refresh_ext_draw_size(obj);
     }
@@ -192,7 +193,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         /*The smaller size is the knob diameter*/
-        lv_coord_t zoom = lv_obj_get_style_transform_zoom(obj, LV_PART_KNOB);
+        lv_coord_t zoom = lv_obj_get_style_transform_scale(obj, LV_PART_KNOB);
         lv_coord_t trans_w = lv_obj_get_style_transform_width(obj, LV_PART_KNOB);
         lv_coord_t trans_h = lv_obj_get_style_transform_height(obj, LV_PART_KNOB);
         lv_coord_t knob_size = LV_MIN(lv_obj_get_width(obj) + 2 * trans_w, lv_obj_get_height(obj) + 2 * trans_h) >> 1;
@@ -222,7 +223,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
-        if(res != LV_RES_OK) return;
+        if(res != LV_RESULT_OK) return;
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_knob(e);
@@ -468,13 +469,13 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
     if(*slider->value_to_set != new_value) {
         *slider->value_to_set = new_value;
         if(is_hor)
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
         else
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
 
         lv_obj_invalidate(obj);
-        lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
-        if(res != LV_RES_OK)
+        lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+        if(res != LV_RESULT_OK)
             return;
     }
 }

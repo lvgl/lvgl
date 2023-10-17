@@ -18,10 +18,12 @@ extern "C" {
 #include "ffmpeg/lv_example_ffmpeg.h"
 #include "freetype/lv_example_freetype.h"
 #include "gif/lv_example_gif.h"
-#include "png/lv_example_png.h"
+#include "lodepng/lv_example_lodepng.h"
+#include "libpng/lv_example_libpng.h"
 #include "qrcode/lv_example_qrcode.h"
 #include "rlottie/lv_example_rlottie.h"
-#include "sjpg/lv_example_sjpg.h"
+#include "tjpgd/lv_example_tjpgd.h"
+#include "libjpeg_turbo/lv_example_libjpeg_turbo.h"
 #include "tiny_ttf/lv_example_tiny_ttf.h"
 
 /*********************

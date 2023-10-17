@@ -49,7 +49,7 @@ lv_anim_timeline_t * lv_anim_timeline_create(void)
     return at;
 }
 
-void lv_anim_timeline_del(lv_anim_timeline_t * at)
+void lv_anim_timeline_delete(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
 
@@ -111,7 +111,7 @@ void lv_anim_timeline_stop(lv_anim_timeline_t * at)
 
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_t * a = &(at->anim_dsc[i].anim);
-        lv_anim_del(a->var, a->exec_cb);
+        lv_anim_delete(a->var, a->exec_cb);
     }
 }
 

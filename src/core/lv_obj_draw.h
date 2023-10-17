@@ -65,7 +65,7 @@ void lv_obj_init_draw_label_dsc(struct _lv_obj_t * obj, uint32_t part, lv_draw_l
  * @param draw_dsc  the descriptor to initialize.
  *                  Should be initialized with `lv_draw_image_dsc_init(draw_dsc)`.
  */
-void lv_obj_init_draw_img_dsc(struct _lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t * draw_dsc);
+void lv_obj_init_draw_image_dsc(struct _lv_obj_t * obj, uint32_t part, lv_draw_image_dsc_t * draw_dsc);
 
 
 /**

@@ -245,7 +245,7 @@ You can do this in the following way:
 .. code:: c
 
    /*Delete the original input device read timer*/
-   lv_timer_del(indev->read_timer);
+   lv_timer_delete(indev->read_timer);
    indev->read_timer = NULL;
 
 

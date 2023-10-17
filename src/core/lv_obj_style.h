@@ -98,7 +98,7 @@ bool lv_obj_replace_style(struct _lv_obj_t * obj, const lv_style_t * old_style, 
                           lv_style_selector_t selector);
 
 /**
- * Add a style to an object.
+ * Remove a style from an object.
  * @param obj       pointer to an object
  * @param style     pointer to a style to remove. Can be NULL to check only the selector
  * @param selector  OR-ed values of states and a part to remove only styles with matching selectors. LV_STATE_ANY and LV_PART_ANY can be used
@@ -313,9 +313,9 @@ static inline lv_coord_t lv_obj_get_style_space_bottom(const struct _lv_obj_t * 
 
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);
 
-static inline lv_coord_t lv_obj_get_style_transform_zoom_safe(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_transform_scale_safe(const struct _lv_obj_t * obj, uint32_t part)
 {
-    int16_t zoom = lv_obj_get_style_transform_zoom(obj, part);
+    int16_t zoom = lv_obj_get_style_transform_scale(obj, part);
     return zoom != 0 ? zoom : 1;
 }
 

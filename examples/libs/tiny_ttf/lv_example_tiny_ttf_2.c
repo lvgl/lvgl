@@ -14,7 +14,7 @@ void lv_example_tiny_ttf_2(void)
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
 
     /*Create a label with the new style*/
-    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_add_style(label, &style, 0);
     lv_label_set_text(label, "Hello world\nI'm a font\ncreated\nwith Tiny TTF");
     lv_obj_center(label);

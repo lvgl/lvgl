@@ -15,7 +15,7 @@ def add_data(t):
 #
 # Circular line chart with gap
 #
-chart = lv.chart(lv.scr_act())
+chart = lv.chart(lv.screen_active())
 
 chart.set_update_mode(lv.chart.UPDATE_MODE.CIRCULAR)
 chart.set_size(200, 150)

@@ -219,7 +219,7 @@ Decoupling the display refresh timer
 ------------------------------------
 
 Normally the dirty (a.k.a invalid) areas are checked and redrawn in
-every :c:macro:`LV_DEF_REFR_PERIOD` milliseconds (set in ``lv_hal_disp.h``).
+every :c:macro:`LV_DEF_REFR_PERIOD` milliseconds (set in ``lv_conf.h``).
 However, in some cases you might need more control on when the display
 refreshing happen, for example to synchronize rendering with VSYNC or
 the TE signal.
@@ -229,7 +229,7 @@ You can do this in the following way:
 .. code:: c
 
    /*Delete the original display refresh timer*/
-   lv_timer_del(disp->refr_timer);
+   lv_timer_delete(disp->refr_timer);
    disp->refr_timer = NULL;
 
 

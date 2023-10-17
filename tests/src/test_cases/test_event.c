@@ -7,7 +7,7 @@ static void event_object_deletion_cb(const lv_obj_class_t * cls, lv_event_t * e)
 {
     LV_UNUSED(cls);
     if(lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
-        lv_obj_del(lv_event_get_target(e));
+        lv_obj_delete(lv_event_get_target(e));
     }
 }
 
@@ -20,7 +20,7 @@ static const lv_obj_class_t event_object_deletion_class = {
 /* Checks for memory leaks/invalid memory accesses on deleted objects */
 void test_event_object_deletion(void)
 {
-    lv_obj_t * obj = lv_obj_class_create_obj(&event_object_deletion_class, lv_scr_act());
+    lv_obj_t * obj = lv_obj_class_create_obj(&event_object_deletion_class, lv_screen_active());
     lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 

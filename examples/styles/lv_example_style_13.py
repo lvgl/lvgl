@@ -15,7 +15,7 @@ style_indic_pr.set_shadow_width(10)
 style_indic_pr.set_shadow_spread(3)
 
 # Create an object with the new style_pr
-obj = lv.slider(lv.scr_act())
+obj = lv.slider(lv.screen_active())
 obj.add_style(style_indic, lv.PART.INDICATOR)
 obj.add_style(style_indic_pr, lv.PART.INDICATOR | lv.STATE.PRESSED)
 obj.set_value(70, lv.ANIM.OFF)

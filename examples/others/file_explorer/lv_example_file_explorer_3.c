@@ -75,7 +75,7 @@ static void file_explorer_event_handler(lv_event_t * e)
 
 void lv_example_file_explorer_3(void)
 {
-    lv_obj_t * file_explorer = lv_file_explorer_create(lv_scr_act());
+    lv_obj_t * file_explorer = lv_file_explorer_create(lv_screen_active());
     /*Before custom sort, please set the default sorting to NONE. The default is NONE.*/
     lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_NONE);
 

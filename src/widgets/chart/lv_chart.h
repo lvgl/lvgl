@@ -90,12 +90,12 @@ typedef struct {
     lv_coord_t * x_points;
     lv_coord_t * y_points;
     lv_color_t color;
-    uint16_t start_point;
-    uint8_t hidden : 1;
-    uint8_t x_ext_buf_assigned : 1;
-    uint8_t y_ext_buf_assigned : 1;
-    uint8_t x_axis_sec : 1;
-    uint8_t y_axis_sec : 1;
+    uint32_t start_point;
+    uint32_t hidden : 1;
+    uint32_t x_ext_buf_assigned : 1;
+    uint32_t y_ext_buf_assigned : 1;
+    uint32_t x_axis_sec : 1;
+    uint32_t y_axis_sec : 1;
 } lv_chart_series_t;
 
 typedef struct {
@@ -104,34 +104,22 @@ typedef struct {
     lv_color_t color;
     lv_chart_series_t * ser;
     lv_dir_t dir;
-    uint8_t pos_set: 1; /*1: pos is set; 0: point_id is set*/
+    uint32_t pos_set: 1; /*1: pos is set; 0: point_id is set*/
 } lv_chart_cursor_t;
-
-typedef struct {
-    lv_coord_t major_len;
-    lv_coord_t minor_len;
-    lv_coord_t draw_size;
-    uint32_t minor_cnt : 15;
-    uint32_t major_cnt : 15;
-    uint32_t label_en  : 1;
-} lv_chart_tick_dsc_t;
 
 
 typedef struct {
     lv_obj_t obj;
     lv_ll_t series_ll;     /**< Linked list for the series (stores lv_chart_series_t)*/
     lv_ll_t cursor_ll;     /**< Linked list for the cursors (stores lv_chart_cursor_t)*/
-    lv_chart_tick_dsc_t tick[4];
     lv_coord_t ymin[2];
     lv_coord_t ymax[2];
     lv_coord_t xmin[2];
     lv_coord_t xmax[2];
     lv_coord_t pressed_point_id;
-    uint16_t hdiv_cnt;      /**< Number of horizontal division lines*/
-    uint16_t vdiv_cnt;      /**< Number of vertical division lines*/
-    uint16_t point_cnt;    /**< Point number in a data line*/
-    uint16_t zoom_x;
-    uint16_t zoom_y;
+    uint32_t hdiv_cnt;      /**< Number of horizontal division lines*/
+    uint32_t vdiv_cnt;      /**< Number of vertical division lines*/
+    uint32_t point_cnt;    /**< Point number in a data line*/
     lv_chart_type_t type  : 3; /**< Line or column chart*/
     lv_chart_update_mode_t update_mode : 1;
 } lv_chart_t;
@@ -160,7 +148,7 @@ void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type);
  * @param obj       pointer to a chart object
  * @param cnt       new number of points on the data lines
  */
-void lv_chart_set_point_count(lv_obj_t * obj, uint16_t cnt);
+void lv_chart_set_point_count(lv_obj_t * obj, uint32_t cnt);
 
 /**
  * Set the minimal and maximal y values on an axis
@@ -187,49 +175,6 @@ void lv_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode
 void lv_chart_set_div_line_count(lv_obj_t * obj, uint8_t hdiv, uint8_t vdiv);
 
 /**
- * Zoom into the chart in X direction
- * @param obj       pointer to a chart object
- * @param zoom_x    zoom in x direction. LV_ZOOM_NONE or 256 for no zoom, 512 double zoom
- */
-void lv_chart_set_zoom_x(lv_obj_t * obj, uint16_t zoom_x);
-
-/**
- * Zoom into the chart in Y direction
- * @param obj       pointer to a chart object
- * @param zoom_y    zoom in y direction. LV_ZOOM_NONE or 256 for no zoom, 512 double zoom
- */
-void lv_chart_set_zoom_y(lv_obj_t * obj, uint16_t zoom_y);
-
-/**
- * Get X zoom of a chart
- * @param obj       pointer to a chart object
- * @return          the X zoom value
- */
-uint16_t lv_chart_get_zoom_x(const lv_obj_t * obj);
-
-/**
- * Get Y zoom of a chart
- * @param obj       pointer to a chart object
- * @return          the Y zoom value
- */
-uint16_t lv_chart_get_zoom_y(const lv_obj_t * obj);
-
-/**
- * Set the number of tick lines on an axis
- * @param obj           pointer to a chart object
- * @param axis          an axis which ticks count should be set
- * @param major_len     length of major ticks
- * @param minor_len     length of minor ticks
- * @param major_cnt     number of major ticks on the axis
- * @param minor_cnt     number of minor ticks between two major ticks
- * @param label_en      true: enable label drawing on major ticks
- * @param draw_size     extra size required to draw the tick and labels
- *                      (start with 20 px and increase if the ticks/labels are clipped)
- */
-void lv_chart_set_axis_tick(lv_obj_t * obj, lv_chart_axis_t axis, lv_coord_t major_len, lv_coord_t minor_len,
-                            lv_coord_t major_cnt, lv_coord_t minor_cnt, bool label_en, lv_coord_t draw_size);
-
-/**
  * Get the type of a chart
  * @param obj       pointer to chart object
  * @return          type of the chart (from 'lv_chart_t' enum)
@@ -241,7 +186,7 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * obj);
  * @param obj       pointer to chart object
  * @return          point number on each data line
  */
-uint16_t lv_chart_get_point_count(const lv_obj_t * obj);
+uint32_t lv_chart_get_point_count(const lv_obj_t * obj);
 
 /**
  * Get the current index of the x-axis start point in the data array
@@ -249,7 +194,7 @@ uint16_t lv_chart_get_point_count(const lv_obj_t * obj);
  * @param ser       pointer to a data series on 'chart'
  * @return          the index of the current x start point in the data array
  */
-uint16_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser);
+uint32_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser);
 
 /**
  * Get the position of a point to the chart.
@@ -258,7 +203,7 @@ uint16_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * se
  * @param id        the index.
  * @param p_out     store the result position here
  */
-void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_point_t * p_out);
+void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_point_t * p_out);
 
 /**
  * Refresh a chart if its data line has changed
@@ -309,7 +254,7 @@ void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_
  * @param ser       pointer to a data series on 'chart'
  * @param id        the index of the x point in the data array
  */
-void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id);
+void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id);
 
 /**
  * Get the next series.
@@ -350,7 +295,7 @@ void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_po
  * @param point_id  the point's index or `LV_CHART_POINT_NONE` to not assign to any points.
  */
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser,
-                               uint16_t point_id);
+                               uint32_t point_id);
 
 /**
  * Get the coordinate of the cursor with respect to the paddings
@@ -396,7 +341,7 @@ void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_
  * @param id      the index of the x point in the array
  * @param value   value to assign to array point
  */
-void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_coord_t value);
+void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_coord_t value);
 
 /**
  * Set an individual point's x and y value of a chart's series directly based on its index
@@ -407,7 +352,7 @@ void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t 
  * @param x_value   the new X value of the next data
  * @param y_value   the new Y value of the next data
  */
-void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_coord_t x_value,
+void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_coord_t x_value,
                                lv_coord_t y_value);
 
 /**
@@ -450,6 +395,14 @@ lv_coord_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
  * @return          the index of the point [0 .. point count] or LV_CHART_POINT_ID_NONE if no point is being pressed
  */
 uint32_t lv_chart_get_pressed_point(const lv_obj_t * obj);
+
+/**
+ * Get the overall offset from the chart's side to the center of the first point.
+ * In case of a bar chart it will be the center of the first column group
+ * @param obj       pointer to a chart object
+ * @return          the offset of the center
+ */
+int32_t lv_chart_get_first_point_center_offset(lv_obj_t * obj);
 
 /**********************
  *      MACROS

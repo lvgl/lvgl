@@ -50,7 +50,7 @@ lv_anim_timeline_t * lv_anim_timeline_create(void);
  * Delete animation timeline.
  * @param at    pointer to the animation timeline.
  */
-void lv_anim_timeline_del(lv_anim_timeline_t * at);
+void lv_anim_timeline_delete(lv_anim_timeline_t * at);
 
 /**
  * Add animation to the animation timeline.

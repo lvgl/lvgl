@@ -61,8 +61,8 @@ Delete character
 ----------------
 
 To delete a character from the left of the current cursor position use
-:cpp:expr:`lv_textarea_del_char(textarea)`. To delete from the right use
-:cpp:expr:`lv_textarea_del_char_forward(textarea)`
+:cpp:expr:`lv_textarea_delete_char(textarea)`. To delete from the right use
+:cpp:expr:`lv_textarea_delete_char_forward(textarea)`
 
 Move the cursor
 ---------------

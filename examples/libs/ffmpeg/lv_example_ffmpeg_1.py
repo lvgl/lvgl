@@ -7,15 +7,15 @@ try:
     #
     # Open an image from a file
     #
-    img = lv.img(lv.scr_act())
-    img.set_src("ffmpeg.png")
-    img.center()
+    image = lv.image(lv.screen_active())
+    image.set_src("ffmpeg.png")
+    image.center()
 except Exception as e:
     print(e)
     # TODO
     # fallback for online examples
 
-    label = lv.label(lv.scr_act())
+    label = lv.label(lv.screen_active())
     label.set_text("FFmpeg is not installed")
     label.center()
 

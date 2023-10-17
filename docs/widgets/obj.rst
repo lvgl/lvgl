@@ -115,7 +115,7 @@ representing a layout that covers the entire display.
 
 When you have created a screen like
 ``lv_obj_t * screen = lv_obj_create(NULL)``, you can make it active with
-:cpp:expr:`lv_scr_load(screen)`. The :cpp:func:`lv_scr_act` function gives you a
+:cpp:expr:`lv_screen_load(screen)`. The :cpp:func:`lv_screen_active` function gives you a
 pointer to the active screen.
 
 If you have multiple displays, it's important to know that the screen
@@ -154,7 +154,7 @@ Flags
 -----
 
 There are some attributes which can be enabled/disabled by
-``lv_obj_add/clear_flag(obj, LV_OBJ_FLAG_...)``:
+``lv_obj_add/remove_flag(obj, LV_OBJ_FLAG_...)``:
 
 -  :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` Make the object hidden. (Like it wasn't there at all)
 -  :cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` Make the object clickable by input devices
@@ -194,7 +194,7 @@ Some examples:
    lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
 
    /*Make an object non-clickable*/
-   lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+   lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
 Groups
 ------

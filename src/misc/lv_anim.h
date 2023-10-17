@@ -445,12 +445,12 @@ static inline void * lv_anim_get_user_data(lv_anim_t * a)
  *                  or NULL to ignore it and delete all the animations of 'var
  * @return          true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb);
+bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb);
 
 /**
  * Delete all the animations
  */
-void lv_anim_del_all(void);
+void lv_anim_delete_all(void);
 
 /**
  * Get the animation of a variable and its `exec_cb`.
@@ -477,9 +477,9 @@ struct _lv_timer_t * lv_anim_get_timer(void);
  *                  or NULL to ignore it and delete all the animations of 'var
  * @return          true: at least 1 animation is deleted, false: no animation is deleted
  */
-static inline bool lv_anim_custom_del(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
+static inline bool lv_anim_custom_delete(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
-    return lv_anim_del(a ? a->var : NULL, (lv_anim_exec_xcb_t)exec_cb);
+    return lv_anim_delete(a ? a->var : NULL, (lv_anim_exec_xcb_t)exec_cb);
 }
 
 /**

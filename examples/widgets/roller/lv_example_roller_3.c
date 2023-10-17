@@ -64,9 +64,9 @@ void lv_example_roller_3(void)
     lv_style_set_text_color(&style, lv_color_white());
     lv_style_set_border_width(&style, 0);
     lv_style_set_pad_all(&style, 0);
-    lv_obj_add_style(lv_scr_act(), &style, 0);
+    lv_obj_add_style(lv_screen_active(), &style, 0);
 
-    lv_obj_t * roller1 = lv_roller_create(lv_scr_act());
+    lv_obj_t * roller1 = lv_roller_create(lv_screen_active());
     lv_obj_add_style(roller1, &style, 0);
     lv_obj_set_style_bg_opa(roller1, LV_OPA_TRANSP, LV_PART_SELECTED);
 

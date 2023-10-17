@@ -71,8 +71,8 @@ static lv_lru_item_t * lv_lru_pop_or_create_item(lv_lru_t * cache);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_t * value_free,
-                         lv_lru_free_t * key_free)
+lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_cb_t value_free,
+                         lv_lru_free_cb_t key_free)
 {
     // create the cache
     lv_lru_t * cache = (lv_lru_t *) lv_malloc(sizeof(lv_lru_t));
@@ -101,12 +101,12 @@ lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_t
 }
 
 
-void lv_lru_del(lv_lru_t * cache)
+void lv_lru_delete(lv_lru_t * cache)
 {
     LV_ASSERT_NULL(cache);
 
     // free each of the cached items, and the hash table
-    lv_lru_item_t * item = NULL, *next = NULL;
+    lv_lru_item_t * item = NULL, * next = NULL;
     uint32_t i = 0;
     if(cache->items) {
         for(; i < cache->hash_table_size; i++) {
@@ -147,7 +147,7 @@ lv_lru_res_t lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, v
     // see if the key already exists
     uint32_t hash_index = lv_lru_hash(cache, key, key_length);
     int required = 0;
-    lv_lru_item_t * item = NULL, *prev = NULL;
+    lv_lru_item_t * item = NULL, * prev = NULL;
     item = cache->items[hash_index];
 
     while(item && lv_lru_cmp_keys(item, key, key_length)) {
@@ -219,7 +219,7 @@ lv_lru_res_t lv_lru_remove(lv_lru_t * cache, const void * key, size_t key_size)
     test_for_missing_key();
 
     // loop until we find the item, or hit the end of a chain
-    lv_lru_item_t * item = NULL, *prev = NULL;
+    lv_lru_item_t * item = NULL, * prev = NULL;
     uint32_t hash_index = lv_lru_hash(cache, key, key_size);
     item = cache->items[hash_index];
 
@@ -237,8 +237,8 @@ lv_lru_res_t lv_lru_remove(lv_lru_t * cache, const void * key, size_t key_size)
 
 void lv_lru_remove_lru_item(lv_lru_t * cache)
 {
-    lv_lru_item_t * min_item = NULL, *min_prev = NULL;
-    lv_lru_item_t * item = NULL, *prev = NULL;
+    lv_lru_item_t * min_item = NULL, * min_prev = NULL;
+    lv_lru_item_t * item = NULL, * prev = NULL;
     uint32_t i = 0, min_index = -1;
     uint64_t min_access_count = -1;
 

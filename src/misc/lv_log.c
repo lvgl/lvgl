@@ -37,6 +37,14 @@
     #define LOG_TIMESTAMP_EXPR
 #endif
 
+#if LV_LOG_USE_FILE_LINE
+    #define LOG_FILE_LINE_FMT "\t(in %s line #%d)"
+    #define LOG_FILE_LINE_EXPR , &file[p], line
+#else
+    #define LOG_FILE_LINE_FMT
+    #define LOG_FILE_LINE_EXPR
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -85,6 +93,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
         va_list args;
         va_start(args, format);
 
+#if LV_LOG_USE_FILE_LINE
         /*Use only the file name not the path*/
         size_t p;
         for(p = lv_strlen(file); p > 0; p--) {
@@ -93,6 +102,11 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
                 break;
             }
         }
+#else
+        LV_UNUSED(file);
+        LV_UNUSED(line);
+#endif
+
 #if LV_LOG_USE_TIMESTAMP
         uint32_t t = lv_tick_get();
 #endif
@@ -102,14 +116,14 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
         printf("[%s]" LOG_TIMESTAMP_FMT " %s: ",
                lvl_prefix[level], LOG_TIMESTAMP_EXPR func);
         vprintf(format, args);
-        printf(" \t(in %s line #%d)\n", &file[p], line);
+        printf(LOG_FILE_LINE_FMT "\n" LOG_FILE_LINE_EXPR);
 #else
         if(custom_print_cb) {
             char buf[512];
             char msg[256];
             lv_vsnprintf(msg, sizeof(msg), format, args);
-            lv_snprintf(buf, sizeof(buf), "[%s]" LOG_TIMESTAMP_FMT " %s: %s \t(in %s line #%d)\n",
-                        lvl_prefix[level], LOG_TIMESTAMP_EXPR func, msg, &file[p], line);
+            lv_snprintf(buf, sizeof(buf), "[%s]" LOG_TIMESTAMP_FMT " %s: %s" LOG_FILE_LINE_FMT "\n",
+                        lvl_prefix[level], LOG_TIMESTAMP_EXPR func, msg LOG_FILE_LINE_EXPR);
             custom_print_cb(level, buf);
         }
 #endif
