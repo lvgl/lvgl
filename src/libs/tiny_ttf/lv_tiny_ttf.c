@@ -141,7 +141,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
     uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
     lv_cache_lock();
     uint32_t cp = unicode_letter;
-    lv_cache_entry_t * cache = lv_cache_find(font + cp, LV_CACHE_SRC_TYPE_PTR, 0, 0);
+    lv_cache_entry_t * cache = lv_cache_find(font, LV_CACHE_SRC_TYPE_PTR, font->line_height, cp);
     if(cache) {
         uint8_t * buffer = (uint8_t *)lv_cache_get_data(cache);
         lv_cache_unlock();
@@ -155,8 +155,10 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
         return NULL;
     }
     /* This smells. We add the codepoint to the base pointer to get a key. */
-    entry->src = font + cp;
+    entry->src = font;
     entry->src_type = LV_CACHE_SRC_TYPE_PTR;
+    entry->param1 = font->line_height;
+    entry->param2 = cp;
     uint8_t * buffer = lv_draw_buf_malloc(szb, LV_COLOR_FORMAT_A8);
     if(NULL == buffer) {
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
