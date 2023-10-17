@@ -312,12 +312,12 @@ Bind an integer subject to a drop-down's value
 
 
 Example
--------
+*******
 
 .. include:: ../examples/others/observer/index.rst
 
 API
----
+***
 
 
 
