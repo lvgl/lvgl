@@ -1295,6 +1295,10 @@ menu "LVGL configuration"
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
 			default n
+
+		config LV_USE_EVDEV
+			bool "Use evdev input driver"
+			default n
 	endmenu
 
 	menu "Examples"
