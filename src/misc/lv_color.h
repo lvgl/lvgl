@@ -166,18 +166,21 @@ typedef uint8_t lv_color_format_t;
  **********************/
 
 /**
- * Get the pixel size of a color format in bytes
- * @param src_cf a color format (`LV_COLOR_FORMAT_...`)
- * @return the pixel size in bytes
- */
-uint8_t lv_color_format_get_size(lv_color_format_t src_cf);
-
-/**
  * Get the pixel size of a color format in bits, bpp
  * @param src_cf a color format (`LV_COLOR_FORMAT_...`)
  * @return the pixel size in bits
  */
 uint8_t lv_color_format_get_bpp(lv_color_format_t cf);
+
+/**
+ * Get the pixel size of a color format in bytes
+ * @param src_cf a color format (`LV_COLOR_FORMAT_...`)
+ * @return the pixel size in bytes
+ */
+static inline uint8_t lv_color_format_get_size(lv_color_format_t cf)
+{
+    return (lv_color_format_get_bpp(cf) + 7) >> 3;
+}
 
 /**
  * Check if a color format has alpha channel or not
