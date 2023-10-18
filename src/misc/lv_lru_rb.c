@@ -227,16 +227,19 @@ void lv_lru_rb_clear(lv_lru_rb_t * lru, void * user_data)
 
 void lv_lru_rb_set_max_size(lv_lru_rb_t * lru, size_t max_size, void * user_data)
 {
+    LV_UNUSED(user_data);
     lru->max_size = max_size;
 }
 
 size_t lv_lru_rb_get_max_size(lv_lru_rb_t * lru, void * user_data)
 {
+    LV_UNUSED(user_data);
     return lru->max_size;
 }
 
 size_t lv_lru_rb_get_size(lv_lru_rb_t * lru, void * user_data)
 {
+    LV_UNUSED(user_data);
     return lru->size;
 }
 
@@ -247,16 +250,19 @@ size_t lv_lru_rb_get_free_size(lv_lru_rb_t * lru, void * user_data)
 
 void lv_lru_rb_set_compare_cb(lv_lru_rb_t * lru, lv_lru_rb_compare_cb_t compare_cb, void * user_data)
 {
+    LV_UNUSED(user_data);
     lru->rb.compare = (lv_rb_compare_t)compare_cb;
 }
 
 void lv_lru_rb_set_alloc_cb(lv_lru_rb_t * lru, lv_lru_rb_alloc_cb_t alloc_cb, void * user_data)
 {
+    LV_UNUSED(user_data);
     lru->alloc_cb = alloc_cb;
 }
 
 void lv_lru_rb_set_free_cb(lv_lru_rb_t * lru, lv_lru_rb_free_cb_t free_cb, void * user_data)
 {
+    LV_UNUSED(user_data);
     lru->free_cb = free_cb;
 }
 
