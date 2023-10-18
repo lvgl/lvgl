@@ -329,6 +329,7 @@ lv_result_t lv_image_decoder_built_in_info(lv_image_decoder_t * decoder, const v
         LV_LOG_WARN("Image get info found unknown src type");
         return LV_RESULT_INVALID;
     }
+
     return LV_RESULT_OK;
 }
 
@@ -348,6 +349,67 @@ static lv_image_decoder_built_in_data_t * get_decoder_data(lv_image_decoder_dsc_
     }
 
     return data;
+}
+
+static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+{
+    lv_result_t res;
+    lv_image_decoder_built_in_data_t * decoder_data = dsc->user_data;
+    lv_fs_file_t *f = &decoder_data->f;
+
+    /*read palette for indexed image*/
+    uint32_t size = LV_COLOR_INDEXED_PALETTE_SIZE(dsc->header.cf);
+    lv_color32_t * palette = lv_malloc(sizeof(lv_color32_t) * size);
+    LV_ASSERT_MALLOC(palette);
+    if(palette == NULL) {
+        LV_LOG_ERROR("out of memory");
+        lv_fs_close(f);
+        return LV_RESULT_INVALID;
+    }
+
+    uint32_t rn;
+    res = fs_read_file_at(f, sizeof(lv_image_header_t), (uint8_t *)palette, sizeof(lv_color32_t) * size, &rn);
+    if(res != LV_FS_RES_OK || rn != sizeof(lv_color32_t) * size) {
+        LV_LOG_WARN("Built-in image decoder can't read the palette");
+        lv_free(palette);
+        return LV_RESULT_INVALID;
+    }
+
+    dsc->palette = palette;
+    dsc->palette_size = size;
+
+    decoder_data->palette = palette; /*Free decoder data on close*/
+
+    /*It needs to be read by get_area_cb later*/
+    return LV_RESULT_OK;
+}
+
+static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+{
+    lv_result_t res;
+    lv_image_decoder_built_in_data_t * decoder_data = dsc->user_data;
+    lv_fs_file_t *f = &decoder_data->f;
+
+    /*For A8, we read directly to RAM since it takes much less memory than ARGB*/
+    uint32_t len = (uint32_t)dsc->header.w * dsc->header.h * 1;
+    uint8_t * data = lv_draw_buf_malloc(len, dsc->header.cf);
+    LV_ASSERT_MALLOC(data);
+    if(data == NULL) {
+        LV_LOG_ERROR("out of memory");
+        return LV_RESULT_INVALID;
+    }
+
+    uint32_t rn;
+    res = fs_read_file_at(f, sizeof(lv_image_header_t), data, len, &rn);
+    if(res != LV_FS_RES_OK || rn != len) {
+        LV_LOG_WARN("Built-in image decoder can't read the palette");
+        lv_draw_buf_free(data);
+        return LV_RESULT_INVALID;
+    }
+
+    decoder_data->img_data = data;
+    dsc->img_data = data;
+    return LV_RESULT_OK;
 }
 
 /**
@@ -380,62 +442,21 @@ lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_imag
         lv_memcpy(&decoder_data->f, &f, sizeof(f));
         dsc->user_data = decoder_data;
 
-        /*read palette for indexed image*/
         if(LV_COLOR_FORMAT_IS_INDEXED(dsc->header.cf)) {
-            uint32_t size = LV_COLOR_INDEXED_PALETTE_SIZE(dsc->header.cf);
-            lv_color32_t * palette = lv_malloc(sizeof(lv_color32_t) * size);
-            LV_ASSERT_MALLOC(palette);
-            if(palette == NULL) {
-                LV_LOG_ERROR("out of memory");
-                lv_fs_close(&f);
-                return LV_RESULT_INVALID;
-            }
-
-            uint32_t rn;
-            res = fs_read_file_at(&f, sizeof(lv_image_header_t), (uint8_t *)palette, sizeof(lv_color32_t) * size, &rn);
-            if(res != LV_FS_RES_OK || rn != sizeof(lv_color32_t) * size) {
-                LV_LOG_WARN("Built-in image decoder can't read the palette");
-                lv_free(palette);
-                lv_fs_close(&f);
-                return LV_RESULT_INVALID;
-            }
-
-            dsc->palette = palette;
-            dsc->palette_size = size;
-
-            decoder_data->palette = palette; /*Free decoder data on close*/
-
-            /*It needs to be read by get_area_cb later*/
-            return LV_RESULT_OK;
+            res = decode_indexed(decoder, dsc);
+        } else if(dsc->header.cf == LV_COLOR_FORMAT_A8) {
+            res = decode_alpha_only(decoder, dsc);
+        } else {
+            /* decode them in get_area_cb */
+            res = LV_RESULT_OK;
         }
 
-        if(dsc->header.cf == LV_COLOR_FORMAT_A8) {
-            /*For A8, we read directly to RAM since it takes much less memory than ARGB*/
-            uint32_t len = (uint32_t)dsc->header.w * dsc->header.h * 1;
-            uint8_t * data = lv_malloc(len);
-            LV_ASSERT_MALLOC(data);
-            if(data == NULL) {
-                LV_LOG_ERROR("out of memory");
-                lv_fs_close(&f);
-                return LV_RESULT_INVALID;
-            }
-
-            uint32_t rn;
-            res = fs_read_file_at(&f, sizeof(lv_image_header_t), data, len, &rn);
-            if(res != LV_FS_RES_OK || rn != len) {
-                LV_LOG_WARN("Built-in image decoder can't read the palette");
-                lv_free(data);
-                lv_fs_close(&f);
-                return LV_RESULT_INVALID;
-            }
-
-            decoder_data->img_data = data;
-            dsc->img_data = data;
-            return LV_RESULT_OK;
+        if (res != LV_RESULT_OK) {
+            lv_fs_close(&f);
+            lv_memset(&decoder_data->f, 0, sizeof(decoder_data->f));
         }
 
-        /*It needs to be read by get_area_cb later*/
-        return LV_RESULT_OK;
+        return res;
     }
 
     if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
@@ -453,7 +474,7 @@ lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_imag
                 return LV_RESULT_INVALID;
             }
 
-            uint8_t * img_data = lv_malloc(sizeof(lv_color32_t) * img_dsc->header.w *  img_dsc->header.h);
+            uint8_t * img_data = lv_draw_buf_malloc(sizeof(lv_color32_t) * img_dsc->header.w *  img_dsc->header.h, img_dsc->header.cf);
             LV_ASSERT_NULL(img_data);
             if(img_data == NULL) {
                 return LV_RESULT_INVALID;
@@ -502,7 +523,7 @@ void lv_image_decoder_built_in_close(lv_image_decoder_t * decoder, lv_image_deco
             lv_fs_close(&decoder_data->f);
         }
 
-        lv_free(decoder_data->img_data);
+        lv_draw_buf_free(decoder_data->img_data);
         lv_free(decoder_data->palette);
         lv_free(decoder_data);
     }
@@ -537,7 +558,7 @@ lv_result_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_
         /*Indexed image is converted to ARGB888*/
         uint32_t len = LV_COLOR_FORMAT_IS_INDEXED(cf) ? sizeof(lv_color32_t) * 8 : bpp;
         len = (len * w_px) / 8;
-        img_data = lv_malloc(len);
+        img_data = lv_draw_buf_malloc(len, cf);
         LV_ASSERT_NULL(img_data);
         if(img_data == NULL)
             return LV_RESULT_INVALID;
