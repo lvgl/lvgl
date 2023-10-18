@@ -41,6 +41,9 @@ typedef struct {
     uint32_t param1;
     uint32_t param2;
 
+    /** User processing tag*/
+    uint32_t process_state;
+
     /** The data to cache*/
     const void * data;
 

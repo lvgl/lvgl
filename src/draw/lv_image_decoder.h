@@ -154,9 +154,6 @@ typedef struct _lv_image_decoder_dsc_t {
      * Can be set in `open` function or set NULL.*/
     const char * error_msg;
 
-    /**See enum _lv_image_decoder_process_state_t*/
-    uint32_t process_state;
-
     /**Store any custom data here is required*/
     void * user_data;
 } lv_image_decoder_dsc_t;
