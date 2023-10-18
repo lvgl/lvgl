@@ -48,7 +48,9 @@
  *      INCLUDES
  *********************/
 #include "lv_lru_rb.h"
+#include "lv_ll.h"
 #include "lv_rb.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

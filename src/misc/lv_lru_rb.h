@@ -15,8 +15,7 @@ extern "C" {
  *********************/
 #include "lv_types.h"
 
-#include "../misc/lv_gc.h"
-#include "../misc/lv_mem.h"
+#include "stdbool.h"
 #include "lv_assert.h"
 
 /*********************
