@@ -105,10 +105,6 @@ typedef struct _lv_global_t {
     struct {
         lv_image_decoder_process_f_t cb;
         void * user_data;
-    } img_decoder_pre_process;
-    struct {
-        lv_image_decoder_process_f_t cb;
-        void * user_data;
     } img_decoder_post_process;
     lv_cache_manager_t cache_manager;
     lv_cache_builtin_dsc_t cache_builtin_dsc;

@@ -195,13 +195,6 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, lv_color_t color, int32_t frame_id);
 
 /**
- * Set a callback to pre-process the image data before decoding.
- * @param process_cb a function to process the image data
- * @param user_data user data to pass to the callback
- */
-void lv_image_decoder_set_pre_process_cb(lv_image_decoder_process_f_t process_cb, void * user_data);
-
-/**
  * Set a callback to post-process the image data after decoding.
  * @param process_cb a function to process the image data
  * @param user_data user data to pass to the callback

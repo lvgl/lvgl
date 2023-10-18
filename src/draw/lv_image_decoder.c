@@ -17,8 +17,6 @@
  *      DEFINES
  *********************/
 #define img_decoder_ll_p &(LV_GLOBAL_DEFAULT()->img_decoder_ll)
-#define pre_process_cb (LV_GLOBAL_DEFAULT()->img_decoder_pre_process.cb)
-#define pre_process_user_data (LV_GLOBAL_DEFAULT()->img_decoder_pre_process.user_data)
 #define post_process_cb (LV_GLOBAL_DEFAULT()->img_decoder_post_process.cb)
 #define post_process_user_data (LV_GLOBAL_DEFAULT()->img_decoder_post_process.user_data)
 
@@ -155,12 +153,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
 
         dsc->decoder = decoder;
 
-        /*Call the pre process callback if set*/
-        if(pre_process_cb) {
-            lv_result_t pre_process_res = pre_process_cb(dsc, pre_process_user_data);
-            if(pre_process_res != LV_RESULT_OK) return pre_process_res;
-        }
-
         res = decoder->open_cb(decoder, dsc);
 
         /*Call the post process callback if set*/
@@ -185,12 +177,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         lv_free((void *)dsc->src);
 
     return res;
-}
-
-void lv_image_decoder_set_pre_process_cb(lv_image_decoder_process_f_t process_cb, void * user_data)
-{
-    pre_process_cb = process_cb;
-    pre_process_user_data = user_data;
 }
 
 void lv_image_decoder_set_post_process_cb(lv_image_decoder_process_f_t process_cb, void * user_data)
