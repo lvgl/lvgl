@@ -35,6 +35,9 @@ To set an initial value use :cpp:expr:`lv_slider_set_value(slider, new_value, LV
 animation time is set by the styles' ``anim_time`` property.
 
 To specify the range (min, max values), :cpp:expr:`lv_slider_set_range(slider, min , max)` can be used.
+The default range is 0..100, and the default drawing direction is from left to right in horizontal mode and
+bottom to top in vertical mode. If the minimum value is greater than the maximum value, like
+100..0, the drawing direction changes to the opposite direction.
 
 Modes
 -----
