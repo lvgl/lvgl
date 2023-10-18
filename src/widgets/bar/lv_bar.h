@@ -150,6 +150,13 @@ int32_t lv_bar_get_max_value(const lv_obj_t * obj);
  */
 lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj);
 
+/**
+ * Give the bar is in symmetrical mode or not
+ * @param obj       pointer to bar object
+ * @return          true: in symmetrical mode false : not in
+*/
+bool lv_bar_is_symmetrical(lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/

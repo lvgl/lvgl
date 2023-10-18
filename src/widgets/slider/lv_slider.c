@@ -243,21 +243,20 @@ static void draw_knob(lv_event_t * e)
 
     lv_area_t knob_area;
     lv_coord_t knob_size;
-    bool is_symmetrical = false;
-    if(slider->bar.mode == LV_BAR_MODE_SYMMETRICAL && slider->bar.min_value < 0 &&
-       slider->bar.max_value > 0) is_symmetrical = true;
+    bool is_symmetrical = lv_slider_is_symmetrical(obj);
 
     if(is_horizontal) {
         knob_size = lv_obj_get_height(obj);
-        if(is_symmetrical && slider->bar.cur_value < 0) knob_area.x1 = slider->bar.indic_area.x1;
+        if(is_symmetrical &&
+           slider->bar.cur_value < 0) knob_area.x1 = LV_SLIDER_KNOB_COORD(!is_reversed, slider->bar.indic_area);
         else knob_area.x1 = LV_SLIDER_KNOB_COORD(is_reversed, slider->bar.indic_area);
     }
     else {
         knob_size = lv_obj_get_width(obj);
-        if(is_symmetrical && slider->bar.cur_value < 0) knob_area.y1 = slider->bar.indic_area.y2;
+        if(is_symmetrical &&
+           slider->bar.cur_value < 0) knob_area.y1 =  LV_SLIDER_KNOB_COORD_VERTICAL(!is_reversed, slider->bar.indic_area);
         else knob_area.y1 = LV_SLIDER_KNOB_COORD_VERTICAL(is_reversed, slider->bar.indic_area);
     }
-
     lv_draw_rect_dsc_t knob_rect_dsc;
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);

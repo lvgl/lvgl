@@ -209,6 +209,15 @@ lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj)
     return bar->mode;
 }
 
+bool lv_bar_is_symmetrical(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_bar_t * bar = (lv_bar_t *)obj;
+
+    return  bar->mode == LV_BAR_MODE_SYMMETRICAL && bar->min_value < 0 && bar->max_value > 0 &&
+            bar->start_value == bar->min_value;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -272,9 +281,7 @@ static void draw_indic(lv_event_t * e)
     }
 
     bool hor = barw >= barh;
-    bool sym = false;
-    if(bar->mode == LV_BAR_MODE_SYMMETRICAL && bar->min_value < 0 && bar->max_value > 0 &&
-       bar->start_value == bar->min_value) sym = true;
+    bool sym = lv_bar_is_symmetrical(obj);
 
     /*Calculate the indicator area*/
     lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
@@ -355,6 +362,7 @@ static void draw_indic(lv_event_t * e)
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
     bool hor_need_reversed = hor && base_dir == LV_BASE_DIR_RTL;
     bool reversed = bar->val_reversed ^ hor_need_reversed;
+
     if(reversed) {
         /*Swap axes*/
         lv_coord_t * tmp;
@@ -378,28 +386,39 @@ static void draw_indic(lv_event_t * e)
     if(sym) {
         lv_coord_t zero, shift;
         shift = (-bar->min_value * anim_length) / range;
+
         if(hor) {
-            zero = *axis1 + shift;
-            if(*axis2 > zero)
-                *axis1 = zero;
+            lv_coord_t * left = reversed ? axis2 : axis1;
+            lv_coord_t * right = reversed ? axis1 : axis2;
+            if(reversed)
+                zero = *axis1 - shift + 1;
+            else
+                zero = *axis1 + shift;
+
+            if(*axis2 > zero) {
+                *right = *axis2;
+                *left = zero;
+            }
             else {
-                *axis1 = *axis2;
-                *axis2 = zero;
+                *left = *axis2;
+                *right = zero;
             }
         }
         else {
-            zero = *axis2 - shift + 1;
-            if(*axis1 > zero)
-                *axis2 = zero;
-            else {
-                *axis2 = *axis1;
-                *axis1 = zero;
+            lv_coord_t * top = reversed ? axis2 : axis1;
+            lv_coord_t * bottom = reversed ? axis1 : axis2;
+            if(reversed)
+                zero = *axis2 + shift;
+            else
+                zero = *axis2 - shift + 1;
+
+            if(*axis1 > zero) {
+                *bottom = *axis1;
+                *top = zero;
             }
-            if(*axis2 < *axis1) {
-                /*swap*/
-                zero = *axis1;
-                *axis1 = *axis2;
-                *axis2 = zero;
+            else {
+                *top = *axis1;
+                *bottom = zero;
             }
         }
     }
