@@ -90,7 +90,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 #if LV_USE_LAYER_DEBUG
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_fill_dsc_init(&fill_dsc);
-    fill_dsc.color = lv_color_hex(layer_to_draw->draw_color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
+    fill_dsc.color = lv_color_hex(layer_to_draw->color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
     fill_dsc.opa = LV_OPA_20;
     lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
 
