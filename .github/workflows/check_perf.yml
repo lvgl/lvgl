@@ -23,11 +23,7 @@ jobs:
           patch -p1 < ci/so3_ci.patch
           
       - name: Docker execution   
-        run: docker build . -t so3/virt64 --platform linux/amd64
+        run: |
+          docker build . -t so3/virt64 --platform linux/amd64
         
-      - name: Download_artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: test_performance
-          path: so3/perf_check*.log
 
