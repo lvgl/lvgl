@@ -1,3 +1,4 @@
+
 name: SO3-LVGL Performance check
 on: [push, pull_request, workflow_dispatch]
 jobs:
@@ -5,7 +6,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
+      - name: Pick-up the LVGL branch to be tested
+        run: |
+          wget https://github.com/lvgl/lvgl/archive/refs/heads/release/v8.3.zip
+          unzip v8.3.zip
+          mv lvgl-release* lvgl_base
+
       - name: SO3-LVGL building the Docker image
         run: |
           wget https://raw.githubusercontent.com/smartobjectoriented/so3/master/Dockerfile.lvgl
@@ -19,5 +26,4 @@ jobs:
         with:
           name: test_performance
           path: perf_check*.log
-        
 
