@@ -15,7 +15,7 @@ The scale widget is divided in the following three parts:
 - :cpp:enumerator:`LV_PART_ITEMS` Minor ticks. See red minor ticks in the example image.
 - :cpp:enumerator:`LV_PART_INDICATOR` Major ticks and its labels (if enabled). See pink labels and green major ticks in the example image.
 
-.. image:: /misc/par_/scale.png
+.. image:: /misc/scale.png
 
 Usage
 *****
