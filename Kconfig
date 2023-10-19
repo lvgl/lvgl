@@ -220,6 +220,34 @@ menu "LVGL configuration"
 					with the given opacity. Note that `bg_opa`, `text_opa` etc
 					don't require buffering into layer.
 
+			choice LV_USE_DRAW_SW_ASM
+				prompt "Asm mode in sw draw"
+				default LV_DRAW_SW_ASM_NONE
+				help
+					ASM mode to be used.
+
+				config LV_DRAW_SW_ASM_NONE
+					bool "0: NONE"
+				config LV_DRAW_SW_ASM_NEON
+					bool "1: NEON"
+				config LV_DRAW_SW_ASM_MVE
+					bool "2: MVE"
+				config LV_DRAW_SW_ASM_CUSTOM
+					bool "255: CUSTOM"
+			endchoice
+
+			config LV_USE_DRAW_SW_ASM
+				int
+				default 0 if LV_DRAW_SW_ASM_NONE
+				default 1 if LV_DRAW_SW_ASM_NEON
+				default 2 if LV_DRAW_SW_ASM_MVE
+				default 255 if LV_DRAW_SW_ASM_CUSTOM
+
+			config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+				string "Set the custom asm include file"
+				default ""
+				depends on LV_DRAW_SW_ASM_CUSTOM
+
 			config LV_IMG_CACHE_DEF_SIZE
 				int "Default image cache size. 0 to disable caching."
 				default 0

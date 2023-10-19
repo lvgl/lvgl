@@ -44,6 +44,11 @@ extern "C" {
 #define LV_STDLIB_MICROPYTHON       2
 #define LV_STDLIB_CUSTOM            255
 
+#define LV_DRAW_SW_ASM_NONE         0
+#define LV_DRAW_SW_ASM_NEON         1
+#define LV_DRAW_SW_ASM_MVE          2
+#define LV_DRAW_SW_ASM_CUSTOM       255
+
 /**********************
  *      TYPEDEFS
  **********************/
