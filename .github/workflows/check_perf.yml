@@ -9,7 +9,7 @@ jobs:
         with:
           branch: v3.15
           packages: cmake gcc-aarch64-linux-gnu device-tree-compiler u-boot-tools pkg-config bridge-utils qemu-system-arm
-          
+      
       - name: Remove useless dependency
         run: |
           sudo apt-get remove -y libyaml-dev
