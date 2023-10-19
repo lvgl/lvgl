@@ -86,3 +86,5 @@
 
 #define LV_USE_OBJ_ID           1
 #define LV_USE_OBJ_ID_BUILTIN   1
+
+#define LV_BIN_DECODER_RAM_LOAD 1

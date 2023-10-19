@@ -550,6 +550,11 @@ menu "LVGL configuration"
 				string "Header to include for the custom 'lv_global' function"
 				depends on LV_ENABLE_GLOBAL_CUSTOM
 				default "lv_global.h"
+
+			config LV_BIN_DECODER_RAM_LOAD
+				bool "Decode whole image to RAM for bin decoder"
+				default n
+
 		endmenu
 
 		menu "Compiler settings"
