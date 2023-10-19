@@ -10,7 +10,7 @@ jobs:
         run: docker build . -t so3/virt64 --platform linux/amd64
 
       - name: SO3-LVL Running containerized performance check app
-        run: docker run -it --privileged -v $PWD:/host -v /dev:/dev so3/virt64 
+        run: docker run --privileged -v $PWD:/host -v /dev:/dev so3/virt64 
         
       - name: Download_artifact
         uses: actions/upload-artifact@v3
