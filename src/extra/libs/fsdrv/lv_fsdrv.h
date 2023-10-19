@@ -33,6 +33,7 @@ void lv_fs_fatfs_init(void);
 
 #if LV_USE_FS_LITTLEFS != '\0'
 void lv_fs_littlefs_init(void);
+void lv_fs_littlefs_set_driver(char label, void *lfs_p);
 #endif
 
 #if LV_USE_FS_STDIO != '\0'

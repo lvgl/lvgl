@@ -27,7 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static lfs_t * fs_init(void);
+static void fs_init(void);
 
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
@@ -37,7 +37,6 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
-/*static lv_fs_res_t fs_size(lv_fs_drv_t * drv, void * file_p, uint32_t * size_p);*/
 
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path);
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn);
@@ -64,7 +63,7 @@ void lv_fs_littlefs_init(void)
     /*----------------------------------------------------
      * Initialize your storage device and File System
      * -------------------------------------------------*/
-    lfs_t * lfs_p = fs_init();
+    fs_init();
 
     /*---------------------------------------------------
      * Register the file system interface in LVGL
@@ -90,10 +89,16 @@ void lv_fs_littlefs_init(void)
     fs_drv.dir_read_cb = fs_dir_read;
 
     /*#if LV_USE_USER_DATA*/
-    fs_drv.user_data = lfs_p;
+    fs_drv.user_data = NULL;
     /*#endif*/
 
     lv_fs_drv_register(&fs_drv);
+}
+
+void lv_fs_littlefs_set_driver(char label, void *lfs_p)
+{
+    lv_fs_drv_t *lfsdrv_p = lv_fs_get_drv(label);
+    lfsdrv_p->user_data = (lfs_t *) lfs_p;
 }
 
 /**********************
@@ -101,14 +106,10 @@ void lv_fs_littlefs_init(void)
  **********************/
 
 /*Initialize your Storage device and File system.*/
-static lfs_t * fs_init(void)
+static void fs_init(void)
 {
     /* Initialize the internal flash or SD-card and LittleFS itself.
-     * Better to do it in your code to keep this library untouched for easy updating
-     * so only a basic lfs_t allocation is made here to better prevent sure segfaults. */
-    lfs_t * lfs_p = NULL; /*lv_mem_alloc( sizeof(lfs_t) );*/ /*will be allocated by outside-code*/
-    /*lv_memset_00( lfs_p, sizeof(lfs_t) );*/
-    return lfs_p;
+     * Better to do it in your code to keep this library untouched for easy updating */
 }
 
 /**
@@ -224,24 +225,6 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
     /*pos = result;*/ /*not supported by lv_fs*/
     return LV_FS_RES_OK;
 }
-
-/**
- * Give the size of the given file
- * @param drv       pointer to a driver where this function belongs
- * @param file_p    pointer to a file_t variable.
- * @param size_p    pointer to where to store the result
- * @return          LV_FS_RES_OK: no error or  any error from @lv_fs_res_t enum
- */
-/*static lv_fs_res_t fs_size (lv_fs_drv_t * drv, void * file_p, uint32_t * size_p)
-{
-    lfs_t *lfs_p = drv->user_data;
-
-    lfs_soff_t result = lfs_file_size( lfs_p, file_p );
-    if (result < 0) return LV_FS_RES_UNKNOWN;
-
-    *size_p = (uint32_t) result;
-    return LV_FS_RES_OK;
-}*/
 
 /**
  * Give the position of the read write pointer
