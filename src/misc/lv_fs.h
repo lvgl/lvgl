@@ -57,7 +57,6 @@ enum {
 };
 typedef uint8_t lv_fs_mode_t;
 
-
 /**
  * Seek modes.
  */

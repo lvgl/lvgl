@@ -2099,7 +2099,7 @@
     #endif
 #endif
 
-/*API for LittleFS (needs to be added separately). Uses lfs_file_open, lfs_file_read, etc*/
+/*API for LittleFS (library needs to be added separately). Uses lfs_file_open, lfs_file_read, etc*/
 #ifndef LV_USE_FS_LITTLEFS
     #ifdef CONFIG_LV_USE_FS_LITTLEFS
         #define LV_USE_FS_LITTLEFS CONFIG_LV_USE_FS_LITTLEFS
