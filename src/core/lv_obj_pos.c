@@ -281,6 +281,9 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
     lv_obj_t * scr = lv_obj_get_screen(obj);
     scr->scr_layout_inv = 1;
 
+    /*Skip refresh request if obj is not visible*/
+    if(lv_obj_is_visible(obj) == false) return;
+
     /*Make the display refreshing*/
     lv_display_t * disp = lv_obj_get_disp(scr);
     lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
