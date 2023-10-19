@@ -24,7 +24,7 @@ extern "C" {
  *********************/
 
 /**Default value of total minor ticks. */
-#define LV_SCALE_TOTAL_TICK_COUNT_DEFAULT (10U)
+#define LV_SCALE_TOTAL_TICK_COUNT_DEFAULT (11U)
 LV_EXPORT_CONST_INT(LV_SCALE_TOTAL_TICK_COUNT_DEFAULT);
 
 /**Default value of major tick every nth ticks. */

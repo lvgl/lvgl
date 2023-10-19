@@ -544,7 +544,7 @@ static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title
     lv_obj_t * scale_ver = lv_scale_create(parent);
     lv_scale_set_mode(scale_ver, LV_SCALE_MODE_VERTICAL_LEFT);
     lv_obj_set_grid_cell(scale_ver, LV_GRID_ALIGN_END, 0, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
-    lv_scale_set_total_tick_count(scale_ver, 10);
+    lv_scale_set_total_tick_count(scale_ver, 11);
     lv_scale_set_major_tick_every(scale_ver, 2);
     lv_scale_set_range(scale_ver, 0, 100);
 
@@ -568,7 +568,7 @@ static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title
     lv_obj_t * scale_hor = lv_scale_create(wrapper);
     lv_scale_set_mode(scale_hor, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
     lv_obj_set_grid_cell(scale_hor, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 1, 1);
-    lv_scale_set_total_tick_count(scale_hor, 11);
+    lv_scale_set_total_tick_count(scale_hor, 12);
     lv_scale_set_major_tick_every(scale_hor, 1);
     lv_scale_set_text_src(scale_hor, hor_text);
     lv_obj_set_width(scale_hor, lv_pct(200));
@@ -699,7 +699,6 @@ static void analytics_create(lv_obj_t * parent)
 
     /*Scale 2*/
     lv_scale_set_round_props(scale2, 330, 0);
-    lv_scale_set_total_tick_count(scale2, 10);
     lv_scale_set_major_tick_length(scale2, 30);
     lv_scale_set_major_tick_every(scale2, 1);
     arc = lv_arc_create(scale2);
@@ -739,7 +738,7 @@ static void analytics_create(lv_obj_t * parent)
 
     /*Scale 3*/
     lv_scale_set_range(scale3, 10, 60);
-    lv_scale_set_total_tick_count(scale3, 20);
+    lv_scale_set_total_tick_count(scale3, 21);
     lv_scale_set_major_tick_every(scale3, 4);
     lv_scale_set_minor_tick_length(scale3, 10);
     lv_scale_set_major_tick_length(scale3, 20);
