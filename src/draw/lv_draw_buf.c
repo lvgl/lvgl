@@ -146,7 +146,8 @@ static void * buf_align(void * buf, lv_color_format_t color_format)
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format)
 {
     uint32_t width_byte;
-    width_byte =  w * lv_color_format_get_size(color_format);
+    width_byte = w * lv_color_format_get_bpp(color_format);
+    width_byte = (width_byte + 7) >> 3; /*Round up*/
     return (width_byte + LV_DRAW_BUF_STRIDE_ALIGN - 1) & ~(LV_DRAW_BUF_STRIDE_ALIGN - 1);
 }
 

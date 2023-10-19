@@ -41,31 +41,6 @@ const lv_color_filter_dsc_t lv_color_filter_shade = {.filter_cb = lv_color_filte
  *   GLOBAL FUNCTIONS
  **********************/
 
-uint8_t lv_color_format_get_size(lv_color_format_t cf)
-{
-    switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE_REVERSED:
-            return LV_COLOR_DEPTH / 8;
-        case LV_COLOR_FORMAT_L8:
-        case LV_COLOR_FORMAT_A8:
-        case LV_COLOR_FORMAT_I8:
-            return 1;
-        case LV_COLOR_FORMAT_RGB565:
-            return 2;
-
-        case LV_COLOR_FORMAT_RGB565A8:
-        case LV_COLOR_FORMAT_RGB888:
-            return 3;
-        case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
-            return 4;
-
-        case LV_COLOR_FORMAT_UNKNOWN:
-        default:
-            return 0;
-    }
-}
-
 uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
 {
     switch(cf) {
