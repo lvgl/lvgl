@@ -8,7 +8,7 @@ def slider_event_cb(e):
     slider_label.align_to(slider, lv.ALIGN.OUT_BOTTOM_MID, 0, 10)
 
 # Create a slider in the center of the display
-slider = lv.slider(lv.scr_act())
+slider = lv.slider(lv.screen_active())
 slider.center()
 slider.add_event(slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
 slider.set_range(100, 0)
