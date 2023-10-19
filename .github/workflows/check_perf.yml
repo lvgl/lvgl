@@ -4,26 +4,15 @@ jobs:
   so3_lvgl:
     runs-on: ubuntu-latest
     steps:
-      - name: Install required APT packages
       - uses: actions/checkout@v4
+
+      - name: SO3-LVGL building the Docker image
+        run: docker build . -t so3/virt64 --platform linux/amd64
+          
+      - name: Download_artifact
+        uses: actions/upload-artifact@v3
         with:
-          branch: v3.15
-          packages: cmake gcc-aarch64-linux-gnu device-tree-compiler u-boot-tools pkg-config bridge-utils qemu-system-arm
-      
-      - name: Remove useless dependency
-        run: |
-          sudo apt-get remove -y libyaml-dev
-          
-      - name: SO3-LVGL building components
-        run: |
-          wget https://github.com/smartobjectoriented/so3/archive/refs/heads/master.zip
-          unzip master.zip
-          mv so3-* so3
-          cd so3
-          patch -p1 < ci/so3_ci.patch
-          
-      - name: Docker execution   
-        run: |
-          docker build . -t so3/virt64 --platform linux/amd64
+          name: test_performance
+          path: so3/perf_check*.log
         
 
