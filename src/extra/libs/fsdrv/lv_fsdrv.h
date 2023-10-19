@@ -31,6 +31,10 @@ extern "C" {
 void lv_fs_fatfs_init(void);
 #endif
 
+#if LV_USE_FS_LITTLEFS != '\0'
+void lv_fs_littlefs_init(void);
+#endif
+
 #if LV_USE_FS_STDIO != '\0'
 void lv_fs_stdio_init(void);
 #endif
