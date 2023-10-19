@@ -158,6 +158,53 @@ void test_arc_click_area_with_adv_hittest(void)
     TEST_ASSERT_EQUAL_UINT32(0, event_cnt);
 }
 
+/* Check value doesn't go to max when clicking on the other side of the arc */
+void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
+{
+    arc = lv_arc_create(lv_scr_act());
+    lv_arc_set_value(arc, 0);
+
+    lv_obj_set_size(arc, 100, 100);
+    lv_obj_center(arc);
+    lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
+    event_cnt = 0;
+
+    /* Click close to start angle */
+    event_cnt = 0;
+    lv_test_mouse_move_to(376, 285);
+    lv_test_mouse_press();
+    lv_test_indev_wait(50);
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
+
+    TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
+    TEST_ASSERT_EQUAL_UINT32(lv_arc_get_value(arc), lv_arc_get_min_value(arc));
+
+    /* Click close to end angle */
+    event_cnt = 0;
+
+    lv_test_mouse_move_to(376, 285);
+    lv_test_mouse_press();
+    lv_test_indev_wait(50);
+    lv_test_mouse_move_to(415, 281);
+    lv_test_indev_wait(50);
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
+
+    TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
+    TEST_ASSERT_NOT_EQUAL_UINT32(lv_arc_get_value(arc), lv_arc_get_max_value(arc));
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("arc_2.png");
+}
+
+void test_arc_basic_render(void)
+{
+    arc = lv_arc_create(lv_scr_act());
+    lv_obj_set_size(arc, 100, 100);
+    lv_obj_center(arc);
+    TEST_ASSERT_EQUAL_SCREENSHOT("arc_1.png");
+}
+
 static void dummy_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
