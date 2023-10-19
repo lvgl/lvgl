@@ -40,7 +40,8 @@ const lv_obj_class_t lv_line_class = {
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_line_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "line",
 };
 
 /**********************
@@ -63,7 +64,7 @@ lv_obj_t * lv_line_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint16_t point_num)
+void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint32_t point_num)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -116,7 +117,7 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     line->point_array = NULL;
     line->y_inv       = 0;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -135,11 +136,11 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
 
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -159,7 +160,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t w = 0;
         lv_coord_t h = 0;
 
-        uint16_t i;
+        uint32_t i;
         for(i = 0; i < line->point_num; i++) {
             if(!LV_COORD_IS_PCT(line->point_array[i].x)) {
                 w = LV_MAX(line->point_array[i].x, w);
@@ -170,15 +171,12 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
 
-        lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-        w += line_width;
-        h += line_width;
         p->x = w;
         p->y = h;
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_line_t * line = (lv_line_t *)obj;
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+        lv_layer_t * layer = lv_event_get_layer(e);
 
         if(line->point_num == 0 || line->point_array == NULL) return;
 
@@ -192,30 +190,27 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
         /*Read all points and draw the lines*/
-        uint16_t i;
+        uint32_t i;
         for(i = 0; i < line->point_num - 1; i++) {
-            lv_point_t p1;
-            lv_point_t p2;
-
             lv_coord_t w = lv_obj_get_width(obj);
             lv_coord_t h = lv_obj_get_height(obj);
 
-            p1.x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
-            p1.y = resolve_point_coord(line->point_array[i].y, h);
+            line_dsc.p1.x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
+            line_dsc.p1.y = resolve_point_coord(line->point_array[i].y, h);
 
-            p2.x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
-            p2.y = resolve_point_coord(line->point_array[i + 1].y, h);
+            line_dsc.p2.x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
+            line_dsc.p2.y = resolve_point_coord(line->point_array[i + 1].y, h);
 
             if(line->y_inv == 0) {
-                p1.y = p1.y + y_ofs;
-                p2.y = p2.y + y_ofs;
+                line_dsc.p1.y = line_dsc.p1.y + y_ofs;
+                line_dsc.p2.y = line_dsc.p2.y + y_ofs;
             }
             else {
-                p1.y = h - p1.y + y_ofs;
-                p2.y = h - p2.y + y_ofs;
+                line_dsc.p1.y = h - line_dsc.p1.y + y_ofs;
+                line_dsc.p2.y = h - line_dsc.p2.y + y_ofs;
             }
 
-            lv_draw_line(draw_ctx, &line_dsc, &p1, &p2);
+            lv_draw_line(layer, &line_dsc);
             line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }
     }

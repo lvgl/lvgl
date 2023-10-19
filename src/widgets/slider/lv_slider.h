@@ -30,13 +30,18 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-enum {
+enum _lv_slider_mode_t {
     LV_SLIDER_MODE_NORMAL = LV_BAR_MODE_NORMAL,
     LV_SLIDER_MODE_SYMMETRICAL = LV_BAR_MODE_SYMMETRICAL,
     LV_SLIDER_MODE_RANGE = LV_BAR_MODE_RANGE
 };
+
+#ifdef DOXYGEN
+typedef _lv_slider_mode_t lv_slider_mode_t;
+#else
 typedef uint8_t lv_slider_mode_t;
+#endif /*DOXYGEN*/
+
 
 typedef struct {
     lv_bar_t bar;       /*Add the ancestor's type first*/
@@ -49,15 +54,6 @@ typedef struct {
 } lv_slider_t;
 
 extern const lv_obj_class_t lv_slider_class;
-
-/**
- * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_slider_class`
- * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
- */
-typedef enum {
-    LV_SLIDER_DRAW_PART_KNOB,           /**< The main (right) knob's rectangle*/
-    LV_SLIDER_DRAW_PART_KNOB_LEFT,      /**< The left knob's rectangle*/
-} lv_slider_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -170,7 +166,7 @@ bool lv_slider_is_dragged(const lv_obj_t * obj);
 
 /**
  * Get the mode of the slider.
- * @param obj       pointer to a bar object
+ * @param slider       pointer to a bar object
  * @return          see ::lv_slider_mode_t
  */
 static inline lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider)

@@ -1,6 +1,6 @@
 #include "gifdec.h"
 #include "../../misc/lv_log.h"
-#include "../../misc/lv_mem.h"
+#include "../../stdlib/lv_mem.h"
 #include "../../misc/lv_color.h"
 #if LV_USE_GIF
 
@@ -497,7 +497,7 @@ static void
 render_frame_rect(gd_GIF * gif, uint8_t * buffer)
 {
     int i, j, k;
-    uint8_t index, *color;
+    uint8_t index, * color;
     i = gif->fy * gif->width + gif->fx;
     for(j = 0; j < gif->fh; j++) {
         for(k = 0; k < gif->fw; k++) {
@@ -600,15 +600,6 @@ gd_get_frame(gd_GIF * gif)
 void
 gd_render_frame(gd_GIF * gif, uint8_t * buffer)
 {
-    //    uint32_t i;
-    //    uint32_t j;
-    //    for(i = 0, j = 0; i < gif->width * gif->height * 3; i+= 3, j+=4) {
-    //        buffer[j + 0] = gif->canvas[i + 2];
-    //        buffer[j + 1] = gif->canvas[i + 1];
-    //        buffer[j + 2] = gif->canvas[i + 0];
-    //        buffer[j + 3] = 0xFF;
-    //    }
-    //    memcpy(buffer, gif->canvas, gif->width * gif->height * 3);
     render_frame_rect(gif, buffer);
 }
 

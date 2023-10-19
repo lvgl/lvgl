@@ -24,24 +24,40 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-enum {
+enum _lv_menu_mode_header_t {
     LV_MENU_HEADER_TOP_FIXED, /* Header is positioned at the top */
     LV_MENU_HEADER_TOP_UNFIXED, /* Header is positioned at the top and can be scrolled out of view*/
     LV_MENU_HEADER_BOTTOM_FIXED /* Header is positioned at the bottom */
 };
+
+#ifdef DOXYGEN
+typedef _lv_menu_mode_header_t lv_menu_mode_header_t;
+#else
 typedef uint8_t lv_menu_mode_header_t;
+#endif /*DOXYGEN*/
 
-enum {
-    LV_MENU_ROOT_BACK_BTN_DISABLED,
-    LV_MENU_ROOT_BACK_BTN_ENABLED
+
+enum _lv_menu_mode_root_back_button_t {
+    LV_MENU_ROOT_BACK_BUTTON_DISABLED,
+    LV_MENU_ROOT_BACK_BUTTON_ENABLED
 };
-typedef uint8_t lv_menu_mode_root_back_btn_t;
 
-typedef struct lv_menu_load_page_event_data_t {
+#ifdef DOXYGEN
+typedef _lv_menu_mode_root_back_button_t lv_menu_mode_root_back_button_t;
+#else
+typedef uint8_t lv_menu_mode_root_back_button_t;
+#endif /*DOXYGEN*/
+
+typedef struct /// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
+    lv_menu_load_page_event_data_t
+/// @endcond
+{
     lv_obj_t * menu;
     lv_obj_t * page;
-} lv_menu_load_page_event_data_t;
+} lv_menu_load_page_event_data_t ;
 
 typedef struct {
     lv_obj_t * page;
@@ -68,7 +84,7 @@ typedef struct {
     uint8_t prev_depth;
     uint8_t sidebar_generated : 1;
     lv_menu_mode_header_t mode_header : 2;
-    lv_menu_mode_root_back_btn_t mode_root_back_btn : 1;
+    lv_menu_mode_root_back_button_t mode_root_back_btn : 1;
 } lv_menu_t;
 
 typedef struct {
@@ -169,7 +185,7 @@ void lv_menu_set_mode_header(lv_obj_t * obj, lv_menu_mode_header_t mode_header);
  * @param obj pointer to a menu
  * @param mode_root_back_btn
  */
-void lv_menu_set_mode_root_back_btn(lv_obj_t * obj, lv_menu_mode_root_back_btn_t mode_root_back_btn);
+void lv_menu_set_mode_root_back_button(lv_obj_t * obj, lv_menu_mode_root_back_button_t mode_root_back_btn);
 
 /**
  * Add menu to the menu item
@@ -208,7 +224,7 @@ lv_obj_t * lv_menu_get_main_header(lv_obj_t * obj);
 * @param obj pointer to the menu
 * @return pointer to main header back btn obj
 */
-lv_obj_t * lv_menu_get_main_header_back_btn(lv_obj_t * obj);
+lv_obj_t * lv_menu_get_main_header_back_button(lv_obj_t * obj);
 
 /**
 * Get a pointer to sidebar header obj
@@ -222,14 +238,15 @@ lv_obj_t * lv_menu_get_sidebar_header(lv_obj_t * obj);
 * @param obj pointer to the menu
 * @return pointer to sidebar header back btn obj
 */
-lv_obj_t * lv_menu_get_sidebar_header_back_btn(lv_obj_t * obj);
+lv_obj_t * lv_menu_get_sidebar_header_back_button(lv_obj_t * obj);
 
 /**
  * Check if an obj is a root back btn
  * @param menu pointer to the menu
+ * @param obj pointer to the back button
  * @return true if it is a root back btn
  */
-bool lv_menu_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj);
+bool lv_menu_back_button_is_root(lv_obj_t * menu, lv_obj_t * obj);
 
 /**
  * Clear menu history

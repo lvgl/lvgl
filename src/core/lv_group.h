@@ -25,8 +25,7 @@ extern "C" {
  *      DEFINES
  *********************/
 /*Predefined keys to control the focused object via lv_group_send(group, c)*/
-
-enum {
+enum _lv_key_t {
     LV_KEY_UP        = 17,  /*0x11*/
     LV_KEY_DOWN      = 18,  /*0x12*/
     LV_KEY_RIGHT     = 19,  /*0x13*/
@@ -40,7 +39,14 @@ enum {
     LV_KEY_HOME      = 2,   /*0x02, STX*/
     LV_KEY_END       = 3,   /*0x03, ETX*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_key_t lv_key_t;
+#else
 typedef uint8_t lv_key_t;
+#endif /*DOXYGEN*/
+
+
 
 /**********************
  *      TYPEDEFS
@@ -101,7 +107,7 @@ lv_group_t * lv_group_create(void);
  * Delete a group object
  * @param group     pointer to a group
  */
-void lv_group_del(lv_group_t * group);
+void lv_group_delete(lv_group_t * group);
 
 /**
  * Set a default group. New object are added to this group if it's enabled in their class with `add_to_def_group = true`
@@ -172,7 +178,7 @@ void lv_group_focus_freeze(lv_group_t * group, bool en);
  * @param c         a character (use LV_KEY_.. to navigate)
  * @return          result of focused object in group.
  */
-lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c);
+lv_result_t lv_group_send_data(lv_group_t * group, uint32_t c);
 
 /**
  * Set a function for a group which will be called when a new object is focused
@@ -252,6 +258,18 @@ bool lv_group_get_wrap(lv_group_t * group);
  * @return              number of objects in the group
  */
 uint32_t lv_group_get_obj_count(lv_group_t * group);
+
+/**
+ * Get the number of groups
+ * @return              number of groups
+ */
+uint32_t lv_group_get_count(void);
+
+/**
+ * Get a group by its index
+ * @return              pointer to the group
+ */
+lv_group_t  * lv_group_by_index(uint32_t index);
 
 /**********************
  *      MACROS

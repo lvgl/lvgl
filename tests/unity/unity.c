@@ -14,7 +14,7 @@
 #define PROGMEM
 #endif
 
-/* If omitted from header, declare overrideable prototypes here so they're ready for use */
+/* If omitted from header, declare overridable prototypes here so they're ready for use */
 #ifdef UNITY_OMIT_OUTPUT_CHAR_HEADER_DECLARATION
 void UNITY_OUTPUT_CHAR(int);
 #endif

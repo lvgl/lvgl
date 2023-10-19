@@ -29,8 +29,14 @@ extern "C" {
 struct _lv_obj_t;
 
 #ifndef LV_OBJ_H
+/// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
 typedef uint32_t lv_part_t;
 typedef uint16_t lv_state_t;
+/// @endcond
+
 #endif
 
 typedef enum {
@@ -39,6 +45,7 @@ typedef enum {
     _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD,  /*The differences can be shown with a simple redraw*/
     _LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /*The differences can be shown with a simple redraw*/
 } _lv_style_state_cmp_t;
+
 
 typedef uint32_t lv_style_selector_t;
 
@@ -91,7 +98,7 @@ bool lv_obj_replace_style(struct _lv_obj_t * obj, const lv_style_t * old_style, 
                           lv_style_selector_t selector);
 
 /**
- * Add a style to an object.
+ * Remove a style from an object.
  * @param obj       pointer to an object
  * @param style     pointer to a style to remove. Can be NULL to check only the selector
  * @param selector  OR-ed values of states and a part to remove only styles with matching selectors. LV_STATE_ANY and LV_PART_ANY can be used
@@ -153,9 +160,6 @@ lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, lv_part_t p
 void lv_obj_set_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value,
                                  lv_style_selector_t selector);
 
-void lv_obj_set_local_style_prop_meta(struct _lv_obj_t * obj, lv_style_prop_t prop, uint16_t meta,
-                                      lv_style_selector_t selector);
-
 lv_style_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
                                            lv_style_selector_t selector);
 
@@ -209,9 +213,16 @@ void lv_obj_fade_in(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
  */
 void lv_obj_fade_out(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
 
-lv_state_t lv_obj_style_get_selector_state(lv_style_selector_t selector);
 
-lv_part_t lv_obj_style_get_selector_part(lv_style_selector_t selector);
+static inline lv_state_t lv_obj_style_get_selector_state(lv_style_selector_t selector)
+{
+    return selector & 0xFFFF;
+}
+
+static inline lv_part_t lv_obj_style_get_selector_part(lv_style_selector_t selector)
+{
+    return selector & 0xFF0000;
+}
 
 #include "lv_obj_style_gen.h"
 
@@ -301,6 +312,21 @@ static inline lv_coord_t lv_obj_get_style_space_bottom(const struct _lv_obj_t * 
 }
 
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);
+
+static inline lv_coord_t lv_obj_get_style_transform_scale_safe(const struct _lv_obj_t * obj, uint32_t part)
+{
+    int16_t zoom = lv_obj_get_style_transform_scale(obj, part);
+    return zoom != 0 ? zoom : 1;
+}
+
+
+/**
+ * Get the `opa` style property from all parents and multiply and `>> 8` them.
+ * @param obj       the object whose opacity should be get
+ * @param part      the part whose opacity should be get. Non-MAIN parts will consider the `opa` of the MAIN part too
+ * @return          the final opacity considering the parents' opacity too
+ */
+lv_opa_t lv_obj_get_style_opa_recursive(const struct _lv_obj_t * obj, lv_part_t part);
 
 
 /**********************

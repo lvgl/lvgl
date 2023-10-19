@@ -9,6 +9,7 @@
 #include "lv_demo_benchmark.h"
 
 #if LV_USE_DEMO_BENCHMARK
+#include "../../src/display/lv_display_private.h"
 
 /*********************
  *      DEFINES
@@ -73,19 +74,18 @@ static lv_style_t style_common;
 static bool scene_with_opa = true;
 static uint32_t last_flush_cb_call;
 static uint32_t render_start_time;
-static void (*flush_cb_ori)(lv_disp_t *, const lv_area_t *, lv_color_t *);
+static void (*flush_cb_ori)(lv_display_t *, const lv_area_t *, uint8_t *);
 static uint32_t disp_ori_timer_period;
 static uint32_t anim_ori_timer_period;
 
 #if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-    LV_IMG_DECLARE(img_benchmark_cogwheel_rgb565a8);
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb565a8);
 #else
-    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
 #endif
-LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
-LV_IMG_DECLARE(img_benchmark_cogwheel_chroma_keyed);
-LV_IMG_DECLARE(img_benchmark_cogwheel_indexed16);
-LV_IMG_DECLARE(img_benchmark_cogwheel_alpha256);
+LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
+LV_IMAGE_DECLARE(img_benchmark_cogwheel_indexed16);
+LV_IMAGE_DECLARE(img_benchmark_cogwheel_alpha256);
 
 #if LV_USE_FONT_COMPRESSED
     LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_compr_az);
@@ -99,10 +99,10 @@ static void benchmark_event_remove(void);
 
 static void show_scene_report(void);
 static void calc_scene_statistics(void);
-static lv_res_t load_next_scene(void);
+static lv_result_t load_next_scene(void);
 static void next_scene_timer_cb(lv_timer_t * timer);
 static void single_scene_finsih_timer_cb(lv_timer_t * timer);
-static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, lv_color_t * colors);
+static void dummy_flush_cb(lv_display_t * drv, const lv_area_t * area, uint8_t * pxmap);
 static void generate_report(void);
 
 static void rect_create(lv_style_t * style);
@@ -268,14 +268,14 @@ static void shadow_large_ofs_cb(void)
 static void img_rgb_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     img_create(&style_common, &img_benchmark_cogwheel_rgb, false, false, false);
 }
 
 static void img_argb_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
 
 #if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
     img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, false, false);
@@ -284,18 +284,10 @@ static void img_argb_cb(void)
 #endif
 }
 
-static void img_ckey_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_chroma_keyed, false, false, false);
-
-}
-
 static void img_index_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     img_create(&style_common, &img_benchmark_cogwheel_indexed16, false, false, false);
 
 }
@@ -303,7 +295,7 @@ static void img_index_cb(void)
 static void img_alpha_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     img_create(&style_common, &img_benchmark_cogwheel_alpha256, false, false, false);
 }
 
@@ -311,8 +303,8 @@ static void img_alpha_cb(void)
 static void img_rgb_recolor_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_img_recolor_opa(&style_common, LV_OPA_50);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_recolor_opa(&style_common, LV_OPA_50);
     img_create(&style_common, &img_benchmark_cogwheel_rgb, false, false, false);
 
 }
@@ -320,8 +312,8 @@ static void img_rgb_recolor_cb(void)
 static void img_argb_recolor_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_img_recolor_opa(&style_common, LV_OPA_50);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_recolor_opa(&style_common, LV_OPA_50);
 #if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
     img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, false, false);
 #else
@@ -329,19 +321,11 @@ static void img_argb_recolor_cb(void)
 #endif
 }
 
-static void img_ckey_recolor_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_img_recolor_opa(&style_common, LV_OPA_50);
-    img_create(&style_common, &img_benchmark_cogwheel_chroma_keyed, false, false, false);
-}
-
 static void img_index_recolor_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_img_recolor_opa(&style_common, LV_OPA_50);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_recolor_opa(&style_common, LV_OPA_50);
     img_create(&style_common, &img_benchmark_cogwheel_indexed16, false, false, false);
 
 }
@@ -349,21 +333,21 @@ static void img_index_recolor_cb(void)
 static void img_rgb_rot_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     img_create(&style_common, &img_benchmark_cogwheel_rgb, true, false, false);
 }
 
 static void img_rgb_rot_aa_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     img_create(&style_common, &img_benchmark_cogwheel_rgb, true, false, true);
 }
 
 static void img_argb_rot_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
 #if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
     img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, true, false, false);
 #else
@@ -374,7 +358,7 @@ static void img_argb_rot_cb(void)
 static void img_argb_rot_aa_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
 #if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
     img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, true, false, true);
 #else
@@ -385,7 +369,7 @@ static void img_argb_rot_aa_cb(void)
 static void img_rgb_zoom_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     img_create(&style_common, &img_benchmark_cogwheel_rgb, false, true, false);
 
 }
@@ -393,7 +377,7 @@ static void img_rgb_zoom_cb(void)
 static void img_rgb_zoom_aa_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     img_create(&style_common, &img_benchmark_cogwheel_rgb, false, true, true);
 
 
@@ -402,7 +386,7 @@ static void img_rgb_zoom_aa_cb(void)
 static void img_argb_zoom_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
 #if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
     img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, true, false);
 #else
@@ -414,7 +398,7 @@ static void img_argb_zoom_cb(void)
 static void img_argb_zoom_aa_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
 #if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
     img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, true, true);
 #else
@@ -483,7 +467,7 @@ static void line_cb(void)
     line_create(&style_common);
 }
 
-static void arc_think_cb(void)
+static void arc_thin_cb(void)
 {
 
     lv_style_reset(&style_common);
@@ -535,10 +519,10 @@ static void sub_shadow_cb(void)
 
 }
 
-static void sub_img_cb(void)
+static void sub_image_cb(void)
 {
     lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
+    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
 #if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
     img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, false, false);
@@ -600,23 +584,21 @@ static scene_dsc_t scenes[] = {
 
     {.name = "Image RGB",                    .weight = 20, .create_cb = img_rgb_cb},
     {.name = "Image ARGB",                   .weight = 20, .create_cb = img_argb_cb},
-    {.name = "Image chorma keyed",           .weight = 5, .create_cb = img_ckey_cb},
     {.name = "Image indexed",                .weight = 5, .create_cb = img_index_cb},
     {.name = "Image alpha only",             .weight = 5, .create_cb = img_alpha_cb},
 
     {.name = "Image RGB recolor",            .weight = 5, .create_cb = img_rgb_recolor_cb},
     {.name = "Image ARGB recolor",           .weight = 20, .create_cb = img_argb_recolor_cb},
-    {.name = "Image chorma keyed recolor",   .weight = 3, .create_cb = img_ckey_recolor_cb},
     {.name = "Image indexed recolor",        .weight = 3, .create_cb = img_index_recolor_cb},
 
-    {.name = "Image RGB rotate",             .weight = 3, .create_cb = img_rgb_rot_cb},
-    {.name = "Image RGB rotate anti aliased", .weight = 3, .create_cb = img_rgb_rot_aa_cb},
-    {.name = "Image ARGB rotate",            .weight = 5, .create_cb = img_argb_rot_cb},
-    {.name = "Image ARGB rotate anti aliased", .weight = 5, .create_cb = img_argb_rot_aa_cb},
-    {.name = "Image RGB zoom",               .weight = 3, .create_cb = img_rgb_zoom_cb},
-    {.name = "Image RGB zoom anti aliased",  .weight = 3, .create_cb = img_rgb_zoom_aa_cb},
-    {.name = "Image ARGB zoom",              .weight = 5, .create_cb = img_argb_zoom_cb},
-    {.name = "Image ARGB zoom anti aliased", .weight = 5, .create_cb = img_argb_zoom_aa_cb},
+    {.name = "Image RGB rotate",             .weight = 5, .create_cb = img_rgb_rot_cb},
+    {.name = "Image RGB rotate anti aliased", .weight = 10, .create_cb = img_rgb_rot_aa_cb},
+    {.name = "Image ARGB rotate",            .weight = 10, .create_cb = img_argb_rot_cb},
+    {.name = "Image ARGB rotate anti aliased", .weight = 15, .create_cb = img_argb_rot_aa_cb},
+    {.name = "Image RGB zoom",               .weight = 5, .create_cb = img_rgb_zoom_cb},
+    {.name = "Image RGB zoom anti aliased",  .weight = 10, .create_cb = img_rgb_zoom_aa_cb},
+    {.name = "Image ARGB zoom",              .weight = 10, .create_cb = img_argb_zoom_cb},
+    {.name = "Image ARGB zoom anti aliased", .weight = 15, .create_cb = img_argb_zoom_aa_cb},
 
     {.name = "Text small",                   .weight = 20, .create_cb = txt_small_cb},
     {.name = "Text medium",                  .weight = 30, .create_cb = txt_medium_cb},
@@ -630,13 +612,13 @@ static scene_dsc_t scenes[] = {
 
     {.name = "Line",                         .weight = 10, .create_cb = line_cb},
 
-    {.name = "Arc think",                    .weight = 10, .create_cb = arc_think_cb},
+    {.name = "Arc thin",                     .weight = 10, .create_cb = arc_thin_cb},
     {.name = "Arc thick",                    .weight = 10, .create_cb = arc_thick_cb},
 
     {.name = "Substr. rectangle",            .weight = 10, .create_cb = sub_rectangle_cb},
     {.name = "Substr. border",               .weight = 10, .create_cb = sub_border_cb},
     {.name = "Substr. shadow",               .weight = 10, .create_cb = sub_shadow_cb},
-    {.name = "Substr. image",                .weight = 10, .create_cb = sub_img_cb},
+    {.name = "Substr. image",                .weight = 10, .create_cb = sub_image_cb},
     {.name = "Substr. line",                 .weight = 10, .create_cb = sub_line_cb},
     {.name = "Substr. arc",                  .weight = 10, .create_cb = sub_arc_cb},
     {.name = "Substr. text",                 .weight = 10, .create_cb = sub_text_cb},
@@ -683,7 +665,7 @@ void lv_demo_benchmark(lv_demo_benchmark_mode_t _mode)
     benchmark_init();
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        while(load_next_scene() == LV_RES_OK) {
+        while(load_next_scene() == LV_RESULT_OK) {
             uint32_t i;
             for(i = 0; i < RENDER_REPEAT_CNT; i++) {
                 /*Wait a little to be sure something happens with the animations*/
@@ -750,9 +732,9 @@ void lv_demo_benchmark_run_scene(lv_demo_benchmark_mode_t _mode, uint16_t scene_
 
 static void benchmark_init(void)
 {
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
 
-    lv_disp_add_event(disp, benchmark_event_cb, LV_EVENT_ALL, NULL);
+    lv_display_add_event(disp, benchmark_event_cb, LV_EVENT_ALL, NULL);
     flush_cb_ori = disp->flush_cb;
     disp->flush_cb = dummy_flush_cb;
 
@@ -767,9 +749,11 @@ static void benchmark_init(void)
         lv_timer_set_period(anim_timer, 2);
     }
 
-    lv_obj_t * scr = lv_scr_act();
+    lv_obj_t * scr = lv_screen_active();
     lv_obj_remove_style_all(scr);
     lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(scr, lv_palette_lighten(LV_PALETTE_GREY, 4), 0);
+    lv_obj_set_style_text_color(scr, lv_color_black(), 0);
 
     title = lv_label_create(scr);
     lv_obj_set_pos(title, LV_DPI_DEF / 30, LV_DPI_DEF / 30);
@@ -800,12 +784,12 @@ static void benchmark_event_cb(lv_event_t * e)
 
 static void benchmark_event_remove(void)
 {
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
     uint32_t i;
-    for(i = 0; i < lv_disp_get_event_count(disp); i++) {
-        lv_event_dsc_t * dsc = lv_disp_get_event_dsc(disp, i);
+    for(i = 0; i < lv_display_get_event_count(disp); i++) {
+        lv_event_dsc_t * dsc = lv_display_get_event_dsc(disp, i);
         if(lv_event_dsc_get_cb(dsc) == benchmark_event_cb) {
-            lv_disp_remove_event(disp, i);
+            lv_display_remove_event(disp, i);
             return;
         }
     }
@@ -842,9 +826,9 @@ static void calc_scene_statistics(void)
     }
 }
 
-static lv_res_t load_next_scene(void)
+static lv_result_t load_next_scene(void)
 {
-    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RES_INV;
+    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RESULT_INVALID;
 
     lv_obj_clean(scene_bg);
 
@@ -856,14 +840,14 @@ static lv_res_t load_next_scene(void)
         scene_with_opa = true;
     }
 
-    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RES_INV;
+    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RESULT_INVALID;
 
     last_flush_cb_call = 0;
     rnd_reset();
     scenes[scene_act].create_cb();
 
     lv_label_set_text_fmt(title, "%s%s", scenes[scene_act].name, scene_with_opa ? " + opa" : "");
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 static void next_scene_timer_cb(lv_timer_t * timer)
@@ -872,10 +856,10 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 
     calc_scene_statistics();
     show_scene_report();
-    lv_res_t res = load_next_scene();
+    lv_result_t res = load_next_scene();
 
-    if(res == LV_RES_INV) {
-        lv_timer_del(timer);
+    if(res == LV_RESULT_INVALID) {
+        lv_timer_delete(timer);
         generate_report();
     }
 }
@@ -885,7 +869,7 @@ static void single_scene_finsih_timer_cb(lv_timer_t * timer)
     LV_UNUSED(timer);
     calc_scene_statistics();
 
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
     disp->flush_cb = flush_cb_ori;
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
@@ -898,18 +882,17 @@ static void single_scene_finsih_timer_cb(lv_timer_t * timer)
     benchmark_event_remove();
     show_scene_report();
     lv_obj_clean(scene_bg);
-    lv_obj_invalidate(lv_scr_act());
+    lv_obj_invalidate(lv_screen_active());
 }
 
-static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, lv_color_t * colors)
+static void dummy_flush_cb(lv_display_t * drv, const lv_area_t * area, uint8_t * pxmap)
 {
     LV_UNUSED(area);
-    LV_UNUSED(colors);
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER) {
         /*Measure the time since render start after flushing*/
-        bool last = lv_disp_flush_is_last(drv);
-        flush_cb_ori(drv, area, colors);
+        bool last = lv_display_flush_is_last(drv);
+        flush_cb_ori(drv, area, pxmap);
 
         if(last) {
             uint32_t t = lv_tick_elaps(render_start_time);
@@ -924,8 +907,8 @@ static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, lv_color_t *
         }
     }
     else if(mode == LV_DEMO_BENCHMARK_MODE_REAL) {
-        bool last = lv_disp_flush_is_last(drv);
-        flush_cb_ori(drv, area, colors);
+        bool last = lv_display_flush_is_last(drv);
+        flush_cb_ori(drv, area, pxmap);
 
         /*Measure the time since the previous last flush (full render)*/
         if(last) {
@@ -945,10 +928,10 @@ static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, lv_color_t *
         }
     }
     else if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        bool last = lv_disp_flush_is_last(drv);
+        bool last = lv_display_flush_is_last(drv);
 
         /*Just bypass the driver and measure the pure rendering time*/
-        lv_disp_flush_ready(drv);
+        lv_display_flush_ready(drv);
 
         if(last) {
             uint32_t t = lv_tick_elaps(render_start_time);
@@ -966,7 +949,7 @@ static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, lv_color_t *
 
 static void generate_report(void)
 {
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
     disp->flush_cb = flush_cb_ori;
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
@@ -1004,19 +987,19 @@ static void generate_report(void)
 
     uint32_t opa_speed_pct = (fps_opa_unweighted * 100) / fps_normal_unweighted;
 
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
     scene_bg = NULL;
 
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
 
-    title = lv_label_create(lv_scr_act());
+    title = lv_label_create(lv_screen_active());
     lv_label_set_text_fmt(title, "Weighted FPS: %"LV_PRIu32, fps_weighted);
 
-    subtitle = lv_label_create(lv_scr_act());
+    subtitle = lv_label_create(lv_screen_active());
     lv_label_set_text_fmt(subtitle, "Opa. speed: %"LV_PRIu32"%%", opa_speed_pct);
 
-    lv_coord_t w = lv_obj_get_content_width(lv_scr_act());
-    lv_obj_t * table = lv_table_create(lv_scr_act());
+    lv_coord_t w = lv_obj_get_content_width(lv_screen_active());
+    lv_obj_t * table = lv_table_create(lv_screen_active());
     //        lv_obj_clean_style_list(table, LV_PART_MAIN);
     lv_table_set_col_cnt(table, 2);
 
@@ -1024,29 +1007,9 @@ static void generate_report(void)
     lv_table_set_col_width(table, 1, w  / 4 - 3);
     lv_obj_set_width(table, lv_pct(100));
 
-    //        static lv_style_t style_cell_slow;
-    //        static lv_style_t style_cell_very_slow;
-    //        static lv_style_t style_cell_title;
-    //
-    //        lv_style_init(&style_cell_title);
-    //        lv_style_set_bg_color(&style_cell_title, LV_STATE_DEFAULT, lv_palette_main(LV_PALETTE_GREY));
-    //        lv_style_set_bg_opa(&style_cell_title, LV_STATE_DEFAULT, LV_OPA_50);
-    //
-    //        lv_style_init(&style_cell_slow);
-    //        lv_style_set_text_color(&style_cell_slow, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
-    //
-    //        lv_style_init(&style_cell_very_slow);
-    //        lv_style_set_text_color(&style_cell_very_slow, LV_STATE_DEFAULT, lv_palette_main(LV_PALETTE_RED));
-
-    //        lv_obj_add_style(table, LV_TABLE_PART_CELL2, &style_cell_slow);
-    //        lv_obj_add_style(table, LV_TABLE_PART_CELL3, &style_cell_very_slow);
-    //        lv_obj_add_style(table, LV_TABLE_PART_CELL4, &style_cell_title);
-
-
     uint16_t row = 0;
     lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     lv_table_set_cell_value(table, row, 0, "Slow but common cases");
-    //        lv_table_set_cell_type(table, row, 0, 4);
 
     LV_LOG("\r\n"
            "LVGL v%d.%d.%d " LVGL_VERSION_INFO
@@ -1065,11 +1028,6 @@ static void generate_report(void)
             lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
             lv_table_set_cell_value(table, row, 1, buf);
 
-            //                lv_table_set_cell_type(table, row, 0, 2);
-            //                lv_table_set_cell_type(table, row, 1, 2);
-
-            //LV_LOG("%s,%s\r\n", scenes[i].name, buf);
-
             row++;
         }
 
@@ -1077,14 +1035,8 @@ static void generate_report(void)
             lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
             lv_table_set_cell_value(table, row, 0, buf);
 
-            //LV_LOG("%s,", buf);
-
             lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
             lv_table_set_cell_value(table, row, 1, buf);
-
-            //                lv_table_set_cell_type(table, row, 0, 2);
-            //                lv_table_set_cell_type(table, row, 1, 2);
-            //LV_LOG("%s\r\n", buf);
 
             row++;
         }
@@ -1108,15 +1060,6 @@ static void generate_report(void)
         lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
         lv_table_set_cell_value(table, row, 1, buf);
 
-        if(scenes[i].fps_normal < 10) {
-            //                lv_table_set_cell_type(table, row, 0, 3);
-            //                lv_table_set_cell_type(table, row, 1, 3);
-        }
-        else if(scenes[i].fps_normal < 20) {
-            //                lv_table_set_cell_type(table, row, 0, 2);
-            //                lv_table_set_cell_type(table, row, 1, 2);
-        }
-
         LV_LOG("%s,%s\r\n", scenes[i].name, buf);
 
         row++;
@@ -1130,21 +1073,11 @@ static void generate_report(void)
         lv_table_set_cell_value(table, row, 1, buf);
 
 
-        if(scenes[i].fps_opa < 10) {
-            //                lv_table_set_cell_type(table, row, 0, 3);
-            //                lv_table_set_cell_type(table, row, 1, 3);
-        }
-        else if(scenes[i].fps_opa < 20) {
-            //                lv_table_set_cell_type(table, row, 0, 2);
-            //                lv_table_set_cell_type(table, row, 1, 2);
-        }
-
         LV_LOG("%s\r\n", buf);
 
         row++;
     }
 
-    //        lv_page_set_scrl_layout(page, LV_LAYOUT_COLUMN_LEFT);
 }
 
 
@@ -1174,15 +1107,15 @@ static void img_create(lv_style_t * style, const void * src, bool rotate, bool z
 {
     uint32_t i;
     for(i = 0; i < (uint32_t)IMG_NUM; i++) {
-        lv_obj_t * obj = lv_img_create(scene_bg);
+        lv_obj_t * obj = lv_image_create(scene_bg);
         lv_obj_remove_style_all(obj);
         lv_obj_add_style(obj, style, 0);
-        lv_img_set_src(obj, src);
-        lv_obj_set_style_img_recolor(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), 0);
+        lv_image_set_src(obj, src);
+        lv_obj_set_style_image_recolor(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), 0);
 
-        if(rotate) lv_img_set_angle(obj, rnd_next(0, 3599));
-        if(zoom) lv_img_set_zoom(obj, rnd_next(IMG_ZOOM_MIN, IMG_ZOOM_MAX));
-        lv_img_set_antialias(obj, aa);
+        if(rotate) lv_image_set_rotation(obj, rnd_next(0, 3599));
+        if(zoom) lv_image_set_zoom(obj, rnd_next(IMG_ZOOM_MIN, IMG_ZOOM_MAX));
+        lv_image_set_antialias(obj, aa);
 
         fall_anim(obj);
     }

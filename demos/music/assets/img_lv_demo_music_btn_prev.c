@@ -202,12 +202,12 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_btn_prev_map[] = {
 #endif
 };
 
-lv_img_dsc_t img_lv_demo_music_btn_prev = {
+lv_image_dsc_t img_lv_demo_music_btn_prev = {
     .header.always_zero = 0,
     .header.w = 62,
     .header.h = 62,
-    .data_size = 3844 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
-    .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
+    //    .data_size = 3844 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_btn_prev_map,
 };
 

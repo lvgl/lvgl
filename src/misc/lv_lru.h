@@ -39,10 +39,17 @@ typedef enum {
     LV_LRU_VALUE_TOO_LARGE
 } lv_lru_res_t;
 
-typedef void (lv_lru_free_t)(void * v);
+typedef void (*lv_lru_free_cb_t)(void * v);
+
 typedef struct _lv_lru_item_t lv_lru_item_t;
 
-typedef struct lv_lru_t {
+typedef struct /// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
+    lv_lru_t
+/// @endcond
+{
     lv_lru_item_t ** items;
     uint64_t access_count;
     size_t free_memory;
@@ -50,8 +57,8 @@ typedef struct lv_lru_t {
     size_t average_item_length;
     size_t hash_table_size;
     uint32_t seed;
-    lv_lru_free_t * value_free;
-    lv_lru_free_t * key_free;
+    lv_lru_free_cb_t value_free;
+    lv_lru_free_cb_t key_free;
     lv_lru_item_t * free_items;
 } lv_lru_t;
 
@@ -60,10 +67,10 @@ typedef struct lv_lru_t {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_t * value_free,
-                         lv_lru_free_t * key_free);
+lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_cb_t value_free,
+                         lv_lru_free_cb_t key_free);
 
-void lv_lru_del(lv_lru_t * cache);
+void lv_lru_delete(lv_lru_t * cache);
 
 lv_lru_res_t lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, void * value, size_t value_length);
 

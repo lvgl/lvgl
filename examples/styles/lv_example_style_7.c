@@ -13,7 +13,7 @@ void lv_example_style_7(void)
     lv_style_set_arc_width(&style, 4);
 
     /*Create an object with the new style*/
-    lv_obj_t * obj = lv_arc_create(lv_scr_act());
+    lv_obj_t * obj = lv_arc_create(lv_screen_active());
     lv_obj_add_style(obj, &style, 0);
     lv_obj_center(obj);
 }

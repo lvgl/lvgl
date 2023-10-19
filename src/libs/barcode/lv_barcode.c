@@ -25,7 +25,7 @@
  **********************/
 static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static bool lv_barcode_change_buf_size(lv_obj_t * obj, lv_coord_t w);
+static bool lv_barcode_change_buf_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 
 /**********************
  *  STATIC VARIABLES
@@ -36,7 +36,8 @@ const lv_obj_class_t lv_barcode_class = {
     .destructor_cb = lv_barcode_destructor,
     .width_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_barcode_t),
-    .base_class = &lv_canvas_class
+    .base_class = &lv_canvas_class,
+    .name = "barcode",
 };
 
 /**********************
@@ -55,7 +56,7 @@ lv_obj_t * lv_barcode_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color32_t color)
+void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color_t color)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -63,7 +64,7 @@ void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color32_t color)
     barcode->dark_color = color;
 }
 
-void lv_barcode_set_light_color(lv_obj_t * obj, lv_color32_t color)
+void lv_barcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -83,17 +84,25 @@ void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale)
     barcode->scale = scale;
 }
 
-lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
+void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+    barcode->direction = direction;
+}
+
+lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(data);
 
-    lv_res_t res = LV_RES_INV;
+    lv_result_t res = LV_RESULT_INVALID;
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
     if(data == NULL || lv_strlen(data) == 0) {
         LV_LOG_WARN("data is empty");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     size_t len = code128_estimate_len(data);
@@ -103,7 +112,7 @@ lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
     LV_ASSERT_MALLOC(out_buf);
     if(!out_buf) {
         LV_LOG_ERROR("malloc failed for out_buf");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     lv_coord_t barcode_w = code128_encode_gs1(data, out_buf, len);
@@ -112,29 +121,37 @@ lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
     LV_ASSERT(barcode->scale > 0);
     uint16_t scale = barcode->scale;
 
-    if(!lv_barcode_change_buf_size(obj, barcode_w * scale)) {
+    lv_coord_t buf_w = (barcode->direction == LV_DIR_HOR) ? barcode_w * scale : 1;
+    lv_coord_t buf_h = (barcode->direction == LV_DIR_VER) ? barcode_w * scale : 1;
+
+    if(!lv_barcode_change_buf_size(obj, buf_w, buf_h)) {
         goto failed;
     }
 
-    lv_canvas_set_palette(obj, 0, barcode->dark_color);
-    lv_canvas_set_palette(obj, 1, barcode->light_color);
+    lv_canvas_set_palette(obj, 0, lv_color_to_32(barcode->dark_color, 0xff));
+    lv_canvas_set_palette(obj, 1, lv_color_to_32(barcode->light_color, 0xff));
 
     for(lv_coord_t x = 0; x < barcode_w; x++) {
         lv_color_t color;
-        lv_color_set_int(&color, out_buf[x] ? 0 : 1);
+        color = lv_color_from_int(out_buf[x] ? 0 : 1);
         for(uint16_t i = 0; i < scale; i++) {
-            lv_canvas_set_px(obj, x * scale + i, 0, color, LV_OPA_COVER);
+            if(barcode->direction == LV_DIR_HOR) {
+                lv_canvas_set_px(obj, x * scale + i, 0, color, LV_OPA_COVER);
+            }
+            else {
+                lv_canvas_set_px(obj, 0, x * scale + i, color, LV_OPA_COVER);
+            }
         }
     }
 
-    res = LV_RES_OK;
+    res = LV_RESULT_OK;
 
 failed:
     lv_free(out_buf);
     return res;
 }
 
-lv_color32_t lv_barcode_get_dark_color(lv_obj_t * obj)
+lv_color_t lv_barcode_get_dark_color(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -142,7 +159,7 @@ lv_color32_t lv_barcode_get_dark_color(lv_obj_t * obj)
     return barcode->dark_color;
 }
 
-lv_color32_t lv_barcode_get_light_color(lv_obj_t * obj)
+lv_color_t lv_barcode_get_light_color(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -167,17 +184,20 @@ static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_UNUSED(class_p);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
-    barcode->dark_color = lv_color_to32(lv_color_black());
-    barcode->light_color = lv_color_to32(lv_color_white());
+    barcode->dark_color = lv_color_black();
+    barcode->light_color = lv_color_white();
     barcode->scale = 1;
+    barcode->direction = LV_DIR_HOR;
 }
 
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
 
-    lv_img_dsc_t * img = lv_canvas_get_img(obj);
-    lv_img_cache_invalidate_src(img);
+    lv_image_dsc_t * img = lv_canvas_get_image(obj);
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(img, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 
     if(!img->data) {
         LV_LOG_INFO("canvas buffer is NULL");
@@ -190,15 +210,15 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     img->data = NULL;
 }
 
-static bool lv_barcode_change_buf_size(lv_obj_t * obj, lv_coord_t w)
+static bool lv_barcode_change_buf_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT(w > 0);
 
-    lv_img_dsc_t * img = lv_canvas_get_img(obj);
+    lv_image_dsc_t * img = lv_canvas_get_image(obj);
     void * buf = (void *)img->data;
 
-    uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, 1);
+    uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h);
     buf = lv_realloc(buf, buf_size);
     LV_ASSERT_MALLOC(buf);
 
@@ -207,7 +227,7 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, lv_coord_t w)
         return false;
     }
 
-    lv_canvas_set_buffer(obj, buf, w, 1, LV_COLOR_FORMAT_I1);
+    lv_canvas_set_buffer(obj, buf, w, h, LV_COLOR_FORMAT_I1);
     LV_LOG_INFO("set canvas buffer: %p, width = %d", buf, (int)w);
     return true;
 }

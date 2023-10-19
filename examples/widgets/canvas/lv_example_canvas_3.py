@@ -9,7 +9,7 @@ LV_COLOR_SIZE = 32
 cbuf = bytearray((LV_COLOR_SIZE // 8) * CANVAS_WIDTH * CANVAS_HEIGHT)
 
 # Create a canvas and initialize its palette*/
-canvas = lv.canvas(lv.scr_act())
+canvas = lv.canvas(lv.screen_active())
 canvas.set_buffer(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, lv.COLOR_FORMAT.NATIVE)
 
 canvas.fill_bg(lv.color_hex3(0xccc), lv.OPA.COVER)
@@ -27,5 +27,18 @@ dsc.outline_pad = 2
 dsc.outline_opa = lv.OPA._50
 dsc.radius = 5
 dsc.border_width = 3
-canvas.draw_rect(10, 10, 30, 20, dsc)
+
+
+coords = lv.area_t()
+coords.x1 = 10
+coords.y1 = 10
+coords.x2 = 30
+coords.y2 = 20
+
+layer = lv.layer_t()
+canvas.init_layer(layer);
+
+lv.draw_rect(layer, dsc, coords)
+
+canvas.finish_layer(layer)
 

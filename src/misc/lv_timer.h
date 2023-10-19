@@ -13,7 +13,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include "../hal/lv_hal_tick.h"
+#include "../tick/lv_tick.h"
+#include "lv_ll.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -50,6 +51,22 @@ typedef struct _lv_timer_t {
     uint32_t paused : 1;
 } lv_timer_t;
 
+typedef struct {
+    lv_ll_t timer_ll; /*Linked list to store the lv_timers*/
+
+    bool lv_timer_run;
+    uint8_t idle_last;
+    bool timer_deleted;
+    bool timer_created;
+    uint32_t timer_time_until_next;
+
+    bool already_running;
+    uint32_t periodic_last_tick;
+    uint32_t busy_time;
+    uint32_t idle_period_start;
+    uint32_t run_cnt;
+} lv_timer_state_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -73,19 +90,25 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void);
  * Call it in the super-loop of main() or threads. It will run lv_timer_handler()
  * with a given period in ms. You can use it with sleep or delay in OS environment.
  * This function is used to simplify the porting.
- * @param __ms the period for running lv_timer_handler()
+ * @param period the period for running lv_timer_handler()
+ * @return the time after which it must be called again
  */
-static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period(uint32_t ms)
+static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period(uint32_t period)
 {
     static uint32_t last_tick = 0;
-    uint32_t curr_tick = lv_tick_get();
 
-    if((curr_tick - last_tick) >= (ms)) {
-        last_tick = curr_tick;
+    if(lv_tick_elaps(last_tick) >= period) {
+        last_tick = lv_tick_get();
         return lv_timer_handler();
     }
     return 1;
 }
+
+/**
+ * Call it in the super-loop of main() or threads. It will automatically call lv_timer_handler() at the right time.
+ * This function is used to simplify the porting.
+ */
+LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void);
 
 /**
  * Create an "empty" timer. It needs to be initialized with at least
@@ -109,7 +132,7 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
  * Delete a lv_timer
  * @param timer pointer to an lv_timer
  */
-void lv_timer_del(lv_timer_t * timer);
+void lv_timer_delete(lv_timer_t * timer);
 
 /**
  * Pause/resume a timer.
@@ -147,6 +170,13 @@ void lv_timer_ready(lv_timer_t * timer);
 void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count);
 
 /**
+ * Set custom parameter to the lv_timer.
+ * @param timer pointer to a lv_timer.
+ * @param user_data custom parameter
+ */
+void lv_timer_set_user_data(lv_timer_t * timer, void * user_data);
+
+/**
  * Reset a lv_timer.
  * It will be called the previously set period milliseconds later.
  * @param timer pointer to a lv_timer.
@@ -164,6 +194,12 @@ void lv_timer_enable(bool en);
  * @return the lv_timer idle in percentage
  */
 uint8_t lv_timer_get_idle(void);
+
+/**
+ * Get the time remaining until the next timer will run
+ * @return the time remaining in ms
+ */
+uint32_t lv_timer_get_time_until_next(void);
 
 /**
  * Iterate through the timers

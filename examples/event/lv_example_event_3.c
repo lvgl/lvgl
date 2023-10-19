@@ -22,14 +22,14 @@ static void event_cb(lv_event_t * e)
 void lv_example_event_3(void)
 {
 
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, 290, 200);
     lv_obj_center(cont);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW_WRAP);
 
     uint32_t i;
     for(i = 0; i < 30; i++) {
-        lv_obj_t * btn = lv_btn_create(cont);
+        lv_obj_t * btn = lv_button_create(cont);
         lv_obj_set_size(btn, 70, 50);
         lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
 

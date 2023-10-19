@@ -5,7 +5,7 @@ col_dsc = [60, 60, 60, lv.GRID_TEMPLATE_LAST]
 row_dsc = [40, 40, 40, lv.GRID_TEMPLATE_LAST]
 
 # Create a container with grid
-cont = lv.obj(lv.scr_act())
+cont = lv.obj(lv.screen_active())
 cont.set_size(300, 220)
 cont.center()
 cont.set_style_base_dir(lv.BASE_DIR.RTL,0)

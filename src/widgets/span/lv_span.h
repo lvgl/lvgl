@@ -27,24 +27,37 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+enum _lv_span_overflow_t {
     LV_SPAN_OVERFLOW_CLIP,
     LV_SPAN_OVERFLOW_ELLIPSIS,
+    _LV_SPAN_OVERFLOW_LAST,  /**< Fence member*/
 };
-typedef uint8_t lv_span_overflow_t;
 
-enum {
+#ifdef DOXYGEN
+typedef _lv_span_overflow_t lv_span_overflow_t;
+#else
+typedef uint32_t lv_span_overflow_t;
+#endif /*DOXYGEN*/
+
+enum _lv_span_mode_t {
     LV_SPAN_MODE_FIXED,     /**< fixed the obj size*/
     LV_SPAN_MODE_EXPAND,    /**< Expand the object size to the text size*/
     LV_SPAN_MODE_BREAK,     /**< Keep width, break the too long lines and expand height*/
+    _LV_SPAN_MODE_LAST      /**< Fence member*/
 };
-typedef uint8_t lv_span_mode_t;
+
+#ifdef DOXYGEN
+typedef _lv_span_mode_t lv_span_mode_t;
+#else
+typedef uint32_t lv_span_mode_t;
+#endif /*DOXYGEN*/
+
 
 typedef struct {
     char * txt;             /* a pointer to display text */
     lv_obj_t * spangroup;   /* a pointer to spangroup */
     lv_style_t style;       /* display text style */
-    uint8_t static_flag : 1;/* the text is static flag */
+    uint32_t static_flag : 1;/* the text is static flag */
 } lv_span_t;
 
 /** Data of label*/
@@ -55,9 +68,9 @@ typedef struct {
     lv_coord_t cache_w;     /* the cache automatically calculates the width */
     lv_coord_t cache_h;     /* similar cache_w */
     lv_ll_t  child_ll;
-    uint8_t mode : 2;       /* details see lv_span_mode_t */
-    uint8_t overflow : 1;   /* details see lv_span_overflow_t */
-    uint8_t refresh : 1;    /* the spangroup need refresh cache_w and cache_h */
+    uint32_t mode : 2;       /* details see lv_span_mode_t */
+    uint32_t overflow : 1;   /* details see lv_span_overflow_t */
+    uint32_t refresh : 1;    /* the spangroup need refresh cache_w and cache_h */
 } lv_spangroup_t;
 
 extern const lv_obj_class_t lv_spangroup_class;
@@ -65,6 +78,9 @@ extern const lv_obj_class_t lv_spangroup_class;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+void lv_span_stack_init(void);
+void lv_span_stack_deinit(void);
 
 /**
  * Create a spangroup object
@@ -85,7 +101,7 @@ lv_span_t * lv_spangroup_new_span(lv_obj_t * obj);
  * @param obj pointer to a spangroup object.
  * @param span pointer to a span.
  */
-void lv_spangroup_del_span(lv_obj_t * obj, lv_span_t * span);
+void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span);
 
 /*=====================
  * Setter functions
@@ -135,11 +151,11 @@ void lv_spangroup_set_indent(lv_obj_t * obj, lv_coord_t indent);
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode);
 
 /**
- * Set lines of the spangroup.
+ * Set maximum lines of the spangroup.
  * @param obj pointer to a spangroup object.
  * @param lines max lines that can be displayed in LV_SPAN_MODE_BREAK mode. < 0 means no limit.
  */
-void lv_spangroup_set_lines(lv_obj_t * obj, int32_t lines);
+void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines);
 
 /*=====================
  * Getter functions
@@ -194,11 +210,11 @@ lv_coord_t lv_spangroup_get_indent(lv_obj_t * obj);
 lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj);
 
 /**
- * get lines of the spangroup.
+ * get maximum lines of the spangroup.
  * @param obj pointer to a spangroup object.
- * @return the lines value.
+ * @return the max lines value.
  */
-int32_t lv_spangroup_get_lines(lv_obj_t * obj);
+int32_t lv_spangroup_get_max_lines(lv_obj_t * obj);
 
 /**
  * get max line height of all span in the spangroup.
@@ -218,6 +234,8 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width);
 /**
  * get the text content height with width fixed.
  * @param obj pointer to a spangroup object.
+ * @param width the width of the span group.
+
  */
 lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width);
 

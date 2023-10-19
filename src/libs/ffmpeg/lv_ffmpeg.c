@@ -54,7 +54,7 @@ struct ffmpeg_context_s {
 
 #pragma pack(1)
 
-struct lv_img_pixel_color_s {
+struct lv_image_pixel_color_s {
     lv_color_t c;
     uint8_t alpha;
 };
@@ -65,18 +65,18 @@ struct lv_img_pixel_color_s {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
-static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_open(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
+static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
 static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx);
 static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
 static void ffmpeg_close_dst_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx);
-static int ffmpeg_get_img_header(const char * path, lv_img_header_t * header);
+static int ffmpeg_get_image_header(const char * path, lv_image_header_t * header);
 static int ffmpeg_get_frame_refr_period(struct ffmpeg_context_s * ffmpeg_ctx);
-static uint8_t * ffmpeg_get_img_data(struct ffmpeg_context_s * ffmpeg_ctx);
+static uint8_t * ffmpeg_get_image_data(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx);
 static bool ffmpeg_pix_fmt_has_alpha(enum AVPixelFormat pix_fmt);
@@ -85,18 +85,16 @@ static bool ffmpeg_pix_fmt_is_yuv(enum AVPixelFormat pix_fmt);
 static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
-#if LV_COLOR_DEPTH != 32
-    static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
-#endif
-
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_ffmpeg_player_class = {
     .constructor_cb = lv_ffmpeg_player_constructor,
     .destructor_cb = lv_ffmpeg_player_destructor,
     .instance_size = sizeof(lv_ffmpeg_player_t),
-    .base_class = &lv_img_class
+    .base_class = &lv_image_class,
+    .name = "ffmpeg-player",
 };
 
 /**********************
@@ -109,10 +107,10 @@ const lv_obj_class_t lv_ffmpeg_player_class = {
 
 void lv_ffmpeg_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
-    lv_img_decoder_set_info_cb(dec, decoder_info);
-    lv_img_decoder_set_open_cb(dec, decoder_open);
-    lv_img_decoder_set_close_cb(dec, decoder_close);
+    lv_image_decoder_t * dec = lv_image_decoder_create();
+    lv_image_decoder_set_info_cb(dec, decoder_info);
+    lv_image_decoder_set_open_cb(dec, decoder_open);
+    lv_image_decoder_set_close_cb(dec, decoder_close);
 
 #if LV_FFMPEG_AV_DUMP_FORMAT == 0
     av_log_set_level(AV_LOG_QUIET);
@@ -139,10 +137,10 @@ lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent)
     return obj;
 }
 
-lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
+lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_res_t res = LV_RES_INV;
+    lv_result_t res = LV_RESULT_INVALID;
 
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
@@ -171,21 +169,17 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     int height = player->ffmpeg_ctx->video_dec_ctx->height;
     uint32_t data_size = 0;
 
-    if(has_alpha) {
-        data_size = width * height * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
-    }
-    else {
-        data_size = width * height * LV_COLOR_SIZE / 8;
-    }
+    data_size = width * height * 4;
+
 
     player->imgdsc.header.always_zero = 0;
     player->imgdsc.header.w = width;
     player->imgdsc.header.h = height;
     player->imgdsc.data_size = data_size;
-    player->imgdsc.header.cf = has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE;
-    player->imgdsc.data = ffmpeg_get_img_data(player->ffmpeg_ctx);
+    player->imgdsc.header.cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+    player->imgdsc.data = ffmpeg_get_image_data(player->ffmpeg_ctx);
 
-    lv_img_set_src(&player->img.obj, &(player->imgdsc));
+    lv_image_set_src(&player->img.obj, &(player->imgdsc));
 
     int period = ffmpeg_get_frame_refr_period(player->ffmpeg_ctx);
 
@@ -198,7 +192,7 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
         LV_LOG_WARN("unable to get frame refresh period");
     }
 
-    res = LV_RES_OK;
+    res = LV_RESULT_OK;
 
 failed:
     return res;
@@ -254,95 +248,75 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
-    /* Get the source type */
-    lv_img_src_t src_type = lv_img_src_get_type(src);
+    LV_UNUSED(decoder);
 
-    if(src_type == LV_IMG_SRC_FILE) {
+    /* Get the source type */
+    lv_image_src_t src_type = lv_image_src_get_type(src);
+
+    if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
 
-        if(ffmpeg_get_img_header(fn, header) < 0) {
+        if(ffmpeg_get_image_header(fn, header) < 0) {
             LV_LOG_ERROR("ffmpeg can't get image header");
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
-        return LV_RES_OK;
+        return LV_RESULT_OK;
     }
 
     /* If didn't succeeded earlier then it's an error */
-    return LV_RES_INV;
+    return LV_RESULT_INVALID;
 }
 
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-    if(dsc->src_type == LV_IMG_SRC_FILE) {
+    LV_UNUSED(decoder);
+
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * path = dsc->src;
 
         struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path);
 
         if(ffmpeg_ctx == NULL) {
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         if(ffmpeg_image_allocate(ffmpeg_ctx) < 0) {
             LV_LOG_ERROR("ffmpeg image allocate failed");
             ffmpeg_close(ffmpeg_ctx);
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         if(ffmpeg_update_next_frame(ffmpeg_ctx) < 0) {
             ffmpeg_close(ffmpeg_ctx);
             LV_LOG_ERROR("ffmpeg update frame failed");
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         ffmpeg_close_src_ctx(ffmpeg_ctx);
-        uint8_t * img_data = ffmpeg_get_img_data(ffmpeg_ctx);
-
-#if LV_COLOR_DEPTH != 32
-        if(ffmpeg_ctx->has_alpha) {
-            convert_color_depth(img_data, dsc->header.w * dsc->header.h);
-        }
-#endif
+        uint8_t * img_data = ffmpeg_get_image_data(ffmpeg_ctx);
 
         dsc->user_data = ffmpeg_ctx;
         dsc->img_data = img_data;
 
         /* The image is fully decoded. Return with its pointer */
-        return LV_RES_OK;
+        return LV_RESULT_OK;
     }
 
     /* If not returned earlier then it failed */
-    return LV_RES_INV;
+    return LV_RESULT_INVALID;
 }
 
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
+    LV_UNUSED(decoder);
     struct ffmpeg_context_s * ffmpeg_ctx = dsc->user_data;
     ffmpeg_close(ffmpeg_ctx);
 }
 
-#if LV_COLOR_DEPTH != 32
-
-static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
-{
-    lv_color32_t * img_src_p = (lv_color32_t *)img;
-    struct lv_img_pixel_color_s * img_dst_p = (struct lv_img_pixel_color_s *)img;
-
-    for(uint32_t i = 0; i < px_cnt; i++) {
-        lv_color32_t temp = *img_src_p;
-        img_dst_p->c = lv_color_hex(temp.full);
-        img_dst_p->alpha = temp.ch.alpha;
-
-        img_src_p++;
-        img_dst_p++;
-    }
-}
-
-#endif
-
-static uint8_t * ffmpeg_get_img_data(struct ffmpeg_context_s * ffmpeg_ctx)
+static uint8_t * ffmpeg_get_image_data(struct ffmpeg_context_s * ffmpeg_ctx)
 {
     uint8_t * img_data = ffmpeg_ctx->video_dst_data[0];
 
@@ -365,7 +339,7 @@ static bool ffmpeg_pix_fmt_has_alpha(enum AVPixelFormat pix_fmt)
         return true;
     }
 
-    return (desc->flags & AV_PIX_FMT_FLAG_ALPHA) ? true : false;
+    return desc->flags & AV_PIX_FMT_FLAG_ALPHA;
 }
 
 static bool ffmpeg_pix_fmt_is_yuv(enum AVPixelFormat pix_fmt)
@@ -445,7 +419,7 @@ static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx)
     }
 
     if(!ffmpeg_ctx->has_alpha) {
-        int lv_linesize = sizeof(lv_color_t) * width;
+        int lv_linesize = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE) * width;
         int dst_linesize = ffmpeg_ctx->video_dst_linesize[0];
         if(dst_linesize != lv_linesize) {
             LV_LOG_WARN("ffmpeg linesize = %d, but lvgl image require %d",
@@ -570,8 +544,8 @@ static int ffmpeg_open_codec_context(int * stream_idx,
     return 0;
 }
 
-static int ffmpeg_get_img_header(const char * filepath,
-                                 lv_img_header_t * header)
+static int ffmpeg_get_image_header(const char * filepath,
+                                   lv_image_header_t * header)
 {
     int ret = -1;
 
@@ -600,7 +574,7 @@ static int ffmpeg_get_img_header(const char * filepath,
         header->w = video_dec_ctx->width;
         header->h = video_dec_ctx->height;
         header->always_zero = 0;
-        header->cf = (has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE);
+        header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
 
         ret = 0;
     }
@@ -666,7 +640,7 @@ static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx)
 
 struct ffmpeg_context_s * ffmpeg_open_file(const char * path)
 {
-    if(path == NULL || strlen(path) == 0) {
+    if(path == NULL || lv_strlen(path) == 0) {
         LV_LOG_ERROR("file path is empty");
         return NULL;
     }
@@ -826,20 +800,18 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
         return;
     }
 
-#if LV_COLOR_DEPTH != 32
-    if(player->ffmpeg_ctx->has_alpha) {
-        convert_color_depth((uint8_t *)(player->imgdsc.data),
-                            player->imgdsc.header.w * player->imgdsc.header.h);
-    }
-#endif
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 
-    lv_img_cache_invalidate_src(lv_img_get_src(obj));
     lv_obj_invalidate(obj);
 }
 
 static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p,
                                          lv_obj_t * obj)
 {
+
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
@@ -856,16 +828,20 @@ static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p,
 static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
                                         lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
+
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
     if(player->timer) {
-        lv_timer_del(player->timer);
+        lv_timer_delete(player->timer);
         player->timer = NULL;
     }
 
-    lv_img_cache_invalidate_src(lv_img_get_src(obj));
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 
     ffmpeg_close(player->ffmpeg_ctx);
     player->ffmpeg_ctx = NULL;

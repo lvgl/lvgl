@@ -22,7 +22,6 @@ extern "C" {
 #include "../misc/lv_area.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_assert.h"
-#include "../hal/lv_hal.h"
 
 /*********************
  *      DEFINES
@@ -38,7 +37,7 @@ struct _lv_obj_t;
  * Possible states of a widget.
  * OR-ed values are possible
  */
-enum {
+enum _lv_state_t {
     LV_STATE_DEFAULT     =  0x0000,
     LV_STATE_CHECKED     =  0x0001,
     LV_STATE_FOCUSED     =  0x0002,
@@ -57,7 +56,11 @@ enum {
     LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states*/
 };
 
+#ifdef DOXYGEN
+typedef _lv_state_t lv_state_t;
+#else
 typedef uint16_t lv_state_t;
+#endif /*DOXYGEN*/
 
 /**
  * The possible parts of widgets.
@@ -65,28 +68,32 @@ typedef uint16_t lv_state_t;
  * E.g. slider = background + indicator + knob
  * Not all parts are used by every widget
  */
-enum {
+
+enum _lv_part_t {
     LV_PART_MAIN         = 0x000000,   /**< A background like rectangle*/
     LV_PART_SCROLLBAR    = 0x010000,   /**< The scrollbar(s)*/
     LV_PART_INDICATOR    = 0x020000,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox*/
     LV_PART_KNOB         = 0x030000,   /**< Like handle to grab to adjust the value*/
     LV_PART_SELECTED     = 0x040000,   /**< Indicate the currently selected option or section*/
     LV_PART_ITEMS        = 0x050000,   /**< Used if the widget has multiple similar elements (e.g. table cells)*/
-    LV_PART_TICKS        = 0x060000,   /**< Ticks on scale e.g. for a chart or meter*/
-    LV_PART_CURSOR       = 0x070000,   /**< Mark a specific place e.g. for text area's cursor or on a chart*/
+    LV_PART_CURSOR       = 0x060000,   /**< Mark a specific place e.g. for text area's cursor or on a chart*/
 
     LV_PART_CUSTOM_FIRST = 0x080000,    /**< Extension point for custom widgets*/
 
     LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
 };
 
+#ifdef DOXYGEN
+typedef _lv_part_t lv_part_t;
+#else
 typedef uint32_t lv_part_t;
+#endif /*DOXYGEN*/
 
 /**
  * On/Off features controlling the object's behavior.
  * OR-ed values are possible
  */
-enum {
+typedef enum {
     LV_OBJ_FLAG_HIDDEN          = (1L << 0),  /**< Make the object hidden. (Like it wasn't there at all)*/
     LV_OBJ_FLAG_CLICKABLE       = (1L << 1),  /**< Make the object clickable by the input devices*/
     LV_OBJ_FLAG_CLICK_FOCUSABLE = (1L << 2),  /**< Add focused state to the object when clicked*/
@@ -107,7 +114,11 @@ enum {
     LV_OBJ_FLAG_ADV_HITTEST     = (1L << 16), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners.*/
     LV_OBJ_FLAG_IGNORE_LAYOUT   = (1L << 17), /**< Make the object position-able by the layouts*/
     LV_OBJ_FLAG_FLOATING        = (1L << 18), /**< Do not scroll the object when the parent scrolls and ignore layout*/
-    LV_OBJ_FLAG_OVERFLOW_VISIBLE = (1L << 19), /**< Do not clip the children's content to the parent's boundary*/
+    LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS = (1L << 19), /**< Send `LV_EVENT_DRAW_TASK_ADDED` events*/
+    LV_OBJ_FLAG_OVERFLOW_VISIBLE = (1L << 20),/**< Do not clip the children to the parent's ext draw size*/
+#if LV_USE_FLEX
+    LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = (1L << 21),     /**< Start a new flex track on this item*/
+#endif
 
     LV_OBJ_FLAG_LAYOUT_1        = (1L << 23), /**< Custom flag, free to use by layouts*/
     LV_OBJ_FLAG_LAYOUT_2        = (1L << 24), /**< Custom flag, free to use by layouts*/
@@ -118,21 +129,14 @@ enum {
     LV_OBJ_FLAG_USER_2          = (1L << 28), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_3          = (1L << 29), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_4          = (1L << 30), /**< Custom flag, free to use by user*/
+} _lv_obj_flag_t;
 
-};
-
-
+#ifdef DOXYGEN
+typedef _lv_obj_flag_t lv_obj_flag_t;
+#else
 typedef uint32_t lv_obj_flag_t;
+#endif /*DOXYGEN*/
 
-/**
- * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_obj_class`
- * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
- */
-typedef enum {
-    LV_OBJ_DRAW_PART_RECTANGLE,  /**< The main rectangle*/
-    LV_OBJ_DRAW_PART_BORDER_POST,/**< The border if style_border_post = true*/
-    LV_OBJ_DRAW_PART_SCROLLBAR,  /**< The scrollbar*/
-} lv_obj_draw_part_type_t;
 
 #include "lv_obj_tree.h"
 #include "lv_obj_pos.h"
@@ -175,7 +179,14 @@ typedef struct _lv_obj_t {
     struct _lv_obj_t * parent;
     _lv_obj_spec_attr_t * spec_attr;
     _lv_obj_style_t * styles;
+#if LV_OBJ_STYLE_CACHE
+    uint32_t style_main_prop_is_set;
+    uint32_t style_other_prop_is_set;
+#endif
     void * user_data;
+#if LV_USE_OBJ_ID
+    void * id;
+#endif
     lv_area_t coords;
     lv_obj_flag_t flags;
     lv_state_t state;
@@ -185,32 +196,12 @@ typedef struct _lv_obj_t {
     uint16_t style_cnt  : 6;
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
+    uint16_t is_deleting : 1;
 } lv_obj_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * Initialize LVGL library.
- * Should be called before any other LVGL related function.
- */
-void lv_init(void);
-
-#if LV_ENABLE_GC || LV_USE_BUILTIN_MALLOC
-
-/**
- * Deinit the 'lv' library
- * Currently only implemented when not using custom allocators, or GC is enabled.
- */
-void lv_deinit(void);
-
-#endif
-
-/**
- * Returns whether the 'lv' library is currently initialized
- */
-bool lv_is_initialized(void);
 
 /**
  * Create a base object (a rectangle)
@@ -236,8 +227,15 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to set.
  */
-void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f);
+void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
+/**
+ * Set add or remove one or more flags.
+ * @param obj   pointer to an object
+ * @param f     OR-ed values from `lv_obj_flag_t` to set.
+ * @param v     true: add the flags; false: remove the flags
+ */
+void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
 
 /**
  * Add one or more states to the object. The other state bits will remain unchanged.
@@ -253,7 +251,15 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
  * @param obj       pointer to an object
  * @param state     the states to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
  */
-void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
+void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state);
+
+/**
+ * Add or remove one or more states to the object. The other state bits will remain unchanged.
+ * @param obj       pointer to an object
+ * @param state     the states to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
+ * @param v         true: add the states; false: remove the states
+ */
+void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
 
 /**
  * Set the user_data field of the object
@@ -357,6 +363,42 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
  * @return          true: valid
  */
 bool lv_obj_is_valid(const lv_obj_t * obj);
+
+#if LV_USE_OBJ_ID
+
+/**
+ * Assign an id to an object if not previously assigned
+ * Set `LV_USE_OBJ_ID_BUILTIN` to 1 to use builtin method to generate object ID.
+ * Otherwise, these functions including `lv_obj_[assign|free|stringify]_id` should be implemented externally.
+ *
+ * @param class_p   the class this obj belongs to. Note obj->class_p is the class currently being constructed.
+ * @param obj   pointer to an object
+ */
+void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj);
+
+/**
+ * Free resources allocated by `lv_obj_assign_id`
+ * @param obj   pointer to an object
+ */
+void lv_obj_free_id(lv_obj_t * obj);
+
+/**
+ * Format an object's id into a string.
+ * @param obj   pointer to an object
+ * @param buf   buffer to write the string into
+ * @param len   length of the buffer
+ */
+const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len);
+
+#if LV_USE_OBJ_ID_BUILTIN
+/**
+ * Free resources used by builtin ID generator.
+ */
+void lv_objid_builtin_destroy(void);
+
+#endif
+
+#endif /*LV_USE_OBJ_ID*/
 
 /**********************
  *      MACROS

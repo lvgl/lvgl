@@ -160,7 +160,7 @@ void pika_lvgl_bar_set_start_value(PikaObj *self, int start_value, int anim){
 
 void pika_lvgl_btn___init__(PikaObj* self, PikaObj* parent) {
     lv_obj_t* lv_parent = obj_getPtr(parent, "lv_obj");
-    lv_obj_t* lv_obj = lv_btn_create(lv_parent);
+    lv_obj_t* lv_obj = lv_button_create(lv_parent);
     obj_setPtr(self, "lv_obj", lv_obj);
 }
 

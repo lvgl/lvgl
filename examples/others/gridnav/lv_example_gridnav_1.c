@@ -9,7 +9,7 @@ void lv_example_gridnav_1(void)
     /*It's assumed that the default group is set and
      *there is a keyboard indev*/
 
-    lv_obj_t * cont1 = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont1 = lv_obj_create(lv_screen_active());
     lv_gridnav_add(cont1, LV_GRIDNAV_CTRL_NONE);
 
     /*Use flex here, but works with grid or manually placed objects as well*/
@@ -25,7 +25,7 @@ void lv_example_gridnav_1(void)
 
     uint32_t i;
     for(i = 0; i < 10; i++) {
-        lv_obj_t * obj = lv_btn_create(cont1);
+        lv_obj_t * obj = lv_button_create(cont1);
         lv_obj_set_size(obj, 70, LV_SIZE_CONTENT);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
         lv_group_remove_obj(obj);   /*Not needed, we use the gridnav instead*/
@@ -37,7 +37,7 @@ void lv_example_gridnav_1(void)
 
     /* Create a second container with rollover grid nav mode.*/
 
-    lv_obj_t * cont2 = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont2 = lv_obj_create(lv_screen_active());
     lv_gridnav_add(cont2, LV_GRIDNAV_CTRL_ROLLOVER);
     lv_obj_set_style_bg_color(cont2, lv_palette_lighten(LV_PALETTE_BLUE, 5), LV_STATE_FOCUSED);
     lv_obj_set_size(cont2, lv_pct(50), lv_pct(100));

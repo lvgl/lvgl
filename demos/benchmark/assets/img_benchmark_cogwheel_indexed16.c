@@ -6,11 +6,12 @@
     #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_IMG_COGWHEEL_INDEXED16
-    #define LV_ATTRIBUTE_IMG_IMG_COGWHEEL_INDEXED16
+#ifndef LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_INDEXED16
+    #define LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_INDEXED16
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMG_IMG_COGWHEEL_INDEXED16 uint8_t img_benchmark_cogwheel_indexed16_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_INDEXED16 uint8_t img_benchmark_cogwheel_indexed16_map[] =
+{
     0x00, 0x00, 0x00, 0x00,   /*Color of index 0*/
     0x6c, 0x5e, 0x4a, 0xff,   /*Color of index 1*/
     0x72, 0x64, 0x50, 0xff,   /*Color of index 2*/
@@ -130,7 +131,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMG_IMG_COGWHEEL_INDEXED16 uint8_t img
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-const lv_img_dsc_t img_benchmark_cogwheel_indexed16 = {
+const lv_image_dsc_t img_benchmark_cogwheel_indexed16 = {
     .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,

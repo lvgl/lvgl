@@ -7,7 +7,7 @@ fs_driver.fs_register(fs_drv, 'S')
 # get the directory in which the script is running
 try:
     script_path = __file__[:__file__.rfind('/')] if __file__.find('/') >= 0 else '.'
-except NameError: 
+except NameError:
     script_path = ''
 
 #
@@ -21,7 +21,7 @@ style.set_text_font(font)
 style.set_text_align(lv.TEXT_ALIGN.CENTER)
 
 # Create a label with the new style
-label = lv.label(lv.scr_act())
+label = lv.label(lv.screen_active())
 label.add_style(style, 0)
 label.set_text("Hello world\nI'm a font created with Tiny TTF")
 label.center()

@@ -13,11 +13,11 @@ void lv_example_label_2(void)
     lv_style_set_text_color(&style_shadow, lv_color_black());
 
     /*Create a label for the shadow first (it's in the background)*/
-    lv_obj_t * shadow_label = lv_label_create(lv_scr_act());
+    lv_obj_t * shadow_label = lv_label_create(lv_screen_active());
     lv_obj_add_style(shadow_label, &style_shadow, 0);
 
     /*Create the main label*/
-    lv_obj_t * main_label = lv_label_create(lv_scr_act());
+    lv_obj_t * main_label = lv_label_create(lv_screen_active());
     lv_label_set_text(main_label, "A simple method to create\n"
                       "shadows on a text.\n"
                       "It even works with\n\n"

@@ -13,7 +13,6 @@
  *********************/
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,14 +42,14 @@ typedef struct {
     png_infop info_ptr;
     int number_of_passes;
     png_bytep * row_pointers;
-} png_img_t;
+} png_image_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static int read_png_file(png_img_t * p, const char * file_name);
+static int read_png_file(png_image_t * p, const char * file_name);
 static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
-static void png_release(png_img_t * p);
+static void png_release(png_image_t * p);
 
 /**********************
  *  STATIC VARIABLES
@@ -64,21 +63,19 @@ static void png_release(png_img_t * p);
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_test_assert_img_eq(const char * fn_ref)
+bool lv_test_assert_image_eq(const char * fn_ref)
 {
     char fn_ref_full[512];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
-    uint8_t * screen_buf;
 
-    lv_obj_invalidate(lv_scr_act());
+    //lv_obj_invalidate(lv_screen_active());
     lv_refr_now(NULL);
 
-    extern lv_color_t test_fb[];
+    extern uint8_t * last_flushed_buf;
+    uint8_t * screen_buf = lv_draw_buf_align(last_flushed_buf, LV_COLOR_FORMAT_XRGB8888);
 
-    screen_buf = (uint8_t *)test_fb;
-
-    png_img_t p;
+    png_image_t p;
     int res = read_png_file(&p, fn_ref_full);
     if(res == ERR_FILE_NOT_FOUND) {
         TEST_PRINTF("%s%s", fn_ref_full, " was not found, creating is now from the rendered screen");
@@ -120,44 +117,14 @@ bool lv_test_assert_img_eq(const char * fn_ref)
     }
 
     if(err) {
-        uint32_t ref_px = 0;
-        uint32_t act_px = 0;
-        memcpy(&ref_px, ptr_ref, 3);
-        memcpy(&act_px, ptr_act, 3);
+        char fn_ref_no_ext[64];
+        strcpy(fn_ref_no_ext, fn_ref);
+        fn_ref_no_ext[strlen(fn_ref_no_ext) - 4] = '\0';
 
-        FILE * f = fopen("../test_screenshot_error.h", "w");
+        char fn_err_full[512];
+        sprintf(fn_err_full, "%s%s_err.png", REF_IMGS_PATH, fn_ref_no_ext);
 
-        fprintf(f, "//Diff in %s at (%d;%d), %x instead of %x)\n\n", fn_ref, x, y, act_px, ref_px);
-        fprintf(f, "static const uint32_t test_screenshot_error_data[] = {\n");
-
-        i_buf = 0;
-        for(y = 0; y < 480; y++) {
-            fprintf(f, "\n");
-            for(x = 0; x < 800; x++) {
-                ptr_act = &(screen_buf[i_buf * 4]);
-                act_px = 0;
-                memcpy(&act_px, ptr_act, 3);
-                fprintf(f, "0xFF%06X, ", act_px);
-                i_buf++;
-            }
-        }
-        fprintf(f, "};\n\n");
-
-        fprintf(f, "static lv_img_dsc_t test_screenshot_error_dsc = { \n"
-                "  .header.w = 800,\n"
-                "  .header.h = 480,\n"
-                "  .header.always_zero = 0,\n"
-                "  .header.cf = LV_COLOR_FORMAT_NATIVE,\n"
-                "  .data_size = 800 * 480 * 4,\n"
-                "  .data = (const uint8_t *) test_screenshot_error_data};\n\n"
-                "static inline void test_screenshot_error_show(void)\n"
-                "{\n"
-                "  lv_obj_t * img = lv_img_create(lv_scr_act());\n"
-                "  lv_img_set_src(img, &test_screenshot_error_dsc);\n"
-                "}\n");
-
-        fclose(f);
-
+        write_png_file(screen_buf, 800, 480, fn_err_full);
     }
 
 
@@ -171,20 +138,20 @@ bool lv_test_assert_img_eq(const char * fn_ref)
  *   STATIC FUNCTIONS
  **********************/
 
-static int read_png_file(png_img_t * p, const char * file_name)
+static int read_png_file(png_image_t * p, const char * file_name)
 {
     char header[8];    // 8 is the maximum size that can be checked
 
     /*open file and test for it being a png*/
     FILE * fp = fopen(file_name, "rb");
     if(!fp) {
-        TEST_PRINTF("%s", "PNG file %s could not be opened for reading");
+        TEST_PRINTF("[read_png_file %s] could not be opened for reading", file_name);
         return ERR_FILE_NOT_FOUND;
     }
 
     size_t rcnt = fread(header, 1, 8, fp);
     if(rcnt != 8 || png_sig_cmp((png_const_bytep)header, 0, 8)) {
-        TEST_PRINTF("%s is not recognized as a PNG file", file_name);
+        TEST_PRINTF("[read_png_file %s]  not recognized as a PNG file", file_name);
         return ERR_PNG;
     }
 
@@ -192,17 +159,17 @@ static int read_png_file(png_img_t * p, const char * file_name)
     p->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
     if(!p->png_ptr) {
-        TEST_PRINTF("%s", "png_create_read_struct failed");
+        TEST_PRINTF("[read_png_file %s] png_create_read_struct failed", file_name);
         return ERR_PNG;
     }
 
     p->info_ptr = png_create_info_struct(p->png_ptr);
     if(!p->info_ptr) {
-        TEST_PRINTF("%s", "png_create_info_struct failed");
+        TEST_PRINTF("[read_png_file %s] png_create_info_struct failed", file_name);
         return ERR_PNG;
     }
     if(setjmp(png_jmpbuf(p->png_ptr))) {
-        TEST_PRINTF("%s", "Error during init_io");
+        TEST_PRINTF("[read_png_file %s] Error during init_io", file_name);
         return ERR_PNG;
     }
     png_init_io(p->png_ptr, fp);
@@ -220,7 +187,7 @@ static int read_png_file(png_img_t * p, const char * file_name)
 
     /*read file*/
     if(setjmp(png_jmpbuf(p->png_ptr))) {
-        TEST_PRINTF("%s", "Error during read_image");
+        TEST_PRINTF("[read_png_file %s] Error during read_image", file_name);
         return ERR_PNG;
     }
     p->row_pointers = (png_bytep *) malloc(sizeof(png_bytep) * p->height);
@@ -244,7 +211,10 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
     /* create file */
     FILE * fp = fopen(file_name, "wb");
     if(!fp) {
-        TEST_PRINTF("%s", "[write_png_file] File %s could not be opened for writing", file_name);
+        printf("###### %s\n", file_name);
+        fflush(stdout);
+        TEST_PRINTF("[write_png_file %s] could not be opened for writing", file_name);
+        TEST_PRINTF("%s", file_name);
         return -1;
     }
 
@@ -252,18 +222,18 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
     if(!png_ptr) {
-        TEST_PRINTF("%s", "[write_png_file] png_create_write_struct failed");
+        TEST_PRINTF("[write_png_file %s] png_create_write_struct failed", file_name);
         return -1;
     }
 
     info_ptr = png_create_info_struct(png_ptr);
     if(!info_ptr) {
-        TEST_PRINTF("%s", "[write_png_file] png_create_info_struct failed");
+        TEST_PRINTF("[write_png_file %s] png_create_info_struct failed", file_name);
         return -1;
     }
 
     if(setjmp(png_jmpbuf(png_ptr))) {
-        TEST_PRINTF("%s", "[write_png_file] Error during init_io");
+        TEST_PRINTF("[write_png_file %s] Error during init_io", file_name);
         return -1;
     }
 
@@ -271,7 +241,7 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
 
     /* write header */
     if(setjmp(png_jmpbuf(png_ptr))) {
-        TEST_PRINTF("%s", "[write_png_file] Error during writing header");
+        TEST_PRINTF("[write_png_file %s] Error during writing header", file_name);
         return -1;
     }
 
@@ -284,7 +254,7 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
 
     /* write bytes */
     if(setjmp(png_jmpbuf(png_ptr))) {
-        TEST_PRINTF("%s", "[write_png_file] Error during writing bytes");
+        TEST_PRINTF("[write_png_file %s] Error during writing bytes", file_name);
         return -1;
     }
 
@@ -304,7 +274,7 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
 
     /* end write */
     if(setjmp(png_jmpbuf(png_ptr))) {
-        TEST_PRINTF("%s", "[write_png_file] Error during end of write");
+        TEST_PRINTF("[write_png_file %s] Error during end of write", file_name);
         return -1;
     }
     png_write_end(png_ptr, NULL);
@@ -320,7 +290,7 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
 }
 
 
-static void png_release(png_img_t * p)
+static void png_release(png_image_t * p)
 {
     int y;
     for(y = 0; y < p->height; y++) free(p->row_pointers[y]);

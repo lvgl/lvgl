@@ -30,7 +30,7 @@ void lv_example_style_10(void)
     lv_style_set_transition(&style_pr, &trans_pr);
 
     /*Create an object with the new style_pr*/
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_add_style(obj, &style_def, 0);
     lv_obj_add_style(obj, &style_pr, LV_STATE_PRESSED);
 

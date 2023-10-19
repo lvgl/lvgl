@@ -57,11 +57,11 @@ def file_explorer_event_handler(e) :
         # print("sum: ",sum)
         sort_by_file_kind(tb, 0, (sum - 1));
 
-file_explorer = lv.file_explorer(lv.scr_act())
+file_explorer = lv.file_explorer(lv.screen_active())
 # Before custom sort, please set the default sorting to NONE. The default is NONE.
 file_explorer.explorer_set_sort(lv.EXPLORER_SORT.NONE)
 
-file_explorer = lv.file_explorer(lv.scr_act())
+file_explorer = lv.file_explorer(lv.screen_active())
 
 if LV_USE_FS_WIN32 :
     file_explorer.explorer_open_dir("D:")

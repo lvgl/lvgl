@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_calendar_header_dropdown.h"
-#if LV_USE_CALENDAR_HEADER_DROPDOWN
+#if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_DROPDOWN
 
 #include "lv_calendar.h"
 #include "../dropdown/lv_dropdown.h"
@@ -32,11 +32,13 @@ static void value_changed_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_calendar_header_dropdown_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
-    .constructor_cb = my_constructor
+    .constructor_cb = my_constructor,
+    .name = "calendar-header-dropdown",
 };
 
 static const char * month_list = "01\n02\n03\n04\n05\n06\n07\n08\n09\n10\n11\n12";
@@ -100,7 +102,7 @@ static void month_event_cb(lv_event_t * e)
     lv_obj_t * dropdown = lv_event_get_target(e);
     lv_obj_t * calendar = lv_event_get_user_data(e);
 
-    uint16_t sel = lv_dropdown_get_selected(dropdown);
+    uint32_t sel = lv_dropdown_get_selected(dropdown);
 
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);
@@ -115,7 +117,7 @@ static void year_event_cb(lv_event_t * e)
     lv_obj_t * dropdown = lv_event_get_target(e);
     lv_obj_t * calendar = lv_event_get_user_data(e);
 
-    uint16_t sel = lv_dropdown_get_selected(dropdown);
+    uint32_t sel = lv_dropdown_get_selected(dropdown);
 
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);

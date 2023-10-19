@@ -6,11 +6,11 @@
     #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_IMGBTN_MID
-    #define LV_ATTRIBUTE_IMG_IMGBTN_MID
+#ifndef LV_ATTRIBUTE_IMAGE_IMGBTN_MID
+    #define LV_ATTRIBUTE_IMAGE_IMGBTN_MID
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMGBTN_MID uint8_t imgbtn_mid_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMGBTN_MID uint8_t imgbtn_mid_map[] = {
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
     /*Pixel format: Blue: 2 bit, Green: 3 bit, Red: 3 bit, Alpha 8 bit */
     0x68, 0x27, 0x68, 0x27, 0x68, 0x27, 0x68, 0x27, 0x68, 0x27,
@@ -169,12 +169,11 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMGBTN_MI
 #endif
 };
 
-const lv_img_dsc_t imgbtn_mid = {
+const lv_image_dsc_t imgbtn_mid = {
     .header.always_zero = 0,
     .header.w = 5,
     .header.h = 49,
-    .data_size = 245 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
-    .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = imgbtn_mid_map,
 };
 

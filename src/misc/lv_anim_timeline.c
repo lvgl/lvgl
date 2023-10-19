@@ -6,9 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_anim_timeline.h"
-#include "lv_mem.h"
 #include "lv_assert.h"
+#include "lv_anim_timeline.h"
+#include "../stdlib/lv_mem.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -18,18 +19,7 @@
  *      TYPEDEFS
  **********************/
 
-/*Data of anim_timeline_dsc*/
-typedef struct {
-    lv_anim_t anim;
-    uint32_t start_time;
-} lv_anim_timeline_dsc_t;
 
-/*Data of anim_timeline*/
-struct _lv_anim_timeline_t {
-    lv_anim_timeline_dsc_t * anim_dsc;  /**< Dynamically allocated anim dsc array*/
-    uint32_t anim_dsc_cnt;              /**< The length of anim dsc array*/
-    bool reverse;                       /**< Reverse playback*/
-};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -59,7 +49,7 @@ lv_anim_timeline_t * lv_anim_timeline_create(void)
     return at;
 }
 
-void lv_anim_timeline_del(lv_anim_timeline_t * at)
+void lv_anim_timeline_delete(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
 
@@ -121,7 +111,7 @@ void lv_anim_timeline_stop(lv_anim_timeline_t * at)
 
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_t * a = &(at->anim_dsc[i].anim);
-        lv_anim_del(a->var, a->exec_cb);
+        lv_anim_delete(a->var, a->exec_cb);
     }
 }
 

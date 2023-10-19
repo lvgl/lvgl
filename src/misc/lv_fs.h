@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_fs.h
  *
  */
@@ -24,6 +24,8 @@ extern "C" {
 #define LV_FS_MAX_FN_LENGTH 64
 #define LV_FS_MAX_PATH_LENGTH 256
 
+#define LV_FS_CACHE_FROM_BUFFER   UINT32_MAX
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -31,7 +33,7 @@ extern "C" {
 /**
  * Errors in the file system module.
  */
-enum {
+enum _lv_fs_res_t {
     LV_FS_RES_OK = 0,
     LV_FS_RES_HW_ERR,     /*Low level hardware error*/
     LV_FS_RES_FS_ERR,     /*Error in the file system structure*/
@@ -46,16 +48,27 @@ enum {
     LV_FS_RES_INV_PARAM,  /*Invalid parameter among arguments*/
     LV_FS_RES_UNKNOWN,    /*Other unknown error*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_fs_res_t lv_fs_res_t;
+#else
 typedef uint8_t lv_fs_res_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * File open mode.
  */
-enum {
+enum _lv_fs_mode_t {
     LV_FS_MODE_WR = 0x01,
     LV_FS_MODE_RD = 0x02,
 };
+
+#ifdef DOXYGEN
+typedef _lv_fs_mode_t lv_fs_mode_t;
+#else
 typedef uint8_t lv_fs_mode_t;
+#endif /*DOXYGEN*/
 
 
 /**
@@ -69,7 +82,7 @@ typedef enum {
 
 typedef struct _lv_fs_drv_t {
     char letter;
-    uint16_t cache_size;
+    uint32_t cache_size;
     bool (*ready_cb)(struct _lv_fs_drv_t * drv);
 
     void * (*open_cb)(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
@@ -98,6 +111,13 @@ typedef struct {
     lv_fs_drv_t * drv;
     lv_fs_file_cache_t * cache;
 } lv_fs_file_t;
+
+/* Extended path object to specify the buffer for memory-mapped files */
+typedef struct {
+    char path[4];   /* This is needed to make it compatible with a normal path */
+    const void * buffer;
+    uint32_t size;
+} lv_fs_path_ex_t;
 
 typedef struct {
     void * dir_d;
@@ -154,6 +174,15 @@ bool lv_fs_is_ready(char letter);
 lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode);
 
 /**
+ * Make a path object for the memory-mapped file compatible with the file system interface
+ * @param path      path to a lv_fs_path_ex object
+ * @param letter    the letter of the driver. E.g. `LV_FS_MEMFS_LETTER`
+ * @param buf       address of the memory buffer
+ * @param size      size of the memory buffer in bytes
+ */
+void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size);
+
+/**
  * Close an already opened file
  * @param file_p    pointer to a lv_fs_file_t variable
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
@@ -192,7 +221,7 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
 /**
  * Give the position of the read write pointer
  * @param file_p    pointer to a lv_fs_file_t variable
- * @param pos_p     pointer to store the position of the read write pointer
+ * @param pos       pointer to store the position of the read write pointer
  * @return          LV_FS_RES_OK or any error from 'fs_res_t'
  */
 lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos);

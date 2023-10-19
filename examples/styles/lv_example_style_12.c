@@ -12,7 +12,7 @@ void lv_example_style_12(void)
     lv_style_set_border_color(&style, lv_palette_lighten(LV_PALETTE_GREEN, 3));
     lv_style_set_border_width(&style, 3);
 
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_add_style(obj, &style, 0);
 
     /*Overwrite the background color locally*/

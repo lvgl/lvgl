@@ -28,10 +28,10 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_img_t img;
+    lv_image_t img;
     gd_GIF * gif;
     lv_timer_t * timer;
-    lv_img_dsc_t imgdsc;
+    lv_image_dsc_t imgdsc;
     uint32_t last_call;
 } lv_gif_t;
 

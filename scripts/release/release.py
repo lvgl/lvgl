@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Create a new release from master. Execute the followings:
+# Create a new release from master. Execute the following:
 # - On lvgl, lv_demos, and lv_drivers:
 #   - Detect the current version of master. E.g. 8.1-dev
 #   - Create a new branch from the master for the release. E.g. release/v8.1

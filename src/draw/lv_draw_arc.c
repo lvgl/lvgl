@@ -6,8 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw.h"
+#include "../core/lv_obj.h"
 #include "lv_draw_arc.h"
+#include "../core/lv_obj_event.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -41,17 +43,27 @@ void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
-void lv_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,
-                 uint16_t start_angle, uint16_t end_angle)
+void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
-    if(start_angle == end_angle) return;
+    if(dsc->start_angle == dsc->end_angle) return;
 
-    draw_ctx->draw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
+    LV_PROFILER_BEGIN;
+    lv_area_t a;
+    a.x1 = dsc->center.x - dsc->radius;
+    a.y1 = dsc->center.y - dsc->radius;
+    a.x2 = dsc->center.x + dsc->radius - 1;
+    a.y2 = dsc->center.y + dsc->radius - 1;
+    lv_draw_task_t * t = lv_draw_add_task(layer, &a);
 
-    //    const lv_draw_backend_t * backend = lv_draw_backend_get();
-    //    backend->draw_arc(center_x, center_y, radius, start_angle, end_angle, clip_area, dsc);
+    t->draw_dsc = lv_malloc(sizeof(*dsc));
+    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
+    t->type = LV_DRAW_TASK_TYPE_ARC;
+
+    lv_draw_finalize_task_creation(layer, t);
+
+    LV_PROFILER_END;
 }
 
 void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,

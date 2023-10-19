@@ -4,37 +4,24 @@
  */
 
 /**
- * MIT License
- *
  * Copyright 2021-2023 NXP
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next paragraph)
- * shall be included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
+ * SPDX-License-Identifier: MIT
  */
+
 
 /*********************
  *      INCLUDES
  *********************/
 
-#include "lv_draw_vglite_arc.h"
+#include "lv_draw_vglite.h"
 
-#if LV_USE_GPU_NXP_VG_LITE
+#if LV_USE_DRAW_VGLITE
 #include "lv_vglite_buf.h"
+#include "lv_vglite_path.h"
+#include "lv_vglite_utils.h"
+
+#include "../../../stdlib/lv_string.h"
 #include <math.h>
 
 /*********************
@@ -87,9 +74,16 @@ typedef struct _cubic_cont_pt {
  *  STATIC PROTOTYPES
  **********************/
 
-static void rotate_point(int32_t angle, int32_t * x, int32_t * y);
-static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
-                         int32_t start_angle, int32_t end_angle, const lv_point_t * center, bool cw);
+/**
+ * Draw arc shape with effects
+ *
+ * @param[in] center Arc center with relative coordinates
+ * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] dsc Arc description structure (width, rounded ending, opacity)
+ *
+ */
+static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_area,
+                             const lv_draw_arc_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -103,137 +97,33 @@ static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_gpu_nxp_vglite_draw_arc(const lv_point_t * center, int32_t radius, int32_t start_angle, int32_t end_angle,
-                                    const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc)
+void lv_draw_vglite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc,
+                        const lv_area_t * coords)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
-    lv_color32_t col32 = {.full = lv_color_to32(dsc->color)}; /*Convert color to RGBA8888*/
-    vg_lite_path_t path;
-    vg_lite_color_t vgcol; /* vglite takes ABGR */
-    bool donut = ((end_angle - start_angle) % 360 == 0) ? true : false;
-    vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
+    LV_UNUSED(coords);
 
-    /* path: max size = 16 cubic bezier (7 words each) */
-    int32_t arc_path[16 * 7];
-    lv_memzero(arc_path, sizeof(arc_path));
+    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+        return;
+    if(dsc->width == 0)
+        return;
+    if(dsc->start_angle == dsc->end_angle)
+        return;
 
-    /*** Init path ***/
-    lv_coord_t width = dsc->width;  /* inner arc radius = outer arc radius - width */
-    if(width > (lv_coord_t)radius)
-        width = radius;
+    lv_layer_t * layer = draw_unit->target_layer;
+    lv_point_t rel_center = {dsc->center.x - layer->draw_buf_ofs.x, dsc->center.y - layer->draw_buf_ofs.y};
 
-    int pidx = 0;
-    int32_t cp_x, cp_y; /* control point coords */
+    lv_area_t rel_clip_area;
+    lv_area_copy(&rel_clip_area, draw_unit->clip_area);
+    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
-    /* first control point of curve */
-    cp_x = radius;
-    cp_y = 0;
-    rotate_point(start_angle, &cp_x, &cp_y);
-    arc_path[pidx++] = VLC_OP_MOVE;
-    arc_path[pidx++] = center->x + cp_x;
-    arc_path[pidx++] = center->y + cp_y;
-
-    /* draw 1-5 outer quarters */
-    add_arc_path(arc_path, &pidx, radius, start_angle, end_angle, center, true);
-
-    if(donut) {
-        /* close outer circle */
-        cp_x = radius;
-        cp_y = 0;
-        rotate_point(start_angle, &cp_x, &cp_y);
-        arc_path[pidx++] = VLC_OP_LINE;
-        arc_path[pidx++] = center->x + cp_x;
-        arc_path[pidx++] = center->y + cp_y;
-        /* start inner circle */
-        cp_x = radius - width;
-        cp_y = 0;
-        rotate_point(start_angle, &cp_x, &cp_y);
-        arc_path[pidx++] = VLC_OP_MOVE;
-        arc_path[pidx++] = center->x + cp_x;
-        arc_path[pidx++] = center->y + cp_y;
-
-    }
-    else if(dsc->rounded != 0U) {    /* 1st rounded arc ending */
-        cp_x = radius - width / 2;
-        cp_y = 0;
-        rotate_point(end_angle, &cp_x, &cp_y);
-        lv_point_t round_center = {center->x + cp_x, center->y + cp_y};
-        add_arc_path(arc_path, &pidx, width / 2, end_angle, (end_angle + 180),
-                     &round_center, true);
-
-    }
-    else {   /* 1st flat ending */
-        cp_x = radius - width;
-        cp_y = 0;
-        rotate_point(end_angle, &cp_x, &cp_y);
-        arc_path[pidx++] = VLC_OP_LINE;
-        arc_path[pidx++] = center->x + cp_x;
-        arc_path[pidx++] = center->y + cp_y;
-    }
-
-    /* draw 1-5 inner quarters */
-    add_arc_path(arc_path, &pidx, radius - width, start_angle, end_angle, center, false);
-
-    /* last control point of curve */
-    if(donut) {     /* close the loop */
-        cp_x = radius - width;
-        cp_y = 0;
-        rotate_point(start_angle, &cp_x, &cp_y);
-        arc_path[pidx++] = VLC_OP_LINE;
-        arc_path[pidx++] = center->x + cp_x;
-        arc_path[pidx++] = center->y + cp_y;
-
-    }
-    else if(dsc->rounded != 0U) {    /* 2nd rounded arc ending */
-        cp_x = radius - width / 2;
-        cp_y = 0;
-        rotate_point(start_angle, &cp_x, &cp_y);
-        lv_point_t round_center = {center->x + cp_x, center->y + cp_y};
-        add_arc_path(arc_path, &pidx, width / 2, (start_angle + 180), (start_angle + 360),
-                     &round_center, true);
-
-    }
-    else {   /* 2nd flat ending */
-        cp_x = radius;
-        cp_y = 0;
-        rotate_point(start_angle, &cp_x, &cp_y);
-        arc_path[pidx++] = VLC_OP_LINE;
-        arc_path[pidx++] = center->x + cp_x;
-        arc_path[pidx++] = center->y + cp_y;
-    }
-
-    arc_path[pidx++] = VLC_OP_END;
-
-    err = vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, (uint32_t)pidx * sizeof(int32_t), arc_path,
-                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
-                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
-    VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
-
-    vg_lite_buffer_format_t color_format = LV_COLOR_DEPTH == 16 ? VG_LITE_BGRA8888 : VG_LITE_ABGR8888;
-    if(lv_vglite_premult_and_swizzle(&vgcol, col32, dsc->opa, color_format) != LV_RES_OK)
-        VG_LITE_RETURN_INV("Premultiplication and swizzle failed.");
-
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-
-    /*** Draw arc ***/
-    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
-    VG_LITE_ERR_RETURN_INV(err, "Draw arc failed.");
-
-    if(lv_vglite_run() != LV_RES_OK)
-        VG_LITE_RETURN_INV("Run failed.");
-
-    err = vg_lite_clear_path(&path);
-    VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");
-
-    return LV_RES_OK;
+    _vglite_draw_arc(&rel_center, &rel_clip_area, dsc);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void copy_arc(vg_arc * dst, vg_arc * src)
+static void _copy_arc(vg_arc * dst, vg_arc * src)
 {
     dst->quarter = src->quarter;
     dst->rad = src->rad;
@@ -251,7 +141,7 @@ static void copy_arc(vg_arc * dst, vg_arc * src)
 /**
  * Rotate the point according given rotation angle rotation center is 0,0
  */
-static void rotate_point(int32_t angle, int32_t * x, int32_t * y)
+static void _rotate_point(int32_t angle, int32_t * x, int32_t * y)
 {
     int32_t ori_x = *x;
     int32_t ori_y = *y;
@@ -268,7 +158,7 @@ static void rotate_point(int32_t angle, int32_t * x, int32_t * y)
  * ---+---
  * Q1 | Q0
  */
-static void set_full_arc(vg_arc * fullarc)
+static void _set_full_arc(vg_arc * fullarc)
 {
     /* the tangent lenght for the bezier circle approx */
     float tang = ((float)fullarc->rad) * BEZIER_OPTIM_CIRCLE;
@@ -318,7 +208,7 @@ static void set_full_arc(vg_arc * fullarc)
             fullarc->p3y = 0;
             break;
         default:
-            LV_LOG_ERROR("Invalid arc quarter value.");
+            LV_ASSERT_MSG(false, "Invalid arc quarter.");
             break;
     }
 }
@@ -327,7 +217,7 @@ static void set_full_arc(vg_arc * fullarc)
  * Linear interpolation between two points 'a' and 'b'
  * 't' parameter is the proportion ratio expressed in range [0 ; T_FRACTION ]
  */
-static inline float lerp(float coord_a, float coord_b, uint16_t t)
+static inline float _lerp(float coord_a, float coord_b, uint16_t t)
 {
     float tf = (float)t;
     return ((T_FRACTION - tf) * coord_a + tf * coord_b) / T_FRACTION;
@@ -336,7 +226,7 @@ static inline float lerp(float coord_a, float coord_b, uint16_t t)
 /**
  * Computes a point of bezier curve given 't' param
  */
-static inline float comp_bezier_point(float t, cubic_cont_pt cp)
+static inline float _comp_bezier_point(float t, cubic_cont_pt cp)
 {
     float t_sq = t * t;
     float inv_t_sq = (1.0f - t) * (1.0f - t);
@@ -352,7 +242,7 @@ static inline float comp_bezier_point(float t, cubic_cont_pt cp)
  * bezier curve is defined by control points [p0 p1 p2 p3]
  * 'dec' tells if curve is decreasing (true) or increasing (false)
  */
-static uint16_t get_bez_t_from_pos(float pt, cubic_cont_pt cp, bool dec)
+static uint16_t _get_bez_t_from_pos(float pt, cubic_cont_pt cp, bool dec)
 {
     /* initialize dichotomy with boundary 't' values */
     float t_low = 0.0f;
@@ -361,7 +251,7 @@ static uint16_t get_bez_t_from_pos(float pt, cubic_cont_pt cp, bool dec)
     float a_pt;
     /* dichotomy loop */
     for(int i = 0; i < DICHOTO_ITER; i++) {
-        a_pt = comp_bezier_point(t_mid, cp);
+        a_pt = _comp_bezier_point(t_mid, cp);
         /* check mid-point position on bezier curve versus targeted point */
         if((a_pt > pt) != dec) {
             t_hig = t_mid;
@@ -380,17 +270,17 @@ static uint16_t get_bez_t_from_pos(float pt, cubic_cont_pt cp, bool dec)
  * Gives relative coords of the control points
  * for the sub-arc starting at angle with given angle span
  */
-static void get_subarc_control_points(vg_arc * arc, int32_t span)
+static void _get_subarc_control_points(vg_arc * arc, int32_t span)
 {
-    vg_arc fullarc;
+    vg_arc fullarc = {0};
     fullarc.angle = arc->angle;
     fullarc.quarter = arc->quarter;
     fullarc.rad = arc->rad;
-    set_full_arc(&fullarc);
+    _set_full_arc(&fullarc);
 
     /* special case of full arc */
     if(arc->angle == 90) {
-        copy_arc(arc, &fullarc);
+        _copy_arc(arc, &fullarc);
         return;
     }
 
@@ -398,67 +288,67 @@ static void get_subarc_control_points(vg_arc * arc, int32_t span)
     uint16_t t2 = TperDegree[arc->angle + span];
 
     /* lerp for A */
-    float a2x = lerp((float)fullarc.p0x, (float)fullarc.p1x, t2);
-    float a2y = lerp((float)fullarc.p0y, (float)fullarc.p1y, t2);
+    float a2x = _lerp((float)fullarc.p0x, (float)fullarc.p1x, t2);
+    float a2y = _lerp((float)fullarc.p0y, (float)fullarc.p1y, t2);
     /* lerp for B */
-    float b2x = lerp((float)fullarc.p1x, (float)fullarc.p2x, t2);
-    float b2y = lerp((float)fullarc.p1y, (float)fullarc.p2y, t2);
+    float b2x = _lerp((float)fullarc.p1x, (float)fullarc.p2x, t2);
+    float b2y = _lerp((float)fullarc.p1y, (float)fullarc.p2y, t2);
     /* lerp for C */
-    float c2x = lerp((float)fullarc.p2x, (float)fullarc.p3x, t2);
-    float c2y = lerp((float)fullarc.p2y, (float)fullarc.p3y, t2);
+    float c2x = _lerp((float)fullarc.p2x, (float)fullarc.p3x, t2);
+    float c2y = _lerp((float)fullarc.p2y, (float)fullarc.p3y, t2);
 
     /* lerp for D */
-    float d2x = lerp(a2x, b2x, t2);
-    float d2y = lerp(a2y, b2y, t2);
+    float d2x = _lerp(a2x, b2x, t2);
+    float d2y = _lerp(a2y, b2y, t2);
     /* lerp for E */
-    float e2x = lerp(b2x, c2x, t2);
-    float e2y = lerp(b2y, c2y, t2);
+    float e2x = _lerp(b2x, c2x, t2);
+    float e2y = _lerp(b2y, c2y, t2);
 
-    float pt2x = lerp(d2x, e2x, t2);
-    float pt2y = lerp(d2y, e2y, t2);
+    float pt2x = _lerp(d2x, e2x, t2);
+    float pt2y = _lerp(d2y, e2y, t2);
 
     /* compute sub-arc using the geometric construction of curve */
     uint16_t t1 = TperDegree[arc->angle];
 
     /* lerp for A */
-    float a1x = lerp((float)fullarc.p0x, (float)fullarc.p1x, t1);
-    float a1y = lerp((float)fullarc.p0y, (float)fullarc.p1y, t1);
+    float a1x = _lerp((float)fullarc.p0x, (float)fullarc.p1x, t1);
+    float a1y = _lerp((float)fullarc.p0y, (float)fullarc.p1y, t1);
     /* lerp for B */
-    float b1x = lerp((float)fullarc.p1x, (float)fullarc.p2x, t1);
-    float b1y = lerp((float)fullarc.p1y, (float)fullarc.p2y, t1);
+    float b1x = _lerp((float)fullarc.p1x, (float)fullarc.p2x, t1);
+    float b1y = _lerp((float)fullarc.p1y, (float)fullarc.p2y, t1);
     /* lerp for C */
-    float c1x = lerp((float)fullarc.p2x, (float)fullarc.p3x, t1);
-    float c1y = lerp((float)fullarc.p2y, (float)fullarc.p3y, t1);
+    float c1x = _lerp((float)fullarc.p2x, (float)fullarc.p3x, t1);
+    float c1y = _lerp((float)fullarc.p2y, (float)fullarc.p3y, t1);
 
     /* lerp for D */
-    float d1x = lerp(a1x, b1x, t1);
-    float d1y = lerp(a1y, b1y, t1);
+    float d1x = _lerp(a1x, b1x, t1);
+    float d1y = _lerp(a1y, b1y, t1);
     /* lerp for E */
-    float e1x = lerp(b1x, c1x, t1);
-    float e1y = lerp(b1y, c1y, t1);
+    float e1x = _lerp(b1x, c1x, t1);
+    float e1y = _lerp(b1y, c1y, t1);
 
-    float pt1x = lerp(d1x, e1x, t1);
-    float pt1y = lerp(d1y, e1y, t1);
+    float pt1x = _lerp(d1x, e1x, t1);
+    float pt1y = _lerp(d1y, e1y, t1);
 
     /* find the 't3' parameter for point P(t1) on the sub-arc [P0 A2 D2 P(t2)] using dichotomy
      * use position of x axis only */
     uint16_t t3;
-    t3 = get_bez_t_from_pos(pt1x,
+    t3 = _get_bez_t_from_pos(pt1x,
     (cubic_cont_pt) {
         .p0 = ((float)fullarc.p0x), .p1 = a2x, .p2 = d2x, .p3 = pt2x
     },
     (bool)(pt2x < (float)fullarc.p0x));
 
     /* lerp for B */
-    float b3x = lerp(a2x, d2x, t3);
-    float b3y = lerp(a2y, d2y, t3);
+    float b3x = _lerp(a2x, d2x, t3);
+    float b3y = _lerp(a2y, d2y, t3);
     /* lerp for C */
-    float c3x = lerp(d2x, pt2x, t3);
-    float c3y = lerp(d2y, pt2y, t3);
+    float c3x = _lerp(d2x, pt2x, t3);
+    float c3y = _lerp(d2y, pt2y, t3);
 
     /* lerp for E */
-    float e3x = lerp(b3x, c3x, t3);
-    float e3y = lerp(b3y, c3y, t3);
+    float e3x = _lerp(b3x, c3x, t3);
+    float e3y = _lerp(b3y, c3y, t3);
 
     arc->p0x = (int32_t)floorf(0.5f + pt1x);
     arc->p0y = (int32_t)floorf(0.5f + pt1y);
@@ -473,43 +363,43 @@ static void get_subarc_control_points(vg_arc * arc, int32_t span)
 /**
  * Gives relative coords of the control points
  */
-static void get_arc_control_points(vg_arc * arc, bool start)
+static void _get_arc_control_points(vg_arc * arc, bool start)
 {
-    vg_arc fullarc;
+    vg_arc fullarc = {0};
     fullarc.angle = arc->angle;
     fullarc.quarter = arc->quarter;
     fullarc.rad = arc->rad;
-    set_full_arc(&fullarc);
+    _set_full_arc(&fullarc);
 
     /* special case of full arc */
     if(arc->angle == 90) {
-        copy_arc(arc, &fullarc);
+        _copy_arc(arc, &fullarc);
         return;
     }
 
     /* compute sub-arc using the geometric construction of curve */
     uint16_t t = TperDegree[arc->angle];
     /* lerp for A */
-    float ax = lerp((float)fullarc.p0x, (float)fullarc.p1x, t);
-    float ay = lerp((float)fullarc.p0y, (float)fullarc.p1y, t);
+    float ax = _lerp((float)fullarc.p0x, (float)fullarc.p1x, t);
+    float ay = _lerp((float)fullarc.p0y, (float)fullarc.p1y, t);
     /* lerp for B */
-    float bx = lerp((float)fullarc.p1x, (float)fullarc.p2x, t);
-    float by = lerp((float)fullarc.p1y, (float)fullarc.p2y, t);
+    float bx = _lerp((float)fullarc.p1x, (float)fullarc.p2x, t);
+    float by = _lerp((float)fullarc.p1y, (float)fullarc.p2y, t);
     /* lerp for C */
-    float cx = lerp((float)fullarc.p2x, (float)fullarc.p3x, t);
-    float cy = lerp((float)fullarc.p2y, (float)fullarc.p3y, t);
+    float cx = _lerp((float)fullarc.p2x, (float)fullarc.p3x, t);
+    float cy = _lerp((float)fullarc.p2y, (float)fullarc.p3y, t);
 
     /* lerp for D */
-    float dx = lerp(ax, bx, t);
-    float dy = lerp(ay, by, t);
+    float dx = _lerp(ax, bx, t);
+    float dy = _lerp(ay, by, t);
     /* lerp for E */
-    float ex = lerp(bx, cx, t);
-    float ey = lerp(by, cy, t);
+    float ex = _lerp(bx, cx, t);
+    float ey = _lerp(by, cy, t);
 
     /* sub-arc's control points are tangents of DeCasteljau's algorithm */
     if(start) {
-        arc->p0x = (int32_t)floorf(0.5f + lerp(dx, ex, t));
-        arc->p0y = (int32_t)floorf(0.5f + lerp(dy, ey, t));
+        arc->p0x = (int32_t)floorf(0.5f + _lerp(dx, ex, t));
+        arc->p0y = (int32_t)floorf(0.5f + _lerp(dy, ey, t));
         arc->p1x = (int32_t)floorf(0.5f + ex);
         arc->p1y = (int32_t)floorf(0.5f + ey);
         arc->p2x = (int32_t)floorf(0.5f + cx);
@@ -524,8 +414,8 @@ static void get_arc_control_points(vg_arc * arc, bool start)
         arc->p1y = (int32_t)floorf(0.5f + ay);
         arc->p2x = (int32_t)floorf(0.5f + dx);
         arc->p2y = (int32_t)floorf(0.5f + dy);
-        arc->p3x = (int32_t)floorf(0.5f + lerp(dx, ex, t));
-        arc->p3y = (int32_t)floorf(0.5f + lerp(dy, ey, t));
+        arc->p3x = (int32_t)floorf(0.5f + _lerp(dx, ex, t));
+        arc->p3y = (int32_t)floorf(0.5f + _lerp(dy, ey, t));
     }
 }
 
@@ -538,7 +428,7 @@ static void get_arc_control_points(vg_arc * arc, bool start)
  * center: (in) the center of the circle in draw coordinates
  * cw: (in) true if arc is clockwise
  */
-static void add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, const lv_point_t * center, bool cw)
+static void _add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, const lv_point_t * center, bool cw)
 {
     /* assumes first control point already in array arc_path[] */
     int idx = *pidx;
@@ -588,8 +478,8 @@ static void add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, c
     *pidx = idx;
 }
 
-static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
-                         int32_t start_angle, int32_t end_angle, const lv_point_t * center, bool cw)
+static void _add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
+                          int32_t start_angle, int32_t end_angle, const lv_point_t * center, bool cw)
 {
     /* set number of arcs to draw */
     vg_arc q_arc;
@@ -603,8 +493,8 @@ static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
     if(((start_angle / 90) == (end_angle / 90)) && (nbarc <= 0)) {
         q_arc.quarter = (start_angle / 90) % 4;
         q_arc.angle = start_arc_angle;
-        get_subarc_control_points(&q_arc, end_arc_angle - start_arc_angle);
-        add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
+        _get_subarc_control_points(&q_arc, end_arc_angle - start_arc_angle);
+        _add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
         return;
     }
 
@@ -614,27 +504,27 @@ static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
             q_arc.quarter = (start_angle / 90) % 4;
             q_arc.angle = start_arc_angle;
             /* get cubic points relative to center */
-            get_arc_control_points(&q_arc, true);
+            _get_arc_control_points(&q_arc, true);
             /* put cubic points in arc_path */
-            add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
+            _add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
         }
         /* full arcs */
         for(int32_t q = 0; q < nbarc ; q++) {
             q_arc.quarter = (q + ((start_angle + 89) / 90)) % 4;
             q_arc.angle = 90;
             /* get cubic points relative to center */
-            get_arc_control_points(&q_arc, true);   /* 2nd parameter 'start' ignored */
+            _get_arc_control_points(&q_arc, true);   /* 2nd parameter 'start' ignored */
             /* put cubic points in arc_path */
-            add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
+            _add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
         }
         /* partial ending arc */
         if(end_arc_angle > 0) {
             q_arc.quarter = (end_angle / 90) % 4;
             q_arc.angle = end_arc_angle;
             /* get cubic points relative to center */
-            get_arc_control_points(&q_arc, false);
+            _get_arc_control_points(&q_arc, false);
             /* put cubic points in arc_path */
-            add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
+            _add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
         }
 
     }
@@ -645,29 +535,157 @@ static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
             q_arc.quarter = (end_angle / 90) % 4;
             q_arc.angle = end_arc_angle;
             /* get cubic points relative to center */
-            get_arc_control_points(&q_arc, false);
+            _get_arc_control_points(&q_arc, false);
             /* put cubic points in arc_path */
-            add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
+            _add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
         }
         /* full arcs */
         for(int32_t q = nbarc - 1; q >= 0; q--) {
             q_arc.quarter = (q + ((start_angle + 89) / 90)) % 4;
             q_arc.angle = 90;
             /* get cubic points relative to center */
-            get_arc_control_points(&q_arc, true);   /* 2nd parameter 'start' ignored */
+            _get_arc_control_points(&q_arc, true);   /* 2nd parameter 'start' ignored */
             /* put cubic points in arc_path */
-            add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
+            _add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
         }
         /* partial starting arc */
         if(start_arc_angle > 0) {
             q_arc.quarter = (start_angle / 90) % 4;
             q_arc.angle = start_arc_angle;
             /* get cubic points relative to center */
-            get_arc_control_points(&q_arc, true);
+            _get_arc_control_points(&q_arc, true);
             /* put cubic points in arc_path */
-            add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
+            _add_split_arc_path(arc_path, pidx, &q_arc, center, cw);
         }
     }
 }
 
-#endif /*LV_USE_GPU_NXP_VG_LITE*/
+static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_area,
+                             const lv_draw_arc_dsc_t * dsc)
+{
+    vg_lite_error_t err = VG_LITE_SUCCESS;
+    vg_lite_path_t path;
+    uint16_t start_angle = dsc->start_angle;
+    uint16_t end_angle = dsc->end_angle;
+    bool donut = ((end_angle - start_angle) % 360 == 0) ? true : false;
+    vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
+
+    /* path: max size = 16 cubic bezier (7 words each) */
+    int32_t arc_path[16 * 7];
+    lv_memset(arc_path, 0, sizeof(arc_path));
+
+    /*** Init path ***/
+    lv_coord_t width = dsc->width;  /* inner arc radius = outer arc radius - width */
+    uint16_t radius = dsc->radius;
+
+    if(width > radius)
+        width = radius;
+
+    int pidx = 0;
+    int32_t cp_x, cp_y; /* control point coords */
+
+    /* first control point of curve */
+    cp_x = radius;
+    cp_y = 0;
+    _rotate_point(start_angle, &cp_x, &cp_y);
+    arc_path[pidx++] = VLC_OP_MOVE;
+    arc_path[pidx++] = center->x + cp_x;
+    arc_path[pidx++] = center->y + cp_y;
+
+    /* draw 1-5 outer quarters */
+    _add_arc_path(arc_path, &pidx, radius, start_angle, end_angle, center, true);
+
+    if(donut) {
+        /* close outer circle */
+        cp_x = radius;
+        cp_y = 0;
+        _rotate_point(start_angle, &cp_x, &cp_y);
+        arc_path[pidx++] = VLC_OP_LINE;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
+        /* start inner circle */
+        cp_x = radius - width;
+        cp_y = 0;
+        _rotate_point(start_angle, &cp_x, &cp_y);
+        arc_path[pidx++] = VLC_OP_MOVE;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
+
+    }
+    else if(dsc->rounded != 0U) {    /* 1st rounded arc ending */
+        cp_x = radius - width / 2;
+        cp_y = 0;
+        _rotate_point(end_angle, &cp_x, &cp_y);
+        lv_point_t round_center = {center->x + cp_x, center->y + cp_y};
+        _add_arc_path(arc_path, &pidx, width / 2, end_angle, (end_angle + 180),
+                      &round_center, true);
+
+    }
+    else {   /* 1st flat ending */
+        cp_x = radius - width;
+        cp_y = 0;
+        _rotate_point(end_angle, &cp_x, &cp_y);
+        arc_path[pidx++] = VLC_OP_LINE;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
+    }
+
+    /* draw 1-5 inner quarters */
+    _add_arc_path(arc_path, &pidx, radius - width, start_angle, end_angle, center, false);
+
+    /* last control point of curve */
+    if(donut) {     /* close the loop */
+        cp_x = radius - width;
+        cp_y = 0;
+        _rotate_point(start_angle, &cp_x, &cp_y);
+        arc_path[pidx++] = VLC_OP_LINE;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
+
+    }
+    else if(dsc->rounded != 0U) {    /* 2nd rounded arc ending */
+        cp_x = radius - width / 2;
+        cp_y = 0;
+        _rotate_point(start_angle, &cp_x, &cp_y);
+        lv_point_t round_center = {center->x + cp_x, center->y + cp_y};
+        _add_arc_path(arc_path, &pidx, width / 2, (start_angle + 180), (start_angle + 360),
+                      &round_center, true);
+
+    }
+    else {   /* 2nd flat ending */
+        cp_x = radius;
+        cp_y = 0;
+        _rotate_point(start_angle, &cp_x, &cp_y);
+        arc_path[pidx++] = VLC_OP_LINE;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
+    }
+
+    arc_path[pidx++] = VLC_OP_END;
+
+    err = vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, (uint32_t)pidx * sizeof(int32_t), arc_path,
+                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
+    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init path failed.");
+
+    lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
+    vg_lite_color_t vgcol = vglite_get_color(col32, false);
+
+    vg_lite_matrix_t matrix;
+    vg_lite_identity(&matrix);
+
+    vglite_set_scissor(clip_area);
+
+    /*** Draw arc ***/
+    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
+    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw arc failed.");
+
+    vglite_run();
+
+    vglite_disable_scissor();
+
+    err = vg_lite_clear_path(&path);
+    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");
+}
+
+#endif /*LV_USE_DRAW_VGLITE*/

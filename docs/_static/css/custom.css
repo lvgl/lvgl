@@ -131,3 +131,15 @@ dl.cpp.unexpanded dd {
 .expanded .lv-api-expansion-button::before {
     content: "\f0d7 \00a0";
 }
+
+.wy-nav-content{
+    padding: 1.618em 3.236em;
+    height: 100%;
+    max-width: 1920px;
+    margin: auto
+}
+
+div.body {
+    min-width: 360px;
+    max-width: 1920px;
+}

@@ -13,7 +13,7 @@ def cont_sub_event_cb(e):
 # It's assumed that the default group is set and
 # there is a keyboard indev*/
 
-cont_main = lv.obj(lv.scr_act())
+cont_main = lv.obj(lv.screen_active())
 lv.gridnav_add(cont_main,lv.GRIDNAV_CTRL.ROLLOVER | lv.GRIDNAV_CTRL.SCROLL_FIRST)
 
 # Only the container needs to be in a group
@@ -24,14 +24,14 @@ cont_main.set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)
 cont_main.set_style_bg_color(lv.palette_lighten(lv.PALETTE.BLUE, 5), lv.STATE.FOCUSED)
 cont_main.set_size(lv.pct(80), lv.SIZE_CONTENT)
 
-btn = lv.btn(cont_main)
-lv.group_remove_obj(btn)
-label = lv.label(btn)
+button = lv.button(cont_main)
+lv.group_remove_obj(button)
+label = lv.label(button)
 label.set_text("Button 1")
 
-btn = lv.btn(cont_main)
-lv.group_remove_obj(btn)
-label = lv.label(btn)
+button = lv.button(cont_main)
+lv.group_remove_obj(button)
+label = lv.label(button)
 label.set_text("Button 2");
 
 
@@ -72,13 +72,13 @@ label = lv.label(cont_sub2)
 label.set_text("Use ENTER/ESC to focus/defocus this container")
 label.set_width(lv.pct(100))
 
-btn = lv.btn(cont_sub2)
-lv.group_remove_obj(btn)
-label = lv.label(btn)
+button = lv.button(cont_sub2)
+lv.group_remove_obj(button)
+label = lv.label(button)
 label.set_text("Button 3")
 
-btn = lv.btn(cont_sub2)
-lv.group_remove_obj(btn)
-label = lv.label(btn)
+button = lv.button(cont_sub2)
+lv.group_remove_obj(button)
+label = lv.label(button)
 label.set_text("Button 4")
 

@@ -3,12 +3,11 @@ class KeyboardEncoder:
         self.g = lv.group_create()
         self.g.set_default()
 
-        cur_drv = lv.indev_t.__cast__(None)
-        while True:
-            cur_drv = cur_drv.get_next()
+        cur_drv = lv.indev_t()
+        cur_drv = cur_drv.get_next()
 
-            if not cur_drv :
-                break
+        while cur_drv != None:
+
             if cur_drv.get_type() == lv.INDEV_TYPE.KEYPAD:
                 print("Found keypad")
                 cur_drv.set_group(self.g)
@@ -16,7 +15,9 @@ class KeyboardEncoder:
                 print("Found encoder")
                 cur_drv.set_group(self.g)
 
-        self.tv = lv.tabview(lv.scr_act(), lv.DIR.TOP, lv.DPI_DEF // 3)
+            cur_drv = cur_drv.get_next()
+
+        self.tv = lv.tabview(lv.screen_active(), lv.DIR.TOP, lv.DPI_DEF // 3)
 
         self.t1 = self.tv.add_tab("Selectors")
         self.t2 = self.tv.add_tab("Text input")
@@ -44,7 +45,7 @@ class KeyboardEncoder:
         obj = lv.calendar(parent)
         obj.add_flag(lv.obj.FLAG.SCROLL_ON_FOCUS)
 
-        obj = lv.btnmatrix(parent)
+        obj = lv.buttonmatrix(parent)
         obj.add_flag(lv.obj.FLAG.SCROLL_ON_FOCUS)
         obj = lv.checkbox(parent)
         obj.add_flag(lv.obj.FLAG.SCROLL_ON_FOCUS);
@@ -70,13 +71,13 @@ class KeyboardEncoder:
         if list.get_height() > parent.get_content_height() :
             list.set_height(parent.get_content_height())
 
-            list.add_btn(lv.SYMBOL.OK, "Apply")
-            list.add_btn(lv.SYMBOL.CLOSE, "Close")
-            list.add_btn(lv.SYMBOL.EYE_OPEN, "Show")
-            list.add_btn(lv.SYMBOL.EYE_CLOSE, "Hide")
-            list.add_btn(lv.SYMBOL.TRASH, "Delete")
-            list.add_btn(lv.SYMBOL.COPY, "Copy")
-            list.add_btn(lv.SYMBOL.PASTE, "Paste")
+            list.add_button(lv.SYMBOL.OK, "Apply")
+            list.add_button(lv.SYMBOL.CLOSE, "Close")
+            list.add_button(lv.SYMBOL.EYE_OPEN, "Show")
+            list.add_button(lv.SYMBOL.EYE_CLOSE, "Hide")
+            list.add_button(lv.SYMBOL.TRASH, "Delete")
+            list.add_button(lv.SYMBOL.COPY, "Copy")
+            list.add_button(lv.SYMBOL.PASTE, "Paste")
 
     def text_input_create(self,parent) :
 
@@ -92,7 +93,7 @@ class KeyboardEncoder:
         ta2.set_one_line(True)
         ta2.set_placeholder_text("Type something")
 
-        self.kb = lv.keyboard(lv.scr_act())
+        self.kb = lv.keyboard(lv.screen_active())
         self.kb.add_flag(lv.obj.FLAG.HIDDEN)
 
         ta1.add_event(self.ta_event_cb, lv.EVENT.ALL, None)
@@ -101,11 +102,11 @@ class KeyboardEncoder:
 
     def msgbox_create(self):
 
-        btns = ["Ok", "Cancel", ""]
-        mbox = lv.msgbox(None, "Hi", "Welcome to the keyboard and encoder demo", btns, False)
+        buttons = ["Ok", "Cancel", ""]
+        mbox = lv.msgbox(None, "Hi", "Welcome to the keyboard and encoder demo", buttons, False)
         mbox.add_event(self.msgbox_event_cb, lv.EVENT.ALL, None)
-        lv.group_focus_obj(mbox.get_btns())
-        mbox.get_btns().add_state(lv.STATE.FOCUS_KEY)
+        lv.group_focus_obj(mbox.get_buttons())
+        mbox.get_buttons().add_state(lv.STATE.FOCUS_KEY)
         self.g.focus_freeze(True)
 
         mbox.align(lv.ALIGN.CENTER, 0, 0)
@@ -121,7 +122,7 @@ class KeyboardEncoder:
         msgbox = e.get_target()
 
         if code == lv.EVENT.VALUE_CHANGED:
-            txt = msgbox.get_active_btn_text()
+            txt = msgbox.get_active_button_text()
             if txt:
                 msgbox.close()
                 self.g.focus_freeze(False)
@@ -140,7 +141,7 @@ class KeyboardEncoder:
 
         if code == lv.EVENT.CLICKED and  indev_type == lv.INDEV_TYPE.ENCODER:
             self.kb.set_textarea(ta)
-            self.kb.clear_flag(lv.obj.FLAG.HIDDEN)
+            self.kb.remove_flag(lv.obj.FLAG.HIDDEN)
             self.kb.group_focus_obj()
             self.kb.get_group().set_editing()
             self.tv.set_height(lv.pct(50))

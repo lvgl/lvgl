@@ -39,6 +39,18 @@ extern "C" {
 #include "flex_layout/lv_demo_flex_layout.h"
 #endif
 
+#if LV_USE_DEMO_TRANSFORM
+#include "transform/lv_demo_transform.h"
+#endif
+
+#if LV_USE_DEMO_SCROLL
+#include "scroll/lv_demo_scroll.h"
+#endif
+
+#if LV_USE_DEMO_MULTILANG
+#include "multilang/lv_demo_multilang.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -51,6 +63,18 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Call lv_demo_xxx.
+ * @param   info the information which contains demo name and parameters
+ *               needs by lv_demo_xxx.
+ * @size    size of information.
+ */
+bool lv_demos_create(char * info[], int size);
+
+/**
+ * Show help for lv_demos.
+ */
+void lv_demos_show_help(void);
 
 /**********************
  *      MACROS

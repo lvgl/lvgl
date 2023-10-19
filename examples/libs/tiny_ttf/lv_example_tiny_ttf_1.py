@@ -1,5 +1,5 @@
 from ubuntu_font import ubuntu_font
-# 
+#
 # Load a font with Tiny_TTF
 #
 #Create style with the new font
@@ -10,7 +10,7 @@ style.set_text_font(font)
 style.set_text_align(lv.TEXT_ALIGN.CENTER)
 
 # Create a label with the new style
-label = lv.label(lv.scr_act())
+label = lv.label(lv.screen_active())
 label.add_style(style, 0)
 label.set_text("Hello world\nI'm a font created with Tiny TTF")
 label.center()

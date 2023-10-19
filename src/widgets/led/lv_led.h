@@ -43,14 +43,6 @@ typedef struct {
 
 extern const lv_obj_class_t lv_led_class;
 
-/**
- * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_led_class`
- * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
- */
-typedef enum {
-    LV_LED_DRAW_PART_RECTANGLE,    /**< The main rectangle*/
-} lv_led_draw_part_type_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -96,7 +88,7 @@ void lv_led_toggle(lv_obj_t * led);
 
 /**
  * Get the brightness of a LED object
- * @param led pointer to LED object
+ * @param obj pointer to LED object
  * @return bright 0 (max. dark) ... 255 (max. light)
  */
 uint8_t lv_led_get_brightness(const lv_obj_t * obj);

@@ -4,28 +4,11 @@
  */
 
 /**
- * MIT License
- *
  * Copyright 2023 NXP
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next paragraph)
- * shall be included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
+ * SPDX-License-Identifier: MIT
  */
+
 
 /*********************
  *      INCLUDES
@@ -33,19 +16,14 @@
 
 #include "lv_vglite_buf.h"
 
-#if LV_USE_GPU_NXP_VG_LITE
+#if LV_USE_DRAW_VGLITE
+#include "lv_vglite_utils.h"
+
+#include "../../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
  *********************/
-
-#if LV_COLOR_DEPTH == 16
-    #define VG_LITE_PX_FMT VG_LITE_RGB565
-#elif LV_COLOR_DEPTH == 32
-    #define VG_LITE_PX_FMT VG_LITE_BGRA8888
-#else
-    #error Only 16bit and 32bit color depth are supported. Set LV_COLOR_DEPTH to 16 or 32.
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -55,17 +33,14 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static inline void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
-static inline void lv_vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf);
-static inline void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
-                                     const lv_area_t * area, lv_coord_t stride);
+static inline void _set_vgbuf_ptr(vg_lite_buffer_t * vgbuf, void * buf);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-static vg_lite_buffer_t dest_vgbuf;
-static vg_lite_buffer_t src_vgbuf;
+static vg_lite_buffer_t _dest_vgbuf;
+static vg_lite_buffer_t _src_vgbuf;
 
 /**********************
  *      MACROS
@@ -75,69 +50,68 @@ static vg_lite_buffer_t src_vgbuf;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_gpu_nxp_vglite_init_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
+vg_lite_buffer_t * vglite_get_dest_buf(void)
 {
-    lv_vglite_set_dest_buf(buf, area, stride);
+    return &_dest_vgbuf;
 }
 
-vg_lite_buffer_t * lv_vglite_get_dest_buf(void)
+vg_lite_buffer_t * vglite_get_src_buf(void)
 {
-    return &dest_vgbuf;
+    return &_src_vgbuf;
 }
 
-vg_lite_buffer_t * lv_vglite_get_src_buf(void)
+void vglite_set_dest_buf_ptr(void * buf)
 {
-    return &src_vgbuf;
+    _set_vgbuf_ptr(&_dest_vgbuf, buf);
 }
 
-void lv_vglite_set_dest_buf_ptr(const lv_color_t * buf)
+void vglite_set_src_buf_ptr(const void * buf)
 {
-    lv_vglite_set_buf_ptr(&dest_vgbuf, buf);
+    _set_vgbuf_ptr(&_src_vgbuf, (void *)buf);
 }
 
-void lv_vglite_set_src_buf_ptr(const lv_color_t * buf)
+void vglite_set_dest_buf(const lv_draw_buf_t * draw_buf)
 {
-    lv_vglite_set_buf_ptr(&src_vgbuf, buf);
+    vglite_set_buf(&_dest_vgbuf, draw_buf->buf, draw_buf->width, draw_buf->height,
+                   lv_draw_buf_get_stride(draw_buf), draw_buf->color_format);
 }
 
-void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
+void vglite_set_src_buf(const void * buf, lv_coord_t width, lv_coord_t height, uint32_t stride,
+                        lv_color_format_t cf)
 {
-    if(src_vgbuf.memory != (void *)buf)
-        lv_vglite_set_buf(&src_vgbuf, buf, area, stride);
+    vglite_set_buf(&_src_vgbuf, (void *)buf, width, height, stride, cf);
+}
+
+void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
+                    lv_coord_t width, lv_coord_t height, uint32_t stride,
+                    lv_color_format_t cf)
+{
+    vg_lite_buffer_format_t vgformat = vglite_get_buf_format(cf);
+
+    vgbuf->format = vgformat;
+    vgbuf->tiled = VG_LITE_LINEAR;
+    vgbuf->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
+    vgbuf->transparency_mode = VG_LITE_IMAGE_OPAQUE;
+
+    vgbuf->width = (int32_t)width;
+    vgbuf->height = (int32_t)height;
+    vgbuf->stride = (int32_t)stride;
+
+    lv_memset(&vgbuf->yuv, 0, sizeof(vgbuf->yuv));
+
+    vgbuf->memory = buf;
+    vgbuf->address = (uint32_t)vgbuf->memory;
+    vgbuf->handle = NULL;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static inline void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
+static inline void _set_vgbuf_ptr(vg_lite_buffer_t * vgbuf, void * buf)
 {
-    lv_vglite_set_buf(&dest_vgbuf, buf, area, stride);
-}
-
-static inline void lv_vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf)
-{
-    vgbuf->memory = (void *)buf;
+    vgbuf->memory = buf;
     vgbuf->address = (uint32_t)vgbuf->memory;
 }
 
-static inline void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
-                                     const lv_area_t * area, lv_coord_t stride)
-{
-    vgbuf->format = VG_LITE_PX_FMT;
-    vgbuf->tiled = VG_LITE_LINEAR;
-    vgbuf->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
-    vgbuf->transparency_mode = VG_LITE_IMAGE_OPAQUE;
-
-    vgbuf->width = (int32_t)lv_area_get_width(area);
-    vgbuf->height = (int32_t)lv_area_get_height(area);
-    vgbuf->stride = (int32_t)(stride) * sizeof(lv_color_t);
-
-    lv_memset(&vgbuf->yuv, 0, sizeof(vgbuf->yuv));
-
-    vgbuf->memory = (void *)buf;
-    vgbuf->address = (uint32_t)vgbuf->memory;
-    vgbuf->handle = NULL;
-}
-
-#endif /*LV_USE_GPU_NXP_VG_LITE*/
+#endif /*LV_USE_DRAW_VGLITE*/

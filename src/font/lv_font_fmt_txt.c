@@ -8,25 +8,23 @@
  *********************/
 #include "lv_font.h"
 #include "lv_font_fmt_txt.h"
+#include "../core/lv_global.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_types.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_utils.h"
-#include "../misc/lv_mem.h"
+#include "../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES
  *********************/
+#if LV_USE_FONT_COMPRESSED
+    #define font_rle LV_GLOBAL_DEFAULT()->font_fmt_rle
+#endif /*LV_USE_FONT_COMPRESSED*/
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
-    RLE_STATE_SINGLE = 0,
-    RLE_STATE_REPEATE,
-    RLE_STATE_COUNTER,
-} rle_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -41,7 +39,6 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
     static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter);
     static inline void decompress_line(uint8_t * out, lv_coord_t w);
     static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
-    static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len);
     static inline void rle_init(const uint8_t * in,  uint8_t bpp);
     static inline uint8_t rle_next(void);
 #endif /*LV_USE_FONT_COMPRESSED*/
@@ -49,14 +46,19 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static const uint8_t opa4_table[16] = {0,  17, 34,  51,
+                                       68, 85, 102, 119,
+                                       136, 153, 170, 187,
+                                       204, 221, 238, 255
+                                      };
+
 #if LV_USE_FONT_COMPRESSED
-    static uint32_t rle_rdp;
-    static const uint8_t * rle_in;
-    static uint8_t rle_bpp;
-    static uint8_t rle_prev_v;
-    static uint8_t rle_cnt;
-    static rle_state_t rle_state;
-#endif /*LV_USE_FONT_COMPRESSED*/
+static const uint8_t opa3_table[8] = {0, 36, 73, 109, 146, 182, 218, 255};
+#endif
+
+static const uint8_t opa2_table[4] = {0, 85, 170, 255};
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -70,13 +72,8 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Used as `get_glyph_bitmap` callback in lvgl's native font format if the font is uncompressed.
- * @param font pointer to font
- * @param unicode_letter a unicode letter which bitmap should be get
- * @return pointer to the bitmap or NULL if not found
- */
-const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter)
+
+const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out)
 {
     if(unicode_letter == '\t') unicode_letter = ' ';
 
@@ -86,47 +83,75 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
+    int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
+    if(gsize == 0) return NULL;
+
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-        return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        uint8_t * bitmap_out_tmp = bitmap_out;
+        int32_t i = 0;
+        int32_t x, y;
+        uint32_t stride = lv_draw_buf_width_to_stride(gdsc->box_w, LV_COLOR_FORMAT_A8);
+
+        if(fdsc->bpp == 1) {
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    i = i & 0x7;
+                    if(i == 0) bitmap_out_tmp[x] = (*bitmap_in) & 0x80 ? 0xff : 0x00;
+                    else if(i == 1) bitmap_out_tmp[x] = (*bitmap_in) & 0x40 ? 0xff : 0x00;
+                    else if(i == 2) bitmap_out_tmp[x] = (*bitmap_in) & 0x20 ? 0xff : 0x00;
+                    else if(i == 3) bitmap_out_tmp[x] = (*bitmap_in) & 0x10 ? 0xff : 0x00;
+                    else if(i == 4) bitmap_out_tmp[x] = (*bitmap_in) & 0x08 ? 0xff : 0x00;
+                    else if(i == 5) bitmap_out_tmp[x] = (*bitmap_in) & 0x04 ? 0xff : 0x00;
+                    else if(i == 6) bitmap_out_tmp[x] = (*bitmap_in) & 0x02 ? 0xff : 0x00;
+                    else if(i == 7) {
+                        bitmap_out_tmp[x] = (*bitmap_in) & 0x01 ? 0xff : 0x00;
+                        bitmap_in++;
+                    }
+                }
+                bitmap_out_tmp += stride;
+            }
+        }
+        else if(fdsc->bpp == 2) {
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    i = i & 0x3;
+                    if(i == 0) bitmap_out_tmp[x] = opa2_table[(*bitmap_in) >> 6];
+                    else if(i == 1) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 4) & 0x3];
+                    else if(i == 2) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 2) & 0x3];
+                    else if(i == 3) {
+                        bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 0) & 0x3];
+                        bitmap_in++;
+                    }
+                }
+                bitmap_out_tmp += stride;
+            }
+
+        }
+        else if(fdsc->bpp == 4) {
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    i = i & 0x1;
+                    if(i == 0) {
+                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) >> 4];
+                    }
+                    else if(i == 1) {
+                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) & 0xF];
+                        bitmap_in++;
+                    }
+                }
+                bitmap_out_tmp += stride;
+            }
+        }
+        return bitmap_out;
     }
     /*Handle compressed bitmap*/
     else {
 #if LV_USE_FONT_COMPRESSED
-        static size_t last_buf_size = 0;
-        if(LV_GC_ROOT(_lv_font_decompr_buf) == NULL) last_buf_size = 0;
-
-        uint32_t gsize = gdsc->box_w * gdsc->box_h;
-        if(gsize == 0) return NULL;
-
-        uint32_t buf_size = gsize;
-        /*Compute memory size needed to hold decompressed glyph, rounding up*/
-        switch(fdsc->bpp) {
-            case 1:
-                buf_size = (gsize + 7) >> 3;
-                break;
-            case 2:
-                buf_size = (gsize + 3) >> 2;
-                break;
-            case 3:
-                buf_size = (gsize + 1) >> 1;
-                break;
-            case 4:
-                buf_size = (gsize + 1) >> 1;
-                break;
-        }
-
-        if(last_buf_size < buf_size) {
-            uint8_t * tmp = lv_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
-            LV_ASSERT_MALLOC(tmp);
-            if(tmp == NULL) return NULL;
-            LV_GC_ROOT(_lv_font_decompr_buf) = tmp;
-            last_buf_size = buf_size;
-        }
-
-        bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], LV_GC_ROOT(_lv_font_decompr_buf), gdsc->box_w, gdsc->box_h,
+        bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
-        return LV_GC_ROOT(_lv_font_decompr_buf);
+        return bitmap_out;
 #else /*!LV_USE_FONT_COMPRESSED*/
         LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
         return NULL;
@@ -149,10 +174,10 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next)
 {
-    bool is_tab = false;
-    if(unicode_letter == '\t') {
+    /*It fixes a strange compiler optimization issue: https://github.com/lvgl/lvgl/issues/4370*/
+    bool is_tab = unicode_letter == '\t';
+    if(is_tab) {
         unicode_letter = ' ';
-        is_tab = true;
     }
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
     uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
@@ -190,19 +215,6 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     return true;
 }
 
-/**
- * Free the allocated memories.
- */
-void _lv_font_clean_up_fmt_txt(void)
-{
-#if LV_USE_FONT_COMPRESSED
-    if(LV_GC_ROOT(_lv_font_decompr_buf)) {
-        lv_free(LV_GC_ROOT(_lv_font_decompr_buf));
-        LV_GC_ROOT(_lv_font_decompr_buf) = NULL;
-    }
-#endif
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -213,15 +225,12 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
 
-    /*Check the cache first*/
-    if(fdsc->cache && letter == fdsc->cache->last_letter) return fdsc->cache->last_glyph_id;
-
     uint16_t i;
     for(i = 0; i < fdsc->cmap_num; i++) {
 
         /*Relative code point*/
         uint32_t rcp = letter - fdsc->cmaps[i].range_start;
-        if(rcp > fdsc->cmaps[i].range_length) continue;
+        if(rcp >= fdsc->cmaps[i].range_length) continue;
         uint32_t glyph_id = 0;
         if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY) {
             glyph_id = fdsc->cmaps[i].glyph_id_start + rcp;
@@ -252,18 +261,9 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
             }
         }
 
-        /*Update the cache*/
-        if(fdsc->cache) {
-            fdsc->cache->last_letter = letter;
-            fdsc->cache->last_glyph_id = glyph_id;
-        }
         return glyph_id;
     }
 
-    if(fdsc->cache) {
-        fdsc->cache->last_letter = letter;
-        fdsc->cache->last_glyph_id = 0;
-    }
     return 0;
 
 }
@@ -356,9 +356,21 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
  */
 static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter)
 {
-    uint32_t wrp = 0;
-    uint8_t wr_size = bpp;
-    if(bpp == 3) wr_size = 4;
+    const lv_opa_t * opa_table;
+    switch(bpp) {
+        case 2:
+            opa_table = opa2_table;
+            break;
+        case 3:
+            opa_table = opa3_table;
+            break;
+        case 4:
+            opa_table = opa4_table;
+            break;
+        default:
+            LV_LOG_WARN("%d bpp is not handled", bpp);
+            return;
+    }
 
     rle_init(in, bpp);
 
@@ -374,11 +386,12 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
     lv_coord_t y;
     lv_coord_t x;
+    uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
 
     for(x = 0; x < w; x++) {
-        bits_write(out, wrp, line_buf1[x], bpp);
-        wrp += wr_size;
+        out[x] = opa_table[line_buf1[x]];
     }
+    out += stride;
 
     for(y = 1; y < h; y++) {
         if(prefilter) {
@@ -386,18 +399,17 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
             for(x = 0; x < w; x++) {
                 line_buf1[x] = line_buf2[x] ^ line_buf1[x];
-                bits_write(out, wrp, line_buf1[x], bpp);
-                wrp += wr_size;
+                out[x] = opa_table[line_buf1[x]];
             }
         }
         else {
             decompress_line(line_buf1, w);
 
             for(x = 0; x < w; x++) {
-                bits_write(out, wrp, line_buf1[x], bpp);
-                wrp += wr_size;
+                out[x] = opa_table[line_buf1[x]];
             }
         }
+        out += stride;
     }
 
     lv_free(line_buf1);
@@ -459,116 +471,69 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
     }
 }
 
-/**
- * Write `val` data to `bit_pos` position of `out`. The write can NOT cross byte boundary.
- * @param out buffer where to write
- * @param bit_pos bit index to write
- * @param val value to write
- * @param len length of bits to write from `val`. (Counted from the LSB).
- * @note `len == 3` will be converted to `len = 4` and `val` will be upscaled too
- */
-static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len)
-{
-    if(len == 3) {
-        len = 4;
-        switch(val) {
-            case 0:
-                val = 0;
-                break;
-            case 1:
-                val = 2;
-                break;
-            case 2:
-                val = 4;
-                break;
-            case 3:
-                val = 6;
-                break;
-            case 4:
-                val = 9;
-                break;
-            case 5:
-                val = 11;
-                break;
-            case 6:
-                val = 13;
-                break;
-            case 7:
-                val = 15;
-                break;
-        }
-    }
-
-    uint16_t byte_pos = bit_pos >> 3;
-    bit_pos = bit_pos & 0x7;
-    bit_pos = 8 - bit_pos - len;
-
-    uint8_t bit_mask = (uint16_t)((uint16_t) 1 << len) - 1;
-    out[byte_pos] &= ((~bit_mask) << bit_pos);
-    out[byte_pos] |= (val << bit_pos);
-}
-
 static inline void rle_init(const uint8_t * in,  uint8_t bpp)
 {
-    rle_in = in;
-    rle_bpp = bpp;
-    rle_state = RLE_STATE_SINGLE;
-    rle_rdp = 0;
-    rle_prev_v = 0;
-    rle_cnt = 0;
+    lv_font_fmt_rle_t * rle = &font_rle;
+    rle->in = in;
+    rle->bpp = bpp;
+    rle->state = RLE_STATE_SINGLE;
+    rle->rdp = 0;
+    rle->prev_v = 0;
+    rle->count = 0;
 }
 
 static inline uint8_t rle_next(void)
 {
     uint8_t v = 0;
     uint8_t ret = 0;
+    lv_font_fmt_rle_t * rle = &font_rle;
 
-    if(rle_state == RLE_STATE_SINGLE) {
-        ret = get_bits(rle_in, rle_rdp, rle_bpp);
-        if(rle_rdp != 0 && rle_prev_v == ret) {
-            rle_cnt = 0;
-            rle_state = RLE_STATE_REPEATE;
+    if(rle->state == RLE_STATE_SINGLE) {
+        ret = get_bits(rle->in, rle->rdp, rle->bpp);
+        if(rle->rdp != 0 && rle->prev_v == ret) {
+            rle->count = 0;
+            rle->state = RLE_STATE_REPEATE;
         }
 
-        rle_prev_v = ret;
-        rle_rdp += rle_bpp;
+        rle->prev_v = ret;
+        rle->rdp += rle->bpp;
     }
-    else if(rle_state == RLE_STATE_REPEATE) {
-        v = get_bits(rle_in, rle_rdp, 1);
-        rle_cnt++;
-        rle_rdp += 1;
+    else if(rle->state == RLE_STATE_REPEATE) {
+        v = get_bits(rle->in, rle->rdp, 1);
+        rle->count++;
+        rle->rdp += 1;
         if(v == 1) {
-            ret = rle_prev_v;
-            if(rle_cnt == 11) {
-                rle_cnt = get_bits(rle_in, rle_rdp, 6);
-                rle_rdp += 6;
-                if(rle_cnt != 0) {
-                    rle_state = RLE_STATE_COUNTER;
+            ret = rle->prev_v;
+            if(rle->count == 11) {
+                rle->count = get_bits(rle->in, rle->rdp, 6);
+                rle->rdp += 6;
+                if(rle->count != 0) {
+                    rle->state = RLE_STATE_COUNTER;
                 }
                 else {
-                    ret = get_bits(rle_in, rle_rdp, rle_bpp);
-                    rle_prev_v = ret;
-                    rle_rdp += rle_bpp;
-                    rle_state = RLE_STATE_SINGLE;
+                    ret = get_bits(rle->in, rle->rdp, rle->bpp);
+                    rle->prev_v = ret;
+                    rle->rdp += rle->bpp;
+                    rle->state = RLE_STATE_SINGLE;
                 }
             }
         }
         else {
-            ret = get_bits(rle_in, rle_rdp, rle_bpp);
-            rle_prev_v = ret;
-            rle_rdp += rle_bpp;
-            rle_state = RLE_STATE_SINGLE;
+            ret = get_bits(rle->in, rle->rdp, rle->bpp);
+            rle->prev_v = ret;
+            rle->rdp += rle->bpp;
+            rle->state = RLE_STATE_SINGLE;
         }
 
     }
-    else if(rle_state == RLE_STATE_COUNTER) {
-        ret = rle_prev_v;
-        rle_cnt--;
-        if(rle_cnt == 0) {
-            ret = get_bits(rle_in, rle_rdp, rle_bpp);
-            rle_prev_v = ret;
-            rle_rdp += rle_bpp;
-            rle_state = RLE_STATE_SINGLE;
+    else if(rle->state == RLE_STATE_COUNTER) {
+        ret = rle->prev_v;
+        rle->count--;
+        if(rle->count == 0) {
+            ret = get_bits(rle->in, rle->rdp, rle->bpp);
+            rle->prev_v = ret;
+            rle->rdp += rle->bpp;
+            rle->state = RLE_STATE_SINGLE;
         }
     }
 

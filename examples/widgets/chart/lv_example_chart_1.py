@@ -1,5 +1,5 @@
 # Create a chart
-chart = lv.chart(lv.scr_act())
+chart = lv.chart(lv.screen_active())
 chart.set_size(200, 150)
 chart.center()
 chart.set_type(lv.chart.TYPE.LINE)   # Show lines and points too

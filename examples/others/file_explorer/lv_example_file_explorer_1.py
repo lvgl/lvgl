@@ -16,7 +16,7 @@ def file_explorer_event_handler(e) :
         # print("cur_path: " + str(cur_path), " sel_fn: " + str(sel_fn))
         print(str(cur_path) + str(sel_fn))
 
-file_explorer = lv.file_explorer(lv.scr_act())
+file_explorer = lv.file_explorer(lv.screen_active())
 file_explorer.explorer_set_sort(lv.EXPLORER_SORT.KIND)
 
 

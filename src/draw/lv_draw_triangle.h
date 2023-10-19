@@ -22,15 +22,24 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_draw_dsc_base_t base;
+
+    lv_opa_t bg_opa;
+    lv_color_t bg_color;
+    lv_grad_dsc_t bg_grad;
+
+    lv_point_t p[3];
+} lv_draw_triangle_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_polygon(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[],
-                     uint16_t point_cnt);
+void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * draw_dsc);
 
-void lv_draw_triangle(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[]);
+void lv_draw_triangle(struct _lv_layer_t * layer, const lv_draw_triangle_dsc_t * draw_dsc);
+
 /**********************
  *      MACROS
  **********************/
