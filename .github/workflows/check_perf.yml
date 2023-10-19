@@ -4,8 +4,8 @@ jobs:
   so3_lvgl:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - name: Install required APT packages
+      - uses: actions/checkout@v4
         with:
           branch: v3.15
           packages: cmake gcc-aarch64-linux-gnu device-tree-compiler u-boot-tools pkg-config bridge-utils qemu-system-arm
