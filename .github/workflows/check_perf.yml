@@ -18,25 +18,7 @@ jobs:
           
       - name: SO3-LVGL building components
         run: |
-          wget https://github.com/smartobjectoriented/so3/archive/refs/heads/master.zip
-          unzip master.zip
-          mv so3-* so3
-          cd so3
-          patch -p1 < ci/so3_ci.patch
-          cd u-boot; make virt64_defconfig; make -j$(ncores); cd ..
-          cd so3; make virt64_defconfig; make -j$(ncores); cd ..
-          cd usr; ./build.sh; cd ..
-          cd filesystem
-          ./create_img.sh virt64
-          cd ../rootfs
-          ./create_ramfs.sh virt64
-          cd ..
-          ./deploy.sh -bu
-          
-      - name: SO3-LVGL performance check
-        run: |
-          cd so3
-          ./st
+          docker build . -t so3/virt64 --platform
           
       - name: Download_artifact
         uses: actions/upload-artifact@v3
