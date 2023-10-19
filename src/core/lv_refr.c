@@ -477,10 +477,9 @@ static void refr_sync_areas(void)
                            ? disp_refr->buf_2
                            : disp_refr->buf_1;
 
-    /*Get stride for buffer copy*/
-    lv_coord_t stride = lv_draw_buf_width_to_stride(
-                            lv_display_get_horizontal_resolution(disp_refr),
-                            lv_display_get_color_format(disp_refr));
+    uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
+    uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
+
 
     /*Iterate through invalidated areas to see if sync area should be copied*/
     uint16_t i;
@@ -521,8 +520,8 @@ static void refr_sync_areas(void)
     for(sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
         sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
         lv_draw_buf_copy(
-            buf_off_screen, stride, sync_area,
-            buf_on_screen, stride, sync_area,
+            buf_off_screen, hor_res, ver_res, sync_area,
+            buf_on_screen, hor_res, ver_res, sync_area,
             lv_display_get_color_format(disp_refr)
         );
     }
@@ -656,8 +655,9 @@ static void refr_area_part(lv_layer_t * layer)
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
-        uint32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
-        lv_draw_buf_clear(layer->buf, stride, layer->color_format, &disp_refr->refreshed_area);
+        uint32_t w = lv_area_get_width(&layer->buf_area);
+        uint32_t h = lv_area_get_height(&layer->buf_area);
+        lv_draw_buf_clear(layer->buf, w, h, layer->color_format, &disp_refr->refreshed_area);
     }
 
     lv_obj_t * top_act_scr = NULL;

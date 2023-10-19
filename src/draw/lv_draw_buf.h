@@ -38,10 +38,13 @@ typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t
 typedef void * (*lv_draw_buf_go_to_xy_cb)(const void * buf, uint32_t stride, lv_color_format_t color_format,
                                           lv_coord_t x, lv_coord_t y);
 
-typedef void (*lv_draw_buf_clear_cb)(void * buf, uint32_t stride, lv_color_format_t color_format, const lv_area_t * a);
+typedef void (*lv_draw_buf_clear_cb)(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format,
+                                     const lv_area_t * a);
 
-typedef void (*lv_draw_buf_copy_cb)(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
-                                    void * src_buf, uint32_t src_stride, const lv_area_t * src_area, lv_color_format_t color_format);
+typedef void (*lv_draw_buf_copy_cb)(void * dest_buf, uint32_t dest_w, uint32_t dest_h,
+                                    const lv_area_t * dest_area_to_copy,
+                                    void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area_to_copy,
+                                    lv_color_format_t color_format);
 
 typedef struct {
     lv_draw_buf_malloc_cb buf_malloc_cb;
@@ -126,25 +129,29 @@ void * lv_draw_buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t
 /**
  * Clear an area on the buffer
  * @param draw_buf          pointer to draw buffer
- * @param stride            stride of the buffer
+ * @param w                 width of the buffer
+ * @param h                 height of the buffer
  * @param color_format      color format of the buffer
  * @param a                 the area to clear, or NULL to clear the whole buffer
  */
-void lv_draw_buf_clear(void * buf, uint32_t stride, lv_color_format_t color_format, const lv_area_t * a);
+void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a);
 
 /**
  * Copy an area from a buffer to an other
- * @param dest_buf          pointer to the destination buffer (not draw_buf)
- * @param dest_stride       the stride of the destination buffer in bytes
- * @param dest_area         pointer to the destination area
- * @param src_buf           pointer to the source buffer (not draw_buf)
- * @param src_stride        the stride of the source buffer in bytes
- * @param src_area          pointer to the source area
- * @param color_format      the color format (should be the same for the source and destination)
+ * @param dest_buf          pointer to the destination buffer)
+ * @param dest_w            width of the destination buffer in pixels
+ * @param dest_h            height of the destination buffer in pixels
+ * @param dest_area_to_copy the area to copy from the destination buffer
+ * @param src_buf           pointer to the source buffer
+ * @param src_w             width of the source buffer in pixels
+ * @param src_h             height of the source buffer in pixels
+ * @param src_area_to_copy  the area to copy from the destination buffer
+ * @param color_format      the color format, should be the same for both buffers
+ * @note `dest_area_to_copy` and `src_area_to_copy` should have the same width and height
  */
-void lv_draw_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
-                      void * src_buf, uint32_t src_stride, const lv_area_t * src_area, lv_color_format_t color_format);
-
+void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area_to_copy,
+                      void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area_to_copy,
+                      lv_color_format_t color_format);
 /**********************
  *      MACROS
  **********************/
