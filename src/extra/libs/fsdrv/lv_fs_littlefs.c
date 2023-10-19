@@ -95,10 +95,17 @@ void lv_fs_littlefs_init(void)
     lv_fs_drv_register(&fs_drv);
 }
 
-void lv_fs_littlefs_set_driver(char label, void *lfs_p)
+/**
+ * Convenience function to attach registered driver to lfs_t structure by driver-label
+ * @param label     the label assigned to the driver when it was registered
+ * @param lfs_p     the pointer to the lfs_t structure initialized by external code/library
+ * @return          pointer to a driver descriptor or NULL on error
+ */
+lv_fs_drv_t * lv_fs_littlefs_set_driver(char label, void * lfs_p)
 {
-    lv_fs_drv_t *lfsdrv_p = lv_fs_get_drv(label);
-    lfsdrv_p->user_data = (lfs_t *) lfs_p;
+    lv_fs_drv_t * drv_p = lv_fs_get_drv(label);
+    if(drv_p != NULL) drv_p->user_data = (lfs_t *) lfs_p;
+    return drv_p;
 }
 
 /**********************
