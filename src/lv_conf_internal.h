@@ -2560,6 +2560,15 @@
     #endif
 #endif
 
+/*Driver for evdev input devices*/
+#ifndef LV_USE_EVDEV
+    #ifdef CONFIG_LV_USE_EVDEV
+        #define LV_USE_EVDEV CONFIG_LV_USE_EVDEV
+    #else
+        #define LV_USE_EVDEV    0
+    #endif
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/
