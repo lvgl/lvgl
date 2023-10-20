@@ -97,10 +97,6 @@ typedef enum {
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
     /** Events of optional LVGL components*/
-#if LV_USE_MSG
-    LV_EVENT_MSG_RECEIVED,
-#endif
-
     LV_EVENT_INVALIDATE_AREA,
     LV_EVENT_RENDER_START,
     LV_EVENT_RENDER_READY,

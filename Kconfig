@@ -1144,10 +1144,6 @@ menu "LVGL configuration"
 			depends on LV_USE_IMGFONT
 			default n
 
-		config LV_USE_MSG
-			bool "Enable a published subscriber based messaging system"
-			default n
-
 		config LV_USE_IME_PINYIN
 			bool "Enable Pinyin input method"
 			default n
