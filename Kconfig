@@ -965,6 +965,17 @@ menu "LVGL configuration"
             default 0
             depends on LV_USE_FS_FATFS
 
+        config LV_USE_FS_LITTLEFS
+            bool "File system on top of LittleFS"
+        config LV_FS_LITTLEFS_LETTER
+            int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+            default 0
+            depends on LV_USE_FS_LITTLEFS
+        config LV_FS_LITTLEFS_CACHE_SIZE
+            int ">0 to cache this number of bytes in lv_fs_read()"
+            default 0
+            depends on LV_USE_FS_LITTLEFS
+
         config LV_USE_PNG
             bool "PNG decoder library"
 
