@@ -653,6 +653,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_t * arc;
     arc = lv_arc_create(scale1);
     lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
+    lv_obj_remove_style(arc, NULL, LV_PART_MAIN);
     lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
     lv_obj_set_style_arc_opa(arc, 0, 0);
     lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
@@ -698,14 +699,17 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_start(&a);
 
     /*Scale 2*/
-    lv_scale_set_round_props(scale2, 330, 0);
+    static const char * scale2_text[] = {"0", "10", "20", "30", "40", "50", "60", "70", "80", "90", NULL};
+    lv_scale_set_round_props(scale2, 360, 0);
+    lv_scale_set_text_src(scale2, scale2_text);
+    lv_scale_set_total_tick_count(scale2, 11);
     lv_scale_set_major_tick_length(scale2, 30);
     lv_scale_set_major_tick_every(scale2, 1);
     arc = lv_arc_create(scale2);
     lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
     lv_obj_set_style_margin_all(arc, 10, 0);
     lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
-    lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+    lv_obj_set_style_arc_opa(arc, 0, LV_PART_MAIN);
     lv_obj_set_style_arc_width(arc, 10, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_BLUE), LV_PART_INDICATOR);
@@ -717,6 +721,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_style_margin_all(arc, 5, 0);
     lv_obj_set_style_arc_opa(arc, 0, 0);
     lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+    lv_obj_set_style_arc_opa(arc, 0, LV_PART_MAIN);
     lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_RED), LV_PART_INDICATOR);
@@ -727,6 +732,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
     lv_obj_set_style_arc_opa(arc, 0, 0);
     lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+    lv_obj_set_style_arc_opa(arc, 0, LV_PART_MAIN);
     lv_obj_set_style_arc_width(arc, 30, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_GREEN), LV_PART_INDICATOR);
