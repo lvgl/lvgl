@@ -155,12 +155,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
 
         res = decoder->open_cb(decoder, dsc);
 
-        /*Call the post process callback if set*/
-        if(post_process_cb) {
-            lv_result_t post_process_res = post_process_cb(dsc, post_process_user_data);
-            if(post_process_res != LV_RESULT_OK) return post_process_res;
-        }
-
         /*Opened successfully. It is a good decoder for this image source*/
         if(res == LV_RESULT_OK) return res;
 
@@ -186,6 +180,14 @@ void lv_image_decoder_set_post_process_cb(lv_image_decoder_process_f_t process_c
     post_process_user_data = user_data;
 }
 
+lv_result_t lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc)
+{
+    if(!post_process_cb) {
+        return LV_RESULT_INVALID;
+    }
+
+    return post_process_cb(dsc, post_process_user_data);
+}
 
 /**
  * Decode an area of image

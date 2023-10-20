@@ -206,6 +206,13 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
 void lv_image_decoder_set_post_process_cb(lv_image_decoder_process_f_t process_cb, void * user_data);
 
 /**
+ * Post-process the image data after decoding.
+ * @param dsc pointer to `lv_image_decoder_dsc_t` used in `lv_image_decoder_open`
+ * @return LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred
+ */
+lv_result_t lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc);
+
+/**
  * Decode an area of the opened image
  * @param dsc           image decoder descriptor
  * @param full_area     start X coordinate (from left)
