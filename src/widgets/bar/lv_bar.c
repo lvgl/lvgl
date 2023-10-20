@@ -99,6 +99,7 @@ void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
     value = value < bar->start_value ? bar->start_value : value; /*Can't be smaller than the left value*/
 
     if(bar->cur_value == value) return;
+
     lv_bar_set_value_with_anim(obj, value, &bar->cur_value, &bar->cur_value_anim, anim);
 }
 
@@ -116,6 +117,7 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim
     value = value > bar->cur_value ? bar->cur_value : value; /*Can't be greater than the right value*/
 
     if(bar->start_value == value) return;
+
     lv_bar_set_value_with_anim(obj, value, &bar->start_value, &bar->start_value_anim, anim);
 }
 
@@ -125,27 +127,27 @@ void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)
 
     lv_bar_t * bar = (lv_bar_t *)obj;
 
-    if(max < min) {
-        LV_LOG_WARN("error range: min = %" LV_PRId32 ", max = %" LV_PRId32, min, max);
-        return;
-    }
+    bar->val_reversed = min > max;
 
-    if(bar->min_value == min && bar->max_value == max) return;
+    int32_t real_min = bar->val_reversed ? max : min;
+    int32_t real_max = bar->val_reversed ? min : max;
+    if(bar->min_value == real_min && bar->max_value == real_max) return;
 
-    bar->max_value = max;
-    bar->min_value = min;
+    bar->max_value = real_max;
+    bar->min_value = real_min;
 
     if(lv_bar_get_mode(obj) != LV_BAR_MODE_RANGE)
-        bar->start_value = min;
+        bar->start_value = real_min;
 
-    if(bar->cur_value > max) {
-        bar->cur_value = max;
+    if(bar->cur_value > real_max) {
+        bar->cur_value = real_max;
         lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
     }
-    if(bar->cur_value < min) {
-        bar->cur_value = min;
+    if(bar->cur_value < real_min) {
+        bar->cur_value = real_min;
         lv_bar_set_value(obj, bar->cur_value, LV_ANIM_OFF);
     }
+
     lv_obj_invalidate(obj);
 }
 
@@ -188,7 +190,7 @@ int32_t lv_bar_get_min_value(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
-    return bar->min_value;
+    return bar->val_reversed ? bar->max_value : bar->min_value;
 }
 
 int32_t lv_bar_get_max_value(const lv_obj_t * obj)
@@ -196,7 +198,7 @@ int32_t lv_bar_get_max_value(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
-    return bar->max_value;
+    return bar->val_reversed ? bar->min_value : bar->max_value;
 }
 
 lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj)
@@ -205,6 +207,15 @@ lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj)
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     return bar->mode;
+}
+
+bool lv_bar_is_symmetrical(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_bar_t * bar = (lv_bar_t *)obj;
+
+    return  bar->mode == LV_BAR_MODE_SYMMETRICAL && bar->min_value < 0 && bar->max_value > 0 &&
+            bar->start_value == bar->min_value;
 }
 
 /**********************
@@ -226,6 +237,7 @@ static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     bar->indic_area.y1 = 0;
     bar->indic_area.y2 = 0;
     bar->mode = LV_BAR_MODE_NORMAL;
+    bar->val_reversed = false;
 
     lv_bar_init_anim(obj, &bar->cur_value_anim);
     lv_bar_init_anim(obj, &bar->start_value_anim);
@@ -269,9 +281,7 @@ static void draw_indic(lv_event_t * e)
     }
 
     bool hor = barw >= barh;
-    bool sym = false;
-    if(bar->mode == LV_BAR_MODE_SYMMETRICAL && bar->min_value < 0 && bar->max_value > 0 &&
-       bar->start_value == bar->min_value) sym = true;
+    bool sym = lv_bar_is_symmetrical(obj);
 
     /*Calculate the indicator area*/
     lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
@@ -345,8 +355,15 @@ static void draw_indic(lv_event_t * e)
         anim_cur_value_x = (int32_t)((int32_t)anim_length * (bar->cur_value - bar->min_value)) / range;
     }
 
+    /**
+     * The drawing drection of the bar can be reversed only when one of the two conditions(value inversion
+     * or horizontal direction base dir is LV_BASE_DIR_RTL) is met.
+    */
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
-    if(base_dir == LV_BASE_DIR_RTL) {
+    bool hor_need_reversed = hor && base_dir == LV_BASE_DIR_RTL;
+    bool reversed = bar->val_reversed ^ hor_need_reversed;
+
+    if(reversed) {
         /*Swap axes*/
         lv_coord_t * tmp;
         tmp = axis1;
@@ -365,31 +382,43 @@ static void draw_indic(lv_event_t * e)
         *axis1 = *axis2 - anim_cur_value_x + 1;
         *axis2 -= anim_start_value_x;
     }
+
     if(sym) {
         lv_coord_t zero, shift;
         shift = (-bar->min_value * anim_length) / range;
+
         if(hor) {
-            zero = *axis1 + shift;
-            if(*axis2 > zero)
-                *axis1 = zero;
+            lv_coord_t * left = reversed ? axis2 : axis1;
+            lv_coord_t * right = reversed ? axis1 : axis2;
+            if(reversed)
+                zero = *axis1 - shift + 1;
+            else
+                zero = *axis1 + shift;
+
+            if(*axis2 > zero) {
+                *right = *axis2;
+                *left = zero;
+            }
             else {
-                *axis1 = *axis2;
-                *axis2 = zero;
+                *left = *axis2;
+                *right = zero;
             }
         }
         else {
-            zero = *axis2 - shift + 1;
-            if(*axis1 > zero)
-                *axis2 = zero;
-            else {
-                *axis2 = *axis1;
-                *axis1 = zero;
+            lv_coord_t * top = reversed ? axis2 : axis1;
+            lv_coord_t * bottom = reversed ? axis1 : axis2;
+            if(reversed)
+                zero = *axis2 + shift;
+            else
+                zero = *axis2 - shift + 1;
+
+            if(*axis1 > zero) {
+                *bottom = *axis1;
+                *top = zero;
             }
-            if(*axis2 < *axis1) {
-                /*swap*/
-                zero = *axis1;
-                *axis1 = *axis2;
-                *axis2 = zero;
+            else {
+                *top = *axis1;
+                *bottom = zero;
             }
         }
     }

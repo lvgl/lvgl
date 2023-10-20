@@ -34,3 +34,9 @@ Custom drawer to show the current value
 .. lv_example:: widgets/bar/lv_example_bar_6
   :language: c
 
+Bar with opposite direction
+---------------------------
+
+.. lv_example:: widgets/bar/lv_example_bar_7
+  :language: c
+
