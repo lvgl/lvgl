@@ -47,7 +47,7 @@ Architecture
 - |check| More color formats: 24 bit, ARGB1555, ARGB4444 etc
   (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__) 
 - |check| Unified caching #3116 #3415
-- |uncheck| Variable binding. I.e create properties which can be bound to objects and those objects are notified on value change. Maybe based on `lv_msg`?
+- |check| Variable binding. I.e create properties which can be bound to objects and those objects are notified on value change. Maybe based on `lv_msg`?
 - |uncheck| Add GPU abstraction for display rotation 
 - |check| Replace the `read_line_cb` of the image decoders with `get_area_cb`
 - |check| Limit the image caching size in bytes instead of image count 
@@ -58,7 +58,7 @@ Styles
 ~~~~~~
 
 - |uncheck| Make `style_bg_img` support `9patch` images
-- |uncheck| non-uniform scale of images: scale width and height differently
+- |check| non-uniform scale of images: scale width and height differently
 - |uncheck| Scroll anim settings should come from styles to allow customization
 
 Widgets
@@ -71,7 +71,7 @@ Widgets
 - |uncheck| `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
 - |uncheck| `lv_roller` make it more flexible #4009
   (see `here <https://forum.lvgl.io/t/linear-meter-bar-with-ticks/10986>`__ and #4043)
-- |uncheck| Disabled widgets should absorb indev actions without sending events. `#3860 <https://github.com/lvgl/lvgl/issues/3860>`__
+- |check| Disabled widgets should absorb indev actions without sending events. `#3860 <https://github.com/lvgl/lvgl/issues/3860>`__
 
 Drawing and rendering
 ~~~~~~~~~~~~~~~~~~~~~
