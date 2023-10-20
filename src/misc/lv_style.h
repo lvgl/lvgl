@@ -296,25 +296,26 @@ enum _lv_style_prop_t {
     LV_STYLE_TEXT_OPA               = 89,
     LV_STYLE_TEXT_FONT              = 90,
 
-    LV_STYLE_TEXT_LETTER_SPACE      = 92,
-    LV_STYLE_TEXT_LINE_SPACE        = 93,
-    LV_STYLE_TEXT_DECOR             = 94,
-    LV_STYLE_TEXT_ALIGN             = 95,
+    LV_STYLE_TEXT_LETTER_SPACE      = 91,
+    LV_STYLE_TEXT_LINE_SPACE        = 92,
+    LV_STYLE_TEXT_DECOR             = 93,
+    LV_STYLE_TEXT_ALIGN             = 94,
 
-    LV_STYLE_OPA                    = 96,
-    LV_STYLE_OPA_LAYERED            = 97,
-    LV_STYLE_COLOR_FILTER_DSC       = 98,
-    LV_STYLE_COLOR_FILTER_OPA       = 99,
-    LV_STYLE_ANIM                   = 100,
-    LV_STYLE_ANIM_TIME              = 101,
-    LV_STYLE_ANIM_SPEED             = 102,
-    LV_STYLE_TRANSITION             = 103,
-    LV_STYLE_BLEND_MODE             = 104,
-    LV_STYLE_TRANSFORM_WIDTH        = 105,
-    LV_STYLE_TRANSFORM_HEIGHT       = 106,
-    LV_STYLE_TRANSLATE_X            = 107,
-    LV_STYLE_TRANSLATE_Y            = 108,
-    LV_STYLE_TRANSFORM_SCALE        = 109,
+    LV_STYLE_OPA                    = 95,
+    LV_STYLE_OPA_LAYERED            = 96,
+    LV_STYLE_COLOR_FILTER_DSC       = 97,
+    LV_STYLE_COLOR_FILTER_OPA       = 98,
+    LV_STYLE_ANIM                   = 99,
+    LV_STYLE_ANIM_TIME              = 100,
+    LV_STYLE_ANIM_SPEED             = 101,
+    LV_STYLE_TRANSITION             = 102,
+    LV_STYLE_BLEND_MODE             = 103,
+    LV_STYLE_TRANSFORM_WIDTH        = 104,
+    LV_STYLE_TRANSFORM_HEIGHT       = 105,
+    LV_STYLE_TRANSLATE_X            = 106,
+    LV_STYLE_TRANSLATE_Y            = 107,
+    LV_STYLE_TRANSFORM_SCALE_X      = 108,
+    LV_STYLE_TRANSFORM_SCALE_Y      = 109,
     LV_STYLE_TRANSFORM_ROTATION     = 110,
     LV_STYLE_TRANSFORM_PIVOT_X      = 111,
     LV_STYLE_TRANSFORM_PIVOT_Y      = 112,
@@ -603,6 +604,12 @@ static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value)
 {
     lv_style_set_pad_row(style, value);
     lv_style_set_pad_column(style, value);
+}
+
+static inline void lv_style_set_transform_scale(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_set_transform_scale_x(style, value);
+    lv_style_set_transform_scale_y(style, value);
 }
 
 /**

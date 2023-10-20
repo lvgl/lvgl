@@ -194,11 +194,9 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         /*The smaller size is the knob diameter*/
-        lv_coord_t zoom = lv_obj_get_style_transform_scale(obj, LV_PART_KNOB);
         lv_coord_t trans_w = lv_obj_get_style_transform_width(obj, LV_PART_KNOB);
         lv_coord_t trans_h = lv_obj_get_style_transform_height(obj, LV_PART_KNOB);
         lv_coord_t knob_size = LV_MIN(lv_obj_get_width(obj) + 2 * trans_w, lv_obj_get_height(obj) + 2 * trans_h) >> 1;
-        knob_size = (knob_size * zoom) >> 8;
         knob_size += LV_MAX(LV_MAX(knob_left, knob_right), LV_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);

@@ -543,7 +543,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 lv_point_t point;
                 point.x = center_point.x + radius_text;
                 point.y = center_point.y;
-                lv_point_transform(&point, angle_upscale, LV_SCALE_NONE, &center_point);
+                lv_point_transform(&point, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);
                 scale_get_label_coords(obj, &label_dsc, &point, &label_coords);
 
                 lv_draw_label(layer, &label_dsc, &label_coords);
@@ -907,11 +907,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
 
         tick_point_a->x = center_point.x + point_closer_to_arc;
         tick_point_a->y = center_point.y;
-        lv_point_transform(tick_point_a, angle_upscale, LV_SCALE_NONE, &center_point);
+        lv_point_transform(tick_point_a, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);
 
         tick_point_b->x = center_point.x + adjusted_radio_with_tick_len;
         tick_point_b->y = center_point.y;
-        lv_point_transform(tick_point_b, angle_upscale, LV_SCALE_NONE, &center_point);
+        lv_point_transform(tick_point_b, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);
     }
     else { /* Nothing to do */ }
 }

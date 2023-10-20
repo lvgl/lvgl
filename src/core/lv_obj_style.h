@@ -279,6 +279,13 @@ static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, lv_coord_t widt
     lv_obj_set_style_height(obj, height, selector);
 }
 
+static inline void lv_obj_set_style_transform_scale(struct _lv_obj_t * obj, lv_coord_t value,
+                                                    lv_style_selector_t selector)
+{
+    lv_obj_set_style_transform_scale_x(obj, value, selector);
+    lv_obj_set_style_transform_scale_y(obj, value, selector);
+}
+
 static inline lv_coord_t lv_obj_get_style_space_left(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_coord_t padding = lv_obj_get_style_pad_left(obj, part);
@@ -313,9 +320,15 @@ static inline lv_coord_t lv_obj_get_style_space_bottom(const struct _lv_obj_t * 
 
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);
 
-static inline lv_coord_t lv_obj_get_style_transform_scale_safe(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_transform_scale_x_safe(const struct _lv_obj_t * obj, uint32_t part)
 {
-    int16_t zoom = lv_obj_get_style_transform_scale(obj, part);
+    int16_t zoom = lv_obj_get_style_transform_scale_x(obj, part);
+    return zoom != 0 ? zoom : 1;
+}
+
+static inline lv_coord_t lv_obj_get_style_transform_scale_y_safe(const struct _lv_obj_t * obj, uint32_t part)
+{
+    int16_t zoom = lv_obj_get_style_transform_scale_y(obj, part);
     return zoom != 0 ? zoom : 1;
 }
 

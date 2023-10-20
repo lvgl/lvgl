@@ -187,7 +187,8 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, uint32_t part, lv_draw_image_dsc
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
     draw_dsc->rotation = 0;
-    draw_dsc->zoom = LV_SCALE_NONE;
+    draw_dsc->zoom_x = LV_SCALE_NONE;
+    draw_dsc->zoom_y = LV_SCALE_NONE;
     draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
     draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
 

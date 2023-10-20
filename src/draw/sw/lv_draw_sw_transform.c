@@ -28,7 +28,8 @@ typedef struct {
     int32_t y_out;
     int32_t sinma;
     int32_t cosma;
-    int32_t zoom;
+    int32_t zoom_x;
+    int32_t zoom_y;
     int32_t angle;
     int32_t pivot_x_256;
     int32_t pivot_y_256;
@@ -87,7 +88,8 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
     point_transform_dsc_t tr_dsc;
     tr_dsc.angle = -draw_dsc->rotation;
-    tr_dsc.zoom = (256 * 256) / draw_dsc->zoom;
+    tr_dsc.zoom_x = (256 * 256) / draw_dsc->zoom_x;
+    tr_dsc.zoom_y = (256 * 256) / draw_dsc->zoom_y;
     tr_dsc.pivot = draw_dsc->pivot;
 
     int32_t angle_low = tr_dsc.angle / 10;
@@ -581,7 +583,7 @@ static void transform_a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout)
 {
-    if(t->angle == 0 && t->zoom == LV_SCALE_NONE) {
+    if(t->angle == 0 && t->zoom_x == LV_SCALE_NONE && t->zoom_y == LV_SCALE_NONE) {
         *xout = xin * 256;
         *yout = yin * 256;
         return;
@@ -591,16 +593,16 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
     yin -= t->pivot.y;
 
     if(t->angle == 0) {
-        *xout = ((int32_t)(xin * t->zoom)) + (t->pivot_x_256);
-        *yout = ((int32_t)(yin * t->zoom)) + (t->pivot_y_256);
+        *xout = ((int32_t)(xin * t->zoom_x)) + (t->pivot_x_256);
+        *yout = ((int32_t)(yin * t->zoom_y)) + (t->pivot_y_256);
     }
-    else if(t->zoom == LV_SCALE_NONE) {
+    else if(t->zoom_x == LV_SCALE_NONE && t->zoom_y == LV_SCALE_NONE) {
         *xout = ((t->cosma * xin - t->sinma * yin) >> 2) + (t->pivot_x_256);
         *yout = ((t->sinma * xin + t->cosma * yin) >> 2) + (t->pivot_y_256);
     }
     else {
-        *xout = (((t->cosma * xin - t->sinma * yin) * t->zoom) >> 10) + (t->pivot_x_256);
-        *yout = (((t->sinma * xin + t->cosma * yin) * t->zoom) >> 10) + (t->pivot_y_256);
+        *xout = (((t->cosma * xin - t->sinma * yin) * t->zoom_x) >> 10) + (t->pivot_x_256);
+        *yout = (((t->sinma * xin + t->cosma * yin) * t->zoom_y) >> 10) + (t->pivot_y_256);
     }
 }
 

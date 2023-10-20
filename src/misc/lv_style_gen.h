@@ -36,8 +36,10 @@ void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_TRANSLATE_X;
 void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_TRANSLATE_Y;
-void lv_style_set_transform_scale(lv_style_t * style, lv_coord_t value);
-extern const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SCALE;
+void lv_style_set_transform_scale_x(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SCALE_X;
+void lv_style_set_transform_scale_y(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SCALE_Y;
 void lv_style_set_transform_rotation(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_ROTATION;
 void lv_style_set_transform_pivot_x(lv_style_t * style, lv_coord_t value);
@@ -284,9 +286,14 @@ extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
         .prop_ptr = &_lv_style_const_prop_id_TRANSLATE_Y, .value = { .num = (int32_t)val } \
     }
 
-#define LV_STYLE_CONST_TRANSFORM_SCALE(val) \
+#define LV_STYLE_CONST_TRANSFORM_SCALE_X(val) \
     { \
-        .prop_ptr = &_lv_style_const_prop_id_TRANSFORM_SCALE, .value = { .num = (int32_t)val } \
+        .prop_ptr = &_lv_style_const_prop_id_TRANSFORM_SCALE_X, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_TRANSFORM_SCALE_Y(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_TRANSFORM_SCALE_Y, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_TRANSFORM_ROTATION(val) \
