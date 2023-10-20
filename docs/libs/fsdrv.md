@@ -21,7 +21,7 @@ There's a convenience function called `lv_fs_littlefs_set_driver(LV_FS_LITTLEFS_
 [esp_littlefs](https://components.espressif.com/components/joltwallet/littlefs) is a wrapper for LittleFS to be used in Espressif ESP-devices. It handles the mounting and has the low-level `littlefs_api` functions to read/write/erase blocks that LittleFS library needs. On mounting by `esp_littlefs` the `lfs_t` structures are created. You need to get a handle to these to use ESP with `lv_fs_littlefs`, as all functions use that `lfs_t` in LittleFS to identify the mounted partition. 
 
 
-In case you don't find a special function in the `lv_fs_littlefs` wrapper, you can look for it in the `esp_littlefs` API and use itm dircetly, as `lv_fs_littlefs` and the `esp_littlefs` APIs can be used side-by-side. 
+In case you don't find a special function in the `lv_fs_littlefs` wrapper, you can look for it in the `esp_littlefs` API and use it directly, as `lv_fs_littlefs` and the `esp_littlefs` APIs can be used side-by-side. 
 
 ### STDIO
 
