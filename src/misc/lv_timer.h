@@ -40,6 +40,11 @@ struct _lv_timer_t;
 typedef void (*lv_timer_cb_t)(struct _lv_timer_t *);
 
 /**
+ * Timer handler resume this type of function.
+ */
+typedef void (*lv_timer_handler_resume_cb_t)(void * data);
+
+/**
  * Descriptor of a lv_timer
  */
 typedef struct _lv_timer_t {
@@ -65,6 +70,9 @@ typedef struct {
     uint32_t busy_time;
     uint32_t idle_period_start;
     uint32_t run_cnt;
+
+    lv_timer_handler_resume_cb_t resume_cb;
+    void * resume_data;
 } lv_timer_state_t;
 
 /**********************
@@ -109,6 +117,13 @@ static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period
  * This function is used to simplify the porting.
  */
 LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void);
+
+/**
+ * Set the resume callback to the timer handler
+ * @param cb the function to call when timer handler is resumed
+ * @param data pointer to a resume data
+ */
+void lv_timer_handler_set_resume_cb(lv_timer_handler_resume_cb_t cb, void * data);
 
 /**
  * Create an "empty" timer. It needs to be initialized with at least
