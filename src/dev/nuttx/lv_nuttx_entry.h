@@ -33,33 +33,37 @@ extern "C" {
 typedef struct {
     const char * fb_path;
     const char * input_path;
-    bool need_wait_vsync;
-} lv_nuttx_t;
+} lv_nuttx_dsc_t;
 
+typedef struct {
+    lv_display_t * disp;
+    lv_indev_t * indev;
+} lv_nuttx_result_t;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 /**
- * Initialize the lv_nuttx_t structure with default values for the NuttX port of LVGL.
- * @param info Pointer to the lv_nuttx_t structure to be initialized.
+ * Initialize the lv_nuttx_dsc_t structure with default values for the NuttX port of LVGL.
+ * @param dsc Pointer to the lv_nuttx_dsc_t structure to be initialized.
  */
-void lv_nuttx_info_init(lv_nuttx_t * info);
+void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc);
 
 /**
  * Initialize the LVGL display driver for NuttX using the provided configuration information.
- * @param info Pointer to the lv_nuttx_t structure containing the configuration information for the display driver.
- * @return Pointer to the lv_display_t structure representing the initialized display driver.
+ * @param dsc Pointer to the lv_nuttx_dsc_t structure containing the configuration information for the display driver.
+ * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler.
  */
-lv_display_t * lv_nuttx_init(const lv_nuttx_t * info);
+void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result);
 
 #if LV_USE_NUTTX_CUSTOM_INIT
 /**
  * Initialize the LVGL display driver for NuttX using the provided custom configuration information.
- * @param info Pointer to the lv_nuttx_t structure containing the custom configuration information for the display driver.
- * @return Pointer to the lv_display_t structure representing the initialized display driver.
+ * @param dsc Pointer to the lv_nuttx_dsc_t structure containing the custom configuration for the display driver.
+ * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler.
  */
-lv_display_t * lv_nuttx_init_custom(const lv_nuttx_t * info);
+void lv_nuttx_init_custom(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result);
+
 #endif /* LV_USE_NUTTX_CUSTOM_INIT */
 
 /**********************

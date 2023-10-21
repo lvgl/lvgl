@@ -1269,6 +1269,11 @@ menu "LVGL configuration"
 			bool "Use Nuttx to open window and handle touchscreen"
 			default n
 
+		config LV_USE_NUTTX_LIBUV
+			bool "Use uv loop to replace default timer loop and other fb/indev timers"
+			depends on LV_USE_NUTTX
+			default n
+
 		config LV_USE_NUTTX_CUSTOM_INIT
 			bool "Use Custom Nuttx init API to open window and handle touchscreen"
 			depends on LV_USE_NUTTX

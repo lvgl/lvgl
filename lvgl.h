@@ -122,6 +122,7 @@ extern "C" {
 #include "src/dev/nuttx/lv_nuttx_fbdev.h"
 #include "src/dev/nuttx/lv_nuttx_touchscreen.h"
 #include "src/dev/nuttx/lv_nuttx_lcd.h"
+#include "src/dev/nuttx/lv_nuttx_libuv.h"
 
 #include "src/dev/evdev/lv_evdev.h"
 
