@@ -129,8 +129,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_
 }
 
 void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
-                                    const lv_area_t * coords,
-                                    lv_draw_letter_cb_t cb)
+                                   const lv_area_t * coords,
+                                   lv_draw_letter_cb_t cb)
 {
     const lv_font_t * font = dsc->font;
     int32_t w;

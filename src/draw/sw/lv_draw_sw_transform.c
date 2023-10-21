@@ -51,13 +51,13 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
                                      int32_t * yout);
 
 static void transform_rgb888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                            int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                            int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size);
+                             int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                             int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size);
 
 
 static void transform_argb8888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                              int32_t x_end, uint8_t * dest_buf, bool aa);
+                               int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                               int32_t x_end, uint8_t * dest_buf, bool aa);
 
 static void transform_rgb565a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -162,17 +162,18 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
         switch(src_cf) {
             case LV_COLOR_FORMAT_XRGB8888:
                 transform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
-                                4);
+                                 4);
                 break;
             case LV_COLOR_FORMAT_RGB888:
                 transform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
-                                3);
+                                 3);
                 break;
             case LV_COLOR_FORMAT_A8:
                 transform_a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
                 break;
             case LV_COLOR_FORMAT_ARGB8888:
-                transform_argb8888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
+                transform_argb8888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
+                                   aa);
                 break;
             case LV_COLOR_FORMAT_RGB565:
                 transform_rgb565a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
@@ -197,8 +198,8 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
  **********************/
 
 static void transform_rgb888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                            int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                            int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size)
+                             int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                             int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size)
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
@@ -298,8 +299,8 @@ static void transform_rgb888(const uint8_t * src, lv_coord_t src_w, lv_coord_t s
 #include "../../stdlib/lv_string.h"
 
 static void transform_argb8888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                              int32_t x_end, uint8_t * dest_buf, bool aa)
+                               int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                               int32_t x_end, uint8_t * dest_buf, bool aa)
 {
     //    lv_memzero(dest_buf, x_end * 4);
     int32_t xs_ups_start = xs_ups;

@@ -94,8 +94,8 @@ typedef void(*lv_draw_letter_cb_t)(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc
                                    const lv_area_t * fill_area);
 
 void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
-                                    const lv_area_t * coords,
-                                    lv_draw_letter_cb_t cb);
+                                   const lv_area_t * coords,
+                                   lv_draw_letter_cb_t cb);
 
 /**********************
  * GLOBAL PROTOTYPES
