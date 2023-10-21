@@ -499,14 +499,14 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
     lv_coord_t bottom_space = lv_obj_get_style_pad_bottom(obj, LV_PART_SCROLLBAR);
     lv_coord_t left_space = lv_obj_get_style_pad_left(obj, LV_PART_SCROLLBAR);
     lv_coord_t right_space = lv_obj_get_style_pad_right(obj, LV_PART_SCROLLBAR);
-    lv_coord_t tickness = lv_obj_get_style_width(obj, LV_PART_SCROLLBAR);
+    lv_coord_t thickness = lv_obj_get_style_width(obj, LV_PART_SCROLLBAR);
 
     lv_coord_t obj_h = lv_obj_get_height(obj);
     lv_coord_t obj_w = lv_obj_get_width(obj);
 
     /*Space required for the vertical and horizontal scrollbars*/
-    lv_coord_t ver_reg_space = ver_draw ? tickness : 0;
-    lv_coord_t hor_req_space = hor_draw ? tickness : 0;
+    lv_coord_t ver_reg_space = ver_draw ? thickness : 0;
+    lv_coord_t hor_req_space = hor_draw ? thickness : 0;
     lv_coord_t rem;
 
     if(lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR) < LV_OPA_MIN &&
@@ -521,11 +521,11 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
         ver_area->y2 = obj->coords.y2;
         if(rtl) {
             ver_area->x1 = obj->coords.x1 + left_space;
-            ver_area->x2 = ver_area->x1 + tickness - 1;
+            ver_area->x2 = ver_area->x1 + thickness - 1;
         }
         else {
             ver_area->x2 = obj->coords.x2 - right_space;
-            ver_area->x1 = ver_area->x2 - tickness + 1;
+            ver_area->x1 = ver_area->x2 - thickness + 1;
         }
 
         lv_coord_t sb_h = ((obj_h - top_space - bottom_space - hor_req_space) * obj_h) / content_h;
@@ -562,7 +562,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
     lv_coord_t content_w = obj_w + sl + sr;
     if(hor_draw && content_w) {
         hor_area->y2 = obj->coords.y2 - bottom_space;
-        hor_area->y1 = hor_area->y2 - tickness + 1;
+        hor_area->y1 = hor_area->y2 - thickness + 1;
         hor_area->x1 = obj->coords.x1;
         hor_area->x2 = obj->coords.x2;
 

@@ -20,7 +20,7 @@ void tearDown(void)
 }
 
 
-void test_win_should_have_valid_documented_defualt_values(void)
+void test_win_should_have_valid_documented_default_values(void)
 {
     // Create the win object and update layout
     win = lv_win_create(active_screen);

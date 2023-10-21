@@ -19,7 +19,7 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-void test_textarea_should_have_valid_documented_defualt_values(void)
+void test_textarea_should_have_valid_documented_default_values(void)
 {
     TEST_ASSERT(lv_textarea_get_cursor_click_pos(textarea));
     TEST_ASSERT_EQUAL(0U, lv_textarea_get_one_line(textarea));

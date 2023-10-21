@@ -21,7 +21,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_obj_t * switch_create(lv_obj_t * parent, const char * title, lv_obj_flag_t flag, bool en);
-static void generic_swicth_event_cb(lv_event_t * e);
+static void generic_switch_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -88,7 +88,7 @@ static lv_obj_t * switch_create(lv_obj_t * parent, const char * title, lv_obj_fl
     lv_obj_set_flex_grow(label, 1);
 
     lv_obj_t * sw = lv_switch_create(cont);
-    lv_obj_add_event(sw, generic_swicth_event_cb, LV_EVENT_VALUE_CHANGED, (void *)((lv_uintptr_t) flag));
+    lv_obj_add_event(sw, generic_switch_event_cb, LV_EVENT_VALUE_CHANGED, (void *)((lv_uintptr_t) flag));
     if(en) {
         lv_obj_add_state(sw, LV_STATE_CHECKED);
         lv_obj_add_flag(list, flag);
@@ -101,7 +101,7 @@ static lv_obj_t * switch_create(lv_obj_t * parent, const char * title, lv_obj_fl
     return cont;
 }
 
-static void generic_swicth_event_cb(lv_event_t * e)
+static void generic_switch_event_cb(lv_event_t * e)
 {
     lv_obj_t * sw = lv_event_get_target(e);
     lv_obj_flag_t flag = (lv_obj_flag_t)((lv_uintptr_t)lv_event_get_user_data(e));

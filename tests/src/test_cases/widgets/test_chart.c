@@ -39,8 +39,8 @@ void test_chart_set_point_count_increments(void)
     lv_chart_series_t * red_series;
     red_series = lv_chart_add_series(chart, red_color, LV_CHART_AXIS_SECONDARY_Y);
 
-    uint16_t points_in_serie = lv_chart_get_point_count(chart);
-    uint16_t new_point_count = points_in_serie * 2;
+    uint16_t points_in_series = lv_chart_get_point_count(chart);
+    uint16_t new_point_count = points_in_series * 2;
     lv_chart_set_point_count(chart, new_point_count);
 
     TEST_ASSERT_EQUAL_MESSAGE(new_point_count, lv_chart_get_point_count(chart),
@@ -52,8 +52,8 @@ void test_chart_set_point_count_decrements(void)
 {
     lv_chart_series_t * red_series;
     red_series = lv_chart_add_series(chart, red_color, LV_CHART_AXIS_SECONDARY_Y);
-    uint16_t points_in_serie = lv_chart_get_point_count(chart);
-    uint16_t new_point_count = points_in_serie / 2;
+    uint16_t points_in_series = lv_chart_get_point_count(chart);
+    uint16_t new_point_count = points_in_series / 2;
 
     lv_chart_set_point_count(chart, new_point_count);
 
@@ -66,8 +66,8 @@ void test_chart_set_point_count_as_same(void)
 {
     lv_chart_series_t * red_series;
     red_series = lv_chart_add_series(chart, red_color, LV_CHART_AXIS_SECONDARY_Y);
-    uint16_t points_in_serie = lv_chart_get_point_count(chart);
-    uint16_t new_point_count = points_in_serie;
+    uint16_t points_in_series = lv_chart_get_point_count(chart);
+    uint16_t new_point_count = points_in_series;
 
     lv_chart_set_point_count(chart, new_point_count);
 
@@ -87,7 +87,7 @@ void test_chart_set_new_point_count_as_zero(void)
     lv_chart_remove_series(chart, red_series);
 }
 
-void test_chart_point_is_added_at_the_end_of_a_serie(void)
+void test_chart_point_is_added_at_the_end_of_a_series(void)
 {
     lv_chart_series_t * red_series;
     red_series = lv_chart_add_series(chart, red_color, LV_CHART_AXIS_SECONDARY_Y);

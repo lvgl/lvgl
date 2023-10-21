@@ -22,7 +22,7 @@ to get a string representation of the ID.
 Use custom ID generator
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Set `LV_USE_OBJ_ID_BUILTIN` to 0 in `lv_conf.h`. Below APIs needed to be impemented and
+Set `LV_USE_OBJ_ID_BUILTIN` to 0 in `lv_conf.h`. Below APIs needed to be implemented and
 linked to lvgl.
 
 .. code:: c
@@ -36,7 +36,7 @@ linked to lvgl.
 parameter ``class_p``. Note it may be different than ``obj->class_p`` which is the class
 currently being constructed.
 
-:c:func:``lv_obj_free_id`` is called when object is deconstructed. Free any resource alloced in ``lv_obj_assign_id``.
+:c:func:``lv_obj_free_id`` is called when object is deconstructed. Free any resource allocated in ``lv_obj_assign_id``.
 
 :c:func:``lv_obj_stringify_id`` converts id to a string representation. The string is stored in ``buf``.
 

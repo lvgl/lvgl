@@ -833,7 +833,7 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
 {
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
     uint16_t page_num = pinyin_ime->cand_num / LV_IME_PINYIN_CAND_TEXT_NUM;
-    uint16_t sur = pinyin_ime->cand_num % LV_IME_PINYIN_CAND_TEXT_NUM;
+    uint16_t remainder = pinyin_ime->cand_num % LV_IME_PINYIN_CAND_TEXT_NUM;
 
     if(dir == 0) {
         if(pinyin_ime->py_page) {
@@ -841,7 +841,7 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
         }
     }
     else {
-        if(sur == 0) {
+        if(remainder == 0) {
             page_num -= 1;
         }
         if(pinyin_ime->py_page < page_num) {
@@ -858,8 +858,8 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
     // fill buf
     uint16_t offset = pinyin_ime->py_page * (3 * LV_IME_PINYIN_CAND_TEXT_NUM);
     for(uint8_t i = 0; (i < pinyin_ime->cand_num && i < LV_IME_PINYIN_CAND_TEXT_NUM); i++) {
-        if((sur > 0) && (pinyin_ime->py_page == page_num)) {
-            if(i > sur)
+        if((remainder > 0) && (pinyin_ime->py_page == page_num)) {
+            if(i > remainder)
                 break;
         }
         for(uint8_t j = 0; j < 3; j++) {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_fs_memfs.c
  *
  * File System Interface driver for memory-mapped files

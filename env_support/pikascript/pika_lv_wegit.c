@@ -268,7 +268,7 @@ void pika_lvgl_dropdown_set_selected(PikaObj *self, int sel_opt){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
     lv_dropdown_set_selected(lv_obj, sel_opt);
 }
-void pika_lvgl_dropdown_set_selected_hightlight(PikaObj *self, int en){
+void pika_lvgl_dropdown_set_selected_highlight(PikaObj *self, int en){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
     lv_dropdown_set_selected_highlight(lv_obj, en);
 }

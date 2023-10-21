@@ -88,7 +88,7 @@ The shell offers enabling/disabling of LVGL monkeys:
     uart$ lvgl monkey set <index> <inactive/active>
 
 This is useful for checking your application for memory leaks and other bugs.
-Speaking of memory leaks, you can also aquire stats of the memory used by LVGL
+Speaking of memory leaks, you can also acquire stats of the memory used by LVGL
 
 .. code:: shell
 
