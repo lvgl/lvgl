@@ -179,7 +179,7 @@ void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[]);
 /**
  * Draw the scale after all the children are drawn
  * @param obj       pointer to a scale object
- * @param en        true: eanble post draw
+ * @param en        true: enable post draw
  */
 void lv_scale_set_post_draw(lv_obj_t * obj, bool en);
 
