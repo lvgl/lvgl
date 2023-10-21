@@ -11,7 +11,7 @@ void setUp(void)
 /* Function run after every test */
 void tearDown(void)
 {
-	lv_obj_clean(lv_screen_active());
+    lv_obj_clean(lv_screen_active());
 }
 
 /* A simple horizontal scale */
@@ -139,7 +139,7 @@ void test_scale_render_example_3(void)
     lv_scale_set_minor_tick_length(scale, 5);
     lv_scale_set_range(scale, 10, 40);
 
-	TEST_ASSERT_EQUAL_SCREENSHOT("scale_3.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("scale_3.png");
 }
 
 /* A round scale with section and custom styling */
@@ -218,7 +218,7 @@ void test_scale_render_example_4(void)
     lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
     lv_scale_section_set_style(section, LV_PART_MAIN, &section_main_line_style);
 
-	TEST_ASSERT_EQUAL_SCREENSHOT("scale_4.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("scale_4.png");
 }
 
 /* The width of the initial and last ticks of the section should be stored in order to compensate the main line drawing */
@@ -230,12 +230,12 @@ void test_scale_linear_section_stores_initial_and_last_tick_widths(void)
 /* When adding a section to a linear scale we should find and store the initial and last ticks that the section covers */
 void test_scale_linear_section_finds_correct_initial_and_last_tick_indexes(void)
 {
-	TEST_FAIL();
+    TEST_FAIL();
 }
 
 void test_scale_round_section_finds_correct_initial_and_last_tick_indexes(void)
 {
-	TEST_FAIL();
+    TEST_FAIL();
 }
 
 #endif
