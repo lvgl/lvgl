@@ -1,5 +1,3 @@
-.typos.toml
-
 [files]
 extend-exclude = [
     ".git/",
