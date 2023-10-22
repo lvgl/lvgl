@@ -53,6 +53,8 @@ Architecture
 - |check| Limit the image caching size in bytes instead of image count 
 - |check| lv_draw_buf for unified stride, buffer and cache invalidation management. `4241 <https://github.com/lvgl/lvgl/pull/4241>`__
 - |uncheck| SVG support: integrate an SVG render library `4388 <https://github.com/lvgl/lvgl/issues/4388>`__
+- |uncheck| Introduce optional ``float`` support. `4648 <https://github.com/lvgl/lvgl/issues/4648>`__
+- |uncheck| Introduce support layer for 3D GPUs (OpenGL, SDL, Vulkan, etc).  `4622 <https://github.com/lvgl/lvgl/issues/4622>`__
 
 Styles
 ~~~~~~
