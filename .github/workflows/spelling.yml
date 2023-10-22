@@ -13,6 +13,6 @@ jobs:
     name: Typos
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Search for misspellings
-        uses: crate-ci/typos@v1.16.4
+        uses: crate-ci/typos@v1.16.20
