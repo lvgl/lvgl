@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file test_font_loader.c
  *
  */
