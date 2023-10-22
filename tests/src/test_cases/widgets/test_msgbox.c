@@ -9,9 +9,9 @@ void setUp(void);
 /* This function runs after every test */
 void tearDown(void);
 
-void test_msgbox_creation_successfull_with_close_button(void);
-void test_msgbox_creation_successfull_no_close_button(void);
-void test_msgbox_creation_successfull_modal(void);
+void test_msgbox_creation_successful_with_close_button(void);
+void test_msgbox_creation_successful_no_close_button(void);
+void test_msgbox_creation_successful_modal(void);
 void test_msgbox_get_title(void);
 void test_msgbox_get_close_button(void);
 void test_msgbox_get_text(void);
@@ -39,7 +39,7 @@ void tearDown(void)
     lv_obj_clean(active_screen);
 }
 
-void test_msgbox_creation_successfull_with_close_button(void)
+void test_msgbox_creation_successful_with_close_button(void)
 {
     bool add_close_btn = true;
 
@@ -50,7 +50,7 @@ void test_msgbox_creation_successfull_with_close_button(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("msgbox_ok_with_close_btn.png");
 }
 
-void test_msgbox_creation_successfull_no_close_button(void)
+void test_msgbox_creation_successful_no_close_button(void)
 {
     bool add_close_btn = false;
 
@@ -61,7 +61,7 @@ void test_msgbox_creation_successfull_no_close_button(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("msgbox_ok_no_close_btn.png");
 }
 
-void test_msgbox_creation_successfull_modal(void)
+void test_msgbox_creation_successful_modal(void)
 {
     // If parent is NULL the message box will be modal
     msgbox = lv_msgbox_create(NULL, "The title", "The text", buttons_txts, true);

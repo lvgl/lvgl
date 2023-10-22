@@ -76,7 +76,7 @@ lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
 /**
  * Allocate a buffer with the given size. It might allocate slightly larger buffer to fulfill the alignment requirements.
  * @param size          the size to allocate in bytes
- * @param color_format  the color format of the buffer to allcoate
+ * @param color_format  the color format of the buffer to allocate
  * @return              the allocated buffer.
  * @note The returned value can be saved in draw_buf->buf
  * @note lv_draw_buf_align can be sued the align the returned pointer
@@ -90,7 +90,7 @@ void * lv_draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format);
 void lv_draw_buf_free(void  * buf);
 
 /**
- * Align the address of a buffer. The buffer needs to be large enough for the real data after alignement
+ * Align the address of a buffer. The buffer needs to be large enough for the real data after alignment
  * @param buf           the data to align
  * @param color_format  the color format of the buffer
  * @return              the aligned buffer

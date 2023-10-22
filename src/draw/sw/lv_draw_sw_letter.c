@@ -53,7 +53,7 @@ void lv_draw_sw_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * ds
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_draw_label_interate_letters(draw_unit, dsc, coords, draw_letter_cb);
+    lv_draw_label_iterate_letters(draw_unit, dsc, coords, draw_letter_cb);
 }
 
 /**********************

@@ -61,7 +61,7 @@ following parameters:
 - :cpp:enumerator:`LV_BTNMATRIX_CTRL_HIDDEN`: Makes a button hidden (hidden buttons still take up space in the layout, they are just not visible or clickable)
 - :cpp:enumerator:`LV_BTNMATRIX_CTRL_NO_REPEAT`: Disable repeating when the button is long pressed
 - :cpp:enumerator:`LV_BTNMATRIX_CTRL_DISABLED`: Makes a button disabled Like :cpp:enumerator:`LV_STATE_DISABLED` on normal objects
-- :cpp:enumerator:`LV_BTNMATRIX_CTRL_CHECKABLE`: Enable toggling of a button. I.e. :cpp:enumerator:`LV_STATE_CHECHED` will be added/removed as the button is clicked
+- :cpp:enumerator:`LV_BTNMATRIX_CTRL_CHECKABLE`: Enable toggling of a button. I.e. :cpp:enumerator:`LV_STATE_CHECKED` will be added/removed as the button is clicked
 - :cpp:enumerator:`LV_BTNMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles.
 - :cpp:enumerator:`LV_BTNMATRIX_CTRL_CLICK_TRIG`: Enabled: send LV_EVENT_VALUE_CHANGE on CLICK, Disabled: send :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on PRESS
 - :cpp:enumerator:`LV_BTNMATRIX_CTRL_POPOVER`: Show the button label in a popover when pressing this key

@@ -101,7 +101,7 @@ static void show_scene_report(void);
 static void calc_scene_statistics(void);
 static lv_result_t load_next_scene(void);
 static void next_scene_timer_cb(lv_timer_t * timer);
-static void single_scene_finsih_timer_cb(lv_timer_t * timer);
+static void single_scene_finish_timer_cb(lv_timer_t * timer);
 static void dummy_flush_cb(lv_display_t * drv, const lv_area_t * area, uint8_t * pxmap);
 static void generate_report(void);
 
@@ -717,10 +717,10 @@ void lv_demo_benchmark_run_scene(lv_demo_benchmark_mode_t _mode, uint16_t scene_
             lv_refr_now(NULL);
         }
 
-        single_scene_finsih_timer_cb(NULL);
+        single_scene_finish_timer_cb(NULL);
     }
     else {
-        lv_timer_t * t = lv_timer_create(single_scene_finsih_timer_cb, SCENE_TIME, NULL);
+        lv_timer_t * t = lv_timer_create(single_scene_finish_timer_cb, SCENE_TIME, NULL);
         lv_timer_set_repeat_count(t, 1);
     }
 }
@@ -864,7 +864,7 @@ static void next_scene_timer_cb(lv_timer_t * timer)
     }
 }
 
-static void single_scene_finsih_timer_cb(lv_timer_t * timer)
+static void single_scene_finish_timer_cb(lv_timer_t * timer)
 {
     LV_UNUSED(timer);
     calc_scene_statistics();

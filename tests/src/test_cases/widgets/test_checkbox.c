@@ -6,10 +6,10 @@
 #include "lv_test_helpers.h"
 #include "lv_test_indev.h"
 
-void test_checkbox_creation_successfull(void);
+void test_checkbox_creation_successful(void);
 void test_checkbox_should_call_event_handler_on_click_when_enabled(void);
 void test_checkbox_should_have_default_text_when_created(void);
-void test_checkbox_should_return_dinamically_allocated_text(void);
+void test_checkbox_should_return_dynamically_allocated_text(void);
 void test_checkbox_should_allocate_memory_for_static_text(void);
 
 static lv_obj_t * active_screen = NULL;
@@ -26,7 +26,7 @@ static void event_handler(lv_event_t * e)
     }
 }
 
-void test_checkbox_creation_successfull(void)
+void test_checkbox_creation_successful(void)
 {
     active_screen = lv_screen_active();
     checkbox = lv_checkbox_create(active_screen);
@@ -60,7 +60,7 @@ void test_checkbox_should_have_default_text_when_created(void)
     TEST_ASSERT_NOT_NULL(lv_checkbox_get_text(checkbox));
 }
 
-void test_checkbox_should_return_dinamically_allocated_text(void)
+void test_checkbox_should_return_dynamically_allocated_text(void)
 {
     const char * message = "Hello World!";
 
