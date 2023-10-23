@@ -1,0 +1,16 @@
+name: pre-commit
+on:
+  push:
+    branches: [ master, release/v8.* ]
+  pull_request:
+    branches: [ master, release/v8.* ]
+
+jobs:
+  pre_commit:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    name: Run pre-commit
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - uses: pre-commit/action@v3.0.0
