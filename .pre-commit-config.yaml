@@ -36,3 +36,4 @@ repos:
     rev: v1.16.20
     hooks:
       - id: typos
+        args: ['--write-changes', '--force-exclude', '--config=.typos.toml']
