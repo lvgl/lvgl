@@ -152,7 +152,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         if(dsc->header.stride == 0) dsc->header.stride = img_width_to_stride(&dsc->header);
 
         dsc->decoder = decoder;
-
         res = decoder->open_cb(decoder, dsc);
 
         /*Opened successfully. It is a good decoder for this image source*/
