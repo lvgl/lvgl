@@ -9,20 +9,20 @@ void test_obj_property_fail_on_invalid_id(void)
     lv_property_t prop = { };
 
     prop.id = LV_PROPERTY_ID_INVALID;
-    TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_property_set(obj, &prop));
+    TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_set_property(obj, &prop));
 
     prop.id = LV_PROPERTY_ID_BUILTIN_LAST; /* No widget use this ID */
-    TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_property_set(obj, &prop));
+    TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_set_property(obj, &prop));
 
     prop.id = LV_PROPERTY_OBJ_PARENT + 1; /* Not a valid ID for obj */
-    TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_property_set(obj, &prop));
+    TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_set_property(obj, &prop));
 
     prop.id = LV_PROPERTY_IMAGE_OFFSET_X; /* Not an ID for obj but for image */
-    TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_property_set(obj, &prop));
+    TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_set_property(obj, &prop));
 
     prop.id = LV_PROPERTY_OBJ_PARENT; /* Valid ID */
     prop.ptr = lv_scr_act();
-    TEST_ASSERT_EQUAL_INT(LV_RESULT_OK, lv_obj_property_set(obj, &prop));
+    TEST_ASSERT_EQUAL_INT(LV_RESULT_OK, lv_obj_set_property(obj, &prop));
 }
 
 void test_obj_property_set_get_should_match(void)
@@ -36,58 +36,58 @@ void test_obj_property_set_get_should_match(void)
     /* int type */
     prop.id = LV_STYLE_X;
     prop.num = 0xaabb;
-    TEST_ASSERT_TRUE(lv_obj_property_set(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_x(obj, 0));
-    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_property_get(obj, LV_STYLE_X).num);
+    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_property(obj, LV_STYLE_X).num);
 
     /* color type */
     prop.id = LV_STYLE_BG_COLOR;
     prop.color = color;
-    TEST_ASSERT_TRUE(lv_obj_property_set(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_COLOR(color, lv_obj_get_style_bg_color(obj, LV_PART_MAIN));
-    TEST_ASSERT_EQUAL_COLOR(color, lv_obj_property_get(obj, LV_STYLE_BG_COLOR).color);
+    TEST_ASSERT_EQUAL_COLOR(color, lv_obj_get_property(obj, LV_STYLE_BG_COLOR).color);
 
     /* pointer type */
     prop.id = LV_STYLE_TEXT_FONT;
     prop.ptr = &lv_font_montserrat_26;
-    TEST_ASSERT_TRUE(lv_obj_property_set(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_26, lv_obj_get_style_text_font(obj, LV_PART_MAIN));
-    TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_26, lv_obj_property_get(obj, LV_STYLE_TEXT_FONT).ptr);
+    TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_26, lv_obj_get_property(obj, LV_STYLE_TEXT_FONT).ptr);
 
     /* Object flags */
     prop.id = LV_PROPERTY_OBJ_FLAG_HIDDEN ;
     prop.num = 1;
-    TEST_ASSERT_TRUE(lv_obj_property_set(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_TRUE(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
-    TEST_ASSERT_TRUE(lv_obj_property_get(obj, LV_PROPERTY_OBJ_FLAG_HIDDEN).num);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, LV_PROPERTY_OBJ_FLAG_HIDDEN).num);
 
     prop.id = LV_PROPERTY_OBJ_FLAG_CLICKABLE;
     prop.num = 0;
-    TEST_ASSERT_TRUE(lv_obj_property_set(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_FALSE(lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE));
-    TEST_ASSERT_FALSE(lv_obj_property_get(obj, LV_PROPERTY_OBJ_FLAG_CLICKABLE).num);
+    TEST_ASSERT_FALSE(lv_obj_get_property(obj, LV_PROPERTY_OBJ_FLAG_CLICKABLE).num);
 
     /* Obj property */
     prop.id = LV_PROPERTY_OBJ_PARENT;
     prop.ptr = root;
-    TEST_ASSERT_TRUE(lv_obj_property_set(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_PTR(root, lv_obj_get_parent(obj));
-    TEST_ASSERT_EQUAL_PTR(root, lv_obj_property_get(obj, LV_PROPERTY_OBJ_PARENT).ptr);
+    TEST_ASSERT_EQUAL_PTR(root, lv_obj_get_property(obj, LV_PROPERTY_OBJ_PARENT).ptr);
 
     /* Derived widget could use same property */
     lv_obj_t * img = lv_image_create(obj);
     prop.id = LV_PROPERTY_OBJ_PARENT;
     prop.ptr = root;
-    TEST_ASSERT_TRUE(lv_obj_property_set(img, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_set_property(img, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_PTR(root, lv_obj_get_parent(img));
-    TEST_ASSERT_EQUAL_PTR(root, lv_obj_property_get(img, LV_PROPERTY_OBJ_PARENT).ptr);
+    TEST_ASSERT_EQUAL_PTR(root, lv_obj_get_property(img, LV_PROPERTY_OBJ_PARENT).ptr);
 
     /* Image properties */
     prop.id = LV_PROPERTY_IMAGE_OFFSET_X;
     prop.num = 0x1234;
-    TEST_ASSERT_TRUE(lv_obj_property_set(img, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_set_property(img, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_UINT16(0x1234, lv_img_get_offset_x(img));
-    TEST_ASSERT_EQUAL_UINT16(0x1234, lv_obj_property_get(img, LV_PROPERTY_IMAGE_OFFSET_X).num);
+    TEST_ASSERT_EQUAL_UINT16(0x1234, lv_obj_get_property(img, LV_PROPERTY_IMAGE_OFFSET_X).num);
 }
 
 void test_obj_property_flag(void)
@@ -132,24 +132,24 @@ void test_obj_property_flag(void)
     obj->flags = 0;
     for(unsigned long i = 0; i < sizeof(properties) / sizeof(properties[0]); i++) {
 
-        TEST_ASSERT_FALSE(lv_obj_property_get(obj, properties[i].id).num);
+        TEST_ASSERT_FALSE(lv_obj_get_property(obj, properties[i].id).num);
         lv_obj_add_flag(obj, properties[i].flag);
-        TEST_ASSERT_TRUE(lv_obj_property_get(obj, properties[i].id).num);
+        TEST_ASSERT_TRUE(lv_obj_get_property(obj, properties[i].id).num);
 
         lv_obj_remove_flag(obj, properties[i].flag);
-        TEST_ASSERT_FALSE(lv_obj_property_get(obj, properties[i].id).num);
+        TEST_ASSERT_FALSE(lv_obj_get_property(obj, properties[i].id).num);
 
         lv_property_t prop = { };
         prop.id = properties[i].id;
         prop.num = 1;
-        TEST_ASSERT_TRUE(lv_obj_property_set(obj, &prop) == LV_RESULT_OK);
-        TEST_ASSERT_TRUE(lv_obj_property_get(obj, properties[i].id).num);
+        TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+        TEST_ASSERT_TRUE(lv_obj_get_property(obj, properties[i].id).num);
         TEST_ASSERT_TRUE(lv_obj_has_flag(obj, properties[i].flag));
 
         prop.id = properties[i].id;
         prop.num = 0;
-        TEST_ASSERT_TRUE(lv_obj_property_set(obj, &prop) == LV_RESULT_OK);
-        TEST_ASSERT_FALSE(lv_obj_property_get(obj, properties[i].id).num);
+        TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+        TEST_ASSERT_FALSE(lv_obj_get_property(obj, properties[i].id).num);
         TEST_ASSERT_FALSE(lv_obj_has_flag(obj, properties[i].flag));
     }
 }

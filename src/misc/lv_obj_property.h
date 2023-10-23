@@ -41,7 +41,7 @@ struct _lv_obj_t;
 #define LV_PROPERTY_ID_INDEX(id) ((id) & 0xfffffff)
 
 /*Set properties from an array of lv_property_t*/
-#define LV_OBJ_PROPERTY_ARRAY_SET(obj, array) lv_obj_properties_set(obj, array, sizeof(array)/sizeof(array[0]))
+#define LV_OBJ_PROPERTY_ARRAY_SET(obj, array) lv_obj_set_properties(obj, array, sizeof(array)/sizeof(array[0]))
 
 /**
  * Group of predefined widget ID start value.
@@ -98,9 +98,9 @@ typedef struct {
  * @param value     The property value to set
  * @return          return LV_RESULT_OK if success
  */
-lv_result_t lv_obj_property_set(struct _lv_obj_t * obj, const lv_property_t * value);
+lv_result_t lv_obj_set_property(struct _lv_obj_t * obj, const lv_property_t * value);
 
-lv_result_t lv_obj_properties_set(struct _lv_obj_t * obj, const lv_property_t * value, uint32_t count);
+lv_result_t lv_obj_set_properties(struct _lv_obj_t * obj, const lv_property_t * value, uint32_t count);
 
 /*=====================
  * Getter functions
@@ -113,7 +113,7 @@ lv_result_t lv_obj_properties_set(struct _lv_obj_t * obj, const lv_property_t * 
  * @param value     pointer to a buffer to store the value
  * @return ? to be discussed, LV_RESULT_OK or LV_RESULT_INVALID
  */
-lv_property_t lv_obj_property_get(struct _lv_obj_t * obj, lv_prop_id_t id);
+lv_property_t lv_obj_get_property(struct _lv_obj_t * obj, lv_prop_id_t id);
 
 /**********************
  *      MACROS

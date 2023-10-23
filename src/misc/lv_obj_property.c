@@ -48,7 +48,7 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_obj_property_set(lv_obj_t * obj, const lv_property_t * value)
+lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
 {
     LV_ASSERT(obj && value);
 
@@ -65,10 +65,10 @@ lv_result_t lv_obj_property_set(lv_obj_t * obj, const lv_property_t * value)
     return obj_property(obj, value->id, (lv_property_t *)value, true);
 }
 
-lv_result_t lv_obj_properties_set(struct _lv_obj_t * obj, const lv_property_t * value, uint32_t count)
+lv_result_t lv_obj_set_properties(struct _lv_obj_t * obj, const lv_property_t * value, uint32_t count)
 {
     for(uint32_t i = 0; i < count; i++) {
-        lv_result_t result = lv_obj_property_set(obj, &value[i]);
+        lv_result_t result = lv_obj_set_property(obj, &value[i]);
         if(result != LV_RESULT_OK) {
             return result;
         }
@@ -77,7 +77,7 @@ lv_result_t lv_obj_properties_set(struct _lv_obj_t * obj, const lv_property_t * 
     return LV_RESULT_OK;
 }
 
-lv_property_t lv_obj_property_get(lv_obj_t * obj, lv_prop_id_t id)
+lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
 {
     lv_result_t result;
     lv_property_t value;
