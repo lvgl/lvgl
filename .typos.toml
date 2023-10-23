@@ -9,6 +9,7 @@ ignore-hidden = false
 
 [default]
 extend-ignore-re = [
+    "\\b[0-9a-f]{7}\\b",
     "\\bser[^a-z]",
     "\\bfle[^a-z]",
     '"Lorem ipsum .*"',
