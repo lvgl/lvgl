@@ -131,6 +131,9 @@
 /* Use NXP's PXP on iMX RTxxx platforms. */
 #define LV_USE_DRAW_PXP 0
 
+/*Enable Vector Graphic APIs*/
+#define LV_USE_VECTOR_GRAPHIC   0
+
 /*=================
  * OPERATING SYSTEM
  *=================*/
@@ -648,6 +651,9 @@
 /*Rlottie library*/
 #define LV_USE_RLOTTIE 0
 
+/*ThorVG library*/
+#define LV_USE_THORVG 0
+
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
 #define LV_USE_FFMPEG 0
@@ -836,6 +842,9 @@
 
 /*Demonstrate scroll settings*/
 #define LV_USE_DEMO_SCROLL          0
+
+/*Vector graphic demo*/
+#define LV_USE_DEMO_VECTOR_GRAPHIC  0
 /*--END OF LV_CONF_H--*/
 
 #endif /*LV_CONF_H*/

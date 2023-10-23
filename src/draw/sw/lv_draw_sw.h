@@ -21,6 +21,7 @@ extern "C" {
 #include "../../display/lv_display.h"
 #include "../../osal/lv_os.h"
 
+#include "../../draw/lv_draw_vector.h"
 /*********************
  *      DEFINES
  *********************/
@@ -53,6 +54,8 @@ typedef struct {
 
 void lv_draw_sw_init(void);
 
+void lv_draw_sw_deinit(void);
+
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                                             const lv_area_t * coords);
 
@@ -80,6 +83,9 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                           lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                           const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t cf, void * dest_buf);
 
+#if LV_USE_VECTOR_GRAPHIC
+void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc_t * dsc);
+#endif
 /***********************
  * GLOBAL VARIABLES
  ***********************/
