@@ -128,6 +128,9 @@
 /* Draw using cached SDL textures*/
 #define LV_USE_DRAW_SDL 0
 
+/* Use VG-Lite GPU. */
+#define LV_USE_DRAW_VG_LITE 0
+
 /*=================
  * OPERATING SYSTEM
  *=================*/
