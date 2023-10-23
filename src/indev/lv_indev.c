@@ -1166,21 +1166,25 @@ static void indev_proc_release(lv_indev_t * indev)
         /*Get the transformed vector with this object*/
         if(scroll_obj) {
             int16_t angle = 0;
-            int16_t zoom = 256;
+            int16_t zoom_x = 256;
+            int16_t zoom_y = 256;
             lv_point_t pivot = { 0, 0 };
             lv_obj_t * parent = scroll_obj;
             while(parent) {
                 angle += lv_obj_get_style_transform_rotation(parent, 0);
-                int32_t zoom_act = lv_obj_get_style_transform_scale_safe(parent, 0);
-                zoom = (zoom * zoom_act) >> 8;
+                int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, 0);
+                int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, 0);
+                zoom_x = (zoom_x * zoom_act_x) >> 8;
+                zoom_y = (zoom_x * zoom_act_y) >> 8;
                 parent = lv_obj_get_parent(parent);
             }
 
-            if(angle != 0 || zoom != LV_SCALE_NONE) {
+            if(angle != 0 || zoom_y != LV_SCALE_NONE || zoom_x != LV_SCALE_NONE) {
                 angle = -angle;
-                zoom = (256 * 256) / zoom;
-                lv_point_transform(&indev->pointer.scroll_throw_vect, angle, zoom, &pivot);
-                lv_point_transform(&indev->pointer.scroll_throw_vect_ori, angle, zoom, &pivot);
+                zoom_x = (256 * 256) / zoom_x;
+                zoom_y = (256 * 256) / zoom_y;
+                lv_point_transform(&indev->pointer.scroll_throw_vect, angle, zoom_x, zoom_y, &pivot, false);
+                lv_point_transform(&indev->pointer.scroll_throw_vect_ori, angle, zoom_x, zoom_y, &pivot, false);
             }
         }
 

@@ -70,10 +70,10 @@ in its cell. The possible values are:
 
 - :c:enumerator:`LV_GRID_ALIGN_START`: means left on a horizontally and top vertically. (default)
 - :c:enumerator:`LV_GRID_ALIGN_END`: means right on a horizontally and bottom vertically
-- :c:enumerator:`LV_GRID_ALIGN_CENTER`: simply center ``colum_pos`` and ``row_pos``
+- :c:enumerator:`LV_GRID_ALIGN_CENTER`: simply center ``column_pos`` and ``row_pos``
   means the zero based index of the cell into the item should be placed.
 
-``colum_span`` and ``row_span`` means how many tracks should the item
+``column_span`` and ``row_span`` means how many tracks should the item
 involve from the start cell. Must be >= 1.
 
 Grid align

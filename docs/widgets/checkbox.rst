@@ -43,7 +43,7 @@ common state add/clear function:
 .. code:: c
 
    lv_obj_add_state(cb, LV_STATE_CHECKED);   /*Make the checkbox checked*/
-   lv_obj_remove_state(cb, LV_STATE_CHECKED); /*MAke the checkbox unchecked*/
+   lv_obj_remove_state(cb, LV_STATE_CHECKED); /*Make the checkbox unchecked*/
    lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /*Make the checkbox checked and disabled*/
 
 To get whether the checkbox is checked or not use:

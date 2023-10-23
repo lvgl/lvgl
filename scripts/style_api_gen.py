@@ -58,9 +58,13 @@ props = [
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
 
-{'name': 'TRANSFORM_SCALE',
+{'name': 'TRANSFORM_SCALE_X',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom an objects. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom an objects horizontally. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+
+{'name': 'TRANSFORM_SCALE_Y',
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
+ 'dsc': "Zoom an objects vertically. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
 
 {'name': 'TRANSFORM_ROTATION',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,

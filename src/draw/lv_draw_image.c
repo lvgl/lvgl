@@ -43,7 +43,8 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
     lv_memzero(dsc, sizeof(lv_draw_image_dsc_t));
     dsc->recolor = lv_color_black();
     dsc->opa = LV_OPA_COVER;
-    dsc->zoom = LV_SCALE_NONE;
+    dsc->zoom_x = LV_SCALE_NONE;
+    dsc->zoom_y = LV_SCALE_NONE;
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
 }
 

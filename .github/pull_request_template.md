@@ -16,7 +16,7 @@ Be sure the following conventions are followed:
 - [ ] Use typed pointers instead of `void *` pointers
 - [ ] Do not `malloc` into a static or global variables. Instead declare the variable in `lv_global_t` structure in [`lv_global.h`](https://github.com/lvgl/lvgl/blob/master/src/core/lv_global.h) and mark the variable with `(LV_GLOBAL_DEFAULT()->variable)` when it's used. See a detailed description [here](https://docs.lvgl.io/master/get-started/bindings/micropython.html#memory-management).
 - [ ] Widget constructor must follow the `lv_<widget_name>_create(lv_obj_t * parent)` pattern.
-- [ ] Widget members function must start with `lv_<modul_name>` and should receive `lv_obj_t *` as first argument which is a pointer to widget object itself.  
+- [ ] Widget members function must start with `lv_<module_name>` and should receive `lv_obj_t *` as first argument which is a pointer to widget object itself.  
 - [ ] `struct`s should be used via an API and not modified directly via their elements.
 - [ ] `struct` APIs should follow the widgets' conventions. That is to receive a pointer to the `struct` as the first argument, and the prefix of the `struct` name should be used as the prefix of the function name too (e.g.  `lv_disp_set_default(lv_disp_t * disp)`)
 - [ ] Functions and `struct`s which are not part of the public API must begin with underscore in order to mark them as "private".

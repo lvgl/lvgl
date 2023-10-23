@@ -696,7 +696,7 @@
               </Pre_Include_Local_Component_h>
               <RTE_Components_h>
 
-/*! \brief enable PikaScrit Binding */
+/*! \brief enable PikaScript Binding */
 #define LV_USE_PIKASCRIPT_BINDING          1
               </RTE_Components_h>
 
@@ -918,9 +918,9 @@
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_rgb.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_rgb565a8.c" />
 
-                <file category="sourceC"    name="demos/benchmark/assets/lv_font_bechmark_montserrat_12_compr_az.c.c" />
-                <file category="sourceC"    name="demos/benchmark/assets/lv_font_bechmark_montserrat_16_compr_az.c.c" />
-                <file category="sourceC"    name="demos/benchmark/assets/lv_font_bechmark_montserrat_28_compr_az.c.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_12_compr_az.c.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_16_compr_az.c.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_28_compr_az.c.c" />
 
                 <file category="doc"        name="demos/benchmark/README.md" />
               </files>

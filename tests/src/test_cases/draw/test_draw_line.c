@@ -28,8 +28,8 @@ static void radial_lines_create(lv_style_t * style, uint32_t line_index)
         p[i][1].x = 100 + length;
         p[i][1].y = 100;
 
-        lv_point_transform(&p[i][0], i * 150, 256, &pivot);
-        lv_point_transform(&p[i][1], i * 150, 256, &pivot);
+        lv_point_transform(&p[i][0], i * 150, LV_SCALE_NONE, LV_SCALE_NONE, &pivot, false);
+        lv_point_transform(&p[i][1], i * 150, LV_SCALE_NONE, LV_SCALE_NONE, &pivot, false);
 
         lv_line_set_points(line, p[i], 2);
         lv_obj_set_pos(line, line_index % 4 * 200, line_index / 4 * 200);

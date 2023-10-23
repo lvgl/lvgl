@@ -55,7 +55,7 @@ lvgljs
 -  `macos x86 build Notes for sdl
    simulator <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-macos-x86-simulator.md>`__
 -  `ubuntu build Notes for platform
-   arm <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-ubuntu-x86-simualtor.md>`__
+   arm <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-ubuntu-x86-simulator.md>`__
 
 JS Bundle
 ~~~~~~~~~

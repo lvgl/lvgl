@@ -236,7 +236,7 @@ You can do this in the following way:
    /*Call this anywhere you want to refresh the dirty areas*/
    _lv_disp_refr_timer(NULL);
 
-If you have multiple displays call :cpp:expr:`lv_disp_set_deafult(disp1)` to
+If you have multiple displays call :cpp:expr:`lv_disp_set_default(disp1)` to
 select the display to refresh before :cpp:expr:`_lv_disp_refr_timer(NULL)`.
 
 

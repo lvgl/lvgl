@@ -88,27 +88,41 @@ static void draw_images(lv_layer_t * layer, lv_draw_image_dsc_t * dsc)
     dsc->pivot.x = 50;
     dsc->pivot.y = 50;
     dsc->rotation = 0;
-    dsc->zoom = 128;
+    dsc->zoom_x = 128;
+    dsc->zoom_y = 128;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
-    dsc->zoom = 300;
+    dsc->zoom_x = 300;
+    dsc->zoom_y = 300;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
     dsc->pivot.x = 0;
     dsc->pivot.y = 0;
-    dsc->zoom = 128;
+    dsc->zoom_x = 128;
+    dsc->zoom_y = 128;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
-    dsc->zoom = 300;
+    dsc->zoom_x = 300;
+    dsc->zoom_y = 300;
     lv_draw_image(layer, dsc, &area);
 
     /* Zoom + Angle*/
     dsc->rotation = 650;
-    dsc->zoom = 200;
+    dsc->zoom_x = 200;
+    dsc->zoom_y = 200;
     lv_area_move(&area, 200, 0);
+    lv_draw_image(layer, dsc, &area);
+
+    /* Zoom non uniform + Angle*/
+    dsc->rotation = 750;
+    dsc->zoom_x = 128;
+    dsc->zoom_y = 350;
+    dsc->pivot.x = 40;
+    dsc->pivot.y = 40;
+    lv_area_move(&area, 100, 0);
     lv_draw_image(layer, dsc, &area);
 
     /*Edge color bleeding test*/
@@ -128,22 +142,32 @@ static void draw_images(lv_layer_t * layer, lv_draw_image_dsc_t * dsc)
     dsc->pivot.x = 50;
     dsc->pivot.y = 50;
     dsc->rotation = 0;
-    dsc->zoom = 256;
+    dsc->zoom_x = 256;
+    dsc->zoom_y = 256;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 180, 0);
     dsc->rotation = 300;
-    dsc->zoom = 200;
+    dsc->zoom_x = 200;
+    dsc->zoom_y = 200;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 150, 0);
     dsc->rotation = 1400;
-    dsc->zoom = 150;
+    dsc->zoom_x = 150;
+    dsc->zoom_y = 150;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 120, 0);
     dsc->rotation = 2000;
-    dsc->zoom = 100;
+    dsc->zoom_x = 100;
+    dsc->zoom_y = 100;
+    lv_draw_image(layer, dsc, &area);
+
+    lv_area_move(&area, 120, 0);
+    dsc->rotation = 2000;
+    dsc->zoom_x = 350;
+    dsc->zoom_y = 100;
     lv_draw_image(layer, dsc, &area);
 }
 

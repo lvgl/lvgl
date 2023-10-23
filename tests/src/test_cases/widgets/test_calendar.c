@@ -8,7 +8,7 @@ void setUp(void);
 /* This function runs after every test */
 void tearDown(void);
 
-void test_calendar_creation_successfull(void);
+void test_calendar_creation_successful(void);
 void test_calendar_set_today_date(void);
 void test_calendar_set_today_date_gui(void);
 void test_calendar_set_showed_date_gui(void);
@@ -36,7 +36,7 @@ void tearDown(void)
     lv_obj_clean(active_screen);
 }
 
-void test_calendar_creation_successfull(void)
+void test_calendar_creation_successful(void)
 {
     TEST_ASSERT_NOT_NULL(calendar);
 }

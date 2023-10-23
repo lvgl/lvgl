@@ -59,10 +59,11 @@ void lv_image_buf_free(lv_image_dsc_t * dsc)
     }
 }
 
-void _lv_image_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, lv_coord_t angle, uint16_t zoom,
+void _lv_image_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, lv_coord_t angle, uint16_t zoom_x,
+                                        uint16_t zoom_y,
                                         const lv_point_t * pivot)
 {
-    if(angle == 0 && zoom == LV_SCALE_NONE) {
+    if(angle == 0 && zoom_x == LV_SCALE_NONE && zoom_y == LV_SCALE_NONE) {
         res->x1 = 0;
         res->y1 = 0;
         res->x2 = w - 1;
@@ -76,10 +77,10 @@ void _lv_image_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_
         {0, h - 1},
         {w - 1, h - 1},
     };
-    lv_point_transform(&p[0], angle, zoom, pivot);
-    lv_point_transform(&p[1], angle, zoom, pivot);
-    lv_point_transform(&p[2], angle, zoom, pivot);
-    lv_point_transform(&p[3], angle, zoom, pivot);
+    lv_point_transform(&p[0], angle, zoom_x, zoom_y, pivot, true);
+    lv_point_transform(&p[1], angle, zoom_x, zoom_y, pivot, true);
+    lv_point_transform(&p[2], angle, zoom_x, zoom_y, pivot, true);
+    lv_point_transform(&p[3], angle, zoom_x, zoom_y, pivot, true);
     res->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
     res->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
     res->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);

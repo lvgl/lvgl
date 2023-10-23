@@ -93,9 +93,9 @@ typedef struct {
 typedef void(*lv_draw_letter_cb_t)(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc, lv_draw_fill_dsc_t * fill_dsc,
                                    const lv_area_t * fill_area);
 
-void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
-                                    const lv_area_t * coords,
-                                    lv_draw_letter_cb_t cb);
+void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
+                                   const lv_area_t * coords,
+                                   lv_draw_letter_cb_t cb);
 
 /**********************
  * GLOBAL PROTOTYPES

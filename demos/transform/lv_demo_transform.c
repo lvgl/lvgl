@@ -155,7 +155,8 @@ static void slider_event_cb(lv_event_t * e)
 {
     lv_obj_t * slider = lv_event_get_target(e);
     int32_t v = lv_slider_get_value(slider);
-    lv_obj_set_style_transform_scale(card_to_transform, v, 0);
+    lv_obj_set_style_transform_scale_x(card_to_transform, v, 0);
+    lv_obj_set_style_transform_scale_y(card_to_transform, v, 0);
 }
 
 #endif

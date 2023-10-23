@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_demo_flex_layout_view_ctrl_pad.c
  *
  */

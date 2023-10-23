@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_font_loader.h
  *
  */

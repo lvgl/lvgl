@@ -170,12 +170,6 @@ typedef struct _lv_global_t {
     lv_profiler_builtin_ctx_t profiler_context;
 #endif
 
-#if LV_USE_MSG
-    bool msg_restart_notify;
-    unsigned int msg_recursion_counter;
-    lv_ll_t msg_subs_ll;
-#endif
-
 #if LV_USE_FILE_EXPLORER != 0
     lv_style_t fe_list_button_style;
 #endif

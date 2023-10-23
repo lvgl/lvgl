@@ -19,5 +19,3 @@
 #define  LV_USE_BMP                     1
 #define  LV_USE_GIF                     1
 #define  LV_USE_QRCODE                  1
-#define  LV_USE_MSG                     1   /*For test_msg*/
-

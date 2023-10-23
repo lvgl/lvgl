@@ -160,7 +160,7 @@ static void _rotate_point(int32_t angle, int32_t * x, int32_t * y)
  */
 static void _set_full_arc(vg_arc * fullarc)
 {
-    /* the tangent lenght for the bezier circle approx */
+    /* the tangent length for the bezier circle approx */
     float tang = ((float)fullarc->rad) * BEZIER_OPTIM_CIRCLE;
     switch(fullarc->quarter) {
         case 0:

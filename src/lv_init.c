@@ -178,9 +178,9 @@ void lv_init(void)
         LV_LOG_WARN("The strings have no UTF-8 encoding. Non-ASCII characters won't be displayed.");
     }
 
-    uint32_t endianess_test = 0x11223344;
-    uint8_t * endianess_test_p = (uint8_t *) &endianess_test;
-    bool big_endian = endianess_test_p[0] == 0x11;
+    uint32_t endianness_test = 0x11223344;
+    uint8_t * endianness_test_p = (uint8_t *) &endianness_test;
+    bool big_endian = endianness_test_p[0] == 0x11;
 
     if(big_endian) {
         LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 1,

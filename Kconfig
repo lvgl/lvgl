@@ -1152,10 +1152,6 @@ menu "LVGL configuration"
 			depends on LV_USE_IMGFONT
 			default n
 
-		config LV_USE_MSG
-			bool "Enable a published subscriber based messaging system"
-			default n
-
 		config LV_USE_IME_PINYIN
 			bool "Enable Pinyin input method"
 			default n
@@ -1330,6 +1326,10 @@ menu "LVGL configuration"
 
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
+			default n
+
+		config LV_USE_EVDEV
+			bool "Use evdev input driver"
 			default n
 	endmenu
 

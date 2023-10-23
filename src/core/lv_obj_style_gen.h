@@ -92,9 +92,15 @@ static inline lv_coord_t lv_obj_get_style_translate_y(const struct _lv_obj_t * o
     return (lv_coord_t)v.num;
 }
 
-static inline lv_coord_t lv_obj_get_style_transform_scale(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_transform_scale_x(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_SCALE);
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_SCALE_X);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_transform_scale_y(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_SCALE_Y);
     return (lv_coord_t)v.num;
 }
 
@@ -718,7 +724,8 @@ void lv_obj_set_style_transform_width(struct _lv_obj_t * obj, lv_coord_t value, 
 void lv_obj_set_style_transform_height(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_translate_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_translate_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
-void lv_obj_set_style_transform_scale(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_transform_scale_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_transform_scale_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transform_rotation(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transform_pivot_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transform_pivot_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);

@@ -114,12 +114,20 @@ void lv_obj_set_style_translate_y(struct _lv_obj_t * obj, lv_coord_t value, lv_s
     lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_Y, v, selector);
 }
 
-void lv_obj_set_style_transform_scale(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+void lv_obj_set_style_transform_scale_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_SCALE, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_SCALE_X, v, selector);
+}
+
+void lv_obj_set_style_transform_scale_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_SCALE_Y, v, selector);
 }
 
 void lv_obj_set_style_transform_rotation(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)

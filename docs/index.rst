@@ -19,6 +19,7 @@ Welcome to the documentation of LVGL!
     intro/index
     examples
     get-started/index
+    integration/index
     porting/index
     overview/index
     widgets/index

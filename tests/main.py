@@ -45,7 +45,7 @@ def options_abbrev(options_name):
     return options_name[len(prefix):].lower()
 
 
-def get_base_buid_dir(options_name):
+def get_base_build_dir(options_name):
     '''Given the build options name, return the build directory name.
 
     Does not return the full path to the directory - just the base name.'''
@@ -57,7 +57,7 @@ def get_build_dir(options_name):
 
     Returns absolute path to the build directory.'''
     global lvgl_test_dir
-    return os.path.join(lvgl_test_dir, get_base_buid_dir(options_name))
+    return os.path.join(lvgl_test_dir, get_base_build_dir(options_name))
 
 
 def build_tests(options_name, build_type, clean):

@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sw_tranform.c
+ * @file lv_draw_sw_transform.c
  *
  */
 
@@ -28,7 +28,8 @@ typedef struct {
     int32_t y_out;
     int32_t sinma;
     int32_t cosma;
-    int32_t zoom;
+    int32_t zoom_x;
+    int32_t zoom_y;
     int32_t angle;
     int32_t pivot_x_256;
     int32_t pivot_y_256;
@@ -49,14 +50,14 @@ typedef struct {
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout);
 
-static void tranform_rgb888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                            int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                            int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size);
+static void transform_rgb888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                             int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                             int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size);
 
 
-static void tranform_argb8888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                              int32_t x_end, uint8_t * dest_buf, bool aa);
+static void transform_argb8888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                               int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                               int32_t x_end, uint8_t * dest_buf, bool aa);
 
 static void transform_rgb565a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -87,7 +88,8 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
     point_transform_dsc_t tr_dsc;
     tr_dsc.angle = -draw_dsc->rotation;
-    tr_dsc.zoom = (256 * 256) / draw_dsc->zoom;
+    tr_dsc.zoom_x = (256 * 256) / draw_dsc->zoom_x;
+    tr_dsc.zoom_y = (256 * 256) / draw_dsc->zoom_y;
     tr_dsc.pivot = draw_dsc->pivot;
 
     int32_t angle_low = tr_dsc.angle / 10;
@@ -159,18 +161,19 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
         switch(src_cf) {
             case LV_COLOR_FORMAT_XRGB8888:
-                tranform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
-                                4);
+                transform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
+                                 4);
                 break;
             case LV_COLOR_FORMAT_RGB888:
-                tranform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
-                                3);
+                transform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
+                                 3);
                 break;
             case LV_COLOR_FORMAT_A8:
                 transform_a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
                 break;
             case LV_COLOR_FORMAT_ARGB8888:
-                tranform_argb8888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
+                transform_argb8888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
+                                   aa);
                 break;
             case LV_COLOR_FORMAT_RGB565:
                 transform_rgb565a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
@@ -194,9 +197,9 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
  *   STATIC FUNCTIONS
  **********************/
 
-static void tranform_rgb888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                            int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                            int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size)
+static void transform_rgb888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                             int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                             int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size)
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
@@ -295,9 +298,9 @@ static void tranform_rgb888(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
 
 #include "../../stdlib/lv_string.h"
 
-static void tranform_argb8888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                              int32_t x_end, uint8_t * dest_buf, bool aa)
+static void transform_argb8888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                               int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                               int32_t x_end, uint8_t * dest_buf, bool aa)
 {
     //    lv_memzero(dest_buf, x_end * 4);
     int32_t xs_ups_start = xs_ups;
@@ -581,7 +584,7 @@ static void transform_a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout)
 {
-    if(t->angle == 0 && t->zoom == LV_SCALE_NONE) {
+    if(t->angle == 0 && t->zoom_x == LV_SCALE_NONE && t->zoom_y == LV_SCALE_NONE) {
         *xout = xin * 256;
         *yout = yin * 256;
         return;
@@ -591,16 +594,16 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
     yin -= t->pivot.y;
 
     if(t->angle == 0) {
-        *xout = ((int32_t)(xin * t->zoom)) + (t->pivot_x_256);
-        *yout = ((int32_t)(yin * t->zoom)) + (t->pivot_y_256);
+        *xout = ((int32_t)(xin * t->zoom_x)) + (t->pivot_x_256);
+        *yout = ((int32_t)(yin * t->zoom_y)) + (t->pivot_y_256);
     }
-    else if(t->zoom == LV_SCALE_NONE) {
+    else if(t->zoom_x == LV_SCALE_NONE && t->zoom_y == LV_SCALE_NONE) {
         *xout = ((t->cosma * xin - t->sinma * yin) >> 2) + (t->pivot_x_256);
         *yout = ((t->sinma * xin + t->cosma * yin) >> 2) + (t->pivot_y_256);
     }
     else {
-        *xout = (((t->cosma * xin - t->sinma * yin) * t->zoom) >> 10) + (t->pivot_x_256);
-        *yout = (((t->sinma * xin + t->cosma * yin) * t->zoom) >> 10) + (t->pivot_y_256);
+        *xout = (((t->cosma * xin - t->sinma * yin) * t->zoom_x) >> 10) + (t->pivot_x_256);
+        *yout = (((t->sinma * xin + t->cosma * yin) * t->zoom_y) >> 10) + (t->pivot_y_256);
     }
 }
 

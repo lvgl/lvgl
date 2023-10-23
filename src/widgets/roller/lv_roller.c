@@ -823,17 +823,22 @@ static void set_y_anim(void * obj, int32_t v)
 static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
 {
     int16_t angle = 0;
-    int32_t zoom = 256;
+    int32_t zoom_x = 256;
+    int32_t zoom_y = 256;
     lv_obj_t * parent = roller;
     while(parent) {
         angle += lv_obj_get_style_transform_rotation(parent, 0);
-        int32_t zoom_act = lv_obj_get_style_transform_scale_safe(parent, 0);
-        zoom = (zoom * zoom_act) >> 8;
+        int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, 0);
+        int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, 0);
+        zoom_x = (zoom_y * zoom_act_x) >> 8;
+        zoom_y = (zoom_y * zoom_act_y) >> 8;
         parent = lv_obj_get_parent(parent);
     }
     lv_point_t pivot = { 0, 0 };
 
-    lv_point_transform(vect, -angle, 256 * 256 / zoom, &pivot);
+    zoom_x = 256 * 256 / zoom_x;
+    zoom_y = 256 * 256 / zoom_y;
+    lv_point_transform(vect, -angle, zoom_x, zoom_y, &pivot, false);
 }
 
 #endif

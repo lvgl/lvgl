@@ -7,7 +7,7 @@
 /* This function runs before each test */
 void setUp(void);
 
-void test_arc_creation_successfull(void);
+void test_arc_creation_successful(void);
 void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void);
 void test_arc_should_truncate_to_min_range_when_new_value_is_inferior(void);
 void test_arc_should_update_value_after_updating_range(void);
@@ -31,7 +31,7 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
-void test_arc_creation_successfull(void)
+void test_arc_creation_successful(void)
 {
     arc = lv_arc_create(active_screen);
 

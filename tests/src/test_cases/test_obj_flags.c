@@ -82,7 +82,7 @@ void test_obj_flag_overflow_visible_1(void)
     /*The left part of the right button (should trigger click event)*/
     lv_test_mouse_click_at(650, 220);
 
-    /*The outter part of the right button (should trigger click event as obj_child_2 has LV_OBJ_FLAG_OVERFLOW_VISIBLE)*/
+    /*The outer part of the right button (should trigger click event as obj_child_2 has LV_OBJ_FLAG_OVERFLOW_VISIBLE)*/
     lv_test_mouse_click_at(690, 220);
 
     TEST_ASSERT_EQUAL_UINT32(1, cnt_1);
@@ -130,7 +130,7 @@ void test_obj_flag_overflow_visible_1(void)
     /*The left part of the right button (should trigger click event)*/
     lv_test_mouse_click_at(590, 370);
 
-    /*The outter part of the right button (should trigger click event as obj_child_2 has LV_OBJ_FLAG_OVERFLOW_VISIBLE)*/
+    /*The outer part of the right button (should trigger click event as obj_child_2 has LV_OBJ_FLAG_OVERFLOW_VISIBLE)*/
     lv_test_mouse_click_at(600, 430);
 
     /*The clipped part of the right button (clipped because it's out of the red panel's ext draw size, shouldn't trigger click event)*/

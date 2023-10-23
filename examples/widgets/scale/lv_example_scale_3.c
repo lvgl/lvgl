@@ -16,7 +16,7 @@ void lv_example_scale_3(void)
 
     lv_scale_set_label_show(scale, true);
 
-    lv_scale_set_total_tick_count(scale, 11);
+    lv_scale_set_total_tick_count(scale, 31);
     lv_scale_set_major_tick_every(scale, 5);
 
     lv_scale_set_major_tick_length(scale, 10);
