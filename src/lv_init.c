@@ -31,6 +31,9 @@
 #if LV_USE_DRAW_PXP
     #include "draw/nxp/pxp/lv_draw_pxp.h"
 #endif
+#if LV_USE_DRAW_VG_LITE
+    #include "draw/vg_lite/lv_draw_vg_lite.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -163,6 +166,10 @@ void lv_init(void)
 #endif
 
     _lv_image_decoder_init();
+
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_init();
+#endif
 
     _lv_cache_init();
     _lv_cache_builtin_init();
@@ -322,6 +329,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VGLITE
     lv_draw_vglite_deinit();
+#endif
+
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_deinit();
 #endif
 
 #if LV_USE_DRAW_SW

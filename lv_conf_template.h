@@ -131,6 +131,9 @@
 /* Use NXP's PXP on iMX RTxxx platforms. */
 #define LV_USE_DRAW_PXP 0
 
+/* Use VG-Lite GPU. */
+#define LV_USE_DRAW_VG_LITE 0
+
 /*Enable Vector Graphic APIs*/
 #define LV_USE_VECTOR_GRAPHIC   0
 
