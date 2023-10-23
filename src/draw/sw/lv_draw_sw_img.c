@@ -343,8 +343,9 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             else if(draw_dsc->recolor_opa >= LV_OPA_MIN) {
                 lv_coord_t h = lv_area_get_height(&relative_area);
                 if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
-                    const uint8_t * rgb_src_buf = src_buf + blend_dsc.src_stride * relative_area.y1 + relative_area.x1 * 2;
-                    const uint8_t * a_src_buf = src_buf + blend_dsc.src_stride * src_h + blend_dsc.src_stride / 2 * relative_area.y1 +
+                    uint32_t stride_px = img_stride / 2;
+                    const uint8_t * rgb_src_buf = src_buf + stride_px * 2 * relative_area.y1 + relative_area.x1 * 2;
+                    const uint8_t * a_src_buf = src_buf + stride_px * 2 * src_h + stride_px * relative_area.y1 +
                                                 relative_area.x1;
                     uint8_t * rgb_dest_buf = tmp_buf_aligned;
                     uint8_t * a_dest_buf = (uint8_t *)blend_dsc.mask_buf;
@@ -352,20 +353,20 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                     for(i = 0; i < h; i++) {
                         lv_memcpy(rgb_dest_buf, rgb_src_buf, blend_w * 2);
                         lv_memcpy(a_dest_buf, a_src_buf, blend_w);
-                        rgb_src_buf += blend_dsc.src_stride;
-                        a_src_buf += blend_dsc.src_stride / 2;
+                        rgb_src_buf += stride_px * 2;
+                        a_src_buf += stride_px;
                         rgb_dest_buf +=  blend_w * 2;
                         a_dest_buf += blend_w;
                     }
                 }
                 else if(cf_final != LV_COLOR_FORMAT_A8) {
-                    const uint8_t * src_buf_tmp = src_buf + blend_dsc.src_stride * relative_area.y1 + relative_area.x1 * px_size;
+                    const uint8_t * src_buf_tmp = src_buf + img_stride * relative_area.y1 + relative_area.x1 * px_size;
                     uint8_t * dest_buf_tmp = tmp_buf_aligned;
                     lv_coord_t i;
                     for(i = 0; i < h; i++) {
                         lv_memcpy(dest_buf_tmp, src_buf_tmp, blend_w * px_size);
                         dest_buf_tmp += blend_w * px_size;
-                        src_buf_tmp += blend_dsc.src_stride;
+                        src_buf_tmp += img_stride;
                     }
                 }
             }
