@@ -9,5 +9,3 @@ cwd  = GetCurrentDir()
 objs = objs + SConscript(cwd + '/env_support/rt-thread/SConscript')
 
 Return('objs')
-
-print('Zaga_krut')
