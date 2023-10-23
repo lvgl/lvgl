@@ -65,9 +65,10 @@ typedef struct {
     drmModePropertyPtr plane_props[128];
     drmModePropertyPtr crtc_props[128];
     drmModePropertyPtr conn_props[128];
-    drm_buffer_t drm_bufs[2]; /* DUMB buffers */
-    uint8_t active_drm_buf_idx; /* double buffering handling */
-    bool inactive_drm_buf_dirty;
+    drm_buffer_t drm_bufs[2]; /*DUMB buffers*/
+    uint8_t active_drm_buf_idx; /*Double buffering handling*/
+    uint8_t * intermediate_buffer;
+    unsigned long int intermediate_buffer_size;
 } drm_dev_t;
 
 /**********************
@@ -155,10 +156,8 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
     lv_coord_t ver_res = drm_dev->height;
     lv_coord_t width = drm_dev->mmWidth;
 
-    uint32_t draw_buf_size = hor_res * ver_res / 4; /*1/4 screen sized buffer has the same performance */
-    lv_color_t * draw_buf = malloc(draw_buf_size * sizeof(lv_color_t));
-    LV_ASSERT_MALLOC(draw_buf);
-    lv_display_set_draw_buffers(disp, draw_buf, NULL, draw_buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_draw_buffers(disp, drm_dev->intermediate_buffer, NULL, drm_dev->intermediate_buffer_size,
+                                LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, hor_res, ver_res);
 
     if(width) {
@@ -734,9 +733,7 @@ static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     buf->handle = creq.handle;
     buf->pitch = creq.pitch;
-    LV_LOG_TRACE("pitch %d", buf->pitch);
     buf->size = creq.size;
-    LV_LOG_TRACE("size %d", buf->size);
 
     /* prepare buffer for memory mapping */
     lv_memzero(&mreq, sizeof(mreq));
@@ -748,6 +745,7 @@ static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
     }
 
     buf->offset = mreq.offset;
+    LV_LOG_INFO("size %lu pitch %u offset %u", buf->size, buf->pitch, buf->offset);
 
     /* perform actual memory mapping */
     buf->map = mmap(0, creq.size, PROT_READ | PROT_WRITE, MAP_SHARED, drm_dev->fd, mreq.offset);
@@ -777,7 +775,7 @@ static int drm_setup_buffers(drm_dev_t * drm_dev)
 {
     int ret;
 
-    /* Allocate DUMB buffers */
+    /*Allocate DUMB buffers*/
     ret = drm_allocate_dumb(drm_dev, &drm_dev->drm_bufs[0]);
     if(ret)
         return ret;
@@ -785,6 +783,14 @@ static int drm_setup_buffers(drm_dev_t * drm_dev)
     ret = drm_allocate_dumb(drm_dev, &drm_dev->drm_bufs[1]);
     if(ret)
         return ret;
+
+    /*Allocate third buffer that flushes go into*/
+    drm_dev->intermediate_buffer_size = drm_dev->width * drm_dev->height * (LV_COLOR_DEPTH / 8);
+    LV_ASSERT(drm_dev->intermediate_buffer_size <= drm_dev->drm_bufs[0].size);
+    LV_ASSERT(drm_dev->intermediate_buffer_size <= drm_dev->drm_bufs[1].size);
+    drm_dev->intermediate_buffer = malloc(drm_dev->intermediate_buffer_size);
+    LV_ASSERT_MALLOC(drm_dev->intermediate_buffer);
+    lv_memzero(drm_dev->intermediate_buffer, drm_dev->intermediate_buffer_size);
 
     return 0;
 }
@@ -811,32 +817,21 @@ static void drm_wait_vsync(drm_dev_t * drm_dev)
 
 static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
-    drm_buffer_t * fbuf = &drm_dev->drm_bufs[!drm_dev->active_drm_buf_idx];
-    uint32_t w = (area->x2 - area->x1 + 1);
-    uint32_t h = (area->y2 - area->y1 + 1);
-    int i, y;
+    LV_UNUSED(area);
+    LV_UNUSED(px_map);
 
-    LV_LOG_TRACE("x %d:%d y %d:%d w %d h %d", area->x1, area->x2, area->y1, area->y2, w, h);
-
-    /*Wait for last requested buffer swap to complete*/
-    if(drm_dev->req)
-        drm_wait_vsync(drm_dev);
-
-    /*Prepare background buffer for partial update*/
-    if(drm_dev->inactive_drm_buf_dirty && (area->x1 != 0 || area->y1 != 0 || w != drm_dev->width || h != drm_dev->height))
-        lv_memcpy(fbuf->map, drm_dev->drm_bufs[drm_dev->active_drm_buf_idx].map, fbuf->size);
-    drm_dev->inactive_drm_buf_dirty = false;
-
-    /*Flush to background buffer*/
-    for(y = 0, i = area->y1 ; i <= area->y2 ; ++i, ++y) {
-        lv_memcpy(fbuf->map + (area->x1 * (LV_COLOR_DEPTH / 8)) + (fbuf->pitch * i),
-                  px_map + (w * (LV_COLOR_DEPTH / 8) * y),
-                  w * (LV_COLOR_DEPTH / 8));
-    }
-
-    /*Request buffer swap*/
     if(lv_display_flush_is_last(disp)) {
+        drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
+
+        /*Wait for last requested buffer swap to complete*/
+        if(drm_dev->req)
+            drm_wait_vsync(drm_dev);
+
+        /*Update background buffer from intermediate buffer*/
+        drm_buffer_t * fbuf = &drm_dev->drm_bufs[drm_dev->active_drm_buf_idx ^ 1];
+        lv_memcpy(fbuf->map, drm_dev->intermediate_buffer, drm_dev->intermediate_buffer_size);
+
+        /*Request buffer swap*/
         if(drm_dmabuf_set_plane(drm_dev, fbuf)) {
             LV_LOG_ERROR("Flush fail");
             return;
@@ -844,8 +839,7 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
         else
             LV_LOG_TRACE("Flush done");
 
-        drm_dev->active_drm_buf_idx = !drm_dev->active_drm_buf_idx;
-        drm_dev->inactive_drm_buf_dirty = true;
+        drm_dev->active_drm_buf_idx ^= 1;
     }
 
     lv_display_flush_ready(disp);

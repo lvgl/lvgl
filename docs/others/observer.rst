@@ -318,6 +318,3 @@ Example
 
 API
 ***
-
-
-

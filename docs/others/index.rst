@@ -10,7 +10,6 @@ Others
     gridnav
     file_explorer
     fragment
-    msg
     observer
     imgfont
     ime_pinyin
