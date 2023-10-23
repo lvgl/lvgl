@@ -592,9 +592,9 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             part_draw_dsc.type = LV_METER_DRAW_PART_NEEDLE_LINE;
             part_draw_dsc.line_dsc = &line_dsc;
             part_draw_dsc.p2 = &p_end;
-
+            part_draw_dsc.p1 = &scale_center;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-            lv_draw_line(draw_ctx, &line_dsc, &scale_center, &p_end);
+            lv_draw_line(draw_ctx, &line_dsc, part_draw_dsc.p1, &p_end);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
         else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
