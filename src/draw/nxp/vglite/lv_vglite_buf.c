@@ -69,10 +69,10 @@ void vglite_set_src_buf_ptr(const void * buf)
     _set_vgbuf_ptr(&_src_vgbuf, (void *)buf);
 }
 
-void vglite_set_dest_buf(const lv_draw_buf_t * draw_buf)
+void vglite_set_dest_buf(const void * buf, lv_coord_t width, lv_coord_t height, uint32_t stride,
+                         lv_color_format_t cf)
 {
-    vglite_set_buf(&_dest_vgbuf, draw_buf->buf, draw_buf->width, draw_buf->height,
-                   lv_draw_buf_get_stride(draw_buf), draw_buf->color_format);
+    vglite_set_buf(&_dest_vgbuf, (void *)buf, width, height, stride, cf);
 }
 
 void vglite_set_src_buf(const void * buf, int32_t width, int32_t height, uint32_t stride,

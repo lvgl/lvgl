@@ -36,13 +36,11 @@
 
 static void * _buf_malloc(size_t size_bytes, lv_color_format_t cf);
 
-static void * _align_buf(void * buf, lv_color_format_t cf);
+static void * _buf_align(void * buf, lv_color_format_t cf);
 
-static void _invalidate_cache(void * buf, size_t size);
+static void _invalidate_cache(void * buf, uint32_t stride, lv_color_format_t cf, const lv_area_t * area);
 
 static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf);
-
-static void * _go_to_xy(lv_draw_buf_t * draw_buf, int32_t x, int32_t y);
 
 /**********************
  *  STATIC VARIABLES
@@ -61,7 +59,7 @@ void lv_draw_buf_vglite_init_handlers(void)
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
 
     handlers->buf_malloc_cb = _buf_malloc;
-    handlers->align_pointer_cb = _align_buf;
+    handlers->align_pointer_cb = _buf_align;
     handlers->invalidate_cache_cb = _invalidate_cache;
     handlers->width_to_stride_cb = _width_to_stride;
 }
@@ -80,7 +78,7 @@ static void * _buf_malloc(size_t size_bytes, lv_color_format_t cf)
     return lv_malloc(size_bytes);
 }
 
-static void * _align_buf(void * buf, lv_color_format_t cf)
+static void * _buf_align(void * buf, lv_color_format_t cf)
 {
     uint8_t align_bytes = vglite_get_alignment(cf);
 
@@ -93,9 +91,49 @@ static void * _align_buf(void * buf, lv_color_format_t cf)
     return buf_u8;
 }
 
-static void _invalidate_cache(void * buf, size_t size)
+static void _invalidate_cache(void * buf, uint32_t stride, lv_color_format_t cf, const lv_area_t * area)
 {
-    DEMO_CleanInvalidateCacheByAddr(buf, size);
+    if(area->y1 == 0) {
+        uint16_t size = stride * lv_area_get_height(area);
+
+        /* Invalidate full buffer. */
+        DEMO_CleanInvalidateCacheByAddr((void *)buf, size);
+        return;
+    }
+
+    const uint8_t * buf_u8 = buf;
+    /* ARM require a 32 byte aligned address. */
+    uint8_t align_bytes = 32;
+    uint8_t bits_per_pixel = vglite_get_px_size(cf);
+
+    uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
+    uint16_t offset_x = 0;
+
+    if(area->x1 >= (lv_coord_t)(area->x1 % align_pixels)) {
+        uint16_t shift_x = area->x1 - (area->x1 % align_pixels);
+
+        offset_x = area->x1 - shift_x;
+        buf_u8 += (shift_x * bits_per_pixel) / 8;
+    }
+
+    if(area->y1) {
+        uint16_t shift_y = area->y1;
+
+        buf_u8 += shift_y * stride;
+    }
+
+    /* Area to clear can start from a different offset in buffer.
+     * Invalidate the area line by line.
+     */
+    uint16_t line_pixels = offset_x + lv_area_get_width(area);
+    uint16_t line_size = (line_pixels * bits_per_pixel) / 8;
+    uint16_t area_height = lv_area_get_height(area);
+
+    for(uint16_t y = 0; y < area_height; y++) {
+        const void * line_addr = buf_u8 + y * stride;
+
+        DEMO_CleanInvalidateCacheByAddr((void *)line_addr, line_size);
+    }
 }
 
 static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)
@@ -107,68 +145,5 @@ static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)
 
     return (width_bytes + align_bytes - 1) & ~(align_bytes - 1);
 }
-
-/**
- * @todo
- * LVGL needs to use hardware acceleration for buf_copy and do not affect GPU rendering.
- */
-#if 0
-
-static void _vglite_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * area)
-{
-    /* Set vgbuf structure. */
-    vg_lite_buffer_t vgbuf;
-    vglite_set_buf(&vgbuf, draw_buf->buf, draw_buf->width, draw_buf->height, lv_draw_buf_get_stride(draw_buf),
-                   draw_buf->color_format);
-
-    vg_lite_rectangle_t rect = {
-        .x = area->x1,
-        .y = area->y1,
-        .width = lv_area_get_width(area),
-        .height = lv_area_get_height(area)
-    };
-
-    vg_lite_error_t err = vg_lite_clear(&vgbuf, &rect, 0x0U);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear failed.");
-
-    vglite_run();
-}
-
-static void _vglite_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
-                             void * src_buf, uint32_t src_stride, const lv_area_t * src_area,
-                             lv_color_format_t cf)
-{
-    /* Set src_vgbuf structure. */
-    vg_lite_buffer_t src_vgbuf;
-    vglite_set_buf(&src_vgbuf, src_buf, lv_area_get_width(src_area), lv_area_get_height(src_area), src_stride, cf);
-
-    /* Set dest_vgbuf structure. */
-    vg_lite_buffer_t dest_vgbuf;
-    vglite_set_buf(&dest_vgbuf, dest_buf, lv_area_get_width(dest_area), lv_area_get_height(dest_area), dest_stride, cf);
-
-    uint32_t rect[] = {
-        (uint32_t)src_area->x1, /* start x */
-        (uint32_t)src_area->y1, /* start y */
-        (uint32_t)lv_area_get_width(src_area), /* width */
-        (uint32_t)lv_area_get_height(src_area) /* height */
-    };
-
-    /* Set scissor. */
-    vglite_set_scissor(dest_area);
-
-    /* Set vgmatrix. */
-    vglite_set_translation_matrix(dest_area);
-    vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
-
-    vg_lite_error_t err = vg_lite_blit_rect(&dest_vgbuf, &src_vgbuf, rect, vgmatrix,
-                                            VG_LITE_BLEND_NONE, 0xFFFFFFFFU, VG_LITE_FILTER_POINT);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Blit rectangle failed.");
-
-    vglite_run();
-
-    /* Disable scissor. */
-    vglite_disable_scissor();
-}
-#endif
 
 #endif /*LV_USE_DRAW_VGLITE*/

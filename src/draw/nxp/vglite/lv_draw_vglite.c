@@ -182,9 +182,8 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_LAYER: {
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
-                lv_draw_buf_t * draw_buf = &layer_to_draw->draw_buf;
 
-                if(!_vglite_cf_supported(draw_buf->color_format))
+                if(!_vglite_cf_supported(layer_to_draw->color_format))
                     return 0;
 
                 if(t->preference_score > 80) {
@@ -235,7 +234,7 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
      *
      * FIXME: Source format and destination format support is different!
      */
-    if(!_vglite_cf_supported(layer->draw_buf.color_format))
+    if(!_vglite_cf_supported(layer->color_format))
         return 0;
 
     /* Try to get an ready to draw. */
@@ -277,10 +276,10 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 
     /* Set target buffer */
     lv_layer_t * layer = draw_unit->target_layer;
-    vglite_set_dest_buf(&layer->draw_buf);
+    vglite_set_dest_buf(layer->buf, lv_area_get_width(&layer->buf_area), lv_area_get_height(&layer->buf_area),
+                        layer->buf_stride, layer->color_format);
 
-    clean_invalidate_dcache(layer->draw_buf.buf, &t->area, lv_draw_buf_get_stride(&layer->draw_buf),
-                            layer->draw_buf.color_format);
+    lv_draw_buf_invalidate_cache(layer->buf, layer->buf_stride, layer->color_format, &t->area);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:

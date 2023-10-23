@@ -100,7 +100,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
             lv_area_t blend_area;
             if(!_lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
                 return;
-            lv_area_move(&blend_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
+            lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
             const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
             const uint8_t * mask_buf = draw_buf->data;
@@ -126,7 +126,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                 /* Set vgmatrix. */
                 vglite_set_translation_matrix(&blend_area);
 
-                clean_invalidate_dcache(mask_buf, &mask_area, mask_stride, LV_COLOR_FORMAT_A8);
+                lv_draw_buf_invalidate_cache((void *)mask_buf, mask_stride, LV_COLOR_FORMAT_A8, &mask_area);
 
                 _vglite_draw_letter(&mask_area, glyph_draw_dsc->color, glyph_draw_dsc->opa);
             }

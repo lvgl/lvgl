@@ -74,10 +74,10 @@ void lv_draw_vglite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * 
     if(!_lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_unit->clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
+    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    lv_point_t rel_point1 = {dsc->p1.x - layer->draw_buf_ofs.x, dsc->p1.y - layer->draw_buf_ofs.y};
-    lv_point_t rel_point2 = {dsc->p2.x - layer->draw_buf_ofs.x, dsc->p2.y - layer->draw_buf_ofs.y};
+    lv_point_t rel_point1 = {dsc->p1.x - layer->buf_area.x1, dsc->p1.y - layer->buf_area.y1};
+    lv_point_t rel_point2 = {dsc->p2.x - layer->buf_area.x1, dsc->p2.y - layer->buf_area.y1};
 
     _vglite_draw_line(&rel_point1, &rel_point2, &rel_clip_area, dsc);
 }
