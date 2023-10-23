@@ -89,7 +89,7 @@ static const demo_entry_info_t demos_entry_info[] = {
     { "scroll", .entry_cb = lv_demo_scroll },
 #endif
 
-#if LV_USE_DEMO_VECTOR_GRAPHIC
+#if LV_USE_DEMO_VECTOR_GRAPHIC && LV_USE_THORVG
     { "vector_graphic", .entry_cb = lv_demo_vector_graphic },
 #endif
 

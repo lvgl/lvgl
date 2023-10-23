@@ -8,7 +8,7 @@
  *********************/
 #include "lv_demo_vector_graphic.h"
 
-#if LV_USE_DEMO_VECTOR_GRAPHIC
+#if LV_USE_DEMO_VECTOR_GRAPHIC && LV_USE_THORVG
 
 /*********************
  *      DEFINES

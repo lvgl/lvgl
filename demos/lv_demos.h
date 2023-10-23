@@ -51,7 +51,7 @@ extern "C" {
 #include "multilang/lv_demo_multilang.h"
 #endif
 
-#if LV_USE_DEMO_VECTOR_GRAPHIC
+#if LV_USE_DEMO_VECTOR_GRAPHIC && LV_USE_THORVG
 #include "vector_graphic/lv_demo_vector_graphic.h"
 #endif
 
