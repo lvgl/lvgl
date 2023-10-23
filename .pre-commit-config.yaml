@@ -4,7 +4,7 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
     hooks:
-    -   id: trailing-whitespace
+    - id: trailing-whitespace
 
 -   repo: local
     hooks:
@@ -30,10 +30,8 @@ repos:
             src/lv_conf_internal.h
          )
       types_or: ["c", "header"]
-
-repos:
 -   repo: https://github.com/crate-ci/typos
     rev: v1.16.20
     hooks:
-      - id: typos
-        pass_filenames: false
+    - id: typos
+      pass_filenames: false
