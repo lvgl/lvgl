@@ -63,6 +63,12 @@ install(
   FILES_MATCHING
   PATTERN "*.h")
 
+install(
+  FILES "${LV_CONF_PATH}"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/../"
+  RENAME "lv_conf.h"
+  OPTIONAL)
+
 set_target_properties(
   lvgl
   PROPERTIES OUTPUT_NAME lvgl
