@@ -72,11 +72,12 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 #if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG
     lv_area_t area_rot;
     lv_area_copy(&area_rot, coords);
-    if(draw_dsc->rotation || draw_dsc->zoom != LV_SCALE_NONE) {
+    if(draw_dsc->rotation || draw_dsc->zoom_x != LV_SCALE_NONE || draw_dsc->zoom_y != LV_SCALE_NONE) {
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
 
-        _lv_image_buf_get_transformed_area(&area_rot, w, h, draw_dsc->rotation, draw_dsc->zoom, &draw_dsc->pivot);
+        _lv_image_buf_get_transformed_area(&area_rot, w, h, draw_dsc->rotation, draw_dsc->zoom_x, draw_dsc->zoom_y,
+                                           &draw_dsc->pivot);
 
         area_rot.x1 += coords->x1;
         area_rot.y1 += coords->y1;
