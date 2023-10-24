@@ -160,7 +160,7 @@ void lv_matrix_scale(lv_matrix_t * matrix, float scale_x, float scale_y)
 
 void lv_matrix_rotate(lv_matrix_t * matrix, float degree)
 {
-    float radian = degree / 180.0f * M_PI;
+    float radian = degree / 180.0f * (float)M_PI;
     float cos_r = cosf(radian);
     float sin_r = sinf(radian);
 
@@ -176,8 +176,8 @@ void lv_matrix_rotate(lv_matrix_t * matrix, float degree)
 
 void lv_matrix_skew(lv_matrix_t * matrix, float skew_x, float skew_y)
 {
-    float rskew_x = skew_x / 180.0f * M_PI;
-    float rskew_y = skew_y / 180.0f * M_PI;
+    float rskew_x = skew_x / 180.0f * (float)M_PI;
+    float rskew_y = skew_y / 180.0f * (float)M_PI;
     float tan_x = tanf(rskew_x);
     float tan_y = tanf(rskew_y);
 
@@ -300,14 +300,14 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
 {
     float x = rect->x1;
     float y = rect->y1;
-    float w = rect->x2 - rect->x1;
-    float h = rect->y2 - rect->y1;
+    float w = (float)lv_area_get_width(rect);
+    float h = (float)lv_area_get_height(rect);
 
     float hw = w * 0.5f;
     float hh = h * 0.5f;
 
-    if(rx > hw) rx = hw;
-    if(ry > hh) ry = hh;
+    if(rx > hw) rx = (lv_coord_t)hw;
+    if(ry > hh) ry = (lv_coord_t)hh;
 
     if(rx == 0 && ry == 0) {
         lv_fpoint_t pt = {x, y};

@@ -49,8 +49,8 @@ static void _lv_area_to_tvg(_tvg_rect * rect, const lv_area_t * area)
 {
     rect->x = area->x1;
     rect->y = area->y1;
-    rect->w = area->x2 - area->x1;
-    rect->h = area->y2 - area->y1;
+    rect->w = lv_area_get_width(area);
+    rect->h = lv_area_get_height(area);
 }
 
 static void _lv_color_to_tvg(_tvg_color * color, const lv_color32_t * c, lv_opa_t opa)
@@ -417,12 +417,14 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
         return;
 
     lv_layer_t * layer = dsc->base.layer;
-    if(layer->draw_buf.buf == NULL)
+    if(layer->buf == NULL)
         return;
 
-    lv_draw_buf_t * buf = &layer->draw_buf;
+    void * buf = layer->buf;
+    int32_t width = lv_area_get_width(&layer->buf_area);
+    int32_t height = lv_area_get_height(&layer->buf_area);
     Tvg_Canvas * canvas = tvg_swcanvas_create();
-    tvg_swcanvas_set_target(canvas, buf->buf, buf->width, buf->width, buf->height, TVG_COLORSPACE_ARGB8888);
+    tvg_swcanvas_set_target(canvas, buf, width, width, height, TVG_COLORSPACE_ARGB8888);
 
     lv_ll_t * task_list = dsc->task_list;
     _lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, canvas);
