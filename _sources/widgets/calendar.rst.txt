@@ -115,7 +115,7 @@ API
 
 :ref:`lv_calendar_header_arrow`
 
-:ref:`lv_calendar_header_dropdown`
-
 :ref:`lv_calendar`
+
+:ref:`lv_calendar_header_dropdown`
 
