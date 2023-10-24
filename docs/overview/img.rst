@@ -358,9 +358,9 @@ Considering that some hardware has special requirements for image formats,
 such as alpha premultiplication and stride alignment, most image decoders (such as PNG decoders) 
 may not directly output image data that meets hardware requirements. 
 
-Therefore, LVGL provides a method for post-processing images. 
-You can register a post-processing callback function by calling ``lv_image_decoder_set_post_process_cb``. 
-Then, you can use ``lv_image_decoder_post_process`` to post-process the image in the GPU draw unit. 
+For this reason, LVGL provides a solution for image post-processing. 
+First, call a custom post-processing function after ``lv_image_decoder_open`` to adjust the data in the image cache, 
+and then mark the processing status in ``cache_entry->process_state`` (to avoid repeated post-processing).
 
 See the detailed code below:
 
@@ -368,79 +368,86 @@ See the detailed code below:
 
 .. code:: c
 
-  static lv_result_t my_image_post_process(lv_image_decoder_dsc_t * dsc, void * user_data)
-  {
-    lv_color_format_t color_format = dsc->header.cf;
-    lv_result_t res = LV_RESULT_OK;
+   /* Define post-processing state */
+   typedef enum {
+     IMAGE_PROCESS_STATE_NONE = 0,
+     IMAGE_PROCESS_STATE_STRIDE_ALIGNED = 1 << 0,
+     IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA = 1 << 1,
+   } image_process_state_t;
 
-    if(color_format == LV_COLOR_FORMAT_ARGB8888) {
-      lv_cache_lock();
-      lv_cache_entry_t * entry = dsc->cache_entry;
+   lv_result_t my_image_post_process(lv_image_decoder_dsc_t * dsc)
+   {
+     lv_color_format_t color_format = dsc->header.cf;
+     lv_result_t res = LV_RESULT_OK;
 
-      if(!(entry->process_state & LV_IMAGE_DECODER_PROCESS_STATE_PREMULTIPLIED_ALPHA)) {
-        lv_color32_t * image = (lv_color32_t *)dsc->img_data;
-        uint32_t px_cnt = dsc->header.w * dsc->header.h;
+     if(color_format == LV_COLOR_FORMAT_ARGB8888) {
+       lv_cache_lock();
+       lv_cache_entry_t * entry = dsc->cache_entry;
 
-        /* premultiply alpha */
-        while(px_cnt--) {
-          image->red = LV_UDIV255(image->red * image->alpha);
-          image->green = LV_UDIV255(image->green * image->alpha);
-          image->blue = LV_UDIV255(image->blue * image->alpha);
-          image++;
-        }
+       if(!(entry->process_state & IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA)) {
+         lv_color32_t * image = (lv_color32_t *)dsc->img_data;
+         uint32_t px_cnt = dsc->header.w * dsc->header.h;
 
-        LV_LOG_USER("premultiplied alpha OK");
+         /* premultiply alpha */
+         while(px_cnt--) {
+           image->red = LV_UDIV255(image->red * image->alpha);
+           image->green = LV_UDIV255(image->green * image->alpha);
+           image->blue = LV_UDIV255(image->blue * image->alpha);
+           image++;
+         }
 
-        entry->process_state |= LV_IMAGE_DECODER_PROCESS_STATE_PREMULTIPLIED_ALPHA;
-      }
+         LV_LOG_USER("premultiplied alpha OK");
 
-      if(!(entry->process_state & LV_IMAGE_DECODER_PROCESS_STATE_STRIDE_ALIGNED)) {
-        lv_coord_t image_w = dsc->header.w;
-        lv_coord_t image_h = dsc->header.h;
-        uint32_t width_byte = image_w * lv_color_format_get_size(color_format);
-        uint32_t stride = lv_draw_buf_width_to_stride(image_w, color_format);
+         entry->process_state |= IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA;
+       }
 
-        /* Check stride alignment requirements */
-        if(stride != width_byte) {
-          LV_LOG_USER("need to realign stride: %" LV_PRIu32 " -> %" LV_PRIu32, width_byte, stride);
+       if(!(entry->process_state & IMAGE_PROCESS_STATE_STRIDE_ALIGNED)) {
+         lv_coord_t image_w = dsc->header.w;
+         lv_coord_t image_h = dsc->header.h;
+         uint32_t width_byte = image_w * lv_color_format_get_size(color_format);
+         uint32_t stride = lv_draw_buf_width_to_stride(image_w, color_format);
 
-          const uint8_t * ori_image = lv_cache_get_data(entry);
-          size_t size_bytes = stride * dsc->header.h;
-          uint8_t * new_image = lv_draw_buf_malloc(size_bytes, color_format);
-          if(!new_image) {
-            LV_LOG_ERROR("alloc failed");
-            res = LV_RESULT_INVALID;
-            goto alloc_failed;
-          }
+         /* Check stride alignment requirements */
+         if(stride != width_byte) {
+           LV_LOG_USER("need to realign stride: %" LV_PRIu32 " -> %" LV_PRIu32, width_byte, stride);
 
-          /* Replace the image data pointer */
-          entry->data = new_image;
-          dsc->img_data = new_image;
+           const uint8_t * ori_image = lv_cache_get_data(entry);
+           size_t size_bytes = stride * dsc->header.h;
+           uint8_t * new_image = lv_draw_buf_malloc(size_bytes, color_format);
+           if(!new_image) {
+             LV_LOG_ERROR("alloc failed");
+             res = LV_RESULT_INVALID;
+             goto alloc_failed;
+           }
 
-          /* Copy image data */
-          const uint8_t * cur = ori_image;
-          for(lv_coord_t y = 0; y < image_h; y++) {
-            lv_memcpy(new_image, cur, width_byte);
-            new_image += stride;
-            cur += width_byte;
-          }
+           /* Replace the image data pointer */
+           entry->data = new_image;
+           dsc->img_data = new_image;
 
-          /* free memory for old image */
-          lv_draw_buf_free((void *)ori_image);
-        }
-        else {
-          LV_LOG_USER("no need to realign stride: %" LV_PRIu32, stride);
-        }
+           /* Copy image data */
+           const uint8_t * cur = ori_image;
+           for(lv_coord_t y = 0; y < image_h; y++) {
+             lv_memcpy(new_image, cur, width_byte);
+             new_image += stride;
+             cur += width_byte;
+           }
 
-        entry->process_state |= LV_IMAGE_DECODER_PROCESS_STATE_STRIDE_ALIGNED;
-      }
+           /* free memory for old image */
+           lv_draw_buf_free((void *)ori_image);
+         }
+         else {
+           LV_LOG_USER("no need to realign stride: %" LV_PRIu32, stride);
+         }
 
-      lv_cache_unlock();
-    }
+         entry->process_state |= IMAGE_PROCESS_STATE_STRIDE_ALIGNED;
+       }
 
-  alloc_failed:
-    return res;
-  }
+   alloc_failed:
+       lv_cache_unlock();
+     }
+
+     return res;
+   }
 
 - GPU draw unit example:
 
@@ -456,7 +463,7 @@ See the detailed code below:
       return;
     }
 
-    res = lv_image_decoder_post_process(&decoder_dsc);
+    res = my_image_post_process(&decoder_dsc);
     if(res != LV_RESULT_OK) {
       LV_LOG_ERROR("Failed to post-process image");
       return;

@@ -44,18 +44,6 @@ typedef _lv_image_src_t lv_image_src_t;
 typedef uint8_t lv_image_src_t;
 #endif /*DOXYGEN*/
 
-enum _lv_image_decoder_process_state_t {
-    LV_IMAGE_DECODER_PROCESS_STATE_NONE = 0,
-    LV_IMAGE_DECODER_PROCESS_STATE_STRIDE_ALIGNED = 1 << 0,
-    LV_IMAGE_DECODER_PROCESS_STATE_PREMULTIPLIED_ALPHA = 1 << 1,
-};
-
-#ifdef DOXYGEN
-typedef _lv_image_decoder_process_state_t lv_image_decoder_process_state_t;
-#else
-typedef uint32_t lv_image_decoder_process_state_t;
-#endif /*DOXYGEN*/
-
 /*Decoder function definitions*/
 struct _lv_image_decoder_dsc_t;
 struct _lv_image_decoder_t;
@@ -100,15 +88,6 @@ typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(struct _lv_image_decoder_t
  * @param dsc pointer to decoder descriptor
  */
 typedef void (*lv_image_decoder_close_f_t)(struct _lv_image_decoder_t * decoder, struct _lv_image_decoder_dsc_t * dsc);
-
-/**
- * Function pointer type for image decoder process function.
- * This function is used to decode and process an image.
- * @param dsc Pointer to an `_lv_image_decoder_dsc_t` struct containing information about the image to be decoded.
- * @param user_data Pointer to user-defined data that can be passed to the decoder function.
- * @return LV_RESULT_OK: ok; LV_RESULT_INVALID: failed
- */
-typedef lv_result_t (*lv_image_decoder_process_f_t)(struct _lv_image_decoder_dsc_t * dsc, void * user_data);
 
 typedef struct _lv_image_decoder_t {
     lv_image_decoder_info_f_t info_cb;
@@ -196,20 +175,6 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, lv_color_t color, int32_t frame_id);
-
-/**
- * Set a callback to post-process the image data after decoding.
- * @param process_cb a function to process the image data
- * @param user_data user data to pass to the callback
- */
-void lv_image_decoder_set_post_process_cb(lv_image_decoder_process_f_t process_cb, void * user_data);
-
-/**
- * Post-process the image data after decoding.
- * @param dsc pointer to `lv_image_decoder_dsc_t` used in `lv_image_decoder_open`
- * @return LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred
- */
-lv_result_t lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc);
 
 /**
  * Decode an area of the opened image

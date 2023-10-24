@@ -17,8 +17,6 @@
  *      DEFINES
  *********************/
 #define img_decoder_ll_p &(LV_GLOBAL_DEFAULT()->img_decoder_ll)
-#define post_process_cb (LV_GLOBAL_DEFAULT()->img_decoder_post_process.cb)
-#define post_process_user_data (LV_GLOBAL_DEFAULT()->img_decoder_post_process.user_data)
 
 /**********************
  *      TYPEDEFS
@@ -171,21 +169,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         lv_free((void *)dsc->src);
 
     return res;
-}
-
-void lv_image_decoder_set_post_process_cb(lv_image_decoder_process_f_t process_cb, void * user_data)
-{
-    post_process_cb = process_cb;
-    post_process_user_data = user_data;
-}
-
-lv_result_t lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc)
-{
-    if(!post_process_cb) {
-        return LV_RESULT_INVALID;
-    }
-
-    return post_process_cb(dsc, post_process_user_data);
 }
 
 /**
