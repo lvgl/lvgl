@@ -394,4 +394,13 @@ static void lv_timer_handler_resume(void)
 {
     /*If there is a timer which is ready to run then resume the timer loop*/
     state.timer_time_until_next = 0;
+    if(state.resume_cb) {
+        state.resume_cb(state.resume_data);
+    }
+}
+
+void lv_timer_handler_set_resume_cb(lv_timer_handler_resume_cb_t cb, void * data)
+{
+    state.resume_cb = cb;
+    state.resume_data = data;
 }
