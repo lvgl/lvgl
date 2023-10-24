@@ -46,57 +46,57 @@ static bool lv_text_is_arabic_vowel(uint16_t c);
 
 const ap_chars_map_t ap_chars_map[] = {
     /*{Key Offset, End, Beginning, Middle, Isolated, {conjunction}}*/
-    {1, 0xFE84, -1, 0, -1,  {1, 0}},    // أ
-    {2, 0xFE86, -1, 0, -1,  {1, 0}},    // ؤ
-    {3, 0xFE88, -1, 0, -1,  {1, 0}},    // ﺇ
-    {4, 0xFE8A, 1, 2, -1,  {1, 0}},    // ئ
-    {5, 0xFE8E, -1, 0, -1,  {1, 0}},    // آ
-    {6, 0xFE90, 1, 2, -1,  {1, 1}},    // ب
-    {92, 0xFB57, 1, 2, -1,  {1, 1}},   // پ
-    {8, 0xFE96, 1, 2, -1,  {1, 1}},    // ت
-    {9, 0xFE9A, 1, 2, -1,  {1, 1}},    // ث
-    {10, 0xFE9E, 1, 2, -1,  {1, 1}},   // ج
-    {100, 0xFB7B, 1, 2, -1,  {1, 1}},  // چ
-    {11, 0xFEA2, 1, 2, -1,  {1, 1}},   // ح
-    {12, 0xFEA6, 1, 2, -1,  {1, 1}},   // خ
-    {13, 0xFEAA, -1, 0, -1,  {1, 0}},   // د
-    {14, 0xFEAC, -1, 0, -1,  {1, 0}},   // ذ
-    {15, 0xFEAE, -1, 0, -1,  {1, 0}},   // ر
-    {16, 0xFEB0, -1, 0, -1,  {1, 0}},   // ز
-    {118, 0xFB8B, -1, 0, -1,  {1, 0}},  // ژ
-    {17, 0xFEB2, 1, 2, -1,  {1, 1}},   // س
-    {18, 0xFEB6, 1, 2, -1,  {1, 1}},   // ش
-    {19, 0xFEBA, 1, 2, -1,  {1, 1}},   // ص
-    {20, 0xFEBE, 1, 2, -1,  {1, 1}},   // ض
-    {21, 0xFEC2, 1, 2, -1,  {1, 1}},   // ط
-    {22, 0xFEC6, 1, 2, -1,  {1, 1}},   // ظ
-    {23, 0xFECA, 1, 2, -1,  {1, 1}},   // ع
-    {24, 0xFECE, 1, 2, -1,  {1, 1}},   // غ
-    {30, 0x0640, 0, 0, 0,  {1, 1}},   // - (mad, hyphen)
-    {31, 0xFED2, 1, 2, -1,  {1, 1}},   // ف
-    {32, 0xFED6, 1, 2, -1,  {1, 1}},   // ق
-    {135, 0xFB8F, 1, 2, -1,  {1, 1}},  // ک
-    {33, 0xFEDA, 1, 2, -1,  {1, 1}},  // ﻙ
-    {141, 0xFB93, 1, 2, -1,  {1, 1}},  // گ
-    {34, 0xFEDE, 1, 2, -1,  {1, 1}},   // ل
-    {35, 0xFEE2, 1, 2, -1,  {1, 1}},   // م
-    {36, 0xFEE6, 1, 2, -1,  {1, 1}},   // ن
-    {38, 0xFEEE, -1, 0, -1,  {1, 0}},   // و
-    {37, 0xFEEA, 1, 2, -1,  {1, 1}},   // ه
-    {39, 0xFEF0, 0, 0, -1, {1, 0}},   // ى
-    {40, 0xFEF2, 1, 2, -1,  {1, 1}},   // ي
-    {170, 0xFBFD, 1, 2, -1,  {1, 1}},   // ی
-    {7, 0xFE94, 1, 2, -1,  {1, 0}},   // ة
-    {206, 0x06F0, 1, 2, -1,  {0, 0}},  // ۰
-    {207, 0x06F1, 0, 0, 0,  {0, 0}},  // ۱
-    {208, 0x06F2, 0, 0, 0,  {0, 0}},  // ۲
-    {209, 0x06F3, 0, 0, 0,  {0, 0}},  // ۳
-    {210, 0x06F4, 0, 0, 0,  {0, 0}},  // ۴
-    {211, 0x06F5, 0, 0, 0,  {0, 0}},  // ۵
-    {212, 0x06F6, 0, 0, 0,  {0, 0}},  // ۶
-    {213, 0x06F7, 0, 0, 0,  {0, 0}},  // ۷
-    {214, 0x06F8, 0, 0, 0,  {0, 0}},  // ۸
-    {215, 0x06F9, 0, 0, 0,  {0, 0}},  // ۹
+    {1, 0xFE84, -1, 0, -1,  {1, 0}}, // U+0623 Arabic Letter Alef with Hamza Above
+    {2, 0xFE86, -1, 0, -1,  {1, 0}}, // U+0624 Arabic Letter Waw with Hamza Above
+    {3, 0xFE88, -1, 0, -1,  {1, 0}}, // U+FE87 Arabic Letter Alef with Hamza Below Isolated Form
+    {4, 0xFE8A, 1, 2, -1,  {1, 0}}, // U+0626 Arabic Letter Yeh with Hamza Above
+    {5, 0xFE8E, -1, 0, -1,  {1, 0}}, // U+0622 Arabic Letter Alef with Madda Above
+    {6, 0xFE90, 1, 2, -1,  {1, 1}}, // U+0628 Arabic Letter Beh
+    {92, 0xFB57, 1, 2, -1,  {1, 1}}, // U+067E Arabic Letter Peh
+    {8, 0xFE96, 1, 2, -1,  {1, 1}}, // U+062A Arabic Letter Teh
+    {9, 0xFE9A, 1, 2, -1,  {1, 1}}, // U+062B Arabic Letter Theh
+    {10, 0xFE9E, 1, 2, -1,  {1, 1}}, // U+062C Arabic Letter Jeem
+    {100, 0xFB7B, 1, 2, -1,  {1, 1}}, // U+0686 Arabic Letter Tcheh
+    {11, 0xFEA2, 1, 2, -1,  {1, 1}}, // U+062D Arabic Letter Hah
+    {12, 0xFEA6, 1, 2, -1,  {1, 1}}, // U+062E Arabic Letter Khah
+    {13, 0xFEAA, -1, 0, -1,  {1, 0}}, // U+062F Arabic Letter Dal
+    {14, 0xFEAC, -1, 0, -1,  {1, 0}}, // U+0630 Arabic Letter Thal
+    {15, 0xFEAE, -1, 0, -1,  {1, 0}}, // U+0631 Arabic Letter Reh
+    {16, 0xFEB0, -1, 0, -1,  {1, 0}}, // U+0632 Arabic Letter Zain
+    {118, 0xFB8B, -1, 0, -1,  {1, 0}}, // U+0698 Arabic Letter Jeh
+    {17, 0xFEB2, 1, 2, -1,  {1, 1}}, // U+0633 Arabic Letter Seen
+    {18, 0xFEB6, 1, 2, -1,  {1, 1}}, // U+0634 Arabic Letter Sheen
+    {19, 0xFEBA, 1, 2, -1,  {1, 1}}, // U+0635 Arabic Letter Sad
+    {20, 0xFEBE, 1, 2, -1,  {1, 1}}, // U+0636 Arabic Letter Dad
+    {21, 0xFEC2, 1, 2, -1,  {1, 1}}, // U+0637 Arabic Letter Tah
+    {22, 0xFEC6, 1, 2, -1,  {1, 1}}, // U+0638 Arabic Letter Zah
+    {23, 0xFECA, 1, 2, -1,  {1, 1}}, // U+0639 Arabic Letter Ain
+    {24, 0xFECE, 1, 2, -1,  {1, 1}}, // U+063A Arabic Letter Ghain
+    {30, 0x0640, 0, 0, 0,  {1, 1}}, // U+0640 Arabic Tatweel
+    {31, 0xFED2, 1, 2, -1,  {1, 1}}, // U+0641 Arabic Letter Feh
+    {32, 0xFED6, 1, 2, -1,  {1, 1}}, // U+0642 Arabic Letter Qaf
+    {135, 0xFB8F, 1, 2, -1,  {1, 1}}, // U+06A9 Arabic Letter Keheh
+    {33, 0xFEDA, 1, 2, -1,  {1, 1}}, // U+FED9 Arabic Letter Kaf Isolated Form
+    {141, 0xFB93, 1, 2, -1,  {1, 1}}, // U+06AF Arabic Letter Gaf
+    {34, 0xFEDE, 1, 2, -1,  {1, 1}}, // U+0644 Arabic Letter Lam
+    {35, 0xFEE2, 1, 2, -1,  {1, 1}}, // U+0645 Arabic Letter Meem
+    {36, 0xFEE6, 1, 2, -1,  {1, 1}}, // U+0646 Arabic Letter Noon
+    {38, 0xFEEE, -1, 0, -1,  {1, 0}}, // U+0648 Arabic Letter Waw
+    {37, 0xFEEA, 1, 2, -1,  {1, 1}}, // U+0647 Arabic Letter Heh
+    {39, 0xFEF0, 0, 0, -1, {1, 0}}, // U+0649 Arabic Letter Alef Maksura
+    {40, 0xFEF2, 1, 2, -1,  {1, 1}}, // U+064A Arabic Letter Yeh
+    {170, 0xFBFD, 1, 2, -1,  {1, 1}}, // U+06CC Arabic Letter Farsi Yeh
+    {7, 0xFE94, 1, 2, -1,  {1, 0}}, // U+0629 Arabic Letter Teh Marbuta
+    {206, 0x06F0, 1, 2, -1,  {0, 0}}, // U+06F0 Extended Arabic-Indic Digit Zero
+    {207, 0x06F1, 0, 0, 0,  {0, 0}}, // U+06F1 Extended Arabic-Indic Digit One
+    {208, 0x06F2, 0, 0, 0,  {0, 0}}, // U+06F2 Extended Arabic-Indic Digit Two
+    {209, 0x06F3, 0, 0, 0,  {0, 0}}, // U+06F3 Extended Arabic-Indic Digit Three
+    {210, 0x06F4, 0, 0, 0,  {0, 0}}, // U+06F4 Extended Arabic-Indic Digit Four
+    {211, 0x06F5, 0, 0, 0,  {0, 0}}, // U+06F5 Extended Arabic-Indic Digit Five
+    {212, 0x06F6, 0, 0, 0,  {0, 0}}, // U+06F6 Extended Arabic-Indic Digit Six
+    {213, 0x06F7, 0, 0, 0,  {0, 0}}, // U+06F7 Extended Arabic-Indic Digit Seven
+    {214, 0x06F8, 0, 0, 0,  {0, 0}}, // U+06F8 Extended Arabic-Indic Digit Eight
+    {215, 0x06F9, 0, 0, 0,  {0, 0}}, // U+06F9 Extended Arabic-Indic Digit Nine
     LV_AP_END_CHARS_LIST
 };
 /**********************
