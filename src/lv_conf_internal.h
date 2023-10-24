@@ -149,17 +149,6 @@
     #endif
 #endif  /*LV_USE_MALLOC == LV_STDLIB_BUILTIN*/
 
-
-#if LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN
-    #ifndef LV_SPRINTF_USE_FLOAT
-        #ifdef CONFIG_LV_SPRINTF_USE_FLOAT
-            #define LV_SPRINTF_USE_FLOAT CONFIG_LV_SPRINTF_USE_FLOAT
-        #else
-            #define LV_SPRINTF_USE_FLOAT 0
-        #endif
-    #endif
-#endif  /*LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN*/
-
 /*====================
    HAL SETTINGS
  *====================*/
@@ -737,7 +726,7 @@
     #ifdef CONFIG_LV_GRADIENT_MAX_STOPS
         #define LV_GRADIENT_MAX_STOPS CONFIG_LV_GRADIENT_MAX_STOPS
     #else
-        #define LV_GRADIENT_MAX_STOPS 2
+        #define LV_GRADIENT_MAX_STOPS   2
     #endif
 #endif
 
@@ -747,7 +736,7 @@
     #ifdef CONFIG_LV_COLOR_MIX_ROUND_OFS
         #define LV_COLOR_MIX_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
     #else
-        #define LV_COLOR_MIX_ROUND_OFS 0
+        #define LV_COLOR_MIX_ROUND_OFS  0
     #endif
 #endif
 
@@ -756,7 +745,7 @@
     #ifdef CONFIG_LV_OBJ_STYLE_CACHE
         #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
     #else
-        #define LV_OBJ_STYLE_CACHE 0
+        #define LV_OBJ_STYLE_CACHE      0
     #endif
 #endif
 
@@ -765,7 +754,7 @@
     #ifdef CONFIG_LV_USE_OBJ_ID
         #define LV_USE_OBJ_ID CONFIG_LV_USE_OBJ_ID
     #else
-        #define LV_USE_OBJ_ID 0
+        #define LV_USE_OBJ_ID           0
     #endif
 #endif
 
@@ -774,7 +763,7 @@
     #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
         #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
     #else
-        #define LV_USE_OBJ_ID_BUILTIN 0
+        #define LV_USE_OBJ_ID_BUILTIN   0
     #endif
 #endif
 
@@ -884,6 +873,15 @@
         #define LV_USE_LARGE_COORD CONFIG_LV_USE_LARGE_COORD
     #else
         #define LV_USE_LARGE_COORD 0
+    #endif
+#endif
+
+/* Use `float` as `lv_value_precise_t` */
+#ifndef LV_USE_FLOAT
+    #ifdef CONFIG_LV_USE_FLOAT
+        #define LV_USE_FLOAT CONFIG_LV_USE_FLOAT
+    #else
+        #define LV_USE_FLOAT            0
     #endif
 #endif
 
@@ -2747,6 +2745,11 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
 
 #undef _LV_KCONFIG_PRESENT
 
+#if LV_USE_FLOAT
+    typedef float lv_value_precise_t;
+#else
+    typedef int32_t lv_value_precise_t;
+#endif
 
 /*Set some defines if a dependency is disabled*/
 #if LV_USE_LOG == 0

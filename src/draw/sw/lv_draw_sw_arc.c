@@ -82,8 +82,8 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     area_in.x2 -= dsc->width;
     area_in.y2 -= dsc->width;
 
-    int32_t start_angle = dsc->start_angle;
-    int32_t end_angle = dsc->end_angle;
+    int32_t start_angle = (int32_t)dsc->start_angle;
+    int32_t end_angle = (int32_t)dsc->end_angle;
     while(start_angle >= 360) start_angle -= 360;
     while(end_angle >= 360) end_angle -= 360;
 
