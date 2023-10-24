@@ -1028,7 +1028,10 @@
 <li class="toctree-l3"><a class="reference internal" href="timer.html#ready-and-reset">Ready and Reset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#set-parameters">Set parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#repeat-count">Repeat count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timer.html#enable-and-disable">Enable and Disable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timer.html#pause-and-resume">Pause and Resume</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#measure-idle-time">Measure idle time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timer.html#timer-handler-resume-callback">Timer handler resume callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#asynchronous-calls">Asynchronous calls</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#api">API</a></li>
 </ul>
@@ -2673,10 +2676,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../API/misc/lv_timer.html">lv_timer.h</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv413lv_timer_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_cb_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv428lv_timer_handler_resume_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_resume_cb_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv410lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv419_lv_timer_core_initv"><code class="docutils literal notranslate"><span class="pre">_lv_timer_core_init()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv430lv_timer_handler_run_in_period8uint32_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_run_in_period()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv425lv_timer_periodic_handlerv"><code class="docutils literal notranslate"><span class="pre">lv_timer_periodic_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_set_resume_cb()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv421lv_timer_create_basicv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create_basic()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv415lv_timer_create13lv_timer_cb_t8uint32_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv415lv_timer_deleteP10lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_delete()</span></code></a></li>
@@ -4305,7 +4310,7 @@
           <li class="breadcrumb-item"><a href="index.html">Overview</a></li>
       <li class="breadcrumb-item active">Drawing</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/docs/overview/draw.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/docs/overview/draw.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="timer.html" class="btn btn-neutral float-left" title="Timers" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4644,21 +4649,21 @@ required for the text.</p>
 </section>
 <section id="api">
 <h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
-<p><a class="reference internal" href="../API/draw/lv_draw_mask.html#lv-draw-mask"><span class="std std-ref">lv_draw_mask.h</span></a></p>
-<p><a class="reference internal" href="../API/draw/lv_draw_rect.html#lv-draw-rect"><span class="std std-ref">lv_draw_rect.h</span></a></p>
-<p><a class="reference internal" href="../API/draw/lv_draw_arc.html#lv-draw-arc"><span class="std std-ref">lv_draw_arc.h</span></a></p>
 <p><a class="reference internal" href="../API/draw/sw/blend/lv_draw_sw_blend_to_rgb888.html#lv-draw-sw-blend-to-rgb888"><span class="std std-ref">lv_draw_sw_blend_to_rgb888.h</span></a></p>
-<p><a class="reference internal" href="../API/draw/sw/lv_draw_sw.html#lv-draw-sw"><span class="std std-ref">lv_draw_sw.h</span></a></p>
 <p><a class="reference internal" href="../API/draw/sw/blend/lv_draw_sw_blend_to_rgb565.html#lv-draw-sw-blend-to-rgb565"><span class="std std-ref">lv_draw_sw_blend_to_rgb565.h</span></a></p>
 <p><a class="reference internal" href="../API/draw/lv_draw_image.html#lv-draw-image"><span class="std std-ref">lv_draw_image.h</span></a></p>
 <p><a class="reference internal" href="../API/draw/sw/blend/lv_draw_sw_blend.html#lv-draw-sw-blend"><span class="std std-ref">lv_draw_sw_blend.h</span></a></p>
-<p><a class="reference internal" href="../API/draw/lv_draw_line.html#lv-draw-line"><span class="std std-ref">lv_draw_line.h</span></a></p>
-<p><a class="reference internal" href="../API/draw/lv_draw_triangle.html#lv-draw-triangle"><span class="std std-ref">lv_draw_triangle.h</span></a></p>
-<p><a class="reference internal" href="../API/draw/lv_draw.html#lv-draw"><span class="std std-ref">lv_draw.h</span></a></p>
-<p><a class="reference internal" href="../API/draw/sw/blend/lv_draw_sw_blend_to_argb8888.html#lv-draw-sw-blend-to-argb8888"><span class="std std-ref">lv_draw_sw_blend_to_argb8888.h</span></a></p>
-<p><a class="reference internal" href="../API/draw/lv_draw_buf.html#lv-draw-buf"><span class="std std-ref">lv_draw_buf.h</span></a></p>
-<p><a class="reference internal" href="../API/draw/sw/lv_draw_sw_mask.html#lv-draw-sw-mask"><span class="std std-ref">lv_draw_sw_mask.h</span></a></p>
 <p><a class="reference internal" href="../API/draw/lv_draw_label.html#lv-draw-label"><span class="std std-ref">lv_draw_label.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/lv_draw_triangle.html#lv-draw-triangle"><span class="std std-ref">lv_draw_triangle.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/sw/lv_draw_sw.html#lv-draw-sw"><span class="std std-ref">lv_draw_sw.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/sw/lv_draw_sw_mask.html#lv-draw-sw-mask"><span class="std std-ref">lv_draw_sw_mask.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/lv_draw_line.html#lv-draw-line"><span class="std std-ref">lv_draw_line.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/lv_draw_rect.html#lv-draw-rect"><span class="std std-ref">lv_draw_rect.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/sw/blend/lv_draw_sw_blend_to_argb8888.html#lv-draw-sw-blend-to-argb8888"><span class="std std-ref">lv_draw_sw_blend_to_argb8888.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/lv_draw.html#lv-draw"><span class="std std-ref">lv_draw.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/lv_draw_arc.html#lv-draw-arc"><span class="std std-ref">lv_draw_arc.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/lv_draw_mask.html#lv-draw-mask"><span class="std std-ref">lv_draw_mask.h</span></a></p>
+<p><a class="reference internal" href="../API/draw/lv_draw_buf.html#lv-draw-buf"><span class="std std-ref">lv_draw_buf.h</span></a></p>
 </section>
 </section>
 

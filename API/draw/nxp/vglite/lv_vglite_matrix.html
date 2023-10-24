@@ -1028,7 +1028,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../overview/timer.html#ready-and-reset">Ready and Reset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../overview/timer.html#set-parameters">Set parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../overview/timer.html#repeat-count">Repeat count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/timer.html#enable-and-disable">Enable and Disable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/timer.html#pause-and-resume">Pause and Resume</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../overview/timer.html#measure-idle-time">Measure idle time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/timer.html#timer-handler-resume-callback">Timer handler resume callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../overview/timer.html#asynchronous-calls">Asynchronous calls</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../overview/timer.html#api">API</a></li>
 </ul>
@@ -2673,10 +2676,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../misc/lv_timer.html">lv_timer.h</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv413lv_timer_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_cb_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv428lv_timer_handler_resume_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_resume_cb_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv410lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv419_lv_timer_core_initv"><code class="docutils literal notranslate"><span class="pre">_lv_timer_core_init()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv430lv_timer_handler_run_in_period8uint32_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_run_in_period()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv425lv_timer_periodic_handlerv"><code class="docutils literal notranslate"><span class="pre">lv_timer_periodic_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_set_resume_cb()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv421lv_timer_create_basicv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create_basic()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv415lv_timer_create13lv_timer_cb_t8uint32_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../misc/lv_timer.html#_CPPv415lv_timer_deleteP10lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_delete()</span></code></a></li>
@@ -4308,7 +4313,7 @@
           <li class="breadcrumb-item"><a href="index.html">vglite</a></li>
       <li class="breadcrumb-item active">lv_vglite_matrix.h</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/docs/API/draw/nxp/vglite/lv_vglite_matrix.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/docs/API/draw/nxp/vglite/lv_vglite_matrix.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="index.html" class="btn btn-neutral float-left" title="vglite" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>

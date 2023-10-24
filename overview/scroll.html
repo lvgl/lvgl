@@ -1028,7 +1028,10 @@
 <li class="toctree-l3"><a class="reference internal" href="timer.html#ready-and-reset">Ready and Reset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#set-parameters">Set parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#repeat-count">Repeat count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timer.html#enable-and-disable">Enable and Disable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timer.html#pause-and-resume">Pause and Resume</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#measure-idle-time">Measure idle time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timer.html#timer-handler-resume-callback">Timer handler resume callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#asynchronous-calls">Asynchronous calls</a></li>
 <li class="toctree-l3"><a class="reference internal" href="timer.html#api">API</a></li>
 </ul>
@@ -2673,10 +2676,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../API/misc/lv_timer.html">lv_timer.h</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv413lv_timer_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_cb_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv428lv_timer_handler_resume_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_resume_cb_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv410lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv419_lv_timer_core_initv"><code class="docutils literal notranslate"><span class="pre">_lv_timer_core_init()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv430lv_timer_handler_run_in_period8uint32_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_run_in_period()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv425lv_timer_periodic_handlerv"><code class="docutils literal notranslate"><span class="pre">lv_timer_periodic_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_set_resume_cb()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv421lv_timer_create_basicv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create_basic()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv415lv_timer_create13lv_timer_cb_t8uint32_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv415lv_timer_deleteP10lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_delete()</span></code></a></li>
@@ -4305,7 +4310,7 @@
           <li class="breadcrumb-item"><a href="index.html">Overview</a></li>
       <li class="breadcrumb-item active">Scroll</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/docs/overview/scroll.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/docs/overview/scroll.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="style-props.html" class="btn btn-neutral float-left" title="Style properties" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4559,7 +4564,7 @@ an object. Here is an example to see how to handle the event:</p>
 <h3>Nested scrolling<a class="headerlink" href="#nested-scrolling" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scroll_1&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../lv_examples.h&quot;</span>
 <span class="cp">#if LV_BUILD_EXAMPLES</span>
 
@@ -4608,7 +4613,7 @@ an object. Here is an example to see how to handle the event:</p>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
 <span class="c1"># Demonstrate how scrolling appears automatically</span>
 <span class="c1">#</span>
@@ -4650,7 +4655,7 @@ an object. Here is an example to see how to handle the event:</p>
 <h3>Snapping<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scroll_2&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../lv_examples.h&quot;</span>
 <span class="cp">#if LV_BUILD_EXAMPLES &amp;&amp; LV_USE_FLEX</span>
 
@@ -4713,7 +4718,7 @@ an object. Here is an example to see how to handle the event:</p>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_2.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_2.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_2.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_2.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sw_event_cb</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">panel</span><span class="p">):</span>
 
     <span class="n">code</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">get_code</span><span class="p">()</span>
@@ -4769,7 +4774,7 @@ an object. Here is an example to see how to handle the event:</p>
 <h3>Floating button<a class="headerlink" href="#floating-button" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scroll_3&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_3.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_3.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../lv_examples.h&quot;</span>
 <span class="cp">#if LV_BUILD_EXAMPLES &amp;&amp; LV_USE_LIST</span>
 
@@ -4824,7 +4829,7 @@ an object. Here is an example to see how to handle the event:</p>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_3.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_3.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_3.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_3.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">ScrollExample_3</span><span class="p">():</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">button_cnt</span> <span class="o">=</span> <span class="mi">1</span>
@@ -4871,7 +4876,7 @@ an object. Here is an example to see how to handle the event:</p>
 <h3>Styling the scrollbars<a class="headerlink" href="#styling-the-scrollbars" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scroll_4&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_4.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_4.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../lv_examples.h&quot;</span>
 <span class="cp">#if LV_BUILD_EXAMPLES &amp;&amp; LV_USE_LIST</span>
 
@@ -4945,7 +4950,7 @@ an object. Here is an example to see how to handle the event:</p>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_4.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_4.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_4.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_4.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
 <span class="c1"># Styling the scrollbars</span>
 <span class="c1">#</span>
@@ -5016,7 +5021,7 @@ an object. Here is an example to see how to handle the event:</p>
 <h3>Right to left scrolling<a class="headerlink" href="#right-to-left-scrolling" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scroll_5&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_5.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_5.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../lv_examples.h&quot;</span>
 <span class="cp">#if LV_BUILD_EXAMPLES &amp;&amp; LV_FONT_DEJAVU_16_PERSIAN_HEBREW</span>
 
@@ -5045,7 +5050,7 @@ an object. Here is an example to see how to handle the event:</p>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_5.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_5.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_5.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_5.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
 <span class="c1"># Scrolling with Right To Left base direction</span>
 <span class="c1">#</span>
@@ -5067,7 +5072,7 @@ an object. Here is an example to see how to handle the event:</p>
 <h3>Translate on scroll<a class="headerlink" href="#translate-on-scroll" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scroll_6&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_6.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_6.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../lv_examples.h&quot;</span>
 <span class="cp">#if LV_BUILD_EXAMPLES &amp;&amp; LV_USE_FLEX</span>
 
@@ -5153,7 +5158,7 @@ an object. Here is an example to see how to handle the event:</p>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_6.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0c2815ee8d71ad8633950d274db31d362988ad0a/examples/scroll/lv_example_scroll_6.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_6.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/scroll/lv_example_scroll_6.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">scroll_event_cb</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
 
     <span class="n">cont</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">get_target_obj</span><span class="p">()</span>

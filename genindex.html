@@ -1025,7 +1025,10 @@
 <li class="toctree-l3"><a class="reference internal" href="overview/timer.html#ready-and-reset">Ready and Reset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="overview/timer.html#set-parameters">Set parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="overview/timer.html#repeat-count">Repeat count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/timer.html#enable-and-disable">Enable and Disable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/timer.html#pause-and-resume">Pause and Resume</a></li>
 <li class="toctree-l3"><a class="reference internal" href="overview/timer.html#measure-idle-time">Measure idle time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/timer.html#timer-handler-resume-callback">Timer handler resume callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="overview/timer.html#asynchronous-calls">Asynchronous calls</a></li>
 <li class="toctree-l3"><a class="reference internal" href="overview/timer.html#api">API</a></li>
 </ul>
@@ -2670,10 +2673,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="API/misc/lv_timer.html">lv_timer.h</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv413lv_timer_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_cb_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv428lv_timer_handler_resume_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_resume_cb_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv410lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv419_lv_timer_core_initv"><code class="docutils literal notranslate"><span class="pre">_lv_timer_core_init()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv430lv_timer_handler_run_in_period8uint32_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_run_in_period()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv425lv_timer_periodic_handlerv"><code class="docutils literal notranslate"><span class="pre">lv_timer_periodic_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_set_resume_cb()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv421lv_timer_create_basicv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create_basic()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv415lv_timer_create13lv_timer_cb_t8uint32_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_timer.html#_CPPv415lv_timer_deleteP10lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_delete()</span></code></a></li>
@@ -4301,7 +4306,7 @@
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/docs/genindex" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/docs/genindex" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -9950,12 +9955,12 @@
 </li>
       <li><a href="API/widgets/label/lv_label.html#_CPPv4N10lv_label_t9sel_startE">lv_label_t::sel_start (C++ member)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API/widgets/label/lv_label.html#_CPPv4N10lv_label_t10size_cacheE">lv_label_t::size_cache (C++ member)</a>
 </li>
       <li><a href="API/widgets/label/lv_label.html#_CPPv4N10lv_label_t10static_txtE">lv_label_t::static_txt (C++ member)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API/widgets/label/lv_label.html#_CPPv4N10lv_label_t4textE">lv_label_t::text (C++ member)</a>
 </li>
       <li><a href="API/widgets/label/lv_label.html#_CPPv4N10lv_label_t3tmpE">lv_label_t::tmp (C++ member)</a>
@@ -12830,7 +12835,11 @@
 </li>
       <li><a href="API/misc/lv_timer.html#_CPPv422lv_timer_get_user_dataP10lv_timer_t">lv_timer_get_user_data (C++ function)</a>
 </li>
+      <li><a href="API/misc/lv_timer.html#_CPPv428lv_timer_handler_resume_cb_t">lv_timer_handler_resume_cb_t (C++ type)</a>
+</li>
       <li><a href="API/misc/lv_timer.html#_CPPv430lv_timer_handler_run_in_period8uint32_t">lv_timer_handler_run_in_period (C++ function)</a>
+</li>
+      <li><a href="API/misc/lv_timer.html#_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv">lv_timer_handler_set_resume_cb (C++ function)</a>
 </li>
       <li><a href="API/misc/lv_timer.html#_CPPv414lv_timer_pauseP10lv_timer_t">lv_timer_pause (C++ function)</a>
 </li>
@@ -12863,6 +12872,10 @@
       <li><a href="API/misc/lv_timer.html#_CPPv4N16lv_timer_state_t12lv_timer_runE">lv_timer_state_t::lv_timer_run (C++ member)</a>
 </li>
       <li><a href="API/misc/lv_timer.html#_CPPv4N16lv_timer_state_t18periodic_last_tickE">lv_timer_state_t::periodic_last_tick (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_timer.html#_CPPv4N16lv_timer_state_t9resume_cbE">lv_timer_state_t::resume_cb (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_timer.html#_CPPv4N16lv_timer_state_t11resume_dataE">lv_timer_state_t::resume_data (C++ member)</a>
 </li>
       <li><a href="API/misc/lv_timer.html#_CPPv4N16lv_timer_state_t7run_cntE">lv_timer_state_t::run_cnt (C++ member)</a>
 </li>

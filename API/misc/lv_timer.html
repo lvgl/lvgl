@@ -1028,7 +1028,10 @@
 <li class="toctree-l3"><a class="reference internal" href="../../overview/timer.html#ready-and-reset">Ready and Reset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../overview/timer.html#set-parameters">Set parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../overview/timer.html#repeat-count">Repeat count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview/timer.html#enable-and-disable">Enable and Disable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview/timer.html#pause-and-resume">Pause and Resume</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../overview/timer.html#measure-idle-time">Measure idle time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview/timer.html#timer-handler-resume-callback">Timer handler resume callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../overview/timer.html#asynchronous-calls">Asynchronous calls</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../overview/timer.html#api">API</a></li>
 </ul>
@@ -2673,10 +2676,12 @@
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">lv_timer.h</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv413lv_timer_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_cb_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv428lv_timer_handler_resume_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_resume_cb_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv410lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv419_lv_timer_core_initv"><code class="docutils literal notranslate"><span class="pre">_lv_timer_core_init()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv430lv_timer_handler_run_in_period8uint32_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_run_in_period()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv425lv_timer_periodic_handlerv"><code class="docutils literal notranslate"><span class="pre">lv_timer_periodic_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_set_resume_cb()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv421lv_timer_create_basicv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create_basic()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv415lv_timer_create13lv_timer_cb_t8uint32_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv415lv_timer_deleteP10lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_delete()</span></code></a></li>
@@ -4306,7 +4311,7 @@
           <li class="breadcrumb-item"><a href="index.html">misc</a></li>
       <li class="breadcrumb-item active">lv_timer.h</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/docs/API/misc/lv_timer.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/docs/API/misc/lv_timer.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="lv_cache.html" class="btn btn-neutral float-left" title="lv_cache.h" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4333,6 +4338,12 @@
 <dt class="sig sig-object cpp" id="_CPPv413lv_timer_cb_t">
 <span id="_CPPv313lv_timer_cb_t"></span><span id="_CPPv213lv_timer_cb_t"></span><span id="lv_timer_cb_t"></span><span class="target" id="lv__timer_8h_1a610169eec97bb2d1d1c20f5a4a0aab4a"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">lv_timer_cb_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411_lv_timer_t" title="_lv_timer_t"><span class="n"><span class="pre">_lv_timer_t</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv413lv_timer_cb_t" title="Link to this definition"></a><br /></dt>
 <dd><p>Timers execute this type of functions. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv428lv_timer_handler_resume_cb_t">
+<span id="_CPPv328lv_timer_handler_resume_cb_t"></span><span id="_CPPv228lv_timer_handler_resume_cb_t"></span><span id="lv_timer_handler_resume_cb_t"></span><span class="target" id="lv__timer_8h_1a0735c7731e190c96870582eda3c2c6ab"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">lv_timer_handler_resume_cb_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv428lv_timer_handler_resume_cb_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Timer handler resume this type of function. </p>
 </dd></dl>
 
 <dl class="cpp type">
@@ -4368,6 +4379,20 @@
 <dt class="sig sig-object cpp" id="_CPPv425lv_timer_periodic_handlerv">
 <span id="_CPPv325lv_timer_periodic_handlerv"></span><span id="_CPPv225lv_timer_periodic_handlerv"></span><span id="lv_timer_periodic_handler__void"></span><span class="target" id="lv__timer_8h_1ae3ab5c950818bd1cdde812a7c0595303"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lv_timer_periodic_handler</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425lv_timer_periodic_handlerv" title="Link to this definition"></a><br /></dt>
 <dd><p>Call it in the super-loop of main() or threads. It will automatically call lv_timer_handler() at the right time. This function is used to simplify the porting. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv">
+<span id="_CPPv330lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv"></span><span id="_CPPv230lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv"></span><span id="lv_timer_handler_set_resume_cb__lv_timer_handler_resume_cb_t.voidP"></span><span class="target" id="lv__timer_8h_1ad9e61e87da50c72666feae74db216192"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lv_timer_handler_set_resume_cb</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv428lv_timer_handler_resume_cb_t" title="lv_timer_handler_resume_cb_t"><span class="n"><span class="pre">lv_timer_handler_resume_cb_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cb</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the resume callback to the timer handler </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cb</strong> -- the function to call when timer handler is resumed </p></li>
+<li><p><strong>data</strong> -- pointer to a resume data </p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
@@ -4670,6 +4695,16 @@
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N16lv_timer_state_t7run_cntE">
 <span id="_CPPv3N16lv_timer_state_t7run_cntE"></span><span id="_CPPv2N16lv_timer_state_t7run_cntE"></span><span id="lv_timer_state_t::run_cnt__uint32_t"></span><span class="target" id="structlv__timer__state__t_1aa93914205edcaeabd6eba7d20edc4299"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">run_cnt</span></span></span><a class="headerlink" href="#_CPPv4N16lv_timer_state_t7run_cntE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16lv_timer_state_t9resume_cbE">
+<span id="_CPPv3N16lv_timer_state_t9resume_cbE"></span><span id="_CPPv2N16lv_timer_state_t9resume_cbE"></span><span id="lv_timer_state_t::resume_cb__lv_timer_handler_resume_cb_t"></span><span class="target" id="structlv__timer__state__t_1ae1cfc1ea42ab02e97b9b4a4c1943ec9e"></span><a class="reference internal" href="#_CPPv428lv_timer_handler_resume_cb_t" title="lv_timer_handler_resume_cb_t"><span class="n"><span class="pre">lv_timer_handler_resume_cb_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resume_cb</span></span></span><a class="headerlink" href="#_CPPv4N16lv_timer_state_t9resume_cbE" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16lv_timer_state_t11resume_dataE">
+<span id="_CPPv3N16lv_timer_state_t11resume_dataE"></span><span id="_CPPv2N16lv_timer_state_t11resume_dataE"></span><span id="lv_timer_state_t::resume_data__voidP"></span><span class="target" id="structlv__timer__state__t_1a06dbd6499392e459e302405517e393ff"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">resume_data</span></span></span><a class="headerlink" href="#_CPPv4N16lv_timer_state_t11resume_dataE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 </div>

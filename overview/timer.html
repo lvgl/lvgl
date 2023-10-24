@@ -1028,7 +1028,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#ready-and-reset">Ready and Reset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#set-parameters">Set parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#repeat-count">Repeat count</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#enable-and-disable">Enable and Disable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pause-and-resume">Pause and Resume</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#measure-idle-time">Measure idle time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#timer-handler-resume-callback">Timer handler resume callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#asynchronous-calls">Asynchronous calls</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#api">API</a></li>
 </ul>
@@ -2673,10 +2676,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../API/misc/lv_timer.html">lv_timer.h</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv413lv_timer_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_cb_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv428lv_timer_handler_resume_cb_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_resume_cb_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv410lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv419_lv_timer_core_initv"><code class="docutils literal notranslate"><span class="pre">_lv_timer_core_init()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv430lv_timer_handler_run_in_period8uint32_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_run_in_period()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv425lv_timer_periodic_handlerv"><code class="docutils literal notranslate"><span class="pre">lv_timer_periodic_handler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_handler_set_resume_cb()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv421lv_timer_create_basicv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create_basic()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv415lv_timer_create13lv_timer_cb_t8uint32_tPv"><code class="docutils literal notranslate"><span class="pre">lv_timer_create()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv415lv_timer_deleteP10lv_timer_t"><code class="docutils literal notranslate"><span class="pre">lv_timer_delete()</span></code></a></li>
@@ -4305,7 +4310,7 @@
           <li class="breadcrumb-item"><a href="index.html">Overview</a></li>
       <li class="breadcrumb-item active">Timers</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/0c2815ee8d71ad8633950d274db31d362988ad0a/docs/overview/timer.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/docs/overview/timer.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="anim.html" class="btn btn-neutral float-left" title="Animations" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4376,6 +4381,15 @@ called again after the defined period of milliseconds has elapsed.</p>
 automatically be deleted after it's called the defined number of times.
 Set the count to <code class="docutils literal notranslate"><span class="pre">-1</span></code> to repeat indefinitely.</p>
 </section>
+<section id="enable-and-disable">
+<h2>Enable and Disable<a class="headerlink" href="#enable-and-disable" title="Link to this heading"></a></h2>
+<p>You can enable or disable a timer with <span class="cpp-expr sig sig-inline cpp"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv415lv_timer_enableb" title="lv_timer_enable"><span class="n">lv_timer_enable</span></a><span class="p">(</span><span class="n">en</span><span class="p">)</span></span>.</p>
+</section>
+<section id="pause-and-resume">
+<h2>Pause and Resume<a class="headerlink" href="#pause-and-resume" title="Link to this heading"></a></h2>
+<p><span class="cpp-expr sig sig-inline cpp"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv414lv_timer_pauseP10lv_timer_t" title="lv_timer_pause"><span class="n">lv_timer_pause</span></a><span class="p">(</span><span class="n">timer</span><span class="p">)</span></span> pauses the specified timer.</p>
+<p><span class="cpp-expr sig sig-inline cpp"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv415lv_timer_resumeP10lv_timer_t" title="lv_timer_resume"><span class="n">lv_timer_resume</span></a><span class="p">(</span><span class="n">timer</span><span class="p">)</span></span> resumes the specified timer.</p>
+</section>
 <section id="measure-idle-time">
 <h2>Measure idle time<a class="headerlink" href="#measure-idle-time" title="Link to this heading"></a></h2>
 <p>You can get the idle percentage time of <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">lv_timer_handler()</span></code> with
@@ -4383,6 +4397,13 @@ Set the count to <code class="docutils literal notranslate"><span class="pre">-1
 the overall system, only <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">lv_timer_handler()</span></code>. It can be misleading if
 you use an operating system and call <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">lv_timer_handler()</span></code> in a timer, as
 it won't actually measure the time the OS spends in an idle thread.</p>
+</section>
+<section id="timer-handler-resume-callback">
+<h2>Timer handler resume callback<a class="headerlink" href="#timer-handler-resume-callback" title="Link to this heading"></a></h2>
+<p>When the <cite>lv_timer_handler</cite> is stopped, if you want to pay attention to the wake-up
+timing of the <cite>lv_timer_handler</cite>, you can set a resume callback using
+<span class="cpp-expr sig sig-inline cpp"><a class="reference internal" href="../API/misc/lv_timer.html#_CPPv430lv_timer_handler_set_resume_cb28lv_timer_handler_resume_cb_tPv" title="lv_timer_handler_set_resume_cb"><span class="n">lv_timer_handler_set_resume_cb</span></a><span class="p">(</span><span class="n">cb</span><span class="p">,</span><span class="w"> </span><span class="n">user_data</span><span class="p">)</span></span>.
+The callback should have a <code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">(*lv_timer_handler_resume_cb_t)(void*)</span></code> prototype.</p>
 </section>
 <section id="asynchronous-calls">
 <h2>Asynchronous calls<a class="headerlink" href="#asynchronous-calls" title="Link to this heading"></a></h2>
