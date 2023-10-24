@@ -3333,6 +3333,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../API/dev/nuttx/lv_nuttx_lcd.html">lv_nuttx_lcd.h</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/dev/nuttx/lv_nuttx_touchscreen.html">lv_nuttx_touchscreen.h</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/dev/nuttx/lv_nuttx_fbdev.html">lv_nuttx_fbdev.h</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/dev/nuttx/lv_nuttx_libuv.html">lv_nuttx_libuv.h</a></li>
 </ul>
 </li>
 </ul>
@@ -4310,7 +4311,7 @@
           <li class="breadcrumb-item"><a href="index.html">Widgets</a></li>
       <li class="breadcrumb-item active">Button (lv_btn)</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/docs/widgets/btn.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/d98e7b27cb0b730a728aae85b27845d912864f63/docs/widgets/btn.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="bar.html" class="btn btn-neutral float-left" title="Bar (lv_bar)" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4366,7 +4367,7 @@ and <a class="reference internal" href="../API/misc/lv_event.html#_CPPv4N15lv_ev
 <h3>Simple Buttons<a class="headerlink" href="#simple-buttons" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_btn_1&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/widgets/btn/lv_example_btn_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/d98e7b27cb0b730a728aae85b27845d912864f63/examples/widgets/btn/lv_example_btn_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_BTN &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4412,7 +4413,7 @@ and <a class="reference internal" href="../API/misc/lv_event.html#_CPPv4N15lv_ev
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/widgets/btn/lv_example_btn_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/widgets/btn/lv_example_btn_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/d98e7b27cb0b730a728aae85b27845d912864f63/examples/widgets/btn/lv_example_btn_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/d98e7b27cb0b730a728aae85b27845d912864f63/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/d98e7b27cb0b730a728aae85b27845d912864f63/examples/widgets/btn/lv_example_btn_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">event_handler</span><span class="p">(</span><span class="n">evt</span><span class="p">):</span>
     <span class="n">code</span> <span class="o">=</span> <span class="n">evt</span><span class="o">.</span><span class="n">get_code</span><span class="p">()</span>
 
@@ -4453,7 +4454,7 @@ and <a class="reference internal" href="../API/misc/lv_event.html#_CPPv4N15lv_ev
 <h3>Styling buttons<a class="headerlink" href="#styling-buttons" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_btn_2&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/widgets/btn/lv_example_btn_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/d98e7b27cb0b730a728aae85b27845d912864f63/examples/widgets/btn/lv_example_btn_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_BTN &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4524,7 +4525,7 @@ and <a class="reference internal" href="../API/misc/lv_event.html#_CPPv4N15lv_ev
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/widgets/btn/lv_example_btn_2.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/widgets/btn/lv_example_btn_2.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/d98e7b27cb0b730a728aae85b27845d912864f63/examples/widgets/btn/lv_example_btn_2.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/d98e7b27cb0b730a728aae85b27845d912864f63/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/d98e7b27cb0b730a728aae85b27845d912864f63/examples/widgets/btn/lv_example_btn_2.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
 <span class="c1"># Style a button from scratch</span>
 <span class="c1">#</span>
@@ -4593,7 +4594,7 @@ and <a class="reference internal" href="../API/misc/lv_event.html#_CPPv4N15lv_ev
 <h3>Gummy button<a class="headerlink" href="#gummy-button" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_btn_3&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/widgets/btn/lv_example_btn_3.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/d98e7b27cb0b730a728aae85b27845d912864f63/examples/widgets/btn/lv_example_btn_3.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_BUILD_EXAMPLES &amp;&amp; LV_USE_BTN</span>
 
@@ -4644,7 +4645,7 @@ and <a class="reference internal" href="../API/misc/lv_event.html#_CPPv4N15lv_ev
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/widgets/btn/lv_example_btn_3.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/4bc07a8552daaab1bd1fece52bf97342b607a724/examples/widgets/btn/lv_example_btn_3.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/d98e7b27cb0b730a728aae85b27845d912864f63/examples/widgets/btn/lv_example_btn_3.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/d98e7b27cb0b730a728aae85b27845d912864f63/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/d98e7b27cb0b730a728aae85b27845d912864f63/examples/widgets/btn/lv_example_btn_3.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
 <span class="c1"># Create a style transition on a button to act like a gum when clicked</span>
 <span class="c1">#</span>

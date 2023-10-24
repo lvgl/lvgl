@@ -10,4 +10,5 @@ nuttx
     lv_nuttx_lcd
     lv_nuttx_touchscreen
     lv_nuttx_fbdev
+    lv_nuttx_libuv
 

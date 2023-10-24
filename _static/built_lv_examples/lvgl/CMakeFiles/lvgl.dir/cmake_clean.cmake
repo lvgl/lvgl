@@ -37,6 +37,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_fbdev.c.o.d"
   "CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_lcd.c.o"
   "CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_lcd.c.o.d"
+  "CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.o"
+  "CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.o.d"
   "CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_touchscreen.c.o"
   "CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_touchscreen.c.o.d"
   "CMakeFiles/lvgl.dir/src/dev/sdl/lv_sdl_keyboard.c.o"

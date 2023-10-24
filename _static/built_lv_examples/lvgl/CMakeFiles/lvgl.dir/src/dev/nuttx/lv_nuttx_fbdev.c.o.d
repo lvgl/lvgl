@@ -1,7 +1,6 @@
 lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_fbdev.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_fbdev.c \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_fbdev.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_entry.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../display/lv_display.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../display/../misc/lv_timer.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../display/../misc/../lv_conf_internal.h \
@@ -80,11 +79,4 @@ lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_fbdev.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../display/../draw/lv_draw_arc.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../display/../draw/lv_draw_line.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../display/../draw/lv_draw_triangle.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../display/../draw/lv_draw_mask.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/lv_indev.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/lv_group.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../lv_conf_internal.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../misc/lv_ll.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../misc/lv_types.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../misc/lv_area.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../misc/lv_timer.h
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../display/../draw/lv_draw_mask.h

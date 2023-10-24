@@ -7835,6 +7835,30 @@ src/dev/nuttx/lv_nuttx_lcd.c.s:
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl.dir/build.make lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_lcd.c.s
 .PHONY : src/dev/nuttx/lv_nuttx_lcd.c.s
 
+src/dev/nuttx/lv_nuttx_libuv.o: src/dev/nuttx/lv_nuttx_libuv.c.o
+.PHONY : src/dev/nuttx/lv_nuttx_libuv.o
+
+# target to build an object file
+src/dev/nuttx/lv_nuttx_libuv.c.o:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl.dir/build.make lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.o
+.PHONY : src/dev/nuttx/lv_nuttx_libuv.c.o
+
+src/dev/nuttx/lv_nuttx_libuv.i: src/dev/nuttx/lv_nuttx_libuv.c.i
+.PHONY : src/dev/nuttx/lv_nuttx_libuv.i
+
+# target to preprocess a source file
+src/dev/nuttx/lv_nuttx_libuv.c.i:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl.dir/build.make lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.i
+.PHONY : src/dev/nuttx/lv_nuttx_libuv.c.i
+
+src/dev/nuttx/lv_nuttx_libuv.s: src/dev/nuttx/lv_nuttx_libuv.c.s
+.PHONY : src/dev/nuttx/lv_nuttx_libuv.s
+
+# target to generate assembly for a file
+src/dev/nuttx/lv_nuttx_libuv.c.s:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl.dir/build.make lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.s
+.PHONY : src/dev/nuttx/lv_nuttx_libuv.c.s
+
 src/dev/nuttx/lv_nuttx_touchscreen.o: src/dev/nuttx/lv_nuttx_touchscreen.c.o
 .PHONY : src/dev/nuttx/lv_nuttx_touchscreen.o
 
@@ -13676,6 +13700,9 @@ help:
 	@echo "... src/dev/nuttx/lv_nuttx_lcd.o"
 	@echo "... src/dev/nuttx/lv_nuttx_lcd.i"
 	@echo "... src/dev/nuttx/lv_nuttx_lcd.s"
+	@echo "... src/dev/nuttx/lv_nuttx_libuv.o"
+	@echo "... src/dev/nuttx/lv_nuttx_libuv.i"
+	@echo "... src/dev/nuttx/lv_nuttx_libuv.s"
 	@echo "... src/dev/nuttx/lv_nuttx_touchscreen.o"
 	@echo "... src/dev/nuttx/lv_nuttx_touchscreen.i"
 	@echo "... src/dev/nuttx/lv_nuttx_touchscreen.s"

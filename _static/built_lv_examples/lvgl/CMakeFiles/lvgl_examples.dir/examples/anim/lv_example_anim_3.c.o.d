@@ -283,6 +283,7 @@ lvgl/CMakeFiles/lvgl_examples.dir/examples/anim/lv_example_anim_3.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_fbdev.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_touchscreen.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_lcd.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_libuv.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/evdev/lv_evdev.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/evdev/../../indev/lv_indev.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_global.h \

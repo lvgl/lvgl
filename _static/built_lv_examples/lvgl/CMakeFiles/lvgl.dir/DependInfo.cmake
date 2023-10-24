@@ -26,6 +26,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_entry.c" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_entry.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_entry.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_fbdev.c" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_fbdev.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_fbdev.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_lcd.c" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_lcd.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_lcd.c.o.d"
+  "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_libuv.c" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/lv_nuttx_touchscreen.c" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_touchscreen.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_touchscreen.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/sdl/lv_sdl_keyboard.c" "lvgl/CMakeFiles/lvgl.dir/src/dev/sdl/lv_sdl_keyboard.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/dev/sdl/lv_sdl_keyboard.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/sdl/lv_sdl_mouse.c" "lvgl/CMakeFiles/lvgl.dir/src/dev/sdl/lv_sdl_mouse.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/dev/sdl/lv_sdl_mouse.c.o.d"
