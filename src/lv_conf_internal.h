@@ -57,6 +57,19 @@
 
 #include <stdint.h>
 
+/*
+* CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not work for global data.
+* To avoid linker errors with MSVC we need to decorate global data with decls specs
+*/
+#ifdef _MSC_VER
+  #ifdef INSIDE_DLL
+    #define DLLIMPEXP __declspec(dllexport) extern
+  #else
+    #define DLLIMPEXP __declspec(dllimport) extern
+  #endif //INSIDE_DLL
+#else
+  #define DLLIMPEXP extern
+#endif //_MSC_VER
 /*====================
    COLOR SETTINGS
  *====================*/
