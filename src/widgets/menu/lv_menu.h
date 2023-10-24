@@ -93,15 +93,15 @@ typedef struct {
     bool     static_title;
 } lv_menu_page_t;
 
-extern const lv_obj_class_t lv_menu_class;
-extern const lv_obj_class_t lv_menu_page_class;
-extern const lv_obj_class_t lv_menu_cont_class;
-extern const lv_obj_class_t lv_menu_section_class;
-extern const lv_obj_class_t lv_menu_separator_class;
-extern const lv_obj_class_t lv_menu_sidebar_cont_class;
-extern const lv_obj_class_t lv_menu_main_cont_class;
-extern const lv_obj_class_t lv_menu_sidebar_header_cont_class;
-extern const lv_obj_class_t lv_menu_main_header_cont_class;
+DLLIMPEXP const lv_obj_class_t lv_menu_class;
+DLLIMPEXP const lv_obj_class_t lv_menu_page_class;
+DLLIMPEXP const lv_obj_class_t lv_menu_cont_class;
+DLLIMPEXP const lv_obj_class_t lv_menu_section_class;
+DLLIMPEXP const lv_obj_class_t lv_menu_separator_class;
+DLLIMPEXP const lv_obj_class_t lv_menu_sidebar_cont_class;
+DLLIMPEXP const lv_obj_class_t lv_menu_main_cont_class;
+DLLIMPEXP const lv_obj_class_t lv_menu_sidebar_header_cont_class;
+DLLIMPEXP const lv_obj_class_t lv_menu_main_header_cont_class;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

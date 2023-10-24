@@ -19,6 +19,17 @@
 
 #include <stdint.h>
 
+#include <stdint.h>
+#ifdef WIN32
+  #ifdef INSIDE_DLL
+    #define DLLIMPEXP __declspec(dllexport) extern
+  #else
+    #define DLLIMPEXP __declspec(dllimport) extern
+  #endif
+#else
+  #define DLLIMPEXP extern
+#endif
+
 /*====================
    COLOR SETTINGS
  *====================*/
