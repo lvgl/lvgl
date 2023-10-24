@@ -763,18 +763,23 @@
 /*Use Nuttx to open window and handle touchscreen*/
 #define LV_USE_NUTTX    0
 
-/*Use Nuttx custom init API to open window and handle touchscreen*/
-#define LV_USE_NUTTX_CUSTOM_INIT    0
+#if LV_USE_NUTTX
+    #define LV_USE_NUTTX_LIBUV    0
 
-/*Driver for /dev/lcd*/
-#define LV_USE_NUTTX_LCD      0
-#if LV_USE_NUTTX_LCD
-    #define LV_NUTTX_LCD_BUFFER_COUNT    0
-    #define LV_NUTTX_LCD_BUFFER_SIZE     60
+    /*Use Nuttx custom init API to open window and handle touchscreen*/
+    #define LV_USE_NUTTX_CUSTOM_INIT    0
+
+    /*Driver for /dev/lcd*/
+    #define LV_USE_NUTTX_LCD      0
+    #if LV_USE_NUTTX_LCD
+        #define LV_NUTTX_LCD_BUFFER_COUNT    0
+        #define LV_NUTTX_LCD_BUFFER_SIZE     60
+    #endif
+
+    /*Driver for /dev/input*/
+    #define LV_USE_NUTTX_TOUCHSCREEN    0
+
 #endif
-
-/*Driver for /dev/input*/
-#define LV_USE_NUTTX_TOUCHSCREEN    0
 
 /*Driver for /dev/dri/card*/
 #define LV_USE_LINUX_DRM        0
