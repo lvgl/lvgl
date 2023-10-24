@@ -1,0 +1,10 @@
+.. _lv_file_explorer:
+
+==================
+lv_file_explorer.h
+==================
+
+
+.. doxygenfile:: lv_file_explorer.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _lv_profiler_builtin:
+
+=====================
+lv_profiler_builtin.h
+=====================
+
+
+.. doxygenfile:: lv_profiler_builtin.h
+    :project: lvgl
+

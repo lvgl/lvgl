@@ -1,0 +1,10 @@
+.. _lv_text:
+
+=========
+lv_text.h
+=========
+
+
+.. doxygenfile:: lv_text.h
+    :project: lvgl
+

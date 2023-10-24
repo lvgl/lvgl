@@ -1,0 +1,10 @@
+.. _lv_sdl_mousewheel:
+
+===================
+lv_sdl_mousewheel.h
+===================
+
+
+.. doxygenfile:: lv_sdl_mousewheel.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _ftmodule:
+
+==========
+ftmodule.h
+==========
+
+
+.. doxygenfile:: ftmodule.h
+    :project: lvgl
+

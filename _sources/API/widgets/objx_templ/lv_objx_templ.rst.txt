@@ -1,0 +1,10 @@
+.. _lv_objx_templ:
+
+===============
+lv_objx_templ.h
+===============
+
+
+.. doxygenfile:: lv_objx_templ.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _lv_obj_pos:
+
+============
+lv_obj_pos.h
+============
+
+
+.. doxygenfile:: lv_obj_pos.h
+    :project: lvgl
+

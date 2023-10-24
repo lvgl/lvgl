@@ -1,0 +1,10 @@
+.. _lv_observer:
+
+=============
+lv_observer.h
+=============
+
+
+.. doxygenfile:: lv_observer.h
+    :project: lvgl
+

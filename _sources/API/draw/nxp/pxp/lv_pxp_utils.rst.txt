@@ -1,0 +1,10 @@
+.. _lv_pxp_utils:
+
+==============
+lv_pxp_utils.h
+==============
+
+
+.. doxygenfile:: lv_pxp_utils.h
+    :project: lvgl
+

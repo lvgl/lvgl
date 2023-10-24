@@ -1,0 +1,10 @@
+.. _lv_pthread:
+
+============
+lv_pthread.h
+============
+
+
+.. doxygenfile:: lv_pthread.h
+    :project: lvgl
+

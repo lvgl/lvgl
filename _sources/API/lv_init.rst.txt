@@ -1,0 +1,10 @@
+.. _lv_init:
+
+=========
+lv_init.h
+=========
+
+
+.. doxygenfile:: lv_init.h
+    :project: lvgl
+

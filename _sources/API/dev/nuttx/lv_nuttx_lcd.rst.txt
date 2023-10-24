@@ -1,0 +1,10 @@
+.. _lv_nuttx_lcd:
+
+==============
+lv_nuttx_lcd.h
+==============
+
+
+.. doxygenfile:: lv_nuttx_lcd.h
+    :project: lvgl
+

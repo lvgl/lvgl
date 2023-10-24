@@ -1,0 +1,10 @@
+.. _lv_textarea:
+
+=============
+lv_textarea.h
+=============
+
+
+.. doxygenfile:: lv_textarea.h
+    :project: lvgl
+

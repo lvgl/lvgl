@@ -1,0 +1,10 @@
+.. _lv_palette:
+
+============
+lv_palette.h
+============
+
+
+.. doxygenfile:: lv_palette.h
+    :project: lvgl
+

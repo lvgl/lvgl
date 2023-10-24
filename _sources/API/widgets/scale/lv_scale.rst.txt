@@ -1,0 +1,10 @@
+.. _lv_scale:
+
+==========
+lv_scale.h
+==========
+
+
+.. doxygenfile:: lv_scale.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _lv_fragment:
+
+=============
+lv_fragment.h
+=============
+
+
+.. doxygenfile:: lv_fragment.h
+    :project: lvgl
+

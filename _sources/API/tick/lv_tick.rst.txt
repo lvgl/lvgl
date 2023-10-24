@@ -1,0 +1,10 @@
+.. _lv_tick:
+
+=========
+lv_tick.h
+=========
+
+
+.. doxygenfile:: lv_tick.h
+    :project: lvgl
+

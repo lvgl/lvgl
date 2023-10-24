@@ -1,0 +1,10 @@
+.. _lv_cache_builtin:
+
+==================
+lv_cache_builtin.h
+==================
+
+
+.. doxygenfile:: lv_cache_builtin.h
+    :project: lvgl
+

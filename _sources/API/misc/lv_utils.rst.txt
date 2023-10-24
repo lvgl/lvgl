@@ -1,0 +1,10 @@
+.. _lv_utils:
+
+==========
+lv_utils.h
+==========
+
+
+.. doxygenfile:: lv_utils.h
+    :project: lvgl
+

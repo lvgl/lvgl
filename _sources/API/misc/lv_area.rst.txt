@@ -1,0 +1,10 @@
+.. _lv_area:
+
+=========
+lv_area.h
+=========
+
+
+.. doxygenfile:: lv_area.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _stb_truetype_htcw:
+
+===================
+stb_truetype_htcw.h
+===================
+
+
+.. doxygenfile:: stb_truetype_htcw.h
+    :project: lvgl
+

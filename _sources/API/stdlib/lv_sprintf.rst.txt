@@ -1,0 +1,10 @@
+.. _lv_sprintf:
+
+============
+lv_sprintf.h
+============
+
+
+.. doxygenfile:: lv_sprintf.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _lv_draw_sw_mask:
+
+=================
+lv_draw_sw_mask.h
+=================
+
+
+.. doxygenfile:: lv_draw_sw_mask.h
+    :project: lvgl
+

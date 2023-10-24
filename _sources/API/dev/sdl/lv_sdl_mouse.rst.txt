@@ -1,0 +1,10 @@
+.. _lv_sdl_mouse:
+
+==============
+lv_sdl_mouse.h
+==============
+
+
+.. doxygenfile:: lv_sdl_mouse.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+===
+ime
+===
+
+
+.. toctree::
+    :maxdepth: 2
+
+    lv_ime_pinyin
+

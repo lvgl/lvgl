@@ -1,0 +1,10 @@
+.. _lv_font_fmt_txt:
+
+=================
+lv_font_fmt_txt.h
+=================
+
+
+.. doxygenfile:: lv_font_fmt_txt.h
+    :project: lvgl
+

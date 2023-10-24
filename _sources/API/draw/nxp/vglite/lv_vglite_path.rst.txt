@@ -1,0 +1,10 @@
+.. _lv_vglite_path:
+
+================
+lv_vglite_path.h
+================
+
+
+.. doxygenfile:: lv_vglite_path.h
+    :project: lvgl
+

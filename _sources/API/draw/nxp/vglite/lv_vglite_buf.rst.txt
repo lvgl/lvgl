@@ -1,0 +1,10 @@
+.. _lv_vglite_buf:
+
+===============
+lv_vglite_buf.h
+===============
+
+
+.. doxygenfile:: lv_vglite_buf.h
+    :project: lvgl
+

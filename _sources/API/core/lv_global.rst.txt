@@ -1,0 +1,10 @@
+.. _lv_global:
+
+===========
+lv_global.h
+===========
+
+
+.. doxygenfile:: lv_global.h
+    :project: lvgl
+

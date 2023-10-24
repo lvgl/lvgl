@@ -1,0 +1,10 @@
+.. _lv_draw_sw_gradient:
+
+=====================
+lv_draw_sw_gradient.h
+=====================
+
+
+.. doxygenfile:: lv_draw_sw_gradient.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _lv_bar:
+
+========
+lv_bar.h
+========
+
+
+.. doxygenfile:: lv_bar.h
+    :project: lvgl
+

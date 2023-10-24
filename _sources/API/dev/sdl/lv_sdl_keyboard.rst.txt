@@ -1,0 +1,10 @@
+.. _lv_sdl_keyboard:
+
+=================
+lv_sdl_keyboard.h
+=================
+
+
+.. doxygenfile:: lv_sdl_keyboard.h
+    :project: lvgl
+

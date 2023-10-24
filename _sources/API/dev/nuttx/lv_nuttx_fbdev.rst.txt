@@ -1,0 +1,10 @@
+.. _lv_nuttx_fbdev:
+
+================
+lv_nuttx_fbdev.h
+================
+
+
+.. doxygenfile:: lv_nuttx_fbdev.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _lv_text_ap:
+
+============
+lv_text_ap.h
+============
+
+
+.. doxygenfile:: lv_text_ap.h
+    :project: lvgl
+

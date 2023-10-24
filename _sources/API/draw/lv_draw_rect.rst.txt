@@ -1,0 +1,10 @@
+.. _lv_draw_rect:
+
+==============
+lv_draw_rect.h
+==============
+
+
+.. doxygenfile:: lv_draw_rect.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _gifdec:
+
+========
+gifdec.h
+========
+
+
+.. doxygenfile:: gifdec.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _lv_conf_internal:
+
+==================
+lv_conf_internal.h
+==================
+
+
+.. doxygenfile:: lv_conf_internal.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _lv_libjpeg_turbo:
+
+==================
+lv_libjpeg_turbo.h
+==================
+
+
+.. doxygenfile:: lv_libjpeg_turbo.h
+    :project: lvgl
+

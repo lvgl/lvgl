@@ -1,0 +1,10 @@
+.. _lv_draw_sw_blend_to_argb8888:
+
+==============================
+lv_draw_sw_blend_to_argb8888.h
+==============================
+
+
+.. doxygenfile:: lv_draw_sw_blend_to_argb8888.h
+    :project: lvgl
+

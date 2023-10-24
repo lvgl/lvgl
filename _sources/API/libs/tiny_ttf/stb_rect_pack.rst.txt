@@ -1,0 +1,10 @@
+.. _stb_rect_pack:
+
+===============
+stb_rect_pack.h
+===============
+
+
+.. doxygenfile:: stb_rect_pack.h
+    :project: lvgl
+

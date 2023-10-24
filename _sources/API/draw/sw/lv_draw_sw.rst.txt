@@ -1,0 +1,10 @@
+.. _lv_draw_sw:
+
+============
+lv_draw_sw.h
+============
+
+
+.. doxygenfile:: lv_draw_sw.h
+    :project: lvgl
+

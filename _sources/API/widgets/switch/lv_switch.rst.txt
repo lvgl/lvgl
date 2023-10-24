@@ -1,0 +1,10 @@
+.. _lv_switch:
+
+===========
+lv_switch.h
+===========
+
+
+.. doxygenfile:: lv_switch.h
+    :project: lvgl
+

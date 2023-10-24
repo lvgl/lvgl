@@ -1,0 +1,10 @@
+.. _lv_linux_drm:
+
+==============
+lv_linux_drm.h
+==============
+
+
+.. doxygenfile:: lv_linux_drm.h
+    :project: lvgl
+

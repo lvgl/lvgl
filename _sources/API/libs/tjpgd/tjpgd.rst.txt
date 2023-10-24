@@ -1,0 +1,10 @@
+.. _tjpgd:
+
+=======
+tjpgd.h
+=======
+
+
+.. doxygenfile:: tjpgd.h
+    :project: lvgl
+

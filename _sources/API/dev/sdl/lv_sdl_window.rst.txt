@@ -1,0 +1,10 @@
+.. _lv_sdl_window:
+
+===============
+lv_sdl_window.h
+===============
+
+
+.. doxygenfile:: lv_sdl_window.h
+    :project: lvgl
+

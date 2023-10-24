@@ -1,0 +1,10 @@
+.. _lv_pxp_osa:
+
+============
+lv_pxp_osa.h
+============
+
+
+.. doxygenfile:: lv_pxp_osa.h
+    :project: lvgl
+

@@ -1,0 +1,10 @@
+.. _lv_anim_timeline:
+
+==================
+lv_anim_timeline.h
+==================
+
+
+.. doxygenfile:: lv_anim_timeline.h
+    :project: lvgl
+

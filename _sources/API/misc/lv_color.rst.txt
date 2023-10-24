@@ -1,0 +1,10 @@
+.. _lv_color:
+
+==========
+lv_color.h
+==========
+
+
+.. doxygenfile:: lv_color.h
+    :project: lvgl
+

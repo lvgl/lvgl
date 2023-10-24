@@ -1,0 +1,10 @@
+.. _lv_sysmon:
+
+===========
+lv_sysmon.h
+===========
+
+
+.. doxygenfile:: lv_sysmon.h
+    :project: lvgl
+

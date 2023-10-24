@@ -1,0 +1,10 @@
+.. _lv_vglite_matrix:
+
+==================
+lv_vglite_matrix.h
+==================
+
+
+.. doxygenfile:: lv_vglite_matrix.h
+    :project: lvgl
+

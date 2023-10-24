@@ -1,0 +1,10 @@
+.. _lv_obj_scroll:
+
+===============
+lv_obj_scroll.h
+===============
+
+
+.. doxygenfile:: lv_obj_scroll.h
+    :project: lvgl
+

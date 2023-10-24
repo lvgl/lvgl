@@ -1,0 +1,10 @@
+.. _lv_draw_sw_blend:
+
+==================
+lv_draw_sw_blend.h
+==================
+
+
+.. doxygenfile:: lv_draw_sw_blend.h
+    :project: lvgl
+

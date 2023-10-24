@@ -1,0 +1,10 @@
+.. _lv_draw_arc:
+
+=============
+lv_draw_arc.h
+=============
+
+
+.. doxygenfile:: lv_draw_arc.h
+    :project: lvgl
+

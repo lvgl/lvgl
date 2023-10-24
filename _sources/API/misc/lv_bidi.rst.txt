@@ -1,0 +1,10 @@
+.. _lv_bidi:
+
+=========
+lv_bidi.h
+=========
+
+
+.. doxygenfile:: lv_bidi.h
+    :project: lvgl
+
