@@ -18,6 +18,6 @@ endif()
 
 if(MSVC)
   if (BUILD_SHARED_LIBS)
-    target_compile_definitions(lvgl PRIVATE INSIDE_DLL)
+    target_compile_definitions(lvgl PRIVATE LV_INSIDE_DLL)
   endif()
 endif()

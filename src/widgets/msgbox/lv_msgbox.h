@@ -43,9 +43,9 @@ typedef struct {
     lv_obj_t * buttons;
 } lv_msgbox_t;
 
-DLLIMPEXP const lv_obj_class_t lv_msgbox_class;
-DLLIMPEXP const lv_obj_class_t lv_msgbox_content_class;
-DLLIMPEXP const lv_obj_class_t lv_msgbox_backdrop_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_msgbox_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_msgbox_content_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_msgbox_backdrop_class;
 
 /**********************
  * GLOBAL PROTOTYPES

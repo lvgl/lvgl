@@ -34,8 +34,8 @@ typedef struct {
     lv_dir_t dir;
 } lv_tileview_tile_t;
 
-DLLIMPEXP const lv_obj_class_t lv_tileview_class;
-DLLIMPEXP const lv_obj_class_t lv_tileview_tile_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_tileview_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_tileview_tile_class;
 
 /**********************
  * GLOBAL PROTOTYPES
