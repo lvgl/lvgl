@@ -118,6 +118,10 @@ lvgl/CMakeFiles/lvgl.dir/src/indev/lv_indev.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../display/../draw/sw/blend/../../../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../display/../draw/sw/blend/../../../misc/lv_style.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../misc/lv_profiler_builtin.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../others/sysmon/lv_sysmon.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../others/sysmon/../../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../others/sysmon/../../others/observer/lv_observer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../others/sysmon/../../others/observer/../../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../stdlib/builtin/lv_tlsf.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../stdlib/builtin/../../lv_conf_internal.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/../core/../stdlib/builtin/../../osal/lv_os.h \

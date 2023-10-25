@@ -220,7 +220,9 @@ lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/snapshot/lv_snapshot.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/snapshot/../../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/sysmon/lv_sysmon.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/sysmon/../../../lvgl.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/sysmon/../../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/sysmon/../../others/observer/lv_observer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/sysmon/../../others/observer/../../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/monkey/lv_monkey.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/monkey/../../../lvgl.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/gridnav/lv_gridnav.h \
@@ -230,7 +232,6 @@ lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/imgfont/lv_imgfont.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/imgfont/../../../lvgl.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/observer/lv_observer.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/observer/../../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/ime/lv_ime_pinyin.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/ime/../../../lvgl.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/file_explorer/lv_file_explorer.h \
@@ -308,6 +309,7 @@ lvgl/CMakeFiles/lvgl.dir/src/dev/nuttx/lv_nuttx_libuv.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../misc/lv_log.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../misc/lv_profiler_builtin.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../others/sysmon/lv_sysmon.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../stdlib/builtin/lv_tlsf.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../stdlib/builtin/../../lv_conf_internal.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/dev/nuttx/../../indev/../core/../stdlib/builtin/../../osal/lv_os.h \

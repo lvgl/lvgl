@@ -106,6 +106,30 @@ lvgl/CMakeFiles/lvgl.dir/src/stdlib/builtin/lv_mem_core_builtin.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../misc/lv_profiler_builtin.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../misc/lv_style.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../others/sysmon/lv_sysmon.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../others/sysmon/../../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../others/sysmon/../../others/observer/lv_observer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../others/sysmon/../../others/observer/../../core/lv_obj.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../misc/lv_types.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../misc/lv_color.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../misc/lv_assert.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/lv_obj_tree.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../display/lv_display.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/lv_obj_pos.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/lv_obj_scroll.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/lv_obj_style.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../misc/lv_bidi.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/lv_obj_style_gen.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../core/lv_obj_style.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/lv_obj_draw.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/lv_obj_class.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/lv_obj_event.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../misc/lv_event.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../indev/lv_indev.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../indev/../core/lv_group.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../indev/../misc/lv_area.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../indev/../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/lv_group.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../stdlib/builtin/lv_tlsf.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../font/lv_font_fmt_txt.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/builtin/../../core/../tick/lv_tick.h \

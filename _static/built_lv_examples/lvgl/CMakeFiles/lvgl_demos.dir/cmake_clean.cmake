@@ -199,6 +199,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_list.c.o.d"
   "CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_main.c.o"
   "CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_main.c.o.d"
+  "CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o"
+  "CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o.d"
   "CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o"
   "CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o.d"
   "CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o"

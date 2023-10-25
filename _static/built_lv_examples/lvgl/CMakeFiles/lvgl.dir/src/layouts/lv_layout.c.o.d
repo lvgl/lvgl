@@ -104,14 +104,10 @@ lvgl/CMakeFiles/lvgl.dir/src/layouts/lv_layout.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../misc/lv_profiler_builtin.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../misc/lv_style.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../misc/lv_timer.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../stdlib/builtin/lv_tlsf.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../stdlib/builtin/../../lv_conf_internal.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../stdlib/builtin/../../osal/lv_os.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../stdlib/builtin/../../misc/lv_ll.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../font/lv_font_fmt_txt.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../tick/lv_tick.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../layouts/lv_layout.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/lv_obj.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../others/sysmon/lv_sysmon.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../others/sysmon/../../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../others/sysmon/../../others/observer/lv_observer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../others/sysmon/../../others/observer/../../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../misc/lv_types.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../misc/lv_color.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../misc/lv_assert.h \
@@ -131,4 +127,12 @@ lvgl/CMakeFiles/lvgl.dir/src/layouts/lv_layout.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../indev/../core/lv_group.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../indev/../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../indev/../misc/lv_timer.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/lv_group.h
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/lv_group.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../stdlib/builtin/lv_tlsf.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../stdlib/builtin/../../lv_conf_internal.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../stdlib/builtin/../../osal/lv_os.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../stdlib/builtin/../../misc/lv_ll.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../font/lv_font_fmt_txt.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../tick/lv_tick.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/../layouts/lv_layout.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/../core/lv_obj.h

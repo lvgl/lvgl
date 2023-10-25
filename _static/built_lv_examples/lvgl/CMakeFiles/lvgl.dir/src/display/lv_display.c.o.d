@@ -136,6 +136,10 @@ lvgl/CMakeFiles/lvgl.dir/src/display/lv_display.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../misc/lv_log.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../misc/lv_profiler_builtin.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../others/sysmon/lv_sysmon.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../others/sysmon/../../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../others/sysmon/../../others/observer/lv_observer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../others/sysmon/../../others/observer/../../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../stdlib/builtin/lv_tlsf.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../stdlib/builtin/../../lv_conf_internal.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/../core/../stdlib/builtin/../../osal/lv_os.h \

@@ -103,14 +103,10 @@ lvgl/CMakeFiles/lvgl.dir/src/lv_init.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_profiler_builtin.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_style.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_timer.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../stdlib/builtin/lv_tlsf.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../stdlib/builtin/../../lv_conf_internal.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../stdlib/builtin/../../osal/lv_os.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../stdlib/builtin/../../misc/lv_ll.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../font/lv_font_fmt_txt.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../tick/lv_tick.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../layouts/lv_layout.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../others/sysmon/lv_sysmon.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../others/sysmon/../../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../others/sysmon/../../others/observer/lv_observer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../others/sysmon/../../others/observer/../../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_types.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_color.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_assert.h \
@@ -131,6 +127,14 @@ lvgl/CMakeFiles/lvgl.dir/src/lv_init.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../indev/../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../indev/../misc/lv_timer.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_group.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../stdlib/builtin/lv_tlsf.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../stdlib/builtin/../../lv_conf_internal.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../stdlib/builtin/../../osal/lv_os.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../stdlib/builtin/../../misc/lv_ll.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../font/lv_font_fmt_txt.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../tick/lv_tick.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../layouts/lv_layout.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/display/lv_display_private.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../draw/sw/../../display/../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/indev/lv_indev_private.h \
@@ -244,7 +248,6 @@ lvgl/CMakeFiles/lvgl.dir/src/lv_init.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/snapshot/lv_snapshot.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/snapshot/../../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/sysmon/lv_sysmon.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/sysmon/../../../lvgl.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/monkey/lv_monkey.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/monkey/../../../lvgl.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/gridnav/lv_gridnav.h \
@@ -254,7 +257,6 @@ lvgl/CMakeFiles/lvgl.dir/src/lv_init.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/imgfont/lv_imgfont.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/imgfont/../../../lvgl.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/observer/lv_observer.h \
-  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/observer/../../core/lv_obj.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/ime/lv_ime_pinyin.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/ime/../../../lvgl.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/others/file_explorer/lv_file_explorer.h \

@@ -101,6 +101,30 @@ lvgl/CMakeFiles/lvgl.dir/src/draw/lv_draw_buf.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/lv_profiler_builtin.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/lv_style.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../others/sysmon/lv_sysmon.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../others/sysmon/../../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../others/sysmon/../../others/observer/lv_observer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../others/sysmon/../../others/observer/../../core/lv_obj.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/lv_types.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/lv_color.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/lv_assert.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_tree.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../display/lv_display.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_pos.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_scroll.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_style.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/lv_bidi.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_style_gen.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../core/lv_obj_style.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_draw.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_class.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_event.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/lv_event.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../indev/lv_indev.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../indev/../core/lv_group.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../indev/../misc/lv_area.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../indev/../misc/lv_timer.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_group.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../stdlib/builtin/lv_tlsf.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../stdlib/builtin/../../lv_conf_internal.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../stdlib/builtin/../../osal/lv_os.h \

@@ -2603,6 +2603,30 @@ demos/music/lv_demo_music_main.c.s:
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_main.c.s
 .PHONY : demos/music/lv_demo_music_main.c.s
 
+demos/render/lv_demo_render.o: demos/render/lv_demo_render.c.o
+.PHONY : demos/render/lv_demo_render.o
+
+# target to build an object file
+demos/render/lv_demo_render.c.o:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o
+.PHONY : demos/render/lv_demo_render.c.o
+
+demos/render/lv_demo_render.i: demos/render/lv_demo_render.c.i
+.PHONY : demos/render/lv_demo_render.i
+
+# target to preprocess a source file
+demos/render/lv_demo_render.c.i:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.i
+.PHONY : demos/render/lv_demo_render.c.i
+
+demos/render/lv_demo_render.s: demos/render/lv_demo_render.c.s
+.PHONY : demos/render/lv_demo_render.s
+
+# target to generate assembly for a file
+demos/render/lv_demo_render.c.s:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.s
+.PHONY : demos/render/lv_demo_render.c.s
+
 demos/scroll/lv_demo_scroll.o: demos/scroll/lv_demo_scroll.c.o
 .PHONY : demos/scroll/lv_demo_scroll.o
 
@@ -13046,6 +13070,9 @@ help:
 	@echo "... demos/music/lv_demo_music_main.o"
 	@echo "... demos/music/lv_demo_music_main.i"
 	@echo "... demos/music/lv_demo_music_main.s"
+	@echo "... demos/render/lv_demo_render.o"
+	@echo "... demos/render/lv_demo_render.i"
+	@echo "... demos/render/lv_demo_render.s"
 	@echo "... demos/scroll/lv_demo_scroll.o"
 	@echo "... demos/scroll/lv_demo_scroll.i"
 	@echo "... demos/scroll/lv_demo_scroll.s"

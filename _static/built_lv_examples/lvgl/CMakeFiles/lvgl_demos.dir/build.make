@@ -1569,11 +1569,26 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_main.c.s"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/music/lv_demo_music_main.c -o CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_main.c.s
 
+lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o: lvgl/CMakeFiles/lvgl_demos.dir/flags.make
+lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
+lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/render/lv_demo_render.c
+lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_101) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o"
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o -MF CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/render/lv_demo_render.c
+
+lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.i"
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/render/lv_demo_render.c > CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.i
+
+lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.s"
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/render/lv_demo_render.c -o CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.s
+
 lvgl/CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o: lvgl/CMakeFiles/lvgl_demos.dir/flags.make
 lvgl/CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
 lvgl/CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/scroll/lv_demo_scroll.c
 lvgl/CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_101) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_102) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o -MF CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/scroll/lv_demo_scroll.c
 
 lvgl/CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.i: cmake_force
@@ -1588,7 +1603,7 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o: lvgl/CMakeFiles/
 lvgl/CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
 lvgl/CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/stress/lv_demo_stress.c
 lvgl/CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_102) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_103) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o -MF CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/stress/lv_demo_stress.c
 
 lvgl/CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.i: cmake_force
@@ -1603,7 +1618,7 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.
 lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
 lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/transform/assets/img_transform_avatar_15.c
 lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_103) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_104) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o -MF CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/transform/assets/img_transform_avatar_15.c
 
 lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.i: cmake_force
@@ -1618,7 +1633,7 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.o: lvgl/CMake
 lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
 lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/transform/lv_demo_transform.c
 lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_104) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_105) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.o"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.o -MF CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/transform/lv_demo_transform.c
 
 lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/lv_demo_transform.c.i: cmake_force
@@ -1633,7 +1648,7 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.o: lvgl/CMakeF
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/assets/img_clothes.c
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_105) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_106) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.o"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.o -MF CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/assets/img_clothes.c
 
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_clothes.c.i: cmake_force
@@ -1648,7 +1663,7 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.o:
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/assets/img_demo_widgets_avatar.c
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_106) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_107) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.o"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.o -MF CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/assets/img_demo_widgets_avatar.c
 
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_avatar.c.i: cmake_force
@@ -1663,7 +1678,7 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.o:
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/assets/img_demo_widgets_needle.c
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_107) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_108) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.o"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.o -MF CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/assets/img_demo_widgets_needle.c
 
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_demo_widgets_needle.c.i: cmake_force
@@ -1678,7 +1693,7 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.o: lvgl/CMak
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/assets/img_lvgl_logo.c
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_108) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_109) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.o"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.o -MF CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/assets/img_lvgl_logo.c
 
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lvgl_logo.c.i: cmake_force
@@ -1693,7 +1708,7 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o: lvgl/CMakeFile
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o: lvgl/CMakeFiles/lvgl_demos.dir/includes_C.rsp
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o: /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/lv_demo_widgets.c
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o: lvgl/CMakeFiles/lvgl_demos.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_109) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_110) "Building C object lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && ccache /home/runner/work/lvgl/lvgl/emsdk-cache/emsdk-master/upstream/emscripten/emcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o -MF CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o.d -o CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o -c /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/demos/widgets/lv_demo_widgets.c
 
 lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.i: cmake_force
@@ -1806,6 +1821,7 @@ lvgl_demos_OBJECTS = \
 "CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music.c.o" \
 "CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_list.c.o" \
 "CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_main.c.o" \
+"CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o" \
 "CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o" \
 "CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o" \
 "CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o" \
@@ -1919,6 +1935,7 @@ lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/music/assets/img_lv_d
 lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music.c.o
 lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_list.c.o
 lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_main.c.o
+lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/render/lv_demo_render.c.o
 lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/scroll/lv_demo_scroll.c.o
 lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/stress/lv_demo_stress.c.o
 lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/transform/assets/img_transform_avatar_15.c.o
@@ -1930,7 +1947,7 @@ lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/assets/img_lv
 lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/demos/widgets/lv_demo_widgets.c.o
 lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/build.make
 lvgl/liblvgl_demos.a: lvgl/CMakeFiles/lvgl_demos.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_110) "Linking C static library liblvgl_demos.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/CMakeFiles --progress-num=$(CMAKE_PROGRESS_111) "Linking C static library liblvgl_demos.a"
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && $(CMAKE_COMMAND) -P CMakeFiles/lvgl_demos.dir/cmake_clean_target.cmake
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild/lvgl && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/lvgl_demos.dir/link.txt --verbose=$(VERBOSE)
 
