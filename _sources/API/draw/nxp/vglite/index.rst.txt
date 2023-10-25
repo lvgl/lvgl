@@ -6,9 +6,9 @@ vglite
 .. toctree::
     :maxdepth: 2
 
-    lv_draw_vglite
-    lv_vglite_buf
     lv_vglite_matrix
     lv_vglite_utils
+    lv_vglite_buf
     lv_vglite_path
+    lv_draw_vglite
 

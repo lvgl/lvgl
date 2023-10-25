@@ -6,8 +6,8 @@ sw
 .. toctree::
     :maxdepth: 2
 
-    lv_draw_sw_gradient
-    lv_draw_sw
     lv_draw_sw_mask
+    lv_draw_sw
+    lv_draw_sw_gradient
     blend/index
 

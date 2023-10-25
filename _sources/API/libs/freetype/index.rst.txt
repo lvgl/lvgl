@@ -6,7 +6,7 @@ freetype
 .. toctree::
     :maxdepth: 2
 
-    ftoption
     lv_freetype
+    ftoption
     ftmodule
 

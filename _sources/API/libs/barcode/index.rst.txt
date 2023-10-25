@@ -6,6 +6,6 @@ barcode
 .. toctree::
     :maxdepth: 2
 
-    code128
     lv_barcode
+    code128
 

@@ -6,36 +6,36 @@ widgets
 .. toctree::
     :maxdepth: 2
 
-    win/index
-    msgbox/index
-    table/index
-    scale/index
-    chart/index
-    spinbox/index
-    buttonmatrix/index
-    menu/index
-    line/index
-    roller/index
-    bar/index
-    spinner/index
-    span/index
-    objx_templ/index
-    animimage/index
-    calendar/index
     slider/index
-    dropdown/index
-    tabview/index
     label/index
-    image/index
-    keyboard/index
-    checkbox/index
-    arc/index
-    tileview/index
-    button/index
-    list/index
-    imgbtn/index
-    switch/index
+    dropdown/index
+    menu/index
+    objx_templ/index
     led/index
-    canvas/index
+    arc/index
+    list/index
+    image/index
+    tabview/index
+    keyboard/index
+    bar/index
     textarea/index
+    table/index
+    line/index
+    switch/index
+    animimage/index
+    msgbox/index
+    calendar/index
+    roller/index
+    buttonmatrix/index
+    scale/index
+    span/index
+    spinbox/index
+    spinner/index
+    chart/index
+    canvas/index
+    imgbtn/index
+    win/index
+    tileview/index
+    checkbox/index
+    button/index
 

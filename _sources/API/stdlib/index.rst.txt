@@ -6,8 +6,8 @@ stdlib
 .. toctree::
     :maxdepth: 2
 
-    lv_string
     lv_mem
     lv_sprintf
+    lv_string
     builtin/index
 

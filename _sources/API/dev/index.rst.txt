@@ -7,7 +7,7 @@ dev
     :maxdepth: 2
 
     display/index
+    sdl/index
     evdev/index
     nuttx/index
-    sdl/index
 

@@ -6,17 +6,17 @@ libs
 .. toctree::
     :maxdepth: 2
 
-    bmp/index
-    libjpeg_turbo/index
-    ffmpeg/index
-    tjpgd/index
-    qrcode/index
-    rlottie/index
-    barcode/index
-    lodepng/index
     freetype/index
     fsdrv/index
     gif/index
+    ffmpeg/index
+    tjpgd/index
+    barcode/index
+    qrcode/index
     tiny_ttf/index
+    rlottie/index
     libpng/index
+    libjpeg_turbo/index
+    lodepng/index
+    bmp/index
 
