@@ -379,6 +379,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &theme->styles.chart_indic, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &theme->styles.card, LV_PART_ITEMS);
+        lv_obj_add_style(obj, &theme->styles.card, LV_PART_TICKS);
         lv_obj_add_style(obj, &theme->styles.card, LV_PART_CURSOR);
         lv_obj_add_style(obj, &theme->styles.focus, LV_STATE_FOCUS_KEY);
     }
