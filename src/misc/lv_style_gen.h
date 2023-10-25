@@ -78,10 +78,12 @@ void lv_style_set_bg_main_stop(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_BG_MAIN_STOP;
 void lv_style_set_bg_grad_stop(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_BG_GRAD_STOP;
+void lv_style_set_bg_main_opa(lv_style_t * style, lv_opa_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_BG_MAIN_OPA;
+void lv_style_set_bg_grad_opa(lv_style_t * style, lv_opa_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_BG_GRAD_OPA;
 void lv_style_set_bg_grad(lv_style_t * style, const lv_grad_dsc_t * value);
 extern const lv_style_prop_t _lv_style_const_prop_id_BG_GRAD;
-void lv_style_set_bg_dither_mode(lv_style_t * style, lv_dither_mode_t value);
-extern const lv_style_prop_t _lv_style_const_prop_id_BG_DITHER_MODE;
 void lv_style_set_bg_image_src(lv_style_t * style, const void * value);
 extern const lv_style_prop_t _lv_style_const_prop_id_BG_IMAGE_SRC;
 void lv_style_set_bg_image_opa(lv_style_t * style, lv_opa_t value);
@@ -391,14 +393,19 @@ extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
         .prop_ptr = &_lv_style_const_prop_id_BG_GRAD_STOP, .value = { .num = (int32_t)val } \
     }
 
+#define LV_STYLE_CONST_BG_MAIN_OPA(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_BG_MAIN_OPA, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_BG_GRAD_OPA(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_BG_GRAD_OPA, .value = { .num = (int32_t)val } \
+    }
+
 #define LV_STYLE_CONST_BG_GRAD(val) \
     { \
         .prop_ptr = &_lv_style_const_prop_id_BG_GRAD, .value = { .ptr = val } \
-    }
-
-#define LV_STYLE_CONST_BG_DITHER_MODE(val) \
-    { \
-        .prop_ptr = &_lv_style_const_prop_id_BG_DITHER_MODE, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_BG_IMAGE_SRC(val) \

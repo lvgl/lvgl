@@ -2634,14 +2634,13 @@
         #define LV_USE_DEMO_BENCHMARK 0
     #endif
 #endif
-#if LV_USE_DEMO_BENCHMARK
-    /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-    #ifndef LV_DEMO_BENCHMARK_RGB565A8
-        #ifdef CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-            #define LV_DEMO_BENCHMARK_RGB565A8 CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-        #else
-            #define LV_DEMO_BENCHMARK_RGB565A8 0
-        #endif
+
+/*Render test for each primitives. Requires at least 480x272 display*/
+#ifndef LV_USE_DEMO_RENDER
+    #ifdef CONFIG_LV_USE_DEMO_RENDER
+        #define LV_USE_DEMO_RENDER CONFIG_LV_USE_DEMO_RENDER
+    #else
+        #define LV_USE_DEMO_RENDER 0
     #endif
 #endif
 
