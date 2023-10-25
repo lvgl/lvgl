@@ -936,8 +936,8 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, 
         smaller_angle = arc->bg_angle_start;
     }
     else {
-        bigger_angle = 360U - arc->bg_angle_end;
-        smaller_angle = arc->bg_angle_start;
+        bigger_angle = (360 - arc->bg_angle_start) + arc->bg_angle_end;
+        smaller_angle = 0;
     }
 
     /* Angle is between both background angles */
