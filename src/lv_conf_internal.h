@@ -149,17 +149,6 @@
     #endif
 #endif  /*LV_USE_MALLOC == LV_STDLIB_BUILTIN*/
 
-
-#if LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN
-    #ifndef LV_SPRINTF_USE_FLOAT
-        #ifdef CONFIG_LV_SPRINTF_USE_FLOAT
-            #define LV_SPRINTF_USE_FLOAT CONFIG_LV_SPRINTF_USE_FLOAT
-        #else
-            #define LV_SPRINTF_USE_FLOAT 0
-        #endif
-    #endif
-#endif  /*LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN*/
-
 /*====================
    HAL SETTINGS
  *====================*/
@@ -746,7 +735,7 @@
     #ifdef CONFIG_LV_GRADIENT_MAX_STOPS
         #define LV_GRADIENT_MAX_STOPS CONFIG_LV_GRADIENT_MAX_STOPS
     #else
-        #define LV_GRADIENT_MAX_STOPS 2
+        #define LV_GRADIENT_MAX_STOPS   2
     #endif
 #endif
 
@@ -756,7 +745,7 @@
     #ifdef CONFIG_LV_COLOR_MIX_ROUND_OFS
         #define LV_COLOR_MIX_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
     #else
-        #define LV_COLOR_MIX_ROUND_OFS 0
+        #define LV_COLOR_MIX_ROUND_OFS  0
     #endif
 #endif
 
@@ -765,7 +754,7 @@
     #ifdef CONFIG_LV_OBJ_STYLE_CACHE
         #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
     #else
-        #define LV_OBJ_STYLE_CACHE 0
+        #define LV_OBJ_STYLE_CACHE      0
     #endif
 #endif
 
@@ -774,7 +763,7 @@
     #ifdef CONFIG_LV_USE_OBJ_ID
         #define LV_USE_OBJ_ID CONFIG_LV_USE_OBJ_ID
     #else
-        #define LV_USE_OBJ_ID 0
+        #define LV_USE_OBJ_ID           0
     #endif
 #endif
 
@@ -783,7 +772,7 @@
     #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
         #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
     #else
-        #define LV_USE_OBJ_ID_BUILTIN 0
+        #define LV_USE_OBJ_ID_BUILTIN   0
     #endif
 #endif
 
@@ -893,6 +882,15 @@
         #define LV_USE_LARGE_COORD CONFIG_LV_USE_LARGE_COORD
     #else
         #define LV_USE_LARGE_COORD 0
+    #endif
+#endif
+
+/* Use `float` as `lv_value_precise_t` */
+#ifndef LV_USE_FLOAT
+    #ifdef CONFIG_LV_USE_FLOAT
+        #define LV_USE_FLOAT CONFIG_LV_USE_FLOAT
+    #else
+        #define LV_USE_FLOAT            0
     #endif
 #endif
 
@@ -2517,47 +2515,58 @@
     #endif
 #endif
 
-/*Use Nuttx custom init API to open window and handle touchscreen*/
-#ifndef LV_USE_NUTTX_CUSTOM_INIT
-    #ifdef CONFIG_LV_USE_NUTTX_CUSTOM_INIT
-        #define LV_USE_NUTTX_CUSTOM_INIT CONFIG_LV_USE_NUTTX_CUSTOM_INIT
-    #else
-        #define LV_USE_NUTTX_CUSTOM_INIT    0
-    #endif
-#endif
-
-/*Driver for /dev/lcd*/
-#ifndef LV_USE_NUTTX_LCD
-    #ifdef CONFIG_LV_USE_NUTTX_LCD
-        #define LV_USE_NUTTX_LCD CONFIG_LV_USE_NUTTX_LCD
-    #else
-        #define LV_USE_NUTTX_LCD      0
-    #endif
-#endif
-#if LV_USE_NUTTX_LCD
-    #ifndef LV_NUTTX_LCD_BUFFER_COUNT
-        #ifdef CONFIG_LV_NUTTX_LCD_BUFFER_COUNT
-            #define LV_NUTTX_LCD_BUFFER_COUNT CONFIG_LV_NUTTX_LCD_BUFFER_COUNT
+#if LV_USE_NUTTX
+    #ifndef LV_USE_NUTTX_LIBUV
+        #ifdef CONFIG_LV_USE_NUTTX_LIBUV
+            #define LV_USE_NUTTX_LIBUV CONFIG_LV_USE_NUTTX_LIBUV
         #else
-            #define LV_NUTTX_LCD_BUFFER_COUNT    0
+            #define LV_USE_NUTTX_LIBUV    0
         #endif
     #endif
-    #ifndef LV_NUTTX_LCD_BUFFER_SIZE
-        #ifdef CONFIG_LV_NUTTX_LCD_BUFFER_SIZE
-            #define LV_NUTTX_LCD_BUFFER_SIZE CONFIG_LV_NUTTX_LCD_BUFFER_SIZE
+
+    /*Use Nuttx custom init API to open window and handle touchscreen*/
+    #ifndef LV_USE_NUTTX_CUSTOM_INIT
+        #ifdef CONFIG_LV_USE_NUTTX_CUSTOM_INIT
+            #define LV_USE_NUTTX_CUSTOM_INIT CONFIG_LV_USE_NUTTX_CUSTOM_INIT
         #else
-            #define LV_NUTTX_LCD_BUFFER_SIZE     60
+            #define LV_USE_NUTTX_CUSTOM_INIT    0
         #endif
     #endif
-#endif
 
-/*Driver for /dev/input*/
-#ifndef LV_USE_NUTTX_TOUCHSCREEN
-    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
-        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
-    #else
-        #define LV_USE_NUTTX_TOUCHSCREEN    0
+    /*Driver for /dev/lcd*/
+    #ifndef LV_USE_NUTTX_LCD
+        #ifdef CONFIG_LV_USE_NUTTX_LCD
+            #define LV_USE_NUTTX_LCD CONFIG_LV_USE_NUTTX_LCD
+        #else
+            #define LV_USE_NUTTX_LCD      0
+        #endif
     #endif
+    #if LV_USE_NUTTX_LCD
+        #ifndef LV_NUTTX_LCD_BUFFER_COUNT
+            #ifdef CONFIG_LV_NUTTX_LCD_BUFFER_COUNT
+                #define LV_NUTTX_LCD_BUFFER_COUNT CONFIG_LV_NUTTX_LCD_BUFFER_COUNT
+            #else
+                #define LV_NUTTX_LCD_BUFFER_COUNT    0
+            #endif
+        #endif
+        #ifndef LV_NUTTX_LCD_BUFFER_SIZE
+            #ifdef CONFIG_LV_NUTTX_LCD_BUFFER_SIZE
+                #define LV_NUTTX_LCD_BUFFER_SIZE CONFIG_LV_NUTTX_LCD_BUFFER_SIZE
+            #else
+                #define LV_NUTTX_LCD_BUFFER_SIZE     60
+            #endif
+        #endif
+    #endif
+
+    /*Driver for /dev/input*/
+    #ifndef LV_USE_NUTTX_TOUCHSCREEN
+        #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+            #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+        #else
+            #define LV_USE_NUTTX_TOUCHSCREEN    0
+        #endif
+    #endif
+
 #endif
 
 /*Driver for /dev/dri/card*/
@@ -2763,6 +2772,11 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
 
 #undef _LV_KCONFIG_PRESENT
 
+#if LV_USE_FLOAT
+    typedef float lv_value_precise_t;
+#else
+    typedef int32_t lv_value_precise_t;
+#endif
 
 /*Set some defines if a dependency is disabled*/
 #if LV_USE_LOG == 0

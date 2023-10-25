@@ -30,8 +30,8 @@ typedef struct {
 
     lv_color_t color;
     lv_coord_t width;
-    uint16_t start_angle;
-    uint16_t end_angle;
+    lv_value_precise_t start_angle;
+    lv_value_precise_t end_angle;
     lv_point_t center;
     uint16_t radius;
     const void * img_src;
@@ -60,7 +60,8 @@ void lv_draw_arc(struct _lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
  * @param rounded       true: the arc is rounded
  * @param area          store the area to invalidate here
  */
-void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
+void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  lv_value_precise_t start_angle,
+                          lv_value_precise_t end_angle,
                           lv_coord_t w, bool rounded, lv_area_t * area);
 
 /**********************

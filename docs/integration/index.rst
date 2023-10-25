@@ -1,5 +1,5 @@
 =======================
-Integration and drivers
+Integration and Drivers
 =======================
 
 .. toctree::

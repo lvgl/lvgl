@@ -13,6 +13,7 @@
 #define LV_USE_ASSERT_OBJ               1
 #define LV_USE_ASSERT_STYLE             1
 #define LV_USE_LARGE_COORD      1
+#define LV_USE_FLOAT      1
 
 #define LV_FONT_MONTSERRAT_8    1
 #define LV_FONT_MONTSERRAT_10   1

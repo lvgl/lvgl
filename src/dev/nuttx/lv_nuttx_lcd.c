@@ -9,6 +9,8 @@
 
 #include "lv_nuttx_lcd.h"
 
+#if LV_USE_NUTTX
+
 #if LV_USE_NUTTX_LCD
 
 #include <sys/ioctl.h>
@@ -20,7 +22,7 @@
 #include <fcntl.h>
 #include <nuttx/lcd/lcd_dev.h>
 
-#include <lvgl/lvgl.h>
+#include "../../../lvgl.h"
 #include "../../lvgl_private.h"
 
 /*********************
@@ -134,7 +136,7 @@ static void rounder_cb(lv_event_t * e)
 static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
                      uint8_t * color_p)
 {
-    lv_nuttx_lcd_t * lcd = disp->user_data;
+    lv_nuttx_lcd_t * lcd = disp->driver_data;
 
     lcd->area.row_start = area_p->y1;
     lcd->area.row_end = area_p->y2;
@@ -198,9 +200,12 @@ static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
     lv_display_set_draw_buffers(lcd->disp, draw_buf, draw_buf_2, buf_size, render_mode);
     lv_display_set_flush_cb(lcd->disp, flush_cb);
     lv_event_add(&lcd->disp->event_list, rounder_cb, LV_EVENT_INVALIDATE_AREA, lcd);
-    lcd->disp->user_data = lcd;
+    lcd->disp->driver_data = lcd;
+    lcd->disp->user_data = (void *)(uintptr_t)fd;
 
     return lcd->disp;
 }
 
 #endif /*LV_USE_NUTTX_LCD*/
+
+#endif /* LV_USE_NUTTX*/

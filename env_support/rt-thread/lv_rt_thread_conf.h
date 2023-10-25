@@ -55,7 +55,6 @@
 #define LV_SPRINTF_INCLUDE LV_RTTHREAD_INCLUDE
 #define LV_SNPRINTF  rt_snprintf
 #define LV_VSNPRINTF rt_vsnprintf
-#define LV_SPRINTF_USE_FLOAT 0
 
 /*=====================
  *  COMPILER SETTINGS
