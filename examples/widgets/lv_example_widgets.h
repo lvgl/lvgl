@@ -55,6 +55,7 @@ void lv_example_canvas_4(void);
 void lv_example_canvas_5(void);
 void lv_example_canvas_6(void);
 void lv_example_canvas_7(void);
+void lv_example_canvas_8(void);
 
 void lv_example_chart_1(void);
 void lv_example_chart_2(void);
