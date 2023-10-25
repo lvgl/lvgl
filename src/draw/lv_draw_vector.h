@@ -155,7 +155,7 @@ typedef struct {
 } lv_draw_vector_task_dsc_t;
 
 typedef struct {
-    struct _lv_layer_t * layer;
+    lv_layer_t * layer;
     lv_vector_draw_dsc_t current_dsc;
     /* private data */
     lv_draw_vector_task_dsc_t tasks;
@@ -193,7 +193,7 @@ void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c
 void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t * subpath);
 
 /* draw dsc property functions */
-lv_vector_dsc_t * lv_vector_dsc_create(struct _lv_layer_t * layer);
+lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer);
 void lv_vector_dsc_destroy(lv_vector_dsc_t * dsc);
 
 void lv_vector_dsc_set_transform(lv_vector_dsc_t * dsc, const lv_matrix_t * matrix);

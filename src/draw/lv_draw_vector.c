@@ -451,7 +451,7 @@ void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t 
 
 /* draw dsc functions */
 
-lv_vector_dsc_t * lv_vector_dsc_create(struct _lv_layer_t * layer)
+lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer)
 {
     lv_vector_dsc_t * dsc = lv_malloc(sizeof(lv_vector_dsc_t));
     LV_ASSERT_MALLOC(dsc);
@@ -689,7 +689,7 @@ void lv_vector_draw(lv_vector_dsc_t * dsc)
         return;
     }
 
-    struct _lv_layer_t * layer = dsc->layer;
+    lv_layer_t * layer = dsc->layer;
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->clip_area));
     t->type = LV_DRAW_TASK_TYPE_VECTOR;
