@@ -49,7 +49,7 @@ static lv_obj_t * fill_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t 
                            lv_color_hex3(0xff0),
                            lv_color_hex3(0x0ff),
                            lv_color_hex3(0xf0f),
-    };
+                          };
 
     lv_obj_t * obj = lv_obj_create(parent);
     lv_obj_remove_style_all(obj);
@@ -133,22 +133,22 @@ static lv_obj_t * border_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_
 static void border_cb(lv_obj_t * parent)
 {
     lv_border_side_t sides[] = {
-            LV_BORDER_SIDE_NONE,
-            LV_BORDER_SIDE_FULL,
-            LV_BORDER_SIDE_LEFT,
-            LV_BORDER_SIDE_RIGHT,
-            LV_BORDER_SIDE_TOP,
-            LV_BORDER_SIDE_BOTTOM,
-            LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_RIGHT,
-            LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_BOTTOM,
-            LV_BORDER_SIDE_LEFT| LV_BORDER_SIDE_BOTTOM,
-            LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_TOP,
-            LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT,
-            LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM,
-            LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_BOTTOM,
-            LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_TOP,
-            LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_TOP,
-            LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_TOP,
+        LV_BORDER_SIDE_NONE,
+        LV_BORDER_SIDE_FULL,
+        LV_BORDER_SIDE_LEFT,
+        LV_BORDER_SIDE_RIGHT,
+        LV_BORDER_SIDE_TOP,
+        LV_BORDER_SIDE_BOTTOM,
+        LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_RIGHT,
+        LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_BOTTOM,
+        LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_BOTTOM,
+        LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_TOP,
+        LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT,
+        LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM,
+        LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_BOTTOM,
+        LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_TOP,
+        LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_TOP,
+        LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT | LV_BORDER_SIDE_TOP,
     };
 
     uint32_t i;
@@ -214,9 +214,6 @@ static void border_cb(lv_obj_t * parent)
 /**********************
  *  STATIC VARIABLES
  **********************/
-//fill (radius + gradient too)
-//border (each sides + radius)
-//outline (radius)
 //box shadow (offset, size, spread)
 //text (normal text + underline/strike through, placeholder)
 //triangle (just some rectangles)
