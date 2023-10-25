@@ -52,7 +52,7 @@ typedef struct {
     uint8_t obj_size_mode: 2; /*Image size mode when image size and object size is different.*/
 } lv_image_t;
 
-DLLIMPEXP const lv_obj_class_t lv_image_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_image_class;
 
 /**
  * Image size mode, when image size and object size is different

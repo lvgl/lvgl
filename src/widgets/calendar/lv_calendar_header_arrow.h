@@ -23,7 +23,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-DLLIMPEXP const lv_obj_class_t lv_calendar_header_arrow_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_calendar_header_arrow_class;
 
 /**********************
  * GLOBAL PROTOTYPES

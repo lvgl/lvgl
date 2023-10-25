@@ -33,7 +33,7 @@ typedef struct {
     lv_dir_t tab_pos;
 } lv_tabview_t;
 
-DLLIMPEXP const lv_obj_class_t lv_tabview_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_tabview_class;
 
 /**********************
  * GLOBAL PROTOTYPES

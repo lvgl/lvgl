@@ -150,7 +150,7 @@ typedef uint32_t lv_obj_flag_t;
 /**
  * Make the base object's class publicly available.
  */
-DLLIMPEXP const lv_obj_class_t lv_obj_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_obj_class;
 
 /**
  * Special, rarely used attributes.

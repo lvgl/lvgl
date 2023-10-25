@@ -61,7 +61,7 @@ typedef struct {
     uint32_t row_act;
 } lv_table_t;
 
-DLLIMPEXP const lv_obj_class_t lv_table_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_table_class;
 
 /**********************
  * GLOBAL PROTOTYPES

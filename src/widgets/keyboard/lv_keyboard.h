@@ -65,7 +65,7 @@ typedef struct {
     uint8_t popovers : 1;       /*Show button titles in popovers on press*/
 } lv_keyboard_t;
 
-DLLIMPEXP const lv_obj_class_t lv_keyboard_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_keyboard_class;
 
 /**********************
  * GLOBAL PROTOTYPES

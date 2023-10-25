@@ -55,7 +55,7 @@ typedef struct {
     uint32_t moved : 1;
 } lv_roller_t;
 
-DLLIMPEXP const lv_obj_class_t lv_roller_class;
+LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_roller_class;
 
 
 /**********************
