@@ -9,10 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __linux__ 
-//unistd is a linux only header
-#include <unistd.h>
-#endif // __linux__ 
+#ifdef __linux__
+  //unistd is a linux only header
+  #include <unistd.h>
+#endif // __linux__
 
 #include "lv_demos.h"
 
