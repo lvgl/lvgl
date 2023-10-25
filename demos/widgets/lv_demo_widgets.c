@@ -48,10 +48,13 @@ static void calendar_event_cb(lv_event_t * e);
 static void slider_event_cb(lv_event_t * e);
 static void chart_event_cb(lv_event_t * e);
 static void shop_chart_event_cb(lv_event_t * e);
-static void scale2_event_cb(lv_event_t * e);
 static void scale1_indic1_anim_cb(void * var, int32_t v);
 static void scale2_timer_cb(lv_timer_t * timer);
 static void scale3_anim_cb(void * var, int32_t v);
+static void scroll_anim_y_cb(void * var, int32_t v);
+static void scroll_anim_y_cb(void * var, int32_t v);
+static void delete_timer_event_cb(lv_event_t * e);
+static void slideshow_anim_ready_cb(lv_anim_t * a_old);
 
 /**********************
  *  STATIC VARIABLES
@@ -193,6 +196,28 @@ void lv_demo_widgets(void)
     shop_create(t3);
 
     color_changer_create(tv);
+}
+
+
+void lv_demo_widgets_start_slideshow(void)
+{
+    lv_obj_update_layout(tv);
+
+    lv_obj_t * cont = lv_tabview_get_content(tv);
+
+    lv_obj_t * tab = lv_obj_get_child(cont, 0);
+
+    int32_t v = lv_obj_get_scroll_bottom(tab);
+    uint32_t t = lv_anim_speed_to_time(lv_display_get_dpi(NULL), 0, v);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
+    lv_anim_set_time(&a, t);
+    lv_anim_set_playback_time(&a, t);
+    lv_anim_set_values(&a, 0, v);
+    lv_anim_set_var(&a, tab);
+    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_start(&a);
 }
 
 /**********************
@@ -740,7 +765,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_center(arc);
 
     lv_timer_t * scale2_timer = lv_timer_create(scale2_timer_cb, 100, scale2);
-    lv_obj_add_event(scale2, scale2_event_cb, LV_EVENT_DELETE, scale2_timer);
+    lv_obj_add_event(scale2, delete_timer_event_cb, LV_EVENT_DELETE, scale2_timer);
 
     /*Scale 3*/
     lv_scale_set_range(scale3, 10, 60);
@@ -1535,15 +1560,6 @@ static void scale1_indic1_anim_cb(void * var, int32_t v)
     lv_label_set_text_fmt(label, "Revenue: %"LV_PRId32" %%", v);
 }
 
-static void scale2_event_cb(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    if(code == LV_EVENT_DELETE) {
-        lv_timer_t * scale2_timer = lv_event_get_user_data(e);
-        if(scale2_timer) lv_timer_delete(scale2_timer);
-    }
-}
-
 static void scale2_timer_cb(lv_timer_t * timer)
 {
     LV_UNUSED(timer);
@@ -1611,6 +1627,48 @@ static void scale3_anim_cb(void * var, int32_t v)
 
     lv_obj_t * label = lv_obj_get_child(scale3, 1);
     lv_label_set_text_fmt(label, "%"LV_PRId32, v);
+}
+
+static void scroll_anim_y_cb(void * var, int32_t v)
+{
+    lv_obj_scroll_to_y(var, v, LV_ANIM_OFF);
+}
+
+static void delete_timer_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_DELETE) {
+        lv_timer_t * t = lv_event_get_user_data(e);
+        if(t) lv_timer_delete(t);
+    }
+}
+
+static void slideshow_anim_ready_cb(lv_anim_t * a_old)
+{
+    LV_UNUSED(a_old);
+
+    lv_obj_t * cont = lv_tabview_get_content(tv);
+    uint32_t tab_id = lv_tabview_get_tab_act(tv);
+    tab_id += 1;
+    if(tab_id > 2) tab_id = 0;
+    lv_tabview_set_act(tv, tab_id, LV_ANIM_ON);
+
+    lv_obj_t * tab = lv_obj_get_child(cont, tab_id);
+    lv_obj_scroll_to_y(tab, 0, LV_ANIM_OFF);
+    lv_obj_update_layout(tv);
+
+    int32_t v = lv_obj_get_scroll_bottom(tab);
+    uint32_t t = lv_anim_speed_to_time(lv_display_get_dpi(NULL), 0, v);
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
+    lv_anim_set_time(&a, t);
+    lv_anim_set_playback_time(&a, t);
+    lv_anim_set_values(&a, 0, v);
+    lv_anim_set_var(&a, tab);
+    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_start(&a);
 }
 
 #endif

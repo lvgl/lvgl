@@ -90,7 +90,7 @@ static card_info_t card_info[] = {
     CARD_INFO_SET(&img_multilang_avatar_13, "Jamal Brown", "Photographer and amateur astronomer 📸"),
     CARD_INFO_SET(&img_multilang_avatar_15, "Pavel Svoboda", "Hudebník a návštěvník koncertů"),
     CARD_INFO_SET(&img_multilang_avatar_16, "Elin Lindqvist", "Språkinlärare och kulturentusiast "),
-    CARD_INFO_SET(&img_multilang_avatar_17, "William Carter", "DIY enthusiast and home improvement guru "),
+    CARD_INFO_SET(&img_multilang_avatar_17, "William Carter", "DIY enthusiast and home improvement guru"),
     CARD_INFO_SET(&img_multilang_avatar_22, "Ava Williams", "Artist and creative visionary 🎨"),
     CARD_INFO_SET(NULL, NULL, NULL),
 };

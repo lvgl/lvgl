@@ -10,646 +10,370 @@
 
 #if LV_USE_DEMO_BENCHMARK
 #include "../../src/display/lv_display_private.h"
-
-/*********************
- *      DEFINES
- *********************/
-#define RND_NUM         64
-#define SCENE_TIME      1000      /*ms*/
-#define RENDER_REPEAT_CNT      50
-#define ANIM_TIME_MIN   ((2 * SCENE_TIME) / 10)
-#define ANIM_TIME_MAX   (SCENE_TIME)
-#define OBJ_NUM         8
-#define OBJ_SIZE_MIN    (LV_MAX(LV_DPI_DEF / 20, 5))
-#define OBJ_SIZE_MAX    (LV_HOR_RES / 2)
-#define RADIUS          LV_MAX(LV_DPI_DEF / 15, 2)
-#define BORDER_WIDTH    LV_MAX(LV_DPI_DEF / 40, 1)
-#define SHADOW_WIDTH_SMALL  LV_MAX(LV_DPI_DEF / 15, 5)
-#define SHADOW_OFS_X_SMALL  LV_MAX(LV_DPI_DEF / 20, 2)
-#define SHADOW_OFS_Y_SMALL  LV_MAX(LV_DPI_DEF / 20, 2)
-#define SHADOW_SPREAD_SMALL LV_MAX(LV_DPI_DEF / 30, 2)
-#define SHADOW_WIDTH_LARGE  LV_MAX(LV_DPI_DEF / 5,  10)
-#define SHADOW_OFS_X_LARGE  LV_MAX(LV_DPI_DEF / 10, 5)
-#define SHADOW_OFS_Y_LARGE  LV_MAX(LV_DPI_DEF / 10, 5)
-#define SHADOW_SPREAD_LARGE LV_MAX(LV_DPI_DEF / 30, 2)
-#define IMG_WIDH        100
-#define IMG_HEIGHT      100
-#define IMG_NUM         LV_MAX((LV_HOR_RES * LV_VER_RES) / 5 / IMG_WIDH / IMG_HEIGHT, 1)
-#define IMG_ZOOM_MIN    128
-#define IMG_ZOOM_MAX    (256 + 64)
-#define TXT "hello world\nit is a multi line text to test\nthe performance of text rendering"
-#define LINE_WIDTH  LV_MAX(LV_DPI_DEF / 50, 2)
-#define LINE_POINT_NUM  16
-#define LINE_POINT_DIFF_MIN (LV_DPI_DEF / 10)
-#define LINE_POINT_DIFF_MAX LV_MAX(LV_HOR_RES / (LINE_POINT_NUM + 2), LINE_POINT_DIFF_MIN * 2)
-#define ARC_WIDTH_THIN LV_MAX(LV_DPI_DEF / 50, 2)
-#define ARC_WIDTH_THICK LV_MAX(LV_DPI_DEF / 10, 5)
-
-#ifndef dimof
-    #define dimof(__array)     (sizeof(__array) / sizeof(__array[0]))
-#endif
+#include "../../src/core/lv_global.h"
 
 /**********************
  *      TYPEDEFS
  **********************/
 
+#define SCENE_TIME_DEF  2000
+
 typedef struct {
     const char * name;
     void (*create_cb)(void);
-    uint32_t time_sum_normal;
-    uint32_t time_sum_opa;
-    uint32_t refr_cnt_normal;
-    uint32_t refr_cnt_opa;
-    uint32_t fps_normal;
-    uint32_t fps_opa;
-    uint8_t weight;
+    uint32_t scene_time;
 } scene_dsc_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_demo_benchmark_mode_t mode;
-static lv_style_t style_common;
-static bool scene_with_opa = true;
-static uint32_t last_flush_cb_call;
-static uint32_t render_start_time;
-static void (*flush_cb_ori)(lv_display_t *, const lv_area_t *, uint8_t *);
-static uint32_t disp_ori_timer_period;
-static uint32_t anim_ori_timer_period;
-
-#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-    LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb565a8);
-#else
-    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
-#endif
-LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
-LV_IMAGE_DECLARE(img_benchmark_cogwheel_indexed16);
-LV_IMAGE_DECLARE(img_benchmark_cogwheel_alpha256);
-
-#if LV_USE_FONT_COMPRESSED
-    LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_compr_az);
-    LV_FONT_DECLARE(lv_font_benchmark_montserrat_16_compr_az);
-    LV_FONT_DECLARE(lv_font_benchmark_montserrat_28_compr_az);
-#endif
-
-static void benchmark_init(void);
-static void benchmark_event_cb(lv_event_t * e);
-static void benchmark_event_remove(void);
-
-static void show_scene_report(void);
-static void calc_scene_statistics(void);
-static lv_result_t load_next_scene(void);
+static void load_scene(uint32_t scene);
 static void next_scene_timer_cb(lv_timer_t * timer);
-static void single_scene_finish_timer_cb(lv_timer_t * timer);
-static void dummy_flush_cb(lv_display_t * drv, const lv_area_t * area, uint8_t * pxmap);
-static void generate_report(void);
-
-static void rect_create(lv_style_t * style);
-static void img_create(lv_style_t * style, const void * src, bool rotate, bool zoom, bool aa);
-static void txt_create(lv_style_t * style);
-static void line_create(lv_style_t * style);
-static void arc_create(lv_style_t * style);
-static void fall_anim(lv_obj_t * obj);
-static void rnd_reset(void);
+static void sysmon_perf_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
 static int32_t rnd_next(int32_t min, int32_t max);
+static void shake_anim_y_cb(void * var, int32_t v);
+static void shake_anim(lv_obj_t * obj, lv_coord_t y_max);
+static void scroll_anim(lv_obj_t * obj, lv_coord_t y_max);
+static void scroll_anim_y_cb(void * var, int32_t v);
+static void color_anim_cb(void * var, int32_t v);
+static void color_anim(lv_obj_t * obj);
+static void arc_anim(lv_obj_t * obj);
 
-static void rectangle_cb(void)
+static lv_obj_t * card_create(void);
+
+static void empty_screen_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_bg_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    rect_create(&style_common);
+    color_anim(lv_screen_active());
 }
 
-static void rectangle_rounded_cb(void)
+static void moving_wallpaper_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_bg_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    rect_create(&style_common);
+    lv_obj_set_style_pad_all(lv_screen_active(), 0, 0);
+    LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
+
+    lv_obj_t * img = lv_img_create(lv_screen_active());
+    lv_obj_set_size(img, lv_pct(150), lv_pct(150));
+    lv_img_set_src(img, &img_benchmark_cogwheel_rgb);
+    shake_anim(img, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
-static void rectangle_circle_cb(void)
+static void single_rectangle_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, LV_RADIUS_CIRCLE);
-    lv_style_set_bg_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    rect_create(&style_common);
-}
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
+    lv_obj_center(obj);
+    lv_obj_set_size(obj, lv_pct(30), lv_pct(30));
 
-static void border_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_border_width(&style_common, BORDER_WIDTH);
-    lv_style_set_border_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    rect_create(&style_common);
-}
-
-static void border_rounded_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_border_width(&style_common, BORDER_WIDTH);
-    lv_style_set_border_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    rect_create(&style_common);
+    color_anim(obj);
 
 }
 
-static void border_circle_cb(void)
+static void multiple_rectangles_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, LV_RADIUS_CIRCLE);
-    lv_style_set_border_width(&style_common, BORDER_WIDTH);
-    lv_style_set_border_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    rect_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+
+    uint32_t i;
+    for(i = 0; i < 9; i++) {
+        lv_obj_t * obj = lv_obj_create(lv_screen_active());
+        lv_obj_remove_style_all(obj);
+        lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
+        lv_obj_set_size(obj, lv_pct(25), lv_pct(25));
+
+        color_anim(obj);
+    }
 }
 
-static void border_top_cb(void)
+static void multiple_rgb_images_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_border_width(&style_common, BORDER_WIDTH);
-    lv_style_set_border_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_border_side(&style_common, LV_BORDER_SIDE_TOP);
-    rect_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
 
+    LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
+    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 116;
+    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 116) / 116;
+
+    uint32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        uint32_t x;
+        for(x = 0; x < hor_cnt; x++) {
+            lv_obj_t * obj = lv_img_create(lv_screen_active());
+            lv_image_set_src(obj, &img_benchmark_cogwheel_rgb);
+            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+
+            shake_anim(obj, 80);
+        }
+    }
 }
 
-static void border_left_cb(void)
+static void multiple_argb_images_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_border_width(&style_common, BORDER_WIDTH);
-    lv_style_set_border_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_border_side(&style_common, LV_BORDER_SIDE_LEFT);
-    rect_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
+
+    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 116;
+    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 116) / 116;
+
+    uint32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        uint32_t x;
+        for(x = 0; x < hor_cnt; x++) {
+            lv_obj_t * obj = lv_img_create(lv_screen_active());
+            lv_image_set_src(obj, &img_benchmark_cogwheel_argb);
+            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+
+            shake_anim(obj, 80);
+        }
+    }
 }
 
-static void border_top_left_cb(void)
+static void rotated_argb_image_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_border_width(&style_common, BORDER_WIDTH);
-    lv_style_set_border_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_border_side(&style_common, LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_TOP);
-    rect_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
+
+
+    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 116;
+    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 116) / 116;
+
+    uint32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        uint32_t x;
+        for(x = 0; x < hor_cnt; x++) {
+            lv_obj_t * obj = lv_img_create(lv_screen_active());
+            lv_image_set_src(obj, &img_benchmark_cogwheel_argb);
+            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+
+            lv_image_set_rotation(obj, lv_rand(100, 3500));
+            shake_anim(obj, 80);
+        }
+    }
 }
 
-static void border_left_right_cb(void)
+static void multiple_labels_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_border_width(&style_common, BORDER_WIDTH);
-    lv_style_set_border_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_border_side(&style_common, LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT);
-    rect_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_set_style_pad_row(lv_screen_active(), 80, 0);
+
+    lv_point_t s;
+    lv_text_get_size(&s, "Hello LVGL!", lv_obj_get_style_text_font(lv_screen_active(), 0), 0, 0, LV_COORD_MAX,
+                     LV_TEXT_FLAG_NONE);
+
+    uint32_t cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / (s.x + 30);
+    cnt = cnt * ((lv_display_get_vertical_resolution(NULL) - 200) / (s.y + 50));
+
+    uint32_t i;
+    for(i = 0; i < cnt; i++) {
+        lv_obj_t * obj = lv_label_create(lv_screen_active());
+        lv_label_set_text(obj, "Hello LVGL!");
+        color_anim(obj);
+    }
 }
 
-static void border_top_bottom_cb(void)
+static void screen_sized_text_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_border_width(&style_common, BORDER_WIDTH);
-    lv_style_set_border_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_border_side(&style_common, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
-    rect_create(&style_common);
+    lv_obj_t * obj = lv_label_create(lv_screen_active());
+    lv_obj_set_width(obj, lv_pct(100));
 
+    if(lv_display_get_horizontal_resolution(NULL) * lv_display_get_vertical_resolution(NULL) < 150000) {
+        lv_label_set_text(obj,
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec rhoncus arcu, in consectetur orci. Sed vitae dolor sed nisi ultrices vehicula quis ac dolor. Vivamus hendrerit hendrerit lectus, sed tempus velit suscipit in. Fusce eu tristique arcu. Sed et molestie leo, in lacinia nunc. Quisque semper lorem sed ante feugiat, at molestie risus blandit. Maecenas lobortis urna in diam feugiat porta. Ut facilisis mauris eget nibh posuere aliquet. Proin facilisis egestas magna, id vulputate massa bibendum a. Etiam gravida metus non egestas suscipit. Sed sollicitudin mollis nisi, eu fringilla leo vestibulum posuere. Donec et ex nulla. Phasellus et ornare justo, vel hendrerit justo. Curabitur pulvinar nunc sed tincidunt dignissim. Praesent eleifend lectus velit, id malesuada ante placerat id. Fusce massa erat, egestas vel venenatis eu, tempus nec est.\n\n"
+                          "Phasellus iaculis malesuada molestie. Cras ullamcorper justo a dolor dignissim tincidunt. Mauris euismod risus quis lobortis mollis. Ut vitae placerat massa, aliquet various lectus. Nulla ac ornare purus, quis auctor velit. Donec posuere dolor rhoncus efficitur dictum. Integer venenatis aliquet nunc eu convallis. Nunc quis various velit. Suspendisse enim metus, molestie eget mauris sit amet, euismod volutpat turpis. Duis rhoncus commodo gravida. Pellentesque velit mi, dictum id consequat placerat, condimentum ac elit. Duis aliquet leo eu dolor cursus rhoncus. Quisque aliquam sapien ut purus hendrerit laoreet. Ut venenatis venenatis risus, a vestibulum enim lobortis a. Maecenas auctor tortor lorem, quis laoreet nulla aliquet a. Sed ipsum lorem, facilisis in congue a, dictum ut ligula.\n\n"
+                          "Aliquam id tellus in enim hendrerit mattis. Sed ipsum arcu, feugiat sed eros quis, vulputate facilisis turpis. Quisque venenatis risus massa. Proin lacinia, nunc non ultrices commodo, ligula dolor lobortis lectus, iaculis pulvinar metus orci eu elit. Donec tincidunt lacinia semper. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec vitae odio risus. Donec sodales sed nulla sit amet iaculis. Duis lacinia mauris dictum, fermentum nibh eget, convallis tellus. Sed congue luctus purus non scelerisque. Etiam fermentum lacus mauris, at bibendum nunc aliquam at. Vivamus accumsan vestibulum pharetra. Proin rhoncus nisi purus, vel blandit metus auctor eget. Fusce dictum sed lectus sed aliquam. Praesent lobortis quam sed pretium tincidunt.");
+    }
+    else {
+        lv_label_set_text(obj,
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec rhoncus arcu, in consectetur orci. Sed vitae dolor sed nisi ultrices vehicula quis ac dolor. Vivamus hendrerit hendrerit lectus, sed tempus velit suscipit in. Fusce eu tristique arcu. Sed et molestie leo, in lacinia nunc. Quisque semper lorem sed ante feugiat, at molestie risus blandit. Maecenas lobortis urna in diam feugiat porta. Ut facilisis mauris eget nibh posuere aliquet. Proin facilisis egestas magna, id vulputate massa bibendum a. Etiam gravida metus non egestas suscipit. Sed sollicitudin mollis nisi, eu fringilla leo vestibulum posuere. Donec et ex nulla. Phasellus et ornare justo, vel hendrerit justo. Curabitur pulvinar nunc sed tincidunt dignissim. Praesent eleifend lectus velit, id malesuada ante placerat id. Fusce massa erat, egestas vel venenatis eu, tempus nec est.\n\n"
+                          "Phasellus iaculis malesuada molestie. Cras ullamcorper justo a dolor dignissim tincidunt. Mauris euismod risus quis lobortis mollis. Ut vitae placerat massa, aliquet various lectus. Nulla ac ornare purus, quis auctor velit. Donec posuere dolor rhoncus efficitur dictum. Integer venenatis aliquet nunc eu convallis. Nunc quis various velit. Suspendisse enim metus, molestie eget mauris sit amet, euismod volutpat turpis. Duis rhoncus commodo gravida. Pellentesque velit mi, dictum id consequat placerat, condimentum ac elit. Duis aliquet leo eu dolor cursus rhoncus. Quisque aliquam sapien ut purus hendrerit laoreet. Ut venenatis venenatis risus, a vestibulum enim lobortis a. Maecenas auctor tortor lorem, quis laoreet nulla aliquet a. Sed ipsum lorem, facilisis in congue a, dictum ut ligula.\n\n"
+                          "Aliquam id tellus in enim hendrerit mattis. Sed ipsum arcu, feugiat sed eros quis, vulputate facilisis turpis. Quisque venenatis risus massa. Proin lacinia, nunc non ultrices commodo, ligula dolor lobortis lectus, iaculis pulvinar metus orci eu elit. Donec tincidunt lacinia semper. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec vitae odio risus. Donec sodales sed nulla sit amet iaculis. Duis lacinia mauris dictum, fermentum nibh eget, convallis tellus. Sed congue luctus purus non scelerisque. Etiam fermentum lacus mauris, at bibendum nunc aliquam at. Vivamus accumsan vestibulum pharetra. Proin rhoncus nisi purus, vel blandit metus auctor eget. Fusce dictum sed lectus sed aliquam. Praesent lobortis quam sed pretium tincidunt.\n\n"
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec rhoncus arcu, in consectetur orci. Sed vitae dolor sed nisi ultrices vehicula quis ac dolor. Vivamus hendrerit hendrerit lectus, sed tempus velit suscipit in. Fusce eu tristique arcu. Sed et molestie leo, in lacinia nunc. Quisque semper lorem sed ante feugiat, at molestie risus blandit. Maecenas lobortis urna in diam feugiat porta. Ut facilisis mauris eget nibh posuere aliquet. Proin facilisis egestas magna, id vulputate massa bibendum a. Etiam gravida metus non egestas suscipit. Sed sollicitudin mollis nisi, eu fringilla leo vestibulum posuere. Donec et ex nulla. Phasellus et ornare justo, vel hendrerit justo. Curabitur pulvinar nunc sed tincidunt dignissim. Praesent eleifend lectus velit, id malesuada ante placerat id. Fusce massa erat, egestas vel venenatis eu, tempus nec est.\n\n"
+                          "Phasellus iaculis malesuada molestie. Cras ullamcorper justo a dolor dignissim tincidunt. Mauris euismod risus quis lobortis mollis. Ut vitae placerat massa, aliquet various lectus. Nulla ac ornare purus, quis auctor velit. Donec posuere dolor rhoncus efficitur dictum. Integer venenatis aliquet nunc eu convallis. Nunc quis various velit. Suspendisse enim metus, molestie eget mauris sit amet, euismod volutpat turpis. Duis rhoncus commodo gravida. Pellentesque velit mi, dictum id consequat placerat, condimentum ac elit. Duis aliquet leo eu dolor cursus rhoncus. Quisque aliquam sapien ut purus hendrerit laoreet. Ut venenatis venenatis risus, a vestibulum enim lobortis a. Maecenas auctor tortor lorem, quis laoreet nulla aliquet a. Sed ipsum lorem, facilisis in congue a, dictum ut ligula.\n\n"
+                          "Aliquam id tellus in enim hendrerit mattis. Sed ipsum arcu, feugiat sed eros quis, vulputate facilisis turpis. Quisque venenatis risus massa. Proin lacinia, nunc non ultrices commodo, ligula dolor lobortis lectus, iaculis pulvinar metus orci eu elit. Donec tincidunt lacinia semper. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec vitae odio risus. Donec sodales sed nulla sit amet iaculis. Duis lacinia mauris dictum, fermentum nibh eget, convallis tellus. Sed congue luctus purus non scelerisque. Etiam fermentum lacus mauris, at bibendum nunc aliquam at. Vivamus accumsan vestibulum pharetra. Proin rhoncus nisi purus, vel blandit metus auctor eget. Fusce dictum sed lectus sed aliquam. Praesent lobortis quam sed pretium tincidunt.");
+    }
+
+    scroll_anim(lv_screen_active(), LV_VER_RES - lv_obj_get_height(obj));
 }
 
-static void shadow_small_cb(void)
+static void multiple_arcs_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_bg_opa(&style_common, LV_OPA_COVER);
-    lv_style_set_shadow_opa(&style_common, scene_with_opa ? LV_OPA_80 : LV_OPA_COVER);
-    lv_style_set_shadow_width(&style_common, SHADOW_WIDTH_SMALL);
-    rect_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
 
-}
+    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / lv_dpx(160);
+    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / lv_dpx(160);
 
-static void shadow_small_ofs_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_bg_opa(&style_common, LV_OPA_COVER);
-    lv_style_set_shadow_opa(&style_common, scene_with_opa ? LV_OPA_80 : LV_OPA_COVER);
-    lv_style_set_shadow_width(&style_common, SHADOW_WIDTH_SMALL);
-    lv_style_set_shadow_ofs_x(&style_common, SHADOW_OFS_X_SMALL);
-    lv_style_set_shadow_ofs_y(&style_common, SHADOW_OFS_Y_SMALL);
-    lv_style_set_shadow_spread(&style_common, SHADOW_SPREAD_SMALL);
-    rect_create(&style_common);
-}
+    uint32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        uint32_t x;
+        for(x = 0; x < hor_cnt; x++) {
 
+            lv_obj_t * obj = lv_arc_create(lv_screen_active());
+            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            lv_obj_set_size(obj, lv_dpx(100), lv_dpx(100));
+            lv_obj_center(obj);
 
-static void shadow_large_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_bg_opa(&style_common, LV_OPA_COVER);
-    lv_style_set_shadow_opa(&style_common, scene_with_opa ? LV_OPA_80 : LV_OPA_COVER);
-    lv_style_set_shadow_width(&style_common, SHADOW_WIDTH_LARGE);
-    rect_create(&style_common);
-}
+            lv_arc_set_bg_angles(obj, 0, 360);
 
-static void shadow_large_ofs_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_bg_opa(&style_common, LV_OPA_COVER);
-    lv_style_set_shadow_opa(&style_common, scene_with_opa ? LV_OPA_80 : LV_OPA_COVER);
-    lv_style_set_shadow_width(&style_common, SHADOW_WIDTH_LARGE);
-    lv_style_set_shadow_ofs_x(&style_common, SHADOW_OFS_X_LARGE);
-    lv_style_set_shadow_ofs_y(&style_common, SHADOW_OFS_Y_LARGE);
-    lv_style_set_shadow_spread(&style_common, SHADOW_SPREAD_LARGE);
-    rect_create(&style_common);
-}
-
-
-static void img_rgb_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_rgb, false, false, false);
-}
-
-static void img_argb_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-
-#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, false, false);
-#else
-    img_create(&style_common, &img_benchmark_cogwheel_argb, false, false, false);
-#endif
-}
-
-static void img_index_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_indexed16, false, false, false);
-
-}
-
-static void img_alpha_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_alpha256, false, false, false);
-}
-
-
-static void img_rgb_recolor_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_image_recolor_opa(&style_common, LV_OPA_50);
-    img_create(&style_common, &img_benchmark_cogwheel_rgb, false, false, false);
-
-}
-
-static void img_argb_recolor_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_image_recolor_opa(&style_common, LV_OPA_50);
-#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, false, false);
-#else
-    img_create(&style_common, &img_benchmark_cogwheel_argb, false, false, false);
-#endif
-}
-
-static void img_index_recolor_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_image_recolor_opa(&style_common, LV_OPA_50);
-    img_create(&style_common, &img_benchmark_cogwheel_indexed16, false, false, false);
-
-}
-
-static void img_rgb_rot_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_rgb, true, false, false);
-}
-
-static void img_rgb_rot_aa_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_rgb, true, false, true);
-}
-
-static void img_argb_rot_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, true, false, false);
-#else
-    img_create(&style_common, &img_benchmark_cogwheel_argb, true, false, false);
-#endif
-}
-
-static void img_argb_rot_aa_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, true, false, true);
-#else
-    img_create(&style_common, &img_benchmark_cogwheel_argb, true, false, true);
-#endif
-}
-
-static void img_rgb_zoom_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_rgb, false, true, false);
-
-}
-
-static void img_rgb_zoom_aa_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_rgb, false, true, true);
-
-
-}
-
-static void img_argb_zoom_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, true, false);
-#else
-    img_create(&style_common, &img_benchmark_cogwheel_argb, false, true, false);
-#endif
+            lv_obj_set_style_margin_all(obj, lv_dpx(20), 0);
+            lv_obj_set_style_arc_opa(obj, 0, LV_PART_MAIN);
+            lv_obj_set_style_bg_opa(obj, 0, LV_PART_KNOB);
+            lv_obj_set_style_arc_width(obj, 10, LV_PART_INDICATOR);
+            lv_obj_set_style_arc_rounded(obj, false, LV_PART_INDICATOR);
+            lv_obj_set_style_arc_color(obj, lv_color_hex3(lv_rand(0x00f, 0xff0)), LV_PART_INDICATOR);
+            arc_anim(obj);
+        }
+    }
 }
 
 
-static void img_argb_zoom_aa_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, true, true);
-#else
-    img_create(&style_common, &img_benchmark_cogwheel_argb, false, true, true);
-#endif
-}
-
-static void txt_small_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_text_font(&style_common, lv_theme_get_font_small(NULL));
-    lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    txt_create(&style_common);
-
-}
-
-static void txt_medium_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_text_font(&style_common, lv_theme_get_font_normal(NULL));
-    lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    txt_create(&style_common);
-
-}
-
-static void txt_large_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_text_font(&style_common, lv_theme_get_font_large(NULL));
-    lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    txt_create(&style_common);
-
-}
-
-#if LV_USE_FONT_COMPRESSED
-static void txt_small_compr_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_text_font(&style_common, &lv_font_benchmark_montserrat_12_compr_az);
-    lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    txt_create(&style_common);
-}
-
-static void txt_medium_compr_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_text_font(&style_common, &lv_font_benchmark_montserrat_16_compr_az);
-    lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    txt_create(&style_common);
-}
-
-static void txt_large_compr_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_text_font(&style_common, &lv_font_benchmark_montserrat_28_compr_az);
-    lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    txt_create(&style_common);
-}
-#endif
-
-static void line_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_line_width(&style_common, LINE_WIDTH);
-    lv_style_set_line_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    line_create(&style_common);
-}
-
-static void arc_thin_cb(void)
+static void containers_cb(void)
 {
 
-    lv_style_reset(&style_common);
-    lv_style_set_arc_width(&style_common, ARC_WIDTH_THIN);
-    lv_style_set_arc_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    arc_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+
+    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 300;
+    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / 150;
+
+    uint32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        uint32_t x;
+        for(x = 0; x < hor_cnt; x++) {
+            lv_obj_t * card = card_create();
+            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            shake_anim(card, 30);
+        }
+    }
 }
 
-static void arc_thick_cb(void)
+static void containers_with_overlay_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_arc_width(&style_common, ARC_WIDTH_THICK);
-    lv_style_set_arc_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    arc_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
 
+    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 300;
+    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / 150;
+
+    uint32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        uint32_t x;
+        for(x = 0; x < hor_cnt; x++) {
+            lv_obj_t * card = card_create();
+            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            shake_anim(card, 30);
+        }
+    }
+
+    lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_50, 0);
+    color_anim(lv_layer_top());
 }
 
-
-static void sub_rectangle_cb(void)
+static void containers_with_opa_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_bg_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
-    rect_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+
+    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 300;
+    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / 150;
+
+    uint32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        uint32_t x;
+        for(x = 0; x < hor_cnt; x++) {
+            lv_obj_t * card = card_create();
+            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            lv_obj_set_style_opa(card, LV_OPA_50, 0);
+            shake_anim(card, 30);
+        }
+    }
 }
 
-static void sub_border_cb(void)
+static void containers_with_opa_layer_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_border_width(&style_common, BORDER_WIDTH);
-    lv_style_set_border_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
-    rect_create(&style_common);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
 
+    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 300;
+    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / 150;
+
+    uint32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        uint32_t x;
+        for(x = 0; x < hor_cnt; x++) {
+            lv_obj_t * card = card_create();
+            lv_obj_set_style_opa_layered(card, LV_OPA_50, 0);
+            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            shake_anim(card, 30);
+        }
+    }
 }
 
-static void sub_shadow_cb(void)
+static void containers_with_scrolling_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_radius(&style_common, RADIUS);
-    lv_style_set_bg_opa(&style_common, LV_OPA_COVER);
-    lv_style_set_shadow_opa(&style_common, scene_with_opa ? LV_OPA_80 : LV_OPA_COVER);
-    lv_style_set_shadow_width(&style_common, SHADOW_WIDTH_SMALL);
-    lv_style_set_shadow_spread(&style_common, SHADOW_WIDTH_SMALL);
-    lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
-    rect_create(&style_common);
+    lv_obj_t * scr = lv_screen_active();
 
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+
+    uint32_t i;
+    for(i = 0; i < 50; i++) {
+        card_create();
+    }
+
+    lv_obj_update_layout(scr);
+    scroll_anim(scr, lv_obj_get_scroll_bottom(scr));
 }
 
-static void sub_image_cb(void)
+static void widgets_demo_cb(void)
 {
-    lv_style_reset(&style_common);
-    lv_style_set_image_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
-#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, false, false);
-#else
-    img_create(&style_common, &img_benchmark_cogwheel_argb, false, false, false);
-#endif
-}
-static void sub_line_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_line_width(&style_common, LINE_WIDTH);
-    lv_style_set_line_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
-    line_create(&style_common);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_style_pad_hor(scr, 0, 0);
+    lv_obj_set_style_pad_bottom(scr, 0, 0);
+    lv_demo_widgets();
+    lv_demo_widgets_start_slideshow();
 
 }
-
-static void sub_arc_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_arc_width(&style_common, ARC_WIDTH_THICK);
-    lv_style_set_arc_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
-    arc_create(&style_common);
-}
-
-static void sub_text_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_text_font(&style_common, lv_theme_get_font_normal(NULL));
-    lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
-    txt_create(&style_common);
-}
-
-
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
 static scene_dsc_t scenes[] = {
-    {.name = "Rectangle",                    .weight = 30, .create_cb = rectangle_cb},
-    {.name = "Rectangle rounded",            .weight = 20, .create_cb = rectangle_rounded_cb},
-    {.name = "Circle",                       .weight = 10, .create_cb = rectangle_circle_cb},
-    {.name = "Border",                       .weight = 20, .create_cb = border_cb},
-    {.name = "Border rounded",               .weight = 30, .create_cb = border_rounded_cb},
-    {.name = "Circle border",                .weight = 10, .create_cb = border_circle_cb},
-    {.name = "Border top",                   .weight = 3, .create_cb = border_top_cb},
-    {.name = "Border left",                  .weight = 3, .create_cb = border_left_cb},
-    {.name = "Border top + left",            .weight = 3, .create_cb = border_top_left_cb},
-    {.name = "Border left + right",          .weight = 3, .create_cb = border_left_right_cb},
-    {.name = "Border top + bottom",          .weight = 3, .create_cb = border_top_bottom_cb},
+    {.name = "Empty screen",               .scene_time = 3000, .create_cb = empty_screen_cb},
+    {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
+    {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
+    {.name = "Multiple rectangles",        .scene_time = 3000, .create_cb = multiple_rectangles_cb},
+    {.name = "Multiple RGB images",        .scene_time = 3000, .create_cb = multiple_rgb_images_cb},
+    {.name = "Multiple ARGB images",       .scene_time = 3000, .create_cb = multiple_argb_images_cb},
+    {.name = "Rotated ARGB images",        .scene_time = 3000, .create_cb = rotated_argb_image_cb},
+    {.name = "Multiple labels",            .scene_time = 3000, .create_cb = multiple_labels_cb},
+    {.name = "Screen sized text",          .scene_time = 5000, .create_cb = screen_sized_text_cb},
+    {.name = "Multiple arcs",              .scene_time = 3000, .create_cb = multiple_arcs_cb},
 
-    {.name = "Shadow small",                 .weight = 3, .create_cb = shadow_small_cb},
-    {.name = "Shadow small offset",          .weight = 5, .create_cb = shadow_small_ofs_cb},
-    {.name = "Shadow large",                 .weight = 5, .create_cb = shadow_large_cb},
-    {.name = "Shadow large offset",          .weight = 3, .create_cb = shadow_large_ofs_cb},
+    {.name = "Containers",                 .scene_time = 3000, .create_cb = containers_cb},
+    {.name = "Containers with overlay",    .scene_time = 3000, .create_cb = containers_with_overlay_cb},
+    {.name = "Containers with opa",        .scene_time = 3000, .create_cb = containers_with_opa_cb},
+    {.name = "Containers with opa_layer",  .scene_time = 3000, .create_cb = containers_with_opa_layer_cb},
+    {.name = "Containers with scrolling",  .scene_time = 5000, .create_cb = containers_with_scrolling_cb},
 
-    {.name = "Image RGB",                    .weight = 20, .create_cb = img_rgb_cb},
-    {.name = "Image ARGB",                   .weight = 20, .create_cb = img_argb_cb},
-    {.name = "Image indexed",                .weight = 5, .create_cb = img_index_cb},
-    {.name = "Image alpha only",             .weight = 5, .create_cb = img_alpha_cb},
-
-    {.name = "Image RGB recolor",            .weight = 5, .create_cb = img_rgb_recolor_cb},
-    {.name = "Image ARGB recolor",           .weight = 20, .create_cb = img_argb_recolor_cb},
-    {.name = "Image indexed recolor",        .weight = 3, .create_cb = img_index_recolor_cb},
-
-    {.name = "Image RGB rotate",             .weight = 5, .create_cb = img_rgb_rot_cb},
-    {.name = "Image RGB rotate anti aliased", .weight = 10, .create_cb = img_rgb_rot_aa_cb},
-    {.name = "Image ARGB rotate",            .weight = 10, .create_cb = img_argb_rot_cb},
-    {.name = "Image ARGB rotate anti aliased", .weight = 15, .create_cb = img_argb_rot_aa_cb},
-    {.name = "Image RGB zoom",               .weight = 5, .create_cb = img_rgb_zoom_cb},
-    {.name = "Image RGB zoom anti aliased",  .weight = 10, .create_cb = img_rgb_zoom_aa_cb},
-    {.name = "Image ARGB zoom",              .weight = 10, .create_cb = img_argb_zoom_cb},
-    {.name = "Image ARGB zoom anti aliased", .weight = 15, .create_cb = img_argb_zoom_aa_cb},
-
-    {.name = "Text small",                   .weight = 20, .create_cb = txt_small_cb},
-    {.name = "Text medium",                  .weight = 30, .create_cb = txt_medium_cb},
-    {.name = "Text large",                   .weight = 20, .create_cb = txt_large_cb},
-
-#if LV_USE_FONT_COMPRESSED
-    {.name = "Text small compressed",        .weight = 3, .create_cb = txt_small_compr_cb},
-    {.name = "Text medium compressed",       .weight = 5, .create_cb = txt_medium_compr_cb},
-    {.name = "Text large compressed",        .weight = 10, .create_cb = txt_large_compr_cb},
-#endif
-
-    {.name = "Line",                         .weight = 10, .create_cb = line_cb},
-
-    {.name = "Arc thin",                     .weight = 10, .create_cb = arc_thin_cb},
-    {.name = "Arc thick",                    .weight = 10, .create_cb = arc_thick_cb},
-
-    {.name = "Substr. rectangle",            .weight = 10, .create_cb = sub_rectangle_cb},
-    {.name = "Substr. border",               .weight = 10, .create_cb = sub_border_cb},
-    {.name = "Substr. shadow",               .weight = 10, .create_cb = sub_shadow_cb},
-    {.name = "Substr. image",                .weight = 10, .create_cb = sub_image_cb},
-    {.name = "Substr. line",                 .weight = 10, .create_cb = sub_line_cb},
-    {.name = "Substr. arc",                  .weight = 10, .create_cb = sub_arc_cb},
-    {.name = "Substr. text",                 .weight = 10, .create_cb = sub_text_cb},
+    {.name = "Widgets demo",               .scene_time = 20000,           .create_cb = widgets_demo_cb},
 
     {.name = "", .create_cb = NULL}
 };
 
-static int32_t scene_act = -1;
-static lv_obj_t * scene_bg;
-static lv_obj_t * title;
-static lv_obj_t * subtitle;
-static uint32_t rnd_act;
+#define sysmon_perf LV_GLOBAL_DEFAULT()->sysmon_perf
 
-static const uint32_t rnd_map[] = {
-    0xbd13204f, 0x67d8167f, 0x20211c99, 0xb0a7cc05,
-    0x06d5c703, 0xeafb01a7, 0xd0473b5c, 0xc999aaa2,
-    0x86f9d5d9, 0x294bdb29, 0x12a3c207, 0x78914d14,
-    0x10a30006, 0x6134c7db, 0x194443af, 0x142d1099,
-    0x376292d5, 0x20f433c5, 0x074d2a59, 0x4e74c293,
-    0x072a0810, 0xdd0f136d, 0x5cca6dbc, 0x623bfdd8,
-    0xb645eb2f, 0xbe50894a, 0xc9b56717, 0xe0f912c8,
-    0x4f6b5e24, 0xfe44b128, 0xe12d57a8, 0x9b15c9cc,
-    0xab2ae1d3, 0xb4dc5074, 0x67d457c8, 0x8e46b00c,
-    0xa29a1871, 0xcee40332, 0x80f93aa1, 0x85286096,
-    0x09bd6b49, 0x95072088, 0x2093924b, 0x6a27328f,
-    0xa796079b, 0xc3b488bc, 0xe29bcce0, 0x07048a4c,
-    0x7d81bd99, 0x27aacb30, 0x44fc7a0e, 0xa2382241,
-    0x8357a17d, 0x97e9c9cc, 0xad10ff52, 0x9923fc5c,
-    0x8f2c840a, 0x20356ba2, 0x7997a677, 0x9a7f1800,
-    0x35c7562b, 0xd901fe51, 0x8f4e053d, 0xa5b94923,
-};
+static uint32_t scene_act;
+static uint32_t rnd_act;
 
 /**********************
  *      MACROS
@@ -659,571 +383,204 @@ static const uint32_t rnd_map[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_benchmark(lv_demo_benchmark_mode_t _mode)
+void lv_demo_benchmark(void)
 {
-    mode = _mode;
-    benchmark_init();
+    scene_act = 0;
 
-    if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        while(load_next_scene() == LV_RESULT_OK) {
-            uint32_t i;
-            for(i = 0; i < RENDER_REPEAT_CNT; i++) {
-                /*Wait a little to be sure something happens with the animations*/
-                uint32_t t = lv_tick_get();
-                while(lv_tick_elaps(t) < 20);
-                lv_refr_now(NULL);
-            }
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_remove_style_all(scr);
+    lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);
+    lv_obj_set_style_text_color(scr, lv_color_black(), 0);
+    lv_obj_set_style_bg_color(scr, lv_palette_lighten(LV_PALETTE_GREY, 4), 0);
+    lv_obj_set_style_pad_all(lv_screen_active(), 8, 0);
+    lv_obj_set_style_pad_top(lv_screen_active(), 48, 0);
+    lv_obj_set_style_pad_gap(lv_screen_active(), 8, 0);
 
-            calc_scene_statistics();
-            show_scene_report();
-        }
-        generate_report();
-    }
-    else {
-        lv_timer_t * t = lv_timer_create(next_scene_timer_cb, SCENE_TIME, NULL);
-        lv_timer_ready(t);
-    }
+    lv_obj_t * title = lv_label_create(lv_layer_top());
+    lv_obj_set_style_bg_opa(title, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(title, lv_color_white(), 0);
+    lv_obj_set_style_text_color(title, lv_color_black(), 0);
+    lv_obj_set_width(title, lv_pct(100));
+    lv_label_set_text(title, "-");
+
+    load_scene(scene_act);
+
+    lv_timer_create(next_scene_timer_cb, SCENE_TIME_DEF, NULL);
+
+    lv_subject_add_observer_obj(&sysmon_perf.subject, sysmon_perf_observer_cb, title, NULL);
 }
-
-
-void lv_demo_benchmark_run_scene(lv_demo_benchmark_mode_t _mode, uint16_t scene_no)
-{
-    mode = _mode;
-    benchmark_init();
-
-    if(((scene_no >> 1) >= dimof(scenes))) {
-        return; /* invalid scene number */
-    }
-
-    scene_with_opa = scene_no & 0x01;
-    scene_act = scene_no >> 1;
-
-    /*Load the scene*/
-    lv_obj_clean(scene_bg);
-
-    last_flush_cb_call = 0;
-    rnd_reset();
-    scenes[scene_act].create_cb();
-
-    lv_label_set_text_fmt(title, "%s%s", scenes[scene_act].name, scene_with_opa ? " + opa" : "");
-
-    if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        uint32_t i;
-        for(i = 0; i < RENDER_REPEAT_CNT; i++) {
-            /*Wait a little to be sure something happens with the animations*/
-            uint32_t t = lv_tick_get();
-            while(lv_tick_elaps(t) < 20);
-
-            lv_refr_now(NULL);
-        }
-
-        single_scene_finish_timer_cb(NULL);
-    }
-    else {
-        lv_timer_t * t = lv_timer_create(single_scene_finish_timer_cb, SCENE_TIME, NULL);
-        lv_timer_set_repeat_count(t, 1);
-    }
-}
-
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void benchmark_init(void)
+
+static void load_scene(uint32_t scene)
 {
-    lv_display_t * disp = lv_display_get_default();
-
-    lv_display_add_event(disp, benchmark_event_cb, LV_EVENT_ALL, NULL);
-    flush_cb_ori = disp->flush_cb;
-    disp->flush_cb = dummy_flush_cb;
-
-    if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        if(disp->refr_timer) {
-            disp_ori_timer_period = disp->refr_timer->period;
-            lv_timer_set_period(disp->refr_timer, 2);
-        }
-
-        lv_timer_t * anim_timer = lv_anim_get_timer();
-        anim_ori_timer_period = anim_timer->period;
-        lv_timer_set_period(anim_timer, 2);
-    }
-
     lv_obj_t * scr = lv_screen_active();
-    lv_obj_remove_style_all(scr);
-    lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);
+    lv_obj_clean(scr);
     lv_obj_set_style_bg_color(scr, lv_palette_lighten(LV_PALETTE_GREY, 4), 0);
     lv_obj_set_style_text_color(scr, lv_color_black(), 0);
+    lv_obj_set_style_pad_all(lv_screen_active(), 8, 0);
+    lv_obj_set_style_pad_top(lv_screen_active(), 48, 0);
+    lv_obj_set_style_pad_gap(lv_screen_active(), 8, 0);
+    lv_obj_set_layout(scr, LV_LAYOUT_NONE);
 
-    title = lv_label_create(scr);
-    lv_obj_set_pos(title, LV_DPI_DEF / 30, LV_DPI_DEF / 30);
-    lv_label_set_text(title, "");
+    lv_anim_delete(scr, scroll_anim_y_cb);
+    lv_anim_delete(scr, shake_anim_y_cb);
+    lv_anim_delete(scr, color_anim_cb);
 
-    subtitle = lv_label_create(scr);
-    lv_obj_align_to(subtitle, title, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
-    lv_label_set_text(subtitle, "");
+    lv_anim_delete(lv_layer_top(), color_anim_cb);
+    lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_TRANSP, 0);
 
-    scene_bg = lv_obj_create(scr);
-    lv_obj_remove_style_all(scene_bg);
-    lv_obj_set_size(scene_bg, lv_obj_get_width(scr), lv_obj_get_height(scr) - subtitle->coords.y2 - LV_DPI_DEF / 30);
-    lv_obj_align(scene_bg, LV_ALIGN_BOTTOM_MID, 0, 0);
-
-    lv_style_init(&style_common);
-
-    lv_obj_update_layout(scr);
+    if(scenes[scene].create_cb) scenes[scene].create_cb();
 }
 
-static void benchmark_event_cb(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
 
-    if(code == LV_EVENT_RENDER_START) {
-        render_start_time = lv_tick_get();
-    }
-}
-
-static void benchmark_event_remove(void)
-{
-    lv_display_t * disp = lv_display_get_default();
-    uint32_t i;
-    for(i = 0; i < lv_display_get_event_count(disp); i++) {
-        lv_event_dsc_t * dsc = lv_display_get_event_dsc(disp, i);
-        if(lv_event_dsc_get_cb(dsc) == benchmark_event_cb) {
-            lv_display_remove_event(disp, i);
-            return;
-        }
-    }
-}
-
-static void show_scene_report(void)
-{
-    if(scene_act < 0) return;
-
-    if(scene_with_opa) {
-        lv_label_set_text_fmt(subtitle, "Result: %" LV_PRIu32 " FPS",
-                              scenes[scene_act].fps_opa);
-        LV_LOG("Result of \"%s + opa\": %" LV_PRIu32 " FPS\n", scenes[scene_act].name,
-               scenes[scene_act].fps_opa);
-    }
-    else {
-        lv_label_set_text_fmt(subtitle, "Result: %" LV_PRIu32 " FPS",
-                              scenes[scene_act].fps_normal);
-        LV_LOG("Result of \"%s\": %" LV_PRIu32 " FPS\n", scenes[scene_act].name,
-               scenes[scene_act].fps_normal);
-    }
-}
-
-static void calc_scene_statistics(void)
-{
-    if(scene_act < 0) return;
-    if(scene_with_opa) {
-        if(scenes[scene_act].time_sum_opa == 0) scenes[scene_act].time_sum_opa = 1;
-        scenes[scene_act].fps_opa = (1000 * scenes[scene_act].refr_cnt_opa) / scenes[scene_act].time_sum_opa;
-    }
-    else {
-        if(scenes[scene_act].time_sum_normal == 0) scenes[scene_act].time_sum_normal = 1;
-        scenes[scene_act].fps_normal = (1000 * scenes[scene_act].refr_cnt_normal) / scenes[scene_act].time_sum_normal;
-    }
-}
-
-static lv_result_t load_next_scene(void)
-{
-    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RESULT_INVALID;
-
-    lv_obj_clean(scene_bg);
-
-    if(scene_with_opa) {
-        scene_act++;
-        scene_with_opa = false;
-    }
-    else {
-        scene_with_opa = true;
-    }
-
-    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RESULT_INVALID;
-
-    last_flush_cb_call = 0;
-    rnd_reset();
-    scenes[scene_act].create_cb();
-
-    lv_label_set_text_fmt(title, "%s%s", scenes[scene_act].name, scene_with_opa ? " + opa" : "");
-    return LV_RESULT_OK;
-}
 
 static void next_scene_timer_cb(lv_timer_t * timer)
 {
     LV_UNUSED(timer);
 
-    calc_scene_statistics();
-    show_scene_report();
-    lv_result_t res = load_next_scene();
+    scene_act++;
 
-    if(res == LV_RESULT_INVALID) {
+    load_scene(scene_act);
+    if(scenes[scene_act].scene_time == 0) {
         lv_timer_delete(timer);
-        generate_report();
+    }
+    else {
+        lv_timer_set_period(timer, scenes[scene_act].scene_time);
     }
 }
 
-static void single_scene_finish_timer_cb(lv_timer_t * timer)
+static void sysmon_perf_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 {
-    LV_UNUSED(timer);
-    calc_scene_statistics();
+    const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(subject);
+    lv_obj_t * label = lv_observer_get_target(observer);
 
-    lv_display_t * disp = lv_display_get_default();
-    disp->flush_cb = flush_cb_ori;
-
-    if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        if(disp->refr_timer) {
-            lv_timer_set_period(disp->refr_timer, disp_ori_timer_period);
-        }
-        lv_timer_set_period(lv_anim_get_timer(), anim_ori_timer_period);
-    }
-
-    benchmark_event_remove();
-    show_scene_report();
-    lv_obj_clean(scene_bg);
-    lv_obj_invalidate(lv_screen_active());
+    lv_label_set_text_fmt(label,
+                          "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
+                          "refr. %" LV_PRIu32" ms = %" LV_PRIu32 "ms render + %" LV_PRIu32" ms flush",
+                          info->calculated.fps, info->calculated.cpu,
+                          info->calculated.render_avg_time + info->calculated.flush_avg_time,
+                          info->calculated.render_avg_time, info->calculated.flush_avg_time);
 }
-
-static void dummy_flush_cb(lv_display_t * drv, const lv_area_t * area, uint8_t * pxmap)
-{
-    LV_UNUSED(area);
-
-    if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER) {
-        /*Measure the time since render start after flushing*/
-        bool last = lv_display_flush_is_last(drv);
-        flush_cb_ori(drv, area, pxmap);
-
-        if(last) {
-            uint32_t t = lv_tick_elaps(render_start_time);
-            if(scene_with_opa) {
-                scenes[scene_act].refr_cnt_opa ++;
-                scenes[scene_act].time_sum_opa += t;
-            }
-            else {
-                scenes[scene_act].refr_cnt_normal ++;
-                scenes[scene_act].time_sum_normal += t;
-            }
-        }
-    }
-    else if(mode == LV_DEMO_BENCHMARK_MODE_REAL) {
-        bool last = lv_display_flush_is_last(drv);
-        flush_cb_ori(drv, area, pxmap);
-
-        /*Measure the time since the previous last flush (full render)*/
-        if(last) {
-            /*Skip the first call as last_flush_cb_call comes from the previous scene */
-            if(last_flush_cb_call != 0) {
-                uint32_t t = lv_tick_elaps(last_flush_cb_call);
-                if(scene_with_opa) {
-                    scenes[scene_act].refr_cnt_opa ++;
-                    scenes[scene_act].time_sum_opa += t;
-                }
-                else {
-                    scenes[scene_act].refr_cnt_normal ++;
-                    scenes[scene_act].time_sum_normal += t;
-                }
-            }
-            last_flush_cb_call = lv_tick_get();
-        }
-    }
-    else if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        bool last = lv_display_flush_is_last(drv);
-
-        /*Just bypass the driver and measure the pure rendering time*/
-        lv_display_flush_ready(drv);
-
-        if(last) {
-            uint32_t t = lv_tick_elaps(render_start_time);
-            if(scene_with_opa) {
-                scenes[scene_act].refr_cnt_opa ++;
-                scenes[scene_act].time_sum_opa += t;
-            }
-            else {
-                scenes[scene_act].refr_cnt_normal ++;
-                scenes[scene_act].time_sum_normal += t;
-            }
-        }
-    }
-}
-
-static void generate_report(void)
-{
-    lv_display_t * disp = lv_display_get_default();
-    disp->flush_cb = flush_cb_ori;
-
-    if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        if(disp->refr_timer) {
-            lv_timer_set_period(disp->refr_timer, disp_ori_timer_period);
-        }
-        lv_timer_set_period(lv_anim_get_timer(), anim_ori_timer_period);
-    }
-
-    benchmark_event_remove();
-
-    uint32_t weight_sum = 0;
-    uint32_t weight_normal_sum = 0;
-    uint32_t weight_opa_sum = 0;
-    uint32_t fps_sum = 0;
-    uint32_t fps_normal_sum = 0;
-    uint32_t fps_opa_sum = 0;
-    uint32_t i;
-    for(i = 0; scenes[i].create_cb; i++) {
-        fps_normal_sum += scenes[i].fps_normal * scenes[i].weight;
-        weight_normal_sum += scenes[i].weight;
-
-        uint32_t w = LV_MAX(scenes[i].weight / 2, 1);
-        fps_opa_sum += scenes[i].fps_opa * w;
-        weight_opa_sum += w;
-    }
-
-
-    fps_sum = fps_normal_sum + fps_opa_sum;
-    weight_sum = weight_normal_sum + weight_opa_sum;
-
-    uint32_t fps_weighted = fps_sum / weight_sum;
-    uint32_t fps_normal_unweighted = fps_normal_sum / weight_normal_sum;
-    uint32_t fps_opa_unweighted = fps_opa_sum / weight_opa_sum;
-
-    uint32_t opa_speed_pct = (fps_opa_unweighted * 100) / fps_normal_unweighted;
-
-    lv_obj_clean(lv_screen_active());
-    scene_bg = NULL;
-
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
-
-    title = lv_label_create(lv_screen_active());
-    lv_label_set_text_fmt(title, "Weighted FPS: %"LV_PRIu32, fps_weighted);
-
-    subtitle = lv_label_create(lv_screen_active());
-    lv_label_set_text_fmt(subtitle, "Opa. speed: %"LV_PRIu32"%%", opa_speed_pct);
-
-    lv_coord_t w = lv_obj_get_content_width(lv_screen_active());
-    lv_obj_t * table = lv_table_create(lv_screen_active());
-    //        lv_obj_clean_style_list(table, LV_PART_MAIN);
-    lv_table_set_col_cnt(table, 2);
-
-    lv_table_set_col_width(table, 0, (w * 3) / 4 - 3);
-    lv_table_set_col_width(table, 1, w  / 4 - 3);
-    lv_obj_set_width(table, lv_pct(100));
-
-    uint16_t row = 0;
-    lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-    lv_table_set_cell_value(table, row, 0, "Slow but common cases");
-
-    LV_LOG("\r\n"
-           "LVGL v%d.%d.%d " LVGL_VERSION_INFO
-           " Benchmark (in csv format)\r\n",
-           LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
-    LV_LOG("Weighted FPS: %"LV_PRIu32"\n", fps_weighted);
-    LV_LOG("Opa. speed: %"LV_PRIu32"%%\n", opa_speed_pct);
-
-    row++;
-    char buf[256];
-    for(i = 0; scenes[i].create_cb; i++) {
-
-        if(scenes[i].fps_normal < 20 && scenes[i].weight >= 10) {
-            lv_table_set_cell_value(table, row, 0, scenes[i].name);
-
-            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
-            lv_table_set_cell_value(table, row, 1, buf);
-
-            row++;
-        }
-
-        if(scenes[i].fps_opa < 20 && LV_MAX(scenes[i].weight / 2, 1) >= 10) {
-            lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
-            lv_table_set_cell_value(table, row, 0, buf);
-
-            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
-            lv_table_set_cell_value(table, row, 1, buf);
-
-            row++;
-        }
-    }
-
-    /*No 'slow but common cases'*/
-    if(row == 1) {
-        lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-        lv_table_set_cell_value(table, row, 0, "All good");
-        row++;
-    }
-
-    lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-    lv_table_set_cell_value(table, row, 0, "All cases");
-    //        lv_table_set_cell_type(table, row, 0, 4);
-    row++;
-
-    for(i = 0; scenes[i].create_cb; i++) {
-        lv_table_set_cell_value(table, row, 0, scenes[i].name);
-
-        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
-        lv_table_set_cell_value(table, row, 1, buf);
-
-        LV_LOG("%s,%s\r\n", scenes[i].name, buf);
-
-        row++;
-
-        lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
-        lv_table_set_cell_value(table, row, 0, buf);
-
-        LV_LOG("%s,", buf);
-
-        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
-        lv_table_set_cell_value(table, row, 1, buf);
-
-
-        LV_LOG("%s\r\n", buf);
-
-        row++;
-    }
-
-}
-
 
 /*----------------
  * SCENE HELPERS
  *----------------*/
 
-static void rect_create(lv_style_t * style)
+
+static void color_anim_cb(void * var, int32_t v)
 {
-    uint32_t i;
-    for(i = 0; i < OBJ_NUM; i++) {
-        lv_obj_t * obj = lv_obj_create(scene_bg);
-        lv_obj_remove_style_all(obj);
-        lv_obj_add_style(obj, style, 0);
-        lv_obj_set_style_bg_color(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), 0);
-        lv_obj_set_style_border_color(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), 0);
-        lv_obj_set_style_shadow_color(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), 0);
-
-        lv_obj_set_size(obj, rnd_next(OBJ_SIZE_MIN, OBJ_SIZE_MAX), rnd_next(OBJ_SIZE_MIN, OBJ_SIZE_MAX));
-
-        fall_anim(obj);
-    }
+    lv_obj_set_style_bg_color(var, lv_color_hex3(lv_rand(0x00f, 0xff0)), 0);
+    lv_obj_set_style_text_color(var, lv_color_hex3(lv_rand(0x00f, 0xff0)), 0);
 }
 
-
-static void img_create(lv_style_t * style, const void * src, bool rotate, bool zoom, bool aa)
+static void color_anim(lv_obj_t * obj)
 {
-    uint32_t i;
-    for(i = 0; i < (uint32_t)IMG_NUM; i++) {
-        lv_obj_t * obj = lv_image_create(scene_bg);
-        lv_obj_remove_style_all(obj);
-        lv_obj_add_style(obj, style, 0);
-        lv_image_set_src(obj, src);
-        lv_obj_set_style_image_recolor(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), 0);
-
-        if(rotate) lv_image_set_rotation(obj, rnd_next(0, 3599));
-        if(zoom) lv_image_set_zoom(obj, rnd_next(IMG_ZOOM_MIN, IMG_ZOOM_MAX));
-        lv_image_set_antialias(obj, aa);
-
-        fall_anim(obj);
-    }
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_exec_cb(&a, color_anim_cb);
+    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_time(&a, 100);      /*New value in each ms*/
+    lv_anim_set_var(&a, obj);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_start(&a);
 }
 
-
-static void txt_create(lv_style_t * style)
+static void arc_anim_cb(void * var, int32_t v)
 {
-    uint32_t i;
-    for(i = 0; i < OBJ_NUM; i++) {
-        lv_obj_t * obj = lv_label_create(scene_bg);
-        lv_obj_remove_style_all(obj);
-        lv_obj_add_style(obj, style, 0);
-        lv_obj_set_style_text_color(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), 0);
-
-        lv_label_set_text(obj, TXT);
-
-        fall_anim(obj);
-    }
+    lv_arc_set_value(var, v);
 }
 
-
-static void line_create(lv_style_t * style)
+static void arc_anim(lv_obj_t * obj)
 {
-    static lv_point_t points[OBJ_NUM][LINE_POINT_NUM];
-
-    uint32_t i;
-    for(i = 0; i < OBJ_NUM; i++) {
-        points[i][0].x = 0;
-        points[i][0].y = 0;
-        uint32_t j;
-        for(j = 1; j < LINE_POINT_NUM; j++) {
-            points[i][j].x = points[i][j - 1].x + rnd_next(LINE_POINT_DIFF_MIN, LINE_POINT_DIFF_MAX);
-            points[i][j].y = rnd_next(LINE_POINT_DIFF_MIN, LINE_POINT_DIFF_MAX);
-        }
-
-
-        lv_obj_t * obj = lv_line_create(scene_bg);
-        lv_obj_remove_style_all(obj);
-        lv_obj_add_style(obj, style, 0);
-        lv_obj_set_style_line_color(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), 0);
-
-        lv_line_set_points(obj, points[i], LINE_POINT_NUM);
-
-        fall_anim(obj);
-
-    }
+    uint32_t t1 = rnd_next(1000, 3000);
+    uint32_t t2 = rnd_next(1000, 3000);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_exec_cb(&a, arc_anim_cb);
+    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_time(&a, t1);
+    lv_anim_set_playback_time(&a, t2);
+    lv_anim_set_var(&a, obj);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_start(&a);
 }
 
-
-static void arc_anim_end_angle_cb(void * var, int32_t v)
+static void scroll_anim_y_cb(void * var, int32_t v)
 {
-    lv_arc_set_end_angle(var, v);
+    lv_obj_scroll_to_y(var, v, LV_ANIM_OFF);
 }
 
-static void arc_create(lv_style_t * style)
+static void scroll_anim(lv_obj_t * obj, lv_coord_t y_max)
 {
-    uint32_t i;
-    for(i = 0; i < OBJ_NUM; i++) {
-        lv_obj_t * obj = lv_arc_create(scene_bg);
-        lv_obj_remove_style_all(obj);
-        lv_obj_set_size(obj, rnd_next(OBJ_SIZE_MIN, OBJ_SIZE_MAX), rnd_next(OBJ_SIZE_MIN, OBJ_SIZE_MAX));
-        lv_obj_add_style(obj, style, LV_PART_INDICATOR);
-        lv_obj_set_style_arc_color(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), LV_PART_INDICATOR);
-
-        lv_arc_set_start_angle(obj, 0);
-
-        uint32_t t = rnd_next(ANIM_TIME_MIN / 4, ANIM_TIME_MAX / 4);
-
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_var(&a, obj);
-        lv_anim_set_exec_cb(&a, arc_anim_end_angle_cb);
-        lv_anim_set_values(&a, rnd_next(30, 300), 359);
-        lv_anim_set_time(&a, t);
-        lv_anim_set_playback_time(&a, t);
-        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-        lv_anim_start(&a);
-
-        fall_anim(obj);
-    }
-}
-
-
-static void fall_anim_y_cb(void * var, int32_t v)
-{
-    lv_obj_set_y(var, v);
-}
-
-static void fall_anim(lv_obj_t * obj)
-{
-    lv_obj_update_layout(obj);  /*To be sure width an height are updated*/
-
-    lv_obj_set_x(obj, rnd_next(0, lv_obj_get_width(scene_bg) - lv_obj_get_width(obj)));
-
-    uint32_t t = rnd_next(ANIM_TIME_MIN, ANIM_TIME_MAX);
+    uint32_t t = lv_anim_speed_to_time(lv_display_get_dpi(NULL), 0, y_max);
 
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_exec_cb(&a, fall_anim_y_cb);
-    lv_anim_set_values(&a, 0, lv_obj_get_height(scene_bg) - lv_obj_get_height(obj));
+    lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
+    lv_anim_set_values(&a, 0, y_max);
     lv_anim_set_time(&a, t);
     lv_anim_set_playback_time(&a, t);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    a.act_time = a.time / 2;    /*To start from the middle*/
     lv_anim_start(&a);
 
+}
+static void shake_anim_y_cb(void * var, int32_t v)
+{
+    lv_obj_set_style_translate_y(var, v, 0);
+}
+
+static void shake_anim(lv_obj_t * obj, lv_coord_t y_max)
+{
+    uint32_t t1 = rnd_next(300, 3000);
+    uint32_t t2 = rnd_next(300, 3000);
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, obj);
+    lv_anim_set_exec_cb(&a, shake_anim_y_cb);
+    lv_anim_set_values(&a, 0, y_max);
+    lv_anim_set_time(&a, t1);
+    lv_anim_set_playback_time(&a, t2);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_start(&a);
+}
+
+
+static lv_obj_t * card_create(void)
+{
+    lv_obj_t * panel = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(panel, 270, 120);
+    lv_obj_set_style_pad_all(panel, 8, 0);
+
+    LV_IMG_DECLARE(img_transform_avatar_15);
+    lv_obj_t * child = lv_image_create(panel);
+    lv_obj_align(child, LV_ALIGN_LEFT_MID, 0, 0);
+    lv_image_set_src(child, &img_transform_avatar_15);
+
+    child = lv_label_create(panel);
+    lv_label_set_text(child, "John Smith");
+    lv_obj_set_style_text_font(child, &lv_font_montserrat_24, 0);
+    lv_obj_set_pos(child, 100, 0);
+
+    child = lv_label_create(panel);
+    lv_label_set_text(child, "A DIY enthusiast");
+    lv_obj_set_style_text_font(child, &lv_font_montserrat_14, 0);
+    lv_obj_set_pos(child, 100, 30);
+
+    child = lv_button_create(panel);
+    lv_obj_set_pos(child, 100, 50);
+
+    child = lv_label_create(child);
+    lv_label_set_text(child, "Connect");
+
+
+
+    return panel;
 }
 
 static void rnd_reset(void)
@@ -1233,8 +590,26 @@ static void rnd_reset(void)
 
 static int32_t rnd_next(int32_t min, int32_t max)
 {
-    if(min == max)
-        return min;
+    static const uint32_t rnd_map[] = {
+        0xbd13204f, 0x67d8167f, 0x20211c99, 0xb0a7cc05,
+        0x06d5c703, 0xeafb01a7, 0xd0473b5c, 0xc999aaa2,
+        0x86f9d5d9, 0x294bdb29, 0x12a3c207, 0x78914d14,
+        0x10a30006, 0x6134c7db, 0x194443af, 0x142d1099,
+        0x376292d5, 0x20f433c5, 0x074d2a59, 0x4e74c293,
+        0x072a0810, 0xdd0f136d, 0x5cca6dbc, 0x623bfdd8,
+        0xb645eb2f, 0xbe50894a, 0xc9b56717, 0xe0f912c8,
+        0x4f6b5e24, 0xfe44b128, 0xe12d57a8, 0x9b15c9cc,
+        0xab2ae1d3, 0xb4dc5074, 0x67d457c8, 0x8e46b00c,
+        0xa29a1871, 0xcee40332, 0x80f93aa1, 0x85286096,
+        0x09bd6b49, 0x95072088, 0x2093924b, 0x6a27328f,
+        0xa796079b, 0xc3b488bc, 0xe29bcce0, 0x07048a4c,
+        0x7d81bd99, 0x27aacb30, 0x44fc7a0e, 0xa2382241,
+        0x8357a17d, 0x97e9c9cc, 0xad10ff52, 0x9923fc5c,
+        0x8f2c840a, 0x20356ba2, 0x7997a677, 0x9a7f1800,
+        0x35c7562b, 0xd901fe51, 0x8f4e053d, 0xa5b94923,
+    };
+
+    if(min == max) return min;
 
     if(min > max) {
         int32_t t = min;
@@ -1246,10 +621,9 @@ static int32_t rnd_next(int32_t min, int32_t max)
     int32_t r = (rnd_map[rnd_act] % d) + min;
 
     rnd_act++;
-    if(rnd_act >= RND_NUM) rnd_act = 0;
+    if(rnd_act >= sizeof(rnd_map) / sizeof(rnd_map[0])) rnd_act = 0;
 
     return r;
-
 }
 
 #endif

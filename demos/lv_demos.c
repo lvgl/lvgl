@@ -25,8 +25,8 @@
 
 typedef void (*demo_method_cb)(void);
 #if LV_USE_DEMO_BENCHMARK
-    typedef void (*demo_method_benchmark_cb)(lv_demo_benchmark_mode_t);
-    typedef void (*demo_method_benchmark_scene_cb)(lv_demo_benchmark_mode_t, uint16_t);
+    //    typedef void (*demo_method_benchmark_cb)(lv_demo_benchmark_mode_t);
+    //    typedef void (*demo_method_benchmark_scene_cb)(lv_demo_benchmark_mode_t, uint16_t);
 #endif
 
 typedef struct  {
@@ -34,8 +34,8 @@ typedef struct  {
     union {
         demo_method_cb entry_cb;
 #if LV_USE_DEMO_BENCHMARK
-        demo_method_benchmark_cb entry_benchmark_cb;
-        demo_method_benchmark_scene_cb entry_benchmark_scene_cb;
+        //        demo_method_benchmark_cb entry_benchmark_cb;
+        //        demo_method_benchmark_scene_cb entry_benchmark_scene_cb;
 #endif
     };
     int arg_count : 8;
@@ -89,10 +89,10 @@ static const demo_entry_info_t demos_entry_info[] = {
     { "scroll", .entry_cb = lv_demo_scroll },
 #endif
 
-#if LV_USE_DEMO_BENCHMARK
-    { DEMO_BENCHMARK_NAME, .entry_benchmark_cb = lv_demo_benchmark, 1 },
-    { DEMO_BENCHMARK_SCENE_NAME, .entry_benchmark_scene_cb = lv_demo_benchmark_run_scene, 2 },
-#endif
+    //#if LV_USE_DEMO_BENCHMARK
+    //    { DEMO_BENCHMARK_NAME, .entry_benchmark_cb = lv_demo_benchmark, 1 },
+    //    { DEMO_BENCHMARK_SCENE_NAME, .entry_benchmark_scene_cb = lv_demo_benchmark_run_scene, 2 },
+    //#endif
     { "", .entry_cb = NULL }
 };
 
@@ -138,16 +138,16 @@ bool lv_demos_create(char * info[], int size)
             return true;
         }
     }
-#if LV_USE_DEMO_BENCHMARK
-    else if(demo_is_benchmark(entry_info) && entry_info->entry_benchmark_cb) {
-        entry_info->entry_benchmark_cb((lv_demo_benchmark_mode_t)atoi(info[1]));
-        return true;
-    }
-    else if(demo_is_benchmark_scene(entry_info) && entry_info->entry_benchmark_scene_cb) {
-        entry_info->entry_benchmark_scene_cb((lv_demo_benchmark_mode_t)atoi(info[1]), (uint16_t)atoi(info[2]));
-        return true;
-    }
-#endif
+    //#if LV_USE_DEMO_BENCHMARK
+    //    else if(demo_is_benchmark(entry_info) && entry_info->entry_benchmark_cb) {
+    //        entry_info->entry_benchmark_cb((lv_demo_benchmark_mode_t)atoi(info[1]));
+    //        return true;
+    //    }
+    //    else if(demo_is_benchmark_scene(entry_info) && entry_info->entry_benchmark_scene_cb) {
+    //        entry_info->entry_benchmark_scene_cb((lv_demo_benchmark_mode_t)atoi(info[1]), (uint16_t)atoi(info[2]));
+    //        return true;
+    //    }
+    //#endif
 
     return false;
 }
