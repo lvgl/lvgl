@@ -211,15 +211,226 @@ static void border_cb(lv_obj_t * parent)
     }
 }
 
+static lv_obj_t * box_shadow_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row)
+{
+    lv_obj_t * obj = lv_obj_create(parent);
+    lv_obj_remove_style_all(obj);
+    lv_obj_set_style_bg_opa(obj, LV_OPA_20, 0);
+    lv_obj_set_style_shadow_color(obj, lv_color_hex3(0xf00), 0);
+    lv_obj_set_size(obj, DEF_WIDTH - 20, DEF_HEIGHT - 5);
+    add_to_cell(obj, col, row);
+
+    return obj;
+}
+
+static void box_shadow_cb(lv_obj_t * parent)
+{
+
+    static const lv_coord_t grid_rows[] = {45, 45, 45, 45, 45, 45, LV_GRID_TEMPLATE_LAST};
+    static const lv_coord_t grid_cols[] = {68, 68, 68, 68, 68, 68, 68, LV_GRID_TEMPLATE_LAST};
+    lv_obj_set_grid_dsc_array(parent, grid_cols, grid_rows);
+
+    lv_point_t ofs[] = {
+        {0, 0},
+        {5, 5},
+        {5, -5},
+        {-5, 5},
+        {-5, -5},
+        {10, 0},
+        {0, 10},
+    };
+
+    uint32_t i;
+    for(i = 0; i < 7; i++) {
+        lv_obj_t * obj = box_shadow_obj_create(parent, i, 0);
+        lv_obj_set_style_radius(obj, 0, 0);
+        lv_obj_set_style_shadow_width(obj, 10, 0);
+        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+    }
+
+    for(i = 0; i < 7; i++) {
+        lv_obj_t * obj = box_shadow_obj_create(parent, i, 1);
+        lv_obj_set_style_radius(obj, 5, 0);
+        lv_obj_set_style_shadow_width(obj, 10, 0);
+        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+    }
+
+    for(i = 0; i < 7; i++) {
+        lv_obj_t * obj = box_shadow_obj_create(parent, i, 2);
+        lv_obj_set_style_radius(obj, 100, 0);
+        lv_obj_set_style_shadow_width(obj, 10, 0);
+        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+    }
+
+    for(i = 0; i < 7; i++) {
+        lv_obj_t * obj = box_shadow_obj_create(parent, i, 3);
+        lv_obj_set_style_radius(obj, 5, 0);
+        lv_obj_set_style_shadow_width(obj, 10, 0);
+        lv_obj_set_style_shadow_spread(obj, 3, 0);
+        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+    }
+
+    for(i = 0; i < 7; i++) {
+        lv_obj_t * obj = box_shadow_obj_create(parent, i, 4);
+        lv_obj_set_style_radius(obj, 5, 0);
+        lv_obj_set_style_shadow_width(obj, 10, 0);
+        lv_obj_set_style_shadow_opa(obj, LV_OPA_50, 0);
+        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+    }
+
+    for(i = 0; i < 7; i++) {
+        lv_obj_t * obj = box_shadow_obj_create(parent, i, 5);
+        lv_obj_set_style_radius(obj, 100, 0);
+        lv_obj_set_style_shadow_width(obj, 10, 0);
+        lv_obj_set_style_shadow_opa(obj, LV_OPA_50, 0);
+        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+    }
+}
+
+
+static lv_obj_t * text_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row)
+{
+
+    lv_obj_t * obj = lv_label_create(parent);
+    lv_obj_remove_style_all(obj);
+    lv_label_set_text(obj, "Hello LVGL! It should be a placeholder: ű. Looks good?");
+    add_to_cell(obj, col, row);
+
+    return obj;
+
+}
+
+static void text_cb(lv_obj_t * parent)
+{
+
+    lv_obj_t * obj;
+
+    obj = text_obj_create(parent, 3, 0);
+
+    obj = text_obj_create(parent, 3, 1);
+    lv_obj_set_style_text_color(obj, lv_color_hex3(0xff0), 0);
+
+    obj = text_obj_create(parent, 3, 2);
+    lv_label_set_text_selection_start(obj, 12);
+    lv_label_set_text_selection_end(obj, 21);
+    lv_obj_set_style_bg_color(obj, lv_color_hex3(0x0ff), LV_PART_SELECTED);
+
+    obj = text_obj_create(parent, 3, 3);
+    lv_obj_set_style_text_decor(obj, LV_TEXT_DECOR_UNDERLINE, 0);
+
+    obj = text_obj_create(parent, 3, 4);
+    lv_obj_set_style_text_decor(obj, LV_TEXT_DECOR_STRIKETHROUGH, 0);
+
+    obj = text_obj_create(parent, 3, 5);
+    lv_obj_set_style_text_decor(obj, LV_TEXT_DECOR_UNDERLINE | LV_TEXT_DECOR_STRIKETHROUGH, 0);
+
+
+}
+
+static lv_obj_t * image_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row, bool recolor)
+{
+    lv_obj_t * obj = lv_image_create(parent);
+    lv_obj_remove_style_all(obj);
+    if(recolor) {
+        lv_obj_set_style_image_recolor_opa(obj, LV_OPA_50, 0);
+        lv_obj_set_style_image_recolor(obj, lv_color_hex3(0x0f0), 0);
+    }
+
+    add_to_cell(obj, col, row);
+
+    return obj;
+
+}
+
+static void image_cb_core(lv_obj_t * parent, bool recolor)
+{
+    LV_IMG_DECLARE(img_render_lvgl_logo_xrgb8888);
+    LV_IMG_DECLARE(img_render_lvgl_logo_rgb888);
+    LV_IMG_DECLARE(img_render_lvgl_logo_rgb565);
+    LV_IMG_DECLARE(img_render_lvgl_logo_argb8888);
+    const void * srcs[] = {
+        &img_render_lvgl_logo_argb8888,
+        &img_render_lvgl_logo_xrgb8888,
+        &img_render_lvgl_logo_rgb888,
+        &img_render_lvgl_logo_rgb565,
+    };
+
+    const void * names[] = {
+        "ARGB\n8888",
+        "XRGB\n8888",
+        "RGB\n888",
+        "RGB\n565",
+    };
+
+    uint32_t i;
+    for(i = 0; i < 4; i++) {
+        lv_obj_t * obj;
+
+        obj = lv_label_create(parent);
+        lv_label_set_text(obj, names[i]);
+        add_to_cell(obj, 0, i * 2);
+
+        obj = image_obj_create(parent, 1, i * 2, recolor);
+        lv_image_set_src(obj, srcs[i]);
+
+        obj = image_obj_create(parent, 2, i * 2, recolor);
+        lv_image_set_src(obj, srcs[i]);
+        lv_image_set_rotation(obj, 300);
+        lv_image_set_pivot(obj, 0, 0);
+
+        obj = image_obj_create(parent, 3, i * 2, recolor);
+        lv_image_set_src(obj, srcs[i]);
+        lv_image_set_scale(obj, 400);
+        lv_image_set_pivot(obj, 0, 0);
+
+        obj = image_obj_create(parent, 4, i * 2, recolor);
+        lv_image_set_src(obj, srcs[i]);
+        lv_image_set_scale_x(obj, 400);
+        lv_image_set_pivot(obj, 0, 0);
+
+        obj = image_obj_create(parent, 5, i * 2, recolor);
+        lv_image_set_src(obj, srcs[i]);
+        lv_image_set_scale_y(obj, 400);
+        lv_image_set_pivot(obj, 0, 0);
+
+        obj = image_obj_create(parent, 6, i * 2, recolor);
+        lv_image_set_src(obj, srcs[i]);
+        lv_image_set_rotation(obj, 300);
+        lv_image_set_scale(obj, 400);
+        lv_image_set_pivot(obj, 0, 0);
+
+        obj = image_obj_create(parent, 7, i * 2, recolor);
+        lv_image_set_src(obj, srcs[i]);
+        lv_image_set_scale_y(obj, 400);
+        lv_image_set_rotation(obj, 300);
+        lv_image_set_pivot(obj, 0, 0);
+    }
+}
+
+
+static void image_cb_normal(lv_obj_t * parent)
+{
+    image_cb_core(parent, false);
+}
+
+static void image_cb_recolored(lv_obj_t * parent)
+{
+    image_cb_core(parent, true);
+}
+
 /**********************
  *  STATIC VARIABLES
  **********************/
-//box shadow (offset, size, spread)
-//text (normal text + underline/strike through, placeholder)
-//triangle (just some rectangles)
-//image (various formats + transformation)
+
 //line (various angles + line caps)
 //arc (some arcs + caps)
+//triangle (just some rectangles)
 //vector (later)
 //layer (blend mode, transformation)
 //mask bitmap (not implemented SW render yet)
@@ -228,6 +439,10 @@ static void border_cb(lv_obj_t * parent)
 static scene_dsc_t scenes[] = {
     {.name = "Fill ",               .create_cb = fill_cb},
     {.name = "Border",              .create_cb = border_cb},
+    {.name = "Box shadow",          .create_cb = box_shadow_cb},
+    {.name = "Text",                .create_cb = text_cb},
+    {.name = "Image normal",        .create_cb = image_cb_normal},
+    {.name = "Image recolor",       .create_cb = image_cb_recolored},
 
     {.name = "", .create_cb = NULL}
 };
