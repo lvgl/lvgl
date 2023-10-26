@@ -106,9 +106,6 @@ typedef struct _lv_image_decoder_dsc_t {
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_image_dsc_t` variable*/
     const void * src;
 
-    /**Color to draw the image. Used when the image has alpha channel only*/
-    lv_color_t color;
-
     /**Frame of the image, using with animated images*/
     int32_t frame_id;
 
