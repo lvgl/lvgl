@@ -241,7 +241,7 @@ static inline void * lv_timer_get_user_data(lv_timer_t * timer)
     return timer->user_data;
 }
 
-inline bool lv_timer_get_paused(lv_timer_t * timer)
+static inline bool lv_timer_get_paused(lv_timer_t * timer)
 {
     return timer->paused;
 }
