@@ -91,6 +91,7 @@ lvgl/CMakeFiles/lvgl.dir/src/draw/sw/lv_draw_sw_fill.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/sw/../../core/../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/sw/../../core/../misc/lv_color.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/sw/../../core/../misc/lv_assert.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/sw/../../core/lv_obj_property.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/sw/../../core/lv_obj_tree.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/sw/../../core/../misc/lv_anim.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/sw/../../core/../display/lv_display.h \

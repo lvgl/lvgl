@@ -50,6 +50,7 @@ lvgl/CMakeFiles/lvgl.dir/src/draw/lv_draw_label.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/../layouts/grid/../../lv_conf_internal.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/../layouts/grid/../../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../misc/lv_style_gen.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_property.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/lv_obj_tree.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../display/lv_display.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/draw/../core/../display/../misc/lv_timer.h \

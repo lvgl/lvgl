@@ -15,6 +15,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/lvgl.dir/src/core/lv_obj_id_builtin.c.o.d"
   "CMakeFiles/lvgl.dir/src/core/lv_obj_pos.c.o"
   "CMakeFiles/lvgl.dir/src/core/lv_obj_pos.c.o.d"
+  "CMakeFiles/lvgl.dir/src/core/lv_obj_property.c.o"
+  "CMakeFiles/lvgl.dir/src/core/lv_obj_property.c.o.d"
   "CMakeFiles/lvgl.dir/src/core/lv_obj_scroll.c.o"
   "CMakeFiles/lvgl.dir/src/core/lv_obj_scroll.c.o.d"
   "CMakeFiles/lvgl.dir/src/core/lv_obj_style.c.o"

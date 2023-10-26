@@ -6,6 +6,6 @@ qrcode
 .. toctree::
     :maxdepth: 2
 
-    qrcodegen
     lv_qrcode
+    qrcodegen
 

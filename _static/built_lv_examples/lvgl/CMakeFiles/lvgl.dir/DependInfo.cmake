@@ -15,6 +15,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj_event.c" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_event.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_event.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj_id_builtin.c" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_id_builtin.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_id_builtin.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj_pos.c" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_pos.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_pos.c.o.d"
+  "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj_property.c" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_property.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_property.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj_scroll.c" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_scroll.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_scroll.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj_style.c" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_style.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_style.c.o.d"
   "/home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj_style_gen.c" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_style_gen.c.o" "gcc" "lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_style_gen.c.o.d"

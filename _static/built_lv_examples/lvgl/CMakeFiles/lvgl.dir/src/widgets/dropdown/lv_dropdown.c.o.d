@@ -50,6 +50,7 @@ lvgl/CMakeFiles/lvgl.dir/src/widgets/dropdown/lv_dropdown.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/dropdown/../../core/../misc/../layouts/grid/../../lv_conf_internal.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/dropdown/../../core/../misc/../layouts/grid/../../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/dropdown/../../core/../misc/lv_style_gen.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/dropdown/../../core/lv_obj_property.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/dropdown/../../core/lv_obj_tree.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/dropdown/../../core/../display/lv_display.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/dropdown/../../core/../display/../misc/lv_timer.h \

@@ -539,7 +539,7 @@ API
 
 :ref:`lv_obj_style`
 
-:ref:`lv_style_gen`
-
 :ref:`lv_style`
+
+:ref:`lv_style_gen`
 

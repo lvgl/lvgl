@@ -51,6 +51,7 @@ lvgl/CMakeFiles/lvgl.dir/src/widgets/tileview/lv_tileview.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/tileview/../../core/../misc/../layouts/grid/../../lv_conf_internal.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/tileview/../../core/../misc/../layouts/grid/../../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/tileview/../../core/../misc/lv_style_gen.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/tileview/../../core/lv_obj_property.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/tileview/../../core/lv_obj_tree.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/tileview/../../core/../display/lv_display.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/tileview/../../core/../display/../misc/lv_timer.h \

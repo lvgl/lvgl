@@ -1,0 +1,10 @@
+.. _lv_obj_property:
+
+=================
+lv_obj_property.h
+=================
+
+
+.. doxygenfile:: lv_obj_property.h
+    :project: lvgl
+

@@ -55,6 +55,7 @@ lvgl/CMakeFiles/lvgl.dir/src/layouts/grid/lv_grid.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/grid/../../core/../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/grid/../../core/../misc/lv_color.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/grid/../../core/../misc/lv_assert.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/grid/../../core/lv_obj_property.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/grid/../../core/lv_obj_tree.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/grid/../../core/../misc/lv_anim.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/layouts/grid/../../core/../display/lv_display.h \

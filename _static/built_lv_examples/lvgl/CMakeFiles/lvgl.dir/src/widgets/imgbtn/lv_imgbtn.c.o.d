@@ -51,6 +51,7 @@ lvgl/CMakeFiles/lvgl.dir/src/widgets/imgbtn/lv_imgbtn.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/imgbtn/../../core/../misc/../layouts/grid/../../lv_conf_internal.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/imgbtn/../../core/../misc/../layouts/grid/../../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/imgbtn/../../core/../misc/lv_style_gen.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/imgbtn/../../core/lv_obj_property.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/imgbtn/../../core/lv_obj_tree.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/imgbtn/../../core/../display/lv_display.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/widgets/imgbtn/../../core/../display/../misc/lv_timer.h \

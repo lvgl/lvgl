@@ -7,6 +7,6 @@ calendar
     :maxdepth: 2
 
     lv_calendar_header_dropdown
-    lv_calendar
     lv_calendar_header_arrow
+    lv_calendar
 

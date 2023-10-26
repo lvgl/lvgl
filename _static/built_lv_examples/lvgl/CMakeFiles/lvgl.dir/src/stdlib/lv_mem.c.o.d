@@ -111,6 +111,7 @@ lvgl/CMakeFiles/lvgl.dir/src/stdlib/lv_mem.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/../core/../misc/lv_types.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/../core/../misc/lv_color.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/../core/../misc/lv_assert.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/../core/lv_obj_property.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/../core/lv_obj_tree.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/../core/../display/lv_display.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/stdlib/../core/lv_obj_pos.h \

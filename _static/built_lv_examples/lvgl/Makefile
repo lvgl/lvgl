@@ -7595,6 +7595,30 @@ src/core/lv_obj_pos.c.s:
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl.dir/build.make lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_pos.c.s
 .PHONY : src/core/lv_obj_pos.c.s
 
+src/core/lv_obj_property.o: src/core/lv_obj_property.c.o
+.PHONY : src/core/lv_obj_property.o
+
+# target to build an object file
+src/core/lv_obj_property.c.o:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl.dir/build.make lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_property.c.o
+.PHONY : src/core/lv_obj_property.c.o
+
+src/core/lv_obj_property.i: src/core/lv_obj_property.c.i
+.PHONY : src/core/lv_obj_property.i
+
+# target to preprocess a source file
+src/core/lv_obj_property.c.i:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl.dir/build.make lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_property.c.i
+.PHONY : src/core/lv_obj_property.c.i
+
+src/core/lv_obj_property.s: src/core/lv_obj_property.c.s
+.PHONY : src/core/lv_obj_property.s
+
+# target to generate assembly for a file
+src/core/lv_obj_property.c.s:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl.dir/build.make lvgl/CMakeFiles/lvgl.dir/src/core/lv_obj_property.c.s
+.PHONY : src/core/lv_obj_property.c.s
+
 src/core/lv_obj_scroll.o: src/core/lv_obj_scroll.c.o
 .PHONY : src/core/lv_obj_scroll.o
 
@@ -13694,6 +13718,9 @@ help:
 	@echo "... src/core/lv_obj_pos.o"
 	@echo "... src/core/lv_obj_pos.i"
 	@echo "... src/core/lv_obj_pos.s"
+	@echo "... src/core/lv_obj_property.o"
+	@echo "... src/core/lv_obj_property.i"
+	@echo "... src/core/lv_obj_property.s"
 	@echo "... src/core/lv_obj_scroll.o"
 	@echo "... src/core/lv_obj_scroll.i"
 	@echo "... src/core/lv_obj_scroll.s"

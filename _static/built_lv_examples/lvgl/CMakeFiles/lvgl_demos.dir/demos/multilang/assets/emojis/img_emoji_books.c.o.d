@@ -64,6 +64,7 @@ lvgl/CMakeFiles/lvgl_demos.dir/demos/multilang/assets/emojis/img_emoji_books.c.o
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_area.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_color.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_assert.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj_property.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/lv_obj_tree.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../misc/lv_anim.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/core/../display/lv_display.h \

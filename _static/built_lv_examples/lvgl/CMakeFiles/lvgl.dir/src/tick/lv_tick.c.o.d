@@ -111,6 +111,7 @@ lvgl/CMakeFiles/lvgl.dir/src/tick/lv_tick.c.o: \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/tick/../core/../misc/lv_types.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/tick/../core/../misc/lv_color.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/tick/../core/../misc/lv_assert.h \
+  /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/tick/../core/lv_obj_property.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/tick/../core/lv_obj_tree.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/tick/../core/../display/lv_display.h \
   /home/runner/work/lvgl/lvgl/emscripten_builder/lvgl/src/tick/../core/lv_obj_pos.h \
