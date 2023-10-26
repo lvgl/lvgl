@@ -30,8 +30,6 @@ repos:
             src/lv_conf_internal.h
          )
       types_or: ["c", "header"]
-
-repos:
 -   repo: https://github.com/crate-ci/typos
     rev: v1.16.20
     hooks:

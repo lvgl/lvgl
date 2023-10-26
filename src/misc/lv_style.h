@@ -146,22 +146,6 @@ typedef uint8_t lv_grad_dir_t;
 #endif /*DOXYGEN*/
 
 
-/**
- * The dithering algorithm for the gradient
- */
-enum _lv_dither_mode_t {
-    LV_DITHER_NONE,     /**< No dithering, colors are just quantized to the output resolution*/
-    LV_DITHER_ORDERED,  /**< Ordered dithering. Faster to compute and use less memory but lower quality*/
-    LV_DITHER_ERR_DIFF, /**< Error diffusion mode. Slower to compute and use more memory but give highest dither quality*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_dither_mode_t lv_dither_mode_t;
-#else
-typedef uint8_t lv_dither_mode_t;
-#endif /*DOXYGEN*/
-
-
 /** A gradient stop definition.
  *  This matches a color and a position in a virtual 0-255 scale.
  */
@@ -177,8 +161,6 @@ typedef struct {
     uint8_t              stops_count;                  /**< The number of used stops in the array */
     lv_grad_dir_t        dir : 3;                      /**< The gradient direction.
                                                         * Any of LV_GRAD_DIR_HOR, LV_GRAD_DIR_VER, LV_GRAD_DIR_NONE */
-    lv_dither_mode_t     dither : 3;                   /**< Whether to dither the gradient or not.
-                                                        * Any of LV_DITHER_NONE, LV_DITHER_ORDERED, LV_DITHER_ERR_DIFF */
 } lv_grad_dsc_t;
 
 /**
@@ -235,13 +217,14 @@ enum _lv_style_prop_t {
 
 
     LV_STYLE_BG_GRAD_DIR            = 32,
-    LV_STYLE_BG_GRAD_COLOR          = 33,
-    LV_STYLE_BG_MAIN_STOP           = 34,
-    LV_STYLE_BG_GRAD_STOP           = 35,
+    LV_STYLE_BG_MAIN_STOP           = 33,
+    LV_STYLE_BG_GRAD_STOP           = 34,
+    LV_STYLE_BG_GRAD_COLOR          = 35,
 
-    LV_STYLE_BG_GRAD                = 36,
-    LV_STYLE_BG_DITHER_MODE         = 37,
-    LV_STYLE_BASE_DIR               = 38,
+    LV_STYLE_BG_MAIN_OPA            = 36,
+    LV_STYLE_BG_GRAD_OPA            = 37,
+    LV_STYLE_BG_GRAD                = 38,
+    LV_STYLE_BASE_DIR               = 39,
 
     LV_STYLE_BG_IMAGE_SRC             = 40,
     LV_STYLE_BG_IMAGE_OPA             = 41,
