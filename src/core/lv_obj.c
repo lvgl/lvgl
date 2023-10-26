@@ -45,10 +45,28 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state);
+#if LV_USE_OBJ_PROPERTY
+    static lv_result_t lv_obj_set_any(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
+    static lv_result_t lv_obj_get_any(const lv_obj_t *, lv_prop_id_t, lv_property_t *);
+#endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_OBJ_PARENT,
+        .setter = lv_obj_set_parent,
+        .getter = lv_obj_get_parent,
+    },
+    {
+        .id = LV_PROPERTY_ID_ANY,
+        .setter = lv_obj_set_any,
+        .getter = lv_obj_get_any,
+    }
+};
+#endif
 
 const lv_obj_class_t lv_obj_class = {
     .constructor_cb = lv_obj_constructor,
@@ -61,6 +79,12 @@ const lv_obj_class_t lv_obj_class = {
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
     .name = "obj",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_OBJ_START,
+    .prop_index_end = LV_PROPERTY_OBJ_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+#endif
 };
 
 /**********************
@@ -182,7 +206,6 @@ void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
         update_obj_state(obj, new_state);
     }
 }
-
 
 void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v)
 {
@@ -784,3 +807,34 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
     }
     return false;
 }
+
+#if LV_USE_OBJ_PROPERTY
+static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_property_t * prop)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
+        lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
+        if(prop->num) lv_obj_add_flag(obj, flag);
+        else lv_obj_remove_flag(obj, flag);
+        return LV_RESULT_OK;
+    }
+    else {
+        return LV_RESULT_INVALID;
+    }
+}
+
+static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_property_t * prop)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(id >= LV_PROPERTY_OBJ_FLAG_START && id <= LV_PROPERTY_OBJ_FLAG_END) {
+        lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
+        prop->id = id;
+        prop->num = obj->flags & flag;
+        return LV_RESULT_OK;
+    }
+    else {
+        return LV_RESULT_INVALID;
+    }
+}
+#endif

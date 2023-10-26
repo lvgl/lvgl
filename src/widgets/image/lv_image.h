@@ -75,6 +75,20 @@ typedef _lv_image_size_mode_t lv_image_size_mode_t;
 typedef uint8_t lv_image_size_mode_t;
 #endif /*DOXYGEN*/
 
+#if LV_USE_OBJ_PROPERTY
+enum {
+    LV_PROPERTY_ID(IMAGE, SRC,        LV_PROPERTY_TYPE_POINTER,   0),
+    LV_PROPERTY_ID(IMAGE, OFFSET_X,   LV_PROPERTY_TYPE_INT,       1),
+    LV_PROPERTY_ID(IMAGE, OFFSET_Y,   LV_PROPERTY_TYPE_INT,       2),
+    LV_PROPERTY_ID(IMAGE, ROTATION,   LV_PROPERTY_TYPE_INT,       3),
+    LV_PROPERTY_ID(IMAGE, PIVOT,      LV_PROPERTY_TYPE_POINTER,   4),
+    LV_PROPERTY_ID(IMAGE, SCALE,      LV_PROPERTY_TYPE_INT,       5),
+    LV_PROPERTY_ID(IMAGE, ANTIALIAS,  LV_PROPERTY_TYPE_INT,       6),
+    LV_PROPERTY_ID(IMAGE, SIZE_MODE,  LV_PROPERTY_TYPE_INT,       7),
+    LV_PROPERTY_IMAGE_END,
+};
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -133,6 +147,14 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle);
  * @param y         rotation center y of the image
  */
 void lv_image_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
+
+/**
+ * Set pivot similar to get_pivot
+ */
+static inline void _lv_image_set_pivot(lv_obj_t * obj, lv_point_t * pivot)
+{
+    lv_image_set_pivot(obj, pivot->x, pivot->y);
+}
 
 
 /**
