@@ -45,6 +45,9 @@ lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, lv_c
 /* set the size of the font to a new line_height*/
 void lv_tiny_ttf_set_size(lv_font_t * font, lv_coord_t line_height);
 
+/* enable/disable kerning (on by default)*/
+void lv_tiny_ttf_set_use_kerning(lv_font_t * font, bool use_kerning);
+
 /* destroy a font previously created with lv_tiny_ttf_create_xxxx()*/
 void lv_tiny_ttf_destroy(lv_font_t * font);
 

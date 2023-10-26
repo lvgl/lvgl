@@ -69,6 +69,7 @@ typedef struct ttf_font_desc {
     const uint8_t * stream;
 #endif
     stbtt_fontinfo info;
+    bool use_kerning;
     float scale;
     int ascent;
     int descent;
@@ -108,7 +109,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     }
     int advw, lsb;
     stbtt_GetGlyphHMetrics(&dsc->info, g1, &advw, &lsb);
-    int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, g2);
+    int k = dsc->use_kerning ? stbtt_GetGlyphKernAdvance(&dsc->info, g1, g2) : 0;
     dsc_out->adv_w = (uint16_t)floor((((float)advw + (float)k) * dsc->scale) +
                                      0.5f); /*Horizontal space required by the glyph in [px]*/
 
@@ -217,8 +218,9 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
         LV_LOG_ERROR("tiny_ttf: init failed\n");
         return NULL;
     }
-
 #endif
+
+    dsc->use_kerning = true;
 
     float scale = stbtt_ScaleForPixelHeight(&dsc->info, line_height);
     lv_font_t * out_font = (lv_font_t *)TTF_MALLOC(sizeof(lv_font_t));
@@ -268,6 +270,11 @@ void lv_tiny_ttf_set_size(lv_font_t * font, lv_coord_t line_height)
         font->base_line = line_height - (lv_coord_t)(dsc->ascent * dsc->scale);
         font->underline_position = (uint8_t)line_height - dsc->descent;
     }
+}
+void lv_tiny_ttf_set_use_kerning(lv_font_t * font, bool use_kerning)
+{
+    ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
+    dsc->use_kerning = use_kerning;
 }
 void lv_tiny_ttf_destroy(lv_font_t * font)
 {
