@@ -2245,6 +2245,24 @@
             #define LV_PROFILER_END     LV_PROFILER_BUILTIN_END
         #endif
     #endif
+
+    /*Profiler start point function with custom tag*/
+    #ifndef LV_PROFILER_BEGINEX
+        #ifdef CONFIG_LV_PROFILER_BEGINEX
+            #define LV_PROFILER_BEGINEX CONFIG_LV_PROFILER_BEGINEX
+        #else
+            #define LV_PROFILER_BEGINEX(tag) LV_PROFILER_BUILTIN_BEGINEX(tag)
+        #endif
+    #endif
+
+    /*Profiler end point function with custom tag*/
+    #ifndef LV_PROFILER_ENDEX
+        #ifdef CONFIG_LV_PROFILER_ENDEX
+            #define LV_PROFILER_ENDEX CONFIG_LV_PROFILER_ENDEX
+        #else
+            #define LV_PROFILER_ENDEX(tag)   LV_PROFILER_BUILTIN_ENDEX(tag)
+        #endif
+    #endif
 #endif
 
 /*1: Enable Monkey test*/
