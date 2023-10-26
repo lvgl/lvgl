@@ -110,6 +110,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
 
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, lv_color_t color, int32_t frame_id)
 {
+    LV_UNUSED(color);
     lv_memzero(dsc, sizeof(lv_image_decoder_dsc_t));
 
     if(src == NULL) return LV_RESULT_INVALID;
@@ -119,7 +120,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         if(img_dsc->data == NULL) return LV_RESULT_INVALID;
     }
 
-    dsc->color    = color;
     dsc->src_type = src_type;
     dsc->frame_id = frame_id;
 
