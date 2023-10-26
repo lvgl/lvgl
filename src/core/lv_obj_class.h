@@ -15,8 +15,8 @@ extern "C" {
  *********************/
 #include <stdint.h>
 #include <stdbool.h>
+#include "lv_obj_property.h"
 #include "../misc/lv_area.h"
-#include "../misc/lv_obj_property.h"
 
 /*********************
  *      DEFINES
