@@ -241,6 +241,11 @@ static inline void * lv_timer_get_user_data(lv_timer_t * timer)
     return timer->user_data;
 }
 
+/**
+ * Get the pause state of a timer
+ * @param timer pointer to a lv_timer
+ * @return true: timer is paused; false: timer is running
+ */
 static inline bool lv_timer_get_paused(lv_timer_t * timer)
 {
     return timer->paused;
