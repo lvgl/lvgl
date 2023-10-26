@@ -687,10 +687,10 @@
     #define LV_PROFILER_END     LV_PROFILER_BUILTIN_END
 
     /*Profiler start point function with custom tag*/
-    #define LV_PROFILER_BEGINEX(tag) LV_PROFILER_BUILTIN_BEGINEX(tag)
+    #define LV_PROFILER_BEGINEX LV_PROFILER_BUILTIN_BEGINEX
 
     /*Profiler end point function with custom tag*/
-    #define LV_PROFILER_ENDEX(tag)   LV_PROFILER_BUILTIN_ENDEX(tag)
+    #define LV_PROFILER_ENDEX   LV_PROFILER_BUILTIN_ENDEX
 #endif
 
 /*1: Enable Monkey test*/

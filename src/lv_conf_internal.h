@@ -2251,7 +2251,7 @@
         #ifdef CONFIG_LV_PROFILER_BEGINEX
             #define LV_PROFILER_BEGINEX CONFIG_LV_PROFILER_BEGINEX
         #else
-            #define LV_PROFILER_BEGINEX(tag) LV_PROFILER_BUILTIN_BEGINEX(tag)
+            #define LV_PROFILER_BEGINEX LV_PROFILER_BUILTIN_BEGINEX
         #endif
     #endif
 
@@ -2260,7 +2260,7 @@
         #ifdef CONFIG_LV_PROFILER_ENDEX
             #define LV_PROFILER_ENDEX CONFIG_LV_PROFILER_ENDEX
         #else
-            #define LV_PROFILER_ENDEX(tag)   LV_PROFILER_BUILTIN_ENDEX(tag)
+            #define LV_PROFILER_ENDEX   LV_PROFILER_BUILTIN_ENDEX
         #endif
     #endif
 #endif
