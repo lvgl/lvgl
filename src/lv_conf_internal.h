@@ -2233,7 +2233,7 @@
         #ifdef CONFIG_LV_PROFILER_BEGIN
             #define LV_PROFILER_BEGIN CONFIG_LV_PROFILER_BEGIN
         #else
-            #define LV_PROFILER_BEGIN   LV_PROFILER_BUILTIN_BEGIN
+            #define LV_PROFILER_BEGIN    LV_PROFILER_BUILTIN_BEGIN
         #endif
     #endif
 
@@ -2242,25 +2242,25 @@
         #ifdef CONFIG_LV_PROFILER_END
             #define LV_PROFILER_END CONFIG_LV_PROFILER_END
         #else
-            #define LV_PROFILER_END     LV_PROFILER_BUILTIN_END
+            #define LV_PROFILER_END      LV_PROFILER_BUILTIN_END
         #endif
     #endif
 
-    /*Profiler start point function with custom string*/
-    #ifndef LV_PROFILER_BEGINEX
-        #ifdef CONFIG_LV_PROFILER_BEGINEX
-            #define LV_PROFILER_BEGINEX CONFIG_LV_PROFILER_BEGINEX
+    /*Profiler start point function with custom tag*/
+    #ifndef LV_PROFILER_BEGIN_TAG
+        #ifdef CONFIG_LV_PROFILER_BEGIN_TAG
+            #define LV_PROFILER_BEGIN_TAG CONFIG_LV_PROFILER_BEGIN_TAG
         #else
-            #define LV_PROFILER_BEGINEX LV_PROFILER_BUILTIN_BEGINEX
+            #define LV_PROFILER_BEGIN_TAG LV_PROFILER_BUILTIN_BEGIN_TAG
         #endif
     #endif
 
-    /*Profiler end point function with custom string*/
-    #ifndef LV_PROFILER_ENDEX
-        #ifdef CONFIG_LV_PROFILER_ENDEX
-            #define LV_PROFILER_ENDEX CONFIG_LV_PROFILER_ENDEX
+    /*Profiler end point function with custom tag*/
+    #ifndef LV_PROFILER_END_TAG
+        #ifdef CONFIG_LV_PROFILER_END_TAG
+            #define LV_PROFILER_END_TAG CONFIG_LV_PROFILER_END_TAG
         #else
-            #define LV_PROFILER_ENDEX   LV_PROFILER_BUILTIN_ENDEX
+            #define LV_PROFILER_END_TAG   LV_PROFILER_BUILTIN_END_TAG
         #endif
     #endif
 #endif
