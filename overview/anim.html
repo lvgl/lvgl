@@ -982,6 +982,7 @@
 <li class="toctree-l4"><a class="reference internal" href="img.html#custom-image-formats">Custom image formats</a></li>
 <li class="toctree-l4"><a class="reference internal" href="img.html#register-an-image-decoder">Register an image decoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="img.html#manually-use-an-image-decoder">Manually use an image decoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="img.html#image-post-processing">Image post-processing</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="img.html#image-caching">Image caching</a><ul>
@@ -2654,6 +2655,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../API/misc/lv_cache.html">lv_cache.h</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv415lv_cache_add_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_add_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_find_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_find_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv422lv_cache_invalidate_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_invalidate_cb</span></code></a></li>
@@ -2673,7 +2675,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv421lv_cache_get_max_sizev"><code class="docutils literal notranslate"><span class="pre">lv_cache_get_max_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv413lv_cache_lockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_lock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv415lv_cache_unlockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_unlock()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv417_lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">_lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv418lv_cache_manager_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_manager_t</span></code></a></li>
 </ul>
 </li>
@@ -4316,7 +4318,7 @@
           <li class="breadcrumb-item"><a href="index.html">Overview</a></li>
       <li class="breadcrumb-item active">Animations</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/docs/overview/anim.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/docs/overview/anim.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="fs.html" class="btn btn-neutral float-left" title="File system" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4474,7 +4476,7 @@ timeline.</p>
 <h3>Start animation on an event<a class="headerlink" href="#start-animation-on-an-event" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_anim_1&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/anim/lv_example_anim_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/anim/lv_example_anim_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../lv_examples.h&quot;</span>
 <span class="cp">#if LV_BUILD_EXAMPLES &amp;&amp; LV_USE_SWITCH</span>
 
@@ -4533,7 +4535,7 @@ timeline.</p>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/anim/lv_example_anim_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/anim/lv_example_anim_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/anim/lv_example_anim_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/anim/lv_example_anim_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">anim_x_cb</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
     <span class="n">label</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
@@ -4583,7 +4585,7 @@ timeline.</p>
 <h3>Playback animation<a class="headerlink" href="#playback-animation" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_anim_2&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/anim/lv_example_anim_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/anim/lv_example_anim_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../lv_examples.h&quot;</span>
 <span class="cp">#if LV_BUILD_EXAMPLES &amp;&amp; LV_USE_SWITCH</span>
 
@@ -4634,7 +4636,7 @@ timeline.</p>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/anim/lv_example_anim_2.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/anim/lv_example_anim_2.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/anim/lv_example_anim_2.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/anim/lv_example_anim_2.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">anim_x_cb</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
     <span class="n">obj</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
@@ -4684,7 +4686,7 @@ timeline.</p>
 <h3>Animation timeline<a class="headerlink" href="#animation-timeline" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_anim_timeline_1&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/anim/lv_example_anim_timeline_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/anim/lv_example_anim_timeline_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_FLEX &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4882,7 +4884,7 @@ timeline.</p>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/anim/lv_example_anim_timeline_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/anim/lv_example_anim_timeline_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/anim/lv_example_anim_timeline_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/anim/lv_example_anim_timeline_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LV_ExampleAnimTimeline_1</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -5033,9 +5035,9 @@ timeline.</p>
 </section>
 <section id="api">
 <h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
-<p><a class="reference internal" href="../API/misc/lv_anim_timeline.html#lv-anim-timeline"><span class="std std-ref">lv_anim_timeline.h</span></a></p>
-<p><a class="reference internal" href="../API/lv_api_map.html#lv-api-map"><span class="std std-ref">lv_api_map.h</span></a></p>
 <p><a class="reference internal" href="../API/misc/lv_anim.html#lv-anim"><span class="std std-ref">lv_anim.h</span></a></p>
+<p><a class="reference internal" href="../API/lv_api_map.html#lv-api-map"><span class="std std-ref">lv_api_map.h</span></a></p>
+<p><a class="reference internal" href="../API/misc/lv_anim_timeline.html#lv-anim-timeline"><span class="std std-ref">lv_anim_timeline.h</span></a></p>
 </section>
 </section>
 
@@ -5051,7 +5053,7 @@ timeline.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, LVGL Kft.
-      <span class="lastupdated">Last updated on Oct 25, 2023.
+      <span class="lastupdated">Last updated on Oct 26, 2023.
       </span></p>
   </div>
 

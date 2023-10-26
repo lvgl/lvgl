@@ -982,6 +982,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#custom-image-formats">Custom image formats</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#register-an-image-decoder">Register an image decoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manually-use-an-image-decoder">Manually use an image decoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#image-post-processing">Image post-processing</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#image-caching">Image caching</a><ul>
@@ -2654,6 +2655,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../API/misc/lv_cache.html">lv_cache.h</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv415lv_cache_add_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_add_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_find_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_find_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv422lv_cache_invalidate_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_invalidate_cb</span></code></a></li>
@@ -2673,7 +2675,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv421lv_cache_get_max_sizev"><code class="docutils literal notranslate"><span class="pre">lv_cache_get_max_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv413lv_cache_lockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_lock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv415lv_cache_unlockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_unlock()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv417_lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">_lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv418lv_cache_manager_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_manager_t</span></code></a></li>
 </ul>
 </li>
@@ -4316,7 +4318,7 @@
           <li class="breadcrumb-item"><a href="index.html">Overview</a></li>
       <li class="breadcrumb-item active">Images</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/docs/overview/img.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/docs/overview/img.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="font.html" class="btn btn-neutral float-left" title="Fonts" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4669,6 +4671,123 @@ to open is an animation.</p>
 </pre></div>
 </div>
 </section>
+<section id="image-post-processing">
+<h3>Image post-processing<a class="headerlink" href="#image-post-processing" title="Link to this heading"></a></h3>
+<p>Considering that some hardware has special requirements for image formats,
+such as alpha premultiplication and stride alignment, most image decoders (such as PNG decoders)
+may not directly output image data that meets hardware requirements.</p>
+<p>For this reason, LVGL provides a solution for image post-processing.
+First, call a custom post-processing function after <code class="docutils literal notranslate"><span class="pre">lv_image_decoder_open</span></code> to adjust the data in the image cache,
+and then mark the processing status in <code class="docutils literal notranslate"><span class="pre">cache_entry-&gt;process_state</span></code> (to avoid repeated post-processing).</p>
+<p>See the detailed code below:</p>
+<ul class="simple">
+<li><p>Stride alignment and premultiply post-processing example:</p></li>
+</ul>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/* Define post-processing state */</span>
+<span class="k">typedef</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">IMAGE_PROCESS_STATE_NONE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">IMAGE_PROCESS_STATE_STRIDE_ALIGNED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="n">IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="p">}</span><span class="w"> </span><span class="n">image_process_state_t</span><span class="p">;</span>
+
+<span class="n">lv_result_t</span><span class="w"> </span><span class="nf">my_image_post_process</span><span class="p">(</span><span class="n">lv_image_decoder_dsc_t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dsc</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">lv_color_format_t</span><span class="w"> </span><span class="n">color_format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dsc</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">cf</span><span class="p">;</span>
+<span class="w">  </span><span class="n">lv_result_t</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LV_RESULT_OK</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="n">color_format</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">LV_COLOR_FORMAT_ARGB8888</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">lv_cache_lock</span><span class="p">();</span>
+<span class="w">    </span><span class="n">lv_cache_entry_t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">entry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dsc</span><span class="o">-&gt;</span><span class="n">cache_entry</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">process_state</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">lv_color32_t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">lv_color32_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">dsc</span><span class="o">-&gt;</span><span class="n">img_data</span><span class="p">;</span>
+<span class="w">      </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">px_cnt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dsc</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dsc</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">h</span><span class="p">;</span>
+
+<span class="w">      </span><span class="cm">/* premultiply alpha */</span>
+<span class="w">      </span><span class="k">while</span><span class="p">(</span><span class="n">px_cnt</span><span class="o">--</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">image</span><span class="o">-&gt;</span><span class="n">red</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LV_UDIV255</span><span class="p">(</span><span class="n">image</span><span class="o">-&gt;</span><span class="n">red</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">image</span><span class="o">-&gt;</span><span class="n">alpha</span><span class="p">);</span>
+<span class="w">        </span><span class="n">image</span><span class="o">-&gt;</span><span class="n">green</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LV_UDIV255</span><span class="p">(</span><span class="n">image</span><span class="o">-&gt;</span><span class="n">green</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">image</span><span class="o">-&gt;</span><span class="n">alpha</span><span class="p">);</span>
+<span class="w">        </span><span class="n">image</span><span class="o">-&gt;</span><span class="n">blue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LV_UDIV255</span><span class="p">(</span><span class="n">image</span><span class="o">-&gt;</span><span class="n">blue</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">image</span><span class="o">-&gt;</span><span class="n">alpha</span><span class="p">);</span>
+<span class="w">        </span><span class="n">image</span><span class="o">++</span><span class="p">;</span>
+<span class="w">      </span><span class="p">}</span>
+
+<span class="w">      </span><span class="n">LV_LOG_USER</span><span class="p">(</span><span class="s">&quot;premultiplied alpha OK&quot;</span><span class="p">);</span>
+
+<span class="w">      </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">process_state</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">process_state</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">IMAGE_PROCESS_STATE_STRIDE_ALIGNED</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">lv_coord_t</span><span class="w"> </span><span class="n">image_w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dsc</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">w</span><span class="p">;</span>
+<span class="w">      </span><span class="n">lv_coord_t</span><span class="w"> </span><span class="n">image_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dsc</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">h</span><span class="p">;</span>
+<span class="w">      </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">width_byte</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">image_w</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">lv_color_format_get_size</span><span class="p">(</span><span class="n">color_format</span><span class="p">);</span>
+<span class="w">      </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">stride</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lv_draw_buf_width_to_stride</span><span class="p">(</span><span class="n">image_w</span><span class="p">,</span><span class="w"> </span><span class="n">color_format</span><span class="p">);</span>
+
+<span class="w">      </span><span class="cm">/* Check stride alignment requirements */</span>
+<span class="w">      </span><span class="k">if</span><span class="p">(</span><span class="n">stride</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">width_byte</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LV_LOG_USER</span><span class="p">(</span><span class="s">&quot;need to realign stride: %&quot;</span><span class="w"> </span><span class="n">LV_PRIu32</span><span class="w"> </span><span class="s">&quot; -&gt; %&quot;</span><span class="w"> </span><span class="n">LV_PRIu32</span><span class="p">,</span><span class="w"> </span><span class="n">width_byte</span><span class="p">,</span><span class="w"> </span><span class="n">stride</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ori_image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lv_cache_get_data</span><span class="p">(</span><span class="n">entry</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stride</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dsc</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">.</span><span class="n">h</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">new_image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lv_draw_buf_malloc</span><span class="p">(</span><span class="n">size_bytes</span><span class="p">,</span><span class="w"> </span><span class="n">color_format</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">new_image</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="n">LV_LOG_ERROR</span><span class="p">(</span><span class="s">&quot;alloc failed&quot;</span><span class="p">);</span>
+<span class="w">          </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LV_RESULT_INVALID</span><span class="p">;</span>
+<span class="w">          </span><span class="k">goto</span><span class="w"> </span><span class="n">alloc_failed</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="cm">/* Replace the image data pointer */</span>
+<span class="w">        </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">new_image</span><span class="p">;</span>
+<span class="w">        </span><span class="n">dsc</span><span class="o">-&gt;</span><span class="n">img_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">new_image</span><span class="p">;</span>
+
+<span class="w">        </span><span class="cm">/* Copy image data */</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">cur</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ori_image</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="p">(</span><span class="n">lv_coord_t</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">image_h</span><span class="p">;</span><span class="w"> </span><span class="n">y</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="n">lv_memcpy</span><span class="p">(</span><span class="n">new_image</span><span class="p">,</span><span class="w"> </span><span class="n">cur</span><span class="p">,</span><span class="w"> </span><span class="n">width_byte</span><span class="p">);</span>
+<span class="w">          </span><span class="n">new_image</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">stride</span><span class="p">;</span>
+<span class="w">          </span><span class="n">cur</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">width_byte</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="cm">/* free memory for old image */</span>
+<span class="w">        </span><span class="n">lv_draw_buf_free</span><span class="p">((</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">ori_image</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">      </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LV_LOG_USER</span><span class="p">(</span><span class="s">&quot;no need to realign stride: %&quot;</span><span class="w"> </span><span class="n">LV_PRIu32</span><span class="p">,</span><span class="w"> </span><span class="n">stride</span><span class="p">);</span>
+<span class="w">      </span><span class="p">}</span>
+
+<span class="w">      </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">process_state</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">IMAGE_PROCESS_STATE_STRIDE_ALIGNED</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="nl">alloc_failed</span><span class="p">:</span>
+<span class="w">    </span><span class="n">lv_cache_unlock</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>GPU draw unit example:</p></li>
+</ul>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">gpu_draw_image</span><span class="p">(</span><span class="n">lv_draw_unit_t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">draw_unit</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">lv_draw_image_dsc_t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">draw_dsc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">lv_area_t</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">coords</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="n">lv_image_decoder_dsc_t</span><span class="w"> </span><span class="n">decoder_dsc</span><span class="p">;</span>
+<span class="w">  </span><span class="n">lv_result_t</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lv_image_decoder_open</span><span class="p">(</span><span class="o">&amp;</span><span class="n">decoder_dsc</span><span class="p">,</span><span class="w"> </span><span class="n">draw_dsc</span><span class="o">-&gt;</span><span class="n">src</span><span class="p">,</span><span class="w"> </span><span class="n">draw_dsc</span><span class="o">-&gt;</span><span class="n">recolor</span><span class="p">,</span><span class="w"> </span><span class="mi">-1</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="n">res</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">LV_RESULT_OK</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">LV_LOG_ERROR</span><span class="p">(</span><span class="s">&quot;Failed to open image&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_image_post_process</span><span class="p">(</span><span class="o">&amp;</span><span class="n">decoder_dsc</span><span class="p">);</span>
+<span class="w">  </span><span class="k">if</span><span class="p">(</span><span class="n">res</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">LV_RESULT_OK</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">LV_LOG_ERROR</span><span class="p">(</span><span class="s">&quot;Failed to post-process image&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="image-caching">
 <span id="id1"></span><h2>Image caching<a class="headerlink" href="#image-caching" title="Link to this heading"></a></h2>
@@ -4810,7 +4929,7 @@ following code to replace the LVGL built-in cache manager:</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, LVGL Kft.
-      <span class="lastupdated">Last updated on Oct 25, 2023.
+      <span class="lastupdated">Last updated on Oct 26, 2023.
       </span></p>
   </div>
 

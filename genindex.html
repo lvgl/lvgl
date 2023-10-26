@@ -979,6 +979,7 @@
 <li class="toctree-l4"><a class="reference internal" href="overview/img.html#custom-image-formats">Custom image formats</a></li>
 <li class="toctree-l4"><a class="reference internal" href="overview/img.html#register-an-image-decoder">Register an image decoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="overview/img.html#manually-use-an-image-decoder">Manually use an image decoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview/img.html#image-post-processing">Image post-processing</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="overview/img.html#image-caching">Image caching</a><ul>
@@ -2651,6 +2652,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="API/misc/lv_cache.html">lv_cache.h</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv415lv_cache_add_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_add_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv416lv_cache_find_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_find_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv422lv_cache_invalidate_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_invalidate_cb</span></code></a></li>
@@ -2670,7 +2672,7 @@
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv421lv_cache_get_max_sizev"><code class="docutils literal notranslate"><span class="pre">lv_cache_get_max_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv413lv_cache_lockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_lock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv415lv_cache_unlockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_unlock()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv417_lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">_lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="API/misc/lv_cache.html#_CPPv418lv_cache_manager_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_manager_t</span></code></a></li>
 </ul>
 </li>
@@ -4312,7 +4314,7 @@
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Index</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/docs/genindex" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/docs/genindex" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -4859,6 +4861,36 @@
 </li>
       <li><a href="API/misc/lv_cache_builtin.html#_CPPv422_lv_cache_builtin_initv">_lv_cache_builtin_init (C++ function)</a>
 </li>
+      <li><a href="API/misc/lv_cache.html#_CPPv417_lv_cache_entry_t">_lv_cache_entry_t (C++ struct)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t4dataE">_lv_cache_entry_t::data (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t9data_sizeE">_lv_cache_entry_t::data_size (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t9free_dataE">_lv_cache_entry_t::free_data (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t8free_srcE">_lv_cache_entry_t::free_src (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t4lifeE">_lv_cache_entry_t::life (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t6param1E">_lv_cache_entry_t::param1 (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t6param2E">_lv_cache_entry_t::param2 (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t13process_stateE">_lv_cache_entry_t::process_state (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t3srcE">_lv_cache_entry_t::src (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t8src_typeE">_lv_cache_entry_t::src_type (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t9temporaryE">_lv_cache_entry_t::temporary (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t11usage_countE">_lv_cache_entry_t::usage_count (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t9user_dataE">_lv_cache_entry_t::user_data (C++ member)</a>
+</li>
+      <li><a href="API/misc/lv_cache.html#_CPPv4N17_lv_cache_entry_t6weightE">_lv_cache_entry_t::weight (C++ member)</a>
+</li>
       <li><a href="API/misc/lv_cache.html#_CPPv414_lv_cache_initv">_lv_cache_init (C++ function)</a>
 </li>
       <li><a href="API/widgets/chart/lv_chart.html#_CPPv416_lv_chart_axis_t">_lv_chart_axis_t (C++ enum)</a>
@@ -5393,6 +5425,8 @@
 </li>
       <li><a href="API/draw/lv_image_decoder.html#_CPPv423_lv_image_decoder_dsc_t">_lv_image_decoder_dsc_t (C++ struct)</a>
 </li>
+      <li><a href="API/draw/lv_image_decoder.html#_CPPv4N23_lv_image_decoder_dsc_t11cache_entryE">_lv_image_decoder_dsc_t::cache_entry (C++ member)</a>
+</li>
       <li><a href="API/draw/lv_image_decoder.html#_CPPv4N23_lv_image_decoder_dsc_t5colorE">_lv_image_decoder_dsc_t::color (C++ member)</a>
 </li>
       <li><a href="API/draw/lv_image_decoder.html#_CPPv4N23_lv_image_decoder_dsc_t7decoderE">_lv_image_decoder_dsc_t::decoder (C++ member)</a>
@@ -5545,6 +5579,8 @@
 </li>
       <li><a href="API/misc/lv_ll.html#_CPPv414_lv_ll_get_lenPK7lv_ll_t">_lv_ll_get_len (C++ function)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API/misc/lv_ll.html#_CPPv415_lv_ll_get_nextPK7lv_ll_tPKv">_lv_ll_get_next (C++ function)</a>
 </li>
       <li><a href="API/misc/lv_ll.html#_CPPv415_lv_ll_get_prevPK7lv_ll_tPKv">_lv_ll_get_prev (C++ function)</a>
@@ -5561,8 +5597,6 @@
 </li>
       <li><a href="API/misc/lv_ll.html#_CPPv415_lv_ll_is_emptyP7lv_ll_t">_lv_ll_is_empty (C++ function)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API/misc/lv_ll.html#_CPPv418_lv_ll_move_beforeP7lv_ll_tPvPv">_lv_ll_move_before (C++ function)</a>
 </li>
       <li><a href="API/misc/lv_ll.html#c._LV_LL_READ">_LV_LL_READ (C macro)</a>
@@ -7329,33 +7363,7 @@
 </li>
       <li><a href="API/misc/lv_cache.html#_CPPv417lv_cache_empty_cb">lv_cache_empty_cb (C++ type)</a>
 </li>
-      <li><a href="API/misc/lv_cache.html#_CPPv416lv_cache_entry_t">lv_cache_entry_t (C++ struct)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t4dataE">lv_cache_entry_t::data (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t9data_sizeE">lv_cache_entry_t::data_size (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t9free_dataE">lv_cache_entry_t::free_data (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t8free_srcE">lv_cache_entry_t::free_src (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t4lifeE">lv_cache_entry_t::life (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t6param1E">lv_cache_entry_t::param1 (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t6param2E">lv_cache_entry_t::param2 (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t3srcE">lv_cache_entry_t::src (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t8src_typeE">lv_cache_entry_t::src_type (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t9temporaryE">lv_cache_entry_t::temporary (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t11usage_countE">lv_cache_entry_t::usage_count (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t9user_dataE">lv_cache_entry_t::user_data (C++ member)</a>
-</li>
-      <li><a href="API/misc/lv_cache.html#_CPPv4N16lv_cache_entry_t6weightE">lv_cache_entry_t::weight (C++ member)</a>
+      <li><a href="API/misc/lv_cache.html#_CPPv416lv_cache_entry_t">lv_cache_entry_t (C++ type)</a>
 </li>
       <li><a href="API/misc/lv_cache.html#_CPPv413lv_cache_findPKv19lv_cache_src_type_t8uint32_t8uint32_t">lv_cache_find (C++ function)</a>
 </li>
@@ -9963,8 +9971,6 @@
 </li>
       <li><a href="API/widgets/label/lv_label.html#_CPPv4N10lv_label_t7tmp_ptrE">lv_label_t::tmp_ptr (C++ member)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API/lv_conf_internal.html#c.LV_LABEL_TEXT_SELECTION">LV_LABEL_TEXT_SELECTION (C macro)</a>
 </li>
       <li><a href="API/widgets/label/lv_label.html#c.LV_LABEL_TEXT_SELECTION_OFF">LV_LABEL_TEXT_SELECTION_OFF (C macro)</a>
@@ -9977,6 +9983,8 @@
 </li>
       <li><a href="API/display/lv_display.html#_CPPv412lv_layer_sysv">lv_layer_sys (C++ function)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API/draw/lv_draw.html#_CPPv410lv_layer_t">lv_layer_t (C++ type)</a>
 </li>
       <li><a href="API/display/lv_display.html#_CPPv412lv_layer_topv">lv_layer_top (C++ function)</a>
@@ -13772,7 +13780,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, LVGL Kft.
-      <span class="lastupdated">Last updated on Oct 25, 2023.
+      <span class="lastupdated">Last updated on Oct 26, 2023.
       </span></p>
   </div>
 

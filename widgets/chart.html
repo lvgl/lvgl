@@ -982,6 +982,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../overview/img.html#custom-image-formats">Custom image formats</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../overview/img.html#register-an-image-decoder">Register an image decoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../overview/img.html#manually-use-an-image-decoder">Manually use an image decoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../overview/img.html#image-post-processing">Image post-processing</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../overview/img.html#image-caching">Image caching</a><ul>
@@ -2654,6 +2655,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../API/misc/lv_cache.html">lv_cache.h</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv415lv_cache_add_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_add_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_find_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_find_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv422lv_cache_invalidate_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_invalidate_cb</span></code></a></li>
@@ -2673,7 +2675,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv421lv_cache_get_max_sizev"><code class="docutils literal notranslate"><span class="pre">lv_cache_get_max_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv413lv_cache_lockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_lock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv415lv_cache_unlockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_unlock()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv417_lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">_lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv418lv_cache_manager_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_manager_t</span></code></a></li>
 </ul>
 </li>
@@ -4316,7 +4318,7 @@
           <li class="breadcrumb-item"><a href="index.html">Widgets</a></li>
       <li class="breadcrumb-item active">Chart (lv_chart)</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/docs/widgets/chart.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/docs/widgets/chart.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="calendar.html" class="btn btn-neutral float-left" title="Calendar (lv_calendar)" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4600,7 +4602,7 @@ ticks</p></li>
 <h3>Line Chart<a class="headerlink" href="#line-chart" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_chart_1&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_CHART &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4638,7 +4640,7 @@ ticks</p></li>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_1.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_1.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a chart</span>
 <span class="n">chart</span> <span class="o">=</span> <span class="n">lv</span><span class="o">.</span><span class="n">chart</span><span class="p">(</span><span class="n">lv</span><span class="o">.</span><span class="n">screen_active</span><span class="p">())</span>
 <span class="n">chart</span><span class="o">.</span><span class="n">set_size</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
@@ -4673,7 +4675,7 @@ ticks</p></li>
 <h3>Axis ticks and labels with scrolling<a class="headerlink" href="#axis-ticks-and-labels-with-scrolling" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_chart_2&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_CHART &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4735,7 +4737,7 @@ ticks</p></li>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_2.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_2.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_2.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_2.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">pass</span>
 </pre></div>
 </div>
@@ -4745,7 +4747,7 @@ ticks</p></li>
 <h3>Show the value of the pressed points<a class="headerlink" href="#show-the-value-of-the-pressed-points" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_chart_3&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_3.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_3.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_CHART &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4837,7 +4839,7 @@ ticks</p></li>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_3.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_3.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_3.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_3.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">pass</span>
 </pre></div>
 </div>
@@ -4847,7 +4849,7 @@ ticks</p></li>
 <h3>Recolor bars based on their value<a class="headerlink" href="#recolor-bars-based-on-their-value" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_chart_4&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_4.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_4.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 
 <span class="cp">#if LV_USE_CHART &amp;&amp; LV_DRAW_SW_COMPLEX &amp;&amp; LV_BUILD_EXAMPLES</span>
@@ -4899,7 +4901,7 @@ ticks</p></li>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_4.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_4.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_4.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_4.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/opt/bin/lv_micropython -i</span>
 <span class="kn">import</span> <span class="nn">lvgl</span> <span class="k">as</span> <span class="nn">lv</span>
 
@@ -4991,7 +4993,7 @@ ticks</p></li>
 <h3>Faded area line chart with custom division lines<a class="headerlink" href="#faded-area-line-chart-with-custom-division-lines" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_chart_5&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_5.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_5.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 
 <span class="cp">#if LV_USE_CHART &amp;&amp; LV_DRAW_SW_COMPLEX &amp;&amp; LV_BUILD_EXAMPLES</span>
@@ -5143,7 +5145,7 @@ ticks</p></li>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_5.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_5.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_5.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_5.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">pass</span>
 </pre></div>
 </div>
@@ -5153,7 +5155,7 @@ ticks</p></li>
 <h3>Show cursor on the clicked point<a class="headerlink" href="#show-cursor-on-the-clicked-point" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_chart_6&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_6.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_6.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_CHART &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -5208,7 +5210,7 @@ ticks</p></li>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_6.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_6.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_6.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_6.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">pass</span>
 </pre></div>
 </div>
@@ -5218,7 +5220,7 @@ ticks</p></li>
 <h3>Scatter chart<a class="headerlink" href="#scatter-chart" title="Link to this heading"></a></h3>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_chart_7&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_7.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_7.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_CHART &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -5291,7 +5293,7 @@ ticks</p></li>
 </div>
 <div class="toggle docutils container">
 <div class="header docutils container">
-<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_7.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/chart/lv_example_chart_7.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
+<p>MicroPython code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_7.py'><i class="fa fa-github"></i>&nbsp;View on GitHub</a><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://sim.lvgl.io/v9.0/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/chart/lv_example_chart_7.py'><i class="fa fa-play"></i>&nbsp;MicroPython Simulator</a></div>
 <div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">pass</span>
 </pre></div>
 </div>
@@ -5316,7 +5318,7 @@ ticks</p></li>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, LVGL Kft.
-      <span class="lastupdated">Last updated on Oct 25, 2023.
+      <span class="lastupdated">Last updated on Oct 26, 2023.
       </span></p>
   </div>
 

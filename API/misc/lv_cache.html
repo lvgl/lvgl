@@ -982,6 +982,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../overview/img.html#custom-image-formats">Custom image formats</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../overview/img.html#register-an-image-decoder">Register an image decoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../overview/img.html#manually-use-an-image-decoder">Manually use an image decoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview/img.html#image-post-processing">Image post-processing</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../overview/img.html#image-caching">Image caching</a><ul>
@@ -2654,6 +2655,7 @@
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">lv_cache.h</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv415lv_cache_add_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_add_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv416lv_cache_find_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_find_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv422lv_cache_invalidate_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_invalidate_cb</span></code></a></li>
@@ -2673,7 +2675,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv421lv_cache_get_max_sizev"><code class="docutils literal notranslate"><span class="pre">lv_cache_get_max_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv413lv_cache_lockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_lock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv415lv_cache_unlockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_unlock()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417_lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">_lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#_CPPv418lv_cache_manager_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_manager_t</span></code></a></li>
 </ul>
 </li>
@@ -4317,7 +4319,7 @@
           <li class="breadcrumb-item"><a href="index.html">misc</a></li>
       <li class="breadcrumb-item active">lv_cache.h</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/docs/API/misc/lv_cache.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/docs/API/misc/lv_cache.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="lv_area.html" class="btn btn-neutral float-left" title="lv_area.h" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4332,6 +4334,11 @@
 <span id="lv-cache"></span><h1>lv_cache.h<a class="headerlink" href="#lv-cache-h" title="Link to this heading"></a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv416lv_cache_entry_t">
+<span id="_CPPv316lv_cache_entry_t"></span><span id="_CPPv216lv_cache_entry_t"></span><span id="lv_cache_entry_t"></span><span class="target" id="lv__cache_8h_1acc3bb05738d33b35c54cff5dcfec50a5"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv417_lv_cache_entry_t" title="_lv_cache_entry_t"><span class="n"><span class="pre">_lv_cache_entry_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lv_cache_entry_t</span></span></span><a class="headerlink" href="#_CPPv416lv_cache_entry_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv415lv_cache_add_cb">
 <span id="_CPPv315lv_cache_add_cb"></span><span id="_CPPv215lv_cache_add_cb"></span><span id="lv_cache_add_cb"></span><span class="target" id="lv__cache_8h_1a44efb7c8e0d8ff8410a83b4529d0386e"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv416lv_cache_entry_t" title="lv_cache_entry_t"><span class="n"><span class="pre">lv_cache_entry_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">lv_cache_add_cb</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv415lv_cache_add_cb" title="Link to this definition"></a><br /></dt>
@@ -4565,83 +4572,89 @@
 
 </div>
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv416lv_cache_entry_t">
-<span id="_CPPv316lv_cache_entry_t"></span><span id="_CPPv216lv_cache_entry_t"></span><span id="lv_cache_entry_t"></span><span class="target" id="structlv__cache__entry__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lv_cache_entry_t</span></span></span><a class="headerlink" href="#_CPPv416lv_cache_entry_t" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv417_lv_cache_entry_t">
+<span id="_CPPv317_lv_cache_entry_t"></span><span id="_CPPv217_lv_cache_entry_t"></span><span id="_lv_cache_entry_t"></span><span class="target" id="struct__lv__cache__entry__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_lv_cache_entry_t</span></span></span><a class="headerlink" href="#_CPPv417_lv_cache_entry_t" title="Link to this definition"></a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t3srcE">
-<span id="_CPPv3N16lv_cache_entry_t3srcE"></span><span id="_CPPv2N16lv_cache_entry_t3srcE"></span><span id="lv_cache_entry_t::src__voidCP"></span><span class="target" id="structlv__cache__entry__t_1aaf5fd76de8b3e991894d0933186fa035"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">src</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t3srcE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t3srcE">
+<span id="_CPPv3N17_lv_cache_entry_t3srcE"></span><span id="_CPPv2N17_lv_cache_entry_t3srcE"></span><span id="_lv_cache_entry_t::src__voidCP"></span><span class="target" id="struct__lv__cache__entry__t_1a6d021117e5a35396cebedf8938bd46b5"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">src</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t3srcE" title="Link to this definition"></a><br /></dt>
 <dd><p>The image source or other source related to the cache content. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t8src_typeE">
-<span id="_CPPv3N16lv_cache_entry_t8src_typeE"></span><span id="_CPPv2N16lv_cache_entry_t8src_typeE"></span><span id="lv_cache_entry_t::src_type__lv_cache_src_type_t"></span><span class="target" id="structlv__cache__entry__t_1abf78c3bc18658b3ba6f0cedadd8e97e5"></span><a class="reference internal" href="#_CPPv419lv_cache_src_type_t" title="lv_cache_src_type_t"><span class="n"><span class="pre">lv_cache_src_type_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">src_type</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t8src_typeE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t8src_typeE">
+<span id="_CPPv3N17_lv_cache_entry_t8src_typeE"></span><span id="_CPPv2N17_lv_cache_entry_t8src_typeE"></span><span id="_lv_cache_entry_t::src_type__lv_cache_src_type_t"></span><span class="target" id="struct__lv__cache__entry__t_1a597efbd19533623f714adbd08b4ce4e3"></span><a class="reference internal" href="#_CPPv419lv_cache_src_type_t" title="lv_cache_src_type_t"><span class="n"><span class="pre">lv_cache_src_type_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">src_type</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t8src_typeE" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t6param1E">
-<span id="_CPPv3N16lv_cache_entry_t6param1E"></span><span id="_CPPv2N16lv_cache_entry_t6param1E"></span><span id="lv_cache_entry_t::param1__uint32_t"></span><span class="target" id="structlv__cache__entry__t_1a8cba63191f4b8b7cf375f89433bb3b9e"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">param1</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t6param1E" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t6param1E">
+<span id="_CPPv3N17_lv_cache_entry_t6param1E"></span><span id="_CPPv2N17_lv_cache_entry_t6param1E"></span><span id="_lv_cache_entry_t::param1__uint32_t"></span><span class="target" id="struct__lv__cache__entry__t_1ac2ee73c63a75f06131846eaee154fb3d"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">param1</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t6param1E" title="Link to this definition"></a><br /></dt>
 <dd><p>Some extra parameters to describe the source. E.g. the current frame of an animation </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t6param2E">
-<span id="_CPPv3N16lv_cache_entry_t6param2E"></span><span id="_CPPv2N16lv_cache_entry_t6param2E"></span><span id="lv_cache_entry_t::param2__uint32_t"></span><span class="target" id="structlv__cache__entry__t_1ab0c1ab39a2cfaca6bbba6a94699d993a"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">param2</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t6param2E" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t6param2E">
+<span id="_CPPv3N17_lv_cache_entry_t6param2E"></span><span id="_CPPv2N17_lv_cache_entry_t6param2E"></span><span id="_lv_cache_entry_t::param2__uint32_t"></span><span class="target" id="struct__lv__cache__entry__t_1a119739a30423a3b0873779a4f19503bd"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">param2</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t6param2E" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t4dataE">
-<span id="_CPPv3N16lv_cache_entry_t4dataE"></span><span id="_CPPv2N16lv_cache_entry_t4dataE"></span><span id="lv_cache_entry_t::data__voidCP"></span><span class="target" id="structlv__cache__entry__t_1a1c34a3cc4646cb894732ee7eadeafbc2"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t4dataE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t13process_stateE">
+<span id="_CPPv3N17_lv_cache_entry_t13process_stateE"></span><span id="_CPPv2N17_lv_cache_entry_t13process_stateE"></span><span id="_lv_cache_entry_t::process_state__uint32_t"></span><span class="target" id="struct__lv__cache__entry__t_1a2e0b253ac27430d77dc91bb3cf5cbd7f"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">process_state</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t13process_stateE" title="Link to this definition"></a><br /></dt>
+<dd><p>User processing tag </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t4dataE">
+<span id="_CPPv3N17_lv_cache_entry_t4dataE"></span><span id="_CPPv2N17_lv_cache_entry_t4dataE"></span><span id="_lv_cache_entry_t::data__voidCP"></span><span class="target" id="struct__lv__cache__entry__t_1ad707bf3df8306ec86d3e3762bf5d6581"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t4dataE" title="Link to this definition"></a><br /></dt>
 <dd><p>The data to cache </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t9data_sizeE">
-<span id="_CPPv3N16lv_cache_entry_t9data_sizeE"></span><span id="_CPPv2N16lv_cache_entry_t9data_sizeE"></span><span id="lv_cache_entry_t::data_size__uint32_t"></span><span class="target" id="structlv__cache__entry__t_1a792356d12016b443efff318ece23e4e6"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data_size</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t9data_sizeE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t9data_sizeE">
+<span id="_CPPv3N17_lv_cache_entry_t9data_sizeE"></span><span id="_CPPv2N17_lv_cache_entry_t9data_sizeE"></span><span id="_lv_cache_entry_t::data_size__uint32_t"></span><span class="target" id="struct__lv__cache__entry__t_1a59d15fd530069cb880e2d47c8250756d"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data_size</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t9data_sizeE" title="Link to this definition"></a><br /></dt>
 <dd><p>Size of data in bytes </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t6weightE">
-<span id="_CPPv3N16lv_cache_entry_t6weightE"></span><span id="_CPPv2N16lv_cache_entry_t6weightE"></span><span id="lv_cache_entry_t::weight__uint32_t"></span><span class="target" id="structlv__cache__entry__t_1a3d0f9659efab855e628a3b3d7df033d9"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">weight</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t6weightE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t6weightE">
+<span id="_CPPv3N17_lv_cache_entry_t6weightE"></span><span id="_CPPv2N17_lv_cache_entry_t6weightE"></span><span id="_lv_cache_entry_t::weight__uint32_t"></span><span class="target" id="struct__lv__cache__entry__t_1a835f3e07944980a4da462b549c28d4e3"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">weight</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t6weightE" title="Link to this definition"></a><br /></dt>
 <dd><p>On access to any cache entry, <code class="docutils literal notranslate"><span class="pre">life</span></code> of each cache entry will be incremented by their own <code class="docutils literal notranslate"><span class="pre">weight</span></code> to keep the entry alive longer </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t4lifeE">
-<span id="_CPPv3N16lv_cache_entry_t4lifeE"></span><span id="_CPPv2N16lv_cache_entry_t4lifeE"></span><span id="lv_cache_entry_t::life__int32_t"></span><span class="target" id="structlv__cache__entry__t_1a0eace5169fe10c38d9b2f5c747c20e68"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">life</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t4lifeE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t4lifeE">
+<span id="_CPPv3N17_lv_cache_entry_t4lifeE"></span><span id="_CPPv2N17_lv_cache_entry_t4lifeE"></span><span id="_lv_cache_entry_t::life__int32_t"></span><span class="target" id="struct__lv__cache__entry__t_1a68a24adc90f182c470596bccd6e6324b"></span><span class="n"><span class="pre">int32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">life</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t4lifeE" title="Link to this definition"></a><br /></dt>
 <dd><p>The current <code class="docutils literal notranslate"><span class="pre">life</span></code>. Entries with the smallest life will be purged from the cache if a new entry needs to be cached </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t11usage_countE">
-<span id="_CPPv3N16lv_cache_entry_t11usage_countE"></span><span id="_CPPv2N16lv_cache_entry_t11usage_countE"></span><span id="lv_cache_entry_t::usage_count__uint32_t"></span><span class="target" id="structlv__cache__entry__t_1afe18ad1e8bbe343237d60b94fd6fb585"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">usage_count</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t11usage_countE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t11usage_countE">
+<span id="_CPPv3N17_lv_cache_entry_t11usage_countE"></span><span id="_CPPv2N17_lv_cache_entry_t11usage_countE"></span><span id="_lv_cache_entry_t::usage_count__uint32_t"></span><span class="target" id="struct__lv__cache__entry__t_1aca288d7536e41c3f0bc95e259ca304aa"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">usage_count</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t11usage_countE" title="Link to this definition"></a><br /></dt>
 <dd><p>Count how many times the cached data is being used. It will be incremented in lv_cache_get_data and decremented in lv_cache_release. A data will dropped from the cache only if its usage_count is zero </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t8free_srcE">
-<span id="_CPPv3N16lv_cache_entry_t8free_srcE"></span><span id="_CPPv2N16lv_cache_entry_t8free_srcE"></span><span id="lv_cache_entry_t::free_src__uint32_t"></span><span class="target" id="structlv__cache__entry__t_1abe7d9b4c8ce62f8842b7ac0d47600702"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_src</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t8free_srcE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t8free_srcE">
+<span id="_CPPv3N17_lv_cache_entry_t8free_srcE"></span><span id="_CPPv2N17_lv_cache_entry_t8free_srcE"></span><span id="_lv_cache_entry_t::free_src__uint32_t"></span><span class="target" id="struct__lv__cache__entry__t_1a7b3e12d28dddff08fc3cbc84d5ee50d2"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_src</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t8free_srcE" title="Link to this definition"></a><br /></dt>
 <dd><p>Call <code class="docutils literal notranslate"><span class="pre">lv_free</span></code> on <code class="docutils literal notranslate"><span class="pre">src</span></code> when the entry is removed from the cache </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t9free_dataE">
-<span id="_CPPv3N16lv_cache_entry_t9free_dataE"></span><span id="_CPPv2N16lv_cache_entry_t9free_dataE"></span><span id="lv_cache_entry_t::free_data__uint32_t"></span><span class="target" id="structlv__cache__entry__t_1a241299b0616d549d8b2ee469aed3face"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_data</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t9free_dataE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t9free_dataE">
+<span id="_CPPv3N17_lv_cache_entry_t9free_dataE"></span><span id="_CPPv2N17_lv_cache_entry_t9free_dataE"></span><span id="_lv_cache_entry_t::free_data__uint32_t"></span><span class="target" id="struct__lv__cache__entry__t_1a0344b8f4404b5cf302c80a19612f3661"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">free_data</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t9free_dataE" title="Link to this definition"></a><br /></dt>
 <dd><p>Call <code class="docutils literal notranslate"><span class="pre">lv_draw_buf_free</span></code> on <code class="docutils literal notranslate"><span class="pre">data</span></code> when the entry is removed from the cache </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t9temporaryE">
-<span id="_CPPv3N16lv_cache_entry_t9temporaryE"></span><span id="_CPPv2N16lv_cache_entry_t9temporaryE"></span><span id="lv_cache_entry_t::temporary__uint32_t"></span><span class="target" id="structlv__cache__entry__t_1a180ebac747291a8f8889e0a7777cde6b"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">temporary</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t9temporaryE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t9temporaryE">
+<span id="_CPPv3N17_lv_cache_entry_t9temporaryE"></span><span id="_CPPv2N17_lv_cache_entry_t9temporaryE"></span><span id="_lv_cache_entry_t::temporary__uint32_t"></span><span class="target" id="struct__lv__cache__entry__t_1a0b9a0df3da932bb41e22785780fe4056"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">temporary</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t9temporaryE" title="Link to this definition"></a><br /></dt>
 <dd><p>The cache entry was larger then the max cache size so only a temporary entry was allocated The entry will be closed and freed in <code class="docutils literal notranslate"><span class="pre">lv_cache_release</span></code> automatically </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N16lv_cache_entry_t9user_dataE">
-<span id="_CPPv3N16lv_cache_entry_t9user_dataE"></span><span id="_CPPv2N16lv_cache_entry_t9user_dataE"></span><span id="lv_cache_entry_t::user_data__voidP"></span><span class="target" id="structlv__cache__entry__t_1a8f8864545cd406f87297569df0466d37"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">user_data</span></span></span><a class="headerlink" href="#_CPPv4N16lv_cache_entry_t9user_dataE" title="Link to this definition"></a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N17_lv_cache_entry_t9user_dataE">
+<span id="_CPPv3N17_lv_cache_entry_t9user_dataE"></span><span id="_CPPv2N17_lv_cache_entry_t9user_dataE"></span><span id="_lv_cache_entry_t::user_data__voidP"></span><span class="target" id="struct__lv__cache__entry__t_1a9038d7bf19f3e7120477cc80cbc6bc0b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">user_data</span></span></span><a class="headerlink" href="#_CPPv4N17_lv_cache_entry_t9user_dataE" title="Link to this definition"></a><br /></dt>
 <dd><p>Any user data if needed </p>
 </dd></dl>
 
@@ -4721,7 +4734,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, LVGL Kft.
-      <span class="lastupdated">Last updated on Oct 25, 2023.
+      <span class="lastupdated">Last updated on Oct 26, 2023.
       </span></p>
   </div>
 

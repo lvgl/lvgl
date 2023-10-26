@@ -982,6 +982,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../overview/img.html#custom-image-formats">Custom image formats</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../overview/img.html#register-an-image-decoder">Register an image decoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../overview/img.html#manually-use-an-image-decoder">Manually use an image decoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview/img.html#image-post-processing">Image post-processing</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../overview/img.html#image-caching">Image caching</a><ul>
@@ -2654,6 +2655,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../misc/lv_cache.html">lv_cache.h</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv415lv_cache_add_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_add_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv416lv_cache_find_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_find_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv422lv_cache_invalidate_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_invalidate_cb</span></code></a></li>
@@ -2673,7 +2675,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv421lv_cache_get_max_sizev"><code class="docutils literal notranslate"><span class="pre">lv_cache_get_max_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv413lv_cache_lockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_lock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv415lv_cache_unlockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_unlock()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv417_lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">_lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../misc/lv_cache.html#_CPPv418lv_cache_manager_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_manager_t</span></code></a></li>
 </ul>
 </li>
@@ -4317,7 +4319,7 @@
           <li class="breadcrumb-item"><a href="index.html">draw</a></li>
       <li class="breadcrumb-item active">lv_image_decoder.h</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/docs/API/draw/lv_image_decoder.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/docs/API/draw/lv_image_decoder.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="lv_draw_mask.html" class="btn btn-neutral float-left" title="lv_draw_mask.h" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4782,6 +4784,12 @@
 </dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N23_lv_image_decoder_dsc_t11cache_entryE">
+<span id="_CPPv3N23_lv_image_decoder_dsc_t11cache_entryE"></span><span id="_CPPv2N23_lv_image_decoder_dsc_t11cache_entryE"></span><span id="_lv_image_decoder_dsc_t::cache_entry___lv_cache_entry_tP"></span><span class="target" id="struct__lv__image__decoder__dsc__t_1a3485d4123c2933b184e485ad544f2685"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="../misc/lv_cache.html#_CPPv417_lv_cache_entry_t" title="_lv_cache_entry_t"><span class="n"><span class="pre">_lv_cache_entry_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cache_entry</span></span></span><a class="headerlink" href="#_CPPv4N23_lv_image_decoder_dsc_t11cache_entryE" title="Link to this definition"></a><br /></dt>
+<dd><p>Point to cache entry information </p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N23_lv_image_decoder_dsc_t9user_dataE">
 <span id="_CPPv3N23_lv_image_decoder_dsc_t9user_dataE"></span><span id="_CPPv2N23_lv_image_decoder_dsc_t9user_dataE"></span><span id="_lv_image_decoder_dsc_t::user_data__voidP"></span><span class="target" id="struct__lv__image__decoder__dsc__t_1ac8f940e5d563b0128defd5075068d187"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">user_data</span></span></span><a class="headerlink" href="#_CPPv4N23_lv_image_decoder_dsc_t9user_dataE" title="Link to this definition"></a><br /></dt>
 <dd><p>Store any custom data here is required </p>
@@ -4804,7 +4812,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, LVGL Kft.
-      <span class="lastupdated">Last updated on Oct 25, 2023.
+      <span class="lastupdated">Last updated on Oct 26, 2023.
       </span></p>
   </div>
 

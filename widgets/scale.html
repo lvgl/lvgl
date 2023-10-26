@@ -982,6 +982,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../overview/img.html#custom-image-formats">Custom image formats</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../overview/img.html#register-an-image-decoder">Register an image decoder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../overview/img.html#manually-use-an-image-decoder">Manually use an image decoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../overview/img.html#image-post-processing">Image post-processing</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../overview/img.html#image-caching">Image caching</a><ul>
@@ -2654,6 +2655,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../API/misc/lv_cache.html">lv_cache.h</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv415lv_cache_add_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_add_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_find_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_find_cb</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv422lv_cache_invalidate_cb"><code class="docutils literal notranslate"><span class="pre">lv_cache_invalidate_cb</span></code></a></li>
@@ -2673,7 +2675,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv421lv_cache_get_max_sizev"><code class="docutils literal notranslate"><span class="pre">lv_cache_get_max_size()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv413lv_cache_lockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_lock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv415lv_cache_unlockv"><code class="docutils literal notranslate"><span class="pre">lv_cache_unlock()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv416lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_entry_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv417_lv_cache_entry_t"><code class="docutils literal notranslate"><span class="pre">_lv_cache_entry_t</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../API/misc/lv_cache.html#_CPPv418lv_cache_manager_t"><code class="docutils literal notranslate"><span class="pre">lv_cache_manager_t</span></code></a></li>
 </ul>
 </li>
@@ -4316,7 +4318,7 @@
           <li class="breadcrumb-item"><a href="index.html">Widgets</a></li>
       <li class="breadcrumb-item active">Scale (lv_scale)</li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/docs/widgets/scale.rst" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/docs/widgets/scale.rst" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="roller.html" class="btn btn-neutral float-left" title="Roller (lv_roller)" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
@@ -4376,7 +4378,7 @@
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
 <div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scale_1&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/scale/lv_example_scale_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/scale/lv_example_scale_1.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_SCALE &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4406,7 +4408,7 @@
 </div>
 <hr/><div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scale_2&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/scale/lv_example_scale_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/scale/lv_example_scale_2.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_SCALE &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4501,7 +4503,7 @@
 </div>
 <hr/><div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scale_3&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/scale/lv_example_scale_3.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/scale/lv_example_scale_3.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_SCALE &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4534,7 +4536,7 @@
 </div>
 <hr/><div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scale_4&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/scale/lv_example_scale_4.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/scale/lv_example_scale_4.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_SCALE &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4623,7 +4625,7 @@
 </div>
 <hr/><div class='lv-example-container'><div class='lv-example' data-real-src='/9.0/_static/built_lv_examples/index.html?example=lv_example_scale_5&w=320&h=240'></div><div class='lv-example-description'></div></div><div class="toggle docutils container">
 <div class="header docutils container">
-<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/e869d76f53369e4f56c884f0f420f013d21e7f75/examples/widgets/scale/lv_example_scale_5.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
+<p>C code &nbsp;</p><a class='lv-example-link-button' onclick="event.stopPropagation();" href='https://github.com/lvgl/lvgl/blob/ce6f56a7423193108c17ad3464ae79c8d63f8e4c/examples/widgets/scale/lv_example_scale_5.c'><i class="fa fa-github"></i>&nbsp;View on GitHub</a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;../../lv_examples.h&quot;</span>
 <span class="cp">#if LV_USE_SCALE &amp;&amp; LV_BUILD_EXAMPLES</span>
 
@@ -4726,7 +4728,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2023, LVGL Kft.
-      <span class="lastupdated">Last updated on Oct 25, 2023.
+      <span class="lastupdated">Last updated on Oct 26, 2023.
       </span></p>
   </div>
 
