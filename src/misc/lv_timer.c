@@ -193,6 +193,7 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
     new_timer->paused = 0;
     new_timer->last_run = lv_tick_get();
     new_timer->user_data = user_data;
+    new_timer->auto_delete = true;
 
     state.timer_created = true;
 
@@ -265,6 +266,16 @@ void lv_timer_ready(lv_timer_t * timer)
 void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count)
 {
     timer->repeat_count = repeat_count;
+}
+
+/**
+ * Set whether a lv_timer will be deleted automatically when it is called `repeat_count` times.
+ * @param timer pointer to a lv_timer.
+ * @param auto_delete true: auto delete; false: timer will be paused when it is called `repeat_count` times.
+ */
+void lv_timer_set_auto_delete(lv_timer_t * timer, bool auto_delete)
+{
+    timer->auto_delete = auto_delete;
 }
 
 /**
@@ -365,8 +376,14 @@ static bool lv_timer_exec(lv_timer_t * timer)
 
     if(state.timer_deleted == false) { /*The timer might be deleted by itself as well*/
         if(timer->repeat_count == 0) { /*The repeat count is over, delete the timer*/
-            LV_TRACE_TIMER("deleting timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
-            lv_timer_delete(timer);
+            if(timer->auto_delete) {
+                LV_TRACE_TIMER("deleting timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
+                lv_timer_delete(timer);
+            }
+            else {
+                LV_TRACE_TIMER("pausing timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
+                lv_timer_pause(timer);
+            }
         }
     }
 

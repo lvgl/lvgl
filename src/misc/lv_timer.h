@@ -54,6 +54,7 @@ typedef struct _lv_timer_t {
     void * user_data; /**< Custom user data*/
     int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
     uint32_t paused : 1;
+    uint32_t auto_delete : 1;
 } lv_timer_t;
 
 typedef struct {
@@ -185,6 +186,13 @@ void lv_timer_ready(lv_timer_t * timer);
 void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count);
 
 /**
+ * Set whether a lv_timer will be deleted automatically when it is called `repeat_count` times.
+ * @param timer pointer to a lv_timer.
+ * @param auto_delete true: auto delete; false: timer will be paused when it is called `repeat_count` times.
+ */
+void lv_timer_set_auto_delete(lv_timer_t * timer, bool auto_delete);
+
+/**
  * Set custom parameter to the lv_timer.
  * @param timer pointer to a lv_timer.
  * @param user_data custom parameter
@@ -231,6 +239,11 @@ lv_timer_t * lv_timer_get_next(lv_timer_t * timer);
 static inline void * lv_timer_get_user_data(lv_timer_t * timer)
 {
     return timer->user_data;
+}
+
+inline bool lv_timer_get_paused(lv_timer_t * timer)
+{
+    return timer->paused;
 }
 
 /**********************
