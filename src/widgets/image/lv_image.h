@@ -44,7 +44,8 @@ typedef struct {
     lv_coord_t w;          /*Width of the image (Handled by the library)*/
     lv_coord_t h;          /*Height of the image (Handled by the library)*/
     uint32_t rotation;    /*rotation angle of the image*/
-    uint32_t zoom;      /*256 means no zoom, 512 double size, 128 half size*/
+    uint32_t zoom_x;      /*256 means no zoom, 512 double size, 128 half size*/
+    uint32_t zoom_y;      /*256 means no zoom, 512 double size, 128 half size*/
     lv_point_t pivot;     /*rotation center of the image*/
     uint8_t src_type : 2;  /*See: lv_image_src_t*/
     uint8_t cf : 5;        /*Color format from `lv_color_format_t`*/
@@ -171,6 +172,33 @@ static inline void _lv_image_set_pivot(lv_obj_t * obj, lv_point_t * pivot)
 void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom);
 
 /**
+ * Set the horizontal zoom factor of the image.
+ * Note that indexed and alpha only images can't be transformed.
+ * @param img       pointer to an image object
+ * @param zoom      the zoom factor.
+ * @example 256 or LV_ZOOM_IMAGE_NONE for no zoom
+ * @example <256: scale down
+ * @example >256 scale up
+ * @example 128 half size
+ * @example 512 double size
+ */
+void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom);
+
+/**
+ * Set the vertical zoom factor of the image.
+ * Note that indexed and alpha only images can't be transformed.
+ * @param img       pointer to an image object
+ * @param zoom      the zoom factor.
+ * @example 256 or LV_ZOOM_IMAGE_NONE for no zoom
+ * @example <256: scale down
+ * @example >256 scale up
+ * @example 128 half size
+ * @example 512 double size
+ */
+void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom);
+
+
+/**
  * Enable/disable anti-aliasing for the transformations (rotate, zoom) or not.
  * The quality is better with anti-aliasing looks better but slower.
  * @param obj       pointer to an image object
@@ -231,6 +259,20 @@ void lv_image_get_pivot(lv_obj_t * obj, lv_point_t * pivot);
  * @return          zoom factor (256: no zoom)
  */
 lv_coord_t lv_image_get_scale(lv_obj_t * obj);
+
+/**
+ * Get the horizontal zoom factor of the image.
+ * @param obj       pointer to an image object
+ * @return          zoom factor (256: no zoom)
+ */
+lv_coord_t lv_image_get_scale_x(lv_obj_t * obj);
+
+/**
+ * Get the vertical zoom factor of the image.
+ * @param obj       pointer to an image object
+ * @return          zoom factor (256: no zoom)
+ */
+lv_coord_t lv_image_get_scale_y(lv_obj_t * obj);
 
 /**
  * Get whether the transformations (rotate, zoom) are anti-aliased or not
