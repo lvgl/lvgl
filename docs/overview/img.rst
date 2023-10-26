@@ -350,6 +350,127 @@ to open is an animation.
      lv_image_decoder_close(&dsc);
    }
 
+
+Image post-processing
+---------------------
+
+Considering that some hardware has special requirements for image formats, 
+such as alpha premultiplication and stride alignment, most image decoders (such as PNG decoders) 
+may not directly output image data that meets hardware requirements. 
+
+For this reason, LVGL provides a solution for image post-processing. 
+First, call a custom post-processing function after ``lv_image_decoder_open`` to adjust the data in the image cache, 
+and then mark the processing status in ``cache_entry->process_state`` (to avoid repeated post-processing).
+
+See the detailed code below:
+
+- Stride alignment and premultiply post-processing example:
+
+.. code:: c
+
+   /* Define post-processing state */
+   typedef enum {
+     IMAGE_PROCESS_STATE_NONE = 0,
+     IMAGE_PROCESS_STATE_STRIDE_ALIGNED = 1 << 0,
+     IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA = 1 << 1,
+   } image_process_state_t;
+
+   lv_result_t my_image_post_process(lv_image_decoder_dsc_t * dsc)
+   {
+     lv_color_format_t color_format = dsc->header.cf;
+     lv_result_t res = LV_RESULT_OK;
+
+     if(color_format == LV_COLOR_FORMAT_ARGB8888) {
+       lv_cache_lock();
+       lv_cache_entry_t * entry = dsc->cache_entry;
+
+       if(!(entry->process_state & IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA)) {
+         lv_color32_t * image = (lv_color32_t *)dsc->img_data;
+         uint32_t px_cnt = dsc->header.w * dsc->header.h;
+
+         /* premultiply alpha */
+         while(px_cnt--) {
+           image->red = LV_UDIV255(image->red * image->alpha);
+           image->green = LV_UDIV255(image->green * image->alpha);
+           image->blue = LV_UDIV255(image->blue * image->alpha);
+           image++;
+         }
+
+         LV_LOG_USER("premultiplied alpha OK");
+
+         entry->process_state |= IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA;
+       }
+
+       if(!(entry->process_state & IMAGE_PROCESS_STATE_STRIDE_ALIGNED)) {
+         lv_coord_t image_w = dsc->header.w;
+         lv_coord_t image_h = dsc->header.h;
+         uint32_t width_byte = image_w * lv_color_format_get_size(color_format);
+         uint32_t stride = lv_draw_buf_width_to_stride(image_w, color_format);
+
+         /* Check stride alignment requirements */
+         if(stride != width_byte) {
+           LV_LOG_USER("need to realign stride: %" LV_PRIu32 " -> %" LV_PRIu32, width_byte, stride);
+
+           const uint8_t * ori_image = lv_cache_get_data(entry);
+           size_t size_bytes = stride * dsc->header.h;
+           uint8_t * new_image = lv_draw_buf_malloc(size_bytes, color_format);
+           if(!new_image) {
+             LV_LOG_ERROR("alloc failed");
+             res = LV_RESULT_INVALID;
+             goto alloc_failed;
+           }
+
+           /* Replace the image data pointer */
+           entry->data = new_image;
+           dsc->img_data = new_image;
+
+           /* Copy image data */
+           const uint8_t * cur = ori_image;
+           for(lv_coord_t y = 0; y < image_h; y++) {
+             lv_memcpy(new_image, cur, width_byte);
+             new_image += stride;
+             cur += width_byte;
+           }
+
+           /* free memory for old image */
+           lv_draw_buf_free((void *)ori_image);
+         }
+         else {
+           LV_LOG_USER("no need to realign stride: %" LV_PRIu32, stride);
+         }
+
+         entry->process_state |= IMAGE_PROCESS_STATE_STRIDE_ALIGNED;
+       }
+
+   alloc_failed:
+       lv_cache_unlock();
+     }
+
+     return res;
+   }
+
+- GPU draw unit example:
+
+.. code:: c
+
+  void gpu_draw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
+  {
+    ...
+    lv_image_decoder_dsc_t decoder_dsc;
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, draw_dsc->recolor, -1);
+    if(res != LV_RESULT_OK) {
+      LV_LOG_ERROR("Failed to open image");
+      return;
+    }
+
+    res = my_image_post_process(&decoder_dsc);
+    if(res != LV_RESULT_OK) {
+      LV_LOG_ERROR("Failed to post-process image");
+      return;
+    }
+    ...
+  }
+
 .. _image-caching:
 
 Image caching
