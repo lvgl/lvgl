@@ -2603,6 +2603,102 @@ demos/music/lv_demo_music_main.c.s:
 	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/music/lv_demo_music_main.c.s
 .PHONY : demos/music/lv_demo_music_main.c.s
 
+demos/render/assets/img_render_lvgl_logo_argb8888.o: demos/render/assets/img_render_lvgl_logo_argb8888.c.o
+.PHONY : demos/render/assets/img_render_lvgl_logo_argb8888.o
+
+# target to build an object file
+demos/render/assets/img_render_lvgl_logo_argb8888.c.o:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_argb8888.c.o
+.PHONY : demos/render/assets/img_render_lvgl_logo_argb8888.c.o
+
+demos/render/assets/img_render_lvgl_logo_argb8888.i: demos/render/assets/img_render_lvgl_logo_argb8888.c.i
+.PHONY : demos/render/assets/img_render_lvgl_logo_argb8888.i
+
+# target to preprocess a source file
+demos/render/assets/img_render_lvgl_logo_argb8888.c.i:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_argb8888.c.i
+.PHONY : demos/render/assets/img_render_lvgl_logo_argb8888.c.i
+
+demos/render/assets/img_render_lvgl_logo_argb8888.s: demos/render/assets/img_render_lvgl_logo_argb8888.c.s
+.PHONY : demos/render/assets/img_render_lvgl_logo_argb8888.s
+
+# target to generate assembly for a file
+demos/render/assets/img_render_lvgl_logo_argb8888.c.s:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_argb8888.c.s
+.PHONY : demos/render/assets/img_render_lvgl_logo_argb8888.c.s
+
+demos/render/assets/img_render_lvgl_logo_rgb565.o: demos/render/assets/img_render_lvgl_logo_rgb565.c.o
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb565.o
+
+# target to build an object file
+demos/render/assets/img_render_lvgl_logo_rgb565.c.o:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_rgb565.c.o
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb565.c.o
+
+demos/render/assets/img_render_lvgl_logo_rgb565.i: demos/render/assets/img_render_lvgl_logo_rgb565.c.i
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb565.i
+
+# target to preprocess a source file
+demos/render/assets/img_render_lvgl_logo_rgb565.c.i:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_rgb565.c.i
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb565.c.i
+
+demos/render/assets/img_render_lvgl_logo_rgb565.s: demos/render/assets/img_render_lvgl_logo_rgb565.c.s
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb565.s
+
+# target to generate assembly for a file
+demos/render/assets/img_render_lvgl_logo_rgb565.c.s:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_rgb565.c.s
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb565.c.s
+
+demos/render/assets/img_render_lvgl_logo_rgb888.o: demos/render/assets/img_render_lvgl_logo_rgb888.c.o
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb888.o
+
+# target to build an object file
+demos/render/assets/img_render_lvgl_logo_rgb888.c.o:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_rgb888.c.o
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb888.c.o
+
+demos/render/assets/img_render_lvgl_logo_rgb888.i: demos/render/assets/img_render_lvgl_logo_rgb888.c.i
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb888.i
+
+# target to preprocess a source file
+demos/render/assets/img_render_lvgl_logo_rgb888.c.i:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_rgb888.c.i
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb888.c.i
+
+demos/render/assets/img_render_lvgl_logo_rgb888.s: demos/render/assets/img_render_lvgl_logo_rgb888.c.s
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb888.s
+
+# target to generate assembly for a file
+demos/render/assets/img_render_lvgl_logo_rgb888.c.s:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_rgb888.c.s
+.PHONY : demos/render/assets/img_render_lvgl_logo_rgb888.c.s
+
+demos/render/assets/img_render_lvgl_logo_xrgb8888.o: demos/render/assets/img_render_lvgl_logo_xrgb8888.c.o
+.PHONY : demos/render/assets/img_render_lvgl_logo_xrgb8888.o
+
+# target to build an object file
+demos/render/assets/img_render_lvgl_logo_xrgb8888.c.o:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_xrgb8888.c.o
+.PHONY : demos/render/assets/img_render_lvgl_logo_xrgb8888.c.o
+
+demos/render/assets/img_render_lvgl_logo_xrgb8888.i: demos/render/assets/img_render_lvgl_logo_xrgb8888.c.i
+.PHONY : demos/render/assets/img_render_lvgl_logo_xrgb8888.i
+
+# target to preprocess a source file
+demos/render/assets/img_render_lvgl_logo_xrgb8888.c.i:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_xrgb8888.c.i
+.PHONY : demos/render/assets/img_render_lvgl_logo_xrgb8888.c.i
+
+demos/render/assets/img_render_lvgl_logo_xrgb8888.s: demos/render/assets/img_render_lvgl_logo_xrgb8888.c.s
+.PHONY : demos/render/assets/img_render_lvgl_logo_xrgb8888.s
+
+# target to generate assembly for a file
+demos/render/assets/img_render_lvgl_logo_xrgb8888.c.s:
+	cd /home/runner/work/lvgl/lvgl/emscripten_builder/cmbuild && $(MAKE) $(MAKESILENT) -f lvgl/CMakeFiles/lvgl_demos.dir/build.make lvgl/CMakeFiles/lvgl_demos.dir/demos/render/assets/img_render_lvgl_logo_xrgb8888.c.s
+.PHONY : demos/render/assets/img_render_lvgl_logo_xrgb8888.c.s
+
 demos/render/lv_demo_render.o: demos/render/lv_demo_render.c.o
 .PHONY : demos/render/lv_demo_render.o
 
@@ -13094,6 +13190,18 @@ help:
 	@echo "... demos/music/lv_demo_music_main.o"
 	@echo "... demos/music/lv_demo_music_main.i"
 	@echo "... demos/music/lv_demo_music_main.s"
+	@echo "... demos/render/assets/img_render_lvgl_logo_argb8888.o"
+	@echo "... demos/render/assets/img_render_lvgl_logo_argb8888.i"
+	@echo "... demos/render/assets/img_render_lvgl_logo_argb8888.s"
+	@echo "... demos/render/assets/img_render_lvgl_logo_rgb565.o"
+	@echo "... demos/render/assets/img_render_lvgl_logo_rgb565.i"
+	@echo "... demos/render/assets/img_render_lvgl_logo_rgb565.s"
+	@echo "... demos/render/assets/img_render_lvgl_logo_rgb888.o"
+	@echo "... demos/render/assets/img_render_lvgl_logo_rgb888.i"
+	@echo "... demos/render/assets/img_render_lvgl_logo_rgb888.s"
+	@echo "... demos/render/assets/img_render_lvgl_logo_xrgb8888.o"
+	@echo "... demos/render/assets/img_render_lvgl_logo_xrgb8888.i"
+	@echo "... demos/render/assets/img_render_lvgl_logo_xrgb8888.s"
 	@echo "... demos/render/lv_demo_render.o"
 	@echo "... demos/render/lv_demo_render.i"
 	@echo "... demos/render/lv_demo_render.s"
