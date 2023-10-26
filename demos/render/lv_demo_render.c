@@ -24,9 +24,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
-#define SCENE_TIME_DEF  2000
-
 typedef struct {
     const char * name;
     void (*create_cb)(lv_obj_t * parent);
@@ -35,9 +32,8 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
+static lv_opa_t opa_saved;
 static void add_to_cell(lv_obj_t * obj, lv_coord_t col, lv_coord_t row);
-
 
 static lv_obj_t * fill_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row)
 {
@@ -53,6 +49,7 @@ static lv_obj_t * fill_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t 
 
     lv_obj_t * obj = lv_obj_create(parent);
     lv_obj_remove_style_all(obj);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
     lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
     lv_obj_set_style_bg_color(obj, colors[col], 0);
     lv_obj_set_size(obj, DEF_WIDTH, DEF_HEIGHT);
@@ -123,6 +120,7 @@ static lv_obj_t * border_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_
     lv_obj_remove_style_all(obj);
     lv_obj_set_style_border_color(obj, lv_color_hex3(0x000), 0);
     lv_obj_set_style_border_width(obj, 3, 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
     lv_obj_set_size(obj, DEF_WIDTH, DEF_HEIGHT);
     add_to_cell(obj, col, row);
 
@@ -217,6 +215,7 @@ static lv_obj_t * box_shadow_obj_create(lv_obj_t * parent, lv_coord_t col, lv_co
     lv_obj_remove_style_all(obj);
     lv_obj_set_style_bg_opa(obj, LV_OPA_20, 0);
     lv_obj_set_style_shadow_color(obj, lv_color_hex3(0xf00), 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
     lv_obj_set_size(obj, DEF_WIDTH - 20, DEF_HEIGHT - 5);
     add_to_cell(obj, col, row);
 
@@ -273,24 +272,6 @@ static void box_shadow_cb(lv_obj_t * parent)
         lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
         lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
     }
-
-    for(i = 0; i < 7; i++) {
-        lv_obj_t * obj = box_shadow_obj_create(parent, i, 4);
-        lv_obj_set_style_radius(obj, 5, 0);
-        lv_obj_set_style_shadow_width(obj, 10, 0);
-        lv_obj_set_style_shadow_opa(obj, LV_OPA_50, 0);
-        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
-        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
-    }
-
-    for(i = 0; i < 7; i++) {
-        lv_obj_t * obj = box_shadow_obj_create(parent, i, 5);
-        lv_obj_set_style_radius(obj, 100, 0);
-        lv_obj_set_style_shadow_width(obj, 10, 0);
-        lv_obj_set_style_shadow_opa(obj, LV_OPA_50, 0);
-        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
-        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
-    }
 }
 
 
@@ -300,6 +281,7 @@ static lv_obj_t * text_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t 
     lv_obj_t * obj = lv_label_create(parent);
     lv_obj_remove_style_all(obj);
     lv_label_set_text(obj, "Hello LVGL! It should be a placeholder: ű. Looks good?");
+    lv_obj_set_style_opa(obj, opa_saved, 0);
     add_to_cell(obj, col, row);
 
     return obj;
@@ -308,7 +290,6 @@ static lv_obj_t * text_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t 
 
 static void text_cb(lv_obj_t * parent)
 {
-
     lv_obj_t * obj;
 
     obj = text_obj_create(parent, 3, 0);
@@ -342,13 +323,14 @@ static lv_obj_t * image_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t
         lv_obj_set_style_image_recolor(obj, lv_color_hex3(0x0f0), 0);
     }
 
+    lv_obj_set_style_opa(obj, opa_saved, 0);
     add_to_cell(obj, col, row);
 
     return obj;
 
 }
 
-static void image_cb_core(lv_obj_t * parent, bool recolor)
+static void image_core_cb(lv_obj_t * parent, bool recolor)
 {
     LV_IMG_DECLARE(img_render_lvgl_logo_xrgb8888);
     LV_IMG_DECLARE(img_render_lvgl_logo_rgb888);
@@ -414,14 +396,14 @@ static void image_cb_core(lv_obj_t * parent, bool recolor)
 }
 
 
-static void image_cb_normal(lv_obj_t * parent)
+static void image_normal_cb(lv_obj_t * parent)
 {
-    image_cb_core(parent, false);
+    image_core_cb(parent, false);
 }
 
-static void image_cb_recolored(lv_obj_t * parent)
+static void image_recolored_cb(lv_obj_t * parent)
 {
-    image_cb_core(parent, true);
+    image_core_cb(parent, true);
 }
 
 
@@ -432,6 +414,7 @@ static lv_obj_t * line_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t 
     lv_line_set_points(obj, p, 2);
     lv_obj_set_size(obj, DEF_WIDTH, DEF_HEIGHT);
     lv_obj_set_style_line_color(obj, lv_color_hex3(0xff0), 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
     add_to_cell(obj, col, row);
 
     return obj;
@@ -473,6 +456,7 @@ static lv_obj_t * arc_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t r
     lv_obj_t * obj = lv_arc_create(parent);
     lv_obj_remove_style_all(obj);
     lv_obj_set_style_arc_width(obj, w, 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
     lv_arc_set_bg_angles(obj, start, end);
     lv_obj_set_size(obj, DEF_HEIGHT, DEF_HEIGHT);
     lv_obj_set_style_line_color(obj, lv_color_hex3(0xff0), 0);
@@ -481,14 +465,13 @@ static lv_obj_t * arc_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t r
     return obj;
 }
 
-static void arc_cb(lv_obj_t * parent)
+static void arc_core_cb(lv_obj_t * parent, const void * img_src)
 {
-
     static lv_value_precise_t angles[][2] = {
-        {0, 1},
-        {90, 91},
-        {180, 181},
-        {270, 271},
+        {355, 5},
+        {85, 95},
+        {175, 185},
+        {265, 275},
         {30, 330},
         {120, 60},
         {0, 180},
@@ -505,9 +488,21 @@ static void arc_cb(lv_obj_t * parent)
             for(i = 0; i < COL_CNT; i++) {
                 lv_obj_t * obj = arc_obj_create(parent, i, w + 4 * r, widths[w], angles[i][0], angles[i][1]);
                 lv_obj_set_style_arc_rounded(obj, r, 0);
+                lv_obj_set_style_arc_image_src(obj, img_src, 0);
             }
         }
     }
+}
+
+static void arc_normal_cb(lv_obj_t * parent)
+{
+    arc_core_cb(parent, NULL);
+}
+
+static void arc_image_cb(lv_obj_t * parent)
+{
+    LV_IMAGE_DECLARE(img_render_arc_bg);
+    arc_core_cb(parent, &img_render_arc_bg);
 }
 
 static void triangle_draw_event_cb(lv_event_t * e)
@@ -526,13 +521,14 @@ static void triangle_draw_event_cb(lv_event_t * e)
     dsc.p[2].x = p_rel[2].x + obj->coords.x1 + 8;
     dsc.p[2].y = p_rel[2].y + obj->coords.y1 + 2;
 
+    lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
     dsc.bg_grad.dir = lv_obj_get_style_bg_grad_dir(obj, 0);
     dsc.bg_grad.stops[0].color = lv_obj_get_style_bg_color(obj, 0);
     dsc.bg_grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, 0);
-    dsc.bg_grad.stops[0].opa = lv_obj_get_style_bg_main_opa(obj, 0);
+    dsc.bg_grad.stops[0].opa = LV_OPA_MIX2(lv_obj_get_style_bg_main_opa(obj, 0), opa);
     dsc.bg_grad.stops[1].color = lv_obj_get_style_bg_grad_color(obj, 0);
     dsc.bg_grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, 0);
-    dsc.bg_grad.stops[1].opa = lv_obj_get_style_bg_grad_opa(obj, 0);
+    dsc.bg_grad.stops[1].opa = LV_OPA_MIX2(lv_obj_get_style_bg_grad_opa(obj, 0), opa);
     dsc.bg_grad.stops_count = 2;
 
     dsc.bg_color = dsc.bg_grad.stops[0].color;
@@ -548,6 +544,7 @@ static lv_obj_t * triangle_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coor
     lv_obj_remove_style_all(obj);
     lv_obj_set_size(obj, DEF_WIDTH, DEF_HEIGHT);
     lv_obj_set_style_bg_color(obj, lv_color_hex3(0xff0), 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
     lv_obj_add_event(obj, triangle_draw_event_cb, LV_EVENT_DRAW_MAIN, p);
     add_to_cell(obj, col, row);
 
@@ -616,7 +613,7 @@ static void triangle_cb(lv_obj_t * parent)
 }
 
 
-static lv_obj_t * layer_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row)
+static lv_obj_t * layer_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row, lv_blend_mode_t blend_mode)
 {
     lv_obj_t * obj = lv_obj_create(parent);
     lv_obj_remove_style_all(obj);
@@ -629,6 +626,8 @@ static lv_obj_t * layer_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t
     lv_obj_set_style_border_color(obj, lv_color_hex3(0x000), 0);
     lv_obj_set_style_transform_pivot_x(obj, 0, 0);
     lv_obj_set_style_transform_pivot_y(obj, 0, 0);
+    lv_obj_set_style_blend_mode(obj, blend_mode, 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
     add_to_cell(obj, col, row);
 
     lv_obj_t * label = lv_label_create(obj);
@@ -638,7 +637,7 @@ static lv_obj_t * layer_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t
     return obj;
 }
 
-static void layer_cb(lv_obj_t * parent)
+static void layer_core_cb(lv_obj_t * parent, lv_blend_mode_t blend_mode)
 {
 
     uint32_t i;
@@ -646,87 +645,86 @@ static void layer_cb(lv_obj_t * parent)
         lv_coord_t row = 4 * i;
         lv_obj_t * obj;
 
-        obj = layer_obj_create(parent, 0, row);
+        obj = layer_obj_create(parent, 0, row, blend_mode);
         lv_obj_set_style_radius(obj, 8 * i, 0);
 
-        obj = layer_obj_create(parent, 1, row);
+        obj = layer_obj_create(parent, 1, row, blend_mode);
         lv_obj_set_style_transform_rotation(obj, 300, 0);
         lv_obj_set_style_translate_x(obj, 10, 0);
         lv_obj_set_style_radius(obj, 8 * i, 0);
 
-        obj = layer_obj_create(parent, 2, row);
+        obj = layer_obj_create(parent, 2, row, blend_mode);
         lv_obj_set_style_transform_scale(obj, 400, 0);
         lv_obj_set_style_radius(obj, 8 * i, 0);
 
-        obj = layer_obj_create(parent, 4, row);
+        obj = layer_obj_create(parent, 4, row, blend_mode);
         lv_obj_set_style_transform_rotation(obj, 300, 0);
         lv_obj_set_style_transform_scale(obj, 400, 0);
         lv_obj_set_style_radius(obj, 8 * i, 0);
 
-        obj = layer_obj_create(parent, 5, row);
+        obj = layer_obj_create(parent, 5, row, blend_mode);
         lv_obj_set_style_transform_scale_x(obj, 400, 0);
         lv_obj_set_style_radius(obj, 8 * i, 0);
 
-        obj = layer_obj_create(parent, 7, row);
+        obj = layer_obj_create(parent, 7, row, blend_mode);
         lv_obj_set_style_transform_scale_y(obj, 400, 0);
         lv_obj_set_style_radius(obj, 8 * i, 0);
 
-        obj = layer_obj_create(parent, 0, row + 2);
+        obj = layer_obj_create(parent, 0, row + 2, blend_mode);
         lv_obj_set_style_transform_rotation(obj, 300, 0);
         lv_obj_set_style_transform_scale_x(obj, 400, 0);
         lv_obj_set_style_translate_x(obj, 10, 0);
         lv_obj_set_style_radius(obj, 8 * i, 0);
 
-        obj = layer_obj_create(parent, 2, row + 2);
+        obj = layer_obj_create(parent, 2, row + 2, blend_mode);
         lv_obj_set_style_transform_rotation(obj, 300, 0);
         lv_obj_set_style_transform_scale_y(obj, 400, 0);
         lv_obj_set_style_radius(obj, 8 * i, 0);
 
-        obj = layer_obj_create(parent, 4, row + 2);
-        lv_obj_set_style_opa(obj, LV_OPA_50, 0);
-        lv_obj_set_style_translate_y(obj, 10, 0);
-        lv_obj_set_style_radius(obj, 8 * i, 0);
-
-        obj = layer_obj_create(parent, 5, row + 2);
+        obj = layer_obj_create(parent, 5, row + 2, blend_mode);
         lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
         lv_obj_set_style_translate_y(obj, 10, 0);
         lv_obj_set_style_radius(obj, 8 * i, 0);
 
-        obj = layer_obj_create(parent, 6, row + 2);
-        lv_obj_set_style_opa(obj, LV_OPA_50, 0);
-        lv_obj_set_style_transform_rotation(obj, 300, 0);
-        lv_obj_set_style_translate_y(obj, 10, 0);
-        lv_obj_set_style_translate_x(obj, 5, 0);
-        lv_obj_set_style_radius(obj, 8 * i, 0);
-
-        obj = layer_obj_create(parent, 7, row + 2);
+        obj = layer_obj_create(parent, 7, row + 2, blend_mode);
         lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
         lv_obj_set_style_transform_rotation(obj, 300, 0);
         lv_obj_set_style_translate_y(obj, 10, 0);
         lv_obj_set_style_radius(obj, 8 * i, 0);
-
-
-
     }
-
 }
 
+static void layer_normal_cb(lv_obj_t * parent)
+{
+    layer_core_cb(parent, LV_BLEND_MODE_NORMAL);
+}
+
+static void layer_additive_cb(lv_obj_t * parent)
+{
+    return; /*Not working*/
+
+    /*Make the parent darker for additive blending*/
+    lv_obj_set_style_bg_color(parent, lv_color_hex3(0x008), 0);
+    layer_core_cb(parent, LV_BLEND_MODE_ADDITIVE);
+}
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
 static scene_dsc_t scenes[] = {
-    {.name = "Fill ",               .create_cb = fill_cb},
-    {.name = "Border",              .create_cb = border_cb},
-    {.name = "Box shadow",          .create_cb = box_shadow_cb},
-    {.name = "Text",                .create_cb = text_cb},
-    {.name = "Image normal",        .create_cb = image_cb_normal},
-    {.name = "Image recolor",       .create_cb = image_cb_recolored},
-    {.name = "Line",                .create_cb = line_cb},
-    {.name = "Arc",                 .create_cb = arc_cb},
-    {.name = "Triangle",            .create_cb = triangle_cb},
-    {.name = "Layer",               .create_cb = layer_cb},
+    {.name = "fill",                .create_cb = fill_cb},
+    {.name = "border",              .create_cb = border_cb},
+    {.name = "box_shadow",          .create_cb = box_shadow_cb},
+    {.name = "text",                .create_cb = text_cb},
+    {.name = "image normal",        .create_cb = image_normal_cb},
+    {.name = "image_recolor",       .create_cb = image_recolored_cb},
+    {.name = "line",                .create_cb = line_cb},
+    {.name = "arc_normal",          .create_cb = arc_normal_cb},
+    {.name = "arc_image",           .create_cb = arc_image_cb},
+    {.name = "triangle",            .create_cb = triangle_cb},
+    {.name = "layer_normal",        .create_cb = layer_normal_cb},
+    {.name = "layer_additive",      .create_cb = layer_additive_cb},
 
     {.name = "", .create_cb = NULL}
 };
@@ -739,7 +737,7 @@ static scene_dsc_t scenes[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_render(uint32_t idx)
+void lv_demo_render(uint32_t idx, lv_opa_t opa)
 {
     lv_obj_t * scr = lv_screen_active();
     lv_obj_clean(scr);
@@ -758,7 +756,16 @@ void lv_demo_render(uint32_t idx)
     static const lv_coord_t grid_rows[] = {34, 34, 34, 34, 34, 34, 34, 34, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_grid_dsc_array(main_parent, grid_cols, grid_rows);
 
+    opa_saved = opa;
+
     if(scenes[idx].create_cb) scenes[idx].create_cb(main_parent);
+}
+
+
+const char * lv_demo_render_get_scene_name(lv_demo_render_scene_t id)
+{
+    if(id > _LV_DEMO_RENDER_SCENE_NUM) return NULL;
+    return scenes[id].name;
 }
 
 /**********************
@@ -769,6 +776,5 @@ static void add_to_cell(lv_obj_t * obj, lv_coord_t col, lv_coord_t row)
 {
     lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_CENTER, col, 1, LV_GRID_ALIGN_CENTER, row, 1);
 }
-
 
 #endif
