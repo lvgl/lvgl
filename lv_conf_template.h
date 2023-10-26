@@ -686,10 +686,10 @@
     /*Profiler end point function*/
     #define LV_PROFILER_END     LV_PROFILER_BUILTIN_END
 
-    /*Profiler start point function with custom tag*/
+    /*Profiler start point function with custom string*/
     #define LV_PROFILER_BEGINEX LV_PROFILER_BUILTIN_BEGINEX
 
-    /*Profiler end point function with custom tag*/
+    /*Profiler end point function with custom string*/
     #define LV_PROFILER_ENDEX   LV_PROFILER_BUILTIN_ENDEX
 #endif
 

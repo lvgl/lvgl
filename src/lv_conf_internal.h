@@ -2246,7 +2246,7 @@
         #endif
     #endif
 
-    /*Profiler start point function with custom tag*/
+    /*Profiler start point function with custom string*/
     #ifndef LV_PROFILER_BEGINEX
         #ifdef CONFIG_LV_PROFILER_BEGINEX
             #define LV_PROFILER_BEGINEX CONFIG_LV_PROFILER_BEGINEX
@@ -2255,7 +2255,7 @@
         #endif
     #endif
 
-    /*Profiler end point function with custom tag*/
+    /*Profiler end point function with custom string*/
     #ifndef LV_PROFILER_ENDEX
         #ifdef CONFIG_LV_PROFILER_ENDEX
             #define LV_PROFILER_ENDEX CONFIG_LV_PROFILER_ENDEX
