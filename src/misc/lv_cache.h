@@ -31,7 +31,7 @@ typedef enum {
     _LV_CACHE_SRC_TYPE_LAST,
 } lv_cache_src_type_t;
 
-typedef struct {
+typedef struct _lv_cache_entry_t {
     /**The image source or other source related to the cache content.*/
     const void * src;
 
@@ -40,6 +40,9 @@ typedef struct {
     /** Some extra parameters to describe the source. E.g. the current frame of an animation*/
     uint32_t param1;
     uint32_t param2;
+
+    /** User processing tag*/
+    uint32_t process_state;
 
     /** The data to cache*/
     const void * data;

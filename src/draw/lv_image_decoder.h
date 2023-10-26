@@ -47,6 +47,7 @@ typedef uint8_t lv_image_src_t;
 /*Decoder function definitions*/
 struct _lv_image_decoder_dsc_t;
 struct _lv_image_decoder_t;
+struct _lv_cache_entry_t;
 
 /**
  * Get info from an image and store in the `header`
@@ -131,6 +132,9 @@ typedef struct _lv_image_decoder_dsc_t {
     /**A text to display instead of the image when the image can't be opened.
      * Can be set in `open` function or set NULL.*/
     const char * error_msg;
+
+    /**Point to cache entry information*/
+    struct _lv_cache_entry_t * cache_entry;
 
     /**Store any custom data here is required*/
     void * user_data;
