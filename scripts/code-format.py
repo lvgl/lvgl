@@ -14,4 +14,4 @@ os.system('astyle --options=code-format.cfg --recursive "../src/*.c,*.h"')
 print("\nFormatting tests")
 os.system('astyle --options=code-format.cfg --recursive "../tests/*.c,*.h"')
 
-print("спасибо за использование программы")
+print("спасибо за использование программыsss")
