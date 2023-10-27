@@ -1,3 +1,4 @@
+#!/bin/sh
 # https://github.com/facebook/infer
 #
 # Install:

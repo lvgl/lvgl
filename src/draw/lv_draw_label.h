@@ -107,16 +107,22 @@ void lv_draw_letter_dsc_init(lv_draw_glyph_dsc_t * dsc);
 
 /**
  * Write a text
- * @param draw_ctx      pointer to the current draw context
+ * @param layer         pointer to a layer
  * @param dsc           pointer to draw descriptor
  * @param coords        coordinates of the label
- * @param txt           `\0` terminated text to write
- * @param hint          pointer to a `lv_draw_label_hint_t` variable.
  * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
                                          const lv_area_t * coords);
 
+/**
+ * Write a text
+ * @param layer          pointer to a layer
+ * @param dsc            pointer to draw descriptor
+ * @param point          position of the label
+ * @param unicode_letter the letter to draw
+ * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
+ */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
                                           const lv_point_t * point, uint32_t unicode_letter);
 

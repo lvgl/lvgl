@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/bin/sh
 
 # Install Linux package prerequisites needed for LVGL development
 # and testing. Some less-common development packages are not included

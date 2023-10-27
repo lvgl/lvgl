@@ -344,6 +344,8 @@ static inline lv_style_value_t lv_style_prop_get_default_inlined(lv_style_prop_t
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_TEXT_OPA:
         case LV_STYLE_IMAGE_OPA:
+        case LV_STYLE_BG_GRAD_OPA:
+        case LV_STYLE_BG_MAIN_OPA:
         case LV_STYLE_BG_IMAGE_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:

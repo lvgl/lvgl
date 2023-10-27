@@ -136,7 +136,7 @@ void lv_draw_bg_image_dsc_init(lv_draw_bg_image_dsc_t * dsc);
 
 /**
  * Draw a rectangle
- * @param draw_ctx      pointer to the current draw context
+ * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized `lv_draw_rect_dsc_t` variable
  * @param coords        the coordinates of the rectangle
  */

@@ -42,20 +42,20 @@ typedef uint8_t lv_arc_mode_t;
 typedef struct {
     lv_obj_t obj;
     uint32_t rotation;
-    uint32_t indic_angle_start;
-    uint32_t indic_angle_end;
-    uint32_t bg_angle_start;
-    uint32_t bg_angle_end;
-    int16_t value;              /*Current value of the arc*/
-    int16_t min_value;          /*Minimum value of the arc*/
-    int16_t max_value;          /*Maximum value of the arc*/
+    lv_value_precise_t indic_angle_start;
+    lv_value_precise_t indic_angle_end;
+    lv_value_precise_t bg_angle_start;
+    lv_value_precise_t bg_angle_end;
+    int32_t value;              /*Current value of the arc*/
+    int32_t min_value;          /*Minimum value of the arc*/
+    int32_t max_value;          /*Maximum value of the arc*/
     uint32_t dragging    : 1;
     uint32_t type        : 2;
     uint32_t min_close   : 1;   /*1: the last pressed angle was closer to minimum end*/
     uint32_t in_out      : 1;   /* 1: The click was within the background arc angles. 0: Click outside */
     uint32_t chg_rate;          /*Drag angle rate of change of the arc (degrees/sec)*/
     uint32_t last_tick;         /*Last dragging event timestamp of the arc*/
-    int16_t last_angle;         /*Last dragging angle of the arc*/
+    lv_value_precise_t last_angle;         /*Last dragging angle of the arc*/
     int16_t knob_offset;        /*knob offset from the main arc*/
 } lv_arc_t;
 
@@ -85,14 +85,14 @@ lv_obj_t * lv_arc_create(lv_obj_t * parent);
  * @param obj   pointer to an arc object
  * @param start the start angle
  */
-void lv_arc_set_start_angle(lv_obj_t * obj, uint32_t start);
+void lv_arc_set_start_angle(lv_obj_t * obj, lv_value_precise_t start);
 
 /**
  * Set the end angle of an arc. 0 deg: right, 90 bottom, etc.
  * @param obj   pointer to an arc object
  * @param end   the end angle
  */
-void lv_arc_set_end_angle(lv_obj_t * obj, uint32_t end);
+void lv_arc_set_end_angle(lv_obj_t * obj, lv_value_precise_t end);
 
 /**
  * Set the start and end angles
@@ -100,21 +100,21 @@ void lv_arc_set_end_angle(lv_obj_t * obj, uint32_t end);
  * @param start the start angle
  * @param end   the end angle
  */
-void lv_arc_set_angles(lv_obj_t * obj, uint32_t start, uint32_t end);
+void lv_arc_set_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end);
 
 /**
  * Set the start angle of an arc background. 0 deg: right, 90 bottom, etc.
  * @param obj   pointer to an arc object
  * @param start the start angle
  */
-void lv_arc_set_bg_start_angle(lv_obj_t * obj, uint32_t start);
+void lv_arc_set_bg_start_angle(lv_obj_t * obj, lv_value_precise_t start);
 
 /**
  * Set the start angle of an arc background. 0 deg: right, 90 bottom etc.
  * @param obj   pointer to an arc object
  * @param end   the end angle
  */
-void lv_arc_set_bg_end_angle(lv_obj_t * obj, uint32_t end);
+void lv_arc_set_bg_end_angle(lv_obj_t * obj, lv_value_precise_t end);
 
 /**
  * Set the start and end angles of the arc background
@@ -122,7 +122,7 @@ void lv_arc_set_bg_end_angle(lv_obj_t * obj, uint32_t end);
  * @param start the start angle
  * @param end   the end angle
  */
-void lv_arc_set_bg_angles(lv_obj_t * obj, uint32_t start, uint32_t end);
+void lv_arc_set_bg_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_precise_t end);
 
 /**
  * Set the rotation for the whole arc
@@ -176,28 +176,28 @@ void lv_arc_set_knob_offset(lv_obj_t * arc, int32_t offset);
  * @param obj   pointer to an arc object
  * @return      the start angle [0..360]
  */
-uint32_t lv_arc_get_angle_start(lv_obj_t * obj);
+lv_value_precise_t lv_arc_get_angle_start(lv_obj_t * obj);
 
 /**
  * Get the end angle of an arc.
  * @param obj   pointer to an arc object
  * @return      the end angle [0..360]
  */
-uint32_t lv_arc_get_angle_end(lv_obj_t * obj);
+lv_value_precise_t lv_arc_get_angle_end(lv_obj_t * obj);
 
 /**
  * Get the start angle of an arc background.
  * @param obj   pointer to an arc object
  * @return      the  start angle [0..360]
  */
-uint32_t lv_arc_get_bg_angle_start(lv_obj_t * obj);
+lv_value_precise_t lv_arc_get_bg_angle_start(lv_obj_t * obj);
 
 /**
  * Get the end angle of an arc background.
  * @param obj   pointer to an arc object
  * @return      the end angle [0..360]
  */
-uint32_t lv_arc_get_bg_angle_end(lv_obj_t * obj);
+lv_value_precise_t lv_arc_get_bg_angle_end(lv_obj_t * obj);
 
 /**
  * Get the value of an arc

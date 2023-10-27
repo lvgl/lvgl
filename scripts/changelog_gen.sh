@@ -1,3 +1,4 @@
+#!/bin/sh
 # Generate CHANGELOG_LAST.md from changes since the last version tag. (vx.y.z-dev tags are ignored)
 # CHANGELOG_LAST.md can be edited manually if required and manually added to docs/CHANGELOG.md
 #

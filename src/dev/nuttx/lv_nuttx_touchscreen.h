@@ -18,7 +18,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_nuttx_entry.h"
+#include "../../indev/lv_indev.h"
+
+#if LV_USE_NUTTX
 
 #if LV_USE_NUTTX_TOUCHSCREEN
 
@@ -34,6 +36,10 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize indev with specified input device.
+ * @param dev_path      path of input device
+ */
 lv_indev_t * lv_nuttx_touchscreen_create(const char * dev_path);
 
 /**********************
@@ -41,6 +47,8 @@ lv_indev_t * lv_nuttx_touchscreen_create(const char * dev_path);
  **********************/
 
 #endif /* LV_USE_NUTTX_TOUCHSCREEN */
+
+#endif /* LV_USE_NUTTX*/
 
 #ifdef __cplusplus
 } /* extern "C" */
