@@ -176,6 +176,10 @@ void lv_display_remove(lv_display_t * disp)
     _lv_ll_clear(&disp->sync_areas);
     _lv_ll_remove(disp_ll_p, disp);
     if(disp->refr_timer) lv_timer_delete(disp->refr_timer);
+
+    if(disp->layer_deinit) disp->layer_deinit(disp, disp->layer_head);
+    lv_free(disp->layer_head);
+
     lv_free(disp);
 
     if(was_default) lv_display_set_default(_lv_ll_get_head(disp_ll_p));
