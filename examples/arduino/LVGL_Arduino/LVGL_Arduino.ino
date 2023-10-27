@@ -119,19 +119,19 @@ void setup()
     //lv_obj_t *label = lv_label_create( lv_scr_act() );
     //lv_label_set_text( label, LVGL_Arduino.c_str() );
     //lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
- 
-    /* Try an example. See all the examples 
+
+    /* Try an example. See all the examples
      * online: https://docs.lvgl.io/master/examples.html
      * source codes: https://github.com/lvgl/lvgl/tree/e7f88efa5853128bf871dde335c0ca8da9eb7731/examples */
      //lv_example_btn_1();
-   
+
      /*Or try out a demo. Don't forget to enable the demos in lv_conf.h. E.g. LV_USE_DEMOS_WIDGETS*/
-    lv_demo_widgets();               
-    // lv_demo_benchmark();          
-    // lv_demo_keypad_encoder();     
-    // lv_demo_music();              
+    lv_demo_widgets();
+    // lv_demo_benchmark();
+    // lv_demo_keypad_encoder();
+    // lv_demo_music();
     // lv_demo_printer();
-    // lv_demo_stress();             
+    // lv_demo_stress();
 
     Serial.println( "Setup done" );
 }

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             cppListing.classList.toggle("unexpanded");
             cppListing.classList.toggle("expanded");
         });
-        
+
         dt.insertBefore(button, dt.firstChild);
     });
 })

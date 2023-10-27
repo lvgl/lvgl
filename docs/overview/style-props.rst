@@ -454,16 +454,16 @@ align
 Set the alignment which tells from which point of the parent the X and Y
 coordinates should be interpreted. The possible values are:
 
-- :cpp:enumerator:`LV_ALIGN_DEFAULT`, 
+- :cpp:enumerator:`LV_ALIGN_DEFAULT`,
 - :cpp:enumerator:`LV_ALIGN_TOP_LEFT`
 - :cpp:enumerator:`LV_ALIGN_TOP_MID`
 - :cpp:enumerator:`LV_ALIGN_TOP_RIGHT`,
 - :cpp:enumerator:`LV_ALIGN_BOTTOM_LEFT`
 - :cpp:enumerator:`LV_ALIGN_BOTTOM_MID`
-- :cpp:enumerator:`LV_ALIGN_BOTTOM_RIGHT`, 
+- :cpp:enumerator:`LV_ALIGN_BOTTOM_RIGHT`,
 - :cpp:enumerator:`LV_ALIGN_LEFT_MID`
 - :cpp:enumerator:`LV_ALIGN_RIGHT_MID`,
-- :cpp:enumerator:`LV_ALIGN_CENTER`. 
+- :cpp:enumerator:`LV_ALIGN_CENTER`.
 - :cpp:enumerator:`LV_ALIGN_DEFAULT`
 
 :cpp:enumerator:`LV_ALIGN_DEFAULT` means :cpp:enumerator:`LV_ALIGN_TOP_LEFT`

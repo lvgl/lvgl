@@ -42,7 +42,7 @@ def event_cb(e):
 
             coords = lv.area_t()
             chart.get_coords(coords)
-	    # print("coords: x1: {:d}, y1: {:d}".format(coords.x1, coords.y1))
+      # print("coords: x1: {:d}, y1: {:d}".format(coords.x1, coords.y1))
             a = lv.area_t()
             a.x1 = coords.x1 + p.x - 20
             a.x2 = coords.x1 + p.x + 20

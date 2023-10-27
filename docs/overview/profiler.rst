@@ -4,17 +4,17 @@
 Profiler
 ========
 
-As the complexity of the application increases, performance issues such as low FPS and frequent cache misses 
-causing lag may arise. LVGL has internally set up some hooks for performance measurement to help developers 
+As the complexity of the application increases, performance issues such as low FPS and frequent cache misses
+causing lag may arise. LVGL has internally set up some hooks for performance measurement to help developers
 analyze and locate performance issues.
 
 Introduction
 ************
 
-LVGL has a built-in trace system to track and record the timestamps of important events that occur during runtime, 
-such as rendering events and user input events. These event timestamps serve as important metrics for performance analysis. 
+LVGL has a built-in trace system to track and record the timestamps of important events that occur during runtime,
+such as rendering events and user input events. These event timestamps serve as important metrics for performance analysis.
 
-The trace system has a configurable record buffer that stores the names of event functions and their timestamps. 
+The trace system has a configurable record buffer that stores the names of event functions and their timestamps.
 When the buffer is full, the trace system prints the log information through the provided user interface.
 
 The output trace logs are formatted according to Android's `systrace <https://developer.android.com/topic/performance/tracing>`_
@@ -133,8 +133,8 @@ If the log parsing is successful, you will see the following screen:
 
 .. image:: /misc/perfetto_ui.png
 
-In the Perfetto UI, use the :kbd:`A` or :kbd:`D` keys to pan the timeline horizontally 
-and the :kbd:`W` or :kbd:`S` keys to zoom in or out on the timeline. 
+In the Perfetto UI, use the :kbd:`A` or :kbd:`D` keys to pan the timeline horizontally
+and the :kbd:`W` or :kbd:`S` keys to zoom in or out on the timeline.
 Use the mouse to move the focus and click on functions on the timeline to observe their execution time.
 
 Add Measurement Point

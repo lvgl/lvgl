@@ -101,7 +101,7 @@ the Label widget only allows manual text selection with
 Text alignment
 --------------
 
-To horizontally align the lines of a label the `text_align` style property can be used with 
+To horizontally align the lines of a label the `text_align` style property can be used with
 :cpp:expr:`lv_obj_set_style_text_align()` or :cpp:expr:`lv_style_set_text_align()`
 Note that it has a visible effect only if
 

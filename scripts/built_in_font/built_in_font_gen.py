@@ -8,48 +8,48 @@ import sys
 parser = argparse.ArgumentParser(description="""Create fonts for LVGL including the built-in symbols. lv_font_conv needs to be installed. See https://github.com/lvgl/lv_font_conv
 Example: python built_in_font_gen.py --size 16 -o lv_font_roboto_16.c --bpp 4 -r 0x20-0x7F""", formatter_class=RawTextHelpFormatter)
 parser.add_argument('-s', '--size',
-					type=int,
-					metavar = 'px',
-					nargs='?',
-					help='Size of the font in px')
+          type=int,
+          metavar = 'px',
+          nargs='?',
+          help='Size of the font in px')
 parser.add_argument('--bpp',
-					type=int,
-					metavar = '1,2,4',
-					nargs='?',
-					help='Bit per pixel')
+          type=int,
+          metavar = '1,2,4',
+          nargs='?',
+          help='Bit per pixel')
 parser.add_argument('-r', '--range',
-					nargs='+',
-					metavar = 'start-end',
-					default=['0x20-0x7F,0xB0,0x2022'],
-					help='Ranges and/or characters to include. Default is 0x20-7F (ASCII). E.g. -r 0x20-0x7F, 0x200, 324')
+          nargs='+',
+          metavar = 'start-end',
+          default=['0x20-0x7F,0xB0,0x2022'],
+          help='Ranges and/or characters to include. Default is 0x20-7F (ASCII). E.g. -r 0x20-0x7F, 0x200, 324')
 parser.add_argument('--symbols',
-					nargs='+',
-					metavar = 'sym',
-					default=[''],
-					help=u'Symbols to include. E.g. -s ÁÉŐ'.encode('utf-8'))
+          nargs='+',
+          metavar = 'sym',
+          default=[''],
+          help=u'Symbols to include. E.g. -s ÁÉŐ'.encode('utf-8'))
 parser.add_argument('--font',
-					metavar = 'file',
-					nargs='?',
-					default='Montserrat-Medium.ttf',
-					help='A TTF or WOFF file')
+          metavar = 'file',
+          nargs='?',
+          default='Montserrat-Medium.ttf',
+          help='A TTF or WOFF file')
 parser.add_argument('-o', '--output',
-					nargs='?',
-					metavar='file',
-					help='Output file name. E.g. my_font_20.c')
+          nargs='?',
+          metavar='file',
+          help='Output file name. E.g. my_font_20.c')
 parser.add_argument('--compressed', action='store_true',
-					help='Compress the bitmaps')
+          help='Compress the bitmaps')
 parser.add_argument('--subpx', action='store_true',
-					help='3 times wider letters for sub pixel rendering')
+          help='3 times wider letters for sub pixel rendering')
 
 args = parser.parse_args()
 
 if args.compressed == False:
-	compr = "--no-compress --no-prefilter"
+  compr = "--no-compress --no-prefilter"
 else:
-	compr = ""
+  compr = ""
 
 if len(args.symbols[0]) != 0:
-	args.symbols[0] = "--symbols " +  args.symbols[0]
+  args.symbols[0] = "--symbols " +  args.symbols[0]
 
 subpx = ""
 if args.subpx: subpx = "--lcd"

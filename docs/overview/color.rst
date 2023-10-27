@@ -52,7 +52,7 @@ LVGL includes `Material Design's palette <https://vuetifyjs.com/en/styles/colors
 colors. In this system all named colors have a nominal main color as
 well as four darker and five lighter variants.
 
-The names of the colors are as follows: 
+The names of the colors are as follows:
 
 - :c:macro:`LV_PALETTE_RED`
 - :c:macro:`LV_PALETTE_PINK`

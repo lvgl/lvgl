@@ -73,7 +73,7 @@ draw the button under the text and it's not necessary to redraw the
 display under the rest of the button too.
 
 The difference between buffering modes regarding the drawing mechanism
-is the following: 
+is the following:
 
 1. **One buffer** - LVGL needs to wait for :cpp:func:`lv_disp_flush_ready` (called from ``flush_cb``) before starting to redraw the next part.
 2. **Two buffers** - LVGL can immediately draw to the second buffer when the first is sent to ``flush_cb`` because the
@@ -128,14 +128,14 @@ applied real-time:
 - :cpp:enumerator:`LV_DRAW_MASK_TYPE_MAP`: The mask is stored in a bitmap array and the
   necessary parts are applied
 
-Masks are used to create almost every basic primitive: 
+Masks are used to create almost every basic primitive:
 
 - **letters**: Create a mask from the letter and draw a rectangle with the letter's color using the mask.
-- **line**: Created from four "line masks" to mask out the left, right, top and bottom part of the line to get a perfectly perpendicular perimeter. 
-- **rounded rectangle**: A mask is created real-time to add a radius to the corners. 
-- **clip corner**: To clip overflowing content (usually children) on rounded corners, a rounded rectangle mask is also applied. 
-- **rectangle border**: Same as a rounded rectangle but the inner part is masked out too. 
-- **arc drawing**: A circular border is drawn but an arc mask is applied too. 
+- **line**: Created from four "line masks" to mask out the left, right, top and bottom part of the line to get a perfectly perpendicular perimeter.
+- **rounded rectangle**: A mask is created real-time to add a radius to the corners.
+- **clip corner**: To clip overflowing content (usually children) on rounded corners, a rounded rectangle mask is also applied.
+- **rectangle border**: Same as a rounded rectangle but the inner part is masked out too.
+- **arc drawing**: A circular border is drawn but an arc mask is applied too.
 - **ARGB images**: The alpha channel is separated into a mask and the image is drawn as a normal RGB image.
 
 Using masks

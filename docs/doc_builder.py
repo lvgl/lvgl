@@ -643,7 +643,7 @@ def run(project_path, temp_directory, *doc_paths):
     global xml_path
     global lvgl_src_path
     global api_path
-    
+
     base_path = temp_directory
     xml_path = os.path.join(base_path, 'xml')
     api_path = os.path.join(base_path, 'API')
@@ -651,7 +651,7 @@ def run(project_path, temp_directory, *doc_paths):
 
     if not os.path.exists(api_path):
         os.makedirs(api_path)
-    
+
     iter_src('API', '')
     index = load_xml('index')
 

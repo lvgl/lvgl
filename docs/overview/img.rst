@@ -354,12 +354,12 @@ to open is an animation.
 Image post-processing
 ---------------------
 
-Considering that some hardware has special requirements for image formats, 
-such as alpha premultiplication and stride alignment, most image decoders (such as PNG decoders) 
-may not directly output image data that meets hardware requirements. 
+Considering that some hardware has special requirements for image formats,
+such as alpha premultiplication and stride alignment, most image decoders (such as PNG decoders)
+may not directly output image data that meets hardware requirements.
 
-For this reason, LVGL provides a solution for image post-processing. 
-First, call a custom post-processing function after ``lv_image_decoder_open`` to adjust the data in the image cache, 
+For this reason, LVGL provides a solution for image post-processing.
+First, call a custom post-processing function after ``lv_image_decoder_open`` to adjust the data in the image cache,
 and then mark the processing status in ``cache_entry->process_state`` (to avoid repeated post-processing).
 
 See the detailed code below:
