@@ -145,12 +145,12 @@ lv_lru_res_t lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, v
     test_for_value_too_large();
 
     // see if the key already exists
-    uint32_t hash_index = lv_lru_hash(cache, key, key_length);
+    uint32_t hash_index = lv_lru_hash(cache, key, (uint32_t)key_length);
     int required = 0;
     lv_lru_item_t * item = NULL, * prev = NULL;
     item = cache->items[hash_index];
 
-    while(item && lv_lru_cmp_keys(item, key, key_length)) {
+    while(item && lv_lru_cmp_keys(item, key, (uint32_t)key_length)) {
         prev = item;
         item = (lv_lru_item_t *) item->next;
     }
@@ -196,10 +196,10 @@ lv_lru_res_t lv_lru_get(lv_lru_t * cache, const void * key, size_t key_size, voi
     test_for_missing_key();
 
     // loop until we find the item, or hit the end of a chain
-    uint32_t hash_index = lv_lru_hash(cache, key, key_size);
+    uint32_t hash_index = lv_lru_hash(cache, key, (uint32_t)key_size);
     lv_lru_item_t * item = cache->items[hash_index];
 
-    while(item && lv_lru_cmp_keys(item, key, key_size))
+    while(item && lv_lru_cmp_keys(item, key,(uint32_t)key_size))
         item = (lv_lru_item_t *) item->next;
 
     if(item) {
@@ -220,10 +220,10 @@ lv_lru_res_t lv_lru_remove(lv_lru_t * cache, const void * key, size_t key_size)
 
     // loop until we find the item, or hit the end of a chain
     lv_lru_item_t * item = NULL, * prev = NULL;
-    uint32_t hash_index = lv_lru_hash(cache, key, key_size);
+    uint32_t hash_index = lv_lru_hash(cache, key, (uint32_t)key_size);
     item = cache->items[hash_index];
 
-    while(item && lv_lru_cmp_keys(item, key, key_size)) {
+    while(item && lv_lru_cmp_keys(item, key, (uint32_t)key_size)) {
         prev = item;
         item = (lv_lru_item_t *) item->next;
     }

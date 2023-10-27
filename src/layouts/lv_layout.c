@@ -63,7 +63,7 @@ uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
 void _lv_layout_apply(lv_obj_t * obj)
 {
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
-    if(layout_id > 0 && layout_id <= layout_cnt) {
+    if(layout_id > 0 && layout_id <= (lv_layout_t)layout_cnt) {
         void  * user_data = layout_list_def[layout_id].user_data;
         layout_list_def[layout_id].cb(obj, user_data);
     }

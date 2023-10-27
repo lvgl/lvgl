@@ -1,3 +1,9 @@
+
+if (MSVC)
+    add_compile_options(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
+
 # Option to define LV_LVGL_H_INCLUDE_SIMPLE, default: ON
 option(LV_LVGL_H_INCLUDE_SIMPLE
        "Use #include \"lvgl.h\" instead of #include \"../../lvgl.h\"" ON)

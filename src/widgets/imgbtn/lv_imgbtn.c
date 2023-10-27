@@ -204,7 +204,7 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(imgbtn->src_left[state].img_src == NULL &&
            imgbtn->src_mid[state].img_src != NULL &&
            imgbtn->src_right[state].img_src == NULL) {
-            p->x = LV_MAX(p->x, imgbtn->src_mid[state].header.w);
+            p->x = LV_MAX((uint32_t)p->x, imgbtn->src_mid[state].header.w);
         }
     }
 }

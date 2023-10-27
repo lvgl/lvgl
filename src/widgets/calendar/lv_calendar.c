@@ -133,7 +133,7 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
     uint8_t act_mo_len = get_month_length(d.year, d.month);
     uint8_t day_first = get_day_of_week(d.year, d.month, 1);
     uint8_t c;
-    for(i = day_first, c = 1; i < act_mo_len + day_first; i++, c++) {
+    for(i = day_first, c = 1; i < (uint32_t)(act_mo_len + day_first); i++, c++) {
         lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
     }
 

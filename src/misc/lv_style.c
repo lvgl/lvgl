@@ -218,7 +218,7 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
             return LV_STYLE_PROP_INV;
         }
         _lv_style_custom_prop_flag_lookup_table = new_p;
-        _lv_style_custom_prop_flag_lookup_table_size = required_size;
+        _lv_style_custom_prop_flag_lookup_table_size = (uint32_t)required_size;
     }
     last_custom_prop_id++;
     /* This should never happen - we should bail out above */

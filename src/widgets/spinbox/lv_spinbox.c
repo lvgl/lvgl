@@ -113,8 +113,8 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t 
 
     if(digit_count < LV_SPINBOX_MAX_DIGIT_COUNT) {
         const int64_t max_val = lv_pow(10, digit_count);
-        if(spinbox->range_max > max_val - 1) spinbox->range_max = max_val - 1;
-        if(spinbox->range_min < -max_val  + 1) spinbox->range_min = -max_val  + 1;
+        if(spinbox->range_max > max_val - 1) spinbox->range_max = (int32_t)(max_val - 1);
+        if(spinbox->range_min < -max_val  + 1) spinbox->range_min = (int32_t)(-max_val  + 1);
     }
 
     spinbox->digit_count   = digit_count;
@@ -168,7 +168,7 @@ void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint32_t pos)
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
-    const int32_t new_step = lv_pow(10, pos);
+    const int32_t new_step = (const int32_t)lv_pow(10, pos);
 
     if(pos <= 0) spinbox->step = 1;
     else if(new_step <= step_limit) spinbox->step = new_step;
@@ -383,7 +383,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
                     }
                     else {
                         /*Restart from the MSB*/
-                        spinbox->step = lv_pow(10, spinbox->digit_count - 2);
+                        spinbox->step = (int32_t)lv_pow(10, spinbox->digit_count - 2);
                         lv_spinbox_step_prev(obj);
                     }
                 }
@@ -412,7 +412,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
             /* Cursor is already in the right-most digit */
             else if(spinbox->ta.cursor.pos == (uint32_t)txt_len) {
-                lv_textarea_set_cursor_pos(obj, txt_len - 1);
+                lv_textarea_set_cursor_pos(obj, (int32_t)(txt_len - 1));
             }
             /* Cursor is already in the left-most digit AND range_min is negative */
             else if(spinbox->ta.cursor.pos == 0 && spinbox->range_min < 0) {
@@ -424,7 +424,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(spinbox->ta.cursor.pos > spinbox->dec_point_pos && spinbox->dec_point_pos != 0) cp--;
 
             const size_t len = spinbox->digit_count - 1;
-            uint32_t pos = len - cp;
+            uint32_t pos = (uint32_t)(len - cp);
 
             if(spinbox->range_min < 0) pos++;
 
@@ -488,7 +488,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     int32_t i;
     const size_t digits_len = lv_strlen(digits);
 
-    const int leading_zeros_cnt = spinbox->digit_count - digits_len;
+    const int leading_zeros_cnt = (const int)(spinbox->digit_count - digits_len);
     if(leading_zeros_cnt) {
         for(i = (int32_t) digits_len; i >= 0; i--) {
             digits[i + leading_zeros_cnt] = digits[i];
@@ -511,7 +511,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
         (*buf_p) = '.';
         buf_p++;
 
-        for(/*Leave i*/; i < spinbox->digit_count && digits[i] != '\0'; i++) {
+        for(/*Leave i*/; i < (int32_t)(spinbox->digit_count && digits[i] != '\0'); i++) {
             (*buf_p) = digits[i];
             buf_p++;
         }

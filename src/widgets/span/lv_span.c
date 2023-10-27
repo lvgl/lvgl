@@ -924,7 +924,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             }
             if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
                 if(last_snippet->txt[last_snippet->bytes] != '\0') {
-                    last_snippet->bytes = lv_strlen(last_snippet->txt);
+                    last_snippet->bytes = (uint32_t)lv_strlen(last_snippet->txt);
                     last_snippet->txt_w = lv_text_get_width(last_snippet->txt, last_snippet->bytes, last_snippet->font,
                                                             last_snippet->letter_space);
                 }

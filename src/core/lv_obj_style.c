@@ -788,7 +788,7 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_sty
     const uint32_t group = (uint32_t)1 << _lv_style_get_prop_group(prop);
     const lv_state_t state = obj->state;
     const lv_state_t state_inv = ~state;
-    const bool skip_trans = obj->skip_trans;
+    const bool skip_trans = (const bool)obj->skip_trans;
     int32_t weight = -1;
     lv_style_res_t found;
     uint32_t i;

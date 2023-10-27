@@ -223,7 +223,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     dropdown->options[old_len] = '\0';
 
     /*Find the insert character position*/
-    uint32_t insert_pos = old_len;
+    uint32_t insert_pos = (uint32_t)old_len;
     if(pos != LV_DROPDOWN_POS_LAST) {
         uint32_t opcnt = 0;
         for(insert_pos = 0; dropdown->options[insert_pos] != 0; insert_pos++) {

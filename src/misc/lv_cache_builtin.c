@@ -91,7 +91,7 @@ static lv_cache_entry_t * add_cb(size_t size)
 
     lv_cache_entry_t * entry = _lv_ll_ins_head(&dsc.entry_ll);
     lv_memzero(entry, sizeof(lv_cache_entry_t));
-    entry->data_size = size;
+    entry->data_size = (uint32_t)size;
     entry->weight = 1;
     entry->temporary = temporary;
 
@@ -100,7 +100,7 @@ static lv_cache_entry_t * add_cb(size_t size)
     }
     else {
         LV_TRACE_CACHE("Add cache: %lu bytes", (unsigned long)size);
-        dsc.cur_size += size;
+        dsc.cur_size += (uint32_t)size;
     }
 
     return entry;

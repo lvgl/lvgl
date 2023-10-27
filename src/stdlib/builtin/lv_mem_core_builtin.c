@@ -140,7 +140,7 @@ void * lv_malloc_core(size_t size)
 #if LV_USE_OS
     lv_mutex_lock(&state.mutex);
 #endif
-    state.cur_used += size;
+    state.cur_used += (uint32_t)size;
     state.max_used = LV_MAX(state.cur_used, state.max_used);
     void * p = lv_tlsf_malloc(state.tlsf, size);
 
@@ -175,7 +175,7 @@ void lv_free_core(void * p)
     lv_memset(p, 0xbb, lv_tlsf_block_size(data));
 #endif
     size_t size = lv_tlsf_free(state.tlsf, p);
-    if(state.cur_used > size) state.cur_used -= size;
+    if(state.cur_used > size) state.cur_used -= (uint32_t)size;
     else state.cur_used = 0;
 
 #if LV_USE_OS
@@ -249,15 +249,15 @@ static void lv_mem_walker(void * ptr, size_t size, int used, void * user)
     LV_UNUSED(ptr);
 
     lv_mem_monitor_t * mon_p = user;
-    mon_p->total_size += size;
+    mon_p->total_size += (uint32_t)size;
     if(used) {
         mon_p->used_cnt++;
     }
     else {
         mon_p->free_cnt++;
-        mon_p->free_size += size;
+        mon_p->free_size += (uint32_t)size;
         if(size > mon_p->free_biggest_size)
-            mon_p->free_biggest_size = size;
+            mon_p->free_biggest_size = (uint32_t)size;
     }
 }
 #endif /*LV_USE_BUILTIN_MALLOC*/

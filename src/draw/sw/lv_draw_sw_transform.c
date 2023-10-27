@@ -138,7 +138,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
         alpha_buf = NULL;
     }
 
-    bool aa = draw_dsc->antialias;
+    bool aa = (bool)draw_dsc->antialias;
 
     lv_coord_t y;
     for(y = 0; y < dest_h; y++) {

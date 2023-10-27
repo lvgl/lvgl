@@ -159,9 +159,9 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
 
             circle_mask_tmp += width;
         }
-        get_rounded_area(start_angle, dsc->radius, width, &round_area_1);
+        get_rounded_area(start_angle, dsc->radius, (uint8_t)width, &round_area_1);
         lv_area_move(&round_area_1, dsc->center.x, dsc->center.y);
-        get_rounded_area(end_angle, dsc->radius, width, &round_area_2);
+        get_rounded_area(end_angle, dsc->radius, (uint8_t)width, &round_area_2);
         lv_area_move(&round_area_2, dsc->center.x, dsc->center.y);
 
     }
