@@ -151,11 +151,15 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
 void lv_timer_delete(lv_timer_t * timer);
 
 /**
- * Pause/resume a timer.
+ * Pause a timer.
  * @param timer pointer to an lv_timer
  */
 void lv_timer_pause(lv_timer_t * timer);
 
+/**
+ * Resume a timer.
+ * @param timer pointer to an lv_timer
+ */
 void lv_timer_resume(lv_timer_t * timer);
 
 /**
