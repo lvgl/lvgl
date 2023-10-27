@@ -199,7 +199,7 @@ lv_lru_res_t lv_lru_get(lv_lru_t * cache, const void * key, size_t key_size, voi
     uint32_t hash_index = lv_lru_hash(cache, key, (uint32_t)key_size);
     lv_lru_item_t * item = cache->items[hash_index];
 
-    while(item && lv_lru_cmp_keys(item, key,(uint32_t)key_size))
+    while(item && lv_lru_cmp_keys(item, key, (uint32_t)key_size))
         item = (lv_lru_item_t *) item->next;
 
     if(item) {
