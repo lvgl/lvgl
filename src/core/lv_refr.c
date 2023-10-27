@@ -353,12 +353,14 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
     lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
 
     /*Refresh the screen's layout if required*/
+    LV_PROFILER_BEGIN_TAG("layout");
     lv_obj_update_layout(disp_refr->act_scr);
     if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
 
     lv_obj_update_layout(disp_refr->bottom_layer);
     lv_obj_update_layout(disp_refr->top_layer);
     lv_obj_update_layout(disp_refr->sys_layer);
+    LV_PROFILER_END_TAG("layout");
 
     /*Do nothing if there is no active screen*/
     if(disp_refr->act_scr == NULL) {
