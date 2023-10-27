@@ -51,10 +51,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
 
 /**
  * Draw a line
- * @param draw_ctx      pointer to the current draw context
+ * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized `lv_draw_line_dsc_t` variable
- * @param point1        first point of the line
- * @param point2        second point of the line
  */
 void lv_draw_line(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
 

@@ -69,14 +69,18 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc);
 
 /**
  * Draw an image
- * @param draw_ctx      pointer to the current draw context
+ * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized `lv_draw_image_dsc_t` variable
  * @param coords        the coordinates of the image
- * @param src           pointer to a lv_color_t array which contains the pixels of the image
  */
 void lv_draw_image(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
-
+/**
+ * Draw a layer on an other layer
+ * @param layer         pointer to a layer
+ * @param dsc           pointer to an initialized `lv_draw_image_dsc_t` variable
+ * @param coords        the coordinates of the layer
+ */
 void lv_draw_layer(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**
