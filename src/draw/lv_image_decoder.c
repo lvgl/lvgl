@@ -481,25 +481,47 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
     lv_result_t res;
     uint32_t rn;
     lv_image_decoder_built_in_data_t * decoder_data = dsc->user_data;
-    lv_fs_file_t * f = &decoder_data->f;
-    uint32_t len = (uint32_t)dsc->header.stride * dsc->header.h;
-    uint8_t * data = lv_draw_buf_malloc(len, dsc->header.cf);
+    uint8_t bpp = lv_color_format_get_bpp(dsc->header.cf);
+    uint32_t w = (dsc->header.stride * 8) / bpp;
+    uint32_t buf_stride = (w * 8 + 7) >> 3; /*stride for img_data*/
+    uint32_t buf_len = w * dsc->header.h; /*always decode to A8 format*/
+    uint8_t * img_data = lv_draw_buf_malloc(buf_len, dsc->header.cf);
+    uint32_t file_len = (uint32_t)dsc->header.stride * dsc->header.h;
 
-    LV_ASSERT_MALLOC(data);
-    if(data == NULL) {
+    LV_ASSERT_MALLOC(img_data);
+    if(img_data == NULL) {
         LV_LOG_ERROR("out of memory");
         return LV_RESULT_INVALID;
     }
 
-    res = fs_read_file_at(f, sizeof(lv_image_header_t), data, len, &rn);
-    if(res != LV_FS_RES_OK || rn != len) {
+    res = fs_read_file_at(&decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
+    if(res != LV_FS_RES_OK || rn != file_len) {
         LV_LOG_WARN("Built-in image decoder can't read the palette");
-        lv_draw_buf_free(data);
+        lv_draw_buf_free(img_data);
         return LV_RESULT_INVALID;
     }
 
-    decoder_data->img_data = data;
-    dsc->img_data = data;
+    if(dsc->header.cf != LV_COLOR_FORMAT_A8) {
+        /*Convert A1/2/4 to A8 from last pixel to first pixel*/
+        uint8_t * in = img_data + file_len - 1;
+        uint8_t * out = img_data + buf_len - 1;
+        uint8_t mask = (1 << bpp) - 1;
+        uint8_t shift = 0;
+        for(uint32_t i = 0; i < buf_len; i++) {
+            *out = ((*in >> shift) & mask) << (8 - bpp);
+            shift += bpp;
+            if(shift >= 8) {
+                shift = 0;
+                in--;
+            }
+            out--;
+        }
+    }
+
+    decoder_data->img_data = img_data;
+    dsc->img_data = img_data;
+    dsc->header.stride = buf_stride;
+    dsc->header.cf = LV_COLOR_FORMAT_A8;
     return LV_RESULT_OK;
 }
 
@@ -539,7 +561,7 @@ lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_imag
         if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
             res = decode_indexed(decoder, dsc);
         }
-        else if(cf == LV_COLOR_FORMAT_A8) {
+        else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
             res = decode_alpha_only(decoder, dsc);
         }
 #if LV_BIN_DECODER_RAM_LOAD
