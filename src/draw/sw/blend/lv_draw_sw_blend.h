@@ -40,6 +40,7 @@ typedef struct {
     const lv_opa_t * mask_buf;      /**< NULL if ignored, or an alpha mask to apply on `blend_area`*/
     lv_draw_sw_mask_res_t mask_res;    /**< The result of the previous mask operation */
     const lv_area_t * mask_area;    /**< The area of `mask_buf` with absolute coordinates*/
+    lv_coord_t mask_stride;
     lv_blend_mode_t blend_mode;     /**< E.g. LV_BLEND_MODE_ADDITIVE*/
 } lv_draw_sw_blend_dsc_t;
 

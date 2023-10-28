@@ -244,6 +244,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
 
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
         blend_dsc.mask_area = img_coords;
+        blend_dsc.mask_stride = img_stride;
         blend_dsc.src_buf = NULL;
         blend_dsc.color = draw_dsc->recolor;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
@@ -258,6 +259,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         blend_dsc.src_buf = src_buf;
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
         blend_dsc.mask_buf += img_stride * src_w / header->w * src_h;
+        blend_dsc.mask_stride = src_w;
         blend_dsc.blend_area = img_coords;
         blend_dsc.mask_area = img_coords;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
@@ -316,12 +318,14 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
              *Therefore the stride can be different. */
             blend_dsc.src_stride = lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565);
             blend_dsc.mask_buf =  tmp_buf_aligned + lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565) * buf_h;
+            blend_dsc.mask_stride = blend_w;
             blend_dsc.mask_area = &blend_area;
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
         }
         else if(cf_final == LV_COLOR_FORMAT_A8) {
             blend_dsc.mask_buf = blend_dsc.src_buf;
+            blend_dsc.mask_stride = blend_w;
             blend_dsc.mask_area = &blend_area;
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             blend_dsc.color = draw_dsc->recolor;

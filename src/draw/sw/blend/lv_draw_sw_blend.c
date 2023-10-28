@@ -65,7 +65,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
                                                    blend_area.y1 - layer->buf_area.y1);
 
         if(fill_dsc.mask_buf) {
-            fill_dsc.mask_stride = lv_area_get_width(blend_dsc->mask_area);
+            fill_dsc.mask_stride = blend_dsc->mask_stride == 0  ? lv_area_get_width(blend_dsc->mask_area) : blend_dsc->mask_stride;
             fill_dsc.mask_buf += fill_dsc.mask_stride * (blend_area.y1 - blend_dsc->mask_area->y1) +
                                  (blend_area.x1 - blend_dsc->mask_area->x1);
         }
