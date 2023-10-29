@@ -15,7 +15,11 @@
 #include "../../stdlib/lv_string.h"
 
 #if LV_USE_THORVG
-    #include <thorvg_capi.h>
+    #if LV_USE_THORVG_EXTERNAL
+        #include <thorvg_capi.h>
+    #else
+        #include "../../libs/thorvg/thorvg_capi.h"
+    #endif
 #endif
 /*********************
  *      DEFINES

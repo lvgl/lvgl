@@ -1099,6 +1099,15 @@ menu "LVGL configuration"
 			bool "Lottie library"
 		config LV_USE_THORVG
 			bool "ThorVG library"
+            choice
+             prompt "Use ThorVG config"
+             depends on LV_USE_THORVG
+                default LV_USE_THORVG_INTERNAL
+                config LV_USE_THORVG_INTERNAL
+                    bool "Use ThorVG internal"
+                config LV_USE_THORVG_EXTERNAL
+                    bool "Use ThorVG external"
+             endchoice
 
 		config LV_USE_FFMPEG
 			bool "FFmpeg library"

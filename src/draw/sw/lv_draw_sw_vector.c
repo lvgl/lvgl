@@ -9,7 +9,11 @@
 #include "lv_draw_sw.h"
 
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
-#include <thorvg_capi.h>
+#if LV_USE_THORVG_EXTERNAL
+    #include <thorvg_capi.h>
+#else
+    #include "../../libs/thorvg/thorvg_capi.h"
+#endif
 #include "../../stdlib/lv_string.h"
 
 /*********************

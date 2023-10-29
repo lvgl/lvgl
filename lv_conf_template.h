@@ -651,6 +651,11 @@
 
 /*ThorVG library*/
 #define LV_USE_THORVG 0
+#if LV_USE_THORVG
+    /* Enable internal thorvg */
+    #define LV_USE_THORVG_INTERNAL 0
+    #define LV_USE_THORVG_EXTERNAL 0
+#endif
 
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/

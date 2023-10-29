@@ -19,6 +19,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
+file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp)
 
 # Build LVGL library
 add_library(lvgl ${SOURCES})
@@ -35,6 +36,13 @@ endif()
 
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
+
+
+if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+    add_library(lvgl_thorvg ${THORVG_SOURCES})
+    add_library(lvgl::thorvg ALIAS lvgl_thorvg)
+    target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
+endif()
 
 # Build LVGL example library
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)

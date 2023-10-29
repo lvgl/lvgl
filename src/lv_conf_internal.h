@@ -2154,6 +2154,17 @@
     #endif
 #endif
 
+#if LV_USE_THORVG
+    #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
+        #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
+        #define LV_USE_THORVG_INTERNAL 0
+    #endif
+    #ifdef CONFIG_LV_USE_THORVG_INTERNAL
+        #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
+        #define LV_USE_THORVG_EXTERNAL 0
+    #endif
+#endif
+
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
 #ifndef LV_USE_FFMPEG
