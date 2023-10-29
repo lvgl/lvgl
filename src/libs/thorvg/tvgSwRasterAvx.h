@@ -44,7 +44,7 @@ static inline __m128i ALPHA_BLEND(__m128i c, __m128i a)
     //- shift bits - corresponding to division by 256
     auto even = _mm_and_si128(c, RB);
     even = _mm_mullo_epi16(even, aRB);
-    even =_mm_add_epi16(even, RB);
+    even = _mm_add_epi16(even, RB);
     even = _mm_srli_epi16(even, 8);
 
     //4. calculate the alpha blending of the 1st and 3rd channel:
@@ -62,7 +62,7 @@ static inline __m128i ALPHA_BLEND(__m128i c, __m128i a)
 }
 
 
-static void avxRasterPixel32(uint32_t *dst, uint32_t val, uint32_t offset, int32_t len)
+static void avxRasterPixel32(uint32_t * dst, uint32_t val, uint32_t offset, int32_t len)
 {
     //1. calculate how many iterations we need to cover the length
     uint32_t iterations = len / N_32BITS_IN_256REG;
@@ -72,19 +72,20 @@ static void avxRasterPixel32(uint32_t *dst, uint32_t val, uint32_t offset, int32
     dst += offset;
 
     //3. fill the octets
-    for (uint32_t i = 0; i < iterations; ++i, dst += N_32BITS_IN_256REG) {
-        _mm256_storeu_si256((__m256i*)dst, _mm256_set1_epi32(val));
+    for(uint32_t i = 0; i < iterations; ++i, dst += N_32BITS_IN_256REG) {
+        _mm256_storeu_si256((__m256i *)dst, _mm256_set1_epi32(val));
     }
 
     //4. fill leftovers (in the first step we have to set the pointer to the place where the avx job is done)
     int32_t leftovers = len - avxFilled;
-    while (leftovers--) *dst++ = val;
+    while(leftovers--) *dst++ = val;
 }
 
 
-static bool avxRasterTranslucentRect(SwSurface* surface, const SwBBox& region, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+static bool avxRasterTranslucentRect(SwSurface * surface, const SwBBox & region, uint8_t r, uint8_t g, uint8_t b,
+                                     uint8_t a)
 {
-    if (surface->channelSize != sizeof(uint32_t)) {
+    if(surface->channelSize != sizeof(uint32_t)) {
         TVGERR("SW_ENGINE", "Unsupported Channel Size = %d", surface->channelSize);
         return false;
     }
@@ -99,14 +100,14 @@ static bool avxRasterTranslucentRect(SwSurface* surface, const SwBBox& region, u
     auto avxColor = _mm_set1_epi32(color);
     auto avxIalpha = _mm_set1_epi8(ialpha);
 
-    for (uint32_t y = 0; y < h; ++y) {
+    for(uint32_t y = 0; y < h; ++y) {
         auto dst = &buffer[y * surface->stride];
 
         //1. fill the not aligned memory (for 128-bit registers a 16-bytes alignment is required)
         auto notAligned = ((uintptr_t)dst & 0xf) / 4;
-        if (notAligned) {
+        if(notAligned) {
             notAligned = (N_32BITS_IN_128REG - notAligned > w ? w : N_32BITS_IN_128REG - notAligned);
-            for (uint32_t x = 0; x < notAligned; ++x, ++dst) {
+            for(uint32_t x = 0; x < notAligned; ++x, ++dst) {
                 *dst = color + ALPHA_BLEND(*dst, ialpha);
             }
         }
@@ -114,15 +115,15 @@ static bool avxRasterTranslucentRect(SwSurface* surface, const SwBBox& region, u
         //2. fill the aligned memory - N_32BITS_IN_128REG pixels processed at once
         uint32_t iterations = (w - notAligned) / N_32BITS_IN_128REG;
         uint32_t avxFilled = iterations * N_32BITS_IN_128REG;
-        auto avxDst = (__m128i*)dst;
-        for (uint32_t x = 0; x < iterations; ++x, ++avxDst) {
+        auto avxDst = (__m128i *)dst;
+        for(uint32_t x = 0; x < iterations; ++x, ++avxDst) {
             *avxDst = _mm_add_epi32(avxColor, ALPHA_BLEND(*avxDst, avxIalpha));
         }
 
         //3. fill the remaining pixels
         int32_t leftovers = w - notAligned - avxFilled;
         dst += avxFilled;
-        while (leftovers--) {
+        while(leftovers--) {
             *dst = color + ALPHA_BLEND(*dst, ialpha);
             dst++;
         }
@@ -131,9 +132,10 @@ static bool avxRasterTranslucentRect(SwSurface* surface, const SwBBox& region, u
 }
 
 
-static bool avxRasterTranslucentRle(SwSurface* surface, const SwRleData* rle, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+static bool avxRasterTranslucentRle(SwSurface * surface, const SwRleData * rle, uint8_t r, uint8_t g, uint8_t b,
+                                    uint8_t a)
 {
-    if (surface->channelSize != sizeof(uint32_t)) {
+    if(surface->channelSize != sizeof(uint32_t)) {
         TVGERR("SW_ENGINE", "Unsupported Channel Size = %d", surface->channelSize);
         return false;
     }
@@ -142,19 +144,19 @@ static bool avxRasterTranslucentRle(SwSurface* surface, const SwRleData* rle, ui
     auto span = rle->spans;
     uint32_t src;
 
-    for (uint32_t i = 0; i < rle->size; ++i) {
+    for(uint32_t i = 0; i < rle->size; ++i) {
         auto dst = &surface->buf32[span->y * surface->stride + span->x];
 
-        if (span->coverage < 255) src = ALPHA_BLEND(color, span->coverage);
+        if(span->coverage < 255) src = ALPHA_BLEND(color, span->coverage);
         else src = color;
 
-	auto ialpha = IA(src);
+        auto ialpha = IA(src);
 
         //1. fill the not aligned memory (for 128-bit registers a 16-bytes alignment is required)
         auto notAligned = ((uintptr_t)dst & 0xf) / 4;
-        if (notAligned) {
+        if(notAligned) {
             notAligned = (N_32BITS_IN_128REG - notAligned > span->len ? span->len : N_32BITS_IN_128REG - notAligned);
-            for (uint32_t x = 0; x < notAligned; ++x, ++dst) {
+            for(uint32_t x = 0; x < notAligned; ++x, ++dst) {
                 *dst = src + ALPHA_BLEND(*dst, ialpha);
             }
         }
@@ -163,13 +165,13 @@ static bool avxRasterTranslucentRle(SwSurface* surface, const SwRleData* rle, ui
         //In order to avoid unneccessary avx variables declarations a check is made whether there are any iterations at all
         uint32_t iterations = (span->len - notAligned) / N_32BITS_IN_128REG;
         uint32_t avxFilled = 0;
-        if (iterations > 0) {
+        if(iterations > 0) {
             auto avxSrc = _mm_set1_epi32(src);
             auto avxIalpha = _mm_set1_epi8(ialpha);
 
             avxFilled = iterations * N_32BITS_IN_128REG;
-            auto avxDst = (__m128i*)dst;
-            for (uint32_t x = 0; x < iterations; ++x, ++avxDst) {
+            auto avxDst = (__m128i *)dst;
+            for(uint32_t x = 0; x < iterations; ++x, ++avxDst) {
                 *avxDst = _mm_add_epi32(avxSrc, ALPHA_BLEND(*avxDst, avxIalpha));
             }
         }
@@ -177,7 +179,7 @@ static bool avxRasterTranslucentRle(SwSurface* surface, const SwRleData* rle, ui
         //3. fill the remaining pixels
         int32_t leftovers = span->len - notAligned - avxFilled;
         dst += avxFilled;
-        while (leftovers--) {
+        while(leftovers--) {
             *dst = src + ALPHA_BLEND(*dst, ialpha);
             dst++;
         }

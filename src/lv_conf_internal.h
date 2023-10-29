@@ -2153,15 +2153,21 @@
         #define LV_USE_THORVG 0
     #endif
 #endif
-
 #if LV_USE_THORVG
-    #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
-        #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
-        #define LV_USE_THORVG_INTERNAL 0
+    /* Enable internal thorvg */
+    #ifndef LV_USE_THORVG_INTERNAL
+        #ifdef CONFIG_LV_USE_THORVG_INTERNAL
+            #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
+        #else
+            #define LV_USE_THORVG_INTERNAL 0
+        #endif
     #endif
-    #ifdef CONFIG_LV_USE_THORVG_INTERNAL
-        #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
-        #define LV_USE_THORVG_EXTERNAL 0
+    #ifndef LV_USE_THORVG_EXTERNAL
+        #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
+            #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
+        #else
+            #define LV_USE_THORVG_EXTERNAL 0
+        #endif
     #endif
 #endif
 

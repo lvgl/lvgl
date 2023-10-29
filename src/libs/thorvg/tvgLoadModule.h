@@ -30,27 +30,48 @@ namespace tvg
 
 class LoadModule
 {
-public:
-    float w = 0, h = 0;                             //default image size
-    ColorSpace cs = ColorSpace::Unsupported;        //must be clarified at open()
+    public:
+        float w = 0, h = 0;                             //default image size
+        ColorSpace cs = ColorSpace::Unsupported;        //must be clarified at open()
 
-    virtual ~LoadModule() {}
+        virtual ~LoadModule() {}
 
-    virtual bool open(const string& path) { return false; }
-    virtual bool open(const char* data, uint32_t size, bool copy) { return false; }
-    virtual bool open(const uint32_t* data, uint32_t w, uint32_t h, bool copy) { return false; }
+        virtual bool open(const string & path)
+        {
+            return false;
+        }
+        virtual bool open(const char * data, uint32_t size, bool copy)
+        {
+            return false;
+        }
+        virtual bool open(const uint32_t * data, uint32_t w, uint32_t h, bool copy)
+        {
+            return false;
+        }
 
-    //Override this if the vector-format has own resizing policy.
-    virtual bool resize(Paint* paint, float w, float h) { return false; }
+        //Override this if the vector-format has own resizing policy.
+        virtual bool resize(Paint * paint, float w, float h)
+        {
+            return false;
+        }
 
-    virtual bool animatable() { return false; }  //true if this loader supports animation.
-    virtual void sync() {};  //finish immediately if any async update jobs.
+        virtual bool animatable()
+        {
+            return false;    //true if this loader supports animation.
+        }
+        virtual void sync() {};  //finish immediately if any async update jobs.
 
-    virtual bool read() = 0;
-    virtual bool close() = 0;
+        virtual bool read() = 0;
+        virtual bool close() = 0;
 
-    virtual unique_ptr<Surface> bitmap() { return nullptr; }
-    virtual unique_ptr<Paint> paint() { return nullptr; }
+        virtual unique_ptr<Surface> bitmap()
+        {
+            return nullptr;
+        }
+        virtual unique_ptr<Paint> paint()
+        {
+            return nullptr;
+        }
 };
 
 }

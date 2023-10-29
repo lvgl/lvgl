@@ -36,8 +36,7 @@ enum RenderUpdateFlag : uint8_t {None = 0, Path = 1, Color = 2, Gradient = 4, St
 
 struct Surface;
 
-enum ColorSpace
-{
+enum ColorSpace {
     ABGR8888 = 0,      //The channels are joined in the order: alpha, blue, green, red. Colors are alpha-premultiplied.
     ARGB8888,          //The channels are joined in the order: alpha, red, green, blue. Colors are alpha-premultiplied.
     ABGR8888S,         //The channels are joined in the order: alpha, blue, green, red. Colors are un-alpha-premultiplied.
@@ -46,12 +45,11 @@ enum ColorSpace
     Unsupported        //TODO: Change to the default, At the moment, we put it in the last to align with SwCanvas::Colorspace.
 };
 
-struct Surface
-{
+struct Surface {
     union {
-        pixel_t* data;       //system based data pointer
-        uint32_t* buf32;     //for explicit 32bits channels
-        uint8_t*  buf8;      //for explicit 8bits grayscale
+        pixel_t * data;      //system based data pointer
+        uint32_t * buf32;    //for explicit 32bits channels
+        uint8_t * buf8;      //for explicit 8bits grayscale
     };
     uint32_t stride;
     uint32_t w, h;
@@ -62,15 +60,13 @@ struct Surface
     bool owner;              //Only owner could modify the buffer
 };
 
-struct Compositor
-{
+struct Compositor {
     CompositeMethod method;
     uint8_t        opacity;
 };
 
-struct RenderMesh
-{
-    Polygon* triangles = nullptr;
+struct RenderMesh {
+    Polygon * triangles = nullptr;
     uint32_t triangleCnt = 0;
 
     ~RenderMesh()
@@ -79,11 +75,10 @@ struct RenderMesh
     }
 };
 
-struct RenderRegion
-{
+struct RenderRegion {
     int32_t x, y, w, h;
 
-    void intersect(const RenderRegion& rhs)
+    void intersect(const RenderRegion & rhs)
     {
         auto x1 = x + w;
         auto y1 = y + h;
@@ -95,27 +90,26 @@ struct RenderRegion
         w = ((x1 < x2) ? x1 : x2) - x;
         h = ((y1 < y2) ? y1 : y2) - y;
 
-        if (w < 0) w = 0;
-        if (h < 0) h = 0;
+        if(w < 0) w = 0;
+        if(h < 0) h = 0;
     }
 
-    void add(const RenderRegion& rhs)
+    void add(const RenderRegion & rhs)
     {
-        if (rhs.x < x) {
+        if(rhs.x < x) {
             w += (x - rhs.x);
             x = rhs.x;
         }
-        if (rhs.y < y) {
+        if(rhs.y < y) {
             h += (y - rhs.y);
             y = rhs.y;
         }
-        if (rhs.x + rhs.w > x + w) w = (rhs.x + rhs.w) - x;
-        if (rhs.y + rhs.h > y + h) h = (rhs.y + rhs.h) - y;
+        if(rhs.x + rhs.w > x + w) w = (rhs.x + rhs.w) - x;
+        if(rhs.y + rhs.h > y + h) h = (rhs.y + rhs.h) - y;
     }
 };
 
-struct RenderTransform
-{
+struct RenderTransform {
     Matrix m;             //3x3 Matrix Elements
     float x = 0.0f;
     float y = 0.0f;
@@ -124,18 +118,17 @@ struct RenderTransform
     bool overriding = false;  //user transform?
 
     bool update();
-    void override(const Matrix& m);
+    void override(const Matrix & m);
 
     RenderTransform();
-    RenderTransform(const RenderTransform* lhs, const RenderTransform* rhs);
+    RenderTransform(const RenderTransform * lhs, const RenderTransform * rhs);
 };
 
-struct RenderStroke
-{
+struct RenderStroke {
     float width = 0.0f;
     uint8_t color[4] = {0, 0, 0, 0};
-    Fill *fill = nullptr;
-    float* dashPattern = nullptr;
+    Fill * fill = nullptr;
+    float * dashPattern = nullptr;
     uint32_t dashCnt = 0;
     float dashOffset = 0.0f;
     StrokeCap cap = StrokeCap::Square;
@@ -155,16 +148,14 @@ struct RenderStroke
     }
 };
 
-struct RenderShape
-{
-    struct
-    {
+struct RenderShape {
+    struct {
         Array<PathCommand> cmds;
         Array<Point> pts;
     } path;
 
-    Fill *fill = nullptr;
-    RenderStroke *stroke = nullptr;
+    Fill * fill = nullptr;
+    RenderStroke * stroke = nullptr;
     uint8_t color[4] = {0, 0, 0, 0};    //r, g, b, a
     FillRule rule = FillRule::Winding;
 
@@ -174,69 +165,69 @@ struct RenderShape
         delete(stroke);
     }
 
-    void fillColor(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) const
+    void fillColor(uint8_t * r, uint8_t * g, uint8_t * b, uint8_t * a) const
     {
-        if (r) *r = color[0];
-        if (g) *g = color[1];
-        if (b) *b = color[2];
-        if (a) *a = color[3];
+        if(r) *r = color[0];
+        if(g) *g = color[1];
+        if(b) *b = color[2];
+        if(a) *a = color[3];
     }
 
     float strokeWidth() const
     {
-        if (!stroke) return 0;
+        if(!stroke) return 0;
         return stroke->width;
     }
 
     bool strokeTrim() const
     {
-        if (!stroke) return false;
-        if (stroke->trim.begin == 0.0f && stroke->trim.end == 1.0f) return false;
-        if (stroke->trim.begin == 1.0f && stroke->trim.end == 0.0f) return false;
+        if(!stroke) return false;
+        if(stroke->trim.begin == 0.0f && stroke->trim.end == 1.0f) return false;
+        if(stroke->trim.begin == 1.0f && stroke->trim.end == 0.0f) return false;
         return true;
     }
 
-    bool strokeColor(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) const
+    bool strokeColor(uint8_t * r, uint8_t * g, uint8_t * b, uint8_t * a) const
     {
-        if (!stroke) return false;
+        if(!stroke) return false;
 
-        if (r) *r = stroke->color[0];
-        if (g) *g = stroke->color[1];
-        if (b) *b = stroke->color[2];
-        if (a) *a = stroke->color[3];
+        if(r) *r = stroke->color[0];
+        if(g) *g = stroke->color[1];
+        if(b) *b = stroke->color[2];
+        if(a) *a = stroke->color[3];
 
         return true;
     }
 
-    const Fill* strokeFill() const
+    const Fill * strokeFill() const
     {
-        if (!stroke) return nullptr;
+        if(!stroke) return nullptr;
         return stroke->fill;
     }
 
-    uint32_t strokeDash(const float** dashPattern, float* offset) const
+    uint32_t strokeDash(const float ** dashPattern, float * offset) const
     {
-        if (!stroke) return 0;
-        if (dashPattern) *dashPattern = stroke->dashPattern;
-        if (offset) *offset = stroke->dashOffset;
+        if(!stroke) return 0;
+        if(dashPattern) *dashPattern = stroke->dashPattern;
+        if(offset) *offset = stroke->dashOffset;
         return stroke->dashCnt;
     }
 
     StrokeCap strokeCap() const
     {
-        if (!stroke) return StrokeCap::Square;
+        if(!stroke) return StrokeCap::Square;
         return stroke->cap;
     }
 
     StrokeJoin strokeJoin() const
     {
-        if (!stroke) return StrokeJoin::Bevel;
+        if(!stroke) return StrokeJoin::Bevel;
         return stroke->join;
     }
 
     float strokeMiterlimit() const
     {
-        if (!stroke) return 4.0f;
+        if(!stroke) return 4.0f;
 
         return stroke->miterlimit;;
     }
@@ -244,28 +235,31 @@ struct RenderShape
 
 class RenderMethod
 {
-public:
-    virtual ~RenderMethod() {}
-    virtual RenderData prepare(const RenderShape& rshape, RenderData data, const RenderTransform* transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag flags, bool clipper) = 0;
-    virtual RenderData prepare(const Array<RenderData>& scene, RenderData data, const RenderTransform* transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag flags) = 0;
-    virtual RenderData prepare(Surface* surface, const RenderMesh* mesh, RenderData data, const RenderTransform* transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag flags) = 0;
-    virtual bool preRender() = 0;
-    virtual bool renderShape(RenderData data) = 0;
-    virtual bool renderImage(RenderData data) = 0;
-    virtual bool postRender() = 0;
-    virtual bool dispose(RenderData data) = 0;
-    virtual RenderRegion region(RenderData data) = 0;
-    virtual RenderRegion viewport() = 0;
-    virtual bool viewport(const RenderRegion& vp) = 0;
-    virtual bool blend(BlendMethod method) = 0;
-    virtual ColorSpace colorSpace() = 0;
+    public:
+        virtual ~RenderMethod() {}
+        virtual RenderData prepare(const RenderShape & rshape, RenderData data, const RenderTransform * transform,
+                                   Array<RenderData> & clips, uint8_t opacity, RenderUpdateFlag flags, bool clipper) = 0;
+        virtual RenderData prepare(const Array<RenderData> & scene, RenderData data, const RenderTransform * transform,
+                                   Array<RenderData> & clips, uint8_t opacity, RenderUpdateFlag flags) = 0;
+        virtual RenderData prepare(Surface * surface, const RenderMesh * mesh, RenderData data,
+                                   const RenderTransform * transform, Array<RenderData> & clips, uint8_t opacity, RenderUpdateFlag flags) = 0;
+        virtual bool preRender() = 0;
+        virtual bool renderShape(RenderData data) = 0;
+        virtual bool renderImage(RenderData data) = 0;
+        virtual bool postRender() = 0;
+        virtual bool dispose(RenderData data) = 0;
+        virtual RenderRegion region(RenderData data) = 0;
+        virtual RenderRegion viewport() = 0;
+        virtual bool viewport(const RenderRegion & vp) = 0;
+        virtual bool blend(BlendMethod method) = 0;
+        virtual ColorSpace colorSpace() = 0;
 
-    virtual bool clear() = 0;
-    virtual bool sync() = 0;
+        virtual bool clear() = 0;
+        virtual bool sync() = 0;
 
-    virtual Compositor* target(const RenderRegion& region, ColorSpace cs) = 0;
-    virtual bool beginComposite(Compositor* cmp, CompositeMethod method, uint8_t opacity) = 0;
-    virtual bool endComposite(Compositor* cmp) = 0;
+        virtual Compositor * target(const RenderRegion & region, ColorSpace cs) = 0;
+        virtual bool beginComposite(Compositor * cmp, CompositeMethod method, uint8_t opacity) = 0;
+        virtual bool endComposite(Compositor * cmp) = 0;
 };
 
 static inline bool MASK_REGION_MERGING(CompositeMethod method)
@@ -305,7 +299,7 @@ static inline uint8_t CHANNEL_SIZE(ColorSpace cs)
     }
 }
 
-static inline ColorSpace COMPOSITE_TO_COLORSPACE(RenderMethod& renderer, CompositeMethod method)
+static inline ColorSpace COMPOSITE_TO_COLORSPACE(RenderMethod & renderer, CompositeMethod method)
 {
     switch(method) {
         case CompositeMethod::AlphaMask:

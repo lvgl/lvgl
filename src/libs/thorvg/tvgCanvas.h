@@ -29,14 +29,13 @@
 /* Internal Class Implementation                                        */
 /************************************************************************/
 
-struct Canvas::Impl
-{
-    list<Paint*> paints;
-    RenderMethod* renderer;
+struct Canvas::Impl {
+    list<Paint *> paints;
+    RenderMethod * renderer;
     bool refresh = false;   //if all paints should be updated by force.
     bool drawing = false;   //on drawing condition?
 
-    Impl(RenderMethod* pRenderer):renderer(pRenderer)
+    Impl(RenderMethod * pRenderer): renderer(pRenderer)
     {
     }
 
@@ -49,10 +48,10 @@ struct Canvas::Impl
     Result push(unique_ptr<Paint> paint)
     {
         //You can not push paints during rendering.
-        if (drawing) return Result::InsufficientCondition;
+        if(drawing) return Result::InsufficientCondition;
 
         auto p = paint.release();
-        if (!p) return Result::MemoryCorruption;
+        if(!p) return Result::MemoryCorruption;
         PP(p)->ref();
         paints.push_back(p);
 
@@ -62,13 +61,13 @@ struct Canvas::Impl
     Result clear(bool free)
     {
         //Clear render target before drawing
-        if (!renderer || !renderer->clear()) return Result::InsufficientCondition;
+        if(!renderer || !renderer->clear()) return Result::InsufficientCondition;
 
         //Free paints
-        if (free) {
-            for (auto paint : paints) {
+        if(free) {
+            for(auto paint : paints) {
                 P(paint)->unref();
-                if (paint->pImpl->dispose(*renderer) && P(paint)->refCnt == 0) {
+                if(paint->pImpl->dispose(*renderer) && P(paint)->refCnt == 0) {
                     delete(paint);
                 }
             }
@@ -84,27 +83,28 @@ struct Canvas::Impl
         refresh = true;
     }
 
-    Result update(Paint* paint, bool force)
+    Result update(Paint * paint, bool force)
     {
-        if (paints.empty() || drawing || !renderer) return Result::InsufficientCondition;
+        if(paints.empty() || drawing || !renderer) return Result::InsufficientCondition;
 
         Array<RenderData> clips;
         auto flag = RenderUpdateFlag::None;
-        if (refresh || force) flag = RenderUpdateFlag::All;
+        if(refresh || force) flag = RenderUpdateFlag::All;
 
         //Update single paint node
-        if (paint) {
+        if(paint) {
             //Optimize Me: Can we skip the searching?
-            for (auto paint2 : paints) {
-                if (paint2 == paint) {
+            for(auto paint2 : paints) {
+                if(paint2 == paint) {
                     paint->pImpl->update(*renderer, nullptr, clips, 255, flag);
                     return Result::Success;
                 }
             }
             return Result::InvalidArguments;
-        //Update all retained paint nodes
-        } else {
-            for (auto paint : paints) {
+            //Update all retained paint nodes
+        }
+        else {
+            for(auto paint : paints) {
                 paint->pImpl->update(*renderer, nullptr, clips, 255, flag);
             }
         }
@@ -116,14 +116,14 @@ struct Canvas::Impl
 
     Result draw()
     {
-        if (drawing || paints.empty() || !renderer || !renderer->preRender()) return Result::InsufficientCondition;
+        if(drawing || paints.empty() || !renderer || !renderer->preRender()) return Result::InsufficientCondition;
 
         bool rendered = false;
-        for (auto paint : paints) {
-            if (paint->pImpl->render(*renderer)) rendered = true;
+        for(auto paint : paints) {
+            if(paint->pImpl->render(*renderer)) rendered = true;
         }
 
-        if (!rendered || !renderer->postRender()) return Result::InsufficientCondition;
+        if(!rendered || !renderer->postRender()) return Result::InsufficientCondition;
 
         drawing = true;
 
@@ -132,9 +132,9 @@ struct Canvas::Impl
 
     Result sync()
     {
-        if (!drawing) return Result::InsufficientCondition;
+        if(!drawing) return Result::InsufficientCondition;
 
-        if (renderer->sync()) {
+        if(renderer->sync()) {
             drawing = false;
             return Result::Success;
         }
