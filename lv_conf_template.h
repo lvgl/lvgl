@@ -613,6 +613,9 @@
 /*GIF decoder library*/
 #define LV_USE_GIF 0
 
+/*Decode bin images to RAM*/
+#define LV_BIN_DECODER_RAM_LOAD 0
+
 /*QR code library*/
 #define LV_USE_QRCODE 0
 
