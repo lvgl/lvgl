@@ -62,7 +62,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     dsc_out->resolved_font = NULL;
 
     while(f) {
-        bool found = f->get_glyph_dsc(f, dsc_out, letter, letter_next);
+        bool found = f->get_glyph_dsc(f, dsc_out, letter, f->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
         if(found) {
             if(!dsc_out->is_placeholder) {
                 dsc_out->resolved_font = f;
@@ -79,7 +79,8 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 
 #if LV_USE_FONT_PLACEHOLDER
     if(placeholder_font != NULL) {
-        placeholder_font->get_glyph_dsc(placeholder_font, dsc_out, letter, letter_next);
+        placeholder_font->get_glyph_dsc(placeholder_font, dsc_out, letter,
+                                        placeholder_font->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
         dsc_out->resolved_font = placeholder_font;
         return true;
     }
@@ -117,6 +118,12 @@ uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32
     lv_font_glyph_dsc_t g;
     lv_font_get_glyph_dsc(font, &g, letter, letter_next);
     return g.adv_w;
+}
+
+void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning)
+{
+    LV_ASSERT_NULL(font);
+    font->kerning = kerning;
 }
 
 /**********************
