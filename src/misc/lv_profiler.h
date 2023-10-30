@@ -40,6 +40,8 @@ extern "C" {
 
 #define LV_PROFILER_BEGIN
 #define LV_PROFILER_END
+#define LV_PROFILER_BEGIN_TAG(tag) LV_UNUSED(tag)
+#define LV_PROFILER_END_TAG(tag)   LV_UNUSED(tag)
 
 #endif /*LV_USE_PROFILER*/
 

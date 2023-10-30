@@ -44,7 +44,8 @@ typedef struct {
     lv_coord_t w;          /*Width of the image (Handled by the library)*/
     lv_coord_t h;          /*Height of the image (Handled by the library)*/
     uint32_t rotation;    /*rotation angle of the image*/
-    uint32_t zoom;      /*256 means no zoom, 512 double size, 128 half size*/
+    uint32_t zoom_x;      /*256 means no zoom, 512 double size, 128 half size*/
+    uint32_t zoom_y;      /*256 means no zoom, 512 double size, 128 half size*/
     lv_point_t pivot;     /*rotation center of the image*/
     uint8_t src_type : 2;  /*See: lv_image_src_t*/
     uint8_t cf : 5;        /*Color format from `lv_color_format_t`*/
@@ -74,6 +75,20 @@ typedef _lv_image_size_mode_t lv_image_size_mode_t;
 #else
 typedef uint8_t lv_image_size_mode_t;
 #endif /*DOXYGEN*/
+
+#if LV_USE_OBJ_PROPERTY
+enum {
+    LV_PROPERTY_ID(IMAGE, SRC,        LV_PROPERTY_TYPE_POINTER,   0),
+    LV_PROPERTY_ID(IMAGE, OFFSET_X,   LV_PROPERTY_TYPE_INT,       1),
+    LV_PROPERTY_ID(IMAGE, OFFSET_Y,   LV_PROPERTY_TYPE_INT,       2),
+    LV_PROPERTY_ID(IMAGE, ROTATION,   LV_PROPERTY_TYPE_INT,       3),
+    LV_PROPERTY_ID(IMAGE, PIVOT,      LV_PROPERTY_TYPE_POINTER,   4),
+    LV_PROPERTY_ID(IMAGE, SCALE,      LV_PROPERTY_TYPE_INT,       5),
+    LV_PROPERTY_ID(IMAGE, ANTIALIAS,  LV_PROPERTY_TYPE_INT,       6),
+    LV_PROPERTY_ID(IMAGE, SIZE_MODE,  LV_PROPERTY_TYPE_INT,       7),
+    LV_PROPERTY_IMAGE_END,
+};
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -134,6 +149,14 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle);
  */
 void lv_image_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 
+/**
+ * Set pivot similar to get_pivot
+ */
+static inline void _lv_image_set_pivot(lv_obj_t * obj, lv_point_t * pivot)
+{
+    lv_image_set_pivot(obj, pivot->x, pivot->y);
+}
+
 
 /**
  * Set the zoom factor of the image.
@@ -147,6 +170,33 @@ void lv_image_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
  * @example 512 double size
  */
 void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom);
+
+/**
+ * Set the horizontal zoom factor of the image.
+ * Note that indexed and alpha only images can't be transformed.
+ * @param img       pointer to an image object
+ * @param zoom      the zoom factor.
+ * @example 256 or LV_ZOOM_IMAGE_NONE for no zoom
+ * @example <256: scale down
+ * @example >256 scale up
+ * @example 128 half size
+ * @example 512 double size
+ */
+void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom);
+
+/**
+ * Set the vertical zoom factor of the image.
+ * Note that indexed and alpha only images can't be transformed.
+ * @param img       pointer to an image object
+ * @param zoom      the zoom factor.
+ * @example 256 or LV_ZOOM_IMAGE_NONE for no zoom
+ * @example <256: scale down
+ * @example >256 scale up
+ * @example 128 half size
+ * @example 512 double size
+ */
+void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom);
+
 
 /**
  * Enable/disable anti-aliasing for the transformations (rotate, zoom) or not.
@@ -209,6 +259,20 @@ void lv_image_get_pivot(lv_obj_t * obj, lv_point_t * pivot);
  * @return          zoom factor (256: no zoom)
  */
 lv_coord_t lv_image_get_scale(lv_obj_t * obj);
+
+/**
+ * Get the horizontal zoom factor of the image.
+ * @param obj       pointer to an image object
+ * @return          zoom factor (256: no zoom)
+ */
+lv_coord_t lv_image_get_scale_x(lv_obj_t * obj);
+
+/**
+ * Get the vertical zoom factor of the image.
+ * @param obj       pointer to an image object
+ * @return          zoom factor (256: no zoom)
+ */
+lv_coord_t lv_image_get_scale_y(lv_obj_t * obj);
 
 /**
  * Get whether the transformations (rotate, zoom) are anti-aliased or not

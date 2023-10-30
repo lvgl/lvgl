@@ -124,8 +124,8 @@ const lv_image_dsc_t img_lv_demo_music_corner_right = {
     .header.always_zero = 0,
     .header.w = 32,
     .header.h = 32,
-    .data_size = 1024 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
-    .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
+    // .data_size = 1024 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
     .data = img_lv_demo_music_corner_right_map,
 };
 

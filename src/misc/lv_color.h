@@ -146,6 +146,7 @@ typedef _lv_color_format_t lv_color_format_t;
 typedef uint8_t lv_color_format_t;
 #endif /*DOXYGEN*/
 
+#define LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf) ((cf) >= LV_COLOR_FORMAT_A1 && (cf) <= LV_COLOR_FORMAT_A8)
 #define LV_COLOR_FORMAT_IS_INDEXED(cf) ((cf) >= LV_COLOR_FORMAT_I1 && (cf) <= LV_COLOR_FORMAT_I8)
 #define LV_COLOR_INDEXED_PALETTE_SIZE(cf) ((cf) == LV_COLOR_FORMAT_I1 ? 2 :\
                                            (cf) == LV_COLOR_FORMAT_I2 ? 4 :\

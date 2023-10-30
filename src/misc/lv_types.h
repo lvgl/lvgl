@@ -38,7 +38,6 @@ extern "C" {
 #define LV_OS_CMSIS_RTOS2   3
 #define LV_OS_CUSTOM        255
 
-
 #define LV_STDLIB_BUILTIN           0
 #define LV_STDLIB_CLIB              1
 #define LV_STDLIB_MICROPYTHON       2

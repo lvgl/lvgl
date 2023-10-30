@@ -69,6 +69,18 @@ You can make a timer repeat only a given number of times with
 automatically be deleted after it's called the defined number of times.
 Set the count to ``-1`` to repeat indefinitely.
 
+Enable and Disable
+******************
+
+You can enable or disable a timer with :cpp:expr:`lv_timer_enable(en)`.
+
+Pause and Resume
+****************
+
+:cpp:expr:`lv_timer_pause(timer)` pauses the specified timer.
+
+:cpp:expr:`lv_timer_resume(timer)` resumes the specified timer.
+
 Measure idle time
 *****************
 
@@ -77,6 +89,14 @@ You can get the idle percentage time of :cpp:func:`lv_timer_handler` with
 the overall system, only :cpp:func:`lv_timer_handler`. It can be misleading if
 you use an operating system and call :cpp:func:`lv_timer_handler` in a timer, as
 it won't actually measure the time the OS spends in an idle thread.
+
+Timer handler resume callback
+*****************************
+
+When the `lv_timer_handler` is stopped, if you want to pay attention to the wake-up
+timing of the `lv_timer_handler`, you can set a resume callback using
+:cpp:expr:`lv_timer_handler_set_resume_cb(cb, user_data)`.
+The callback should have a ``void (*lv_timer_handler_resume_cb_t)(void*)`` prototype.
 
 Asynchronous calls
 ******************

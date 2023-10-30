@@ -51,6 +51,10 @@ extern "C" {
 #include "multilang/lv_demo_multilang.h"
 #endif
 
+#if LV_USE_DEMO_RENDER
+#include "render/lv_demo_render.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

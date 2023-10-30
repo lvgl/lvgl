@@ -8,6 +8,9 @@
  *********************/
 
 #include "lv_nuttx_touchscreen.h"
+
+#if LV_USE_NUTTX
+
 #if LV_USE_NUTTX_TOUCHSCREEN
 
 #include <sys/types.h>
@@ -82,7 +85,7 @@ lv_indev_t * lv_nuttx_touchscreen_create(const char * dev_path)
 
 static void touchscreen_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
-    lv_nuttx_touchscreen_t * touchscreen = drv->user_data;
+    lv_nuttx_touchscreen_t * touchscreen = drv->driver_data;
     struct touch_sample_s sample;
 
     /* Read one sample */
@@ -132,9 +135,12 @@ static lv_indev_t * touchscreen_init(int fd)
     touchscreen->indev_drv = lv_indev_create();
     touchscreen->indev_drv->type = LV_INDEV_TYPE_POINTER;
     touchscreen->indev_drv->read_cb = touchscreen_read;
-    touchscreen->indev_drv->user_data = touchscreen;
+    touchscreen->indev_drv->driver_data = touchscreen;
+    touchscreen->indev_drv->user_data = (void *)(uintptr_t)fd;
 
     return touchscreen->indev_drv;
 }
 
 #endif /*LV_USE_NUTTX_TOUCHSCREEN*/
+
+#endif /* LV_USE_NUTTX*/

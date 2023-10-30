@@ -69,8 +69,9 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_BG_GRAD_DIR] = 0,
     [LV_STYLE_BG_MAIN_STOP] = 0,
     [LV_STYLE_BG_GRAD_STOP] = 0,
+    [LV_STYLE_BG_MAIN_OPA] = 0,
+    [LV_STYLE_BG_GRAD_OPA] = 0,
     [LV_STYLE_BG_GRAD] = 0,
-    [LV_STYLE_BG_DITHER_MODE] = 0,
 
     [LV_STYLE_BG_IMAGE_SRC] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
     [LV_STYLE_BG_IMAGE_OPA] = 0,
@@ -371,6 +372,8 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_TEXT_OPA:
         case LV_STYLE_IMAGE_OPA:
+        case LV_STYLE_BG_GRAD_OPA:
+        case LV_STYLE_BG_MAIN_OPA:
         case LV_STYLE_BG_IMAGE_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:

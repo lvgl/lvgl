@@ -112,7 +112,8 @@ void lv_image_buf_free(lv_image_dsc_t * dsc);
  * @param w width of the rectangle to transform
  * @param h height of the rectangle to transform
  * @param angle angle of rotation
- * @param zoom zoom, (256 no zoom)
+ * @param zoom_x zoom in x direction, (256 no zoom)
+ * @param zoom_y zoom in y direction, (256 no zoom)
  * @param pivot x,y pivot coordinates of rotation
  */
 void _lv_image_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, lv_coord_t angle, uint16_t zoom_x,

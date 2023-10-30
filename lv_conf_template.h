@@ -56,11 +56,6 @@
     #endif
 #endif  /*LV_USE_MALLOC == LV_STDLIB_BUILTIN*/
 
-
-#if LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN
-    #define LV_SPRINTF_USE_FLOAT 0
-#endif  /*LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN*/
-
 /*====================
    HAL SETTINGS
  *====================*/
@@ -266,20 +261,23 @@
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
-#define LV_GRADIENT_MAX_STOPS 2
+#define LV_GRADIENT_MAX_STOPS   2
 
 /* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
-#define LV_COLOR_MIX_ROUND_OFS 0
+#define LV_COLOR_MIX_ROUND_OFS  0
 
 /* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
-#define LV_OBJ_STYLE_CACHE 0
+#define LV_OBJ_STYLE_CACHE      0
 
 /* Add `id` field to `lv_obj_t` */
-#define LV_USE_OBJ_ID 0
+#define LV_USE_OBJ_ID           0
 
 /* Use lvgl builtin method for obj ID */
-#define LV_USE_OBJ_ID_BUILTIN 0
+#define LV_USE_OBJ_ID_BUILTIN   0
+
+/*Use obj property set/get API*/
+#define LV_USE_OBJ_PROPERTY 0
 
 /*=====================
  *  COMPILER SETTINGS
@@ -319,6 +317,9 @@
 
 /*Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates instead of int16_t*/
 #define LV_USE_LARGE_COORD 0
+
+/* Use `float` as `lv_value_precise_t` */
+#define LV_USE_FLOAT            0
 
 /*==================
  *   FONT USAGE
@@ -611,6 +612,9 @@
 /*GIF decoder library*/
 #define LV_USE_GIF 0
 
+/*Decode bin images to RAM*/
+#define LV_BIN_DECODER_RAM_LOAD 0
+
 /*QR code library*/
 #define LV_USE_QRCODE 0
 
@@ -679,10 +683,16 @@
     #define LV_PROFILER_INCLUDE "lvgl/src/misc/lv_profiler_builtin.h"
 
     /*Profiler start point function*/
-    #define LV_PROFILER_BEGIN   LV_PROFILER_BUILTIN_BEGIN
+    #define LV_PROFILER_BEGIN    LV_PROFILER_BUILTIN_BEGIN
 
     /*Profiler end point function*/
-    #define LV_PROFILER_END     LV_PROFILER_BUILTIN_END
+    #define LV_PROFILER_END      LV_PROFILER_BUILTIN_END
+
+    /*Profiler start point function with custom tag*/
+    #define LV_PROFILER_BEGIN_TAG LV_PROFILER_BUILTIN_BEGIN_TAG
+
+    /*Profiler end point function with custom tag*/
+    #define LV_PROFILER_END_TAG   LV_PROFILER_BUILTIN_END_TAG
 #endif
 
 /*1: Enable Monkey test*/
@@ -762,18 +772,23 @@
 /*Use Nuttx to open window and handle touchscreen*/
 #define LV_USE_NUTTX    0
 
-/*Use Nuttx custom init API to open window and handle touchscreen*/
-#define LV_USE_NUTTX_CUSTOM_INIT    0
+#if LV_USE_NUTTX
+    #define LV_USE_NUTTX_LIBUV    0
 
-/*Driver for /dev/lcd*/
-#define LV_USE_NUTTX_LCD      0
-#if LV_USE_NUTTX_LCD
-    #define LV_NUTTX_LCD_BUFFER_COUNT    0
-    #define LV_NUTTX_LCD_BUFFER_SIZE     60
+    /*Use Nuttx custom init API to open window and handle touchscreen*/
+    #define LV_USE_NUTTX_CUSTOM_INIT    0
+
+    /*Driver for /dev/lcd*/
+    #define LV_USE_NUTTX_LCD      0
+    #if LV_USE_NUTTX_LCD
+        #define LV_NUTTX_LCD_BUFFER_COUNT    0
+        #define LV_NUTTX_LCD_BUFFER_SIZE     60
+    #endif
+
+    /*Driver for /dev/input*/
+    #define LV_USE_NUTTX_TOUCHSCREEN    0
+
 #endif
-
-/*Driver for /dev/input*/
-#define LV_USE_NUTTX_TOUCHSCREEN    0
 
 /*Driver for /dev/dri/card*/
 #define LV_USE_LINUX_DRM        0
@@ -806,10 +821,9 @@
 
 /*Benchmark your system*/
 #define LV_USE_DEMO_BENCHMARK 0
-#if LV_USE_DEMO_BENCHMARK
-    /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-    #define LV_DEMO_BENCHMARK_RGB565A8 0
-#endif
+
+/*Render test for each primitives. Requires at least 480x272 display*/
+#define LV_USE_DEMO_RENDER 0
 
 /*Stress test for LVGL*/
 #define LV_USE_DEMO_STRESS 0

@@ -118,8 +118,8 @@ const lv_image_dsc_t img_lv_demo_music_icon_1 = {
     .header.always_zero = 0,
     .header.w = 30,
     .header.h = 30,
-    .data_size = 900 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
-    .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
+    // .data_size = 900 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
     .data = img_lv_demo_music_icon_1_map,
 };
 

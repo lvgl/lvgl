@@ -178,26 +178,26 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
     event_cnt = 0;
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
-    lv_test_indev_wait(50);
+    lv_test_indev_wait(500);
     lv_test_mouse_release();
     lv_test_indev_wait(50);
 
     TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
-    TEST_ASSERT_EQUAL_UINT32(lv_arc_get_value(arc), lv_arc_get_min_value(arc));
+    TEST_ASSERT_EQUAL_INT32(lv_arc_get_min_value(arc), lv_arc_get_value(arc));
 
     /* Click close to end angle */
     event_cnt = 0;
 
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
-    lv_test_indev_wait(50);
+    lv_test_indev_wait(500);
     lv_test_mouse_move_to(415, 281);
-    lv_test_indev_wait(50);
+    lv_test_indev_wait(500);
     lv_test_mouse_release();
     lv_test_indev_wait(50);
 
     TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
-    TEST_ASSERT_NOT_EQUAL_UINT32(lv_arc_get_value(arc), lv_arc_get_max_value(arc));
+    TEST_ASSERT_EQUAL_INT32(lv_arc_get_min_value(arc), lv_arc_get_value(arc));
 
     TEST_ASSERT_EQUAL_SCREENSHOT("arc_2.png");
 }

@@ -13,7 +13,8 @@
 #include <time.h>
 #include <nuttx/tls.h>
 #include <syslog.h>
-#include <lvgl/lvgl.h>
+
+#include "../../../lvgl.h"
 
 /*********************
  *      DEFINES
@@ -44,20 +45,12 @@ static void syslog_print(lv_log_level_t level, const char * buf);
 
 #if LV_ENABLE_GLOBAL_CUSTOM
 
-/****************************************************************************
- * Name: lv_global_free
- ****************************************************************************/
-
 static void lv_global_free(void * data)
 {
     if(data) {
         free(data);
     }
 }
-
-/****************************************************************************
- * Name: lv_global_default
- ****************************************************************************/
 
 lv_global_t * lv_global_default(void)
 {
@@ -79,46 +72,50 @@ lv_global_t * lv_global_default(void)
 }
 #endif
 
-void lv_nuttx_info_init(lv_nuttx_t * info)
+void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
 {
-    lv_memzero(info, sizeof(lv_nuttx_t));
-    info->fb_path = "/dev/fb0";
-    info->input_path = "/dev/input0";
+    lv_memzero(dsc, sizeof(lv_nuttx_dsc_t));
+    dsc->fb_path = "/dev/fb0";
+    dsc->input_path = "/dev/input0";
 }
 
-lv_display_t * lv_nuttx_init(const lv_nuttx_t * info)
+void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 {
-    lv_display_t * disp = NULL;
-
     lv_log_register_print_cb(syslog_print);
     lv_tick_set_cb(millis);
 
 #if !LV_USE_NUTTX_CUSTOM_INIT
 
-    if(info && info->fb_path) {
+    if(dsc && dsc->fb_path) {
+        lv_display_t * disp = NULL;
+
 #if LV_USE_NUTTX_LCD
-        disp = lv_nuttx_lcd_create(info->fb_path);
+        disp = lv_nuttx_lcd_create(dsc->fb_path);
 #else
         disp = lv_nuttx_fbdev_create();
-        if(lv_nuttx_fbdev_set_file(disp, info->fb_path) != 0) {
+        if(lv_nuttx_fbdev_set_file(disp, dsc->fb_path) != 0) {
             lv_display_remove(disp);
             disp = NULL;
         }
 #endif
+        if(result) {
+            result->disp = disp;
+        }
     }
 
-    if(info && info->input_path) {
+    if(dsc && dsc->input_path) {
 #if LV_USE_NUTTX_TOUCHSCREEN
-        lv_nuttx_touchscreen_create(info->input_path);
+        lv_indev_t * indev = lv_nuttx_touchscreen_create(dsc->input_path);
+        if(result) {
+            result->indev = indev;
+        }
 #endif
     }
 
 #else
 
-    disp = lv_nuttx_init_custom(info);
+    lv_nuttx_init_custom(dsc, result);
 #endif
-
-    return disp;
 }
 
 /**********************

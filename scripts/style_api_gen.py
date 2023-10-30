@@ -145,13 +145,17 @@ props = [
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the point from which the background's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
 
+{'name': 'BG_MAIN_OPA',
+ 'style_type': 'num',   'var_type': 'lv_opa_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the opacity of the first gradient color"},
+
+{'name': 'BG_GRAD_OPA',
+ 'style_type': 'num',   'var_type': 'lv_opa_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the opacity of the second gradient color"},
+
 {'name': 'BG_GRAD',
  'style_type': 'ptr',   'var_type': 'const lv_grad_dsc_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the gradient definition. The pointed instance must exist while the object is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors too."},
-
-{'name': 'BG_DITHER_MODE',
- 'style_type': 'num',   'var_type': 'lv_dither_mode_t',  'default':'`LV_DITHER_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the dithering mode of the gradient of the background. The possible values are `LV_DITHER_NONE/ORDERED/ERR_DIFF`."},
+ 'dsc': "Set the gradient definition. The pointed instance must exist while the object is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors too. If it's set other gradient related properties will be ignored'"},
 
 {'name': 'BG_IMAGE_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,

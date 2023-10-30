@@ -550,6 +550,11 @@ menu "LVGL configuration"
 				string "Header to include for the custom 'lv_global' function"
 				depends on LV_ENABLE_GLOBAL_CUSTOM
 				default "lv_global.h"
+
+			config LV_BIN_DECODER_RAM_LOAD
+				bool "Decode whole image to RAM for bin decoder"
+				default n
+
 		endmenu
 
 		menu "Compiler settings"
@@ -1267,6 +1272,11 @@ menu "LVGL configuration"
 
 		config LV_USE_NUTTX
 			bool "Use Nuttx to open window and handle touchscreen"
+			default n
+
+		config LV_USE_NUTTX_LIBUV
+			bool "Use uv loop to replace default timer loop and other fb/indev timers"
+			depends on LV_USE_NUTTX
 			default n
 
 		config LV_USE_NUTTX_CUSTOM_INIT
