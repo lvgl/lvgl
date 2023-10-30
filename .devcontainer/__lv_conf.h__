@@ -324,19 +324,6 @@
 /*=====================
  *  COMPILER SETTINGS
  *====================*/
-/*
-* CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not work for global data.
-* To avoid linker errors with MSVC we need to decorate global data with decls specs
-*/
-#ifdef _MSC_VER
-  #ifdef LV_INSIDE_DLL
-    #define LV_ATTRIBUTE_EXTERN  __declspec(dllexport) extern
-  #else
-    #define LV_ATTRIBUTE_EXTERN  __declspec(dllimport) extern
-  #endif //LV_INSIDE_DLL
-#else
-  #define LV_ATTRIBUTE_EXTERN extern
-#endif //_MSC_VER
 
 /*For big endian systems set to 1*/
 #define LV_BIG_ENDIAN_SYSTEM 0

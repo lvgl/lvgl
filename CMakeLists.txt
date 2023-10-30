@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.12.4)
 
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 if(NOT ESP_PLATFORM)
   project(lvgl HOMEPAGE_URL https://github.com/lvgl/lvgl)
 endif()
@@ -18,6 +20,6 @@ endif()
 
 if(MSVC)
   if (BUILD_SHARED_LIBS)
-    target_compile_definitions(lvgl PRIVATE LV_INSIDE_DLL)
+    target_compile_definitions(lvgl PRIVATE LV_ATTRIBUTE_EXTERN_DATA)
   endif()
 endif()
