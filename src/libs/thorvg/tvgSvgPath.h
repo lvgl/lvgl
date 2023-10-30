@@ -25,6 +25,6 @@
 
 #include "tvgCommon.h"
 
-bool svgPathToTvgPath(const char * svgPath, Array<PathCommand> & cmds, Array<Point> & pts);
+bool svgPathToTvgPath(const char* svgPath, Array<PathCommand>& cmds, Array<Point>& pts);
 
 #endif //_TVG_SVG_PATH_H_

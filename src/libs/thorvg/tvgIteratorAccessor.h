@@ -30,12 +30,12 @@ namespace tvg
 
 class IteratorAccessor
 {
-    public:
-        //Utility Method: Iterator Accessor
-        static Iterator * iterator(const Paint * paint)
-        {
-            return paint->pImpl->iterator();
-        }
+public:
+    //Utility Method: Iterator Accessor
+    static Iterator* iterator(const Paint* paint)
+    {
+        return paint->pImpl->iterator();
+    }
 };
 
 }

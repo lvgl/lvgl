@@ -30,11 +30,11 @@ namespace tvg
 
 class SaveModule
 {
-    public:
-        virtual ~SaveModule() {}
+public:
+    virtual ~SaveModule() {}
 
-        virtual bool save(Paint * paint, const string & path, bool compress) = 0;
-        virtual bool close() = 0;
+    virtual bool save(Paint* paint, const string& path, bool compress) = 0;
+    virtual bool close() = 0;
 };
 
 }

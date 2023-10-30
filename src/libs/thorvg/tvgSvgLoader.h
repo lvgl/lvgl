@@ -28,41 +28,41 @@
 
 class SvgLoader : public LoadModule, public Task
 {
-    public:
-        string filePath;
-        string svgPath = "";
-        const char * content = nullptr;
-        uint32_t size = 0;
+public:
+    string filePath;
+    string svgPath = "";
+    const char* content = nullptr;
+    uint32_t size = 0;
 
-        SvgLoaderData loaderData;
-        unique_ptr<Scene> root;
+    SvgLoaderData loaderData;
+    unique_ptr<Scene> root;
 
-        bool copy = false;
+    bool copy = false;
 
-        SvgLoader();
-        ~SvgLoader();
+    SvgLoader();
+    ~SvgLoader();
 
-        using LoadModule::open;
-        bool open(const string & path) override;
-        bool open(const char * data, uint32_t size, bool copy) override;
-        bool resize(Paint * paint, float w, float h) override;
-        bool read() override;
-        bool close() override;
+    using LoadModule::open;
+    bool open(const string& path) override;
+    bool open(const char* data, uint32_t size, bool copy) override;
+    bool resize(Paint* paint, float w, float h) override;
+    bool read() override;
+    bool close() override;
 
-        unique_ptr<Paint> paint() override;
+    unique_ptr<Paint> paint() override;
 
-    private:
-        SvgViewFlag viewFlag = SvgViewFlag::None;
-        AspectRatioAlign align = AspectRatioAlign::XMidYMid;
-        AspectRatioMeetOrSlice meetOrSlice = AspectRatioMeetOrSlice::Meet;
-        float vx = 0;
-        float vy = 0;
-        float vw = 0;
-        float vh = 0;
+private:
+    SvgViewFlag viewFlag = SvgViewFlag::None;
+    AspectRatioAlign align = AspectRatioAlign::XMidYMid;
+    AspectRatioMeetOrSlice meetOrSlice = AspectRatioMeetOrSlice::Meet;
+    float vx = 0;
+    float vy = 0;
+    float vw = 0;
+    float vh = 0;
 
-        bool header();
-        void clear(bool all = true);
-        void run(unsigned tid) override;
+    bool header();
+    void clear(bool all = true);
+    void run(unsigned tid) override;
 };
 
 
