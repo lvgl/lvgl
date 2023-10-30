@@ -68,7 +68,7 @@ static inline void lv_global_init(lv_global_t * global)
         return;
     }
 
-    lv_memset(global, 0, sizeof(lv_global_t));
+    lv_memzero(global, sizeof(lv_global_t));
 
     _lv_ll_init(&(global->disp_ll), sizeof(lv_display_t));
     _lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));

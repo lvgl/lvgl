@@ -42,10 +42,9 @@ static uint32_t keycode_to_ctrl_key(SDL_Keycode sdl_key);
 
 lv_indev_t * lv_sdl_keyboard_create(void)
 {
-    lv_sdl_keyboard_t * dsc = lv_malloc(sizeof(lv_sdl_keyboard_t));
+    lv_sdl_keyboard_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_keyboard_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_sdl_keyboard_t));
 
     lv_indev_t * indev = lv_indev_create();
     LV_ASSERT_MALLOC(indev);

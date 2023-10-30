@@ -38,10 +38,9 @@ typedef struct {
 
 lv_indev_t * lv_sdl_mousewheel_create(void)
 {
-    lv_sdl_mousewheel_t * dsc = lv_malloc(sizeof(lv_sdl_mousewheel_t));
+    lv_sdl_mousewheel_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_mousewheel_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_sdl_mousewheel_t));
 
     lv_indev_t * indev = lv_indev_create();
     if(indev == NULL) {

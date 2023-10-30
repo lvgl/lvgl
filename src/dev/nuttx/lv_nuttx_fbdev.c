@@ -64,10 +64,9 @@ static void _display_refr_timer_cb(lv_timer_t * tmr);
 
 lv_display_t * lv_nuttx_fbdev_create(void)
 {
-    lv_nuttx_fb_t * dsc = lv_malloc(sizeof(lv_nuttx_fb_t));
+    lv_nuttx_fb_t * dsc = lv_malloc_zeroed(sizeof(lv_nuttx_fb_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_nuttx_fb_t));
 
     lv_display_t * disp = lv_display_create(800, 480);
     if(disp == NULL) {
@@ -154,7 +153,7 @@ static void _display_refr_timer_cb(lv_timer_t * tmr)
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
     struct pollfd pfds[1];
 
-    lv_memset(pfds, 0, sizeof(pfds));
+    lv_memzero(pfds, sizeof(pfds));
     pfds[0].fd = dsc->fd;
     pfds[0].events = POLLOUT;
 
@@ -250,7 +249,7 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
     struct fb_planeinfo_s pinfo;
     int ret;
 
-    lv_memset(&pinfo, 0, sizeof(pinfo));
+    lv_memzero(&pinfo, sizeof(pinfo));
 
     /* Get display[1] planeinfo */
 
