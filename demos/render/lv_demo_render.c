@@ -737,7 +737,7 @@ static scene_dsc_t scenes[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_render(uint32_t idx, lv_opa_t opa)
+void lv_demo_render(lv_demo_render_scene_t id, lv_opa_t opa)
 {
     lv_obj_t * scr = lv_screen_active();
     lv_obj_clean(scr);
@@ -758,7 +758,7 @@ void lv_demo_render(uint32_t idx, lv_opa_t opa)
 
     opa_saved = opa;
 
-    if(scenes[idx].create_cb) scenes[idx].create_cb(main_parent);
+    if(scenes[id].create_cb) scenes[id].create_cb(main_parent);
 }
 
 
