@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgSwCommon.h"
 #include "tvgMath.h"
 #include "tvgBezier.h"
@@ -89,7 +92,7 @@ static void _outlineCubicTo(SwOutline& outline, const Point* ctrl1, const Point*
     outline.types.push(SW_CURVE_TYPE_CUBIC);
 
     outline.pts.push(mathTransform(ctrl2, transform));
-    outline.types.push(SW_CURVE_TYPE_CUBIC);    
+    outline.types.push(SW_CURVE_TYPE_CUBIC);
 
     outline.pts.push(mathTransform(to, transform));
     outline.types.push(SW_CURVE_TYPE_POINT);
@@ -678,3 +681,6 @@ void shapeDelStrokeFill(SwShape* shape)
     fillFree(shape->stroke->fill);
     shape->stroke->fill = nullptr;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

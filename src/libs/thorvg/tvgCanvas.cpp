@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgCanvas.h"
 
 /************************************************************************/
@@ -85,3 +88,6 @@ Result Canvas::sync() noexcept
 {
     return pImpl->sync();
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

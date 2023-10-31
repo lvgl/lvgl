@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 /*
  * Copyright notice for the EFL:
 
@@ -553,3 +556,6 @@ bool svgPathToTvgPath(const char* svgPath, Array<PathCommand>& cmds, Array<Point
 
     return true;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include <cstring>
 #include <ctype.h>
 #include <string>
@@ -583,3 +586,6 @@ const char* simpleXmlFindAttributesTag(const char* buf, unsigned bufLength)
 
     return nullptr;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

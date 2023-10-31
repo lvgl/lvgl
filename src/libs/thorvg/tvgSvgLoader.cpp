@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 /*
  * Copyright notice for the EFL:
 
@@ -388,7 +391,7 @@ static char* _idFromUrl(const char* url)
 
     int i = 0;
     while (url[i] > ' ' && url[i] != ')' && url[i] != '\'') ++i;
-    
+
     return strDuplicate(url, i);
 }
 
@@ -3751,3 +3754,6 @@ unique_ptr<Paint> SvgLoader::paint()
     this->done();
     return std::move(root);
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include <deque>
 #include <thread>
 #include <vector>
@@ -201,3 +204,6 @@ void TaskScheduler::async(bool on)
 {
     _async = on;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

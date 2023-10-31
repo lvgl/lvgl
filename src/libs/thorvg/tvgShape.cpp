@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgMath.h"
 #include "tvgShape.h"
 
@@ -408,3 +411,6 @@ FillRule Shape::fillRule() const noexcept
 {
     return pImpl->rs.rule;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

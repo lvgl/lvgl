@@ -15,6 +15,9 @@
 *
 */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef __THORVG_CAPI_H__
 #define __THORVG_CAPI_H__
 
@@ -2320,3 +2323,6 @@ TVG_API Tvg_Result tvg_animation_del(Tvg_Animation* animation);
 #endif
 
 #endif //_THORVG_CAPI_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

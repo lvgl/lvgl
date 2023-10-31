@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgCommon.h"
 #include "tvgTaskScheduler.h"
 #include "tvgLoader.h"
@@ -176,4 +179,7 @@ uint16_t THORVG_VERSION_NUMBER()
 {
     return _version;
 }
+
+
+#endif /* LV_USE_THORVG_INTERNAL */
 

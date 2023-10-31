@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgLoader.h"
 
 #ifdef THORVG_SVG_LOADER_SUPPORT
@@ -247,3 +250,6 @@ shared_ptr<LoadModule> LoaderMgr::loader(const uint32_t *data, uint32_t w, uint3
 
     return nullptr;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

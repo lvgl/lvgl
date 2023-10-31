@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgSwCommon.h"
 
 
@@ -127,3 +130,6 @@ bool mpoolTerm(SwMpool* mpool)
 
     return true;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

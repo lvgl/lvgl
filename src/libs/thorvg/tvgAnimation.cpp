@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgCommon.h"
 #include "tvgFrameModule.h"
 #include "tvgPaint.h"
@@ -117,3 +120,6 @@ unique_ptr<Animation> Animation::gen() noexcept
 {
     return unique_ptr<Animation>(new Animation);
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

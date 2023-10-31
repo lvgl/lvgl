@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgPicture.h"
 
 /************************************************************************/
@@ -145,3 +148,6 @@ uint32_t Picture::mesh(const Polygon** triangles) const noexcept
     if (triangles) *triangles = pImpl->rm.triangles;
     return pImpl->rm.triangleCnt;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

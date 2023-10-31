@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 /*
  * Lempel–Ziv–Welch (LZW) encoder/decoder by Guilherme R. Lampert(guilherme.ronaldo.lampert@gmail.com)
 
@@ -473,3 +476,6 @@ size_t b64Decode(const char* encoded, const size_t len, char** decoded)
 
 
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

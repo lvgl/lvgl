@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgCanvas.h"
 
 #ifdef THORVG_SW_RASTER_SUPPORT
@@ -104,3 +107,6 @@ unique_ptr<SwCanvas> SwCanvas::gen() noexcept
 #endif
     return nullptr;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

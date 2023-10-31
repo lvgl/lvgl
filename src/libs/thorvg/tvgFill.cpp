@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgFill.h"
 
 /************************************************************************/
@@ -247,4 +250,7 @@ uint32_t LinearGradient::identifier() noexcept
 {
     return TVG_CLASS_ID_LINEAR;
 }
+
+
+#endif /* LV_USE_THORVG_INTERNAL */
 

@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgCommon.h"
 #include "tvgSaveModule.h"
 
@@ -139,3 +142,6 @@ unique_ptr<Saver> Saver::gen() noexcept
 {
     return unique_ptr<Saver>(new Saver);
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

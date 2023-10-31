@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgMath.h"
 #include "tvgBezier.h"
 
@@ -191,3 +194,6 @@ float bezAngleAt(const Bezier& bz, float t)
 
 
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

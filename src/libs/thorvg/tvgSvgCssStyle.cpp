@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgSvgCssStyle.h"
 
 #include <cstring>
@@ -247,3 +250,6 @@ void cssApplyStyleToPostponeds(Array<SvgNodeIdPair>& postponeds, SvgNode* style)
         }
     }
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

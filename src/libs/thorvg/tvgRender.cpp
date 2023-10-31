@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgMath.h"
 #include "tvgRender.h"
 
@@ -67,3 +70,6 @@ RenderTransform::RenderTransform(const RenderTransform* lhs, const RenderTransfo
 {
     m = mathMultiply(&lhs->m, &rhs->m);
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

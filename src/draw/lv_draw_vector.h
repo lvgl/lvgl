@@ -178,7 +178,7 @@ void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * matrix2);
 lv_vector_path_t * lv_vector_path_create(lv_vector_path_quality_t quality);
 void lv_vector_path_copy(lv_vector_path_t * target_path, const lv_vector_path_t * path);
 void lv_vector_path_clear(lv_vector_path_t * path);
-void lv_vector_path_destroy(lv_vector_path_t * path);
+void lv_vector_path_delete(lv_vector_path_t * path);
 
 void lv_vector_path_move_to(lv_vector_path_t * path, const lv_fpoint_t * p);
 void lv_vector_path_line_to(lv_vector_path_t * path, const lv_fpoint_t * p);
@@ -194,7 +194,7 @@ void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t 
 
 /* draw dsc property functions */
 lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer);
-void lv_vector_dsc_destroy(lv_vector_dsc_t * dsc);
+void lv_vector_dsc_delete(lv_vector_dsc_t * dsc);
 
 void lv_vector_dsc_set_transform(lv_vector_dsc_t * dsc, const lv_matrix_t * matrix);
 void lv_vector_dsc_set_blend_mode(lv_vector_dsc_t * dsc, lv_vector_blend_t blend);
@@ -230,9 +230,9 @@ void lv_vector_dsc_translate(lv_vector_dsc_t * dsc, float tx, float ty);
 void lv_vector_dsc_skew(lv_vector_dsc_t * dsc, float skew_x, float skew_y);
 
 /* draw functions */
-void lv_vector_add(lv_vector_dsc_t * dsc, const lv_vector_path_t * path);
+void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path);
 void lv_vector_clear(lv_vector_dsc_t * dsc, const lv_area_t * rect);
-void lv_vector_draw(lv_vector_dsc_t * dsc);
+void lv_draw_vector(lv_vector_dsc_t * dsc);
 
 /* Traverser for task list */
 typedef void (*vector_draw_task_cb)(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);

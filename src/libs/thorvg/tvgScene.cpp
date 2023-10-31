@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include "tvgScene.h"
 
 /************************************************************************/
@@ -80,3 +83,6 @@ list<Paint*>& Scene::paints() noexcept
 {
     return pImpl->paints;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

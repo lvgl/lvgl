@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include <string.h>
 #include <math.h>
 #include "tvgSwCommon.h"
@@ -907,3 +910,6 @@ SwOutline* strokeExportOutline(SwStroke* stroke, SwMpool* mpool, unsigned tid)
 
     return outline;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

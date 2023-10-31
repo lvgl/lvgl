@@ -221,7 +221,7 @@ void lv_vector_path_clear(lv_vector_path_t * path)
     lv_array_clear(&path->points);
 }
 
-void lv_vector_path_destroy(lv_vector_path_t * path)
+void lv_vector_path_delete(lv_vector_path_t * path)
 {
     lv_array_destroy(&path->ops);
     lv_array_destroy(&path->points);
@@ -483,7 +483,7 @@ lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer)
     return dsc;
 }
 
-void lv_vector_dsc_destroy(lv_vector_dsc_t * dsc)
+void lv_vector_dsc_delete(lv_vector_dsc_t * dsc)
 {
     if(dsc->tasks.task_list) {
         lv_ll_t * task_list = dsc->tasks.task_list;
@@ -635,7 +635,7 @@ void lv_vector_dsc_set_stroke_radial_gradient(lv_vector_dsc_t * dsc, const lv_gr
 }
 
 /* draw functions */
-void lv_vector_add(lv_vector_dsc_t * dsc, const lv_vector_path_t * path)
+void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path)
 {
     lv_area_t rect;
     if(!_lv_area_intersect(&rect, &(dsc->layer->clip_area), &(dsc->current_dsc.scissor_area))) {
@@ -683,7 +683,7 @@ void lv_vector_clear(lv_vector_dsc_t * dsc, const lv_area_t * rect)
     lv_area_copy(&(new_task->dsc.scissor_area), rect);
 }
 
-void lv_vector_draw(lv_vector_dsc_t * dsc)
+void lv_draw_vector(lv_vector_dsc_t * dsc)
 {
     if(!dsc->tasks.task_list) {
         return;
@@ -739,7 +739,7 @@ void _lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb 
         }
 
         if(task->path) {
-            lv_vector_path_destroy(task->path);
+            lv_vector_path_delete(task->path);
         }
         lv_array_destroy(&(task->dsc.stroke_dsc.dash_pattern));
 

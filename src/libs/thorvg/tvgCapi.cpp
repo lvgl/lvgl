@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #include <string>
 #include <thorvg.h>
 #include "thorvg_capi.h"
@@ -30,7 +33,6 @@ using namespace tvg;
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /************************************************************************/
 /* Engine API                                                           */
@@ -730,8 +732,9 @@ TVG_API Tvg_Animation* tvg_animation_new()
 
 TVG_API Tvg_Result tvg_animation_set_frame(Tvg_Animation* animation, uint32_t no)
 {
-    if (!animation) return TVG_RESULT_INVALID_ARGUMENT;
-    return (Tvg_Result) reinterpret_cast<Animation*>(animation)->frame(no);
+    return TVG_RESULT_INVALID_ARGUMENT;
+//    if (!animation) return TVG_RESULT_INVALID_ARGUMENT;
+//    return (Tvg_Result) reinterpret_cast<Animation*>(animation)->frame(no);
 }
 
 
@@ -776,3 +779,6 @@ TVG_API Tvg_Result tvg_animation_del(Tvg_Animation* animation)
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* LV_USE_THORVG_INTERNAL */
+
