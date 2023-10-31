@@ -1282,7 +1282,7 @@ static void ta_event_cb(lv_event_t * e)
     lv_obj_t * ta = lv_event_get_target(e);
     lv_obj_t * kb = lv_event_get_user_data(e);
     if(code == LV_EVENT_FOCUSED) {
-        if(lv_indev_get_type(lv_indev_get_act()) != LV_INDEV_TYPE_KEYPAD) {
+        if(lv_indev_get_type(lv_indev_active()) != LV_INDEV_TYPE_KEYPAD) {
             lv_keyboard_set_textarea(kb, ta);
             lv_obj_set_style_max_height(kb, LV_HOR_RES * 2 / 3, 0);
             lv_obj_update_layout(tv);   /*Be sure the sizes are recalculated*/
@@ -1312,7 +1312,7 @@ static void birthday_event_cb(lv_event_t * e)
     lv_obj_t * ta = lv_event_get_target(e);
 
     if(code == LV_EVENT_FOCUSED) {
-        if(lv_indev_get_type(lv_indev_get_act()) == LV_INDEV_TYPE_POINTER) {
+        if(lv_indev_get_type(lv_indev_active()) == LV_INDEV_TYPE_POINTER) {
             if(calendar == NULL) {
                 lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
                 calendar = lv_calendar_create(lv_layer_top());
@@ -1648,10 +1648,10 @@ static void slideshow_anim_ready_cb(lv_anim_t * a_old)
     LV_UNUSED(a_old);
 
     lv_obj_t * cont = lv_tabview_get_content(tv);
-    uint32_t tab_id = lv_tabview_get_tab_act(tv);
+    uint32_t tab_id = lv_tabview_get_tab_active(tv);
     tab_id += 1;
     if(tab_id > 2) tab_id = 0;
-    lv_tabview_set_act(tv, tab_id, LV_ANIM_ON);
+    lv_tabview_set_active(tv, tab_id, LV_ANIM_ON);
 
     lv_obj_t * tab = lv_obj_get_child(cont, tab_id);
     lv_obj_scroll_to_y(tab, 0, LV_ANIM_OFF);

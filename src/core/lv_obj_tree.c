@@ -436,7 +436,7 @@ static void obj_delete_core(lv_obj_t * obj)
             }
         }
 
-        if(indev->group == group && obj == lv_indev_get_obj_act()) {
+        if(indev->group == group && obj == lv_indev_get_active_obj()) {
             lv_indev_reset(indev, obj);
         }
         indev = lv_indev_get_next(indev);

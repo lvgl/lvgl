@@ -102,6 +102,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_obj_clear_flag                lv_obj_remove_flag
 #define lv_obj_clear_state               lv_obj_remove_state
 
+#define lv_indev_get_act                 lv_indev_active
 #define lv_scr_act                       lv_screen_active
 #define lv_disp_create                   lv_display_create
 #define lv_disp_remove                   lv_display_remove
@@ -206,6 +207,10 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_btnmatrix_get_one_checked         lv_buttonmatrix_get_one_checked
 
 #define lv_tabview_get_tab_btns              lv_tabview_get_tab_buttons
+#define lv_tabview_get_act                   lv_tabview_get_active
+#define lv_tabview_set_act                   lv_tabview_set_active
+
+#define lv_tileview_get_tile_act             lv_tileview_get_tile_active
 
 #define lv_msgbox_get_btns                   lv_msgbox_get_buttons
 

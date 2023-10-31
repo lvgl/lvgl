@@ -5,7 +5,7 @@ static void drag_event_handler(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
 
-    lv_indev_t * indev = lv_indev_get_act();
+    lv_indev_t * indev = lv_indev_active();
     if(indev == NULL)  return;
 
     lv_point_t vect;

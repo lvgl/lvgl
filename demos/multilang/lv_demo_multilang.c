@@ -266,7 +266,7 @@ static void shrink_anim_cb(void * var, int32_t v)
 
 static void scroll_event_cb(lv_event_t * e)
 {
-    lv_indev_t * indev = lv_indev_get_act();
+    lv_indev_t * indev = lv_indev_active();
     lv_obj_t * cont = lv_event_get_target(e);
     if(lv_indev_get_scroll_obj(indev) != cont) return;
 

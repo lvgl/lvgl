@@ -496,14 +496,14 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_RELEASED) {
         lv_obj_invalidate(obj);
-        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_t * indev = lv_indev_active();
         lv_obj_t * scroll_obj = lv_indev_get_scroll_obj(indev);
         if(table->col_act != LV_TABLE_CELL_NONE && table->row_act != LV_TABLE_CELL_NONE && scroll_obj == NULL) {
             res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RESULT_OK) return;
         }
 
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
         if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
             table->col_act = LV_TABLE_CELL_NONE;
             table->row_act = LV_TABLE_CELL_NONE;
@@ -896,7 +896,7 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
 {
     lv_table_t * table = (lv_table_t *)obj;
 
-    lv_indev_type_t type = lv_indev_get_type(lv_indev_get_act());
+    lv_indev_type_t type = lv_indev_get_type(lv_indev_active());
     if(type != LV_INDEV_TYPE_POINTER && type != LV_INDEV_TYPE_BUTTON) {
         if(col) *col = LV_TABLE_CELL_NONE;
         if(row) *row = LV_TABLE_CELL_NONE;
@@ -904,7 +904,7 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
     }
 
     lv_point_t p;
-    lv_indev_get_point(lv_indev_get_act(), &p);
+    lv_indev_get_point(lv_indev_active(), &p);
 
     lv_coord_t tmp;
     if(col) {

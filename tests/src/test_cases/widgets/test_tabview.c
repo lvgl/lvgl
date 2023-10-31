@@ -206,7 +206,7 @@ void test_tabview_set_act_non_existent(void)
 {
     tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
 
-    lv_tabview_set_act(tabview, 1, LV_ANIM_ON);
+    lv_tabview_set_active(tabview, 1, LV_ANIM_ON);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("tabview_10.png");
 }
@@ -222,9 +222,9 @@ void test_tabview_tab2_selected_event(void)
     LV_UNUSED(tab1);
     LV_UNUSED(tab2);
 
-    lv_tabview_set_act(tabview, 1, LV_ANIM_OFF);
+    lv_tabview_set_active(tabview, 1, LV_ANIM_OFF);
 
-    TEST_ASSERT_EQUAL_UINT16(1, lv_tabview_get_tab_act(tabview));
+    TEST_ASSERT_EQUAL_UINT16(1, lv_tabview_get_tab_active(tabview));
 }
 
 void test_tabview_update_on_external_scroll(void)
@@ -257,7 +257,7 @@ void test_tabview_update_on_external_scroll(void)
 
     TEST_ASSERT_TRUE(lv_obj_is_visible(label1));
     TEST_ASSERT_FALSE(lv_obj_is_visible(label2));
-    TEST_ASSERT_EQUAL_UINT16(2, lv_tabview_get_tab_act(tabview));
+    TEST_ASSERT_EQUAL_UINT16(2, lv_tabview_get_tab_active(tabview));
 }
 
 #endif

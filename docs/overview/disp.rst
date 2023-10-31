@@ -87,7 +87,7 @@ existing screen copied into the new screen.
 To load a screen, use :cpp:expr:`lv_screen_load(scr)`. To get the active screen,
 use :cpp:expr:`lv_screen_active()`. These functions work on the default display. If
 you want to specify which display to work on, use
-:cpp:expr:`lv_disp_get_screen_act(disp)` and :cpp:expr:`lv_disp_load_scr(disp, scr)`. A
+:cpp:expr:`lv_disp_get_screen_active(disp)` and :cpp:expr:`lv_disp_load_scr(disp, scr)`. A
 screen can be loaded with animations too. Read more
 `here <object.html#load-screens>`__.
 

@@ -96,8 +96,8 @@ Input device events
 -  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN`: Sent once when the object is released while scrolling but the "momentum" still keeps the content scrolling.
 -  :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends.
 -  :cpp:enumerator:`LV_EVENT_SCROLL`: An object was scrolled
--  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_get_act())`
--  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to an object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_get_act())`
+-  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_active())`
+-  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to an object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_active())`
 -  :cpp:enumerator:`LV_EVENT_FOCUSED`: An object is focused
 -  :cpp:enumerator:`LV_EVENT_DEFOCUSED`: An object is unfocused
 -  :cpp:enumerator:`LV_EVENT_LEAVE`: An object is unfocused but still selected

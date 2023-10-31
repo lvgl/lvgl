@@ -1143,7 +1143,7 @@ static void refr_cursor_area(lv_obj_t * obj)
 
 static void update_cursor_position_on_click(lv_event_t * e)
 {
-    lv_indev_t * click_source = lv_indev_get_act();
+    lv_indev_t * click_source = lv_indev_active();
     if(click_source == NULL) return;
 
     lv_obj_t * obj = lv_event_get_target(e);

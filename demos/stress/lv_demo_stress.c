@@ -107,7 +107,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
                 t = lv_tabview_add_tab(obj, LV_SYMBOL_EDIT " Edit");
                 t = lv_tabview_add_tab(obj, LV_SYMBOL_CLOSE);
 
-                lv_tabview_set_act(obj, 1, LV_ANIM_ON);
+                lv_tabview_set_active(obj, 1, LV_ANIM_ON);
                 auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 5 + 30);
             }
             break;

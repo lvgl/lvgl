@@ -686,7 +686,7 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(code == LV_EVENT_PRESSED) {
-        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_t * indev = lv_indev_active();
         lv_point_t p;
         lv_indev_get_point(indev, &p);
 

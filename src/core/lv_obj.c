@@ -636,7 +636,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /* Use the indev for then indev handler.
          * But if the obj was focused manually it returns NULL so try to
          * use the indev from the event*/
-        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_t * indev = lv_indev_active();
         if(indev == NULL) indev = lv_event_get_indev(e);
 
         lv_indev_type_t indev_type = lv_indev_get_type(indev);

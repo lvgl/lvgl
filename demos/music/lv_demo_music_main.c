@@ -973,7 +973,7 @@ static lv_obj_t * album_image_create(lv_obj_t * parent)
 static void album_gesture_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
-    lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+    lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
     if(dir == LV_DIR_LEFT) _lv_demo_music_album_next(true);
     if(dir == LV_DIR_RIGHT) _lv_demo_music_album_next(false);
 }

@@ -672,7 +672,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_FOCUSED) {
         lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
@@ -733,7 +733,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(c == LV_KEY_ENTER) {
             /* Handle the ENTER key only if it was send by an other object.
              * Do no process it if ENTER is sent by the dropdown because it's handled in LV_EVENT_RELEASED */
-            lv_obj_t * indev_obj = lv_indev_get_obj_act();
+            lv_obj_t * indev_obj = lv_indev_get_active_obj();
             if(indev_obj != obj) {
                 res = btn_release_handler(obj);
                 if(res != LV_RESULT_OK) return;
@@ -762,7 +762,7 @@ static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
     if(code == LV_EVENT_RELEASED) {
-        if(lv_indev_get_scroll_obj(lv_indev_get_act()) == NULL) {
+        if(lv_indev_get_scroll_obj(lv_indev_active()) == NULL) {
             list_release_handler(list);
         }
     }
@@ -1024,7 +1024,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t
 static lv_result_t btn_release_handler(lv_obj_t * obj)
 {
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    lv_indev_t * indev = lv_indev_get_act();
+    lv_indev_t * indev = lv_indev_active();
     if(lv_indev_get_scroll_obj(indev) == NULL) {
         if(lv_dropdown_is_open(obj)) {
             lv_dropdown_close(obj);
@@ -1063,7 +1063,7 @@ static lv_result_t list_release_handler(lv_obj_t * list_obj)
     lv_obj_t * dropdown_obj = list->dropdown;
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
-    lv_indev_t * indev = lv_indev_get_act();
+    lv_indev_t * indev = lv_indev_active();
     /*Leave edit mode once a new item is selected*/
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
         dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
@@ -1099,7 +1099,7 @@ static void list_press_handler(lv_obj_t * list_obj)
     lv_obj_t * dropdown_obj = list->dropdown;
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
-    lv_indev_t * indev = lv_indev_get_act();
+    lv_indev_t * indev = lv_indev_active();
     if(indev && (lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON)) {
         lv_point_t p;
         lv_indev_get_point(indev, &p);

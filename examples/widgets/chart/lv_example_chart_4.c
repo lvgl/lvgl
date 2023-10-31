@@ -26,7 +26,7 @@ static void draw_event_cb(lv_event_t * e)
 void lv_example_chart_4(void)
 {
     /*Create a chart1*/
-    lv_obj_t * chart = lv_chart_create(lv_scr_act());
+    lv_obj_t * chart = lv_chart_create(lv_screen_active());
     lv_chart_set_type(chart, LV_CHART_TYPE_BAR);
     lv_chart_set_point_count(chart, 24);
     lv_obj_set_style_pad_column(chart, 2, 0);

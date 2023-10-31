@@ -254,7 +254,7 @@ void lv_indev_enable(lv_indev_t * indev, bool en)
     }
 }
 
-lv_indev_t * lv_indev_get_act(void)
+lv_indev_t * lv_indev_active(void)
 {
     return indev_act;
 }
@@ -445,7 +445,7 @@ void lv_indev_wait_release(lv_indev_t * indev)
     indev->wait_until_release = 1;
 }
 
-lv_obj_t * lv_indev_get_obj_act(void)
+lv_obj_t * lv_indev_get_active_obj(void)
 {
     return indev_obj_act;
 }
@@ -1205,7 +1205,7 @@ static lv_obj_t * pointer_search_obj(lv_display_t * disp, lv_point_t * p)
     if(indev_obj_act) return indev_obj_act;
 
     /* Search the object in the active screen */
-    indev_obj_act = lv_indev_search_obj(lv_display_get_screen_act(disp), p);
+    indev_obj_act = lv_indev_search_obj(lv_display_get_screen_active(disp), p);
     if(indev_obj_act) return indev_obj_act;
 
     indev_obj_act = lv_indev_search_obj(lv_display_get_layer_bottom(disp), p);

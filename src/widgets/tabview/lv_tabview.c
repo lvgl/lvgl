@@ -118,7 +118,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
     tabview->tab_cnt++;
     if(tabview->tab_cnt == 1) {
-        lv_tabview_set_act(obj, 0, LV_ANIM_OFF);
+        lv_tabview_set_active(obj, 0, LV_ANIM_OFF);
     }
 
     lv_buttonmatrix_set_button_ctrl(buttons, tabview->tab_cur, LV_BUTTONMATRIX_CTRL_CHECKED);
@@ -140,7 +140,7 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t id, const char * new_name)
     lv_obj_invalidate(obj);
 }
 
-void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
+void lv_tabview_set_active(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
@@ -177,7 +177,7 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
     tabview->tab_cur = id;
 }
 
-uint32_t lv_tabview_get_tab_act(lv_obj_t * obj)
+uint32_t lv_tabview_get_tab_active(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
@@ -302,7 +302,7 @@ static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
 
     if(code == LV_EVENT_SIZE_CHANGED) {
-        lv_tabview_set_act(target, lv_tabview_get_tab_act(target), LV_ANIM_OFF);
+        lv_tabview_set_active(target, lv_tabview_get_tab_active(target), LV_ANIM_OFF);
     }
 }
 
@@ -313,7 +313,7 @@ static void buttons_value_changed_event_cb(lv_event_t * e)
 
     lv_obj_t * tv = lv_obj_get_parent(buttons);
     uint32_t id = lv_buttonmatrix_get_selected_button(buttons);
-    lv_tabview_set_act(tv, id, LV_ANIM_OFF);
+    lv_tabview_set_active(tv, id, LV_ANIM_OFF);
 }
 
 static void cont_scroll_end_event_cb(lv_event_t * e)
@@ -324,10 +324,10 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
     lv_obj_t * tv = lv_obj_get_parent(cont);
     lv_tabview_t * tv_obj = (lv_tabview_t *)tv;
     if(code == LV_EVENT_LAYOUT_CHANGED) {
-        lv_tabview_set_act(tv, lv_tabview_get_tab_act(tv), LV_ANIM_OFF);
+        lv_tabview_set_active(tv, lv_tabview_get_tab_active(tv), LV_ANIM_OFF);
     }
     else if(code == LV_EVENT_SCROLL_END) {
-        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_t * indev = lv_indev_active();
         if(indev && indev->state == LV_INDEV_STATE_PRESSED) {
             return;
         }
@@ -348,15 +348,15 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
 
         if(t < 0) t = 0;
         bool new_tab = false;
-        if(t != (int32_t)lv_tabview_get_tab_act(tv)) new_tab = true;
+        if(t != (int32_t)lv_tabview_get_tab_active(tv)) new_tab = true;
 
 
         /*If not scrolled by an indev set the tab immediately*/
-        if(lv_indev_get_act()) {
-            lv_tabview_set_act(tv, t, LV_ANIM_ON);
+        if(lv_indev_active()) {
+            lv_tabview_set_active(tv, t, LV_ANIM_ON);
         }
         else {
-            lv_tabview_set_act(tv, t, LV_ANIM_OFF);
+            lv_tabview_set_active(tv, t, LV_ANIM_OFF);
         }
 
         if(new_tab) lv_obj_send_event(tv, LV_EVENT_VALUE_CHANGED, NULL);

@@ -461,7 +461,7 @@ bool lv_display_is_double_buffered(lv_display_t * disp)
   * SCREENS
   *--------------------*/
 
-lv_obj_t * lv_display_get_screen_act(lv_display_t * disp)
+lv_obj_t * lv_display_get_screen_active(lv_display_t * disp)
 {
     if(!disp) disp = lv_display_get_default();
     if(!disp) {

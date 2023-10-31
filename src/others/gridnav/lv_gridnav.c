@@ -279,9 +279,9 @@ static void gridnav_event_cb(lv_event_t * e)
             code == LV_EVENT_CLICKED || code == LV_EVENT_RELEASED) {
         if(lv_group_get_focused(lv_obj_get_group(obj)) == obj) {
             /*Forward press/release related event too*/
-            lv_indev_type_t t = lv_indev_get_type(lv_indev_get_act());
+            lv_indev_type_t t = lv_indev_get_type(lv_indev_active());
             if(t == LV_INDEV_TYPE_ENCODER || t == LV_INDEV_TYPE_KEYPAD) {
-                lv_obj_send_event(dsc->focused_obj, code, lv_indev_get_act());
+                lv_obj_send_event(dsc->focused_obj, code, lv_indev_active());
             }
         }
     }

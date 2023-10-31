@@ -8,7 +8,7 @@ static void ta_event_cb(lv_event_t * e)
     lv_obj_t * kb = lv_event_get_user_data(e);
 
     if(code == LV_EVENT_FOCUSED) {
-        if(lv_indev_get_type(lv_indev_get_act()) != LV_INDEV_TYPE_KEYPAD) {
+        if(lv_indev_get_type(lv_indev_active()) != LV_INDEV_TYPE_KEYPAD) {
             lv_keyboard_set_textarea(kb, ta);
             lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
         }

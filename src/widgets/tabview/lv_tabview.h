@@ -48,9 +48,9 @@ lv_obj_t * lv_tabview_get_content(lv_obj_t * tv);
 
 lv_obj_t * lv_tabview_get_tab_buttons(lv_obj_t * tv);
 
-void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en);
+void lv_tabview_set_active(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en);
 
-uint32_t lv_tabview_get_tab_act(lv_obj_t * tv);
+uint32_t lv_tabview_get_tab_active(lv_obj_t * tv);
 
 /**********************
  *      MACROS

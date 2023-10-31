@@ -450,7 +450,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_arc_t * arc = (lv_arc_t *)lv_event_get_target(e);
     if(code == LV_EVENT_PRESSING) {
-        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_t * indev = lv_indev_active();
         if(indev == NULL) return;
 
         /*Handle only pointers here*/
@@ -600,7 +600,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Leave edit mode if released. (No need to wait for LONG_PRESS)*/
         lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             if(editing) lv_group_set_editing(g, false);
         }

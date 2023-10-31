@@ -134,7 +134,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_PRESSED) {
         /*Save the pressed coordinates*/
-        lv_indev_get_point(lv_indev_get_act(), &slider->pressed_point);
+        lv_indev_get_point(lv_indev_active(), &slider->pressed_point);
         lv_obj_transform_point(obj, &slider->pressed_point, true, true);
     }
     else if(code == LV_EVENT_PRESSING) {
@@ -150,7 +150,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Leave edit mode if released. (No need to wait for LONG_PRESS)*/
         lv_group_t * g   = lv_obj_get_group(obj);
         bool editing     = lv_group_get_editing(g);
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             if(editing) {
                 if(lv_slider_get_mode(obj) == LV_SLIDER_MODE_RANGE) {
@@ -171,7 +171,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_FOCUSED) {
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
         if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
             slider->left_knob_focus = 0;
         }
@@ -335,7 +335,7 @@ static void drag_start(lv_obj_t * obj)
         slider->value_to_set = &slider->bar.cur_value;
     }
     else if(mode == LV_SLIDER_MODE_RANGE) {
-        lv_indev_get_point(lv_indev_get_act(), &p);
+        lv_indev_get_point(lv_indev_active(), &p);
         lv_obj_transform_point(obj, &p, true, true);
         const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
         const bool is_horizontal = is_slider_horizontal(obj);
@@ -392,7 +392,7 @@ static void drag_start(lv_obj_t * obj)
 static void update_knob_pos(lv_obj_t * obj, bool check_drag)
 {
     lv_slider_t * slider = (lv_slider_t *)obj;
-    lv_indev_t * indev = lv_indev_get_act();
+    lv_indev_t * indev = lv_indev_active();
     if(lv_indev_get_type(indev) != LV_INDEV_TYPE_POINTER)
         return;
     if(lv_indev_get_scroll_obj(indev) != NULL)

@@ -327,7 +327,7 @@ bool lv_display_is_double_buffered(lv_display_t * disp);
  *                  (NULL to use the default screen)
  * @return          pointer to the active screen object (loaded by 'lv_screen_load()')
  */
-struct _lv_obj_t * lv_display_get_screen_act(lv_display_t * disp);
+struct _lv_obj_t * lv_display_get_screen_active(lv_display_t * disp);
 
 /**
  * Return with a pointer to the previous screen. Only used during screen transitions.
@@ -384,7 +384,7 @@ void lv_screen_load_anim(struct _lv_obj_t * scr, lv_screen_load_anim_t anim_type
  */
 static inline struct _lv_obj_t * lv_screen_active(void)
 {
-    return lv_display_get_screen_act(lv_display_get_default());
+    return lv_display_get_screen_active(lv_display_get_default());
 }
 
 /**

@@ -358,7 +358,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_anim_delete(get_label(obj), set_y_anim);
     }
     else if(code == LV_EVENT_PRESSING) {
-        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_t * indev = lv_indev_active();
         lv_point_t p;
         lv_indev_get_vect(indev, &p);
 
@@ -374,7 +374,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_FOCUSED) {
         lv_group_t * g             = lv_obj_get_group(obj);
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
@@ -678,7 +678,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
     lv_obj_t * label = get_label(obj);
     if(label == NULL) return LV_RESULT_OK;
 
-    lv_indev_t * indev = lv_indev_get_act();
+    lv_indev_t * indev = lv_indev_active();
     lv_roller_t * roller = (lv_roller_t *)obj;
 
     /*Leave edit mode once a new option is selected*/
