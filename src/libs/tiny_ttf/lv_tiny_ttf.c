@@ -253,7 +253,7 @@ lv_font_t * lv_tiny_ttf_create_data(const void * data, size_t data_size, int32_t
 void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
 {
     if(font_size <= 0) {
-        LV_LOG_ERROR("invalid font size: %d", font_size);
+        LV_LOG_ERROR("invalid font size: %"PRIx32, font_size);
         return;
     }
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
