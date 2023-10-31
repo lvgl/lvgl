@@ -7,7 +7,7 @@
 LV_IMAGE_DECLARE(emoji_F617)
 char path_buf[128];
 static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, uint32_t unicode_next,
-                                     lv_coord_t * offset_y, void * user_data)
+                                     int32_t * offset_y, void * user_data)
 {
     LV_UNUSED(font);
     LV_UNUSED(unicode_next);

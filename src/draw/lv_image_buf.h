@@ -116,7 +116,7 @@ void lv_image_buf_free(lv_image_dsc_t * dsc);
  * @param zoom_y zoom in y direction, (256 no zoom)
  * @param pivot x,y pivot coordinates of rotation
  */
-void _lv_image_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, lv_coord_t angle, uint16_t zoom_x,
+void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle, uint16_t zoom_x,
                                         uint16_t zoom_y,
                                         const lv_point_t * pivot);
 

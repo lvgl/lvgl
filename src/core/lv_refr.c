@@ -41,7 +41,7 @@ static void refr_area_part(lv_layer_t * layer);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj);
 static void refr_obj(lv_layer_t * layer, lv_obj_t * obj);
-static uint32_t get_max_row(lv_display_t * disp, lv_coord_t area_w, lv_coord_t area_h);
+static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h);
 static void draw_buf_flush(lv_display_t * disp);
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void wait_for_flushing(lv_display_t * disp);
@@ -95,7 +95,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     /*Truncate the clip area to `obj size + ext size` area*/
     lv_area_t obj_coords_ext;
     lv_obj_get_coords(obj, &obj_coords_ext);
-    lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
 
     if(!_lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext)) return;
@@ -145,7 +145,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
             layer->clip_area = clip_coords_for_children;
             bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
 
-            lv_coord_t radius = 0;
+            int32_t radius = 0;
             if(clip_corner) {
                 radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
                 if(radius == 0) clip_corner = false;
@@ -607,15 +607,15 @@ static void refr_area(const lv_area_t * area_p)
 
     /*Normal refresh: draw the area in parts*/
     /*Calculate the max row num*/
-    lv_coord_t w = lv_area_get_width(area_p);
-    lv_coord_t h = lv_area_get_height(area_p);
-    lv_coord_t y2 = area_p->y2 >= lv_display_get_vertical_resolution(disp_refr) ?
-                    lv_display_get_vertical_resolution(disp_refr) - 1 : area_p->y2;
+    int32_t w = lv_area_get_width(area_p);
+    int32_t h = lv_area_get_height(area_p);
+    int32_t y2 = area_p->y2 >= lv_display_get_vertical_resolution(disp_refr) ?
+                 lv_display_get_vertical_resolution(disp_refr) - 1 : area_p->y2;
 
     int32_t max_row = get_max_row(disp_refr, w, h);
 
-    lv_coord_t row;
-    lv_coord_t row_last = 0;
+    int32_t row;
+    int32_t row_last = 0;
     lv_area_t sub_area;
     for(row = area_p->y1; row + max_row - 1 <= y2; row += max_row) {
         /*Calc. the next y coordinates of draw_buf*/
@@ -801,7 +801,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
                                   lv_area_t * layer_area_out)
 {
-    lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_t obj_coords_ext;
     lv_obj_get_coords(obj, &obj_coords_ext);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
@@ -878,7 +878,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
         uint32_t max_argb_row_height = lv_area_get_height(&layer_area_full);
         if(layer_type == LV_LAYER_TYPE_SIMPLE) {
-            lv_coord_t w = lv_area_get_width(&layer_area_full);
+            int32_t w = lv_area_get_width(&layer_area_full);
             uint8_t px_size = lv_color_format_get_size(disp_refr->color_format);
             max_rgb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / px_size;
             max_argb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color32_t);
@@ -928,7 +928,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 }
 
 
-static uint32_t get_max_row(lv_display_t * disp, lv_coord_t area_w, lv_coord_t area_h)
+static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 {
     bool has_alpha = lv_color_format_has_alpha(disp->color_format);
     uint32_t px_size_disp =  lv_color_format_get_size(disp->color_format);
@@ -943,7 +943,7 @@ static uint32_t get_max_row(lv_display_t * disp, lv_coord_t area_w, lv_coord_t a
     tmp.x2 = 0;
     tmp.y1 = 0;
 
-    lv_coord_t h_tmp = max_row;
+    int32_t h_tmp = max_row;
     do {
         tmp.y2 = h_tmp - 1;
         lv_display_send_event(disp_refr, LV_EVENT_INVALIDATE_AREA, &tmp);

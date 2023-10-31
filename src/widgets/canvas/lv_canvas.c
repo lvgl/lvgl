@@ -63,7 +63,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h, lv_color_format_t cf)
+void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_color_format_t cf)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(buf);
@@ -83,7 +83,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     lv_cache_unlock();
 }
 
-void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa)
+void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv_opa_t opa)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -152,7 +152,7 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t id, lv_color32_t c)
  * Getter functions
  *====================*/
 
-lv_color32_t lv_canvas_get_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -211,14 +211,14 @@ lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * obj)
  * Other functions
  *====================*/
 
-void lv_canvas_copy_buf(lv_obj_t * obj, const void * to_copy, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h)
+void lv_canvas_copy_buf(lv_obj_t * obj, const void * to_copy, int32_t x, int32_t y, int32_t w, int32_t h)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(to_copy);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-    if(x + w - 1 >= (lv_coord_t)canvas->dsc.header.w || y + h - 1 >= (lv_coord_t)canvas->dsc.header.h) {
+    if(x + w - 1 >= (int32_t)canvas->dsc.header.w || y + h - 1 >= (int32_t)canvas->dsc.header.h) {
         LV_LOG_WARN("x or y out of the canvas");
         return;
     }
@@ -226,7 +226,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const void * to_copy, lv_coord_t x, lv_c
     uint32_t px_size   = lv_color_format_get_size(canvas->dsc.header.cf) >> 3;
     uint32_t px        = canvas->dsc.header.w * y * px_size + x * px_size;
     uint8_t * to_copy8 = (uint8_t *)to_copy;
-    lv_coord_t i;
+    int32_t i;
     for(i = 0; i < h; i++) {
         lv_memcpy((void *)&canvas->dsc.data[px], to_copy8, w * px_size);
         px += canvas->dsc.header.w * px_size;

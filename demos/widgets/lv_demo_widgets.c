@@ -105,7 +105,7 @@ void lv_demo_widgets(void)
     font_large = LV_FONT_DEFAULT;
     font_normal = LV_FONT_DEFAULT;
 
-    lv_coord_t tab_h;
+    int32_t tab_h;
     if(disp_size == DISP_LARGE) {
         tab_h = 70;
 #if LV_FONT_MONTSERRAT_24
@@ -346,15 +346,15 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_t * sw2 = lv_switch_create(panel3);
 
     if(disp_size == DISP_LARGE) {
-        static lv_coord_t grid_main_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_main_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
 
         /*Create the top panel*/
-        static lv_coord_t grid_1_col_dsc[] = {LV_GRID_CONTENT, 5, LV_GRID_CONTENT, LV_GRID_FR(2), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_1_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, 10, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_1_col_dsc[] = {LV_GRID_CONTENT, 5, LV_GRID_CONTENT, LV_GRID_FR(2), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_1_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, 10, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
 
-        static lv_coord_t grid_2_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_2_row_dsc[] = {
+        static int32_t grid_2_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_2_row_dsc[] = {
             LV_GRID_CONTENT,  /*Title*/
             5,                /*Separator*/
             LV_GRID_CONTENT,  /*Box title*/
@@ -405,13 +405,13 @@ static void profile_create(lv_obj_t * parent)
         lv_obj_set_grid_cell(team_player_label, LV_GRID_ALIGN_START, 1, 1, LV_GRID_ALIGN_START, 5, 1);
     }
     else if(disp_size == DISP_MEDIUM) {
-        static lv_coord_t grid_main_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_main_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
 
 
         /*Create the top panel*/
-        static lv_coord_t grid_1_col_dsc[] = {LV_GRID_CONTENT, 1, LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_1_row_dsc[] = {
+        static int32_t grid_1_col_dsc[] = {LV_GRID_CONTENT, 1, LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_1_row_dsc[] = {
             LV_GRID_CONTENT, /*Name*/
             LV_GRID_CONTENT, /*Description*/
             LV_GRID_CONTENT, /*Email*/
@@ -421,8 +421,8 @@ static void profile_create(lv_obj_t * parent)
             LV_GRID_TEMPLATE_LAST
         };
 
-        static lv_coord_t grid_2_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_2_row_dsc[] = {
+        static int32_t grid_2_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_2_row_dsc[] = {
             LV_GRID_CONTENT,  /*Title*/
             5,                /*Separator*/
             LV_GRID_CONTENT,  /*Box title*/
@@ -477,28 +477,28 @@ static void profile_create(lv_obj_t * parent)
         lv_obj_set_grid_cell(sw1, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 7, 1);
     }
     else if(disp_size == DISP_SMALL) {
-        static lv_coord_t grid_main_col_dsc[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_main_col_dsc[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
         lv_obj_set_grid_dsc_array(parent, grid_main_col_dsc, grid_main_row_dsc);
 
 
         /*Create the top panel*/
-        static lv_coord_t grid_1_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_1_row_dsc[] = {LV_GRID_CONTENT, /*Avatar*/
-                                              LV_GRID_CONTENT, /*Name*/
-                                              LV_GRID_CONTENT, /*Description*/
-                                              LV_GRID_CONTENT, /*Email*/
-                                              LV_GRID_CONTENT, /*Phone number*/
-                                              LV_GRID_CONTENT, /*Button1*/
-                                              LV_GRID_CONTENT, /*Button2*/
-                                              LV_GRID_TEMPLATE_LAST
-                                             };
+        static int32_t grid_1_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_1_row_dsc[] = {LV_GRID_CONTENT, /*Avatar*/
+                                           LV_GRID_CONTENT, /*Name*/
+                                           LV_GRID_CONTENT, /*Description*/
+                                           LV_GRID_CONTENT, /*Email*/
+                                           LV_GRID_CONTENT, /*Phone number*/
+                                           LV_GRID_CONTENT, /*Button1*/
+                                           LV_GRID_CONTENT, /*Button2*/
+                                           LV_GRID_TEMPLATE_LAST
+                                          };
 
         lv_obj_set_grid_dsc_array(panel1, grid_1_col_dsc, grid_1_row_dsc);
 
 
-        static lv_coord_t grid_2_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_2_row_dsc[] = {
+        static int32_t grid_2_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_2_row_dsc[] = {
             LV_GRID_CONTENT,  /*Title*/
             5,                /*Separator*/
             LV_GRID_CONTENT,  /*Box title*/
@@ -554,8 +554,8 @@ static void profile_create(lv_obj_t * parent)
 
 static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title,  const char * hor_text[])
 {
-    static const lv_coord_t col_dsc[] = {40, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static const lv_coord_t row_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), 40, LV_GRID_TEMPLATE_LAST};
+    static const int32_t col_dsc[] = {40, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static const int32_t row_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), 40, LV_GRID_TEMPLATE_LAST};
 
     lv_obj_set_grid_dsc_array(parent, col_dsc, row_dsc);
     lv_obj_set_style_pad_column(parent, 0, 0);
@@ -653,7 +653,7 @@ static void analytics_create(lv_obj_t * parent)
     if(disp_size < DISP_LARGE) lv_obj_add_flag(lv_obj_get_parent(scale3), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
     lv_obj_update_layout(parent);
-    lv_coord_t scale_w;
+    int32_t scale_w;
     if(disp_size == DISP_MEDIUM) {
         scale_w = 200;
         lv_obj_set_size(scale1, scale_w, scale_w);
@@ -907,8 +907,8 @@ void shop_create(lv_obj_t * parent)
     lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
 
     if(disp_size == DISP_LARGE) {
-        static lv_coord_t grid1_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid1_row_dsc[] = {
+        static int32_t grid1_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid1_row_dsc[] = {
             LV_GRID_CONTENT,  /*Title*/
             LV_GRID_CONTENT,  /*Sub title*/
             20,               /*Spacer*/
@@ -929,8 +929,8 @@ void shop_create(lv_obj_t * parent)
         lv_obj_set_grid_cell(chart3, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 0, 5);
     }
     else if(disp_size == DISP_MEDIUM) {
-        static lv_coord_t grid1_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid1_row_dsc[] = {
+        static int32_t grid1_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid1_row_dsc[] = {
             LV_GRID_CONTENT,  /*Title + Date*/
             LV_GRID_CONTENT,  /*Amount + Hint*/
             200,              /*Chart*/
@@ -949,8 +949,8 @@ void shop_create(lv_obj_t * parent)
         lv_obj_set_grid_cell(chart3, LV_GRID_ALIGN_END, 0, 2, LV_GRID_ALIGN_STRETCH, 2, 1);
     }
     else if(disp_size == DISP_SMALL) {
-        static lv_coord_t grid1_col_dsc[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid1_row_dsc[] = {
+        static int32_t grid1_col_dsc[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid1_row_dsc[] = {
             LV_GRID_CONTENT,  /*Title*/
             LV_GRID_CONTENT,  /*Date*/
             LV_GRID_CONTENT,  /*Amount*/
@@ -1095,8 +1095,8 @@ static void color_changer_create(lv_obj_t * parent)
 static void color_changer_anim_cb(void * var, int32_t v)
 {
     lv_obj_t * obj = var;
-    lv_coord_t max_w = lv_obj_get_width(lv_obj_get_parent(obj)) - LV_DPX(20);
-    lv_coord_t w;
+    int32_t max_w = lv_obj_get_width(lv_obj_get_parent(obj)) - LV_DPX(20);
+    int32_t w;
 
     if(disp_size == DISP_SMALL) {
         w = lv_map(v, 0, 256, LV_DPX(52), max_w);
@@ -1215,8 +1215,8 @@ static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const 
     lv_label_set_text(label3, text3);
 
     if(disp_size == DISP_MEDIUM) {
-        static lv_coord_t grid_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_FR(8), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_FR(8), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
         lv_obj_set_grid_dsc_array(cont, grid_col_dsc, grid_row_dsc);
         lv_obj_set_grid_cell(title_label, LV_GRID_ALIGN_START, 0, 4, LV_GRID_ALIGN_START, 0, 1);
@@ -1229,8 +1229,8 @@ static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const 
         lv_obj_set_grid_cell(label3, LV_GRID_ALIGN_STRETCH, 3, 1, LV_GRID_ALIGN_CENTER, 4, 1);
     }
     else {
-        static lv_coord_t grid_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-        static lv_coord_t grid_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+        static int32_t grid_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
         lv_obj_set_grid_dsc_array(cont, grid_col_dsc, grid_row_dsc);
         lv_obj_set_grid_cell(title_label, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 0, 1);
         lv_obj_set_grid_cell(scale, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 1, 1);
@@ -1247,8 +1247,8 @@ static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const 
 static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, const char * name, const char * category,
                                    const char * price)
 {
-    static lv_coord_t grid_col_dsc[] = {LV_GRID_CONTENT, 5, LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t grid_row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static int32_t grid_col_dsc[] = {LV_GRID_CONTENT, 5, LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static int32_t grid_row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
     lv_obj_t * cont = lv_obj_create(parent);
     lv_obj_remove_style_all(cont);
@@ -1356,7 +1356,7 @@ static void slider_event_cb(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = lv_event_get_param(e);
+        int32_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, 60);
     }
     else if(code == LV_EVENT_DRAW_TASK_ADDED) {
@@ -1428,9 +1428,9 @@ static void chart_event_cb(lv_event_t * e)
             tri_dsc.p[2].y = (int32_t)LV_MAX(draw_line_dsc->p1_y, draw_line_dsc->p2_y);
             tri_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
 
-            lv_coord_t full_h = lv_obj_get_height(obj);
-            lv_coord_t fract_uppter = (int32_t)(LV_MIN(draw_line_dsc->p1_y, draw_line_dsc->p2_y) - obj->coords.y1) * 255 / full_h;
-            lv_coord_t fract_lower = (int32_t)(LV_MAX(draw_line_dsc->p1_y, draw_line_dsc->p2_y) - obj->coords.y1) * 255 / full_h;
+            int32_t full_h = lv_obj_get_height(obj);
+            int32_t fract_uppter = (int32_t)(LV_MIN(draw_line_dsc->p1_y, draw_line_dsc->p2_y) - obj->coords.y1) * 255 / full_h;
+            int32_t fract_lower = (int32_t)(LV_MAX(draw_line_dsc->p1_y, draw_line_dsc->p2_y) - obj->coords.y1) * 255 / full_h;
             tri_dsc.bg_grad.stops[0].color = ser->color;
             tri_dsc.bg_grad.stops[0].opa = 255 - fract_uppter;
             tri_dsc.bg_grad.stops[0].frac = 0;

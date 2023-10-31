@@ -176,14 +176,14 @@ can do custom GPU operations. Here is a complete example:
                    dsc->blend_mode == LV_BLEND_MODE_NORMAL && lv_area_get_size(&blend_area) > 100) {
 
                    /*Got the first pixel on the buffer*/
-                   lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area); /*Width of the destination buffer*/
+                   int32_t dest_stride = lv_area_get_width(draw_ctx->buf_area); /*Width of the destination buffer*/
                    lv_color_t * dest_buf = draw_ctx->buf;
                    dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) + (blend_area.x1 - draw_ctx->buf_area->x1);
 
-                   /*Make the blend area relative to the buffer*/        
+                   /*Make the blend area relative to the buffer*/
                    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-                   
-                   /*Call your custom gou fill function to fill blend_area, on dest_buf with dsc->color*/ 
+
+                   /*Call your custom gou fill function to fill blend_area, on dest_buf with dsc->color*/
                    my_gpu_fill(dest_buf, dest_stride, &blend_area, dsc->color);
            }
            /*Fallback: the GPU doesn't support these settings. Call the SW renderer.*/
@@ -199,7 +199,7 @@ The implementation of wait callback is much simpler:
    void my_gpu_wait(lv_draw_ctx_t * draw_ctx)
    {
            while(my_gpu_is_working());
-           
+
            /*Call SW renderer's wait callback too*/
            lv_draw_sw_wait_for_finish(draw_ctx);
    }
@@ -220,12 +220,12 @@ rectangles you can replace the original software drawer too. A custom
        {
            /*Draw the background*/
            my_bg_drawer(draw_ctx, coords, dsc->bg_color, dsc->radius);
-           
+
            /*Draw the border if any*/
            if(dsc->border_width) {
                my_border_drawer(draw_ctx, coords, dsc->border_width, dsc->border_color, dsc->border_opa)
            }
-           
+
            /*Draw the outline if any*/
            if(dsc->outline_width) {
                my_outline_drawer(draw_ctx, coords, dsc->outline_width, dsc->outline_color, dsc->outline_opa, dsc->outline_pad)

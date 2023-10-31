@@ -33,9 +33,9 @@ typedef struct {
     lv_value_precise_t p2_x;
     lv_value_precise_t p2_y;
     lv_color_t color;
-    lv_coord_t width;
-    lv_coord_t dash_width;
-    lv_coord_t dash_gap;
+    int32_t width;
+    int32_t dash_width;
+    int32_t dash_gap;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode  : 2;
     uint8_t round_start : 1;

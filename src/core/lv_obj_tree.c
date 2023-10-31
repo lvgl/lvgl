@@ -35,7 +35,7 @@
 static void lv_obj_delete_async_cb(void * obj);
 static void obj_delete_core(lv_obj_t * obj);
 static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data);
-static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, lv_coord_t depth);
+static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth);
 
 /**********************
  *  STATIC VARIABLES
@@ -514,7 +514,7 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
     return LV_OBJ_TREE_WALK_NEXT;
 }
 
-static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, lv_coord_t depth)
+static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth)
 {
     lv_obj_tree_walk_res_t res;
     const char * id;

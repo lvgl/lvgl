@@ -13,7 +13,7 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-static lv_obj_t * create_panel(lv_coord_t radius, bool transform)
+static lv_obj_t * create_panel(int32_t radius, bool transform)
 {
     lv_obj_t * parent = lv_obj_create(lv_screen_active());
     lv_obj_set_style_pad_all(parent, 3, 0);

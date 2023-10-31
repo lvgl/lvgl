@@ -25,7 +25,7 @@ lv_obj_t * obj_create(lv_obj_t * parent, lv_color_t color)
     return obj;
 }
 
-void obj_set_margin(lv_obj_t * obj, lv_coord_t left, lv_coord_t top, lv_coord_t right, lv_coord_t bottom)
+void obj_set_margin(lv_obj_t * obj, int32_t left, int32_t top, int32_t right, int32_t bottom)
 {
     lv_obj_set_style_margin_left(obj, left, LV_PART_MAIN);
     lv_obj_set_style_margin_top(obj, top, LV_PART_MAIN);

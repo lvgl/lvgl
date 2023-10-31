@@ -15,8 +15,8 @@ static void draw_event_cb(lv_event_t * e)
         rect_draw_dsc->bg_opa = (LV_OPA_COVER *  base_dsc->id2) / (cnt - 1);
 
         /*Make smaller values blue, higher values red*/
-        lv_coord_t * x_array = lv_chart_get_x_array(obj, ser);
-        lv_coord_t * y_array = lv_chart_get_y_array(obj, ser);
+        int32_t * x_array = lv_chart_get_x_array(obj, ser);
+        int32_t * y_array = lv_chart_get_y_array(obj, ser);
         /*dsc->id is the tells drawing order, but we need the ID of the point being drawn.*/
         uint32_t start_point = lv_chart_get_x_start_point(obj, ser);
         uint32_t p_act = (start_point + base_dsc->id2) % cnt; /*Consider start point to get the index of the array*/

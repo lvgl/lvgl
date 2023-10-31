@@ -268,11 +268,11 @@ static void draw_indic(lv_event_t * e)
     lv_area_t bar_coords;
     lv_obj_get_coords(obj, &bar_coords);
 
-    lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-    lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    int32_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+    int32_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
     lv_area_increase(&bar_coords, transf_w, transf_h);
-    lv_coord_t barw = lv_area_get_width(&bar_coords);
-    lv_coord_t barh = lv_area_get_height(&bar_coords);
+    int32_t barw = lv_area_get_width(&bar_coords);
+    int32_t barh = lv_area_get_height(&bar_coords);
     int32_t range = bar->max_value - bar->min_value;
 
     /*Prevent division by 0*/
@@ -284,10 +284,10 @@ static void draw_indic(lv_event_t * e)
     bool sym = lv_bar_is_symmetrical(obj);
 
     /*Calculate the indicator area*/
-    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
-    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
-    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
-    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    int32_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
+    int32_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
+    int32_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
+    int32_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
     /*Respect padding and minimum width/height too*/
     lv_area_copy(&bar->indic_area, &bar_coords);
     bar->indic_area.x1 += bg_left;
@@ -304,16 +304,16 @@ static void draw_indic(lv_event_t * e)
         bar->indic_area.x2 = bar->indic_area.x1 + LV_BAR_SIZE_MIN;
     }
 
-    lv_coord_t indicw = lv_area_get_width(&bar->indic_area);
-    lv_coord_t indich = lv_area_get_height(&bar->indic_area);
+    int32_t indicw = lv_area_get_width(&bar->indic_area);
+    int32_t indich = lv_area_get_height(&bar->indic_area);
 
     /*Calculate the indicator length*/
-    lv_coord_t anim_length = hor ? indicw : indich;
+    int32_t anim_length = hor ? indicw : indich;
 
-    lv_coord_t anim_cur_value_x, anim_start_value_x;
+    int32_t anim_cur_value_x, anim_start_value_x;
 
-    lv_coord_t * axis1, * axis2;
-    lv_coord_t (*indic_length_calc)(const lv_area_t * area);
+    int32_t * axis1, * axis2;
+    int32_t (*indic_length_calc)(const lv_area_t * area);
 
     if(hor) {
         axis1 = &bar->indic_area.x1;
@@ -327,9 +327,9 @@ static void draw_indic(lv_event_t * e)
     }
 
     if(LV_BAR_IS_ANIMATING(bar->start_value_anim)) {
-        lv_coord_t anim_start_value_start_x =
+        int32_t anim_start_value_start_x =
             (int32_t)((int32_t)anim_length * (bar->start_value_anim.anim_start - bar->min_value)) / range;
-        lv_coord_t anim_start_value_end_x =
+        int32_t anim_start_value_end_x =
             (int32_t)((int32_t)anim_length * (bar->start_value_anim.anim_end - bar->min_value)) / range;
 
         anim_start_value_x = (((anim_start_value_end_x - anim_start_value_start_x) * bar->start_value_anim.anim_state) /
@@ -342,9 +342,9 @@ static void draw_indic(lv_event_t * e)
     }
 
     if(LV_BAR_IS_ANIMATING(bar->cur_value_anim)) {
-        lv_coord_t anim_cur_value_start_x =
+        int32_t anim_cur_value_start_x =
             (int32_t)((int32_t)anim_length * (bar->cur_value_anim.anim_start - bar->min_value)) / range;
-        lv_coord_t anim_cur_value_end_x =
+        int32_t anim_cur_value_end_x =
             (int32_t)((int32_t)anim_length * (bar->cur_value_anim.anim_end - bar->min_value)) / range;
 
         anim_cur_value_x = anim_cur_value_start_x + (((anim_cur_value_end_x - anim_cur_value_start_x) *
@@ -365,7 +365,7 @@ static void draw_indic(lv_event_t * e)
 
     if(reversed) {
         /*Swap axes*/
-        lv_coord_t * tmp;
+        int32_t * tmp;
         tmp = axis1;
         axis1 = axis2;
         axis2 = tmp;
@@ -384,12 +384,12 @@ static void draw_indic(lv_event_t * e)
     }
 
     if(sym) {
-        lv_coord_t zero, shift;
+        int32_t zero, shift;
         shift = (-bar->min_value * anim_length) / range;
 
         if(hor) {
-            lv_coord_t * left = reversed ? axis2 : axis1;
-            lv_coord_t * right = reversed ? axis1 : axis2;
+            int32_t * left = reversed ? axis2 : axis1;
+            int32_t * right = reversed ? axis1 : axis2;
             if(reversed)
                 zero = *axis1 - shift + 1;
             else
@@ -405,8 +405,8 @@ static void draw_indic(lv_event_t * e)
             }
         }
         else {
-            lv_coord_t * top = reversed ? axis2 : axis1;
-            lv_coord_t * bottom = reversed ? axis1 : axis2;
+            int32_t * top = reversed ? axis2 : axis1;
+            int32_t * bottom = reversed ? axis1 : axis2;
             if(reversed)
                 zero = *axis2 + shift;
             else
@@ -436,11 +436,11 @@ static void draw_indic(lv_event_t * e)
     lv_draw_rect_dsc_init(&draw_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
 
-    lv_coord_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-    lv_coord_t short_side = LV_MIN(barw, barh);
+    int32_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+    int32_t short_side = LV_MIN(barw, barh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
-    lv_coord_t indic_radius = draw_rect_dsc.radius;
+    int32_t indic_radius = draw_rect_dsc.radius;
     short_side = LV_MIN(indicw, indich);
     if(indic_radius > short_side >> 1) indic_radius = short_side >> 1;
 
@@ -489,20 +489,20 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t indic_size;
+        int32_t indic_size;
         indic_size = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
 
         /*Bg size is handled by lv_obj*/
-        lv_coord_t * s = lv_event_get_param(e);
+        int32_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, indic_size);
 
         /*Calculate the indicator area*/
-        lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-        lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+        int32_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        int32_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+        int32_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        int32_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
-        lv_coord_t pad = LV_MIN4(bg_left, bg_right, bg_top, bg_bottom);
+        int32_t pad = LV_MIN4(bg_left, bg_right, bg_top, bg_bottom);
         if(pad < 0) {
             *s = LV_MAX(*s, -pad);
         }

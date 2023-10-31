@@ -41,8 +41,8 @@ typedef struct {
     lv_obj_t obj;
     const void * src;   /*Image source: Pointer to an array or a file or a symbol*/
     lv_point_t offset;
-    lv_coord_t w;          /*Width of the image (Handled by the library)*/
-    lv_coord_t h;          /*Height of the image (Handled by the library)*/
+    int32_t w;          /*Width of the image (Handled by the library)*/
+    int32_t h;          /*Height of the image (Handled by the library)*/
     uint32_t rotation;    /*rotation angle of the image*/
     uint32_t zoom_x;      /*256 means no zoom, 512 double size, 128 half size*/
     uint32_t zoom_y;      /*256 means no zoom, 512 double size, 128 half size*/
@@ -119,7 +119,7 @@ void lv_image_set_src(lv_obj_t * obj, const void * src);
  * @param obj       pointer to an image
  * @param x         the new offset along x axis.
  */
-void lv_image_set_offset_x(lv_obj_t * obj, lv_coord_t x);
+void lv_image_set_offset_x(lv_obj_t * obj, int32_t x);
 
 /**
  * Set an offset for the source of an image.
@@ -127,7 +127,7 @@ void lv_image_set_offset_x(lv_obj_t * obj, lv_coord_t x);
  * @param obj       pointer to an image
  * @param y         the new offset along y axis.
  */
-void lv_image_set_offset_y(lv_obj_t * obj, lv_coord_t y);
+void lv_image_set_offset_y(lv_obj_t * obj, int32_t y);
 
 
 /**
@@ -147,7 +147,7 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle);
  * @param x         rotation center x of the image
  * @param y         rotation center y of the image
  */
-void lv_image_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
+void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y);
 
 /**
  * Set pivot similar to get_pivot
@@ -229,21 +229,21 @@ const void * lv_image_get_src(lv_obj_t * obj);
  * @param obj       pointer to an image
  * @return          offset X value.
  */
-lv_coord_t lv_image_get_offset_x(lv_obj_t * obj);
+int32_t lv_image_get_offset_x(lv_obj_t * obj);
 
 /**
  * Get the offset's y attribute of the image object.
  * @param obj       pointer to an image
  * @return          offset Y value.
  */
-lv_coord_t lv_image_get_offset_y(lv_obj_t * obj);
+int32_t lv_image_get_offset_y(lv_obj_t * obj);
 
 /**
  * Get the rotation of the image.
  * @param obj       pointer to an image object
  * @return      rotation in 0.1 degrees (0..3600)
  */
-lv_coord_t lv_image_get_rotation(lv_obj_t * obj);
+int32_t lv_image_get_rotation(lv_obj_t * obj);
 
 /**
  * Get the pivot (rotation center) of the image.
@@ -258,21 +258,21 @@ void lv_image_get_pivot(lv_obj_t * obj, lv_point_t * pivot);
  * @param obj       pointer to an image object
  * @return          zoom factor (256: no zoom)
  */
-lv_coord_t lv_image_get_scale(lv_obj_t * obj);
+int32_t lv_image_get_scale(lv_obj_t * obj);
 
 /**
  * Get the horizontal zoom factor of the image.
  * @param obj       pointer to an image object
  * @return          zoom factor (256: no zoom)
  */
-lv_coord_t lv_image_get_scale_x(lv_obj_t * obj);
+int32_t lv_image_get_scale_x(lv_obj_t * obj);
 
 /**
  * Get the vertical zoom factor of the image.
  * @param obj       pointer to an image object
  * @return          zoom factor (256: no zoom)
  */
-lv_coord_t lv_image_get_scale_y(lv_obj_t * obj);
+int32_t lv_image_get_scale_y(lv_obj_t * obj);
 
 /**
  * Get whether the transformations (rotate, zoom) are anti-aliased or not

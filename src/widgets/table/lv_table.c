@@ -34,9 +34,9 @@ static void lv_table_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
-static lv_coord_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t * font,
-                                 lv_coord_t letter_space, lv_coord_t line_space,
-                                 lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
+static int32_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t * font,
+                              int32_t letter_space, int32_t line_space,
+                              int32_t cell_left, int32_t cell_right, int32_t cell_top, int32_t cell_bottom);
 static void refr_size_form_row(lv_obj_t * obj, uint32_t start_row);
 static void refr_cell_size(lv_obj_t * obj, uint32_t row, uint32_t col);
 static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * col);
@@ -280,7 +280,7 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint32_t col_cnt)
     refr_size_form_row(obj, 0) ;
 }
 
-void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, lv_coord_t w)
+void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, int32_t w)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -377,7 +377,7 @@ uint32_t lv_table_get_col_cnt(lv_obj_t * obj)
     return table->col_cnt;
 }
 
-lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col)
+int32_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -474,10 +474,10 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         uint32_t i;
-        lv_coord_t w = 0;
+        int32_t w = 0;
         for(i = 0; i < table->col_cnt; i++) w += table->col_w[i];
 
-        lv_coord_t h = 0;
+        int32_t h = 0;
         for(i = 0; i < table->row_cnt; i++) h += table->row_h[i];
 
         p->x = w - 1;
@@ -590,11 +590,11 @@ static void draw_main(lv_event_t * e)
     lv_point_t txt_size;
     lv_area_t cell_area;
 
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    int32_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    int32_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    int32_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
 
     lv_state_t state_ori = obj->state;
     obj->state = LV_STATE_DEFAULT;
@@ -618,12 +618,12 @@ static void draw_main(lv_event_t * e)
     cell_area.y2 = obj->coords.y1 + bg_top - 1 - lv_obj_get_scroll_y(obj) + border_width;
     cell_area.x1 = 0;
     cell_area.x2 = 0;
-    lv_coord_t scroll_x = lv_obj_get_scroll_x(obj) ;
+    int32_t scroll_x = lv_obj_get_scroll_x(obj) ;
     bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL;
 
     /*Handle custom drawer*/
     for(row = 0; row < table->row_cnt; row++) {
-        lv_coord_t h_row = table->row_h[row];
+        int32_t h_row = table->row_h[row];
 
         cell_area.y1 = cell_area.y2 + 1;
         cell_area.y2 = cell_area.y1 + h_row - 1;
@@ -654,7 +654,7 @@ static void draw_main(lv_event_t * e)
 
                 lv_table_cell_ctrl_t merge_ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
                 if(merge_ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT) {
-                    lv_coord_t offset = table->col_w[col + col_merge + 1];
+                    int32_t offset = table->col_w[col + col_merge + 1];
 
                     if(rtl) cell_area.x1 -= offset;
                     else cell_area.x2 += offset;
@@ -720,10 +720,10 @@ static void draw_main(lv_event_t * e)
             lv_draw_rect(layer, &rect_dsc_act, &cell_area_border);
 
             if(table->cell_data[cell]) {
-                const lv_coord_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-                const lv_coord_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-                const lv_coord_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-                const lv_coord_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+                const int32_t cell_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
+                const int32_t cell_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
+                const int32_t cell_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
+                const int32_t cell_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
                 lv_text_flag_t txt_flags = LV_TEXT_FLAG_NONE;
                 lv_area_t txt_area;
 
@@ -768,23 +768,23 @@ static void draw_main(lv_event_t * e)
 /* Refreshes size of the table starting from @start_row row */
 static void refr_size_form_row(lv_obj_t * obj, uint32_t start_row)
 {
-    const lv_coord_t cell_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-    const lv_coord_t cell_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-    const lv_coord_t cell_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-    const lv_coord_t cell_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
 
-    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_ITEMS);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
+    int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_ITEMS);
+    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_ITEMS);
 
-    const lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
-    const lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
+    const int32_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
+    const int32_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
 
     lv_table_t * table = (lv_table_t *)obj;
     uint32_t i;
     for(i = start_row; i < table->row_cnt; i++) {
-        lv_coord_t calculated_height = get_row_height(obj, i, font, letter_space, line_space,
-                                                      cell_pad_left, cell_pad_right, cell_pad_top, cell_pad_bottom);
+        int32_t calculated_height = get_row_height(obj, i, font, letter_space, line_space,
+                                                   cell_pad_left, cell_pad_right, cell_pad_top, cell_pad_bottom);
         table->row_h[i] = LV_CLAMP(minh, calculated_height, maxh);
     }
 
@@ -795,23 +795,23 @@ static void refr_size_form_row(lv_obj_t * obj, uint32_t start_row)
 
 static void refr_cell_size(lv_obj_t * obj, uint32_t row, uint32_t col)
 {
-    const lv_coord_t cell_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
-    const lv_coord_t cell_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
-    const lv_coord_t cell_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
-    const lv_coord_t cell_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
+    const int32_t cell_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
 
-    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_ITEMS);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
+    int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_ITEMS);
+    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_ITEMS);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_ITEMS);
 
-    const lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
-    const lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
+    const int32_t minh = lv_obj_get_style_min_height(obj, LV_PART_ITEMS);
+    const int32_t maxh = lv_obj_get_style_max_height(obj, LV_PART_ITEMS);
 
     lv_table_t * table = (lv_table_t *)obj;
-    lv_coord_t calculated_height = get_row_height(obj, row, font, letter_space, line_space,
-                                                  cell_pad_left, cell_pad_right, cell_pad_top, cell_pad_bottom);
+    int32_t calculated_height = get_row_height(obj, row, font, letter_space, line_space,
+                                               cell_pad_left, cell_pad_right, cell_pad_top, cell_pad_bottom);
 
-    lv_coord_t prev_row_size = table->row_h[row];
+    int32_t prev_row_size = table->row_h[row];
     table->row_h[row] = LV_CLAMP(minh, calculated_height, maxh);
 
     /*If the row height haven't changed invalidate only this cell*/
@@ -827,13 +827,13 @@ static void refr_cell_size(lv_obj_t * obj, uint32_t row, uint32_t col)
     }
 }
 
-static lv_coord_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t * font,
-                                 lv_coord_t letter_space, lv_coord_t line_space,
-                                 lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom)
+static int32_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_t * font,
+                              int32_t letter_space, int32_t line_space,
+                              int32_t cell_left, int32_t cell_right, int32_t cell_top, int32_t cell_bottom)
 {
     lv_table_t * table = (lv_table_t *)obj;
 
-    lv_coord_t h_max = lv_font_get_line_height(font) + cell_top + cell_bottom;
+    int32_t h_max = lv_font_get_line_height(font) + cell_top + cell_bottom;
     /* Calculate the cell_data index where to start */
     uint32_t row_start = row_id * table->col_cnt;
 
@@ -847,7 +847,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint32_t row_id, const lv_font_
             continue;
         }
 
-        lv_coord_t txt_w = table->col_w[col];
+        int32_t txt_w = table->col_w[col];
 
         /* Traverse the current row from the first until the penultimate column.
          * Increment the text width if the cell has the LV_TABLE_CELL_CTRL_MERGE_RIGHT control,
@@ -906,9 +906,9 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
     lv_point_t p;
     lv_indev_get_point(lv_indev_active(), &p);
 
-    lv_coord_t tmp;
+    int32_t tmp;
     if(col) {
-        lv_coord_t x = p.x + lv_obj_get_scroll_x(obj);
+        int32_t x = p.x + lv_obj_get_scroll_x(obj);
 
         if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
             x = obj->coords.x2 - lv_obj_get_style_pad_right(obj, LV_PART_MAIN) - x;
@@ -927,7 +927,7 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
     }
 
     if(row) {
-        lv_coord_t y = p.y + lv_obj_get_scroll_y(obj);;
+        int32_t y = p.y + lv_obj_get_scroll_y(obj);;
         y -= obj->coords.y1;
         y -= lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
 
@@ -982,7 +982,7 @@ static void get_cell_area(lv_obj_t * obj, uint32_t row, uint32_t col, lv_area_t 
     bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL;
     if(rtl) {
         area->x1 += lv_obj_get_scroll_x(obj);
-        lv_coord_t w = lv_obj_get_width(obj);
+        int32_t w = lv_obj_get_width(obj);
         area->x2 = w - area->x1 - lv_obj_get_style_pad_right(obj, 0);
         area->x1 = area->x2 - table->col_w[col];
     }

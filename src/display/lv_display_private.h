@@ -37,22 +37,22 @@ struct _lv_display_t {
      *--------------------*/
 
     /** Horizontal resolution.*/
-    lv_coord_t hor_res;
+    int32_t hor_res;
 
     /** Vertical resolution.*/
-    lv_coord_t ver_res;
+    int32_t ver_res;
 
     /** Horizontal resolution of the full / physical display. Set to -1 for fullscreen mode.*/
-    lv_coord_t physical_hor_res;
+    int32_t physical_hor_res;
 
     /** Vertical resolution of the full / physical display. Set to -1 for fullscreen mode.*/
-    lv_coord_t physical_ver_res;
+    int32_t physical_ver_res;
 
     /** Horizontal offset from the full / physical display. Set to 0 for fullscreen mode.*/
-    lv_coord_t offset_x;
+    int32_t offset_x;
 
     /** Vertical offset from the full / physical display. Set to 0 for fullscreen mode.*/
-    lv_coord_t offset_y;
+    int32_t offset_y;
 
     uint32_t dpi;              /** DPI (dot per inch) of the display. Default value is `LV_DPI_DEF`.*/
 

@@ -95,10 +95,10 @@ void test_table_row_height_should_increase_with_multiline_cell_value(void)
     const char * multiline_value = "LVGL\nRocks";
 
     lv_table_set_cell_value(table, 0, 0, singleline_value);
-    lv_coord_t singleline_row_height = table_ptr->row_h[0];
+    int32_t singleline_row_height = table_ptr->row_h[0];
 
     lv_table_set_cell_value(table, 0, 0, multiline_value);
-    lv_coord_t multiline_row_height = table_ptr->row_h[0];
+    int32_t multiline_row_height = table_ptr->row_h[0];
 
     TEST_ASSERT_GREATER_THAN(singleline_row_height, multiline_row_height);
 }
@@ -112,10 +112,10 @@ void test_table_should_wrap_long_texts(void)
     lv_table_set_col_width(table, 0, 50);
 
     lv_table_set_cell_value(table, 0, 0, small_text);
-    lv_coord_t row_height = table_ptr->row_h[0];
+    int32_t row_height = table_ptr->row_h[0];
 
     lv_table_set_cell_value(table, 0, 0, long_text);
-    lv_coord_t wrapped_row_height = table_ptr->row_h[0];
+    int32_t wrapped_row_height = table_ptr->row_h[0];
 
     /* Row height on cells with wrapped text is bigger than cells with small texts */
     TEST_ASSERT_GREATER_THAN(row_height, wrapped_row_height);

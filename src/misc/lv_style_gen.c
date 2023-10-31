@@ -10,7 +10,7 @@
 #include "lv_style.h"
 
 
-void lv_style_set_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -20,7 +20,7 @@ void lv_style_set_width(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_WIDTH = LV_STYLE_WIDTH;
 
-void lv_style_set_min_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_min_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -30,7 +30,7 @@ void lv_style_set_min_width(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_MIN_WIDTH = LV_STYLE_MIN_WIDTH;
 
-void lv_style_set_max_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_max_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -40,7 +40,7 @@ void lv_style_set_max_width(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_MAX_WIDTH = LV_STYLE_MAX_WIDTH;
 
-void lv_style_set_height(lv_style_t * style, lv_coord_t value)
+void lv_style_set_height(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -50,7 +50,7 @@ void lv_style_set_height(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_HEIGHT = LV_STYLE_HEIGHT;
 
-void lv_style_set_min_height(lv_style_t * style, lv_coord_t value)
+void lv_style_set_min_height(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -60,7 +60,7 @@ void lv_style_set_min_height(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_MIN_HEIGHT = LV_STYLE_MIN_HEIGHT;
 
-void lv_style_set_max_height(lv_style_t * style, lv_coord_t value)
+void lv_style_set_max_height(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -70,7 +70,7 @@ void lv_style_set_max_height(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_MAX_HEIGHT = LV_STYLE_MAX_HEIGHT;
 
-void lv_style_set_x(lv_style_t * style, lv_coord_t value)
+void lv_style_set_x(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -80,7 +80,7 @@ void lv_style_set_x(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_X = LV_STYLE_X;
 
-void lv_style_set_y(lv_style_t * style, lv_coord_t value)
+void lv_style_set_y(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -100,7 +100,7 @@ void lv_style_set_align(lv_style_t * style, lv_align_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_ALIGN = LV_STYLE_ALIGN;
 
-void lv_style_set_transform_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -110,7 +110,7 @@ void lv_style_set_transform_width(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_WIDTH = LV_STYLE_TRANSFORM_WIDTH;
 
-void lv_style_set_transform_height(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_height(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -120,7 +120,7 @@ void lv_style_set_transform_height(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_HEIGHT = LV_STYLE_TRANSFORM_HEIGHT;
 
-void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value)
+void lv_style_set_translate_x(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -130,7 +130,7 @@ void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSLATE_X = LV_STYLE_TRANSLATE_X;
 
-void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value)
+void lv_style_set_translate_y(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -140,7 +140,7 @@ void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSLATE_Y = LV_STYLE_TRANSLATE_Y;
 
-void lv_style_set_transform_scale_x(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_scale_x(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -150,7 +150,7 @@ void lv_style_set_transform_scale_x(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SCALE_X = LV_STYLE_TRANSFORM_SCALE_X;
 
-void lv_style_set_transform_scale_y(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_scale_y(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -160,7 +160,7 @@ void lv_style_set_transform_scale_y(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SCALE_Y = LV_STYLE_TRANSFORM_SCALE_Y;
 
-void lv_style_set_transform_rotation(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_rotation(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -170,7 +170,7 @@ void lv_style_set_transform_rotation(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_ROTATION = LV_STYLE_TRANSFORM_ROTATION;
 
-void lv_style_set_transform_pivot_x(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_pivot_x(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -180,7 +180,7 @@ void lv_style_set_transform_pivot_x(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_PIVOT_X = LV_STYLE_TRANSFORM_PIVOT_X;
 
-void lv_style_set_transform_pivot_y(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_pivot_y(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -190,7 +190,7 @@ void lv_style_set_transform_pivot_y(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_PIVOT_Y = LV_STYLE_TRANSFORM_PIVOT_Y;
 
-void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value)
+void lv_style_set_pad_top(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -200,7 +200,7 @@ void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_PAD_TOP = LV_STYLE_PAD_TOP;
 
-void lv_style_set_pad_bottom(lv_style_t * style, lv_coord_t value)
+void lv_style_set_pad_bottom(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -210,7 +210,7 @@ void lv_style_set_pad_bottom(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_PAD_BOTTOM = LV_STYLE_PAD_BOTTOM;
 
-void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value)
+void lv_style_set_pad_left(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -220,7 +220,7 @@ void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_PAD_LEFT = LV_STYLE_PAD_LEFT;
 
-void lv_style_set_pad_right(lv_style_t * style, lv_coord_t value)
+void lv_style_set_pad_right(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -230,7 +230,7 @@ void lv_style_set_pad_right(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_PAD_RIGHT = LV_STYLE_PAD_RIGHT;
 
-void lv_style_set_pad_row(lv_style_t * style, lv_coord_t value)
+void lv_style_set_pad_row(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -240,7 +240,7 @@ void lv_style_set_pad_row(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_PAD_ROW = LV_STYLE_PAD_ROW;
 
-void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value)
+void lv_style_set_pad_column(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -250,7 +250,7 @@ void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_PAD_COLUMN = LV_STYLE_PAD_COLUMN;
 
-void lv_style_set_margin_top(lv_style_t * style, lv_coord_t value)
+void lv_style_set_margin_top(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -260,7 +260,7 @@ void lv_style_set_margin_top(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_MARGIN_TOP = LV_STYLE_MARGIN_TOP;
 
-void lv_style_set_margin_bottom(lv_style_t * style, lv_coord_t value)
+void lv_style_set_margin_bottom(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -270,7 +270,7 @@ void lv_style_set_margin_bottom(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_MARGIN_BOTTOM = LV_STYLE_MARGIN_BOTTOM;
 
-void lv_style_set_margin_left(lv_style_t * style, lv_coord_t value)
+void lv_style_set_margin_left(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -280,7 +280,7 @@ void lv_style_set_margin_left(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_MARGIN_LEFT = LV_STYLE_MARGIN_LEFT;
 
-void lv_style_set_margin_right(lv_style_t * style, lv_coord_t value)
+void lv_style_set_margin_right(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -330,7 +330,7 @@ void lv_style_set_bg_grad_dir(lv_style_t * style, lv_grad_dir_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_BG_GRAD_DIR = LV_STYLE_BG_GRAD_DIR;
 
-void lv_style_set_bg_main_stop(lv_style_t * style, lv_coord_t value)
+void lv_style_set_bg_main_stop(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -340,7 +340,7 @@ void lv_style_set_bg_main_stop(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_BG_MAIN_STOP = LV_STYLE_BG_MAIN_STOP;
 
-void lv_style_set_bg_grad_stop(lv_style_t * style, lv_coord_t value)
+void lv_style_set_bg_grad_stop(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -450,7 +450,7 @@ void lv_style_set_border_opa(lv_style_t * style, lv_opa_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_BORDER_OPA = LV_STYLE_BORDER_OPA;
 
-void lv_style_set_border_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_border_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -480,7 +480,7 @@ void lv_style_set_border_post(lv_style_t * style, bool value)
 
 const lv_style_prop_t _lv_style_const_prop_id_BORDER_POST = LV_STYLE_BORDER_POST;
 
-void lv_style_set_outline_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_outline_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -510,7 +510,7 @@ void lv_style_set_outline_opa(lv_style_t * style, lv_opa_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_OUTLINE_OPA = LV_STYLE_OUTLINE_OPA;
 
-void lv_style_set_outline_pad(lv_style_t * style, lv_coord_t value)
+void lv_style_set_outline_pad(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -520,7 +520,7 @@ void lv_style_set_outline_pad(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_OUTLINE_PAD = LV_STYLE_OUTLINE_PAD;
 
-void lv_style_set_shadow_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_shadow_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -530,7 +530,7 @@ void lv_style_set_shadow_width(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_SHADOW_WIDTH = LV_STYLE_SHADOW_WIDTH;
 
-void lv_style_set_shadow_offset_x(lv_style_t * style, lv_coord_t value)
+void lv_style_set_shadow_offset_x(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -540,7 +540,7 @@ void lv_style_set_shadow_offset_x(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFFSET_X = LV_STYLE_SHADOW_OFFSET_X;
 
-void lv_style_set_shadow_offset_y(lv_style_t * style, lv_coord_t value)
+void lv_style_set_shadow_offset_y(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -550,7 +550,7 @@ void lv_style_set_shadow_offset_y(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFFSET_Y = LV_STYLE_SHADOW_OFFSET_Y;
 
-void lv_style_set_shadow_spread(lv_style_t * style, lv_coord_t value)
+void lv_style_set_shadow_spread(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -610,7 +610,7 @@ void lv_style_set_image_recolor_opa(lv_style_t * style, lv_opa_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_IMAGE_RECOLOR_OPA = LV_STYLE_IMAGE_RECOLOR_OPA;
 
-void lv_style_set_line_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_line_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -620,7 +620,7 @@ void lv_style_set_line_width(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_LINE_WIDTH = LV_STYLE_LINE_WIDTH;
 
-void lv_style_set_line_dash_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_line_dash_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -630,7 +630,7 @@ void lv_style_set_line_dash_width(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_LINE_DASH_WIDTH = LV_STYLE_LINE_DASH_WIDTH;
 
-void lv_style_set_line_dash_gap(lv_style_t * style, lv_coord_t value)
+void lv_style_set_line_dash_gap(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -670,7 +670,7 @@ void lv_style_set_line_opa(lv_style_t * style, lv_opa_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_LINE_OPA = LV_STYLE_LINE_OPA;
 
-void lv_style_set_arc_width(lv_style_t * style, lv_coord_t value)
+void lv_style_set_arc_width(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -750,7 +750,7 @@ void lv_style_set_text_font(lv_style_t * style, const lv_font_t * value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TEXT_FONT = LV_STYLE_TEXT_FONT;
 
-void lv_style_set_text_letter_space(lv_style_t * style, lv_coord_t value)
+void lv_style_set_text_letter_space(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -760,7 +760,7 @@ void lv_style_set_text_letter_space(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TEXT_LETTER_SPACE = LV_STYLE_TEXT_LETTER_SPACE;
 
-void lv_style_set_text_line_space(lv_style_t * style, lv_coord_t value)
+void lv_style_set_text_line_space(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -790,7 +790,7 @@ void lv_style_set_text_align(lv_style_t * style, lv_text_align_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TEXT_ALIGN = LV_STYLE_TEXT_ALIGN;
 
-void lv_style_set_radius(lv_style_t * style, lv_coord_t value)
+void lv_style_set_radius(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -970,7 +970,7 @@ void lv_style_set_flex_grow(lv_style_t * style, uint8_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_FLEX_GROW = LV_STYLE_FLEX_GROW;
 
-void lv_style_set_grid_column_dsc_array(lv_style_t * style, const lv_coord_t * value)
+void lv_style_set_grid_column_dsc_array(lv_style_t * style, const int32_t * value)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -990,7 +990,7 @@ void lv_style_set_grid_column_align(lv_style_t * style, lv_grid_align_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_GRID_COLUMN_ALIGN = LV_STYLE_GRID_COLUMN_ALIGN;
 
-void lv_style_set_grid_row_dsc_array(lv_style_t * style, const lv_coord_t * value)
+void lv_style_set_grid_row_dsc_array(lv_style_t * style, const int32_t * value)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -1010,7 +1010,7 @@ void lv_style_set_grid_row_align(lv_style_t * style, lv_grid_align_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_GRID_ROW_ALIGN = LV_STYLE_GRID_ROW_ALIGN;
 
-void lv_style_set_grid_cell_column_pos(lv_style_t * style, lv_coord_t value)
+void lv_style_set_grid_cell_column_pos(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -1030,7 +1030,7 @@ void lv_style_set_grid_cell_x_align(lv_style_t * style, lv_grid_align_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_X_ALIGN = LV_STYLE_GRID_CELL_X_ALIGN;
 
-void lv_style_set_grid_cell_column_span(lv_style_t * style, lv_coord_t value)
+void lv_style_set_grid_cell_column_span(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -1040,7 +1040,7 @@ void lv_style_set_grid_cell_column_span(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_COLUMN_SPAN = LV_STYLE_GRID_CELL_COLUMN_SPAN;
 
-void lv_style_set_grid_cell_row_pos(lv_style_t * style, lv_coord_t value)
+void lv_style_set_grid_cell_row_pos(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
@@ -1060,7 +1060,7 @@ void lv_style_set_grid_cell_y_align(lv_style_t * style, lv_grid_align_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_Y_ALIGN = LV_STYLE_GRID_CELL_Y_ALIGN;
 
-void lv_style_set_grid_cell_row_span(lv_style_t * style, lv_coord_t value)
+void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value

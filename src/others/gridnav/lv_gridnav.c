@@ -44,8 +44,8 @@ static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t 
 static lv_obj_t * find_first_focusable(lv_obj_t * obj);
 static lv_obj_t * find_last_focusable(lv_obj_t * obj);
 static bool obj_is_focuable(lv_obj_t * obj);
-static lv_coord_t get_x_center(lv_obj_t * obj);
-static lv_coord_t get_y_center(lv_obj_t * obj);
+static int32_t get_x_center(lv_obj_t * obj);
+static int32_t get_y_center(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -149,7 +149,7 @@ static void gridnav_event_cb(lv_event_t * e)
         if(key == LV_KEY_RIGHT) {
             if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_right(dsc->focused_obj) > 0) {
-                lv_coord_t d = lv_obj_get_width(dsc->focused_obj) / 4;
+                int32_t d = lv_obj_get_width(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
                 lv_obj_scroll_by_bounded(dsc->focused_obj, -d, 0, LV_ANIM_ON);
             }
@@ -169,7 +169,7 @@ static void gridnav_event_cb(lv_event_t * e)
         else if(key == LV_KEY_LEFT) {
             if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_left(dsc->focused_obj) > 0) {
-                lv_coord_t d = lv_obj_get_width(dsc->focused_obj) / 4;
+                int32_t d = lv_obj_get_width(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
                 lv_obj_scroll_by_bounded(dsc->focused_obj, d, 0, LV_ANIM_ON);
             }
@@ -189,7 +189,7 @@ static void gridnav_event_cb(lv_event_t * e)
         else if(key == LV_KEY_DOWN) {
             if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_bottom(dsc->focused_obj) > 0) {
-                lv_coord_t d = lv_obj_get_height(dsc->focused_obj) / 4;
+                int32_t d = lv_obj_get_height(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
                 lv_obj_scroll_by_bounded(dsc->focused_obj, 0, -d, LV_ANIM_ON);
             }
@@ -208,7 +208,7 @@ static void gridnav_event_cb(lv_event_t * e)
         else if(key == LV_KEY_UP) {
             if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_top(dsc->focused_obj) > 0) {
-                lv_coord_t d = lv_obj_get_height(dsc->focused_obj) / 4;
+                int32_t d = lv_obj_get_height(dsc->focused_obj) / 4;
                 if(d <= 0) d = 1;
                 lv_obj_scroll_by_bounded(dsc->focused_obj, 0, d, LV_ANIM_ON);
             }
@@ -289,22 +289,22 @@ static void gridnav_event_cb(lv_event_t * e)
 
 static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t mode)
 {
-    lv_coord_t x_start = get_x_center(start_child);
-    lv_coord_t y_start = get_y_center(start_child);
+    int32_t x_start = get_x_center(start_child);
+    int32_t y_start = get_y_center(start_child);
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     lv_obj_t * guess = NULL;
-    lv_coord_t x_err_guess = LV_COORD_MAX;
-    lv_coord_t y_err_guess = LV_COORD_MAX;
-    lv_coord_t h_half = lv_obj_get_height(start_child) / 2;
-    lv_coord_t h_max = lv_obj_get_height(obj) + lv_obj_get_scroll_top(obj) + lv_obj_get_scroll_bottom(obj);
+    int32_t x_err_guess = LV_COORD_MAX;
+    int32_t y_err_guess = LV_COORD_MAX;
+    int32_t h_half = lv_obj_get_height(start_child) / 2;
+    int32_t h_max = lv_obj_get_height(obj) + lv_obj_get_scroll_top(obj) + lv_obj_get_scroll_bottom(obj);
     uint32_t i;
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(child == start_child) continue;
         if(obj_is_focuable(child) == false) continue;
 
-        lv_coord_t x_err = 0;
-        lv_coord_t y_err = 0;
+        int32_t x_err = 0;
+        int32_t y_err = 0;
         switch(mode) {
             case FIND_LEFT:
                 x_err = get_x_center(child) - x_start;
@@ -387,12 +387,12 @@ static bool obj_is_focuable(lv_obj_t * obj)
     else return false;
 }
 
-static lv_coord_t get_x_center(lv_obj_t * obj)
+static int32_t get_x_center(lv_obj_t * obj)
 {
     return obj->coords.x1 + lv_area_get_width(&obj->coords) / 2;
 }
 
-static lv_coord_t get_y_center(lv_obj_t * obj)
+static int32_t get_y_center(lv_obj_t * obj)
 {
     return obj->coords.y1 + lv_area_get_height(&obj->coords) / 2;
 }

@@ -136,10 +136,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, cons
 
         int32_t blend_area_w = lv_area_get_width(&blend_area);
 
-        lv_coord_t y2 = blend_area.y2;
+        int32_t y2 = blend_area.y2;
         blend_area.y2 = blend_area.y1;
 
-        lv_coord_t dash_start = blend_area.x1 % (dsc->dash_gap + dsc->dash_width);
+        int32_t dash_start = blend_area.x1 % (dsc->dash_gap + dsc->dash_width);
 
         lv_opa_t * mask_buf = lv_malloc(blend_area_w);
         blend_dsc.mask_buf = mask_buf;
@@ -149,8 +149,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, cons
         for(h = blend_area.y1; h <= y2; h++) {
             lv_memset(mask_buf, 0xff, blend_area_w);
 
-            lv_coord_t dash_cnt = dash_start;
-            lv_coord_t i;
+            int32_t dash_cnt = dash_start;
+            int32_t i;
             for(i = 0; i < blend_area_w; i++, dash_cnt++) {
                 if(dash_cnt <= dsc->dash_width) {
                     int16_t diff = dsc->dash_width - dash_cnt;
@@ -211,16 +211,16 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
     else {
         int32_t draw_area_w = lv_area_get_width(&blend_area);
 
-        lv_coord_t y2 = blend_area.y2;
+        int32_t y2 = blend_area.y2;
         blend_area.y2 = blend_area.y1;
 
         lv_opa_t * mask_buf = lv_malloc(draw_area_w);
         blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
-        lv_coord_t dash_start = (blend_area.y1) % (dsc->dash_gap + dsc->dash_width);
+        int32_t dash_start = (blend_area.y1) % (dsc->dash_gap + dsc->dash_width);
 
-        lv_coord_t dash_cnt = dash_start;
+        int32_t dash_cnt = dash_start;
 
         int32_t h;
         for(h = blend_area.y1; h <= y2; h++) {
@@ -353,7 +353,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
     size_t mask_buf_size = LV_MIN(lv_area_get_size(&blend_area), hor_res);
     lv_opa_t * mask_buf = lv_malloc(mask_buf_size);
 
-    lv_coord_t y2 = blend_area.y2;
+    int32_t y2 = blend_area.y2;
     blend_area.y2 = blend_area.y1;
 
     uint32_t mask_p = 0;

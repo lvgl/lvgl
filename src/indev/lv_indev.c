@@ -476,7 +476,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     /*If the point is on this object check its children too*/
     lv_area_t obj_coords = obj->coords;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-        lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+        int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
         lv_area_increase(&obj_coords, ext_draw_size, ext_draw_size);
     }
     if(_lv_area_is_point_on(&obj_coords, &p_trans, 0)) {
@@ -518,7 +518,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         data->point.y = disp->ver_res - data->point.y - 1;
     }
     if(disp->rotation == LV_DISPLAY_ROTATION_90 || disp->rotation == LV_DISPLAY_ROTATION_270) {
-        lv_coord_t tmp = data->point.y;
+        int32_t tmp = data->point.y;
         data->point.y = data->point.x;
         data->point.x = disp->ver_res - tmp - 1;
     }
@@ -944,8 +944,8 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
         return;
     }
 
-    lv_coord_t x = i->btn_points[data->btn_id].x;
-    lv_coord_t y = i->btn_points[data->btn_id].y;
+    int32_t x = i->btn_points[data->btn_id].x;
+    int32_t y = i->btn_points[data->btn_id].y;
 
     if(LV_INDEV_STATE_RELEASED != data->state) {
         if(data->state == LV_INDEV_STATE_PRESSED) {

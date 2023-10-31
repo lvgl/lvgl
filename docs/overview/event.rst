@@ -107,7 +107,7 @@ Drawing events
 --------------
 
 -  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if an object fully covers an area. The event parameter is :cpp:struct:`lv_cover_check_info_t` ``*``.
--  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around an object (e.g. for a shadow). The event parameter is :cpp:type:`lv_coord_t` ``*`` to store the size. Only overwrite it with a larger value.
+-  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around an object (e.g. for a shadow). The event parameter is :cpp:type:`int32_t` ``*`` to store the size. Only overwrite it with a larger value.
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`: Starting the main drawing phase.
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN`: Perform the main drawing
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_END`: Finishing the main drawing phase

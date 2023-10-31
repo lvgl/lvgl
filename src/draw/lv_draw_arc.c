@@ -66,11 +66,11 @@ void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
     LV_PROFILER_END;
 }
 
-void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  lv_value_precise_t start_angle,
+void lv_draw_arc_get_area(int32_t x, int32_t y, uint16_t radius,  lv_value_precise_t start_angle,
                           lv_value_precise_t end_angle,
-                          lv_coord_t w, bool rounded, lv_area_t * area)
+                          int32_t w, bool rounded, lv_area_t * area)
 {
-    lv_coord_t rout = radius;
+    int32_t rout = radius;
     int32_t start_angle_int = (int32_t) start_angle;
     int32_t end_angle_int = (int32_t) end_angle;
 
@@ -86,8 +86,8 @@ void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  lv_value
     if(start_angle_int > 360) start_angle_int -= 360;
     if(end_angle_int > 360) end_angle_int -= 360;
 
-    lv_coord_t rin = radius - w;
-    lv_coord_t extra_area = rounded ? w / 2 + 1 : 0;
+    int32_t rin = radius - w;
+    int32_t extra_area = rounded ? w / 2 + 1 : 0;
     uint8_t start_quarter = start_angle_int / 90;
     uint8_t end_quarter = end_angle_int / 90;
 

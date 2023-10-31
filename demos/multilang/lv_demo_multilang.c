@@ -101,7 +101,7 @@ static card_info_t card_info[] = {
 
 static const void * get_imgfont_path(const lv_font_t * font,
                                      uint32_t unicode, uint32_t unicode_next,
-                                     lv_coord_t * offset_y, void * user_data)
+                                     int32_t * offset_y, void * user_data)
 {
     LV_UNUSED(user_data);
     LV_UNUSED(unicode_next);
@@ -164,8 +164,8 @@ void lv_demo_multilang(void)
     lv_obj_set_style_bg_grad_color(lv_screen_active(), lv_color_hex(0xf9f9f9), 0);
     lv_obj_set_style_bg_grad_dir(lv_screen_active(), LV_GRAD_DIR_HOR, 0);
 
-    static const lv_coord_t grid_cols[] = {LV_GRID_CONTENT, 4, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static const lv_coord_t grid_rows[] = {LV_GRID_CONTENT, -10, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_cols[] = {LV_GRID_CONTENT, 4, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_rows[] = {LV_GRID_CONTENT, -10, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
 
     lv_style_init(&style_card_cont);
     lv_style_set_width(&style_card_cont, lv_pct(100));
@@ -270,8 +270,8 @@ static void scroll_event_cb(lv_event_t * e)
     lv_obj_t * cont = lv_event_get_target(e);
     if(lv_indev_get_scroll_obj(indev) != cont) return;
 
-    lv_coord_t w = lv_obj_get_width(cont);
-    lv_coord_t scroll_x = lv_obj_get_scroll_x(cont) - lv_indev_scroll_throw_predict(indev, LV_DIR_HOR);
+    int32_t w = lv_obj_get_width(cont);
+    int32_t scroll_x = lv_obj_get_scroll_x(cont) - lv_indev_scroll_throw_predict(indev, LV_DIR_HOR);
 
     if(scroll_x < w / 2) {
         lv_obj_set_scroll_snap_x(cont, LV_SCROLL_SNAP_NONE);

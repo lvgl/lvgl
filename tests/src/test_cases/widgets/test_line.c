@@ -7,8 +7,8 @@ static lv_obj_t * active_screen = NULL;
 static lv_obj_t * line = NULL;
 
 static const uint16_t default_point_num = 0U;
-static const lv_coord_t initial_extra_draw_size = 5U;
-static const lv_coord_t final_extra_draw_size = 10U;
+static const int32_t initial_extra_draw_size = 5U;
+static const int32_t final_extra_draw_size = 10U;
 
 void setUp(void)
 {
@@ -45,8 +45,8 @@ void test_line_size_should_be_updated_after_adding_points(void)
     uint16_t point_cnt = (uint16_t) sizeof(points) / sizeof(lv_point_precise_t);
     lv_line_set_points(line, points, point_cnt);
 
-    lv_coord_t calculated_width = 0;
-    lv_coord_t calculated_height = 0;
+    int32_t calculated_width = 0;
+    int32_t calculated_height = 0;
 
     /* Get the biggest coordinate on both axis */
     uint16_t point_idx = 0;

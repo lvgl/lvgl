@@ -44,7 +44,7 @@ typedef struct {
     uint32_t max_length;         /*The max. number of characters. 0: no limit*/
     uint32_t pwd_show_time;      /*Time to show characters in password mode before change them to '*'*/
     struct {
-        lv_coord_t valid_x;        /*Used when stepping up/down to a shorter line.
+        int32_t valid_x;        /*Used when stepping up/down to a shorter line.
                                     *(Used by the library)*/
         uint32_t pos;              /*The current cursor position
                                     *(0: before 1st letter; 1: before 2nd letter ...)*/

@@ -113,7 +113,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
     masks[0] = &mask_left;
     masks[1] = &mask_right;
     masks[2] = &mask_bottom;
-    lv_coord_t area_w = lv_area_get_width(&draw_area);
+    int32_t area_w = lv_area_get_width(&draw_area);
     lv_opa_t * mask_buf = lv_malloc(area_w);
 
     lv_area_t blend_area = draw_area;
@@ -151,7 +151,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
         }
         else if(grad_dir == LV_GRAD_DIR_HOR) {
             if(grad_opa_map) {
-                lv_coord_t i;
+                int32_t i;
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_CHANGED) {
                     blend_dsc.mask_buf = mask_buf;
                     for(i = 0; i < area_w; i++) {

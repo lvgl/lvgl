@@ -33,9 +33,9 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static lv_opa_t opa_saved;
-static void add_to_cell(lv_obj_t * obj, lv_coord_t col, lv_coord_t row);
+static void add_to_cell(lv_obj_t * obj, int32_t col, int32_t row);
 
-static lv_obj_t * fill_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row)
+static lv_obj_t * fill_obj_create(lv_obj_t * parent, int32_t col, int32_t row)
 {
     lv_color_t colors[] = {lv_color_hex3(0x000),
                            lv_color_hex3(0xfff),
@@ -113,7 +113,7 @@ static void fill_cb(lv_obj_t * parent)
     }
 }
 
-static lv_obj_t * border_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row)
+static lv_obj_t * border_obj_create(lv_obj_t * parent, int32_t col, int32_t row)
 {
 
     lv_obj_t * obj = lv_obj_create(parent);
@@ -209,7 +209,7 @@ static void border_cb(lv_obj_t * parent)
     }
 }
 
-static lv_obj_t * box_shadow_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row)
+static lv_obj_t * box_shadow_obj_create(lv_obj_t * parent, int32_t col, int32_t row)
 {
     lv_obj_t * obj = lv_obj_create(parent);
     lv_obj_remove_style_all(obj);
@@ -225,8 +225,8 @@ static lv_obj_t * box_shadow_obj_create(lv_obj_t * parent, lv_coord_t col, lv_co
 static void box_shadow_cb(lv_obj_t * parent)
 {
 
-    static const lv_coord_t grid_rows[] = {45, 45, 45, 45, 45, 45, LV_GRID_TEMPLATE_LAST};
-    static const lv_coord_t grid_cols[] = {68, 68, 68, 68, 68, 68, 68, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_rows[] = {45, 45, 45, 45, 45, 45, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_cols[] = {68, 68, 68, 68, 68, 68, 68, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_grid_dsc_array(parent, grid_cols, grid_rows);
 
     lv_point_t ofs[] = {
@@ -275,7 +275,7 @@ static void box_shadow_cb(lv_obj_t * parent)
 }
 
 
-static lv_obj_t * text_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row)
+static lv_obj_t * text_obj_create(lv_obj_t * parent, int32_t col, int32_t row)
 {
 
     lv_obj_t * obj = lv_label_create(parent);
@@ -314,7 +314,7 @@ static void text_cb(lv_obj_t * parent)
 
 }
 
-static lv_obj_t * image_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row, bool recolor)
+static lv_obj_t * image_obj_create(lv_obj_t * parent, int32_t col, int32_t row, bool recolor)
 {
     lv_obj_t * obj = lv_image_create(parent);
     lv_obj_remove_style_all(obj);
@@ -407,7 +407,7 @@ static void image_recolored_cb(lv_obj_t * parent)
 }
 
 
-static lv_obj_t * line_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row, lv_point_precise_t p[])
+static lv_obj_t * line_obj_create(lv_obj_t * parent, int32_t col, int32_t row, lv_point_precise_t p[])
 {
     lv_obj_t * obj = lv_line_create(parent);
     lv_obj_remove_style_all(obj);
@@ -434,7 +434,7 @@ static void line_cb(lv_obj_t * parent)
         {{DEF_WIDTH - 5, 5}, {5, DEF_HEIGHT - 5}},               /* / */
     };
 
-    lv_coord_t widths[] = {1, 3, 5, 10};
+    int32_t widths[] = {1, 3, 5, 10};
 
     uint32_t r;
     for(r = 0; r < 2; r++) {
@@ -450,7 +450,7 @@ static void line_cb(lv_obj_t * parent)
     }
 }
 
-static lv_obj_t * arc_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row, lv_coord_t w,
+static lv_obj_t * arc_obj_create(lv_obj_t * parent, int32_t col, int32_t row, int32_t w,
                                  lv_value_precise_t start, lv_value_precise_t end)
 {
     lv_obj_t * obj = lv_arc_create(parent);
@@ -478,7 +478,7 @@ static void arc_core_cb(lv_obj_t * parent, const void * img_src)
         {0, 360},
     };
 
-    lv_coord_t widths[] = {1, 5, 10, 100};
+    int32_t widths[] = {1, 5, 10, 100};
 
     uint32_t r;
     for(r = 0; r < 2; r++) {
@@ -538,7 +538,7 @@ static void triangle_draw_event_cb(lv_event_t * e)
 }
 
 
-static lv_obj_t * triangle_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row, lv_point_t p[])
+static lv_obj_t * triangle_obj_create(lv_obj_t * parent, int32_t col, int32_t row, lv_point_t p[])
 {
     lv_obj_t * obj = lv_arc_create(parent);
     lv_obj_remove_style_all(obj);
@@ -613,7 +613,7 @@ static void triangle_cb(lv_obj_t * parent)
 }
 
 
-static lv_obj_t * layer_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row, lv_blend_mode_t blend_mode)
+static lv_obj_t * layer_obj_create(lv_obj_t * parent, int32_t col, int32_t row, lv_blend_mode_t blend_mode)
 {
     lv_obj_t * obj = lv_obj_create(parent);
     lv_obj_remove_style_all(obj);
@@ -642,7 +642,7 @@ static void layer_core_cb(lv_obj_t * parent, lv_blend_mode_t blend_mode)
 
     uint32_t i;
     for(i = 0; i < 2; i++) {
-        lv_coord_t row = 4 * i;
+        int32_t row = 4 * i;
         lv_obj_t * obj;
 
         obj = layer_obj_create(parent, 0, row, blend_mode);
@@ -752,8 +752,8 @@ void lv_demo_render(lv_demo_render_scene_t id, lv_opa_t opa)
     lv_obj_set_style_bg_color(main_parent, lv_color_hex3(0xaaf), 0);
     lv_obj_set_size(main_parent, 480, 272);
 
-    static const lv_coord_t grid_cols[] = {60, 60, 60, 60, 60, 60, 60, 60, LV_GRID_TEMPLATE_LAST};
-    static const lv_coord_t grid_rows[] = {34, 34, 34, 34, 34, 34, 34, 34, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_cols[] = {60, 60, 60, 60, 60, 60, 60, 60, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_rows[] = {34, 34, 34, 34, 34, 34, 34, 34, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_grid_dsc_array(main_parent, grid_cols, grid_rows);
 
     opa_saved = opa;
@@ -772,7 +772,7 @@ const char * lv_demo_render_get_scene_name(lv_demo_render_scene_t id)
  *   STATIC FUNCTIONS
  **********************/
 
-static void add_to_cell(lv_obj_t * obj, lv_coord_t col, lv_coord_t row)
+static void add_to_cell(lv_obj_t * obj, int32_t col, int32_t row)
 {
     lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_CENTER, col, 1, LV_GRID_ALIGN_CENTER, row, 1);
 }

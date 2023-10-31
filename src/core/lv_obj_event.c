@@ -230,10 +230,10 @@ lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e)
     }
 }
 
-void lv_event_set_ext_draw_size(lv_event_t * e, lv_coord_t size)
+void lv_event_set_ext_draw_size(lv_event_t * e, int32_t size)
 {
     if(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * cur_size = lv_event_get_param(e);
+        int32_t * cur_size = lv_event_get_param(e);
         *cur_size = LV_MAX(*cur_size, size);
     }
     else {

@@ -54,7 +54,7 @@ static void disp_event_cb(lv_event_t * e);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_display_create(lv_coord_t hor_res, lv_coord_t ver_res)
+lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 {
     lv_display_t * disp = _lv_ll_ins_head(disp_ll_p);
     LV_ASSERT_MALLOC(disp);
@@ -207,7 +207,7 @@ lv_display_t * lv_display_get_next(lv_display_t * disp)
  * RESOLUTION
  *--------------------*/
 
-void lv_display_set_resolution(lv_display_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
+void lv_display_set_resolution(lv_display_t * disp, int32_t hor_res, int32_t ver_res)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
@@ -220,7 +220,7 @@ void lv_display_set_resolution(lv_display_t * disp, lv_coord_t hor_res, lv_coord
     update_resolution(disp);
 }
 
-void lv_display_set_physical_resolution(lv_display_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
+void lv_display_set_physical_resolution(lv_display_t * disp, int32_t hor_res, int32_t ver_res)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
@@ -232,7 +232,7 @@ void lv_display_set_physical_resolution(lv_display_t * disp, lv_coord_t hor_res,
 
 }
 
-void lv_display_set_offset(lv_display_t * disp, lv_coord_t x, lv_coord_t y)
+void lv_display_set_offset(lv_display_t * disp, int32_t x, int32_t y)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
@@ -244,7 +244,7 @@ void lv_display_set_offset(lv_display_t * disp, lv_coord_t x, lv_coord_t y)
 
 }
 
-void lv_display_set_dpi(lv_display_t * disp, lv_coord_t dpi)
+void lv_display_set_dpi(lv_display_t * disp, int32_t dpi)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
@@ -252,7 +252,7 @@ void lv_display_set_dpi(lv_display_t * disp, lv_coord_t dpi)
     disp->dpi = dpi;
 }
 
-lv_coord_t lv_display_get_horizontal_resolution(const lv_display_t * disp)
+int32_t lv_display_get_horizontal_resolution(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
 
@@ -270,7 +270,7 @@ lv_coord_t lv_display_get_horizontal_resolution(const lv_display_t * disp)
     }
 }
 
-lv_coord_t lv_display_get_vertical_resolution(const lv_display_t * disp)
+int32_t lv_display_get_vertical_resolution(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
 
@@ -288,7 +288,7 @@ lv_coord_t lv_display_get_vertical_resolution(const lv_display_t * disp)
     }
 }
 
-lv_coord_t lv_display_get_physical_horizontal_resolution(const lv_display_t * disp)
+int32_t lv_display_get_physical_horizontal_resolution(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
 
@@ -306,7 +306,7 @@ lv_coord_t lv_display_get_physical_horizontal_resolution(const lv_display_t * di
     }
 }
 
-lv_coord_t lv_display_get_physical_vertical_resolution(const lv_display_t * disp)
+int32_t lv_display_get_physical_vertical_resolution(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
 
@@ -324,7 +324,7 @@ lv_coord_t lv_display_get_physical_vertical_resolution(const lv_display_t * disp
     }
 }
 
-lv_coord_t lv_display_get_offset_x(const lv_display_t * disp)
+int32_t lv_display_get_offset_x(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
 
@@ -345,7 +345,7 @@ lv_coord_t lv_display_get_offset_x(const lv_display_t * disp)
     }
 }
 
-lv_coord_t lv_display_get_offset_y(const lv_display_t * disp)
+int32_t lv_display_get_offset_y(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
 
@@ -366,7 +366,7 @@ lv_coord_t lv_display_get_offset_y(const lv_display_t * disp)
     }
 }
 
-lv_coord_t lv_display_get_dpi(const lv_display_t * disp)
+int32_t lv_display_get_dpi(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return LV_DPI_DEF;  /*Do not return 0 because it might be a divider*/
@@ -856,8 +856,8 @@ void * lv_display_get_driver_data(lv_display_t * disp)
 
 static void update_resolution(lv_display_t * disp)
 {
-    lv_coord_t hor_res = lv_display_get_horizontal_resolution(disp);
-    lv_coord_t ver_res = lv_display_get_vertical_resolution(disp);
+    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
+    int32_t ver_res = lv_display_get_vertical_resolution(disp);
 
     lv_area_t prev_coords;
     lv_obj_get_coords(disp->sys_layer, &prev_coords);

@@ -11,7 +11,7 @@ static void event_cb(lv_event_t * e)
         lv_obj_invalidate(chart);
     }
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = lv_event_get_param(e);
+        int32_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, 20);
     }
     else if(code == LV_EVENT_DRAW_POST_END) {
@@ -25,8 +25,8 @@ static void event_cb(lv_event_t * e)
             lv_point_t p;
             lv_chart_get_point_pos_by_id(chart, ser, id, &p);
 
-            lv_coord_t * y_array = lv_chart_get_y_array(chart, ser);
-            lv_coord_t value = y_array[id];
+            int32_t * y_array = lv_chart_get_y_array(chart, ser);
+            int32_t value = y_array[id];
 
             char buf[16];
             lv_snprintf(buf, sizeof(buf), LV_SYMBOL_DUMMY"$%d", value);

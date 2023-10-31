@@ -557,13 +557,13 @@ uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop);
 
 #include "lv_style_gen.h"
 
-static inline void lv_style_set_size(lv_style_t * style, lv_coord_t width, lv_coord_t height)
+static inline void lv_style_set_size(lv_style_t * style, int32_t width, int32_t height)
 {
     lv_style_set_width(style, width);
     lv_style_set_height(style, height);
 }
 
-static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
+static inline void lv_style_set_pad_all(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_left(style, value);
     lv_style_set_pad_right(style, value);
@@ -571,25 +571,25 @@ static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
     lv_style_set_pad_bottom(style, value);
 }
 
-static inline void lv_style_set_pad_hor(lv_style_t * style, lv_coord_t value)
+static inline void lv_style_set_pad_hor(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_left(style, value);
     lv_style_set_pad_right(style, value);
 }
 
-static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value)
+static inline void lv_style_set_pad_ver(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_top(style, value);
     lv_style_set_pad_bottom(style, value);
 }
 
-static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value)
+static inline void lv_style_set_pad_gap(lv_style_t * style, int32_t value)
 {
     lv_style_set_pad_row(style, value);
     lv_style_set_pad_column(style, value);
 }
 
-static inline void lv_style_set_transform_scale(lv_style_t * style, lv_coord_t value)
+static inline void lv_style_set_transform_scale(lv_style_t * style, int32_t value)
 {
     lv_style_set_transform_scale_x(style, value);
     lv_style_set_transform_scale_y(style, value);

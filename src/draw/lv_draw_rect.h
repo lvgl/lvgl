@@ -32,7 +32,7 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 typedef struct {
     lv_draw_dsc_base_t base;
 
-    lv_coord_t radius;
+    int32_t radius;
 
     /*Background*/
     lv_opa_t bg_opa;
@@ -49,30 +49,30 @@ typedef struct {
 
     /*Border*/
     lv_color_t border_color;
-    lv_coord_t border_width;
+    int32_t border_width;
     lv_opa_t border_opa;
     lv_border_side_t border_side : 5;
     uint8_t border_post : 1; /*The border will be drawn later*/
 
     /*Outline*/
     lv_color_t outline_color;
-    lv_coord_t outline_width;
-    lv_coord_t outline_pad;
+    int32_t outline_width;
+    int32_t outline_pad;
     lv_opa_t outline_opa;
 
     /*Shadow*/
     lv_color_t shadow_color;
-    lv_coord_t shadow_width;
-    lv_coord_t shadow_offset_x;
-    lv_coord_t shadow_offset_y;
-    lv_coord_t shadow_spread;
+    int32_t shadow_width;
+    int32_t shadow_offset_x;
+    int32_t shadow_offset_y;
+    int32_t shadow_spread;
     lv_opa_t shadow_opa;
 } lv_draw_rect_dsc_t;
 
 typedef struct {
     lv_draw_dsc_base_t base;
 
-    lv_coord_t radius;
+    int32_t radius;
 
     lv_opa_t opa;
     lv_color_t color;
@@ -82,7 +82,7 @@ typedef struct {
 typedef struct {
     lv_draw_dsc_base_t base;
 
-    lv_coord_t radius;
+    int32_t radius;
 
     const void * src;
     const void * font;
@@ -96,10 +96,10 @@ typedef struct {
 typedef struct {
     lv_draw_dsc_base_t base;
 
-    lv_coord_t radius;
+    int32_t radius;
 
     lv_color_t color;
-    lv_coord_t width;
+    int32_t width;
     lv_opa_t opa;
     lv_border_side_t side : 5;
 
@@ -108,13 +108,13 @@ typedef struct {
 typedef struct {
     lv_draw_dsc_base_t base;
 
-    lv_coord_t radius;
+    int32_t radius;
 
     lv_color_t color;
-    lv_coord_t width;
-    lv_coord_t spread;
-    lv_coord_t ofs_x;
-    lv_coord_t ofs_y;
+    int32_t width;
+    int32_t spread;
+    int32_t ofs_x;
+    int32_t ofs_y;
     lv_opa_t opa;
     uint8_t bg_cover    : 1;
 } lv_draw_box_shadow_dsc_t;

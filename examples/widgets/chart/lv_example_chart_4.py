@@ -10,8 +10,6 @@ def event_cb(e):
         chart.invalidate()
 
     if code == lv.EVENT.REFR_EXT_DRAW_SIZE:
-        # s = lv.coord_t.__cast__(e.get_param())
-        # print("s: {:d}".format(s))
         e.set_ext_draw_size(20)
 
     elif code == lv.EVENT.DRAW_POST_END:

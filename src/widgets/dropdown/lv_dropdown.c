@@ -53,7 +53,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t
 static lv_result_t btn_release_handler(lv_obj_t * obj);
 static lv_result_t list_release_handler(lv_obj_t * list_obj);
 static void list_press_handler(lv_obj_t * page);
-static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y);
+static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y);
 static void position_to_selected(lv_obj_t * obj);
 static lv_obj_t * get_label(const lv_obj_t * obj);
 
@@ -477,13 +477,13 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
         lv_obj_set_width(dropdown->list, lv_obj_get_width(dropdown_obj));
     }
 
-    lv_coord_t label_h = lv_obj_get_height(label);
-    lv_coord_t border_width = lv_obj_get_style_border_width(dropdown->list, LV_PART_MAIN);
-    lv_coord_t top = lv_obj_get_style_pad_top(dropdown->list, LV_PART_MAIN) + border_width;
-    lv_coord_t bottom = lv_obj_get_style_pad_bottom(dropdown->list, LV_PART_MAIN) + border_width;
+    int32_t label_h = lv_obj_get_height(label);
+    int32_t border_width = lv_obj_get_style_border_width(dropdown->list, LV_PART_MAIN);
+    int32_t top = lv_obj_get_style_pad_top(dropdown->list, LV_PART_MAIN) + border_width;
+    int32_t bottom = lv_obj_get_style_pad_bottom(dropdown->list, LV_PART_MAIN) + border_width;
 
-    lv_coord_t list_fit_h = label_h + top + bottom;
-    lv_coord_t list_h = list_fit_h;
+    int32_t list_fit_h = label_h + top + bottom;
+    int32_t list_h = list_fit_h;
 
     lv_dir_t dir = dropdown->dir;
     /*No space on the bottom? See if top is better.*/
@@ -526,8 +526,8 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_obj_update_layout(dropdown->list);
 
     if(dropdown->dir == LV_DIR_LEFT || dropdown->dir == LV_DIR_RIGHT) {
-        lv_coord_t y1 = lv_obj_get_y(dropdown->list);
-        lv_coord_t y2 = lv_obj_get_y2(dropdown->list);
+        int32_t y1 = lv_obj_get_y(dropdown->list);
+        int32_t y2 = lv_obj_get_y2(dropdown->list);
         if(y2 >= LV_VER_RES) {
             lv_obj_set_y(dropdown->list, y1 - (y2 - LV_VER_RES) - 1);
         }
@@ -787,10 +787,10 @@ static void draw_main(lv_event_t * e)
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
 
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
-    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
-    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
+    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
+    int32_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
+    int32_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
 
     lv_draw_label_dsc_t symbol_dsc;
     lv_draw_label_dsc_init(&symbol_dsc);
@@ -811,8 +811,8 @@ static void draw_main(lv_event_t * e)
 
     if(dropdown->symbol) {
         lv_image_src_t symbol_type = lv_image_src_get_type(dropdown->symbol);
-        lv_coord_t symbol_w;
-        lv_coord_t symbol_h;
+        int32_t symbol_w;
+        int32_t symbol_h;
         if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
             lv_point_t size;
             lv_text_get_size(&size, dropdown->symbol, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space, LV_COORD_MAX,
@@ -950,8 +950,8 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, l
 
     /*Draw a rectangle under the selected item*/
     const lv_font_t * font    = lv_obj_get_style_text_font(list_obj, LV_PART_SELECTED);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(list_obj,  LV_PART_SELECTED);
-    lv_coord_t font_h         = lv_font_get_line_height(font);
+    int32_t line_space = lv_obj_get_style_text_line_space(list_obj,  LV_PART_SELECTED);
+    int32_t font_h         = lv_font_get_line_height(font);
 
     /*Draw the selected*/
     lv_obj_t * label = get_label(dropdown_obj);
@@ -996,7 +996,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t
     lv_obj_t * label = get_label(dropdown_obj);
     if(label == NULL) return;
 
-    lv_coord_t font_h        = lv_font_get_line_height(label_dsc.font);
+    int32_t font_h        = lv_font_get_line_height(label_dsc.font);
 
     lv_area_t area_sel;
     area_sel.y1 = label->coords.y1;
@@ -1108,7 +1108,7 @@ static void list_press_handler(lv_obj_t * list_obj)
     }
 }
 
-static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y)
+static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y)
 {
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
     lv_obj_t * label = get_label(dropdown_obj);
@@ -1116,11 +1116,11 @@ static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y)
     y -= label->coords.y1;
 
     const lv_font_t * font         = lv_obj_get_style_text_font(label, LV_PART_MAIN);
-    lv_coord_t font_h              = lv_font_get_line_height(font);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(label, LV_PART_MAIN);
+    int32_t font_h              = lv_font_get_line_height(font);
+    int32_t line_space = lv_obj_get_style_text_line_space(label, LV_PART_MAIN);
 
     y += line_space / 2;
-    lv_coord_t h = font_h + line_space;
+    int32_t h = font_h + line_space;
 
     uint32_t opt = y / h;
 
@@ -1142,10 +1142,10 @@ static void position_to_selected(lv_obj_t * dropdown_obj)
     if(lv_obj_get_height(label) <= lv_obj_get_content_height(dropdown_obj)) return;
 
     const lv_font_t * font         = lv_obj_get_style_text_font(label, LV_PART_MAIN);
-    lv_coord_t font_h              = lv_font_get_line_height(font);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(label, LV_PART_MAIN);
-    lv_coord_t unit_h = font_h + line_space;
-    lv_coord_t line_y1 = dropdown->sel_opt_id * unit_h;
+    int32_t font_h              = lv_font_get_line_height(font);
+    int32_t line_space = lv_obj_get_style_text_line_space(label, LV_PART_MAIN);
+    int32_t unit_h = font_h + line_space;
+    int32_t line_y1 = dropdown->sel_opt_id * unit_h;
 
     /*Scroll to the selected option*/
     lv_obj_scroll_to_y(dropdown->list, line_y1, LV_ANIM_OFF);

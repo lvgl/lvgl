@@ -323,8 +323,8 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_obj_t * parent = obj->parent;
     if(parent) {
-        lv_coord_t sl = lv_obj_get_scroll_left(parent);
-        lv_coord_t st = lv_obj_get_scroll_top(parent);
+        int32_t sl = lv_obj_get_scroll_left(parent);
+        int32_t st = lv_obj_get_scroll_top(parent);
 
         obj->coords.y1 = parent->coords.y1 + lv_obj_get_style_pad_top(parent, LV_PART_MAIN) - st;
         obj->coords.y2 = obj->coords.y1 - 1;
@@ -402,9 +402,9 @@ static void lv_obj_draw(lv_event_t * e)
         }
 
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
-        lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        int32_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+        int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+        int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         lv_area_increase(&coords, w, h);
@@ -438,8 +438,8 @@ static void lv_obj_draw(lv_event_t * e)
             draw_dsc.border_post = 1;
         }
 
-        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+        int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         lv_area_increase(&coords, w, h);
@@ -460,8 +460,8 @@ static void lv_obj_draw(lv_event_t * e)
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
-            lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-            lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+            int32_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+            int32_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
             lv_area_t coords;
             lv_area_copy(&coords, &obj->coords);
             lv_area_increase(&coords, w, h);
@@ -598,8 +598,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_WITH_ARROW) && !lv_obj_is_editable(obj)) {
             /*scroll by keypad or encoder*/
             lv_anim_enable_t anim_enable = LV_ANIM_OFF;
-            lv_coord_t sl = lv_obj_get_scroll_left(obj);
-            lv_coord_t sr = lv_obj_get_scroll_right(obj);
+            int32_t sl = lv_obj_get_scroll_left(obj);
+            int32_t sr = lv_obj_get_scroll_right(obj);
             char c = *((char *)lv_event_get_param(e));
             if(c == LV_KEY_DOWN) {
                 /*use scroll_to_x/y functions to enforce scroll limits*/
@@ -666,7 +666,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        lv_coord_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
+        int32_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
         uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
         if(layout || align) {
             lv_obj_mark_layout_as_dirty(obj);
@@ -680,16 +680,16 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_CHILD_CHANGED) {
-        lv_coord_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_height(obj, LV_PART_MAIN);
-        lv_coord_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
+        int32_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);
+        int32_t h = lv_obj_get_style_height(obj, LV_PART_MAIN);
+        int32_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
         uint16_t layout = lv_obj_get_style_layout(obj, LV_PART_MAIN);
         if(layout || align || w == LV_SIZE_CONTENT || h == LV_SIZE_CONTENT) {
             lv_obj_mark_layout_as_dirty(obj);
         }
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
+        int32_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
         lv_event_set_ext_draw_size(e, d);
     }
     else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST || code == LV_EVENT_COVER_CHECK) {

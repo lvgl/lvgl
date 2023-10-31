@@ -283,8 +283,8 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     LV_PROFILER_BEGIN;
     /*If the first task is screen sized, there cannot be independent areas*/
     if(layer->draw_task_head) {
-        lv_coord_t hor_res = lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
-        lv_coord_t ver_res = lv_display_get_vertical_resolution(_lv_refr_get_disp_refreshing());
+        int32_t hor_res = lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
+        int32_t ver_res = lv_display_get_vertical_resolution(_lv_refr_get_disp_refreshing());
         lv_draw_task_t * t = layer->draw_task_head;
         if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
            t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
@@ -370,7 +370,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     return lv_draw_buf_align(layer->buf, layer->color_format);
 }
 
-void * lv_draw_layer_go_to_xy(lv_layer_t * layer, lv_coord_t x, lv_coord_t y)
+void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
 {
     uint32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
     return lv_draw_buf_go_to_xy(layer->buf, stride, layer->color_format, x, y);

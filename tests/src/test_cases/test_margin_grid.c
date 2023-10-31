@@ -25,7 +25,7 @@ lv_obj_t * obj_create(lv_obj_t * parent, lv_color_t color)
     return obj;
 }
 
-void obj_set_margin(lv_obj_t * obj, lv_coord_t left, lv_coord_t top, lv_coord_t right, lv_coord_t bottom)
+void obj_set_margin(lv_obj_t * obj, int32_t left, int32_t top, int32_t right, int32_t bottom)
 {
     lv_obj_set_style_margin_left(obj, left, LV_PART_MAIN);
     lv_obj_set_style_margin_top(obj, top, LV_PART_MAIN);
@@ -40,8 +40,8 @@ void test_grid(void)
 
     lv_obj_t * obj0 = active_screen;
 
-    static lv_coord_t row_dsc[M + 1];
-    static lv_coord_t col_dsc[N + 1];
+    static int32_t row_dsc[M + 1];
+    static int32_t col_dsc[N + 1];
 
     row_dsc[M] = LV_GRID_TEMPLATE_LAST;
     col_dsc[N] = LV_GRID_TEMPLATE_LAST;

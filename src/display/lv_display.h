@@ -97,7 +97,7 @@ typedef void (*lv_display_flush_wait_cb_t)(struct _lv_display_t * disp);
  * @param ver_res   vertical resolution in pixels
  * @return          pointer to a display object or `NULL` on error
  */
-lv_display_t * lv_display_create(lv_coord_t hor_res, lv_coord_t ver_res);
+lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res);
 
 /**
  * Remove a display
@@ -136,7 +136,7 @@ lv_display_t * lv_display_get_next(lv_display_t * disp);
  * @param hor_res   the new horizontal resolution
  * @param ver_res   the new vertical resolution
  */
-void lv_display_set_resolution(lv_display_t * disp, lv_coord_t hor_res, lv_coord_t ver_res);
+void lv_display_set_resolution(lv_display_t * disp, int32_t hor_res, int32_t ver_res);
 
 /**
  * It's not mandatory to use the whole display for LVGL, however in some cases physical resolution is important.
@@ -146,7 +146,7 @@ void lv_display_set_resolution(lv_display_t * disp, lv_coord_t hor_res, lv_coord
  * @param hor_res   the new physical horizontal resolution, or -1 to assume it's the same as the normal hor. res.
  * @param ver_res   the new physical vertical resolution, or -1 to assume it's the same as the normal hor. res.
  */
-void lv_display_set_physical_resolution(lv_display_t * disp, lv_coord_t hor_res, lv_coord_t ver_res);
+void lv_display_set_physical_resolution(lv_display_t * disp, int32_t hor_res, int32_t ver_res);
 
 /**
  * If physical resolution is not the same as the normal resolution
@@ -155,7 +155,7 @@ void lv_display_set_physical_resolution(lv_display_t * disp, lv_coord_t hor_res,
  * @param x         X offset
  * @param y         Y offset
  */
-void lv_display_set_offset(lv_display_t * disp, lv_coord_t x, lv_coord_t y);
+void lv_display_set_offset(lv_display_t * disp, int32_t x, int32_t y);
 
 /**
  * Set the rotation of this display. LVGL will swap the horizontal and vertical resolutions internally.
@@ -172,49 +172,49 @@ void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation
  * @param disp      pointer to a display
  * @param dpi       the new DPI
  */
-void lv_display_set_dpi(lv_display_t * disp, lv_coord_t dpi);
+void lv_display_set_dpi(lv_display_t * disp, int32_t dpi);
 
 /**
  * Get the horizontal resolution of a display.
  * @param disp      pointer to a display (NULL to use the default display)
  * @return          the horizontal resolution of the display.
  */
-lv_coord_t lv_display_get_horizontal_resolution(const lv_display_t * disp);
+int32_t lv_display_get_horizontal_resolution(const lv_display_t * disp);
 
 /**
  * Get the vertical resolution of a display
  * @param disp      pointer to a display (NULL to use the default display)
  * @return          the vertical resolution of the display
  */
-lv_coord_t lv_display_get_vertical_resolution(const lv_display_t * disp);
+int32_t lv_display_get_vertical_resolution(const lv_display_t * disp);
 
 /**
  * Get the physical horizontal resolution of a display
  * @param disp      pointer to a display (NULL to use the default display)
  * @return the      physical horizontal resolution of the display
  */
-lv_coord_t lv_display_get_physical_horizontal_resolution(const lv_display_t * disp);
+int32_t lv_display_get_physical_horizontal_resolution(const lv_display_t * disp);
 
 /**
  * Get the physical vertical resolution of a display
  * @param disp      pointer to a display (NULL to use the default display)
  * @return          the physical vertical resolution of the display
  */
-lv_coord_t lv_display_get_physical_vertical_resolution(const lv_display_t * disp);
+int32_t lv_display_get_physical_vertical_resolution(const lv_display_t * disp);
 
 /**
  * Get the horizontal offset from the full / physical display
  * @param disp      pointer to a display (NULL to use the default display)
  * @return          the horizontal offset from the physical display
  */
-lv_coord_t lv_display_get_offset_x(const lv_display_t * disp);
+int32_t lv_display_get_offset_x(const lv_display_t * disp);
 
 /**
  * Get the vertical offset from the full / physical display
  * @param disp      pointer to a display (NULL to use the default display)
  * @return          the horizontal offset from the physical display
  */
-lv_coord_t lv_display_get_offset_y(const lv_display_t * disp);
+int32_t lv_display_get_offset_y(const lv_display_t * disp);
 
 /**
  * Get the current rotation of this display.
@@ -228,7 +228,7 @@ lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp);
  * @param disp      pointer to a display (NULL to use the default display)
  * @return          dpi of the display
  */
-lv_coord_t lv_display_get_dpi(const lv_display_t * disp);
+int32_t lv_display_get_dpi(const lv_display_t * disp);
 
 /*---------------------
  * BUFFERING
@@ -547,7 +547,7 @@ void * lv_display_get_driver_data(lv_display_t * disp);
  * @param n     the number of pixels to scale
  * @return      `n x current_dpi/160`
  */
-static inline lv_coord_t lv_dpx(lv_coord_t n)
+static inline int32_t lv_dpx(int32_t n)
 {
     return LV_DPX(n);
 }
@@ -561,7 +561,7 @@ static inline lv_coord_t lv_dpx(lv_coord_t n)
  * @param n     the number of pixels to scale
  * @return      `n x current_dpi/160`
  */
-static inline lv_coord_t lv_display_dpx(const lv_display_t * disp, lv_coord_t n)
+static inline int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
 {
     return _LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }

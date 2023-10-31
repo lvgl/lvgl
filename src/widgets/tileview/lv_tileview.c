@@ -84,8 +84,8 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, l
 
 void lv_obj_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t anim_en)
 {
-    lv_coord_t tx = lv_obj_get_x(tile_obj);
-    lv_coord_t ty = lv_obj_get_y(tile_obj);
+    int32_t tx = lv_obj_get_x(tile_obj);
+    int32_t ty = lv_obj_get_y(tile_obj);
 
     lv_tileview_tile_t * tile = (lv_tileview_tile_t *)tile_obj;
     lv_tileview_t * tv = (lv_tileview_t *) obj;
@@ -99,17 +99,17 @@ void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim
 {
     lv_obj_update_layout(tv);
 
-    lv_coord_t w = lv_obj_get_content_width(tv);
-    lv_coord_t h = lv_obj_get_content_height(tv);
+    int32_t w = lv_obj_get_content_width(tv);
+    int32_t h = lv_obj_get_content_height(tv);
 
-    lv_coord_t tx = col_id * w;
-    lv_coord_t ty = row_id * h;
+    int32_t tx = col_id * w;
+    int32_t ty = row_id * h;
 
     uint32_t i;
     for(i = 0; i < lv_obj_get_child_cnt(tv); i++) {
         lv_obj_t * tile_obj = lv_obj_get_child(tv, i);
-        lv_coord_t x = lv_obj_get_x(tile_obj);
-        lv_coord_t y = lv_obj_get_y(tile_obj);
+        int32_t x = lv_obj_get_x(tile_obj);
+        int32_t y = lv_obj_get_y(tile_obj);
         if(x == tx && y == ty) {
             lv_obj_set_tile(tv, tile_obj, anim_en);
             return;
@@ -160,23 +160,23 @@ static void tileview_event_cb(lv_event_t * e)
             return;
         }
 
-        lv_coord_t w = lv_obj_get_content_width(obj);
-        lv_coord_t h = lv_obj_get_content_height(obj);
+        int32_t w = lv_obj_get_content_width(obj);
+        int32_t h = lv_obj_get_content_height(obj);
 
         lv_point_t scroll_end;
         lv_obj_get_scroll_end(obj, &scroll_end);
-        lv_coord_t left = scroll_end.x;
-        lv_coord_t top = scroll_end.y;
+        int32_t left = scroll_end.x;
+        int32_t top = scroll_end.y;
 
-        lv_coord_t tx = ((left + (w / 2)) / w) * w;
-        lv_coord_t ty = ((top + (h / 2)) / h) * h;
+        int32_t tx = ((left + (w / 2)) / w) * w;
+        int32_t ty = ((top + (h / 2)) / h) * h;
 
         lv_dir_t dir = LV_DIR_ALL;
         uint32_t i;
         for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
             lv_obj_t * tile_obj = lv_obj_get_child(obj, i);
-            lv_coord_t x = lv_obj_get_x(tile_obj);
-            lv_coord_t y = lv_obj_get_y(tile_obj);
+            int32_t x = lv_obj_get_x(tile_obj);
+            int32_t y = lv_obj_get_y(tile_obj);
             if(x == tx && y == ty) {
                 lv_tileview_tile_t * tile = (lv_tileview_tile_t *)tile_obj;
                 tv->tile_act = (lv_obj_t *)tile;

@@ -48,8 +48,8 @@ LV_IMAGE_DECLARE(img_transform_avatar_15)
  **********************/
 void lv_demo_transform(void)
 {
-    static const lv_coord_t grid_cols[] = {LV_GRID_CONTENT, 4, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static const lv_coord_t grid_rows[] = {LV_GRID_CONTENT, -10, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_cols[] = {LV_GRID_CONTENT, 4, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_rows[] = {LV_GRID_CONTENT, -10, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
 
     lv_style_init(&style_card);
     lv_style_set_width(&style_card, 300);
@@ -87,7 +87,7 @@ void lv_demo_transform(void)
     card_to_transform = card_create();
     lv_obj_center(card_to_transform);
 
-    lv_coord_t disp_w = lv_display_get_horizontal_resolution(NULL);
+    int32_t disp_w = lv_display_get_horizontal_resolution(NULL);
     lv_obj_t * arc = lv_arc_create(lv_screen_active());
     lv_obj_set_size(arc, disp_w - 20, disp_w - 20);
     lv_arc_set_range(arc, 0, 270);

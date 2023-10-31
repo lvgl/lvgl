@@ -162,7 +162,7 @@ typedef enum {
 typedef struct _my_theme_t {
     lv_theme_t base;
     disp_size_t disp_size;
-    lv_coord_t disp_dpi;
+    int32_t disp_dpi;
     lv_color_t color_scr;
     lv_color_t color_text;
     lv_color_t color_card;
@@ -458,7 +458,7 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_line_width(&theme->styles.chart_series, _LV_DPX_CALC(theme->disp_dpi, 3));
     lv_style_set_radius(&theme->styles.chart_series, _LV_DPX_CALC(theme->disp_dpi, 3));
 
-    lv_coord_t chart_size = _LV_DPX_CALC(theme->disp_dpi, 8);
+    int32_t chart_size = _LV_DPX_CALC(theme->disp_dpi, 8);
     lv_style_set_size(&theme->styles.chart_series, chart_size, chart_size);
     lv_style_set_pad_column(&theme->styles.chart_series, _LV_DPX_CALC(theme->disp_dpi, 2));
 
@@ -535,7 +535,7 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_line_width(&theme->styles.meter_marker, _LV_DPX_CALC(theme->disp_dpi, 5));
     lv_style_set_line_color(&theme->styles.meter_marker, theme->color_text);
 
-    lv_coord_t meter_size = _LV_DPX_CALC(theme->disp_dpi, 20);
+    int32_t meter_size = _LV_DPX_CALC(theme->disp_dpi, 20);
     lv_style_set_size(&theme->styles.meter_marker, meter_size, meter_size);
 
     meter_size = _LV_DPX_CALC(theme->disp_dpi, 15);
@@ -674,8 +674,8 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
     struct _my_theme_t * theme = theme_def;
 
     lv_display_t * new_disp = disp == NULL ? lv_display_get_default() : disp;
-    lv_coord_t new_dpi = lv_display_get_dpi(new_disp);
-    lv_coord_t hor_res = lv_display_get_horizontal_resolution(new_disp);
+    int32_t new_dpi = lv_display_get_dpi(new_disp);
+    int32_t hor_res = lv_display_get_horizontal_resolution(new_disp);
     disp_size_t new_size;
 
     if(hor_res <= 320) new_size = DISP_SMALL;

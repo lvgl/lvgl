@@ -37,9 +37,9 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer);
 static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer);
-static uint32_t get_index_from_x(lv_obj_t * obj, lv_coord_t x);
+static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x);
 static void invalidate_point(lv_obj_t * obj, uint32_t i);
-static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t cnt, lv_coord_t ** a);
+static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t cnt, int32_t ** a);
 
 /**********************
  *  STATIC VARIABLES
@@ -125,7 +125,7 @@ void lv_chart_set_point_count(lv_obj_t * obj, uint32_t cnt)
     lv_chart_refresh(obj);
 }
 
-void lv_chart_set_range(lv_obj_t * obj, lv_chart_axis_t axis, lv_coord_t min, lv_coord_t max)
+void lv_chart_set_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, int32_t max)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -219,8 +219,8 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
         return;
     }
 
-    lv_coord_t w = lv_obj_get_content_width(obj);
-    lv_coord_t h = lv_obj_get_content_height(obj);
+    int32_t w = lv_obj_get_content_width(obj);
+    int32_t h = lv_obj_get_content_height(obj);
 
     if(chart->type == LV_CHART_TYPE_LINE) {
         p_out->x = (w * id) / (chart->point_cnt - 1);
@@ -235,7 +235,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
         /*Gap between the columns on adjacent X ticks*/
         int32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
-        lv_coord_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
+        int32_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
 
         p_out->x = (int32_t)((int32_t)(w - block_w) * id) / (chart->point_cnt - 1);
         lv_chart_series_t * ser_i = NULL;
@@ -248,11 +248,11 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
         p_out->x = (int32_t)((int32_t)(w + block_gap) * id) / chart->point_cnt;
         p_out->x += block_w * ser_idx / ser_cnt;
 
-        lv_coord_t col_w = (block_w - (ser_gap * (ser_cnt - 1))) / ser_cnt;
+        int32_t col_w = (block_w - (ser_gap * (ser_cnt - 1))) / ser_cnt;
         p_out->x += col_w / 2;
     }
 
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     p_out->x += lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     p_out->x -= lv_obj_get_scroll_left(obj);
 
@@ -291,11 +291,11 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     if(ser == NULL) return NULL;
 
     /* Allocate memory for point_cnt points, handle failure below */
-    ser->y_points = lv_malloc(sizeof(lv_coord_t) * chart->point_cnt);
+    ser->y_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
     LV_ASSERT_MALLOC(ser->y_points);
 
     if(chart->type == LV_CHART_TYPE_SCATTER) {
-        ser->x_points = lv_malloc(sizeof(lv_coord_t) * chart->point_cnt);
+        ser->x_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
         LV_ASSERT_MALLOC(ser->x_points);
         if(NULL == ser->x_points) {
             lv_free(ser->y_points);
@@ -323,8 +323,8 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     ser->y_axis_sec = axis & LV_CHART_AXIS_SECONDARY_Y ? 1 : 0;
 
     uint32_t i;
-    const lv_coord_t def = LV_CHART_POINT_NONE;
-    lv_coord_t * p_tmp = ser->y_points;
+    const int32_t def = LV_CHART_POINT_NONE;
+    int32_t * p_tmp = ser->y_points;
     for(i = 0; i < chart->point_cnt; i++) {
         *p_tmp = def;
         p_tmp++;
@@ -473,7 +473,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
  *====================*/
 
 
-void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t value)
+void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -487,7 +487,7 @@ void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t 
     lv_chart_refresh(obj);
 }
 
-void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t value)
+void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -499,7 +499,7 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t
     invalidate_point(obj, ser->start_point);
 }
 
-void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t x_value, lv_coord_t y_value)
+void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, int32_t x_value, int32_t y_value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -517,7 +517,7 @@ void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_
     invalidate_point(obj, ser->start_point);
 }
 
-void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_coord_t value)
+void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -528,8 +528,8 @@ void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t 
     invalidate_point(obj, id);
 }
 
-void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_coord_t x_value,
-                               lv_coord_t y_value)
+void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t x_value,
+                               int32_t y_value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -546,7 +546,7 @@ void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t
     invalidate_point(obj, id);
 }
 
-void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t array[])
+void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -557,7 +557,7 @@ void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_
     lv_obj_invalidate(obj);
 }
 
-void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t array[])
+void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -568,7 +568,7 @@ void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_
     lv_obj_invalidate(obj);
 }
 
-lv_coord_t * lv_chart_get_y_array(const lv_obj_t * obj, lv_chart_series_t * ser)
+int32_t * lv_chart_get_y_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
     LV_UNUSED(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -576,7 +576,7 @@ lv_coord_t * lv_chart_get_y_array(const lv_obj_t * obj, lv_chart_series_t * ser)
     return ser->y_points;
 }
 
-lv_coord_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
+int32_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
     LV_UNUSED(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -599,8 +599,8 @@ int32_t lv_chart_get_first_point_center_offset(lv_obj_t * obj)
         lv_obj_update_layout(obj);
         /*Gap between the columns on ~adjacent X*/
         int32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
-        lv_coord_t w = lv_obj_get_content_width(obj);
-        lv_coord_t block_w = (w + block_gap) / (chart->point_cnt);
+        int32_t w = lv_obj_get_content_width(obj);
+        int32_t block_w = (w + block_gap) / (chart->point_cnt);
 
         x_ofs += (block_w - block_gap) / 2;
     }
@@ -731,24 +731,24 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
     int16_t i;
     int16_t i_start;
     int16_t i_end;
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
-    lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
-    lv_coord_t w = lv_obj_get_content_width(obj);
-    lv_coord_t h = lv_obj_get_content_height(obj);
+    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
+    int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
+    int32_t w = lv_obj_get_content_width(obj);
+    int32_t h = lv_obj_get_content_height(obj);
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
     lv_opa_t border_opa = lv_obj_get_style_border_opa(obj, LV_PART_MAIN);
-    lv_coord_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_border_side_t border_side = lv_obj_get_style_border_side(obj, LV_PART_MAIN);
 
-    lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
-    lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
+    int32_t scroll_left = lv_obj_get_scroll_left(obj);
+    int32_t scroll_top = lv_obj_get_scroll_top(obj);
     if(chart->hdiv_cnt != 0) {
-        lv_coord_t y_ofs = obj->coords.y1 + pad_top - scroll_top;
+        int32_t y_ofs = obj->coords.y1 + pad_top - scroll_top;
         line_dsc.p1_x = obj->coords.x1;
         line_dsc.p2_x = obj->coords.x2;
 
@@ -770,7 +770,7 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
     }
 
     if(chart->vdiv_cnt != 0) {
-        lv_coord_t x_ofs = obj->coords.x1 + pad_left - scroll_left;
+        int32_t x_ofs = obj->coords.x1 + pad_left - scroll_left;
         line_dsc.p1_y = obj->coords.y1;
         line_dsc.p2_y = obj->coords.y2;
         i_start = 0;
@@ -805,13 +805,13 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     if(chart->point_cnt < 2) return;
 
     uint32_t i;
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
-    lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
-    lv_coord_t w     = lv_obj_get_content_width(obj);
-    lv_coord_t h     = lv_obj_get_content_height(obj);
-    lv_coord_t x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-    lv_coord_t y_ofs = obj->coords.y1 + pad_top - lv_obj_get_scroll_top(obj);
+    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
+    int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
+    int32_t w     = lv_obj_get_content_width(obj);
+    int32_t h     = lv_obj_get_content_height(obj);
+    int32_t x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
+    int32_t y_ofs = obj->coords.y1 + pad_top - lv_obj_get_scroll_top(obj);
     lv_chart_series_t * ser;
 
     lv_area_t series_clip_area;
@@ -826,8 +826,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     lv_draw_rect_dsc_init(&point_dsc_default);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &point_dsc_default);
 
-    lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
-    lv_coord_t point_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
+    int32_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
+    int32_t point_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
 
     /*Do not bother with line ending is the point will over it*/
     if(LV_MIN(point_w, point_h) > line_dsc.width / 2) line_dsc.raw_end = 1;
@@ -844,13 +844,13 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.base.id2 = 0;
         point_dsc_default.base.id2 = 0;
 
-        lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+        int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
         line_dsc.p1_x = x_ofs;
         line_dsc.p2_x = x_ofs;
 
-        lv_coord_t p_act = start_point;
-        lv_coord_t p_prev = start_point;
+        int32_t p_act = start_point;
+        int32_t p_prev = start_point;
         int32_t y_tmp = (int32_t)((int32_t)ser->y_points[p_prev] - chart->ymin[ser->y_axis_sec]) * h;
         y_tmp  = y_tmp / (chart->ymax[ser->y_axis_sec] - chart->ymin[ser->y_axis_sec]);
         line_dsc.p2_y   = h - y_tmp + y_ofs;
@@ -952,13 +952,13 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
     uint32_t i;
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t w     = lv_obj_get_content_width(obj);
-    lv_coord_t h     = lv_obj_get_content_height(obj);
-    lv_coord_t x_ofs = obj->coords.x1 + pad_left + border_width - lv_obj_get_scroll_left(obj);
-    lv_coord_t y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
+    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    int32_t w     = lv_obj_get_content_width(obj);
+    int32_t h     = lv_obj_get_content_height(obj);
+    int32_t x_ofs = obj->coords.x1 + pad_left + border_width - lv_obj_get_scroll_left(obj);
+    int32_t y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
     lv_chart_series_t * ser;
 
     lv_draw_line_dsc_t line_dsc;
@@ -969,8 +969,8 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
     lv_draw_rect_dsc_init(&point_dsc_default);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &point_dsc_default);
 
-    lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
-    lv_coord_t point_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
+    int32_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
+    int32_t point_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
 
     /*Do not bother with line ending is the point will over it*/
     if(LV_MIN(point_w, point_h) > line_dsc.width / 2) line_dsc.raw_end = 1;
@@ -982,13 +982,13 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.color = ser->color;
         point_dsc_default.bg_color = ser->color;
 
-        lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+        int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
         line_dsc.p1_x = x_ofs;
         line_dsc.p2_x = x_ofs;
 
-        lv_coord_t p_act = start_point;
-        lv_coord_t p_prev = start_point;
+        int32_t p_act = start_point;
+        int32_t p_prev = start_point;
         if(ser->y_points[p_act] != LV_CHART_POINT_CNT_DEF) {
             line_dsc.p2_x = lv_map(ser->x_points[p_act], chart->xmin[ser->x_axis_sec], chart->xmax[ser->x_axis_sec], 0, w);
             line_dsc.p2_x += x_ofs;
@@ -1073,22 +1073,22 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
 
     uint32_t i;
     lv_area_t col_a;
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t w = lv_obj_get_content_width(obj);
-    lv_coord_t h  = lv_obj_get_content_height(obj);
+    int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    int32_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    int32_t w = lv_obj_get_content_width(obj);
+    int32_t h  = lv_obj_get_content_height(obj);
     int32_t y_tmp;
     lv_chart_series_t * ser;
     uint32_t ser_cnt = _lv_ll_get_len(&chart->series_ll);
     int32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);  /*Gap between the column on ~adjacent X*/
-    lv_coord_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
+    int32_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
     int32_t ser_gap = lv_obj_get_style_pad_column(obj, LV_PART_ITEMS); /*Gap between the columns on the ~same X*/
-    lv_coord_t col_w = (block_w - (ser_cnt - 1) * ser_gap) / ser_cnt;
+    int32_t col_w = (block_w - (ser_cnt - 1) * ser_gap) / ser_cnt;
     if(col_w < 1) col_w  = 1;
 
-    lv_coord_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t x_ofs = pad_left - lv_obj_get_scroll_left(obj) + border_w;
-    lv_coord_t y_ofs = pad_top - lv_obj_get_scroll_top(obj) + border_w;
+    int32_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t x_ofs = pad_left - lv_obj_get_scroll_left(obj) + border_w;
+    int32_t y_ofs = pad_top - lv_obj_get_scroll_top(obj) + border_w;
 
     lv_draw_rect_dsc_t col_dsc;
     lv_draw_rect_dsc_init(&col_dsc);
@@ -1101,7 +1101,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
 
     /*Go through all points*/
     for(i = 0; i < chart->point_cnt; i++) {
-        lv_coord_t x_act = (int32_t)((int32_t)(w - block_w) * i) / (chart->point_cnt - 1) + obj->coords.x1 + x_ofs;
+        int32_t x_act = (int32_t)((int32_t)(w - block_w) * i) / (chart->point_cnt - 1) + obj->coords.x1 + x_ofs;
         col_dsc.base.id2 = i;
         col_dsc.base.id1 = 0;
 
@@ -1109,7 +1109,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
         _LV_LL_READ(&chart->series_ll, ser) {
             if(ser->hidden) continue;
 
-            lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+            int32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
             col_a.x1 = x_act;
             col_a.x2 = col_a.x1 + col_w - 1;
@@ -1120,7 +1120,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
 
             col_dsc.bg_color = ser->color;
 
-            lv_coord_t p_act = (start_point + i) % chart->point_cnt;
+            int32_t p_act = (start_point + i) % chart->point_cnt;
             y_tmp            = (int32_t)((int32_t)ser->y_points[p_act] - chart->ymin[ser->y_axis_sec]) * h;
             y_tmp            = y_tmp / (chart->ymax[ser->y_axis_sec] - chart->ymin[ser->y_axis_sec]);
             col_a.y1         = h - y_tmp + obj->coords.y1 + y_ofs;
@@ -1160,8 +1160,8 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
     lv_draw_line_dsc_t line_dsc;
     lv_draw_rect_dsc_t point_dsc_tmp;
 
-    lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_CURSOR) / 2;
-    lv_coord_t point_h = lv_obj_get_style_width(obj, LV_PART_CURSOR) / 2;
+    int32_t point_w = lv_obj_get_style_width(obj, LV_PART_CURSOR) / 2;
+    int32_t point_h = lv_obj_get_style_width(obj, LV_PART_CURSOR) / 2;
 
     /*Go through all cursor lines*/
     _LV_LL_READ_BACK(&chart->cursor_ll, cursor) {
@@ -1170,8 +1170,8 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.color = cursor->color;
         point_dsc_tmp.bg_color = cursor->color;
 
-        lv_coord_t cx;
-        lv_coord_t cy;
+        int32_t cx;
+        int32_t cy;
         if(cursor->pos_set) {
             cx = cursor->pos.x;
             cy = cursor->pos.y;
@@ -1239,11 +1239,11 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
  * @param coord the coordination of the point relative to the series area.
  * @return the found index
  */
-static uint32_t get_index_from_x(lv_obj_t * obj, lv_coord_t x)
+static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x)
 {
     lv_chart_t * chart  = (lv_chart_t *)obj;
-    lv_coord_t w = lv_obj_get_content_width(obj);
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    int32_t w = lv_obj_get_content_width(obj);
+    int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     x -= pad_left;
 
     if(x < 0) return 0;
@@ -1259,8 +1259,8 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(i >= chart->point_cnt) return;
 
-    lv_coord_t w  = lv_obj_get_content_width(obj);
-    lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
+    int32_t w  = lv_obj_get_content_width(obj);
+    int32_t scroll_left = lv_obj_get_scroll_left(obj);
 
     /*In shift mode the whole chart changes so the whole object*/
     if(chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT) {
@@ -1269,11 +1269,11 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
     }
 
     if(chart->type == LV_CHART_TYPE_LINE) {
-        lv_coord_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        lv_coord_t x_ofs = obj->coords.x1 + pleft + bwidth - scroll_left;
-        lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
-        lv_coord_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR);
+        int32_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+        int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        int32_t x_ofs = obj->coords.x1 + pleft + bwidth - scroll_left;
+        int32_t line_width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
+        int32_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR);
 
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
@@ -1297,10 +1297,10 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
         /*Gap between the column on ~adjacent X*/
         int32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
-        lv_coord_t block_w = (w + block_gap) / chart->point_cnt;
+        int32_t block_w = (w + block_gap) / chart->point_cnt;
 
-        lv_coord_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        lv_coord_t x_act;
+        int32_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+        int32_t x_act;
         x_act = (int32_t)((int32_t)(block_w) * i) ;
         x_act += obj->coords.x1 + bwidth + lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
 
@@ -1316,7 +1316,7 @@ static void invalidate_point(lv_obj_t * obj, uint32_t i)
     }
 }
 
-static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t cnt, lv_coord_t ** a)
+static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t cnt, int32_t ** a)
 {
     if((*a) == NULL) return;
 
@@ -1325,7 +1325,7 @@ static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t c
     uint32_t i;
 
     if(ser->start_point != 0) {
-        lv_coord_t * new_points = lv_malloc(sizeof(lv_coord_t) * cnt);
+        int32_t * new_points = lv_malloc(sizeof(int32_t) * cnt);
         LV_ASSERT_MALLOC(new_points);
         if(new_points == NULL) return;
 
@@ -1350,7 +1350,7 @@ static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t c
         (*a) = new_points;
     }
     else {
-        (*a) = lv_realloc((*a), sizeof(lv_coord_t) * cnt);
+        (*a) = lv_realloc((*a), sizeof(int32_t) * cnt);
         LV_ASSERT_MALLOC((*a));
         if((*a) == NULL) return;
         /*Initialize the new points*/

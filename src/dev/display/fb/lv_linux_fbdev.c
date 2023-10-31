@@ -189,9 +189,9 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
     LV_LOG_INFO("The framebuffer device was mapped to memory successfully");
 
-    lv_coord_t hor_res = dsc->vinfo.xres;
-    lv_coord_t ver_res = dsc->vinfo.yres;
-    lv_coord_t width = dsc->vinfo.width;
+    int32_t hor_res = dsc->vinfo.xres;
+    int32_t ver_res = dsc->vinfo.yres;
+    int32_t width = dsc->vinfo.width;
     uint32_t draw_buf_size = hor_res * dsc->vinfo.bits_per_pixel >> 3;
     if(LV_LINUX_FBDEV_BUFFER_COUNT < 1) {
         draw_buf_size *= LV_LINUX_FBDEV_BUFFER_SIZE;
@@ -230,7 +230,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         return;
     }
 
-    lv_coord_t w = lv_area_get_width(area);
+    int32_t w = lv_area_get_width(area);
     uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
     uint32_t color_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * dsc->finfo.line_length;
     uint32_t fb_pos = color_pos + dsc->vinfo.yoffset * dsc->finfo.line_length;

@@ -45,7 +45,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_t * indev);
  * @param dir `     LV_DIR_VER` or `LV_DIR_HOR`
  * @return          the difference compared to the current position when the throw would be finished
  */
-lv_coord_t lv_indev_scroll_throw_predict(lv_indev_t * indev, lv_dir_t dir);
+int32_t lv_indev_scroll_throw_predict(lv_indev_t * indev, lv_dir_t dir);
 
 /**
  * Get the distance of the nearest snap point

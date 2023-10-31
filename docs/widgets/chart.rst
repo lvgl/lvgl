@@ -69,7 +69,7 @@ an array for the data points. ``axis`` can have the following values:
 
 :cpp:expr:`lv_chart_set_ext_y_array(chart, ser, value_array)` makes the chart
 use an external array for the given series. ``value_array`` should look
-like this: ``lv_coord_t * value_array[num_points]``. The array size
+like this: ``int32_t * value_array[num_points]``. The array size
 needs to be large enough to hold all the points of that series. The
 array's pointer will be saved in the chart so it needs to be global,
 static or dynamically allocated. Note: you should call

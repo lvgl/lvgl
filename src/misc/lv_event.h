@@ -66,7 +66,7 @@ typedef enum {
 
     /** Drawing events*/
     LV_EVENT_COVER_CHECK,        /**< Check if the object fully covers an area. The event parameter is `lv_cover_check_info_t *`.*/
-    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow). The event parameter is `lv_coord_t *` to store the size.*/
+    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow). The event parameter is `int32_t *` to store the size.*/
     LV_EVENT_DRAW_MAIN_BEGIN,    /**< Starting the main drawing phase*/
     LV_EVENT_DRAW_MAIN,          /**< Perform the main drawing*/
     LV_EVENT_DRAW_MAIN_END,      /**< Finishing the main drawing phase*/
