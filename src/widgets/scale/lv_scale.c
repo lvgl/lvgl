@@ -450,13 +450,17 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                                                              tick_value, tick_idx, &tick_point_a);
 
             if(is_major_tick) {
-                major_tick_dsc.p1 = tick_point_a;
-                major_tick_dsc.p2 = tick_point_b;
+                major_tick_dsc.p1_x = tick_point_a.x;
+                major_tick_dsc.p1_y = tick_point_a.y;
+                major_tick_dsc.p2_x = tick_point_b.x;
+                major_tick_dsc.p2_y = tick_point_b.y;
                 lv_draw_line(layer, &major_tick_dsc);
             }
             else {
-                minor_tick_dsc.p1 = tick_point_a;
-                minor_tick_dsc.p2 = tick_point_b;
+                minor_tick_dsc.p1_x = tick_point_a.x;
+                minor_tick_dsc.p1_y = tick_point_a.y;
+                minor_tick_dsc.p2_x = tick_point_b.x;
+                minor_tick_dsc.p2_y = tick_point_b.y;
                 lv_draw_line(layer, &minor_tick_dsc);
             }
         }
@@ -553,13 +557,17 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
 
             if(is_major_tick) {
-                major_tick_dsc.p1 = tick_point_a;
-                major_tick_dsc.p2 = tick_point_b;
+                major_tick_dsc.p1_x = tick_point_a.x;
+                major_tick_dsc.p1_y = tick_point_a.y;
+                major_tick_dsc.p2_x = tick_point_b.x;
+                major_tick_dsc.p2_y = tick_point_b.y;
                 lv_draw_line(layer, &major_tick_dsc);
             }
             else {
-                minor_tick_dsc.p1 = tick_point_a;
-                minor_tick_dsc.p2 = tick_point_b;
+                minor_tick_dsc.p1_x = tick_point_a.x;
+                minor_tick_dsc.p1_y = tick_point_a.y;
+                minor_tick_dsc.p2_x = tick_point_b.x;
+                minor_tick_dsc.p2_y = tick_point_b.y;
                 lv_draw_line(layer, &minor_tick_dsc);
             }
         }
@@ -636,8 +644,10 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             main_line_point_b.x += scale->first_tick_width / 2U;
         }
 
-        line_dsc.p1 = main_line_point_a;
-        line_dsc.p2 = main_line_point_b;
+        line_dsc.p1_x = main_line_point_a.x;
+        line_dsc.p1_y = main_line_point_a.y;
+        line_dsc.p2_x = main_line_point_b.x;
+        line_dsc.p2_y = main_line_point_b.y;
         lv_draw_line(layer, &line_dsc);
 
         lv_scale_section_t * section;
@@ -676,8 +686,10 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 
             scale_set_line_properties(obj, &main_line_section_dsc, section->main_style, LV_PART_MAIN);
 
-            main_line_section_dsc.p1 = main_point_a;
-            main_line_section_dsc.p2 = main_point_b;
+            main_line_section_dsc.p1_x = main_point_a.x;
+            main_line_section_dsc.p1_y = main_point_a.y;
+            main_line_section_dsc.p2_x = main_point_b.x;
+            main_line_section_dsc.p2_y = main_point_b.y;
             lv_draw_line(layer, &main_line_section_dsc);
         }
     }

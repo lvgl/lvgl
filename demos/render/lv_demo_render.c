@@ -407,7 +407,7 @@ static void image_recolored_cb(lv_obj_t * parent)
 }
 
 
-static lv_obj_t * line_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row, lv_point_t p[])
+static lv_obj_t * line_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t row, lv_point_precise_t p[])
 {
     lv_obj_t * obj = lv_line_create(parent);
     lv_obj_remove_style_all(obj);
@@ -423,7 +423,7 @@ static lv_obj_t * line_obj_create(lv_obj_t * parent, lv_coord_t col, lv_coord_t 
 static void line_cb(lv_obj_t * parent)
 {
 
-    static lv_point_t points[][2] = {
+    static lv_point_precise_t points[][2] = {
         {{5, DEF_HEIGHT / 2}, {DEF_WIDTH - 5, DEF_HEIGHT / 2}}, /* - */
         {{5, DEF_HEIGHT / 2}, {DEF_WIDTH - 5, DEF_HEIGHT / 2 + 1}}, /* - */
         {{5, DEF_HEIGHT / 2}, {DEF_WIDTH - 5, DEF_HEIGHT / 2 - 1}}, /* - */

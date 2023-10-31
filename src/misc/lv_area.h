@@ -39,6 +39,11 @@ typedef struct {
     lv_coord_t y;
 } lv_point_t;
 
+typedef struct {
+    lv_value_precise_t x;
+    lv_value_precise_t y;
+} lv_point_precise_t;
+
 /** Represents an area of the screen.*/
 typedef struct {
     lv_coord_t x1;

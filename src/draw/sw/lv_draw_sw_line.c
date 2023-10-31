@@ -54,20 +54,20 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    if(dsc->p1.x == dsc->p2.x && dsc->p1.y == dsc->p2.y) return;
+    if(dsc->p1_x == dsc->p2_x && dsc->p1_y == dsc->p2_y) return;
 
     lv_area_t clip_line;
-    clip_line.x1 = LV_MIN(dsc->p1.x, dsc->p2.x) - dsc->width / 2;
-    clip_line.x2 = LV_MAX(dsc->p1.x, dsc->p2.x) + dsc->width / 2;
-    clip_line.y1 = LV_MIN(dsc->p1.y, dsc->p2.y) - dsc->width / 2;
-    clip_line.y2 = LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width / 2;
+    clip_line.x1 = (int32_t)LV_MIN(dsc->p1_x, dsc->p2_x) - dsc->width / 2;
+    clip_line.x2 = (int32_t)LV_MAX(dsc->p1_x, dsc->p2_x) + dsc->width / 2;
+    clip_line.y1 = (int32_t)LV_MIN(dsc->p1_y, dsc->p2_y) - dsc->width / 2;
+    clip_line.y2 = (int32_t)LV_MAX(dsc->p1_y, dsc->p2_y) + dsc->width / 2;
 
     bool is_common;
     is_common = _lv_area_intersect(&clip_line, &clip_line, draw_unit->clip_area);
     if(!is_common) return;
 
-    if(dsc->p1.y == dsc->p2.y) draw_line_hor(draw_unit, dsc);
-    else if(dsc->p1.x == dsc->p2.x) draw_line_ver(draw_unit, dsc);
+    if(dsc->p1_y == dsc->p2_y) draw_line_hor(draw_unit, dsc);
+    else if(dsc->p1_x == dsc->p2_x) draw_line_ver(draw_unit, dsc);
     else draw_line_skew(draw_unit, dsc);
 
     if(dsc->round_end || dsc->round_start) {
@@ -82,18 +82,18 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_
         lv_area_t cir_area;
 
         if(dsc->round_start) {
-            cir_area.x1 = dsc->p1.x - r;
-            cir_area.y1 = dsc->p1.y - r;
-            cir_area.x2 = dsc->p1.x + r - r_corr;
-            cir_area.y2 = dsc->p1.y + r - r_corr ;
+            cir_area.x1 = (int32_t)dsc->p1_x - r;
+            cir_area.y1 = (int32_t)dsc->p1_y - r;
+            cir_area.x2 = (int32_t)dsc->p1_x + r - r_corr;
+            cir_area.y2 = (int32_t)dsc->p1_y + r - r_corr ;
             lv_draw_sw_fill(draw_unit, &cir_dsc, &cir_area);
         }
 
         if(dsc->round_end) {
-            cir_area.x1 = dsc->p2.x - r;
-            cir_area.y1 = dsc->p2.y - r;
-            cir_area.x2 = dsc->p2.x + r - r_corr;
-            cir_area.y2 = dsc->p2.y + r - r_corr ;
+            cir_area.x1 = (int32_t)dsc->p2_x - r;
+            cir_area.y1 = (int32_t)dsc->p2_y - r;
+            cir_area.x2 = (int32_t)dsc->p2_x + r - r_corr;
+            cir_area.y2 = (int32_t)dsc->p2_y + r - r_corr ;
             lv_draw_sw_fill(draw_unit, &cir_dsc, &cir_area);
         }
     }
@@ -109,10 +109,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, cons
     int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
     lv_area_t blend_area;
-    blend_area.x1 = LV_MIN(dsc->p1.x, dsc->p2.x);
-    blend_area.x2 = LV_MAX(dsc->p1.x, dsc->p2.x)  - 1;
-    blend_area.y1 = dsc->p1.y - w_half1;
-    blend_area.y2 = dsc->p1.y + w_half0;
+    blend_area.x1 = (int32_t)LV_MIN(dsc->p1_x, dsc->p2_x);
+    blend_area.x2 = (int32_t)LV_MAX(dsc->p1_x, dsc->p2_x)  - 1;
+    blend_area.y1 = (int32_t)dsc->p1_y - w_half1;
+    blend_area.y2 = (int32_t)dsc->p1_y + w_half0;
 
     bool is_common;
     is_common = _lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
@@ -184,10 +184,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
     int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
     lv_area_t blend_area;
-    blend_area.x1 = dsc->p1.x - w_half1;
-    blend_area.x2 = dsc->p1.x + w_half0;
-    blend_area.y1 = LV_MIN(dsc->p1.y, dsc->p2.y);
-    blend_area.y2 = LV_MAX(dsc->p1.y, dsc->p2.y) - 1;
+    blend_area.x1 = (int32_t)dsc->p1_x - w_half1;
+    blend_area.x2 = (int32_t)dsc->p1_x + w_half0;
+    blend_area.y1 = (int32_t)LV_MIN(dsc->p1_y, dsc->p2_y);
+    blend_area.y2 = (int32_t)LV_MAX(dsc->p1_y, dsc->p2_y) - 1;
 
     bool is_common;
     is_common = _lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
@@ -255,17 +255,17 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
     /*Keep the great y in p1*/
     lv_point_t p1;
     lv_point_t p2;
-    if(dsc->p1.y < dsc->p2.y) {
-        p1.y = dsc->p1.y;
-        p2.y = dsc->p2.y;
-        p1.x = dsc->p1.x;
-        p2.x = dsc->p2.x;
+    if(dsc->p1_y < dsc->p2_y) {
+        p1.y = (int32_t)dsc->p1_y;
+        p2.y = (int32_t)dsc->p2_y;
+        p1.x = (int32_t)dsc->p1_x;
+        p2.x = (int32_t)dsc->p2_x;
     }
     else {
-        p1.y = dsc->p2.y;
-        p2.y = dsc->p1.y;
-        p1.x = dsc->p2.x;
-        p2.x = dsc->p1.x;
+        p1.y = (int32_t)dsc->p2_y;
+        p2.y = (int32_t)dsc->p1_y;
+        p1.x = (int32_t)dsc->p2_x;
+        p2.x = (int32_t)dsc->p1_x;
     }
 
     int32_t xdiff = p2.x - p1.x;

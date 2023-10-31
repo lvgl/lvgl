@@ -64,7 +64,7 @@ lv_obj_t * lv_line_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint32_t point_num)
+void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -122,10 +122,10 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static inline lv_coord_t resolve_point_coord(lv_coord_t coord, lv_coord_t max)
+static inline lv_value_precise_t resolve_point_coord(lv_value_precise_t coord, lv_coord_t max)
 {
-    if(LV_COORD_IS_PCT(coord)) {
-        return LV_CLAMP(0, max * LV_COORD_GET_PCT(coord) / 100, max);
+    if(LV_COORD_IS_PCT((int32_t)coord)) {
+        return LV_CLAMP(0, max * LV_COORD_GET_PCT((int32_t)coord) / 100, max);
     }
     else {
         return coord;
@@ -162,12 +162,12 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         uint32_t i;
         for(i = 0; i < line->point_num; i++) {
-            if(!LV_COORD_IS_PCT(line->point_array[i].x)) {
-                w = LV_MAX(line->point_array[i].x, w);
+            if(!LV_COORD_IS_PCT((int32_t)line->point_array[i].x)) {
+                w = (int32_t)LV_MAX(line->point_array[i].x, w);
             }
 
-            if(!LV_COORD_IS_PCT(line->point_array[i].y)) {
-                h = LV_MAX(line->point_array[i].y, h);
+            if(!LV_COORD_IS_PCT((int32_t)line->point_array[i].y)) {
+                h = (int32_t)LV_MAX(line->point_array[i].y, h);
             }
         }
 
@@ -195,19 +195,19 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_coord_t w = lv_obj_get_width(obj);
             lv_coord_t h = lv_obj_get_height(obj);
 
-            line_dsc.p1.x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
-            line_dsc.p1.y = resolve_point_coord(line->point_array[i].y, h);
+            line_dsc.p1_x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
+            line_dsc.p1_y = resolve_point_coord(line->point_array[i].y, h);
 
-            line_dsc.p2.x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
-            line_dsc.p2.y = resolve_point_coord(line->point_array[i + 1].y, h);
+            line_dsc.p2_x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
+            line_dsc.p2_y = resolve_point_coord(line->point_array[i + 1].y, h);
 
             if(line->y_inv == 0) {
-                line_dsc.p1.y = line_dsc.p1.y + y_ofs;
-                line_dsc.p2.y = line_dsc.p2.y + y_ofs;
+                line_dsc.p1_y = line_dsc.p1_y + y_ofs;
+                line_dsc.p2_y = line_dsc.p2_y + y_ofs;
             }
             else {
-                line_dsc.p1.y = h - line_dsc.p1.y + y_ofs;
-                line_dsc.p2.y = h - line_dsc.p2.y + y_ofs;
+                line_dsc.p1_y = h - line_dsc.p1_y + y_ofs;
+                line_dsc.p2_y = h - line_dsc.p2_y + y_ofs;
             }
 
             lv_draw_line(layer, &line_dsc);
