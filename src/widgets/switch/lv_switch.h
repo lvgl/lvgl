@@ -35,7 +35,7 @@ typedef struct {
     int32_t anim_state;
 } lv_switch_t;
 
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_switch_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_switch_class;
 
 /**********************
  * GLOBAL PROTOTYPES

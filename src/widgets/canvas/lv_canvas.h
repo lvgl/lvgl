@@ -27,7 +27,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_canvas_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_canvas_class;
 
 /*Data of canvas*/
 typedef struct {

@@ -120,7 +120,7 @@ typedef struct {
     lv_chart_update_mode_t update_mode : 1;
 } lv_chart_t;
 
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_chart_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_chart_class;
 
 /**********************
  * GLOBAL PROTOTYPES

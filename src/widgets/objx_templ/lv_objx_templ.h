@@ -39,7 +39,7 @@ typedef struct {
     /*New data for this type*/
 } lv_templ_t;
 
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_templ_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_templ_class;
 
 /**********************
  * GLOBAL PROTOTYPES

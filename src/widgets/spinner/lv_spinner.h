@@ -29,7 +29,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_spinner_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_spinner_class;
 
 /**********************
  * GLOBAL PROTOTYPES

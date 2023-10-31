@@ -47,7 +47,7 @@ typedef struct {
     char nums [7 * 6][4];
 } lv_calendar_t;
 
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_calendar_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_calendar_class;
 
 /**********************
  * GLOBAL PROTOTYPES
