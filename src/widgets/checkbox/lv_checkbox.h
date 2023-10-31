@@ -32,7 +32,7 @@ typedef struct {
     uint32_t static_txt : 1;
 } lv_checkbox_t;
 
-LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_checkbox_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_checkbox_class;
 
 /**********************
  * GLOBAL PROTOTYPES
