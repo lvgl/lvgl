@@ -153,9 +153,9 @@ void lv_port_indev_init(void)
     button_init();
 
     /*Register a button input device*/
-    indev_touchpad = lv_indev_create();
-    lv_indev_set_type(indev_touchpad, LV_INDEV_TYPE_BUTTON);
-    lv_indev_set_read_cb(indev_touchpad, button_read);
+    indev_button = lv_indev_create();
+    lv_indev_set_type(indev_button, LV_INDEV_TYPE_BUTTON);
+    lv_indev_set_read_cb(indev_button, button_read);
 
     /*Assign buttons to points on the screen*/
     static const lv_point_t btn_points[2] = {
