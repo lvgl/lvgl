@@ -207,6 +207,15 @@
     #endif
 #endif
 
+/*Enable Vector Graphic APIs*/
+#ifndef LV_USE_VECTOR_GRAPHIC
+    #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
+        #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
+    #else
+        #define LV_USE_VECTOR_GRAPHIC   0
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
@@ -321,15 +330,6 @@
         #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
     #else
         #define LV_USE_DRAW_PXP 0
-    #endif
-#endif
-
-/*Enable Vector Graphic APIs*/
-#ifndef LV_USE_VECTOR_GRAPHIC
-    #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
-        #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
-    #else
-        #define LV_USE_VECTOR_GRAPHIC   0
     #endif
 #endif
 
@@ -2163,29 +2163,21 @@
     #endif
 #endif
 
-/*ThorVG library*/
-#ifndef LV_USE_THORVG
-    #ifdef CONFIG_LV_USE_THORVG
-        #define LV_USE_THORVG CONFIG_LV_USE_THORVG
+/* Enable ThorVG (vector graphics library) from the src/libs folder */
+#ifndef LV_USE_THORVG_INTERNAL
+    #ifdef CONFIG_LV_USE_THORVG_INTERNAL
+        #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
     #else
-        #define LV_USE_THORVG 0
+        #define LV_USE_THORVG_INTERNAL 0
     #endif
 #endif
-#if LV_USE_THORVG
-    /* Enable internal thorvg */
-    #ifndef LV_USE_THORVG_INTERNAL
-        #ifdef CONFIG_LV_USE_THORVG_INTERNAL
-            #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
-        #else
-            #define LV_USE_THORVG_INTERNAL 0
-        #endif
-    #endif
-    #ifndef LV_USE_THORVG_EXTERNAL
-        #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
-            #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
-        #else
-            #define LV_USE_THORVG_EXTERNAL 0
-        #endif
+
+/* Enable ThorVG by assuming that its installed and linked to the project */
+#ifndef LV_USE_THORVG_EXTERNAL
+    #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
+        #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
+    #else
+        #define LV_USE_THORVG_EXTERNAL 0
     #endif
 #endif
 

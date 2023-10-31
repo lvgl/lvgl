@@ -81,6 +81,9 @@
 /* Max. memory to be used for layers */
 #define  LV_LAYER_MAX_MEMORY_USAGE             150       /*[kB]*/
 
+/*Enable Vector Graphic APIs*/
+#define LV_USE_VECTOR_GRAPHIC   0
+
 #define LV_USE_DRAW_SW 1
 #if LV_USE_DRAW_SW == 1
     /* Set the number of draw unit.
@@ -125,9 +128,6 @@
 
 /* Use NXP's PXP on iMX RTxxx platforms. */
 #define LV_USE_DRAW_PXP 0
-
-/*Enable Vector Graphic APIs*/
-#define LV_USE_VECTOR_GRAPHIC   0
 
 /*=================
  * OPERATING SYSTEM
@@ -655,13 +655,11 @@
 /*Rlottie library*/
 #define LV_USE_RLOTTIE 0
 
-/*ThorVG library*/
-#define LV_USE_THORVG 0
-#if LV_USE_THORVG
-    /* Enable internal thorvg */
-    #define LV_USE_THORVG_INTERNAL 0
-    #define LV_USE_THORVG_EXTERNAL 0
-#endif
+/* Enable ThorVG (vector graphics library) from the src/libs folder */
+#define LV_USE_THORVG_INTERNAL 0
+
+/* Enable ThorVG by assuming that its installed and linked to the project */
+#define LV_USE_THORVG_EXTERNAL 0
 
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
