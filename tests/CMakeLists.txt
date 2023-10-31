@@ -209,7 +209,14 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
-    target_link_libraries(${test_name} test_common lvgl_demos lvgl png ${JPEG_LIBRARIES} m ${TEST_LIBS})
+    target_link_libraries(${test_name} PRIVATE test_common lvgl_demos lvgl png ${JPEG_LIBRARIES} m ${TEST_LIBS})
+    if(LV_CONF_BUILD_THORVG_EXTERNAL)
+        target_link_libraries(${test_name} PUBLIC thorvg pthread)
+    else()
+        if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+            target_link_libraries(${test_name} PRIVATE lvgl_thorvg)
+        endif()
+    endif()
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
