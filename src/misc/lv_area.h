@@ -21,15 +21,12 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#if LV_USE_LARGE_COORD
-typedef int32_t lv_coord_t;
-#else
-typedef int16_t lv_coord_t;
-#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef int32_t lv_coord_t;
 
 /**
  * Represents a point on the screen.

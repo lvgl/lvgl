@@ -22,11 +22,7 @@ extern "C" {
  *********************/
 
 /**Default value of points. Can be used to not draw a point*/
-#if LV_USE_LARGE_COORD
-#define LV_CHART_POINT_NONE (INT32_MAX)
-#else
-#define LV_CHART_POINT_NONE (INT16_MAX)
-#endif
+#define LV_CHART_POINT_NONE     (INT32_MAX)
 LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 
 /**********************
