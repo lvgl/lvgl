@@ -962,7 +962,7 @@ void shop_create(lv_obj_t * parent)
         lv_obj_set_width(chart3, LV_PCT(95));
         lv_obj_set_height(chart3, LV_VER_RES - 70);
         lv_obj_set_style_max_height(chart3, 300, 0);
-        //        lv_chart_set_zoom_x(chart3, 512);
+        //        lv_chart_set_scale_x(chart3, 512);
 
         lv_obj_set_grid_dsc_array(panel1, grid1_col_dsc, grid1_row_dsc);
         lv_obj_set_grid_cell(title, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 1);

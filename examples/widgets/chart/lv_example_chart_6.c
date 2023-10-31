@@ -39,7 +39,7 @@ void lv_example_chart_6(void)
         lv_chart_set_next_value(chart, ser, lv_rand(10, 90));
     }
 
-    //    lv_chart_set_zoom_x(chart, 500);
+    //    lv_chart_set_scale_x(chart, 500);
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Click on a point");

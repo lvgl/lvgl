@@ -180,8 +180,8 @@ Zoom
 ----
 
 The chart can be zoomed independently in x and y directions with
-:cpp:expr:`lv_chart_set_zoom_x(chart, factor)` and
-:cpp:expr:`lv_chart_set_zoom_y(chart, factor)`. If ``factor`` is 256 there is no
+:cpp:expr:`lv_chart_set_scale_x(chart, factor)` and
+:cpp:expr:`lv_chart_set_scale_y(chart, factor)`. If ``factor`` is 256 there is no
 zoom. 512 means double zoom, etc. Fractional values are also possible
 but < 256 value is not allowed.
 

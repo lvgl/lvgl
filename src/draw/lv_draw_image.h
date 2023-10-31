@@ -44,8 +44,8 @@ typedef struct _lv_draw_image_dsc_t {
 
 
     int32_t rotation;
-    int32_t zoom_x;
-    int32_t zoom_y;
+    int32_t scale_x;
+    int32_t scale_y;
     lv_point_t pivot;
 
     lv_color_t recolor;

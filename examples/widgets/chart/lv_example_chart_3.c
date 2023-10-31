@@ -71,7 +71,7 @@ void lv_example_chart_3(void)
     lv_obj_refresh_ext_draw_size(chart);
 
     /*Zoom in a little in X*/
-    //    lv_chart_set_zoom_x(chart, 800);
+    //    lv_chart_set_scale_x(chart, 800);
 
     /*Add two data series*/
     lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);

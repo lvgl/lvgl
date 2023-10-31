@@ -44,8 +44,8 @@ typedef struct {
     int32_t w;          /*Width of the image (Handled by the library)*/
     int32_t h;          /*Height of the image (Handled by the library)*/
     uint32_t rotation;    /*rotation angle of the image*/
-    uint32_t zoom_x;      /*256 means no zoom, 512 double size, 128 half size*/
-    uint32_t zoom_y;      /*256 means no zoom, 512 double size, 128 half size*/
+    uint32_t scale_x;      /*256 means no zoom, 512 double size, 128 half size*/
+    uint32_t scale_y;      /*256 means no zoom, 512 double size, 128 half size*/
     lv_point_t pivot;     /*rotation center of the image*/
     uint8_t src_type : 2;  /*See: lv_image_src_t*/
     uint8_t cf : 5;        /*Color format from `lv_color_format_t`*/
