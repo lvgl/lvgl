@@ -94,7 +94,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     if(dsc->shadow_width == 0 ||
        dsc->shadow_opa <= LV_OPA_MIN ||
        (dsc->shadow_width == 1 && dsc->shadow_spread <= 0 &&
-        dsc->shadow_ofs_x == 0 && dsc->shadow_ofs_y == 0)) {
+        dsc->shadow_offset_x == 0 && dsc->shadow_offset_y == 0)) {
         has_shadow = false;
     }
     else {
@@ -139,8 +139,8 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         shadow_dsc->width = dsc->shadow_width;
         shadow_dsc->spread = dsc->shadow_spread;
         shadow_dsc->opa = dsc->shadow_opa;
-        shadow_dsc->ofs_x = dsc->shadow_ofs_x;
-        shadow_dsc->ofs_y = dsc->shadow_ofs_y;
+        shadow_dsc->ofs_x = dsc->shadow_offset_x;
+        shadow_dsc->ofs_y = dsc->shadow_offset_y;
         shadow_dsc->bg_cover = bg_cover;
         t->type = LV_DRAW_TASK_TYPE_BOX_SHADOW;
         lv_draw_finalize_task_creation(layer, t);

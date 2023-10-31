@@ -185,7 +185,7 @@ void lv_demo_multilang(void)
     lv_style_set_grid_column_dsc_array(&style_card, grid_cols);
     lv_style_set_grid_row_dsc_array(&style_card, grid_rows);
     lv_style_set_shadow_width(&style_card, 20);
-    lv_style_set_shadow_ofs_y(&style_card, 5);
+    lv_style_set_shadow_offset_y(&style_card, 5);
     lv_style_set_shadow_color(&style_card, lv_color_hex3(0xccc));
     lv_style_set_border_width(&style_card, 0);
     lv_style_set_radius(&style_card, 12);
@@ -209,7 +209,7 @@ void lv_demo_multilang(void)
 
     lv_style_init(&style_avatar);
     lv_style_set_shadow_width(&style_avatar, 20);
-    lv_style_set_shadow_ofs_y(&style_avatar, 5);
+    lv_style_set_shadow_offset_y(&style_avatar, 5);
     lv_style_set_shadow_color(&style_avatar, lv_color_hex3(0xbbb));
     lv_style_set_radius(&style_avatar, LV_RADIUS_CIRCLE);
 

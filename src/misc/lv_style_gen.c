@@ -530,25 +530,25 @@ void lv_style_set_shadow_width(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_SHADOW_WIDTH = LV_STYLE_SHADOW_WIDTH;
 
-void lv_style_set_shadow_ofs_x(lv_style_t * style, lv_coord_t value)
+void lv_style_set_shadow_offset_x(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_SHADOW_OFS_X, v);
+    lv_style_set_prop(style, LV_STYLE_SHADOW_OFFSET_X, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFS_X = LV_STYLE_SHADOW_OFS_X;
+const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFFSET_X = LV_STYLE_SHADOW_OFFSET_X;
 
-void lv_style_set_shadow_ofs_y(lv_style_t * style, lv_coord_t value)
+void lv_style_set_shadow_offset_y(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_SHADOW_OFS_Y, v);
+    lv_style_set_prop(style, LV_STYLE_SHADOW_OFFSET_Y, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFS_Y = LV_STYLE_SHADOW_OFS_Y;
+const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFFSET_Y = LV_STYLE_SHADOW_OFFSET_Y;
 
 void lv_style_set_shadow_spread(lv_style_t * style, lv_coord_t value)
 {

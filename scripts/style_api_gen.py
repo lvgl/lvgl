@@ -220,11 +220,11 @@ props = [
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set the width of the shadow in pixels. The value should be >= 0."},
 
-{'name': 'SHADOW_OFS_X',
+{'name': 'SHADOW_OFFSET_X',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set an offset on the shadow in pixels in X direction. "},
 
-{'name': 'SHADOW_OFS_Y',
+{'name': 'SHADOW_OFFSET_Y',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set an offset on the shadow in pixels in Y direction. "},
 

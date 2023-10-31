@@ -22,8 +22,8 @@ static void event_cb(lv_event_t * e)
                 if(pressed) rect_draw_dsc->bg_color = lv_palette_darken(LV_PALETTE_BLUE, 3);
                 else rect_draw_dsc->bg_color = lv_palette_main(LV_PALETTE_BLUE);
                 rect_draw_dsc->shadow_width = 6;
-                rect_draw_dsc->shadow_ofs_x = 3;
-                rect_draw_dsc->shadow_ofs_y = 3;
+                rect_draw_dsc->shadow_offset_x = 3;
+                rect_draw_dsc->shadow_offset_y = 3;
             }
             if(draw_task->type == LV_DRAW_TASK_TYPE_LABEL) {
                 lv_draw_label_dsc_t * label_draw_dsc = draw_task->draw_dsc;

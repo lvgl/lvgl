@@ -301,7 +301,7 @@ static void style_init(struct _my_theme_t * theme)
         lv_style_set_shadow_color(&theme->styles.btn, lv_palette_main(LV_PALETTE_GREY));
         lv_style_set_shadow_width(&theme->styles.btn, LV_DPX(3));
         lv_style_set_shadow_opa(&theme->styles.btn, LV_OPA_50);
-        lv_style_set_shadow_ofs_y(&theme->styles.btn, _LV_DPX_CALC(theme->disp_dpi, LV_DPX(4)));
+        lv_style_set_shadow_offset_y(&theme->styles.btn, _LV_DPX_CALC(theme->disp_dpi, LV_DPX(4)));
     }
     lv_style_set_text_color(&theme->styles.btn, theme->color_text);
     lv_style_set_pad_hor(&theme->styles.btn, PAD_DEF);

@@ -63,8 +63,8 @@ typedef struct {
     /*Shadow*/
     lv_color_t shadow_color;
     lv_coord_t shadow_width;
-    lv_coord_t shadow_ofs_x;
-    lv_coord_t shadow_ofs_y;
+    lv_coord_t shadow_offset_x;
+    lv_coord_t shadow_offset_y;
     lv_coord_t shadow_spread;
     lv_opa_t shadow_opa;
 } lv_draw_rect_dsc_t;

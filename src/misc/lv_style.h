@@ -253,8 +253,8 @@ enum _lv_style_prop_t {
     LV_STYLE_SHADOW_COLOR           = 61,
     LV_STYLE_SHADOW_OPA             = 62,
 
-    LV_STYLE_SHADOW_OFS_X           = 64,
-    LV_STYLE_SHADOW_OFS_Y           = 65,
+    LV_STYLE_SHADOW_OFFSET_X        = 64,
+    LV_STYLE_SHADOW_OFFSET_Y        = 65,
     LV_STYLE_SHADOW_SPREAD          = 66,
 
     LV_STYLE_IMAGE_OPA                = 68,

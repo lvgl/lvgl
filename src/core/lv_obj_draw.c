@@ -124,8 +124,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
             if(draw_dsc->shadow_opa > LV_OPA_MIN) {
                 draw_dsc->shadow_opa = lv_obj_get_style_shadow_opa(obj, part);
                 if(draw_dsc->shadow_opa > LV_OPA_MIN) {
-                    draw_dsc->shadow_ofs_x = lv_obj_get_style_shadow_ofs_x(obj, part);
-                    draw_dsc->shadow_ofs_y = lv_obj_get_style_shadow_ofs_y(obj, part);
+                    draw_dsc->shadow_offset_x = lv_obj_get_style_shadow_offset_x(obj, part);
+                    draw_dsc->shadow_offset_y = lv_obj_get_style_shadow_offset_y(obj, part);
                     draw_dsc->shadow_spread = lv_obj_get_style_shadow_spread(obj, part);
                     draw_dsc->shadow_color = lv_obj_get_style_shadow_color_filtered(obj, part);
                 }
@@ -260,8 +260,8 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
         if(sh_opa > LV_OPA_MIN) {
             sh_width = sh_width / 2 + 1;    /*The blur adds only half width*/
             sh_width += lv_obj_get_style_shadow_spread(obj, part);
-            lv_coord_t sh_ofs_x = lv_obj_get_style_shadow_ofs_x(obj, part);
-            lv_coord_t sh_ofs_y = lv_obj_get_style_shadow_ofs_y(obj, part);
+            lv_coord_t sh_ofs_x = lv_obj_get_style_shadow_offset_x(obj, part);
+            lv_coord_t sh_ofs_y = lv_obj_get_style_shadow_offset_y(obj, part);
             sh_width += LV_MAX(LV_ABS(sh_ofs_x), LV_ABS(sh_ofs_y));
             s = LV_MAX(s, sh_width);
         }

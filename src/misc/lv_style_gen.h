@@ -114,10 +114,10 @@ void lv_style_set_outline_pad(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_OUTLINE_PAD;
 void lv_style_set_shadow_width(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_SHADOW_WIDTH;
-void lv_style_set_shadow_ofs_x(lv_style_t * style, lv_coord_t value);
-extern const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFS_X;
-void lv_style_set_shadow_ofs_y(lv_style_t * style, lv_coord_t value);
-extern const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFS_Y;
+void lv_style_set_shadow_offset_x(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFFSET_X;
+void lv_style_set_shadow_offset_y(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OFFSET_Y;
 void lv_style_set_shadow_spread(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_SHADOW_SPREAD;
 void lv_style_set_shadow_color(lv_style_t * style, lv_color_t value);
@@ -483,14 +483,14 @@ extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
         .prop_ptr = &_lv_style_const_prop_id_SHADOW_WIDTH, .value = { .num = (int32_t)val } \
     }
 
-#define LV_STYLE_CONST_SHADOW_OFS_X(val) \
+#define LV_STYLE_CONST_SHADOW_OFFSET_X(val) \
     { \
-        .prop_ptr = &_lv_style_const_prop_id_SHADOW_OFS_X, .value = { .num = (int32_t)val } \
+        .prop_ptr = &_lv_style_const_prop_id_SHADOW_OFFSET_X, .value = { .num = (int32_t)val } \
     }
 
-#define LV_STYLE_CONST_SHADOW_OFS_Y(val) \
+#define LV_STYLE_CONST_SHADOW_OFFSET_Y(val) \
     { \
-        .prop_ptr = &_lv_style_const_prop_id_SHADOW_OFS_Y, .value = { .num = (int32_t)val } \
+        .prop_ptr = &_lv_style_const_prop_id_SHADOW_OFFSET_Y, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_SHADOW_SPREAD(val) \

@@ -244,24 +244,24 @@ static void box_shadow_cb(lv_obj_t * parent)
         lv_obj_t * obj = box_shadow_obj_create(parent, i, 0);
         lv_obj_set_style_radius(obj, 0, 0);
         lv_obj_set_style_shadow_width(obj, 10, 0);
-        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
-        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+        lv_obj_set_style_shadow_offset_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_offset_y(obj, ofs[i].y, 0);
     }
 
     for(i = 0; i < 7; i++) {
         lv_obj_t * obj = box_shadow_obj_create(parent, i, 1);
         lv_obj_set_style_radius(obj, 5, 0);
         lv_obj_set_style_shadow_width(obj, 10, 0);
-        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
-        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+        lv_obj_set_style_shadow_offset_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_offset_y(obj, ofs[i].y, 0);
     }
 
     for(i = 0; i < 7; i++) {
         lv_obj_t * obj = box_shadow_obj_create(parent, i, 2);
         lv_obj_set_style_radius(obj, 100, 0);
         lv_obj_set_style_shadow_width(obj, 10, 0);
-        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
-        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+        lv_obj_set_style_shadow_offset_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_offset_y(obj, ofs[i].y, 0);
     }
 
     for(i = 0; i < 7; i++) {
@@ -269,8 +269,8 @@ static void box_shadow_cb(lv_obj_t * parent)
         lv_obj_set_style_radius(obj, 5, 0);
         lv_obj_set_style_shadow_width(obj, 10, 0);
         lv_obj_set_style_shadow_spread(obj, 3, 0);
-        lv_obj_set_style_shadow_ofs_x(obj, ofs[i].x, 0);
-        lv_obj_set_style_shadow_ofs_y(obj, ofs[i].y, 0);
+        lv_obj_set_style_shadow_offset_x(obj, ofs[i].x, 0);
+        lv_obj_set_style_shadow_offset_y(obj, ofs[i].y, 0);
     }
 }
 

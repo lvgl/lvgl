@@ -68,7 +68,7 @@ void view_create(lv_obj_t * par, view_t * ui)
     lv_obj_set_style_border_width(obj, 0, 0);
     lv_obj_set_style_shadow_color(obj, lv_color_hex3(0xaaa), 0);
     lv_obj_set_style_shadow_width(obj, 20, 0);
-    lv_obj_set_style_shadow_ofs_y(obj, 2, 0);
+    lv_obj_set_style_shadow_offset_y(obj, 2, 0);
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(

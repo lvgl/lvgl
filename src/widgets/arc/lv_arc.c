@@ -891,8 +891,8 @@ static lv_coord_t knob_get_extra_size(lv_obj_t * obj)
     lv_coord_t knob_shadow_size = 0;
     knob_shadow_size += lv_obj_get_style_shadow_width(obj, LV_PART_KNOB);
     knob_shadow_size += lv_obj_get_style_shadow_spread(obj, LV_PART_KNOB);
-    knob_shadow_size += LV_ABS(lv_obj_get_style_shadow_ofs_x(obj, LV_PART_KNOB));
-    knob_shadow_size += LV_ABS(lv_obj_get_style_shadow_ofs_y(obj, LV_PART_KNOB));
+    knob_shadow_size += LV_ABS(lv_obj_get_style_shadow_offset_x(obj, LV_PART_KNOB));
+    knob_shadow_size += LV_ABS(lv_obj_get_style_shadow_offset_y(obj, LV_PART_KNOB));
 
     lv_coord_t knob_outline_size = 0;
     knob_outline_size += lv_obj_get_style_outline_width(obj, LV_PART_KNOB);
