@@ -398,6 +398,15 @@ void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb
     disp->flush_cb = flush_cb;
 }
 
+
+void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_t wait_cb)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    disp->flush_wait_cb = wait_cb;
+}
+
 void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format)
 {
     if(disp == NULL) disp = lv_display_get_default();

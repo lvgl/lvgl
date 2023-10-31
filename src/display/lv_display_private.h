@@ -70,6 +70,12 @@ struct _lv_display_t {
      * called when finished*/
     lv_display_flush_cb_t flush_cb;
 
+    /**
+     * Used to wait while flushing is ready.
+     * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
+     * If not set `flushing` flag is used which can be cleared with `lv_display_flush_ready()`*/
+    lv_display_flush_wait_cb_t flush_wait_cb;
+
     /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing;
 

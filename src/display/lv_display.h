@@ -85,6 +85,7 @@ typedef enum {
 
 
 typedef void (*lv_display_flush_cb_t)(struct _lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
+typedef void (*lv_display_flush_wait_cb_t)(struct _lv_display_t * disp);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -249,6 +250,18 @@ void lv_display_set_draw_buffers(lv_display_t * disp, void * buf1, void * buf2, 
  * @param flush_cb  the flush callback (`px_map` contains the rendered image as raw pixel map and it should be copied to `area` on the display)
  */
 void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb);
+
+/**
+ * Set a callback to be used while LVGL is waiting flushing to be finished.
+ * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
+ * If not set the `disp->flushing` flag is used which can be cleared with `lv_display_flush_ready()`
+ * @param disp      pointer to a display
+ * @param wait_cb   a callback to call while LVGL is waiting for flush ready.
+ *                  If NULL `lv_display_flush_ready()` can be used to signal that flushing is ready.
+ */
+void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_t wait_cb);
+
+
 /**
  * Set the color format of the display.
  * If set to other than `LV_COLOR_FORMAT_NATIVE` the layer's `buffer_convert` function will be used
