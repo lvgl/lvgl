@@ -314,6 +314,15 @@ lv_display_t * _lv_refr_get_disp_refreshing(void)
 }
 
 /**
+ * Get the display which is being refreshed
+ * @return the display being refreshed
+ */
+void _lv_refr_set_disp_refreshing(lv_display_t * disp)
+{
+    disp_refr = disp;
+}
+
+/**
  * Called periodically to handle the refreshing
  * @param tmr pointer to the timer itself
  */

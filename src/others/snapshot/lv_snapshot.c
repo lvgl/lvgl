@@ -130,12 +130,21 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
     layer.color_format = cf;
     layer.clip_area = snapshot_area;
 
+    lv_display_t * disp_old = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp_new = lv_obj_get_disp(obj);
+    lv_layer_t * layer_old = disp_new->layer_head;
+    disp_new->layer_head = &layer;
+
+    _lv_refr_set_disp_refreshing(disp_new);
     lv_obj_redraw(&layer, obj);
 
     while(layer.draw_task_head) {
         lv_draw_dispatch_wait_for_request();
         lv_draw_dispatch_layer(NULL, &layer);
     }
+
+    disp_new->layer_head = layer_old;
+    _lv_refr_set_disp_refreshing(disp_old);
 
     return LV_RESULT_OK;
 }
