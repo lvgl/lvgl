@@ -68,7 +68,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         lv_draw_border_dsc_init(&cir_dsc);
         cir_dsc.opa = dsc->opa;
         cir_dsc.color = dsc->color;
-        cir_dsc.width = dsc->width;
+        cir_dsc.width = width;
         cir_dsc.radius = LV_RADIUS_CIRCLE;
         cir_dsc.side = LV_BORDER_SIDE_FULL;
         lv_draw_sw_border(draw_unit, &cir_dsc, &area_out);

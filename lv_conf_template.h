@@ -280,6 +280,9 @@
 /* Use lvgl builtin method for obj ID */
 #define LV_USE_OBJ_ID_BUILTIN   0
 
+/*Use obj property set/get API*/
+#define LV_USE_OBJ_PROPERTY 0
+
 /*=====================
  *  COMPILER SETTINGS
  *====================*/
@@ -613,6 +616,9 @@
 /*GIF decoder library*/
 #define LV_USE_GIF 0
 
+/*Decode bin images to RAM*/
+#define LV_BIN_DECODER_RAM_LOAD 0
+
 /*QR code library*/
 #define LV_USE_QRCODE 0
 
@@ -689,10 +695,16 @@
     #define LV_PROFILER_INCLUDE "lvgl/src/misc/lv_profiler_builtin.h"
 
     /*Profiler start point function*/
-    #define LV_PROFILER_BEGIN   LV_PROFILER_BUILTIN_BEGIN
+    #define LV_PROFILER_BEGIN    LV_PROFILER_BUILTIN_BEGIN
 
     /*Profiler end point function*/
-    #define LV_PROFILER_END     LV_PROFILER_BUILTIN_END
+    #define LV_PROFILER_END      LV_PROFILER_BUILTIN_END
+
+    /*Profiler start point function with custom tag*/
+    #define LV_PROFILER_BEGIN_TAG LV_PROFILER_BUILTIN_BEGIN_TAG
+
+    /*Profiler end point function with custom tag*/
+    #define LV_PROFILER_END_TAG   LV_PROFILER_BUILTIN_END_TAG
 #endif
 
 /*1: Enable Monkey test*/

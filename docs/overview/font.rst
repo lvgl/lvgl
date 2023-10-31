@@ -208,6 +208,20 @@ because
 - they can be compressed better
 - and probably they are used less frequently then the medium-sized fonts, so the performance cost is smaller.
 
+Kerning
+-------
+
+Fonts may provide kerning information to adjust the spacing between specific
+characters.
+
+- The online converter generates kerning tables.
+- The offline converter generates kerning tables unless ``--no-kerning`` is
+  specified.
+- FreeType integration does not currently support kerning.
+- The Tiny TTF font engine supports GPOS and Kern tables.
+
+To configure kerning at runtime, use :cpp:func:`lv_font_set_kerning`.
+
 .. _add_font:
 
 Add a new font

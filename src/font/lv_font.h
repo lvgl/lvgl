@@ -64,6 +64,18 @@ typedef _lv_font_subpx_t lv_font_subpx_t;
 typedef uint8_t lv_font_subpx_t;
 #endif /*DOXYGEN*/
 
+/** Adjust letter spacing for specific character pairs.*/
+enum _lv_font_kerning_t {
+    LV_FONT_KERNING_NORMAL,
+    LV_FONT_KERNING_NONE,
+};
+
+#ifdef DOXYGEN
+typedef _lv_font_kerning_t lv_font_kerning_t;
+#else
+typedef uint8_t lv_font_kerning_t;
+#endif /*DOXYGEN*/
+
 /** Describe the properties of a font*/
 typedef struct _lv_font_t {
     /** Get a glyph's descriptor from a font*/
@@ -75,7 +87,8 @@ typedef struct _lv_font_t {
     /*Pointer to the font in a font pack (must have the same line height)*/
     lv_coord_t line_height;         /**< The real line height where any text fits*/
     lv_coord_t base_line;           /**< Base line measured from the top of the line_height*/
-    uint8_t subpx  : 2;             /**< An element of `lv_font_subpx_t`*/
+    uint8_t subpx   : 2;            /**< An element of `lv_font_subpx_t`*/
+    uint8_t kerning : 1;            /**< An element of `lv_font_kerning_t`*/
 
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
@@ -127,6 +140,13 @@ static inline lv_coord_t lv_font_get_line_height(const lv_font_t * font)
 {
     return font->line_height;
 }
+
+/**
+ * Configure the use of kerning information stored in a font
+ * @param font    pointer to a font
+ * @param kerning `LV_FONT_KERNING_NORMAL` (default) or `LV_FONT_KERNING_NONE`
+ */
+void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning);
 
 /**********************
  *      MACROS

@@ -67,27 +67,23 @@ jobs:
       - name: Deploy to subfolder
         uses: JamesIves/github-pages-deploy-action@v4.4.3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ACCESS_TOKEN: ${{ secrets.LVGL_BOT_TOKEN }}
-          REPOSITORY_NAME: lvgl/docs
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: out_html  # The folder the action should deploy.
-          TARGET_FOLDER: ${{ steps.version.outputs.VERSION_NAME }}
-          GIT_CONFIG_NAME: lvgl-bot
-          GIT_CONFIG_EMAIL: lvgl-bot@users.noreply.github.com
-          PRESERVE: true
-          SINGLE_COMMIT: true
+          token: ${{ secrets.LVGL_BOT_TOKEN }}
+          repository-name: lvgl/docs
+          branch: gh-pages # The branch the action should deploy to.
+          folder: out_html  # The folder the action should deploy.
+          target-folder: ${{ steps.version.outputs.VERSION_NAME }}
+          git-config-name: lvgl-bot
+          git-config-email: lvgl-bot@users.noreply.github.com
+          single-commit: true
       - name: Deploy to master
         if: github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@v4.4.3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ACCESS_TOKEN: ${{ secrets.LVGL_BOT_TOKEN }}
-          REPOSITORY_NAME: lvgl/docs
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: out_html  # The folder the action should deploy.
-          TARGET_FOLDER: master
-          GIT_CONFIG_NAME: lvgl-bot
-          GIT_CONFIG_EMAIL: lvgl-bot@users.noreply.github.com
-          PRESERVE: true
-          SINGLE_COMMIT: true
+          token: ${{ secrets.LVGL_BOT_TOKEN }}
+          repository-name: lvgl/docs
+          branch: gh-pages # The branch the action should deploy to.
+          folder: out_html  # The folder the action should deploy.
+          target-folder: master
+          git-config-name: lvgl-bot
+          git-config-emai: lvgl-bot@users.noreply.github.com
+          commit: true

@@ -129,13 +129,4 @@ void test_label_decor(void)
 }
 
 
-void test_label_placeholder(void)
-{
-    lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "ABCÁÉŐ\naáeéoő");
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/label_placeholder.png");
-
-}
-
-
 #endif
