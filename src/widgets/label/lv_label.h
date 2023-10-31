@@ -89,7 +89,7 @@ typedef struct {
     uint8_t invalid_size_cache : 1;     /*1: Recalculate size and update cache*/
 } lv_label_t;
 
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_label_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_label_class;
 
 /**********************
  * GLOBAL PROTOTYPES

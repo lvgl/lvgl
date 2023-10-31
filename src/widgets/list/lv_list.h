@@ -25,9 +25,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_list_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_list_text_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_list_button_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_list_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_list_text_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_list_button_class;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

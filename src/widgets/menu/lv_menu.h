@@ -93,15 +93,15 @@ typedef struct {
     bool     static_title;
 } lv_menu_page_t;
 
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_menu_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_menu_page_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_menu_cont_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_menu_section_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_menu_separator_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_menu_sidebar_cont_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_menu_main_cont_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_menu_sidebar_header_cont_class;
-LV_ATTRIBUTE_EXTERN const lv_obj_class_t lv_menu_main_header_cont_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_menu_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_menu_page_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_menu_cont_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_menu_section_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_menu_separator_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_menu_sidebar_cont_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_menu_main_cont_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_menu_sidebar_header_cont_class;
+LV_ATTRIBUTE_EXTERN extern const lv_obj_class_t lv_menu_main_header_cont_class;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
