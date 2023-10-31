@@ -18,6 +18,7 @@
 #define LV_CONF_H
 
 #include <stdint.h>
+
 /*====================
    COLOR SETTINGS
  *====================*/
