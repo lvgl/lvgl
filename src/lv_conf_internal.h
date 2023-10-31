@@ -2799,6 +2799,7 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
+
 /*If running without lv_conf.h add typedefs with default value*/
 #ifdef LV_CONF_SKIP
     #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
