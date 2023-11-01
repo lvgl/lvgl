@@ -134,6 +134,11 @@ typedef struct {
 void _lv_fs_init(void);
 
 /**
+ * Deinitialize the File system interface
+ */
+void _lv_fs_deinit(void);
+
+/**
  * Initialize a file system driver with default values.
  * It is used to ensure all fields have known values and not memory junk.
  * After it you can set the fields.

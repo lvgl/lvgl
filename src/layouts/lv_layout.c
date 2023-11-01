@@ -50,6 +50,11 @@ void _lv_layout_init(void)
 #endif
 }
 
+void _lv_layout_deinit(void)
+{
+    lv_free(layout_list_def);
+}
+
 uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
 {
     layout_list_def = lv_realloc(layout_list_def, (layout_cnt + 1) * sizeof(lv_layout_dsc_t));

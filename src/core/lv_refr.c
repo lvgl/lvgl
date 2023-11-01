@@ -69,6 +69,10 @@ void _lv_refr_init(void)
 {
 }
 
+void _lv_refr_deinit(void)
+{
+}
+
 void lv_refr_now(lv_display_t * disp)
 {
     lv_anim_refr_now();

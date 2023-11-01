@@ -146,6 +146,11 @@ typedef struct _lv_image_decoder_dsc_t {
 void _lv_image_decoder_init(void);
 
 /**
+ * Deinitialize the image decoder module
+ */
+void _lv_image_decoder_deinit(void);
+
+/**
  * Get information about an image.
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
  * @param src the image source. Can be

@@ -47,6 +47,11 @@ extern "C" {
 void _lv_refr_init(void);
 
 /**
+ * Deinitialize the screen refresh subsystem
+ */
+void _lv_refr_deinit(void);
+
+/**
  * Redraw the invalidated areas now.
  * Normally the redrawing is periodically executed in `lv_timer_handler` but a long blocking process
  * can prevent the call of `lv_timer_handler`. In this case if the GUI is updated in the process

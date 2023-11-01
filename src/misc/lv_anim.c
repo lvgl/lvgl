@@ -64,6 +64,11 @@ void _lv_anim_core_init(void)
     state.anim_run_round = false;
 }
 
+void _lv_anim_core_deinit(void)
+{
+    lv_anim_delete_all();
+}
+
 void lv_anim_init(lv_anim_t * a)
 {
     lv_memzero(a, sizeof(lv_anim_t));

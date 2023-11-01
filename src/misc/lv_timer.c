@@ -63,6 +63,13 @@ void _lv_timer_core_init(void)
     lv_timer_enable(true);
 }
 
+void _lv_timer_core_deinit(void)
+{
+    lv_timer_enable(false);
+
+    _lv_ll_clear(timer_ll_p);
+}
+
 /**
  * Call it periodically to handle lv_timers.
  * @return the time after which it must be called again

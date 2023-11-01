@@ -188,6 +188,8 @@ typedef struct _lv_draw_sw_mask_map_param_t {
 
 void lv_draw_sw_mask_init(void);
 
+void lv_draw_sw_mask_deinit(void);
+
 //! @cond Doxygen_Suppress
 
 /**

@@ -280,15 +280,7 @@ void lv_deinit(void)
     }
 #if LV_ENABLE_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
-#if LV_USE_SYSMON
-    _lv_sysmon_builtin_deinit();
-#endif
-
     lv_display_set_default(NULL);
-
-#if LV_USE_SPAN != 0
-    lv_span_stack_deinit();
-#endif
 
 #if LV_USE_FREETYPE
     lv_freetype_uninit();
@@ -306,7 +298,51 @@ void lv_deinit(void)
     lv_theme_mono_deinit();
 #endif
 
-    lv_mem_deinit();
+    _lv_cache_builtin_deinit();
+
+    _lv_cache_deinit();
+
+    _lv_image_decoder_deinit();
+
+#if LV_USE_SYSMON
+    _lv_sysmon_builtin_deinit();
+#endif
+
+    _lv_refr_deinit();
+
+    _lv_obj_style_deinit();
+
+#if LV_USE_DRAW_PXP
+    lv_draw_pxp_deinit();
+#endif
+
+#if LV_USE_DRAW_VGLITE
+    lv_draw_vglite_deinit();
+#endif
+
+#if LV_USE_DRAW_SW
+    lv_draw_sw_deinit();
+#endif
+
+    lv_draw_deinit();
+
+    _lv_group_deinit();
+
+    _lv_anim_core_deinit();
+
+    _lv_layout_deinit();
+
+    _lv_fs_deinit();
+
+    _lv_timer_core_deinit();
+
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+    lv_profiler_builtin_uninit();
+#endif
+
+#if LV_USE_SPAN != 0
+    lv_span_stack_deinit();
+#endif
 
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
@@ -316,6 +352,8 @@ void lv_deinit(void)
     lv_objid_builtin_destroy();
 #endif
 #endif
+
+    lv_mem_deinit();
 
     lv_initialized = false;
 

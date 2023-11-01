@@ -83,6 +83,11 @@ void lv_draw_pxp_init(void)
 #endif
 }
 
+void lv_draw_pxp_deinit(void)
+{
+    lv_pxp_deinit();
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

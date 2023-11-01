@@ -79,6 +79,11 @@ void _lv_obj_style_init(void)
     _lv_ll_init(style_trans_ll_p, sizeof(trans_t));
 }
 
+void _lv_obj_style_deinit(void)
+{
+    _lv_ll_clear(style_trans_ll_p);
+}
+
 void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
     LV_ASSERT(obj->style_cnt < 63);

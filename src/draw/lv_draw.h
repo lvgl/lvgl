@@ -129,6 +129,13 @@ typedef struct _lv_draw_unit_t {
      * @return
      */
     int32_t (*evaluate_cb)(struct _lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+
+    /**
+     * Called to delete draw unit.
+     * @param draw_unit
+     * @return
+     */
+    int32_t (*delete_cb)(struct _lv_draw_unit_t * draw_unit);
 } lv_draw_unit_t;
 
 
@@ -189,6 +196,8 @@ typedef struct {
  **********************/
 
 void lv_draw_init(void);
+
+void lv_draw_deinit(void);
 
 /**
  * Allocate a new draw unit with the given size and appends it to the list of draw units

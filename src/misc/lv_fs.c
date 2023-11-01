@@ -45,6 +45,11 @@ void _lv_fs_init(void)
     _lv_ll_init(fsdrv_ll_p, sizeof(lv_fs_drv_t *));
 }
 
+void _lv_fs_deinit(void)
+{
+    _lv_ll_clear(fsdrv_ll_p);
+}
+
 bool lv_fs_is_ready(char letter)
 {
     lv_fs_drv_t * drv = lv_fs_get_drv(letter);
