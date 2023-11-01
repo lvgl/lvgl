@@ -172,6 +172,31 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
     lv_label_refr_text(obj);
 }
 
+void lv_label_set_text_vfmt(lv_obj_t * obj, const char* fmt, va_list args)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(fmt);
+
+    lv_obj_invalidate(obj);
+    lv_label_t * label = (lv_label_t *)obj;
+
+    /*If text is NULL then refresh*/
+    if(fmt == NULL) {
+        lv_label_refr_text(obj);
+        return;
+    }
+
+    if(label->text != NULL && label->static_txt == 0) {
+        lv_mem_free(label->text);
+        label->text = NULL;
+    }
+
+    label->text = _lv_txt_set_text_vfmt(fmt, args);
+    label->static_txt = 0; /*Now the text is dynamically allocated*/
+
+    lv_label_refr_text(obj);
+}
+
 void lv_label_set_text_static(lv_obj_t * obj, const char * text)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

@@ -109,6 +109,15 @@ void lv_label_set_text(lv_obj_t * obj, const char * text);
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
 
 /**
+ * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
+ * It's also used for c++ binding when package a new format function.
+ * @param obj           pointer to a label object
+ * @param fmt           `printf`-like format
+ * @param args          argument list.
+ */
+void lv_label_set_text_vfmt(lv_obj_t * obj, const char* fmt, va_list args);
+
+/**
  * Set a static text. It will not be saved by the label so the 'text' variable
  * has to be 'alive' while the label exists.
  * @param obj           pointer to a label object
