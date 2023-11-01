@@ -207,15 +207,6 @@
     #endif
 #endif
 
-/*Enable Vector Graphic APIs*/
-#ifndef LV_USE_VECTOR_GRAPHIC
-    #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
-        #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
-    #else
-        #define LV_USE_VECTOR_GRAPHIC   0
-    #endif
-#endif
-
 #ifndef LV_USE_DRAW_SW
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
@@ -2160,6 +2151,15 @@
         #define LV_USE_RLOTTIE CONFIG_LV_USE_RLOTTIE
     #else
         #define LV_USE_RLOTTIE 0
+    #endif
+#endif
+
+/*Enable Vector Graphic APIs*/
+#ifndef LV_USE_VECTOR_GRAPHIC
+    #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
+        #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
+    #else
+        #define LV_USE_VECTOR_GRAPHIC  0
     #endif
 #endif
 

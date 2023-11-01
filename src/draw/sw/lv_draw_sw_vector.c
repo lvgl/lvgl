@@ -177,7 +177,7 @@ static Tvg_Stroke_Fill _lv_spread_to_tvg(lv_vector_gradient_spread_t sp)
 }
 
 static void _setup_gradient(Tvg_Gradient * gradient, const lv_vector_gradient_t * grad,
-                                const lv_matrix_t * matrix)
+                            const lv_matrix_t * matrix)
 {
     const lv_grad_dsc_t * g = &grad->grad;
     Tvg_Color_Stop * stops = (Tvg_Color_Stop *)lv_malloc(sizeof(Tvg_Color_Stop) * g->stops_count);

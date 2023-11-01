@@ -14,7 +14,7 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-static void draw_shapes(lv_layer_t* layer)
+static void draw_shapes(lv_layer_t * layer)
 {
     lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
 
@@ -46,7 +46,7 @@ static void draw_shapes(lv_layer_t* layer)
     lv_vector_dsc_set_fill_color32(ctx, lv_color_to_32(lv_color_make(0x00, 0xff, 0x00), 0x80));
     lv_vector_dsc_add_path(ctx, path);
 
-    
+
     lv_vector_dsc_identity(ctx);
     lv_vector_dsc_translate(ctx, 0, 150);
 
@@ -104,7 +104,7 @@ static void draw_shapes(lv_layer_t* layer)
     lv_vector_dsc_delete(ctx);
 }
 
-static void draw_lines(lv_layer_t* layer)
+static void draw_lines(lv_layer_t * layer)
 {
     lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
 
@@ -206,7 +206,7 @@ static void draw_lines(lv_layer_t* layer)
     lv_vector_dsc_delete(ctx);
 }
 
-static void canvas_draw(const char* name, void (*draw_cb)(lv_layer_t*))
+static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 {
     static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(640, 4) * 480 + LV_DRAW_BUF_ALIGN];
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
@@ -226,12 +226,12 @@ static void canvas_draw(const char* name, void (*draw_cb)(lv_layer_t*))
 
 void test_draw_lines(void)
 {
-    canvas_draw("draw_lines", draw_lines); 
+    canvas_draw("draw_lines", draw_lines);
 }
 
 
 void test_draw_shapes(void)
 {
-    canvas_draw("draw_shapes", draw_shapes); 
+    canvas_draw("draw_shapes", draw_shapes);
 }
 #endif

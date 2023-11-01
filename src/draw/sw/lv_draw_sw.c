@@ -15,11 +15,11 @@
 #include "../../stdlib/lv_string.h"
 
 #if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
-#if LV_USE_THORVG_EXTERNAL
-    #include <thorvg_capi.h>
-#else
-    #include "../../libs/thorvg/thorvg_capi.h"
-#endif
+    #if LV_USE_THORVG_EXTERNAL
+        #include <thorvg_capi.h>
+    #else
+        #include "../../libs/thorvg/thorvg_capi.h"
+    #endif
 #endif
 /*********************
  *      DEFINES
