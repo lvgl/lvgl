@@ -14,12 +14,12 @@
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 
-#if LV_USE_THORVG
-    #if LV_USE_THORVG_EXTERNAL
-        #include <thorvg_capi.h>
-    #else
-        #include "../../libs/thorvg/thorvg_capi.h"
-    #endif
+#if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
+#if LV_USE_THORVG_EXTERNAL
+    #include <thorvg_capi.h>
+#else
+    #include "../../libs/thorvg/thorvg_capi.h"
+#endif
 #endif
 /*********************
  *      DEFINES
@@ -75,14 +75,14 @@ void lv_draw_sw_init(void)
 #endif
     }
 
-#if LV_USE_THORVG
+#if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
     tvg_engine_init(TVG_ENGINE_SW, 0);
 #endif
 }
 
 void lv_draw_sw_deinit(void)
 {
-#if LV_USE_THORVG
+#if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
     tvg_engine_term(TVG_ENGINE_SW);
 #endif
 }

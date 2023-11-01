@@ -74,7 +74,7 @@ void mathRotate(Matrix* m, float degree)
 {
     if (degree == 0.0f) return;
 
-    auto radian = degree / 180.0f * M_PI;
+    auto radian = degree / 180.0f * (float)M_PI;
     auto cosVal = cosf((float)radian);
     auto sinVal = sinf((float)radian);
 

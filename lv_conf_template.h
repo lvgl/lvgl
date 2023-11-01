@@ -81,9 +81,6 @@
 /* Max. memory to be used for layers */
 #define  LV_LAYER_MAX_MEMORY_USAGE             150       /*[kB]*/
 
-/*Enable Vector Graphic APIs*/
-#define LV_USE_VECTOR_GRAPHIC   0
-
 #define LV_USE_DRAW_SW 1
 #if LV_USE_DRAW_SW == 1
     /* Set the number of draw unit.
@@ -654,6 +651,9 @@
 
 /*Rlottie library*/
 #define LV_USE_RLOTTIE 0
+
+/*Enable Vector Graphic APIs*/
+#define LV_USE_VECTOR_GRAPHIC  0
 
 /* Enable ThorVG (vector graphics library) from the src/libs folder */
 #define LV_USE_THORVG_INTERNAL 0

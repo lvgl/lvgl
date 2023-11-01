@@ -16,8 +16,6 @@
 #endif
 #include "../../stdlib/lv_string.h"
 
-#define UNUSED(x) (void)(x)
-
 /*********************
  *      DEFINES
  *********************/
@@ -419,7 +417,7 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
  **********************/
 void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc_t * dsc)
 {
-    UNUSED(draw_unit);
+    LV_UNUSED(draw_unit);
 
     if(dsc->task_list == NULL)
         return;

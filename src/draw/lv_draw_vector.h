@@ -231,7 +231,7 @@ void lv_vector_dsc_skew(lv_vector_dsc_t * dsc, float skew_x, float skew_y);
 
 /* draw functions */
 void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path);
-void lv_vector_clear(lv_vector_dsc_t * dsc, const lv_area_t * rect);
+void lv_clear_rect(lv_vector_dsc_t * dsc, const lv_area_t * rect);
 void lv_draw_vector(lv_vector_dsc_t * dsc);
 
 /* Traverser for task list */

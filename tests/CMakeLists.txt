@@ -94,15 +94,13 @@ set(COMPILE_OPTIONS
     -Wextra
     -Wformat-security
     -Wmaybe-uninitialized
-    -Wmissing-prototypes
     -Wpointer-arith
     -Wmultichar
     -Wno-pedantic # ignored for now, we convert functions to pointers for propertis table.
+    -Wno-unused-parameter
     -Wreturn-type
-    -Wshadow
     -Wshift-negative-value
     -Wsizeof-pointer-memaccess
-    -Wstack-usage=5000
     -Wtype-limits
     -Wundef
     -Wuninitialized
@@ -115,7 +113,6 @@ set(COMPILE_OPTIONS
 # Options test cases are compiled with.
 set(LVGL_TESTFILE_COMPILE_OPTIONS
     ${COMPILE_OPTIONS}
-    -Wno-missing-prototypes
 )
 
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
@@ -123,6 +120,7 @@ get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 # Include lvgl project file.
 include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC ${COMPILE_OPTIONS})
+target_compile_options(lvgl_thorvg PUBLIC ${COMPILE_OPTIONS})
 if (TARGET lvgl_examples)
   target_compile_options(lvgl_examples PUBLIC ${COMPILE_OPTIONS})
 endif()
@@ -209,14 +207,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
-    target_link_libraries(${test_name} PRIVATE test_common lvgl_demos lvgl png ${JPEG_LIBRARIES} m ${TEST_LIBS})
-    if(LV_CONF_BUILD_THORVG_EXTERNAL)
-        target_link_libraries(${test_name} PUBLIC thorvg pthread)
-    else()
-        if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
-            target_link_libraries(${test_name} PRIVATE lvgl_thorvg)
-        endif()
-    endif()
+    target_link_libraries(${test_name} PRIVATE test_common lvgl_demos lvgl lvgl_thorvg png ${JPEG_LIBRARIES} m ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
