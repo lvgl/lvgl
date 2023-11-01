@@ -490,6 +490,7 @@ void lv_vector_dsc_destroy(lv_vector_dsc_t * dsc)
         _lv_vector_for_each_destroy_tasks(task_list, NULL, NULL);
         dsc->tasks.task_list = NULL;
     }
+    lv_array_destroy(&(dsc->current_dsc.stroke_dsc.dash_pattern));
     lv_free(dsc);
 }
 

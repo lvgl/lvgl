@@ -29,16 +29,16 @@ enum {
 typedef uint8_t lv_vector_fill_t;
 
 enum {
-    LV_VECTOR_STROKE_CAP_SQUARE = 0,
+    LV_VECTOR_STROKE_CAP_BUTT = 0,
+    LV_VECTOR_STROKE_CAP_SQUARE,
     LV_VECTOR_STROKE_CAP_ROUND,
-    LV_VECTOR_STROKE_CAP_BUTT,
 };
 typedef uint8_t lv_vector_stroke_cap_t;
 
 enum {
-    LV_VECTOR_STROKE_JOIN_BEVEL = 0,
+    LV_VECTOR_STROKE_JOIN_MITER = 0,
+    LV_VECTOR_STROKE_JOIN_BEVEL,
     LV_VECTOR_STROKE_JOIN_ROUND,
-    LV_VECTOR_STROKE_JOIN_MITER,
 };
 typedef uint8_t lv_vector_stroke_join_t;
 

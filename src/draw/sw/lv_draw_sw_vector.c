@@ -172,7 +172,7 @@ static Tvg_Stroke_Fill _lv_spread_to_tvg(lv_vector_gradient_spread_t sp)
     }
 }
 
-static void _set_paint_gradient(Tvg_Paint * obj, Tvg_Gradient * gradient, const lv_vector_gradient_t * grad,
+static void _setup_gradient(Tvg_Gradient * gradient, const lv_vector_gradient_t * grad,
                                 const lv_matrix_t * matrix)
 {
     const lv_grad_dsc_t * g = &grad->grad;
@@ -204,7 +204,7 @@ static void _set_paint_stroke_gradient(Tvg_Paint * obj, const lv_vector_gradient
     if(g->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
         grad = tvg_radial_gradient_new();
         tvg_radial_gradient_set(grad, g->cx + x, g->cy + y, g->cr);
-        _set_paint_gradient(obj, grad, g, m);
+        _setup_gradient(grad, g, m);
         tvg_shape_set_stroke_radial_gradient(obj, grad);
     }
     else {
@@ -217,12 +217,12 @@ static void _set_paint_stroke_gradient(Tvg_Paint * obj, const lv_vector_gradient
             tvg_linear_gradient_set(grad, x, y, x + w, y);
         }
 
-        _set_paint_gradient(obj, grad, g, m);
+        _setup_gradient(grad, g, m);
         tvg_shape_set_stroke_linear_gradient(obj, grad);
     }
 }
 
-static void _set_paint_stroke(Tvg_Paint * obj, Tvg_Canvas * canvas, const lv_vector_stroke_dsc_t * dsc)
+static void _set_paint_stroke(Tvg_Paint * obj, const lv_vector_stroke_dsc_t * dsc)
 {
     if(dsc->style == LV_VECTOR_DRAW_STYLE_SOLID) {
         _tvg_color c;
@@ -265,7 +265,7 @@ static void _set_paint_fill_gradient(Tvg_Paint * obj, const lv_vector_gradient_t
     if(g->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
         grad = tvg_radial_gradient_new();
         tvg_radial_gradient_set(grad, g->cx + x, g->cy + y, g->cr);
-        _set_paint_gradient(obj, grad, g, m);
+        _setup_gradient(grad, g, m);
         tvg_shape_set_radial_gradient(obj, grad);
     }
     else {
@@ -278,7 +278,7 @@ static void _set_paint_fill_gradient(Tvg_Paint * obj, const lv_vector_gradient_t
             tvg_linear_gradient_set(grad, x, y, x + w, y);
         }
 
-        _set_paint_gradient(obj, grad, g, m);
+        _setup_gradient(grad, g, m);
         tvg_shape_set_linear_gradient(obj, grad);
     }
 }
@@ -401,7 +401,7 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
         _set_paint_shape(obj, path);
 
         _set_paint_fill(obj, canvas, &dsc->fill_dsc, &dsc->matrix);
-        _set_paint_stroke(obj, canvas, &dsc->stroke_dsc);
+        _set_paint_stroke(obj, &dsc->stroke_dsc);
         _set_paint_blend_mode(obj, dsc->blend_mode);
     }
 
@@ -413,6 +413,8 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
  **********************/
 void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc_t * dsc)
 {
+    LV_UNUSED(draw_unit);
+
     if(dsc->task_list == NULL)
         return;
 
