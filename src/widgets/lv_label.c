@@ -849,18 +849,10 @@ static void draw_main(lv_event_t * e)
         lv_area_move(&txt_coords, 0, -s);
         txt_coords.y2 = obj->coords.y2;
     }
-    if(label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
-        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-        draw_ctx->clip_area = &txt_clip;
-        lv_draw_label(draw_ctx, &label_draw_dsc, &txt_coords, label->text, hint);
-        draw_ctx->clip_area = clip_area_ori;
-    }
-    else {
-        lv_draw_label(draw_ctx, &label_draw_dsc, &txt_coords, label->text, hint);
-    }
 
-    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+    const lv_area_t* clip_area_ori = draw_ctx->clip_area;
     draw_ctx->clip_area = &txt_clip;
+    lv_draw_label(draw_ctx, &label_draw_dsc, &txt_coords, label->text, hint);
 
     if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
         lv_point_t size;
