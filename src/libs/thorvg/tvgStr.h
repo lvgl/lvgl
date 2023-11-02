@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_STR_H_
 #define _TVG_STR_H_
 
@@ -35,3 +38,6 @@ char* strDirname(const char* path);                 //return the full directory 
 
 }
 #endif //_TVG_STR_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

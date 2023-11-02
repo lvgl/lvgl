@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifdef THORVG_NEON_VECTOR_SUPPORT
 
 #include <arm_neon.h>
@@ -136,3 +139,6 @@ static bool neonRasterTranslucentRect(SwSurface* surface, const SwBBox& region, 
 }
 
 #endif
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

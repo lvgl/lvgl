@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 template<typename PIXEL_T>
 static void inline cRasterPixels(PIXEL_T* dst, PIXEL_T val, uint32_t offset, int32_t len)
 {
@@ -161,3 +164,6 @@ static bool inline cRasterARGBtoABGR(Surface* surface)
     //exactly same with ABGRtoARGB
     return cRasterABGRtoARGB(surface);
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

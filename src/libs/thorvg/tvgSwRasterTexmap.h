@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 struct AALine
 {
    int32_t x[2];
@@ -1205,3 +1208,6 @@ static bool _rasterTexmapPolygonMesh(SwSurface* surface, const SwImage* image, c
     free(transformedTris);
     return true;
 }
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

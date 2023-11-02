@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_CANVAS_IMPL_H_
 #define _TVG_CANVAS_IMPL_H_
 
@@ -144,3 +147,6 @@ struct Canvas::Impl
 };
 
 #endif /* _TVG_CANVAS_IMPL_H_ */
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifdef THORVG_AVX_VECTOR_SUPPORT
 
 #include <immintrin.h>
@@ -189,3 +192,6 @@ static bool avxRasterTranslucentRle(SwSurface* surface, const SwRleData* rle, ui
 
 
 #endif
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

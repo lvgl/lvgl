@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_SW_COMMON_H_
 #define _TVG_SW_COMMON_H_
 
@@ -572,3 +575,6 @@ void rasterPremultiply(Surface* surface);
 bool rasterConvertCS(Surface* surface, ColorSpace to);
 
 #endif /* _TVG_SW_COMMON_H_ */
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

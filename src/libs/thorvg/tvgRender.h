@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_RENDER_H_
 #define _TVG_RENDER_H_
 
@@ -334,3 +337,6 @@ static inline uint8_t MULTIPLY(uint8_t c, uint8_t a)
 }
 
 #endif //_TVG_RENDER_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

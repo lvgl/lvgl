@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_SVG_LOADER_COMMON_H_
 #define _TVG_SVG_LOADER_COMMON_H_
 
@@ -568,3 +571,6 @@ struct Box
 };
 
 #endif
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

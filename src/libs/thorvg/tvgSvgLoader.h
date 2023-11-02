@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_SVG_LOADER_H_
 #define _TVG_SVG_LOADER_H_
 
@@ -67,3 +70,6 @@ private:
 
 
 #endif //_TVG_SVG_LOADER_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

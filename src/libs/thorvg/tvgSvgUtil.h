@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_SVG_UTIL_H_
 #define _TVG_SVG_UTIL_H_
 
@@ -28,3 +31,6 @@
 size_t svgUtilURLDecode(const char *src, char** dst);
 
 #endif //_TVG_SVG_UTIL_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

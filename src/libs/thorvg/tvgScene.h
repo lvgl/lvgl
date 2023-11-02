@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_SCENE_IMPL_H_
 #define _TVG_SCENE_IMPL_H_
 
@@ -247,3 +250,6 @@ struct Scene::Impl
 };
 
 #endif //_TVG_SCENE_IMPL_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_COMMON_H_
 #define _TVG_COMMON_H_
 
@@ -87,3 +90,6 @@ uint16_t THORVG_VERSION_NUMBER();
 #define PP(A) (((Paint*)(A))->pImpl)   //Access to pimpl.
 
 #endif //_TVG_COMMON_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

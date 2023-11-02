@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_SHAPE_IMPL_H_
 #define _TVG_SHAPE_IMPL_H_
 
@@ -86,10 +89,10 @@ struct Shape::Impl
     }
 
     RenderData update(RenderMethod& renderer, const RenderTransform* transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag pFlag, bool clipper)
-    {     
+    {
         if ((needComp = needComposition(opacity))) {
             /* Overriding opacity value. If this scene is half-translucent,
-               It must do intermeidate composition with that opacity value. */ 
+               It must do intermeidate composition with that opacity value. */
             this->opacity = opacity;
             opacity = 255;
         }
@@ -388,3 +391,6 @@ struct Shape::Impl
 };
 
 #endif //_TVG_SHAPE_IMPL_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

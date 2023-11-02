@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_FILL_H_
 #define _TVG_FILL_H_
 
@@ -110,3 +113,6 @@ struct LinearGradient::Impl
 
 
 #endif  //_TVG_FILL_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+

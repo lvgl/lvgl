@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+#include "../../lv_conf_internal.h"
+#if LV_USE_THORVG_INTERNAL
+
 #ifndef _TVG_SVG_SCENE_BUILDER_H_
 #define _TVG_SVG_SCENE_BUILDER_H_
 
@@ -28,3 +31,6 @@
 unique_ptr<Scene> svgSceneBuild(SvgLoaderData& loaderData, Box vBox, float w, float h, AspectRatioAlign align, AspectRatioMeetOrSlice meetOrSlice, const string& svgPath, SvgViewFlag viewFlag);
 
 #endif //_TVG_SVG_SCENE_BUILDER_H_
+
+#endif /* LV_USE_THORVG_INTERNAL */
+
