@@ -21,7 +21,7 @@ Naming and API
   `LINK <https://github.com/lvgl/lvgl/pull/3390#discussion_r885915769>`__
 - |check| Replace `disp_drv->direct_mode/full_refresh` with enum.
 - |check| Consider flat directory structure. E.g. `extra/widgets` to `widgets`
-- |uncheck| Use `uint32_t` and `int32_t` in APIs where possible. Consider hardcoding `int32_t` as `int32_t`.
+- |check| Use `uint32_t` and `int32_t` in APIs where possible. Consider hardcoding `int32_t` as `int32_t`.
 - |check| To define a new stdlib API use defines `LV_USE_CUSTOM_...` and
   let the user implement `lv_...` functions somewhere (instead of defining the name of the custom functions)
   (see `here <https://github.com/lvgl/lvgl/issues/3481#issuecomment-1206434501>`__)
@@ -59,7 +59,7 @@ Architecture
 Styles
 ~~~~~~
 
-- |uncheck| Make `style_bg_img` support `9patch` images
+- |uncheck| Make `style_bg_img` `LV_PART_BACKGROUNG`
 - |check| non-uniform scale of images: scale width and height differently
 - |uncheck| Scroll anim settings should come from styles to allow customization
 
