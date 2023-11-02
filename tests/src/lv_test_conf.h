@@ -20,6 +20,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_USE_TINY_TTF 1
+
 void lv_test_assert_fail(void);
 #define LV_ASSERT_HANDLER lv_test_assert_fail();
 
