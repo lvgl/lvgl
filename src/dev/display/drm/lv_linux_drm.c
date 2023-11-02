@@ -66,9 +66,6 @@ typedef struct {
     drmModePropertyPtr crtc_props[128];
     drmModePropertyPtr conn_props[128];
     drm_buffer_t drm_bufs[2]; /*DUMB buffers*/
-    uint8_t active_drm_buf_idx; /*Double buffering handling*/
-    uint8_t * intermediate_buffer;
-    unsigned long int intermediate_buffer_size;
 } drm_dev_t;
 
 /**********************
@@ -93,7 +90,7 @@ static int drm_open(const char * path);
 static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t connector_id, unsigned int fourcc);
 static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf);
 static int drm_setup_buffers(drm_dev_t * drm_dev);
-static void drm_wait_vsync(drm_dev_t * drm_dev);
+static void drm_flush_wait(lv_display_t * drm_dev);
 static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 
 /**********************
@@ -125,6 +122,7 @@ lv_display_t * lv_linux_drm_create(void)
     }
     drm_dev->fd = -1;
     lv_display_set_driver_data(disp, drm_dev);
+    lv_display_set_flush_wait_cb(disp, drm_flush_wait);
     lv_display_set_flush_cb(disp, drm_flush);
 
     return disp;
@@ -156,7 +154,8 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
     int32_t ver_res = drm_dev->height;
     int32_t width = drm_dev->mmWidth;
 
-    lv_display_set_draw_buffers(disp, drm_dev->intermediate_buffer, NULL, drm_dev->intermediate_buffer_size,
+    size_t buf_size = LV_MIN(drm_dev->drm_bufs[1].size, drm_dev->drm_bufs[0].size);
+    lv_display_set_draw_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
                                 LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, hor_res, ver_res);
 
@@ -223,8 +222,12 @@ static void page_flip_handler(int fd, unsigned int sequence, unsigned int tv_sec
     LV_UNUSED(sequence);
     LV_UNUSED(tv_sec);
     LV_UNUSED(tv_usec);
-    LV_UNUSED(user_data);
     LV_LOG_TRACE("flip");
+    drm_dev_t * drm_dev = user_data;
+    if(drm_dev->req) {
+        drmModeAtomicFree(drm_dev->req);
+        drm_dev->req = NULL;
+    }
 }
 
 static int drm_get_plane_props(drm_dev_t * drm_dev)
@@ -378,7 +381,7 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
     drm_add_plane_property(drm_dev, "CRTC_W", drm_dev->width);
     drm_add_plane_property(drm_dev, "CRTC_H", drm_dev->height);
 
-    ret = drmModeAtomicCommit(drm_dev->fd, drm_dev->req, flags, NULL);
+    ret = drmModeAtomicCommit(drm_dev->fd, drm_dev->req, flags, drm_dev);
     if(ret) {
         LV_LOG_ERROR("drmModeAtomicCommit failed: %s (%d)", strerror(errno), errno);
         drmModeAtomicFree(drm_dev->req);
@@ -784,65 +787,51 @@ static int drm_setup_buffers(drm_dev_t * drm_dev)
     if(ret)
         return ret;
 
-    /*Allocate third buffer that flushes go into*/
-    drm_dev->intermediate_buffer_size = drm_dev->width * drm_dev->height * (LV_COLOR_DEPTH / 8);
-    LV_ASSERT(drm_dev->intermediate_buffer_size <= drm_dev->drm_bufs[0].size);
-    LV_ASSERT(drm_dev->intermediate_buffer_size <= drm_dev->drm_bufs[1].size);
-    drm_dev->intermediate_buffer = malloc(drm_dev->intermediate_buffer_size);
-    LV_ASSERT_MALLOC(drm_dev->intermediate_buffer);
-    lv_memzero(drm_dev->intermediate_buffer, drm_dev->intermediate_buffer_size);
-
     return 0;
 }
 
-static void drm_wait_vsync(drm_dev_t * drm_dev)
+static void drm_flush_wait(lv_display_t * disp)
 {
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
+
     struct pollfd pfd;
     pfd.fd = drm_dev->fd;
     pfd.events = POLLIN;
 
-    int ret;
-    do {
-        ret = poll(&pfd, 1, -1);
-    } while(ret == -1 && errno == EINTR);
+    while(drm_dev->req) {
+        int ret;
+        do {
+            ret = poll(&pfd, 1, -1);
+        } while(ret == -1 && errno == EINTR);
 
-    if(ret > 0)
-        drmHandleEvent(drm_dev->fd, &drm_dev->drm_event_ctx);
-    else
-        LV_LOG_ERROR("poll failed: %s", strerror(errno));
-
-    drmModeAtomicFree(drm_dev->req);
-    drm_dev->req = NULL;
+        if(ret > 0)
+            drmHandleEvent(drm_dev->fd, &drm_dev->drm_event_ctx);
+        else {
+            LV_LOG_ERROR("poll failed: %s", strerror(errno));
+            return;
+        }
+    }
 }
 
 static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
+    if(!lv_display_flush_is_last(disp)) return;
+
     LV_UNUSED(area);
     LV_UNUSED(px_map);
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
 
-    if(lv_display_flush_is_last(disp)) {
-        drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
-
-        /*Wait for last requested buffer swap to complete*/
-        if(drm_dev->req)
-            drm_wait_vsync(drm_dev);
-
-        /*Update background buffer from intermediate buffer*/
-        drm_buffer_t * fbuf = &drm_dev->drm_bufs[drm_dev->active_drm_buf_idx ^ 1];
-        lv_memcpy(fbuf->map, drm_dev->intermediate_buffer, drm_dev->intermediate_buffer_size);
-
-        /*Request buffer swap*/
-        if(drm_dmabuf_set_plane(drm_dev, fbuf)) {
-            LV_LOG_ERROR("Flush fail");
-            return;
+    for(int idx = 0; idx < 2; idx++) {
+        if(drm_dev->drm_bufs[idx].map == px_map) {
+            /*Request buffer swap*/
+            if(drm_dmabuf_set_plane(drm_dev, &drm_dev->drm_bufs[idx])) {
+                LV_LOG_ERROR("Flush fail");
+                return;
+            }
+            else
+                LV_LOG_TRACE("Flush done");
         }
-        else
-            LV_LOG_TRACE("Flush done");
-
-        drm_dev->active_drm_buf_idx ^= 1;
     }
-
-    lv_display_flush_ready(disp);
 }
 
 #endif /*LV_USE_LINUX_DRM*/

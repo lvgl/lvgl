@@ -242,10 +242,11 @@ static void obj_test_task_cb(lv_timer_t * tmr)
 
         case 14:
             obj = lv_msgbox_create(NULL, "Title", "Some text on the message box with average length", mbox_buttons, true);
-
-            lv_timer_t * msgbox_tmr = lv_timer_create(msgbox_delete, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
-            lv_timer_set_repeat_count(msgbox_tmr, 1);
-            lv_obj_align(obj, LV_ALIGN_RIGHT_MID, -10, 0);
+            {
+                lv_timer_t * msgbox_tmr = lv_timer_create(msgbox_delete, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
+                lv_timer_set_repeat_count(msgbox_tmr, 1);
+                lv_obj_align(obj, LV_ALIGN_RIGHT_MID, -10, 0);
+            }
             break;
 
         case 15:

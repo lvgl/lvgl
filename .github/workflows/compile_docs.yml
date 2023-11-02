@@ -14,7 +14,7 @@ jobs:
     concurrency: docs-build-and-deploy
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache Python packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           # Cache the Python package environment, excluding pip and setuptools installed by setup-python
           path: |
@@ -44,11 +44,11 @@ jobs:
           pip install -r docs/requirements.txt
       - name: Setup Emscripten cache
         id: cache-system-libraries
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{env.EM_CACHE_FOLDER}}
           key: ${{env.EM_VERSION}}-${{ runner.os }}
-      - uses: mymindstorm/setup-emsdk@v9
+      - uses: mymindstorm/setup-emsdk@v12
         with:
           version: ${{env.EM_VERSION}}
           actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
