@@ -188,8 +188,8 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
 void lv_vector_path_close(lv_vector_path_t * path);
 
 /* complex shape functions */
-void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, lv_coord_t rx, lv_coord_t ry);
-void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, lv_coord_t rx, lv_coord_t ry);
+void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, int32_t rx, int32_t ry);
+void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, int32_t rx, int32_t ry);
 void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t * subpath);
 
 /* draw dsc property functions */
