@@ -154,23 +154,20 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
     }
     LV_LOG_TRACE("cache miss for letter: %u", unicode_letter);
     /*Prepare space in cache*/
-    void * cache_key_ptr = lv_mem_alloc(sizeof(cache_key));
-    if(!cache_key_ptr) {
-        LV_LOG_ERROR("failed to allocate cache key");
-        return NULL;
-    }
-    lv_memcpy(cache_key_ptr, &cache_key, sizeof(cache_key));
     size_t szb = h * stride;
     buffer = lv_mem_alloc(szb);
     if(!buffer) {
-        lv_mem_free(cache_key_ptr);
         LV_LOG_ERROR("failed to allocate cache value");
         return NULL;
     }
-    /*Render into cache*/
     lv_memset(buffer, 0, szb);
+    if(LV_LRU_OK != lv_lru_set(dsc->bitmap_cache, &cache_key, sizeof(cache_key), buffer, szb)) {
+        LV_LOG_ERROR("failed to add cache value");
+        lv_mem_free(buffer);
+        return NULL;
+    }
+    /*Render into cache*/
     stbtt_MakeGlyphBitmap(info, buffer, w, h, stride, dsc->scale, dsc->scale, g1);
-    lv_lru_set(dsc->bitmap_cache, cache_key_ptr, sizeof(cache_key), buffer, szb);
     return buffer;
 }
 
