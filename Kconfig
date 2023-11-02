@@ -1012,6 +1012,13 @@ menu "LVGL configuration"
             endmenu
         endif
 
+        config LV_USE_TINY_TTF
+            bool "Tiny TTF library"
+        config LV_TINY_TTF_FILE_SUPPORT
+            bool "Load TTF data from files"
+            depends on LV_USE_TINY_TTF
+            default n
+
         config LV_USE_RLOTTIE
             bool "Lottie library"
 
