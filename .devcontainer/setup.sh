@@ -15,6 +15,4 @@ cp __build_all.sh__ ../../build_all.sh
 cp __c_cpp_properties.json__ ../../.vscode/c_cpp_properties.json
 cp __settings.json__ ../../.vscode/settings.json
 
-cd ../../
-chmod +x build_all.sh
-./build_all.sh
+chmod +x ../../build_all.sh
