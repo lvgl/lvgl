@@ -1,0 +1,44 @@
+From c5bd602452a72e031cc91050e2dc7a04e8d6bc49 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <nicusor.citu@nxp.com>
+Date: Mon, 30 Oct 2023 15:07:38 +0200
+Subject: [PATCH 1/2] fix(freertos) Do not reinitialize the mutex/conditional
+ if already done.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In some cases, the mutex_lock() gets called before its creation so it will perform the init first.
+Next, if mutex_init() gets eventually called, do not reinit the mutex.
+
+Signed-off-by: Nicușor Cîțu <nicusor.citu@nxp.com>
+---
+ src/osal/lv_freertos.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/osal/lv_freertos.c b/src/osal/lv_freertos.c
+index 49192402d..bc3f7d9d8 100644
+--- a/src/osal/lv_freertos.c
++++ b/src/osal/lv_freertos.c
+@@ -96,7 +96,8 @@ lv_result_t lv_thread_delete(lv_thread_t * pxThread)
+
+ lv_result_t lv_mutex_init(lv_mutex_t * pxMutex)
+ {
+-    prvMutexInit(pxMutex);
++    /* If mutex in uninitialized, perform initialization. */
++    prvCheckMutexInit(pxMutex);
+
+     return LV_RESULT_OK;
+ }
+@@ -165,7 +166,8 @@ lv_result_t lv_thread_sync_init(lv_thread_sync_t * pxCond)
+     /* Store the handle of the calling task. */
+     pxCond->xTaskToNotify = xTaskGetCurrentTaskHandle();
+ #else
+-    prvCondInit(pxCond);
++    /* If the cond is uninitialized, perform initialization. */
++    prvCheckCondInit(pxCond);
+ #endif
+
+     return LV_RESULT_OK;
+--
+2.25.1
+
