@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Cache Python packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           # Cache the Python package environment, excluding pip and setuptools installed by setup-python
           path: |
@@ -44,7 +44,7 @@ jobs:
           pip install -r docs/requirements.txt
       - name: Setup Emscripten cache
         id: cache-system-libraries
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{env.EM_CACHE_FOLDER}}
           key: ${{env.EM_VERSION}}-${{ runner.os }}
