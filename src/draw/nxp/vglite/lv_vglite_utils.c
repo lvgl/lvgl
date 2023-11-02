@@ -20,7 +20,7 @@
 
 #include "../../../core/lv_refr.h"
 
-#if LV_USE_OS
+#if VGLITE_TASK_QUEUE
     #include "vg_lite_gpu.h"
 #endif
 
@@ -40,7 +40,7 @@
  *  STATIC VARIABLES
  **********************/
 
-#if LV_USE_OS
+#if VGLITE_TASK_QUEUE
     static volatile bool _cmd_buf_flushed = false;
 #endif
 
@@ -52,7 +52,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if LV_USE_OS
+#if VGLITE_TASK_QUEUE
 bool vglite_cmd_buf_is_flushed(void)
 {
     return _cmd_buf_flushed;
@@ -61,7 +61,7 @@ bool vglite_cmd_buf_is_flushed(void)
 
 void vglite_run(void)
 {
-#if LV_USE_OS
+#if VGLITE_TASK_QUEUE
     vg_lite_gpu_state_t gpu_state = vg_lite_get_gpu_state();
 
     if(gpu_state == VG_LITE_GPU_BUSY) {
@@ -72,11 +72,11 @@ void vglite_run(void)
 #endif
 
     /*
-     * For multithreading version (with OS), we simply flush the command buffer
-     * and the vglite draw thread will signal the dispatcher for completed tasks.
-     * Without OS, we process the tasks and signal them as complete one by one.
+     * If VGLITE_TASK_QUEUE is enabled, simply flush the command buffer and the
+     * vglite draw thread will signal asynchronous the dispatcher for completed tasks.
+     * Without the queue, process the tasks and signal them as complete one by one.
      */
-#if LV_USE_OS
+#if VGLITE_TASK_QUEUE
     LV_ASSERT_MSG(vg_lite_flush() == VG_LITE_SUCCESS, "Flush failed.");
     _cmd_buf_flushed = true;
 #else

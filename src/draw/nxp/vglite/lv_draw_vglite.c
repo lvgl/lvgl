@@ -27,7 +27,7 @@
 
 #define DRAW_UNIT_ID_VGLITE 2
 
-#if LV_USE_OS
+#if VGLITE_TASK_QUEUE
     #define VGLITE_TASK_BUF_SIZE 10
 #endif
 
@@ -35,7 +35,7 @@
  *      TYPEDEFS
  **********************/
 
-#if LV_USE_OS
+#if VGLITE_TASK_QUEUE
 /**
  * Structure of pending vglite draw task
  */
@@ -71,7 +71,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
-#if LV_USE_OS
+#if VGLITE_TASK_QUEUE
     /*
     * Circular buffer to hold the queued and the flushed tasks.
     * Two indexes, _head and _tail, are used to signal the beginning
@@ -357,7 +357,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 #endif
 }
 
-#if LV_USE_OS
+#if VGLITE_TASK_QUEUE
 static inline void _vglite_queue_task(lv_draw_task_t * task_act)
 {
     _draw_task_buf[_tail].task = task_act;
@@ -390,7 +390,9 @@ static inline void _vglite_signal_task_ready(lv_draw_task_t * task_act)
     if(task_act)
         LV_ASSERT_MSG(_tail != _head, "VGLite task buffer full.");
 }
+#endif
 
+#if LV_USE_OS
 static void _vglite_render_thread_cb(void * ptr)
 {
     lv_draw_vglite_unit_t * u = ptr;
@@ -399,18 +401,27 @@ static void _vglite_render_thread_cb(void * ptr)
 
     while(1) {
         /*
-         * Wait for sync if no task received or _draw_task_buf is empty.
-         * The thread will have to run as much as there are pending tasks.
+         * Wait for sync if no task received.
          */
-        while(u->task_act == NULL && _head == _tail) {
+        while(u->task_act == NULL
+#if VGLITE_TASK_QUEUE
+              /*
+               * Wait for sync if _draw_task_buf is empty.
+               * The thread will have to run as much as there are pending tasks.
+               */
+              && _head == _tail
+#endif
+             ) {
             lv_thread_sync_wait(&u->sync);
         }
 
         if(u->task_act) {
+#if VGLITE_TASK_QUEUE
             _vglite_queue_task((void *)u->task_act);
-
+#endif
             _vglite_execute_drawing(u);
         }
+#if VGLITE_TASK_QUEUE
         else {
             /*
              * Update the flush status for last pending tasks.
@@ -418,9 +429,13 @@ static void _vglite_render_thread_cb(void * ptr)
              */
             vglite_run();
         }
-
+#endif
+#if VGLITE_TASK_QUEUE
         _vglite_signal_task_ready((void *)u->task_act);
-
+#else
+        /* Signal the ready state to dispatcher. */
+        u->task_act->state = LV_DRAW_TASK_STATE_READY;
+#endif
         /* Cleanup. */
         u->task_act = NULL;
 
