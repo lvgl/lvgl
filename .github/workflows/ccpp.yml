@@ -19,7 +19,7 @@ jobs:
                        'OPTIONS_FULL_32BIT']
     name: Build ${{ matrix.build_option }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     name: amd64 Executable Tests
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
@@ -53,7 +53,7 @@ jobs:
         arch: [ 'aarch64', 'armv6', 'armv7' ]
 
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v4
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: Setup cache
         uses: actions/cache@v3
