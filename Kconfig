@@ -1,5 +1,6 @@
 # Kconfig file for LVGL v8.0
 
+if LVGL
 menu "LVGL configuration"
 
     # Define CONFIG_LV_CONF_SKIP so we can use LVGL
@@ -1109,3 +1110,4 @@ menu "LVGL configuration"
     endmenu
 
 endmenu
+endif
