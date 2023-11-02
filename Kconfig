@@ -170,6 +170,17 @@ menu "LVGL configuration"
 			help
 				Max. memory to be used for layers.
 
+			config LV_USE_OS
+				int "Default operating system to use"
+				default 0
+			help
+				"Select an operating system to use. Possible options:"
+				0:LV_OS_NONE
+				1:LV_OS_PTHREAD
+				2:LV_OS_FREERTOS
+				3:LV_OS_CMSIS_RTOS2
+				255:LV_OS_CUSTOM
+
 			config LV_USE_DRAW_SW
 				bool "Enable software rendering"
 				default y
