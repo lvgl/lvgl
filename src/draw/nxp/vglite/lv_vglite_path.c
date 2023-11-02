@@ -44,11 +44,11 @@
  **********************/
 
 void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size,
-                                  lv_coord_t radius,
+                                  int32_t radius,
                                   const lv_area_t * coords)
 {
-    lv_coord_t rect_width = lv_area_get_width(coords);
-    lv_coord_t rect_height = lv_area_get_height(coords);
+    int32_t rect_width = lv_area_get_width(coords);
+    int32_t rect_height = lv_area_get_height(coords);
 
     /* Get the final radius. Can't be larger than the half of the shortest side */
     int32_t shortest_side = LV_MIN(rect_width, rect_height);
@@ -57,7 +57,7 @@ void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size
     /* Path data element index */
     uint8_t pidx = 0;
 
-    if((radius == (lv_coord_t)LV_RADIUS_CIRCLE) && (rect_width == rect_height)) {
+    if((radius == (int32_t)LV_RADIUS_CIRCLE) && (rect_width == rect_height)) {
 
         /* Get the control point offset for rounded cases */
         int32_t cpoff = (int32_t)((float)final_radius * BEZIER_OPTIM_CIRCLE);

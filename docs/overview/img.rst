@@ -354,12 +354,12 @@ to open is an animation.
 Image post-processing
 ---------------------
 
-Considering that some hardware has special requirements for image formats, 
-such as alpha premultiplication and stride alignment, most image decoders (such as PNG decoders) 
-may not directly output image data that meets hardware requirements. 
+Considering that some hardware has special requirements for image formats,
+such as alpha premultiplication and stride alignment, most image decoders (such as PNG decoders)
+may not directly output image data that meets hardware requirements.
 
-For this reason, LVGL provides a solution for image post-processing. 
-First, call a custom post-processing function after ``lv_image_decoder_open`` to adjust the data in the image cache, 
+For this reason, LVGL provides a solution for image post-processing.
+First, call a custom post-processing function after ``lv_image_decoder_open`` to adjust the data in the image cache,
 and then mark the processing status in ``cache_entry->process_state`` (to avoid repeated post-processing).
 
 See the detailed code below:
@@ -402,8 +402,8 @@ See the detailed code below:
        }
 
        if(!(entry->process_state & IMAGE_PROCESS_STATE_STRIDE_ALIGNED)) {
-         lv_coord_t image_w = dsc->header.w;
-         lv_coord_t image_h = dsc->header.h;
+         int32_t image_w = dsc->header.w;
+         int32_t image_h = dsc->header.h;
          uint32_t width_byte = image_w * lv_color_format_get_size(color_format);
          uint32_t stride = lv_draw_buf_width_to_stride(image_w, color_format);
 
@@ -426,7 +426,7 @@ See the detailed code below:
 
            /* Copy image data */
            const uint8_t * cur = ori_image;
-           for(lv_coord_t y = 0; y < image_h; y++) {
+           for(int32_t y = 0; y < image_h; y++) {
              lv_memcpy(new_image, cur, width_byte);
              new_image += stride;
              cur += width_byte;

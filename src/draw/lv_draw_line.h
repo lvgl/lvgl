@@ -28,12 +28,14 @@ extern "C" {
 typedef struct {
     lv_draw_dsc_base_t base;
 
-    lv_point_t p1;
-    lv_point_t p2;
+    lv_value_precise_t p1_x;
+    lv_value_precise_t p1_y;
+    lv_value_precise_t p2_x;
+    lv_value_precise_t p2_y;
     lv_color_t color;
-    lv_coord_t width;
-    lv_coord_t dash_width;
-    lv_coord_t dash_gap;
+    int32_t width;
+    int32_t dash_width;
+    int32_t dash_gap;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode  : 2;
     uint8_t round_start : 1;

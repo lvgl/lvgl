@@ -5,7 +5,7 @@
 
 void test_obj_property_fail_on_invalid_id(void)
 {
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_property_t prop = { };
 
     prop.id = LV_PROPERTY_ID_INVALID;
@@ -21,14 +21,14 @@ void test_obj_property_fail_on_invalid_id(void)
     TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_set_property(obj, &prop));
 
     prop.id = LV_PROPERTY_OBJ_PARENT; /* Valid ID */
-    prop.ptr = lv_scr_act();
+    prop.ptr = lv_screen_active();
     TEST_ASSERT_EQUAL_INT(LV_RESULT_OK, lv_obj_set_property(obj, &prop));
 }
 
 void test_obj_property_set_get_should_match(void)
 {
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
-    lv_obj_t * root = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_t * root = lv_obj_create(lv_screen_active());
     lv_property_t prop = { };
     lv_color_t color = {.red = 0x11, .green = 0x22, .blue = 0x33};
 
@@ -128,7 +128,7 @@ void test_obj_property_flag(void)
         { LV_OBJ_FLAG_USER_4,                    LV_PROPERTY_OBJ_FLAG_USER_4 },
     };
 
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     obj->flags = 0;
     for(unsigned long i = 0; i < sizeof(properties) / sizeof(properties[0]); i++) {
 

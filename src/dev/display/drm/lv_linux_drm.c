@@ -152,9 +152,9 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
     LV_LOG_INFO("DRM subsystem and buffer mapped successfully");
 
-    lv_coord_t hor_res = drm_dev->width;
-    lv_coord_t ver_res = drm_dev->height;
-    lv_coord_t width = drm_dev->mmWidth;
+    int32_t hor_res = drm_dev->width;
+    int32_t ver_res = drm_dev->height;
+    int32_t width = drm_dev->mmWidth;
 
     lv_display_set_draw_buffers(disp, drm_dev->intermediate_buffer, NULL, drm_dev->intermediate_buffer_size,
                                 LV_DISPLAY_RENDER_MODE_DIRECT);

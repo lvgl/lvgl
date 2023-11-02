@@ -45,7 +45,7 @@ Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new tile loaded by scrolling.
-   :cpp:expr:`lv_tileview_get_tile_act(tabview)` can be used to get current
+   :cpp:expr:`lv_tileview_get_tile_active(tabview)` can be used to get current
    tile.
 
 Keys

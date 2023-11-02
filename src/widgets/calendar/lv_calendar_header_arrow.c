@@ -77,7 +77,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_style_bg_image_src(mo_prev, LV_SYMBOL_LEFT, 0);
     lv_obj_set_height(mo_prev, lv_pct(100));
     lv_obj_update_layout(mo_prev);
-    lv_coord_t btn_size = lv_obj_get_height(mo_prev);
+    int32_t btn_size = lv_obj_get_height(mo_prev);
     lv_obj_set_width(mo_prev, btn_size);
 
     lv_obj_add_event(mo_prev, month_event_cb, LV_EVENT_CLICKED, NULL);

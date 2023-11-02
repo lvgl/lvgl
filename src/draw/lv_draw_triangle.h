@@ -29,7 +29,7 @@ typedef struct {
     lv_color_t bg_color;
     lv_grad_dsc_t bg_grad;
 
-    lv_point_t p[3];
+    lv_point_precise_t p[3];
 } lv_draw_triangle_dsc_t;
 
 /**********************

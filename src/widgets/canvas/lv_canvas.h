@@ -62,9 +62,9 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
  * @param h height of the canvas
  * @param cf color format. `LV_IMAGE_CF_...`
  */
-void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_t h, lv_color_format_t cf);
+void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, int32_t w, int32_t h, lv_color_format_t cf);
 
-void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
+void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv_opa_t opa);
 
 /**
  * Set the palette color of a canvas with index format. Valid only for `LV_IMAGE_CF_INDEXED1/2/4/8`
@@ -83,7 +83,7 @@ void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color32_t c);
  *====================*/
 
 
-lv_color32_t lv_canvas_get_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
+lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y);
 
 /**
  * Get the image of the canvas as a pointer to an `lv_image_dsc_t` variable.
@@ -106,8 +106,8 @@ lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * canvas);
  * @param w width of the buffer to copy
  * @param h height of the buffer to copy
  */
-void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, lv_coord_t y, lv_coord_t w,
-                        lv_coord_t h);
+void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, int32_t x, int32_t y, int32_t w,
+                        int32_t h);
 /**
  * Fill the canvas with color
  * @param canvas pointer to a canvas

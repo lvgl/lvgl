@@ -19,7 +19,7 @@ style.set_border_color(lv.palette_main(lv.PALETTE.GREY))
 
 style.set_shadow_width(8)
 style.set_shadow_color(lv.palette_main(lv.PALETTE.GREY))
-style.set_shadow_ofs_y(8)
+style.set_shadow_offset_y(8)
 
 style.set_outline_opa(lv.OPA.COVER)
 style.set_outline_color(lv.palette_main(lv.PALETTE.BLUE))
@@ -36,7 +36,7 @@ style_pr.set_outline_width(30)
 style_pr.set_outline_opa(lv.OPA.TRANSP)
 
 style_pr.set_translate_y(5)
-style_pr.set_shadow_ofs_y(3)
+style_pr.set_shadow_offset_y(3)
 style_pr.set_bg_color(lv.palette_darken(lv.PALETTE.BLUE, 2))
 style_pr.set_bg_grad_color(lv.palette_darken(lv.PALETTE.BLUE, 4))
 

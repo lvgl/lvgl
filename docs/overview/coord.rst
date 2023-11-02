@@ -256,10 +256,10 @@ the following functions:
 
 .. code:: c
 
-   lv_coord_t w = lv_obj_get_width(obj);
-   lv_coord_t h = lv_obj_get_height(obj);
-   lv_coord_t content_w = lv_obj_get_content_width(obj);
-   lv_coord_t content_h = lv_obj_get_content_height(obj);
+   int32_t w = lv_obj_get_width(obj);
+   int32_t h = lv_obj_get_height(obj);
+   int32_t content_w = lv_obj_get_content_width(obj);
+   int32_t content_h = lv_obj_get_content_height(obj);
 
 Using styles
 ************

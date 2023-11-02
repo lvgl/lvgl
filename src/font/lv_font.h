@@ -85,8 +85,8 @@ typedef struct _lv_font_t {
     const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_t *, uint32_t, uint8_t *);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
-    lv_coord_t line_height;         /**< The real line height where any text fits*/
-    lv_coord_t base_line;           /**< Base line measured from the top of the line_height*/
+    int32_t line_height;         /**< The real line height where any text fits*/
+    int32_t base_line;           /**< Base line measured from the top of the line_height*/
     uint8_t subpx   : 2;            /**< An element of `lv_font_subpx_t`*/
     uint8_t kerning : 1;            /**< An element of `lv_font_kerning_t`*/
 
@@ -136,7 +136,7 @@ uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32
  * @param font      pointer to a font
  * @return the height of a font
  */
-static inline lv_coord_t lv_font_get_line_height(const lv_font_t * font)
+static inline int32_t lv_font_get_line_height(const lv_font_t * font)
 {
     return font->line_height;
 }

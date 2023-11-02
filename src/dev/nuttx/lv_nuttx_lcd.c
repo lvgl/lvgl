@@ -44,7 +44,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_coord_t align_round_up(lv_coord_t v, uint16_t align);
+static int32_t align_round_up(int32_t v, uint16_t align);
 static void rounder_cb(lv_event_t * e);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
                      uint8_t * color_p);
@@ -109,7 +109,7 @@ lv_display_t * lv_nuttx_lcd_create(const char * dev_path)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_coord_t align_round_up(lv_coord_t v, uint16_t align)
+static int32_t align_round_up(int32_t v, uint16_t align)
 {
     return (v + align - 1) & ~(align - 1);
 }
@@ -120,8 +120,8 @@ static void rounder_cb(lv_event_t * e)
     lv_nuttx_lcd_t * lcd = lv_event_get_user_data(e);
     lv_area_t * area = lv_event_get_param(e);
     struct lcddev_area_align_s * align_info = &lcd->align_info;
-    lv_coord_t w;
-    lv_coord_t h;
+    int32_t w;
+    int32_t h;
 
     area->x1 &= ~(align_info->col_start_align - 1);
     area->y1 &= ~(align_info->row_start_align - 1);

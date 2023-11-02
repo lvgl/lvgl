@@ -47,7 +47,7 @@ static bool lv_point_within_circle(const lv_area_t * area, const lv_point_t * p)
  * @param x2 right coordinate of the area
  * @param y2 bottom coordinate of the area
  */
-void lv_area_set(lv_area_t * area_p, lv_coord_t x1, lv_coord_t y1, lv_coord_t x2, lv_coord_t y2)
+void lv_area_set(lv_area_t * area_p, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
     area_p->x1 = x1;
     area_p->y1 = y1;
@@ -60,7 +60,7 @@ void lv_area_set(lv_area_t * area_p, lv_coord_t x1, lv_coord_t y1, lv_coord_t x2
  * @param area_p pointer to an area
  * @param w the new width of the area (w == 1 makes x1 == x2)
  */
-void lv_area_set_width(lv_area_t * area_p, lv_coord_t w)
+void lv_area_set_width(lv_area_t * area_p, int32_t w)
 {
     area_p->x2 = area_p->x1 + w - 1;
 }
@@ -70,7 +70,7 @@ void lv_area_set_width(lv_area_t * area_p, lv_coord_t w)
  * @param area_p pointer to an area
  * @param h the new height of the area (h == 1 makes y1 == y2)
  */
-void lv_area_set_height(lv_area_t * area_p, lv_coord_t h)
+void lv_area_set_height(lv_area_t * area_p, int32_t h)
 {
     area_p->y2 = area_p->y1 + h - 1;
 }
@@ -81,10 +81,10 @@ void lv_area_set_height(lv_area_t * area_p, lv_coord_t h)
  * @param x the new x coordinate of the area
  * @param y the new y coordinate of the area
  */
-void _lv_area_set_pos(lv_area_t * area_p, lv_coord_t x, lv_coord_t y)
+void _lv_area_set_pos(lv_area_t * area_p, int32_t x, int32_t y)
 {
-    lv_coord_t w = lv_area_get_width(area_p);
-    lv_coord_t h = lv_area_get_height(area_p);
+    int32_t w = lv_area_get_width(area_p);
+    int32_t h = lv_area_get_height(area_p);
     area_p->x1   = x;
     area_p->y1   = y;
     lv_area_set_width(area_p, w);
@@ -105,7 +105,7 @@ uint32_t lv_area_get_size(const lv_area_t * area_p)
     return size;
 }
 
-void lv_area_increase(lv_area_t * area, lv_coord_t w_extra, lv_coord_t h_extra)
+void lv_area_increase(lv_area_t * area, int32_t w_extra, int32_t h_extra)
 {
     area->x1 -= w_extra;
     area->x2 += w_extra;
@@ -113,7 +113,7 @@ void lv_area_increase(lv_area_t * area, lv_coord_t w_extra, lv_coord_t h_extra)
     area->y2 += h_extra;
 }
 
-void lv_area_move(lv_area_t * area, lv_coord_t x_ofs, lv_coord_t y_ofs)
+void lv_area_move(lv_area_t * area, int32_t x_ofs, int32_t y_ofs)
 {
     area->x1 += x_ofs;
     area->x2 += x_ofs;
@@ -165,11 +165,11 @@ int8_t _lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t 
 
     /*Get required information*/
     lv_area_t n;
-    lv_coord_t a1_w = lv_area_get_width(a1_p) - 1;
-    lv_coord_t a1_h = lv_area_get_height(a1_p) - 1;
+    int32_t a1_w = lv_area_get_width(a1_p) - 1;
+    int32_t a1_h = lv_area_get_height(a1_p) - 1;
 
     /*Compute top rectangle*/
-    lv_coord_t th = a2_p->y1 - a1_p->y1;
+    int32_t th = a2_p->y1 - a1_p->y1;
     if(th > 0) {
         n.x1 = a1_p->x1;
         n.y1 = a1_p->y1;
@@ -179,7 +179,7 @@ int8_t _lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t 
     }
 
     /*Compute the bottom rectangle*/
-    lv_coord_t bh = a1_h - (a2_p->y2 - a1_p->y1);
+    int32_t bh = a1_h - (a2_p->y2 - a1_p->y1);
     if(bh > 0 && a2_p->y2 < a1_p->y2) {
         n.x1 = a1_p->x1;
         n.y1 = a2_p->y2;
@@ -189,12 +189,12 @@ int8_t _lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t 
     }
 
     /*Compute side height*/
-    lv_coord_t y1 = a2_p->y1 > a1_p->y1 ? a2_p->y1 : a1_p->y1;
-    lv_coord_t y2 = a2_p->y2 < a1_p->y2 ? a2_p->y2 : a1_p->y2;
-    lv_coord_t sh = y2 - y1;
+    int32_t y1 = a2_p->y1 > a1_p->y1 ? a2_p->y1 : a1_p->y1;
+    int32_t y2 = a2_p->y2 < a1_p->y2 ? a2_p->y2 : a1_p->y2;
+    int32_t sh = y2 - y1;
 
     /*Compute the left rectangle*/
-    lv_coord_t lw = a2_p->x1 - a1_p->x1;
+    int32_t lw = a2_p->x1 - a1_p->x1;
     if(lw > 0 && sh > 0) {
         n.x1 = a1_p->x1;
         n.y1 = y1;
@@ -204,7 +204,7 @@ int8_t _lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t 
     }
 
     /*Compute the right rectangle*/
-    lv_coord_t rw = a1_w - (a2_p->x2 - a1_p->x1);
+    int32_t rw = a1_w - (a2_p->x2 - a1_p->x1);
     if(rw > 0) {
         n.x1 = a2_p->x2;
         n.y1 = y1;
@@ -238,7 +238,7 @@ void _lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t 
  * @param radius radius of area (e.g. for rounded rectangle)
  * @return false:the point is out of the area
  */
-bool _lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord_t radius)
+bool _lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, int32_t radius)
 {
     /*First check the basic area*/
     bool is_on_rect = false;
@@ -252,9 +252,9 @@ bool _lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coor
         /*No radius, it is within the rectangle*/
         return true;
     }
-    lv_coord_t w = lv_area_get_width(a_p) / 2;
-    lv_coord_t h = lv_area_get_height(a_p) / 2;
-    lv_coord_t max_radius = LV_MIN(w, h);
+    int32_t w = lv_area_get_width(a_p) / 2;
+    int32_t h = lv_area_get_height(a_p) / 2;
+    int32_t max_radius = LV_MIN(w, h);
     if(radius > max_radius)
         radius = max_radius;
 
@@ -321,7 +321,7 @@ bool _lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
  * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
  * @return true: `ain_p` is fully inside `aholder_p`
  */
-bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coord_t radius)
+bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, int32_t radius)
 {
     bool is_in = false;
 
@@ -362,7 +362,7 @@ bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coo
  * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
  * @return true: `aout_p` is fully outside `aholder_p`
  */
-bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, lv_coord_t radius)
+bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, int32_t radius)
 {
     if(aout_p->x2 < aholder_p->x1 || aout_p->y2 < aholder_p->y1 || aout_p->x1 > aholder_p->x2 ||
        aout_p->y1 > aholder_p->y2) {
@@ -405,11 +405,11 @@ bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b)
  * @param align `LV_ALIGN_...`
  * @param res x/y coordinates where `to_align` align area should be placed
  */
-void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t align, lv_coord_t ofs_x, lv_coord_t ofs_y)
+void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t align, int32_t ofs_x, int32_t ofs_y)
 {
 
-    lv_coord_t x;
-    lv_coord_t y;
+    int32_t x;
+    int32_t y;
     switch(align) {
         case LV_ALIGN_CENTER:
             x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
@@ -522,8 +522,8 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
     x += base->x1;
     y += base->y1;
 
-    lv_coord_t w = lv_area_get_width(to_align);
-    lv_coord_t h = lv_area_get_height(to_align);
+    int32_t w = lv_area_get_width(to_align);
+    int32_t h = lv_area_get_height(to_align);
     to_align->x1 = x + ofs_x;
     to_align->y1 = y + ofs_y;
     to_align->x2 = to_align->x1 + w - 1;
@@ -531,10 +531,10 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
 }
 
 #define _LV_TRANSFORM_TRIGO_SHIFT 10
-void lv_point_transform(lv_point_t * p, int32_t angle, int32_t zoom_x, int32_t zoom_y, const lv_point_t * pivot,
+void lv_point_transform(lv_point_t * p, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
                         bool zoom_first)
 {
-    if(angle == 0 && zoom_x == 256 && zoom_y == 256) {
+    if(angle == 0 && scale_x == 256 && scale_y == 256) {
         return;
     }
 
@@ -542,8 +542,8 @@ void lv_point_transform(lv_point_t * p, int32_t angle, int32_t zoom_x, int32_t z
     p->y -= pivot->y;
 
     if(angle == 0) {
-        p->x = (((int32_t)(p->x) * zoom_x) >> 8) + pivot->x;
-        p->y = (((int32_t)(p->y) * zoom_y) >> 8) + pivot->y;
+        p->x = (((int32_t)(p->x) * scale_x) >> 8) + pivot->x;
+        p->y = (((int32_t)(p->y) * scale_y) >> 8) + pivot->y;
         return;
     }
     lv_area_transform_cache_t * cache = &trans_cache;
@@ -570,20 +570,20 @@ void lv_point_transform(lv_point_t * p, int32_t angle, int32_t zoom_x, int32_t z
     }
     int32_t x = p->x;
     int32_t y = p->y;
-    if(zoom_x == 256 && zoom_y == 256) {
+    if(scale_x == 256 && scale_y == 256) {
         p->x = ((cache->cosma * x - cache->sinma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
         p->y = ((cache->sinma * x + cache->cosma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
     }
     else {
         if(zoom_first) {
-            x *= zoom_x;
-            y *= zoom_y;
+            x *= scale_x;
+            y *= scale_y;
             p->x = (((cache->cosma * x - cache->sinma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
             p->y = (((cache->sinma * x + cache->cosma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
         }
         else {
-            p->x = (((cache->cosma * x - cache->sinma * y) * zoom_x) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
-            p->y = (((cache->sinma * x + cache->cosma * y) * zoom_y) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
+            p->x = (((cache->cosma * x - cache->sinma * y) * scale_x) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
+            p->y = (((cache->sinma * x + cache->cosma * y) * scale_y) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
         }
 
     }
@@ -596,15 +596,15 @@ void lv_point_transform(lv_point_t * p, int32_t angle, int32_t zoom_x, int32_t z
 
 static bool lv_point_within_circle(const lv_area_t * area, const lv_point_t * p)
 {
-    lv_coord_t r = (area->x2 - area->x1) / 2;
+    int32_t r = (area->x2 - area->x1) / 2;
 
     /*Circle center*/
-    lv_coord_t cx = area->x1 + r;
-    lv_coord_t cy = area->y1 + r;
+    int32_t cx = area->x1 + r;
+    int32_t cy = area->y1 + r;
 
     /*Simplify the code by moving everything to (0, 0)*/
-    lv_coord_t px = p->x - cx;
-    lv_coord_t py = p->y - cy;
+    int32_t px = p->x - cx;
+    int32_t py = p->y - cy;
 
     uint32_t r_sqrd = r * r;
     uint32_t dist = (px * px) + (py * py);

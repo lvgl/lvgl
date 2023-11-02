@@ -69,7 +69,7 @@ an array for the data points. ``axis`` can have the following values:
 
 :cpp:expr:`lv_chart_set_ext_y_array(chart, ser, value_array)` makes the chart
 use an external array for the given series. ``value_array`` should look
-like this: ``lv_coord_t * value_array[num_points]``. The array size
+like this: ``int32_t * value_array[num_points]``. The array size
 needs to be large enough to hold all the points of that series. The
 array's pointer will be saved in the chart so it needs to be global,
 static or dynamically allocated. Note: you should call
@@ -180,8 +180,8 @@ Zoom
 ----
 
 The chart can be zoomed independently in x and y directions with
-:cpp:expr:`lv_chart_set_zoom_x(chart, factor)` and
-:cpp:expr:`lv_chart_set_zoom_y(chart, factor)`. If ``factor`` is 256 there is no
+:cpp:expr:`lv_chart_set_scale_x(chart, factor)` and
+:cpp:expr:`lv_chart_set_scale_y(chart, factor)`. If ``factor`` is 256 there is no
 zoom. 512 means double zoom, etc. Fractional values are also possible
 but < 256 value is not allowed.
 

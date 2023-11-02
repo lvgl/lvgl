@@ -55,8 +55,8 @@ typedef struct {
     uint32_t col_cnt;
     uint32_t row_cnt;
     char ** cell_data;
-    lv_coord_t * row_h;
-    lv_coord_t * col_w;
+    int32_t * row_h;
+    int32_t * col_w;
     uint32_t col_act;
     uint32_t row_act;
 } lv_table_t;
@@ -119,7 +119,7 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint32_t col_cnt);
  * @param col_id    id of the column [0 .. LV_TABLE_COL_MAX -1]
  * @param w         width of the column
  */
-void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, lv_coord_t w);
+void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, int32_t w);
 
 /**
  * Add control bits to the cell.
@@ -173,7 +173,7 @@ uint32_t lv_table_get_col_cnt(lv_obj_t * obj);
  * @param col       id of the column [0 .. LV_TABLE_COL_MAX -1]
  * @return          width of the column
  */
-lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col);
+int32_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col);
 
 /**
  * Get whether a cell has the control bits

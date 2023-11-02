@@ -240,8 +240,8 @@ void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_lab
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_fill_dsc_init(&fill_dsc);
     fill_dsc.opa = dsc->opa;
-    lv_coord_t underline_width = font->underline_thickness ? font->underline_thickness : 1;
-    lv_coord_t line_start_x;
+    int32_t underline_width = font->underline_thickness ? font->underline_thickness : 1;
+    int32_t line_start_x;
     uint32_t i;
     int32_t letter_w;
 

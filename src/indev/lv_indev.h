@@ -103,7 +103,7 @@ void lv_indev_enable(lv_indev_t * indev, bool en);
  * @return pointer to the currently processed input device or NULL if no input device processing
  * right now
  */
-lv_indev_t * lv_indev_get_act(void);
+lv_indev_t * lv_indev_active(void);
 
 /**
  * Set the type of an input device
@@ -228,7 +228,7 @@ void lv_indev_wait_release(lv_indev_t * indev);
  * Gets a pointer to the currently active object in the currently processed input device.
  * @return pointer to currently active object or NULL if no active object
  */
-struct _lv_obj_t * lv_indev_get_obj_act(void);
+struct _lv_obj_t * lv_indev_get_active_obj(void);
 
 /**
  * Get a pointer to the indev read timer to

@@ -254,7 +254,7 @@ void lv_indev_enable(lv_indev_t * indev, bool en)
     }
 }
 
-lv_indev_t * lv_indev_get_act(void)
+lv_indev_t * lv_indev_active(void)
 {
     return indev_act;
 }
@@ -445,7 +445,7 @@ void lv_indev_wait_release(lv_indev_t * indev)
     indev->wait_until_release = 1;
 }
 
-lv_obj_t * lv_indev_get_obj_act(void)
+lv_obj_t * lv_indev_get_active_obj(void)
 {
     return indev_obj_act;
 }
@@ -476,7 +476,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     /*If the point is on this object check its children too*/
     lv_area_t obj_coords = obj->coords;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-        lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+        int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
         lv_area_increase(&obj_coords, ext_draw_size, ext_draw_size);
     }
     if(_lv_area_is_point_on(&obj_coords, &p_trans, 0)) {
@@ -518,7 +518,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         data->point.y = disp->ver_res - data->point.y - 1;
     }
     if(disp->rotation == LV_DISPLAY_ROTATION_90 || disp->rotation == LV_DISPLAY_ROTATION_270) {
-        lv_coord_t tmp = data->point.y;
+        int32_t tmp = data->point.y;
         data->point.y = data->point.x;
         data->point.x = disp->ver_res - tmp - 1;
     }
@@ -944,8 +944,8 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
         return;
     }
 
-    lv_coord_t x = i->btn_points[data->btn_id].x;
-    lv_coord_t y = i->btn_points[data->btn_id].y;
+    int32_t x = i->btn_points[data->btn_id].x;
+    int32_t y = i->btn_points[data->btn_id].y;
 
     if(LV_INDEV_STATE_RELEASED != data->state) {
         if(data->state == LV_INDEV_STATE_PRESSED) {
@@ -1166,25 +1166,25 @@ static void indev_proc_release(lv_indev_t * indev)
         /*Get the transformed vector with this object*/
         if(scroll_obj) {
             int16_t angle = 0;
-            int16_t zoom_x = 256;
-            int16_t zoom_y = 256;
+            int16_t scale_x = 256;
+            int16_t scale_y = 256;
             lv_point_t pivot = { 0, 0 };
             lv_obj_t * parent = scroll_obj;
             while(parent) {
                 angle += lv_obj_get_style_transform_rotation(parent, 0);
                 int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, 0);
                 int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, 0);
-                zoom_x = (zoom_x * zoom_act_x) >> 8;
-                zoom_y = (zoom_x * zoom_act_y) >> 8;
+                scale_x = (scale_x * zoom_act_x) >> 8;
+                scale_y = (scale_x * zoom_act_y) >> 8;
                 parent = lv_obj_get_parent(parent);
             }
 
-            if(angle != 0 || zoom_y != LV_SCALE_NONE || zoom_x != LV_SCALE_NONE) {
+            if(angle != 0 || scale_y != LV_SCALE_NONE || scale_x != LV_SCALE_NONE) {
                 angle = -angle;
-                zoom_x = (256 * 256) / zoom_x;
-                zoom_y = (256 * 256) / zoom_y;
-                lv_point_transform(&indev->pointer.scroll_throw_vect, angle, zoom_x, zoom_y, &pivot, false);
-                lv_point_transform(&indev->pointer.scroll_throw_vect_ori, angle, zoom_x, zoom_y, &pivot, false);
+                scale_x = (256 * 256) / scale_x;
+                scale_y = (256 * 256) / scale_y;
+                lv_point_transform(&indev->pointer.scroll_throw_vect, angle, scale_x, scale_y, &pivot, false);
+                lv_point_transform(&indev->pointer.scroll_throw_vect_ori, angle, scale_x, scale_y, &pivot, false);
             }
         }
 
@@ -1205,7 +1205,7 @@ static lv_obj_t * pointer_search_obj(lv_display_t * disp, lv_point_t * p)
     if(indev_obj_act) return indev_obj_act;
 
     /* Search the object in the active screen */
-    indev_obj_act = lv_indev_search_obj(lv_display_get_screen_act(disp), p);
+    indev_obj_act = lv_indev_search_obj(lv_display_get_screen_active(disp), p);
     if(indev_obj_act) return indev_obj_act;
 
     indev_obj_act = lv_indev_search_obj(lv_display_get_layer_bottom(disp), p);

@@ -43,8 +43,8 @@ For example:
 
 .. code:: c
 
-   static lv_coord_t column_dsc[] = {100, 400, LV_GRID_TEMPLATE_LAST};   /*2 columns with 100 and 400 ps width*/
-   static lv_coord_t row_dsc[] = {100, 100, 100, LV_GRID_TEMPLATE_LAST}; /*3 100 px tall rows*/
+   static int32_t column_dsc[] = {100, 400, LV_GRID_TEMPLATE_LAST};   /*2 columns with 100 and 400 ps width*/
+   static int32_t row_dsc[] = {100, 100, 100, LV_GRID_TEMPLATE_LAST}; /*3 100 px tall rows*/
 
 To set the descriptors on a parent use
 :c:expr:`lv_obj_set_grid_dsc_array(obj, col_dsc, row_dsc)`.

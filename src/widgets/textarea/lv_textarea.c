@@ -367,12 +367,12 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
     /*The text area needs to have it's final size to see if the cursor is out of the area or not*/
 
     /*Check the top*/
-    lv_coord_t font_h = lv_font_get_line_height(font);
+    int32_t font_h = lv_font_get_line_height(font);
     if(cur_pos.y < lv_obj_get_scroll_top(obj)) {
         lv_obj_scroll_to_y(obj, cur_pos.y, LV_ANIM_ON);
     }
     /*Check the bottom*/
-    lv_coord_t h = lv_obj_get_content_height(obj);
+    int32_t h = lv_obj_get_content_height(obj);
     if(cur_pos.y + font_h - lv_obj_get_scroll_top(obj) > h) {
         lv_obj_scroll_to_y(obj, cur_pos.y - h + font_h, LV_ANIM_ON);
     }
@@ -382,7 +382,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
         lv_obj_scroll_to_x(obj, cur_pos.x, LV_ANIM_ON);
     }
     /*Check the right*/
-    lv_coord_t w = lv_obj_get_content_width(obj);
+    int32_t w = lv_obj_get_content_width(obj);
     if(cur_pos.x + font_h - lv_obj_get_scroll_left(obj) > w) {
         lv_obj_scroll_to_x(obj, cur_pos.x - w + font_h, LV_ANIM_ON);
     }
@@ -470,8 +470,8 @@ void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
     if(ta->one_line == en) return;
 
     ta->one_line = en ? 1U : 0U;
-    lv_coord_t width = en ? LV_SIZE_CONTENT : lv_pct(100);
-    lv_coord_t min_width_value = en ? lv_pct(100) : 0;
+    int32_t width = en ? LV_SIZE_CONTENT : lv_pct(100);
+    int32_t min_width_value = en ? lv_pct(100) : 0;
 
     lv_obj_set_width(ta->label, width);
     lv_obj_set_style_min_width(ta->label, min_width_value, 0);
@@ -767,9 +767,9 @@ void lv_textarea_cursor_down(lv_obj_t * obj)
 
     /*Increment the y with one line and keep the valid x*/
 
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_coord_t font_h              = lv_font_get_line_height(font);
+    int32_t font_h              = lv_font_get_line_height(font);
     pos.y += font_h + line_space + 1;
     pos.x = ta->cursor.valid_x;
 
@@ -778,7 +778,7 @@ void lv_textarea_cursor_down(lv_obj_t * obj)
         /*Get the letter index on the new cursor position and set it*/
         uint32_t new_cur_pos = lv_label_get_letter_on(ta->label, &pos);
 
-        lv_coord_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position*/
+        int32_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position*/
         lv_textarea_set_cursor_pos(obj, new_cur_pos);
         ta->cursor.valid_x = cur_valid_x_tmp;
     }
@@ -795,15 +795,15 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
     lv_label_get_letter_pos(ta->label, lv_textarea_get_cursor_pos(obj), &pos);
 
     /*Decrement the y with one line and keep the valid x*/
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_coord_t font_h              = lv_font_get_line_height(font);
+    int32_t font_h              = lv_font_get_line_height(font);
     pos.y -= font_h + line_space - 1;
     pos.x = ta->cursor.valid_x;
 
     /*Get the letter index on the new cursor position and set it*/
     uint32_t new_cur_pos       = lv_label_get_letter_on(ta->label, &pos);
-    lv_coord_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position*/
+    int32_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position*/
     lv_textarea_set_cursor_pos(obj, new_cur_pos);
     ta->cursor.valid_x = cur_valid_x_tmp;
 }
@@ -1065,7 +1065,7 @@ static void refr_cursor_area(lv_obj_t * obj)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
 
     uint32_t cur_pos = lv_textarea_get_cursor_pos(obj);
     const char * txt = lv_label_get_text(ta->label);
@@ -1074,13 +1074,13 @@ static void refr_cursor_area(lv_obj_t * obj)
     uint32_t letter = _lv_text_encoded_next(&txt[byte_pos], NULL);
 
     /* Letter height and width */
-    const lv_coord_t letter_h = lv_font_get_line_height(font);
+    const int32_t letter_h = lv_font_get_line_height(font);
     /*Set letter_w (set not 0 on non printable but valid chars)*/
     uint32_t letter_space = letter;
     if(is_valid_but_non_printable_char(letter)) {
         letter_space = ' ';
     }
-    lv_coord_t letter_w = lv_font_get_glyph_width(font, letter_space, IGNORE_KERNING);
+    int32_t letter_w = lv_font_get_glyph_width(font, letter_space, IGNORE_KERNING);
 
     lv_point_t letter_pos;
     lv_label_get_letter_pos(ta->label, cur_pos, &letter_pos);
@@ -1110,11 +1110,11 @@ static void refr_cursor_area(lv_obj_t * obj)
     ta->cursor.txt_byte_pos = byte_pos;
 
     /*Calculate the cursor according to its type*/
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
-    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR) + border_width;
-    lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_CURSOR) + border_width;
-    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
-    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_CURSOR) + border_width;
+    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
+    int32_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR) + border_width;
+    int32_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_CURSOR) + border_width;
+    int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
+    int32_t right = lv_obj_get_style_pad_right(obj, LV_PART_CURSOR) + border_width;
 
     lv_area_t cur_area;
     cur_area.x1 = letter_pos.x - left;
@@ -1143,7 +1143,7 @@ static void refr_cursor_area(lv_obj_t * obj)
 
 static void update_cursor_position_on_click(lv_event_t * e)
 {
-    lv_indev_t * click_source = lv_indev_get_act();
+    lv_indev_t * click_source = lv_indev_active();
     if(click_source == NULL) return;
 
     lv_obj_t * obj = lv_event_get_target(e);
@@ -1169,7 +1169,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
 
     const lv_event_code_t code = lv_event_get_code(e);
 
-    lv_coord_t label_width = lv_obj_get_width(ta->label);
+    int32_t label_width = lv_obj_get_width(ta->label);
     uint32_t char_id_at_click = 0;
 
 #if LV_LABEL_TEXT_SELECTION
@@ -1294,9 +1294,9 @@ static void draw_placeholder(lv_event_t * e)
 
         if(ta->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 
-        lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-        lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-        lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+        int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        int32_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         lv_area_t ph_coords;
         lv_area_copy(&ph_coords, &obj->coords);
         lv_area_move(&ph_coords, left + border_width, top + border_width);
@@ -1330,9 +1330,9 @@ static void draw_cursor(lv_event_t * e)
 
     lv_draw_rect(layer, &cur_dsc, &cur_area);
 
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
-    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
-    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR) + border_width;
+    int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
+    int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
+    int32_t top = lv_obj_get_style_pad_top(obj, LV_PART_CURSOR) + border_width;
     char letter_buf[8] = {0};
     lv_memcpy(letter_buf, &txt[ta->cursor.txt_byte_pos], _lv_text_encoded_size(&txt[ta->cursor.txt_byte_pos]));
 

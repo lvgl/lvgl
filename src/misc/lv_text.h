@@ -82,8 +82,8 @@ typedef uint8_t lv_text_align_t;
 
  * line breaks
  */
-void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
-                      lv_coord_t line_space, lv_coord_t max_width, lv_text_flag_t flag);
+void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, int32_t letter_space,
+                      int32_t line_space, int32_t max_width, lv_text_flag_t flag);
 
 /**
  * Get the next line of text. Check line length and break chars too.
@@ -98,8 +98,8 @@ void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8
  * they are different)
  */
-uint32_t _lv_text_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space,
-                                lv_coord_t max_width, lv_coord_t * used_width, lv_text_flag_t flag);
+uint32_t _lv_text_get_next_line(const char * txt, const lv_font_t * font, int32_t letter_space,
+                                int32_t max_width, int32_t * used_width, lv_text_flag_t flag);
 
 /**
  * Give the length of a text with a given font
@@ -110,7 +110,7 @@ uint32_t _lv_text_get_next_line(const char * txt, const lv_font_t * font, lv_coo
  * @param letter_space letter space
  * @return length of a char_num long text
  */
-lv_coord_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space);
+int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space);
 
 /**
  * Insert a string into an other

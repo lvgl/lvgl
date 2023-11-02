@@ -7,8 +7,8 @@
 #include "lv_test_indev.h"
 #include "lv_test_init.h"
 
-static lv_coord_t x_act;
-static lv_coord_t y_act;
+static int32_t x_act;
+static int32_t y_act;
 static uint32_t key_act;
 static int32_t diff_act;
 static bool mouse_pressed;
@@ -23,13 +23,13 @@ void lv_test_mouse_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
     data->state = mouse_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
 
-void lv_test_mouse_move_to(lv_coord_t x, lv_coord_t y)
+void lv_test_mouse_move_to(int32_t x, int32_t y)
 {
     x_act = x;
     y_act = y;
 }
 
-void lv_test_mouse_move_by(lv_coord_t x, lv_coord_t y)
+void lv_test_mouse_move_by(int32_t x, int32_t y)
 {
     x_act += x;
     y_act += y;
@@ -45,7 +45,7 @@ void lv_test_mouse_release(void)
     mouse_pressed = false;
 }
 
-void lv_test_mouse_click_at(lv_coord_t x, lv_coord_t y)
+void lv_test_mouse_click_at(int32_t x, int32_t y)
 {
     lv_test_mouse_release();
     lv_test_indev_wait(50);

@@ -46,7 +46,7 @@ event. For example:
    void my_event(lv_event_t * e)
    {
      lv_obj_t * screen = lv_event_get_current_target(e);
-     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_act());
+     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
      switch(dir) {
        case LV_DIR_LEFT:
          ...
@@ -73,7 +73,7 @@ To prevent passing the gesture event to the parent from an object use
 Note that, gestures are not triggered if an object is being scrolled.
 
 If you did some action on a gesture you can call
-:cpp:expr:`lv_indev_wait_release(lv_indev_get_act())` in the event handler to
+:cpp:expr:`lv_indev_wait_release(lv_indev_active())` in the event handler to
 prevent LVGL sending further input device related events.
 
 Keypad and encoder

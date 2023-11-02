@@ -41,9 +41,10 @@ static void refr_area_part(lv_layer_t * layer);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj);
 static void refr_obj(lv_layer_t * layer, lv_obj_t * obj);
-static uint32_t get_max_row(lv_display_t * disp, lv_coord_t area_w, lv_coord_t area_h);
+static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h);
 static void draw_buf_flush(lv_display_t * disp);
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
+static void wait_for_flushing(lv_display_t * disp);
 
 /**********************
  *  STATIC VARIABLES
@@ -94,7 +95,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     /*Truncate the clip area to `obj size + ext size` area*/
     lv_area_t obj_coords_ext;
     lv_obj_get_coords(obj, &obj_coords_ext);
-    lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
 
     if(!_lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext)) return;
@@ -144,7 +145,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
             layer->clip_area = clip_coords_for_children;
             bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
 
-            lv_coord_t radius = 0;
+            int32_t radius = 0;
             if(clip_corner) {
                 radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
                 if(radius == 0) clip_corner = false;
@@ -384,7 +385,7 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
 
     /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
     /*We need to wait for ready here to not mess up the active screen*/
-    while(disp_refr->flushing);
+    wait_for_flushing(disp_refr);
 
     uint32_t i;
     for(i = 0; i < disp_refr->inv_p; i++) {
@@ -470,7 +471,7 @@ static void refr_sync_areas(void)
 
     /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
     /*We need to wait for ready here to not mess up the active screen*/
-    while(disp_refr->flushing) {}
+    wait_for_flushing(disp_refr);
 
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
@@ -606,15 +607,15 @@ static void refr_area(const lv_area_t * area_p)
 
     /*Normal refresh: draw the area in parts*/
     /*Calculate the max row num*/
-    lv_coord_t w = lv_area_get_width(area_p);
-    lv_coord_t h = lv_area_get_height(area_p);
-    lv_coord_t y2 = area_p->y2 >= lv_display_get_vertical_resolution(disp_refr) ?
-                    lv_display_get_vertical_resolution(disp_refr) - 1 : area_p->y2;
+    int32_t w = lv_area_get_width(area_p);
+    int32_t h = lv_area_get_height(area_p);
+    int32_t y2 = area_p->y2 >= lv_display_get_vertical_resolution(disp_refr) ?
+                 lv_display_get_vertical_resolution(disp_refr) - 1 : area_p->y2;
 
     int32_t max_row = get_max_row(disp_refr, w, h);
 
-    lv_coord_t row;
-    lv_coord_t row_last = 0;
+    int32_t row;
+    int32_t row_last = 0;
     lv_area_t sub_area;
     for(row = area_p->y1; row + max_row - 1 <= y2; row += max_row) {
         /*Calc. the next y coordinates of draw_buf*/
@@ -653,7 +654,7 @@ static void refr_area_part(lv_layer_t * layer)
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/
     if(!lv_display_is_double_buffered(disp_refr)) {
-        while(disp_refr->flushing);
+        wait_for_flushing(disp_refr);
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
@@ -666,7 +667,7 @@ static void refr_area_part(lv_layer_t * layer)
     lv_obj_t * top_prev_scr = NULL;
 
     /*Get the most top object which is not covered by others*/
-    top_act_scr = lv_refr_get_top_obj(&layer->clip_area, lv_display_get_screen_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(&layer->clip_area, lv_display_get_screen_active(disp_refr));
     if(disp_refr->prev_scr) {
         top_prev_scr = lv_refr_get_top_obj(&layer->clip_area, disp_refr->prev_scr);
     }
@@ -755,7 +756,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     /*Normally always will be a top_obj (at least the screen)
      *but in special cases (e.g. if the screen has alpha) it won't.
      *In this case use the screen directly*/
-    if(top_obj == NULL) top_obj = lv_display_get_screen_act(disp_refr);
+    if(top_obj == NULL) top_obj = lv_display_get_screen_active(disp_refr);
     if(top_obj == NULL) return;  /*Shouldn't happen*/
 
     /*Refresh the top object and its children*/
@@ -800,7 +801,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
                                   lv_area_t * layer_area_out)
 {
-    lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_t obj_coords_ext;
     lv_obj_get_coords(obj, &obj_coords_ext);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
@@ -877,7 +878,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
         uint32_t max_argb_row_height = lv_area_get_height(&layer_area_full);
         if(layer_type == LV_LAYER_TYPE_SIMPLE) {
-            lv_coord_t w = lv_area_get_width(&layer_area_full);
+            int32_t w = lv_area_get_width(&layer_area_full);
             uint8_t px_size = lv_color_format_get_size(disp_refr->color_format);
             max_rgb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / px_size;
             max_argb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color32_t);
@@ -913,8 +914,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, 0);
             while(layer_draw_dsc.rotation > 3600) layer_draw_dsc.rotation -= 3600;
             while(layer_draw_dsc.rotation < 0) layer_draw_dsc.rotation += 3600;
-            layer_draw_dsc.zoom_x = lv_obj_get_style_transform_scale_x(obj, 0);
-            layer_draw_dsc.zoom_y = lv_obj_get_style_transform_scale_y(obj, 0);
+            layer_draw_dsc.scale_x = lv_obj_get_style_transform_scale_x(obj, 0);
+            layer_draw_dsc.scale_y = lv_obj_get_style_transform_scale_y(obj, 0);
             layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
             layer_draw_dsc.antialias = disp_refr->antialiasing;
             layer_draw_dsc.src = new_layer;
@@ -927,7 +928,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 }
 
 
-static uint32_t get_max_row(lv_display_t * disp, lv_coord_t area_w, lv_coord_t area_h)
+static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 {
     bool has_alpha = lv_color_format_has_alpha(disp->color_format);
     uint32_t px_size_disp =  lv_color_format_get_size(disp->color_format);
@@ -942,7 +943,7 @@ static uint32_t get_max_row(lv_display_t * disp, lv_coord_t area_w, lv_coord_t a
     tmp.x2 = 0;
     tmp.y1 = 0;
 
-    lv_coord_t h_tmp = max_row;
+    int32_t h_tmp = max_row;
     do {
         tmp.y2 = h_tmp - 1;
         lv_display_send_event(disp_refr, LV_EVENT_INVALIDATE_AREA, &tmp);
@@ -984,7 +985,7 @@ static void draw_buf_flush(lv_display_t * disp)
      * If we need to wait here it means that the content of one buffer is being sent to display
      * and other buffer already contains the new rendered image. */
     if(lv_display_is_double_buffered(disp)) {
-        while(disp->flushing);
+        wait_for_flushing(disp_refr);
     }
 
     disp->flushing = 1;
@@ -1034,5 +1035,22 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
     disp->flush_cb(disp, &offset_area, px_map);
     lv_display_send_event(disp, LV_EVENT_FLUSH_FINISH, &offset_area);
 
+    LV_PROFILER_END;
+}
+
+
+static void wait_for_flushing(lv_display_t * disp)
+{
+    LV_PROFILER_BEGIN;
+    LV_LOG_TRACE("begin");
+
+    if(disp->flush_wait_cb) {
+        disp->flush_wait_cb(disp);
+    }
+    else {
+        while(disp->flushing);
+    }
+
+    LV_LOG_TRACE("end");
     LV_PROFILER_END;
 }

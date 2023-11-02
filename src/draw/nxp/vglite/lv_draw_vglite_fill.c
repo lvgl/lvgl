@@ -163,9 +163,9 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
                               const lv_draw_fill_dsc_t * dsc)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
-    lv_coord_t width = lv_area_get_width(coords);
-    lv_coord_t height = lv_area_get_height(coords);
-    lv_coord_t radius = dsc->radius;
+    int32_t width = lv_area_get_width(coords);
+    int32_t height = lv_area_get_height(coords);
+    int32_t radius = dsc->radius;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
     if(dsc->radius < 0)

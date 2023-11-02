@@ -230,10 +230,10 @@ lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e)
     }
 }
 
-void lv_event_set_ext_draw_size(lv_event_t * e, lv_coord_t size)
+void lv_event_set_ext_draw_size(lv_event_t * e, int32_t size)
 {
     if(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * cur_size = lv_event_get_param(e);
+        int32_t * cur_size = lv_event_get_param(e);
         *cur_size = LV_MAX(*cur_size, size);
     }
     else {
@@ -307,7 +307,7 @@ static lv_result_t event_send_core(lv_event_t * e)
     LV_TRACE_EVENT("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
 
     /*Call the input device's feedback callback if set*/
-    lv_indev_t * indev_act = lv_indev_get_act();
+    lv_indev_t * indev_act = lv_indev_active();
     if(indev_act) {
         if(indev_act->feedback_cb) indev_act->feedback_cb(indev_act, e);
         if(e->stop_processing) return LV_RESULT_OK;

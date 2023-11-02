@@ -11,8 +11,8 @@ static void draw_event_cb(lv_event_t * e)
         lv_draw_fill_dsc_t * fill_dsc = draw_task->draw_dsc;
 
         lv_obj_t * chart = lv_event_get_target(e);
-        lv_coord_t * y_array = lv_chart_get_y_array(chart, lv_chart_get_series_next(chart, NULL));
-        lv_coord_t v = y_array[base_dsc->id2];
+        int32_t * y_array = lv_chart_get_y_array(chart, lv_chart_get_series_next(chart, NULL));
+        int32_t v = y_array[base_dsc->id2];
 
         uint32_t ratio = v * 255 / 100;
         fill_dsc->color = lv_color_mix(lv_palette_main(LV_PALETTE_GREEN), lv_palette_main(LV_PALETTE_RED), ratio);
@@ -26,7 +26,7 @@ static void draw_event_cb(lv_event_t * e)
 void lv_example_chart_4(void)
 {
     /*Create a chart1*/
-    lv_obj_t * chart = lv_chart_create(lv_scr_act());
+    lv_obj_t * chart = lv_chart_create(lv_screen_active());
     lv_chart_set_type(chart, LV_CHART_TYPE_BAR);
     lv_chart_set_point_count(chart, 24);
     lv_obj_set_style_pad_column(chart, 2, 0);

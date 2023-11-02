@@ -146,7 +146,7 @@ void test_spangroup_set_overflow_invalid_parameters_overflow_not_changed(void)
 
 void test_spangroup_set_indent(void)
 {
-    const lv_coord_t indent = 100;
+    const int32_t indent = 100;
 
     lv_spangroup_set_indent(spangroup, indent);
 
@@ -198,7 +198,7 @@ void test_spangroup_get_max_lines_for_new_span_group(void)
 
 void test_spangroup_get_max_line_h(void)
 {
-    lv_coord_t max_line;
+    int32_t max_line;
 
     max_line = lv_spangroup_get_max_line_h(spangroup);
 

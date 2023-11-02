@@ -68,7 +68,7 @@ static lv_timer_t * event_handler_timer;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
+lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 {
     if(!inited) {
         SDL_Init(SDL_INIT_VIDEO);
@@ -171,7 +171,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         uint8_t * fb_tmp = dsc->fb_act;
         uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
         uint32_t px_map_stride = lv_area_get_width(area) * px_size;
-        lv_coord_t fb_stride = lv_display_get_horizontal_resolution(disp) * px_size;
+        int32_t fb_stride = lv_display_get_horizontal_resolution(disp) * px_size;
         fb_tmp += area->y1 * fb_stride;
         fb_tmp += area->x1 * px_size;
         for(y = area->y1; y <= area->y2; y++) {
@@ -265,8 +265,8 @@ static void window_create(lv_display_t * disp)
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
 
-    lv_coord_t hor_res = lv_display_get_horizontal_resolution(disp);
-    lv_coord_t ver_res = lv_display_get_vertical_resolution(disp);
+    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
+    int32_t ver_res = lv_display_get_vertical_resolution(disp);
     dsc->window = SDL_CreateWindow("LVGL Simulator",
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
@@ -286,7 +286,7 @@ static void window_create(lv_display_t * disp)
 static void window_update(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    lv_coord_t hor_res = lv_display_get_horizontal_resolution(disp);
+    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_display_get_color_format(disp));
     SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
 
@@ -299,8 +299,8 @@ static void window_update(lv_display_t * disp)
 
 static void texture_resize(lv_display_t * disp)
 {
-    lv_coord_t hor_res = lv_display_get_horizontal_resolution(disp);
-    lv_coord_t ver_res = lv_display_get_vertical_resolution(disp);
+    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
+    int32_t ver_res = lv_display_get_vertical_resolution(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_display_get_color_format(disp));
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
 

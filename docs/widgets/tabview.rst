@@ -56,7 +56,7 @@ To select a new tab you can:
 
 - Click on its tab button
 - Slide horizontally
-- Use :cpp:expr:`lv_tabview_set_act(tabview, id, LV_ANIM_ON)` function
+- Use :cpp:expr:`lv_tabview_set_active(tabview, id, LV_ANIM_ON)` function
 
 Get the parts
 -------------
@@ -69,7 +69,7 @@ Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new tab is selected by sliding
-   or clicking the tab button. :cpp:expr:`lv_tabview_get_tab_act(tabview)`
+   or clicking the tab button. :cpp:expr:`lv_tabview_get_tab_active(tabview)`
    returns the zero based index of the current tab.
 
 Learn more about :ref:`events`.

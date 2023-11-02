@@ -27,7 +27,7 @@ extern "C" {
 /*Data of line*/
 typedef struct {
     lv_obj_t obj;
-    const lv_point_t * point_array;     /**< Pointer to an array with the points of the line*/
+    const lv_point_precise_t * point_array;     /**< Pointer to an array with the points of the line*/
     uint32_t point_num;                 /**< Number of points in 'point_array'*/
     uint32_t y_inv : 1;                  /**< 1: y == 0 will be on the bottom*/
 } lv_line_t;
@@ -55,7 +55,7 @@ lv_obj_t * lv_line_create(lv_obj_t * parent);
  * @param points        an array of points. Only the address is saved, so the array needs to be alive while the line exists
  * @param point_num     number of points in 'point_a'
  */
-void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint32_t point_num);
+void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num);
 
 /**
  * Enable (or disable) the y coordinate inversion.

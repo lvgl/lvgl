@@ -53,8 +53,8 @@ static void canvas_basic_render(uint8_t * canvas_buf, lv_color_format_t render_c
     rect_dsc.outline_opa = LV_OPA_60;
     rect_dsc.shadow_color = lv_palette_main(LV_PALETTE_ORANGE);
     rect_dsc.shadow_width = 10;
-    rect_dsc.shadow_ofs_x = 5;
-    rect_dsc.shadow_ofs_y = 10;
+    rect_dsc.shadow_offset_x = 5;
+    rect_dsc.shadow_offset_y = 10;
 
     area.x1 = 10;
     area.x2 = 170;

@@ -221,8 +221,8 @@ static void draw_main(lv_event_t * e)
     /*Simply draw the middle src if no tiled*/
     lv_imgbtn_src_info_t * src_info = &imgbtn->src_left[state];
 
-    lv_coord_t tw = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-    lv_coord_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    int32_t tw = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+    int32_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
     lv_area_t coords;
     lv_area_copy(&coords, &obj->coords);
     lv_area_increase(&coords, tw, th);
@@ -232,8 +232,8 @@ static void draw_main(lv_event_t * e)
     lv_obj_init_draw_image_dsc(obj, LV_PART_MAIN, &img_dsc);
 
     lv_area_t coords_part;
-    lv_coord_t left_w = 0;
-    lv_coord_t right_w = 0;
+    int32_t left_w = 0;
+    int32_t right_w = 0;
 
     if(src_info->img_src) {
         left_w = src_info->header.w;
@@ -267,7 +267,7 @@ static void draw_main(lv_event_t * e)
         bool comm_res;
         comm_res = _lv_area_intersect(&clip_area_center, &clip_area_center, &layer->clip_area);
         if(comm_res) {
-            lv_coord_t i;
+            int32_t i;
 
             const lv_area_t clip_area_ori = layer->clip_area;
             layer->clip_area = clip_area_center;
@@ -277,7 +277,7 @@ static void draw_main(lv_event_t * e)
             coords_part.x2 = coords_part.x1 + src_info->header.w - 1;
             coords_part.y2 = coords_part.y1 + src_info->header.h - 1;
 
-            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + src_info->header.w - 1); i += src_info->header.w) {
+            for(i = coords_part.x1; i < (int32_t)(clip_area_center.x2 + src_info->header.w - 1); i += src_info->header.w) {
                 img_dsc.src = src_info->img_src;
                 lv_draw_image(layer, &img_dsc, &coords_part);
                 coords_part.x1 = coords_part.x2 + 1;
