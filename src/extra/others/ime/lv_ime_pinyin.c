@@ -562,6 +562,8 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     lv_memset_00(pinyin_ime->py_num, sizeof(pinyin_ime->py_num));
     lv_memset_00(pinyin_ime->py_pos, sizeof(pinyin_ime->py_pos));
 
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(55));
     lv_obj_align(obj, LV_ALIGN_BOTTOM_MID, 0, 0);
 
@@ -576,6 +578,7 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
 
     lv_btnmatrix_set_one_checked(pinyin_ime->cand_panel, true);
+    lv_obj_clear_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     /* Set cand_panel style*/
     // Default style
