@@ -36,6 +36,7 @@ extern "C" {
 #define LV_OS_PTHREAD       1
 #define LV_OS_FREERTOS      2
 #define LV_OS_CMSIS_RTOS2   3
+#define LV_OS_RTTHREAD      4
 #define LV_OS_CUSTOM        255
 
 #define LV_STDLIB_BUILTIN           0
