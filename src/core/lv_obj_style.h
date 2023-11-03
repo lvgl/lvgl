@@ -76,6 +76,12 @@ typedef struct {
 void _lv_obj_style_init(void);
 
 /**
+ * Deinitialize the object related style manager module.
+ * Called by LVGL in `lv_deinit()`
+ */
+void _lv_obj_style_deinit(void);
+
+/**
  * Add a style to an object.
  * @param obj       pointer to an object
  * @param style     pointer to a style to add

@@ -66,6 +66,8 @@ void lv_draw_buf_vglite_init_handlers(void);
 
 void lv_draw_vglite_init(void);
 
+void lv_draw_vglite_deinit(void);
+
 void lv_draw_vglite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc,
                         const lv_area_t * coords);
 

@@ -53,6 +53,8 @@ typedef enum {
 
 void _lv_layout_init(void);
 
+void _lv_layout_deinit(void);
+
 /**
  * Register a new layout
  * @param cb        the layout update callback

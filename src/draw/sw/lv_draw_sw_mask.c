@@ -82,6 +82,10 @@ void lv_draw_sw_mask_init(void)
     lv_mutex_init(&circle_cache_mutex);
 }
 
+void lv_draw_sw_mask_deinit(void)
+{
+    lv_mutex_delete(&circle_cache_mutex);
+}
 
 LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf, int32_t abs_x,
                                                                   int32_t abs_y,

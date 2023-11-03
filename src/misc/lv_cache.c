@@ -42,6 +42,11 @@ void _lv_cache_init(void)
     lv_mutex_init(&_cache_manager.mutex);
 }
 
+void _lv_cache_deinit(void)
+{
+    lv_mutex_delete(&_cache_manager.mutex);
+}
+
 void lv_cache_set_manager(lv_cache_manager_t * manager)
 {
     LV_ASSERT(_cache_manager.locked);

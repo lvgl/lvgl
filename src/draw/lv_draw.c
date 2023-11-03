@@ -50,6 +50,23 @@ void lv_draw_init(void)
 #endif
 }
 
+void lv_draw_deinit(void)
+{
+#if LV_USE_OS
+    lv_thread_sync_delete(&_draw_info.sync);
+#endif
+
+    lv_draw_unit_t * u = _draw_info.unit_head;
+    while(u) {
+        lv_draw_unit_t * cur_unit = u;
+        u = u->next;
+
+        if(cur_unit->delete_cb) cur_unit->delete_cb(cur_unit);
+        lv_free(cur_unit);
+    }
+    _draw_info.unit_head = NULL;
+}
+
 void * lv_draw_create_unit(size_t size)
 {
     lv_draw_unit_t * new_unit = lv_malloc(size);

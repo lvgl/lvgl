@@ -98,6 +98,12 @@ typedef enum {
 void _lv_group_init(void);
 
 /**
+ * Deinit. the group module
+ * @remarks Internal function, do not call directly.
+ */
+void _lv_group_deinit(void);
+
+/**
  * Create a new object group
  * @return          pointer to the new object group
  */

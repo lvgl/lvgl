@@ -153,6 +153,11 @@ typedef struct {
 void _lv_cache_init(void);
 
 /**
+ * Deinitialize the cache module
+ */
+void _lv_cache_deinit(void);
+
+/**
  * Set new cache manager
  * @param manager   the new cache manager with callback functions set
  */
