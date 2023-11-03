@@ -131,7 +131,7 @@ lv_result_t lv_mutex_delete(lv_mutex_t * mutex)
 
 lv_result_t lv_thread_sync_init(lv_thread_sync_t * sync)
 {
-    sync->sem = rt_sem_create("mutex", RT_IPC_FLAG_PRIO);
+    sync->sem = rt_sem_create("sem", RT_IPC_FLAG_PRIO);
     if(sync->sem == RT_NULL) {
         LV_LOG_WARN("create semaphore failed");
         return LV_RESULT_INVALID;
