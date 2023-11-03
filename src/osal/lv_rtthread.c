@@ -40,11 +40,11 @@ lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*c
                            void * user_data)
 {
     thread->thread = rt_thread_create("thread",
-                                        callback, 
-                                        user_data,
-                                        stack_size,
-                                        prio, 
-                                        THREAD_TIMESLICE);
+                                      callback, 
+                                      user_data,
+                                      stack_size,
+                                      prio, 
+                                      THREAD_TIMESLICE);
     rt_err_t ret = rt_thread_startup(thread->thread);
     if(ret) {
         LV_LOG_WARN("Error: %d", ret);
