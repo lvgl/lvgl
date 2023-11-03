@@ -26,7 +26,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct {
-    rt_thread thread;
+    rt_thread_t thread;
 } lv_thread_t;
 
 typedef struct {
