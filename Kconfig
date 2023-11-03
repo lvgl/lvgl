@@ -179,6 +179,7 @@ menu "LVGL configuration"
 				1:LV_OS_PTHREAD
 				2:LV_OS_FREERTOS
 				3:LV_OS_CMSIS_RTOS2
+				4:LV_OS_RTTHREAD
 				255:LV_OS_CUSTOM
 
 			config LV_USE_DRAW_SW
