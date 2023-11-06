@@ -58,10 +58,9 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
     img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
     img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
     img_dsc.header.cf = layer_to_draw->color_format;
-    img_dsc.header.stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer_to_draw->buf_area),
-                                                        layer_to_draw->color_format);
+    img_dsc.header.stride = layer_to_draw->buf_stride;
     img_dsc.header.always_zero = 0;
-    img_dsc.data = lv_draw_buf_align(layer_to_draw->buf, layer_to_draw->color_format);
+    img_dsc.data = layer_to_draw->buf;
 
     lv_draw_image_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));

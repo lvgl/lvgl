@@ -338,11 +338,12 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
+    int32_t w = lv_area_get_width(&layer->buf_area);
+    uint32_t stride = lv_draw_buf_width_to_stride(w, layer->color_format);
+
     /*If the buffer of the layer is not allocated yet, allocate it now*/
     if(layer->buf == NULL) {
-        int32_t w = lv_area_get_width(&layer->buf_area);
         int32_t h = lv_area_get_height(&layer->buf_area);
-        int32_t stride = lv_draw_buf_width_to_stride(w, layer->color_format);
         uint32_t layer_size_byte = h * stride;
         layer->buf_unaligned = lv_draw_buf_malloc(layer_size_byte, layer->color_format);
 
@@ -368,6 +369,10 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         }
     }
 
+    /*Set the stride also for static allocated buffers as well as for new dynamically allocated*/
+    layer->buf_stride = stride;
+
+    /*Make sure the buffer address is aligned in case of already allocated buffers*/
     return lv_draw_buf_align(layer->buf, layer->color_format);
 }
 
