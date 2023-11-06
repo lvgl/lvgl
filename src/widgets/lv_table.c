@@ -226,6 +226,7 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
 #if LV_USE_USER_DATA
             if(table->cell_data[i]->user_data) {
                 lv_mem_free(table->cell_data[i]->user_data);
+                table->cell_data[i]->user_data = NULL;
             }
 #endif
             lv_mem_free(table->cell_data[i]);
@@ -283,6 +284,7 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
 #if LV_USE_USER_DATA
             if(table->cell_data[idx]->user_data) {
                 lv_mem_free(table->cell_data[idx]->user_data);
+                table->cell_data[idx]->user_data = NULL;
             }
 #endif
             lv_mem_free(table->cell_data[idx]);
@@ -480,7 +482,7 @@ void * lv_table_get_user_data(lv_obj_t * obj, uint16_t row, uint16_t col)
     lv_table_t * table = (lv_table_t *)obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
         LV_LOG_WARN("invalid row or column");
-        return "";
+        return NULL;
     }
     uint32_t cell = row * table->col_cnt + col;
 
@@ -523,6 +525,7 @@ static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 #if LV_USE_USER_DATA
             if(table->cell_data[i]->user_data) {
                 lv_mem_free(table->cell_data[i]->user_data);
+                table->cell_data[i]->user_data = NULL;
             }
 #endif
             lv_mem_free(table->cell_data[i]);
