@@ -107,7 +107,7 @@ bool lv_test_assert_image_eq(const char * fn_ref)
             uint8_t act_swap[3] = {ptr_act[2], ptr_act[1], ptr_act[0]};
 
             if(memcmp(act_swap, ptr_ref, 3) != 0) {
-                TEST_PRINTF("Erron on x:%d, y:%d. Expected %08X, Actual %08X", x, y, ptr_ref, act_swap);
+                TEST_PRINTF("Error on x:%d, y:%d. Expected %X, Actual %X", x, y, ref_px, act_px);
                 fflush(stderr);
                 err = true;
                 break;
