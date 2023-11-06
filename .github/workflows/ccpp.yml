@@ -43,6 +43,7 @@ jobs:
         name: screenshot-errors-amd64
         path: |
              tests/ref_imgs/**/*_err.png
+             test_screenshot_error.h
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       if: github.event_name == 'push'
@@ -106,4 +107,5 @@ jobs:
             name: screenshot-errors-${{ matrix.arch }}
             path: |
                 tests/ref_imgs/**/*_err.png
+                test_screenshot_error.h
 
