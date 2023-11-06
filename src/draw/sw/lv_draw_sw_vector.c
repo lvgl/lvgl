@@ -294,6 +294,7 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     }
 
     if(!decoder_dsc.img_data) {
+        lv_image_decoder_close(&decoder_dsc);
         LV_LOG_ERROR("Image not ready");
         return;
     }
@@ -303,12 +304,13 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     lv_color_format_t cf = header->cf;
 
     if(cf != LV_COLOR_FORMAT_ARGB8888) {
+        lv_image_decoder_close(&decoder_dsc);
         LV_LOG_ERROR("Not support image format");
         return;
     }
 
     Tvg_Paint * img = tvg_picture_new();
-    tvg_picture_load_raw(img, (uint32_t *)src_buf, header->w, header->h, false);
+    tvg_picture_load_raw(img, (uint32_t *)src_buf, header->w, header->h, true);
     Tvg_Paint * clip_path = tvg_paint_duplicate(obj);
     tvg_paint_set_composite_method(img, clip_path, TVG_COMPOSITE_METHOD_CLIP_PATH);
 
@@ -316,6 +318,7 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     _lv_matrix_to_tvg(&mtx, m);
     tvg_paint_set_transform(img, &mtx);
     tvg_canvas_push(canvas, img);
+    lv_image_decoder_close(&decoder_dsc);
 }
 
 static void _set_paint_fill(Tvg_Paint * obj, Tvg_Canvas * canvas, const lv_vector_fill_dsc_t * dsc,
