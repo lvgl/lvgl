@@ -13,6 +13,7 @@
 #include "lv_draw_sw.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
@@ -35,12 +36,9 @@ static void execute_drawing(lv_draw_sw_unit_t * u);
 static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 /**********************
- *  GLOBAL PROTOTYPES
- **********************/
-
-/**********************
  *  STATIC VARIABLES
  **********************/
+#define _draw_info LV_GLOBAL_DEFAULT()->draw_info
 
 /**********************
  *      MACROS
@@ -182,8 +180,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
 
         int32_t idx = 0;
-        lv_display_t * disp = _lv_refr_get_disp_refreshing();
-        lv_draw_unit_t * draw_unit_tmp = disp->draw_unit_head;
+        lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
         while(draw_unit_tmp != (lv_draw_unit_t *)u) {
             draw_unit_tmp = draw_unit_tmp->next;
             idx++;
