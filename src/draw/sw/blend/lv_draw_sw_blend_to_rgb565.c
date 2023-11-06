@@ -68,9 +68,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_rgb565(_lv_draw_sw_blend_fi
     uint16_t color16 = lv_color_to_u16(dsc->color);
     lv_opa_t opa = dsc->opa;
     const lv_opa_t * mask = dsc->mask_buf;
-    lv_coord_t mask_stride = dsc->mask_stride;
+    int32_t mask_stride = dsc->mask_stride;
     uint16_t * dest_buf_u16 = dsc->dest_buf;
-    lv_coord_t dest_stride = dsc->dest_stride;
+    int32_t dest_stride = dsc->dest_stride;
 
     int32_t x;
     int32_t y;
@@ -232,11 +232,11 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
     uint16_t * dest_buf_u16 = dsc->dest_buf;
-    lv_coord_t dest_stride = dsc->dest_stride;
+    int32_t dest_stride = dsc->dest_stride;
     const uint16_t * src_buf_u16 = dsc->src_buf;
-    lv_coord_t src_stride = dsc->src_stride;
+    int32_t src_stride = dsc->src_stride;
     const lv_opa_t * mask_buf = dsc->mask_buf;
-    lv_coord_t mask_stride = dsc->mask_stride;
+    int32_t mask_stride = dsc->mask_stride;
 
     int32_t x;
     int32_t y;
@@ -332,11 +332,11 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
     uint16_t * dest_buf_u16 = dsc->dest_buf;
-    lv_coord_t dest_stride = dsc->dest_stride;
+    int32_t dest_stride = dsc->dest_stride;
     const uint8_t * src_buf_u8 = dsc->src_buf;
-    lv_coord_t src_stride = dsc->src_stride * src_px_size;
+    int32_t src_stride = dsc->src_stride * src_px_size;
     const lv_opa_t * mask_buf = dsc->mask_buf;
-    lv_coord_t mask_stride = dsc->mask_stride;
+    int32_t mask_stride = dsc->mask_stride;
 
     int32_t dest_x;
     int32_t src_x;
@@ -433,11 +433,11 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
     uint16_t * dest_buf_u16 = dsc->dest_buf;
-    lv_coord_t dest_stride = dsc->dest_stride;
+    int32_t dest_stride = dsc->dest_stride;
     const uint8_t * src_buf_u8 = dsc->src_buf;
-    lv_coord_t src_stride = dsc->src_stride * 4;
+    int32_t src_stride = dsc->src_stride * 4;
     const lv_opa_t * mask_buf = dsc->mask_buf;
-    lv_coord_t mask_stride = dsc->mask_stride;
+    int32_t mask_stride = dsc->mask_stride;
 
     int32_t dest_x;
     int32_t src_x;

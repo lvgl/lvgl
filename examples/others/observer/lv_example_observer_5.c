@@ -48,8 +48,8 @@ static void fw_update_btn_clicked_event_cb(lv_event_t * e)
     lv_obj_set_height(lv_win_get_header(win), 40);
     lv_obj_set_style_radius(win, 8, 0);
     lv_obj_set_style_shadow_width(win, 24, 0);
-    lv_obj_set_style_shadow_ofs_x(win, 2, 0);
-    lv_obj_set_style_shadow_ofs_y(win, 3, 0);
+    lv_obj_set_style_shadow_offset_x(win, 2, 0);
+    lv_obj_set_style_shadow_offset_y(win, 3, 0);
     lv_obj_set_style_shadow_color(win, lv_color_hex3(0x888), 0);
     lv_win_add_title(win, "Firmware update");
     lv_obj_t * btn = lv_win_add_button(win, LV_SYMBOL_CLOSE, 40);

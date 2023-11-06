@@ -89,7 +89,7 @@ static const uint8_t * imgfont_get_glyph_bitmap(const lv_font_t * font, uint32_t
     LV_UNUSED(bitmap_buf);
     LV_ASSERT_NULL(font);
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
-    lv_coord_t offset_y = 0;
+    int32_t offset_y = 0;
     const void * img_src = dsc->path_cb(dsc->font, unicode, 0, &offset_y, dsc->user_data);
     return img_src;
 }
@@ -103,7 +103,7 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
     LV_ASSERT_NULL(dsc);
     if(dsc->path_cb == NULL) return false;
 
-    lv_coord_t offset_y = 0;
+    int32_t offset_y = 0;
 
     const void * img_src = dsc->path_cb(dsc->font, unicode, unicode_next, &offset_y, dsc->user_data);
     if(img_src == NULL) return false;

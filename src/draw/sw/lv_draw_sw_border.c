@@ -31,7 +31,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void draw_border_complex(lv_draw_unit_t * draw_unit, const lv_area_t * outer_area, const lv_area_t * inner_area,
-                                lv_coord_t rout, lv_coord_t rin, lv_color_t color, lv_opa_t opa);
+                                int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa);
 
 static void draw_border_simple(lv_draw_unit_t * draw_unit, const lv_area_t * outer_area, const lv_area_t * inner_area,
                                lv_color_t color, lv_opa_t opa);
@@ -69,7 +69,7 @@ void lv_draw_sw_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_t * 
     area_inner.y1 += ((dsc->side & LV_BORDER_SIDE_TOP) ? dsc->width : - (dsc->width + rout));
     area_inner.y2 -= ((dsc->side & LV_BORDER_SIDE_BOTTOM) ? dsc->width : - (dsc->width + rout));
 
-    lv_coord_t rin = rout - dsc->width;
+    int32_t rin = rout - dsc->width;
     if(rin < 0) rin = 0;
 
     if(rout == 0 && rin == 0) {
@@ -86,7 +86,7 @@ void lv_draw_sw_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_t * 
  **********************/
 
 void draw_border_complex(lv_draw_unit_t * draw_unit, const lv_area_t * outer_area, const lv_area_t * inner_area,
-                         lv_coord_t rout, lv_coord_t rin, lv_color_t color, lv_opa_t opa)
+                         int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa)
 {
 #if LV_DRAW_SW_COMPLEX
     /*Get clipped draw area which is the real draw area.
@@ -129,7 +129,7 @@ void draw_border_complex(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
     core_area.x2 = LV_MIN(outer_area->x2 - rout, inner_area->x2);
     core_area.y1 = LV_MAX(outer_area->y1 + rout, inner_area->y1);
     core_area.y2 = LV_MIN(outer_area->y2 - rout, inner_area->y2);
-    lv_coord_t core_w = lv_area_get_width(&core_area);
+    int32_t core_w = lv_area_get_width(&core_area);
 
     bool top_side = outer_area->y1 <= inner_area->y1;
     bool bottom_side = outer_area->y2 >= inner_area->y2;
@@ -190,17 +190,17 @@ void draw_border_complex(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
     }
 
     /*Draw the corners*/
-    lv_coord_t blend_w;
+    int32_t blend_w;
 
     /*Left and right corner together if they are close to each other*/
     if(!split_hor) {
         /*Calculate the top corner and mirror it to the bottom*/
         blend_area.x1 = draw_area.x1;
         blend_area.x2 = draw_area.x2;
-        lv_coord_t max_h = LV_MAX(rout, inner_area->y1 - outer_area->y1);
+        int32_t max_h = LV_MAX(rout, inner_area->y1 - outer_area->y1);
         for(h = 0; h < max_h; h++) {
-            lv_coord_t top_y = outer_area->y1 + h;
-            lv_coord_t bottom_y = outer_area->y2 - h;
+            int32_t top_y = outer_area->y1 + h;
+            int32_t bottom_y = outer_area->y2 - h;
             if(top_y < draw_area.y1 && bottom_y > draw_area.y2) continue;   /*This line is clipped now*/
 
             lv_memset(mask_buf, 0xff, draw_area_w);

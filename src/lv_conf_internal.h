@@ -876,12 +876,12 @@
     #endif
 #endif
 
-/*Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates instead of int16_t*/
-#ifndef LV_USE_LARGE_COORD
-    #ifdef CONFIG_LV_USE_LARGE_COORD
-        #define LV_USE_LARGE_COORD CONFIG_LV_USE_LARGE_COORD
+/*Prefix all global extern data with this*/
+#ifndef LV_ATTRIBUTE_EXTERN_DATA
+    #ifdef CONFIG_LV_ATTRIBUTE_EXTERN_DATA
+        #define LV_ATTRIBUTE_EXTERN_DATA CONFIG_LV_ATTRIBUTE_EXTERN_DATA
     #else
-        #define LV_USE_LARGE_COORD 0
+        #define LV_ATTRIBUTE_EXTERN_DATA
     #endif
 #endif
 

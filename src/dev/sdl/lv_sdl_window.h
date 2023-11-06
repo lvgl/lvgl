@@ -31,7 +31,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_display_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res);
+lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res);
 
 void lv_sdl_window_set_zoom(lv_display_t * disp, uint8_t zoom);
 

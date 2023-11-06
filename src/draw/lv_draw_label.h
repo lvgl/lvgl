@@ -57,10 +57,10 @@ typedef struct {
     lv_color_t color;
     lv_color_t sel_color;
     lv_color_t sel_bg_color;
-    lv_coord_t line_space;
-    lv_coord_t letter_space;
-    lv_coord_t ofs_x;
-    lv_coord_t ofs_y;
+    int32_t line_space;
+    int32_t letter_space;
+    int32_t ofs_x;
+    int32_t ofs_y;
     lv_opa_t opa;
     lv_base_dir_t bidi_dir;
     lv_text_align_t align;

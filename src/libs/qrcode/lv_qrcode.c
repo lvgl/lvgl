@@ -60,7 +60,7 @@ lv_obj_t * lv_qrcode_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_qrcode_set_size(lv_obj_t * obj, lv_coord_t size)
+void lv_qrcode_set_size(lv_obj_t * obj, int32_t size)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -145,7 +145,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
         return LV_RESULT_INVALID;
     }
 
-    lv_coord_t obj_w = img_dsc->header.w;
+    int32_t obj_w = img_dsc->header.w;
     qr_size = qrcodegen_getSize(qr0);
     scale = obj_w / qr_size;
     int scaled = qr_size * scale;

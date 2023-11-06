@@ -28,6 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_point_t point_to_normal(const lv_point_precise_t * p);
 static void point_swap(lv_point_t * p1, lv_point_t * p2);
 
 /**********************
@@ -46,10 +47,10 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
 {
 #if LV_DRAW_SW_COMPLEX
     lv_area_t tri_area;
-    tri_area.x1 = LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
-    tri_area.y1 = LV_MIN3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
-    tri_area.x2 = LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
-    tri_area.y2 = LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
+    tri_area.x1 = (int32_t)LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
+    tri_area.y1 = (int32_t)LV_MIN3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
+    tri_area.x2 = (int32_t)LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
+    tri_area.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
     bool is_common;
     lv_area_t draw_area;
@@ -59,24 +60,24 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
     lv_point_t p[3];
     /*If there is a vertical side use it as p[0] and p[1]*/
     if(dsc->p[0].x == dsc->p[1].x) {
-        p[0] = dsc->p[0];
-        p[1] = dsc->p[1];
-        p[2] = dsc->p[2];
+        p[0] = point_to_normal(&dsc->p[0]);
+        p[1] = point_to_normal(&dsc->p[1]);
+        p[2] = point_to_normal(&dsc->p[2]);
     }
     else if(dsc->p[0].x == dsc->p[2].x) {
-        p[0] = dsc->p[0];
-        p[1] = dsc->p[2];
-        p[2] = dsc->p[1];
+        p[0] = point_to_normal(&dsc->p[0]);
+        p[1] = point_to_normal(&dsc->p[2]);
+        p[2] = point_to_normal(&dsc->p[1]);
     }
     else if(dsc->p[1].x == dsc->p[2].x) {
-        p[0] = dsc->p[1];
-        p[1] = dsc->p[2];
-        p[2] = dsc->p[0];
+        p[0] = point_to_normal(&dsc->p[1]);
+        p[1] = point_to_normal(&dsc->p[2]);
+        p[2] = point_to_normal(&dsc->p[0]);
     }
     else {
-        p[0] = dsc->p[0];
-        p[1] = dsc->p[1];
-        p[2] = dsc->p[2];
+        p[0] = point_to_normal(&dsc->p[0]);
+        p[1] = point_to_normal(&dsc->p[1]);
+        p[2] = point_to_normal(&dsc->p[2]);
 
         /*Set the smallest y as p[0]*/
         if(p[0].y > p[1].y) point_swap(&p[0], &p[1]);
@@ -112,7 +113,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
     masks[0] = &mask_left;
     masks[1] = &mask_right;
     masks[2] = &mask_bottom;
-    lv_coord_t area_w = lv_area_get_width(&draw_area);
+    int32_t area_w = lv_area_get_width(&draw_area);
     lv_opa_t * mask_buf = lv_malloc(area_w);
 
     lv_area_t blend_area = draw_area;
@@ -150,7 +151,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
         }
         else if(grad_dir == LV_GRAD_DIR_HOR) {
             if(grad_opa_map) {
-                lv_coord_t i;
+                int32_t i;
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_CHANGED) {
                     blend_dsc.mask_buf = mask_buf;
                     for(i = 0; i < area_w; i++) {
@@ -188,6 +189,15 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_point_t point_to_normal(const lv_point_precise_t * p)
+{
+    lv_point_t p_out;
+    p_out.x = (int32_t)p->x;
+    p_out.y = (int32_t)p->y;
+
+    return p_out;
+}
 
 static void point_swap(lv_point_t * p1, lv_point_t * p2)
 {

@@ -29,7 +29,7 @@ typedef struct {
     lv_draw_dsc_base_t base;
 
     lv_area_t area;
-    lv_coord_t radius;
+    int32_t radius;
 } lv_draw_mask_rect_dsc_t;
 
 struct _lv_layer_t;

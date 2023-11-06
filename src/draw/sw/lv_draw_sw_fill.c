@@ -73,8 +73,8 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
     lv_opa_t opa = dsc->opa >= LV_OPA_MAX ? LV_OPA_COVER : dsc->opa;
 
     /*Get the real radius. Can't be larger than the half of the shortest side */
-    lv_coord_t coords_bg_w = lv_area_get_width(&bg_coords);
-    lv_coord_t coords_bg_h = lv_area_get_height(&bg_coords);
+    int32_t coords_bg_w = lv_area_get_width(&bg_coords);
+    int32_t coords_bg_h = lv_area_get_height(&bg_coords);
     int32_t short_side = LV_MIN(coords_bg_w, coords_bg_h);
     int32_t rout = LV_MIN(dsc->radius, short_side >> 1);
 
@@ -123,8 +123,8 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
 
     /* Draw the top of the rectangle line by line and mirror it to the bottom. */
     for(h = 0; h < rout; h++) {
-        lv_coord_t top_y = bg_coords.y1 + h;
-        lv_coord_t bottom_y = bg_coords.y2 - h;
+        int32_t top_y = bg_coords.y1 + h;
+        int32_t bottom_y = bg_coords.y2 - h;
         if(top_y < clipped_coords.y1 && bottom_y > clipped_coords.y2) continue;   /*This line is clipped now*/
 
         /* Initialize the mask to opa instead of 0xFF and blend with LV_OPA_COVER.
@@ -143,7 +143,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
             }
             else if(grad_dir == LV_GRAD_DIR_HOR) {
                 if(grad_opa_map) {
-                    lv_coord_t i;
+                    int32_t i;
                     for(i = 0; i < clipped_w; i++) {
                         if(grad_opa_map[i] < LV_OPA_MAX) mask_buf[i] = (mask_buf[i] * grad_opa_map[i]) >> 8;
                     }

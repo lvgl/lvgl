@@ -96,8 +96,8 @@ Input device events
 -  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN`: Sent once when the object is released while scrolling but the "momentum" still keeps the content scrolling.
 -  :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends.
 -  :cpp:enumerator:`LV_EVENT_SCROLL`: An object was scrolled
--  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_get_act())`
--  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to an object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_get_act())`
+-  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_active())`
+-  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to an object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_active())`
 -  :cpp:enumerator:`LV_EVENT_FOCUSED`: An object is focused
 -  :cpp:enumerator:`LV_EVENT_DEFOCUSED`: An object is unfocused
 -  :cpp:enumerator:`LV_EVENT_LEAVE`: An object is unfocused but still selected
@@ -107,7 +107,7 @@ Drawing events
 --------------
 
 -  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if an object fully covers an area. The event parameter is :cpp:struct:`lv_cover_check_info_t` ``*``.
--  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around an object (e.g. for a shadow). The event parameter is :cpp:type:`lv_coord_t` ``*`` to store the size. Only overwrite it with a larger value.
+-  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around an object (e.g. for a shadow). The event parameter is :cpp:type:`int32_t` ``*`` to store the size. Only overwrite it with a larger value.
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`: Starting the main drawing phase.
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN`: Perform the main drawing
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_END`: Finishing the main drawing phase

@@ -124,8 +124,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
             if(draw_dsc->shadow_opa > LV_OPA_MIN) {
                 draw_dsc->shadow_opa = lv_obj_get_style_shadow_opa(obj, part);
                 if(draw_dsc->shadow_opa > LV_OPA_MIN) {
-                    draw_dsc->shadow_ofs_x = lv_obj_get_style_shadow_ofs_x(obj, part);
-                    draw_dsc->shadow_ofs_y = lv_obj_get_style_shadow_ofs_y(obj, part);
+                    draw_dsc->shadow_offset_x = lv_obj_get_style_shadow_offset_x(obj, part);
+                    draw_dsc->shadow_offset_y = lv_obj_get_style_shadow_offset_y(obj, part);
                     draw_dsc->shadow_spread = lv_obj_get_style_shadow_spread(obj, part);
                     draw_dsc->shadow_color = lv_obj_get_style_shadow_color_filtered(obj, part);
                 }
@@ -186,8 +186,8 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, uint32_t part, lv_draw_image_dsc
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
     draw_dsc->rotation = 0;
-    draw_dsc->zoom_x = LV_SCALE_NONE;
-    draw_dsc->zoom_y = LV_SCALE_NONE;
+    draw_dsc->scale_x = LV_SCALE_NONE;
+    draw_dsc->scale_y = LV_SCALE_NONE;
     draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
     draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
 
@@ -250,35 +250,35 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t *
     draw_dsc->rounded = lv_obj_get_style_arc_rounded(obj, part);
 }
 
-lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
+int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
 {
-    lv_coord_t s = 0;
+    int32_t s = 0;
 
-    lv_coord_t sh_width = lv_obj_get_style_shadow_width(obj, part);
+    int32_t sh_width = lv_obj_get_style_shadow_width(obj, part);
     if(sh_width) {
         lv_opa_t sh_opa = lv_obj_get_style_shadow_opa(obj, part);
         if(sh_opa > LV_OPA_MIN) {
             sh_width = sh_width / 2 + 1;    /*The blur adds only half width*/
             sh_width += lv_obj_get_style_shadow_spread(obj, part);
-            lv_coord_t sh_ofs_x = lv_obj_get_style_shadow_ofs_x(obj, part);
-            lv_coord_t sh_ofs_y = lv_obj_get_style_shadow_ofs_y(obj, part);
+            int32_t sh_ofs_x = lv_obj_get_style_shadow_offset_x(obj, part);
+            int32_t sh_ofs_y = lv_obj_get_style_shadow_offset_y(obj, part);
             sh_width += LV_MAX(LV_ABS(sh_ofs_x), LV_ABS(sh_ofs_y));
             s = LV_MAX(s, sh_width);
         }
     }
 
-    lv_coord_t outline_width = lv_obj_get_style_outline_width(obj, part);
+    int32_t outline_width = lv_obj_get_style_outline_width(obj, part);
     if(outline_width) {
         lv_opa_t outline_opa = lv_obj_get_style_outline_opa(obj, part);
         if(outline_opa > LV_OPA_MIN) {
-            lv_coord_t outline_pad = lv_obj_get_style_outline_pad(obj, part);
+            int32_t outline_pad = lv_obj_get_style_outline_pad(obj, part);
             s = LV_MAX(s, outline_pad + outline_width);
         }
     }
 
-    lv_coord_t w = lv_obj_get_style_transform_width(obj, part);
-    lv_coord_t h = lv_obj_get_style_transform_height(obj, part);
-    lv_coord_t wh = LV_MAX(w, h);
+    int32_t w = lv_obj_get_style_transform_width(obj, part);
+    int32_t h = lv_obj_get_style_transform_height(obj, part);
+    int32_t wh = LV_MAX(w, h);
     if(wh > 0) s += wh;
 
     return s;
@@ -288,8 +288,8 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_coord_t s_old = _lv_obj_get_ext_draw_size(obj);
-    lv_coord_t s_new = 0;
+    int32_t s_old = _lv_obj_get_ext_draw_size(obj);
+    int32_t s_new = 0;
     lv_obj_send_event(obj, LV_EVENT_REFR_EXT_DRAW_SIZE, &s_new);
 
     if(s_new != s_old) lv_obj_invalidate(obj);
@@ -308,7 +308,7 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
     if(s_new != s_old) lv_obj_invalidate(obj);
 }
 
-lv_coord_t _lv_obj_get_ext_draw_size(const lv_obj_t * obj)
+int32_t _lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 {
     if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
     else return 0;

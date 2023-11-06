@@ -25,7 +25,7 @@
  **********************/
 static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static bool lv_barcode_change_buf_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
+static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h);
 
 /**********************
  *  STATIC VARIABLES
@@ -115,14 +115,14 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
         return LV_RESULT_INVALID;
     }
 
-    lv_coord_t barcode_w = code128_encode_gs1(data, out_buf, len);
+    int32_t barcode_w = code128_encode_gs1(data, out_buf, len);
     LV_LOG_INFO("barcode width = %d", (int)barcode_w);
 
     LV_ASSERT(barcode->scale > 0);
     uint16_t scale = barcode->scale;
 
-    lv_coord_t buf_w = (barcode->direction == LV_DIR_HOR) ? barcode_w * scale : 1;
-    lv_coord_t buf_h = (barcode->direction == LV_DIR_VER) ? barcode_w * scale : 1;
+    int32_t buf_w = (barcode->direction == LV_DIR_HOR) ? barcode_w * scale : 1;
+    int32_t buf_h = (barcode->direction == LV_DIR_VER) ? barcode_w * scale : 1;
 
     if(!lv_barcode_change_buf_size(obj, buf_w, buf_h)) {
         goto failed;
@@ -131,7 +131,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     lv_canvas_set_palette(obj, 0, lv_color_to_32(barcode->dark_color, 0xff));
     lv_canvas_set_palette(obj, 1, lv_color_to_32(barcode->light_color, 0xff));
 
-    for(lv_coord_t x = 0; x < barcode_w; x++) {
+    for(int32_t x = 0; x < barcode_w; x++) {
         lv_color_t color;
         color = lv_color_from_int(out_buf[x] ? 0 : 1);
         for(uint16_t i = 0; i < scale; i++) {
@@ -210,7 +210,7 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     img->data = NULL;
 }
 
-static bool lv_barcode_change_buf_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
+static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT(w > 0);

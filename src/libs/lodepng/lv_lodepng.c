@@ -107,8 +107,8 @@ static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void
             header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_ARGB8888;
             /*The width and height are stored in Big endian format so convert them to little endian*/
-            header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
-            header->h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
+            header->w = (int32_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
+            header->h = (int32_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
 
             return LV_RESULT_OK;
         }
@@ -129,14 +129,14 @@ static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void
             header->w = img_dsc->header.w;         /*Save the image width*/
         }
         else {
-            header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
+            header->w = (int32_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
         }
 
         if(img_dsc->header.h) {
             header->h = img_dsc->header.h;         /*Save the color height*/
         }
         else {
-            header->h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
+            header->h = (int32_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
         }
 
         return LV_RESULT_OK;

@@ -68,8 +68,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_argb8888(_lv_draw_sw_blend_
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
     const lv_opa_t * mask = dsc->mask_buf;
-    lv_coord_t mask_stride = dsc->mask_stride;
-    lv_coord_t dest_stride = dsc->dest_stride;
+    int32_t mask_stride = dsc->mask_stride;
+    int32_t dest_stride = dsc->dest_stride;
 
     lv_color_mix_alpha_cache_t cache;
     lv_color_mix_with_alpha_cache_init(&cache);
@@ -183,11 +183,11 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
     lv_color32_t * dest_buf_c32 = dsc->dest_buf;
-    lv_coord_t dest_stride = dsc->dest_stride;
+    int32_t dest_stride = dsc->dest_stride;
     const lv_color16_t * src_buf_c16 = (const lv_color16_t *) dsc->src_buf;
-    lv_coord_t src_stride = dsc->src_stride;
+    int32_t src_stride = dsc->src_stride;
     const lv_opa_t * mask_buf = dsc->mask_buf;
-    lv_coord_t mask_stride = dsc->mask_stride;
+    int32_t mask_stride = dsc->mask_stride;
 
     lv_color32_t color_argb;
     lv_color_mix_alpha_cache_t cache;
@@ -264,11 +264,11 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
     lv_color32_t * dest_buf_c32 = dsc->dest_buf;
-    lv_coord_t dest_stride = dsc->dest_stride;
+    int32_t dest_stride = dsc->dest_stride;
     const uint8_t * src_buf = dsc->src_buf;
-    lv_coord_t src_stride = dsc->src_stride * src_px_size;
+    int32_t src_stride = dsc->src_stride * src_px_size;
     const lv_opa_t * mask_buf = dsc->mask_buf;
-    lv_coord_t mask_stride = dsc->mask_stride;
+    int32_t mask_stride = dsc->mask_stride;
 
     lv_color32_t color_argb;
     lv_color_mix_alpha_cache_t cache;
@@ -369,11 +369,11 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
     lv_color32_t * dest_buf_c32 = dsc->dest_buf;
-    lv_coord_t dest_stride = dsc->dest_stride;
+    int32_t dest_stride = dsc->dest_stride;
     const lv_color32_t * src_buf_c32 = dsc->src_buf;
-    lv_coord_t src_stride = dsc->src_stride;
+    int32_t src_stride = dsc->src_stride;
     const lv_opa_t * mask_buf = dsc->mask_buf;
-    lv_coord_t mask_stride = dsc->mask_stride;
+    int32_t mask_stride = dsc->mask_stride;
 
     lv_color32_t color_argb;
     lv_color_mix_alpha_cache_t cache;

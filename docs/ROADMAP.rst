@@ -21,7 +21,7 @@ Naming and API
   `LINK <https://github.com/lvgl/lvgl/pull/3390#discussion_r885915769>`__
 - |check| Replace `disp_drv->direct_mode/full_refresh` with enum.
 - |check| Consider flat directory structure. E.g. `extra/widgets` to `widgets`
-- |uncheck| Use `uint32_t` and `int32_t` in APIs where possible. Consider hardcoding `lv_coord_t` as `int32_t`.
+- |check| Use `uint32_t` and `int32_t` in APIs where possible. Consider hardcoding `int32_t` as `int32_t`.
 - |check| To define a new stdlib API use defines `LV_USE_CUSTOM_...` and
   let the user implement `lv_...` functions somewhere (instead of defining the name of the custom functions)
   (see `here <https://github.com/lvgl/lvgl/issues/3481#issuecomment-1206434501>`__)
@@ -45,12 +45,12 @@ Architecture
 - |check| Drop `lv_mem_buf_get` as tlsf should be fast enough for normal allocations too.
   Fragmentation is also lower if processes can completely clean up after themselves.
 - |check| More color formats: 24 bit, ARGB1555, ARGB4444 etc
-  (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__) 
+  (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__)
 - |check| Unified caching #3116 #3415
 - |check| Variable binding. I.e create properties which can be bound to objects and those objects are notified on value change. Maybe based on `lv_msg`?
-- |uncheck| Add GPU abstraction for display rotation 
+- |uncheck| Add GPU abstraction for display rotation
 - |check| Replace the `read_line_cb` of the image decoders with `get_area_cb`
-- |check| Limit the image caching size in bytes instead of image count 
+- |check| Limit the image caching size in bytes instead of image count
 - |check| lv_draw_buf for unified stride, buffer and cache invalidation management. `4241 <https://github.com/lvgl/lvgl/pull/4241>`__
 - |uncheck| SVG support: integrate an SVG render library `4388 <https://github.com/lvgl/lvgl/issues/4388>`__
 - |uncheck| Introduce optional ``float`` support. `4648 <https://github.com/lvgl/lvgl/issues/4648>`__
@@ -59,7 +59,7 @@ Architecture
 Styles
 ~~~~~~
 
-- |uncheck| Make `style_bg_img` support `9patch` images
+- |uncheck| Make `style_bg_img` `LV_PART_BACKGROUNG`
 - |check| non-uniform scale of images: scale width and height differently
 - |uncheck| Scroll anim settings should come from styles to allow customization
 

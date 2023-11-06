@@ -251,7 +251,7 @@ int32_t lv_arc_get_knob_offset(const lv_obj_t * obj);
  * @param obj_to_align  pointer to an object to align
  * @param r_offset      consider the radius larger with this value (< 0: for smaller radius)
  */
-void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, lv_coord_t r_offset);
+void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, int32_t r_offset);
 
 /**
  * Rotate an object to the current position of the arc (knob)
@@ -259,7 +259,7 @@ void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, lv
  * @param obj_to_rotate  pointer to an object to rotate
  * @param r_offset       consider the radius larger with this value (< 0: for smaller radius)
  */
-void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, lv_coord_t r_offset);
+void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, int32_t r_offset);
 
 /**********************
  *      MACROS

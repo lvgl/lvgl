@@ -572,6 +572,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
         return false;
     }
 
+    /*kerning*/
     if(font_header.tables_count < 4) {
         font_dsc->kern_dsc = NULL;
         font_dsc->kern_classes = 0;

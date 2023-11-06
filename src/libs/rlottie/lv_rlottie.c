@@ -42,8 +42,8 @@ const lv_obj_class_t lv_rlottie_class = {
 };
 
 typedef struct {
-    lv_coord_t width;
-    lv_coord_t height;
+    int32_t width;
+    int32_t height;
     const char * rlottie_desc;
     const char * path;
 } lv_rlottie_create_info_t;
@@ -59,7 +59,7 @@ static lv_rlottie_create_info_t create_info;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * path)
+lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t height, const char * path)
 {
     create_info.width = width;
     create_info.height = height;
@@ -73,7 +73,7 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
     return obj;
 }
 
-lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * rlottie_desc)
+lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, int32_t width, int32_t height, const char * rlottie_desc)
 {
     create_info.width = width;
     create_info.height = height;

@@ -44,6 +44,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef int32_t int32_t;
 typedef lv_result_t                 lv_res_t;
 typedef lv_image_dsc_t              lv_img_dsc_t;
 typedef lv_display_t                lv_disp_t;
@@ -102,6 +103,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_obj_clear_flag                lv_obj_remove_flag
 #define lv_obj_clear_state               lv_obj_remove_state
 
+#define lv_indev_get_act                 lv_indev_active
 #define lv_scr_act                       lv_screen_active
 #define lv_disp_create                   lv_display_create
 #define lv_disp_remove                   lv_display_remove
@@ -206,6 +208,10 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_btnmatrix_get_one_checked         lv_buttonmatrix_get_one_checked
 
 #define lv_tabview_get_tab_btns              lv_tabview_get_tab_buttons
+#define lv_tabview_get_act                   lv_tabview_get_active
+#define lv_tabview_set_act                   lv_tabview_set_active
+
+#define lv_tileview_get_tile_act             lv_tileview_get_tile_active
 
 #define lv_msgbox_get_btns                   lv_msgbox_get_buttons
 
@@ -214,13 +220,22 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_image_set_zoom                   lv_image_set_scale
 #define lv_image_get_zoom                   lv_image_get_scale
 
+#define lv_obj_get_style_shadow_ofs_x       lv_obj_get_style_shadow_offset_x
+#define lv_obj_get_style_shadow_ofs_y       lv_obj_get_style_shadow_offset_y
 #define lv_obj_get_style_transform_zoom     lv_obj_get_style_transform_scale
 #define lv_obj_get_style_transform_angle    lv_obj_get_style_transform_rotation
+
+#define lv_obj_set_style_shadow_ofs_x       lv_obj_set_style_shadow_offset_x
+#define lv_obj_set_style_shadow_ofs_y       lv_obj_set_style_shadow_offset_y
 #define lv_obj_set_style_transform_zoom     lv_obj_set_style_transform_scale
 #define lv_obj_set_style_transform_angle    lv_obj_set_style_transform_rotation
+
+#define lv_style_set_shadow_ofs_x           lv_style_set_shadow_offset_x
+#define lv_style_set_shadow_ofs_y           lv_style_set_shadow_offset_y
 #define lv_style_set_transform_angle        lv_style_set_transform_rotation
 #define lv_style_set_transform_zoom         lv_style_set_transform_scale
-#define LV_ZOOM_NONE             LV_SCALE_NONE
+
+#define LV_ZOOM_NONE                        LV_SCALE_NONE
 
 /**********************
  *      MACROS

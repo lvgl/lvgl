@@ -32,9 +32,9 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, lv_coord_t x,
-                                       lv_coord_t y,
-                                       lv_coord_t w_px, const uint8_t * in, lv_color32_t * out);
+static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,
+                                       int32_t y,
+                                       int32_t w_px, const uint8_t * in, lv_color32_t * out);
 
 static uint32_t img_width_to_stride(lv_image_header_t * header);
 static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, uint8_t * buff, uint32_t btr, uint32_t * br);
@@ -678,7 +678,7 @@ lv_result_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_
     lv_image_decoder_built_in_data_t * decoder_data = dsc->user_data;
     lv_fs_file_t * f = &decoder_data->f;
     uint32_t bpp = lv_color_format_get_bpp(cf);
-    lv_coord_t w_px = lv_area_get_width(full_area);
+    int32_t w_px = lv_area_get_width(full_area);
     uint8_t * img_data = NULL;
     uint32_t offset = sizeof(lv_image_header_t); /*All image starts with image header*/
 
@@ -707,7 +707,7 @@ lv_result_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_
     }
 
     if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-        lv_coord_t x_fraction = decoded_area->x1 % (8 / bpp);
+        int32_t x_fraction = decoded_area->x1 % (8 / bpp);
         uint32_t len = (w_px * bpp + 7) / 8 + 1; /*10px for 1bpp may across 3bytes*/
         uint8_t * buf = lv_malloc(len);
         LV_ASSERT_NULL(buf);
@@ -776,16 +776,16 @@ lv_result_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, lv_coord_t x,
-                                       lv_coord_t y,
-                                       lv_coord_t w_px, const uint8_t * in, lv_color32_t * out)
+static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,
+                                       int32_t y,
+                                       int32_t w_px, const uint8_t * in, lv_color32_t * out)
 {
     uint8_t px_size;
     uint16_t mask;
 
     out += w_px * y;
 
-    lv_coord_t w_byte = 0;
+    int32_t w_byte = 0;
     int8_t shift   = 0;
     switch(color_format) {
         case LV_COLOR_FORMAT_I1:
@@ -822,7 +822,7 @@ static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_
 
     mask   = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
 
-    lv_coord_t i;
+    int32_t i;
     for(i = 0; i < w_px; i++) {
         uint8_t val_act = (*in >> shift) & mask;
         out[i] = palette[val_act];

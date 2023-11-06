@@ -36,8 +36,8 @@ static void next_scene_timer_cb(lv_timer_t * timer);
 static void rnd_reset(void);
 static int32_t rnd_next(int32_t min, int32_t max);
 static void shake_anim_y_cb(void * var, int32_t v);
-static void shake_anim(lv_obj_t * obj, lv_coord_t y_max);
-static void scroll_anim(lv_obj_t * obj, lv_coord_t y_max);
+static void shake_anim(lv_obj_t * obj, int32_t y_max);
+static void scroll_anim(lv_obj_t * obj, int32_t y_max);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void color_anim_cb(void * var, int32_t v);
 static void color_anim(lv_obj_t * obj);
@@ -522,7 +522,7 @@ static void scroll_anim_y_cb(void * var, int32_t v)
     lv_obj_scroll_to_y(var, v, LV_ANIM_OFF);
 }
 
-static void scroll_anim(lv_obj_t * obj, lv_coord_t y_max)
+static void scroll_anim(lv_obj_t * obj, int32_t y_max)
 {
     uint32_t t = lv_anim_speed_to_time(lv_display_get_dpi(NULL), 0, y_max);
 
@@ -542,7 +542,7 @@ static void shake_anim_y_cb(void * var, int32_t v)
     lv_obj_set_style_translate_y(var, v, 0);
 }
 
-static void shake_anim(lv_obj_t * obj, lv_coord_t y_max)
+static void shake_anim(lv_obj_t * obj, int32_t y_max)
 {
     uint32_t t1 = rnd_next(300, 3000);
     uint32_t t2 = rnd_next(300, 3000);

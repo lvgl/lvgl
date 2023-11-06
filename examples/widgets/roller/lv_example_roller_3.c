@@ -17,8 +17,8 @@ static void mask_event_cb(lv_event_t * e)
     else if(code == LV_EVENT_DRAW_MAIN_BEGIN) {
         /* add mask */
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-        lv_coord_t font_h = lv_font_get_line_height(font);
+        int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        int32_t font_h = lv_font_get_line_height(font);
 
         lv_area_t roller_coords;
         lv_obj_get_coords(obj, &roller_coords);

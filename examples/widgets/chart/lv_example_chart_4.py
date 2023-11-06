@@ -10,8 +10,6 @@ def event_cb(e):
         chart.invalidate()
 
     if code == lv.EVENT.REFR_EXT_DRAW_SIZE:
-        # s = lv.coord_t.__cast__(e.get_param())
-        # print("s: {:d}".format(s))
         e.set_ext_draw_size(20)
 
     elif code == lv.EVENT.DRAW_POST_END:
@@ -72,7 +70,7 @@ chart.add_event(event_cb, lv.EVENT.ALL, None)
 chart.refresh_ext_draw_size()
 
 # Zoom in a little in X
-#chart.set_zoom_x(800)
+#chart.set_scale_x(800)
 
 # Add two data series
 ser1 = chart.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)

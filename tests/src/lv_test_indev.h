@@ -11,11 +11,11 @@ extern "C" {
 
 void lv_test_mouse_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 
-void lv_test_mouse_move_to(lv_coord_t x, lv_coord_t y);
-void lv_test_mouse_move_by(lv_coord_t x, lv_coord_t y);
+void lv_test_mouse_move_to(int32_t x, int32_t y);
+void lv_test_mouse_move_by(int32_t x, int32_t y);
 void lv_test_mouse_press(void);
 void lv_test_mouse_release(void);
-void lv_test_mouse_click_at(lv_coord_t x, lv_coord_t y);
+void lv_test_mouse_click_at(int32_t x, int32_t y);
 
 void lv_test_keypad_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 

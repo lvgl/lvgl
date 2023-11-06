@@ -575,7 +575,7 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     lv_memset(arc_path, 0, sizeof(arc_path));
 
     /*** Init path ***/
-    lv_coord_t width = dsc->width;  /* inner arc radius = outer arc radius - width */
+    int32_t width = dsc->width;  /* inner arc radius = outer arc radius - width */
     uint16_t radius = dsc->radius;
 
     if(width > radius)

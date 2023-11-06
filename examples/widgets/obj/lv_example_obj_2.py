@@ -2,7 +2,7 @@ def drag_event_handler(e):
 
     obj = e.get_target_obj()
 
-    indev = lv.indev_get_act()
+    indev = lv.indev_active()
 
     vect = lv.point_t()
     indev.get_vect(vect)

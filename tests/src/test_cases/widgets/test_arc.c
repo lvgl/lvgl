@@ -166,7 +166,7 @@ void test_arc_click_area_with_adv_hittest(void)
 /* Check value doesn't go to max when clicking on the other side of the arc */
 void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
 {
-    arc = lv_arc_create(lv_scr_act());
+    arc = lv_arc_create(lv_screen_active());
     lv_arc_set_value(arc, 0);
 
     lv_obj_set_size(arc, 100, 100);

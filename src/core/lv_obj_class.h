@@ -72,8 +72,8 @@ typedef struct _lv_obj_class_t {
 
     void * user_data;
     const char * name;
-    lv_coord_t width_def;
-    lv_coord_t height_def;
+    int32_t width_def;
+    int32_t height_def;
     uint32_t editable : 2;             /**< Value from ::lv_obj_class_editable_t*/
     uint32_t group_def : 2;            /**< Value from ::lv_obj_class_group_def_t*/
     uint32_t instance_size : 16;

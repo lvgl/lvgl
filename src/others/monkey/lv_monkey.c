@@ -149,8 +149,8 @@ static void lv_monkey_timer_cb(lv_timer_t * timer)
 
     switch(lv_indev_get_type(monkey->indev)) {
         case LV_INDEV_TYPE_POINTER:
-            data->point.x = (lv_coord_t)lv_monkey_random(0, LV_HOR_RES - 1);
-            data->point.y = (lv_coord_t)lv_monkey_random(0, LV_VER_RES - 1);
+            data->point.x = (int32_t)lv_monkey_random(0, LV_HOR_RES - 1);
+            data->point.y = (int32_t)lv_monkey_random(0, LV_VER_RES - 1);
             break;
         case LV_INDEV_TYPE_ENCODER:
             data->enc_diff = (int16_t)lv_monkey_random(monkey->config.input_range.min, monkey->config.input_range.max);

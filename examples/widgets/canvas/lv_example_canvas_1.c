@@ -20,8 +20,8 @@ void lv_example_canvas_1(void)
     rect_dsc.border_opa = LV_OPA_90;
     rect_dsc.border_color = lv_color_white();
     rect_dsc.shadow_width = 5;
-    rect_dsc.shadow_ofs_x = 5;
-    rect_dsc.shadow_ofs_y = 5;
+    rect_dsc.shadow_offset_x = 5;
+    rect_dsc.shadow_offset_y = 5;
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
