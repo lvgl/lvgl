@@ -321,6 +321,7 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     new_layer->parent = parent_layer;
     new_layer->clip_area = *area;
     new_layer->buf_area = *area;
+    new_layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), color_format);
     new_layer->color_format = color_format;
 
     if(disp->layer_head) {
@@ -372,8 +373,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
 {
-    uint32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
-    return lv_draw_buf_go_to_xy(layer->buf, stride, layer->color_format, x, y);
+    return lv_draw_buf_go_to_xy(layer->buf, layer->buf_stride, layer->color_format, x, y);
 
 }
 
