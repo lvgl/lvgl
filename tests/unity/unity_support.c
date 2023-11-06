@@ -103,11 +103,12 @@ bool lv_test_assert_image_eq(const char * fn_ref)
             uint32_t act_px = 0;
             memcpy(&ref_px, ptr_ref, 3);
             memcpy(&act_px, ptr_act, 3);
-            //printf("0xFF%06x, ", act_px);
 
             uint8_t act_swap[3] = {ptr_act[2], ptr_act[1], ptr_act[0]};
 
             if(memcmp(act_swap, ptr_ref, 3) != 0) {
+                TEST_PRINTF("Erron on x:%d, y:%d. Expected %08X, Actual %08X", x, y, ptr_ref, act_swap);
+                fflush(stderr);
                 err = true;
                 break;
             }
@@ -130,6 +131,7 @@ bool lv_test_assert_image_eq(const char * fn_ref)
 
     png_release(&p);
 
+    fflush(stdout);
     return !err;
 
 }
