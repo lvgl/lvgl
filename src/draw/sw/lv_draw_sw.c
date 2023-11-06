@@ -34,6 +34,7 @@
 static void execute_drawing(lv_draw_sw_unit_t * u);
 
 static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit);
 
 /**********************
  *  STATIC VARIABLES
@@ -60,11 +61,30 @@ void lv_draw_sw_init(void)
         lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
         draw_sw_unit->base_unit.dispatch_cb = lv_draw_sw_dispatch;
         draw_sw_unit->idx = i;
+        draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
 
 #if LV_USE_OS
         lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_HIGH, render_thread_cb, 8 * 1024, draw_sw_unit);
 #endif
     }
+}
+
+void lv_draw_sw_deinit(void)
+{
+#if LV_DRAW_SW_COMPLEX == 1
+    lv_draw_sw_mask_deinit();
+#endif
+}
+
+static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
+{
+#if LV_USE_OS
+    lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
+    return lv_thread_delete(&draw_sw_unit->thread);
+#else
+    LV_UNUSED(draw_unit);
+    return 0;
+#endif
 }
 
 /**********************

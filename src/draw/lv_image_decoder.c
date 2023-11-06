@@ -75,6 +75,14 @@ void _lv_image_decoder_init(void)
 }
 
 /**
+ * Deinitialize the image decoder module
+ */
+void _lv_image_decoder_deinit(void)
+{
+    _lv_ll_clear(img_decoder_ll_p);
+}
+
+/**
  * Get information about an image.
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
  * @param src the image source. E.g. file name or variable.
