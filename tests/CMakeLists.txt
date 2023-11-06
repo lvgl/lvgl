@@ -84,6 +84,7 @@ endif()
 set(COMPILE_OPTIONS
     -DLV_CONF_PATH=${LVGL_TEST_DIR}/src/lv_test_conf.h
     -DLV_BUILD_TEST
+    -ffloat-store
     -pedantic-errors
     -Wall
     -Wclobbered
