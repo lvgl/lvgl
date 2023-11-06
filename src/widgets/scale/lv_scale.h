@@ -90,7 +90,7 @@ typedef struct {
     int32_t rotation;
 } lv_scale_t;
 
-extern const lv_obj_class_t lv_scale_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_scale_class;
 
 /**********************
  * GLOBAL PROTOTYPES

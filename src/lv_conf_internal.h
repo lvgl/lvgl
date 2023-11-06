@@ -877,6 +877,15 @@
     #endif
 #endif
 
+/*Prefix all global extern data with this*/
+#ifndef LV_ATTRIBUTE_EXTERN_DATA
+    #ifdef CONFIG_LV_ATTRIBUTE_EXTERN_DATA
+        #define LV_ATTRIBUTE_EXTERN_DATA CONFIG_LV_ATTRIBUTE_EXTERN_DATA
+    #else
+        #define LV_ATTRIBUTE_EXTERN_DATA
+    #endif
+#endif
+
 /* Use `float` as `lv_value_precise_t` */
 #ifndef LV_USE_FLOAT
     #ifdef CONFIG_LV_USE_FLOAT
@@ -2791,6 +2800,7 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
+#define LV_ATTRIBUTE_EXTERN_DATA
 
 /*If running without lv_conf.h add typedefs with default value*/
 #ifdef LV_CONF_SKIP

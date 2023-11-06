@@ -59,7 +59,7 @@ typedef struct {
     int16_t knob_offset;        /*knob offset from the main arc*/
 } lv_arc_t;
 
-extern const lv_obj_class_t lv_arc_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_arc_class;
 
 /**********************
  * GLOBAL PROTOTYPES

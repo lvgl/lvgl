@@ -41,7 +41,7 @@ typedef struct {
     uint8_t bright;     /**< Current brightness of the LED (0..255)*/
 } lv_led_t;
 
-extern const lv_obj_class_t lv_led_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_led_class;
 
 /**********************
  * GLOBAL PROTOTYPES

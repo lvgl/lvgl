@@ -30,7 +30,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-extern const lv_obj_class_t lv_animimg_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_animimg_class;
 
 /*Data of image*/
 typedef struct {

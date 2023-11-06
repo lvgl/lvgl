@@ -32,7 +32,7 @@ typedef struct {
     uint32_t y_inv : 1;                  /**< 1: y == 0 will be on the bottom*/
 } lv_line_t;
 
-extern const lv_obj_class_t lv_line_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_line_class;
 
 /**********************
  * GLOBAL PROTOTYPES
