@@ -63,7 +63,7 @@ typedef struct {
     uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
 } lv_textarea_t;
 
-extern const lv_obj_class_t lv_textarea_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_textarea_class;
 
 enum {
     LV_PART_TEXTAREA_PLACEHOLDER = LV_PART_CUSTOM_FIRST,

@@ -196,7 +196,7 @@ enum {
 /**
  * Make the base object's class publicly available.
  */
-extern const lv_obj_class_t lv_obj_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
 
 /**
  * Special, rarely used attributes.

@@ -73,7 +73,7 @@ typedef struct {
     uint32_t refresh : 1;    /* the spangroup need refresh cache_w and cache_h */
 } lv_spangroup_t;
 
-extern const lv_obj_class_t lv_spangroup_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spangroup_class;
 
 /**********************
  * GLOBAL PROTOTYPES
