@@ -104,9 +104,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     }
 
     if(drv->cache_size) {
-        file_p->cache = lv_malloc(sizeof(lv_fs_file_cache_t));
+        file_p->cache = lv_malloc_zeroed(sizeof(lv_fs_file_cache_t));
         LV_ASSERT_MALLOC(file_p->cache);
-        lv_memzero(file_p->cache, sizeof(lv_fs_file_cache_t));
 
         /* If this is a memory-mapped file, then set "cache" to the memory buffer */
         if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {

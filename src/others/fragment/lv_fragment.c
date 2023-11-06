@@ -27,8 +27,7 @@ lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
     LV_ASSERT_NULL(cls);
     LV_ASSERT_NULL(cls->create_obj_cb);
     LV_ASSERT(cls->instance_size >= sizeof(lv_fragment_t));
-    lv_fragment_t * instance = lv_malloc(cls->instance_size);
-    lv_memzero(instance, cls->instance_size);
+    lv_fragment_t * instance = lv_malloc_zeroed(cls->instance_size);
     instance->cls = cls;
     instance->child_manager = lv_fragment_manager_create(instance);
     if(cls->constructor_cb) {

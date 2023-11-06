@@ -51,9 +51,8 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb,
                   "LV_IMGFONT_PATH_MAX_LEN must be greater than sizeof(lv_image_dsc_t)");
 
     size_t size = sizeof(imgfont_dsc_t) + sizeof(lv_font_t);
-    imgfont_dsc_t * dsc = (imgfont_dsc_t *)lv_malloc(size);
+    imgfont_dsc_t * dsc = lv_malloc_zeroed(size);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, size);
 
     dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(imgfont_dsc_t));
     dsc->path_cb = path_cb;

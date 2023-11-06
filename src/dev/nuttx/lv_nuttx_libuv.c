@@ -75,10 +75,9 @@ void * lv_nuttx_uv_init(lv_nuttx_uv_t * uv_info)
     lv_nuttx_uv_ctx_t * uv_ctx;
     int ret;
 
-    uv_ctx = lv_malloc(sizeof(lv_nuttx_uv_ctx_t));
+    uv_ctx = lv_malloc_zeroed(sizeof(lv_nuttx_uv_ctx_t));
     LV_ASSERT_MALLOC(uv_ctx);
     if(uv_ctx == NULL) return NULL;
-    lv_memset(uv_ctx, 0, sizeof(lv_nuttx_uv_ctx_t));
 
     if((ret = lv_nuttx_uv_timer_init(uv_info, uv_ctx)) < 0) {
         LV_LOG_ERROR("lv_nuttx_uv_timer_init fail : %d", ret);

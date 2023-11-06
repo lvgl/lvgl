@@ -110,10 +110,9 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
 
 lv_display_t * lv_linux_drm_create(void)
 {
-    drm_dev_t * drm_dev = lv_malloc(sizeof(drm_dev_t));
+    drm_dev_t * drm_dev = lv_malloc_zeroed(sizeof(drm_dev_t));
     LV_ASSERT_MALLOC(drm_dev);
     if(drm_dev == NULL) return NULL;
-    lv_memzero(drm_dev, sizeof(drm_dev_t));
 
     lv_display_t * disp = lv_display_create(800, 480);
     if(disp == NULL) {

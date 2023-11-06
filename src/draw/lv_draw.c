@@ -69,8 +69,7 @@ void lv_draw_deinit(void)
 
 void * lv_draw_create_unit(size_t size)
 {
-    lv_draw_unit_t * new_unit = lv_malloc(size);
-    lv_memzero(new_unit, size);
+    lv_draw_unit_t * new_unit = lv_malloc_zeroed(size);
 
     new_unit->next = _draw_info.unit_head;
     _draw_info.unit_head = new_unit;
@@ -81,8 +80,7 @@ void * lv_draw_create_unit(size_t size)
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 {
     LV_PROFILER_BEGIN;
-    lv_draw_task_t * new_task = lv_malloc(sizeof(lv_draw_task_t));
-    lv_memzero(new_task, sizeof(*new_task));
+    lv_draw_task_t * new_task = lv_malloc_zeroed(sizeof(lv_draw_task_t));
 
     new_task->area = *coords;
     new_task->clip_area = layer->clip_area;
@@ -330,10 +328,9 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
     lv_display_t * disp = _lv_refr_get_disp_refreshing();
-    lv_layer_t * new_layer = lv_malloc(sizeof(lv_layer_t));
+    lv_layer_t * new_layer = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
     if(new_layer == NULL) return NULL;
-    lv_memzero(new_layer, sizeof(lv_layer_t));
 
     new_layer->parent = parent_layer;
     new_layer->clip_area = *area;

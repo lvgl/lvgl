@@ -64,10 +64,8 @@ void lv_monkey_config_init(lv_monkey_config_t * config)
 
 lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
 {
-    lv_monkey_t * monkey = lv_malloc(sizeof(lv_monkey_t));
+    lv_monkey_t * monkey = lv_malloc_zeroed(sizeof(lv_monkey_t));
     LV_ASSERT_MALLOC(monkey);
-
-    lv_memzero(monkey, sizeof(lv_monkey_t));
 
     monkey->config = *config;
     monkey->timer = lv_timer_create(lv_monkey_timer_cb, monkey->config.period_range.min, monkey);

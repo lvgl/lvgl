@@ -383,9 +383,8 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
 
     /*There is no unused entry. Allocate one temporarily*/
     if(!entry) {
-        entry = lv_malloc(sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
+        entry = lv_malloc_zeroed(sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
         LV_ASSERT_MALLOC(entry);
-        lv_memzero(entry, sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
         entry->life = -1;
     }
     else {
@@ -1156,8 +1155,7 @@ static void circ_calc_aa4(_lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radi
     }
 
     const size_t cir_xy_size = (radius + 1) * 2 * 2 * sizeof(int32_t);
-    int32_t * cir_x = lv_malloc(cir_xy_size);
-    lv_memset(cir_x, 0, cir_xy_size);
+    int32_t * cir_x = lv_malloc_zeroed(cir_xy_size);
     int32_t * cir_y = &cir_x[(radius + 1) * 2];
 
     uint32_t y_8th_cnt = 0;
