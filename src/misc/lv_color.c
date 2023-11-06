@@ -44,8 +44,6 @@ const lv_color_filter_dsc_t lv_color_filter_shade = {.filter_cb = lv_color_filte
 uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
 {
     switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE_REVERSED:
-            return LV_COLOR_DEPTH / 8;
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_A1:
             return 1;
