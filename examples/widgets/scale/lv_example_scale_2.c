@@ -26,7 +26,7 @@ void lv_example_scale_2(void)
     lv_style_init(&indicator_style);
 
     /* Label style properties */
-    lv_style_set_text_font(&indicator_style, &lv_font_montserrat_14);
+    lv_style_set_text_font(&indicator_style, LV_FONT_DEFAULT);
     lv_style_set_text_color(&indicator_style, lv_palette_darken(LV_PALETTE_BLUE, 3));
 
     /* Major tick properties */
@@ -59,7 +59,7 @@ void lv_example_scale_2(void)
     lv_style_init(&section_main_line_style);
 
     /* Label style properties */
-    lv_style_set_text_font(&section_label_style, &lv_font_montserrat_14);
+    lv_style_set_text_font(&section_label_style, LV_FONT_DEFAULT);
     lv_style_set_text_color(&section_label_style, lv_palette_darken(LV_PALETTE_RED, 3));
 
     lv_style_set_line_color(&section_label_style, lv_palette_darken(LV_PALETTE_RED, 3));

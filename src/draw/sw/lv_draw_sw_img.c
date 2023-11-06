@@ -18,6 +18,7 @@
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_color.h"
 #include "../../stdlib/lv_string.h"
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
@@ -37,6 +38,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
 /**********************
  *  STATIC VARIABLES
  **********************/
+#define _draw_info LV_GLOBAL_DEFAULT()->draw_info
 
 /**********************
  *      MACROS
@@ -58,10 +60,9 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
     img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
     img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
     img_dsc.header.cf = layer_to_draw->color_format;
-    img_dsc.header.stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer_to_draw->buf_area),
-                                                        layer_to_draw->color_format);
+    img_dsc.header.stride = layer_to_draw->buf_stride;
     img_dsc.header.always_zero = 0;
-    img_dsc.data = lv_draw_buf_align(layer_to_draw->buf, layer_to_draw->color_format);
+    img_dsc.data = layer_to_draw->buf;
 
     lv_draw_image_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));
@@ -106,21 +107,24 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
     uint32_t idx = 0;
-    lv_display_t * disp = _lv_refr_get_disp_refreshing();
-    lv_draw_unit_t * draw_unit_tmp = disp->draw_unit_head;
+    lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
     while(draw_unit_tmp != draw_unit) {
         draw_unit_tmp = draw_unit_tmp->next;
         idx++;
     }
 
-    lv_draw_rect_dsc_t rect_dsc;
-    lv_draw_rect_dsc_init(&rect_dsc);
-    rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
-    rect_dsc.border_color = rect_dsc.bg_color;
-    rect_dsc.bg_opa = LV_OPA_10;
-    rect_dsc.border_opa = LV_OPA_100;
-    rect_dsc.border_width = 2;
-    lv_draw_sw_rect(draw_unit, &rect_dsc, &area_rot);
+    lv_draw_fill_dsc_t fill_dsc;
+    lv_draw_rect_dsc_init(&fill_dsc);
+    fill_dsc.color = lv_palette_main(idx % _LV_PALETTE_LAST);
+    fill_dsc.opa = LV_OPA_10;
+    lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
+
+    lv_draw_border_dsc_t border_dsc;
+    lv_draw_border_dsc_init(&border_dsc);
+    border_dsc.color = lv_palette_main(idx % _LV_PALETTE_LAST);
+    border_dsc.opa = LV_OPA_100;
+    border_dsc.width = 2;
+    lv_draw_sw_border(draw_unit, &border_dsc, &area_rot);
 
     lv_point_t txt_size;
     lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
@@ -131,9 +135,9 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
     txt_area.y2 = draw_area.y2;
     txt_area.y1 = draw_area.y2 - txt_size.y + 1;
 
-    lv_draw_rect_dsc_init(&rect_dsc);
-    rect_dsc.bg_color = lv_color_black();
-    lv_draw_sw_rect(draw_unit, &rect_dsc, &txt_area);
+    lv_draw_fill_dsc_init(&fill_dsc);
+    fill_dsc.color = lv_color_black();
+    lv_draw_sw_fill(draw_unit, &fill_dsc, &txt_area);
 
     char buf[8];
     lv_snprintf(buf, sizeof(buf), "%d", idx);
