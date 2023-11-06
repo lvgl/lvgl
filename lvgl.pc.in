@@ -1,0 +1,10 @@
+prefix="@CMAKE_INSTALL_PREFIX@"
+includedir="${prefix}/@INC_INSTALL_DIR@"
+libdir=${prefix}/lib
+
+Name: lvgl
+Description: Light and Versatile Graphics Library
+URL: https://lvgl.io/
+Version: 8.3.11
+Cflags: -I${includedir}
+Libs: -L${libdir} -llvgl
