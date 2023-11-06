@@ -77,8 +77,8 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_dsc_set_fill_image(ctx, &img_dsc);
     lv_matrix_identity(&mt);
     lv_matrix_translate(&mt, 50, 50);
-    lv_matrix_rotate(&mt, 45);
-    lv_matrix_scale(&mt, 1.5f, 1.5f);
+    //lv_matrix_rotate(&mt, 45);
+    //lv_matrix_scale(&mt, 1.5f, 1.5f);
     lv_matrix_translate(&mt, -50, -50);
     lv_vector_dsc_set_fill_transform(ctx, &mt);
     lv_vector_dsc_add_path(ctx, path);

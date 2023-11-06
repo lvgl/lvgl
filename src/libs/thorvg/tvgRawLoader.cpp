@@ -91,7 +91,7 @@ unique_ptr<Surface> RawLoader::bitmap()
     surface->h = static_cast<uint32_t>(h);
     surface->cs = cs;
     surface->channelSize = sizeof(uint32_t);
-    surface->premultiplied = true;
+    surface->premultiplied = false;
     surface->owner = true;
 
     return unique_ptr<Surface>(surface);
