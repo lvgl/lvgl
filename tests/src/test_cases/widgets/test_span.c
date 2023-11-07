@@ -223,19 +223,19 @@ void test_spangroup_draw(void)
     lv_span_set_text(span_2, "This text is also over 100 pixels width");
     lv_style_set_text_decor(&span_2->style, LV_TEXT_DECOR_STRIKETHROUGH);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("span_02.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_02.png");
 
     lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("span_03.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_03.png");
 
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("span_04.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_04.png");
 
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_FIXED);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("span_05.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_05.png");
 }
 
 void test_spangroup_get_child(void)

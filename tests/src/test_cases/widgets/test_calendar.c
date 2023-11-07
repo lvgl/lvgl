@@ -69,14 +69,14 @@ void test_calendar_set_today_date_gui(void)
     lv_calendar_set_today_date(calendar, today.year, today.month, today.day);
     lv_calendar_set_showed_date(calendar, 2022, 9);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("calendar_01.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_01.png");
 }
 
 void test_calendar_set_showed_date_gui(void)
 {
     lv_calendar_set_showed_date(calendar, 2022, 9);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("calendar_02.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_02.png");
 }
 
 void test_calendar_set_highlighted_dates(void)
@@ -126,7 +126,7 @@ void test_calendar_set_highlighted_dates_gui(void)
 
     lv_calendar_set_showed_date(calendar, 2022, 2);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("calendar_03.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_03.png");
 }
 
 void test_calendar_set_day_names_gui(void)
@@ -137,7 +137,7 @@ void test_calendar_set_day_names_gui(void)
 
     lv_calendar_set_showed_date(calendar, 2022, 9);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("calendar_04.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_04.png");
 }
 
 void test_calendar_get_highlighted_dates_num(void)
@@ -167,7 +167,7 @@ void test_calendar_header_dropdown_create_gui(void)
 
     lv_calendar_set_showed_date(calendar, 2022, 9);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("calendar_05.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_05.png");
 }
 
 void test_calendar_header_arrow_create_gui(void)
@@ -176,7 +176,7 @@ void test_calendar_header_arrow_create_gui(void)
 
     lv_calendar_set_showed_date(calendar, 2022, 10);    // Use October to avoid month name sliding
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("calendar_06.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_06.png");
 }
 
 void test_calendar_event_key_down_gui(void)
@@ -187,7 +187,7 @@ void test_calendar_event_key_down_gui(void)
 
     lv_obj_send_event(calendar, LV_EVENT_KEY, (void *) &key);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("calendar_07.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_07.png");
 }
 
 void test_calendar_get_pressed_date_null(void)

@@ -37,7 +37,7 @@ void test_image_rotated_pivot_center(void)
         /*The default pivot should be the center*/
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_rotate_pivot_center.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_rotate_pivot_center.png");
 }
 
 void test_image_rotated_pivot_top_left(void)
@@ -51,7 +51,7 @@ void test_image_rotated_pivot_top_left(void)
         lv_image_set_pivot(img, 0, 0);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_rotate_pivot_top_left.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_rotate_pivot_top_left.png");
 }
 
 void test_image_scale_pivot_center(void)
@@ -65,7 +65,7 @@ void test_image_scale_pivot_center(void)
         /*The default pivot should be the center*/
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_scale_pivot_center.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_scale_pivot_center.png");
 }
 
 void test_image_scale_pivot_top_left(void)
@@ -79,7 +79,7 @@ void test_image_scale_pivot_top_left(void)
         lv_image_set_pivot(img, 0, 0);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_scale_pivot_top_left.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_scale_pivot_top_left.png");
 }
 
 void test_image_scale_x_pivot_center(void)
@@ -93,7 +93,7 @@ void test_image_scale_x_pivot_center(void)
         /*The default pivot should be the center*/
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_scale_x_pivot_center.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_scale_x_pivot_center.png");
 }
 
 void test_image_scale_x_pivot_top_left(void)
@@ -107,7 +107,7 @@ void test_image_scale_x_pivot_top_left(void)
         lv_image_set_pivot(img, 0, 0);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_scale_x_pivot_top_left.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_scale_x_pivot_top_left.png");
 }
 
 void test_image_scale_y_pivot_center(void)
@@ -121,7 +121,7 @@ void test_image_scale_y_pivot_center(void)
         /*The default pivot should be the center*/
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_scale_y_pivot_center.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_scale_y_pivot_center.png");
 }
 
 void test_image_scale_y_pivot_top_left(void)
@@ -135,7 +135,7 @@ void test_image_scale_y_pivot_top_left(void)
         lv_image_set_pivot(img, 0, 0);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_scale_y_pivot_top_left.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_scale_y_pivot_top_left.png");
 }
 
 void test_image_rotate_and_scale_pivot_center(void)
@@ -151,7 +151,7 @@ void test_image_rotate_and_scale_pivot_center(void)
         /*The default pivot should be the center*/
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_rotate_and_scale_pivot_center.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_rotate_and_scale_pivot_center.png");
 }
 
 void test_image_rotate_and_scale_pivot_top_left(void)
@@ -167,7 +167,7 @@ void test_image_rotate_and_scale_pivot_top_left(void)
         lv_image_set_pivot(img, 0, 0);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_rotate_and_scale_pivot_top_left.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_rotate_and_scale_pivot_top_left.png");
 }
 
 void test_image_normal_align(void)
@@ -187,7 +187,7 @@ void test_image_normal_align(void)
         lv_image_set_align(img, aligns[i]);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_normal_align.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_normal_align.png");
 }
 
 void test_image_normal_align_offset(void)
@@ -209,7 +209,7 @@ void test_image_normal_align_offset(void)
         lv_image_set_offset_y(img, 20);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_normal_align_offset.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_normal_align_offset.png");
 }
 
 void test_image_transform_align(void)
@@ -232,7 +232,7 @@ void test_image_transform_align(void)
         lv_image_set_align(img, aligns[i]);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_transform_align.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_transform_align.png");
 }
 
 void test_image_transform_align_offset(void)
@@ -257,7 +257,7 @@ void test_image_transform_align_offset(void)
         lv_image_set_rotation(img, 200);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_transform_align_offset.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_transform_align_offset.png");
 }
 
 void test_image_stretch(void)
@@ -279,7 +279,7 @@ void test_image_stretch(void)
         lv_image_set_align(img, LV_IMAGE_ALIGN_STRETCH);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_stretch.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_stretch.png");
 }
 
 
@@ -316,7 +316,7 @@ void test_image_tile(void)
     lv_image_set_offset_x(img, -2000);
     lv_image_set_offset_y(img, 2000);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("image_tile.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_tile.png");
 }
 
 void test_image_ignore_transformation_settings_when_stretched(void)

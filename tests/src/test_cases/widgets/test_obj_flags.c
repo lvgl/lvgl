@@ -88,14 +88,14 @@ void test_obj_flag_overflow_visible_1(void)
     TEST_ASSERT_EQUAL_UINT32(1, cnt_1);
     TEST_ASSERT_EQUAL_UINT32(2, cnt_2);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("obj_flag_overflow_visible_1_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_overflow_visible_1_1.png");
 
     /*Test if the overflowing parts are rendered correctly after scrolling too*/
     lv_obj_scroll_by_bounded(obj_main, -20, 0, LV_ANIM_OFF);
-    TEST_ASSERT_EQUAL_SCREENSHOT("obj_flag_overflow_visible_1_2.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_overflow_visible_1_2.png");
 
     lv_obj_scroll_by_bounded(obj_child_2, -30, 0, LV_ANIM_OFF);
-    TEST_ASSERT_EQUAL_SCREENSHOT("obj_flag_overflow_visible_1_3.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_overflow_visible_1_3.png");
 
     /*Test with rotation*/
     lv_obj_set_style_transform_rotation(obj_main, 300, 0);
@@ -138,7 +138,7 @@ void test_obj_flag_overflow_visible_1(void)
 
     TEST_ASSERT_EQUAL_UINT32(1, cnt_1);
     TEST_ASSERT_EQUAL_UINT32(2, cnt_2);
-    TEST_ASSERT_EQUAL_SCREENSHOT("obj_flag_overflow_visible_1_4.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_overflow_visible_1_4.png");
 
 }
 

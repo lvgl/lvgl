@@ -194,7 +194,7 @@ void test_table_rendering(void)
     lv_table_add_cell_ctrl(table, 4, 3, LV_TABLE_CELL_CTRL_TEXT_CROP);
     lv_table_set_cell_value_fmt(table, 4, 3, "crop crop crop crop crop crop crop crop ");
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("table_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/table_1.png");
 }
 
 /* See #3120 for context */

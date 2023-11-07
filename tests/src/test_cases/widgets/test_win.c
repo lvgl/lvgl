@@ -108,7 +108,7 @@ void test_win_add_button(void)
     TEST_ASSERT_EQUAL(win_button_width, lv_obj_get_width(btn));
 
     // Check the output remains visually consistent
-    TEST_ASSERT_EQUAL_SCREENSHOT("win_01.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/win_01.png");
 }
 
 void test_win_add_multiple_elements(void)
@@ -155,7 +155,7 @@ void test_win_add_multiple_elements(void)
     TEST_ASSERT_EQUAL(win_button_close_width, lv_obj_get_width(btn));
 
     // Check the output remains visually consistent
-    TEST_ASSERT_EQUAL_SCREENSHOT("win_02.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/win_02.png");
 }
 
 #endif

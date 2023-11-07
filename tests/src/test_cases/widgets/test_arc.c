@@ -199,7 +199,7 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
     TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
     TEST_ASSERT_EQUAL_INT32(lv_arc_get_min_value(arc), lv_arc_get_value(arc));
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("arc_2.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_2.png");
 }
 
 void test_arc_basic_render(void)
@@ -207,7 +207,7 @@ void test_arc_basic_render(void)
     arc = lv_arc_create(lv_screen_active());
     lv_obj_set_size(arc, 100, 100);
     lv_obj_center(arc);
-    TEST_ASSERT_EQUAL_SCREENSHOT("arc_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_1.png");
 }
 
 static void dummy_event_cb(lv_event_t * e)

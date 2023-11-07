@@ -58,7 +58,7 @@ void test_list_snapshot(void)
 
     lv_obj_center(snapshot_list);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("list_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/list_1.png");
 }
 
 #endif
