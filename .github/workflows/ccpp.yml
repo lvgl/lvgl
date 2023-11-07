@@ -60,14 +60,9 @@ jobs:
       matrix:
         arch: [ 'aarch64', 'armv6', 'armv7' ]
 
-    env:
-        NON_AMD64_BUILD: 1
-
     steps:
       - uses: actions/checkout@v4
       - uses: ammaraskar/gcc-problem-matcher@master
-      - name: Print environment variable
-        run: echo "NON_AMD64_BUILD=$NON_AMD64_BUILD"
       - name: Setup cache
         uses: actions/cache@v3
         with:
@@ -104,7 +99,7 @@ jobs:
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 
           run: |
-            env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+            env PATH="/usr/lib/ccache:$PATH" NON_AMD64_BUILD=1 ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
       - name: Archive screenshot errors
         if: failure()
         uses: actions/upload-artifact@v3
