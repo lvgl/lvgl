@@ -82,16 +82,17 @@ void lv_mem_init(void)
 #else
     state.tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_ADR, LV_MEM_SIZE);
 #endif
+
+#if LV_USE_OS
+    lv_mutex_init(&state.mutex);
+#endif
+
     _lv_ll_init(&state.pool_ll, sizeof(lv_pool_t));
 
     /*Record the first pool*/
     lv_pool_t * pool_p = _lv_ll_ins_tail(&state.pool_ll);
     LV_ASSERT_MALLOC(pool_p);
     *pool_p = lv_tlsf_get_pool(state.tlsf);
-
-#if LV_USE_OS
-    lv_mutex_init(&state.mutex);
-#endif
 
 #if LV_MEM_ADD_JUNK
     LV_LOG_WARN("LV_MEM_ADD_JUNK is enabled which makes LVGL much slower");
@@ -102,7 +103,9 @@ void lv_mem_deinit(void)
 {
     _lv_ll_clear(&state.pool_ll);
     lv_tlsf_destroy(state.tlsf);
-    lv_mem_init();
+#if LV_USE_OS
+    lv_mutex_delete(&state.mutex);
+#endif
 }
 
 lv_mem_pool_t lv_mem_add_pool(void * mem, size_t bytes)
