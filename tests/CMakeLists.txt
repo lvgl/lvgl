@@ -83,6 +83,7 @@ endif()
 
 if ($ENV{NON_AMD64_BUILD})
     set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
+    message("Non AMD64 target is specified")
 endif()
 
 # Options lvgl and examples are compiled with.
