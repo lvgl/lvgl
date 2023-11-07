@@ -2615,6 +2615,35 @@
     #endif
 #endif
 
+/*Driver for win32 display and input devices*/
+#ifndef LV_USE_WIN32
+    #ifdef CONFIG_LV_USE_WIN32
+        #define LV_USE_WIN32 CONFIG_LV_USE_WIN32
+    #else
+        #define LV_USE_WIN32    0
+    #endif
+#endif
+#if LV_USE_WIN32
+    #ifndef LV_WIN32_MONITOR_ZOOM
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_WIN32_MONITOR_ZOOM
+                #define LV_WIN32_MONITOR_ZOOM CONFIG_LV_WIN32_MONITOR_ZOOM
+            #else
+                #define LV_WIN32_MONITOR_ZOOM 0
+            #endif
+        #else
+            #define LV_WIN32_MONITOR_ZOOM 1
+        #endif
+    #endif
+    #ifndef LV_WIN32_DEFAULT_SCREEN_DPI
+        #ifdef CONFIG_LV_WIN32_DEFAULT_SCREEN_DPI
+            #define LV_WIN32_DEFAULT_SCREEN_DPI CONFIG_LV_WIN32_DEFAULT_SCREEN_DPI
+        #else
+            #define LV_WIN32_DEFAULT_SCREEN_DPI 96
+        #endif
+    #endif
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/

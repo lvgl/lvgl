@@ -126,6 +126,8 @@ extern "C" {
 
 #include "src/dev/evdev/lv_evdev.h"
 
+#include "src/dev/win32/lv_win32.h"
+
 #include "src/core/lv_global.h"
 /*********************
  *      DEFINES

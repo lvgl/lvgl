@@ -801,6 +801,13 @@
 /*Driver for evdev input devices*/
 #define LV_USE_EVDEV    0
 
+/*Driver for win32 display and input devices*/
+#define LV_USE_WIN32    0
+#if LV_USE_WIN32
+    #define LV_WIN32_MONITOR_ZOOM 1
+    #define LV_WIN32_DEFAULT_SCREEN_DPI 96
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/
