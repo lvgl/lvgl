@@ -85,10 +85,7 @@ void lv_draw_sw_deinit(void)
 #if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
     tvg_engine_term(TVG_ENGINE_SW);
 #endif
-}
 
-void lv_draw_sw_deinit(void)
-{
 #if LV_DRAW_SW_COMPLEX == 1
     lv_draw_sw_mask_deinit();
 #endif
