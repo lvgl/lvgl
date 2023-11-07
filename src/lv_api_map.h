@@ -44,7 +44,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef int32_t int32_t;
+typedef int32_t                     lv_coord_t;
 typedef lv_result_t                 lv_res_t;
 typedef lv_image_dsc_t              lv_img_dsc_t;
 typedef lv_display_t                lv_disp_t;
@@ -132,7 +132,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_flush_ready              lv_display_flush_ready
 #define lv_disp_flush_is_last            lv_display_flush_is_last
 #define lv_disp_is_double_buffered       lv_display_is_double_buffered
-#define lv_disp_get_scr_act              lv_display_get_screen_act
+#define lv_disp_get_scr_act              lv_display_get_screen_active
 #define lv_disp_get_scr_prev             lv_display_get_screen_prev
 #define lv_disp_load_scr                 lv_display_load_scr
 #define lv_disp_get_layer_top            lv_display_get_layer_top
