@@ -80,11 +80,15 @@ else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
 
+
+if ($ENV{NON_AMD64_BUILD})
+    set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
+endif()
+
 # Options lvgl and examples are compiled with.
 set(COMPILE_OPTIONS
     -DLV_CONF_PATH=${LVGL_TEST_DIR}/src/lv_test_conf.h
     -DLV_BUILD_TEST
-    -ffloat-store
     -pedantic-errors
     -Wall
     -Wclobbered
@@ -109,6 +113,7 @@ set(COMPILE_OPTIONS
     -Werror=float-conversion
     -Werror=strict-aliasing
     ${BUILD_OPTIONS}
+    ${BUILD_TARGET_DEF}
 )
 
 # Options test cases are compiled with.

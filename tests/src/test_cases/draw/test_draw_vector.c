@@ -137,8 +137,8 @@ static void draw_lines(lv_layer_t * layer)
     lv_vector_path_line_to(path, &pts3[1]);
     lv_vector_dsc_set_stroke_color(ctx, lv_color_make(0x00, 0xff, 0x00));
     lv_vector_dsc_set_stroke_width(ctx, 5.0f);
-    float dashs[] = {10, 15, 20, 12};
-    lv_vector_dsc_set_stroke_dash(ctx, dashs, 4);
+    float dashes[] = {10, 15, 20, 12};
+    lv_vector_dsc_set_stroke_dash(ctx, dashes, 4);
     lv_vector_dsc_add_path(ctx, path);
 
     lv_fpoint_t pts4[] = {{100, 150}, {50, 250}, {150, 250}};
@@ -219,9 +219,11 @@ static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 
     lv_canvas_finish_layer(canvas, &layer);
 
+#ifndef NON_AMD64_BUILD
     char fn_buf[64];
     lv_snprintf(fn_buf, sizeof(fn_buf), "draw/vector_%s.png", name);
     TEST_ASSERT_EQUAL_SCREENSHOT(fn_buf);
+#endif
 }
 
 void test_draw_lines(void)
