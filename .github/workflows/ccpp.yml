@@ -66,6 +66,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ammaraskar/gcc-problem-matcher@master
+      - name: Print environment variable
+        run: echo "NON_AMD64_BUILD=$NON_AMD64_BUILD"
       - name: Setup cache
         uses: actions/cache@v3
         with:
