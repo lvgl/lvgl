@@ -224,7 +224,7 @@ static int fbdev_get_pinfo(int fd, FAR struct fb_planeinfo_s * pinfo)
     }
 
     LV_LOG_INFO("PlaneInfo (plane %d):", pinfo->display);
-    LV_LOG_INFO("    mem: %p", pinfo->mem);
+    LV_LOG_INFO("    mem: %p", pinfo->fbmem);
     LV_LOG_INFO("    fblen: %zu", pinfo->fblen);
     LV_LOG_INFO("   stride: %u", pinfo->stride);
     LV_LOG_INFO("  display: %u", pinfo->display);
