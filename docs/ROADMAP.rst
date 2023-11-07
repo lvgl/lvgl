@@ -15,7 +15,7 @@ Naming and API
 
 - |check| `lv_style_set_size()` should have separate width and height parameters
 - |check| Reconsider image color formats.
-- |uncheck| More consistent names:`remove/clear/delete/del`, `offset/ofs`, `add/create/register`, `id/idx/index`, `middle/mid/center`, `img/image`, `txt/text`, `opa/opacity/alpha`, `scr/screen`, `disp, display`, `finished/complete/completed/ready`, `buf/buffer`,  `..._cb`, `angle/rotation`, `zoom/scale`, `has`, `is`, `enable`
+- |check| More consistent names:`remove/clear/delete/del`, `offset/ofs`, `add/create/register`, `id/idx/index`, `middle/mid/center`, `img/image`, `txt/text`, `opa/opacity/alpha`, `scr/screen`, `disp, display`, `finished/complete/completed/ready`, `buf/buffer`,  `..._cb`, `angle/rotation`, `zoom/scale`, `has`, `is`, `enable`
 - |check| Update canvas API `LINK <https://github.com/lvgl/lvgl/issues/3393>`__
 - |check| `LV_STYLE_PROP_INHERIT` -> `LV_STYLE_PROP_FLAG_INHERITABLE`
   `LINK <https://github.com/lvgl/lvgl/pull/3390#discussion_r885915769>`__
@@ -53,13 +53,11 @@ Architecture
 - |check| Limit the image caching size in bytes instead of image count
 - |check| lv_draw_buf for unified stride, buffer and cache invalidation management. `4241 <https://github.com/lvgl/lvgl/pull/4241>`__
 - |uncheck| SVG support: integrate an SVG render library `4388 <https://github.com/lvgl/lvgl/issues/4388>`__
-- |uncheck| Introduce optional ``float`` support. `4648 <https://github.com/lvgl/lvgl/issues/4648>`__
+- |check| Introduce optional ``float`` support. `4648 <https://github.com/lvgl/lvgl/issues/4648>`__
 - |uncheck| Introduce support layer for 3D GPUs (OpenGL, SDL, Vulkan, etc).  `4622 <https://github.com/lvgl/lvgl/issues/4622>`__
 
 Styles
 ~~~~~~
-
-- |uncheck| Make `style_bg_img` `LV_PART_BACKGROUNG`
 - |check| non-uniform scale of images: scale width and height differently
 - |uncheck| Scroll anim settings should come from styles to allow customization
 
@@ -67,7 +65,7 @@ Widgets
 ~~~~~~~
 
 - |check| Universal scale widget/support
-- |uncheck| `lv_img`: Reconsider image sizing models
+- |check| `lv_img`: Reconsider image sizing models
   (when the image size is not content): center, top-left, zoom, tile, other?
 - |uncheck| `lv_tabview` Replace button matrix with real buttons for more flexibility
 - |uncheck| `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
