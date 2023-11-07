@@ -188,6 +188,7 @@ static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     barcode->light_color = lv_color_white();
     barcode->scale = 1;
     barcode->direction = LV_DIR_HOR;
+    lv_image_set_align(obj, LV_IMAGE_ALIGN_TILE);
 }
 
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)

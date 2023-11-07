@@ -56,6 +56,7 @@ typedef struct _lv_draw_image_dsc_t {
 
     int32_t frame_id;
     uint16_t antialias      : 1;
+    uint16_t tile           : 1;
     lv_draw_image_sup_t * sup;
 } lv_draw_image_dsc_t;
 
