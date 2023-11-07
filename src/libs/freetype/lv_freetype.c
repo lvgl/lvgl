@@ -172,13 +172,12 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, uint16
     }
 
     size_t need_size = sizeof(lv_freetype_font_dsc_t) + sizeof(lv_font_t);
-    lv_freetype_font_dsc_t * dsc = lv_malloc(need_size);
+    lv_freetype_font_dsc_t * dsc = lv_malloc_zeroed(need_size);
     LV_ASSERT_MALLOC(dsc);
     if(!dsc) {
         LV_LOG_ERROR("malloc failed for lv_freetype_font_dsc");
         return NULL;
     }
-    lv_memzero(dsc, need_size);
 
     dsc->font = (lv_font_t *)(((uint8_t *)dsc) + sizeof(lv_freetype_font_dsc_t));
 

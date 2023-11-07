@@ -84,7 +84,6 @@ void _lv_sysmon_builtin_deinit(void)
 {
     lv_async_call_cancel(sysmon_backend_init_async_cb, NULL);
 #if LV_USE_PERF_MONITOR
-    //    lv_subject_deinit(&sysmon_perf->subject);
     lv_timer_delete(sysmon_perf.timer);
 #endif
 }
@@ -101,8 +100,6 @@ lv_obj_t * lv_sysmon_create(lv_obj_t * parent)
     lv_label_set_text(label, "?");
     return label;
 }
-
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -147,6 +144,7 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
 static void perf_update_timer_cb(lv_timer_t * t)
 {
     lv_sysmon_perf_info_t * info = lv_timer_get_user_data(t);
+    info->calculated.run_cnt++;
 
     info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt /
                                                                info->measured.refr_interval_sum) : 0;
@@ -159,12 +157,19 @@ static void perf_update_timer_cb(lv_timer_t * t)
                                       : 0;
     info->calculated.render_real_avg_time = info->calculated.render_avg_time - info->calculated.flush_avg_time;
 
+    info->calculated.cpu_avg_total = ((info->calculated.cpu_avg_total * (info->calculated.run_cnt - 1)) +
+                                      info->calculated.cpu) / info->calculated.run_cnt;
+    info->calculated.fps_avg_total = ((info->calculated.fps_avg_total * (info->calculated.run_cnt - 1)) +
+                                      info->calculated.fps) / info->calculated.run_cnt;
+
     lv_subject_set_pointer(&sysmon_perf.subject, info);
 
-    uint32_t refr_start = info->measured.refr_start;
+    lv_sysmon_perf_info_t prev_info = *info;
     lv_memzero(info, sizeof(lv_sysmon_perf_info_t));
-    info->measured.refr_start = refr_start;
-
+    info->measured.refr_start = prev_info.measured.refr_start;
+    info->calculated.cpu_avg_total = prev_info.calculated.cpu_avg_total;
+    info->calculated.fps_avg_total = prev_info.calculated.fps_avg_total;
+    info->calculated.run_cnt = prev_info.calculated.run_cnt;
 }
 
 static void perf_observer_cb(lv_subject_t * subject, lv_observer_t * observer)

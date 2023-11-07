@@ -91,10 +91,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
 lv_display_t * lv_linux_fbdev_create(void)
 {
-    lv_linux_fb_t * dsc = lv_malloc(sizeof(lv_linux_fb_t));
+    lv_linux_fb_t * dsc = lv_malloc_zeroed(sizeof(lv_linux_fb_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_linux_fb_t));
 
     lv_display_t * disp = lv_display_create(800, 480);
     if(disp == NULL) {

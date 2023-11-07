@@ -45,7 +45,7 @@ typedef struct {
     uint32_t digit_step_dir : 2; /* the direction the digit will step on encoder button press when editing*/
 } lv_spinbox_t;
 
-extern const lv_obj_class_t lv_spinbox_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spinbox_class;
 
 /**********************
  * GLOBAL PROTOTYPES

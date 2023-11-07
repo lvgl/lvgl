@@ -75,6 +75,14 @@ void _lv_image_decoder_init(void)
 }
 
 /**
+ * Deinitialize the image decoder module
+ */
+void _lv_image_decoder_deinit(void)
+{
+    _lv_ll_clear(img_decoder_ll_p);
+}
+
+/**
  * Get information about an image.
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
  * @param src the image source. E.g. file name or variable.
@@ -338,14 +346,13 @@ static lv_image_decoder_built_in_data_t * get_decoder_data(lv_image_decoder_dsc_
 {
     lv_image_decoder_built_in_data_t * data = dsc->user_data;
     if(data == NULL) {
-        data = lv_malloc(sizeof(lv_image_decoder_built_in_data_t));
+        data = lv_malloc_zeroed(sizeof(lv_image_decoder_built_in_data_t));
         LV_ASSERT_MALLOC(data);
         if(data == NULL) {
             LV_LOG_ERROR("out of memory");
             return NULL;
         }
 
-        lv_memzero(data, sizeof(lv_image_decoder_built_in_data_t));
         dsc->user_data = data;
     }
 
@@ -581,7 +588,7 @@ lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_imag
 
         if(res != LV_RESULT_OK) {
             lv_fs_close(&f);
-            lv_memset(&decoder_data->f, 0, sizeof(decoder_data->f));
+            lv_memzero(&decoder_data->f, sizeof(decoder_data->f));
         }
 
         return res;

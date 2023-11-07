@@ -23,6 +23,10 @@ extern "C" {
 #error "lv_sysmon: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
+#if LV_USE_OBSERVER == 0
+#error "lv_observer: lv_observer is required. Enable it in lv_conf.h (LV_USE_OBSERVER  1) "
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -58,6 +62,9 @@ typedef struct {
         uint32_t render_avg_time;
         uint32_t flush_avg_time;
         uint32_t render_real_avg_time;
+        uint32_t cpu_avg_total;
+        uint32_t fps_avg_total;
+        uint32_t run_cnt;
     } calculated;
 
 } lv_sysmon_perf_info_t;

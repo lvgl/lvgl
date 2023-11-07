@@ -45,6 +45,11 @@ void _lv_fs_init(void)
     _lv_ll_init(fsdrv_ll_p, sizeof(lv_fs_drv_t *));
 }
 
+void _lv_fs_deinit(void)
+{
+    _lv_ll_clear(fsdrv_ll_p);
+}
+
 bool lv_fs_is_ready(char letter)
 {
     lv_fs_drv_t * drv = lv_fs_get_drv(letter);
@@ -99,9 +104,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     }
 
     if(drv->cache_size) {
-        file_p->cache = lv_malloc(sizeof(lv_fs_file_cache_t));
+        file_p->cache = lv_malloc_zeroed(sizeof(lv_fs_file_cache_t));
         LV_ASSERT_MALLOC(file_p->cache);
-        lv_memzero(file_p->cache, sizeof(lv_fs_file_cache_t));
 
         /* If this is a memory-mapped file, then set "cache" to the memory buffer */
         if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {

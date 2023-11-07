@@ -528,7 +528,16 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     blend_area.x2 = shadow_area.x2 - corner_size;
     blend_area.y1 = shadow_area.y1 + corner_size;
     blend_area.y2 = shadow_area.y2 - corner_size;
+    blend_area.y1 = LV_MIN(blend_area.y1, h_half + 1);
+    blend_area.y2 = LV_MAX(blend_area.y2, h_half);
     blend_dsc.mask_buf = mask_buf;
+
+
+
+
+
+
+
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {

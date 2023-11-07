@@ -262,11 +262,9 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(obj->spec_attr == NULL) {
-        obj->spec_attr = lv_malloc(sizeof(_lv_obj_spec_attr_t));
+        obj->spec_attr = lv_malloc_zeroed(sizeof(_lv_obj_spec_attr_t));
         LV_ASSERT_MALLOC(obj->spec_attr);
         if(obj->spec_attr == NULL) return;
-
-        lv_memzero(obj->spec_attr, sizeof(_lv_obj_spec_attr_t));
 
         obj->spec_attr->scroll_dir = LV_DIR_ALL;
         obj->spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
@@ -728,8 +726,7 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     obj->state = new_state;
 
 
-    _lv_obj_style_transition_dsc_t * ts = lv_malloc(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
-    lv_memzero(ts, sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    _lv_obj_style_transition_dsc_t * ts = lv_malloc_zeroed(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     uint32_t tsi = 0;
     uint32_t i;
     for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {

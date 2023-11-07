@@ -164,10 +164,9 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
 lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
 {
-    lv_evdev_t * dsc = lv_malloc(sizeof(lv_evdev_t));
+    lv_evdev_t * dsc = lv_malloc_zeroed(sizeof(lv_evdev_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_evdev_t));
 
     dsc->fd = open(dev_path, O_RDONLY | O_NOCTTY | O_CLOEXEC);
     if(dsc->fd < 0) {

@@ -65,6 +65,11 @@ void _lv_cache_builtin_init(void)
     _cache_manager.empty_cb = empty_cb;
 }
 
+void _lv_cache_builtin_deinit(void)
+{
+    _lv_ll_clear(&dsc.entry_ll);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

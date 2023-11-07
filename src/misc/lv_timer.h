@@ -85,6 +85,11 @@ typedef struct {
  */
 void _lv_timer_core_init(void);
 
+/**
+ * Deinit the lv_timer module
+ */
+void _lv_timer_core_deinit(void);
+
 //! @cond Doxygen_Suppress
 
 /**

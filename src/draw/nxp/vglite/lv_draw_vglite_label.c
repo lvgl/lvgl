@@ -175,7 +175,7 @@ static void _vglite_draw_letter(const lv_area_t * dest_area,
     mask_vgbuf.height = (int32_t)lv_area_get_height(mask_area);
     mask_vgbuf.stride = (int32_t)mask_stride;
 
-    lv_memset(&mask_vgbuf.yuv, 0, sizeof(mask_vgbuf.yuv));
+    lv_memzero(&mask_vgbuf.yuv, sizeof(mask_vgbuf.yuv));
 
     mask_vgbuf.memory = (void *)mask_buf;
     mask_vgbuf.address = (uint32_t)mask_vgbuf.memory;

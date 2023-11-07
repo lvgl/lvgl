@@ -317,6 +317,9 @@
  *should also appear on LVGL binding API such as Micropython.*/
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning /*The default value just prevents GCC warning*/
 
+/*Prefix all global extern data with this*/
+#define LV_ATTRIBUTE_EXTERN_DATA
+
 /* Use `float` as `lv_value_precise_t` */
 #define LV_USE_FLOAT            0
 

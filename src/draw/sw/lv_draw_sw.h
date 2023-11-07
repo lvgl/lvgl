@@ -86,6 +86,15 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 #if LV_USE_VECTOR_GRAPHIC
 void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc_t * dsc);
 #endif
+
+/**
+ * Swap the upper and lower byte of an RGB565 buffer.
+ * Might be required if a 8bit parallel port or an SPI port send the bytes in the wrong order.
+ * The bytes will be swapped in place.
+ * @param buf_size_px   number of pixels in the buffer
+ */
+void lv_draw_sw_rgb565_swap(void * buf, int32_t buf_size_px);
+
 /***********************
  * GLOBAL VARIABLES
  ***********************/

@@ -97,7 +97,7 @@ void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
     vgbuf->height = (int32_t)height;
     vgbuf->stride = (int32_t)stride;
 
-    lv_memset(&vgbuf->yuv, 0, sizeof(vgbuf->yuv));
+    lv_memzero(&vgbuf->yuv, sizeof(vgbuf->yuv));
 
     vgbuf->memory = buf;
     vgbuf->address = (uint32_t)vgbuf->memory;

@@ -258,7 +258,6 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_timer_set_repeat_count(stop_start_anim_timer, 1);
 
     lv_anim_init(&a);
-    lv_anim_set_path_cb(&a, lv_anim_path_bounce);
 
     uint32_t i;
     lv_anim_set_exec_cb(&a, start_anim_cb);
@@ -757,8 +756,7 @@ int32_t get_sin(int32_t deg, int32_t a)
 {
     int32_t r = lv_trigo_sin(deg) * a;
 
-    r += LV_TRIGO_SIN_MAX / 2;
-    return r >> LV_TRIGO_SHIFT;
+    return (r + LV_TRIGO_SIN_MAX / 2) >> LV_TRIGO_SHIFT;
 
 }
 
@@ -880,7 +878,6 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             int32_t x2_in = get_cos(di, r_in);
             draw_dsc.p[2].x = center.x + x2_in;
             draw_dsc.p[2].y = center.y + get_sin(di, r_in);
-
 
             lv_draw_triangle(layer, &draw_dsc);
 

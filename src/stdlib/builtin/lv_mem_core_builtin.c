@@ -186,7 +186,7 @@ void lv_free_core(void * p)
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 {
     /*Init the data*/
-    lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
+    lv_memzero(mon_p, sizeof(lv_mem_monitor_t));
     LV_TRACE_MEM("begin");
 
     lv_pool_t * pool_p;

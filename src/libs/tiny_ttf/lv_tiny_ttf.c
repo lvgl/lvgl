@@ -11,8 +11,6 @@
 #define STBTT_HEAP_FACTOR_SIZE_DEFAULT 10
 #define STBTT_malloc(x, u) ((void)(u), lv_malloc(x))
 #define STBTT_free(x, u) ((void)(u), lv_free(x))
-#define TTF_MALLOC(x) (lv_malloc(x))
-#define TTF_FREE(x) (lv_free(x))
 
 #if LV_TINY_TTF_FILE_SUPPORT != 0
 /* a hydra stream that can be in memory or from a file*/
@@ -183,7 +181,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
         LV_LOG_ERROR("tiny_ttf: invalid argument\n");
         return NULL;
     }
-    ttf_font_desc_t * dsc = (ttf_font_desc_t *)TTF_MALLOC(sizeof(ttf_font_desc_t));
+    ttf_font_desc_t * dsc = lv_malloc_zeroed(sizeof(ttf_font_desc_t));
     if(dsc == NULL) {
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
         return NULL;
@@ -191,21 +189,18 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
 #if LV_TINY_TTF_FILE_SUPPORT != 0
     if(path != NULL) {
         if(LV_FS_RES_OK != lv_fs_open(&dsc->file, path, LV_FS_MODE_RD)) {
-            TTF_FREE(dsc);
+            lv_free(dsc);
             LV_LOG_ERROR("tiny_ttf: unable to open %s\n", path);
             return NULL;
         }
         dsc->stream.file = &dsc->file;
     }
     else {
-        dsc->stream.file = NULL;
         dsc->stream.data = (const uint8_t *)data;
         dsc->stream.size = data_size;
-        dsc->stream.position = 0;
     }
     if(0 == stbtt_InitFont(&dsc->info, &dsc->stream, stbtt_GetFontOffsetForIndex(&dsc->stream, 0))) {
-        TTF_FREE(dsc);
-
+        lv_free(dsc);
         LV_LOG_ERROR("tiny_ttf: init failed\n");
         return NULL;
     }
@@ -213,19 +208,18 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
 #else
     dsc->stream = (const uint8_t *)data;
     if(0 == stbtt_InitFont(&dsc->info, dsc->stream, stbtt_GetFontOffsetForIndex(dsc->stream, 0))) {
-        TTF_FREE(dsc);
+        lv_free(dsc);
         LV_LOG_ERROR("tiny_ttf: init failed\n");
         return NULL;
     }
 #endif
 
-    lv_font_t * out_font = (lv_font_t *)TTF_MALLOC(sizeof(lv_font_t));
+    lv_font_t * out_font = lv_malloc_zeroed(sizeof(lv_font_t));
     if(out_font == NULL) {
-        TTF_FREE(dsc);
+        lv_free(dsc);
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
         return NULL;
     }
-    lv_memzero(out_font, sizeof(lv_font_t));
     out_font->get_glyph_dsc = ttf_get_glyph_dsc_cb;
     out_font->get_glyph_bitmap = ttf_get_glyph_bitmap_cb;
     out_font->dsc = dsc;
@@ -273,9 +267,9 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
                 lv_fs_close(&ttf->file);
             }
 #endif
-            TTF_FREE(ttf);
+            lv_free(ttf);
         }
-        TTF_FREE(font);
+        lv_free(font);
     }
 }
 #endif

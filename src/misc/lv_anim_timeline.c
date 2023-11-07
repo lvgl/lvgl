@@ -40,12 +40,8 @@ static void lv_anim_timeline_virtual_exec_cb(void * var, int32_t v);
 
 lv_anim_timeline_t * lv_anim_timeline_create(void)
 {
-    lv_anim_timeline_t * at = (lv_anim_timeline_t *)lv_malloc(sizeof(lv_anim_timeline_t));
-
+    lv_anim_timeline_t * at = lv_malloc_zeroed(sizeof(lv_anim_timeline_t));
     LV_ASSERT_MALLOC(at);
-
-    if(at) lv_memzero(at, sizeof(lv_anim_timeline_t));
-
     return at;
 }
 

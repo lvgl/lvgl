@@ -46,7 +46,7 @@ typedef struct {
     lv_imgbtn_src_info_t src_right[_LV_IMGBTN_STATE_NUM]; /*Store right side images to each state*/
 } lv_imgbtn_t;
 
-extern const lv_obj_class_t lv_imgbtn_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_imgbtn_class;
 
 /**********************
  * GLOBAL PROTOTYPES
