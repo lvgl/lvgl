@@ -60,6 +60,9 @@ jobs:
       matrix:
         arch: [ 'aarch64', 'armv6', 'armv7' ]
 
+    env:
+        NON_AMD64_BUILD: 1
+
     steps:
       - uses: actions/checkout@v4
       - uses: ammaraskar/gcc-problem-matcher@master
