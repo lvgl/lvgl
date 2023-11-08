@@ -109,7 +109,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
 
     size_t to_allocate = get_cell_txt_len(txt);
 
-    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + to_allocate);
+    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], to_allocate);
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) return;
 
@@ -171,13 +171,13 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
 
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
-    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len_ap + 1);
+    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + len_ap + 1);
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) {
         va_end(ap2);
         return;
     }
-    _lv_txt_ap_proc(raw_txt, &table->cell_data[cell][1]);
+    _lv_txt_ap_proc(raw_txt, &table->cell_data[cell]->txt);
 
     lv_mem_buf_release(raw_txt);
 #else
@@ -1039,7 +1039,7 @@ static size_t get_cell_txt_len(const char * txt)
     size_t retval = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    retval = _lv_txt_ap_calc_bytes_cnt(txt) + 1;    /* TODO */
+    retval = sizeof(lv_table_cell_t) + _lv_txt_ap_calc_bytes_cnt(txt) + 1;
 #else
     retval = sizeof(lv_table_cell_t) + strlen(txt) + 1;
 #endif
