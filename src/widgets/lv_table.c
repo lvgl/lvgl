@@ -181,7 +181,8 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
 
     lv_mem_buf_release(raw_txt);
 #else
-    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + len + 1); /*+1: trailing '\0; */
+    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell],
+                                            sizeof(lv_table_cell_t) + len + 1); /*+1: trailing '\0; */
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) {
         va_end(ap2);
