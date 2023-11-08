@@ -317,6 +317,4 @@ lv_image_dsc_t img_lv_demo_music_logo = {
     .data = img_lv_demo_music_logo_map,
 };
 
-
 #endif /*LV_USE_DEMO_MUSIC*/
-

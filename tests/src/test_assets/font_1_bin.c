@@ -2,7 +2,6 @@
     filename: D:\lvgl\test\lv_port_pc_visual_studio\LvglPlatform\lvgl\tests\src\test_assets\font_1.fnt
     position 0, 6876 bytes   */
 
-
 unsigned char const font_1_buf[6876] = {
     44,   0,   0,   0, 104, 101,  97, 100,   1,   0,   0,   0,   4,   0,   8,   0,
     8,   0, 254, 255,   8,   0, 254, 255,   0,   0, 254, 255,   8,   0,   0,   0,

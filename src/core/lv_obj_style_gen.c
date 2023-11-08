@@ -6,9 +6,7 @@
  **********************************************************************
  */
 
-
 #include "lv_obj.h"
-
 
 void lv_obj_set_style_width(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {

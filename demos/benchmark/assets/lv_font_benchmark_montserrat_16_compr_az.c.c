@@ -203,7 +203,6 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     0x68, 0x49, 0x56, 0x34, 0x11, 0x55, 0x6f
 };
 
-
 /*---------------------
  *  GLYPH DESCRIPTION
  *--------------------*/
@@ -243,8 +242,6 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
  *  CHARACTER MAPPING
  *--------------------*/
 
-
-
 /*Collect the unicode lists and glyph_id offsets*/
 static const lv_font_fmt_txt_cmap_t cmaps[] = {
     {
@@ -260,7 +257,6 @@ static const lv_font_fmt_txt_cmap_t cmaps[] = {
 /*-----------------
  *    KERNING
  *----------------*/
-
 
 /*Map glyph_ids to kern left classes*/
 static const uint8_t kern_left_class_mapping[] = {
@@ -302,7 +298,6 @@ static const int8_t kern_class_values[] = {
     -3, 0
 };
 
-
 /*Collect the kern class' data in one place*/
 static const lv_font_fmt_txt_kern_classes_t kern_classes = {
     .class_pair_values   = kern_class_values,
@@ -329,7 +324,6 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
     .bitmap_format = 1
 };
 
-
 /*-----------------
  *  PUBLIC FONT
  *----------------*/
@@ -349,4 +343,3 @@ lv_font_t lv_font_benchmark_montserrat_16_compr_az = {
 #endif /*#if LV_FONT_BENCHMARK_MONTSERRAT_16_COMPR_AZ*/
 
 #endif
-

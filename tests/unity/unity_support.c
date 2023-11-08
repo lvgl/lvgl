@@ -68,7 +68,6 @@ bool lv_test_assert_image_eq(const char * fn_ref)
     char fn_ref_full[512];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
-
     //lv_obj_invalidate(lv_screen_active());
     lv_refr_now(NULL);
 
@@ -126,7 +125,6 @@ bool lv_test_assert_image_eq(const char * fn_ref)
 
         write_png_file(screen_buf, 800, 480, fn_err_full);
     }
-
 
     png_release(&p);
 
@@ -202,7 +200,6 @@ static int read_png_file(png_image_t * p, const char * file_name)
     return 0;
 }
 
-
 static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name)
 {
     png_structp png_ptr;
@@ -251,7 +248,6 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
 
     png_write_info(png_ptr, info_ptr);
 
-
     /* write bytes */
     if(setjmp(png_jmpbuf(png_ptr))) {
         TEST_PRINTF("[write_png_file %s] Error during writing bytes", file_name);
@@ -271,7 +267,6 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
     }
     png_write_image(png_ptr, row_pointers);
 
-
     /* end write */
     if(setjmp(png_jmpbuf(png_ptr))) {
         TEST_PRINTF("[write_png_file %s] Error during end of write", file_name);
@@ -289,7 +284,6 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
     return 0;
 }
 
-
 static void png_release(png_image_t * p)
 {
     int y;
@@ -299,6 +293,5 @@ static void png_release(png_image_t * p)
 
     png_destroy_read_struct(&p->png_ptr, &p->info_ptr, NULL);
 }
-
 
 #endif
