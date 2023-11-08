@@ -205,19 +205,6 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     lv_label_refr_text(obj);
 }
 
-void lv_label_set_recolor(lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_label_t * label = (lv_label_t *)obj;
-    if(label->recolor == en) return;
-
-    label->recolor = en ? 1 : 0;
-
-    /*Refresh the text because the potential color codes in text needs to be hidden or revealed*/
-    lv_label_refr_text(obj);
-}
-
 void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -262,14 +249,6 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
     return label->long_mode;
-}
-
-bool lv_label_get_recolor(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_label_t * label = (lv_label_t *)obj;
-    return label->recolor;
 }
 
 void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)
@@ -641,7 +620,6 @@ static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     label->text       = NULL;
     label->static_txt = 0;
-    label->recolor    = 0;
     label->dot_end    = LV_LABEL_DOT_END_INV;
     label->long_mode  = LV_LABEL_LONG_WRAP;
     label->offset.x = 0;
@@ -709,7 +687,6 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
             int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
             int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
             lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
-            if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
             if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
 
             int32_t w = lv_obj_get_content_width(obj);
@@ -740,7 +717,6 @@ static void draw_main(lv_event_t * e)
     lv_obj_get_content_coords(obj, &txt_coords);
 
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
-    if(label->recolor) flag |= LV_TEXT_FLAG_RECOLOR;
     if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
     if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
 
@@ -876,7 +852,6 @@ static void lv_label_refr_text(lv_obj_t * obj)
     /*Calc. the height and longest line*/
     lv_point_t size;
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
-    if(label->recolor) flag |= LV_TEXT_FLAG_RECOLOR;
     if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
     if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
 
@@ -1270,7 +1245,6 @@ static lv_text_flag_t get_label_flags(lv_label_t * label)
 {
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
 
-    if(label->recolor) flag |= LV_TEXT_FLAG_RECOLOR;
     if(label->expand) flag |= LV_TEXT_FLAG_EXPAND;
 
     return flag;
