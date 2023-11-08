@@ -141,7 +141,6 @@ static void rotated_argb_image_cb(void)
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
 
-
     LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
     uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 116;
     uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 116) / 116;
@@ -232,7 +231,6 @@ static void multiple_arcs_cb(void)
         }
     }
 }
-
 
 static void containers_cb(void)
 {
@@ -416,7 +414,6 @@ void lv_demo_benchmark(void)
  *   STATIC FUNCTIONS
  **********************/
 
-
 static void load_scene(uint32_t scene)
 {
     lv_obj_t * scr = lv_screen_active();
@@ -429,7 +426,6 @@ static void load_scene(uint32_t scene)
     lv_obj_set_layout(scr, LV_LAYOUT_NONE);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
-
     lv_anim_delete(scr, scroll_anim_y_cb);
     lv_anim_delete(scr, shake_anim_y_cb);
     lv_anim_delete(scr, color_anim_cb);
@@ -440,8 +436,6 @@ static void load_scene(uint32_t scene)
     rnd_reset();
     if(scenes[scene].create_cb) scenes[scene].create_cb();
 }
-
-
 
 static void next_scene_timer_cb(lv_timer_t * timer)
 {
@@ -476,7 +470,6 @@ static void sysmon_perf_observer_cb(lv_subject_t * subject, lv_observer_t * obse
 /*----------------
  * SCENE HELPERS
  *----------------*/
-
 
 static void color_anim_cb(void * var, int32_t v)
 {
@@ -558,7 +551,6 @@ static void shake_anim(lv_obj_t * obj, int32_t y_max)
     lv_anim_start(&a);
 }
 
-
 static lv_obj_t * card_create(void)
 {
     lv_obj_t * panel = lv_obj_create(lv_screen_active());
@@ -585,8 +577,6 @@ static lv_obj_t * card_create(void)
 
     child = lv_label_create(child);
     lv_label_set_text(child, "Connect");
-
-
 
     return panel;
 }
