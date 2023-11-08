@@ -138,7 +138,7 @@ static lv_fs_res_t fs_error_from_win32(DWORD error)
         case ERROR_BAD_NETPATH:
         case ERROR_BAD_NET_NAME:
         case ERROR_BAD_PATHNAME:
-        case ERROR_FILENAME_EXCED_RANGE:
+        case ERROR_FILENAME_EXCEED_RANGE:
             res = LV_FS_RES_NOT_EX;
             break;
         case ERROR_DISK_FULL:

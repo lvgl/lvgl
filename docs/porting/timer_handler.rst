@@ -48,7 +48,7 @@ In an OS environment, you can use it together with the **delay** or
 .. code:: c
 
    while (1) {
-      uint32_t time_till_next = lv_timer_handler(); 
+      uint32_t time_till_next = lv_timer_handler();
       os_delay_ms(time_till_next); /* delay to avoid unnecessary polling */
    }
 

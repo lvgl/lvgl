@@ -4262,11 +4262,11 @@ static unsigned auto_choose_color(LodePNGColorMode * mode_out,
 #endif /* #ifdef LODEPNG_COMPILE_ENCODER */
 
 /*
-Paeth predictor, used by PNG filter type 4
+Path predictor, used by PNG filter type 4
 The parameters are of type short, but should come from unsigned chars, the shorts
-are only needed to make the paeth calculation correct.
+are only needed to make the path calculation correct.
 */
-static unsigned char paethPredictor(short a, short b, short c)
+static unsigned char pathPredictor(short a, short b, short c)
 {
     short pa = LODEPNG_ABS(b - c);
     short pb = LODEPNG_ABS(a - c);
@@ -4441,10 +4441,10 @@ static unsigned unfilterScanline(unsigned char * recon, const unsigned char * sc
         case 4:
             if(precon) {
                 for(i = 0; i != bytewidth; ++i) {
-                    recon[i] = (scanline[i] + precon[i]); /*paethPredictor(0, precon[i], 0) is always precon[i]*/
+                    recon[i] = (scanline[i] + precon[i]); /*pathPredictor(0, precon[i], 0) is always precon[i]*/
                 }
 
-                /* Unroll independent paths of the paeth predictor. A 6x and 8x version would also be possible but that
+                /* Unroll independent paths of the path predictor. A 6x and 8x version would also be possible but that
                 adds too much code. Whether this actually speeds anything up at all depends on compiler and settings. */
                 if(bytewidth >= 4) {
                     for(; i + 3 < length; i += 4) {
@@ -4453,10 +4453,10 @@ static unsigned unfilterScanline(unsigned char * recon, const unsigned char * sc
                         unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2], r3 = recon[j + 3];
                         unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2], p3 = precon[i + 3];
                         unsigned char q0 = precon[j + 0], q1 = precon[j + 1], q2 = precon[j + 2], q3 = precon[j + 3];
-                        recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
-                        recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
-                        recon[i + 2] = s2 + paethPredictor(r2, p2, q2);
-                        recon[i + 3] = s3 + paethPredictor(r3, p3, q3);
+                        recon[i + 0] = s0 + pathPredictor(r0, p0, q0);
+                        recon[i + 1] = s1 + pathPredictor(r1, p1, q1);
+                        recon[i + 2] = s2 + pathPredictor(r2, p2, q2);
+                        recon[i + 3] = s3 + pathPredictor(r3, p3, q3);
                     }
                 }
                 else if(bytewidth >= 3) {
@@ -4466,9 +4466,9 @@ static unsigned unfilterScanline(unsigned char * recon, const unsigned char * sc
                         unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2];
                         unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2];
                         unsigned char q0 = precon[j + 0], q1 = precon[j + 1], q2 = precon[j + 2];
-                        recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
-                        recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
-                        recon[i + 2] = s2 + paethPredictor(r2, p2, q2);
+                        recon[i + 0] = s0 + pathPredictor(r0, p0, q0);
+                        recon[i + 1] = s1 + pathPredictor(r1, p1, q1);
+                        recon[i + 2] = s2 + pathPredictor(r2, p2, q2);
                     }
                 }
                 else if(bytewidth >= 2) {
@@ -4478,13 +4478,13 @@ static unsigned unfilterScanline(unsigned char * recon, const unsigned char * sc
                         unsigned char r0 = recon[j + 0], r1 = recon[j + 1];
                         unsigned char p0 = precon[i + 0], p1 = precon[i + 1];
                         unsigned char q0 = precon[j + 0], q1 = precon[j + 1];
-                        recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
-                        recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
+                        recon[i + 0] = s0 + pathPredictor(r0, p0, q0);
+                        recon[i + 1] = s1 + pathPredictor(r1, p1, q1);
                     }
                 }
 
                 for(; i != length; ++i) {
-                    recon[i] = (scanline[i] + paethPredictor(recon[i - bytewidth], precon[i], precon[i - bytewidth]));
+                    recon[i] = (scanline[i] + pathPredictor(recon[i - bytewidth], precon[i], precon[i - bytewidth]));
                 }
             }
             else {
@@ -4492,7 +4492,7 @@ static unsigned unfilterScanline(unsigned char * recon, const unsigned char * sc
                     recon[i] = scanline[i];
                 }
                 for(i = bytewidth; i < length; ++i) {
-                    /*paethPredictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
+                    /*pathPredictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
                     recon[i] = (scanline[i] + recon[i - bytewidth]);
                 }
             }
@@ -5800,17 +5800,17 @@ static void filterScanline(unsigned char * out, const unsigned char * scanline, 
                 for(i = bytewidth; i < length; ++i) out[i] = scanline[i] - (scanline[i - bytewidth] >> 1);
             }
             break;
-        case 4: /*Paeth*/
+        case 4: /*Path*/
             if(prevline) {
-                /*paethPredictor(0, prevline[i], 0) is always prevline[i]*/
+                /*pathPredictor(0, prevline[i], 0) is always prevline[i]*/
                 for(i = 0; i != bytewidth; ++i) out[i] = (scanline[i] - prevline[i]);
                 for(i = bytewidth; i < length; ++i) {
-                    out[i] = (scanline[i] - paethPredictor(scanline[i - bytewidth], prevline[i], prevline[i - bytewidth]));
+                    out[i] = (scanline[i] - pathPredictor(scanline[i - bytewidth], prevline[i], prevline[i - bytewidth]));
                 }
             }
             else {
                 for(i = 0; i != bytewidth; ++i) out[i] = scanline[i];
-                /*paethPredictor(scanline[i - bytewidth], 0, 0) is always scanline[i - bytewidth]*/
+                /*pathPredictor(scanline[i - bytewidth], 0, 0) is always scanline[i - bytewidth]*/
                 for(i = bytewidth; i < length; ++i) out[i] = (scanline[i] - scanline[i - bytewidth]);
             }
             break;

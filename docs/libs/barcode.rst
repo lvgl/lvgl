@@ -15,8 +15,8 @@ Use :c:expr:`lv_barcode_create()` to create a barcode object, and use
 :c:expr:`lv_barcode_update()` to generate a barcode.
 
 Call :c:expr:`lv_barcode_set_scale()` or :c:expr:`lv_barcode_set_dark/light_color()`
-to adjust scaling and color, call :c:expr:`lv_barcode_set_direction()` will set 
-direction to display, and call :c:expr:`lv_barcode_update()` again to regenerate 
+to adjust scaling and color, call :c:expr:`lv_barcode_set_direction()` will set
+direction to display, and call :c:expr:`lv_barcode_update()` again to regenerate
 the barcode.
 
 Notes

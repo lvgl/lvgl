@@ -1,8 +1,6 @@
 #include "../lv_demo_music.h"
 #if LV_USE_DEMO_MUSIC && LV_DEMO_MUSIC_LARGE
 
-
-
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
@@ -130,4 +128,3 @@ const lv_image_dsc_t img_lv_demo_music_corner_left = {
 };
 
 #endif
-

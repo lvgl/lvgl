@@ -678,7 +678,7 @@ void lodepng_decoder_settings_init(LodePNGDecoderSettings * settings);
 typedef enum _LodePNGFilterStrategy {
     /*every filter at zero*/
     LFS_ZERO = 0,
-    /*every filter at 1, 2, 3 or 4 (paeth), unlike LFS_ZERO not a good choice, but for testing*/
+    /*every filter at 1, 2, 3 or 4 (path), unlike LFS_ZERO not a good choice, but for testing*/
     LFS_ONE = 1,
     LFS_TWO = 2,
     LFS_THREE = 3,

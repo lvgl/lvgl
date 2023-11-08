@@ -20,8 +20,8 @@ The music player demo shows what kind of modern, smartphone-like user interfaces
 	- If there is a large enough bass, add a random offset to the position of the bars. E.g. start from 63° instead of 0°. (bars greater than 180° start again from 0°)
 	- If there is no bass, add 1 to the offset of the bars (it creates a "walking" effect)
 	- Mirror the bars to the right side of the circle
-	
+
 ## Using spectrum.py
-- install `librosa` with `pip3 install librosa`	
+- install `librosa` with `pip3 install librosa`
 - run `python sectrum.py my_file.mp3`
 - see the result in `spectrum.h`

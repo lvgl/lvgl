@@ -460,7 +460,7 @@ New Features
    scrolling animation of label widget (#3128)
    `340d45c <https://github.com/lvgl/lvgl/commit/340d45cfa91b7108d43af906fc51b1c431877827>`__
 -  feat(gridnav): add lv_gridnav_set_focused
-   `b6d2daa <https://github.com/lvgl/lvgl/commit/b6d2daa4935128ca8193863d4deaf58fa40b3154>`__
+   `b6d2data <https://github.com/lvgl/lvgl/commit/b6d2daa4935128ca8193863d4deaf58fa40b3154>`__
 
 .. _performance-1:
 
@@ -1266,7 +1266,7 @@ Fixes
 -  fix(dropdown) be sure the list is the top object on the screen
    `cb7fc2b <https://github.com/littlevgl/lvgl/commit/cb7fc2bb59f788ce8024d62a5b1e821575a9cb74>`__
 -  fix(img) fix invalidation issue on transformations
-   `d5ede0e <https://github.com/littlevgl/lvgl/commit/d5ede0ebc6685d4857b5ac554d53c0a7373d7532>`__
+   `d5edge0e <https://github.com/littlevgl/lvgl/commit/d5ede0ebc6685d4857b5ac554d53c0a7373d7532>`__
 -  fix(obj) fix comments of lv_obj_set_pos/x/y
    `b9a5078 <https://github.com/littlevgl/lvgl/commit/b9a5078cd9d57662fc6e684d57a0ee4e70ca49c0>`__
 
