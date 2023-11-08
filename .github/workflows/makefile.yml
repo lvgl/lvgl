@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build using Makefile
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh

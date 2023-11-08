@@ -8,7 +8,7 @@ def anim_size_cb(obj, v):
 #
 # Create a playback animation
 #
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.set_style_bg_color(lv.palette_main(lv.PALETTE.RED), 0)
 obj.set_style_radius(lv.RADIUS_CIRCLE, 0)
 

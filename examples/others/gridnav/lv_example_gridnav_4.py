@@ -1,7 +1,7 @@
 def event_handler(e):
     obj = e.get_target_obj()
     list = obj.get_parent()
-    print("Clicked: " + list.get_btn_text(obj))
+    print("Clicked: " + list.get_button_text(obj))
 
 
 #
@@ -10,7 +10,7 @@ def event_handler(e):
 # It's assumed that the default group is set and
 # there is a keyboard indev
 
-list = lv.list(lv.scr_act())
+list = lv.list(lv.screen_active())
 lv.gridnav_add(list, lv.GRIDNAV_CTRL.ROLLOVER)
 list.align(lv.ALIGN.LEFT_MID, 0, 10)
 lv.group_get_default().add_obj(list)
@@ -25,12 +25,12 @@ for i in range(20):
 
     txt = "File {:d}".format(i + 1)
     #lv_snprintf(buf, sizeof(buf), "File %d", i + 1);
-    item = list.add_btn(lv.SYMBOL.FILE, txt)
+    item = list.add_button(lv.SYMBOL.FILE, txt)
     item.add_event(event_handler, lv.EVENT.CLICKED, None)
     lv.group_remove_obj(item)  # The default group adds it automatically
 
-btn = lv.btn(lv.scr_act())
-btn.align(lv.ALIGN.RIGHT_MID, 0, -10)
-label = lv.label(btn)
+button = lv.button(lv.screen_active())
+button.align(lv.ALIGN.RIGHT_MID, 0, -10)
+label = lv.label(button)
 label.set_text("Button")
 

@@ -4,28 +4,11 @@
  */
 
 /**
- * MIT License
- *
  * Copyright 2023 NXP
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next paragraph)
- * shall be included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
+ * SPDX-License-Identifier: MIT
  */
+
 
 #ifndef LV_VGLITE_BUF_H
 #define LV_VGLITE_BUF_H
@@ -39,9 +22,10 @@ extern "C" {
  *********************/
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_GPU_NXP_VG_LITE
-#include "vg_lite.h"
+#if LV_USE_DRAW_VGLITE
 #include "../../sw/lv_draw_sw.h"
+
+#include "vg_lite.h"
 
 /*********************
  *      DEFINES
@@ -54,57 +38,80 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-/**
- * Init vglite destination buffer. It will be done once per frame.
- *
- * @param[in] buf Destination buffer address (does not require alignment for VG_LITE_LINEAR mode)
- * @param[in] area Destination buffer area (for width and height)
- * @param[in] stride Stride of destination buffer
- */
-void lv_gpu_nxp_vglite_init_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
 
 /**
  * Get vglite destination buffer pointer.
  *
  * @retval The vglite destination buffer
+ *
  */
-vg_lite_buffer_t * lv_vglite_get_dest_buf(void);
+vg_lite_buffer_t * vglite_get_dest_buf(void);
 
 /**
  * Get vglite source buffer pointer.
  *
  * @retval The vglite source buffer
+ *
  */
-vg_lite_buffer_t * lv_vglite_get_src_buf(void);
+vg_lite_buffer_t * vglite_get_src_buf(void);
 
 /**
  * Set vglite destination buffer address only.
  *
  * @param[in] buf Destination buffer address (does not require alignment for VG_LITE_LINEAR mode)
+ *
  */
-void lv_vglite_set_dest_buf_ptr(const lv_color_t * buf);
+void vglite_set_dest_buf_ptr(void * buf);
 
 /**
  * Set vglite source buffer address only.
  *
  * @param[in] buf Source buffer address
+ *
  */
-void lv_vglite_set_src_buf_ptr(const lv_color_t * buf);
+void vglite_set_src_buf_ptr(const void * buf);
 
 /**
- * Set vglite source buffer. It will be done only if buffer addreess is different.
+ * Set vglite target (destination) buffer.
+ *
+ * @param[in] draw_buf Destination draw buffer descriptor
+ *
+ */
+void vglite_set_dest_buf(const lv_draw_buf_t * draw_buf);
+
+/**
+ * Set vglite source buffer.
  *
  * @param[in] buf Source buffer address
- * @param[in] area Source buffer area (for width and height)
- * @param[in] stride Stride of source buffer
+ * @param[in] width Source buffer width
+ * @param[in] height Source buffer height
+ * @param[in] stride Source buffer stride in bytes
+ * @param[in] cf Source buffer color format
+ *
  */
-void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
+void vglite_set_src_buf(const void * buf, int32_t width, int32_t height, uint32_t stride,
+                        lv_color_format_t cf);
+
+/**
+ * Set vglite buffer.
+ *
+ * @param[in] vgbuf Address of the VGLite buffer object
+ * @param[in] buf Address of the memory for the VGLite buffer
+ * @param[in] width Buffer width
+ * @param[in] height Buffer height
+ * @param[in] stride Buffer stride in bytes
+ * @param[in] cf Buffer color format
+ *
+ */
+void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
+                    int32_t width, int32_t height, uint32_t stride,
+                    lv_color_format_t cf);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_NXP_VG_LITE*/
+#endif /*LV_USE_DRAW_VGLITE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

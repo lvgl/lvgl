@@ -26,12 +26,12 @@
 static void touchpad_init(void);
 static void touchpad_read(lv_indev_t * indev, lv_indev_data_t * data);
 static bool touchpad_is_pressed(void);
-static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y);
+static void touchpad_get_xy(int32_t * x, int32_t * y);
 
 static void mouse_init(void);
 static void mouse_read(lv_indev_t * indev, lv_indev_data_t * data);
 static bool mouse_is_pressed(void);
-static void mouse_get_xy(lv_coord_t * x, lv_coord_t * y);
+static void mouse_get_xy(int32_t * x, int32_t * y);
 
 static void keypad_init(void);
 static void keypad_read(lv_indev_t * indev, lv_indev_data_t * data);
@@ -106,8 +106,8 @@ void lv_port_indev_init(void)
     lv_indev_set_read_cb(indev_mouse, mouse_read);
 
     /*Set cursor. For simplicity set a HOME symbol now.*/
-    lv_obj_t * mouse_cursor = lv_img_create(lv_scr_act());
-    lv_img_set_src(mouse_cursor, LV_SYMBOL_HOME);
+    lv_obj_t * mouse_cursor = lv_image_create(lv_screen_active());
+    lv_image_set_src(mouse_cursor, LV_SYMBOL_HOME);
     lv_indev_set_cursor(indev_mouse, mouse_cursor);
 
     /*------------------
@@ -153,9 +153,9 @@ void lv_port_indev_init(void)
     button_init();
 
     /*Register a button input device*/
-    indev_touchpad = lv_indev_create();
-    lv_indev_set_type(indev_touchpad, LV_INDEV_TYPE_BUTTON);
-    lv_indev_set_read_cb(indev_touchpad, button_read);
+    indev_button = lv_indev_create();
+    lv_indev_set_type(indev_button, LV_INDEV_TYPE_BUTTON);
+    lv_indev_set_read_cb(indev_button, button_read);
 
     /*Assign buttons to points on the screen*/
     static const lv_point_t btn_points[2] = {
@@ -182,8 +182,8 @@ static void touchpad_init(void)
 /*Will be called by the library to read the touchpad*/
 static void touchpad_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
 {
-    static lv_coord_t last_x = 0;
-    static lv_coord_t last_y = 0;
+    static int32_t last_x = 0;
+    static int32_t last_y = 0;
 
     /*Save the pressed coordinates and the state*/
     if(touchpad_is_pressed()) {
@@ -208,7 +208,7 @@ static bool touchpad_is_pressed(void)
 }
 
 /*Get the x and y coordinates if the touchpad is pressed*/
-static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y)
+static void touchpad_get_xy(int32_t * x, int32_t * y)
 {
     /*Your code comes here*/
 
@@ -250,7 +250,7 @@ static bool mouse_is_pressed(void)
 }
 
 /*Get the x and y coordinates if the mouse is pressed*/
-static void mouse_get_xy(lv_coord_t * x, lv_coord_t * y)
+static void mouse_get_xy(int32_t * x, int32_t * y)
 {
     /*Your code comes here*/
 
@@ -321,7 +321,7 @@ static uint32_t keypad_get_key(void)
  * Encoder
  * -----------------*/
 
-/*Initialize your keypad*/
+/*Initialize your encoder*/
 static void encoder_init(void)
 {
     /*Your code comes here*/

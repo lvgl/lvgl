@@ -1,28 +1,18 @@
 #include "../../lv_examples.h"
 #if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
-static void scroll_begin_event(lv_event_t * e)
-{
-    /*Disable the scroll animations. Triggered when a tab button is clicked */
-    if(lv_event_get_code(e) == LV_EVENT_SCROLL_BEGIN) {
-        lv_anim_t * a = lv_event_get_param(e);
-        if(a)  a->time = 0;
-    }
-}
-
 void lv_example_tabview_2(void)
 {
     /*Create a Tab view object*/
     lv_obj_t * tabview;
-    tabview = lv_tabview_create(lv_scr_act(), LV_DIR_LEFT, 80);
-    lv_obj_add_event(lv_tabview_get_content(tabview), scroll_begin_event, LV_EVENT_SCROLL_BEGIN, NULL);
+    tabview = lv_tabview_create(lv_screen_active(), LV_DIR_LEFT, 80);
 
     lv_obj_set_style_bg_color(tabview, lv_palette_lighten(LV_PALETTE_RED, 2), 0);
 
-    lv_obj_t * tab_btns = lv_tabview_get_tab_btns(tabview);
-    lv_obj_set_style_bg_color(tab_btns, lv_palette_darken(LV_PALETTE_GREY, 3), 0);
-    lv_obj_set_style_text_color(tab_btns, lv_palette_lighten(LV_PALETTE_GREY, 5), 0);
-    lv_obj_set_style_border_side(tab_btns, LV_BORDER_SIDE_RIGHT, LV_PART_ITEMS | LV_STATE_CHECKED);
+    lv_obj_t * tab_buttons = lv_tabview_get_tab_buttons(tabview);
+    lv_obj_set_style_bg_color(tab_buttons, lv_palette_darken(LV_PALETTE_GREY, 3), 0);
+    lv_obj_set_style_text_color(tab_buttons, lv_palette_lighten(LV_PALETTE_GREY, 5), 0);
+    lv_obj_set_style_border_side(tab_buttons, LV_BORDER_SIDE_RIGHT, LV_PART_ITEMS | LV_STATE_CHECKED);
 
 
     /*Add 3 tabs (the tabs are page (lv_page) and can be scrolled*/
@@ -51,6 +41,6 @@ void lv_example_tabview_2(void)
     label = lv_label_create(tab5);
     lv_label_set_text(label, "Fifth tab");
 
-    lv_obj_clear_flag(lv_tabview_get_content(tabview), LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(lv_tabview_get_content(tabview), LV_OBJ_FLAG_SCROLLABLE);
 }
 #endif

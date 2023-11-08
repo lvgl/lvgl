@@ -1,19 +1,18 @@
-#define LV_MEM_SIZE         8388608
-#define LV_USE_DRAW_MASKS       1
-#define LV_SHADOW_CACHE_SIZE    10240
-#define LV_IMG_CACHE_DEF_SIZE   32
+#define LV_MEM_SIZE         (32 * 1024 * 1024)
+#define LV_LAYER_MAX_MEMORY_USAGE   (4 * 1024)
+#define LV_SHADOW_CACHE_SIZE    (8 * 1024)
+#define LV_IMAGE_CACHE_DEF_SIZE   32
 #define LV_USE_LOG              1
 #define LV_LOG_LEVEL            LV_LOG_LEVEL_TRACE
 #define LV_LOG_PRINTF           1
 #define LV_USE_FONT_SUBPX       1
 #define LV_FONT_SUBPX_BGR       1
-#define LV_USE_PERF_MONITOR     1
 #define LV_USE_ASSERT_NULL      1
 #define LV_USE_ASSERT_MALLOC    1
 #define LV_USE_ASSERT_MEM_INTEGRITY     1
 #define LV_USE_ASSERT_OBJ               1
 #define LV_USE_ASSERT_STYLE             1
-#define LV_USE_LARGE_COORD      1
+#define LV_USE_FLOAT      1
 
 #define LV_FONT_MONTSERRAT_8    1
 #define LV_FONT_MONTSERRAT_10   1
@@ -36,7 +35,6 @@
 #define LV_FONT_MONTSERRAT_44   1
 #define LV_FONT_MONTSERRAT_46   1
 #define LV_FONT_MONTSERRAT_48   1
-#define LV_FONT_MONTSERRAT_12_SUBPX         1
 #define LV_FONT_MONTSERRAT_28_COMPRESSED    1
 #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW    1
 #define LV_FONT_SIMSUN_16_CJK   1
@@ -59,22 +57,36 @@
 #define LV_FS_STDIO_CACHE_SIZE 512
 #define LV_USE_FS_POSIX     1
 #define LV_FS_POSIX_LETTER  'B'
+#define LV_USE_FS_MEMFS     1
+#define LV_FS_MEMFS_LETTER  'M'
 
-#define LV_USE_PNG      1
-#define LV_USE_BMP      1
-#define LV_USE_SJPG     1
-#define LV_USE_GIF      1
-#define LV_USE_QRCODE   1
-#define LV_USE_BARCODE  1
-#define LV_USE_FRAGMENT 1
-#define LV_USE_IMGFONT  1
-#define LV_USE_IME_PINYIN   1
-#define LV_USE_MSG          1
+#define LV_USE_LODEPNG      1
+#define LV_USE_LIBPNG       1
+#define LV_USE_BMP          1
+#define LV_USE_TJPGD        1
+#define LV_USE_LIBJPEG_TURBO   1
+#define LV_USE_GIF          1
+#define LV_USE_QRCODE       1
+#define LV_USE_BARCODE      1
+#define LV_USE_FRAGMENT     1
+#define LV_USE_IMGFONT      1
+#define LV_USE_IME_PINYIN       1
+#define LV_USE_OBSERVER         1
 #define LV_USE_FILE_EXPLORER    1
-#define LV_USE_TINY_TTF 1
-
+#define LV_USE_TINY_TTF         1
+#define LV_USE_SYSMON           1
+#define LV_USE_SNAPSHOT         1
 
 #define LV_BUILD_EXAMPLES       1
 #define LV_USE_DEMO_WIDGETS     1
 #define LV_USE_DEMO_STRESS      1
+#define LV_USE_DEMO_TRANSFORM   1
+#define LV_USE_DEMO_MULTILANG   1
+#define LV_USE_DEMO_RENDER      1
+#define LV_USE_DEMO_BENCHMARK   1
+#define LV_USE_DEMO_SCROLL      1
 
+#define LV_USE_OBJ_ID           1
+#define LV_USE_OBJ_ID_BUILTIN   1
+#define LV_USE_OBJ_PROPERTY     1
+#define LV_BIN_DECODER_RAM_LOAD 1

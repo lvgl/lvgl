@@ -11,7 +11,7 @@ void lv_example_slider_3(void)
 {
     /*Create a slider in the center of the display*/
     lv_obj_t * slider;
-    slider = lv_slider_create(lv_scr_act());
+    slider = lv_slider_create(lv_screen_active());
     lv_obj_center(slider);
 
     lv_slider_set_mode(slider, LV_SLIDER_MODE_RANGE);
@@ -31,25 +31,31 @@ static void slider_event_cb(lv_event_t * e)
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_event_set_ext_draw_size(e, 50);
     }
-    else if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
-        if(dsc->part == LV_PART_INDICATOR) {
-            char buf[16];
-            lv_snprintf(buf, sizeof(buf), "%d - %d", (int)lv_slider_get_left_value(obj), (int)lv_slider_get_value(obj));
+    else if(code == LV_EVENT_DRAW_MAIN_END) {
+        if(!lv_obj_has_state(obj, LV_STATE_PRESSED)) return;
 
-            lv_point_t label_size;
-            lv_txt_get_size(&label_size, buf, LV_FONT_DEFAULT, 0, 0, LV_COORD_MAX, 0);
-            lv_area_t label_area;
-            label_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2 - label_size.x / 2;
-            label_area.x2 = label_area.x1 + label_size.x;
-            label_area.y2 = dsc->draw_area->y1 - 10;
-            label_area.y1 = label_area.y2 - label_size.y;
+        lv_slider_t * slider = (lv_slider_t *) obj;
+        const lv_area_t * indic_area = &slider->bar.indic_area;
+        char buf[16];
+        lv_snprintf(buf, sizeof(buf), "%d - %d", (int)lv_slider_get_left_value(obj), (int)lv_slider_get_value(obj));
 
-            lv_draw_label_dsc_t label_draw_dsc;
-            lv_draw_label_dsc_init(&label_draw_dsc);
-            label_draw_dsc.color = lv_color_hex3(0x888);
-            lv_draw_label(dsc->draw_ctx, &label_draw_dsc, &label_area, buf, NULL);
-        }
+        lv_point_t label_size;
+        lv_text_get_size(&label_size, buf, LV_FONT_DEFAULT, 0, 0, LV_COORD_MAX, 0);
+        lv_area_t label_area;
+        label_area.x1 = 0;
+        label_area.x2 = label_size.x - 1;
+        label_area.y1 = 0;
+        label_area.y2 = label_size.y - 1;
+
+        lv_area_align(indic_area, &label_area, LV_ALIGN_OUT_TOP_MID, 0, -10);
+
+        lv_draw_label_dsc_t label_draw_dsc;
+        lv_draw_label_dsc_init(&label_draw_dsc);
+        label_draw_dsc.color = lv_color_hex3(0x888);
+        label_draw_dsc.text = buf;
+        label_draw_dsc.text_local = true;
+        lv_layer_t * layer = lv_event_get_layer(e);
+        lv_draw_label(layer, &label_draw_dsc, &label_area);
     }
 }
 

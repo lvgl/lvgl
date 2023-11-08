@@ -30,7 +30,7 @@ void pika_lvgl_lv_obj_align(PikaObj* self, int align, int x_ofs, int y_ofs) {
     lv_obj_align(lv_obj, align, x_ofs, y_ofs);
 }
 
-void pika_lvgl_lv_obj_set_hight(PikaObj* self, int h) {
+void pika_lvgl_lv_obj_set_height(PikaObj* self, int h) {
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
     lv_obj_set_height(lv_obj, h);
 }
@@ -69,7 +69,7 @@ static void __pika_event_cb(lv_event_t* e) {
     obj_run(event_handler, "_event_cb(_event_evt)");
 }
 
-void eventLicener_registEvent(PikaObj* self,
+void eventLicener_registerEvent(PikaObj* self,
                               uintptr_t event_id,
                               PikaObj* event_handler) {
     Args buffs = {0};
@@ -90,7 +90,7 @@ void pika_lvgl_lv_obj_add_event(PikaObj* self,
     obj_setArg(self, "_event_cb", event_cb);
     obj_setPtr(self, "_event_user_data", user_data);
     obj_newDirectObj(self, "_event_evt", New_pika_lvgl_lv_event);
-    eventLicener_registEvent(pika_lv_event_listener_g, (uintptr_t)lv_obj, self);
+    eventLicener_registerEvent(pika_lv_event_listener_g, (uintptr_t)lv_obj, self);
 }
 
 void pika_lvgl_lv_obj_add_style(PikaObj *self, PikaObj* style, int selector){

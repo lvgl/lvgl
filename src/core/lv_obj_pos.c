@@ -7,15 +7,16 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "lv_disp.h"
-#include "lv_disp_private.h"
+#include "../display/lv_display.h"
+#include "../display/lv_display_private.h"
 #include "lv_refr.h"
-#include "../misc/lv_gc.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
+#define update_layout_mutex LV_GLOBAL_DEFAULT()->layout_update_mutex
 
 /**********************
  *      TYPEDEFS
@@ -24,15 +25,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_coord_t calc_content_width(lv_obj_t * obj);
-static lv_coord_t calc_content_height(lv_obj_t * obj);
+static int32_t calc_content_width(lv_obj_t * obj);
+static int32_t calc_content_height(lv_obj_t * obj);
 static void layout_update_core(lv_obj_t * obj);
 static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static uint32_t layout_cnt;
 
 /**********************
  *      MACROS
@@ -42,7 +42,7 @@ static uint32_t layout_cnt;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+void lv_obj_set_pos(lv_obj_t * obj, int32_t x, int32_t y)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -50,30 +50,30 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     lv_obj_set_y(obj, y);
 }
 
-void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
+void lv_obj_set_x(lv_obj_t * obj, int32_t x)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_res_t res_x;
+    lv_result_t res_x;
     lv_style_value_t v_x;
 
     res_x = lv_obj_get_local_style_prop(obj, LV_STYLE_X, &v_x, 0);
 
-    if((res_x == LV_RES_OK && v_x.num != x) || res_x == LV_RES_INV) {
+    if((res_x == LV_RESULT_OK && v_x.num != x) || res_x == LV_RESULT_INVALID) {
         lv_obj_set_style_x(obj, x, 0);
     }
 }
 
-void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
+void lv_obj_set_y(lv_obj_t * obj, int32_t y)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_res_t res_y;
+    lv_result_t res_y;
     lv_style_value_t v_y;
 
     res_y = lv_obj_get_local_style_prop(obj, LV_STYLE_Y, &v_y, 0);
 
-    if((res_y == LV_RES_OK && v_y.num != y) || res_y == LV_RES_INV) {
+    if((res_y == LV_RESULT_OK && v_y.num != y) || res_y == LV_RESULT_INVALID) {
         lv_obj_set_style_y(obj, y, 0);
     }
 }
@@ -88,19 +88,18 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return false;
 
-    lv_coord_t sl_ori = lv_obj_get_scroll_left(obj);
     bool w_is_content = false;
     bool w_is_pct = false;
 
-    lv_coord_t w;
+    int32_t w;
     if(obj->w_layout) {
         w = lv_obj_get_width(obj);
     }
     else {
         w = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        w_is_content = w == LV_SIZE_CONTENT ? true : false;
-        w_is_pct = LV_COORD_IS_PCT(w) ? true : false;
-        lv_coord_t parent_w = lv_obj_get_content_width(parent);
+        w_is_content = w == LV_SIZE_CONTENT;
+        w_is_pct = LV_COORD_IS_PCT(w);
+        int32_t parent_w = lv_obj_get_content_width(parent);
 
         if(w_is_content) {
             w = calc_content_width(obj);
@@ -117,13 +116,12 @@ bool lv_obj_refr_size(lv_obj_t * obj)
             }
         }
 
-        lv_coord_t minw = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
-        lv_coord_t maxw = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
+        int32_t minw = lv_obj_get_style_min_width(obj, LV_PART_MAIN);
+        int32_t maxw = lv_obj_get_style_max_width(obj, LV_PART_MAIN);
         w = lv_clamp_width(w, minw, maxw, parent_w);
     }
 
-    lv_coord_t st_ori = lv_obj_get_scroll_top(obj);
-    lv_coord_t h;
+    int32_t h;
     bool h_is_content = false;
     bool h_is_pct = false;
     if(obj->h_layout) {
@@ -131,9 +129,9 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
     else {
         h = lv_obj_get_style_height(obj, LV_PART_MAIN);
-        h_is_content = h == LV_SIZE_CONTENT ? true : false;
-        h_is_pct = LV_COORD_IS_PCT(h) ? true : false;
-        lv_coord_t parent_h = lv_obj_get_content_height(parent);
+        h_is_content = h == LV_SIZE_CONTENT;
+        h_is_pct = LV_COORD_IS_PCT(h);
+        int32_t parent_h = lv_obj_get_content_height(parent);
 
         if(h_is_content) {
             h = calc_content_height(obj);
@@ -150,14 +148,9 @@ bool lv_obj_refr_size(lv_obj_t * obj)
             }
         }
 
-        lv_coord_t minh = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
-        lv_coord_t maxh = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
+        int32_t minh = lv_obj_get_style_min_height(obj, LV_PART_MAIN);
+        int32_t maxh = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
         h = lv_clamp_height(h, minh, maxh, parent_h);
-    }
-
-    /*calc_auto_size set the scroll x/y to 0 so revert the original value*/
-    if(w_is_content || h_is_content) {
-        lv_obj_scroll_to(obj, sl_ori, st_ori, LV_ANIM_OFF);
     }
 
     /*Do nothing if the size is not changed*/
@@ -211,7 +204,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     return true;
 }
 
-void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
+void lv_obj_set_size(lv_obj_t * obj, int32_t w, int32_t h)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -219,43 +212,43 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_obj_set_height(obj, h);
 }
 
-void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
+void lv_obj_set_width(lv_obj_t * obj, int32_t w)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_res_t res_w;
+    lv_result_t res_w;
     lv_style_value_t v_w;
 
     res_w = lv_obj_get_local_style_prop(obj, LV_STYLE_WIDTH, &v_w, 0);
 
-    if((res_w == LV_RES_OK && v_w.num != w) || res_w == LV_RES_INV) {
+    if((res_w == LV_RESULT_OK && v_w.num != w) || res_w == LV_RESULT_INVALID) {
         lv_obj_set_style_width(obj, w, 0);
     }
 }
 
-void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
+void lv_obj_set_height(lv_obj_t * obj, int32_t h)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_res_t res_h;
+    lv_result_t res_h;
     lv_style_value_t v_h;
 
     res_h = lv_obj_get_local_style_prop(obj, LV_STYLE_HEIGHT, &v_h, 0);
 
-    if((res_h == LV_RES_OK && v_h.num != h) || res_h == LV_RES_INV) {
+    if((res_h == LV_RESULT_OK && v_h.num != h) || res_h == LV_RESULT_INVALID) {
         lv_obj_set_style_height(obj, h, 0);
     }
 }
 
-void lv_obj_set_content_width(lv_obj_t * obj, lv_coord_t w)
+void lv_obj_set_content_width(lv_obj_t * obj, int32_t w)
 {
-    lv_coord_t left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
-    lv_coord_t right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
+    int32_t left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
+    int32_t right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
     lv_obj_set_width(obj, w + left + right);
 }
 
-void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h)
+void lv_obj_set_content_height(lv_obj_t * obj, int32_t h)
 {
-    lv_coord_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
-    lv_coord_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
+    int32_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
+    int32_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
     lv_obj_set_height(obj, h + top + bottom);
 }
 
@@ -289,41 +282,28 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
     scr->scr_layout_inv = 1;
 
     /*Make the display refreshing*/
-    lv_disp_t * disp = lv_obj_get_disp(scr);
-    if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
+    lv_display_t * disp = lv_obj_get_disp(scr);
+    lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
 }
 
 void lv_obj_update_layout(const lv_obj_t * obj)
 {
-    static bool mutex = false;
-    if(mutex) {
+    if(update_layout_mutex) {
         LV_LOG_TRACE("Already running, returning");
         return;
     }
-    mutex = true;
+    update_layout_mutex = true;
 
     lv_obj_t * scr = lv_obj_get_screen(obj);
-
-    /*Repeat until there where layout invalidations*/
+    /*Repeat until there are no more layout invalidations*/
     while(scr->scr_layout_inv) {
-        LV_LOG_INFO("Layout update begin");
+        LV_LOG_TRACE("Layout update begin");
         scr->scr_layout_inv = 0;
         layout_update_core(scr);
         LV_LOG_TRACE("Layout update end");
     }
 
-    mutex = false;
-}
-
-uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
-{
-    layout_cnt++;
-    LV_GC_ROOT(_lv_layout_list) = lv_realloc(LV_GC_ROOT(_lv_layout_list), layout_cnt * sizeof(lv_layout_dsc_t));
-    LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_layout_list));
-
-    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].cb = cb;
-    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].user_data = user_data;
-    return layout_cnt;  /*No -1 to skip 0th index*/
+    update_layout_mutex = false;
 }
 
 void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)
@@ -331,13 +311,13 @@ void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)
     lv_obj_set_style_align(obj, align, 0);
 }
 
-void lv_obj_align(lv_obj_t * obj, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+void lv_obj_align(lv_obj_t * obj, lv_align_t align, int32_t x_ofs, int32_t y_ofs)
 {
     lv_obj_set_style_align(obj, align, 0);
     lv_obj_set_pos(obj, x_ofs, y_ofs);
 }
 
-void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, int32_t x_ofs, int32_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -346,15 +326,18 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv
 
     LV_ASSERT_OBJ(base, MY_CLASS);
 
-    lv_coord_t x = 0;
-    lv_coord_t y = 0;
+    int32_t x = 0;
+    int32_t y = 0;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_coord_t pleft = lv_obj_get_style_space_left(parent, LV_PART_MAIN);
-    lv_coord_t ptop = lv_obj_get_style_space_top(parent, LV_PART_MAIN);
 
-    lv_coord_t bleft = lv_obj_get_style_space_left(base, LV_PART_MAIN);
-    lv_coord_t btop = lv_obj_get_style_space_top(base, LV_PART_MAIN);
+    LV_ASSERT_OBJ(parent, MY_CLASS);
+
+    int32_t pleft = lv_obj_get_style_space_left(parent, LV_PART_MAIN);
+    int32_t ptop = lv_obj_get_style_space_top(parent, LV_PART_MAIN);
+
+    int32_t bleft = lv_obj_get_style_space_left(base, LV_PART_MAIN);
+    int32_t btop = lv_obj_get_style_space_top(base, LV_PART_MAIN);
 
     if(align == LV_ALIGN_DEFAULT) {
         if(lv_obj_get_style_base_dir(base, LV_PART_MAIN) == LV_BASE_DIR_RTL) align = LV_ALIGN_TOP_RIGHT;
@@ -486,11 +469,11 @@ void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * coords)
     lv_area_copy(coords, &obj->coords);
 }
 
-lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
+int32_t lv_obj_get_x(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_coord_t rel_x;
+    int32_t rel_x;
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) {
         rel_x  = obj->coords.x1 - parent->coords.x1;
@@ -503,18 +486,18 @@ lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
     return rel_x;
 }
 
-lv_coord_t lv_obj_get_x2(const lv_obj_t * obj)
+int32_t lv_obj_get_x2(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return lv_obj_get_x(obj) + lv_obj_get_width(obj);
 }
 
-lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
+int32_t lv_obj_get_y(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_coord_t rel_y;
+    int32_t rel_y;
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) {
         rel_y = obj->coords.y1 - parent->coords.y1;
@@ -527,54 +510,54 @@ lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
     return rel_y;
 }
 
-lv_coord_t lv_obj_get_y2(const lv_obj_t * obj)
+int32_t lv_obj_get_y2(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return lv_obj_get_y(obj) + lv_obj_get_height(obj);
 }
 
-lv_coord_t lv_obj_get_x_aligned(const lv_obj_t * obj)
+int32_t lv_obj_get_x_aligned(const lv_obj_t * obj)
 {
     return lv_obj_get_style_x(obj, LV_PART_MAIN);
 }
 
-lv_coord_t lv_obj_get_y_aligned(const lv_obj_t * obj)
+int32_t lv_obj_get_y_aligned(const lv_obj_t * obj)
 {
     return lv_obj_get_style_y(obj, LV_PART_MAIN);
 }
 
 
-lv_coord_t lv_obj_get_width(const lv_obj_t * obj)
+int32_t lv_obj_get_width(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return lv_area_get_width(&obj->coords);
 }
 
-lv_coord_t lv_obj_get_height(const lv_obj_t * obj)
+int32_t lv_obj_get_height(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     return lv_area_get_height(&obj->coords);
 }
 
-lv_coord_t lv_obj_get_content_width(const lv_obj_t * obj)
+int32_t lv_obj_get_content_width(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_coord_t left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
-    lv_coord_t right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
+    int32_t left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
+    int32_t right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
 
     return lv_obj_get_width(obj) - left - right;
 }
 
-lv_coord_t lv_obj_get_content_height(const lv_obj_t * obj)
+int32_t lv_obj_get_content_height(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_coord_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
-    lv_coord_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
+    int32_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
+    int32_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
 
     return lv_obj_get_height(obj) - top - bottom;
 }
@@ -591,14 +574,14 @@ void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
 
 }
 
-lv_coord_t lv_obj_get_self_width(const lv_obj_t * obj)
+int32_t lv_obj_get_self_width(const lv_obj_t * obj)
 {
     lv_point_t p = {0, LV_COORD_MIN};
     lv_obj_send_event((lv_obj_t *)obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.x;
 }
 
-lv_coord_t lv_obj_get_self_height(const lv_obj_t * obj)
+int32_t lv_obj_get_self_height(const lv_obj_t * obj)
 {
     lv_point_t p = {LV_COORD_MIN, 0};
     lv_obj_send_event((lv_obj_t *)obj, LV_EVENT_GET_SELF_SIZE, &p);
@@ -607,8 +590,8 @@ lv_coord_t lv_obj_get_self_height(const lv_obj_t * obj)
 
 bool lv_obj_refresh_self_size(lv_obj_t * obj)
 {
-    lv_coord_t w_set = lv_obj_get_style_width(obj, LV_PART_MAIN);
-    lv_coord_t h_set = lv_obj_get_style_height(obj, LV_PART_MAIN);
+    int32_t w_set = lv_obj_get_style_width(obj, LV_PART_MAIN);
+    int32_t h_set = lv_obj_get_style_height(obj, LV_PART_MAIN);
     if(w_set != LV_SIZE_CONTENT && h_set != LV_SIZE_CONTENT) return false;
 
     lv_obj_mark_layout_as_dirty(obj);
@@ -621,8 +604,8 @@ void lv_obj_refr_pos(lv_obj_t * obj)
 
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
-    lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
+    int32_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
+    int32_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
 
     if(parent == NULL) {
         lv_obj_move_to(obj, x, y);
@@ -630,16 +613,16 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     }
 
     /*Handle percentage value*/
-    lv_coord_t pw = lv_obj_get_content_width(parent);
-    lv_coord_t ph = lv_obj_get_content_height(parent);
+    int32_t pw = lv_obj_get_content_width(parent);
+    int32_t ph = lv_obj_get_content_height(parent);
     if(LV_COORD_IS_PCT(x)) x = (pw * LV_COORD_GET_PCT(x)) / 100;
     if(LV_COORD_IS_PCT(y)) y = (ph * LV_COORD_GET_PCT(y)) / 100;
 
     /*Handle percentage value of translate*/
-    lv_coord_t tr_x = lv_obj_get_style_translate_x(obj, LV_PART_MAIN);
-    lv_coord_t tr_y = lv_obj_get_style_translate_y(obj, LV_PART_MAIN);
-    lv_coord_t w = lv_obj_get_width(obj);
-    lv_coord_t h = lv_obj_get_height(obj);
+    int32_t tr_x = lv_obj_get_style_translate_x(obj, LV_PART_MAIN);
+    int32_t tr_y = lv_obj_get_style_translate_y(obj, LV_PART_MAIN);
+    int32_t w = lv_obj_get_width(obj);
+    int32_t h = lv_obj_get_height(obj);
     if(LV_COORD_IS_PCT(tr_x)) tr_x = (w * LV_COORD_GET_PCT(tr_x)) / 100;
     if(LV_COORD_IS_PCT(tr_y)) tr_y = (h * LV_COORD_GET_PCT(tr_y)) / 100;
 
@@ -692,7 +675,7 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     lv_obj_move_to(obj, x, y);
 }
 
-void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
 {
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * parent = obj->parent;
@@ -761,7 +744,7 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     }
 }
 
-void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff, bool ignore_floating)
+void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, bool ignore_floating)
 {
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
@@ -781,7 +764,7 @@ void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive
 {
     if(obj) {
         lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
-        bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM ? true : false;
+        bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
         if(inv) {
             if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
             if(do_tranf) transform_point(obj, p, inv);
@@ -812,7 +795,6 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool re
     area->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
     area->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
     area->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
-    lv_area_increase(area, 5, 5);
 }
 
 
@@ -820,8 +802,8 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_disp_t * disp   = lv_obj_get_disp(obj);
-    if(!lv_disp_is_invalidation_enabled(disp)) return;
+    lv_display_t * disp   = lv_obj_get_disp(obj);
+    if(!lv_display_is_invalidation_enabled(disp)) return;
 
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, area);
@@ -836,7 +818,7 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
-    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_copy(&obj_coords, &obj->coords);
     obj_coords.x1 -= ext_size;
     obj_coords.y1 -= ext_size;
@@ -852,46 +834,43 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 
     /*Invalidate the object only if it belongs to the current or previous or one of the layers'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
-    lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
-    if(obj_scr != lv_disp_get_scr_act(disp) &&
-       obj_scr != lv_disp_get_scr_prev(disp) &&
-       obj_scr != lv_disp_get_layer_bottom(disp) &&
-       obj_scr != lv_disp_get_layer_top(disp) &&
-       obj_scr != lv_disp_get_layer_sys(disp)) {
+    lv_display_t * disp   = lv_obj_get_disp(obj_scr);
+    if(obj_scr != lv_display_get_screen_active(disp) &&
+       obj_scr != lv_display_get_screen_prev(disp) &&
+       obj_scr != lv_display_get_layer_bottom(disp) &&
+       obj_scr != lv_display_get_layer_top(disp) &&
+       obj_scr != lv_display_get_layer_sys(disp)) {
         return false;
     }
 
     /*Truncate the area to the object*/
-    if(!lv_obj_has_flag_any(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-        lv_area_t obj_coords;
-        lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
-        lv_area_copy(&obj_coords, &obj->coords);
-        obj_coords.x1 -= ext_size;
-        obj_coords.y1 -= ext_size;
-        obj_coords.x2 += ext_size;
-        obj_coords.y2 += ext_size;
+    lv_area_t obj_coords;
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    lv_area_copy(&obj_coords, &obj->coords);
+    lv_area_increase(&obj_coords, ext_size, ext_size);
 
-        /*The area is not on the object*/
-        if(!_lv_area_intersect(area, area, &obj_coords)) return false;
-    }
+    /*The area is not on the object*/
+    if(!_lv_area_intersect(area, area, &obj_coords)) return false;
 
     lv_obj_get_transformed_area(obj, area, true, false);
 
-
     /*Truncate recursively to the parents*/
-    lv_obj_t * par = lv_obj_get_parent(obj);
-    while(par != NULL) {
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    while(parent != NULL) {
         /*If the parent is hidden then the child is hidden and won't be drawn*/
-        if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false;
+        if(lv_obj_has_flag(parent, LV_OBJ_FLAG_HIDDEN)) return false;
 
         /*Truncate to the parent and if no common parts break*/
-        if(!lv_obj_has_flag_any(par, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-            lv_area_t par_area = par->coords;
-            lv_obj_get_transformed_area(par, &par_area, true, false);
-            if(!_lv_area_intersect(area, area, &par_area)) return false;
+        lv_area_t parent_coords = parent->coords;
+        if(lv_obj_has_flag(parent, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+            int32_t parent_ext_size = _lv_obj_get_ext_draw_size(parent);
+            lv_area_increase(&parent_coords, parent_ext_size, parent_ext_size);
         }
 
-        par = lv_obj_get_parent(par);
+        lv_obj_get_transformed_area(parent, &parent_coords, true, false);
+        if(!_lv_area_intersect(area, area, &parent_coords)) return false;
+
+        parent = lv_obj_get_parent(parent);
     }
 
     return true;
@@ -902,7 +881,7 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_area_t obj_coords;
-    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_copy(&obj_coords, &obj->coords);
     obj_coords.x1 -= ext_size;
     obj_coords.y1 -= ext_size;
@@ -912,7 +891,7 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
     return lv_obj_area_is_visible(obj, &obj_coords);
 }
 
-void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t size)
+void lv_obj_set_ext_click_area(lv_obj_t * obj, int32_t size)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -924,17 +903,13 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 {
     lv_area_copy(area, &obj->coords);
     if(obj->spec_attr) {
-        area->x1 -= obj->spec_attr->ext_click_pad;
-        area->x2 += obj->spec_attr->ext_click_pad;
-        area->y1 -= obj->spec_attr->ext_click_pad;
-        area->y2 += obj->spec_attr->ext_click_pad;
+        lv_area_increase(area, obj->spec_attr->ext_click_pad, obj->spec_attr->ext_click_pad);
     }
 }
 
 bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
     if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) return false;
-    if(lv_obj_has_state(obj, LV_STATE_DISABLED)) return false;
 
     lv_area_t a;
     lv_obj_get_click_area(obj, &a);
@@ -952,14 +927,14 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
     return res;
 }
 
-lv_coord_t lv_clamp_width(lv_coord_t width, lv_coord_t min_width, lv_coord_t max_width, lv_coord_t ref_width)
+int32_t lv_clamp_width(int32_t width, int32_t min_width, int32_t max_width, int32_t ref_width)
 {
     if(LV_COORD_IS_PCT(min_width)) min_width = (ref_width * LV_COORD_GET_PCT(min_width)) / 100;
     if(LV_COORD_IS_PCT(max_width)) max_width = (ref_width * LV_COORD_GET_PCT(max_width)) / 100;
     return LV_CLAMP(min_width, width, max_width);
 }
 
-lv_coord_t lv_clamp_height(lv_coord_t height, lv_coord_t min_height, lv_coord_t max_height, lv_coord_t ref_height)
+int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, int32_t ref_height)
 {
     if(LV_COORD_IS_PCT(min_height)) min_height = (ref_height * LV_COORD_GET_PCT(min_height)) / 100;
     if(LV_COORD_IS_PCT(max_height)) max_height = (ref_height * LV_COORD_GET_PCT(max_height)) / 100;
@@ -972,23 +947,24 @@ lv_coord_t lv_clamp_height(lv_coord_t height, lv_coord_t min_height, lv_coord_t 
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_coord_t calc_content_width(lv_obj_t * obj)
+static int32_t calc_content_width(lv_obj_t * obj)
 {
-    lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
+    int32_t scroll_x_tmp = lv_obj_get_scroll_x(obj);
+    if(obj->spec_attr) obj->spec_attr->scroll.x = 0;
 
-    lv_coord_t space_right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
-    lv_coord_t space_left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
+    int32_t space_right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
+    int32_t space_left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
 
-    lv_coord_t self_w;
+    int32_t self_w;
     self_w = lv_obj_get_self_width(obj) + space_left + space_right;
 
-    lv_coord_t child_res = LV_COORD_MIN;
+    int32_t child_res = LV_COORD_MIN;
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     /*With RTL find the left most coordinate*/
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
         for(i = 0; i < child_cnt; i++) {
-            lv_coord_t child_res_tmp = LV_COORD_MIN;
+            int32_t child_res_tmp = LV_COORD_MIN;
             lv_obj_t * child = obj->spec_attr->children[i];
             if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
@@ -1024,7 +1000,7 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
     /*Else find the right most coordinate*/
     else {
         for(i = 0; i < child_cnt; i++) {
-            lv_coord_t child_res_tmp = LV_COORD_MIN;
+            int32_t child_res_tmp = LV_COORD_MIN;
             lv_obj_t * child = obj->spec_attr->children[i];
             if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
@@ -1060,25 +1036,28 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
         }
     }
 
+    if(obj->spec_attr) obj->spec_attr->scroll.x = scroll_x_tmp;
+
     if(child_res == LV_COORD_MIN) return self_w;
     return LV_MAX(child_res, self_w);
 }
 
-static lv_coord_t calc_content_height(lv_obj_t * obj)
+static int32_t calc_content_height(lv_obj_t * obj)
 {
-    lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
+    int32_t scroll_y_tmp = lv_obj_get_scroll_y(obj);
+    if(obj->spec_attr) obj->spec_attr->scroll.y = 0;
 
-    lv_coord_t space_top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
-    lv_coord_t space_bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
+    int32_t space_top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
+    int32_t space_bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
 
-    lv_coord_t self_h;
+    int32_t self_h;
     self_h = lv_obj_get_self_height(obj) + space_top + space_bottom;
 
-    lv_coord_t child_res = LV_COORD_MIN;
+    int32_t child_res = LV_COORD_MIN;
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_coord_t child_res_tmp = LV_COORD_MIN;
+        int32_t child_res_tmp = LV_COORD_MIN;
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
@@ -1109,6 +1088,8 @@ static lv_coord_t calc_content_height(lv_obj_t * obj)
         child_res = LV_MAX(child_res, child_res_tmp + lv_obj_get_style_margin_bottom(child, LV_PART_MAIN));
     }
 
+    if(obj->spec_attr) obj->spec_attr->scroll.y = scroll_y_tmp;
+
     if(child_res == LV_COORD_MIN) return self_h;
     return LV_MAX(self_h, child_res + space_bottom);
 }
@@ -1130,20 +1111,17 @@ static void layout_update_core(lv_obj_t * obj)
     lv_obj_refr_pos(obj);
 
     if(child_cnt > 0) {
-        uint32_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
-        if(layout_id > 0 && layout_id <= layout_cnt) {
-            void  * user_data = LV_GC_ROOT(_lv_layout_list)[layout_id - 1].user_data;
-            LV_GC_ROOT(_lv_layout_list)[layout_id - 1].cb(obj, user_data);
-        }
+        _lv_layout_apply(obj);
     }
 }
 
 static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv)
 {
-    int16_t angle = lv_obj_get_style_transform_angle(obj, 0);
-    int16_t zoom = lv_obj_get_style_transform_zoom(obj, 0);
+    int32_t angle = lv_obj_get_style_transform_rotation(obj, 0);
+    int32_t scale_x = lv_obj_get_style_transform_scale_x_safe(obj, 0);
+    int32_t scale_y = lv_obj_get_style_transform_scale_y_safe(obj, 0);
 
-    if(angle == 0 && zoom == LV_ZOOM_NONE) return;
+    if(angle == 0 && scale_x == LV_SCALE_NONE && scale_y == LV_SCALE_NONE) return;
 
     lv_point_t pivot = {
         .x = lv_obj_get_style_transform_pivot_x(obj, 0),
@@ -1162,8 +1140,9 @@ static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv)
 
     if(inv) {
         angle = -angle;
-        zoom = (256 * 256) / zoom;
+        scale_x = (256 * 256) / scale_x;
+        scale_y = (256 * 256) / scale_y;
     }
 
-    lv_point_transform(p, angle, zoom, &pivot);
+    lv_point_transform(p, angle, scale_x, scale_y, &pivot, !inv);
 }

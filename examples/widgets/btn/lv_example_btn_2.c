@@ -4,7 +4,7 @@
 /**
  * Style a button from scratch
  */
-void lv_example_btn_2(void)
+void lv_example_button_2(void)
 {
     /*Init the style for the default state*/
     static lv_style_t style;
@@ -23,7 +23,7 @@ void lv_example_btn_2(void)
 
     lv_style_set_shadow_width(&style, 8);
     lv_style_set_shadow_color(&style, lv_palette_main(LV_PALETTE_GREY));
-    lv_style_set_shadow_ofs_y(&style, 8);
+    lv_style_set_shadow_offset_y(&style, 8);
 
     lv_style_set_outline_opa(&style, LV_OPA_COVER);
     lv_style_set_outline_color(&style, lv_palette_main(LV_PALETTE_BLUE));
@@ -40,7 +40,7 @@ void lv_example_btn_2(void)
     lv_style_set_outline_opa(&style_pr, LV_OPA_TRANSP);
 
     lv_style_set_translate_y(&style_pr, 5);
-    lv_style_set_shadow_ofs_y(&style_pr, 3);
+    lv_style_set_shadow_offset_y(&style_pr, 3);
     lv_style_set_bg_color(&style_pr, lv_palette_darken(LV_PALETTE_BLUE, 2));
     lv_style_set_bg_grad_color(&style_pr, lv_palette_darken(LV_PALETTE_BLUE, 4));
 
@@ -51,7 +51,7 @@ void lv_example_btn_2(void)
 
     lv_style_set_transition(&style_pr, &trans);
 
-    lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
+    lv_obj_t * btn1 = lv_button_create(lv_screen_active());
     lv_obj_remove_style_all(btn1);                          /*Remove the style coming from the theme*/
     lv_obj_add_style(btn1, &style, 0);
     lv_obj_add_style(btn1, &style_pr, LV_STATE_PRESSED);

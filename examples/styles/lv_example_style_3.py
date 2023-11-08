@@ -16,6 +16,6 @@ style.set_border_opa(lv.OPA._50)
 style.set_border_side(lv.BORDER_SIDE.BOTTOM | lv.BORDER_SIDE.RIGHT)
 
 # Create an object with the new style
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.add_style(style, 0)
 obj.center()

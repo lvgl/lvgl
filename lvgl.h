@@ -21,39 +21,42 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "src/lv_init.h"
+
+#include "src/stdlib/lv_mem.h"
+#include "src/stdlib/lv_string.h"
+#include "src/stdlib/lv_sprintf.h"
+
 #include "src/misc/lv_log.h"
 #include "src/misc/lv_timer.h"
 #include "src/misc/lv_math.h"
-#include "src/misc/lv_mem.h"
 #include "src/misc/lv_async.h"
 #include "src/misc/lv_anim_timeline.h"
-#include "src/misc/lv_printf.h"
+#include "src/misc/lv_profiler_builtin.h"
 
-#include "src/hal/lv_hal.h"
+#include "src/tick/lv_tick.h"
 
 #include "src/core/lv_obj.h"
 #include "src/core/lv_group.h"
-#include "src/core/lv_indev.h"
+#include "src/indev/lv_indev.h"
 #include "src/core/lv_refr.h"
-#include "src/core/lv_disp.h"
-#include "src/core/lv_theme.h"
+#include "src/display/lv_display.h"
 
 #include "src/font/lv_font.h"
 #include "src/font/lv_font_loader.h"
 #include "src/font/lv_font_fmt_txt.h"
 
-#include "src/widgets/animimg/lv_animimg.h"
+#include "src/widgets/animimage/lv_animimage.h"
 #include "src/widgets/arc/lv_arc.h"
 #include "src/widgets/bar/lv_bar.h"
-#include "src/widgets/btn/lv_btn.h"
-#include "src/widgets/btnmatrix/lv_btnmatrix.h"
+#include "src/widgets/button/lv_button.h"
+#include "src/widgets/buttonmatrix/lv_buttonmatrix.h"
 #include "src/widgets/calendar/lv_calendar.h"
 #include "src/widgets/canvas/lv_canvas.h"
 #include "src/widgets/chart/lv_chart.h"
 #include "src/widgets/checkbox/lv_checkbox.h"
-#include "src/widgets/colorwheel/lv_colorwheel.h"
 #include "src/widgets/dropdown/lv_dropdown.h"
-#include "src/widgets/img/lv_img.h"
+#include "src/widgets/image/lv_image.h"
 #include "src/widgets/imgbtn/lv_imgbtn.h"
 #include "src/widgets/keyboard/lv_keyboard.h"
 #include "src/widgets/label/lv_label.h"
@@ -61,9 +64,9 @@ extern "C" {
 #include "src/widgets/line/lv_line.h"
 #include "src/widgets/list/lv_list.h"
 #include "src/widgets/menu/lv_menu.h"
-#include "src/widgets/meter/lv_meter.h"
 #include "src/widgets/msgbox/lv_msgbox.h"
 #include "src/widgets/roller/lv_roller.h"
+#include "src/widgets/scale/lv_scale.h"
 #include "src/widgets/slider/lv_slider.h"
 #include "src/widgets/span/lv_span.h"
 #include "src/widgets/spinbox/lv_spinbox.h"
@@ -76,31 +79,34 @@ extern "C" {
 #include "src/widgets/win/lv_win.h"
 
 #include "src/others/snapshot/lv_snapshot.h"
+#include "src/others/sysmon/lv_sysmon.h"
 #include "src/others/monkey/lv_monkey.h"
 #include "src/others/gridnav/lv_gridnav.h"
 #include "src/others/fragment/lv_fragment.h"
 #include "src/others/imgfont/lv_imgfont.h"
-#include "src/others/msg/lv_msg.h"
+#include "src/others/observer/lv_observer.h"
 #include "src/others/ime/lv_ime_pinyin.h"
 #include "src/others/file_explorer/lv_file_explorer.h"
 
 #include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bmp/lv_bmp.h"
 #include "src/libs/fsdrv/lv_fsdrv.h"
-#include "src/libs/png/lv_png.h"
+#include "src/libs/lodepng/lv_lodepng.h"
+#include "src/libs/libpng/lv_libpng.h"
 #include "src/libs/gif/lv_gif.h"
 #include "src/libs/qrcode/lv_qrcode.h"
-#include "src/libs/sjpg/lv_sjpg.h"
+#include "src/libs/tjpgd/lv_tjpgd.h"
+#include "src/libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "src/libs/freetype/lv_freetype.h"
 #include "src/libs/rlottie/lv_rlottie.h"
 #include "src/libs/ffmpeg/lv_ffmpeg.h"
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
 
-#include "src/layouts/lv_layouts.h"
+#include "src/layouts/lv_layout.h"
 
 #include "src/draw/lv_draw.h"
 
-#include "src/themes/lv_themes.h"
+#include "src/themes/lv_theme.h"
 
 #include "src/lv_api_map.h"
 
@@ -109,10 +115,18 @@ extern "C" {
 #include "src/dev/sdl/lv_sdl_mousewheel.h"
 #include "src/dev/sdl/lv_sdl_keyboard.h"
 
-#include "src/dev/disp/fb/lv_linux_fbdev.h"
+#include "src/dev/display/drm/lv_linux_drm.h"
+#include "src/dev/display/fb/lv_linux_fbdev.h"
 
-#include "src/lvgl_private.h"
+#include "src/dev/nuttx/lv_nuttx_entry.h"
+#include "src/dev/nuttx/lv_nuttx_fbdev.h"
+#include "src/dev/nuttx/lv_nuttx_touchscreen.h"
+#include "src/dev/nuttx/lv_nuttx_lcd.h"
+#include "src/dev/nuttx/lv_nuttx_libuv.h"
 
+#include "src/dev/evdev/lv_evdev.h"
+
+#include "src/core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
@@ -174,7 +188,7 @@ static inline int lv_version_patch(void)
     return LVGL_VERSION_PATCH;
 }
 
-static inline const char *lv_version_info(void)
+static inline const char * lv_version_info(void)
 {
     return LVGL_VERSION_INFO;
 }

@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -22,6 +22,6 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            See the [CHANGELOG](https://github.com/lvgl/lvgl/blob/master/docs/CHANGELOG.md)
+            See the [CHANGELOG](https://github.com/lvgl/lvgl/blob/master/docs/CHANGELOG.rst)
           draft: false
           prerelease: false

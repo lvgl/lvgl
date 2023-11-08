@@ -12,7 +12,7 @@ static lv_obj_t * kb;
 void lv_example_textarea_3(void)
 {
     /*Create the text area*/
-    lv_obj_t * ta = lv_textarea_create(lv_scr_act());
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
     lv_obj_add_event(ta, ta_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_textarea_set_accepted_chars(ta, "0123456789:");
     lv_textarea_set_max_length(ta, 5);
@@ -20,7 +20,7 @@ void lv_example_textarea_3(void)
     lv_textarea_set_text(ta, "");
 
     /*Create a keyboard*/
-    kb = lv_keyboard_create(lv_scr_act());
+    kb = lv_keyboard_create(lv_screen_active());
     lv_obj_set_size(kb,  LV_HOR_RES, LV_VER_RES / 2);
     lv_keyboard_set_mode(kb, LV_KEYBOARD_MODE_NUMBER);
     lv_keyboard_set_textarea(kb, ta);

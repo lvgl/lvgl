@@ -9,6 +9,8 @@
 #include "lv_file_explorer.h"
 #if LV_USE_FILE_EXPLORER != 0
 
+#include "../../core/lv_global.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -16,6 +18,8 @@
 
 #define FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH       (22)
 #define FILE_EXPLORER_BROWSER_AREA_WIDTH            (100 - FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH)
+
+#define quick_access_list_button_style (LV_GLOBAL_DEFAULT()->fe_list_button_style)
 
 /**********************
  *      TYPEDEFS
@@ -43,14 +47,14 @@ static bool is_end_with(const char * str1, const char * str2);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_style_t quick_access_list_btn_style;
 
 const lv_obj_class_t lv_file_explorer_class = {
     .constructor_cb = lv_file_explorer_constructor,
     .width_def      = LV_SIZE_CONTENT,
     .height_def     = LV_SIZE_CONTENT,
     .instance_size  = sizeof(lv_file_explorer_t),
-    .base_class     = &lv_obj_class
+    .base_class     = &lv_obj_class,
+    .name = "file-explorer",
 };
 
 /**********************
@@ -81,7 +85,7 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
     /*If path is unavailable */
-    if((path == NULL) || (strlen(path) <= 0)) return;
+    if((path == NULL) || (lv_strlen(path) <= 0)) return;
 
     char ** dir_str = NULL;
     switch(dir) {
@@ -115,15 +119,8 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
         *dir_str = NULL;
     }
 
-    /*Get the size of the text*/
-    size_t len = strlen(path) + 1;
-
     /*Allocate space for the new text*/
-    *dir_str = lv_malloc(len);
-    LV_ASSERT_MALLOC(*dir_str);
-    if(*dir_str == NULL) return;
-
-    strcpy(*dir_str, path);
+    *dir_str = lv_strdup(path);
 }
 
 #endif
@@ -289,7 +286,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*The area displayed above the file browse list(head)*/
     explorer->head_area = lv_obj_create(explorer->browser_area);
     lv_obj_set_size(explorer->head_area, LV_PCT(100), LV_PCT(14));
-    lv_obj_clear_flag(explorer->head_area, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(explorer->head_area, LV_OBJ_FLAG_SCROLLABLE);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
     /*Two lists of quick access bar*/
@@ -299,7 +296,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_set_size(explorer->list_device, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(lv_list_add_text(explorer->list_device, "DEVICE"), lv_palette_main(LV_PALETTE_ORANGE), 0);
 
-    btn = lv_list_add_btn(explorer->list_device, NULL, LV_SYMBOL_DRIVE " File System");
+    btn = lv_list_add_button(explorer->list_device, NULL, LV_SYMBOL_DRIVE " File System");
     lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
 
     /*list 2*/
@@ -307,15 +304,15 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_set_size(explorer->list_places, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(lv_list_add_text(explorer->list_places, "PLACES"), lv_palette_main(LV_PALETTE_LIME), 0);
 
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_HOME " HOME");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_HOME " HOME");
     lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_VIDEO " Video");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_VIDEO " Video");
     lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_IMAGE " Pictures");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_IMAGE " Pictures");
     lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_AUDIO " Music");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_AUDIO " Music");
     lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
-    btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_FILE "  Documents");
+    btn = lv_list_add_button(explorer->list_places, NULL, LV_SYMBOL_FILE "  Documents");
     lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
 #endif
 
@@ -403,9 +400,9 @@ static void init_style(lv_obj_t * obj)
     lv_obj_set_style_pad_all(explorer->list_places, 0, 0);
 
     /*Style of the quick access list btn in the quick access bar*/
-    lv_style_init(&quick_access_list_btn_style);
-    lv_style_set_border_width(&quick_access_list_btn_style, 0);
-    lv_style_set_bg_color(&quick_access_list_btn_style, lv_color_hex(0xf2f1f6));
+    lv_style_init(&quick_access_list_button_style);
+    lv_style_set_border_width(&quick_access_list_button_style, 0);
+    lv_style_set_bg_color(&quick_access_list_button_style, lv_color_hex(0xf2f1f6));
 
     uint32_t i, j;
     for(i = 0; i < lv_obj_get_child_cnt(explorer->quick_access_area); i++) {
@@ -413,8 +410,8 @@ static void init_style(lv_obj_t * obj)
         if(lv_obj_check_type(child, &lv_list_class)) {
             for(j = 0; j < lv_obj_get_child_cnt(child); j++) {
                 lv_obj_t * list_child = lv_obj_get_child(child, j);
-                if(lv_obj_check_type(list_child, &lv_list_btn_class)) {
-                    lv_obj_add_style(list_child, &quick_access_list_btn_style, 0);
+                if(lv_obj_check_type(list_child, &lv_list_button_class)) {
+                    lv_obj_add_style(list_child, &quick_access_list_button_style, 0);
                 }
             }
         }
@@ -488,8 +485,8 @@ static void browser_file_event_handler(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         char file_name[LV_FILE_EXPLORER_PATH_MAX_LEN];
         const char * str_fn = NULL;
-        uint16_t row;
-        uint16_t col;
+        uint32_t row;
+        uint32_t col;
 
         lv_memzero(file_name, sizeof(file_name));
         lv_table_get_selected_cell(explorer->file_table, &row, &col);
@@ -498,7 +495,7 @@ static void browser_file_event_handler(lv_event_t * e)
         str_fn = str_fn + 5;
         if((strcmp(str_fn, ".") == 0))  return;
 
-        if((strcmp(str_fn, "..") == 0) && (strlen(explorer->current_path) > 3)) {
+        if((strcmp(str_fn, "..") == 0) && (lv_strlen(explorer->current_path) > 3)) {
             strip_ext(explorer->current_path);
             /*Remove the last '/' character*/
             strip_ext(explorer->current_path);
@@ -559,7 +556,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
         }
 
         /*fn is empty, if not more files to read*/
-        if(strlen(fn) == 0) {
+        if(lv_strlen(fn) == 0) {
             LV_LOG_USER("Not more files to read!");
             break;
         }
@@ -605,10 +602,10 @@ static void show_dir(lv_obj_t * obj, const char * path)
     lv_obj_scroll_to_y(explorer->file_table, 0, LV_ANIM_OFF);
 
     lv_memzero(explorer->current_path, sizeof(explorer->current_path));
-    strcpy(explorer->current_path, path);
+    lv_strncpy(explorer->current_path, path, sizeof(explorer->current_path) - 1);
     lv_label_set_text_fmt(explorer->path_label, LV_SYMBOL_EYE_OPEN" %s", path);
 
-    size_t current_path_len = strlen(explorer->current_path);
+    size_t current_path_len = lv_strlen(explorer->current_path);
     if((*((explorer->current_path) + current_path_len) != '/') && (current_path_len < LV_FILE_EXPLORER_PATH_MAX_LEN)) {
         *((explorer->current_path) + current_path_len) = '/';
     }
@@ -618,7 +615,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
 /*Remove the specified suffix*/
 static void strip_ext(char * dir)
 {
-    char * end = dir + strlen(dir);
+    char * end = dir + lv_strlen(dir);
 
     while(end >= dir && *end != '/') {
         --end;
@@ -698,8 +695,8 @@ static bool is_end_with(const char * str1, const char * str2)
     if(str1 == NULL || str2 == NULL)
         return false;
 
-    uint16_t len1 = strlen(str1);
-    uint16_t len2 = strlen(str2);
+    uint16_t len1 = lv_strlen(str1);
+    uint16_t len2 = lv_strlen(str2);
     if((len1 < len2) || (len1 == 0 || len2 == 0))
         return false;
 

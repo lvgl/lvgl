@@ -10,8 +10,6 @@ def event_cb(e):
         chart.invalidate()
 
     if code == lv.EVENT.REFR_EXT_DRAW_SIZE:
-        # s = lv.coord_t.__cast__(e.get_param())
-        # print("s: {:d}".format(s))
         e.set_ext_draw_size(20)
 
     elif code == lv.EVENT.DRAW_POST_END:
@@ -37,8 +35,8 @@ def event_cb(e):
             draw_rect_dsc.bg_color = lv.color_black()
             draw_rect_dsc.bg_opa = lv.OPA._50
             draw_rect_dsc.radius = 3
-            draw_rect_dsc.bg_img_src = buf
-            draw_rect_dsc.bg_img_recolor = lv.color_white()
+            draw_rect_dsc.bg_image_src = buf
+            draw_rect_dsc.bg_image_recolor = lv.color_white()
 
             coords = lv.area_t()
             chart.get_coords(coords)
@@ -63,7 +61,7 @@ def event_cb(e):
 #
 
 # Create a chart
-chart = lv.chart(lv.scr_act())
+chart = lv.chart(lv.screen_active())
 chart.set_size(200, 150)
 chart.center()
 
@@ -72,7 +70,7 @@ chart.add_event(event_cb, lv.EVENT.ALL, None)
 chart.refresh_ext_draw_size()
 
 # Zoom in a little in X
-chart.set_zoom_x(800)
+#chart.set_scale_x(800)
 
 # Add two data series
 ser1 = chart.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)

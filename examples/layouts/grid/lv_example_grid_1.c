@@ -6,11 +6,11 @@
  */
 void lv_example_grid_1(void)
 {
-    static lv_coord_t col_dsc[] = {70, 70, 70, LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t row_dsc[] = {50, 50, 50, LV_GRID_TEMPLATE_LAST};
+    static int32_t col_dsc[] = {70, 70, 70, LV_GRID_TEMPLATE_LAST};
+    static int32_t row_dsc[] = {50, 50, 50, LV_GRID_TEMPLATE_LAST};
 
     /*Create a container with grid*/
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_style_grid_column_dsc_array(cont, col_dsc, 0);
     lv_obj_set_style_grid_row_dsc_array(cont, row_dsc, 0);
     lv_obj_set_size(cont, 300, 220);
@@ -25,7 +25,7 @@ void lv_example_grid_1(void)
         uint8_t col = i % 3;
         uint8_t row = i / 3;
 
-        obj = lv_btn_create(cont);
+        obj = lv_button_create(cont);
         /*Stretch the cell horizontally and vertically too
          *Set span to 1 to make the cell 1 column/row sized*/
         lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_STRETCH, col, 1,

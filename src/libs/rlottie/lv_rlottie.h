@@ -34,10 +34,10 @@ typedef enum {
 /** definition in lottieanimation_capi.c */
 struct Lottie_Animation_S;
 typedef struct {
-    lv_img_t img_ext;
+    lv_image_t img_ext;
     struct Lottie_Animation_S * animation;
     lv_timer_t * task;
-    lv_img_dsc_t imgdsc;
+    lv_image_dsc_t imgdsc;
     size_t total_frames;
     size_t current_frame;
     size_t framerate;
@@ -54,9 +54,9 @@ extern const lv_obj_class_t lv_rlottie_class;
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * path);
+lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t height, const char * path);
 
-lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height,
+lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, int32_t width, int32_t height,
                                       const char * rlottie_desc);
 
 void lv_rlottie_set_play_mode(lv_obj_t * rlottie, const lv_rlottie_ctrl_t ctrl);

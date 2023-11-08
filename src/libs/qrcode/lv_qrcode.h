@@ -49,7 +49,7 @@ lv_obj_t * lv_qrcode_create(lv_obj_t * parent);
  * @param obj pointer to a QR code object
  * @param size width and height of the QR code
  */
-void lv_qrcode_set_size(lv_obj_t * obj, lv_coord_t size);
+void lv_qrcode_set_size(lv_obj_t * obj, int32_t size);
 
 /**
  * Set QR code dark color.
@@ -70,9 +70,9 @@ void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color);
  * @param obj pointer to a QR code object
  * @param data data to display
  * @param data_len length of data in bytes
- * @return LV_RES_OK: if no error; LV_RES_INV: on error
+ * @return LV_RESULT_OK: if no error; LV_RESULT_INVALID: on error
  */
-lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len);
+lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len);
 
 /**********************
  *      MACROS

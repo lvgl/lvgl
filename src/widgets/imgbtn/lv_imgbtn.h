@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_imgbtn.h
  *
  */
@@ -32,7 +32,7 @@ typedef enum {
 
 typedef struct {
     const void * img_src;
-    lv_img_header_t header;
+    lv_image_header_t header;
 } lv_imgbtn_src_info_t;
 
 /**********************
@@ -46,7 +46,7 @@ typedef struct {
     lv_imgbtn_src_info_t src_right[_LV_IMGBTN_STATE_NUM]; /*Store right side images to each state*/
 } lv_imgbtn_t;
 
-extern const lv_obj_class_t lv_imgbtn_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_imgbtn_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -83,7 +83,7 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_imgbtn_state_t state, const void * 
 
 
 /**
- * Use this function instead of `lv_obj_add/clear_state` to set a state manually
+ * Use this function instead of `lv_obj_add/remove_state` to set a state manually
  * @param imgbtn pointer to an image button object
  * @param state  the new state
  */
@@ -96,7 +96,7 @@ void lv_imgbtn_set_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
 /**
  * Get the left image in a given state
  * @param imgbtn pointer to an image button object
- * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @param state the state where to get the image (from `lv_button_state_t`) `
  * @return pointer to the left image source (a C array or path to a file)
  */
 const void * lv_imgbtn_get_src_left(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
@@ -104,7 +104,7 @@ const void * lv_imgbtn_get_src_left(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
 /**
  * Get the middle image in a given state
  * @param imgbtn pointer to an image button object
- * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @param state the state where to get the image (from `lv_button_state_t`) `
  * @return pointer to the middle image source (a C array or path to a file)
  */
 const void * lv_imgbtn_get_src_middle(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
@@ -112,7 +112,7 @@ const void * lv_imgbtn_get_src_middle(lv_obj_t * imgbtn, lv_imgbtn_state_t state
 /**
  * Get the right image in a given state
  * @param imgbtn pointer to an image button object
- * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @param state the state where to get the image (from `lv_button_state_t`) `
  * @return pointer to the left image source (a C array or path to a file)
  */
 const void * lv_imgbtn_get_src_right(lv_obj_t * imgbtn, lv_imgbtn_state_t state);

@@ -143,7 +143,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_wave_bottom_map[] = {
 #endif
 };
 
-lv_img_dsc_t img_lv_demo_music_wave_bottom = {
+lv_image_dsc_t img_lv_demo_music_wave_bottom = {
     .header.always_zero = 0,
     .header.w = 272,
     .header.h = 42,

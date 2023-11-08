@@ -51,14 +51,30 @@ typedef struct {
 } lv_font_glyph_dsc_t;
 
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering.*/
-enum {
+enum _lv_font_subpx_t {
     LV_FONT_SUBPX_NONE,
     LV_FONT_SUBPX_HOR,
     LV_FONT_SUBPX_VER,
     LV_FONT_SUBPX_BOTH,
 };
 
+#ifdef DOXYGEN
+typedef _lv_font_subpx_t lv_font_subpx_t;
+#else
 typedef uint8_t lv_font_subpx_t;
+#endif /*DOXYGEN*/
+
+/** Adjust letter spacing for specific character pairs.*/
+enum _lv_font_kerning_t {
+    LV_FONT_KERNING_NORMAL,
+    LV_FONT_KERNING_NONE,
+};
+
+#ifdef DOXYGEN
+typedef _lv_font_kerning_t lv_font_kerning_t;
+#else
+typedef uint8_t lv_font_kerning_t;
+#endif /*DOXYGEN*/
 
 /** Describe the properties of a font*/
 typedef struct _lv_font_t {
@@ -66,12 +82,13 @@ typedef struct _lv_font_t {
     bool (*get_glyph_dsc)(const struct _lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
-    const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_t *, uint32_t);
+    const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_t *, uint32_t, uint8_t *);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
-    lv_coord_t line_height;         /**< The real line height where any text fits*/
-    lv_coord_t base_line;           /**< Base line measured from the top of the line_height*/
-    uint8_t subpx  : 2;             /**< An element of `lv_font_subpx_t`*/
+    int32_t line_height;         /**< The real line height where any text fits*/
+    int32_t base_line;           /**< Base line measured from the top of the line_height*/
+    uint8_t subpx   : 2;            /**< An element of `lv_font_subpx_t`*/
+    uint8_t kerning : 1;            /**< An element of `lv_font_kerning_t`*/
 
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
@@ -87,42 +104,49 @@ typedef struct _lv_font_t {
 
 /**
  * Return with the bitmap of a font.
- * @param font_p pointer to a font
- * @param letter a UNICODE character code
+ * @param font_p        pointer to a font
+ * @param letter        a UNICODE character code
  * @return pointer to the bitmap of the letter
  */
-const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter);
+const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font, uint32_t letter, uint8_t * buf_out);
 
 /**
  * Get the descriptor of a glyph
- * @param font_p pointer to font
- * @param dsc_out store the result descriptor here
- * @param letter a UNICODE letter code
- * @param letter_next the next letter after `letter`. Used for kerning
+ * @param font          pointer to font
+ * @param dsc_out       store the result descriptor here
+ * @param letter        a UNICODE letter code
+ * @param letter_next   the next letter after `letter`. Used for kerning
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
+bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
                            uint32_t letter_next);
 
 /**
  * Get the width of a glyph with kerning
- * @param font pointer to a font
- * @param letter a UNICODE letter
- * @param letter_next the next letter after `letter`. Used for kerning
+ * @param font          pointer to a font
+ * @param letter        a UNICODE letter
+ * @param letter_next   the next letter after `letter`. Used for kerning
  * @return the width of the glyph
  */
 uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next);
 
 /**
  * Get the line height of a font. All characters fit into this height
- * @param font_p pointer to a font
+ * @param font      pointer to a font
  * @return the height of a font
  */
-static inline lv_coord_t lv_font_get_line_height(const lv_font_t * font_p)
+static inline int32_t lv_font_get_line_height(const lv_font_t * font)
 {
-    return font_p->line_height;
+    return font->line_height;
 }
+
+/**
+ * Configure the use of kerning information stored in a font
+ * @param font    pointer to a font
+ * @param kerning `LV_FONT_KERNING_NORMAL` (default) or `LV_FONT_KERNING_NONE`
+ */
+void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning);
 
 /**********************
  *      MACROS
@@ -212,10 +236,6 @@ LV_FONT_DECLARE(lv_font_montserrat_46)
 
 #if LV_FONT_MONTSERRAT_48
 LV_FONT_DECLARE(lv_font_montserrat_48)
-#endif
-
-#if LV_FONT_MONTSERRAT_12_SUBPX
-LV_FONT_DECLARE(lv_font_montserrat_12_subpx)
 #endif
 
 #if LV_FONT_MONTSERRAT_28_COMPRESSED

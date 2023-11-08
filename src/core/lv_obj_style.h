@@ -29,8 +29,14 @@ extern "C" {
 struct _lv_obj_t;
 
 #ifndef LV_OBJ_H
+/// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
 typedef uint32_t lv_part_t;
 typedef uint16_t lv_state_t;
+/// @endcond
+
 #endif
 
 typedef enum {
@@ -39,6 +45,7 @@ typedef enum {
     _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD,  /*The differences can be shown with a simple redraw*/
     _LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /*The differences can be shown with a simple redraw*/
 } _lv_style_state_cmp_t;
+
 
 typedef uint32_t lv_style_selector_t;
 
@@ -69,6 +76,12 @@ typedef struct {
 void _lv_obj_style_init(void);
 
 /**
+ * Deinitialize the object related style manager module.
+ * Called by LVGL in `lv_deinit()`
+ */
+void _lv_obj_style_deinit(void);
+
+/**
  * Add a style to an object.
  * @param obj       pointer to an object
  * @param style     pointer to a style to add
@@ -91,7 +104,7 @@ bool lv_obj_replace_style(struct _lv_obj_t * obj, const lv_style_t * old_style, 
                           lv_style_selector_t selector);
 
 /**
- * Add a style to an object.
+ * Remove a style from an object.
  * @param obj       pointer to an object
  * @param style     pointer to a style to remove. Can be NULL to check only the selector
  * @param selector  OR-ed values of states and a part to remove only styles with matching selectors. LV_STATE_ANY and LV_PART_ANY can be used
@@ -153,9 +166,6 @@ lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, lv_part_t p
 void lv_obj_set_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value,
                                  lv_style_selector_t selector);
 
-void lv_obj_set_local_style_prop_meta(struct _lv_obj_t * obj, lv_style_prop_t prop, uint16_t meta,
-                                      lv_style_selector_t selector);
-
 lv_style_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
                                            lv_style_selector_t selector);
 
@@ -209,13 +219,20 @@ void lv_obj_fade_in(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
  */
 void lv_obj_fade_out(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
 
-lv_state_t lv_obj_style_get_selector_state(lv_style_selector_t selector);
 
-lv_part_t lv_obj_style_get_selector_part(lv_style_selector_t selector);
+static inline lv_state_t lv_obj_style_get_selector_state(lv_style_selector_t selector)
+{
+    return selector & 0xFFFF;
+}
+
+static inline lv_part_t lv_obj_style_get_selector_part(lv_style_selector_t selector)
+{
+    return selector & 0xFF0000;
+}
 
 #include "lv_obj_style_gen.h"
 
-static inline void lv_obj_set_style_pad_all(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_pad_all(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_obj_set_style_pad_left(obj, value, selector);
     lv_obj_set_style_pad_right(obj, value, selector);
@@ -223,19 +240,19 @@ static inline void lv_obj_set_style_pad_all(struct _lv_obj_t * obj, lv_coord_t v
     lv_obj_set_style_pad_bottom(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_pad_hor(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_pad_hor(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_obj_set_style_pad_left(obj, value, selector);
     lv_obj_set_style_pad_right(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_pad_ver(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_pad_ver(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_obj_set_style_pad_top(obj, value, selector);
     lv_obj_set_style_pad_bottom(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_margin_all(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_margin_all(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_obj_set_style_margin_left(obj, value, selector);
     lv_obj_set_style_margin_right(obj, value, selector);
@@ -243,64 +260,92 @@ static inline void lv_obj_set_style_margin_all(struct _lv_obj_t * obj, lv_coord_
     lv_obj_set_style_margin_bottom(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_margin_hor(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_margin_hor(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_obj_set_style_margin_left(obj, value, selector);
     lv_obj_set_style_margin_right(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_margin_ver(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_margin_ver(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_obj_set_style_margin_top(obj, value, selector);
     lv_obj_set_style_margin_bottom(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_obj_set_style_pad_row(obj, value, selector);
     lv_obj_set_style_pad_column(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, lv_coord_t width, lv_coord_t height,
+static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, int32_t width, int32_t height,
                                          lv_style_selector_t selector)
 {
     lv_obj_set_style_width(obj, width, selector);
     lv_obj_set_style_height(obj, height, selector);
 }
 
-static inline lv_coord_t lv_obj_get_style_space_left(const struct _lv_obj_t * obj, uint32_t part)
+static inline void lv_obj_set_style_transform_scale(struct _lv_obj_t * obj, int32_t value,
+                                                    lv_style_selector_t selector)
 {
-    lv_coord_t padding = lv_obj_get_style_pad_left(obj, part);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, part);
+    lv_obj_set_style_transform_scale_x(obj, value, selector);
+    lv_obj_set_style_transform_scale_y(obj, value, selector);
+}
+
+static inline int32_t lv_obj_get_style_space_left(const struct _lv_obj_t * obj, uint32_t part)
+{
+    int32_t padding = lv_obj_get_style_pad_left(obj, part);
+    int32_t border_width = lv_obj_get_style_border_width(obj, part);
     lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
     return (border_side & LV_BORDER_SIDE_LEFT) ? padding + border_width : padding;
 }
 
-static inline lv_coord_t lv_obj_get_style_space_right(const struct _lv_obj_t * obj, uint32_t part)
+static inline int32_t lv_obj_get_style_space_right(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_coord_t padding = lv_obj_get_style_pad_right(obj, part);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, part);
+    int32_t padding = lv_obj_get_style_pad_right(obj, part);
+    int32_t border_width = lv_obj_get_style_border_width(obj, part);
     lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
     return (border_side & LV_BORDER_SIDE_RIGHT) ? padding + border_width : padding;
 }
 
-static inline lv_coord_t lv_obj_get_style_space_top(const struct _lv_obj_t * obj, uint32_t part)
+static inline int32_t lv_obj_get_style_space_top(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_coord_t padding = lv_obj_get_style_pad_top(obj, part);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, part);
+    int32_t padding = lv_obj_get_style_pad_top(obj, part);
+    int32_t border_width = lv_obj_get_style_border_width(obj, part);
     lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
     return (border_side & LV_BORDER_SIDE_TOP) ? padding + border_width : padding;
 }
 
-static inline lv_coord_t lv_obj_get_style_space_bottom(const struct _lv_obj_t * obj, uint32_t part)
+static inline int32_t lv_obj_get_style_space_bottom(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_coord_t padding = lv_obj_get_style_pad_bottom(obj, part);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, part);
+    int32_t padding = lv_obj_get_style_pad_bottom(obj, part);
+    int32_t border_width = lv_obj_get_style_border_width(obj, part);
     lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
     return (border_side & LV_BORDER_SIDE_BOTTOM) ? padding + border_width : padding;
 }
 
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);
+
+static inline int32_t lv_obj_get_style_transform_scale_x_safe(const struct _lv_obj_t * obj, uint32_t part)
+{
+    int16_t zoom = lv_obj_get_style_transform_scale_x(obj, part);
+    return zoom != 0 ? zoom : 1;
+}
+
+static inline int32_t lv_obj_get_style_transform_scale_y_safe(const struct _lv_obj_t * obj, uint32_t part)
+{
+    int16_t zoom = lv_obj_get_style_transform_scale_y(obj, part);
+    return zoom != 0 ? zoom : 1;
+}
+
+
+/**
+ * Get the `opa` style property from all parents and multiply and `>> 8` them.
+ * @param obj       the object whose opacity should be get
+ * @param part      the part whose opacity should be get. Non-MAIN parts will consider the `opa` of the MAIN part too
+ * @return          the final opacity considering the parents' opacity too
+ */
+lv_opa_t lv_obj_get_style_opa_recursive(const struct _lv_obj_t * obj, lv_part_t part);
 
 
 /**********************

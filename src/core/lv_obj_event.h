@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include <stdbool.h>
 #include "../misc/lv_event.h"
-#include "lv_indev.h"
+#include "../indev/lv_indev.h"
 
 /*********************
  *      DEFINES
@@ -26,6 +26,7 @@ extern "C" {
  **********************/
 
 struct _lv_obj_t;
+struct _lv_obj_class_t;
 
 /**
  * Used as the event parameter of ::LV_EVENT_HIT_TEST to check if an `point` can click the object or not.
@@ -38,6 +39,14 @@ typedef struct {
     const lv_point_t * point;   /**< A point relative to screen to check if it can click the object or not*/
     bool res;                   /**< true: `point` can click the object; false: it cannot*/
 } lv_hit_test_info_t;
+
+
+/** Cover check results.*/
+typedef enum {
+    LV_COVER_RES_COVER      = 0,
+    LV_COVER_RES_NOT_COVER  = 1,
+    LV_COVER_RES_MASKED     = 2,
+} lv_cover_res_t;
 
 /**
  * Used as the event parameter of ::LV_EVENT_COVER_CHECK to check if an area is covered by the object or not.
@@ -58,21 +67,21 @@ typedef struct {
  * @param obj           pointer to an object
  * @param event_code    the type of the event from `lv_event_t`
  * @param param         arbitrary data depending on the widget type and the event. (Usually `NULL`)
- * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event_code
+ * @return LV_RESULT_OK: `obj` was not deleted in the event; LV_RESULT_INVALID: `obj` was deleted in the event_code
  */
-lv_res_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code, void * param);
+lv_result_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code, void * param);
 
 /**
  * Used by the widgets internally to call the ancestor widget types's event handler
  * @param class_p   pointer to the class of the widget (NOT the ancestor class)
  * @param e         pointer to the event descriptor
- * @return          LV_RES_OK: the target object was not deleted in the event; LV_RES_INV: it was deleted in the event_code
+ * @return          LV_RESULT_OK: the target object was not deleted in the event; LV_RESULT_INVALID: it was deleted in the event_code
  */
-lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e);
+lv_result_t lv_obj_event_base(const struct _lv_obj_class_t * class_p, lv_event_t * e);
 
 /**
  * Get the current target of the event. It's the object which event handler being called.
- * If the event is not bubbled it's the same as "orignal" target.
+ * If the event is not bubbled it's the same as "original" target.
  * @param e     pointer to the event descriptor
  * @return      the target of the event_code
  */
@@ -103,6 +112,8 @@ lv_event_dsc_t * lv_obj_get_event_dsc(struct _lv_obj_t * obj, uint32_t index);
 
 bool lv_obj_remove_event(struct _lv_obj_t * obj, uint32_t index);
 
+bool lv_obj_remove_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb);
+
 /**
  * Get the input device passed as parameter to indev related events.
  * @param e     pointer to an event
@@ -111,19 +122,12 @@ bool lv_obj_remove_event(struct _lv_obj_t * obj, uint32_t index);
 lv_indev_t * lv_event_get_indev(lv_event_t * e);
 
 /**
- * Get the part draw descriptor passed as parameter to `LV_EVENT_DRAW_PART_BEGIN/END`.
- * @param e     pointer to an event
- * @return      the part draw descriptor to hook the drawing or NULL if called on an unrelated event
- */
-lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e);
-
-/**
  * Get the draw context which should be the first parameter of the draw functions.
  * Namely: `LV_EVENT_DRAW_MAIN/POST`, `LV_EVENT_DRAW_MAIN/POST_BEGIN`, `LV_EVENT_DRAW_MAIN/POST_END`
  * @param e     pointer to an event
  * @return      pointer to a draw context or NULL if called on an unrelated event
  */
-lv_draw_ctx_t * lv_event_get_draw_ctx(lv_event_t * e);
+lv_layer_t * lv_event_get_layer(lv_event_t * e);
 
 /**
  * Get the old area of the object before its size was changed. Can be used in `LV_EVENT_SIZE_CHANGED`
@@ -151,7 +155,7 @@ lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e);
  * @param e     pointer to an event
  * @param size  The new extra draw size
  */
-void lv_event_set_ext_draw_size(lv_event_t * e, lv_coord_t size);
+void lv_event_set_ext_draw_size(lv_event_t * e, int32_t size);
 
 /**
  * Get a pointer to an `lv_point_t` variable in which the self size should be saved (width in `point->x` and height `point->y`).
@@ -182,6 +186,14 @@ const lv_area_t * lv_event_get_cover_area(lv_event_t * e);
  * @param res   an element of ::lv_cover_check_info_t
  */
 void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res);
+
+/**
+ * Get the draw task which was just added.
+ * Can be used in `LV_EVENT_DRAW_TASK_ADDED event`
+ * @param e     pointer to an event
+ * @return      the added draw task
+ */
+lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e);
 
 /**********************
  *      MACROS

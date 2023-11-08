@@ -36,4 +36,4 @@ void lv_example_rlottie_2(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EXAMPLE_SJPG_H*/
+#endif /*LV_EXAMPLE_RLOTTIE_H*/

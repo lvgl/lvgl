@@ -2,7 +2,7 @@
 # Demonstrate how scrolling appears automatically
 #
 # Create an object with the new style
-panel = lv.obj(lv.scr_act())
+panel = lv.obj(lv.screen_active())
 panel.set_size(200, 200)
 panel.center()
 
@@ -17,7 +17,7 @@ child = lv.obj(panel)
 child.set_pos(160, 80)
 child.set_size(80, 80)
 
-child2 = lv.btn(child)
+child2 = lv.button(child)
 child2.set_size(100, 50)
 
 label = lv.label(child2)

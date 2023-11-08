@@ -2,7 +2,7 @@ def drag_event_handler(e):
 
     obj = e.get_target_obj()
 
-    indev = lv.indev_get_act()
+    indev = lv.indev_active()
 
     vect = lv.point_t()
     indev.get_vect(vect)
@@ -12,10 +12,10 @@ def drag_event_handler(e):
 
 
 #
-# Make an object dragable.
+# Make an object draggable.
 #
 
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.set_size(150, 100)
 obj.add_event(drag_event_handler, lv.EVENT.PRESSING, None)
 

@@ -145,9 +145,9 @@ void pika_lvgl_PALETTE___init__(PikaObj* self) {
     obj_setInt(self, "NONE", LV_PALETTE_NONE);
 }
 
-PikaObj* pika_lvgl_scr_act(PikaObj* self) {
+PikaObj* pika_lvgl_screen_active(PikaObj* self) {
     PikaObj* new_obj = newNormalObj(New_TinyObj);
-    lv_obj_t* lv_obj = lv_scr_act();
+    lv_obj_t* lv_obj = lv_screen_active();
     obj_setPtr(new_obj, "lv_obj", lv_obj);
     return new_obj;
 }
@@ -183,9 +183,9 @@ PikaObj* pika_lvgl_palette_main(PikaObj* self, int p) {
     return new_obj;
 }
 
-PikaObj* pika_lvgl_indev_get_act(PikaObj *self){
+PikaObj* pika_lvgl_indev_get_active(PikaObj *self){
     PikaObj* new_obj = newNormalObj(New_pika_lvgl_indev_t);
-    lv_indev_t *lv_indev = lv_indev_get_act();
+    lv_indev_t *lv_indev = lv_indev_active();
     obj_setPtr(new_obj,"lv_indev", lv_indev);
     return new_obj;
 }

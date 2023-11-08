@@ -18,7 +18,7 @@ def event_handler(e):
             if child == currentButton:
                 child.add_state(lv.STATE.CHECKED)
             else:
-                child.clear_state(lv.STATE.CHECKED)
+                child.remove_state(lv.STATE.CHECKED)
 
 def event_handler_top(e):
     global currentButton
@@ -91,15 +91,15 @@ def event_handler_swap(e):
             currentButton.scroll_to_view(lv.ANIM.ON)
 
 #Create a list with buttons that can be sorted
-list1 = lv.list(lv.scr_act())
+list1 = lv.list(lv.screen_active())
 list1.set_size(lv.pct(60), lv.pct(100))
 list1.set_style_pad_row( 5, 0)
 
 for i in range(15):
-    btn = lv.btn(list1)
-    btn.set_width(lv.pct(100))
-    btn.add_event( event_handler, lv.EVENT.CLICKED, None)
-    lab = lv.label(btn)
+    button = lv.button(list1)
+    button.set_width(lv.pct(100))
+    button.add_event( event_handler, lv.EVENT.CLICKED, None)
+    lab = lv.label(button)
     lab.set_text("Item " + str(i))
 
 #Select the first button by default
@@ -107,31 +107,31 @@ currentButton = list1.get_child(0)
 currentButton.add_state(lv.STATE.CHECKED)
 
 #Create a second list with up and down buttons
-list2 = lv.list(lv.scr_act())
+list2 = lv.list(lv.screen_active())
 list2.set_size(lv.pct(40), lv.pct(100))
 list2.align(lv.ALIGN.TOP_RIGHT, 0, 0)
 list2.set_flex_flow(lv.FLEX_FLOW.COLUMN)
 
-btn = list2.add_btn(None, "Top")
-btn.add_event(event_handler_top, lv.EVENT.ALL, None)
-lv.group_remove_obj(btn)
+button = list2.add_button(None, "Top")
+button.add_event(event_handler_top, lv.EVENT.ALL, None)
+lv.group_remove_obj(button)
 
-btn = list2.add_btn(lv.SYMBOL.UP, "Up")
-btn.add_event(event_handler_up, lv.EVENT.ALL, None)
-lv.group_remove_obj(btn)
+button = list2.add_button(lv.SYMBOL.UP, "Up")
+button.add_event(event_handler_up, lv.EVENT.ALL, None)
+lv.group_remove_obj(button)
 
-btn = list2.add_btn(lv.SYMBOL.LEFT, "Center")
-btn.add_event(event_handler_center, lv.EVENT.ALL, None)
-lv.group_remove_obj(btn)
+button = list2.add_button(lv.SYMBOL.LEFT, "Center")
+button.add_event(event_handler_center, lv.EVENT.ALL, None)
+lv.group_remove_obj(button)
 
-btn = list2.add_btn(lv.SYMBOL.DOWN, "Down")
-btn.add_event(event_handler_dn, lv.EVENT.ALL, None)
-lv.group_remove_obj(btn)
+button = list2.add_button(lv.SYMBOL.DOWN, "Down")
+button.add_event(event_handler_dn, lv.EVENT.ALL, None)
+lv.group_remove_obj(button)
 
-btn = list2.add_btn(None, "Bottom")
-btn.add_event(event_handler_bottom, lv.EVENT.ALL, None)
-lv.group_remove_obj(btn)
+button = list2.add_button(None, "Bottom")
+button.add_event(event_handler_bottom, lv.EVENT.ALL, None)
+lv.group_remove_obj(button)
 
-btn = list2.add_btn(lv.SYMBOL.SHUFFLE, "Shuffle")
-btn.add_event(event_handler_swap, lv.EVENT.ALL, None)
-lv.group_remove_obj(btn)
+button = list2.add_button(lv.SYMBOL.SHUFFLE, "Shuffle")
+button.add_event(event_handler_swap, lv.EVENT.ALL, None)
+lv.group_remove_obj(button)

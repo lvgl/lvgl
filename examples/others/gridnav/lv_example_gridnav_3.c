@@ -22,7 +22,7 @@ void lv_example_gridnav_3(void)
     /*It's assumed that the default group is set and
      *there is a keyboard indev*/
 
-    lv_obj_t * cont_main = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont_main = lv_obj_create(lv_screen_active());
     lv_gridnav_add(cont_main, LV_GRIDNAV_CTRL_ROLLOVER | LV_GRIDNAV_CTRL_SCROLL_FIRST);
 
     /*Only the container needs to be in a group*/
@@ -36,12 +36,12 @@ void lv_example_gridnav_3(void)
     lv_obj_t * btn;
     lv_obj_t * label;
 
-    btn = lv_btn_create(cont_main);
+    btn = lv_button_create(cont_main);
     lv_group_remove_obj(btn);
     label = lv_label_create(btn);
     lv_label_set_text(label, "Button 1");
 
-    btn = lv_btn_create(cont_main);
+    btn = lv_button_create(cont_main);
     lv_group_remove_obj(btn);
     label = lv_label_create(btn);
     lv_label_set_text(label, "Button 2");
@@ -83,12 +83,12 @@ void lv_example_gridnav_3(void)
     lv_label_set_text(label, "Use ENTER/ESC to focus/defocus this container");
     lv_obj_set_width(label, lv_pct(100));
 
-    btn = lv_btn_create(cont_sub2);
+    btn = lv_button_create(cont_sub2);
     lv_group_remove_obj(btn);
     label = lv_label_create(btn);
     lv_label_set_text(label, "Button 3");
 
-    btn = lv_btn_create(cont_sub2);
+    btn = lv_button_create(cont_sub2);
     lv_group_remove_obj(btn);
     label = lv_label_create(btn);
     lv_label_set_text(label, "Button 4");

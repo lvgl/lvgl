@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "lv_log.h"
-#include "lv_mem.h"
+#include "../stdlib/lv_mem.h"
 #include LV_ASSERT_HANDLER_INCLUDE
 
 /*********************
@@ -67,7 +67,7 @@ extern "C" {
 #endif
 
 #if LV_USE_ASSERT_MEM_INTEGRITY
-#   define LV_ASSERT_MEM_INTEGRITY() LV_ASSERT_MSG(lv_mem_test() == LV_RES_OK, "Memory integrity error");
+#   define LV_ASSERT_MEM_INTEGRITY() LV_ASSERT_MSG(lv_mem_test() == LV_RESULT_OK, "Memory integrity error");
 #else
 #   define LV_ASSERT_MEM_INTEGRITY()
 #endif

@@ -8,7 +8,7 @@ def event_handler(e):
         print("Option: \"%s\"" % option.strip())
 
 # Create a normal drop down list
-dd = lv.dropdown(lv.scr_act())
+dd = lv.dropdown(lv.screen_active())
 dd.set_options("\n".join([
     "Apple",
     "Banana",

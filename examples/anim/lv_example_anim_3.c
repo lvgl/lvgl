@@ -26,7 +26,7 @@ struct {
 
 static int32_t anim_path_bezier3_cb(const lv_anim_t * a);
 static void refer_chart_cubic_bezier(void);
-static void run_btn_event_handler(lv_event_t * e);
+static void run_button_event_handler(lv_event_t * e);
 static void slider_event_cb(lv_event_t * e);
 static void page_obj_init(lv_obj_t * par);
 static void anim_x_cb(void * var, int32_t v);
@@ -36,11 +36,11 @@ static void anim_x_cb(void * var, int32_t v);
  */
 void lv_example_anim_3(void)
 {
-    static lv_coord_t col_dsc[] = {LV_GRID_FR(1), 200, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t row_dsc[] = {30, 10, 10, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static int32_t col_dsc[] = {LV_GRID_FR(1), 200, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static int32_t row_dsc[] = {30, 10, 10, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
     /*Create a container with grid*/
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_style_pad_all(cont, 2, LV_PART_MAIN);
     lv_obj_set_style_pad_column(cont, 10, LV_PART_MAIN);
     lv_obj_set_style_pad_row(cont, 10, LV_PART_MAIN);
@@ -88,7 +88,7 @@ static void anim_x_cb(void * var, int32_t v)
     lv_obj_set_style_translate_x(var, v, LV_PART_MAIN);
 }
 
-static void run_btn_event_handler(lv_event_t * e)
+static void run_button_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_CLICKED) {
@@ -122,7 +122,7 @@ static void page_obj_init(lv_obj_t * par)
     ginfo.anim_obj = lv_obj_create(par);
     lv_obj_set_size(ginfo.anim_obj, 30, 30);
     lv_obj_set_align(ginfo.anim_obj, LV_ALIGN_TOP_LEFT);
-    lv_obj_clear_flag(ginfo.anim_obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(ginfo.anim_obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(ginfo.anim_obj, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
     lv_obj_set_grid_cell(ginfo.anim_obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 1);
 
@@ -144,8 +144,8 @@ static void page_obj_init(lv_obj_t * par)
     lv_obj_set_grid_cell(ginfo.p1_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 1, 1);
     lv_obj_set_grid_cell(ginfo.p2_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 2, 1);
 
-    ginfo.run_btn = lv_btn_create(par);
-    lv_obj_add_event(ginfo.run_btn, run_btn_event_handler, LV_EVENT_CLICKED, NULL);
+    ginfo.run_btn = lv_button_create(par);
+    lv_obj_add_event(ginfo.run_btn, run_button_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_t * btn_label = lv_label_create(ginfo.run_btn);
     lv_label_set_text(btn_label, LV_SYMBOL_PLAY);
     lv_obj_center(btn_label);

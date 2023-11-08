@@ -14,6 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
+#include "lv_math.h"
+#include "lv_timer.h"
+#include "lv_ll.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -25,6 +28,52 @@ extern "C" {
 
 #define LV_ANIM_REPEAT_INFINITE      0xFFFF
 #define LV_ANIM_PLAYTIME_INFINITE    0xFFFFFFFF
+
+/*
+ * Macros used to set cubic-bezier anim parameter.
+ * Parameters come from https://easings.net/
+ *
+ * Usage:
+ *
+ * lv_anim_t a;
+ * lv_anim_init(&a);
+ * ...
+ * lv_anim_set_path_cb(&a, lv_anim_path_custom_bezier3);
+ * LV_ANIM_SET_EASE_IN_SINE(&a); //Set cubic-bezier anim parameter to easeInSine
+ * ...
+ * lv_anim_start(&a);
+ */
+
+#define _PARA(a, x1, y1, x2, y2) ((a)->parameter.bezier3 =                                  \
+(struct _lv_anim_bezier3_para_t) {                      \
+    LV_BEZIER_VAL_FLOAT(x1), LV_BEZIER_VAL_FLOAT(y1),   \
+    LV_BEZIER_VAL_FLOAT(x2), LV_BEZIER_VAL_FLOAT(y2) }  \
+                                 )
+
+#define LV_ANIM_SET_EASE_IN_SINE(a) _PARA(a, 0.12, 0, 0.39, 0)
+#define LV_ANIM_SET_EASE_OUT_SINE(a) _PARA(a, 0.61, 1, 0.88, 1)
+#define LV_ANIM_SET_EASE_IN_OUT_SINE(a) _PARA(a, 0.37, 0, 0.63, 1)
+#define LV_ANIM_SET_EASE_IN_QUAD(a) _PARA(a, 0.11, 0, 0.5, 0)
+#define LV_ANIM_SET_EASE_OUT_QUAD(a) _PARA(a, 0.5, 1, 0.89, 1)
+#define LV_ANIM_SET_EASE_IN_OUT_QUAD(a) _PARA(a, 0.45, 0, 0.55, 1)
+#define LV_ANIM_SET_EASE_IN_CUBIC(a) _PARA(a, 0.32, 0, 0.67, 0)
+#define LV_ANIM_SET_EASE_OUT_CUBIC(a) _PARA(a, 0.33, 1, 0.68, 1)
+#define LV_ANIM_SET_EASE_IN_OUT_CUBIC(a) _PARA(a, 0.65, 0, 0.35, 1)
+#define LV_ANIM_SET_EASE_IN_QUART(a) _PARA(a, 0.5, 0, 0.75, 0)
+#define LV_ANIM_SET_EASE_OUT_QUART(a) _PARA(a, 0.25, 1, 0.5, 1)
+#define LV_ANIM_SET_EASE_IN_OUT_QUART(a) _PARA(a, 0.76, 0, 0.24, 1)
+#define LV_ANIM_SET_EASE_IN_QUINT(a) _PARA(a, 0.64, 0, 0.78, 0)
+#define LV_ANIM_SET_EASE_OUT_QUINT(a) _PARA(a, 0.22, 1, 0.36, 1)
+#define LV_ANIM_SET_EASE_IN_OUT_QUINT(a) _PARA(a, 0.83, 0, 0.17, 1)
+#define LV_ANIM_SET_EASE_IN_EXPO(a) _PARA(a, 0.7, 0, 0.84, 0)
+#define LV_ANIM_SET_EASE_OUT_EXPO(a) _PARA(a, 0.16, 1, 0.3, 1)
+#define LV_ANIM_SET_EASE_IN_OUT_EXPO(a) _PARA(a, 0.87, 0, 0.13, 1)
+#define LV_ANIM_SET_EASE_IN_CIRC(a) _PARA(a, 0.55, 0, 1, 0.45)
+#define LV_ANIM_SET_EASE_OUT_CIRC(a) _PARA(a, 0, 0.55, 0.45, 1)
+#define LV_ANIM_SET_EASE_IN_OUT_CIRC(a) _PARA(a, 0.85, 0, 0.15, 1)
+#define LV_ANIM_SET_EASE_IN_BACK(a) _PARA(a, 0.36, 0, 0.66, -0.56)
+#define LV_ANIM_SET_EASE_OUT_BACK(a) _PARA(a, 0.34, 1.56, 0.64, 1)
+#define LV_ANIM_SET_EASE_IN_OUT_BACK(a) _PARA(a, 0.68, -0.6, 0.32, 1.6)
 
 LV_EXPORT_CONST_INT(LV_ANIM_REPEAT_INFINITE);
 LV_EXPORT_CONST_INT(LV_ANIM_PLAYTIME_INFINITE);
@@ -41,6 +90,13 @@ typedef enum {
 
 struct _lv_anim_t;
 struct _lv_timer_t;
+
+typedef struct {
+    bool anim_list_changed;
+    bool anim_run_round;
+    struct _lv_timer_t * timer;
+    lv_ll_t anim_ll;
+} lv_anim_state_t;
 
 /** Get the current value during an animation*/
 typedef int32_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
@@ -69,6 +125,13 @@ typedef int32_t (*lv_anim_get_value_cb_t)(struct _lv_anim_t *);
 /** Callback used when the animation is deleted*/
 typedef void (*lv_anim_deleted_cb_t)(struct _lv_anim_t *);
 
+typedef struct _lv_anim_bezier3_para_t {
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+} lv_anim_bezier3_para_t; /**< Parameter used when path is custom_bezier*/
+
 /** Describes an animation*/
 typedef struct _lv_anim_t {
     void * var;                          /**<Variable to animate*/
@@ -88,6 +151,10 @@ typedef struct _lv_anim_t {
     uint32_t playback_time;      /**< Duration of playback animation*/
     uint32_t repeat_delay;       /**< Wait before repeat*/
     uint16_t repeat_cnt;         /**< Repeat count for the animation*/
+    union _lv_anim_path_para_t {
+        lv_anim_bezier3_para_t bezier3; /**< Parameter used when path is custom_bezier*/
+    } parameter;
+
     uint8_t early_apply  : 1;    /**< 1: Apply start value immediately even is there is `delay`*/
 
     /*Animation system use these - user shouldn't set*/
@@ -105,6 +172,11 @@ typedef struct _lv_anim_t {
  * Init. the animation module
  */
 void _lv_anim_core_init(void);
+
+/**
+ * Deinit. the animation module
+ */
+void _lv_anim_core_deinit(void);
 
 /**
  * Initialize an animation variable.
@@ -300,6 +372,24 @@ static inline void lv_anim_set_user_data(lv_anim_t * a, void * user_data)
 }
 
 /**
+ * Set parameter for cubic bezier path
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @param x1        first control point
+ * @param y1
+ * @param y1        second control point
+ */
+static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+{
+    struct _lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
+
+    para->x1 = x1;
+    para->x2 = x2;
+    para->y1 = y1;
+    para->y2 = y2;
+}
+
+
+/**
  * Create an animation
  * @param a         an initialized 'anim_t' variable. Not required after call.
  * @return          pointer to the created animation (different from the `a` parameter)
@@ -360,12 +450,12 @@ static inline void * lv_anim_get_user_data(lv_anim_t * a)
  *                  or NULL to ignore it and delete all the animations of 'var
  * @return          true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb);
+bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb);
 
 /**
  * Delete all the animations
  */
-void lv_anim_del_all(void);
+void lv_anim_delete_all(void);
 
 /**
  * Get the animation of a variable and its `exec_cb`.
@@ -392,9 +482,9 @@ struct _lv_timer_t * lv_anim_get_timer(void);
  *                  or NULL to ignore it and delete all the animations of 'var
  * @return          true: at least 1 animation is deleted, false: no animation is deleted
  */
-static inline bool lv_anim_custom_del(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
+static inline bool lv_anim_custom_delete(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
-    return lv_anim_del(a ? a->var : NULL, (lv_anim_exec_xcb_t)exec_cb);
+    return lv_anim_delete(a ? a->var : NULL, (lv_anim_exec_xcb_t)exec_cb);
 }
 
 /**
@@ -483,6 +573,13 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a);
  * @return      the current value to set
  */
 int32_t lv_anim_path_step(const lv_anim_t * a);
+
+/**
+ * A custom cubic bezier animation path, need to specify cubic-parameters in a->parameter.bezier3
+ * @param a     pointer to an animation
+ * @return      the current value to set
+ */
+int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a);
 
 /**********************
  *   GLOBAL VARIABLES

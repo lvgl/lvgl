@@ -40,27 +40,12 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Return with the bitmap of a font.
- * @param font_p pointer to a font
- * @param letter a UNICODE character code
- * @return pointer to the bitmap of the letter
- */
-const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter)
+const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter, uint8_t * buf_out)
 {
     LV_ASSERT_NULL(font_p);
-    return font_p->get_glyph_bitmap(font_p, letter);
+    return font_p->get_glyph_bitmap(font_p, letter, buf_out);
 }
 
-/**
- * Get the descriptor of a glyph
- * @param font_p pointer to font
- * @param dsc_out store the result descriptor here
- * @param letter a UNICODE letter code
- * @param letter_next the next letter after `letter`. Used for kerning
- * @return true: descriptor is successfully loaded into `dsc_out`.
- *         false: the letter was not found, no data is loaded to `dsc_out`
- */
 bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
                            uint32_t letter_next)
 {
@@ -77,7 +62,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     dsc_out->resolved_font = NULL;
 
     while(f) {
-        bool found = f->get_glyph_dsc(f, dsc_out, letter, letter_next);
+        bool found = f->get_glyph_dsc(f, dsc_out, letter, f->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
         if(found) {
             if(!dsc_out->is_placeholder) {
                 dsc_out->resolved_font = f;
@@ -94,7 +79,8 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 
 #if LV_USE_FONT_PLACEHOLDER
     if(placeholder_font != NULL) {
-        placeholder_font->get_glyph_dsc(placeholder_font, dsc_out, letter, letter_next);
+        placeholder_font->get_glyph_dsc(placeholder_font, dsc_out, letter,
+                                        placeholder_font->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
         dsc_out->resolved_font = placeholder_font;
         return true;
     }
@@ -126,19 +112,18 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     return false;
 }
 
-/**
- * Get the width of a glyph with kerning
- * @param font pointer to a font
- * @param letter a UNICODE letter
- * @param letter_next the next letter after `letter`. Used for kerning
- * @return the width of the glyph
- */
 uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
 {
     LV_ASSERT_NULL(font);
     lv_font_glyph_dsc_t g;
     lv_font_get_glyph_dsc(font, &g, letter, letter_next);
     return g.adv_w;
+}
+
+void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning)
+{
+    LV_ASSERT_NULL(font);
+    font->kerning = kerning;
 }
 
 /**********************

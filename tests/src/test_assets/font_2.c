@@ -18,7 +18,7 @@
  *----------------*/
 
 /*Store the image of the glyphs*/
-static LV_ATTRIBUTE_LARGE_CONST const uint8_t gylph_bitmap[] = {
+static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     /* U+20 " " */
 
     /* U+21 "!" */
@@ -1374,7 +1374,7 @@ static const lv_font_fmt_txt_kern_classes_t kern_classes = {
 
 /*Store all the custom data of the font*/
 static lv_font_fmt_txt_dsc_t font_dsc = {
-    .glyph_bitmap = gylph_bitmap,
+    .glyph_bitmap = glyph_bitmap,
     .glyph_dsc = glyph_dsc,
     .cmaps = cmaps,
     .kern_dsc = &kern_classes,

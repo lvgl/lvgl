@@ -32,13 +32,13 @@ void pika_lvgl_lv_timer_t_set_cb(PikaObj* self, Arg* cb) {
     if (NULL == g_pika_lv_timer_event_listener) {
         pks_eventLisener_init(&g_pika_lv_timer_event_listener);
     }
-    pks_eventLicener_registEvent(g_pika_lv_timer_event_listener,
+    pks_eventLicener_registerEvent(g_pika_lv_timer_event_listener,
                                  (uint32_t)lv_timer, self);
 
 }
 
-void pika_lvgl_lv_timer_t__del(PikaObj* self) {
+void pika_lvgl_lv_timer_t__delete(PikaObj* self) {
     lv_timer_t* lv_timer = obj_getPtr(self, "lv_timer");
-    lv_timer_del(lv_timer);
+    lv_timer_delete(lv_timer);
 }
 #endif

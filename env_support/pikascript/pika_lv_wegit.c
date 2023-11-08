@@ -160,7 +160,7 @@ void pika_lvgl_bar_set_start_value(PikaObj *self, int start_value, int anim){
 
 void pika_lvgl_btn___init__(PikaObj* self, PikaObj* parent) {
     lv_obj_t* lv_parent = obj_getPtr(parent, "lv_obj");
-    lv_obj_t* lv_obj = lv_btn_create(lv_parent);
+    lv_obj_t* lv_obj = lv_button_create(lv_parent);
     obj_setPtr(self, "lv_obj", lv_obj);
 }
 
@@ -268,7 +268,7 @@ void pika_lvgl_dropdown_set_selected(PikaObj *self, int sel_opt){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
     lv_dropdown_set_selected(lv_obj, sel_opt);
 }
-void pika_lvgl_dropdown_set_selected_hightlight(PikaObj *self, int en){
+void pika_lvgl_dropdown_set_selected_highlight(PikaObj *self, int en){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
     lv_dropdown_set_selected_highlight(lv_obj, en);
 }

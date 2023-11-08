@@ -7,11 +7,11 @@
  */
 void lv_example_grid_2(void)
 {
-    static lv_coord_t col_dsc[] = {70, 70, 70, LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t row_dsc[] = {50, 50, 50, LV_GRID_TEMPLATE_LAST};
+    static int32_t col_dsc[] = {70, 70, 70, LV_GRID_TEMPLATE_LAST};
+    static int32_t row_dsc[] = {50, 50, 50, LV_GRID_TEMPLATE_LAST};
 
     /*Create a container with grid*/
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_grid_dsc_array(cont, col_dsc, row_dsc);
     lv_obj_set_size(cont, 300, 220);
     lv_obj_center(cont);

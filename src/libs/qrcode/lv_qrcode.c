@@ -30,11 +30,13 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
  *  STATIC VARIABLES
  **********************/
 
+
 const lv_obj_class_t lv_qrcode_class = {
     .constructor_cb = lv_qrcode_constructor,
     .destructor_cb = lv_qrcode_destructor,
     .instance_size = sizeof(lv_qrcode_t),
-    .base_class = &lv_canvas_class
+    .base_class = &lv_canvas_class,
+    .name = "qrcode",
 };
 
 /**********************
@@ -58,11 +60,11 @@ lv_obj_t * lv_qrcode_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_qrcode_set_size(lv_obj_t * obj, lv_coord_t size)
+void lv_qrcode_set_size(lv_obj_t * obj, int32_t size)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_img_dsc_t * img_dsc = lv_canvas_get_img(obj);
+    lv_image_dsc_t * img_dsc = lv_canvas_get_image(obj);
     void * buf = (void *)img_dsc->data;
 
     uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(size, size);
@@ -93,31 +95,30 @@ void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color)
     qrcode->light_color = color;
 }
 
-lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
+lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
-    lv_img_dsc_t * img_dsc = lv_canvas_get_img(obj);
+    lv_image_dsc_t * img_dsc = lv_canvas_get_image(obj);
     if(!img_dsc->data) {
         LV_LOG_ERROR("canvas buffer is NULL");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
-    lv_canvas_set_palette(obj, 0, lv_color_to32(qrcode->dark_color));
-    lv_canvas_set_palette(obj, 1, lv_color_to32(qrcode->light_color));
-    lv_color_t c;
-    lv_color_set_int(&c, 1);
+    lv_canvas_set_palette(obj, 0, lv_color_to_32(qrcode->dark_color, 0xff));
+    lv_canvas_set_palette(obj, 1, lv_color_to_32(qrcode->light_color, 0xff));
+    lv_color_t c = lv_color_from_int(1);
     lv_canvas_fill_bg(obj, c, LV_OPA_COVER);
 
-    if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RES_INV;
+    if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RESULT_INVALID;
 
     int32_t qr_version = qrcodegen_getMinFitVersion(qrcodegen_Ecc_MEDIUM, data_len);
-    if(qr_version <= 0) return LV_RES_INV;
+    if(qr_version <= 0) return LV_RESULT_INVALID;
     int32_t qr_size = qrcodegen_version2size(qr_version);
-    if(qr_size <= 0) return LV_RES_INV;
+    if(qr_size <= 0) return LV_RESULT_INVALID;
     int32_t scale = img_dsc->header.w / qr_size;
-    if(scale <= 0) return LV_RES_INV;
+    if(scale <= 0) return LV_RESULT_INVALID;
     int32_t remain = img_dsc->header.w % qr_size;
 
     /* The qr version is incremented by four point */
@@ -141,10 +142,10 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
     if(!ok) {
         lv_free(qr0);
         lv_free(data_tmp);
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
-    lv_coord_t obj_w = img_dsc->header.w;
+    int32_t obj_w = img_dsc->header.w;
     qr_size = qrcodegen_getSize(qr0);
     scale = obj_w / qr_size;
     int scaled = qr_size * scale;
@@ -167,7 +168,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
             if(aligned == false && (x & 0x7) == 0) aligned = true;
 
             if(aligned == false) {
-                lv_color_set_int(&c, a ? 0 : 1);
+                c = lv_color_from_int(a ? 0 : 1);
                 lv_canvas_set_px(obj, x, y, c, LV_OPA_COVER);
             }
             else {
@@ -201,7 +202,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
 
     lv_free(qr0);
     lv_free(data_tmp);
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 /**********************
@@ -224,8 +225,10 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
 
-    lv_img_dsc_t * img_dsc = lv_canvas_get_img(obj);
-    lv_img_cache_invalidate_src(img_dsc);
+    lv_image_dsc_t * img_dsc = lv_canvas_get_image(obj);
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(img_dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 
     if(!img_dsc->data) {
         return;

@@ -15,29 +15,20 @@ extern "C" {
 /***********************
  * PLATFORM CONFIGS
  ***********************/
-#include "lv_test_malloc.h"
 
 #ifdef LVGL_CI_USING_SYS_HEAP
-#define LV_USE_BUILTIN_MALLOC   0
-#define LV_USE_BUILTIN_MEMCPY   1
-#define LV_USE_BUILTIN_SNPRINTF 1
-#define LV_STDLIB_INCLUDE <stdlib.h>
-#define LV_MALLOC       lv_test_malloc
-#define LV_REALLOC      lv_test_realloc
-#define LV_FREE         lv_test_free
-#define LV_MEMSET       memset
-#define LV_MEMCPY       memcpy
+#define LV_USE_STDLIB_MALLOC        LV_STDLIB_CLIB
+#define LV_USE_STDLIB_STRING        LV_STDLIB_CLIB
+#define LV_USE_STDLIB_SPRINTF       LV_STDLIB_CLIB
+#define LV_USE_OS                   LV_OS_PTHREAD
+#define LV_OBJ_STYLE_CACHE          0
 #endif
 
 #ifdef LVGL_CI_USING_DEF_HEAP
-#define LV_USE_BUILTIN_MALLOC   1
-#define LV_USE_BUILTIN_MEMCPY   1
-#define LV_USE_BUILTIN_SNPRINTF 1
-#define LV_MALLOC       lv_test_malloc
-#define LV_REALLOC      lv_test_realloc
-#define LV_FREE         lv_test_free
-#define LV_MEMSET       lv_memset_builtin
-#define LV_MEMCPY       lv_memcpy_builtin
+#define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
+#define LV_OBJ_STYLE_CACHE      1
 #endif
 
 
@@ -64,9 +55,6 @@ extern "C" {
 void lv_test_assert_fail(void);
 #define LV_ASSERT_HANDLER lv_test_assert_fail();
 
-uint32_t custom_tick_get(void);
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR custom_tick_get()
-
 typedef void * lv_user_data_t;
 
 
@@ -86,7 +74,7 @@ typedef void * lv_user_data_t;
 #elif LV_TEST_OPTION == 3
 #define  LV_COLOR_DEPTH     16
 #define  LV_DPI_DEF         90
-#include "lv_test_conf_full.h"
+#include "lv_test_conf_minimal.h"
 #elif LV_TEST_OPTION == 2
 #define  LV_COLOR_DEPTH     8
 #define  LV_DPI_DEF         60
@@ -100,11 +88,18 @@ typedef void * lv_user_data_t;
 #if defined(LVGL_CI_USING_SYS_HEAP) || defined(LVGL_CI_USING_DEF_HEAP)
 #undef LV_LOG_PRINTF
 
+//#define LV_DRAW_BUF_STRIDE_ALIGN                64
+//#define LV_DRAW_BUF_ALIGN                       40  /*Use non power of 2 to avoid the case when `malloc` returns aligned pointer by default*/
+
 /*For screenshots*/
 #undef LV_USE_PERF_MONITOR
 #undef LV_USE_MEM_MONITOR
 #undef LV_DPI_DEF
 #define  LV_DPI_DEF         130
+#endif
+
+#if defined(LVGL_CI_USING_SYS_HEAP)
+#undef LV_USE_FLOAT
 #endif
 
 

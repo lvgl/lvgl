@@ -1,7 +1,7 @@
 #
 # Styling the scrollbars
 #
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.set_size(200, 100)
 obj.center()
 

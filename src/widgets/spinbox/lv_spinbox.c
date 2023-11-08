@@ -10,7 +10,8 @@
 #if LV_USE_SPINBOX
 
 #include "../../misc/lv_assert.h"
-#include "../../core/lv_indev.h"
+#include "../../indev/lv_indev.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -40,7 +41,8 @@ const lv_obj_class_t lv_spinbox_class = {
     .width_def = LV_DPI_DEF,
     .instance_size = sizeof(lv_spinbox_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
-    .base_class = &lv_textarea_class
+    .base_class = &lv_textarea_class,
+    .name = "spinbox",
 };
 /**********************
  *      MACROS
@@ -100,7 +102,7 @@ void lv_spinbox_set_rollover(lv_obj_t * obj, bool b)
  * @param separator_position number of digit before the decimal point. If 0, decimal point is not
  * shown
  */
-void lv_spinbox_set_digit_format(lv_obj_t * obj, uint8_t digit_count, uint8_t separator_position)
+void lv_spinbox_set_digit_format(lv_obj_t * obj, uint32_t digit_count, uint32_t separator_position)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
@@ -160,7 +162,7 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t range_min, int32_t range_max)
  * @param spinbox pointer to spinbox
  * @param pos selected position in spinbox
  */
-void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint8_t pos)
+void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint32_t pos)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
@@ -363,16 +365,16 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
     LV_UNUSED(class_p);
 
     /*Call the ancestor's event handler*/
-    lv_res_t res = LV_RES_OK;
+    lv_result_t res = LV_RESULT_OK;
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     if(code == LV_EVENT_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
-        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_t * indev = lv_indev_active();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(obj))) {
             if(spinbox->digit_count > 1) {
                 if(spinbox->digit_step_dir == LV_DIR_RIGHT) {
@@ -418,7 +420,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
 
             /* Handle spinbox with decimal point (spinbox->dec_point_pos != 0) */
-            uint16_t cp = spinbox->ta.cursor.pos;
+            uint32_t cp = spinbox->ta.cursor.pos;
             if(spinbox->ta.cursor.pos > spinbox->dec_point_pos && spinbox->dec_point_pos != 0) cp--;
 
             const size_t len = spinbox->digit_count - 1;
@@ -427,12 +429,12 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(spinbox->range_min < 0) pos++;
 
             spinbox->step = 1;
-            uint16_t i;
+            uint32_t i;
             for(i = 0; i < pos; i++) spinbox->step *= 10;
         }
     }
     else if(code == LV_EVENT_KEY) {
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
 
         uint32_t c = *((uint32_t *)lv_event_get_param(e)); /*uint32_t because can be UTF-8*/
         if(c == LV_KEY_RIGHT) {
@@ -467,7 +469,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     char textarea_txt[LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES] = {0U};
     char * buf_p = textarea_txt;
 
-    uint8_t cur_shift_left = 0;
+    uint32_t cur_shift_left = 0;
     if(spinbox->range_min < 0) {  // hide sign if there are only positive values
         /*Add the sign*/
         (*buf_p) = spinbox->value >= 0 ? '+' : '-';
@@ -478,17 +480,17 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
         cur_shift_left++;
     }
 
-    /*Convert the numbers to string (the sign is already handled so always covert positive number)*/
+    /*Convert the numbers to string (the sign is already handled so always convert positive number)*/
     char digits[LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES];
     lv_snprintf(digits, LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES, "%" LV_PRId32, LV_ABS(spinbox->value));
 
     /*Add leading zeros*/
     int32_t i;
-    const int digits_len = (int) lv_strlen(digits);
+    const size_t digits_len = lv_strlen(digits);
 
     const int leading_zeros_cnt = spinbox->digit_count - digits_len;
     if(leading_zeros_cnt) {
-        for(i = (uint16_t) digits_len; i >= 0; i--) {
+        for(i = (int32_t) digits_len; i >= 0; i--) {
             digits[i + leading_zeros_cnt] = digits[i];
         }
         /* NOTE: Substitute with memset? */
@@ -498,8 +500,8 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     }
 
     /*Add the decimal part*/
-    const int32_t intDigits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
-    for(i = 0; i < intDigits && digits[i] != '\0'; i++) {
+    const uint32_t intDigits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
+    for(i = 0; i < (int32_t)intDigits && digits[i] != '\0'; i++) {
         (*buf_p) = digits[i];
         buf_p++;
     }
@@ -520,7 +522,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
 
     /*Set the cursor position*/
     int32_t step = spinbox->step;
-    uint8_t cur_pos = (uint8_t)spinbox->digit_count;
+    uint32_t cur_pos = (uint32_t)spinbox->digit_count;
     while(step >= 10) {
         step /= 10;
         cur_pos--;

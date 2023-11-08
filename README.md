@@ -53,7 +53,7 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - A fully portable C (C++ compatible) library with no external dependencies.
   - Can be compiled to any MCU or MPU, with any (RT)OS.
   - Supports monochrome, ePaper, OLED or TFT displays, or even monitors. [Porting Guide](https://docs.lvgl.io/master/porting/project.html)
-  - Distributed under the MIT licence, so you can easily use it in commercial projects too.
+  - Distributed under the MIT license, so you can easily use it in commercial projects too.
   - Needs only 32kB RAM and 128 kB Flash, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
   - OS, External memory and GPU are supported but not required.
 
@@ -65,7 +65,7 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.
   - Rendering engine supporting animations, anti-aliasing, opacity, smooth scrolling, shadows, image transformation, etc  
   - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/porting/indev.html).
-  - [Multiple display](https://docs.lvgl.io/master/overview/display.html) support.
+  - [Multiple display](https://docs.lvgl.io/master/overview/disp.html#multiple-display-support) support.
 
 **Binding and Build Support**
   - [Micropython Binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
@@ -91,7 +91,7 @@ Our goal is to provide financial compensation for people who do the most for LVG
 We use [GitHub Sponsors](https://github.com/sponsors/lvgl) where you can easily send one time or recurring donations. You can also see all of our expenses  in a transparent way.
 
 **How to get paid for your contribution?**<br>
-If someone implements or fixes an issue labeled as [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) he or she will get a payment for that work. We estimate the required time, complexity and importance of the issue and set a price accordingly. To jump in just comment on a [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) issue saying "Hi, I'd like to deal with it. This is how I'm planning to fix/implement it...". A work is considered ready when it's approved and merged by a maintainer. After that you can submit and expense at [opencollective.com](https://opencollective.com/lvgl) and you will receive teh payment in a few days.
+If someone implements or fixes an issue labeled as [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) he or she will get a payment for that work. We estimate the required time, complexity and importance of the issue and set a price accordingly. To jump in just comment on a [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) issue saying "Hi, I'd like to deal with it. This is how I'm planning to fix/implement it...". A work is considered ready when it's approved and merged by a maintainer. After that you can submit and expense at [opencollective.com](https://opencollective.com/lvgl) and you will receive the payment in a few days.
 
 **Organizations supporting LVGL**<br>
 [![Sponsors of LVGL](https://opencollective.com/lvgl/organizations.svg?width=600)](https://opencollective.com/lvgl)
@@ -101,13 +101,13 @@ If someone implements or fixes an issue labeled as [Sponsored](https://github.co
 
 ## :package: Packages
 LVGL is available as:
-- [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
+- [Arduino library](https://docs.lvgl.io/master/integration/framework/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr library](https://docs.zephyrproject.org/latest/reference/kconfig/CONFIG_LVGL.html)
-- [ESP32 component](https://docs.lvgl.io/master/get-started/platforms/espressif.html)
+- [Zephyr library](https://docs.lvgl.io/master/integration/os/zephyr.html)
+- [ESP32 component](https://components.espressif.com/components/lvgl/lvgl)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/get-started/os/rt-thread.html)
+- [NuttX library](https://docs.lvgl.io/master/integration/os/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
 - CMSIS-Pack
 - [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 

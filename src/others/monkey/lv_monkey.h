@@ -32,8 +32,10 @@ typedef struct {
 
     /**< Monkey execution period*/
     struct {
+        //! @cond Doxygen_Suppress
         uint32_t min;
         uint32_t max;
+        //! @endcond
     } period_range;
 
     /**< The range of input value*/
@@ -99,7 +101,7 @@ void * lv_monkey_get_user_data(lv_monkey_t * monkey);
  * Delete monkey
  * @param monkey pointer to monkey
  */
-void lv_monkey_del(lv_monkey_t * monkey);
+void lv_monkey_delete(lv_monkey_t * monkey);
 
 /**********************
  *      MACROS

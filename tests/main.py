@@ -12,7 +12,7 @@ lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Key values must match variable names in CMakeLists.txt.
 build_only_options = {
-    'OPTIONS_NORMAL_8BIT': 'Normal config, 8 bit color depth',
+#    'OPTIONS_NORMAL_8BIT': 'Normal config, 8 bit color depth',
     'OPTIONS_16BIT': 'Minimal config, 16 bit color depth',
     'OPTIONS_24BIT': 'Normal config, 24 bit color depth',
     'OPTIONS_FULL_32BIT': 'Full config, 32 bit color depth',
@@ -45,7 +45,7 @@ def options_abbrev(options_name):
     return options_name[len(prefix):].lower()
 
 
-def get_base_buid_dir(options_name):
+def get_base_build_dir(options_name):
     '''Given the build options name, return the build directory name.
 
     Does not return the full path to the directory - just the base name.'''
@@ -57,7 +57,7 @@ def get_build_dir(options_name):
 
     Returns absolute path to the build directory.'''
     global lvgl_test_dir
-    return os.path.join(lvgl_test_dir, get_base_buid_dir(options_name))
+    return os.path.join(lvgl_test_dir, get_base_build_dir(options_name))
 
 
 def build_tests(options_name, build_type, clean):

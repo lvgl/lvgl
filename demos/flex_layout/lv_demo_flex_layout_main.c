@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_demo_flex_layout_main.c
  *
  */
@@ -40,7 +40,7 @@ static view_t view;
 
 void lv_demo_flex_layout(void)
 {
-    view_create(lv_scr_act(), &view);
+    view_create(lv_screen_active(), &view);
     ctrl_pad_attach(&view);
 }
 
