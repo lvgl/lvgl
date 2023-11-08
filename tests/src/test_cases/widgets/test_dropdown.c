@@ -360,7 +360,6 @@ void test_dropdown_render_1(void)
     lv_obj_set_style_bg_color(list, lv_color_hex3(0xf00), LV_PART_SELECTED | LV_STATE_CHECKED);
     lv_dropdown_set_selected(dd3, 3);
 
-
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_1.png");
 }
 
