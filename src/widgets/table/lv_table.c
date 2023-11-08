@@ -363,7 +363,7 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_tab
     table->cell_data[cell]->ctrl &= (~ctrl);
 }
 
-void lv_table_set_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, void * user_data)
+void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, void * user_data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -464,7 +464,7 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint32_t * row, uint32_t * col)
     *col = table->col_act;
 }
 
-void * lv_table_get_user_data(lv_obj_t * obj, uint16_t row, uint16_t col)
+void * lv_table_get_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

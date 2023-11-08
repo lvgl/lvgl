@@ -157,7 +157,7 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_tab
  *                  and it will be freed automatically when the table is deleted or
  *                  when the cell is dropped due to lower row or column count.
  */
-void lv_table_set_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, void * user_data);
+void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, void * user_data);
 
 /*=====================
  * Getter functions
@@ -218,7 +218,7 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint32_t * row, uint32_t * col);
  * @param row       id of the row [0 .. row_cnt -1]
  * @param col       id of the column [0 .. col_cnt -1]
  */
-void * lv_table_get_user_data(lv_obj_t * obj, uint16_t row, uint16_t col);
+void * lv_table_get_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col);
 
 /**********************
  *      MACROS
