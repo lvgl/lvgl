@@ -903,10 +903,6 @@ static bool button_get_checked(lv_buttonmatrix_ctrl_t ctrl_bits)
     return ctrl_bits & LV_BUTTONMATRIX_CTRL_CHECKED;
 }
 
-static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits)
-{
-    return ctrl_bits & LV_BUTTONMATRIX_CTRL_RECOLOR;
-}
 /**
  * Gives the button id of a button under a given point
  * @param obj pointer to a button matrix object
