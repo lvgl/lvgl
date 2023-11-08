@@ -39,9 +39,8 @@ extern "C" {
 
 enum _lv_text_flag_t {
     LV_TEXT_FLAG_NONE    = 0x00,
-    LV_TEXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
-    LV_TEXT_FLAG_EXPAND  = 0x02, /**< Ignore max-width to avoid automatic word wrapping*/
-    LV_TEXT_FLAG_FIT     = 0x04, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
+    LV_TEXT_FLAG_EXPAND  = 0x01, /**< Ignore max-width to avoid automatic word wrapping*/
+    LV_TEXT_FLAG_FIT     = 0x02, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
 };
 
 #ifdef DOXYGEN
