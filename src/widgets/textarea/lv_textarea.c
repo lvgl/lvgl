@@ -935,7 +935,6 @@ static void label_event_cb(lv_event_t * e)
 }
 
 
-
 /**
  * Called to blink the cursor
  * @param ta pointer to a text area

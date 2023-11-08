@@ -85,7 +85,6 @@ testable int getTotalBits(const struct qrcodegen_Segment segs[], size_t len, int
 static int numCharCountBits(enum qrcodegen_Mode mode, int version);
 
 
-
 /*---- Private tables of constants ----*/
 
 // The set of all legal characters in alphanumeric mode, where each character
@@ -119,7 +118,6 @@ static const int PENALTY_N1 =  3;
 static const int PENALTY_N2 =  3;
 static const int PENALTY_N3 = 40;
 static const int PENALTY_N4 = 10;
-
 
 
 /*---- High-level QR Code encoding functions ----*/
@@ -191,7 +189,6 @@ testable void appendBitsToBuffer(unsigned int val, int numBits, uint8_t buffer[]
     for(int i = numBits - 1; i >= 0; i--, (*bitLen)++)
         buffer[*bitLen >> 3] |= ((val >> i) & 1) << (7 - (*bitLen & 7));
 }
-
 
 
 /*---- Low-level QR Code encoding functions ----*/
@@ -288,7 +285,6 @@ bool qrcodegen_encodeSegmentsAdvanced(const struct qrcodegen_Segment segs[], siz
 }
 
 
-
 /*---- Error correction code generation functions ----*/
 
 // Appends error correction bytes to each block of the given data array, then interleaves
@@ -356,7 +352,6 @@ testable int getNumRawDataModules(int ver)
 }
 
 
-
 /*---- Reed-Solomon ECC generator functions ----*/
 
 // Calculates the Reed-Solomon generator polynomial of the given degree, storing in result[0 : degree].
@@ -416,7 +411,6 @@ testable uint8_t finiteFieldMultiply(uint8_t x, uint8_t y)
     }
     return z;
 }
-
 
 
 /*---- Drawing function modules ----*/
@@ -580,7 +574,6 @@ static void fillRectangle(int left, int top, int width, int height, uint8_t qrco
             setModule(qrcode, left + dx, top + dy, true);
     }
 }
-
 
 
 /*---- Drawing data modules and masking ----*/
@@ -775,7 +768,6 @@ static bool hasFinderLikePattern(const unsigned char runHistory[7])
 }
 
 
-
 /*---- Basic QR Code information ----*/
 
 // Public function - see documentation comment in header file.
@@ -837,7 +829,6 @@ static bool getBit(int x, int i)
 {
     return ((x >> i) & 1) != 0;
 }
-
 
 
 /*---- Segment handling ----*/

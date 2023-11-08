@@ -1629,7 +1629,6 @@ static void hash_cleanup(Hash * hash)
 }
 
 
-
 static unsigned getHash(const unsigned char * data, size_t size, size_t pos)
 {
     unsigned result = 0;

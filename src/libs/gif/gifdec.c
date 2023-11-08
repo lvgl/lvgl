@@ -39,7 +39,6 @@ read_num(gd_GIF * gif)
 }
 
 
-
 gd_GIF *
 gd_open_gif_file(const char * fname)
 {

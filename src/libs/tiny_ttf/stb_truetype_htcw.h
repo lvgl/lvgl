@@ -1045,7 +1045,6 @@ STBTT_DEF unsigned char * stbtt_GetCodepointSDF(const stbtt_fontinfo * info, flo
 // if computing lots of characters or very large sizes.
 
 
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // Finding the right font...

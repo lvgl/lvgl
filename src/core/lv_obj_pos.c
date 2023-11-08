@@ -942,7 +942,6 @@ int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, 
 }
 
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

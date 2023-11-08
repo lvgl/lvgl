@@ -60,13 +60,11 @@ void lv_example_observer_3(void)
     lv_obj_t * set_label = lv_label_create(set_btn);
     lv_label_set_text(set_label, "Set");
 
-
     /*Update some subjects to see if the UI is updated as well*/
     lv_subject_set_int(&hour_subject, 9);
     lv_subject_set_int(&minute_subject, 30);
     lv_subject_set_int(&am_pm_subject, TIME_PM);
 }
-
 
 static void set_btn_clicked_event_cb(lv_event_t * e)
 {

@@ -5725,6 +5725,5 @@ lv_font_t lv_font_montserrat_30 = {
 };
 
 
-
 #endif /*#if LV_FONT_MONTSERRAT_30*/
 

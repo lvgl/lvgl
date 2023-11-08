@@ -46,7 +46,6 @@ static const uint8_t Zig[64] = {    /* Zigzag-order to raster-order conversion t
 };
 
 
-
 /*-------------------------------------------------*/
 /* Input scale factor of Arai algorithm            */
 /* (scaled up 16 bits for fixed point operations)  */
@@ -62,7 +61,6 @@ static const uint16_t Ipsf[64] = {  /* See also aa_idct.png */
     (uint16_t)(0.54120 * 8192), (uint16_t)(0.75066 * 8192), (uint16_t)(0.70711 * 8192), (uint16_t)(0.63638 * 8192), (uint16_t)(0.54120 * 8192), (uint16_t)(0.42522 * 8192), (uint16_t)(0.29290 * 8192), (uint16_t)(0.14932 * 8192),
     (uint16_t)(0.27590 * 8192), (uint16_t)(0.38268 * 8192), (uint16_t)(0.36048 * 8192), (uint16_t)(0.32442 * 8192), (uint16_t)(0.27590 * 8192), (uint16_t)(0.21678 * 8192), (uint16_t)(0.14932 * 8192), (uint16_t)(0.07612 * 8192)
 };
-
 
 
 /*---------------------------------------------*/
@@ -124,7 +122,6 @@ static uint8_t BYTECLIP(int val)
 #endif
 
 
-
 /*-----------------------------------------------------------------------*/
 /* Allocate a memory block from memory pool                              */
 /*-----------------------------------------------------------------------*/
@@ -147,8 +144,6 @@ static void * alloc_pool(   /* Pointer to allocated memory block (NULL:no memory
 
     return (void *)rp;  /* Return allocated memory block (NULL:no memory to allocate) */
 }
-
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -183,8 +178,6 @@ static JRESULT create_qt_tbl(   /* 0:OK, !0:Failed */
 
     return JDR_OK;
 }
-
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -274,8 +267,6 @@ static JRESULT create_huffman_tbl(  /* 0:OK, !0:Failed */
 
     return JDR_OK;
 }
-
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -429,8 +420,6 @@ static int huffext(     /* >=0: decoded data, <0: error code */
 }
 
 
-
-
 /*-----------------------------------------------------------------------*/
 /* Extract N bits from input stream                                      */
 /*-----------------------------------------------------------------------*/
@@ -525,8 +514,6 @@ static int bitext(  /* >=0: extracted data, <0: error code */
 }
 
 
-
-
 /*-----------------------------------------------------------------------*/
 /* Process restart interval                                              */
 /*-----------------------------------------------------------------------*/
@@ -599,8 +586,6 @@ JRESULT jd_restart(
     jd->dcv[2] = jd->dcv[1] = jd->dcv[0] = 0;   /* Reset DC offset */
     return JDR_OK;
 }
-
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -726,8 +711,6 @@ static void block_idct(
 }
 
 
-
-
 /*-----------------------------------------------------------------------*/
 /* Load all blocks in an MCU into working buffer                         */
 /*-----------------------------------------------------------------------*/
@@ -815,8 +798,6 @@ JRESULT jd_mcu_load(
 
     return JDR_OK;  /* All blocks have been loaded successfully */
 }
-
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -926,8 +907,6 @@ JRESULT jd_mcu_output(
     if(outfunc) return  outfunc(jd, jd->workbuf, &rect) ? JDR_OK : JDR_INTR;
     return 0;
 }
-
-
 
 
 /*-----------------------------------------------------------------------*/
@@ -1090,8 +1069,6 @@ JRESULT jd_prepare(
         }
     }
 }
-
-
 
 
 /*-----------------------------------------------------------------------*/

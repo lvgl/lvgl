@@ -2193,6 +2193,5 @@ lv_font_t lv_font_montserrat_14 = {
 };
 
 
-
 #endif /*#if LV_FONT_MONTSERRAT_14*/
 

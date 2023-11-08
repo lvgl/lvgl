@@ -533,12 +533,6 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     blend_dsc.mask_buf = mask_buf;
 
 
-
-
-
-
-
-
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         int32_t w = lv_area_get_width(&clip_area_sub);

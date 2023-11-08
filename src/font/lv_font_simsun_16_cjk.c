@@ -23724,7 +23724,6 @@ static const lv_font_fmt_txt_cmap_t cmaps[] = {
 };
 
 
-
 /*--------------------
  *  ALL CUSTOM DATA
  *--------------------*/
@@ -23772,7 +23771,6 @@ lv_font_t lv_font_simsun_16_cjk = {
 #endif
     .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 };
-
 
 
 #endif /*#if LV_FONT_SIMSUN_16_CJK*/

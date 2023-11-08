@@ -149,7 +149,6 @@ static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 
 }
 
-
 static void btn_create(lv_obj_t * parent, const char * text)
 {
     lv_obj_t * btn = lv_button_create(parent);

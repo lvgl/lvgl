@@ -289,7 +289,6 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
 }
 
 
-
 void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
     LV_ASSERT_NULL(canvas);

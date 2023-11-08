@@ -630,7 +630,6 @@ static void strip_ext(char * dir)
 }
 
 
-
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 {
     const char * tmp;

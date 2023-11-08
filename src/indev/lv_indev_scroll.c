@@ -593,7 +593,6 @@ static void scroll_limit_diff(lv_indev_t * indev, int32_t * diff_x, int32_t * di
 }
 
 
-
 static int32_t scroll_throw_predict_y(lv_indev_t * indev)
 {
     int32_t y = indev->pointer.scroll_throw_vect.y;
@@ -702,5 +701,4 @@ static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_
 
     return diff;
 }
-
 

@@ -42,7 +42,6 @@ typedef enum {
 } JRESULT;
 
 
-
 /* Rectangular region in the output image */
 typedef struct {
     uint16_t left;      /* Left end */
@@ -50,7 +49,6 @@ typedef struct {
     uint16_t top;       /* Top end */
     uint16_t bottom;    /* Bottom end */
 } JRECT;
-
 
 
 /* Decompressor object structure */
@@ -90,7 +88,6 @@ struct JDEC {
     size_t (*infunc)(JDEC *, uint8_t *, size_t); /* Pointer to jpeg stream input function */
     void * device;              /* Pointer to I/O device identifiler for the session */
 };
-
 
 
 /* TJpgDec API functions */

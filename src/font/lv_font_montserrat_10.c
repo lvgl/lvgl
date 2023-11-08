@@ -1656,6 +1656,5 @@ lv_font_t lv_font_montserrat_10 = {
 };
 
 
-
 #endif /*#if LV_FONT_MONTSERRAT_10*/
 

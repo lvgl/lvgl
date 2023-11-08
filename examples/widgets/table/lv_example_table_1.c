@@ -41,7 +41,6 @@ static void draw_event_cb(lv_event_t * e)
     }
 }
 
-
 void lv_example_table_1(void)
 {
     lv_obj_t * table = lv_table_create(lv_screen_active());

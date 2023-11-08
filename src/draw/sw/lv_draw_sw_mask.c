@@ -899,7 +899,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_angle(lv_opa_t *
 }
 
 
-
 LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, int32_t abs_x,
                                                                        int32_t abs_y, int32_t len,
                                                                        lv_draw_sw_mask_radius_param_t * p)

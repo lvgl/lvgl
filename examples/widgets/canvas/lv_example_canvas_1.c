@@ -1,7 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_CANVAS && LV_BUILD_EXAMPLES
 
-
 #define CANVAS_WIDTH  200
 #define CANVAS_HEIGHT  150
 
@@ -35,13 +34,11 @@ void lv_example_canvas_1(void)
     lv_obj_center(canvas);
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_GREY, 3), LV_OPA_COVER);
 
-
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
     lv_area_t coords_rect = {30, 20, 100, 70};
     lv_draw_rect(&layer, &rect_dsc, &coords_rect);
-
 
     lv_area_t coords_text = {40, 80, 100, 120};
     lv_draw_label(&layer, &label_dsc, &coords_text);

@@ -47,7 +47,6 @@ typedef uint8_t lv_key_t;
 #endif /*DOXYGEN*/
 
 
-
 /**********************
  *      TYPEDEFS
  **********************/
