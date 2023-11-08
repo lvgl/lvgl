@@ -476,6 +476,7 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
     *col = table->col_act;
 }
 
+#if LV_USE_USER_DATA
 void * lv_table_get_user_data(lv_obj_t * obj, uint16_t row, uint16_t col)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -491,6 +492,7 @@ void * lv_table_get_user_data(lv_obj_t * obj, uint16_t row, uint16_t col)
 
     return table->cell_data[cell]->user_data;
 }
+#endif
 
 /**********************
  *   STATIC FUNCTIONS
@@ -726,7 +728,7 @@ static void draw_main(lv_event_t * e)
 
         for(col = 0; col < table->col_cnt; col++) {
             lv_table_cell_ctrl_t ctrl = 0;
-            if(table->cell_data[cell]->ctrl) ctrl = table->cell_data[cell]->ctrl;
+            if(table->cell_data[cell]) ctrl = table->cell_data[cell]->ctrl;
 
             if(rtl) {
                 cell_area.x2 = cell_area.x1 - 1;
