@@ -47,7 +47,7 @@ void test_msgbox_creation_successful_with_close_button(void)
 
     TEST_ASSERT_NOT_NULL(msgbox);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("msgbox_ok_with_close_btn.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/msgbox_ok_with_close_btn.png");
 }
 
 void test_msgbox_creation_successful_no_close_button(void)
@@ -58,7 +58,7 @@ void test_msgbox_creation_successful_no_close_button(void)
 
     TEST_ASSERT_NOT_NULL(msgbox);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("msgbox_ok_no_close_btn.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/msgbox_ok_no_close_btn.png");
 }
 
 void test_msgbox_creation_successful_modal(void)

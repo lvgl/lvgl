@@ -109,7 +109,7 @@ void test_line_basic_render(void)
     lv_obj_set_style_line_dash_gap(line, 3, LV_PART_MAIN);
     lv_obj_set_style_line_dash_width(line, 10, LV_PART_MAIN);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("line_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/line_1.png");
 }
 
 #endif

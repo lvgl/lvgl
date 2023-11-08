@@ -212,7 +212,7 @@ void test_roller_with_overlay_and_bubble_events_enabled(void)
 //    lv_roller_set_selected(roller, 1, LV_ANIM_OFF);
 //    lv_obj_center(roller);
 //
-//    TEST_ASSERT_EQUAL_SCREENSHOT("roller_1.png");
+//    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_1.png");
 //#else
 //    TEST_PASS();
 //#endif

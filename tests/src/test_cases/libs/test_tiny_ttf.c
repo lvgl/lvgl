@@ -37,7 +37,7 @@ void test_tiny_ttf_rendering_test(void)
                       "Accents: ÁÉÍÓÖŐÜŰ áéíóöőüű");
     lv_obj_center(label);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tiny_ttf_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/tiny_ttf_1.png");
 
     lv_obj_del(label);
     lv_tiny_ttf_destroy(font);
@@ -69,7 +69,7 @@ void test_tiny_ttf_kerning()
     lv_label_set_text(label_none, "ıTuTuTı");
     lv_obj_set_style_text_font(label_none, font_none, LV_PART_MAIN);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tiny_ttf_2.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/tiny_ttf_2.png");
 
     lv_obj_del(cont);
     lv_tiny_ttf_destroy(font_normal);

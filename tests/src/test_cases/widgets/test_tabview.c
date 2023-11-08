@@ -42,7 +42,7 @@ void test_tabview_create_successful_dir_top(void)
 
     TEST_ASSERT_NOT_NULL(tabview);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_01.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_01.png");
 }
 
 void test_tabview_create_successful_dir_bottom(void)
@@ -51,7 +51,7 @@ void test_tabview_create_successful_dir_bottom(void)
 
     TEST_ASSERT_NOT_NULL(tabview);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_02.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_02.png");
 }
 
 void test_tabview_create_successful_dir_left(void)
@@ -60,7 +60,7 @@ void test_tabview_create_successful_dir_left(void)
 
     TEST_ASSERT_NOT_NULL(tabview);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_03.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_03.png");
 }
 
 void test_tabview_create_successful_dir_right(void)
@@ -69,7 +69,7 @@ void test_tabview_create_successful_dir_right(void)
 
     TEST_ASSERT_NOT_NULL(tabview);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_04.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_04.png");
 }
 
 void test_tabview_add_one_tab_empty(void)
@@ -100,7 +100,7 @@ void test_tabview_add_one_tab_no_scroll(void)
     const char * content = "Content of the first tab\n";
     lv_label_set_text(label, content);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_05.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_05.png");
 }
 
 void test_tabview_add_one_tab_with_scroll(void)
@@ -126,7 +126,7 @@ void test_tabview_add_one_tab_with_scroll(void)
                       "\n"
                       "Can you see it?");
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_06.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_06.png");
 }
 
 void test_tabview_add_several_tabs_no_scroll(void)
@@ -144,7 +144,7 @@ void test_tabview_add_several_tabs_no_scroll(void)
     LV_UNUSED(tab2);
     LV_UNUSED(tab3);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_07.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_07.png");
 }
 
 void test_tabview_rename_tab(void)
@@ -163,7 +163,7 @@ void test_tabview_rename_tab(void)
     // rename 2nd tab (0-based index)
     lv_tabview_rename_tab(tabview, 1, "2nd Tab");
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_08.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_08.png");
 }
 
 void test_tabview_add_several_tabs_hor(void)
@@ -181,7 +181,7 @@ void test_tabview_add_several_tabs_hor(void)
     LV_UNUSED(tab2);
     LV_UNUSED(tab3);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_09.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_09.png");
 }
 
 void test_tabview_get_content(void)
@@ -208,7 +208,7 @@ void test_tabview_set_act_non_existent(void)
 
     lv_tabview_set_active(tabview, 1, LV_ANIM_ON);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_10.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_10.png");
 }
 
 void test_tabview_tab2_selected_event(void)

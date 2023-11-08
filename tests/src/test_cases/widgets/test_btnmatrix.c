@@ -51,7 +51,7 @@ void test_button_matrix_set_map_works(void)
     TEST_ASSERT_EQUAL_STRING(exp_map[4], ret_map[4]);
     TEST_ASSERT_EQUAL_STRING(exp_map[5], ret_map[5]);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("btnm_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/btnm_1.png");
 }
 
 void test_button_matrix_render_2(void)
@@ -123,7 +123,7 @@ void test_button_matrix_render_2(void)
     lv_buttonmatrix_set_button_ctrl(btnm, 11, LV_BUTTONMATRIX_CTRL_CHECKED);
     lv_obj_set_pos(btnm, 180, 160);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("btnm_2.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/btnm_2.png");
 }
 
 void test_button_matrix_set_ctrl_map_works(void)

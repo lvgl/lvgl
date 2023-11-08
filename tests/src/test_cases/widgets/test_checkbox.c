@@ -113,7 +113,7 @@ void test_checkbox_rtl(void)
     lv_obj_center(test_checkbox);
     lv_obj_set_style_base_dir(test_checkbox, LV_BASE_DIR_RTL, 0);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("checkbox_rtl_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/checkbox_rtl_1.png");
 }
 
 #endif

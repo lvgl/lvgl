@@ -203,7 +203,7 @@ void test_bar_normal(void)
     lv_bar_set_value(test_bar, 30, LV_ANIM_OFF);
     lv_obj_set_size(test_bar, h, w);
     lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
-    TEST_ASSERT_EQUAL_SCREENSHOT("bar_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_1.png");
 }
 
 
