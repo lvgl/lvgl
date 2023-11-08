@@ -56,7 +56,6 @@ typedef _lv_keyboard_mode_t lv_keyboard_mode_t;
 typedef uint8_t lv_keyboard_mode_t;
 #endif /*DOXYGEN*/
 
-
 /*Data of keyboard*/
 typedef struct {
     lv_buttonmatrix_t btnm;

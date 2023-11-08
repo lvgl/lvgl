@@ -61,7 +61,6 @@ typedef _lv_opa_t lv_opa_t;
 typedef uint8_t lv_opa_t;
 #endif /*DOXYGEN*/
 
-
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
 
@@ -187,7 +186,6 @@ static inline uint8_t lv_color_format_get_size(lv_color_format_t cf)
  */
 bool lv_color_format_has_alpha(lv_color_format_t src_cf);
 
-
 lv_color32_t lv_color_to_32(lv_color_t color, lv_opa_t opa);
 
 static inline uint32_t lv_color_to_int(lv_color_t c)
@@ -195,7 +193,6 @@ static inline uint32_t lv_color_to_int(lv_color_t c)
     uint8_t * tmp = (uint8_t *) &c;
     return tmp[0] + (tmp[1] << 8) + (tmp[2] << 16);
 }
-
 
 static inline lv_color_t lv_color_from_int(uint32_t v)
 {
@@ -226,7 +223,6 @@ static inline lv_color_t lv_color_make(uint8_t r, uint8_t g, uint8_t b)
 {
     return lv_color_hex((r << 16) + (g << 8) + b);
 }
-
 
 static inline lv_color_t lv_color_hex3(uint32_t c)
 {
@@ -295,7 +291,6 @@ static inline lv_color_t lv_color_black(void)
 {
     return lv_color_make(0x00, 0x00, 0x00);
 }
-
 
 /**********************
  *      MACROS

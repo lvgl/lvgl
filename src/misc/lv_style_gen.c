@@ -6,9 +6,7 @@
  **********************************************************************
  */
 
-
 #include "lv_style.h"
-
 
 void lv_style_set_width(lv_style_t * style, int32_t value)
 {

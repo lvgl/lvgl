@@ -82,7 +82,6 @@ void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color32_t c);
  * Getter functions
  *====================*/
 
-
 lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y);
 
 /**

@@ -176,7 +176,6 @@ static int lodepng_gtofl(size_t a, size_t b, size_t c)
 #endif /*LODEPNG_COMPILE_ZLIB*/
 #endif /*LODEPNG_COMPILE_DECODER*/
 
-
 /*
 Often in case of an error a value is assigned to a variable and then it breaks
 out of a loop (to go to the cleanup phase of a function). This macro does that.
@@ -1628,7 +1627,6 @@ static void hash_cleanup(Hash * hash)
     lodepng_free(hash->chainz);
 }
 
-
 static unsigned getHash(const unsigned char * data, size_t size, size_t pos)
 {
     unsigned result = 0;
@@ -2328,7 +2326,6 @@ static unsigned lodepng_zlib_decompressv(ucvector * out,
     return 0; /*no error*/
 }
 
-
 unsigned lodepng_zlib_decompress(unsigned char ** out, size_t * outsize, const unsigned char * in,
                                  size_t insize, const LodePNGDecompressSettings * settings)
 {
@@ -2471,7 +2468,6 @@ void lodepng_compress_settings_init(LodePNGCompressSettings * settings)
 
 const LodePNGCompressSettings lodepng_default_compress_settings = {2, 1, DEFAULT_WINDOWSIZE, 3, 128, 1, 0, 0, 0};
 
-
 #endif /*LODEPNG_COMPILE_ENCODER*/
 
 #ifdef LODEPNG_COMPILE_DECODER
@@ -2502,7 +2498,6 @@ const LodePNGDecompressSettings lodepng_default_decompress_settings = {0, 0, 0, 
 /* ////////////////////////////////////////////////////////////////////////// */
 /* / CRC32                                                                  / */
 /* ////////////////////////////////////////////////////////////////////////// */
-
 
 #ifndef LODEPNG_NO_COMPILE_CRC
 /* CRC polynomial: 0xedb88320 */
@@ -2992,7 +2987,6 @@ size_t lodepng_get_raw_size(unsigned w, unsigned h, const LodePNGColorMode * col
 {
     return lodepng_get_raw_size_lct(w, h, color->colortype, color->bitdepth);
 }
-
 
 #ifdef LODEPNG_COMPILE_PNG
 
@@ -3873,7 +3867,6 @@ unsigned lodepng_convert(unsigned char * out, const unsigned char * in,
     return error;
 }
 
-
 /* Converts a single rgb color without alpha from one type to another, color bits truncated to
 their bitdepth. In case of single channel (gray or palette), only the r channel is used. Slow
 function, do not use to process all pixels of an image. Alpha channel not supported on purpose:
@@ -4719,7 +4712,6 @@ static unsigned readChunk_tRNS(LodePNGColorMode * color, const unsigned char * d
     return 0; /* OK */
 }
 
-
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
 /*background color chunk (bKGD)*/
 static unsigned readChunk_bKGD(LodePNGInfo * info, const unsigned char * data, size_t chunkLength)
@@ -5124,7 +5116,6 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
     unsigned critical_pos = 1; /*1 = after IHDR, 2 = after PLTE, 3 = after IDAT*/
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
-
     /* safe output values in case error happens */
     *out = 0;
     *w = *h = 0;
@@ -5468,7 +5459,6 @@ void lodepng_state_copy(LodePNGState * dest, const LodePNGState * source)
 /* ////////////////////////////////////////////////////////////////////////// */
 /* / PNG Encoder                                                            / */
 /* ////////////////////////////////////////////////////////////////////////// */
-
 
 static unsigned writeSignature(ucvector * out)
 {
@@ -6885,7 +6875,6 @@ unsigned compress(std::vector<unsigned char> & out, const std::vector<unsigned c
 }
 #endif /* LODEPNG_COMPILE_ENCODER */
 #endif /* LODEPNG_COMPILE_ZLIB */
-
 
 #ifdef LODEPNG_COMPILE_PNG
 

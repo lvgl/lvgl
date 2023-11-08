@@ -100,7 +100,6 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
     blend_dsc.mask_area = &blend_area;
     blend_dsc.opa = LV_OPA_COVER;
 
-
     /*Get gradient if appropriate*/
     lv_grad_t * grad = lv_gradient_get(&dsc->grad, coords_bg_w, coords_bg_h);
     lv_opa_t * grad_opa_map = NULL;

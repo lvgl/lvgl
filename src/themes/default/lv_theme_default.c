@@ -179,7 +179,6 @@ typedef struct _my_theme_t {
 #endif
 } my_theme_t;
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -197,7 +196,6 @@ static void style_init_reset(lv_style_t * style);
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t c, lv_opa_t opa)
 {
@@ -634,7 +632,6 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_transform_width(&theme->styles.list_item_grow, PAD_DEF);
 #endif
 
-
 #if LV_USE_LED
     style_init_reset(&theme->styles.led);
     lv_style_set_bg_opa(&theme->styles.led, LV_OPA_COVER);
@@ -736,7 +733,6 @@ bool lv_theme_default_is_inited(void)
     return theme->inited;
 }
 
-
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
@@ -782,7 +778,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
             return;
         }
 #endif
-
 
 #if LV_USE_CALENDAR
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
@@ -1021,7 +1016,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.knob, LV_PART_KNOB);
     }
 #endif
-
 
 #if LV_USE_SPINNER
     else if(lv_obj_check_type(obj, &lv_spinner_class)) {

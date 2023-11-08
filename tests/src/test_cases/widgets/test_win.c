@@ -19,7 +19,6 @@ void tearDown(void)
     lv_obj_clean(active_screen);
 }
 
-
 void test_win_should_have_valid_documented_default_values(void)
 {
     // Create the win object and update layout

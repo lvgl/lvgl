@@ -37,7 +37,6 @@
  *Time between `LV_EVENT_LONG_PRESSED_REPEAT*/
 #define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
 
-
 /*Gesture threshold in pixels*/
 #define LV_INDEV_DEF_GESTURE_LIMIT        50
 
@@ -286,7 +285,6 @@ void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data)
     indev->driver_data = driver_data;
 }
 
-
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
 {
     if(indev == NULL) return LV_INDEV_TYPE_NONE;
@@ -459,7 +457,6 @@ lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev)
 
     return indev->read_timer;
 }
-
 
 lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 {
@@ -1161,7 +1158,6 @@ static void indev_proc_release(lv_indev_t * indev)
         indev->pointer.act_obj = NULL;
         indev->pr_timestamp          = 0;
         indev->longpr_rep_timestamp  = 0;
-
 
         /*Get the transformed vector with this object*/
         if(scroll_obj) {

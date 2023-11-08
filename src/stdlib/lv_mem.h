@@ -92,7 +92,6 @@ void lv_free(void * data);
  */
 void * lv_realloc(void * data_p, size_t new_size);
 
-
 /**
  * Used internally to execute a plain `malloc` operation
  * @param size      size in bytes to `malloc`
@@ -117,7 +116,6 @@ void * lv_realloc_core(void * p, size_t new_size);
  * @param size      size in bytes to malloc
  */
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p);
-
 
 lv_result_t lv_mem_test_core(void);
 

@@ -16,8 +16,6 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
-
-
 static lv_obj_t * label_create(const lv_font_t * font, lv_style_t * style, const char * text_base)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
@@ -43,18 +41,15 @@ static void all_labels_create(const char * name, lv_style_t * style)
     label_create(&test_font_montserrat_ascii_4bpp_compressed, style, "4bpp compressed font");
     //    label_create(&test_font_montserrat_ascii_4bpp_subpx, style, "4bpp subpx font");
 
-
     char buf[64];
     lv_snprintf(buf, sizeof(buf), "draw/label_%s.png", name);
     TEST_ASSERT_EQUAL_SCREENSHOT(buf);
 }
 
-
 void test_draw_label_normal(void)
 {
     all_labels_create("normal", NULL);
 }
-
 
 void test_draw_label_color(void)
 {
@@ -81,7 +76,6 @@ void test_draw_label_color_and_opa(void)
     lv_style_set_text_opa(&style, LV_OPA_50);
     all_labels_create("color_and_opa", &style);
 }
-
 
 static lv_obj_t * decor_label_create(lv_text_decor_t decor, lv_text_align_t align, lv_opa_t opa)
 {
@@ -127,6 +121,5 @@ void test_label_decor(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/label_decor.png");
 }
-
 
 #endif

@@ -16,7 +16,6 @@ static const lv_obj_class_t event_object_deletion_class = {
     .base_class = &lv_obj_class
 };
 
-
 /* Checks for memory leaks/invalid memory accesses on deleted objects */
 void test_event_object_deletion(void)
 {

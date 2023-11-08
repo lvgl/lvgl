@@ -53,7 +53,6 @@ typedef _lv_buttonmatrix_ctrl_t lv_buttonmatrix_ctrl_t;
 typedef uint32_t lv_buttonmatrix_ctrl_t;
 #endif /*DOXYGEN*/
 
-
 typedef bool (*lv_buttonmatrix_button_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area,
                                                  const lv_area_t * clip_area);
 
@@ -70,7 +69,6 @@ typedef struct {
 } lv_buttonmatrix_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_buttonmatrix_class;
-
 
 /**********************
  * GLOBAL PROTOTYPES

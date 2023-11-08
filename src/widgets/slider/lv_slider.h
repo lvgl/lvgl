@@ -22,7 +22,6 @@ extern "C" {
 #error "lv_slider: lv_bar is required. Enable it in lv_conf.h (LV_USE_BAR 1)"
 #endif
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -41,7 +40,6 @@ typedef _lv_slider_mode_t lv_slider_mode_t;
 #else
 typedef uint8_t lv_slider_mode_t;
 #endif /*DOXYGEN*/
-
 
 typedef struct {
     lv_bar_t bar;       /*Add the ancestor's type first*/

@@ -26,13 +26,11 @@
 
 #include "tjpgd.h"
 
-
 #if JD_FASTDECODE == 2
     #define HUFF_BIT    10  /* Bit length to apply fast huffman decode */
     #define HUFF_LEN    (1 << HUFF_BIT)
     #define HUFF_MASK   (HUFF_LEN - 1)
 #endif
-
 
 /*-----------------------------------------------*/
 /* Zigzag-order to raster-order conversion table */
@@ -44,7 +42,6 @@ static const uint8_t Zig[64] = {    /* Zigzag-order to raster-order conversion t
     35, 42, 49, 56, 57, 50, 43, 36, 29, 22, 15, 23, 30, 37, 44, 51,
     58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62, 63
 };
-
 
 /*-------------------------------------------------*/
 /* Input scale factor of Arai algorithm            */
@@ -61,7 +58,6 @@ static const uint16_t Ipsf[64] = {  /* See also aa_idct.png */
     (uint16_t)(0.54120 * 8192), (uint16_t)(0.75066 * 8192), (uint16_t)(0.70711 * 8192), (uint16_t)(0.63638 * 8192), (uint16_t)(0.54120 * 8192), (uint16_t)(0.42522 * 8192), (uint16_t)(0.29290 * 8192), (uint16_t)(0.14932 * 8192),
     (uint16_t)(0.27590 * 8192), (uint16_t)(0.38268 * 8192), (uint16_t)(0.36048 * 8192), (uint16_t)(0.32442 * 8192), (uint16_t)(0.27590 * 8192), (uint16_t)(0.21678 * 8192), (uint16_t)(0.14932 * 8192), (uint16_t)(0.07612 * 8192)
 };
-
 
 /*---------------------------------------------*/
 /* Conversion table for fast clipping process  */
@@ -121,7 +117,6 @@ static uint8_t BYTECLIP(int val)
 
 #endif
 
-
 /*-----------------------------------------------------------------------*/
 /* Allocate a memory block from memory pool                              */
 /*-----------------------------------------------------------------------*/
@@ -133,7 +128,6 @@ static void * alloc_pool(   /* Pointer to allocated memory block (NULL:no memory
 {
     char * rp = 0;
 
-
     ndata = (ndata + 3) & ~3;           /* Align block size to the word boundary */
 
     if(jd->sz_pool >= ndata) {
@@ -144,7 +138,6 @@ static void * alloc_pool(   /* Pointer to allocated memory block (NULL:no memory
 
     return (void *)rp;  /* Return allocated memory block (NULL:no memory to allocate) */
 }
-
 
 /*-----------------------------------------------------------------------*/
 /* Create de-quantization and prescaling tables with a DQT segment       */
@@ -159,7 +152,6 @@ static JRESULT create_qt_tbl(   /* 0:OK, !0:Failed */
     unsigned int i, zi;
     uint8_t d;
     int32_t * pb;
-
 
     while(ndata) {  /* Process all tables in the segment */
         if(ndata < 65) return JDR_FMT1;     /* Err: table size is unaligned */
@@ -179,7 +171,6 @@ static JRESULT create_qt_tbl(   /* 0:OK, !0:Failed */
     return JDR_OK;
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* Create huffman code tables with a DHT segment                         */
 /*-----------------------------------------------------------------------*/
@@ -194,7 +185,6 @@ static JRESULT create_huffman_tbl(  /* 0:OK, !0:Failed */
     size_t np;
     uint8_t d, * pb, * pd;
     uint16_t hc, * ph;
-
 
     while(ndata) {  /* Process all tables in the segment */
         if(ndata < 17) return JDR_FMT1;     /* Err: wrong data size */
@@ -268,7 +258,6 @@ static JRESULT create_huffman_tbl(  /* 0:OK, !0:Failed */
     return JDR_OK;
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* Extract a huffman decoded data from input stream                      */
 /*-----------------------------------------------------------------------*/
@@ -288,7 +277,6 @@ static int huffext(     /* >=0: decoded data, <0: error code */
     const uint8_t * hb = jd->huffbits[id][cls]; /* Bit distribution table */
     const uint16_t * hc = jd->huffcode[id][cls]; /* Code word table */
     const uint8_t * hd = jd->huffdata[id][cls]; /* Data table */
-
 
     bm = jd->dbit;  /* Bit mask to extract */
     d = 0;
@@ -338,7 +326,6 @@ static int huffext(     /* >=0: decoded data, <0: error code */
     const uint16_t * hc;
     unsigned int nc, bl, wbit = jd->dbit % 32;
     uint32_t w = jd->wreg & ((1UL << wbit) - 1);
-
 
     while(wbit < 16) {  /* Prepare 16 bits into the working register */
         if(jd->marker) {
@@ -419,7 +406,6 @@ static int huffext(     /* >=0: decoded data, <0: error code */
     return 0 - (int)JDR_FMT1;   /* Err: code not found (may be collapted data) */
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* Extract N bits from input stream                                      */
 /*-----------------------------------------------------------------------*/
@@ -476,7 +462,6 @@ static int bitext(  /* >=0: extracted data, <0: error code */
     unsigned int wbit = jd->dbit % 32;
     uint32_t w = jd->wreg & ((1UL << wbit) - 1);
 
-
     while(wbit < nbit) {    /* Prepare nbit bits into the working register */
         if(jd->marker) {
             d = 0xFF;   /* Input stream stalled, generate stuff bits */
@@ -512,7 +497,6 @@ static int bitext(  /* >=0: extracted data, <0: error code */
     return (int)(w >> ((wbit - nbit) % 32));
 #endif
 }
-
 
 /*-----------------------------------------------------------------------*/
 /* Process restart interval                                              */
@@ -555,7 +539,6 @@ JRESULT jd_restart(
 #else
     uint16_t marker;
 
-
     if(jd->marker) {    /* Generate a maker if it has been detected */
         marker = 0xFF00 | jd->marker;
         jd->marker = 0;
@@ -586,7 +569,6 @@ JRESULT jd_restart(
     jd->dcv[2] = jd->dcv[1] = jd->dcv[0] = 0;   /* Reset DC offset */
     return JDR_OK;
 }
-
 
 /*-----------------------------------------------------------------------*/
 /* Apply Inverse-DCT in Arai Algorithm (see also aa_idct.png)            */
@@ -710,7 +692,6 @@ static void block_idct(
     }
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* Load all blocks in an MCU into working buffer                         */
 /*-----------------------------------------------------------------------*/
@@ -724,7 +705,6 @@ JRESULT jd_mcu_load(
     unsigned int blk, nby, i, bc, z, id, cmp;
     jd_yuv_t * bp;
     const int32_t * dqf;
-
 
     nby = jd->msx * jd->msy;    /* Number of Y blocks (1, 2 or 4) */
     bp = jd->mcubuf;            /* Pointer to the first block of MCU */
@@ -799,7 +779,6 @@ JRESULT jd_mcu_load(
     return JDR_OK;  /* All blocks have been loaded successfully */
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* Output an MCU: Convert YCrCb to RGB and output it in RGB form         */
 /*-----------------------------------------------------------------------*/
@@ -818,7 +797,6 @@ JRESULT jd_mcu_output(
     uint8_t * pix;
     JRECT rect;
 
-
     mx = jd->msx * 8;
     my = jd->msy * 8;                 /* MCU size (pixel) */
     rx = (x + mx <= jd->width) ? mx : jd->width -
@@ -835,7 +813,6 @@ JRESULT jd_mcu_output(
     rect.right = x + rx - 1;             /* Rectangular area in the frame buffer */
     rect.top = y;
     rect.bottom = y + ry - 1;
-
 
     if(!JD_USE_SCALE || jd->scale != 3) {   /* Not for 1/8 scaling */
         pix = (uint8_t *)jd->workbuf;
@@ -908,13 +885,11 @@ JRESULT jd_mcu_output(
     return 0;
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* Analyze the JPEG image and Initialize decompressor object             */
 /*-----------------------------------------------------------------------*/
 
 #define LDB_WORD(ptr)       (uint16_t)(((uint16_t)*((uint8_t*)(ptr))<<8)|(uint16_t)*(uint8_t*)((ptr)+1))
-
 
 JRESULT jd_prepare(
     JDEC * jd,              /* Blank decompressor object */
@@ -929,7 +904,6 @@ JRESULT jd_prepare(
     unsigned int n, i, ofs;
     size_t len;
     JRESULT rc;
-
 
     memset(jd, 0, sizeof(
                JDEC));    /* Clear decompression object (this might be a problem if machine's null pointer is not all bits zero) */
@@ -1070,7 +1044,6 @@ JRESULT jd_prepare(
     }
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* Start to decompress the JPEG picture                                  */
 /*-----------------------------------------------------------------------*/
@@ -1084,7 +1057,6 @@ JRESULT jd_decomp(
     unsigned int x, y, mx, my;
     uint16_t rst, rsc;
     JRESULT rc;
-
 
     if(scale > (JD_USE_SCALE ? 3 : 0)) return JDR_PAR;
     jd->scale = scale;

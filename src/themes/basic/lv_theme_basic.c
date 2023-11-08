@@ -45,7 +45,6 @@ typedef struct {
 #endif
 } my_theme_styles_t;
 
-
 typedef struct _my_theme_t {
     lv_theme_t base;
     my_theme_styles_t styles;
@@ -81,7 +80,6 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_bg_opa(&theme->styles.scr, LV_OPA_COVER);
     lv_style_set_bg_color(&theme->styles.scr, COLOR_SCR);
     lv_style_set_text_color(&theme->styles.scr, COLOR_DIM);
-
 
     style_init_reset(&theme->styles.transp);
     lv_style_set_bg_opa(&theme->styles.transp, LV_OPA_TRANSP);
@@ -134,7 +132,6 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_anim_time(&theme->styles.ta_cursor, 500);
 #endif
 }
-
 
 /**********************
  *   GLOBAL FUNCTIONS

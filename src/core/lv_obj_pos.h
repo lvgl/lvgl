@@ -186,7 +186,6 @@ static inline void lv_obj_center(struct _lv_obj_t * obj)
     lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
 }
 
-
 /**
  * Copy the coordinates of an object to an area
  * @param obj       pointer to an object
@@ -329,7 +328,6 @@ bool lv_obj_refresh_self_size(struct _lv_obj_t * obj);
 void lv_obj_refr_pos(struct _lv_obj_t * obj);
 
 void lv_obj_move_to(struct _lv_obj_t * obj, int32_t x, int32_t y);
-
 
 void lv_obj_move_children_by(struct _lv_obj_t * obj, int32_t x_diff, int32_t y_diff, bool ignore_floating);
 

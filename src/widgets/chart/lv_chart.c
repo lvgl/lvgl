@@ -357,7 +357,6 @@ void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hid
     lv_chart_refresh(chart);
 }
 
-
 void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_color_t color)
 {
     LV_ASSERT_OBJ(chart, MY_CLASS);
@@ -434,7 +433,6 @@ void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_po
     lv_chart_refresh(chart);
 }
 
-
 /**
  * Set the coordinate of the cursor with respect
  * to the origin of series area of the chart.
@@ -471,7 +469,6 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
 /*=====================
  * Set/Get value(s)
  *====================*/
-
 
 void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
 {
@@ -1232,7 +1229,6 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
     layer->clip_area = clip_area_ori;
 }
 
-
 /**
  * Get the nearest index to an X coordinate
  * @param chart pointer to a chart object
@@ -1361,6 +1357,5 @@ static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t c
         }
     }
 }
-
 
 #endif

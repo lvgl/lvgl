@@ -1528,7 +1528,6 @@ static inline void _lv_color_blend_to_rgb888_neon(_lv_draw_sw_blend_fill_dsc_t *
     }
 }
 
-
 static inline void _lv_color_blend_to_rgb888_with_opa_neon(_lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)
 {
     if(dest_px_size == 3) {

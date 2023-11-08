@@ -117,7 +117,6 @@ void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
  * Getter functions
  *====================*/
 
-
 /**
  * Get the left image in a given state
  * @param obj pointer to an image button object
@@ -161,7 +160,6 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
     return imgbtn->src_right[state].img_src;
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -176,7 +174,6 @@ static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     lv_memzero(&imgbtn->src_left, sizeof(imgbtn->src_left));
     lv_memzero(&imgbtn->src_right, sizeof(imgbtn->src_right));
 }
-
 
 static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {

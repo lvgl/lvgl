@@ -18,7 +18,6 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-
 static void img_create(const char * name, const void * img_src, bool rotate, bool recolor)
 {
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
@@ -37,7 +36,6 @@ static void img_create(const char * name, const void * img_src, bool rotate, boo
     lv_obj_t * label = lv_label_create(cont);
     lv_label_set_text(label, name);
 }
-
 
 void test_image_built_in_decode(void)
 {
@@ -126,7 +124,6 @@ void test_image_built_in_decode_recolor(void)
     img_create("binXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.bin", false, true);
     img_create("binARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.bin", false, true);
 
-
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_recolor.png");
 }
 
@@ -157,11 +154,7 @@ void test_image_built_in_decode_rotate_and_recolor(void)
     img_create("binXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.bin", true, true);
     img_create("binARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.bin", true, true);
 
-
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rotate_and_recolor.png");
 }
-
-
-
 
 #endif

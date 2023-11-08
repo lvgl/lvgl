@@ -42,7 +42,6 @@ void test_subgrid_row(void)
     lv_obj_set_grid_dsc_array(cont_sub, col_dsc2, NULL);
     lv_obj_set_style_pad_all(cont_sub, 0, 0);
 
-
     button_create(cont_main, "Main 0,0", 0, 0);
     button_create(cont_main, "Main 3,3", 3, 3);
     button_create(cont_main, "Main 2,2", 2, 2);
@@ -53,10 +52,8 @@ void test_subgrid_row(void)
     button_create(cont_sub, "Sub 1,1", 1, 1);
     button_create(cont_sub, "Sub 0,1", 0, 1);
 
-
     TEST_ASSERT_EQUAL_SCREENSHOT("subgrid_row.png");
 }
-
 
 void test_subgrid_col(void)
 {
@@ -75,7 +72,6 @@ void test_subgrid_col(void)
     lv_obj_set_grid_dsc_array(cont_sub, NULL, row_dsc2);
     lv_obj_set_style_pad_all(cont_sub, 0, 0);
 
-
     button_create(cont_main, "Main 0,0", 0, 0);
     button_create(cont_main, "Main 3,3", 3, 3);
     button_create(cont_main, "Main 2,2", 2, 2);
@@ -88,6 +84,5 @@ void test_subgrid_col(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("subgrid_col.png");
 }
-
 
 #endif

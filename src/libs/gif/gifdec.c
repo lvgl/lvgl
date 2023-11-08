@@ -38,7 +38,6 @@ read_num(gd_GIF * gif)
     return bytes[0] + (((uint16_t) bytes[1]) << 8);
 }
 
-
 gd_GIF *
 gd_open_gif_file(const char * fname)
 {
@@ -50,7 +49,6 @@ gd_open_gif_file(const char * fname)
 
     return gif_open(&gif_base);
 }
-
 
 gd_GIF *
 gd_open_gif_data(const void * data)

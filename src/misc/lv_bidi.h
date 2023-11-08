@@ -45,7 +45,6 @@ typedef _lv_base_dir_t lv_base_dir_t;
 typedef uint8_t lv_base_dir_t;
 #endif /*DOXYGEN*/
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -117,7 +116,6 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
  * @param txt       a text, used with LV_BASE_DIR_AUTO to determine the base direction
  */
 void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, const char * txt);
-
 
 /**********************
  *      MACROS

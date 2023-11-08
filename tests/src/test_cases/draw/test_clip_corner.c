@@ -21,7 +21,6 @@ static lv_obj_t * create_panel(int32_t radius, bool transform)
     lv_obj_set_style_clip_corner(parent, true, 0);
     if(transform) lv_obj_set_style_transform_rotation(parent, 300, 0);
 
-
     lv_obj_t * label = lv_label_create(parent);
     lv_obj_set_width(label, lv_pct(200));
     lv_label_set_text(label,

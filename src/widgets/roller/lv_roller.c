@@ -266,7 +266,6 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
     buf[c] = '\0';
 }
 
-
 /**
  * Get the options of a roller
  * @param roller pointer to roller object
@@ -278,7 +277,6 @@ const char * lv_roller_get_options(const lv_obj_t * obj)
 
     return lv_label_get_text(get_label(obj));
 }
-
 
 /**
  * Get the total number of options
@@ -301,7 +299,6 @@ uint32_t lv_roller_get_option_cnt(const lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -460,7 +457,6 @@ static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e
         draw_label(e);
     }
 }
-
 
 static void draw_main(lv_event_t * e)
 {
@@ -792,7 +788,6 @@ static lv_obj_t * get_label(const lv_obj_t * obj)
     return lv_obj_get_child(obj, 0);
 }
 
-
 static int32_t get_selected_label_width(const lv_obj_t * obj)
 {
     lv_obj_t * label = get_label(obj);
@@ -816,7 +811,6 @@ static void set_y_anim(void * obj, int32_t v)
 {
     lv_obj_set_y(obj, v);
 }
-
 
 static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
 {

@@ -97,7 +97,6 @@ typedef struct _lv_image_decoder_t {
     void * user_data;
 } lv_image_decoder_t;
 
-
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_image_decoder_dsc_t {
     /**The decoder which was able to open the image source*/

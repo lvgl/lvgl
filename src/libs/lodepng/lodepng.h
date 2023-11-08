@@ -159,7 +159,6 @@ unsigned lodepng_decode24_file(unsigned char ** out, unsigned * w, unsigned * h,
 #endif /*LODEPNG_COMPILE_DISK*/
 #endif /*LODEPNG_COMPILE_DECODER*/
 
-
 #ifdef LODEPNG_COMPILE_ENCODER
 /*
 Converts raw pixel data into a PNG image in memory. The colortype and bitdepth
@@ -208,7 +207,6 @@ unsigned lodepng_encode24_file(const char * filename,
                                const unsigned char * image, unsigned w, unsigned h);
 #endif /*LODEPNG_COMPILE_DISK*/
 #endif /*LODEPNG_COMPILE_ENCODER*/
-
 
 #ifdef LODEPNG_COMPILE_CPP
 namespace lodepng
@@ -579,7 +577,6 @@ typedef struct _LodePNGInfo {
 
     /* End of color profile related chunks */
 
-
     /*
     unknown chunks: chunks not known by LodePNG, passed on byte for byte.
 
@@ -763,7 +760,6 @@ typedef struct _LodePNGEncoderSettings {
 void lodepng_encoder_settings_init(LodePNGEncoderSettings * settings);
 #endif /*LODEPNG_COMPILE_ENCODER*/
 
-
 #if defined(LODEPNG_COMPILE_DECODER) || defined(LODEPNG_COMPILE_ENCODER)
 /*The settings, state and information for extended encoding and decoding.*/
 typedef struct _LodePNGState {
@@ -916,11 +912,9 @@ Return error code (0 if it went ok)
 unsigned lodepng_chunk_create(unsigned char ** out, size_t * outsize, unsigned length,
                               const char * type, const unsigned char * data);
 
-
 /*Calculate CRC32 of buffer*/
 unsigned lodepng_crc32(const unsigned char * buf, size_t len);
 #endif /*LODEPNG_COMPILE_PNG*/
-
 
 #ifdef LODEPNG_COMPILE_ZLIB
 /*

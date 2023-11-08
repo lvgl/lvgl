@@ -477,7 +477,6 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
                 if(btnm->one_check) make_one_button_checked(obj, btnm->btn_id_sel);
             }
 
-
             if((button_is_click_trig(btnm->ctrl_bits[btnm->btn_id_sel]) == true ||
                 button_is_popover(btnm->ctrl_bits[btnm->btn_id_sel]) == true) &&
                button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&

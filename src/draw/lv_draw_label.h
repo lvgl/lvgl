@@ -46,7 +46,6 @@ typedef struct _lv_draw_label_hint_t {
     int32_t coord_y;
 } lv_draw_label_hint_t;
 
-
 typedef struct {
     lv_draw_dsc_base_t base;
 
@@ -88,7 +87,6 @@ typedef struct {
     lv_color_t color;
     lv_opa_t opa;
 } lv_draw_glyph_dsc_t;
-
 
 typedef void(*lv_draw_letter_cb_t)(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc, lv_draw_fill_dsc_t * fill_dsc,
                                    const lv_area_t * fill_area);

@@ -15,13 +15,10 @@
  *
  */
 
-
 #ifndef FTOPTION_H_
 #define FTOPTION_H_
 
-
 #include <ft2build.h>
-
 
 FT_BEGIN_HEADER
 
@@ -67,7 +64,6 @@ FT_BEGIN_HEADER
  *
  */
 
-
 /*************************************************************************/
 /*************************************************************************/
 /****                                                                 ****/
@@ -75,7 +71,6 @@ FT_BEGIN_HEADER
 /****                                                                 ****/
 /*************************************************************************/
 /*************************************************************************/
-
 
 /*#************************************************************************
  *
@@ -111,7 +106,6 @@ FT_BEGIN_HEADER
  */
 #define FT_CONFIG_OPTION_ENVIRONMENT_PROPERTIES
 
-
 /**************************************************************************
  *
  * Uncomment the line below if you want to activate LCD rendering
@@ -124,7 +118,6 @@ FT_BEGIN_HEADER
  * rendering technology that produces excellent output.
  */
 /* #define FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
-
 
 /**************************************************************************
  *
@@ -145,7 +138,6 @@ FT_BEGIN_HEADER
  */
 #undef FT_CONFIG_OPTION_FORCE_INT64
 
-
 /**************************************************************************
  *
  * If this macro is defined, do not try to use an assembler version of
@@ -154,7 +146,6 @@ FT_BEGIN_HEADER
  * benchmark tests of the various implementations.
  */
 /* #define FT_CONFIG_OPTION_NO_ASSEMBLER */
-
 
 /**************************************************************************
  *
@@ -166,7 +157,6 @@ FT_BEGIN_HEADER
  * the standard and portable implementation found in `ftcalc.c`.
  */
 #define FT_CONFIG_OPTION_INLINE_MULFIX
-
 
 /**************************************************************************
  *
@@ -182,7 +172,6 @@ FT_BEGIN_HEADER
  */
 #define FT_CONFIG_OPTION_USE_LZW
 
-
 /**************************************************************************
  *
  * Gzip-compressed file support.
@@ -196,7 +185,6 @@ FT_BEGIN_HEADER
  *   macro `FT_CONFIG_OPTION_SYSTEM_ZLIB` below.
  */
 #define FT_CONFIG_OPTION_USE_ZLIB
-
 
 /**************************************************************************
  *
@@ -226,7 +214,6 @@ FT_BEGIN_HEADER
  */
 /* #define FT_CONFIG_OPTION_SYSTEM_ZLIB */
 
-
 /**************************************************************************
  *
  * Bzip2-compressed file support.
@@ -246,7 +233,6 @@ FT_BEGIN_HEADER
  */
 /* #define FT_CONFIG_OPTION_USE_BZIP2 */
 
-
 /**************************************************************************
  *
  * Define to disable the use of file stream functions and types, `FILE`,
@@ -256,7 +242,6 @@ FT_BEGIN_HEADER
  * such as memory loading of font files.
  */
 /* #define FT_CONFIG_OPTION_DISABLE_STREAM_SUPPORT */
-
 
 /**************************************************************************
  *
@@ -275,7 +260,6 @@ FT_BEGIN_HEADER
  */
 /* #define FT_CONFIG_OPTION_USE_PNG */
 
-
 /**************************************************************************
  *
  * HarfBuzz support.
@@ -292,7 +276,6 @@ FT_BEGIN_HEADER
  */
 /* #define FT_CONFIG_OPTION_USE_HARFBUZZ */
 
-
 /**************************************************************************
  *
  * Brotli support.
@@ -307,7 +290,6 @@ FT_BEGIN_HEADER
  *   here with the configured one.
  */
 /* #define FT_CONFIG_OPTION_USE_BROTLI */
-
 
 /**************************************************************************
  *
@@ -333,7 +315,6 @@ FT_BEGIN_HEADER
  */
 #define FT_CONFIG_OPTION_POSTSCRIPT_NAMES
 
-
 /**************************************************************************
  *
  * Postscript Names to Unicode Values support
@@ -350,7 +331,6 @@ FT_BEGIN_HEADER
  */
 #define FT_CONFIG_OPTION_ADOBE_GLYPH_LIST
 
-
 /**************************************************************************
  *
  * Support for Mac fonts
@@ -362,7 +342,6 @@ FT_BEGIN_HEADER
  *   Note that the 'FOND' resource isn't checked.
  */
 /* #define FT_CONFIG_OPTION_MAC_FONTS */
-
 
 /**************************************************************************
  *
@@ -384,7 +363,6 @@ FT_BEGIN_HEADER
     #define FT_CONFIG_OPTION_GUESSING_EMBEDDED_RFORK
 #endif
 
-
 /**************************************************************************
  *
  * Allow the use of `FT_Incremental_Interface` to load typefaces that
@@ -395,14 +373,12 @@ FT_BEGIN_HEADER
  */
 #define FT_CONFIG_OPTION_INCREMENTAL
 
-
 /**************************************************************************
  *
  * The size in bytes of the render pool used by the scan-line converter to
  * do all of its work.
  */
 #define FT_RENDER_POOL_SIZE  16384L
-
 
 /**************************************************************************
  *
@@ -412,7 +388,6 @@ FT_BEGIN_HEADER
  *   FreeType library object.  32~is the default.
  */
 #define FT_MAX_MODULES  32
-
 
 /**************************************************************************
  *
@@ -433,7 +408,6 @@ FT_BEGIN_HEADER
 /* #define FT_DEBUG_LEVEL_ERROR */
 /* #define FT_DEBUG_LEVEL_TRACE */
 
-
 /**************************************************************************
  *
  * Logging
@@ -449,7 +423,6 @@ FT_BEGIN_HEADER
  *   This option needs a C99 compiler.
  */
 /* #define FT_DEBUG_LOGGING */
-
 
 /**************************************************************************
  *
@@ -491,7 +464,6 @@ FT_BEGIN_HEADER
  */
 /* #define FT_DEBUG_AUTOFIT */
 
-
 /**************************************************************************
  *
  * Memory Debugging
@@ -509,7 +481,6 @@ FT_BEGIN_HEADER
  */
 /* #define FT_DEBUG_MEMORY */
 
-
 /**************************************************************************
  *
  * Module errors
@@ -526,7 +497,6 @@ FT_BEGIN_HEADER
  */
 #undef FT_CONFIG_OPTION_USE_MODULE_ERRORS
 
-
 /**************************************************************************
  *
  * OpenType SVG Glyph Support
@@ -540,7 +510,6 @@ FT_BEGIN_HEADER
  */
 #define FT_CONFIG_OPTION_SVG
 
-
 /**************************************************************************
  *
  * Error Strings
@@ -553,7 +522,6 @@ FT_BEGIN_HEADER
  */
 #define FT_CONFIG_OPTION_ERROR_STRINGS
 
-
 /*************************************************************************/
 /*************************************************************************/
 /****                                                                 ****/
@@ -561,7 +529,6 @@ FT_BEGIN_HEADER
 /****                                                                 ****/
 /*************************************************************************/
 /*************************************************************************/
-
 
 /**************************************************************************
  *
@@ -571,7 +538,6 @@ FT_BEGIN_HEADER
  */
 #define TT_CONFIG_OPTION_EMBEDDED_BITMAPS
 
-
 /**************************************************************************
  *
  * Define `TT_CONFIG_OPTION_COLOR_LAYERS` if you want to support colored
@@ -579,7 +545,6 @@ FT_BEGIN_HEADER
  * module (namely TrueType~& OpenType).
  */
 #define TT_CONFIG_OPTION_COLOR_LAYERS
-
 
 /**************************************************************************
  *
@@ -595,7 +560,6 @@ FT_BEGIN_HEADER
  */
 #define TT_CONFIG_OPTION_POSTSCRIPT_NAMES
 
-
 /**************************************************************************
  *
  * Define `TT_CONFIG_OPTION_SFNT_NAMES` if your applications need to access
@@ -608,7 +572,6 @@ FT_BEGIN_HEADER
  * `ftsnames.h`.
  */
 #define TT_CONFIG_OPTION_SFNT_NAMES
-
 
 /**************************************************************************
  *
@@ -626,7 +589,6 @@ FT_BEGIN_HEADER
 #define TT_CONFIG_CMAP_FORMAT_12
 #define TT_CONFIG_CMAP_FORMAT_13
 #define TT_CONFIG_CMAP_FORMAT_14
-
 
 /*************************************************************************/
 /*************************************************************************/
@@ -648,7 +610,6 @@ FT_BEGIN_HEADER
  * for certain configurations only.
  */
 #define TT_CONFIG_OPTION_BYTECODE_INTERPRETER
-
 
 /**************************************************************************
  *
@@ -709,7 +670,6 @@ FT_BEGIN_HEADER
 #define TT_CONFIG_OPTION_SUBPIXEL_HINTING  2
 /* #define TT_CONFIG_OPTION_SUBPIXEL_HINTING  ( 1 | 2 ) */
 
-
 /**************************************************************************
  *
  * Define `TT_CONFIG_OPTION_COMPONENT_OFFSET_SCALED` to compile the
@@ -728,7 +688,6 @@ FT_BEGIN_HEADER
  */
 #undef TT_CONFIG_OPTION_COMPONENT_OFFSET_SCALED
 
-
 /**************************************************************************
  *
  * Define `TT_CONFIG_OPTION_GX_VAR_SUPPORT` if you want to include support
@@ -738,14 +697,12 @@ FT_BEGIN_HEADER
  */
 #define TT_CONFIG_OPTION_GX_VAR_SUPPORT
 
-
 /**************************************************************************
  *
  * Define `TT_CONFIG_OPTION_BDF` if you want to include support for an
  * embedded 'BDF~' table within SFNT-based bitmap formats.
  */
 #define TT_CONFIG_OPTION_BDF
-
 
 /**************************************************************************
  *
@@ -764,7 +721,6 @@ FT_BEGIN_HEADER
     #define TT_CONFIG_OPTION_MAX_RUNNABLE_OPCODES  1000000L
 #endif
 
-
 /*************************************************************************/
 /*************************************************************************/
 /****                                                                 ****/
@@ -773,7 +729,6 @@ FT_BEGIN_HEADER
 /*************************************************************************/
 /*************************************************************************/
 
-
 /**************************************************************************
  *
  * `T1_MAX_DICT_DEPTH` is the maximum depth of nest dictionaries and arrays
@@ -781,14 +736,12 @@ FT_BEGIN_HEADER
  */
 #define T1_MAX_DICT_DEPTH  5
 
-
 /**************************************************************************
  *
  * `T1_MAX_SUBRS_CALLS` details the maximum number of nested sub-routine
  * calls during glyph loading.
  */
 #define T1_MAX_SUBRS_CALLS  16
-
 
 /**************************************************************************
  *
@@ -800,7 +753,6 @@ FT_BEGIN_HEADER
  */
 #define T1_MAX_CHARSTRINGS_OPERANDS  256
 
-
 /**************************************************************************
  *
  * Define this configuration macro if you want to prevent the compilation
@@ -810,14 +762,12 @@ FT_BEGIN_HEADER
  */
 #undef T1_CONFIG_OPTION_NO_AFM
 
-
 /**************************************************************************
  *
  * Define this configuration macro if you want to prevent the compilation
  * of the Multiple Masters font support in the Type~1 driver.
  */
 #undef T1_CONFIG_OPTION_NO_MM_SUPPORT
-
 
 /**************************************************************************
  *
@@ -828,7 +778,6 @@ FT_BEGIN_HEADER
  */
 /* #define T1_CONFIG_OPTION_OLD_ENGINE */
 
-
 /*************************************************************************/
 /*************************************************************************/
 /****                                                                 ****/
@@ -836,7 +785,6 @@ FT_BEGIN_HEADER
 /****                                                                 ****/
 /*************************************************************************/
 /*************************************************************************/
-
 
 /**************************************************************************
  *
@@ -860,7 +808,6 @@ FT_BEGIN_HEADER
 #define CFF_CONFIG_OPTION_DARKENING_PARAMETER_X4  2333
 #define CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y4     0
 
-
 /**************************************************************************
  *
  * `CFF_CONFIG_OPTION_OLD_ENGINE` controls whether the pre-Adobe CFF engine
@@ -870,7 +817,6 @@ FT_BEGIN_HEADER
  */
 /* #define CFF_CONFIG_OPTION_OLD_ENGINE */
 
-
 /*************************************************************************/
 /*************************************************************************/
 /****                                                                 ****/
@@ -878,7 +824,6 @@ FT_BEGIN_HEADER
 /****                                                                 ****/
 /*************************************************************************/
 /*************************************************************************/
-
 
 /**************************************************************************
  *
@@ -897,7 +842,6 @@ FT_BEGIN_HEADER
  */
 /* #define PCF_CONFIG_OPTION_LONG_FAMILY_NAMES */
 
-
 /*************************************************************************/
 /*************************************************************************/
 /****                                                                 ****/
@@ -906,14 +850,12 @@ FT_BEGIN_HEADER
 /*************************************************************************/
 /*************************************************************************/
 
-
 /**************************************************************************
  *
  * Compile 'autofit' module with CJK (Chinese, Japanese, Korean) script
  * support.
  */
 #define AF_CONFIG_OPTION_CJK
-
 
 /**************************************************************************
  *
@@ -924,7 +866,6 @@ FT_BEGIN_HEADER
 #ifdef AF_CONFIG_OPTION_CJK
     #define AF_CONFIG_OPTION_INDIC
 #endif
-
 
 /**************************************************************************
  *
@@ -950,13 +891,11 @@ FT_BEGIN_HEADER
 
 /* */
 
-
 /*
  * This macro is obsolete.  Support has been removed in FreeType version
  * 2.5.
  */
 /* #define FT_CONFIG_OPTION_OLD_INTERNALS */
-
 
 /*
  * The next three macros are defined if native TrueType hinting is
@@ -976,7 +915,6 @@ FT_BEGIN_HEADER
     #endif
 #endif
 
-
 /*
  * The TT_SUPPORT_COLRV1 macro is defined to indicate to clients that this
  * version of FreeType has support for 'COLR' v1 API.  This definition is
@@ -990,7 +928,6 @@ FT_BEGIN_HEADER
 #ifdef TT_CONFIG_OPTION_COLOR_LAYERS
     #define  TT_SUPPORT_COLRV1
 #endif
-
 
 /*
  * Check CFF darkening parameters.  The checks are the same as in function
@@ -1020,10 +957,8 @@ FT_BEGIN_HEADER
     #error "Invalid CFF darkening parameters!"
 #endif
 
-
 FT_END_HEADER
 
 #endif /* FTOPTION_H_ */
-
 
 /* END */

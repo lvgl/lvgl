@@ -49,7 +49,6 @@ typedef struct {
     uint32_t grow_dsc_calc : 1;
 } track_t;
 
-
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
@@ -285,7 +284,6 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                 t->track_fix_main_size += item_size + item_gap;
             }
 
-
             t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
             t->item_cnt++;
         }
@@ -365,7 +363,6 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
         }
     }
 
-
     bool rtl = lv_obj_get_style_base_dir(cont, LV_PART_MAIN) == LV_BASE_DIR_RTL;
 
     int32_t main_pos = 0;
@@ -434,7 +431,6 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
         }
 
         if(f->row && rtl) main_pos -= area_get_main_size(&item->coords);
-
 
         /*Handle percentage value of translate*/
         int32_t tr_x = lv_obj_get_style_translate_x(item, LV_PART_MAIN);

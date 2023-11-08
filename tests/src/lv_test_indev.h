@@ -45,10 +45,8 @@ extern lv_indev_t * lv_test_mouse_indev;
 extern lv_indev_t * lv_test_keypad_indev;
 extern lv_indev_t * lv_test_encoder_indev;
 
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
 #endif /*LV_TEST_INDEV_H*/
-

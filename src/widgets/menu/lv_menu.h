@@ -36,7 +36,6 @@ typedef _lv_menu_mode_header_t lv_menu_mode_header_t;
 typedef uint8_t lv_menu_mode_header_t;
 #endif /*DOXYGEN*/
 
-
 enum _lv_menu_mode_root_back_button_t {
     LV_MENU_ROOT_BACK_BUTTON_DISABLED,
     LV_MENU_ROOT_BACK_BUTTON_ENABLED

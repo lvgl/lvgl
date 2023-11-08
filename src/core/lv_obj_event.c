@@ -69,7 +69,6 @@ lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void *
     return res;
 }
 
-
 lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     const lv_obj_class_t * base;
@@ -108,7 +107,6 @@ uint32_t lv_obj_get_event_count(lv_obj_t * obj)
     if(obj->spec_attr == NULL) return 0;
     return lv_event_get_count(&obj->spec_attr->event_list);
 }
-
 
 lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index)
 {
@@ -150,7 +148,6 @@ lv_obj_t * lv_event_get_target_obj(lv_event_t * e)
 {
     return lv_event_get_target(e);
 }
-
 
 lv_indev_t * lv_event_get_indev(lv_event_t * e)
 {
@@ -336,7 +333,6 @@ static lv_result_t event_send_core(lv_event_t * e)
 
     return res;
 }
-
 
 static bool event_is_bubbled(lv_event_t * e)
 {

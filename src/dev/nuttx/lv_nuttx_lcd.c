@@ -114,7 +114,6 @@ static int32_t align_round_up(int32_t v, uint16_t align)
     return (v + align - 1) & ~(align - 1);
 }
 
-
 static void rounder_cb(lv_event_t * e)
 {
     lv_nuttx_lcd_t * lcd = lv_event_get_user_data(e);

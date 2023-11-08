@@ -433,7 +433,6 @@ void lv_menu_set_page_title_static(lv_obj_t * page_obj, char const * const title
     }
 }
 
-
 /*=====================
  * Getter functions
  *====================*/

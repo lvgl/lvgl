@@ -66,7 +66,6 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_color_format_t cf);
 lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf,
                                     uint32_t buff_size);
 
-
 /**********************
  *      MACROS
  **********************/

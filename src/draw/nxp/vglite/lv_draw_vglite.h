@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 #ifndef LV_DRAW_VGLITE_H
 #define LV_DRAW_VGLITE_H
 

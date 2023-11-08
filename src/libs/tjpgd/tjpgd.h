@@ -27,7 +27,6 @@ typedef int16_t jd_yuv_t;
 typedef uint8_t jd_yuv_t;
 #endif
 
-
 /* Error code */
 typedef enum {
     JDR_OK = 0, /* 0: Succeeded */
@@ -41,7 +40,6 @@ typedef enum {
     JDR_FMT3    /* 8: Not supported JPEG standard */
 } JRESULT;
 
-
 /* Rectangular region in the output image */
 typedef struct {
     uint16_t left;      /* Left end */
@@ -49,7 +47,6 @@ typedef struct {
     uint16_t top;       /* Top end */
     uint16_t bottom;    /* Bottom end */
 } JRECT;
-
 
 /* Decompressor object structure */
 typedef struct JDEC JDEC;
@@ -89,7 +86,6 @@ struct JDEC {
     void * device;              /* Pointer to I/O device identifiler for the session */
 };
 
-
 /* TJpgDec API functions */
 JRESULT jd_prepare(JDEC * jd, size_t (*infunc)(JDEC *, uint8_t *, size_t), void * pool, size_t sz_pool, void * dev);
 
@@ -100,7 +96,6 @@ JRESULT jd_mcu_load(JDEC * jd);
 JRESULT jd_mcu_output(JDEC * jd, int (*outfunc)(JDEC *, void *, JRECT *), unsigned int x, unsigned int y);
 
 JRESULT jd_restart(JDEC * jd, uint16_t rstn);
-
 
 #ifdef __cplusplus
 }

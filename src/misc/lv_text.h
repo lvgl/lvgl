@@ -49,7 +49,6 @@ typedef _lv_text_flag_t lv_text_flag_t;
 typedef uint8_t lv_text_flag_t;
 #endif /*DOXYGEN*/
 
-
 /** Label align policy*/
 enum _lv_text_align_t {
     LV_TEXT_ALIGN_AUTO, /**< Align text auto*/
@@ -63,7 +62,6 @@ typedef _lv_text_align_t lv_text_align_t;
 #else
 typedef uint8_t lv_text_align_t;
 #endif /*DOXYGEN*/
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -168,7 +166,6 @@ static inline bool _lv_text_is_break_char(uint32_t letter)
 
     return ret;
 }
-
 
 /**
  * Test if char is break char or not (a text can broken here or not)

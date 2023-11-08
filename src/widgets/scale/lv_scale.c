@@ -832,7 +832,6 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
         }
         else { /* Nothing to do */ }
 
-
         if(is_major_tick && ((LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode))) {
             major_len *= -1;
         }

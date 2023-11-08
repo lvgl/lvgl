@@ -260,7 +260,6 @@ void test_dropdown_keypad(void)
     lv_group_delete(g);
 }
 
-
 void test_dropdown_encoder(void)
 {
     lv_obj_clean(lv_screen_active());
@@ -317,7 +316,6 @@ void test_dropdown_encoder(void)
     lv_group_delete(g);
 }
 
-
 void test_dropdown_render_1(void)
 {
     lv_obj_clean(lv_screen_active());
@@ -359,7 +357,6 @@ void test_dropdown_render_1(void)
     lv_obj_set_style_text_line_space(list, 5, 0);
     lv_obj_set_style_bg_color(list, lv_color_hex3(0xf00), LV_PART_SELECTED | LV_STATE_CHECKED);
     lv_dropdown_set_selected(dd3, 3);
-
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/dropdown_1.png");
 }
@@ -452,6 +449,5 @@ void test_dropdown_get_options_should_check_lengths(void)
     TEST_ASSERT_EQUAL_INT(3, lv_dropdown_get_option_index(dd, "Option"));
     TEST_ASSERT_EQUAL_INT(-1, lv_dropdown_get_option_index(dd, "Option "));
 }
-
 
 #endif

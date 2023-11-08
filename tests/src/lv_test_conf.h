@@ -31,7 +31,6 @@ extern "C" {
 #define LV_OBJ_STYLE_CACHE      1
 #endif
 
-
 #ifdef MICROPYTHON
 #define LV_USE_BUILTIN_MALLOC   0
 #define LV_USE_BUILTIN_MEMCPY   1
@@ -56,7 +55,6 @@ void lv_test_assert_fail(void);
 #define LV_ASSERT_HANDLER lv_test_assert_fail();
 
 typedef void * lv_user_data_t;
-
 
 /***********************
  * TEST CONFIGS
@@ -101,7 +99,6 @@ typedef void * lv_user_data_t;
 #if defined(LVGL_CI_USING_SYS_HEAP)
 #undef LV_USE_FLOAT
 #endif
-
 
 #ifdef __cplusplus
 } /*extern "C"*/

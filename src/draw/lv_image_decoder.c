@@ -751,7 +751,6 @@ lv_result_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_
         return LV_RESULT_OK;
     }
 
-
     if(cf == LV_COLOR_FORMAT_RGB565A8) {
         bpp = 16; /* RGB565 + A8 mask*/
         uint32_t len = (w_px * bpp) / 8; /*map comes firstly*/

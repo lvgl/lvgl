@@ -19,7 +19,6 @@ typedef struct _gd_GCE {
     int transparency;
 } gd_GCE;
 
-
 typedef struct _gd_GIF {
     lv_fs_file_t fd;
     const char * data;
