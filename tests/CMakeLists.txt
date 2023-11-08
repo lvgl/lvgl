@@ -100,9 +100,47 @@ set(COMPILE_OPTIONS
     -Wextra
     -Wformat-security
     -Wmaybe-uninitialized
+    -Wmissing-prototypes
     -Wpointer-arith
     -Wmultichar
     -Wno-pedantic # ignored for now, we convert functions to pointers for propertis table.
+    -Wreturn-type
+    -Wshadow
+    -Wshift-negative-value
+    -Wsizeof-pointer-memaccess
+    -Wstack-usage=5000
+    -Wtype-limits
+    -Wundef
+    -Wuninitialized
+    -Wunreachable-code
+    -Werror=float-conversion
+    -Werror=strict-aliasing
+    ${BUILD_OPTIONS}
+    ${BUILD_TARGET_DEF}
+)
+
+# Options test cases are compiled with.
+set(LVGL_TESTFILE_COMPILE_OPTIONS
+    ${COMPILE_OPTIONS}
+    -Wno-missing-prototypes
+)
+
+set(LVGL_THORVG_COMPILE_OPTIONS
+    -DLV_CONF_PATH=${LVGL_TEST_DIR}/src/lv_test_conf.h
+    -DLV_BUILD_TEST
+    -pedantic-errors
+    -Wall
+    -Wclobbered
+    -Wdeprecated
+    -Wdouble-promotion
+    -Wempty-body
+    -Werror
+    -Wextra
+    -Wformat-security
+    -Wmaybe-uninitialized
+    -Wpointer-arith
+    -Wmultichar
+    -Wno-pedantic
     -Wno-unused-parameter
     -Wreturn-type
     -Wshift-negative-value
@@ -117,17 +155,12 @@ set(COMPILE_OPTIONS
     ${BUILD_TARGET_DEF}
 )
 
-# Options test cases are compiled with.
-set(LVGL_TESTFILE_COMPILE_OPTIONS
-    ${COMPILE_OPTIONS}
-)
-
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 
 # Include lvgl project file.
 include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC ${COMPILE_OPTIONS})
-target_compile_options(lvgl_thorvg PUBLIC ${COMPILE_OPTIONS})
+target_compile_options(lvgl_thorvg PUBLIC ${LVGL_THORVG_COMPILE_OPTIONS})
 if (TARGET lvgl_examples)
   target_compile_options(lvgl_examples PUBLIC ${COMPILE_OPTIONS})
 endif()
