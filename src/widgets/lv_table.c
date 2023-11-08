@@ -177,7 +177,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
         va_end(ap2);
         return;
     }
-    _lv_txt_ap_proc(raw_txt, &table->cell_data[cell]->txt);
+    _lv_txt_ap_proc(raw_txt, table->cell_data[cell]->txt);
 
     lv_mem_buf_release(raw_txt);
 #else
