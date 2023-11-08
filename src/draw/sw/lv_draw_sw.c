@@ -126,7 +126,7 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
 
 #if LV_USE_OS
     /*Let the render thread work*/
-    lv_thread_sync_signal(&draw_sw_unit->sync);
+    if(draw_sw_unit->inited) lv_thread_sync_signal(&draw_sw_unit->sync);
 #else
     execute_drawing(draw_sw_unit);
 
@@ -146,6 +146,7 @@ static void render_thread_cb(void * ptr)
     lv_draw_sw_unit_t * u = ptr;
 
     lv_thread_sync_init(&u->sync);
+    u->inited = true;
 
     while(1) {
         while(u->task_act == NULL) {
@@ -161,6 +162,8 @@ static void render_thread_cb(void * ptr)
         /*The draw unit is free now. Request a new dispatching as it can get a new task*/
         lv_draw_dispatch_request();
     }
+    u->inited = false;
+    lv_thread_sync_delete(&u->sync);
 }
 #endif
 
