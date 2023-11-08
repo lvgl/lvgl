@@ -400,6 +400,10 @@ void lv_table_set_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, void * u
         table->cell_data[cell]->txt[0] = '\0';
     }
 
+    if(table->cell_data[cell]->user_data) {
+        lv_mem_free(table->cell_data[cell]->user_data);
+    }
+
     table->cell_data[cell]->user_data = user_data;
 }
 #endif
