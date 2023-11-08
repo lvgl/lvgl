@@ -750,8 +750,6 @@ static void draw_main(lv_event_t * e)
 
         draw_rect_dsc_act.base.id1 = btn_i;
 
-        bool recolor = button_is_recolor(btnm->ctrl_bits[btn_i]);
-
         /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
         if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
             draw_rect_dsc_act.border_side = LV_BORDER_SIDE_FULL;
