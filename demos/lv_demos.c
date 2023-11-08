@@ -8,7 +8,6 @@
  *********************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "lv_demos.h"
 
