@@ -149,7 +149,15 @@ bool lv_theme_basic_is_inited(void)
 
 void lv_theme_basic_deinit(void)
 {
-    if(theme_def) {
+    struct _my_theme_t * theme = theme_def;
+    if(theme) {
+        if(theme->inited) {
+            lv_style_t * theme_styles = (lv_style_t *)(&(theme->styles));
+            uint32_t i;
+            for(i = 0; i < sizeof(my_theme_styles_t) / sizeof(lv_style_t); i++) {
+                lv_style_reset(theme_styles + i);
+            }
+        }
         lv_free(theme_def);
         theme_def = NULL;
     }
