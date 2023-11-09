@@ -19,6 +19,7 @@ jobs:
           cd astyle/build/gcc/
           make
           sudo make install
+          astyle --version
       - name: Format code
         run: python code-format.py
         working-directory: scripts
