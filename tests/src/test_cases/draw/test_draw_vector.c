@@ -20,7 +20,7 @@ static void draw_shapes(lv_layer_t * layer)
 
     lv_area_t rect = {0, 0, 640, 480};
     lv_vector_dsc_set_fill_color(ctx, lv_color_white());
-    lv_clear_rect(ctx, &rect);
+    lv_vector_clear_area(ctx, &rect);
 
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
@@ -110,7 +110,7 @@ static void draw_lines(lv_layer_t * layer)
 
     lv_area_t rect = {0, 0, 640, 480};
     lv_vector_dsc_set_fill_color(ctx, lv_color_white());
-    lv_clear_rect(ctx, &rect);
+    lv_vector_clear_area(ctx, &rect);
 
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 

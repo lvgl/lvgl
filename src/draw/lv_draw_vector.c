@@ -664,7 +664,7 @@ void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path
     new_task->dsc.scissor_area = rect;
 }
 
-void lv_clear_rect(lv_vector_dsc_t * dsc, const lv_area_t * rect)
+void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
 {
     lv_area_t r;
     if(!_lv_area_intersect(&r, &(dsc->layer->clip_area), &(dsc->current_dsc.scissor_area))) {
