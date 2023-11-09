@@ -35,7 +35,6 @@ typedef struct {
     lv_style_t scr;
     lv_style_t card;
     lv_style_t scrollbar;
-    lv_style_t btn;
     lv_style_t pr;
     lv_style_t inv;
     lv_style_t disabled;
@@ -186,7 +185,31 @@ bool lv_theme_mono_is_inited(void)
 
 void lv_theme_mono_deinit(void)
 {
-    if(theme_def) {
+    struct _my_theme_t * theme = theme_def;
+    if(theme) {
+        if(theme->inited) {
+            lv_style_reset(&theme->styles.scr);
+            lv_style_reset(&theme->styles.card);
+            lv_style_reset(&theme->styles.scrollbar);
+            lv_style_reset(&theme->styles.pr);
+            lv_style_reset(&theme->styles.inv);
+            lv_style_reset(&theme->styles.disabled);
+            lv_style_reset(&theme->styles.focus);
+            lv_style_reset(&theme->styles.edit);
+            lv_style_reset(&theme->styles.pad_gap);
+            lv_style_reset(&theme->styles.pad_zero);
+            lv_style_reset(&theme->styles.no_radius);
+            lv_style_reset(&theme->styles.radius_circle);
+            lv_style_reset(&theme->styles.large_border);
+            lv_style_reset(&theme->styles.large_line_space);
+            lv_style_reset(&theme->styles.underline);
+#if LV_USE_TEXTAREA
+            lv_style_reset(&theme->styles.ta_cursor);
+#endif
+#if LV_USE_CHART
+            lv_style_reset(&theme->styles.chart_indic);
+#endif
+        }
         lv_free(theme_def);
         theme_def = NULL;
     }
