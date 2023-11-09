@@ -149,7 +149,24 @@ bool lv_theme_basic_is_inited(void)
 
 void lv_theme_basic_deinit(void)
 {
-    if(theme_def) {
+    struct _my_theme_t * theme = theme_def;
+    if(theme) {
+        if(theme->inited) {
+            lv_style_reset(&theme->styles.scr);
+            lv_style_reset(&theme->styles.transp);
+            lv_style_reset(&theme->styles.white);
+            lv_style_reset(&theme->styles.light);
+            lv_style_reset(&theme->styles.dark);
+            lv_style_reset(&theme->styles.dim);
+            lv_style_reset(&theme->styles.scrollbar);
+#if LV_USE_ARC
+            lv_style_reset(&theme->styles.arc_line);
+            lv_style_reset(&theme->styles.arc_knob);
+#endif
+#if LV_USE_TEXTAREA
+            lv_style_reset(&theme->styles.ta_cursor);
+#endif
+        }
         lv_free(theme_def);
         theme_def = NULL;
     }
