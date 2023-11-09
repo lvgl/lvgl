@@ -36,6 +36,14 @@ jobs:
       run: scripts/install-prerequisites.sh
     - name: Run tests
       run: python tests/main.py --report test
+    - name: Archive screenshot errors
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: screenshot-errors-amd64
+        path: |
+             tests/ref_imgs/**/*_err.png
+             test_screenshot_error.h
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       if: github.event_name == 'push'
@@ -91,4 +99,13 @@ jobs:
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 
           run: |
-            env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+            env PATH="/usr/lib/ccache:$PATH" NON_AMD64_BUILD=1 ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+      - name: Archive screenshot errors
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+            name: screenshot-errors-${{ matrix.arch }}
+            path: |
+                tests/ref_imgs/**/*_err.png
+                test_screenshot_error.h
+

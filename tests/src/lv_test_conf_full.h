@@ -76,6 +76,8 @@
 #define LV_USE_TINY_TTF         1
 #define LV_USE_SYSMON           1
 #define LV_USE_SNAPSHOT         1
+#define LV_USE_THORVG_INTERNAL  1
+#define LV_USE_VECTOR_GRAPHIC   1
 
 #define LV_BUILD_EXAMPLES       1
 #define LV_USE_DEMO_WIDGETS     1
@@ -85,6 +87,7 @@
 #define LV_USE_DEMO_RENDER      1
 #define LV_USE_DEMO_BENCHMARK   1
 #define LV_USE_DEMO_SCROLL      1
+#define LV_USE_DEMO_VECTOR_GRAPHIC  1
 
 #define LV_USE_OBJ_ID           1
 #define LV_USE_OBJ_ID_BUILTIN   1

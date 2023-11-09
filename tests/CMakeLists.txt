@@ -80,6 +80,12 @@ else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
 
+
+if ($ENV{NON_AMD64_BUILD})
+    set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
+    message("Non AMD64 target is specified")
+endif()
+
 # Options lvgl and examples are compiled with.
 set(COMPILE_OPTIONS
     -DLV_CONF_PATH=${LVGL_TEST_DIR}/src/lv_test_conf.h
@@ -110,6 +116,7 @@ set(COMPILE_OPTIONS
     -Werror=float-conversion
     -Werror=strict-aliasing
     ${BUILD_OPTIONS}
+    ${BUILD_TARGET_DEF}
 )
 
 # Options test cases are compiled with.
@@ -118,11 +125,42 @@ set(LVGL_TESTFILE_COMPILE_OPTIONS
     -Wno-missing-prototypes
 )
 
+set(LVGL_THORVG_COMPILE_OPTIONS
+    -DLV_CONF_PATH=${LVGL_TEST_DIR}/src/lv_test_conf.h
+    -DLV_BUILD_TEST
+    -pedantic-errors
+    -Wall
+    -Wclobbered
+    -Wdeprecated
+    -Wdouble-promotion
+    -Wempty-body
+    -Werror
+    -Wextra
+    -Wformat-security
+    -Wmaybe-uninitialized
+    -Wpointer-arith
+    -Wmultichar
+    -Wno-pedantic
+    -Wno-unused-parameter
+    -Wreturn-type
+    -Wshift-negative-value
+    -Wsizeof-pointer-memaccess
+    -Wtype-limits
+    -Wundef
+    -Wuninitialized
+    -Wunreachable-code
+    -Werror=float-conversion
+    -Werror=strict-aliasing
+    ${BUILD_OPTIONS}
+    ${BUILD_TARGET_DEF}
+)
+
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 
 # Include lvgl project file.
 include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC ${COMPILE_OPTIONS})
+target_compile_options(lvgl_thorvg PUBLIC ${LVGL_THORVG_COMPILE_OPTIONS})
 if (TARGET lvgl_examples)
   target_compile_options(lvgl_examples PUBLIC ${COMPILE_OPTIONS})
 endif()
@@ -209,7 +247,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
-    target_link_libraries(${test_name} test_common lvgl_demos lvgl png ${JPEG_LIBRARIES} m ${TEST_LIBS})
+    target_link_libraries(${test_name} PRIVATE test_common lvgl_demos lvgl lvgl_thorvg png ${JPEG_LIBRARIES} m ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 

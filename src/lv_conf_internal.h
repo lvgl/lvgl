@@ -2155,6 +2155,33 @@
     #endif
 #endif
 
+/*Enable Vector Graphic APIs*/
+#ifndef LV_USE_VECTOR_GRAPHIC
+    #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
+        #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
+    #else
+        #define LV_USE_VECTOR_GRAPHIC  0
+    #endif
+#endif
+
+/* Enable ThorVG (vector graphics library) from the src/libs folder */
+#ifndef LV_USE_THORVG_INTERNAL
+    #ifdef CONFIG_LV_USE_THORVG_INTERNAL
+        #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
+    #else
+        #define LV_USE_THORVG_INTERNAL 0
+    #endif
+#endif
+
+/* Enable ThorVG by assuming that its installed and linked to the project */
+#ifndef LV_USE_THORVG_EXTERNAL
+    #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
+        #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
+    #else
+        #define LV_USE_THORVG_EXTERNAL 0
+    #endif
+#endif
+
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
 #ifndef LV_USE_FFMPEG
@@ -2769,6 +2796,15 @@
         #define LV_USE_DEMO_SCROLL CONFIG_LV_USE_DEMO_SCROLL
     #else
         #define LV_USE_DEMO_SCROLL          0
+    #endif
+#endif
+
+/*Vector graphic demo*/
+#ifndef LV_USE_DEMO_VECTOR_GRAPHIC
+    #ifdef CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+        #define LV_USE_DEMO_VECTOR_GRAPHIC CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+    #else
+        #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #endif
 #endif
 

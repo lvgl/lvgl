@@ -30,6 +30,7 @@ extern "C" {
 #include "src/misc/lv_log.h"
 #include "src/misc/lv_timer.h"
 #include "src/misc/lv_math.h"
+#include "src/misc/lv_array.h"
 #include "src/misc/lv_async.h"
 #include "src/misc/lv_anim_timeline.h"
 #include "src/misc/lv_profiler_builtin.h"
@@ -105,6 +106,7 @@ extern "C" {
 #include "src/layouts/lv_layout.h"
 
 #include "src/draw/lv_draw.h"
+#include "src/draw/lv_draw_vector.h"
 
 #include "src/themes/lv_theme.h"
 

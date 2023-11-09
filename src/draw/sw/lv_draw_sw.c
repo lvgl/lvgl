@@ -15,6 +15,13 @@
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 
+#if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
+    #if LV_USE_THORVG_EXTERNAL
+        #include <thorvg_capi.h>
+    #else
+        #include "../../libs/thorvg/thorvg_capi.h"
+    #endif
+#endif
 /*********************
  *      DEFINES
  *********************/
@@ -67,10 +74,18 @@ void lv_draw_sw_init(void)
         lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_HIGH, render_thread_cb, 8 * 1024, draw_sw_unit);
 #endif
     }
+
+#if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
+    tvg_engine_init(TVG_ENGINE_SW, 0);
+#endif
 }
 
 void lv_draw_sw_deinit(void)
 {
+#if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
+    tvg_engine_term(TVG_ENGINE_SW);
+#endif
+
 #if LV_DRAW_SW_COMPLEX == 1
     lv_draw_sw_mask_deinit();
 #endif
@@ -189,6 +204,11 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
             lv_draw_sw_mask_rect((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
+#if LV_USE_VECTOR_GRAPHIC
+        case LV_DRAW_TASK_TYPE_VECTOR:
+            lv_draw_sw_vector((lv_draw_unit_t *)u, t->draw_dsc);
+            break;
+#endif
         default:
             break;
     }

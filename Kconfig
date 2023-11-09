@@ -311,6 +311,12 @@ menu "LVGL configuration"
 				depends on LV_USE_DRAW_SW
 				help
 					Only used if software rotation is enabled in the display driver.
+
+			config LV_USE_VECTOR_GRAPHIC
+				bool "Use Vector Graphic APIs"
+				default n
+				help
+					Enable drawing support vector graphic APIs.
 		endmenu
 
 		menu "GPU"
@@ -1108,6 +1114,17 @@ menu "LVGL configuration"
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
+		config LV_USE_THORVG
+			bool "ThorVG library"
+            choice
+             prompt "Use ThorVG config"
+             depends on LV_USE_THORVG
+                default LV_USE_THORVG_INTERNAL
+                config LV_USE_THORVG_INTERNAL
+                    bool "Use ThorVG internal"
+                config LV_USE_THORVG_EXTERNAL
+                    bool "Use ThorVG external"
+             endchoice
 
 		config LV_USE_FFMPEG
 			bool "FFmpeg library"
@@ -1407,6 +1424,9 @@ menu "LVGL configuration"
 			default n
 		config LV_USE_DEMO_MULTILANG
 			bool "multi-language demo"
+			default n
+		config LV_USE_DEMO_VECTOR_GRAPHIC
+			bool "vector graphic demo"
 			default n
 	endmenu
 

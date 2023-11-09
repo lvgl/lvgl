@@ -34,3 +34,7 @@ repos:
     rev: v1.16.20
     hooks:
       - id: typos
+        exclude: |
+            (?x)^(
+                src/libs/
+             )
