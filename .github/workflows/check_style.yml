@@ -13,9 +13,13 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Checkout astyle
+        uses: actions/checkout@v4
+        with:
+          repository: szepeviktor/astyle
+          path: astyle
       - name: Install astyle
         run: |
-          svn checkout https://svn.code.sf.net/p/astyle/code/trunk/AStyle/ astyle
           cd astyle/build/gcc/
           make
           sudo make install
