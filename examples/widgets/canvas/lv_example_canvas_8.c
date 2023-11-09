@@ -1,5 +1,7 @@
 #include "../../lv_examples.h"
-#if LV_USE_CANVAS && LV_BUILD_EXAMPLES && LV_USE_VECTOR_GRAPHIC
+#if LV_USE_CANVAS && LV_BUILD_EXAMPLES
+
+#if LV_USE_VECTOR_GRAPHIC
 
 #define CANVAS_WIDTH  150
 #define CANVAS_HEIGHT 150
@@ -39,4 +41,16 @@ void lv_example_canvas_8(void)
 
     lv_canvas_finish_layer(canvas, &layer);
 }
+#else
+
+void lv_example_canvas_8(void)
+{
+    /*fallback for online examples*/
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Vector graphics is not enabled");
+    lv_obj_center(label);
+}
+
+#endif /*LV_USE_VECTOR_GRAPHIC*/
+
 #endif
