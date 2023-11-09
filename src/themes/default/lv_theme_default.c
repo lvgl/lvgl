@@ -81,7 +81,6 @@ typedef struct {
 
     /*Parts*/
     lv_style_t knob;
-    lv_style_t indic;
 
 #if LV_USE_ARC
     lv_style_t arc_indic;
@@ -138,7 +137,7 @@ typedef struct {
 #endif
 
 #if LV_USE_LIST
-    lv_style_t list_bg, list_btn, list_item_grow, list_label;
+    lv_style_t list_bg, list_btn, list_item_grow;
 #endif
 
 #if LV_USE_TABVIEW
@@ -721,7 +720,134 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
 void lv_theme_default_deinit(void)
 {
-    if(theme_def) {
+    struct _my_theme_t * theme = theme_def;
+    if(theme) {
+
+        if(theme->inited) {
+            lv_style_reset(&theme->styles.scr);
+            lv_style_reset(&theme->styles.scrollbar);
+            lv_style_reset(&theme->styles.scrollbar_scrolled);
+            lv_style_reset(&theme->styles.card);
+            lv_style_reset(&theme->styles.btn);
+
+            lv_style_reset(&theme->styles.bg_color_primary);
+            lv_style_reset(&theme->styles.bg_color_primary_muted);
+            lv_style_reset(&theme->styles.bg_color_secondary);
+            lv_style_reset(&theme->styles.bg_color_secondary_muted);
+            lv_style_reset(&theme->styles.bg_color_grey);
+            lv_style_reset(&theme->styles.bg_color_white);
+            lv_style_reset(&theme->styles.pressed);
+            lv_style_reset(&theme->styles.disabled);
+            lv_style_reset(&theme->styles.pad_zero);
+            lv_style_reset(&theme->styles.pad_tiny);
+            lv_style_reset(&theme->styles.pad_normal);
+            lv_style_reset(&theme->styles.pad_small);
+            lv_style_reset(&theme->styles.pad_gap);
+            lv_style_reset(&theme->styles.line_space_large);
+            lv_style_reset(&theme->styles.text_align_center);
+            lv_style_reset(&theme->styles.outline_primary);
+            lv_style_reset(&theme->styles.outline_secondary);
+            lv_style_reset(&theme->styles.circle);
+            lv_style_reset(&theme->styles.no_radius);
+            lv_style_reset(&theme->styles.clip_corner);
+#if LV_THEME_DEFAULT_GROW
+            lv_style_reset(&theme->styles.grow);
+#endif
+            lv_style_reset(&theme->styles.transition_delayed);
+            lv_style_reset(&theme->styles.transition_normal);
+            lv_style_reset(&theme->styles.anim);
+            lv_style_reset(&theme->styles.anim_fast);
+            lv_style_reset(&theme->styles.knob);
+#if LV_USE_ARC
+            lv_style_reset(&theme->styles.arc_indic);
+            lv_style_reset(&theme->styles.arc_indic_primary);
+#endif
+
+#if LV_USE_CHART
+            lv_style_reset(&theme->styles.chart_bg);
+            lv_style_reset(&theme->styles.chart_series);
+            lv_style_reset(&theme->styles.chart_indic);
+            lv_style_reset(&theme->styles.chart_ticks);
+#endif
+
+#if LV_USE_DROPDOWN
+            lv_style_reset(&theme->styles.dropdown_list);
+#endif
+#if LV_USE_CHECKBOX
+            lv_style_reset(&theme->styles.cb_marker);
+            lv_style_reset(&theme->styles.cb_marker_checked);
+#endif
+
+#if LV_USE_SWITCH
+            lv_style_reset(&theme->styles.switch_knob);
+#endif
+
+#if LV_USE_LINE
+            lv_style_reset(&theme->styles.line);
+#endif
+
+#if LV_USE_TABLE
+            lv_style_reset(&theme->styles.table_cell);
+#endif
+
+
+#if LV_USE_METER
+            lv_style_reset(&theme->styles.meter_marker);
+            lv_style_reset(&theme->styles.meter_indic);
+#endif
+
+#if LV_USE_TEXTAREA
+            lv_style_reset(&theme->styles.ta_cursor);
+            lv_style_reset(&theme->styles.ta_placeholder);
+#endif
+
+#if LV_USE_CALENDAR
+            lv_style_reset(&theme->styles.calendar_btnm_bg);
+            lv_style_reset(&theme->styles.calendar_btnm_day);
+            lv_style_reset(&theme->styles.calendar_header);
+#endif
+
+#if LV_USE_MENU
+            lv_style_reset(&theme->styles.menu_bg);
+            lv_style_reset(&theme->styles.menu_section);
+            lv_style_reset(&theme->styles.menu_cont);
+            lv_style_reset(&theme->styles.menu_sidebar_cont);
+            lv_style_reset(&theme->styles.menu_main_cont);
+            lv_style_reset(&theme->styles.menu_header_cont);
+            lv_style_reset(&theme->styles.menu_header_btn);
+            lv_style_reset(&theme->styles.menu_page);
+            lv_style_reset(&theme->styles.menu_pressed);
+            lv_style_reset(&theme->styles.menu_separator);
+#endif
+
+#if LV_USE_MSGBOX
+            lv_style_reset(&theme->styles.msgbox_button_bg);
+            lv_style_reset(&theme->styles.msgbox_bg);
+            lv_style_reset(&theme->styles.msgbox_backdrop_bg);
+#endif
+#if LV_USE_KEYBOARD
+            lv_style_reset(&theme->styles.keyboard_button_bg);
+#endif
+
+#if LV_USE_LIST
+            lv_style_reset(&theme->styles.list_bg);
+            lv_style_reset(&theme->styles.list_btn);
+            lv_style_reset(&theme->styles.list_item_grow);
+#endif
+
+#if LV_USE_TABVIEW
+            lv_style_reset(&theme->styles.tab_btn);
+            lv_style_reset(&theme->styles.tab_bg_focus);
+#endif
+
+#if LV_USE_LED
+            lv_style_reset(&theme->styles.led);
+#endif
+
+#if LV_USE_SCALE
+            lv_style_reset(&theme->styles.scale);
+#endif
+        }
         lv_free(theme_def);
         theme_def = NULL;
     }
