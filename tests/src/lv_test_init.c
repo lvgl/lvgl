@@ -17,7 +17,6 @@ lv_indev_t * lv_test_mouse_indev;
 lv_indev_t * lv_test_keypad_indev;
 lv_indev_t * lv_test_encoder_indev;
 
-
 void lv_test_init(void)
 {
     lv_init();

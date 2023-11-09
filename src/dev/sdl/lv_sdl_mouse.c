@@ -74,7 +74,6 @@ static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data)
     data->state = dsc->left_button_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
 
-
 void _lv_sdl_mouse_handler(SDL_Event * event)
 {
     uint32_t win_id = UINT32_MAX;

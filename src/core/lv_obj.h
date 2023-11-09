@@ -256,7 +256,6 @@ typedef struct _lv_obj_t {
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent);
 
-
 /*=====================
  * Setter functions
  *====================*/
@@ -466,7 +465,6 @@ void lv_objid_builtin_destroy(void);
 #else
 #  define LV_TRACE_OBJ_CREATE(...)
 #endif
-
 
 #ifdef __cplusplus
 } /*extern "C"*/

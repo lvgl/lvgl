@@ -46,7 +46,6 @@ typedef struct {
 *  STATIC PROTOTYPES
  **********************/
 
-
 static bool _is_identity_or_translation(const lv_matrix_t * matrix)
 {
     return (matrix->m[0][0] == 1.0f &&

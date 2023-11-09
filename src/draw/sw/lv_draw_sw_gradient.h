@@ -25,7 +25,6 @@ extern "C" {
 #error LVGL needs at least 2 stops for gradients. Please increase the LV_GRADIENT_MAX_STOPS
 #endif
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -49,7 +48,6 @@ typedef struct _lv_gradient_cache_t {
 
 LV_ATTRIBUTE_FAST_MEM void lv_gradient_color_calculate(const lv_grad_dsc_t * dsc, int32_t range,
                                                        int32_t frac, lv_grad_color_t * color_out, lv_opa_t * opa_out);
-
 
 /** Get a gradient cache from the given parameters */
 lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * gradient, int32_t w, int32_t h);

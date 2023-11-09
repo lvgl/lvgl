@@ -288,8 +288,6 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     lv_obj_invalidate(obj);
 }
 
-
-
 void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
     LV_ASSERT_NULL(canvas);
@@ -305,7 +303,6 @@ void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
     layer->clip_area = canvas_area;
     layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
 }
-
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
@@ -349,6 +346,5 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_cache_invalidate(lv_cache_find(&canvas->dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
     lv_cache_unlock();
 }
-
 
 #endif

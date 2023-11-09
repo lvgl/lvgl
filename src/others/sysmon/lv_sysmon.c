@@ -88,7 +88,6 @@ void _lv_sysmon_builtin_deinit(void)
 #endif
 }
 
-
 lv_obj_t * lv_sysmon_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
@@ -104,7 +103,6 @@ lv_obj_t * lv_sysmon_create(lv_obj_t * parent)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 #if LV_USE_PERF_MONITOR
 
@@ -246,6 +244,5 @@ static void sysmon_backend_init_async_cb(void * user_data)
     lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, obj2, NULL);
 #endif
 }
-
 
 #endif /*LV_USE_SYSMON*/

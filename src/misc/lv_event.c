@@ -96,13 +96,11 @@ void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filt
     list->dsc[list->cnt - 1].user_data = user_data;
 }
 
-
 uint32_t lv_event_get_count(lv_event_list_t * list)
 {
     LV_ASSERT_NULL(list);
     return list->cnt;
 }
-
 
 lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index)
 {
@@ -204,4 +202,3 @@ void _lv_event_mark_deleted(void * target)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-

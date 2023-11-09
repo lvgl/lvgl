@@ -1,7 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
-
 /**
  * Create a drop down, up, left and right menus
  */

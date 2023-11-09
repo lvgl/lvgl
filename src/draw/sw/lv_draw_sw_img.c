@@ -403,7 +403,6 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             blend_dsc.src_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
         }
 
-
         while(blend_area.y1 <= y_last) {
             /*Apply transformations if any or separate the channels*/
             lv_area_t relative_area;

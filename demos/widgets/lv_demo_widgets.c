@@ -211,7 +211,6 @@ void lv_demo_widgets(void)
     color_changer_create(tv);
 }
 
-
 void lv_demo_widgets_start_slideshow(void)
 {
     lv_obj_update_layout(tv);
@@ -378,7 +377,6 @@ static void profile_create(lv_obj_t * parent)
             LV_GRID_TEMPLATE_LAST
         };
 
-
         lv_obj_set_grid_dsc_array(parent, grid_main_col_dsc, grid_main_row_dsc);
 
         lv_obj_set_grid_cell(panel1, LV_GRID_ALIGN_STRETCH, 0, 2, LV_GRID_ALIGN_CENTER, 0, 1);
@@ -406,7 +404,6 @@ static void profile_create(lv_obj_t * parent)
         lv_obj_set_grid_cell(gender, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 6, 1);
         lv_obj_set_grid_cell(gender_label, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 5, 1);
 
-
         lv_obj_set_grid_cell(panel3, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
         lv_obj_set_grid_dsc_array(panel3, grid_2_col_dsc, grid_2_row_dsc);
         lv_obj_set_grid_cell(panel3_title, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_CENTER, 0, 1);
@@ -420,7 +417,6 @@ static void profile_create(lv_obj_t * parent)
     else if(disp_size == DISP_MEDIUM) {
         static int32_t grid_main_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
         static int32_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
-
 
         /*Create the top panel*/
         static int32_t grid_1_col_dsc[] = {LV_GRID_CONTENT, 1, LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
@@ -448,7 +444,6 @@ static void profile_create(lv_obj_t * parent)
             40,               /*Box*/
             LV_GRID_TEMPLATE_LAST
         };
-
 
         lv_obj_set_grid_dsc_array(parent, grid_main_col_dsc, grid_main_row_dsc);
         lv_obj_set_grid_cell(panel1, LV_GRID_ALIGN_STRETCH, 0, 2, LV_GRID_ALIGN_CENTER, 0, 1);
@@ -494,7 +489,6 @@ static void profile_create(lv_obj_t * parent)
         static int32_t grid_main_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
         lv_obj_set_grid_dsc_array(parent, grid_main_col_dsc, grid_main_row_dsc);
 
-
         /*Create the top panel*/
         static int32_t grid_1_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
         static int32_t grid_1_row_dsc[] = {LV_GRID_CONTENT, /*Avatar*/
@@ -508,7 +502,6 @@ static void profile_create(lv_obj_t * parent)
                                           };
 
         lv_obj_set_grid_dsc_array(panel1, grid_1_col_dsc, grid_1_row_dsc);
-
 
         static int32_t grid_2_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
         static int32_t grid_2_row_dsc[] = {
@@ -563,7 +556,6 @@ static void profile_create(lv_obj_t * parent)
         lv_obj_set_grid_cell(sw2, LV_GRID_ALIGN_START, 1, 1, LV_GRID_ALIGN_START, 5, 1);
     }
 }
-
 
 static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title,  const char * hor_text[])
 {
@@ -625,7 +617,6 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_style_max_height(chart1_cont, 300, 0);
     lv_obj_set_flex_grow(chart1_cont, 1);
 
-
     static const char * chart1_texts[] = {"Jan", "Feb", "March", "April", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec", NULL};
     chart1 = create_chart_with_scales(chart1_cont, "Unique visitors", chart1_texts);
 
@@ -640,7 +631,6 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_style_max_height(chart2_cont, 300, 0);
     lv_obj_set_flex_grow(chart2_cont, 1);
     lv_obj_add_flag(chart2_cont, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-
 
     static const char * chart2_texts[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", NULL};
     chart2 = create_chart_with_scales(chart2_cont, "Monthly revenue", chart2_texts);
@@ -925,7 +915,6 @@ void shop_create(lv_obj_t * parent)
         lv_obj_set_size(chart3, lv_pct(100), lv_pct(100));
         lv_obj_set_style_pad_column(chart3, LV_DPX(30), 0);
 
-
         lv_obj_set_grid_dsc_array(panel1, grid1_col_dsc, grid1_row_dsc);
         lv_obj_set_grid_cell(title, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 1);
         lv_obj_set_grid_cell(date, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 1, 1);
@@ -1040,7 +1029,6 @@ void shop_create(lv_obj_t * parent)
 
     cb = lv_checkbox_create(notifications);
     lv_checkbox_set_text(cb, "Out of stock");
-
 
 }
 
@@ -1549,12 +1537,10 @@ static void chart_event_cb(lv_event_t * e)
     }
 }
 
-
 static void shop_chart_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
 }
-
 
 static void scale1_indic1_anim_cb(void * var, int32_t v)
 {
@@ -1572,7 +1558,6 @@ static void scale2_timer_cb(lv_timer_t * timer)
     static bool down1 = false;
     static bool down2 = false;
     static bool down3 = false;
-
 
     if(down1) {
         session_desktop -= 137;

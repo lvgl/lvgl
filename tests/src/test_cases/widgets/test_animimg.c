@@ -59,7 +59,6 @@ void test_animimg_get_src(void)
     TEST_ASSERT_EQUAL_PTR(actual_dsc, anim_imgs);
 }
 
-
 void test_animimg_get_src_count(void)
 {
     uint8_t expected_count = 3;
@@ -105,4 +104,3 @@ void test_animimg_start(void)
 }
 
 #endif
-

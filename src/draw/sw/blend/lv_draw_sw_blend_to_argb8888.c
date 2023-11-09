@@ -32,7 +32,6 @@ typedef struct {
     lv_opa_t ratio_saved;
 } lv_color_mix_alpha_cache_t;
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -171,7 +170,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_image_to_argb8888(_lv_draw_sw_blend_
             break;
     }
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -518,6 +516,5 @@ LV_ATTRIBUTE_FAST_MEM static inline void blend_non_normal_pixel(lv_color32_t * d
     }
     *dest = lv_color_32_32_mix(res, *dest, cache);
 }
-
 
 #endif

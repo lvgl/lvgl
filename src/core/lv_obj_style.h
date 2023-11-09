@@ -46,7 +46,6 @@ typedef enum {
     _LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /*The differences can be shown with a simple redraw*/
 } _lv_style_state_cmp_t;
 
-
 typedef uint32_t lv_style_selector_t;
 
 typedef struct {
@@ -219,7 +218,6 @@ void lv_obj_fade_in(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
  */
 void lv_obj_fade_out(struct _lv_obj_t * obj, uint32_t time, uint32_t delay);
 
-
 static inline lv_state_t lv_obj_style_get_selector_state(lv_style_selector_t selector)
 {
     return selector & 0xFFFF;
@@ -338,7 +336,6 @@ static inline int32_t lv_obj_get_style_transform_scale_y_safe(const struct _lv_o
     return zoom != 0 ? zoom : 1;
 }
 
-
 /**
  * Get the `opa` style property from all parents and multiply and `>> 8` them.
  * @param obj       the object whose opacity should be get
@@ -346,7 +343,6 @@ static inline int32_t lv_obj_get_style_transform_scale_y_safe(const struct _lv_o
  * @return          the final opacity considering the parents' opacity too
  */
 lv_opa_t lv_obj_get_style_opa_recursive(const struct _lv_obj_t * obj, lv_part_t part);
-
 
 /**********************
  *      MACROS

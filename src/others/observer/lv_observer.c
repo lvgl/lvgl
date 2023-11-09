@@ -71,7 +71,6 @@ void lv_subject_init_int(lv_subject_t * subject, int32_t value)
     _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
-
 void lv_subject_set_int(lv_subject_t * subject, int32_t value)
 {
     if(subject->type != LV_SUBJECT_TYPE_INT) {
@@ -206,7 +205,6 @@ void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)
     _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
-
 void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)
 {
     if(subject->type != LV_SUBJECT_TYPE_COLOR) {
@@ -266,7 +264,6 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
     return ((lv_subject_t **)(subject->value.pointer))[index];
 }
 
-
 lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t cb, void * user_data)
 {
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, cb, NULL, user_data);
@@ -296,7 +293,6 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
 
     return observer;
 }
-
 
 lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t cb, void * target,
                                                     void * user_data)
@@ -378,7 +374,6 @@ void lv_subject_notify(lv_subject_t * subject)
     } while(subject->notify_restart_query);
 }
 
-
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false);
@@ -442,7 +437,6 @@ lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, arc_value_observer_cb, obj, NULL);
     return observer;
 }
-
 
 lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
@@ -554,7 +548,6 @@ static void obj_state_observer_cb(lv_subject_t * subject, lv_observer_t * observ
         lv_obj_remove_state(observer->target, p->flag);
     }
 }
-
 
 static void btn_value_changed_event_cb(lv_event_t * e)
 {

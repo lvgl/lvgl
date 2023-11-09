@@ -226,7 +226,6 @@ static lv_obj_t * add_list_button(lv_obj_t * parent, uint32_t track_id)
     return btn;
 }
 
-
 static void btn_click_event_cb(lv_event_t * e)
 {
     lv_obj_t * btn = lv_event_get_target(e);
@@ -252,4 +251,3 @@ static void list_delete_event_cb(lv_event_t * e)
     }
 }
 #endif /*LV_USE_DEMO_MUSIC*/
-

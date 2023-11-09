@@ -88,7 +88,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
     lv_obj_move_to_index(obj, 0);
 }
 
-
 /**********************
  *      MACROS
  **********************/

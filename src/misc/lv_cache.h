@@ -75,7 +75,6 @@ typedef struct _lv_cache_entry_t {
     void * user_data;
 } lv_cache_entry_t;
 
-
 /**
  * Add a new entry to the cache with the given size.
  * It won't allocate any buffers just free enough space to be a new entry

@@ -179,7 +179,6 @@ static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
         obj->class_p = original_class_p;
     }
 
-
     if(obj->class_p->constructor_cb) obj->class_p->constructor_cb(class_p, obj);
 }
 

@@ -40,7 +40,6 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
 LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(int32_t size, int32_t sw, uint16_t * sh_ups_buf);
 #endif /*LV_DRAW_SW_COMPLEX*/
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -91,7 +90,6 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     int32_t r_sh = dsc->radius;
     short_side = LV_MIN(lv_area_get_width(&core_area), lv_area_get_height(&core_area));
     if(r_sh > short_side >> 1) r_sh = short_side >> 1;
-
 
     /*Get how many pixels are affected by the blur on the corners*/
     int32_t corner_size = dsc->width  + r_sh;
@@ -292,7 +290,6 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     blend_area.y1 = shadow_area.y2 - corner_size + 1;
     blend_area.y2 = shadow_area.y2;
     blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
-
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
@@ -531,13 +528,6 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     blend_area.y1 = LV_MIN(blend_area.y1, h_half + 1);
     blend_area.y2 = LV_MAX(blend_area.y2, h_half);
     blend_dsc.mask_buf = mask_buf;
-
-
-
-
-
-
-
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {

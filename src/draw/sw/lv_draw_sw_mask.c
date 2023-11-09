@@ -898,8 +898,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_angle(lv_opa_t *
     }
 }
 
-
-
 LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, int32_t abs_x,
                                                                        int32_t abs_y, int32_t len,
                                                                        lv_draw_sw_mask_radius_param_t * p)
@@ -1288,7 +1286,6 @@ static lv_opa_t * get_next_line(_lv_draw_sw_mask_radius_circle_dsc_t * c, int32_
     return &c->cir_opa[c->opa_start_on_y[y]];
 }
 
-
 LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new)
 {
     if(mask_new >= LV_OPA_MAX) return mask_act;
@@ -1296,6 +1293,5 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
 
     return LV_UDIV255(mask_act * mask_new);
 }
-
 
 #endif /*LV_DRAW_SW_COMPLEX*/

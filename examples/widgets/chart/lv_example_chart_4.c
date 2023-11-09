@@ -19,7 +19,6 @@ static void draw_event_cb(lv_event_t * e)
     }
 }
 
-
 /**
  * Recolor the bars of a chart based on their value
  */

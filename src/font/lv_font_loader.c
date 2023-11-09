@@ -78,7 +78,6 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 lv_font_t * lv_font_load(const char * font_name)
 {
     lv_fs_file_t file;

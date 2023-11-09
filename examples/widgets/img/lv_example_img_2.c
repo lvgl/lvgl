@@ -7,7 +7,6 @@ static void slider_event_cb(lv_event_t * e);
 static lv_obj_t * red_slider, * green_slider, * blue_slider, * intense_slider;
 static lv_obj_t * img1;
 
-
 /**
  * Demonstrate runtime image re-coloring
  */

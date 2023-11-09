@@ -40,7 +40,6 @@ typedef struct {
     bool res;                   /**< true: `point` can click the object; false: it cannot*/
 } lv_hit_test_info_t;
 
-
 /** Cover check results.*/
 typedef enum {
     LV_COVER_RES_COVER      = 0,

@@ -36,11 +36,9 @@
 extern "C" {
 #endif
 
-
 int lv_snprintf(char * buffer, size_t count, const char * format, ...);
 
 int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va);
-
 
 #ifdef __cplusplus
 } /*extern "C"*/

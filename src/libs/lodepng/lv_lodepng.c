@@ -145,7 +145,6 @@ static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void
     return LV_RESULT_INVALID;         /*If didn't succeeded earlier then it's an error*/
 }
 
-
 /**
  * Open a PNG image and decode it into dsc.img_data
  * @param decoder   pointer to the decoder where this function belongs
@@ -230,7 +229,6 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     lv_cache_unlock();
 }
 
-
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 {
     lv_cache_lock();
@@ -282,7 +280,6 @@ static const void * decode_png_data(const void * png_data, size_t png_data_size)
     return img_data;
 }
 
-
 /**
  * If the display is not in 32 bit format (ARGB888) then convert the image to the current color depth
  * @param img the ARGB888 image
@@ -300,5 +297,3 @@ static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt)
 }
 
 #endif /*LV_USE_LODEPNG*/
-
-

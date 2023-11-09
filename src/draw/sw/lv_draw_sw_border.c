@@ -22,7 +22,6 @@
  *********************/
 #define SPLIT_LIMIT             50
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -35,7 +34,6 @@ static void draw_border_complex(lv_draw_unit_t * draw_unit, const lv_area_t * ou
 
 static void draw_border_simple(lv_draw_unit_t * draw_unit, const lv_area_t * outer_area, const lv_area_t * inner_area,
                                lv_color_t color, lv_opa_t opa);
-
 
 /**********************
  *  STATIC VARIABLES
@@ -100,14 +98,12 @@ void draw_border_complex(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
     lv_opa_t * mask_buf = lv_malloc(draw_area_w);
     blend_dsc.mask_buf = mask_buf;
 
-
     void * mask_list[3] = {0};
 
     /*Create mask for the inner mask*/
     lv_draw_sw_mask_radius_param_t mask_rin_param;
     lv_draw_sw_mask_radius_init(&mask_rin_param, inner_area, rin, true);
     mask_list[0] = &mask_rin_param;
-
 
     /*Create mask for the outer area*/
     lv_draw_sw_mask_radius_param_t mask_rout_param;
@@ -143,7 +139,6 @@ void draw_border_complex(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
        core_w < SPLIT_LIMIT) {
         split_hor = false;
     }
-
 
     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_FULL_COVER;
     /*Draw the straight lines first if they are long enough*/

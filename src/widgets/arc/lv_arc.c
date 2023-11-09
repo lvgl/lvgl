@@ -350,7 +350,6 @@ int32_t lv_arc_get_knob_offset(const lv_obj_t * obj)
  * Other functions
  *====================*/
 
-
 void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, int32_t r_offset)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -399,7 +398,6 @@ void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, 
     lv_obj_set_style_transform_rotation(obj_to_rotate, angle * 10 + 900, 0);
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -431,7 +429,6 @@ static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN | LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
-
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -813,7 +810,6 @@ static lv_value_precise_t get_angle(const lv_obj_t * obj)
 
     return angle;
 }
-
 
 static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, int32_t r, lv_area_t * knob_area)
 {

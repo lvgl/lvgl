@@ -59,7 +59,6 @@ static const uint8_t opa3_table[8] = {0, 36, 73, 109, 146, 182, 218, 255};
 
 static const uint8_t opa2_table[4] = {0, 85, 170, 255};
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -71,7 +70,6 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
 
 const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out)
 {

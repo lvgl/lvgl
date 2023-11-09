@@ -73,7 +73,6 @@ lv_obj_t * lv_file_explorer_create(lv_obj_t * parent)
     return obj;
 }
 
-
 /*=====================
  * Setter functions
  *====================*/
@@ -125,7 +124,6 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
 
 #endif
 
-
 void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -136,7 +134,6 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 
     file_explorer_sort(obj);
 }
-
 
 /*=====================
  * Getter functions
@@ -337,7 +334,6 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-
 static void init_style(lv_obj_t * obj)
 {
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
@@ -527,7 +523,6 @@ static void browser_file_event_handler(lv_event_t * e)
     }
 }
 
-
 static void show_dir(lv_obj_t * obj, const char * path)
 {
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
@@ -611,7 +606,6 @@ static void show_dir(lv_obj_t * obj, const char * path)
     }
 }
 
-
 /*Remove the specified suffix*/
 static void strip_ext(char * dir)
 {
@@ -629,8 +623,6 @@ static void strip_ext(char * dir)
     }
 }
 
-
-
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 {
     const char * tmp;
@@ -644,7 +636,6 @@ static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
     lv_table_set_cell_value(tb, i, 1, lv_table_get_cell_value(tb, j, 1));
     lv_table_set_cell_value(tb, j, 1, lv_table_get_cell_value(tb, 0, 2));
 }
-
 
 static void file_explorer_sort(lv_obj_t * obj)
 {
@@ -688,7 +679,6 @@ static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
     sort_by_file_kind(tb, lo, lt - 1);
     sort_by_file_kind(tb, gt + 1, hi);
 }
-
 
 static bool is_end_with(const char * str1, const char * str2)
 {

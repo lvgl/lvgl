@@ -63,7 +63,6 @@ typedef enum {
     LV_DISPLAY_RENDER_MODE_FULL,
 } lv_display_render_mode_t;
 
-
 typedef enum {
     LV_SCR_LOAD_ANIM_NONE,
     LV_SCR_LOAD_ANIM_OVER_LEFT,
@@ -82,7 +81,6 @@ typedef enum {
     LV_SCR_LOAD_ANIM_OUT_TOP,
     LV_SCR_LOAD_ANIM_OUT_BOTTOM,
 } lv_screen_load_anim_t;
-
 
 typedef void (*lv_display_flush_cb_t)(struct _lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 typedef void (*lv_display_flush_wait_cb_t)(struct _lv_display_t * disp);
@@ -261,7 +259,6 @@ void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb
  */
 void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_t wait_cb);
 
-
 /**
  * Set the color format of the display.
  * If set to other than `LV_COLOR_FORMAT_NATIVE` the layer's `buffer_convert` function will be used
@@ -294,7 +291,6 @@ void lv_display_set_antialiasing(lv_display_t * disp, bool en);
  */
 bool lv_display_get_antialiasing(lv_display_t * disp);
 
-
 //! @cond Doxygen_Suppress
 
 /**
@@ -313,7 +309,6 @@ LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp);
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp);
 
 //! @endcond
-
 
 bool lv_display_is_double_buffered(lv_display_t * disp);
 
@@ -357,7 +352,6 @@ struct _lv_obj_t * lv_display_get_layer_top(lv_display_t * disp);
  */
 struct _lv_obj_t * lv_display_get_layer_sys(lv_display_t * disp);
 
-
 /**
  * Return the bottom layer. The bottom layer is the same on all screen and it is under the normal screen layer.
  * It's visible only if the the screen is transparent.
@@ -365,7 +359,6 @@ struct _lv_obj_t * lv_display_get_layer_sys(lv_display_t * disp);
  * @return          pointer to the bottom layer object
  */
 struct _lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp);
-
 
 /**
  * Switch screen with animation
@@ -422,7 +415,6 @@ static inline void lv_screen_load(struct _lv_obj_t * scr)
 {
     lv_display_load_scr(scr);
 }
-
 
 /*---------------------
  * OTHERS
@@ -529,7 +521,6 @@ void * lv_display_get_driver_data(lv_display_t * disp);
 #define LV_VER_RES lv_display_get_vertical_resolution(lv_display_get_default())
 #endif
 
-
 /**
  * Same as Android's DIP. (Different name is chosen to avoid mistype between LV_DPI and LV_DIP)
  * 1 dip is 1 px on a 160 DPI screen
@@ -565,7 +556,6 @@ static inline int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
 {
     return _LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
-
 
 #ifdef __cplusplus
 } /*extern "C"*/

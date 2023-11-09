@@ -1,7 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_BTNMATRIX && LV_BUILD_EXAMPLES
 
-
 static void event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);

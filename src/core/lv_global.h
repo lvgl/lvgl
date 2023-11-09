@@ -194,7 +194,6 @@ typedef struct _lv_global_t {
     void * user_data;
 } lv_global_t;
 
-
 /**********************
  *      MACROS
  **********************/

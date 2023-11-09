@@ -260,7 +260,6 @@ void test_dropdown_keypad(void)
     lv_group_delete(g);
 }
 
-
 void test_dropdown_encoder(void)
 {
     lv_obj_clean(lv_screen_active());
@@ -316,7 +315,6 @@ void test_dropdown_encoder(void)
     lv_indev_set_group(lv_test_encoder_indev, NULL);
     lv_group_delete(g);
 }
-
 
 void test_dropdown_render_1(void)
 {
@@ -451,6 +449,5 @@ void test_dropdown_get_options_should_check_lengths(void)
     TEST_ASSERT_EQUAL_INT(3, lv_dropdown_get_option_index(dd, "Option"));
     TEST_ASSERT_EQUAL_INT(-1, lv_dropdown_get_option_index(dd, "Option "));
 }
-
 
 #endif

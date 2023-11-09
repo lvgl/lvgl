@@ -45,7 +45,6 @@ typedef _lv_chart_type_t lv_chart_type_t;
 typedef uint8_t lv_chart_type_t;
 #endif /*DOXYGEN*/
 
-
 /**
  * Chart update mode for `lv_chart_set_next`
  */
@@ -59,7 +58,6 @@ typedef _lv_chart_update_mode_t lv_chart_update_mode_t;
 #else
 typedef uint8_t lv_chart_update_mode_t;
 #endif /*DOXYGEN*/
-
 
 /**
  * Enumeration of the axis'
@@ -77,7 +75,6 @@ typedef _lv_chart_axis_t lv_chart_axis_t;
 #else
 typedef uint8_t lv_chart_axis_t;
 #endif /*DOXYGEN*/
-
 
 /**
  * Descriptor a chart series
@@ -102,7 +99,6 @@ typedef struct {
     lv_dir_t dir;
     uint32_t pos_set: 1; /*1: pos is set; 0: point_id is set*/
 } lv_chart_cursor_t;
-
 
 typedef struct {
     lv_obj_t obj;
@@ -259,8 +255,6 @@ void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_
  * @return          the next series or NULL if there is no more.
  */
 lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * chart, const lv_chart_series_t * ser);
-
-
 
 /*=====================
  * Cursor

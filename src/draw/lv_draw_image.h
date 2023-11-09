@@ -42,7 +42,6 @@ typedef struct _lv_draw_image_dsc_t {
     const void * src;
     lv_image_header_t header;
 
-
     int32_t rotation;
     int32_t scale_x;
     int32_t scale_y;

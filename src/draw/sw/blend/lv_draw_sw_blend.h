@@ -46,7 +46,6 @@ typedef struct {
 
 struct _lv_draw_unit_t;
 
-
 typedef struct {
     void * dest_buf;
     int32_t dest_w;

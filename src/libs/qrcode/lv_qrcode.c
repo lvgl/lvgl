@@ -30,7 +30,6 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
  *  STATIC VARIABLES
  **********************/
 
-
 const lv_obj_class_t lv_qrcode_class = {
     .constructor_cb = lv_qrcode_constructor,
     .destructor_cb = lv_qrcode_destructor,

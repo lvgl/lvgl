@@ -16,7 +16,6 @@
 #include "../../stdlib/lv_string.h"
 #include "../lv_draw.h"
 
-
 static void add_circle(const lv_opa_t * circle_mask, const lv_area_t * blend_area, const lv_area_t * circle_area,
                        lv_opa_t * mask_buf,  int32_t width);
 static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, lv_area_t * res_area);
@@ -137,7 +136,6 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         blend_dsc.src_color_format = decoder_dsc.header.cf;
         blend_dsc.src_stride = decoder_dsc.header.stride;
     }
-
 
     lv_opa_t * circle_mask = NULL;
     lv_area_t round_area_1;

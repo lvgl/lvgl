@@ -216,7 +216,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_image_to_rgb888(_lv_draw_sw_blend_im
     }
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -415,7 +414,6 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
     int32_t src_x;
     int32_t y;
 
-
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
 #ifdef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888
@@ -517,10 +515,8 @@ LV_ATTRIBUTE_FAST_MEM static inline void blend_non_normal_pixel(uint8_t * dest, 
     lv_color_24_24_mix(res, dest, src.alpha);
 }
 
-
 LV_ATTRIBUTE_FAST_MEM static inline void lv_color_24_24_mix(const uint8_t * src, uint8_t * dest, uint8_t mix)
 {
-
 
     if(mix == 0) return;
     //    dest[0] = 0xff;
@@ -540,6 +536,5 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_24_24_mix(const uint8_t * src,
         dest[2] = (uint32_t)((uint32_t)src[2] * mix + dest[2] * mix_inv) >> 8;
     }
 }
-
 
 #endif

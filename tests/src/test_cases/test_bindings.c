@@ -31,8 +31,6 @@ void test_binding(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("binding.png");
 }
 
-
-
 static void create_ui(void)
 {
     /*Create a colors*/
@@ -93,7 +91,6 @@ static void create_ui(void)
     lv_obj_set_style_bg_color(label, c1, 0);
     lv_obj_set_style_text_color(label, c2, 0);
     lv_obj_add_style(label, &style_big_font, 0);
-
 
     /*Declare an array of strings*/
     static const char * btnmatrix_options[] = {
@@ -216,7 +213,6 @@ static void opa_anim_cb(void * var, int32_t v)
     lv_obj_set_style_opa(var, v, 0);
 }
 
-
 static void draw_to_canvas(lv_obj_t * canvas)
 {
     lv_layer_t layer;
@@ -256,6 +252,5 @@ static void draw_to_canvas(lv_obj_t * canvas)
         lv_canvas_set_px(canvas, 100 + i * 2, 10, c, LV_OPA_COVER);
     }
 }
-
 
 #endif

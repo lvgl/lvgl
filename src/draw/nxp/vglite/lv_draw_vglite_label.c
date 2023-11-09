@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -37,7 +36,6 @@
 
 static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                 lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
-
 
 /**
  * Draw letter (character bitmap blend) with optional color and opacity

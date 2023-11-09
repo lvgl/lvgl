@@ -527,7 +527,6 @@ int32_t lv_obj_get_y_aligned(const lv_obj_t * obj)
     return lv_obj_get_style_y(obj, LV_PART_MAIN);
 }
 
-
 int32_t lv_obj_get_width(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -601,7 +600,6 @@ bool lv_obj_refresh_self_size(lv_obj_t * obj)
 void lv_obj_refr_pos(lv_obj_t * obj)
 {
     if(lv_obj_is_layout_positioned(obj)) return;
-
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
     int32_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
@@ -797,7 +795,6 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool re
     area->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
 }
 
-
 void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -940,8 +937,6 @@ int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, 
     if(LV_COORD_IS_PCT(max_height)) max_height = (ref_height * LV_COORD_GET_PCT(max_height)) / 100;
     return LV_CLAMP(min_height, height, max_height);
 }
-
-
 
 /**********************
  *   STATIC FUNCTIONS

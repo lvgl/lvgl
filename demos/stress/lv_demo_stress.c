@@ -88,7 +88,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_obj_set_size(main_page, LV_HOR_RES / 2, LV_VER_RES);
             lv_obj_set_flex_flow(main_page, LV_FLEX_FLOW_COLUMN);
 
-
             obj = lv_button_create(main_page);
             lv_obj_set_size(obj, 100, 70);
             obj = lv_label_create(obj);

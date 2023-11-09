@@ -38,7 +38,6 @@ typedef _lv_arc_mode_t lv_arc_mode_t;
 typedef uint8_t lv_arc_mode_t;
 #endif /*DOXYGEN*/
 
-
 typedef struct {
     lv_obj_t obj;
     uint32_t rotation;

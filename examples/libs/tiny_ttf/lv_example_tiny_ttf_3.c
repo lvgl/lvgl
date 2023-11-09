@@ -32,14 +32,12 @@ void lv_example_tiny_ttf_3(void)
     lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
     lv_label_bind_text(slider_label, &subject_font, "%d");
 
-
     /*Create a label with the new style*/
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_add_style(label, &style, 0);
     lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_label_set_text(label, "Hello world!");
     lv_obj_center(label);
-
 
     lv_subject_add_observer(&subject_font, font_size_observer_cb, &style);
 }

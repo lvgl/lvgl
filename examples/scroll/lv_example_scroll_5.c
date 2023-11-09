@@ -1,7 +1,6 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 
-
 /**
  * Scrolling with Right To Left base direction
  */

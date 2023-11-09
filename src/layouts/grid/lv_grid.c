@@ -136,7 +136,6 @@ static inline int32_t get_margin_ver(lv_obj_t * obj)
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 void lv_grid_init(void)
 {
     layout_list_def[LV_LAYOUT_GRID].cb = grid_update;
@@ -355,7 +354,6 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
         c->w[last_fr_i] = free_w - ((free_w * (col_fr_cnt - last_fr_x)) / col_fr_cnt);
     }
 
-
     if(subgrid) {
         lv_free((void *)col_templ);
     }
@@ -427,7 +425,6 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
         }
     }
 
-
     int32_t row_gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
     int32_t cont_h = lv_obj_get_content_height(cont) - row_gap * (c->row_num - 1);
     int32_t free_h = cont_h - grid_h;
@@ -474,7 +471,6 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
     lv_grid_align_t col_align = get_cell_col_align(item);
     lv_grid_align_t row_align = get_cell_row_align(item);
 
-
     int32_t col_x1 = c->x[col_pos];
     int32_t col_x2 = c->x[col_pos + col_span - 1] + c->w[col_pos + col_span - 1];
     int32_t col_w = col_x2 - col_x1;
@@ -482,7 +478,6 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
     int32_t row_y1 = c->y[row_pos];
     int32_t row_y2 = c->y[row_pos + row_span - 1] + c->h[row_pos + row_span - 1];
     int32_t row_h = row_y2 - row_y1;
-
 
     /*If the item has RTL base dir switch start and end*/
     if(lv_obj_get_style_base_dir(item, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
@@ -664,6 +659,5 @@ static uint32_t count_tracks(const int32_t * templ)
 
     return i;
 }
-
 
 #endif /*LV_USE_GRID*/

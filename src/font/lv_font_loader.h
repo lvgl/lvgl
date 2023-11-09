@@ -33,7 +33,6 @@ extern "C" {
  */
 lv_font_t * lv_font_load(const char * fontName);
 
-
 #if LV_USE_FS_MEMFS
 /**
  * Loads a `lv_font_t` object from a memory buffer containing the binary font file.

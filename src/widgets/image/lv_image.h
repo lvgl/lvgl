@@ -133,7 +133,6 @@ void lv_image_set_offset_x(lv_obj_t * obj, int32_t x);
  */
 void lv_image_set_offset_y(lv_obj_t * obj, int32_t y);
 
-
 /**
  * Set the rotation angle of the image.
  * The image will be rotated around the set pivot set by `lv_image_set_pivot()`
@@ -163,7 +162,6 @@ static inline void _lv_image_set_pivot(lv_obj_t * obj, lv_point_t * pivot)
 {
     lv_image_set_pivot(obj, pivot->x, pivot->y);
 }
-
 
 /**
  * Set the zoom factor of the image.
@@ -203,7 +201,6 @@ void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom);
  * @example 512 double size
  */
 void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom);
-
 
 /**
  * Enable/disable anti-aliasing for the transformations (rotate, zoom) or not.

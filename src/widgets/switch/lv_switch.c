@@ -261,5 +261,4 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
     }
 }
 
-
 #endif

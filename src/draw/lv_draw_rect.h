@@ -133,7 +133,6 @@ void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc);
 
 void lv_draw_bg_image_dsc_init(lv_draw_bg_image_dsc_t * dsc);
 
-
 /**
  * Draw a rectangle
  * @param layer         pointer to a layer

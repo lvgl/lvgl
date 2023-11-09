@@ -206,5 +206,4 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2)
     *p2 = tmp;
 }
 
-
 #endif /*LV_USE_DRAW_SW*/

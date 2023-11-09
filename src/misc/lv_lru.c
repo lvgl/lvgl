@@ -98,7 +98,6 @@ lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_c
     return cache;
 }
 
-
 void lv_lru_delete(lv_lru_t * cache)
 {
     LV_ASSERT_NULL(cache);
@@ -133,7 +132,6 @@ void lv_lru_delete(lv_lru_t * cache)
     // free the cache
     lv_free(cache);
 }
-
 
 lv_lru_res_t lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, void * value, size_t value_length)
 {
@@ -186,7 +184,6 @@ lv_lru_res_t lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, v
     cache->free_memory -= required;
     return LV_LRU_OK;
 }
-
 
 lv_lru_res_t lv_lru_get(lv_lru_t * cache, const void * key, size_t key_size, void ** value)
 {

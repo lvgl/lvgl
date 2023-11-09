@@ -58,7 +58,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
  */
 void lv_draw_line(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
 
-
 /**********************
  *      MACROS
  **********************/

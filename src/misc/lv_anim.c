@@ -50,7 +50,6 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
     #define LV_TRACE_ANIM(...)
 #endif
 
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -326,7 +325,6 @@ int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a)
 static void anim_timer(lv_timer_t * param)
 {
     LV_UNUSED(param);
-
 
     /*Flip the run round*/
     state.anim_run_round = state.anim_run_round ? false : true;
