@@ -11,8 +11,6 @@
 
 #ifdef _MSC_VER
     #include <io.h>
-#elif __linux__
-    #include <unistd.h>
 #endif
 
 #include "lv_demos.h"
