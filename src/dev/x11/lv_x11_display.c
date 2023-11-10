@@ -1,5 +1,5 @@
 /**
- * @file lv_x11_display.h
+ * @file lv_x11_display.c
  *
  */
 
@@ -25,34 +25,28 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
-{
-    Display* display;  /* X11 Display */
-    void*    inp_data; /* reserved pointer for input user data (see lv_x11_input.c) */
-} x11_disp_user_hdr_t;
 
 typedef struct
 {
     /* header (containing X Display + input user data pointer - keep aligned with x11_input module!) */
-    x11_disp_user_hdr_t hdr;
+    x11_user_hdr_t  hdr;
     /* X11 related information */
-    Window          window;
-    GC              gc;
-    Visual*         visual;
-    int             dplanes;
-    XImage*         ximage;
-    Atom            wmDeleteMessage;
-    void*           xdata;
-    bool            resize;
+    Window          window;           /**< X11 window object */
+    GC              gc;               /**< X11 graphics context object */
+    Visual*         visual;           /**< X11 visual */
+    int             dplanes;          /**< X11 display depth */
+    XImage*         ximage;           /**< X11 XImage cache object for updating window content */
+    Atom            wmDeleteMessage;  /**< X11 atom to window object */
+    void*           xdata;            /**< allocated data for XImage */
     /* LVGL related information */
-    lv_timer_t*     timer;
-    lv_color_t*     buffer[2];
-    lv_area_t       flush_area;
-    lv_x11_close_cb close_cb;
+    lv_timer_t*     timer;            /**< timer object for @ref x11_event_handler */
+    lv_color_t*     buffer[2];        /**< (double) lv display buffers, depending on @ref LV_X11_RENDER_MODE */
+    lv_area_t       flush_area;       /**< integrated area for a display update */
+    lv_x11_close_cb close_cb;         /**< optional user close callback (called on @ref wmDeleteMessage event) */
     /* systemtick by thread related information */
-    pthread_t       thr_tick;
-    bool            terminated;
-} x11_data_t;
+    pthread_t       thr_tick;         /**< pthread for SysTick simulation */
+    bool            terminated;       /**< flag to germinate SysTick simulation thread */
+} x11_disp_data_t;
 
 /**********************
  *  STATIC VARIABLES
@@ -83,14 +77,16 @@ typedef struct
     #error ("Unsupported LV_COLOR_DEPTH")
 #endif
 
-/*
+/**
  * Flush the content of the internal buffer the specific area on the display.
- *`px_map` contains the rendered image as raw pixel map and it should be copied to `area` on the display.
- *'lv_display_flush_ready()' has to be called when it's finished.
+ * @param[in] disp    the created X11 display object from @lv_x11_window_create
+ * @param[in] area    area to be updated
+ * @param[in] px_map  contains the rendered image as raw pixel map and it should be copied to `area` on the display.
+ * @note              @ref lv_display_flush_ready has to be called when it's finished.
  */
 static void x11_flush_cb(lv_display_t* disp, const lv_area_t* area, uint8_t* px_map)
 {
-    x11_data_t* xd = (x11_data_t*)lv_display_get_driver_data(disp);
+    x11_disp_data_t* xd = lv_display_get_driver_data(disp);
     LV_ASSERT_NULL(xd);
 
     static const lv_area_t inv_area = { .x1 = 0xFFFF,
@@ -108,10 +104,6 @@ static void x11_flush_cb(lv_display_t* disp, const lv_area_t* area, uint8_t* px_
     xd->flush_area.y2 = MAX(xd->flush_area.y2, area->y2);
 
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
-    int32_t ver_res = lv_display_get_vertical_resolution(disp);
-
-    LV_LOG_WARN("x1:%d, y1:%d, w:%d, h:%d", area->x1, area->y1, area->x2+1-area->x1, area->y2+1-area->y1);
-
 
     uint32_t      dst_offs;
     lv_color32_t* dst_data;
@@ -126,23 +118,77 @@ static void x11_flush_cb(lv_display_t* disp, const lv_area_t* area, uint8_t* px_
     }
 
     if (lv_display_flush_is_last(disp)) {
+        LV_LOG_TRACE("(%d/%d), %dx%d)", xd->flush_area.x1, xd->flush_area.y1, xd->flush_area.x2+1-xd->flush_area.x1, xd->flush_area.y2+1-xd->flush_area.y1);
+
         /* refresh collected display update area only */
         int16_t upd_w = xd->flush_area.x2 - xd->flush_area.x1 + 1;
         int16_t upd_h = xd->flush_area.y2 - xd->flush_area.y1 + 1;
-        if (xd->resize) {
-            XResizeWindow(xd->hdr.display, xd->window, hor_res, ver_res);
-            xd->resize = false;
-        }
         XPutImage(xd->hdr.display, xd->window, xd->gc, xd->ximage, xd->flush_area.x1, xd->flush_area.y1, xd->flush_area.x1, xd->flush_area.y1, upd_w, upd_h);
+
         /* invalidate collected area */
         xd->flush_area = inv_area;
     }
-    /*Inform the graphics library that you are ready with the flushing*/
+    /* Inform the graphics library that you are ready with the flushing */
     lv_display_flush_ready(disp);
 }
 
-static void x11_hide_cursor(x11_data_t* xd)
+/**
+ * event callbed by lvgl display if resolution has been changed (@ref lv_display_set_resolution has been called)
+ * @param[in] e  event data, containing lv_display_t object
+ */
+static void x11_resolution_evt_cb(lv_event_t* e)
 {
+    lv_display_t* disp = lv_event_get_user_data(e);
+    x11_disp_data_t* xd = lv_display_get_driver_data(disp);
+    LV_ASSERT_NULL(xd);
+
+    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
+    int32_t ver_res = lv_display_get_vertical_resolution(disp);
+
+    if (LV_X11_RENDER_MODE != LV_DISPLAY_RENDER_MODE_PARTIAL) {
+	    /* update lvgl full-screen display draw buffers for new display size */
+        int sz_buffers = (hor_res * ver_res * (LV_COLOR_DEPTH + 7)/8);
+        xd->buffer[0] = lv_realloc(xd->buffer[0], sz_buffers);
+        xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ?  lv_realloc(xd->buffer[1], sz_buffers) : NULL);
+        lv_display_set_draw_buffers(disp, xd->buffer[0], xd->buffer[1], sz_buffers, LV_X11_RENDER_MODE);
+    }
+
+    /* re-create cache image with new size */
+    XDestroyImage(xd->ximage);
+    size_t sz_buffers = hor_res * ver_res * sizeof(lv_color32_t);
+    xd->xdata = malloc(sz_buffers); /* use clib method here, x11 memory not part of device footprint */
+    xd->ximage = XCreateImage(xd->hdr.display, xd->visual, xd->dplanes, ZPixmap, 0, xd->xdata,
+                                hor_res, ver_res, lv_color_format_get_bpp(LV_COLOR_FORMAT_ARGB8888), 0);
+}
+
+/**
+ * event callbed by lvgl display if display has been closed (@ref lv_display_remove has been called)
+ * @param[in] e  event data, containing lv_display_t object
+ */
+static void x11_disp_delete_evt_cb(lv_event_t* e)
+{
+    lv_display_t* disp = lv_event_get_user_data(e);
+    x11_disp_data_t* xd = lv_display_get_driver_data(disp);
+
+    lv_timer_delete(xd->timer);
+
+    lv_display_set_draw_buffers(disp, NULL, NULL, 0, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_free(xd->buffer[0]);
+    if (LV_X11_DOUBLE_BUFFER) { lv_free(xd->buffer[1]); }
+
+    XDestroyImage(xd->ximage);
+    XFreeGC(xd->hdr.display, xd->gc);
+    XDestroyWindow(xd->hdr.display, xd->window);
+
+    lv_free(xd);
+}
+
+
+static void x11_hide_cursor(lv_display_t* disp)
+{
+    x11_disp_data_t* xd = lv_display_get_driver_data(disp);
+    LV_ASSERT_NULL(xd);
+
     XColor black = { .red = 0, .green = 0, .blue = 0 };
     char empty_data[] = { 0 };
 
@@ -154,45 +200,44 @@ static void x11_hide_cursor(x11_data_t* xd)
 }
 
 /**
- * X11 input event handler, only handling display related events (Expose)
+ * X11 input event handler, predicated to fetch and handle only display related events
+ * (Window changes)
  */
-static int is_disp_event(Display* disp, XEvent* evt, XPointer arg)
+static int is_disp_event(Display* disp, XEvent* event, XPointer arg)
 {
     LV_UNUSED(disp);
     LV_UNUSED(arg);
-    return (evt->type == Expose
-         || evt->type == ResizeRequest
-         || evt->type == ClientMessage);
+    return (    event->type == Expose
+            || (event->type >= DestroyNotify && event->type <= CirculateNotify) /* events from StructureNotifyMask */
+            ||  event->type == ClientMessage);
 }
-static void event_handler(lv_timer_t* t)
+static void x11_event_handler(lv_timer_t* t)
 {
     lv_display_t* disp = lv_timer_get_user_data(t);
-    LV_ASSERT_NULL(disp);
-    x11_data_t* xd = (x11_data_t*)lv_display_get_driver_data(disp);
+    x11_disp_data_t* xd = lv_display_get_driver_data(disp);
     LV_ASSERT_NULL(xd);
 
 
     /* handle all outstanding X events */
-    XEvent myevent;
-    while (XCheckIfEvent(xd->hdr.display, &myevent, is_disp_event, NULL)) {
-        LV_LOG_TRACE("Display Event %d", myevent.type);
-        switch(myevent.type)
+    XEvent event;
+    while (XCheckIfEvent(xd->hdr.display, &event, is_disp_event, NULL)) {
+        LV_LOG_TRACE("Display Event %d", event.type);
+        switch(event.type)
         {
         case Expose:
-            if(myevent.xexpose.count==0)
+            if(event.xexpose.count==0)
             {
-                int32_t hor_res = lv_display_get_horizontal_resolution(disp);
-                int32_t ver_res = lv_display_get_vertical_resolution(disp);
-                XPutImage(xd->hdr.display, xd->window, xd->gc, xd->ximage, 0, 0, 0, 0, hor_res, ver_res);
+                //XPutImage(xd->hdr.display, xd->window, xd->gc, xd->ximage, 0, 0, 0, 0, event.xexpose.width, event.xexpose.height);
             }
             break;
-        case ResizeRequest:
-            /* foce window redraw with size restore */
-            xd->resize = true;
-            lv_obj_invalidate(lv_screen_active());
+        case ConfigureNotify:
+            if (event.xconfigure.width  != lv_display_get_horizontal_resolution(disp)
+            ||  event.xconfigure.height != lv_display_get_vertical_resolution(disp)) {
+                lv_display_set_resolution(disp, event.xconfigure.width, event.xconfigure.height);
+            }
             break;
         case ClientMessage:
-            if (myevent.xclient.data.l[0] == (long)xd->wmDeleteMessage) {
+            if (event.xclient.data.l[0] == (long)xd->wmDeleteMessage) {
                 xd->terminated = true;
                 void* ret = NULL;
                 pthread_join(xd->thr_tick, &ret);
@@ -201,14 +246,20 @@ static void event_handler(lv_timer_t* t)
                 }
             }
             break;
+        case MapNotify:
+        case ReparentNotify:
+            /*supress unhandled warning*/
+            break;
+        default:
+            LV_LOG_WARN("unhandled x11 event: %d", event.type);
         }
     }
 }
 
 
-static void* tick_thread(void *data)
+static void* x11_tick_thread(void *data)
 {
-    x11_data_t* xd = (x11_data_t*)data;
+    x11_disp_data_t* xd = data;
     LV_ASSERT_NULL(xd);
 
     while(!xd->terminated) {
@@ -220,48 +271,44 @@ static void* tick_thread(void *data)
 
 static void x11_window_create(lv_display_t* disp, char const* title)
 {
-    x11_data_t* xd = (x11_data_t*)lv_display_get_driver_data(disp);
+    x11_disp_data_t* xd = lv_display_get_driver_data(disp);
     LV_ASSERT_NULL(xd);
 
     /* setup display/screen */
     xd->hdr.display = XOpenDisplay(NULL);
     int screen = DefaultScreen(xd->hdr.display);
-
-    /* drawing contexts for an window */
-    unsigned long col_fg = BlackPixel(xd->hdr.display, screen);
-    unsigned long col_bg = WhitePixel(xd->hdr.display, screen);
+    xd->visual = XDefaultVisual(xd->hdr.display, screen);
 
     /* create window */
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
-#if 1
+#if 0
+    /* drawing contexts for an window */
+    unsigned long col_fg = BlackPixel(xd->hdr.display, screen);
+    unsigned long col_bg = WhitePixel(xd->hdr.display, screen);
+
     xd->window = XCreateSimpleWindow(xd->hdr.display, DefaultRootWindow(xd->hdr.display),
                                      0, 0, hor_res, ver_res, 0, col_fg, col_bg);
 #else
     xd->window = XCreateWindow(xd->hdr.display, DefaultRootWindow(xd->hdr.display),
                                    0, 0, hor_res, ver_res, 0,
-                                   DefaultDepth(xd->hdr.display,screen), CopyFromParent,
-                                   XDefaultVisual(xd->hdr.display, screen), 0, NULL);
+                                   DefaultDepth(xd->hdr.display, screen), InputOutput,
+                                   xd->visual, 0, NULL);
 #endif
     /* window manager properties (yes, use of StdProp is obsolete) */
     XSetStandardProperties(xd->hdr.display, xd->window, title, NULL, None, NULL, 0, NULL);
+    xd->gc = XCreateGC(xd->hdr.display, xd->window, 0, 0);
 
-    /* allow receiving mouse and keyboard events */
-    XSelectInput(xd->hdr.display, xd->window, PointerMotionMask|ButtonPressMask|ButtonReleaseMask|KeyPressMask|KeyReleaseMask|ExposureMask|ResizeRedirectMask);
+    /* allow receiving mouse, keyboard and window change/close events */
+    XSelectInput(xd->hdr.display, xd->window, PointerMotionMask|ButtonPressMask|ButtonReleaseMask|KeyPressMask|KeyReleaseMask|ExposureMask|StructureNotifyMask);
     xd->wmDeleteMessage = XInternAtom(xd->hdr.display, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(xd->hdr.display, xd->window, &xd->wmDeleteMessage, 1);
 
-    /* graphics context */
-    xd->gc = XCreateGC(xd->hdr.display, xd->window, 0, 0);
-
-    x11_hide_cursor(xd);
+    x11_hide_cursor(disp);
 
     /* create cache XImage */
-    xd->xdata = lv_malloc(hor_res * ver_res * sizeof(uint32_t));
-    xd->visual = XDefaultVisual(xd->hdr.display, screen);
-    xd->dplanes = DisplayPlanes(xd->hdr.display, screen);
-
     size_t sz_buffers = hor_res * ver_res * sizeof(lv_color32_t);
+    xd->dplanes = XDisplayPlanes(xd->hdr.display, screen);
     xd->xdata = malloc(sz_buffers); /* use clib method here, x11 memory not part of device footprint */
     xd->ximage = XCreateImage(xd->hdr.display, xd->visual, xd->dplanes, ZPixmap, 0, xd->xdata,
                               hor_res, ver_res, lv_color_format_get_bpp(LV_COLOR_FORMAT_ARGB8888), 0);
@@ -274,19 +321,21 @@ static void x11_window_create(lv_display_t* disp, char const* title)
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_x11_window_create(char const* title, int32_t hor_res, int32_t ver_res)
+lv_display_t* lv_x11_window_create(char const* title, int32_t hor_res, int32_t ver_res)
 {
-    x11_data_t* xd = lv_malloc_zeroed(sizeof(x11_data_t));
+    x11_disp_data_t* xd = lv_malloc_zeroed(sizeof(x11_disp_data_t));
     LV_ASSERT_MALLOC(xd);
-    if (xd == NULL) return NULL;
+    if (NULL == xd) return NULL;
 
     lv_display_t * disp = lv_display_create(hor_res, ver_res);
-    if (disp == NULL) {
+    if (NULL == disp) {
         lv_free(xd);
         return NULL;
     }
     lv_display_set_driver_data(disp, xd);
     lv_display_set_flush_cb(disp, x11_flush_cb);
+    lv_display_add_event(disp, x11_resolution_evt_cb, LV_EVENT_RESOLUTION_CHANGED, disp);
+    lv_display_add_event(disp, x11_disp_delete_evt_cb, LV_EVENT_DELETE, disp);
 
     x11_window_create(disp, title);
 
@@ -298,18 +347,18 @@ lv_display_t * lv_x11_window_create(char const* title, int32_t hor_res, int32_t 
     xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ? lv_malloc(sz_buffers) : NULL);
     lv_display_set_draw_buffers(disp, xd->buffer[0], xd->buffer[1], sz_buffers, LV_X11_RENDER_MODE);
 
-    xd->timer = lv_timer_create(event_handler, 5, disp);
+    xd->timer = lv_timer_create(x11_event_handler, 5, disp);
 
     /* initialize Tick simulation */
     xd->terminated = false;
-    pthread_create(&xd->thr_tick, NULL, tick_thread, xd);
+    pthread_create(&xd->thr_tick, NULL, x11_tick_thread, xd);
 
     return disp;
 }
 
 void lv_x11_window_set_close_cb(lv_display_t* disp, lv_x11_close_cb close_cb)
 {
-    x11_data_t* xd = (x11_data_t*)lv_display_get_driver_data(disp);
+    x11_disp_data_t* xd = lv_display_get_driver_data(disp);
     LV_ASSERT_NULL(xd);
     xd->close_cb = close_cb;
 }

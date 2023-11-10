@@ -1,10 +1,10 @@
 /**
- * @file lv_sdl_window.h
+ * @file lv_x11.h
  *
  */
 
-#ifndef LV_X11_DISP_H
-#define LV_X11_DISP_H
+#ifndef LV_X11_H
+#define LV_X11_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,62 +23,78 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/**********************
- *      TYPEDEFS
- **********************/
+#ifndef LV_X11_DOUBLE_BUFFER
+    #define LV_X11_DOUBLE_BUFFER 1
+#endif
+#ifndef LV_X11_RENDER_MODE
+    #define LV_X11_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
+#endif
+
+/** Header of private display driver user data - for internal use only */
+typedef struct
+{
+    struct _XDisplay*     display;  /**< X11 display object     */
+    struct _x11_inp_data* inp_data; /**< input user data object */
+} x11_user_hdr_t;
+
+
+/** optional window close callback function type
+ *  @see lv_x11_window_set_close_cb
+*/
 typedef void(*lv_x11_close_cb)(lv_display_t*);
+
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+
+/**
+ * create and add keyboard, mouse and scrillwheel objects and connect them to x11 display.
+ *
+ * This is a convenience method handling the typical input initialisation:
+ * - create keyboard (@ref lv_x11_keyboard_create)
+ * - create mouse (with scrollwheel, @ref lv_x11_mouse_create @ref lv_x11_mousewheel_create)
+ * @param[in] disp the created X11 display object from @ref lv_x11_window_create
+ * @return         pointer to the mousewheel input object
+ */
+void lv_x11_inputs_create(lv_display_t* disp, lv_image_dsc_t const* mouse_img);
+
+
 /**
  * create the X11 display
- * @param title    title of the created X11 window
- * @param hor_res  horizontal resolution (=width) of the X11 window
- * @param ver_res  vertical resolution (=height) of the X11 window
- * @return         pointer to the display object
+ *
+ * The minimal initialisation for initializing the X11 display driver with keyboard/mouse support:
+ * @code
+ * lv_display_t* disp = lv_x11_window_create("My Window Title", window_width, window_width);
+ * lv_x11_inputs_create(disp, NULL);
+ * @endcode
+ * or with mouse cursor icon:
+ * @code
+ * lv_img_dsc_t mouse_symbol = {.....};
+ * lv_display_t* disp = lv_x11_window_create("My Window Title", window_width, window_width);
+ * lv_x11_inputs_create(disp, &mouse_symbol);
+ * @endcode
+ *
+ * @param[in] title    title of the created X11 window
+ * @param[in] hor_res  horizontal resolution (=width) of the X11 window
+ * @param[in] ver_res  vertical resolution (=height) of the X11 window
+ * @return             pointer to the display object
  */
 lv_display_t* lv_x11_window_create(char const* title, int32_t hor_res, int32_t ver_res);
 
 /**
- * set optional application callback on X11 window close event
- * @param disp      the created X11 display object from @lv_x11_window_create
- * @param close_cb  callback funtion to be called
+ * set optional application callback to get informed on X11 window close event (to cleanup application)
+ * @param[in] disp      the created X11 display object from @lv_x11_window_create
+ * @param[in] close_cb  callback funtion to be called
  */
 void lv_x11_window_set_close_cb(lv_display_t* disp, lv_x11_close_cb close_cb);
 
-/**
- * create the keyboard input object for the X11 display object
- * @param disp  the created X11 display object from @lv_x11_window_create
- * @return      pointer to the keyboard input object
- */
-lv_indev_t* lv_x11_keyboard_create(lv_display_t* disp);
 
-/**
- * create the mouse input object for the X11 display object
- * @param disp  the created X11 display object from @lv_x11_window_create
- * @param symb  optional symbol for the mouse (if NULL no symbol is added)
- * @return      pointer to the mouse input object
- */
-lv_indev_t* lv_x11_mouse_create(lv_display_t* disp, lv_image_dsc_t const* symb);
-
-/**
- * add the X11 display encoder (=mousewheel) input
- * @param disp  the created X11 display object from @lv_x11_window_create
- * @return      pointer to the mousewheel input object
- */
-lv_indev_t* lv_x11_mousewheel_create(lv_display_t* disp);
-
-
-/**********************
- *      MACROS
- **********************/
-
-#endif /* LV_DRV_SDL */
+#endif /* LV_USE_X11 */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /* LV_SDL_DISP_H */
+#endif /* LV_X11_H */

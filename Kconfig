@@ -1284,6 +1284,10 @@ menu "LVGL configuration"
 		config LV_USE_X11
 			bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"
 			default n
+		config LV_X11_DOUBLE_BUFFER
+			bool "Use double buffers"
+			depends on LV_USE_X11
+			default y
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
