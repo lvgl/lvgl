@@ -59,7 +59,6 @@ void lv_mem_remove_pool(lv_mem_pool_t pool)
     return;
 }
 
-
 void * lv_malloc_core(size_t size)
 {
     return malloc(size);
@@ -81,7 +80,6 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
     LV_UNUSED(mon_p);
     return;
 }
-
 
 lv_result_t lv_mem_test_core(void)
 {

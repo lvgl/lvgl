@@ -746,7 +746,6 @@ static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y)
     lv_obj_invalidate_area(obj, &a);
 }
 
-
 static void update_align(lv_obj_t * obj)
 {
     lv_image_t * img = (lv_image_t *)obj;

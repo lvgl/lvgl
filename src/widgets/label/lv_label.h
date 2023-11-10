@@ -60,7 +60,6 @@ typedef _lv_label_long_mode_t lv_label_long_mode_t;
 typedef uint8_t lv_label_long_mode_t;
 #endif /*DOXYGEN*/
 
-
 typedef struct {
     lv_obj_t obj;
     char * text;

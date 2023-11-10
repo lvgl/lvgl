@@ -12,7 +12,6 @@
 #include "../../misc/lv_types.h"
 #include "../../osal/lv_os.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -55,7 +54,6 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h)
     item->size = size;
     return item;
 }
-
 
 /**********************
  *     FUNCTIONS

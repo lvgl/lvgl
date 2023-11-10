@@ -20,7 +20,6 @@ static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
     lv_table_set_cell_value(tb, j, 1, lv_table_get_cell_value(tb, 0, 2));
 }
 
-
 /*Quick sort 3 way*/
 static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
 {
@@ -42,7 +41,6 @@ static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
     sort_by_file_kind(tb, lo, lt - 1);
     sort_by_file_kind(tb, gt + 1, hi);
 }
-
 
 static void file_explorer_event_handler(lv_event_t * e)
 {

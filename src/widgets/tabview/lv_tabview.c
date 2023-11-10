@@ -287,7 +287,6 @@ static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
         }
     }
 
-
     lv_free(tabview->map);
     tabview->map = NULL;
 }
@@ -305,7 +304,6 @@ static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_tabview_set_active(target, lv_tabview_get_tab_active(target), LV_ANIM_OFF);
     }
 }
-
 
 static void buttons_value_changed_event_cb(lv_event_t * e)
 {
@@ -349,7 +347,6 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
         if(t < 0) t = 0;
         bool new_tab = false;
         if(t != (int32_t)lv_tabview_get_tab_active(tv)) new_tab = true;
-
 
         /*If not scrolled by an indev set the tab immediately*/
         if(lv_indev_active()) {

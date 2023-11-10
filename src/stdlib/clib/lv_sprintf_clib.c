@@ -1,5 +1,4 @@
 
-
 /**
  * @file lv_templ.c
  *

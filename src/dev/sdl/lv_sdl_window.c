@@ -161,7 +161,6 @@ void lv_sdl_quit()
  *   STATIC FUNCTIONS
  **********************/
 
-
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);

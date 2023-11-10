@@ -206,7 +206,6 @@ void test_bar_normal(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_1.png");
 }
 
-
 void test_bar_indicator_area_should_get_smaller_when_padding_is_increased(void)
 {
     lv_bar_t * bar_ptr = (lv_bar_t *) bar;

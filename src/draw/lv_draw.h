@@ -143,7 +143,6 @@ typedef struct _lv_draw_unit_t {
     int32_t (*delete_cb)(struct _lv_draw_unit_t * draw_unit);
 } lv_draw_unit_t;
 
-
 typedef struct _lv_layer_t  {
 
     /** The unaligned buffer where drawing will happen*/

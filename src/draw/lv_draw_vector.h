@@ -16,7 +16,6 @@ extern "C" {
 #include "lv_draw.h"
 #include "../misc/lv_array.h"
 
-
 #if LV_USE_VECTOR_GRAPHIC
 
 /**********************
@@ -96,11 +95,9 @@ typedef struct {
     float y;
 } lv_fpoint_t;
 
-
 typedef struct {
     float m[3][3];
 } lv_matrix_t;
-
 
 typedef struct {
     lv_vector_path_quality_t quality;
@@ -148,7 +145,6 @@ typedef struct {
     lv_area_t scissor_area;
 } lv_vector_draw_dsc_t;
 
-
 typedef struct {
     lv_draw_dsc_base_t base;
     lv_ll_t * task_list; // draw task list.
@@ -160,7 +156,6 @@ typedef struct {
     /* private data */
     lv_draw_vector_task_dsc_t tasks;
 } lv_vector_dsc_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES

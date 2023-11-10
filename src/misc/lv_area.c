@@ -589,7 +589,6 @@ void lv_point_transform(lv_point_t * p, int32_t angle, int32_t scale_x, int32_t 
     }
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

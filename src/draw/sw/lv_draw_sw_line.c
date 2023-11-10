@@ -308,7 +308,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
 
     void * masks[5] = {&mask_left_param, & mask_right_param, NULL, NULL, NULL};
 
-
     if(flat) {
         if(xdiff > 0) {
             lv_draw_sw_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0,

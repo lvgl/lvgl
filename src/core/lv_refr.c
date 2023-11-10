@@ -405,7 +405,6 @@ refr_clean_up:
     lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
     disp_refr->inv_p = 0;
 
-
 refr_finish:
 
 #if LV_DRAW_SW_COMPLEX == 1
@@ -486,7 +485,6 @@ static void refr_sync_areas(void)
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
-
 
     /*Iterate through invalidated areas to see if sync area should be copied*/
     uint16_t i;
@@ -803,7 +801,6 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     }
 }
 
-
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
                                   lv_area_t * layer_area_out)
 {
@@ -862,7 +859,6 @@ static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area)
     if(info.res == LV_COVER_RES_COVER) return false;
     else return true;
 }
-
 
 void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 {
@@ -932,7 +928,6 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         }
     }
 }
-
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 {
@@ -1043,7 +1038,6 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
 
     LV_PROFILER_END;
 }
-
 
 static void wait_for_flushing(lv_display_t * disp)
 {

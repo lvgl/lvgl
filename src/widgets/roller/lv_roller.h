@@ -44,7 +44,6 @@ typedef _lv_roller_mode_t lv_roller_mode_t;
 typedef uint8_t lv_roller_mode_t;
 #endif /*DOXYGEN*/
 
-
 typedef struct {
     lv_obj_t obj;
     uint32_t option_cnt;          /**< Number of options*/
@@ -56,7 +55,6 @@ typedef struct {
 } lv_roller_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_roller_class;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -114,7 +112,6 @@ uint32_t lv_roller_get_selected(const lv_obj_t * obj);
  * @param buf_size  size of `buf` in bytes. 0: to ignore it.
  */
 void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size);
-
 
 /**
  * Get the options of a roller

@@ -114,7 +114,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_INVALID;         /*If didn't succeeded earlier then it's an error*/
 }
 
-
 /**
  * Open a PNG image and return the decided image
  * @param src can be file name or pointer to a C array

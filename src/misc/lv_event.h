@@ -29,13 +29,11 @@ struct _lv_event_t;
 
 typedef void (*lv_event_cb_t)(struct _lv_event_t * e);
 
-
 typedef struct {
     lv_event_cb_t cb;
     void * user_data;
     uint32_t filter;
 } lv_event_dsc_t;
-
 
 /**
  * Type of event being sent to the object.
@@ -109,11 +107,9 @@ typedef enum {
 
     _LV_EVENT_LAST,               /** Number of default events*/
 
-
     LV_EVENT_PREPROCESS = 0x80,   /** This is a flag that can be set with an event so it's processed
                                       before the class default event processing */
 } lv_event_code_t;
-
 
 typedef struct {
     lv_event_dsc_t * dsc;

@@ -19,7 +19,6 @@
 
 #define profiler_ctx LV_GLOBAL_DEFAULT()->profiler_context
 
-
 #define LV_PROFILER_STR_MAX_LEN 128
 #define LV_PROFILER_TICK_PER_SEC_MAX 1000000
 

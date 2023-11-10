@@ -274,7 +274,6 @@ static void box_shadow_cb(lv_obj_t * parent)
     }
 }
 
-
 static lv_obj_t * text_obj_create(lv_obj_t * parent, int32_t col, int32_t row)
 {
 
@@ -310,7 +309,6 @@ static void text_cb(lv_obj_t * parent)
 
     obj = text_obj_create(parent, 3, 5);
     lv_obj_set_style_text_decor(obj, LV_TEXT_DECOR_UNDERLINE | LV_TEXT_DECOR_STRIKETHROUGH, 0);
-
 
 }
 
@@ -395,7 +393,6 @@ static void image_core_cb(lv_obj_t * parent, bool recolor)
     }
 }
 
-
 static void image_normal_cb(lv_obj_t * parent)
 {
     image_core_cb(parent, false);
@@ -405,7 +402,6 @@ static void image_recolored_cb(lv_obj_t * parent)
 {
     image_core_cb(parent, true);
 }
-
 
 static lv_obj_t * line_obj_create(lv_obj_t * parent, int32_t col, int32_t row, lv_point_precise_t p[])
 {
@@ -537,7 +533,6 @@ static void triangle_draw_event_cb(lv_event_t * e)
     lv_draw_triangle(lv_event_get_layer(e), &dsc);
 }
 
-
 static lv_obj_t * triangle_obj_create(lv_obj_t * parent, int32_t col, int32_t row, lv_point_t p[])
 {
     lv_obj_t * obj = lv_arc_create(parent);
@@ -611,7 +606,6 @@ static void triangle_cb(lv_obj_t * parent)
         lv_obj_set_style_bg_grad_opa(obj, LV_OPA_TRANSP, 0);
     }
 }
-
 
 static lv_obj_t * layer_obj_create(lv_obj_t * parent, int32_t col, int32_t row, lv_blend_mode_t blend_mode)
 {
@@ -760,7 +754,6 @@ void lv_demo_render(lv_demo_render_scene_t id, lv_opa_t opa)
 
     if(scenes[id].create_cb) scenes[id].create_cb(main_parent);
 }
-
 
 const char * lv_demo_render_get_scene_name(lv_demo_render_scene_t id)
 {

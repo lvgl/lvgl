@@ -60,7 +60,6 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     dsc->bidi_dir = LV_BASE_DIR_LTR;
 }
 
-
 void lv_draw_letter_dsc_init(lv_draw_glyph_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_glyph_dsc_t));
@@ -90,8 +89,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label
 
     lv_draw_finalize_task_creation(layer, t);
 }
-
-
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
                                           const lv_point_t * point, uint32_t unicode_letter)
@@ -307,8 +304,6 @@ void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_lab
                 }
             }
 
-
-
             if(sel_start != 0xFFFF && sel_end != 0xFFFF && logical_char_pos >= sel_start && logical_char_pos < sel_end) {
                 draw_letter_dsc.color = dsc->sel_color;
                 fill_dsc.color = dsc->sel_bg_color;
@@ -317,7 +312,6 @@ void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_lab
             else {
                 draw_letter_dsc.color = dsc->color;
             }
-
 
             draw_letter(draw_unit, &draw_letter_dsc, &pos, font, letter, cb);
 
@@ -358,7 +352,6 @@ void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_lab
 
     LV_ASSERT_MEM_INTEGRITY();
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -423,4 +416,3 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     cb(draw_unit, dsc, NULL, NULL);
     LV_PROFILER_END;
 }
-

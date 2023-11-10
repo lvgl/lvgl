@@ -84,7 +84,6 @@ void _lv_indev_scroll_handler(lv_indev_t * indev)
         lv_point_transform(&indev->pointer.vect, angle, scale_x, scale_y, &pivot, false);
     }
 
-
     int32_t diff_x = 0;
     int32_t diff_y = 0;
     if(indev->pointer.scroll_dir == LV_DIR_HOR) {
@@ -112,7 +111,6 @@ void _lv_indev_scroll_handler(lv_indev_t * indev)
     indev->pointer.scroll_sum.x += diff_x;
     indev->pointer.scroll_sum.y += diff_y;
 }
-
 
 void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
 {
@@ -592,8 +590,6 @@ static void scroll_limit_diff(lv_indev_t * indev, int32_t * diff_x, int32_t * di
     }
 }
 
-
-
 static int32_t scroll_throw_predict_y(lv_indev_t * indev)
 {
     int32_t y = indev->pointer.scroll_throw_vect.y;
@@ -608,7 +604,6 @@ static int32_t scroll_throw_predict_y(lv_indev_t * indev)
     }
     return move;
 }
-
 
 static int32_t scroll_throw_predict_x(lv_indev_t * indev)
 {
@@ -702,5 +697,3 @@ static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_
 
     return diff;
 }
-
-

@@ -341,7 +341,6 @@ lv_obj_t * lv_obj_get_sibling(const lv_obj_t * obj, int32_t id)
     return lv_obj_get_child(parent, (int32_t)lv_obj_get_index(obj) + id);
 }
 
-
 uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -482,7 +481,6 @@ static void obj_delete_core(lv_obj_t * obj)
     /*Free the object itself*/
     lv_free(obj);
 }
-
 
 static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data)
 {

@@ -296,7 +296,6 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint32_t col_cnt)
         table->col_w[col] = LV_DPI_DEF;
     }
 
-
     refr_size_form_row(obj, 0) ;
 }
 
@@ -646,7 +645,6 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
 }
 
-
 static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
@@ -863,7 +861,6 @@ static void refr_size_form_row(lv_obj_t * obj, uint32_t start_row)
     lv_obj_invalidate(obj);
 }
 
-
 static void refr_cell_size(lv_obj_t * obj, uint32_t row, uint32_t col)
 {
     const int32_t cell_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
@@ -1072,7 +1069,6 @@ static void get_cell_area(lv_obj_t * obj, uint32_t row, uint32_t col, lv_area_t 
     area->y2 = area->y1 + table->row_h[row] - 1;
 
 }
-
 
 static void scroll_to_selected_cell(lv_obj_t * obj)
 {

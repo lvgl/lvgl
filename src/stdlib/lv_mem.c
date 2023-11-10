@@ -42,7 +42,6 @@ void lv_free_core(void * p);
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p);
 lv_result_t lv_mem_test_core(void);
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/

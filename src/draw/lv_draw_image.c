@@ -48,7 +48,6 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
 }
 
-
 void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_draw_task_t * t = lv_draw_add_task(layer, coords);
@@ -64,7 +63,6 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     lv_draw_finalize_task_creation(layer, t);
 }
 
-
 void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->src == NULL) {
@@ -72,7 +70,6 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         return;
     }
     if(dsc->opa <= LV_OPA_MIN) return;
-
 
     LV_PROFILER_BEGIN;
 
@@ -129,4 +126,3 @@ lv_image_src_t lv_image_src_get_type(const void * src)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-

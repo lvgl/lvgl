@@ -38,7 +38,6 @@
 #endif
 #define state LV_GLOBAL_DEFAULT()->tlsf_state
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -137,7 +136,6 @@ void lv_mem_remove_pool(lv_mem_pool_t pool)
     LV_LOG_WARN("invalid pool: %p", pool);
 }
 
-
 void * lv_malloc_core(size_t size)
 {
 #if LV_USE_OS
@@ -210,7 +208,6 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 
     LV_TRACE_MEM("finished");
 }
-
 
 lv_result_t lv_mem_test_core(void)
 {

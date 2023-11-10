@@ -31,13 +31,11 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_dsc_set_fill_color(ctx, lv_color_make(0xff, 0x00, 0x00));
     lv_vector_dsc_add_path(ctx, path);
 
-
     lv_vector_path_clear(path);
     lv_vector_path_append_rect(path, &rect1, 20, 20);
     lv_vector_dsc_translate(ctx, 150, 0);
     lv_vector_dsc_set_fill_color(ctx, lv_color_make(0x00, 0x00, 0xff));
     lv_vector_dsc_add_path(ctx, path);
-
 
     lv_fpoint_t pc = {100, 100};
     lv_vector_path_clear(path);
@@ -45,7 +43,6 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_dsc_translate(ctx, 150, 0);
     lv_vector_dsc_set_fill_color32(ctx, lv_color_to_32(lv_color_make(0x00, 0xff, 0x00), 0x80));
     lv_vector_dsc_add_path(ctx, path);
-
 
     lv_vector_dsc_identity(ctx);
     lv_vector_dsc_translate(ctx, 0, 150);
@@ -66,7 +63,6 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_dsc_set_fill_radial_gradient(ctx, &grad, 50, 50, 50, LV_VECTOR_GRADIENT_SPREAD_PAD);
     lv_vector_dsc_add_path(ctx, path);
 
-
     lv_vector_dsc_identity(ctx);
     lv_vector_dsc_translate(ctx, 150, 150);
     lv_draw_image_dsc_t img_dsc;
@@ -82,7 +78,6 @@ static void draw_shapes(lv_layer_t * layer)
     lv_matrix_translate(&mt, -50, -50);
     lv_vector_dsc_set_fill_transform(ctx, &mt);
     lv_vector_dsc_add_path(ctx, path);
-
 
     lv_vector_dsc_identity(ctx);
     lv_vector_dsc_translate(ctx, 300, 150);
@@ -176,7 +171,6 @@ static void draw_lines(lv_layer_t * layer)
     lv_vector_dsc_set_stroke_cap(ctx, LV_VECTOR_STROKE_CAP_ROUND);
     lv_vector_dsc_add_path(ctx, path);
 
-
     lv_area_t rect1 = {250, 300, 350, 400};
     lv_vector_dsc_identity(ctx);
     lv_vector_path_clear(path);
@@ -230,7 +224,6 @@ void test_draw_lines(void)
 {
     canvas_draw("draw_lines", draw_lines);
 }
-
 
 void test_draw_shapes(void)
 {

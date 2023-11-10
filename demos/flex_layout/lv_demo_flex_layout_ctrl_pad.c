@@ -25,7 +25,6 @@
 #define SPINBOX_EVENT_ATTACH(item)  \
     lv_obj_add_event(ui->ctrl_pad.tab.layout.spinbox_##item, ctrl_pad_spinbox_event_handler, LV_EVENT_VALUE_CHANGED, ui);
 
-
 /**********************
  *      TYPEDEFS
  **********************/

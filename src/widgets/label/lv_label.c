@@ -706,7 +706,6 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
 }
 
-
 static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
@@ -1117,7 +1116,6 @@ static void lv_label_refr_text(lv_obj_t * obj)
     lv_obj_invalidate(obj);
 }
 
-
 static void lv_label_revert_dots(lv_obj_t * obj)
 {
     lv_label_t * label = (lv_label_t *)obj;
@@ -1204,7 +1202,6 @@ static void lv_label_dot_tmp_free(lv_obj_t * obj)
     label->dot_tmp_alloc = false;
     label->dot.tmp_ptr   = NULL;
 }
-
 
 static void set_ofs_x_anim(void * obj, int32_t v)
 {

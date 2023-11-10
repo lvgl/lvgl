@@ -51,7 +51,6 @@ lv_obj_t * lv_spinner_create(lv_obj_t * parent)
     return obj;
 }
 
-
 void lv_spinner_set_anim_params(lv_obj_t * obj, uint32_t t, uint32_t angle)
 {
     /*Delete the current animation*/
@@ -92,12 +91,10 @@ static void lv_spinner_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_spinner_set_anim_params(obj, DEF_TIME, DEF_ARC_ANGLE);
 }
 
-
 static void arc_anim_start_angle(void * obj, int32_t v)
 {
     lv_arc_set_start_angle(obj, (uint32_t) v);
 }
-
 
 static void arc_anim_end_angle(void * obj, int32_t v)
 {

@@ -56,7 +56,6 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
     return ret;
 }
 
-
 /**
  *
  * @param fg
@@ -79,7 +78,6 @@ static inline lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg)
     bg.blue = (uint32_t)((uint32_t)fg.blue * fg.alpha + (uint32_t)bg.blue * (255 - fg.alpha)) >> 8;
     return bg;
 }
-
 
 //! @endcond
 

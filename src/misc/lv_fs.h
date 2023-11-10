@@ -55,7 +55,6 @@ typedef _lv_fs_res_t lv_fs_res_t;
 typedef uint8_t lv_fs_res_t;
 #endif /*DOXYGEN*/
 
-
 /**
  * File open mode.
  */
@@ -69,7 +68,6 @@ typedef _lv_fs_mode_t lv_fs_mode_t;
 #else
 typedef uint8_t lv_fs_mode_t;
 #endif /*DOXYGEN*/
-
 
 /**
  * Seek modes.

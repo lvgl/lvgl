@@ -70,7 +70,6 @@ typedef _lv_result_t lv_result_t;
 typedef uint8_t lv_result_t;
 #endif /*DOXYGEN*/
 
-
 #if defined(__cplusplus) || __STDC_VERSION__ >= 199901L
 // If c99 or newer,  use the definition of uintptr_t directly from <stdint.h>
 typedef uintptr_t lv_uintptr_t;

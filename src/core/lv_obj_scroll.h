@@ -258,7 +258,6 @@ void lv_obj_scroll_to_view(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
  */
 void lv_obj_scroll_to_view_recursive(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
 
-
 /**
  * Low level function to scroll by given x and y coordinates.
  * `LV_EVENT_SCROLL` is sent.

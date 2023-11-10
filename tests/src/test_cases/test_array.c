@@ -24,7 +24,6 @@ void test_array_append_values(void)
     TEST_ASSERT_EQUAL_UINT32(8, lv_array_length(&array));
 }
 
-
 void test_array_set_get(void)
 {
     uint32_t v = 100;
@@ -32,7 +31,6 @@ void test_array_set_get(void)
     uint32_t * r = LV_ARRAY_GET(&array, 0, uint32_t);
     TEST_ASSERT_EQUAL_UINT32(100, *r);
 }
-
 
 void test_array_len(void)
 {
@@ -47,7 +45,6 @@ void test_array_len(void)
     TEST_ASSERT_EQUAL_UINT32(0, lv_array_length(&array));
 }
 
-
 void test_array_resize(void)
 {
     for(int32_t i = 0; i < 10; i++) {
@@ -59,7 +56,6 @@ void test_array_resize(void)
     lv_array_resize(&array, 6);
     TEST_ASSERT_EQUAL_UINT32(6, lv_array_length(&array));
 }
-
 
 void test_array_copy(void)
 {
@@ -76,7 +72,5 @@ void test_array_copy(void)
     TEST_ASSERT_EQUAL_UINT32(1, *r);
     lv_array_destroy(&array2);
 }
-
-
 
 #endif

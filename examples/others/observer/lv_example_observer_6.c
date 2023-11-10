@@ -6,7 +6,6 @@ typedef enum {
     THEME_MODE_DARK,
 } theme_mode_t;
 
-
 static lv_obj_t * my_panel_create(lv_obj_t * parent);
 static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_event_cb_t event_cb);
 static void switch_theme_event_cb(lv_event_t * e);
@@ -44,7 +43,6 @@ static void switch_theme_event_cb(lv_event_t * e)
     if(lv_subject_get_int(&theme_subject) == THEME_MODE_LIGHT) lv_subject_set_int(&theme_subject, THEME_MODE_DARK);
     else lv_subject_set_int(&theme_subject, THEME_MODE_LIGHT);
 }
-
 
 /*-----------------------------------------
  * my_panel.c

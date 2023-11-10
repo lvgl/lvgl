@@ -456,5 +456,4 @@ void test_button_matrix_focused_event_works(void)
     TEST_ASSERT_TRUE(event_triggered);
 }
 
-
 #endif

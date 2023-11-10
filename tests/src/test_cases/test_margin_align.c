@@ -67,7 +67,6 @@ void test_align(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("margin_align_0.png");
     obj_set_margin(obj0s[4], 6, 100, 100, 100);
 
-
     lv_obj_set_style_radius(obj0s[0], 0, LV_PART_MAIN);
 
     lv_obj_align(obj0s[4], LV_ALIGN_LEFT_MID, 0, 0);

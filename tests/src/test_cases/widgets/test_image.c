@@ -271,7 +271,6 @@ void test_image_stretch(void)
     int32_t w_array[] = {img_w / 2, img_w, img_w * 2};
     int32_t h_array[] = {img_h / 2, img_h, img_h * 2};
 
-
     for(i = 0; i < 9; i++) {
         img = img_create();
         lv_obj_set_size(img, w_array[i / 3], h_array[i % 3]);
@@ -281,7 +280,6 @@ void test_image_stretch(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_stretch.png");
 }
-
 
 void test_image_tile(void)
 {
@@ -361,7 +359,5 @@ void test_image_ignore_transformation_settings_when_tiled(void)
     TEST_ASSERT_EQUAL_INT(LV_SCALE_NONE, lv_image_get_scale_x(img));
     TEST_ASSERT_EQUAL_INT(LV_SCALE_NONE, lv_image_get_scale_y(img));
 }
-
-
 
 #endif

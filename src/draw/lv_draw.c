@@ -101,7 +101,6 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
     return new_task;
 }
 
-
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 {
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
@@ -368,7 +367,6 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         _draw_info.used_memory_for_layers_kb += kb;
         LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
 
-
         if(lv_color_format_has_alpha(layer->color_format)) {
             lv_area_t a;
             a.x1 = 0;
@@ -422,4 +420,3 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
 
     return true;
 }
-

@@ -22,7 +22,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -186,7 +185,6 @@ void lv_obj_dump_tree(struct _lv_obj_t * start_ob);
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /*extern "C"*/

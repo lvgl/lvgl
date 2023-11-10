@@ -135,7 +135,6 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     return disp;
 }
 
-
 void lv_display_remove(lv_display_t * disp)
 {
     bool was_default = false;
@@ -398,7 +397,6 @@ void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb
     disp->flush_cb = flush_cb;
 }
 
-
 void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_t wait_cb)
 {
     if(disp == NULL) disp = lv_display_get_default();
@@ -439,7 +437,6 @@ bool lv_display_get_antialiasing(lv_display_t * disp)
 
     return disp->antialiasing;
 }
-
 
 LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 {
@@ -565,7 +562,6 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
     lv_obj_remove_local_style_prop(new_scr, LV_STYLE_OPA, 0);
     lv_obj_remove_local_style_prop(lv_screen_active(), LV_STYLE_OPA, 0);
 
-
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
 
@@ -687,7 +683,6 @@ uint32_t lv_display_get_event_count(lv_display_t * disp)
     LV_ASSERT_NULL(disp);
     return lv_event_get_count(&disp->event_list);
 }
-
 
 lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 {

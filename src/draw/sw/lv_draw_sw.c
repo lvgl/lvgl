@@ -128,7 +128,6 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) return -1;
 
-
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_sw_unit->base_unit.target_layer = layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
@@ -279,7 +278,6 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
 #endif
 
 }
-
 
 void lv_draw_sw_rgb565_swap(void * buf, int32_t buf_size_px)
 {

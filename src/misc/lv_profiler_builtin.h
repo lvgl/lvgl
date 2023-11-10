@@ -45,7 +45,6 @@ typedef struct {
     void (*flush_cb)(const char * buf); /**< Callback function to flush the profiling data */
 } lv_profiler_builtin_config_t;
 
-
 /**
  * @brief Structure representing a built-in profiler item in LVGL
  */

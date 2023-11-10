@@ -21,5 +21,4 @@ void lv_example_observer_1(void)
     lv_label_bind_text(label, &temperature_subject, "%d °C");
 }
 
-
 #endif

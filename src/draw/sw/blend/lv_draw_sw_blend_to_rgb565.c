@@ -221,7 +221,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_image_to_rgb565(_lv_draw_sw_blend_im
     }
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

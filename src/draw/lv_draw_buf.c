@@ -11,7 +11,6 @@
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -67,7 +66,6 @@ lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void)
     return &handlers;
 }
 
-
 uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
 {
     if(handlers.width_to_stride_cb) return handlers.width_to_stride_cb(w, color_format);
@@ -108,7 +106,6 @@ void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t col
     if(handlers.buf_clear_cb) handlers.buf_clear_cb(buf, w, h, color_format, a);
 }
 
-
 void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area_to_copy,
                       void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area_to_copy,
                       lv_color_format_t color_format)
@@ -121,7 +118,6 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const l
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 static void * buf_malloc(size_t size_bytes, lv_color_format_t color_format)
 {
@@ -218,4 +214,3 @@ static void buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv
         src_bufc += src_stride;
     }
 }
-

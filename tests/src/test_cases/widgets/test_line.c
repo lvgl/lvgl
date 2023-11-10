@@ -88,7 +88,6 @@ void test_line_should_update_extra_draw_size_based_on_style(void)
     TEST_ASSERT_EQUAL(final_extra_draw_size, _lv_obj_get_ext_draw_size(line));
 }
 
-
 void test_line_basic_render(void)
 {
     static lv_point_precise_t points[] = { {5, 5},
@@ -100,7 +99,6 @@ void test_line_basic_render(void)
     uint16_t point_cnt = (uint16_t) sizeof(points) / sizeof(lv_point_precise_t);
     lv_line_set_points(line, points, point_cnt);
     lv_obj_set_pos(line, 10, 10);
-
 
     line = lv_line_create(active_screen);
     lv_line_set_points(line, points, point_cnt);

@@ -388,7 +388,6 @@ static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t 
     para->y2 = y2;
 }
 
-
 /**
  * Create an animation
  * @param a         an initialized 'anim_t' variable. Not required after call.

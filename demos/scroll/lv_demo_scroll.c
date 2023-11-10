@@ -65,7 +65,6 @@ void lv_demo_scroll(void)
     switch_create(panel, "Elastic scroll", LV_OBJ_FLAG_SCROLL_ELASTIC, true);
     switch_create(panel, "Add scroll momentum", LV_OBJ_FLAG_SCROLL_MOMENTUM, true);
 
-
     /*Show the switches first*/
     lv_obj_move_foreground(list);
 

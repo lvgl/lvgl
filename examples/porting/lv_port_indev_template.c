@@ -80,7 +80,6 @@ void lv_port_indev_init(void)
      *  You should shape them according to your hardware
      */
 
-
     /*------------------
      * Touchpad
      * -----------------*/
@@ -121,7 +120,6 @@ void lv_port_indev_init(void)
     indev_keypad = lv_indev_create();
     lv_indev_set_type(indev_keypad, LV_INDEV_TYPE_KEYPAD);
     lv_indev_set_read_cb(indev_keypad, keypad_read);
-
 
     /*Later you should create group(s) with `lv_group_t * group = lv_group_create()`,
      *add objects to the group with `lv_group_add_obj(group, obj)`

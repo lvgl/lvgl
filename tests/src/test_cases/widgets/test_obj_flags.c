@@ -69,7 +69,6 @@ void test_obj_flag_overflow_visible_1(void)
     lv_label_set_text(label_2, "Button 2");
     lv_obj_center(label_2);
 
-
     cnt_1 = 0;
     cnt_2 = 0;
 
@@ -141,6 +140,5 @@ void test_obj_flag_overflow_visible_1(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_overflow_visible_1_4.png");
 
 }
-
 
 #endif

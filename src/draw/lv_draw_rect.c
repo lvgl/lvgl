@@ -80,7 +80,6 @@ void lv_draw_bg_image_dsc_init(lv_draw_bg_image_dsc_t * dsc)
     dsc->opa = LV_OPA_COVER;
 }
 
-
 void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
 
@@ -174,7 +173,6 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
 
         t = lv_draw_add_task(layer, coords);
 
-
         lv_image_src_t src_type = lv_image_src_get_type(dsc->bg_image_src);
         lv_result_t res = LV_RESULT_OK;
         lv_image_header_t header;
@@ -242,7 +240,6 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
 
     LV_PROFILER_END;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS

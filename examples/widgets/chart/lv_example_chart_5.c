@@ -54,7 +54,6 @@ static void add_faded_area(lv_event_t * e)
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
 
-
     const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
 
     /*Draw a triangle below the line witch some opacity gradient*/

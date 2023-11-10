@@ -25,7 +25,6 @@ static void observer_int(lv_subject_t * subject, lv_observer_t * observer)
     current_v = lv_subject_get_int(subject);
 }
 
-
 void test_observer_add_remove(void)
 {
     static lv_subject_t subject;
