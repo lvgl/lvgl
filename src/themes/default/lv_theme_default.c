@@ -81,7 +81,6 @@ typedef struct {
 
     /*Parts*/
     lv_style_t knob;
-    lv_style_t indic;
 
 #if LV_USE_ARC
     lv_style_t arc_indic;
@@ -138,7 +137,7 @@ typedef struct {
 #endif
 
 #if LV_USE_LIST
-    lv_style_t list_bg, list_btn, list_item_grow, list_label;
+    lv_style_t list_bg, list_btn, list_item_grow;
 #endif
 
 #if LV_USE_TABVIEW
@@ -714,7 +713,16 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
 void lv_theme_default_deinit(void)
 {
-    if(theme_def) {
+    struct _my_theme_t * theme = theme_def;
+    if(theme) {
+        if(theme->inited) {
+            lv_style_t * theme_styles = (lv_style_t *)(&(theme->styles));
+            uint32_t i;
+            for(i = 0; i < sizeof(my_theme_styles_t) / sizeof(lv_style_t); i++) {
+                lv_style_reset(theme_styles + i);
+            }
+
+        }
         lv_free(theme_def);
         theme_def = NULL;
     }
