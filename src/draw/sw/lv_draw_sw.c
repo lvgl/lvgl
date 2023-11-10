@@ -80,6 +80,14 @@ static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
 {
 #if LV_USE_OS
     lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
+
+    LV_LOG_INFO("cancel software rendering thread");
+    draw_sw_unit->exit_status = true;
+
+    if(draw_sw_unit->inited) {
+        lv_thread_sync_signal(&draw_sw_unit->sync);
+    }
+
     return lv_thread_delete(&draw_sw_unit->thread);
 #else
     LV_UNUSED(draw_unit);
@@ -137,7 +145,15 @@ static void render_thread_cb(void * ptr)
 
     while(1) {
         while(u->task_act == NULL) {
+            if(u->exit_status) {
+                break;
+            }
             lv_thread_sync_wait(&u->sync);
+        }
+
+        if(u->exit_status) {
+            LV_LOG_INFO("ready to exit software rendering thread");
+            break;
         }
 
         execute_drawing(u);
@@ -149,8 +165,10 @@ static void render_thread_cb(void * ptr)
         /*The draw unit is free now. Request a new dispatching as it can get a new task*/
         lv_draw_dispatch_request();
     }
+
     u->inited = false;
     lv_thread_sync_delete(&u->sync);
+    LV_LOG_INFO("exit software rendering thread");
 }
 #endif
 
