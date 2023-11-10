@@ -263,9 +263,6 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
             lv_draw_unit_t * u = _draw_info.unit_head;
             while(u) {
                 int32_t taken_cnt = u->dispatch_cb(u, layer);
-                if(taken_cnt < 0) {
-                    break;
-                }
                 if(taken_cnt >= 0) need_waiting = true;
                 u = u->next;
             }
