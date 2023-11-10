@@ -159,9 +159,9 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_tab
  * @param obj       pointer to a Table object
  * @param row       id of the row [0 .. row_cnt -1]
  * @param col       id of the column [0 .. col_cnt -1]
- * @param user_data pointer to the new user_data.
+ * @param user_data pointer to the new user_data. It must be allocated by user as it will be freed automatically
  */
-void lv_table_set_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, void * user_data);
+void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, void * user_data);
 #endif
 
 /*=====================
@@ -224,7 +224,7 @@ void lv_table_get_selected_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
  * @param row       id of the row [0 .. row_cnt -1]
  * @param col       id of the column [0 .. col_cnt -1]
  */
-void * lv_table_get_user_data(lv_obj_t * obj, uint16_t row, uint16_t col);
+void * lv_table_get_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col);
 #endif
 
 /**********************
