@@ -9,6 +9,15 @@
 #include "lv_demo_benchmark.h"
 
 #if LV_USE_DEMO_BENCHMARK
+
+#if LV_FONT_MONTSERRAT_14 == 0
+    #error "LV_FONT_MONTSERRAT_14 is required for lv_demo_benchmark. Enable it in lv_conf.h."
+#endif
+
+#if LV_FONT_MONTSERRAT_24 == 0
+    #error "LV_FONT_MONTSERRAT_24 is required for lv_demo_benchmark. Enable it in lv_conf.h."
+#endif
+
 #include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 
