@@ -74,7 +74,7 @@ void _lv_sysmon_builtin_init(void)
 #if LV_USE_MEM_MONITOR
     static lv_mem_monitor_t mem_info;
     lv_subject_init_pointer(&sysmon_mem.subject, &mem_info);
-    sysmon_perf.timer = lv_timer_create(mem_update_timer_cb, SYSMON_REFR_PERIOD_DEF, &mem_info);
+    sysmon_mem.timer = lv_timer_create(mem_update_timer_cb, SYSMON_REFR_PERIOD_DEF, &mem_info);
 #endif
 
     lv_async_call(sysmon_backend_init_async_cb, NULL);
