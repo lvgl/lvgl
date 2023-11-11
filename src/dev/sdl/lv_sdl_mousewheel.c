@@ -22,6 +22,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data);
+static void sdl_mousewheel_delete(lv_indev_t * indev);
 
 /**********************
  *  STATIC VARIABLES
@@ -50,6 +51,7 @@ lv_indev_t * lv_sdl_mousewheel_create(void)
 
     lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
     lv_indev_set_read_cb(indev, sdl_mousewheel_read);
+    lv_indev_set_delete_cb(indev, sdl_mousewheel_delete);
     lv_indev_set_driver_data(indev, dsc);
 
     return indev;
@@ -66,6 +68,19 @@ static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data)
     data->state = dsc->state;
     data->enc_diff = dsc->diff;
     dsc->diff = 0;
+}
+
+static void sdl_mousewheel_delete(lv_indev_t * indev)
+{
+    lv_sdl_mousewheel_t * dsc = lv_indev_get_driver_data(indev);
+    if(dsc) {
+        lv_indev_set_driver_data(indev, NULL);
+        lv_indev_set_delete_cb(indev, NULL);
+        lv_indev_set_read_cb(indev, NULL);
+
+        lv_free(dsc);
+        LV_LOG_INFO("done");
+    }
 }
 
 void _lv_sdl_mousewheel_handler(SDL_Event * event)

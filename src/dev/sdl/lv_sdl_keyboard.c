@@ -30,6 +30,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data);
+static void sdl_keyboard_delete(lv_indev_t * indev);
 static uint32_t keycode_to_ctrl_key(SDL_Keycode sdl_key);
 
 /**********************
@@ -55,6 +56,7 @@ lv_indev_t * lv_sdl_keyboard_create(void)
 
     lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
     lv_indev_set_read_cb(indev, sdl_keyboard_read);
+    lv_indev_set_delete_cb(indev, sdl_keyboard_delete);
     lv_indev_set_driver_data(indev, dsc);
 
     return indev;
@@ -83,6 +85,18 @@ static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
         data->key = dev->buf[0];
         memmove(dev->buf, dev->buf + 1, len);
         data->continue_reading = true;
+    }
+}
+
+static void sdl_keyboard_delete(lv_indev_t * indev)
+{
+    lv_sdl_keyboard_t * dev = lv_indev_get_driver_data(indev);
+    if(dev) {
+        lv_indev_set_driver_data(indev, NULL);
+        lv_indev_set_delete_cb(indev, NULL);
+        lv_indev_set_read_cb(indev, NULL);
+        lv_free(dev);
+        LV_LOG_INFO("done");
     }
 }
 

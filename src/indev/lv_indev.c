@@ -121,11 +121,15 @@ lv_indev_t * lv_indev_create(void)
 void lv_indev_delete(lv_indev_t * indev)
 {
     LV_ASSERT_NULL(indev);
+
     /*Clean up the read timer first*/
     if(indev->read_timer) lv_timer_delete(indev->read_timer);
+
     /*Remove the input device from the list*/
     _lv_ll_remove(indev_ll_head, indev);
+
     /*Free the memory of the input device*/
+    if(indev->delete_cb) indev->delete_cb(indev);
     lv_free(indev);
 }
 
@@ -266,11 +270,18 @@ void lv_indev_set_type(lv_indev_t * indev, lv_indev_type_t indev_type)
     indev->reset_query = 1;
 }
 
-void lv_indev_set_read_cb(lv_indev_t * indev,  lv_indev_read_cb_t read_cb)
+void lv_indev_set_read_cb(lv_indev_t * indev, lv_indev_read_cb_t read_cb)
 {
     if(indev == NULL) return;
 
     indev->read_cb = read_cb;
+}
+
+void lv_indev_set_delete_cb(lv_indev_t * indev, lv_indev_delete_cb_t delete_cb)
+{
+    if(indev == NULL) return;
+
+    indev->delete_cb = delete_cb;
 }
 
 void lv_indev_set_user_data(lv_indev_t * indev, void * user_data)

@@ -58,6 +58,7 @@ typedef struct {
 } lv_indev_data_t;
 
 typedef void (*lv_indev_read_cb_t)(struct _lv_indev_t * indev, lv_indev_data_t * data);
+typedef void (*lv_indev_delete_cb_t)(struct _lv_indev_t * indev);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -113,6 +114,8 @@ lv_indev_t * lv_indev_active(void);
 void lv_indev_set_type(lv_indev_t * indev, lv_indev_type_t indev_type);
 
 void lv_indev_set_read_cb(lv_indev_t * indev,  lv_indev_read_cb_t read_cb);
+
+void lv_indev_set_delete_cb(lv_indev_t * indev,  lv_indev_delete_cb_t delete_cb);
 
 void lv_indev_set_user_data(lv_indev_t * indev, void * user_data);
 

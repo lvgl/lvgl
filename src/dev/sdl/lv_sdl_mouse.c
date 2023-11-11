@@ -25,6 +25,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data);
+static void sdl_mouse_delete(lv_indev_t * indev);
 
 /**********************
  *  STATIC VARIABLES
@@ -55,6 +56,7 @@ lv_indev_t * lv_sdl_mouse_create(void)
 
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, sdl_mouse_read);
+    lv_indev_set_delete_cb(indev, sdl_mouse_delete);
     lv_indev_set_driver_data(indev, dsc);
 
     return indev;
@@ -72,6 +74,18 @@ static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data)
     data->point.x = dsc->last_x;
     data->point.y = dsc->last_y;
     data->state = dsc->left_button_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+}
+
+static void sdl_mouse_delete(lv_indev_t * indev)
+{
+    lv_sdl_mouse_t * dsc = lv_indev_get_driver_data(indev);
+    if(dsc) {
+        lv_indev_set_driver_data(indev, NULL);
+        lv_indev_set_delete_cb(indev, NULL);
+        lv_indev_set_read_cb(indev, NULL);
+        lv_free(dsc);
+        LV_LOG_INFO("done");
+    }
 }
 
 void _lv_sdl_mouse_handler(SDL_Event * event)
