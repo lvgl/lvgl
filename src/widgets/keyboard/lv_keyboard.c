@@ -263,6 +263,7 @@ void lv_keyboard_set_popovers(lv_obj_t * obj, bool en)
 void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * map[],
                          const lv_buttonmatrix_ctrl_t ctrl_map[])
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
     kb_map[mode] = map;
     kb_ctrl[mode] = ctrl_map;
     lv_keyboard_update_map(obj);
