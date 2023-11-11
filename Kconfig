@@ -63,6 +63,10 @@ menu "LVGL configuration"
 			bool "Use builtin method to deal with obj ID"
 			default n
 
+		config LV_USE_OBJ_PROPERTY
+			bool "Use obj property set/get API"
+			default n
+
 	endmenu
 
 	menu "Memory settings"
@@ -75,6 +79,12 @@ menu "LVGL configuration"
 
 		config LV_USE_CLIB_MALLOC
 			bool "Standard C functions malloc/realloc/free"
+
+		config LV_USE_MICROPYTHON_MALLOC
+			bool "MicroPython functions malloc/realloc/free"
+
+		config LV_USE_RTTHREAD_MALLOC
+			bool "RTThread functions malloc/realloc/free"
 
 		config LV_USE_CUSTOM_MALLOC
 			bool "Implement the functions externally"
@@ -261,7 +271,7 @@ menu "LVGL configuration"
 				default ""
 				depends on LV_DRAW_SW_ASM_CUSTOM
 
-			config LV_IMG_CACHE_DEF_SIZE
+			config LV_CACHE_DEF_SIZE
 				int "Default image cache size. 0 to disable caching."
 				default 0
 				depends on LV_USE_DRAW_SW
@@ -487,6 +497,10 @@ menu "LVGL configuration"
 		endmenu
 
 		menu "Others"
+			config LV_USE_FLOAT
+				bool "Use float as lv_value_precise_t."
+				default n
+
 			config LV_USE_PERF_MONITOR
 				bool "Show CPU usage and FPS count."
 				depends on LV_USE_SYSMON
@@ -553,6 +567,12 @@ menu "LVGL configuration"
 
 			config LV_USE_REFR_DEBUG
 				bool "Draw random colored rectangles over the redrawn areas."
+
+			config LV_USE_LAYER_DEBUG
+				bool "Draw a red overlay for ARGB layers and a green overlay for RGB layers"
+
+			config LV_USE_PARALLEL_DRAW_DEBUG
+				bool "Draw overlays with different colors for each draw_unit's tasks."
 
 			config LV_USE_BUILTIN_SNPRINTF
 				bool "Use the built-in (v)snprintf functions"
@@ -939,6 +959,9 @@ menu "LVGL configuration"
 		config LV_USE_IMGBTN
 			bool "Imgbtn."
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_OBSERVER
+			bool "Observer."
+			default n
 		config LV_USE_KEYBOARD
 			bool "Keyboard."
 			default y if !LV_CONF_MINIMAL
@@ -1067,6 +1090,13 @@ menu "LVGL configuration"
 			default 0
 			depends on LV_USE_FS_FATFS
 
+		config LV_USE_FS_MEMFS
+			bool "File system on top of memory-mapped API"
+		config LV_FS_MEMFS_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			default 0
+			depends on LV_USE_FS_MEMFS
+
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
 
@@ -1111,6 +1141,14 @@ menu "LVGL configuration"
 					int "The maximum number of FT_Size(0: use defaults)"
 					default 4
 			endmenu
+
+		config LV_USE_TINY_TTF
+			bool "Enable Tiny TTF decoder"
+			default n
+		config LV_TINY_TTF_FILE_SUPPORT
+			bool "Enable loading Tiny TTF data from files"
+			default n
+			depends on LV_USE_TINY_TTF
 		endif
 
 		config LV_USE_RLOTTIE
@@ -1391,6 +1429,14 @@ menu "LVGL configuration"
 		config LV_DEMO_BENCHMARK_RGB565A8
 			bool "Use RGB565A8 images with 16 bit color depth instead of ARGB8565"
 			depends on LV_USE_DEMO_BENCHMARK
+			default n
+
+		config LV_USE_DEMO_RENDER
+			bool "Render test for each primitives. Requires at least 480x272 display"
+			default n
+
+		config LV_USE_DEMO_SCROLL
+			bool "Scroll settings test for LVGL"
 			default n
 
 		config LV_USE_DEMO_STRESS
