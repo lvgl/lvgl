@@ -48,7 +48,8 @@ typedef struct {
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static int fbdev_get_pinfo(int fd, struct fb_planeinfo_s * pinfo);
 static int fbdev_init_mem2(lv_nuttx_fb_t * dsc);
-static void _display_refr_timer_cb(lv_timer_t * tmr);
+static void display_refr_timer_cb(lv_timer_t * tmr);
+static void display_release_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -75,6 +76,7 @@ lv_display_t * lv_nuttx_fbdev_create(void)
     }
     dsc->fd = -1;
     lv_display_set_driver_data(disp, dsc);
+    lv_display_add_event(disp, display_release_cb, LV_EVENT_DELETE, disp);
     lv_display_set_flush_cb(disp, flush_cb);
     return disp;
 }
@@ -132,7 +134,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
                                 (dsc->pinfo.stride * dsc->vinfo.yres), LV_DISP_RENDER_MODE_DIRECT);
     lv_display_set_user_data(disp, (void *)(uintptr_t)(dsc->fd));
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
-    lv_timer_set_cb(disp->refr_timer, _display_refr_timer_cb);
+    lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
 
     LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", dsc->vinfo.xres, dsc->vinfo.yres, lv_display_get_dpi(disp));
     return 0;
@@ -147,7 +149,7 @@ errout:
  *   STATIC FUNCTIONS
  **********************/
 
-static void _display_refr_timer_cb(lv_timer_t * tmr)
+static void display_refr_timer_cb(lv_timer_t * tmr)
 {
     lv_display_t * disp = lv_timer_get_user_data(tmr);
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
@@ -295,6 +297,23 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
     }
 
     return 0;
+}
+
+static void display_release_cb(lv_event_t * e)
+{
+    lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
+    lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc) {
+        lv_display_set_driver_data(disp, NULL);
+        lv_display_set_flush_cb(disp, NULL);
+
+        if(dsc->fd >= 0) {
+            close(dsc->fd);
+            dsc->fd = -1;
+        }
+        lv_free(dsc);
+    }
+    LV_LOG_INFO("Done");
 }
 
 #endif /*LV_USE_NUTTX*/

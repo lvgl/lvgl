@@ -29,7 +29,9 @@
  **********************/
 
 static uint32_t millis(void);
-static void syslog_print(lv_log_level_t level, const char * buf);
+#if LV_USE_LOG
+    static void syslog_print(lv_log_level_t level, const char * buf);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -81,7 +83,9 @@ void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
 
 void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 {
+#if LV_USE_LOG
     lv_log_register_print_cb(syslog_print);
+#endif
     lv_tick_set_cb(millis);
 
 #if !LV_USE_NUTTX_CUSTOM_INIT
@@ -132,6 +136,7 @@ static uint32_t millis(void)
     return tick;
 }
 
+#if LV_USE_LOG
 static void syslog_print(lv_log_level_t level, const char * buf)
 {
     static const int priority[_LV_LOG_LEVEL_NUM] = {
@@ -140,5 +145,6 @@ static void syslog_print(lv_log_level_t level, const char * buf)
 
     syslog(priority[level], "[LVGL] %s", buf);
 }
+#endif
 
 #endif /*LV_USE_NUTTX*/

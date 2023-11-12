@@ -49,6 +49,7 @@ static void rounder_cb(lv_event_t * e);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
                      uint8_t * color_p);
 static lv_display_t * lcd_init(int fd, int hor_res, int ver_res);
+static void display_release_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -197,13 +198,41 @@ static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
     lcd->disp = disp;
     lv_display_set_draw_buffers(lcd->disp, draw_buf, draw_buf_2, buf_size, render_mode);
     lv_display_set_flush_cb(lcd->disp, flush_cb);
-    lv_event_add(&lcd->disp->event_list, rounder_cb, LV_EVENT_INVALIDATE_AREA, lcd);
-    lcd->disp->driver_data = lcd;
-    lcd->disp->user_data = (void *)(uintptr_t)fd;
+    lv_display_add_event(lcd->disp, rounder_cb, LV_EVENT_INVALIDATE_AREA, lcd);
+    lv_display_add_event(lcd->disp, display_release_cb, LV_EVENT_DELETE, lcd->disp);
+    lv_display_set_driver_data(lcd->disp, lcd);
+    lv_display_set_user_data(lcd->disp, (void *)(uintptr_t)fd);
 
     return lcd->disp;
 }
 
+static void display_release_cb(lv_event_t * e)
+{
+    lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
+    lv_nuttx_lcd_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc) {
+        lv_display_set_driver_data(disp, NULL);
+        lv_display_set_flush_cb(disp, NULL);
+
+        /* clear display buffer */
+        if(disp->buf_1) {
+            lv_free(disp->buf_1);
+            disp->buf_1 = NULL;
+        }
+        if(disp->buf_2) {
+            lv_free(disp->buf_2);
+            disp->buf_2 = NULL;
+        }
+
+        /* close device fb */
+        if(dsc->fd >= 0) {
+            close(dsc->fd);
+            dsc->fd = -1;
+        }
+        lv_free(dsc);
+        LV_LOG_INFO("Done");
+    }
+}
 #endif /*LV_USE_NUTTX_LCD*/
 
 #endif /* LV_USE_NUTTX*/

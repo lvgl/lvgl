@@ -41,6 +41,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void touchscreen_read(lv_indev_t * drv, lv_indev_data_t * data);
+static void touchscreen_delete(lv_indev_t * drv);
 static lv_indev_t * touchscreen_init(int fd);
 
 /**********************
@@ -119,11 +120,29 @@ static void touchscreen_read(lv_indev_t * drv, lv_indev_data_t * data)
     data->state = touchscreen->last_state;
 }
 
+static void touchscreen_delete(lv_indev_t * drv)
+{
+    lv_nuttx_touchscreen_t * touchscreen = lv_indev_get_driver_data(drv);
+    if(touchscreen) {
+        lv_indev_set_driver_data(drv, NULL);
+        lv_indev_set_delete_cb(drv, NULL);
+        lv_indev_set_read_cb(drv, NULL);
+
+        if(touchscreen->fd >= 0) {
+            close(touchscreen->fd);
+            touchscreen->fd = -1;
+        }
+        lv_free(touchscreen);
+        LV_LOG_INFO("done");
+    }
+}
+
 static lv_indev_t * touchscreen_init(int fd)
 {
     lv_nuttx_touchscreen_t * touchscreen;
-    touchscreen = malloc(sizeof(lv_nuttx_touchscreen_t));
+    lv_indev_t * indev_drv = NULL;
 
+    touchscreen = malloc(sizeof(lv_nuttx_touchscreen_t));
     if(touchscreen == NULL) {
         LV_LOG_ERROR("touchscreen_s malloc failed");
         return NULL;
@@ -131,14 +150,14 @@ static lv_indev_t * touchscreen_init(int fd)
 
     touchscreen->fd = fd;
     touchscreen->last_state = LV_INDEV_STATE_RELEASED;
+    touchscreen->indev_drv = indev_drv = lv_indev_create();
 
-    touchscreen->indev_drv = lv_indev_create();
-    touchscreen->indev_drv->type = LV_INDEV_TYPE_POINTER;
-    touchscreen->indev_drv->read_cb = touchscreen_read;
-    touchscreen->indev_drv->driver_data = touchscreen;
-    touchscreen->indev_drv->user_data = (void *)(uintptr_t)fd;
-
-    return touchscreen->indev_drv;
+    lv_indev_set_type(indev_drv, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(indev_drv, touchscreen_read);
+    lv_indev_set_delete_cb(indev_drv, touchscreen_delete);
+    lv_indev_set_driver_data(indev_drv, touchscreen);
+    lv_indev_set_user_data(indev_drv, (void *)(uintptr_t)fd);
+    return indev_drv;
 }
 
 #endif /*LV_USE_NUTTX_TOUCHSCREEN*/
