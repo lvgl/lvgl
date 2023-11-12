@@ -2524,6 +2524,35 @@
     #endif
 #endif
 
+/*Use X11 to open window on Linux desktop and handle mouse and keyboard*/
+#ifndef LV_USE_X11
+    #ifdef CONFIG_LV_USE_X11
+        #define LV_USE_X11 CONFIG_LV_USE_X11
+    #else
+        #define LV_USE_X11              0
+    #endif
+#endif
+#if LV_USE_X11
+    #ifndef LV_X11_RENDER_MODE
+        #ifdef CONFIG_LV_X11_RENDER_MODE
+            #define LV_X11_RENDER_MODE CONFIG_LV_X11_RENDER_MODE
+        #else
+            #define LV_X11_RENDER_MODE     LV_DISPLAY_RENDER_MODE_PARTIAL
+        #endif
+    #endif
+    #ifndef LV_X11_DOUBLE_BUFFER
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_X11_DOUBLE_BUFFER
+                #define LV_X11_DOUBLE_BUFFER CONFIG_LV_X11_DOUBLE_BUFFER
+            #else
+                #define LV_X11_DOUBLE_BUFFER 0
+            #endif
+        #else
+            #define LV_X11_DOUBLE_BUFFER   1
+        #endif
+    #endif
+#endif
+
 /*Driver for /dev/fb*/
 #ifndef LV_USE_LINUX_FBDEV
     #ifdef CONFIG_LV_USE_LINUX_FBDEV

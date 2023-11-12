@@ -28,7 +28,7 @@ Choose your favorite IDE, read its README on GitHub, download the project, and l
 - `Eclipse with SDLdriver <https://github.com/lvgl/lv_sim_eclipse_sdl>`__: Recommended on Linux and Mac
 - `CodeBlocks <https://github.com/lvgl/lv_sim_codeblocks_win>`__: Recommended on Windows
 - `VisualStudio <https://github.com/lvgl/lv_sim_visual_studio_sdl>`__: For Windows
-- `VSCode with SDL driver <https://github.com/lvgl/lv_sim_vscode_sdl>`__: Recommended on Linux and Mac
+- `VSCode with SDL/X11 driver <https://github.com/lvgl/lv_sim_vscode_sdl>`__: Recommended on Linux (SDL/X11) and Mac (SDL)
 - `PlatformIO with SDL driver <https://github.com/lvgl/lv_platformio>`__: Recommended on Linux and Mac
 - `MDK with FastModel <https://github.com/lvgl/lv_port_an547_cm55_sim>`__: For Windows
 
@@ -70,8 +70,11 @@ choose *Eclipse CDT* from the list.
 Install SDL 2
 ~~~~~~~~~~~~~
 
-The PC simulator uses the `SDL2 <https://www.libsdl.org/download-2.0.php>`__ cross-platform library to
-simulate a TFT display and a touchpad.
+The PC simulator uses
+- `SDL2 <https://www.libsdl.org/download-2.0.php>`__ cross-platform library or
+- `X11 <https://www.x.org/releases/current/doc/libX11/libX11/libX11.html>`__ Linux library
+
+to simulate a TFT display and a touchpad.
 
 Linux
 ^^^^^
@@ -82,6 +85,11 @@ On **Linux** you can easily install SDL2 using a terminal:
 2. Install SDL2: ``sudo apt-get install libsdl2-2.0-0`` (replace with the found version)
 3. Install SDL2 development package: ``sudo apt-get install libsdl2-dev``
 4. If build essentials are not installed yet: ``sudo apt-get install build-essential``
+
+On **Linux** X11 is even easier to install by terminal:
+
+1. Install XLib: ``sudo apt-get install libx11-6`` (should be installed already)
+2. Install XLib development package: ``sudo apt-get install libx11-dev``
 
 Windows
 ^^^^^^^

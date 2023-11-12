@@ -776,6 +776,13 @@
     #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL windows are closed*/
 #endif
 
+/*Use X11 to open window on Linux desktop and handle mouse and keyboard*/
+#define LV_USE_X11              0
+#if LV_USE_X11
+    #define LV_X11_RENDER_MODE     LV_DISPLAY_RENDER_MODE_PARTIAL
+    #define LV_X11_DOUBLE_BUFFER   1
+#endif
+
 /*Driver for /dev/fb*/
 #define LV_USE_LINUX_FBDEV      0
 #if LV_USE_LINUX_FBDEV
