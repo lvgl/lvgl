@@ -156,7 +156,6 @@ static x11_inp_data_t * x11_input_get_user_data(lv_display_t * disp)
     return *inp_data;
 }
 
-
 static void x11_keyboard_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_display_t * disp = lv_indev_get_driver_data(indev);
@@ -241,7 +240,6 @@ static lv_indev_t * lv_x11_mousewheel_create(lv_display_t * disp)
     }
     return indev;
 }
-
 
 /**********************
  *   GLOBAL FUNCTIONS

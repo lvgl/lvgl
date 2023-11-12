@@ -36,17 +36,14 @@ typedef struct {
     struct _x11_inp_data * inp_data; /**< input user data object */
 } _x11_user_hdr_t;
 
-
 /** optional window close callback function type
  *  @see lv_x11_window_set_close_cb
 */
 typedef void(*lv_x11_close_cb)(void * user_data);
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
 
 /**
  * create and add keyboard, mouse and scrillwheel objects and connect them to x11 display.
@@ -59,7 +56,6 @@ typedef void(*lv_x11_close_cb)(void * user_data);
  * @param[in] mouse_img optional image description for the mouse cursor (NULL for no/invisible mouse cursor)
  */
 void lv_x11_inputs_create(lv_display_t * disp, lv_image_dsc_t const * mouse_img);
-
 
 /**
  * create the X11 display
@@ -89,7 +85,6 @@ lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t
  * @param[in] close_cb  callback funtion to be called
  */
 void lv_x11_window_set_close_cb(lv_display_t * disp, lv_x11_close_cb close_cb, void * user_data);
-
 
 #endif /* LV_USE_X11 */
 

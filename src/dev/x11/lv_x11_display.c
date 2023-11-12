@@ -203,7 +203,6 @@ static void x11_disp_delete_evt_cb(lv_event_t * e)
     lv_free(xd);
 }
 
-
 static void x11_hide_cursor(lv_display_t * disp)
 {
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
@@ -236,7 +235,6 @@ static void x11_event_handler(lv_timer_t * t)
     lv_display_t * disp = lv_timer_get_user_data(t);
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
     LV_ASSERT_NULL(xd);
-
 
     /* handle all outstanding X events */
     XEvent event;
@@ -273,7 +271,6 @@ static void x11_event_handler(lv_timer_t * t)
         }
     }
 }
-
 
 static void * x11_tick_thread(void * data)
 {
