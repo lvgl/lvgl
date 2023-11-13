@@ -43,7 +43,6 @@ extern "C" {
 #endif
 
 #define LV_FREETYPE_FONT_DSC_MAGIC_NUM 0x5F5F4654 /* '__FT' */
-#define LV_FREETYPE_FONT_DSC_DEADBEEF 0xDEADBEEF
 #define LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc) ((dsc)->magic_num == LV_FREETYPE_FONT_DSC_MAGIC_NUM)
 #define LV_ASSERT_FREETYPE_FONT_DSC(dsc)                                                   \
     do {                                                                                   \

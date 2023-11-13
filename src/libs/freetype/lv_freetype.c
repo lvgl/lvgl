@@ -160,7 +160,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint32_t size, lv_fre
     return font;
 }
 
-void lv_freetype_font_del(lv_font_t * font)
+void lv_freetype_font_delete(lv_font_t * font)
 {
     LV_ASSERT_NULL(font);
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)(font->dsc);
@@ -168,10 +168,10 @@ void lv_freetype_font_del(lv_font_t * font)
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
     lv_freetype_on_font_delete(dsc);
+    lv_freetype_drop_face_id(dsc->context, dsc->face_id);
 
     /* invalidate magic number */
-    dsc->magic_num = LV_FREETYPE_FONT_DSC_DEADBEEF;
-    lv_freetype_drop_face_id(dsc->context, dsc->face_id);
+    lv_memzero(dsc, sizeof(lv_freetype_font_dsc_t));
     lv_free(dsc);
 }
 
