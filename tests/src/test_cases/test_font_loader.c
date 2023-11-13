@@ -179,7 +179,6 @@ void test_font_loader_reload(void)
     lv_font_free(&font);
 }
 
-
 static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
 {
     TEST_ASSERT_NOT_NULL_MESSAGE(f1, "font not null");
@@ -325,4 +324,3 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
  **********************/
 
 #endif // LV_BUILD_TEST
-
