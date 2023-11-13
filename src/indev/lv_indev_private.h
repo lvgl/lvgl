@@ -32,10 +32,6 @@ struct _lv_indev_t {
     /**< Function pointer to read input device data.*/
     lv_indev_read_cb_t read_cb;
 
-    /** Called when an action happened on the input device.
-     * The second parameter is the event structure pointer*/
-    void (*feedback_cb)(struct _lv_indev_t * indev, struct _lv_event_t * e);
-
     lv_indev_state_t state; /**< Current state of the input device.*/
 
     /*Flags*/
@@ -105,6 +101,8 @@ struct _lv_indev_t {
     struct _lv_group_t * group;    /**< Keypad destination group*/
     const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
                                       here by the buttons*/
+
+    lv_event_list_t event_list;
 };
 /**********************
  * GLOBAL PROTOTYPES
