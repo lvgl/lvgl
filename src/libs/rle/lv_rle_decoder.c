@@ -301,7 +301,7 @@ static inline lv_res_t decode_from_file(lv_image_decoder_t * decoder,
         goto error_file;
     }
 
-    img_buf = lv_malloc(buf_len);
+    img_buf = lv_draw_buf_malloc(buf_len, header->cf);
     if(img_buf == NULL) {
         LV_LOG_ERROR("alloc img buf failed: %" LV_PRId32, buf_len);
         goto error_file;
