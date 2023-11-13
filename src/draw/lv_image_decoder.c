@@ -456,6 +456,15 @@ lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_imag
                 decode_indexed_line(cf, dsc->palette, 0, y, img_dsc->header.w, in, out);
             }
         }
+        else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
+            /*Alpha only image will need decoder data to store pointer to decoded image, to free it when decoder closes*/
+            lv_image_decoder_built_in_data_t * decoder_data = get_decoder_data(dsc);
+            if(decoder_data == NULL) {
+                return LV_RESULT_INVALID;
+            }
+
+            return decode_alpha_only(decoder, dsc);
+        }
         else {
             /*In case of uncompressed formats the image stored in the ROM/RAM.
              *So simply give its pointer*/
@@ -770,11 +779,17 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
         return LV_RESULT_INVALID;
     }
 
-    res = fs_read_file_at(decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
-    if(res != LV_FS_RES_OK || rn != file_len) {
-        LV_LOG_WARN("Built-in image decoder can't read the palette");
-        lv_draw_buf_free(img_data);
-        return LV_RESULT_INVALID;
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
+        res = fs_read_file_at(&decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
+        if(res != LV_FS_RES_OK || rn != file_len) {
+            LV_LOG_WARN("Built-in image decoder can't read the palette");
+            lv_draw_buf_free(img_data);
+            return LV_RESULT_INVALID;
+        }
+    }
+    else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
+        /*Copy from image data*/
+        lv_memcpy(img_data, ((lv_image_dsc_t *)dsc->src)->data, file_len);
     }
 
     if(dsc->header.cf != LV_COLOR_FORMAT_A8) {
@@ -784,7 +799,22 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
         uint8_t mask = (1 << bpp) - 1;
         uint8_t shift = 0;
         for(uint32_t i = 0; i < buf_len; i++) {
-            *out = ((*in >> shift) & mask) << (8 - bpp);
+            /**
+             * Rounding error:
+             * Take bpp = 4 as example, alpha value of 0x0 to 0x0F should be
+             * mapped to 0x00 to 0xFF, thus the equation should be below Equation 3.
+             *
+             * But it involves division and multiplication, which is slow. So, if
+             * we ignore the rounding errors, Equation1, 2 could be faster. But it
+             * will either has error when alpha is 0xff or 0x00.
+             *
+             * We use Equation 3 here for maximum accuracy.
+             *
+             * Equation 1: *out = ((*in >> shift) & mask) << (8 - bpp);
+             * Equation 2: *out = ((((*in >> shift) & mask) + 1) << (8 - bpp)) - 1;
+             * Equation 3: *out = ((*in >> shift) & mask) * 255 / ((1L << bpp) - 1) ;
+             */
+            *out = ((*in >> shift) & mask) * 255L / ((1L << bpp) - 1) ;
             shift += bpp;
             if(shift >= 8) {
                 shift = 0;
