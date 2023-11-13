@@ -90,6 +90,17 @@ static inline void lv_global_init(lv_global_t * global)
 #endif
 }
 
+static inline void _lv_cleanup_devices(lv_global_t * global)
+{
+    LV_ASSERT_NULL(global);
+
+    if(global) {
+        /* cleanup indev and display */
+        _lv_ll_clear_custom(&(global->indev_ll), (void (*)(void *)) lv_indev_delete);
+        _lv_ll_clear_custom(&(global->disp_ll), (void (*)(void *)) lv_display_remove);
+    }
+}
+
 bool lv_is_initialized(void)
 {
 #if LV_ENABLE_GLOBAL_CUSTOM
@@ -285,9 +296,14 @@ void lv_deinit(void)
         LV_LOG_WARN("lv_deinit: already deinit!");
         return;
     }
-#if LV_ENABLE_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
     lv_display_set_default(NULL);
+
+    _lv_cleanup_devices(LV_GLOBAL_DEFAULT());
+
+#if LV_USE_SPAN != 0
+    lv_span_stack_deinit();
+#endif
 
 #if LV_USE_DRAW_SW
     lv_draw_sw_deinit();
@@ -355,17 +371,8 @@ void lv_deinit(void)
     lv_profiler_builtin_uninit();
 #endif
 
-#if LV_USE_SPAN != 0
-    lv_span_stack_deinit();
-#endif
-
-#if LV_USE_LOG
-    lv_log_register_print_cb(NULL);
-#endif
-
 #if LV_USE_OBJ_ID_BUILTIN
     lv_objid_builtin_destroy();
-#endif
 #endif
 
     lv_mem_deinit();
@@ -373,6 +380,11 @@ void lv_deinit(void)
     lv_initialized = false;
 
     LV_LOG_INFO("lv_deinit done");
+
+#if LV_USE_LOG
+    lv_log_register_print_cb(NULL);
+#endif
+
 }
 
 /**********************
