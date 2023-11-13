@@ -18,6 +18,9 @@ on:
     - cron: '0 0 * * *'
   pull_request:
     branches: '*'
+  push:
+    branches: '*'
+
 
 jobs:
   analyze:
@@ -84,7 +87,7 @@ jobs:
         upload: false
       id: step1
 
-    # Filter out rules with low severity or high false positve rate
+    # Filter out rules with low severity or high false positive rate
     # Also filter out warnings in third-party code
     - name: Filter out unwanted errors and warnings
       uses: advanced-security/filter-sarif@v1
