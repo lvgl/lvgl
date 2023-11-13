@@ -23,7 +23,7 @@
  **********************/
 
 typedef struct {
-    lv_fs_file_t f;
+    lv_fs_file_t * f;
     lv_color32_t * palette;
     uint8_t * img_data;
     lv_opa_t * opa;
@@ -359,13 +359,29 @@ static lv_image_decoder_built_in_data_t * get_decoder_data(lv_image_decoder_dsc_
     return data;
 }
 
+static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
+{
+    lv_image_decoder_built_in_data_t * decoder_data = dsc->user_data;
+    if(decoder_data) {
+        if(decoder_data->f) {
+            lv_fs_close(decoder_data->f);
+            lv_free(decoder_data->f);
+        }
+
+        lv_draw_buf_free(decoder_data->img_data);
+        lv_free(decoder_data->palette);
+        lv_free(decoder_data);
+        dsc->user_data = NULL;
+    }
+}
+
 static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
     lv_result_t res;
     uint32_t rn;
     lv_image_decoder_built_in_data_t * decoder_data = dsc->user_data;
-    lv_fs_file_t * f = &decoder_data->f;
+    lv_fs_file_t * f = decoder_data->f;
     lv_color_format_t cf = dsc->header.cf;
 
     /*read palette for indexed image*/
@@ -386,8 +402,6 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 
     dsc->palette = palette;
     dsc->palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(cf);
-
-    decoder_data->palette = palette; /*Free decoder data on close*/
 
 #if LV_BIN_DECODER_RAM_LOAD
     uint32_t stride = dsc->header.stride;
@@ -433,6 +447,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     dsc->header.cf = LV_COLOR_FORMAT_ARGB8888;
     dsc->img_data = img_data;
     decoder_data->img_data = img_data; /*Free when decoder closes*/
+    decoder_data->palette = palette; /*Free decoder data on close*/
     lv_draw_buf_free(file_buf);
 
     return LV_RESULT_OK;
@@ -453,7 +468,7 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
     LV_UNUSED(decoder);
     lv_result_t res;
     lv_image_decoder_built_in_data_t * decoder_data = dsc->user_data;
-    lv_fs_file_t * f = &decoder_data->f;
+    lv_fs_file_t * f = decoder_data->f;
     lv_color_format_t cf = dsc->header.cf;
 
     uint32_t len = dsc->header.stride * dsc->header.h;
@@ -501,7 +516,7 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
         return LV_RESULT_INVALID;
     }
 
-    res = fs_read_file_at(&decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
+    res = fs_read_file_at(decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
     if(res != LV_FS_RES_OK || rn != file_len) {
         LV_LOG_WARN("Built-in image decoder can't read the palette");
         lv_draw_buf_free(img_data);
@@ -546,21 +561,28 @@ lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_imag
         /*Support only "*.bin" files*/
         if(strcmp(lv_fs_get_ext(dsc->src), "bin")) return LV_RESULT_INVALID;
 
-        lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->src, LV_FS_MODE_RD);
-        if(res != LV_FS_RES_OK) {
-            LV_LOG_WARN("open file failed");
-            return LV_RESULT_INVALID;
-        }
-
         /*If the file was open successfully save the file descriptor*/
         lv_image_decoder_built_in_data_t * decoder_data = get_decoder_data(dsc);
         if(decoder_data == NULL) {
             return LV_RESULT_INVALID;
         }
 
-        lv_memcpy(&decoder_data->f, &f, sizeof(f));
         dsc->user_data = decoder_data;
+        lv_fs_file_t * f = lv_malloc(sizeof(*f));
+        if(f == NULL) {
+            free_decoder_data(dsc);
+            return LV_RESULT_INVALID;
+        }
+
+        lv_fs_res_t res = lv_fs_open(f, dsc->src, LV_FS_MODE_RD);
+        if(res != LV_FS_RES_OK) {
+            LV_LOG_WARN("open file failed");
+            lv_free(f);
+            free_decoder_data(dsc);
+            return LV_RESULT_INVALID;
+        }
+
+        decoder_data->f = f;
 
         lv_color_format_t cf = dsc->header.cf;
 
@@ -587,8 +609,7 @@ lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_imag
 #endif
 
         if(res != LV_RESULT_OK) {
-            lv_fs_close(&f);
-            lv_memzero(&decoder_data->f, sizeof(decoder_data->f));
+            free_decoder_data(dsc);
         }
 
         return res;
@@ -653,16 +674,7 @@ lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_imag
 void lv_image_decoder_built_in_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
-    lv_image_decoder_built_in_data_t * decoder_data = dsc->user_data;
-    if(decoder_data) {
-        if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-            lv_fs_close(&decoder_data->f);
-        }
-
-        lv_draw_buf_free(decoder_data->img_data);
-        lv_free(decoder_data->palette);
-        lv_free(decoder_data);
-    }
+    free_decoder_data(dsc);
 }
 
 lv_result_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
@@ -683,7 +695,7 @@ lv_result_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_
 
     lv_result_t res = LV_RESULT_INVALID;
     lv_image_decoder_built_in_data_t * decoder_data = dsc->user_data;
-    lv_fs_file_t * f = &decoder_data->f;
+    lv_fs_file_t * f = decoder_data->f;
     uint32_t bpp = lv_color_format_get_bpp(cf);
     int32_t w_px = lv_area_get_width(full_area);
     uint8_t * img_data = NULL;
