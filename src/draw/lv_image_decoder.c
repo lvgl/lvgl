@@ -780,7 +780,7 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
     }
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        res = fs_read_file_at(&decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
+        res = fs_read_file_at(decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
         if(res != LV_FS_RES_OK || rn != file_len) {
             LV_LOG_WARN("Read header failed: %d", res);
             lv_draw_buf_free(img_data);
