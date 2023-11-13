@@ -71,7 +71,7 @@ void _lv_image_decoder_init(void)
     decoder = lv_image_decoder_create();
     LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) {
-        LV_LOG_WARN("out of memory");
+        LV_LOG_WARN("Out of memory");
         return;
     }
 
@@ -143,7 +143,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         dsc->src = lv_malloc(fnlen + 1);
         LV_ASSERT_MALLOC(dsc->src);
         if(dsc->src == NULL) {
-            LV_LOG_WARN("out of memory");
+            LV_LOG_WARN("Out of memory");
             return LV_RESULT_INVALID;
         }
         lv_strcpy((char *)dsc->src, src);
@@ -327,7 +327,7 @@ lv_result_t lv_image_decoder_built_in_info(lv_image_decoder_t * decoder, const v
             res = lv_fs_read(&f, header, sizeof(lv_image_header_t), &rn);
             lv_fs_close(&f);
             if(res != LV_FS_RES_OK || rn != sizeof(lv_image_header_t)) {
-                LV_LOG_WARN("Image get info get read file header");
+                LV_LOG_WARN("Read file header failed: %d", res);
                 return LV_RESULT_INVALID;
             }
         }
@@ -378,7 +378,7 @@ lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_imag
 
         lv_fs_res_t res = lv_fs_open(f, dsc->src, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) {
-            LV_LOG_WARN("open file failed");
+            LV_LOG_WARN("Open file failed: %d", res);
             lv_free(f);
             free_decoder_data(dsc);
             return LV_RESULT_INVALID;
@@ -612,7 +612,7 @@ static lv_image_decoder_built_in_data_t * get_decoder_data(lv_image_decoder_dsc_
         data = lv_malloc_zeroed(sizeof(lv_image_decoder_built_in_data_t));
         LV_ASSERT_MALLOC(data);
         if(data == NULL) {
-            LV_LOG_ERROR("out of memory");
+            LV_LOG_ERROR("Out of memory");
             return NULL;
         }
 
@@ -652,13 +652,13 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     lv_color32_t * palette = lv_malloc(palette_len);
     LV_ASSERT_MALLOC(palette);
     if(palette == NULL) {
-        LV_LOG_ERROR("out of memory");
+        LV_LOG_ERROR("Out of memory");
         return LV_RESULT_INVALID;
     }
 
     res = fs_read_file_at(f, sizeof(lv_image_header_t), (uint8_t *)palette, palette_len, &rn);
     if(res != LV_FS_RES_OK || rn != palette_len) {
-        LV_LOG_WARN("read palette failed");
+        LV_LOG_WARN("Read palette failed: %d", res);
         lv_free(palette);
         return LV_RESULT_INVALID;
     }
@@ -671,14 +671,14 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     uint8_t * file_buf = lv_draw_buf_malloc(stride * dsc->header.h, cf);
     LV_ASSERT_MALLOC(file_buf);
     if(file_buf == NULL) {
-        LV_LOG_ERROR("draw buffer alloc failed");
+        LV_LOG_ERROR("Draw buffer alloc failed");
         return LV_RESULT_INVALID;
     }
 
     uint32_t data_len = 0;
     if(lv_fs_seek(f, 0, LV_FS_SEEK_END) != LV_FS_RES_OK ||
        lv_fs_tell(f, &data_len) != LV_FS_RES_OK) {
-        LV_LOG_WARN("failed to get file to size");
+        LV_LOG_WARN("Failed to get file to size");
         goto exit_with_buf;
     }
 
@@ -686,7 +686,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     data_len -= data_offset;
     res = fs_read_file_at(f, data_offset, (uint8_t *)file_buf, data_len, &rn);
     if(res != LV_FS_RES_OK || rn != data_len) {
-        LV_LOG_WARN("read palette failed");
+        LV_LOG_WARN("Read indexed image failed: %d", res);
         goto exit_with_buf;
     }
 
@@ -694,7 +694,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     stride = lv_draw_buf_width_to_stride(dsc->header.w, LV_COLOR_FORMAT_ARGB8888);
     uint8_t * img_data = lv_draw_buf_malloc(stride * dsc->header.h, cf);
     if(img_data == NULL) {
-        LV_LOG_ERROR("no memory for indexed image");
+        LV_LOG_ERROR("No memory for indexed image");
         goto exit_with_buf;
     }
 
@@ -742,14 +742,14 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
     uint8_t * img_data = lv_draw_buf_malloc(len, cf);
     LV_ASSERT_MALLOC(img_data);
     if(img_data == NULL) {
-        LV_LOG_ERROR("no memory for rgb file read");
+        LV_LOG_ERROR("No memory for rgb file read");
         return LV_RESULT_INVALID;
     }
 
     uint32_t rn;
     res = fs_read_file_at(f, sizeof(lv_image_header_t), img_data, len, &rn);
     if(res != LV_FS_RES_OK || rn != len) {
-        LV_LOG_WARN("read rgb file failed");
+        LV_LOG_WARN("Read rgb file failed: %d", res);
         lv_draw_buf_free(img_data);
         return LV_RESULT_INVALID;
     }
@@ -775,14 +775,14 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
 
     LV_ASSERT_MALLOC(img_data);
     if(img_data == NULL) {
-        LV_LOG_ERROR("out of memory");
+        LV_LOG_ERROR("Out of memory");
         return LV_RESULT_INVALID;
     }
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         res = fs_read_file_at(&decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
         if(res != LV_FS_RES_OK || rn != file_len) {
-            LV_LOG_WARN("Built-in image decoder can't read the palette");
+            LV_LOG_WARN("Read header failed: %d", res);
             lv_draw_buf_free(img_data);
             return LV_RESULT_INVALID;
         }
