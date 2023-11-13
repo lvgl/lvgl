@@ -79,13 +79,6 @@ void lv_x11_inputs_create(lv_display_t * disp, lv_image_dsc_t const * mouse_img)
  */
 lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t ver_res);
 
-/**
- * set optional application callback to get informed on X11 window close event (to cleanup application)
- * @param[in] disp      the created X11 display object from @lv_x11_window_create
- * @param[in] close_cb  callback funtion to be called
- */
-void lv_x11_window_set_close_cb(lv_display_t * disp, lv_x11_close_cb close_cb, void * user_data);
-
 #endif /* LV_USE_X11 */
 
 #ifdef __cplusplus

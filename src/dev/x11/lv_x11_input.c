@@ -133,6 +133,18 @@ static void x11_inp_event_handler(lv_timer_t * t)
 }
 
 /**
+ * event callbed by lvgl display if display has been closed (@ref lv_display_remove has been called)
+ * @param[in] e  event data, containing lv_display_t object
+ */
+static void x11_inp_delete_evt_cb(lv_event_t * e)
+{
+    x11_inp_data_t * xd = (x11_inp_data_t *)lv_event_get_user_data(e);
+
+    lv_timer_delete(xd->timer);
+    lv_free(xd);
+}
+
+/**
  * create the local data/timers for the X11 input functionality.
  * extracts the user data information from lv_display_t object and initializes the input user object on 1st use.
  * @param[in] disp   the created X11 display object from @lv_x11_window_create
@@ -151,6 +163,7 @@ static x11_inp_data_t * x11_input_get_user_data(lv_display_t * disp)
         if(NULL != *inp_data) {
             /* initialize timer callback for X11 kb/mouse input event reading */
             (*inp_data)->timer = lv_timer_create(x11_inp_event_handler, 1, disp);
+            lv_display_add_event(disp, x11_inp_delete_evt_cb, LV_EVENT_DELETE, *inp_data);
         }
     }
     return *inp_data;

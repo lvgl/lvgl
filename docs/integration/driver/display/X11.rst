@@ -1,0 +1,113 @@
+=======
+X11
+=======
+
+Overview
+-------------
+
+The `X11 display/input driver <https://github.com/lvgl/lvgl/src/dev/x11>`__ offers support for simulating the LVGL display
+in a X11 desktop window. It is an alternative to Wayland, XCB, SDL or Qt.
+
+The main purpose for this display driver is for testing/debugging the LVGL application in a Linux simulation window.
+
+
+Prerequisites
+-------------
+
+The X11 display driver uses XLib to access the linux window manager.
+
+1. Install XLib: ``sudo apt-get install libx11-6`` (should be installed already)
+2. Install XLib development package: ``sudo apt-get install libx11-dev``
+
+
+Configure X11 display driver
+----------------------------
+
+1. Enable the X11 display driver support in lv_conf.h, by cmake compiler define or by KConfig
+    .. code:: c
+
+        #define LV_USE_X11  1
+
+2. Optional configuration options:
+    -  Double buffering
+        .. code:: c
+
+            #define LV_X11_DOUBLE_BUFFER  1 /*preferred default*/
+            // or
+            #define LV_X11_DOUBLE_BUFFER  0 /*not recommended*/
+
+    - Render mode
+        .. code:: c
+
+            #define LV_X11_RENDER_MODE     LV_DISPLAY_RENDER_MODE_PARTIAL /*preferred default*/
+            // or
+            #define LV_X11_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT  /*not recommended*/
+            // or
+            #define LV_X11_RENDER_MODE     LV_DISPLAY_RENDER_MODE_FULL    /*not recommended*/
+
+Usage
+-----
+
+The minimal initialisation (e.g. in main.c):
+
+.. code:: c
+
+    int main(int argc, char ** argv)
+    {
+        ...
+
+        /* initialize X11 display driver */
+        lv_disp_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+
+        /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
+        lv_x11_inputs_create(disp, NULL);
+
+        ...
+
+        while(true)
+        {
+            ...
+
+            /* Periodically call the lv_task handler */
+            lv_task_handler();
+        }
+    }
+
+Full initialisation with mouse pointer symbol and application close callback
+
+.. code:: c
+
+    bool terminated = false;
+
+    static void on_close_cb(lv_event_t * e)
+    {
+        ...
+
+        terminate = true;
+    }
+
+    int main(int argc, char ** argv)
+    {
+        ...
+
+        /* initialize X11 display driver */
+        lv_disp_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+        lv_display_add_event(disp, on_close_cb, LV_EVENT_DELETE, disp);
+
+        /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
+        LV_IMG_DECLARE(my_mouse_cursor_icon);
+        lv_x11_inputs_create(disp, &my_mouse_cursor_icon);
+
+        /* set window close callback to terminate application properly */
+        lv_x11_window_set_close_cb(disp, on_close_cb, disp);
+
+        ...
+
+        while(!terminated)
+        {
+            ...
+
+            /* Periodically call the lv_task handler */
+            lv_task_handler();
+        }
+    }

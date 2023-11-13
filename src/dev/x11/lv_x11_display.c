@@ -43,8 +43,6 @@ typedef struct {
     lv_timer_t   *  timer;           /**< timer object for @ref x11_event_handler */
     lv_color_t   *  buffer[2];       /**< (double) lv display buffers, depending on @ref LV_X11_RENDER_MODE */
     lv_area_t       flush_area;      /**< integrated area for a display update */
-    lv_x11_close_cb close_cb;        /**< optional user close callback (called on @ref wmDeleteMessage event) */
-    void      *     close_cb_data;   /**< user data for optional user close callback */
     /* systemtick by thread related information */
     pthread_t       thr_tick;        /**< pthread for SysTick simulation */
     bool            terminated;      /**< flag to germinate SysTick simulation thread */
@@ -257,9 +255,8 @@ static void x11_event_handler(lv_timer_t * t)
                     xd->terminated = true;
                     void * ret = NULL;
                     pthread_join(xd->thr_tick, &ret);
-                    if(NULL != xd->close_cb) {
-                        xd->close_cb(xd->close_cb_data);
-                    }
+                    lv_display_remove(disp);
+                    return;
                 }
                 break;
             case MapNotify:
@@ -371,14 +368,6 @@ lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t
     pthread_create(&xd->thr_tick, NULL, x11_tick_thread, xd);
 
     return disp;
-}
-
-void lv_x11_window_set_close_cb(lv_display_t * disp, lv_x11_close_cb close_cb, void * user_data)
-{
-    x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
-    xd->close_cb = close_cb;
-    xd->close_cb_data = user_data;
 }
 
 #endif /*LV_USE_X11*/
