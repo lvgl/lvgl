@@ -172,7 +172,8 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
     return buffer; /*Or NULL if not found*/
 }
 
-static lv_result_t lv_tiny_ttf_create(lv_font_t * out_font, const char * path, const void * data, size_t data_size, int32_t font_size,
+static lv_result_t lv_tiny_ttf_create(lv_font_t * out_font, const char * path, const void * data, size_t data_size,
+                                      int32_t font_size,
                                       size_t cache_size)
 {
     LV_UNUSED(data_size);
@@ -231,7 +232,8 @@ lv_result_t lv_tiny_ttf_create_file(lv_font_t * font, const char * path, int32_t
     return lv_tiny_ttf_create(font, path, NULL, 0, font_size, 0);
 }
 #endif
-lv_result_t lv_tiny_ttf_create_data_ex(lv_font_t * font, const void * data, size_t data_size, int32_t font_size, size_t cache_size)
+lv_result_t lv_tiny_ttf_create_data_ex(lv_font_t * font, const void * data, size_t data_size, int32_t font_size,
+                                       size_t cache_size)
 {
     return lv_tiny_ttf_create(font, NULL, data, data_size, font_size, cache_size);
 }
