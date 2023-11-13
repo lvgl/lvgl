@@ -18,7 +18,7 @@
 #define MY_CLASS &lv_obj_class
 #define style_refr LV_GLOBAL_DEFAULT()->style_refresh
 #define style_trans_ll_p &(LV_GLOBAL_DEFAULT()->style_trans_ll)
-#define style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
+#define _style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
 
 /**********************
  *      TYPEDEFS
@@ -82,6 +82,10 @@ void _lv_obj_style_init(void)
 void _lv_obj_style_deinit(void)
 {
     _lv_ll_clear(style_trans_ll_p);
+    if(_style_custom_prop_flag_lookup_table != NULL) {
+        lv_free(_style_custom_prop_flag_lookup_table);
+        _style_custom_prop_flag_lookup_table = NULL;
+    }
 }
 
 void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
@@ -399,13 +403,15 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     }
 
     extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
-    bool inheritable;
+    bool inheritable = false;
     if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS) {
         inheritable = _lv_style_builtin_prop_flag_lookup_table[prop] & LV_STYLE_PROP_FLAG_INHERITABLE;
     }
     else {
-        inheritable = style_custom_prop_flag_lookup_table[prop - _LV_STYLE_NUM_BUILT_IN_PROPS] &
-                      LV_STYLE_PROP_FLAG_INHERITABLE;
+        if(_style_custom_prop_flag_lookup_table != NULL) {
+            inheritable = _style_custom_prop_flag_lookup_table[prop - _LV_STYLE_NUM_BUILT_IN_PROPS] &
+                          LV_STYLE_PROP_FLAG_INHERITABLE;
+        }
     }
 
     if(inheritable) {
