@@ -159,6 +159,9 @@ void test_image_built_in_decode_rotate_and_recolor(void)
 
 void test_image_rle_decode(void)
 {
+    img_create("rleA1", "A:src/test_files/binimages/cogwheel.A1.rle", false, false);
+    img_create("rleA2", "A:src/test_files/binimages/cogwheel.A2.rle", false, false);
+    img_create("rleA4", "A:src/test_files/binimages/cogwheel.A4.rle", false, false);
     img_create("rleA8", "A:src/test_files/binimages/cogwheel.A8.rle", false, false);
     img_create("rleI1", "A:src/test_files/binimages/cogwheel.I1.rle", false, false);
     img_create("rleI2", "A:src/test_files/binimages/cogwheel.I2.rle", false, false);
@@ -175,6 +178,9 @@ void test_image_rle_decode(void)
 
 void test_image_rle_decode_rotate(void)
 {
+    img_create("rleA1", "A:src/test_files/binimages/cogwheel.A1.rle", true, false);
+    img_create("rleA2", "A:src/test_files/binimages/cogwheel.A2.rle", true, false);
+    img_create("rleA4", "A:src/test_files/binimages/cogwheel.A4.rle", true, false);
     img_create("rleA8", "A:src/test_files/binimages/cogwheel.A8.rle", true, false);
     img_create("rleI1", "A:src/test_files/binimages/cogwheel.I1.rle", true, false);
     img_create("rleI2", "A:src/test_files/binimages/cogwheel.I2.rle", true, false);
@@ -191,6 +197,9 @@ void test_image_rle_decode_rotate(void)
 
 void test_image_rle_decode_rotate_recolor(void)
 {
+    img_create("rleA1", "A:src/test_files/binimages/cogwheel.A1.rle", true, true);
+    img_create("rleA2", "A:src/test_files/binimages/cogwheel.A2.rle", true, true);
+    img_create("rleA4", "A:src/test_files/binimages/cogwheel.A4.rle", true, true);
     img_create("rleA8", "A:src/test_files/binimages/cogwheel.A8.rle", true, true);
     img_create("rleI1", "A:src/test_files/binimages/cogwheel.I1.rle", true, true);
     img_create("rleI2", "A:src/test_files/binimages/cogwheel.I2.rle", true, true);
