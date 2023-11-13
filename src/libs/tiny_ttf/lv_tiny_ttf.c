@@ -172,26 +172,26 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
     return buffer; /*Or NULL if not found*/
 }
 
-static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size, int32_t font_size,
+static lv_result_t lv_tiny_ttf_create(lv_font_t * out_font, const char * path, const void * data, size_t data_size, int32_t font_size,
                                       size_t cache_size)
 {
     LV_UNUSED(data_size);
     LV_UNUSED(cache_size);
     if((path == NULL && data == NULL) || 0 >= font_size) {
         LV_LOG_ERROR("tiny_ttf: invalid argument\n");
-        return NULL;
+        return LV_RESULT_INVALID;
     }
     ttf_font_desc_t * dsc = lv_malloc_zeroed(sizeof(ttf_font_desc_t));
     if(dsc == NULL) {
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
-        return NULL;
+        return LV_RESULT_INVALID;
     }
 #if LV_TINY_TTF_FILE_SUPPORT != 0
     if(path != NULL) {
         if(LV_FS_RES_OK != lv_fs_open(&dsc->file, path, LV_FS_MODE_RD)) {
             lv_free(dsc);
             LV_LOG_ERROR("tiny_ttf: unable to open %s\n", path);
-            return NULL;
+            return LV_RESULT_INVALID;
         }
         dsc->stream.file = &dsc->file;
     }
@@ -202,7 +202,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     if(0 == stbtt_InitFont(&dsc->info, &dsc->stream, stbtt_GetFontOffsetForIndex(&dsc->stream, 0))) {
         lv_free(dsc);
         LV_LOG_ERROR("tiny_ttf: init failed\n");
-        return NULL;
+        return LV_RESULT_INVALID;
     }
 
 #else
@@ -210,39 +210,34 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     if(0 == stbtt_InitFont(&dsc->info, dsc->stream, stbtt_GetFontOffsetForIndex(dsc->stream, 0))) {
         lv_free(dsc);
         LV_LOG_ERROR("tiny_ttf: init failed\n");
-        return NULL;
+        return LV_RESULT_INVALID;
     }
 #endif
 
-    lv_font_t * out_font = lv_malloc_zeroed(sizeof(lv_font_t));
-    if(out_font == NULL) {
-        lv_free(dsc);
-        LV_LOG_ERROR("tiny_ttf: out of memory\n");
-        return NULL;
-    }
+    lv_memzero(out_font, sizeof(lv_font_t));
     out_font->get_glyph_dsc = ttf_get_glyph_dsc_cb;
     out_font->get_glyph_bitmap = ttf_get_glyph_bitmap_cb;
     out_font->dsc = dsc;
     lv_tiny_ttf_set_size(out_font, font_size);
-    return out_font;
+    return LV_RESULT_OK;
 }
 #if LV_TINY_TTF_FILE_SUPPORT != 0
-lv_font_t * lv_tiny_ttf_create_file_ex(const char * path, int32_t font_size, size_t cache_size)
+lv_result_t lv_tiny_ttf_create_file_ex(lv_font_t * font, const char * path, int32_t font_size, size_t cache_size)
 {
-    return lv_tiny_ttf_create(path, NULL, 0, font_size, cache_size);
+    return lv_tiny_ttf_create(font, path, NULL, 0, font_size, cache_size);
 }
-lv_font_t * lv_tiny_ttf_create_file(const char * path, int32_t font_size)
+lv_result_t lv_tiny_ttf_create_file(lv_font_t * font, const char * path, int32_t font_size)
 {
-    return lv_tiny_ttf_create(path, NULL, 0, font_size, 0);
+    return lv_tiny_ttf_create(font, path, NULL, 0, font_size, 0);
 }
 #endif
-lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size, size_t cache_size)
+lv_result_t lv_tiny_ttf_create_data_ex(lv_font_t * font, const void * data, size_t data_size, int32_t font_size, size_t cache_size)
 {
-    return lv_tiny_ttf_create(NULL, data, data_size, font_size, cache_size);
+    return lv_tiny_ttf_create(font, NULL, data, data_size, font_size, cache_size);
 }
-lv_font_t * lv_tiny_ttf_create_data(const void * data, size_t data_size, int32_t font_size)
+lv_result_t lv_tiny_ttf_create_data(lv_font_t * font, const void * data, size_t data_size, int32_t font_size)
 {
-    return lv_tiny_ttf_create(NULL, data, data_size, font_size, 0);
+    return lv_tiny_ttf_create(font, NULL, data, data_size, font_size, 0);
 }
 void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
 {
@@ -269,7 +264,6 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
 #endif
             lv_free(ttf);
         }
-        lv_free(font);
     }
 }
 #endif
