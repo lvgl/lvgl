@@ -176,7 +176,7 @@ static void perf_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
     const lv_sysmon_perf_info_t * perf = lv_subject_get_pointer(subject);
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
-
+    LV_UNUSED(label);
     LV_LOG("sysmon: "
            "%" LV_PRIu32 " FPS (refr_cnt: %" LV_PRIu32 " | redraw_cnt: %" LV_PRIu32 " | flush_cnt: %" LV_PRIu32 "), "
            "refr %" LV_PRIu32 "ms (render %" LV_PRIu32 "ms | flush %" LV_PRIu32 "ms), "
@@ -230,10 +230,11 @@ static void sysmon_backend_init_async_cb(void * user_data)
 #if LV_USE_PERF_MONITOR
     lv_display_add_event(lv_display_get_default(), perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
 
-#if !LV_USE_PERF_MONITOR_LOG_MODE
     lv_obj_t * obj1 = lv_sysmon_create(lv_layer_sys());
     lv_obj_align(obj1, LV_USE_PERF_MONITOR_POS, 0, 0);
     lv_subject_add_observer_obj(&sysmon_perf.subject, perf_observer_cb, obj1, NULL);
+#if LV_USE_PERF_MONITOR_LOG_MODE
+    lv_obj_add_flag(obj1, LV_OBJ_FLAG_HIDDEN);
 #endif
 
 #endif
