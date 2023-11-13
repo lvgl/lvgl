@@ -39,7 +39,6 @@ typedef struct {
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static void window_create(lv_display_t * disp);
 static void window_update(lv_display_t * disp);
-static void clean_up(lv_display_t * disp);
 static void texture_resize(lv_display_t * disp);
 static void sdl_event_handler(lv_timer_t * t);
 static void release_disp_cb(lv_event_t * e);
@@ -243,16 +242,6 @@ static void sdl_event_handler(lv_timer_t * t)
     }
 }
 
-static void clean_up(lv_display_t * disp)
-{
-    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    SDL_DestroyTexture(dsc->texture);
-    SDL_DestroyRenderer(dsc->renderer);
-    SDL_DestroyWindow(dsc->window);
-
-    lv_free(dsc);
-}
-
 static void window_create(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
@@ -350,7 +339,14 @@ static void res_chg_event_cb(lv_event_t * e)
 static void release_disp_cb(lv_event_t * e)
 {
     lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
-    clean_up(disp);
+
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    SDL_DestroyTexture(dsc->texture);
+    SDL_DestroyRenderer(dsc->renderer);
+    SDL_DestroyWindow(dsc->window);
+
+    lv_free(dsc);
+    lv_display_set_driver_data(disp, NULL);
 }
 
 #endif /*LV_USE_SDL*/
