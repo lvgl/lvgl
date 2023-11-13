@@ -506,7 +506,6 @@ static inline lv_anim_t * lv_anim_custom_get(lv_anim_t * a, lv_anim_custom_exec_
  */
 uint16_t lv_anim_count_running(void);
 
-
 /**
  * Store the speed as a special value which can be used as time in animations.
  * It will be converted to time internally based on the start and end values
