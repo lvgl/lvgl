@@ -103,7 +103,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
             memcpy(&h, headers + 22, 4);
             header->w = w;
             header->h = h;
-            header->always_zero = 0;
             lv_fs_close(&f);
 
             uint16_t bpp;

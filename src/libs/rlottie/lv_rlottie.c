@@ -137,7 +137,6 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         memset(rlottie->allocated_buf, 0, allocaled_buf_size);
     }
 
-    rlottie->imgdsc.header.always_zero = 0;
     rlottie->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
     rlottie->imgdsc.header.h = create_info.height;
     rlottie->imgdsc.header.w = create_info.width;

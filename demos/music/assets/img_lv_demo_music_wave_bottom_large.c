@@ -246,7 +246,6 @@ img_lv_demo_music_wave_bottom_map[] = {
 };
 
 const lv_image_dsc_t img_lv_demo_music_wave_bottom = {
-    .header.always_zero = 0,
     .header.w = 479,
     .header.h = 74,
     .data_size = 35446 * LV_COLOR_DEPTH / 8,

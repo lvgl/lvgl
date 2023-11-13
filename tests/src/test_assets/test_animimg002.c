@@ -185,7 +185,6 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_ANIMIMG
 };
 
 const lv_image_dsc_t test_animimg002 = {
-    .header.always_zero = 0,
     .header.w = 130,
     .header.h = 170,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,

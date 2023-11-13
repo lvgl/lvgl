@@ -323,7 +323,6 @@ static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-    canvas->dsc.header.always_zero = 0;
     canvas->dsc.header.cf          = LV_COLOR_FORMAT_NATIVE;
     canvas->dsc.header.h           = 0;
     canvas->dsc.header.w           = 0;

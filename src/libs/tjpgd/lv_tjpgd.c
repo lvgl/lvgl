@@ -84,7 +84,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 
         if(is_jpg(raw_data, raw_sjpeg_data_size) == true) {
 #if LV_USE_FS_MEMFS
-            header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = img_dsc->header.w;
             header->h = img_dsc->header.h;
@@ -112,7 +111,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
                 lv_fs_close(&f);
                 return LV_RESULT_INVALID;
             }
-            header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = jd.width;
             header->h = jd.height;
@@ -184,7 +182,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     JRESULT rc = jd_prepare(jd, input_func, workb_temp, (size_t)TJPGD_WORKBUFF_SIZE, f);
     if(rc) return rc;
 
-    dsc->header.always_zero = 0;
     dsc->header.cf = LV_COLOR_FORMAT_RGB888;
     dsc->header.w = jd->width;
     dsc->header.h = jd->height;

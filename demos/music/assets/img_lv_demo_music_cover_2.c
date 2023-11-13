@@ -542,8 +542,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_cover_2_map[] = {
 #endif
 };
 
-lv_image_dsc_t img_lv_demo_music_cover_2 = {
-    .header.always_zero = 0,
+const lv_image_dsc_t img_lv_demo_music_cover_2 = {
     .header.w = 176,
     .header.h = 175,
     .data_size = 30800 * LV_COLOR_DEPTH / 8,
