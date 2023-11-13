@@ -526,7 +526,7 @@ static void scroll_anim_y_cb(void * var, int32_t v)
 
 static void scroll_anim(lv_obj_t * obj, int32_t y_max)
 {
-    uint32_t t = lv_anim_speed_to_time(lv_display_get_dpi(NULL), 0, y_max);
+    uint32_t t = lv_anim_speed(lv_display_get_dpi(NULL));
 
     lv_anim_t a;
     lv_anim_init(&a);

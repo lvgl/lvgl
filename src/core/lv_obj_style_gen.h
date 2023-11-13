@@ -597,12 +597,6 @@ static inline uint32_t lv_obj_get_style_anim_time(const struct _lv_obj_t * obj, 
     return (uint32_t)v.num;
 }
 
-static inline uint32_t lv_obj_get_style_anim_speed(const struct _lv_obj_t * obj, uint32_t part)
-{
-    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ANIM_SPEED);
-    return (uint32_t)v.num;
-}
-
 static inline const lv_style_transition_dsc_t * lv_obj_get_style_transition(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION);
@@ -804,7 +798,6 @@ void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_fi
 void lv_obj_set_style_color_filter_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim(struct _lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_time(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
-void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value,
                                  lv_style_selector_t selector);
 void lv_obj_set_style_blend_mode(struct _lv_obj_t * obj, lv_blend_mode_t value, lv_style_selector_t selector);
@@ -818,8 +811,7 @@ void lv_obj_set_style_flex_grow(struct _lv_obj_t * obj, uint8_t value, lv_style_
 void lv_obj_set_style_grid_column_dsc_array(struct _lv_obj_t * obj, const int32_t * value,
                                             lv_style_selector_t selector);
 void lv_obj_set_style_grid_column_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector);
-void lv_obj_set_style_grid_row_dsc_array(struct _lv_obj_t * obj, const int32_t * value,
-                                         lv_style_selector_t selector);
+void lv_obj_set_style_grid_row_dsc_array(struct _lv_obj_t * obj, const int32_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_grid_row_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector);
 void lv_obj_set_style_grid_cell_column_pos(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_grid_cell_x_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector);

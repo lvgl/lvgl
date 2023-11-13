@@ -506,14 +506,27 @@ static inline lv_anim_t * lv_anim_custom_get(lv_anim_t * a, lv_anim_custom_exec_
  */
 uint16_t lv_anim_count_running(void);
 
+
 /**
- * Calculate the time of an animation with a given speed and the start and end values
- * @param speed speed of animation in unit/sec
- * @param start     start value of the animation
- * @param end       end value of the animation
- * @return          the required time [ms] for the animation with the given parameters
+ * Store the speed as a special value which can be used as time in animations.
+ * It will be converted to time internally based on the start and end values
+ * @param speed         the speed of the animation in with 10 unit / sec resolution in 0..1023 range
+ * @return              a special value which can be used as an animation time
  */
-uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end);
+uint32_t lv_anim_speed(uint32_t speed);
+
+/**
+ * Store the speed as a special value which can be used as time in animations.
+ * It will be converted to time internally based on the start and end values
+ * @param speed         the speed of the animation in as unit / sec resolution in 0..10k range
+ * @param min_time      the minimum time in 0..10k range
+ * @param max_time      the maximum time in 0..10k range
+ * @return              a special value in where all three values are stored and can be used as an animation time
+ * @note                internally speed is stored as 10 unit/sec
+ * @note                internally min/max_time are stored with 10 ms unit
+ *
+ */
+uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_time);
 
 /**
  * Manually refresh the state of the animations.
