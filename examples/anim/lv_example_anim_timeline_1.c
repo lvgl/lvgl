@@ -187,6 +187,20 @@ void lv_example_anim_timeline_1(void)
 
     obj3 = lv_obj_create(par);
     lv_obj_set_size(obj3, obj_width, obj_height);
+
+
+    anim_timeline_create();
+
+    lv_anim_timeline_set_progress(anim_timeline, 32000);
+    lv_refr_now(NULL);
+    lv_anim_timeline_set_progress(anim_timeline, 65535);
+    lv_refr_now(NULL);
+    lv_anim_timeline_set_progress(anim_timeline, 50000);
+    lv_refr_now(NULL);
+    lv_anim_timeline_set_progress(anim_timeline, 60000);
+    lv_refr_now(NULL);
+
+
 }
 
 #endif
