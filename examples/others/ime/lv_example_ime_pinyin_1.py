@@ -15,7 +15,9 @@ def ta_event_cb(e,kb):
 
 fs_drv = lv.fs_drv_t()
 fs_driver.fs_register(fs_drv, 'S')
-font_simsun_16_cjk = lv.font_load("S:../../assets/font/lv_font_simsun_16_cjk.fnt")
+
+font_simsun_16_cjk = lv.font_t()
+lv.binfont_load(font_simsun_16_cjk, "S:../../assets/font/lv_font_simsun_16_cjk.fnt")
 if font_simsun_16_cjk == None:
     print("Error when loading chinese font")
 

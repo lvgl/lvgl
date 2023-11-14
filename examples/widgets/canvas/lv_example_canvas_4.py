@@ -39,7 +39,8 @@ if script_path != '':
         fs_driver.fs_register(fs_drv, 'S')
 
         print("Loading font montserrat_18")
-        font_montserrat_18 = lv.font_load("S:" + script_path + "/../../assets/font/montserrat-18.fnt")
+        font_montserrat_18 = lv.font_t()
+        lv.binfont_load(font_montserrat_18, "S:" + script_path + "/../../assets/font/montserrat-18.fnt")
         if not font_montserrat_18:
             print("Font loading failed")
         else:
