@@ -21,6 +21,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_conf_internal.h"
+
 #include "src/lv_init.h"
 
 #include "src/stdlib/lv_mem.h"
