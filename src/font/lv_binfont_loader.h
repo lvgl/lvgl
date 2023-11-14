@@ -1,5 +1,5 @@
 /**
- * @file lv_font_loader.h
+ * @file lv_binfont_loader.h
  *
  */
 
@@ -32,7 +32,7 @@ extern "C" {
  * @param path          path where the font file is located
  * @return              LV_RESULT_OK on success; LV_RESULT_INVALID on error
  */
-lv_result_t lv_font_load(lv_font_t * font, const char * font_name);
+lv_result_t lv_binfont_load(lv_font_t * font, const char * font_name);
 
 #if LV_USE_FS_MEMFS
 /**
@@ -43,12 +43,12 @@ lv_result_t lv_font_load(lv_font_t * font, const char * font_name);
  * @param size          size of the font file buffer
  * @return              LV_RESULT_OK on success; LV_RESULT_INVALID on error
  */
-lv_result_t lv_font_load_from_buffer(lv_font_t * font, void * buffer, uint32_t size);
+lv_result_t lv_binfont_load_from_buffer(lv_font_t * font, void * buffer, uint32_t size);
 #endif
 
 /**
- * Frees the memory allocated by the `lv_font_load()` function
- * @param font          lv_font_t object created by the lv_font_load function
+ * Frees the memory allocated by the `lv_binfont_load()` function
+ * @param font          lv_font_t object created by the lv_binfont_load function
  */
 void lv_font_free(lv_font_t * font);
 

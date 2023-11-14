@@ -1,5 +1,5 @@
 /**
- * @file lv_font_loader.c
+ * @file lv_binfont_loader.c
  *
  */
 
@@ -12,7 +12,7 @@
 
 #include "../lvgl.h"
 #include "../misc/lv_fs.h"
-#include "lv_font_loader.h"
+#include "lv_binfont_loader.h"
 
 /**********************
  *      TYPEDEFS
@@ -78,7 +78,7 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_font_load(lv_font_t * font, const char * path)
+lv_result_t lv_binfont_load(lv_font_t * font, const char * path)
 {
     LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(path);
@@ -109,12 +109,12 @@ lv_result_t lv_font_load(lv_font_t * font, const char * path)
 }
 
 #if LV_USE_FS_MEMFS
-lv_result_t lv_font_load_from_buffer(lv_font_t * font, void * buffer, uint32_t size)
+lv_result_t lv_binfont_load_from_buffer(lv_font_t * font, void * buffer, uint32_t size)
 {
     lv_fs_path_ex_t mempath;
 
     lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, buffer, size);
-    return lv_font_load(font, (const char *)&mempath);
+    return lv_binfont_load(font, (const char *)&mempath);
 }
 #endif
 

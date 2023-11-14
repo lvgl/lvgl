@@ -33,7 +33,7 @@
  *
  * The path object can be used at any place where a file path is required, e.g.:
  *
- * lv_font_t* my_font = lv_font_load((const char *) & mempath);
+ * lv_font_t* my_font = lv_binfont_load((const char *) & mempath);
  *
  */
 

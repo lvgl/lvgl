@@ -102,13 +102,13 @@ void test_font_loader_with_cache(void)
     /*Test with cache ('A' has cache)*/
     lv_result_t res;
 
-    res = lv_font_load(&font_1_bin, "A:src/test_assets/font_1.fnt");
+    res = lv_binfont_load(&font_1_bin, "A:src/test_assets/font_1.fnt");
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
-    res = lv_font_load(&font_2_bin, "A:src/test_assets/font_2.fnt");
+    res = lv_binfont_load(&font_2_bin, "A:src/test_assets/font_2.fnt");
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
-    res = lv_font_load(&font_3_bin, "A:src/test_assets/font_3.fnt");
+    res = lv_binfont_load(&font_3_bin, "A:src/test_assets/font_3.fnt");
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     common();
@@ -119,13 +119,13 @@ void test_font_loader_no_cache(void)
     /*Test without cache ('B' has NO cache)*/
     lv_result_t res;
 
-    res = lv_font_load(&font_1_bin, "B:src/test_assets/font_1.fnt");
+    res = lv_binfont_load(&font_1_bin, "B:src/test_assets/font_1.fnt");
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
-    res = lv_font_load(&font_2_bin, "B:src/test_assets/font_2.fnt");
+    res = lv_binfont_load(&font_2_bin, "B:src/test_assets/font_2.fnt");
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
-    res = lv_font_load(&font_3_bin, "B:src/test_assets/font_3.fnt");
+    res = lv_binfont_load(&font_3_bin, "B:src/test_assets/font_3.fnt");
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     common();
@@ -136,13 +136,13 @@ void test_font_loader_from_buffer(void)
     /*Test with memfs*/
     lv_result_t res;
 
-    res = lv_font_load_from_buffer(&font_1_bin, (void *)&font_1_buf, sizeof(font_1_buf));
+    res = lv_binfont_load_from_buffer(&font_1_bin, (void *)&font_1_buf, sizeof(font_1_buf));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
-    res = lv_font_load_from_buffer(&font_2_bin, (void *)&font_2_buf, sizeof(font_2_buf));
+    res = lv_binfont_load_from_buffer(&font_2_bin, (void *)&font_2_buf, sizeof(font_2_buf));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
-    res = lv_font_load_from_buffer(&font_3_bin, (void *)&font_3_buf, sizeof(font_3_buf));
+    res = lv_binfont_load_from_buffer(&font_3_bin, (void *)&font_3_buf, sizeof(font_3_buf));
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     common();
@@ -158,7 +158,7 @@ void test_font_loader_reload(void)
 
     lv_font_t font;
     lv_result_t res;
-    res = lv_font_load(&font, "A:src/test_assets/font_2.fnt");
+    res = lv_binfont_load(&font, "A:src/test_assets/font_2.fnt");
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     lv_obj_set_style_text_font(label, &font, 0);
@@ -167,7 +167,7 @@ void test_font_loader_reload(void)
 
     lv_font_free(&font);
 
-    res = lv_font_load(&font, "A:src/test_assets/font_3.fnt");
+    res = lv_binfont_load(&font, "A:src/test_assets/font_3.fnt");
     TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
 
     lv_obj_report_style_change(NULL);
