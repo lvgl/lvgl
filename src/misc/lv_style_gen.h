@@ -181,8 +181,6 @@ void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value);
 extern const lv_style_prop_t _lv_style_const_prop_id_ANIM;
 void lv_style_set_anim_time(lv_style_t * style, uint32_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_ANIM_TIME;
-void lv_style_set_anim_speed(lv_style_t * style, uint32_t value);
-extern const lv_style_prop_t _lv_style_const_prop_id_ANIM_SPEED;
 void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value);
 extern const lv_style_prop_t _lv_style_const_prop_id_TRANSITION;
 void lv_style_set_blend_mode(lv_style_t * style, lv_blend_mode_t value);
@@ -650,11 +648,6 @@ extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
 #define LV_STYLE_CONST_ANIM_TIME(val) \
     { \
         .prop_ptr = &_lv_style_const_prop_id_ANIM_TIME, .value = { .num = (int32_t)val } \
-    }
-
-#define LV_STYLE_CONST_ANIM_SPEED(val) \
-    { \
-        .prop_ptr = &_lv_style_const_prop_id_ANIM_SPEED, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_TRANSITION(val) \

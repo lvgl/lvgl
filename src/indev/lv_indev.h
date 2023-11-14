@@ -16,6 +16,7 @@ extern "C" {
 #include "../core/lv_group.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_timer.h"
+#include "../misc/lv_event.h"
 
 /*********************
  *      DEFINES
@@ -245,6 +246,47 @@ lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev);
  * @return pointer to the found object or NULL if there was no suitable object
  */
 struct _lv_obj_t * lv_indev_search_obj(struct _lv_obj_t * obj, lv_point_t * point);
+
+/**
+ * Add an event handler to the indev
+ * @param indev          pointer to an indev
+ * @param event_cb      an event callback
+ * @param filter        event code to react or `LV_EVENT_ALL`
+ * @param user_data     optional user_data
+ */
+void lv_indev_add_event(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+
+/**
+ * Get the number of event attached to an indev
+ * @param indev          pointer to an indev
+ * @return              number of events
+ */
+uint32_t lv_indev_get_event_count(lv_indev_t * indev);
+
+/**
+ * Get an event descriptor for an event
+ * @param indev          pointer to an indev
+ * @param index         the index of the event
+ * @return              the event descriptor
+ */
+lv_event_dsc_t * lv_indev_get_event_dsc(lv_indev_t * indev, uint32_t index);
+
+/**
+ * Remove an event
+ * @param indev         pointer to an indev
+ * @param index         the index of the event to remove
+ * @return              true: and event was removed; false: no event was removed
+ */
+bool lv_indev_remove_event(lv_indev_t * indev, uint32_t index);
+
+/**
+ * Send an event to an indev
+ * @param indev         pointer to an indev
+ * @param code          an event code. LV_EVENT_...
+ * @param param         optional param
+ * @return              LV_RESULT_OK: indev wasn't deleted in the event.
+ */
+lv_result_t lv_indev_send_event(lv_indev_t * indev, lv_event_code_t code, void * param);
 
 /**********************
  *      MACROS

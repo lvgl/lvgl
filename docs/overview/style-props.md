@@ -810,15 +810,6 @@ The animation time in milliseconds. Its meaning is widget specific. E.g. blink t
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### anim_speed
-The animation speed in pixel/sec. Its meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
 ### transition
 An initialized `lv_style_transition_dsc_t` to describe a transition.
 <ul>

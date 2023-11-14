@@ -188,7 +188,7 @@ void _lv_ll_remove(lv_ll_t * ll_p, void * node_p)
  * Remove and free all elements from a linked list. The list remain valid but become empty.
  * @param ll_p pointer to linked list
  */
-void _lv_ll_clear(lv_ll_t * ll_p)
+void _lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *))
 {
     void * i;
     void * i_next;
@@ -198,10 +198,13 @@ void _lv_ll_clear(lv_ll_t * ll_p)
 
     while(i != NULL) {
         i_next = _lv_ll_get_next(ll_p, i);
-
-        _lv_ll_remove(ll_p, i);
-        lv_free(i);
-
+        if(cleanup == NULL) {
+            _lv_ll_remove(ll_p, i);
+            lv_free(i);
+        }
+        else {
+            cleanup(i);
+        }
         i = i_next;
     }
 }

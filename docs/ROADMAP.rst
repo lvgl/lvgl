@@ -81,8 +81,7 @@ Drawing and rendering
 Animations
 ~~~~~~~~~~
 
-- |uncheck| Use `anim` events to replace many callbacks with one
-- |uncheck| `lv_anim_time_to_speed` should work differently to remove
+- |check| `lv_anim_time_to_speed` should work differently to remove
   `style_anim_speed`. E.g. on large values of anim time store the
   speed. Besides all widgets should use the `style_anim` property.
   `anim` should clamp the time if it's calculated from speed, e.g
