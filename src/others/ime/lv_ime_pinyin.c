@@ -829,6 +829,8 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
     uint16_t page_num = pinyin_ime->cand_num / LV_IME_PINYIN_CAND_TEXT_NUM;
     uint16_t remainder = pinyin_ime->cand_num % LV_IME_PINYIN_CAND_TEXT_NUM;
 
+    if (!pinyin_ime->cand_str) return;
+
     if(dir == 0) {
         if(pinyin_ime->py_page) {
             pinyin_ime->py_page--;
