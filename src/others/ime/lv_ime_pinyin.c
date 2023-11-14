@@ -963,7 +963,10 @@ static void pinyin_ime_clear_data(lv_obj_t * obj)
 #endif
 
     pinyin_ime->ta_count = 0;
-    lv_memzero(lv_pinyin_cand_str, (sizeof(lv_pinyin_cand_str)));
+    for(uint8_t i = 0; i < LV_IME_PINYIN_CAND_TEXT_NUM; i++) {
+        memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
+        lv_pinyin_cand_str[i][0] = ' ';
+    }
     lv_memzero(pinyin_ime->input_char, sizeof(pinyin_ime->input_char));
 
     lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
