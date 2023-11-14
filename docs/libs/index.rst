@@ -19,3 +19,4 @@
     barcode
     rlottie
     ffmpeg
+    rle

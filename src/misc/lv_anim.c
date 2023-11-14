@@ -36,6 +36,8 @@ static void anim_mark_list_change(void);
 static void anim_ready_handler(lv_anim_t * a);
 static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
                                          int32_t y1, int32_t x2, int32_t y2);
+static uint32_t convert_speed_to_time(uint32_t speed, int32_t start, int32_t end);
+static void resolve_time(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -104,6 +106,8 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
             new_anim->start_value += v_ofs;
             new_anim->end_value += v_ofs;
         }
+
+        resolve_time(new_anim);
 
         if(new_anim->exec_cb && new_anim->var) new_anim->exec_cb(new_anim->var, new_anim->start_value);
     }
@@ -194,16 +198,34 @@ uint16_t lv_anim_count_running(void)
     return cnt;
 }
 
-uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end)
+uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_time)
 {
-    uint32_t d    = LV_ABS(start - end);
-    uint32_t time = (d * 1000) / speed;
 
-    if(time == 0) {
-        time++;
+    if(speed > 10000) {
+        LV_LOG_WARN("speed is truncated to 10000 (was %d)", speed);
+        speed = 10230;
+    }
+    if(min_time > 10000) {
+        LV_LOG_WARN("min_time is truncated to 10000 (was %d)", min_time);
+        min_time = 10230;
+    }
+    if(max_time > 10000) {
+        LV_LOG_WARN("max_time is truncated to 10000 (was %d)", max_time);
+        max_time = 10230;
     }
 
-    return time;
+    /*Lower the resolution to fit the 0.1023 range*/
+    speed = (speed + 5) / 10;
+    min_time = (min_time + 5) / 10;
+    max_time = (max_time + 5) / 10;
+
+    return 0x80000000 + (max_time << 20) + (min_time << 10) + speed;
+
+}
+
+uint32_t lv_anim_speed(uint32_t speed)
+{
+    return lv_anim_speed_clamped(speed, 0, 1023);
 }
 
 void lv_anim_refr_now(void)
@@ -351,6 +373,9 @@ static void anim_timer(lv_timer_t * param)
                     a->start_value += v_ofs;
                     a->end_value += v_ofs;
                 }
+
+                resolve_time(a);
+
                 if(a->start_cb) a->start_cb(a);
                 a->start_cb_called = 1;
             }
@@ -455,4 +480,27 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_
     new_value += a->start_value;
 
     return new_value;
+}
+
+static uint32_t convert_speed_to_time(uint32_t speed_or_time, int32_t start, int32_t end)
+{
+    /*It was a simple time*/
+    if((speed_or_time & 0x80000000) == 0) return speed_or_time;
+
+    uint32_t d    = LV_ABS(start - end);
+    uint32_t speed = speed_or_time & 0x3FF;
+    uint32_t time = (d * 100) / speed; /*Speed is in 10 units per sec*/
+    uint32_t max_time = (speed_or_time >> 20) & 0x3FF;
+    uint32_t min_time = (speed_or_time >> 10) & 0x3FF;
+
+    return LV_CLAMP(min_time * 10, time, max_time * 10);
+}
+
+static void resolve_time(lv_anim_t * a)
+{
+    a->time = convert_speed_to_time(a->time, a->start_value, a->end_value);
+    a->act_time = -convert_speed_to_time(- a->act_time, a->start_value, a->end_value);
+    a->playback_time = convert_speed_to_time(a->playback_time, a->start_value, a->end_value);
+    a->playback_delay = convert_speed_to_time(a->playback_delay, a->start_value, a->end_value);
+    a->repeat_delay = convert_speed_to_time(a->repeat_delay, a->start_value, a->end_value);
 }

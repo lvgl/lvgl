@@ -429,14 +429,31 @@ static inline void lv_screen_load(struct _lv_obj_t * scr)
  */
 void lv_display_add_event(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 
+/**
+ * Get the number of event attached to a display
+ * @param disp          pointer to a display
+ * @return              number of events
+ */
 uint32_t lv_display_get_event_count(lv_display_t * disp);
 
+/**
+ * Get an event descriptor for an event
+ * @param disp          pointer to a display
+ * @param index         the index of the event
+ * @return              the event descriptor
+ */
 lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index);
 
+/**
+ * Remove an event
+ * @param disp          pointer to a display
+ * @param index         the index of the event to remove
+ * @return              true: and event was removed; false: no event was removed
+ */
 bool lv_display_remove_event(lv_display_t * disp, uint32_t index);
 
 /**
- * Send amn event to a display
+ * Send an event to a display
  * @param disp          pointer to a display
  * @param code          an event code. LV_EVENT_...
  * @param param         optional param

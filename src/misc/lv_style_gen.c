@@ -868,16 +868,6 @@ void lv_style_set_anim_time(lv_style_t * style, uint32_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_ANIM_TIME = LV_STYLE_ANIM_TIME;
 
-void lv_style_set_anim_speed(lv_style_t * style, uint32_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_ANIM_SPEED, v);
-}
-
-const lv_style_prop_t _lv_style_const_prop_id_ANIM_SPEED = LV_STYLE_ANIM_SPEED;
-
 void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value)
 {
     lv_style_value_t v = {

@@ -320,7 +320,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         blend_dsc.blend_area = img_coords;
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
-    else if(!transformed && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
+    else if(!transformed && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa <= LV_OPA_MIN) {
         int32_t src_h = lv_area_get_height(img_coords);
         int32_t src_w = lv_area_get_width(img_coords);
         blend_dsc.src_area = img_coords;
@@ -335,7 +335,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
     /*The simplest case just copy the pixels into the draw_buf. Blending will convert the colors if needed*/
-    else if(!transformed && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
+    else if(!transformed && draw_dsc->recolor_opa <= LV_OPA_MIN) {
         blend_dsc.src_area = img_coords;
         blend_dsc.src_buf = src_buf;
         blend_dsc.blend_area = img_coords;

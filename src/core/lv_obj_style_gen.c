@@ -6,9 +6,7 @@
  **********************************************************************
  */
 
-
 #include "lv_obj.h"
-
 
 void lv_obj_set_style_width(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
@@ -699,14 +697,6 @@ void lv_obj_set_style_anim_time(struct _lv_obj_t * obj, uint32_t value, lv_style
     lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_TIME, v, selector);
 }
 
-void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_SPEED, v, selector);
-}
-
 void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value,
                                  lv_style_selector_t selector)
 {
@@ -780,8 +770,7 @@ void lv_obj_set_style_flex_grow(struct _lv_obj_t * obj, uint8_t value, lv_style_
     lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_GROW, v, selector);
 }
 
-void lv_obj_set_style_grid_column_dsc_array(struct _lv_obj_t * obj, const int32_t * value,
-                                            lv_style_selector_t selector)
+void lv_obj_set_style_grid_column_dsc_array(struct _lv_obj_t * obj, const int32_t * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value

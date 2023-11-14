@@ -220,7 +220,7 @@ void lv_demo_widgets_start_slideshow(void)
     lv_obj_t * tab = lv_obj_get_child(cont, 0);
 
     int32_t v = lv_obj_get_scroll_bottom(tab);
-    uint32_t t = lv_anim_speed_to_time(lv_display_get_dpi(NULL), 0, v);
+    uint32_t t = lv_anim_speed(lv_display_get_dpi(NULL));
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
@@ -1648,7 +1648,7 @@ static void slideshow_anim_ready_cb(lv_anim_t * a_old)
     lv_obj_update_layout(tv);
 
     int32_t v = lv_obj_get_scroll_bottom(tab);
-    uint32_t t = lv_anim_speed_to_time(lv_display_get_dpi(NULL), 0, v);
+    uint32_t t = lv_anim_speed(lv_display_get_dpi(NULL));
 
     lv_anim_t a;
     lv_anim_init(&a);

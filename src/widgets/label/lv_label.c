@@ -861,8 +861,8 @@ static void lv_label_refr_text(lv_obj_t * obj)
     /*In scroll mode start an offset animation*/
     if(label->long_mode == LV_LABEL_LONG_SCROLL) {
         const lv_anim_t * anim_template = lv_obj_get_style_anim(obj, LV_PART_MAIN);
-        uint32_t anim_speed = lv_obj_get_style_anim_speed(obj, LV_PART_MAIN);
-        if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
+        uint32_t anim_time = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+        if(anim_time == 0) anim_time = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
@@ -916,7 +916,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 }
             }
 
-            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
+            lv_anim_set_time(&a, anim_time);
             lv_anim_set_playback_time(&a, a.time);
 
             /*If a template animation exists, overwrite some property*/
@@ -955,7 +955,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 }
             }
 
-            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
+            lv_anim_set_time(&a, anim_time);
             lv_anim_set_playback_time(&a, a.time);
 
             /*If a template animation exists, overwrite some property*/
@@ -972,8 +972,8 @@ static void lv_label_refr_text(lv_obj_t * obj)
     /*In roll inf. mode keep the size but start offset animations*/
     else if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
         const lv_anim_t * anim_template = lv_obj_get_style_anim(obj, LV_PART_MAIN);
-        uint32_t anim_speed = lv_obj_get_style_anim_speed(obj, LV_PART_MAIN);
-        if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
+        uint32_t anim_time = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+        if(anim_time == 0) anim_time = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
@@ -1002,7 +1002,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             lv_anim_set_values(&a, 0, -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT);
 #endif
             lv_anim_set_exec_cb(&a, set_ofs_x_anim);
-            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
+            lv_anim_set_time(&a, anim_time);
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
@@ -1028,7 +1028,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         if(size.y > lv_area_get_height(&txt_coords) && hor_anim == false) {
             lv_anim_set_values(&a, 0, -size.y - (lv_font_get_line_height(font)));
             lv_anim_set_exec_cb(&a, set_ofs_y_anim);
-            lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
+            lv_anim_set_time(&a, anim_time);
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;

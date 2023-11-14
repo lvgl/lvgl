@@ -312,9 +312,8 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
         lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
 
         if(dx) {
-            uint32_t t = lv_anim_speed_to_time((lv_display_get_horizontal_resolution(d) * 2) >> 2, 0, dx);
-            if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
-            if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
+            uint32_t t = lv_anim_speed_clamped((lv_display_get_horizontal_resolution(d)) >> 1, SCROLL_ANIM_TIME_MIN,
+                                               SCROLL_ANIM_TIME_MAX);
             lv_anim_set_time(&a, t);
             int32_t sx = lv_obj_get_scroll_x(obj);
             lv_anim_set_values(&a, -sx, -sx + dx);
@@ -328,9 +327,8 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
         }
 
         if(dy) {
-            uint32_t t = lv_anim_speed_to_time((lv_display_get_vertical_resolution(d) * 2) >> 2, 0, dy);
-            if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
-            if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
+            uint32_t t = lv_anim_speed_clamped((lv_display_get_vertical_resolution(d)) >> 1, SCROLL_ANIM_TIME_MIN,
+                                               SCROLL_ANIM_TIME_MAX);
             lv_anim_set_time(&a, t);
             int32_t sy = lv_obj_get_scroll_y(obj);
             lv_anim_set_values(&a, -sy, -sy + dy);

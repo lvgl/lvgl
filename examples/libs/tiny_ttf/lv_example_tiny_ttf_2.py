@@ -16,7 +16,8 @@ except NameError:
 # Create style with the new font
 style = lv.style_t()
 style.init()
-font = lv.tiny_ttf_create_file("S:" + script_path + "/Ubuntu-Medium.ttf", 30)
+font = lv.font_t()
+lv.tiny_ttf_create_file(font, "S:" + script_path + "/Ubuntu-Medium.ttf", 30)
 style.set_text_font(font)
 style.set_text_align(lv.TEXT_ALIGN.CENTER)
 
