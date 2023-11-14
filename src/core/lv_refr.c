@@ -8,15 +8,15 @@
  *********************/
 #include <stddef.h>
 #include "lv_refr.h"
-#include "../display/lv_display.h"
-#include "../display/lv_display_private.h"
-#include "../tick/lv_tick.h"
-#include "../misc/lv_timer.h"
-#include "../misc/lv_math.h"
-#include "../misc/lv_profiler.h"
-#include "../draw/lv_draw.h"
-#include "../font/lv_font_fmt_txt.h"
-#include "../stdlib/lv_string.h"
+#include "display/lv_display.h"
+#include "display/lv_display_private.h"
+#include "tick/lv_tick.h"
+#include "misc/lv_timer.h"
+#include "misc/lv_math.h"
+#include "misc/lv_profiler.h"
+#include "draw/lv_draw.h"
+#include "font/lv_font_fmt_txt.h"
+#include "stdlib/lv_string.h"
 #include "lv_global.h"
 
 /*********************

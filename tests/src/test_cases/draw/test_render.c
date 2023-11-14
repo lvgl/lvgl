@@ -1,6 +1,6 @@
 #if LV_BUILD_TEST
-#include "../lvgl.h"
-#include "../demos/lv_demos.h"
+#include "lvgl.h"
+#include "demos/lv_demos.h"
 
 #include "unity/unity.h"
 

@@ -21,7 +21,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <nuttx/input/touchscreen.h>
-#include "../../lvgl_private.h"
+#include "lvgl_private.h"
 
 /*********************
  *      DEFINES

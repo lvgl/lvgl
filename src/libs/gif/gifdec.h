@@ -2,7 +2,7 @@
 #define GIFDEC_H
 
 #include <stdint.h>
-#include "../../misc/lv_fs.h"
+#include "misc/lv_fs.h"
 
 #if LV_USE_GIF
 

@@ -10,9 +10,9 @@
 #ifndef LV_OBJ_STYLE_GEN_H
 #define LV_OBJ_STYLE_GEN_H
 
-#include "../misc/lv_area.h"
-#include "../misc/lv_style.h"
-#include "../core/lv_obj_style.h"
+#include "misc/lv_area.h"
+#include "misc/lv_style.h"
+#include "core/lv_obj_style.h"
 
 static inline int32_t lv_obj_get_style_width(const struct _lv_obj_t * obj, uint32_t part)
 {

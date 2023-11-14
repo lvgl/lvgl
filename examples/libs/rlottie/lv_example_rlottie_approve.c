@@ -11,7 +11,7 @@
 
 */
 
-#include "../../../lvgl.h"
+#include "lvgl.h"
 
 #if LV_BUILD_EXAMPLES && LV_USE_RLOTTIE
 

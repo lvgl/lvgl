@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 
 #if LV_USE_IMG != 0
 
@@ -22,9 +22,9 @@ extern "C" {
 #error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
-#include "../../core/lv_obj.h"
-#include "../../misc/lv_fs.h"
-#include "../../draw/lv_draw.h"
+#include "core/lv_obj.h"
+#include "misc/lv_fs.h"
+#include "draw/lv_draw.h"
 
 /*********************
  *      DEFINES

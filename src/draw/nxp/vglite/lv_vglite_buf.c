@@ -18,7 +18,7 @@
 #if LV_USE_DRAW_VGLITE
 #include "lv_vglite_utils.h"
 
-#include "../../../stdlib/lv_string.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

@@ -15,12 +15,12 @@
  *********************/
 #define MY_CLASS &lv_menu_class
 
-#include "../../core/lv_obj.h"
-#include "../../layouts/lv_layout.h"
-#include "../../stdlib/lv_string.h"
-#include "../label/lv_label.h"
-#include "../button/lv_button.h"
-#include "../image/lv_image.h"
+#include "core/lv_obj.h"
+#include "layouts/lv_layout.h"
+#include "stdlib/lv_string.h"
+#include "widgets/label/lv_label.h"
+#include "widgets/button/lv_button.h"
+#include "widgets/image/lv_image.h"
 
 /**********************
  *      TYPEDEFS

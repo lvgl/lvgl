@@ -16,7 +16,7 @@
 #include "lv_pxp_osa.h"
 
 #if LV_USE_DRAW_PXP
-#include "../../../misc/lv_log.h"
+#include "misc/lv_log.h"
 #include "fsl_pxp.h"
 
 #if defined(SDK_OS_FREE_RTOS)

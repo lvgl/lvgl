@@ -6,16 +6,16 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "draw/lv_draw.h"
 
 #if LV_DRAW_SW_COMPLEX
 #include "lv_draw_sw_mask.h"
-#include "../../core/lv_global.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_assert.h"
-#include "../../osal/lv_os.h"
-#include "../../stdlib/lv_string.h"
+#include "core/lv_global.h"
+#include "misc/lv_math.h"
+#include "misc/lv_log.h"
+#include "misc/lv_assert.h"
+#include "osal/lv_os.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

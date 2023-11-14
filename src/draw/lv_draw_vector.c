@@ -10,8 +10,8 @@
 
 #if LV_USE_VECTOR_GRAPHIC
 
-#include "../misc/lv_ll.h"
-#include "../stdlib/lv_string.h"
+#include "misc/lv_ll.h"
+#include "stdlib/lv_string.h"
 #include <stdbool.h>
 #include <math.h>
 

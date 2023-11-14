@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../misc/lv_types.h"
+#include "misc/lv_types.h"
 #include "lv_draw_buf.h"
-#include "../stdlib/lv_string.h"
-#include "../core/lv_global.h"
+#include "stdlib/lv_string.h"
+#include "core/lv_global.h"
 
 /*********************
  *      DEFINES

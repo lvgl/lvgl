@@ -13,16 +13,16 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 
 #if LV_USE_LABEL != 0
 
 #include <stdarg.h>
-#include "../../core/lv_obj.h"
-#include "../../font/lv_font.h"
-#include "../../font/lv_symbol_def.h"
-#include "../../misc/lv_text.h"
-#include "../../draw/lv_draw.h"
+#include "core/lv_obj.h"
+#include "font/lv_font.h"
+#include "font/lv_symbol_def.h"
+#include "misc/lv_text.h"
+#include "draw/lv_draw.h"
 
 /*********************
  *      DEFINES

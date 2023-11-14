@@ -17,9 +17,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 
-#include "../misc/lv_types.h"
+#include "misc/lv_types.h"
 #include <stddef.h>
 
 #if LV_USE_OS == LV_OS_NONE

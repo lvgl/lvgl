@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_LABEL && LV_USE_TEXTAREA && LV_FONT_SIMSUN_16_CJK && LV_USE_IME_PINYIN && LV_BUILD_EXAMPLES
 
 static void ta_event_cb(lv_event_t * e)

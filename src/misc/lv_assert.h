@@ -13,9 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 #include "lv_log.h"
-#include "../stdlib/lv_mem.h"
+#include "stdlib/lv_mem.h"
 #include LV_ASSERT_HANDLER_INCLUDE
 
 /*********************

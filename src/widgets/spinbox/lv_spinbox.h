@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../textarea/lv_textarea.h"
+#include "widgets/textarea/lv_textarea.h"
 
 #if LV_USE_SPINBOX
 

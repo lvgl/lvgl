@@ -20,7 +20,7 @@
 #include "lv_vglite_matrix.h"
 #include "lv_vglite_utils.h"
 
-#include "../../../stdlib/lv_string.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

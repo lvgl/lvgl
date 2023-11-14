@@ -8,7 +8,7 @@
  *********************/
 #include "lv_tick.h"
 #include <stddef.h>
-#include "../core/lv_global.h"
+#include "core/lv_global.h"
 
 /*********************
  *      DEFINES

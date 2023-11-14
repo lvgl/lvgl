@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl.h"
+#include "lvgl.h"
 
 #if LV_USE_DEMO_BENCHMARK
 #include "benchmark/lv_demo_benchmark.h"

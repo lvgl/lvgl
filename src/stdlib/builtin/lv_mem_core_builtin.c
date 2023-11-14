@@ -5,17 +5,17 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_mem.h"
+#include "stdlib/lv_mem.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #include "lv_tlsf.h"
-#include "../lv_string.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_log.h"
-#include "../../misc/lv_ll.h"
-#include "../../misc/lv_math.h"
-#include "../../osal/lv_os.h"
-#include "../../core/lv_global.h"
+#include "stdlib/lv_string.h"
+#include "misc/lv_assert.h"
+#include "misc/lv_log.h"
+#include "misc/lv_ll.h"
+#include "misc/lv_math.h"
+#include "osal/lv_os.h"
+#include "core/lv_global.h"
 
 #ifdef LV_MEM_POOL_INCLUDE
     #include LV_MEM_POOL_INCLUDE

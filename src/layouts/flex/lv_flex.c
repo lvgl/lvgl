@@ -7,12 +7,12 @@
  *      INCLUDES
  *********************/
 #include "lv_flex.h"
-#include "../lv_layout.h"
-#include "../../core/lv_obj.h"
+#include "layouts/lv_layout.h"
+#include "core/lv_obj.h"
 
 #if LV_USE_FLEX
 
-#include "../../core/lv_global.h"
+#include "core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/

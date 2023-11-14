@@ -10,8 +10,8 @@
 #include "lv_bidi.h"
 #include "lv_text.h"
 #include "lv_text_ap.h"
-#include "../stdlib/lv_mem.h"
-#include "../draw/lv_draw.h"
+#include "stdlib/lv_mem.h"
+#include "draw/lv_draw.h"
 
 /*********************
  *      DEFINES

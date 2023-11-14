@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl.h"
+#include "lvgl.h"
 #if LV_USE_FREETYPE && LV_FREETYPE_USE_LVGL_PORT
 
 #include <ft2build.h>

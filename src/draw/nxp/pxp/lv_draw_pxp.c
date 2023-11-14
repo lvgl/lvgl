@@ -17,7 +17,7 @@
 
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
-#include "../../../display/lv_display_private.h"
+#include "display/lv_display_private.h"
 
 /*********************
  *      DEFINES

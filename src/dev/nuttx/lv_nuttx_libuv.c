@@ -8,8 +8,8 @@
 #include "lv_nuttx_libuv.h"
 #include <stdlib.h>
 
-#include "../../../lvgl.h"
-#include "../../lvgl_private.h"
+#include "lvgl.h"
+#include "lvgl_private.h"
 
 #if LV_USE_NUTTX
 

@@ -13,15 +13,15 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_color.h"
-#include "../../display/lv_display.h"
-#include "../../osal/lv_os.h"
+#include "misc/lv_area.h"
+#include "misc/lv_color.h"
+#include "display/lv_display.h"
+#include "osal/lv_os.h"
 
-#include "../../draw/lv_draw_vector.h"
+#include "draw/lv_draw_vector.h"
 /*********************
  *      DEFINES
  *********************/

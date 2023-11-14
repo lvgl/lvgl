@@ -5,13 +5,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 #if LV_USE_STDLIB_STRING == LV_STDLIB_CLIB
-#include "../lv_string.h"
+#include "stdlib/lv_string.h"
 #include <string.h>
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-    #include "../lv_mem.h"
+    #include "stdlib/lv_mem.h"
 #endif
 
 /*********************

@@ -17,7 +17,7 @@
 #include FT_IMAGE_H
 #include FT_OUTLINE_H
 
-#include "../../core/lv_global.h"
+#include "core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/

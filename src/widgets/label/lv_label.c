@@ -8,17 +8,17 @@
  *********************/
 #include "lv_label.h"
 #if LV_USE_LABEL != 0
-#include "../../core/lv_obj.h"
-#include "../../misc/lv_assert.h"
-#include "../../core/lv_group.h"
-#include "../../display/lv_display.h"
-#include "../../draw/lv_draw.h"
-#include "../../misc/lv_color.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_bidi.h"
-#include "../../misc/lv_text_ap.h"
-#include "../../stdlib/lv_sprintf.h"
-#include "../../stdlib/lv_string.h"
+#include "core/lv_obj.h"
+#include "misc/lv_assert.h"
+#include "core/lv_group.h"
+#include "display/lv_display.h"
+#include "draw/lv_draw.h"
+#include "misc/lv_color.h"
+#include "misc/lv_math.h"
+#include "misc/lv_bidi.h"
+#include "misc/lv_text_ap.h"
+#include "stdlib/lv_sprintf.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

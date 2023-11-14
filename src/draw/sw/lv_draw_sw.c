@@ -6,20 +6,20 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../core/lv_refr.h"
+#include "core/lv_refr.h"
 #include "lv_draw_sw.h"
-#include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
-#include "../../core/lv_global.h"
+#include "display/lv_display_private.h"
+#include "stdlib/lv_string.h"
+#include "core/lv_global.h"
 
 #if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
     #if LV_USE_THORVG_EXTERNAL
         #include <thorvg_capi.h>
     #else
-        #include "../../libs/thorvg/thorvg_capi.h"
+        #include "libs/thorvg/thorvg_capi.h"
     #endif
 #endif
 /*********************

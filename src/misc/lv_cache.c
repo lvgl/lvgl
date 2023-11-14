@@ -7,9 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_cache.h"
-#include "../stdlib/lv_string.h"
-#include "../osal/lv_os.h"
-#include "../core/lv_global.h"
+#include "stdlib/lv_string.h"
+#include "osal/lv_os.h"
+#include "core/lv_global.h"
 
 /*********************
  *      DEFINES

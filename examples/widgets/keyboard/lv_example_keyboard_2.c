@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_KEYBOARD && LV_BUILD_EXAMPLES
 
 void lv_example_keyboard_2(void)

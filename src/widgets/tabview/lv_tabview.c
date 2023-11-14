@@ -9,8 +9,8 @@
 #include "lv_tabview.h"
 #if LV_USE_TABVIEW
 
-#include "../../misc/lv_assert.h"
-#include "../../indev/lv_indev_private.h"
+#include "misc/lv_assert.h"
+#include "indev/lv_indev_private.h"
 
 /*********************
  *      DEFINES

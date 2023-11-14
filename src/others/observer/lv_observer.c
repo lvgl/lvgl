@@ -10,7 +10,7 @@
 #include "lv_observer.h"
 #if LV_USE_OBSERVER
 
-#include "../../lvgl.h"
+#include"lvgl.h"
 
 /*********************
  *      DEFINES

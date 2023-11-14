@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_math.h"
-#include "../core/lv_global.h"
+#include "core/lv_global.h"
 
 /*********************
  *      DEFINES

@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../buttonmatrix/lv_buttonmatrix.h"
+#include "widgets/buttonmatrix/lv_buttonmatrix.h"
 
 #if LV_USE_KEYBOARD
 

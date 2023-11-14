@@ -14,7 +14,7 @@
 #include <nuttx/tls.h>
 #include <syslog.h>
 
-#include "../../../lvgl.h"
+#include "lvgl.h"
 
 /*********************
  *      DEFINES

@@ -9,10 +9,10 @@
 #include "lv_fs.h"
 
 #include <string.h>
-#include "../misc/lv_assert.h"
-#include "../stdlib/lv_string.h"
+#include "misc/lv_assert.h"
+#include "stdlib/lv_string.h"
 #include "lv_ll.h"
-#include "../core/lv_global.h"
+#include "core/lv_global.h"
 
 /*********************
  *      DEFINES

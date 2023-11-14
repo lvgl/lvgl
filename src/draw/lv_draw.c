@@ -8,10 +8,10 @@
  *********************/
 #include "lv_draw.h"
 #include "sw/lv_draw_sw.h"
-#include "../display/lv_display_private.h"
-#include "../core/lv_global.h"
-#include "../core/lv_refr.h"
-#include "../stdlib/lv_string.h"
+#include "display/lv_display_private.h"
+#include "core/lv_global.h"
+#include "core/lv_refr.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

@@ -8,17 +8,17 @@
  ********************/
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
-#include "../display/lv_display_private.h"
-#include "../core/lv_global.h"
-#include "../core/lv_obj.h"
-#include "../core/lv_group.h"
-#include "../core/lv_refr.h"
+#include "display/lv_display_private.h"
+#include "core/lv_global.h"
+#include "core/lv_obj.h"
+#include "core/lv_group.h"
+#include "core/lv_refr.h"
 
-#include "../tick/lv_tick.h"
-#include "../misc/lv_timer.h"
-#include "../misc/lv_math.h"
-#include "../misc/lv_profiler.h"
-#include "../stdlib/lv_string.h"
+#include "tick/lv_tick.h"
+#include "misc/lv_timer.h"
+#include "misc/lv_math.h"
+#include "misc/lv_profiler.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

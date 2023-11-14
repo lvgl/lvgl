@@ -20,8 +20,8 @@
 #include <sys/ioctl.h>
 #include <nuttx/video/fb.h>
 
-#include "../../../lvgl.h"
-#include "../../lvgl_private.h"
+#include "lvgl.h"
+#include "lvgl_private.h"
 
 /*********************
  *      DEFINES

@@ -9,9 +9,9 @@
 #include "lv_spinbox.h"
 #if LV_USE_SPINBOX
 
-#include "../../misc/lv_assert.h"
-#include "../../indev/lv_indev.h"
-#include "../../stdlib/lv_string.h"
+#include "misc/lv_assert.h"
+#include "indev/lv_indev.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

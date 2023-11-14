@@ -17,7 +17,7 @@
 #if LV_USE_OS == LV_OS_FREERTOS
 
 #include "atomic.h"
-#include "../misc/lv_log.h"
+#include "misc/lv_log.h"
 
 /*********************
  *      DEFINES

@@ -7,18 +7,18 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "../indev/lv_indev.h"
-#include "../indev/lv_indev_private.h"
+#include "indev/lv_indev.h"
+#include "indev/lv_indev_private.h"
 #include "lv_refr.h"
 #include "lv_group.h"
-#include "../display/lv_display.h"
-#include "../display/lv_display_private.h"
-#include "../themes/lv_theme.h"
-#include "../misc/lv_assert.h"
-#include "../misc/lv_math.h"
-#include "../misc/lv_log.h"
-#include "../tick/lv_tick.h"
-#include "../stdlib/lv_string.h"
+#include "display/lv_display.h"
+#include "display/lv_display_private.h"
+#include "themes/lv_theme.h"
+#include "misc/lv_assert.h"
+#include "misc/lv_math.h"
+#include "misc/lv_log.h"
+#include "tick/lv_tick.h"
+#include "stdlib/lv_string.h"
 #include <stdint.h>
 #include <string.h>
 

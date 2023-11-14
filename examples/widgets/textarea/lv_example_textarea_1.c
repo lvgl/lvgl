@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_TEXTAREA && LV_BUILD_EXAMPLES
 
 static void textarea_event_handler(lv_event_t * e)

@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../bar/lv_bar.h"
+#include "widgets/bar/lv_bar.h"
 
 #if LV_USE_SLIDER != 0
 

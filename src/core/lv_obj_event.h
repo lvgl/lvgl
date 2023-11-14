@@ -14,8 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include <stdbool.h>
-#include "../misc/lv_event.h"
-#include "../indev/lv_indev.h"
+#include "misc/lv_event.h"
+#include "indev/lv_indev.h"
 
 /*********************
  *      DEFINES

@@ -7,12 +7,12 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_image.h"
-#include "../display/lv_display.h"
-#include "../misc/lv_log.h"
-#include "../misc/lv_math.h"
-#include "../core/lv_refr.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
+#include "display/lv_display.h"
+#include "misc/lv_log.h"
+#include "misc/lv_math.h"
+#include "core/lv_refr.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

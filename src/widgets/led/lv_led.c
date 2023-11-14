@@ -9,9 +9,9 @@
 #include "lv_led.h"
 #if LV_USE_LED
 
-#include "../../misc/lv_assert.h"
-#include "../../themes/lv_theme.h"
-#include "../../misc/lv_color.h"
+#include "misc/lv_assert.h"
+#include "themes/lv_theme.h"
+#include "misc/lv_color.h"
 
 /*********************
  *      DEFINES

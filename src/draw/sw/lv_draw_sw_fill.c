@@ -11,12 +11,12 @@
 
 #include "blend/lv_draw_sw_blend.h"
 #include "lv_draw_sw_gradient.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_text_ap.h"
-#include "../../core/lv_refr.h"
-#include "../../misc/lv_assert.h"
-#include "../../stdlib/lv_string.h"
-#include "../lv_draw_mask.h"
+#include "misc/lv_math.h"
+#include "misc/lv_text_ap.h"
+#include "core/lv_refr.h"
+#include "misc/lv_assert.h"
+#include "stdlib/lv_string.h"
+#include "draw/lv_draw_mask.h"
 
 /*********************
  *      DEFINES

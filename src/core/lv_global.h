@@ -13,33 +13,33 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 
 #include <stdbool.h>
 
-#include "../misc/lv_cache.h"
-#include "../misc/lv_cache_builtin.h"
-#include "../draw/lv_draw.h"
+#include "misc/lv_cache.h"
+#include "misc/lv_cache_builtin.h"
+#include "draw/lv_draw.h"
 #if LV_USE_DRAW_SW
-#include "../draw/sw/lv_draw_sw.h"
+#include "draw/sw/lv_draw_sw.h"
 #endif
-#include "../misc/lv_anim.h"
-#include "../misc/lv_area.h"
-#include "../misc/lv_color_op.h"
-#include "../misc/lv_ll.h"
-#include "../misc/lv_log.h"
-#include "../misc/lv_profiler_builtin.h"
-#include "../misc/lv_style.h"
-#include "../misc/lv_timer.h"
-#include "../others/sysmon/lv_sysmon.h"
-#include "../stdlib/builtin/lv_tlsf.h"
+#include "misc/lv_anim.h"
+#include "misc/lv_area.h"
+#include "misc/lv_color_op.h"
+#include "misc/lv_ll.h"
+#include "misc/lv_log.h"
+#include "misc/lv_profiler_builtin.h"
+#include "misc/lv_style.h"
+#include "misc/lv_timer.h"
+#include "others/sysmon/lv_sysmon.h"
+#include "stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED
-#include "../font/lv_font_fmt_txt.h"
+#include "font/lv_font_fmt_txt.h"
 #endif
 
-#include "../tick/lv_tick.h"
-#include "../layouts/lv_layout.h"
+#include "tick/lv_tick.h"
+#include "layouts/lv_layout.h"
 
 /*********************
  *      DEFINES

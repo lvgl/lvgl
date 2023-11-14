@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_OBSERVER && LV_USE_SLIDER && LV_USE_LABEL && LV_USE_ROLLER && LV_USE_DROPDOWN && LV_FONT_MONTSERRAT_30 && LV_BUILD_EXAMPLES
 
 static lv_subject_t hour_subject;

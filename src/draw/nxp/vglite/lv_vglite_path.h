@@ -19,10 +19,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 
 #if LV_USE_DRAW_VGLITE
-#include "../../sw/lv_draw_sw.h"
+#include "draw/sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES

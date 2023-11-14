@@ -9,13 +9,13 @@
 #include "lv_msgbox.h"
 #if LV_USE_MSGBOX
 
-#include "../label/lv_label.h"
-#include "../button/lv_button.h"
-#include "../buttonmatrix/lv_buttonmatrix.h"
-#include "../../misc/lv_assert.h"
-#include "../../display/lv_display.h"
-#include "../../layouts/flex/lv_flex.h"
-#include "../../stdlib/lv_string.h"
+#include "widgets/label/lv_label.h"
+#include "widgets/button/lv_button.h"
+#include "widgets/buttonmatrix/lv_buttonmatrix.h"
+#include "misc/lv_assert.h"
+#include "display/lv_display.h"
+#include "layouts/flex/lv_flex.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

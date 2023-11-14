@@ -6,14 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../core/lv_obj.h"
+#include "core/lv_obj.h"
 #include "lv_draw_label.h"
-#include "../misc/lv_math.h"
-#include "../core/lv_obj_event.h"
-#include "../misc/lv_bidi.h"
-#include "../misc/lv_assert.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
+#include "misc/lv_math.h"
+#include "core/lv_obj_event.h"
+#include "misc/lv_bidi.h"
+#include "misc/lv_assert.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

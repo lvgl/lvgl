@@ -11,10 +11,10 @@
 
 #if LV_USE_SYSMON
 
-#include "../../core/lv_global.h"
-#include "../../misc/lv_async.h"
-#include "../../stdlib/lv_string.h"
-#include "../../widgets/label/lv_label.h"
+#include "core/lv_global.h"
+#include "misc/lv_async.h"
+#include "stdlib/lv_string.h"
+#include "widgets/label/lv_label.h"
 
 /*********************
  *      DEFINES

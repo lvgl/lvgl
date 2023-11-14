@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "lvgl.h"
 #if LV_USE_LODEPNG
 
 #include "lv_lodepng.h"

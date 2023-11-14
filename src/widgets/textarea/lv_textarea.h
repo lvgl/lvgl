@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../label/lv_label.h"
+#include "widgets/label/lv_label.h"
 
 #if LV_USE_TEXTAREA != 0
 

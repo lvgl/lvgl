@@ -10,11 +10,11 @@
 #if LV_USE_DRAW_SW
 
 #include "blend/lv_draw_sw_blend.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_text_ap.h"
-#include "../../core/lv_refr.h"
-#include "../../misc/lv_assert.h"
-#include "../lv_draw_mask.h"
+#include "misc/lv_math.h"
+#include "misc/lv_text_ap.h"
+#include "core/lv_refr.h"
+#include "misc/lv_assert.h"
+#include "draw/lv_draw_mask.h"
 
 /*********************
  *      DEFINES

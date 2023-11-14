@@ -7,15 +7,15 @@
  *      INCLUDES
  *********************/
 #include "lv_display.h"
-#include "../misc/lv_math.h"
-#include "../core/lv_refr.h"
-#include "../display/lv_display_private.h"
-#include "../stdlib/lv_string.h"
-#include "../themes/lv_theme.h"
-#include "../core/lv_global.h"
+#include "misc/lv_math.h"
+#include "core/lv_refr.h"
+#include "display/lv_display_private.h"
+#include "stdlib/lv_string.h"
+#include "themes/lv_theme.h"
+#include "core/lv_global.h"
 
 #if LV_USE_DRAW_SW
-    #include "../draw/sw/lv_draw_sw.h"
+    #include "draw/sw/lv_draw_sw.h"
 #endif
 
 /*********************

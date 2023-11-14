@@ -7,11 +7,11 @@
  *      INCLUDES
  *********************/
 #include "lv_list.h"
-#include "../../layouts/flex/lv_flex.h"
-#include "../../display/lv_display.h"
-#include "../label/lv_label.h"
-#include "../image/lv_image.h"
-#include "../button/lv_button.h"
+#include "layouts/flex/lv_flex.h"
+#include "display/lv_display.h"
+#include "widgets/label/lv_label.h"
+#include "widgets/image/lv_image.h"
+#include "widgets/button/lv_button.h"
 
 #if LV_USE_LIST
 

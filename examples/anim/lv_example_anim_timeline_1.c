@@ -1,4 +1,4 @@
-#include "../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_FLEX && LV_BUILD_EXAMPLES
 
 static lv_anim_timeline_t * anim_timeline = NULL;

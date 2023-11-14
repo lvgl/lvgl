@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_OBSERVER && LV_USE_ARC && LV_USE_LABEL && LV_USE_BTN && LV_USE_SPINNER && LV_BUILD_EXAMPLES
 
 typedef enum {

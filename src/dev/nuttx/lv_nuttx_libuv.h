@@ -14,8 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../display/lv_display.h"
-#include "../../indev/lv_indev.h"
+#include "display/lv_display.h"
+#include "indev/lv_indev.h"
 
 #if LV_USE_NUTTX
 

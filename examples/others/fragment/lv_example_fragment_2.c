@@ -2,7 +2,7 @@
  * @file lv_example_fragment_2.c
  * @brief Navigation stack using obj fragment
  */
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 
 #if LV_USE_FRAGMENT && LV_USE_WIN && LV_BUILD_EXAMPLES
 

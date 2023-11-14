@@ -9,8 +9,8 @@
 #include <stddef.h>
 #include "lv_bidi.h"
 #include "lv_text.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_string.h"
 
 #if LV_USE_BIDI
 

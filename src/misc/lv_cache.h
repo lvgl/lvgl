@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include <stdint.h>
 #include <stddef.h>
-#include "../osal/lv_os.h"
+#include "osal/lv_os.h"
 
 /*********************
  *      DEFINES

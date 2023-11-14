@@ -8,13 +8,13 @@
  *********************/
 #include "lv_anim.h"
 
-#include "../core/lv_global.h"
-#include "../tick/lv_tick.h"
+#include "core/lv_global.h"
+#include "tick/lv_tick.h"
 #include "lv_assert.h"
 #include "lv_timer.h"
 #include "lv_math.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

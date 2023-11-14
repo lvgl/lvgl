@@ -9,13 +9,13 @@
 #include "lv_roller.h"
 #if LV_USE_ROLLER != 0
 
-#include "../../misc/lv_assert.h"
-#include "../../draw/lv_draw.h"
-#include "../../core/lv_group.h"
-#include "../../indev/lv_indev.h"
-#include "../../indev/lv_indev_scroll.h"
-#include "../../indev/lv_indev_private.h"
-#include "../../stdlib/lv_string.h"
+#include "misc/lv_assert.h"
+#include "draw/lv_draw.h"
+#include "core/lv_group.h"
+#include "indev/lv_indev.h"
+#include "indev/lv_indev_scroll.h"
+#include "indev/lv_indev_private.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

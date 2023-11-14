@@ -4,7 +4,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../unity/unity.h"
+#include "unity/unity.h"
 
 #define HOR_RES 800
 #define VER_RES 480

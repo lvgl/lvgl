@@ -2,7 +2,7 @@
  * @file lv_example_fragment_1.c
  * @brief Basic usage of obj fragment
  */
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 
 #if LV_USE_FRAGMENT && LV_BUILD_EXAMPLES
 

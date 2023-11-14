@@ -6,14 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 #if LV_DRAW_SW_COMPLEX
 
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_log.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
+#include "misc/lv_math.h"
+#include "misc/lv_log.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_string.h"
 #include "lv_draw_sw.h"
 #include "lv_draw_sw_mask.h"
 

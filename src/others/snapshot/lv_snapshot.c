@@ -10,10 +10,10 @@
 #if LV_USE_SNAPSHOT
 
 #include <stdbool.h>
-#include "../../display/lv_display.h"
-#include "../../core/lv_refr.h"
-#include "../../display/lv_display_private.h"
-#include "../../stdlib/lv_string.h"
+#include "display/lv_display.h"
+#include "core/lv_refr.h"
+#include "display/lv_display_private.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

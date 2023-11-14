@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_DROPDOWN && LV_BUILD_EXAMPLES
 
 /**

@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../core/lv_obj.h"
-#include "../stdlib/lv_string.h"
+#include "core/lv_obj.h"
+#include "stdlib/lv_string.h"
 #include "lv_obj_property.h"
 
 #if LV_USE_OBJ_PROPERTY

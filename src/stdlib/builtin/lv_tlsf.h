@@ -1,4 +1,4 @@
-#include "../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #ifndef LV_TLSF_H
@@ -43,8 +43,8 @@
 
 #include <stddef.h>
 
-#include "../../osal/lv_os.h"
-#include "../../misc/lv_ll.h"
+#include "osal/lv_os.h"
+#include "misc/lv_ll.h"
 
 #if defined(__cplusplus)
 extern "C" {

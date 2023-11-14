@@ -9,8 +9,8 @@
 #include "lv_os.h"
 
 #if LV_USE_OS == LV_OS_NONE
-#include "../misc/lv_types.h"
-#include "../misc/lv_assert.h"
+#include "misc/lv_types.h"
+#include "misc/lv_assert.h"
 
 /*********************
  *      DEFINES

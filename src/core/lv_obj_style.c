@@ -7,11 +7,11 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "../display/lv_display.h"
-#include "../display/lv_display_private.h"
-#include "../misc/lv_color.h"
-#include "../stdlib/lv_string.h"
-#include "../core/lv_global.h"
+#include "display/lv_display.h"
+#include "display/lv_display_private.h"
+#include "misc/lv_color.h"
+#include "stdlib/lv_string.h"
+#include "core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/

@@ -19,11 +19,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 
 #if LV_USE_DRAW_PXP
 #include "fsl_pxp.h"
-#include "../../../misc/lv_color.h"
+#include "misc/lv_color.h"
 
 /*********************
  *      DEFINES

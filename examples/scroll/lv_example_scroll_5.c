@@ -1,4 +1,4 @@
-#include "../lv_examples.h"
+#include "lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 
 /**

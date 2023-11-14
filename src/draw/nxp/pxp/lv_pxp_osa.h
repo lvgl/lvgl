@@ -20,7 +20,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"

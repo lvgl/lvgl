@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "lvgl.h"
 #if LV_USE_LIBJPEG_TURBO
 
 #include "lv_libjpeg_turbo.h"

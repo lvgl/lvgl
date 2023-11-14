@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
-#include "../../lvgl.h"
+#include"lvgl.h"
 
 bool lv_test_assert_image_eq(const char * fn_ref);
 

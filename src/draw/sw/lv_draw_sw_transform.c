@@ -9,11 +9,11 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_area.h"
-#include "../../core/lv_refr.h"
-#include "../../misc/lv_color.h"
-#include "../../stdlib/lv_string.h"
+#include "misc/lv_assert.h"
+#include "misc/lv_area.h"
+#include "core/lv_refr.h"
+#include "misc/lv_color.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

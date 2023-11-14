@@ -17,7 +17,7 @@
 
 #if LV_USE_DRAW_PXP
 
-#include "../../../stdlib/lv_string.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

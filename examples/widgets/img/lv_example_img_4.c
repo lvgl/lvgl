@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_IMG && LV_BUILD_EXAMPLES
 
 static void ofs_y_anim(void * img, int32_t v)

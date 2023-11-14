@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_layout.h"
-#include "../core/lv_global.h"
-#include "../core/lv_obj.h"
+#include "core/lv_global.h"
+#include "core/lv_obj.h"
 
 /*********************
  *      DEFINES

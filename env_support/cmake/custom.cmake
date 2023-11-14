@@ -44,7 +44,7 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     add_library(lvgl_thorvg ${THORVG_SOURCES})
     add_library(lvgl::thorvg ALIAS lvgl_thorvg)
     target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
-    target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src)
+    target_include_directories(lvgl_thorvg SYSTEM PRIVATE ${LVGL_ROOT_DIR}/src)
 endif()
 
 # Build LVGL example library

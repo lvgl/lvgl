@@ -11,7 +11,7 @@
 #if LV_USE_OS == LV_OS_PTHREAD
 
 #include <errno.h>
-#include "../misc/lv_log.h"
+#include "misc/lv_log.h"
 
 /*********************
  *      DEFINES

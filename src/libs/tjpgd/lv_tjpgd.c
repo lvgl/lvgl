@@ -7,12 +7,12 @@
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl.h"
+#include "lvgl.h"
 #if LV_USE_TJPGD
 
 #include "tjpgd.h"
 #include "lv_tjpgd.h"
-#include "../../misc/lv_fs.h"
+#include "misc/lv_fs.h"
 
 /*********************
  *      DEFINES

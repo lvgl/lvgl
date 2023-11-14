@@ -9,7 +9,7 @@
 
 #include "lv_async.h"
 #include "lv_timer.h"
-#include "../stdlib/lv_mem.h"
+#include "stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES

@@ -8,8 +8,8 @@
  *********************/
 #include "lv_assert.h"
 #include "lv_anim_timeline.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

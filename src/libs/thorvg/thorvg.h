@@ -11,7 +11,7 @@
  * and finally drawing the canvas and TVG termination.
  */
 
-#include "../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
 
 

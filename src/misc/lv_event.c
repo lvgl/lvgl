@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_event.h"
-#include "../core/lv_global.h"
-#include "../stdlib/lv_mem.h"
+#include "core/lv_global.h"
+#include "stdlib/lv_mem.h"
 #include "lv_assert.h"
 #include <stddef.h>
 

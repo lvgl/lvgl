@@ -22,8 +22,8 @@
 #include <fcntl.h>
 #include <nuttx/lcd/lcd_dev.h>
 
-#include "../../../lvgl.h"
-#include "../../lvgl_private.h"
+#include "lvgl.h"
+#include "lvgl_private.h"
 
 /*********************
  *      DEFINES

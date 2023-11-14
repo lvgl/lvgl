@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../image/lv_image.h"
+#include "widgets/image/lv_image.h"
 
 #if LV_USE_ANIMIMG != 0
 

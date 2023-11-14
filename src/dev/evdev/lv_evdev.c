@@ -18,11 +18,11 @@
 #else
     #include <linux/input.h>
 #endif /*BSD*/
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
-#include "../../display/lv_display.h"
+#include "misc/lv_assert.h"
+#include "misc/lv_math.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_string.h"
+#include "display/lv_display.h"
 
 /**********************
  *      TYPEDEFS

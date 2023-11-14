@@ -10,7 +10,7 @@
 #include "lv_fragment.h"
 
 #if LV_USE_FRAGMENT
-#include "../../stdlib/lv_string.h"
+#include "stdlib/lv_string.h"
 
 /**********************
  *  STATIC PROTOTYPES

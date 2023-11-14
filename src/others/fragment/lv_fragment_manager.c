@@ -11,8 +11,8 @@
 
 #if LV_USE_FRAGMENT
 
-#include "../../misc/lv_ll.h"
-#include "../../stdlib/lv_string.h"
+#include "misc/lv_ll.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

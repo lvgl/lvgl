@@ -9,10 +9,10 @@
 #include "lv_bar.h"
 #if LV_USE_BAR != 0
 
-#include "../../draw/lv_draw.h"
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_anim.h"
-#include "../../misc/lv_math.h"
+#include "draw/lv_draw.h"
+#include "misc/lv_assert.h"
+#include "misc/lv_anim.h"
+#include "misc/lv_math.h"
 
 /*********************
  *      DEFINES

@@ -10,7 +10,7 @@
 
 #if LV_USE_DEMO_MULTILANG
 
-#include "../../src/indev/lv_indev_scroll.h"
+#include "indev/lv_indev_scroll.h"
 
 /*********************
  *      DEFINES

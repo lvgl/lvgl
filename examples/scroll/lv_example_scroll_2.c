@@ -1,4 +1,4 @@
-#include "../lv_examples.h"
+#include "lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_FLEX
 
 static void sw_event_cb(lv_event_t * e)

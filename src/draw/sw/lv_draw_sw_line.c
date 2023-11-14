@@ -10,9 +10,9 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_math.h"
-#include "../../core/lv_refr.h"
-#include "../../stdlib/lv_string.h"
+#include "misc/lv_math.h"
+#include "core/lv_refr.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

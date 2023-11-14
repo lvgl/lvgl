@@ -8,7 +8,7 @@
  *********************/
 #include "lv_color.h"
 #include "lv_log.h"
-#include "../misc/lv_color.h"
+#include "misc/lv_color.h"
 
 /*********************
  *      DEFINES

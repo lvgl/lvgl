@@ -13,10 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../core/lv_group.h"
-#include "../misc/lv_area.h"
-#include "../misc/lv_timer.h"
-#include "../misc/lv_event.h"
+#include "core/lv_group.h"
+#include "misc/lv_area.h"
+#include "misc/lv_timer.h"
+#include "misc/lv_event.h"
 
 /*********************
  *      DEFINES

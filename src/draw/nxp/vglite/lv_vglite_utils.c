@@ -18,7 +18,7 @@
 #if LV_USE_DRAW_VGLITE
 #include "lv_vglite_buf.h"
 
-#include "../../../core/lv_refr.h"
+#include "core/lv_refr.h"
 
 #if LV_USE_OS
     #include "vg_lite_gpu.h"

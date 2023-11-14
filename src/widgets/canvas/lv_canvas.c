@@ -8,13 +8,13 @@
  *********************/
 #include "lv_canvas.h"
 #if LV_USE_CANVAS != 0
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
-#include "../../draw/lv_draw.h"
-#include "../../core/lv_refr.h"
-#include "../../display/lv_display.h"
-#include "../../draw/sw/lv_draw_sw.h"
-#include "../../stdlib/lv_string.h"
+#include "misc/lv_assert.h"
+#include "misc/lv_math.h"
+#include "draw/lv_draw.h"
+#include "core/lv_refr.h"
+#include "display/lv_display.h"
+#include "draw/sw/lv_draw_sw.h"
+#include "stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

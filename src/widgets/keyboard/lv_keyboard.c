@@ -10,9 +10,9 @@
 #include "lv_keyboard.h"
 #if LV_USE_KEYBOARD
 
-#include "../textarea/lv_textarea.h"
-#include "../../misc/lv_assert.h"
-#include "../../stdlib/lv_string.h"
+#include "widgets/textarea/lv_textarea.h"
+#include "misc/lv_assert.h"
+#include "stdlib/lv_string.h"
 
 #include <stdlib.h>
 

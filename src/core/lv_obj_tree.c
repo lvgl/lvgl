@@ -9,13 +9,13 @@
 #include <stdlib.h>
 
 #include "lv_obj.h"
-#include "../indev/lv_indev.h"
-#include "../indev/lv_indev_private.h"
-#include "../display/lv_display.h"
-#include "../display/lv_display_private.h"
-#include "../misc/lv_anim.h"
-#include "../misc/lv_async.h"
-#include "../core/lv_global.h"
+#include "indev/lv_indev.h"
+#include "indev/lv_indev_private.h"
+#include "display/lv_display.h"
+#include "display/lv_display_private.h"
+#include "misc/lv_anim.h"
+#include "misc/lv_async.h"
+#include "core/lv_global.h"
 
 /*********************
  *      DEFINES

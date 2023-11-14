@@ -11,11 +11,11 @@
 
 #include <stdarg.h>
 #include <string.h>
-#include "../stdlib/lv_sprintf.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_string.h"
-#include "../tick/lv_tick.h"
-#include "../core/lv_global.h"
+#include "stdlib/lv_sprintf.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_string.h"
+#include "tick/lv_tick.h"
+#include "core/lv_global.h"
 
 #if LV_LOG_PRINTF
     #include <stdio.h>

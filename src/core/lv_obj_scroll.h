@@ -13,9 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../misc/lv_area.h"
-#include "../misc/lv_anim.h"
-#include "../misc/lv_types.h"
+#include "misc/lv_area.h"
+#include "misc/lv_anim.h"
+#include "misc/lv_types.h"
 
 /*********************
  *      DEFINES

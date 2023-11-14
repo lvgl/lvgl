@@ -10,11 +10,11 @@
 #if LV_USE_DRAW_SW
 #if LV_DRAW_SW_COMPLEX
 
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_log.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../stdlib/lv_string.h"
-#include "../lv_draw.h"
+#include "misc/lv_math.h"
+#include "misc/lv_log.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_string.h"
+#include "draw/lv_draw.h"
 
 static void add_circle(const lv_opa_t * circle_mask, const lv_area_t * blend_area, const lv_area_t * circle_area,
                        lv_opa_t * mask_buf,  int32_t width);

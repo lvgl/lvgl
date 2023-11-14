@@ -10,10 +10,10 @@
 
 #if LV_USE_GRID
 
-#include "../../stdlib/lv_string.h"
-#include "../lv_layout.h"
-#include "../../core/lv_obj.h"
-#include "../../core/lv_global.h"
+#include "stdlib/lv_string.h"
+#include "layouts/lv_layout.h"
+#include "core/lv_obj.h"
+#include "core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/

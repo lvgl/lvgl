@@ -9,8 +9,8 @@
 #include "lv_draw_sw_gradient.h"
 #if LV_USE_DRAW_SW
 
-#include "../../misc/lv_types.h"
-#include "../../osal/lv_os.h"
+#include "misc/lv_types.h"
+#include "osal/lv_os.h"
 
 /*********************
  *      DEFINES

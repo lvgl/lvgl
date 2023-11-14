@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_tileview.h"
-#include "../../indev/lv_indev.h"
-#include "../../indev/lv_indev_private.h"
+#include "indev/lv_indev.h"
+#include "indev/lv_indev_private.h"
 #if LV_USE_TILEVIEW
 
 /*********************

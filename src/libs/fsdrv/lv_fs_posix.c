@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "lvgl.h"
 
 #if LV_USE_FS_POSIX
 
@@ -20,7 +20,7 @@
     #include <windows.h>
 #endif
 
-#include "../../core/lv_global.h"
+#include "core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/

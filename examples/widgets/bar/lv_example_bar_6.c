@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 static void set_value(void * bar, int32_t v)

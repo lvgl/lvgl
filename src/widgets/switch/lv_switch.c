@@ -10,11 +10,11 @@
 
 #if LV_USE_SWITCH != 0
 
-#include "../../misc/lv_assert.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_anim.h"
-#include "../../indev/lv_indev.h"
-#include "../../display/lv_display.h"
+#include "misc/lv_assert.h"
+#include "misc/lv_math.h"
+#include "misc/lv_anim.h"
+#include "indev/lv_indev.h"
+#include "display/lv_display.h"
 
 /*********************
  *      DEFINES

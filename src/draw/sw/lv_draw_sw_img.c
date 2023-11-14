@@ -9,16 +9,16 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../display/lv_display.h"
-#include "../../display/lv_display_private.h"
-#include "../../misc/lv_log.h"
-#include "../../core/lv_refr.h"
-#include "../../stdlib/lv_mem.h"
-#include "../../misc/lv_cache.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_color.h"
-#include "../../stdlib/lv_string.h"
-#include "../../core/lv_global.h"
+#include "display/lv_display.h"
+#include "display/lv_display_private.h"
+#include "misc/lv_log.h"
+#include "core/lv_refr.h"
+#include "stdlib/lv_mem.h"
+#include "misc/lv_cache.h"
+#include "misc/lv_math.h"
+#include "misc/lv_color.h"
+#include "stdlib/lv_string.h"
+#include "core/lv_global.h"
 
 /*********************
  *      DEFINES

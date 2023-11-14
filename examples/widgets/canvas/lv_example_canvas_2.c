@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_CANVAS && LV_BUILD_EXAMPLES
 
 #define CANVAS_WIDTH  80

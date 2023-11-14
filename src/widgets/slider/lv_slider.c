@@ -9,15 +9,15 @@
 #include "lv_slider.h"
 #if LV_USE_SLIDER != 0
 
-#include "../../misc/lv_assert.h"
-#include "../../core/lv_group.h"
-#include "../../indev/lv_indev.h"
-#include "../../indev/lv_indev_private.h"
-#include "../../display/lv_display.h"
-#include "../../draw/lv_draw.h"
-#include "../../stdlib/lv_string.h"
-#include "../../misc/lv_math.h"
-#include "../image/lv_image.h"
+#include "misc/lv_assert.h"
+#include "core/lv_group.h"
+#include "indev/lv_indev.h"
+#include "indev/lv_indev_private.h"
+#include "display/lv_display.h"
+#include "draw/lv_draw.h"
+#include "stdlib/lv_string.h"
+#include "misc/lv_math.h"
+#include "widgets/image/lv_image.h"
 
 /*********************
  *      DEFINES

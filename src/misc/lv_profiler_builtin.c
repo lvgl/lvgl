@@ -8,8 +8,8 @@
  *********************/
 
 #include "lv_profiler_builtin.h"
-#include "../lvgl.h"
-#include "../core/lv_global.h"
+#include "lvgl.h"
+#include "core/lv_global.h"
 
 /*********************
  *      DEFINES

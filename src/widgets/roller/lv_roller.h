@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../core/lv_obj.h"
+#include "core/lv_obj.h"
 
 #if LV_USE_ROLLER != 0
 
@@ -22,7 +22,7 @@ extern "C" {
 #error "lv_roller: lv_label is required. Enable it in lv_conf.h (LV_USE_ROLLER 1)"
 #endif
 
-#include "../label/lv_label.h"
+#include "widgets/label/lv_label.h"
 
 /*********************
  *      DEFINES

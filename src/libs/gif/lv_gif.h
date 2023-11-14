@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl.h"
+#include "lvgl.h"
 #if LV_USE_GIF
 
 #include "gifdec.h"

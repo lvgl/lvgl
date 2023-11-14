@@ -8,8 +8,8 @@
  *********************/
 #include "lv_obj.h"
 #include "lv_global.h"
-#include "../osal/lv_os.h"
-#include "../stdlib/lv_sprintf.h"
+#include "osal/lv_os.h"
+#include "stdlib/lv_sprintf.h"
 
 /*********************
  *      DEFINES

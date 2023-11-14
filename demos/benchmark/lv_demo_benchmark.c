@@ -18,8 +18,8 @@
     #error "LV_FONT_MONTSERRAT_24 is required for lv_demo_benchmark. Enable it in lv_conf.h."
 #endif
 
-#include "../../src/display/lv_display_private.h"
-#include "../../src/core/lv_global.h"
+#include "display/lv_display_private.h"
+#include "core/lv_global.h"
 
 /**********************
  *      TYPEDEFS

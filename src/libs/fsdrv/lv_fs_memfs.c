@@ -40,7 +40,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "lvgl.h"
 #if LV_USE_FS_MEMFS
 
 /*********************

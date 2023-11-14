@@ -1,4 +1,4 @@
-#include "../lv_demo_music.h"
+#include "music/lv_demo_music.h"
 #if LV_USE_DEMO_MUSIC  && !LV_DEMO_MUSIC_LARGE
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN

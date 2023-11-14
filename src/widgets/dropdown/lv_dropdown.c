@@ -6,20 +6,20 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../core/lv_obj.h"
+#include "core/lv_obj.h"
 #include "lv_dropdown.h"
 #if LV_USE_DROPDOWN != 0
 
-#include "../../misc/lv_assert.h"
-#include "../../draw/lv_draw.h"
-#include "../../core/lv_group.h"
-#include "../../indev/lv_indev.h"
-#include "../../display/lv_display.h"
-#include "../../font/lv_symbol_def.h"
-#include "../../misc/lv_anim.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_text_ap.h"
-#include "../../stdlib/lv_string.h"
+#include "misc/lv_assert.h"
+#include "draw/lv_draw.h"
+#include "core/lv_group.h"
+#include "indev/lv_indev.h"
+#include "display/lv_display.h"
+#include "font/lv_symbol_def.h"
+#include "misc/lv_anim.h"
+#include "misc/lv_math.h"
+#include "misc/lv_text_ap.h"
+#include "stdlib/lv_string.h"
 #include <string.h>
 
 /*********************

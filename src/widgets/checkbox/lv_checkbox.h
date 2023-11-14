@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
-#include "../../core/lv_obj.h"
+#include "lv_conf_internal.h"
+#include "core/lv_obj.h"
 
 #if LV_USE_CHECKBOX != 0
 

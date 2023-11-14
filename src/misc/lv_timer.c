@@ -6,10 +6,10 @@
  *      INCLUDES
  *********************/
 #include "lv_timer.h"
-#include "../core/lv_global.h"
-#include "../tick/lv_tick.h"
-#include "../stdlib/lv_mem.h"
-#include "../stdlib/lv_sprintf.h"
+#include "core/lv_global.h"
+#include "tick/lv_tick.h"
+#include "stdlib/lv_mem.h"
+#include "stdlib/lv_sprintf.h"
 #include "lv_assert.h"
 #include "lv_ll.h"
 #include "lv_profiler.h"

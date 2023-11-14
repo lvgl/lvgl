@@ -16,7 +16,7 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-#include "../../core/lv_obj.h"
+#include "core/lv_obj.h"
 
 /*********************
  *      DEFINES

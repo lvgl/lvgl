@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>
-#include "../lvgl.h"
+#include "lvgl.h"
 
 void lv_test_mouse_read_cb(lv_indev_t * indev, lv_indev_data_t * data);
 

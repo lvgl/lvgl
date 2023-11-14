@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl.h"
+#include "lvgl.h"
 
 #include "anim/lv_example_anim.h"
 #include "event/lv_example_event.h"

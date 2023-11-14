@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_SPINBOX && LV_BUILD_EXAMPLES
 
 static lv_obj_t * spinbox;

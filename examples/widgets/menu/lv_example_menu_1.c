@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_MENU && LV_BUILD_EXAMPLES
 
 void lv_example_menu_1(void)

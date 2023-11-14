@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 
 #if LV_USE_DROPDOWN != 0
 
@@ -23,7 +23,7 @@ extern "C" {
 #error "lv_dropdown: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
 #endif
 
-#include "../label/lv_label.h"
+#include "widgets/label/lv_label.h"
 
 /*********************
  *      DEFINES

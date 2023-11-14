@@ -1,5 +1,5 @@
 
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 
 #if LV_USE_TABLE && LV_USE_FILE_EXPLORER && (LV_USE_FS_STDIO || LV_USE_FS_POSIX || LV_USE_FS_WIN32 || LV_USE_FS_FATFS) && LV_BUILD_EXAMPLES
 

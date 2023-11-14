@@ -4,7 +4,7 @@
  * Opts:
  ******************************************************************************/
 
-#include "../../../lvgl.h"
+#include "lvgl.h"
 
 #ifndef TEST_FONT_MONTSERRAT_ASCII_4BPP
     #define TEST_FONT_MONTSERRAT_ASCII_4BPP 1

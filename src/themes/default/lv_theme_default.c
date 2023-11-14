@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h" /*To see all the widgets*/
+#include "lvgl.h" /*To see all the widgets*/
 
 #if LV_USE_THEME_DEFAULT
 
-#include "../lv_theme.h"
-#include "../../misc/lv_color.h"
-#include "../../core/lv_global.h"
+#include "themes/lv_theme.h"
+#include "misc/lv_color.h"
+#include "core/lv_global.h"
 
 /*********************
  *      DEFINES

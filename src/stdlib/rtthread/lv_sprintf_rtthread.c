@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lv_conf_internal.h"
+#include "lv_conf_internal.h"
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_RTTHREAD
 #include <rtthread.h>
 #include <stdarg.h>
-#include "../lv_sprintf.h"
+#include "stdlib/lv_sprintf.h"
 
 #if LV_USE_FLOAT == 1
     #warning "lv_sprintf_rtthread: rtthread not support float in sprintf"

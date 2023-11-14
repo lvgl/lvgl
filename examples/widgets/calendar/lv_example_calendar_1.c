@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+#include "lv_examples.h"
 #if LV_USE_CALENDAR && LV_BUILD_EXAMPLES
 
 static void event_handler(lv_event_t * e)

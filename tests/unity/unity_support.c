@@ -12,7 +12,7 @@
  *      INCLUDES
  *********************/
 #if LV_BUILD_TEST
-#include "../lvgl.h"
+#include "lvgl.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>

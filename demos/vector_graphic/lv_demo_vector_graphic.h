@@ -14,7 +14,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_demos.h"
+#include "lv_demos.h"
 
 /*********************
  *      DEFINES

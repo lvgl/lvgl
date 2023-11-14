@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include <stdbool.h>
 #include <stdint.h>
-#include "../font/lv_font.h"
+#include "font/lv_font.h"
 #include "lv_color.h"
 #include "lv_area.h"
 #include "lv_anim.h"
@@ -23,7 +23,7 @@ extern "C" {
 #include "lv_types.h"
 #include "lv_assert.h"
 #include "lv_bidi.h"
-#include "../layouts/lv_layout.h"
+#include "layouts/lv_layout.h"
 
 /*********************
  *      DEFINES
