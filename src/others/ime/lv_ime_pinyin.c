@@ -655,7 +655,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
                 strcat(pinyin_ime->input_char, txt);
                 pinyin_input_proc(obj);
 
-                for(int index = 0; index <  tmp_button_str_len; index++) {
+                for(int index = 0; index < (pinyin_ime->ta_count + tmp_button_str_len); index++) {
                     lv_textarea_delete_char(ta);
                 }
 
@@ -809,7 +809,7 @@ static void pinyin_input_proc(lv_obj_t * obj)
     pinyin_ime->py_page = 0;
 
     for(uint8_t i = 0; i < LV_IME_PINYIN_CAND_TEXT_NUM; i++) {
-        memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
+        lv_memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
         lv_pinyin_cand_str[i][0] = ' ';
     }
 
@@ -829,6 +829,8 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
     uint16_t page_num = pinyin_ime->cand_num / LV_IME_PINYIN_CAND_TEXT_NUM;
     uint16_t remainder = pinyin_ime->cand_num % LV_IME_PINYIN_CAND_TEXT_NUM;
 
+    if(!pinyin_ime->cand_str) return;
+
     if(dir == 0) {
         if(pinyin_ime->py_page) {
             pinyin_ime->py_page--;
@@ -845,7 +847,7 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
     }
 
     for(uint8_t i = 0; i < LV_IME_PINYIN_CAND_TEXT_NUM; i++) {
-        memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
+        lv_memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
         lv_pinyin_cand_str[i][0] = ' ';
     }
 
@@ -957,13 +959,19 @@ static void pinyin_ime_clear_data(lv_obj_t * obj)
         pinyin_ime->k9_legal_py_count = 0;
         lv_memzero(pinyin_ime->k9_input_str,  LV_IME_PINYIN_K9_MAX_INPUT);
         lv_memzero(lv_pinyin_k9_cand_str, sizeof(lv_pinyin_k9_cand_str));
+        for(uint8_t i = 0; i < LV_IME_PINYIN_CAND_TEXT_NUM; i++) {
+            lv_strcpy(lv_pinyin_k9_cand_str[i], " ");
+        }
         lv_strcpy(lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM], LV_SYMBOL_RIGHT"\0");
         lv_strcpy(lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 1], "\0");
     }
 #endif
 
     pinyin_ime->ta_count = 0;
-    lv_memzero(lv_pinyin_cand_str, (sizeof(lv_pinyin_cand_str)));
+    for(uint8_t i = 0; i < LV_IME_PINYIN_CAND_TEXT_NUM; i++) {
+        lv_memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
+        lv_pinyin_cand_str[i][0] = ' ';
+    }
     lv_memzero(pinyin_ime->input_char, sizeof(pinyin_ime->input_char));
 
     lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
@@ -1113,11 +1121,16 @@ static void pinyin_k9_fill_cand(lv_obj_t * obj)
     ll_index = _lv_ll_get_head(&pinyin_ime->k9_legal_py_ll);
     lv_strcpy(pinyin_ime->input_char, ll_index->py_str);
     while(ll_index) {
-        if((index >= LV_IME_PINYIN_K9_CAND_TEXT_NUM) || \
-           (index >= pinyin_ime->k9_legal_py_count))
+        if(index >= LV_IME_PINYIN_K9_CAND_TEXT_NUM)
             break;
 
-        lv_strcpy(lv_pinyin_k9_cand_str[index], ll_index->py_str);
+        if(index >= pinyin_ime->k9_legal_py_count) {
+            lv_strcpy(lv_pinyin_k9_cand_str[index], " ");
+        }
+        else {
+            lv_strcpy(lv_pinyin_k9_cand_str[index], ll_index->py_str);
+        }
+
         ll_index = _lv_ll_get_next(&pinyin_ime->k9_legal_py_ll, ll_index); /*Find the next list*/
         index++;
     }
