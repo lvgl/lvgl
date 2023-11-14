@@ -168,6 +168,7 @@ endif()
 
 set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/src>
+    $<BUILD_INTERFACE:${LVGL_ROOT_DIR}/src>  # instead of using include ../../../lvgl.h, we add it to the include path
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/unity>
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}>
 )

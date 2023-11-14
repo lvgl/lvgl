@@ -16,3 +16,4 @@ target_sources(lvgl_interface INTERFACE ${SOURCES})
 # lv_style_transition_dsc_t_path_xcb_callback(const struct _lv_anim_t * arg0) |
 # ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 target_compile_options(lvgl_interface INTERFACE -Wno-unused-function)
+target_include_directories(lvgl_interface SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src)
