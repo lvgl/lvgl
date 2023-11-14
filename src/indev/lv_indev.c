@@ -272,7 +272,7 @@ void lv_indev_set_type(lv_indev_t * indev, lv_indev_type_t indev_type)
     indev->reset_query = 1;
 }
 
-void lv_indev_set_read_cb(lv_indev_t * indev,  lv_indev_read_cb_t read_cb)
+void lv_indev_set_read_cb(lv_indev_t * indev, lv_indev_read_cb_t read_cb)
 {
     if(indev == NULL) return;
 
