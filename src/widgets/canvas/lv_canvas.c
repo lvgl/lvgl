@@ -102,26 +102,26 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     }
     else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_A8) {
         uint8_t * buf = (uint8_t *)canvas->dsc.data;
-        buf += canvas->dsc.header.w * y + x;
+        buf += canvas->dsc.header.stride * y + x;
         *buf = opa;
     }
     else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_RGB565) {
         lv_color16_t * buf = (lv_color16_t *)canvas->dsc.data;
-        buf += canvas->dsc.header.w * y + x;
+        buf += canvas->dsc.header.stride / 2 * y + x;
         buf->red = color.red >> 3;
         buf->green = color.green >> 2;
         buf->blue = color.blue >> 3;
     }
     else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_RGB888) {
         uint8_t * buf = (uint8_t *)canvas->dsc.data;
-        buf += canvas->dsc.header.w * y * 3 + x * 3;
+        buf += canvas->dsc.header.stride / 3 * y * 3 + x * 3;
         buf[2] = color.red;
         buf[1] = color.green;
         buf[0] = color.blue;
     }
     else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_XRGB8888) {
         uint8_t * buf = (uint8_t *)canvas->dsc.data;
-        buf += canvas->dsc.header.w * y * 4 + x * 4;
+        buf += canvas->dsc.header.stride / 4 * y * 4 + x * 4;
         buf[2] = color.red;
         buf[1] = color.green;
         buf[0] = color.blue;
@@ -129,7 +129,7 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     }
     else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_ARGB8888) {
         lv_color32_t * buf = (lv_color32_t *)canvas->dsc.data;
-        buf += canvas->dsc.header.w * y + x;
+        buf += canvas->dsc.header.stride / 4 * y + x;
         buf->red = color.red;
         buf->green = color.green;
         buf->blue = color.blue;

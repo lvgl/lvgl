@@ -116,15 +116,15 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
     int32_t dest_stride;
     int32_t src_stride_px;
     if(src_cf == LV_COLOR_FORMAT_RGB888) {
-        dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_ARGB8888);
+        dest_stride = dest_w * lv_color_format_get_size(LV_COLOR_FORMAT_ARGB8888);
         src_stride_px = src_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB888);
     }
     else if(src_cf == LV_COLOR_FORMAT_RGB565A8) {
-        dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_RGB565);
+        dest_stride = dest_w * 2;
         src_stride_px = src_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB565);
     }
     else {
-        dest_stride = lv_draw_buf_width_to_stride(dest_w, src_cf);
+        dest_stride = dest_w * lv_color_format_get_size(src_cf);
         src_stride_px = src_stride / lv_color_format_get_size(src_cf);
     }
 

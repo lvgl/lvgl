@@ -153,7 +153,7 @@ static void create_ui(void)
     }
 
     /*Large byte array*/
-    static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(400, 2) * 100 * 2];
+    static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(400, 2) * 100 * 2 + LV_DRAW_BUF_ALIGN];
 
     lv_obj_t * canvas = lv_canvas_create(scr);
     lv_obj_set_grid_cell(canvas, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 2, 1);
