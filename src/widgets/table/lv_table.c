@@ -178,14 +178,14 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
     lv_free(raw_txt);
 #else
     table->cell_data[cell] = lv_realloc(table->cell_data[cell],
-                                        sizeof(lv_table_cell_t) + len + 2); /*+1: trailing '\0; */
+                                        sizeof(lv_table_cell_t) + len + 1); /*+1: trailing '\0; */
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) {
         va_end(ap2);
         return;
     }
 
-    table->cell_data[cell]->txt[len + 1] = 0; /*Ensure NULL termination*/
+    table->cell_data[cell]->txt[len] = 0; /*Ensure NULL termination*/
 
     lv_vsnprintf(table->cell_data[cell]->txt, len + 1, fmt, ap2);
 #endif
