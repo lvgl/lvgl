@@ -202,7 +202,7 @@ uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_t
 {
 
     if(speed > 10000) {
-        LV_LOG_WARN("speed is truncated to 10000 (was %d"LV_PRIu32")", speed);
+        LV_LOG_WARN("speed is truncated to 10000 (was %"LV_PRIu32")", speed);
         speed = 10230;
     }
     if(min_time > 10000) {
