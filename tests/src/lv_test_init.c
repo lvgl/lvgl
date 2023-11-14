@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST || 1
 #include "lv_test_init.h"
 #include "lv_test_indev.h"
 #include <sys/time.h>
@@ -31,9 +31,10 @@ void lv_test_deinit(void)
 static void hal_init(void)
 {
 
-    static lv_color32_t test_fb[HOR_RES * VER_RES * 2];
+    static lv_color32_t test_fb[(HOR_RES + LV_DRAW_BUF_STRIDE_ALIGN - 1) * VER_RES + LV_DRAW_BUF_ALIGN];
     lv_display_t * disp = lv_display_create(HOR_RES, VER_RES);
-    lv_display_set_draw_buffers(disp, test_fb, NULL, HOR_RES * VER_RES, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_draw_buffers(disp, lv_draw_buf_align(test_fb, LV_COLOR_FORMAT_ARGB8888), NULL, HOR_RES * VER_RES,
+                                LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_flush_cb(disp, dummy_flush_cb);
 
     lv_test_mouse_indev = lv_indev_create();

@@ -195,9 +195,9 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
         lv_tlsf_walk_pool(*pool_p, lv_mem_walker, mon_p);
     }
 
-    mon_p->used_pct = 100 - (100U * mon_p->free_size) / mon_p->total_size;
+    mon_p->used_pct = 100 - (uint64_t)100U * mon_p->free_size / mon_p->total_size;
     if(mon_p->free_size > 0) {
-        mon_p->frag_pct = mon_p->free_biggest_size * 100U / mon_p->free_size;
+        mon_p->frag_pct = (uint64_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
         mon_p->frag_pct = 100 - mon_p->frag_pct;
     }
     else {

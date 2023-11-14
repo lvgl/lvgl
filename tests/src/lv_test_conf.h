@@ -86,8 +86,11 @@ typedef void * lv_user_data_t;
 #if defined(LVGL_CI_USING_SYS_HEAP) || defined(LVGL_CI_USING_DEF_HEAP)
 #undef LV_LOG_PRINTF
 
+/*Use a large value be sure any issues will cause crash*/
 //#define LV_DRAW_BUF_STRIDE_ALIGN                64
-//#define LV_DRAW_BUF_ALIGN                       40  /*Use non power of 2 to avoid the case when `malloc` returns aligned pointer by default*/
+
+/*Use non power of 2 to avoid the case when `malloc` returns aligned pointer by default, and use a large value be sure any issues will cause crash*/
+#define LV_DRAW_BUF_ALIGN                       852
 
 /*For screenshots*/
 #undef LV_USE_PERF_MONITOR

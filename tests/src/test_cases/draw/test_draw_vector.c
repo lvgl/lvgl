@@ -204,7 +204,8 @@ static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 {
     static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(640, 4) * 480 + LV_DRAW_BUF_ALIGN];
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas, canvas_buf, 640, 480, LV_COLOR_FORMAT_ARGB8888);
+    lv_canvas_set_buffer(canvas, lv_draw_buf_align(canvas_buf, LV_COLOR_FORMAT_ARGB8888), 640, 480,
+                         LV_COLOR_FORMAT_ARGB8888);
 
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);

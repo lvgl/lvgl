@@ -1,8 +1,9 @@
-#if LV_BUILD_TEST || 1
+#if LV_BUILD_TEST
 #include "../lvgl.h"
 
 #include "unity/unity.h"
 #include "lv_test_indev.h"
+#include "lv_test_helpers.h"
 
 static void create_ui(void);
 static void chart_type_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
@@ -152,12 +153,12 @@ static void create_ui(void)
     }
 
     /*Large byte array*/
-    static uint8_t canvas_buf[400 * 100 * 2];
+    static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(400, 2) * 100 * 2];
 
     lv_obj_t * canvas = lv_canvas_create(scr);
     lv_obj_set_grid_cell(canvas, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 2, 1);
     /*Test RGB565 rendering*/
-    lv_canvas_set_buffer(canvas, canvas_buf, 400, 100, LV_COLOR_FORMAT_RGB565);
+    lv_canvas_set_buffer(canvas, lv_draw_buf_align(canvas_buf, LV_COLOR_FORMAT_RGB565), 400, 100, LV_COLOR_FORMAT_RGB565);
     lv_canvas_fill_bg(canvas, c2, LV_OPA_COVER);
     draw_to_canvas(canvas);
 

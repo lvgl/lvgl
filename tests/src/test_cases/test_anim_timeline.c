@@ -1,4 +1,5 @@
-#if LV_BUILD_TEST || 1
+#if LV_BUILD_TEST
+
 #include "../lvgl.h"
 
 #include "unity/unity.h"
@@ -77,9 +78,7 @@ void test_anim_timeline_progress_1(void)
     lv_refr_now(NULL);
     TEST_ASSERT_EQUAL(700, lv_obj_get_x(obj));
 
-
 }
-
 
 void test_anim_timeline_progress_2(void)
 {
@@ -105,7 +104,6 @@ void test_anim_timeline_progress_2(void)
      *   0     500    1000   1500 ms
      *   0     21845  43690  65535 progress
      */
-
 
     anim_timeline = lv_anim_timeline_create();
     lv_anim_timeline_add(anim_timeline, 0, &a1);
@@ -145,6 +143,5 @@ void test_anim_timeline_progress_2(void)
     TEST_ASSERT_EQUAL(700, lv_obj_get_x(obj));
     TEST_ASSERT_EQUAL(300, lv_obj_get_y(obj));
 }
-
 
 #endif
