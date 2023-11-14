@@ -959,6 +959,9 @@ static void pinyin_ime_clear_data(lv_obj_t * obj)
         pinyin_ime->k9_legal_py_count = 0;
         lv_memzero(pinyin_ime->k9_input_str,  LV_IME_PINYIN_K9_MAX_INPUT);
         lv_memzero(lv_pinyin_k9_cand_str, sizeof(lv_pinyin_k9_cand_str));
+         for(uint8_t i = 0; i < LV_IME_PINYIN_CAND_TEXT_NUM; i++){
+            lv_strcpy(lv_pinyin_k9_cand_str[i], " ");
+         }
         lv_strcpy(lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM], LV_SYMBOL_RIGHT"\0");
         lv_strcpy(lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 1], "\0");
     }
@@ -1118,11 +1121,16 @@ static void pinyin_k9_fill_cand(lv_obj_t * obj)
     ll_index = _lv_ll_get_head(&pinyin_ime->k9_legal_py_ll);
     lv_strcpy(pinyin_ime->input_char, ll_index->py_str);
     while(ll_index) {
-        if((index >= LV_IME_PINYIN_K9_CAND_TEXT_NUM) || \
-           (index >= pinyin_ime->k9_legal_py_count))
+        if(index >= LV_IME_PINYIN_K9_CAND_TEXT_NUM)
             break;
 
-        lv_strcpy(lv_pinyin_k9_cand_str[index], ll_index->py_str);
+        if(index >= pinyin_ime->k9_legal_py_count){
+            lv_strcpy(lv_pinyin_k9_cand_str[index], " ");
+        }
+        else{
+            lv_strcpy(lv_pinyin_k9_cand_str[index], ll_index->py_str);
+        }
+
         ll_index = _lv_ll_get_next(&pinyin_ime->k9_legal_py_ll, ll_index); /*Find the next list*/
         index++;
     }
