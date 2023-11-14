@@ -809,7 +809,7 @@ static void pinyin_input_proc(lv_obj_t * obj)
     pinyin_ime->py_page = 0;
 
     for(uint8_t i = 0; i < LV_IME_PINYIN_CAND_TEXT_NUM; i++) {
-        memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
+        lv_memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
         lv_pinyin_cand_str[i][0] = ' ';
     }
 
@@ -845,7 +845,7 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
     }
 
     for(uint8_t i = 0; i < LV_IME_PINYIN_CAND_TEXT_NUM; i++) {
-        memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
+        lv_memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
         lv_pinyin_cand_str[i][0] = ' ';
     }
 
@@ -964,7 +964,7 @@ static void pinyin_ime_clear_data(lv_obj_t * obj)
 
     pinyin_ime->ta_count = 0;
     for(uint8_t i = 0; i < LV_IME_PINYIN_CAND_TEXT_NUM; i++) {
-        memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
+        lv_memset(lv_pinyin_cand_str[i], 0x00, sizeof(lv_pinyin_cand_str[i]));
         lv_pinyin_cand_str[i][0] = ' ';
     }
     lv_memzero(pinyin_ime->input_char, sizeof(pinyin_ime->input_char));
