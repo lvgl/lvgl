@@ -84,7 +84,7 @@ void _lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *));
  */
 static inline void _lv_ll_clear(lv_ll_t * ll_p)
 {
-    return _lv_ll_clear_custom(ll_p, NULL);
+    _lv_ll_clear_custom(ll_p, NULL);
 }
 
 /**
