@@ -187,7 +187,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
 
     table->cell_data[cell]->txt[len] = 0; /*Ensure NULL termination*/
 
-    lv_vsnprintf(table->cell_data[cell]->txt, len, fmt, ap2);
+    lv_vsnprintf(table->cell_data[cell]->txt, len + 1, fmt, ap2);
 #endif
 
     va_end(ap2);
