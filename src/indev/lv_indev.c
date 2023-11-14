@@ -131,6 +131,7 @@ void lv_indev_delete(lv_indev_t * indev)
 
     /*Remove the input device from the list*/
     _lv_ll_remove(indev_ll_head, indev);
+    /*Free the memory of the input device*/
     lv_free(indev);
 }
 
