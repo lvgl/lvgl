@@ -51,6 +51,7 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
 static int read_png_file(png_image_t * p, const char * file_name);
 static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
 static void png_release(png_image_t * p);
+static void buf_to_xrgb8888(const uint8_t * buf_in, uint8_t * buf_out, lv_color_format_t cf_in);
 
 /**********************
  *  STATIC VARIABLES
@@ -117,6 +118,7 @@ bool lv_test_assert_image_eq(const char * fn_ref)
  *   STATIC FUNCTIONS
  **********************/
 
+static uint8_t screen_buf_xrgb8888[800 * 480 * 4];
 /**
  * Compare the content of the frame buffer with a reference image
  * @param fn_ref        reference image name
@@ -132,14 +134,17 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
     lv_refr_now(NULL);
 
     extern uint8_t * last_flushed_buf;
-    uint8_t * screen_buf = lv_draw_buf_align(last_flushed_buf, LV_COLOR_FORMAT_XRGB8888);
+
+    lv_color_format_t cf = lv_display_get_color_format(NULL);
+    uint8_t * screen_buf = lv_draw_buf_align(last_flushed_buf, cf);
+    buf_to_xrgb8888(screen_buf, screen_buf_xrgb8888, cf);
 
     png_image_t p;
     int res = read_png_file(&p, fn_ref_full);
     if(res == ERR_FILE_NOT_FOUND) {
         TEST_PRINTF("%s%s", fn_ref_full, " was not found, creating is now from the rendered screen");
         fflush(stderr);
-        write_png_file(screen_buf, 800, 480, fn_ref_full);
+        write_png_file(screen_buf_xrgb8888, 800, 480, fn_ref_full);
         return true;
     }
     else if(res == ERR_PNG) {
@@ -150,27 +155,27 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
     const png_byte * ptr_ref = NULL;
 
     bool err = false;
-    uint32_t stride = lv_draw_buf_width_to_stride(800, LV_COLOR_FORMAT_ARGB8888);
     int x, y;
     for(y = 0; y < p.height; y++) {
-        uint8_t * screen_buf_tmp = screen_buf + stride * y;
+        uint8_t * screen_buf_tmp = screen_buf_xrgb8888 + 800 * 4 * y;
         png_byte * row = p.row_pointers[y];
         for(x = 0; x < p.width; x++) {
             ptr_ref = &(row[x * 3]);
             ptr_act = screen_buf_tmp;
 
-            uint32_t ref_px = 0;
-            uint32_t act_px = 0;
-            memcpy(&ref_px, ptr_ref, 3);
-            memcpy(&act_px, ptr_act, 3);
-
-            uint8_t act_swap[3] = {ptr_act[2], ptr_act[1], ptr_act[0]};
-
-            if(LV_ABS((int32_t) act_swap[0] - ptr_ref[0]) > tolerance ||
-               LV_ABS((int32_t) act_swap[1] - ptr_ref[1]) > tolerance ||
-               LV_ABS((int32_t) act_swap[2] - ptr_ref[2]) > tolerance) {
-                uint32_t act_swap_32 = (act_swap[2] << 16) + (act_swap[1] << 8) + (act_swap[0] << 0);
-                TEST_PRINTF("Error %s on x:%d, y:%d.\nExpected: %X\nActual:   %X", mode,  x, y, ref_px, act_swap_32);
+            if(LV_ABS((int32_t) ptr_act[0] - ptr_ref[0]) > tolerance ||
+               LV_ABS((int32_t) ptr_act[1] - ptr_ref[1]) > tolerance ||
+               LV_ABS((int32_t) ptr_act[2] - ptr_ref[2]) > tolerance) {
+                uint32_t act_px = (ptr_act[2] << 16) + (ptr_act[1] << 8) + (ptr_act[0] << 0);
+                uint32_t ref_px = 0;
+                memcpy(&ref_px, ptr_ref, 3);
+                TEST_PRINTF("\nScreenshot compare error\n"
+                            "  - File: %s\n"
+                            "  - Mode: %s\n"
+                            "  - At x:%d, y:%d.\n"
+                            "  - Expected: %X\n"
+                            "  - Actual:   %X",
+                            fn_ref_full, mode,  x, y, ref_px, act_px);
                 fflush(stderr);
                 err = true;
                 break;
@@ -181,14 +186,14 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
     }
 
     if(err) {
-        char fn_ref_no_ext[64];
+        char fn_ref_no_ext[256];
         strcpy(fn_ref_no_ext, fn_ref);
         fn_ref_no_ext[strlen(fn_ref_no_ext) - 4] = '\0';
 
         char fn_err_full[512];
         sprintf(fn_err_full, "%s%s_err.png", REF_IMGS_PATH, fn_ref_no_ext);
 
-        write_png_file(screen_buf, 800, 480, fn_err_full);
+        write_png_file(screen_buf_xrgb8888, 800, 480, fn_err_full);
     }
 
     png_release(&p);
@@ -322,9 +327,9 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
         row_pointers[y] = malloc(3 * width);
         uint8_t * line = raw_img8 + y * width * 4;
         for(uint32_t x = 0; x < width; x++) {
-            row_pointers[y][x * 3 + 0] = line[x * 4 + 2];
+            row_pointers[y][x * 3 + 0] = line[x * 4 + 0];
             row_pointers[y][x * 3 + 1] = line[x * 4 + 1];
-            row_pointers[y][x * 3 + 2] = line[x * 4 + 0];
+            row_pointers[y][x * 3 + 2] = line[x * 4 + 2];
         }
     }
     png_write_image(png_ptr, row_pointers);
@@ -354,6 +359,59 @@ static void png_release(png_image_t * p)
     free(p->row_pointers);
 
     png_destroy_read_struct(&p->png_ptr, &p->info_ptr, NULL);
+}
+
+static void buf_to_xrgb8888(const uint8_t * buf_in, uint8_t * buf_out, lv_color_format_t cf_in)
+{
+    uint32_t stride = lv_draw_buf_width_to_stride(800, cf_in);
+    if(cf_in == LV_COLOR_FORMAT_RGB565) {
+        uint32_t y;
+        for(y = 0; y < 480; y++) {
+
+            uint32_t x;
+            for(x = 0; x < 800; x++) {
+                const lv_color16_t * c16 = (const lv_color16_t *)&buf_in[x * 2];
+
+                buf_out[x * 4 + 3] = 0xff;
+                buf_out[x * 4 + 2] = (c16->blue * 2106) >> 8;  /*To make it rounded*/
+                buf_out[x * 4 + 1] = (c16->green * 1037) >> 8;
+                buf_out[x * 4 + 0] = (c16->red * 2106) >> 8;
+            }
+
+            buf_in += stride;
+            buf_out += 800 * 4;
+        }
+    }
+    else if(cf_in == LV_COLOR_FORMAT_ARGB8888 || cf_in == LV_COLOR_FORMAT_XRGB8888) {
+        uint32_t y;
+        for(y = 0; y < 480; y++) {
+            uint32_t x;
+            for(x = 0; x < 800; x++) {
+                buf_out[x * 4 + 3] = buf_in[x * 4 + 3];
+                buf_out[x * 4 + 2] = buf_in[x * 4 + 0];
+                buf_out[x * 4 + 1] = buf_in[x * 4 + 1];
+                buf_out[x * 4 + 0] = buf_in[x * 4 + 2];
+            }
+
+            buf_in += stride;
+            buf_out += 800 * 4;
+        }
+    }
+    else if(cf_in == LV_COLOR_FORMAT_RGB888) {
+        uint32_t y;
+        for(y = 0; y < 480; y++) {
+            uint32_t x;
+            for(x = 0; x < 800; x++) {
+                buf_out[x * 4 + 3] = 0xff;
+                buf_out[x * 4 + 2] = buf_in[x * 3 + 0];
+                buf_out[x * 4 + 1] = buf_in[x * 3 + 1];
+                buf_out[x * 4 + 0] = buf_in[x * 3 + 2];
+            }
+
+            buf_in += stride;
+            buf_out += 800 * 4;
+        }
+    }
 }
 
 #endif
