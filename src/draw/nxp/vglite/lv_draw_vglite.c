@@ -50,16 +50,21 @@ typedef struct _vglite_draw_task_t {
  **********************/
 
 /*
- * Dispatch a task to the VGLite unit.
+ * Evaluate a task and set the score and preferred VGLite draw unit.
+ * Return 1 if task is preferred, 0 otherwise (task is not supported).
+ */
+static int32_t _vglite_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+
+/*
+ * Dispatch (assign) a task to VGLite draw unit (itself).
  * Return 1 if task was dispatched, 0 otherwise (task not supported).
  */
 static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 /*
- * Evaluate a task and set the score and preferred VGLite unit.
- * Return 1 if task is preferred, 0 otherwise (task is not supported).
+ * Delete the VGLite draw unit.
  */
-static int32_t _vglite_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static int32_t _vglite_delete(lv_draw_unit_t * draw_unit);
 
 #if LV_USE_OS
     static void _vglite_render_thread_cb(void * ptr);
@@ -95,8 +100,9 @@ void lv_draw_vglite_init(void)
     lv_draw_buf_vglite_init_handlers();
 
     lv_draw_vglite_unit_t * draw_vglite_unit = lv_draw_create_unit(sizeof(lv_draw_vglite_unit_t));
-    draw_vglite_unit->base_unit.dispatch_cb = _vglite_dispatch;
     draw_vglite_unit->base_unit.evaluate_cb = _vglite_evaluate;
+    draw_vglite_unit->base_unit.dispatch_cb = _vglite_dispatch;
+    draw_vglite_unit->base_unit.delete_cb = _vglite_delete;
 
 #if LV_USE_OS
     lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 8 * 1024, draw_vglite_unit);
@@ -122,7 +128,12 @@ static inline bool _vglite_cf_supported(lv_color_format_t cf)
 
 static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
-    LV_UNUSED(u);
+    /* Return if target buffer format is not supported.
+     *
+     * FIXME: Source format and destination format support is different!
+     */
+    if(!_vglite_cf_supported(u->target_layer->color_format))
+        return 0;
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
@@ -230,19 +241,11 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(draw_vglite_unit->task_act)
         return 0;
 
-    /* Return if target buffer format is not supported.
-     *
-     * FIXME: Source format and destination format support is different!
-     */
-    if(!_vglite_cf_supported(layer->color_format))
-        return 0;
-
     /* Try to get an ready to draw. */
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_VGLITE);
 
-    /* Return 0 is no selection, some tasks can be supported by other units. */
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_VGLITE)
-        return 0;
+        return -1;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL)
@@ -255,7 +258,8 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 #if LV_USE_OS
     /* Let the render thread work. */
-    lv_thread_sync_signal(&draw_vglite_unit->sync);
+    if(draw_vglite_unit->inited)
+        lv_thread_sync_signal(&draw_vglite_unit->sync);
 #else
     _vglite_execute_drawing(draw_vglite_unit);
 
@@ -267,6 +271,27 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 #endif
 
     return 1;
+}
+
+static int32_t _vglite_delete(lv_draw_unit_t * draw_unit)
+{
+#if LV_USE_OS
+    lv_draw_vglite_unit_t * draw_vglite_unit = (lv_draw_vglite_unit_t *) draw_unit;
+
+    LV_LOG_INFO("Cancel VGLite draw thread.");
+    draw_vglite_unit->exit_status = true;
+
+    if(draw_vglite_unit->inited)
+        lv_thread_sync_signal(&draw_vglite_unit->sync);
+
+    lv_result_t res = lv_thread_delete(&draw_vglite_unit->thread);
+
+    return res;
+#else
+    LV_UNUSED(draw_unit);
+
+    return 0;
+#endif
 }
 
 static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
@@ -400,11 +425,10 @@ static void _vglite_render_thread_cb(void * ptr)
     lv_draw_vglite_unit_t * u = ptr;
 
     lv_thread_sync_init(&u->sync);
+    u->inited = true;
 
     while(1) {
-        /*
-         * Wait for sync if no task received.
-         */
+        /* Wait for sync if there is no task set. */
         while(u->task_act == NULL
 #if VGLITE_TASK_QUEUE
               /*
@@ -414,7 +438,15 @@ static void _vglite_render_thread_cb(void * ptr)
               && _head == _tail
 #endif
              ) {
+            if(u->exit_status)
+                break;
+
             lv_thread_sync_wait(&u->sync);
+        }
+
+        if(u->exit_status) {
+            LV_LOG_INFO("Ready to exit VGLite draw thread.");
+            break;
         }
 
         if(u->task_act) {
@@ -444,6 +476,10 @@ static void _vglite_render_thread_cb(void * ptr)
         /* The draw unit is free now. Request a new dispatching as it can get a new task. */
         lv_draw_dispatch_request();
     }
+
+    u->inited = false;
+    lv_thread_sync_delete(&u->sync);
+    LV_LOG_INFO("Exit VGLite draw thread.");
 }
 #endif
 
