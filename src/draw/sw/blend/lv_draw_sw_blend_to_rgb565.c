@@ -233,7 +233,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
     uint16_t * dest_buf_u16 = dsc->dest_buf;
     int32_t dest_stride_px = dsc->dest_stride / 2;
     const uint16_t * src_buf_u16 = dsc->src_buf;
-    int32_t src_stride = dsc->src_stride;
+    int32_t src_stride_px = dsc->src_stride / 2;
     const lv_opa_t * mask_buf = dsc->mask_buf;
     int32_t mask_stride = dsc->mask_stride;
 
@@ -246,7 +246,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
             for(y = 0; y < h; y++) {
                 lv_memcpy(dest_buf_u16, src_buf_u16, line_in_bytes);
                 dest_buf_u16 += dest_stride_px;
-                src_buf_u16 += src_stride;
+                src_buf_u16 += src_stride_px;
             }
         }
         else if(mask_buf == NULL && opa < LV_OPA_MAX) {
@@ -255,7 +255,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
                     dest_buf_u16[x] = lv_color_16_16_mix(src_buf_u16[x], dest_buf_u16[x], opa);
                 }
                 dest_buf_u16 += dest_stride_px;
-                src_buf_u16 += src_stride;
+                src_buf_u16 += src_stride_px;
             }
         }
         else if(mask_buf && opa >= LV_OPA_MAX) {
@@ -264,7 +264,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
                     dest_buf_u16[x] = lv_color_16_16_mix(src_buf_u16[x], dest_buf_u16[x], mask_buf[x]);
                 }
                 dest_buf_u16 += dest_stride_px;
-                src_buf_u16 += src_stride;
+                src_buf_u16 += src_stride_px;
                 mask_buf += mask_stride;
             }
         }
@@ -274,7 +274,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
                     dest_buf_u16[x] = lv_color_16_16_mix(src_buf_u16[x], dest_buf_u16[x], LV_OPA_MIX2(mask_buf[x], opa));
                 }
                 dest_buf_u16 += dest_stride_px;
-                src_buf_u16 += src_stride;
+                src_buf_u16 += src_stride_px;
                 mask_buf += mask_stride;
             }
         }
@@ -319,7 +319,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
             }
 
             dest_buf_u16 += dest_stride_px;
-            src_buf_u16 += src_stride;
+            src_buf_u16 += src_stride_px;
             if(mask_buf) mask_buf += mask_stride;
         }
     }
@@ -333,7 +333,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
     uint16_t * dest_buf_u16 = dsc->dest_buf;
     int32_t dest_stride_px = dsc->dest_stride / 2;
     const uint8_t * src_buf_u8 = dsc->src_buf;
-    int32_t src_stride = dsc->src_stride * src_px_size;
+    int32_t src_stride = dsc->src_stride;
     const lv_opa_t * mask_buf = dsc->mask_buf;
     int32_t mask_stride = dsc->mask_stride;
 
@@ -434,7 +434,7 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
     uint16_t * dest_buf_u16 = dsc->dest_buf;
     int32_t dest_stride_px = dsc->dest_stride / 2;
     const uint8_t * src_buf_u8 = dsc->src_buf;
-    int32_t src_stride = dsc->src_stride * 4;
+    int32_t src_stride = dsc->src_stride;
     const lv_opa_t * mask_buf = dsc->mask_buf;
     int32_t mask_stride = dsc->mask_stride;
 

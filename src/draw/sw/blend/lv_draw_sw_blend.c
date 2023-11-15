@@ -96,12 +96,12 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
 
         image_dsc.opa = blend_dsc->opa;
         image_dsc.blend_mode = blend_dsc->blend_mode;
-        image_dsc.src_stride = blend_dsc->src_stride / lv_color_format_get_size(blend_dsc->src_color_format);
+        image_dsc.src_stride = blend_dsc->src_stride;
         image_dsc.src_color_format = blend_dsc->src_color_format;
 
         const uint8_t * src_buf = blend_dsc->src_buf;
         uint32_t src_px_size = lv_color_format_get_size(blend_dsc->src_color_format);
-        src_buf += image_dsc.src_stride * (blend_area.y1 - blend_dsc->src_area->y1) * src_px_size;
+        src_buf += image_dsc.src_stride * (blend_area.y1 - blend_dsc->src_area->y1);
         src_buf += (blend_area.x1 - blend_dsc->src_area->x1) * src_px_size;
         image_dsc.src_buf = src_buf;
 
