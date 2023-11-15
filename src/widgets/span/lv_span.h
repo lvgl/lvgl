@@ -179,7 +179,7 @@ lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id);
  * @param obj   The spangroup object to get the child count of.
  * @return      The span count of the spangroup.
  */
-uint32_t lv_spangroup_get_child_conut(const lv_obj_t * obj);
+uint32_t lv_spangroup_get_child_count(const lv_obj_t * obj);
 
 /**
  * get the align of the spangroup.

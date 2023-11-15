@@ -286,7 +286,7 @@ lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
     return NULL;
 }
 
-uint32_t lv_spangroup_get_child_conut(const lv_obj_t * obj)
+uint32_t lv_spangroup_get_child_count(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

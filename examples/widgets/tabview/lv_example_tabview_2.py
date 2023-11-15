@@ -1,6 +1,6 @@
 
 # Create a Tab view object
-tabview = lv.tabview(lv.screen_active(), lv.DIR.LEFT, 80)
+tabview = lv.tabview(lv.screen_active())
 
 tabview.set_style_bg_color(lv.palette_lighten(lv.PALETTE.RED, 2), 0)
 
