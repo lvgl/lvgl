@@ -27,6 +27,10 @@
  **********************/
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
 
+static inline uint32_t get_layer_size_kb(uint32_t size_byte)
+{
+    return size_byte < 1024 ? 1 : size_byte >> 10;
+}
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -155,7 +159,6 @@ void lv_draw_dispatch(void)
                 render_running = true;
             layer = layer->next;
         }
-
         if(!render_running) {
             lv_draw_dispatch_request();
         }
@@ -185,7 +188,7 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
                     int32_t w = lv_area_get_width(&layer_drawn->buf_area);
                     uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer_drawn->color_format);
 
-                    _draw_info.used_memory_for_layers_kb -= layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
+                    _draw_info.used_memory_for_layers_kb -= get_layer_size_kb(layer_size_byte);
                     LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
                     lv_draw_buf_free(layer_drawn->buf_unaligned);
                 }
@@ -248,8 +251,10 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
             int32_t w = lv_area_get_width(&layer->buf_area);
             uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
 
-            uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
-            if(_draw_info.used_memory_for_layers_kb + kb > LV_LAYER_MAX_MEMORY_USAGE) {
+            uint32_t kb = get_layer_size_kb(layer_size_byte);
+            /*WARN: At least one layer must be supported, otherwise it will cause the layer task cannot be correctly dispatched.
+             * all draw tasks cannot be fully consumed, the dispatch task enters an infinite loop, and UI freezes.*/
+            if(_draw_info.used_memory_for_layers_kb > 0 && _draw_info.used_memory_for_layers_kb + kb > LV_LAYER_MAX_MEMORY_USAGE) {
                 layer_ok = false;
             }
         }
@@ -363,8 +368,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 
         layer->buf = lv_draw_buf_align(layer->buf_unaligned, layer->color_format);
 
-        uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
-        _draw_info.used_memory_for_layers_kb += kb;
+        _draw_info.used_memory_for_layers_kb += get_layer_size_kb(layer_size_byte);
         LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
 
         if(lv_color_format_has_alpha(layer->color_format)) {
