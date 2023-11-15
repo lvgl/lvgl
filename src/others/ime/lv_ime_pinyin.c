@@ -999,14 +999,15 @@ static void pinyin_k9_init_data(lv_obj_t * obj)
         py_str_i++;
     }
 
-    default_kb_ctrl_k9_map[0]  = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
-    default_kb_ctrl_k9_map[4]  = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
-    default_kb_ctrl_k9_map[5]  = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
+    default_kb_ctrl_k9_map[0]  = LV_BUTTONMATRIX_CTRL_CHECKED | 1;
+    default_kb_ctrl_k9_map[1]  = LV_BUTTONMATRIX_CTRL_NO_REPEAT | LV_BUTTONMATRIX_CTRL_CLICK_TRIG | 1;
+    default_kb_ctrl_k9_map[4]  = LV_BUTTONMATRIX_CTRL_CHECKED | 1;
+    default_kb_ctrl_k9_map[5]  = LV_BUTTONMATRIX_CTRL_CHECKED | 1;
     default_kb_ctrl_k9_map[9]  = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
-    default_kb_ctrl_k9_map[10] = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
-    default_kb_ctrl_k9_map[14] = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
-    default_kb_ctrl_k9_map[15] = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
-    default_kb_ctrl_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 16] = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
+    default_kb_ctrl_k9_map[10] = LV_BUTTONMATRIX_CTRL_CHECKED | 1;
+    default_kb_ctrl_k9_map[14] = LV_BUTTONMATRIX_CTRL_CHECKED | 1;
+    default_kb_ctrl_k9_map[15] = LV_BUTTONMATRIX_CTRL_CHECKED | 1;
+    default_kb_ctrl_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 16] = LV_BUTTONMATRIX_CTRL_CHECKED | 1;
 }
 
 static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char * py9_map[])
