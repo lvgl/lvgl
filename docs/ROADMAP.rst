@@ -76,7 +76,7 @@ Widgets
 Drawing and rendering
 ~~~~~~~~~~~~~~~~~~~~~
 
-- |uncheck| Automatically recalculate the layout if a coordinate is get with `lv_obj_get_width/height/x/y/etc`
+- |uncheck| Automatically recalculate the layout if a coordinate is obtained using `lv_obj_get_width/height/x/y/etc`
 
 Animations
 ~~~~~~~~~~
@@ -145,7 +145,7 @@ Widgets
 Others
 ~~~~~~
 - |uncheck| `em`, `ch`, `vw/vh` units
-- |uncheck| `astect-ratio` as size
+- |uncheck| `aspect-ratio` as size
 - |uncheck| More grid features. E.g. repeat(auto-fill, minmax( px, 1fr))
 - |uncheck| Named grid cells to allow updating layouts without touching the children (like CSS `grid-template-areas`)
 - |uncheck| Scene support. See `this comment <https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911>`__
