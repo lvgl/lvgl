@@ -276,8 +276,8 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 
     /* Set target buffer */
     lv_layer_t * layer = draw_unit->target_layer;
-    lv_coord_t buf_width = lv_area_get_width(&layer->buf_area);
-    lv_coord_t buf_height = lv_area_get_height(&layer->buf_area);
+    uint32_t buf_width = lv_area_get_width(&layer->buf_area);
+    uint32_t buf_height = lv_area_get_height(&layer->buf_area);
 
     vglite_set_dest_buf(layer->buf, buf_width, buf_height, layer->buf_stride, layer->color_format);
 

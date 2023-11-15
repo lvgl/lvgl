@@ -109,7 +109,7 @@ static void _invalidate_cache(void * buf, uint32_t stride, lv_color_format_t cf,
     uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
     uint16_t offset_x = 0;
 
-    if(area->x1 >= (lv_coord_t)(area->x1 % align_pixels)) {
+    if(area->x1 >= (int32_t)(area->x1 % align_pixels)) {
         uint16_t shift_x = area->x1 - (area->x1 % align_pixels);
 
         offset_x = area->x1 - shift_x;

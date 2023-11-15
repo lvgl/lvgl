@@ -80,7 +80,7 @@ void vglite_set_src_buf_ptr(const void * buf);
  * @param[in] cf Destination buffer color format
  *
  */
-void vglite_set_dest_buf(const void * buf, lv_coord_t width, lv_coord_t height, uint32_t stride,
+void vglite_set_dest_buf(const void * buf, uint32_t width, uint32_t height, uint32_t stride,
                          lv_color_format_t cf);
 
 /**
@@ -93,7 +93,7 @@ void vglite_set_dest_buf(const void * buf, lv_coord_t width, lv_coord_t height, 
  * @param[in] cf Source buffer color format
  *
  */
-void vglite_set_src_buf(const void * buf, int32_t width, int32_t height, uint32_t stride,
+void vglite_set_src_buf(const void * buf, uint32_t width, uint32_t height, uint32_t stride,
                         lv_color_format_t cf);
 
 /**
@@ -108,7 +108,7 @@ void vglite_set_src_buf(const void * buf, int32_t width, int32_t height, uint32_
  *
  */
 void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
-                    int32_t width, int32_t height, uint32_t stride,
+                    uint32_t width, uint32_t height, uint32_t stride,
                     lv_color_format_t cf);
 
 /**********************
