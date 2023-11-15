@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST || 1
+#if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "../demos/lv_demos.h"
 

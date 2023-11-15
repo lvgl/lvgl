@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST || 1
+#if LV_BUILD_TEST
 #include "lv_test_init.h"
 #include "lv_test_indev.h"
 #include <sys/time.h>
