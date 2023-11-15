@@ -115,7 +115,6 @@ static void fill_cb(lv_obj_t * parent)
 
 static lv_obj_t * border_obj_create(lv_obj_t * parent, int32_t col, int32_t row)
 {
-
     lv_obj_t * obj = lv_obj_create(parent);
     lv_obj_remove_style_all(obj);
     lv_obj_set_style_border_color(obj, lv_color_hex3(0x000), 0);

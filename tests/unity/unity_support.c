@@ -11,7 +11,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST || 1
 #include "../lvgl.h"
 #include <unistd.h>
 #include <stdlib.h>
@@ -47,6 +47,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t tolerance);
 static int read_png_file(png_image_t * p, const char * file_name);
 static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
 static void png_release(png_image_t * p);
@@ -65,11 +66,69 @@ static void png_release(png_image_t * p);
 
 bool lv_test_assert_image_eq(const char * fn_ref)
 {
+    bool pass;
+
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_invalidate(scr);
+
+    pass = screenhot_compare(fn_ref, "full refresh", 0);
+    if(!pass) return false;
+
+    //Software has minor rounding errors when not the whole image is updated
+    //so ignore stripe invalidation for now
+    //    uint32_t i;
+    //    for(i = 0; i < 800; i += 50 ) {
+    //        lv_area_t a;
+    //        a.y1 = 0;
+    //        a.y2 = 479;
+    //        a.x1 = i;
+    //        a.x2 = i + 12;
+    //        lv_obj_invalidate_area(scr, &a);
+    //
+    //        a.x1 = i + 25;
+    //        a.x2 = i + 32;
+    //        lv_obj_invalidate_area(scr, &a);
+    //    }
+    //
+    //    pass = screenhot_compare(fn_ref, "vertical stripes", 32);
+    //    if(!pass) return false;
+    //
+    //
+    //    for(i = 0; i < 480; i += 40) {
+    //        lv_area_t a;
+    //        a.x1 = 0;
+    //        a.x2 = 799;
+    //        a.y1 = i;
+    //        a.y2 = i + 9;
+    //        lv_obj_invalidate_area(scr, &a);
+    //
+    //        a.y1 = i + 25;
+    //        a.y2 = i + 32;
+    //        lv_obj_invalidate_area(scr, &a);
+    //    }
+    //
+    //    pass = screenhot_compare(fn_ref, "horizontal stripes", 32);
+    //    if(!pass) return false;
+
+    return true;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+/**
+ * Compare the content of the frame buffer with a reference image
+ * @param fn_ref        reference image name
+ * @param mode          arbitrary string to tell more about the compare
+ * @return  true: test passed; false: test failed
+ */
+static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t tolerance)
+{
+
     char fn_ref_full[512];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
-
-    //lv_obj_invalidate(lv_screen_active());
     lv_refr_now(NULL);
 
     extern uint8_t * last_flushed_buf;
@@ -91,13 +150,14 @@ bool lv_test_assert_image_eq(const char * fn_ref)
     const png_byte * ptr_ref = NULL;
 
     bool err = false;
-    int x, y, i_buf = 0;
+    uint32_t stride = lv_draw_buf_width_to_stride(800, LV_COLOR_FORMAT_ARGB8888);
+    int x, y;
     for(y = 0; y < p.height; y++) {
+        uint8_t * screen_buf_tmp = screen_buf + stride * y;
         png_byte * row = p.row_pointers[y];
-
         for(x = 0; x < p.width; x++) {
             ptr_ref = &(row[x * 3]);
-            ptr_act = &(screen_buf[i_buf * 4]);
+            ptr_act = screen_buf_tmp;
 
             uint32_t ref_px = 0;
             uint32_t act_px = 0;
@@ -106,13 +166,16 @@ bool lv_test_assert_image_eq(const char * fn_ref)
 
             uint8_t act_swap[3] = {ptr_act[2], ptr_act[1], ptr_act[0]};
 
-            if(memcmp(act_swap, ptr_ref, 3) != 0) {
-                TEST_PRINTF("Error on x:%d, y:%d. Expected %X, Actual %X", x, y, ref_px, act_px);
+            if(LV_ABS((int32_t) act_swap[0] - ptr_ref[0]) > tolerance ||
+               LV_ABS((int32_t) act_swap[1] - ptr_ref[1]) > tolerance ||
+               LV_ABS((int32_t) act_swap[2] - ptr_ref[2]) > tolerance) {
+                uint32_t act_swap_32 = (act_swap[2] << 16) + (act_swap[1] << 8) + (act_swap[0] << 0);
+                TEST_PRINTF("Error %s on x:%d, y:%d.\nExpected: %X\nActual:   %X", mode,  x, y, ref_px, act_swap_32);
                 fflush(stderr);
                 err = true;
                 break;
             }
-            i_buf++;
+            screen_buf_tmp += 4;
         }
         if(err) break;
     }
@@ -128,17 +191,12 @@ bool lv_test_assert_image_eq(const char * fn_ref)
         write_png_file(screen_buf, 800, 480, fn_err_full);
     }
 
-
     png_release(&p);
 
     fflush(stdout);
     return !err;
 
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 static int read_png_file(png_image_t * p, const char * file_name)
 {
@@ -204,7 +262,6 @@ static int read_png_file(png_image_t * p, const char * file_name)
     return 0;
 }
 
-
 static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name)
 {
     png_structp png_ptr;
@@ -253,7 +310,6 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
 
     png_write_info(png_ptr, info_ptr);
 
-
     /* write bytes */
     if(setjmp(png_jmpbuf(png_ptr))) {
         TEST_PRINTF("[write_png_file %s] Error during writing bytes", file_name);
@@ -273,7 +329,6 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
     }
     png_write_image(png_ptr, row_pointers);
 
-
     /* end write */
     if(setjmp(png_jmpbuf(png_ptr))) {
         TEST_PRINTF("[write_png_file %s] Error during end of write", file_name);
@@ -291,7 +346,6 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
     return 0;
 }
 
-
 static void png_release(png_image_t * p)
 {
     int y;
@@ -301,6 +355,5 @@ static void png_release(png_image_t * p)
 
     png_destroy_read_struct(&p->png_ptr, &p->info_ptr, NULL);
 }
-
 
 #endif

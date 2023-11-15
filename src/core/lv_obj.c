@@ -422,6 +422,22 @@ static void lv_obj_draw(lv_event_t * e)
             return;
         }
 
+        if(lv_obj_get_style_bg_grad_dir(obj, 0) != LV_GRAD_DIR_NONE) {
+            if(lv_obj_get_style_bg_grad_opa(obj, 0) < LV_OPA_MAX) {
+                info->res = LV_COVER_RES_NOT_COVER;
+                return;
+            }
+            const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad(obj, 0);
+            if(grad_dsc) {
+                uint32_t i;
+                for(i = 0; i < grad_dsc->stops_count; i++) {
+                    if(grad_dsc->stops[i].opa < LV_OPA_MAX) {
+                        info->res = LV_COVER_RES_NOT_COVER;
+                        return;
+                    }
+                }
+            }
+        }
         info->res = LV_COVER_RES_COVER;
 
     }

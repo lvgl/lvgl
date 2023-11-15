@@ -132,7 +132,9 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
         blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, top_y, clipped_w);
         if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
 
+        bool hor_grad_processed;
         if(top_y >= clipped_coords.y1) {
+            hor_grad_processed = false;
             blend_area.y1 = top_y;
             blend_area.y2 = top_y;
 
@@ -141,6 +143,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                 blend_dsc.opa = grad->opa_map[top_y - bg_coords.y1];
             }
             else if(grad_dir == LV_GRAD_DIR_HOR) {
+                hor_grad_processed = true;
                 if(grad_opa_map) {
                     int32_t i;
                     for(i = 0; i < clipped_w; i++) {
@@ -159,6 +162,15 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
             if(grad_dir == LV_GRAD_DIR_VER) {
                 blend_dsc.color = grad->color_map[bottom_y - bg_coords.y1];
                 blend_dsc.opa = grad->opa_map[bottom_y - bg_coords.y1];
+            }
+            else if(hor_grad_processed == false && grad_dir == LV_GRAD_DIR_HOR) {
+                if(grad_opa_map) {
+                    int32_t i;
+                    for(i = 0; i < clipped_w; i++) {
+                        if(grad_opa_map[i] < LV_OPA_MAX) mask_buf[i] = (mask_buf[i] * grad_opa_map[i]) >> 8;
+                    }
+                    blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+                }
             }
             lv_draw_sw_blend(draw_unit, &blend_dsc);
         }
