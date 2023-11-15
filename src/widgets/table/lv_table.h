@@ -117,7 +117,7 @@ void lv_table_set_row_count(lv_obj_t * obj, uint32_t row_cnt);
  * @param obj       table pointer to a Table object
  * @param col_cnt   number of columns.
  */
-void lv_table_set_col_count(lv_obj_t * obj, uint32_t col_cnt);
+void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt);
 
 /**
  * Set the width of a column
@@ -182,7 +182,7 @@ uint32_t lv_table_get_row_count(lv_obj_t * obj);
  * @param obj       table pointer to a Table object
  * @return          number of columns.
  */
-uint32_t lv_table_get_col_count(lv_obj_t * obj);
+uint32_t lv_table_get_column_count(lv_obj_t * obj);
 
 /**
  * Get the width of a column

@@ -93,7 +93,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col, const c
     lv_table_t * table = (lv_table_t *)obj;
 
     /*Auto expand*/
-    if(col >= table->col_cnt) lv_table_set_col_count(obj, col + 1);
+    if(col >= table->col_cnt) lv_table_set_column_count(obj, col + 1);
     if(row >= table->row_cnt) lv_table_set_row_count(obj, row + 1);
 
     uint32_t cell = row * table->col_cnt + col;
@@ -127,7 +127,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
 
     lv_table_t * table = (lv_table_t *)obj;
     if(col >= table->col_cnt) {
-        lv_table_set_col_count(obj, col + 1);
+        lv_table_set_column_count(obj, col + 1);
     }
 
     /*Auto expand*/
@@ -240,7 +240,7 @@ void lv_table_set_row_count(lv_obj_t * obj, uint32_t row_cnt)
     refr_size_form_row(obj, 0);
 }
 
-void lv_table_set_col_count(lv_obj_t * obj, uint32_t col_cnt)
+void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -306,7 +306,7 @@ void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, int32_t w)
     lv_table_t * table = (lv_table_t *)obj;
 
     /*Auto expand*/
-    if(col_id >= table->col_cnt) lv_table_set_col_count(obj, col_id + 1);
+    if(col_id >= table->col_cnt) lv_table_set_column_count(obj, col_id + 1);
 
     table->col_w[col_id] = w;
     refr_size_form_row(obj, 0);
@@ -319,7 +319,7 @@ void lv_table_add_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table
     lv_table_t * table = (lv_table_t *)obj;
 
     /*Auto expand*/
-    if(col >= table->col_cnt) lv_table_set_col_count(obj, col + 1);
+    if(col >= table->col_cnt) lv_table_set_column_count(obj, col + 1);
     if(row >= table->row_cnt) lv_table_set_row_count(obj, row + 1);
 
     uint32_t cell = row * table->col_cnt + col;
@@ -344,7 +344,7 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_tab
     lv_table_t * table = (lv_table_t *)obj;
 
     /*Auto expand*/
-    if(col >= table->col_cnt) lv_table_set_col_count(obj, col + 1);
+    if(col >= table->col_cnt) lv_table_set_column_count(obj, col + 1);
     if(row >= table->row_cnt) lv_table_set_row_count(obj, row + 1);
 
     uint32_t cell = row * table->col_cnt + col;
@@ -369,7 +369,7 @@ void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, voi
     lv_table_t * table = (lv_table_t *)obj;
 
     /*Auto expand*/
-    if(col >= table->col_cnt) lv_table_set_col_count(obj, col + 1);
+    if(col >= table->col_cnt) lv_table_set_column_count(obj, col + 1);
     if(row >= table->row_cnt) lv_table_set_row_count(obj, row + 1);
 
     uint32_t cell = row * table->col_cnt + col;
@@ -419,7 +419,7 @@ uint32_t lv_table_get_row_count(lv_obj_t * obj)
     return table->row_cnt;
 }
 
-uint32_t lv_table_get_col_count(lv_obj_t * obj)
+uint32_t lv_table_get_column_count(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

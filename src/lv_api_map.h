@@ -222,9 +222,9 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_roller_set_visible_row_cnt       lv_roller_set_visible_row_count
 #define lv_roller_get_option_cnt            lv_roller_get_option_count
 
-#define lv_table_set_col_cnt                lv_table_set_col_count
+#define lv_table_set_col_cnt                lv_table_set_column_count
 #define lv_table_set_row_cnt                lv_table_set_row_count
-#define lv_table_get_row_cnt                lv_table_get_row_count
+#define lv_table_get_col_cnt                lv_table_get_column_count
 #define lv_table_get_row_cnt                lv_table_get_row_count
 
 #define lv_dropdown_get_option_cnt          lv_dropdown_get_option_count

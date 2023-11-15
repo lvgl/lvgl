@@ -44,7 +44,7 @@ Rows and Columns
 
 To explicitly set number of rows and columns use
 :cpp:expr:`lv_table_set_row_count(table, row_cnt)` and
-:cpp:expr:`lv_table_set_col_count(table, col_cnt)`
+:cpp:expr:`lv_table_set_column_count(table, col_cnt)`
 
 Width and Height
 ----------------

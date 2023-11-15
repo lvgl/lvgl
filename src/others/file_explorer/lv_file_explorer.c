@@ -322,7 +322,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     explorer->file_table = lv_table_create(explorer->browser_area);
     lv_obj_set_size(explorer->file_table, LV_PCT(100), LV_PCT(86));
     lv_table_set_col_width(explorer->file_table, 0, LV_PCT(100));
-    lv_table_set_col_count(explorer->file_table, 1);
+    lv_table_set_column_count(explorer->file_table, 1);
     lv_obj_add_event(explorer->file_table, browser_file_event_handler, LV_EVENT_ALL, obj);
 
     /*only scroll up and down*/
