@@ -143,7 +143,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
-    bool has_transform = dsc->rotation != 0 || dsc->zoom_x != LV_SCALE_NONE; // FIXME
+    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     if(has_transform)
         lv_area_copy(&blend_area, &rel_coords);
     else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))

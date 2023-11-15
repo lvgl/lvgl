@@ -86,7 +86,10 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
 #if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG
     lv_area_t area_rot;
     lv_area_copy(&area_rot, coords);
-    if(draw_dsc->rotation || draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE) {
+    bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
+                          draw_dsc->scale_y != LV_SCALE_NONE);
+
+    if(has_transform) {
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
 

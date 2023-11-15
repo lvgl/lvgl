@@ -216,7 +216,8 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
 #if VGLITE_BLIT_SPLIT_ENABLED
-                bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->zoom != LV_SCALE_NONE);
+                bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
+                                      draw_dsc->scale_y != LV_SCALE_NONE);
 #endif
 
                 if((!_vglite_cf_supported(img_dsc->header.cf))
