@@ -283,7 +283,7 @@ const char * lv_roller_get_options(const lv_obj_t * obj)
  * @param roller pointer to a roller object
  * @return the total number of options
  */
-uint32_t lv_roller_get_option_cnt(const lv_obj_t * obj)
+uint32_t lv_roller_get_option_count(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

@@ -484,7 +484,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     }
     if(_lv_area_is_point_on(&obj_coords, &p_trans, 0)) {
         int32_t i;
-        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        uint32_t child_cnt = lv_obj_get_child_count(obj);
 
         /*If a child matches use it*/
         for(i = child_cnt - 1; i >= 0; i--) {

@@ -587,7 +587,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
-        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        uint32_t child_cnt = lv_obj_get_child_count(obj);
         for(uint32_t i = 0; i < child_cnt; i++) {
             lv_obj_t * child = obj->spec_attr->children[i];
             lv_obj_mark_layout_as_dirty(child);
@@ -687,7 +687,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         uint32_t i;
-        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        uint32_t child_cnt = lv_obj_get_child_count(obj);
         for(i = 0; i < child_cnt; i++) {
             lv_obj_t * child = obj->spec_attr->children[i];
             lv_obj_mark_layout_as_dirty(child);

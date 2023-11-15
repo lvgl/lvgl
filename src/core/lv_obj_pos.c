@@ -745,7 +745,7 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
 void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, bool ignore_floating)
 {
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(ignore_floating && lv_obj_has_flag(child, LV_OBJ_FLAG_FLOATING)) continue;
@@ -955,7 +955,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
 
     int32_t child_res = LV_COORD_MIN;
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     /*With RTL find the left most coordinate*/
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
         for(i = 0; i < child_cnt; i++) {
@@ -1050,7 +1050,7 @@ static int32_t calc_content_height(lv_obj_t * obj)
 
     int32_t child_res = LV_COORD_MIN;
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         int32_t child_res_tmp = LV_COORD_MIN;
         lv_obj_t * child = obj->spec_attr->children[i];
@@ -1092,7 +1092,7 @@ static int32_t calc_content_height(lv_obj_t * obj)
 static void layout_update_core(lv_obj_t * obj)
 {
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         layout_update_core(child);

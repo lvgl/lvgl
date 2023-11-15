@@ -1110,7 +1110,7 @@ static void color_changer_anim_cb(void * var, int32_t v)
     if(v > LV_OPA_COVER) v = LV_OPA_COVER;
 
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+    for(i = 0; i < lv_obj_get_child_count(obj); i++) {
         lv_obj_set_style_opa(lv_obj_get_child(obj, i), v, 0);
     }
 

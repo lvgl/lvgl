@@ -53,7 +53,7 @@ def file_explorer_event_handler(e) :
 
     elif code == lv.EVENT.READY :
         tb = obj.explorer_get_file_table()
-        sum = tb.get_row_cnt()
+        sum = tb.get_row_count()
         # print("sum: ",sum)
         sort_by_file_kind(tb, 0, (sum - 1));
 

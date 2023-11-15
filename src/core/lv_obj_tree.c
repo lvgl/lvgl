@@ -161,7 +161,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_obj_t * old_parent = obj->parent;
     /*Remove the object from the old parent's child list*/
     int32_t i;
-    for(i = lv_obj_get_index(obj); i <= (int32_t)lv_obj_get_child_cnt(old_parent) - 2; i++) {
+    for(i = lv_obj_get_index(obj); i <= (int32_t)lv_obj_get_child_count(old_parent) - 2; i++) {
         old_parent->spec_attr->children[i] = old_parent->spec_attr->children[i + 1];
     }
     old_parent->spec_attr->child_cnt--;
@@ -178,7 +178,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     parent->spec_attr->child_cnt++;
     parent->spec_attr->children = lv_realloc(parent->spec_attr->children,
                                              parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
-    parent->spec_attr->children[lv_obj_get_child_cnt(parent) - 1] = obj;
+    parent->spec_attr->children[lv_obj_get_child_count(parent) - 1] = obj;
 
     obj->parent = parent;
 
@@ -209,13 +209,13 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
     }
 
     if(index < 0) {
-        index = lv_obj_get_child_cnt(parent) + index;
+        index = lv_obj_get_child_count(parent) + index;
     }
 
     const int32_t old_index = lv_obj_get_index(obj);
 
     if(index < 0) return;
-    if(index >= (int32_t) lv_obj_get_child_cnt(parent)) return;
+    if(index >= (int32_t) lv_obj_get_child_count(parent)) return;
     if(index == old_index) return;
 
     int32_t i = old_index;
@@ -383,7 +383,7 @@ lv_obj_t * lv_obj_get_sibling_by_type(const lv_obj_t * obj, int32_t idx, const l
     return lv_obj_get_child(parent, sibling_idx);
 }
 
-uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj)
+uint32_t lv_obj_get_child_count(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     if(obj->spec_attr == NULL) return 0;
@@ -580,7 +580,7 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
 
     if(res != LV_OBJ_TREE_WALK_SKIP_CHILDREN) {
         uint32_t i;
-        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        for(i = 0; i < lv_obj_get_child_count(obj); i++) {
             res = walk_core(lv_obj_get_child(obj, i), cb, user_data);
             if(res == LV_OBJ_TREE_WALK_END) return LV_OBJ_TREE_WALK_END;
         }

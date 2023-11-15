@@ -106,7 +106,7 @@ void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim
     int32_t ty = row_id * h;
 
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(tv); i++) {
+    for(i = 0; i < lv_obj_get_child_count(tv); i++) {
         lv_obj_t * tile_obj = lv_obj_get_child(tv, i);
         int32_t x = lv_obj_get_x(tile_obj);
         int32_t y = lv_obj_get_y(tile_obj);
@@ -173,7 +173,7 @@ static void tileview_event_cb(lv_event_t * e)
 
         lv_dir_t dir = LV_DIR_ALL;
         uint32_t i;
-        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        for(i = 0; i < lv_obj_get_child_count(obj); i++) {
             lv_obj_t * tile_obj = lv_obj_get_child(obj, i);
             int32_t x = lv_obj_get_x(tile_obj);
             int32_t y = lv_obj_get_y(tile_obj);

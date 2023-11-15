@@ -1221,7 +1221,7 @@ static size_t get_text_length(const char * text)
 {
     size_t len = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    len = _lv_text_ap_calc_bytes_cnt(text);
+    len = _lv_text_ap_calc_bytes_count(text);
 #else
     len = lv_strlen(text) + 1;
 #endif

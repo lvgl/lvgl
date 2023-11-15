@@ -322,7 +322,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     explorer->file_table = lv_table_create(explorer->browser_area);
     lv_obj_set_size(explorer->file_table, LV_PCT(100), LV_PCT(86));
     lv_table_set_col_width(explorer->file_table, 0, LV_PCT(100));
-    lv_table_set_col_cnt(explorer->file_table, 1);
+    lv_table_set_col_count(explorer->file_table, 1);
     lv_obj_add_event(explorer->file_table, browser_file_event_handler, LV_EVENT_ALL, obj);
 
     /*only scroll up and down*/
@@ -401,10 +401,10 @@ static void init_style(lv_obj_t * obj)
     lv_style_set_bg_color(&quick_access_list_button_style, lv_color_hex(0xf2f1f6));
 
     uint32_t i, j;
-    for(i = 0; i < lv_obj_get_child_cnt(explorer->quick_access_area); i++) {
+    for(i = 0; i < lv_obj_get_child_count(explorer->quick_access_area); i++) {
         lv_obj_t * child = lv_obj_get_child(explorer->quick_access_area, i);
         if(lv_obj_check_type(child, &lv_list_class)) {
-            for(j = 0; j < lv_obj_get_child_cnt(child); j++) {
+            for(j = 0; j < lv_obj_get_child_count(child); j++) {
                 lv_obj_t * list_child = lv_obj_get_child(child, j);
                 if(lv_obj_check_type(list_child, &lv_list_button_class)) {
                     lv_obj_add_style(list_child, &quick_access_list_button_style, 0);
@@ -589,7 +589,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
 
     lv_fs_dir_close(&dir);
 
-    lv_table_set_row_cnt(explorer->file_table, index);
+    lv_table_set_row_count(explorer->file_table, index);
     file_explorer_sort(obj);
     lv_obj_send_event(obj, LV_EVENT_READY, NULL);
 
@@ -643,7 +643,7 @@ static void file_explorer_sort(lv_obj_t * obj)
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
-    uint16_t sum = lv_table_get_row_cnt(explorer->file_table);
+    uint16_t sum = lv_table_get_row_count(explorer->file_table);
 
     if(sum > 1) {
         switch(explorer->sort) {

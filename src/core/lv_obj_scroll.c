@@ -137,7 +137,7 @@ int32_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
 
     int32_t child_res = LV_COORD_MIN;
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
@@ -178,7 +178,7 @@ int32_t lv_obj_get_scroll_left(lv_obj_t * obj)
 
     uint32_t i;
     int32_t x1 = LV_COORD_MAX;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
@@ -216,7 +216,7 @@ int32_t lv_obj_get_scroll_right(lv_obj_t * obj)
     /*With other base direction (LTR) scrolling to the right is normal so find the right most coordinate*/
     int32_t child_res = LV_COORD_MIN;
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;

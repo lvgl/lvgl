@@ -748,9 +748,9 @@ void lv_display_set_theme(lv_display_t * disp, lv_theme_t * th)
     disp->theme = th;
 
     if(disp->screen_cnt == 4 &&
-       lv_obj_get_child_cnt(disp->screens[0]) == 0 &&
-       lv_obj_get_child_cnt(disp->screens[1]) == 0 &&
-       lv_obj_get_child_cnt(disp->screens[2]) == 0) {
+       lv_obj_get_child_count(disp->screens[0]) == 0 &&
+       lv_obj_get_child_count(disp->screens[1]) == 0 &&
+       lv_obj_get_child_count(disp->screens[2]) == 0) {
         lv_theme_apply(disp->screens[0]);
     }
 }

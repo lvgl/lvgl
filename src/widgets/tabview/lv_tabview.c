@@ -71,7 +71,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
     lv_obj_t * page = lv_obj_create(cont);
     lv_obj_set_size(page, lv_pct(100), lv_pct(100));
-    uint32_t tab_idx = lv_obj_get_child_cnt(cont);
+    uint32_t tab_idx = lv_obj_get_child_count(cont);
 
     lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
 

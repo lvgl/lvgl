@@ -17,33 +17,33 @@ void tearDown(void)
 void test_dropdown_create_delete(void)
 {
     lv_dropdown_create(lv_screen_active());
-    TEST_ASSERT_EQUAL(2, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(2, lv_obj_get_child_count(lv_screen_active()));
 
     lv_obj_t * dd2 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd2, 200, 0);
-    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(4, lv_obj_get_child_count(lv_screen_active()));
     TEST_ASSERT_FALSE(lv_dropdown_is_open(dd2));
     lv_dropdown_open(dd2);
-    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(4, lv_obj_get_child_count(lv_screen_active()));
     TEST_ASSERT_TRUE(lv_dropdown_is_open(dd2));
     lv_dropdown_open(dd2);    /*Try to open again*/
-    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(4, lv_obj_get_child_count(lv_screen_active()));
 
     lv_obj_t * dd3 = lv_dropdown_create(lv_screen_active());
     lv_obj_set_pos(dd3, 400, 0);
-    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(6, lv_obj_get_child_count(lv_screen_active()));
     lv_dropdown_open(dd3);
-    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(6, lv_obj_get_child_count(lv_screen_active()));
     lv_dropdown_close(dd3);
-    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(6, lv_obj_get_child_count(lv_screen_active()));
     lv_dropdown_close(dd3);   /*Try to close again*/
-    TEST_ASSERT_EQUAL(6, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(6, lv_obj_get_child_count(lv_screen_active()));
 
     lv_obj_delete(dd2);
-    TEST_ASSERT_EQUAL(4, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(4, lv_obj_get_child_count(lv_screen_active()));
 
     lv_obj_clean(lv_screen_active());
-    TEST_ASSERT_EQUAL(0, lv_obj_get_child_cnt(lv_screen_active()));
+    TEST_ASSERT_EQUAL(0, lv_obj_get_child_count(lv_screen_active()));
 
 }
 
@@ -55,11 +55,11 @@ void test_dropdown_set_options(void)
 
     lv_obj_t * dd1 = lv_dropdown_create(lv_screen_active());
     TEST_ASSERT_EQUAL_STRING("Option 1\nOption 2\nOption 3", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(3, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(3, lv_dropdown_get_option_count(dd1));
 
     lv_dropdown_set_options(dd1, "a1\nb2\nc3\nd4\ne5\nf6");
     TEST_ASSERT_EQUAL_STRING("a1\nb2\nc3\nd4\ne5\nf6", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(6, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(6, lv_dropdown_get_option_count(dd1));
 
     lv_obj_set_width(dd1, 200);
     lv_dropdown_open(dd1);
@@ -70,41 +70,41 @@ void test_dropdown_set_options(void)
 
     lv_dropdown_add_option(dd1, "x0", 0);
     TEST_ASSERT_EQUAL_STRING("x0\na1\nb2\nc3\nd4\ne5\nf6", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(7, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(7, lv_dropdown_get_option_count(dd1));
 
     lv_dropdown_add_option(dd1, "y0", 3);
     TEST_ASSERT_EQUAL_STRING("x0\na1\nb2\ny0\nc3\nd4\ne5\nf6", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(8, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(8, lv_dropdown_get_option_count(dd1));
 
     lv_dropdown_add_option(dd1, "z0", LV_DROPDOWN_POS_LAST);
     TEST_ASSERT_EQUAL_STRING("x0\na1\nb2\ny0\nc3\nd4\ne5\nf6\nz0", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(9, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(9, lv_dropdown_get_option_count(dd1));
 
     lv_dropdown_clear_options(dd1);
     TEST_ASSERT_EQUAL_STRING("", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(0, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(0, lv_dropdown_get_option_count(dd1));
 
     lv_dropdown_set_options(dd1, "o1\no2"); /*Just to add some content before lv_dropdown_set_options_static*/
 
     lv_dropdown_set_options_static(dd1, "a1\nb2\nc3\nd4\ne5\nf6");
     TEST_ASSERT_EQUAL_STRING("a1\nb2\nc3\nd4\ne5\nf6", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(6, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(6, lv_dropdown_get_option_count(dd1));
 
     lv_dropdown_add_option(dd1, "x0", 0);
     TEST_ASSERT_EQUAL_STRING("x0\na1\nb2\nc3\nd4\ne5\nf6", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(7, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(7, lv_dropdown_get_option_count(dd1));
 
     lv_dropdown_add_option(dd1, "y0", 3);
     TEST_ASSERT_EQUAL_STRING("x0\na1\nb2\ny0\nc3\nd4\ne5\nf6", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(8, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(8, lv_dropdown_get_option_count(dd1));
 
     lv_dropdown_add_option(dd1, "z0", LV_DROPDOWN_POS_LAST);
     TEST_ASSERT_EQUAL_STRING("x0\na1\nb2\ny0\nc3\nd4\ne5\nf6\nz0", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(9, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(9, lv_dropdown_get_option_count(dd1));
 
     lv_dropdown_clear_options(dd1);
     TEST_ASSERT_EQUAL_STRING("", lv_dropdown_get_options(dd1));
-    TEST_ASSERT_EQUAL(0, lv_dropdown_get_option_cnt(dd1));
+    TEST_ASSERT_EQUAL(0, lv_dropdown_get_option_count(dd1));
 
     lv_obj_delete(dd1);
 

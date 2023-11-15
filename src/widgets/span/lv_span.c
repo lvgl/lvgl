@@ -60,7 +60,7 @@ static bool lv_text_get_snippet(const char * txt, const lv_font_t * font, int32_
                                 uint32_t * end_ofs);
 
 static void lv_snippet_clear(void);
-static uint32_t lv_get_snippet_cnt(void);
+static uint32_t lv_get_snippet_count(void);
 static void lv_snippet_push(lv_snippet_t * item);
 static lv_snippet_t * lv_get_snippet(uint32_t index);
 static int32_t convert_indent_pct(lv_obj_t * spans, int32_t width);
@@ -286,7 +286,7 @@ lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
     return NULL;
 }
 
-uint32_t lv_spangroup_get_child_cnt(const lv_obj_t * obj)
+uint32_t lv_spangroup_get_child_conut(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -665,7 +665,7 @@ static void lv_snippet_push(lv_snippet_t * item)
     }
 }
 
-static uint32_t lv_get_snippet_cnt(void)
+static uint32_t lv_get_snippet_count(void)
 {
     return snippet_stack->index;
 }
@@ -870,9 +870,9 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                                               max_w, txt_flag, &use_width, &next_ofs);
 
             if(isfill) {
-                if(next_ofs > 0 && lv_get_snippet_cnt() > 0) {
+                if(next_ofs > 0 && lv_get_snippet_count() > 0) {
                     /* To prevent infinite loops, the _lv_text_get_next_line() may return incomplete words, */
-                    /* This phenomenon should be avoided when lv_get_snippet_cnt() > 0 */
+                    /* This phenomenon should be avoided when lv_get_snippet_count() > 0 */
                     if(max_w < use_width) {
                         break;
                     }
@@ -906,7 +906,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 
         /* start current line deal with */
 
-        uint32_t item_cnt = lv_get_snippet_cnt();
+        uint32_t item_cnt = lv_get_snippet_count();
         if(item_cnt == 0) {     /* break if stack is empty */
             break;
         }

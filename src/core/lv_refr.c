@@ -136,7 +136,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 
     if(refr_children) {
         uint32_t i;
-        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        uint32_t child_cnt = lv_obj_get_child_count(obj);
         if(child_cnt == 0) {
             /*If the object was visible on the clip area call the post draw events too*/
             layer->clip_area = clip_coords_for_obj;
@@ -731,7 +731,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     if(info.res == LV_COVER_RES_MASKED) return NULL;
 
     int32_t i;
-    int32_t child_cnt = lv_obj_get_child_cnt(obj);
+    int32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = child_cnt - 1; i >= 0; i--) {
         lv_obj_t * child = obj->spec_attr->children[i];
         found_p = lv_refr_get_top_obj(area_p, child);
@@ -776,7 +776,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     while(parent != NULL) {
         bool go = false;
         uint32_t i;
-        uint32_t child_cnt = lv_obj_get_child_cnt(parent);
+        uint32_t child_cnt = lv_obj_get_child_count(parent);
         for(i = 0; i < child_cnt; i++) {
             lv_obj_t * child = parent->spec_attr->children[i];
             if(!go) {

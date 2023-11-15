@@ -43,7 +43,7 @@ lv_obj_t * obj_child_node_create(lv_obj_t * par, view_t * ui)
         return NULL;
     }
 
-    uint32_t cnt = lv_obj_get_child_cnt(par);
+    uint32_t cnt = lv_obj_get_child_count(par);
 
     lv_obj_t * obj = lv_obj_create(par);
     lv_obj_add_style(obj, &ui->obj_def_style, 0);

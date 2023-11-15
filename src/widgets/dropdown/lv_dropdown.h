@@ -179,7 +179,7 @@ uint32_t lv_dropdown_get_selected(const lv_obj_t * obj);
  * @param obj       pointer to drop-down list object
  * @return          the total number of options in the list
  */
-uint32_t lv_dropdown_get_option_cnt(const lv_obj_t * obj);
+uint32_t lv_dropdown_get_option_count(const lv_obj_t * obj);
 
 /**
  * Get the current selected option as a string

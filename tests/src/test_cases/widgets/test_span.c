@@ -35,7 +35,7 @@ void test_spangroup_new_span_with_null_parameter_returns_null_object(void)
     lv_span_t * span = lv_spangroup_new_span(NULL);
 
     TEST_ASSERT(NULL == span);
-    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_child_cnt(spangroup));
+    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_child_conut(spangroup));
 }
 
 void test_spangroup_new_span_with_valid_parameter_returns_not_null_object(void)
@@ -43,7 +43,7 @@ void test_spangroup_new_span_with_valid_parameter_returns_not_null_object(void)
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
     TEST_ASSERT(NULL != span);
-    TEST_ASSERT_EQUAL_INT(1, lv_spangroup_get_child_cnt(spangroup));
+    TEST_ASSERT_EQUAL_INT(1, lv_spangroup_get_child_conut(spangroup));
 }
 
 void test_spangroup_delete_span_span_is_null(void)
@@ -52,7 +52,7 @@ void test_spangroup_delete_span_span_is_null(void)
 
     lv_spangroup_delete_span(spangroup, span);
 
-    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_child_cnt(spangroup));
+    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_child_conut(spangroup));
 }
 
 void test_span_set_text(void)
@@ -249,12 +249,12 @@ void test_spangroup_get_child(void)
     TEST_ASSERT_EQUAL_PTR(span_1, lv_spangroup_get_child(spangroup, span_1_idx));
 }
 
-void test_spangroup_get_child_cnt(void)
+void test_spangroup_get_child_conut(void)
 {
     (void)lv_spangroup_new_span(spangroup);
     (void)lv_spangroup_new_span(spangroup);
 
-    const uint32_t cnt = lv_spangroup_get_child_cnt(spangroup);
+    const uint32_t cnt = lv_spangroup_get_child_conut(spangroup);
 
     TEST_ASSERT_EQUAL(2, cnt);
 }

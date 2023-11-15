@@ -31,7 +31,7 @@ void test_table_should_return_assigned_cell_value(void)
 void test_table_should_grow_columns_automatically_when_setting_formatted_cell_value(void)
 {
     /* Newly created tables have 1 column and 1 row */
-    uint16_t original_column_count = lv_table_get_col_cnt(table);
+    uint16_t original_column_count = lv_table_get_col_count(table);
     TEST_ASSERT_EQUAL_UINT16(1, original_column_count);
 
     /* Table currently only has a cell at 0,0 (row, column) */
@@ -39,7 +39,7 @@ void test_table_should_grow_columns_automatically_when_setting_formatted_cell_va
 
     /* Table now should have cells at 0,0 and 0,1, so 2 columns */
     uint16_t expected_column_count = original_column_count + 1;
-    TEST_ASSERT_EQUAL_UINT16(expected_column_count, lv_table_get_col_cnt(table));
+    TEST_ASSERT_EQUAL_UINT16(expected_column_count, lv_table_get_col_count(table));
 }
 
 void test_table_should_identify_cell_with_ctrl(void)
@@ -169,8 +169,8 @@ void test_table_rendering(void)
     lv_obj_set_style_border_side(table, LV_BORDER_SIDE_FULL, LV_PART_ITEMS);
     lv_obj_set_style_pad_all(table, 10, LV_PART_ITEMS);
     lv_obj_set_style_border_width(table, 5, LV_PART_ITEMS);
-    lv_table_set_col_cnt(table, 5);
-    lv_table_set_row_cnt(table, 5);
+    lv_table_set_col_count(table, 5);
+    lv_table_set_row_count(table, 5);
     lv_table_set_col_width(table, 1, 60);
     lv_table_set_col_width(table, 2, 100);
 
@@ -207,8 +207,8 @@ void test_table_should_reduce_cells(void)
 
     lv_obj_center(table);
 
-    lv_table_set_col_cnt(table, initial_col_num);
-    lv_table_set_row_cnt(table, initial_row_num);
+    lv_table_set_col_count(table, initial_col_num);
+    lv_table_set_row_count(table, initial_row_num);
 
     uint32_t row_idx, col_idx;
     for(row_idx = 0; row_idx < initial_row_num; row_idx++) {
@@ -217,8 +217,8 @@ void test_table_should_reduce_cells(void)
         }
     }
 
-    lv_table_set_col_cnt(table, final_col_num);
-    lv_table_set_row_cnt(table, final_row_num);
+    lv_table_set_col_count(table, final_col_num);
+    lv_table_set_row_count(table, final_row_num);
 
     for(row_idx = 0; row_idx < final_row_num; row_idx++) {
         for(col_idx = 0; col_idx < final_col_num; col_idx++) {
@@ -237,8 +237,8 @@ void test_table_should_reduce_cells_with_more_than_one_row(void)
 
     lv_obj_center(table);
 
-    lv_table_set_col_cnt(table, initial_col_num);
-    lv_table_set_row_cnt(table, initial_row_num);
+    lv_table_set_col_count(table, initial_col_num);
+    lv_table_set_row_count(table, initial_row_num);
 
     uint32_t row_idx, col_idx;
     for(row_idx = 0; row_idx < initial_row_num; row_idx++) {
@@ -247,8 +247,8 @@ void test_table_should_reduce_cells_with_more_than_one_row(void)
         }
     }
 
-    lv_table_set_col_cnt(table, final_col_num);
-    lv_table_set_row_cnt(table, final_row_num);
+    lv_table_set_col_count(table, final_col_num);
+    lv_table_set_row_count(table, final_row_num);
 
     for(row_idx = 0; row_idx < final_row_num; row_idx++) {
         for(col_idx = 0; col_idx < final_col_num; col_idx++) {

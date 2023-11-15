@@ -11,7 +11,7 @@ static void scroll_event_cb(lv_event_t * e)
 
     int32_t r = lv_obj_get_height(cont) * 7 / 10;
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(cont);
+    uint32_t child_cnt = lv_obj_get_child_count(cont);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(cont, i);
         lv_area_t child_a;

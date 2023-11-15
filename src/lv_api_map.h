@@ -74,7 +74,7 @@ static inline void lv_obj_move_foreground(lv_obj_t * obj)
         return;
     }
 
-    lv_obj_move_to_index(obj, lv_obj_get_child_cnt(parent) - 1);
+    lv_obj_move_to_index(obj, lv_obj_get_child_count(parent) - 1);
 }
 
 /**
@@ -218,6 +218,18 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_image_get_angle                  lv_image_get_rotation
 #define lv_image_set_zoom                   lv_image_set_scale
 #define lv_image_get_zoom                   lv_image_get_scale
+
+#define lv_roller_set_visible_row_cnt       lv_roller_set_visible_row_count
+#define lv_roller_get_option_cnt            lv_roller_get_option_count
+
+#define lv_table_set_col_cnt                lv_table_set_col_count
+#define lv_table_set_row_cnt                lv_table_set_row_count
+#define lv_table_get_row_cnt                lv_table_get_row_count
+#define lv_table_get_row_cnt                lv_table_get_row_count
+
+#define lv_dropdown_get_option_cnt          lv_dropdown_get_option_count
+
+#define lv_obj_get_child_cnt                lv_obj_get_child_count
 
 #define lv_obj_get_style_shadow_ofs_x       lv_obj_get_style_shadow_offset_x
 #define lv_obj_get_style_shadow_ofs_y       lv_obj_get_style_shadow_offset_y
