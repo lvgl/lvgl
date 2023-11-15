@@ -204,7 +204,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
  */
 typedef struct {
     struct _lv_obj_t ** children;       /**< Store the pointer of the children in an array.*/
-    uint32_t child_cnt;                 /**< Number of children*/
     lv_group_t * group_p;
     lv_event_list_t event_list;
 
@@ -213,6 +212,7 @@ typedef struct {
     int32_t ext_click_pad;           /**< Extra click padding in all direction*/
     int32_t ext_draw_size;           /**< EXTend the size in every direction for drawing.*/
 
+    uint16_t child_cnt;                 /**< Number of children*/
     lv_scrollbar_mode_t scrollbar_mode : 2; /**< How to display scrollbars*/
     lv_scroll_snap_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally*/
     lv_scroll_snap_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/

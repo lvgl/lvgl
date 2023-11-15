@@ -129,7 +129,7 @@ struct _lv_obj_t * lv_obj_get_parent(const struct _lv_obj_t * obj);
 /**
  * Get the child of an object by the child's index.
  * @param obj       pointer to an object whose child should be get
- * @param id        the index of the child.
+ * @param idx       the index of the child.
  *                  0: the oldest (firstly created) child
  *                  1: the second oldest
  *                  child count-1: the youngest
@@ -137,12 +137,28 @@ struct _lv_obj_t * lv_obj_get_parent(const struct _lv_obj_t * obj);
  *                  -2: the second youngest
  * @return          pointer to the child or NULL if the index was invalid
  */
-struct _lv_obj_t * lv_obj_get_child(const struct _lv_obj_t * obj, int32_t id);
+struct _lv_obj_t * lv_obj_get_child(const struct _lv_obj_t * obj, int32_t idx);
+
+
+/**
+ * Get the child of an object by the child's index. Consider the children only with a given type.
+ * @param obj       pointer to an object whose child should be get
+ * @param idx       the index of the child.
+ *                  0: the oldest (firstly created) child
+ *                  1: the second oldest
+ *                  child count-1: the youngest
+ *                  -1: the youngest
+ *                  -2: the second youngest
+ * @param class_p   the type of the children to check
+ * @return          pointer to the child or NULL if the index was invalid
+ */
+struct _lv_obj_t * lv_obj_get_child_by_type(const struct _lv_obj_t * obj, int32_t idx,
+                                            const struct _lv_obj_class_t * class_p);
 
 /**
  * Return a sibling of an object
  * @param obj       pointer to an object whose sibling should be get
- * @param id        0: `obj` itself
+ * @param idx       0: `obj` itself
  *                  -1: the first older sibling
  *                  -2: the next older sibling
  *                  1: the first younger sibling
@@ -150,7 +166,22 @@ struct _lv_obj_t * lv_obj_get_child(const struct _lv_obj_t * obj, int32_t id);
  *                  etc
  * @return          pointer to the requested sibling  or NULL if there is no such sibling
  */
-struct _lv_obj_t * lv_obj_get_sibling(const struct _lv_obj_t * obj, int32_t id);
+struct _lv_obj_t * lv_obj_get_sibling(const struct _lv_obj_t * obj, int32_t idx);
+
+/**
+ * Return a sibling of an object. Consider the siblings only with a given type.
+ * @param obj       pointer to an object whose sibling should be get
+ * @param idx       0: `obj` itself
+ *                  -1: the first older sibling
+ *                  -2: the next older sibling
+ *                  1: the first younger sibling
+ *                  2: the next younger sibling
+ *                  etc
+ * @param class_p   the type of the children to check
+ * @return          pointer to the requested sibling  or NULL if there is no such sibling
+ */
+struct _lv_obj_t * lv_obj_get_sibling_by_type(const struct _lv_obj_t * obj, int32_t idx,
+                                              const struct _lv_obj_class_t * class_p);
 
 /**
  * Get the number of children
@@ -160,13 +191,33 @@ struct _lv_obj_t * lv_obj_get_sibling(const struct _lv_obj_t * obj, int32_t id);
 uint32_t lv_obj_get_child_cnt(const struct _lv_obj_t * obj);
 
 /**
+ * Get the number of children having a given type.
+ * @param obj       pointer to an object
+ * @param class_p   the type of the children to check
+ * @return          the number of children
+ */
+
+uint32_t lv_obj_get_child_count_by_type(const struct _lv_obj_t * obj, const struct _lv_obj_class_t * class_p);
+
+/**
  * Get the index of a child.
  * @param obj       pointer to an object
  * @return          the child index of the object.
  *                  E.g. 0: the oldest (firstly created child).
- *                  (0xFFFFFFFF if child could not be found or no parent exists)
+ *                  (-1 if child could not be found or no parent exists)
  */
-uint32_t lv_obj_get_index(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_index(const struct _lv_obj_t * obj);
+
+
+/**
+ * Get the index of a child. Consider the children only with a given type.
+ * @param obj       pointer to an object
+ * @param class_p   the type of the children to check
+ * @return          the child index of the object.
+ *                  E.g. 0: the oldest (firstly created child with the given class).
+ *                  (-1 if child could not be found or no parent exists)
+ */
+int32_t lv_obj_get_index_by_type(const struct _lv_obj_t * obj, const struct _lv_obj_class_t * class_p);
 
 /**
  * Iterate through all children of any object.

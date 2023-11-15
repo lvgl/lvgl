@@ -315,30 +315,72 @@ lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj)
     return obj->parent;
 }
 
-lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t id)
+lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t idx)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(obj->spec_attr == NULL) return NULL;
 
     uint32_t idu;
-    if(id < 0) {
-        id = obj->spec_attr->child_cnt + id;
-        if(id < 0) return NULL;
-        idu = (uint32_t) id;
+    if(idx < 0) {
+        idx = obj->spec_attr->child_cnt + idx;
+        if(idx < 0) return NULL;
+        idu = (uint32_t) idx;
     }
     else {
-        idu = id;
+        idu = idx;
     }
 
     if(idu >= obj->spec_attr->child_cnt) return NULL;
-    else return obj->spec_attr->children[id];
+    else return obj->spec_attr->children[idx];
 }
 
-lv_obj_t * lv_obj_get_sibling(const lv_obj_t * obj, int32_t id)
+lv_obj_t * lv_obj_get_child_by_type(const lv_obj_t * obj, int32_t idx, const lv_obj_class_t * class_p)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(obj->spec_attr == NULL) return NULL;
+
+    int32_t i;
+    int32_t cnt = (int32_t)obj->spec_attr->child_cnt;
+    if(idx >= 0) {
+        for(i = 0; i < cnt; i++) {
+            if(obj->spec_attr->children[i]->class_p == class_p) {
+                if(idx == 0) return obj->spec_attr->children[i];
+                else idx--;
+            }
+        }
+    }
+    else {
+        idx++;   /*-1 means the first child*/
+        for(i = cnt - 1; i >= 0; i--) {
+            if(obj->spec_attr->children[i]->class_p == class_p) {
+                if(idx == 0) return obj->spec_attr->children[i];
+                else idx++;
+            }
+        }
+    }
+    return NULL;
+}
+
+lv_obj_t * lv_obj_get_sibling(const lv_obj_t * obj, int32_t idx)
 {
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    return lv_obj_get_child(parent, (int32_t)lv_obj_get_index(obj) + id);
+    int32_t sibling_idx = (int32_t)lv_obj_get_index(obj) + idx;
+    if(sibling_idx < 0) return NULL;
+
+    return lv_obj_get_child(parent, sibling_idx);
+}
+
+lv_obj_t * lv_obj_get_sibling_by_type(const lv_obj_t * obj, int32_t idx, const lv_obj_class_t * class_p)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    int32_t sibling_idx = (int32_t)lv_obj_get_index_by_type(obj, class_p) + idx;
+    if(sibling_idx < 0) return NULL;
+
+    return lv_obj_get_child(parent, sibling_idx);
 }
 
 uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj)
@@ -348,7 +390,35 @@ uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj)
     return obj->spec_attr->child_cnt;
 }
 
-uint32_t lv_obj_get_index(const lv_obj_t * obj)
+uint32_t lv_obj_get_child_count_by_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->spec_attr == NULL) return 0;
+
+    uint32_t i;
+    uint32_t cnt = 0;
+    for(i = 0; i < obj->spec_attr->child_cnt; i++) {
+        if(obj->spec_attr->children[i]->class_p == class_p) cnt++;
+    }
+    return cnt;
+}
+
+int32_t lv_obj_get_index(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent == NULL) return 0xFFFFFFFF;
+
+    int32_t i = 0;
+    for(i = 0; i < parent->spec_attr->child_cnt; i++) {
+        if(parent->spec_attr->children[i] == obj) return i;
+    }
+
+    return -1; /*Shouldn't happen*/
+}
+
+int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -356,11 +426,17 @@ uint32_t lv_obj_get_index(const lv_obj_t * obj)
     if(parent == NULL) return 0xFFFFFFFF;
 
     uint32_t i = 0;
-    for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
-        if(lv_obj_get_child(parent, i) == obj) return i;
+    uint32_t idx = 0;
+    for(i = 0; i < parent->spec_attr->child_cnt; i++) {
+        lv_obj_t * child = parent->spec_attr->children[i];
+        if(child->class_p == class_p) {
+            if(child == obj) return idx;
+            idx++;
+        }
     }
 
-    return 0xFFFFFFFF; /*Shouldn't happen*/
+    /*Can happen if there was no children with the given type*/
+    return -1;
 }
 
 void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * user_data)
@@ -468,8 +544,8 @@ static void obj_delete_core(lv_obj_t * obj)
     }
     /*Remove the object from the child list of its parent*/
     else {
-        uint32_t id = lv_obj_get_index(obj);
-        uint32_t i;
+        int32_t id = lv_obj_get_index(obj);
+        uint16_t i;
         for(i = id; i < obj->parent->spec_attr->child_cnt - 1; i++) {
             obj->parent->spec_attr->children[i] = obj->parent->spec_attr->children[i + 1];
         }
