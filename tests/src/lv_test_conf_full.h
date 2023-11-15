@@ -82,6 +82,7 @@
 
 #define LV_BUILD_EXAMPLES       1
 #define LV_USE_DEMO_WIDGETS     1
+#define LV_USE_DEMO_KEYPAD_AND_ENCODER     1
 #define LV_USE_DEMO_STRESS      1
 #define LV_USE_DEMO_TRANSFORM   1
 #define LV_USE_DEMO_MULTILANG   1

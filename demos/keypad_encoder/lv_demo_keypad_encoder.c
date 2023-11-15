@@ -66,7 +66,7 @@ void lv_demo_keypad_encoder(void)
         }
     }
 
-    tv = lv_tabview_create(lv_screen_active(), LV_DIR_TOP, LV_DPI_DEF / 3);
+    tv = lv_tabview_create(lv_screen_active());
 
     t1 = lv_tabview_add_tab(tv, "Selectors");
     t2 = lv_tabview_add_tab(tv, "Text input");
