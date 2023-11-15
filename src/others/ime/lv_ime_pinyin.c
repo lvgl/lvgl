@@ -923,6 +923,7 @@ static char * pinyin_search_matching(lv_obj_t * obj, char * py_str, uint16_t * c
     if(*py_str == 'i')     return NULL;
     if(*py_str == 'u')     return NULL;
     if(*py_str == 'v')     return NULL;
+    if(*py_str == ' ')     return NULL;
 
     offset = py_str[0] - 'a';
     len = lv_strlen(py_str);
@@ -1122,14 +1123,16 @@ static void pinyin_k9_fill_cand(lv_obj_t * obj)
 
     ll_index = _lv_ll_get_head(&pinyin_ime->k9_legal_py_ll);
     lv_strcpy(pinyin_ime->input_char, ll_index->py_str);
+
+    for(uint8_t i = 0; i < LV_IME_PINYIN_K9_CAND_TEXT_NUM; i++) {
+        lv_strcpy(lv_pinyin_k9_cand_str[i], " ");
+    }
+
     while(ll_index) {
         if(index >= LV_IME_PINYIN_K9_CAND_TEXT_NUM)
             break;
 
-        if(index >= pinyin_ime->k9_legal_py_count) {
-            lv_strcpy(lv_pinyin_k9_cand_str[index], " ");
-        }
-        else {
+        if(index < pinyin_ime->k9_legal_py_count) {
             lv_strcpy(lv_pinyin_k9_cand_str[index], ll_index->py_str);
         }
 
@@ -1173,6 +1176,10 @@ static void pinyin_k9_cand_page_proc(lv_obj_t * obj, uint16_t dir)
 
         // next page
         if(dir == 1) {
+            for(uint8_t i = 0; i < LV_IME_PINYIN_K9_CAND_TEXT_NUM; i++) {
+                lv_strcpy(lv_pinyin_k9_cand_str[i], " ");
+            }
+
             count = 0;
             while(ll_index) {
                 if(count >= (LV_IME_PINYIN_K9_CAND_TEXT_NUM - 1))
@@ -1187,6 +1194,9 @@ static void pinyin_k9_cand_page_proc(lv_obj_t * obj, uint16_t dir)
         }
         // previous page
         else {
+            for(uint8_t i = 0; i < LV_IME_PINYIN_K9_CAND_TEXT_NUM; i++) {
+                lv_strcpy(lv_pinyin_k9_cand_str[i], " ");
+            }
             count = LV_IME_PINYIN_K9_CAND_TEXT_NUM - 1;
             ll_index = _lv_ll_get_prev(&pinyin_ime->k9_legal_py_ll, ll_index);
             while(ll_index) {
