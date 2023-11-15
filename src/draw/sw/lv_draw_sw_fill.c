@@ -132,9 +132,8 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
         blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, top_y, clipped_w);
         if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
 
-        bool hor_grad_processed;
+        bool hor_grad_processed = false;
         if(top_y >= clipped_coords.y1) {
-            hor_grad_processed = false;
             blend_area.y1 = top_y;
             blend_area.y2 = top_y;
 
