@@ -6,4 +6,3 @@ Display
     :maxdepth: 2
 
     ili9341
-    X11

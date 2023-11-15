@@ -24,6 +24,14 @@
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
 
+#if LV_X11_RENDER_MODE_PARTIAL
+    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
+#elif defined LV_X11_RENDER_MODE_DIRECT
+    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
+#elif defined LV_X11_RENDER_MODE_FULL
+    #define LV_X11_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -51,6 +59,9 @@ typedef struct {
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_X11_DIRECT_EXIT
+    static unsigned int count_windows = 0;
+#endif
 
 /**********************
  *      MACROS
@@ -196,9 +207,16 @@ static void x11_disp_delete_evt_cb(lv_event_t * e)
 
     XDestroyImage(xd->ximage);
     XFreeGC(xd->hdr.display, xd->gc);
+    XUnmapWindow(xd->hdr.display, xd->window);
     XDestroyWindow(xd->hdr.display, xd->window);
+    XFlush(xd->hdr.display);
 
     lv_free(xd);
+#if LV_X11_DIRECT_EXIT
+    if(0 == --count_windows) {
+        exit(0);
+    }
+#endif
 }
 
 static void x11_hide_cursor(lv_display_t * disp)
@@ -241,7 +259,7 @@ static void x11_event_handler(lv_timer_t * t)
         switch(event.type) {
             case Expose:
                 if(event.xexpose.count == 0) {
-                    //XPutImage(xd->hdr.display, xd->window, xd->gc, xd->ximage, 0, 0, 0, 0, event.xexpose.width, event.xexpose.height);
+                    XPutImage(xd->hdr.display, xd->window, xd->gc, xd->ximage, 0, 0, 0, 0, event.xexpose.width, event.xexpose.height);
                 }
                 break;
             case ConfigureNotify:
@@ -288,7 +306,7 @@ static void x11_window_create(lv_display_t * disp, char const * title)
 
     /* setup display/screen */
     xd->hdr.display = XOpenDisplay(NULL);
-    int screen = DefaultScreen(xd->hdr.display);
+    int screen = XDefaultScreen(xd->hdr.display);
     xd->visual = XDefaultVisual(xd->hdr.display, screen);
 
     /* create window */
@@ -329,6 +347,10 @@ static void x11_window_create(lv_display_t * disp, char const * title)
 
     /* finally bring window on top of the other windows */
     XMapRaised(xd->hdr.display, xd->window);
+
+#if LV_X11_DIRECT_EXIT
+    count_windows++;
+#endif
 }
 
 /**********************

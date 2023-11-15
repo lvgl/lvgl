@@ -23,13 +23,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#ifndef LV_X11_DOUBLE_BUFFER
-#  define LV_X11_DOUBLE_BUFFER 1
-#endif
-#ifndef LV_X11_RENDER_MODE
-#  define LV_X11_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
-#endif
-
 /** Header of private display driver user data - for internal use only */
 typedef struct {
     struct _XDisplay   *  display;  /**< X11 display object     */

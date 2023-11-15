@@ -29,6 +29,14 @@ Configure X11 display driver
         #define LV_USE_X11  1
 
 2. Optional configuration options:
+    -  Direct Exit
+        .. code:: c
+
+            #define LV_X11_DIRECT_EXIT  1 /*preferred default - ends the application automatically if last window has been closed*/
+            // or
+            #define LV_X11_DIRECT_EXIT  0 /*applicaion is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler*/
+
+
     -  Double buffering
         .. code:: c
 
@@ -39,16 +47,16 @@ Configure X11 display driver
     - Render mode
         .. code:: c
 
-            #define LV_X11_RENDER_MODE     LV_DISPLAY_RENDER_MODE_PARTIAL /*preferred default*/
+            #define LV_X11_RENDER_MODE_PARTIAL 1  /*LV_DISPLAY_RENDER_MODE_PARTIAL, preferred default*/
             // or
-            #define LV_X11_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT  /*not recommended*/
+            #define LV_X11_RENDER_MODE_DIRECT  1  /*LV_DISPLAY_RENDER_MODE_DIRECT, not recommended for X11 driver*/
             // or
-            #define LV_X11_RENDER_MODE     LV_DISPLAY_RENDER_MODE_FULL    /*not recommended*/
+            #define LV_X11_RENDER_MODE_DULL    1  /*LV_DISPLAY_RENDER_MODE_FULL, not recommended for X11 driver*/
 
 Usage
 -----
 
-The minimal initialisation (e.g. in main.c):
+The minimal initialisation (e.g. in main.c, LV_X11_DIRECT_EXIT must be 1):
 
 .. code:: c
 
@@ -73,18 +81,21 @@ The minimal initialisation (e.g. in main.c):
         }
     }
 
-Full initialisation with mouse pointer symbol and application close callback
+Full initialisation with mouse pointer symbol and
+own application exit handling dependent on LV_X11_DIRECT_EXIT (can be 1 or 0)
 
 .. code:: c
 
     bool terminated = false;
 
+    #if !LV_X11_DIRECT_EXIT
     static void on_close_cb(lv_event_t * e)
     {
         ...
 
         terminate = true;
     }
+    #endif
 
     int main(int argc, char ** argv)
     {
@@ -98,8 +109,10 @@ Full initialisation with mouse pointer symbol and application close callback
         LV_IMG_DECLARE(my_mouse_cursor_icon);
         lv_x11_inputs_create(disp, &my_mouse_cursor_icon);
 
-        /* set window close callback to terminate application properly */
+        #if !LV_X11_DIRECT_EXIT
+        /* set optional window close callback to enable applicaton cleanup and exit */
         lv_x11_window_set_close_cb(disp, on_close_cb, disp);
+        #endif
 
         ...
 

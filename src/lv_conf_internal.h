@@ -2501,7 +2501,7 @@
                 #define LV_SDL_BUF_COUNT 0
             #endif
         #else
-            #define LV_SDL_BUF_COUNT       1   /*1 or 2*/
+            #define LV_SDL_BUF_COUNT       1    /*1 or 2*/
         #endif
     #endif
     #ifndef LV_SDL_FULLSCREEN
@@ -2533,11 +2533,15 @@
     #endif
 #endif
 #if LV_USE_X11
-    #ifndef LV_X11_RENDER_MODE
-        #ifdef CONFIG_LV_X11_RENDER_MODE
-            #define LV_X11_RENDER_MODE CONFIG_LV_X11_RENDER_MODE
+    #ifndef LV_X11_DIRECT_EXIT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_X11_DIRECT_EXIT
+                #define LV_X11_DIRECT_EXIT CONFIG_LV_X11_DIRECT_EXIT
+            #else
+                #define LV_X11_DIRECT_EXIT 0
+            #endif
         #else
-            #define LV_X11_RENDER_MODE     LV_DISPLAY_RENDER_MODE_PARTIAL
+            #define LV_X11_DIRECT_EXIT         1  /*Exit the application when all X11 windows have been closed*/
         #endif
     #endif
     #ifndef LV_X11_DOUBLE_BUFFER
@@ -2548,7 +2552,33 @@
                 #define LV_X11_DOUBLE_BUFFER 0
             #endif
         #else
-            #define LV_X11_DOUBLE_BUFFER   1
+            #define LV_X11_DOUBLE_BUFFER       1  /*Use double buffers for endering*/
+        #endif
+    #endif
+    /*select only 1 of the following render modes (LV_X11_RENDER_MODE_PARTIAL preferred!)*/
+    #ifndef LV_X11_RENDER_MODE_PARTIAL
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_X11_RENDER_MODE_PARTIAL
+                #define LV_X11_RENDER_MODE_PARTIAL CONFIG_LV_X11_RENDER_MODE_PARTIAL
+            #else
+                #define LV_X11_RENDER_MODE_PARTIAL 0
+            #endif
+        #else
+            #define LV_X11_RENDER_MODE_PARTIAL 1  /*Partial render mode (preferred)*/
+        #endif
+    #endif
+    #ifndef LV_X11_RENDER_MODE_DIRECT
+        #ifdef CONFIG_LV_X11_RENDER_MODE_DIRECT
+            #define LV_X11_RENDER_MODE_DIRECT CONFIG_LV_X11_RENDER_MODE_DIRECT
+        #else
+            #define LV_X11_RENDER_MODE_DIRECT  0  /*direct render mode*/
+        #endif
+    #endif
+    #ifndef LV_X11_RENDER_MODE_FULL
+        #ifdef CONFIG_LV_X11_RENDER_MODE_FULL
+            #define LV_X11_RENDER_MODE_FULL CONFIG_LV_X11_RENDER_MODE_FULL
+        #else
+            #define LV_X11_RENDER_MODE_FULL    0  /*Full render mode*/
         #endif
     #endif
 #endif
