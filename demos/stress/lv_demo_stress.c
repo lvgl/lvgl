@@ -95,7 +95,8 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 1: {
-                obj = lv_tabview_create(lv_screen_active(), LV_DIR_TOP, 50);
+                obj = lv_tabview_create(lv_screen_active());
+                lv_tabview_set_tab_bar_size(obj, 50);
                 lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
                 lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
                 lv_obj_t * t = lv_tabview_add_tab(obj, "First");

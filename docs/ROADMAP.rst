@@ -52,12 +52,14 @@ Architecture
 - |check| Replace the `read_line_cb` of the image decoders with `get_area_cb`
 - |check| Limit the image caching size in bytes instead of image count
 - |check| lv_draw_buf for unified stride, buffer and cache invalidation management. `4241 <https://github.com/lvgl/lvgl/pull/4241>`__
+- |check| Add vector graphics support via ThorVG
 - |uncheck| SVG support: integrate an SVG render library `4388 <https://github.com/lvgl/lvgl/issues/4388>`__
 - |check| Introduce optional ``float`` support. `4648 <https://github.com/lvgl/lvgl/issues/4648>`__
 - |uncheck| Introduce support layer for 3D GPUs (OpenGL, SDL, Vulkan, etc).  `4622 <https://github.com/lvgl/lvgl/issues/4622>`__
 
 Styles
 ~~~~~~
+
 - |check| non-uniform scale of images: scale width and height differently
 - |uncheck| Scroll anim settings should come from styles to allow customization
 
@@ -67,9 +69,7 @@ Widgets
 - |check| Universal scale widget/support
 - |check| `lv_img`: Reconsider image sizing models
   (when the image size is not content): center, top-left, zoom, tile, other?
-- |uncheck| `lv_tabview` Replace button matrix with real buttons for more flexibility
-- |uncheck| `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
-- |uncheck| `lv_roller` make it more flexible #4009
+- |check| `lv_tabview` Replace button matrix with real buttons for more flexibility
   (see `here <https://forum.lvgl.io/t/linear-meter-bar-with-ticks/10986>`__ and #4043)
 - |check| Disabled widgets should absorb indev actions without sending events. `#3860 <https://github.com/lvgl/lvgl/issues/3860>`__
 
@@ -141,6 +141,8 @@ Widgets
 - |uncheck| `lv_bar`, `lv_arc`: handle max < min for fill direction swapping #4039
 - |uncheck| `lv_bar`, `lv_slider`, `lv_arc`: make possible to move the knob only inside the background (see `here <https://forum.lvgl.io/t/slider-knob-out-of-the-track/11956>`__)
 - |uncheck| Improve `lv_label_align_t` #1656
+- |uncheck| `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
+- |uncheck| `lv_roller` make it more flexible #4009
 
 Others
 ~~~~~~

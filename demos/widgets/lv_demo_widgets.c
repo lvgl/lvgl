@@ -177,33 +177,38 @@ void lv_demo_widgets(void)
     lv_style_set_border_width(&style_bullet, 0);
     lv_style_set_radius(&style_bullet, LV_RADIUS_CIRCLE);
 
-    tv = lv_tabview_create(lv_screen_active(), LV_DIR_TOP, tab_h);
+    tv = lv_tabview_create(lv_screen_active());
+    lv_tabview_set_tab_bar_size(tv, tab_h);
     lv_obj_add_event(tv, tabview_delete_event_cb, LV_EVENT_DELETE, NULL);
 
     lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
 
+    lv_obj_t * t1 = lv_tabview_add_tab(tv, "Profile");
+    lv_obj_t * t2 = lv_tabview_add_tab(tv, "Analytics");
+    lv_obj_t * t3 = lv_tabview_add_tab(tv, "Shop");
+
     if(disp_size == DISP_LARGE) {
-        lv_obj_t * tab_buttons = lv_tabview_get_tab_buttons(tv);
-        lv_obj_set_style_pad_left(tab_buttons, LV_HOR_RES / 2, 0);
-        lv_obj_t * logo = lv_image_create(tab_buttons);
+        lv_obj_t * tab_bar = lv_tabview_get_tab_bar(tv);
+        lv_obj_set_style_pad_left(tab_bar, LV_HOR_RES / 2, 0);
+        lv_obj_t * logo = lv_image_create(tab_bar);
+        lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
         LV_IMAGE_DECLARE(img_lvgl_logo);
         lv_image_set_src(logo, &img_lvgl_logo);
         lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
-        lv_obj_t * label = lv_label_create(tab_buttons);
+        lv_obj_t * label = lv_label_create(tab_bar);
         lv_obj_add_style(label, &style_title, 0);
+        lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
         lv_label_set_text_fmt(label, "LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
-        label = lv_label_create(tab_buttons);
+        label = lv_label_create(tab_bar);
         lv_label_set_text(label, "Widgets demo");
+        lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
         lv_obj_add_style(label, &style_text_muted, 0);
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
     }
 
-    lv_obj_t * t1 = lv_tabview_add_tab(tv, "Profile");
-    lv_obj_t * t2 = lv_tabview_add_tab(tv, "Analytics");
-    lv_obj_t * t3 = lv_tabview_add_tab(tv, "Shop");
     profile_create(t1);
     analytics_create(t2);
     shop_create(t3);

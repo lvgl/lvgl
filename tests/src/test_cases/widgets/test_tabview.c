@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST || 1
 #include "../lvgl.h"
 
 #include "unity/unity.h"
@@ -18,7 +18,7 @@ void test_tabview_add_several_tabs_no_scroll(void);
 void test_tabview_rename_tab(void);
 void test_tabview_add_several_tabs_hor(void);
 void test_tabview_get_content(void);
-void test_tabview_get_tab_buttons(void);
+void test_tabview_get_tab_bar(void);
 void test_tabview_set_act_non_existent(void);
 void test_tabview_tab2_selected_event(void);
 void test_tabview_update_on_external_scroll(void);
@@ -38,7 +38,8 @@ void tearDown(void)
 
 void test_tabview_create_successful_dir_top(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     TEST_ASSERT_NOT_NULL(tabview);
 
@@ -47,7 +48,9 @@ void test_tabview_create_successful_dir_top(void)
 
 void test_tabview_create_successful_dir_bottom(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_BOTTOM, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_BOTTOM);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     TEST_ASSERT_NOT_NULL(tabview);
 
@@ -56,7 +59,9 @@ void test_tabview_create_successful_dir_bottom(void)
 
 void test_tabview_create_successful_dir_left(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_LEFT, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_LEFT);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     TEST_ASSERT_NOT_NULL(tabview);
 
@@ -65,7 +70,9 @@ void test_tabview_create_successful_dir_left(void)
 
 void test_tabview_create_successful_dir_right(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_RIGHT, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_RIGHT);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     TEST_ASSERT_NOT_NULL(tabview);
 
@@ -74,7 +81,9 @@ void test_tabview_create_successful_dir_right(void)
 
 void test_tabview_add_one_tab_empty(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
 
@@ -83,7 +92,9 @@ void test_tabview_add_one_tab_empty(void)
 
 void test_tabview_add_one_tab_empty_hor(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_LEFT, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_LEFT);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
 
@@ -92,7 +103,9 @@ void test_tabview_add_one_tab_empty_hor(void)
 
 void test_tabview_add_one_tab_no_scroll(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
 
@@ -105,7 +118,9 @@ void test_tabview_add_one_tab_no_scroll(void)
 
 void test_tabview_add_one_tab_with_scroll(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
 
@@ -131,7 +146,9 @@ void test_tabview_add_one_tab_with_scroll(void)
 
 void test_tabview_add_several_tabs_no_scroll(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
@@ -149,7 +166,9 @@ void test_tabview_add_several_tabs_no_scroll(void)
 
 void test_tabview_rename_tab(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
@@ -168,7 +187,9 @@ void test_tabview_rename_tab(void)
 
 void test_tabview_add_several_tabs_hor(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_LEFT, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
@@ -186,25 +207,25 @@ void test_tabview_add_several_tabs_hor(void)
 
 void test_tabview_get_content(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
 
     lv_obj_t * content = lv_tabview_get_content(tabview);
 
     TEST_ASSERT_NOT_NULL(content);
 }
 
-void test_tabview_get_tab_buttons(void)
+void test_tabview_get_tab_bar(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
 
-    lv_obj_t * buttons = lv_tabview_get_tab_buttons(tabview);
+    lv_obj_t * tab_bar = lv_tabview_get_tab_bar(tabview);
 
-    TEST_ASSERT_NOT_NULL(buttons);
+    TEST_ASSERT_NOT_NULL(tab_bar);
 }
 
 void test_tabview_set_act_non_existent(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
 
     lv_tabview_set_active(tabview, 1, LV_ANIM_ON);
 
@@ -213,7 +234,9 @@ void test_tabview_set_act_non_existent(void)
 
 void test_tabview_tab2_selected_event(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
@@ -229,7 +252,9 @@ void test_tabview_tab2_selected_event(void)
 
 void test_tabview_update_on_external_scroll(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
