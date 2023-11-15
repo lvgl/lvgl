@@ -1277,9 +1277,42 @@ menu "LVGL configuration"
 			depends on LV_USE_SDL
 			default n
 		config LV_SDL_DIRECT_EXIT
-			bool "Exit the application when all SDL widows are closed"
+			bool "Exit the application when all SDL windows are closed"
 			depends on LV_USE_SDL
 			default y
+
+		config LV_USE_X11
+			bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"
+			default n
+		config LV_X11_DOUBLE_BUFFER
+			bool "Use double buffers for lvgl rendering"
+			depends on LV_USE_X11
+			default y
+		config LV_X11_DIRECT_EXIT
+			bool "Exit the application when all X11 windows have been closed"
+			depends on LV_USE_X11
+			default y
+		choice
+			prompt "X11 device render mode"
+			depends on LV_USE_X11
+			default LV_X11_RENDER_MODE_PARTIAL
+
+			config LV_X11_RENDER_MODE_PARTIAL
+				bool "Partial render mode (preferred)"
+				help
+					Use the buffer(s) to render the screen is smaller parts. This way the buffers can be smaller then the display to save RAM.
+					Appr. 1/10 screen size buffer(s) are used.
+			config LV_X11_RENDER_MODE_DIRECT
+				bool "Direct render mode"
+				help
+					The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer. This way the buffer always contain the whole image. Only the changed ares will be updated.
+					With 2 buffers the buffers' content are kept in sync automatically and in flush_cb only address change is required.
+			config LV_X11_RENDER_MODE_FULL
+				bool "Full render mode"
+				help
+					Always redraw the whole screen even if only one pixel has been changed.
+					With 2 buffers in flush_cb only and address change is required.
+		endchoice
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"

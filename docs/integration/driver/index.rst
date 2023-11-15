@@ -7,3 +7,4 @@ Drivers
 
     display/index
     touchpad/index
+    X11

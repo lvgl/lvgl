@@ -301,7 +301,7 @@ lv_image_align_t lv_image_get_align(lv_obj_t * obj);
  **********************/
 
 /** Use this macro to declare an image in a C file*/
-#define LV_IMAGE_DECLARE(var_name) extern const lv_image_dsc_t var_name;
+#define LV_IMAGE_DECLARE(var_name) extern const lv_image_dsc_t var_name
 
 #endif /*LV_USE_IMG*/
 
