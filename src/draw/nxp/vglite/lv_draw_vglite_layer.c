@@ -53,14 +53,21 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     if(layer_to_draw->buf == NULL)
         return;
 
-    lv_draw_buf_invalidate_cache(layer_to_draw->buf, layer_to_draw->buf_stride, layer_to_draw->color_format, coords);
+    uint32_t width = lv_area_get_width(&layer_to_draw->buf_area);
+    uint32_t height = lv_area_get_height(&layer_to_draw->buf_area);
+    const lv_area_t area = {
+        .x1 = 0,
+        .y1 = 0,
+        .x2 = width - 1,
+        .y2 = height - 1
+    };
+    lv_draw_buf_invalidate_cache(layer_to_draw->buf, layer_to_draw->buf_stride, layer_to_draw->color_format, &area);
 
-    lv_image_dsc_t img_dsc = { 0 };
-    img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
-    img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
+    lv_image_dsc_t img_dsc = {0};
+    img_dsc.header.w = width;
+    img_dsc.header.h = height;
     img_dsc.header.cf = layer_to_draw->color_format;
     img_dsc.header.stride = layer_to_draw->buf_stride;
-    img_dsc.header.always_zero = 0;
     img_dsc.data = layer_to_draw->buf;
 
     lv_draw_image_dsc_t new_draw_dsc;

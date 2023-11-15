@@ -298,15 +298,22 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
     lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
+    lv_layer_t * layer = draw_unit->target_layer;
 
     /* Set target buffer */
-    lv_layer_t * layer = draw_unit->target_layer;
     uint32_t buf_width = lv_area_get_width(&layer->buf_area);
     uint32_t buf_height = lv_area_get_height(&layer->buf_area);
 
     vglite_set_dest_buf(layer->buf, buf_width, buf_height, layer->buf_stride, layer->color_format);
 
-    lv_draw_buf_invalidate_cache(layer->buf, layer->buf_stride, layer->color_format, &t->area);
+    lv_area_t draw_area;
+    if(!_lv_area_intersect(&draw_area, &t->area, draw_unit->clip_area))
+        return; /*Fully clipped, nothing to do*/
+
+    /* Make area relative to the buffer */
+    lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    /* Invalidate the drawing area */
+    lv_draw_buf_invalidate_cache(layer->buf, layer->buf_stride, layer->color_format, &draw_area);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:
