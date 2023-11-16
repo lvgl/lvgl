@@ -152,6 +152,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_LINE:
         case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
             if(t->preference_score > 90) {
                 t->preference_score = 90;
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
@@ -347,6 +348,9 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
             lv_draw_vglite_layer(draw_unit, t->draw_dsc, &t->area);
+            break;
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
+            lv_draw_vglite_triangle(draw_unit, t->draw_dsc);
             break;
         default:
             break;
