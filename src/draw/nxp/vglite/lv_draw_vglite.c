@@ -20,6 +20,9 @@
 #include "lv_vglite_utils.h"
 
 #include "../../../display/lv_display_private.h"
+#if LV_USE_PARALLEL_DRAW_DEBUG
+    #include "../../../core/lv_global.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -75,6 +78,10 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_PARALLEL_DRAW_DEBUG
+    #define _draw_info LV_GLOBAL_DEFAULT()->draw_info
+#endif
 
 #if VGLITE_TASK_QUEUE
     /*
@@ -345,15 +352,14 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
     }
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
-    /* Layers manage it for themselves. */
+    /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
         if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area))
             return;
 
         int32_t idx = 0;
-        lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-        lv_draw_unit_t * draw_unit_tmp = disp->draw_unit_head;
+        lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
         while(draw_unit_tmp != (lv_draw_unit_t *)u) {
             draw_unit_tmp = draw_unit_tmp->next;
             idx++;
@@ -365,10 +371,10 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
         rect_dsc.bg_opa = LV_OPA_10;
         rect_dsc.border_opa = LV_OPA_80;
         rect_dsc.border_width = 1;
-        lv_draw_vglite_rect((lv_draw_unit_t *)u, &rect_dsc, &draw_area);
+        lv_draw_sw_fill((lv_draw_unit_t *)u, &rect_dsc, &draw_area);
 
         lv_point_t txt_size;
-        lv_txt_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
 
         lv_area_t txt_area;
         txt_area.x1 = draw_area.x1;
@@ -378,7 +384,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 
         lv_draw_rect_dsc_init(&rect_dsc);
         rect_dsc.bg_color = lv_color_white();
-        lv_draw_vglite_rect((lv_draw_unit_t *)u, &rect_dsc, &txt_area);
+        lv_draw_sw_fill((lv_draw_unit_t *)u, &rect_dsc, &txt_area);
 
         char buf[8];
         lv_snprintf(buf, sizeof(buf), "%d", idx);
@@ -386,7 +392,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
         lv_draw_label_dsc_init(&label_dsc);
         label_dsc.color = lv_color_black();
         label_dsc.text = buf;
-        lv_draw_vglite_label((lv_draw_unit_t *)u, &label_dsc, &txt_area);
+        lv_draw_sw_label((lv_draw_unit_t *)u, &label_dsc, &txt_area);
     }
 #endif
 }
