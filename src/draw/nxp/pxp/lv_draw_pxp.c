@@ -110,7 +110,8 @@ static bool _pxp_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
     const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
     bool has_recolor = (draw_dsc->recolor_opa > LV_OPA_MIN);
-    bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->zoom != LV_SCALE_NONE);
+    bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
+                          draw_dsc->scale_y != LV_SCALE_NONE);
 
     /* Recolor and transformation are not supported at the same time. */
     if(has_recolor && has_transform)
