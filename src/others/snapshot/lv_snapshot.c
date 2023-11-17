@@ -140,9 +140,17 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
     _lv_refr_set_disp_refreshing(disp_new);
     lv_obj_redraw(&layer, obj);
 
-    while(layer.draw_task_head) {
-        lv_draw_dispatch_wait_for_request();
-        lv_draw_dispatch_layer(NULL, &layer);
+    bool need_waiting = false;
+    lv_layer_t * layer_dispatch = &layer;
+
+    while(layer_dispatch) {
+        if(lv_draw_dispatch_layer(NULL, layer_dispatch))
+            need_waiting = true;
+        layer_dispatch = layer_dispatch->next;
+    }
+
+    if(!need_waiting) {
+        lv_draw_dispatch_request();
     }
 
     disp_new->layer_head = layer_old;
