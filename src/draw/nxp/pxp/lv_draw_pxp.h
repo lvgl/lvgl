@@ -33,16 +33,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef lv_layer_t lv_pxp_layer_t;
-
-typedef struct {
-    lv_draw_unit_t base_unit;
-    lv_draw_task_t * task_act;
-#if LV_USE_OS
-    lv_thread_sync_t sync;
-    lv_thread_t thread;
-#endif
-} lv_draw_pxp_unit_t;
+typedef lv_draw_sw_unit_t lv_draw_pxp_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES

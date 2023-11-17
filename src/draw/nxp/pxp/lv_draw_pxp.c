@@ -34,16 +34,21 @@
  **********************/
 
 /*
+ * Evaluate a task and set the score and preferred PXP unit.
+ * Return 1 if task is preferred, 0 otherwise (task is not supported).
+ */
+static int32_t _pxp_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+
+/*
  * Dispatch a task to the PXP unit.
  * Return 1 if task was dispatched, 0 otherwise (task not supported).
  */
 static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 /*
- * Evaluate a task and set the score and preferred PXP unit.
- * Return 1 if task is preferred, 0 otherwise (task is not supported).
+ * Delete the PXP draw unit.
  */
-static int32_t _pxp_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
+static int32_t _pxp_delete(lv_draw_unit_t * draw_unit);
 
 #if LV_USE_OS
     static void _pxp_render_thread_cb(void * ptr);
@@ -72,8 +77,9 @@ void lv_draw_pxp_init(void)
     lv_draw_buf_pxp_init_handlers();
 
     lv_draw_pxp_unit_t * draw_pxp_unit = lv_draw_create_unit(sizeof(lv_draw_pxp_unit_t));
-    draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
     draw_pxp_unit->base_unit.evaluate_cb = _pxp_evaluate;
+    draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
+    draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
 
     lv_pxp_init();
 
@@ -144,7 +150,8 @@ static bool _pxp_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
 
 static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
-    LV_UNUSED(u);
+    if(!_pxp_cf_supported(u->target_layer->color_format))
+        return 0;
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL: {
@@ -226,16 +233,11 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(draw_pxp_unit->task_act)
         return 0;
 
-    /* Return if target buffer format is not supported. */
-    if(!_pxp_cf_supported(layer->draw_buf.color_format))
-        return 0;
-
     /* Try to get an ready to draw. */
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
 
-    /* Return 0 is no selection, some tasks can be supported only by other units. */
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_PXP)
-        return 0;
+        return -1;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL)
@@ -248,7 +250,8 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 #if LV_USE_OS
     /* Let the render thread work. */
-    lv_thread_sync_signal(&draw_pxp_unit->sync);
+    if(draw_pxp_unit->inited)
+        lv_thread_sync_signal(&draw_pxp_unit->sync);
 #else
     _pxp_execute_drawing(draw_pxp_unit);
 
@@ -260,6 +263,27 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 #endif
 
     return 1;
+}
+
+static int32_t _pxp_delete(lv_draw_unit_t * draw_unit)
+{
+#if LV_USE_OS
+    lv_draw_pxp_unit_t * draw_pxp_unit = (lv_draw_pxp_unit_t *) draw_unit;
+
+    LV_LOG_INFO("Cancel PXP draw thread.");
+    draw_pxp_unit->exit_status = true;
+
+    if(draw_pxp_unit->inited)
+        lv_thread_sync_signal(&draw_pxp_unit->sync);
+
+    lv_result_t res = lv_thread_delete(&draw_pxp_unit->thread);
+
+    return res;
+#else
+    LV_UNUSED(draw_unit);
+
+    return 0;
+#endif
 }
 
 static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
@@ -294,25 +318,37 @@ static void _pxp_render_thread_cb(void * ptr)
     lv_draw_pxp_unit_t * u = ptr;
 
     lv_thread_sync_init(&u->sync);
+    u->inited = true;
 
     while(1) {
-        /*
-         * Wait for sync if no task received or _draw_task_buf is empty.
-         * The thread will have to run as much as there are pending tasks.
-         */
+        /* Wait for sync if there is no task set. */
         while(u->task_act == NULL) {
+            if(u->exit_status)
+                break;
+
             lv_thread_sync_wait(&u->sync);
+        }
+
+        if(u->exit_status) {
+            LV_LOG_INFO("Ready to exit PXP draw thread.");
+            break;
         }
 
         _pxp_execute_drawing(u);
 
-        /* Cleanup. */
+        /* Signal the ready state to dispatcher. */
         u->task_act->state = LV_DRAW_TASK_STATE_READY;
+
+        /* Cleanup. */
         u->task_act = NULL;
 
         /* The draw unit is free now. Request a new dispatching as it can get a new task. */
         lv_draw_dispatch_request();
     }
+
+    u->inited = false;
+    lv_thread_sync_delete(&u->sync);
+    LV_LOG_INFO("Exit PXP draw thread.");
 }
 #endif
 
