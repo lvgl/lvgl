@@ -71,11 +71,11 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
 
     lv_area_t rel_coords;
     lv_area_copy(&rel_coords, coords);
-    lv_area_move(&rel_coords, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
+    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
+    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
     bool has_transform = dsc->rotation != 0 || dsc->zoom != LV_SCALE_NONE;
@@ -87,16 +87,16 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     const uint8_t * src_buf = img_dsc->data;
 
     lv_area_t src_area;
-    src_area.x1 = blend_area.x1 - (coords->x1 - layer->draw_buf_ofs.x);
-    src_area.y1 = blend_area.y1 - (coords->y1 - layer->draw_buf_ofs.y);
+    src_area.x1 = blend_area.x1 - (coords->x1 - layer->buf_area.x1);
+    src_area.y1 = blend_area.y1 - (coords->y1 - layer->buf_area.y1);
     src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
     src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
     int32_t src_stride = img_dsc->header.stride;
     lv_color_format_t src_cf = img_dsc->header.cf;
 
-    uint8_t * dest_buf = layer->draw_buf.buf;
-    int32_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
-    lv_color_format_t dest_cf = layer->draw_buf.color_format;
+    uint8_t * dest_buf = layer->buf;
+    int32_t dest_stride = layer->buf_stride;
+    lv_color_format_t dest_cf = layer->color_format;
     bool has_recolor = (dsc->recolor_opa > LV_OPA_MIN);
 
     if(has_recolor && !has_transform)

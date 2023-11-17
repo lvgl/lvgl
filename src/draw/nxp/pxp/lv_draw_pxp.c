@@ -181,9 +181,8 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_LAYER: {
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
-                lv_draw_buf_t * draw_buf = &layer_to_draw->draw_buf;
 
-                if(!_pxp_cf_supported(draw_buf->color_format))
+                if(!_pxp_cf_supported(layer_to_draw->color_format))
                     return 0;
 
                 if(!_pxp_draw_img_supported(draw_dsc))
