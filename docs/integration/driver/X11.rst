@@ -1,29 +1,29 @@
-=======
-X11
-=======
+=========================
+X11 Display/Inputs driver
+=========================
 
 Overview
 -------------
 
-The `X11 display/input driver <https://github.com/lvgl/lvgl/src/dev/x11>`__ offers support for simulating the LVGL display
-in a X11 desktop window. It is an alternative to Wayland, XCB, SDL or Qt.
+| The **X11** display/input `driver <https://github.com/lvgl/lvgl/src/dev/x11>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in an X11 desktop window.
+| It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
 
-The main purpose for this display driver is for testing/debugging the LVGL application in a Linux simulation window.
+The main purpose for this driver is for testing/debugging the LVGL application in a **Linux** simulation window.
 
 
 Prerequisites
 -------------
 
-The X11 display driver uses XLib to access the linux window manager.
+The X11 driver uses XLib to access the linux window manager.
 
 1. Install XLib: ``sudo apt-get install libx11-6`` (should be installed already)
 2. Install XLib development package: ``sudo apt-get install libx11-dev``
 
 
-Configure X11 display driver
-----------------------------
+Configure X11 driver
+--------------------
 
-1. Enable the X11 display driver support in lv_conf.h, by cmake compiler define or by KConfig
+1. Enable the X11 driver support in lv_conf.h, by cmake compiler define or by KConfig
     .. code:: c
 
         #define LV_USE_X11  1
@@ -56,7 +56,8 @@ Configure X11 display driver
 Usage
 -----
 
-The minimal initialisation (e.g. in main.c, LV_X11_DIRECT_EXIT must be 1):
+| The minimal initialisation opening a window and enabling keyboard/mouse support
+| (e.g. in main.c, LV_X11_DIRECT_EXIT must be 1):
 
 .. code:: c
 
@@ -81,8 +82,8 @@ The minimal initialisation (e.g. in main.c, LV_X11_DIRECT_EXIT must be 1):
         }
     }
 
-Full initialisation with mouse pointer symbol and
-own application exit handling dependent on LV_X11_DIRECT_EXIT (can be 1 or 0)
+| Full initialisation with mouse pointer symbol and own application exit handling
+| (dependent on LV_X11_DIRECT_EXIT (can be 1 or 0))
 
 .. code:: c
 
