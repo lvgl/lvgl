@@ -181,45 +181,6 @@ vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf)
     return vg_buffer_format;
 }
 
-uint8_t vglite_get_px_size(lv_color_format_t cf)
-{
-    uint8_t bits_per_pixel = LV_COLOR_DEPTH;
-
-    switch(cf) {
-        case LV_COLOR_FORMAT_I1:
-            bits_per_pixel = 1;
-            break;
-        case LV_COLOR_FORMAT_I2:
-            bits_per_pixel = 2;
-            break;
-        case LV_COLOR_FORMAT_I4:
-            bits_per_pixel = 4;
-            break;
-        case LV_COLOR_FORMAT_I8:
-        case LV_COLOR_FORMAT_A8:
-        case LV_COLOR_FORMAT_L8:
-            bits_per_pixel = 8;
-            break;
-        case LV_COLOR_FORMAT_RGB565:
-            bits_per_pixel = 16;
-            break;
-        case LV_COLOR_FORMAT_RGB565A8:
-        case LV_COLOR_FORMAT_RGB888:
-            bits_per_pixel = 24;
-            break;
-        case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
-            bits_per_pixel = 32;
-            break;
-
-        default:
-            LV_ASSERT_MSG(false, "Unsupported buffer format.");
-            break;
-    }
-
-    return bits_per_pixel;
-}
-
 uint8_t vglite_get_alignment(lv_color_format_t cf)
 {
     uint8_t align_bytes = LV_COLOR_DEPTH / 8 * 16; /*16 pixels*/

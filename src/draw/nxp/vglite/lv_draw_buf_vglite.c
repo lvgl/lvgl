@@ -104,7 +104,7 @@ static void _invalidate_cache(void * buf, uint32_t stride, lv_color_format_t cf,
     const uint8_t * buf_u8 = buf;
     /* ARM require a 32 byte aligned address. */
     uint8_t align_bytes = 32;
-    uint8_t bits_per_pixel = vglite_get_px_size(cf);
+    uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
 
     uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
     uint16_t offset_x = 0;
@@ -138,7 +138,7 @@ static void _invalidate_cache(void * buf, uint32_t stride, lv_color_format_t cf,
 
 static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)
 {
-    uint8_t bits_per_pixel = vglite_get_px_size(cf);
+    uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
     uint32_t width_bits = (w * bits_per_pixel + 7) & ~7;
     uint32_t width_bytes = width_bits / 8;
     uint8_t align_bytes = vglite_get_alignment(cf);

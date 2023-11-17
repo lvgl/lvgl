@@ -111,16 +111,6 @@ vg_lite_blend_t vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode);
 vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf);
 
 /**
- * Get vglite buffer pixel size.
- *
- * @param[in] cf Color format
- *
- * @retval Bits per pixel
- *
- */
-uint8_t vglite_get_px_size(lv_color_format_t cf);
-
-/**
  * Get vglite buffer alignment.
  *
  * @param[in] cf Color format

@@ -246,7 +246,7 @@ static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stri
 {
     uint8_t ** buf_u8 = (uint8_t **)buf;
     uint8_t align_bytes = vglite_get_alignment(cf);
-    uint8_t bits_per_pixel = vglite_get_px_size(cf);
+    uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
 
     uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
 
@@ -360,8 +360,8 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
             tile_dest_area.x1 = shift_dest_x;
             if(x > 0) {
                 /* Advance start pointer for every tile, except the first raw (x = 0) */
-                tile_src_buf += VGLITE_BLIT_SPLIT_THR * vglite_get_px_size(src_cf) / 8;
-                tile_dest_buf += VGLITE_BLIT_SPLIT_THR * vglite_get_px_size(dest_cf) / 8;
+                tile_src_buf += VGLITE_BLIT_SPLIT_THR * lv_color_format_get_bpp(src_cf) / 8;
+                tile_dest_buf += VGLITE_BLIT_SPLIT_THR * lv_color_format_get_bpp(dest_cf) / 8;
             }
 
             /* Calculate x2 coordinates */
