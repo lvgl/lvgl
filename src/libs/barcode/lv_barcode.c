@@ -207,7 +207,7 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     LV_LOG_INFO("free canvas buffer: %p", img->data);
 
-    lv_free((void *)img->data);
+    lv_draw_buf_free((void *)img->data);
     img->data = NULL;
 }
 
@@ -219,8 +219,9 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
     lv_image_dsc_t * img = lv_canvas_get_image(obj);
     void * buf = (void *)img->data;
 
-    uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h);
-    buf = lv_realloc(buf, buf_size);
+    uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_I1);
+    uint32_t buf_size = stride * h;
+    buf = lv_draw_buf_malloc(buf_size, LV_COLOR_FORMAT_I1);
     LV_ASSERT_MALLOC(buf);
 
     if(!buf) {
@@ -228,6 +229,7 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
         return false;
     }
 
+    lv_draw_buf_free((void *)img->data);
     lv_canvas_set_buffer(obj, buf, w, h, LV_COLOR_FORMAT_I1);
     LV_LOG_INFO("set canvas buffer: %p, width = %d", buf, (int)w);
     return true;
