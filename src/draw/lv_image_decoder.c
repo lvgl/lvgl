@@ -516,22 +516,30 @@ lv_result_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_
     if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
         int32_t x_fraction = decoded_area->x1 % (8 / bpp);
         uint32_t len = (w_px * bpp + 7) / 8 + 1; /*10px for 1bpp may across 3bytes*/
-        uint8_t * buf = lv_malloc(len);
-        LV_ASSERT_NULL(buf);
-        if(buf == NULL)
-            return LV_RESULT_INVALID;
-
+        uint8_t * buf = NULL;
         offset += dsc->palette_size * 4; /*Skip palette*/
-        offset += decoded_area->y1 * ((dsc->header.w * bpp + 7) / 8); /*Move to y1*/
+        offset += decoded_area->y1 * dsc->header.stride;
         offset += decoded_area->x1 * bpp / 8; /*Move to x1*/
-        res = fs_read_file_at(f, offset, buf, len, NULL);
-        if(res != LV_FS_RES_OK) {
-            lv_free(buf);
-            return LV_RESULT_INVALID;
+        if(dsc->src_type == LV_IMAGE_SRC_FILE) {
+            buf = lv_malloc(len);
+            LV_ASSERT_NULL(buf);
+            if(buf == NULL)
+                return LV_RESULT_INVALID;
+
+            res = fs_read_file_at(f, offset, buf, len, NULL);
+            if(res != LV_FS_RES_OK) {
+                lv_free(buf);
+                return LV_RESULT_INVALID;
+            }
+        }
+        else {
+            const lv_image_dsc_t * image = dsc->src;
+            buf = (void *)(image->data + offset);
         }
 
         decode_indexed_line(cf, dsc->palette, x_fraction, 0, w_px, buf, (lv_color32_t *)img_data);
-        lv_free(buf);
+
+        if(dsc->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)buf);
 
         dsc->img_data = img_data; /*Return decoded image*/
         return LV_RESULT_OK;
