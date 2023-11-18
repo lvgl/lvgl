@@ -18,7 +18,6 @@ extern "C" {
 #include "../../indev/lv_indev.h"
 
 #if LV_USE_SDL
-#include LV_SDL_INCLUDE_PATH
 
 /*********************
  *      DEFINES
@@ -42,7 +41,7 @@ lv_display_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id);
 
 void lv_sdl_window_set_title(lv_display_t * disp, const char * title);
 
-SDL_Renderer * lv_sdl_window_get_renderer(lv_display_t * disp);
+void * lv_sdl_window_get_renderer(lv_display_t * disp);
 
 void lv_sdl_quit();
 

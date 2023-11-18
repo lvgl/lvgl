@@ -159,7 +159,7 @@ void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
     SDL_SetWindowTitle(dsc->window, title);
 }
 
-SDL_Renderer * lv_sdl_window_get_renderer(lv_display_t * disp)
+void * lv_sdl_window_get_renderer(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     return dsc->renderer;
