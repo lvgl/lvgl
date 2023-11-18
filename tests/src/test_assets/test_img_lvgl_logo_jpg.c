@@ -165,8 +165,6 @@ test_img_lvgl_logo_jpg_map[] = {
 
 const lv_image_dsc_t test_img_lvgl_logo_jpg = {
     .header.cf = LV_COLOR_FORMAT_RAW,
-    .header.always_zero = 0,
-    .header.reserved = 0,
     .header.w = 105,
     .header.h = 33,
     .data_size = 1947,

@@ -320,9 +320,9 @@ static void x11_window_create(lv_display_t * disp, char const * title)
     xd->window = XCreateSimpleWindow(xd->hdr.display, DefaultRootWindow(xd->hdr.display),
                                      0, 0, hor_res, ver_res, 0, col_fg, col_bg);
 #else
-    xd->window = XCreateWindow(xd->hdr.display, DefaultRootWindow(xd->hdr.display),
+    xd->window = XCreateWindow(xd->hdr.display, XDefaultRootWindow(xd->hdr.display),
                                0, 0, hor_res, ver_res, 0,
-                               DefaultDepth(xd->hdr.display, screen), InputOutput,
+                               XDefaultDepth(xd->hdr.display, screen), InputOutput,
                                xd->visual, 0, NULL);
 #endif
     /* window manager properties (yes, use of StdProp is obsolete) */

@@ -68,12 +68,11 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
      *In this case just return. */
     if(layer_to_draw->buf == NULL) return;
 
-    lv_image_dsc_t img_dsc;
+    lv_image_dsc_t img_dsc = { 0 };
     img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
     img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
     img_dsc.header.cf = layer_to_draw->color_format;
     img_dsc.header.stride = layer_to_draw->buf_stride;
-    img_dsc.header.always_zero = 0;
     img_dsc.data = layer_to_draw->buf;
 
     lv_draw_image_dsc_t new_draw_dsc;

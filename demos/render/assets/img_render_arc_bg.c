@@ -114,7 +114,6 @@ img_render_arc_bg_map[] = {
 
 const lv_image_dsc_t img_render_arc_bg = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
     .data_size = 0,

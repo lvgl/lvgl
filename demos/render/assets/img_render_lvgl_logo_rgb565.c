@@ -58,8 +58,6 @@ img_render_lvgl_logo_rgb565_map[] = {
 
 const lv_img_dsc_t img_render_lvgl_logo_rgb565 = {
     .header.cf = LV_COLOR_FORMAT_RGB565,
-    .header.always_zero = 0,
-    .header.reserved = 0,
     .header.w = 30,
     .header.h = 30,
     .data_size = 900 * 2,

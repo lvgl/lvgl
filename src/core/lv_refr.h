@@ -82,6 +82,12 @@ void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p);
 lv_display_t * _lv_refr_get_disp_refreshing(void);
 
 /**
+ * Set the display which is being refreshed
+ * @param disp the display being refreshed
+ */
+void _lv_refr_set_disp_refreshing(lv_display_t * disp);
+
+/**
  * Called periodically to handle the refreshing
  * @param timer pointer to the timer itself
  */

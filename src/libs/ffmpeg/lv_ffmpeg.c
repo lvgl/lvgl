@@ -171,7 +171,6 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 
     data_size = width * height * 4;
 
-    player->imgdsc.header.always_zero = 0;
     player->imgdsc.header.w = width;
     player->imgdsc.header.h = height;
     player->imgdsc.data_size = data_size;
@@ -572,7 +571,6 @@ static int ffmpeg_get_image_header(const char * filepath,
         /* allocate image where the decoded image will be put */
         header->w = video_dec_ctx->width;
         header->h = video_dec_ctx->height;
-        header->always_zero = 0;
         header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
 
         ret = 0;
