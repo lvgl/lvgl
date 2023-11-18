@@ -126,7 +126,6 @@ static void cache_invalidate_cb(lv_cache_entry_t * entry)
     lv_draw_buf_free((void *)entry->data);
 }
 
-
 static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_buf)
 {
     LV_UNUSED(bitmap_buf);
@@ -287,6 +286,5 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
         }
     }
 }
-
 
 #endif

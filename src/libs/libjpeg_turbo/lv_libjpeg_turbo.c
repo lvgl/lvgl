@@ -475,12 +475,10 @@ static void error_exit(j_common_ptr cinfo)
     longjmp(myerr->jb, 1);
 }
 
-
 static void cache_invalidate_cb(lv_cache_entry_t * entry)
 {
     if(entry->src_type == LV_CACHE_SRC_TYPE_PATH) lv_free((void *)entry->src);
     lv_free((void *)entry->data);
 }
-
 
 #endif /*LV_USE_LIBJPEG_TURBO*/

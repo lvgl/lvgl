@@ -301,7 +301,6 @@ static const void * decode_png_file(const char * filename)
     return image_data;
 }
 
-
 static void cache_invalidate_cb(lv_cache_entry_t * entry)
 {
     lv_free((void *)entry->src);
