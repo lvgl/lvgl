@@ -222,7 +222,6 @@ img_lv_demo_music_slider_knob_map[] = {
 };
 
 const lv_image_dsc_t img_lv_demo_music_slider_knob = {
-    .header.always_zero = 0,
     .header.w = 66,
     .header.h = 66,
     // .data_size = 4356 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,

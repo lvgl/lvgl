@@ -102,7 +102,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 
         uint32_t * size = (uint32_t *)&buf[16];
         /*Save the data in the header*/
-        header->always_zero = 0;
         header->cf = LV_COLOR_FORMAT_ARGB8888;
         /*The width and height are stored in Big endian format so convert them to little endian*/
         header->w = (int32_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);

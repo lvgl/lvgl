@@ -422,7 +422,6 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_ARGB uint8_t img_be
 };
 
 const lv_image_dsc_t img_benchmark_cogwheel_argb = {
-    .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
     //    .data_size = 10000 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,

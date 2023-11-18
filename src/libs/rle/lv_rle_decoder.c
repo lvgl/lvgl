@@ -241,7 +241,6 @@ static lv_res_t decoder_info(struct _lv_image_decoder_t * decoder,
             return LV_RES_INV;
         }
 
-        header->always_zero = 0;
         header->cf = img_dsc->header.cf;
         header->w = img_dsc->header.w;
         header->h = img_dsc->header.h;

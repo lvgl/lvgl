@@ -104,7 +104,6 @@ static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void
             if(rn != 8) return LV_RESULT_INVALID;
 
             /*Save the data in the header*/
-            header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_ARGB8888;
             /*The width and height are stored in Big endian format so convert them to little endian*/
             header->w = (int32_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
@@ -121,7 +120,6 @@ static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void
         const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
         if(data_size < sizeof(magic)) return LV_RESULT_INVALID;
         if(memcmp(magic, img_dsc->data, sizeof(magic))) return LV_RESULT_INVALID;
-        header->always_zero = 0;
 
         header->cf = LV_COLOR_FORMAT_ARGB8888;
 

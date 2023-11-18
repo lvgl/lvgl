@@ -321,7 +321,6 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_TEST_AR
 
 const lv_image_dsc_t test_arc_bg = {
     .header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
-    .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
     .data_size = 0,

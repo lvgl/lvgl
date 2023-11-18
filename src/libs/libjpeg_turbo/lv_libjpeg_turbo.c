@@ -128,7 +128,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
         }
 
         /*Save the data in the header*/
-        header->always_zero = 0;
         header->cf = LV_COLOR_FORMAT_RGB888;
         header->w = width;
         header->h = height;

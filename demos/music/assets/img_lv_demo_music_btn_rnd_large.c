@@ -131,7 +131,6 @@ img_lv_demo_music_btn_rnd_map[] = {
 };
 
 const lv_image_dsc_t img_lv_demo_music_btn_rnd = {
-    .header.always_zero = 0,
     .header.w = 37,
     .header.h = 36,
     // .data_size = 1332 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,

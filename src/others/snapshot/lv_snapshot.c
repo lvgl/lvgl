@@ -119,7 +119,6 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
     dsc->header.w = w;
     dsc->header.h = h;
     dsc->header.cf = cf;
-    dsc->header.always_zero = 0;
 
     lv_layer_t layer;
     lv_memzero(&layer, sizeof(layer));
