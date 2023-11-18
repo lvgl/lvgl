@@ -4,14 +4,10 @@
  * Opts: --no-compress --no-prefilter --bpp 4 --size 15 --format lvgl --output font_multilang_small.c --font NotoSerifHebrew-SemiBold.ttf --symbols קורא נלהב שצובר אוסף עצום של ספרים יקרים --font NotoSerifDevanagari-SemiBold.ttf --symbols हरित कार्यकर्ता, एक स्थायी कल के लिए प्रयासरत। --font NotoNaskhArabic-SemiBold.ttf -r 0xFEEA, 0xFEE4, 0xFEEB, 0xFED6, 0xFEB7, 0xFE8E, 0xFECB, 0xFEED, 0xFEA6, 0xFBFE, 0xFEAD, 0xFE8E, 0xFE97, 0xFED6, 0xFEB7, 0xFE8E, 0xFECB, 0xFEA9, 0xFEAD, 0xFEEE, 0xFEE3, 0xFE96, 0xFEE4, 0xFEB4, 0xFED7, 0xFEEA, 0xFED8, 0xFBFF, 0xFE98, 0xFECB, 0xFEB0, 0xFBFF, 0xFB7C, 0xFE96, 0xFEB3, 0xFE8D, 0xFEE5, 0xFEAE, 0xFED7, 0xFEE6, 0xFEE3, 0xFEEA, 0xFED7, 0xFEFC, 0xFECB, 0xFEF1, 0xFE8B, 0xFEE8, 0xFEF4, 0xFEAA, 0xFEE7, 0xFEE1, 0xFED3, 0xFEF8, 0xFEDF, 0xFECD, 0xFE92, 0xFEE0, 0xFEF4, 0xFE92, 0xFED4, 0xFEF4, 0xFE91, 0xFE90, 0xFEA0, 0xFECC, 0xFEF2, 0xFEBF --font NotoSansSC-Medium.otf --symbols 对编程和技术充满热情。 开源倡导者。 --font Montserrat-SemiBold.ttf -r 0x20-0x24f --symbols Любитель приключений на свежем воздухе, всегда ищущий новых острых ощущений
  ******************************************************************************/
 
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
-#include "lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
+#include "../../../../lvgl.h"
 
 #ifndef FONT_MULTILANG_SMALL
-#define FONT_MULTILANG_SMALL 1
+    #define FONT_MULTILANG_SMALL 1
 #endif
 
 #if FONT_MULTILANG_SMALL
@@ -4680,7 +4676,6 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     0xb, 0xb5, 0x1c, 0xff, 0xc3, 0x3, 0xd9
 };
 
-
 /*---------------------
  *  GLYPH DESCRIPTION
  *--------------------*/
@@ -5240,8 +5235,7 @@ static const uint16_t unicode_list_6[] = {
 };
 
 /*Collect the unicode lists and glyph_id offsets*/
-static const lv_font_fmt_txt_cmap_t cmaps[] =
-{
+static const lv_font_fmt_txt_cmap_t cmaps[] = {
     {
         .range_start = 32, .range_length = 95, .glyph_id_start = 1,
         .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
@@ -5276,10 +5270,8 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
  *    KERNING
  *----------------*/
 
-
 /*Map glyph_ids to kern left classes*/
-static const uint8_t kern_left_class_mapping[] =
-{
+static const uint8_t kern_left_class_mapping[] = {
     0, 0, 1, 2, 0, 3, 4, 5,
     2, 6, 7, 8, 9, 10, 9, 10,
     11, 12, 0, 13, 14, 15, 16, 17,
@@ -5348,8 +5340,7 @@ static const uint8_t kern_left_class_mapping[] =
 };
 
 /*Map glyph_ids to kern right classes*/
-static const uint8_t kern_right_class_mapping[] =
-{
+static const uint8_t kern_right_class_mapping[] = {
     0, 0, 1, 2, 0, 3, 4, 5,
     2, 6, 7, 8, 9, 10, 9, 10,
     11, 12, 13, 14, 15, 16, 17, 12,
@@ -5418,8 +5409,7 @@ static const uint8_t kern_right_class_mapping[] =
 };
 
 /*Kern values between classes*/
-static const int8_t kern_class_values[] =
-{
+static const int8_t kern_class_values[] = {
     0, 0, 0, 0, 0, 0, 0, 2,
     0, 0, 0, 0, 2, 0, 0, 0,
     0, 1, 0, 0, 0, 0, 0, 0,
@@ -6292,10 +6282,8 @@ static const int8_t kern_class_values[] =
     0, 0, 0, 0, 0, -2, -3, -12
 };
 
-
 /*Collect the kern class' data in one place*/
-static const lv_font_fmt_txt_kern_classes_t kern_classes =
-{
+static const lv_font_fmt_txt_kern_classes_t kern_classes = {
     .class_pair_values   = kern_class_values,
     .left_class_mapping  = kern_left_class_mapping,
     .right_class_mapping = kern_right_class_mapping,
@@ -6328,7 +6316,6 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
 #endif
 };
 
-
 /*-----------------
  *  PUBLIC FONT
  *----------------*/
@@ -6353,7 +6340,4 @@ lv_font_t font_multilang_small = {
     .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 };
 
-
-
 #endif /*#if FONT_MULTILANG_SMALL*/
-
