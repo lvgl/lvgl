@@ -903,7 +903,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 act_time = anim_cur->act_time;
                 playback_now = anim_cur->playback_now;
             }
-            if(act_time < a.time) {
+            if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position*/
                 a.early_apply = 0;
                 if(playback_now) {
@@ -917,7 +917,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_time(&a, anim_time);
-            lv_anim_set_playback_time(&a, a.time);
+            lv_anim_set_playback_time(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
             if(anim_template)
@@ -942,7 +942,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 act_time = anim_cur->act_time;
                 playback_now = anim_cur->playback_now;
             }
-            if(act_time < a.time) {
+            if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position*/
                 a.early_apply = 0;
                 if(playback_now) {
@@ -956,7 +956,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_time(&a, anim_time);
-            lv_anim_set_playback_time(&a, a.time);
+            lv_anim_set_playback_time(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
             if(anim_template)
@@ -1011,7 +1011,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(anim_template) {
                 overwrite_anim_property(&a, anim_template, label->long_mode);
             }
-            else if(act_time < a.time) {
+            else if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
                 a.early_apply = 0;
             }
@@ -1037,7 +1037,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(anim_template) {
                 overwrite_anim_property(&a, anim_template, label->long_mode);
             }
-            else if(act_time < a.time) {
+            else if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
                 a.early_apply = 0;
             }

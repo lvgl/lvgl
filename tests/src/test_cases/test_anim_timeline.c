@@ -3,6 +3,7 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+#include "lv_test_helpers.h"
 
 static lv_anim_timeline_t * anim_timeline;
 
@@ -142,6 +143,183 @@ void test_anim_timeline_progress_2(void)
     lv_refr_now(NULL);
     TEST_ASSERT_EQUAL(700, lv_obj_get_x(obj));
     TEST_ASSERT_EQUAL(300, lv_obj_get_y(obj));
+}
+
+void test_anim_timeline_start(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(obj, 100, 100);
+
+    lv_obj_set_pos(obj, 70, 70);
+
+    /*
+     *       |------1------|
+     *                             |-----Y-----|
+     *                                   |--------Z--------|
+     *   0  200           1000   1500   2000  2500        3500    ms
+     *   ?  50            100     200   400               700     value (px)
+     */
+
+    anim_timeline = lv_anim_timeline_create();
+
+    lv_anim_t a1;
+    lv_anim_init(&a1);
+    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_var(&a1, obj);
+    lv_anim_set_values(&a1, 50, 100);
+    lv_anim_set_time(&a1, 800);
+    lv_anim_set_early_apply(&a1, false);
+    lv_anim_timeline_add(anim_timeline, 200, &a1);
+
+    lv_anim_set_values(&a1, 200, 300);
+    lv_anim_set_time(&a1, 1000);
+    lv_anim_timeline_add(anim_timeline, 1500, &a1);
+
+    /*Overlap with the previous*/
+    lv_anim_set_values(&a1, 400, 700);
+    lv_anim_set_time(&a1, 1500);
+    lv_anim_timeline_add(anim_timeline, 2000, &a1);
+
+    lv_anim_timeline_start(anim_timeline);
+
+    /*As doesn't start at the beginning keep the original value*/
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL(70, lv_obj_get_x(obj));
+
+    lv_test_wait(199);
+    TEST_ASSERT_EQUAL(70, lv_obj_get_x(obj));
+
+    lv_test_wait(1);  /*200*/
+    TEST_ASSERT_EQUAL(50, lv_obj_get_x(obj));
+
+    lv_test_wait(400);  /*600*/
+    TEST_ASSERT_EQUAL(75, lv_obj_get_x(obj));
+
+    lv_test_wait(400);  /*1000*/
+    TEST_ASSERT_EQUAL(100, lv_obj_get_x(obj));
+
+    /*There is a gap*/
+    lv_test_wait(100);  /*1100*/
+    TEST_ASSERT_EQUAL(100, lv_obj_get_x(obj));
+
+    /*Nothing should change it*/
+    lv_obj_set_x(obj, 10);
+
+    lv_test_wait(100);  /*1200*/
+    TEST_ASSERT_EQUAL(10, lv_obj_get_x(obj));
+
+    lv_test_wait(300);  /*1500*/
+    TEST_ASSERT_EQUAL(200, lv_obj_get_x(obj));
+
+    lv_test_wait(499);  /*1999*/
+    TEST_ASSERT_EQUAL(249, lv_obj_get_x(obj));
+
+    lv_test_wait(1);    /*2000*/
+    TEST_ASSERT_EQUAL(400, lv_obj_get_x(obj));
+
+    lv_test_wait(500);    /*2500*/
+    TEST_ASSERT_EQUAL(499, lv_obj_get_x(obj));
+
+    lv_test_wait(500);    /*3000*/
+    TEST_ASSERT_EQUAL(599, lv_obj_get_x(obj));
+
+    lv_test_wait(500);    /*3500*/
+    TEST_ASSERT_EQUAL(700, lv_obj_get_x(obj));
+
+    lv_test_wait(500);    /*3500*/
+    TEST_ASSERT_EQUAL(700, lv_obj_get_x(obj));
+
+    /*Nothing should change it*/
+    lv_obj_set_x(obj, 20);
+
+    lv_test_wait(100);    /*3600*/
+    TEST_ASSERT_EQUAL(20, lv_obj_get_x(obj));
+}
+
+void test_anim_timeline_reverse(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(obj, 100, 100);
+
+    lv_obj_set_pos(obj, 70, 70);
+
+    /* Reverse this:
+     *       |------1------|
+     *                             |-----Y-----|
+     *                                   |--------Z--------|
+     *   0  200           1000   1500   2000  2500        3500    ms
+     *   ?  50            100     200         300         700     value (px)
+     */
+
+    anim_timeline = lv_anim_timeline_create();
+    lv_anim_timeline_set_reverse(anim_timeline, true);
+
+    lv_anim_t a1;
+    lv_anim_init(&a1);
+    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_var(&a1, obj);
+    lv_anim_set_values(&a1, 50, 100);
+    lv_anim_set_time(&a1, 800);
+    lv_anim_set_early_apply(&a1, false);
+    lv_anim_timeline_add(anim_timeline, 200, &a1);
+
+    lv_anim_set_values(&a1, 200, 300);
+    lv_anim_set_time(&a1, 1000);
+    lv_anim_timeline_add(anim_timeline, 1500, &a1);
+
+    /*Overlap with the previous*/
+    lv_anim_set_values(&a1, 400, 700);
+    lv_anim_set_time(&a1, 1500);
+    lv_anim_timeline_add(anim_timeline, 2000, &a1);
+
+    lv_anim_timeline_set_reverse(anim_timeline, true);
+    lv_anim_timeline_start(anim_timeline);    /*0 (3500)*/
+
+    lv_refr_now(NULL);
+    TEST_ASSERT_EQUAL(700, lv_obj_get_x(obj));
+
+    lv_test_wait(999);                   /*999 (2501)*/
+    TEST_ASSERT_EQUAL(500, lv_obj_get_x(obj));
+
+    lv_test_wait(201);                   /*1200 (2300)*/
+    TEST_ASSERT_EQUAL(280, lv_obj_get_x(obj));
+
+    lv_test_wait(300);                   /*1500 (2000)*/
+    TEST_ASSERT_EQUAL(250, lv_obj_get_x(obj));
+
+    lv_test_wait(500);                    /*2000 (1500)*/
+    TEST_ASSERT_EQUAL(200, lv_obj_get_x(obj));
+
+    /*There is a gap*/
+    lv_test_wait(100);                    /*2100 (1400)*/
+    TEST_ASSERT_EQUAL(200, lv_obj_get_x(obj));
+
+    /*Nothing should change it*/
+    lv_obj_set_x(obj, 10);
+
+    lv_test_wait(100);                    /*2200 (1300)*/
+    TEST_ASSERT_EQUAL(10, lv_obj_get_x(obj));
+
+    lv_test_wait(300);                    /*2500 (1000)*/
+    TEST_ASSERT_EQUAL(100, lv_obj_get_x(obj));
+
+    lv_test_wait(400);                    /*2900 (600)*/
+    TEST_ASSERT_EQUAL(75, lv_obj_get_x(obj));
+
+    lv_test_wait(400);                    /*3300 (200)*/
+    TEST_ASSERT_EQUAL(50, lv_obj_get_x(obj));
+
+    /*There is a gap*/
+    lv_test_wait(100);                    /*3400 (100)*/
+    TEST_ASSERT_EQUAL(50, lv_obj_get_x(obj));
+
+    /*Nothing should change it*/
+    lv_obj_set_x(obj, 20);
+    lv_test_wait(100);
+    TEST_ASSERT_EQUAL(20, lv_obj_get_x(obj));
+
+    lv_test_wait(1000);
+    TEST_ASSERT_EQUAL(20, lv_obj_get_x(obj));
 }
 
 #endif

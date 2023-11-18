@@ -145,7 +145,7 @@ typedef struct _lv_anim_t {
     int32_t start_value;               /**< Start value*/
     int32_t current_value;             /**< Current value*/
     int32_t end_value;                 /**< End value*/
-    int32_t time;                /**< Animation time in ms*/
+    int32_t duration;                /**< Animation time in ms*/
     int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
     uint32_t playback_delay;     /**< Wait before play back*/
     uint32_t playback_time;      /**< Duration of playback animation*/
@@ -218,7 +218,7 @@ static inline void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_xcb_t exec_cb
  */
 static inline void lv_anim_set_time(lv_anim_t * a, uint32_t duration)
 {
-    a->time = duration;
+    a->duration = duration;
 }
 
 /**
@@ -240,7 +240,7 @@ static inline void lv_anim_set_delay(lv_anim_t * a, uint32_t delay)
 static inline void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end)
 {
     a->start_value = start;
-    a->current_value = start;
+    a->current_value = INT32_MIN;
     a->end_value = end;
 }
 
@@ -419,7 +419,7 @@ uint32_t lv_anim_get_playtime(lv_anim_t * a);
  */
 static inline uint32_t lv_anim_get_time(lv_anim_t * a)
 {
-    return a->time;
+    return a->duration;
 }
 
 /**
