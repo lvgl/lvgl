@@ -84,7 +84,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
     }
 
     gifobj->imgdsc.data = gifobj->gif->canvas;
-    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA;
+    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
     gifobj->imgdsc.header.h = gifobj->gif->height;
     gifobj->imgdsc.header.w = gifobj->gif->width;
     gifobj->last_call = lv_tick_get();

@@ -210,7 +210,7 @@ static inline bool lv_color32_eq(lv_color32_t c1, lv_color32_t c2)
     return *((uint32_t *)&c1) == *((uint32_t *)&c2);
 }
 
-static lv_color_t lv_color_hex(uint32_t c)
+static inline lv_color_t lv_color_hex(uint32_t c)
 {
     lv_color_t ret;
     ret.red = (c >> 16) & 0xff;
@@ -221,7 +221,21 @@ static lv_color_t lv_color_hex(uint32_t c)
 
 static inline lv_color_t lv_color_make(uint8_t r, uint8_t g, uint8_t b)
 {
-    return lv_color_hex((r << 16) + (g << 8) + b);
+    lv_color_t ret;
+    ret.red = r;
+    ret.green = g;
+    ret.blue = b;
+    return ret;
+}
+
+static inline lv_color32_t lv_color32_make(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    lv_color32_t ret;
+    ret.red = r;
+    ret.green = g;
+    ret.blue = b;
+    ret.alpha = a;
+    return ret;
 }
 
 static inline lv_color_t lv_color_hex3(uint32_t c)
