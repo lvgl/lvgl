@@ -164,6 +164,10 @@ void lv_init(void)
     lv_draw_pxp_init();
 #endif
 
+#if LV_USE_DRAW_SDL
+    lv_draw_sdl_init();
+#endif
+
     _lv_obj_style_init();
 
     /*Initialize the screen refresh system*/

@@ -121,6 +121,12 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     return true; /*true: glyph found; false: glyph was not found*/
 }
 
+static void cache_invalidate_cb(lv_cache_entry_t * entry)
+{
+    lv_draw_buf_free((void *)entry->data);
+}
+
+
 static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_buf)
 {
     LV_UNUSED(bitmap_buf);
@@ -139,37 +145,50 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
     uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
     lv_cache_lock();
     uint32_t cp = unicode_letter;
-    lv_cache_entry_t * cache = lv_cache_find(font, LV_CACHE_SRC_TYPE_PTR, font->line_height, cp);
+    lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, font, LV_CACHE_SRC_TYPE_POINTER);
+    while(cache) {
+        if(cache->param1 == (int32_t)font->line_height && cache->param2 == (int32_t)cp) break;
+        cache = lv_cache_find_by_src(cache, font, LV_CACHE_SRC_TYPE_POINTER);
+    }
     if(cache) {
         uint8_t * buffer = (uint8_t *)lv_cache_get_data(cache);
+        lv_cache_release(cache);
         lv_cache_unlock();
         return buffer;
     }
+
     size_t szb = h * stride;
-    lv_cache_entry_t * entry = lv_cache_add(szb);
+
+    uint8_t * buffer = lv_draw_buf_malloc(szb, LV_COLOR_FORMAT_A8);
+    if(NULL == buffer) {
+        LV_LOG_ERROR("tiny_ttf: out of memory\n");
+        lv_cache_unlock();
+        return NULL;
+    }
+
+    lv_cache_entry_t * entry = lv_cache_add(buffer, 0, LV_CACHE_DATA_TYPE_NOT_SET, szb);
     if(entry == NULL) {
         lv_cache_unlock();
+        lv_draw_buf_free(buffer);
         LV_LOG_ERROR("tiny_ttf: cache not allocated\n");
         return NULL;
     }
     /* This smells. We add the codepoint to the base pointer to get a key. */
     entry->src = font;
-    entry->src_type = LV_CACHE_SRC_TYPE_PTR;
+    entry->src_type = LV_CACHE_SRC_TYPE_POINTER;
     entry->param1 = font->line_height;
     entry->param2 = cp;
-    uint8_t * buffer = lv_draw_buf_malloc(szb, LV_COLOR_FORMAT_A8);
-    if(NULL == buffer) {
-        LV_LOG_ERROR("tiny_ttf: out of memory\n");
-        lv_cache_invalidate(entry);
-        lv_cache_unlock();
-        return NULL;
-    }
-    entry->data = buffer;
-    entry->free_data = 1;
+    entry->invalidate_cb = cache_invalidate_cb;
+
+    /*Just to increment life*/
+    lv_cache_get_data(entry);
+
     memset(buffer, 0, szb);
-    stbtt_MakeGlyphBitmap(info, buffer, w, h, stride, dsc->scale, dsc->scale, g1);
+    stbtt_MakeGlyphBitmap(info, bitmap_buf, w, h, stride, dsc->scale, dsc->scale, g1);
+    lv_memcpy(buffer, bitmap_buf, stride * h);
+    lv_cache_release(entry);
     lv_cache_unlock();
-    return buffer; /*Or NULL if not found*/
+    return bitmap_buf; /*Or NULL if not found*/
 }
 
 static lv_result_t lv_tiny_ttf_create(lv_font_t * out_font, const char * path, const void * data, size_t data_size,
@@ -268,4 +287,6 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
         }
     }
 }
+
+
 #endif

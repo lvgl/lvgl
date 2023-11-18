@@ -325,6 +325,15 @@
     #endif
 #endif
 
+/* Draw using cached SDL textures*/
+#ifndef LV_USE_DRAW_SDL
+    #ifdef CONFIG_LV_USE_DRAW_SDL
+        #define LV_USE_DRAW_SDL CONFIG_LV_USE_DRAW_SDL
+    #else
+        #define LV_USE_DRAW_SDL 0
+    #endif
+#endif
+
 /*=================
  * OPERATING SYSTEM
  *=================*/

@@ -262,12 +262,12 @@ static void draw_main(lv_event_t * e)
         clip_area_center.y2 = coords.y2;
 
         bool comm_res;
-        comm_res = _lv_area_intersect(&clip_area_center, &clip_area_center, &layer->clip_area);
+        comm_res = _lv_area_intersect(&clip_area_center, &clip_area_center, &layer->_clip_area);
         if(comm_res) {
             int32_t i;
 
-            const lv_area_t clip_area_ori = layer->clip_area;
-            layer->clip_area = clip_area_center;
+            const lv_area_t clip_area_ori = layer->_clip_area;
+            layer->_clip_area = clip_area_center;
 
             coords_part.x1 = coords.x1 + left_w;
             coords_part.y1 = coords.y1;
@@ -280,7 +280,7 @@ static void draw_main(lv_event_t * e)
                 coords_part.x1 = coords_part.x2 + 1;
                 coords_part.x2 += src_info->header.w;
             }
-            layer->clip_area = clip_area_ori;
+            layer->_clip_area = clip_area_ori;
         }
     }
 }

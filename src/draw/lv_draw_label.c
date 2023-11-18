@@ -58,6 +58,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     dsc->sel_color = lv_color_black();
     dsc->sel_bg_color = lv_palette_main(LV_PALETTE_BLUE);
     dsc->bidi_dir = LV_BASE_DIR_LTR;
+    dsc->base.dsc_size = sizeof(lv_draw_label_dsc_t);
 }
 
 void lv_draw_letter_dsc_init(lv_draw_glyph_dsc_t * dsc)

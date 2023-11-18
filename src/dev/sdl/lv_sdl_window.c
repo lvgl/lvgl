@@ -15,6 +15,8 @@
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include LV_SDL_INCLUDE_PATH
 
+#include <SDL2/SDL_image.h>
+
 /*********************
  *      DEFINES
  *********************/
@@ -74,6 +76,12 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         SDL_StartTextInput();
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
         lv_tick_set_cb(SDL_GetTicks);
+
+        if(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+            fprintf(stderr, "could not initialize sdl2_image: %s\n", IMG_GetError());
+            return NULL;
+        }
+
         inited = true;
     }
 
@@ -145,6 +153,12 @@ void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     SDL_SetWindowTitle(dsc->window, title);
+}
+
+SDL_Renderer * lv_sdl_window_get_renderer(lv_display_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    return dsc->renderer;
 }
 
 void lv_sdl_quit()
@@ -260,6 +274,7 @@ static void window_create(lv_display_t * disp)
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
     texture_resize(disp);
+
     uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
     lv_memset(dsc->fb1, 0xff, hor_res * ver_res * px_size);
 #if LV_SDL_DIRECT_MODE_2_BUF
@@ -273,6 +288,7 @@ static void window_create(lv_display_t * disp)
 static void window_update(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+#if LV_USE_DRAW_SDL == 0
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_display_get_color_format(disp));
     SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
@@ -281,6 +297,7 @@ static void window_update(lv_display_t * disp)
 
     /*Update the renderer with the texture containing the rendered image*/
     SDL_RenderCopy(dsc->renderer, dsc->texture, NULL, NULL);
+#endif
     SDL_RenderPresent(dsc->renderer);
 }
 

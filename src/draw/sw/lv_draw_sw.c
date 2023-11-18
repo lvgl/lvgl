@@ -40,7 +40,9 @@
 
 static void execute_drawing(lv_draw_sw_unit_t * u);
 
-static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit);
 
 /**********************
@@ -66,7 +68,8 @@ void lv_draw_sw_init(void)
     uint32_t i;
     for(i = 0; i < LV_DRAW_SW_DRAW_UNIT_CNT; i++) {
         lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
-        draw_sw_unit->base_unit.dispatch_cb = lv_draw_sw_dispatch;
+        draw_sw_unit->base_unit.dispatch_cb = dispatch;
+        draw_sw_unit->base_unit.evaluate_cb = evaluate;
         draw_sw_unit->idx = i;
         draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
 
@@ -114,7 +117,18 @@ static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
  *   STATIC FUNCTIONS
  **********************/
 
-static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
+{
+    LV_UNUSED(draw_unit);
+
+    if(task->preference_score >= 100) {
+        task->preference_score = 100;
+        task->preferred_draw_unit_id = DRAW_UNIT_ID_SW;
+    }
+    return 0;
+}
+
+static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
 

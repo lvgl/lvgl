@@ -20,6 +20,9 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+
+} cache_data_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -30,6 +33,7 @@ static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt);
 static const void * decode_png_data(const void * png_data, size_t png_data_size);
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
+static void cache_invalidate_cb(lv_cache_entry_t * entry);
 
 /**********************
  *  STATIC VARIABLES
@@ -52,6 +56,7 @@ void lv_lodepng_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+    dec->cache_data_type = lv_cache_register_data_type();
 }
 
 void lv_lodepng_deinit(void)
@@ -182,7 +187,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
 
     lv_cache_lock();
-    lv_cache_entry_t * cache = lv_cache_add(dsc->header.w * dsc->header.h * 4);
+    lv_cache_entry_t * cache = lv_cache_add(NULL, 0, decoder->cache_data_type, dsc->header.w * dsc->header.h * 4);
     if(cache == NULL) {
         lv_cache_unlock();
         return LV_RESULT_INVALID;
@@ -193,15 +198,14 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     t = lv_tick_elaps(t);
     cache->weight = t;
     cache->data = decoded_img;
-    cache->free_data = 1;
+    cache->invalidate_cb = cache_invalidate_cb;
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         cache->src = lv_strdup(dsc->src);
-        cache->src_type = LV_CACHE_SRC_TYPE_STR;
-        cache->free_src = 1;
+        cache->src_type = LV_CACHE_SRC_TYPE_PATH;
         lv_free((void *)png_data);
     }
     else {
-        cache->src_type = LV_CACHE_SRC_TYPE_PTR;
+        cache->src_type = LV_CACHE_SRC_TYPE_POINTER;
         cache->src = dsc->src;
     }
 
@@ -233,7 +237,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
 
-        lv_cache_entry_t * cache = lv_cache_find(fn, LV_CACHE_SRC_TYPE_STR, 0, 0);
+        lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, fn, LV_CACHE_SRC_TYPE_PATH);
         if(cache) {
             dsc->img_data = lv_cache_get_data(cache);
             dsc->cache_entry = cache;     /*Save the cache to release it in decoder_close*/
@@ -245,7 +249,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = dsc->src;
 
-        lv_cache_entry_t * cache = lv_cache_find(img_dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0);
+        lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, img_dsc, LV_CACHE_SRC_TYPE_POINTER);
         if(cache) {
             dsc->img_data = lv_cache_get_data(cache);
             dsc->cache_entry = cache;     /*Save the cache to release it in decoder_close*/
@@ -292,6 +296,12 @@ static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt)
         img_argb[i].blue = img_argb[i].red;
         img_argb[i].red = blue;
     }
+}
+
+static void cache_invalidate_cb(lv_cache_entry_t * entry)
+{
+    if(entry->src_type == LV_CACHE_SRC_TYPE_PATH) lv_free((void *)entry->src);
+    lv_free((void *)entry->data);
 }
 
 #endif /*LV_USE_LODEPNG*/

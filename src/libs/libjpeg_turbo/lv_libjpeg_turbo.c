@@ -39,6 +39,7 @@ static const void * decode_jpeg_file(const char * filename);
 static bool get_jpeg_size(const char * filename, uint32_t * width, uint32_t * height);
 static void error_exit(j_common_ptr cinfo);
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
+static void cache_invalidate_cb(lv_cache_entry_t * entry);
 
 /**********************
  *  STATIC VARIABLES
@@ -61,6 +62,7 @@ void lv_libjpeg_turbo_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+    dec->cache_data_type = lv_cache_register_data_type();
 }
 
 void lv_libjpeg_turbo_deinit(void)
@@ -155,26 +157,26 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
 
+        uint32_t t = lv_tick_get();
+        const void * decoded_img = decode_jpeg_file(fn);
+        t = lv_tick_elaps(t);
+
         lv_cache_lock();
-        lv_cache_entry_t * cache = lv_cache_add(dsc->header.w * dsc->header.h * JPEG_PIXEL_SIZE);
+        lv_cache_entry_t * cache = lv_cache_add(decoded_img, 0, dsc->header.w * dsc->header.h * JPEG_PIXEL_SIZE,
+                                                decoder->cache_data_type);
         if(cache == NULL) {
             lv_cache_unlock();
             return LV_RESULT_INVALID;
         }
 
-        uint32_t t = lv_tick_get();
-        const void * decoded_img = decode_jpeg_file(fn);
-        t = lv_tick_elaps(t);
         cache->weight = t;
-        cache->data = decoded_img;
-        cache->free_data = 1;
+        cache->invalidate_cb = cache_invalidate_cb;
         if(dsc->src_type == LV_IMAGE_SRC_FILE) {
             cache->src = lv_strdup(dsc->src);
-            cache->src_type = LV_CACHE_SRC_TYPE_STR;
-            cache->free_src = 1;
+            cache->src_type = LV_CACHE_SRC_TYPE_PATH;
         }
         else {
-            cache->src_type = LV_CACHE_SRC_TYPE_PTR;
+            cache->src_type = LV_CACHE_SRC_TYPE_POINTER;
             cache->src = dsc->src;
         }
 
@@ -205,7 +207,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
 
-        lv_cache_entry_t * cache = lv_cache_find(fn, LV_CACHE_SRC_TYPE_STR, 0, 0);
+        lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, fn, LV_CACHE_SRC_TYPE_PATH);
         if(cache) {
             dsc->img_data = lv_cache_get_data(cache);
             dsc->cache_entry = cache;     /*Save the cache to release it in decoder_close*/
@@ -472,5 +474,13 @@ static void error_exit(j_common_ptr cinfo)
     (*cinfo->err->output_message)(cinfo);
     longjmp(myerr->jb, 1);
 }
+
+
+static void cache_invalidate_cb(lv_cache_entry_t * entry)
+{
+    if(entry->src_type == LV_CACHE_SRC_TYPE_PATH) lv_free((void *)entry->src);
+    lv_free((void *)entry->data);
+}
+
 
 #endif /*LV_USE_LIBJPEG_TURBO*/

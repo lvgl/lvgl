@@ -94,6 +94,7 @@ typedef struct _lv_image_decoder_t {
     lv_image_decoder_open_f_t open_cb;
     lv_image_decoder_get_area_cb_t get_area_cb;
     lv_image_decoder_close_f_t close_cb;
+    uint32_t cache_data_type;
     void * user_data;
 } lv_image_decoder_t;
 

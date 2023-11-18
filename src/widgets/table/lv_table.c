@@ -651,10 +651,10 @@ static void draw_main(lv_event_t * e)
     lv_table_t * table = (lv_table_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, &obj->coords, &layer->clip_area)) return;
+    if(!_lv_area_intersect(&clip_area, &obj->coords, &layer->_clip_area)) return;
 
-    const lv_area_t clip_area_ori = layer->clip_area;
-    layer->clip_area = clip_area;
+    const lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area = clip_area;
 
     lv_point_t txt_size;
     lv_area_t cell_area;
@@ -819,10 +819,10 @@ static void draw_main(lv_event_t * e)
                 bool label_mask_ok;
                 label_mask_ok = _lv_area_intersect(&label_clip_area, &clip_area, &cell_area);
                 if(label_mask_ok) {
-                    layer->clip_area = label_clip_area;
+                    layer->_clip_area = label_clip_area;
                     label_dsc_act.text = table->cell_data[cell]->txt;
                     lv_draw_label(layer, &label_dsc_act, &txt_area);
-                    layer->clip_area = clip_area;
+                    layer->_clip_area = clip_area;
                 }
             }
 
@@ -831,7 +831,7 @@ static void draw_main(lv_event_t * e)
         }
     }
 
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 /* Refreshes size of the table starting from @start_row row */

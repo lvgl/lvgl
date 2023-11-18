@@ -68,6 +68,11 @@ char * lv_strcpy(char * dst, const char * src)
     return strcpy(dst, src);
 }
 
+int32_t lv_strcmp(const char * s1, const char * s2)
+{
+    return strcmp(s1, s2);
+}
+
 char * lv_strdup(const char * src)
 {
     /*strdup uses malloc, so use the built in malloc if it's enabled */

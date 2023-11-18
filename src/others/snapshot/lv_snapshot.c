@@ -129,7 +129,7 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
     layer.buf_area.x2 = snapshot_area.x1 + w - 1;
     layer.buf_area.y2 = snapshot_area.y1 + h - 1;
     layer.color_format = cf;
-    layer.clip_area = snapshot_area;
+    layer._clip_area = snapshot_area;
 
     lv_display_t * disp_old = _lv_refr_get_disp_refreshing();
     lv_display_t * disp_new = lv_obj_get_disp(obj);

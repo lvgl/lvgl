@@ -360,7 +360,7 @@ void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom)
 
     if(zoom == 0) zoom = 1;
 
-    scale_update(obj, img->scale_y, zoom);
+    scale_update(obj, img->scale_x, zoom);
 }
 
 void lv_image_set_antialias(lv_obj_t * obj, bool antialias)
@@ -664,7 +664,7 @@ static void draw_image(lv_event_t * e)
             lv_draw_image_dsc_init(&draw_dsc);
             lv_obj_init_draw_image_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
-            lv_area_t clip_area_ori = layer->clip_area;
+            lv_area_t clip_area_ori = layer->_clip_area;
 
             lv_image_get_pivot(obj, &draw_dsc.pivot);
             draw_dsc.scale_x = img->scale_x;
@@ -680,17 +680,17 @@ static void draw_image(lv_event_t * e)
                 lv_area_align(&obj->coords, &img_area, img->align, img->offset.x, img->offset.y);
             }
             else if(img->align == LV_IMAGE_ALIGN_TILE) {
-                _lv_area_intersect(&layer->clip_area, &layer->clip_area, &obj->coords);
+                _lv_area_intersect(&layer->_clip_area, &layer->_clip_area, &obj->coords);
                 lv_area_move(&img_area, img->offset.x, img->offset.y);
 
                 lv_area_move(&img_area,
-                             ((layer->clip_area.x1 - img_area.x1 - (img->w - 1)) / img->w) * img->w,
-                             ((layer->clip_area.y1 - img_area.y1 - (img->h - 1)) / img->h) * img->h);
+                             ((layer->_clip_area.x1 - img_area.x1 - (img->w - 1)) / img->w) * img->w,
+                             ((layer->_clip_area.y1 - img_area.y1 - (img->h - 1)) / img->h) * img->h);
                 draw_dsc.tile = 1;
             }
 
             lv_draw_image(layer, &draw_dsc, &img_area);
-            layer->clip_area = clip_area_ori;
+            layer->_clip_area = clip_area_ori;
 
         }
         else if(img->src_type == LV_IMAGE_SRC_SYMBOL) {

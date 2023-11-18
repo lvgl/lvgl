@@ -754,7 +754,7 @@ static void draw_main(lv_event_t * e)
     }
 
     lv_area_t txt_clip;
-    bool is_common = _lv_area_intersect(&txt_clip, &txt_coords, &layer->clip_area);
+    bool is_common = _lv_area_intersect(&txt_clip, &txt_coords, &layer->_clip_area);
     if(!is_common) {
         return;
     }
@@ -765,17 +765,17 @@ static void draw_main(lv_event_t * e)
         txt_coords.y2 = obj->coords.y2;
     }
     if(label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
-        const lv_area_t clip_area_ori = layer->clip_area;
-        layer->clip_area = txt_clip;
+        const lv_area_t clip_area_ori = layer->_clip_area;
+        layer->_clip_area = txt_clip;
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
-        layer->clip_area = clip_area_ori;
+        layer->_clip_area = clip_area_ori;
     }
     else {
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
     }
 
-    lv_area_t clip_area_ori = layer->clip_area;
-    layer->clip_area = txt_clip;
+    lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area = txt_clip;
 
     if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
         lv_point_t size;
@@ -800,7 +800,7 @@ static void draw_main(lv_event_t * e)
         }
     }
 
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_label_long_mode_t mode)

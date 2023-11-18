@@ -485,7 +485,7 @@ static void draw_main(lv_event_t * e)
         get_sel_area(obj, &sel_area);
         lv_area_t mask_sel;
         bool area_ok;
-        area_ok = _lv_area_intersect(&mask_sel, &layer->clip_area, &sel_area);
+        area_ok = _lv_area_intersect(&mask_sel, &layer->_clip_area, &sel_area);
         if(area_ok) {
             lv_obj_t * label = get_label(obj);
 
@@ -523,11 +523,11 @@ static void draw_main(lv_event_t * e)
             label_sel_area.y2 = label_sel_area.y1 + res_p.y;
 
             label_dsc.flag |= LV_TEXT_FLAG_EXPAND;
-            const lv_area_t clip_area_ori = layer->clip_area;
-            layer->clip_area = mask_sel;
+            const lv_area_t clip_area_ori = layer->_clip_area;
+            layer->_clip_area = mask_sel;
             label_dsc.text = lv_label_get_text(label);
             lv_draw_label(layer, &label_dsc, &label_sel_area);
-            layer->clip_area = clip_area_ori;
+            layer->_clip_area = clip_area_ori;
         }
     }
 }
@@ -547,10 +547,10 @@ static void draw_label(lv_event_t * e)
     /*If the roller has shadow or outline it has some ext. draw size
      *therefore the label can overflow the roller's boundaries.
      *To solve this limit the clip area to the "plain" roller.*/
-    const lv_area_t clip_area_ori = layer->clip_area;
+    const lv_area_t clip_area_ori = layer->_clip_area;
     lv_area_t roller_clip_area;
-    if(!_lv_area_intersect(&roller_clip_area, &layer->clip_area, &roller->coords)) return;
-    layer->clip_area = roller_clip_area;
+    if(!_lv_area_intersect(&roller_clip_area, &layer->_clip_area, &roller->coords)) return;
+    layer->_clip_area = roller_clip_area;
 
     lv_area_t sel_area;
     get_sel_area(roller, &sel_area);
@@ -560,27 +560,27 @@ static void draw_label(lv_event_t * e)
     clip2.y1 = label_obj->coords.y1;
     clip2.x2 = label_obj->coords.x2;
     clip2.y2 = sel_area.y1;
-    if(_lv_area_intersect(&clip2, &layer->clip_area, &clip2)) {
-        const lv_area_t clip_area_ori2 = layer->clip_area;
-        layer->clip_area = clip2;
+    if(_lv_area_intersect(&clip2, &layer->_clip_area, &clip2)) {
+        const lv_area_t clip_area_ori2 = layer->_clip_area;
+        layer->_clip_area = clip2;
         label_draw_dsc.text = lv_label_get_text(label_obj);
         lv_draw_label(layer, &label_draw_dsc, &label_obj->coords);
-        layer->clip_area = clip_area_ori2;
+        layer->_clip_area = clip_area_ori2;
     }
 
     clip2.x1 = label_obj->coords.x1;
     clip2.y1 = sel_area.y2;
     clip2.x2 = label_obj->coords.x2;
     clip2.y2 = label_obj->coords.y2;
-    if(_lv_area_intersect(&clip2, &layer->clip_area, &clip2)) {
-        const lv_area_t clip_area_ori2 = layer->clip_area;
-        layer->clip_area = clip2;
+    if(_lv_area_intersect(&clip2, &layer->_clip_area, &clip2)) {
+        const lv_area_t clip_area_ori2 = layer->_clip_area;
+        layer->_clip_area = clip2;
         label_draw_dsc.text = lv_label_get_text(label_obj);
         lv_draw_label(layer, &label_draw_dsc, &label_obj->coords);
-        layer->clip_area = clip_area_ori2;
+        layer->_clip_area = clip_area_ori2;
     }
 
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area)

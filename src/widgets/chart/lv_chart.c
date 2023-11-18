@@ -719,11 +719,11 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
     lv_area_t series_clip_area;
-    bool mask_ret = _lv_area_intersect(&series_clip_area, &obj->coords, &layer->clip_area);
+    bool mask_ret = _lv_area_intersect(&series_clip_area, &obj->coords, &layer->_clip_area);
     if(mask_ret == false) return;
 
-    const lv_area_t clip_area_ori = layer->clip_area;
-    layer->clip_area = series_clip_area;
+    const lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area = series_clip_area;
 
     int16_t i;
     int16_t i_start;
@@ -787,16 +787,16 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
         }
     }
 
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
 {
     lv_area_t clip_area;
-    if(_lv_area_intersect(&clip_area, &obj->coords, &layer->clip_area) == false) return;
+    if(_lv_area_intersect(&clip_area, &obj->coords, &layer->_clip_area) == false) return;
 
-    const lv_area_t clip_area_ori = layer->clip_area;
-    layer->clip_area = clip_area;
+    const lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area = clip_area;
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->point_cnt < 2) return;
@@ -812,7 +812,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     lv_chart_series_t * ser;
 
     lv_area_t series_clip_area;
-    bool mask_ret = _lv_area_intersect(&series_clip_area, &obj->coords, &layer->clip_area);
+    bool mask_ret = _lv_area_intersect(&series_clip_area, &obj->coords, &layer->_clip_area);
     if(mask_ret == false) return;
 
     lv_draw_line_dsc_t line_dsc;
@@ -934,17 +934,17 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         }
     }
 
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
 {
 
     lv_area_t clip_area;
-    if(_lv_area_intersect(&clip_area, &obj->coords, &layer->clip_area) == false) return;
+    if(_lv_area_intersect(&clip_area, &obj->coords, &layer->_clip_area) == false) return;
 
-    const lv_area_t clip_area_ori = layer->clip_area;
-    layer->clip_area = clip_area;
+    const lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area = clip_area;
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -1054,17 +1054,17 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
         }
         line_dsc.base.id1++;
         point_dsc_default.base.id1++;
-        layer->clip_area = clip_area_ori;
+        layer->_clip_area = clip_area_ori;
     }
 }
 
 static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
 {
     lv_area_t clip_area;
-    if(_lv_area_intersect(&clip_area, &obj->coords, &layer->clip_area) == false) return;
+    if(_lv_area_intersect(&clip_area, &obj->coords, &layer->_clip_area) == false) return;
 
-    const lv_area_t clip_area_ori = layer->clip_area;
-    layer->clip_area = clip_area;
+    const lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area = clip_area;
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -1128,7 +1128,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
             col_dsc.base.id1++;
         }
     }
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
@@ -1139,10 +1139,10 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
     if(_lv_ll_is_empty(&chart->cursor_ll)) return;
 
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, &layer->clip_area, &obj->coords)) return;
+    if(!_lv_area_intersect(&clip_area, &layer->_clip_area, &obj->coords)) return;
 
-    const lv_area_t clip_area_ori = layer->clip_area;
-    layer->clip_area = clip_area;
+    const lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area = clip_area;
 
     lv_chart_cursor_t * cursor;
 
@@ -1226,7 +1226,7 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
         point_dsc_ori.base.id1++;
     }
 
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 /**

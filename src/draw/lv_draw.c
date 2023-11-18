@@ -83,7 +83,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
     lv_draw_task_t * new_task = lv_malloc_zeroed(sizeof(lv_draw_task_t));
 
     new_task->area = *coords;
-    new_task->clip_area = layer->clip_area;
+    new_task->clip_area = layer->_clip_area;
     new_task->state = LV_DRAW_TASK_STATE_QUEUED;
 
     /*Find the tail*/
@@ -110,13 +110,14 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 
     /*Send LV_EVENT_DRAW_TASK_ADDED and dispatch only on the "main" draw_task
      *and not on the draw tasks added in the event.
-     *Sending LV_EVENT_DRAW_TASK_ADDED events might cause recursive event sends
-     *Dispatching might remove the "main" draw task while it's still being used in the event*/
+     *Sending LV_EVENT_DRAW_TASK_ADDED events might cause recursive event sends and besides
+     *dispatching might remove the "main" draw task while it's still being used in the event*/
 
     if(info->task_running == false) {
-        info->task_running = true;
         if(base_dsc->obj && lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
+            info->task_running = true;
             lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
+            info->task_running = false;
         }
 
         /*Let the draw units set their preference score*/
@@ -129,7 +130,6 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
         }
 
         lv_draw_dispatch();
-        info->task_running = false;
     }
     else {
         /*Let the draw units set their preference score*/
@@ -292,17 +292,17 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 {
     LV_PROFILER_BEGIN;
     /*If the first task is screen sized, there cannot be independent areas*/
-    if(layer->draw_task_head) {
-        int32_t hor_res = lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
-        int32_t ver_res = lv_display_get_vertical_resolution(_lv_refr_get_disp_refreshing());
-        lv_draw_task_t * t = layer->draw_task_head;
-        if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
-           t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
-           t->area.y1 <= 0 && t->area.y2 >= ver_res - 1) {
-            LV_PROFILER_END;
-            return NULL;
-        }
-    }
+    //    if(layer->draw_task_head) {
+    //        int32_t hor_res = lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
+    //        int32_t ver_res = lv_display_get_vertical_resolution(_lv_refr_get_disp_refreshing());
+    //        lv_draw_task_t * t = layer->draw_task_head;
+    //        if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
+    //           t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
+    //           t->area.y1 <= 0 && t->area.y2 >= ver_res - 1) {
+    //            LV_PROFILER_END;
+    //            return NULL;
+    //        }
+    //    }
 
     lv_draw_task_t * t = t_prev ? t_prev->next : layer->draw_task_head;
     while(t) {
@@ -328,7 +328,7 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     if(new_layer == NULL) return NULL;
 
     new_layer->parent = parent_layer;
-    new_layer->clip_area = *area;
+    new_layer->_clip_area = *area;
     new_layer->buf_area = *area;
     new_layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), color_format);
     new_layer->color_format = color_format;

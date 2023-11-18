@@ -93,7 +93,7 @@ void lv_refr_now(lv_display_t * disp)
 
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 {
-    lv_area_t clip_area_ori = layer->clip_area;
+    lv_area_t clip_area_ori = layer->_clip_area;
     lv_area_t clip_coords_for_obj;
 
     /*Truncate the clip area to `obj size + ext size` area*/
@@ -104,7 +104,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 
     if(!_lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext)) return;
     /*If the object is visible on the current clip area*/
-    layer->clip_area = clip_coords_for_obj;
+    layer->_clip_area = clip_coords_for_obj;
 
     lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_BEGIN, layer);
     lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN, layer);
@@ -139,14 +139,14 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
         uint32_t child_cnt = lv_obj_get_child_count(obj);
         if(child_cnt == 0) {
             /*If the object was visible on the clip area call the post draw events too*/
-            layer->clip_area = clip_coords_for_obj;
+            layer->_clip_area = clip_coords_for_obj;
             /*If all the children are redrawn make 'post draw' draw*/
             lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer);
             lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer);
             lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer);
         }
         else {
-            layer->clip_area = clip_coords_for_children;
+            layer->_clip_area = clip_coords_for_children;
             bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
 
             int32_t radius = 0;
@@ -162,7 +162,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 }
 
                 /*If the object was visible on the clip area call the post draw events too*/
-                layer->clip_area = clip_coords_for_obj;
+                layer->_clip_area = clip_coords_for_obj;
                 /*If all the children are redrawn make 'post draw' draw*/
                 lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer);
                 lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer);
@@ -228,7 +228,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 mid.y1 += rout;
                 mid.y2 -= rout;
                 if(_lv_area_intersect(&mid, &mid, &clip_area_ori)) {
-                    layer->clip_area = mid;
+                    layer->_clip_area = mid;
                     for(i = 0; i < child_cnt; i++) {
                         lv_obj_t * child = obj->spec_attr->children[i];
                         refr_obj(layer, child);
@@ -245,7 +245,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
         }
     }
 
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 /**
@@ -606,12 +606,12 @@ static void refr_area(const lv_area_t * area_p)
 
         if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
             disp_refr->last_part = 1;
-            layer->clip_area = disp_area;
+            layer->_clip_area = disp_area;
             refr_area_part(layer);
         }
         else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
             disp_refr->last_part = disp_refr->last_area;
-            layer->clip_area = *area_p;
+            layer->_clip_area = *area_p;
             refr_area_part(layer);
         }
         return;
@@ -638,7 +638,7 @@ static void refr_area(const lv_area_t * area_p)
         layer->buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
         layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
-        layer->clip_area = sub_area;
+        layer->_clip_area = sub_area;
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
         if(y2 == row_last) disp_refr->last_part = 1;
@@ -654,7 +654,7 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.y2 = y2;
         layer->buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
-        layer->clip_area = sub_area;
+        layer->_clip_area = sub_area;
         disp_refr->last_part = 1;
         refr_area_part(layer);
     }
@@ -662,7 +662,7 @@ static void refr_area(const lv_area_t * area_p)
 
 static void refr_area_part(lv_layer_t * layer)
 {
-    disp_refr->refreshed_area = layer->clip_area;
+    disp_refr->refreshed_area = layer->_clip_area;
 
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/
@@ -680,9 +680,9 @@ static void refr_area_part(lv_layer_t * layer)
     lv_obj_t * top_prev_scr = NULL;
 
     /*Get the most top object which is not covered by others*/
-    top_act_scr = lv_refr_get_top_obj(&layer->clip_area, lv_display_get_screen_active(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(&layer->_clip_area, lv_display_get_screen_active(disp_refr));
     if(disp_refr->prev_scr) {
-        top_prev_scr = lv_refr_get_top_obj(&layer->clip_area, disp_refr->prev_scr);
+        top_prev_scr = lv_refr_get_top_obj(&layer->_clip_area, disp_refr->prev_scr);
     }
 
     /*Draw a bottom layer background if there is no top object*/
@@ -824,7 +824,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
         lv_area_t clip_coords_for_obj;
         lv_area_t tranf_coords = obj_coords_ext;
         lv_obj_get_transformed_area(obj, &tranf_coords, false, false);
-        if(!_lv_area_intersect(&clip_coords_for_obj, &layer->clip_area, &tranf_coords)) {
+        if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &tranf_coords)) {
             return LV_RESULT_INVALID;
         }
 
@@ -842,7 +842,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
     }
     else if(layer_type == LV_LAYER_TYPE_SIMPLE) {
         lv_area_t clip_coords_for_obj;
-        if(!_lv_area_intersect(&clip_coords_for_obj, &layer->clip_area, &obj_coords_ext)) {
+        if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &obj_coords_ext)) {
             return LV_RESULT_INVALID;
         }
         *layer_area_out = clip_coords_for_obj;

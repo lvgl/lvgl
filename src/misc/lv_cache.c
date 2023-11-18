@@ -56,7 +56,7 @@ void lv_cache_set_manager(lv_cache_manager_t * manager)
     else if(_cache_manager.set_max_size_cb != NULL) _cache_manager.set_max_size_cb(0);
 
     _cache_manager.add_cb = manager->add_cb;
-    _cache_manager.find_cb = manager->find_cb;
+    _cache_manager.find_by_data_cb = manager->find_by_data_cb;
     _cache_manager.invalidate_cb = manager->invalidate_cb;
     _cache_manager.get_data_cb = manager->get_data_cb;
     _cache_manager.release_cb = manager->release_cb;
@@ -66,20 +66,28 @@ void lv_cache_set_manager(lv_cache_manager_t * manager)
     if(_cache_manager.set_max_size_cb != NULL) _cache_manager.set_max_size_cb(_cache_manager.max_size);
 }
 
-lv_cache_entry_t * lv_cache_add(size_t size)
+lv_cache_entry_t * lv_cache_add(const void * data, size_t data_size, uint32_t data_type, size_t memory_usage)
 {
     LV_ASSERT(_cache_manager.locked);
     if(_cache_manager.add_cb == NULL) return NULL;
 
-    return _cache_manager.add_cb(size);
+    return _cache_manager.add_cb(data, data_size, data_type, memory_usage);
 }
 
-lv_cache_entry_t * lv_cache_find(const void * src_ptr, lv_cache_src_type_t src_type, uint32_t param1, uint32_t param2)
+lv_cache_entry_t * lv_cache_find_by_data(const void * data, size_t data_size, uint32_t data_type)
 {
     LV_ASSERT(_cache_manager.locked);
-    if(_cache_manager.find_cb == NULL) return NULL;
+    if(_cache_manager.find_by_data_cb == NULL) return NULL;
 
-    return _cache_manager.find_cb(src_ptr, src_type, param1, param2);
+    return _cache_manager.find_by_data_cb(data, data_size, data_type);
+}
+
+lv_cache_entry_t * lv_cache_find_by_src(lv_cache_entry_t * entry, const void * src, lv_cache_src_type_t src_type)
+{
+    LV_ASSERT(_cache_manager.locked);
+    if(_cache_manager.find_by_src_cb == NULL) return NULL;
+
+    return _cache_manager.find_by_src_cb(entry, src, src_type);
 }
 
 void lv_cache_invalidate(lv_cache_entry_t * entry)
@@ -88,6 +96,16 @@ void lv_cache_invalidate(lv_cache_entry_t * entry)
     if(_cache_manager.invalidate_cb == NULL) return;
 
     _cache_manager.invalidate_cb(entry);
+}
+
+void lv_cache_invalidate_by_src(const void * src, lv_cache_src_type_t src_type)
+{
+    LV_ASSERT(_cache_manager.locked);
+    lv_cache_entry_t * entry = lv_cache_find_by_src(NULL, src, src_type);
+    while(entry) {
+        lv_cache_invalidate(entry);
+        entry = lv_cache_find_by_src(entry, src, src_type);
+    }
 }
 
 const void * lv_cache_get_data(lv_cache_entry_t * entry)
@@ -131,6 +149,12 @@ void lv_cache_unlock(void)
 {
     _cache_manager.locked = 0;
     lv_mutex_unlock(&_cache_manager.mutex);
+}
+
+uint32_t lv_cache_register_data_type(void)
+{
+    _cache_manager.last_data_type++;
+    return _cache_manager.last_data_type;
 }
 
 /**********************

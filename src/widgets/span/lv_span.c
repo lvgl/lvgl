@@ -806,9 +806,9 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 
     /* return if no draw area */
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, &coords, &layer->clip_area))  return;
-    const lv_area_t clip_area_ori = layer->clip_area;
-    layer->clip_area = clip_area;
+    if(!_lv_area_intersect(&clip_area, &coords, &layer->_clip_area))  return;
+    const lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area = clip_area;
 
     /* init draw variable */
     lv_text_flag_t txt_flag = LV_TEXT_FLAG_NONE;
@@ -1056,12 +1056,12 @@ Next_line_init:
         txt_pos.x = coords.x1;
         txt_pos.y += max_line_h;
         if(is_end_line || txt_pos.y > clip_area.y2 + 1) {
-            layer->clip_area = clip_area_ori;
+            layer->_clip_area = clip_area_ori;
             return;
         }
         max_w = max_width;
     }
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 static void refresh_self_size(lv_obj_t * obj)

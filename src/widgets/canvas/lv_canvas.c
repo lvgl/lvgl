@@ -70,16 +70,17 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
+    canvas->buf_unaligned = buf;
     canvas->dsc.header.cf = cf;
     canvas->dsc.header.w  = w;
     canvas->dsc.header.h  = h;
-    canvas->dsc.header.stride  = lv_draw_buf_width_to_stride(w, cf); /*Let LVGL calculate it automatically*/
-    canvas->dsc.data      = buf;
+    canvas->dsc.header.stride  = lv_draw_buf_width_to_stride(w, cf);
+    canvas->dsc.data      = lv_draw_buf_align(buf, cf);
     canvas->dsc.data_size = w * h * lv_color_format_get_size(cf);
 
     lv_image_set_src(obj, &canvas->dsc);
     lv_cache_lock();
-    lv_cache_invalidate(lv_cache_find(&canvas->dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_invalidate_by_src(&canvas->dsc, LV_CACHE_SRC_TYPE_POINTER);
     lv_cache_unlock();
 }
 
@@ -205,6 +206,15 @@ lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * obj)
     return &canvas->dsc;
 }
 
+const void * lv_canvas_get_buf(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_canvas_t * canvas = (lv_canvas_t *)obj;
+    return canvas->buf_unaligned;
+
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -298,7 +308,7 @@ void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
     layer->buf = lv_draw_buf_align((uint8_t *)dsc->data, dsc->header.cf);
     layer->color_format = dsc->header.cf;
     layer->buf_area = canvas_area;
-    layer->clip_area = canvas_area;
+    layer->_clip_area = canvas_area;
     layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
 }
 
@@ -340,7 +350,7 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
     lv_cache_lock();
-    lv_cache_invalidate(lv_cache_find(&canvas->dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_invalidate_by_src(&canvas->dsc, LV_CACHE_SRC_TYPE_POINTER);
     lv_cache_unlock();
 }
 
