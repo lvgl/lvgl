@@ -15,8 +15,6 @@
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include LV_SDL_INCLUDE_PATH
 
-#include <SDL2/SDL_image.h>
-
 /*********************
  *      DEFINES
  *********************/
