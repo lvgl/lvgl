@@ -619,30 +619,25 @@ static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_
     uint8_t px_size;
     uint16_t mask;
 
-    int32_t w_byte = 0;
     int8_t shift   = 0;
     switch(color_format) {
         case LV_COLOR_FORMAT_I1:
             px_size = 1;
-            w_byte = (w_px + 7) >> 3;   /*E.g. w = 20 -> w = 2 + 1*/
             in += x / 8;                /*8pixel per byte*/
             shift = 7 - (x & 0x7);
             break;
         case LV_COLOR_FORMAT_I2:
             px_size = 2;
-            w_byte = (w_px + 3) >> 2;   /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
             in += x / 4;                /*4pixel per byte*/
             shift = 6 - 2 * (x & 0x3);
             break;
         case LV_COLOR_FORMAT_I4:
             px_size = 4;
-            w_byte = (w_px + 1) >> 1;   /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
             in += x / 2;                /*2pixel per byte*/
             shift = 4 - 4 * (x & 0x1);
             break;
         case LV_COLOR_FORMAT_I8:
             px_size = 8;
-            w_byte = w_px;
             in += x;
             shift = 0;
             break;
