@@ -11,6 +11,7 @@
 #include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
 #include "layouts/lv_layout.h"
+#include "libs/bin_decoder/lv_bin_decoder.h"
 #include "libs/bmp/lv_bmp.h"
 #include "libs/ffmpeg/lv_ffmpeg.h"
 #include "libs/freetype/lv_freetype.h"
@@ -178,6 +179,7 @@ void lv_init(void)
 #endif
 
     _lv_image_decoder_init();
+    lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
     _lv_cache_init();
     _lv_cache_builtin_init();
