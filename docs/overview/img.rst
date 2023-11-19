@@ -276,8 +276,8 @@ open/close the PNG files. It should look like this:
      /*Change the color format if required. For PNG usually 'Raw' is fine*/
      dsc->header.cf = LV_COLOR_FORMAT_...
 
-     /*Call a built in decoder function if required. It's not required if `my_png_decoder` opened the image in true color format.*/
-     lv_result_t res = lv_image_decoder_built_in_open(decoder, dsc);
+     /*Call a binary image decoder function if required. It's not required if `my_png_decoder` opened the image in true color format.*/
+     lv_result_t res = lv_bin_decoder_open(decoder, dsc);
 
      return res;
    }
@@ -306,7 +306,7 @@ open/close the PNG files. It should look like this:
      /*Free all allocated data*/
 
      /*Call the built-in close function if the built-in open/read_line was used*/
-     lv_image_decoder_built_in_close(decoder, dsc);
+     lv_bin_decoder_close(decoder, dsc);
 
    }
 

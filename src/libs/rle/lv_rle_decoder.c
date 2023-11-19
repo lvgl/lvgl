@@ -15,6 +15,7 @@
  *********************/
 #include <stdlib.h>
 #include "lv_rle_decoder.h"
+#include "../bin_decoder/lv_bin_decoder.h"
 
 #if LV_USE_RLE
 
@@ -490,7 +491,7 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder,
     data->decoder_dsc.src_type = LV_IMAGE_SRC_VARIABLE;
     data->decoder_dsc.src = &data->img_dsc;
 
-    res = lv_image_decoder_built_in_open(decoder, &data->decoder_dsc);
+    res = lv_bin_decoder_open(decoder, &data->decoder_dsc);
     if(res != LV_RES_OK) {
         lv_free(img_data);
         lv_free(data);
@@ -507,7 +508,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     if(dsc->user_data) {
         lv_rle_decoder_data_t * decoder_data = dsc->user_data;
-        lv_image_decoder_built_in_close(decoder, &decoder_data->decoder_dsc);
+        lv_bin_decoder_close(decoder, &decoder_data->decoder_dsc);
         if(decoder_data->img_dsc.data)
             lv_free((void *)decoder_data->img_dsc.data);
         lv_free(dsc->user_data);

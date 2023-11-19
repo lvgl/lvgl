@@ -248,6 +248,9 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 
 #define LV_ZOOM_NONE                        LV_SCALE_NONE
 
+#define lv_image_decoder_built_in_open      lv_bin_decoder_open
+#define lv_image_decoder_built_in_close     lv_bin_decoder_close
+
 /**********************
  *      MACROS
  **********************/
