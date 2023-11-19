@@ -37,7 +37,6 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 #endif
 static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,
-                                       int32_t y,
                                        int32_t w_px, const uint8_t * in, lv_color32_t * out);
 
 static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, uint8_t * buff, uint32_t btr, uint32_t * br);
@@ -316,7 +315,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
             buf = (void *)(image->data + offset);
         }
 
-        decode_indexed_line(cf, dsc->palette, x_fraction, 0, w_px, buf, (lv_color32_t *)img_data);
+        decode_indexed_line(cf, dsc->palette, x_fraction, w_px, buf, (lv_color32_t *)img_data);
 
         if(dsc->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)buf);
 
@@ -479,7 +478,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     const uint8_t * in = indexed_data;
     uint8_t * out = img_data;
     for(uint32_t y = 0; y < dsc->header.h; y++) {
-        decode_indexed_line(cf, dsc->palette, 0, 0, dsc->header.w, in, (lv_color32_t *)out);
+        decode_indexed_line(cf, dsc->palette, 0, dsc->header.w, in, (lv_color32_t *)out);
         in += dsc->header.stride;
         out += stride;
     }
@@ -615,13 +614,10 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
 }
 
 static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,
-                                       int32_t y,
                                        int32_t w_px, const uint8_t * in, lv_color32_t * out)
 {
     uint8_t px_size;
     uint16_t mask;
-
-    out += w_px * y;
 
     int32_t w_byte = 0;
     int8_t shift   = 0;
@@ -629,28 +625,24 @@ static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_
         case LV_COLOR_FORMAT_I1:
             px_size = 1;
             w_byte = (w_px + 7) >> 3;   /*E.g. w = 20 -> w = 2 + 1*/
-            in += w_byte * y;           /*First pixel*/
             in += x / 8;                /*8pixel per byte*/
             shift = 7 - (x & 0x7);
             break;
         case LV_COLOR_FORMAT_I2:
             px_size = 2;
             w_byte = (w_px + 3) >> 2;   /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
-            in += w_byte * y;           /*First pixel*/
             in += x / 4;                /*4pixel per byte*/
             shift = 6 - 2 * (x & 0x3);
             break;
         case LV_COLOR_FORMAT_I4:
             px_size = 4;
             w_byte = (w_px + 1) >> 1;   /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
-            in += w_byte * y;           /*First pixel*/
             in += x / 2;                /*2pixel per byte*/
             shift = 4 - 4 * (x & 0x1);
             break;
         case LV_COLOR_FORMAT_I8:
             px_size = 8;
             w_byte = w_px;
-            in += w_byte * y;  /*First pixel*/
             in += x;
             shift = 0;
             break;
