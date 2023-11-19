@@ -41,7 +41,6 @@
 static void execute_drawing(lv_draw_sw_unit_t * u);
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
-static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit);
 
