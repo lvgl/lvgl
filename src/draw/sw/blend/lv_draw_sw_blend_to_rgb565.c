@@ -420,11 +420,11 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
                     else dest_buf_u16[dest_x] = lv_color_16_16_mix(res, dest_buf_u16[dest_x], LV_OPA_MIX2(mask_buf[dest_x], opa));
                 }
             }
+            dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
+            src_buf_u8 += src_stride;
+            if(mask_buf) mask_buf += mask_stride;
         }
 
-        dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
-        src_buf_u8 += src_stride;
-        if(mask_buf) mask_buf += mask_stride;
     }
 }
 
