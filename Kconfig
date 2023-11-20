@@ -901,6 +901,10 @@ menu "LVGL configuration"
 			bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
 			depends on LV_USE_LABEL
 			default y
+		config LV_LABEL_WAIT_CHAR_COUNT
+			int "The count of wait chart."
+			depends on LV_USE_LABEL
+			default 3
 		config LV_USE_LINE
 			bool "Line."
 			default y if !LV_CONF_MINIMAL

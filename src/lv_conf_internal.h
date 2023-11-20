@@ -1511,6 +1511,13 @@
             #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
         #endif
     #endif
+    #ifndef LV_LABEL_WAIT_CHAR_COUNT
+        #ifdef CONFIG_LV_LABEL_WAIT_CHAR_COUNT
+            #define LV_LABEL_WAIT_CHAR_COUNT CONFIG_LV_LABEL_WAIT_CHAR_COUNT
+        #else
+            #define LV_LABEL_WAIT_CHAR_COUNT 3  /*The count of wait chart*/
+        #endif
+    #endif
 #endif
 
 #ifndef LV_USE_LED
