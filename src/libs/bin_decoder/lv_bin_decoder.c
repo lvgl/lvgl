@@ -326,7 +326,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     if(cf == LV_COLOR_FORMAT_ARGB8888 || cf == LV_COLOR_FORMAT_XRGB8888 || cf == LV_COLOR_FORMAT_RGB888
        || cf == LV_COLOR_FORMAT_RGB565) {
         uint32_t len = (w_px * bpp) / 8;
-        offset += decoded_area->y1 * dsc->header.w * bpp / 8; /*Move to y1*/
+        offset += decoded_area->y1 * dsc->header.stride;
         offset += decoded_area->x1 * bpp / 8; /*Move to x1*/
         res = fs_read_file_at(f, offset, img_data, len, NULL);
         if(res != LV_FS_RES_OK) {
