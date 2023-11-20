@@ -107,7 +107,7 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
             }
 
             /*File is always read to buf, thus data can be modified.*/
-            header->flag |= LV_IMAGE_FLAGS_MODIFIABLE;
+            header->flags |= LV_IMAGE_FLAGS_MODIFIABLE;
         }
     }
     else if(src_type == LV_IMAGE_SRC_SYMBOL) {
@@ -125,7 +125,7 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
     }
 
     /*For backward compatibility, all images are not premultiplied for now.*/
-    header->flag &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
+    header->flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
 
     return LV_RESULT_OK;
 }

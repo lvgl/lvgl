@@ -93,7 +93,7 @@ typedef struct {
                                   non-printable character*/
 
     uint32_t format: 8;         /*Image format? To be defined by LVGL*/
-    uint32_t flag: 16;          /*Image flags, see `lv_image_flags_t`*/
+    uint32_t flags: 16;         /*Image flags, see `lv_image_flags_t`*/
 
     uint32_t w: 16;
     uint32_t h: 16;
