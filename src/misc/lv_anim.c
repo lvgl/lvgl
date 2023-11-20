@@ -333,7 +333,6 @@ int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#include <stdio.h>
 /**
  * Periodically handle the animations.
  * @param param unused
