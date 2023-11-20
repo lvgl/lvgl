@@ -237,6 +237,7 @@ void lv_image_set_offset_y(lv_obj_t * obj, int32_t y)
 
 void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_image_t * img = (lv_image_t *)obj;
     if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
@@ -281,6 +282,8 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
 
 void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_image_t * img = (lv_image_t *)obj;
     if(img->align > _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
         x = 0;
@@ -323,6 +326,8 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
 
 void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_image_t * img = (lv_image_t *)obj;
 
     /*If scale is set internally, do no overwrite it*/
@@ -337,6 +342,8 @@ void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom)
 
 void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_image_t * img = (lv_image_t *)obj;
 
     /*If scale is set internally, do no overwrite it*/
@@ -351,6 +358,8 @@ void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom)
 
 void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_image_t * img = (lv_image_t *)obj;
 
     /*If scale is set internally, do no overwrite it*/
@@ -363,8 +372,24 @@ void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom)
     scale_update(obj, img->scale_x, zoom);
 }
 
+void lv_image_set_blend_mode(lv_obj_t * obj, lv_blend_mode_t blend_mode)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_image_t * img = (lv_image_t *)obj;
+
+    /*If scale is set internally, do no overwrite it*/
+    if(img->blend_mode == blend_mode) return;
+
+    img->blend_mode = blend_mode;
+
+    lv_obj_invalidate(obj);
+}
+
 void lv_image_set_antialias(lv_obj_t * obj, bool antialias)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_image_t * img = (lv_image_t *)obj;
     if(antialias == img->antialias) return;
 
@@ -375,6 +400,7 @@ void lv_image_set_antialias(lv_obj_t * obj, bool antialias)
 void lv_image_set_align(lv_obj_t * obj, lv_image_align_t align)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_image_t * img = (lv_image_t *)obj;
     if(align == img->align) return;
 
@@ -462,6 +488,15 @@ int32_t lv_image_get_scale_y(lv_obj_t * obj)
     return img->scale_y;
 }
 
+lv_blend_mode_t lv_image_get_blend_mode(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_image_t * img = (lv_image_t *)obj;
+
+    return img->blend_mode;
+}
+
 bool lv_image_get_antialias(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -474,7 +509,9 @@ bool lv_image_get_antialias(lv_obj_t * obj)
 lv_image_align_t lv_image_get_align(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_image_t * img = (lv_image_t *)obj;
+
     return img->align;
 }
 
@@ -671,6 +708,7 @@ static void draw_image(lv_event_t * e)
             draw_dsc.scale_y = img->scale_y;
             draw_dsc.rotation = img->rotation;
             draw_dsc.antialias = img->antialias;
+            draw_dsc.blend_mode = img->blend_mode;
             draw_dsc.src = img->src;
 
             lv_area_t img_area = {obj->coords.x1, obj->coords.y1,

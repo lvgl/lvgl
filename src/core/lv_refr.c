@@ -838,7 +838,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
         }
 
         *layer_area_out = inverse_clip_coords_for_obj;
-        lv_area_increase(layer_area_out, 1, 1); /*To avoid rounding error*/
+        lv_area_increase(layer_area_out, 5, 5); /*To avoid rounding error*/
     }
     else if(layer_type == LV_LAYER_TYPE_SIMPLE) {
         lv_area_t clip_coords_for_obj;

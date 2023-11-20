@@ -340,6 +340,7 @@ static void texture_resize(lv_display_t * disp)
 #else
 #error("Unsupported color format")
 #endif
+    //    px_format = SDL_PIXELFORMAT_BGR24;
 
     dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
                                      SDL_TEXTUREACCESS_STATIC, hor_res, ver_res);

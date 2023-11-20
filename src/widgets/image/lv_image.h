@@ -47,10 +47,11 @@ typedef struct {
     uint32_t scale_x;      /**< 256 means no zoom, 512 double size, 128 half size*/
     uint32_t scale_y;      /**< 256 means no zoom, 512 double size, 128 half size*/
     lv_point_t pivot;     /**< Rotation center of the image*/
-    uint8_t src_type : 2;  /**< See: lv_image_src_t*/
-    uint8_t cf : 5;        /**< Color format from `lv_color_format_t`*/
-    uint8_t antialias : 1; /**< Apply anti-aliasing in transformations (rotate, zoom)*/
-    uint8_t align: 4;   /**< Image size mode when image size and object size is different. See `lv_image_align_t`*/
+    uint32_t src_type : 2;  /**< See: lv_image_src_t*/
+    uint32_t cf : 5;        /**< Color format from `lv_color_format_t`*/
+    uint32_t antialias : 1; /**< Apply anti-aliasing in transformations (rotate, zoom)*/
+    uint32_t align: 4;   /**< Image size mode when image size and object size is different. See `lv_image_align_t`*/
+    uint32_t blend_mode: 4;   /**< Element of `lv_blend_mode_t`*/
 } lv_image_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_image_class;
@@ -203,6 +204,13 @@ void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom);
 void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom);
 
 /**
+ * Set the blend mode of an image.
+ * @param obj           pointer to an image object
+ * @param blend_mode    the new blend mode
+ */
+void lv_image_set_blend_mode(lv_obj_t * obj, lv_blend_mode_t blend_mode);
+
+/**
  * Enable/disable anti-aliasing for the transformations (rotate, zoom) or not.
  * The quality is better with anti-aliasing looks better but slower.
  * @param obj       pointer to an image object
@@ -281,6 +289,13 @@ int32_t lv_image_get_scale_x(lv_obj_t * obj);
  * @return          zoom factor (256: no zoom)
  */
 int32_t lv_image_get_scale_y(lv_obj_t * obj);
+
+/**
+ * Get the current blend mode of the image
+ * @param obj       pointer to an image object
+ * @return          the current blend mode
+ */
+lv_blend_mode_t lv_image_get_blend_mode(lv_obj_t * obj);
 
 /**
  * Get whether the transformations (rotate, zoom) are anti-aliased or not

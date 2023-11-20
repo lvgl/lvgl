@@ -692,13 +692,127 @@ static void layer_normal_cb(lv_obj_t * parent)
     layer_core_cb(parent, LV_BLEND_MODE_NORMAL);
 }
 
-static void layer_additive_cb(lv_obj_t * parent)
+static void create_blend_mode_image_buffer(lv_obj_t * canvas)
 {
-    return; /*Not working*/
+    lv_canvas_fill_bg(canvas, lv_color_hex3(0x844), LV_OPA_COVER);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    lv_draw_label_dsc_t dsc;
+    lv_draw_label_dsc_init(&dsc);
+    dsc.color = lv_color_hex(0xff0000);
+    dsc.text = "R";
+
+    lv_area_t coords = {0, 0, 100, 60};
+
+    lv_draw_label(&layer, &dsc, &coords);
+    dsc.color = lv_color_hex(0x00ff00);
+    dsc.text = "G";
+    coords.x1 = 11;
+    lv_draw_label(&layer, &dsc, &coords);
+
+    dsc.color = lv_color_hex(0x0000ff);
+    dsc.text = "B";
+    coords.x1 = 23;
+    lv_draw_label(&layer, &dsc, &coords);
+
+    dsc.color = lv_color_hex(0xffffff);
+    dsc.text = "W";
+    coords.y1 = 14;
+    coords.x1 = 4;
+    lv_draw_label(&layer, &dsc, &coords);
+
+    dsc.color = lv_color_hex(0x000000);
+    dsc.text = "K";
+    coords.x1 = 20;
+    lv_draw_label(&layer, &dsc, &coords);
+
+    lv_canvas_finish_layer(canvas, &layer);
+}
+
+static lv_obj_t * create_blend_mode_obj(lv_obj_t * parent, int32_t col, int32_t row, const void * src,
+                                        lv_blend_mode_t blend_mode)
+{
+    lv_obj_t * obj = lv_image_create(parent);
+    lv_image_set_src(obj, src);
+    lv_image_set_blend_mode(obj, blend_mode);
+    lv_obj_set_style_image_opa(obj, opa_saved, 0);
+    lv_obj_set_style_image_recolor(obj, lv_color_hex(0x00ff00), 0);
+
+    add_to_cell(obj, col, row);
+
+    return obj;
+}
+
+static void blend_mode_cb(lv_obj_t * parent)
+{
+
+    static const int32_t grid_cols[] = {53, 53, 53, 53, 53, 53, 53, 53, 53, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_rows[] = {32, 40, 40, 40, 40, 40, 40, LV_GRID_TEMPLATE_LAST};
+    lv_obj_set_grid_dsc_array(parent, grid_cols, grid_rows);
 
     /*Make the parent darker for additive blending*/
-    lv_obj_set_style_bg_color(parent, lv_color_hex3(0x008), 0);
-    layer_core_cb(parent, LV_BLEND_MODE_ADDITIVE);
+    lv_obj_set_style_bg_color(parent, lv_color_hex(0x808080), 0);
+
+    static uint8_t buf_rgb565[LV_CANVAS_BUF_SIZE(36, 30, 16, LV_DRAW_BUF_STRIDE_ALIGN)];
+    static uint8_t buf_rgb888[LV_CANVAS_BUF_SIZE(36, 30, 24, LV_DRAW_BUF_STRIDE_ALIGN)];
+    static uint8_t buf_xrgb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
+    static uint8_t buf_argb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
+
+    /*The canvas will stay in the top left corner to show the original image*/
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+
+    const char * cf_txt[] = {"RGB565", "RGB888.", "XRGB8888", "ARGB8888"};
+    lv_color_format_t cf_values[] = {LV_COLOR_FORMAT_RGB565, LV_COLOR_FORMAT_RGB888, LV_COLOR_FORMAT_XRGB8888, LV_COLOR_FORMAT_ARGB8888};
+    uint8_t * cf_bufs[] = {buf_rgb565, buf_rgb888, buf_xrgb8888, buf_argb8888};
+    static lv_image_dsc_t image_dscs[4];
+
+    const char * mode_txt[] = {"Add.", "Sub.", "Mul."};
+    lv_blend_mode_t mode_values[] = {LV_BLEND_MODE_ADDITIVE, LV_BLEND_MODE_SUBTRACTIVE, LV_BLEND_MODE_MULTIPLY};
+
+    uint32_t m;
+    for(m = 0; m < 3; m++) {
+        lv_obj_t * mode_label = lv_label_create(parent);
+        lv_label_set_text(mode_label, mode_txt[m]);
+        lv_obj_set_grid_cell(mode_label, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 1 + m * 2, 2);
+    }
+
+    uint32_t cf;
+    for(cf = 0; cf < 4; cf++) {
+        lv_obj_t * cf_label = lv_label_create(parent);
+        lv_label_set_text(cf_label, cf_txt[cf]);
+        lv_obj_set_grid_cell(cf_label, LV_GRID_ALIGN_CENTER, 1 + cf * 2, 2, LV_GRID_ALIGN_CENTER, 0, 1);
+
+        lv_canvas_set_buffer(canvas, cf_bufs[cf], 36, 30, cf_values[cf]);
+        create_blend_mode_image_buffer(canvas);
+        lv_img_dsc_t * img_src = lv_canvas_get_image(canvas);
+        image_dscs[cf] = *img_src;
+
+        for(m = 0; m < 3; m++) {
+            lv_obj_t * img;
+            img = create_blend_mode_obj(parent, 1 + cf * 2, 1 + m * 2, &image_dscs[cf], mode_values[m]);
+
+            img = create_blend_mode_obj(parent, 2 + cf * 2, 1 + m * 2, &image_dscs[cf], mode_values[m]);
+            lv_image_set_rotation(img, 200);
+
+            img = create_blend_mode_obj(parent, 1 + cf * 2, 2 + m * 2, &image_dscs[cf], mode_values[m]);
+            lv_obj_set_style_image_recolor_opa(img, LV_OPA_50, 0);
+
+            img = create_blend_mode_obj(parent, 2 + cf * 2, 2 + m * 2, &image_dscs[cf], mode_values[m]);
+            lv_image_set_rotation(img, 200);
+            lv_obj_set_style_image_recolor_opa(img, LV_OPA_50, 0);
+        }
+    }
+
+    /*Show the recolored image to show the original image*/
+    lv_obj_t * img_recolored = lv_image_create(parent);
+    lv_image_set_src(img_recolored, lv_canvas_get_image(canvas));
+    lv_obj_set_style_image_recolor(img_recolored, lv_color_hex(0x00ff00), 0);
+    lv_obj_set_style_image_recolor_opa(img_recolored, LV_OPA_50, 0);
+    lv_obj_set_y(img_recolored, 30);
+    lv_obj_add_flag(img_recolored, LV_OBJ_FLAG_IGNORE_LAYOUT);
+
 }
 
 /**********************
@@ -717,7 +831,7 @@ static scene_dsc_t scenes[] = {
     {.name = "arc_image",           .create_cb = arc_image_cb},
     {.name = "triangle",            .create_cb = triangle_cb},
     {.name = "layer_normal",        .create_cb = layer_normal_cb},
-    {.name = "layer_additive",      .create_cb = layer_additive_cb},
+    {.name = "blend_mode",          .create_cb = blend_mode_cb},
 
     {.name = "", .create_cb = NULL}
 };

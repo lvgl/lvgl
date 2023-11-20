@@ -495,7 +495,7 @@ void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache)
 LV_ATTRIBUTE_FAST_MEM static inline void blend_non_normal_pixel(lv_color32_t * dest, lv_color32_t src,
                                                                 lv_blend_mode_t mode, lv_color_mix_alpha_cache_t * cache)
 {
-    lv_color32_t res = {0, 0, 0, 0};
+    lv_color32_t res;
     switch(mode) {
         case LV_BLEND_MODE_ADDITIVE:
             res.red = LV_MIN(dest->red + src.red, 255);
@@ -516,6 +516,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void blend_non_normal_pixel(lv_color32_t * d
             LV_LOG_WARN("Not supported blend mode: %d", mode);
             return;
     }
+    res.alpha = src.alpha;
     *dest = lv_color_32_32_mix(res, *dest, cache);
 }
 
