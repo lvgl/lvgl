@@ -1501,7 +1501,6 @@ static void indev_scroll_throw_anim_cb(void * var, int32_t v)
 {
     LV_ASSERT_NULL(var);
     LV_UNUSED(v);
-
     lv_indev_t * indev = (lv_indev_t *)var;
 
     _lv_indev_scroll_throw_handler(indev);
@@ -1529,11 +1528,12 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, indev);
-    lv_anim_set_time(&a, 5000);
-    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_time(&a, 1024);
+    lv_anim_set_values(&a, 0, 1024);
     lv_anim_set_exec_cb(&a, indev_scroll_throw_anim_cb);
     lv_anim_set_ready_cb(&a, indev_scroll_throw_anim_ready_cb);
     lv_anim_set_deleted_cb(&a, indev_scroll_throw_anim_ready_cb);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     indev->scroll_throw_anim = lv_anim_start(&a);
 }
