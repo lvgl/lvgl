@@ -115,6 +115,70 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const l
                                                       color_format);
 }
 
+lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
+{
+    uint32_t size;
+    lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+    LV_ASSERT_MALLOC(draw_buf);
+    if(draw_buf == NULL) return NULL;
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+    size = stride * h;
+    if(cf == LV_COLOR_FORMAT_RGB565A8) {
+        size += (stride / 2) * h; /*A8 mask*/
+    }
+    else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+        /*@todo we have to include palette right before image data*/
+        size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
+    }
+
+    /*RLE decompression operates on pixel unit, thus add padding to make sure memory is enough*/
+    uint8_t bpp = lv_color_format_get_bpp(cf);
+    bpp = (bpp + 7) >> 3;
+    size += bpp;
+
+    void * buf = lv_draw_buf_malloc(size, cf);
+    LV_ASSERT_MALLOC(buf);
+    if(buf == NULL) {
+        lv_free(draw_buf);
+        return NULL;
+    }
+
+    draw_buf->header.w = w;
+    draw_buf->header.h = h;
+    draw_buf->header.cf = cf;
+    draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
+    draw_buf->header.stride = stride;
+    draw_buf->data = lv_draw_buf_align(buf, cf);
+    draw_buf->_unaligned = buf;
+    draw_buf->data_size = size;
+    return draw_buf;
+}
+
+void lv_draw_buf_destroy(lv_draw_buf_t * buf)
+{
+    LV_ASSERT_NULL(buf);
+    if(buf == NULL) return;
+    if(buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE)
+        lv_draw_buf_free(buf->_unaligned);
+
+    lv_free(buf);
+}
+
+void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y)
+{
+    LV_ASSERT_NULL(buf);
+    if(buf == NULL) return NULL;
+
+    uint8_t * data = buf->data;
+    data += buf->header.stride * y;
+
+    if(x == 0)
+        return data;
+
+    return data + x * lv_color_format_get_size(buf->header.cf);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

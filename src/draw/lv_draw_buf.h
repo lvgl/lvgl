@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../misc/lv_area.h"
 #include "../misc/lv_color.h"
+#include "lv_image_buf.h"
 
 /*********************
  *      DEFINES
@@ -23,6 +24,13 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct {
+    lv_image_header_t header;
+    uint32_t data_size;     /*Total buf size in bytes*/
+    void * data;
+    void * _unaligned;      /*Unaligned address of data*/
+} lv_draw_buf_t;
 
 typedef void * (*lv_draw_buf_malloc_cb)(size_t size, lv_color_format_t color_format);
 
@@ -152,6 +160,49 @@ void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t col
 void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area_to_copy,
                       void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area_to_copy,
                       lv_color_format_t color_format);
+
+/**
+ * Note: Eventually, lv_draw_buf_malloc/free will be kept as private.
+ *       For now, we use `create` to distinguish with malloc.
+ *
+ * Create an draw buf by allocating struct for `lv_draw_buf_t` and allocating a buffer for it
+ * that meets specified requirements.
+ *
+ * @param w         the buffer width in pixels
+ * @param h
+ * @param cf        the color format for image
+ * @param stride    the stride in bytes for image. Use 0 for automatic calculation based on
+ *                  w, cf, and global stride alignment configuration.
+ */
+lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride);
+
+/**
+ * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_MODIFIABLE in header.
+ * Then free the lv_draw_buf_t struct.
+ */
+void lv_draw_buf_destroy(lv_draw_buf_t * buf);
+
+/**
+ * @todo, need to replace lv_draw_buf_go_to_xy.
+ * Return pointer to the buffer at the given coordinates
+ */
+void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y);
+
+/**
+ * As of now, draw buf share same definition as `lv_image_dsc_t`.
+ * And is interchangeable with `lv_image_dsc_t`.
+ */
+
+static inline void lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)
+{
+    lv_memcpy(buf, img, sizeof(lv_image_dsc_t));
+}
+
+static inline void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
+{
+    lv_memcpy(img, buf, sizeof(lv_image_dsc_t));
+}
+
 /**********************
  *      MACROS
  **********************/

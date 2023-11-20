@@ -16,6 +16,7 @@ extern "C" {
 #include <stdbool.h>
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -121,8 +122,13 @@ typedef struct {
 } lv_image_header_t;
 #endif
 
-/** Image header it is compatible with
- * the result from image converter utility*/
+/**
+ * Struct to describe an image. Both decoded and raw image can share
+ * the same struct.
+ *
+ * Image is also identical to lv_draw_buf_t for now.
+ * Ideally, decoded image should be lv_draw_buf_t.
+ */
 typedef struct {
     lv_image_header_t header; /**< A header describing the basics of the image*/
     uint32_t data_size;     /**< Size of the image in bytes*/
@@ -165,6 +171,17 @@ void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, i
                                         uint16_t scale_y,
                                         const lv_point_t * pivot);
 
+static inline void lv_image_header_init(lv_image_header_t * header, uint32_t w, uint32_t h, lv_color_format_t cf,
+                                        uint32_t stride, lv_image_flags_t flags)
+{
+    LV_ASSERT(header);
+    lv_memzero(header, sizeof(*header));
+    header->w = w;
+    header->h = h;
+    header->cf = cf;
+    header->stride = stride;
+    header->flags = flags;
+}
 /**********************
  *      MACROS
  **********************/
