@@ -7,8 +7,15 @@
 Roadmap
 =======
 
-Planned for v9
---------------
+v9
+--
+
+Schedule
+~~~~~~~~
+
+- December 4: Feature stop, start updating the docs and testing
+- December 18: Release candidate version and call to test
+- January 15: Release v9.0
 
 Naming and API
 ~~~~~~~~~~~~~~
