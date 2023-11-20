@@ -566,6 +566,11 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     vg_lite_path_t path;
     uint16_t start_angle = dsc->start_angle;
     uint16_t end_angle = dsc->end_angle;
+
+    /* be sure end_angle > start_angle */
+    if(end_angle < start_angle)
+        end_angle += 360;
+
     bool donut = ((end_angle - start_angle) % 360 == 0) ? true : false;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
