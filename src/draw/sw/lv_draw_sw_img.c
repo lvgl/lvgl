@@ -326,7 +326,12 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         blend_dsc.src_buf = src_buf;
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
         blend_dsc.mask_buf += img_stride * src_w / header->w * src_h;
-        blend_dsc.mask_stride = src_w;
+        /**
+         * Note, for RGB565A8, lacking of stride parameter, we always use
+         * always half of RGB map stride as alpha map stride. The image should
+         * be generated in this way too.
+         */
+        blend_dsc.mask_stride = img_stride / 2;
         blend_dsc.blend_area = img_coords;
         blend_dsc.mask_area = img_coords;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
