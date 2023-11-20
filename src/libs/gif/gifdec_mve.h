@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef GIFDEV_MVE_H
-#define GIFDEV_MVE_H
+#ifndef GIFDEC_MVE_H
+#define GIFDEC_MVE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -137,4 +137,4 @@ static inline void _gifdec_render_frame_mve(uint8_t * dst, uint16_t w, uint16_t 
 } /*extern "C"*/
 #endif
 
-#endif /*GIFDEV_MVE_H*/
+#endif /*GIFDEC_MVE_H*/
