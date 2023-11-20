@@ -48,25 +48,31 @@ typedef enum _lv_image_flags_t {
      * For RGB map of the image data, mark if it's pre-multiplied with alpha.
      * For indexed image, this bit indicated palette data is pre-multiplied with alpha.
      */
-    LV_IMAGE_FLAGS_PREMULTIPLIED = 0x01,
+    LV_IMAGE_FLAGS_PREMULTIPLIED    = 0x01,
 
     /**
      * If the image data is malloced and can be processed in place.
      * In image decoder post processing, this flag means we modify it in-place.
      */
-    LV_IMAGE_FLAGS_MODIFIABLE    = 0x02,
+    LV_IMAGE_FLAGS_MODIFIABLE       = 0x02,
+
+    /**
+     * Indicating it's a vector image instead of default raster image.
+     * Some of the flags are not usable for vector image, like PREMULTIPLIED.
+     */
+    LV_IMAGE_FLAGS_VECTORS          = 0x04,
 
     /**
      * Flags reserved for user, lvgl won't use these bits.
      */
-    LV_IMAGE_FLAGS_USER1         = 0x1000,
-    LV_IMAGE_FLAGS_USER2         = 0x2000,
-    LV_IMAGE_FLAGS_USER3         = 0x4000,
-    LV_IMAGE_FLAGS_USER4         = 0x8000,
-    LV_IMAGE_FLAGS_USER5         = 0x0100,
-    LV_IMAGE_FLAGS_USER6         = 0x0200,
-    LV_IMAGE_FLAGS_USER7         = 0x0400,
-    LV_IMAGE_FLAGS_USER8         = 0x0800,
+    LV_IMAGE_FLAGS_USER1            = 0x1000,
+    LV_IMAGE_FLAGS_USER2            = 0x2000,
+    LV_IMAGE_FLAGS_USER3            = 0x4000,
+    LV_IMAGE_FLAGS_USER4            = 0x8000,
+    LV_IMAGE_FLAGS_USER5            = 0x0100,
+    LV_IMAGE_FLAGS_USER6            = 0x0200,
+    LV_IMAGE_FLAGS_USER7            = 0x0400,
+    LV_IMAGE_FLAGS_USER8            = 0x0800,
 } lv_image_flags_t;
 
 /**
