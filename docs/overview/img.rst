@@ -343,7 +343,8 @@ to open is an animation.
 
    lv_result_t res;
    lv_image_decoder_dsc_t dsc;
-   res = lv_image_decoder_open(&dsc, &my_img_dsc, color, frame_id);
+   lv_image_decoder_args_t args = { 0 }; /*Custom decoder behavior via args*/
+   res = lv_image_decoder_open(&dsc, &my_img_dsc, &args);
 
    if(res == LV_RESULT_OK) {
      /*Do something with `dsc->img_data`*/
@@ -457,7 +458,7 @@ See the detailed code below:
   {
     ...
     lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, draw_dsc->recolor, -1);
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
     if(res != LV_RESULT_OK) {
       LV_LOG_ERROR("Failed to open image");
       return;

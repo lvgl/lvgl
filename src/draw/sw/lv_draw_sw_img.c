@@ -195,7 +195,7 @@ static void img_draw_normal(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_
     }
 
     lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, draw_dsc->recolor, -1);
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return;
@@ -210,7 +210,7 @@ static void img_draw_tiled(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t
                            const lv_area_t * coords)
 {
     lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, draw_dsc->recolor, -1);
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return;

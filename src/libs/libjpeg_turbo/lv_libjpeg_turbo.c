@@ -33,7 +33,8 @@ typedef struct error_mgr_s {
  *  STATIC PROTOTYPES
  **********************/
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static const void * decode_jpeg_file(const char * filename);
 static bool get_jpeg_size(const char * filename, uint32_t * width, uint32_t * height);
@@ -146,9 +147,11 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
  * @param style style of the image object (unused now but certain formats might use it)
  * @return pointer to the decoded image or  `LV_IMAGE_DECODER_OPEN_FAIL` if failed
  */
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args)
 {
     LV_UNUSED(decoder); /*Unused*/
+    LV_UNUSED(args); /*Unused*/
 
     /*Check the cache first*/
     if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
