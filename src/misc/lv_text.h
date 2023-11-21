@@ -203,17 +203,17 @@ static inline bool _lv_text_is_a_word(uint32_t letter)
     }
 
     /*Hiragana and Katakana*/
-    if (letter >= 0x3040 && letter <= 0x30FF) {
+    if(letter >= 0x3040 && letter <= 0x30FF) {
         return true;
     }
 
     /*Chinese Vertical Forms*/
-    if (letter >= 0xFE10 && letter <= 0xFE1F) {
+    if(letter >= 0xFE10 && letter <= 0xFE1F) {
         return true;
     }
 
     /*CJK Compatibility Forms*/
-    if (letter >= 0xFE30 && letter <= 0xFE4F) {
+    if(letter >= 0xFE30 && letter <= 0xFE4F) {
         return true;
     }
 
