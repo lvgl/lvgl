@@ -135,7 +135,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     return disp;
 }
 
-void lv_display_remove(lv_display_t * disp)
+void lv_display_delete(lv_display_t * disp)
 {
     bool was_default = false;
     if(disp == lv_display_get_default()) was_default = true;
@@ -694,7 +694,7 @@ lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 
 }
 
-bool lv_display_remove_event(lv_display_t * disp, uint32_t index)
+bool lv_display_delete_event(lv_display_t * disp, uint32_t index)
 {
     LV_ASSERT_NULL(disp);
 

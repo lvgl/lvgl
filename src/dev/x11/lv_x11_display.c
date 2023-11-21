@@ -189,7 +189,7 @@ static void x11_resolution_evt_cb(lv_event_t * e)
 }
 
 /**
- * event callbed by lvgl display if display has been closed (@ref lv_display_remove has been called)
+ * event callbed by lvgl display if display has been closed (@ref lv_display_delete has been called)
  * @param[in] e  event data, containing lv_display_t object
  */
 static void x11_disp_delete_evt_cb(lv_event_t * e)
@@ -273,13 +273,13 @@ static void x11_event_handler(lv_timer_t * t)
                     xd->terminated = true;
                     void * ret = NULL;
                     pthread_join(xd->thr_tick, &ret);
-                    lv_display_remove(disp);
+                    lv_display_delete(disp);
                     return;
                 }
                 break;
             case MapNotify:
             case ReparentNotify:
-                /*supress unhandled warning*/
+                /*suppress unhandled warning*/
                 break;
             default:
                 LV_LOG_WARN("unhandled x11 event: %d", event.type);

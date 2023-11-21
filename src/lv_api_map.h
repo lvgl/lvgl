@@ -105,7 +105,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_indev_get_act                 lv_indev_active
 #define lv_scr_act                       lv_screen_active
 #define lv_disp_create                   lv_display_create
-#define lv_disp_remove                   lv_display_remove
+#define lv_disp_remove                   lv_display_delete
 #define lv_disp_set_default              lv_display_set_default
 #define lv_disp_get_default              lv_display_get_default
 #define lv_disp_get_next                 lv_display_get_next
@@ -140,7 +140,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_add_event                lv_display_add_event
 #define lv_disp_get_event_count          lv_display_get_event_count
 #define lv_disp_get_event_dsc            lv_display_get_event_dsc
-#define lv_disp_remove_event             lv_display_remove_event
+#define lv_disp_remove_event             lv_display_delete_event
 #define lv_disp_send_event               lv_display_send_event
 #define lv_disp_set_theme                lv_display_set_theme
 #define lv_disp_get_theme                lv_display_get_theme

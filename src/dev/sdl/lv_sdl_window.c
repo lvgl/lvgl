@@ -246,7 +246,7 @@ static void sdl_event_handler(lv_timer_t * t)
                     lv_refr_now(disp);
                     break;
                 case SDL_WINDOWEVENT_CLOSE:
-                    lv_display_remove(disp);
+                    lv_display_delete(disp);
                     break;
                 default:
                     break;

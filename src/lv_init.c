@@ -96,7 +96,7 @@ static inline void _lv_cleanup_devices(lv_global_t * global)
     if(global) {
         /* cleanup indev and display */
         _lv_ll_clear_custom(&(global->indev_ll), (void (*)(void *)) lv_indev_delete);
-        _lv_ll_clear_custom(&(global->disp_ll), (void (*)(void *)) lv_display_remove);
+        _lv_ll_clear_custom(&(global->disp_ll), (void (*)(void *)) lv_display_delete);
     }
 }
 

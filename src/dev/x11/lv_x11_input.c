@@ -133,7 +133,7 @@ static void x11_inp_event_handler(lv_timer_t * t)
 }
 
 /**
- * event callbed by lvgl display if display has been closed (@ref lv_display_remove has been called)
+ * event callbed by lvgl display if display has been closed (@ref lv_display_delete has been called)
  * @param[in] e  event data, containing lv_display_t object
  */
 static void x11_inp_delete_evt_cb(lv_event_t * e)
