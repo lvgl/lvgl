@@ -103,12 +103,17 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
             lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
             const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
-            const uint8_t * mask_buf = draw_buf->data;
+            const void * mask_buf = draw_buf->data;
+
+            uint32_t mask_width = lv_area_get_width(glyph_draw_dsc->letter_coords);
+            uint32_t mask_height = lv_area_get_height(glyph_draw_dsc->letter_coords);
+            uint32_t mask_stride = draw_buf->header.stride;
 
             lv_area_t mask_area;
-            lv_area_copy(&mask_area, glyph_draw_dsc->letter_coords);
-            lv_area_move(&mask_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
-            uint32_t mask_stride = draw_buf->header.stride;
+            mask_area.x1 = blend_area.x1 - (glyph_draw_dsc->letter_coords->x1 - layer->buf_area.x1);
+            mask_area.y1 = blend_area.y1 - (glyph_draw_dsc->letter_coords->y1 - layer->buf_area.y1);
+            mask_area.x2 = mask_width - 1;
+            mask_area.y2 = mask_height - 1;
 
             if(!vglite_buf_aligned(mask_buf, mask_stride, LV_COLOR_FORMAT_A8)) {
                 /* Draw a placeholder rectangle*/
