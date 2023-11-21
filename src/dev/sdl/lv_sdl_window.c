@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_string.h"
+#include "../../core/lv_global.h"
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include LV_SDL_INCLUDE_PATH
@@ -62,6 +63,8 @@ static bool inited = false;
  *  STATIC VARIABLES
  **********************/
 static lv_timer_t * event_handler_timer;
+
+#define lv_deinit_in_progress  LV_GLOBAL_DEFAULT()->deinit_in_progress
 
 /**********************
  *      MACROS
@@ -359,6 +362,10 @@ static void res_chg_event_cb(lv_event_t * e)
 
 static void release_disp_cb(lv_event_t * e)
 {
+    if(lv_deinit_in_progress) {
+        lv_sdl_quit();
+    }
+
     lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
 
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);

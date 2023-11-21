@@ -37,6 +37,7 @@
  *      DEFINES
  *********************/
 #define lv_initialized  LV_GLOBAL_DEFAULT()->inited
+#define lv_deinit_in_progress  LV_GLOBAL_DEFAULT()->deinit_in_progress
 
 /**********************
  *      TYPEDEFS
@@ -295,6 +296,8 @@ void lv_deinit(void)
         LV_LOG_WARN("lv_deinit: already deinit!");
         return;
     }
+
+    lv_deinit_in_progress = true;
 
 #if LV_USE_SYSMON
     _lv_sysmon_builtin_deinit();
