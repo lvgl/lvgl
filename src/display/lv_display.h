@@ -447,6 +447,8 @@ lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index);
  */
 bool lv_display_remove_event(lv_display_t * disp, uint32_t index);
 
+uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data);
+
 /**
  * Send an event to a display
  * @param disp          pointer to a display
