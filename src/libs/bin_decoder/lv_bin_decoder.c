@@ -105,6 +105,9 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
                 LV_LOG_WARN("Read file header failed: %d", res);
                 return LV_RESULT_INVALID;
             }
+
+            /*File is always read to buf, thus data can be modified.*/
+            header->flags |= LV_IMAGE_FLAGS_MODIFIABLE;
         }
     }
     else if(src_type == LV_IMAGE_SRC_SYMBOL) {
@@ -120,6 +123,9 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
         LV_LOG_WARN("Image get info found unknown src type");
         return LV_RESULT_INVALID;
     }
+
+    /*For backward compatibility, all images are not premultiplied for now.*/
+    header->flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
 
     return LV_RESULT_OK;
 }
