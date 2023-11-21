@@ -527,7 +527,7 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
 
     uint32_t len = dsc->header.stride * dsc->header.h;
     if(cf == LV_COLOR_FORMAT_RGB565A8) {
-        len += dsc->header.w * dsc->header.h * 1;
+        len += (dsc->header.stride / 2) * dsc->header.h; /*A8 mask*/
     }
 
     uint8_t * img_data = lv_draw_buf_malloc(len, cf);
