@@ -114,18 +114,14 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
     int32_t dest_stride_a8 = dest_w;
     int32_t dest_stride;
-    int32_t src_stride_px;
     if(src_cf == LV_COLOR_FORMAT_RGB888) {
         dest_stride = dest_w * lv_color_format_get_size(LV_COLOR_FORMAT_ARGB8888);
-        src_stride_px = src_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB888);
     }
     else if(src_cf == LV_COLOR_FORMAT_RGB565A8) {
         dest_stride = dest_w * 2;
-        src_stride_px = src_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB565);
     }
     else {
         dest_stride = dest_w * lv_color_format_get_size(src_cf);
-        src_stride_px = src_stride / lv_color_format_get_size(src_cf);
     }
 
     uint8_t * alpha_buf;
@@ -160,26 +156,26 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
         switch(src_cf) {
             case LV_COLOR_FORMAT_XRGB8888:
-                transform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
+                transform_rgb888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
                                  4);
                 break;
             case LV_COLOR_FORMAT_RGB888:
-                transform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
+                transform_rgb888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
                                  3);
                 break;
             case LV_COLOR_FORMAT_A8:
-                transform_a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
+                transform_a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
                 break;
             case LV_COLOR_FORMAT_ARGB8888:
-                transform_argb8888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
+                transform_argb8888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
                                    aa);
                 break;
             case LV_COLOR_FORMAT_RGB565:
-                transform_rgb565a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
+                transform_rgb565a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
                                    alpha_buf, false, aa);
                 break;
             case LV_COLOR_FORMAT_RGB565A8:
-                transform_rgb565a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w,
+                transform_rgb565a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w,
                                    (uint16_t *)dest_buf,
                                    alpha_buf, true, aa);
                 break;
@@ -242,7 +238,7 @@ static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, 
             ys_fract = ys_fract - 0x80;
         }
 
-        const uint8_t * src_u8 = &src[ys_int * src_stride * px_size + xs_int * px_size];
+        const uint8_t * src_u8 = &src[ys_int * src_stride + xs_int * px_size];
 
         dest_c32[x].red = src_u8[2];
         dest_c32[x].green = src_u8[1];
@@ -261,7 +257,7 @@ static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, 
             px_hor.blue = px_hor_u8[0];
             px_hor.alpha = 0xff;
 
-            const uint8_t * px_ver_u8 = src_u8 + (int32_t)(y_next * src_stride * px_size);
+            const uint8_t * px_ver_u8 = src_u8 + (int32_t)(y_next * src_stride);
             lv_color32_t px_ver;
             px_ver.red = px_ver_u8[2];
             px_ver.green = px_ver_u8[1];
@@ -342,6 +338,8 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
         const lv_color32_t * src_c32 = (const lv_color32_t *)src;
         src_c32 += (ys_int * src_stride) + xs_int;
 
+        src_c32 = (const lv_color32_t *)(src + ys_int * src_stride + xs_int * 4);
+
         dest_c32[x] = src_c32[0];
 
         if(aa &&
@@ -351,7 +349,7 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
            ys_int + y_next <= src_h - 1) {
 
             lv_color32_t px_hor = src_c32[x_next];
-            lv_color32_t px_ver = src_c32[y_next * src_stride];
+            lv_color32_t px_ver = *(const lv_color32_t *)((uint8_t *)src_c32 + y_next * src_stride);
 
             if(px_ver.alpha == 0) {
                 dest_c32[x].alpha = (dest_c32[x].alpha * (0xFF - ys_fract)) >> 8;
@@ -390,8 +388,10 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
 
-    const uint16_t * src_rgb = (const uint16_t *)src;
-    const lv_opa_t * src_alpha = src + src_stride * src_h * 2;
+    const lv_opa_t * src_alpha = src + src_stride * src_h;
+
+    /*Must be signed type, because we would use negative array index calculated from stride*/
+    int32_t alpha_stride = src_stride / 2; /*alpha map stride is always half of RGB map stride*/
 
     int32_t x;
     for(x = 0; x < x_end; x++) {
@@ -431,8 +431,7 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
             ys_fract = (ys_fract - 0x80) * 2;
         }
 
-        const uint16_t * src_tmp_u16 = (const uint16_t *)src_rgb;
-        src_tmp_u16 += (ys_int * src_stride) + xs_int;
+        const uint16_t * src_tmp_u16 = (const uint16_t *)(src + (ys_int * src_stride) + xs_int * 2);
         cbuf[x] = src_tmp_u16[0];
 
         if(aa &&
@@ -442,15 +441,15 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
            ys_int + y_next <= src_h - 1) {
 
             uint16_t px_hor = src_tmp_u16[x_next];
-            uint16_t px_ver = src_tmp_u16[y_next * src_stride];
+            uint16_t px_ver = *(const uint16_t *)((uint8_t *)src_tmp_u16 + (y_next * src_stride));
 
             if(src_has_a8) {
                 const lv_opa_t * src_alpha_tmp = src_alpha;
-                src_alpha_tmp += (ys_int * src_stride) + xs_int;
+                src_alpha_tmp += (ys_int * alpha_stride) + xs_int;
                 abuf[x] = src_alpha_tmp[0];
 
                 lv_opa_t a_hor = src_alpha_tmp[x_next];
-                lv_opa_t a_ver = src_alpha_tmp[y_next * src_stride];
+                lv_opa_t a_ver = src_alpha_tmp[y_next * alpha_stride];
 
                 if(a_ver != abuf[x]) a_ver = ((a_ver * ys_fract) + (abuf[x] * (0x100 - ys_fract))) >> 8;
                 if(a_hor != abuf[x]) a_hor = ((a_hor * xs_fract) + (abuf[x] * (0x100 - xs_fract))) >> 8;
@@ -473,7 +472,7 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
             lv_opa_t a;
             if(src_has_a8) {
                 const lv_opa_t * src_alpha_tmp = src_alpha;
-                src_alpha_tmp += (ys_int * src_stride) + xs_int;
+                src_alpha_tmp += (ys_int * alpha_stride) + xs_int;
                 a = src_alpha_tmp[0];
             }
             else {
