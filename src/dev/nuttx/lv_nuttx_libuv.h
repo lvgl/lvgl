@@ -25,6 +25,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_EVENT_VSYNC (_LV_EVENT_LAST + 1)
+
 /**********************
  *      TYPEDEFS
  **********************/
