@@ -134,11 +134,14 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
  * Open a lvgl binary image
  * @param decoder the decoder where this function belongs
  * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
+ * @param args arguments of how to decode the image.
  * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
  */
-lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args)
 {
     LV_UNUSED(decoder);
+    LV_UNUSED(args);
     lv_fs_res_t res = LV_RESULT_INVALID;
 
     /*Open the file if it's a file*/
