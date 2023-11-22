@@ -118,8 +118,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
     if(scroll_obj == NULL) return;
     if(indev->pointer.scroll_dir == LV_DIR_NONE) return;
 
-    lv_indev_t * indev_act = lv_indev_active();
-    int32_t scroll_throw = indev_act->scroll_throw;
+    int32_t scroll_throw = indev->scroll_throw;
 
     if(lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_MOMENTUM) == false) {
         indev->pointer.scroll_throw_vect.y = 0;
@@ -217,7 +216,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
             }
         }
 
-        lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
+        lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_END, indev);
         if(indev->reset_query) return;
 
         indev->pointer.scroll_dir = LV_DIR_NONE;
@@ -270,8 +269,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_t * indev)
 {
     lv_obj_t * obj_candidate = NULL;
     lv_dir_t dir_candidate = LV_DIR_NONE;
-    lv_indev_t * indev_act = lv_indev_active();
-    int32_t scroll_limit = indev_act->scroll_limit;
+    int32_t scroll_limit = indev->scroll_limit;
 
     /*Go until find a scrollable object in the current direction
      *More precisely:
@@ -595,8 +593,7 @@ static int32_t scroll_throw_predict_y(lv_indev_t * indev)
     int32_t y = indev->pointer.scroll_throw_vect.y;
     int32_t move = 0;
 
-    lv_indev_t * indev_act = lv_indev_active();
-    int32_t scroll_throw = indev_act->scroll_throw;
+    int32_t scroll_throw = indev->scroll_throw;
 
     while(y) {
         move += y;
@@ -610,8 +607,7 @@ static int32_t scroll_throw_predict_x(lv_indev_t * indev)
     int32_t x = indev->pointer.scroll_throw_vect.x;
     int32_t move = 0;
 
-    lv_indev_t * indev_act = lv_indev_active();
-    int32_t scroll_throw = indev_act->scroll_throw;
+    int32_t scroll_throw = indev->scroll_throw;
 
     while(x) {
         move += x;

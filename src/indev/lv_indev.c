@@ -73,6 +73,18 @@ static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
 static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
 static lv_result_t send_event(lv_event_code_t code, void * param);
 
+static void indev_scroll_throw_anim_start(lv_indev_t * indev);
+static void indev_scroll_throw_anim_cb(void * var, int32_t v);
+static void indev_scroll_throw_anim_ready_cb(lv_anim_t * anim);
+static inline void indev_scroll_throw_anim_reset(lv_indev_t * indev)
+{
+    if(indev) {
+        indev->pointer.scroll_throw_vect.x = 0;
+        indev->pointer.scroll_throw_vect.y = 0;
+        indev->scroll_throw_anim = NULL;
+    }
+}
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -1056,8 +1068,12 @@ static void indev_proc_press(lv_indev_t * indev)
 
     /*The last object might have scroll throw. Stop it manually*/
     if(new_obj_searched && indev->pointer.last_obj) {
-        indev->pointer.scroll_throw_vect.x = 0;
-        indev->pointer.scroll_throw_vect.y = 0;
+
+        /*Attempt to stop scroll throw animation firstly*/
+        if(!indev->scroll_throw_anim || !lv_anim_delete(indev, indev_scroll_throw_anim_cb)) {
+            indev_scroll_throw_anim_reset(indev);
+        }
+
         _lv_indev_scroll_throw_handler(indev);
         if(indev_reset_check(indev)) return;
     }
@@ -1233,7 +1249,10 @@ static void indev_proc_release(lv_indev_t * indev)
     }
 
     if(scroll_obj) {
-        _lv_indev_scroll_throw_handler(indev);
+        if(!indev->scroll_throw_anim) {
+            indev_scroll_throw_anim_start(indev);
+        }
+
         if(indev_reset_check(indev)) return;
     }
 }
@@ -1476,4 +1495,45 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
     }
 
     return LV_RESULT_OK;
+}
+
+static void indev_scroll_throw_anim_cb(void * var, int32_t v)
+{
+    LV_ASSERT_NULL(var);
+    LV_UNUSED(v);
+    lv_indev_t * indev = (lv_indev_t *)var;
+
+    _lv_indev_scroll_throw_handler(indev);
+
+    if(indev->pointer.scroll_dir == LV_DIR_NONE || indev->pointer.scroll_obj == NULL) {
+        if(indev->scroll_throw_anim) {
+            /*hacky*/
+            LV_LOG_INFO("stop animation");
+            lv_anim_set_time(indev->scroll_throw_anim, 0);
+        }
+    }
+}
+
+static void indev_scroll_throw_anim_ready_cb(lv_anim_t * anim)
+{
+    if(anim) {
+        indev_scroll_throw_anim_reset((lv_indev_t *)anim->var);
+    }
+}
+
+static void indev_scroll_throw_anim_start(lv_indev_t * indev)
+{
+    LV_ASSERT_NULL(indev);
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, indev);
+    lv_anim_set_time(&a, 1024);
+    lv_anim_set_values(&a, 0, 1024);
+    lv_anim_set_exec_cb(&a, indev_scroll_throw_anim_cb);
+    lv_anim_set_ready_cb(&a, indev_scroll_throw_anim_ready_cb);
+    lv_anim_set_deleted_cb(&a, indev_scroll_throw_anim_ready_cb);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+
+    indev->scroll_throw_anim = lv_anim_start(&a);
 }
