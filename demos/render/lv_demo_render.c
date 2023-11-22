@@ -710,7 +710,7 @@ static scene_dsc_t scenes[] = {
     {.name = "border",              .create_cb = border_cb},
     {.name = "box_shadow",          .create_cb = box_shadow_cb},
     {.name = "text",                .create_cb = text_cb},
-    {.name = "image normal",        .create_cb = image_normal_cb},
+    {.name = "image_normal",        .create_cb = image_normal_cb},
     {.name = "image_recolor",       .create_cb = image_recolored_cb},
     {.name = "line",                .create_cb = line_cb},
     {.name = "arc_normal",          .create_cb = arc_normal_cb},
