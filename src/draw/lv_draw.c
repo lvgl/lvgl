@@ -186,7 +186,7 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
                     uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer_drawn->color_format);
 
                     _draw_info.used_memory_for_layers_kb -= layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
-                    LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
+                    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
                     lv_draw_buf_free(layer_drawn->buf_unaligned);
                 }
 
@@ -365,7 +365,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 
         uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
         _draw_info.used_memory_for_layers_kb += kb;
-        LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
+        LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
 
         if(lv_color_format_has_alpha(layer->color_format)) {
             lv_area_t a;
