@@ -88,6 +88,8 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 #endif
     lv_tick_set_cb(millis);
 
+    lv_memzero(result, sizeof(lv_nuttx_result_t));
+
 #if !LV_USE_NUTTX_CUSTOM_INIT
 
     if(dsc && dsc->fb_path) {
