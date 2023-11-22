@@ -284,7 +284,7 @@ static void window_create(lv_display_t * disp)
 
     uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
     lv_memset(dsc->fb1, 0xff, hor_res * ver_res * px_size);
-#if LV_SDL_DIRECT_MODE_2_BUF
+#if LV_SDL_BUF_COUNT == 2
     lv_memset(dsc->fb2, 0xff, hor_res * ver_res * px_size);
 #endif
     /*Some platforms (e.g. Emscripten) seem to require setting the size again */
