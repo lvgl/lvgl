@@ -154,8 +154,8 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     lv_area_t src_area;
     src_area.x1 = blend_area.x1 - (coords->x1 - layer->buf_area.x1);
     src_area.y1 = blend_area.y1 - (coords->y1 - layer->buf_area.y1);
-    src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
-    src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
+    src_area.x2 = img_dsc->header.w - 1;
+    src_area.y2 = img_dsc->header.h - 1;
 
     lv_color_format_t src_cf = img_dsc->header.cf;
     uint32_t src_stride = img_dsc->header.stride;
