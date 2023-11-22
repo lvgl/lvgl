@@ -238,7 +238,7 @@ bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf)
     }
 
     /* Test for stride alignment */
-    if(stride % align_bytes) {
+    if(stride == 0 || stride % align_bytes) {
         LV_LOG_ERROR("Buffer stride (%d bytes) not aligned to %d bytes.",
                      stride, align_bytes);
         return false;
