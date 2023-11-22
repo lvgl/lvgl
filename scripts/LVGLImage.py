@@ -33,8 +33,13 @@ def uint32_t(val) -> bytes:
         raise ParameterError(f"overflow: {hex(val)}")
 
 
-def color_premultiply(r, g, b, a):
-    return ((r * a) >> 8, (g * a) >> 8, (b * a) >> 8, a)
+def color_pre_multiply(r, g, b, a, background):
+    bb = background & 0xff
+    bg = (background >> 8) & 0xff
+    br = (background >> 16) & 0xff
+
+    return ((r * a + (255 - a) * br) >> 8, (g * a + (255 - a) * bg) >> 8,
+            (b * a + (255 - a) * bb) >> 8, a)
 
 
 class Error(Exception):
@@ -385,8 +390,9 @@ class LVGLImage:
             data_out = []  # stride adjusted new data
             if new_stride < current_stride:  # remove padding byte
                 for i in range(h):
-                    data_out.append(data_in[i * current_stride:(i + 1) *
-                                            new_stride])
+                    start = i * current_stride
+                    end = start + new_stride
+                    data_out.append(data_in[start:end])
             else:  # adding more padding bytes
                 padding = b'\x00' * (new_stride - current_stride)
                 for i in range(h):
@@ -536,8 +542,10 @@ class LVGLImage:
 #define LV_ATTRIBUTE_IMG_DUST
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST uint8_t {varname}_map[] = {{
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST
+uint8_t {varname}_map[] = {{
 '''
+
         ending = f'''
 }};
 
@@ -576,6 +584,8 @@ const lv_img_dsc_t {varname} = {{
         self._check_ext(filename, ".png")
         self._check_dir(filename)
 
+        old_stride = self.stride
+        self.adjust_stride(align=1)
         if self.cf.is_indexed:
             data = self.data
             # Separate lvgl bin image data to palette and bitmap
@@ -620,14 +630,22 @@ const lv_img_dsc_t {varname} = {{
         with open(filename, "wb") as f:
             encoder.write_array(f, data)
 
-    def from_png(self, filename: str, cf: ColorFormat = None):
+        self.adjust_stride(stride=self.stride)
+
+    def from_png(self,
+                 filename: str,
+                 cf: ColorFormat = None,
+                 background: int = 0x00_00_00):
         '''
         Create lvgl image from png file.
         If cf is none, used I1/2/4/8 based on palette size
         '''
 
+        self.background = background
+
         if cf is None:  # guess cf from filename
-            # split filename string and match with ColorFormat to check which cf to use
+            # split filename string and match with ColorFormat to check
+            # which cf to use
             names = str(path.basename(filename)).split(".")
             for c in names[1:-1]:
                 if c in ColorFormat.__members__:
@@ -670,8 +688,8 @@ const lv_img_dsc_t {varname} = {{
         if palette_len != cf.ncolors:
             if not auto_cf:
                 logging.warning(
-                    f"{path.basename(filename)} palette: {palette_len}, extended to: {cf.ncolors}"
-                )
+                    f"{path.basename(filename)} palette: {palette_len}, "
+                    f"extended to: {cf.ncolors}")
             palette += [(255, 255, 255, 0)] * (cf.ncolors - palette_len)
 
         # Assemble lvgl image palette from PNG palette.
@@ -722,7 +740,7 @@ const lv_img_dsc_t {varname} = {{
             B = row[2::4]
             A = row[3::4]
             for r, g, b, a in zip(R, G, B, A):
-                r, g, b, a = color_premultiply(r, g, b, a)
+                r, g, b, a = color_pre_multiply(r, g, b, a, self.background)
                 luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
                 rawdata += uint8_t(int(luma))
 
@@ -737,17 +755,17 @@ const lv_img_dsc_t {varname} = {{
         elif cf in (ColorFormat.XRGB8888, ColorFormat.TRUECOLOR):
 
             def pack(r, g, b, a):
-                r, g, b, a = color_premultiply(r, g, b, a)
+                r, g, b, a = color_pre_multiply(r, g, b, a, self.background)
                 return uint32_t((0xff << 24) | (r << 16) | (g << 8) | (b << 0))
         elif cf == ColorFormat.RGB888:
 
             def pack(r, g, b, a):
-                r, g, b, a = color_premultiply(r, g, b, a)
+                r, g, b, a = color_pre_multiply(r, g, b, a, self.background)
                 return uint24_t((r << 16) | (g << 8) | (b << 0))
         elif cf == ColorFormat.RGB565:
 
             def pack(r, g, b, a):
-                r, g, b, a = color_premultiply(r, g, b, a)
+                r, g, b, a = color_pre_multiply(r, g, b, a, self.background)
                 color = (r >> 3) << 11
                 color |= (g >> 2) << 5
                 color |= (b >> 3) << 0
@@ -922,6 +940,7 @@ class PNGConverter:
                  cf: ColorFormat,
                  ofmt: OutputFormat,
                  odir: str,
+                 background: int = 0x00,
                  align: int = 1,
                  keep_folder=True) -> None:
         self.files = files
@@ -931,6 +950,7 @@ class PNGConverter:
         self.pngquant = None
         self.keep_folder = keep_folder
         self.align = align
+        self.background = background
 
     def _replace_ext(self, input, ext):
         if self.keep_folder:
@@ -946,12 +966,16 @@ class PNGConverter:
         for f in self.files:
 
             if self.ofmt == OutputFormat.RLE_FILE:
-                rle = RLEImage().from_png(f, self.cf)
+                rle = RLEImage().from_png(f,
+                                          self.cf,
+                                          background=self.background)
                 rle.adjust_stride(align=self.align)
                 output.append((f, rle))
                 rle.to_rle(self._replace_ext(f, ".rle"))
             else:
-                img = LVGLImage().from_png(f, self.cf)
+                img = LVGLImage().from_png(f,
+                                           self.cf,
+                                           background=self.background)
                 img.adjust_stride(align=self.align)
                 output.append((f, img))
                 if self.ofmt == OutputFormat.BIN_FILE:
@@ -986,6 +1010,12 @@ def main():
                         type=int,
                         metavar='byte',
                         nargs='?')
+    parser.add_argument('--background',
+                        help="Background color for formats without alpha",
+                        default=0x00_00_00,
+                        type=lambda x: int(x, 0),
+                        metavar='color',
+                        nargs='?')
     parser.add_argument('-o',
                         '--output',
                         default="./output",
@@ -1019,6 +1049,7 @@ def main():
                              cf,
                              ofmt,
                              args.output,
+                             background=args.background,
                              align=args.align,
                              keep_folder=False)
     output = converter.convert()
@@ -1031,9 +1062,10 @@ def main():
 def test():
     logging.basicConfig(level=logging.INFO)
     f = "pngs/cogwheel.RGB565A8.png"
-    img = LVGLImage().from_png(f)
+    img = LVGLImage().from_png(f, cf=ColorFormat.RGB565, background=0xFF_FF_00)
     img.adjust_stride(align=16)
     img.to_bin(f + ".bin")
+    img.to_png(f + ".png")  # convert back to png
 
 
 if __name__ == "__main__":
