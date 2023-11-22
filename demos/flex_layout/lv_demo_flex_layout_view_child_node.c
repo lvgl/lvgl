@@ -50,7 +50,7 @@ lv_obj_t * obj_child_node_create(lv_obj_t * par, view_t * ui)
     lv_obj_add_style(obj, &ui->obj_checked_style, LV_STATE_CHECKED);
 
     lv_obj_t * label = lv_label_create(obj);
-    lv_label_set_text_fmt(label, "%d", cnt);
+    lv_label_set_text_fmt(label, "%" LV_PRIu32, cnt);
     lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING);
     lv_obj_center(label);
 
