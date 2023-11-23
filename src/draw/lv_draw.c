@@ -189,7 +189,7 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
                     uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer_drawn->color_format);
 
                     _draw_info.used_memory_for_layers_kb -= get_layer_size_kb(layer_size_byte);
-                    LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
+                    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
                     lv_draw_buf_free(layer_drawn->buf_unaligned);
                 }
 
@@ -245,29 +245,13 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
     }
     /*Assign draw tasks to the draw_units*/
     else {
-        bool layer_ok = true;
-        if(layer->buf == NULL) {
-            int32_t h = lv_area_get_height(&layer->buf_area);
-            int32_t w = lv_area_get_width(&layer->buf_area);
-            uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
-
-            uint32_t kb = get_layer_size_kb(layer_size_byte);
-            /*WARN: At least one layer must be supported, otherwise it will cause the layer task cannot be correctly dispatched.
-             * all draw tasks cannot be fully consumed, the dispatch task enters an infinite loop, and UI freezes.*/
-            if(_draw_info.used_memory_for_layers_kb > 0 && _draw_info.used_memory_for_layers_kb + kb > LV_LAYER_MAX_MEMORY_USAGE) {
-                layer_ok = false;
-            }
-        }
-
-        if(layer_ok) {
-            /*Find a draw unit which is not busy and can take at least one task*/
-            /*Let all draw units to pick draw tasks*/
-            lv_draw_unit_t * u = _draw_info.unit_head;
-            while(u) {
-                int32_t taken_cnt = u->dispatch_cb(u, layer);
-                if(taken_cnt >= 0) render_running = true;
-                u = u->next;
-            }
+        /*Find a draw unit which is not busy and can take at least one task*/
+        /*Let all draw units to pick draw tasks*/
+        lv_draw_unit_t * u = _draw_info.unit_head;
+        while(u) {
+            int32_t taken_cnt = u->dispatch_cb(u, layer);
+            if(taken_cnt >= 0) render_running = true;
+            u = u->next;
         }
     }
 
@@ -369,7 +353,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         layer->buf = lv_draw_buf_align(layer->buf_unaligned, layer->color_format);
 
         _draw_info.used_memory_for_layers_kb += get_layer_size_kb(layer_size_byte);
-        LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
+        LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
 
         if(lv_color_format_has_alpha(layer->color_format)) {
             lv_area_t a;

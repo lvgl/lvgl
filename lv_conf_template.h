@@ -79,9 +79,6 @@
 /*Align the start address of draw_buf addresses to this bytes*/
 #define LV_DRAW_BUF_ALIGN                       4
 
-/* Max. memory to be used for layers */
-#define  LV_LAYER_MAX_MEMORY_USAGE             150       /*[kB]*/
-
 #define LV_USE_DRAW_SW 1
 #if LV_USE_DRAW_SW == 1
     /* Set the number of draw unit.

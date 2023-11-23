@@ -199,15 +199,6 @@
     #endif
 #endif
 
-/* Max. memory to be used for layers */
-#ifndef LV_LAYER_MAX_MEMORY_USAGE
-    #ifdef CONFIG_LV_LAYER_MAX_MEMORY_USAGE
-        #define LV_LAYER_MAX_MEMORY_USAGE CONFIG_LV_LAYER_MAX_MEMORY_USAGE
-    #else
-        #define  LV_LAYER_MAX_MEMORY_USAGE             150       /*[kB]*/
-    #endif
-#endif
-
 #ifndef LV_USE_DRAW_SW
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
