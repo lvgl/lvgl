@@ -198,16 +198,16 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     if(has_gradient) {
         vg_lite_matrix_t * grad_matrix;
 
-        uint32_t colors[2];
-        uint32_t stops[2];
-        lv_color32_t col32[2];
+        uint32_t colors[LV_GRADIENT_MAX_STOPS];
+        uint32_t stops[LV_GRADIENT_MAX_STOPS];
+        lv_color32_t col32[LV_GRADIENT_MAX_STOPS];
 
         /* Gradient setup */
-        uint8_t cnt = LV_MAX(dsc->grad.stops_count, 2);
+        uint8_t cnt = LV_MAX(dsc->grad.stops_count, LV_GRADIENT_MAX_STOPS);
         for(uint8_t i = 0; i < cnt; i++) {
             stops[i] = dsc->grad.stops[i].frac;
 
-            col32[i] = lv_color_to_32(dsc->grad.stops[i].color, dsc->opa);
+            col32[i] = lv_color_to_32(dsc->grad.stops[i].color, dsc->grad.stops[i].opa);
             colors[i] = vglite_get_color(col32[i], true);
         }
 
