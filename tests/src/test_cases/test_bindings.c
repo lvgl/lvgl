@@ -150,7 +150,23 @@ static void create_ui(void)
             lv_label_set_text(btn_label, "A multi-line text with a ° symbol");
             lv_obj_set_width(btn_label, lv_pct(100));
         }
+
+        if(i == 3) {
+            /*Start an infinite animation and delete this button later*/
+            lv_anim_t a;
+            lv_anim_init(&a);
+            lv_anim_set_var(&a, btn);
+            lv_anim_set_values(&a, LV_OPA_COVER, LV_OPA_50);
+            lv_anim_set_exec_cb(&a, opa_anim_cb);   /*Pass a callback*/
+            lv_anim_set_time(&a, 300);
+            lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+            lv_anim_start(&a);
+        }
     }
+
+    /*Wait and delete the button with the animation*/
+    lv_test_wait(300);
+    lv_obj_delete(lv_obj_get_child(cont, 3));
 
     /*Large byte array*/
     static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(400, 2) * 100 * 2 + LV_DRAW_BUF_ALIGN];
