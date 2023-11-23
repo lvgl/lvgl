@@ -49,6 +49,8 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLV_TEST_OPTION=5
     -DLVGL_CI_USING_DEF_HEAP
     -fsanitize=address
+    -fsanitize=leak
+    -fsanitize=undefined
     --coverage
 )
 
@@ -61,13 +63,13 @@ elseif (OPTIONS_24BIT)
 elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST_SYSHEAP)
-    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address --coverage)
-    set (TEST_LIBS --coverage -fsanitize=address)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address -fsanitize=leak -fsanitize=undefined --coverage)
+    set (TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
-    set (TEST_LIBS --coverage -fsanitize=address)
+    set (TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
