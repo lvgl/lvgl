@@ -110,7 +110,7 @@ set(COMPILE_OPTIONS
     -Wshadow
     -Wshift-negative-value
     -Wsizeof-pointer-memaccess
-    -Wstack-usage=5000
+    -Wstack-usage=6000
     -Wtype-limits
     -Wundef
     -Wuninitialized
