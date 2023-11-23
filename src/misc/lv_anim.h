@@ -134,8 +134,10 @@ typedef struct _lv_anim_bezier3_para_t {
 
 /** Describes an animation*/
 typedef struct _lv_anim_t {
-    void * var;                          /**<Variable to animate*/
-    lv_anim_exec_xcb_t exec_cb;          /**< Function to execute to animate*/
+    void * var;                                 /**<Variable to animate*/
+    lv_anim_exec_xcb_t exec_cb;                 /**< Function to execute to animate*/
+    lv_anim_custom_exec_cb_t custom_exec_cb;/**< Function to execute to animate,
+                                                 same purpose as exec_cb but different parameters*/
     lv_anim_start_cb_t start_cb;         /**< Call it when the animation is starts (considering `delay`)*/
     lv_anim_ready_cb_t ready_cb;         /**< Call it when the animation is ready*/
     lv_anim_deleted_cb_t deleted_cb;     /**< Call it when the animation is deleted*/
@@ -249,14 +251,12 @@ static inline void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end)
  * `lv_anim_t * ` as its first parameter instead of `void *`.
  * This function might be used when LVGL is bound to other languages because
  * it's more consistent to have `lv_anim_t *` as first parameter.
- * The variable to animate can be stored in the animation's `user_data`
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param exec_cb   a function to execute.
  */
 static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
-    a->var     = a;
-    a->exec_cb = (lv_anim_exec_xcb_t)exec_cb;
+    a->custom_exec_cb = exec_cb;
 }
 
 /**
@@ -443,7 +443,7 @@ static inline void * lv_anim_get_user_data(lv_anim_t * a)
 }
 
 /**
- * Delete an animation of a variable with a given animator function
+ * Delete animation(s) of a variable with a given animator function
  * @param var       pointer to variable
  * @param exec_cb   a function pointer which is animating 'var',
  *                  or NULL to ignore it and delete all the animations of 'var
