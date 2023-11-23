@@ -17,7 +17,6 @@
 
 #if LV_USE_DRAW_VGLITE
 #include "lv_vglite_buf.h"
-#include "lv_vglite_matrix.h"
 #include "lv_vglite_utils.h"
 
 #include "lvgl_support.h"
