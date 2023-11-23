@@ -36,7 +36,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                 const lv_image_decoder_args_t * args);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
-static const void * decode_jpeg_file(const char * filename);
+static const void * decode_jpeg_file(const char * filename, size_t * size);
 static bool get_jpeg_size(const char * filename, uint32_t * width, uint32_t * height);
 static void error_exit(j_common_ptr cinfo);
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
@@ -159,14 +159,14 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     /*If it's a JPEG file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
-
+        size_t decoded_size = 0;
         uint32_t t = lv_tick_get();
-        const void * decoded_img = decode_jpeg_file(fn);
+        const void * decoded_img = decode_jpeg_file(fn, &decoded_size);
         t = lv_tick_elaps(t);
 
         lv_cache_lock();
-        lv_cache_entry_t * cache = lv_cache_add(decoded_img, 0, dsc->header.w * dsc->header.h * JPEG_PIXEL_SIZE,
-                                                decoder->cache_data_type);
+        lv_cache_entry_t * cache = lv_cache_add(decoded_img, decoded_size, decoder->cache_data_type,
+                                                decoded_size);
         if(cache == NULL) {
             lv_cache_unlock();
             return LV_RESULT_INVALID;
@@ -278,7 +278,7 @@ failed:
     return data;
 }
 
-static const void * decode_jpeg_file(const char * filename)
+static const void * decode_jpeg_file(const char * filename, size_t * size)
 {
     /* This struct contains the JPEG decompression parameters and pointers to
      * working space (which is allocated as needed by the JPEG library).
@@ -380,6 +380,7 @@ static const void * decode_jpeg_file(const char * filename)
     if(output_buffer) {
         uint8_t * cur_pos = output_buffer;
         size_t stride = cinfo.output_width * JPEG_PIXEL_SIZE;
+        if(size) *size = output_buffer_size;
 
         /* while (scan lines remain to be read) */
         /* jpeg_read_scanlines(...); */
