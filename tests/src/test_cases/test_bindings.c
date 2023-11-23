@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST || 1
 #include "../lvgl.h"
 
 #include "unity/unity.h"
@@ -169,7 +169,7 @@ static void create_ui(void)
     lv_obj_delete(lv_obj_get_child(cont, 3));
 
     /*Large byte array*/
-    static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(400, 2) * 100 * 2 + LV_DRAW_BUF_ALIGN];
+    static uint8_t canvas_buf[LV_CANVAS_BUF_SIZE(400, 100, 16, LV_DRAW_BUF_STRIDE_ALIGN)];
 
     lv_obj_t * canvas = lv_canvas_create(scr);
     lv_obj_set_grid_cell(canvas, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 2, 1);
