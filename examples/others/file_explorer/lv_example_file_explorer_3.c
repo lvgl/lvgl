@@ -65,7 +65,7 @@ static void file_explorer_event_handler(lv_event_t * e)
     }
     else if(code == LV_EVENT_READY) {
         lv_obj_t * tb = lv_file_explorer_get_file_table(obj);
-        uint16_t sum = lv_table_get_row_cnt(tb);
+        uint16_t sum = lv_table_get_row_count(tb);
 
         sort_by_file_kind(tb, 0, (sum - 1));
     }

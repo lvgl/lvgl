@@ -156,7 +156,6 @@ img_multilang_avatar_4_map[] = {
 
 const lv_image_dsc_t img_multilang_avatar_4 = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .header.always_zero = 0,
     .header.w = 128,
     .header.h = 128,
     .data = img_multilang_avatar_4_map,

@@ -107,7 +107,6 @@ img_transform_avatar_15_map[] = {
 
 const lv_image_dsc_t img_transform_avatar_15 = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .header.always_zero = 0,
     .header.w = 80,
     .header.h = 80,
     .data_size = 0,

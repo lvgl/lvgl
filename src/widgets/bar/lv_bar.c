@@ -453,7 +453,7 @@ static void draw_indic(lv_event_t * e)
         draw_rect_dsc.shadow_width = 0;
 
         lv_area_t indic_clip_area;
-        if(_lv_area_intersect(&indic_clip_area, &indic_area, &layer->clip_area)) {
+        if(_lv_area_intersect(&indic_clip_area, &indic_area, &layer->_clip_area)) {
             lv_layer_t * layer_indic = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &indic_area);
 
             lv_draw_rect(layer_indic, &draw_rect_dsc, &indic_area);

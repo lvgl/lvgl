@@ -216,9 +216,9 @@ int pika_lvgl_dropdown_get_dir(PikaObj *self){
 //     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
 //     return obj_getObj(lv_dropdown_get_list(lv_obj));
 // }
-int pika_lvgl_dropdown_get_option_cnt(PikaObj *self){
+int pika_lvgl_dropdown_get_option_count(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_dropdown_get_option_cnt(lv_obj);
+    return lv_dropdown_get_option_count(lv_obj);
 }
 int pika_lvgl_dropdown_get_option_index(PikaObj *self, char* txt){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");

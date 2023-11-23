@@ -5,7 +5,7 @@ void lv_example_tabview_1(void)
 {
     /*Create a Tab view object*/
     lv_obj_t * tabview;
-    tabview = lv_tabview_create(lv_screen_active(), LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(lv_screen_active());
 
     /*Add 3 tabs (the tabs are page (lv_page) and can be scrolled*/
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");

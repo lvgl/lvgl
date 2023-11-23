@@ -754,7 +754,7 @@ static void draw_main(lv_event_t * e)
     }
 
     lv_area_t txt_clip;
-    bool is_common = _lv_area_intersect(&txt_clip, &txt_coords, &layer->clip_area);
+    bool is_common = _lv_area_intersect(&txt_clip, &txt_coords, &layer->_clip_area);
     if(!is_common) {
         return;
     }
@@ -765,17 +765,17 @@ static void draw_main(lv_event_t * e)
         txt_coords.y2 = obj->coords.y2;
     }
     if(label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
-        const lv_area_t clip_area_ori = layer->clip_area;
-        layer->clip_area = txt_clip;
+        const lv_area_t clip_area_ori = layer->_clip_area;
+        layer->_clip_area = txt_clip;
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
-        layer->clip_area = clip_area_ori;
+        layer->_clip_area = clip_area_ori;
     }
     else {
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
     }
 
-    lv_area_t clip_area_ori = layer->clip_area;
-    layer->clip_area = txt_clip;
+    lv_area_t clip_area_ori = layer->_clip_area;
+    layer->_clip_area = txt_clip;
 
     if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
         lv_point_t size;
@@ -800,7 +800,7 @@ static void draw_main(lv_event_t * e)
         }
     }
 
-    layer->clip_area = clip_area_ori;
+    layer->_clip_area = clip_area_ori;
 }
 
 static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_label_long_mode_t mode)
@@ -903,7 +903,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 act_time = anim_cur->act_time;
                 playback_now = anim_cur->playback_now;
             }
-            if(act_time < a.time) {
+            if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position*/
                 a.early_apply = 0;
                 if(playback_now) {
@@ -917,7 +917,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_time(&a, anim_time);
-            lv_anim_set_playback_time(&a, a.time);
+            lv_anim_set_playback_time(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
             if(anim_template)
@@ -942,7 +942,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 act_time = anim_cur->act_time;
                 playback_now = anim_cur->playback_now;
             }
-            if(act_time < a.time) {
+            if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position*/
                 a.early_apply = 0;
                 if(playback_now) {
@@ -956,7 +956,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_time(&a, anim_time);
-            lv_anim_set_playback_time(&a, a.time);
+            lv_anim_set_playback_time(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
             if(anim_template)
@@ -1011,7 +1011,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(anim_template) {
                 overwrite_anim_property(&a, anim_template, label->long_mode);
             }
-            else if(act_time < a.time) {
+            else if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
                 a.early_apply = 0;
             }
@@ -1037,7 +1037,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(anim_template) {
                 overwrite_anim_property(&a, anim_template, label->long_mode);
             }
-            else if(act_time < a.time) {
+            else if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
                 a.early_apply = 0;
             }
@@ -1221,7 +1221,7 @@ static size_t get_text_length(const char * text)
 {
     size_t len = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    len = _lv_text_ap_calc_bytes_cnt(text);
+    len = _lv_text_ap_calc_bytes_count(text);
 #else
     len = lv_strlen(text) + 1;
 #endif

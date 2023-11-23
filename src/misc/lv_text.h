@@ -177,8 +177,8 @@ static inline bool _lv_text_is_a_word(uint32_t letter)
     /*Cheap check on invalid letter*/
     if(letter == 0) return false;
 
-    /*Chinese characters*/
-    if(letter >= 0x4E00 && letter <= 0x9FA5) {
+    /*CJK Unified Ideographs*/
+    if(letter >= 0x4E00 && letter <= 0x9FFF) {
         return true;
     }
 
@@ -189,6 +189,31 @@ static inline bool _lv_text_is_a_word(uint32_t letter)
 
     /*CJK symbols and punctuation*/
     if(letter >= 0x3000 && letter <= 0x303F) {
+        return true;
+    }
+
+    /*CJK Radicals Supplement*/
+    if(letter >= 0x2E80 && letter <= 0x2EFF) {
+        return true;
+    }
+
+    /*CJK Strokes*/
+    if(letter >= 0x31C0 && letter <= 0x31EF) {
+        return true;
+    }
+
+    /*Hiragana and Katakana*/
+    if(letter >= 0x3040 && letter <= 0x30FF) {
+        return true;
+    }
+
+    /*Chinese Vertical Forms*/
+    if(letter >= 0xFE10 && letter <= 0xFE1F) {
+        return true;
+    }
+
+    /*CJK Compatibility Forms*/
+    if(letter >= 0xFE30 && letter <= 0xFE4F) {
         return true;
     }
 

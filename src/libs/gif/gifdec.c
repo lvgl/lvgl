@@ -29,6 +29,10 @@ static void f_gif_read(gd_GIF * gif, void * buf, size_t len);
 static int f_gif_seek(gd_GIF * gif, size_t pos, int k);
 static void f_gif_close(gd_GIF * gif);
 
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_MVE
+    #include "gifdec_mve.h"
+#endif
+
 static uint16_t
 read_num(gd_GIF * gif)
 {
@@ -37,8 +41,6 @@ read_num(gd_GIF * gif)
     f_gif_read(gif, bytes, 2);
     return bytes[0] + (((uint16_t) bytes[1]) << 8);
 }
-
-
 
 gd_GIF *
 gd_open_gif_file(const char * fname)
@@ -51,7 +53,6 @@ gd_open_gif_file(const char * fname)
 
     return gif_open(&gif_base);
 }
-
 
 gd_GIF *
 gd_open_gif_data(const void * data)
@@ -70,7 +71,6 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     uint8_t sigver[3];
     uint16_t width, height, depth;
     uint8_t fdsz, bgidx, aspect;
-    int i;
     uint8_t * bgcolor;
     int gct_sz;
     gd_GIF * gif = NULL;
@@ -107,13 +107,7 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     /* Aspect Ratio */
     f_gif_read(gif_base, &aspect, 1);
     /* Create gd_GIF Structure. */
-#if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
     gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height);
-#elif LV_COLOR_DEPTH == 16
-    gif = lv_malloc(sizeof(gd_GIF) + 4 * width * height);
-#elif LV_COLOR_DEPTH == 8
-    gif = lv_malloc(sizeof(gd_GIF) + 3 * width * height);
-#endif
 
     if(!gif) goto fail;
     memcpy(gif, gif_base, sizeof(gd_GIF));
@@ -126,36 +120,22 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     gif->palette = &gif->gct;
     gif->bgindex = bgidx;
     gif->canvas = (uint8_t *) &gif[1];
-#if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
     gif->frame = &gif->canvas[4 * width * height];
-#elif LV_COLOR_DEPTH == 16
-    gif->frame = &gif->canvas[3 * width * height];
-#elif LV_COLOR_DEPTH == 8
-    gif->frame = &gif->canvas[2 * width * height];
-#endif
     if(gif->bgindex) {
         memset(gif->frame, gif->bgindex, gif->width * gif->height);
     }
     bgcolor = &gif->palette->colors[gif->bgindex * 3];
 
-    for(i = 0; i < gif->width * gif->height; i++) {
-#if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
+#ifdef GIFDEC_FILL_BG
+    GIFDEC_FILL_BG(gif->canvas, gif->width * gif->height, 1, gif->width * gif->height, bgcolor, 0xff);
+#else
+    for(int i = 0; i < gif->width * gif->height; i++) {
         gif->canvas[i * 4 + 0] = *(bgcolor + 2);
         gif->canvas[i * 4 + 1] = *(bgcolor + 1);
         gif->canvas[i * 4 + 2] = *(bgcolor + 0);
         gif->canvas[i * 4 + 3] = 0xff;
-#elif LV_COLOR_DEPTH == 16
-        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-        uint16_t c16 = lv_color_to_int(c);
-        gif->canvas[i * 3 + 0] = c16 >> 8;
-        gif->canvas[i * 3 + 1] = c16 & 0xff;
-        gif->canvas[i * 3 + 2] = 0xff;
-#elif LV_COLOR_DEPTH == 8
-        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-        gif->canvas[i * 2 + 0] = *((uint8_t *)&c);
-        gif->canvas[i * 2 + 1] = 0xff;
-#endif
     }
+#endif
     gif->anim_start = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
     gif->loop_count = -1;
     goto ok;
@@ -496,40 +476,35 @@ read_image(gd_GIF * gif)
 static void
 render_frame_rect(gd_GIF * gif, uint8_t * buffer)
 {
-    int i, j, k;
+    int i = gif->fy * gif->width + gif->fx;
+#ifdef GIFDEC_RENDER_FRAME
+    GIFDEC_RENDER_FRAME(&buffer[i * 4], gif->fw, gif->fh, gif->width,
+                        &gif->frame[i], gif->palette->colors,
+                        gif->gce.transparency ? gif->gce.tindex : 0x100);
+#else
+    int j, k;
     uint8_t index, * color;
-    i = gif->fy * gif->width + gif->fx;
+
     for(j = 0; j < gif->fh; j++) {
         for(k = 0; k < gif->fw; k++) {
             index = gif->frame[(gif->fy + j) * gif->width + gif->fx + k];
             color = &gif->palette->colors[index * 3];
             if(!gif->gce.transparency || index != gif->gce.tindex) {
-#if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
                 buffer[(i + k) * 4 + 0] = *(color + 2);
                 buffer[(i + k) * 4 + 1] = *(color + 1);
                 buffer[(i + k) * 4 + 2] = *(color + 0);
                 buffer[(i + k) * 4 + 3] = 0xFF;
-#elif LV_COLOR_DEPTH == 16
-                lv_color_t c = lv_color_make(*(color + 0), *(color + 1), *(color + 2));
-                uint16_t c16 = lv_color_to_int(c);
-                buffer[(i + k) * 3 + 0] = c16 & 0xff;
-                buffer[(i + k) * 3 + 1] = c16 >> 8;
-                buffer[(i + k) * 3 + 2] = 0xff;
-#elif LV_COLOR_DEPTH == 8
-                lv_color_t c = lv_color_make(*(color + 0), *(color + 1), *(color + 2));
-                buffer[(i + k) * 2 + 0] = *((uint8_t *)&c);
-                buffer[(i + k) * 2 + 1] = 0xff;
-#endif
             }
         }
         i += gif->width;
     }
+#endif
 }
 
 static void
 dispose(gd_GIF * gif)
 {
-    int i, j, k;
+    int i;
     uint8_t * bgcolor;
     switch(gif->gce.disposal) {
         case 2: /* Restore to background color. */
@@ -539,27 +514,20 @@ dispose(gd_GIF * gif)
             if(gif->gce.transparency) opa = 0x00;
 
             i = gif->fy * gif->width + gif->fx;
+#ifdef GIFDEC_FILL_BG
+            GIFDEC_FILL_BG(&(gif->canvas[i * 4]), gif->fw, gif->fh, gif->width, bgcolor, opa);
+#else
+            int j, k;
             for(j = 0; j < gif->fh; j++) {
                 for(k = 0; k < gif->fw; k++) {
-#if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
                     gif->canvas[(i + k) * 4 + 0] = *(bgcolor + 2);
                     gif->canvas[(i + k) * 4 + 1] = *(bgcolor + 1);
                     gif->canvas[(i + k) * 4 + 2] = *(bgcolor + 0);
                     gif->canvas[(i + k) * 4 + 3] = opa;
-#elif LV_COLOR_DEPTH == 16
-                    lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-                    uint16_t c16 = lv_color_to_int(c);
-                    gif->canvas[(i + k) * 3 + 0] = c16 & 0xff;
-                    gif->canvas[(i + k) * 3 + 1] = c16 >> 8;
-                    gif->canvas[(i + k) * 3 + 2] = opa;
-#elif LV_COLOR_DEPTH == 8
-                    lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-                    gif->canvas[(i + k) * 2 + 0] = *((uint8_t *)&c);
-                    gif->canvas[(i + k) * 2 + 1] = opa;
-#endif
                 }
                 i += gif->width;
             }
+#endif
             break;
         case 3: /* Restore to previous, i.e., don't update canvas.*/
             break;

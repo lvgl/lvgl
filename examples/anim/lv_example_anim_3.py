@@ -113,7 +113,7 @@ class LvExampleAnim_3():
         var.set_style_translate_x(v, lv.PART.MAIN)
 
     def anim_path_bezier3_cb(self,a):
-        t = lv.map(a.act_time, 0, a.time, 0, 1024)
+        t = lv.map(a.act_time, 0, a.duration, 0, 1024)
         step = lv.bezier3(t, 0, self.p1, self.p2, 1024)
         new_value = step * (a.end_value - a.start_value)
         new_value = new_value >> 10

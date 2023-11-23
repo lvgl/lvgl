@@ -32,7 +32,6 @@ target_compile_definitions(
 # Add definition of LV_CONF_PATH only if needed
 if(LV_CONF_PATH)
   target_compile_definitions(lvgl PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
-  target_compile_definitions(lvgl_thorvg PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
 endif()
 
 # Include root and optional parent path of LV_CONF_PATH
@@ -43,6 +42,9 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     add_library(lvgl_thorvg ${THORVG_SOURCES})
     add_library(lvgl::thorvg ALIAS lvgl_thorvg)
     target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
+    if(LV_CONF_PATH)
+        target_compile_definitions(lvgl_thorvg PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
+    endif()
 endif()
 
 # Build LVGL example library
@@ -83,7 +85,7 @@ install(
 configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" lvgl.pc @ONLY)
 
 install(
-  FILES "${CMAKE_BINARY_DIR}/lvgl.pc"
+  FILES "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
   DESTINATION "${LIB_INSTALL_DIR}/pkgconfig/")
 
 set_target_properties(

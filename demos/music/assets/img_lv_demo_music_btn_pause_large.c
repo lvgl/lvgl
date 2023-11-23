@@ -450,7 +450,6 @@ img_lv_demo_music_btn_pause_map[] = {
 };
 
 const lv_image_dsc_t img_lv_demo_music_btn_pause = {
-    .header.always_zero = 0,
     .header.w = 141,
     .header.h = 142,
     // .data_size = 20022 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,

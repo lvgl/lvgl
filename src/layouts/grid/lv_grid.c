@@ -299,7 +299,7 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
         if(IS_CONTENT(col_templ[i])) {
             /*Check the size of children of this cell*/
             uint32_t ci;
-            for(ci = 0; ci < lv_obj_get_child_cnt(cont); ci++) {
+            for(ci = 0; ci < lv_obj_get_child_count(cont); ci++) {
                 lv_obj_t * item = lv_obj_get_child(cont, ci);
                 if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
                 uint32_t col_span = get_col_span(item);
@@ -392,7 +392,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
         if(IS_CONTENT(row_templ[i])) {
             /*Check the size of children of this cell*/
             uint32_t ci;
-            for(ci = 0; ci < lv_obj_get_child_cnt(cont); ci++) {
+            for(ci = 0; ci < lv_obj_get_child_count(cont); ci++) {
                 lv_obj_t * item = lv_obj_get_child(cont, ci);
                 if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
                 uint32_t row_span = get_row_span(item);

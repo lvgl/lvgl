@@ -422,6 +422,22 @@ static void lv_obj_draw(lv_event_t * e)
             return;
         }
 
+        if(lv_obj_get_style_bg_grad_dir(obj, 0) != LV_GRAD_DIR_NONE) {
+            if(lv_obj_get_style_bg_grad_opa(obj, 0) < LV_OPA_MAX) {
+                info->res = LV_COVER_RES_NOT_COVER;
+                return;
+            }
+            const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad(obj, 0);
+            if(grad_dsc) {
+                uint32_t i;
+                for(i = 0; i < grad_dsc->stops_count; i++) {
+                    if(grad_dsc->stops[i].opa < LV_OPA_MAX) {
+                        info->res = LV_COVER_RES_NOT_COVER;
+                        return;
+                    }
+                }
+            }
+        }
         info->res = LV_COVER_RES_COVER;
 
     }
@@ -571,7 +587,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
-        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        uint32_t child_cnt = lv_obj_get_child_count(obj);
         for(uint32_t i = 0; i < child_cnt; i++) {
             lv_obj_t * child = obj->spec_attr->children[i];
             lv_obj_mark_layout_as_dirty(child);
@@ -671,7 +687,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         uint32_t i;
-        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        uint32_t child_cnt = lv_obj_get_child_count(obj);
         for(i = 0; i < child_cnt; i++) {
             lv_obj_t * child = obj->spec_attr->children[i];
             lv_obj_mark_layout_as_dirty(child);

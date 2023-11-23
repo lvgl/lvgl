@@ -119,7 +119,6 @@ img_lv_demo_music_btn_corner_map[] = {
 };
 
 const lv_image_dsc_t img_lv_demo_music_btn_corner = {
-    .header.always_zero = 0,
     .header.w = 32,
     .header.h = 32,
     // .data_size = 1024 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,

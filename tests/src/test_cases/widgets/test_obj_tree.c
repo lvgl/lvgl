@@ -8,7 +8,7 @@ void test_obj_tree_2(void);
 
 void test_obj_tree_1(void)
 {
-    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(lv_screen_active()), 0);
+    TEST_ASSERT_EQUAL(lv_obj_get_child_count(lv_screen_active()), 0);
 }
 
 void test_obj_tree_2(void)
@@ -17,13 +17,13 @@ void test_obj_tree_2(void)
     lv_obj_create(lv_screen_active());
     lv_obj_t * o2 = lv_obj_create(lv_screen_active());
     lv_obj_create(lv_screen_active());
-    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(lv_screen_active()), 3);
+    TEST_ASSERT_EQUAL(lv_obj_get_child_count(lv_screen_active()), 3);
 
     lv_obj_delete(o2);
-    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(lv_screen_active()), 2);
+    TEST_ASSERT_EQUAL(lv_obj_get_child_count(lv_screen_active()), 2);
 
     lv_obj_clean(lv_screen_active());
-    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(lv_screen_active()), 0);
+    TEST_ASSERT_EQUAL(lv_obj_get_child_count(lv_screen_active()), 0);
 
     lv_color_t c1 = lv_color_hex(0x444444);
     lv_color_t c2 = lv_color_hex3(0x444);
@@ -52,11 +52,11 @@ void test_obj_tree_3(void)
     TEST_ASSERT_EQUAL(child2_parent_before, parent2);
 
     /* were the children set correctly for the parents? */
-    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(parent1), 1);
+    TEST_ASSERT_EQUAL(lv_obj_get_child_count(parent1), 1);
     TEST_ASSERT_EQUAL(lv_obj_get_index(child1), 0);
     TEST_ASSERT_EQUAL(lv_obj_get_child(parent1, 0), child1);
 
-    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(parent2), 1);
+    TEST_ASSERT_EQUAL(lv_obj_get_child_count(parent2), 1);
     TEST_ASSERT_EQUAL(lv_obj_get_index(child2), 0);
     TEST_ASSERT_EQUAL(lv_obj_get_child(parent2, 0), child2);
 
@@ -71,11 +71,11 @@ void test_obj_tree_3(void)
     TEST_ASSERT_EQUAL(child2_parent_after, parent1);
 
     /* test for correctly set children */
-    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(parent1), 1);
+    TEST_ASSERT_EQUAL(lv_obj_get_child_count(parent1), 1);
     TEST_ASSERT_EQUAL(lv_obj_get_index(child2), 0);
     TEST_ASSERT_EQUAL(lv_obj_get_child(parent1, 0), child2);
 
-    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(parent2), 1);
+    TEST_ASSERT_EQUAL(lv_obj_get_child_count(parent2), 1);
     TEST_ASSERT_EQUAL(lv_obj_get_index(child1), 0);
     TEST_ASSERT_EQUAL(lv_obj_get_child(parent2, 0), child1);
 }

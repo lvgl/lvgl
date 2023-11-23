@@ -47,7 +47,6 @@ img_emoji_movie_camera_map[] = {
 
 const lv_image_dsc_t img_emoji_movie_camera = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .header.always_zero = 0,
     .header.w = 18,
     .header.h = 19,
     .data = img_emoji_movie_camera_map,

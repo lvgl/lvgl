@@ -88,6 +88,8 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 #endif
     lv_tick_set_cb(millis);
 
+    lv_memzero(result, sizeof(lv_nuttx_result_t));
+
 #if !LV_USE_NUTTX_CUSTOM_INIT
 
     if(dsc && dsc->fb_path) {
@@ -98,7 +100,7 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 #else
         disp = lv_nuttx_fbdev_create();
         if(lv_nuttx_fbdev_set_file(disp, dsc->fb_path) != 0) {
-            lv_display_remove(disp);
+            lv_display_delete(disp);
             disp = NULL;
         }
 #endif

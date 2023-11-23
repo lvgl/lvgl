@@ -326,7 +326,6 @@ img_wink_png_map = bytes([
 ])
 '''
 const lv_image_dsc_t image_wink_png = {
-  .header.always_zero = 0,
   .header.w = 50,
   .header.h = 50,
   .data_size = 5158,

@@ -64,7 +64,6 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMGBTN_
 };
 
 const lv_image_dsc_t imgbtn_mid = {
-    .header.always_zero = 0,
     .header.w = 5,
     .header.h = 49,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,

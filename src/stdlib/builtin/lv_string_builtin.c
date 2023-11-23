@@ -171,6 +171,15 @@ char * lv_strcpy(char * dst, const char * src)
     return tmp;
 }
 
+int32_t lv_strcmp(const char * s1, const char * s2)
+{
+    while(*s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return *(const unsigned char *)s1 - *(const unsigned char *)s2;
+}
+
 char * lv_strdup(const char * src)
 {
     size_t len = lv_strlen(src) + 1;

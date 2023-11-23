@@ -130,8 +130,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_slider_knob_map[] = {
 #endif
 };
 
-lv_image_dsc_t img_lv_demo_music_slider_knob = {
-    .header.always_zero = 0,
+const lv_image_dsc_t img_lv_demo_music_slider_knob = {
     .header.w = 36,
     .header.h = 38,
     //    .data_size = 1368 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,

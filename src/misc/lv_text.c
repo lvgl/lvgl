@@ -422,7 +422,7 @@ char * _lv_text_set_text_vfmt(const char * fmt, va_list ap)
     lv_vsnprintf(raw_txt, len + 1, fmt, ap);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = _lv_text_ap_calc_bytes_cnt(raw_txt);
+    size_t len_ap = _lv_text_ap_calc_bytes_count(raw_txt);
     text = lv_malloc(len_ap + 1);
     LV_ASSERT_MALLOC(text);
     if(text == NULL) {

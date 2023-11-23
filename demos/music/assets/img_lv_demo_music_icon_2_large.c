@@ -118,7 +118,6 @@ img_lv_demo_music_icon_2_map[] = {
 };
 
 const lv_image_dsc_t img_lv_demo_music_icon_2 = {
-    .header.always_zero = 0,
     .header.w = 31,
     .header.h = 31,
     // .data_size = 961 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,

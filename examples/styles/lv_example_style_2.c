@@ -16,7 +16,9 @@ void lv_example_style_2(void)
     grad.dir = LV_GRAD_DIR_VER;
     grad.stops_count = 2;
     grad.stops[0].color = lv_palette_lighten(LV_PALETTE_GREY, 1);
+    grad.stops[0].opa = LV_OPA_COVER;
     grad.stops[1].color = lv_palette_main(LV_PALETTE_BLUE);
+    grad.stops[1].opa = LV_OPA_COVER;
 
     /*Shift the gradient to the bottom*/
     grad.stops[0].frac  = 128;

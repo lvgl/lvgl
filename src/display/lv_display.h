@@ -101,7 +101,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res);
  * Remove a display
  * @param disp      pointer to display
  */
-void lv_display_remove(lv_display_t * disp);
+void lv_display_delete(lv_display_t * disp);
 
 /**
  * Set a default display. The new screens will be created on it by default.
@@ -450,7 +450,7 @@ lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index);
  * @param index         the index of the event to remove
  * @return              true: and event was removed; false: no event was removed
  */
-bool lv_display_remove_event(lv_display_t * disp, uint32_t index);
+bool lv_display_delete_event(lv_display_t * disp, uint32_t index);
 
 /**
  * Send an event to a display

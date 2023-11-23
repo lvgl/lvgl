@@ -86,7 +86,7 @@ The children can be iterated like this:
 .. code:: c
 
    uint32_t i;
-   for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
+   for(i = 0; i < lv_obj_get_child_count(parent); i++) {
      lv_obj_t * child = lv_obj_get_child(parent, i);
      /*Do something with child*/
    }

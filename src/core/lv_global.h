@@ -67,6 +67,7 @@ struct _lv_freetype_context_t;
 
 typedef struct _lv_global_t {
     bool inited;
+    bool deinit_in_progress;     /**< Can be used e.g. in the LV_EVENT_DELETE to deinit the drivers too */
 
     lv_ll_t disp_ll;
     struct _lv_display_t * disp_refresh;

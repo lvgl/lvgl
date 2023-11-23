@@ -11,6 +11,7 @@
 #include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
 #include "layouts/lv_layout.h"
+#include "libs/bin_decoder/lv_bin_decoder.h"
 #include "libs/bmp/lv_bmp.h"
 #include "libs/ffmpeg/lv_ffmpeg.h"
 #include "libs/freetype/lv_freetype.h"
@@ -36,6 +37,7 @@
  *      DEFINES
  *********************/
 #define lv_initialized  LV_GLOBAL_DEFAULT()->inited
+#define lv_deinit_in_progress  LV_GLOBAL_DEFAULT()->deinit_in_progress
 
 /**********************
  *      TYPEDEFS
@@ -94,7 +96,7 @@ static inline void _lv_cleanup_devices(lv_global_t * global)
     if(global) {
         /* cleanup indev and display */
         _lv_ll_clear_custom(&(global->indev_ll), (void (*)(void *)) lv_indev_delete);
-        _lv_ll_clear_custom(&(global->disp_ll), (void (*)(void *)) lv_display_remove);
+        _lv_ll_clear_custom(&(global->disp_ll), (void (*)(void *)) lv_display_delete);
     }
 }
 
@@ -164,6 +166,10 @@ void lv_init(void)
     lv_draw_pxp_init();
 #endif
 
+#if LV_USE_DRAW_SDL
+    lv_draw_sdl_init();
+#endif
+
     _lv_obj_style_init();
 
     /*Initialize the screen refresh system*/
@@ -174,6 +180,7 @@ void lv_init(void)
 #endif
 
     _lv_image_decoder_init();
+    lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
     _lv_cache_init();
     _lv_cache_builtin_init();
@@ -289,6 +296,8 @@ void lv_deinit(void)
         LV_LOG_WARN("lv_deinit: already deinit!");
         return;
     }
+
+    lv_deinit_in_progress = true;
 
 #if LV_USE_SYSMON
     _lv_sysmon_builtin_deinit();

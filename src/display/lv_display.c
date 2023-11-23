@@ -135,7 +135,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     return disp;
 }
 
-void lv_display_remove(lv_display_t * disp)
+void lv_display_delete(lv_display_t * disp)
 {
     bool was_default = false;
     if(disp == lv_display_get_default()) was_default = true;
@@ -694,7 +694,7 @@ lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 
 }
 
-bool lv_display_remove_event(lv_display_t * disp, uint32_t index)
+bool lv_display_delete_event(lv_display_t * disp, uint32_t index)
 {
     LV_ASSERT_NULL(disp);
 
@@ -748,9 +748,9 @@ void lv_display_set_theme(lv_display_t * disp, lv_theme_t * th)
     disp->theme = th;
 
     if(disp->screen_cnt == 4 &&
-       lv_obj_get_child_cnt(disp->screens[0]) == 0 &&
-       lv_obj_get_child_cnt(disp->screens[1]) == 0 &&
-       lv_obj_get_child_cnt(disp->screens[2]) == 0) {
+       lv_obj_get_child_count(disp->screens[0]) == 0 &&
+       lv_obj_get_child_count(disp->screens[1]) == 0 &&
+       lv_obj_get_child_count(disp->screens[2]) == 0) {
         lv_theme_apply(disp->screens[0]);
     }
 }

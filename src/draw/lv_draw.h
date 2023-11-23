@@ -152,21 +152,24 @@ typedef struct _lv_layer_t  {
     void * buf;
 
     uint32_t buf_stride;
+
+    /** The absolute coordinates of the buffer */
     lv_area_t buf_area;
+
+    /** The color format of the layer. LV_COLOR_FORMAT_...  */
     lv_color_format_t color_format;
 
     /**
+     * NEVER USE IT DRAW UNITS. USED INTERNALLY DURING DRAW TASK CREATION.
      * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
      * Can be set before new draw tasks are added to indicate the clip area of the draw tasks.
      * Therefore `lv_draw_add_task()` always saves it in the new draw task to know the clip area when the draw task was added.
      * During drawing the draw units also sees the saved clip_area and should use it during drawing.
      * During drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
      */
-    lv_area_t clip_area;
+    lv_area_t _clip_area;
 
-    /**
-     * Linked list of draw tasks
-     */
+    /** Linked list of draw tasks */
     lv_draw_task_t * draw_task_head;
 
     struct _lv_layer_t * parent;
@@ -181,6 +184,8 @@ typedef struct {
     uint32_t id1;
     uint32_t id2;
     lv_layer_t * layer;
+    size_t dsc_size;
+    void * user_data;
 } lv_draw_dsc_base_t;
 
 typedef struct {

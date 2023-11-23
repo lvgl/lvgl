@@ -137,7 +137,7 @@ static void gridnav_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
 
     if(code == LV_EVENT_KEY) {
-        uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+        uint32_t child_cnt = lv_obj_get_child_count(obj);
         if(child_cnt == 0) return;
 
         if(dsc->focused_obj == NULL) dsc->focused_obj = find_first_focusable(obj);
@@ -291,7 +291,7 @@ static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t 
 {
     int32_t x_start = get_x_center(start_child);
     int32_t y_start = get_y_center(start_child);
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     lv_obj_t * guess = NULL;
     int32_t x_err_guess = LV_COORD_MAX;
     int32_t y_err_guess = LV_COORD_MAX;
@@ -359,7 +359,7 @@ static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t 
 
 static lv_obj_t * find_first_focusable(lv_obj_t * obj)
 {
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     uint32_t i;
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
@@ -371,7 +371,7 @@ static lv_obj_t * find_first_focusable(lv_obj_t * obj)
 
 static lv_obj_t * find_last_focusable(lv_obj_t * obj)
 {
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     int32_t i;
     for(i = child_cnt - 1; i >= 0; i--) {
         lv_obj_t * child = lv_obj_get_child(obj, i);

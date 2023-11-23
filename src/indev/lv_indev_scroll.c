@@ -118,8 +118,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
     if(scroll_obj == NULL) return;
     if(indev->pointer.scroll_dir == LV_DIR_NONE) return;
 
-    lv_indev_t * indev_act = lv_indev_active();
-    int32_t scroll_throw = indev_act->scroll_throw;
+    int32_t scroll_throw = indev->scroll_throw;
 
     if(lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_MOMENTUM) == false) {
         indev->pointer.scroll_throw_vect.y = 0;
@@ -217,7 +216,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
             }
         }
 
-        lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
+        lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_END, indev);
         if(indev->reset_query) return;
 
         indev->pointer.scroll_dir = LV_DIR_NONE;
@@ -270,8 +269,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_t * indev)
 {
     lv_obj_t * obj_candidate = NULL;
     lv_dir_t dir_candidate = LV_DIR_NONE;
-    lv_indev_t * indev_act = lv_indev_active();
-    int32_t scroll_limit = indev_act->scroll_limit;
+    int32_t scroll_limit = indev->scroll_limit;
 
     /*Go until find a scrollable object in the current direction
      *More precisely:
@@ -477,7 +475,7 @@ static int32_t find_snap_point_x(const lv_obj_t * obj, int32_t min, int32_t max,
     int32_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
 
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
@@ -532,7 +530,7 @@ static int32_t find_snap_point_y(const lv_obj_t * obj, int32_t min, int32_t max,
     int32_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
     uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
@@ -595,8 +593,7 @@ static int32_t scroll_throw_predict_y(lv_indev_t * indev)
     int32_t y = indev->pointer.scroll_throw_vect.y;
     int32_t move = 0;
 
-    lv_indev_t * indev_act = lv_indev_active();
-    int32_t scroll_throw = indev_act->scroll_throw;
+    int32_t scroll_throw = indev->scroll_throw;
 
     while(y) {
         move += y;
@@ -610,8 +607,7 @@ static int32_t scroll_throw_predict_x(lv_indev_t * indev)
     int32_t x = indev->pointer.scroll_throw_vect.x;
     int32_t move = 0;
 
-    lv_indev_t * indev_act = lv_indev_active();
-    int32_t scroll_throw = indev_act->scroll_throw;
+    int32_t scroll_throw = indev->scroll_throw;
 
     while(x) {
         move += x;

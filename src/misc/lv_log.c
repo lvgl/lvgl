@@ -38,7 +38,7 @@
 #endif
 
 #if LV_LOG_USE_FILE_LINE
-    #define LOG_FILE_LINE_FMT "\t(in %s line #%d)"
+    #define LOG_FILE_LINE_FMT " %s:%d"
     #define LOG_FILE_LINE_EXPR , &file[p], line
 #else
     #define LOG_FILE_LINE_FMT

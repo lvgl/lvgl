@@ -50,26 +50,26 @@ extern lv_font_t font_multilang_large;
  **********************/
 #define CARD_INFO_SET(_image, _name, _description) {.image = _image, .name = _name, .description = _description}
 
-LV_IMAGE_DECLARE(img_multilang_avatar_1)
-LV_IMAGE_DECLARE(img_multilang_avatar_2)
-LV_IMAGE_DECLARE(img_multilang_avatar_3)
-LV_IMAGE_DECLARE(img_multilang_avatar_4)
-LV_IMAGE_DECLARE(img_multilang_avatar_5)
-LV_IMAGE_DECLARE(img_multilang_avatar_6)
-LV_IMAGE_DECLARE(img_multilang_avatar_7)
-LV_IMAGE_DECLARE(img_multilang_avatar_8)
-LV_IMAGE_DECLARE(img_multilang_avatar_9)
-LV_IMAGE_DECLARE(img_multilang_avatar_10)
-LV_IMAGE_DECLARE(img_multilang_avatar_11)
-LV_IMAGE_DECLARE(img_multilang_avatar_12)
-LV_IMAGE_DECLARE(img_multilang_avatar_13)
-LV_IMAGE_DECLARE(img_multilang_avatar_14)
-LV_IMAGE_DECLARE(img_multilang_avatar_15)
-LV_IMAGE_DECLARE(img_multilang_avatar_16)
-LV_IMAGE_DECLARE(img_multilang_avatar_17)
-LV_IMAGE_DECLARE(img_multilang_avatar_18)
-LV_IMAGE_DECLARE(img_multilang_avatar_22)
-LV_IMAGE_DECLARE(img_multilang_avatar_25)
+LV_IMAGE_DECLARE(img_multilang_avatar_1);
+LV_IMAGE_DECLARE(img_multilang_avatar_2);
+LV_IMAGE_DECLARE(img_multilang_avatar_3);
+LV_IMAGE_DECLARE(img_multilang_avatar_4);
+LV_IMAGE_DECLARE(img_multilang_avatar_5);
+LV_IMAGE_DECLARE(img_multilang_avatar_6);
+LV_IMAGE_DECLARE(img_multilang_avatar_7);
+LV_IMAGE_DECLARE(img_multilang_avatar_8);
+LV_IMAGE_DECLARE(img_multilang_avatar_9);
+LV_IMAGE_DECLARE(img_multilang_avatar_10);
+LV_IMAGE_DECLARE(img_multilang_avatar_11);
+LV_IMAGE_DECLARE(img_multilang_avatar_12);
+LV_IMAGE_DECLARE(img_multilang_avatar_13);
+LV_IMAGE_DECLARE(img_multilang_avatar_14);
+LV_IMAGE_DECLARE(img_multilang_avatar_15);
+LV_IMAGE_DECLARE(img_multilang_avatar_16);
+LV_IMAGE_DECLARE(img_multilang_avatar_17);
+LV_IMAGE_DECLARE(img_multilang_avatar_18);
+LV_IMAGE_DECLARE(img_multilang_avatar_22);
+LV_IMAGE_DECLARE(img_multilang_avatar_25);
 
 static card_info_t card_info[] = {
     CARD_INFO_SET(&img_multilang_avatar_5, "Zhang Wei", "对编程和技术充满热情。 开源倡导者🚀"),

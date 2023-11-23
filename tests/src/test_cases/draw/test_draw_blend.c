@@ -130,7 +130,6 @@ static void canvas_draw(const char * name, lv_color_format_t large_render_cf)
     lv_image_dsc_t img = { 0 };
     img.header.w = 180;
     img.header.h = 180;
-    img.header.always_zero = 0;
     img.data = lv_draw_buf_align(canvas_buf, LV_COLOR_FORMAT_ARGB8888);
 
     lv_draw_image_dsc_t img_dsc;

@@ -13,7 +13,7 @@ def event_handler(e):
         else:
             currentButton = obj
         parent = obj.get_parent()
-        for i in range( parent.get_child_cnt()):
+        for i in range( parent.get_child_count()):
             child = parent.get_child(i)
             if child == currentButton:
                 child.add_state(lv.STATE.CHECKED)
@@ -51,7 +51,7 @@ def event_handler_center(e):
         if currentButton == None:
             return
         parent = currentButton.get_parent()
-        pos = parent.get_child_cnt() // 2
+        pos = parent.get_child_count() // 2
         currentButton.move_to_index(pos)
         currentButton.scroll_to_view(lv.ANIM.ON)
 
@@ -82,7 +82,7 @@ def event_handler_swap(e):
     code = e.get_code()
     obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED:
-        cnt = list1.get_child_cnt()
+        cnt = list1.get_child_count()
         for i in range(100):
             if cnt > 1:
                 obj = list1.get_child(urandom.getrandbits(32) % cnt )

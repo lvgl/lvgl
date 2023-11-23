@@ -33,6 +33,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_canvas_class;
 typedef struct {
     lv_image_t img;
     lv_image_dsc_t dsc;
+    const void * buf_unaligned;
 } lv_canvas_t;
 
 /**********************
@@ -91,6 +92,15 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y);
  */
 lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * canvas);
 
+/**
+ * Return the pointer for the buffer.
+ * It's recommended to use this function instead of the buffer form the
+ * return value of lv_canvas_get_image() as is can be aligned
+ * @param canvas    pointer to a canvas object
+ * @return          pointer to the buffer
+ */
+const void * lv_canvas_get_buf(lv_obj_t * canvas);
+
 /*=====================
  * Other functions
  *====================*/
@@ -122,21 +132,8 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer);
 /**********************
  *      MACROS
  **********************/
-#define LV_CANVAS_BUF_SIZE_TRUE_COLOR(w, h) LV_IMAGE_BUF_SIZE_TRUE_COLOR(w, h)
-#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) LV_IMAGE_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h)
-#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) LV_IMAGE_BUF_SIZE_TRUE_COLOR_ALPHA(w, h)
 
-/*+ 1: to be sure no fractional row*/
-#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) LV_IMAGE_BUF_SIZE_ALPHA_1BIT(w, h)
-#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) LV_IMAGE_BUF_SIZE_ALPHA_2BIT(w, h)
-#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) LV_IMAGE_BUF_SIZE_ALPHA_4BIT(w, h)
-#define LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) LV_IMAGE_BUF_SIZE_ALPHA_8BIT(w, h)
-
-/*4 * X: for palette*/
-#define LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h) LV_IMAGE_BUF_SIZE_INDEXED_1BIT(w, h)
-#define LV_CANVAS_BUF_SIZE_INDEXED_2BIT(w, h) LV_IMAGE_BUF_SIZE_INDEXED_2BIT(w, h)
-#define LV_CANVAS_BUF_SIZE_INDEXED_4BIT(w, h) LV_IMAGE_BUF_SIZE_INDEXED_4BIT(w, h)
-#define LV_CANVAS_BUF_SIZE_INDEXED_8BIT(w, h) LV_IMAGE_BUF_SIZE_INDEXED_8BIT(w, h)
+#define LV_CANVAS_BUF_SIZE(w, h, bpp, stride) (((((w * bpp + 7) >> 3) + stride - 1) & ~(stride - 1)) * h + LV_DRAW_BUF_ALIGN)
 
 #endif /*LV_USE_CANVAS*/
 

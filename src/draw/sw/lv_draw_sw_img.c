@@ -68,12 +68,11 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
      *In this case just return. */
     if(layer_to_draw->buf == NULL) return;
 
-    lv_image_dsc_t img_dsc;
+    lv_image_dsc_t img_dsc = { 0 };
     img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
     img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
     img_dsc.header.cf = layer_to_draw->color_format;
     img_dsc.header.stride = layer_to_draw->buf_stride;
-    img_dsc.header.always_zero = 0;
     img_dsc.data = layer_to_draw->buf;
 
     lv_draw_image_dsc_t new_draw_dsc;
@@ -196,7 +195,7 @@ static void img_draw_normal(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_
     }
 
     lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, draw_dsc->recolor, -1);
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return;
@@ -211,7 +210,7 @@ static void img_draw_tiled(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t
                            const lv_area_t * coords)
 {
     lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, draw_dsc->recolor, -1);
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return;
@@ -327,7 +326,12 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         blend_dsc.src_buf = src_buf;
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
         blend_dsc.mask_buf += img_stride * src_w / header->w * src_h;
-        blend_dsc.mask_stride = src_w;
+        /**
+         * Note, for RGB565A8, lacking of stride parameter, we always use
+         * always half of RGB map stride as alpha map stride. The image should
+         * be generated in this way too.
+         */
+        blend_dsc.mask_stride = img_stride / 2;
         blend_dsc.blend_area = img_coords;
         blend_dsc.mask_area = img_coords;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
@@ -355,7 +359,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         lv_color_format_t cf_final = cf;
         if(transformed) {
             if(cf == LV_COLOR_FORMAT_RGB888 || cf == LV_COLOR_FORMAT_XRGB8888) cf_final = LV_COLOR_FORMAT_ARGB8888;
-            if(cf == LV_COLOR_FORMAT_RGB565) cf_final = LV_COLOR_FORMAT_RGB565A8;
+            else if(cf == LV_COLOR_FORMAT_RGB565) cf_final = LV_COLOR_FORMAT_RGB565A8;
         }
         uint8_t * tmp_buf;
         uint32_t px_size = lv_color_format_get_size(cf_final);

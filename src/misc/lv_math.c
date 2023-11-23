@@ -352,7 +352,7 @@ int64_t lv_pow(int64_t base, int8_t exp)
  * @param x integer which mapped value should be calculated
  * @param min_in min input range
  * @param max_in max input range
- * @param min_out max output range
+ * @param min_out min output range
  * @param max_out max output range
  * @return the mapped number
  */

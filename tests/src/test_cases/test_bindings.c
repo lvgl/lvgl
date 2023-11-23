@@ -50,8 +50,8 @@ static void create_ui(void)
     lv_obj_t * scr = lv_screen_active();
 
     /*Declare static array of integers, and test grid setting options*/
-    static lv_coord_t gird_cols[] = {300, LV_GRID_FR(3), LV_GRID_FR(2), LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t gird_rows[] = {100, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+    static int32_t gird_cols[] = {300, LV_GRID_FR(3), LV_GRID_FR(2), LV_GRID_TEMPLATE_LAST};
+    static int32_t gird_rows[] = {100, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_grid_dsc_array(scr, gird_cols, gird_rows);
 
     static lv_subject_t chart_type_subject;

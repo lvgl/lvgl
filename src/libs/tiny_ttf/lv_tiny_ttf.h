@@ -28,6 +28,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
 #if LV_TINY_TTF_FILE_SUPPORT !=0
 /* create a font from the specified file or path with the specified line height.*/
 lv_result_t lv_tiny_ttf_create_file(lv_font_t * font, const char * path, int32_t font_size);

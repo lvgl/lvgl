@@ -1,5 +1,5 @@
 # Create a Tab view object
-tabview = lv.tabview(lv.screen_active(), lv.DIR.TOP, 50)
+tabview = lv.tabview(lv.screen_active())
 
 # Add 3 tabs (the tabs are page (lv_page) and can be scrolled
 tab1 = tabview.add_tab("Tab 1")

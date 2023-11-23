@@ -11,9 +11,14 @@
 #include <stdbool.h>
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_string.h"
+#include "../../core/lv_global.h"
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include LV_SDL_INCLUDE_PATH
+
+#if LV_USE_DRAW_SDL
+    #include <SDL2/SDL_image.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -59,6 +64,8 @@ static bool inited = false;
  **********************/
 static lv_timer_t * event_handler_timer;
 
+#define lv_deinit_in_progress  LV_GLOBAL_DEFAULT()->deinit_in_progress
+
 /**********************
  *      MACROS
  **********************/
@@ -74,6 +81,14 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         SDL_StartTextInput();
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
         lv_tick_set_cb(SDL_GetTicks);
+
+#if LV_USE_DRAW_SDL
+        if(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+            fprintf(stderr, "could not initialize sdl2_image: %s\n", IMG_GetError());
+            return NULL;
+        }
+#endif
+
         inited = true;
     }
 
@@ -145,6 +160,12 @@ void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     SDL_SetWindowTitle(dsc->window, title);
+}
+
+void * lv_sdl_window_get_renderer(lv_display_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    return dsc->renderer;
 }
 
 void lv_sdl_quit()
@@ -225,7 +246,7 @@ static void sdl_event_handler(lv_timer_t * t)
                     lv_refr_now(disp);
                     break;
                 case SDL_WINDOWEVENT_CLOSE:
-                    lv_display_remove(disp);
+                    lv_display_delete(disp);
                     break;
                 default:
                     break;
@@ -260,9 +281,10 @@ static void window_create(lv_display_t * disp)
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
     texture_resize(disp);
+
     uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
     lv_memset(dsc->fb1, 0xff, hor_res * ver_res * px_size);
-#if LV_SDL_DIRECT_MODE_2_BUF
+#if LV_SDL_BUF_COUNT == 2
     lv_memset(dsc->fb2, 0xff, hor_res * ver_res * px_size);
 #endif
     /*Some platforms (e.g. Emscripten) seem to require setting the size again */
@@ -273,6 +295,7 @@ static void window_create(lv_display_t * disp)
 static void window_update(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+#if LV_USE_DRAW_SDL == 0
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_display_get_color_format(disp));
     SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
@@ -281,6 +304,7 @@ static void window_update(lv_display_t * disp)
 
     /*Update the renderer with the texture containing the rendered image*/
     SDL_RenderCopy(dsc->renderer, dsc->texture, NULL, NULL);
+#endif
     SDL_RenderPresent(dsc->renderer);
 }
 
@@ -316,6 +340,7 @@ static void texture_resize(lv_display_t * disp)
 #else
 #error("Unsupported color format")
 #endif
+    //    px_format = SDL_PIXELFORMAT_BGR24;
 
     dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
                                      SDL_TEXTUREACCESS_STATIC, hor_res, ver_res);
@@ -338,6 +363,10 @@ static void res_chg_event_cb(lv_event_t * e)
 
 static void release_disp_cb(lv_event_t * e)
 {
+    if(lv_deinit_in_progress) {
+        lv_sdl_quit();
+    }
+
     lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
 
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);

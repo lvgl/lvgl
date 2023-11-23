@@ -88,8 +88,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_btn_loop_map[] = {
 #endif
 };
 
-lv_image_dsc_t img_lv_demo_music_btn_loop = {
-    .header.always_zero = 0,
+const lv_image_dsc_t img_lv_demo_music_btn_loop = {
     .header.w = 24,
     .header.h = 24,
     //    .data_size = 576 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
