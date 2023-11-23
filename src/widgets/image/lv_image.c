@@ -665,9 +665,8 @@ static void draw_image(lv_event_t * e)
             return;
         }
 
-        const lv_area_t * clip_area = lv_event_get_param(e);
         if(img->scale_x == LV_SCALE_NONE && img->scale_y == LV_SCALE_NONE) {
-            if(_lv_area_is_in(clip_area, &obj->coords, 0) == false) {
+            if(_lv_area_is_in(info->area, &obj->coords, 0) == false) {
                 info->res = LV_COVER_RES_NOT_COVER;
                 return;
             }
@@ -683,7 +682,7 @@ static void draw_image(lv_event_t * e)
             a.x2 += obj->coords.x1;
             a.y2 += obj->coords.y1;
 
-            if(_lv_area_is_in(clip_area, &a, 0) == false) {
+            if(_lv_area_is_in(info->area, &a, 0) == false) {
                 info->res = LV_COVER_RES_NOT_COVER;
                 return;
             }
