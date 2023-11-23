@@ -100,11 +100,13 @@ void lv_cache_invalidate(lv_cache_entry_t * entry)
 
 void lv_cache_invalidate_by_src(const void * src, lv_cache_src_type_t src_type)
 {
+    lv_cache_entry_t * next;
     LV_ASSERT(_cache_manager.locked);
     lv_cache_entry_t * entry = lv_cache_find_by_src(NULL, src, src_type);
     while(entry) {
+        next = lv_cache_find_by_src(entry, src, src_type);
         lv_cache_invalidate(entry);
-        entry = lv_cache_find_by_src(entry, src, src_type);
+        entry = next;
     }
 }
 
