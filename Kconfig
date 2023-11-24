@@ -174,12 +174,6 @@ menu "LVGL configuration"
 			help
 				Align the start address of draw_buf addresses to this bytes.
 
-			config LV_LAYER_MAX_MEMORY_USAGE
-				int "Max layer memory usage(kB)"
-				default 150
-			help
-				Max. memory to be used for layers.
-
 			config LV_USE_OS
 				int "Default operating system to use"
 				default 0
