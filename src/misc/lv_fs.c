@@ -285,12 +285,15 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
     /*Need to do FS seek before writing data to FS*/
     if(file_p->drv->cache_size) {
         res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
-        if (res != LV_FS_RES_OK) return res;
+        if(res != LV_FS_RES_OK) return res;
     }
 
     uint32_t bw_tmp = 0;
     res = file_p->drv->write_cb(file_p->drv, file_p->file_d, buf, btw, &bw_tmp);
     if(bw != NULL) *bw = bw_tmp;
+
+    if(file_p->drv->cache_size && res == LV_FS_RES_OK)
+        file_p->cache->file_position += bw_tmp;
 
     return res;
 }
