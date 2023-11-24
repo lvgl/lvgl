@@ -76,6 +76,9 @@ lv_global_t * lv_global_default(void)
 
 void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
 {
+    if(dsc == NULL)
+        return;
+
     lv_memzero(dsc, sizeof(lv_nuttx_dsc_t));
     dsc->fb_path = "/dev/fb0";
     dsc->input_path = "/dev/input0";
@@ -88,7 +91,9 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 #endif
     lv_tick_set_cb(millis);
 
-    lv_memzero(result, sizeof(lv_nuttx_result_t));
+    if(result) {
+        lv_memzero(result, sizeof(lv_nuttx_result_t));
+    }
 
 #if !LV_USE_NUTTX_CUSTOM_INIT
 
