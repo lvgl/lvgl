@@ -106,6 +106,18 @@ void lv_gif_restart(lv_obj_t * obj)
     lv_timer_reset(gifobj->timer);
 }
 
+void lv_gif_pause(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+    lv_timer_pause(gifobj->timer);
+}
+
+void lv_gif_resume(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+    lv_timer_resume(gifobj->timer);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
