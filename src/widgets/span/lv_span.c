@@ -1032,18 +1032,18 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                 line_dsc.blend_mode = label_draw_dsc.blend_mode;
 
                 if(decor & LV_TEXT_DECOR_STRIKETHROUGH) {
-                    line_dsc.p1_x = txt_pos.x;
-                    line_dsc.p1_y = pos.y + ((pinfo->line_h - line_space) >> 1)  + (line_dsc.width >> 1);
-                    line_dsc.p2_x = pos.x;
-                    line_dsc.p2_y = line_dsc.p1_y;
+                    line_dsc.p1.x = txt_pos.x;
+                    line_dsc.p1.y = pos.y + ((pinfo->line_h - line_space) >> 1)  + (line_dsc.width >> 1);
+                    line_dsc.p2.x = pos.x;
+                    line_dsc.p2.y = line_dsc.p1.y;
                     lv_draw_line(layer, &line_dsc);
                 }
 
                 if(decor & LV_TEXT_DECOR_UNDERLINE) {
-                    line_dsc.p1_x = txt_pos.x;
-                    line_dsc.p1_y = pos.y + pinfo->line_h - line_space - pinfo->font->base_line - pinfo->font->underline_position;
-                    line_dsc.p2_x = pos.x;
-                    line_dsc.p2_y = line_dsc.p1_y;
+                    line_dsc.p1.x = txt_pos.x;
+                    line_dsc.p1.y = pos.y + pinfo->line_h - line_space - pinfo->font->base_line - pinfo->font->underline_position;
+                    line_dsc.p2.x = pos.x;
+                    line_dsc.p2.y = line_dsc.p1.y;
                     lv_draw_line(layer, &line_dsc);
                 }
             }

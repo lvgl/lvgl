@@ -195,19 +195,19 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
             int32_t w = lv_obj_get_width(obj);
             int32_t h = lv_obj_get_height(obj);
 
-            line_dsc.p1_x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
-            line_dsc.p1_y = resolve_point_coord(line->point_array[i].y, h);
+            line_dsc.p1.x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
+            line_dsc.p1.y = resolve_point_coord(line->point_array[i].y, h);
 
-            line_dsc.p2_x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
-            line_dsc.p2_y = resolve_point_coord(line->point_array[i + 1].y, h);
+            line_dsc.p2.x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
+            line_dsc.p2.y = resolve_point_coord(line->point_array[i + 1].y, h);
 
             if(line->y_inv == 0) {
-                line_dsc.p1_y = line_dsc.p1_y + y_ofs;
-                line_dsc.p2_y = line_dsc.p2_y + y_ofs;
+                line_dsc.p1.y = line_dsc.p1.y + y_ofs;
+                line_dsc.p2.y = line_dsc.p2.y + y_ofs;
             }
             else {
-                line_dsc.p1_y = h - line_dsc.p1_y + y_ofs;
-                line_dsc.p2_y = h - line_dsc.p2_y + y_ofs;
+                line_dsc.p1.y = h - line_dsc.p1.y + y_ofs;
+                line_dsc.p2.y = h - line_dsc.p2.y + y_ofs;
             }
 
             lv_draw_line(layer, &line_dsc);

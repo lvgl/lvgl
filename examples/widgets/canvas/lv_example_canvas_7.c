@@ -27,10 +27,10 @@ void lv_example_canvas_7(void)
     dsc.width = 4;
     dsc.round_end = 1;
     dsc.round_start = 1;
-    dsc.p1_x = 15;
-    dsc.p1_y = 15;
-    dsc.p2_x = 35;
-    dsc.p2_y = 10;
+    dsc.p1.x = 15;
+    dsc.p1.y = 15;
+    dsc.p2.x = 35;
+    dsc.p2.y = 10;
     lv_draw_line(&layer, &dsc);
 
     lv_canvas_finish_layer(canvas, &layer);
