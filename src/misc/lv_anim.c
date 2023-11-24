@@ -105,16 +105,17 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
             new_anim->start_value += v_ofs;
             new_anim->end_value += v_ofs;
 
-            /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
-            if(a->exec_cb || a->custom_exec_cb) remove_concurrent_anims(new_anim);
         }
 
         resolve_time(new_anim);
 
-        if(new_anim->exec_cb && new_anim->var) {
+        /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
+        if(a->exec_cb || a->custom_exec_cb) remove_concurrent_anims(new_anim);
+
+        if(new_anim->exec_cb) {
             new_anim->exec_cb(new_anim->var, new_anim->start_value);
         }
-        if(new_anim->custom_exec_cb && new_anim->var) {
+        if(new_anim->custom_exec_cb) {
             new_anim->custom_exec_cb(new_anim, new_anim->start_value);
         }
     }
