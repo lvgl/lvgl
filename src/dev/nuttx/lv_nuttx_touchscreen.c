@@ -21,6 +21,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <nuttx/input/touchscreen.h>
+
+#include "../../../lvgl.h"
 #include "../../lvgl_private.h"
 
 /*********************
@@ -142,11 +144,13 @@ static lv_indev_t * touchscreen_init(int fd)
     lv_nuttx_touchscreen_t * touchscreen;
     lv_indev_t * indev = NULL;
 
-    touchscreen = lv_malloc_zeroed(sizeof(lv_nuttx_touchscreen_t));
+    touchscreen = lv_malloc(sizeof(lv_nuttx_touchscreen_t));
+    LV_ASSERT_MALLOC(touchscreen);
     if(touchscreen == NULL) {
         LV_LOG_ERROR("touchscreen_s malloc failed");
         return NULL;
     }
+    lv_memzero(touchscreen, sizeof(lv_nuttx_touchscreen_t));
 
     touchscreen->fd = fd;
     touchscreen->last_state = LV_INDEV_STATE_RELEASED;

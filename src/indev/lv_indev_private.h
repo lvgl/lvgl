@@ -32,6 +32,9 @@ struct _lv_indev_t {
 
     /**< Function pointer to read input device data.*/
     lv_indev_read_cb_t read_cb;
+    /** Called when an action happened on the input device.
+     * The second parameter is the event structure pointer*/
+    void (*feedback_cb)(struct _lv_indev_t * indev, struct _lv_event_t * e);
 
     lv_indev_state_t state; /**< Current state of the input device.*/
 
