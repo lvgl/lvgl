@@ -18,8 +18,7 @@ static bool enc_pressed;
 void lv_test_mouse_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_UNUSED(indev);
-    data->point.x = x_act;
-    data->point.y = y_act;
+    lv_point_set(&data->point, x_act, y_act);
     data->state = mouse_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
 

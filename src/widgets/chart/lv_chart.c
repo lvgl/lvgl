@@ -405,8 +405,7 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
     LV_ASSERT_MALLOC(cursor);
     if(cursor == NULL) return NULL;
 
-    cursor->pos.x = LV_CHART_POINT_NONE;
-    cursor->pos.y = LV_CHART_POINT_NONE;
+    lv_point_set(&cursor->pos, LV_CHART_POINT_NONE, LV_CHART_POINT_NONE);
     cursor->point_id = LV_CHART_POINT_NONE;
     cursor->pos_set = 0;
     cursor->color = color;
@@ -427,8 +426,7 @@ void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_po
     LV_ASSERT_NULL(cursor);
     LV_UNUSED(chart);
 
-    cursor->pos.x = pos->x;
-    cursor->pos.y = pos->y;
+    cursor->pos = *pos;
     cursor->pos_set = 1;
     lv_chart_refresh(chart);
 }

@@ -433,8 +433,7 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 
     /* coords of draw span-txt */
     lv_point_t txt_pos;
-    txt_pos.y = 0;
-    txt_pos.x = 0 + indent; /* first line need add indent */
+    lv_point_set(&txt_pos, 0, indent); /* first line need add indent */
 
     lv_span_t * cur_span = _lv_ll_get_head(&spans->child_ll);
     const char * cur_txt = cur_span->txt;
@@ -1032,18 +1031,16 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                 line_dsc.blend_mode = label_draw_dsc.blend_mode;
 
                 if(decor & LV_TEXT_DECOR_STRIKETHROUGH) {
-                    line_dsc.p1.x = txt_pos.x;
-                    line_dsc.p1.y = pos.y + ((pinfo->line_h - line_space) >> 1)  + (line_dsc.width >> 1);
-                    line_dsc.p2.x = pos.x;
-                    line_dsc.p2.y = line_dsc.p1.y;
+                    int32_t y = pos.y + ((pinfo->line_h - line_space) >> 1)  + (line_dsc.width >> 1);
+                    lv_point_precise_set(&line_dsc.p1, txt_pos.x, y);
+                    lv_point_precise_set(&line_dsc.p2, pos.x, y);
                     lv_draw_line(layer, &line_dsc);
                 }
 
                 if(decor & LV_TEXT_DECOR_UNDERLINE) {
-                    line_dsc.p1.x = txt_pos.x;
-                    line_dsc.p1.y = pos.y + pinfo->line_h - line_space - pinfo->font->base_line - pinfo->font->underline_position;
-                    line_dsc.p2.x = pos.x;
-                    line_dsc.p2.y = line_dsc.p1.y;
+                    int32_t y = pos.y + pinfo->line_h - line_space - pinfo->font->base_line - pinfo->font->underline_position;
+                    lv_point_precise_set(&line_dsc.p1, txt_pos.x, y);
+                    lv_point_precise_set(&line_dsc.p2, pos.x, y);
                     lv_draw_line(layer, &line_dsc);
                 }
             }

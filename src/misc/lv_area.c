@@ -336,20 +336,16 @@ bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, int32_
     /*Check if the corner points are inside the radius or not*/
     lv_point_t p;
 
-    p.x = ain_p->x1;
-    p.y = ain_p->y1;
+    lv_point_set(&p, ain_p->x1, ain_p->y1);
     if(_lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
 
-    p.x = ain_p->x2;
-    p.y = ain_p->y1;
+    lv_point_set(&p, ain_p->x2, ain_p->y1);
     if(_lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
 
-    p.x = ain_p->x1;
-    p.y = ain_p->y2;
+    lv_point_set(&p, ain_p->x1, ain_p->y2);
     if(_lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
 
-    p.x = ain_p->x2;
-    p.y = ain_p->y2;
+    lv_point_set(&p, ain_p->x2, ain_p->y2);
     if(_lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
 
     return true;
@@ -374,20 +370,16 @@ bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, int3
     /*Check if the corner points are outside the radius or not*/
     lv_point_t p;
 
-    p.x = aout_p->x1;
-    p.y = aout_p->y1;
+    lv_point_set(&p, aout_p->x1, aout_p->y1);
     if(_lv_area_is_point_on(aholder_p, &p, radius)) return false;
 
-    p.x = aout_p->x2;
-    p.y = aout_p->y1;
+    lv_point_set(&p, aout_p->x2, aout_p->y1);
     if(_lv_area_is_point_on(aholder_p, &p, radius)) return false;
 
-    p.x = aout_p->x1;
-    p.y = aout_p->y2;
+    lv_point_set(&p, aout_p->x1, aout_p->y2);
     if(_lv_area_is_point_on(aholder_p, &p, radius)) return false;
 
-    p.x = aout_p->x2;
-    p.y = aout_p->y2;
+    lv_point_set(&p, aout_p->x2, aout_p->y2);
     if(_lv_area_is_point_on(aholder_p, &p, radius)) return false;
 
     return true;

@@ -188,8 +188,7 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     /*Delete the old animation (if exists)*/
     lv_anim_delete(obj, set_ofs_x_anim);
     lv_anim_delete(obj, set_ofs_y_anim);
-    label->offset.x = 0;
-    label->offset.y = 0;
+    lv_point_set(&label->offset, 0, 0);
 
     if(long_mode == LV_LABEL_LONG_SCROLL || long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || long_mode == LV_LABEL_LONG_CLIP)
         label->expand = 1;
@@ -622,8 +621,7 @@ static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     label->static_txt = 0;
     label->dot_end    = LV_LABEL_DOT_END_INV;
     label->long_mode  = LV_LABEL_LONG_WRAP;
-    label->offset.x = 0;
-    label->offset.y = 0;
+    lv_point_set(&label->offset, 0, 0);
 
 #if LV_LABEL_LONG_TXT_HINT
     label->hint.line_start = -1;

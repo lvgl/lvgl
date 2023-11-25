@@ -305,8 +305,7 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
     a.y2 += obj->coords.y1;
     lv_obj_invalidate_area(obj, &a);
 
-    img->pivot.x = x;
-    img->pivot.y = y;
+    lv_point_set(&img->pivot, x, y);
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
@@ -535,10 +534,8 @@ static void lv_image_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     img->scale_x      = LV_SCALE_NONE;
     img->scale_y      = LV_SCALE_NONE;
     img->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
-    img->offset.x  = 0;
-    img->offset.y  = 0;
-    img->pivot.x   = LV_PCT(50); /*Default pivot to image center*/
-    img->pivot.y   = LV_PCT(50);
+    lv_point_set(&img->offset, 0, 0);
+    lv_point_set(&img->pivot, LV_PCT(50), LV_PCT(50)); /*Default pivot to image center*/
     img->align     = LV_IMAGE_ALIGN_CENTER;
 
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);

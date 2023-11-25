@@ -255,10 +255,8 @@ static void draw_to_canvas(lv_obj_t * canvas)
     line_draw_dsc.width = 8;
     line_draw_dsc.round_end = 1;
     line_draw_dsc.round_start = 1;
-    line_draw_dsc.p1.x = 150;
-    line_draw_dsc.p1.y = 30;
-    line_draw_dsc.p2.x = 350;
-    line_draw_dsc.p2.y = 55;
+    lv_point_precise_set(&line_draw_dsc.p1, 150, 30);
+    lv_point_precise_set(&line_draw_dsc.p2, 350, 55);
     lv_draw_line(&layer, &line_draw_dsc);
 
     lv_canvas_finish_layer(canvas, &layer);
