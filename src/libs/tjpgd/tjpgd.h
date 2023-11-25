@@ -59,13 +59,13 @@ struct JDEC {
     size_t dctr;                /* Number of bytes available in the input buffer */
     uint8_t * dptr;             /* Current data read ptr */
     uint8_t * inbuf;            /* Bit stream input buffer */
-    uint8_t dbit;               /* Number of bits availavble in wreg or reading bit mask */
+    uint8_t dbit;               /* Number of bits available in wreg or reading bit mask */
     uint8_t scale;              /* Output scaling ratio */
     uint8_t msx, msy;           /* MCU size in unit of block (width, height) */
     uint8_t qtid[3];            /* Quantization table ID of each component, Y, Cb, Cr */
     uint8_t ncomp;              /* Number of color components 1:grayscale, 3:color */
     int16_t dcv[3];             /* Previous DC element of each component */
-    uint16_t nrst;              /* Restart inverval */
+    uint16_t nrst;              /* Restart interval */
     uint16_t rst;              /* Restart count*/
     uint16_t rsc;               /* Expected restart sequence ID*/
     uint16_t width, height;     /* Size of the input image (pixel) */
@@ -86,9 +86,9 @@ struct JDEC {
     jd_yuv_t * mcubuf;          /* Working buffer for the MCU */
     void * pool;                /* Pointer to available memory pool */
     void * pool_original;       /* Pointer to original pool */
-    size_t sz_pool;             /* Size of momory pool (bytes available) */
+    size_t sz_pool;             /* Size of memory pool (bytes available) */
     size_t (*infunc)(JDEC *, uint8_t *, size_t); /* Pointer to jpeg stream input function */
-    void * device;              /* Pointer to I/O device identifiler for the session */
+    void * device;              /* Pointer to I/O device identifier for the session */
 };
 
 

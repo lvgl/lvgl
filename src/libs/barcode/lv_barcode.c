@@ -221,7 +221,7 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
 
     uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_I1);
     uint32_t buf_size = stride * h;
-    /*+8 for the 2x4 byte pallette*/
+    /*+8 for the 2x4 byte palette*/
     buf = lv_draw_buf_malloc(buf_size + 8, LV_COLOR_FORMAT_I1);
     LV_ASSERT_MALLOC(buf);
 

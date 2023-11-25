@@ -34,7 +34,7 @@ Configure X11 driver
 
             #define LV_X11_DIRECT_EXIT  1 /*preferred default - ends the application automatically if last window has been closed*/
             // or
-            #define LV_X11_DIRECT_EXIT  0 /*applicaion is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler*/
+            #define LV_X11_DIRECT_EXIT  0 /*application is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler*/
 
 
     -  Double buffering
@@ -111,7 +111,7 @@ Usage
         lv_x11_inputs_create(disp, &my_mouse_cursor_icon);
 
         #if !LV_X11_DIRECT_EXIT
-        /* set optional window close callback to enable applicaton cleanup and exit */
+        /* set optional window close callback to enable application cleanup and exit */
         lv_x11_window_set_close_cb(disp, on_close_cb, disp);
         #endif
 
