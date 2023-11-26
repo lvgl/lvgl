@@ -309,6 +309,28 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     return NULL;
 }
 
+uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
+{
+    if(t_check == NULL) return 0;
+    if(t_check->next == NULL) return 0;
+
+    LV_PROFILER_BEGIN;
+    uint32_t cnt = 0;
+
+    lv_draw_task_t * t = t_check->next;
+    while(t) {
+        if((t->state == LV_DRAW_TASK_STATE_QUEUED || t->state == LV_DRAW_TASK_STATE_WAITING) &&
+           _lv_area_is_on(&t_check->area, &t->area)) {
+            cnt++;
+        }
+
+        t = t->next;
+    }
+    LV_PROFILER_END;
+    return cnt;
+}
+
+
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
     lv_display_t * disp = _lv_refr_get_disp_refreshing();
