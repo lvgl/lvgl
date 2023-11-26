@@ -267,7 +267,7 @@ Label
 
 Bind an integer, string, or pointer (pointing to a string) subject to a label.
 An optional format string can be added with 1 format specifier (e.g. "%d °C")
-If the format string is NULL the value will be used directly. In this case on string ans pointer type subjects can be used.
+If the format string is NULL the value will be used directly. In this case on string and pointer type subjects can be used.
 
 .. code:: c
 

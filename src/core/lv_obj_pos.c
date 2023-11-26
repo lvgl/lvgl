@@ -735,7 +735,7 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
     lv_obj_invalidate(obj);
 
     /*If the object was out of the parent invalidate the new scrollbar area too.
-     *If it wasn't out of the parent but out now, also invalidate the srollbars*/
+     *If it wasn't out of the parent but out now, also invalidate the scrollbars*/
     if(parent) {
         bool on2 = _lv_area_is_in(&obj->coords, &parent_fit_area, 0);
         if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
