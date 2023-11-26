@@ -14,6 +14,12 @@ except ImportError:
     raise ImportError("Need pypng package, do `pip3 install pypng`")
 
 
+try:
+    import lz4.block
+except ImportError:
+    raise ImportError("Need lz4 package, do `pip3 install lz4`")
+
+
 def uint8_t(val) -> bytes:
     return val.to_bytes(1, byteorder='little')
 
@@ -94,6 +100,7 @@ class PngQuant:
 class CompressMethod(Enum):
     NONE = 0x00
     RLE = 0x01
+    LZ4 = 0x02
 
 
 class ColorFormat(Enum):
@@ -365,6 +372,8 @@ class LVGLCompressData:
             pad = b'\x00' * (self.blk_size - self.raw_data_len % self.blk_size)
             self.raw_data_len += len(pad)
             compressed = RLEImage().rle_compress(raw_data + pad, self.blk_size)
+        elif self.compress == CompressMethod.LZ4:
+            compressed = lz4.block.compress(raw_data, store_size=False)
         else:
             raise ParameterError(f"Invalid compress method: {self.compress}")
 
@@ -1069,7 +1078,7 @@ def main():
     parser.add_argument('--compress',
                         help=("Binary data compress method, default to NONE"),
                         default="NONE",
-                        choices=["NONE", "RLE"])
+                        choices=["NONE", "RLE", "LZ4"])
 
     parser.add_argument('--align',
                         help="stride alignment in bytes for bin image",
