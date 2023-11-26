@@ -304,7 +304,6 @@ static inline void lv_point_precise_swap(lv_point_precise_t * p1, lv_point_preci
     *p2 = tmp;
 }
 
-
 /**********************
  *      MACROS
  **********************/
