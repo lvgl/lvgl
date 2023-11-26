@@ -509,11 +509,14 @@ static bool remove_concurrent_anims(lv_anim_t * a_current)
     a = _lv_ll_get_head(anim_ll_p);
     while(a != NULL) {
         bool del = false;
+        /*We can't test for custom_exec_cb equality because in the MicroPython binding
+         *a wrapper callback is used here an the real callback data is stored in the `user_data`.
+         *Therefore equality check would remove all animations.*/
         if(a != a_current &&
            (a->act_time >= 0 || a->early_apply) &&
            (a->var == a_current->var) &&
-           ((a->exec_cb && a->exec_cb == a_current->exec_cb) ||
-            (a->custom_exec_cb && a->custom_exec_cb == a_current->custom_exec_cb))) {
+           ((a->exec_cb && a->exec_cb == a_current->exec_cb)
+            /*|| (a->custom_exec_cb && a->custom_exec_cb == a_current->custom_exec_cb)*/)) {
             _lv_ll_remove(anim_ll_p, a);
             if(a->deleted_cb != NULL) a->deleted_cb(a);
             lv_free(a);
