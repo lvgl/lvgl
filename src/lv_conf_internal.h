@@ -2202,6 +2202,33 @@
     #endif
 #endif
 
+/*Enable LZ4 compress/decompress lib*/
+#ifndef LV_USE_LZ4
+    #ifdef CONFIG_LV_USE_LZ4
+        #define LV_USE_LZ4 CONFIG_LV_USE_LZ4
+    #else
+        #define LV_USE_LZ4  0
+    #endif
+#endif
+
+/*Use lvgl built-in LZ4 lib*/
+#ifndef LV_USE_LZ4_INTERNAL
+    #ifdef CONFIG_LV_USE_LZ4_INTERNAL
+        #define LV_USE_LZ4_INTERNAL CONFIG_LV_USE_LZ4_INTERNAL
+    #else
+        #define LV_USE_LZ4_INTERNAL  0
+    #endif
+#endif
+
+/*Use external LZ4 library*/
+#ifndef LV_USE_LZ4_EXTERNAL
+    #ifdef CONFIG_LV_USE_LZ4_EXTERNAL
+        #define LV_USE_LZ4_EXTERNAL CONFIG_LV_USE_LZ4_EXTERNAL
+    #else
+        #define LV_USE_LZ4_EXTERNAL  0
+    #endif
+#endif
+
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
 #ifndef LV_USE_FFMPEG

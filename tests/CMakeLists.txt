@@ -162,6 +162,7 @@ get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 # Include lvgl project file.
 include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC ${COMPILE_OPTIONS})
+target_compile_options(lvgl_lz4 PUBLIC ${COMPILE_OPTIONS})
 target_compile_options(lvgl_thorvg PUBLIC ${LVGL_THORVG_COMPILE_OPTIONS})
 if (TARGET lvgl_examples)
   target_compile_options(lvgl_examples PUBLIC ${COMPILE_OPTIONS})

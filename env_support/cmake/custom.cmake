@@ -20,6 +20,7 @@ file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp)
+file(GLOB_RECURSE LZ4_SOURCES ${LVGL_ROOT_DIR}/src/libs/lz4/*.c)
 
 # Build LVGL library
 add_library(lvgl ${SOURCES})
@@ -44,6 +45,14 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
     if(LV_CONF_PATH)
         target_compile_definitions(lvgl_thorvg PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
+    endif()
+endif()
+
+if(NOT LV_CONF_BUILD_DISABLE_LZ4_INTERNAL)
+    add_library(lvgl_lz4 ${LZ4_SOURCES})
+    add_library(lvgl::lz4 ALIAS lvgl_lz4)
+    if(LV_CONF_PATH)
+        target_compile_definitions(lvgl_lz4 PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
     endif()
 endif()
 
