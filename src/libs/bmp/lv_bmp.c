@@ -90,7 +90,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     /*If it's a BMP file...*/
     if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
-        if(strcmp(lv_fs_get_ext(fn), "bmp") == 0) {              /*Check the extension*/
+        if(lv_strcmp(lv_fs_get_ext(fn), "bmp") == 0) {              /*Check the extension*/
             /*Save the data in the header*/
             lv_fs_file_t f;
             lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
@@ -100,14 +100,14 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
             lv_fs_read(&f, headers, 54, NULL);
             uint32_t w;
             uint32_t h;
-            memcpy(&w, headers + 18, 4);
-            memcpy(&h, headers + 22, 4);
+            lv_memcpy(&w, headers + 18, 4);
+            lv_memcpy(&h, headers + 22, 4);
             header->w = w;
             header->h = h;
             lv_fs_close(&f);
 
             uint16_t bpp;
-            memcpy(&bpp, headers + 28, 2);
+            lv_memcpy(&bpp, headers + 28, 2);
             switch(bpp) {
                 case 16:
                     header->cf = LV_COLOR_FORMAT_RGB565;
@@ -150,12 +150,12 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
 
-        if(strcmp(lv_fs_get_ext(fn), "bmp") != 0) {
+        if(lv_strcmp(lv_fs_get_ext(fn), "bmp") != 0) {
             return LV_RESULT_INVALID;       /*Check the extension*/
         }
 
         bmp_dsc_t b;
-        memset(&b, 0x00, sizeof(b));
+        lv_memset(&b, 0x00, sizeof(b));
 
         lv_fs_res_t res = lv_fs_open(&b.f, dsc->src, LV_FS_MODE_RD);
         if(res == LV_RESULT_OK) return LV_RESULT_INVALID;
@@ -168,16 +168,16 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
 
-        memcpy(&b.px_offset, header + 10, 4);
-        memcpy(&b.px_width, header + 18, 4);
-        memcpy(&b.px_height, header + 22, 4);
-        memcpy(&b.bpp, header + 28, 2);
+        lv_memcpy(&b.px_offset, header + 10, 4);
+        lv_memcpy(&b.px_width, header + 18, 4);
+        lv_memcpy(&b.px_height, header + 22, 4);
+        lv_memcpy(&b.bpp, header + 28, 2);
         b.row_size_bytes = ((b.bpp * b.px_width + 31) / 32) * 4;
 
         dsc->user_data = lv_malloc(sizeof(bmp_dsc_t));
         LV_ASSERT_MALLOC(dsc->user_data);
         if(dsc->user_data == NULL) return LV_RESULT_INVALID;
-        memcpy(dsc->user_data, &b, sizeof(b));
+        lv_memcpy(dsc->user_data, &b, sizeof(b));
         dsc->img_data = NULL;
         return LV_RESULT_OK;
     }

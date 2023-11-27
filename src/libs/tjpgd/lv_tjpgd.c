@@ -98,7 +98,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     }
     else if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
-        if((strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
+        if((lv_strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (lv_strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
             lv_fs_file_t f;
             lv_fs_res_t res;
             res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
@@ -169,7 +169,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
     else if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
-        if((strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
+        if((lv_strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (lv_strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
             lv_fs_res_t res;
             res = lv_fs_open(f, fn, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {

@@ -93,7 +93,7 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
     }
     else if(src_type == LV_IMAGE_SRC_FILE) {
         /*Support only "*.bin" files*/
-        if(strcmp(lv_fs_get_ext(src), "bin")) return LV_RESULT_INVALID;
+        if(lv_strcmp(lv_fs_get_ext(src), "bin")) return LV_RESULT_INVALID;
 
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
@@ -147,7 +147,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     /*Open the file if it's a file*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         /*Support only "*.bin" files*/
-        if(strcmp(lv_fs_get_ext(dsc->src), "bin")) return LV_RESULT_INVALID;
+        if(lv_strcmp(lv_fs_get_ext(dsc->src), "bin")) return LV_RESULT_INVALID;
 
         /*If the file was open successfully save the file descriptor*/
         decoder_data_t * decoder_data = get_decoder_data(dsc);

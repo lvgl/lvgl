@@ -1268,7 +1268,7 @@ static lv_result_t insert_handler(lv_obj_t * obj, const char * txt)
 
     if(ta_insert_replace) {
         /*Add the replaced text directly it's different from the original*/
-        if(strcmp(ta_insert_replace, txt)) {
+        if(lv_strcmp(ta_insert_replace, txt)) {
             lv_textarea_add_text(obj, ta_insert_replace);
             return LV_RESULT_INVALID;
         }

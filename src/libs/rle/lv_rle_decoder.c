@@ -212,7 +212,7 @@ static lv_res_t decoder_info(struct _lv_image_decoder_t * decoder,
         lv_fs_file_t f;
         lv_rle_file_header_t file_header = { 0 };
         /*Support only "*.rle" files*/
-        if(strcmp(lv_fs_get_ext(src), "rle") != 0)
+        if(lv_strcmp(lv_fs_get_ext(src), "rle") != 0)
             return LV_RES_INV;
 
         res = lv_fs_open(&f, src, LV_FS_MODE_RD);
