@@ -273,7 +273,7 @@ void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_lab
             uint32_t letter;
             uint32_t letter_next;
             _lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
-            if(_lv_text_is_invisible(letter))
+            if(_lv_text_is_marker(letter)) /*Markers are valid letters but should not be rendered.*/
                 continue;
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);

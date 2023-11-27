@@ -221,13 +221,13 @@ static inline bool _lv_text_is_a_word(uint32_t letter)
 }
 
 /**
- * Test if character is invisible
- * Note, this is not a full list, nor a official definition of invisibility.
+ * Test if character can be treated as marker, and don't need to be rendered.
+ * Note, this is not a full list. Add your findings to the list.
  *
  * @param letter a letter
  * @return true if so
  */
-static inline bool _lv_text_is_invisible(uint32_t letter)
+static inline bool _lv_text_is_marker(uint32_t letter)
 {
     if(letter == 0) return true;
 
