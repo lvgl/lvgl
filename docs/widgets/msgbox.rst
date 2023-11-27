@@ -66,8 +66,8 @@ Events
    you can add events to the message box itself. In the event handler,
    :cpp:expr:`lv_event_get_target(e)` will return the button matrix and
    :cpp:expr:`lv_event_get_current_target(e)` will return the message box.
-   :cpp:expr:`lv_msgbox_get_active_btn(msgbox)` and
-   :cpp:expr:`lv_msgbox_get_active_btn_text(msgbox)` can be used to get the
+   :cpp:expr:`lv_msgbox_get_active_button(msgbox)` and
+   :cpp:expr:`lv_msgbox_get_active_button_text(msgbox)` can be used to get the
    index and text of the clicked button.
 
 Learn more about :ref:`events`.
