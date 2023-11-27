@@ -122,11 +122,9 @@ Observer
 ********
 
 Subscribe to a subject
-----------------------ubject groups can be created. For the above example it looks like this:
+----------------------
 
-
-
-to subscribe to a subject the following function can be used:
+To subscribe to a subject the following function can be used:
 
 .. code:: c
 
