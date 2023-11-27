@@ -55,6 +55,7 @@ typedef struct {
     lv_subject_value_t value;           /**< Actual value*/
     lv_subject_value_t prev_value;      /**< Previous value*/
     uint32_t notify_restart_query : 1; /**< If an observer deleted start notifying from the beginning. */
+    void * user_data;                   /**< Additional parameter, can be used freely by the user*/
 } lv_subject_t;
 
 /**
