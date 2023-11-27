@@ -330,7 +330,6 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
     return cnt;
 }
 
-
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
     lv_display_t * disp = _lv_refr_get_disp_refreshing();
