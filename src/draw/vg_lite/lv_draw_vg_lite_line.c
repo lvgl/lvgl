@@ -49,10 +49,10 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     if(dsc->width == 0)
         return;
 
-    float p1_x = dsc->p1_x;
-    float p1_y = dsc->p1_y;
-    float p2_x = dsc->p2_x;
-    float p2_y = dsc->p2_y;
+    float p1_x = dsc->p1.x;
+    float p1_y = dsc->p1.y;
+    float p2_x = dsc->p2.x;
+    float p2_y = dsc->p2.y;
 
     if(p1_x == p2_x && p1_y == p2_y)
         return;

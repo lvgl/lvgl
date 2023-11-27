@@ -17,6 +17,10 @@
  *      DEFINES
  *********************/
 
+#ifndef LV_COLOR_FORMAT_IS_ALPHA_ONLY
+    #define LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf) ((cf) >= LV_COLOR_FORMAT_A1 && (cf) <= LV_COLOR_FORMAT_A8)
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

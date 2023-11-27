@@ -41,7 +41,7 @@ extern "C" {
         }                                                     \
     } while (0)
 
-#ifdef LV_VG_LITE_ASSERT_ENABLE
+#ifdef CONFIG_LV_VG_LITE_ASSERT_ENABLE
 #define LV_VG_LITE_ASSERT_PATH(path) LV_ASSERT(lv_vg_lite_path_check(path))
 #define LV_VG_LITE_ASSERT_BUFFER(buffer) LV_ASSERT(lv_vg_lite_buffer_check(buffer))
 #else

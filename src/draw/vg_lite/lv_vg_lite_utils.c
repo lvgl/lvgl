@@ -658,8 +658,8 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     LV_ASSERT_NULL(dsc);
 
     int32_t rotation = dsc->rotation;
-    int32_t scale_x = dsc->scale_x;
-    int32_t scale_y = dsc->scale_y;
+    int32_t scale_x = dsc->zoom_x;
+    int32_t scale_y = dsc->zoom_y;
 
     vg_lite_translate(x, y, matrix);
 
@@ -991,7 +991,7 @@ void lv_vg_lite_draw_grad(
                                buffer,
                                path,
                                fill,
-                               matrix,
+                               (vg_lite_matrix_t *)matrix,
                                &gradient,
                                blend));
 

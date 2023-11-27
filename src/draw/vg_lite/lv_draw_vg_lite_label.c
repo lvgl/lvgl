@@ -83,8 +83,8 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
             lv_draw_image_dsc_t draw_img_dsc;
             lv_draw_image_dsc_init(&draw_img_dsc);
             draw_img_dsc.rotation = 0;
-            draw_img_dsc.scale_x = LV_SCALE_NONE;
-            draw_img_dsc.scale_y = LV_SCALE_NONE;
+            draw_img_dsc.zoom_x = LV_SCALE_NONE;
+            draw_img_dsc.zoom_y = LV_SCALE_NONE;
             draw_img_dsc.opa = glyph_draw_dsc->opa;
             draw_img_dsc.recolor_opa = glyph_draw_dsc->opa;
             draw_img_dsc.recolor = glyph_draw_dsc->color;

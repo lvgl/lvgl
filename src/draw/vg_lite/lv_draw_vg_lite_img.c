@@ -58,8 +58,8 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         lv_area_get_width(coords),
         lv_area_get_height(coords),
         dsc->rotation,
-        dsc->scale_x,
-        dsc->scale_y,
+        dsc->zoom_x,
+        dsc->zoom_y,
         &dsc->pivot);
     lv_area_move(&image_tf_area, coords->x1, coords->y1);
 
@@ -75,7 +75,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     }
 
     lv_opa_t opa = dsc->opa;
-    bool has_trasform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
+    bool has_trasform = (dsc->rotation != 0 || dsc->zoom_x != LV_SCALE_NONE || dsc->zoom_y != LV_SCALE_NONE);
     vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
     vg_lite_color_t recolor = lv_vg_lite_color(dsc->recolor, dsc->recolor_opa, true);
     LV_UNUSED(recolor);
