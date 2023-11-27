@@ -852,8 +852,7 @@ static void draw_main(lv_event_t * e)
             lv_draw_image_dsc_t img_dsc;
             lv_draw_image_dsc_init(&img_dsc);
             lv_obj_init_draw_image_dsc(obj, LV_PART_INDICATOR, &img_dsc);
-            img_dsc.pivot.x = symbol_w / 2;
-            img_dsc.pivot.y = symbol_h / 2;
+            lv_point_set(&img_dsc.pivot, symbol_w / 2, symbol_h / 2);
             img_dsc.rotation = lv_obj_get_style_transform_rotation(obj, LV_PART_INDICATOR);
             img_dsc.src = dropdown->symbol;
             lv_draw_image(layer, &img_dsc, &symbol_area);

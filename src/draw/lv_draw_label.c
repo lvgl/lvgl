@@ -160,8 +160,7 @@ void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_lab
     /*Init variables for the first line*/
     int32_t line_width = 0;
     lv_point_t pos;
-    pos.x = coords->x1;
-    pos.y = coords->y1;
+    lv_point_set(&pos, coords->x1, coords->y1);
 
     int32_t x_ofs = 0;
     int32_t y_ofs = 0;
