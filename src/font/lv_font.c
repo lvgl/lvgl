@@ -55,11 +55,6 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     LV_ASSERT_NULL(font_p);
     LV_ASSERT_NULL(dsc_out);
 
-    if(_lv_text_is_marker(letter)) {
-        lv_memzero(dsc_out, sizeof(*dsc_out));
-        return false;
-    }
-
 #if LV_USE_FONT_PLACEHOLDER
     const lv_font_t * placeholder_font = NULL;
 #endif
