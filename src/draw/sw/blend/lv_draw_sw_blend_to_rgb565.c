@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sw_blend.c
+ * @file lv_draw_sw_blend_to_rgb565.c
  *
  */
 
@@ -15,6 +15,12 @@
 #include "../../../core/lv_refr.h"
 #include "../../../misc/lv_color.h"
 #include "../../../stdlib/lv_string.h"
+
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
+    #include "neon/lv_blend_neon.h"
+#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
+    #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+#endif
 
 /*********************
  *      DEFINES
@@ -77,8 +83,22 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_rgb565(_lv_draw_sw_blend_fi
     int32_t x;
     int32_t y;
 
+    LV_UNUSED(w);
+    LV_UNUSED(h);
+    LV_UNUSED(x);
+    LV_UNUSED(y);
+    LV_UNUSED(opa);
+    LV_UNUSED(mask);
+    LV_UNUSED(color16);
+    LV_UNUSED(mask_stride);
+    LV_UNUSED(dest_stride);
+    LV_UNUSED(dest_buf_u16);
+
     /*Simple fill*/
     if(mask == NULL && opa >= LV_OPA_MAX)  {
+#ifdef LV_DRAW_SW_COLOR_BLEND_TO_RGB565
+        LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc);
+#else
         for(y = 0; y < h; y++) {
             uint16_t * dest_end_final = dest_buf_u16 + w;
             uint32_t * dest_end_mid = (uint32_t *)((uint16_t *) dest_buf_u16 + ((w - 1) & ~(0xF)));
@@ -111,9 +131,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_rgb565(_lv_draw_sw_blend_fi
             dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
             dest_buf_u16 -= w;
         }
+#endif
     }
     /*Opacity only*/
     else if(mask == NULL && opa < LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA
+        LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA(dsc);
+#else
         uint32_t last_dest32_color = dest_buf_u16[0] + 1; /*Set to value which is not equal to the first pixel*/
         uint32_t last_res32_color = 0;
 
@@ -150,10 +174,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_rgb565(_lv_draw_sw_blend_fi
             }
             dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
         }
+#endif
     }
 
     /*Masked with full opacity*/
     else if(mask && opa >= LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK
+        LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK(dsc);
+#else
         uint32_t c32 = color16 + ((uint32_t)color16 << 16);
         for(y = 0; y < h; y++) {
             for(x = 0; x < w && ((lv_uintptr_t)(mask) & 0x3); x++) {
@@ -189,9 +217,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_rgb565(_lv_draw_sw_blend_fi
             dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
             mask += mask_stride;
         }
+#endif
     }
     /*Masked with opacity*/
     else if(mask && opa < LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_COLOR_BLEND_TO_RGB565_MIX_MASK_OPA
+        LV_DRAW_SW_COLOR_BLEND_TO_RGB565_MIX_MASK_OPA(dsc);
+#else
         for(y = 0; y < h; y++) {
             for(x = 0; x < w; x++) {
                 dest_buf_u16[x] = lv_color_16_16_mix(color16, dest_buf_u16[x], LV_OPA_MIX2(mask[x], opa));
@@ -199,6 +231,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_rgb565(_lv_draw_sw_blend_fi
             dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
             mask += mask_stride;
         }
+#endif
     }
 }
 
@@ -244,14 +277,21 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
 
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565
+            LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565(dsc);
+#else
             uint32_t line_in_bytes = w * 2;
             for(y = 0; y < h; y++) {
                 lv_memcpy(dest_buf_u16, src_buf_u16, line_in_bytes);
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                 src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
             }
+#endif
         }
         else if(mask_buf == NULL && opa < LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_OPA
+            LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc);
+#else
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     dest_buf_u16[x] = lv_color_16_16_mix(src_buf_u16[x], dest_buf_u16[x], opa);
@@ -259,8 +299,12 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                 src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
             }
+#endif
         }
         else if(mask_buf && opa >= LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_MASK
+            LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc);
+#else
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     dest_buf_u16[x] = lv_color_16_16_mix(src_buf_u16[x], dest_buf_u16[x], mask_buf[x]);
@@ -269,8 +313,12 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
                 src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
                 mask_buf += mask_stride;
             }
+#endif
         }
         else {
+#ifdef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
+            LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc);
+#else
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     dest_buf_u16[x] = lv_color_16_16_mix(src_buf_u16[x], dest_buf_u16[x], LV_OPA_MIX2(mask_buf[x], opa));
@@ -279,6 +327,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
                 src_buf_u16 = drawbuf_next_row(src_buf_u16, src_stride);
                 mask_buf += mask_stride;
             }
+#endif
         }
     }
     else {
@@ -345,6 +394,9 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
 
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565
+            LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565(dsc, src_px_size);
+#else
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += src_px_size) {
                     dest_buf_u16[dest_x]  = ((src_buf_u8[src_x + 2] & 0xF8) << 8) +
@@ -354,8 +406,12 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                 src_buf_u8 += src_stride;
             }
+#endif
         }
         else if(mask_buf == NULL && opa < LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_OPA
+            LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc, src_px_size);
+#else
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += src_px_size) {
                     dest_buf_u16[dest_x] = lv_color_24_16_mix(&src_buf_u8[src_x], dest_buf_u16[dest_x], opa);
@@ -363,8 +419,12 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                 src_buf_u8 += src_stride;
             }
+#endif
         }
         if(mask_buf && opa >= LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_MASK
+            LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc, src_px_size);
+#else
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += src_px_size) {
                     dest_buf_u16[dest_x] = lv_color_24_16_mix(&src_buf_u8[src_x], dest_buf_u16[dest_x], mask_buf[dest_x]);
@@ -373,8 +433,12 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
                 src_buf_u8 += src_stride;
                 mask_buf += mask_stride;
             }
+#endif
         }
         if(mask_buf && opa < LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
+            LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc, src_px_size);
+#else
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += src_px_size) {
                     dest_buf_u16[dest_x] = lv_color_24_16_mix(&src_buf_u8[src_x], dest_buf_u16[dest_x], LV_OPA_MIX2(mask_buf[dest_x], opa));
@@ -383,6 +447,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
                 src_buf_u8 += src_stride;
                 mask_buf += mask_stride;
             }
+#endif
         }
     }
     else {
@@ -445,6 +510,9 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
 
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565
+            LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565(dsc);
+#else
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
                     dest_buf_u16[dest_x] = lv_color_24_16_mix(&src_buf_u8[src_x], dest_buf_u16[dest_x], src_buf_u8[src_x + 3]);
@@ -452,8 +520,12 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                 src_buf_u8 += src_stride;
             }
+#endif
         }
         else if(mask_buf == NULL && opa < LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_OPA
+            LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc);
+#else
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
                     dest_buf_u16[dest_x] = lv_color_24_16_mix(&src_buf_u8[src_x], dest_buf_u16[dest_x], LV_OPA_MIX2(src_buf_u8[src_x + 3],
@@ -462,8 +534,12 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
                 dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                 src_buf_u8 += src_stride;
             }
+#endif
         }
         else if(mask_buf && opa >= LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK
+            LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc);
+#else
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
                     dest_buf_u16[dest_x] = lv_color_24_16_mix(&src_buf_u8[src_x], dest_buf_u16[dest_x],
@@ -473,8 +549,12 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
                 src_buf_u8 += src_stride;
                 mask_buf += mask_stride;
             }
+#endif
         }
         else if(mask_buf && opa < LV_OPA_MAX) {
+#ifdef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
+            LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc);
+#else
             for(y = 0; y < h; y++) {
                 for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
                     dest_buf_u16[dest_x] = lv_color_24_16_mix(&src_buf_u8[src_x], dest_buf_u16[dest_x],
@@ -484,6 +564,7 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
                 src_buf_u8 += src_stride;
                 mask_buf += mask_stride;
             }
+#endif
         }
     }
     else {
