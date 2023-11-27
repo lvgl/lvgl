@@ -171,18 +171,6 @@ char * lv_strcpy(char * dst, const char * src)
     return tmp;
 }
 
-int32_t lv_strncmp(const char * s1, const char * s2, size_t count)
-{
-    int32_t res = 0;
-    while(count) {
-        if((res = *s1 - *s2++) != 0 || !*s1++) {
-            break;
-        }
-        count --;
-    }
-    return res;
-}
-
 int32_t lv_strcmp(const char * s1, const char * s2)
 {
     while(*s1 && (*s1 == *s2)) {

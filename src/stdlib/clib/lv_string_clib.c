@@ -68,11 +68,6 @@ char * lv_strcpy(char * dst, const char * src)
     return strcpy(dst, src);
 }
 
-int32_t lv_strncmp(const char * s1, const char * s2, size_t count)
-{
-    return strncmp(s1, s2, count);
-}
-
 int32_t lv_strcmp(const char * s1, const char * s2)
 {
     return strcmp(s1, s2);
@@ -80,8 +75,8 @@ int32_t lv_strcmp(const char * s1, const char * s2)
 
 char * lv_strdup(const char * src)
 {
-    /*strdup uses malloc, so use the built in malloc if it's enabled */
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    /*strdup uses malloc, so use the lv_malloc when LV_USE_STDLIB_MALLOC is not LV_STDLIB_CLIB */
+#if LV_USE_STDLIB_MALLOC != LV_STDLIB_CLIB
     size_t len = lv_strlen(src) + 1;
     char * dst = lv_malloc(len);
     if(dst == NULL) return NULL;

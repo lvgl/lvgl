@@ -84,15 +84,6 @@ char * lv_strncpy(char * dst, const char * src, size_t dest_size);
 char * lv_strcpy(char * dst, const char * src);
 
 /**
- * @brief  This function will compare two strings with specified maximum length.
- * @param s1    pointer to the first string
- * @param s2    pointer to the second string
- * @param count is the maximum compare length.
- * @return      the difference between the value of the first unmatching character.
- */
-int32_t lv_strncmp(const char * s1, const char * s2, size_t count);
-
-/**
  * @brief  This function will compare two strings without specified length.
  * @param s1    pointer to the first string
  * @param s2    pointer to the second string
