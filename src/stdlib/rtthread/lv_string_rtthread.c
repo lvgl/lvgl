@@ -63,6 +63,16 @@ char * lv_strcpy(char * dst, const char * src)
     return rt_strcpy(dst, src);
 }
 
+int32_t lv_strncmp(const char * s1, const char * s2, size_t count)
+{
+    return rt_strncmp(s1, s2, count);
+}
+
+int32_t lv_strcmp(const char * s1, const char * s2)
+{
+    return rt_strcmp(s1, s2);
+}
+
 char * lv_strdup(const char * src)
 {
     /*strdup uses malloc, so use the built in malloc if it's enabled */
