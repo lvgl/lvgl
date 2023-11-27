@@ -229,7 +229,7 @@ static inline bool _lv_text_is_a_word(uint32_t letter)
  */
 static inline bool _lv_text_is_marker(uint32_t letter)
 {
-    if(letter == 0) return true;
+    if(letter < 0x20) return true;
 
     /*U+061C ARABIC LETTER MARK, see https://www.compart.com/en/unicode/block/U+0600*/
     if(letter == 0x061C) return true;
@@ -249,6 +249,8 @@ static inline bool _lv_text_is_marker(uint32_t letter)
 
     /*U+FEFF ZERO WIDTH NO-BREAK SPACE, see https://www.compart.com/en/unicode/block/U+FE70*/
     if(letter == 0xFEFF) return true;
+
+    if(letter == 0xF8FF) return true; /*LV_SYMBOL_DUMMY*/
 
     return false;
 }
