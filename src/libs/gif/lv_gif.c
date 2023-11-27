@@ -101,6 +101,12 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 void lv_gif_restart(lv_obj_t * obj)
 {
     lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    if(gifobj->gif == NULL) {
+        LV_LOG_WARN("Gif resource not loaded correctly");
+        return;
+    }
+
     gd_rewind(gifobj->gif);
     lv_timer_resume(gifobj->timer);
     lv_timer_reset(gifobj->timer);
@@ -115,6 +121,12 @@ void lv_gif_pause(lv_obj_t * obj)
 void lv_gif_resume(lv_obj_t * obj)
 {
     lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    if(gifobj->gif == NULL) {
+        LV_LOG_WARN("Gif resource not loaded correctly");
+        return;
+    }
+
     lv_timer_resume(gifobj->timer);
 }
 
