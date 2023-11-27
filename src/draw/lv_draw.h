@@ -240,7 +240,6 @@ void lv_draw_dispatch_request(void);
  */
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
 
-
 /**
  * Tell how many draw task are waiting to be drawn on the area of `t_check`.
  * It can be used to determine if a GPU shall combine many draw tasks in to one or not.
