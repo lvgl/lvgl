@@ -128,7 +128,7 @@ static uint8_t screen_buf_xrgb8888[800 * 480 * 4];
 static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t tolerance)
 {
 
-    char fn_ref_full[512];
+    char fn_ref_full[256];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
     lv_refr_now(NULL);
@@ -186,11 +186,11 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
     }
 
     if(err) {
-        char fn_ref_no_ext[256];
+        char fn_ref_no_ext[128];
         strcpy(fn_ref_no_ext, fn_ref);
         fn_ref_no_ext[strlen(fn_ref_no_ext) - 4] = '\0';
 
-        char fn_err_full[512];
+        char fn_err_full[256];
         sprintf(fn_err_full, "%s%s_err.png", REF_IMGS_PATH, fn_ref_no_ext);
 
         write_png_file(screen_buf_xrgb8888, 800, 480, fn_err_full);
