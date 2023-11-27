@@ -13,32 +13,30 @@
 
 #ifdef __RTTHREAD__
 
+#include <lvgl.h>
+
 #define LV_RTTHREAD_INCLUDE <rtthread.h>
 #include LV_RTTHREAD_INCLUDE
 
 /*=========================
-   MEMORY SETTINGS
+   STDLIB WRAPPER SETTINGS
  *=========================*/
 
 #ifdef RT_USING_HEAP
-#  define LV_MEM_CUSTOM 1
-#  define LV_MEM_CUSTOM_INCLUDE LV_RTTHREAD_INCLUDE
-#  define LV_MEM_CUSTOM_ALLOC   rt_malloc
-#  define LV_MEM_CUSTOM_FREE    rt_free
-#  define LV_MEM_CUSTOM_REALLOC rt_realloc
+    #define LV_USE_STDLIB_MALLOC    LV_STDLIB_RTTHREAD
 #endif
 
-/*====================
-   HAL SETTINGS
- *====================*/
+#define LV_USE_STDLIB_STRING    LV_STDLIB_RTTHREAD
 
-#define LV_TICK_CUSTOM 1
-#define LV_TICK_CUSTOM_INCLUDE LV_RTTHREAD_INCLUDE
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (rt_tick_get_millisecond())    /*Expression evaluating to current system time in ms*/
+#if LV_USE_FLOAT == 0
+    #define LV_USE_STDLIB_SPRINTF   LV_STDLIB_RTTHREAD
+#endif
 
-/*=======================
- * FEATURE CONFIGURATION
- *=======================*/
+/*=================
+ * OPERATING SYSTEM
+ *=================*/
+
+#define LV_USE_OS   LV_OS_RTTHREAD
 
 /*-------------
  * Asserts
@@ -47,29 +45,20 @@
 #define LV_ASSERT_HANDLER_INCLUDE LV_RTTHREAD_INCLUDE
 #define LV_ASSERT_HANDLER RT_ASSERT(0);
 
-/*-------------
- * Others
- *-----------*/
-
-#define LV_SPRINTF_CUSTOM 1
-#define LV_SPRINTF_INCLUDE LV_RTTHREAD_INCLUDE
-#define LV_SNPRINTF  rt_snprintf
-#define LV_VSNPRINTF rt_vsnprintf
-
 /*=====================
  *  COMPILER SETTINGS
  *====================*/
 
 #ifdef ARCH_CPU_BIG_ENDIAN
-#  define LV_BIG_ENDIAN_SYSTEM 1
+    #define LV_BIG_ENDIAN_SYSTEM 1
 #else
-#  define LV_BIG_ENDIAN_SYSTEM 0
+    #define LV_BIG_ENDIAN_SYSTEM 0
 #endif
 
 #ifdef rt_align /* >= RT-Thread v5.0.0 */
-#  define LV_ATTRIBUTE_MEM_ALIGN rt_align(RT_ALIGN_SIZE)
+    #define LV_ATTRIBUTE_MEM_ALIGN rt_align(RT_ALIGN_SIZE)
 #else
-#  define LV_ATTRIBUTE_MEM_ALIGN ALIGN(RT_ALIGN_SIZE)
+    #define LV_ATTRIBUTE_MEM_ALIGN ALIGN(RT_ALIGN_SIZE)
 #endif
 
 /*==================
@@ -77,7 +66,7 @@
 *==================*/
 
 #ifdef PKG_LVGL_USING_EXAMPLES
-#  define LV_BUILD_EXAMPLES 1
+    #define LV_BUILD_EXAMPLES 1
 #endif
 
 /*--END OF LV_RT_THREAD_CONF_H--*/
