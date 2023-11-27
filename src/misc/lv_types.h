@@ -58,7 +58,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-// Exclude C enum and struct definitions when included by assembly code
+/* Exclude C enum and struct definitions when included by assembly code */
 #ifndef __ASSEMBLY__
 
 /**
