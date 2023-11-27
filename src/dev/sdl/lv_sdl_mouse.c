@@ -58,6 +58,7 @@ lv_indev_t * lv_sdl_mouse_create(void)
     lv_indev_set_read_cb(indev, sdl_mouse_read);
     lv_indev_set_driver_data(indev, dsc);
 
+    lv_timer_delete(lv_indev_get_read_timer(indev));
     lv_indev_add_event(indev, release_indev_cb, LV_EVENT_DELETE, indev);
 
     return indev;
@@ -174,6 +175,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
             indev_dev->last_y = (int16_t)((float)ver_res * event->tfinger.y / zoom);
             break;
     }
+    lv_indev_read(indev);
 }
 
 #endif /*LV_USE_SDL*/
