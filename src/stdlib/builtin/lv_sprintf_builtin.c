@@ -883,4 +883,4 @@ int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va)
     return _lv_vsnprintf(_out_buffer, buffer, count, format, va);
 }
 
-#endif /*LV_USE_BUILTIN_SNPRINTF*/
+#endif /*LV_STDLIB_BUILTIN*/

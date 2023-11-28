@@ -10,10 +10,6 @@
 #include "../lv_string.h"
 #include <rtthread.h>
 
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-    #include "../lv_mem.h"
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -92,4 +88,4 @@ char * lv_strdup(const char * src)
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_STDLIB_STRING*/
+#endif /*LV_STDLIB_RTTHREAD*/

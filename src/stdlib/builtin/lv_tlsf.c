@@ -1242,4 +1242,4 @@ void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size)
     return p;
 }
 
-#endif /* LV_USE_BUILTIN_MALLOC */
+#endif /*LV_STDLIB_BUILTIN*/

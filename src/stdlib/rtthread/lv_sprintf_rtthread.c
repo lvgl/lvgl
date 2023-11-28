@@ -58,4 +58,4 @@ int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va)
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_STDLIB_SPRINTF*/
+#endif /*LV_STDLIB_RTTHREAD*/

@@ -95,4 +95,4 @@ lv_result_t lv_mem_test_core(void)
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_STDLIB_MALLOC*/
+#endif /*LV_STDLIB_RTTHREAD*/
