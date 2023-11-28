@@ -8,6 +8,7 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_STRING == LV_STDLIB_RTTHREAD
 #include "../lv_string.h"
+#include "../lv_mem.h" /*Need lv_malloc*/
 #include <rtthread.h>
 
 /*********************
