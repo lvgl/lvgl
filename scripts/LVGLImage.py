@@ -526,6 +526,10 @@ class LVGLImage:
 
         varname = path.basename(filename).split('.')[0]
         varname = varname.replace("-", "_")
+        varname += f"_{self.cf.name.lower()}"
+        if self.stride != (self.w * self.cf.bpp + 7) // 8:
+            varname += f"_stride{self.stride}"
+
         header = f'''
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
