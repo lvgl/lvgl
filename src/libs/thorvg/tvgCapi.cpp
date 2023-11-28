@@ -24,7 +24,7 @@
 #if LV_USE_THORVG_INTERNAL
 
 #include <string>
-#include <thorvg.h>
+#include "thorvg.h"
 #include "thorvg_capi.h"
 
 using namespace std;
