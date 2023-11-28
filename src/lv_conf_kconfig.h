@@ -215,13 +215,13 @@ extern "C" {
  * BIDI DIRECTION
  *-----------------*/
 
-// #ifdef CONFIG_LV_BASE_DIR_LTR
+#ifdef CONFIG_LV_BASE_DIR_LTR
 #  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_LTR
-// #elif defined(CONFIG_LV_BASE_DIR_RTL)
-// #  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_RTL
-// #elif defined(CONFIG_LV_BASE_DIR_AUTO)
-// #  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_AUTO
-// #endif
+#elif defined(CONFIG_LV_BASE_DIR_RTL)
+#  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_RTL
+#elif defined(CONFIG_LV_BASE_DIR_AUTO)
+#  define CONFIG_LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_AUTO
+#endif
 
 /*------------------
  * LINUX FBDEV
