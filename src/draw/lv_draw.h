@@ -19,6 +19,8 @@ extern "C" {
 #include "../misc/lv_style.h"
 #include "../misc/lv_text.h"
 #include "../misc/lv_profiler.h"
+#include "../misc/lv_cache.h"
+#include "../misc/lv_matrix.h"
 #include "lv_image_decoder.h"
 #include "../osal/lv_os.h"
 #include "lv_draw_buf.h"
@@ -164,6 +166,14 @@ struct _lv_layer_t  {
      * During drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
      */
     lv_area_t _clip_area;
+
+#if LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
+    /** Transform matrix to be applied when rendering the layer */
+    lv_matrix_t matrix;
+
+    /** layer's opacity */
+    lv_opa_t opa;
+#endif
 
     /** Linked list of draw tasks */
     lv_draw_task_t * draw_task_head;

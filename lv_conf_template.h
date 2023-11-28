@@ -94,6 +94,10 @@
 /*Align the start address of draw_buf addresses to this bytes*/
 #define LV_DRAW_BUF_ALIGN                       4
 
+/*Using global transparency and matrix draw mode.
+ *Requirements: The rendering engine needs to support global alpha and 2.5D transformations*/
+#define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX       1
+
 #define LV_USE_DRAW_SW 1
 #if LV_USE_DRAW_SW == 1
     /* Set the number of draw unit.
