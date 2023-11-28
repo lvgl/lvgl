@@ -50,8 +50,8 @@ void lv_example_snapshot_1(void)
         lv_obj_set_style_bg_opa(img, LV_OPA_COVER, 0);
         //        lv_obj_set_style_transform_scale(img, 400, LV_STATE_PRESSED);
         lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_add_event(img, event_cb, LV_EVENT_PRESSED, snapshot_obj);
-        lv_obj_add_event(img, event_cb, LV_EVENT_RELEASED, snapshot_obj);
+        lv_obj_add_event_cb(img, event_cb, LV_EVENT_PRESSED, snapshot_obj);
+        lv_obj_add_event_cb(img, event_cb, LV_EVENT_RELEASED, snapshot_obj);
     }
 }
 

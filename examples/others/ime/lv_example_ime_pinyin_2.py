@@ -38,7 +38,7 @@ kb.set_textarea(ta1)
 pinyin_ime.pinyin_set_keyboard(kb)
 pinyin_ime.pinyin_set_mode(lv.ime_pinyin.PINYIN_MODE.K9)    #  Set to 9-key input mode. Default: 26-key input(k26) mode.
 
-ta1.add_event(lambda evt: ta_event_cb(evt,kb), lv.EVENT.ALL, None)
+ta1.add_event_cb(lambda evt: ta_event_cb(evt,kb), lv.EVENT.ALL, None)
 
 # Get the cand_panel, and adjust its size and position
 cand_panel = pinyin_ime.pinyin_get_cand_panel()

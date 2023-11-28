@@ -254,7 +254,7 @@ struct _lv_obj_t * lv_indev_search_obj(struct _lv_obj_t * obj, lv_point_t * poin
  * @param filter        event code to react or `LV_EVENT_ALL`
  * @param user_data     optional user_data
  */
-void lv_indev_add_event(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+void lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 
 /**
  * Get the number of event attached to an indev

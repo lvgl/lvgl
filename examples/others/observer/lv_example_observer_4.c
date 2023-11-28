@@ -156,7 +156,7 @@ static void btn_create(lv_obj_t * parent, const char * text)
     lv_obj_set_height(btn, lv_pct(100));
     lv_obj_set_style_radius(btn, 0, 0);
     lv_subject_add_observer_obj(&current_tab_subject, btn_observer_cb, btn, NULL);
-    lv_obj_add_event(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, text);

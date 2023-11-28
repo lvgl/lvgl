@@ -37,7 +37,7 @@ void lv_example_dropdown_3(void)
     /*In a menu we don't need to show the last clicked item*/
     lv_dropdown_set_selected_highlight(dropdown, false);
 
-    lv_obj_add_event(dropdown, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(dropdown, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 #endif

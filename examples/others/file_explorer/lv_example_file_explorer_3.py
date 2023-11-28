@@ -86,4 +86,4 @@ if LV_FILE_EXPLORER_QUICK_ACCESS :
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.DOCS_DIR, home_dir + "/Documents")
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.FS_DIR, "A:/")
 
-    file_explorer.add_event(file_explorer_event_handler, lv.EVENT.ALL, None)
+    file_explorer.add_event_cb(file_explorer_event_handler, lv.EVENT.ALL, None)

@@ -36,7 +36,7 @@ kb = lv.keyboard(lv.screen_active())
 pinyin_ime.pinyin_set_keyboard(kb)
 kb.set_textarea(ta1)
 
-ta1.add_event(lambda evt: ta_event_cb(evt,kb), lv.EVENT.ALL, None)
+ta1.add_event_cb(lambda evt: ta_event_cb(evt,kb), lv.EVENT.ALL, None)
 
 # Get the cand_panel, and adjust its size and position
 cand_panel = pinyin_ime.pinyin_get_cand_panel()

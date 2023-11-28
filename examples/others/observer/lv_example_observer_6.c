@@ -179,7 +179,7 @@ static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_even
     lv_obj_remove_style_all(btn);
     lv_obj_add_style(btn, &styles.style_main, 0);
     lv_obj_add_style(btn, &styles.style_pressed, LV_STATE_PRESSED);
-    lv_obj_add_event(btn, event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, text);

@@ -85,8 +85,8 @@ void lv_example_table_2(void)
     lv_obj_align(table, LV_ALIGN_CENTER, 0, -20);
 
     /*Add an event callback to to apply some custom drawing*/
-    lv_obj_add_event(table, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-    lv_obj_add_event(table, change_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(table, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(table, change_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
     lv_mem_monitor_t mon2;

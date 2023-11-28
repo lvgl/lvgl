@@ -295,7 +295,7 @@ static void card_create(lv_obj_t * parent, card_info_t * info)
     lv_obj_t * cont = lv_obj_create(parent);
     lv_obj_add_style(cont, &style_card_cont, 0);
     lv_obj_set_scroll_snap_x(cont, LV_SCROLL_SNAP_CENTER);
-    lv_obj_add_event(cont, scroll_event_cb, LV_EVENT_RELEASED, NULL);
+    lv_obj_add_event_cb(cont, scroll_event_cb, LV_EVENT_RELEASED, NULL);
     lv_obj_remove_flag(cont, LV_OBJ_FLAG_SCROLL_ELASTIC);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 

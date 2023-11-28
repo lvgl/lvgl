@@ -76,7 +76,7 @@ lv_display_t * lv_nuttx_fbdev_create(void)
     }
     dsc->fd = -1;
     lv_display_set_driver_data(disp, dsc);
-    lv_display_add_event(disp, display_release_cb, LV_EVENT_DELETE, disp);
+    lv_display_add_event_cb(disp, display_release_cb, LV_EVENT_DELETE, disp);
     lv_display_set_flush_cb(disp, flush_cb);
     return disp;
 }

@@ -130,7 +130,7 @@ lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent)
 
     /*Create an empty transparent container*/
     list = lv_obj_create(parent);
-    lv_obj_add_event(list, list_delete_event_cb, LV_EVENT_DELETE, NULL);
+    lv_obj_add_event_cb(list, list_delete_event_cb, LV_EVENT_DELETE, NULL);
     lv_obj_remove_style_all(list);
     lv_obj_set_size(list, LV_HOR_RES, LV_VER_RES - LV_DEMO_MUSIC_HANDLE_SIZE);
     lv_obj_set_y(list, LV_DEMO_MUSIC_HANDLE_SIZE);
@@ -191,7 +191,7 @@ static lv_obj_t * add_list_button(lv_obj_t * parent, uint32_t track_id)
     lv_obj_add_style(btn, &style_button_pr, LV_STATE_PRESSED);
     lv_obj_add_style(btn, &style_button_chk, LV_STATE_CHECKED);
     lv_obj_add_style(btn, &style_button_dis, LV_STATE_DISABLED);
-    lv_obj_add_event(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
 
     if(track_id >= 3) {
         lv_obj_add_state(btn, LV_STATE_DISABLED);

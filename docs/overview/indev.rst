@@ -65,7 +65,7 @@ event. For example:
 
    ...
 
-   lv_obj_add_event(screen1, my_event, LV_EVENT_GESTURE, NULL);
+   lv_obj_add_event_cb(screen1, my_event, LV_EVENT_GESTURE, NULL);
 
 To prevent passing the gesture event to the parent from an object use
 :cpp:expr:`lv_obj_remove_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE)`.

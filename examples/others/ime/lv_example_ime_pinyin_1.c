@@ -37,7 +37,7 @@ void lv_example_ime_pinyin_1(void)
     lv_ime_pinyin_set_keyboard(pinyin_ime, kb);
     lv_keyboard_set_textarea(kb, ta1);
 
-    lv_obj_add_event(ta1, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
 
     /*Get the cand_panel, and adjust its size and position*/
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(pinyin_ime);

@@ -91,6 +91,6 @@ void lv_example_roller_3(void)
 
     lv_obj_center(roller1);
     lv_roller_set_visible_row_count(roller1, 3);
-    lv_obj_add_event(roller1, mask_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(roller1, mask_event_cb, LV_EVENT_ALL, NULL);
 }
 #endif

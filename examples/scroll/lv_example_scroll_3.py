@@ -16,7 +16,7 @@ class ScrollExample_3():
         float_button.set_size(50, 50)
         float_button.add_flag(lv.obj.FLAG.FLOATING)
         float_button.align(lv.ALIGN.BOTTOM_RIGHT, 0, -list.get_style_pad_right(lv.PART.MAIN))
-        float_button.add_event(lambda evt: self.float_button_event_cb(evt,list), lv.EVENT.ALL, None)
+        float_button.add_event_cb(lambda evt: self.float_button_event_cb(evt,list), lv.EVENT.ALL, None)
         float_button.set_style_radius(lv.RADIUS_CIRCLE, 0)
         float_button.set_style_bg_image_src(lv.SYMBOL.PLUS, 0)
         float_button.set_style_text_font(lv.theme_get_font_large(float_button), 0)

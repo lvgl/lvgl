@@ -33,7 +33,7 @@ void lv_example_gridnav_4(void)
 
         lv_snprintf(buf, sizeof(buf), "File %d", i + 1);
         lv_obj_t * item = lv_list_add_button(list, LV_SYMBOL_FILE, buf);
-        lv_obj_add_event(item, event_handler, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event_cb(item, event_handler, LV_EVENT_CLICKED, NULL);
         lv_group_remove_obj(item);  /*The default group adds it automatically*/
     }
 

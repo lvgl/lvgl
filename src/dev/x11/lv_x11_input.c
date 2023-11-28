@@ -163,7 +163,7 @@ static x11_inp_data_t * x11_input_get_user_data(lv_display_t * disp)
         if(NULL != *inp_data) {
             /* initialize timer callback for X11 kb/mouse input event reading */
             (*inp_data)->timer = lv_timer_create(x11_inp_event_handler, 1, disp);
-            lv_display_add_event(disp, x11_inp_delete_evt_cb, LV_EVENT_DELETE, *inp_data);
+            lv_display_add_event_cb(disp, x11_inp_delete_evt_cb, LV_EVENT_DELETE, *inp_data);
         }
     }
     return *inp_data;

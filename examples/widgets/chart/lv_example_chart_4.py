@@ -65,7 +65,7 @@ chart = lv.chart(lv.screen_active())
 chart.set_size(200, 150)
 chart.center()
 
-chart.add_event(event_cb, lv.EVENT.ALL, None)
+chart.add_event_cb(event_cb, lv.EVENT.ALL, None)
 
 chart.refresh_ext_draw_size()
 

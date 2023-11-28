@@ -128,7 +128,7 @@ Events
 ------
 
 To set an event callback for an object, use
-:cpp:expr:`lv_obj_add_event(obj, event_cb, LV_EVENT_..., user_data)`,
+:cpp:expr:`lv_obj_add_event_cb(obj, event_cb, LV_EVENT_..., user_data)`,
 
 To manually send an event to an object, use
 :cpp:expr:`lv_event_send(obj, LV_EVENT_..., param)`

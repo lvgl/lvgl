@@ -96,14 +96,14 @@ void lv_demo_transform(void)
     lv_obj_set_size(arc, disp_w - 20, disp_w - 20);
     lv_arc_set_range(arc, 0, 270);
     lv_arc_set_value(arc, 225);
-    lv_obj_add_event(arc, arc_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(arc, arc_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_center(arc);
 
     lv_obj_t * slider = lv_slider_create(lv_screen_active());
     lv_obj_set_width(slider, lv_pct(70));
     lv_obj_align(slider, LV_ALIGN_BOTTOM_MID, 0, -20);
-    lv_obj_add_event(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_slider_set_range(slider, 128, 300);
     lv_slider_set_value(slider, 256, LV_ANIM_OFF);
 }

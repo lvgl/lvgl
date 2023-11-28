@@ -26,7 +26,7 @@ void lv_example_buttonmatrix_1(void)
     lv_buttonmatrix_set_button_ctrl(btnm1, 10, LV_BUTTONMATRIX_CTRL_CHECKABLE);
     lv_buttonmatrix_set_button_ctrl(btnm1, 11, LV_BUTTONMATRIX_CTRL_CHECKED);
     lv_obj_align(btnm1, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_event(btnm1, event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btnm1, event_handler, LV_EVENT_ALL, NULL);
 }
 
 #endif

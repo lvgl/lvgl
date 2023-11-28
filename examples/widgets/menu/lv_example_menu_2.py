@@ -7,7 +7,7 @@ def back_event_handler(e):
 # Create a menu object
 menu = lv.menu(lv.screen_active())
 menu.set_mode_root_back_button(lv.menu.ROOT_BACK_BUTTON.ENABLED)
-menu.add_event(back_event_handler, lv.EVENT.CLICKED, None)
+menu.add_event_cb(back_event_handler, lv.EVENT.CLICKED, None)
 menu.set_size(320, 240)
 menu.center()
 

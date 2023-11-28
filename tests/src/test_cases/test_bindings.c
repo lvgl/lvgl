@@ -113,7 +113,7 @@ static void create_ui(void)
     lv_obj_add_style(btnmatrix, &style_big_font, LV_PART_ITEMS | LV_STATE_CHECKED);
 
     lv_buttonmatrix_set_selected_button(btnmatrix, 1);
-    lv_obj_add_event(btnmatrix, buttonmatrix_event_cb, LV_EVENT_VALUE_CHANGED, label);
+    lv_obj_add_event_cb(btnmatrix, buttonmatrix_event_cb, LV_EVENT_VALUE_CHANGED, label);
     lv_obj_send_event(btnmatrix, LV_EVENT_VALUE_CHANGED, NULL);
 
     /*Create a base object*/

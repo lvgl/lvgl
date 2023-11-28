@@ -49,7 +49,7 @@ void lv_example_buttonmatrix_3(void)
     lv_buttonmatrix_set_map(btnm, map);
     lv_obj_add_style(btnm, &style_bg, 0);
     lv_obj_add_style(btnm, &style_btn, LV_PART_ITEMS);
-    lv_obj_add_event(btnm, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(btnm, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_size(btnm, 225, 35);
 
     /*Allow selecting on one number at time*/

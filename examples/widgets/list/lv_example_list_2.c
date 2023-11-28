@@ -124,7 +124,7 @@ void lv_example_list_2(void)
     for(i = 0; i < 15; i++) {
         btn = lv_button_create(list1);
         lv_obj_set_width(btn, lv_pct(50));
-        lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
 
         lv_obj_t * lab = lv_label_create(btn);
         lv_label_set_text_fmt(lab, "Item %d", i);
@@ -141,27 +141,27 @@ void lv_example_list_2(void)
     lv_obj_set_flex_flow(list2, LV_FLEX_FLOW_COLUMN);
 
     btn = lv_list_add_button(list2, NULL, "Top");
-    lv_obj_add_event(btn, event_handler_top, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btn, event_handler_top, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
     btn = lv_list_add_button(list2, LV_SYMBOL_UP, "Up");
-    lv_obj_add_event(btn, event_handler_up, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btn, event_handler_up, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
     btn = lv_list_add_button(list2, LV_SYMBOL_LEFT, "Center");
-    lv_obj_add_event(btn, event_handler_center, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btn, event_handler_center, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
     btn = lv_list_add_button(list2, LV_SYMBOL_DOWN, "Down");
-    lv_obj_add_event(btn, event_handler_dn, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btn, event_handler_dn, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
     btn = lv_list_add_button(list2, NULL, "Bottom");
-    lv_obj_add_event(btn, event_handler_bottom, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btn, event_handler_bottom, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
     btn = lv_list_add_button(list2, LV_SYMBOL_SHUFFLE, "Shuffle");
-    lv_obj_add_event(btn, event_handler_swap, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btn, event_handler_swap, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 }
 

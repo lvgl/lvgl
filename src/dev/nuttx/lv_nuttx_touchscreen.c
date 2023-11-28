@@ -156,7 +156,7 @@ static lv_indev_t * touchscreen_init(int fd)
     lv_indev_set_read_cb(indev, touchscreen_read);
     lv_indev_set_driver_data(indev, touchscreen);
     lv_indev_set_user_data(indev, (void *)(uintptr_t)fd);
-    lv_indev_add_event(indev, touchscreen_delete_cb, LV_EVENT_DELETE, indev);
+    lv_indev_add_event_cb(indev, touchscreen_delete_cb, LV_EVENT_DELETE, indev);
     return indev;
 }
 

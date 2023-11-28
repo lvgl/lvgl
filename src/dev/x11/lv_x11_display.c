@@ -370,8 +370,8 @@ lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t
     }
     lv_display_set_driver_data(disp, xd);
     lv_display_set_flush_cb(disp, x11_flush_cb);
-    lv_display_add_event(disp, x11_resolution_evt_cb, LV_EVENT_RESOLUTION_CHANGED, disp);
-    lv_display_add_event(disp, x11_disp_delete_evt_cb, LV_EVENT_DELETE, disp);
+    lv_display_add_event_cb(disp, x11_resolution_evt_cb, LV_EVENT_RESOLUTION_CHANGED, disp);
+    lv_display_add_event_cb(disp, x11_disp_delete_evt_cb, LV_EVENT_DELETE, disp);
 
     x11_window_create(disp, title);
 

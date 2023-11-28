@@ -228,7 +228,7 @@ static void sysmon_backend_init_async_cb(void * user_data)
     LV_UNUSED(user_data);
 
 #if LV_USE_PERF_MONITOR
-    lv_display_add_event(lv_display_get_default(), perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
+    lv_display_add_event_cb(lv_display_get_default(), perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
 
     lv_obj_t * obj1 = lv_sysmon_create(lv_layer_sys());
     lv_obj_align(obj1, LV_USE_PERF_MONITOR_POS, 0, 0);

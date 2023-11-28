@@ -22,5 +22,5 @@ dd.set_options("\n".join([
     "Nuts"]))
 
 dd.align(lv.ALIGN.TOP_MID, 0, 20)
-dd.add_event(event_handler, lv.EVENT.ALL, None)
+dd.add_event_cb(event_handler, lv.EVENT.ALL, None)
 

@@ -18,7 +18,7 @@ void lv_example_slider_3(void)
     lv_slider_set_value(slider, 70, LV_ANIM_OFF);
     lv_slider_set_left_value(slider, 20, LV_ANIM_OFF);
 
-    lv_obj_add_event(slider, slider_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(slider);
 }
 

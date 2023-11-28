@@ -545,7 +545,7 @@ static lv_obj_t * create_spectrum_obj(lv_obj_t * parent)
     lv_obj_set_height(obj, 250);
 #endif
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_event(obj, spectrum_draw_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(obj, spectrum_draw_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(obj);
     album_image_obj = album_image_create(obj);
     return obj;
@@ -585,7 +585,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     icon = lv_image_create(cont);
     lv_image_set_src(icon, &img_lv_demo_music_btn_prev);
     lv_obj_set_grid_cell(icon, LV_GRID_ALIGN_CENTER, 2, 1, LV_GRID_ALIGN_CENTER, 0, 1);
-    lv_obj_add_event(icon, prev_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(icon, prev_click_event_cb, LV_EVENT_CLICKED, NULL);
 
     play_obj = lv_imgbtn_create(cont);
     lv_imgbtn_set_src(play_obj, LV_IMGBTN_STATE_RELEASED, NULL, &img_lv_demo_music_btn_play, NULL);
@@ -593,14 +593,14 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     lv_obj_add_flag(play_obj, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_set_grid_cell(play_obj, LV_GRID_ALIGN_CENTER, 3, 1, LV_GRID_ALIGN_CENTER, 0, 1);
 
-    lv_obj_add_event(play_obj, play_event_click_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(play_obj, play_event_click_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(play_obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_width(play_obj, img_lv_demo_music_btn_play.header.w);
 
     icon = lv_image_create(cont);
     lv_image_set_src(icon, &img_lv_demo_music_btn_next);
     lv_obj_set_grid_cell(icon, LV_GRID_ALIGN_CENTER, 4, 1, LV_GRID_ALIGN_CENTER, 0, 1);
-    lv_obj_add_event(icon, next_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(icon, next_click_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(icon, LV_OBJ_FLAG_CLICKABLE);
 
     LV_IMAGE_DECLARE(img_lv_demo_music_slider_knob);
@@ -622,14 +622,14 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     lv_obj_set_style_bg_color(slider_obj, lv_color_hex(0x569af8), LV_PART_INDICATOR);
     lv_obj_set_style_bg_grad_color(slider_obj, lv_color_hex(0xa666f1), LV_PART_INDICATOR);
     lv_obj_set_style_outline_width(slider_obj, 0, 0);
-    lv_obj_add_event(slider_obj, del_counter_timer_cb, LV_EVENT_DELETE, NULL);
+    lv_obj_add_event_cb(slider_obj, del_counter_timer_cb, LV_EVENT_DELETE, NULL);
 
     time_obj = lv_label_create(cont);
     lv_obj_set_style_text_font(time_obj, font_small, 0);
     lv_obj_set_style_text_color(time_obj, lv_color_hex(0x8a86b8), 0);
     lv_label_set_text(time_obj, "0:00");
     lv_obj_set_grid_cell(time_obj, LV_GRID_ALIGN_END, 5, 1, LV_GRID_ALIGN_CENTER, 1, 1);
-    lv_obj_add_event(time_obj, del_counter_timer_cb, LV_EVENT_DELETE, NULL);
+    lv_obj_add_event_cb(time_obj, del_counter_timer_cb, LV_EVENT_DELETE, NULL);
 
     return cont;
 }
@@ -959,7 +959,7 @@ static lv_obj_t * album_image_create(lv_obj_t * parent)
     }
     lv_image_set_antialias(img, false);
     lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_event(img, album_gesture_event_cb, LV_EVENT_GESTURE, NULL);
+    lv_obj_add_event_cb(img, album_gesture_event_cb, LV_EVENT_GESTURE, NULL);
     lv_obj_remove_flag(img, LV_OBJ_FLAG_GESTURE_BUBBLE);
     lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
 

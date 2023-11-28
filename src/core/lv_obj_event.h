@@ -102,8 +102,8 @@ struct _lv_obj_t * lv_event_get_target_obj(lv_event_t * e);
  * @param event_cb  the new event function
  * @param           user_data custom data data will be available in `event_cb`
  */
-void lv_obj_add_event(struct _lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
-                      void * user_data);
+void lv_obj_add_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
+                         void * user_data);
 
 uint32_t lv_obj_get_event_count(struct _lv_obj_t * obj);
 

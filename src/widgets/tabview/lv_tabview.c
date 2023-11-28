@@ -78,7 +78,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     lv_obj_t * button = lv_button_create(tab_bar);
     lv_obj_set_flex_grow(button, 1);
     lv_obj_set_size(button, lv_pct(100), lv_pct(100));
-    lv_obj_add_event(button, button_clicked_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(button, button_clicked_event_cb, LV_EVENT_CLICKED, NULL);
     lv_group_t * g = lv_group_get_default();
     if(g) lv_group_add_obj(g, button);
 
@@ -265,7 +265,7 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     cont = lv_obj_create(obj);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
 
-    lv_obj_add_event(cont, cont_scroll_end_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
     lv_tabview_set_tab_position(obj, LV_DIR_TOP);
 

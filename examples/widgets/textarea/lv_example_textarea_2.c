@@ -14,7 +14,7 @@ void lv_example_textarea_2(void)
     lv_textarea_set_one_line(pwd_ta, true);
     lv_obj_set_width(pwd_ta, lv_pct(40));
     lv_obj_set_pos(pwd_ta, 5, 20);
-    lv_obj_add_event(pwd_ta, ta_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(pwd_ta, ta_event_cb, LV_EVENT_ALL, NULL);
 
     /*Create a label and position it above the text box*/
     lv_obj_t * pwd_label = lv_label_create(lv_screen_active());
@@ -26,7 +26,7 @@ void lv_example_textarea_2(void)
     lv_textarea_set_one_line(text_ta, true);
     lv_textarea_set_password_mode(text_ta, false);
     lv_obj_set_width(text_ta, lv_pct(40));
-    lv_obj_add_event(text_ta, ta_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(text_ta, ta_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_align(text_ta, LV_ALIGN_TOP_RIGHT, -5, 20);
 
     /*Create a label and position it above the text box*/

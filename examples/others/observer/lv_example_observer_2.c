@@ -99,7 +99,7 @@ static void ui_init(void)
     lv_textarea_set_one_line(ta, true);
     lv_textarea_set_password_mode(ta, true);
     lv_textarea_set_placeholder_text(ta, "The password is: hello");
-    lv_obj_add_event(ta, textarea_event_cb, LV_EVENT_READY, NULL);
+    lv_obj_add_event_cb(ta, textarea_event_cb, LV_EVENT_READY, NULL);
     lv_obj_bind_state_if_eq(ta, &auth_state_subject, LV_STATE_DISABLED, LOGGED_IN);
 
     lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
@@ -111,7 +111,7 @@ static void ui_init(void)
     /*Create a log out button which will be active only when logged in*/
     btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(btn, 220, 10);
-    lv_obj_add_event(btn, log_out_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, log_out_click_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_bind_state_if_not_eq(btn, &auth_state_subject, LV_STATE_DISABLED, LOGGED_IN);
 
     label = lv_label_create(btn);

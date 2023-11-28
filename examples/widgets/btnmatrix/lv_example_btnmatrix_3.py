@@ -49,7 +49,7 @@ buttonm = lv.buttonmatrix(lv.screen_active())
 buttonm.set_map(map)
 buttonm.add_style(style_bg, 0)
 buttonm.add_style(style_button, lv.PART.ITEMS)
-buttonm.add_event(event_cb, lv.EVENT.VALUE_CHANGED, None)
+buttonm.add_event_cb(event_cb, lv.EVENT.VALUE_CHANGED, None)
 buttonm.set_size(225, 35)
 
 # Allow selecting on one number at time

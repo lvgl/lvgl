@@ -539,7 +539,7 @@ static lv_obj_t * triangle_obj_create(lv_obj_t * parent, int32_t col, int32_t ro
     lv_obj_set_size(obj, DEF_WIDTH, DEF_HEIGHT);
     lv_obj_set_style_bg_color(obj, lv_color_hex3(0xff0), 0);
     lv_obj_set_style_opa(obj, opa_saved, 0);
-    lv_obj_add_event(obj, triangle_draw_event_cb, LV_EVENT_DRAW_MAIN, p);
+    lv_obj_add_event_cb(obj, triangle_draw_event_cb, LV_EVENT_DRAW_MAIN, p);
     add_to_cell(obj, col, row);
 
     return obj;

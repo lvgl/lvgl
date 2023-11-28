@@ -18,7 +18,7 @@ buttonm1.set_button_width(10, 2)        # Make "Action1" twice as wide as "Actio
 buttonm1.set_button_ctrl(10, lv.buttonmatrix.CTRL.CHECKABLE)
 buttonm1.set_button_ctrl(11, lv.buttonmatrix.CTRL.CHECKED)
 buttonm1.align(lv.ALIGN.CENTER, 0, 0)
-buttonm1.add_event(event_handler, lv.EVENT.ALL, None)
+buttonm1.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
 
 #endif

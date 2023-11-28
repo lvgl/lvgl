@@ -89,7 +89,7 @@ lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container
     lv_fragment_manager_create_obj(fragment->child_manager);
     if(states) {
         states->obj_created = true;
-        lv_obj_add_event(obj, cb_delete_assertion, LV_EVENT_DELETE, NULL);
+        lv_obj_add_event_cb(obj, cb_delete_assertion, LV_EVENT_DELETE, NULL);
     }
     if(cls->obj_created_cb) {
         cls->obj_created_cb(fragment, obj);

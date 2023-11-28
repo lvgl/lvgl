@@ -198,8 +198,8 @@ static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
     lcd->disp = disp;
     lv_display_set_draw_buffers(lcd->disp, draw_buf, draw_buf_2, buf_size, render_mode);
     lv_display_set_flush_cb(lcd->disp, flush_cb);
-    lv_display_add_event(lcd->disp, rounder_cb, LV_EVENT_INVALIDATE_AREA, lcd);
-    lv_display_add_event(lcd->disp, display_release_cb, LV_EVENT_DELETE, lcd->disp);
+    lv_display_add_event_cb(lcd->disp, rounder_cb, LV_EVENT_INVALIDATE_AREA, lcd);
+    lv_display_add_event_cb(lcd->disp, display_release_cb, LV_EVENT_DELETE, lcd->disp);
     lv_display_set_driver_data(lcd->disp, lcd);
     lv_display_set_user_data(lcd->disp, (void *)(uintptr_t)fd);
 

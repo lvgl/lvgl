@@ -156,15 +156,15 @@ static void text_input_create(lv_obj_t * parent)
     lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
 
-    lv_obj_add_event(ta1, ta_event_cb, LV_EVENT_ALL, kb);
-    lv_obj_add_event(ta2, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_add_event_cb(ta2, ta_event_cb, LV_EVENT_ALL, kb);
 }
 
 static void msgbox_create(void)
 {
     static const char * buttons[] = {"Ok", "Cancel", ""};
     lv_obj_t * mbox = lv_msgbox_create(NULL, "Hi", "Welcome to the keyboard and encoder demo", buttons, false);
-    lv_obj_add_event(mbox, msgbox_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(mbox, msgbox_event_cb, LV_EVENT_ALL, NULL);
     lv_group_focus_obj(lv_msgbox_get_buttons(mbox));
     lv_obj_add_state(lv_msgbox_get_buttons(mbox), LV_STATE_FOCUS_KEY);
     lv_group_focus_freeze(g, true);

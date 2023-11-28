@@ -25,7 +25,7 @@ void lv_example_textarea_1(void)
     lv_obj_t * ta = lv_textarea_create(lv_screen_active());
     lv_textarea_set_one_line(ta, true);
     lv_obj_align(ta, LV_ALIGN_TOP_MID, 0, 10);
-    lv_obj_add_event(ta, textarea_event_handler, LV_EVENT_READY, ta);
+    lv_obj_add_event_cb(ta, textarea_event_handler, LV_EVENT_READY, ta);
     lv_obj_add_state(ta, LV_STATE_FOCUSED); /*To be sure the cursor is visible*/
 
     static const char * btnm_map[] = {"1", "2", "3", "\n",
@@ -37,7 +37,7 @@ void lv_example_textarea_1(void)
     lv_obj_t * btnm = lv_buttonmatrix_create(lv_screen_active());
     lv_obj_set_size(btnm, 200, 150);
     lv_obj_align(btnm, LV_ALIGN_BOTTOM_MID, 0, -10);
-    lv_obj_add_event(btnm, btnm_event_handler, LV_EVENT_VALUE_CHANGED, ta);
+    lv_obj_add_event_cb(btnm, btnm_event_handler, LV_EVENT_VALUE_CHANGED, ta);
     lv_obj_remove_flag(btnm, LV_OBJ_FLAG_CLICK_FOCUSABLE); /*To keep the text area focused on button clicks*/
     lv_buttonmatrix_set_map(btnm, btnm_map);
 }

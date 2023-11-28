@@ -179,7 +179,7 @@ void lv_demo_widgets(void)
 
     tv = lv_tabview_create(lv_screen_active());
     lv_tabview_set_tab_bar_size(tv, tab_h);
-    lv_obj_add_event(tv, tabview_delete_event_cb, LV_EVENT_DELETE, NULL);
+    lv_obj_add_event_cb(tv, tabview_delete_event_cb, LV_EVENT_DELETE, NULL);
 
     lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
 
@@ -308,7 +308,7 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_t * user_name = lv_textarea_create(panel2);
     lv_textarea_set_one_line(user_name, true);
     lv_textarea_set_placeholder_text(user_name, "Your name");
-    lv_obj_add_event(user_name, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_add_event_cb(user_name, ta_event_cb, LV_EVENT_ALL, kb);
 
     lv_obj_t * password_label = lv_label_create(panel2);
     lv_label_set_text(password_label, "Password");
@@ -318,7 +318,7 @@ static void profile_create(lv_obj_t * parent)
     lv_textarea_set_one_line(password, true);
     lv_textarea_set_password_mode(password, true);
     lv_textarea_set_placeholder_text(password, "Min. 8 chars.");
-    lv_obj_add_event(password, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_add_event_cb(password, ta_event_cb, LV_EVENT_ALL, kb);
 
     lv_obj_t * gender_label = lv_label_create(panel2);
     lv_label_set_text(gender_label, "Gender");
@@ -333,7 +333,7 @@ static void profile_create(lv_obj_t * parent)
 
     lv_obj_t * birthdate = lv_textarea_create(panel2);
     lv_textarea_set_one_line(birthdate, true);
-    lv_obj_add_event(birthdate, birthday_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(birthdate, birthday_event_cb, LV_EVENT_ALL, NULL);
 
     /*Create the third panel*/
     lv_obj_t * panel3 = lv_obj_create(parent);
@@ -347,7 +347,7 @@ static void profile_create(lv_obj_t * parent)
 
     lv_obj_t * slider1 = lv_slider_create(panel3);
     lv_obj_set_width(slider1, LV_PCT(95));
-    lv_obj_add_event(slider1, slider_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(slider1, slider_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_add_flag(slider1, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     lv_obj_refresh_ext_draw_size(slider1);
 
@@ -597,7 +597,7 @@ static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title
     lv_chart_set_point_count(chart, 12);
     lv_obj_set_grid_cell(chart, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
     lv_obj_set_style_border_width(chart, 0, 0);
-    lv_obj_add_event(chart, chart_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(chart, chart_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_set_width(chart, lv_pct(200));
     lv_obj_set_style_radius(chart, 0, 0);
 
@@ -774,7 +774,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_center(arc);
 
     lv_timer_t * scale2_timer = lv_timer_create(scale2_timer_cb, 100, scale2);
-    lv_obj_add_event(scale2, delete_timer_event_cb, LV_EVENT_DELETE, scale2_timer);
+    lv_obj_add_event_cb(scale2, delete_timer_event_cb, LV_EVENT_DELETE, scale2_timer);
 
     /*Scale 3*/
     lv_scale_set_range(scale3, 10, 60);
@@ -820,7 +820,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_style_set_line_width(&scale3_section3_tick_style, 4);
     lv_style_set_line_color(&scale3_section3_tick_style, lv_palette_darken(LV_PALETTE_GREEN, 2));
 
-    lv_obj_add_event(scale3, scale3_delete_event_cb, LV_EVENT_DELETE, NULL);
+    lv_obj_add_event_cb(scale3, scale3_delete_event_cb, LV_EVENT_DELETE, NULL);
 
     lv_scale_section_t * section;
     section = lv_scale_add_section(scale3);
@@ -896,7 +896,7 @@ void shop_create(lv_obj_t * parent)
     lv_chart_set_type(chart3, LV_CHART_TYPE_BAR);
     lv_chart_set_div_line_count(chart3, 6, 0);
     lv_chart_set_point_count(chart3, 7);
-    lv_obj_add_event(chart3, shop_chart_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(chart3, shop_chart_event_cb, LV_EVENT_ALL, NULL);
 
     ser4 = lv_chart_add_series(chart3, lv_theme_get_color_primary(chart3), LV_CHART_AXIS_PRIMARY_Y);
     lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
@@ -1068,7 +1068,7 @@ static void color_changer_create(lv_obj_t * parent)
         lv_obj_set_style_radius(c, LV_RADIUS_CIRCLE, 0);
         lv_obj_set_style_opa(c, LV_OPA_TRANSP, 0);
         lv_obj_set_size(c, 20, 20);
-        lv_obj_add_event(c, color_event_cb, LV_EVENT_ALL, &palette[i]);
+        lv_obj_add_event_cb(c, color_event_cb, LV_EVENT_ALL, &palette[i]);
         lv_obj_remove_flag(c, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     }
 
@@ -1077,7 +1077,7 @@ static void color_changer_create(lv_obj_t * parent)
     lv_obj_set_style_bg_color(btn, lv_color_white(), LV_STATE_CHECKED);
     lv_obj_set_style_pad_all(btn, 10, 0);
     lv_obj_set_style_radius(btn, LV_RADIUS_CIRCLE, 0);
-    lv_obj_add_event(btn, color_changer_event_cb, LV_EVENT_ALL, color_cont);
+    lv_obj_add_event_cb(btn, color_changer_event_cb, LV_EVENT_ALL, color_cont);
     lv_obj_set_style_shadow_width(btn, 0, 0);
     lv_obj_set_style_bg_image_src(btn, LV_SYMBOL_TINT, 0);
 
@@ -1322,7 +1322,7 @@ static void birthday_event_cb(lv_event_t * e)
                 else  lv_obj_set_size(calendar, 300, 330);
                 lv_calendar_set_showed_date(calendar, 1990, 01);
                 lv_obj_align(calendar, LV_ALIGN_CENTER, 0, 30);
-                lv_obj_add_event(calendar, calendar_event_cb, LV_EVENT_ALL, ta);
+                lv_obj_add_event_cb(calendar, calendar_event_cb, LV_EVENT_ALL, ta);
 
                 lv_calendar_header_dropdown_create(calendar);
             }

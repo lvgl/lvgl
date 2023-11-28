@@ -57,13 +57,13 @@ void lv_example_fragment_2(void)
 
     lv_fragment_manager_t * manager = lv_fragment_manager_create(NULL);
     /* Clean up the fragment manager before objects in containers got deleted */
-    lv_obj_add_event(root, sample_container_delete, LV_EVENT_DELETE, manager);
+    lv_obj_add_event_cb(root, sample_container_delete, LV_EVENT_DELETE, manager);
 
     int depth = 0;
     lv_fragment_t * fragment = lv_fragment_create(&sample_cls, &depth);
     lv_fragment_manager_push(manager, fragment, &container);
-    lv_obj_add_event(push_btn, sample_push_click, LV_EVENT_CLICKED, manager);
-    lv_obj_add_event(pop_btn, sample_pop_click, LV_EVENT_CLICKED, manager);
+    lv_obj_add_event_cb(push_btn, sample_push_click, LV_EVENT_CLICKED, manager);
+    lv_obj_add_event_cb(pop_btn, sample_pop_click, LV_EVENT_CLICKED, manager);
 }
 
 static void sample_fragment_ctor(lv_fragment_t * self, void * args)
@@ -91,7 +91,7 @@ static lv_obj_t * sample_fragment_create_obj(lv_fragment_t * self, lv_obj_t * pa
     lv_obj_t * inc_btn = lv_button_create(content);
     lv_obj_t * inc_label = lv_label_create(inc_btn);
     lv_label_set_text(inc_label, "+1");
-    lv_obj_add_event(inc_btn, sample_fragment_inc_click, LV_EVENT_CLICKED, fragment);
+    lv_obj_add_event_cb(inc_btn, sample_fragment_inc_click, LV_EVENT_CLICKED, fragment);
 
     return content;
 }

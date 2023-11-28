@@ -87,7 +87,7 @@ static lv_obj_t * switch_create(lv_obj_t * parent, const char * title, lv_obj_fl
     lv_obj_set_flex_grow(label, 1);
 
     lv_obj_t * sw = lv_switch_create(cont);
-    lv_obj_add_event(sw, generic_switch_event_cb, LV_EVENT_VALUE_CHANGED, (void *)((lv_uintptr_t) flag));
+    lv_obj_add_event_cb(sw, generic_switch_event_cb, LV_EVENT_VALUE_CHANGED, (void *)((lv_uintptr_t) flag));
     if(en) {
         lv_obj_add_state(sw, LV_STATE_CHECKED);
         lv_obj_add_flag(list, flag);

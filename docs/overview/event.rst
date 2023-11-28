@@ -21,7 +21,7 @@ In practice, it looks like this:
 .. code:: c
 
    lv_obj_t * btn = lv_btn_create(lv_screen_active());
-   lv_obj_add_event(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
+   lv_obj_add_event_cb(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
 
    ...
 
@@ -42,17 +42,17 @@ More events can be added to an object, like this:
 
 .. code:: c
 
-   lv_obj_add_event(obj, my_event_cb_1, LV_EVENT_CLICKED, NULL);
-   lv_obj_add_event(obj, my_event_cb_2, LV_EVENT_PRESSED, NULL);
-   lv_obj_add_event(obj, my_event_cb_3, LV_EVENT_ALL, NULL);       /*No filtering, receive all events*/
+   lv_obj_add_event_cb(obj, my_event_cb_1, LV_EVENT_CLICKED, NULL);
+   lv_obj_add_event_cb(obj, my_event_cb_2, LV_EVENT_PRESSED, NULL);
+   lv_obj_add_event_cb(obj, my_event_cb_3, LV_EVENT_ALL, NULL);       /*No filtering, receive all events*/
 
 Even the same event callback can be used on an object with different
 ``user_data``. For example:
 
 .. code:: c
 
-   lv_obj_add_event(obj, increment_on_click, LV_EVENT_CLICKED, &num1);
-   lv_obj_add_event(obj, increment_on_click, LV_EVENT_CLICKED, &num2);
+   lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num1);
+   lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num2);
 
 The events will be called in the order as they were added.
 

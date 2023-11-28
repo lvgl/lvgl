@@ -198,7 +198,7 @@ be stored in display object.
 Events
 ******
 
-:cpp:expr:`lv_disp_add_event(disp, event_cb, LV_DISP_EVENT_..., user_data)` adds
+:cpp:expr:`lv_disp_add_event_cb(disp, event_cb, LV_DISP_EVENT_..., user_data)` adds
 an event handler to a display. The following events are sent:
 
 - :cpp:enumerator:`LV_DISP_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw).
