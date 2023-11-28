@@ -77,6 +77,7 @@
 #define LV_USE_SYSMON           1
 #define LV_USE_SNAPSHOT         1
 #define LV_USE_THORVG_INTERNAL  1
+#define LV_USE_LZ4_INTERNAL     1
 #define LV_USE_VECTOR_GRAPHIC   1
 
 #define LV_BUILD_EXAMPLES       1
