@@ -596,9 +596,8 @@ static void refr_area(const lv_area_t * area_p)
     lv_layer_t * layer = disp_refr->layer_head;
     layer->draw_buf = disp_refr->buf_act;
 
-#if LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
+#if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer->matrix);
-    layer->opa = LV_OPA_COVER;
 #endif
 
     /*With full refresh just redraw directly into the buffer*/
@@ -887,114 +886,110 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
-#if LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
-    LV_UNUSED(layer_get_area);
-    LV_UNUSED(alpha_test_area_on_obj);
-
-    lv_opa_t ori_opa = layer->opa;
-    lv_opa_t opa = lv_obj_get_style_opa_layered(obj, 0);
-    layer->opa = LV_OPA_MIX2(ori_opa, opa);
-
-    lv_matrix_t ori_matrix = layer->matrix;
-    lv_matrix_t obj_matrix;
-    lv_matrix_identity(&obj_matrix);
-
-    int32_t pivot_x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0);
-    int32_t pivot_y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0);
-    int32_t rotation = lv_obj_get_style_transform_rotation(obj, 0);
-    int32_t scale_x = lv_obj_get_style_transform_scale_x(obj, 0);
-    int32_t scale_y = lv_obj_get_style_transform_scale_y(obj, 0);
-
-    /* generate the obj matrix */
-    lv_matrix_translate(&obj_matrix, pivot_x, pivot_y);
-    if(rotation != 0) {
-        lv_matrix_rotate(&obj_matrix, rotation * 0.1f);
-    }
-    if(scale_x != LV_SCALE_NONE || scale_y != LV_SCALE_NONE) {
-        lv_matrix_scale(
-            &obj_matrix,
-            (float)scale_x / LV_SCALE_NONE,
-            (float)scale_y / LV_SCALE_NONE
-        );
-    }
-    lv_matrix_translate(&obj_matrix, -pivot_x, -pivot_y);
-
-    /* apply the obj matrix */
-    lv_matrix_multiply(&layer->matrix, &obj_matrix);
-
-    /* redraw obj */
-    lv_obj_redraw(layer, obj);
-
-    /* restore original matrix and opa */
-    layer->opa = ori_opa;
-    layer->matrix = ori_matrix;
-#else
     lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
     if(layer_type == LV_LAYER_TYPE_NONE) {
         lv_obj_redraw(layer, obj);
+        return;
     }
-    else {
-        lv_opa_t opa = lv_obj_get_style_opa_layered(obj, 0);
-        if(opa < LV_OPA_MIN) return;
 
-        lv_area_t layer_area_full;
-        lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full);
-        if(res != LV_RESULT_OK) return;
+    lv_opa_t opa = lv_obj_get_style_opa_layered(obj, 0);
+    if(opa < LV_OPA_MIN) return;
 
-        /*Simple layers can be subdivied into smaller layers*/
-        uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
-        uint32_t max_argb_row_height = lv_area_get_height(&layer_area_full);
-        if(layer_type == LV_LAYER_TYPE_SIMPLE) {
-            int32_t w = lv_area_get_width(&layer_area_full);
-            uint8_t px_size = lv_color_format_get_size(disp_refr->color_format);
-            max_rgb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / px_size;
-            max_argb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color32_t);
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /*If the layer opa is opaque, it will be rendered using the matrix method.*/
+    if(opa >= LV_OPA_MAX) {
+        lv_matrix_t ori_matrix = layer->matrix;
+        lv_matrix_t obj_matrix;
+        lv_matrix_identity(&obj_matrix);
+
+        int32_t pivot_x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0);
+        int32_t pivot_y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0);
+        int32_t rotation = lv_obj_get_style_transform_rotation(obj, 0);
+        int32_t scale_x = lv_obj_get_style_transform_scale_x(obj, 0);
+        int32_t scale_y = lv_obj_get_style_transform_scale_y(obj, 0);
+
+        /* generate the obj matrix */
+        lv_matrix_translate(&obj_matrix, pivot_x, pivot_y);
+        if(rotation != 0) {
+            lv_matrix_rotate(&obj_matrix, rotation * 0.1f);
         }
+        if(scale_x != LV_SCALE_NONE || scale_y != LV_SCALE_NONE) {
+            lv_matrix_scale(
+                &obj_matrix,
+                (float)scale_x / LV_SCALE_NONE,
+                (float)scale_y / LV_SCALE_NONE
+            );
+        }
+        lv_matrix_translate(&obj_matrix, -pivot_x, -pivot_y);
 
-        lv_area_t layer_area_act;
-        layer_area_act.x1 = layer_area_full.x1;
-        layer_area_act.x2 = layer_area_full.x2;
-        layer_area_act.y1 = layer_area_full.y1;
-        layer_area_act.y2 = layer_area_full.y1;
+        /* apply the obj matrix */
+        lv_matrix_multiply(&layer->matrix, &obj_matrix);
 
-        while(layer_area_act.y2 < layer_area_full.y2) {
-            /* Test with an RGB layer size (which is larger than the ARGB layer size)
-             * If it really doesn't need alpha use it. Else switch to the ARGB size*/
-            layer_area_act.y2 = layer_area_act.y1 + max_rgb_row_height - 1;
+        /* redraw obj */
+        lv_obj_redraw(layer, obj);
+
+        /* restore original matrix */
+        layer->matrix = ori_matrix;
+        return;
+    }
+#endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
+
+    lv_area_t layer_area_full;
+    lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full);
+    if(res != LV_RESULT_OK) return;
+
+    /*Simple layers can be subdivied into smaller layers*/
+    uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
+    uint32_t max_argb_row_height = lv_area_get_height(&layer_area_full);
+    if(layer_type == LV_LAYER_TYPE_SIMPLE) {
+        int32_t w = lv_area_get_width(&layer_area_full);
+        uint8_t px_size = lv_color_format_get_size(disp_refr->color_format);
+        max_rgb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / px_size;
+        max_argb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color32_t);
+    }
+
+    lv_area_t layer_area_act;
+    layer_area_act.x1 = layer_area_full.x1;
+    layer_area_act.x2 = layer_area_full.x2;
+    layer_area_act.y1 = layer_area_full.y1;
+    layer_area_act.y2 = layer_area_full.y1;
+
+    while(layer_area_act.y2 < layer_area_full.y2) {
+        /* Test with an RGB layer size (which is larger than the ARGB layer size)
+         * If it really doesn't need alpha use it. Else switch to the ARGB size*/
+        layer_area_act.y2 = layer_area_act.y1 + max_rgb_row_height - 1;
+        if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
+        bool area_need_alpha = alpha_test_area_on_obj(obj, &layer_area_act);
+        if(area_need_alpha) {
+            layer_area_act.y2 = layer_area_act.y1 + max_argb_row_height - 1;
             if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
-            bool area_need_alpha = alpha_test_area_on_obj(obj, &layer_area_act);
-            if(area_need_alpha) {
-                layer_area_act.y2 = layer_area_act.y1 + max_argb_row_height - 1;
-                if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
-            }
-
-            lv_layer_t * new_layer = lv_draw_layer_create(layer,
-                                                          area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE, &layer_area_act);
-            lv_obj_redraw(new_layer, obj);
-
-            lv_draw_image_dsc_t layer_draw_dsc;
-            lv_draw_image_dsc_init(&layer_draw_dsc);
-            layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->buf_area.x1;
-            layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->buf_area.y1;
-
-            layer_draw_dsc.opa = opa;
-            layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, 0);
-            while(layer_draw_dsc.rotation > 3600) layer_draw_dsc.rotation -= 3600;
-            while(layer_draw_dsc.rotation < 0) layer_draw_dsc.rotation += 3600;
-            layer_draw_dsc.scale_x = lv_obj_get_style_transform_scale_x(obj, 0);
-            layer_draw_dsc.scale_y = lv_obj_get_style_transform_scale_y(obj, 0);
-            layer_draw_dsc.skew_x = lv_obj_get_style_transform_skew_x(obj, 0);
-            layer_draw_dsc.skew_y = lv_obj_get_style_transform_skew_y(obj, 0);
-            layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
-            layer_draw_dsc.antialias = disp_refr->antialiasing;
-            layer_draw_dsc.src = new_layer;
-
-            lv_draw_layer(layer, &layer_draw_dsc, &layer_area_act);
-
-            layer_area_act.y1 = layer_area_act.y2 + 1;
         }
+
+        lv_layer_t * new_layer = lv_draw_layer_create(layer,
+                                                      area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE, &layer_area_act);
+        lv_obj_redraw(new_layer, obj);
+
+        lv_draw_image_dsc_t layer_draw_dsc;
+        lv_draw_image_dsc_init(&layer_draw_dsc);
+        layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->buf_area.x1;
+        layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->buf_area.y1;
+
+        layer_draw_dsc.opa = opa;
+        layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, 0);
+        while(layer_draw_dsc.rotation > 3600) layer_draw_dsc.rotation -= 3600;
+        while(layer_draw_dsc.rotation < 0) layer_draw_dsc.rotation += 3600;
+        layer_draw_dsc.scale_x = lv_obj_get_style_transform_scale_x(obj, 0);
+        layer_draw_dsc.scale_y = lv_obj_get_style_transform_scale_y(obj, 0);
+        layer_draw_dsc.skew_x = lv_obj_get_style_transform_skew_x(obj, 0);
+        layer_draw_dsc.skew_y = lv_obj_get_style_transform_skew_y(obj, 0);
+        layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
+        layer_draw_dsc.antialias = disp_refr->antialiasing;
+        layer_draw_dsc.src = new_layer;
+
+        lv_draw_layer(layer, &layer_draw_dsc, &layer_area_act);
+
+        layer_area_act.y1 = layer_area_act.y2 + 1;
     }
-#endif /*LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX*/
 }
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)

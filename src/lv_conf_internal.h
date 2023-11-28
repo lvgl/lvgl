@@ -244,15 +244,15 @@
     #endif
 #endif
 
-/*Using global transparency and matrix draw mode.
+/*Using matrix for transformations.
  *Requirements:
     `LV_USE_MATRIX = 1`.
-    The rendering engine needs to support global alpha and 2.5D transformations.*/
-#ifndef LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
-    #ifdef CONFIG_LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
-        #define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX CONFIG_LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
+    The rendering engine needs to support 2.5D transformations.*/
+#ifndef LV_DRAW_TRANSFORM_USE_MATRIX
+    #ifdef CONFIG_LV_DRAW_TRANSFORM_USE_MATRIX
+        #define LV_DRAW_TRANSFORM_USE_MATRIX CONFIG_LV_DRAW_TRANSFORM_USE_MATRIX
     #else
-        #define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX       0
+        #define LV_DRAW_TRANSFORM_USE_MATRIX            0
     #endif
 #endif
 

@@ -166,12 +166,12 @@ menu "LVGL configuration"
 			help
 				Align the start address of draw_buf addresses to this bytes.
 
-			config LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
-				bool "Using global transparency and matrix draw mode"
+			config LV_DRAW_TRANSFORM_USE_MATRIX
+				bool "Using matrix for transformations"
 				default n
 				depends on LV_USE_MATRIX
 				help
-					Requirements: The rendering engine needs to support global alpha and 2.5D transformations.
+					Requirements: The rendering engine needs to support 2.5D transformations.
 
 			config LV_USE_OS
 				int "Default operating system to use"
