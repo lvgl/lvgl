@@ -51,11 +51,12 @@ extern "C" {
 #define LV_GC_ROOT(x) MP_STATE_PORT(x)
 #endif
 
+#ifndef __ASSEMBLY__
 void lv_test_assert_fail(void);
 #define LV_ASSERT_HANDLER lv_test_assert_fail();
 
 typedef void * lv_user_data_t;
-
+#endif
 /***********************
  * TEST CONFIGS
  ***********************/
