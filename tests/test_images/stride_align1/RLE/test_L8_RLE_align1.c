@@ -251,6 +251,7 @@ uint8_t test_L8_RLE_align1_map[] = {
 };
 
 const lv_img_dsc_t test_L8_RLE_align1 = {
+  .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_L8,
   .header.flags = 0 | LV_IMAGE_FLAGS_COMPRESSED,
   .header.w = 71,
