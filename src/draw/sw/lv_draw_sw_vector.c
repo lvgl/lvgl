@@ -233,7 +233,7 @@ static void _set_paint_stroke(Tvg_Paint * obj, const lv_vector_stroke_dsc_t * ds
         _lv_color_to_tvg(&c, &dsc->color, dsc->opa);
         tvg_shape_set_stroke_color(obj, c.r, c.g, c.b, c.a);
     }
-    else {   // gradient
+    else {   /*gradient*/
         _set_paint_stroke_gradient(obj, &dsc->gradient, &dsc->matrix);
     }
 
@@ -367,7 +367,7 @@ static Tvg_Blend_Method _lv_blend_to_tvg(lv_vector_blend_t blend)
         case LV_VECTOR_BLEND_DST_OVER:
         case LV_VECTOR_BLEND_DST_IN:
         case LV_VECTOR_BLEND_SUBTRACTIVE:
-        // not support yet.
+        /*not support yet.*/
         default:
             return TVG_BLEND_METHOD_NORMAL;
     }
@@ -384,7 +384,7 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
 
     Tvg_Paint * obj = tvg_shape_new();
 
-    if(!path) {  // clear
+    if(!path) {  /*clear*/
         _tvg_rect rc;
         _lv_area_to_tvg(&rc, &dsc->scissor_area);
 

@@ -2470,7 +2470,7 @@
                 #define LV_IME_PINYIN_K9_CAND_TEXT_NUM 3
             #endif
         #endif
-    #endif // LV_IME_PINYIN_USE_K9_MODE
+    #endif /*LV_IME_PINYIN_USE_K9_MODE*/
 #endif
 
 /*1: Enable file explorer*/

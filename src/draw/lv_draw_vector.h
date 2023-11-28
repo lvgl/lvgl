@@ -147,7 +147,7 @@ typedef struct {
 
 typedef struct {
     lv_draw_dsc_base_t base;
-    lv_ll_t * task_list; // draw task list.
+    lv_ll_t * task_list; /*draw task list.*/
 } lv_draw_vector_task_dsc_t;
 
 typedef struct {

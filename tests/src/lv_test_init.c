@@ -60,7 +60,7 @@ static void dummy_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t 
 
 void lv_test_assert_fail(void)
 {
-    // Handle error on test
+    /*Handle error on test*/
 }
 
 #endif

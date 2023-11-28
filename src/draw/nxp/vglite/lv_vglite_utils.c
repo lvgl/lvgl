@@ -225,7 +225,7 @@ uint8_t vglite_get_px_size(lv_color_format_t cf)
 
 uint8_t vglite_get_alignment(lv_color_format_t cf)
 {
-    uint8_t align_bytes = LV_COLOR_DEPTH / 8 * 16; //16 pixels
+    uint8_t align_bytes = LV_COLOR_DEPTH / 8 * 16; /*16 pixels*/
 
     switch(cf) {
         case LV_COLOR_FORMAT_I1:

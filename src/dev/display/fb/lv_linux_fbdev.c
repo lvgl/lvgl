@@ -174,7 +174,7 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     LV_LOG_INFO("%dx%d, %dbpp", dsc->vinfo.xres, dsc->vinfo.yres, dsc->vinfo.bits_per_pixel);
 
     /* Figure out the size of the screen in bytes*/
-    dsc->screensize =  dsc->finfo.smem_len; //finfo.line_length * vinfo.yres;
+    dsc->screensize =  dsc->finfo.smem_len;/*finfo.line_length * vinfo.yres;*/
 
     /* Map the device to memory*/
     dsc->fbp = (char *)mmap(0, dsc->screensize, PROT_READ | PROT_WRITE, MAP_SHARED, dsc->fbfd, 0);

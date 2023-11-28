@@ -470,7 +470,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     char * buf_p = textarea_txt;
 
     uint32_t cur_shift_left = 0;
-    if(spinbox->range_min < 0) {  // hide sign if there are only positive values
+    if(spinbox->range_min < 0) {  /*hide sign if there are only positive values*/
         /*Add the sign*/
         (*buf_p) = spinbox->value >= 0 ? '+' : '-';
         buf_p++;
