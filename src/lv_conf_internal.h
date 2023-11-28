@@ -2264,14 +2264,10 @@
 
 /*1: Enable system monitor component*/
 #ifndef LV_USE_SYSMON
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_SYSMON
-            #define LV_USE_SYSMON CONFIG_LV_USE_SYSMON
-        #else
-            #define LV_USE_SYSMON 0
-        #endif
+    #ifdef CONFIG_LV_USE_SYSMON
+        #define LV_USE_SYSMON CONFIG_LV_USE_SYSMON
     #else
-        #define LV_USE_SYSMON 1
+        #define LV_USE_SYSMON   (LV_USE_MEM_MONITOR | LV_USE_PERF_MONITOR)
     #endif
 #endif
 
@@ -2410,10 +2406,14 @@
 
 /*1: Enable an observer pattern implementation*/
 #ifndef LV_USE_OBSERVER
-    #ifdef CONFIG_LV_USE_OBSERVER
-        #define LV_USE_OBSERVER CONFIG_LV_USE_OBSERVER
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_OBSERVER
+            #define LV_USE_OBSERVER CONFIG_LV_USE_OBSERVER
+        #else
+            #define LV_USE_OBSERVER 0
+        #endif
     #else
-        #define LV_USE_OBSERVER 0
+        #define LV_USE_OBSERVER 1
     #endif
 #endif
 
