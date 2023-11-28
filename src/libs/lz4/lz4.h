@@ -46,10 +46,7 @@ extern "C" {
 #define LZ4_FREESTANDING    1
 #define LZ4_memset  lv_memset
 #define LZ4_memcpy  lv_memcpy
-#define LZ4_memmove memmove
-/**
- * @todo add LZ4_memmove
- */
+#define LZ4_memmove lv_memmove
 
 #ifndef LZ4_H_2983827168210
 #define LZ4_H_2983827168210
