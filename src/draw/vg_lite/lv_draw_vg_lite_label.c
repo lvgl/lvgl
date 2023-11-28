@@ -243,16 +243,24 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
 
     lv_vg_lite_path_t * outline = (lv_vg_lite_path_t *)dsc->glyph_data;
     lv_point_t pos = {dsc->letter_coords->x1, dsc->letter_coords->y1};
+    /* scale size */
+    float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
 
     /* calc convert matrix */
-    float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
+    /* matrix for drawing, different from matrix for calculating the bonding box */
+    vg_lite_matrix_t draw_matrix;
+    vg_lite_identity(&draw_matrix);
+
+    lv_vg_lite_matrix_multiply(&draw_matrix, &u->global_matrix);
+
     /* convert to vg-lite coordinate */
+    vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &draw_matrix);
     vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
 
-    /* scale size */
+    vg_lite_scale(scale, scale, &draw_matrix);
     vg_lite_scale(scale, scale, &matrix);
 
     /* calc inverse matrix */
@@ -272,20 +280,16 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     /* Since the font uses Cartesian coordinates, the y coordinates need to be reversed */
     lv_vg_lite_path_set_bonding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
 
-    /* Move to the position relative to the first address of the buffer */
-    lv_layer_t * layer = u->base_unit.target_layer;
-    vg_lite_translate(-layer->buf_area.x1 / scale, layer->buf_area.y1 / scale, &matrix);
-
     vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(outline);
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
-    LV_VG_LITE_ASSERT_MATRIX(&matrix);
+    LV_VG_LITE_ASSERT_MATRIX(&draw_matrix);
 
     LV_PROFILER_BEGIN_TAG("vg_lite_draw");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
-                               &matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
+                               &draw_matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
     LV_PROFILER_END_TAG("vg_lite_draw");
 
     /* Flush in time to avoid accumulation of drawing commands */
