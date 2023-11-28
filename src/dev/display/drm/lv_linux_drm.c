@@ -176,7 +176,7 @@ static uint32_t get_plane_property_id(drm_dev_t * drm_dev, const char * name)
     LV_LOG_TRACE("Find plane property: %s", name);
 
     for(i = 0; i < drm_dev->count_plane_props; ++i)
-        if(!strcmp(drm_dev->plane_props[i]->name, name))
+        if(!lv_strcmp(drm_dev->plane_props[i]->name, name))
             return drm_dev->plane_props[i]->prop_id;
 
     LV_LOG_TRACE("Unknown plane property: %s", name);
@@ -191,7 +191,7 @@ static uint32_t get_crtc_property_id(drm_dev_t * drm_dev, const char * name)
     LV_LOG_TRACE("Find crtc property: %s", name);
 
     for(i = 0; i < drm_dev->count_crtc_props; ++i)
-        if(!strcmp(drm_dev->crtc_props[i]->name, name))
+        if(!lv_strcmp(drm_dev->crtc_props[i]->name, name))
             return drm_dev->crtc_props[i]->prop_id;
 
     LV_LOG_TRACE("Unknown crtc property: %s", name);
@@ -206,7 +206,7 @@ static uint32_t get_conn_property_id(drm_dev_t * drm_dev, const char * name)
     LV_LOG_TRACE("Find conn property: %s", name);
 
     for(i = 0; i < drm_dev->count_conn_props; ++i)
-        if(!strcmp(drm_dev->conn_props[i]->name, name))
+        if(!lv_strcmp(drm_dev->conn_props[i]->name, name))
             return drm_dev->conn_props[i]->prop_id;
 
     LV_LOG_TRACE("Unknown conn property: %s", name);

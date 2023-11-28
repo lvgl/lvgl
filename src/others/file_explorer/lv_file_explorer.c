@@ -430,22 +430,22 @@ static void quick_access_event_handler(lv_event_t * e)
         lv_obj_t * label = lv_obj_get_child(btn, -1);
         char * label_text = lv_label_get_text(label);
 
-        if((strcmp(label_text, LV_SYMBOL_HOME " HOME") == 0)) {
+        if((lv_strcmp(label_text, LV_SYMBOL_HOME " HOME") == 0)) {
             path = &(explorer->home_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_VIDEO " Video") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_VIDEO " Video") == 0)) {
             path = &(explorer->video_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_IMAGE " Pictures") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_IMAGE " Pictures") == 0)) {
             path = &(explorer->pictures_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_AUDIO " Music") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_AUDIO " Music") == 0)) {
             path = &(explorer->music_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_FILE "  Documents") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_FILE "  Documents") == 0)) {
             path = &(explorer->docs_dir);
         }
-        else if((strcmp(label_text, LV_SYMBOL_DRIVE " File System") == 0)) {
+        else if((lv_strcmp(label_text, LV_SYMBOL_DRIVE " File System") == 0)) {
             path = &(explorer->fs_dir);
         }
 
@@ -489,16 +489,16 @@ static void browser_file_event_handler(lv_event_t * e)
         str_fn = lv_table_get_cell_value(explorer->file_table, row, col);
 
         str_fn = str_fn + 5;
-        if((strcmp(str_fn, ".") == 0))  return;
+        if((lv_strcmp(str_fn, ".") == 0))  return;
 
-        if((strcmp(str_fn, "..") == 0) && (lv_strlen(explorer->current_path) > 3)) {
+        if((lv_strcmp(str_fn, "..") == 0) && (lv_strlen(explorer->current_path) > 3)) {
             strip_ext(explorer->current_path);
             /*Remove the last '/' character*/
             strip_ext(explorer->current_path);
             lv_snprintf((char *)file_name, sizeof(file_name), "%s", explorer->current_path);
         }
         else {
-            if(strcmp(str_fn, "..") != 0) {
+            if(lv_strcmp(str_fn, "..") != 0) {
                 lv_snprintf((char *)file_name, sizeof(file_name), "%s%s", explorer->current_path, str_fn);
             }
         }
@@ -509,7 +509,7 @@ static void browser_file_event_handler(lv_event_t * e)
             show_dir(obj, (char *)file_name);
         }
         else {
-            if(strcmp(str_fn, "..") != 0) {
+            if(lv_strcmp(str_fn, "..") != 0) {
                 explorer->sel_fn = str_fn;
                 lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             }
@@ -668,9 +668,9 @@ static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
     int16_t gt = hi;
     const char * v = lv_table_get_cell_value(tb, lo, 1);
     while(i <= gt) {
-        if(strcmp(lv_table_get_cell_value(tb, i, 1), v) < 0)
+        if(lv_strcmp(lv_table_get_cell_value(tb, i, 1), v) < 0)
             exch_table_item(tb, lt++, i++);
-        else if(strcmp(lv_table_get_cell_value(tb, i, 1), v) > 0)
+        else if(lv_strcmp(lv_table_get_cell_value(tb, i, 1), v) > 0)
             exch_table_item(tb, i, gt--);
         else
             i++;

@@ -113,8 +113,8 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
             return LV_RESULT_INVALID;
         }
 
-        bool is_jpeg_ext = (strcmp(lv_fs_get_ext(fn), "jpg") == 0)
-                           || (strcmp(lv_fs_get_ext(fn), "jpeg") == 0);
+        bool is_jpeg_ext = (lv_strcmp(lv_fs_get_ext(fn), "jpg") == 0)
+                           || (lv_strcmp(lv_fs_get_ext(fn), "jpeg") == 0);
 
         if(!IS_JPEG_SIGNATURE(jpg_signature)) {
             if(is_jpeg_ext) {

@@ -331,33 +331,33 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
     const char * txt = lv_buttonmatrix_get_button_text(obj, btn_id);
     if(txt == NULL) return;
 
-    if(strcmp(txt, "abc") == 0) {
+    if(lv_strcmp(txt, "abc") == 0) {
         keyboard->mode = LV_KEYBOARD_MODE_TEXT_LOWER;
         lv_buttonmatrix_set_map(obj, kb_map[LV_KEYBOARD_MODE_TEXT_LOWER]);
         lv_keyboard_update_ctrl_map(obj);
         return;
     }
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-    else if(strcmp(txt, "أب") == 0) {
+    else if(lv_strcmp(txt, "أب") == 0) {
         keyboard->mode = LV_KEYBOARD_MODE_TEXT_ARABIC;
         lv_buttonmatrix_set_map(obj, kb_map[LV_KEYBOARD_MODE_TEXT_ARABIC]);
         lv_keyboard_update_ctrl_map(obj);
         return;
     }
 #endif
-    else if(strcmp(txt, "ABC") == 0) {
+    else if(lv_strcmp(txt, "ABC") == 0) {
         keyboard->mode = LV_KEYBOARD_MODE_TEXT_UPPER;
         lv_buttonmatrix_set_map(obj, kb_map[LV_KEYBOARD_MODE_TEXT_UPPER]);
         lv_keyboard_update_ctrl_map(obj);
         return;
     }
-    else if(strcmp(txt, "1#") == 0) {
+    else if(lv_strcmp(txt, "1#") == 0) {
         keyboard->mode = LV_KEYBOARD_MODE_SPECIAL;
         lv_buttonmatrix_set_map(obj, kb_map[LV_KEYBOARD_MODE_SPECIAL]);
         lv_keyboard_update_ctrl_map(obj);
         return;
     }
-    else if(strcmp(txt, LV_SYMBOL_CLOSE) == 0 || strcmp(txt, LV_SYMBOL_KEYBOARD) == 0) {
+    else if(lv_strcmp(txt, LV_SYMBOL_CLOSE) == 0 || lv_strcmp(txt, LV_SYMBOL_KEYBOARD) == 0) {
         lv_result_t res = lv_obj_send_event(obj, LV_EVENT_CANCEL, NULL);
         if(res != LV_RESULT_OK) return;
 
@@ -367,7 +367,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
         }
         return;
     }
-    else if(strcmp(txt, LV_SYMBOL_OK) == 0) {
+    else if(lv_strcmp(txt, LV_SYMBOL_OK) == 0) {
         lv_result_t res = lv_obj_send_event(obj, LV_EVENT_READY, NULL);
         if(res != LV_RESULT_OK) return;
 
@@ -381,23 +381,23 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
     /*Add the characters to the text area if set*/
     if(keyboard->ta == NULL) return;
 
-    if(strcmp(txt, "Enter") == 0 || strcmp(txt, LV_SYMBOL_NEW_LINE) == 0) {
+    if(lv_strcmp(txt, "Enter") == 0 || lv_strcmp(txt, LV_SYMBOL_NEW_LINE) == 0) {
         lv_textarea_add_char(keyboard->ta, '\n');
         if(lv_textarea_get_one_line(keyboard->ta)) {
             lv_result_t res = lv_obj_send_event(keyboard->ta, LV_EVENT_READY, NULL);
             if(res != LV_RESULT_OK) return;
         }
     }
-    else if(strcmp(txt, LV_SYMBOL_LEFT) == 0) {
+    else if(lv_strcmp(txt, LV_SYMBOL_LEFT) == 0) {
         lv_textarea_cursor_left(keyboard->ta);
     }
-    else if(strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
+    else if(lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
         lv_textarea_cursor_right(keyboard->ta);
     }
-    else if(strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
+    else if(lv_strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
         lv_textarea_delete_char(keyboard->ta);
     }
-    else if(strcmp(txt, "+/-") == 0) {
+    else if(lv_strcmp(txt, "+/-") == 0) {
         uint32_t cur        = lv_textarea_get_cursor_pos(keyboard->ta);
         const char * ta_txt = lv_textarea_get_text(keyboard->ta);
         if(ta_txt[0] == '-') {

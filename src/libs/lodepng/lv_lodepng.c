@@ -90,7 +90,7 @@ static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void
     /*If it's a PNG file...*/
     if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
-        if(strcmp(lv_fs_get_ext(fn), "png") == 0) {              /*Check the extension*/
+        if(lv_strcmp(lv_fs_get_ext(fn), "png") == 0) {              /*Check the extension*/
 
             /* Read the width and height from the file. They have a constant location:
              * [16..23]: width
@@ -168,7 +168,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     size_t png_data_size = 0;
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
-        if(strcmp(lv_fs_get_ext(fn), "png") == 0) {              /*Check the extension*/
+        if(lv_strcmp(lv_fs_get_ext(fn), "png") == 0) {              /*Check the extension*/
             unsigned error;
             error = lodepng_load_file((void *)&png_data, &png_data_size, fn);  /*Load the file*/
             if(error) {

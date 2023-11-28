@@ -668,11 +668,11 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
         }
 #endif
 
-        if(strcmp(txt, "Enter") == 0 || strcmp(txt, LV_SYMBOL_NEW_LINE) == 0) {
+        if(lv_strcmp(txt, "Enter") == 0 || lv_strcmp(txt, LV_SYMBOL_NEW_LINE) == 0) {
             pinyin_ime_clear_data(obj);
             lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
         }
-        else if(strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
+        else if(lv_strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
             // del input char
             if(pinyin_ime->ta_count > 0) {
                 if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K26)
@@ -701,12 +701,12 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
 #endif
             }
         }
-        else if((strcmp(txt, "ABC") == 0) || (strcmp(txt, "abc") == 0) || (strcmp(txt, "1#") == 0) ||
-                (strcmp(txt, LV_SYMBOL_OK) == 0)) {
+        else if((lv_strcmp(txt, "ABC") == 0) || (lv_strcmp(txt, "abc") == 0) || (lv_strcmp(txt, "1#") == 0) ||
+                (lv_strcmp(txt, LV_SYMBOL_OK) == 0)) {
             pinyin_ime_clear_data(obj);
             return;
         }
-        else if(strcmp(txt, "123") == 0) {
+        else if(lv_strcmp(txt, "123") == 0) {
             for(uint16_t i = 0; i < lv_strlen(txt); i++)
                 lv_textarea_delete_char(ta);
 
@@ -716,7 +716,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
             lv_keyboard_set_mode(kb, LV_KEYBOARD_MODE_NUMBER);
             lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
         }
-        else if(strcmp(txt, LV_SYMBOL_KEYBOARD) == 0) {
+        else if(lv_strcmp(txt, LV_SYMBOL_KEYBOARD) == 0) {
             if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K26) {
                 lv_ime_pinyin_set_mode(obj, LV_IME_PINYIN_MODE_K9);
             }
@@ -738,8 +738,8 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
 #if LV_IME_PINYIN_USE_K9_MODE
         else if((pinyin_ime->mode == LV_IME_PINYIN_MODE_K9) && (txt[0] >= 'a' && txt[0] <= 'z')) {
             for(uint16_t i = 0; i < 8; i++) {
-                if((strcmp(txt, k9_py_map[i]) == 0) || (strcmp(txt, "abc ") == 0)) {
-                    if(strcmp(txt, "abc ") == 0)    pinyin_ime->k9_input_str_len += lv_strlen(k9_py_map[i]) + 1;
+                if((lv_strcmp(txt, k9_py_map[i]) == 0) || (lv_strcmp(txt, "abc ") == 0)) {
+                    if(lv_strcmp(txt, "abc ") == 0)    pinyin_ime->k9_input_str_len += lv_strlen(k9_py_map[i]) + 1;
                     else                            pinyin_ime->k9_input_str_len += lv_strlen(k9_py_map[i]);
                     pinyin_ime->k9_input_str[pinyin_ime->ta_count] = 50 + i;
                     pinyin_ime->k9_input_str[pinyin_ime->ta_count + 1] = '\0';
@@ -751,10 +751,10 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
             pinyin_k9_fill_cand(obj);
             pinyin_input_proc(obj);
         }
-        else if(strcmp(txt, LV_SYMBOL_LEFT) == 0) {
+        else if(lv_strcmp(txt, LV_SYMBOL_LEFT) == 0) {
             pinyin_k9_cand_page_proc(obj, 0);
         }
-        else if(strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
+        else if(lv_strcmp(txt, LV_SYMBOL_RIGHT) == 0) {
             pinyin_k9_cand_page_proc(obj, 1);
         }
 #endif
