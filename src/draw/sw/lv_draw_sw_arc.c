@@ -87,7 +87,6 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     while(end_angle >= 360) end_angle -= 360;
 
     void * mask_list[4] = {0};
-
     /*Create an angle mask*/
     lv_draw_sw_mask_angle_param_t mask_angle_param;
     lv_draw_sw_mask_angle_init(&mask_angle_param, dsc->center.x, dsc->center.y, start_angle, end_angle);

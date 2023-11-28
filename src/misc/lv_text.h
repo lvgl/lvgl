@@ -220,6 +220,41 @@ static inline bool _lv_text_is_a_word(uint32_t letter)
     return false;
 }
 
+/**
+ * Test if character can be treated as marker, and don't need to be rendered.
+ * Note, this is not a full list. Add your findings to the list.
+ *
+ * @param letter a letter
+ * @return true if so
+ */
+static inline bool _lv_text_is_marker(uint32_t letter)
+{
+    if(letter < 0x20) return true;
+
+    /*U+061C ARABIC LETTER MARK, see https://www.compart.com/en/unicode/block/U+0600*/
+    if(letter == 0x061C) return true;
+
+    /*U+115F HANGUL CHOSEONG FILLER, See https://www.compart.com/en/unicode/block/U+1100*/
+    if(letter == 0x115F) return true;
+    /*U+1160 HANGUL JUNGSEONG FILLER*/
+    if(letter == 0x1160) return true;
+
+    /*See https://www.compart.com/en/unicode/block/U+1800*/
+    if(letter >= 0x180B && letter <= 0x180E) return true;
+
+    /*See https://www.compart.com/en/unicode/block/U+2000*/
+    if(letter >= 0x200B && letter <= 0x200F) return true;
+    if(letter >= 0x2028 && letter <= 0x202F) return true;
+    if(letter >= 0x205F && letter <= 0x206F) return true;
+
+    /*U+FEFF ZERO WIDTH NO-BREAK SPACE, see https://www.compart.com/en/unicode/block/U+FE70*/
+    if(letter == 0xFEFF) return true;
+
+    if(letter == 0xF8FF) return true; /*LV_SYMBOL_DUMMY*/
+
+    return false;
+}
+
 /***************************************************************
  *  GLOBAL FUNCTION POINTERS FOR CHARACTER ENCODING INTERFACE
  ***************************************************************/

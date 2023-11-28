@@ -256,16 +256,12 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
     lv_point_t p1;
     lv_point_t p2;
     if(dsc->p1.y < dsc->p2.y) {
-        p1.y = (int32_t)dsc->p1.y;
-        p2.y = (int32_t)dsc->p2.y;
-        p1.x = (int32_t)dsc->p1.x;
-        p2.x = (int32_t)dsc->p2.x;
+        p1 = lv_point_from_precise(&dsc->p1);
+        p2 = lv_point_from_precise(&dsc->p2);
     }
     else {
-        p1.y = (int32_t)dsc->p2.y;
-        p2.y = (int32_t)dsc->p1.y;
-        p1.x = (int32_t)dsc->p2.x;
-        p2.x = (int32_t)dsc->p1.x;
+        p1 = lv_point_from_precise(&dsc->p2);
+        p2 = lv_point_from_precise(&dsc->p1);
     }
 
     int32_t xdiff = p2.x - p1.x;

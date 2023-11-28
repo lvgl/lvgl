@@ -13,7 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+
+#ifndef __ASSEMBLY__
 #include <stdint.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -55,6 +58,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/* Exclude C enum and struct definitions when included by assembly code */
+#ifndef __ASSEMBLY__
+
 /**
  * LVGL error codes.
  */
@@ -87,6 +93,8 @@ typedef int32_t lv_intptr_t;
 #endif
 
 #endif
+
+#endif /*__ASSEMBLY__*/
 
 /**********************
  * GLOBAL PROTOTYPES

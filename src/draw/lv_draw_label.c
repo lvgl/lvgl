@@ -100,6 +100,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_
         return;
     }
 
+    if(_lv_text_is_marker(unicode_letter)) return;
+
     lv_font_glyph_dsc_t g;
     lv_font_get_glyph_dsc(dsc->font, &g, unicode_letter, 0);
 
@@ -160,8 +162,7 @@ void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_lab
     /*Init variables for the first line*/
     int32_t line_width = 0;
     lv_point_t pos;
-    pos.x = coords->x1;
-    pos.y = coords->y1;
+    lv_point_set(&pos, coords->x1, coords->y1);
 
     int32_t x_ofs = 0;
     int32_t y_ofs = 0;
@@ -363,16 +364,14 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
 {
     lv_font_glyph_dsc_t g;
 
+    if(_lv_text_is_marker(letter)) /*Markers are valid letters but should not be rendered.*/
+        return;
+
     LV_PROFILER_BEGIN;
     bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, '\0');
     if(g_ret == false) {
-        /*Add warning if the dsc is not found
-         *but do not print warning for non printable ASCII chars (e.g. '\n')*/
-        if(letter >= 0x20 &&
-           letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
-           letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
-        }
+        /*Add warning if the dsc is not found*/
+        LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
     }
 
     /*Don't draw anything if the character is empty. E.g. space*/

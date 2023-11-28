@@ -264,6 +264,46 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
 void lv_point_transform(lv_point_t * p, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
                         bool zoom_first);
 
+static inline lv_point_t lv_point_from_precise(const lv_point_precise_t * p)
+{
+    return (lv_point_t) {
+        (int32_t)p->x, (int32_t)p->y
+    };
+}
+
+static inline lv_point_precise_t lv_point_to_precise(const lv_point_t * p)
+{
+    return (lv_point_precise_t) {
+        p->x, p->y
+    };
+}
+
+static inline void lv_point_set(lv_point_t * p, int32_t x, int32_t y)
+{
+    p->x = x;
+    p->y = y;
+}
+
+static inline void lv_point_precise_set(lv_point_precise_t * p, lv_value_precise_t x, lv_value_precise_t y)
+{
+    p->x = x;
+    p->y = y;
+}
+
+static inline void lv_point_swap(lv_point_t * p1, lv_point_t * p2)
+{
+    lv_point_t tmp = *p1;
+    *p1 = *p2;
+    *p2 = tmp;
+}
+
+static inline void lv_point_precise_swap(lv_point_precise_t * p1, lv_point_precise_t * p2)
+{
+    lv_point_precise_t tmp = *p1;
+    *p1 = *p2;
+    *p2 = tmp;
+}
+
 /**********************
  *      MACROS
  **********************/

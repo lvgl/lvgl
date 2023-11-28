@@ -177,14 +177,11 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, int3
         p1y = t;
     }
 
-    param->cfg.p1.x = p1x;
-    param->cfg.p1.y = p1y;
-    param->cfg.p2.x = p2x;
-    param->cfg.p2.y = p2y;
+    lv_point_set(&param->cfg.p1, p1x, p1y);
+    lv_point_set(&param->cfg.p2, p2x, p2y);
     param->cfg.side = side;
 
-    param->origo.x = p1x;
-    param->origo.y = p1y;
+    lv_point_set(&param->origo, p1x, p1y);
     param->flat = (LV_ABS(p2x - p1x) > LV_ABS(p2y - p1y)) ? 1 : 0;
     param->yx_steep = 0;
     param->xy_steep = 0;
@@ -302,8 +299,7 @@ void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, int32_t v
 
     param->cfg.start_angle = start_angle;
     param->cfg.end_angle = end_angle;
-    param->cfg.vertex_p.x = vertex_x;
-    param->cfg.vertex_p.y = vertex_y;
+    lv_point_set(&param->cfg.vertex_p, vertex_x, vertex_y);
     param->dsc.cb = (lv_draw_sw_mask_xcb_t)lv_draw_mask_angle;
     param->dsc.type = LV_DRAW_SW_MASK_TYPE_ANGLE;
 
