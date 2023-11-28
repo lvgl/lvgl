@@ -245,16 +245,14 @@
 #endif
 
 /*Using global transparency and matrix draw mode.
- *Requirements: The rendering engine needs to support global alpha and 2.5D transformations*/
+ *Requirements:
+    `LV_USE_MATRIX = 1`.
+    The rendering engine needs to support global alpha and 2.5D transformations.*/
 #ifndef LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
-            #define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX CONFIG_LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
-        #else
-            #define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX 0
-        #endif
+    #ifdef CONFIG_LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
+        #define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX CONFIG_LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
     #else
-        #define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX       1
+        #define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX       0
     #endif
 #endif
 
@@ -1049,6 +1047,15 @@
         #define LV_USE_FLOAT CONFIG_LV_USE_FLOAT
     #else
         #define LV_USE_FLOAT            0
+    #endif
+#endif
+
+/*Enable matrix support*/
+#ifndef LV_USE_MATRIX
+    #ifdef CONFIG_LV_USE_MATRIX
+        #define LV_USE_MATRIX CONFIG_LV_USE_MATRIX
+    #else
+        #define LV_USE_MATRIX           0
     #endif
 #endif
 
@@ -2323,7 +2330,8 @@
     #endif
 #endif
 
-/*Enable Vector Graphic APIs*/
+/*Enable Vector Graphic APIs
+ *Requires `LV_USE_MATRIX = 1`*/
 #ifndef LV_USE_VECTOR_GRAPHIC
     #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
         #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC

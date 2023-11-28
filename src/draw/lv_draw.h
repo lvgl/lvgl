@@ -30,6 +30,12 @@ extern "C" {
  *********************/
 #define LV_DRAW_UNIT_ID_ANY  0
 
+#if LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
+#if !LV_USE_MATRIX
+#error "LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX requires LV_USE_MATRIX = 1"
+#endif
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

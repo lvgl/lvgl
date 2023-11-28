@@ -14,6 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "../lv_conf_internal.h"
+
+#if LV_USE_MATRIX
+
 /*********************
  *      DEFINES
  *********************/
@@ -77,6 +81,8 @@ void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * matrix2);
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_MATRIX*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

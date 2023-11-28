@@ -169,6 +169,7 @@ menu "LVGL configuration"
 			config LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX
 				bool "Using global transparency and matrix draw mode"
 				default n
+				depends on LV_USE_MATRIX
 				help
 					Requirements: The rendering engine needs to support global alpha and 2.5D transformations.
 
@@ -323,6 +324,7 @@ menu "LVGL configuration"
 			config LV_USE_VECTOR_GRAPHIC
 				bool "Use Vector Graphic APIs"
 				default n
+				depends on LV_USE_MATRIX
 				help
 					Enable drawing support vector graphic APIs.
 		endmenu
@@ -524,6 +526,10 @@ menu "LVGL configuration"
 		menu "Others"
 			config LV_USE_FLOAT
 				bool "Use float as lv_value_precise_t."
+				default n
+
+			config LV_USE_MATRIX
+				bool "Enable matrix operations"
 				default n
 
 			config LV_USE_REFR_DEBUG

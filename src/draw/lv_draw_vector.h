@@ -19,6 +19,10 @@ extern "C" {
 
 #if LV_USE_VECTOR_GRAPHIC
 
+#if !LV_USE_MATRIX
+#error "lv_draw_vector needs LV_USE_MATRIX = 1"
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

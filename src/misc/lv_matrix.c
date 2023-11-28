@@ -8,6 +8,9 @@
  *********************/
 
 #include "lv_matrix.h"
+
+#if LV_USE_MATRIX
+
 #include "../stdlib/lv_string.h"
 #include <math.h>
 #include <stdbool.h>
@@ -152,3 +155,5 @@ static void _multiply_matrix(lv_matrix_t * matrix, const lv_matrix_t * mul)
 
     lv_memcpy(matrix, &tmp, sizeof(lv_matrix_t));
 }
+
+#endif /*LV_USE_MATRIX*/

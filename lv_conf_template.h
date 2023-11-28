@@ -95,8 +95,10 @@
 #define LV_DRAW_BUF_ALIGN                       4
 
 /*Using global transparency and matrix draw mode.
- *Requirements: The rendering engine needs to support global alpha and 2.5D transformations*/
-#define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX       1
+ *Requirements:
+    `LV_USE_MATRIX = 1`.
+    The rendering engine needs to support global alpha and 2.5D transformations.*/
+#define LV_DRAW_USE_GLOBAL_OPA_AND_MATRIX       0
 
 #define LV_USE_DRAW_SW 1
 #if LV_USE_DRAW_SW == 1
@@ -371,6 +373,9 @@
 
 /* Use `float` as `lv_value_precise_t` */
 #define LV_USE_FLOAT            0
+
+/*Enable matrix support*/
+#define LV_USE_MATRIX           0
 
 /*==================
  *   FONT USAGE
@@ -705,7 +710,8 @@
 /*Rlottie library*/
 #define LV_USE_RLOTTIE 0
 
-/*Enable Vector Graphic APIs*/
+/*Enable Vector Graphic APIs
+ *Requires `LV_USE_MATRIX = 1`*/
 #define LV_USE_VECTOR_GRAPHIC  0
 
 /* Enable ThorVG (vector graphics library) from the src/libs folder */
