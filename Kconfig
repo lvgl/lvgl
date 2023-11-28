@@ -1119,7 +1119,7 @@ menu "LVGL configuration"
 		endif
 
 		config LV_USE_RLE
-			bool "RLE compressed bin image decoder library"
+			bool "LVGL's version of RLE compression method"
 
 		config LV_USE_QRCODE
 			bool "QR code library"

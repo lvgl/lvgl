@@ -1,14 +1,12 @@
-RLE Decoder
+RLE Compress
 ===========
 
-The RLE Decoder is a part of LVGL that is responsible for decoding RLE
-compressed original LVGL binary files. The file name suffix is always set
-to '.rle' and the file header is added with another 64-bit value that
-includes a 32-bit magic number and 32-bit RLE information.
+LVGL provides a custom RLE compression method. It can be used to reduce binary
+image size. The RLE compression is a lossless compression method.
 
+The LVGL's built-in binary image decoder supports RLE compressed images.
 The decoder supports both variable and file as image sources. The original
-binary data is directly decompressed to RAM, and further decoded by LVGL's
-built-in decoder.
+binary data is directly decoded to RAM
 
 Benefits
 --------
@@ -73,12 +71,12 @@ The RLE image can be used same as other images.
 
    lv_image_set_src(img, "path/to/image.rle");
 
-Generate RLE images
--------------------
+Generate RLE compressed binary images
+-------------------------------------
 
 The image can be directly generated using script `lvgl/script/LVGLImage.py`
 
 
 .. code:: bash
 
-   ./script/LVGLImage.py --ofmt RLE --cf I8 cogwheel.png
+   ./script/LVGLImage.py --ofmt BIN --cf I8 --compress RLE cogwheel.png

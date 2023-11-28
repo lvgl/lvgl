@@ -995,7 +995,6 @@ class RLEImage(LVGLImage):
 class OutputFormat(Enum):
     C_ARRAY = "C"
     BIN_FILE = "BIN"
-    RLE_FILE = "RLE"
     RAW_DATA = "RAW"  # option of not writing any file
     PNG_FILE = "PNG"  # convert to lvgl image and then to png
 
@@ -1033,27 +1032,17 @@ class PNGConverter:
     def convert(self):
         output = []
         for f in self.files:
-            if self.ofmt == OutputFormat.RLE_FILE:
-                rle = RLEImage().from_png(f,
-                                          self.cf,
-                                          background=self.background)
-                rle.adjust_stride(align=self.align)
-                output.append((f, rle))
-                rle.to_rle(self._replace_ext(f, ".rle"))
-            else:
-                img = LVGLImage().from_png(f,
-                                           self.cf,
-                                           background=self.background)
-                img.adjust_stride(align=self.align)
-                output.append((f, img))
-                if self.ofmt == OutputFormat.BIN_FILE:
-                    img.to_bin(self._replace_ext(f, ".bin"),
+            img = LVGLImage().from_png(f, self.cf, background=self.background)
+            img.adjust_stride(align=self.align)
+            output.append((f, img))
+            if self.ofmt == OutputFormat.BIN_FILE:
+                img.to_bin(self._replace_ext(f, ".bin"),
+                           compress=self.compress)
+            elif self.ofmt == OutputFormat.C_ARRAY:
+                img.to_c_array(self._replace_ext(f, ".c"),
                                compress=self.compress)
-                elif self.ofmt == OutputFormat.C_ARRAY:
-                    img.to_c_array(self._replace_ext(f, ".c"),
-                                   compress=self.compress)
-                elif self.ofmt == OutputFormat.PNG_FILE:
-                    img.to_png(self._replace_ext(f, ".png"))
+            elif self.ofmt == OutputFormat.PNG_FILE:
+                img.to_png(self._replace_ext(f, ".png"))
 
         return output
 
@@ -1063,7 +1052,7 @@ def main():
     parser.add_argument('--ofmt',
                         help="output filename format, C or BIN",
                         default="BIN",
-                        choices=["C", "BIN", "PNG", "RLE"])
+                        choices=["C", "BIN", "PNG"])
     parser.add_argument(
         '--cf',
         help=("bin image color format, use AUTO for automatically "

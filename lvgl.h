@@ -95,7 +95,7 @@ extern "C" {
 #include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bin_decoder/lv_bin_decoder.h"
 #include "src/libs/bmp/lv_bmp.h"
-#include "src/libs/rle/lv_rle_decoder.h"
+#include "src/libs/rle/lv_rle.h"
 #include "src/libs/fsdrv/lv_fsdrv.h"
 #include "src/libs/lodepng/lv_lodepng.h"
 #include "src/libs/libpng/lv_libpng.h"
