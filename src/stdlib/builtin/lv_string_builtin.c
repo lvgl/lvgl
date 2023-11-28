@@ -145,6 +145,22 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
     }
 }
 
+LV_ATTRIBUTE_FAST_MEM void * lv_memmove(void * dst, const void * src, size_t len)
+{
+    if(dst < src || (char *)dst > ((char *)src + len)) {
+        return lv_memcpy(dst, src, len);
+    }
+    else {
+        char * tmp = (char *)dst + len;
+        char * s = (char *) src + len;
+
+        while(len--) {
+            *--tmp = *--s;
+        }
+        return dst;
+    }
+}
+
 /* See https://en.cppreference.com/w/c/string/byte/strlen for reference */
 size_t lv_strlen(const char * str)
 {

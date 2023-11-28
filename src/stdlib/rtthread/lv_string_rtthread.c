@@ -48,6 +48,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
     rt_memset(dst, v, len);
 }
 
+LV_ATTRIBUTE_FAST_MEM void * lv_memmove(void * dst, const void * src, size_t len)
+{
+    return rt_memmove(dst, src, len);
+}
+
 size_t lv_strlen(const char * str)
 {
     return rt_strlen(str);
