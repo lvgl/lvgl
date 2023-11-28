@@ -3,6 +3,10 @@
  *
  */
 
+#ifndef __ASSEMBLY__
+#define __ASSEMBLY__
+#endif
+
 #include "lv_blend_neon.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
