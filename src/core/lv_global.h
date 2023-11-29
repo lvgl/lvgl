@@ -2,6 +2,7 @@
  * @file lv_global.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_GLOBAL_H
 #define LV_GLOBAL_H

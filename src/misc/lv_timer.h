@@ -1,6 +1,7 @@
 /**
  * @file lv_timer.h
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_TIMER_H
 #define LV_TIMER_H

@@ -2,6 +2,7 @@
  * @file lv_anim_timeline.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_ANIM_TIMELINE_H
 #define LV_ANIM_TIMELINE_H

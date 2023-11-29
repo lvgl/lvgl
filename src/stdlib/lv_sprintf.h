@@ -2,6 +2,7 @@
  * lv_snprintf.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef _LV_SPRINTF_H_
 #define _LV_SPRINTF_H_

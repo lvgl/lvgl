@@ -2,6 +2,7 @@
  * @file lv_observer.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_OBSERVER_H
 #define LV_OBSERVER_H

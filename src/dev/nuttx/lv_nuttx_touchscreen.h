@@ -2,6 +2,7 @@
  * @file lv_nuttx_touchscreen.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 /*********************
  *      INCLUDES

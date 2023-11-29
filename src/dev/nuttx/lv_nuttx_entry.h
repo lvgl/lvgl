@@ -2,6 +2,7 @@
  * @file lv_nuttx_entry.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 /*********************
  *      INCLUDES

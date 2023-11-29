@@ -2,6 +2,7 @@
  * @file lv_stringn.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_STRING_H
 #define LV_STRING_H

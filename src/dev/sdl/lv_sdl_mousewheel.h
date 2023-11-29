@@ -2,6 +2,7 @@
  * @file lv_sdl_mousewheel.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_SDL_MOUSEWHEEL_H
 #define LV_SDL_MOUSEWHEEL_H

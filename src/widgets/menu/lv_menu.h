@@ -2,6 +2,7 @@
  * @file lv_menu.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_MENU_H
 #define LV_MENU_H

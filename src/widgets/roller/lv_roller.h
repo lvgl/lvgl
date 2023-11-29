@@ -2,6 +2,7 @@
  * @file lv_roller.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_ROLLER_H
 #define LV_ROLLER_H

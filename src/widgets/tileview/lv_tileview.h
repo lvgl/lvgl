@@ -2,6 +2,7 @@
  * @file lv_tileview.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_TILEVIEW_H
 #define LV_TILEVIEW_H

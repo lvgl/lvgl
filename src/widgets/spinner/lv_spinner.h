@@ -2,6 +2,7 @@
  * @file lv_spinner.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_SPINNER_H
 #define LV_SPINNER_H

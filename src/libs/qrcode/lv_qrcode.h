@@ -2,6 +2,7 @@
  * @file lv_qrcode
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_QRCODE_H
 #define LV_QRCODE_H

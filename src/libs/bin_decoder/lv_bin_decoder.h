@@ -2,6 +2,7 @@
  * @file lv_bin_decoder.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_BIN_DECODER_H
 #define LV_BIN_DECODER_H

@@ -2,6 +2,7 @@
  * @file lv_hal_tick.h
  * Provide access to the system tick with 1 millisecond resolution
  */
+ // IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_HAL_TICK_H
 #define LV_HAL_TICK_H

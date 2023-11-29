@@ -2,6 +2,7 @@
  * @file lv_libjpeg_turbo.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_LIBJPEG_TURBO_H
 #define LV_LIBJPEG_TURBO_H

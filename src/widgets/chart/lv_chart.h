@@ -2,6 +2,7 @@
  * @file lv_chart.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_CHART_H
 #define LV_CHART_H

@@ -2,6 +2,7 @@
  * @file lv_led.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_LED_H
 #define LV_LED_H

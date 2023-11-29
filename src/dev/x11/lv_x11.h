@@ -2,6 +2,7 @@
  * @file lv_x11.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_X11_H
 #define LV_X11_H

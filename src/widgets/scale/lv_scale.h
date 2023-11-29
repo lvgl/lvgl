@@ -2,6 +2,7 @@
  * @file lv_scale.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_SCALE_H
 #define LV_SCALE_H

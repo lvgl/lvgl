@@ -2,6 +2,7 @@
  * @file lv_barcode.c
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_BARCODE_H
 #define LV_BARCODE_H

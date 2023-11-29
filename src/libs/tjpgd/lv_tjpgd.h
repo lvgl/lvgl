@@ -2,6 +2,7 @@
  * @file lv_tjpgd.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_TJPGD_H
 #define LV_TJPGD_H

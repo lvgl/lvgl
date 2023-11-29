@@ -2,6 +2,7 @@
  * @file lv_cb.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_CHECKBOX_H
 #define LV_CHECKBOX_H

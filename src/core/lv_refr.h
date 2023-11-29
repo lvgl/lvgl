@@ -2,6 +2,7 @@
  * @file lv_refr.h
  *
  */
+ // IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_REFR_H
 #define LV_REFR_H

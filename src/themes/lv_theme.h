@@ -2,6 +2,7 @@
  *@file lv_theme.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_THEME_H
 #define LV_THEME_H

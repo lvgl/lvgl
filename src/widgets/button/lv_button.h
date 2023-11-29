@@ -2,6 +2,7 @@
  * @file lv_btn.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_BUTTON_H
 #define LV_BUTTON_H

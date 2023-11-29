@@ -2,6 +2,7 @@
  * @file lv_nuttx_libuv.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_NUTTX_LIBUV_H
 #define LV_NUTTX_LIBUV_H

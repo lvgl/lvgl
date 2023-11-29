@@ -2,6 +2,7 @@
  * @file lv_mem.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_MEM_H
 #define LV_MEM_H

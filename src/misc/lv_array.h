@@ -2,6 +2,7 @@
  * @file lv_array.h
  * Array. The elements are dynamically allocated by the 'lv_mem' module.
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_ARRAY_H
 #define LV_ARRAY_H

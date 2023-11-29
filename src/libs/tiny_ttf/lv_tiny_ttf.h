@@ -2,6 +2,7 @@
  * @file lv_templ.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_TINY_TTF_H
 #define LV_TINY_TTF_H

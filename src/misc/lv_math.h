@@ -2,6 +2,7 @@
  * @file lv_math.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_MATH_H
 #define LV_MATH_H

@@ -2,6 +2,7 @@
  * @file lv_draw_vector.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_DRAW_VECTOR_H
 #define LV_DRAW_VECTOR_H

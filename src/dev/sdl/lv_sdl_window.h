@@ -2,6 +2,7 @@
  * @file lv_sdl_window.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_SDL_DISP_H
 #define LV_SDL_DISP_H

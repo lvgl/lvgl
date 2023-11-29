@@ -2,6 +2,7 @@
  * @file lv_ime_pinyin.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 #ifndef LV_IME_PINYIN_H
 #define LV_IME_PINYIN_H
 

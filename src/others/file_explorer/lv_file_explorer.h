@@ -2,6 +2,7 @@
  * @file lv_file_explorer.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_FILE_EXPLORER_H
 #define LV_FILE_EXPLORER_H

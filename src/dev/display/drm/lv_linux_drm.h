@@ -2,6 +2,7 @@
  * @file lv_linux_drm_h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_LINUX_DRM_H
 #define LV_LINUX_DRM_H

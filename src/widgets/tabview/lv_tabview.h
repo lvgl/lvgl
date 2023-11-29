@@ -2,6 +2,7 @@
  * @file lv_templ.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_TABVIEW_H
 #define LV_TABVIEW_H

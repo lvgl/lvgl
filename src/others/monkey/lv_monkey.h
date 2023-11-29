@@ -2,6 +2,7 @@
  * @file lv_monkey.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 #ifndef LV_MONKEY_H
 #define LV_MONKEY_H
 

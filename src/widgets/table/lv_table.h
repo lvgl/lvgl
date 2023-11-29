@@ -2,6 +2,7 @@
  * @file lv_table.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_TABLE_H
 #define LV_TABLE_H

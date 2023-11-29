@@ -2,6 +2,7 @@
  * @file lv_profiler_builtin.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_PROFILER_BUILTIN_H
 #define LV_PROFILER_BUILTIN_H

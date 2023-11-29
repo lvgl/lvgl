@@ -2,6 +2,7 @@
  * @file lv_api_map.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h">
 
 #ifndef LV_API_MAP_H
 #define LV_API_MAP_H
