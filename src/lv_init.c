@@ -32,6 +32,9 @@
 #if LV_USE_DRAW_PXP
     #include "draw/nxp/pxp/lv_draw_pxp.h"
 #endif
+#if LV_USE_DRAW_SDL
+    #include "draw/sdl/lv_draw_sdl.h"
+#endif
 
 /*********************
  *      DEFINES
