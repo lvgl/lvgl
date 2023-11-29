@@ -1,10 +1,10 @@
 /**
- * @file lv_draw_sw.h
+ * @file lv_draw_sdl.h
  *
  */
 
-#ifndef LV_DRAW_SW_H
-#define LV_DRAW_SW_H
+#ifndef LV_DRAW_SDL_H
+#define LV_DRAW_SDL_H
 
 #ifdef __cplusplus
 extern "C" {
