@@ -49,6 +49,15 @@ void * lv_memcpy(void * dst, const void * src, size_t len);
 void lv_memset(void * dst, uint8_t v, size_t len);
 
 /**
+ * @brief Move a block of memory from source to destination
+ * @param dst Pointer to the destination array where the content is to be copied.
+ * @param src Pointer to the source of data to be copied.
+ * @param len Number of bytes to copy
+ * @return Pointer to the destination array.
+ */
+void * lv_memmove(void * dst, const void * src, size_t len);
+
+/**
  * Same as `memset(dst, 0x00, len)`.
  * @param dst pointer to the destination buffer
  * @param len number of byte to set

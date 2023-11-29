@@ -260,4 +260,4 @@ static void lv_mem_walker(void * ptr, size_t size, int used, void * user)
             mon_p->free_biggest_size = size;
     }
 }
-#endif /*LV_USE_BUILTIN_MALLOC*/
+#endif /*LV_STDLIB_BUILTIN*/

@@ -8,11 +8,8 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_STRING == LV_STDLIB_RTTHREAD
 #include "../lv_string.h"
+#include "../lv_mem.h" /*Need lv_malloc*/
 #include <rtthread.h>
-
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-    #include "../lv_mem.h"
-#endif
 
 /*********************
  *      DEFINES
@@ -46,6 +43,11 @@ LV_ATTRIBUTE_FAST_MEM void * lv_memcpy(void * dst, const void * src, size_t len)
 LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
 {
     rt_memset(dst, v, len);
+}
+
+LV_ATTRIBUTE_FAST_MEM void * lv_memmove(void * dst, const void * src, size_t len)
+{
+    return rt_memmove(dst, src, len);
 }
 
 size_t lv_strlen(const char * str)
@@ -87,4 +89,4 @@ char * lv_strdup(const char * src)
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_STDLIB_STRING*/
+#endif /*LV_STDLIB_RTTHREAD*/
