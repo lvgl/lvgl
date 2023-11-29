@@ -423,9 +423,9 @@ static void rotate90_rgb888(const uint8_t * src, uint8_t * dst, int32_t srcWidth
         for(int32_t y = 0; y < srcHeight; ++y) {
             int32_t srcIndex = y * srcStride + x * 3;
             int32_t dstIndex = (srcWidth - x - 1) * dstStride + y * 3;
-            dst[dstIndex] = src[srcIndex];       // Red
-            dst[dstIndex + 1] = src[srcIndex + 1]; // Green
-            dst[dstIndex + 2] = src[srcIndex + 2]; // Blue
+            dst[dstIndex] = src[srcIndex];       /*Red*/
+            dst[dstIndex + 1] = src[srcIndex + 1]; /*Green*/
+            dst[dstIndex + 2] = src[srcIndex + 2]; /*Blue*/
         }
     }
 }
@@ -452,9 +452,9 @@ static void rotate270_rgb888(const uint8_t * src, uint8_t * dst, int32_t width, 
         for(int32_t y = 0; y < height; ++y) {
             int32_t srcIndex = y * srcStride + x * 3;
             int32_t dstIndex = x * dstStride + (height - y - 1) * 3;
-            dst[dstIndex] = src[srcIndex];       // Red
-            dst[dstIndex + 1] = src[srcIndex + 1]; // Green
-            dst[dstIndex + 2] = src[srcIndex + 2]; // Blue
+            dst[dstIndex] = src[srcIndex];       /*Red*/
+            dst[dstIndex + 1] = src[srcIndex + 1]; /*Green*/
+            dst[dstIndex + 2] = src[srcIndex + 2]; /*Blue*/
         }
     }
 }

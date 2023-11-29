@@ -118,7 +118,7 @@ void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size
 
         /* Top side */
         path_data[pidx++] = VLC_OP_LINE;
-        path_data[pidx++] = coords->x2 - final_radius + 1;  // Extended for VGLite
+        path_data[pidx++] = coords->x2 - final_radius + 1;  /*Extended for VGLite*/
         path_data[pidx++] = coords->y1;
 
         /* Top-right corner */
@@ -132,8 +132,8 @@ void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size
 
         /* Right side */
         path_data[pidx++] = VLC_OP_LINE;
-        path_data[pidx++] = coords->x2 + 1;                 // Extended for VGLite
-        path_data[pidx++] = coords->y2 - final_radius + 1;  // Extended for VGLite
+        path_data[pidx++] = coords->x2 + 1;                 /*Extended for VGLite*/
+        path_data[pidx++] = coords->y2 - final_radius + 1;  /*Extended for VGLite*/
 
         /* Bottom-right corner*/
         path_data[pidx++] = VLC_OP_CUBIC_REL;
@@ -147,7 +147,7 @@ void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size
         /* Bottom side */
         path_data[pidx++] = VLC_OP_LINE;
         path_data[pidx++] = coords->x1 + final_radius;
-        path_data[pidx++] = coords->y2 + 1;                 // Extended for VGLite
+        path_data[pidx++] = coords->y2 + 1;                 /*Extended for VGLite*/
 
         /* Bottom-left corner */
         path_data[pidx++] = VLC_OP_CUBIC_REL;
@@ -184,18 +184,18 @@ void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size
 
         /* Top side */
         path_data[pidx++] = VLC_OP_LINE;
-        path_data[pidx++] = coords->x2 + 1; // Extended for VGLite
+        path_data[pidx++] = coords->x2 + 1; /*Extended for VGLite*/
         path_data[pidx++] = coords->y1;
 
         /* Right side */
         path_data[pidx++] = VLC_OP_LINE;
-        path_data[pidx++] = coords->x2 + 1; // Extended for VGLite
-        path_data[pidx++] = coords->y2 + 1; // Extended for VGLite
+        path_data[pidx++] = coords->x2 + 1; /*Extended for VGLite*/
+        path_data[pidx++] = coords->y2 + 1; /*Extended for VGLite*/
 
         /* Bottom side */
         path_data[pidx++] = VLC_OP_LINE;
         path_data[pidx++] = coords->x1;
-        path_data[pidx++] = coords->y2 + 1; // Extended for VGLite
+        path_data[pidx++] = coords->y2 + 1; /*Extended for VGLite*/
 
         /* Left side*/
         path_data[pidx++] = VLC_OP_LINE;

@@ -258,8 +258,10 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
         /*Move pointer "i" backwards*/
         for(; n_move > 0; n_move--) {
             _lv_text_encoded_prev(txt, &i);
-            // TODO: it would be appropriate to update the returned word width here
-            // However, in current usage, this doesn't impact anything.
+            /**
+             * TODO: it would be appropriate to update the returned
+             * word width hereHowever, in current usage, this doesn't impact anything.
+             */
         }
     }
     return i;

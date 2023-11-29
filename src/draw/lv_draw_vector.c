@@ -59,7 +59,7 @@ static bool _is_identity_or_translation(const lv_matrix_t * matrix)
 
 static void _multiply_matrix(lv_matrix_t * matrix, const lv_matrix_t * mul)
 {
-    // TODO: use NEON to optimize this function on ARM architecture.
+    /*TODO: use NEON to optimize this function on ARM architecture.*/
     lv_matrix_t tmp;
 
     for(int y = 0; y < 3; y++) {
@@ -129,7 +129,7 @@ void lv_matrix_identity(lv_matrix_t * matrix)
 void lv_matrix_translate(lv_matrix_t * matrix, float dx, float dy)
 {
     if(_is_identity_or_translation(matrix)) {
-        // optimization for matrix translation.
+        /*optimization for matrix translation.*/
         matrix->m[0][2] += dx;
         matrix->m[1][2] += dy;
         return;
@@ -239,7 +239,7 @@ void lv_vector_path_move_to(lv_vector_path_t * path, const lv_fpoint_t * p)
 void lv_vector_path_line_to(lv_vector_path_t * path, const lv_fpoint_t * p)
 {
     if(lv_array_is_empty(&path->ops)) {
-        // first op must be move_to
+        /*first op must be move_to*/
         return;
     }
 
@@ -253,7 +253,7 @@ void lv_vector_path_line_to(lv_vector_path_t * path, const lv_fpoint_t * p)
 void lv_vector_path_quad_to(lv_vector_path_t * path, const lv_fpoint_t * p1, const lv_fpoint_t * p2)
 {
     if(lv_array_is_empty(&path->ops)) {
-        // first op must be move_to
+        /*first op must be move_to*/
         return;
     }
 
@@ -269,7 +269,7 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
                              const lv_fpoint_t * p3)
 {
     if(lv_array_is_empty(&path->ops)) {
-        // first op must be move_to
+        /*first op must be move_to*/
         return;
     }
 
@@ -285,7 +285,7 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
 void lv_vector_path_close(lv_vector_path_t * path)
 {
     if(lv_array_is_empty(&path->ops)) {
-        // first op must be move_to
+        /*first op must be move_to*/
         return;
     }
 
@@ -463,21 +463,21 @@ lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer)
     fill_dsc->color = lv_color_to_32(lv_color_black(), 0xFF);
     fill_dsc->opa = LV_OPA_COVER;
     fill_dsc->fill_rule = LV_VECTOR_FILL_NONZERO;
-    lv_matrix_identity(&(fill_dsc->matrix)); // identity matrix
+    lv_matrix_identity(&(fill_dsc->matrix)); /*identity matrix*/
 
     lv_vector_stroke_dsc_t * stroke_dsc = &(dsc->current_dsc.stroke_dsc);
     stroke_dsc->style = LV_VECTOR_DRAW_STYLE_SOLID;
     stroke_dsc->color = lv_color_to_32(lv_color_black(), 0xFF);
-    stroke_dsc->opa = LV_OPA_0; // default no stroke
+    stroke_dsc->opa = LV_OPA_0; /*default no stroke*/
     stroke_dsc->width = 1.0f;
     stroke_dsc->cap = LV_VECTOR_STROKE_CAP_BUTT;
     stroke_dsc->join = LV_VECTOR_STROKE_JOIN_MITER;
     stroke_dsc->miter_limit = 4.0f;
-    lv_matrix_identity(&(stroke_dsc->matrix)); // identity matrix
+    lv_matrix_identity(&(stroke_dsc->matrix)); /*identity matrix*/
 
     dsc->current_dsc.blend_mode = LV_VECTOR_BLEND_SRC_OVER;
     dsc->current_dsc.scissor_area = layer->_clip_area;
-    lv_matrix_identity(&(dsc->current_dsc.matrix)); // identity matrix
+    lv_matrix_identity(&(dsc->current_dsc.matrix)); /*identity matrix*/
     dsc->tasks.task_list = NULL;
     return dsc;
 }
@@ -593,7 +593,7 @@ void lv_vector_dsc_set_stroke_dash(lv_vector_dsc_t * dsc, float * dash_pattern, 
             LV_ARRAY_APPEND_VALUE(dash_array, dash_pattern[i]);
         }
     }
-    else {   // clear dash
+    else {   /*clear dash*/
         lv_array_clear(dash_array);
     }
 }
@@ -702,7 +702,7 @@ void lv_draw_vector(lv_vector_dsc_t * dsc)
 /* draw dsc transform */
 void lv_vector_dsc_identity(lv_vector_dsc_t * dsc)
 {
-    lv_matrix_identity(&(dsc->current_dsc.matrix)); // identity matrix
+    lv_matrix_identity(&(dsc->current_dsc.matrix)); /*identity matrix*/
 }
 
 void lv_vector_dsc_scale(lv_vector_dsc_t * dsc, float scale_x, float scale_y)

@@ -113,7 +113,7 @@ void lv_draw_vglite_deinit(void)
 
 static inline bool _vglite_cf_supported(lv_color_format_t cf)
 {
-    // Add here the platform specific code for supported formats.
+    /*Add here the platform specific code for supported formats.*/
 
     bool is_cf_unsupported = (cf == LV_COLOR_FORMAT_RGB565A8 || cf == LV_COLOR_FORMAT_RGB888);
 

@@ -157,7 +157,7 @@ void test_tabview_add_several_tabs_no_scroll(void)
     lv_obj_t * label1 = lv_label_create(tab1);
     lv_label_set_text(label1, "Content of the first tab\n");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab2);
     LV_UNUSED(tab3);
 
@@ -174,12 +174,12 @@ void test_tabview_rename_tab(void)
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
     lv_obj_t * tab3 = lv_tabview_add_tab(tabview, "Tab 3");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab1);
     LV_UNUSED(tab2);
     LV_UNUSED(tab3);
 
-    // rename 2nd tab (0-based index)
+    /*rename 2nd tab (0-based index)*/
     lv_tabview_rename_tab(tabview, 1, "2nd Tab");
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_08.png");
@@ -198,7 +198,7 @@ void test_tabview_add_several_tabs_hor(void)
     lv_obj_t * label1 = lv_label_create(tab1);
     lv_label_set_text(label1, "Content of the first tab\n");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab2);
     LV_UNUSED(tab3);
 
@@ -241,7 +241,7 @@ void test_tabview_tab2_selected_event(void)
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab1);
     LV_UNUSED(tab2);
 
@@ -261,7 +261,7 @@ void test_tabview_update_on_external_scroll(void)
     lv_obj_t * tab3 = lv_tabview_add_tab(tabview, "Tab 3");
     lv_obj_t * tab4 = lv_tabview_add_tab(tabview, "Tab 4");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab1);
     LV_UNUSED(tab2);
     LV_UNUSED(tab4);
