@@ -126,6 +126,8 @@ void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data);
  */
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev);
 
+lv_indev_read_cb_t lv_indev_get_read_cb(lv_indev_t * indev);
+
 lv_indev_state_t lv_indev_get_state(const lv_indev_t * indev);
 
 lv_group_t * lv_indev_get_group(const lv_indev_t * indev);
