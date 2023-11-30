@@ -486,6 +486,14 @@ lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev)
     return indev->read_timer;
 }
 
+void lv_indev_delete_read_timer(lv_indev_t * indev)
+{
+    if(indev && indev->read_timer) {
+        lv_timer_delete(indev->read_timer);
+        indev->read_timer = NULL;
+    }
+}
+
 lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 {
     lv_obj_t * found_p = NULL;

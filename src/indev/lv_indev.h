@@ -242,6 +242,13 @@ struct _lv_obj_t * lv_indev_get_active_obj(void);
 lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev);
 
 /**
+ * Delete the read timer associates to indev. This is typically used when
+ * indev works in event driven mode instead of polling mode.
+ * @param indev pointer to an input device
+ */
+void lv_indev_delete_read_timer(lv_indev_t * indev);
+
+/**
  * Search the most top, clickable object by a point
  * @param obj pointer to a start object, typically the screen
  * @param point pointer to a point for searching the most top child
