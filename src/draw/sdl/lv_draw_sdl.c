@@ -213,7 +213,6 @@ static lv_cache_entry_t * draw_to_texture(lv_draw_sdl_unit_t * u)
                     return NULL;
                 }
 
-                lv_display_t * disp = _lv_refr_get_disp_refreshing();
                 SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
                 texture = SDL_CreateTextureFromSurface(renderer, surface);
                 break;
@@ -302,7 +301,6 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     cache_data_t data_to_find;
     data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
-    lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
 
     data_to_find.w = lv_area_get_width(&t->area);
     data_to_find.h = lv_area_get_height(&t->area);
