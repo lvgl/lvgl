@@ -53,7 +53,7 @@ lv_indev_t * lv_sdl_mousewheel_create(void)
     lv_indev_set_read_cb(indev, sdl_mousewheel_read);
     lv_indev_set_driver_data(indev, dsc);
 
-    lv_timer_delete(lv_indev_get_read_timer(indev));
+    lv_indev_delete_read_timer(indev);
     lv_indev_add_event_cb(indev, release_indev_cb, LV_EVENT_DELETE, indev);
 
     return indev;

@@ -12,6 +12,7 @@
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
+#include "../../lv_init.h"
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include LV_SDL_INCLUDE_PATH
@@ -173,6 +174,7 @@ void lv_sdl_quit()
     if(inited) {
         SDL_Quit();
         lv_timer_delete(event_handler_timer);
+        event_handler_timer = NULL;
         inited = false;
     }
 }
@@ -254,7 +256,7 @@ static void sdl_event_handler(lv_timer_t * t)
         }
         if(event.type == SDL_QUIT) {
             SDL_Quit();
-            lv_timer_delete(event_handler_timer);
+            lv_deinit();
             inited = false;
 #if LV_SDL_DIRECT_EXIT
             exit(0);
@@ -373,7 +375,8 @@ static void release_disp_cb(lv_event_t * e)
     SDL_DestroyTexture(dsc->texture);
     SDL_DestroyRenderer(dsc->renderer);
     SDL_DestroyWindow(dsc->window);
-
+    if(dsc->fb1) lv_free(dsc->fb1);
+    if(dsc->fb2) lv_free(dsc->fb2);
     lv_free(dsc);
     lv_display_set_driver_data(disp, NULL);
 }
