@@ -28,12 +28,13 @@ extern "C" {
 struct _lv_observer_t;
 
 typedef enum {
-    LV_SUBJECT_TYPE_NONE =      0,
-    LV_SUBJECT_TYPE_INT =       1,   /**< an int32_t*/
-    LV_SUBJECT_TYPE_POINTER =   2,   /**< a void pointer*/
-    LV_SUBJECT_TYPE_COLOR   =   3,   /**< an lv_color_t*/
-    LV_SUBJECT_TYPE_GROUP  =    4,   /**< an array of subjects*/
-    LV_SUBJECT_TYPE_STRING  =   5,   /**< a char pointer*/
+    LV_SUBJECT_TYPE_INVALID =   0,   /**< indicates subject not initialized yet*/
+    LV_SUBJECT_TYPE_NONE =      1,   /**< a null value like None or NILt*/
+    LV_SUBJECT_TYPE_INT =       2,   /**< an int32_t*/
+    LV_SUBJECT_TYPE_POINTER =   3,   /**< a void pointer*/
+    LV_SUBJECT_TYPE_COLOR   =   4,   /**< an lv_color_t*/
+    LV_SUBJECT_TYPE_GROUP  =    5,   /**< an array of subjects*/
+    LV_SUBJECT_TYPE_STRING  =   6,   /**< a char pointer*/
 } lv_subject_type_t;
 
 /**
