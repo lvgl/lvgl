@@ -159,6 +159,7 @@ void test_image_built_in_decode_rotate_and_recolor(void)
 
 void test_image_rle_decode(void)
 {
+#if LV_USE_RLE
     img_create("rleA1", "A:src/test_files/binimages/cogwheel.A1.rle", false, false);
     img_create("rleA2", "A:src/test_files/binimages/cogwheel.A2.rle", false, false);
     img_create("rleA4", "A:src/test_files/binimages/cogwheel.A4.rle", false, false);
@@ -174,10 +175,12 @@ void test_image_rle_decode(void)
     img_create("rleARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.rle", false, false);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rle.png");
+#endif
 }
 
 void test_image_rle_decode_rotate(void)
 {
+#if LV_USE_RLE
     img_create("rleA1", "A:src/test_files/binimages/cogwheel.A1.rle", true, false);
     img_create("rleA2", "A:src/test_files/binimages/cogwheel.A2.rle", true, false);
     img_create("rleA4", "A:src/test_files/binimages/cogwheel.A4.rle", true, false);
@@ -193,10 +196,12 @@ void test_image_rle_decode_rotate(void)
     img_create("rleARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.rle", true, false);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rle_rotate.png");
+#endif
 }
 
 void test_image_rle_decode_rotate_recolor(void)
 {
+#if LV_USE_RLE
     img_create("rleA1", "A:src/test_files/binimages/cogwheel.A1.rle", true, true);
     img_create("rleA2", "A:src/test_files/binimages/cogwheel.A2.rle", true, true);
     img_create("rleA4", "A:src/test_files/binimages/cogwheel.A4.rle", true, true);
@@ -212,6 +217,70 @@ void test_image_rle_decode_rotate_recolor(void)
     img_create("rleARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.rle", true, true);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rle_rotate_recolor.png");
+#endif
+}
+
+void test_image_rle_compressed_decode(void)
+{
+#if LV_USE_RLE
+    img_create("rleA1", "A:src/test_files/rle_compressed/cogwheel.A1.bin", false, false);
+    img_create("rleA2", "A:src/test_files/rle_compressed/cogwheel.A2.bin", false, false);
+    img_create("rleA4", "A:src/test_files/rle_compressed/cogwheel.A4.bin", false, false);
+    img_create("rleA8", "A:src/test_files/rle_compressed/cogwheel.A8.bin", false, false);
+    img_create("rleI1", "A:src/test_files/rle_compressed/cogwheel.I1.bin", false, false);
+    img_create("rleI2", "A:src/test_files/rle_compressed/cogwheel.I2.bin", false, false);
+    img_create("rleI4", "A:src/test_files/rle_compressed/cogwheel.I4.bin", false, false);
+    img_create("rleI8", "A:src/test_files/rle_compressed/cogwheel.I8.bin", false, false);
+    img_create("rleRGB565A8", "A:src/test_files/rle_compressed/cogwheel.RGB565A8.bin", false, false);
+    img_create("rleRGB565", "A:src/test_files/rle_compressed/cogwheel.RGB565.bin", false, false);
+    img_create("rleRGB888", "A:src/test_files/rle_compressed/cogwheel.RGB888.bin", false, false);
+    img_create("rleXRGB8888", "A:src/test_files/rle_compressed/cogwheel.XRGB8888.bin", false, false);
+    img_create("rleARGB8888", "A:src/test_files/rle_compressed/cogwheel.ARGB8888.bin", false, false);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rle_compressed.png");
+#endif
+}
+
+void test_image_rle_compressed_decode_rotate(void)
+{
+#if LV_USE_RLE
+    img_create("rleA1", "A:src/test_files/rle_compressed/cogwheel.A1.bin", true, false);
+    img_create("rleA2", "A:src/test_files/rle_compressed/cogwheel.A2.bin", true, false);
+    img_create("rleA4", "A:src/test_files/rle_compressed/cogwheel.A4.bin", true, false);
+    img_create("rleA8", "A:src/test_files/rle_compressed/cogwheel.A8.bin", true, false);
+    img_create("rleI1", "A:src/test_files/rle_compressed/cogwheel.I1.bin", true, false);
+    img_create("rleI2", "A:src/test_files/rle_compressed/cogwheel.I2.bin", true, false);
+    img_create("rleI4", "A:src/test_files/rle_compressed/cogwheel.I4.bin", true, false);
+    img_create("rleI8", "A:src/test_files/rle_compressed/cogwheel.I8.bin", true, false);
+    img_create("rleRGB565A8", "A:src/test_files/rle_compressed/cogwheel.RGB565A8.bin", true, false);
+    img_create("rleRGB565", "A:src/test_files/rle_compressed/cogwheel.RGB565.bin", true, false);
+    img_create("rleRGB888", "A:src/test_files/rle_compressed/cogwheel.RGB888.bin", true, false);
+    img_create("rleXRGB8888", "A:src/test_files/rle_compressed/cogwheel.XRGB8888.bin", true, false);
+    img_create("rleARGB8888", "A:src/test_files/rle_compressed/cogwheel.ARGB8888.bin", true, false);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rle_compressed_rotate.png");
+#endif
+}
+
+void test_image_rle_compressed_decode_rotate_recolor(void)
+{
+#if LV_USE_RLE
+    img_create("rleA1", "A:src/test_files/rle_compressed/cogwheel.A1.bin", true, true);
+    img_create("rleA2", "A:src/test_files/rle_compressed/cogwheel.A2.bin", true, true);
+    img_create("rleA4", "A:src/test_files/rle_compressed/cogwheel.A4.bin", true, true);
+    img_create("rleA8", "A:src/test_files/rle_compressed/cogwheel.A8.bin", true, true);
+    img_create("rleI1", "A:src/test_files/rle_compressed/cogwheel.I1.bin", true, true);
+    img_create("rleI2", "A:src/test_files/rle_compressed/cogwheel.I2.bin", true, true);
+    img_create("rleI4", "A:src/test_files/rle_compressed/cogwheel.I4.bin", true, true);
+    img_create("rleI8", "A:src/test_files/rle_compressed/cogwheel.I8.bin", true, true);
+    img_create("rleRGB565A8", "A:src/test_files/rle_compressed/cogwheel.RGB565A8.bin", true, true);
+    img_create("rleRGB565", "A:src/test_files/rle_compressed/cogwheel.RGB565.bin", true, true);
+    img_create("rleRGB888", "A:src/test_files/rle_compressed/cogwheel.RGB888.bin", true, true);
+    img_create("rleXRGB8888", "A:src/test_files/rle_compressed/cogwheel.XRGB8888.bin", true, true);
+    img_create("rleARGB8888", "A:src/test_files/rle_compressed/cogwheel.ARGB8888.bin", true, true);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rle_compressed_rotate_recolor.png");
+#endif
 }
 
 #endif

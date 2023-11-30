@@ -63,6 +63,13 @@ typedef enum _lv_image_flags_t {
     LV_IMAGE_FLAGS_VECTORS          = 0x04,
 
     /**
+     * The image data is compressed, so decoder needs to decode image firstly.
+     * If this flag is set, the whole image will be decompressed upon decode, and
+     * `get_area_cb` won't be necessary.
+     */
+    LV_IMAGE_FLAGS_COMPRESSED       = 0x08,
+
+    /**
      * Flags reserved for user, lvgl won't use these bits.
      */
     LV_IMAGE_FLAGS_USER1            = 0x1000,
@@ -74,6 +81,12 @@ typedef enum _lv_image_flags_t {
     LV_IMAGE_FLAGS_USER7            = 0x0400,
     LV_IMAGE_FLAGS_USER8            = 0x0800,
 } lv_image_flags_t;
+
+typedef enum {
+    LV_IMAGE_COMPRESS_NONE = 0,
+    LV_IMAGE_COMPRESS_RLE,  /*LVGL custom RLE compression*/
+    LV_IMAGE_COMPRESS_LZ4,
+} lv_image_compress_t;
 
 /**
  * The first 8 bit is very important to distinguish the different source types.

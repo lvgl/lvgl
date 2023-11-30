@@ -91,6 +91,11 @@ class PngQuant:
         return compressed
 
 
+class CompressMethod(Enum):
+    NONE = 0x00
+    RLE = 0x01
+
+
 class ColorFormat(Enum):
     UNKNOWN = 0x00
     TRUECOLOR = 0x04
@@ -280,8 +285,10 @@ class LVGLImageHeader:
                  w: int = 0,
                  h: int = 0,
                  stride: int = 0,
-                 align: int = 1):
+                 align: int = 1,
+                 flags: int = 0):
         self.cf = cf
+        self.flags = flags
         self.w = w & 0xffff
         self.h = h & 0xffff
         if w > 0xffff or h > 0xffff:
@@ -314,8 +321,7 @@ class LVGLImageHeader:
         binary = bytearray()
         binary += uint8_t(self.cf.value)
         binary += uint8_t(0)  # 8bits format
-        binary += uint8_t(0)  # 8bits user flags
-        binary += uint8_t(0)  # 8bits reserved
+        binary += uint16_t(self.flags)  # 16bits flags
 
         binary += uint16_t(self.w)  # 16bits width
         binary += uint16_t(self.h)  # 16bits height
@@ -338,6 +344,40 @@ class LVGLImageHeader:
         return self
 
 
+class LVGLCompressData:
+
+    def __init__(self,
+                 cf: ColorFormat,
+                 method: CompressMethod,
+                 raw_data: bytes = b''):
+        self.blk_size = (cf.bpp + 7) // 8
+        self.compress = method
+        self.raw_data = raw_data
+        self.raw_data_len = len(raw_data)
+        self.compressed = self._compress(raw_data)
+
+    def _compress(self, raw_data: bytes) -> bytearray:
+        if self.compress == CompressMethod.NONE:
+            return raw_data
+
+        if self.compress == CompressMethod.RLE:
+            # RLE compression performs on pixel unit, pad data to pixel unit
+            pad = b'\x00' * (self.blk_size - self.raw_data_len % self.blk_size)
+            self.raw_data_len += len(pad)
+            compressed = RLEImage().rle_compress(raw_data + pad, self.blk_size)
+        else:
+            raise ParameterError(f"Invalid compress method: {self.compress}")
+
+        self.compressed_len = len(compressed)
+
+        bin = bytearray()
+        bin += uint32_t(self.compress.value)
+        bin += uint32_t(self.compressed_len)
+        bin += uint32_t(self.raw_data_len)
+        bin += compressed
+        return bin
+
+
 class LVGLImage:
 
     def __init__(self,
@@ -346,11 +386,16 @@ class LVGLImage:
                  h: int = 0,
                  data: bytes = b'') -> None:
         self.stride = 0  # default no valid stride value
+        self.compress = CompressMethod.NONE
         self.set_data(cf, w, h, data)
 
     def __repr__(self) -> str:
         return (f"'LVGL image {self.w}x{self.h}, {self.cf.name},"
                 f" (12+{self.data_len})Byte'")
+
+    def set_compress(self, method: CompressMethod):
+        # only do compression when return binary data
+        self.compress = method
 
     def adjust_stride(self, stride: int = 0, align: int = 1):
         '''
@@ -439,9 +484,17 @@ class LVGLImage:
         raw data
         '''
         bin = bytearray()
-        header = LVGLImageHeader(self.cf, self.w, self.h, self.stride)
+        flags = 0
+        flags |= 0x08 if self.compress != CompressMethod.NONE else 0
+
+        header = LVGLImageHeader(self.cf,
+                                 self.w,
+                                 self.h,
+                                 self.stride,
+                                 flags=flags)
         bin += header.binary
-        bin += self.data
+        compress = LVGLCompressData(self.cf, self.compress, self.data)
+        bin += compress.compressed
         return bin
 
     @property
@@ -614,7 +667,7 @@ const lv_img_dsc_t {varname} = {{
                 data += [0, 0, 0, a]
             encoder = png.Writer(self.w, self.h, greyscale=False, alpha=True)
         elif self.cf == ColorFormat.L8:
-            # to greyscale
+            # to grayscale
             encoder = png.Writer(self.w,
                                  self.h,
                                  bitdepth=self.cf.bpp,
@@ -634,7 +687,7 @@ const lv_img_dsc_t {varname} = {{
         with open(filename, "wb") as f:
             encoder.write_array(f, data)
 
-        self.adjust_stride(stride=self.stride)
+        self.adjust_stride(stride=old_stride)
 
     def from_png(self,
                  filename: str,
@@ -852,8 +905,8 @@ class RLEImage(LVGLImage):
         index = 0
         data_len = len(data)
         compressed_data = []
+        memview = memoryview(data)
         while index < data_len:
-            memview = memoryview(data)
             repeat_cnt = self.get_repeat_count(memview[index:], blksize)
             if repeat_cnt == 0:
                 # done
@@ -946,6 +999,7 @@ class PNGConverter:
                  odir: str,
                  background: int = 0x00,
                  align: int = 1,
+                 compress: CompressMethod = CompressMethod.NONE,
                  keep_folder=True) -> None:
         self.files = files
         self.cf = cf
@@ -954,6 +1008,7 @@ class PNGConverter:
         self.pngquant = None
         self.keep_folder = keep_folder
         self.align = align
+        self.compress = compress
         self.background = background
 
     def _replace_ext(self, input, ext):
@@ -974,6 +1029,7 @@ class PNGConverter:
                                           self.cf,
                                           background=self.background)
                 rle.adjust_stride(align=self.align)
+                rle.set_compress(self.compress)
                 output.append((f, rle))
                 rle.to_rle(self._replace_ext(f, ".rle"))
             else:
@@ -981,6 +1037,7 @@ class PNGConverter:
                                            self.cf,
                                            background=self.background)
                 img.adjust_stride(align=self.align)
+                img.set_compress(self.compress)
                 output.append((f, img))
                 if self.ofmt == OutputFormat.BIN_FILE:
                     img.to_bin(self._replace_ext(f, ".bin"))
@@ -1008,6 +1065,12 @@ def main():
             "XRGB8888", "RGB565", "RGB565A8", "RGB888", "TRUECOLOR",
             "TRUECOLOR_ALPHA", "AUTO"
         ])
+
+    parser.add_argument('--compress',
+                        help=("Binary data compress method, default to NONE"),
+                        default="NONE",
+                        choices=["NONE", "RLE"])
+
     parser.add_argument('--align',
                         help="stride alignment in bytes for bin image",
                         default=1,
@@ -1048,6 +1111,7 @@ def main():
         cf = ColorFormat[args.cf]
 
     ofmt = OutputFormat(args.ofmt)
+    compress = CompressMethod[args.compress]
 
     converter = PNGConverter(files,
                              cf,
@@ -1055,6 +1119,7 @@ def main():
                              args.output,
                              background=args.background,
                              align=args.align,
+                             compress=compress,
                              keep_folder=False)
     output = converter.convert()
     for f, img in output:
@@ -1066,10 +1131,11 @@ def main():
 def test():
     logging.basicConfig(level=logging.INFO)
     f = "pngs/cogwheel.RGB565A8.png"
-    img = LVGLImage().from_png(f, cf=ColorFormat.RGB565, background=0xFF_FF_00)
+    img = LVGLImage().from_png(f, cf=ColorFormat.RGB888, background=0xFF_FF_00)
     img.adjust_stride(align=16)
-    img.to_bin(f + ".bin")
-    img.to_png(f + ".png")  # convert back to png
+    img.set_compress(CompressMethod.RLE)
+    img.to_bin("output/cogwheel.RGB888.bin")
+    img.to_png("output/cogwheel.RGB888.png.png")  # convert back to png
 
 
 if __name__ == "__main__":
