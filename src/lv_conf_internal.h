@@ -55,10 +55,6 @@
  * Start parsing lv_conf_template.h
  -----------------------------------*/
 
-#ifndef __ASSEMBLY__
-#include <stdint.h>
-#endif
-
 /*====================
    COLOR SETTINGS
  *====================*/
