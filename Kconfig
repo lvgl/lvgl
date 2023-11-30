@@ -1065,6 +1065,9 @@ menu "LVGL configuration"
 				bool "Use extra 16KB RAM to cache decoded data to accerlate"
 		endif
 
+		config LV_USE_SVG
+			bool "SVG library"
+
 		config LV_USE_RLE
 			bool "LVGL's version of RLE compression method"
 

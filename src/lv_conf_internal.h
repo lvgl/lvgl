@@ -2361,6 +2361,15 @@
     #endif
 #endif
 
+/*SVG library*/
+#ifndef LV_USE_SVG
+    #ifdef CONFIG_LV_USE_SVG
+        #define LV_USE_SVG CONFIG_LV_USE_SVG
+    #else
+        #define LV_USE_SVG 0
+    #endif
+#endif
+
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
 #ifndef LV_USE_FFMPEG

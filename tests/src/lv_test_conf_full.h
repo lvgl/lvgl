@@ -79,6 +79,8 @@
 #define LV_USE_LZ4              1
 #define LV_USE_LZ4_INTERNAL     1
 #define LV_USE_VECTOR_GRAPHIC   1
+#define LV_USE_SVG              1
+#define LV_USE_SVG_DEBUG        1
 
 #define LV_BUILD_EXAMPLES       1
 #define LV_USE_DEMO_WIDGETS     1
