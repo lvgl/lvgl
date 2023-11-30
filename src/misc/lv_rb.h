@@ -3,7 +3,6 @@
  *
  */
 
-
 #ifndef LV_RB_H
 #define LV_RB_H
 
