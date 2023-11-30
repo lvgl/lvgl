@@ -1125,22 +1125,34 @@ menu "LVGL configuration"
 		config LV_USE_FREETYPE
 			bool "FreeType library"
 		if LV_USE_FREETYPE
-			menu "FreeType cache config"
+			menu "FreeType config"
 				config LV_FREETYPE_CACHE_SIZE
-					int "Memory used by FreeType to cache characters [bytes]"
-					default 65535
-				config LV_FREETYPE_USE_LVGL_PORT
-					bool "Let FreeType to use LVGL memory and file porting"
-					default n
-				config LV_FREETYPE_SBIT_CACHE
-					bool "enable sbit cache"
-					default n
-				config LV_FREETYPE_CACHE_FT_FACES
-					int "The maximum number of FT_Face(0: use defaults)"
-					default 4
-				config LV_FREETYPE_CACHE_FT_SIZES
-					int "The maximum number of FT_Size(0: use defaults)"
-					default 4
+				int "Memory used by FreeType to cache characters in kilobytes"
+				default 768
+			config LV_FREETYPE_USE_LVGL_PORT
+				bool "Let FreeType to use LVGL memory and file porting"
+				default n
+			choice
+				prompt "Freetype cache type"
+				default LV_FREETYPE_CACHE_TYPE_IMAGE
+
+				config LV_FREETYPE_CACHE_TYPE_IMAGE
+					bool "IMAGE"
+				config LV_FREETYPE_CACHE_TYPE_SBIT
+					bool "SBIT"
+				config LV_FREETYPE_CACHE_TYPE_OUTLINE
+					bool "OUTLINE"
+			endchoice
+			config LV_FREETYPE_CACHE_FT_FACES
+				int "The maximum number of FT_Face"
+				default 8
+			config LV_FREETYPE_CACHE_FT_SIZES
+				int "The maximum number of FT_Size"
+				default 8
+			config LV_FREETYPE_CACHE_FT_OUTLINES
+				int "The maximum number of Outline"
+				depends on LV_FREETYPE_CACHE_TYPE_OUTLINE
+				default 256
 			endmenu
 
 		config LV_USE_TINY_TTF

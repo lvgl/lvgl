@@ -2100,12 +2100,12 @@
     #endif
 #endif
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters [bytes]*/
+    /*Memory used by FreeType to cache characters in kilobytes*/
     #ifndef LV_FREETYPE_CACHE_SIZE
         #ifdef CONFIG_LV_FREETYPE_CACHE_SIZE
             #define LV_FREETYPE_CACHE_SIZE CONFIG_LV_FREETYPE_CACHE_SIZE
         #else
-            #define LV_FREETYPE_CACHE_SIZE (64 * 1024)
+            #define LV_FREETYPE_CACHE_SIZE 768
         #endif
     #endif
 
@@ -2118,14 +2118,15 @@
         #endif
     #endif
 
-    /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
-    /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
-    /* if font size >= 256, must be configured as image cache */
-    #ifndef LV_FREETYPE_SBIT_CACHE
-        #ifdef CONFIG_LV_FREETYPE_SBIT_CACHE
-            #define LV_FREETYPE_SBIT_CACHE CONFIG_LV_FREETYPE_SBIT_CACHE
+    /*FreeType cache type:
+     * LV_FREETYPE_CACHE_TYPE_IMAGE    - Image cache
+     * LV_FREETYPE_CACHE_TYPE_SBIT     - Sbit cache
+     * LV_FREETYPE_CACHE_TYPE_OUTLINE  - Outline cache*/
+    #ifndef LV_FREETYPE_CACHE_TYPE
+        #ifdef CONFIG_LV_FREETYPE_CACHE_TYPE
+            #define LV_FREETYPE_CACHE_TYPE CONFIG_LV_FREETYPE_CACHE_TYPE
         #else
-            #define LV_FREETYPE_SBIT_CACHE 0
+            #define LV_FREETYPE_CACHE_TYPE LV_FREETYPE_CACHE_TYPE_IMAGE
         #endif
     #endif
 
@@ -2135,14 +2136,21 @@
         #ifdef CONFIG_LV_FREETYPE_CACHE_FT_FACES
             #define LV_FREETYPE_CACHE_FT_FACES CONFIG_LV_FREETYPE_CACHE_FT_FACES
         #else
-            #define LV_FREETYPE_CACHE_FT_FACES 4
+            #define LV_FREETYPE_CACHE_FT_FACES 8
         #endif
     #endif
     #ifndef LV_FREETYPE_CACHE_FT_SIZES
         #ifdef CONFIG_LV_FREETYPE_CACHE_FT_SIZES
             #define LV_FREETYPE_CACHE_FT_SIZES CONFIG_LV_FREETYPE_CACHE_FT_SIZES
         #else
-            #define LV_FREETYPE_CACHE_FT_SIZES 4
+            #define LV_FREETYPE_CACHE_FT_SIZES 8
+        #endif
+    #endif
+    #ifndef LV_FREETYPE_CACHE_FT_OUTLINES
+        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_OUTLINES
+            #define LV_FREETYPE_CACHE_FT_OUTLINES CONFIG_LV_FREETYPE_CACHE_FT_OUTLINES
+        #else
+            #define LV_FREETYPE_CACHE_FT_OUTLINES 256
         #endif
     #endif
 #endif
