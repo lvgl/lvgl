@@ -100,6 +100,7 @@ void lv_obj_clean(lv_obj_t * obj)
 
     lv_obj_invalidate(obj);
 
+    uint32_t cnt = lv_obj_get_child_count(obj);
     lv_obj_t * child = lv_obj_get_first_not_deleting_child(obj);
     while(child) {
         obj_delete_core(child);
@@ -110,6 +111,11 @@ void lv_obj_clean(lv_obj_t * obj)
     if(obj->spec_attr) {
         obj->spec_attr->scroll.x = 0;
         obj->spec_attr->scroll.y = 0;
+    }
+
+    if(lv_obj_get_child_count(obj) < cnt) {
+        lv_obj_send_event(obj, LV_EVENT_CHILD_CHANGED, NULL);
+        lv_obj_send_event(obj, LV_EVENT_CHILD_DELETED, NULL);
     }
 
     LV_ASSERT_MEM_INTEGRITY();
