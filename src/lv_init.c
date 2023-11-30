@@ -300,6 +300,8 @@ void lv_deinit(void)
         return;
     }
 
+    if(lv_deinit_in_progress) return;
+
     lv_deinit_in_progress = true;
 
 #if LV_USE_SYSMON

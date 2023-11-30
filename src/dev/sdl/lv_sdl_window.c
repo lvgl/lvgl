@@ -375,8 +375,8 @@ static void release_disp_cb(lv_event_t * e)
     SDL_DestroyTexture(dsc->texture);
     SDL_DestroyRenderer(dsc->renderer);
     SDL_DestroyWindow(dsc->window);
-    if(dsc->fb1) lv_free(dsc->fb1);
-    if(dsc->fb2) lv_free(dsc->fb2);
+    if(dsc->fb1) free(dsc->fb1);
+    if(dsc->fb2) free(dsc->fb2);
     lv_free(dsc);
     lv_display_set_driver_data(disp, NULL);
 }
