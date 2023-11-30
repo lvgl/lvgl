@@ -36,6 +36,7 @@ static void lv_obj_delete_async_cb(void * obj);
 static void obj_delete_core(lv_obj_t * obj);
 static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data);
 static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth);
+static lv_obj_t * lv_obj_get_first_not_deleting_child(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -99,10 +100,10 @@ void lv_obj_clean(lv_obj_t * obj)
 
     lv_obj_invalidate(obj);
 
-    lv_obj_t * child = lv_obj_get_child(obj, 0);
+    lv_obj_t * child = lv_obj_get_first_not_deleting_child(obj);
     while(child) {
         obj_delete_core(child);
-        child = lv_obj_get_child(obj, 0);
+        child = lv_obj_get_first_not_deleting_child(obj);
     }
     /*Just to remove scroll animations if any*/
     lv_obj_scroll_to(obj, 0, 0, LV_ANIM_OFF);
@@ -615,4 +616,21 @@ static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth)
     else {
         return LV_OBJ_TREE_WALK_END;
     }
+}
+
+static lv_obj_t * lv_obj_get_first_not_deleting_child(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(obj->spec_attr == NULL) return NULL;
+
+    int32_t i;
+    int32_t cnt = (int32_t)obj->spec_attr->child_cnt;
+    for(i = 0; i < cnt; i++) {
+        if(!obj->spec_attr->children[i]->is_deleting) {
+            return obj->spec_attr->children[i];
+        }
+    }
+
+    return NULL;
 }
