@@ -303,6 +303,16 @@ void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data)
     indev->driver_data = driver_data;
 }
 
+lv_indev_read_cb_t lv_indev_get_read_cb(lv_indev_t * indev)
+{
+    if(!indev) {
+        LV_LOG_WARN("lv_indev_get_read_cb: indev was NULL");
+        return NULL;
+    }
+
+    return indev->read_cb;
+}
+
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
 {
     if(indev == NULL) return LV_INDEV_TYPE_NONE;
