@@ -2,7 +2,7 @@
  * @file lv_sysmon.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_SYSMON_H
 #define LV_SYSMON_H

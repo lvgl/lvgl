@@ -2,7 +2,7 @@
  * @file lv_sdl_keyboard.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_SDL_KEYBOARD_H
 #define LV_SDL_KEYBOARD_H

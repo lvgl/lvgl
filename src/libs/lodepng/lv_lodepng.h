@@ -2,7 +2,7 @@
  * @file lv_lodepng.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_LODEPNG_H
 #define LV_LODEPNG_H

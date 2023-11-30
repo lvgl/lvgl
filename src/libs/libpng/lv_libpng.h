@@ -2,7 +2,7 @@
  * @file lv_libpng.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_LIBPNG_H
 #define LV_LIBPNG_H

@@ -2,7 +2,7 @@
  * @file lv_canvas.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_CANVAS_H
 #define LV_CANVAS_H

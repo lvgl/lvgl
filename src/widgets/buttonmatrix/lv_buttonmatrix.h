@@ -2,7 +2,7 @@
  * @file lv_btnmatrix.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_BUTTONMATRIX_H
 #define LV_BUTTONMATRIX_H

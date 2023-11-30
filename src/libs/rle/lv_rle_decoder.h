@@ -2,7 +2,7 @@
  * @file lv_rle_decoder.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_RLE_DECODER_H
 #define LV_RLE_DECODER_H

@@ -2,7 +2,7 @@
  * @file lv_font_fmt_txt.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_FONT_FMT_TXT_H
 #define LV_FONT_FMT_TXT_H

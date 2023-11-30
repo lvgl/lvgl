@@ -2,7 +2,7 @@
  * @file lv_imgfont.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_IMGFONT_H
 #define LV_IMGFONT_H

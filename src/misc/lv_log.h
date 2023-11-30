@@ -2,7 +2,7 @@
  * @file lv_log.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_LOG_H
 #define LV_LOG_H

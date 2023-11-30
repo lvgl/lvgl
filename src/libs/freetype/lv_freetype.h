@@ -2,7 +2,7 @@
  * @file lv_freetype.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 #ifndef LV_FREETYPE_H
 #define LV_FREETYPE_H
 

@@ -2,6 +2,7 @@
  * @file lv_label.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_LABEL_H
 #define LV_LABEL_H

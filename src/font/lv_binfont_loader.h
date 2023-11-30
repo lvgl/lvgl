@@ -2,7 +2,7 @@
  * @file lv_binfont_loader.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_FONT_LOADER_H
 #define LV_FONT_LOADER_H

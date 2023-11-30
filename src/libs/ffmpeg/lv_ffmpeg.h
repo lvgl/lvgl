@@ -2,7 +2,7 @@
  * @file lv_ffmpeg.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 #ifndef LV_FFMPEG_H
 #define LV_FFMPEG_H
 

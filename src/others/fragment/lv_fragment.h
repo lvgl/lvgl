@@ -2,7 +2,7 @@
  * Public header for Fragment
  * @file lv_fragment.h
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_FRAGMENT_H
 #define LV_FRAGMENT_H

@@ -2,7 +2,7 @@
  * @file lv_textarea.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_TEXTAREA_H
 #define LV_TEXTAREA_H

@@ -2,7 +2,7 @@
  * @file lv_indev.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_INDEV_H
 #define LV_INDEV_H

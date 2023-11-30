@@ -2,7 +2,7 @@
  * @file lv_switch.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_SWITCH_H
 #define LV_SWITCH_H

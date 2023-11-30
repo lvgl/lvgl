@@ -2,7 +2,7 @@
  * @file lv_animimg.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_ANIM_IMAGE_H
 #define LV_ANIM_IMAGE_H

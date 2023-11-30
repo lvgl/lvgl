@@ -2,7 +2,7 @@
  * @file lv_dropdown.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_DROPDOWN_H
 #define LV_DROPDOWN_H

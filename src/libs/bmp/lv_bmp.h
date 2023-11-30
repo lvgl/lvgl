@@ -2,7 +2,7 @@
  * @file lv_bmp.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_BMP_H
 #define LV_BMP_H

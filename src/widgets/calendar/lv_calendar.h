@@ -2,7 +2,7 @@
  * @file lv_calendar.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_CALENDAR_H
 #define LV_CALENDAR_H

@@ -2,7 +2,7 @@
  * @file lv_span.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_SPAN_H
 #define LV_SPAN_H

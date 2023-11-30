@@ -32,7 +32,7 @@
     - LZ4 homepage : http://www.lz4.org
     - LZ4 source repository : https://github.com/lz4/lz4
 */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #include "../../lv_conf_internal.h"
 #if LV_USE_LZ4_INTERNAL

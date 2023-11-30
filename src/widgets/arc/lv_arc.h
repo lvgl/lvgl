@@ -2,7 +2,7 @@
  * @file lv_arc.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_ARC_H
 #define LV_ARC_H

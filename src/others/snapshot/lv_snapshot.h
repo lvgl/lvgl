@@ -2,6 +2,7 @@
  * @file lv_snapshot.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_SNAPSHOT_H
 #define LV_SNAPSHOT_H

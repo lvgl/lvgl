@@ -2,7 +2,7 @@
  * @file lv_linux_fb_dev_h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_LINUX_FB_DEV_H
 #define LV_LINUX_FB_DEV_H

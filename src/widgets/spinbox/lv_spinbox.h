@@ -2,7 +2,7 @@
  * @file lv_spinbox.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_SPINBOX_H
 #define LV_SPINBOX_H

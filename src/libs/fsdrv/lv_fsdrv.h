@@ -2,7 +2,7 @@
  * @file lv_fsdrv.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_FSDRV_H
 #define LV_FSDRV_H

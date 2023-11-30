@@ -2,7 +2,7 @@
  * @file lv_slider.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_SLIDER_H
 #define LV_SLIDER_H

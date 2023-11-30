@@ -2,7 +2,7 @@
  * @file lv_nuttx_lcd.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_NUTTX_LCD_H
 #define LV_NUTTX_LCD_H

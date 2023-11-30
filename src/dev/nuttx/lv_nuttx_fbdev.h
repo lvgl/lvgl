@@ -2,7 +2,7 @@
  * @file lv_nuttx_fbdev_h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_NUTTX_FBDEV_H
 #define LV_NUTTX_FBDEV_H

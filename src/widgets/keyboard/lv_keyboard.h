@@ -2,6 +2,7 @@
  * @file lv_keyboard.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_KEYBOARD_H
 #define LV_KEYBOARD_H

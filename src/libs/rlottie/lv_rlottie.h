@@ -2,7 +2,7 @@
  * @file lv_rlottie.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_RLOTTIE_H
 #define LV_RLOTTIE_H

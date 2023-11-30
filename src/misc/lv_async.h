@@ -2,7 +2,7 @@
  * @file lv_async.h
  *
  */
-// IWYU pragma: private, include <lvgl/lvgl.h">
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_ASYNC_H
 #define LV_ASYNC_H

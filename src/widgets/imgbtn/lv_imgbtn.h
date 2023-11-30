@@ -2,6 +2,7 @@
  * @file lv_imgbtn.h
  *
  */
+// IWYU pragma: private, include <lvgl/lvgl.h>
 
 #ifndef LV_IMGBTN_H
 #define LV_IMGBTN_H
