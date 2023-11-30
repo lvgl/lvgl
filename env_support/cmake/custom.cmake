@@ -16,9 +16,10 @@ endif( LV_CONF_PATH )
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # Set sources used for LVGL components
-file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
+file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.S)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
+file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp)
 
 # Build LVGL library
 add_library(lvgl ${SOURCES})
@@ -26,7 +27,8 @@ add_library(lvgl::lvgl ALIAS lvgl)
 
 target_compile_definitions(
   lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
-              $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>)
+              $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>
+              $<$<COMPILE_LANGUAGE:ASM>:__ASSEMBLY__>)
 
 # Add definition of LV_CONF_PATH only if needed
 if(LV_CONF_PATH)
@@ -35,6 +37,16 @@ endif()
 
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
+
+
+if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+    add_library(lvgl_thorvg ${THORVG_SOURCES})
+    add_library(lvgl::thorvg ALIAS lvgl_thorvg)
+    target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
+    if(LV_CONF_PATH)
+        target_compile_definitions(lvgl_thorvg PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
+    endif()
+endif()
 
 # Build LVGL example library
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
@@ -70,6 +82,12 @@ install(
   DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
   FILES_MATCHING
   PATTERN "*.h")
+
+configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" lvgl.pc @ONLY)
+
+install(
+  FILES "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
+  DESTINATION "${LIB_INSTALL_DIR}/pkgconfig/")
 
 set_target_properties(
   lvgl

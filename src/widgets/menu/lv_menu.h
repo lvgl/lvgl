@@ -36,7 +36,6 @@ typedef _lv_menu_mode_header_t lv_menu_mode_header_t;
 typedef uint8_t lv_menu_mode_header_t;
 #endif /*DOXYGEN*/
 
-
 enum _lv_menu_mode_root_back_button_t {
     LV_MENU_ROOT_BACK_BUTTON_DISABLED,
     LV_MENU_ROOT_BACK_BUTTON_ENABLED
@@ -93,15 +92,15 @@ typedef struct {
     bool     static_title;
 } lv_menu_page_t;
 
-extern const lv_obj_class_t lv_menu_class;
-extern const lv_obj_class_t lv_menu_page_class;
-extern const lv_obj_class_t lv_menu_cont_class;
-extern const lv_obj_class_t lv_menu_section_class;
-extern const lv_obj_class_t lv_menu_separator_class;
-extern const lv_obj_class_t lv_menu_sidebar_cont_class;
-extern const lv_obj_class_t lv_menu_main_cont_class;
-extern const lv_obj_class_t lv_menu_sidebar_header_cont_class;
-extern const lv_obj_class_t lv_menu_main_header_cont_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_page_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_cont_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_section_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_separator_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_sidebar_cont_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_main_cont_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_sidebar_header_cont_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_main_header_cont_class;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -35,19 +34,19 @@
  **********************/
 
 /* Blit w/ recolor for images w/o opa and alpha channel */
-static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t dest_stride,
                               lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                              lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc);
+                              int32_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc);
 
 /* Blit w/ transformation for images w/o opa and alpha channel */
-static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t dest_stride,
                                 lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                                lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc);
+                                int32_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc);
 
 /* Blit simple w/ opa and alpha channel */
-static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t dest_stride,
                       lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                      lv_coord_t src_stride, lv_color_format_t src_cf, lv_opa_t opa);
+                      int32_t src_stride, lv_color_format_t src_cf, lv_opa_t opa);
 
 /**********************
  *  STATIC VARIABLES
@@ -92,11 +91,11 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     src_area.y1 = blend_area.y1 - (coords->y1 - layer->draw_buf_ofs.y);
     src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
     src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
-    lv_coord_t src_stride = img_dsc->header.stride;
+    int32_t src_stride = img_dsc->header.stride;
     lv_color_format_t src_cf = img_dsc->header.cf;
 
     uint8_t * dest_buf = layer->draw_buf.buf;
-    lv_coord_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
+    int32_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
     lv_color_format_t dest_cf = layer->draw_buf.color_format;
     bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
 
@@ -115,15 +114,15 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
  *   STATIC FUNCTIONS
  **********************/
 
-static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t dest_stride,
                               lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                              lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc)
+                              int32_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc)
 {
 
-    lv_coord_t dest_w = lv_area_get_width(dest_area);
-    lv_coord_t dest_h = lv_area_get_height(dest_area);
-    lv_coord_t src_w = lv_area_get_width(src_area);
-    lv_coord_t src_h = lv_area_get_height(src_area);
+    int32_t dest_w = lv_area_get_width(dest_area);
+    int32_t dest_h = lv_area_get_height(dest_area);
+    int32_t src_w = lv_area_get_width(src_area);
+    int32_t src_h = lv_area_get_height(src_area);
 
     bool src_has_alpha = (src_cf == LV_COLOR_FORMAT_ARGB8888);
     uint8_t src_px_size = lv_color_format_get_size(src_cf);
@@ -181,21 +180,21 @@ static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, l
     lv_pxp_run();
 }
 
-static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t dest_stride,
                                 lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                                lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc)
+                                int32_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc)
 {
-    lv_coord_t src_w = lv_area_get_width(src_area);
-    lv_coord_t src_h = lv_area_get_height(src_area);
-    lv_coord_t dest_w = lv_area_get_width(dest_area);
-    lv_coord_t dest_h = lv_area_get_height(dest_area);
+    int32_t src_w = lv_area_get_width(src_area);
+    int32_t src_h = lv_area_get_height(src_area);
+    int32_t dest_w = lv_area_get_width(dest_area);
+    int32_t dest_h = lv_area_get_height(dest_area);
 
     lv_point_t pivot = dsc->pivot;
     /*The offsets are now relative to the transformation result with pivot ULC*/
-    lv_coord_t piv_offset_x = 0;
-    lv_coord_t piv_offset_y = 0;
+    int32_t piv_offset_x = 0;
+    int32_t piv_offset_y = 0;
 
-    lv_coord_t trim_size = 0;
+    int32_t trim_size = 0;
 
     bool has_rotation = (dsc->rotation != 0);
     bool has_scale = (dsc->zoom != LV_SCALE_NONE);
@@ -239,7 +238,7 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
 
     if(has_scale) {
         float scale_factor_fp = (float)dsc->zoom / LV_SCALE_NONE;
-        lv_coord_t scale_factor_int = (lv_coord_t)scale_factor_fp;
+        int32_t scale_factor_int = (int32_t)scale_factor_fp;
 
         /*Any scale_factor in (k, k + 1] will result in a trim equal to k*/
         if(scale_factor_fp == scale_factor_int)
@@ -288,14 +287,14 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
     lv_pxp_run();
 }
 
-static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t dest_stride,
                       lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                      lv_coord_t src_stride, lv_color_format_t src_cf, lv_opa_t opa)
+                      int32_t src_stride, lv_color_format_t src_cf, lv_opa_t opa)
 {
-    lv_coord_t dest_w = lv_area_get_width(dest_area);
-    lv_coord_t dest_h = lv_area_get_height(dest_area);
-    lv_coord_t src_w = lv_area_get_width(src_area);
-    lv_coord_t src_h = lv_area_get_height(src_area);
+    int32_t dest_w = lv_area_get_width(dest_area);
+    int32_t dest_h = lv_area_get_height(dest_area);
+    int32_t src_w = lv_area_get_width(src_area);
+    int32_t src_h = lv_area_get_height(src_area);
 
     bool src_has_alpha = (src_cf == LV_COLOR_FORMAT_ARGB8888);
     uint8_t src_px_size = lv_color_format_get_size(src_cf);

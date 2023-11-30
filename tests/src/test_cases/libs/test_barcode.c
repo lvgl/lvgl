@@ -44,7 +44,7 @@ void test_barcode_normal(void)
     TEST_ASSERT_NOT_NULL(image_dsc);
 
     lv_obj_set_size(barcode, image_dsc->header.w, 50);
-    TEST_ASSERT_EQUAL_SCREENSHOT("barcode_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
 
     lv_barcode_set_direction(barcode, LV_DIR_VER);
     res = lv_barcode_update(barcode, "https://lvgl.io");
@@ -54,7 +54,7 @@ void test_barcode_normal(void)
     TEST_ASSERT_NOT_NULL(image_dsc);
 
     lv_obj_set_size(barcode, 50, image_dsc->header.h);
-    TEST_ASSERT_EQUAL_SCREENSHOT("barcode_2.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_2.png");
 
 }
 

@@ -17,4 +17,8 @@ Slider with extended drawer
 .. lv_example:: widgets/slider/lv_example_slider_3
   :language: c
 
+Slider with opposite direction
+------------------------------
 
+.. lv_example:: widgets/slider/lv_example_slider_4
+  :language: c

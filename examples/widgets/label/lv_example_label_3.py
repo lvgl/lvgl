@@ -25,7 +25,8 @@ except:
         script_path = ''
     if script_path != '':
         try:
-            font_montserrat_16 = lv.font_load("S:" + script_path + "/../../assets/font/montserrat-16.fnt")
+            font_montserrat_16 = lv.font_t()
+            lv.binfont_load(font_montserrat_16, "S:" + script_path + "/../../assets/font/montserrat-16.fnt")
             ltr_label.set_style_text_font(font_montserrat_16,0)
         except:
             print("Cannot load font file montserrat-16.fnt")
@@ -40,7 +41,8 @@ rtl_label.set_style_text_font(lv.font_dejavu_16_persian_hebrew, 0)
 rtl_label.set_width(310)
 rtl_label.align(lv.ALIGN.LEFT_MID, 5, 0)
 
-font_simsun_16_cjk = lv.font_load("S:../../assets/font/lv_font_simsun_16_cjk.fnt")
+font_simsun_16_cjk = lv.font_t()
+lv.binfont_load(font_simsun_16_cjk, "S:../../assets/font/lv_font_simsun_16_cjk.fnt")
 
 cz_label = lv.label(lv.screen_active())
 cz_label.set_style_text_font(font_simsun_16_cjk, 0)

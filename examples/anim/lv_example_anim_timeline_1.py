@@ -12,7 +12,7 @@ class LV_ExampleAnimTimeline_1(object):
         self.par.set_flex_align(lv.FLEX_ALIGN.SPACE_AROUND, lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.CENTER)
 
         self.button_run = lv.button(self.par)
-        self.button_run.add_event(self.button_run_event_handler, lv.EVENT.VALUE_CHANGED, None)
+        self.button_run.add_event_cb(self.button_run_event_handler, lv.EVENT.VALUE_CHANGED, None)
         self.button_run.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
         self.button_run.add_flag(lv.obj.FLAG.CHECKABLE)
         self.button_run.align(lv.ALIGN.TOP_MID, -50, 20)
@@ -22,7 +22,7 @@ class LV_ExampleAnimTimeline_1(object):
         self.label_run.center()
 
         self.button_del = lv.button(self.par)
-        self.button_del.add_event(self.button_delete_event_handler, lv.EVENT.CLICKED, None)
+        self.button_del.add_event_cb(self.button_delete_event_handler, lv.EVENT.CLICKED, None)
         self.button_del.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
         self.button_del.align(lv.ALIGN.TOP_MID, 50, 20)
 
@@ -31,7 +31,7 @@ class LV_ExampleAnimTimeline_1(object):
         self.label_del.center()
 
         self.slider = lv.slider(self.par)
-        self.slider.add_event(self.slider_prg_event_handler, lv.EVENT.VALUE_CHANGED, None)
+        self.slider.add_event_cb(self.slider_prg_event_handler, lv.EVENT.VALUE_CHANGED, None)
         self.slider.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
         self.slider.align(lv.ALIGN.BOTTOM_RIGHT, -20, -20)
         self.slider.set_range(0, 65535)

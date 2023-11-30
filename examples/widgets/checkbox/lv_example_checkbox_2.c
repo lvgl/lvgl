@@ -24,7 +24,6 @@ static void radio_event_handler(lv_event_t * e)
     LV_LOG_USER("Selected radio buttons: %d, %d", (int)active_index_1, (int)active_index_2);
 }
 
-
 static void radiobutton_create(lv_obj_t * parent, const char * txt)
 {
     lv_obj_t * obj = lv_checkbox_create(parent);
@@ -44,7 +43,6 @@ void lv_example_checkbox_2(void)
      * A variable is passed as event user data where the index of the active
      * radiobutton is saved */
 
-
     lv_style_init(&style_radio);
     lv_style_set_radius(&style_radio, LV_RADIUS_CIRCLE);
 
@@ -57,7 +55,7 @@ void lv_example_checkbox_2(void)
     lv_obj_t * cont1 = lv_obj_create(lv_screen_active());
     lv_obj_set_flex_flow(cont1, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_size(cont1, lv_pct(40), lv_pct(80));
-    lv_obj_add_event(cont1, radio_event_handler, LV_EVENT_CLICKED, &active_index_1);
+    lv_obj_add_event_cb(cont1, radio_event_handler, LV_EVENT_CLICKED, &active_index_1);
 
     for(i = 0; i < 5; i++) {
         lv_snprintf(buf, sizeof(buf), "A %d", (int)i + 1);
@@ -71,7 +69,7 @@ void lv_example_checkbox_2(void)
     lv_obj_set_flex_flow(cont2, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_size(cont2, lv_pct(40), lv_pct(80));
     lv_obj_set_x(cont2, lv_pct(50));
-    lv_obj_add_event(cont2, radio_event_handler, LV_EVENT_CLICKED, &active_index_2);
+    lv_obj_add_event_cb(cont2, radio_event_handler, LV_EVENT_CLICKED, &active_index_2);
 
     for(i = 0; i < 3; i++) {
         lv_snprintf(buf, sizeof(buf), "B %d", (int)i + 1);
@@ -81,6 +79,5 @@ void lv_example_checkbox_2(void)
     /*Make the first checkbox checked*/
     lv_obj_add_state(lv_obj_get_child(cont2, 0), LV_STATE_CHECKED);
 }
-
 
 #endif

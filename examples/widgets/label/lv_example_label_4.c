@@ -67,7 +67,7 @@ void lv_example_label_4(void)
     lv_obj_set_style_bg_color(grad, lv_color_hex(0xff0000), 0);
     lv_obj_set_style_bg_grad_color(grad, lv_color_hex(0x0000ff), 0);
     lv_obj_set_style_bg_grad_dir(grad, LV_GRAD_DIR_HOR, 0);
-    lv_obj_add_event(grad, add_mask_event_cb, LV_EVENT_ALL, mask_map);
+    lv_obj_add_event_cb(grad, add_mask_event_cb, LV_EVENT_ALL, mask_map);
 }
 
 #endif

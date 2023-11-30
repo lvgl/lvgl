@@ -91,7 +91,6 @@ lv_obj_t * lv_file_explorer_create(lv_obj_t * parent);
 void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir_t dir, const char * path);
 #endif
 
-
 /**
  * Set file_explorer sort
  * @param obj   pointer to a file explorer object

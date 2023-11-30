@@ -53,7 +53,7 @@ def file_explorer_event_handler(e) :
 
     elif code == lv.EVENT.READY :
         tb = obj.explorer_get_file_table()
-        sum = tb.get_row_cnt()
+        sum = tb.get_row_count()
         # print("sum: ",sum)
         sort_by_file_kind(tb, 0, (sum - 1));
 
@@ -86,4 +86,4 @@ if LV_FILE_EXPLORER_QUICK_ACCESS :
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.DOCS_DIR, home_dir + "/Documents")
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.FS_DIR, "A:/")
 
-    file_explorer.add_event(file_explorer_event_handler, lv.EVENT.ALL, None)
+    file_explorer.add_event_cb(file_explorer_event_handler, lv.EVENT.ALL, None)

@@ -37,7 +37,6 @@ struct _lv_fragment_manager_t {
     lv_ll_t stack;
 };
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -65,8 +64,7 @@ static lv_fragment_managed_states_t * fragment_attach(lv_fragment_manager_t * ma
 
 lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent)
 {
-    lv_fragment_manager_t * instance = lv_malloc(sizeof(lv_fragment_manager_t));
-    lv_memzero(instance, sizeof(lv_fragment_manager_t));
+    lv_fragment_manager_t * instance = lv_malloc_zeroed(sizeof(lv_fragment_manager_t));
     instance->parent = parent;
     _lv_ll_init(&instance->attached, sizeof(lv_fragment_managed_states_t));
     _lv_ll_init(&instance->stack, sizeof(lv_fragment_stack_item_t));
@@ -258,7 +256,6 @@ static void item_delete_fragment(lv_fragment_managed_states_t * item)
     lv_fragment_delete(instance);
     item->instance = NULL;
 }
-
 
 static lv_fragment_managed_states_t * fragment_attach(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
                                                       lv_obj_t * const * container)

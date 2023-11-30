@@ -31,6 +31,7 @@ typedef struct {
  **********************/
 static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data);
 static uint32_t keycode_to_ctrl_key(SDL_Keycode sdl_key);
+static void release_indev_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -42,10 +43,9 @@ static uint32_t keycode_to_ctrl_key(SDL_Keycode sdl_key);
 
 lv_indev_t * lv_sdl_keyboard_create(void)
 {
-    lv_sdl_keyboard_t * dsc = lv_malloc(sizeof(lv_sdl_keyboard_t));
+    lv_sdl_keyboard_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_keyboard_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_sdl_keyboard_t));
 
     lv_indev_t * indev = lv_indev_create();
     LV_ASSERT_MALLOC(indev);
@@ -57,6 +57,9 @@ lv_indev_t * lv_sdl_keyboard_create(void)
     lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
     lv_indev_set_read_cb(indev, sdl_keyboard_read);
     lv_indev_set_driver_data(indev, dsc);
+
+    lv_timer_delete(lv_indev_get_read_timer(indev));
+    lv_indev_add_event_cb(indev, release_indev_cb, LV_EVENT_DELETE, indev);
 
     return indev;
 }
@@ -84,6 +87,18 @@ static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
         data->key = dev->buf[0];
         memmove(dev->buf, dev->buf + 1, len);
         data->continue_reading = true;
+    }
+}
+
+static void release_indev_cb(lv_event_t * e)
+{
+    lv_indev_t * indev = (lv_indev_t *) lv_event_get_user_data(e);
+    lv_sdl_keyboard_t * dev = lv_indev_get_driver_data(indev);
+    if(dev) {
+        lv_indev_set_driver_data(indev, NULL);
+        lv_indev_set_read_cb(indev, NULL);
+        lv_free(dev);
+        LV_LOG_INFO("done");
     }
 }
 
@@ -115,7 +130,6 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
     if(indev == NULL) return;
     lv_sdl_keyboard_t * dsc = lv_indev_get_driver_data(indev);
 
-
     /* We only care about SDL_KEYDOWN and SDL_TEXTINPUT events */
     switch(event->type) {
         case SDL_KEYDOWN: {                     /*Button press*/
@@ -139,8 +153,8 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
             break;
 
     }
+    lv_indev_read(indev);
 }
-
 
 /**
  * Convert a SDL key code to it's LV_KEY_* counterpart or return '\0' if it's not a control character.

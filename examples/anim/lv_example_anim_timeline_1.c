@@ -7,8 +7,8 @@ static lv_obj_t * obj1 = NULL;
 static lv_obj_t * obj2 = NULL;
 static lv_obj_t * obj3 = NULL;
 
-static const lv_coord_t obj_width = 90;
-static const lv_coord_t obj_height = 70;
+static const int32_t obj_width = 90;
+static const int32_t obj_height = 70;
 
 static void set_width(void * var, int32_t v)
 {
@@ -142,7 +142,7 @@ void lv_example_anim_timeline_1(void)
 
     /* create btn_start */
     lv_obj_t * btn_start = lv_button_create(par);
-    lv_obj_add_event(btn_start, btn_start_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(btn_start, btn_start_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(btn_start, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_add_flag(btn_start, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_align(btn_start, LV_ALIGN_TOP_MID, -100, 20);
@@ -153,7 +153,7 @@ void lv_example_anim_timeline_1(void)
 
     /* create btn_del */
     lv_obj_t * btn_del = lv_button_create(par);
-    lv_obj_add_event(btn_del, btn_delete_event_handler, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn_del, btn_delete_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(btn_del, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(btn_del, LV_ALIGN_TOP_MID, 0, 20);
 
@@ -163,7 +163,7 @@ void lv_example_anim_timeline_1(void)
 
     /* create btn_stop */
     lv_obj_t * btn_stop = lv_button_create(par);
-    lv_obj_add_event(btn_stop, btn_stop_event_handler, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn_stop, btn_stop_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(btn_stop, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(btn_stop, LV_ALIGN_TOP_MID, 100, 20);
 
@@ -173,7 +173,7 @@ void lv_example_anim_timeline_1(void)
 
     /* create slider_prg */
     lv_obj_t * slider_prg = lv_slider_create(par);
-    lv_obj_add_event(slider_prg, slider_prg_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(slider_prg, slider_prg_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(slider_prg, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(slider_prg, LV_ALIGN_BOTTOM_MID, 0, -20);
     lv_slider_set_range(slider_prg, 0, 65535);
@@ -187,6 +187,18 @@ void lv_example_anim_timeline_1(void)
 
     obj3 = lv_obj_create(par);
     lv_obj_set_size(obj3, obj_width, obj_height);
+
+    anim_timeline_create();
+
+    lv_anim_timeline_set_progress(anim_timeline, 32000);
+    lv_refr_now(NULL);
+    lv_anim_timeline_set_progress(anim_timeline, 65535);
+    lv_refr_now(NULL);
+    lv_anim_timeline_set_progress(anim_timeline, 50000);
+    lv_refr_now(NULL);
+    lv_anim_timeline_set_progress(anim_timeline, 60000);
+    lv_refr_now(NULL);
+
 }
 
 #endif

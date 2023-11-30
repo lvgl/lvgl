@@ -27,7 +27,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_LABEL_WAIT_CHAR_COUNT        3
 #define LV_LABEL_DOT_NUM 3
 #define LV_LABEL_POS_LAST 0xFFFF
 #define LV_LABEL_TEXT_SELECTION_OFF LV_DRAW_LABEL_NO_TXT_SEL
@@ -60,7 +59,6 @@ typedef _lv_label_long_mode_t lv_label_long_mode_t;
 typedef uint8_t lv_label_long_mode_t;
 #endif /*DOXYGEN*/
 
-
 typedef struct {
     lv_obj_t obj;
     char * text;
@@ -83,13 +81,12 @@ typedef struct {
     lv_point_t offset; /*Text draw position offset*/
     lv_label_long_mode_t long_mode : 3; /*Determine what to do with the long texts*/
     uint8_t static_txt : 1;             /*Flag to indicate the text is static*/
-    uint8_t recolor : 1;                /*Enable in-line letter re-coloring*/
     uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SCROLL)*/
     uint8_t dot_tmp_alloc : 1;          /*1: dot is allocated, 0: dot directly holds up to 4 chars*/
     uint8_t invalid_size_cache : 1;     /*1: Recalculate size and update cache*/
 } lv_label_t;
 
-extern const lv_obj_class_t lv_label_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_label_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -138,14 +135,6 @@ void lv_label_set_text_static(lv_obj_t * obj, const char * text);
 void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode);
 
 /**
- * Enable the recoloring by in-line commands
- * @param obj           pointer to a label object
- * @param en            true: enable recoloring, false: disable
- * @example "This is a #ff0000 red# word"
- */
-void lv_label_set_recolor(lv_obj_t * obj, bool en);
-
-/**
  * Set where text selection should start
  * @param obj       pointer to a label object
  * @param index     character index from where selection should start. `LV_LABEL_TEXT_SELECTION_OFF` for no selection
@@ -176,13 +165,6 @@ char * lv_label_get_text(const lv_obj_t * obj);
  * @return          the current long mode
  */
 lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj);
-
-/**
- * Get the recoloring attribute
- * @param obj       pointer to a label object
- * @return          true: recoloring is enabled, false: disable
- */
-bool lv_label_get_recolor(const lv_obj_t * obj);
 
 /**
  * Get the relative x and y coordinates of a letter

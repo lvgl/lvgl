@@ -181,7 +181,6 @@ img_demo_widgets_avatar_map[] = {
 
 const lv_image_dsc_t img_demo_widgets_avatar = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .header.always_zero = 0,
     .header.w = 160,
     .header.h = 154,
     .data = img_demo_widgets_avatar_map,

@@ -15,11 +15,12 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <poll.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <nuttx/video/fb.h>
 
-#include <lvgl/lvgl.h>
+#include "../../../lvgl.h"
 #include "../../lvgl_private.h"
 
 /*********************
@@ -47,6 +48,8 @@ typedef struct {
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static int fbdev_get_pinfo(int fd, struct fb_planeinfo_s * pinfo);
 static int fbdev_init_mem2(lv_nuttx_fb_t * dsc);
+static void display_refr_timer_cb(lv_timer_t * tmr);
+static void display_release_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -60,16 +63,11 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc);
  *   GLOBAL FUNCTIONS
  **********************/
 
-/****************************************************************************
- * Name: lv_nuttx_fbdev_create
- ****************************************************************************/
-
 lv_display_t * lv_nuttx_fbdev_create(void)
 {
-    lv_nuttx_fb_t * dsc = lv_malloc(sizeof(lv_nuttx_fb_t));
+    lv_nuttx_fb_t * dsc = lv_malloc_zeroed(sizeof(lv_nuttx_fb_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_nuttx_fb_t));
 
     lv_display_t * disp = lv_display_create(800, 480);
     if(disp == NULL) {
@@ -78,13 +76,10 @@ lv_display_t * lv_nuttx_fbdev_create(void)
     }
     dsc->fd = -1;
     lv_display_set_driver_data(disp, dsc);
+    lv_display_add_event_cb(disp, display_release_cb, LV_EVENT_DELETE, disp);
     lv_display_set_flush_cb(disp, flush_cb);
     return disp;
 }
-
-/****************************************************************************
- * Name: lv_nuttx_fbdev_set_file
- ****************************************************************************/
 
 int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
 {
@@ -95,6 +90,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     if(dsc->fd >= 0) close(dsc->fd);
 
     /* Open the file for reading and writing*/
+
     dsc->fd = open(file, O_RDWR);
     if(dsc->fd < 0) {
         LV_LOG_ERROR("Error: cannot open framebuffer device");
@@ -127,6 +123,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     }
 
     /* double buffer mode */
+
     if(dsc->pinfo.yres_virtual == (dsc->vinfo.yres * 2)) {
         if((ret = fbdev_init_mem2(dsc)) < 0) {
             goto errout;
@@ -135,7 +132,9 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
 
     lv_display_set_draw_buffers(disp, dsc->mem, dsc->mem2,
                                 (dsc->pinfo.stride * dsc->vinfo.yres), LV_DISP_RENDER_MODE_DIRECT);
+    lv_display_set_user_data(disp, (void *)(uintptr_t)(dsc->fd));
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
+    lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
 
     LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", dsc->vinfo.xres, dsc->vinfo.yres, lv_display_get_dpi(disp));
     return 0;
@@ -150,10 +149,30 @@ errout:
  *   STATIC FUNCTIONS
  **********************/
 
+static void display_refr_timer_cb(lv_timer_t * tmr)
+{
+    lv_display_t * disp = lv_timer_get_user_data(tmr);
+    lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
+    struct pollfd pfds[1];
+
+    lv_memzero(pfds, sizeof(pfds));
+    pfds[0].fd = dsc->fd;
+    pfds[0].events = POLLOUT;
+
+    /* Query free fb to draw */
+
+    if(poll(pfds, 1, 0) < 0) {
+        return;
+    }
+
+    if(pfds[0].revents & POLLOUT) {
+        _lv_display_refr_timer(tmr);
+    }
+}
+
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
-
 
     /* Skip the non-last flush */
 
@@ -171,6 +190,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
 #if defined(CONFIG_FB_UPDATE)
     /*May be some direct update command is required*/
+
     struct fb_area_s fb_area;
     fb_area.x = area->x1;
     fb_area.y = area->y1;
@@ -182,6 +202,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 #endif
 
     /* double framebuffer */
+
     if(dsc->mem2 != NULL) {
         if(disp->buf_act == disp->buf_1) {
             dsc->pinfo.yoffset = 0;
@@ -197,11 +218,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     lv_display_flush_ready(disp);
 }
 
-
-/****************************************************************************
- * Name: fbdev_get_pinfo
- ****************************************************************************/
-
 static int fbdev_get_pinfo(int fd, FAR struct fb_planeinfo_s * pinfo)
 {
     if(ioctl(fd, FBIOGET_PLANEINFO, (unsigned long)((uintptr_t)pinfo)) < 0) {
@@ -210,13 +226,13 @@ static int fbdev_get_pinfo(int fd, FAR struct fb_planeinfo_s * pinfo)
     }
 
     LV_LOG_INFO("PlaneInfo (plane %d):", pinfo->display);
-    LV_LOG_INFO("    mem: %p", pinfo->mem);
+    LV_LOG_INFO("    mem: %p", pinfo->fbmem);
     LV_LOG_INFO("    fblen: %zu", pinfo->fblen);
     LV_LOG_INFO("   stride: %u", pinfo->stride);
     LV_LOG_INFO("  display: %u", pinfo->display);
     LV_LOG_INFO("      bpp: %u", pinfo->bpp);
 
-    /* Only these pixel depths are supported.  viinfo.fmt is ignored, only
+    /* Only these pixel depths are supported.  vinfo.fmt is ignored, only
      * certain color formats are supported.
      */
 
@@ -229,17 +245,13 @@ static int fbdev_get_pinfo(int fd, FAR struct fb_planeinfo_s * pinfo)
     return 0;
 }
 
-/****************************************************************************
- * Name: fbdev_init_mem2
- ****************************************************************************/
-
 static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
 {
     uintptr_t buf_offset;
     struct fb_planeinfo_s pinfo;
     int ret;
 
-    memset(&pinfo, 0, sizeof(pinfo));
+    lv_memzero(&pinfo, sizeof(pinfo));
 
     /* Get display[1] planeinfo */
 
@@ -285,6 +297,23 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
     }
 
     return 0;
+}
+
+static void display_release_cb(lv_event_t * e)
+{
+    lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
+    lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc) {
+        lv_display_set_driver_data(disp, NULL);
+        lv_display_set_flush_cb(disp, NULL);
+
+        if(dsc->fd >= 0) {
+            close(dsc->fd);
+            dsc->fd = -1;
+        }
+        lv_free(dsc);
+    }
+    LV_LOG_INFO("Done");
 }
 
 #endif /*LV_USE_NUTTX*/

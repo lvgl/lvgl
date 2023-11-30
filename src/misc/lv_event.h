@@ -29,13 +29,11 @@ struct _lv_event_t;
 
 typedef void (*lv_event_cb_t)(struct _lv_event_t * e);
 
-
 typedef struct {
     lv_event_cb_t cb;
     void * user_data;
     uint32_t filter;
 } lv_event_dsc_t;
-
 
 /**
  * Type of event being sent to the object.
@@ -56,17 +54,17 @@ typedef enum {
     LV_EVENT_SCROLL_THROW_BEGIN,
     LV_EVENT_SCROLL_END,          /**< Scrolling ends*/
     LV_EVENT_SCROLL,              /**< Scrolling*/
-    LV_EVENT_GESTURE,             /**< A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_get_act());` */
-    LV_EVENT_KEY,                 /**< A key is sent to the object. Get the key with `lv_indev_get_key(lv_indev_get_act());`*/
+    LV_EVENT_GESTURE,             /**< A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_active());` */
+    LV_EVENT_KEY,                 /**< A key is sent to the object. Get the key with `lv_indev_get_key(lv_indev_active());`*/
     LV_EVENT_FOCUSED,             /**< The object is focused*/
     LV_EVENT_DEFOCUSED,           /**< The object is defocused*/
     LV_EVENT_LEAVE,               /**< The object is defocused but still selected*/
     LV_EVENT_HIT_TEST,            /**< Perform advanced hit-testing*/
-    LV_EVENT_INDEV_RESET,         /**< Indev has been reseted*/
+    LV_EVENT_INDEV_RESET,         /**< Indev has been reset*/
 
     /** Drawing events*/
     LV_EVENT_COVER_CHECK,        /**< Check if the object fully covers an area. The event parameter is `lv_cover_check_info_t *`.*/
-    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow). The event parameter is `lv_coord_t *` to store the size.*/
+    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow). The event parameter is `int32_t *` to store the size.*/
     LV_EVENT_DRAW_MAIN_BEGIN,    /**< Starting the main drawing phase*/
     LV_EVENT_DRAW_MAIN,          /**< Perform the main drawing*/
     LV_EVENT_DRAW_MAIN_END,      /**< Finishing the main drawing phase*/
@@ -97,10 +95,6 @@ typedef enum {
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
     /** Events of optional LVGL components*/
-#if LV_USE_MSG
-    LV_EVENT_MSG_RECEIVED,
-#endif
-
     LV_EVENT_INVALIDATE_AREA,
     LV_EVENT_RENDER_START,
     LV_EVENT_RENDER_READY,
@@ -113,11 +107,9 @@ typedef enum {
 
     _LV_EVENT_LAST,               /** Number of default events*/
 
-
     LV_EVENT_PREPROCESS = 0x80,   /** This is a flag that can be set with an event so it's processed
                                       before the class default event processing */
 } lv_event_code_t;
-
 
 typedef struct {
     lv_event_dsc_t * dsc;

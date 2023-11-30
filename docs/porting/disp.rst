@@ -198,7 +198,7 @@ be stored in display object.
 Events
 ******
 
-:cpp:expr:`lv_disp_add_event(disp, event_cb, LV_DISP_EVENT_..., user_data)` adds
+:cpp:expr:`lv_disp_add_event_cb(disp, event_cb, LV_DISP_EVENT_..., user_data)` adds
 an event handler to a display. The following events are sent:
 
 - :cpp:enumerator:`LV_DISP_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw).
@@ -236,7 +236,7 @@ You can do this in the following way:
    /*Call this anywhere you want to refresh the dirty areas*/
    _lv_disp_refr_timer(NULL);
 
-If you have multiple displays call :cpp:expr:`lv_disp_set_deafult(disp1)` to
+If you have multiple displays call :cpp:expr:`lv_disp_set_default(disp1)` to
 select the display to refresh before :cpp:expr:`_lv_disp_refr_timer(NULL)`.
 
 

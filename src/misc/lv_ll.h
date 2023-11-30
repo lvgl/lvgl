@@ -76,11 +76,16 @@ void * _lv_ll_ins_tail(lv_ll_t * ll_p);
  */
 void _lv_ll_remove(lv_ll_t * ll_p, void * node_p);
 
+void _lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *));
+
 /**
  * Remove and free all elements from a linked list. The list remain valid but become empty.
  * @param ll_p pointer to linked list
  */
-void _lv_ll_clear(lv_ll_t * ll_p);
+static inline void _lv_ll_clear(lv_ll_t * ll_p)
+{
+    _lv_ll_clear_custom(ll_p, NULL);
+}
 
 /**
  * Move a node to a new linked list

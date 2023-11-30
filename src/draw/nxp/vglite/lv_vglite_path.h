@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 #ifndef LV_VGLITE_PATH_H
 #define LV_VGLITE_PATH_H
 
@@ -72,7 +71,7 @@ extern "C" {
  *
  */
 void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size,
-                                  lv_coord_t radius,
+                                  int32_t radius,
                                   const lv_area_t * coords);
 
 /**********************

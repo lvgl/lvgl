@@ -23,7 +23,7 @@
 typedef struct {
     uint8_t char_offset;
     uint16_t char_end_form;
-    int8_t char_begining_form_offset;
+    int8_t char_beginning_form_offset;
     int8_t char_middle_form_offset;
     int8_t char_isolated_form_offset;
     struct {
@@ -106,7 +106,7 @@ const ap_chars_map_t ap_chars_map[] = {
 /**********************
 *   GLOBAL FUNCTIONS
 **********************/
-uint32_t _lv_text_ap_calc_bytes_cnt(const char * txt)
+uint32_t _lv_text_ap_calc_bytes_count(const char * txt)
 {
     uint32_t txt_length = 0;
     uint32_t chars_cnt = 0;
@@ -205,7 +205,7 @@ void _lv_text_ap_proc(const char * txt, char * txt_out)
         if(conjunction_to_previuse && conjunction_to_next)
             ch_fin[j] = ap_chars_map[index_current].char_end_form + ap_chars_map[index_current].char_middle_form_offset;
         else if(!conjunction_to_previuse && conjunction_to_next)
-            ch_fin[j] = ap_chars_map[index_current].char_end_form + ap_chars_map[index_current].char_begining_form_offset;
+            ch_fin[j] = ap_chars_map[index_current].char_end_form + ap_chars_map[index_current].char_beginning_form_offset;
         else if(conjunction_to_previuse && !conjunction_to_next)
             ch_fin[j] = ap_chars_map[index_current].char_end_form;
         else
@@ -259,7 +259,7 @@ static uint32_t lv_ap_get_char_index(uint16_t c)
         if(c == (ap_chars_map[i].char_offset + LV_AP_ALPHABET_BASE_CODE))
             return i;
         else if(c == ap_chars_map[i].char_end_form                                                  //is it an End form
-                || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_begining_form_offset)     //is it a Beginning form
+                || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_beginning_form_offset)     //is it a Beginning form
                 || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_middle_form_offset)       //is it a middle form
                 || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_isolated_form_offset)) {  //is it an isolated form
             return i;

@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -65,8 +64,8 @@ enum {
  * A common callback type for every mask type.
  * Used internally by the library.
  */
-typedef lv_draw_sw_mask_res_t (*lv_draw_sw_mask_xcb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
-                                                       lv_coord_t len,
+typedef lv_draw_sw_mask_res_t (*lv_draw_sw_mask_xcb_t)(lv_opa_t * mask_buf, int32_t abs_x, int32_t abs_y,
+                                                       int32_t len,
                                                        void * p);
 
 typedef uint8_t lv_draw_sw_mask_line_side_t;
@@ -120,8 +119,8 @@ typedef struct {
 
     struct {
         lv_point_t vertex_p;
-        lv_coord_t start_angle;
-        lv_coord_t end_angle;
+        int32_t start_angle;
+        int32_t end_angle;
     } cfg;
 
     lv_draw_sw_mask_line_param_t start_line;
@@ -136,7 +135,7 @@ typedef struct  {
     uint16_t * opa_start_on_y;      /*The index of `cir_opa` for each y value*/
     int32_t life;               /*How many times the entry way used*/
     uint32_t used_cnt;          /*Like a semaphore to count the referencing masks*/
-    lv_coord_t radius;          /*The radius of the entry*/
+    int32_t radius;          /*The radius of the entry*/
 } _lv_draw_sw_mask_radius_circle_dsc_t;
 
 typedef _lv_draw_sw_mask_radius_circle_dsc_t _lv_draw_sw_mask_radius_circle_dsc_arr_t[LV_DRAW_SW_CIRCLE_CACHE_SIZE];
@@ -147,7 +146,7 @@ typedef struct {
 
     struct {
         lv_area_t rect;
-        lv_coord_t radius;
+        int32_t radius;
         /*Invert the mask. 0: Keep the pixels inside.*/
         uint8_t outer: 1;
     } cfg;
@@ -155,21 +154,19 @@ typedef struct {
     _lv_draw_sw_mask_radius_circle_dsc_t * circle;
 } lv_draw_sw_mask_radius_param_t;
 
-
 typedef struct {
     /*The first element must be the common descriptor*/
     _lv_draw_sw_mask_common_dsc_t dsc;
 
     struct {
         lv_area_t coords;
-        lv_coord_t y_top;
-        lv_coord_t y_bottom;
+        int32_t y_top;
+        int32_t y_bottom;
         lv_opa_t opa_top;
         lv_opa_t opa_bottom;
     } cfg;
 
 } lv_draw_sw_mask_fade_param_t;
-
 
 typedef struct _lv_draw_sw_mask_map_param_t {
     /*The first element must be the common descriptor*/
@@ -181,12 +178,13 @@ typedef struct _lv_draw_sw_mask_map_param_t {
     } cfg;
 } lv_draw_sw_mask_map_param_t;
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 void lv_draw_sw_mask_init(void);
+
+void lv_draw_sw_mask_deinit(void);
 
 //! @cond Doxygen_Suppress
 
@@ -202,9 +200,9 @@ void lv_draw_sw_mask_init(void);
  * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
-LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                  lv_coord_t abs_y,
-                                                                  lv_coord_t len);
+LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf, int32_t abs_x,
+                                                                  int32_t abs_y,
+                                                                  int32_t len);
 
 //! @endcond
 
@@ -234,9 +232,9 @@ void _lv_draw_sw_mask_cleanup(void);
  * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
  * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, lv_coord_t p1x, lv_coord_t p1y,
-                                      lv_coord_t p2x,
-                                      lv_coord_t p2y, lv_draw_sw_mask_line_side_t side);
+void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, int32_t p1x, int32_t p1y,
+                                      int32_t p2x,
+                                      int32_t p2y, lv_draw_sw_mask_line_side_t side);
 
 /**
  *Initialize a line mask from a point and an angle.
@@ -248,7 +246,7 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, lv_c
  * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
  * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, lv_coord_t p1x, lv_coord_t py, int16_t angle,
+void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t p1x, int32_t py, int16_t angle,
                                      lv_draw_sw_mask_line_side_t side);
 
 /**
@@ -259,8 +257,8 @@ void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, lv_co
  * @param start_angle start angle in degrees. 0 deg on the right, 90 deg, on the bottom
  * @param end_angle end angle
  */
-void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, lv_coord_t vertex_x, lv_coord_t vertex_y,
-                                lv_coord_t start_angle, lv_coord_t end_angle);
+void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, int32_t vertex_x, int32_t vertex_y,
+                                int32_t start_angle, int32_t end_angle);
 
 /**
  * Initialize a fade mask.
@@ -269,7 +267,7 @@ void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, lv_coord_
  * @param radius radius of the rectangle
  * @param inv true: keep the pixels inside the rectangle; keep the pixels outside of the rectangle
  */
-void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const lv_area_t * rect, lv_coord_t radius,
+void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const lv_area_t * rect, int32_t radius,
                                  bool inv);
 
 /**
@@ -282,8 +280,8 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
  * @param y_bottom at which coordinate reach `opa_bottom`.
  */
 void lv_draw_sw_mask_fade_init(lv_draw_sw_mask_fade_param_t * param, const lv_area_t * coords, lv_opa_t opa_top,
-                               lv_coord_t y_top,
-                               lv_opa_t opa_bottom, lv_coord_t y_bottom);
+                               int32_t y_top,
+                               lv_opa_t opa_bottom, int32_t y_bottom);
 
 /**
  * Initialize a map mask.

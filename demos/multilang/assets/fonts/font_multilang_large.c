@@ -4,14 +4,10 @@
  * Opts: --no-compress --no-prefilter --bpp 4 --size 22 --format lvgl --output font_multilang_large.c --font Montserrat-Bold.ttf -r 0x20-0x7F
  ******************************************************************************/
 
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
-#include "lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
+#include "../../../../lvgl.h"
 
 #ifndef FONT_MULTILANG_LARGE
-#define FONT_MULTILANG_LARGE 1
+    #define FONT_MULTILANG_LARGE 1
 #endif
 
 #if FONT_MULTILANG_LARGE
@@ -1334,7 +1330,6 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     0xdf, 0x50, 0x2, 0xbf, 0xe7, 0x0
 };
 
-
 /*---------------------
  *  GLYPH DESCRIPTION
  *--------------------*/
@@ -1442,11 +1437,8 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
  *  CHARACTER MAPPING
  *--------------------*/
 
-
-
 /*Collect the unicode lists and glyph_id offsets*/
-static const lv_font_fmt_txt_cmap_t cmaps[] =
-{
+static const lv_font_fmt_txt_cmap_t cmaps[] = {
     {
         .range_start = 32, .range_length = 95, .glyph_id_start = 1,
         .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
@@ -1457,10 +1449,8 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
  *    KERNING
  *----------------*/
 
-
 /*Map glyph_ids to kern left classes*/
-static const uint8_t kern_left_class_mapping[] =
-{
+static const uint8_t kern_left_class_mapping[] = {
     0, 0, 1, 2, 0, 3, 4, 5,
     2, 6, 7, 8, 9, 10, 9, 10,
     11, 12, 0, 13, 14, 15, 16, 17,
@@ -1476,8 +1466,7 @@ static const uint8_t kern_left_class_mapping[] =
 };
 
 /*Map glyph_ids to kern right classes*/
-static const uint8_t kern_right_class_mapping[] =
-{
+static const uint8_t kern_right_class_mapping[] = {
     0, 0, 1, 2, 0, 3, 4, 5,
     2, 6, 7, 8, 9, 10, 9, 10,
     11, 12, 13, 14, 15, 16, 17, 12,
@@ -1493,8 +1482,7 @@ static const uint8_t kern_right_class_mapping[] =
 };
 
 /*Kern values between classes*/
-static const int8_t kern_class_values[] =
-{
+static const int8_t kern_class_values[] = {
     0, 1, 0, 0, 0, 0, 0, 3,
     0, 1, 0, 0, 4, 0, 0, 0,
     0, 1, 0, 0, 0, 0, 0, 0,
@@ -1872,10 +1860,8 @@ static const int8_t kern_class_values[] =
     0, 0, 1, 0, -4, -4, -4, 0
 };
 
-
 /*Collect the kern class' data in one place*/
-static const lv_font_fmt_txt_kern_classes_t kern_classes =
-{
+static const lv_font_fmt_txt_kern_classes_t kern_classes = {
     .class_pair_values   = kern_class_values,
     .left_class_mapping  = kern_left_class_mapping,
     .right_class_mapping = kern_right_class_mapping,
@@ -1908,7 +1894,6 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
 #endif
 };
 
-
 /*-----------------
  *  PUBLIC FONT
  *----------------*/
@@ -1933,7 +1918,4 @@ lv_font_t font_multilang_large = {
     .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 };
 
-
-
 #endif /*#if FONT_MULTILANG_LARGE*/
-

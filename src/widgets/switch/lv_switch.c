@@ -120,17 +120,17 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
-        lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
-        lv_coord_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
-        lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+        int32_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
+        int32_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
+        int32_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
+        int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         /*The smaller size is the knob diameter*/
-        lv_coord_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
+        int32_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
         knob_size += _LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
-        lv_coord_t * s = lv_event_get_param(e);
+        int32_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, knob_size);
         *s = LV_MAX(*s, lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR));
     }
@@ -161,9 +161,9 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect(layer, &draw_indic_dsc, &indic_area);
 
     /*Draw the knob*/
-    lv_coord_t anim_value_x = 0;
-    lv_coord_t knob_size = lv_obj_get_height(obj);
-    lv_coord_t anim_length = lv_area_get_width(&obj->coords) - knob_size;
+    int32_t anim_value_x = 0;
+    int32_t knob_size = lv_obj_get_height(obj);
+    int32_t anim_length = lv_area_get_width(&obj->coords) - knob_size;
 
     if(LV_SWITCH_IS_ANIMATING(sw)) {
         /* Use the animation's coordinate */
@@ -184,10 +184,10 @@ static void draw_main(lv_event_t * e)
     knob_area.x1 += anim_value_x;
     knob_area.x2 = knob_area.x1 + (knob_size > 0 ? knob_size - 1 : 0);
 
-    lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
-    lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
-    lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
-    lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+    int32_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
+    int32_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
+    int32_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
+    int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
     /*Apply the paddings on the knob area*/
     knob_area.x1 -= knob_left;
@@ -260,6 +260,5 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
         lv_anim_start(&a);
     }
 }
-
 
 #endif

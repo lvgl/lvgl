@@ -31,7 +31,7 @@ void test_table_should_return_assigned_cell_value(void)
 void test_table_should_grow_columns_automatically_when_setting_formatted_cell_value(void)
 {
     /* Newly created tables have 1 column and 1 row */
-    uint16_t original_column_count = lv_table_get_col_cnt(table);
+    uint16_t original_column_count = lv_table_get_column_count(table);
     TEST_ASSERT_EQUAL_UINT16(1, original_column_count);
 
     /* Table currently only has a cell at 0,0 (row, column) */
@@ -39,7 +39,7 @@ void test_table_should_grow_columns_automatically_when_setting_formatted_cell_va
 
     /* Table now should have cells at 0,0 and 0,1, so 2 columns */
     uint16_t expected_column_count = original_column_count + 1;
-    TEST_ASSERT_EQUAL_UINT16(expected_column_count, lv_table_get_col_cnt(table));
+    TEST_ASSERT_EQUAL_UINT16(expected_column_count, lv_table_get_column_count(table));
 }
 
 void test_table_should_identify_cell_with_ctrl(void)
@@ -95,10 +95,10 @@ void test_table_row_height_should_increase_with_multiline_cell_value(void)
     const char * multiline_value = "LVGL\nRocks";
 
     lv_table_set_cell_value(table, 0, 0, singleline_value);
-    lv_coord_t singleline_row_height = table_ptr->row_h[0];
+    int32_t singleline_row_height = table_ptr->row_h[0];
 
     lv_table_set_cell_value(table, 0, 0, multiline_value);
-    lv_coord_t multiline_row_height = table_ptr->row_h[0];
+    int32_t multiline_row_height = table_ptr->row_h[0];
 
     TEST_ASSERT_GREATER_THAN(singleline_row_height, multiline_row_height);
 }
@@ -112,10 +112,10 @@ void test_table_should_wrap_long_texts(void)
     lv_table_set_col_width(table, 0, 50);
 
     lv_table_set_cell_value(table, 0, 0, small_text);
-    lv_coord_t row_height = table_ptr->row_h[0];
+    int32_t row_height = table_ptr->row_h[0];
 
     lv_table_set_cell_value(table, 0, 0, long_text);
-    lv_coord_t wrapped_row_height = table_ptr->row_h[0];
+    int32_t wrapped_row_height = table_ptr->row_h[0];
 
     /* Row height on cells with wrapped text is bigger than cells with small texts */
     TEST_ASSERT_GREATER_THAN(row_height, wrapped_row_height);
@@ -164,13 +164,13 @@ static void draw_part_event_cb(lv_event_t * e)
 void test_table_rendering(void)
 {
     lv_obj_center(table);
-    lv_obj_add_event(table, draw_part_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(table, draw_part_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     lv_obj_set_style_border_side(table, LV_BORDER_SIDE_FULL, LV_PART_ITEMS);
     lv_obj_set_style_pad_all(table, 10, LV_PART_ITEMS);
     lv_obj_set_style_border_width(table, 5, LV_PART_ITEMS);
-    lv_table_set_col_cnt(table, 5);
-    lv_table_set_row_cnt(table, 5);
+    lv_table_set_column_count(table, 5);
+    lv_table_set_row_count(table, 5);
     lv_table_set_col_width(table, 1, 60);
     lv_table_set_col_width(table, 2, 100);
 
@@ -194,7 +194,7 @@ void test_table_rendering(void)
     lv_table_add_cell_ctrl(table, 4, 3, LV_TABLE_CELL_CTRL_TEXT_CROP);
     lv_table_set_cell_value_fmt(table, 4, 3, "crop crop crop crop crop crop crop crop ");
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("table_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/table_1.png");
 }
 
 /* See #3120 for context */
@@ -207,8 +207,8 @@ void test_table_should_reduce_cells(void)
 
     lv_obj_center(table);
 
-    lv_table_set_col_cnt(table, initial_col_num);
-    lv_table_set_row_cnt(table, initial_row_num);
+    lv_table_set_column_count(table, initial_col_num);
+    lv_table_set_row_count(table, initial_row_num);
 
     uint32_t row_idx, col_idx;
     for(row_idx = 0; row_idx < initial_row_num; row_idx++) {
@@ -217,8 +217,8 @@ void test_table_should_reduce_cells(void)
         }
     }
 
-    lv_table_set_col_cnt(table, final_col_num);
-    lv_table_set_row_cnt(table, final_row_num);
+    lv_table_set_column_count(table, final_col_num);
+    lv_table_set_row_count(table, final_row_num);
 
     for(row_idx = 0; row_idx < final_row_num; row_idx++) {
         for(col_idx = 0; col_idx < final_col_num; col_idx++) {
@@ -237,8 +237,8 @@ void test_table_should_reduce_cells_with_more_than_one_row(void)
 
     lv_obj_center(table);
 
-    lv_table_set_col_cnt(table, initial_col_num);
-    lv_table_set_row_cnt(table, initial_row_num);
+    lv_table_set_column_count(table, initial_col_num);
+    lv_table_set_row_count(table, initial_row_num);
 
     uint32_t row_idx, col_idx;
     for(row_idx = 0; row_idx < initial_row_num; row_idx++) {
@@ -247,8 +247,8 @@ void test_table_should_reduce_cells_with_more_than_one_row(void)
         }
     }
 
-    lv_table_set_col_cnt(table, final_col_num);
-    lv_table_set_row_cnt(table, final_row_num);
+    lv_table_set_column_count(table, final_col_num);
+    lv_table_set_row_count(table, final_row_num);
 
     for(row_idx = 0; row_idx < final_row_num; row_idx++) {
         for(col_idx = 0; col_idx < final_col_num; col_idx++) {

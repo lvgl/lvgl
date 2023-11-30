@@ -1,3 +1,4 @@
+#!/bin/sh
 # Generate CHANGELOG_LAST.md from changes since the last version tag. (vx.y.z-dev tags are ignored)
 # CHANGELOG_LAST.md can be edited manually if required and manually added to docs/CHANGELOG.md
 #
@@ -7,7 +8,7 @@
 # Usage:
 #    changelog-gen <next-version>
 #
-# Example: if the latest verision is v5.6.7 the following can be used for bugfix, minor or major versions:
+# Example: if the latest version is v5.6.7 the following can be used for bugfix, minor or major versions:
 #    changelog-gen v5.6.8
 #    changelog-gen v5.7.0
 #    changelog-gen v6.0.0

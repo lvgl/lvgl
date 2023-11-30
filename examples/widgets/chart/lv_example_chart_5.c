@@ -21,7 +21,7 @@ void lv_example_chart_5(void)
 
     lv_chart_set_div_line_count(chart, 5, 7);
 
-    lv_obj_add_event(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_flag(chart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
     lv_chart_series_t * ser = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
@@ -54,7 +54,6 @@ static void add_faded_area(lv_event_t * e)
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
 
-
     const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
 
     /*Draw a triangle below the line witch some opacity gradient*/
@@ -70,9 +69,9 @@ static void add_faded_area(lv_event_t * e)
     tri_dsc.p[2].y = LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
     tri_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
 
-    lv_coord_t full_h = lv_obj_get_height(obj);
-    lv_coord_t fract_uppter = (LV_MIN(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj->coords.y1) * 255 / full_h;
-    lv_coord_t fract_lower = (LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj->coords.y1) * 255 / full_h;
+    int32_t full_h = lv_obj_get_height(obj);
+    int32_t fract_uppter = (int32_t)(LV_MIN(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj->coords.y1) * 255 / full_h;
+    int32_t fract_lower = (int32_t)(LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj->coords.y1) * 255 / full_h;
     tri_dsc.bg_grad.stops[0].color = ser->color;
     tri_dsc.bg_grad.stops[0].opa = 255 - fract_uppter;
     tri_dsc.bg_grad.stops[0].frac = 0;
@@ -94,10 +93,10 @@ static void add_faded_area(lv_event_t * e)
     rect_dsc.bg_grad.stops[1].opa = 0;
 
     lv_area_t rect_area;
-    rect_area.x1 = draw_line_dsc->p1.x;
-    rect_area.x2 = draw_line_dsc->p2.x - 1;
-    rect_area.y1 = LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - 1;
-    rect_area.y2 = obj->coords.y2;
+    rect_area.x1 = (int32_t)draw_line_dsc->p1.x;
+    rect_area.x2 = (int32_t)draw_line_dsc->p2.x - 1;
+    rect_area.y1 = (int32_t)LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - 1;
+    rect_area.y2 = (int32_t)obj->coords.y2;
     lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
 }
 

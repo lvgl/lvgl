@@ -55,18 +55,16 @@ void lv_example_observer_3(void)
 
     lv_obj_t * set_btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(set_btn, 180, 24);
-    lv_obj_add_event(set_btn, set_btn_clicked_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(set_btn, set_btn_clicked_event_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t * set_label = lv_label_create(set_btn);
     lv_label_set_text(set_label, "Set");
-
 
     /*Update some subjects to see if the UI is updated as well*/
     lv_subject_set_int(&hour_subject, 9);
     lv_subject_set_int(&minute_subject, 30);
     lv_subject_set_int(&am_pm_subject, TIME_PM);
 }
-
 
 static void set_btn_clicked_event_cb(lv_event_t * e)
 {
@@ -104,7 +102,7 @@ static void set_btn_clicked_event_cb(lv_event_t * e)
     lv_obj_t * close_btn = lv_button_create(cont);
     lv_obj_align(close_btn, LV_ALIGN_TOP_RIGHT, 0, 0);
     /*Pass the set_btn as user_data to make it non-disabled on close*/
-    lv_obj_add_event(close_btn, close_clicked_event_cb, LV_EVENT_CLICKED, set_btn);
+    lv_obj_add_event_cb(close_btn, close_clicked_event_cb, LV_EVENT_CLICKED, set_btn);
 
     lv_obj_t * close_label = lv_label_create(close_btn);
     lv_label_set_text(close_label, LV_SYMBOL_CLOSE);

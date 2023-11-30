@@ -9,6 +9,8 @@
 
 #include "lv_nuttx_lcd.h"
 
+#if LV_USE_NUTTX
+
 #if LV_USE_NUTTX_LCD
 
 #include <sys/ioctl.h>
@@ -20,7 +22,7 @@
 #include <fcntl.h>
 #include <nuttx/lcd/lcd_dev.h>
 
-#include <lvgl/lvgl.h>
+#include "../../../lvgl.h"
 #include "../../lvgl_private.h"
 
 /*********************
@@ -42,11 +44,12 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_coord_t align_round_up(lv_coord_t v, uint16_t align);
+static int32_t align_round_up(int32_t v, uint16_t align);
 static void rounder_cb(lv_event_t * e);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
                      uint8_t * color_p);
 static lv_display_t * lcd_init(int fd, int hor_res, int ver_res);
+static void display_release_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -107,19 +110,18 @@ lv_display_t * lv_nuttx_lcd_create(const char * dev_path)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_coord_t align_round_up(lv_coord_t v, uint16_t align)
+static int32_t align_round_up(int32_t v, uint16_t align)
 {
     return (v + align - 1) & ~(align - 1);
 }
-
 
 static void rounder_cb(lv_event_t * e)
 {
     lv_nuttx_lcd_t * lcd = lv_event_get_user_data(e);
     lv_area_t * area = lv_event_get_param(e);
     struct lcddev_area_align_s * align_info = &lcd->align_info;
-    lv_coord_t w;
-    lv_coord_t h;
+    int32_t w;
+    int32_t h;
 
     area->x1 &= ~(align_info->col_start_align - 1);
     area->y1 &= ~(align_info->row_start_align - 1);
@@ -134,7 +136,7 @@ static void rounder_cb(lv_event_t * e)
 static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
                      uint8_t * color_p)
 {
-    lv_nuttx_lcd_t * lcd = disp->user_data;
+    lv_nuttx_lcd_t * lcd = disp->driver_data;
 
     lcd->area.row_start = area_p->y1;
     lcd->area.row_end = area_p->y2;
@@ -149,13 +151,12 @@ static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
 {
     lv_color_t * draw_buf = NULL;
     lv_color_t * draw_buf_2 = NULL;
-    lv_nuttx_lcd_t * lcd = lv_malloc(sizeof(lv_nuttx_lcd_t));
+    lv_nuttx_lcd_t * lcd = lv_malloc_zeroed(sizeof(lv_nuttx_lcd_t));
     LV_ASSERT_MALLOC(lcd);
     if(lcd == NULL) {
         LV_LOG_ERROR("lv_nuttx_lcd_t malloc failed");
         return NULL;
     }
-    lv_memzero(lcd, sizeof(lv_nuttx_lcd_t));
 
     lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(disp == NULL) {
@@ -197,10 +198,41 @@ static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
     lcd->disp = disp;
     lv_display_set_draw_buffers(lcd->disp, draw_buf, draw_buf_2, buf_size, render_mode);
     lv_display_set_flush_cb(lcd->disp, flush_cb);
-    lv_event_add(&lcd->disp->event_list, rounder_cb, LV_EVENT_INVALIDATE_AREA, lcd);
-    lcd->disp->user_data = lcd;
+    lv_display_add_event_cb(lcd->disp, rounder_cb, LV_EVENT_INVALIDATE_AREA, lcd);
+    lv_display_add_event_cb(lcd->disp, display_release_cb, LV_EVENT_DELETE, lcd->disp);
+    lv_display_set_driver_data(lcd->disp, lcd);
+    lv_display_set_user_data(lcd->disp, (void *)(uintptr_t)fd);
 
     return lcd->disp;
 }
 
+static void display_release_cb(lv_event_t * e)
+{
+    lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
+    lv_nuttx_lcd_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc) {
+        lv_display_set_driver_data(disp, NULL);
+        lv_display_set_flush_cb(disp, NULL);
+
+        /* clear display buffer */
+        if(disp->buf_1) {
+            lv_free(disp->buf_1);
+            disp->buf_1 = NULL;
+        }
+        if(disp->buf_2) {
+            lv_free(disp->buf_2);
+            disp->buf_2 = NULL;
+        }
+
+        /* close device fb */
+        if(dsc->fd >= 0) {
+            close(dsc->fd);
+            dsc->fd = -1;
+        }
+        lv_free(dsc);
+        LV_LOG_INFO("Done");
+    }
+}
 #endif /*LV_USE_NUTTX_LCD*/
+
+#endif /* LV_USE_NUTTX*/

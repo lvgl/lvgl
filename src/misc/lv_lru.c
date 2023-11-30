@@ -75,8 +75,7 @@ lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_c
                          lv_lru_free_cb_t key_free)
 {
     // create the cache
-    lv_lru_t * cache = (lv_lru_t *) lv_malloc(sizeof(lv_lru_t));
-    lv_memzero(cache, sizeof(lv_lru_t));
+    lv_lru_t * cache = lv_malloc_zeroed(sizeof(lv_lru_t));
     if(!cache) {
         LV_LOG_WARN("LRU Cache unable to create cache object");
         return NULL;
@@ -90,8 +89,7 @@ lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_c
     cache->key_free = key_free ? key_free : lv_free;
 
     // size the hash table to a guestimate of the number of slots required (assuming a perfect hash)
-    cache->items = (lv_lru_item_t **) lv_malloc(sizeof(lv_lru_item_t *) * cache->hash_table_size);
-    lv_memzero(cache->items, sizeof(lv_lru_item_t *) * cache->hash_table_size);
+    cache->items = lv_malloc_zeroed(sizeof(lv_lru_item_t *) * cache->hash_table_size);
     if(!cache->items) {
         LV_LOG_WARN("LRU Cache unable to create cache hash table");
         lv_free(cache);
@@ -99,7 +97,6 @@ lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_c
     }
     return cache;
 }
-
 
 void lv_lru_delete(lv_lru_t * cache)
 {
@@ -135,7 +132,6 @@ void lv_lru_delete(lv_lru_t * cache)
     // free the cache
     lv_free(cache);
 }
-
 
 lv_lru_res_t lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, void * value, size_t value_length)
 {
@@ -188,7 +184,6 @@ lv_lru_res_t lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, v
     cache->free_memory -= required;
     return LV_LRU_OK;
 }
-
 
 lv_lru_res_t lv_lru_get(lv_lru_t * cache, const void * key, size_t key_size, void ** value)
 {
@@ -342,8 +337,7 @@ static lv_lru_item_t * lv_lru_pop_or_create_item(lv_lru_t * cache)
         lv_memzero(item, sizeof(lv_lru_item_t));
     }
     else {
-        item = (lv_lru_item_t *) lv_malloc(sizeof(lv_lru_item_t));
-        lv_memzero(item, sizeof(lv_lru_item_t));
+        item = lv_malloc_zeroed(sizeof(lv_lru_item_t));
     }
 
     return item;

@@ -12,7 +12,6 @@
 #include "../../misc/lv_types.h"
 #include "../../osal/lv_os.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -30,7 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 typedef lv_result_t (*op_cache_t)(lv_grad_t * c, void * ctx);
-static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord_t h);
+static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h);
 
 /**********************
  *   STATIC VARIABLE
@@ -40,9 +39,9 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord_t h)
+static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h)
 {
-    lv_coord_t size = g->dir == LV_GRAD_DIR_HOR ? w : h;
+    int32_t size = g->dir == LV_GRAD_DIR_HOR ? w : h;
 
     size_t req_size = ALIGN(sizeof(lv_grad_t)) + ALIGN(size * sizeof(lv_color_t)) + ALIGN(size * sizeof(lv_opa_t));
     lv_grad_t * item  = lv_malloc(req_size);
@@ -56,12 +55,11 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord
     return item;
 }
 
-
 /**********************
  *     FUNCTIONS
  **********************/
 
-lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord_t h)
+lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * g, int32_t w, int32_t h)
 {
     /* No gradient, no cache */
     if(g->dir == LV_GRAD_DIR_NONE) return NULL;
@@ -81,8 +79,8 @@ lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord_t h)
     return item;
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_gradient_color_calculate(const lv_grad_dsc_t * dsc, lv_coord_t range,
-                                                       lv_coord_t frac, lv_grad_color_t * color_out, lv_opa_t * opa_out)
+LV_ATTRIBUTE_FAST_MEM void lv_gradient_color_calculate(const lv_grad_dsc_t * dsc, int32_t range,
+                                                       int32_t frac, lv_grad_color_t * color_out, lv_opa_t * opa_out)
 {
     lv_grad_color_t tmp;
     /*Clip out-of-bounds first*/

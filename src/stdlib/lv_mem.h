@@ -64,11 +64,18 @@ lv_mem_pool_t lv_mem_add_pool(void * mem, size_t bytes);
 void lv_mem_remove_pool(lv_mem_pool_t pool);
 
 /**
- * Allocate a memory dynamically
- * @param size size of the memory to allocate in bytes
- * @return pointer to the allocated memory
+ * Allocate memory dynamically
+ * @param size requested size in bytes
+ * @return pointer to allocated uninitialized memory, or NULL on failure
  */
 void * lv_malloc(size_t size);
+
+/**
+ * Allocate zeroed memory dynamically
+ * @param size requested size in bytes
+ * @return pointer to allocated zeroed memory, or NULL on failure
+ */
+void * lv_malloc_zeroed(size_t size);
 
 /**
  * Free an allocated data
@@ -85,14 +92,11 @@ void lv_free(void * data);
  */
 void * lv_realloc(void * data_p, size_t new_size);
 
-
 /**
  * Used internally to execute a plain `malloc` operation
  * @param size      size in bytes to `malloc`
  */
 void * lv_malloc_core(size_t size);
-
-
 
 /**
  * Used internally to execute a plain `free` operation
@@ -112,7 +116,6 @@ void * lv_realloc_core(void * p, size_t new_size);
  * @param size      size in bytes to malloc
  */
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p);
-
 
 lv_result_t lv_mem_test_core(void);
 

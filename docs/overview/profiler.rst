@@ -144,11 +144,22 @@ Users can add their own measured functions:
 
 .. code:: c
 
-    void my_function(void)
+    void my_function_1(void)
     {
         LV_PROFILER_BEGIN;
         do_something();
         LV_PROFILER_END;
+    }
+
+    void my_function_2(void)
+    {
+        LV_PROFILER_BEGIN_TAG("do_something_1");
+        do_something_1();
+        LV_PROFILER_END_TAG("do_something_1");
+
+        LV_PROFILER_BEGIN_TAG("do_something_2");
+        do_something_2();
+        LV_PROFILER_END_TAG("do_something_2");
     }
 
 Custom profiler implementation
@@ -159,14 +170,19 @@ If you wish to use a profiler method provided by your operating system, you can 
 - :c:macro:`LV_PROFILER_INCLUDE`: Provides a header file for the profiler function.
 - :c:macro:`LV_PROFILER_BEGIN`: Profiler start point function.
 - :c:macro:`LV_PROFILER_END`: Profiler end point function.
+- :c:macro:`LV_PROFILER_BEGIN_TAG`: Profiler start point function with custom tag.
+- :c:macro:`LV_PROFILER_END_TAG`: Profiler end point function with custom tag.
+
 
 Taking `NuttX <https://github.com/apache/nuttx>`_ RTOS as an example:
 
 .. code:: c
 
     #define LV_PROFILER_INCLUDE "nuttx/sched_note.h"
-    #define LV_PROFILER_BEGIN   sched_note_begin(NOTE_TAG_ALWAYS)
-    #define LV_PROFILER_END     sched_note_end(NOTE_TAG_ALWAYS)
+    #define LV_PROFILER_BEGIN          sched_note_begin(NOTE_TAG_ALWAYS)
+    #define LV_PROFILER_END            sched_note_end(NOTE_TAG_ALWAYS)
+    #define LV_PROFILER_BEGIN_TAG(str) sched_note_beginex(NOTE_TAG_ALWAYS, str)
+    #define LV_PROFILER_END_TAG(str)   sched_note_endex(NOTE_TAG_ALWAYS, str)
 
 FAQ
 ***
@@ -179,6 +195,7 @@ Please check the completeness of the logs. If the logs are incomplete, it may be
 1. Serial port reception errors caused by a high baud rate. You need to reduce the baud rate.
 2. Data corruption caused by other thread logs inserted during the printing of trace logs. You need to disable the log output of other threads or refer to the configuration above to use a separate log output interface.
 3. Cross-thread calling of :c:macro:`LV_PROFILER_BEGIN/END`.The built-in LVGL profiler is designed for single-threaded use, so calling it from multiple threads can lead to thread safety issues. If you need to use it in a multi-threaded environment, you can use profiler interfaces provided by your operating system that ensure thread safety.
+4. Make sure that the string passed in by c:macro:`LV_PROFILER_BEGIN_TAG/END_TAG` is not a local variable on the stack or a string in shared memory, because currently only the string address is recorded and the content is not copied.
 
 Function execution time displayed as 0s in Perfetto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

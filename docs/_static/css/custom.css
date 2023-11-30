@@ -143,3 +143,10 @@ div.body {
     min-width: 360px;
     max-width: 1920px;
 }
+
+.cpp-expr {
+  font-family: monospace;
+  background-color: #dff0ff;
+  padding: 1px;
+  border-radius: 4px;
+}

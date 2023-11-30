@@ -44,6 +44,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef int32_t                     lv_coord_t;
 typedef lv_result_t                 lv_res_t;
 typedef lv_image_dsc_t              lv_img_dsc_t;
 typedef lv_display_t                lv_disp_t;
@@ -73,7 +74,7 @@ static inline void lv_obj_move_foreground(lv_obj_t * obj)
         return;
     }
 
-    lv_obj_move_to_index(obj, lv_obj_get_child_cnt(parent) - 1);
+    lv_obj_move_to_index(obj, lv_obj_get_child_count(parent) - 1);
 }
 
 /**
@@ -86,7 +87,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 {
     lv_obj_move_to_index(obj, 0);
 }
-
 
 /**********************
  *      MACROS
@@ -102,9 +102,10 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_obj_clear_flag                lv_obj_remove_flag
 #define lv_obj_clear_state               lv_obj_remove_state
 
+#define lv_indev_get_act                 lv_indev_active
 #define lv_scr_act                       lv_screen_active
 #define lv_disp_create                   lv_display_create
-#define lv_disp_remove                   lv_display_remove
+#define lv_disp_remove                   lv_display_delete
 #define lv_disp_set_default              lv_display_set_default
 #define lv_disp_get_default              lv_display_get_default
 #define lv_disp_get_next                 lv_display_get_next
@@ -130,7 +131,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_flush_ready              lv_display_flush_ready
 #define lv_disp_flush_is_last            lv_display_flush_is_last
 #define lv_disp_is_double_buffered       lv_display_is_double_buffered
-#define lv_disp_get_scr_act              lv_display_get_screen_act
+#define lv_disp_get_scr_act              lv_display_get_screen_active
 #define lv_disp_get_scr_prev             lv_display_get_screen_prev
 #define lv_disp_load_scr                 lv_display_load_scr
 #define lv_disp_get_layer_top            lv_display_get_layer_top
@@ -139,7 +140,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_add_event                lv_display_add_event
 #define lv_disp_get_event_count          lv_display_get_event_count
 #define lv_disp_get_event_dsc            lv_display_get_event_dsc
-#define lv_disp_remove_event             lv_display_remove_event
+#define lv_disp_remove_event             lv_display_delete_event
 #define lv_disp_send_event               lv_display_send_event
 #define lv_disp_set_theme                lv_display_set_theme
 #define lv_disp_get_theme                lv_display_get_theme
@@ -206,6 +207,10 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_btnmatrix_get_one_checked         lv_buttonmatrix_get_one_checked
 
 #define lv_tabview_get_tab_btns              lv_tabview_get_tab_buttons
+#define lv_tabview_get_act                   lv_tabview_get_active
+#define lv_tabview_set_act                   lv_tabview_set_active
+
+#define lv_tileview_get_tile_act             lv_tileview_get_tile_active
 
 #define lv_msgbox_get_btns                   lv_msgbox_get_buttons
 
@@ -214,13 +219,37 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_image_set_zoom                   lv_image_set_scale
 #define lv_image_get_zoom                   lv_image_get_scale
 
+#define lv_roller_set_visible_row_cnt       lv_roller_set_visible_row_count
+#define lv_roller_get_option_cnt            lv_roller_get_option_count
+
+#define lv_table_set_col_cnt                lv_table_set_column_count
+#define lv_table_set_row_cnt                lv_table_set_row_count
+#define lv_table_get_col_cnt                lv_table_get_column_count
+#define lv_table_get_row_cnt                lv_table_get_row_count
+
+#define lv_dropdown_get_option_cnt          lv_dropdown_get_option_count
+
+#define lv_obj_get_child_cnt                lv_obj_get_child_count
+
+#define lv_obj_get_style_shadow_ofs_x       lv_obj_get_style_shadow_offset_x
+#define lv_obj_get_style_shadow_ofs_y       lv_obj_get_style_shadow_offset_y
 #define lv_obj_get_style_transform_zoom     lv_obj_get_style_transform_scale
 #define lv_obj_get_style_transform_angle    lv_obj_get_style_transform_rotation
+
+#define lv_obj_set_style_shadow_ofs_x       lv_obj_set_style_shadow_offset_x
+#define lv_obj_set_style_shadow_ofs_y       lv_obj_set_style_shadow_offset_y
 #define lv_obj_set_style_transform_zoom     lv_obj_set_style_transform_scale
 #define lv_obj_set_style_transform_angle    lv_obj_set_style_transform_rotation
+
+#define lv_style_set_shadow_ofs_x           lv_style_set_shadow_offset_x
+#define lv_style_set_shadow_ofs_y           lv_style_set_shadow_offset_y
 #define lv_style_set_transform_angle        lv_style_set_transform_rotation
 #define lv_style_set_transform_zoom         lv_style_set_transform_scale
-#define LV_ZOOM_NONE             LV_SCALE_NONE
+
+#define LV_ZOOM_NONE                        LV_SCALE_NONE
+
+#define lv_image_decoder_built_in_open      lv_bin_decoder_open
+#define lv_image_decoder_built_in_close     lv_bin_decoder_close
 
 /**********************
  *      MACROS

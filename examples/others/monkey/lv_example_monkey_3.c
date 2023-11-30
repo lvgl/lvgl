@@ -4,7 +4,7 @@
 void lv_example_monkey_3(void)
 {
     static lv_point_t btn_points[3];
-    lv_coord_t hor_res = LV_HOR_RES;
+    int32_t hor_res = LV_HOR_RES;
 
     /*Create button monkey test*/
     lv_monkey_config_t config;

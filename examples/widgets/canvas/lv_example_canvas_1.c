@@ -1,7 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_CANVAS && LV_BUILD_EXAMPLES
 
-
 #define CANVAS_WIDTH  200
 #define CANVAS_HEIGHT  150
 
@@ -20,28 +19,26 @@ void lv_example_canvas_1(void)
     rect_dsc.border_opa = LV_OPA_90;
     rect_dsc.border_color = lv_color_white();
     rect_dsc.shadow_width = 5;
-    rect_dsc.shadow_ofs_x = 5;
-    rect_dsc.shadow_ofs_y = 5;
+    rect_dsc.shadow_offset_x = 5;
+    rect_dsc.shadow_offset_y = 5;
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     label_dsc.color = lv_palette_main(LV_PALETTE_ORANGE);
     label_dsc.text = "Some text on text canvas";
-
-    static uint8_t cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, CANVAS_HEIGHT)];
+    /*Create a buffer for the canvas*/
+    static uint8_t cbuf[LV_CANVAS_BUF_SIZE(CANVAS_WIDTH, CANVAS_HEIGHT, 16, LV_DRAW_BUF_STRIDE_ALIGN)];
 
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_NATIVE);
+    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_RGB565);
     lv_obj_center(canvas);
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_GREY, 3), LV_OPA_COVER);
-
 
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
     lv_area_t coords_rect = {30, 20, 100, 70};
     lv_draw_rect(&layer, &rect_dsc, &coords_rect);
-
 
     lv_area_t coords_text = {40, 80, 100, 120};
     lv_draw_label(&layer, &label_dsc, &coords_text);
@@ -50,11 +47,18 @@ void lv_example_canvas_1(void)
 
     /*Test the rotation. It requires another buffer where the original image is stored.
      *So copy the current image to buffer and rotate it to the canvas*/
-    static uint8_t cbuf_tmp[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, CANVAS_HEIGHT)];
+    static uint8_t cbuf_tmp[LV_CANVAS_BUF_SIZE(CANVAS_WIDTH, CANVAS_HEIGHT, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
+
+    /*Create a canvas and initialize its palette*/
+    canvas = lv_canvas_create(lv_screen_active());
+    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
+    lv_obj_center(canvas);
+
     lv_memcpy(cbuf_tmp, cbuf, sizeof(cbuf_tmp));
     lv_image_dsc_t img;
     img.data = (void *)cbuf_tmp;
-    img.header.cf = LV_COLOR_FORMAT_NATIVE;
+    img.header.cf = LV_COLOR_FORMAT_ARGB8888;
     img.header.w = CANVAS_WIDTH;
     img.header.h = CANVAS_HEIGHT;
 

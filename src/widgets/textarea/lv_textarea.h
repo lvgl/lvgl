@@ -44,7 +44,7 @@ typedef struct {
     uint32_t max_length;         /*The max. number of characters. 0: no limit*/
     uint32_t pwd_show_time;      /*Time to show characters in password mode before change them to '*'*/
     struct {
-        lv_coord_t valid_x;        /*Used when stepping up/down to a shorter line.
+        int32_t valid_x;        /*Used when stepping up/down to a shorter line.
                                     *(Used by the library)*/
         uint32_t pos;              /*The current cursor position
                                     *(0: before 1st letter; 1: before 2nd letter ...)*/
@@ -63,7 +63,7 @@ typedef struct {
     uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
 } lv_textarea_t;
 
-extern const lv_obj_class_t lv_textarea_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_textarea_class;
 
 enum {
     LV_PART_TEXTAREA_PLACEHOLDER = LV_PART_CUSTOM_FIRST,

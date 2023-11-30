@@ -26,7 +26,7 @@ typedef struct {
     lv_obj_t obj;
 } lv_win_t;
 
-extern const lv_obj_class_t lv_win_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_win_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -34,9 +34,8 @@ extern const lv_obj_class_t lv_win_class;
 
 lv_obj_t * lv_win_create(lv_obj_t * parent);
 
-
 lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt);
-lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, lv_coord_t btn_w);
+lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w);
 
 lv_obj_t * lv_win_get_header(lv_obj_t * win);
 lv_obj_t * lv_win_get_content(lv_obj_t * win);

@@ -16,7 +16,6 @@ extern "C" {
 #include "../lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -24,7 +23,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
 
 /**********************
  * GLOBAL PROTOTYPES

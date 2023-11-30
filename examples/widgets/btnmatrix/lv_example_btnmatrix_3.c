@@ -34,7 +34,6 @@ void lv_example_buttonmatrix_3(void)
     lv_style_set_radius(&style_bg, LV_RADIUS_CIRCLE);
     lv_style_set_border_width(&style_bg, 0);
 
-
     static lv_style_t style_btn;
     lv_style_init(&style_btn);
     lv_style_set_radius(&style_btn, 0);
@@ -50,7 +49,7 @@ void lv_example_buttonmatrix_3(void)
     lv_buttonmatrix_set_map(btnm, map);
     lv_obj_add_style(btnm, &style_bg, 0);
     lv_obj_add_style(btnm, &style_btn, LV_PART_ITEMS);
-    lv_obj_add_event(btnm, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(btnm, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_size(btnm, 225, 35);
 
     /*Allow selecting on one number at time*/

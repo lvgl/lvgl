@@ -340,9 +340,6 @@
  *should also appear on LVGL binding API such as Micropython.*/
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning /*The default value just prevents GCC warning*/
 
-/*Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates instead of int16_t*/
-#define LV_USE_LARGE_COORD 0
-
 /*==================
  *   FONT USAGE
  *===================*/
@@ -692,9 +689,6 @@
     /*1: Use img cache to buffer header information*/
     #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
 #endif
-
-/*1: Enable a published subscriber based messaging system */
-#define LV_USE_MSG 0
 
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/

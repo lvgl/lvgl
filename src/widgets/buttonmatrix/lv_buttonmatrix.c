@@ -46,7 +46,6 @@ static bool button_is_inactive(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_is_click_trig(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_is_popover(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_is_checkable(lv_buttonmatrix_ctrl_t ctrl_bits);
-static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_get_checked(lv_buttonmatrix_ctrl_t ctrl_bits);
 static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p);
 static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char ** map);
@@ -108,16 +107,16 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[])
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
     /*Set size and positions of the buttons*/
-    lv_coord_t sleft = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
-    lv_coord_t stop = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
-    lv_coord_t prow = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
-    lv_coord_t pcol = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+    int32_t sleft = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
+    int32_t stop = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
+    int32_t prow = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
+    int32_t pcol = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
-    lv_coord_t max_w            = lv_obj_get_content_width(obj);
-    lv_coord_t max_h            = lv_obj_get_content_height(obj);
+    int32_t max_w            = lv_obj_get_content_width(obj);
+    int32_t max_h            = lv_obj_get_content_height(obj);
 
     /*Calculate the position of each row*/
-    lv_coord_t max_h_no_gap = max_h - (prow * (btnm->row_cnt - 1));
+    int32_t max_h_no_gap = max_h - (prow * (btnm->row_cnt - 1));
 
     /*Count the units and the buttons in a line
      *(A button can be 1,2,3... unit wide)*/
@@ -142,11 +141,11 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[])
             continue;
         }
 
-        lv_coord_t row_y1 = stop + (max_h_no_gap * row) / btnm->row_cnt + row * prow;
-        lv_coord_t row_y2 = stop + (max_h_no_gap * (row + 1)) / btnm->row_cnt + row * prow - 1;
+        int32_t row_y1 = stop + (max_h_no_gap * row) / btnm->row_cnt + row * prow;
+        int32_t row_y2 = stop + (max_h_no_gap * (row + 1)) / btnm->row_cnt + row * prow - 1;
 
         /*Set the button size and positions*/
-        lv_coord_t max_w_no_gap = max_w - (pcol * (btn_cnt - 1));
+        int32_t max_w_no_gap = max_w - (pcol * (btn_cnt - 1));
         if(max_w_no_gap < 0) max_w_no_gap = 0;
 
         uint32_t row_unit_cnt = 0;  /*The current unit position in the row*/
@@ -154,12 +153,12 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[])
         for(btn = 0; btn < btn_cnt; btn++, btn_tot_i++, txt_tot_i++) {
             uint32_t btn_u = get_button_width(btnm->ctrl_bits[btn_tot_i]);
 
-            lv_coord_t btn_x1 = (max_w_no_gap * row_unit_cnt) / unit_cnt + btn * pcol;
-            lv_coord_t btn_x2 = (max_w_no_gap * (row_unit_cnt + btn_u)) / unit_cnt + btn * pcol - 1;
+            int32_t btn_x1 = (max_w_no_gap * row_unit_cnt) / unit_cnt + btn * pcol;
+            int32_t btn_x2 = (max_w_no_gap * (row_unit_cnt + btn_u)) / unit_cnt + btn * pcol - 1;
 
             /*If RTL start from the right*/
             if(base_dir == LV_BASE_DIR_RTL) {
-                lv_coord_t tmp = btn_x1;
+                int32_t tmp = btn_x1;
                 btn_x1 = btn_x2;
                 btn_x2 = tmp;
 
@@ -407,7 +406,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         if(has_popovers_in_top_row(obj)) {
             /*reserve one row worth of extra space to account for popovers in the top row*/
-            lv_coord_t s = btnm->row_cnt > 0 ? lv_obj_get_content_height(obj) / btnm->row_cnt : 0;
+            int32_t s = btnm->row_cnt > 0 ? lv_obj_get_content_height(obj) / btnm->row_cnt : 0;
             lv_event_set_ext_draw_size(e, s);
         }
     }
@@ -421,7 +420,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
         lv_indev_t * indev = lv_event_get_indev(e);
         invalidate_button_area(obj, btnm->btn_id_sel);
 
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_active());
         if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
             uint32_t btn_pr;
             /*Search the pressed area*/
@@ -477,7 +476,6 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
                 }
                 if(btnm->one_check) make_one_button_checked(obj, btnm->btn_id_sel);
             }
-
 
             if((button_is_click_trig(btnm->ctrl_bits[btnm->btn_id_sel]) == true ||
                 button_is_popover(btnm->ctrl_bits[btnm->btn_id_sel]) == true) &&
@@ -592,7 +590,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
             }
         }
         else if(c == LV_KEY_DOWN) {
-            lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+            int32_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
             /*Find the area below the current*/
             if(btnm->btn_id_sel == LV_BUTTONMATRIX_BUTTON_NONE) {
                 btnm->btn_id_sel = 0;
@@ -606,7 +604,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
             }
             else {
                 uint32_t area_below;
-                lv_coord_t pr_center =
+                int32_t pr_center =
                     btnm->button_areas[btnm->btn_id_sel].x1 + (lv_area_get_width(&btnm->button_areas[btnm->btn_id_sel]) >> 1);
 
                 for(area_below = btnm->btn_id_sel; area_below < btnm->btn_cnt; area_below++) {
@@ -623,7 +621,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
             }
         }
         else if(c == LV_KEY_UP) {
-            lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+            int32_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
             /*Find the area below the current*/
             if(btnm->btn_id_sel == LV_BUTTONMATRIX_BUTTON_NONE) {
                 btnm->btn_id_sel = 0;
@@ -637,7 +635,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
             }
             else {
                 int16_t area_above;
-                lv_coord_t pr_center =
+                int32_t pr_center =
                     btnm->button_areas[btnm->btn_id_sel].x1 + (lv_area_get_width(&btnm->button_areas[btnm->btn_id_sel]) >> 1);
 
                 for(area_above = btnm->btn_id_sel; area_above >= 0; area_above--) {
@@ -694,10 +692,10 @@ static void draw_main(lv_event_t * e)
     obj->skip_trans = 0;
     obj->state = state_ori;
 
-    lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-    lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    int32_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    int32_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    int32_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     char txt_ap[256];
@@ -750,10 +748,6 @@ static void draw_main(lv_event_t * e)
 
         draw_rect_dsc_act.base.id1 = btn_i;
 
-        bool recolor = button_is_recolor(btnm->ctrl_bits[btn_i]);
-        if(recolor) draw_label_dsc_act.flag |= LV_TEXT_FLAG_RECOLOR;
-        else draw_label_dsc_act.flag &= ~LV_TEXT_FLAG_RECOLOR;
-
         /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
         if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
             draw_rect_dsc_act.border_side = LV_BORDER_SIDE_FULL;
@@ -763,7 +757,7 @@ static void draw_main(lv_event_t * e)
             if(btn_area.y2 == obj->coords.y2 - pbottom) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_BOTTOM;
         }
 
-        lv_coord_t btn_height = lv_area_get_height(&btn_area);
+        int32_t btn_height = lv_area_get_height(&btn_area);
 
         if((btn_state & LV_STATE_PRESSED) && (btnm->ctrl_bits[btn_i] & LV_BUTTONMATRIX_CTRL_POPOVER)) {
             /*Push up the upper boundary of the btn area to create the popover*/
@@ -775,13 +769,13 @@ static void draw_main(lv_event_t * e)
 
         /*Calculate the size of the text*/
         const lv_font_t * font = draw_label_dsc_act.font;
-        lv_coord_t letter_space = draw_label_dsc_act.letter_space;
-        lv_coord_t line_space = draw_label_dsc_act.line_space;
+        int32_t letter_space = draw_label_dsc_act.letter_space;
+        int32_t line_space = draw_label_dsc_act.line_space;
         const char * txt = btnm->map_p[txt_i];
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the Arabic text and process it*/
-        size_t len_ap = _lv_text_ap_calc_bytes_cnt(txt);
+        size_t len_ap = _lv_text_ap_calc_bytes_count(txt);
         if(len_ap < sizeof(txt_ap)) {
             _lv_text_ap_proc(txt, txt_ap);
             txt = txt_ap;
@@ -907,10 +901,6 @@ static bool button_get_checked(lv_buttonmatrix_ctrl_t ctrl_bits)
     return ctrl_bits & LV_BUTTONMATRIX_CTRL_CHECKED;
 }
 
-static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits)
-{
-    return ctrl_bits & LV_BUTTONMATRIX_CTRL_RECOLOR;
-}
 /**
  * Gives the button id of a button under a given point
  * @param obj pointer to a button matrix object
@@ -925,14 +915,14 @@ static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p)
     uint32_t i;
     lv_obj_get_coords(obj, &obj_cords);
 
-    lv_coord_t w = lv_obj_get_width(obj);
-    lv_coord_t h = lv_obj_get_height(obj);
-    lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-    lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-    lv_coord_t prow = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
-    lv_coord_t pcol = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+    int32_t w = lv_obj_get_width(obj);
+    int32_t h = lv_obj_get_height(obj);
+    int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    int32_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    int32_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    int32_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    int32_t prow = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
+    int32_t pcol = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
     /*Get the half gap. Button look larger with this value. (+1 for rounding error)*/
     prow = (prow / 2) + 1 + (prow & 1);
@@ -985,11 +975,11 @@ static void invalidate_button_area(const lv_obj_t * obj, uint32_t btn_idx)
 
     /*The buttons might have outline and shadow so make the invalidation larger with the gaps between the buttons.
      *It assumes that the outline or shadow is smaller than the gaps*/
-    lv_coord_t row_gap = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
-    lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+    int32_t row_gap = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
+    int32_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
     /*Be sure to have a minimal extra space if row/col_gap is small*/
-    lv_coord_t dpi = lv_display_get_dpi(lv_obj_get_disp(obj));
+    int32_t dpi = lv_display_get_dpi(lv_obj_get_disp(obj));
     row_gap = LV_MAX(row_gap, dpi / 10);
     col_gap = LV_MAX(col_gap, dpi / 10);
 

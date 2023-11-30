@@ -1,6 +1,5 @@
 #include "../../../lvgl.h"
 
-
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
@@ -1119,7 +1118,6 @@ static const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_
 };
 
 const lv_image_dsc_t img_bulb_gif = {
-    .header.always_zero = 0,
     .header.w = 0,
     .header.h = 0,
     .data_size = 0,

@@ -61,7 +61,7 @@ lv.gridnav_add(cont_sub2, lv.GRIDNAV_CTRL.ROLLOVER)
 #Only the container needs to be in a group
 lv.group_get_default().add_obj(cont_sub2)
 
-cont_sub2.add_event(cont_sub_event_cb, lv.EVENT.KEY, None)
+cont_sub2.add_event_cb(cont_sub_event_cb, lv.EVENT.KEY, None)
 
 # Use flex here, but works with grid or manually placed objects as well
 cont_sub2.set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)

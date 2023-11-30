@@ -10,7 +10,7 @@ def slider_event_cb(e):
 # Create a slider in the center of the display
 slider = lv.slider(lv.screen_active())
 slider.center()
-slider.add_event(slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
+slider.add_event_cb(slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
 
 # Create a label below the slider
 slider_label = lv.label(lv.screen_active())

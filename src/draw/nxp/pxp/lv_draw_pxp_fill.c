@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -32,7 +31,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void _pxp_fill(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void _pxp_fill(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t dest_stride,
                       lv_color_format_t dest_cf, const lv_draw_fill_dsc_t * dsc);
 
 /**********************
@@ -68,7 +67,7 @@ void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc
         return; /*Fully clipped, nothing to do*/
 
     uint8_t * dest_buf = layer->draw_buf.buf;
-    lv_coord_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
+    int32_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
     lv_color_format_t dest_cf = layer->draw_buf.color_format;
 
     _pxp_fill(dest_buf, &blend_area, dest_stride, dest_cf, dsc);
@@ -78,11 +77,11 @@ void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc
  *   STATIC FUNCTIONS
  **********************/
 
-static void _pxp_fill(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void _pxp_fill(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t dest_stride,
                       lv_color_format_t dest_cf, const lv_draw_fill_dsc_t * dsc)
 {
-    lv_coord_t dest_w = lv_area_get_width(dest_area);
-    lv_coord_t dest_h = lv_area_get_height(dest_area);
+    int32_t dest_w = lv_area_get_width(dest_area);
+    int32_t dest_h = lv_area_get_height(dest_area);
 
     lv_pxp_reset();
 

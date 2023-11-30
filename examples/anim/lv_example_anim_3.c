@@ -36,8 +36,8 @@ static void anim_x_cb(void * var, int32_t v);
  */
 void lv_example_anim_3(void)
 {
-    static lv_coord_t col_dsc[] = {LV_GRID_FR(1), 200, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t row_dsc[] = {30, 10, 10, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static int32_t col_dsc[] = {LV_GRID_FR(1), 200, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static int32_t row_dsc[] = {30, 10, 10, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
     /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
@@ -64,7 +64,7 @@ void lv_example_anim_3(void)
 
 static int32_t anim_path_bezier3_cb(const lv_anim_t * a)
 {
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, 1024);
+    uint32_t t = lv_map(a->act_time, 0, a->duration, 0, 1024);
     int32_t step = lv_bezier3(t, 0, ginfo.p1, ginfo.p2, 1024);
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
@@ -139,13 +139,13 @@ static void page_obj_init(lv_obj_t * par)
     lv_slider_set_range(ginfo.p2_slider, 0, 1024);
     lv_obj_set_style_pad_all(ginfo.p1_slider, 2, LV_PART_KNOB);
     lv_obj_set_style_pad_all(ginfo.p2_slider, 2, LV_PART_KNOB);
-    lv_obj_add_event(ginfo.p1_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
-    lv_obj_add_event(ginfo.p2_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(ginfo.p1_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(ginfo.p2_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_grid_cell(ginfo.p1_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 1, 1);
     lv_obj_set_grid_cell(ginfo.p2_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 2, 1);
 
     ginfo.run_btn = lv_button_create(par);
-    lv_obj_add_event(ginfo.run_btn, run_button_event_handler, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(ginfo.run_btn, run_button_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_t * btn_label = lv_label_create(ginfo.run_btn);
     lv_label_set_text(btn_label, LV_SYMBOL_PLAY);
     lv_obj_center(btn_label);

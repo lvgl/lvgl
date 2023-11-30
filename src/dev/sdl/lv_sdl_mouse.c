@@ -25,6 +25,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data);
+static void release_indev_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -42,10 +43,9 @@ typedef struct {
 
 lv_indev_t * lv_sdl_mouse_create(void)
 {
-    lv_sdl_mouse_t * dsc = lv_malloc(sizeof(lv_sdl_mouse_t));
+    lv_sdl_mouse_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_mouse_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_sdl_mouse_t));
 
     lv_indev_t * indev = lv_indev_create();
     LV_ASSERT_MALLOC(indev);
@@ -57,6 +57,9 @@ lv_indev_t * lv_sdl_mouse_create(void)
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, sdl_mouse_read);
     lv_indev_set_driver_data(indev, dsc);
+
+    lv_timer_delete(lv_indev_get_read_timer(indev));
+    lv_indev_add_event_cb(indev, release_indev_cb, LV_EVENT_DELETE, indev);
 
     return indev;
 }
@@ -75,6 +78,17 @@ static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data)
     data->state = dsc->left_button_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
 
+static void release_indev_cb(lv_event_t * e)
+{
+    lv_indev_t * indev = (lv_indev_t *) lv_event_get_user_data(e);
+    lv_sdl_mouse_t * dsc = lv_indev_get_driver_data(indev);
+    if(dsc) {
+        lv_indev_set_driver_data(indev, NULL);
+        lv_indev_set_read_cb(indev, NULL);
+        lv_free(dsc);
+        LV_LOG_INFO("done");
+    }
+}
 
 void _lv_sdl_mouse_handler(SDL_Event * event)
 {
@@ -117,8 +131,8 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
     lv_sdl_mouse_t * indev_dev = lv_indev_get_driver_data(indev);
     if(indev_dev == NULL) return;
 
-    lv_coord_t hor_res = lv_display_get_horizontal_resolution(disp);
-    lv_coord_t ver_res = lv_display_get_vertical_resolution(disp);
+    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
+    int32_t ver_res = lv_display_get_vertical_resolution(disp);
     uint8_t zoom = lv_sdl_window_get_zoom(disp);
 
     switch(event->type) {
@@ -161,6 +175,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
             indev_dev->last_y = (int16_t)((float)ver_res * event->tfinger.y / zoom);
             break;
     }
+    lv_indev_read(indev);
 }
 
 #endif /*LV_USE_SDL*/

@@ -19,8 +19,6 @@
  *      TYPEDEFS
  **********************/
 
-
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -40,12 +38,8 @@ static void lv_anim_timeline_virtual_exec_cb(void * var, int32_t v);
 
 lv_anim_timeline_t * lv_anim_timeline_create(void)
 {
-    lv_anim_timeline_t * at = (lv_anim_timeline_t *)lv_malloc(sizeof(lv_anim_timeline_t));
-
+    lv_anim_timeline_t * at = lv_malloc_zeroed(sizeof(lv_anim_timeline_t));
     LV_ASSERT_MALLOC(at);
-
-    if(at) lv_memzero(at, sizeof(lv_anim_timeline_t));
-
     return at;
 }
 
@@ -93,7 +87,7 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
             int32_t temp = a.start_value;
             a.start_value = a.end_value;
             a.end_value = temp;
-            lv_anim_set_delay(&a, playtime - (start_time + a.time));
+            lv_anim_set_delay(&a, playtime - (start_time + a.duration));
         }
         else {
             lv_anim_set_delay(&a, start_time);
@@ -137,19 +131,20 @@ void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 
         uint32_t start_time = at->anim_dsc[i].start_time;
         int32_t value = 0;
-
-        if(act_time < start_time) {
+        if(act_time < start_time && a->early_apply) {
             value = a->start_value;
+            a->exec_cb(a->var, value);
         }
-        else if(act_time < (start_time + a->time)) {
+        else if(act_time >= start_time && act_time <= (start_time + a->duration)) {
             a->act_time = act_time - start_time;
             value = a->path_cb(a);
+            a->exec_cb(a->var, value);
         }
-        else {
+        else if(act_time > start_time + a->duration) {
             value = a->end_value;
+            a->exec_cb(a->var, value);
         }
 
-        a->exec_cb(a->var, value);
     }
 }
 

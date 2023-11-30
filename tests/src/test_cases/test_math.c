@@ -74,7 +74,6 @@ found:
     return do_cubic_bezier_f(t, ay, by, cy);
 }
 
-
 static int test_cubic_bezier_ease_functions(float fx1, float fy1, float fx2, float fy2)
 {
     int x1, y1, x2, y2, y;

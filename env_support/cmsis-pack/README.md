@@ -6,7 +6,7 @@
 
 1. Copy the **lv_conf_template.h** to '**cmsis-pack**' directory
 
-2. Set the macro protector to '1' 
+2. Set the macro protector to '1'
 
 ```c
 ...
@@ -47,7 +47,7 @@ remove the misleading guide above this code segment.
    #define LV_STRING_INCLUDE <string.h>
    ```
 
-   
+
 
 5. Remove macro definitions for
 
@@ -135,7 +135,7 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
    #if LV_USE_DEMO_WIDGETS
        #define LV_DEMO_WIDGETS_SLIDESHOW 0
    #endif
-   
+
    /*Benchmark your system*/
    #if LV_USE_DEMO_BENCHMARK
        /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
@@ -143,7 +143,7 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
    #endif
    ```
 
-   
+
 
 10. Remove following macro definitions in the `3rd party libraries` section:
 
@@ -153,6 +153,7 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
     - \#define LV_USE_FS_FATFS 0
     - \#define LV_USE_LODEPNG 0
     - \#define LV_USE_BMP 0
+    - \#define LV_USE_RLE 0
     - \#define LV_USE_SJPG 0
     - \#define LV_USE_GIF 0
     - \#define LV_USE_BARCODE 0
@@ -165,6 +166,8 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
 11. Remove unsupported devices from the `DEVICES` section
 
     - LV_USE_SDL
+
+    - LV_USE_X11
 
     - LV_USE_LINUX_FBDEV
 
@@ -223,4 +226,3 @@ enter the following command:
 ```sh
 ./gen_pack.sh
 ```
-

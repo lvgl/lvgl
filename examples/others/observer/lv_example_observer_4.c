@@ -91,7 +91,7 @@ static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 
     uint32_t i;
     uint32_t delay = 0;
-    uint32_t child_cnt_prev = lv_obj_get_child_cnt(cont);
+    uint32_t child_cnt_prev = lv_obj_get_child_count(cont);
     for(i = 0; i < child_cnt_prev; i++) {
         lv_obj_t * child = lv_obj_get_child(cont, i);
         lv_anim_set_var(&a, child);
@@ -132,7 +132,7 @@ static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 
     /*Animate in the new widgets*/
     lv_anim_set_ready_cb(&a, NULL);
-    for(i = child_cnt_prev; i < lv_obj_get_child_cnt(cont); i++) {
+    for(i = child_cnt_prev; i < lv_obj_get_child_count(cont); i++) {
         lv_obj_t * child = lv_obj_get_child(cont, i);
         lv_anim_set_var(&a, child);
         if(prev_v < cur_v) {
@@ -149,7 +149,6 @@ static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 
 }
 
-
 static void btn_create(lv_obj_t * parent, const char * text)
 {
     lv_obj_t * btn = lv_button_create(parent);
@@ -157,7 +156,7 @@ static void btn_create(lv_obj_t * parent, const char * text)
     lv_obj_set_height(btn, lv_pct(100));
     lv_obj_set_style_radius(btn, 0, 0);
     lv_subject_add_observer_obj(&current_tab_subject, btn_observer_cb, btn, NULL);
-    lv_obj_add_event(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, text);

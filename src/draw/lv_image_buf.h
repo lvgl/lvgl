@@ -42,6 +42,39 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef enum _lv_image_flags_t {
+    /**
+     * For RGB map of the image data, mark if it's pre-multiplied with alpha.
+     * For indexed image, this bit indicated palette data is pre-multiplied with alpha.
+     */
+    LV_IMAGE_FLAGS_PREMULTIPLIED    = 0x01,
+
+    /**
+     * If the image data is malloced and can be processed in place.
+     * In image decoder post processing, this flag means we modify it in-place.
+     */
+    LV_IMAGE_FLAGS_MODIFIABLE       = 0x02,
+
+    /**
+     * Indicating it's a vector image instead of default raster image.
+     * Some of the flags are not usable for vector image, like PREMULTIPLIED.
+     */
+    LV_IMAGE_FLAGS_VECTORS          = 0x04,
+
+    /**
+     * Flags reserved for user, lvgl won't use these bits.
+     */
+    LV_IMAGE_FLAGS_USER1            = 0x1000,
+    LV_IMAGE_FLAGS_USER2            = 0x2000,
+    LV_IMAGE_FLAGS_USER3            = 0x4000,
+    LV_IMAGE_FLAGS_USER4            = 0x8000,
+    LV_IMAGE_FLAGS_USER5            = 0x0100,
+    LV_IMAGE_FLAGS_USER6            = 0x0200,
+    LV_IMAGE_FLAGS_USER7            = 0x0400,
+    LV_IMAGE_FLAGS_USER8            = 0x0800,
+} lv_image_flags_t;
+
 /**
  * The first 8 bit is very important to distinguish the different source types.
  * For more info see `lv_image_get_src_type()` in lv_img.c
@@ -61,13 +94,12 @@ typedef struct {
 } lv_image_header_t;
 #else
 typedef struct {
-    uint32_t cf : 5;          /*Color format: See `lv_color_format_t`*/
-    uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
-                                 non-printable character*/
+    uint32_t cf : 5;            /*Color format: See `lv_color_format_t`*/
+    uint32_t always_zero : 3;   /*It the upper bits of the first byte. Always zero to look like a
+                                  non-printable character*/
 
-    uint32_t format: 8;       /*Image format? To be defined by LVGL*/
-    uint32_t user: 8;
-    uint32_t reserved: 8;   /*Reserved to be used later*/
+    uint32_t format: 8;         /*Image format? To be defined by LVGL*/
+    uint32_t flags: 16;         /*Image flags, see `lv_image_flags_t`*/
 
     uint32_t w: 16;
     uint32_t h: 16;
@@ -112,10 +144,12 @@ void lv_image_buf_free(lv_image_dsc_t * dsc);
  * @param w width of the rectangle to transform
  * @param h height of the rectangle to transform
  * @param angle angle of rotation
- * @param zoom zoom, (256 no zoom)
+ * @param scale_x zoom in x direction, (256 no zoom)
+ * @param scale_y zoom in y direction, (256 no zoom)
  * @param pivot x,y pivot coordinates of rotation
  */
-void _lv_image_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, lv_coord_t angle, uint16_t zoom,
+void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle, uint16_t scale_x,
+                                        uint16_t scale_y,
                                         const lv_point_t * pivot);
 
 /**********************

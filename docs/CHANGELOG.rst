@@ -53,7 +53,7 @@ Examples
 Docs
 ~~~~
 
-- docs(arduino): add note to not use lv_examles library `2f294aa <https://github.com/lvgl/lvgl/commit/2f294aa76c8fece98a4fa72304bc6f267ed2a228>`__
+- docs(arduino): add note to not use lv_examples library `2f294aa <https://github.com/lvgl/lvgl/commit/2f294aa76c8fece98a4fa72304bc6f267ed2a228>`__
 - docs: use a fixed commit of lv_web_emscripten `501230e <https://github.com/lvgl/lvgl/commit/501230e0fc95936199b3187d350873c3bb4a94e4>`__
 
 CI and tests

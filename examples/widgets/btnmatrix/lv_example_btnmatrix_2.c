@@ -1,7 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_BTNMATRIX && LV_BUILD_EXAMPLES
 
-
 static void event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
@@ -22,8 +21,8 @@ static void event_cb(lv_event_t * e)
                 if(pressed) rect_draw_dsc->bg_color = lv_palette_darken(LV_PALETTE_BLUE, 3);
                 else rect_draw_dsc->bg_color = lv_palette_main(LV_PALETTE_BLUE);
                 rect_draw_dsc->shadow_width = 6;
-                rect_draw_dsc->shadow_ofs_x = 3;
-                rect_draw_dsc->shadow_ofs_y = 3;
+                rect_draw_dsc->shadow_offset_x = 3;
+                rect_draw_dsc->shadow_offset_y = 3;
             }
             if(draw_task->type == LV_DRAW_TASK_TYPE_LABEL) {
                 lv_draw_label_dsc_t * label_draw_dsc = draw_task->draw_dsc;
@@ -77,7 +76,7 @@ static void event_cb(lv_event_t * e)
 void lv_example_buttonmatrix_2(void)
 {
     lv_obj_t * btnm = lv_buttonmatrix_create(lv_screen_active());
-    lv_obj_add_event(btnm, event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(btnm, event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_flag(btnm, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     lv_obj_center(btnm);
 }

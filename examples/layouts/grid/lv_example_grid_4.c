@@ -6,9 +6,8 @@
  */
 void lv_example_grid_4(void)
 {
-    static lv_coord_t col_dsc[] = {60, 60, 60, LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t row_dsc[] = {45, 45, 45, LV_GRID_TEMPLATE_LAST};
-
+    static int32_t col_dsc[] = {60, 60, 60, LV_GRID_TEMPLATE_LAST};
+    static int32_t row_dsc[] = {45, 45, 45, LV_GRID_TEMPLATE_LAST};
 
     /*Add space between the columns and move the rows to the bottom (end)*/
 

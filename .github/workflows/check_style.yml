@@ -9,15 +9,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Checkout astyle
+        uses: actions/checkout@v4
+        with:
+          repository: szepeviktor/astyle
+          path: astyle
       - name: Install astyle
         run: |
-          sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
-          sudo apt-get update -y -qq
-          sudo apt-get install astyle
+          cd astyle/build/gcc/
+          make
+          sudo make install
+          astyle --version
       - name: Format code
         run: python code-format.py
         working-directory: scripts

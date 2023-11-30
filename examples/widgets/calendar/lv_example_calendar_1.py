@@ -13,7 +13,7 @@ def event_handler(e):
 calendar = lv.calendar(lv.screen_active())
 calendar.set_size(200, 200)
 calendar.align(lv.ALIGN.CENTER, 0, 20)
-calendar.add_event(event_handler, lv.EVENT.ALL, None)
+calendar.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
 calendar.set_today_date(2021, 02, 23)
 calendar.set_showed_date(2021, 02)

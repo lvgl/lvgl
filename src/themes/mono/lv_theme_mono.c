@@ -35,7 +35,6 @@ typedef struct {
     lv_style_t scr;
     lv_style_t card;
     lv_style_t scrollbar;
-    lv_style_t btn;
     lv_style_t pr;
     lv_style_t inv;
     lv_style_t disabled;
@@ -186,7 +185,15 @@ bool lv_theme_mono_is_inited(void)
 
 void lv_theme_mono_deinit(void)
 {
-    if(theme_def) {
+    struct _my_theme_t * theme = theme_def;
+    if(theme) {
+        if(theme->inited) {
+            lv_style_t * theme_styles = (lv_style_t *)(&(theme->styles));
+            uint32_t i;
+            for(i = 0; i < sizeof(my_theme_styles_t) / sizeof(lv_style_t); i++) {
+                lv_style_reset(theme_styles + i);
+            }
+        }
         lv_free(theme_def);
         theme_def = NULL;
     }
@@ -198,8 +205,7 @@ lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_mono_is_inited()) {
-        theme_def = (my_theme_t *)lv_malloc(sizeof(my_theme_t));
-        lv_memzero(theme_def, sizeof(my_theme_t));
+        theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
     struct _my_theme_t * theme = theme_def;

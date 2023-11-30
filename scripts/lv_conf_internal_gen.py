@@ -150,10 +150,19 @@ fout.write(
  * End of parsing lv_conf_template.h
  -----------------------------------*/
 
+#ifndef __ASSEMBLY__
 LV_EXPORT_CONST_INT(LV_DPI_DEF);
+#endif
 
 #undef _LV_KCONFIG_PRESENT
 
+#ifndef __ASSEMBLY__
+#if LV_USE_FLOAT
+    typedef float lv_value_precise_t;
+#else
+    typedef int32_t lv_value_precise_t;
+#endif
+#endif
 
 /*Set some defines if a dependency is disabled*/
 #if LV_USE_LOG == 0

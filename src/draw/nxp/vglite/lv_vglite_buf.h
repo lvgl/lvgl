@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 #ifndef LV_VGLITE_BUF_H
 #define LV_VGLITE_BUF_H
 
@@ -89,7 +88,7 @@ void vglite_set_dest_buf(const lv_draw_buf_t * draw_buf);
  * @param[in] cf Source buffer color format
  *
  */
-void vglite_set_src_buf(const void * buf, lv_coord_t width, lv_coord_t height, uint32_t stride,
+void vglite_set_src_buf(const void * buf, int32_t width, int32_t height, uint32_t stride,
                         lv_color_format_t cf);
 
 /**
@@ -104,7 +103,7 @@ void vglite_set_src_buf(const void * buf, lv_coord_t width, lv_coord_t height, u
  *
  */
 void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
-                    lv_coord_t width, lv_coord_t height, uint32_t stride,
+                    int32_t width, int32_t height, uint32_t stride,
                     lv_color_format_t cf);
 
 /**********************

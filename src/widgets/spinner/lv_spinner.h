@@ -29,14 +29,13 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-extern const lv_obj_class_t lv_spinner_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spinner_class;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 lv_obj_t * lv_spinner_create(lv_obj_t * parent);
-
 
 void lv_spinner_set_anim_params(lv_obj_t * obj, uint32_t t, uint32_t angle);
 

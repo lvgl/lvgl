@@ -31,7 +31,7 @@ def ta_event_cb(e):
 # Create the text area
 
 ta = lv.textarea(lv.screen_active())
-ta.add_event(ta_event_cb, lv.EVENT.VALUE_CHANGED, None)
+ta.add_event_cb(ta_event_cb, lv.EVENT.VALUE_CHANGED, None)
 ta.set_accepted_chars("0123456789:")
 ta.set_max_length(5)
 ta.set_one_line(True)

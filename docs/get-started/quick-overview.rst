@@ -171,7 +171,7 @@ A callback is assigned like this:
 
 .. code:: c
 
-   lv_obj_add_event(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
+   lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
 
    ...
 

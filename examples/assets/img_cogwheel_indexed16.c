@@ -131,7 +131,6 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_INDEXED16 uint8_t i
 };
 
 const lv_image_dsc_t img_cogwheel_indexed16 = {
-    .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
     .data_size = 5064,

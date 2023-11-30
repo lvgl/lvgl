@@ -66,7 +66,8 @@ struct lv_image_pixel_color_s {
  **********************/
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
@@ -171,8 +172,6 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 
     data_size = width * height * 4;
 
-
-    player->imgdsc.header.always_zero = 0;
     player->imgdsc.header.w = width;
     player->imgdsc.header.h = height;
     player->imgdsc.data_size = data_size;
@@ -270,9 +269,11 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_INVALID;
 }
 
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args)
 {
     LV_UNUSED(decoder);
+    LV_UNUSED(args);
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * path = dsc->src;
@@ -573,7 +574,6 @@ static int ffmpeg_get_image_header(const char * filepath,
         /* allocate image where the decoded image will be put */
         header->w = video_dec_ctx->width;
         header->h = video_dec_ctx->height;
-        header->always_zero = 0;
         header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
 
         ret = 0;
@@ -801,7 +801,7 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
     }
 
     lv_cache_lock();
-    lv_cache_invalidate(lv_cache_find(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_invalidate_by_src(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_POINTER);
     lv_cache_unlock();
 
     lv_obj_invalidate(obj);
@@ -840,7 +840,7 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
     }
 
     lv_cache_lock();
-    lv_cache_invalidate(lv_cache_find(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_invalidate_by_src(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_POINTER);
     lv_cache_unlock();
 
     ffmpeg_close(player->ffmpeg_ctx);

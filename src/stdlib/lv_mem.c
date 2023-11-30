@@ -42,7 +42,6 @@ void lv_free_core(void * p);
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p);
 lv_result_t lv_mem_test_core(void);
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -83,8 +82,8 @@ void * lv_malloc(size_t size)
         LV_LOG_INFO("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d",
                     (int)(mon.total_size - mon.free_size), mon.used_pct, mon.frag_pct,
                     (int)mon.free_biggest_size);
-        return NULL;
 #endif
+        return NULL;
     }
 
 #if LV_MEM_ADD_JUNK
@@ -92,7 +91,33 @@ void * lv_malloc(size_t size)
 #endif
 
     LV_TRACE_MEM("allocated at %p", alloc);
+    return alloc;
+}
 
+void * lv_malloc_zeroed(size_t size)
+{
+    LV_TRACE_MEM("allocating %lu bytes", (unsigned long)size);
+    if(size == 0) {
+        LV_TRACE_MEM("using zero_mem");
+        return &zero_mem;
+    }
+
+    void * alloc = lv_malloc_core(size);
+    if(alloc == NULL) {
+        LV_LOG_INFO("couldn't allocate memory (%lu bytes)", (unsigned long)size);
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
+        lv_mem_monitor_t mon;
+        lv_mem_monitor(&mon);
+        LV_LOG_INFO("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d",
+                    (int)(mon.total_size - mon.free_size), mon.used_pct, mon.frag_pct,
+                    (int)mon.free_biggest_size);
+#endif
+        return NULL;
+    }
+
+    lv_memzero(alloc, size);
+
+    LV_TRACE_MEM("allocated at %p", alloc);
     return alloc;
 }
 
@@ -107,7 +132,6 @@ void lv_free(void * data)
     if(data == NULL) return;
 
     lv_free_core(data);
-
 }
 
 /**
@@ -151,7 +175,7 @@ lv_result_t lv_mem_test(void)
 
 void lv_mem_monitor(lv_mem_monitor_t * mon_p)
 {
-    lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
+    lv_memzero(mon_p, sizeof(lv_mem_monitor_t));
     lv_mem_monitor_core(mon_p);
 }
 

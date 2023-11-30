@@ -59,13 +59,13 @@ class LvExampleAnim_3():
         self.p2_slider.set_range(0, 1024)
         self.p1_slider.set_style_pad_all(2, lv.PART.KNOB)
         self.p2_slider.set_style_pad_all(2, lv.PART.KNOB)
-        self.p1_slider.add_event(self.slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
-        self.p2_slider.add_event(self.slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
+        self.p1_slider.add_event_cb(self.slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
+        self.p2_slider.add_event_cb(self.slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
         self.p1_slider.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1,lv.GRID_ALIGN.START, 1, 1)
         self.p2_slider.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1,lv.GRID_ALIGN.START, 2, 1)
 
         self.run_button = lv.button(par)
-        self.run_button.add_event(self.run_button_event_handler, lv.EVENT.CLICKED, None)
+        self.run_button.add_event_cb(self.run_button_event_handler, lv.EVENT.CLICKED, None)
         button_label = lv.label(self.run_button)
         button_label.set_text(lv.SYMBOL.PLAY)
         button_label.center()
@@ -113,7 +113,7 @@ class LvExampleAnim_3():
         var.set_style_translate_x(v, lv.PART.MAIN)
 
     def anim_path_bezier3_cb(self,a):
-        t = lv.map(a.act_time, 0, a.time, 0, 1024)
+        t = lv.map(a.act_time, 0, a.duration, 0, 1024)
         step = lv.bezier3(t, 0, self.p1, self.p2, 1024)
         new_value = step * (a.end_value - a.start_value)
         new_value = new_value >> 10

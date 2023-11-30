@@ -22,6 +22,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data);
+static void release_indev_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -38,10 +39,9 @@ typedef struct {
 
 lv_indev_t * lv_sdl_mousewheel_create(void)
 {
-    lv_sdl_mousewheel_t * dsc = lv_malloc(sizeof(lv_sdl_mousewheel_t));
+    lv_sdl_mousewheel_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_mousewheel_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_sdl_mousewheel_t));
 
     lv_indev_t * indev = lv_indev_create();
     if(indev == NULL) {
@@ -52,6 +52,9 @@ lv_indev_t * lv_sdl_mousewheel_create(void)
     lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
     lv_indev_set_read_cb(indev, sdl_mousewheel_read);
     lv_indev_set_driver_data(indev, dsc);
+
+    lv_timer_delete(lv_indev_get_read_timer(indev));
+    lv_indev_add_event_cb(indev, release_indev_cb, LV_EVENT_DELETE, indev);
 
     return indev;
 }
@@ -67,6 +70,18 @@ static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data)
     data->state = dsc->state;
     data->enc_diff = dsc->diff;
     dsc->diff = 0;
+}
+
+static void release_indev_cb(lv_event_t * e)
+{
+    lv_indev_t * indev = (lv_indev_t *) lv_event_get_user_data(e);
+    lv_sdl_mousewheel_t * dsc = lv_indev_get_driver_data(indev);
+    if(dsc) {
+        lv_indev_set_driver_data(indev, NULL);
+        lv_indev_set_read_cb(indev, NULL);
+        lv_free(dsc);
+        LV_LOG_INFO("done");
+    }
 }
 
 void _lv_sdl_mousewheel_handler(SDL_Event * event)
@@ -121,6 +136,7 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
         default:
             break;
     }
+    lv_indev_read(indev);
 }
 
 #endif /*LV_USE_SDL*/

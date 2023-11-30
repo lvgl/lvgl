@@ -46,8 +46,6 @@ typedef _lv_key_t lv_key_t;
 typedef uint8_t lv_key_t;
 #endif /*DOXYGEN*/
 
-
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -81,7 +79,6 @@ typedef struct _lv_group_t {
                                    of list.*/
 } lv_group_t;
 
-
 typedef enum {
     LV_GROUP_REFOCUS_POLICY_NEXT = 0,
     LV_GROUP_REFOCUS_POLICY_PREV = 1
@@ -96,6 +93,12 @@ typedef enum {
  * @remarks Internal function, do not call directly.
  */
 void _lv_group_init(void);
+
+/**
+ * Deinit. the group module
+ * @remarks Internal function, do not call directly.
+ */
+void _lv_group_deinit(void);
 
 /**
  * Create a new object group
@@ -193,7 +196,6 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb);
  * @param edge_cb      the call back function or NULL if unused
  */
 void lv_group_set_edge_cb(lv_group_t * group, lv_group_edge_cb_t edge_cb);
-
 
 /**
  * Set whether the next or previous item in a group is focused if the currently focused obj is

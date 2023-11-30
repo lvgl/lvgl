@@ -21,7 +21,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -36,7 +35,6 @@ typedef enum {
     LV_SUBJECT_TYPE_GROUP  =    4,   /**< an array of subjects*/
     LV_SUBJECT_TYPE_STRING  =   5,   /**< a char pointer*/
 } lv_subject_type_t;
-
 
 /**
  * A common type to handle all the various observable types in the same way
@@ -57,6 +55,7 @@ typedef struct {
     lv_subject_value_t value;           /**< Actual value*/
     lv_subject_value_t prev_value;      /**< Previous value*/
     uint32_t notify_restart_query : 1; /**< If an observer deleted start notifying from the beginning. */
+    void * user_data;                   /**< Additional parameter, can be used freely by the user*/
 } lv_subject_t;
 
 /**
@@ -235,7 +234,6 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
  */
 lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t observer_cb, lv_obj_t * obj,
                                             void * user_data);
-
 
 /**
  * Add an observer to a subject and also save a target.

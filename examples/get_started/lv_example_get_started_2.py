@@ -9,7 +9,7 @@ class CounterBtn():
         button.set_pos(10, 10)                                      # Set its position
         button.set_size(120, 50)                                    # Set its size
         button.align(lv.ALIGN.CENTER,0,0)
-        button.add_event(self.button_event_cb, lv.EVENT.ALL, None)  # Assign a callback to the button
+        button.add_event_cb(self.button_event_cb, lv.EVENT.ALL, None)  # Assign a callback to the button
         label = lv.label(button)                                    # Add a label to the button
         label.set_text("Button")                                 # Set the labels text
         label.center()

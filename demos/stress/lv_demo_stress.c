@@ -79,7 +79,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
 
                 if(mem_free_start == 0)  mem_free_start = mon.free_size;
 
-                LV_LOG_USER("mem leak since start: %d, frag: %3d %%",  mem_free_start - mon.free_size, mon.frag_pct);
+                LV_LOG_USER("mem leak since start: %" LV_PRIu32 ", frag: %3d %%", mem_free_start - mon.free_size, mon.frag_pct);
             }
             break;
         case 0:
@@ -88,7 +88,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_obj_set_size(main_page, LV_HOR_RES / 2, LV_VER_RES);
             lv_obj_set_flex_flow(main_page, LV_FLEX_FLOW_COLUMN);
 
-
             obj = lv_button_create(main_page);
             lv_obj_set_size(obj, 100, 70);
             obj = lv_label_create(obj);
@@ -96,7 +95,8 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 1: {
-                obj = lv_tabview_create(lv_screen_active(), LV_DIR_TOP, 50);
+                obj = lv_tabview_create(lv_screen_active());
+                lv_tabview_set_tab_bar_size(obj, 50);
                 lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
                 lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
                 lv_obj_t * t = lv_tabview_add_tab(obj, "First");
@@ -107,7 +107,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
                 t = lv_tabview_add_tab(obj, LV_SYMBOL_EDIT " Edit");
                 t = lv_tabview_add_tab(obj, LV_SYMBOL_CLOSE);
 
-                lv_tabview_set_act(obj, 1, LV_ANIM_ON);
+                lv_tabview_set_active(obj, 1, LV_ANIM_ON);
                 auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 5 + 30);
             }
             break;
@@ -242,10 +242,11 @@ static void obj_test_task_cb(lv_timer_t * tmr)
 
         case 14:
             obj = lv_msgbox_create(NULL, "Title", "Some text on the message box with average length", mbox_buttons, true);
-
-            lv_timer_t * msgbox_tmr = lv_timer_create(msgbox_delete, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
-            lv_timer_set_repeat_count(msgbox_tmr, 1);
-            lv_obj_align(obj, LV_ALIGN_RIGHT_MID, -10, 0);
+            {
+                lv_timer_t * msgbox_tmr = lv_timer_create(msgbox_delete, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
+                lv_timer_set_repeat_count(msgbox_tmr, 1);
+                lv_obj_align(obj, LV_ALIGN_RIGHT_MID, -10, 0);
+            }
             break;
 
         case 15:

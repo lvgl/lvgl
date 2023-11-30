@@ -6,7 +6,6 @@ typedef enum {
     THEME_MODE_DARK,
 } theme_mode_t;
 
-
 static lv_obj_t * my_panel_create(lv_obj_t * parent);
 static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_event_cb_t event_cb);
 static void switch_theme_event_cb(lv_event_t * e);
@@ -44,7 +43,6 @@ static void switch_theme_event_cb(lv_event_t * e)
     if(lv_subject_get_int(&theme_subject) == THEME_MODE_LIGHT) lv_subject_set_int(&theme_subject, THEME_MODE_DARK);
     else lv_subject_set_int(&theme_subject, THEME_MODE_LIGHT);
 }
-
 
 /*-----------------------------------------
  * my_panel.c
@@ -93,8 +91,8 @@ static lv_obj_t * my_panel_create(lv_obj_t * parent)
         lv_style_set_radius(&styles.style_main, 12);
         lv_style_set_bg_opa(&styles.style_main, LV_OPA_COVER);
         lv_style_set_shadow_width(&styles.style_main, 24);
-        lv_style_set_shadow_ofs_x(&styles.style_main, 4);
-        lv_style_set_shadow_ofs_y(&styles.style_main, 6);
+        lv_style_set_shadow_offset_x(&styles.style_main, 4);
+        lv_style_set_shadow_offset_y(&styles.style_main, 6);
         lv_style_set_pad_all(&styles.style_main, 12);
         lv_style_set_pad_gap(&styles.style_main, 16);
 
@@ -168,7 +166,7 @@ static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_even
         lv_style_set_bg_opa(&styles.style_main, LV_OPA_COVER);
         lv_style_set_bg_grad_dir(&styles.style_main, LV_GRAD_DIR_HOR);
         lv_style_set_shadow_width(&styles.style_main, 24);
-        lv_style_set_shadow_ofs_y(&styles.style_main, 6);
+        lv_style_set_shadow_offset_y(&styles.style_main, 6);
         lv_style_set_pad_hor(&styles.style_main, 32);
         lv_style_set_pad_ver(&styles.style_main, 12);
 
@@ -181,7 +179,7 @@ static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_even
     lv_obj_remove_style_all(btn);
     lv_obj_add_style(btn, &styles.style_main, 0);
     lv_obj_add_style(btn, &styles.style_pressed, LV_STATE_PRESSED);
-    lv_obj_add_event(btn, event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, text);

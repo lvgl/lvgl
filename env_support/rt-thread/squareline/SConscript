@@ -4,8 +4,8 @@ cwd = GetCurrentDir()
 src = Glob('*.c')
 inc = [cwd]
  
-# check if .h or .hpp files exsit
-def check_h_hpp_exsit(path):
+# check if .h or .hpp files exists
+def check_h_hpp_exists(path):
     file_dirs = os.listdir(path)
     for file_dir in file_dirs:
         if os.path.splitext(file_dir)[1] in ['.h', '.hpp']:
@@ -17,7 +17,7 @@ for root, dirs, files in os.walk(sls_src_cwd):
     for dir in dirs:
         current_path = os.path.join(root, dir)
         src = src + Glob(os.path.join(current_path,'*.c')) # add all .c files
-        if check_h_hpp_exsit(current_path): # add .h and .hpp path
+        if check_h_hpp_exists(current_path): # add .h and .hpp path
             inc = inc + [current_path]
  
 group = DefineGroup('LVGL-SquareLine', src, depend = ['PKG_USING_LVGL_SQUARELINE'], CPPPATH = inc)

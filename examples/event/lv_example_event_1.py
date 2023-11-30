@@ -8,7 +8,7 @@ class Event_1():
         button = lv.button(lv.screen_active())
         button.set_size(100, 50)
         button.center()
-        button.add_event(self.event_cb, lv.EVENT.CLICKED, None)
+        button.add_event_cb(self.event_cb, lv.EVENT.CLICKED, None)
 
         label = lv.label(button)
         label.set_text("Click me!")

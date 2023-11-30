@@ -45,7 +45,6 @@ typedef struct {
 #endif
 } my_theme_styles_t;
 
-
 typedef struct _my_theme_t {
     lv_theme_t base;
     my_theme_styles_t styles;
@@ -81,7 +80,6 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_bg_opa(&theme->styles.scr, LV_OPA_COVER);
     lv_style_set_bg_color(&theme->styles.scr, COLOR_SCR);
     lv_style_set_text_color(&theme->styles.scr, COLOR_DIM);
-
 
     style_init_reset(&theme->styles.transp);
     lv_style_set_bg_opa(&theme->styles.transp, LV_OPA_TRANSP);
@@ -135,7 +133,6 @@ static void style_init(struct _my_theme_t * theme)
 #endif
 }
 
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -149,7 +146,15 @@ bool lv_theme_basic_is_inited(void)
 
 void lv_theme_basic_deinit(void)
 {
-    if(theme_def) {
+    struct _my_theme_t * theme = theme_def;
+    if(theme) {
+        if(theme->inited) {
+            lv_style_t * theme_styles = (lv_style_t *)(&(theme->styles));
+            uint32_t i;
+            for(i = 0; i < sizeof(my_theme_styles_t) / sizeof(lv_style_t); i++) {
+                lv_style_reset(theme_styles + i);
+            }
+        }
         lv_free(theme_def);
         theme_def = NULL;
     }
@@ -161,8 +166,7 @@ lv_theme_t * lv_theme_basic_init(lv_display_t * disp)
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_basic_is_inited()) {
-        theme_def  = (my_theme_t *)lv_malloc(sizeof(my_theme_t));
-        lv_memzero(theme_def, sizeof(my_theme_t));
+        theme_def  = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
     struct _my_theme_t * theme = theme_def;

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_fs.h
  *
  */
@@ -55,7 +55,6 @@ typedef _lv_fs_res_t lv_fs_res_t;
 typedef uint8_t lv_fs_res_t;
 #endif /*DOXYGEN*/
 
-
 /**
  * File open mode.
  */
@@ -69,7 +68,6 @@ typedef _lv_fs_mode_t lv_fs_mode_t;
 #else
 typedef uint8_t lv_fs_mode_t;
 #endif /*DOXYGEN*/
-
 
 /**
  * Seek modes.
@@ -132,6 +130,11 @@ typedef struct {
  * Initialize the File system interface
  */
 void _lv_fs_init(void);
+
+/**
+ * Deinitialize the File system interface
+ */
+void _lv_fs_deinit(void);
 
 /**
  * Initialize a file system driver with default values.

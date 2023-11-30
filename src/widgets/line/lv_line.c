@@ -64,7 +64,7 @@ lv_obj_t * lv_line_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint32_t point_num)
+void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -122,10 +122,10 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static inline lv_coord_t resolve_point_coord(lv_coord_t coord, lv_coord_t max)
+static inline lv_value_precise_t resolve_point_coord(lv_value_precise_t coord, int32_t max)
 {
-    if(LV_COORD_IS_PCT(coord)) {
-        return LV_CLAMP(0, max * LV_COORD_GET_PCT(coord) / 100, max);
+    if(LV_COORD_IS_PCT((int32_t)coord)) {
+        return LV_CLAMP(0, max * LV_COORD_GET_PCT((int32_t)coord) / 100, max);
     }
     else {
         return coord;
@@ -147,8 +147,8 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /*The corner of the skew lines is out of the intended area*/
-        lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-        lv_coord_t * s = lv_event_get_param(e);
+        int32_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+        int32_t * s = lv_event_get_param(e);
         if(*s < line_width) *s = line_width;
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
@@ -157,17 +157,17 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(line->point_num == 0 || line->point_array == NULL) return;
 
         lv_point_t * p = lv_event_get_param(e);
-        lv_coord_t w = 0;
-        lv_coord_t h = 0;
+        int32_t w = 0;
+        int32_t h = 0;
 
         uint32_t i;
         for(i = 0; i < line->point_num; i++) {
-            if(!LV_COORD_IS_PCT(line->point_array[i].x)) {
-                w = LV_MAX(line->point_array[i].x, w);
+            if(!LV_COORD_IS_PCT((int32_t)line->point_array[i].x)) {
+                w = (int32_t)LV_MAX(line->point_array[i].x, w);
             }
 
-            if(!LV_COORD_IS_PCT(line->point_array[i].y)) {
-                h = LV_MAX(line->point_array[i].y, h);
+            if(!LV_COORD_IS_PCT((int32_t)line->point_array[i].y)) {
+                h = (int32_t)LV_MAX(line->point_array[i].y, h);
             }
         }
 
@@ -182,8 +182,8 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_area_t area;
         lv_obj_get_coords(obj, &area);
-        lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
-        lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
+        int32_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
+        int32_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
 
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
@@ -192,8 +192,8 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Read all points and draw the lines*/
         uint32_t i;
         for(i = 0; i < line->point_num - 1; i++) {
-            lv_coord_t w = lv_obj_get_width(obj);
-            lv_coord_t h = lv_obj_get_height(obj);
+            int32_t w = lv_obj_get_width(obj);
+            int32_t h = lv_obj_get_height(obj);
 
             line_dsc.p1.x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
             line_dsc.p1.y = resolve_point_coord(line->point_array[i].y, h);

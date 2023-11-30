@@ -26,7 +26,7 @@ for i in range(20):
     txt = "File {:d}".format(i + 1)
     #lv_snprintf(buf, sizeof(buf), "File %d", i + 1);
     item = list.add_button(lv.SYMBOL.FILE, txt)
-    item.add_event(event_handler, lv.EVENT.CLICKED, None)
+    item.add_event_cb(event_handler, lv.EVENT.CLICKED, None)
     lv.group_remove_obj(item)  # The default group adds it automatically
 
 button = lv.button(lv.screen_active())

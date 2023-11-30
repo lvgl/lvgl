@@ -132,7 +132,6 @@ test_image_cogwheel_i4_map[] = {
 
 const lv_image_dsc_t test_image_cogwheel_i4 = {
     .header.cf = LV_COLOR_FORMAT_I4,
-    .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
     .data_size = 5064,

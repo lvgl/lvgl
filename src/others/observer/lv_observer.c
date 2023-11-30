@@ -71,7 +71,6 @@ void lv_subject_init_int(lv_subject_t * subject, int32_t value)
     _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
-
 void lv_subject_set_int(lv_subject_t * subject, int32_t value)
 {
     if(subject->type != LV_SUBJECT_TYPE_INT) {
@@ -206,7 +205,6 @@ void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)
     _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
-
 void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)
 {
     if(subject->type != LV_SUBJECT_TYPE_COLOR) {
@@ -266,7 +264,6 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
     return ((lv_subject_t **)(subject->value.pointer))[index];
 }
 
-
 lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t cb, void * user_data)
 {
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, cb, NULL, user_data);
@@ -288,7 +285,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     observer->target = obj;
     /* subscribe to delete event of the object */
     if(obj != NULL) {
-        lv_obj_add_event(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
+        lv_obj_add_event_cb(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
     }
 
     /* update object immediately */
@@ -296,7 +293,6 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
 
     return observer;
 }
-
 
 lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t cb, void * target,
                                                     void * user_data)
@@ -378,7 +374,6 @@ void lv_subject_notify(lv_subject_t * subject)
     } while(subject->notify_restart_query);
 }
 
-
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false);
@@ -407,7 +402,7 @@ lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subje
 lv_observer_t * lv_button_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 1, false);
-    lv_obj_add_event(obj, btn_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, btn_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
     return observable;
 }
 lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
@@ -437,12 +432,11 @@ lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         return NULL;
     }
 
-    lv_obj_add_event(obj, arc_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, arc_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, arc_value_observer_cb, obj, NULL);
     return observer;
 }
-
 
 lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
@@ -451,7 +445,7 @@ lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         return NULL;
     }
 
-    lv_obj_add_event(obj, slider_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, slider_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, slider_value_observer_cb, obj, NULL);
     return observer;
@@ -464,7 +458,7 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         return NULL;
     }
 
-    lv_obj_add_event(obj, roller_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, roller_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, roller_value_observer_cb, obj, NULL);
     return observer;
@@ -478,7 +472,7 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         return NULL;
     }
 
-    lv_obj_add_event(obj, dropdown_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, dropdown_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, dropdown_value_observer_cb, obj, NULL);
     return observer;
@@ -554,7 +548,6 @@ static void obj_state_observer_cb(lv_subject_t * subject, lv_observer_t * observ
         lv_obj_remove_state(observer->target, p->flag);
     }
 }
-
 
 static void btn_value_changed_event_cb(lv_event_t * e)
 {

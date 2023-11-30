@@ -42,15 +42,6 @@ void test_label_creation(void)
     TEST_ASSERT_EQUAL(lv_label_get_long_mode(label), LV_LABEL_LONG_WRAP);
 }
 
-void test_label_recolor(void)
-{
-    lv_label_set_recolor(label, true);
-    TEST_ASSERT(lv_label_get_recolor(label));
-
-    lv_label_set_recolor(label, false);
-    TEST_ASSERT_FALSE(lv_label_get_recolor(label));
-}
-
 void test_label_set_text(void)
 {
     const char * new_text = "Hello world";

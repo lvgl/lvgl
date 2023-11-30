@@ -105,11 +105,11 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     if(add_close_btn) {
         mbox->close_btn = lv_button_create(obj);
         lv_obj_set_ext_click_area(mbox->close_btn, LV_DPX(10));
-        lv_obj_add_event(mbox->close_btn, msgbox_close_click_event_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event_cb(mbox->close_btn, msgbox_close_click_event_cb, LV_EVENT_CLICKED, NULL);
         lv_obj_t * label = lv_label_create(mbox->close_btn);
         lv_label_set_text(label, LV_SYMBOL_CLOSE);
         const lv_font_t * font = lv_obj_get_style_text_font(mbox->close_btn, LV_PART_MAIN);
-        lv_coord_t close_button_size = lv_font_get_line_height(font) + LV_DPX(10);
+        int32_t close_button_size = lv_font_get_line_height(font) + LV_DPX(10);
         lv_obj_set_size(mbox->close_btn, close_button_size, close_button_size);
         lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
     }
@@ -138,7 +138,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
         }
 
         const lv_font_t * font = lv_obj_get_style_text_font(mbox->buttons, LV_PART_ITEMS);
-        lv_coord_t btn_h = lv_font_get_line_height(font) + LV_DPI_DEF / 10;
+        int32_t btn_h = lv_font_get_line_height(font) + LV_DPI_DEF / 10;
         lv_obj_set_size(mbox->buttons, btn_cnt * (2 * LV_DPI_DEF / 3), btn_h);
         lv_obj_set_style_max_width(mbox->buttons, lv_pct(100), 0);
         lv_obj_add_flag(mbox->buttons, LV_OBJ_FLAG_EVENT_BUBBLE);    /*To see the event directly on the message box*/
@@ -146,7 +146,6 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
 
     return obj;
 }
-
 
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj)
 {
