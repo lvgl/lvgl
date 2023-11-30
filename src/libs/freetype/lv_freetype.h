@@ -16,7 +16,6 @@ extern "C" {
 
 #if LV_USE_FREETYPE
 
-
 /*********************
  *      DEFINES
  *********************/
