@@ -34,6 +34,7 @@
  **********************/
 
 typedef struct {
+    /* fd should be defined at the beginning */
     int fd;
     lv_display_t * disp;
     struct lcddev_area_s area;
@@ -114,7 +115,6 @@ static lv_coord_t align_round_up(lv_coord_t v, uint16_t align)
 {
     return (v + align - 1) & ~(align - 1);
 }
-
 
 static void rounder_cb(lv_event_t * e)
 {
@@ -203,7 +203,6 @@ static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
     lv_display_add_event(lcd->disp, rounder_cb, LV_EVENT_INVALIDATE_AREA, lcd);
     lv_display_add_event(lcd->disp, display_release_cb, LV_EVENT_DELETE, lcd->disp);
     lv_display_set_driver_data(lcd->disp, lcd);
-    lv_display_set_user_data(lcd->disp, (void *)(uintptr_t)fd);
 
     return lcd->disp;
 }
