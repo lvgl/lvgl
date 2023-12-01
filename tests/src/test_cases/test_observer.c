@@ -41,6 +41,10 @@ void test_observer_add_remove(void)
     lv_subject_set_int(&subject, 15);
     TEST_ASSERT_EQUAL(15, lv_subject_get_int(&subject));
     TEST_ASSERT_EQUAL(10, current_v);   /*The observer cb is not called*/
+
+    static lv_subject_t uninitialized_subject;
+    observer = lv_subject_add_observer(&uninitialized_subject, observer_int, NULL);
+    TEST_ASSERT_EQUAL_PTR(NULL, observer);   /*The observer must be NULL*/
 }
 
 void test_observer_int(void)
