@@ -2055,6 +2055,15 @@
     #endif
 #endif
 
+/*GIF decoder accelerate*/
+#ifndef LV_GIF_CACHE_LZW_CODE
+    #ifdef CONFIG_LV_GIF_CACHE_LZW_CODE
+        #define LV_GIF_CACHE_LZW_CODE CONFIG_LV_GIF_CACHE_LZW_CODE
+    #else
+        #define LV_GIF_CACHE_LZW_CODE 0
+    #endif
+#endif
+
 /*Decode bin images to RAM*/
 #ifndef LV_BIN_DECODER_RAM_LOAD
     #ifdef CONFIG_LV_BIN_DECODER_RAM_LOAD
