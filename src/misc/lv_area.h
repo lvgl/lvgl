@@ -266,16 +266,20 @@ void lv_point_transform(lv_point_t * p, int32_t angle, int32_t scale_x, int32_t 
 
 static inline lv_point_t lv_point_from_precise(const lv_point_precise_t * p)
 {
-    return (lv_point_t) {
+    lv_point_t point = {
         (int32_t)p->x, (int32_t)p->y
     };
+
+    return point;
 }
 
 static inline lv_point_precise_t lv_point_to_precise(const lv_point_t * p)
 {
-    return (lv_point_precise_t) {
+    lv_point_precise_t point = {
         p->x, p->y
     };
+
+    return point;
 }
 
 static inline void lv_point_set(lv_point_t * p, int32_t x, int32_t y)
