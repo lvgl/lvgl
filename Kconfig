@@ -1114,8 +1114,8 @@ menu "LVGL configuration"
 			bool "GIF decoder library"
 
 		if LV_USE_GIF
-			config LV_GIF_CACHE_LZW_CODE
-				bool "Use extra 16KB RAM to cache lzw code to accerlate"
+			config LV_GIF_CACHE_DECODE_DATA
+				bool "Use extra 16KB RAM to cache decoded data to accerlate"
 		endif
 
 		config LV_USE_RLE

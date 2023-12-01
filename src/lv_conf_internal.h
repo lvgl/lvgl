@@ -2056,11 +2056,11 @@
 #endif
 #if LV_USE_GIF
 /*GIF decoder accelerate*/
-#ifndef LV_GIF_CACHE_LZW_CODE
-    #ifdef CONFIG_LV_GIF_CACHE_LZW_CODE
-        #define LV_GIF_CACHE_LZW_CODE CONFIG_LV_GIF_CACHE_LZW_CODE
+#ifndef LV_GIF_CACHE_DECODE_DATA
+    #ifdef CONFIG_LV_GIF_CACHE_DECODE_DATA
+        #define LV_GIF_CACHE_DECODE_DATA CONFIG_LV_GIF_CACHE_DECODE_DATA
     #else
-        #define LV_GIF_CACHE_LZW_CODE 0
+        #define LV_GIF_CACHE_DECODE_DATA 0
     #endif
 #endif
 #endif

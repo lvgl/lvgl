@@ -620,7 +620,7 @@
 #define LV_USE_GIF 0
 #if LV_USE_GIF
 /*GIF decoder accelerate*/
-#define LV_GIF_CACHE_LZW_CODE 0
+#define LV_GIF_CACHE_DECODE_DATA 0
 #endif
 
 

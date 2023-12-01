@@ -23,7 +23,7 @@ typedef struct Table {
     Entry * entries;
 } Table;
 
-#if LV_GIF_CACHE_LZW_CODE
+#if LV_GIF_CACHE_DECODE_DATA
 #define LZW_MAXBITS                 12
 #define LZW_TABLE_SIZE              (1 << LZW_MAXBITS)
 #define LZW_CACHE_SIZE              (LZW_TABLE_SIZE * 4)
@@ -113,7 +113,7 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     /* Aspect Ratio */
     f_gif_read(gif_base, &aspect, 1);
     /* Create gd_GIF Structure. */
-#if LV_GIF_CACHE_LZW_CODE
+#if LV_GIF_CACHE_DECODE_DATA
     gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height + LZW_CACHE_SIZE);
     #else
     gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height);
@@ -134,7 +134,7 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
         memset(gif->frame, gif->bgindex, gif->width * gif->height);
     }
     bgcolor = &gif->palette->colors[gif->bgindex * 3];
-    #if LV_GIF_CACHE_LZW_CODE
+    #if LV_GIF_CACHE_DECODE_DATA
     gif->lzw_cache = gif->frame + width * height;
     #endif
 
@@ -317,7 +317,7 @@ get_key(gd_GIF *gif, int key_size, uint8_t *sub_len, uint8_t *shift, uint8_t *by
     return key;
 }
 
-#if LV_GIF_CACHE_LZW_CODE
+#if LV_GIF_CACHE_DECODE_DATA
 static int
 read_image_data(gd_GIF *gif, int interlace)
 {

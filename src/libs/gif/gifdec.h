@@ -43,7 +43,7 @@ typedef struct _gd_GIF {
     uint16_t fx, fy, fw, fh;
     uint8_t bgindex;
     uint8_t * canvas, * frame;
-    #if LV_GIF_CACHE_LZW_CODE
+    #if LV_GIF_CACHE_DECODE_DATA
     uint8_t *lzw_cache;
     #endif
 } gd_GIF;
