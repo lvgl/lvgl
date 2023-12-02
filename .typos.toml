@@ -15,6 +15,7 @@ extend-ignore-re = [
     "Nam consectetur",
     "U\\+[0-9A-F]{4}",
     '\{ "[a-z]+", "[^ -~]+" \},',
+    "`[0-9a-f]{7} <https://\\S+>`__",
     "Rename lv_chart_clear_serie",
     "rename LV_ROLLER_MODE_INIFINITE",
     "CARD_INFO_SET\\(&img_multilang_avatar_.*\\)",

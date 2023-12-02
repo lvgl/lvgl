@@ -22,7 +22,7 @@
 @ d4 ~ d7 : dst B,G,R,A
 @ q8 : src RGB565 raw
 @ q9 : dst RGB565 raw
-@ q10 ~ q12: pre-multipled src
+@ q10 ~ q12: pre-multiplied src
 @ d26~29 : temp
 @ d30 : mask
 @ d31 : opa
