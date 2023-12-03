@@ -2050,6 +2050,17 @@
         #define LV_USE_GIF 0
     #endif
 #endif
+#if LV_USE_GIF
+/*GIF decoder accelerate*/
+#ifndef LV_GIF_CACHE_DECODE_DATA
+    #ifdef CONFIG_LV_GIF_CACHE_DECODE_DATA
+        #define LV_GIF_CACHE_DECODE_DATA CONFIG_LV_GIF_CACHE_DECODE_DATA
+    #else
+        #define LV_GIF_CACHE_DECODE_DATA 0
+    #endif
+#endif
+#endif
+
 
 /*Decode bin images to RAM*/
 #ifndef LV_BIN_DECODER_RAM_LOAD

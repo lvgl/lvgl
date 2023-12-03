@@ -1113,6 +1113,11 @@ menu "LVGL configuration"
 		config LV_USE_GIF
 			bool "GIF decoder library"
 
+		if LV_USE_GIF
+			config LV_GIF_CACHE_DECODE_DATA
+				bool "Use extra 16KB RAM to cache decoded data to accerlate"
+		endif
+
 		config LV_USE_RLE
 			bool "RLE compressed bin image decoder library"
 

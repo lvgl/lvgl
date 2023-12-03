@@ -23,6 +23,12 @@ typedef struct Table {
     Entry * entries;
 } Table;
 
+#if LV_GIF_CACHE_DECODE_DATA
+#define LZW_MAXBITS                 12
+#define LZW_TABLE_SIZE              (1 << LZW_MAXBITS)
+#define LZW_CACHE_SIZE              (LZW_TABLE_SIZE * 4)
+#endif
+
 static gd_GIF  * gif_open(gd_GIF * gif);
 static bool f_gif_open(gd_GIF * gif, const void * path, bool is_file);
 static void f_gif_read(gd_GIF * gif, void * buf, size_t len);
@@ -107,8 +113,11 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     /* Aspect Ratio */
     f_gif_read(gif_base, &aspect, 1);
     /* Create gd_GIF Structure. */
+#if LV_GIF_CACHE_DECODE_DATA
+    gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height + LZW_CACHE_SIZE);
+    #else
     gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height);
-
+    #endif
     if(!gif) goto fail;
     memcpy(gif, gif_base, sizeof(gd_GIF));
     gif->width  = width;
@@ -125,6 +134,9 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
         memset(gif->frame, gif->bgindex, gif->width * gif->height);
     }
     bgcolor = &gif->palette->colors[gif->bgindex * 3];
+    #if LV_GIF_CACHE_DECODE_DATA
+    gif->lzw_cache = gif->frame + width * height;
+    #endif
 
 #ifdef GIFDEC_FILL_BG
     GIFDEC_FILL_BG(gif->canvas, gif->width * gif->height, 1, gif->width * gif->height, bgcolor, 0xff);
@@ -276,6 +288,177 @@ read_ext(gd_GIF * gif)
     }
 }
 
+static uint16_t
+get_key(gd_GIF *gif, int key_size, uint8_t *sub_len, uint8_t *shift, uint8_t *byte)
+{
+    int bits_read;
+    int rpad;
+    int frag_size;
+    uint16_t key;
+
+    key = 0;
+    for (bits_read = 0; bits_read < key_size; bits_read += frag_size) {
+        rpad = (*shift + bits_read) % 8;
+        if (rpad == 0) {
+            /* Update byte. */
+            if (*sub_len == 0) {
+                f_gif_read(gif, sub_len, 1); /* Must be nonzero! */
+                if (*sub_len == 0) return 0x1000;
+            }
+            f_gif_read(gif, byte, 1);
+            (*sub_len)--;
+        }
+        frag_size = MIN(key_size - bits_read, 8 - rpad);
+        key |= ((uint16_t) ((*byte) >> rpad)) << bits_read;
+    }
+    /* Clear extra bits to the left. */
+    key &= (1 << key_size) - 1;
+    *shift = (*shift + key_size) % 8;
+    return key;
+}
+
+#if LV_GIF_CACHE_DECODE_DATA
+static int
+read_image_data(gd_GIF *gif, int interlace)
+{
+    uint8_t sub_len, shift, byte;
+    int ret = 0;
+    int key_size;
+    int y, pass, linesize;
+    uint8_t *ptr = NULL;
+    uint8_t *ptr_init = NULL;
+    size_t start, end;
+    uint16_t key, clear_code, stop_code, curr_code;
+    int frm_off, frm_size,curr_size,top_slot,new_codes,slot;
+    /* The first value of the value sequence corresponding to key */
+    int first_value;
+    int last_key;
+    uint8_t *sp = NULL;
+    uint8_t *p_stack = NULL;
+    uint8_t *p_suffix = NULL;
+    uint16_t *p_prefix = NULL;
+
+    /* get initial key size and clear code, stop code */
+    f_gif_read(gif, &byte, 1);
+    key_size = (int) byte;
+    clear_code = 1 << key_size;
+    stop_code = clear_code + 1;
+    key = 0;
+
+    start = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
+    discard_sub_blocks(gif);
+    end = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
+    f_gif_seek(gif, start, LV_FS_SEEK_SET);
+
+    linesize = gif->width;
+    ptr_init = &gif->frame[gif->fy * linesize + gif->fx];
+    ptr = ptr_init;
+    sub_len = shift = 0;
+    /* decoder */
+    pass = 0;
+    y = 0;
+    p_stack = gif->lzw_cache;
+    p_suffix = gif->lzw_cache + LZW_TABLE_SIZE;
+    p_prefix = (uint16_t*)(gif->lzw_cache + LZW_TABLE_SIZE * 2);
+    frm_off = 0;
+    frm_size = gif->fw * gif->fh;
+    curr_size = key_size + 1;
+    top_slot = 1 << curr_size;
+    new_codes = clear_code + 2;
+    slot = new_codes;
+    first_value = -1;
+    last_key = -1;
+    sp = p_stack;
+
+    while (frm_off < frm_size) {
+        /* copy data to frame buffer */
+        while (sp > p_stack) {
+            *ptr++ = *(--sp);
+            frm_off += 1;
+            /* read one line */
+            if ((ptr - ptr_init) == gif->fw) {
+                if (interlace) {
+                    switch(pass) {
+                    case 0:
+                    case 1:
+                        y += 8;
+                        ptr_init += linesize * 8;
+                        break;
+                    case 2:
+                        y += 4;
+                        ptr_init += linesize * 4;
+                        break;
+                    case 3:
+                        y += 2;
+                        ptr_init += linesize * 2;
+                        break;
+                    default:
+                        break;
+                    }
+                    while (y >= gif->fh) {
+                        y  = 4 >> pass;
+                        ptr_init = ptr_init + linesize * y;
+                        pass++;
+                    }
+                } else {
+                    ptr_init += linesize;
+                }
+                ptr = ptr_init;
+            }
+        }
+
+        key = get_key(gif, curr_size, &sub_len, &shift, &byte);
+
+        if (key == stop_code || key >= LZW_TABLE_SIZE)
+            break;
+
+        if (key == clear_code) {
+            curr_size = key_size + 1;
+            slot = new_codes;
+            top_slot = 1 << curr_size;
+            first_value = last_key = -1;
+            sp = p_stack;
+            continue;
+        }
+
+        curr_code = key;
+        /*
+         * If the current code is a code that will be added to the decoding
+         * dictionary, it is composed of the data list corresponding to the
+         * previous key and its first data.
+         * */
+        if (curr_code == slot && first_value >= 0) {
+            *sp++ = first_value;
+            curr_code = last_key;
+        }else if(curr_code >= slot)
+            break;
+
+        while (curr_code >= new_codes) {
+            *sp++ = p_suffix[curr_code];
+            curr_code = p_prefix[curr_code];
+        }
+        *sp++ = curr_code;
+
+        /* Add code to decoding dictionary */
+        if (slot < top_slot && last_key >= 0) {
+            p_suffix[slot] = curr_code;
+            p_prefix[slot++] = last_key;
+        }
+        first_value = curr_code;
+        last_key = key;
+        if (slot >= top_slot) {
+            if (curr_size < LZW_MAXBITS) {
+                top_slot <<= 1;
+                curr_size += 1;
+            }
+        }
+    }
+
+    if (key == stop_code) f_gif_read(gif, &sub_len, 1); /* Must be zero! */
+    f_gif_seek(gif, end, LV_FS_SEEK_SET);
+    return ret;
+}
+#else
 static Table *
 new_table(int key_size)
 {
@@ -316,35 +499,6 @@ add_entry(Table ** tablep, uint16_t length, uint16_t prefix, uint8_t suffix)
     if((table->nentries & (table->nentries - 1)) == 0)
         return 1;
     return 0;
-}
-
-static uint16_t
-get_key(gd_GIF * gif, int key_size, uint8_t * sub_len, uint8_t * shift, uint8_t * byte)
-{
-    int bits_read;
-    int rpad;
-    int frag_size;
-    uint16_t key;
-
-    key = 0;
-    for(bits_read = 0; bits_read < key_size; bits_read += frag_size) {
-        rpad = (*shift + bits_read) % 8;
-        if(rpad == 0) {
-            /* Update byte. */
-            if(*sub_len == 0) {
-                f_gif_read(gif, sub_len, 1); /* Must be nonzero! */
-                if(*sub_len == 0) return 0x1000;
-            }
-            f_gif_read(gif, byte, 1);
-            (*sub_len)--;
-        }
-        frag_size = MIN(key_size - bits_read, 8 - rpad);
-        key |= ((uint16_t)((*byte) >> rpad)) << bits_read;
-    }
-    /* Clear extra bits to the left. */
-    key &= (1 << key_size) - 1;
-    *shift = (*shift + key_size) % 8;
-    return key;
 }
 
 /* Compute output index of y-th input line, in frame of height h. */
@@ -443,6 +597,8 @@ read_image_data(gd_GIF * gif, int interlace)
     f_gif_seek(gif, end, LV_FS_SEEK_SET);
     return 0;
 }
+
+#endif
 
 /* Read image.
  * Return 0 on success or -1 on out-of-memory (w.r.t. LZW code table). */
