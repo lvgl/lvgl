@@ -103,7 +103,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col, const c
  * @note                New roes/columns are added automatically if required
  */
 void lv_table_set_cell_value_format(lv_obj_t * obj, uint32_t row, uint32_t col, const char * fmt,
-                                 ...) LV_FORMAT_ATTRIBUTE(4, 5);
+                                    ...) LV_FORMAT_ATTRIBUTE(4, 5);
 
 /**
  * Set the number of rows
