@@ -60,7 +60,7 @@ Merge cells
 -----------
 
 Cells can be merged horizontally with
-:cpp:expr:`lv_table_add_cell_control(table, row, col, LV_TABLE_CELL_CTRL_MERGE_RIGHT)`.
+:cpp:expr:`lv_table_add_cell_ctrl(table, row, col, LV_TABLE_CELL_CTRL_MERGE_RIGHT)`.
 To merge more adjacent cells call this function for each cell.
 
 Scroll
