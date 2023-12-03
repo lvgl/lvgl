@@ -321,7 +321,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*Table showing the contents of the table of contents*/
     explorer->file_table = lv_table_create(explorer->browser_area);
     lv_obj_set_size(explorer->file_table, LV_PCT(100), LV_PCT(86));
-    lv_table_set_col_width(explorer->file_table, 0, LV_PCT(100));
+    lv_table_set_column_width(explorer->file_table, 0, LV_PCT(100));
     lv_table_set_column_count(explorer->file_table, 1);
     lv_obj_add_event_cb(explorer->file_table, browser_file_event_handler, LV_EVENT_ALL, obj);
 
@@ -516,7 +516,7 @@ static void browser_file_event_handler(lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        lv_table_set_col_width(explorer->file_table, 0, lv_obj_get_width(explorer->file_table));
+        lv_table_set_column_width(explorer->file_table, 0, lv_obj_get_width(explorer->file_table));
     }
     else if((code == LV_EVENT_CLICKED) || (code == LV_EVENT_RELEASED)) {
         lv_obj_send_event(obj, LV_EVENT_CLICKED, NULL);
@@ -538,8 +538,8 @@ static void show_dir(lv_obj_t * obj, const char * path)
         return;
     }
 
-    lv_table_set_cell_value_fmt(explorer->file_table, index++, 0, LV_SYMBOL_DIRECTORY "  %s", ".");
-    lv_table_set_cell_value_fmt(explorer->file_table, index++, 0, LV_SYMBOL_DIRECTORY "  %s", "..");
+    lv_table_set_cell_value_format(explorer->file_table, index++, 0, LV_SYMBOL_DIRECTORY "  %s", ".");
+    lv_table_set_cell_value_format(explorer->file_table, index++, 0, LV_SYMBOL_DIRECTORY "  %s", "..");
     lv_table_set_cell_value(explorer->file_table, 0, 1, "0");
     lv_table_set_cell_value(explorer->file_table, 1, 1, "0");
 
@@ -560,15 +560,15 @@ static void show_dir(lv_obj_t * obj, const char * path)
            (is_end_with(fn, ".jpg") == true) || (is_end_with(fn, ".JPG") == true) || \
            (is_end_with(fn, ".bmp") == true) || (is_end_with(fn, ".BMP") == true) || \
            (is_end_with(fn, ".gif") == true) || (is_end_with(fn, ".GIF") == true)) {
-            lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_IMAGE "  %s", fn);
+            lv_table_set_cell_value_format(explorer->file_table, index, 0, LV_SYMBOL_IMAGE "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "1");
         }
         else if((is_end_with(fn, ".mp3") == true) || (is_end_with(fn, ".MP3") == true)) {
-            lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_AUDIO "  %s", fn);
+            lv_table_set_cell_value_format(explorer->file_table, index, 0, LV_SYMBOL_AUDIO "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "2");
         }
         else if((is_end_with(fn, ".mp4") == true) || (is_end_with(fn, ".MP4") == true)) {
-            lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_VIDEO "  %s", fn);
+            lv_table_set_cell_value_format(explorer->file_table, index, 0, LV_SYMBOL_VIDEO "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "3");
         }
         else if((is_end_with(fn, ".") == true) || (is_end_with(fn, "..") == true)) {
@@ -576,11 +576,11 @@ static void show_dir(lv_obj_t * obj, const char * path)
             continue;
         }
         else if(fn[0] == '/') {/*is dir*/
-            lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_DIRECTORY "  %s", fn + 1);
+            lv_table_set_cell_value_format(explorer->file_table, index, 0, LV_SYMBOL_DIRECTORY "  %s", fn + 1);
             lv_table_set_cell_value(explorer->file_table, index, 1, "0");
         }
         else {
-            lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_FILE "  %s", fn);
+            lv_table_set_cell_value_format(explorer->file_table, index, 0, LV_SYMBOL_FILE "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "4");
         }
 

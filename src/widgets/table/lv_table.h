@@ -102,7 +102,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col, const c
  * @param fmt           `printf`-like format
  * @note                New roes/columns are added automatically if required
  */
-void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, const char * fmt,
+void lv_table_set_cell_value_format(lv_obj_t * obj, uint32_t row, uint32_t col, const char * fmt,
                                  ...) LV_FORMAT_ATTRIBUTE(4, 5);
 
 /**
@@ -125,7 +125,7 @@ void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt);
  * @param col_id    id of the column [0 .. LV_TABLE_COL_MAX -1]
  * @param w         width of the column
  */
-void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, int32_t w);
+void lv_table_set_column_width(lv_obj_t * obj, uint32_t col_id, int32_t w);
 
 /**
  * Add control bits to the cell.
@@ -134,7 +134,7 @@ void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, int32_t w);
  * @param col       id of the column [0 .. col_cnt -1]
  * @param ctrl      OR-ed values from ::lv_table_cell_ctrl_t
  */
-void lv_table_add_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl);
+void lv_table_add_cell_control(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl);
 
 /**
  * Clear control bits of the cell.
@@ -143,7 +143,7 @@ void lv_table_add_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table
  * @param col       id of the column [0 .. col_cnt -1]
  * @param ctrl      OR-ed values from ::lv_table_cell_ctrl_t
  */
-void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl);
+void lv_table_clear_cell_control(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl);
 
 /**
  * Add custom user data to the cell.
@@ -190,7 +190,7 @@ uint32_t lv_table_get_column_count(lv_obj_t * obj);
  * @param col       id of the column [0 .. LV_TABLE_COL_MAX -1]
  * @return          width of the column
  */
-int32_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col);
+int32_t lv_table_get_column_width(lv_obj_t * obj, uint32_t col);
 
 /**
  * Get whether a cell has the control bits
@@ -200,7 +200,7 @@ int32_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col);
  * @param ctrl      OR-ed values from ::lv_table_cell_ctrl_t
  * @return          true: all control bits are set; false: not all control bits are set
  */
-bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl);
+bool lv_table_has_cell_control(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl);
 
 /**
  * Get the selected cell (pressed and or focused)

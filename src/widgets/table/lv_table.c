@@ -120,7 +120,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col, const c
     refr_cell_size(obj, row, col);
 }
 
-void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, const char * fmt, ...)
+void lv_table_set_cell_value_format(lv_obj_t * obj, uint32_t row, uint32_t col, const char * fmt, ...)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(fmt);
@@ -299,7 +299,7 @@ void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt)
     refr_size_form_row(obj, 0) ;
 }
 
-void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, int32_t w)
+void lv_table_set_column_width(lv_obj_t * obj, uint32_t col_id, int32_t w)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -312,7 +312,7 @@ void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, int32_t w)
     refr_size_form_row(obj, 0);
 }
 
-void lv_table_add_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)
+void lv_table_add_cell_control(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -337,7 +337,7 @@ void lv_table_add_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table
     table->cell_data[cell]->ctrl |= ctrl;
 }
 
-void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)
+void lv_table_clear_cell_control(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -427,7 +427,7 @@ uint32_t lv_table_get_column_count(lv_obj_t * obj)
     return table->col_cnt;
 }
 
-int32_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col)
+int32_t lv_table_get_column_width(lv_obj_t * obj, uint32_t col)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -441,7 +441,7 @@ int32_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col)
     return table->col_w[col];
 }
 
-bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)
+bool lv_table_has_cell_control(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

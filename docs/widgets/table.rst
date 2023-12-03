@@ -50,7 +50,7 @@ Width and Height
 ----------------
 
 The width of the columns can be set with
-:cpp:expr:`lv_table_set_col_width(table, col_id, width)`. The overall width of
+:cpp:expr:`lv_table_set_column_width(table, col_id, width)`. The overall width of
 the Table object will be set to the sum of columns widths.
 
 The height is calculated automatically from the cell styles (font,
@@ -60,7 +60,7 @@ Merge cells
 -----------
 
 Cells can be merged horizontally with
-:cpp:expr:`lv_table_add_cell_ctrl(table, row, col, LV_TABLE_CELL_CTRL_MERGE_RIGHT)`.
+:cpp:expr:`lv_table_add_cell_control(table, row, col, LV_TABLE_CELL_CTRL_MERGE_RIGHT)`.
 To merge more adjacent cells call this function for each cell.
 
 Scroll

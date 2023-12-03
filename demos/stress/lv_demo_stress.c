@@ -294,9 +294,9 @@ static void obj_test_task_cb(lv_timer_t * tmr)
 
             obj = lv_table_create(main_page);
             lv_table_set_cell_value(obj, 0, 0, "0,0");
-            lv_table_set_cell_value_fmt(obj, 3, 0, "%d,%d", 5, 0);
+            lv_table_set_cell_value_format(obj, 3, 0, "%d,%d", 5, 0);
             lv_table_set_row_cnt(obj, 5);
-            lv_table_set_cell_value_fmt(obj, 1, 0, "%s", "1,0");
+            lv_table_set_cell_value_format(obj, 1, 0, "%s", "1,0");
             lv_table_set_cell_value(obj, 1, 3, "1,3");
             break;
 

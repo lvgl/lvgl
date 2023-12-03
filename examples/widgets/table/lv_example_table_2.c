@@ -12,7 +12,7 @@ static void draw_event_cb(lv_event_t * e)
     /*If the cells are drawn...*/
     if(base_dsc->part == LV_PART_ITEMS && draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
         /*Draw the background*/
-        bool chk = lv_table_has_cell_ctrl(obj, base_dsc->id1, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
+        bool chk = lv_table_has_cell_control(obj, base_dsc->id1, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
         rect_dsc.bg_color = chk ? lv_theme_get_color_primary(obj) : lv_palette_lighten(LV_PALETTE_GREY, 2);
@@ -49,9 +49,9 @@ static void change_event_cb(lv_event_t * e)
     uint32_t col;
     uint32_t row;
     lv_table_get_selected_cell(obj, &row, &col);
-    bool chk = lv_table_has_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
-    if(chk) lv_table_clear_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
-    else lv_table_add_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
+    bool chk = lv_table_has_cell_control(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
+    if(chk) lv_table_clear_cell_control(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
+    else lv_table_add_cell_control(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
 }
 
 /**
@@ -70,7 +70,7 @@ void lv_example_table_2(void)
     /*Set a smaller height to the table. It'll make it scrollable*/
     lv_obj_set_size(table, LV_SIZE_CONTENT, 200);
 
-    lv_table_set_col_width(table, 0, 150);
+    lv_table_set_column_width(table, 0, 150);
     lv_table_set_row_count(table, ITEM_CNT); /*Not required but avoids a lot of memory reallocation lv_table_set_set_value*/
     lv_table_set_column_count(table, 1);
 
@@ -79,7 +79,7 @@ void lv_example_table_2(void)
 
     uint32_t i;
     for(i = 0; i < ITEM_CNT; i++) {
-        lv_table_set_cell_value_fmt(table, i, 0, "Item %"LV_PRIu32, i + 1);
+        lv_table_set_cell_value_format(table, i, 0, "Item %"LV_PRIu32, i + 1);
     }
 
     lv_obj_align(table, LV_ALIGN_CENTER, 0, -20);
