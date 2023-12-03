@@ -192,7 +192,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
 
-    lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
+    obj->readjust_scroll_after_layout = 1;
 
     /*If the object was out of the parent invalidate the new scrollbar area too.
      *If it wasn't out of the parent but out now, also invalidate the scrollbars*/
@@ -1098,15 +1098,19 @@ static void layout_update_core(lv_obj_t * obj)
         layout_update_core(child);
     }
 
-    if(obj->layout_inv == 0) return;
+    if(obj->layout_inv) {
+        obj->layout_inv = 0;
+        lv_obj_refr_size(obj);
+        lv_obj_refr_pos(obj);
 
-    obj->layout_inv = 0;
+        if(child_cnt > 0) {
+            _lv_layout_apply(obj);
+        }
+    }
 
-    lv_obj_refr_size(obj);
-    lv_obj_refr_pos(obj);
-
-    if(child_cnt > 0) {
-        _lv_layout_apply(obj);
+    if(obj->readjust_scroll_after_layout) {
+        obj->readjust_scroll_after_layout = 0;
+        lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
     }
 }
 

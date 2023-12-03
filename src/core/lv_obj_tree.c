@@ -60,9 +60,6 @@ void lv_obj_delete(lv_obj_t * obj)
     lv_obj_invalidate(obj);
 
     lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par && !par->is_deleting) {
-        lv_obj_scrollbar_invalidate(par);
-    }
 
     lv_display_t * disp = NULL;
     bool act_screen_del = false;
@@ -76,8 +73,6 @@ void lv_obj_delete(lv_obj_t * obj)
 
     /*Call the ancestor's event handler to the parent to notify it about the child delete*/
     if(par && !par->is_deleting) {
-        lv_obj_update_layout(par);
-        lv_obj_readjust_scroll(par, LV_ANIM_OFF);
         lv_obj_scrollbar_invalidate(par);
         lv_obj_send_event(par, LV_EVENT_CHILD_CHANGED, NULL);
         lv_obj_send_event(par, LV_EVENT_CHILD_DELETED, NULL);
@@ -190,7 +185,6 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     obj->parent = parent;
 
     /*Notify the original parent because one of its children is lost*/
-    lv_obj_readjust_scroll(old_parent, LV_ANIM_OFF);
     lv_obj_scrollbar_invalidate(old_parent);
     lv_obj_send_event(old_parent, LV_EVENT_CHILD_CHANGED, obj);
     lv_obj_send_event(old_parent, LV_EVENT_CHILD_DELETED, NULL);
