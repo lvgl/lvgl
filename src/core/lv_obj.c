@@ -862,6 +862,10 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_obj_mark_layout_as_dirty(obj);
         }
     }
+    else if(code == LV_EVENT_CHILD_DELETED) {
+        obj->readjust_scroll_after_layout = 1;
+        lv_obj_mark_layout_as_dirty(obj);
+    }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
         lv_event_set_ext_draw_size(e, d);

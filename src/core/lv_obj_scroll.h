@@ -290,7 +290,7 @@ void lv_obj_get_scrollbar_area(struct _lv_obj_t * obj, lv_area_t * hor, lv_area_
 void lv_obj_scrollbar_invalidate(struct _lv_obj_t * obj);
 
 /**
- * Checked if the content is scrolled "in" and adjusts it to a normal position.
+ * Checks if the content is scrolled "in" and adjusts it to a normal position.
  * @param obj       pointer to an object
  * @param anim_en   LV_ANIM_ON/OFF
  */
