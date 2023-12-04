@@ -227,10 +227,9 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
         lv_color_format_t cf = image->header.cf;
         if(dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) {
-            /*@todo*/
-            res = LV_RESULT_INVALID;
+            res = decode_compressed(decoder, dsc);
         }
-        if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+        else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
             /*Need decoder data to store converted image*/
             decoder_data_t * decoder_data = get_decoder_data(dsc);
             if(decoder_data == NULL) {
@@ -665,53 +664,77 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t compressed_len;
     uint8_t * file_buf;
     decoder_data_t * decoder_data = get_decoder_data(dsc);
-    lv_fs_file_t * f = decoder_data->f;
     lv_result_t res;
     lv_image_compressed_t * compressed = &decoder_data->compressed;
+    bool is_file = dsc->src_type == LV_IMAGE_SRC_FILE;
+
     lv_memzero(compressed, sizeof(lv_image_compressed_t));
 
-    if(lv_fs_seek(f, 0, LV_FS_SEEK_END) != LV_FS_RES_OK ||
-       lv_fs_tell(f, &compressed_len) != LV_FS_RES_OK) {
-        LV_LOG_WARN("Failed to get compressed file len");
+    if(is_file) {
+        lv_fs_file_t * f = decoder_data->f;
+
+        if(lv_fs_seek(f, 0, LV_FS_SEEK_END) != LV_FS_RES_OK ||
+           lv_fs_tell(f, &compressed_len) != LV_FS_RES_OK) {
+            LV_LOG_WARN("Failed to get compressed file len");
+            return LV_RESULT_INVALID;
+        }
+
+        compressed_len -= sizeof(lv_image_header_t);
+        compressed_len -= 12;
+
+        /*Read compress header*/
+        len = 12;
+        res = fs_read_file_at(f, sizeof(lv_image_header_t), compressed, len, &rn);
+        if(res != LV_FS_RES_OK || rn != len) {
+            LV_LOG_WARN("Read compressed header failed: %d", res);
+            return LV_RESULT_INVALID;
+        }
+
+        if(compressed->compressed_size != compressed_len) {
+            LV_LOG_WARN("Compressed size mismatch: %" LV_PRIu32" != %" LV_PRIu32, compressed->compressed_size, compressed_len);
+            return LV_RESULT_INVALID;
+        }
+
+        file_buf = lv_malloc(compressed_len);
+        if(file_buf == NULL) {
+            LV_LOG_WARN("No memory for compressed file");
+            return LV_RESULT_INVALID;
+
+        }
+
+        /*Continue to read the compressed data following compression header*/
+        res = lv_fs_read(f, file_buf, compressed_len, &rn);
+        if(res != LV_FS_RES_OK || rn != compressed_len) {
+            LV_LOG_WARN("Read compressed file failed: %d", res);
+            lv_free(file_buf);
+            return LV_RESULT_INVALID;
+        }
+
+        /*Decompress the image*/
+        compressed->data = file_buf;
+    }
+    else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
+        lv_image_dsc_t * image = (lv_image_dsc_t *)dsc->src;
+        compressed_len = image->data_size;
+
+        /*Read compress header*/
+        len = 12;
+        compressed_len -= len;
+        lv_memcpy(compressed, image->data, len);
+        compressed->data = image->data + len;
+        if(compressed->compressed_size != compressed_len) {
+            LV_LOG_WARN("Compressed size mismatch: %" LV_PRIu32" != %" LV_PRIu32, compressed->compressed_size, compressed_len);
+            return LV_RESULT_INVALID;
+        }
+    }
+    else {
+        LV_LOG_WARN("Compressed image only support file or variable");
         return LV_RESULT_INVALID;
     }
 
-    compressed_len -= sizeof(lv_image_header_t);
-    compressed_len -= 12;
-
-    /*Read compress header*/
-    len = 12;
-    res = fs_read_file_at(f, sizeof(lv_image_header_t), compressed, len, &rn);
-    if(res != LV_FS_RES_OK || rn != len) {
-        LV_LOG_WARN("Read compressed header failed: %d", res);
-        return LV_RESULT_INVALID;
-    }
-
-    if(compressed->compressed_size != compressed_len) {
-        LV_LOG_WARN("Compressed size mismatch: %" LV_PRIu32" != %" LV_PRIu32, compressed->compressed_size, compressed_len);
-        return LV_RESULT_INVALID;
-    }
-
-    file_buf = lv_malloc(compressed_len);
-    if(file_buf == NULL) {
-        LV_LOG_WARN("No memory for compressed file");
-        return LV_RESULT_INVALID;
-
-    }
-
-    /*Continue to read the compressed data following compression header*/
-    res = lv_fs_read(f, file_buf, compressed_len, &rn);
-    if(res != LV_FS_RES_OK || rn != compressed_len) {
-        LV_LOG_WARN("Read compressed file failed: %d", res);
-        lv_free(file_buf);
-        return LV_RESULT_INVALID;
-    }
-
-    /*Decompress the image*/
-    compressed->data = file_buf;
     res = decompress_image(dsc, compressed);
     compressed->data = NULL; /*No need to store the data any more*/
-    lv_free(file_buf);
+    if(is_file) lv_free(file_buf);
     if(res != LV_RESULT_OK) {
         LV_LOG_WARN("Decompress failed");
         return LV_RESULT_INVALID;
