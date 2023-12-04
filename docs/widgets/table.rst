@@ -50,7 +50,7 @@ Width and Height
 ----------------
 
 The width of the columns can be set with
-:cpp:expr:`lv_table_set_col_width(table, col_id, width)`. The overall width of
+:cpp:expr:`lv_table_set_column_width(table, col_id, width)`. The overall width of
 the Table object will be set to the sum of columns widths.
 
 The height is calculated automatically from the cell styles (font,

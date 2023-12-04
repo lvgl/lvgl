@@ -321,7 +321,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     /*Table showing the contents of the table of contents*/
     explorer->file_table = lv_table_create(explorer->browser_area);
     lv_obj_set_size(explorer->file_table, LV_PCT(100), LV_PCT(86));
-    lv_table_set_col_width(explorer->file_table, 0, LV_PCT(100));
+    lv_table_set_column_width(explorer->file_table, 0, LV_PCT(100));
     lv_table_set_column_count(explorer->file_table, 1);
     lv_obj_add_event_cb(explorer->file_table, browser_file_event_handler, LV_EVENT_ALL, obj);
 
@@ -516,7 +516,7 @@ static void browser_file_event_handler(lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        lv_table_set_col_width(explorer->file_table, 0, lv_obj_get_width(explorer->file_table));
+        lv_table_set_column_width(explorer->file_table, 0, lv_obj_get_width(explorer->file_table));
     }
     else if((code == LV_EVENT_CLICKED) || (code == LV_EVENT_RELEASED)) {
         lv_obj_send_event(obj, LV_EVENT_CLICKED, NULL);

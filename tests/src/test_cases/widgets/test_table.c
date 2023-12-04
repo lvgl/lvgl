@@ -109,7 +109,7 @@ void test_table_should_wrap_long_texts(void)
     const char * long_text = "Testing automatic text wrap with a very long text";
     const char * small_text = "Hi";
 
-    lv_table_set_col_width(table, 0, 50);
+    lv_table_set_column_width(table, 0, 50);
 
     lv_table_set_cell_value(table, 0, 0, small_text);
     int32_t row_height = table_ptr->row_h[0];
@@ -171,8 +171,8 @@ void test_table_rendering(void)
     lv_obj_set_style_border_width(table, 5, LV_PART_ITEMS);
     lv_table_set_column_count(table, 5);
     lv_table_set_row_count(table, 5);
-    lv_table_set_col_width(table, 1, 60);
-    lv_table_set_col_width(table, 2, 100);
+    lv_table_set_column_width(table, 1, 60);
+    lv_table_set_column_width(table, 2, 100);
 
     lv_table_add_cell_ctrl(table, 0, 1, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     lv_table_set_cell_value(table, 0, 1, "2 cells are merged");

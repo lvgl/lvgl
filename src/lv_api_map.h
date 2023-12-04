@@ -226,6 +226,8 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_table_set_row_cnt                lv_table_set_row_count
 #define lv_table_get_col_cnt                lv_table_get_column_count
 #define lv_table_get_row_cnt                lv_table_get_row_count
+#define lv_table_set_col_width              lv_table_set_column_width
+#define lv_table_get_col_width              lv_table_get_column_width
 
 #define lv_dropdown_get_option_cnt          lv_dropdown_get_option_count
 

@@ -125,7 +125,7 @@ void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt);
  * @param col_id    id of the column [0 .. LV_TABLE_COL_MAX -1]
  * @param w         width of the column
  */
-void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, int32_t w);
+void lv_table_set_column_width(lv_obj_t * obj, uint32_t col_id, int32_t w);
 
 /**
  * Add control bits to the cell.
@@ -190,7 +190,7 @@ uint32_t lv_table_get_column_count(lv_obj_t * obj);
  * @param col       id of the column [0 .. LV_TABLE_COL_MAX -1]
  * @return          width of the column
  */
-int32_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col);
+int32_t lv_table_get_column_width(lv_obj_t * obj, uint32_t col);
 
 /**
  * Get whether a cell has the control bits

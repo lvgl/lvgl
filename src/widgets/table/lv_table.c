@@ -299,7 +299,7 @@ void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt)
     refr_size_form_row(obj, 0) ;
 }
 
-void lv_table_set_col_width(lv_obj_t * obj, uint32_t col_id, int32_t w)
+void lv_table_set_column_width(lv_obj_t * obj, uint32_t col_id, int32_t w)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -427,7 +427,7 @@ uint32_t lv_table_get_column_count(lv_obj_t * obj)
     return table->col_cnt;
 }
 
-int32_t lv_table_get_col_width(lv_obj_t * obj, uint32_t col)
+int32_t lv_table_get_column_width(lv_obj_t * obj, uint32_t col)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
