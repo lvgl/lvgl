@@ -326,7 +326,8 @@ read_image_data(gd_GIF *gif, int interlace)
     int key_size;
     int y, pass, linesize;
     uint8_t *ptr = NULL;
-    uint8_t *ptr_init = NULL;
+    uint8_t *ptr_row_start = NULL;
+    uint8_t *ptr_base = NULL;
     size_t start, end;
     uint16_t key, clear_code, stop_code, curr_code;
     int frm_off, frm_size,curr_size,top_slot,new_codes,slot;
@@ -351,8 +352,9 @@ read_image_data(gd_GIF *gif, int interlace)
     f_gif_seek(gif, start, LV_FS_SEEK_SET);
 
     linesize = gif->width;
-    ptr_init = &gif->frame[gif->fy * linesize + gif->fx];
-    ptr = ptr_init;
+    ptr_base = &gif->frame[gif->fy * linesize + gif->fx];
+    ptr_row_start = ptr_base;
+    ptr = ptr_row_start;
     sub_len = shift = 0;
     /* decoder */
     pass = 0;
@@ -376,34 +378,34 @@ read_image_data(gd_GIF *gif, int interlace)
             *ptr++ = *(--sp);
             frm_off += 1;
             /* read one line */
-            if ((ptr - ptr_init) == gif->fw) {
+            if ((ptr - ptr_row_start) == gif->fw) {
                 if (interlace) {
                     switch(pass) {
                     case 0:
                     case 1:
                         y += 8;
-                        ptr_init += linesize * 8;
+                        ptr_row_start += linesize * 8;
                         break;
                     case 2:
                         y += 4;
-                        ptr_init += linesize * 4;
+                        ptr_row_start += linesize * 4;
                         break;
                     case 3:
                         y += 2;
-                        ptr_init += linesize * 2;
+                        ptr_row_start += linesize * 2;
                         break;
                     default:
                         break;
                     }
                     while (y >= gif->fh) {
                         y  = 4 >> pass;
-                        ptr_init = ptr_init + linesize * y;
+                        ptr_row_start = ptr_base + linesize * y;
                         pass++;
                     }
                 } else {
-                    ptr_init += linesize;
+                    ptr_row_start += linesize;
                 }
-                ptr = ptr_init;
+                ptr = ptr_row_start;
             }
         }
 
