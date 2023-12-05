@@ -806,9 +806,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     lv_group_t * g = i->group;
     if(g == NULL) return;
 
-    indev_obj_act = lv_group_get_focused(g);
-    if(indev_obj_act == NULL) return;
-
     /*Process the steps they are valid only with released button*/
     if(data->state != LV_INDEV_STATE_RELEASED) {
         data->enc_diff = 0;
