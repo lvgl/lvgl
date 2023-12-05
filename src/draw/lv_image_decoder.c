@@ -102,7 +102,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     }
 
     dsc->src_type = src_type;
-    if(args) dsc->frame_id = args->frame_id;
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         size_t fnlen = lv_strlen(src);

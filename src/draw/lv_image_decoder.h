@@ -59,7 +59,6 @@ struct _lv_cache_entry_t;
  * all field are zero or false.
  */
 typedef struct _lv_image_decoder_args_t {
-    int32_t frame_id;       /*A not use args*/
     bool stride_align;      /*Whether stride should be aligned*/
     bool premultiply;       /*Whether image should be premultiplied or not after decoding*/
     bool no_cache;          /*Whether this image should be kept out of cache*/
@@ -126,9 +125,6 @@ typedef struct _lv_image_decoder_dsc_t {
 
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_image_dsc_t` variable*/
     const void * src;
-
-    /**Frame of the image, using with animated images*/
-    int32_t frame_id;
 
     /**Type of the source: file or variable. Can be set in `open` function if required*/
     lv_image_src_t src_type;

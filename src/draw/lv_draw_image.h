@@ -53,7 +53,6 @@ typedef struct _lv_draw_image_dsc_t {
     lv_opa_t opa;
     lv_blend_mode_t blend_mode : 4;
 
-    int32_t frame_id;
     uint16_t antialias      : 1;
     uint16_t tile           : 1;
     lv_draw_image_sup_t * sup;
