@@ -13,7 +13,6 @@ try:
 except ImportError:
     raise ImportError("Need pypng package, do `pip3 install pypng`")
 
-
 try:
     import lz4.block
 except ImportError:
@@ -395,16 +394,11 @@ class LVGLImage:
                  h: int = 0,
                  data: bytes = b'') -> None:
         self.stride = 0  # default no valid stride value
-        self.compress = CompressMethod.NONE
         self.set_data(cf, w, h, data)
 
     def __repr__(self) -> str:
         return (f"'LVGL image {self.w}x{self.h}, {self.cf.name},"
                 f" (12+{self.data_len})Byte'")
-
-    def set_compress(self, method: CompressMethod):
-        # only do compression when return binary data
-        self.compress = method
 
     def adjust_stride(self, stride: int = 0, align: int = 1):
         '''
@@ -487,26 +481,6 @@ class LVGLImage:
         return p
 
     @property
-    def binary(self) -> bytearray:
-        '''
-        Return binary of this image including correct lvgl image header and
-        raw data
-        '''
-        bin = bytearray()
-        flags = 0
-        flags |= 0x08 if self.compress != CompressMethod.NONE else 0
-
-        header = LVGLImageHeader(self.cf,
-                                 self.w,
-                                 self.h,
-                                 self.stride,
-                                 flags=flags)
-        bin += header.binary
-        compress = LVGLCompressData(self.cf, self.compress, self.data)
-        bin += compress.compressed
-        return bin
-
-    @property
     def header(self) -> bytearray:
         return LVGLImageHeader(self.cf, self.w, self.h)
 
@@ -570,7 +544,9 @@ class LVGLImage:
             logging.info(f"mkdir of {dir} for {filename}")
             os.makedirs(dir)
 
-    def to_bin(self, filename: str):
+    def to_bin(self,
+               filename: str,
+               compress: CompressMethod = CompressMethod.NONE):
         '''
         Write this image to file, filename should be ended with '.bin'
         '''
@@ -578,19 +554,38 @@ class LVGLImage:
         self._check_dir(filename)
 
         with open(filename, "wb+") as f:
-            f.write(self.binary)
+            bin = bytearray()
+            flags = 0
+            flags |= 0x08 if compress != CompressMethod.NONE else 0
+
+            header = LVGLImageHeader(self.cf,
+                                     self.w,
+                                     self.h,
+                                     self.stride,
+                                     flags=flags)
+            bin += header.binary
+            compressed = LVGLCompressData(self.cf, compress, self.data)
+            bin += compressed.compressed
+
+            f.write(bin)
 
         return self
 
-    def to_c_array(self, filename: str):
+    def to_c_array(self,
+                   filename: str,
+                   compress: CompressMethod = CompressMethod.NONE):
         self._check_ext(filename, ".c")
         self._check_dir(filename)
 
         varname = path.basename(filename).split('.')[0]
         varname = varname.replace("-", "_")
-        varname += f"_{self.cf.name.lower()}"
-        if self.stride != (self.w * self.cf.bpp + 7) // 8:
-            varname += f"_stride{self.stride}"
+        varname = varname.replace(".", "_")
+
+        flags = "0"
+        if compress is not CompressMethod.NONE:
+            flags += " | LV_IMAGE_FLAGS_COMPRESSED"
+
+        compressed = LVGLCompressData(self.cf, compress, self.data)
 
         header = f'''
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
@@ -608,7 +603,8 @@ class LVGLImage:
 #define LV_ATTRIBUTE_IMG_DUST
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST
+static const
+LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST
 uint8_t {varname}_map[] = {{
 '''
 
@@ -617,10 +613,11 @@ uint8_t {varname}_map[] = {{
 
 const lv_img_dsc_t {varname} = {{
   .header.cf = LV_COLOR_FORMAT_{self.cf.name},
+  .header.flags = {flags},
   .header.w = {self.w},
   .header.h = {self.h},
   .header.stride = {self.stride},
-  .data_size = {len(self.data)},
+  .data_size = {len(compressed.compressed)},
   .data = {varname}_map,
 }};
 
@@ -636,12 +633,16 @@ const lv_img_dsc_t {varname} = {{
         with open(filename, "w+") as f:
             f.write(header)
 
-            # write palette separately
-            ncolors = self.cf.ncolors
-            if ncolors:
-                write_binary(f, self.data[:ncolors * 4], 16)
+            if compress is not CompressMethod.NONE:
+                write_binary(f, compressed.compressed, 16)
+            else:
+                # write palette separately
+                ncolors = self.cf.ncolors
+                if ncolors:
+                    write_binary(f, self.data[:ncolors * 4], 16)
 
-            write_binary(f, self.data[ncolors * 4:], self.stride)
+                write_binary(f, self.data[ncolors * 4:], self.stride)
+
             f.write(ending)
 
         return self
@@ -1032,13 +1033,11 @@ class PNGConverter:
     def convert(self):
         output = []
         for f in self.files:
-
             if self.ofmt == OutputFormat.RLE_FILE:
                 rle = RLEImage().from_png(f,
                                           self.cf,
                                           background=self.background)
                 rle.adjust_stride(align=self.align)
-                rle.set_compress(self.compress)
                 output.append((f, rle))
                 rle.to_rle(self._replace_ext(f, ".rle"))
             else:
@@ -1046,12 +1045,13 @@ class PNGConverter:
                                            self.cf,
                                            background=self.background)
                 img.adjust_stride(align=self.align)
-                img.set_compress(self.compress)
                 output.append((f, img))
                 if self.ofmt == OutputFormat.BIN_FILE:
-                    img.to_bin(self._replace_ext(f, ".bin"))
+                    img.to_bin(self._replace_ext(f, ".bin"),
+                               compress=self.compress)
                 elif self.ofmt == OutputFormat.C_ARRAY:
-                    img.to_c_array(self._replace_ext(f, ".c"))
+                    img.to_c_array(self._replace_ext(f, ".c"),
+                                   compress=self.compress)
                 elif self.ofmt == OutputFormat.PNG_FILE:
                     img.to_png(self._replace_ext(f, ".png"))
 
@@ -1142,8 +1142,8 @@ def test():
     f = "pngs/cogwheel.RGB565A8.png"
     img = LVGLImage().from_png(f, cf=ColorFormat.RGB888, background=0xFF_FF_00)
     img.adjust_stride(align=16)
-    img.set_compress(CompressMethod.RLE)
     img.to_bin("output/cogwheel.RGB888.bin")
+    img.to_c_array("output/cogwheel-abc.c")  # file name is used as c var name
     img.to_png("output/cogwheel.RGB888.png.png")  # convert back to png
 
 
