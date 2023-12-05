@@ -269,6 +269,18 @@ void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj);
 void * lv_observer_get_target(lv_observer_t * observer);
 
 /**
+ * Get the target object of the observer.
+ * It's the same as `lv_observer_get_target` and added only
+ * for semantic reasons
+ * @param observer      pointer to an observer
+ * @return              pointer to the saved object target
+ */
+static inline lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
+{
+    return lv_observer_get_target(observer);
+}
+
+/**
  * Notify all observers of subject
  * @param subject       pointer to a subject
  */
