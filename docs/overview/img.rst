@@ -335,8 +335,7 @@ manually too. Create an :cpp:type:`lv_image_decoder_dsc_t` variable to describe
 the decoding session and call :cpp:func:`lv_image_decoder_open`.
 
 The ``color`` parameter is used only with ``LV_COLOR_FORMAT_A1/2/4/8``
-images to tell color of the image. ``frame_id`` can be used if the image
-to open is an animation.
+images to tell color of the image.
 
 .. code:: c
 
