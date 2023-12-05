@@ -451,7 +451,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_line(lv_opa_t * 
             /*Non sense: Can't be on the right/left of a horizontal line*/
             if(p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_LEFT ||
                p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_RIGHT) return LV_DRAW_SW_MASK_RES_FULL_COVER;
-            else if(p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_TOP && abs_y + 1 < 0) return LV_DRAW_SW_MASK_RES_FULL_COVER;
+            else if(p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_TOP && abs_y < 0) return LV_DRAW_SW_MASK_RES_FULL_COVER;
             else if(p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_BOTTOM && abs_y > 0) return LV_DRAW_SW_MASK_RES_FULL_COVER;
             else {
                 return LV_DRAW_SW_MASK_RES_TRANSP;

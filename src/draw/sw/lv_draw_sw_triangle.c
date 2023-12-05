@@ -104,9 +104,15 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
                                      p[2].x, p[2].y,
                                      right ? LV_DRAW_SW_MASK_LINE_SIDE_LEFT : LV_DRAW_SW_MASK_LINE_SIDE_RIGHT);
 
-    lv_draw_sw_mask_line_points_init(&mask_bottom, p[1].x, p[1].y,
-                                     p[2].x, p[2].y,
-                                     right ? LV_DRAW_SW_MASK_LINE_SIDE_LEFT : LV_DRAW_SW_MASK_LINE_SIDE_RIGHT);
+    if(p[1].y == p[2].y) {
+        lv_draw_sw_mask_line_points_init(&mask_bottom, p[1].x, p[1].y,
+                                         p[2].x, p[2].y, LV_DRAW_SW_MASK_LINE_SIDE_TOP);
+    }
+    else {
+        lv_draw_sw_mask_line_points_init(&mask_bottom, p[1].x, p[1].y,
+                                         p[2].x, p[2].y,
+                                         right ? LV_DRAW_SW_MASK_LINE_SIDE_LEFT  : LV_DRAW_SW_MASK_LINE_SIDE_RIGHT);
+    }
 
     masks[0] = &mask_left;
     masks[1] = &mask_right;
