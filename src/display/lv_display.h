@@ -159,10 +159,8 @@ void lv_display_set_offset(lv_display_t * disp, int32_t x, int32_t y);
  * Set the rotation of this display. LVGL will swap the horizontal and vertical resolutions internally.
  * @param disp      pointer to a display (NULL to use the default display)
  * @param rotation  `LV_DISPLAY_ROTATION_0/90/180/270`
- * @param sw_rotate true: make LVGL rotate the rendered image;
- *                  false: the display driver should rotate the rendered image
  */
-void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation, bool sw_rotate);
+void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation);
 
 /**
  * Set the DPI (dot per inch) of the display.
