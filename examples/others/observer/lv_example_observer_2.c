@@ -25,7 +25,7 @@ void lv_example_observer_2(void)
  * It doesn't know anything about the internals of the UI
  * and uses any the `engine_subject` as an interface.
  * -------------------------------------------------*/
-static void engine_state_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void engine_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(observer);
 
@@ -66,7 +66,7 @@ static void textarea_event_cb(lv_event_t * e)
     }
 }
 
-static void info_label_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void info_label_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * label = lv_observer_get_target(observer);
     switch(lv_subject_get_int(subject)) {

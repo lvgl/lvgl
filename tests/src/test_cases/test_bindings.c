@@ -6,7 +6,7 @@
 #include "lv_test_helpers.h"
 
 static void create_ui(void);
-static void chart_type_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void chart_type_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void buttonmatrix_event_cb(lv_event_t * e);
 static lv_obj_t * list_button_create(lv_obj_t * parent);
 static void opa_anim_cb(void * var, int32_t v);
@@ -193,7 +193,7 @@ static void create_ui(void)
     lv_image_set_scale_x(img, 400);
 }
 
-static void chart_type_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void chart_type_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t v = lv_subject_get_int(subject);
     lv_obj_t * chart = lv_observer_get_target(observer);

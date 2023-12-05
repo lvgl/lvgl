@@ -40,7 +40,7 @@ A typical use case looks like this:
     extern lv_subject_t some_subject;
 
     //Will be called when the related subject's value changes
-    static void some_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+    static void some_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     {
         int32_t v = lv_subject_get_int(subject);
         do_something(v);
@@ -135,7 +135,7 @@ Where the observer callback should look like this:
 
 .. code:: c
 
-    static void some_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+    static void some_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     {
         ...
     }
@@ -191,11 +191,11 @@ To handle this you can create an array from some existing subjects and pass
 this array as a parameter when you initialize a subject with group type.
 
 .. code:: c
-    static lv_subject_t * subject_list[3] = {&subject_1, &subject_2, &subject_3}; 
+    static lv_subject_t * subject_list[3] = {&subject_1, &subject_2, &subject_3};
     lv_subject_init_group(&subject_all, subject_list, 3);  /*The last parameter is the number of elements*/
 
-You can add observers to subject groups in the regular way. 
-The trick is that when any element of the group is notified the subject group will be notified too. 
+You can add observers to subject groups in the regular way.
+The trick is that when any element of the group is notified the subject group will be notified too.
 
 The above Voltage/Current measurement example looks like this in the practice:
 
@@ -218,7 +218,7 @@ The above Voltage/Current measurement example looks like this in the practice:
 
     ...
 
-    static void all_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+    static void all_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     {
         lv_obj_t * label = lv_observer_get_target(observer);
         lv_subject_t * subject_mode = lv_subject_get_group_element(subject, 0);

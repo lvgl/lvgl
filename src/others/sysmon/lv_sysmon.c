@@ -43,12 +43,12 @@ static void sysmon_backend_init_async_cb(void * user_data);
 
 #if LV_USE_PERF_MONITOR
     static void perf_update_timer_cb(lv_timer_t * t);
-    static void perf_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+    static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
 #if LV_USE_MEM_MONITOR
     static void mem_update_timer_cb(lv_timer_t * t);
-    static void mem_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+    static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
 /**********************
@@ -170,7 +170,7 @@ static void perf_update_timer_cb(lv_timer_t * t)
     info->calculated.run_cnt = prev_info.calculated.run_cnt;
 }
 
-static void perf_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * label = lv_observer_get_target(observer);
     const lv_sysmon_perf_info_t * perf = lv_subject_get_pointer(subject);
@@ -206,7 +206,7 @@ static void mem_update_timer_cb(lv_timer_t * t)
     lv_subject_set_pointer(&sysmon_mem.subject, mem_mon);
 }
 
-static void mem_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * label = lv_observer_get_target(observer);
     const lv_mem_monitor_t * mon = lv_subject_get_pointer(subject);
