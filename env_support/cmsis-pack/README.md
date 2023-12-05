@@ -46,12 +46,33 @@ remove the misleading guide above this code segment.
    - LV_USE_GPU_SWM341_DMA2D
    - LV_USE_GPU_ARM2D
    - LV_USE_IME_PINYIN
+   - LV_USE_PNG
+   - LV_USE_BMP
+   - LV_USE_SJPG
+   - LV_USE_GIF
+   - LV_USE_QRCODE
+   - LV_USE_FREETYPE
+   - LV_USE_TINY_TTF
+   - LV_USE_RLOTTIE
+   - LV_USE_FFMPEG
+   - LV_USE_SNAPSHOT
+   - LV_USE_MONKEY
+   - LV_USE_GRIDNAV
+   - LV_USE_FRAGMENT
+   - LV_USE_IMGFONT
+   - LV_USE_MSG
+   - LV_USE_IME_PINYIN
 5. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
 Update macro `LV_MEM_SIZE` to `(64*1024U)`.
+
+Update macro `LV_FONT_MONTSERRAT_12` to `1`.
+
+Update macro `LV_FONT_MONTSERRAT_12` to `1`.
+
 6. Update Theme related macros:
 
 ```c
@@ -89,25 +110,41 @@ Update macro `LV_MEM_SIZE` to `(64*1024U)`.
     #define LV_TICK_CUSTOM 1
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE             "perf_counter.h"
-
-        #if __PER_COUNTER_VER__ < 10902ul
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
-        #else
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
-        #endif
+        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h"
+        #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
     #endif   /*LV_TICK_CUSTOM*/
 #else
     #define LV_TICK_CUSTOM 0
     #if LV_TICK_CUSTOM
         #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
         #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
+    /*If using lvgl as ESP32 component*/
+    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
+    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
     #endif   /*LV_TICK_CUSTOM*/
 #endif       /*__PERF_COUNTER__*/
 ```
-9. Thoroughly remove the `DEMO USAGE` section.
-10. Thoroughly remove the '3rd party libraries' section.
-10. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+
+
+9. Remove all content in `DEMO USAGE` section but keep the following:
+
+```c
+/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
+#if LV_USE_DEMO_WIDGETS
+	#define LV_DEMO_WIDGETS_SLIDESHOW 0
+#endif
+
+/*Benchmark your system*/
+#if LV_USE_DEMO_BENCHMARK
+/*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+	#define LV_DEMO_BENCHMARK_RGB565A8 1
+#endif
+```
+
+
+
+10. Thoroughly remove the `3rd party libraries` section.
+11. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 
