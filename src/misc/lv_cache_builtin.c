@@ -69,6 +69,14 @@ void _lv_cache_builtin_init(void)
 
 void _lv_cache_builtin_deinit(void)
 {
+    lv_cache_entry_t * entry = _lv_ll_get_head(&dsc.entry_ll);
+    lv_cache_entry_t * next;
+    while(entry) {
+        next = _lv_ll_get_next(&dsc.entry_ll, entry);
+        invalidate_cb(entry);
+        entry = next;
+    }
+
     _lv_ll_clear(&dsc.entry_ll);
 }
 
