@@ -61,6 +61,9 @@ static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, 
 
 static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image_compressed_t * compressed);
 
+static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
+static void cache_invalidate_cb(lv_cache_entry_t * entry);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -160,7 +163,12 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 {
     LV_UNUSED(decoder);
     LV_UNUSED(args);
+
+    /*Check the cache first*/
+    if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
+
     lv_fs_res_t res = LV_RESULT_INVALID;
+    uint32_t t = lv_tick_get();
 
     /*Open the file if it's a file*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -257,8 +265,38 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     if(res != LV_RESULT_OK) {
         free_decoder_data(dsc);
+        return res;
     }
 
+    if(dsc->img_data == NULL) return LV_RESULT_OK;
+
+    /*Add it to cache*/
+    t = lv_tick_elaps(t);
+    lv_cache_lock();
+    lv_cache_entry_t * cache = lv_cache_add(NULL, 0, decoder->cache_data_type, dsc->header.w * dsc->header.h * 4);
+    if(cache == NULL) {
+        lv_cache_unlock();
+        free_decoder_data(dsc);
+        return LV_RESULT_INVALID;
+    }
+
+    cache->weight = t;
+    cache->data = dsc->img_data;
+    cache->invalidate_cb = cache_invalidate_cb;
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
+        cache->src = lv_strdup(dsc->src);
+        cache->src_type = LV_CACHE_SRC_TYPE_PATH;
+    }
+    else {
+        cache->src_type = LV_CACHE_SRC_TYPE_POINTER;
+        cache->src = dsc->src;
+    }
+
+    cache->user_data = dsc->user_data; /*Need to free data on cache invalidate instead of decoder_close*/
+    dsc->img_data = lv_cache_get_data(cache); /*@note: Must get from cache to increase reference count.*/
+    dsc->cache_entry = cache;
+
+    lv_cache_unlock();
     return res;
 }
 
@@ -270,7 +308,10 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
-    free_decoder_data(dsc);
+
+    lv_cache_lock();
+    lv_cache_release(dsc->cache_entry);
+    lv_cache_unlock();
 }
 
 lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
@@ -890,4 +931,64 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
 
     decoder_data->decompressed = decompressed; /*Free on decoder close*/
     return LV_RESULT_OK;
+}
+
+static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
+{
+    lv_cache_lock();
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
+        const char * fn = dsc->src;
+
+        lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, fn, LV_CACHE_SRC_TYPE_PATH);
+        if(cache) {
+            dsc->img_data = lv_cache_get_data(cache);
+            /**
+             * The img_data may not be consistent with dsc->header.cf
+             * For indexed image, it could be converted to ARGB8888 when enabled.
+             * For alpha only image, it's always converted to A8 format.
+             */
+            if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(dsc->header.cf)) {
+                uint8_t bpp = lv_color_format_get_bpp(dsc->header.cf);
+                lv_image_header_t header;
+                lv_image_decoder_get_info(dsc->src, &header);
+                uint32_t w = (header.stride * 8) / bpp;
+                uint32_t buf_stride = (w * 8 + 7) >> 3; /*stride for img_data*/
+                dsc->header.cf = LV_COLOR_FORMAT_A8;
+                dsc->header.stride = buf_stride;
+            }
+#if LV_BIN_DECODER_RAM_LOAD
+            else if(LV_COLOR_FORMAT_IS_INDEXED(dsc->header.cf)) {
+                dsc->header.stride = lv_draw_buf_width_to_stride(dsc->header.w, LV_COLOR_FORMAT_ARGB8888);
+                dsc->header.cf = LV_COLOR_FORMAT_ARGB8888;
+            }
+#endif
+            dsc->cache_entry = cache;     /*Save the cache to release it in decoder_close*/
+            lv_cache_unlock();
+            return LV_RESULT_OK;
+        }
+    }
+
+    else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
+        const lv_image_dsc_t * img_dsc = dsc->src;
+
+        lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, img_dsc, LV_CACHE_SRC_TYPE_POINTER);
+        if(cache) {
+            dsc->img_data = lv_cache_get_data(cache);
+            dsc->cache_entry = cache;     /*Save the cache to release it in decoder_close*/
+            lv_cache_unlock();
+            return LV_RESULT_OK;
+        }
+    }
+
+    lv_cache_unlock();
+    return LV_RESULT_INVALID;
+}
+
+static void cache_invalidate_cb(lv_cache_entry_t * entry)
+{
+    lv_image_decoder_dsc_t fake = { 0 };
+    fake.user_data = entry->user_data;
+    free_decoder_data(&fake);
+
+    if(entry->src_type == LV_CACHE_SRC_TYPE_PATH) lv_free((void *)entry->src);
 }
