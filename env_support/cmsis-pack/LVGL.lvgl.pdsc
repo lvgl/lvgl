@@ -909,7 +909,7 @@
               <RTE_Components_h>
 
 /*! \brief enable demo:bencharmk */
-#define LV_USE_DEMO_BENCHMAR    1
+#define LV_USE_DEMO_BENCHMARK    1
               </RTE_Components_h>
 
             </component>
