@@ -17,6 +17,13 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
+void test_table_should_set_row_count_to_zero(void)
+{
+    lv_table_set_row_count(table, 0);
+
+    TEST_ASSERT_EQUAL_UINT32(0, lv_table_get_row_count(table));
+}
+
 void test_table_should_return_assigned_cell_value(void)
 {
     uint16_t row = 0;
