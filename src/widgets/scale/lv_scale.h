@@ -18,6 +18,7 @@ extern "C" {
 #if LV_USE_SCALE != 0
 
 #include "../../core/lv_obj.h"
+#include "../line/lv_line.h"
 
 /*********************
  *      DEFINES
@@ -168,6 +169,16 @@ void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max);
  * @param rotation  the angular offset from the 3 o'clock position (clock-wise)
  */
 void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rotation);
+
+/**
+ * Set the needle to point to the corresponding value
+ * @param obj              pointer to a scale object
+ * @param needle_line      needle_line of the scale
+ * @param needle_length    length of the needle
+ * @param value            needle to point to the corresponding value
+ */
+void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
+                                    int32_t value);
 
 /**
  * Set custom text source for major ticks labels
