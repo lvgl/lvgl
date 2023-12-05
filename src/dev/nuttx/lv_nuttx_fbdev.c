@@ -96,7 +96,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         LV_LOG_ERROR("Error: cannot open framebuffer device");
         return -errno;
     }
-    LV_LOG_INFO("The framebuffer device was opened successfully");
+    LV_LOG_USER("The framebuffer device was opened successfully");
 
     if(ioctl(dsc->fd, FBIOGET_VIDEOINFO, (unsigned long)((uintptr_t)&dsc->vinfo)) < 0) {
         LV_LOG_ERROR("ioctl(FBIOGET_VIDEOINFO) failed: %d", errno);
@@ -104,11 +104,11 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         goto errout;
     }
 
-    LV_LOG_INFO("VideoInfo:");
-    LV_LOG_INFO("      fmt: %u", dsc->vinfo.fmt);
-    LV_LOG_INFO("     xres: %u", dsc->vinfo.xres);
-    LV_LOG_INFO("     yres: %u", dsc->vinfo.yres);
-    LV_LOG_INFO("  nplanes: %u", dsc->vinfo.nplanes);
+    LV_LOG_USER("VideoInfo:");
+    LV_LOG_USER("      fmt: %u", dsc->vinfo.fmt);
+    LV_LOG_USER("     xres: %u", dsc->vinfo.xres);
+    LV_LOG_USER("     yres: %u", dsc->vinfo.yres);
+    LV_LOG_USER("  nplanes: %u", dsc->vinfo.nplanes);
 
     if((ret = fbdev_get_pinfo(dsc->fd, &dsc->pinfo)) < 0) {
         goto errout;
@@ -136,7 +136,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
 
-    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", dsc->vinfo.xres, dsc->vinfo.yres, lv_display_get_dpi(disp));
+    LV_LOG_USER("Resolution is set to %dx%d at %ddpi", dsc->vinfo.xres, dsc->vinfo.yres, lv_display_get_dpi(disp));
     return 0;
 
 errout:
@@ -225,12 +225,12 @@ static int fbdev_get_pinfo(int fd, FAR struct fb_planeinfo_s * pinfo)
         return -errno;
     }
 
-    LV_LOG_INFO("PlaneInfo (plane %d):", pinfo->display);
-    LV_LOG_INFO("    mem: %p", pinfo->fbmem);
-    LV_LOG_INFO("    fblen: %zu", pinfo->fblen);
-    LV_LOG_INFO("   stride: %u", pinfo->stride);
-    LV_LOG_INFO("  display: %u", pinfo->display);
-    LV_LOG_INFO("      bpp: %u", pinfo->bpp);
+    LV_LOG_USER("PlaneInfo (plane %d):", pinfo->display);
+    LV_LOG_USER("    mem: %p", pinfo->fbmem);
+    LV_LOG_USER("    fblen: %zu", pinfo->fblen);
+    LV_LOG_USER("   stride: %u", pinfo->stride);
+    LV_LOG_USER("  display: %u", pinfo->display);
+    LV_LOG_USER("      bpp: %u", pinfo->bpp);
 
     /* Only these pixel depths are supported.  vinfo.fmt is ignored, only
      * certain color formats are supported.
@@ -286,13 +286,13 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
     if(buf_offset == 0) {
         dsc->mem2_yoffset = dsc->vinfo.yres;
         dsc->mem2 = pinfo.fbmem + dsc->mem2_yoffset * pinfo.stride;
-        LV_LOG_INFO("Use consecutive mem2 = %p, yoffset = %" PRIu32,
+        LV_LOG_USER("Use consecutive mem2 = %p, yoffset = %" LV_PRIu32,
                     dsc->mem2, dsc->mem2_yoffset);
     }
     else {
         dsc->mem2_yoffset = buf_offset / dsc->pinfo.stride;
         dsc->mem2 = pinfo.fbmem;
-        LV_LOG_INFO("Use non-consecutive mem2 = %p, yoffset = %" PRIu32,
+        LV_LOG_USER("Use non-consecutive mem2 = %p, yoffset = %" LV_PRIu32,
                     dsc->mem2, dsc->mem2_yoffset);
     }
 
@@ -313,7 +313,7 @@ static void display_release_cb(lv_event_t * e)
         }
         lv_free(dsc);
     }
-    LV_LOG_INFO("Done");
+    LV_LOG_USER("Done");
 }
 
 #endif /*LV_USE_NUTTX*/
