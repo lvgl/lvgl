@@ -297,13 +297,13 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
         return;
     }
 
-    if(!decoder_dsc.img_data) {
+    if(!decoder_dsc.decoded && !decoder_dsc.img_data) {
         lv_image_decoder_close(&decoder_dsc);
         LV_LOG_ERROR("Image not ready");
         return;
     }
 
-    const uint8_t * src_buf = decoder_dsc.img_data;
+    const uint8_t * src_buf = _lv_image_decoder_get_data(&decoder_dsc);
     const lv_image_header_t * header = &decoder_dsc.header;
     lv_color_format_t cf = header->cf;
 
