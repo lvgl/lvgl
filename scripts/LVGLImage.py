@@ -579,14 +579,12 @@ class LVGLImage:
 
         varname = path.basename(filename).split('.')[0]
         varname = varname.replace("-", "_")
-        varname += f"_{self.cf.name.lower()}"
-        if self.stride != (self.w * self.cf.bpp + 7) // 8:
-            varname += f"_stride{self.stride}"
-        if compress is not CompressMethod.NONE:
-            varname += f"_{compress.name}"
+        varname = varname.replace(".", "_")
 
-        flags = 0
-        flags |= 0x08 if compress != CompressMethod.NONE else 0
+        flags = "0"
+        if compress is not CompressMethod.NONE:
+            flags += " | LV_IMAGE_FLAGS_COMPRESSED"
+
         compressed = LVGLCompressData(self.cf, compress, self.data)
 
         header = f'''
@@ -615,7 +613,7 @@ uint8_t {varname}_map[] = {{
 
 const lv_img_dsc_t {varname} = {{
   .header.cf = LV_COLOR_FORMAT_{self.cf.name},
-  .header.flags = {hex(flags)},
+  .header.flags = {flags},
   .header.w = {self.w},
   .header.h = {self.h},
   .header.stride = {self.stride},
@@ -1145,6 +1143,7 @@ def test():
     img = LVGLImage().from_png(f, cf=ColorFormat.RGB888, background=0xFF_FF_00)
     img.adjust_stride(align=16)
     img.to_bin("output/cogwheel.RGB888.bin")
+    img.to_c_array("output/cogwheel-abc.c")  # file name is used as c var name
     img.to_png("output/cogwheel.RGB888.png.png")  # convert back to png
 
 
