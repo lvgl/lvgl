@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
 #if LV_USE_TINY_TTF && LV_BUILD_EXAMPLES && LV_USE_OBSERVER
 
-static void font_size_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void font_size_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static lv_subject_t subject_font;
 static lv_font_t font;
@@ -43,7 +43,7 @@ void lv_example_tiny_ttf_3(void)
     lv_subject_add_observer(&subject_font, font_size_observer_cb, &style);
 }
 
-static void font_size_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void font_size_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_style_t * style = observer->user_data;
     int32_t size = lv_subject_get_int(subject);

@@ -18,7 +18,7 @@ void tearDown(void)
 static int32_t prev_v;
 static int32_t current_v;
 
-static void observer_int(lv_subject_t * subject, lv_observer_t * observer)
+static void observer_int(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(observer);
     prev_v = lv_subject_get_previous_int(subject);
@@ -180,7 +180,7 @@ void test_observer_color(void)
 
 static int32_t group_observer_called;
 
-static void group_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void group_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(observer);
     LV_UNUSED(subject);

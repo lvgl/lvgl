@@ -15,8 +15,8 @@ const char * minute_options =
 
 static void set_btn_clicked_event_cb(lv_event_t * e);
 static void close_clicked_event_cb(lv_event_t * e);
-static void hour_roller_options_update(lv_subject_t * subject, lv_observer_t * observer);
-static void time_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void hour_roller_options_update(lv_observer_t * observer, lv_subject_t * subject);
+static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 typedef enum {
     TIME_FORMAT_12,
@@ -118,7 +118,7 @@ static void close_clicked_event_cb(lv_event_t * e)
 }
 
 /*Watch all related subject to display the current time correctly*/
-static void time_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t hour = lv_subject_get_int(lv_subject_get_group_element(subject, 0));
     int32_t minute = lv_subject_get_int(lv_subject_get_group_element(subject, 1));
@@ -136,7 +136,7 @@ static void time_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 }
 
 /*Change the hour options on format change*/
-static void hour_roller_options_update(lv_subject_t * subject, lv_observer_t * observer)
+static void hour_roller_options_update(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * roller = lv_observer_get_target(observer);
     int32_t prev_selected = lv_roller_get_selected(roller);

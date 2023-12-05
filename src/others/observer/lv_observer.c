@@ -29,26 +29,26 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void unsubscribe_on_delete_cb(lv_event_t * e);
-static void group_notify_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
                                         int32_t ref_value, bool inv);
-static void obj_flag_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
-static void obj_state_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void btn_value_changed_event_cb(lv_event_t * e);
 
-static void label_text_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static void arc_value_changed_event_cb(lv_event_t * e);
-static void arc_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static void slider_value_changed_event_cb(lv_event_t * e);
-static void slider_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void slider_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static void roller_value_changed_event_cb(lv_event_t * e);
-static void roller_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static void dropdown_value_changed_event_cb(lv_event_t * e);
-static void dropdown_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC VARIABLES
@@ -294,7 +294,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     }
 
     /* update object immediately */
-    if(observer->cb) observer->cb(subject, observer);
+    if(observer->cb) observer->cb(observer, subject);
 
     return observer;
 }
@@ -319,7 +319,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
     observer->target = target;
 
     /* update object immediately */
-    if(observer->cb) observer->cb(subject, observer);
+    if(observer->cb) observer->cb(observer, subject);
 
     return observer;
 }
@@ -381,7 +381,7 @@ void lv_subject_notify(lv_subject_t * subject)
         subject->notify_restart_query = 0;
         _LV_LL_READ(&(subject->subs_ll), observer) {
             if(observer->cb && observer->notified == 0) {
-                observer->cb(subject, observer);
+                observer->cb(observer, subject);
                 if(subject->notify_restart_query) break;
                 observer->notified = 1;
             }
@@ -498,7 +498,7 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
  *   STATIC FUNCTIONS
  **********************/
 
-static void group_notify_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
     lv_subject_t * subject_group = observer->user_data;
@@ -534,7 +534,7 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
     return observable;
 }
 
-static void obj_flag_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     flag_and_cond_t * p = observer->user_data;
 
@@ -549,7 +549,7 @@ static void obj_flag_observer_cb(lv_subject_t * subject, lv_observer_t * observe
     }
 }
 
-static void obj_state_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     flag_and_cond_t * p = observer->user_data;
 
@@ -572,7 +572,7 @@ static void btn_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_obj_has_state(obj, LV_STATE_CHECKED));
 }
 
-static void label_text_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     const char * fmt = observer->user_data;
 
@@ -602,7 +602,7 @@ static void arc_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_arc_get_value(arc));
 }
 
-static void arc_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_arc_set_value(observer->target, subject->value.num);
 }
@@ -615,7 +615,7 @@ static void slider_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_slider_get_value(slider));
 }
 
-static void slider_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void slider_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_slider_set_value(observer->target, subject->value.num, LV_ANIM_OFF);
 }
@@ -628,7 +628,7 @@ static void roller_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_roller_get_selected(roller));
 }
 
-static void roller_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     if((int32_t)lv_roller_get_selected(observer->target) != subject->value.num) {
         lv_roller_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
@@ -643,7 +643,7 @@ static void dropdown_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_dropdown_get_selected(dropdown));
 }
 
-static void dropdown_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_dropdown_set_selected(observer->target, subject->value.num);
 }

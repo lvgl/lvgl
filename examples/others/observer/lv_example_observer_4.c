@@ -1,11 +1,11 @@
 #include "../../lv_examples.h"
 #if LV_USE_OBSERVER && LV_USE_SLIDER && LV_USE_LABEL && LV_USE_ROLLER && LV_USE_DROPDOWN && LV_FONT_MONTSERRAT_30 && LV_BUILD_EXAMPLES
 
-static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void cont_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void btn_create(lv_obj_t * parent, const char * text);
 static void btn_click_event_cb(lv_event_t * e);
-static void btn_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
-static void indicator_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void btn_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void indicator_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static lv_subject_t current_tab_subject;
 static lv_subject_t slider_subject[4];
@@ -74,7 +74,7 @@ static void anim_set_x_cb(void * obj, int32_t v)
     lv_obj_set_x(obj, v);
 }
 
-static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void cont_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t prev_v = lv_subject_get_previous_int(subject);
     int32_t cur_v = lv_subject_get_int(subject);
@@ -170,7 +170,7 @@ static void btn_click_event_cb(lv_event_t * e)
     lv_subject_set_int(&current_tab_subject, idx);
 }
 
-static void btn_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void btn_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t prev_v = lv_subject_get_previous_int(subject);
     int32_t cur_v = lv_subject_get_int(subject);
@@ -182,7 +182,7 @@ static void btn_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
     if(idx == cur_v) lv_obj_add_state(btn, LV_STATE_CHECKED);
 }
 
-static void indicator_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void indicator_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t cur_v = lv_subject_get_int(subject);
     lv_obj_t * indicator = lv_observer_get_target(observer);

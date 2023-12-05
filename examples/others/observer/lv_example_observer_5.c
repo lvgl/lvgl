@@ -10,10 +10,10 @@ typedef enum {
     FW_UPDATE_STATE_READY,
 } fw_update_state_t;
 
-static void fw_upload_manager_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void fw_update_btn_clicked_event_cb(lv_event_t * e);
 static void fw_update_close_event_cb(lv_event_t * e);
-static void fw_update_win_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static lv_subject_t fw_download_percent_subject;
 static lv_subject_t fw_update_status_subject;
@@ -73,7 +73,7 @@ static void restart_btn_click_event_cb(lv_event_t * e)
     lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_IDLE);
 }
 
-static void fw_update_win_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * win = lv_observer_get_target(observer);
     lv_obj_t * cont = lv_win_get_content(win);
@@ -148,7 +148,7 @@ static void download_timer_cb(lv_timer_t * t)
 /**
  * Emulate connection and FW dowlading by timers
  */
-static void fw_upload_manager_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
     LV_UNUSED(observer);

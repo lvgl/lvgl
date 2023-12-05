@@ -39,7 +39,7 @@ static void load_scene(uint32_t scene);
 static void next_scene_timer_cb(lv_timer_t * timer);
 
 #if LV_USE_PERF_MONITOR
-    static void sysmon_perf_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+    static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
 static void rnd_reset(void);
@@ -462,7 +462,7 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 }
 
 #if LV_USE_PERF_MONITOR
-static void sysmon_perf_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(subject);
     lv_obj_t * label = lv_observer_get_target(observer);

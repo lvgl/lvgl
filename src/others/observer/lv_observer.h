@@ -61,9 +61,10 @@ typedef struct {
 
 /**
   * Callback called when the observed value changes
-  * @param s the lv_observer_t object created when the object was subscribed to the value
+  * @param observer     pointer to the observer of the callback
+  * @param subject      pointer to the subject of the observer
   */
-typedef void (*lv_observer_cb_t)(lv_subject_t * subject, struct _lv_observer_t * observer);
+typedef void (*lv_observer_cb_t)(struct _lv_observer_t * observer, lv_subject_t * subject);
 
 /**
  * The observer object: a descriptor returned when subscribing LVGL widgets to subjects
