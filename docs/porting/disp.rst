@@ -5,7 +5,7 @@ Display interface
 =================
 
 To create a display for LVGL call
-:cpp:expr:`lv_disp_t * disp = lv_disp_create(hor_res, ver_res)`. You can create
+:cpp:expr:`lv_display_t * display = lv_display_create(hor_res, ver_res)`. You can create
 a multiple displays and a different driver for each (see below),
 
 Basic setup
@@ -22,38 +22,39 @@ An example ``flush_cb`` looks like this:
 
 .. code:: c
 
-   void my_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * buf)
+   void my_flush_cb(lv_display_t * display, const lv_area_t * area, void * px_map)
    {
        /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one
         *`put_px` is just an example, it needs to be implemented by you.*/
+       uint16_t * buf16 = (uint16_t)px_map; /*Let's say it's a 16 bit (RGB565) display*/
        int32_t x, y;
        for(y = area->y1; y <= area->y2; y++) {
            for(x = area->x1; x <= area->x2; x++) {
-               put_px(x, y, *buf);
-               buf++;
+               put_px(x, y, *buf16);
+               buf16++;
            }
        }
 
        /* IMPORTANT!!!
         * Inform LVGL that you are ready with the flushing and buf is not used anymore*/
-       lv_disp_flush_ready(disp);
+       lv_display_flush_ready(disp);
    }
 
-Use :cpp:expr:`lv_disp_set_flush_cb(disp, my_flush_cb)` to set a new ``flush_cb``.
+Use :cpp:expr:`lv_display_set_flush_cb(disp, my_flush_cb)` to set a new ``flush_cb``.
 
-:cpp:expr:`lv_disp_flush_ready(disp)` needs to be called when flushing is ready
+:cpp:expr:`lv_display_flush_ready(disp)` needs to be called when flushing is ready
 to inform LVGL the buffer is not used anymore by the driver and it can
 render new content into it.
 
 LVGL might render the screen in multiple chunks and therefore call
 ``flush_cb`` multiple times. To see if the current one is the last chunk
-of rendering use :cpp:expr:`lv_disp_flush_is_last(disp)`.
+of rendering use :cpp:expr:`lv_display_flush_is_last(display)`.
 
 Draw buffers
 ------------
 
 The draw buffers can be set with
-:cpp:expr:`lv_disp_set_draw_buffers(disp, buf1, buf2, buf_size_px, render_mode)`
+:cpp:expr:`lv_display_set_draw_buffers(display, buf1, buf2, buf_size_px, render_mode)`
 
 -  ``buf1`` a buffer where LVGL can render
 -  ``buf2`` a second optional buffer (see more details below)
@@ -64,26 +65,27 @@ The draw buffers can be set with
       screen is smaller parts. This way the buffers can be smaller then
       the display to save RAM. At least 1/10 screen size buffer(s) are
       recommended. In ``flush_cb`` the rendered images needs to be
-      copied to the given area of the display.
+      copied to the given area of the display. In this mode if a button is pressed
+      only the button's area will be redrawn.
    -  :cpp:enumerator:`LV_DISP_RENDER_MODE_DIRECT` The buffer(s) has to be screen
       sized and LVGL will render into the correct location of the
       buffer. This way the buffer always contain the whole image. If two
       buffer are used the rendered ares are automatically copied to the
       other buffer after flushing. Due to this in ``flush_cb`` typically
-      only a frame buffer address needs to be changed and always the
-      changed areas will be redrawn.
-   -  :cpp:enumerator:`LV_DISP_RENDER_MODE_FULL` The buffer can smaller or screen
-      sized but LVGL will always redraw the whole screen even is only 1
+      only a frame buffer address needs to be changed. If a button is pressed
+      only the button's area will be redrawn.
+   -  :cpp:enumerator:`LV_DISP_RENDER_MODE_FULL` The buffer(s) has to be screen
+      sized and LVGL will always redraw the whole screen even if only 1
       pixel has been changed. If two screen sized draw buffers are
       provided, LVGL's display handling works like "traditional" double
       buffering. This means the ``flush_cb`` callback only has to update
-      the address of the framebuffer (``color_p`` parameter).
+      the address of the frame buffer to the ``px_map`` parameter.
 
 Example:
 
 .. code:: c
 
-   static lv_color_t buf[LCD_HOR_RES * LCD_VER_RES / 10];
+   static uint16_t buf[LCD_HOR_RES * LCD_VER_RES / 10];
    lv_disp_set_draw_buffers(disp, buf, NULL, sizeof(buf), LV_DISP_RENDER_MODE_PARTIAL);
 
 One buffer
@@ -91,8 +93,9 @@ One buffer
 
 If only one buffer is used LVGL draws the content of the screen into
 that draw buffer and sends it to the display via the ``flush_cb``. LVGL
-then needs to wait until the content of the buffer is sent to the
-display before drawing something new into it.
+then needs to wait until :cpp:expr:`lv_display_flush_ready` is called
+(that is the content of the buffer is sent to the
+display) before drawing something new into it.
 
 Two buffers
 ^^^^^^^^^^^
@@ -110,110 +113,68 @@ Resolution
 ----------
 
 To set the resolution of the display after creation use
-:cpp:expr:`lv_disp_set_res(disp, hor_res, ver_res)`
+:cpp:expr:`lv_display_set_resolution(display, hor_res, ver_res)`
 
 It's not mandatory to use the whole display for LVGL, however in some
 cases the physical resolution is important. For example the touchpad
 still sees the whole resolution and the values needs to be converted to
 the active LVGL display area. So the physical resolution and the offset
 of the active area can be set with
-:cpp:expr:`lv_disp_set_physical_res(disp, hor_res, ver_res)` and
-:cpp:expr:`lv_disp_set_offset(disp, x, y)`
+:cpp:expr:`lv_display_set_physical_resolution(disp, hor_res, ver_res)` and
+:cpp:expr:`lv_display_set_offset(disp, x, y)`
+
+Flush wait callback
+-------------------
+
+By using :cpp:expr:`lv_display_flush_ready` LVGL will spin in a loop
+while waiting for flushing.
+
+However with the help of :cpp:expr:`lv_display_set_flush_wait_cb` a custom
+wait callback be set for flushing. This callback can use a semaphore, mutex,
+or anything else to optimize while the waiting for flush.
+
+If ``flush_wait_cb`` is not set, LVGL assume that `lv_display_flush_ready`
+is used.
 
 Rotation
 --------
 
 LVGL supports rotation of the display in 90 degree increments. You can
-select whether you'd like software rotation or hardware rotation.
+select whether you would like software rotation or hardware rotation.
 
 The orientation of the display can be changed with
-``lv_disp_set_rotation(disp, LV_DISP_ROTATION_0/90/180/270, true/false)``.
+``lv_disp_set_rotation(disp, LV_DISPLAY_ROTATION_0/90/180/270)``.
 LVGL will swap the horizontal and vertical resolutions internally
-according to the set degree. If the last parameter is ``true`` LVGL will
-rotate the rendered image. If it's ``false`` the display driver should
-rotate the rendered image.
+according to the set degree. When changing the rotation
+:cpp:expr:`LV_EVENT_SIZE_CHANGED` is sent to the display to allow
+reconfiguring the hardware. In lack of hardware display rotation support
+:cpp:expr:`lv_draw_sw_rotate` can be used to rotate the buffer in the
+``flush_cb``.
 
 Color format
 ------------
 
-Set the color format of the display. The default is
-:cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` which means LVGL render with the follow
-formats depending on :c:macro:`LV_COLOR_DEPTH`:
+The default color format of the display is set according to :c:macro:`LV_COLOR_DEPTH`
+(see ``lv_conf.h``)
 
 - :c:macro:`LV_COLOR_DEPTH` ``32``: XRGB8888 (4 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``24``: RGB888 (3 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``16``: RGB565 (2 bytes/pixel)
-- :c:macro:`LV_COLOR_DEPTH` ``8``: L8 (1 bytes/pixel)
+- :c:macro:`LV_COLOR_DEPTH` ``8``: L8 (1 bytes/pixel) Not supported yet
 
 The ``color_format`` can be changed with
-:cpp:expr:`lv_disp_set_color_depth(disp, LV_COLOR_FORMAT_...)` to the following
-values:
+:cpp:expr:`lv_display_set_color_depth(display, LV_COLOR_FORMAT_...)`.
+Besides the default value :c:macro:`LV_COLOR_FORMAT_ARGB8888` can be
+used as a well.
 
-- :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`: Append an alpha byte to the native format resulting
-  in A8L8, ARGB8565, ARGB8888 formats.
-- :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_REVERSE`: Reverse the byte order of the native format. Useful if the
-  rendered image is sent to the display via SPI and
-  the display needs the bytes in the opposite order.
-- :cpp:enumerator:`LV_COLOR_FORMAT_L8`: Lightness only on 8 bit
-- :cpp:enumerator:`LV_COLOR_FORMAT_A8`: Alpha only on 8 bit
-- :cpp:enumerator:`LV_COLOR_FORMAT_I8`: Indexed (palette) 8 bit
-- :cpp:enumerator:`LV_COLOR_FORMAT_A8L8`: Lightness on 8 bit with 8 bit alpha
-- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB2222`: ARGB with 2 bit for each channel
-- :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`: 16 bit RGB565 format without alpha channel
-- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8565`: 16 bit RGB565 format and 8 bit alpha channel
-- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB1555`: 5 bit for each color channel and 1 bit for alpha
-- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB4444`: 4 bit for each channel
-- :cpp:enumerator:`LV_COLOR_FORMAT_RGB888`: 8 bit for each color channel with out alpha channel
-- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`: 8 bit for each channel
-- :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`: 8 bit for each color channel and 8 bit placeholder for the alpha channel
-
-If the color format is set to non-native ``draw_ctx->buffer_convert``
-function will be called before calling ``flush_cb`` to convert the
-native color format to the desired, therefore rendering in non-native
-formats has a negative effect on performance. Learn more about
-``draw_ctx`` `here </porting/gpu>`__.
-
-It's very important that draw buffer(s) should be large enough for both
-the native format and the target color format. For example if
-``LV_COLOR_DEPTH == 16`` and :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888` is selected
-LVGL will choose the larger to figure out how many pixel can be
-rendered at once. Therefore with :cpp:enumerator:`LV_DISP_RENDER_MODE_FULL` and the
-larger pixel size needs to be chosen.
-
-:cpp:enumerator:`LV_DISP_RENDER_MODE_DIRECT` supports only the
-:cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` format.
-
-Antialiasing
-------------
-
-:cpp:expr:`lv_disp_set_antialiasing(disp, true/false)` enables/disables the
-antialiasing (edge smoothing) on the given display.
+It's very important that draw buffer(s) should be large enough for any
+selected color format.
 
 User data
 ---------
 
-With :cpp:expr:`lv_disp_set_user_data(disp, p)` a pointer to a custom data can
+With :cpp:expr:`lv_display_set_user_data(disp, p)` a pointer to a custom data can
 be stored in display object.
-
-Events
-******
-
-:cpp:expr:`lv_disp_add_event_cb(disp, event_cb, LV_DISP_EVENT_..., user_data)` adds
-an event handler to a display. The following events are sent:
-
-- :cpp:enumerator:`LV_DISP_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw).
-  :cpp:expr:`lv_event_get_param(e)` returns a pointer to an :cpp:struct:`lv_area_t`
-  variable with the coordinates of the area to be invalidated. The area can
-  be freely modified is needed to adopt it the special requirement of the
-  display. Usually needed with monochrome displays to invalidate Nx8
-  lines at once.
-- :cpp:enumerator:`LV_DISP_EVENT_RENDER_START`: Called when rendering starts.
-- :cpp:enumerator:`LV_DISP_EVENT_RENDER_READY`: Called when rendering is ready
-- :cpp:enumerator:`LV_DISP_EVENT_RESOLUTION_CHANGED`: Called when the resolution changes due
-  to :cpp:func:`lv_disp_set_resolution` or :cpp:func:`lv_disp_set_rotation`.
-
-Other options
-*************
 
 Decoupling the display refresh timer
 ------------------------------------
@@ -245,6 +206,30 @@ select the display to refresh before :cpp:expr:`_lv_disp_refr_timer(NULL)`.
 
 If the performance monitor is enabled, the value of :c:macro:`LV_DEF_REFR_PERIOD` needs to be set to be
 consistent with the refresh period of the display to ensure that the statistical results are correct.
+
+
+Events
+******
+
+:cpp:expr:`lv_display_add_event_cb(disp, event_cb, LV_EVENT_..., user_data)` adds
+an event handler to a display. The following events are sent:
+
+- :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw).
+  :cpp:expr:`lv_event_get_param(e)` returns a pointer to an :cpp:struct:`lv_area_t`
+  variable with the coordinates of the area to be invalidated. The area can
+  be freely modified if needed to adopt it the special requirement of the
+  display. Usually needed with monochrome displays to invalidate ``N x 8``
+  rows or columns at once.
+- :cpp:enumerator:`LV_EVENT_REFR_REQUEST`: Sent when something happened that requires redraw.
+- :cpp:enumerator:`LV_EVENT_REFR_START`: Sent when a refreshing cycle starts. Sent even if there is nothing to redraw.
+- :cpp:enumerator:`LV_EVENT_REFR_READY`: Sent when refreshing is ready (after rendering and calling the ``flush_cb``). Sent even if no redraw happened.
+- :cpp:enumerator:`LV_EVENT_RENDER_START`: Sent when rendering starts.
+- :cpp:enumerator:`LV_EVENT_RENDER_READY`: Sent when rendering is ready (before calling the ``flush_cb``)
+- :cpp:enumerator:`LV_EVENT_FLUSH_START`: Sent before the ``flush_cb`` is called.
+- :cpp:enumerator:`LV_EVENT_FLUSH_READY`: Sent when the ``flush_cb`` returned.
+- :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED`: Sent when the resolution changes due
+  to :cpp:func:`lv_display_set_resolution` or :cpp:func:`lv_display_set_rotation`.
+
 
 Further reading
 ***************

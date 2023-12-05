@@ -420,7 +420,7 @@ refr_finish:
     _lv_draw_sw_mask_cleanup();
 #endif
 
-    lv_display_send_event(disp_refr, LV_EVENT_REFR_FINISH, NULL);
+    lv_display_send_event(disp_refr, LV_EVENT_REFR_READY, NULL);
 
     LV_TRACE_REFR("finished");
     LV_PROFILER_END;
@@ -1006,14 +1006,7 @@ static void draw_buf_flush(lv_display_t * disp)
     bool flushing_last = disp->flushing_last;
 
     if(disp->flush_cb) {
-        /*Rotate the buffer to the display's native orientation if necessary*/
-        if(disp->rotation != LV_DISPLAY_ROTATION_0 && disp->sw_rotate) {
-            LV_LOG_WARN("SW rotation is not supported now");
-            call_flush_cb(disp, &disp->refreshed_area, layer->buf);
-        }
-        else {
-            call_flush_cb(disp, &disp->refreshed_area, layer->buf);
-        }
+        call_flush_cb(disp, &disp->refreshed_area, layer->buf);
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
     if(lv_display_is_double_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {

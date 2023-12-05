@@ -720,13 +720,12 @@ lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, voi
     return res;
 }
 
-void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation, bool sw_rotate)
+void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     disp->rotation = rotation;
-    disp->sw_rotate = sw_rotate;
     update_resolution(disp);
 }
 

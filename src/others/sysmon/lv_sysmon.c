@@ -116,7 +116,7 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
             info->measured.refr_interval_sum += lv_tick_elaps(info->measured.refr_start);
             info->measured.refr_start = lv_tick_get();
             break;
-        case LV_EVENT_REFR_FINISH:
+        case LV_EVENT_REFR_READY:
             info->measured.refr_elaps_sum += lv_tick_elaps(info->measured.refr_start);
             info->measured.refr_cnt++;
             break;
