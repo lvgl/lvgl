@@ -73,14 +73,14 @@ lv_display_t * lv_nuttx_lcd_create(const char * dev_path)
 
     LV_ASSERT_NULL(dev_path);
 
-    LV_LOG_INFO("lcd %s opening", dev_path);
+    LV_LOG_USER("lcd %s opening", dev_path);
     fd = open(dev_path, 0);
     if(fd < 0) {
         perror("Error: cannot open lcd device");
         return NULL;
     }
 
-    LV_LOG_INFO("lcd %s open success", dev_path);
+    LV_LOG_USER("lcd %s open success", dev_path);
 
     ret = ioctl(fd, LCDDEVIO_GETVIDEOINFO,
                 (unsigned long)((uintptr_t)&vinfo));
@@ -230,7 +230,7 @@ static void display_release_cb(lv_event_t * e)
             dsc->fd = -1;
         }
         lv_free(dsc);
-        LV_LOG_INFO("Done");
+        LV_LOG_USER("Done");
     }
 }
 #endif /*LV_USE_NUTTX_LCD*/

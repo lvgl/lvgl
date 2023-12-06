@@ -62,14 +62,14 @@ lv_indev_t * lv_nuttx_touchscreen_create(const char * dev_path)
     int fd;
 
     LV_ASSERT_NULL(dev_path);
-    LV_LOG_INFO("touchscreen %s opening", dev_path);
+    LV_LOG_USER("touchscreen %s opening", dev_path);
     fd = open(dev_path, O_RDONLY | O_NONBLOCK);
     if(fd < 0) {
         perror("Error: cannot open touchscreen device");
         return NULL;
     }
 
-    LV_LOG_INFO("touchscreen %s open success", dev_path);
+    LV_LOG_USER("touchscreen %s open success", dev_path);
 
     indev = touchscreen_init(fd);
 
@@ -133,7 +133,7 @@ static void touchscreen_delete_cb(lv_event_t * e)
             touchscreen->fd = -1;
         }
         lv_free(touchscreen);
-        LV_LOG_INFO("done");
+        LV_LOG_USER("done");
     }
 }
 

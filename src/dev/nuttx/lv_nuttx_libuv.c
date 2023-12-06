@@ -112,7 +112,7 @@ void lv_nuttx_uv_deinit(void ** data)
 
     lv_free(uv_ctx);
     *data = NULL;
-    LV_LOG_INFO("Done");
+    LV_LOG_USER("Done");
 }
 
 /**********************
@@ -136,7 +136,7 @@ static void lv_nuttx_uv_timer_cb(uv_timer_t * handle)
         sleep_ms = 1;
     }
 
-    LV_LOG_TRACE("sleep_ms = %" PRIu32, sleep_ms);
+    LV_LOG_TRACE("sleep_ms = %" LV_PRIu32, sleep_ms);
     uv_timer_start(handle, lv_nuttx_uv_timer_cb, sleep_ms, 0);
 }
 
@@ -165,7 +165,7 @@ static void lv_nuttx_uv_timer_deinit(lv_nuttx_uv_ctx_t * uv_ctx)
 {
     lv_timer_handler_set_resume_cb(NULL, NULL);
     uv_close((uv_handle_t *)&uv_ctx->uv_timer, NULL);
-    LV_LOG_INFO("Done");
+    LV_LOG_USER("Done");
 }
 
 static void lv_nuttx_uv_disp_poll_cb(uv_poll_t * handle, int status, int events)
@@ -202,7 +202,7 @@ static int lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_fb_ctx_t * f
     fb_ctx->fd = (uintptr_t)lv_display_get_user_data(disp);
 
     if(fb_ctx->fd <= 0) {
-        LV_LOG_INFO("skip uv fb init.");
+        LV_LOG_USER("skip uv fb init.");
         return 0;
     }
 
@@ -220,7 +220,7 @@ static int lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_fb_ctx_t * f
     uv_poll_init(loop, &fb_ctx->fb_poll, fb_ctx->fd);
     uv_poll_start(&fb_ctx->fb_poll, UV_WRITABLE, lv_nuttx_uv_disp_poll_cb);
 
-    LV_LOG_INFO("lvgl fb loop start OK");
+    LV_LOG_USER("lvgl fb loop start OK");
 
     /* Register for the invalidate area event */
 
@@ -236,7 +236,7 @@ static void lv_nuttx_uv_fb_deinit(lv_nuttx_uv_fb_ctx_t * fb_ctx)
     if(fb_ctx->fd > 0) {
         uv_close((uv_handle_t *)&fb_ctx->fb_poll, NULL);
     }
-    LV_LOG_INFO("Done");
+    LV_LOG_USER("Done");
 }
 
 static void lv_nuttx_uv_input_poll_cb(uv_poll_t * handle, int status, int events)
@@ -259,7 +259,7 @@ static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_input_ctx
     lv_indev_t * indev = uv_info->indev;
 
     if(indev == NULL) {
-        LV_LOG_INFO("skip uv input init.");
+        LV_LOG_USER("skip uv input init.");
         return 0;
     }
 
@@ -285,7 +285,7 @@ static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_input_ctx
     uv_poll_init(loop, &input_ctx->input_poll, input_ctx->fd);
     uv_poll_start(&input_ctx->input_poll, UV_READABLE, lv_nuttx_uv_input_poll_cb);
 
-    LV_LOG_INFO("lvgl input loop start OK");
+    LV_LOG_USER("lvgl input loop start OK");
 
     return 0;
 }
@@ -295,7 +295,7 @@ static void lv_nuttx_uv_input_deinit(lv_nuttx_uv_input_ctx_t * input_ctx)
     if(input_ctx->fd > 0) {
         uv_close((uv_handle_t *)&input_ctx->input_poll, NULL);
     }
-    LV_LOG_INFO("Done");
+    LV_LOG_USER("Done");
 }
 
 #endif /*LV_USE_NUTTX_LIBUV*/
