@@ -1,5 +1,50 @@
 # Changelog
 
+## [v8.3.11](https://github.com/lvgl/lvgl/compare/v8.3.11...v8.3.10) 6 December 2023
+
+### New Features
+
+- feat(table): add user_data to table cells [`4767`](https://github.com/lvgl/lvgl/pull/4767)
+- feat(tiny_ttf): backport Tiny TTF to lvgl 8 [`4727`](https://github.com/lvgl/lvgl/pull/4727)
+- feat(littlefs): add lv_fs_littlefs system as a driver [`4677`](https://github.com/lvgl/lvgl/pull/4677)
+
+### Fixes
+
+- fix(obj): readjust scroll after layout when child removed [`4921`](https://github.com/lvgl/lvgl/pull/4921)
+- fix(rt-thread): fix create lvgl thread problem [`4862`](https://github.com/lvgl/lvgl/pull/4862)
+- fix(obj): fix arduino compile warnings [`4807`](https://github.com/lvgl/lvgl/pull/4807)
+- fix(table):fix issue with abnormal string output of 'lv_table_set_cell_value_fmt' [`4804`](https://github.com/lvgl/lvgl/pull/4804)
+- fix(table) user data API functions renamed [`4769`](https://github.com/lvgl/lvgl/pull/4769)
+- fix(ime_pinyin): keep cursor in the textarea when a candidate is pressed [`4731`](https://github.com/lvgl/lvgl/pull/4731)
+- fix(draw_needles): changed needle line draw start point from scale ce… [`4682`](https://github.com/lvgl/lvgl/pull/4682)
+- fix(arc): handle click outside background angle range (#4586) [`4667`](https://github.com/lvgl/lvgl/pull/4667)
+- fix(meter):  fix minor issues [`4657`](https://github.com/lvgl/lvgl/pull/4657)
+- fix(draw): fix compiler error in lv_draw_sw_transform.c #2 [`4612`](https://github.com/lvgl/lvgl/pull/4612)
+- fix(dropdown): avoid partial match in lv_dropdown_get_option_index [`4598`](https://github.com/lvgl/lvgl/pull/4598)
+- fix(dropdown): reset char_i = 0, avoid access overflow [`4589`](https://github.com/lvgl/lvgl/pull/4589)
+- fix(btnmatrix): set LV_BTNMATRIX_BTN_NONE when clicking of disabled button (#4571) [`4578`](https://github.com/lvgl/lvgl/pull/4578)
+- fix(qrcode): use LV_ASSERT instead of assert [`1840dec`](https://github.com/lvgl/lvgl/commit/1840decb4136ba01552fcb7cedb0ff759824e2fd)
+- fix: fix warning in lv_draw_sw_letter.c [`d22cda3`](https://github.com/lvgl/lvgl/commit/d22cda3cdb15cee95763491db95753980846d9f9)
+- fix(arc): fix setting value by click [`20b6199`](https://github.com/lvgl/lvgl/commit/20b6199ba90319942c3cd91f2c727da6cd40cd2d)
+- fix(disp): fix infinite recursive SCREEN_LOADED events [`ef76206`](https://github.com/lvgl/lvgl/commit/ef76206c75ea9de26407534a9ce1079dc8e750e3)
+- fix(keyboard): add '&' character [`d20bd1c`](https://github.com/lvgl/lvgl/commit/d20bd1ca397ff954167dd496cf1a78da8814f602)
+- fix(draw): fix scaling rectangle parts with opa [`7a8fcbf`](https://github.com/lvgl/lvgl/commit/7a8fcbfd3458739cbe64b29767a969ece9542039)
+
+### Docs
+
+- docs(obj): fix wording [`4625`](https://github.com/lvgl/lvgl/pull/4625)
+- docs(label): update text for recoloring [`4606`](https://github.com/lvgl/lvgl/pull/4606)
+- docs: fix typo [`9fbac75`](https://github.com/lvgl/lvgl/commit/9fbac7570bdec18ddbb157b59f5e26a2ebdf5daf)
+
+### Others
+
+- chore(cmsis-pack): prepare for v8.3.11 [`4936`](https://github.com/lvgl/lvgl/pull/4936)
+- chore(cmake): add support for user-specified lv_conf.h path [`4689`](https://github.com/lvgl/lvgl/pull/4689)
+- STM32U5 DMA2D support (8.3) [`4643`](https://github.com/lvgl/lvgl/pull/4643)
+- backport: fix(lv_disp): fix lv_scr_load_anim being called twice quickly [`4629`](https://github.com/lvgl/lvgl/pull/4629)
+- chore(lv_draw_sw_letter.c): Fix print format [`4615`](https://github.com/lvgl/lvgl/pull/4615)
+- chore: fix compile error [`7568df7`](https://github.com/lvgl/lvgl/commit/7568df77d16ecbf2242b2bc290dc8fc0eb29cf5a)
+
 ## [v8.3.10](https://github.com/lvgl/lvgl/compare/v8.3.10...v8.3.9) 20 September 2023
 
 ### New Features
