@@ -36,10 +36,17 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-09-19" version="8.3.10" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.10.pack">
+    <release date="2023-12-05" version="8.3.11" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.11.pack">
+      - LVGL 8.3.11
+      - Add LittleFS Library to LVGL8
+      - Backport Tiny TTF to LVGL8
+      - Some minor fixes
+    </release>
+    <release date="2023-09-19" version="8.3.10" url="https://github.com/lvgl/lvgl/raw/9e388055ec0bcad5179461e66d6dac6823129eee/env_support/cmsis-pack/LVGL.lvgl.8.3.10.pack">
       - LVGL 8.3.10
       - Some minor fixes
     </release>
+    
     <release date="2023-08-04" version="8.3.9" url="https://github.com/lvgl/lvgl/raw/bdf5bfb88ce107f16cf9128cf75e61394b3219d0/env_support/cmsis-pack/LVGL.lvgl.8.3.9.pack">
       - LVGL 8.3.10
       - Add snapshot, fragment, imgfont, gridnav, msg and monkey
@@ -303,7 +310,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.10">
+        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.11">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="lvgl" Csub="Essential" >
@@ -436,7 +443,7 @@
                 <file category="sourceC"            name="src/widgets/lv_textarea.c" />
 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.3" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.4" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -721,9 +728,26 @@
                 <file category="sourceC"            name="src/extra/libs/fsdrv/lv_fs_fatfs.c" />
                 <file category="sourceC"            name="src/extra/libs/fsdrv/lv_fs_posix.c" />
                 <file category="sourceC"            name="src/extra/libs/fsdrv/lv_fs_stdio.c" />
+                <file category="sourceC"            name="src/extra/libs/fsdrv/lv_fs_littlefs.c" />
               </files>
 
             </component>
+            
+            <component Cgroup="lvgl" Csub="Libs Tiny TTF"  condition="LVGL-Essential">
+              <description>Add Tiny TTF Library</description>
+              <files>
+                <!-- src/extra/libs/tiny_ttf -->
+                <file category="sourceC"            name="src/extra/libs/tiny_ttf/lv_tiny_ttf.c" />
+              </files>
+              
+              <RTE_Components_h>
+
+/*! \brief enable Tiny TTF Library */
+#define LV_USE_TINY_TTF         1
+              </RTE_Components_h>
+              
+            </component>
+
 
             <component Cgroup="lvgl" Csub="Libs RLOTTIE"  condition="LVGL-Essential">
               <description>Add RLOTTIE support, an extra librbary is required.</description>
@@ -735,7 +759,7 @@
               <RTE_Components_h>
 
 /*! \brief enable RLOTTIE support */
-#define LV_USE_RLOTTIE         1
+#define LV_USE_RLOTTIE          1
               </RTE_Components_h>
 
             </component>
@@ -750,7 +774,7 @@
               <RTE_Components_h>
 
 /*! \brief enable ffmpeg support */
-#define LV_USE_FFMPEG         1
+#define LV_USE_FFMPEG           1
               </RTE_Components_h>
 
             </component>
@@ -765,7 +789,7 @@
               <RTE_Components_h>
 
 /*! \brief enable ffmpeg support */
-#define LV_USE_IME_PINYIN         1
+#define LV_USE_IME_PINYIN       1
               </RTE_Components_h>
 
             </component>
@@ -811,7 +835,7 @@
               <RTE_Components_h>
 
 /*! \brief enable the Grid Navigation support*/
-#define LV_USE_GRIDNAV         1
+#define LV_USE_GRIDNAV          1
               </RTE_Components_h>
 
             </component>
@@ -826,7 +850,7 @@
               <RTE_Components_h>
 
 /*! \brief enable the image font support*/
-#define LV_USE_IMGFONT         1
+#define LV_USE_IMGFONT          1
               </RTE_Components_h>
 
             </component>
@@ -841,7 +865,7 @@
               <RTE_Components_h>
 
 /*! \brief enable the monkey service support*/
-#define LV_USE_MONKEY         1
+#define LV_USE_MONKEY           1
               </RTE_Components_h>
 
             </component>
@@ -856,7 +880,7 @@
               <RTE_Components_h>
 
 /*! \brief enable the message service support*/
-#define LV_USE_MSG         1
+#define LV_USE_MSG              1
               </RTE_Components_h>
 
             </component>
@@ -885,7 +909,7 @@
               <RTE_Components_h>
 
 /*! \brief enable demo:bencharmk */
-#define LV_USE_DEMO_BENCHMARK         1
+#define LV_USE_DEMO_BENCHMARK    1
               </RTE_Components_h>
 
             </component>
@@ -905,7 +929,7 @@
               <RTE_Components_h>
 
 /*! \brief enable demo:widgets support */
-#define LV_USE_DEMO_WIDGETS         1
+#define LV_USE_DEMO_WIDGETS     1
               </RTE_Components_h>
 
             </component>
