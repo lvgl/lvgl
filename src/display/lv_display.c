@@ -567,9 +567,7 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
-
         scr_load_internal(new_scr);
-        d->scr_to_load = NULL;
         if(auto_del) lv_obj_delete(act_scr);
         return;
     }
@@ -905,6 +903,7 @@ static void scr_load_internal(lv_obj_t * scr)
     if(d->act_scr) lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
 
     d->act_scr = scr;
+    d->scr_to_load = NULL;
 
     if(d->act_scr) lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
     if(d->act_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
