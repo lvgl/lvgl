@@ -69,6 +69,7 @@ void test_image_built_in_decode(void)
 
 void test_image_built_in_decode_rotate(void)
 {
+#if LV_BIN_DECODER_RAM_LOAD
     LV_IMAGE_DECLARE(test_image_cogwheel_i4);
     LV_IMAGE_DECLARE(test_image_cogwheel_a8);
     LV_IMAGE_DECLARE(test_image_cogwheel_rgb565);
@@ -95,6 +96,7 @@ void test_image_built_in_decode_rotate(void)
     img_create("binARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.bin", true, false);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rotated.png");
+#endif
 }
 
 void test_image_built_in_decode_recolor(void)
@@ -129,6 +131,7 @@ void test_image_built_in_decode_recolor(void)
 
 void test_image_built_in_decode_rotate_and_recolor(void)
 {
+#if LV_BIN_DECODER_RAM_LOAD
     LV_IMAGE_DECLARE(test_image_cogwheel_i4);
     LV_IMAGE_DECLARE(test_image_cogwheel_a8);
     LV_IMAGE_DECLARE(test_image_cogwheel_rgb565);
@@ -155,11 +158,12 @@ void test_image_built_in_decode_rotate_and_recolor(void)
     img_create("binARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.bin", true, true);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rotate_and_recolor.png");
+#endif
 }
 
 void test_image_rle_compressed_decode(void)
 {
-#if LV_USE_RLE
+#if LV_USE_RLE && LV_BIN_DECODER_RAM_LOAD
     img_create("rleA1", "A:src/test_files/rle_compressed/cogwheel.A1.bin", false, false);
     img_create("rleA2", "A:src/test_files/rle_compressed/cogwheel.A2.bin", false, false);
     img_create("rleA4", "A:src/test_files/rle_compressed/cogwheel.A4.bin", false, false);
@@ -180,7 +184,7 @@ void test_image_rle_compressed_decode(void)
 
 void test_image_rle_compressed_decode_rotate(void)
 {
-#if LV_USE_RLE
+#if LV_USE_RLE && LV_BIN_DECODER_RAM_LOAD
     img_create("rleA1", "A:src/test_files/rle_compressed/cogwheel.A1.bin", true, false);
     img_create("rleA2", "A:src/test_files/rle_compressed/cogwheel.A2.bin", true, false);
     img_create("rleA4", "A:src/test_files/rle_compressed/cogwheel.A4.bin", true, false);
@@ -201,7 +205,7 @@ void test_image_rle_compressed_decode_rotate(void)
 
 void test_image_rle_compressed_decode_rotate_recolor(void)
 {
-#if LV_USE_RLE
+#if LV_USE_RLE && LV_BIN_DECODER_RAM_LOAD
     img_create("rleA1", "A:src/test_files/rle_compressed/cogwheel.A1.bin", true, true);
     img_create("rleA2", "A:src/test_files/rle_compressed/cogwheel.A2.bin", true, true);
     img_create("rleA4", "A:src/test_files/rle_compressed/cogwheel.A4.bin", true, true);
@@ -222,7 +226,7 @@ void test_image_rle_compressed_decode_rotate_recolor(void)
 
 void test_image_lz4_compressed_decode(void)
 {
-#if LV_USE_LZ4
+#if LV_USE_LZ4 && LV_BIN_DECODER_RAM_LOAD
     img_create("lz4A1", "A:src/test_files/lz4_compressed/cogwheel.A1.bin", false, false);
     img_create("lz4A2", "A:src/test_files/lz4_compressed/cogwheel.A2.bin", false, false);
     img_create("lz4A4", "A:src/test_files/lz4_compressed/cogwheel.A4.bin", false, false);
@@ -243,7 +247,7 @@ void test_image_lz4_compressed_decode(void)
 
 void test_image_lz4_compressed_decode_rotate(void)
 {
-#if LV_USE_LZ4
+#if LV_USE_LZ4 && LV_BIN_DECODER_RAM_LOAD
     img_create("lz4A1", "A:src/test_files/lz4_compressed/cogwheel.A1.bin", true, false);
     img_create("lz4A2", "A:src/test_files/lz4_compressed/cogwheel.A2.bin", true, false);
     img_create("lz4A4", "A:src/test_files/lz4_compressed/cogwheel.A4.bin", true, false);
@@ -264,7 +268,7 @@ void test_image_lz4_compressed_decode_rotate(void)
 
 void test_image_lz4_compressed_decode_rotate_recolor(void)
 {
-#if LV_USE_LZ4
+#if LV_USE_LZ4 && LV_BIN_DECODER_RAM_LOAD
     img_create("lz4A1", "A:src/test_files/lz4_compressed/cogwheel.A1.bin", true, true);
     img_create("lz4A2", "A:src/test_files/lz4_compressed/cogwheel.A2.bin", true, true);
     img_create("lz4A4", "A:src/test_files/lz4_compressed/cogwheel.A4.bin", true, true);
