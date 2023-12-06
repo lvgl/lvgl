@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v8.3.10
+ * Configuration file for v8.3.11
  */
 
 /* clang-format off */
@@ -76,6 +76,7 @@
 /*Input device read period in milliseconds*/
 #define LV_INDEV_DEF_READ_PERIOD 30     /*[ms]*/
 
+
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
 #ifdef __PERF_COUNTER__
@@ -90,11 +91,12 @@
     #if LV_TICK_CUSTOM
         #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
         #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-        /*If using lvgl as ESP32 component*/
-        // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-        // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
+    /*If using lvgl as ESP32 component*/
+    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
+    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
     #endif   /*LV_TICK_CUSTOM*/
 #endif       /*__PERF_COUNTER__*/
+
 
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
@@ -178,11 +180,19 @@
  * GPU
  *-----------*/
 
+
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
 #if LV_USE_GPU_STM32_DMA2D
     /*Must be defined to include path of CMSIS header of target processor
     e.g. "stm32f7xx.h" or "stm32f4xx.h"*/
     #define LV_GPU_DMA2D_CMSIS_INCLUDE
+#endif
+
+/*Enable RA6M3 G2D GPU*/
+#if LV_USE_GPU_RA6M3_G2D
+    /*include path of target processor
+    e.g. "hal_data.h"*/
+    #define LV_GPU_RA6M3_G2D_INCLUDE "hal_data.h"
 #endif
 
 /*Use SWM341's DMA2D GPU*/
@@ -200,22 +210,6 @@
     #define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
 #endif
 
-#if LV_USE_GPU_RA6M3_G2D
-    /*include path of target processor
-    e.g. "hal_data.h"*/
-    #define LV_GPU_RA6M3_G2D_INCLUDE "hal_data.h"
-#endif
-
-/*Use SDL renderer API*/
-#define LV_USE_GPU_SDL 0
-#if LV_USE_GPU_SDL
-    #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
-    /*Texture cache size, 8MB by default*/
-    #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
-    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
-    #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
-#endif
-
 /*-------------
  * Logging
  *-----------*/
@@ -231,11 +225,11 @@
     *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
     *LV_LOG_LEVEL_USER        Only logs added by the user
     *LV_LOG_LEVEL_NONE        Do not log anything*/
-    #define LV_LOG_LEVEL LV_LOG_LEVEL_USER
+    #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
 
     /*1: Print the log with 'printf';
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
-    #define LV_LOG_PRINTF 1
+    #define LV_LOG_PRINTF 0
 
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #define LV_LOG_TRACE_MEM        1
@@ -588,7 +582,6 @@
     #define LV_USE_THEME_BASIC      0
     #define LV_USE_THEME_MONO       0
 #endif
-
 /*-----------
  * Layouts
  *----------*/
@@ -599,27 +592,85 @@
 /*A layout similar to Grid in CSS.*/
 #define LV_USE_GRID 1
 
+/*---------------------
+ * 3rd party libraries
+ *--------------------*/
+
+/*File system interfaces for common APIs */
+
+/*API for fopen, fread, etc*/
+#define LV_USE_FS_STDIO 0
+#if LV_USE_FS_STDIO
+    #define LV_FS_STDIO_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_STDIO_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+    #define LV_FS_STDIO_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+/*API for open, read, etc*/
+#define LV_USE_FS_POSIX 0
+#if LV_USE_FS_POSIX
+    #define LV_FS_POSIX_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_POSIX_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+    #define LV_FS_POSIX_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+/*API for CreateFile, ReadFile, etc*/
+#define LV_USE_FS_WIN32 0
+#if LV_USE_FS_WIN32
+    #define LV_FS_WIN32_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_WIN32_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+    #define LV_FS_WIN32_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+/*API for FATFS (needs to be added separately). Uses f_open, f_read, etc*/
+#define LV_USE_FS_FATFS 0
+#if LV_USE_FS_FATFS
+    #define LV_FS_FATFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+/*API for LittleFS (library needs to be added separately). Uses lfs_file_open, lfs_file_read, etc*/
+#define LV_USE_FS_LITTLEFS 0
+#if LV_USE_FS_LITTLEFS
+    #define LV_FS_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_LITTLEFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+
+
+/*FreeType library*/
+#if LV_USE_FREETYPE
+    /*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
+    #define LV_FREETYPE_CACHE_SIZE (16 * 1024)
+    #if LV_FREETYPE_CACHE_SIZE >= 0
+        /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
+        /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
+        /* if font size >= 256, must be configured as image cache */
+        #define LV_FREETYPE_SBIT_CACHE 0
+        /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
+        /* (0:use system defaults) */
+        #define LV_FREETYPE_CACHE_FT_FACES 0
+        #define LV_FREETYPE_CACHE_FT_SIZES 0
+    #endif
+#endif
+
+/*Tiny TTF library*/
+#if LV_USE_TINY_TTF
+    /*Load TTF data from files*/
+    #define LV_TINY_TTF_FILE_SUPPORT 0
+#endif
+
+
+/*FFmpeg library for image decoding and playing videos
+ *Supports all major image formats so do not enable other image decoder with it*/
+#if LV_USE_FFMPEG
+    /*Dump input information to stderr*/
+    #define LV_FFMPEG_DUMP_FORMAT 0
+#endif
+
 /*-----------
  * Others
  *----------*/
-
-/*1: Enable API to take snapshot for object*/
-#define LV_USE_SNAPSHOT 0
-
-/*1: Enable Monkey test*/
-#define LV_USE_MONKEY 0
-
-/*1: Enable grid navigation*/
-#define LV_USE_GRIDNAV 0
-
-/*1: Enable lv_obj fragment*/
-#define LV_USE_FRAGMENT 0
-
-/*1: Support using images as font in label or span widgets */
-#define LV_USE_IMGFONT 0
-
-/*1: Enable a published subscriber based messaging system */
-#define LV_USE_MSG 0
 
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
@@ -645,6 +696,20 @@
 /*Enable the examples to be built with the library*/
 #define LV_BUILD_EXAMPLES 1
 
+/*===================
+ * DEMO USAGE
+ ====================*/
+
+/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
+#if LV_USE_DEMO_WIDGETS
+    #define LV_DEMO_WIDGETS_SLIDESHOW 0
+#endif
+
+/*Benchmark your system*/
+#if LV_USE_DEMO_BENCHMARK
+/*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+    #define LV_DEMO_BENCHMARK_RGB565A8 1
+#endif
 
 /*--END OF LV_CONF_H--*/
 
