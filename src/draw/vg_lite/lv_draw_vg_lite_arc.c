@@ -68,18 +68,14 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
 
     float start_angle = dsc->start_angle;
     float end_angle = dsc->end_angle;
-
-    while(start_angle > 360) {
-        start_angle -= 360;
-    }
-
-    while(end_angle > 360) {
-        end_angle -= 360;
-    }
-
     float sweep_angle = end_angle - start_angle;
-    if(sweep_angle < 0) {
+
+    while(sweep_angle < 0) {
         sweep_angle += 360;
+    }
+
+    while(sweep_angle > 360) {
+        sweep_angle -= 360;
     }
 
     /*If the angles are the same then there is nothing to draw*/
@@ -135,11 +131,12 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
                                    -sweep_angle,
                                    false);
 
-        /* line to radius_out */
+        /* close arc */
         lv_vg_lite_path_line_to(path, start_x, start_y);
+        lv_vg_lite_path_close(path);
 
         /* draw round */
-        if(dsc->rounded && !math_zero(half_width)) {
+        if(dsc->rounded && half_width > 0) {
             float rcx1 = cx + radius_center * MATH_COSF(end_angle_rad);
             float rcy1 = cy + radius_center * MATH_SINF(end_angle_rad);
             lv_vg_lite_path_append_circle(path, rcx1, rcy1, half_width, half_width);
@@ -148,9 +145,6 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
             float rcy2 = cy + radius_center * MATH_SINF(start_angle_rad);
             lv_vg_lite_path_append_circle(path, rcx2, rcy2, half_width, half_width);
         }
-
-        /* close arc */
-        lv_vg_lite_path_close(path);
     }
 
     lv_vg_lite_path_end(path);
@@ -173,6 +167,28 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
                                &matrix,
                                VG_LITE_BLEND_SRC_OVER,
                                color));
+
+    if(dsc->img_src) {
+        vg_lite_buffer_t src_buf;
+        lv_image_decoder_dsc_t decoder_dsc;
+        if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src)) {
+            vg_lite_matrix_t path_matrix;
+            vg_lite_identity(&path_matrix);
+            LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
+                                       &u->target_buffer,
+                                       vg_lite_path,
+                                       fill,
+                                       &path_matrix,
+                                       &src_buf,
+                                       &matrix,
+                                       VG_LITE_BLEND_SRC_OVER,
+                                       VG_LITE_PATTERN_COLOR,
+                                       0,
+                                       color,
+                                       VG_LITE_FILTER_BI_LINEAR));
+            lv_image_decoder_close(&decoder_dsc);
+        }
+    }
 
     lv_vg_lite_path_drop(u, path);
 }

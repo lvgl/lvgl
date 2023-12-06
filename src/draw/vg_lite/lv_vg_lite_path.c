@@ -13,6 +13,7 @@
 
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_math.h"
+#include <float.h>
 
 /*********************
  *      DEFINES
@@ -26,6 +27,10 @@
 
 #define SIGN(x) (math_zero(x) ? 0 : ((x) > 0 ? 1 : -1))
 
+#define VLC_OP_ARG_LEN(OP, LEN) \
+    case VLC_OP_##OP:           \
+    return (LEN)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -38,12 +43,16 @@ struct _lv_vg_lite_path_t {
 
 typedef struct _lv_vg_lite_path_t * lv_vg_lite_path_ref_t;
 
+typedef struct {
+    float min_x;
+    float min_y;
+    float max_x;
+    float max_y;
+} lv_vg_lite_path_bounds_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_vg_lite_path_t * path_create(vg_lite_format_t data_format);
-static void path_destroy(lv_vg_lite_path_t * path);
-static float arc_get_angle(float ux, float uy, float vx, float vy);
 
 /**********************
  *  STATIC VARIABLES
@@ -71,10 +80,36 @@ void lv_vg_lite_path_deinit(struct _lv_draw_vg_lite_unit_t * unit)
     lv_vg_lite_path_ref_t * path_ref;
 
     _LV_LL_READ(ll_p, path_ref) {
-        path_destroy(*path_ref);
+        lv_vg_lite_path_destroy(*path_ref);
     }
 
     _lv_ll_clear(ll_p);
+}
+
+lv_vg_lite_path_t * lv_vg_lite_path_create(vg_lite_format_t data_format)
+{
+    lv_vg_lite_path_t * path = lv_malloc_zeroed(sizeof(lv_vg_lite_path_t));
+    LV_ASSERT_MALLOC(path);
+    path->format_len = lv_vg_lite_path_format_len(data_format);
+    LV_ASSERT(vg_lite_init_path(
+                  &path->base,
+                  data_format,
+                  VG_LITE_MEDIUM,
+                  0,
+                  NULL,
+                  0, 0, 0, 0)
+              == VG_LITE_SUCCESS);
+    return path;
+}
+
+void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path)
+{
+    LV_ASSERT_NULL(path);
+    if(path->base.path != NULL) {
+        lv_free(path->base.path);
+        path->base.path = NULL;
+    }
+    lv_free(path);
 }
 
 lv_vg_lite_path_t * lv_vg_lite_path_get(struct _lv_draw_vg_lite_unit_t * unit, vg_lite_format_t data_format)
@@ -96,7 +131,7 @@ lv_vg_lite_path_t * lv_vg_lite_path_get(struct _lv_draw_vg_lite_unit_t * unit, v
         return path;
     }
 
-    return path_create(data_format);
+    return lv_vg_lite_path_create(data_format);
 }
 
 void lv_vg_lite_path_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * path)
@@ -112,7 +147,7 @@ void lv_vg_lite_path_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path
     uint32_t len = _lv_ll_get_len(ll_p);
     if(len >= PATH_MAX_CNT) {
         lv_vg_lite_path_ref_t * tail = _lv_ll_get_tail(ll_p);
-        path_destroy(*tail);
+        lv_vg_lite_path_destroy(*tail);
         _lv_ll_remove(ll_p, tail);
         lv_free(tail);
     }
@@ -154,6 +189,70 @@ void lv_vg_lite_path_set_bonding_box_area(lv_vg_lite_path_t * path, const lv_are
     LV_ASSERT_NULL(path);
     LV_ASSERT_NULL(area);
     lv_vg_lite_path_set_bonding_box(path, area->x1, area->y1, area->x2 + 1, area->y2 + 1);
+}
+
+void lv_vg_lite_path_get_bonding_box(lv_vg_lite_path_t * path,
+                                     float * min_x, float * min_y,
+                                     float * max_x, float * max_y)
+{
+    LV_ASSERT_NULL(path);
+    if(min_x) *min_x = path->base.bounding_box[0];
+    if(min_y) *min_y = path->base.bounding_box[1];
+    if(max_x) *max_x = path->base.bounding_box[2];
+    if(max_y) *max_y = path->base.bounding_box[3];
+}
+
+static void path_bounds_iter_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len)
+{
+    if(len == 0) {
+        return;
+    }
+
+    typedef struct {
+        float x;
+        float y;
+    } point_t;
+
+    const int pt_len = sizeof(point_t) / sizeof(float);
+
+    LV_ASSERT(len % pt_len == 0);
+
+    const point_t * pt = (point_t *)data;
+    len /= pt_len;
+
+    lv_vg_lite_path_bounds_t * bounds = user_data;
+
+    for(uint32_t i = 0; i < len; i++) {
+        if(pt[i].x < bounds->min_x) bounds->min_x = pt[i].x;
+        if(pt[i].y < bounds->min_y) bounds->min_y = pt[i].y;
+        if(pt[i].x > bounds->max_x) bounds->max_x = pt[i].x;
+        if(pt[i].y > bounds->max_y) bounds->max_y = pt[i].y;
+    }
+}
+
+bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path)
+{
+    LV_ASSERT_NULL(path);
+
+    if(!path->format_len) {
+        return false;
+    }
+
+    lv_vg_lite_path_bounds_t bounds;
+
+    /* init bounds */
+    bounds.min_x = __FLT_MAX__;
+    bounds.min_y = __FLT_MAX__;
+    bounds.max_x = __FLT_MIN__;
+    bounds.max_y = __FLT_MIN__;
+
+    /* calc bounds */
+    lv_vg_lite_path_for_each_data(lv_vg_lite_path_get_path(path), path_bounds_iter_cb, &bounds);
+
+    /* set bounds */
+    lv_vg_lite_path_set_bonding_box(path, bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y);
+
+    return true;
 }
 
 void lv_vg_lite_path_set_quality(lv_vg_lite_path_t * path, vg_lite_quality_t quality)
@@ -331,103 +430,6 @@ void lv_vg_lite_path_append_arc_right_angle(lv_vg_lite_path_t * path,
                              end_x, end_y);
 }
 
-void lv_vg_lite_path_append_arc_acute_angle(lv_vg_lite_path_t * path,
-                                            float start_x, float start_y,
-                                            float center_x, float center_y,
-                                            float end_x, float end_y)
-{
-    float dx1 = center_x - start_x;
-    float dy1 = center_y - start_y;
-    float dx2 = end_x - center_x;
-    float dy2 = end_y - center_y;
-
-    float theta = arc_get_angle(dx1, dy1, dx2, dy2);
-    float c = 1.3333333f * MATH_TANF(theta * 0.25f);
-    lv_vg_lite_path_cubic_to(path,
-                             start_x - c * dy1, start_y + c * dx1,
-                             end_x - c * dy2, end_y + c * dx2,
-                             end_x, end_y);
-
-}
-
-void lv_vg_lite_path_append_arc_round(lv_vg_lite_path_t * path,
-                                      float cx, float cy,
-                                      float start_angle, float end_angle,
-                                      float radius,
-                                      float width,
-                                      bool rounded)
-{
-    float angle = end_angle - start_angle;
-
-    if(math_zero(angle)) {
-        lv_vg_lite_path_append_arc_right_angle(
-            path,
-            cx + radius, cy,
-            cx, cy,
-            cx, cy + radius);
-        lv_vg_lite_path_append_arc_right_angle(
-            path,
-            cx, cy + radius,
-            cx, cy,
-            cx - radius, cy);
-        lv_vg_lite_path_append_arc_right_angle(
-            path,
-            cx - radius, cy,
-            cx, cy,
-            cx, cy - radius);
-        lv_vg_lite_path_append_arc_right_angle(
-            path,
-            cx, cy - radius,
-            cx, cy,
-            cx + radius, cy);
-        lv_vg_lite_path_close(path);
-
-        if(width - radius < 0) {
-            float inner_radius = radius - width;
-            lv_vg_lite_path_append_arc_right_angle(
-                path,
-                cx + inner_radius, cy,
-                cx, cy,
-                cx, cy + inner_radius);
-            lv_vg_lite_path_append_arc_right_angle(
-                path,
-                cx, cy + inner_radius,
-                cx, cy,
-                cx - inner_radius, cy);
-            lv_vg_lite_path_append_arc_right_angle(
-                path,
-                cx - inner_radius, cy,
-                cx, cy,
-                cx, cy - inner_radius);
-            lv_vg_lite_path_append_arc_right_angle(
-                path,
-                cx, cy - inner_radius,
-                cx, cy,
-                cx + inner_radius, cy);
-            lv_vg_lite_path_close(path);
-        }
-        return;
-    }
-
-    float st_sin = MATH_SINF(start_angle);
-    float st_cos = MATH_COSF(start_angle);
-    float ed_sin = MATH_SINF(end_angle);
-    float ed_cos = MATH_COSF(end_angle);
-
-    width = LV_MIN(width, radius);
-    // float half_width = width / 2;
-    if(rounded) {
-        lv_vg_lite_path_append_arc_right_angle(
-            path,
-            cx + radius * st_cos, cy + radius * st_sin,
-            cx, cy,
-            cx + radius * ed_cos, cy + radius * ed_sin);
-    }
-    else {
-        lv_vg_lite_path_line_to(path, cx + ed_sin * radius, cy - ed_cos * radius);
-    }
-}
-
 void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
                                 float cx, float cy,
                                 float radius,
@@ -499,43 +501,106 @@ void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
     }
 }
 
+uint8_t lv_vg_lite_vlc_op_arg_len(uint8_t vlc_op)
+{
+    switch(vlc_op) {
+            VLC_OP_ARG_LEN(END, 0);
+            VLC_OP_ARG_LEN(CLOSE, 0);
+            VLC_OP_ARG_LEN(MOVE, 2);
+            VLC_OP_ARG_LEN(MOVE_REL, 2);
+            VLC_OP_ARG_LEN(LINE, 2);
+            VLC_OP_ARG_LEN(LINE_REL, 2);
+            VLC_OP_ARG_LEN(QUAD, 4);
+            VLC_OP_ARG_LEN(QUAD_REL, 4);
+            VLC_OP_ARG_LEN(CUBIC, 6);
+            VLC_OP_ARG_LEN(CUBIC_REL, 6);
+            VLC_OP_ARG_LEN(SCCWARC, 5);
+            VLC_OP_ARG_LEN(SCCWARC_REL, 5);
+            VLC_OP_ARG_LEN(SCWARC, 5);
+            VLC_OP_ARG_LEN(SCWARC_REL, 5);
+            VLC_OP_ARG_LEN(LCCWARC, 5);
+            VLC_OP_ARG_LEN(LCCWARC_REL, 5);
+            VLC_OP_ARG_LEN(LCWARC, 5);
+            VLC_OP_ARG_LEN(LCWARC_REL, 5);
+        default:
+            break;
+    }
+
+    LV_LOG_ERROR("UNKNOW_VLC_OP: 0x%x", vlc_op);
+    LV_ASSERT(false);
+    return 0;
+}
+
+uint8_t lv_vg_lite_path_format_len(vg_lite_format_t format)
+{
+    switch(format) {
+        case VG_LITE_S8:
+            return 1;
+        case VG_LITE_S16:
+            return 2;
+        case VG_LITE_S32:
+            return 4;
+        case VG_LITE_FP32:
+            return 4;
+        default:
+            break;
+    }
+
+    LV_LOG_ERROR("UNKNOW_FORMAT: %d", format);
+    LV_ASSERT(false);
+    return 0;
+}
+
+void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_iter_cb_t cb, void * user_data)
+{
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(cb);
+
+    uint8_t fmt_len = lv_vg_lite_path_format_len(path->format);
+    uint8_t * cur = path->path;
+    uint8_t * end = cur + path->path_length;
+    float tmp_data[8];
+
+    while(cur < end) {
+        /* get op code */
+        uint8_t op_code = VLC_GET_OP_CODE(cur);
+
+        /* get arguments length */
+        uint8_t arg_len = lv_vg_lite_vlc_op_arg_len(op_code);
+
+        /* skip op code */
+        cur += fmt_len;
+
+        /* print arguments */
+        for(uint8_t i = 0; i < arg_len; i++) {
+            switch(path->format) {
+                case VG_LITE_S8:
+                    tmp_data[i] = *((int8_t *)cur);
+                    break;
+                case VG_LITE_S16:
+                    tmp_data[i] = *((int16_t *)cur);
+                    break;
+                case VG_LITE_S32:
+                    tmp_data[i] = *((int32_t *)cur);
+                    break;
+                case VG_LITE_FP32:
+                    tmp_data[i] = *((float *)cur);
+                    break;
+                default:
+                    LV_LOG_ERROR("UNKNOW_FORMAT(%d)", path->format);
+                    LV_ASSERT(false);
+                    break;
+            }
+
+            cur += fmt_len;
+        }
+
+        cb(user_data, op_code, tmp_data, arg_len);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static lv_vg_lite_path_t * path_create(vg_lite_format_t data_format)
-{
-    lv_vg_lite_path_t * path = lv_malloc(sizeof(lv_vg_lite_path_t));
-    LV_ASSERT_MALLOC(path);
-    lv_memzero(path, sizeof(lv_vg_lite_path_t));
-    path->format_len = lv_vg_lite_path_format_len(data_format);
-    LV_ASSERT(vg_lite_init_path(
-                  &path->base,
-                  data_format,
-                  VG_LITE_MEDIUM,
-                  0,
-                  NULL,
-                  0, 0, 0, 0)
-              == VG_LITE_SUCCESS);
-    return path;
-}
-
-static void path_destroy(lv_vg_lite_path_t * path)
-{
-    LV_ASSERT_NULL(path);
-    if(path->base.path != NULL) {
-        lv_free(path->base.path);
-        path->base.path = NULL;
-    }
-    lv_free(path);
-}
-
-static float arc_get_angle(float ux, float uy, float vx, float vy)
-{
-    float det = ux * vy - uy * vx;
-    float norm2 = (ux * ux + uy * uy) * (vx * vx + vy * vy);
-    float angle = MATH_ASINF(det * math_fast_inv_sqrtf(norm2));
-    return angle;
-}
 
 #endif /*LV_USE_DRAW_VG_LITE*/

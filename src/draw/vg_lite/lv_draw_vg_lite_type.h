@@ -36,6 +36,7 @@ typedef struct _lv_draw_vg_lite_unit_t {
     vg_lite_matrix_t global_matrix;
     lv_ll_t path_free_ll;
     int path_max_cnt;
+    const lv_font_t * cur_font;
 } lv_draw_vg_lite_unit_t;
 
 /**********************
