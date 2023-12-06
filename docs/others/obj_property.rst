@@ -71,4 +71,4 @@ all properties to an array now and set properties with a for loop.
         { .id = LV_STYLE_BG_COLOR, .color = (lv_color_t){.red = 0x11, .green = 0x22, .blue = 0x33}, },
     }
 
-    LV_OBJ_PROPERTY_ARRAY_SET(obj, props);
+    LV_OBJ_SET_PROPERTY_ARRAY(obj, props);
