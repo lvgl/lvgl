@@ -78,6 +78,7 @@ void lv_example_scale_3(void)
 
     lv_scale_set_round_props(scale_img, 270, 135);
 
+    /* image must point to the right. E.g. -O------>*/
     needle_img = lv_img_create(scale_img);
     lv_image_set_src(needle_img, &img_hand);
     lv_obj_align(needle_img, LV_ALIGN_CENTER, 47, -2);

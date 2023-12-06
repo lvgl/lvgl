@@ -182,7 +182,8 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
                                     int32_t value);
 
 /**
- * Point the needle to the corresponding value through the image
+ * Point the needle to the corresponding value through the image,
+   image must point to the right. E.g. -O------>
  * @param obj              pointer to a scale object
  * @param needle_img       needle_img of the scale
  * @param value            needle to point to the corresponding value
