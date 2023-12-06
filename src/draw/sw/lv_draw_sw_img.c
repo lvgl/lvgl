@@ -222,8 +222,8 @@ static void img_draw_tiled(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t
     lv_area_t tile_area = *coords;
     int32_t tile_x_start = tile_area.x1;
 
-    while(tile_area.y1 < draw_unit->clip_area->y2) {
-        while(tile_area.x1 < draw_unit->clip_area->x2) {
+    while(tile_area.y1 <= draw_unit->clip_area->y2) {
+        while(tile_area.x1 <= draw_unit->clip_area->x2) {
 
             lv_area_t clipped_img_area;
             if(_lv_area_intersect(&clipped_img_area, &tile_area, draw_unit->clip_area)) {
