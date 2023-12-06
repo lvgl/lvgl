@@ -2089,7 +2089,7 @@
     #endif
 #endif
 
-/*RLE decoder library*/
+/*RLE decompress library*/
 #ifndef LV_USE_RLE
     #ifdef CONFIG_LV_USE_RLE
         #define LV_USE_RLE CONFIG_LV_USE_RLE

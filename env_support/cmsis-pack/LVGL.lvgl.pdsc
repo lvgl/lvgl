@@ -785,14 +785,14 @@
             </component>
 
             <component Cgroup="lvgl" Csub="Libs RLE"  condition="LVGL-Essential">
-              <description>Add RLE compressed bin image decoder support</description>
+              <description>Add LVGL's version of RLE compression method support</description>
               <files>
                 <!-- src/libs/rle -->
-                <file category="sourceC"    name="src/libs/rle/lv_rle_decoder.c" />
+                <file category="sourceC"    name="src/libs/rle/lv_rle.c" />
               </files>
 
               <RTE_Components_h>
-/*! \brief enable RLE compressed bin image decoder support */
+/*! \brief LVGL's version of RLE compression method support */
 #define LV_USE_RLE          1
               </RTE_Components_h>
             </component>

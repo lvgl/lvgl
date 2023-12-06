@@ -268,10 +268,6 @@ void lv_init(void)
     lv_bmp_init();
 #endif
 
-#if LV_USE_RLE
-    lv_rle_decoder_init();
-#endif
-
     /*Make FFMPEG last because the last converter will be checked first and
      *it's superior to any other */
 #if LV_USE_FFMPEG

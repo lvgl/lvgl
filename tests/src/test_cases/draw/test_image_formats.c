@@ -157,69 +157,6 @@ void test_image_built_in_decode_rotate_and_recolor(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rotate_and_recolor.png");
 }
 
-void test_image_rle_decode(void)
-{
-#if LV_USE_RLE
-    img_create("rleA1", "A:src/test_files/binimages/cogwheel.A1.rle", false, false);
-    img_create("rleA2", "A:src/test_files/binimages/cogwheel.A2.rle", false, false);
-    img_create("rleA4", "A:src/test_files/binimages/cogwheel.A4.rle", false, false);
-    img_create("rleA8", "A:src/test_files/binimages/cogwheel.A8.rle", false, false);
-    img_create("rleI1", "A:src/test_files/binimages/cogwheel.I1.rle", false, false);
-    img_create("rleI2", "A:src/test_files/binimages/cogwheel.I2.rle", false, false);
-    img_create("rleI4", "A:src/test_files/binimages/cogwheel.I4.rle", false, false);
-    img_create("rleI8", "A:src/test_files/binimages/cogwheel.I8.rle", false, false);
-    img_create("rleRGB565A8", "A:src/test_files/binimages/cogwheel.RGB565A8.rle", false, false);
-    img_create("rleRGB565", "A:src/test_files/binimages/cogwheel.RGB565.rle", false, false);
-    img_create("rleRGB888", "A:src/test_files/binimages/cogwheel.RGB888.rle", false, false);
-    img_create("rleXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.rle", false, false);
-    img_create("rleARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.rle", false, false);
-
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rle.png");
-#endif
-}
-
-void test_image_rle_decode_rotate(void)
-{
-#if LV_USE_RLE
-    img_create("rleA1", "A:src/test_files/binimages/cogwheel.A1.rle", true, false);
-    img_create("rleA2", "A:src/test_files/binimages/cogwheel.A2.rle", true, false);
-    img_create("rleA4", "A:src/test_files/binimages/cogwheel.A4.rle", true, false);
-    img_create("rleA8", "A:src/test_files/binimages/cogwheel.A8.rle", true, false);
-    img_create("rleI1", "A:src/test_files/binimages/cogwheel.I1.rle", true, false);
-    img_create("rleI2", "A:src/test_files/binimages/cogwheel.I2.rle", true, false);
-    img_create("rleI4", "A:src/test_files/binimages/cogwheel.I4.rle", true, false);
-    img_create("rleI8", "A:src/test_files/binimages/cogwheel.I8.rle", true, false);
-    img_create("rleRGB565A8", "A:src/test_files/binimages/cogwheel.RGB565A8.rle", true, false);
-    img_create("rleRGB565", "A:src/test_files/binimages/cogwheel.RGB565.rle", true, false);
-    img_create("rleRGB888", "A:src/test_files/binimages/cogwheel.RGB888.rle", true, false);
-    img_create("rleXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.rle", true, false);
-    img_create("rleARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.rle", true, false);
-
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rle_rotate.png");
-#endif
-}
-
-void test_image_rle_decode_rotate_recolor(void)
-{
-#if LV_USE_RLE
-    img_create("rleA1", "A:src/test_files/binimages/cogwheel.A1.rle", true, true);
-    img_create("rleA2", "A:src/test_files/binimages/cogwheel.A2.rle", true, true);
-    img_create("rleA4", "A:src/test_files/binimages/cogwheel.A4.rle", true, true);
-    img_create("rleA8", "A:src/test_files/binimages/cogwheel.A8.rle", true, true);
-    img_create("rleI1", "A:src/test_files/binimages/cogwheel.I1.rle", true, true);
-    img_create("rleI2", "A:src/test_files/binimages/cogwheel.I2.rle", true, true);
-    img_create("rleI4", "A:src/test_files/binimages/cogwheel.I4.rle", true, true);
-    img_create("rleI8", "A:src/test_files/binimages/cogwheel.I8.rle", true, true);
-    img_create("rleRGB565A8", "A:src/test_files/binimages/cogwheel.RGB565A8.rle", true, true);
-    img_create("rleRGB565", "A:src/test_files/binimages/cogwheel.RGB565.rle", true, true);
-    img_create("rleRGB888", "A:src/test_files/binimages/cogwheel.RGB888.rle", true, true);
-    img_create("rleXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.rle", true, true);
-    img_create("rleARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.rle", true, true);
-
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rle_rotate_recolor.png");
-#endif
-}
-
 void test_image_rle_compressed_decode(void)
 {
 #if LV_USE_RLE
