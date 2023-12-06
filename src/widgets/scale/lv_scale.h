@@ -18,6 +18,8 @@ extern "C" {
 #if LV_USE_SCALE != 0
 
 #include "../../core/lv_obj.h"
+#include "../line/lv_line.h"
+#include "../image/lv_image.h"
 
 /*********************
  *      DEFINES
@@ -168,6 +170,27 @@ void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max);
  * @param rotation  the angular offset from the 3 o'clock position (clock-wise)
  */
 void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rotation);
+
+/**
+ * Point the needle to the corresponding value through the line
+ * @param obj              pointer to a scale object
+ * @param needle_line      needle_line of the scale
+ * @param needle_length    length of the needle
+ *                         needle_length>0 needle_length=needle_length;
+ *                         needle_length<0 needle_length=radius-|needle_length|;
+ * @param value            needle to point to the corresponding value
+ */
+void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
+                                    int32_t value);
+
+/**
+ * Point the needle to the corresponding value through the image,
+   image must point to the right. E.g. -O------>
+ * @param obj              pointer to a scale object
+ * @param needle_img       needle_img of the scale
+ * @param value            needle to point to the corresponding value
+ */
+void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value);
 
 /**
  * Set custom text source for major ticks labels

@@ -182,6 +182,88 @@ void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rota
     lv_obj_invalidate(obj);
 }
 
+void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
+                                    int32_t value)
+{
+    int32_t angle;
+    int32_t scale_width, scale_height;
+    int32_t actual_needle_length;
+    int32_t needle_length_x, needle_length_y;
+    static lv_point_precise_t needle_line_points[2];
+
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    if((scale->mode != LV_SCALE_MODE_ROUND_INNER) &&
+       (scale->mode != LV_SCALE_MODE_ROUND_OUTER)) {
+        return;
+    }
+
+    lv_obj_align(needle_line, LV_ALIGN_TOP_LEFT, 0, 0);
+
+    scale_width = lv_obj_get_style_width(obj, LV_PART_MAIN);
+    scale_height = lv_obj_get_style_height(obj, LV_PART_MAIN);
+
+    if(scale_width != scale_height) {
+        return;
+    }
+
+    if(needle_length >= scale_width / 2) {
+        actual_needle_length = scale_width / 2;
+    }
+    else if(needle_length >= 0) {
+        actual_needle_length = needle_length;
+    }
+    else if(needle_length + scale_width / 2 < 0) {
+        actual_needle_length = 0;
+    }
+    else {
+        actual_needle_length = scale_width / 2 + needle_length;
+    }
+
+    if(value < scale->range_min) {
+        angle = 0;
+    }
+    else if(value > scale->range_max) {
+        angle = scale->angle_range;
+    }
+    else {
+        angle = scale->angle_range * (value - scale->range_min) / (scale->range_max - scale->range_min);
+    }
+
+    needle_length_x = (actual_needle_length * lv_trigo_cos(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
+    needle_length_y = (actual_needle_length * lv_trigo_sin(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
+
+    needle_line_points[0].x = scale_width / 2;
+    needle_line_points[0].y = scale_height / 2;
+    needle_line_points[1].x = scale_width / 2 + needle_length_x;
+    needle_line_points[1].y = scale_height / 2 + needle_length_y;
+
+    lv_line_set_points(needle_line, needle_line_points, 2);
+}
+
+void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value)
+{
+    int32_t angle;
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    if((scale->mode != LV_SCALE_MODE_ROUND_INNER) &&
+       (scale->mode != LV_SCALE_MODE_ROUND_OUTER)) {
+        return;
+    }
+
+    if(value < scale->range_min) {
+        angle = 0;
+    }
+    else if(value > scale->range_max) {
+        angle = scale->angle_range;
+    }
+    else {
+        angle = scale->angle_range * (value - scale->range_min) / (scale->range_max - scale->range_min);
+    }
+
+    lv_image_set_rotation(needle_img, (scale->rotation + angle) * 10);
+}
+
 void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

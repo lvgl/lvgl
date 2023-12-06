@@ -854,7 +854,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_label_set_text(mbps_unit_label, "Mbps");
 
     lv_anim_init(&a);
-    lv_anim_set_values(&a, 0, 60);
+    lv_anim_set_values(&a, 10, 60);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_set_exec_cb(&a, scale3_anim_cb);
     lv_anim_set_var(&a, needle);
@@ -1617,9 +1617,8 @@ static void scale3_anim_cb(void * var, int32_t v)
 {
     LV_UNUSED(var);
 
-    int32_t angle = lv_map(v, 0, 60, 1350, 3600);
     lv_obj_t * needle = lv_obj_get_child(scale3, 0);
-    lv_image_set_rotation(needle, angle);
+    lv_scale_set_image_needle_value(scale3, needle, v);
 
     lv_obj_t * label = lv_obj_get_child(scale3, 1);
     lv_label_set_text_fmt(label, "%"LV_PRId32, v);
