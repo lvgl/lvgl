@@ -25,9 +25,10 @@ extern "C" {
 /*All possible property value types*/
 #define LV_PROPERTY_TYPE_INVALID        0   /*Use default 0 as invalid to detect program outliers*/
 #define LV_PROPERTY_TYPE_INT            1   /*int32_t type*/
-#define LV_PROPERTY_TYPE_COLOR          2   /*ARGB8888 type*/
-#define LV_PROPERTY_TYPE_POINTER        3   /*void * pointer*/
-#define LV_PROPERTY_TYPE_IMGSRC         4   /*Special pointer for image*/
+#define LV_PROPERTY_TYPE_PRECISE        2   /*lv_value_precise_t, int32_t or float depending on LV_USE_FLOAT*/
+#define LV_PROPERTY_TYPE_COLOR          3   /*ARGB8888 type*/
+#define LV_PROPERTY_TYPE_POINTER        4   /*void * pointer*/
+#define LV_PROPERTY_TYPE_IMGSRC         5   /*Special pointer for image*/
 
 /**********************
  *      TYPEDEFS
@@ -72,6 +73,7 @@ typedef struct {
         int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
         const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
         lv_color_t color;           /**< Colors*/
+        lv_value_precise_t precise; /**< float or int for precise value*/
         lv_style_value_t _style;    /**< A place holder for style value which is same as property value.*/
     };
 } lv_property_t;
