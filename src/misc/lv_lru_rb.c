@@ -65,7 +65,7 @@ struct _lv_lru_rb_t {
 
     size_t max_size;
     size_t size;
-    lv_lru_rb_alloc_cb_t alloc_cb;
+    lv_lru_rb_create_cb_t create_cb;
     lv_lru_rb_free_cb_t free_cb;
 };
 /**********************
@@ -90,15 +90,15 @@ inline static void ** get_lru_node(lv_lru_rb_t * lru, lv_rb_node_t * node);
  **********************/
 
 lv_lru_rb_t * lv_lru_rb_create(size_t node_size, size_t max_size, lv_lru_rb_compare_cb_t compare_cb,
-                               lv_lru_rb_alloc_cb_t alloc_cb, lv_lru_rb_free_cb_t free_cb)
+                               lv_lru_rb_create_cb_t create_cb, lv_lru_rb_free_cb_t free_cb)
 {
     LV_ASSERT_NULL(compare_cb);
-    LV_ASSERT_NULL(alloc_cb);
+    LV_ASSERT_NULL(create_cb);
     LV_ASSERT_NULL(free_cb);
     LV_ASSERT(node_size > 0);
     LV_ASSERT(max_size > 0);
 
-    if(node_size == 0 || max_size == 0 || compare_cb == NULL || alloc_cb == NULL || free_cb == NULL) {
+    if(node_size == 0 || max_size == 0 || compare_cb == NULL || create_cb == NULL || free_cb == NULL) {
         return NULL;
     }
 
@@ -119,7 +119,7 @@ lv_lru_rb_t * lv_lru_rb_create(size_t node_size, size_t max_size, lv_lru_rb_comp
 
     lv_lru_rb_set_max_size(lru, max_size, NULL);
     lv_lru_rb_set_compare_cb(lru, compare_cb, NULL);
-    lv_lru_rb_set_alloc_cb(lru, alloc_cb, NULL);
+    lv_lru_rb_set_create_cb(lru, create_cb, NULL);
     lv_lru_rb_set_free_cb(lru, free_cb, NULL);
 
     return lru;
@@ -133,12 +133,12 @@ void lv_lru_rb_destroy(lv_lru_rb_t * lru, void * user_data)
         return;
     }
 
-    lv_lru_rb_clear(lru, user_data);
+    lv_lru_rb_drop_all(lru, user_data);
 
     lv_free(lru);
 }
 
-void * lv_lru_rb_get(lv_lru_rb_t * lru, const void * key, void * user_data)
+void * lv_lru_rb_get_or_create(lv_lru_rb_t * lru, const void * key, void * user_data)
 {
     LV_ASSERT_NULL(lru);
     LV_ASSERT_NULL(key);
@@ -167,7 +167,7 @@ void * lv_lru_rb_get(lv_lru_rb_t * lru, const void * key, void * user_data)
 
     while(lru->size >= lru->max_size) {
         lv_rb_node_t * tail = *(lv_rb_node_t **)_lv_ll_get_tail(&lru->lru_ll);
-        lv_lru_rb_reset(lru, tail->data, user_data);
+        lv_lru_rb_drop(lru, tail->data, user_data);
     }
 
     /*cache miss*/
@@ -180,7 +180,7 @@ void * lv_lru_rb_get(lv_lru_rb_t * lru, const void * key, void * user_data)
     return new_node->data;
 }
 
-void lv_lru_rb_reset(lv_lru_rb_t * lru, const void * key, void * user_data)
+void lv_lru_rb_drop(lv_lru_rb_t * lru, const void * key, void * user_data)
 {
     LV_ASSERT_NULL(lru);
     LV_ASSERT_NULL(key);
@@ -197,7 +197,7 @@ void lv_lru_rb_reset(lv_lru_rb_t * lru, const void * key, void * user_data)
     lru->free_cb(node->data, user_data);
 
     void * lru_node = *get_lru_node(lru, node);
-    lv_rb_remove(&lru->rb, key);
+    lv_rb_drop(&lru->rb, key);
     _lv_ll_remove(&lru->lru_ll, lru_node);
 
     lv_free(lru_node);
@@ -205,7 +205,7 @@ void lv_lru_rb_reset(lv_lru_rb_t * lru, const void * key, void * user_data)
     lru->size--;
 }
 
-void lv_lru_rb_clear(lv_lru_rb_t * lru, void * user_data)
+void lv_lru_rb_drop_all(lv_lru_rb_t * lru, void * user_data)
 {
     LV_ASSERT_NULL(lru);
 
@@ -254,10 +254,10 @@ void lv_lru_rb_set_compare_cb(lv_lru_rb_t * lru, lv_lru_rb_compare_cb_t compare_
     lru->rb.compare = (lv_rb_compare_t)compare_cb;
 }
 
-void lv_lru_rb_set_alloc_cb(lv_lru_rb_t * lru, lv_lru_rb_alloc_cb_t alloc_cb, void * user_data)
+void lv_lru_rb_set_create_cb(lv_lru_rb_t * lru, lv_lru_rb_create_cb_t create_cb, void * user_data)
 {
     LV_UNUSED(user_data);
-    lru->alloc_cb = alloc_cb;
+    lru->create_cb = create_cb;
 }
 
 void lv_lru_rb_set_free_cb(lv_lru_rb_t * lru, lv_lru_rb_free_cb_t free_cb, void * user_data)
@@ -284,7 +284,7 @@ static void * alloc_new_node(lv_lru_rb_t * lru, void * key, void * user_data)
 
     lv_memcpy(node->data, key, lru->rb.size - sizeof(void *));
 
-    bool alloc_res = lru->alloc_cb(node->data, user_data);
+    bool alloc_res = lru->create_cb(node->data, user_data);
     if(alloc_res == false)
         goto FAILED_HANDLER2;
 
@@ -300,7 +300,7 @@ FAILED_HANDLER1:
     lru->free_cb(node->data, user_data);
 FAILED_HANDLER2:
     node = NULL;
-    lv_rb_remove(&lru->rb, key);
+    lv_rb_drop(&lru->rb, key);
 FAILED_HANDLER3:
     return node;
 }

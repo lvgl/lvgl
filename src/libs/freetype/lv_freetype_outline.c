@@ -80,13 +80,13 @@ static void lv_freetype_cache_node_drop(lv_freetype_font_dsc_t * dsc);
 static lv_freetype_outline_node_t * lv_freetype_outline_lookup(lv_freetype_font_dsc_t * dsc, uint32_t unicode_letter);
 
 /*glyph dsc cache lru callbacks*/
-static bool freetype_glyph_outline_alloc_cb(lv_freetype_outline_node_t * node, lv_freetype_font_dsc_t * dsc);
+static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, lv_freetype_font_dsc_t * dsc);
 static void freetype_glyph_outline_free_cb(lv_freetype_outline_node_t * node, lv_freetype_font_dsc_t * dsc);
 static lv_lru_rb_compare_res_t freetype_glyph_outline_cmp_cb(const lv_freetype_outline_node_t * node_a,
                                                              const lv_freetype_outline_node_t * node_b);
 
 /*glyph dsc cache lru callbacks*/
-static bool freetype_glyph_dsc_alloc_cb(lv_freetype_glyph_dsc_node_t * glyph_dsc_node, lv_freetype_font_dsc_t * dsc);
+static bool freetype_glyph_dsc_create_cb(lv_freetype_glyph_dsc_node_t * glyph_dsc_node, lv_freetype_font_dsc_t * dsc);
 static void freetype_glyph_dsc_free_cb(lv_freetype_glyph_dsc_node_t * glyph_dsc_node, lv_freetype_font_dsc_t * dsc);
 static lv_lru_rb_compare_res_t freetype_glyph_dsc_cmp_cb(const lv_freetype_glyph_dsc_node_t * node_a,
                                                          const lv_freetype_glyph_dsc_node_t * node_b);
@@ -268,11 +268,11 @@ static lv_freetype_cache_node_t * lv_freetype_cache_node_lookup(lv_freetype_cont
 
     cache->glyph_dsc_lru = lv_lru_rb_create(sizeof(lv_freetype_glyph_dsc_node_t), LV_FREETYPE_GLYPH_DSC_CACHE_SIZE,
                                             (lv_lru_rb_compare_cb_t)freetype_glyph_dsc_cmp_cb,
-                                            (lv_lru_rb_alloc_cb_t)freetype_glyph_dsc_alloc_cb,
+                                            (lv_lru_rb_create_cb_t)freetype_glyph_dsc_create_cb,
                                             (lv_lru_rb_free_cb_t)freetype_glyph_dsc_free_cb);
     cache->glyph_outline_lru = lv_lru_rb_create(sizeof(lv_freetype_outline_node_t), LV_FREETYPE_CACHE_FT_OUTLINES,
                                                 (lv_lru_rb_compare_cb_t)freetype_glyph_outline_cmp_cb,
-                                                (lv_lru_rb_alloc_cb_t)freetype_glyph_outline_alloc_cb,
+                                                (lv_lru_rb_create_cb_t)freetype_glyph_outline_create_cb,
                                                 (lv_lru_rb_free_cb_t)freetype_glyph_outline_free_cb);
 
     LV_LOG_INFO("outline cache(name: %s, style: 0x%x) create %p, ref_cnt = %d",
@@ -312,7 +312,7 @@ static void lv_freetype_cache_node_drop(lv_freetype_font_dsc_t * dsc)
  *  GLYPH DSC CACHE
  *------------------*/
 
-static bool freetype_glyph_dsc_alloc_cb(lv_freetype_glyph_dsc_node_t * glyph_dsc_node, lv_freetype_font_dsc_t * dsc)
+static bool freetype_glyph_dsc_create_cb(lv_freetype_glyph_dsc_node_t * glyph_dsc_node, lv_freetype_font_dsc_t * dsc)
 {
     lv_font_glyph_dsc_t * dsc_out = &glyph_dsc_node->glyph_dsc;
 
@@ -394,7 +394,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
     tmp_node.glyph_index = glyph_index;
     tmp_node.size = dsc->size;
 
-    lv_freetype_glyph_dsc_node_t * new_node = lv_lru_rb_get(cache_node->glyph_dsc_lru, &tmp_node, dsc);
+    lv_freetype_glyph_dsc_node_t * new_node = lv_lru_rb_get_or_create(cache_node->glyph_dsc_lru, &tmp_node, dsc);
     if(!new_node) {
         return false;
     }
@@ -411,7 +411,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
  *   OUTLINE CACHE
  *------------------*/
 
-static bool freetype_glyph_outline_alloc_cb(lv_freetype_outline_node_t * node, lv_freetype_font_dsc_t * dsc)
+static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, lv_freetype_font_dsc_t * dsc)
 {
     lv_freetype_outline_t outline;
     outline = outline_create(dsc->context,
@@ -466,7 +466,7 @@ static lv_freetype_outline_node_t * lv_freetype_outline_lookup(lv_freetype_font_
     lv_freetype_outline_node_t tmp_node;
     tmp_node.glyph_index = glyph_index;
 
-    lv_freetype_outline_node_t * new_node = lv_lru_rb_get(cache_node->glyph_outline_lru, &tmp_node, dsc);
+    lv_freetype_outline_node_t * new_node = lv_lru_rb_get_or_create(cache_node->glyph_outline_lru, &tmp_node, dsc);
     if(!new_node) {
         LV_LOG_ERROR("glyph outline lookup failed for glyph_index = %u", glyph_index);
         return NULL;
