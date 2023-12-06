@@ -277,7 +277,7 @@ void * lv_observer_get_target(lv_observer_t * observer);
  */
 static inline lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
 {
-    return lv_observer_get_target(observer);
+    return (lv_obj_t *)lv_observer_get_target(observer);
 }
 
 /**
