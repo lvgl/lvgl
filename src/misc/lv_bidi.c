@@ -257,7 +257,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
         else if(dir != LV_BASE_DIR_WEAK) break;
     }
 
-    if(rd && str_in[rd] != '\0') {
+    if(rd && str_in[rd] != '\0' && rd < len) {
         _lv_text_encoded_prev(str_in, &rd);
         pos_conv_rd--;
     }
