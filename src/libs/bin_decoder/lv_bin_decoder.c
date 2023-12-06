@@ -473,8 +473,8 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
 
     if(cf == LV_COLOR_FORMAT_RGB565A8) {
         bpp = 16; /* RGB565 + A8 mask*/
-        uint32_t len = (w_px * bpp) / 8; /*map comes firstly*/
-        offset += decoded_area->y1 * dsc->header.w * bpp / 8; /*Move to y1*/
+        uint32_t len = decoded->header.stride;
+        offset += decoded_area->y1 * dsc->header.stride; /*Move to y1*/
         offset += decoded_area->x1 * bpp / 8; /*Move to x1*/
         res = fs_read_file_at(f, offset, img_data, len, NULL);
         if(res != LV_FS_RES_OK) {
@@ -483,8 +483,8 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
 
         /*Now the A8 mask*/
         offset = sizeof(lv_image_header_t);
-        offset += dsc->header.h * dsc->header.w * bpp / 8; /*Move to A8 map*/
-        offset += decoded_area->y1 * dsc->header.w * 1; /*Move to y1*/
+        offset += dsc->header.h * dsc->header.stride; /*Move to A8 map*/
+        offset += decoded_area->y1 * (dsc->header.stride / 2); /*Move to y1*/
         offset += decoded_area->x1 * 1; /*Move to x1*/
         res = fs_read_file_at(f, offset, img_data + len, w_px * 1, NULL);
         if(res != LV_FS_RES_OK) {
@@ -571,6 +571,8 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
             lv_free((void *)palette);
             return LV_RESULT_INVALID;
         }
+
+        decoder_data->palette = (void *)palette; /*Need to free when decoder closes*/
 
 #if LV_BIN_DECODER_RAM_LOAD
         draw_buf_indexed = lv_draw_buf_create(dsc->header.w, dsc->header.h, cf, dsc->header.stride);
