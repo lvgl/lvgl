@@ -126,18 +126,18 @@ lv_rb_node_t * lv_rb_find(lv_rb_t * tree, const void * key)
     return NULL;
 }
 
-bool lv_rb_remove(lv_rb_t * tree, const void * key)
+void * lv_rb_remove(lv_rb_t * tree, const void * key)
 {
     LV_ASSERT_NULL(tree);
     if(tree == NULL) {
-        return false;
+        return NULL;
     }
 
     lv_rb_node_t * node = lv_rb_find(tree, key);
     LV_ASSERT_NULL(node);
     if(node == NULL) {
         LV_LOG_WARN("rb delete %d not found", (int)(uintptr_t)key);
-        return false;
+        return NULL;
     }
 
     lv_rb_node_t * child = NULL;
@@ -185,9 +185,9 @@ bool lv_rb_remove(lv_rb_t * tree, const void * key)
             rb_delete_color(tree, child, parent);
         }
 
-        lv_free(node->data);
+        void * data = node->data;
         lv_free(node);
-        return true;
+        return data;
     }
 
     child = node->right != NULL ? node->right : node->left;
@@ -214,9 +214,24 @@ bool lv_rb_remove(lv_rb_t * tree, const void * key)
         rb_delete_color(tree, child, parent);
     }
 
-    lv_free(node->data);
+    void * data = node->data;
     lv_free(node);
-    return true;
+    return data;
+}
+
+bool lv_rb_drop(lv_rb_t * tree, const void * key)
+{
+    LV_ASSERT_NULL(tree);
+    if(tree == NULL) {
+        return NULL;
+    }
+
+    void * data = lv_rb_remove(tree, key);
+    if(data) {
+        lv_free(data);
+        return true;
+    }
+    return false;
 }
 
 void lv_rb_destroy(lv_rb_t * tree)

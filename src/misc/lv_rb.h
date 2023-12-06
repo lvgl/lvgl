@@ -55,7 +55,8 @@ typedef struct {
 bool lv_rb_init(lv_rb_t * tree, lv_rb_compare_t compare, size_t node_size);
 lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * key);
 lv_rb_node_t * lv_rb_find(lv_rb_t * tree, const void * key);
-bool lv_rb_remove(lv_rb_t * tree, const void * key);
+void * lv_rb_remove(lv_rb_t * tree, const void * key);
+bool lv_rb_drop(lv_rb_t * tree, const void * key);
 lv_rb_node_t * lv_rb_minimum(lv_rb_t * node);
 lv_rb_node_t * lv_rb_maximum(lv_rb_t * node);
 lv_rb_node_t * lv_rb_minimum_from(lv_rb_node_t * node);
