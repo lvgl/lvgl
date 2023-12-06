@@ -218,7 +218,7 @@ void lv_table_set_row_count(lv_obj_t * obj, uint32_t row_cnt)
         uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
         uint32_t i;
         for(i = new_cell_cnt; i < old_cell_cnt; i++) {
-            if(table->cell_data[i]->user_data) {
+            if(table->cell_data[i] && table->cell_data[i]->user_data) {
                 lv_free(table->cell_data[i]->user_data);
                 table->cell_data[i]->user_data = NULL;
             }
