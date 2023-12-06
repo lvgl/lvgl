@@ -187,6 +187,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
 {
     int32_t angle;
     int32_t scale_width, scale_height;
+    int32_t actual_needle_length;
     int32_t needle_length_x, needle_length_y;
     static lv_point_precise_t needle_line_points[2];
 
@@ -199,6 +200,26 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
 
     lv_obj_align(needle_line, LV_ALIGN_TOP_LEFT, 0, 0);
 
+    scale_width = lv_obj_get_style_width(obj, LV_PART_MAIN);
+    scale_height = lv_obj_get_style_height(obj, LV_PART_MAIN);
+
+    if(scale_width != scale_height) {
+        return;
+    }
+
+    if(needle_length >= scale_width / 2) {
+        actual_needle_length = scale_width / 2;
+    }
+    else if(needle_length >= 0) {
+        actual_needle_length = needle_length;
+    }
+    else if(needle_length + scale_width / 2 < 0) {
+        actual_needle_length = 0;
+    }
+    else {
+        actual_needle_length = scale_width / 2 + needle_length;
+    }
+
     if(value < scale->range_min) {
         angle = 0;
     }
@@ -209,11 +230,8 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
         angle = scale->angle_range * (value - scale->range_min) / (scale->range_max - scale->range_min);
     }
 
-    scale_width = lv_obj_get_style_width(obj, LV_PART_MAIN);
-    scale_height = lv_obj_get_style_height(obj, LV_PART_MAIN);
-
-    needle_length_x = (needle_length * lv_trigo_cos(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
-    needle_length_y = (needle_length * lv_trigo_sin(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
+    needle_length_x = (actual_needle_length * lv_trigo_cos(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
+    needle_length_y = (actual_needle_length * lv_trigo_sin(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
 
     needle_line_points[0].x = scale_width / 2;
     needle_line_points[0].y = scale_height / 2;

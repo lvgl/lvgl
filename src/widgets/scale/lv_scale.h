@@ -176,6 +176,8 @@ void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rota
  * @param obj              pointer to a scale object
  * @param needle_line      needle_line of the scale
  * @param needle_length    length of the needle
+ *                         needle_length>0 needle_length=needle_length;
+ *                         needle_length<0 needle_length=radius-|needle_length|;
  * @param value            needle to point to the corresponding value
  */
 void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
