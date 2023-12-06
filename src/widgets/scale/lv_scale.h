@@ -19,6 +19,7 @@ extern "C" {
 
 #include "../../core/lv_obj.h"
 #include "../line/lv_line.h"
+#include "../image/lv_image.h"
 
 /*********************
  *      DEFINES
@@ -171,7 +172,7 @@ void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max);
 void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rotation);
 
 /**
- * Set the needle to point to the corresponding value
+ * Point the needle to the corresponding value through the line
  * @param obj              pointer to a scale object
  * @param needle_line      needle_line of the scale
  * @param needle_length    length of the needle
@@ -179,6 +180,14 @@ void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rota
  */
 void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
                                     int32_t value);
+
+/**
+ * Point the needle to the corresponding value through the image
+ * @param obj              pointer to a scale object
+ * @param needle_img       needle_img of the scale
+ * @param value            needle to point to the corresponding value
+ */
+void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value);
 
 /**
  * Set custom text source for major ticks labels
