@@ -30,7 +30,25 @@ fout.write(
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
-#include "misc/lv_types.h"
+/*Config options*/
+#define LV_OS_NONE          0
+#define LV_OS_PTHREAD       1
+#define LV_OS_FREERTOS      2
+#define LV_OS_CMSIS_RTOS2   3
+#define LV_OS_RTTHREAD      4
+#define LV_OS_WINDOWS       5
+#define LV_OS_CUSTOM        255
+
+#define LV_STDLIB_BUILTIN           0
+#define LV_STDLIB_CLIB              1
+#define LV_STDLIB_MICROPYTHON       2
+#define LV_STDLIB_RTTHREAD          3
+#define LV_STDLIB_CUSTOM            255
+
+#define LV_DRAW_SW_ASM_NONE         0
+#define LV_DRAW_SW_ASM_NEON         1
+#define LV_DRAW_SW_ASM_MVE          2
+#define LV_DRAW_SW_ASM_CUSTOM       255
 
 /* Handle special Kconfig options */
 #ifndef LV_KCONFIG_IGNORE
@@ -155,14 +173,6 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
 #endif
 
 #undef _LV_KCONFIG_PRESENT
-
-#ifndef __ASSEMBLY__
-#if LV_USE_FLOAT
-    typedef float lv_value_precise_t;
-#else
-    typedef int32_t lv_value_precise_t;
-#endif
-#endif
 
 /*Set some defines if a dependency is disabled*/
 #if LV_USE_LOG == 0

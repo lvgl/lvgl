@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_conf_internal.h"
 
 #ifndef __ASSEMBLY__
 #include <stdint.h>
@@ -34,25 +35,6 @@ extern "C" {
 #define LV_ARCH_64
 
 #endif
-
-#define LV_OS_NONE          0
-#define LV_OS_PTHREAD       1
-#define LV_OS_FREERTOS      2
-#define LV_OS_CMSIS_RTOS2   3
-#define LV_OS_RTTHREAD      4
-#define LV_OS_WINDOWS       5
-#define LV_OS_CUSTOM        255
-
-#define LV_STDLIB_BUILTIN           0
-#define LV_STDLIB_CLIB              1
-#define LV_STDLIB_MICROPYTHON       2
-#define LV_STDLIB_RTTHREAD          3
-#define LV_STDLIB_CUSTOM            255
-
-#define LV_DRAW_SW_ASM_NONE         0
-#define LV_DRAW_SW_ASM_NEON         1
-#define LV_DRAW_SW_ASM_MVE          2
-#define LV_DRAW_SW_ASM_CUSTOM       255
 
 /**********************
  *      TYPEDEFS
@@ -92,6 +74,12 @@ typedef uint32_t lv_uintptr_t;
 typedef int32_t lv_intptr_t;
 #endif
 
+#endif
+
+#if LV_USE_FLOAT
+typedef float lv_value_precise_t;
+#else
+typedef int32_t lv_value_precise_t;
 #endif
 
 #endif /*__ASSEMBLY__*/
