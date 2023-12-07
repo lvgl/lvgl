@@ -136,6 +136,7 @@ or anything else to optimize while the waiting for flush.
 If ``flush_wait_cb`` is not set, LVGL assume that `lv_display_flush_ready`
 is used.
 
+
 Rotation
 --------
 
@@ -169,6 +170,29 @@ used as a well.
 
 It's very important that draw buffer(s) should be large enough for any
 selected color format.
+
+
+Swap endianness
+--------------
+
+In case of RGB565 color format it might be required to swap the 2 bytes
+because the SPI, I2C or 8 bit parallel port periphery sends them in the wrong order.
+
+The ideal solution is configure the hardware to handle the 16 bit data with different byte order,
+however if it's not possible `:cpp:expr:`lv_draw_sw_rgb565_swap(buf, buf_size_in_px)`
+can be called in the ``flush_cb`` to swap the bytes.
+
+If you wish you can also write your own function, or use assembly instructions for
+the fastest possible byte swapping.
+
+Note that this is not about swapping the Red and Blue channel but converting
+
+``RRRRR GGG | GGG BBBBB``
+
+to
+
+``GGG BBBBB | RRRRR GGG``.
+
 
 User data
 ---------
