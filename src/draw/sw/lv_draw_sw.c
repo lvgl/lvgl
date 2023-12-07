@@ -190,6 +190,16 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static inline void execute_drawing_unit(lv_draw_sw_unit_t * u)
+{
+    execute_drawing(u);
+
+    u->task_act->state = LV_DRAW_TASK_STATE_READY;
+    u->task_act = NULL;
+
+    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
+    lv_draw_dispatch_request();
+}
 
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
@@ -225,14 +235,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     /*Let the render thread work*/
     if(draw_sw_unit->inited) lv_thread_sync_signal(&draw_sw_unit->sync);
 #else
-    execute_drawing(draw_sw_unit);
-
-    draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
-    draw_sw_unit->task_act = NULL;
-
-    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-    lv_draw_dispatch_request();
-
+    execute_drawing_unit(draw_sw_unit);
 #endif
     return 1;
 }
@@ -258,14 +261,7 @@ static void render_thread_cb(void * ptr)
             break;
         }
 
-        execute_drawing(u);
-
-        /*Cleanup*/
-        u->task_act->state = LV_DRAW_TASK_STATE_READY;
-        u->task_act = NULL;
-
-        /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-        lv_draw_dispatch_request();
+        execute_drawing_unit(u);
     }
 
     u->inited = false;
