@@ -118,14 +118,15 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
     if(qr_size <= 0) return LV_RESULT_INVALID;
     int32_t scale = img_dsc->header.w / qr_size;
     if(scale <= 0) return LV_RESULT_INVALID;
-    int32_t remain = img_dsc->header.w % qr_size;
 
-    /* The qr version is incremented by four point */
-    uint32_t version_extend = remain / (scale << 2);
-    if(version_extend && qr_version < qrcodegen_VERSION_MAX) {
-        qr_version = qr_version + version_extend > qrcodegen_VERSION_MAX ?
-                     qrcodegen_VERSION_MAX : qr_version + version_extend;
+    /* Pick the largest QR code that still maintains scale. */
+    for(int32_t i = qr_version + 1; i < qrcodegen_VERSION_MAX; i++) {
+        if(qrcodegen_version2size(i) * scale > img_dsc->header.w)
+            break;
+
+        qr_version = i;
     }
+    qr_size = qrcodegen_version2size(qr_version);
 
     uint8_t * qr0 = lv_malloc(qrcodegen_BUFFER_LEN_FOR_VERSION(qr_version));
     LV_ASSERT_MALLOC(qr0);
