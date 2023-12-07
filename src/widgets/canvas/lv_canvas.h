@@ -135,6 +135,14 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer);
 
 #define LV_CANVAS_BUF_SIZE(w, h, bpp, stride) (((((w * bpp + 7) >> 3) + stride - 1) & ~(stride - 1)) * h + LV_DRAW_BUF_ALIGN)
 
+/**
+ * Just a wrapper to `LV_CANVAS_BUF_SIZE` for bindings.
+ */
+static inline uint32_t lv_canvas_buf_size(int32_t w, int32_t h, uint8_t bpp, uint8_t stride)
+{
+    return (uint32_t)LV_CANVAS_BUF_SIZE(w, h, bpp, stride);
+}
+
 #endif /*LV_USE_CANVAS*/
 
 #ifdef __cplusplus
