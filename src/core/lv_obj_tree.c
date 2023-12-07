@@ -592,6 +592,8 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
 static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth)
 {
     lv_obj_tree_walk_res_t res;
+
+#if LV_USE_LOG
     const char * id;
 
 #if LV_USE_OBJ_ID
@@ -604,6 +606,7 @@ static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth)
 
     /*id of `obj0` is an invalid id for builtin id*/
     LV_LOG_USER("parent:%p, obj:%p, id:%s;", (void *)(obj ? obj->parent : NULL), (void *)obj, id);
+#endif /*LV_USE_LOG*/
 
     if(obj && obj->spec_attr && obj->spec_attr->child_cnt) {
         for(uint32_t i = 0; i < obj->spec_attr->child_cnt; i++) {
