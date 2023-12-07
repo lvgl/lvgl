@@ -29,7 +29,7 @@ void lv_example_scale_3(void)
     lv_obj_set_style_bg_color(scale_line, lv_palette_lighten(LV_PALETTE_RED, 5), 0);
     lv_obj_set_style_radius(scale_line, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_clip_corner(scale_line, true, 0);
-    lv_obj_align(scale_line, LV_ALIGN_LEFT_MID, LV_PCT(5), 0);
+    lv_obj_align(scale_line, LV_ALIGN_LEFT_MID, LV_PCT(2), 0);
 
     lv_scale_set_label_show(scale_line, true);
 
@@ -65,7 +65,7 @@ void lv_example_scale_3(void)
     lv_obj_set_style_bg_color(scale_img, lv_palette_lighten(LV_PALETTE_RED, 5), 0);
     lv_obj_set_style_radius(scale_img, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_clip_corner(scale_img, true, 0);
-    lv_obj_align(scale_img, LV_ALIGN_RIGHT_MID, LV_PCT(-5), 0);
+    lv_obj_align(scale_img, LV_ALIGN_RIGHT_MID, LV_PCT(-2), 0);
 
     lv_scale_set_label_show(scale_img, true);
 
