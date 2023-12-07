@@ -466,11 +466,12 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
     lv_style_set_prop(style, prop, value);
 
 #if LV_OBJ_STYLE_CACHE
+    uint32_t prop_is_set = (uint32_t)1 << (prop >> 3);
     if(lv_obj_style_get_selector_part(selector) == LV_PART_MAIN) {
-        obj->style_main_prop_is_set |= (uint32_t)1 << (prop >> 2);
+        obj->style_main_prop_is_set |= prop_is_set;
     }
     else {
-        obj->style_other_prop_is_set |= (uint32_t)1 << (prop >> 2);
+        obj->style_other_prop_is_set |= prop_is_set;
     }
 #endif
 
