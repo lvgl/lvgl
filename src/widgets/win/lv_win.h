@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
-
+#if LV_USE_WIN
 /*********************
  *      DEFINES
  *********************/
@@ -42,7 +42,7 @@ lv_obj_t * lv_win_get_content(lv_obj_t * win);
 /**********************
  *      MACROS
  **********************/
-
+#endif /*LV_USE_WIN*/
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
