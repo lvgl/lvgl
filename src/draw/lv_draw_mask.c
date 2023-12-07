@@ -48,6 +48,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect(struct _lv_layer_t * layer, const l
         return;
     }
 
+    LV_PROFILER_BEGIN;
     lv_draw_task_t * t = lv_draw_add_task(layer, &layer->buf_area);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
@@ -66,6 +67,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect(struct _lv_layer_t * layer, const l
     }
 
     lv_draw_dispatch();
+    LV_PROFILER_END;
 }
 
 /**********************

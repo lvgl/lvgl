@@ -292,6 +292,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
         LV_LOG_TRACE("Already running, returning");
         return;
     }
+    LV_PROFILER_BEGIN;
     update_layout_mutex = true;
 
     lv_obj_t * scr = lv_obj_get_screen(obj);
@@ -304,6 +305,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
     }
 
     update_layout_mutex = false;
+    LV_PROFILER_END;
 }
 
 void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)
@@ -1096,6 +1098,7 @@ static lv_coord_t calc_content_height(lv_obj_t * obj)
 
 static void layout_update_core(lv_obj_t * obj)
 {
+    LV_PROFILER_BEGIN;
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     for(i = 0; i < child_cnt; i++) {
@@ -1103,7 +1106,10 @@ static void layout_update_core(lv_obj_t * obj)
         layout_update_core(child);
     }
 
-    if(obj->layout_inv == 0) return;
+    if(obj->layout_inv == 0) {
+        LV_PROFILER_END;
+        return;
+    }
 
     obj->layout_inv = 0;
 
@@ -1113,6 +1119,7 @@ static void layout_update_core(lv_obj_t * obj)
     if(child_cnt > 0) {
         _lv_layout_apply(obj);
     }
+    LV_PROFILER_END;
 }
 
 static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv)

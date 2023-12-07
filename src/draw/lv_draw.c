@@ -110,6 +110,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 {
+    LV_PROFILER_BEGIN;
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
 
@@ -148,6 +149,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             u = u->next;
         }
     }
+    LV_PROFILER_END;
 }
 
 void lv_draw_dispatch(void)
@@ -172,6 +174,8 @@ void lv_draw_dispatch(void)
 
 bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
 {
+    LV_PROFILER_BEGIN;
+
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
     lv_draw_task_t * t = layer->draw_task_head;
@@ -181,8 +185,15 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
             if(t_prev) t_prev->next = t->next;      /*Remove by it by assigning the next task to the previous*/
             else layer->draw_task_head = t_next;    /*If it was the head, set the next as head*/
 
-            /*If it was layer drawing free the layer too*/
-            if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
+            if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
+                lv_draw_label_dsc_t * draw_label_dsc = t->draw_dsc;
+                if(draw_label_dsc->text_local) {
+                    lv_free((void *)draw_label_dsc->text);
+                    draw_label_dsc->text = NULL;
+                }
+            }
+            else if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
+                /*If it was layer drawing free the layer too*/
                 lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
                 lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
 
@@ -211,13 +222,6 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
                     lv_free(layer_drawn);
                 }
             }
-            if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
-                lv_draw_label_dsc_t * draw_label_dsc = t->draw_dsc;
-                if(draw_label_dsc->text_local) {
-                    lv_free((void *)draw_label_dsc->text);
-                    draw_label_dsc->text = NULL;
-                }
-            }
 
             lv_free(t->draw_dsc);
             lv_free(t);
@@ -227,6 +231,7 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
         }
         t = t_next;
     }
+    LV_PROFILER_END;
 
     bool render_running = false;
 

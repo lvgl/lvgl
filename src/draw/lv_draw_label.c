@@ -76,6 +76,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label
         return;
     }
 
+    LV_PROFILER_BEGIN;
     lv_draw_task_t * t = lv_draw_add_task(layer, coords);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
@@ -89,9 +90,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label
     }
 
     lv_draw_finalize_task_creation(layer, t);
+    LV_PROFILER_END;
 }
-
-
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
                                           const lv_point_t * point, uint32_t unicode_letter)
@@ -101,6 +101,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_
         LV_LOG_WARN("dsc->font == NULL");
         return;
     }
+    LV_PROFILER_BEGIN;
 
     lv_font_glyph_dsc_t g;
     lv_font_get_glyph_dsc(dsc->font, &g, unicode_letter, 0);
@@ -126,6 +127,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_
     dsc->text_local = 1;
 
     lv_draw_label(layer, dsc, &a);
+    LV_PROFILER_END;
 }
 
 void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,

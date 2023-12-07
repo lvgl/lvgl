@@ -111,6 +111,18 @@ static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static inline void execute_drawing_unit(lv_draw_sw_unit_t * u)
+{
+    LV_PROFILER_BEGIN;
+    execute_drawing(u);
+
+    u->task_act->state = LV_DRAW_TASK_STATE_READY;
+    u->task_act = NULL;
+
+    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
+    lv_draw_dispatch_request();
+    LV_PROFILER_END;
+}
 
 static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
@@ -126,7 +138,7 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) return -1;
 
-
+    LV_PROFILER_BEGIN;
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_sw_unit->base_unit.target_layer = layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
@@ -136,15 +148,9 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     /*Let the render thread work*/
     if(draw_sw_unit->inited) lv_thread_sync_signal(&draw_sw_unit->sync);
 #else
-    execute_drawing(draw_sw_unit);
-
-    draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
-    draw_sw_unit->task_act = NULL;
-
-    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-    lv_draw_dispatch_request();
-
+    execute_drawing_unit(draw_sw_unit);
 #endif
+    LV_PROFILER_END;
     return 1;
 }
 
@@ -169,14 +175,7 @@ static void render_thread_cb(void * ptr)
             break;
         }
 
-        execute_drawing(u);
-
-        /*Cleanup*/
-        u->task_act->state = LV_DRAW_TASK_STATE_READY;
-        u->task_act = NULL;
-
-        /*The draw unit is free now. Request a new dispatching as it can get a new task*/
-        lv_draw_dispatch_request();
+        execute_drawing_unit(u);
     }
 
     u->inited = false;

@@ -433,6 +433,7 @@ refr_finish:
  */
 static void lv_refr_join_area(void)
 {
+    LV_PROFILER_BEGIN;
     uint32_t join_from;
     uint32_t join_in;
     lv_area_t joined_area;
@@ -463,6 +464,7 @@ static void lv_refr_join_area(void)
             }
         }
     }
+    LV_PROFILER_END;
 }
 
 /**
@@ -479,6 +481,7 @@ static void refr_sync_areas(void)
     /*Do not sync if no sync areas*/
     if(_lv_ll_is_empty(&disp_refr->sync_areas)) return;
 
+    LV_PROFILER_BEGIN;
     /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
     /*We need to wait for ready here to not mess up the active screen*/
     while(disp_refr->flushing) {}
@@ -541,6 +544,7 @@ static void refr_sync_areas(void)
 
     /*Clear sync areas*/
     _lv_ll_clear(&disp_refr->sync_areas);
+    LV_PROFILER_END;
 }
 
 /**
@@ -594,6 +598,7 @@ static void refr_area(const lv_area_t * area_p)
     /*With full refresh just redraw directly into the buffer*/
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
     if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        LV_PROFILER_BEGIN;
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
         layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
@@ -612,6 +617,7 @@ static void refr_area(const lv_area_t * area_p)
             layer->clip_area = *area_p;
             refr_area_part(layer);
         }
+        LV_PROFILER_END;
         return;
     }
 
@@ -659,6 +665,7 @@ static void refr_area(const lv_area_t * area_p)
 
 static void refr_area_part(lv_layer_t * layer)
 {
+    LV_PROFILER_BEGIN;
     disp_refr->refreshed_area = layer->clip_area;
 
     /* In single buffered mode wait here until the buffer is freed.
@@ -713,6 +720,7 @@ static void refr_area_part(lv_layer_t * layer)
     refr_obj_and_children(layer, lv_display_get_layer_sys(disp_refr));
 
     draw_buf_flush(disp_refr);
+    LV_PROFILER_END;
 }
 
 /**
@@ -769,6 +777,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     if(top_obj == NULL) top_obj = lv_display_get_screen_act(disp_refr);
     if(top_obj == NULL) return;  /*Shouldn't happen*/
 
+    LV_PROFILER_BEGIN;
     /*Refresh the top object and its children*/
     refr_obj(layer, top_obj);
 
@@ -805,6 +814,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
         /*Go a level deeper*/
         parent = lv_obj_get_parent(parent);
     }
+    LV_PROFILER_END;
 }
 
 
