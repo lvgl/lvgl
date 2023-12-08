@@ -413,7 +413,6 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
         bidi_txt = (char *)txt + line_start;
     }
 
-
     /*Calculate the x coordinate*/
     int32_t x = 0;
     const lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, label->text);
@@ -465,7 +464,6 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     {
         logical_pos = _lv_text_encoded_get_char_id(bidi_txt, i);
     }
-
 
     return  logical_pos + _lv_text_encoded_get_char_id(txt, line_start);
 }
