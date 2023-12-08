@@ -698,7 +698,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
             p.y -= label->coords.y1;
             p.x -= label->coords.x1;
             uint32_t letter_i;
-            letter_i = lv_label_get_letter_on(label, &p);
+            letter_i = lv_label_get_letter_on(label, &p, true);
 
             const char * txt  = lv_label_get_text(label);
             uint32_t i        = 0;
