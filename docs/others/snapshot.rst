@@ -47,7 +47,7 @@ Use Existing Buffer
 ~~~~~~~~~~~~~~~~~~~
 
 If the snapshot needs update now and then, or simply caller provides memory, use API
-``lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf, uint32_t buff_size);``
+``lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf, uint32_t buf_size);``
 for this case. It's caller's responsibility to alloc/free the memory.
 
 If snapshot is generated successfully, the image descriptor is updated
