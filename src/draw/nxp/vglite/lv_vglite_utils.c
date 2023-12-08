@@ -20,6 +20,7 @@
 
 #include "../../../core/lv_refr.h"
 
+#include "vg_lite_options.h"
 #if VGLITE_TASK_QUEUE
     #include "vg_lite_gpu.h"
 #endif
@@ -88,12 +89,10 @@ vg_lite_color_t vglite_get_color(lv_color32_t lv_col32, bool gradient)
 {
     vg_lite_color_t vg_col32;
 
-    /* Only pre-multiply color if hardware pre-multiplication is not present */
-    if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
-        lv_col32.red = (uint8_t)((uint16_t)(lv_col32.red * lv_col32.alpha) >> 8);
-        lv_col32.green = (uint8_t)((uint16_t)(lv_col32.green * lv_col32.alpha) >> 8);
-        lv_col32.blue = (uint8_t)((uint16_t)(lv_col32.blue * lv_col32.alpha) >> 8);
-    }
+    /* Pre-multiply alpha */
+    lv_col32.red = LV_UDIV255(lv_col32.red * lv_col32.alpha);
+    lv_col32.green = LV_UDIV255(lv_col32.green * lv_col32.alpha);
+    lv_col32.blue = LV_UDIV255(lv_col32.blue * lv_col32.alpha);
 
     if(!gradient)
         /* The color is in ABGR8888 format with red channel in the lower 8 bits. */
@@ -109,21 +108,45 @@ vg_lite_color_t vglite_get_color(lv_color32_t lv_col32, bool gradient)
 
 vg_lite_blend_t vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode)
 {
-    vg_lite_blend_t vg_blend_mode;
+    vg_lite_blend_t vg_blend_mode = VG_LITE_BLEND_NONE;
 
-    switch(lv_blend_mode) {
-        case LV_BLEND_MODE_ADDITIVE:
-            vg_blend_mode = VG_LITE_BLEND_ADDITIVE;
-            break;
-        case LV_BLEND_MODE_SUBTRACTIVE:
-            vg_blend_mode = VG_LITE_BLEND_SUBTRACT;
-            break;
-        case LV_BLEND_MODE_MULTIPLY:
-            vg_blend_mode = VG_LITE_BLEND_MULTIPLY;
-            break;
-        default:
-            vg_blend_mode = VG_LITE_BLEND_SRC_OVER;
-            break;
+    if(vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
+        switch(lv_blend_mode) {
+            case LV_BLEND_MODE_NORMAL:
+                vg_blend_mode = VG_LITE_BLEND_NORMAL_LVGL;
+                break;
+            case LV_BLEND_MODE_ADDITIVE:
+                vg_blend_mode = VG_LITE_BLEND_ADDITIVE_LVGL;
+                break;
+            case LV_BLEND_MODE_SUBTRACTIVE:
+                vg_blend_mode = VG_LITE_BLEND_SUBTRACT_LVGL;
+                break;
+            case LV_BLEND_MODE_MULTIPLY:
+                vg_blend_mode = VG_LITE_BLEND_MULTIPLY_LVGL;
+                break;
+            default:
+                LV_ASSERT_MSG(false, "Unsupported blend mode.");
+                break;
+        }
+    }
+    else {
+        switch(lv_blend_mode) {
+            case LV_BLEND_MODE_NORMAL:
+                vg_blend_mode = VG_LITE_BLEND_SRC_OVER;
+                break;
+            case LV_BLEND_MODE_ADDITIVE:
+                vg_blend_mode = VG_LITE_BLEND_ADDITIVE;
+                break;
+            case LV_BLEND_MODE_SUBTRACTIVE:
+                vg_blend_mode = VG_LITE_BLEND_SUBTRACT;
+                break;
+            case LV_BLEND_MODE_MULTIPLY:
+                vg_blend_mode = VG_LITE_BLEND_MULTIPLY;
+                break;
+            default:
+                LV_ASSERT_MSG(false, "Unsupported blend mode.");
+                break;
+        }
     }
 
     return vg_blend_mode;

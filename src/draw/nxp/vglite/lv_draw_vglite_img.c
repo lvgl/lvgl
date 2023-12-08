@@ -204,7 +204,7 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
     bool has_recolor = (dsc->recolor_opa > LV_OPA_MIN);
     if(has_recolor) {
         color = dsc->recolor;
-        opa = (lv_opa_t)((uint16_t)(dsc->recolor_opa * dsc->opa) >> 8);
+        opa = LV_OPA_MIX2(dsc->recolor_opa, dsc->opa);
     }
     else {
         color.red = 0xFF;
