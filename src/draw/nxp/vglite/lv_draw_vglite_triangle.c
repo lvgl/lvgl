@@ -132,12 +132,12 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
     if(has_gradient) {
         vg_lite_matrix_t * grad_matrix;
 
-        uint32_t colors[LV_GRADIENT_MAX_STOPS];
-        uint32_t stops[LV_GRADIENT_MAX_STOPS];
+        vg_lite_uint32_t colors[LV_GRADIENT_MAX_STOPS];
+        vg_lite_uint32_t stops[LV_GRADIENT_MAX_STOPS];
         lv_color32_t col32[LV_GRADIENT_MAX_STOPS];
 
         /* Gradient Setup */
-        uint8_t cnt = LV_MAX(dsc->bg_grad.stops_count, LV_GRADIENT_MAX_STOPS);
+        vg_lite_uint32_t cnt = LV_MAX(dsc->bg_grad.stops_count, LV_GRADIENT_MAX_STOPS);
         for(uint8_t i = 0; i < cnt; i++) {
             stops[i] = dsc->bg_grad.stops[i].frac;
 
