@@ -14,8 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_draw.h"
+
 #if LV_USE_DRAW_SDL
 
+#include <src/misc/cache/lv_cache.h>
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
 #include "../../display/lv_display.h"
@@ -33,6 +35,7 @@ typedef struct {
     lv_draw_unit_t base_unit;
     struct _lv_draw_task_t * task_act;
     uint32_t texture_cache_data_type;
+    lv_cache_t_ * texture_cache;
 } lv_draw_sdl_unit_t;
 
 #if LV_DRAW_SW_SHADOW_CACHE_SIZE
