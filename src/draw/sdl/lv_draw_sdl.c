@@ -219,7 +219,6 @@ static lv_cache_entry_t * draw_to_texture(lv_draw_sdl_unit_t * u)
             }
         default:
             return NULL;
-            break;
     }
 
     while(dest_layer.draw_task_head) {
