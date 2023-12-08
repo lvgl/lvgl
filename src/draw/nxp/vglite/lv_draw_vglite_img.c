@@ -188,11 +188,11 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
     vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
     vg_lite_buffer_t * src_vgbuf = vglite_get_src_buf();
 
-    uint32_t rect[] = {
-        (uint32_t)src_area->x1, /* start x */
-        (uint32_t)src_area->y1, /* start y */
-        (uint32_t)lv_area_get_width(src_area), /* width */
-        (uint32_t)lv_area_get_height(src_area) /* height */
+    vg_lite_rectangle_t rect = {
+        .x = (vg_lite_int32_t)src_area->x1,
+        .y = (vg_lite_int32_t)src_area->y1,
+        .width = (vg_lite_int32_t)lv_area_get_width(src_area),
+        .height = (vg_lite_int32_t)lv_area_get_height(src_area)
     };
 
     src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
@@ -219,7 +219,7 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
     vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
     vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
 
-    err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, rect, vgmatrix, vgblend, vgcol, VG_LITE_FILTER_POINT);
+    err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, &rect, vgmatrix, vgblend, vgcol, VG_LITE_FILTER_POINT);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Blit rectangle failed.");
 
     vglite_run();

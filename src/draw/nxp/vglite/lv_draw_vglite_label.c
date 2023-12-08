@@ -169,11 +169,11 @@ static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, l
     mask_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
     mask_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
-    uint32_t rect[] = {
-        (uint32_t)mask_area->x1, /* start x */
-        (uint32_t)mask_area->y1, /* start y */
-        (uint32_t)lv_area_get_width(mask_area), /* width */
-        (uint32_t)lv_area_get_height(mask_area) /* height */
+    vg_lite_rectangle_t rect = {
+        .x = (vg_lite_int32_t)mask_area->x1,
+        .y = (vg_lite_int32_t)mask_area->y1,
+        .width = (vg_lite_int32_t)lv_area_get_width(mask_area),
+        .height = (vg_lite_int32_t)lv_area_get_height(mask_area)
     };
 
     lv_color32_t col32 = lv_color_to_32(color, opa);
@@ -182,7 +182,7 @@ static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, l
     vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
 
     /*Blit with font color as paint color*/
-    err = vg_lite_blit_rect(dst_vgbuf, mask_vgbuf, rect, vgmatrix, VG_LITE_BLEND_SRC_OVER, vgcol, VG_LITE_FILTER_POINT);
+    err = vg_lite_blit_rect(dst_vgbuf, mask_vgbuf, &rect, vgmatrix, VG_LITE_BLEND_SRC_OVER, vgcol, VG_LITE_FILTER_POINT);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw letter failed.");
 
     vglite_run();
