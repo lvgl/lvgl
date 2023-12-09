@@ -60,11 +60,11 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_color_format_t cf);
  * @param cf        color format for generated image.
  * @param dsc       image descriptor to store the image result.
  * @param buf       the buffer to store image data.
- * @param buff_size provided buffer size in bytes.
+ * @param buf_size  provided buffer size in bytes.
  * @return          LV_RESULT_OK on success, LV_RESULT_INVALID on error.
  */
 lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf,
-                                    uint32_t buff_size);
+                                    uint32_t buf_size);
 
 /**********************
  *      MACROS
