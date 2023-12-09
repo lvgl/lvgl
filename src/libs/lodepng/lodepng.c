@@ -5307,13 +5307,17 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
     lodepng_free(idat);
 
     if(!state->error) {
-        outsize = lodepng_get_raw_size(*w, *h, &state->info_png.color);
-        *out = (unsigned char *)lv_draw_buf_malloc(outsize, LV_COLOR_FORMAT_ARGB8888);
-        if(!*out) state->error = 83; /*alloc fail*/
+        lv_draw_buf_t * decoded = lv_draw_buf_create(*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
+        if(decoded) {
+            *out = (unsigned char*)decoded;
+            outsize = decoded->data_size;
+        }
+        else state->error = 83; /*alloc fail*/
     }
     if(!state->error) {
-        lodepng_memset(*out, 0, outsize);
-        state->error = postProcessScanlines(*out, scanlines, *w, *h, &state->info_png);
+        lv_draw_buf_t * decoded = (lv_draw_buf_t *)*out;
+        lodepng_memset(decoded->data, 0, outsize);
+        state->error = postProcessScanlines(decoded->data, scanlines, *w, *h, &state->info_png);
     }
     lodepng_free(scanlines);
 }

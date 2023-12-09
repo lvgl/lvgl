@@ -162,7 +162,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         size_t decoded_size = 0;
         uint32_t t = lv_tick_get();
         lv_draw_buf_t * decoded = decode_jpeg_file(fn);
-        if(decoded == NULL){
+        if(decoded == NULL) {
             LV_LOG_WARN("decode jpeg file failed");
             return LV_RESULT_INVALID;
         }
