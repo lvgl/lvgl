@@ -189,6 +189,11 @@ void lv_draw_buf_destroy(lv_draw_buf_t * buf);
 void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y);
 
 /**
+ * Adjust the stride of a draw buf.
+ */
+lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t stride);
+
+/**
  * As of now, draw buf share same definition as `lv_image_dsc_t`.
  * And is interchangeable with `lv_image_dsc_t`.
  */

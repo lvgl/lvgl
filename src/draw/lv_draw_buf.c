@@ -179,6 +179,44 @@ void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y)
     return data + x * lv_color_format_get_size(buf->header.cf);
 }
 
+/**
+ * Convert draw buffer stride and color format.
+ * @param src source draw buffer
+ * @param stride new stride
+ * @return converted draw buffer
+ */
+lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t stride)
+{
+    LV_ASSERT_NULL(src);
+    LV_ASSERT_NULL(src->data);
+    if(src == NULL) return NULL;
+    if(src->data == NULL) return NULL;
+
+    /*Check if stride already match*/
+    if(src->header.stride == stride) return NULL;
+
+    /*Calculate the minimal stride allowed from bpp*/
+    uint32_t bpp = lv_color_format_get_bpp(src->header.cf);
+    uint32_t min_stride = (src->header.w * bpp + 7) >> 3;
+    if(stride < min_stride) {
+        LV_LOG_WARN("New stride is too small. min: %" LV_PRId32, min_stride);
+        return NULL;
+    }
+
+    lv_draw_buf_t * dst = lv_draw_buf_create(src->header.w, src->header.h, src->header.cf, stride);
+    if(dst == NULL) return NULL;
+
+    uint8_t * dst_data = dst->data;
+    const uint8_t * src_data = src->data;
+    for(int32_t y = 0; y < src->header.h; y++) {
+        lv_memcpy(dst_data, src_data, min_stride);
+        src_data += src->header.stride;
+        dst_data += dst->header.stride;
+    }
+
+    return dst;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
