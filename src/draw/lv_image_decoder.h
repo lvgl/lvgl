@@ -145,10 +145,8 @@ typedef struct _lv_image_decoder_dsc_t {
     /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
     lv_image_header_t header;
 
-    /** Pointer to a buffer where the image's data (pixels) are stored in a decoded, plain format.
-     *  MUST be set in `open` function*/
-    const uint8_t * img_data;
-
+    /** Pointer to a draw buffer where the image's data (pixels) are stored in a decoded, plain format.
+     *  MUST be set in `open` or `get_area_cb`function*/
     const lv_draw_buf_t * decoded;    /*A draw buffer to described decoded image.*/
 
     const lv_color32_t * palette;
@@ -174,14 +172,6 @@ typedef struct _lv_image_decoder_dsc_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * @todo remove it when all decoder migrates to new draw buf interface.
- */
-static inline const void * _lv_image_decoder_get_data(const lv_image_decoder_dsc_t * dsc)
-{
-    return dsc->decoded ? dsc->decoded->data : dsc->img_data;
-}
 
 /**
  * Initialize the image decoder module

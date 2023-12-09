@@ -171,7 +171,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         lv_memzero(&dsc->header, sizeof(lv_image_header_t));
 
         dsc->error_msg = NULL;
-        dsc->img_data  = NULL;
         dsc->decoded  = NULL;
         dsc->cache_entry = NULL;
         dsc->user_data = NULL;
