@@ -79,7 +79,6 @@ LV_IMAGE_DECLARE(test_RGB888_LZ4_align1);
 LV_IMAGE_DECLARE(test_XRGB8888_LZ4_align1);
 LV_IMAGE_DECLARE(test_ARGB8888_LZ4_align1);
 
-
 LV_IMAGE_DECLARE(test_I1_NONE_align64);
 LV_IMAGE_DECLARE(test_I2_NONE_align64);
 LV_IMAGE_DECLARE(test_I4_NONE_align64);
@@ -258,7 +257,7 @@ static void bin_image_create(bool rotate, bool recolor, int align, int compress)
     char name[32];
     char path[256];
     int stride = stride_align[align];
-    for (unsigned i = 0; i < sizeof(color_formats) / sizeof(color_formats[0]); i++) {
+    for(unsigned i = 0; i < sizeof(color_formats) / sizeof(color_formats[0]); i++) {
         sprintf(name, "bin%s", color_formats[i]);
         sprintf(path, "A:test_images/stride_align%d/%s/test_%s.bin", stride, compressions[compress], color_formats[i]);
         img_create(name, path, rotate, recolor);
@@ -268,7 +267,7 @@ static void bin_image_create(bool rotate, bool recolor, int align, int compress)
 static void c_array_image_create(bool rotate, bool recolor, int align, int compress)
 {
     char name[32];
-    for (unsigned i = 0; i < sizeof(color_formats) / sizeof(color_formats[0]); i++) {
+    for(unsigned i = 0; i < sizeof(color_formats) / sizeof(color_formats[0]); i++) {
         sprintf(name, "%s%s", compressions[compress], color_formats[i]);
         const void * src = c_array_images[align][compress][i];
         img_create(name, src, rotate, recolor);
@@ -277,13 +276,13 @@ static void c_array_image_create(bool rotate, bool recolor, int align, int compr
 
 void test_image_formats()
 {
-    for (unsigned align = 0; align <= 1; align++){
+    for(unsigned align = 0; align <= 1; align++) {
         int stride = stride_align[align];
-        for (unsigned mode = 0; mode <= 3; mode++) {
+        for(unsigned mode = 0; mode <= 3; mode++) {
             bool rotate = mode & 0x02;
             bool recolor = mode & 0x01;
             /*Loop compressions array and do test.*/
-            for (unsigned i = 0; i < sizeof(compressions) / sizeof(compressions[0]); i++) {
+            for(unsigned i = 0; i < sizeof(compressions) / sizeof(compressions[0]); i++) {
                 char reference[256];
                 bin_image_create(rotate, recolor, align, i);
                 snprintf(reference, sizeof(reference), "draw/bin_image_stride%d_%s_%s.png", stride, compressions[i], modes[mode]);
