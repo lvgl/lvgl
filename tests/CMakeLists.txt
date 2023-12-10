@@ -174,6 +174,8 @@ set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}>
 )
 
+file(GLOB_RECURSE TEST_IMAGES_SRC ${LVGL_TEST_DIR}/test_images/*.c)
+
 add_library(test_common
     STATIC
         src/lv_test_indev.c
@@ -206,6 +208,7 @@ add_library(test_common
         src/test_assets/kern_one_otf.c
         unity/unity_support.c
         unity/unity.c
+        ${TEST_IMAGES_SRC}
 )
 target_include_directories(test_common PUBLIC ${TEST_INCLUDE_DIRS})
 target_compile_options(test_common PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
