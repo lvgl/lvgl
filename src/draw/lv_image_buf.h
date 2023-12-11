@@ -96,14 +96,15 @@ typedef enum {
  */
 #if LV_BIG_ENDIAN_SYSTEM
 typedef struct {
-
-    uint32_t h : 11; /*Height of the image map*/
-    uint32_t w : 11; /*Width of the image map*/
-    uint32_t reserved : 2; /*Reserved to be used later*/
-    uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
-                                 non-printable character*/
-    uint32_t cf : 5;          /*Color format: See `lv_color_format_t`*/
-
+    uint32_t reserved_2: 16;    /*Reserved to be used later*/
+    uint32_t stride: 16;        /*Number of bytes in a row*/
+    uint32_t h: 16;
+    uint32_t w: 16;
+    uint32_t flags: 16;         /*Image flags, see `lv_image_flags_t`*/
+    uint32_t reserved_1: 8;     /*Reserved by LVGL for later use*/
+    uint32_t always_zero : 3;   /*It the upper bits of the first byte. Always zero to look like a
+                                  non-printable character*/
+    uint32_t cf : 5;            /*Color format: See `lv_color_format_t`*/
 } lv_image_header_t;
 #else
 typedef struct {
@@ -111,13 +112,13 @@ typedef struct {
     uint32_t always_zero : 3;   /*It the upper bits of the first byte. Always zero to look like a
                                   non-printable character*/
 
-    uint32_t format: 8;         /*Image format? To be defined by LVGL*/
+    uint32_t reserved_1: 8;     /*Reserved by LVGL for later use*/
     uint32_t flags: 16;         /*Image flags, see `lv_image_flags_t`*/
 
     uint32_t w: 16;
     uint32_t h: 16;
-    uint32_t stride: 16;       /*Number of bytes in a row*/
-    uint32_t reserved_2: 16;   /*Reserved to be used later*/
+    uint32_t stride: 16;        /*Number of bytes in a row*/
+    uint32_t reserved_2: 16;    /*Reserved to be used later*/
 } lv_image_header_t;
 #endif
 
