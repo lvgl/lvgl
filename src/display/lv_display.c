@@ -542,7 +542,7 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
         if(d->del_prev) {
             lv_obj_delete(act_scr);
         }
-        act_scr = d->scr_to_load;
+        act_scr = lv_screen_active(); /*Active screen changed.*/
     }
 
     d->scr_to_load = new_scr;
@@ -557,18 +557,18 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
     /*Be sure there is no other animation on the screens*/
     lv_anim_delete(new_scr, NULL);
-    lv_anim_delete(lv_screen_active(), NULL);
+    if(act_scr) lv_anim_delete(act_scr, NULL);
 
     /*Be sure both screens are in a normal position*/
     lv_obj_set_pos(new_scr, 0, 0);
-    lv_obj_set_pos(lv_screen_active(), 0, 0);
+    if(act_scr) lv_obj_set_pos(act_scr, 0, 0);
     lv_obj_remove_local_style_prop(new_scr, LV_STYLE_OPA, 0);
-    lv_obj_remove_local_style_prop(lv_screen_active(), LV_STYLE_OPA, 0);
+    if(act_scr) lv_obj_remove_local_style_prop(act_scr, LV_STYLE_OPA, 0);
 
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
         scr_load_internal(new_scr);
-        if(auto_del) lv_obj_delete(act_scr);
+        if(auto_del && act_scr) lv_obj_delete(act_scr);
         return;
     }
 
@@ -582,7 +582,7 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
     lv_anim_t a_old;
     lv_anim_init(&a_old);
-    lv_anim_set_var(&a_old, d->act_scr);
+    lv_anim_set_var(&a_old, act_scr);
     lv_anim_set_duration(&a_old, time);
     lv_anim_set_delay(&a_old, delay);
 
@@ -662,10 +662,10 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
             break;
     }
 
-    lv_obj_send_event(act_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
+    if(act_scr) lv_obj_send_event(act_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
 
     lv_anim_start(&a_new);
-    lv_anim_start(&a_old);
+    if(act_scr) lv_anim_start(&a_old);
 }
 
 /*---------------------
@@ -894,19 +894,23 @@ static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_d
 
 static void scr_load_internal(lv_obj_t * scr)
 {
+    /*scr must not be NULL, but d->act_scr might be*/
+    LV_ASSERT_NULL(scr);
+    if(scr == NULL) return;
+
     lv_display_t * d = lv_obj_get_disp(scr);
     if(!d) return;  /*Shouldn't happen, just to be sure*/
 
     lv_obj_t * old_scr = d->act_scr;
 
-    if(d->act_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
-    if(d->act_scr) lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
+    if(old_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
+    lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
 
     d->act_scr = scr;
     d->scr_to_load = NULL;
 
-    if(d->act_scr) lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
-    if(d->act_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+    lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
+    if(old_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
 
     lv_obj_invalidate(scr);
 }
