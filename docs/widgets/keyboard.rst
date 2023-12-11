@@ -4,7 +4,7 @@ Keyboard (lv_keyboard)
 Overview
 ********
 
-The Keyboard object is a special `Button matrix </widgets/btnmatrix>`__
+The Keyboard object is a special `Button matrix </widgets/buttonmatrix>`__
 with predefined keymaps and other features to realize a virtual keyboard
 to write texts into a `Text area </widgets/textarea>`__.
 
@@ -49,7 +49,7 @@ To enable key popovers on press, like on common Android and iOS
 keyboards, use :cpp:expr:`lv_keyboard_set_popovers(kb, true)`. The default
 control maps are preconfigured to only show the popovers on keys that
 produce a symbol and not on e.g. space. If you use a custom keymap, set
-the :cpp:enumerator:`LV_BTNMATRIX_CTRL_POPOVER` flag for all keys that you want to
+the :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_POPOVER` flag for all keys that you want to
 show a popover.
 
 Note that popovers for keys in the top row will draw outside the widget
@@ -65,7 +65,7 @@ New Keymap
 
 You can specify a new map (layout) for the keyboard with
 :cpp:expr:`lv_keyboard_set_map(kb, LV_KEYBOARD_MODE_..., kb_map, kb_ctrl)`. See
-the `Button matrix </widgets/btnmatrix>`__ for more information about
+the `Button matrix </widgets/buttonmatrix>`__ for more information about
 creating new maps and ctrls.
 
 Keep in mind that using following keywords will have the same effect as

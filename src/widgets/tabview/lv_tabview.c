@@ -149,7 +149,7 @@ void lv_tabview_set_active(lv_obj_t * obj, uint32_t idx, lv_anim_enable_t anim_e
     tabview->tab_cur = idx;
 }
 
-void lv_tabview_set_tab_position(lv_obj_t * obj, lv_dir_t dir)
+void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
@@ -267,7 +267,7 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
-    lv_tabview_set_tab_position(obj, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_position(obj, LV_DIR_TOP);
 
     lv_obj_add_flag(cont, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_remove_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);

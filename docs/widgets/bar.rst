@@ -54,16 +54,6 @@ The bar can be one of the following modes:
 
 Events
 ******
-
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following parts:
-
-   -  :cpp:enumerator:`LV_BAR_DRAW_PART_INDICATOR` The indicator of the bar
-
-      -  ``part``: :cpp:enumerator:`LV_PART_INDICATOR`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-
 See the events of the `Base object </widgets/obj>`__ too.
 
 Learn more about :ref:`events`.

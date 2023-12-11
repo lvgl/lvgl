@@ -1,4 +1,4 @@
-Button (lv_btn)
+Button (lv_button)
 ===============
 
 Overview
@@ -46,7 +46,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/btn/index.rst
+.. include:: ../examples/widgets/button/index.rst
 
 API
 ***

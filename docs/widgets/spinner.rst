@@ -18,8 +18,10 @@ Create a spinner
 ----------------
 
 To create a spinner use
-:cpp:expr:`lv_spinner_create(parent, spin_time, arc_length)`. ``spin time`` sets
-the spin time in milliseconds, ``arc_length`` sets the length of the spinning arc in degrees.
+:cpp:expr:`lv_spinner_create(parent)`.
+
+Using :cpp:expr:`lv_spinner_set_anim_params(spinner, spin_duration, angle)` the duration
+of one revulation and the length of he arc can be customized.
 
 Events
 ******

@@ -38,8 +38,8 @@ Change tile
 -----------
 
 The Tile view can scroll to a tile with
-:cpp:expr:`lv_obj_set_tile(tileview, tile_obj, LV_ANIM_ON/OFF)` or
-:cpp:expr:`lv_obj_set_tile_id(tileview, col_id, row_id, LV_ANIM_ON/OFF)`
+:cpp:expr:`lv_tileview_set_tile(tileview, tile_obj, LV_ANIM_ON/OFF)` or
+:cpp:expr:`lv_tileview_set_tile_by_index(tileview, col_id, row_id, LV_ANIM_ON/OFF)`
 
 Events
 ******

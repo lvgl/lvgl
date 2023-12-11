@@ -8,7 +8,7 @@ The Tab view object can be used to organize content in tabs. The Tab
 view is built from other widgets:
 
 - Main container: `lv_obj </widgets/obj>`__
-- Tab buttons: `lv_btnmatrix </widgets/btnmatrix>`__
+- Tab buttons: an `lv_obj </widgets/obj>`__` with `lv_button </widgets/button>`__ s
 - Container for the tabs: `lv_obj </widgets/obj>`__
 - Content of the tabs: `lv_obj </widgets/obj>`__
 
@@ -22,7 +22,7 @@ Parts and Styles
 ****************
 
 There are no special parts on the Tab view but the ``lv_obj`` and
-``lv_btnmatrix`` widgets are used to create the Tab view.
+``lv_button`` widgets are used to create the Tab view.
 
 Usage
 *****
@@ -30,12 +30,8 @@ Usage
 Create a Tab view
 -----------------
 
-:cpp:expr:`lv_tabview_create(parent, tab_pos, tab_size)` creates a new empty
-Tab view. ``tab_pos`` can be ``LV_DIR_TOP/BOTTOM/LEFT/RIGHT`` to
-position the tab buttons to a side. ``tab_size`` is the height (in case
-of ``LV_DIR_TOP/BOTTOM``) or width (in case of ``LV_DIR_LEFT/RIGHT``)
-tab buttons.
-
+:cpp:expr:`lv_tabview_create(parent)` creates a new empty
+Tab view.
 Add tabs
 --------
 
@@ -58,12 +54,26 @@ To select a new tab you can:
 - Slide horizontally
 - Use :cpp:expr:`lv_tabview_set_active(tabview, id, LV_ANIM_ON)` function
 
+
+Set tab bar position
+--------------------
+
+Using the :cpp:expr:`lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT/RIGHT/TOP/BOTTOM)`
+the tab bar can be moved to any sides.
+
+Set tab bra size
+----------------
+
+The size of the tab bar can be adjusted by :spp:expr:`lv_tabview_set_tab_bar_size(tabview, size)`
+In case of vertical arrangement is means the height of the tab bar, and in horizontal
+arrangement it means the width.
+
 Get the parts
 -------------
 
 :cpp:expr:`lv_tabview_get_content(tabview)` returns the container for the tabs,
-:cpp:expr:`lv_tabview_get_tab_btns(tabview)` returns the Tab buttons object
-which is a `Button matrix </widgets/btnmatrix>`__.
+:cpp:expr:`lv_tabview_get_tab_buttons(tabview)` returns the Tab buttons object
+which is a `Button matrix </widgets/buttonmatrix>`__.
 
 Events
 ******

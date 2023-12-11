@@ -270,7 +270,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
                 obj = lv_label_create(obj);
                 lv_label_set_text(obj, "Tile: 1;1");
 
-                lv_obj_set_tile_id(tv, 1, 1, LV_ANIM_ON);
+                lv_tileview_set_tile_by_index(tv, 1, 1, LV_ANIM_ON);
             }
             break;
 

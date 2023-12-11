@@ -11,11 +11,11 @@ Parts and Styles
 ****************
 
 The menu widget is built from the following objects: - Main container:
-lv_menu_main_cont - Main header: lv_menu_main_header_cont - Back btn:
-`lv_btn </widgets/btn>`__ - Back btn icon: `lv_img </widgets/img>`__ -
+lv_menu_main_cont - Main header: lv_menu_main_header_cont - Back button:
+`lv_button </widgets/button>`__ - Back button icon: `lv_img </widgets/img>`__ -
 Main page: lv_menu_page - Sidebar container: lv_menu_sidebar_cont -
-Sidebar header: lv_menu_sidebar_header_cont - Back btn:
-`lv_btn </widgets/btn>`__ - Back btn icon: `lv_img </widgets/img>`__ -
+Sidebar header: lv_menu_sidebar_header_cont - Back button:
+`lv_button </widgets/button>`__ - Back button icon: `lv_img </widgets/img>`__ -
 Sidebar page: lv_menu_page
 
 Usage
@@ -46,7 +46,7 @@ The following root back button modes exist:
 - :cpp:enumerator:`LV_MENU_ROOT_BACK_BTN_ENABLED`
 
 You can set root back button modes with
-:cpp:expr:`lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN...)`.
+:cpp:expr:`lv_menu_set_mode_root_back_button(menu, LV_MENU_ROOT_BACK_BTN...)`.
 
 Create a menu page
 ------------------
@@ -70,8 +70,8 @@ Once a menu page has been created, you can set it to the sidebar with
 Linking between menu pages
 --------------------------
 
-For instance, you have created a btn obj in the main page. When you
-click the btn obj, you want it to open up a new page, use
+For instance, you have created a button obj in the main page. When you
+click the button obj, you want it to open up a new page, use
 :cpp:expr:`lv_menu_set_load_page_event(menu, obj, new page)`.
 
 Create a menu container, section, separator
@@ -94,12 +94,12 @@ Events
    -  :cpp:expr:`lv_menu_get_cur_sidebar_page(menu)` returns a pointer to menu
       page that is currently displayed in sidebar.
 
--  :cpp:enumerator:`LV_EVENT_CLICKED` Sent when a back btn in a header from either
+-  :cpp:enumerator:`LV_EVENT_CLICKED` Sent when a back button in a header from either
    main or sidebar is clicked. :cpp:enumerator:`LV_OBJ_FLAG_EVENT_BUBBLE` is enabled
    on the buttons so you can add events to the menu itself.
 
-   -  :cpp:expr:`lv_menu_back_btn_is_root(menu, btn)` to check if btn is root
-      back btn
+   -  :cpp:expr:`lv_menu_back_button_is_root(menu, button)` to check if button is root
+      back button
 
 See the events of the `Base object </widgets/obj>`__ too.
 

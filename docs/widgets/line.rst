@@ -19,7 +19,7 @@ Usage
 Set points
 ----------
 
-The points have to be stored in an :cpp:struct:`lv_point_t` array and passed to
+The points have to be stored in an :cpp:struct:`lv_point_precise_t` array and passed to
 the object by the :cpp:expr:`lv_line_set_points(lines, point_array, point_cnt)`
 function.
 
