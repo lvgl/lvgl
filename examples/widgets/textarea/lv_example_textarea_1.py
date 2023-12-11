@@ -16,7 +16,7 @@ def buttonm_event_handler(e, ta):
 ta = lv.textarea(lv.screen_active())
 ta.set_one_line(True)
 ta.align(lv.ALIGN.TOP_MID, 0, 10)
-ta.add_event(lambda e: textarea_event_handler(e, ta), lv.EVENT.READY, None)
+ta.add_event_cb(lambda e: textarea_event_handler(e, ta), lv.EVENT.READY, None)
 ta.add_state(lv.STATE.FOCUSED)   # To be sure the cursor is visible
 
 buttonm_map = ["1", "2", "3", "\n",
@@ -27,6 +27,6 @@ buttonm_map = ["1", "2", "3", "\n",
 buttonm = lv.buttonmatrix(lv.screen_active())
 buttonm.set_size(200, 150)
 buttonm.align(lv.ALIGN.BOTTOM_MID, 0, -10)
-buttonm.add_event(lambda e: buttonm_event_handler(e, ta), lv.EVENT.VALUE_CHANGED, None)
+buttonm.add_event_cb(lambda e: buttonm_event_handler(e, ta), lv.EVENT.VALUE_CHANGED, None)
 buttonm.remove_flag(lv.obj.FLAG.CLICK_FOCUSABLE)    # To keep the text area focused on button clicks
 buttonm.set_map(buttonm_map)

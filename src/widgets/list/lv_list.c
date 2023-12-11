@@ -102,7 +102,7 @@ const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn)
 {
     LV_UNUSED(list);
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(btn); i++) {
+    for(i = 0; i < lv_obj_get_child_count(btn); i++) {
         lv_obj_t * child = lv_obj_get_child(btn, i);
         if(lv_obj_check_type(child, &lv_label_class)) {
             return lv_label_get_text(child);
@@ -117,7 +117,7 @@ void lv_list_set_button_text(lv_obj_t * list, lv_obj_t * btn, const char * txt)
 {
     LV_UNUSED(list);
     uint32_t i;
-    for(i = 0; i < lv_obj_get_child_cnt(btn); i++) {
+    for(i = 0; i < lv_obj_get_child_count(btn); i++) {
         lv_obj_t * child = lv_obj_get_child(btn, i);
         if(lv_obj_check_type(child, &lv_label_class)) {
             lv_label_set_text(child, txt);

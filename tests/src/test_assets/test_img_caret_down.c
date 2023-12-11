@@ -25,7 +25,6 @@ test_image_caret_down_map[]
 };
 
 const lv_image_dsc_t test_image_caret_down = {
-    .header.always_zero = 0,
     .header.w = 13,
     .header.h = 8,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,

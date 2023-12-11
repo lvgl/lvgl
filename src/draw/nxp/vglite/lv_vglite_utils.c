@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -212,9 +211,6 @@ uint8_t vglite_get_px_size(lv_color_format_t cf)
         case LV_COLOR_FORMAT_XRGB8888:
             bits_per_pixel = 32;
             break;
-        case LV_COLOR_FORMAT_NATIVE_REVERSED:
-            bits_per_pixel = LV_COLOR_DEPTH;
-            break;
 
         default:
             LV_ASSERT_MSG(false, "Unsupported buffer format.");
@@ -226,7 +222,7 @@ uint8_t vglite_get_px_size(lv_color_format_t cf)
 
 uint8_t vglite_get_alignment(lv_color_format_t cf)
 {
-    uint8_t align_bytes = LV_COLOR_DEPTH / 8 * 16; //16 pixels
+    uint8_t align_bytes = LV_COLOR_DEPTH / 8 * 16; /*16 pixels*/
 
     switch(cf) {
         case LV_COLOR_FORMAT_I1:
@@ -249,9 +245,6 @@ uint8_t vglite_get_alignment(lv_color_format_t cf)
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
             align_bytes = 64;
-            break;
-        case LV_COLOR_FORMAT_NATIVE_REVERSED:
-            align_bytes = LV_COLOR_DEPTH / 8 * 16;
             break;
 
         default:

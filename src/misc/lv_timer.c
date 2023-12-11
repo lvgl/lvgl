@@ -52,9 +52,6 @@ static void lv_timer_handler_resume(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Init the lv_timer module
- */
 void _lv_timer_core_init(void)
 {
     _lv_ll_init(timer_ll_p, sizeof(lv_timer_t));
@@ -63,17 +60,6 @@ void _lv_timer_core_init(void)
     lv_timer_enable(true);
 }
 
-void _lv_timer_core_deinit(void)
-{
-    lv_timer_enable(false);
-
-    _lv_ll_clear(timer_ll_p);
-}
-
-/**
- * Call it periodically to handle lv_timers.
- * @return the time after which it must be called again
- */
 LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 {
     LV_TRACE_TIMER("begin");
@@ -167,25 +153,11 @@ LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void)
     }
 }
 
-/**
- * Create an "empty" timer. It needs to be initialized with at least
- * `lv_timer_set_cb` and `lv_timer_set_period`
- * @return pointer to the created timer
- */
 lv_timer_t * lv_timer_create_basic(void)
 {
     return lv_timer_create(NULL, DEF_PERIOD, NULL);
 }
 
-/**
- * Create a new lv_timer
- * @param timer_xcb a callback which is the timer itself. It will be called periodically.
- *                 (the 'x' in the argument name indicates that it's not a fully generic function because it not follows
- *                  the `func_name(object, callback, ...)` convention)
- * @param period call period in ms unit
- * @param user_data custom parameter
- * @return pointer to the new timer
- */
 lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * user_data)
 {
     lv_timer_t * new_timer = NULL;
@@ -200,6 +172,7 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
     new_timer->paused = 0;
     new_timer->last_run = lv_tick_get();
     new_timer->user_data = user_data;
+    new_timer->auto_delete = true;
 
     state.timer_created = true;
 
@@ -208,20 +181,12 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
     return new_timer;
 }
 
-/**
- * Set the callback to the timer (the function to call periodically)
- * @param timer pointer to a timer
- * @param timer_cb the function to call periodically
- */
 void lv_timer_set_cb(lv_timer_t * timer, lv_timer_cb_t timer_cb)
 {
+    LV_ASSERT_NULL(timer);
     timer->timer_cb = timer_cb;
 }
 
-/**
- * Delete a lv_timer
- * @param timer pointer to timer created by timer
- */
 void lv_timer_delete(lv_timer_t * timer)
 {
     _lv_ll_remove(timer_ll_p, timer);
@@ -230,104 +195,79 @@ void lv_timer_delete(lv_timer_t * timer)
     lv_free(timer);
 }
 
-/**
- * Pause/resume a timer.
- * @param timer pointer to an lv_timer
- */
 void lv_timer_pause(lv_timer_t * timer)
 {
+    LV_ASSERT_NULL(timer);
     timer->paused = true;
 }
 
 void lv_timer_resume(lv_timer_t * timer)
 {
+    LV_ASSERT_NULL(timer);
     timer->paused = false;
     lv_timer_handler_resume();
 }
 
-/**
- * Set new period for a lv_timer
- * @param timer pointer to a lv_timer
- * @param period the new period
- */
 void lv_timer_set_period(lv_timer_t * timer, uint32_t period)
 {
+    LV_ASSERT_NULL(timer);
     timer->period = period;
 }
 
-/**
- * Make a lv_timer ready. It will not wait its period.
- * @param timer pointer to a lv_timer.
- */
 void lv_timer_ready(lv_timer_t * timer)
 {
+    LV_ASSERT_NULL(timer);
     timer->last_run = lv_tick_get() - timer->period - 1;
 }
 
-/**
- * Set the number of times a timer will repeat.
- * @param timer pointer to a lv_timer.
- * @param repeat_count -1 : infinity;  0 : stop ;  n >0: residual times
- */
 void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count)
 {
+    LV_ASSERT_NULL(timer);
     timer->repeat_count = repeat_count;
 }
 
-/**
- * Set custom parameter to the lv_timer.
- * @param timer pointer to a lv_timer.
- * @param user_data custom parameter
- */
+void lv_timer_set_auto_delete(lv_timer_t * timer, bool auto_delete)
+{
+    LV_ASSERT_NULL(timer);
+    timer->auto_delete = auto_delete;
+}
+
 void lv_timer_set_user_data(lv_timer_t * timer, void * user_data)
 {
+    LV_ASSERT_NULL(timer);
     timer->user_data = user_data;
 }
 
-/**
- * Reset a lv_timer.
- * It will be called the previously set period milliseconds later.
- * @param timer pointer to a lv_timer.
- */
 void lv_timer_reset(lv_timer_t * timer)
 {
+    LV_ASSERT_NULL(timer);
     timer->last_run = lv_tick_get();
     lv_timer_handler_resume();
 }
 
-/**
- * Enable or disable the whole lv_timer handling
- * @param en true: lv_timer handling is running, false: lv_timer handling is suspended
- */
 void lv_timer_enable(bool en)
 {
     state.lv_timer_run = en;
     if(en) lv_timer_handler_resume();
 }
 
-/**
- * Get idle percentage
- * @return the lv_timer idle in percentage
- */
+void _lv_timer_core_deinit(void)
+{
+    lv_timer_enable(false);
+
+    _lv_ll_clear(timer_ll_p);
+}
+
 uint8_t lv_timer_get_idle(void)
 {
     return state.idle_last;
 }
 
-/**
- * Get idle period start tick
- * @return the lv_timer idle period start tick
- */
 uint32_t lv_timer_get_time_until_next(void)
 {
     return state.timer_time_until_next;
 }
 
-/**
- * Iterate through the timers
- * @param timer NULL to start iteration or the previous return value to get the next timer
- * @return the next timer or NULL if there is no more timer
- */
 lv_timer_t * lv_timer_get_next(lv_timer_t * timer)
 {
     if(timer == NULL) return _lv_ll_get_head(timer_ll_p);
@@ -372,8 +312,14 @@ static bool lv_timer_exec(lv_timer_t * timer)
 
     if(state.timer_deleted == false) { /*The timer might be deleted by itself as well*/
         if(timer->repeat_count == 0) { /*The repeat count is over, delete the timer*/
-            LV_TRACE_TIMER("deleting timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
-            lv_timer_delete(timer);
+            if(timer->auto_delete) {
+                LV_TRACE_TIMER("deleting timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
+                lv_timer_delete(timer);
+            }
+            else {
+                LV_TRACE_TIMER("pausing timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
+                lv_timer_pause(timer);
+            }
         }
     }
 

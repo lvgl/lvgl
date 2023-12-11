@@ -61,5 +61,5 @@ for i in range(4):
     image.set_style_bg_opa(lv.OPA.COVER, 0)
     image.set_style_transform_scale(400, lv.STATE.PRESSED)
     image.add_flag(image.FLAG.CLICKABLE)
-    image.add_event(lambda e: event_cb(e, snapshot_obj), lv.EVENT.PRESSED, None)
-    image.add_event(lambda e: event_cb(e, snapshot_obj), lv.EVENT.RELEASED, None)
+    image.add_event_cb(lambda e: event_cb(e, snapshot_obj), lv.EVENT.PRESSED, None)
+    image.add_event_cb(lambda e: event_cb(e, snapshot_obj), lv.EVENT.RELEASED, None)

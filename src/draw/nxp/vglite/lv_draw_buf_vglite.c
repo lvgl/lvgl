@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -43,7 +42,7 @@ static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area);
 
 static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf);
 
-static void * _go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y);
+static void * _go_to_xy(lv_draw_buf_t * draw_buf, int32_t x, int32_t y);
 
 static void _vglite_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
@@ -120,7 +119,7 @@ static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)
     return (width_bytes + align_bytes - 1) & ~(align_bytes - 1);
 }
 
-static void * _go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y)
+static void * _go_to_xy(lv_draw_buf_t * draw_buf, int32_t x, int32_t y)
 {
     uint8_t bits_per_pixel = vglite_get_px_size(draw_buf->color_format);
     uint32_t stride = lv_draw_buf_get_stride(draw_buf);

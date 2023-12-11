@@ -7,7 +7,6 @@ static void slider_event_cb(lv_event_t * e);
 static lv_obj_t * red_slider, * green_slider, * blue_slider, * intense_slider;
 static lv_obj_t * img1;
 
-
 /**
  * Demonstrate runtime image re-coloring
  */
@@ -30,7 +29,7 @@ void lv_example_image_2(void)
     lv_obj_align_to(intense_slider, blue_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
 
     /*Now create the actual image*/
-    LV_IMAGE_DECLARE(img_cogwheel_argb)
+    LV_IMAGE_DECLARE(img_cogwheel_argb);
     img1 = lv_image_create(lv_screen_active());
     lv_image_set_src(img1, &img_cogwheel_argb);
     lv_obj_align(img1, LV_ALIGN_RIGHT_MID, -20, 0);
@@ -57,7 +56,7 @@ static lv_obj_t * create_slider(lv_color_t color)
     lv_obj_set_size(slider, 10, 200);
     lv_obj_set_style_bg_color(slider, color, LV_PART_KNOB);
     lv_obj_set_style_bg_color(slider, lv_color_darken(color, LV_OPA_40), LV_PART_INDICATOR);
-    lv_obj_add_event(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     return slider;
 }
 

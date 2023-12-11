@@ -41,7 +41,6 @@ static void draw_event_cb(lv_event_t * e)
     }
 }
 
-
 void lv_example_table_1(void)
 {
     lv_obj_t * table = lv_table_create(lv_screen_active());
@@ -71,7 +70,7 @@ void lv_example_table_1(void)
     lv_obj_center(table);
 
     /*Add an event callback to to apply some custom drawing*/
-    lv_obj_add_event(table, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(table, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 }
 

@@ -225,7 +225,7 @@ to combine scroll event and store the scroll top position.
    }
 
    lv_obj_t* container = lv_obj_create(NULL);
-   lv_obj_add_event(container, store_scroll_value_event_cb, LV_EVENT_SCROLL, NULL);
+   lv_obj_add_event_cb(container, store_scroll_value_event_cb, LV_EVENT_SCROLL, NULL);
 
 Scroll coordinates can be retrieved from different axes with these
 functions:

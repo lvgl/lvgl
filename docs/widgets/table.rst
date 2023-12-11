@@ -43,14 +43,14 @@ Rows and Columns
 ----------------
 
 To explicitly set number of rows and columns use
-:cpp:expr:`lv_table_set_row_cnt(table, row_cnt)` and
-:cpp:expr:`lv_table_set_col_cnt(table, col_cnt)`
+:cpp:expr:`lv_table_set_row_count(table, row_cnt)` and
+:cpp:expr:`lv_table_set_column_count(table, col_cnt)`
 
 Width and Height
 ----------------
 
 The width of the columns can be set with
-:cpp:expr:`lv_table_set_col_width(table, col_id, width)`. The overall width of
+:cpp:expr:`lv_table_set_column_width(table, col_id, width)`. The overall width of
 the Table object will be set to the sum of columns widths.
 
 The height is calculated automatically from the cell styles (font,

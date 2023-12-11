@@ -44,13 +44,14 @@ const lv_color_filter_dsc_t lv_color_filter_shade = {.filter_cb = lv_color_filte
 uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
 {
     switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE_REVERSED:
-            return LV_COLOR_DEPTH / 8;
         case LV_COLOR_FORMAT_I1:
+        case LV_COLOR_FORMAT_A1:
             return 1;
         case LV_COLOR_FORMAT_I2:
+        case LV_COLOR_FORMAT_A2:
             return 2;
         case LV_COLOR_FORMAT_I4:
+        case LV_COLOR_FORMAT_A4:
             return 4;
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_A8:
@@ -244,7 +245,6 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t c)
     return lv_color_rgb_to_hsv(c.red, c.green, c.blue);
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -268,4 +268,3 @@ static lv_color_t lv_color_filter_shade_cb(const lv_color_filter_dsc_t * dsc, lv
     if(opa < LV_OPA_50) return lv_color_lighten(c, (LV_OPA_50 - opa) * 2);
     else return lv_color_darken(c, (opa - LV_OPA_50 * LV_OPA_50) * 2);
 }
-

@@ -8,7 +8,7 @@ def scroll_event_cb(e):
 
     r = cont.get_height() * 7 // 10
 
-    child_cnt = cont.get_child_cnt()
+    child_cnt = cont.get_child_count()
     for i in range(child_cnt):
         child = cont.get_child(i)
         child_a = lv.area_t()
@@ -46,7 +46,7 @@ cont = lv.obj(lv.screen_active())
 cont.set_size(200, 200)
 cont.center()
 cont.set_flex_flow(lv.FLEX_FLOW.COLUMN)
-cont.add_event(scroll_event_cb, lv.EVENT.SCROLL, None)
+cont.add_event_cb(scroll_event_cb, lv.EVENT.SCROLL, None)
 cont.set_style_radius(lv.RADIUS_CIRCLE, 0)
 cont.set_style_clip_corner(True, 0)
 cont.set_scroll_dir(lv.DIR.VER)

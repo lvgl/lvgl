@@ -158,7 +158,7 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
 static void index_change(lv_obj_t * obj, int32_t index)
 {
-    lv_coord_t idx;
+    int32_t idx;
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
 
     idx = index % animimg->pic_count;

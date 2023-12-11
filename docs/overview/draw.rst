@@ -73,7 +73,7 @@ draw the button under the text and it's not necessary to redraw the
 display under the rest of the button too.
 
 The difference between buffering modes regarding the drawing mechanism
-is the following: 
+is the following:
 
 1. **One buffer** - LVGL needs to wait for :cpp:func:`lv_disp_flush_ready` (called from ``flush_cb``) before starting to redraw the next part.
 2. **Two buffers** - LVGL can immediately draw to the second buffer when the first is sent to ``flush_cb`` because the
@@ -128,14 +128,14 @@ applied real-time:
 - :cpp:enumerator:`LV_DRAW_MASK_TYPE_MAP`: The mask is stored in a bitmap array and the
   necessary parts are applied
 
-Masks are used to create almost every basic primitive: 
+Masks are used to create almost every basic primitive:
 
 - **letters**: Create a mask from the letter and draw a rectangle with the letter's color using the mask.
-- **line**: Created from four "line masks" to mask out the left, right, top and bottom part of the line to get a perfectly perpendicular perimeter. 
-- **rounded rectangle**: A mask is created real-time to add a radius to the corners. 
-- **clip corner**: To clip overflowing content (usually children) on rounded corners, a rounded rectangle mask is also applied. 
-- **rectangle border**: Same as a rounded rectangle but the inner part is masked out too. 
-- **arc drawing**: A circular border is drawn but an arc mask is applied too. 
+- **line**: Created from four "line masks" to mask out the left, right, top and bottom part of the line to get a perfectly perpendicular perimeter.
+- **rounded rectangle**: A mask is created real-time to add a radius to the corners.
+- **clip corner**: To clip overflowing content (usually children) on rounded corners, a rounded rectangle mask is also applied.
+- **rectangle border**: Same as a rounded rectangle but the inner part is masked out too.
+- **arc drawing**: A circular border is drawn but an arc mask is applied too.
 - **ARGB images**: The alpha channel is separated into a mask and the image is drawn as a normal RGB image.
 
 Using masks
@@ -287,7 +287,7 @@ documentation.
         uint32_t text_length;         /**< Size of the text buffer containing null-terminated text string calculated during drawing.*/
         uint32_t part;                /**< The current part for which the event is sent*/
         uint32_t id;                  /**< The index of the part. E.g. a button's index on button matrix or table cell index.*/
-        lv_coord_t radius;            /**< E.g. the radius of an arc (not the corner radius).*/
+        int32_t radius;            /**< E.g. the radius of an arc (not the corner radius).*/
         int32_t value;                /**< A value calculated during drawing. E.g. Chart's tick line value.*/
         const void * sub_part_ptr;    /**< A pointer the identifies something in the part. E.g. chart series. */
     } lv_obj_draw_part_dsc_t;

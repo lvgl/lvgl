@@ -68,7 +68,7 @@ if LV_FILE_EXPLORER_QUICK_ACCESS :
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.DOCS_DIR, home_dir + "/Documents")
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.FS_DIR, "A:/")
 
-file_explorer.add_event(file_explorer_event_handler, lv.EVENT.ALL, None)
+file_explorer.add_event_cb(file_explorer_event_handler, lv.EVENT.ALL, None)
 
 # Quick access status control button
 fe_quick_access_obj = file_explorer.explorer_get_quick_access_area()
@@ -83,8 +83,8 @@ label = lv.label(button)
 label.set_text(lv.SYMBOL.LIST)
 label.center()
 
-button.add_event(lambda evt: button_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
-#button.add_event(lambda evt: button_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
+button.add_event_cb(lambda evt: button_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
+#button.add_event_cb(lambda evt: button_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
 
 # Sort control
 opts = "NONE\nKIND"
@@ -97,6 +97,6 @@ dd.set_options_static(opts)
 dd.align(lv.ALIGN.RIGHT_MID, 0, 0)
 # lv_obj_align_to(dd, button, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
-dd.add_event(lambda evt: dd_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
-#dd.add_event(lambda evt: dd_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
+dd.add_event_cb(lambda evt: dd_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
+#dd.add_event_cb(lambda evt: dd_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
 

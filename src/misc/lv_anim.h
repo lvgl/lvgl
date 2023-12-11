@@ -134,8 +134,10 @@ typedef struct _lv_anim_bezier3_para_t {
 
 /** Describes an animation*/
 typedef struct _lv_anim_t {
-    void * var;                          /**<Variable to animate*/
-    lv_anim_exec_xcb_t exec_cb;          /**< Function to execute to animate*/
+    void * var;                                 /**<Variable to animate*/
+    lv_anim_exec_xcb_t exec_cb;                 /**< Function to execute to animate*/
+    lv_anim_custom_exec_cb_t custom_exec_cb;/**< Function to execute to animate,
+                                                 same purpose as exec_cb but different parameters*/
     lv_anim_start_cb_t start_cb;         /**< Call it when the animation is starts (considering `delay`)*/
     lv_anim_ready_cb_t ready_cb;         /**< Call it when the animation is ready*/
     lv_anim_deleted_cb_t deleted_cb;     /**< Call it when the animation is deleted*/
@@ -145,7 +147,7 @@ typedef struct _lv_anim_t {
     int32_t start_value;               /**< Start value*/
     int32_t current_value;             /**< Current value*/
     int32_t end_value;                 /**< End value*/
-    int32_t time;                /**< Animation time in ms*/
+    int32_t duration;                /**< Animation time in ms*/
     int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
     uint32_t playback_delay;     /**< Wait before play back*/
     uint32_t playback_time;      /**< Duration of playback animation*/
@@ -218,7 +220,7 @@ static inline void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_xcb_t exec_cb
  */
 static inline void lv_anim_set_time(lv_anim_t * a, uint32_t duration)
 {
-    a->time = duration;
+    a->duration = duration;
 }
 
 /**
@@ -240,7 +242,7 @@ static inline void lv_anim_set_delay(lv_anim_t * a, uint32_t delay)
 static inline void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end)
 {
     a->start_value = start;
-    a->current_value = start;
+    a->current_value = INT32_MIN;
     a->end_value = end;
 }
 
@@ -249,14 +251,12 @@ static inline void lv_anim_set_values(lv_anim_t * a, int32_t start, int32_t end)
  * `lv_anim_t * ` as its first parameter instead of `void *`.
  * This function might be used when LVGL is bound to other languages because
  * it's more consistent to have `lv_anim_t *` as first parameter.
- * The variable to animate can be stored in the animation's `user_data`
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param exec_cb   a function to execute.
  */
 static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
-    a->var     = a;
-    a->exec_cb = (lv_anim_exec_xcb_t)exec_cb;
+    a->custom_exec_cb = exec_cb;
 }
 
 /**
@@ -388,7 +388,6 @@ static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t 
     para->y2 = y2;
 }
 
-
 /**
  * Create an animation
  * @param a         an initialized 'anim_t' variable. Not required after call.
@@ -420,7 +419,7 @@ uint32_t lv_anim_get_playtime(lv_anim_t * a);
  */
 static inline uint32_t lv_anim_get_time(lv_anim_t * a)
 {
-    return a->time;
+    return a->duration;
 }
 
 /**
@@ -444,7 +443,7 @@ static inline void * lv_anim_get_user_data(lv_anim_t * a)
 }
 
 /**
- * Delete an animation of a variable with a given animator function
+ * Delete animation(s) of a variable with a given animator function
  * @param var       pointer to variable
  * @param exec_cb   a function pointer which is animating 'var',
  *                  or NULL to ignore it and delete all the animations of 'var
@@ -508,13 +507,25 @@ static inline lv_anim_t * lv_anim_custom_get(lv_anim_t * a, lv_anim_custom_exec_
 uint16_t lv_anim_count_running(void);
 
 /**
- * Calculate the time of an animation with a given speed and the start and end values
- * @param speed speed of animation in unit/sec
- * @param start     start value of the animation
- * @param end       end value of the animation
- * @return          the required time [ms] for the animation with the given parameters
+ * Store the speed as a special value which can be used as time in animations.
+ * It will be converted to time internally based on the start and end values
+ * @param speed         the speed of the animation in with 10 unit / sec resolution in 0..1023 range
+ * @return              a special value which can be used as an animation time
  */
-uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end);
+uint32_t lv_anim_speed(uint32_t speed);
+
+/**
+ * Store the speed as a special value which can be used as time in animations.
+ * It will be converted to time internally based on the start and end values
+ * @param speed         the speed of the animation in as unit / sec resolution in 0..10k range
+ * @param min_time      the minimum time in 0..10k range
+ * @param max_time      the maximum time in 0..10k range
+ * @return              a special value in where all three values are stored and can be used as an animation time
+ * @note                internally speed is stored as 10 unit/sec
+ * @note                internally min/max_time are stored with 10 ms unit
+ *
+ */
+uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_time);
 
 /**
  * Manually refresh the state of the animations.

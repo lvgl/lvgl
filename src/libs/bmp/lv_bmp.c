@@ -32,7 +32,8 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args);
 
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area);
@@ -89,7 +90,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     /*If it's a BMP file...*/
     if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
-        if(strcmp(lv_fs_get_ext(fn), "bmp") == 0) {              /*Check the extension*/
+        if(lv_strcmp(lv_fs_get_ext(fn), "bmp") == 0) {              /*Check the extension*/
             /*Save the data in the header*/
             lv_fs_file_t f;
             lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
@@ -99,15 +100,14 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
             lv_fs_read(&f, headers, 54, NULL);
             uint32_t w;
             uint32_t h;
-            memcpy(&w, headers + 18, 4);
-            memcpy(&h, headers + 22, 4);
+            lv_memcpy(&w, headers + 18, 4);
+            lv_memcpy(&h, headers + 22, 4);
             header->w = w;
             header->h = h;
-            header->always_zero = 0;
             lv_fs_close(&f);
 
             uint16_t bpp;
-            memcpy(&bpp, headers + 28, 2);
+            lv_memcpy(&bpp, headers + 28, 2);
             switch(bpp) {
                 case 16:
                     header->cf = LV_COLOR_FORMAT_RGB565;
@@ -134,27 +134,28 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_INVALID;         /*If didn't succeeded earlier then it's an error*/
 }
 
-
 /**
  * Open a PNG image and return the decided image
  * @param src can be file name or pointer to a C array
  * @param style style of the image object (unused now but certain formats might use it)
  * @return pointer to the decoded image or `LV_IMAGE_DECODER_OPEN_FAIL` if failed
  */
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args)
 {
     LV_UNUSED(decoder);
+    LV_UNUSED(args);
 
     /*If it's a PNG file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
 
-        if(strcmp(lv_fs_get_ext(fn), "bmp") != 0) {
+        if(lv_strcmp(lv_fs_get_ext(fn), "bmp") != 0) {
             return LV_RESULT_INVALID;       /*Check the extension*/
         }
 
         bmp_dsc_t b;
-        memset(&b, 0x00, sizeof(b));
+        lv_memset(&b, 0x00, sizeof(b));
 
         lv_fs_res_t res = lv_fs_open(&b.f, dsc->src, LV_FS_MODE_RD);
         if(res == LV_RESULT_OK) return LV_RESULT_INVALID;
@@ -167,16 +168,16 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
 
-        memcpy(&b.px_offset, header + 10, 4);
-        memcpy(&b.px_width, header + 18, 4);
-        memcpy(&b.px_height, header + 22, 4);
-        memcpy(&b.bpp, header + 28, 2);
+        lv_memcpy(&b.px_offset, header + 10, 4);
+        lv_memcpy(&b.px_width, header + 18, 4);
+        lv_memcpy(&b.px_height, header + 22, 4);
+        lv_memcpy(&b.bpp, header + 28, 2);
         b.row_size_bytes = ((b.bpp * b.px_width + 31) / 32) * 4;
 
         dsc->user_data = lv_malloc(sizeof(bmp_dsc_t));
         LV_ASSERT_MALLOC(dsc->user_data);
         if(dsc->user_data == NULL) return LV_RESULT_INVALID;
-        memcpy(dsc->user_data, &b, sizeof(b));
+        lv_memcpy(dsc->user_data, &b, sizeof(b));
         dsc->img_data = NULL;
         return LV_RESULT_OK;
     }
@@ -188,7 +189,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     return LV_RESULT_INVALID;    /*If not returned earlier then it failed*/
 }
-
 
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area)
@@ -207,12 +207,11 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded_area->y2++;
     }
 
-
     if(decoded_area->y1 > full_area->y2) {
         return LV_RESULT_INVALID;
     }
     else {
-        lv_coord_t y = (b->px_height - 1) - (decoded_area->y1); /*BMP images are stored upside down*/
+        int32_t y = (b->px_height - 1) - (decoded_area->y1); /*BMP images are stored upside down*/
         uint32_t p = b->px_offset + b->row_size_bytes * y;
         p += (decoded_area->x1) * (b->bpp / 8);
         lv_fs_seek(&b->f, p, LV_FS_SEEK_SET);
@@ -221,7 +220,6 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         return LV_RESULT_OK;
     }
 }
-
 
 /**
  * Free the allocated resources

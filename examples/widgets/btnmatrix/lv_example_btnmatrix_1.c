@@ -13,7 +13,6 @@ static void event_handler(lv_event_t * e)
     }
 }
 
-
 static const char * btnm_map[] = {"1", "2", "3", "4", "5", "\n",
                                   "6", "7", "8", "9", "0", "\n",
                                   "Action1", "Action2", ""
@@ -27,7 +26,7 @@ void lv_example_buttonmatrix_1(void)
     lv_buttonmatrix_set_button_ctrl(btnm1, 10, LV_BUTTONMATRIX_CTRL_CHECKABLE);
     lv_buttonmatrix_set_button_ctrl(btnm1, 11, LV_BUTTONMATRIX_CTRL_CHECKED);
     lv_obj_align(btnm1, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_event(btnm1, event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btnm1, event_handler, LV_EVENT_ALL, NULL);
 }
 
 #endif

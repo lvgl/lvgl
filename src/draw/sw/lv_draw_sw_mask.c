@@ -32,37 +32,37 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                     lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                     int32_t abs_y, int32_t len,
                                                                      lv_draw_sw_mask_line_param_t * param);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                       lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                       int32_t abs_y, int32_t len,
                                                                        lv_draw_sw_mask_radius_param_t * param);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                      lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                      int32_t abs_y, int32_t len,
                                                                       lv_draw_sw_mask_angle_param_t * param);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                     lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                     int32_t abs_y, int32_t len,
                                                                      lv_draw_sw_mask_fade_param_t * param);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                    lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                    int32_t abs_y, int32_t len,
                                                                     lv_draw_sw_mask_map_param_t * param);
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                  lv_coord_t abs_y,
-                                                                  lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                  int32_t abs_y,
+                                                                  int32_t len,
                                                                   lv_draw_sw_mask_line_param_t * p);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                   lv_coord_t abs_y,
-                                                                   lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                   int32_t abs_y,
+                                                                   int32_t len,
                                                                    lv_draw_sw_mask_line_param_t * p);
 
-static void circ_init(lv_point_t * c, lv_coord_t * tmp, lv_coord_t radius);
+static void circ_init(lv_point_t * c, int32_t * tmp, int32_t radius);
 static bool circ_cont(lv_point_t * c);
-static void circ_next(lv_point_t * c, lv_coord_t * tmp);
-static void circ_calc_aa4(_lv_draw_sw_mask_radius_circle_dsc_t * c, lv_coord_t radius);
-static lv_opa_t * get_next_line(_lv_draw_sw_mask_radius_circle_dsc_t * c, lv_coord_t y, lv_coord_t * len,
-                                lv_coord_t * x_start);
+static void circ_next(lv_point_t * c, int32_t * tmp);
+static void circ_calc_aa4(_lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radius);
+static lv_opa_t * get_next_line(_lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t y, int32_t * len,
+                                int32_t * x_start);
 LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new);
 
 /**********************
@@ -87,9 +87,9 @@ void lv_draw_sw_mask_deinit(void)
     lv_mutex_delete(&circle_cache_mutex);
 }
 
-LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                  lv_coord_t abs_y,
-                                                                  lv_coord_t len)
+LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf, int32_t abs_x,
+                                                                  int32_t abs_y,
+                                                                  int32_t len)
 {
     bool changed = false;
     _lv_draw_sw_mask_common_dsc_t * dsc;
@@ -155,9 +155,9 @@ void _lv_draw_sw_mask_cleanup(void)
  * With `LV_DRAW_SW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
  * With `LV_DRAW_SW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, lv_coord_t p1x, lv_coord_t p1y,
-                                      lv_coord_t p2x,
-                                      lv_coord_t p2y, lv_draw_sw_mask_line_side_t side)
+void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, int32_t p1x, int32_t p1y,
+                                      int32_t p2x,
+                                      int32_t p2y, lv_draw_sw_mask_line_side_t side)
 {
     lv_memzero(param, sizeof(lv_draw_sw_mask_line_param_t));
 
@@ -167,7 +167,7 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, lv_c
     }
 
     if(p1y > p2y) {
-        lv_coord_t t;
+        int32_t t;
         t = p2x;
         p2x = p1x;
         p1x = t;
@@ -177,14 +177,11 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, lv_c
         p1y = t;
     }
 
-    param->cfg.p1.x = p1x;
-    param->cfg.p1.y = p1y;
-    param->cfg.p2.x = p2x;
-    param->cfg.p2.y = p2y;
+    lv_point_set(&param->cfg.p1, p1x, p1y);
+    lv_point_set(&param->cfg.p2, p2x, p2y);
     param->cfg.side = side;
 
-    param->origo.x = p1x;
-    param->origo.y = p1y;
+    lv_point_set(&param->origo, p1x, p1y);
     param->flat = (LV_ABS(p2x - p1x) > LV_ABS(p2y - p1y)) ? 1 : 0;
     param->yx_steep = 0;
     param->xy_steep = 0;
@@ -250,7 +247,7 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, lv_c
  * With `LV_DRAW_SW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
  * With `LV_DRAW_SW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, lv_coord_t p1x, lv_coord_t py, int16_t angle,
+void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t p1x, int32_t py, int16_t angle,
                                      lv_draw_sw_mask_line_side_t side)
 {
     /*Find an optimal degree.
@@ -276,8 +273,8 @@ void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, lv_co
  * @param start_angle start angle in degrees. 0 deg on the right, 90 deg, on the bottom
  * @param end_angle end angle
  */
-void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, lv_coord_t vertex_x, lv_coord_t vertex_y,
-                                lv_coord_t start_angle, lv_coord_t end_angle)
+void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, int32_t vertex_x, int32_t vertex_y,
+                                int32_t start_angle, int32_t end_angle)
 {
     lv_draw_sw_mask_line_side_t start_side;
     lv_draw_sw_mask_line_side_t end_side;
@@ -302,8 +299,7 @@ void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, lv_coord_
 
     param->cfg.start_angle = start_angle;
     param->cfg.end_angle = end_angle;
-    param->cfg.vertex_p.x = vertex_x;
-    param->cfg.vertex_p.y = vertex_y;
+    lv_point_set(&param->cfg.vertex_p, vertex_x, vertex_y);
     param->dsc.cb = (lv_draw_sw_mask_xcb_t)lv_draw_mask_angle;
     param->dsc.type = LV_DRAW_SW_MASK_TYPE_ANGLE;
 
@@ -337,11 +333,11 @@ void lv_draw_sw_mask_angle_init(lv_draw_sw_mask_angle_param_t * param, lv_coord_
  * @param radius radius of the rectangle
  * @param inv true: keep the pixels inside the rectangle; keep the pixels outside of the rectangle
  */
-void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const lv_area_t * rect, lv_coord_t radius,
+void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const lv_area_t * rect, int32_t radius,
                                  bool inv)
 {
-    lv_coord_t w = lv_area_get_width(rect);
-    lv_coord_t h = lv_area_get_height(rect);
+    int32_t w = lv_area_get_width(rect);
+    int32_t h = lv_area_get_height(rect);
     int32_t short_side = LV_MIN(w, h);
     if(radius > short_side >> 1) radius = short_side >> 1;
     if(radius < 0) radius = 0;
@@ -383,9 +379,8 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
 
     /*There is no unused entry. Allocate one temporarily*/
     if(!entry) {
-        entry = lv_malloc(sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
+        entry = lv_malloc_zeroed(sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
         LV_ASSERT_MALLOC(entry);
-        lv_memzero(entry, sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
         entry->life = -1;
     }
     else {
@@ -411,8 +406,8 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
  * @param y_bottom at which coordinate reach `opa_bottom`.
  */
 void lv_draw_sw_mask_fade_init(lv_draw_sw_mask_fade_param_t * param, const lv_area_t * coords, lv_opa_t opa_top,
-                               lv_coord_t y_top,
-                               lv_opa_t opa_bottom, lv_coord_t y_bottom)
+                               int32_t y_top,
+                               lv_opa_t opa_bottom, int32_t y_bottom)
 {
     lv_area_copy(&param->cfg.coords, coords);
     param->cfg.opa_top = opa_top;
@@ -441,8 +436,8 @@ void lv_draw_sw_mask_map_init(lv_draw_sw_mask_map_param_t * param, const lv_area
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                     lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                     int32_t abs_y, int32_t len,
                                                                      lv_draw_sw_mask_line_param_t * p)
 {
     /*Make to points relative to the vertex*/
@@ -456,7 +451,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_line(lv_opa_t * 
             /*Non sense: Can't be on the right/left of a horizontal line*/
             if(p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_LEFT ||
                p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_RIGHT) return LV_DRAW_SW_MASK_RES_FULL_COVER;
-            else if(p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_TOP && abs_y + 1 < 0) return LV_DRAW_SW_MASK_RES_FULL_COVER;
+            else if(p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_TOP && abs_y < 0) return LV_DRAW_SW_MASK_RES_FULL_COVER;
             else if(p->cfg.side == LV_DRAW_SW_MASK_LINE_SIDE_BOTTOM && abs_y > 0) return LV_DRAW_SW_MASK_RES_FULL_COVER;
             else {
                 return LV_DRAW_SW_MASK_RES_TRANSP;
@@ -501,9 +496,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_line(lv_opa_t * 
     return res;
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                  lv_coord_t abs_y,
-                                                                  lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                  int32_t abs_y,
+                                                                  int32_t len,
                                                                   lv_draw_sw_mask_line_param_t * p)
 {
 
@@ -618,9 +613,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_flat(lv_opa_t * mas
     return LV_DRAW_SW_MASK_RES_CHANGED;
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                   lv_coord_t abs_y,
-                                                                   lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                   int32_t abs_y,
+                                                                   int32_t len,
                                                                    lv_draw_sw_mask_line_param_t * p)
 {
     int32_t k;
@@ -761,8 +756,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t line_mask_steep(lv_opa_t * ma
     return LV_DRAW_SW_MASK_RES_CHANGED;
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                      lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                      int32_t abs_y, int32_t len,
                                                                       lv_draw_sw_mask_angle_param_t * p)
 {
     int32_t rel_y = abs_y - p->cfg.vertex_p.y;
@@ -899,10 +894,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_angle(lv_opa_t *
     }
 }
 
-
-
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                       lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                       int32_t abs_y, int32_t len,
                                                                        lv_draw_sw_mask_radius_param_t * p)
 {
     bool outer = p->cfg.outer;
@@ -959,9 +952,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t 
     abs_x -= rect.x1;
     abs_y -= rect.y1;
 
-    lv_coord_t aa_len;
-    lv_coord_t x_start;
-    lv_coord_t cir_y;
+    int32_t aa_len;
+    int32_t x_start;
+    int32_t cir_y;
     if(abs_y < radius) {
         cir_y = radius - abs_y - 1;
     }
@@ -969,9 +962,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t 
         cir_y = abs_y - (h - radius);
     }
     lv_opa_t * aa_opa = get_next_line(p->circle, cir_y, &aa_len, &x_start);
-    lv_coord_t cir_x_right = k + w - radius + x_start;
-    lv_coord_t cir_x_left = k + radius - x_start - 1;
-    lv_coord_t i;
+    int32_t cir_x_right = k + w - radius + x_start;
+    int32_t cir_x_left = k + radius - x_start - 1;
+    int32_t i;
 
     if(outer == false) {
         for(i = 0; i < aa_len; i++) {
@@ -1003,16 +996,16 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t 
             }
         }
 
-        lv_coord_t clr_start = LV_CLAMP(0, cir_x_left + 1, len);
-        lv_coord_t clr_len = LV_CLAMP(0, cir_x_right - clr_start, len - clr_start);
+        int32_t clr_start = LV_CLAMP(0, cir_x_left + 1, len);
+        int32_t clr_len = LV_CLAMP(0, cir_x_right - clr_start, len - clr_start);
         lv_memzero(&mask_buf[clr_start], clr_len);
     }
 
     return LV_DRAW_SW_MASK_RES_CHANGED;
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                     lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                     int32_t abs_y, int32_t len,
                                                                      lv_draw_sw_mask_fade_param_t * p)
 {
     if(abs_y < p->cfg.coords.y1) return LV_DRAW_SW_MASK_RES_FULL_COVER;
@@ -1057,8 +1050,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_fade(lv_opa_t * 
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x,
-                                                                    lv_coord_t abs_y, lv_coord_t len,
+LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, int32_t abs_x,
+                                                                    int32_t abs_y, int32_t len,
                                                                     lv_draw_sw_mask_map_param_t * p)
 {
     /*Handle out of the mask cases*/
@@ -1097,7 +1090,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_map(lv_opa_t * m
  * @param tmp point to a variable. It will store temporary data
  * @param radius radius of the circle
  */
-static void circ_init(lv_point_t * c, lv_coord_t * tmp, lv_coord_t radius)
+static void circ_init(lv_point_t * c, int32_t * tmp, int32_t radius)
 {
     c->x = radius;
     c->y = 0;
@@ -1119,7 +1112,7 @@ static bool circ_cont(lv_point_t * c)
  * @param c same as in circ_init. The next point stored here.
  * @param tmp same as in circ_init.
  */
-static void circ_next(lv_point_t * c, lv_coord_t * tmp)
+static void circ_next(lv_point_t * c, int32_t * tmp)
 {
 
     if(*tmp <= 0) {
@@ -1132,7 +1125,7 @@ static void circ_next(lv_point_t * c, lv_coord_t * tmp)
     c->y++;
 }
 
-static void circ_calc_aa4(_lv_draw_sw_mask_radius_circle_dsc_t * c, lv_coord_t radius)
+static void circ_calc_aa4(_lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radius)
 {
     if(radius == 0) return;
     c->radius = radius;
@@ -1155,20 +1148,19 @@ static void circ_calc_aa4(_lv_draw_sw_mask_radius_circle_dsc_t * c, lv_coord_t r
         return;
     }
 
-    const size_t cir_xy_size = (radius + 1) * 2 * 2 * sizeof(lv_coord_t);
-    lv_coord_t * cir_x = lv_malloc(cir_xy_size);
-    lv_memset(cir_x, 0, cir_xy_size);
-    lv_coord_t * cir_y = &cir_x[(radius + 1) * 2];
+    const size_t cir_xy_size = (radius + 1) * 2 * 2 * sizeof(int32_t);
+    int32_t * cir_x = lv_malloc_zeroed(cir_xy_size);
+    int32_t * cir_y = &cir_x[(radius + 1) * 2];
 
     uint32_t y_8th_cnt = 0;
     lv_point_t cp;
-    lv_coord_t tmp;
+    int32_t tmp;
     circ_init(&cp, &tmp, radius * 4);    /*Upscale by 4*/
     int32_t i;
 
     uint32_t x_int[4];
     uint32_t x_fract[4];
-    lv_coord_t cir_size = 0;
+    int32_t cir_size = 0;
     x_int[0] = cp.x >> 2;
     x_fract[0] = 0;
 
@@ -1267,7 +1259,7 @@ static void circ_calc_aa4(_lv_draw_sw_mask_radius_circle_dsc_t * c, lv_coord_t r
         c->cir_opa[cir_size] = c->cir_opa[i];
     }
 
-    lv_coord_t y = 0;
+    int32_t y = 0;
     i = 0;
     c->opa_start_on_y[0] = 0;
     while(i < cir_size) {
@@ -1282,14 +1274,13 @@ static void circ_calc_aa4(_lv_draw_sw_mask_radius_circle_dsc_t * c, lv_coord_t r
     lv_free(cir_x);
 }
 
-static lv_opa_t * get_next_line(_lv_draw_sw_mask_radius_circle_dsc_t * c, lv_coord_t y, lv_coord_t * len,
-                                lv_coord_t * x_start)
+static lv_opa_t * get_next_line(_lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t y, int32_t * len,
+                                int32_t * x_start)
 {
     *len = c->opa_start_on_y[y + 1] - c->opa_start_on_y[y];
     *x_start = c->x_start_on_y[y];
     return &c->cir_opa[c->opa_start_on_y[y]];
 }
-
 
 LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new)
 {
@@ -1298,6 +1289,5 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
 
     return LV_UDIV255(mask_act * mask_new);
 }
-
 
 #endif /*LV_DRAW_SW_COMPLEX*/

@@ -10,7 +10,7 @@ def event_handler(evt):
 button1 = lv.button(lv.screen_active())
 
 # attach the callback
-button1.add_event(event_handler,lv.EVENT.ALL, None)
+button1.add_event_cb(event_handler,lv.EVENT.ALL, None)
 
 button1.align(lv.ALIGN.CENTER,0,-40)
 label=lv.label(button1)
@@ -20,8 +20,8 @@ label.set_text("Button")
 button2 = lv.button(lv.screen_active())
 
 # attach the callback
-#button2.add_event(event_handler,lv.EVENT.VALUE_CHANGED,None)
-button2.add_event(event_handler,lv.EVENT.ALL, None)
+#button2.add_event_cb(event_handler,lv.EVENT.VALUE_CHANGED,None)
+button2.add_event_cb(event_handler,lv.EVENT.ALL, None)
 
 button2.align(lv.ALIGN.CENTER,0,40)
 button2.add_flag(lv.obj.FLAG.CHECKABLE)

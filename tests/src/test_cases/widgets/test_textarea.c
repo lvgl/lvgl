@@ -48,10 +48,10 @@ void test_textarea_should_update_label_style_with_one_line_enabled(void)
     lv_textarea_add_text(textarea, "Hi");
     lv_textarea_set_one_line(textarea, true);
 
-    lv_coord_t left_padding = lv_obj_get_style_pad_left(txt_ptr->label, LV_PART_MAIN);
-    lv_coord_t right_padding = lv_obj_get_style_pad_right(txt_ptr->label, LV_PART_MAIN);
-    lv_coord_t line_width = lv_obj_get_width(txt_ptr->label);
-    lv_coord_t expected_size = left_padding + right_padding + line_width;
+    int32_t left_padding = lv_obj_get_style_pad_left(txt_ptr->label, LV_PART_MAIN);
+    int32_t right_padding = lv_obj_get_style_pad_right(txt_ptr->label, LV_PART_MAIN);
+    int32_t line_width = lv_obj_get_width(txt_ptr->label);
+    int32_t expected_size = left_padding + right_padding + line_width;
 
     TEST_ASSERT(lv_textarea_get_one_line(textarea));
     TEST_ASSERT_EQUAL_UINT16(expected_size, lv_obj_get_width(txt_ptr->label));

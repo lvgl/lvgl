@@ -101,13 +101,13 @@ If someone implements or fixes an issue labeled as [Sponsored](https://github.co
 
 ## :package: Packages
 LVGL is available as:
-- [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
+- [Arduino library](https://docs.lvgl.io/master/integration/framework/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr library](https://docs.zephyrproject.org/latest/reference/kconfig/CONFIG_LVGL.html)
-- [ESP32 component](https://docs.lvgl.io/master/get-started/platforms/espressif.html)
+- [Zephyr library](https://docs.lvgl.io/master/integration/os/zephyr.html)
+- [ESP32 component](https://components.espressif.com/components/lvgl/lvgl)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/get-started/os/rt-thread.html)
+- [NuttX library](https://docs.lvgl.io/master/integration/os/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
 - CMSIS-Pack
 - [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 

@@ -6,7 +6,7 @@
 
 static void obj_set_height_helper(void * obj, int32_t height)
 {
-    lv_obj_set_height((lv_obj_t *)obj, (lv_coord_t)height);
+    lv_obj_set_height((lv_obj_t *)obj, (int32_t)height);
 }
 
 void test_gradient_vertical_misalignment(void)

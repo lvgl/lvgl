@@ -56,7 +56,6 @@ typedef _lv_keyboard_mode_t lv_keyboard_mode_t;
 typedef uint8_t lv_keyboard_mode_t;
 #endif /*DOXYGEN*/
 
-
 /*Data of keyboard*/
 typedef struct {
     lv_buttonmatrix_t btnm;
@@ -65,7 +64,7 @@ typedef struct {
     uint8_t popovers : 1;       /*Show button titles in popovers on press*/
 } lv_keyboard_t;
 
-extern const lv_obj_class_t lv_keyboard_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_keyboard_class;
 
 /**********************
  * GLOBAL PROTOTYPES

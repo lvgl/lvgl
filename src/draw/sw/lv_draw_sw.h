@@ -37,6 +37,7 @@ typedef struct {
     lv_thread_sync_t sync;
     lv_thread_t thread;
     volatile bool inited;
+    volatile bool exit_status;
 #endif
     uint32_t idx;
 } lv_draw_sw_unit_t;
@@ -81,12 +82,24 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
 void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
-                          lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                          int32_t src_w, int32_t src_h, int32_t src_stride,
                           const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t cf, void * dest_buf);
 
 #if LV_USE_VECTOR_GRAPHIC
 void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc_t * dsc);
 #endif
+
+/**
+ * Swap the upper and lower byte of an RGB565 buffer.
+ * Might be required if a 8bit parallel port or an SPI port send the bytes in the wrong order.
+ * The bytes will be swapped in place.
+ * @param buf_size_px   number of pixels in the buffer
+ */
+void lv_draw_sw_rgb565_swap(void * buf, int32_t buf_size_px);
+
+void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_sride,
+                       int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format);
+
 /***********************
  * GLOBAL VARIABLES
  ***********************/

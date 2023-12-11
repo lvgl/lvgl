@@ -22,7 +22,7 @@ def create_slider(color):
     slider.set_size(10, 200)
     slider.set_style_bg_color(color, lv.PART.KNOB)
     slider.set_style_bg_color(color.darken(lv.OPA._40), lv.PART.INDICATOR)
-    slider.add_event(slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
+    slider.add_event_cb(slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
     return slider
 
 def slider_event_cb(e):

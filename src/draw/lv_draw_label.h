@@ -46,7 +46,6 @@ typedef struct _lv_draw_label_hint_t {
     int32_t coord_y;
 } lv_draw_label_hint_t;
 
-
 typedef struct {
     lv_draw_dsc_base_t base;
 
@@ -57,18 +56,20 @@ typedef struct {
     lv_color_t color;
     lv_color_t sel_color;
     lv_color_t sel_bg_color;
-    lv_coord_t line_space;
-    lv_coord_t letter_space;
-    lv_coord_t ofs_x;
-    lv_coord_t ofs_y;
+    int32_t line_space;
+    int32_t letter_space;
+    int32_t ofs_x;
+    int32_t ofs_y;
     lv_opa_t opa;
     lv_base_dir_t bidi_dir;
     lv_text_align_t align;
     lv_text_flag_t flag;
     lv_text_decor_t decor : 3;
-    lv_blend_mode_t blend_mode: 3;
-uint8_t text_local  :
-    1;        /**< 1: malloc buffer and copy `text` there. 0: `text` is const and it's pointer will be valid during rendering*/
+    lv_blend_mode_t blend_mode : 3;
+    /**
+     * < 1: malloc buffer and copy `text` there.
+     * 0: `text` is const and it's pointer will be valid during rendering.*/
+    uint8_t text_local : 1;
     lv_draw_label_hint_t * hint;
 } lv_draw_label_dsc_t;
 
@@ -89,7 +90,6 @@ typedef struct {
     lv_opa_t opa;
 } lv_draw_glyph_dsc_t;
 
-
 typedef void(*lv_draw_letter_cb_t)(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc, lv_draw_fill_dsc_t * fill_dsc,
                                    const lv_area_t * fill_area);
 
@@ -107,16 +107,22 @@ void lv_draw_letter_dsc_init(lv_draw_glyph_dsc_t * dsc);
 
 /**
  * Write a text
- * @param draw_ctx      pointer to the current draw context
+ * @param layer         pointer to a layer
  * @param dsc           pointer to draw descriptor
  * @param coords        coordinates of the label
- * @param txt           `\0` terminated text to write
- * @param hint          pointer to a `lv_draw_label_hint_t` variable.
  * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
                                          const lv_area_t * coords);
 
+/**
+ * Write a text
+ * @param layer          pointer to a layer
+ * @param dsc            pointer to draw descriptor
+ * @param point          position of the label
+ * @param unicode_letter the letter to draw
+ * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
+ */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
                                           const lv_point_t * point, uint32_t unicode_letter);
 

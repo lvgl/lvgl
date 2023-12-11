@@ -104,9 +104,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     }
 
     if(drv->cache_size) {
-        file_p->cache = lv_malloc(sizeof(lv_fs_file_cache_t));
+        file_p->cache = lv_malloc_zeroed(sizeof(lv_fs_file_cache_t));
         LV_ASSERT_MALLOC(file_p->cache);
-        lv_memzero(file_p->cache, sizeof(lv_fs_file_cache_t));
 
         /* If this is a memory-mapped file, then set "cache" to the memory buffer */
         if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
@@ -230,8 +229,6 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
                 buffer = file_p->cache->buffer;
             }
 
-
-
             uint32_t bytes_read_to_buffer = 0;
             res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buffer, buffer_size, &bytes_read_to_buffer);
             file_p->cache->start = file_position;
@@ -283,9 +280,20 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
         return LV_FS_RES_NOT_IMP;
     }
 
+    lv_fs_res_t res = LV_FS_RES_OK;
+
+    /*Need to do FS seek before writing data to FS*/
+    if(file_p->drv->cache_size) {
+        res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
+        if(res != LV_FS_RES_OK) return res;
+    }
+
     uint32_t bw_tmp = 0;
-    lv_fs_res_t res = file_p->drv->write_cb(file_p->drv, file_p->file_d, buf, btw, &bw_tmp);
+    res = file_p->drv->write_cb(file_p->drv, file_p->file_d, buf, btw, &bw_tmp);
     if(bw != NULL) *bw = bw_tmp;
+
+    if(file_p->drv->cache_size && res == LV_FS_RES_OK)
+        file_p->cache->file_position += bw_tmp;
 
     return res;
 }

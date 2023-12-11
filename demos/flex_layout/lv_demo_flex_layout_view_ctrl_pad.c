@@ -54,13 +54,14 @@ static void tab_layout_create(lv_obj_t * tab, view_t * ui);
 
 void view_ctrl_pad_create(lv_obj_t * par, view_t * ui)
 {
-    lv_obj_t * tv = lv_tabview_create(par, LV_DIR_TOP, 50);
+    lv_obj_t * tv = lv_tabview_create(par);
+    lv_tabview_set_tab_bar_size(tv, 50);
     lv_obj_set_width(tv, lv_pct(100));
     lv_obj_set_flex_grow(tv, 1);
     lv_obj_set_style_radius(tv, 0, 0);
     lv_obj_set_style_bg_color(tv, lv_color_hex(0xffffff), 0);
 
-    lv_obj_t * buttons = lv_tabview_get_tab_buttons(tv);
+    lv_obj_t * buttons = lv_tabview_get_tab_bar(tv);
     lv_obj_set_style_outline_width(buttons, 0,  LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
     lv_obj_set_style_outline_width(buttons, 0,   LV_STATE_FOCUS_KEY);
     lv_obj_set_style_bg_color(buttons, lv_color_white(), LV_PART_ITEMS | LV_STATE_CHECKED);
@@ -215,8 +216,8 @@ static lv_obj_t * spinbox_ctrl_create(lv_obj_t * par, lv_style_prop_t prop, lv_o
     lv_label_set_text(label, "+");
     lv_obj_center(label);
 
-    lv_obj_add_event(btn_inc, btn_inc_event_handler, LV_EVENT_ALL, spinbox);
-    lv_obj_add_event(btn_dec, btn_dec_event_handler, LV_EVENT_ALL, spinbox);
+    lv_obj_add_event_cb(btn_inc, btn_inc_event_handler, LV_EVENT_ALL, spinbox);
+    lv_obj_add_event_cb(btn_dec, btn_dec_event_handler, LV_EVENT_ALL, spinbox);
 
     return spinbox;
 }

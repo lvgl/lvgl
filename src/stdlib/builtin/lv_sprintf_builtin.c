@@ -38,7 +38,7 @@
 #include "../lv_sprintf.h"
 #include "../../misc/lv_types.h"
 
-#define PRINTF_DISABLE_SUPPORT_FLOAT    (!LV_SPRINTF_USE_FLOAT)
+#define PRINTF_DISABLE_SUPPORT_FLOAT    (!LV_USE_FLOAT)
 
 // 'ntoa' conversion buffer size, this must be big enough to hold one converted
 // numeric number including padded zeros (dynamically created on stack)
@@ -883,4 +883,4 @@ int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va)
     return _lv_vsnprintf(_out_buffer, buffer, count, format, va);
 }
 
-#endif /*LV_USE_BUILTIN_SNPRINTF*/
+#endif /*LV_STDLIB_BUILTIN*/

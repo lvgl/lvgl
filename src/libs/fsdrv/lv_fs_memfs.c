@@ -33,10 +33,9 @@
  *
  * The path object can be used at any place where a file path is required, e.g.:
  *
- * lv_font_t* my_font = lv_font_load((const char *) & mempath);
+ * lv_font_t* my_font = lv_binfont_load((const char *) & mempath);
  *
  */
-
 
 /*********************
  *      INCLUDES
@@ -207,7 +206,6 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     return LV_FS_RES_OK;
 }
 
-
 #else /*LV_USE_FS_MEMFS == 0*/
 
 #if defined(LV_FS_MEMFS_LETTER) && LV_FS_MEMFS_LETTER != '\0'
@@ -215,4 +213,3 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 #endif
 
 #endif /*LV_USE_FS_MEMFS*/
-

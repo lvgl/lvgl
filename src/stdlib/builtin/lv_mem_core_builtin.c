@@ -38,7 +38,6 @@
 #endif
 #define state LV_GLOBAL_DEFAULT()->tlsf_state
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -137,7 +136,6 @@ void lv_mem_remove_pool(lv_mem_pool_t pool)
     LV_LOG_WARN("invalid pool: %p", pool);
 }
 
-
 void * lv_malloc_core(size_t size)
 {
 #if LV_USE_OS
@@ -189,7 +187,7 @@ void lv_free_core(void * p)
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 {
     /*Init the data*/
-    lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
+    lv_memzero(mon_p, sizeof(lv_mem_monitor_t));
     LV_TRACE_MEM("begin");
 
     lv_pool_t * pool_p;
@@ -197,9 +195,9 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
         lv_tlsf_walk_pool(*pool_p, lv_mem_walker, mon_p);
     }
 
-    mon_p->used_pct = 100 - (100U * mon_p->free_size) / mon_p->total_size;
+    mon_p->used_pct = 100 - (uint64_t)100U * mon_p->free_size / mon_p->total_size;
     if(mon_p->free_size > 0) {
-        mon_p->frag_pct = mon_p->free_biggest_size * 100U / mon_p->free_size;
+        mon_p->frag_pct = (uint64_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
         mon_p->frag_pct = 100 - mon_p->frag_pct;
     }
     else {
@@ -210,7 +208,6 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 
     LV_TRACE_MEM("finished");
 }
-
 
 lv_result_t lv_mem_test_core(void)
 {
@@ -263,4 +260,4 @@ static void lv_mem_walker(void * ptr, size_t size, int used, void * user)
             mon_p->free_biggest_size = size;
     }
 }
-#endif /*LV_USE_BUILTIN_MALLOC*/
+#endif /*LV_STDLIB_BUILTIN*/

@@ -7,12 +7,12 @@ def event_handler(e):
 
 win = lv.win(lv.screen_active())
 button1 = win.add_button(lv.SYMBOL.LEFT, 40)
-button1.add_event(event_handler, lv.EVENT.ALL, None)
+button1.add_event_cb(event_handler, lv.EVENT.ALL, None)
 win.add_title("A title")
 button2=win.add_button(lv.SYMBOL.RIGHT, 40)
-button2.add_event(event_handler, lv.EVENT.ALL, None)
+button2.add_event_cb(event_handler, lv.EVENT.ALL, None)
 button3 = win.add_button(lv.SYMBOL.CLOSE, 60)
-button3.add_event(event_handler, lv.EVENT.ALL, None)
+button3.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
 cont = win.get_content()  # Content can be added here
 label = lv.label(cont)

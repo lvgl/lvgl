@@ -14,7 +14,7 @@ void lv_example_style_11(void)
     lv_style_set_border_width(&style_base, 2);
     lv_style_set_radius(&style_base, 10);
     lv_style_set_shadow_width(&style_base, 10);
-    lv_style_set_shadow_ofs_y(&style_base, 5);
+    lv_style_set_shadow_offset_y(&style_base, 5);
     lv_style_set_shadow_opa(&style_base, LV_OPA_50);
     lv_style_set_text_color(&style_base, lv_color_white());
     lv_style_set_width(&style_base, 100);

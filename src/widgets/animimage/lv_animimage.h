@@ -30,7 +30,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-extern const lv_obj_class_t lv_animimg_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_animimg_class;
 
 /*Data of image*/
 typedef struct {
@@ -41,19 +41,16 @@ typedef struct {
     int8_t  pic_count;
 } lv_animimg_t;
 
-
 /*Image parts*/
 enum _lv_animimg_part_t {
     LV_ANIM_IMAGE_PART_MAIN,
 };
-
 
 #ifdef DOXYGEN
 typedef _lv_animimg_part_t lv_animimg_part_t;
 #else
 typedef uint8_t lv_animimg_part_t;
 #endif
-
 
 /**********************
  * GLOBAL PROTOTYPES

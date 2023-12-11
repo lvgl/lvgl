@@ -132,6 +132,7 @@ lv_micropython already contains these drivers:
 - Display drivers:
 
   - SDL on Linux
+  - X11 on Linux
   - ESP32 specific:
 
     - ILI9341
@@ -149,6 +150,7 @@ lv_micropython already contains these drivers:
 - Input drivers:
 
   - SDL
+  - X11
   - XPT2046
   - FT6X36
   - ESP32 ADC with resistive touch

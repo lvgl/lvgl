@@ -46,7 +46,6 @@ typedef struct {
 *  STATIC PROTOTYPES
  **********************/
 
-
 static bool _is_identity_or_translation(const lv_matrix_t * matrix)
 {
     return (matrix->m[0][0] == 1.0f &&
@@ -60,7 +59,7 @@ static bool _is_identity_or_translation(const lv_matrix_t * matrix)
 
 static void _multiply_matrix(lv_matrix_t * matrix, const lv_matrix_t * mul)
 {
-    // TODO: use NEON to optimize this function on ARM architecture.
+    /*TODO: use NEON to optimize this function on ARM architecture.*/
     lv_matrix_t tmp;
 
     for(int y = 0; y < 3; y++) {
@@ -130,7 +129,7 @@ void lv_matrix_identity(lv_matrix_t * matrix)
 void lv_matrix_translate(lv_matrix_t * matrix, float dx, float dy)
 {
     if(_is_identity_or_translation(matrix)) {
-        // optimization for matrix translation.
+        /*optimization for matrix translation.*/
         matrix->m[0][2] += dx;
         matrix->m[1][2] += dy;
         return;
@@ -221,7 +220,7 @@ void lv_vector_path_clear(lv_vector_path_t * path)
     lv_array_clear(&path->points);
 }
 
-void lv_vector_path_destroy(lv_vector_path_t * path)
+void lv_vector_path_delete(lv_vector_path_t * path)
 {
     lv_array_destroy(&path->ops);
     lv_array_destroy(&path->points);
@@ -240,7 +239,7 @@ void lv_vector_path_move_to(lv_vector_path_t * path, const lv_fpoint_t * p)
 void lv_vector_path_line_to(lv_vector_path_t * path, const lv_fpoint_t * p)
 {
     if(lv_array_is_empty(&path->ops)) {
-        // first op must be move_to
+        /*first op must be move_to*/
         return;
     }
 
@@ -254,7 +253,7 @@ void lv_vector_path_line_to(lv_vector_path_t * path, const lv_fpoint_t * p)
 void lv_vector_path_quad_to(lv_vector_path_t * path, const lv_fpoint_t * p1, const lv_fpoint_t * p2)
 {
     if(lv_array_is_empty(&path->ops)) {
-        // first op must be move_to
+        /*first op must be move_to*/
         return;
     }
 
@@ -270,7 +269,7 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
                              const lv_fpoint_t * p3)
 {
     if(lv_array_is_empty(&path->ops)) {
-        // first op must be move_to
+        /*first op must be move_to*/
         return;
     }
 
@@ -286,7 +285,7 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
 void lv_vector_path_close(lv_vector_path_t * path)
 {
     if(lv_array_is_empty(&path->ops)) {
-        // first op must be move_to
+        /*first op must be move_to*/
         return;
     }
 
@@ -296,7 +295,7 @@ void lv_vector_path_close(lv_vector_path_t * path)
     LV_ARRAY_APPEND_VALUE(&path->ops, op);
 }
 
-void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, lv_coord_t rx, lv_coord_t ry)
+void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, int32_t rx, int32_t ry)
 {
     float x = rect->x1;
     float y = rect->y1;
@@ -306,8 +305,8 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
     float hw = w * 0.5f;
     float hh = h * 0.5f;
 
-    if(rx > hw) rx = (lv_coord_t)hw;
-    if(ry > hh) ry = (lv_coord_t)hh;
+    if(rx > hw) rx = (int32_t)hw;
+    if(ry > hh) ry = (int32_t)hh;
 
     if(rx == 0 && ry == 0) {
         lv_fpoint_t pt = {x, y};
@@ -320,7 +319,7 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
         lv_vector_path_line_to(path, &pt);
         lv_vector_path_close(path);
     }
-    else if(rx == (lv_coord_t)hw && ry == (lv_coord_t)hh) {
+    else if(rx == (int32_t)hw && ry == (int32_t)hh) {
         lv_fpoint_t pt = {x + w * 0.5f, y + h * 0.5f};
         lv_vector_path_append_circle(path, &pt, rx, ry);
     }
@@ -384,7 +383,7 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
     }
 }
 
-void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, lv_coord_t rx, lv_coord_t ry)
+void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, int32_t rx, int32_t ry)
 {
     float krx = rx * 0.552284f;
     float kry = ry * 0.552284f;
@@ -464,26 +463,26 @@ lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer)
     fill_dsc->color = lv_color_to_32(lv_color_black(), 0xFF);
     fill_dsc->opa = LV_OPA_COVER;
     fill_dsc->fill_rule = LV_VECTOR_FILL_NONZERO;
-    lv_matrix_identity(&(fill_dsc->matrix)); // identity matrix
+    lv_matrix_identity(&(fill_dsc->matrix)); /*identity matrix*/
 
     lv_vector_stroke_dsc_t * stroke_dsc = &(dsc->current_dsc.stroke_dsc);
     stroke_dsc->style = LV_VECTOR_DRAW_STYLE_SOLID;
     stroke_dsc->color = lv_color_to_32(lv_color_black(), 0xFF);
-    stroke_dsc->opa = LV_OPA_0; // default no stroke
+    stroke_dsc->opa = LV_OPA_0; /*default no stroke*/
     stroke_dsc->width = 1.0f;
     stroke_dsc->cap = LV_VECTOR_STROKE_CAP_BUTT;
     stroke_dsc->join = LV_VECTOR_STROKE_JOIN_MITER;
     stroke_dsc->miter_limit = 4.0f;
-    lv_matrix_identity(&(stroke_dsc->matrix)); // identity matrix
+    lv_matrix_identity(&(stroke_dsc->matrix)); /*identity matrix*/
 
     dsc->current_dsc.blend_mode = LV_VECTOR_BLEND_SRC_OVER;
-    dsc->current_dsc.scissor_area = layer->clip_area;
-    lv_matrix_identity(&(dsc->current_dsc.matrix)); // identity matrix
+    dsc->current_dsc.scissor_area = layer->_clip_area;
+    lv_matrix_identity(&(dsc->current_dsc.matrix)); /*identity matrix*/
     dsc->tasks.task_list = NULL;
     return dsc;
 }
 
-void lv_vector_dsc_destroy(lv_vector_dsc_t * dsc)
+void lv_vector_dsc_delete(lv_vector_dsc_t * dsc)
 {
     if(dsc->tasks.task_list) {
         lv_ll_t * task_list = dsc->tasks.task_list;
@@ -594,7 +593,7 @@ void lv_vector_dsc_set_stroke_dash(lv_vector_dsc_t * dsc, float * dash_pattern, 
             LV_ARRAY_APPEND_VALUE(dash_array, dash_pattern[i]);
         }
     }
-    else {   // clear dash
+    else {   /*clear dash*/
         lv_array_clear(dash_array);
     }
 }
@@ -636,10 +635,10 @@ void lv_vector_dsc_set_stroke_radial_gradient(lv_vector_dsc_t * dsc, const lv_gr
 }
 
 /* draw functions */
-void lv_vector_add(lv_vector_dsc_t * dsc, const lv_vector_path_t * path)
+void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path)
 {
     lv_area_t rect;
-    if(!_lv_area_intersect(&rect, &(dsc->layer->clip_area), &(dsc->current_dsc.scissor_area))) {
+    if(!_lv_area_intersect(&rect, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
         return;
     }
 
@@ -664,10 +663,10 @@ void lv_vector_add(lv_vector_dsc_t * dsc, const lv_vector_path_t * path)
     new_task->dsc.scissor_area = rect;
 }
 
-void lv_vector_clear(lv_vector_dsc_t * dsc, const lv_area_t * rect)
+void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
 {
     lv_area_t r;
-    if(!_lv_area_intersect(&r, &(dsc->layer->clip_area), &(dsc->current_dsc.scissor_area))) {
+    if(!_lv_area_intersect(&r, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
         return;
     }
 
@@ -684,7 +683,7 @@ void lv_vector_clear(lv_vector_dsc_t * dsc, const lv_area_t * rect)
     lv_area_copy(&(new_task->dsc.scissor_area), rect);
 }
 
-void lv_vector_draw(lv_vector_dsc_t * dsc)
+void lv_draw_vector(lv_vector_dsc_t * dsc)
 {
     if(!dsc->tasks.task_list) {
         return;
@@ -692,7 +691,7 @@ void lv_vector_draw(lv_vector_dsc_t * dsc)
 
     lv_layer_t * layer = dsc->layer;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->clip_area));
+    lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area));
     t->type = LV_DRAW_TASK_TYPE_VECTOR;
     t->draw_dsc = lv_malloc(sizeof(lv_draw_vector_task_dsc_t));
     lv_memcpy(t->draw_dsc, &(dsc->tasks), sizeof(lv_draw_vector_task_dsc_t));
@@ -703,7 +702,7 @@ void lv_vector_draw(lv_vector_dsc_t * dsc)
 /* draw dsc transform */
 void lv_vector_dsc_identity(lv_vector_dsc_t * dsc)
 {
-    lv_matrix_identity(&(dsc->current_dsc.matrix)); // identity matrix
+    lv_matrix_identity(&(dsc->current_dsc.matrix)); /*identity matrix*/
 }
 
 void lv_vector_dsc_scale(lv_vector_dsc_t * dsc, float scale_x, float scale_y)
@@ -740,7 +739,7 @@ void _lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb 
         }
 
         if(task->path) {
-            lv_vector_path_destroy(task->path);
+            lv_vector_path_delete(task->path);
         }
         lv_array_destroy(&(task->dsc.stroke_dsc.dash_pattern));
 

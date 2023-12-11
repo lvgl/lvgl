@@ -1,0 +1,126 @@
+/**
+ * @file lv_freetype_private.h
+ *
+ */
+
+#ifndef LV_FREETYPE_PRIVATE_H
+#define LV_FREETYPE_PRIVATE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "../../../lvgl.h"
+
+#if LV_USE_FREETYPE
+
+#include "ft2build.h"
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+#include FT_CACHE_H
+#include FT_SIZES_H
+#include FT_IMAGE_H
+#include FT_OUTLINE_H
+
+/*********************
+ *      DEFINES
+ *********************/
+
+#ifdef FT_CONFIG_OPTION_ERROR_STRINGS
+#define FT_ERROR_MSG(msg, error_code) \
+    LV_LOG_ERROR(msg " error(0x%x): %s", (int)error_code, FT_Error_String(error_code))
+#else
+#define FT_ERROR_MSG(msg, error_code) \
+    LV_LOG_ERROR(msg " error(0x%x)", (int)error_code)
+#endif
+
+#if LV_FREETYPE_CACHE_SIZE <= 0
+#error "LV_FREETYPE_CACHE_SIZE must > 0"
+#endif
+
+#define LV_FREETYPE_FONT_DSC_MAGIC_NUM 0x5F5F4654 /* '__FT' */
+#define LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc) ((dsc)->magic_num == LV_FREETYPE_FONT_DSC_MAGIC_NUM)
+#define LV_ASSERT_FREETYPE_FONT_DSC(dsc)                                                   \
+    do {                                                                                   \
+        LV_ASSERT_NULL(dsc);                                                               \
+        LV_ASSERT_MSG(LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc), "Invalid font descriptor"); \
+    } while (0)
+
+#define FT_INT_TO_F26DOT6(x) ((x) << 6)
+#define FT_F26DOT6_TO_INT(x) ((x) >> 6)
+
+#define FT_INT_TO_F16DOT16(x) ((x) << 16)
+#define FT_F16DOT16_TO_INT(x) ((x) >> 16)
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+typedef struct _lv_freetype_cache_context_t lv_freetype_cache_context_t;
+typedef struct _lv_freetype_cache_node_t lv_freetype_cache_node_t;
+
+typedef struct _lv_freetype_context_t {
+    FT_Library library;
+    FTC_Manager cache_manager;
+    FTC_CMapCache cmap_cache;
+    lv_freetype_cache_context_t * cache_context;
+    lv_ll_t face_id_ll;
+} lv_freetype_context_t;
+
+typedef struct _lv_freetype_font_dsc_t {
+    uint32_t magic_num;
+    lv_font_t font;
+    uint32_t size;
+    lv_freetype_font_style_t style;
+    lv_freetype_context_t * context;
+    lv_freetype_cache_node_t * cache_node;
+    FTC_FaceID face_id;
+} lv_freetype_font_dsc_t;
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+/**
+ * Get the FreeType context.
+ *
+ * @return A pointer to the FreeType context used by LittlevGL.
+ */
+lv_freetype_context_t * lv_freetype_get_context(void);
+
+/**
+ * Look up a FreeType size object for a given font descriptor and size.
+ *
+ * @param dsc The font descriptor to use.
+ * @param size The size of the font.
+ * @return A pointer to the FreeType size object.
+ */
+FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc);
+
+lv_freetype_cache_context_t * lv_freetype_cache_context_create(lv_freetype_context_t * ctx);
+
+void lv_freetype_cache_context_delete(lv_freetype_cache_context_t * cache_ctx);
+
+bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc);
+
+void lv_freetype_on_font_delete(lv_freetype_font_dsc_t * dsc);
+
+void lv_freetype_italic_transform(FT_Face face);
+
+const char * lv_freetype_get_pathname(FTC_FaceID face_id);
+
+/**********************
+ *      MACROS
+ **********************/
+
+#endif /*LV_USE_FREETYPE*/
+
+#ifdef __cplusplus
+} /*extern "C"*/
+#endif
+
+#endif /*LV_FREETYPE_PRIVATE_H*/

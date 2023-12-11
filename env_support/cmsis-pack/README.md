@@ -167,6 +167,8 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
 
     - LV_USE_SDL
 
+    - LV_USE_X11
+
     - LV_USE_LINUX_FBDEV
 
     - LV_USE_NUTTX_FBDEV
@@ -224,4 +226,3 @@ enter the following command:
 ```sh
 ./gen_pack.sh
 ```
-

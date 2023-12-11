@@ -20,7 +20,6 @@ static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
     lv_table_set_cell_value(tb, j, 1, lv_table_get_cell_value(tb, 0, 2));
 }
 
-
 /*Quick sort 3 way*/
 static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
 {
@@ -42,7 +41,6 @@ static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
     sort_by_file_kind(tb, lo, lt - 1);
     sort_by_file_kind(tb, gt + 1, hi);
 }
-
 
 static void file_explorer_event_handler(lv_event_t * e)
 {
@@ -67,7 +65,7 @@ static void file_explorer_event_handler(lv_event_t * e)
     }
     else if(code == LV_EVENT_READY) {
         lv_obj_t * tb = lv_file_explorer_get_file_table(obj);
-        uint16_t sum = lv_table_get_row_cnt(tb);
+        uint16_t sum = lv_table_get_row_count(tb);
 
         sort_by_file_kind(tb, 0, (sum - 1));
     }
@@ -122,7 +120,7 @@ void lv_example_file_explorer_3(void)
 #endif
 #endif
 
-    lv_obj_add_event(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
 }
 
 #endif

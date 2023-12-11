@@ -69,7 +69,6 @@ lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void *
     return res;
 }
 
-
 lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     const lv_obj_class_t * base;
@@ -93,8 +92,8 @@ lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
     return res;
 }
 
-void lv_obj_add_event(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
-                      void * user_data)
+void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
+                         void * user_data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_allocate_spec_attr(obj);
@@ -108,7 +107,6 @@ uint32_t lv_obj_get_event_count(lv_obj_t * obj)
     if(obj->spec_attr == NULL) return 0;
     return lv_event_get_count(&obj->spec_attr->event_list);
 }
-
 
 lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index)
 {
@@ -150,7 +148,6 @@ lv_obj_t * lv_event_get_target_obj(lv_event_t * e)
 {
     return lv_event_get_target(e);
 }
-
 
 lv_indev_t * lv_event_get_indev(lv_event_t * e)
 {
@@ -230,10 +227,10 @@ lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e)
     }
 }
 
-void lv_event_set_ext_draw_size(lv_event_t * e, lv_coord_t size)
+void lv_event_set_ext_draw_size(lv_event_t * e, int32_t size)
 {
     if(e->code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * cur_size = lv_event_get_param(e);
+        int32_t * cur_size = lv_event_get_param(e);
         *cur_size = LV_MAX(*cur_size, size);
     }
     else {
@@ -307,9 +304,8 @@ static lv_result_t event_send_core(lv_event_t * e)
     LV_TRACE_EVENT("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
 
     /*Call the input device's feedback callback if set*/
-    lv_indev_t * indev_act = lv_indev_get_act();
+    lv_indev_t * indev_act = lv_indev_active();
     if(indev_act) {
-        if(indev_act->feedback_cb) indev_act->feedback_cb(indev_act, e);
         if(e->stop_processing) return LV_RESULT_OK;
         if(e->deleted) return LV_RESULT_INVALID;
     }
@@ -336,7 +332,6 @@ static lv_result_t event_send_core(lv_event_t * e)
 
     return res;
 }
-
 
 static bool event_is_bubbled(lv_event_t * e)
 {

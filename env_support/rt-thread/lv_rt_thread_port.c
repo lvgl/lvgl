@@ -19,12 +19,16 @@
 #include <rtdbg.h>
 
 #ifndef PKG_LVGL_THREAD_STACK_SIZE
-#define PKG_LVGL_THREAD_STACK_SIZE 4096
+    #define PKG_LVGL_THREAD_STACK_SIZE 4096
 #endif /* PKG_LVGL_THREAD_STACK_SIZE */
 
 #ifndef PKG_LVGL_THREAD_PRIO
-#define PKG_LVGL_THREAD_PRIO (RT_THREAD_PRIORITY_MAX*2/3)
+    #define PKG_LVGL_THREAD_PRIO (RT_THREAD_PRIORITY_MAX*2/3)
 #endif /* PKG_LVGL_THREAD_PRIO */
+
+#ifndef PKG_LVGL_DISP_REFR_PERIOD
+    #define PKG_LVGL_DISP_REFR_PERIOD 33
+#endif /* PKG_LVGL_DISP_REFR_PERIOD */
 
 extern void lv_port_disp_init(void);
 extern void lv_port_indev_init(void);
@@ -33,9 +37,9 @@ extern void lv_user_gui_init(void);
 static struct rt_thread lvgl_thread;
 
 #ifdef rt_align
-rt_align(RT_ALIGN_SIZE)
+    rt_align(RT_ALIGN_SIZE)
 #else
-ALIGN(RT_ALIGN_SIZE)
+    ALIGN(RT_ALIGN_SIZE)
 #endif
 static rt_uint8_t lvgl_thread_stack[PKG_LVGL_THREAD_STACK_SIZE];
 
@@ -55,6 +59,8 @@ static void lvgl_thread_entry(void *parameter)
     lv_port_disp_init();
     lv_port_indev_init();
     lv_user_gui_init();
+
+    lv_tick_set_cb(&rt_tick_get_millisecond);
 
     /* handle the tasks of LVGL */
     while(1)

@@ -61,7 +61,7 @@ typedef enum {
 
 void lv_grid_init(void);
 
-void lv_obj_set_grid_dsc_array(struct _lv_obj_t * obj, const lv_coord_t col_dsc[], const lv_coord_t row_dsc[]);
+void lv_obj_set_grid_dsc_array(struct _lv_obj_t * obj, const int32_t col_dsc[], const int32_t row_dsc[]);
 
 void lv_obj_set_grid_align(struct _lv_obj_t * obj, lv_grid_align_t column_align, lv_grid_align_t row_align);
 
@@ -75,13 +75,13 @@ void lv_obj_set_grid_align(struct _lv_obj_t * obj, lv_grid_align_t column_align,
  * @param row_pos row ID
  * @param row_span number of rows to take (>= 1)
  */
-void lv_obj_set_grid_cell(struct _lv_obj_t * obj, lv_grid_align_t column_align, lv_coord_t col_pos, lv_coord_t col_span,
-                          lv_grid_align_t row_align, lv_coord_t row_pos, lv_coord_t row_span);
+void lv_obj_set_grid_cell(struct _lv_obj_t * obj, lv_grid_align_t column_align, int32_t col_pos, int32_t col_span,
+                          lv_grid_align_t row_align, int32_t row_pos, int32_t row_span);
 
 /**
  * Just a wrapper to `LV_GRID_FR` for bindings.
  */
-static inline lv_coord_t lv_grid_fr(uint8_t x)
+static inline int32_t lv_grid_fr(uint8_t x)
 {
     return LV_GRID_FR(x);
 }

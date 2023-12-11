@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -76,14 +75,14 @@ void vglite_set_dest_buf(const lv_draw_buf_t * draw_buf)
                    lv_draw_buf_get_stride(draw_buf), draw_buf->color_format);
 }
 
-void vglite_set_src_buf(const void * buf, lv_coord_t width, lv_coord_t height, uint32_t stride,
+void vglite_set_src_buf(const void * buf, int32_t width, int32_t height, uint32_t stride,
                         lv_color_format_t cf)
 {
     vglite_set_buf(&_src_vgbuf, (void *)buf, width, height, stride, cf);
 }
 
 void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
-                    lv_coord_t width, lv_coord_t height, uint32_t stride,
+                    int32_t width, int32_t height, uint32_t stride,
                     lv_color_format_t cf)
 {
     vg_lite_buffer_format_t vgformat = vglite_get_buf_format(cf);
@@ -97,7 +96,7 @@ void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
     vgbuf->height = (int32_t)height;
     vgbuf->stride = (int32_t)stride;
 
-    lv_memset(&vgbuf->yuv, 0, sizeof(vgbuf->yuv));
+    lv_memzero(&vgbuf->yuv, sizeof(vgbuf->yuv));
 
     vgbuf->memory = buf;
     vgbuf->address = (uint32_t)vgbuf->memory;

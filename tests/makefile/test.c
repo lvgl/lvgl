@@ -1,6 +1,6 @@
 #if LV_BUILD_TEST
 #include <stdio.h>
-#include "lvgl/lvgl.h"
+#include "../../lvgl.h"
 
 int main(void)
 {

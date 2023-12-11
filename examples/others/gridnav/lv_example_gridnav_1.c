@@ -30,7 +30,7 @@ void lv_example_gridnav_1(void)
         lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
         lv_group_remove_obj(obj);   /*Not needed, we use the gridnav instead*/
 
-        lv_obj_t * label = lv_label_create(obj);
+        label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "%"LV_PRIu32"", i);
         lv_obj_center(label);
     }

@@ -23,7 +23,6 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_HAND uint8_t img_hand_map[] 
 };
 
 const lv_image_dsc_t img_hand = {
-    .header.always_zero = 0,
     .header.w = 100,
     .header.h = 9,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,

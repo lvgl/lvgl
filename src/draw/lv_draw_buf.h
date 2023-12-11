@@ -36,7 +36,7 @@ typedef void (*lv_draw_buf_invalidate_cache_cb)(void * buf, uint32_t stride, lv_
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
 typedef void * (*lv_draw_buf_go_to_xy_cb)(const void * buf, uint32_t stride, lv_color_format_t color_format,
-                                          lv_coord_t x, lv_coord_t y);
+                                          int32_t x, int32_t y);
 
 typedef void (*lv_draw_buf_clear_cb)(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format,
                                      const lv_area_t * a);
@@ -123,8 +123,8 @@ uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
  * @param y                 the target X coordinate
  * @return                  `buf` offset to point to the given X and Y coordinate
  */
-void * lv_draw_buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format, lv_coord_t x,
-                            lv_coord_t y);
+void * lv_draw_buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format, int32_t x,
+                            int32_t y);
 
 /**
  * Clear an area on the buffer

@@ -53,10 +53,10 @@ void lv_draw_triangle(struct _lv_layer_t * layer, const lv_draw_triangle_dsc_t *
 {
     LV_PROFILER_BEGIN;
     lv_area_t a;
-    a.x1 = LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
-    a.y1 = LV_MIN3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
-    a.x2 = LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
-    a.y2 = LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
+    a.x1 = (int32_t)LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
+    a.y1 = (int32_t)LV_MIN3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
+    a.x2 = (int32_t)LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
+    a.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &a);
 

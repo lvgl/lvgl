@@ -15,40 +15,76 @@ extern "C" {
  *********************/
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include "../osal/lv_os.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_CACHE_DATA_TYPE_NOT_SET  0xFFFFFFFF
 
 /**********************
  *      TYPEDEFS
  **********************/
 
 typedef enum {
-    LV_CACHE_SRC_TYPE_PTR,
-    LV_CACHE_SRC_TYPE_STR,
-    _LV_CACHE_SRC_TYPE_LAST,
+    LV_CACHE_SRC_TYPE_PATH,
+    LV_CACHE_SRC_TYPE_POINTER,
 } lv_cache_src_type_t;
 
 typedef struct _lv_cache_entry_t {
-    /**The image source or other source related to the cache content.*/
+
+    /**
+     * The data to cache.
+     * Can be just a pointer to a byte array, or pointer to a complex structure, or anything else*/
+    const void * data;
+
+    /**
+     * Size of data in bytes.
+     * It's not the size of the cached data, just the size of the structure pointed by `data`
+     * E.g. `data` can point to descriptor struct and the size of that struct needs to be stored here.
+     * It can be used in the `compary_cb` to compare `data` fields of the entries with a requested one*/
+    uint32_t data_size;
+
+    /**An integer ID to tell the type of the cached data.
+     * If set to `LV_CACHE_DATA_TYPE_NOT_SET` `lv_cache_find_by_data` cannot be used*/
+    uint32_t data_type;
+
+    /**
+     * The source from which the cache is created.
+     * It's can or cannot be the same as data, or different, or NULL.
+     * It's used to find the cache entries which are relted to same source.
+     * E.g. the same image, font, etc.  */
     const void * src;
 
     lv_cache_src_type_t src_type;
 
-    /** Some extra parameters to describe the source. E.g. the current frame of an animation*/
-    uint32_t param1;
-    uint32_t param2;
+    /**Arbitrary parameters to better identify the source*/
+    int32_t param1;
+    int32_t param2;
+
+    /** Memory in bytes used by data. */
+    uint32_t memory_usage;
+
+    /**
+     * Called to compare the data of cache entries.
+     * Before calling this function LVGL checks that `data_size` of both entries are the same.
+     * This callback look into `data` and check all the pointers and their content on any level.
+     * @param data1      first data to compare
+     * @param data2      second data to compare
+     * @param data_size  size of data
+     * @return           true: `data1` and `data2` are the same
+     */
+    bool (*compare_cb)(const void * data1, const void * data2, size_t data_size);
+
+    /**
+     * Called when the entry is invalidated to free its data
+     * @param e     the cache entry to free
+     */
+    void (*invalidate_cb)(struct _lv_cache_entry_t * e);
 
     /** User processing tag*/
     uint32_t process_state;
-
-    /** The data to cache*/
-    const void * data;
-
-    /** Size of data in bytes*/
-    uint32_t data_size;
 
     /** On access to any cache entry, `life` of each cache entry will be incremented by their own `weight` to keep the entry alive longer*/
     uint32_t weight;
@@ -61,12 +97,6 @@ typedef struct _lv_cache_entry_t {
      * A data will dropped from the cache only if its usage_count is zero */
     uint32_t usage_count;
 
-    /** Call `lv_free` on `src` when the entry is removed from the cache */
-    uint32_t free_src   : 1;
-
-    /** Call `lv_draw_buf_free` on `data` when the entry is removed from the cache */
-    uint32_t free_data   : 1;
-
     /** The cache entry was larger then the max cache size so only a temporary entry was allocated
      * The entry will be closed and freed in `lv_cache_release` automatically*/
     uint32_t temporary  : 1;
@@ -75,26 +105,37 @@ typedef struct _lv_cache_entry_t {
     void * user_data;
 } lv_cache_entry_t;
 
-
 /**
  * Add a new entry to the cache with the given size.
  * It won't allocate any buffers just free enough space to be a new entry
  * with `size` bytes fits.
- * @param size      the size of the new entry in bytes
- * @return          a handler for the new cache entry
+ * @param data          data the cache, can be a complex structure too
+ * @param data_size     the size of data (if it's a struct then the size of the struct)
+ * @param data_type     type of data to identify the kind of this cache entry
+ * @param memory_usage  the size of memory used by this entry (`data` might contain pointers so it's size of all buffers related to entry)
+ * @return              a handler for the new cache entry
  */
-typedef lv_cache_entry_t * (*lv_cache_add_cb)(size_t size);
+typedef lv_cache_entry_t * (*lv_cache_add_cb)(const void * data, size_t data_size, uint32_t data_type,
+                                              size_t memory_usage);
 
 /**
- * Find a cache entry
- * @param src_ptr   pointer to the source data
- * @param src_type  source type (`LV_CACHE_SRC_TYPE_PTR` or `LV_CACHE_SRC_TYPE_STR`)
- * @param param1    param1, which was set when the cache was added
- * @param param2    param2, which was set when the cache was added
- * @return          the cache entry with given source and parameters or NULL if not found
+ * Find a cache entry based on its data
+ * @param data      the data to find
+ * @param data_size size of data
+ * @param data_type ID for the data type
+ * @return          the cache entry with given `data` or NULL if not found
  */
-typedef lv_cache_entry_t * (*lv_cache_find_cb)(const void * src_ptr, lv_cache_src_type_t src_type, uint32_t param1,
-                                               uint32_t param2);
+typedef lv_cache_entry_t * (*lv_cache_find_by_data_cb)(const void * data, size_t data_size, uint32_t data_type);
+
+/**
+ * Get the next entry which has the given source and parameters
+ * @param prev_entry    pointer to the previous entry from which the nest should be found. NULL means to start from the beginning.
+ * @param src           a pointer or a string
+ * @param src_type      element of lv_cache_src_type_t
+ * @return              the cache entry with given source or NULL if not found
+ */
+typedef lv_cache_entry_t * (*lv_cache_find_by_src_cb)(lv_cache_entry_t * entry, const void * src,
+                                                      lv_cache_src_type_t src_type);
 
 /**
  * Invalidate (drop) a cache entry
@@ -131,7 +172,8 @@ typedef void (*lv_cache_empty_cb)(void);
 
 typedef struct {
     lv_cache_add_cb add_cb;
-    lv_cache_find_cb find_cb;
+    lv_cache_find_by_data_cb find_by_data_cb;
+    lv_cache_find_by_src_cb find_by_src_cb;
     lv_cache_invalidate_cb invalidate_cb;
     lv_cache_get_data_cb get_data_cb;
     lv_cache_release_cb release_cb;
@@ -141,6 +183,7 @@ typedef struct {
     lv_mutex_t mutex;
     size_t max_size;
     uint32_t locked     : 1;    /**< Show the mutex state, used to log unlocked cache access*/
+    uint32_t last_data_type;
 } lv_cache_manager_t;
 
 /**********************
@@ -167,26 +210,44 @@ void lv_cache_set_manager(lv_cache_manager_t * manager);
  * Add a new entry to the cache with the given size.
  * It won't allocate any buffers just free enough space to be a new entry
  * with `size` bytes fits.
- * @param size      the size of the new entry in bytes
- * @return          a handler for the new cache entry
+ * @param data          data the cache, can be a complex structure too
+ * @param data_size     the size of data (if it's a struct then the size of the struct)
+ * @param data_type     type of data to identify the kind of this cache entry
+ * @param memory_usage  the size of memory used by this entry (`data` might contain pointers so it's size of all buffers related to entry)
+ * @return              a handler for the new cache entry
  */
-lv_cache_entry_t * lv_cache_add(size_t size);
+lv_cache_entry_t * lv_cache_add(const void * data, size_t data_size, uint32_t data_type, size_t memory_usage);
 
 /**
- * Find a cache entry with pointer source type
- * @param src_ptr   pointer to the source data
- * @param src_type  source type (`LV_CACHE_SRC_TYPE_PTR` or `LV_CACHE_SRC_TYPE_STR`)
- * @param param1    param1, which was set when the cache was added
- * @param param2    param2, which was set when the cache was added
- * @return          the cache entry with given source and parameters or NULL if not found
+ * Find a cache entry based on its data
+ * @param data      the data to find
+ * @param data_size size of data
+ * @param data_type ID of data type
+ * @return          the cache entry with given `data` or NULL if not found
  */
-lv_cache_entry_t * lv_cache_find(const void * src, lv_cache_src_type_t src_type, uint32_t param1, uint32_t param2);
+lv_cache_entry_t * lv_cache_find_by_data(const void * data, size_t data_size, uint32_t data_type);
 
 /**
- * Invalidate (drop) a cache entry
+ * Get the next entry which has the given source and parameters
+ * @param prev_entry    pointer to the previous entry from which the nest should be found. NULL means to start from the beginning.
+ * @param src           a pointer or a string
+ * @param src_type      element of lv_cache_src_type_t
+ * @return              the cache entry with given source or NULL if not found
+ */
+lv_cache_entry_t * lv_cache_find_by_src(lv_cache_entry_t * entry, const void * src, lv_cache_src_type_t src_type);
+
+/**
+ * Invalidate (drop) a cache entry. It will call the entry's `invalidate_cb` to free the resources
  * @param entry    the entry to invalidate. (can be retrieved by `lv_cache_find()`)
  */
 void lv_cache_invalidate(lv_cache_entry_t * entry);
+
+/**
+ * Invalidate all cache entries with a given source
+ * @param src           a pointer or a string
+ * @param src_type      element of lv_cache_src_type_t
+ */
+void lv_cache_invalidate_by_src(const void * src, lv_cache_src_type_t src_type);
 
 /**
  * Get the data of a cache entry.
@@ -227,6 +288,12 @@ void lv_cache_lock(void);
  * Needs to be called manually after any cache operation,
  */
 void lv_cache_unlock(void);
+
+/**
+ * Register a data type which can be used as `entry->data_type`.
+ * @return      the registered unique data type ID.
+ */
+uint32_t lv_cache_register_data_type(void);
 
 /**********************
  *      MACROS

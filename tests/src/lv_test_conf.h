@@ -31,7 +31,6 @@ extern "C" {
 #define LV_OBJ_STYLE_CACHE      1
 #endif
 
-
 #ifdef MICROPYTHON
 #define LV_USE_BUILTIN_MALLOC   0
 #define LV_USE_BUILTIN_MEMCPY   1
@@ -52,12 +51,12 @@ extern "C" {
 #define LV_GC_ROOT(x) MP_STATE_PORT(x)
 #endif
 
+#ifndef __ASSEMBLY__
 void lv_test_assert_fail(void);
 #define LV_ASSERT_HANDLER lv_test_assert_fail();
 
 typedef void * lv_user_data_t;
-
-
+#endif
 /***********************
  * TEST CONFIGS
  ***********************/
@@ -88,8 +87,11 @@ typedef void * lv_user_data_t;
 #if defined(LVGL_CI_USING_SYS_HEAP) || defined(LVGL_CI_USING_DEF_HEAP)
 #undef LV_LOG_PRINTF
 
-//#define LV_DRAW_BUF_STRIDE_ALIGN                64
-//#define LV_DRAW_BUF_ALIGN                       40  /*Use non power of 2 to avoid the case when `malloc` returns aligned pointer by default*/
+/*Use a large value be sure any issues will cause crash*/
+#define LV_DRAW_BUF_STRIDE_ALIGN                64
+
+/*Use non power of 2 to avoid the case when `malloc` returns aligned pointer by default, and use a large value be sure any issues will cause crash*/
+#define LV_DRAW_BUF_ALIGN                       852
 
 /*For screenshots*/
 #undef LV_USE_PERF_MONITOR
@@ -98,6 +100,9 @@ typedef void * lv_user_data_t;
 #define  LV_DPI_DEF         130
 #endif
 
+#if defined(LVGL_CI_USING_SYS_HEAP)
+#undef LV_USE_FLOAT
+#endif
 
 #ifdef __cplusplus
 } /*extern "C"*/

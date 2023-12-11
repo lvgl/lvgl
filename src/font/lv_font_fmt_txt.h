@@ -59,7 +59,6 @@ typedef _lv_font_fmt_txt_cmap_type_t lv_font_fmt_txt_cmap_type_t;
 typedef uint8_t lv_font_fmt_txt_cmap_type_t;
 #endif /*DOXYGEN*/
 
-
 /**
  * Map codepoints to a `glyph_dsc`s
  * Several formats are supported to optimize memory usage
@@ -224,7 +223,6 @@ typedef struct {
  */
 const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out);
 
-
 /**
  * Used as `get_glyph_dsc` callback in lvgl's native font format if the font is uncompressed.
  * @param font pointer to font
@@ -236,7 +234,6 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
  */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next);
-
 
 /**********************
  *      MACROS

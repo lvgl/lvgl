@@ -19,7 +19,7 @@ jobs:
                        'OPTIONS_FULL_32BIT']
     name: Build ${{ matrix.build_option }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
@@ -30,15 +30,23 @@ jobs:
     runs-on: ubuntu-latest
     name: amd64 Executable Tests
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Run tests
       run: python tests/main.py --report test
+    - name: Archive screenshot errors
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: screenshot-errors-amd64
+        path: |
+             tests/ref_imgs/**/*_err.png
+             test_screenshot_error.h
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
-      if: github.event_name == 'push'
+      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
       with:
         fail_ci_if_error: true
         verbose: true
@@ -53,17 +61,17 @@ jobs:
         arch: [ 'aarch64', 'armv6', 'armv7' ]
 
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v4
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: Setup cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.ccache
           key: lvgl_ci_cross_test_ccache_${{ matrix.arch }}_${{ github.sha }}
           restore-keys: |
             lvgl_ci_cross_test_ccache_${{ matrix.arch }}
-      - uses: uraimo/run-on-arch-action@v2.1.1
+      - uses: uraimo/run-on-arch-action@v2.6.0
         name: Run tests
         id: build
         with:
@@ -91,4 +99,13 @@ jobs:
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 
           run: |
-            env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+            env PATH="/usr/lib/ccache:$PATH" NON_AMD64_BUILD=1 ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+      - name: Archive screenshot errors
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+            name: screenshot-errors-${{ matrix.arch }}
+            path: |
+                tests/ref_imgs/**/*_err.png
+                test_screenshot_error.h
+

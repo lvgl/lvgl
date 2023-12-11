@@ -29,7 +29,9 @@
  **********************/
 
 static uint32_t millis(void);
-static void syslog_print(lv_log_level_t level, const char * buf);
+#if LV_USE_LOG
+    static void syslog_print(lv_log_level_t level, const char * buf);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -74,6 +76,9 @@ lv_global_t * lv_global_default(void)
 
 void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
 {
+    if(dsc == NULL)
+        return;
+
     lv_memzero(dsc, sizeof(lv_nuttx_dsc_t));
     dsc->fb_path = "/dev/fb0";
     dsc->input_path = "/dev/input0";
@@ -81,8 +86,14 @@ void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
 
 void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 {
+#if LV_USE_LOG
     lv_log_register_print_cb(syslog_print);
+#endif
     lv_tick_set_cb(millis);
+
+    if(result) {
+        lv_memzero(result, sizeof(lv_nuttx_result_t));
+    }
 
 #if !LV_USE_NUTTX_CUSTOM_INIT
 
@@ -94,7 +105,7 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 #else
         disp = lv_nuttx_fbdev_create();
         if(lv_nuttx_fbdev_set_file(disp, dsc->fb_path) != 0) {
-            lv_display_remove(disp);
+            lv_display_delete(disp);
             disp = NULL;
         }
 #endif
@@ -132,6 +143,7 @@ static uint32_t millis(void)
     return tick;
 }
 
+#if LV_USE_LOG
 static void syslog_print(lv_log_level_t level, const char * buf)
 {
     static const int priority[_LV_LOG_LEVEL_NUM] = {
@@ -140,5 +152,6 @@ static void syslog_print(lv_log_level_t level, const char * buf)
 
     syslog(priority[level], "[LVGL] %s", buf);
 }
+#endif
 
 #endif /*LV_USE_NUTTX*/

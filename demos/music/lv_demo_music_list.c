@@ -87,11 +87,11 @@ lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent)
     lv_style_set_radius(&style_scrollbar, LV_RADIUS_CIRCLE);
     lv_style_set_pad_right(&style_scrollbar, 4);
 
-    static const lv_coord_t grid_cols[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_cols[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
 #if LV_DEMO_MUSIC_LARGE
-    static const lv_coord_t grid_rows[] = {35,  30, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_rows[] = {35,  30, LV_GRID_TEMPLATE_LAST};
 #else
-    static const lv_coord_t grid_rows[] = {22,  17, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_rows[] = {22,  17, LV_GRID_TEMPLATE_LAST};
 #endif
     lv_style_init(&style_btn);
     lv_style_set_bg_opa(&style_btn, LV_OPA_TRANSP);
@@ -130,7 +130,7 @@ lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent)
 
     /*Create an empty transparent container*/
     list = lv_obj_create(parent);
-    lv_obj_add_event(list, list_delete_event_cb, LV_EVENT_DELETE, NULL);
+    lv_obj_add_event_cb(list, list_delete_event_cb, LV_EVENT_DELETE, NULL);
     lv_obj_remove_style_all(list);
     lv_obj_set_size(list, LV_HOR_RES, LV_VER_RES - LV_DEMO_MUSIC_HANDLE_SIZE);
     lv_obj_set_y(list, LV_DEMO_MUSIC_HANDLE_SIZE);
@@ -191,7 +191,7 @@ static lv_obj_t * add_list_button(lv_obj_t * parent, uint32_t track_id)
     lv_obj_add_style(btn, &style_button_pr, LV_STATE_PRESSED);
     lv_obj_add_style(btn, &style_button_chk, LV_STATE_CHECKED);
     lv_obj_add_style(btn, &style_button_dis, LV_STATE_DISABLED);
-    lv_obj_add_event(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
 
     if(track_id >= 3) {
         lv_obj_add_state(btn, LV_STATE_DISABLED);
@@ -226,7 +226,6 @@ static lv_obj_t * add_list_button(lv_obj_t * parent, uint32_t track_id)
     return btn;
 }
 
-
 static void btn_click_event_cb(lv_event_t * e)
 {
     lv_obj_t * btn = lv_event_get_target(e);
@@ -238,16 +237,17 @@ static void btn_click_event_cb(lv_event_t * e)
 
 static void list_delete_event_cb(lv_event_t * e)
 {
-    LV_UNUSED(e);
+    lv_event_code_t code = lv_event_get_code(e);
 
-    lv_style_reset(&style_scrollbar);
-    lv_style_reset(&style_btn);
-    lv_style_reset(&style_button_pr);
-    lv_style_reset(&style_button_chk);
-    lv_style_reset(&style_button_dis);
-    lv_style_reset(&style_title);
-    lv_style_reset(&style_artist);
-    lv_style_reset(&style_time);
+    if(code == LV_EVENT_DELETE) {
+        lv_style_reset(&style_scrollbar);
+        lv_style_reset(&style_btn);
+        lv_style_reset(&style_button_pr);
+        lv_style_reset(&style_button_chk);
+        lv_style_reset(&style_button_dis);
+        lv_style_reset(&style_title);
+        lv_style_reset(&style_artist);
+        lv_style_reset(&style_time);
+    }
 }
 #endif /*LV_USE_DEMO_MUSIC*/
-

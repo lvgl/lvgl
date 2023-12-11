@@ -73,7 +73,7 @@ void lv_draw_vglite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_
 
     lv_layer_t * layer = draw_unit->target_layer;
     lv_area_t rel_coords;
-    lv_coord_t width = dsc->width;
+    int32_t width = dsc->width;
 
     /* Move border inwards to align with software rendered border */
     rel_coords.x1 = coords->x1 + ceil(width / 2.0f);
@@ -82,7 +82,7 @@ void lv_draw_vglite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_
     rel_coords.y2 = coords->y2 - floor(width / 2.0f);
 
     /* Move outline outwards to align with software rendered outline */
-    //lv_coord_t outline_pad = dsc->outline_pad - 1;
+    //int32_t outline_pad = dsc->outline_pad - 1;
     //rel_coords.x1 = coords->x1 - outline_pad - floor(dsc->outline_width / 2.0f);
     //rel_coords.x2 = coords->x2 + outline_pad + ceil(dsc->outline_width / 2.0f);
     //rel_coords.y1 = coords->y1 - outline_pad - floor(dsc->outline_width / 2.0f);
@@ -109,20 +109,20 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
                                 const lv_draw_border_dsc_t * dsc)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
-    lv_coord_t radius = dsc->radius;
+    int32_t radius = dsc->radius;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
     if(radius < 0)
         return;
 
-    lv_coord_t border_half = (lv_coord_t)floor(dsc->width / 2.0f);
+    int32_t border_half = (int32_t)floor(dsc->width / 2.0f);
     if(radius > border_half)
         radius = radius - border_half;
 
     //else {
     //    /* Draw outline - always has radius, leave the same radius in the circle case */
-    //    lv_coord_t outline_half = (lv_coord_t)ceil(dsc->outline_width / 2.0f);
-    //    if(radius < (lv_coord_t)LV_RADIUS_CIRCLE - outline_half)
+    //    int32_t outline_half = (int32_t)ceil(dsc->outline_width / 2.0f);
+    //    if(radius < (int32_t)LV_RADIUS_CIRCLE - outline_half)
     //        radius = radius + outline_half;
     //}
 
@@ -147,7 +147,7 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
-    lv_coord_t line_width = dsc->width;
+    int32_t line_width = dsc->width;
 
     /*** Draw border ***/
     err = vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH);

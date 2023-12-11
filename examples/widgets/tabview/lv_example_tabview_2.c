@@ -1,19 +1,21 @@
 #include "../../lv_examples.h"
 #if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
+/*A vertical tab view with disabled scrolling and some styling*/
 void lv_example_tabview_2(void)
 {
     /*Create a Tab view object*/
     lv_obj_t * tabview;
-    tabview = lv_tabview_create(lv_screen_active(), LV_DIR_LEFT, 80);
+    tabview = lv_tabview_create(lv_screen_active());
+    lv_tabview_set_tab_position(tabview, LV_DIR_LEFT);
+    lv_tabview_set_tab_bar_size(tabview, 80);
 
     lv_obj_set_style_bg_color(tabview, lv_palette_lighten(LV_PALETTE_RED, 2), 0);
 
-    lv_obj_t * tab_buttons = lv_tabview_get_tab_buttons(tabview);
+    lv_obj_t * tab_buttons = lv_tabview_get_tab_bar(tabview);
     lv_obj_set_style_bg_color(tab_buttons, lv_palette_darken(LV_PALETTE_GREY, 3), 0);
     lv_obj_set_style_text_color(tab_buttons, lv_palette_lighten(LV_PALETTE_GREY, 5), 0);
     lv_obj_set_style_border_side(tab_buttons, LV_BORDER_SIDE_RIGHT, LV_PART_ITEMS | LV_STATE_CHECKED);
-
 
     /*Add 3 tabs (the tabs are page (lv_page) and can be scrolled*/
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");

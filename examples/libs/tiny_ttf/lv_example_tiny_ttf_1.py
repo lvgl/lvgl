@@ -5,7 +5,8 @@ from ubuntu_font import ubuntu_font
 #Create style with the new font
 style = lv.style_t()
 style.init()
-font = lv.tiny_ttf_create_data(ubuntu_font, len(ubuntu_font), 30)
+font = lv.font_t()
+lv.tiny_ttf_create_data(font, ubuntu_font, len(ubuntu_font), 30)
 style.set_text_font(font)
 style.set_text_align(lv.TEXT_ALIGN.CENTER)
 

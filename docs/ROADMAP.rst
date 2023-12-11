@@ -7,21 +7,28 @@
 Roadmap
 =======
 
-Planned for v9
---------------
+v9
+--
+
+Schedule
+~~~~~~~~
+
+- December 4: Feature stop, start updating the docs and testing
+- December 18: Release candidate version and call to test
+- January 15: Release v9.0
 
 Naming and API
 ~~~~~~~~~~~~~~
 
 - |check| `lv_style_set_size()` should have separate width and height parameters
 - |check| Reconsider image color formats.
-- |uncheck| More consistent names:`remove/clear/delete/del`, `offset/ofs`, `add/create/register`, `id/idx/index`, `middle/mid/center`, `img/image`, `txt/text`, `opa/opacity/alpha`, `scr/screen`, `disp, display`, `finished/complete/completed/ready`, `buf/buffer`,  `..._cb`, `angle/rotation`, `zoom/scale`, `has`, `is`, `enable`
+- |check| More consistent names:`remove/clear/delete/del`, `offset/ofs`, `add/create/register`, `id/idx/index`, `middle/mid/center`, `img/image`, `txt/text`, `opa/opacity/alpha`, `scr/screen`, `disp, display`, `finished/complete/completed/ready`, `buf/buffer`,  `..._cb`, `angle/rotation`, `zoom/scale`, `has`, `is`, `enable`
 - |check| Update canvas API `LINK <https://github.com/lvgl/lvgl/issues/3393>`__
 - |check| `LV_STYLE_PROP_INHERIT` -> `LV_STYLE_PROP_FLAG_INHERITABLE`
   `LINK <https://github.com/lvgl/lvgl/pull/3390#discussion_r885915769>`__
 - |check| Replace `disp_drv->direct_mode/full_refresh` with enum.
 - |check| Consider flat directory structure. E.g. `extra/widgets` to `widgets`
-- |uncheck| Use `uint32_t` and `int32_t` in APIs where possible. Consider hardcoding `lv_coord_t` as `int32_t`.
+- |check| Use `uint32_t` and `int32_t` in APIs where possible. Consider hardcoding `int32_t` as `int32_t`.
 - |check| To define a new stdlib API use defines `LV_USE_CUSTOM_...` and
   let the user implement `lv_...` functions somewhere (instead of defining the name of the custom functions)
   (see `here <https://github.com/lvgl/lvgl/issues/3481#issuecomment-1206434501>`__)
@@ -45,21 +52,21 @@ Architecture
 - |check| Drop `lv_mem_buf_get` as tlsf should be fast enough for normal allocations too.
   Fragmentation is also lower if processes can completely clean up after themselves.
 - |check| More color formats: 24 bit, ARGB1555, ARGB4444 etc
-  (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__) 
+  (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__)
 - |check| Unified caching #3116 #3415
 - |check| Variable binding. I.e create properties which can be bound to objects and those objects are notified on value change. Maybe based on `lv_msg`?
-- |uncheck| Add GPU abstraction for display rotation 
+- |uncheck| Add GPU abstraction for display rotation
 - |check| Replace the `read_line_cb` of the image decoders with `get_area_cb`
-- |check| Limit the image caching size in bytes instead of image count 
+- |check| Limit the image caching size in bytes instead of image count
 - |check| lv_draw_buf for unified stride, buffer and cache invalidation management. `4241 <https://github.com/lvgl/lvgl/pull/4241>`__
+- |check| Add vector graphics support via ThorVG
 - |uncheck| SVG support: integrate an SVG render library `4388 <https://github.com/lvgl/lvgl/issues/4388>`__
-- |uncheck| Introduce optional ``float`` support. `4648 <https://github.com/lvgl/lvgl/issues/4648>`__
-- |uncheck| Introduce support layer for 3D GPUs (OpenGL, SDL, Vulkan, etc).  `4622 <https://github.com/lvgl/lvgl/issues/4622>`__
+- |check| Introduce optional ``float`` support. `4648 <https://github.com/lvgl/lvgl/issues/4648>`__
+- |check| Introduce support layer for 3D GPUs (OpenGL, SDL, Vulkan, etc).  `4622 <https://github.com/lvgl/lvgl/issues/4622>`__
 
 Styles
 ~~~~~~
 
-- |uncheck| Make `style_bg_img` support `9patch` images
 - |check| non-uniform scale of images: scale width and height differently
 - |uncheck| Scroll anim settings should come from styles to allow customization
 
@@ -67,24 +74,16 @@ Widgets
 ~~~~~~~
 
 - |check| Universal scale widget/support
-- |uncheck| `lv_img`: Reconsider image sizing models
+- |check| `lv_img`: Reconsider image sizing models
   (when the image size is not content): center, top-left, zoom, tile, other?
-- |uncheck| `lv_tabview` Replace button matrix with real buttons for more flexibility
-- |uncheck| `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
-- |uncheck| `lv_roller` make it more flexible #4009
+- |check| `lv_tabview` Replace button matrix with real buttons for more flexibility
   (see `here <https://forum.lvgl.io/t/linear-meter-bar-with-ticks/10986>`__ and #4043)
 - |check| Disabled widgets should absorb indev actions without sending events. `#3860 <https://github.com/lvgl/lvgl/issues/3860>`__
-
-Drawing and rendering
-~~~~~~~~~~~~~~~~~~~~~
-
-- |uncheck| Automatically recalculate the layout if a coordinate is get with `lv_obj_get_width/height/x/y/etc`
 
 Animations
 ~~~~~~~~~~
 
-- |uncheck| Use `anim` events to replace many callbacks with one
-- |uncheck| `lv_anim_time_to_speed` should work differently to remove
+- |check| `lv_anim_time_to_speed` should work differently to remove
   `style_anim_speed`. E.g. on large values of anim time store the
   speed. Besides all widgets should use the `style_anim` property.
   `anim` should clamp the time if it's calculated from speed, e.g
@@ -144,17 +143,20 @@ Widgets
 - |uncheck| `lv_bar`, `lv_arc`: handle max < min for fill direction swapping #4039
 - |uncheck| `lv_bar`, `lv_slider`, `lv_arc`: make possible to move the knob only inside the background (see `here <https://forum.lvgl.io/t/slider-knob-out-of-the-track/11956>`__)
 - |uncheck| Improve `lv_label_align_t` #1656
+- |uncheck| `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
+- |uncheck| `lv_roller` make it more flexible #4009
 
 Others
 ~~~~~~
 - |uncheck| `em`, `ch`, `vw/vh` units
-- |uncheck| `astect-ratio` as size
+- |uncheck| `aspect-ratio` as size
 - |uncheck| More grid features. E.g. repeat(auto-fill, minmax( px, 1fr))
 - |uncheck| Named grid cells to allow updating layouts without touching the children (like CSS `grid-template-areas`)
 - |uncheck| Scene support. See `this comment <https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911>`__
 - |uncheck| Circle layout. #2871
 - |uncheck| Consider `stagger animations <https://greensock.com/docs/v3/Staggers>`__.
 - |uncheck| Add custom indev type. See [here](https://github.com/lvgl/lvgl/issues/3298#issuecomment-1616706654).
+- |uncheck| Automatically recalculate the layout if a coordinate is obtained using `lv_obj_get_width/height/x/y/etc`
 
 Ideas
 -----

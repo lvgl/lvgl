@@ -51,8 +51,12 @@ lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*c
 
 lv_result_t lv_thread_delete(lv_thread_t * thread)
 {
-    LV_UNUSED(thread);
-    /*How?*/
+    int ret = pthread_join(thread->thread, NULL);
+    if(ret != 0) {
+        LV_LOG_WARN("Error: %d", ret);
+        return LV_RESULT_INVALID;
+    }
+
     return LV_RESULT_OK;
 }
 

@@ -48,10 +48,10 @@ the last (or most recent) child.
 Child Count
 -----------
 
-Use the function :cpp:expr:`lv_spangroup_get_child_cnt(spangroup)` to get back
+Use the function :cpp:expr:`lv_spangroup_get_child_count(spangroup)` to get back
 the number of spans the group is maintaining.
 
-e.g. ``uint32_t size = lv_spangroup_get_child_cnt(spangroup)``
+e.g. ``uint32_t size = lv_spangroup_get_child_count(spangroup)``
 
 Text align
 ----------

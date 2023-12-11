@@ -75,7 +75,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
         size_t len;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        len = _lv_text_ap_calc_bytes_cnt(txt) + 1;
+        len = _lv_text_ap_calc_bytes_count(txt) + 1;
 #else
         len = lv_strlen(txt) + 1;
 #endif
@@ -179,18 +179,18 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_coord_t font_h = lv_font_get_line_height(font);
-        lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-        lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+        int32_t font_h = lv_font_get_line_height(font);
+        int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
         lv_point_t txt_size;
         lv_text_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
-        lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
-        lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-        lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-        lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-        lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+        int32_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+        int32_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+        int32_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+        int32_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+        int32_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
         lv_point_t marker_size;
         marker_size.x = font_h + marker_leftp + marker_rightp;
         marker_size.y = font_h + marker_topp + marker_bottomp;
@@ -199,8 +199,8 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         p->y = LV_MAX(marker_size.y, txt_size.y);
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = lv_event_get_param(e);
-        lv_coord_t m = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
+        int32_t * s = lv_event_get_param(e);
+        int32_t m = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
         *s = LV_MAX(*s, m);
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
@@ -215,23 +215,23 @@ static void lv_checkbox_draw(lv_event_t * e)
 
     lv_layer_t * layer = lv_event_get_layer(e);
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_coord_t font_h = lv_font_get_line_height(font);
+    int32_t font_h = lv_font_get_line_height(font);
 
     const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
-    lv_coord_t bg_border = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t bg_topp = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + bg_border;
-    lv_coord_t bg_p = is_rtl ? lv_obj_get_style_pad_right(obj, LV_PART_MAIN) : lv_obj_get_style_pad_left(obj,
-                                                                                                         LV_PART_MAIN) + bg_border;
-    lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+    int32_t bg_border = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    int32_t bg_topp = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + bg_border;
+    int32_t bg_p = is_rtl ? lv_obj_get_style_pad_right(obj, LV_PART_MAIN) : lv_obj_get_style_pad_left(obj,
+                                                                                                      LV_PART_MAIN) + bg_border;
+    int32_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
-    lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-    lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-    lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-    lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+    int32_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+    int32_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+    int32_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+    int32_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
 
-    lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_INDICATOR);
-    lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_INDICATOR);
+    int32_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_INDICATOR);
+    int32_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_INDICATOR);
 
     lv_draw_rect_dsc_t indic_dsc;
     lv_draw_rect_dsc_init(&indic_dsc);
@@ -254,8 +254,8 @@ static void lv_checkbox_draw(lv_event_t * e)
 
     lv_draw_rect(layer, &indic_dsc, &marker_area_transf);
 
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+    int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
     lv_point_t txt_size;
     lv_text_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
@@ -265,7 +265,7 @@ static void lv_checkbox_draw(lv_event_t * e)
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &txt_dsc);
     txt_dsc.text = cb->txt;
 
-    lv_coord_t y_ofs = (lv_area_get_height(&marker_area) - font_h) / 2;
+    int32_t y_ofs = (lv_area_get_height(&marker_area) - font_h) / 2;
     lv_area_t txt_area;
     if(is_rtl) {
         txt_area.x2 = marker_area.x1 - bg_colp;

@@ -262,7 +262,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
         }
         else lv_strcpy(fn, fno.fname);
 
-    } while(strcmp(fn, "/.") == 0 || strcmp(fn, "/..") == 0);
+    } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
 
     return LV_FS_RES_OK;
 }

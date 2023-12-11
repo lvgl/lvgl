@@ -15,8 +15,8 @@ Add lvgl to your project
 ------------------------
 
 The graphics library itself is the ``lvgl`` directory. It contains a
-couple of folders but to use ``lvgl`` you only need ``.c`` and ``.h``
-files from the ``src`` folder.
+couple of folders but to use ``lvgl`` you only need the ``.c`` and ``.h``
+files in the ``src`` folder.
 
 Automatically add files
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,12 +39,12 @@ main Makefile:
    include $(LVGL_DIR)/$(LVGL_DIR_NAME)/lvgl.mk
 
 For integration with CMake take a look this section of the
-`Documentation </get-started/platforms/cmake>`__.
+`Documentation </integration/build/cmake>`__.
 
 Other platforms and tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `Get started </get-started/index>`__ section contains many platform
+The `Get started </integartion/index>`__ section contains many platform
 specific descriptions e.g. for ESP32, Arduino, NXP, RT-Thread, NuttX,
 etc.
 
@@ -61,8 +61,8 @@ Configuration file
 ------------------
 
 There is a configuration header file for LVGL called **lv_conf.h**. You
-modify this header to set the library's basic behavior, disable unused
-modules and features, adjust the size of memory buffers in compile-time,
+can modify this header to set the library's basic behavior, disable unused
+modules and features, adjust the size of buffers in compile-time,
 etc.
 
 To get ``lv_conf.h`` **copy lvgl/lv_conf_template.h** next to the
@@ -94,12 +94,12 @@ be set via the :c:macro:`LV_CONF_PATH` define. For example
 
 If :c:macro:`LV_CONF_SKIP` is defined, LVGL will not try to include
 ``lv_conf.h``. Instead you can pass the config defines using build
-options. For example ``"-DLV_COLOR_DEPTH=32 -DLV_USE_BTN=1"``. The unset
-options will get a default value which is the same as the ones in
+options. For example ``"-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1"``. The unset
+options will get a default value which is the same as the content of
 ``lv_conf_template.h``.
 
 LVGL also can be used via ``Kconfig`` and ``menuconfig``. You can use
-``lv_conf.h`` together with Kconfig, but keep in mind that the value
+``lv_conf.h`` together with Kconfig too, but keep in mind that the value
 from ``lv_conf.h`` or build settings (``-D...``) overwrite the values
 set in Kconfig. To ignore the configs from ``lv_conf.h`` simply remove
 its content, or define :c:macro:`LV_CONF_SKIP`.
@@ -107,6 +107,8 @@ its content, or define :c:macro:`LV_CONF_SKIP`.
 To enable multi-instance feature, set :c:macro:`LV_GLOBAL_CUSTOM` in
 ``lv_conf.h`` and provide a custom function to
 :cpp:func:`lv_global_default` using ``__thread`` or ``pthread_key_t``.
+It will allow running multiple LVGL instances by storing the global variables
+in TLS (Thread Local Storage).
 
 For example:
 
@@ -125,7 +127,7 @@ Initialization
 To use the graphics library you have to initialize it and setup required
 components. The order of the initialization is:
 
-1. Call :cpp:func:`lv_init`.
+1. Call :cpp:func:`lv_init()`.
 2. Initialize your drivers.
 3. Register the display and input devices drivers in LVGL. Learn more
    about `Display </porting/display>`__ and `Input

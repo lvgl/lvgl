@@ -29,7 +29,7 @@ typedef struct {
     lv_draw_dsc_base_t base;
 
     lv_area_t area;
-    lv_coord_t radius;
+    int32_t radius;
 } lv_draw_mask_rect_dsc_t;
 
 struct _lv_layer_t;
@@ -48,7 +48,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * 
  * @param dsc pointer to an initialized `lv_draw_line_dsc_t` variable
  */
 void lv_draw_mask_rect(struct _lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
-
 
 /**********************
  *      MACROS

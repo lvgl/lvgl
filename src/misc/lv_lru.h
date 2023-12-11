@@ -21,7 +21,6 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -43,13 +42,7 @@ typedef void (*lv_lru_free_cb_t)(void * v);
 
 typedef struct _lv_lru_item_t lv_lru_item_t;
 
-typedef struct /// @cond
-/**
- *  Tells Doxygen to ignore a duplicate declaration
- */
-    lv_lru_t
-/// @endcond
-{
+typedef struct lv_lru_t {
     lv_lru_item_t ** items;
     uint64_t access_count;
     size_t free_memory;
@@ -61,7 +54,6 @@ typedef struct /// @cond
     lv_lru_free_cb_t key_free;
     lv_lru_item_t * free_items;
 } lv_lru_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES

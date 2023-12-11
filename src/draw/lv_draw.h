@@ -120,8 +120,10 @@ typedef struct _lv_draw_unit_t {
      * @return              >=0:    The number of taken draw task:
      *                                  0 means the task has not yet been completed.
      *                                  1 means a new task has been accepted.
-     *                      -1:     There are no available draw tasks at all.
-     *                              Also means to no call the dispatcher of the other draw units as there is no draw task to take
+     *                      -1:     The draw unit wanted to work on a task but couldn't do that
+     *                              due to some errors (e.g. out of memory).
+     *                              It signals that LVGL should call the dispatcher later again
+     *                              to let draw unit try to start the rendering again.
      */
     int32_t (*dispatch_cb)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
 
@@ -141,7 +143,6 @@ typedef struct _lv_draw_unit_t {
     int32_t (*delete_cb)(struct _lv_draw_unit_t * draw_unit);
 } lv_draw_unit_t;
 
-
 typedef struct _lv_layer_t  {
 
     /** The unaligned buffer where drawing will happen*/
@@ -151,21 +152,24 @@ typedef struct _lv_layer_t  {
     void * buf;
 
     uint32_t buf_stride;
+
+    /** The absolute coordinates of the buffer */
     lv_area_t buf_area;
+
+    /** The color format of the layer. LV_COLOR_FORMAT_...  */
     lv_color_format_t color_format;
 
     /**
+     * NEVER USE IT DRAW UNITS. USED INTERNALLY DURING DRAW TASK CREATION.
      * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
      * Can be set before new draw tasks are added to indicate the clip area of the draw tasks.
      * Therefore `lv_draw_add_task()` always saves it in the new draw task to know the clip area when the draw task was added.
      * During drawing the draw units also sees the saved clip_area and should use it during drawing.
      * During drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
      */
-    lv_area_t clip_area;
+    lv_area_t _clip_area;
 
-    /**
-     * Linked list of draw tasks
-     */
+    /** Linked list of draw tasks */
     lv_draw_task_t * draw_task_head;
 
     struct _lv_layer_t * parent;
@@ -180,6 +184,8 @@ typedef struct {
     uint32_t id1;
     uint32_t id2;
     lv_layer_t * layer;
+    size_t dsc_size;
+    void * user_data;
 } lv_draw_dsc_base_t;
 
 typedef struct {
@@ -235,6 +241,16 @@ void lv_draw_dispatch_request(void);
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
 
 /**
+ * Tell how many draw task are waiting to be drawn on the area of `t_check`.
+ * It can be used to determine if a GPU shall combine many draw tasks in to one or not.
+ * If a lot of tasks are waiting for the current ones it makes sense to draw them one-by-one
+ * to not block the dependent tasks' rendering
+ * @param t_check   the task whose dependent tasks shall be counted
+ * @return          number of tasks depending on `t_check`
+ */
+uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check);
+
+/**
  * Create a new layer on a parent layer
  * @param parent_layer      the parent layer to which the layer will be merged when it's rendered
  * @param color_format      the color format of the layer
@@ -257,7 +273,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
  * @param y                 the target X coordinate
  * @return                  `buf` offset to point to the given X and Y coordinate
  */
-void * lv_draw_layer_go_to_xy(lv_layer_t * layer, lv_coord_t x, lv_coord_t y);
+void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y);
 
 /**********************
  *  GLOBAL VARIABLES

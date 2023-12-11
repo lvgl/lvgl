@@ -16,7 +16,7 @@ arc.set_rotation(135)
 arc.set_bg_angles(0, 270)
 arc.set_value(10)
 arc.center()
-arc.add_event(lambda e: value_changed_event_cb(e,label),lv.EVENT.VALUE_CHANGED, None)
+arc.add_event_cb(lambda e: value_changed_event_cb(e,label),lv.EVENT.VALUE_CHANGED, None)
 
 # Manually update the label for the first time
 arc.send_event(lv.EVENT.VALUE_CHANGED, None)

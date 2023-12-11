@@ -13,14 +13,13 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-static lv_obj_t * create_panel(lv_coord_t radius, bool transform)
+static lv_obj_t * create_panel(int32_t radius, bool transform)
 {
     lv_obj_t * parent = lv_obj_create(lv_screen_active());
     lv_obj_set_style_pad_all(parent, 3, 0);
     lv_obj_set_style_radius(parent, radius, 0);
     lv_obj_set_style_clip_corner(parent, true, 0);
     if(transform) lv_obj_set_style_transform_rotation(parent, 300, 0);
-
 
     lv_obj_t * label = lv_label_create(parent);
     lv_obj_set_width(label, lv_pct(200));

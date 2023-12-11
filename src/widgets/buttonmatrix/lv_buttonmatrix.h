@@ -40,9 +40,9 @@ enum _lv_buttonmatrix_ctrl_t {
     LV_BUTTONMATRIX_CTRL_CHECKED      = 0x0100, /**< Button is currently toggled (e.g. checked).*/
     LV_BUTTONMATRIX_CTRL_CLICK_TRIG   = 0x0200, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
     LV_BUTTONMATRIX_CTRL_POPOVER      = 0x0400, /**< Show a popover when pressing this key*/
-    LV_BUTTONMATRIX_CTRL_RECOLOR      = 0x0800, /**< Enable text recoloring with `#color`*/
-    _LV_BUTTONMATRIX_CTRL_RESERVED_1  = 0x1000, /**< Reserved for later use*/
-    _LV_BUTTONMATRIX_CTRL_RESERVED_2  = 0x2000, /**< Reserved for later use*/
+    _LV_BUTTONMATRIX_CTRL_RESERVED_1  = 0x0800, /**< Reserved for later use*/
+    _LV_BUTTONMATRIX_CTRL_RESERVED_2  = 0x1000, /**< Reserved for later use*/
+    _LV_BUTTONMATRIX_CTRL_RESERVED_3  = 0x2000, /**< Reserved for later use*/
     LV_BUTTONMATRIX_CTRL_CUSTOM_1     = 0x4000, /**< Custom free to use flag*/
     LV_BUTTONMATRIX_CTRL_CUSTOM_2     = 0x8000, /**< Custom free to use flag*/
 };
@@ -52,7 +52,6 @@ typedef _lv_buttonmatrix_ctrl_t lv_buttonmatrix_ctrl_t;
 #else
 typedef uint32_t lv_buttonmatrix_ctrl_t;
 #endif /*DOXYGEN*/
-
 
 typedef bool (*lv_buttonmatrix_button_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area,
                                                  const lv_area_t * clip_area);
@@ -69,8 +68,7 @@ typedef struct {
     uint32_t one_check : 1;  /*Single button toggled at once*/
 } lv_buttonmatrix_t;
 
-extern const lv_obj_class_t lv_buttonmatrix_class;
-
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_buttonmatrix_class;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -63,6 +63,10 @@ menu "LVGL configuration"
 			bool "Use builtin method to deal with obj ID"
 			default n
 
+		config LV_USE_OBJ_PROPERTY
+			bool "Use obj property set/get API"
+			default n
+
 	endmenu
 
 	menu "Memory settings"
@@ -75,6 +79,12 @@ menu "LVGL configuration"
 
 		config LV_USE_CLIB_MALLOC
 			bool "Standard C functions malloc/realloc/free"
+
+		config LV_USE_MICROPYTHON_MALLOC
+			bool "MicroPython functions malloc/realloc/free"
+
+		config LV_USE_RTTHREAD_MALLOC
+			bool "RTThread functions malloc/realloc/free"
 
 		config LV_USE_CUSTOM_MALLOC
 			bool "Implement the functions externally"
@@ -164,11 +174,18 @@ menu "LVGL configuration"
 			help
 				Align the start address of draw_buf addresses to this bytes.
 
-			config LV_LAYER_MAX_MEMORY_USAGE
-				int "Max layer memory usage(kB)"
-				default 150
+			config LV_USE_OS
+				int "Default operating system to use"
+				default 0
 			help
-				Max. memory to be used for layers.
+				"Select an operating system to use. Possible options:"
+				0:LV_OS_NONE
+				1:LV_OS_PTHREAD
+				2:LV_OS_FREERTOS
+				3:LV_OS_CMSIS_RTOS2
+				4:LV_OS_RTTHREAD
+				5:LV_OS_WINDOWS
+				255:LV_OS_CUSTOM
 
 			config LV_USE_OS
 				int "Default operating system to use"
@@ -259,7 +276,7 @@ menu "LVGL configuration"
 				default ""
 				depends on LV_DRAW_SW_ASM_CUSTOM
 
-			config LV_IMG_CACHE_DEF_SIZE
+			config LV_CACHE_DEF_SIZE
 				int "Default image cache size. 0 to disable caching."
 				default 0
 				depends on LV_USE_DRAW_SW
@@ -488,6 +505,10 @@ menu "LVGL configuration"
 		endmenu
 
 		menu "Others"
+			config LV_USE_FLOAT
+				bool "Use float as lv_value_precise_t."
+				default n
+
 			config LV_USE_PERF_MONITOR
 				bool "Show CPU usage and FPS count."
 				depends on LV_USE_SYSMON
@@ -554,6 +575,12 @@ menu "LVGL configuration"
 
 			config LV_USE_REFR_DEBUG
 				bool "Draw random colored rectangles over the redrawn areas."
+
+			config LV_USE_LAYER_DEBUG
+				bool "Draw a red overlay for ARGB layers and a green overlay for RGB layers"
+
+			config LV_USE_PARALLEL_DRAW_DEBUG
+				bool "Draw overlays with different colors for each draw_unit's tasks."
 
 			config LV_USE_BUILTIN_SNPRINTF
 				bool "Use the built-in (v)snprintf functions"
@@ -882,6 +909,10 @@ menu "LVGL configuration"
 			bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
 			depends on LV_USE_LABEL
 			default y
+		config LV_LABEL_WAIT_CHAR_COUNT
+			int "The count of wait chart."
+			depends on LV_USE_LABEL
+			default 3
 		config LV_USE_LINE
 			bool "Line."
 			default y if !LV_CONF_MINIMAL
@@ -940,6 +971,9 @@ menu "LVGL configuration"
 		config LV_USE_IMGBTN
 			bool "Imgbtn."
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_OBSERVER
+			bool "Observer."
+			default n
 		config LV_USE_KEYBOARD
 			bool "Keyboard."
 			default y if !LV_CONF_MINIMAL
@@ -1068,6 +1102,13 @@ menu "LVGL configuration"
 			default 0
 			depends on LV_USE_FS_FATFS
 
+		config LV_USE_FS_MEMFS
+			bool "File system on top of memory-mapped API"
+		config LV_FS_MEMFS_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			default 0
+			depends on LV_USE_FS_MEMFS
+
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
 
@@ -1086,8 +1127,13 @@ menu "LVGL configuration"
 		config LV_USE_GIF
 			bool "GIF decoder library"
 
+		if LV_USE_GIF
+			config LV_GIF_CACHE_DECODE_DATA
+				bool "Use extra 16KB RAM to cache decoded data to accerlate"
+		endif
+
 		config LV_USE_RLE
-			bool "RLE compressed bin image decoder library"
+			bool "LVGL's version of RLE compression method"
 
 		config LV_USE_QRCODE
 			bool "QR code library"
@@ -1098,29 +1144,70 @@ menu "LVGL configuration"
 		config LV_USE_FREETYPE
 			bool "FreeType library"
 		if LV_USE_FREETYPE
-			menu "FreeType cache config"
+			menu "FreeType config"
 				config LV_FREETYPE_CACHE_SIZE
-					int "Memory used by FreeType to cache characters [bytes]"
-					default 65535
-				config LV_FREETYPE_USE_LVGL_PORT
-					bool "Let FreeType to use LVGL memory and file porting"
-					default n
-				config LV_FREETYPE_SBIT_CACHE
-					bool "enable sbit cache"
-					default n
-				config LV_FREETYPE_CACHE_FT_FACES
-					int "The maximum number of FT_Face(0: use defaults)"
-					default 4
-				config LV_FREETYPE_CACHE_FT_SIZES
-					int "The maximum number of FT_Size(0: use defaults)"
-					default 4
+				int "Memory used by FreeType to cache characters in kilobytes"
+				default 768
+			config LV_FREETYPE_USE_LVGL_PORT
+				bool "Let FreeType to use LVGL memory and file porting"
+				default n
+			choice
+				prompt "Freetype cache type"
+				default LV_FREETYPE_CACHE_TYPE_IMAGE
+
+				config LV_FREETYPE_CACHE_TYPE_IMAGE
+					bool "IMAGE"
+				config LV_FREETYPE_CACHE_TYPE_SBIT
+					bool "SBIT"
+				config LV_FREETYPE_CACHE_TYPE_OUTLINE
+					bool "OUTLINE"
+			endchoice
+			config LV_FREETYPE_CACHE_FT_FACES
+				int "The maximum number of FT_Face"
+				default 8
+			config LV_FREETYPE_CACHE_FT_SIZES
+				int "The maximum number of FT_Size"
+				default 8
+			config LV_FREETYPE_CACHE_FT_OUTLINES
+				int "The maximum number of Outline"
+				depends on LV_FREETYPE_CACHE_TYPE_OUTLINE
+				default 256
 			endmenu
+
+		config LV_USE_TINY_TTF
+			bool "Enable Tiny TTF decoder"
+			default n
+		config LV_TINY_TTF_FILE_SUPPORT
+			bool "Enable loading Tiny TTF data from files"
+			default n
+			depends on LV_USE_TINY_TTF
 		endif
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
 		config LV_USE_THORVG
 			bool "ThorVG library"
+            choice
+             prompt "Use ThorVG config"
+             depends on LV_USE_THORVG
+                default LV_USE_THORVG_INTERNAL
+                config LV_USE_THORVG_INTERNAL
+                    bool "Use ThorVG internal"
+                config LV_USE_THORVG_EXTERNAL
+                    bool "Use ThorVG external"
+             endchoice
+
+		config LV_USE_LZ4
+			bool "Enable LZ4 compress/decompress lib"
+            choice
+             prompt "Choose lvgl built-in LZ4 lib or external lib"
+             depends on LV_USE_LZ4
+                default LV_USE_LZ4_INTERNAL
+                config LV_USE_LZ4_INTERNAL
+                    bool "Use lvgl built-in LZ4 lib"
+                config LV_USE_LZ4_EXTERNAL
+                    bool "Use external LZ4 library"
+             endchoice
 
 		config LV_USE_FFMPEG
 			bool "FFmpeg library"
@@ -1231,9 +1318,42 @@ menu "LVGL configuration"
 			depends on LV_USE_SDL
 			default n
 		config LV_SDL_DIRECT_EXIT
-			bool "Exit the application when all SDL widows are closed"
+			bool "Exit the application when all SDL windows are closed"
 			depends on LV_USE_SDL
 			default y
+
+		config LV_USE_X11
+			bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"
+			default n
+		config LV_X11_DOUBLE_BUFFER
+			bool "Use double buffers for lvgl rendering"
+			depends on LV_USE_X11
+			default y
+		config LV_X11_DIRECT_EXIT
+			bool "Exit the application when all X11 windows have been closed"
+			depends on LV_USE_X11
+			default y
+		choice
+			prompt "X11 device render mode"
+			depends on LV_USE_X11
+			default LV_X11_RENDER_MODE_PARTIAL
+
+			config LV_X11_RENDER_MODE_PARTIAL
+				bool "Partial render mode (preferred)"
+				help
+					Use the buffer(s) to render the screen is smaller parts. This way the buffers can be smaller then the display to save RAM.
+					Appr. 1/10 screen size buffer(s) are used.
+			config LV_X11_RENDER_MODE_DIRECT
+				bool "Direct render mode"
+				help
+					The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer. This way the buffer always contain the whole image. Only the changed ares will be updated.
+					With 2 buffers the buffers' content are kept in sync automatically and in flush_cb only address change is required.
+			config LV_X11_RENDER_MODE_FULL
+				bool "Full render mode"
+				help
+					Always redraw the whole screen even if only one pixel has been changed.
+					With 2 buffers in flush_cb only and address change is required.
+		endchoice
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
@@ -1382,14 +1502,28 @@ menu "LVGL configuration"
 		config LV_USE_DEMO_BENCHMARK
 			bool "Benchmark your system"
 			default n
+			depends on LV_FONT_MONTSERRAT_14 && LV_FONT_MONTSERRAT_24
 		config LV_DEMO_BENCHMARK_RGB565A8
 			bool "Use RGB565A8 images with 16 bit color depth instead of ARGB8565"
 			depends on LV_USE_DEMO_BENCHMARK
 			default n
 
+		config LV_USE_DEMO_RENDER
+			bool "Render test for each primitives. Requires at least 480x272 display"
+			default n
+
+		config LV_USE_DEMO_SCROLL
+			bool "Scroll settings test for LVGL"
+			default n
+
 		config LV_USE_DEMO_STRESS
 			bool "Stress test for LVGL"
 			default n
+
+		config LV_USE_DEMO_TRANSFORM
+			bool "Transform test for LVGL"
+			default n
+			depends on LV_FONT_MONTSERRAT_18
 
 		config LV_USE_DEMO_MUSIC
 			bool "Music player demo"

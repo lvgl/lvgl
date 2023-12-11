@@ -1,4 +1,5 @@
 LVGL_PATH := $(CURDIR)/../..
+$(info LVGL_PATH is set to: $(LVGL_PATH))
 include ../../lvgl.mk
 
 CSRCS += test.c

@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -246,7 +245,7 @@ static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stri
 
     uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
 
-    if(area->x1 >= (lv_coord_t)(area->x1 % align_pixels)) {
+    if(area->x1 >= (int32_t)(area->x1 % align_pixels)) {
         uint16_t shift_x = area->x1 - (area->x1 % align_pixels);
 
         area->x1 -= shift_x;
@@ -313,8 +312,8 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
                  lv_area_get_width(dest_area), lv_area_get_height(dest_area),
                  (uintptr_t)src_buf, (uintptr_t)dest_buf);
 
-    lv_coord_t width = LV_MIN(lv_area_get_width(src_area), lv_area_get_width(dest_area));
-    lv_coord_t height = LV_MIN(lv_area_get_height(src_area), lv_area_get_height(dest_area));
+    int32_t width = LV_MIN(lv_area_get_width(src_area), lv_area_get_width(dest_area));
+    int32_t height = LV_MIN(lv_area_get_height(src_area), lv_area_get_height(dest_area));
 
     /* Number of tiles needed */
     uint8_t total_tiles_x = (src_area->x1 + width + VGLITE_BLIT_SPLIT_THR - 1) /

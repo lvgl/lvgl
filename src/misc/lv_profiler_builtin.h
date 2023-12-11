@@ -26,8 +26,10 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_PROFILER_BUILTIN_BEGIN lv_profiler_builtin_write(__func__, 'B')
-#define LV_PROFILER_BUILTIN_END   lv_profiler_builtin_write(__func__, 'E')
+#define LV_PROFILER_BUILTIN_BEGIN_TAG(tag)  lv_profiler_builtin_write((tag), 'B')
+#define LV_PROFILER_BUILTIN_END_TAG(tag)    lv_profiler_builtin_write((tag), 'E')
+#define LV_PROFILER_BUILTIN_BEGIN           LV_PROFILER_BUILTIN_BEGIN_TAG(__func__)
+#define LV_PROFILER_BUILTIN_END             LV_PROFILER_BUILTIN_END_TAG(__func__)
 
 /**********************
  *      TYPEDEFS
@@ -42,7 +44,6 @@ typedef struct {
     uint32_t (*tick_get_cb)(void);      /**< Callback function to get the current tick count */
     void (*flush_cb)(const char * buf); /**< Callback function to flush the profiling data */
 } lv_profiler_builtin_config_t;
-
 
 /**
  * @brief Structure representing a built-in profiler item in LVGL

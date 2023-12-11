@@ -115,7 +115,6 @@ test_image_cogwheel_a8_map[] = {
 
 const lv_image_dsc_t test_image_cogwheel_a8 = {
     .header.cf = LV_COLOR_FORMAT_A8,
-    .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
     .data_size = 10000,

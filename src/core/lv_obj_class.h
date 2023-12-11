@@ -15,12 +15,12 @@ extern "C" {
  *********************/
 #include <stdint.h>
 #include <stdbool.h>
+#include "lv_obj_property.h"
 #include "../misc/lv_area.h"
 
 /*********************
  *      DEFINES
  *********************/
-
 
 /**********************
  *      TYPEDEFS
@@ -61,10 +61,18 @@ typedef struct _lv_obj_class_t {
     /*class_p is the class in which event is being processed.*/
     void (*event_cb)(const struct _lv_obj_class_t * class_p,
                      struct _lv_event_t * e);  /**< Widget type specific event function*/
+
+#if LV_USE_OBJ_PROPERTY
+    uint32_t prop_index_start;
+    uint32_t prop_index_end;
+    const lv_property_ops_t * properties;
+    uint32_t properties_count;
+#endif
+
     void * user_data;
     const char * name;
-    lv_coord_t width_def;
-    lv_coord_t height_def;
+    int32_t width_def;
+    int32_t height_def;
     uint32_t editable : 2;             /**< Value from ::lv_obj_class_editable_t*/
     uint32_t group_def : 2;            /**< Value from ::lv_obj_class_group_def_t*/
     uint32_t instance_size : 16;
@@ -94,7 +102,6 @@ bool lv_obj_is_group_def(struct _lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /*extern "C"*/

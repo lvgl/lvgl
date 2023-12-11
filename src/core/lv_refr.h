@@ -62,7 +62,7 @@ void lv_refr_now(lv_display_t * disp);
 
 /**
  * Redrawn on object an all its children using the passed draw context
- * @param draw_ctx  pointer to an initialized draw context
+ * @param layer pointer to a layer where to draw.
  * @param obj   the start object from the redraw should start
  */
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj);

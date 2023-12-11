@@ -7,17 +7,17 @@ static lv_obj_t * obj1 = NULL;
 static lv_obj_t * obj2 = NULL;
 static lv_obj_t * obj3 = NULL;
 
-static const lv_coord_t obj_width = 90;
-static const lv_coord_t obj_height = 70;
+static const int32_t obj_width = 90;
+static const int32_t obj_height = 70;
 
-static void set_width(void * var, int32_t v)
+static void set_width(lv_anim_t * var, int32_t v)
 {
-    lv_obj_set_width((lv_obj_t *)var, v);
+    lv_obj_set_width(var->var, v);
 }
 
-static void set_height(void * var, int32_t v)
+static void set_height(lv_anim_t * var, int32_t v)
 {
-    lv_obj_set_height((lv_obj_t *)var, v);
+    lv_obj_set_height(var->var, v);
 }
 
 static void anim_timeline_create(void)
@@ -27,8 +27,7 @@ static void anim_timeline_create(void)
     lv_anim_init(&a1);
     lv_anim_set_var(&a1, obj1);
     lv_anim_set_values(&a1, 0, obj_width);
-    lv_anim_set_early_apply(&a1, false);
-    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)set_width);
+    lv_anim_set_custom_exec_cb(&a1, set_width);
     lv_anim_set_path_cb(&a1, lv_anim_path_overshoot);
     lv_anim_set_time(&a1, 300);
 
@@ -36,8 +35,7 @@ static void anim_timeline_create(void)
     lv_anim_init(&a2);
     lv_anim_set_var(&a2, obj1);
     lv_anim_set_values(&a2, 0, obj_height);
-    lv_anim_set_early_apply(&a2, false);
-    lv_anim_set_exec_cb(&a2, (lv_anim_exec_xcb_t)set_height);
+    lv_anim_set_custom_exec_cb(&a2, set_height);
     lv_anim_set_path_cb(&a2, lv_anim_path_ease_out);
     lv_anim_set_time(&a2, 300);
 
@@ -46,8 +44,7 @@ static void anim_timeline_create(void)
     lv_anim_init(&a3);
     lv_anim_set_var(&a3, obj2);
     lv_anim_set_values(&a3, 0, obj_width);
-    lv_anim_set_early_apply(&a3, false);
-    lv_anim_set_exec_cb(&a3, (lv_anim_exec_xcb_t)set_width);
+    lv_anim_set_custom_exec_cb(&a3, set_width);
     lv_anim_set_path_cb(&a3, lv_anim_path_overshoot);
     lv_anim_set_time(&a3, 300);
 
@@ -55,8 +52,7 @@ static void anim_timeline_create(void)
     lv_anim_init(&a4);
     lv_anim_set_var(&a4, obj2);
     lv_anim_set_values(&a4, 0, obj_height);
-    lv_anim_set_early_apply(&a4, false);
-    lv_anim_set_exec_cb(&a4, (lv_anim_exec_xcb_t)set_height);
+    lv_anim_set_custom_exec_cb(&a4, set_height);
     lv_anim_set_path_cb(&a4, lv_anim_path_ease_out);
     lv_anim_set_time(&a4, 300);
 
@@ -65,8 +61,7 @@ static void anim_timeline_create(void)
     lv_anim_init(&a5);
     lv_anim_set_var(&a5, obj3);
     lv_anim_set_values(&a5, 0, obj_width);
-    lv_anim_set_early_apply(&a5, false);
-    lv_anim_set_exec_cb(&a5, (lv_anim_exec_xcb_t)set_width);
+    lv_anim_set_custom_exec_cb(&a5, set_width);
     lv_anim_set_path_cb(&a5, lv_anim_path_overshoot);
     lv_anim_set_time(&a5, 300);
 
@@ -74,8 +69,7 @@ static void anim_timeline_create(void)
     lv_anim_init(&a6);
     lv_anim_set_var(&a6, obj3);
     lv_anim_set_values(&a6, 0, obj_height);
-    lv_anim_set_early_apply(&a6, false);
-    lv_anim_set_exec_cb(&a6, (lv_anim_exec_xcb_t)set_height);
+    lv_anim_set_custom_exec_cb(&a6, set_height);
     lv_anim_set_path_cb(&a6, lv_anim_path_ease_out);
     lv_anim_set_time(&a6, 300);
 
@@ -142,7 +136,7 @@ void lv_example_anim_timeline_1(void)
 
     /* create btn_start */
     lv_obj_t * btn_start = lv_button_create(par);
-    lv_obj_add_event(btn_start, btn_start_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(btn_start, btn_start_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(btn_start, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_add_flag(btn_start, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_align(btn_start, LV_ALIGN_TOP_MID, -100, 20);
@@ -153,7 +147,7 @@ void lv_example_anim_timeline_1(void)
 
     /* create btn_del */
     lv_obj_t * btn_del = lv_button_create(par);
-    lv_obj_add_event(btn_del, btn_delete_event_handler, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn_del, btn_delete_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(btn_del, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(btn_del, LV_ALIGN_TOP_MID, 0, 20);
 
@@ -163,7 +157,7 @@ void lv_example_anim_timeline_1(void)
 
     /* create btn_stop */
     lv_obj_t * btn_stop = lv_button_create(par);
-    lv_obj_add_event(btn_stop, btn_stop_event_handler, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn_stop, btn_stop_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(btn_stop, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(btn_stop, LV_ALIGN_TOP_MID, 100, 20);
 
@@ -173,7 +167,7 @@ void lv_example_anim_timeline_1(void)
 
     /* create slider_prg */
     lv_obj_t * slider_prg = lv_slider_create(par);
-    lv_obj_add_event(slider_prg, slider_prg_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(slider_prg, slider_prg_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(slider_prg, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(slider_prg, LV_ALIGN_BOTTOM_MID, 0, -20);
     lv_slider_set_range(slider_prg, 0, 65535);
@@ -181,12 +175,17 @@ void lv_example_anim_timeline_1(void)
     /* create 3 objects */
     obj1 = lv_obj_create(par);
     lv_obj_set_size(obj1, obj_width, obj_height);
+    lv_obj_set_scrollbar_mode(obj1, LV_SCROLLBAR_MODE_OFF);
 
     obj2 = lv_obj_create(par);
     lv_obj_set_size(obj2, obj_width, obj_height);
+    lv_obj_set_scrollbar_mode(obj2, LV_SCROLLBAR_MODE_OFF);
 
     obj3 = lv_obj_create(par);
     lv_obj_set_size(obj3, obj_width, obj_height);
+    lv_obj_set_scrollbar_mode(obj3, LV_SCROLLBAR_MODE_OFF);
+
+    anim_timeline_create();
 }
 
 #endif

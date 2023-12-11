@@ -208,6 +208,20 @@ because
 - they can be compressed better
 - and probably they are used less frequently then the medium-sized fonts, so the performance cost is smaller.
 
+Kerning
+-------
+
+Fonts may provide kerning information to adjust the spacing between specific
+characters.
+
+- The online converter generates kerning tables.
+- The offline converter generates kerning tables unless ``--no-kerning`` is
+  specified.
+- FreeType integration does not currently support kerning.
+- The Tiny TTF font engine supports GPOS and Kern tables.
+
+To configure kerning at runtime, use :cpp:func:`lv_font_set_kerning`.
+
 .. _add_font:
 
 Add a new font
@@ -266,7 +280,7 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
 Load a font at run-time
 ***********************
 
-:cpp:func:`lv_font_load` can be used to load a font from a file. The font needs
+:cpp:func:`lv_binfont_load` can be used to load a font from a file. The font needs
 to have a special binary format. (Not TTF or WOFF). Use
 `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ with the
 ``--format bin`` option to generate an LVGL compatible font file.
@@ -278,18 +292,19 @@ Example
 
 .. code:: c
 
-   lv_font_t * my_font;
-   my_font = lv_font_load(X/path/to/my_font.bin);
+   static lv_font_t my_font;
+   lv_result_t res = lv_binfont_load(&my_font, "X:/path/to/my_font.bin");
+   if(res != LV_RESULT_OK) return;
 
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(my_font);
+   lv_font_free(&my_font);
 
 Load a font from a memory buffer at run-time
 ******************************************
 
-:cpp:func:`lv_font_load_from_buffer` can be used to load a font from a memory buffer.
+:cpp:func:`lv_binfont_load_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not
 supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
 
@@ -300,7 +315,7 @@ Example
 
 .. code:: c
 
-   lv_font_t * my_font;
+   static lv_font_t my_font;
    uint8_t *buf;
    uint32_t bufsize;
 
@@ -308,12 +323,12 @@ Example
    ...
 
    /*Load font from the buffer*/
-   my_font = lv_font_load_from_buffer((void *)buf, buf));
-
+   lv_result_t res = lv_binfont_load_from_buffer(&my_font, (void *)buf, buf));
+   if(res != LV_RESULT_OK) return;
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(my_font);
+   lv_font_free(&my_font);
 
 Add a new font engine
 *********************

@@ -39,8 +39,8 @@ void lv_demo_scroll(void)
 {
     lv_obj_t * panel = lv_obj_create(lv_screen_active());
     lv_obj_set_style_shadow_width(panel, 16, 0);
-    lv_obj_set_style_shadow_ofs_y(panel, 8, 0);
-    lv_obj_set_style_shadow_ofs_x(panel, 4, 0);
+    lv_obj_set_style_shadow_offset_y(panel, 8, 0);
+    lv_obj_set_style_shadow_offset_x(panel, 4, 0);
     lv_obj_set_style_shadow_opa(panel, LV_OPA_40, 0);
 
     lv_obj_set_size(panel, lv_pct(70), lv_pct(90));
@@ -65,7 +65,6 @@ void lv_demo_scroll(void)
     switch_create(panel, "Elastic scroll", LV_OBJ_FLAG_SCROLL_ELASTIC, true);
     switch_create(panel, "Add scroll momentum", LV_OBJ_FLAG_SCROLL_MOMENTUM, true);
 
-
     /*Show the switches first*/
     lv_obj_move_foreground(list);
 
@@ -88,7 +87,7 @@ static lv_obj_t * switch_create(lv_obj_t * parent, const char * title, lv_obj_fl
     lv_obj_set_flex_grow(label, 1);
 
     lv_obj_t * sw = lv_switch_create(cont);
-    lv_obj_add_event(sw, generic_switch_event_cb, LV_EVENT_VALUE_CHANGED, (void *)((lv_uintptr_t) flag));
+    lv_obj_add_event_cb(sw, generic_switch_event_cb, LV_EVENT_VALUE_CHANGED, (void *)((lv_uintptr_t) flag));
     if(en) {
         lv_obj_add_state(sw, LV_STATE_CHECKED);
         lv_obj_add_flag(list, flag);

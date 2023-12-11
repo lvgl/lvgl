@@ -24,7 +24,7 @@ class LV_Example_Checkbox_2:
         self.cont1 = lv.obj(lv.screen_active())
         self.cont1.set_flex_flow(lv.FLEX_FLOW.COLUMN)
         self.cont1.set_size(lv.pct(40), lv.pct(80))
-        self.cont1.add_event(self.radio_event_handler, lv.EVENT.CLICKED, None)
+        self.cont1.add_event_cb(self.radio_event_handler, lv.EVENT.CLICKED, None)
 
         for i in range(5):
             txt = "A {:d}".format(i+1)
@@ -38,7 +38,7 @@ class LV_Example_Checkbox_2:
         self.cont2.set_flex_flow(lv.FLEX_FLOW.COLUMN)
         self.cont2.set_size(lv.pct(40), lv.pct(80))
         self.cont2.set_x(lv.pct(50))
-        self.cont2.add_event(self.radio_event_handler, lv.EVENT.CLICKED, None)
+        self.cont2.add_event_cb(self.radio_event_handler, lv.EVENT.CLICKED, None)
 
         for i in range(3):
             txt = "B {:d}".format(i+1)

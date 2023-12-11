@@ -47,9 +47,9 @@ void test_bar_should_update_indicator_right_coordinate_based_on_bar_value(void)
 
     static lv_style_t bar_style;
 
-    const lv_coord_t style_padding = 5u;
-    const lv_coord_t bar_width = 200u;
-    const lv_coord_t bar_height = 20u;
+    const int32_t style_padding = 5u;
+    const int32_t bar_width = 200u;
+    const int32_t bar_height = 20u;
     int32_t bar_value = 10u;
 
     lv_style_init(&bar_style);
@@ -69,9 +69,9 @@ void test_bar_should_update_indicator_right_coordinate_based_on_bar_value(void)
     int32_t actual_coord = lv_area_get_width(&bar_ptr->indic_area);
 
     /* Calculate bar indicator right coordinate, using rule of 3 */
-    lv_coord_t bar_max_value = lv_bar_get_max_value(bar);
-    lv_coord_t indicator_part_width = lv_obj_get_content_width(bar);
-    lv_coord_t sides_padding = lv_obj_get_style_pad_left(bar, LV_PART_MAIN);
+    int32_t bar_max_value = lv_bar_get_max_value(bar);
+    int32_t indicator_part_width = lv_obj_get_content_width(bar);
+    int32_t sides_padding = lv_obj_get_style_pad_left(bar, LV_PART_MAIN);
     sides_padding += lv_obj_get_style_pad_right(bar, LV_PART_MAIN);
 
     int32_t expected_coord = (bar_value * indicator_part_width) / bar_max_value;
@@ -102,9 +102,9 @@ void test_bar_rtl_should_update_indicator_left_coordinate_based_on_bar_value(voi
 
     static lv_style_t bar_style;
 
-    const lv_coord_t style_padding = 5u;
-    const lv_coord_t bar_width = 200u;
-    const lv_coord_t bar_height = 20u;
+    const int32_t style_padding = 5u;
+    const int32_t bar_width = 200u;
+    const int32_t bar_height = 20u;
     int32_t bar_value = 10u;
 
     lv_style_init(&bar_style);
@@ -125,9 +125,9 @@ void test_bar_rtl_should_update_indicator_left_coordinate_based_on_bar_value(voi
     int32_t actual_coord = bar_ptr->indic_area.x1;
 
     /* Calculate current indicator width */
-    lv_coord_t bar_max_value = lv_bar_get_max_value(bar);
-    lv_coord_t indicator_part_width = lv_obj_get_content_width(bar);
-    lv_coord_t right_padding = lv_obj_get_style_pad_right(bar, LV_PART_MAIN);
+    int32_t bar_max_value = lv_bar_get_max_value(bar);
+    int32_t indicator_part_width = lv_obj_get_content_width(bar);
+    int32_t right_padding = lv_obj_get_style_pad_right(bar, LV_PART_MAIN);
     int32_t indicator_width = (bar_value * indicator_part_width) / bar_max_value;
 
     int32_t expected_coord = (bar_width - right_padding) - indicator_width;
@@ -138,12 +138,12 @@ void test_bar_rtl_should_update_indicator_left_coordinate_based_on_bar_value(voi
 
 void test_bar_normal(void)
 {
-    lv_coord_t w = 300;
-    lv_coord_t h = 40;
-    lv_coord_t h_gap = 20;
-    lv_coord_t w_gap = 20;
-    lv_coord_t y = h_gap;
-    lv_coord_t x = w_gap;
+    int32_t w = 300;
+    int32_t h = 40;
+    int32_t h_gap = 20;
+    int32_t w_gap = 20;
+    int32_t y = h_gap;
+    int32_t x = w_gap;
     lv_color_t bg_color = lv_color_black();
     lv_color_t indic_color = lv_color_hex(0x0000FF);
 
@@ -203,15 +203,14 @@ void test_bar_normal(void)
     lv_bar_set_value(test_bar, 30, LV_ANIM_OFF);
     lv_obj_set_size(test_bar, h, w);
     lv_obj_align(test_bar, LV_ALIGN_TOP_LEFT, x, y);
-    TEST_ASSERT_EQUAL_SCREENSHOT("bar_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_1.png");
 }
-
 
 void test_bar_indicator_area_should_get_smaller_when_padding_is_increased(void)
 {
     lv_bar_t * bar_ptr = (lv_bar_t *) bar;
 
-    const lv_coord_t style_padding = 10u;
+    const int32_t style_padding = 10u;
     static lv_style_t bar_style;
 
     int32_t new_height = 0u;
@@ -310,13 +309,13 @@ void test_bar_indicator_should_be_drawn_towards_the_min_range_side_after_setting
     lv_bar_set_value(bar, 1, LV_ANIM_OFF);
     lv_test_indev_wait(50);
 
-    lv_coord_t original_pos = bar_ptr->indic_area.x1;
+    int32_t original_pos = bar_ptr->indic_area.x1;
 
     /* Set bar to a more negative value */
     lv_bar_set_value(bar, -50, LV_ANIM_OFF);
     lv_test_indev_wait(50);
 
-    lv_coord_t final_pos = bar_ptr->indic_area.x1;
+    int32_t final_pos = bar_ptr->indic_area.x1;
 
     TEST_ASSERT_LESS_THAN(original_pos, final_pos);
 }

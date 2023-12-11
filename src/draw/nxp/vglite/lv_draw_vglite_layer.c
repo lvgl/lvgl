@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -54,11 +53,10 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     if(layer_to_draw->draw_buf.buf == NULL)
         return;
 
-    lv_image_dsc_t img_dsc;
+    lv_image_dsc_t img_dsc = { 0 };
     img_dsc.header.w = layer_to_draw->draw_buf.width;
     img_dsc.header.h = layer_to_draw->draw_buf.height;
     img_dsc.header.cf = layer_to_draw->draw_buf.color_format;
-    img_dsc.header.always_zero = 0;
     img_dsc.data = lv_draw_buf_get_buf(&layer_to_draw->draw_buf);
 
     lv_draw_image_dsc_t new_draw_dsc;

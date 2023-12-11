@@ -61,7 +61,6 @@ typedef _lv_opa_t lv_opa_t;
 typedef uint8_t lv_opa_t;
 #endif /*DOXYGEN*/
 
-
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
 
@@ -117,9 +116,6 @@ enum _lv_color_format_t {
     LV_COLOR_FORMAT_ARGB8888          = 0x10,
     LV_COLOR_FORMAT_XRGB8888          = 0x11,
 
-    /*Miscellaneous formats*/
-    LV_COLOR_FORMAT_NATIVE_REVERSED   = 0x1A,
-
     /*Formats not supported by software renderer but kept here so GPU can use it*/
     LV_COLOR_FORMAT_A1                = 0x0B,
     LV_COLOR_FORMAT_A2                = 0x0C,
@@ -146,6 +142,7 @@ typedef _lv_color_format_t lv_color_format_t;
 typedef uint8_t lv_color_format_t;
 #endif /*DOXYGEN*/
 
+#define LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf) ((cf) >= LV_COLOR_FORMAT_A1 && (cf) <= LV_COLOR_FORMAT_A8)
 #define LV_COLOR_FORMAT_IS_INDEXED(cf) ((cf) >= LV_COLOR_FORMAT_I1 && (cf) <= LV_COLOR_FORMAT_I8)
 #define LV_COLOR_INDEXED_PALETTE_SIZE(cf) ((cf) == LV_COLOR_FORMAT_I1 ? 2 :\
                                            (cf) == LV_COLOR_FORMAT_I2 ? 4 :\
@@ -189,7 +186,6 @@ static inline uint8_t lv_color_format_get_size(lv_color_format_t cf)
  */
 bool lv_color_format_has_alpha(lv_color_format_t src_cf);
 
-
 lv_color32_t lv_color_to_32(lv_color_t color, lv_opa_t opa);
 
 static inline uint32_t lv_color_to_int(lv_color_t c)
@@ -197,7 +193,6 @@ static inline uint32_t lv_color_to_int(lv_color_t c)
     uint8_t * tmp = (uint8_t *) &c;
     return tmp[0] + (tmp[1] << 8) + (tmp[2] << 16);
 }
-
 
 static inline lv_color_t lv_color_from_int(uint32_t v)
 {
@@ -215,7 +210,7 @@ static inline bool lv_color32_eq(lv_color32_t c1, lv_color32_t c2)
     return *((uint32_t *)&c1) == *((uint32_t *)&c2);
 }
 
-static lv_color_t lv_color_hex(uint32_t c)
+static inline lv_color_t lv_color_hex(uint32_t c)
 {
     lv_color_t ret;
     ret.red = (c >> 16) & 0xff;
@@ -226,9 +221,22 @@ static lv_color_t lv_color_hex(uint32_t c)
 
 static inline lv_color_t lv_color_make(uint8_t r, uint8_t g, uint8_t b)
 {
-    return lv_color_hex((r << 16) + (g << 8) + b);
+    lv_color_t ret;
+    ret.red = r;
+    ret.green = g;
+    ret.blue = b;
+    return ret;
 }
 
+static inline lv_color32_t lv_color32_make(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    lv_color32_t ret;
+    ret.red = r;
+    ret.green = g;
+    ret.blue = b;
+    ret.alpha = a;
+    return ret;
+}
 
 static inline lv_color_t lv_color_hex3(uint32_t c)
 {
@@ -297,7 +305,6 @@ static inline lv_color_t lv_color_black(void)
 {
     return lv_color_make(0x00, 0x00, 0x00);
 }
-
 
 /**********************
  *      MACROS

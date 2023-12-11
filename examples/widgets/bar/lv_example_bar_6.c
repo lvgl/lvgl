@@ -54,7 +54,7 @@ void lv_example_bar_6(void)
     lv_obj_t * bar = lv_bar_create(lv_screen_active());
     lv_obj_set_size(bar, 200, 20);
     lv_obj_center(bar);
-    lv_obj_add_event(bar, event_cb, LV_EVENT_DRAW_MAIN_END, NULL);
+    lv_obj_add_event_cb(bar, event_cb, LV_EVENT_DRAW_MAIN_END, NULL);
 
     lv_anim_t a;
     lv_anim_init(&a);

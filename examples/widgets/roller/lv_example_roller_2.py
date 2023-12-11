@@ -52,7 +52,7 @@ roller.set_style_text_align(lv.TEXT_ALIGN.LEFT, 0)
 roller.set_style_bg_color(lv.color_hex3(0x0f0), 0)
 roller.set_style_bg_grad_color(lv.color_hex3(0xafa), 0);
 roller.align(lv.ALIGN.LEFT_MID, 10, 0)
-roller.add_event(event_handler, lv.EVENT.ALL, None)
+roller.add_event_cb(event_handler, lv.EVENT.ALL, None)
 roller.set_selected(2, lv.ANIM.OFF)
 
 # A roller in the middle with center aligned text, and auto (default) width
@@ -61,7 +61,7 @@ roller.set_options(opts, lv.roller.MODE.NORMAL)
 roller.set_visible_row_count(3)
 roller.add_style(style_sel, lv.PART.SELECTED)
 roller.align(lv.ALIGN.CENTER, 0, 0)
-roller.add_event(event_handler, lv.EVENT.ALL, None)
+roller.add_event_cb(event_handler, lv.EVENT.ALL, None)
 roller.set_selected(5, lv.ANIM.OFF)
 
 # A roller on the right with right aligned text, and custom width
@@ -72,5 +72,5 @@ roller.set_width(80)
 roller.add_style(style_sel, lv.PART.SELECTED)
 roller.set_style_text_align(lv.TEXT_ALIGN.RIGHT, 0)
 roller.align(lv.ALIGN.RIGHT_MID, -10, 0)
-roller.add_event(event_handler, lv.EVENT.ALL, None)
+roller.add_event_cb(event_handler, lv.EVENT.ALL, None)
 roller.set_selected(8, lv.ANIM.OFF)

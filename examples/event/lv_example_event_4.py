@@ -9,7 +9,7 @@ class LV_Example_Event_4:
         self.cont = lv.obj(lv.screen_active())
         self.cont.set_size(200, 200)
         self.cont.center()
-        self.cont.add_event(self.event_cb, lv.EVENT.DRAW_TASK_ADDED, None)
+        self.cont.add_event_cb(self.event_cb, lv.EVENT.DRAW_TASK_ADDED, None)
         self.cont.add_flag(lv.obj.FLAG.SEND_DRAW_TASK_EVENTS)
         lv.timer_create(self.timer_cb, 30, None)
 

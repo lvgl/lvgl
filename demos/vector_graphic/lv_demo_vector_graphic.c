@@ -45,7 +45,7 @@ static void draw_pattern(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_dsc_translate(ctx, 250, 250);
     lv_vector_dsc_rotate(ctx, 25);
     lv_vector_dsc_translate(ctx, -250, -250);
-    lv_vector_add(ctx, path); // draw a path
+    lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
 static void draw_gradient(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
@@ -77,7 +77,7 @@ static void draw_gradient(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_dsc_set_fill_transform(ctx, &mt);
 
     lv_vector_dsc_set_fill_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_PAD);
-    lv_vector_add(ctx, path); // draw a path
+    lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
 static void draw_radial_gradient(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
@@ -106,7 +106,7 @@ static void draw_radial_gradient(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     // grad.stops[2].frac = 255;
 
     lv_vector_dsc_set_fill_radial_gradient(ctx, &grad, 50, 50, 20, LV_VECTOR_GRADIENT_SPREAD_REFLECT);
-    lv_vector_add(ctx, path); // draw a path
+    lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
 static void draw_shapes(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
@@ -121,7 +121,7 @@ static void draw_shapes(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_path_close(path);
     lv_vector_dsc_set_fill_color(ctx, lv_color_make(0xFF, 0x00, 0x00));
     lv_vector_dsc_scale(ctx, 0.5, 0.5);
-    lv_vector_add(ctx, path); // draw a path
+    lv_vector_dsc_add_path(ctx, path); // draw a path
 
     lv_vector_path_clear(path);
     lv_vector_dsc_identity(ctx);
@@ -130,7 +130,7 @@ static void draw_shapes(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_path_append_rect(path, &rect, 50, 60);
     lv_vector_dsc_set_fill_color(ctx, lv_color_make(0x00, 0x80, 0xff));
     lv_vector_dsc_skew(ctx, 5, 0);
-    lv_vector_add(ctx, path); // draw a path
+    lv_vector_dsc_add_path(ctx, path); // draw a path
 
     lv_vector_path_clear(path);
     lv_vector_dsc_identity(ctx);
@@ -144,9 +144,9 @@ static void draw_shapes(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_path_append_circle(path2, &p, 50, 30);
     lv_vector_path_append_path(path, path2);
 
-    lv_vector_add(ctx, path); // draw a path
+    lv_vector_dsc_add_path(ctx, path); // draw a path
 
-    lv_vector_path_destroy(path2);
+    lv_vector_path_delete(path2);
 }
 
 static void draw_lines(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
@@ -164,10 +164,10 @@ static void draw_lines(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_dsc_set_fill_opa(ctx, LV_OPA_0);
     lv_vector_dsc_set_stroke_width(ctx, 8.0f);
 
-    float dashs[] = {10, 15, 20, 12};
-    lv_vector_dsc_set_stroke_dash(ctx, dashs, 4);
+    float dashes[] = {10, 15, 20, 12};
+    lv_vector_dsc_set_stroke_dash(ctx, dashes, 4);
 
-    lv_vector_add(ctx, path); // draw a path
+    lv_vector_dsc_add_path(ctx, path); // draw a path
 
     lv_vector_dsc_set_stroke_opa(ctx, LV_OPA_0);
     lv_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
@@ -186,7 +186,7 @@ static void draw_blend(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_dsc_set_fill_color(ctx, lv_color_make(0xFF, 0x00, 0xFF));
     lv_vector_dsc_set_blend_mode(ctx, LV_VECTOR_BLEND_SCREEN);
 
-    lv_vector_add(ctx, path); // draw a path
+    lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
 static void draw_vector(lv_layer_t * layer)
@@ -195,7 +195,7 @@ static void draw_vector(lv_layer_t * layer)
 
     lv_area_t rect = {0, 100, 300, 300};
     lv_vector_dsc_set_fill_color(ctx, lv_color_lighten(lv_color_black(), 50));
-    lv_vector_clear(ctx, &rect); // clear screen
+    lv_vector_clear_area(ctx, &rect); // clear screen
 
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
@@ -206,15 +206,9 @@ static void draw_vector(lv_layer_t * layer)
     draw_gradient(ctx, path);
     draw_blend(ctx, path);
 
-    lv_vector_draw(ctx); // submit draw
-    lv_vector_path_destroy(path);
-    lv_vector_dsc_destroy(ctx);
-}
-
-static void canvas_delete_cb(lv_event_t * e)
-{
-    uint8_t * buf = e->user_data;
-    lv_free(buf);
+    lv_draw_vector(ctx); // submit draw
+    lv_vector_path_delete(path);
+    lv_vector_dsc_delete(ctx);
 }
 
 /**********************
@@ -231,12 +225,10 @@ static void canvas_delete_cb(lv_event_t * e)
 
 void lv_demo_vector_graphic(void)
 {
-    uint8_t * canvas_buf = lv_malloc(WIDTH * HEIGHT * 4);
+    static uint8_t canvas_buf[LV_CANVAS_BUF_SIZE(WIDTH, HEIGHT, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
 
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
     lv_canvas_set_buffer(canvas, canvas_buf, WIDTH, HEIGHT, LV_COLOR_FORMAT_ARGB8888);
-
-    lv_obj_add_event(canvas, canvas_delete_cb, LV_EVENT_DELETE, canvas_buf);
 
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
@@ -248,6 +240,14 @@ void lv_demo_vector_graphic(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+#else
 
+void lv_demo_vector_graphic(void)
+{
+    /*fallback for online examples*/
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Vector graphics is not enabled");
+    lv_obj_center(label);
+}
 
 #endif

@@ -1,11 +1,11 @@
 #include "../../lv_examples.h"
 #if LV_USE_OBSERVER && LV_USE_SLIDER && LV_USE_LABEL && LV_USE_ROLLER && LV_USE_DROPDOWN && LV_FONT_MONTSERRAT_30 && LV_BUILD_EXAMPLES
 
-static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void cont_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void btn_create(lv_obj_t * parent, const char * text);
 static void btn_click_event_cb(lv_event_t * e);
-static void btn_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
-static void indicator_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void btn_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void indicator_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static lv_subject_t current_tab_subject;
 static lv_subject_t slider_subject[4];
@@ -74,7 +74,7 @@ static void anim_set_x_cb(void * obj, int32_t v)
     lv_obj_set_x(obj, v);
 }
 
-static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void cont_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t prev_v = lv_subject_get_previous_int(subject);
     int32_t cur_v = lv_subject_get_int(subject);
@@ -91,7 +91,7 @@ static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 
     uint32_t i;
     uint32_t delay = 0;
-    uint32_t child_cnt_prev = lv_obj_get_child_cnt(cont);
+    uint32_t child_cnt_prev = lv_obj_get_child_count(cont);
     for(i = 0; i < child_cnt_prev; i++) {
         lv_obj_t * child = lv_obj_get_child(cont, i);
         lv_anim_set_var(&a, child);
@@ -132,7 +132,7 @@ static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 
     /*Animate in the new widgets*/
     lv_anim_set_ready_cb(&a, NULL);
-    for(i = child_cnt_prev; i < lv_obj_get_child_cnt(cont); i++) {
+    for(i = child_cnt_prev; i < lv_obj_get_child_count(cont); i++) {
         lv_obj_t * child = lv_obj_get_child(cont, i);
         lv_anim_set_var(&a, child);
         if(prev_v < cur_v) {
@@ -149,7 +149,6 @@ static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 
 }
 
-
 static void btn_create(lv_obj_t * parent, const char * text)
 {
     lv_obj_t * btn = lv_button_create(parent);
@@ -157,7 +156,7 @@ static void btn_create(lv_obj_t * parent, const char * text)
     lv_obj_set_height(btn, lv_pct(100));
     lv_obj_set_style_radius(btn, 0, 0);
     lv_subject_add_observer_obj(&current_tab_subject, btn_observer_cb, btn, NULL);
-    lv_obj_add_event(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, text);
@@ -171,7 +170,7 @@ static void btn_click_event_cb(lv_event_t * e)
     lv_subject_set_int(&current_tab_subject, idx);
 }
 
-static void btn_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void btn_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t prev_v = lv_subject_get_previous_int(subject);
     int32_t cur_v = lv_subject_get_int(subject);
@@ -183,7 +182,7 @@ static void btn_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
     if(idx == cur_v) lv_obj_add_state(btn, LV_STATE_CHECKED);
 }
 
-static void indicator_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void indicator_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     int32_t cur_v = lv_subject_get_int(subject);
     lv_obj_t * indicator = lv_observer_get_target(observer);

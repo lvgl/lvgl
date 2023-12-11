@@ -27,30 +27,37 @@ extern "C" {
 
 typedef struct {
     lv_obj_t obj;
-    char ** map;
-    uint32_t tab_cnt;
     uint32_t tab_cur;
     lv_dir_t tab_pos;
 } lv_tabview_t;
 
-extern const lv_obj_class_t lv_tabview_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_tabview_class;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t * lv_tabview_create(lv_obj_t * parent, lv_dir_t tab_pos, lv_coord_t tab_size);
+
+lv_obj_t * lv_tabview_create(lv_obj_t * parent);
 
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * tv, const char * name);
 
 void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t tab_id, const char * new_name);
 
+void lv_tabview_set_active(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en);
+
+void lv_tabview_set_tab_position(lv_obj_t * obj, lv_dir_t dir);
+
+void lv_tabview_set_tab_bar_size(lv_obj_t * obj, int32_t size);
+
+uint32_t lv_tabview_get_tab_count(lv_obj_t * tv);
+
+uint32_t lv_tabview_get_tab_active(lv_obj_t * tv);
+
+uint32_t lv_tabview_get_tab_count(lv_obj_t * tv);
+
 lv_obj_t * lv_tabview_get_content(lv_obj_t * tv);
 
-lv_obj_t * lv_tabview_get_tab_buttons(lv_obj_t * tv);
-
-void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en);
-
-uint32_t lv_tabview_get_tab_act(lv_obj_t * tv);
+lv_obj_t * lv_tabview_get_tab_bar(lv_obj_t * tv);
 
 /**********************
  *      MACROS
