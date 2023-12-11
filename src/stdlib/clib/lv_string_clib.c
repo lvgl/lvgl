@@ -78,16 +78,12 @@ int32_t lv_strcmp(const char * s1, const char * s2)
 char * lv_strdup(const char * src)
 {
     /*strdup uses malloc, so use the lv_malloc when LV_USE_STDLIB_MALLOC is not LV_STDLIB_CLIB */
-#if LV_USE_STDLIB_MALLOC != LV_STDLIB_CLIB
     size_t len = lv_strlen(src) + 1;
     char * dst = lv_malloc(len);
     if(dst == NULL) return NULL;
 
     lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy when length is known*/
     return dst;
-#else
-    return strdup(src);
-#endif
 }
 
 /**********************
