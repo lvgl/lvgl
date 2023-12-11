@@ -41,7 +41,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
     newP.innerHTML = data
     newDiv.insertBefore(newP, newDiv.firstChild);
 
-      }) .catch(error => {
+    const children = newDiv.querySelectorAll('*');
+
+    // Iterate over each child
+    children.forEach(child => {
+        // Check if the child has an id
+        if (child.id) {
+            // Prepend 'docs-' to the id
+            child.id = 'docs-' + child.id;
+        }
+    })
+  }) .catch(error => {
         console.error('Fetch error: ' + error.message);
-    });
+  });
 })
