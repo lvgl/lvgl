@@ -577,13 +577,13 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
     lv_anim_set_var(&a_new, new_scr);
     lv_anim_set_start_cb(&a_new, scr_load_anim_start);
     lv_anim_set_ready_cb(&a_new, scr_anim_ready);
-    lv_anim_set_time(&a_new, time);
+    lv_anim_set_duration(&a_new, time);
     lv_anim_set_delay(&a_new, delay);
 
     lv_anim_t a_old;
     lv_anim_init(&a_old);
     lv_anim_set_var(&a_old, d->act_scr);
-    lv_anim_set_time(&a_old, time);
+    lv_anim_set_duration(&a_old, time);
     lv_anim_set_delay(&a_old, delay);
 
     switch(anim_type) {

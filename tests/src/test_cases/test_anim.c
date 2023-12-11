@@ -36,7 +36,7 @@ void test_anim_delete(void)
     lv_anim_set_var(&a, &var);
     lv_anim_set_values(&a, 0, 100);
     lv_anim_set_exec_cb(&a, exec_cb);
-    lv_anim_set_time(&a, 100);
+    lv_anim_set_duration(&a, 100);
     lv_anim_start(&a);
 
     lv_test_wait(20);
@@ -68,7 +68,7 @@ void test_anim_delete_custom(void)
     lv_anim_set_var(&a, &var);
     lv_anim_set_values(&a, 0, 100);
     lv_anim_set_custom_exec_cb(&a, custom_exec_cb);
-    lv_anim_set_time(&a, 100);
+    lv_anim_set_duration(&a, 100);
     lv_anim_start(&a);
 
     lv_test_wait(20);

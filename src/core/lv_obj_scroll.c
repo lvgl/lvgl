@@ -314,7 +314,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
         if(dx) {
             uint32_t t = lv_anim_speed_clamped((lv_display_get_horizontal_resolution(d)) >> 1, SCROLL_ANIM_TIME_MIN,
                                                SCROLL_ANIM_TIME_MAX);
-            lv_anim_set_time(&a, t);
+            lv_anim_set_duration(&a, t);
             int32_t sx = lv_obj_get_scroll_x(obj);
             lv_anim_set_values(&a, -sx, -sx + dx);
             lv_anim_set_exec_cb(&a, scroll_x_anim);
@@ -329,7 +329,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
         if(dy) {
             uint32_t t = lv_anim_speed_clamped((lv_display_get_vertical_resolution(d)) >> 1, SCROLL_ANIM_TIME_MIN,
                                                SCROLL_ANIM_TIME_MAX);
-            lv_anim_set_time(&a, t);
+            lv_anim_set_duration(&a, t);
             int32_t sy = lv_obj_get_scroll_y(obj);
             lv_anim_set_values(&a, -sy, -sy + dy);
             lv_anim_set_exec_cb(&a,  scroll_y_anim);

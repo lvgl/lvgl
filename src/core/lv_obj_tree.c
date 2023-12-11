@@ -124,7 +124,7 @@ void lv_obj_delete_delayed(lv_obj_t * obj, uint32_t delay_ms)
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
     lv_anim_set_exec_cb(&a, NULL);
-    lv_anim_set_time(&a, 1);
+    lv_anim_set_duration(&a, 1);
     lv_anim_set_delay(&a, delay_ms);
     lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);

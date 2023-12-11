@@ -51,7 +51,7 @@ void lv_example_scale_3(void)
     lv_anim_init(&anim_scale_line);
     lv_anim_set_var(&anim_scale_line, scale_line);
     lv_anim_set_exec_cb(&anim_scale_line, set_needle_line_value);
-    lv_anim_set_time(&anim_scale_line, 1000);
+    lv_anim_set_duration(&anim_scale_line, 1000);
     lv_anim_set_repeat_count(&anim_scale_line, LV_ANIM_REPEAT_INFINITE);
     lv_anim_set_playback_time(&anim_scale_line, 1000);
     lv_anim_set_values(&anim_scale_line, 10, 40);
@@ -88,7 +88,7 @@ void lv_example_scale_3(void)
     lv_anim_init(&anim_scale_img);
     lv_anim_set_var(&anim_scale_img, scale_img);
     lv_anim_set_exec_cb(&anim_scale_img, set_needle_img_value);
-    lv_anim_set_time(&anim_scale_img, 1000);
+    lv_anim_set_duration(&anim_scale_img, 1000);
     lv_anim_set_repeat_count(&anim_scale_img, LV_ANIM_REPEAT_INFINITE);
     lv_anim_set_playback_time(&anim_scale_img, 1000);
     lv_anim_set_values(&anim_scale_img, 10, 40);

@@ -49,12 +49,12 @@ void lv_example_grid_5(void)
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     lv_anim_set_exec_cb(&a, row_gap_anim);
-    lv_anim_set_time(&a, 500);
+    lv_anim_set_duration(&a, 500);
     lv_anim_set_playback_time(&a, 500);
     lv_anim_start(&a);
 
     lv_anim_set_exec_cb(&a, column_gap_anim);
-    lv_anim_set_time(&a, 3000);
+    lv_anim_set_duration(&a, 3000);
     lv_anim_set_playback_time(&a, 3000);
     lv_anim_start(&a);
 }

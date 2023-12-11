@@ -1527,7 +1527,7 @@ static void indev_scroll_throw_anim_cb(void * var, int32_t v)
         if(indev->scroll_throw_anim) {
             /*hacky*/
             LV_LOG_INFO("stop animation");
-            lv_anim_set_time(indev->scroll_throw_anim, 0);
+            lv_anim_set_duration(indev->scroll_throw_anim, 0);
         }
     }
 }
@@ -1546,7 +1546,7 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, indev);
-    lv_anim_set_time(&a, 1024);
+    lv_anim_set_duration(&a, 1024);
     lv_anim_set_values(&a, 0, 1024);
     lv_anim_set_exec_cb(&a, indev_scroll_throw_anim_cb);
     lv_anim_set_ready_cb(&a, indev_scroll_throw_anim_ready_cb);

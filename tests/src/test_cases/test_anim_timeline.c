@@ -32,7 +32,7 @@ void test_anim_timeline_progress_1(void)
     lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 0, 700);
-    lv_anim_set_time(&a1, 1000);
+    lv_anim_set_duration(&a1, 1000);
 
     anim_timeline = lv_anim_timeline_create();
     TEST_ASSERT_NOT_NULL(anim_timeline);
@@ -90,14 +90,14 @@ void test_anim_timeline_progress_2(void)
     lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 0, 700);
-    lv_anim_set_time(&a1, 1000);
+    lv_anim_set_duration(&a1, 1000);
 
     lv_anim_t a2;
     lv_anim_init(&a2);
     lv_anim_set_exec_cb(&a2, (lv_anim_exec_xcb_t)lv_obj_set_y);
     lv_anim_set_var(&a2, obj);
     lv_anim_set_values(&a2, 0, 300);
-    lv_anim_set_time(&a2, 1000);
+    lv_anim_set_duration(&a2, 1000);
 
     /*
      *   |------X------|
@@ -167,17 +167,17 @@ void test_anim_timeline_start(void)
     lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 50, 100);
-    lv_anim_set_time(&a1, 800);
+    lv_anim_set_duration(&a1, 800);
     lv_anim_set_early_apply(&a1, false);
     lv_anim_timeline_add(anim_timeline, 200, &a1);
 
     lv_anim_set_values(&a1, 200, 300);
-    lv_anim_set_time(&a1, 1000);
+    lv_anim_set_duration(&a1, 1000);
     lv_anim_timeline_add(anim_timeline, 1500, &a1);
 
     /*Overlap with the previous*/
     lv_anim_set_values(&a1, 400, 700);
-    lv_anim_set_time(&a1, 1500);
+    lv_anim_set_duration(&a1, 1500);
     lv_anim_timeline_add(anim_timeline, 2000, &a1);
 
     lv_anim_timeline_start(anim_timeline);
@@ -259,17 +259,17 @@ void test_anim_timeline_reverse(void)
     lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 50, 100);
-    lv_anim_set_time(&a1, 800);
+    lv_anim_set_duration(&a1, 800);
     lv_anim_set_early_apply(&a1, false);
     lv_anim_timeline_add(anim_timeline, 200, &a1);
 
     lv_anim_set_values(&a1, 200, 300);
-    lv_anim_set_time(&a1, 1000);
+    lv_anim_set_duration(&a1, 1000);
     lv_anim_timeline_add(anim_timeline, 1500, &a1);
 
     /*Overlap with the previous*/
     lv_anim_set_values(&a1, 400, 700);
-    lv_anim_set_time(&a1, 1500);
+    lv_anim_set_duration(&a1, 1500);
     lv_anim_timeline_add(anim_timeline, 2000, &a1);
 
     lv_anim_timeline_set_reverse(anim_timeline, true);

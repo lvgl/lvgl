@@ -562,7 +562,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     lv_anim_set_start_cb(&a, trans_anim_start_cb);
     lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
     lv_anim_set_values(&a, 0x00, 0xFF);
-    lv_anim_set_time(&a, tr_dsc->time);
+    lv_anim_set_duration(&a, tr_dsc->time);
     lv_anim_set_delay(&a, tr_dsc->delay);
     lv_anim_set_path_cb(&a, tr_dsc->path_cb);
     lv_anim_set_early_apply(&a, false);
@@ -650,7 +650,7 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_set_values(&a, 0, LV_OPA_COVER);
     lv_anim_set_exec_cb(&a, fade_anim_cb);
     lv_anim_set_ready_cb(&a, fade_in_anim_ready);
-    lv_anim_set_time(&a, time);
+    lv_anim_set_duration(&a, time);
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
 }
@@ -662,7 +662,7 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_set_var(&a, obj);
     lv_anim_set_values(&a, lv_obj_get_style_opa(obj, 0), LV_OPA_TRANSP);
     lv_anim_set_exec_cb(&a, fade_anim_cb);
-    lv_anim_set_time(&a, time);
+    lv_anim_set_duration(&a, time);
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
 }

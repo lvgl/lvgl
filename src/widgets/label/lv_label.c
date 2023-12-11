@@ -914,7 +914,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 }
             }
 
-            lv_anim_set_time(&a, anim_time);
+            lv_anim_set_duration(&a, anim_time);
             lv_anim_set_playback_time(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
@@ -953,7 +953,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 }
             }
 
-            lv_anim_set_time(&a, anim_time);
+            lv_anim_set_duration(&a, anim_time);
             lv_anim_set_playback_time(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
@@ -1000,7 +1000,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             lv_anim_set_values(&a, 0, -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT);
 #endif
             lv_anim_set_exec_cb(&a, set_ofs_x_anim);
-            lv_anim_set_time(&a, anim_time);
+            lv_anim_set_duration(&a, anim_time);
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
@@ -1026,7 +1026,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
         if(size.y > lv_area_get_height(&txt_coords) && hor_anim == false) {
             lv_anim_set_values(&a, 0, -size.y - (lv_font_get_line_height(font)));
             lv_anim_set_exec_cb(&a, set_ofs_y_anim);
-            lv_anim_set_time(&a, anim_time);
+            lv_anim_set_duration(&a, anim_time);
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
