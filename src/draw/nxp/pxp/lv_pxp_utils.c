@@ -42,15 +42,9 @@ pxp_output_pixel_format_t pxp_get_out_px_format(lv_color_format_t cf)
     pxp_output_pixel_format_t out_px_format = kPXP_OutputPixelFormatRGB565;
 
     switch(cf) {
-        /*2 byte (+alpha) formats*/
         case LV_COLOR_FORMAT_RGB565:
             out_px_format = kPXP_OutputPixelFormatRGB565;
             break;
-        case LV_COLOR_FORMAT_RGB565A8:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
-            break;
-
-        /*3 byte (+alpha) formats*/
         case LV_COLOR_FORMAT_RGB888:
             out_px_format = kPXP_OutputPixelFormatRGB888P;
             break;
@@ -74,15 +68,9 @@ pxp_as_pixel_format_t pxp_get_as_px_format(lv_color_format_t cf)
     pxp_as_pixel_format_t as_px_format = kPXP_AsPixelFormatRGB565;
 
     switch(cf) {
-        /*2 byte (+alpha) formats*/
         case LV_COLOR_FORMAT_RGB565:
             as_px_format = kPXP_AsPixelFormatRGB565;
             break;
-        case LV_COLOR_FORMAT_RGB565A8:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
-            break;
-
-        /*3 byte (+alpha) formats*/
         case LV_COLOR_FORMAT_RGB888:
             LV_ASSERT_MSG(false, "Unsupported color format.");
             break;
@@ -106,15 +94,9 @@ pxp_ps_pixel_format_t pxp_get_ps_px_format(lv_color_format_t cf)
     pxp_ps_pixel_format_t ps_px_format = kPXP_PsPixelFormatRGB565;
 
     switch(cf) {
-        /*2 byte (+alpha) formats*/
         case LV_COLOR_FORMAT_RGB565:
             ps_px_format = kPXP_PsPixelFormatRGB565;
             break;
-        case LV_COLOR_FORMAT_RGB565A8:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
-            break;
-
-        /*3 byte (+alpha) formats*/
         case LV_COLOR_FORMAT_RGB888:
             LV_ASSERT_MSG(false, "Unsupported color format.");
             break;

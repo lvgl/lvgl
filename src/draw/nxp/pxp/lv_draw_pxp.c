@@ -105,10 +105,37 @@ void lv_draw_pxp_deinit(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static inline bool _pxp_cf_supported(lv_color_format_t cf)
+static inline bool _pxp_src_cf_supported(lv_color_format_t cf)
 {
-    bool is_cf_supported = (cf == LV_COLOR_FORMAT_RGB565 || cf == LV_COLOR_FORMAT_RGB888 ||
-                            cf == LV_COLOR_FORMAT_ARGB8888 || cf == LV_COLOR_FORMAT_XRGB8888);
+    bool is_cf_supported = false;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            is_cf_supported = true;
+            break;
+        default:
+            break;
+    }
+
+    return is_cf_supported;
+}
+
+static inline bool _pxp_dest_cf_supported(lv_color_format_t cf)
+{
+    bool is_cf_supported = false;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            is_cf_supported = true;
+            break;
+        default:
+            break;
+    }
 
     return is_cf_supported;
 }
@@ -159,7 +186,11 @@ static bool _pxp_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
 
 static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
-    if(!_pxp_cf_supported(u->target_layer->color_format))
+    LV_UNUSED(u);
+
+    const lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+
+    if(!_pxp_dest_cf_supported(draw_dsc_base->layer->color_format))
         return 0;
 
     switch(t->type) {
@@ -184,7 +215,7 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 if(src_type == LV_IMAGE_SRC_SYMBOL)
                     return 0;
 
-                if(!_pxp_cf_supported(draw_dsc->img_header.cf))
+                if(!_pxp_src_cf_supported(draw_dsc->img_header.cf))
                     return 0;
 
                 if(t->preference_score > 70) {
@@ -198,7 +229,7 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
 
-                if(!_pxp_cf_supported(layer_to_draw->color_format))
+                if(!_pxp_src_cf_supported(layer_to_draw->color_format))
                     return 0;
 
                 if(!_pxp_draw_img_supported(draw_dsc))
@@ -215,7 +246,7 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
-                if(!_pxp_cf_supported(img_dsc->header.cf))
+                if(!_pxp_src_cf_supported(img_dsc->header.cf))
                     return 0;
 
                 if(!_pxp_draw_img_supported(draw_dsc))
