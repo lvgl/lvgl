@@ -156,7 +156,6 @@ vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf)
     vg_lite_buffer_format_t vg_buffer_format = VG_LITE_BGR565;
 
     switch(cf) {
-        /*<=1 byte (+alpha) formats*/
         case LV_COLOR_FORMAT_L8:
             vg_buffer_format = VG_LITE_L8;
             break;
@@ -175,18 +174,14 @@ vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf)
         case LV_COLOR_FORMAT_I8:
             vg_buffer_format = VG_LITE_INDEX_8;
             break;
-
-        /*2 byte (+alpha) formats*/
         case LV_COLOR_FORMAT_RGB565:
             vg_buffer_format = VG_LITE_BGR565;
             break;
         case LV_COLOR_FORMAT_RGB565A8:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
+            vg_buffer_format = VG_LITE_ABGR8565;
             break;
-
-        /*3 byte (+alpha) formats*/
         case LV_COLOR_FORMAT_RGB888:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
+            vg_buffer_format = VG_LITE_BGR888;
             break;
         case LV_COLOR_FORMAT_ARGB8888:
             vg_buffer_format = VG_LITE_BGRA8888;
