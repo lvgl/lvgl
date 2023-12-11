@@ -356,6 +356,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 
 uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool bidi)
 {
+    LV_UNUSED(bidi);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(pos_in);
     lv_label_t * label = (lv_label_t *)obj;
