@@ -66,6 +66,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_
     is_common = _lv_area_intersect(&clip_line, &clip_line, draw_unit->clip_area);
     if(!is_common) return;
 
+    LV_PROFILER_BEGIN;
     if(dsc->p1.y == dsc->p2.y) draw_line_hor(draw_unit, dsc);
     else if(dsc->p1.x == dsc->p2.x) draw_line_ver(draw_unit, dsc);
     else draw_line_skew(draw_unit, dsc);
@@ -97,6 +98,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_
             lv_draw_sw_fill(draw_unit, &cir_dsc, &cir_area);
         }
     }
+    LV_PROFILER_END;
 }
 
 /**********************
@@ -250,7 +252,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
 
 LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
 {
-
 #if LV_DRAW_SW_COMPLEX
     /*Keep the great y in p1*/
     lv_point_t p1;

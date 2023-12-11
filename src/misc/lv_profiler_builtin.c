@@ -87,6 +87,12 @@ void lv_profiler_builtin_init(const lv_profiler_builtin_config_t * config)
     profiler_ctx.item_num = num;
     profiler_ctx.config = *config;
 
+    if(profiler_ctx.config.flush_cb) {
+        /* add profiler header for perfetto */
+        profiler_ctx.config.flush_cb("# tracer: nop\n");
+        profiler_ctx.config.flush_cb("#\n");
+    }
+
     LV_LOG_INFO("init OK, item_num = %d", (int)num);
 }
 
@@ -113,7 +119,7 @@ void lv_profiler_builtin_flush(void)
         uint32_t sec = item->tick / tick_per_sec;
         uint32_t usec = (item->tick % tick_per_sec) * (LV_PROFILER_TICK_PER_SEC_MAX / tick_per_sec);
         lv_snprintf(buf, sizeof(buf),
-                    "LVGL-1 [0] %" LV_PRIu32 ".%06" LV_PRIu32 ": tracing_mark_write: %c|1|%s\n",
+                    "   LVGL-1 [0] %" LV_PRIu32 ".%06" LV_PRIu32 ": tracing_mark_write: %c|1|%s\n",
                     sec,
                     usec,
                     item->tag,
