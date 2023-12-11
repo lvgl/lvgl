@@ -882,7 +882,7 @@ static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area)
     else return true;
 }
 
-void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
+static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
