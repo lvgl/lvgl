@@ -44,7 +44,6 @@ PACK_BUILD=build/
 # alternative: specify directory names to be added to pack base directory
 PACK_DIRS="
   ../../src
-  ../../docs
   ../../demos
   ../../env_support/pikascript
 "
@@ -193,6 +192,15 @@ rm -rf PackName.txt
 # echo apply patches...
 # rm -rf $PACK_BUILD/demos/lv_demos.h
 # cp -f ./lv_demos.h $PACK_BUILD/demos/
+
+echo delete files...
+find $PACK_BUILD/demos/ -type f -name "*.png" -delete
+find $PACK_BUILD/demos/ -type f -name "*.gif" -delete
+find $PACK_BUILD/demos/ -type f -name "*.gif" -delete
+find $PACK_BUILD/demos/ -type f -name "*.ttf" -delete
+find $PACK_BUILD/demos/ -type f -name "*.otf" -delete
+find $PACK_BUILD/demos/ -type f -name "*.jpg" -delete
+find $PACK_BUILD/demos/ -type f -name "*.fnt" -delete
 
 # Archiving
 # $ZIP a $PACKNAME
