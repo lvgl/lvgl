@@ -588,7 +588,7 @@ void test_label_rtl_dot_long_mode(void)
     lv_obj_set_size(test_label, 300, lv_font_dejavu_16_persian_hebrew.line_height);
     lv_label_set_text(test_label, message);
     lv_obj_center(test_label);
-    
+
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_rtl_dot_long_mode.png");
 }
 
