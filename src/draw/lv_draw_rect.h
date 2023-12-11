@@ -84,20 +84,6 @@ typedef struct {
 
     int32_t radius;
 
-    const void * src;
-    const void * font;
-    lv_color_t recolor;
-    lv_opa_t opa;
-    lv_opa_t recolor_opa;
-    lv_image_header_t img_header; /*To make it easier for draw_unit to decide if they can draw this image */
-    uint8_t tiled : 1;
-} lv_draw_bg_image_dsc_t;
-
-typedef struct {
-    lv_draw_dsc_base_t base;
-
-    int32_t radius;
-
     lv_color_t color;
     int32_t width;
     lv_opa_t opa;
@@ -130,8 +116,6 @@ void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc);
 void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc);
 
 void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc);
-
-void lv_draw_bg_image_dsc_init(lv_draw_bg_image_dsc_t * dsc);
 
 /**
  * Draw a rectangle

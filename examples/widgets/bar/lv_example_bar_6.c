@@ -61,7 +61,7 @@ void lv_example_bar_6(void)
     lv_anim_set_var(&a, bar);
     lv_anim_set_values(&a, 0, 100);
     lv_anim_set_exec_cb(&a, set_value);
-    lv_anim_set_time(&a, 4000);
+    lv_anim_set_duration(&a, 4000);
     lv_anim_set_playback_time(&a, 4000);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);

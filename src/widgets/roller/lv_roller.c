@@ -660,7 +660,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
         lv_anim_set_var(&a, label);
         lv_anim_set_exec_cb(&a, set_y_anim);
         lv_anim_set_values(&a, lv_obj_get_y(label), new_y);
-        lv_anim_set_time(&a, anim_time);
+        lv_anim_set_duration(&a, anim_time);
         lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
         lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
         lv_anim_start(&a);

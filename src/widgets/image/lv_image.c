@@ -63,6 +63,21 @@ static const lv_property_ops_t properties[] = {
         .getter = lv_image_get_scale,
     },
     {
+        .id = LV_PROPERTY_IMAGE_SCALE_X,
+        .setter = lv_image_set_scale_x,
+        .getter = lv_image_get_scale_x,
+    },
+    {
+        .id = LV_PROPERTY_IMAGE_SCALE_Y,
+        .setter = lv_image_set_scale_y,
+        .getter = lv_image_get_scale_y,
+    },
+    {
+        .id = LV_PROPERTY_IMAGE_BLEND_MODE,
+        .setter = lv_image_set_blend_mode,
+        .getter = lv_image_get_blend_mode,
+    },
+    {
         .id = LV_PROPERTY_IMAGE_ANTIALIAS,
         .setter = lv_image_set_antialias,
         .getter = lv_image_get_antialias,

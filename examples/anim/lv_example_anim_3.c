@@ -55,7 +55,7 @@ void lv_example_anim_3(void)
     int32_t end = lv_obj_get_style_width(cont, LV_PART_MAIN) -
                   lv_obj_get_style_width(ginfo.anim_obj, LV_PART_MAIN) - 10;
     lv_anim_set_values(&ginfo.a, 5, end);
-    lv_anim_set_time(&ginfo.a, 2000);
+    lv_anim_set_duration(&ginfo.a, 2000);
     lv_anim_set_exec_cb(&ginfo.a, anim_x_cb);
     lv_anim_set_path_cb(&ginfo.a, anim_path_bezier3_cb);
 

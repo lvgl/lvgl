@@ -16,6 +16,7 @@ extern "C" {
 #include <stdbool.h>
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -96,14 +97,15 @@ typedef enum {
  */
 #if LV_BIG_ENDIAN_SYSTEM
 typedef struct {
-
-    uint32_t h : 11; /*Height of the image map*/
-    uint32_t w : 11; /*Width of the image map*/
-    uint32_t reserved : 2; /*Reserved to be used later*/
-    uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
-                                 non-printable character*/
-    uint32_t cf : 5;          /*Color format: See `lv_color_format_t`*/
-
+    uint32_t reserved_2: 16;    /*Reserved to be used later*/
+    uint32_t stride: 16;        /*Number of bytes in a row*/
+    uint32_t h: 16;
+    uint32_t w: 16;
+    uint32_t flags: 16;         /*Image flags, see `lv_image_flags_t`*/
+    uint32_t reserved_1: 8;     /*Reserved by LVGL for later use*/
+    uint32_t always_zero : 3;   /*It the upper bits of the first byte. Always zero to look like a
+                                  non-printable character*/
+    uint32_t cf : 5;            /*Color format: See `lv_color_format_t`*/
 } lv_image_header_t;
 #else
 typedef struct {
@@ -111,18 +113,23 @@ typedef struct {
     uint32_t always_zero : 3;   /*It the upper bits of the first byte. Always zero to look like a
                                   non-printable character*/
 
-    uint32_t format: 8;         /*Image format? To be defined by LVGL*/
+    uint32_t reserved_1: 8;     /*Reserved by LVGL for later use*/
     uint32_t flags: 16;         /*Image flags, see `lv_image_flags_t`*/
 
     uint32_t w: 16;
     uint32_t h: 16;
-    uint32_t stride: 16;       /*Number of bytes in a row*/
-    uint32_t reserved_2: 16;   /*Reserved to be used later*/
+    uint32_t stride: 16;        /*Number of bytes in a row*/
+    uint32_t reserved_2: 16;    /*Reserved to be used later*/
 } lv_image_header_t;
 #endif
 
-/** Image header it is compatible with
- * the result from image converter utility*/
+/**
+ * Struct to describe an image. Both decoded and raw image can share
+ * the same struct.
+ *
+ * Image is also identical to lv_draw_buf_t for now.
+ * Ideally, decoded image should be lv_draw_buf_t.
+ */
 typedef struct {
     lv_image_header_t header; /**< A header describing the basics of the image*/
     uint32_t data_size;     /**< Size of the image in bytes*/
@@ -165,6 +172,17 @@ void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, i
                                         uint16_t scale_y,
                                         const lv_point_t * pivot);
 
+static inline void lv_image_header_init(lv_image_header_t * header, uint32_t w, uint32_t h, lv_color_format_t cf,
+                                        uint32_t stride, lv_image_flags_t flags)
+{
+    LV_ASSERT(header);
+    lv_memzero(header, sizeof(*header));
+    header->w = w;
+    header->h = h;
+    header->cf = cf;
+    header->stride = stride;
+    header->flags = flags;
+}
 /**********************
  *      MACROS
  **********************/

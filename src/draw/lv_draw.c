@@ -107,6 +107,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 {
+    LV_PROFILER_BEGIN;
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
 
@@ -145,6 +146,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             u = u->next;
         }
     }
+    LV_PROFILER_END;
 }
 
 void lv_draw_dispatch(void)
@@ -169,6 +171,7 @@ void lv_draw_dispatch(void)
 
 bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
 {
+    LV_PROFILER_BEGIN;
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
     lv_draw_task_t * t = layer->draw_task_head;
@@ -255,6 +258,7 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
         }
     }
 
+    LV_PROFILER_END;
     return render_running;
 }
 

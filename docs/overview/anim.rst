@@ -41,7 +41,7 @@ and configured with ``lv_anim_set_...()`` functions.
    lv_anim_set_var(&a, obj);
 
    /*Length of the animation [ms]*/
-   lv_anim_set_time(&a, duration);
+   lv_anim_set_duration(&a, duration);
 
    /*Set start and end values. E.g. 0, 150*/
    lv_anim_set_values(&a, start, end);

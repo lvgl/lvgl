@@ -209,22 +209,33 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         task->preference_score = 100;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_SW;
     }
+
     return 0;
 }
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
+    LV_PROFILER_BEGIN;
     lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
 
     /*Return immediately if it's busy with draw task*/
-    if(draw_sw_unit->task_act) return 0;
+    if(draw_sw_unit->task_act) {
+        LV_PROFILER_END;
+        return 0;
+    }
 
     lv_draw_task_t * t = NULL;
     t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_SW);
-    if(t == NULL) return -1;
+    if(t == NULL) {
+        LV_PROFILER_END;
+        return -1;
+    }
 
     void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL) return -1;
+    if(buf == NULL) {
+        LV_PROFILER_END;
+        return -1;
+    }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_sw_unit->base_unit.target_layer = layer;
@@ -237,6 +248,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 #else
     execute_drawing_unit(draw_sw_unit);
 #endif
+    LV_PROFILER_END;
     return 1;
 }
 
@@ -272,6 +284,7 @@ static void render_thread_cb(void * ptr)
 
 static void execute_drawing(lv_draw_sw_unit_t * u)
 {
+    LV_PROFILER_BEGIN;
     /*Render the draw task*/
     lv_draw_task_t * t = u->task_act;
     switch(t->type) {
@@ -283,9 +296,6 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
             break;
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
             lv_draw_sw_box_shadow((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_TASK_TYPE_BG_IMG:
-            lv_draw_sw_bg_image((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
             lv_draw_sw_label((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
@@ -360,7 +370,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         lv_draw_sw_label((lv_draw_unit_t *)u, &label_dsc, &txt_area);
     }
 #endif
-
+    LV_PROFILER_END;
 }
 
 static void rotate90_argb8888(const uint32_t * src, uint32_t * dst, int32_t srcWidth, int32_t srcHeight,
