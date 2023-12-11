@@ -25,6 +25,7 @@ extern "C" {
 #include "../../sw/lv_draw_sw.h"
 
 #include "vg_lite.h"
+#include "vg_lite_options.h"
 
 /*********************
  *      DEFINES

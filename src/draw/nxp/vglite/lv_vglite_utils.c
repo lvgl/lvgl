@@ -20,7 +20,6 @@
 
 #include "../../../core/lv_refr.h"
 
-#include "vg_lite_options.h"
 #if VGLITE_TASK_QUEUE
     #include "vg_lite_gpu.h"
 #endif

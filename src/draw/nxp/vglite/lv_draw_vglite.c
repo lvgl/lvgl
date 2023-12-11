@@ -124,22 +124,68 @@ void lv_draw_vglite_deinit(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static inline bool _vglite_cf_supported(lv_color_format_t cf)
+static inline bool _vglite_src_cf_supported(lv_color_format_t cf)
 {
-    /*Add here the platform specific code for supported formats.*/
+    bool is_cf_supported = false;
 
-    bool is_cf_unsupported = (cf == LV_COLOR_FORMAT_RGB565A8 || cf == LV_COLOR_FORMAT_RGB888);
+    switch(cf) {
+#if CHIPID == 0x255 || CHIPID == 0x555
+        case LV_COLOR_FORMAT_I1:
+        case LV_COLOR_FORMAT_I2:
+        case LV_COLOR_FORMAT_I4:
+        case LV_COLOR_FORMAT_I8:
+#endif
+        case LV_COLOR_FORMAT_A4:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_RGB565:
+#if CHIPID == 0x555
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGB888:
+#endif
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            is_cf_supported = true;
+            break;
+        default:
+            break;
+    }
 
-    return (!is_cf_unsupported);
+    return is_cf_supported;
+}
+
+static inline bool _vglite_dest_cf_supported(lv_color_format_t cf)
+{
+    bool is_cf_supported = false;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_A8:
+#if CHIPID == 0x255 || CHIPID == 0x555
+        case LV_COLOR_FORMAT_L8:
+#endif
+        case LV_COLOR_FORMAT_RGB565:
+#if CHIPTID == 0x555
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGB888:
+#endif
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            is_cf_supported = true;
+            break;
+        default:
+            break;
+    }
+
+    return is_cf_supported;
 }
 
 static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
-    /* Return if target buffer format is not supported.
-     *
-     * FIXME: Source format and destination format support is different!
-     */
-    if(!_vglite_cf_supported(u->target_layer->color_format))
+    LV_UNUSED(u);
+
+    const lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+
+    if(!_vglite_dest_cf_supported(draw_dsc_base->layer->color_format))
         return 0;
 
     switch(t->type) {
@@ -185,7 +231,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
                 if(src_type != LV_IMAGE_SRC_SYMBOL) {
 
-                    if((!_vglite_cf_supported(draw_dsc->img_header.cf))
+                    if((!_vglite_src_cf_supported(draw_dsc->img_header.cf))
                        || (!vglite_buf_aligned(draw_dsc->src, draw_dsc->img_header.stride, draw_dsc->img_header.cf))
                       )
                         return 0;
@@ -202,7 +248,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
 
-                if(!_vglite_cf_supported(layer_to_draw->color_format))
+                if(!_vglite_src_cf_supported(layer_to_draw->color_format))
                     return 0;
 
                 if(t->preference_score > 80) {
@@ -221,7 +267,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                                       draw_dsc->scale_y != LV_SCALE_NONE);
 #endif
 
-                if((!_vglite_cf_supported(img_dsc->header.cf))
+                if((!_vglite_src_cf_supported(img_dsc->header.cf))
 #if VGLITE_BLIT_SPLIT_ENABLED
                    || has_transform
 #endif
