@@ -91,7 +91,7 @@ typedef struct _lv_draw_task_t {
      * Set to which extent `preferred_draw_unit_id` is good at this task.
      * 80: means 20% better (faster) than software rendering
      * 100: the default value
-     * 110: means 10% better (faster) than software rendering
+     * 110: means 10% worse (slower) than software rendering
      */
     uint8_t preference_score;
 
