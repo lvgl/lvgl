@@ -122,7 +122,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             /*Add an infinite width change animation*/
             lv_anim_init(&a);
             lv_anim_set_var(&a, obj);
-            lv_anim_set_time(&a, LV_DEMO_STRESS_TIME_STEP * 2);
+            lv_anim_set_duration(&a, LV_DEMO_STRESS_TIME_STEP * 2);
             lv_anim_set_exec_cb(&a, set_width_anim);
             lv_anim_set_values(&a, 100, 200);
             lv_anim_set_playback_time(&a, LV_DEMO_STRESS_TIME_STEP * 2);
@@ -199,7 +199,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_anim_init(&a);
             lv_anim_set_var(&a, obj);
             lv_anim_set_values(&a, LV_VER_RES, LV_VER_RES - lv_obj_get_height(obj));
-            lv_anim_set_time(&a, LV_DEMO_STRESS_TIME_STEP + 3);
+            lv_anim_set_duration(&a, LV_DEMO_STRESS_TIME_STEP + 3);
             lv_anim_set_exec_cb(&a, set_y_anim);
             lv_anim_start(&a);
 
@@ -226,7 +226,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_anim_init(&a);
             lv_anim_set_var(&a, obj);
             lv_anim_set_values(&a, 180, 400);
-            lv_anim_set_time(&a, LV_DEMO_STRESS_TIME_STEP * 2);
+            lv_anim_set_duration(&a, LV_DEMO_STRESS_TIME_STEP * 2);
             lv_anim_set_delay(&a, LV_DEMO_STRESS_TIME_STEP + 25);
             lv_anim_set_playback_time(&a, LV_DEMO_STRESS_TIME_STEP * 5);
             lv_anim_set_repeat_count(&a, 3);
@@ -426,7 +426,7 @@ static void auto_delete(lv_obj_t * obj, uint32_t delay)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_time(&a, 0);
+    lv_anim_set_duration(&a, 0);
     lv_anim_set_delay(&a, delay);
     lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);

@@ -28,7 +28,7 @@ void lv_example_bar_3(void)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, set_temp);
-    lv_anim_set_time(&a, 3000);
+    lv_anim_set_duration(&a, 3000);
     lv_anim_set_playback_time(&a, 3000);
     lv_anim_set_var(&a, bar);
     lv_anim_set_values(&a, -20, 40);

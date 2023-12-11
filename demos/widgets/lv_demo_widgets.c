@@ -229,7 +229,7 @@ void lv_demo_widgets_start_slideshow(void)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
-    lv_anim_set_time(&a, t);
+    lv_anim_set_duration(&a, t);
     lv_anim_set_playback_time(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
@@ -696,7 +696,7 @@ static void analytics_create(lv_obj_t * parent)
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
-    lv_anim_set_time(&a, 4100);
+    lv_anim_set_duration(&a, 4100);
     lv_anim_set_playback_time(&a, 2700);
     lv_anim_start(&a);
 
@@ -712,7 +712,7 @@ static void analytics_create(lv_obj_t * parent)
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
-    lv_anim_set_time(&a, 2600);
+    lv_anim_set_duration(&a, 2600);
     lv_anim_set_playback_time(&a, 3200);
     lv_anim_start(&a);
 
@@ -728,7 +728,7 @@ static void analytics_create(lv_obj_t * parent)
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
-    lv_anim_set_time(&a, 2800);
+    lv_anim_set_duration(&a, 2800);
     lv_anim_set_playback_time(&a, 1800);
     lv_anim_start(&a);
 
@@ -858,7 +858,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_set_exec_cb(&a, scale3_anim_cb);
     lv_anim_set_var(&a, scale3);
-    lv_anim_set_time(&a, 4100);
+    lv_anim_set_duration(&a, 4100);
     lv_anim_set_playback_time(&a, 800);
     lv_anim_start(&a);
 
@@ -1127,7 +1127,7 @@ static void color_changer_event_cb(lv_event_t * e)
             lv_anim_set_var(&a, color_cont);
             lv_anim_set_exec_cb(&a, color_changer_anim_cb);
             lv_anim_set_values(&a, 0, 256);
-            lv_anim_set_time(&a, 200);
+            lv_anim_set_duration(&a, 200);
             lv_anim_start(&a);
         }
         else {
@@ -1136,7 +1136,7 @@ static void color_changer_event_cb(lv_event_t * e)
             lv_anim_set_var(&a, color_cont);
             lv_anim_set_exec_cb(&a, color_changer_anim_cb);
             lv_anim_set_values(&a, 256, 0);
-            lv_anim_set_time(&a, 200);
+            lv_anim_set_duration(&a, 200);
             lv_anim_start(&a);
         }
     }
@@ -1154,7 +1154,7 @@ static void color_event_cb(lv_event_t * e)
             lv_anim_set_var(&a, color_cont);
             lv_anim_set_exec_cb(&a, color_changer_anim_cb);
             lv_anim_set_values(&a, 0, 256);
-            lv_anim_set_time(&a, 200);
+            lv_anim_set_duration(&a, 200);
             lv_anim_start(&a);
         }
     }
@@ -1656,7 +1656,7 @@ static void slideshow_anim_ready_cb(lv_anim_t * a_old)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
-    lv_anim_set_time(&a, t);
+    lv_anim_set_duration(&a, t);
     lv_anim_set_playback_time(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);

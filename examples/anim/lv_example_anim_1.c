@@ -16,7 +16,7 @@ static void sw_event_cb(lv_event_t * e)
         lv_anim_init(&a);
         lv_anim_set_var(&a, label);
         lv_anim_set_values(&a, lv_obj_get_x(label), 100);
-        lv_anim_set_time(&a, 500);
+        lv_anim_set_duration(&a, 500);
         lv_anim_set_exec_cb(&a, anim_x_cb);
         lv_anim_set_path_cb(&a, lv_anim_path_overshoot);
         lv_anim_start(&a);
@@ -26,7 +26,7 @@ static void sw_event_cb(lv_event_t * e)
         lv_anim_init(&a);
         lv_anim_set_var(&a, label);
         lv_anim_set_values(&a, lv_obj_get_x(label), -lv_obj_get_width(label));
-        lv_anim_set_time(&a, 500);
+        lv_anim_set_duration(&a, 500);
         lv_anim_set_exec_cb(&a, anim_x_cb);
         lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
         lv_anim_start(&a);

@@ -61,7 +61,7 @@ void lv_spinner_set_anim_params(lv_obj_t * obj, uint32_t t, uint32_t angle)
     lv_anim_set_var(&a, obj);
     lv_anim_set_exec_cb(&a, arc_anim_end_angle);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    lv_anim_set_time(&a, t);
+    lv_anim_set_duration(&a, t);
     lv_anim_set_values(&a, angle, 360 + angle);
     lv_anim_start(&a);
 
