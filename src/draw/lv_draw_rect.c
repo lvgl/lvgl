@@ -77,13 +77,6 @@ void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_box_shadow_dsc_t);
 }
 
-void lv_draw_bg_image_dsc_init(lv_draw_bg_image_dsc_t * dsc)
-{
-    lv_memzero(dsc, sizeof(*dsc));
-    dsc->opa = LV_OPA_COVER;
-    dsc->base.dsc_size = sizeof(lv_draw_bg_image_dsc_t);
-}
-
 void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
 
@@ -178,9 +171,6 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
 
     /*Background image*/
     if(has_bg_img) {
-
-        t = lv_draw_add_task(layer, coords);
-
         lv_image_src_t src_type = lv_image_src_get_type(dsc->bg_image_src);
         lv_result_t res = LV_RESULT_OK;
         lv_image_header_t header;
@@ -195,20 +185,50 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         }
 
         if(res == LV_RESULT_OK) {
-            lv_draw_bg_image_dsc_t * bg_image_dsc = lv_malloc(sizeof(lv_draw_bg_image_dsc_t));
-            t->draw_dsc = bg_image_dsc;
-            bg_image_dsc->base = dsc->base;
-            bg_image_dsc->base.dsc_size = sizeof(lv_draw_bg_image_dsc_t);
-            bg_image_dsc->radius = dsc->radius;
-            bg_image_dsc->src = dsc->bg_image_src;
-            bg_image_dsc->font = dsc->bg_image_symbol_font;
-            bg_image_dsc->opa = dsc->bg_image_opa;
-            bg_image_dsc->recolor = dsc->bg_image_recolor;
-            bg_image_dsc->recolor_opa = dsc->bg_image_recolor_opa;
-            bg_image_dsc->tiled = dsc->bg_image_tiled;
-            bg_image_dsc->img_header = header;
-            t->type = LV_DRAW_TASK_TYPE_BG_IMG;
-            lv_draw_finalize_task_creation(layer, t);
+            if(src_type == LV_IMAGE_SRC_VARIABLE || src_type == LV_IMAGE_SRC_FILE) {
+
+                if(dsc->bg_image_tiled) {
+                    t = lv_draw_add_task(layer, coords);
+                }
+                else {
+                    lv_area_t a = {0, 0, header.w - 1, header.h - 1};
+                    lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);
+                    t = lv_draw_add_task(layer, &a);
+                }
+
+                lv_draw_image_dsc_t * bg_image_dsc = lv_malloc(sizeof(lv_draw_image_dsc_t));
+                lv_draw_image_dsc_init(bg_image_dsc);
+                t->draw_dsc = bg_image_dsc;
+                bg_image_dsc->base = dsc->base;
+                bg_image_dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
+                bg_image_dsc->src = dsc->bg_image_src;
+                bg_image_dsc->opa = dsc->bg_image_opa;
+                bg_image_dsc->recolor = dsc->bg_image_recolor;
+                bg_image_dsc->recolor_opa = dsc->bg_image_recolor_opa;
+                bg_image_dsc->tile = dsc->bg_image_tiled;
+                bg_image_dsc->header = header;
+                t->type = LV_DRAW_TASK_TYPE_IMAGE;
+                lv_draw_finalize_task_creation(layer, t);
+            }
+            else {
+                lv_point_t s;
+                lv_text_get_size(&s, dsc->bg_image_src, dsc->bg_image_symbol_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+                lv_area_t a = {0, 0, s.x - 1, s.y - 1};
+                lv_area_align(coords, &a, LV_ALIGN_CENTER, 0, 0);
+                t = lv_draw_add_task(layer, &a);
+
+                lv_draw_label_dsc_t * bg_label_dsc = lv_malloc(sizeof(lv_draw_label_dsc_t));
+                lv_draw_label_dsc_init(bg_label_dsc);
+                t->draw_dsc = bg_label_dsc;
+                bg_label_dsc->base = dsc->base;
+                bg_label_dsc->base.dsc_size = sizeof(lv_draw_label_dsc_t);
+                bg_label_dsc->color = dsc->bg_image_recolor;
+                bg_label_dsc->font = dsc->bg_image_symbol_font;
+                bg_label_dsc->text = dsc->bg_image_src;
+                t->type = LV_DRAW_TASK_TYPE_LABEL;
+                lv_draw_finalize_task_creation(layer, t);
+            }
         }
     }
 

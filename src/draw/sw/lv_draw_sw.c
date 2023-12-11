@@ -209,6 +209,7 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         task->preference_score = 100;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_SW;
     }
+
     return 0;
 }
 
@@ -283,9 +284,6 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
             break;
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
             lv_draw_sw_box_shadow((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
-            break;
-        case LV_DRAW_TASK_TYPE_BG_IMG:
-            lv_draw_sw_bg_image((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
             lv_draw_sw_label((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
