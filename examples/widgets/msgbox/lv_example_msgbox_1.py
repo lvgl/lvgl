@@ -1,10 +1,14 @@
 def event_cb(e):
-    mbox = e.get_target_obj()
-    print("Button %s clicked" % mbox.get_active_button_text())
+    btn = e.get_target_obj()
+    label = btn.get_child(btn)
+    print("Button %s clicked" % label.get_text())
 
-buttons = ["Apply", "Close", ""]
+mbox1 = lv.msgbox(lv.screen_active())
+mbox1.add_title("Hello")
+mbox1.add_text("This is a message box with two buttons")
+mbox1.add_close_button()
 
-mbox1 = lv.msgbox(lv.screen_active(), "Hello", "This is a message box with two buttons.", buttons, True)
-mbox1.add_event_cb(event_cb, lv.EVENT.VALUE_CHANGED, None)
-mbox1.center()
-
+btn = mbox1.add_footer_button("Apply")
+btn.add_event_cb(event_cb, lv.EVENT.CLICKED, None)
+btn = mbox1.add_footer_button("Cancel")
+btn.add_event_cb(event_cb, lv.EVENT.CLICKED, None)

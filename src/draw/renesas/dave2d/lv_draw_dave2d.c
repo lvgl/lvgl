@@ -273,9 +273,9 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
 #if USE_D2
-//TODO
-//                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-//                t->preference_score = 0;
+                //TODO
+                //                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
+                //                t->preference_score = 0;
 #endif
                 ret = 0;
                 break;
@@ -362,7 +362,7 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     return ret;
 }
 
-#define DAVE2D_REFFERING_WATERMARK  10
+#define DAVE2D_REFERRING_WATERMARK  10
 
 static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
@@ -395,7 +395,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
 #if  (0 == D2_RENDER_EACH_OPERATION)
     ref_count += lv_draw_get_dependent_count(t);
 
-    if(DAVE2D_REFFERING_WATERMARK < ref_count) {
+    if(DAVE2D_REFERRING_WATERMARK < ref_count) {
         ref_count = 0;
         dave2d_execute_dlist_and_flush();
     }
