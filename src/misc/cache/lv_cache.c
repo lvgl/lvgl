@@ -147,10 +147,12 @@ void     lv_cache_entry_set_generation(lv_cache_entry_t_ * entry, uint32_t gener
     LV_ASSERT_NULL(entry);
     entry->generation = generation;
 }
-uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t_ * entry){
+uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t_ * entry)
+{
     return entry->node_size;
 }
-void     lv_cache_entry_set_node_size(lv_cache_entry_t_ * entry, uint32_t node_size){
+void     lv_cache_entry_set_node_size(lv_cache_entry_t_ * entry, uint32_t node_size)
+{
     entry->node_size = node_size;
 }
 void  *  lv_cache_entry_get_data(lv_cache_entry_t_ * entry)
@@ -174,10 +176,12 @@ const lv_cache_t_ * lv_cache_entry_get_cache(const lv_cache_entry_t_ * entry)
     return entry->cache;
 }
 
-uint32_t lv_cache_entry_get_size(const uint32_t node_size) {
+uint32_t lv_cache_entry_get_size(const uint32_t node_size)
+{
     return node_size + sizeof(lv_cache_entry_t_);
 }
-lv_cache_entry_t_ * lv_cache_entry_alloc(const uint32_t node_size) {
+lv_cache_entry_t_ * lv_cache_entry_alloc(const uint32_t node_size)
+{
     void * res = lv_malloc_zeroed(lv_cache_entry_get_size(node_size));
     LV_ASSERT_MALLOC(res)
     if(res == NULL) {
@@ -188,7 +192,8 @@ lv_cache_entry_t_ * lv_cache_entry_alloc(const uint32_t node_size) {
     entry->node_size = node_size;
     return (lv_cache_entry_t_ *)((uint8_t *)entry + node_size);
 }
-void lv_cache_entry_free(lv_cache_entry_t_ * entry) {
+void lv_cache_entry_free(lv_cache_entry_t_ * entry)
+{
     void * data = lv_cache_entry_get_data(entry);
     lv_free(data);
 }

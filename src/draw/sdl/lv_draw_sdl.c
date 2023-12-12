@@ -60,37 +60,36 @@ static SDL_Texture * layer_get_texture(lv_layer_t * layer);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-static bool sdl_texture_cache_create_cb(void * node, void * user_data) {
-    cache_data_t * cached_data = node;
+static bool sdl_texture_cache_create_cb(cache_data_t * cached_data, void * user_data)
+{
+    LV_LOG_USER("SDL Cache Miss");
     return draw_to_texture((lv_draw_sdl_unit_t *)user_data, cached_data);
 }
 
-static void sdl_texture_cache_free_cb(void * node, void * user_data) {
-    const cache_data_t * d = node;
-    lv_free((void *)d->draw_dsc);
-    SDL_DestroyTexture(d->texture);
+static void sdl_texture_cache_free_cb(cache_data_t * cached_data, void * user_data)
+{
+    LV_LOG_USER("SDL Cache Free");
+    lv_free(cached_data->draw_dsc);
+    SDL_DestroyTexture(cached_data->texture);
 }
 
-static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const void* a, const void* b)
+static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const cache_data_t * lhs, const cache_data_t * rhs)
 {
-    const cache_data_t* d1 = a;
-    const cache_data_t* d2 = b;
+    if(lhs == rhs) return 0;
 
-    if (d1 == d2) return 0;
-
-    if (d1->w != d2->w) {
-        return d1->w > d2->w ? 1 : -1;
+    if(lhs->w != rhs->w) {
+        return lhs->w > rhs->w ? 1 : -1;
     }
-    if (d1->h != d2->h) {
-        return d1->h > d2->h ? 1 : -1;
+    if(lhs->h != rhs->h) {
+        return lhs->h > rhs->h ? 1 : -1;
     }
 
-    if (d1->draw_dsc->dsc_size != d2->draw_dsc->dsc_size) {
-        return d1->draw_dsc->dsc_size > d2->draw_dsc->dsc_size ? 1 : -1;
+    if(lhs->draw_dsc->dsc_size != rhs->draw_dsc->dsc_size) {
+        return lhs->draw_dsc->dsc_size > rhs->draw_dsc->dsc_size ? 1 : -1;
     }
 
-    if (memcmp(d1->draw_dsc, d2->draw_dsc, d1->draw_dsc->dsc_size)) {
-        return d1->draw_dsc > d2->draw_dsc ? 1 : -1;
+    if(memcmp(lhs->draw_dsc, rhs->draw_dsc, lhs->draw_dsc->dsc_size)) {
+        return lhs->draw_dsc > rhs->draw_dsc ? 1 : -1;
     };
 
     return 0;
@@ -102,9 +101,9 @@ void lv_draw_sdl_init(void)
     draw_sdl_unit->base_unit.dispatch_cb = dispatch;
     draw_sdl_unit->base_unit.evaluate_cb = evaluate;
     draw_sdl_unit->texture_cache = lv_cache_create_(&lv_lru_rb_class, sizeof(cache_data_t), 128,
-        sdl_texture_cache_compare_cb,
-        sdl_texture_cache_create_cb,
-        sdl_texture_cache_free_cb);
+                                                    (lv_cache_compare_cb_t)sdl_texture_cache_compare_cb,
+                                                    (lv_cache_create_cb_t)sdl_texture_cache_create_cb,
+                                                    (lv_cache_free_cb_t)sdl_texture_cache_free_cb);
 }
 
 /**********************
@@ -317,7 +316,7 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     lv_cache_lock();
     lv_cache_entry_t_ * entry_cached = lv_cache_get_or_create_(u->texture_cache, &data_to_find, u);
-    if (!entry_cached) {
+    if(!entry_cached) {
         lv_cache_unlock();
         return;
     }

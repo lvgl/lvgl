@@ -134,7 +134,7 @@ static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
 
     lv_memcpy(lru_node, &node, sizeof(void *));
     lv_memcpy(get_lru_node(lru, node), &lru_node, sizeof(void *));
-    lv_cache_entry_set_cache(entry, (const lv_cache_t_*)lru);
+    lv_cache_entry_set_cache(entry, (const lv_cache_t_ *)lru);
     lv_cache_entry_set_generation(entry, 0);
     lv_cache_entry_set_node_size(entry, lru->cache.node_size);
     goto FAILED_HANDLER3;
@@ -245,7 +245,7 @@ static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * ke
 
     while(lru->cache.size >= lru->cache.max_size) {
         lv_rb_node_t * tail = *(lv_rb_node_t **)_lv_ll_get_tail(&lru->ll);
-        void * search_key = (lv_cache_entry_t_ *)tail->data;
+        void * search_key = tail->data;
         cache->clz->drop_cb(cache, search_key, user_data);
     }
 
