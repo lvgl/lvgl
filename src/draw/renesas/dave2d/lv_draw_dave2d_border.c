@@ -56,7 +56,6 @@ static void dave2d_draw_border_simple(lv_draw_dave2d_unit_t * u, const lv_area_t
     int32_t y;
     bool is_common;
 
-
     is_common = _lv_area_intersect(&clip_area, outer_area, u->base_unit.clip_area);
     if(!is_common) return;
 
@@ -79,7 +78,6 @@ static void dave2d_draw_border_simple(lv_draw_dave2d_unit_t * u, const lv_area_t
     lv_area_move(&buffer_area, x, y);
     lv_area_move(&local_outer_area, x, y);
     lv_area_move(&local_inner_area, x, y);
-
 
 #if D2_RENDER_EACH_OPERATION
     d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
@@ -264,7 +262,6 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                      (d2_point)D2_FIX4(lv_area_get_height(&blend_area)));
     }
 
-
     if(left_side) {
         blend_area.x1 = outer_area.x1;
         blend_area.x2 = inner_area.x1 - 1;
@@ -288,7 +285,6 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                      (d2_point)D2_FIX4(lv_area_get_width(&blend_area)),
                      (d2_point)D2_FIX4(lv_area_get_height(&blend_area)));
     }
-
 
     /*Draw the corners*/
     int32_t blend_w;

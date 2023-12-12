@@ -39,7 +39,6 @@ typedef struct {
 #endif
 } lv_draw_dave2d_unit_t;
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

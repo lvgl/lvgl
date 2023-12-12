@@ -21,7 +21,6 @@ void lv_draw_dave2d_mask_rect(lv_draw_dave2d_unit_t * u, const lv_draw_mask_rect
     lv_area_move(&buffer_area, x, y);
     lv_area_move(&coordinates, x, y);
 
-
 #if LV_USE_OS
     lv_result_t  status;
     status = lv_mutex_lock(u->pd2Mutex);
@@ -40,7 +39,6 @@ void lv_draw_dave2d_mask_rect(lv_draw_dave2d_unit_t * u, const lv_draw_mask_rect
                    (d2_u32)lv_area_get_width(&u->base_unit.target_layer->buf_area),
                    (d2_u32)lv_area_get_height(&u->base_unit.target_layer->buf_area),
                    lv_draw_dave2d_cf_fb_get());
-
 
     d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1, (d2_border)clipped_area.x2,
                 (d2_border)clipped_area.y2);

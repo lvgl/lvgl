@@ -65,7 +65,6 @@ lv_ll_t  _ll_Dave2D_Tasks;
     lv_mutex_t xd2Semaphore;
 #endif
 
-
 /**********************
  *      MACROS
  **********************/
@@ -427,8 +426,6 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     return 1;
 }
 
-
-
 #if LV_USE_OS
 static void _dave2d_render_thread_cb(void * ptr)
 {
@@ -584,8 +581,6 @@ static d2_s32 lv_dave2d_init(void)
 
     return result;
 }
-
-
 
 void dave2d_execute_dlist_and_flush(void)
 {

@@ -4,7 +4,6 @@
 static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
 
-
 static lv_draw_dave2d_unit_t * unit = NULL;
 
 void lv_draw_dave2d_label(lv_draw_dave2d_unit_t * u, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
@@ -67,7 +66,6 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
 
     current_fillmode = d2_getfillmode(unit->d2_handle);
 
-
     d2_cliprect(unit->d2_handle, (d2_border)clip_area.x1, (d2_border)clip_area.y1, (d2_border)clip_area.x2,
                 (d2_border)clip_area.y2);
 
@@ -124,7 +122,6 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
                          (d2_point)D2_FIX4(lv_area_get_width(&letter_coords)),
                          (d2_point)D2_FIX4(lv_area_get_height(&letter_coords)));
 
-
             d2_setfillmode(unit->d2_handle, current_fillmode);
         }
         else if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE) {
@@ -153,7 +150,6 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
         //lv_draw_sw_fill(u, fill_draw_dsc, fill_area);
         lv_draw_dave2d_fill(unit, fill_draw_dsc, fill_area);
     }
-
 
 #if LV_USE_OS
     status = lv_mutex_unlock(unit->pd2Mutex);

@@ -113,7 +113,6 @@ d2_u32 lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(lv_color_format_t colour_format)
     return d2_lvgl_mode;
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

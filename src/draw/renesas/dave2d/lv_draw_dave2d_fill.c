@@ -1,7 +1,6 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 
-
 void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_area_t draw_area;
@@ -50,7 +49,6 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                    (d2_u32)lv_area_get_width(&buffer_area),
                    (d2_u32)lv_area_get_height(&buffer_area),
                    lv_draw_dave2d_cf_fb_get());
-
 
     if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
         float a1;
@@ -136,7 +134,6 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
         d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(dsc->color));
         d2_setalpha(u->d2_handle, dsc->opa);
     }
-
 
     d2_cliprect(u->d2_handle, (d2_border)draw_area.x1, (d2_border)draw_area.y1, (d2_border)draw_area.x2,
                 (d2_border)draw_area.y2);

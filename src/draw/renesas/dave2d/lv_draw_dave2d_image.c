@@ -14,13 +14,10 @@
 #include "../../../stdlib/lv_string.h"
 #include "../../../core/lv_global.h"
 
-
-
 /*********************
  *      DEFINES
  *********************/
 #define MAX_BUF_SIZE (uint32_t) (4 * lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing()) * lv_color_format_get_size(lv_display_get_color_format(_lv_refr_get_disp_refreshing())))
-
 
 static void dave2d_img_draw_normal(lv_draw_dave2d_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                                    const lv_area_t * coords);
@@ -186,7 +183,6 @@ static void dave2d_img_draw_core(lv_draw_dave2d_unit_t * u, const lv_draw_image_
     d2_u8 current_fill_mode;
     d2_u32 src_blend_mode;
     d2_u32 dst_blend_mode;
-
 
     if(LV_COLOR_FORMAT_RGB565A8 == header->cf) {
         /* Colour format not support by Dave2D */

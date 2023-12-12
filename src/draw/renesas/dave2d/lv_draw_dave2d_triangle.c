@@ -1,7 +1,6 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 
-
 void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_dsc_t * dsc)
 {
     lv_area_t clipped_area;
@@ -16,7 +15,6 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
     tri_area.y1 = LV_MIN3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
     tri_area.x2 = LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
     tri_area.y2 = LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
-
 
     if(!_lv_area_intersect(&clipped_area, &tri_area, u->base_unit.clip_area)) return;
 
@@ -49,7 +47,6 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
      * [0]: top
      * [1]: right bottom
      * [2]: left bottom */
-
 
     if(dsc->p[0].y <= dsc->p[1].y && dsc->p[0].y <= dsc->p[2].y) {
         p[0] = dsc->p[0];
@@ -153,7 +150,6 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
                    (d2_u32)lv_area_get_height(&buffer_area),
                    lv_draw_dave2d_cf_fb_get());
 
-
     d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1, (d2_border)clipped_area.x2,
                 (d2_border)clipped_area.y2);
 
@@ -176,17 +172,14 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
 
     d2_setalphamode(u->d2_handle, current_alpha_mode);
 
-
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
     if(LV_RESULT_OK != status) {
         __BKPT(0);
     }
 
-
 #endif
 
 }
-
 
 #endif /*LV_USE_DRAW_DAVE2D*/

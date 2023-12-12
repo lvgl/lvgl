@@ -180,7 +180,6 @@ void lv_init(void)
     lv_draw_sdl_init();
 #endif
 
-
     _lv_obj_style_init();
 
     /*Initialize the screen refresh system*/

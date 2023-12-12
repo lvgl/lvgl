@@ -1,7 +1,6 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 
-
 void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * dsc)
 {
 
@@ -16,7 +15,6 @@ void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * d
     lv_value_precise_t p2_y;
     int32_t x;
     int32_t y;
-
 
     clip_line.x1 = LV_MIN(dsc->p1.x, dsc->p2.x) - dsc->width / 2;
     clip_line.x2 = LV_MAX(dsc->p1.x, dsc->p2.x) + dsc->width / 2;
@@ -69,9 +67,7 @@ void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * d
 
     d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(dsc->color));
 
-
     d2_setalpha(u->d2_handle, dsc->opa);
-
 
     d2_cliprect(u->d2_handle, clip_line.x1, clip_line.y1, clip_line.x2, clip_line.y2);
 
@@ -83,7 +79,6 @@ void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * d
     }
 
     d2_setlinecap(u->d2_handle, mode);
-
 
     d2_renderline(u->d2_handle, D2_FIX4(p1_x), D2_FIX4(p1_y), D2_FIX4(p2_x),
                   D2_FIX4(p2_y), D2_FIX4(dsc->width), d2_le_exclude_none);

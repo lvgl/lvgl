@@ -63,7 +63,6 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
 
     d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(dsc->color));
 
-
     result = d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1, (d2_border)clipped_area.x2,
                          (d2_border)clipped_area.y2);
     if(D2_OK != result) {
@@ -110,14 +109,12 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
             __BKPT(0);
         }
 
-
         if(dsc->rounded) {
             lv_point_t start_coord;
             lv_point_t end_coord;
 
             start_coord.x = arc_centre.x + (int16_t)(((dsc->radius - dsc->width / 2) * cos_start) >> LV_TRIGO_SHIFT);
             start_coord.y = arc_centre.y + (int16_t)(((dsc->radius - dsc->width / 2) * sin_start) >> LV_TRIGO_SHIFT);
-
 
             /** Render a circle. */
             d2_rendercircle(u->d2_handle,
