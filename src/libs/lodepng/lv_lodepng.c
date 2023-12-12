@@ -20,9 +20,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    void * dummy;
-} cache_data_t;
 
 /**********************
  *  STATIC PROTOTYPES
