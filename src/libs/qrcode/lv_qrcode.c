@@ -63,11 +63,12 @@ void lv_qrcode_set_size(lv_obj_t * obj, int32_t size)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_image_dsc_t * img_dsc = lv_canvas_get_image(obj);
-    void * buf = (void *)img_dsc->data;
+    void * buf = (void *)lv_canvas_get_buf(obj);
+    if(buf) lv_draw_buf_free(buf);
 
-    uint32_t buf_size = LV_CANVAS_BUF_SIZE(size, size, 1, LV_DRAW_BUF_STRIDE_ALIGN);
-    buf = lv_realloc(buf, buf_size);
+    size_t buf_size = lv_draw_buf_width_to_stride(size, LV_COLOR_FORMAT_I1) * size;
+    buf_size += 8; /*palette*/
+    buf = lv_draw_buf_malloc(buf_size, LV_COLOR_FORMAT_I1);
     LV_ASSERT_MALLOC(buf);
     if(buf == NULL) {
         LV_LOG_ERROR("malloc failed for canvas buffer");
@@ -155,7 +156,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
     /* Copy the qr code canvas:
      * A simple `lv_canvas_set_px` would work but it's slow for so many pixels.
      * So buffer 1 byte (8 px) from the qr code and set it in the canvas image */
-    uint32_t row_byte_cnt = (img_dsc->header.w + 7) >> 3;
+    uint32_t row_byte_cnt = img_dsc->header.stride;
     int y;
     for(y = margin; y < scaled + margin; y += scale) {
         uint8_t b = 0;
@@ -234,7 +235,7 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         return;
     }
 
-    lv_free((void *)lv_canvas_get_image(obj));
+    lv_draw_buf_free((void *)lv_canvas_get_buf(obj));
     img_dsc->data = NULL;
 }
 
