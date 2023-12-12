@@ -205,6 +205,21 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    switch(task->type) {
+        case LV_DRAW_TASK_TYPE_IMAGE:
+        case LV_DRAW_TASK_TYPE_LAYER: {
+                lv_draw_image_dsc_t * draw_dsc = task->draw_dsc;
+
+                /* not support skew */
+                if(draw_dsc->skew_x != 0 || draw_dsc->skew_y != 0) {
+                    return 0;
+                }
+            }
+            break;
+        default:
+            break;
+    }
+
     if(task->preference_score >= 100) {
         task->preference_score = 100;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_SW;
