@@ -122,6 +122,18 @@ static inline int32_t lv_obj_get_style_transform_pivot_y(const struct _lv_obj_t 
     return (int32_t)v.num;
 }
 
+static inline int32_t lv_obj_get_style_transform_skew_x(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_SKEW_X);
+    return (int32_t)v.num;
+}
+
+static inline int32_t lv_obj_get_style_transform_skew_y(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSFORM_SKEW_Y);
+    return (int32_t)v.num;
+}
+
 static inline int32_t lv_obj_get_style_pad_top(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_PAD_TOP);
@@ -208,8 +220,7 @@ static inline lv_color_t lv_obj_get_style_bg_grad_color(const struct _lv_obj_t *
 
 static inline lv_color_t lv_obj_get_style_bg_grad_color_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                           LV_STYLE_BG_GRAD_COLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BG_GRAD_COLOR));
     return v.color;
 }
 
@@ -269,8 +280,7 @@ static inline lv_color_t lv_obj_get_style_bg_image_recolor(const struct _lv_obj_
 
 static inline lv_color_t lv_obj_get_style_bg_image_recolor_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                           LV_STYLE_BG_IMAGE_RECOLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BG_IMAGE_RECOLOR));
     return v.color;
 }
 
@@ -294,8 +304,7 @@ static inline lv_color_t lv_obj_get_style_border_color(const struct _lv_obj_t * 
 
 static inline lv_color_t lv_obj_get_style_border_color_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                           LV_STYLE_BORDER_COLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BORDER_COLOR));
     return v.color;
 }
 
@@ -337,8 +346,7 @@ static inline lv_color_t lv_obj_get_style_outline_color(const struct _lv_obj_t *
 
 static inline lv_color_t lv_obj_get_style_outline_color_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                           LV_STYLE_OUTLINE_COLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_OUTLINE_COLOR));
     return v.color;
 }
 
@@ -386,8 +394,7 @@ static inline lv_color_t lv_obj_get_style_shadow_color(const struct _lv_obj_t * 
 
 static inline lv_color_t lv_obj_get_style_shadow_color_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                           LV_STYLE_SHADOW_COLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_SHADOW_COLOR));
     return v.color;
 }
 
@@ -411,8 +418,7 @@ static inline lv_color_t lv_obj_get_style_image_recolor(const struct _lv_obj_t *
 
 static inline lv_color_t lv_obj_get_style_image_recolor_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
-                                                                                           LV_STYLE_IMAGE_RECOLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_IMAGE_RECOLOR));
     return v.color;
 }
 
@@ -572,8 +578,7 @@ static inline lv_opa_t lv_obj_get_style_opa_layered(const struct _lv_obj_t * obj
     return (lv_opa_t)v.num;
 }
 
-static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc(const struct _lv_obj_t * obj,
-                                                                              uint32_t part)
+static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_COLOR_FILTER_DSC);
     return (const lv_color_filter_dsc_t *)v.ptr;
@@ -729,6 +734,8 @@ void lv_obj_set_style_transform_scale_y(struct _lv_obj_t * obj, int32_t value, l
 void lv_obj_set_style_transform_rotation(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transform_pivot_x(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transform_pivot_y(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
+void lv_obj_set_style_transform_skew_x(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
+void lv_obj_set_style_transform_skew_y(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_pad_top(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_pad_bottom(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_pad_left(struct _lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
@@ -793,13 +800,11 @@ void lv_obj_set_style_radius(struct _lv_obj_t * obj, int32_t value, lv_style_sel
 void lv_obj_set_style_clip_corner(struct _lv_obj_t * obj, bool value, lv_style_selector_t selector);
 void lv_obj_set_style_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_opa_layered(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
-void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value,
-                                       lv_style_selector_t selector);
+void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_color_filter_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim(struct _lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_time(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
-void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value,
-                                 lv_style_selector_t selector);
+void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_blend_mode(struct _lv_obj_t * obj, lv_blend_mode_t value, lv_style_selector_t selector);
 void lv_obj_set_style_layout(struct _lv_obj_t * obj, uint16_t value, lv_style_selector_t selector);
 void lv_obj_set_style_base_dir(struct _lv_obj_t * obj, lv_base_dir_t value, lv_style_selector_t selector);
@@ -808,8 +813,7 @@ void lv_obj_set_style_flex_main_place(struct _lv_obj_t * obj, lv_flex_align_t va
 void lv_obj_set_style_flex_cross_place(struct _lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
 void lv_obj_set_style_flex_track_place(struct _lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
 void lv_obj_set_style_flex_grow(struct _lv_obj_t * obj, uint8_t value, lv_style_selector_t selector);
-void lv_obj_set_style_grid_column_dsc_array(struct _lv_obj_t * obj, const int32_t * value,
-                                            lv_style_selector_t selector);
+void lv_obj_set_style_grid_column_dsc_array(struct _lv_obj_t * obj, const int32_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_grid_column_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector);
 void lv_obj_set_style_grid_row_dsc_array(struct _lv_obj_t * obj, const int32_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_grid_row_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector);
