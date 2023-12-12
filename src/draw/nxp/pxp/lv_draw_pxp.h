@@ -45,9 +45,6 @@ void lv_draw_pxp_init(void);
 
 void lv_draw_pxp_deinit(void);
 
-void lv_draw_pxp_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_image_dsc_t * dsc,
-                        const lv_area_t * coords);
-
 void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                       const lv_area_t * coords);
 
