@@ -39,7 +39,6 @@ static void  drop_all_cb(lv_cache_t_ * cache, void * user_data);
 
 static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data);
 inline static void ** get_lru_node(lv_lru_rb_t_ * lru, lv_rb_node_t * node);
-static lv_rb_compare_res_t _rb_compare_inner(const void * a, const lv_cache_entry_t_ * b);
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -121,13 +120,8 @@ static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
     if(node == NULL)
         goto FAILED_HANDLER3;
 
-    lv_cache_entry_t_ * entry = (lv_cache_entry_t_ *)node->data;
-    void * data = lv_malloc(lru->cache.node_size);
-    LV_ASSERT_MALLOC(data);
-    if(data == NULL)
-        goto FAILED_HANDLER2;
-
-    lv_cache_entry_set_data(entry, data);
+    void * data = node->data;
+    lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(data, lru->cache.node_size);
     lv_memcpy(data, key, lru->cache.node_size);
 
     bool alloc_res = lru->cache.create_cb(data, user_data);
@@ -141,6 +135,8 @@ static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
     lv_memcpy(lru_node, &node, sizeof(void *));
     lv_memcpy(get_lru_node(lru, node), &lru_node, sizeof(void *));
     lv_cache_entry_set_cache(entry, (const lv_cache_t_*)lru);
+    lv_cache_entry_set_generation(entry, 0);
+    lv_cache_entry_set_node_size(entry, lru->cache.node_size);
     goto FAILED_HANDLER3;
 
 FAILED_HANDLER1:
@@ -186,13 +182,13 @@ static bool  init_cb(lv_cache_t_ * cache)
     }
 
     /*add void* to store the ll node pointer*/
-    if(!lv_rb_init(&lru->rb, (lv_rb_compare_t)_rb_compare_inner,  lv_cache_entry_get_size() + sizeof(void *))) {
+    if(!lv_rb_init(&lru->rb, lru->cache.compare_cb,   lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
         return NULL;
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
 
     lv_lru_rb_set_max_size(lru, lru->cache.max_size, NULL);
-    lv_lru_rb_set_compare_cb(lru, (lv_rb_compare_t)_rb_compare_inner, NULL);
+    lv_lru_rb_set_compare_cb(lru, (lv_rb_compare_t)lru->cache.compare_cb, NULL);
     lv_lru_rb_set_create_cb(lru, lru->cache.create_cb, NULL);
     lv_lru_rb_set_free_cb(lru, lru->cache.free_cb, NULL);
 
@@ -229,8 +225,8 @@ static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * ke
     void * head = _lv_ll_get_head(&lru->ll);
     if(head) {
         lv_rb_node_t * node = *(lv_rb_node_t **)head;
-        lv_cache_entry_t_ * entry = (lv_cache_entry_t_ *)node->data;
-        void * data = lv_cache_entry_get_data(entry);
+        void * data = node->data;
+        lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(data, cache->node_size);
         if(lru->cache.compare_cb(data, key) == 0) {
             return entry;
         }
@@ -243,14 +239,13 @@ static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * ke
         head = _lv_ll_get_head(&lru->ll);
         _lv_ll_move_before(&lru->ll, lru_node, head);
 
-        lv_cache_entry_t_ * entry = (lv_cache_entry_t_ *)node->data;
+        lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(node->data, cache->node_size);
         return entry;
     }
 
     while(lru->cache.size >= lru->cache.max_size) {
         lv_rb_node_t * tail = *(lv_rb_node_t **)_lv_ll_get_tail(&lru->ll);
-        lv_cache_entry_t_ * entry = (lv_cache_entry_t_ *)tail->data;
-        void * search_key = lv_cache_entry_get_data(entry);
+        void * search_key = (lv_cache_entry_t_ *)tail->data;
         cache->clz->drop_cb(cache, search_key, user_data);
     }
 
@@ -262,7 +257,7 @@ static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * ke
 
     lru->cache.size++;
 
-    lv_cache_entry_t_ * entry = (lv_cache_entry_t_ *)new_node->data;
+    lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(new_node->data, cache->node_size);
     return entry;
 }
 
@@ -282,14 +277,12 @@ static void  drop_cb(lv_cache_t_ * cache, const void * key, void * user_data)
         return;
     }
 
-    lv_cache_entry_t_ * entry = (lv_cache_entry_t_ *)node->data;
-    void * data = lv_cache_entry_get_data(entry);
+    void * data = node->data;
 
     lru->cache.free_cb(data, user_data);
 
     void * lru_node = *get_lru_node(lru, node);
     lv_rb_drop(&lru->rb, key);
-    lv_free(data);
     _lv_ll_remove(&lru->ll, lru_node);
     lv_free(lru_node);
 
@@ -318,8 +311,3 @@ static void  drop_all_cb(lv_cache_t_ * cache, void * user_data)
     lru->cache.size = 0;
 }
 
-static lv_rb_compare_res_t _rb_compare_inner(const void * a, const lv_cache_entry_t_ * b)
-{
-    const lv_cache_t_ * cache = lv_cache_entry_get_cache(b);
-    return cache->compare_cb(a, lv_cache_entry_get_data((lv_cache_entry_t_*)b));
-}

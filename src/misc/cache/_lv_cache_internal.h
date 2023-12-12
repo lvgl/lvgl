@@ -74,12 +74,16 @@ void     lv_cache_entry_ref_dec(lv_cache_entry_t_ * entry);
 uint32_t lv_cache_entry_get_generation(lv_cache_entry_t_ * entry);
 void     lv_cache_entry_inc_generation(lv_cache_entry_t_ * entry);
 void     lv_cache_entry_set_generation(lv_cache_entry_t_ * entry, uint32_t generation);
+uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t_ * entry);
+void     lv_cache_entry_set_node_size(lv_cache_entry_t_ * entry, uint32_t node_size);
 void  *  lv_cache_entry_get_data(lv_cache_entry_t_ * entry);
-void     lv_cache_entry_set_data(lv_cache_entry_t_ * entry, void * data);
+lv_cache_entry_t_ * lv_cache_entry_get_entry(void * data, const uint32_t node_size);
 void     lv_cache_entry_set_cache(lv_cache_entry_t_ * entry, const lv_cache_t_ * cache);
 const lv_cache_t_ * lv_cache_entry_get_cache(const lv_cache_entry_t_ * entry);
 
-uint32_t lv_cache_entry_get_size();
+uint32_t lv_cache_entry_get_size(const uint32_t node_size);
+lv_cache_entry_t_ * lv_cache_entry_alloc(const uint32_t node_size);
+void lv_cache_entry_free(lv_cache_entry_t_ * entry);
 /*************************
  *    GLOBAL VARIABLES
  *************************/

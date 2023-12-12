@@ -17,11 +17,10 @@
  *      TYPEDEFS
  **********************/
 struct _lv_cache_entry_t_ {
-    void * data;
-
     const lv_cache_t_ * cache;
     uint32_t ref_cnt;
     uint32_t generation;
+    uint32_t node_size;
 };
 /**********************
  *  STATIC PROTOTYPES
@@ -148,15 +147,21 @@ void     lv_cache_entry_set_generation(lv_cache_entry_t_ * entry, uint32_t gener
     LV_ASSERT_NULL(entry);
     entry->generation = generation;
 }
+uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t_ * entry){
+    return entry->node_size;
+}
+void     lv_cache_entry_set_node_size(lv_cache_entry_t_ * entry, uint32_t node_size){
+    entry->node_size = node_size;
+}
 void  *  lv_cache_entry_get_data(lv_cache_entry_t_ * entry)
 {
     LV_ASSERT_NULL(entry);
-    return entry->data;
+    return (uint8_t *)entry - entry->node_size;
 }
-void     lv_cache_entry_set_data(lv_cache_entry_t_ * entry, void * data)
+lv_cache_entry_t_ * lv_cache_entry_get_entry(void * data, const uint32_t node_size)
 {
-    LV_ASSERT_NULL(entry);
-    entry->data = data;
+    LV_ASSERT_NULL(data);
+    return (lv_cache_entry_t_ *)((uint8_t *)data + node_size);
 }
 void     lv_cache_entry_set_cache(lv_cache_entry_t_ * entry, const lv_cache_t_ * cache)
 {
@@ -169,8 +174,23 @@ const lv_cache_t_ * lv_cache_entry_get_cache(const lv_cache_entry_t_ * entry)
     return entry->cache;
 }
 
-uint32_t lv_cache_entry_get_size() {
-    return sizeof(lv_cache_entry_t_);
+uint32_t lv_cache_entry_get_size(const uint32_t node_size) {
+    return node_size + sizeof(lv_cache_entry_t_);
+}
+lv_cache_entry_t_ * lv_cache_entry_alloc(const uint32_t node_size) {
+    void * res = lv_malloc_zeroed(lv_cache_entry_get_size(node_size));
+    LV_ASSERT_MALLOC(res)
+    if(res == NULL) {
+        LV_LOG_ERROR("lv_cache_entry_alloc: malloc failed");
+        return NULL;
+    }
+    lv_cache_entry_t_ * entry = (lv_cache_entry_t_ *)res;
+    entry->node_size = node_size;
+    return (lv_cache_entry_t_ *)((uint8_t *)entry + node_size);
+}
+void lv_cache_entry_free(lv_cache_entry_t_ * entry) {
+    void * data = lv_cache_entry_get_data(entry);
+    lv_free(data);
 }
 /**********************
  *   STATIC FUNCTIONS
