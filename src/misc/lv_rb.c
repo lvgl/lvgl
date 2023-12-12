@@ -311,13 +311,13 @@ lv_rb_node_t * lv_rb_maximum_from(lv_rb_node_t * node)
 
 static lv_rb_node_t * rb_create_node(lv_rb_t * tree)
 {
-    lv_rb_node_t * node = lv_malloc(sizeof(lv_rb_node_t));
+    lv_rb_node_t * node = lv_malloc_zeroed(sizeof(lv_rb_node_t));
     LV_ASSERT_MALLOC(node);
     if(node == NULL) {
         return NULL;
     }
 
-    node->data = lv_malloc(tree->size);
+    node->data = lv_malloc_zeroed(tree->size);
     LV_ASSERT_MALLOC(node->data);
     if(node->data == NULL) {
         lv_free(node);
