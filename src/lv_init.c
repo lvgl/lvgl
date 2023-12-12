@@ -32,6 +32,9 @@
 #if LV_USE_DRAW_PXP
     #include "draw/nxp/pxp/lv_draw_pxp.h"
 #endif
+#if LV_USE_DRAW_DAVE2D
+    #include "draw/renesas/dave2d/lv_draw_dave2d.h"
+#endif
 #if LV_USE_DRAW_SDL
     #include "draw/sdl/lv_draw_sdl.h"
 #endif
@@ -169,9 +172,14 @@ void lv_init(void)
     lv_draw_pxp_init();
 #endif
 
+#if LV_USE_DRAW_DAVE2D
+    lv_draw_dave2d_init();
+#endif
+
 #if LV_USE_DRAW_SDL
     lv_draw_sdl_init();
 #endif
+
 
     _lv_obj_style_init();
 
