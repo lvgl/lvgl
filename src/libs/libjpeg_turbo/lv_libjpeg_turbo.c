@@ -36,7 +36,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                 const lv_image_decoder_args_t * args);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
-static const void * decode_jpeg_file(const char * filename, size_t * size);
+static lv_draw_buf_t * decode_jpeg_file(const char * filename);
 static bool get_jpeg_size(const char * filename, uint32_t * width, uint32_t * height);
 static void error_exit(j_common_ptr cinfo);
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
@@ -161,11 +161,15 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         const char * fn = dsc->src;
         size_t decoded_size = 0;
         uint32_t t = lv_tick_get();
-        const void * decoded_img = decode_jpeg_file(fn, &decoded_size);
+        lv_draw_buf_t * decoded = decode_jpeg_file(fn);
+        if(decoded == NULL) {
+            LV_LOG_WARN("decode jpeg file failed");
+            return LV_RESULT_INVALID;
+        }
         t = lv_tick_elaps(t);
 
         lv_cache_lock();
-        lv_cache_entry_t * cache = lv_cache_add(decoded_img, decoded_size, decoder->cache_data_type,
+        lv_cache_entry_t * cache = lv_cache_add(decoded, decoded_size, decoder->cache_data_type,
                                                 decoded_size);
         if(cache == NULL) {
             lv_cache_unlock();
@@ -183,7 +187,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             cache->src = dsc->src;
         }
 
-        dsc->img_data = lv_cache_get_data(cache);
+        dsc->decoded = lv_cache_get_data(cache);
         dsc->cache_entry = cache;
 
         lv_cache_unlock();
@@ -212,7 +216,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 
         lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, fn, LV_CACHE_SRC_TYPE_PATH);
         if(cache) {
-            dsc->img_data = lv_cache_get_data(cache);
+            dsc->decoded = lv_cache_get_data(cache);
             dsc->cache_entry = cache;     /*Save the cache to release it in decoder_close*/
             lv_cache_unlock();
             return LV_RESULT_OK;
@@ -278,7 +282,7 @@ failed:
     return data;
 }
 
-static const void * decode_jpeg_file(const char * filename, size_t * size)
+static lv_draw_buf_t * decode_jpeg_file(const char * filename)
 {
     /* This struct contains the JPEG decompression parameters and pointers to
      * working space (which is allocated as needed by the JPEG library).
@@ -370,17 +374,16 @@ static const void * decode_jpeg_file(const char * filename, size_t * size)
      * In this example, we need to make an output work buffer of the right size.
      */
     /* JSAMPLEs per row in output buffer */
+    lv_draw_buf_t * decoded;
     row_stride = cinfo.output_width * cinfo.output_components;
     /* Make a one-row-high sample array that will go away when done with image */
     buffer = (*cinfo.mem->alloc_sarray)
              ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-    size_t output_buffer_size = cinfo.output_width * cinfo.output_height * JPEG_PIXEL_SIZE;
-    output_buffer = lv_draw_buf_malloc(output_buffer_size, LV_COLOR_FORMAT_RGB888);
-    if(output_buffer) {
-        uint8_t * cur_pos = output_buffer;
+    decoded = lv_draw_buf_create(cinfo.output_width, cinfo.output_height, LV_COLOR_FORMAT_RGB888, 0);
+    if(decoded != NULL) {
+        uint8_t * cur_pos = decoded->data;
         size_t stride = cinfo.output_width * JPEG_PIXEL_SIZE;
-        if(size) *size = output_buffer_size;
 
         /* while (scan lines remain to be read) */
         /* jpeg_read_scanlines(...); */
@@ -397,7 +400,7 @@ static const void * decode_jpeg_file(const char * filename, size_t * size)
 
             /* Assume put_scanline_someplace wants a pointer and sample count. */
             lv_memcpy(cur_pos, buffer[0], stride);
-            cur_pos += stride;
+            cur_pos += decoded->header.stride;
         }
     }
 
@@ -426,7 +429,7 @@ static const void * decode_jpeg_file(const char * filename, size_t * size)
     */
 
     /* And we're done! */
-    return output_buffer;
+    return decoded;
 }
 
 static bool get_jpeg_size(const char * filename, uint32_t * width, uint32_t * height)
@@ -482,7 +485,7 @@ static void error_exit(j_common_ptr cinfo)
 static void cache_invalidate_cb(lv_cache_entry_t * entry)
 {
     if(entry->src_type == LV_CACHE_SRC_TYPE_PATH) lv_free((void *)entry->src);
-    lv_free((void *)entry->data);
+    lv_draw_buf_destroy((lv_draw_buf_t *)entry->data);
 }
 
 #endif /*LV_USE_LIBJPEG_TURBO*/

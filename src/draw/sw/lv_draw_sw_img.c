@@ -253,7 +253,7 @@ static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_
     sup.palette_size = decoder_dsc->palette_size;
 
     /*The whole image is available, just draw it*/
-    if(decoder_dsc->img_data) {
+    if(decoder_dsc->decoded || decoder_dsc->img_data) {
         img_draw_core(draw_unit, draw_dsc, decoder_dsc, &sup, img_area, clipped_img_area);
     }
     /*Draw in smaller pieces*/
@@ -298,7 +298,13 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     uint32_t img_stride = header->stride;
     lv_color_format_t cf = header->cf;
 
-    cf = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf,
+    cf = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
+
+    if(decoder_dsc->decoded) {
+        src_buf = decoder_dsc->decoded->data;
+        img_stride = decoder_dsc->decoded->header.stride;
+        cf = decoder_dsc->decoded->header.cf;
+    }
 
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
     blend_dsc.opa = draw_dsc->opa;
