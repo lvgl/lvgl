@@ -129,7 +129,7 @@ typedef struct {
 #endif
 
 #if LV_USE_MSGBOX
-    lv_style_t msgbox_bg, msgbox_button_bg, msgbox_backdrop_bg;
+    lv_style_t msgbox_backdrop_bg;
 #endif
 
 #if LV_USE_KEYBOARD
@@ -585,13 +585,6 @@ static void style_init(struct _my_theme_t * theme)
 #endif
 
 #if LV_USE_MSGBOX
-    /*To add space for for the button shadow*/
-    style_init_reset(&theme->styles.msgbox_button_bg);
-    lv_style_set_pad_all(&theme->styles.msgbox_button_bg, _LV_DPX_CALC(theme->disp_dpi, 4));
-
-    style_init_reset(&theme->styles.msgbox_bg);
-    lv_style_set_max_width(&theme->styles.msgbox_bg, lv_pct(100));
-
     style_init_reset(&theme->styles.msgbox_backdrop_bg);
     lv_style_set_bg_color(&theme->styles.msgbox_backdrop_bg, lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_bg_opa(&theme->styles.msgbox_backdrop_bg, LV_OPA_100);
@@ -852,19 +845,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_BTNMATRIX
     else if(lv_obj_check_type(obj, &lv_buttonmatrix_class)) {
-#if LV_USE_MSGBOX
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
-            lv_obj_add_style(obj, &theme->styles.msgbox_button_bg, 0);
-            lv_obj_add_style(obj, &theme->styles.pad_gap, 0);
-            lv_obj_add_style(obj, &theme->styles.btn, LV_PART_ITEMS);
-            lv_obj_add_style(obj, &theme->styles.pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
-            lv_obj_add_style(obj, &theme->styles.disabled, LV_PART_ITEMS | LV_STATE_DISABLED);
-            lv_obj_add_style(obj, &theme->styles.bg_color_primary, LV_PART_ITEMS | LV_STATE_CHECKED);
-            lv_obj_add_style(obj, &theme->styles.bg_color_primary_muted, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
-            lv_obj_add_style(obj, &theme->styles.bg_color_secondary_muted, LV_PART_ITEMS | LV_STATE_EDITED);
-            return;
-        }
-#endif
 
 #if LV_USE_CALENDAR
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
@@ -1161,13 +1141,42 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_MSGBOX
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
-        lv_obj_add_style(obj, &theme->styles.msgbox_bg, 0);
+        lv_obj_add_style(obj, &theme->styles.pad_zero, 0);
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_backdrop_class)) {
         lv_obj_add_style(obj, &theme->styles.msgbox_backdrop_bg, 0);
+        return;
     }
+    else if(lv_obj_check_type(obj, &lv_msgbox_header_class)) {
+        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        lv_obj_add_style(obj, &theme->styles.bg_color_grey, 0);
+        return;
+    }
+    else if(lv_obj_check_type(obj, &lv_msgbox_footer_class)) {
+        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        return;
+    }
+    else if(lv_obj_check_type(obj, &lv_msgbox_header_button_class) ||
+            lv_obj_check_type(obj, &lv_msgbox_footer_button_class)) {
+        lv_obj_add_style(obj, &theme->styles.btn, 0);
+        lv_obj_add_style(obj, &theme->styles.bg_color_primary, 0);
+        lv_obj_add_style(obj, &theme->styles.transition_delayed, 0);
+        lv_obj_add_style(obj, &theme->styles.pressed, LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &theme->styles.transition_normal, LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
+        lv_obj_add_style(obj, &theme->styles.bg_color_secondary, LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &theme->styles.disabled, LV_STATE_DISABLED);
+        return;
+    }
+
+    if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
+        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        return;
+    }
+
 #endif
+
 #if LV_USE_SPINBOX
     else if(lv_obj_check_type(obj, &lv_spinbox_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);

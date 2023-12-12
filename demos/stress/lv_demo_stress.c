@@ -32,7 +32,6 @@ static void obj_test_task_cb(lv_timer_t * tmr);
  **********************/
 static lv_obj_t * main_page;
 static lv_obj_t * ta;
-static const char * mbox_buttons[] = {"Ok", "Cancel", ""};
 static uint32_t mem_free_start = 0;
 static int16_t g_state = -1;
 
@@ -241,7 +240,12 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 14:
-            obj = lv_msgbox_create(NULL, "Title", "Some text on the message box with average length", mbox_buttons, true);
+            obj = lv_msgbox_create(NULL);
+            lv_msgbox_add_title(obj, "Title");
+            lv_msgbox_add_header_button(obj, LV_SYMBOL_AUDIO);
+            lv_msgbox_add_text(obj, "Some text");
+            lv_msgbox_add_footer_button(obj, "Button 1");
+            lv_msgbox_add_footer_button(obj, "Button 2");
             {
                 lv_timer_t * msgbox_tmr = lv_timer_create(msgbox_delete, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
                 lv_timer_set_repeat_count(msgbox_tmr, 1);
