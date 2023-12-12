@@ -927,6 +927,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             while(layer_draw_dsc.rotation < 0) layer_draw_dsc.rotation += 3600;
             layer_draw_dsc.scale_x = lv_obj_get_style_transform_scale_x(obj, 0);
             layer_draw_dsc.scale_y = lv_obj_get_style_transform_scale_y(obj, 0);
+            layer_draw_dsc.skew_x = lv_obj_get_style_transform_skew_x(obj, 0);
+            layer_draw_dsc.skew_y = lv_obj_get_style_transform_skew_y(obj, 0);
             layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
             layer_draw_dsc.antialias = disp_refr->antialiasing;
             layer_draw_dsc.src = new_layer;
