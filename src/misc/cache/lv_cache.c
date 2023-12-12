@@ -16,10 +16,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_cache_entry_t {
-    lv_cache_t_ * cache;
-    uint32_t ref_cnt;
+struct _lv_cache_entry_t_ {
     void * data;
+
+    const lv_cache_t_ * cache;
+    uint32_t ref_cnt;
+    uint32_t generation;
 };
 /**********************
  *  STATIC PROTOTYPES
@@ -42,10 +44,10 @@ struct _lv_cache_entry_t {
  **********************/
 
 lv_cache_t_ * lv_cache_create_(const lv_cache_class_t * cache_class,
-                              size_t node_size, size_t max_size,
-                              lv_cache_compare_cb_t compare_cb,
-                              lv_cache_create_cb_t create_cb,
-                              lv_cache_free_cb_t free_cb)
+                               size_t node_size, size_t max_size,
+                               lv_cache_compare_cb_t compare_cb,
+                               lv_cache_create_cb_t create_cb,
+                               lv_cache_free_cb_t free_cb)
 {
     lv_cache_t_ * cache = cache_class->alloc_cb();
     LV_ASSERT_MALLOC(cache);
@@ -69,13 +71,17 @@ void   lv_cache_destroy_(lv_cache_t_ * cache, void * user_data)
     cache->clz->destroy_cb(cache, user_data);
 }
 
-void * lv_cache_get_or_create_(lv_cache_t_ * cache, const void * key, void * user_data)
+lv_cache_entry_t_ * lv_cache_get_or_create_(lv_cache_t_ * cache, const void * key, void * user_data)
 {
     return cache->clz->get_or_create_cb(cache, key, user_data);
 }
 void   lv_cache_drop_(lv_cache_t_ * cache, const void * key, void * user_data)
 {
     cache->clz->drop_cb(cache, key, user_data);
+}
+void   lv_cache_remove_(lv_cache_t_ * cache, const void * key, void * user_data)
+{
+    // TODO: Not implemented yet
 }
 void   lv_cache_drop_all_(lv_cache_t_ * cache, void * user_data)
 {
@@ -115,6 +121,56 @@ void   lv_cache_set_free_cb(lv_cache_t_ * cache, lv_cache_free_cb_t free_cb, voi
 {
     LV_UNUSED(user_data);
     cache->free_cb = free_cb;
+}
+
+void     lv_cache_entry_ref_inc(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    entry->ref_cnt++;
+}
+void     lv_cache_entry_ref_dec(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    entry->ref_cnt--;
+}
+uint32_t lv_cache_entry_get_generation(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    return entry->generation;
+}
+void     lv_cache_entry_inc_generation(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    entry->generation++;
+}
+void     lv_cache_entry_set_generation(lv_cache_entry_t_ * entry, uint32_t generation)
+{
+    LV_ASSERT_NULL(entry);
+    entry->generation = generation;
+}
+void  *  lv_cache_entry_get_data(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    return entry->data;
+}
+void     lv_cache_entry_set_data(lv_cache_entry_t_ * entry, void * data)
+{
+    LV_ASSERT_NULL(entry);
+    entry->data = data;
+}
+void     lv_cache_entry_set_cache(lv_cache_entry_t_ * entry, const lv_cache_t_ * cache)
+{
+    LV_ASSERT_NULL(entry);
+    entry->cache = cache;
+}
+const lv_cache_t_ * lv_cache_entry_get_cache(const lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    return entry->cache;
+}
+
+uint32_t lv_cache_entry_get_size() {
+    return sizeof(lv_cache_entry_t_);
 }
 /**********************
  *   STATIC FUNCTIONS

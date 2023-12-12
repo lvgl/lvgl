@@ -26,9 +26,11 @@ extern "C" {
  **********************/
 struct _lv_cache_t_;
 struct _lv_cache_class_t;
+struct _lv_cache_entry_t_;
 
 typedef struct _lv_cache_t_ lv_cache_t_;
 typedef struct _lv_cache_class_t lv_cache_class_t;
+typedef struct _lv_cache_entry_t_ lv_cache_entry_t_;
 
 typedef int8_t lv_cache_compare_res_t;
 typedef bool (*lv_cache_create_cb_t)(void * node, void * user_data);
@@ -38,7 +40,7 @@ typedef lv_cache_compare_res_t (*lv_cache_compare_cb_t)(const void * a, const vo
 typedef void * (*lv_cache_alloc_cb_t)(void);
 typedef bool (*lv_cache_init_cb_t)(lv_cache_t_ * cache);
 typedef void (*lv_cache_destroy_cb_t)(lv_cache_t_ * cache, void * user_data);
-typedef void * (*lv_cache_get_or_create_cb_t)(lv_cache_t_ * cache, const void * key, void * user_data);
+typedef lv_cache_entry_t_ * (*lv_cache_get_or_create_cb_t)(lv_cache_t_ * cache, const void * key, void * user_data);
 typedef void (*lv_cache_drop_cb_t)(lv_cache_t_ * cache, const void * key, void * user_data);
 typedef void (*lv_cache_clear_cb_t)(lv_cache_t_ * cache, void * user_data);
 
@@ -67,7 +69,17 @@ struct _lv_cache_class_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void     lv_cache_entry_ref_inc(lv_cache_entry_t_ * entry);
+void     lv_cache_entry_ref_dec(lv_cache_entry_t_ * entry);
+uint32_t lv_cache_entry_get_generation(lv_cache_entry_t_ * entry);
+void     lv_cache_entry_inc_generation(lv_cache_entry_t_ * entry);
+void     lv_cache_entry_set_generation(lv_cache_entry_t_ * entry, uint32_t generation);
+void  *  lv_cache_entry_get_data(lv_cache_entry_t_ * entry);
+void     lv_cache_entry_set_data(lv_cache_entry_t_ * entry, void * data);
+void     lv_cache_entry_set_cache(lv_cache_entry_t_ * entry, const lv_cache_t_ * cache);
+const lv_cache_t_ * lv_cache_entry_get_cache(const lv_cache_entry_t_ * entry);
 
+uint32_t lv_cache_entry_get_size();
 /*************************
  *    GLOBAL VARIABLES
  *************************/
