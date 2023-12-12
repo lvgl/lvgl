@@ -161,7 +161,8 @@ done
 # pdsc file is mandatory in base directory:
 cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc ${PACK_BUILD}
 cp -f ../../examples/porting/* ${PACK_BUILD}/examples/porting
-cp -f ./lv_os_custom.* ${PACK_BUILD}/src/osal
+cp -f ./lv_os_custom_c.txt ${PACK_BUILD}/src/osal/lv_os_custom.c
+cp -f ./lv_os_custom_h.txt ${PACK_BUILD}/src/osal/lv_os_custom.h
 
 mv "${PACK_BUILD}/lv_cmsis_pack.txt" "${PACK_BUILD}/lv_cmsis_pack.c"
 

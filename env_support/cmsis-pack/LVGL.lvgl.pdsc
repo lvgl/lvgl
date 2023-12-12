@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-12-10" version="9.0.0-dev" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev.pack">
+    <release date="2023-12-12" version="9.0.0-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev1.pack">
       - LVGL 9.0.0-dev
       - New Driver Architecture
       - Other fixes
@@ -430,7 +430,6 @@
                 <!-- src/draw/sw -->
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_arc.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_bg_img.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_border.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_box_shadow.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_fill.c" />
