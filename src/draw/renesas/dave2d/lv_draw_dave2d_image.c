@@ -130,7 +130,7 @@ static void dave2d_img_decode_and_draw(lv_draw_dave2d_unit_t * draw_unit, const 
     sup.palette_size = decoder_dsc->palette_size;
 
     /*The whole image is available, just draw it*/
-    if(decoder_dsc->img_data) {
+    if(decoder_dsc->decoded || decoder_dsc->img_data) {
         dave2d_img_draw_core(draw_unit, draw_dsc, decoder_dsc, &sup, img_area, clipped_img_area);
     }
     /*Draw in smaller pieces*/
