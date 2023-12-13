@@ -335,6 +335,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_DRAW_G2D
+    #ifdef CONFIG_LV_USE_DRAW_G2D
+        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+    #else
+        #define LV_USE_DRAW_G2D 0
+    #endif
+#endif
+
 /*Enable Vector Graphic APIs*/
 #ifndef LV_USE_VECTOR_GRAPHIC
     #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC

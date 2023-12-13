@@ -34,6 +34,9 @@
 #if LV_USE_DRAW_VG_LITE
     #include "draw/vg_lite/lv_draw_vg_lite.h"
 #endif
+#if LV_USE_DRAW_G2D
+    #include "draw/sunxi_g2d/lv_draw_g2d.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -165,6 +168,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_PXP
     lv_draw_pxp_init();
+#endif
+
+#if LV_USE_DRAW_G2D
+    lv_draw_g2d_init();
 #endif
 
     _lv_obj_style_init();
