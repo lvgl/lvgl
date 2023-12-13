@@ -389,6 +389,7 @@ void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
 
     lv_chart_t * chart    = (lv_chart_t *)obj;
     if(!series->y_ext_buf_assigned && series->y_points) lv_mem_free(series->y_points);
+    if(!series->x_ext_buf_assigned && series->x_points) lv_mem_free(series->x_points);
 
     _lv_ll_remove(&chart->series_ll, series);
     lv_mem_free(series);
