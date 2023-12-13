@@ -143,15 +143,13 @@ bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf)
 
 static inline void vglite_set_scissor(const lv_area_t * clip_area)
 {
-    vg_lite_enable_scissor();
-    vg_lite_set_scissor((int32_t)clip_area->x1, (int32_t)clip_area->y1,
-                        (int32_t)lv_area_get_width(clip_area),
-                        (int32_t)lv_area_get_height(clip_area));
+    vg_lite_set_scissor(clip_area->x1, clip_area->y1, clip_area->x2 + 1, clip_area->y2 + 1);
 }
 
 static inline void vglite_disable_scissor(void)
 {
-    vg_lite_disable_scissor();
+    //FIXME
+    vg_lite_set_scissor(0, 0, 720, 1280);
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/
