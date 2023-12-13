@@ -135,6 +135,7 @@ static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
     lv_memcpy(lru_node, &node, sizeof(void *));
     lv_memcpy(get_lru_node(lru, node), &lru_node, sizeof(void *));
     lv_cache_entry_set_cache(entry, (const lv_cache_t_ *)lru);
+    lv_cache_entry_ref_reset(entry);
     lv_cache_entry_set_generation(entry, 0);
     lv_cache_entry_set_node_size(entry, lru->cache.node_size);
     goto FAILED_HANDLER3;

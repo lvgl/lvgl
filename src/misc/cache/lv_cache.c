@@ -8,6 +8,7 @@
  *********************/
 #include "lv_cache.h"
 #include "../lv_assert.h"
+#include "../../stdlib/lv_sprintf.h"
 
 /*********************
  *      DEFINES
@@ -122,6 +123,11 @@ void   lv_cache_set_free_cb(lv_cache_t_ * cache, lv_cache_free_cb_t free_cb, voi
     cache->free_cb = free_cb;
 }
 
+void     lv_cache_entry_ref_reset(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    entry->ref_cnt = 0;
+}
 void     lv_cache_entry_ref_inc(lv_cache_entry_t_ * entry)
 {
     LV_ASSERT_NULL(entry);
@@ -131,6 +137,10 @@ void     lv_cache_entry_ref_dec(lv_cache_entry_t_ * entry)
 {
     LV_ASSERT_NULL(entry);
     entry->ref_cnt--;
+    if (entry->ref_cnt < 0) {
+        LV_LOG_WARN("lv_cache_entry_ref_dec: ref_cnt(%" LV_PRIu32 ") < 0", entry->ref_cnt);
+        entry->ref_cnt = 0;
+    }
 }
 uint32_t lv_cache_entry_get_generation(lv_cache_entry_t_ * entry)
 {

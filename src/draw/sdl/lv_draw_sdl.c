@@ -62,13 +62,11 @@ static SDL_Texture * layer_get_texture(lv_layer_t * layer);
  **********************/
 static bool sdl_texture_cache_create_cb(cache_data_t * cached_data, void * user_data)
 {
-    LV_LOG_USER("SDL Cache Miss");
     return draw_to_texture((lv_draw_sdl_unit_t *)user_data, cached_data);
 }
 
 static void sdl_texture_cache_free_cb(cache_data_t * cached_data, void * user_data)
 {
-    LV_LOG_USER("SDL Cache Free");
     lv_free(cached_data->draw_dsc);
     SDL_DestroyTexture(cached_data->texture);
     cached_data->draw_dsc = NULL;

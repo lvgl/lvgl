@@ -69,6 +69,7 @@ struct _lv_cache_class_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void     lv_cache_entry_ref_reset(lv_cache_entry_t_ * entry);
 void     lv_cache_entry_ref_inc(lv_cache_entry_t_ * entry);
 void     lv_cache_entry_ref_dec(lv_cache_entry_t_ * entry);
 uint32_t lv_cache_entry_get_generation(lv_cache_entry_t_ * entry);
