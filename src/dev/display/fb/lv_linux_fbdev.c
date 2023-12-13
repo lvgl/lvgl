@@ -211,7 +211,8 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));
     }
 
-    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", hor_res, ver_res, lv_display_get_dpi(disp));
+    LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
+                hor_res, ver_res, lv_display_get_dpi(disp));
 }
 
 /**********************
