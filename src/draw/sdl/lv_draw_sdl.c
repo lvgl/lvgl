@@ -71,6 +71,8 @@ static void sdl_texture_cache_free_cb(cache_data_t * cached_data, void * user_da
     LV_LOG_USER("SDL Cache Free");
     lv_free(cached_data->draw_dsc);
     SDL_DestroyTexture(cached_data->texture);
+    cached_data->draw_dsc = NULL;
+    cached_data->texture = NULL;
 }
 
 static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const cache_data_t * lhs, const cache_data_t * rhs)
@@ -84,13 +86,18 @@ static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const cache_data_t * 
         return lhs->h > rhs->h ? 1 : -1;
     }
 
-    if(lhs->draw_dsc->dsc_size != rhs->draw_dsc->dsc_size) {
-        return lhs->draw_dsc->dsc_size > rhs->draw_dsc->dsc_size ? 1 : -1;
+    uint32_t lhs_dsc_size = lhs->draw_dsc->dsc_size;
+    uint32_t rhs_dsc_size = rhs->draw_dsc->dsc_size;
+
+    if(lhs_dsc_size != rhs_dsc_size) {
+        return lhs_dsc_size > rhs_dsc_size ? 1 : -1;
     }
 
-    if(memcmp(lhs->draw_dsc, rhs->draw_dsc, lhs->draw_dsc->dsc_size)) {
-        return lhs->draw_dsc > rhs->draw_dsc ? 1 : -1;
-    };
+    int cmp_res = memcmp(lhs->draw_dsc, rhs->draw_dsc, lhs->draw_dsc->dsc_size);
+
+    if(cmp_res != 0) {
+        return cmp_res > 0 ? 1 : -1;
+    }
 
     return 0;
 }
@@ -368,7 +375,7 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     SDL_RenderSetClipRect(renderer, NULL);
 
-    lv_cache_drop_(u->texture_cache, data_cached, u);
+    //    lv_cache_drop_(u->texture_cache, data_cached, u);
     lv_cache_unlock();
 }
 

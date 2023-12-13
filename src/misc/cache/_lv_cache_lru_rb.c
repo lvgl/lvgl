@@ -142,8 +142,8 @@ static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
 FAILED_HANDLER1:
     lru->cache.free_cb(data, user_data);
 FAILED_HANDLER2:
+    lv_rb_drop_node(&lru->rb, node);
     node = NULL;
-    lv_rb_drop(&lru->rb, key);
 FAILED_HANDLER3:
     return node;
 }
@@ -244,8 +244,9 @@ static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * ke
     }
 
     while(lru->cache.size >= lru->cache.max_size) {
-        lv_rb_node_t * tail = *(lv_rb_node_t **)_lv_ll_get_tail(&lru->ll);
-        void * search_key = tail->data;
+        void * tail = _lv_ll_get_tail(&lru->ll);
+        lv_rb_node_t * tail_node = *(lv_rb_node_t **)_lv_ll_get_tail(&lru->ll);
+        void * search_key = tail_node->data;
         cache->clz->drop_cb(cache, search_key, user_data);
     }
 
@@ -282,7 +283,7 @@ static void  drop_cb(lv_cache_t_ * cache, const void * key, void * user_data)
     lru->cache.free_cb(data, user_data);
 
     void * lru_node = *get_lru_node(lru, node);
-    lv_rb_drop(&lru->rb, key);
+    lv_rb_drop_node(&lru->rb, node);
     _lv_ll_remove(&lru->ll, lru_node);
     lv_free(lru_node);
 
@@ -310,4 +311,3 @@ static void  drop_all_cb(lv_cache_t_ * cache, void * user_data)
 
     lru->cache.size = 0;
 }
-
