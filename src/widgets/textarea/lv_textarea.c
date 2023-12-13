@@ -776,7 +776,7 @@ void lv_textarea_cursor_down(lv_obj_t * obj)
     /*Do not go below the last line*/
     if(pos.y < lv_obj_get_height(ta->label)) {
         /*Get the letter index on the new cursor position and set it*/
-        uint32_t new_cur_pos = lv_label_get_letter_on(ta->label, &pos);
+        uint32_t new_cur_pos = lv_label_get_letter_on(ta->label, &pos, true);
 
         int32_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position*/
         lv_textarea_set_cursor_pos(obj, new_cur_pos);
@@ -802,7 +802,7 @@ void lv_textarea_cursor_up(lv_obj_t * obj)
     pos.x = ta->cursor.valid_x;
 
     /*Get the letter index on the new cursor position and set it*/
-    uint32_t new_cur_pos       = lv_label_get_letter_on(ta->label, &pos);
+    uint32_t new_cur_pos       = lv_label_get_letter_on(ta->label, &pos, true);
     int32_t cur_valid_x_tmp = ta->cursor.valid_x; /*Cursor position set overwrites the valid position*/
     lv_textarea_set_cursor_pos(obj, new_cur_pos);
     ta->cursor.valid_x = cur_valid_x_tmp;
@@ -1184,7 +1184,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
         click_outside_label = true;
     }
     else {
-        char_id_at_click = lv_label_get_letter_on(ta->label, &rel_pos);
+        char_id_at_click = lv_label_get_letter_on(ta->label, &rel_pos, true);
         click_outside_label = !lv_label_is_char_under_pos(ta->label, &rel_pos);
     }
 
@@ -1248,7 +1248,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
         char_id_at_click = LV_TEXTAREA_CURSOR_LAST;
     }
     else {
-        char_id_at_click = lv_label_get_letter_on(ta->label, &rel_pos);
+        char_id_at_click = lv_label_get_letter_on(ta->label, &rel_pos, true);
     }
 
     if(code == LV_EVENT_PRESSED) lv_textarea_set_cursor_pos(obj, char_id_at_click);
