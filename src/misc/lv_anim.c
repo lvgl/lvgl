@@ -137,7 +137,7 @@ uint32_t lv_anim_get_playtime(lv_anim_t * a)
     uint32_t repeate_cnt = a->repeat_cnt;
     if(repeate_cnt < 1) repeate_cnt = 1;
 
-    uint32_t playtime = a->repeat_delay + a->duration + a->playback_delay + a->playback_time;
+    uint32_t playtime = a->repeat_delay + a->duration + a->playback_delay + a->playback_duration;
     playtime = playtime * a->repeat_cnt;
     return playtime;
 }
@@ -414,7 +414,7 @@ static void anim_ready_handler(lv_anim_t * a)
     /*Delete the animation if
      * - no repeat left and no play back (simple one shot animation)
      * - no repeat, play back is enabled and play back is ready*/
-    if(a->repeat_cnt == 0 && (a->playback_time == 0 || a->playback_now == 1)) {
+    if(a->repeat_cnt == 0 && (a->playback_duration == 0 || a->playback_now == 1)) {
 
         /*Delete the animation from the list.
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
@@ -431,7 +431,7 @@ static void anim_ready_handler(lv_anim_t * a)
     else {
         a->act_time = -(int32_t)(a->repeat_delay); /*Restart the animation*/
         /*Swap the start and end values in play back mode*/
-        if(a->playback_time != 0) {
+        if(a->playback_duration != 0) {
             /*If now turning back use the 'playback_pause*/
             if(a->playback_now == 0) a->act_time = -(int32_t)(a->playback_delay);
 
@@ -441,10 +441,10 @@ static void anim_ready_handler(lv_anim_t * a)
             int32_t tmp    = a->start_value;
             a->start_value = a->end_value;
             a->end_value   = tmp;
-            /*Swap the time and playback_time*/
+            /*Swap the time and playback_duration*/
             tmp = a->duration;
-            a->duration = a->playback_time;
-            a->playback_time = tmp;
+            a->duration = a->playback_duration;
+            a->playback_duration = tmp;
         }
     }
 }
@@ -489,7 +489,7 @@ static uint32_t convert_speed_to_time(uint32_t speed_or_time, int32_t start, int
 static void resolve_time(lv_anim_t * a)
 {
     a->duration = convert_speed_to_time(a->duration, a->start_value, a->end_value);
-    a->playback_time = convert_speed_to_time(a->playback_time, a->start_value, a->end_value);
+    a->playback_duration = convert_speed_to_time(a->playback_duration, a->start_value, a->end_value);
     a->playback_delay = convert_speed_to_time(a->playback_delay, a->start_value, a->end_value);
     a->repeat_delay = convert_speed_to_time(a->repeat_delay, a->start_value, a->end_value);
 }

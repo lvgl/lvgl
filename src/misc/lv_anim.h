@@ -150,7 +150,7 @@ typedef struct _lv_anim_t {
     int32_t duration;                /**< Animation time in ms*/
     int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
     uint32_t playback_delay;     /**< Wait before play back*/
-    uint32_t playback_time;      /**< Duration of playback animation*/
+    uint32_t playback_duration;      /**< Duration of playback animation*/
     uint32_t repeat_delay;       /**< Wait before repeat*/
     uint16_t repeat_cnt;         /**< Repeat count for the animation*/
     union _lv_anim_path_para_t {
@@ -323,9 +323,17 @@ static inline void lv_anim_set_deleted_cb(lv_anim_t * a, lv_anim_deleted_cb_t de
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param time      the duration of the playback animation in milliseconds. 0: disable playback
  */
-static inline void lv_anim_set_playback_time(lv_anim_t * a, uint32_t time)
+static inline void lv_anim_set_playback_duration(lv_anim_t * a, uint32_t duration)
 {
-    a->playback_time = time;
+    a->playback_duration = duration;
+}
+
+/**
+ * Legacy `lv_anim_set_playback_time` API will be removed soon, use `lv_anim_set_playback_duration` instead.
+ */
+static inline void lv_anim_set_playback_time(lv_anim_t * a, uint32_t duration)
+{
+    lv_anim_set_playback_duration(a, duration);
 }
 
 /**

@@ -513,7 +513,7 @@ static void arc_anim(lv_obj_t * obj)
     lv_anim_set_exec_cb(&a, arc_anim_cb);
     lv_anim_set_values(&a, 0, 100);
     lv_anim_set_duration(&a, t1);
-    lv_anim_set_playback_time(&a, t2);
+    lv_anim_set_playback_duration(&a, t2);
     lv_anim_set_var(&a, obj);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);
@@ -534,7 +534,7 @@ static void scroll_anim(lv_obj_t * obj, int32_t y_max)
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
     lv_anim_set_values(&a, 0, y_max);
     lv_anim_set_duration(&a, t);
-    lv_anim_set_playback_time(&a, t);
+    lv_anim_set_playback_duration(&a, t);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);
 
@@ -555,7 +555,7 @@ static void shake_anim(lv_obj_t * obj, int32_t y_max)
     lv_anim_set_exec_cb(&a, shake_anim_y_cb);
     lv_anim_set_values(&a, 0, y_max);
     lv_anim_set_duration(&a, t1);
-    lv_anim_set_playback_time(&a, t2);
+    lv_anim_set_playback_duration(&a, t2);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);
 }

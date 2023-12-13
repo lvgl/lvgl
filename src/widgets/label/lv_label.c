@@ -925,7 +925,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_duration(&a, anim_time);
-            lv_anim_set_playback_time(&a, a.duration);
+            lv_anim_set_playback_duration(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
             if(anim_template)
@@ -964,7 +964,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_duration(&a, anim_time);
-            lv_anim_set_playback_time(&a, a.duration);
+            lv_anim_set_playback_duration(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
             if(anim_template)
