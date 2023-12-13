@@ -332,15 +332,6 @@
     #endif
 #endif
 
-/* Use VG-Lite GPU. */
-#ifndef LV_USE_DRAW_VG_LITE
-    #ifdef CONFIG_LV_USE_DRAW_VG_LITE
-        #define LV_USE_DRAW_VG_LITE CONFIG_LV_USE_DRAW_VG_LITE
-    #else
-        #define LV_USE_DRAW_VG_LITE 0
-    #endif
-#endif
-
 /* Use Renesas Dave2D on RA  platforms. */
 #ifndef LV_USE_DRAW_DAVE2D
     #ifdef CONFIG_LV_USE_DRAW_DAVE2D
@@ -356,6 +347,15 @@
         #define LV_USE_DRAW_SDL CONFIG_LV_USE_DRAW_SDL
     #else
         #define LV_USE_DRAW_SDL 0
+    #endif
+#endif
+
+/* Use VG-Lite GPU. */
+#ifndef LV_USE_DRAW_VG_LITE
+    #ifdef CONFIG_LV_USE_DRAW_VG_LITE
+        #define LV_USE_DRAW_VG_LITE CONFIG_LV_USE_DRAW_VG_LITE
+    #else
+        #define LV_USE_DRAW_VG_LITE 0
     #endif
 #endif
 

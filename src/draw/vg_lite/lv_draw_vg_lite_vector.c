@@ -32,6 +32,7 @@ static void lv_matrix_to_vg(vg_lite_matrix_t * desy, const lv_matrix_t * src);
 static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src);
 static vg_lite_blend_t lv_blend_to_vg(lv_vector_blend_t blend);
 static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule);
+static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread);
 
 /**********************
  *  STATIC VARIABLES
@@ -61,84 +62,144 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_tas
  *   STATIC FUNCTIONS
  **********************/
 
+static vg_lite_color_t lv_color32_to_vg(lv_color32_t color, lv_opa_t opa)
+{
+    uint8_t a = LV_OPA_MIX2(color.alpha, opa);
+    if(a < LV_OPA_MAX) {
+        color.red = LV_UDIV255(color.red * opa);
+        color.green = LV_UDIV255(color.green * opa);
+        color.blue = LV_UDIV255(color.blue * opa);
+    }
+    return (uint32_t)a << 24 | (uint32_t)color.blue << 16 | (uint32_t)color.green << 8 | color.red;
+}
+
 static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc)
 {
     lv_draw_vg_lite_unit_t * u = ctx;
-    lv_color_t color = lv_color_make(dsc->fill_dsc.color.red, dsc->fill_dsc.color.green, dsc->fill_dsc.color.blue);
-    vg_lite_color_t vg_color = lv_vg_lite_color(color, dsc->fill_dsc.opa, true);
-
     LV_VG_LITE_ASSERT_BUFFER(&u->target_buffer);
 
-    if(!path) {  // clear
+    /* clear area */
+    if(!path) {
+        /* clear color needs to ignore fill_dsc.opa */
+        vg_lite_color_t c = lv_color32_to_vg(dsc->fill_dsc.color, LV_OPA_COVER);
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, &dsc->scissor_area);
-        LV_VG_LITE_CHECK_ERROR(vg_lite_clear(&u->target_buffer, &rect, vg_color));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_clear(&u->target_buffer, &rect, c));
+        return;
     }
-    else {
-        vg_lite_matrix_t matrix;
-        lv_matrix_to_vg(&matrix, &dsc->matrix);
-        lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
 
-        lv_vg_lite_path_t * lv_vg_path = lv_vg_lite_path_get(u, VG_LITE_FP32);
+    /* set scissor area */
+    lv_vg_lite_set_scissor_area(&dsc->scissor_area);
 
-        lv_path_to_vg(lv_vg_path, path);
-        lv_vg_lite_path_end(lv_vg_path);
+    /* convert color */
+    vg_lite_color_t vg_color = lv_color32_to_vg(dsc->fill_dsc.color, dsc->fill_dsc.opa);
 
-        vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(lv_vg_path);
-        LV_VG_LITE_ASSERT_PATH(vg_path);
+    /* transform matrix */
+    vg_lite_matrix_t matrix;
+    lv_matrix_to_vg(&matrix, &dsc->matrix);
 
-        vg_lite_blend_t blend = lv_blend_to_vg(dsc->blend_mode);
-        vg_lite_fill_t fill = lv_fill_to_vg(dsc->fill_dsc.fill_rule);
+    /* convert path */
+    lv_vg_lite_path_t * lv_vg_path = lv_vg_lite_path_get(u, VG_LITE_FP32);
+    lv_path_to_vg(lv_vg_path, path);
+    vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(lv_vg_path);
+    LV_VG_LITE_ASSERT_PATH(vg_path);
 
-        const void * image_src = dsc->fill_dsc.img_dsc.src;
+    /* convert blend mode and fill rule */
+    vg_lite_blend_t blend = lv_blend_to_vg(dsc->blend_mode);
+    vg_lite_fill_t fill = lv_fill_to_vg(dsc->fill_dsc.fill_rule);
 
-        bool has_gradient = dsc->fill_dsc.gradient.grad.dir != LV_GRAD_DIR_NONE;
+    /* get path bounds */
+    float min_x, min_y, max_x, max_y;
+    lv_vg_lite_path_get_bonding_box(lv_vg_path, &min_x, &min_y, &max_x, &max_y);
 
-        if(image_src) {
-            vg_lite_buffer_t image_buffer;
-            if(lv_vg_lite_buffer_load_image(&image_buffer, image_src, lv_color_black())) {
-                vg_lite_matrix_t path_matrix;
-                vg_lite_identity(&path_matrix);
-                LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
+    switch(dsc->fill_dsc.style) {
+        case LV_VECTOR_DRAW_STYLE_SOLID: {
+                /* normal draw shape */
+                LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                            &u->target_buffer,
                                            vg_path,
                                            fill,
-                                           &path_matrix,
-                                           &image_buffer,
                                            &matrix,
                                            blend,
-                                           VG_LITE_PATTERN_COLOR,
-                                           vg_color,
-                                           VG_LITE_FILTER_BI_LINEAR));
+                                           vg_color));
             }
-        }
-        else if(has_gradient) {
-            lv_vg_lite_draw_grad(
-                &u->target_buffer,
-                vg_path,
-                &dsc->scissor_area,
-                &dsc->fill_dsc.gradient.grad,
-                &matrix,
-                fill,
-                blend);
-        }
-        else {
-            LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                                       &u->target_buffer,
-                                       vg_path,
-                                       fill,
-                                       &matrix,
-                                       blend,
-                                       vg_color));
-        }
+            break;
+        case LV_VECTOR_DRAW_STYLE_PATTERN: {
+                /* draw image */
+                vg_lite_buffer_t image_buffer;
+                lv_image_decoder_dsc_t decoder_dsc;
+                if(lv_vg_lite_buffer_open_image(&image_buffer, &decoder_dsc, dsc->fill_dsc.img_dsc.src)) {
+                    lv_matrix_t m = dsc->matrix;
+                    lv_matrix_translate(&m, min_x, min_y);
+                    lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
 
-        lv_vg_lite_path_drop(u, lv_vg_path);
+                    vg_lite_matrix_t src_matrix;
+                    lv_matrix_to_vg(&src_matrix, &m);
+
+                    vg_lite_matrix_t path_matrix;
+                    vg_lite_identity(&path_matrix);
+
+                    vg_lite_color_t recolor = lv_vg_lite_color(dsc->fill_dsc.img_dsc.recolor, dsc->fill_dsc.img_dsc.recolor_opa, true);
+
+                    LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
+                                               &u->target_buffer,
+                                               vg_path,
+                                               fill,
+                                               &path_matrix,
+                                               &image_buffer,
+                                               &src_matrix,
+                                               blend,
+                                               VG_LITE_PATTERN_COLOR,
+                                               recolor,
+                                               vg_color,
+                                               VG_LITE_FILTER_BI_LINEAR));
+                    lv_image_decoder_close(&decoder_dsc);
+                }
+            }
+            break;
+        case LV_VECTOR_DRAW_STYLE_GRADIENT: {
+                /* draw gradient */
+                lv_area_t grad_area;
+                lv_area_set(&grad_area, min_x, min_y, max_x, max_y);
+                lv_vector_gradient_style_t style = dsc->fill_dsc.gradient.style;
+                vg_lite_gradient_spreadmode_t spreadmode = lv_spread_to_vg(dsc->fill_dsc.gradient.spread);
+                LV_UNUSED(spreadmode);
+
+                if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
+                    lv_vg_lite_draw_linear_grad(
+                        &u->target_buffer,
+                        vg_path,
+                        &grad_area,
+                        &dsc->fill_dsc.gradient.grad,
+                        &matrix,
+                        fill,
+                        blend);
+                }
+                else if(style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
+                    if(vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {
+                        /* TODO: radial gradient */
+                    }
+                    else {
+                        LV_LOG_WARN("radial gradient is not supported");
+                    }
+                }
+            }
+            break;
+        default:
+            LV_LOG_WARN("unknown style: %d", dsc->fill_dsc.style);
+            break;
     }
+
+    /* drop path */
+    lv_vg_lite_path_drop(u, lv_vg_path);
+
+    /* disable scissor */
+    lv_vg_lite_disable_scissor();
 }
 
 static void lv_matrix_to_vg(vg_lite_matrix_t * dest, const lv_matrix_t * src)
 {
-    lv_memcpy(dest, src, sizeof(vg_lite_matrix_t));
+    lv_memcpy(dest, src, sizeof(lv_matrix_t));
 }
 
 static vg_lite_quality_t lv_quality_to_vg(lv_vector_path_quality_t quality)
@@ -159,8 +220,6 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
 {
     lv_vg_lite_path_set_quality(dest, lv_quality_to_vg(src->quality));
 
-    /* no bonding box */
-    lv_vg_lite_path_set_bonding_box(dest, __FLT_MIN__, __FLT_MIN__, __FLT_MAX__, __FLT_MAX__);
     uint32_t pidx = 0;
     for(uint32_t i = 0; i < src->ops.size; i++) {
         lv_vector_path_op_t * op = LV_ARRAY_GET(&src->ops, i, uint8_t);
@@ -198,6 +257,9 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
                 break;
         }
     }
+
+    lv_vg_lite_path_end(dest);
+    lv_vg_lite_path_update_bonding_box(dest);
 }
 
 static vg_lite_blend_t lv_blend_to_vg(lv_vector_blend_t blend)
@@ -231,12 +293,24 @@ static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule)
     switch(fill_rule) {
         case LV_VECTOR_FILL_NONZERO:
             return VG_LITE_FILL_NON_ZERO;
-
         case LV_VECTOR_FILL_EVENODD:
             return VG_LITE_FILL_EVEN_ODD;
-
         default:
             return VG_LITE_FILL_NON_ZERO;
+    }
+}
+
+static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread)
+{
+    switch(spread) {
+        case LV_VECTOR_GRADIENT_SPREAD_PAD:
+            return VG_LITE_GRADIENT_SPREAD_PAD;
+        case LV_VECTOR_GRADIENT_SPREAD_REPEAT:
+            return VG_LITE_GRADIENT_SPREAD_REPEAT;
+        case LV_VECTOR_GRADIENT_SPREAD_REFLECT:
+            return VG_LITE_GRADIENT_SPREAD_REFLECT;
+        default:
+            return VG_LITE_GRADIENT_SPREAD_FILL;
     }
 }
 

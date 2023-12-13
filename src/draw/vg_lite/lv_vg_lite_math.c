@@ -53,7 +53,6 @@ float math_fast_inv_sqrtf(float number)
     return y;
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -12,6 +12,7 @@
 #if LV_USE_DRAW_VG_LITE
 
 #include "lv_vg_lite_decoder.h"
+#include "lv_vg_lite_path.h"
 #include <string.h>
 
 /*********************
@@ -33,10 +34,6 @@
 #define FEATURE_ENUM_TO_STRING(e) \
     case (gcFEATURE_BIT_VG_##e):  \
     return #e
-
-#define VLC_OP_ARG_LEN(OP, LEN) \
-    case VLC_OP_##OP:           \
-    return (LEN)
 
 /**********************
  *      TYPEDEFS
@@ -321,75 +318,13 @@ const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op)
     return "UNKNOW_VLC_OP";
 }
 
-uint8_t lv_vg_lite_vlc_op_arg_len(uint8_t vlc_op)
+static void path_data_print_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len)
 {
-    switch(vlc_op) {
-            VLC_OP_ARG_LEN(END, 0);
-            VLC_OP_ARG_LEN(CLOSE, 0);
-            VLC_OP_ARG_LEN(MOVE, 2);
-            VLC_OP_ARG_LEN(MOVE_REL, 2);
-            VLC_OP_ARG_LEN(LINE, 2);
-            VLC_OP_ARG_LEN(LINE_REL, 2);
-            VLC_OP_ARG_LEN(QUAD, 4);
-            VLC_OP_ARG_LEN(QUAD_REL, 4);
-            VLC_OP_ARG_LEN(CUBIC, 6);
-            VLC_OP_ARG_LEN(CUBIC_REL, 6);
-            VLC_OP_ARG_LEN(SCCWARC, 5);
-            VLC_OP_ARG_LEN(SCCWARC_REL, 5);
-            VLC_OP_ARG_LEN(SCWARC, 5);
-            VLC_OP_ARG_LEN(SCWARC_REL, 5);
-            VLC_OP_ARG_LEN(LCCWARC, 5);
-            VLC_OP_ARG_LEN(LCCWARC_REL, 5);
-            VLC_OP_ARG_LEN(LCWARC, 5);
-            VLC_OP_ARG_LEN(LCWARC_REL, 5);
-        default:
-            break;
+    LV_LOG("%s, ", lv_vg_lite_vlc_op_string(op_code));
+    for(uint32_t i = 0; i < len; i++) {
+        LV_LOG("%0.2f, ", data[i]);
     }
-
-    LV_LOG_ERROR("UNKNOW_VLC_OP: 0x%x", vlc_op);
-    LV_ASSERT(false);
-    return 0;
-}
-
-uint8_t lv_vg_lite_path_format_len(vg_lite_format_t format)
-{
-    switch(format) {
-        case VG_LITE_S8:
-            return 1;
-        case VG_LITE_S16:
-            return 2;
-        case VG_LITE_S32:
-            return 4;
-        case VG_LITE_FP32:
-            return 4;
-        default:
-            break;
-    }
-
-    LV_LOG_ERROR("UNKNOW_FORMAT: %d", format);
-    LV_ASSERT(false);
-    return 0;
-}
-
-void lv_vg_lite_print_data(const void * data, vg_lite_format_t format)
-{
-    switch(format) {
-        case VG_LITE_S8:
-            LV_LOG("%d, ", *((int8_t *)data));
-            break;
-        case VG_LITE_S16:
-            LV_LOG("%d, ", *((int16_t *)data));
-            break;
-        case VG_LITE_S32:
-            LV_LOG("%" PRId32 ", ", *((int32_t *)data));
-            break;
-        case VG_LITE_FP32:
-            LV_LOG("%0.2f, ", *((float *)data));
-            break;
-        default:
-            LV_LOG("UNKNOW(%d), ", format);
-            break;
-    }
+    LV_LOG("\n");
 }
 
 void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
@@ -409,31 +344,7 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
     LV_LOG_USER("format: %d", (int)path->format);
     LV_LOG_USER("quality: %d", (int)path->quality);
 
-    uint8_t * cur = path->path;
-    uint8_t * end = cur + path->path_length;
-
-    while(cur < end) {
-        /* get op code */
-        uint8_t op_code = VLC_GET_OP_CODE(cur);
-        LV_LOG("\n%s, ", lv_vg_lite_vlc_op_string(op_code));
-
-        /* get arguments length */
-        uint8_t arg_len = lv_vg_lite_vlc_op_arg_len(op_code);
-
-        /* skip op code */
-        cur += fmt_len;
-
-        /* print arguments */
-        while(arg_len--) {
-            lv_vg_lite_print_data((uint8_t *)cur, path->format);
-            cur += fmt_len;
-        }
-    }
-
-    uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
-    if(end_op_code != VLC_OP_END) {
-        LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
-    }
+    lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
 }
 
 void lv_vg_lite_buffer_dump_info(const vg_lite_buffer_t * buffer)
@@ -454,6 +365,42 @@ void lv_vg_lite_matrix_dump_info(const vg_lite_matrix_t * matrix)
         LV_LOG_USER("| %0.2f, %0.2f, %0.2f |",
                     (matrix)->m[i][0], (matrix)->m[i][1], (matrix)->m[i][2]);
     }
+}
+
+bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_A4:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_I1:
+        case LV_COLOR_FORMAT_I2:
+        case LV_COLOR_FORMAT_I4:
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            return true;
+        default:
+            break;
+    }
+    return false;
 }
 
 vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
@@ -496,7 +443,7 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
             return VG_LITE_BGRX8888;
 
         default:
-            LV_LOG_WARN("unsupport color format: %d", cf);
+            LV_LOG_ERROR("unsupport color format: %d", cf);
             break;
     }
 
@@ -622,14 +569,14 @@ bool lv_vg_lite_buffer_init(
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(ptr);
 
-    memset(buffer, 0, sizeof(vg_lite_buffer_t));
+    lv_memzero(buffer, sizeof(vg_lite_buffer_t));
 
     buffer->format = format;
-    if(format == VG_LITE_RGBA8888_ETC2_EAC) {
+    if(tiled || format == VG_LITE_RGBA8888_ETC2_EAC) {
         buffer->tiled = VG_LITE_TILED;
     }
     else {
-        buffer->tiled = tiled ? VG_LITE_TILED : VG_LITE_LINEAR;
+        buffer->tiled = VG_LITE_LINEAR;
     }
     buffer->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
     buffer->transparency_mode = VG_LITE_IMAGE_OPAQUE;
@@ -658,8 +605,8 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     LV_ASSERT_NULL(dsc);
 
     int32_t rotation = dsc->rotation;
-    int32_t scale_x = dsc->zoom_x;
-    int32_t scale_y = dsc->zoom_y;
+    int32_t scale_x = dsc->scale_x;
+    int32_t scale_y = dsc->scale_y;
 
     vg_lite_translate(x, y, matrix);
 
@@ -682,38 +629,55 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     }
 }
 
-bool lv_vg_lite_buffer_load_image(vg_lite_buffer_t * buffer, const void * src, lv_color_t recolor)
+bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src)
 {
-    lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, src, recolor, -1);
+    LV_ASSERT_NULL(buffer);
+    LV_ASSERT_NULL(decoder_dsc);
+    LV_ASSERT_NULL(src);
+
+    lv_result_t res = lv_image_decoder_open(decoder_dsc, src, NULL);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return false;
     }
 
-    res = lv_vg_lite_decoder_post_process(&decoder_dsc);
+    const uint8_t * img_data = _lv_image_decoder_get_data(decoder_dsc);
+
+    if(!img_data) {
+        lv_image_decoder_close(decoder_dsc);
+        LV_LOG_ERROR("image data is NULL");
+        return false;
+    }
+
+    if(!lv_vg_lite_is_src_cf_supported(decoder_dsc->header.cf)) {
+        lv_image_decoder_close(decoder_dsc);
+        LV_LOG_ERROR("unsupport color format: %d", decoder_dsc->header.cf);
+        return false;
+    }
+
+    res = lv_vg_lite_decoder_post_process(decoder_dsc);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to post process image");
         return false;
     }
 
-    vg_lite_buffer_format_t fmt = lv_vg_lite_vg_fmt(decoder_dsc.header.cf);
+    vg_lite_buffer_format_t fmt = lv_vg_lite_vg_fmt(decoder_dsc->header.cf);
 
     uint32_t palette_size = lv_vg_lite_get_palette_size(fmt);
     uint32_t image_offset = 0;
     if(palette_size) {
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (uint32_t *)decoder_dsc.img_data));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (uint32_t *)decoder_dsc->img_data));
         image_offset = LV_VG_LITE_ALIGN(palette_size * sizeof(uint32_t), LV_VG_LITE_BUF_ALIGN);
     }
 
-    uint32_t width = lv_vg_lite_width_align(decoder_dsc.header.w);
-    const uint8_t * img_data = decoder_dsc.img_data + image_offset;
+    uint32_t width = lv_vg_lite_width_align(decoder_dsc->header.w);
+    img_data += image_offset;
 
     LV_ASSERT(lv_vg_lite_buffer_init(
                   buffer,
                   img_data,
                   width,
-                  decoder_dsc.header.h,
+                  decoder_dsc->header.h,
                   fmt,
                   false));
 
@@ -907,13 +871,8 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
         /* get arguments length */
         uint8_t arg_len = lv_vg_lite_vlc_op_arg_len(op_code);
 
-        /* skip op code */
-        cur += fmt_len;
-
-        /* print arguments */
-        while(arg_len--) {
-            cur += fmt_len;
-        }
+        /* get next op code */
+        cur += (fmt_len * (1 + arg_len)) ;
     }
 
     uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
@@ -936,7 +895,7 @@ bool lv_vg_lite_16px_align(void)
     return vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN);
 }
 
-void lv_vg_lite_draw_grad(
+void lv_vg_lite_draw_linear_grad(
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_area_t * area,
@@ -1016,6 +975,87 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
 
     /* Copy temporary matrix into result. */
     lv_memcpy(matrix, &temp, sizeof(temp));
+}
+
+void lv_vg_lite_matrix_flip_y(vg_lite_matrix_t * matrix)
+{
+    matrix->m[1][1] = -matrix->m[1][1];
+}
+
+bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix)
+{
+    vg_lite_float_t det00, det01, det02;
+    vg_lite_float_t d;
+    bool is_affine;
+
+    /* Test for identity matrix. */
+    if(matrix == NULL) {
+        result->m[0][0] = 1.0f;
+        result->m[0][1] = 0.0f;
+        result->m[0][2] = 0.0f;
+        result->m[1][0] = 0.0f;
+        result->m[1][1] = 1.0f;
+        result->m[1][2] = 0.0f;
+        result->m[2][0] = 0.0f;
+        result->m[2][1] = 0.0f;
+        result->m[2][2] = 1.0f;
+
+        /* Success. */
+        return true;
+    }
+
+    det00 = (matrix->m[1][1] * matrix->m[2][2]) - (matrix->m[2][1] * matrix->m[1][2]);
+    det01 = (matrix->m[2][0] * matrix->m[1][2]) - (matrix->m[1][0] * matrix->m[2][2]);
+    det02 = (matrix->m[1][0] * matrix->m[2][1]) - (matrix->m[2][0] * matrix->m[1][1]);
+
+    /* Compute determinant. */
+    d = (matrix->m[0][0] * det00) + (matrix->m[0][1] * det01) + (matrix->m[0][2] * det02);
+
+    /* Return 0 if there is no inverse matrix. */
+    if(d == 0.0f)
+        return false;
+
+    /* Compute reciprocal. */
+    d = 1.0f / d;
+
+    /* Determine if the matrix is affine. */
+    is_affine = (matrix->m[2][0] == 0.0f) && (matrix->m[2][1] == 0.0f) && (matrix->m[2][2] == 1.0f);
+
+    result->m[0][0] = d * det00;
+    result->m[0][1] = d * ((matrix->m[2][1] * matrix->m[0][2]) - (matrix->m[0][1] * matrix->m[2][2]));
+    result->m[0][2] = d * ((matrix->m[0][1] * matrix->m[1][2]) - (matrix->m[1][1] * matrix->m[0][2]));
+    result->m[1][0] = d * det01;
+    result->m[1][1] = d * ((matrix->m[0][0] * matrix->m[2][2]) - (matrix->m[2][0] * matrix->m[0][2]));
+    result->m[1][2] = d * ((matrix->m[1][0] * matrix->m[0][2]) - (matrix->m[0][0] * matrix->m[1][2]));
+    result->m[2][0] = is_affine ? 0.0f : d * det02;
+    result->m[2][1] = is_affine ? 0.0f : d * ((matrix->m[2][0] * matrix->m[0][1]) - (matrix->m[0][0] * matrix->m[2][1]));
+    result->m[2][2] = is_affine ? 1.0f : d * ((matrix->m[0][0] * matrix->m[1][1]) - (matrix->m[1][0] * matrix->m[0][1]));
+
+    /* Success. */
+    return true;
+}
+
+lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point)
+{
+    lv_point_precise_t p;
+    p.x = point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2];
+    p.y = point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2];
+    return p;
+}
+
+void lv_vg_lite_set_scissor_area(const lv_area_t * area)
+{
+    vg_lite_enable_scissor();
+    vg_lite_set_scissor(
+        area->x1,
+        area->y1,
+        lv_area_get_width(area),
+        lv_area_get_height(area));
+}
+
+void lv_vg_lite_disable_scissor(void)
+{
+    vg_lite_disable_scissor();
 }
 
 /**********************

@@ -58,8 +58,8 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         lv_area_get_width(coords),
         lv_area_get_height(coords),
         dsc->rotation,
-        dsc->zoom_x,
-        dsc->zoom_y,
+        dsc->scale_x,
+        dsc->scale_y,
         &dsc->pivot);
     lv_area_move(&image_tf_area, coords->x1, coords->y1);
 
@@ -70,24 +70,22 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     }
 
     vg_lite_buffer_t src_buf;
-    if(!lv_vg_lite_buffer_load_image(&src_buf, dsc->src, dsc->recolor)) {
+    lv_image_decoder_dsc_t decoder_dsc;
+    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src)) {
         return;
     }
 
+    /* image opa */
     lv_opa_t opa = dsc->opa;
-    bool has_trasform = (dsc->rotation != 0 || dsc->zoom_x != LV_SCALE_NONE || dsc->zoom_y != LV_SCALE_NONE);
-    vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
-    vg_lite_color_t recolor = lv_vg_lite_color(dsc->recolor, dsc->recolor_opa, true);
-    LV_UNUSED(recolor);
-
     vg_lite_color_t color = 0;
     if(opa < LV_OPA_MAX) {
         lv_memset(&color, opa, sizeof(color));
         src_buf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
     }
-    else {
-        src_buf.image_mode = VG_LITE_NORMAL_IMAGE_MODE;
-    }
+
+    bool has_recolor = dsc->recolor_opa >= LV_OPA_MIN;
+    bool has_trasform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
+    vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
@@ -98,7 +96,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     LV_VG_LITE_ASSERT_BUFFER(&u->target_buffer);
 
     /* If clipping is not required, blit directly */
-    if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false)) {
+    if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && !has_recolor) {
         /* The image area is the coordinates relative to the image itself */
         lv_area_t src_area = *coords;
         lv_area_move(&src_area, -coords->x1, -coords->y1);
@@ -140,11 +138,14 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    &matrix,
                                    lv_vg_lite_blend_mode(dsc->blend_mode),
                                    VG_LITE_PATTERN_COLOR,
+                                   lv_vg_lite_color(dsc->recolor, dsc->recolor_opa, true),
                                    color,
                                    filter));
 
         lv_vg_lite_path_drop(u, path);
     }
+
+    lv_image_decoder_close(&decoder_dsc);
 }
 
 /**********************

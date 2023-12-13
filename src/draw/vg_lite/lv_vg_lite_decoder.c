@@ -17,10 +17,6 @@
  *      DEFINES
  *********************/
 
-#ifndef LV_COLOR_FORMAT_IS_ALPHA_ONLY
-    #define LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf) ((cf) >= LV_COLOR_FORMAT_A1 && (cf) <= LV_COLOR_FORMAT_A8)
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -39,7 +35,8 @@ typedef struct {
  **********************/
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args);
 static void decode_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void image_try_self_pre_mul(lv_image_decoder_dsc_t * dsc);
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size);
@@ -50,6 +47,7 @@ static void image_copy(uint8_t * dest, const uint8_t * src,
 static void image_invalidate_cache(void * buf, uint32_t stride,
                                    uint32_t width, uint32_t height,
                                    lv_color_format_t cf);
+static void cache_invalidate_cb(lv_cache_entry_t * entry);
 
 /**********************
  *  STATIC VARIABLES
@@ -69,6 +67,7 @@ void lv_vg_lite_decoder_init(void)
     lv_image_decoder_set_info_cb(decoder, decoder_info);
     lv_image_decoder_set_open_cb(decoder, decoder_open);
     lv_image_decoder_set_close_cb(decoder, decode_close);
+    decoder->cache_data_type = lv_cache_register_data_type();
 }
 
 void lv_vg_lite_decoder_deinit(void)
@@ -100,8 +99,14 @@ lv_result_t lv_vg_lite_decoder_post_process(lv_image_decoder_dsc_t * dsc)
             return LV_RESULT_OK;
     }
 
-    lv_cache_lock();
     lv_cache_entry_t * entry = dsc->cache_entry;
+    if(!entry) {
+        LV_LOG_WARN("No detected cache entry, src_type: %d, src: %p",
+                    dsc->src_type, dsc->src);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_cache_lock();
 
     /* Check if the image is aligned */
     if(!(entry->process_state & LV_VG_LITE_IMAGE_FLAG_ALIGNED)) {
@@ -167,7 +172,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
 
-        lv_cache_entry_t * cache = lv_cache_find(fn, LV_CACHE_SRC_TYPE_STR, 0, 0);
+        lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, fn, LV_CACHE_SRC_TYPE_PATH);
         if(cache) {
             dsc->img_data = lv_cache_get_data(cache);
             dsc->cache_entry = cache; /*Save the cache to release it in decoder_close*/
@@ -177,7 +182,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     }
 
     if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
-        lv_cache_entry_t * cache = lv_cache_find(dsc->src, LV_CACHE_SRC_TYPE_PTR, 0, 0);
+        lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, dsc->src, LV_CACHE_SRC_TYPE_POINTER);
         if(cache) {
             dsc->img_data = lv_cache_get_data(cache);
             dsc->cache_entry = cache;
@@ -281,7 +286,7 @@ static void image_invalidate_cache(void * buf, uint32_t stride,
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
-    return lv_image_decoder_built_in_info(decoder, src, header);
+    return lv_bin_decoder_info(decoder, src, header);
 }
 
 static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
@@ -322,15 +327,14 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
         /*add cache*/
         lv_cache_lock();
-        lv_cache_entry_t * cache = lv_cache_add(1);
+        lv_cache_entry_t * cache = lv_cache_add(image_data, 0, decoder->cache_data_type, 1);
         cache->process_state = LV_VG_LITE_IMAGE_FLAG_ALIGNED;
         cache->weight = lv_tick_elaps(start);
-        cache->data = image_data;
-        cache->src_type = LV_CACHE_SRC_TYPE_PTR;
+        cache->src_type = LV_CACHE_SRC_TYPE_POINTER;
         cache->src = dsc->src;
 
         dsc->cache_entry = cache;
-        dsc->img_data = image_data;
+        dsc->img_data = lv_cache_get_data(cache);
         lv_cache_unlock();
         return LV_RESULT_OK;
     }
@@ -366,9 +370,9 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     image_copy(dest, src, stride, width_byte, height);
 
     lv_cache_lock();
-    lv_cache_entry_t * cache = lv_cache_add(image_size);
+    lv_cache_entry_t * cache = lv_cache_add(image_buf, 0, decoder->cache_data_type, image_size);
 
-    dsc->img_data = image_buf;
+    dsc->img_data = lv_cache_get_data(cache);
     dsc->cache_entry = cache;
 
     /* premul alpha */
@@ -379,10 +383,8 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
     cache->process_state |= LV_VG_LITE_IMAGE_FLAG_ALLOCED | LV_VG_LITE_IMAGE_FLAG_ALIGNED;
     cache->weight = lv_tick_elaps(start);
-    cache->data = image_buf;
-    cache->src_type = LV_CACHE_SRC_TYPE_PTR;
+    cache->src_type = LV_CACHE_SRC_TYPE_POINTER;
     cache->src = dsc->src;
-    cache->free_data = 1;
     lv_cache_unlock();
 
     LV_LOG_USER("image %p (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p, cf: %d) decode finish %" LV_PRIu32 "ms",
@@ -477,10 +479,10 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     lv_fs_close(&file);
 
     lv_cache_lock();
-    lv_cache_entry_t * cache = lv_cache_add(image_size);
+    lv_cache_entry_t * cache = lv_cache_add(image_buf, 0, decoder->cache_data_type, image_size);
 
-    dsc->img_data = image_buf;
     dsc->cache_entry = cache;
+    dsc->img_data = lv_cache_get_data(cache);
 
     /* premul alpha */
     image_try_self_pre_mul(dsc);
@@ -490,11 +492,9 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
 
     cache->process_state |= LV_VG_LITE_IMAGE_FLAG_ALLOCED | LV_VG_LITE_IMAGE_FLAG_ALIGNED;
     cache->weight = lv_tick_elaps(start);
-    cache->data = image_buf;
+    cache->invalidate_cb = cache_invalidate_cb;
     cache->src = lv_strdup(dsc->src);
-    cache->src_type = LV_CACHE_SRC_TYPE_STR;
-    cache->free_src = 1;
-    cache->free_data = 1;
+    cache->src_type = LV_CACHE_SRC_TYPE_PATH;
     lv_cache_unlock();
 
     LV_LOG_USER("image %s (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p cf: %d) decode finish %" LV_PRIu32 "ms",
@@ -512,8 +512,11 @@ failed:
     return LV_RESULT_INVALID;
 }
 
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args)
 {
+    LV_UNUSED(args); /*Unused*/
+
     /*Check the cache first*/
     if(try_cache(dsc) == LV_RESULT_OK) {
         return LV_RESULT_OK;
@@ -536,6 +539,12 @@ static void decode_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * 
     lv_cache_lock();
     lv_cache_release(dsc->cache_entry);
     lv_cache_unlock();
+}
+
+static void cache_invalidate_cb(lv_cache_entry_t * entry)
+{
+    if(entry->src_type == LV_CACHE_SRC_TYPE_PATH) lv_free((void *)entry->src);
+    lv_draw_buf_free((void *)entry->data);
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/

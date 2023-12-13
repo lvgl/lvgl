@@ -31,13 +31,12 @@ static void buf_free(void * buf);
 static void * buf_align(void * buf, lv_color_format_t color_format);
 static void invalidate_cache(void * buf, uint32_t stride, lv_color_format_t color_format, const lv_area_t * area);
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format);
-static void * buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format,
-                           lv_coord_t x, lv_coord_t y);
+static void * buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format, int32_t x,
+                           int32_t y);
 static void buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a);
 static void buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area_to_copy,
                      void * src_buf, uint32_t src_w, uint32_t src_h, const lv_area_t * src_area_to_copy,
                      lv_color_format_t color_format);
-
 
 /**********************
  *  STATIC VARIABLES
@@ -96,8 +95,8 @@ static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format)
     return lv_vg_lite_width_to_stride(w, lv_vg_lite_vg_fmt(color_format));
 }
 
-static void * buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format,
-                           lv_coord_t x, lv_coord_t y)
+static void * buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format, int32_t x,
+                           int32_t y)
 {
     const uint8_t * buf_tmp = buf;
     buf_tmp += stride * y;

@@ -110,9 +110,6 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
         case LV_DRAW_TASK_TYPE_BORDER:
             lv_draw_vg_lite_border(draw_unit, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_BG_IMG:
-            lv_draw_vg_lite_bg_img(draw_unit, t->draw_dsc, &t->area);
-            break;
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
             lv_draw_vg_lite_box_shadow(draw_unit, t->draw_dsc, &t->area);
             break;
@@ -152,20 +149,6 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 }
 
-static bool is_vg_lite_cf_supported(lv_color_format_t cf)
-{
-    switch(cf) {
-        case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_RGB565A8:
-        case LV_COLOR_FORMAT_RGB888:
-        case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
-            return true;
-        default:
-            return false;
-    }
-}
-
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_vg_lite_unit_t * draw_vg_lite_unit = (lv_draw_vg_lite_unit_t *)draw_unit;
@@ -176,8 +159,8 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     /* Return if target buffer format is not supported. */
-    if(!is_vg_lite_cf_supported(layer->color_format)) {
-        return 0;
+    if(!lv_vg_lite_is_dest_cf_supported(layer->color_format)) {
+        return -1;
     }
 
     /* Try to get an ready to draw. */
@@ -185,7 +168,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     /* Return 0 is no selection, some tasks can be supported by other units. */
     if(!t || t->preferred_draw_unit_id != VG_LITE_DRAW_UNIT_ID) {
-        return 0;
+        return -1;
     }
 
     void * buf = lv_draw_layer_alloc_buf(layer);
@@ -214,11 +197,20 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     LV_UNUSED(draw_unit);
 
     switch(task->type) {
+#if LV_USE_FREETYPE && LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_OUTLINE
+        case LV_DRAW_TASK_TYPE_LABEL: {
+                const lv_draw_label_dsc_t * label_dsc = task->draw_dsc;
+                if(lv_freetype_is_outline_font(label_dsc->font)) {
+                    task->preference_score = 0;
+                    task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+                    return 1;
+                }
+                return 0;
+            }
+#endif
         case LV_DRAW_TASK_TYPE_FILL:
         case LV_DRAW_TASK_TYPE_BORDER:
-        case LV_DRAW_TASK_TYPE_BG_IMG:
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-        // case LV_DRAW_TASK_TYPE_LABEL:
         case LV_DRAW_TASK_TYPE_IMAGE:
         case LV_DRAW_TASK_TYPE_LAYER:
         case LV_DRAW_TASK_TYPE_LINE:
@@ -229,6 +221,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
 #endif
+            task->preference_score = 80;
             task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
             return 1;
         default:

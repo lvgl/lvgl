@@ -31,23 +31,24 @@ extern "C" {
 
 #define VLC_GET_OP_CODE(ptr) (*((uint8_t*)ptr))
 
+#ifdef LV_VG_LITE_ASSERT_ENABLE
+#define LV_VG_LITE_ASSERT(expr) LV_ASSERT(expr)
+#else
+#define LV_VG_LITE_ASSERT(expr)
+#endif
+
 #define LV_VG_LITE_CHECK_ERROR(expr)                          \
     do {                                                      \
         vg_lite_error_t error = expr;                         \
         if (LV_VG_LITE_IS_ERROR(error)) {                     \
             LV_LOG_ERROR("Execute '" #expr "' error(%d): %s", \
                          (int)error, lv_vg_lite_error_string(error));  \
-            LV_ASSERT(false);                                 \
+            LV_VG_LITE_ASSERT(false);                         \
         }                                                     \
     } while (0)
 
-#ifdef CONFIG_LV_VG_LITE_ASSERT_ENABLE
-#define LV_VG_LITE_ASSERT_PATH(path) LV_ASSERT(lv_vg_lite_path_check(path))
-#define LV_VG_LITE_ASSERT_BUFFER(buffer) LV_ASSERT(lv_vg_lite_buffer_check(buffer))
-#else
-#define LV_VG_LITE_ASSERT_PATH(path)
-#define LV_VG_LITE_ASSERT_BUFFER(buffer)
-#endif
+#define LV_VG_LITE_ASSERT_PATH(path) LV_VG_LITE_ASSERT(lv_vg_lite_path_check(path))
+#define LV_VG_LITE_ASSERT_BUFFER(buffer) LV_VG_LITE_ASSERT(lv_vg_lite_buffer_check(buffer))
 
 #define LV_VG_LITE_ALIGN(number, align_bytes) \
     (((number) + ((align_bytes)-1)) & ~((align_bytes)-1))
@@ -96,15 +97,15 @@ const char * lv_vg_lite_image_mode_string(vg_lite_buffer_image_mode_t image_mode
 
 const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op);
 
-uint8_t lv_vg_lite_vlc_op_arg_len(uint8_t vlc_op);
-
-uint8_t lv_vg_lite_path_format_len(vg_lite_format_t format);
-
 void lv_vg_lite_path_dump_info(const vg_lite_path_t * path);
 
 void lv_vg_lite_buffer_dump_info(const vg_lite_buffer_t * buffer);
 
 void lv_vg_lite_matrix_dump_info(const vg_lite_matrix_t * matrix);
+
+bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf);
+
+bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf);
 
 /* Converter */
 
@@ -130,7 +131,7 @@ bool lv_vg_lite_buffer_init(
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
 
-bool lv_vg_lite_buffer_load_image(vg_lite_buffer_t * buffer, const void * src, lv_color_t recolor);
+bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src);
 
 vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode);
 
@@ -152,7 +153,7 @@ bool lv_vg_lite_support_blend_normal(void);
 
 bool lv_vg_lite_16px_align(void);
 
-void lv_vg_lite_draw_grad(
+void lv_vg_lite_draw_linear_grad(
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_area_t * area,
@@ -162,6 +163,16 @@ void lv_vg_lite_draw_grad(
     vg_lite_blend_t blend);
 
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
+
+void lv_vg_lite_matrix_flip_y(vg_lite_matrix_t * matrix);
+
+bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
+
+lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point);
+
+void lv_vg_lite_set_scissor_area(const lv_area_t * area);
+
+void lv_vg_lite_disable_scissor(void);
 
 /**********************
  *      MACROS

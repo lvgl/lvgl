@@ -122,14 +122,14 @@
 /* Use NXP's PXP on iMX RTxxx platforms. */
 #define LV_USE_DRAW_PXP 0
 
-/* Use VG-Lite GPU. */
-#define LV_USE_DRAW_VG_LITE 0
-
 /* Use Renesas Dave2D on RA  platforms. */
 #define LV_USE_DRAW_DAVE2D 0
 
 /* Draw using cached SDL textures*/
 #define LV_USE_DRAW_SDL 0
+
+/* Use VG-Lite GPU. */
+#define LV_USE_DRAW_VG_LITE 0
 
 /*=================
  * OPERATING SYSTEM

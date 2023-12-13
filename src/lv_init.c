@@ -38,6 +38,9 @@
 #if LV_USE_DRAW_SDL
     #include "draw/sdl/lv_draw_sdl.h"
 #endif
+#if LV_USE_DRAW_VG_LITE
+    #include "draw/vg_lite/lv_draw_vg_lite.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -355,6 +358,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VGLITE
     lv_draw_vglite_deinit();
+#endif
+
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_deinit();
 #endif
 
 #if LV_USE_DRAW_SW
