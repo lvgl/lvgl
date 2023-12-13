@@ -22,6 +22,7 @@ extern "C" {
 #include "../../osal/lv_os.h"
 
 #include "../../draw/lv_draw_vector.h"
+
 /*********************
  *      DEFINES
  *********************/

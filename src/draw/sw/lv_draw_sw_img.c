@@ -33,16 +33,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void img_draw_normal(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
-                            const lv_area_t * coords);
-
-static void img_draw_tiled(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
-                           const lv_area_t * coords);
-
-static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
-                                lv_image_decoder_dsc_t * decoder_dsc,
-                                const lv_area_t * img_area, const lv_area_t * clipped_img_area);
-
 static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                           const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                           const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
@@ -164,126 +154,16 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv
                                             const lv_area_t * coords)
 {
     if(!draw_dsc->tile) {
-        img_draw_normal(draw_unit, draw_dsc, coords);
+        _lv_draw_image_normal_helper(draw_unit, draw_dsc, coords, img_draw_core);
     }
     else {
-        img_draw_tiled(draw_unit, draw_dsc, coords);
+        _lv_draw_image_tiled_helper(draw_unit, draw_dsc, coords, img_draw_core);
     }
 }
 
-static void img_draw_normal(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
-                            const lv_area_t * coords)
-{
-    lv_area_t draw_area;
-    lv_area_copy(&draw_area, coords);
-    if(draw_dsc->rotation || draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE) {
-        int32_t w = lv_area_get_width(coords);
-        int32_t h = lv_area_get_height(coords);
-
-        _lv_image_buf_get_transformed_area(&draw_area, w, h, draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y,
-                                           &draw_dsc->pivot);
-
-        draw_area.x1 += coords->x1;
-        draw_area.y1 += coords->y1;
-        draw_area.x2 += coords->x1;
-        draw_area.y2 += coords->y1;
-    }
-
-    lv_area_t clipped_img_area;
-    if(!_lv_area_intersect(&clipped_img_area, &draw_area, draw_unit->clip_area)) {
-        return;
-    }
-
-    lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
-    if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to open image");
-        return;
-    }
-
-    img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, coords, &clipped_img_area);
-
-    lv_image_decoder_close(&decoder_dsc);
-}
-
-static void img_draw_tiled(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
-                           const lv_area_t * coords)
-{
-    lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
-    if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to open image");
-        return;
-    }
-
-    int32_t img_w = lv_area_get_width(coords);
-    int32_t img_h = lv_area_get_height(coords);
-
-    lv_area_t tile_area = *coords;
-    int32_t tile_x_start = tile_area.x1;
-
-    while(tile_area.y1 <= draw_unit->clip_area->y2) {
-        while(tile_area.x1 <= draw_unit->clip_area->x2) {
-
-            lv_area_t clipped_img_area;
-            if(_lv_area_intersect(&clipped_img_area, &tile_area, draw_unit->clip_area)) {
-                img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, &tile_area, &clipped_img_area);
-            }
-
-            tile_area.x1 += img_w;
-            tile_area.x2 += img_w;
-        }
-
-        tile_area.y1 += img_h;
-        tile_area.y2 += img_h;
-        tile_area.x1 = tile_x_start;
-        tile_area.x2 = tile_x_start + img_w - 1;
-    }
-
-    lv_image_decoder_close(&decoder_dsc);
-}
-
-static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
-                                lv_image_decoder_dsc_t * decoder_dsc,
-                                const lv_area_t * img_area, const lv_area_t * clipped_img_area)
-{
-    lv_draw_image_sup_t sup;
-    sup.alpha_color = draw_dsc->recolor;
-    sup.palette = decoder_dsc->palette;
-    sup.palette_size = decoder_dsc->palette_size;
-
-    /*The whole image is available, just draw it*/
-    if(decoder_dsc->decoded || decoder_dsc->img_data) {
-        img_draw_core(draw_unit, draw_dsc, decoder_dsc, &sup, img_area, clipped_img_area);
-    }
-    /*Draw in smaller pieces*/
-    else {
-        lv_area_t relative_full_area_to_decode = *clipped_img_area;
-        lv_area_move(&relative_full_area_to_decode, -img_area->x1, -img_area->y1);
-
-        lv_area_t relative_decoded_area;
-        relative_decoded_area.x1 = LV_COORD_MIN;
-        relative_decoded_area.y1 = LV_COORD_MIN;
-        relative_decoded_area.x2 = LV_COORD_MIN;
-        relative_decoded_area.y2 = LV_COORD_MIN;
-        lv_result_t res = LV_RESULT_OK;
-
-        while(res == LV_RESULT_OK) {
-            res = lv_image_decoder_get_area(decoder_dsc, &relative_full_area_to_decode, &relative_decoded_area);
-
-            lv_area_t absolute_decoded_area = relative_decoded_area;
-            lv_area_move(&absolute_decoded_area, img_area->x1, img_area->y1);
-            if(res == LV_RESULT_OK) {
-                /*Limit draw area to the current decoded area and draw the image*/
-                lv_area_t clipped_img_area_sub;
-                if(_lv_area_intersect(&clipped_img_area_sub, clipped_img_area, &absolute_decoded_area)) {
-                    img_draw_core(draw_unit, draw_dsc, decoder_dsc, &sup,
-                                  &absolute_decoded_area, &clipped_img_area_sub);
-                }
-            }
-        }
-    }
-}
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                           const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
@@ -503,9 +383,5 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         lv_free(tmp_buf);
     }
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 #endif /*LV_USE_DRAW_SW*/
