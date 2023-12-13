@@ -101,9 +101,6 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
         case LV_DRAW_TASK_TYPE_BORDER:
             lv_draw_vg_lite_border(draw_unit, t->draw_dsc, &t->area);
             break;
-        case LV_DRAW_TASK_TYPE_BG_IMG:
-            lv_draw_vg_lite_bg_img(draw_unit, t->draw_dsc, &t->area);
-            break;
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
             lv_draw_vg_lite_box_shadow(draw_unit, t->draw_dsc, &t->area);
             break;
@@ -204,7 +201,6 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 #endif
         case LV_DRAW_TASK_TYPE_FILL:
         case LV_DRAW_TASK_TYPE_BORDER:
-        case LV_DRAW_TASK_TYPE_BG_IMG:
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
         case LV_DRAW_TASK_TYPE_IMAGE:
         case LV_DRAW_TASK_TYPE_LAYER:
