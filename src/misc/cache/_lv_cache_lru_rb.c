@@ -246,8 +246,9 @@ static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * ke
 
     while(lru->cache.size >= lru->cache.max_size) {
         void * tail = _lv_ll_get_tail(&lru->ll);
-        lv_rb_node_t * tail_node = *(lv_rb_node_t **)_lv_ll_get_tail(&lru->ll);
+        lv_rb_node_t * tail_node = *(lv_rb_node_t **)tail;
         void * search_key = tail_node->data;
+
         cache->clz->drop_cb(cache, search_key, user_data);
     }
 
