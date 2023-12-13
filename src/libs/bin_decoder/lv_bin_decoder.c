@@ -770,7 +770,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t rn;
     uint32_t len;
     uint32_t compressed_len;
-    uint8_t * file_buf;
+    uint8_t * file_buf = NULL;
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     lv_result_t res;
     lv_image_compressed_t * compressed = &decoder_data->compressed;
