@@ -1508,7 +1508,7 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
        code == LV_EVENT_RELEASED ||
        code == LV_EVENT_LONG_PRESSED ||
        code == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_indev_send_event(indev_act, LV_EVENT_LONG_PRESSED, indev_obj_act);
+        lv_indev_send_event(indev_act, code, indev_obj_act);
         if(indev_reset_check(indev_act)) return LV_RESULT_INVALID;
     }
 
