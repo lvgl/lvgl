@@ -29,7 +29,7 @@ static void anim_timeline_create(void)
     lv_anim_set_values(&a1, 0, obj_width);
     lv_anim_set_custom_exec_cb(&a1, set_width);
     lv_anim_set_path_cb(&a1, lv_anim_path_overshoot);
-    lv_anim_set_time(&a1, 300);
+    lv_anim_set_duration(&a1, 300);
 
     lv_anim_t a2;
     lv_anim_init(&a2);
@@ -37,7 +37,7 @@ static void anim_timeline_create(void)
     lv_anim_set_values(&a2, 0, obj_height);
     lv_anim_set_custom_exec_cb(&a2, set_height);
     lv_anim_set_path_cb(&a2, lv_anim_path_ease_out);
-    lv_anim_set_time(&a2, 300);
+    lv_anim_set_duration(&a2, 300);
 
     /* obj2 */
     lv_anim_t a3;
@@ -46,7 +46,7 @@ static void anim_timeline_create(void)
     lv_anim_set_values(&a3, 0, obj_width);
     lv_anim_set_custom_exec_cb(&a3, set_width);
     lv_anim_set_path_cb(&a3, lv_anim_path_overshoot);
-    lv_anim_set_time(&a3, 300);
+    lv_anim_set_duration(&a3, 300);
 
     lv_anim_t a4;
     lv_anim_init(&a4);
@@ -54,7 +54,7 @@ static void anim_timeline_create(void)
     lv_anim_set_values(&a4, 0, obj_height);
     lv_anim_set_custom_exec_cb(&a4, set_height);
     lv_anim_set_path_cb(&a4, lv_anim_path_ease_out);
-    lv_anim_set_time(&a4, 300);
+    lv_anim_set_duration(&a4, 300);
 
     /* obj3 */
     lv_anim_t a5;
@@ -63,7 +63,7 @@ static void anim_timeline_create(void)
     lv_anim_set_values(&a5, 0, obj_width);
     lv_anim_set_custom_exec_cb(&a5, set_width);
     lv_anim_set_path_cb(&a5, lv_anim_path_overshoot);
-    lv_anim_set_time(&a5, 300);
+    lv_anim_set_duration(&a5, 300);
 
     lv_anim_t a6;
     lv_anim_init(&a6);
@@ -71,7 +71,7 @@ static void anim_timeline_create(void)
     lv_anim_set_values(&a6, 0, obj_height);
     lv_anim_set_custom_exec_cb(&a6, set_height);
     lv_anim_set_path_cb(&a6, lv_anim_path_ease_out);
-    lv_anim_set_time(&a6, 300);
+    lv_anim_set_duration(&a6, 300);
 
     /* Create anim timeline */
     anim_timeline = lv_anim_timeline_create();

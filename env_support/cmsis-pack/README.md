@@ -34,127 +34,63 @@ remove the misleading guide above this code segment.
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
-#include <stdint.h>
 #include "RTE_Components.h"
 ...
 ```
+4. Remove macro definitions for
 
-4. Update `LV_STDIO_INCLUDE` and `LV_STRING_INCLUDE`
-
-   ```c
-   #define LV_STDLIB_INCLUDE <stdlib.h>
-   #define LV_STDIO_INCLUDE  <stdio.h>
-   #define LV_STRING_INCLUDE <string.h>
-   ```
-
-
-
-5. Remove macro definitions for
-
-   - LV_USE_GPU_STM32_DMA2D
-   - LV_USE_GPU_NXP_PXP
-   - LV_USE_GPU_NXP_VG_LITE
-   - LV_USE_GPU_SWM341_DMA2D
-   - LV_USE_GPU_GD32_IPA
-   - LV_USE_GPU_ARM2D
    - LV_USE_DEMO_WIDGETS
    - LV_USE_DEMO_BENCHMARK
    - LV_USE_IME_PINYIN
+   - LV_USE_OS
    - LV_USE_FILE_EXPLORER
+   - LV_USE_DEMO_WIDGETS
+   - LV_USE_DEMO_KEYPAD_AND_ENCODER
+   - LV_USE_DEMO_BENCHMARK
+   - LV_USE_DEMO_RENDER
+   - LV_USE_DEMO_STRESS
+   - LV_USE_DEMO_MUSIC
+   - LV_USE_DEMO_FLEX_LAYOUT
+   - LV_USE_DEMO_MULTILANG
+   - LV_USE_DEMO_TRANSFORM
+   - LV_USE_DEMO_SCROLL
+   - LV_USE_DEMO_VECTOR_GRAPHIC
+   - LV_USE_DRAW_VGLITE
+   - LV_USE_DRAW_PXP
+   - LV_USE_DRAW_SDL
+   - LV_USE_SNAPSHOT
+   - LV_USE_MONKEY
+   - LV_USE_GRIDNAV
+   - LV_USE_FRAGMENT
+   - LV_USE_IMGFONT
+   - LV_USE_OBSERVER
+5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
-6. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
-7. Update `LV_DEMO_BENCHMARK_RGB565A8` to `1`
+6. Set `LV_FONT_MONTSERRAT_12` and `LV_FONT_MONTSERRAT_16` to `1` (So Widgets and Benchmark can be compiled correctly, this is for improving the out of box experience.)
 
-8. Set `LV_FONT_MONTSERRAT_12` and `LV_FONT_MONTSERRAT_16` to `1` (So Widgets and Benchmark can be compiled correctly, this is for improving the out of box experience.)
 
-9. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
+7. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
+#define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
-Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
+Make sure `LV_MEM_SIZE` is no less than `(256*1024U)`.
 
-
-
-6. Update Theme related macros:
-
-```c
-#ifdef RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES
-    /*A simple, impressive and very complete theme*/
-    #define LV_USE_THEME_DEFAULT 1
-    #if LV_USE_THEME_DEFAULT
-
-        /*0: Light mode; 1: Dark mode*/
-        #define LV_THEME_DEFAULT_DARK 0
-
-        /*1: Enable grow on press*/
-        #define LV_THEME_DEFAULT_GROW 1
-
-        /*Default transition time in [ms]*/
-        #define LV_THEME_DEFAULT_TRANSITION_TIME 80
-    #endif /*LV_USE_THEME_DEFAULT*/
-
-    /*A very simple theme that is a good starting point for a custom theme*/
-    #define LV_USE_THEME_BASIC 1
-
-    /*A theme designed for monochrome displays*/
-    #define LV_USE_THEME_MONO 1
-#else
-    #define LV_USE_THEME_DEFAULT    0
-    #define LV_USE_THEME_BASIC      0
-    #define LV_USE_THEME_MONO       0
-#endif
-```
-7. Update `LV_TICK_CUSTOM` related macros:
-```c
-/*Use a custom tick source that tells the elapsed time in milliseconds.
- *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#ifdef __PERF_COUNTER__
-    #define LV_TICK_CUSTOM 1
-    #if LV_TICK_CUSTOM
-        extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h"
-        #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
-    #endif   /*LV_TICK_CUSTOM*/
-#else
-    #define LV_TICK_CUSTOM 0
-    #if LV_TICK_CUSTOM
-        #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-        #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-        /*If using lvgl as ESP32 component*/
-        // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-        // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
-    #endif   /*LV_TICK_CUSTOM*/
-#endif       /*__PERF_COUNTER__*/
-```
-9. Thoroughly remove the `DEMO USAGE` section and add following code:
-
-   ```c
-   /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
-   #if LV_USE_DEMO_WIDGETS
-       #define LV_DEMO_WIDGETS_SLIDESHOW 0
-   #endif
-
-   /*Benchmark your system*/
-   #if LV_USE_DEMO_BENCHMARK
-       /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-       #define LV_DEMO_BENCHMARK_RGB565A8 0
-   #endif
-   ```
-
-
-
-10. Remove following macro definitions in the `3rd party libraries` section:
+8. Remove following macro definitions in the `3rd party libraries` section:
 
     - \#define LV_USE_FS_STDIO 0
     - \#define LV_USE_FS_POSIX 0
     - \#define LV_USE_FS_WIN32 0
     - \#define LV_USE_FS_FATFS 0
+    - #define LV_USE_FS_MEMFS 0
     - \#define LV_USE_LODEPNG 0
+    - #define LV_USE_LIBPNG 0
     - \#define LV_USE_BMP 0
     - \#define LV_USE_RLE 0
-    - \#define LV_USE_SJPG 0
+    - #define LV_USE_TJPGD 0
+    - #define LV_USE_LIBJPEG_TURBO 0
     - \#define LV_USE_GIF 0
     - \#define LV_USE_BARCODE 0
     - \#define LV_USE_QRCODE 0
@@ -163,21 +99,38 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
     - \#define LV_USE_RLOTTIE 0
     - \#define LV_USE_FFMPEG 0
 
-11. Remove unsupported devices from the `DEVICES` section
+9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVE_INTERNAL` and `LV_USE_THORVE_EXTERNAL` as 
 
-    - LV_USE_SDL
+    ```c
+    /*Enable Vector Graphic APIs*/
+    #ifndef LV_USE_VECTOR_GRAPHIC
+    #   define LV_USE_VECTOR_GRAPHIC  0
+    
+    /* Enable ThorVG (vector graphics library) from the src/libs folder */
+    #   define LV_USE_THORVG_INTERNAL 0
+    
+    /* Enable ThorVG by assuming that its installed and linked to the project */
+    #   define LV_USE_THORVG_EXTERNAL 0
+    #endif
+    ```
 
-    - LV_USE_X11
+10. update the definition of following macros: `LV_USE_LZ4`, `LV_USE_LZ4_INTERNAL` and `LV_USE_LZ4_EXTERNAL` as 
 
-    - LV_USE_LINUX_FBDEV
+    ```c
+    /*Enable LZ4 compress/decompress lib*/
+    #ifndef LV_USE_LZ4
+    #   define LV_USE_LZ4  0
+    
+    /*Use lvgl built-in LZ4 lib*/
+    #   define LV_USE_LZ4_INTERNAL  0
+    
+    /*Use external LZ4 library*/
+    #   define LV_USE_LZ4_EXTERNAL  0
+    #endif
+    ```
 
-    - LV_USE_NUTTX_FBDEV
 
-    - LV_USE_LINUX_DRM
-
-    - LV_USE_TFT_ESPI
-
-12. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+11. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 

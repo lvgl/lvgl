@@ -16,7 +16,7 @@ documentation for details:
 - Background: `lv_obj </widgets/obj>`__
 - Header on the background: `lv_obj </widgets/obj>`__
 - Title on the header: `lv_label </widgets/label>`__
-- Buttons on the header: `lv_btn </widgets/btn>`__
+- Buttons on the header: `lv_button </widgets/button>`__
 - Content area on the background: `lv_obj </widgets/obj>`__
 
 Usage
@@ -35,8 +35,8 @@ Any number of texts (but typically only one) can be added to the header
 with :cpp:expr:`lv_win_add_title(win, "The title")`.
 
 Control buttons can be added to the window's header with
-:cpp:expr:`lv_win_add_btn(win, icon, btn_width)`. ``icon`` can be any image
-source, and ``btn_width`` is the width of the button.
+:cpp:expr:`lv_win_add_button(win, icon, button_width)`. ``icon`` can be any image
+source, and ``button_width`` is the width of the button.
 
 The title and the buttons will be added in the order the functions are
 called. So adding a button, a text and two other buttons will result in
@@ -56,7 +56,7 @@ Events
 ******
 
 No special events are sent by the windows, however events can be added
-manually to the return value of :cpp:func:`lv_win_add_btn`.
+manually to the return value of :cpp:func:`lv_win_add_button`.
 
 Learn more about :ref:`events`.
 

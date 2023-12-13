@@ -39,16 +39,6 @@ the ON and OFF state.
 Events
 ******
 
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` is sent
-   for the following types:
-
-   -  :cpp:enumerator:`LV_LED_DRAW_PART_RECTANGLE` The main rectangle.
-      :cpp:enumerator:`LV_OBJ_DRAW_PART_RECTANGLE` is not sent by the base object.
-
-      -  ``part``: :cpp:enumerator:`LV_PART_MAIN`
-      -  ``rect_dsc``
-      -  ``draw_area``: the area of the rectangle
-
 See the events of the `Base object </widgets/obj>`__ too.
 
 Learn more about :ref:`events`.

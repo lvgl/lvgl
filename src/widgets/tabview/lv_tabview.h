@@ -45,7 +45,7 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t tab_id, const char * new_nam
 
 void lv_tabview_set_active(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en);
 
-void lv_tabview_set_tab_position(lv_obj_t * obj, lv_dir_t dir);
+void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir);
 
 void lv_tabview_set_tab_bar_size(lv_obj_t * obj, int32_t size);
 

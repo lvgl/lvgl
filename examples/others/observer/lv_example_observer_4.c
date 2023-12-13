@@ -83,7 +83,7 @@ static void cont_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     /*Animate out the previous content*/
     lv_anim_t a;
     lv_anim_init(&a);
-    lv_anim_set_time(&a, 300);
+    lv_anim_set_duration(&a, 300);
     lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
     lv_anim_set_exec_cb(&a, anim_set_x_cb);
     lv_anim_set_get_value_cb(&a, anim_get_x_cb);
@@ -194,7 +194,7 @@ static void indicator_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, anim_set_x_cb);
-    lv_anim_set_time(&a, 300);
+    lv_anim_set_duration(&a, 300);
     lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
     lv_anim_set_var(&a, indicator);
     lv_anim_set_values(&a, lv_obj_get_x(indicator), lv_obj_get_x(btn_act));

@@ -90,7 +90,7 @@ void lv_animimg_set_duration(lv_obj_t * obj, uint32_t duration)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
-    lv_anim_set_time(&animimg->anim, duration);
+    lv_anim_set_duration(&animimg->anim, duration);
     lv_anim_set_playback_delay(&animimg->anim, duration);
 }
 
@@ -150,7 +150,7 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     /*initial animation*/
     lv_anim_init(&animimg->anim);
     lv_anim_set_var(&animimg->anim, obj);
-    lv_anim_set_time(&animimg->anim, 30);
+    lv_anim_set_duration(&animimg->anim, 30);
     lv_anim_set_exec_cb(&animimg->anim, (lv_anim_exec_xcb_t)index_change);
     lv_anim_set_values(&animimg->anim, 0, 1);
     lv_anim_set_repeat_count(&animimg->anim, LV_ANIM_REPEAT_INFINITE);

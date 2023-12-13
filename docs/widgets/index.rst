@@ -11,15 +11,15 @@ Widgets
     arc
     animimg
     bar
-    btn
-    btnmatrix
+    button
+    buttonmatrix
     calendar
     chart
     colorwheel
     canvas
     checkbox
     dropdown
-    img
+    image
     imgbtn
     keyboard
     label

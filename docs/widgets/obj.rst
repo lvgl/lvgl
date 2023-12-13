@@ -154,7 +154,7 @@ Flags
 -----
 
 There are some attributes which can be enabled/disabled by
-``lv_obj_add/remove_flag(obj, LV_OBJ_FLAG_...)``:
+``lv_obj_add/remove_flag(obj, LV_OBJ_FLAG_...)`` and ``lv_obj_set_flag(obj, LV_OBJ_FLAG_..., true/false)``
 
 -  :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` Make the object hidden. (Like it wasn't there at all)
 -  :cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` Make the object clickable by input devices
@@ -176,7 +176,9 @@ There are some attributes which can be enabled/disabled by
 -  :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` Allow performing more accurate hit (click) test. E.g. accounting for rounded corners
 -  :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` Make the object positionable by the layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` Do not scroll the object when the parent scrolls and ignore layout
+-  :cpp:enumerator:`LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` Enable sending ``LV_EVENT_DRAW_TASK_ADDED`` events
 -  :cpp:enumerator:`LV_OBJ_FLAG_OVERFLOW_VISIBLE` Do not clip the children's content to the parent's boundary
+-  :cpp:enumerator:`LV_OBJ_FLAG_FLEX_IN_NEW_TRACK` Start a new flex track on this item
 -  :cpp:enumerator:`LV_OBJ_FLAG_LAYOUT_1` Custom flag, free to use by layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_LAYOUT_2` Custom flag, free to use by layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_WIDGET_1` Custom flag, free to use by widget
@@ -224,27 +226,6 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` when the :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` flag is
    enabled and the object clicked (on transition to/from the checked state)
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` is sent
-   for the following types:
-
-   -  :cpp:enumerator:`LV_OBJ_DRAW_PART_RECTANGLE` The main rectangle
-
-      -  ``part``: :cpp:enumerator:`LV_PART_MAIN`
-      -  ``rect_dsc``
-      -  ``draw_area``: the area of the rectangle
-
-   -  :cpp:enumerator:`LV_OBJ_DRAW_PART_BORDER_POST` The border if the ``border_post``
-      style property is ``true``
-
-      -  ``part``: :cpp:enumerator:`LV_PART_MAIN`
-      -  ``rect_dsc``
-      -  ``draw_area``: the area of the rectangle
-
-   -  :cpp:enumerator:`LV_OBJ_DRAW_PART_SCROLLBAR` the scrollbars
-
-      -  ``part``: :cpp:enumerator:`LV_PART_SCROLLBAR`
-      -  ``rect_dsc``
-      -  ``draw_area``: the area of the rectangle
 
 Learn more about :ref:`events`.
 

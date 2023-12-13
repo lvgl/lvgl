@@ -835,6 +835,16 @@ static lv_result_t lv_obj_set_any(lv_obj_t * obj, lv_prop_id_t id, const lv_prop
         else lv_obj_remove_flag(obj, flag);
         return LV_RESULT_OK;
     }
+    else if(id >= LV_PROPERTY_OBJ_STATE_START && id <= LV_PROPERTY_OBJ_STATE_END) {
+        lv_state_t state = 1L << (id - LV_PROPERTY_OBJ_STATE_START);
+        if(id == LV_PROPERTY_OBJ_STATE_ANY) {
+            state = LV_STATE_ANY;
+        }
+
+        if(prop->num) lv_obj_add_state(obj, state);
+        else lv_obj_remove_state(obj, state);
+        return LV_RESULT_OK;
+    }
     else {
         return LV_RESULT_INVALID;
     }
@@ -847,6 +857,17 @@ static lv_result_t lv_obj_get_any(const lv_obj_t * obj, lv_prop_id_t id, lv_prop
         lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_FLAG_START);
         prop->id = id;
         prop->num = obj->flags & flag;
+        return LV_RESULT_OK;
+    }
+    else if(id >= LV_PROPERTY_OBJ_STATE_START && id <= LV_PROPERTY_OBJ_STATE_END) {
+        prop->id = id;
+        if(id == LV_PROPERTY_OBJ_STATE_ANY) {
+            prop->num = obj->state;
+        }
+        else {
+            lv_obj_flag_t flag = 1L << (id - LV_PROPERTY_OBJ_STATE_START);
+            prop->num = obj->state & flag;
+        }
         return LV_RESULT_OK;
     }
     else {

@@ -218,9 +218,17 @@ static inline void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_xcb_t exec_cb
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param duration  duration of the animation in milliseconds
  */
-static inline void lv_anim_set_time(lv_anim_t * a, uint32_t duration)
+static inline void lv_anim_set_duration(lv_anim_t * a, uint32_t duration)
 {
     a->duration = duration;
+}
+
+/**
+ * Legacy `lv_anim_set_time` API will be removed soon, use `lv_anim_set_duration` instead.
+ */
+static inline void lv_anim_set_time(lv_anim_t * a, uint32_t duration)
+{
+    lv_anim_set_duration(a, duration);
 }
 
 /**

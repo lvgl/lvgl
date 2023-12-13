@@ -162,11 +162,14 @@ static void text_input_create(lv_obj_t * parent)
 
 static void msgbox_create(void)
 {
-    static const char * buttons[] = {"Ok", "Cancel", ""};
-    lv_obj_t * mbox = lv_msgbox_create(NULL, "Hi", "Welcome to the keyboard and encoder demo", buttons, false);
-    lv_obj_add_event_cb(mbox, msgbox_event_cb, LV_EVENT_ALL, NULL);
-    lv_group_focus_obj(lv_msgbox_get_buttons(mbox));
-    lv_obj_add_state(lv_msgbox_get_buttons(mbox), LV_STATE_FOCUS_KEY);
+    lv_obj_t * mbox = lv_msgbox_create(NULL);
+    lv_msgbox_add_title(mbox, "Hi");
+    lv_msgbox_add_text(mbox, "Welcome to the keyboard and encoder demo");
+
+    lv_obj_t * btn = lv_msgbox_add_footer_button(mbox, "Ok");
+    lv_obj_add_event_cb(btn, msgbox_event_cb, LV_EVENT_CLICKED, mbox);
+    lv_group_focus_obj(btn);
+    lv_obj_add_state(btn, LV_STATE_FOCUS_KEY);
     lv_group_focus_freeze(g, true);
 
     lv_obj_align(mbox, LV_ALIGN_CENTER, 0, 0);
@@ -178,19 +181,12 @@ static void msgbox_create(void)
 
 static void msgbox_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * msgbox = lv_event_get_current_target(e);
+    lv_obj_t * msgbox = lv_event_get_user_data(e);
 
-    if(code == LV_EVENT_VALUE_CHANGED) {
-        const char * txt = lv_msgbox_get_active_button_text(msgbox);
-        if(txt) {
-            lv_msgbox_close(msgbox);
-            lv_group_focus_freeze(g, false);
-            lv_group_focus_obj(lv_obj_get_child(t1, 0));
-            lv_obj_scroll_to(t1, 0, 0, LV_ANIM_OFF);
-
-        }
-    }
+    lv_msgbox_close(msgbox);
+    lv_group_focus_freeze(g, false);
+    lv_group_focus_obj(lv_obj_get_child(t1, 0));
+    lv_obj_scroll_to(t1, 0, 0, LV_ANIM_OFF);
 }
 
 static void ta_event_cb(lv_event_t * e)

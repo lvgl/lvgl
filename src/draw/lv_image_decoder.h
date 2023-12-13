@@ -16,7 +16,7 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 #include <stdint.h>
-#include "lv_image_buf.h"
+#include "lv_draw_buf.h"
 #include "../misc/lv_fs.h"
 #include "../misc/lv_types.h"
 #include "../misc/lv_area.h"
@@ -136,6 +136,8 @@ typedef struct _lv_image_decoder_dsc_t {
      *  MUST be set in `open` function*/
     const uint8_t * img_data;
 
+    const lv_draw_buf_t * decoded;    /*A draw buffer to described decoded image.*/
+
     const lv_color32_t * palette;
     uint32_t palette_size;
 
@@ -157,6 +159,14 @@ typedef struct _lv_image_decoder_dsc_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * @todo remove it when all decoder migrates to new draw buf interface.
+ */
+static inline const void * _lv_image_decoder_get_data(const lv_image_decoder_dsc_t * dsc)
+{
+    return dsc->decoded ? dsc->decoded->data : dsc->img_data;
+}
 
 /**
  * Initialize the image decoder module

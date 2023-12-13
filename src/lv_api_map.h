@@ -220,6 +220,8 @@ static inline lv_cache_entry_t * lv_cache_find_unused(const void * src_ptr, lv_c
 #define lv_tabview_set_act                   lv_tabview_set_active
 
 #define lv_tileview_get_tile_act             lv_tileview_get_tile_active
+#define lv_obj_set_tile_id                   lv_obj_set_tile_by_index
+#define lv_obj_set_tile                      lv_obj_set_tile
 
 #define lv_msgbox_get_btns                   lv_msgbox_get_buttons
 

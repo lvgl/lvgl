@@ -27,7 +27,7 @@ void lv_example_anim_2(void)
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
     lv_anim_set_values(&a, 10, 50);
-    lv_anim_set_time(&a, 1000);
+    lv_anim_set_duration(&a, 1000);
     lv_anim_set_playback_delay(&a, 100);
     lv_anim_set_playback_time(&a, 300);
     lv_anim_set_repeat_delay(&a, 500);

@@ -53,14 +53,6 @@ Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the checkbox is toggled.
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following types:
-
-   -  :cpp:enumerator:`LV_CHECKBOX_DRAW_PART_BOX` The tickbox of the checkbox
-
-      -  ``part``: :cpp:enumerator:`LV_PART_INDICATOR`
-      -  ``draw_area``: the area of the tickbox
-      -  ``rect_dsc``
 
 See the events of the `Base object </widgets/obj>`__ too.
 

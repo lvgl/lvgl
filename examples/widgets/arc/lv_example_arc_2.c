@@ -24,7 +24,7 @@ void lv_example_arc_2(void)
     lv_anim_init(&a);
     lv_anim_set_var(&a, arc);
     lv_anim_set_exec_cb(&a, set_angle);
-    lv_anim_set_time(&a, 1000);
+    lv_anim_set_duration(&a, 1000);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);    /*Just for the demo*/
     lv_anim_set_repeat_delay(&a, 500);
     lv_anim_set_values(&a, 0, 100);

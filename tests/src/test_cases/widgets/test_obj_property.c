@@ -154,4 +154,50 @@ void test_obj_property_flag(void)
     }
 }
 
+void test_obj_property_state(void)
+{
+    const struct {
+        uint32_t state;
+        uint32_t id;
+    } states[] = {
+        { LV_STATE_CHECKED,     LV_PROPERTY_OBJ_STATE_CHECKED },
+        { LV_STATE_FOCUSED,     LV_PROPERTY_OBJ_STATE_FOCUSED },
+        { LV_STATE_FOCUS_KEY,   LV_PROPERTY_OBJ_STATE_FOCUS_KEY },
+        { LV_STATE_EDITED,      LV_PROPERTY_OBJ_STATE_EDITED },
+        { LV_STATE_HOVERED,     LV_PROPERTY_OBJ_STATE_HOVERED },
+        { LV_STATE_PRESSED,     LV_PROPERTY_OBJ_STATE_PRESSED },
+        { LV_STATE_SCROLLED,    LV_PROPERTY_OBJ_STATE_SCROLLED },
+        { LV_STATE_DISABLED,    LV_PROPERTY_OBJ_STATE_DISABLED },
+        { LV_STATE_USER_1,      LV_PROPERTY_OBJ_STATE_USER_1 },
+        { LV_STATE_USER_2,      LV_PROPERTY_OBJ_STATE_USER_2 },
+        { LV_STATE_USER_3,      LV_PROPERTY_OBJ_STATE_USER_3 },
+        { LV_STATE_USER_4,      LV_PROPERTY_OBJ_STATE_USER_4 },
+    };
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    obj->state = 0;
+    for(unsigned long i = 0; i < sizeof(states) / sizeof(states[0]); i++) {
+        TEST_ASSERT_FALSE(lv_obj_get_property(obj, states[i].id).num);
+        lv_obj_add_state(obj, states[i].state);
+        printf("state: %d, value: %d\n", states[i].state, lv_obj_get_property(obj, states[i].id).num);
+        TEST_ASSERT_TRUE(lv_obj_get_property(obj, states[i].id).num);
+
+        lv_obj_remove_state(obj, states[i].state);
+        TEST_ASSERT_FALSE(lv_obj_get_property(obj, states[i].id).num);
+
+        lv_property_t prop = { };
+        prop.id = states[i].id;
+        prop.num = 1;
+        TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+        TEST_ASSERT_TRUE(lv_obj_get_property(obj, states[i].id).num);
+        TEST_ASSERT_TRUE(lv_obj_get_state(obj) & states[i].state);
+
+        prop.id = states[i].id;
+        prop.num = 0;
+        TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+        TEST_ASSERT_FALSE(lv_obj_get_property(obj, states[i].id).num);
+        TEST_ASSERT_FALSE(lv_obj_get_state(obj) & states[i].state);
+    }
+}
+
 #endif

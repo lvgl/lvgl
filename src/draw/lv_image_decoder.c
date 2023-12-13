@@ -154,6 +154,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
 
         dsc->error_msg = NULL;
         dsc->img_data  = NULL;
+        dsc->decoded  = NULL;
         dsc->cache_entry = NULL;
         dsc->user_data = NULL;
         dsc->time_to_open = 0;

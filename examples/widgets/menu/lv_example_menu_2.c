@@ -7,8 +7,10 @@ static void back_event_handler(lv_event_t * e)
     lv_obj_t * menu = lv_event_get_user_data(e);
 
     if(lv_menu_back_button_is_root(menu, obj)) {
-        lv_obj_t * mbox1 = lv_msgbox_create(NULL, "Hello", "Root back btn click.", NULL, true);
-        lv_obj_center(mbox1);
+        lv_obj_t * mbox1 = lv_msgbox_create(NULL);
+        lv_msgbox_add_title(mbox1, "Hello");
+        lv_msgbox_add_text(mbox1, "Root back btn click.");
+        lv_msgbox_add_close_button(mbox1);
     }
 }
 

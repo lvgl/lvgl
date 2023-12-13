@@ -57,7 +57,10 @@ def back_event_handler(e,menu):
     # menu = lv_event_get_user_data(e);
 
     if menu.back_button_is_root(obj) :
-        mbox1 = lv.msgbox(None, "Hello", "Root back button click.", None, True)
+        mbox1 = lv.msgbox(None)
+        mbox1.add_title("Hello")
+        mbox1.add_text("Root back button click.")
+        mbox1.add_close_button()
         mbox1.center()
 
 def switch_handler(e,menu):
