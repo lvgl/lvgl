@@ -641,7 +641,9 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
         return false;
     }
 
-    if(!decoder_dsc->img_data) {
+    const uint8_t * img_data = _lv_image_decoder_get_data(decoder_dsc);
+
+    if(!img_data) {
         lv_image_decoder_close(decoder_dsc);
         LV_LOG_ERROR("image data is NULL");
         return false;
@@ -669,7 +671,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     }
 
     uint32_t width = lv_vg_lite_width_align(decoder_dsc->header.w);
-    const uint8_t * img_data = decoder_dsc->img_data + image_offset;
+    img_data += image_offset;
 
     LV_ASSERT(lv_vg_lite_buffer_init(
                   buffer,
