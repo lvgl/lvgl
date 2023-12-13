@@ -171,12 +171,21 @@ void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max)
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rotation)
+void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->angle_range = angle_range;
+
+    lv_obj_invalidate(obj);
+}
+
+void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+
     scale->rotation = rotation;
 
     lv_obj_invalidate(obj);

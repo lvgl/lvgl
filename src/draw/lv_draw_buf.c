@@ -179,12 +179,6 @@ void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y)
     return data + x * lv_color_format_get_size(buf->header.cf);
 }
 
-/**
- * Convert draw buffer stride and color format.
- * @param src source draw buffer
- * @param stride new stride
- * @return converted draw buffer
- */
 lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t stride)
 {
     LV_ASSERT_NULL(src);

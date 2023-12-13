@@ -42,13 +42,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Draw a line
- * @param point1 first point of the line
- * @param point2 second point of the line
- * @param clip the line will be drawn only in this area
- * @param dsc pointer to an initialized `lv_draw_line_dsc_t` variable
- */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
 {
     if(dsc->width == 0) return;

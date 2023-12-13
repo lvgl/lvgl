@@ -10,8 +10,8 @@
 #if LV_USE_ANIMIMG != 0
 
 /*Testing of dependencies*/
-#if LV_USE_IMG == 0
-    #error "lv_animimg: lv_img is required. Enable it in lv_conf.h (LV_USE_IMG  1) "
+#if LV_USE_IMAGE == 0
+    #error "lv_animimg: lv_img is required. Enable it in lv_conf.h (LV_USE_IMAGE  1) "
 #endif
 
 #include "../../draw/lv_image_decoder.h"

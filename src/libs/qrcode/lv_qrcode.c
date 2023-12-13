@@ -46,11 +46,6 @@ const lv_obj_class_t lv_qrcode_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create an empty QR code (an `lv_canvas`) object.
- * @param parent point to an object where to create the QR code
- * @return pointer to the created QR code object
- */
 lv_obj_t * lv_qrcode_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
@@ -108,7 +103,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
 
     lv_canvas_set_palette(obj, 0, lv_color_to_32(qrcode->dark_color, 0xff));
     lv_canvas_set_palette(obj, 1, lv_color_to_32(qrcode->light_color, 0xff));
-    lv_color_t c = lv_color_from_int(1);
+    lv_color_t c = lv_color_hex(1);
     lv_canvas_fill_bg(obj, c, LV_OPA_COVER);
 
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RESULT_INVALID;
@@ -169,7 +164,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
             if(aligned == false && (x & 0x7) == 0) aligned = true;
 
             if(aligned == false) {
-                c = lv_color_from_int(a ? 0 : 1);
+                c = lv_color_hex(a ? 0 : 1);
                 lv_canvas_set_px(obj, x, y, c, LV_OPA_COVER);
             }
             else {

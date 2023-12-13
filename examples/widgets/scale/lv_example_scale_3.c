@@ -40,7 +40,8 @@ void lv_example_scale_3(void)
     lv_scale_set_minor_tick_length(scale_line, 5);
     lv_scale_set_range(scale_line, 10, 40);
 
-    lv_scale_set_round_props(scale_line, 270, 135);
+    lv_scale_set_angle_range(scale_line, 270);
+    lv_scale_set_rotation(scale_line, 135);
 
     needle_line = lv_line_create(scale_line);
 
@@ -76,7 +77,8 @@ void lv_example_scale_3(void)
     lv_scale_set_minor_tick_length(scale_img, 5);
     lv_scale_set_range(scale_img, 10, 40);
 
-    lv_scale_set_round_props(scale_img, 270, 135);
+    lv_scale_set_angle_range(scale_img, 270);
+    lv_scale_set_rotation(scale_img, 135);
 
     /* image must point to the right. E.g. -O------>*/
     needle_img = lv_img_create(scale_img);

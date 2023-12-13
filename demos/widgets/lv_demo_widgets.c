@@ -734,7 +734,7 @@ static void analytics_create(lv_obj_t * parent)
 
     /*Scale 2*/
     static const char * scale2_text[] = {"0", "10", "20", "30", "40", "50", "60", "70", "80", "90", NULL};
-    lv_scale_set_round_props(scale2, 360, 0);
+    lv_scale_set_angle_range(scale2, 360);
     lv_scale_set_text_src(scale2, scale2_text);
     lv_scale_set_total_tick_count(scale2, 11);
     lv_scale_set_major_tick_length(scale2, 30);
@@ -782,7 +782,8 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_set_major_tick_every(scale3, 4);
     lv_scale_set_minor_tick_length(scale3, 10);
     lv_scale_set_major_tick_length(scale3, 20);
-    lv_scale_set_round_props(scale3, 225, 135);
+    lv_scale_set_angle_range(scale3, 225);
+    lv_scale_set_rotation(scale3, 135);
 
     lv_style_init(&scale3_section1_main_style);
     lv_style_set_arc_width(&scale3_section1_main_style, 8);

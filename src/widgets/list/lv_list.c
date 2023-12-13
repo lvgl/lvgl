@@ -86,7 +86,7 @@ lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * t
     lv_obj_class_init_obj(obj);
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
 
-#if LV_USE_IMG == 1
+#if LV_USE_IMAGE == 1
     if(icon) {
         lv_obj_t * img = lv_image_create(obj);
         lv_image_set_src(img, icon);

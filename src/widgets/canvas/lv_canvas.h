@@ -65,17 +65,29 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
  */
 void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, int32_t w, int32_t h, lv_color_format_t cf);
 
+/**
+ * Set a pixel's color and opacity
+ * @param obj   pointer to a canvas
+ * @param x     X coordinate of the pixel
+ * @param y     Y coordinate of the pixel
+ * @param color the color
+ * @param opa   the opacity
+ * @note        The following color formats are supported
+ *              LV_COLOR_FORMAT_I1/2/4/8, LV_COLOR_FORMAT_A8,
+ *              LV_COLOR_FORMAT_RGB565, LV_COLOR_FORMAT_RGB888,
+ *              LV_COLOR_FORMAT_XRGB8888, LV_COLOR_FORMAT_ARGB8888
+ */
 void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv_opa_t opa);
 
 /**
- * Set the palette color of a canvas with index format. Valid only for `LV_IMAGE_CF_INDEXED1/2/4/8`
- * @param canvas pointer to canvas object
- * @param id the palette color to set:
- *   - for `LV_IMAGE_CF_INDEXED1`: 0..1
- *   - for `LV_IMAGE_CF_INDEXED2`: 0..3
- *   - for `LV_IMAGE_CF_INDEXED4`: 0..15
- *   - for `LV_IMAGE_CF_INDEXED8`: 0..255
- * @param c the color to set
+ * Set the palette color of a canvas for index format. Valid only for `LV_COLOR_FORMAT_I1/2/4/8`
+ * @param canvas    pointer to canvas object
+ * @param id        the palette color to set:
+ *                  - for `LV_COLOR_FORMAT_I1`: 0..1
+ *                  - for `LV_COLOR_FORMAT_I2`: 0..3
+ *                  - for `LV_COLOR_FORMAT_I4`: 0..15
+ *                  - for `LV_COLOR_FORMAT_I8`: 0..255
+ * @param c         the color to set
  */
 void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color32_t c);
 
@@ -83,12 +95,19 @@ void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color32_t c);
  * Getter functions
  *====================*/
 
+/**
+ * Get a pixel's color and opacity
+ * @param obj   pointer to a canvas
+ * @param x     X coordinate of the pixel
+ * @param y     Y coordinate of the pixel
+ * @return      ARGB8888 color of the pixel
+ */
 lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y);
 
 /**
  * Get the image of the canvas as a pointer to an `lv_image_dsc_t` variable.
- * @param canvas pointer to a canvas object
- * @return pointer to the image descriptor.
+ * @param canvas    pointer to a canvas object
+ * @return          pointer to the image descriptor.
  */
 lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * canvas);
 
@@ -107,26 +126,38 @@ const void * lv_canvas_get_buf(lv_obj_t * canvas);
 
 /**
  * Copy a buffer to the canvas
- * @param canvas pointer to a canvas object
- * @param to_copy buffer to copy. The color format has to match with the canvas's buffer color
+ * @param canvas    pointer to a canvas object
+ * @param to_copy   buffer to copy. The color format has to match with the canvas's buffer color
  * format
- * @param x left side of the destination position
- * @param y top side of the destination position
- * @param w width of the buffer to copy
- * @param h height of the buffer to copy
+ * @param x     left side of the destination position
+ * @param y     top side of the destination position
+ * @param w     width of the buffer to copy
+ * @param h     height of the buffer to copy
  */
 void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, int32_t x, int32_t y, int32_t w,
                         int32_t h);
 /**
  * Fill the canvas with color
- * @param canvas pointer to a canvas
- * @param color the background color
- * @param opa the desired opacity
+ * @param canvas    pointer to a canvas
+ * @param color     the background color
+ * @param opa       the desired opacity
  */
 void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa);
 
+/**
+ * Initialize a layer to use LVGL's generic draw functions (lv_draw_rect/label/...) on the canvas.
+ * Needs to be usd in pair with `lv_canvas_finish_layer`.
+ * @param canvas    pointer to a canvas
+ * @param layer     pointer to a layer variable to initialize
+ */
 void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer);
 
+/**
+ * Wait until all the drawings are finished on layer.
+ * Needs to be usd in pair with `lv_canvas_init_layer`.
+ * @param canvas    pointer to a canvas
+ * @param layer     pointer to a layer to finalize
+ */
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer);
 
 /**********************

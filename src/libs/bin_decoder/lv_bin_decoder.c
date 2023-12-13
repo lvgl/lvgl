@@ -98,13 +98,6 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_set_close_cb(decoder, lv_bin_decoder_close);
 }
 
-/**
- * Get info about a lvgl binary image
- * @param decoder the decoder where this function belongs
- * @param src the image source: pointer to an `lv_image_dsc_t` variable, a file path or a symbol
- * @param header store the image data here
- * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
- */
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
     LV_UNUSED(decoder); /*Unused*/
@@ -153,13 +146,6 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_OK;
 }
 
-/**
- * Open a lvgl binary image
- * @param decoder the decoder where this function belongs
- * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
- * @param args arguments of how to decode the image.
- * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
- */
 lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                 const lv_image_decoder_args_t * args)
 {
@@ -330,11 +316,6 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     return res;
 }
 
-/**
- * Close the pending decoding. Free resources etc.
- * @param decoder pointer to the decoder the function associated with
- * @param dsc pointer to decoder descriptor
- */
 void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/

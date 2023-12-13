@@ -248,12 +248,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     layer->_clip_area = clip_area_ori;
 }
 
-/**
- * Invalidate an area on display to redraw it
- * @param disp pointer to display where the area should be invalidated (NULL can be used if there is
- * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
- * only one display)
- */
 void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
 {
     if(!disp) disp = lv_display_get_default();
@@ -327,10 +321,6 @@ void _lv_refr_set_disp_refreshing(lv_display_t * disp)
     disp_refr = disp;
 }
 
-/**
- * Called periodically to handle the refreshing
- * @param tmr pointer to the timer itself
- */
 void _lv_display_refr_timer(lv_timer_t * tmr)
 {
     LV_PROFILER_BEGIN;

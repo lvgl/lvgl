@@ -286,7 +286,7 @@ lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
     return NULL;
 }
 
-uint32_t lv_spangroup_get_child_count(const lv_obj_t * obj)
+uint32_t lv_spangroup_get_span_count(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -366,7 +366,7 @@ void lv_spangroup_refr_mode(lv_obj_t * obj)
     refresh_self_size(obj);
 }
 
-int32_t lv_spangroup_get_max_line_h(lv_obj_t * obj)
+int32_t lv_spangroup_get_max_line_height(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
@@ -584,7 +584,7 @@ static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(spans->mode == LV_SPAN_MODE_EXPAND) {
             if(spans->refresh) {
                 spans->cache_w = (int32_t)lv_spangroup_get_expand_width(obj, 0);
-                spans->cache_h = lv_spangroup_get_max_line_h(obj);
+                spans->cache_h = lv_spangroup_get_max_line_height(obj);
                 spans->refresh = 0;
             }
             width = spans->cache_w;
