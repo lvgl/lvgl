@@ -95,18 +95,10 @@ typedef struct {
     float y;
 } lv_fpoint_t;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> github/master
 typedef struct {
     float m[3][3];
 } lv_matrix_t;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> github/master
 typedef struct {
     lv_vector_path_quality_t quality;
     lv_array_t ops;
