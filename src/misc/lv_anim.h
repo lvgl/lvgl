@@ -525,7 +525,7 @@ uint16_t lv_anim_count_running(void);
 /**
  * Store the speed as a special value which can be used as time in animations.
  * It will be converted to time internally based on the start and end values
- * @param speed         the speed of the animation in with 10 unit / sec resolution in 0..1023 range
+ * @param speed         the speed of the animation in with unit / sec resolution in 0..10k range
  * @return              a special value which can be used as an animation time
  */
 uint32_t lv_anim_speed(uint32_t speed);
