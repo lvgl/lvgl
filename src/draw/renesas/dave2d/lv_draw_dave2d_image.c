@@ -171,6 +171,7 @@ static void dave2d_img_draw_core(lv_draw_dave2d_unit_t * u, const lv_draw_image_
 
     const uint8_t * src_buf = decoder_dsc->img_data;
     const lv_image_header_t * header = &decoder_dsc->header;
+    uint32_t img_stride = header->stride;
     lv_area_t buffer_area;
     lv_area_t draw_area;
     lv_area_t clipped_area;
@@ -184,11 +185,21 @@ static void dave2d_img_draw_core(lv_draw_dave2d_unit_t * u, const lv_draw_image_
     d2_u32 src_blend_mode;
     d2_u32 dst_blend_mode;
 
-    if(LV_COLOR_FORMAT_RGB565A8 == header->cf) {
+    lv_color_format_t cf = header->cf;
+
+    if(decoder_dsc->decoded) {
+        src_buf = decoder_dsc->decoded->data;
+        img_stride = decoder_dsc->decoded->header.stride;
+        cf = decoder_dsc->decoded->header.cf;
+    }
+
+    if(LV_COLOR_FORMAT_RGB565A8 == cf) {
         /* Colour format not support by Dave2D */
         sw_fallback_img_draw_core(&u->base_unit, draw_dsc, decoder_dsc, sup, img_coords, clipped_img_area);
         return;
     }
+
+
 
 #if LV_USE_OS
     lv_result_t  status;
@@ -237,13 +248,13 @@ static void dave2d_img_draw_core(lv_draw_dave2d_unit_t * u, const lv_draw_image_
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
     d1_cacheblockflush(u->d2_handle, 0, src_buf,
-                       decoder_dsc->header.stride * decoder_dsc->header.h); //Stride is in bytes, not pixels/texels
+            img_stride * decoder_dsc->header.h); //Stride is in bytes, not pixels/texels
 #endif
 #endif
 
     d2_settexopparam(u->d2_handle, d2_cc_alpha, draw_dsc->opa, 0);
 
-    if(LV_COLOR_FORMAT_RGB565 == header->cf) {
+    if(LV_COLOR_FORMAT_RGB565 == cf) {
         d2_settextureoperation(u->d2_handle, d2_to_replace, d2_to_copy, d2_to_copy, d2_to_copy);
     }
     else { //Formats with an alpha channel,
@@ -274,8 +285,8 @@ static void dave2d_img_draw_core(lv_draw_dave2d_unit_t * u, const lv_draw_image_
     };
 
     d2_settexture(u->d2_handle, (void *)src_buf,
-                  (d2_s32)(decoder_dsc->header.stride / lv_color_format_get_size(header->cf)),
-                  decoder_dsc->header.w,  decoder_dsc->header.h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(header->cf));
+                  (d2_s32)(img_stride / lv_color_format_get_size(cf)),
+                  decoder_dsc->header.w,  decoder_dsc->header.h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(cf));
 
     d2_settexturemode(u->d2_handle, d2_tm_filter);
     d2_setfillmode(u->d2_handle, d2_fm_texture);
@@ -373,7 +384,13 @@ static void sw_fallback_img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_
     uint32_t img_stride = header->stride;
     lv_color_format_t cf = header->cf;
 
-    cf = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf,
+    if(decoder_dsc->decoded) {
+        src_buf = decoder_dsc->decoded->data;
+        img_stride = decoder_dsc->decoded->header.stride;
+        cf = decoder_dsc->decoded->header.cf;
+    }
+
+    cf = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
 
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
     blend_dsc.opa = draw_dsc->opa;
