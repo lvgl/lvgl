@@ -64,6 +64,24 @@ typedef uint8_t lv_opa_t;
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
 
+#define LV_COLOR_FORMAT_GET_BPP(cf) (       \
+                                            (cf) == LV_COLOR_FORMAT_I1 ? 1 :        \
+                                            (cf) == LV_COLOR_FORMAT_A1 ? 1 :        \
+                                            (cf) == LV_COLOR_FORMAT_I2 ? 2 :        \
+                                            (cf) == LV_COLOR_FORMAT_A2 ? 2 :        \
+                                            (cf) == LV_COLOR_FORMAT_I4 ? 4 :        \
+                                            (cf) == LV_COLOR_FORMAT_A4 ? 4 :        \
+                                            (cf) == LV_COLOR_FORMAT_L8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_A8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
+                                            (cf) == LV_COLOR_FORMAT_RGB565A8 ? 24 : \
+                                            (cf) == LV_COLOR_FORMAT_RGB888 ? 24 :   \
+                                            (cf) == LV_COLOR_FORMAT_ARGB8888 ? 32 : \
+                                            (cf) == LV_COLOR_FORMAT_XRGB8888 ? 32 : \
+                                            0                                       \
+                                    )
+
 /**********************
  *      TYPEDEFS
  **********************/
