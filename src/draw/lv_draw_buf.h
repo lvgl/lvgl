@@ -32,6 +32,37 @@ typedef struct {
     void * _unaligned;      /*Unaligned address of data*/
 } lv_draw_buf_t;
 
+/**
+ * Stride alignment for draw buffers.
+ * It may vary between different color formats and hardware.
+ * Refine it to suit your needs.
+ */
+
+#define _LV_DRAW_BUF_STRIDE(w, cf) \
+    (((w) * LV_COLOR_FORMAT_GET_BPP(cf) + 7) / 8 + (LV_DRAW_BUF_STRIDE_ALIGN) - 1)
+
+#define _LV_DRAW_BUF_SIZE(w, h, cf) \
+    (_LV_DRAW_BUF_STRIDE(w, cf) * (h))
+
+/**
+ * Define a static draw buffer with the given width, height, and color format.
+ * Stride alignment is set to LV_DRAW_BUF_STRIDE_ALIGN.
+ */
+#define LV_DRAW_BUF_DEFINE(name, _w, _h, _cf) \
+    static uint8_t buf_##name[_LV_DRAW_BUF_SIZE(_w, _h, _cf)]; \
+    static lv_draw_buf_t name = { \
+                                  .header = { \
+                                              .w = (_w), \
+                                              .h = (_h), \
+                                              .cf = (_cf), \
+                                              .flags = LV_IMAGE_FLAGS_MODIFIABLE, \
+                                              .stride = _LV_DRAW_BUF_STRIDE(_w, _cf), \
+                                            }, \
+                                  .data_size = sizeof(buf_##name), \
+                                  .data = buf_##name, \
+                                  ._unaligned = buf_##name, \
+                                }
+
 typedef void * (*lv_draw_buf_malloc_cb)(size_t size, lv_color_format_t color_format);
 
 typedef void (*lv_draw_buf_free_cb)(void * draw_buf);
