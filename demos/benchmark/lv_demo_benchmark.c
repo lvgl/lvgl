@@ -29,6 +29,11 @@ typedef struct {
     const char * name;
     void (*create_cb)(void);
     uint32_t scene_time;
+    uint32_t cpu_avg_usage;
+    uint32_t fps_avg;
+    uint32_t render_avg_time;
+    uint32_t flush_avg_time;
+    uint32_t measurement_cnt;
 } scene_dsc_t;
 
 /**********************
@@ -41,6 +46,8 @@ static void next_scene_timer_cb(lv_timer_t * timer);
 #if LV_USE_PERF_MONITOR
     static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
+
+static void summary_create(void);
 
 static void rnd_reset(void);
 static int32_t rnd_next(int32_t min, int32_t max);
@@ -66,7 +73,8 @@ static void moving_wallpaper_cb(void)
 
     lv_obj_t * img = lv_img_create(lv_screen_active());
     lv_obj_set_size(img, lv_pct(150), lv_pct(150));
-    lv_img_set_src(img, &img_benchmark_cogwheel_rgb);
+    lv_image_set_src(img, &img_benchmark_cogwheel_rgb);
+    lv_image_set_align(img, LV_IMAGE_ALIGN_TILE);
     shake_anim(img, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
@@ -455,6 +463,7 @@ static void next_scene_timer_cb(lv_timer_t * timer)
     load_scene(scene_act);
     if(scenes[scene_act].scene_time == 0) {
         lv_timer_delete(timer);
+        summary_create();
     }
     else {
         lv_timer_set_period(timer, scenes[scene_act].scene_time);
@@ -468,13 +477,133 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
     lv_obj_t * label = lv_observer_get_target(observer);
 
     lv_label_set_text_fmt(label,
+                          "%s: "
                           "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
                           "refr. %" LV_PRIu32" ms = %" LV_PRIu32 "ms render + %" LV_PRIu32" ms flush",
+                          scenes[scene_act].name,
                           info->calculated.fps, info->calculated.cpu,
                           info->calculated.render_avg_time + info->calculated.flush_avg_time,
                           info->calculated.render_avg_time, info->calculated.flush_avg_time);
+
+    /*Ignore the first call as it contains data from the previous scene*/
+    if(scenes[scene_act].measurement_cnt != 0) {
+        scenes[scene_act].cpu_avg_usage += info->calculated.cpu;
+        scenes[scene_act].fps_avg += info->calculated.fps;
+        scenes[scene_act].render_avg_time += info->calculated.render_avg_time;
+        scenes[scene_act].flush_avg_time += info->calculated.flush_avg_time;
+    }
+    scenes[scene_act].measurement_cnt++;
+
 }
 #endif
+
+static void table_draw_task_event_cb(lv_event_t * e)
+{
+    lv_draw_task_t * t = lv_event_get_draw_task(e);
+    lv_draw_dsc_base_t * draw_dsc_base = t->draw_dsc;
+    if(draw_dsc_base->part != LV_PART_ITEMS) return;
+
+    int32_t row = draw_dsc_base->id1;
+    if(row == 0) {
+        if(t->type == LV_DRAW_TASK_TYPE_FILL) {
+            lv_draw_fill_dsc_t * draw_dsc_fill = t->draw_dsc;
+            draw_dsc_fill->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
+        }
+        else if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
+            lv_draw_label_dsc_t * draw_dsc_label = t->draw_dsc;
+            draw_dsc_label->color = lv_color_white();
+        }
+    }
+    else if(row == 1) {
+        if(t->type == LV_DRAW_TASK_TYPE_BORDER) {
+            lv_draw_border_dsc_t * draw_dsc_border = t->draw_dsc;
+            draw_dsc_border->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
+            draw_dsc_border->width = 2;
+            draw_dsc_border->side = LV_BORDER_SIDE_BOTTOM;
+        }
+        else if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
+            lv_draw_label_dsc_t * draw_dsc_label = t->draw_dsc;
+            draw_dsc_label->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
+        }
+    }
+
+}
+
+lv_obj_t * table;
+
+static void summary_create(void)
+{
+    lv_obj_clean(lv_screen_active());
+    lv_obj_set_style_pad_hor(lv_screen_active(), 0, 0);
+    table = lv_table_create(lv_screen_active());
+    lv_obj_set_width(table, lv_pct(100));
+    lv_obj_set_style_max_height(table, lv_pct(100), 0);
+    lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_style_text_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
+    lv_obj_set_style_border_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
+    lv_obj_add_event_cb(table, table_draw_task_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+
+    lv_table_set_cell_value(table, 0, 0, "Name");
+    lv_table_set_cell_value(table, 0, 1, "Avg. CPU");
+    lv_table_set_cell_value(table, 0, 2, "Avg. FPS");
+    lv_table_set_cell_value(table, 0, 3, "Avg. render time");
+    lv_table_set_cell_value(table, 0, 4, "Avg. flush time");
+
+    lv_obj_update_layout(table);
+    int32_t col_w = lv_obj_get_content_width(table) / 5;
+
+    lv_table_set_column_width(table, 0, col_w);
+    lv_table_set_column_width(table, 1, col_w);
+    lv_table_set_column_width(table, 2, col_w);
+    lv_table_set_column_width(table, 3, col_w);
+    lv_table_set_column_width(table, 4, col_w);
+
+    uint32_t i;
+    int32_t total_avg_fps = 0;
+    int32_t total_avg_cpu = 0;
+    int32_t total_avg_render_time = 0;
+    int32_t total_avg_flush_time = 0;
+    int32_t valid_scene_cnt = 0;
+    for(i = 0; scenes[i].create_cb; i++) {
+        lv_table_set_cell_value(table, i + 2, 0, scenes[i].name);
+
+        /*the first measurement was ignored as it contains data from the previous scene*/
+        if(scenes[i].measurement_cnt <= 1) {
+            lv_table_set_cell_value(table, i + 2, 1, "N/A");
+            lv_table_set_cell_value(table, i + 2, 2, "N/A");
+            lv_table_set_cell_value(table, i + 2, 3, "N/A");
+            lv_table_set_cell_value(table, i + 2, 4, "N/A");
+        }
+        else {
+            int32_t cnt = scenes[i].measurement_cnt - 1;
+            lv_table_set_cell_value_fmt(table, i + 2, 1, "%d %%", scenes[i].cpu_avg_usage / cnt);
+            lv_table_set_cell_value_fmt(table, i + 2, 2, "%d FPS", scenes[i].fps_avg / cnt);
+            lv_table_set_cell_value_fmt(table, i + 2, 3, "%d ms", scenes[i].render_avg_time / cnt);
+            lv_table_set_cell_value_fmt(table, i + 2, 4, "%d ms", scenes[i].flush_avg_time / cnt);
+
+            valid_scene_cnt++;
+            total_avg_cpu += scenes[i].cpu_avg_usage / cnt;
+            total_avg_fps += scenes[i].fps_avg / cnt;
+            total_avg_render_time += scenes[i].render_avg_time / cnt;
+            total_avg_flush_time += scenes[i].flush_avg_time / cnt;
+        }
+    }
+
+    /*Add the average*/
+    lv_table_set_cell_value(table, 1, 0, "All scenes avg.");
+    if(valid_scene_cnt < 1) {
+        lv_table_set_cell_value(table, 1, 1, "N/A");
+        lv_table_set_cell_value(table, 1, 2, "N/A");
+        lv_table_set_cell_value(table, 1, 3, "N/A");
+        lv_table_set_cell_value(table, 1, 4, "N/A");
+    }
+    else {
+        lv_table_set_cell_value_fmt(table, 1, 1, "%d %%", total_avg_cpu / valid_scene_cnt);
+        lv_table_set_cell_value_fmt(table, 1, 2, "%d FPS", total_avg_fps / valid_scene_cnt);
+        lv_table_set_cell_value_fmt(table, 1, 3, "%d ms", total_avg_render_time / valid_scene_cnt);
+        lv_table_set_cell_value_fmt(table, 1, 4, "%d ms", total_avg_flush_time / valid_scene_cnt);
+    }
+}
 
 /*----------------
  * SCENE HELPERS
