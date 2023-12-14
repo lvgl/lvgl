@@ -162,16 +162,13 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
 
     switch(canvas->dsc.header.cf) {
         case LV_COLOR_FORMAT_ARGB8888:
-            ret.red = px[0];
-            ret.green = px[1];
-            ret.blue = px[2];
-            ret.alpha = px[3];
+            ret = *(lv_color32_t *)px;
             break;
         case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_XRGB8888:
-            ret.red = px[0];
+            ret.red = px[2];
             ret.green = px[1];
-            ret.blue = px[2];
+            ret.blue = px[0];
             ret.alpha = 0xFF;
             break;
         case LV_COLOR_FORMAT_RGB565: {
