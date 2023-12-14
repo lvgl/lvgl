@@ -333,6 +333,11 @@ int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32
     return ((x - min_in) * delta_out) / delta_in + min_out;
 }
 
+void lv_rand_set_seed(uint32_t seed)
+{
+    rand_seed = seed;
+}
+
 uint32_t lv_rand(uint32_t min, uint32_t max)
 {
     /*Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs"*/
