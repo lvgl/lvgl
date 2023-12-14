@@ -87,7 +87,7 @@ static inline void lv_global_init(lv_global_t * global)
     global->style_last_custom_prop_id = (uint32_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     global->area_trans_cache.angle_prev = INT32_MIN;
     global->event_last_register_id = _LV_EVENT_LAST;
-    global->math_rand_seed = 0x1234ABCD;
+    lv_rand_set_seed(0x1234ABCD);
 
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     global->sw_shadow_cache.cache_size = -1;
