@@ -33,7 +33,9 @@ static void * alloc_cb(void);
 static bool  init_cb(lv_cache_t_ * cache);
 static void  destroy_cb(lv_cache_t_ * cache, void * user_data);
 
-static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * key, void * user_data);
+static lv_cache_entry_t_ * get_cb(lv_cache_t_ * cache, const void * key, void * user_data);
+static lv_cache_entry_t_ * create_entry_cb(lv_cache_t_ * cache, const void * key, void * user_data);
+static void  remove_cb(lv_cache_t_ * cache, lv_cache_entry_t_ * entry, void * user_data);
 static void  drop_cb(lv_cache_t_ * cache, const void * key, void * user_data);
 static void  drop_all_cb(lv_cache_t_ * cache, void * user_data);
 
@@ -47,7 +49,9 @@ const lv_cache_class_t lv_lru_rb_class = {
     .init_cb = init_cb,
     .destroy_cb = destroy_cb,
 
-    .get_or_create_cb = get_or_create_cb,
+    .get_cb = get_cb,
+    .create_entry_cb = create_entry_cb,
+    .remove_cb = remove_cb,
     .drop_cb = drop_cb,
     .drop_all_cb = drop_all_cb
 };
@@ -211,7 +215,7 @@ static void  destroy_cb(lv_cache_t_ * cache, void * user_data)
     lv_free(lru);
 }
 
-static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * key, void * user_data)
+static lv_cache_entry_t_ * get_cb(lv_cache_t_ * cache, const void * key, void * user_data)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
@@ -243,13 +247,37 @@ static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * ke
         lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(node->data, cache->node_size);
         return entry;
     }
+    return NULL;
+}
 
+static lv_cache_entry_t_ * create_entry_cb(lv_cache_t_ * cache, const void * key, void * user_data)
+{
+    lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
+
+    LV_ASSERT_NULL(lru);
+    LV_ASSERT_NULL(key);
+
+    if(lru == NULL || key == NULL) {
+        return NULL;
+    }
+
+    void * tail = _lv_ll_get_tail(&lru->ll);
+    void * curr = tail;
     while(lru->cache.size >= lru->cache.max_size) {
-        void * tail = _lv_ll_get_tail(&lru->ll);
-        lv_rb_node_t * tail_node = *(lv_rb_node_t **)tail;
-        void * search_key = tail_node->data;
+        if (curr == NULL) {
+            LV_LOG_ERROR("create_entry_cb: failed to drop cache");
+            return NULL;
+        }
 
-        cache->clz->drop_cb(cache, search_key, user_data);
+        lv_rb_node_t * tail_node = *(lv_rb_node_t **)curr;
+        void * search_key = tail_node->data;
+        lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
+        if (lv_cache_entry_ref_get(entry) == 0) {
+            cache->clz->drop_cb(cache, search_key, user_data);
+            continue;
+        }
+
+        curr = _lv_ll_get_prev(&lru->ll, curr);
     }
 
     /*cache miss*/
@@ -262,6 +290,31 @@ static lv_cache_entry_t_ * get_or_create_cb(lv_cache_t_ * cache, const void * ke
 
     lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(new_node->data, cache->node_size);
     return entry;
+}
+
+static void  remove_cb(lv_cache_t_ * cache, lv_cache_entry_t_ * entry, void * user_data)
+{
+    lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
+
+    LV_ASSERT_NULL(lru);
+    LV_ASSERT_NULL(entry);
+
+    if(lru == NULL || entry == NULL) {
+        return;
+    }
+
+    void * data = lv_cache_entry_get_data(entry);
+    lv_rb_node_t * node = lv_rb_find(&lru->rb, data);
+    if(node == NULL) {
+        return;
+    }
+
+    void * lru_node = *get_lru_node(lru, node);
+    lv_rb_remove_node(&lru->rb, node);
+    _lv_ll_remove(&lru->ll, lru_node);
+    lv_free(lru_node);
+
+    lru->cache.size--;
 }
 
 static void  drop_cb(lv_cache_t_ * cache, const void * key, void * user_data)

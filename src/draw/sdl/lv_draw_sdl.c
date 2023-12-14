@@ -328,7 +328,7 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     data_to_find.draw_dsc->user_data = user_data_saved;
 
-    cache_data_t * data_cached = lv_cache_entry_get_data(entry_cached);
+    cache_data_t * data_cached = lv_cache_entry_acquire_data(entry_cached);
     SDL_Texture * texture = data_cached->texture;
     lv_display_t * disp = _lv_refr_get_disp_refreshing();
     SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
@@ -373,7 +373,7 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     SDL_RenderSetClipRect(renderer, NULL);
 
-    //    lv_cache_drop_(u->texture_cache, data_cached, u);
+    lv_cache_entry_release_data(entry_cached, u);
     lv_cache_unlock();
 }
 

@@ -19,9 +19,10 @@
  **********************/
 struct _lv_cache_entry_t_ {
     const lv_cache_t_ * cache;
-    uint32_t ref_cnt;
+    int32_t ref_cnt;
     uint32_t generation;
     uint32_t node_size;
+    bool is_invalid;
 };
 /**********************
  *  STATIC PROTOTYPES
@@ -71,17 +72,49 @@ void   lv_cache_destroy_(lv_cache_t_ * cache, void * user_data)
     cache->clz->destroy_cb(cache, user_data);
 }
 
+lv_cache_entry_t_ * lv_cache_get_(lv_cache_t_ * cache, const void * key, void * user_data)
+{
+    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NULL(key);
+
+    lv_cache_entry_t_ * entry = cache->clz->get_cb(cache, key, user_data);
+    return entry;
+}
 lv_cache_entry_t_ * lv_cache_get_or_create_(lv_cache_t_ * cache, const void * key, void * user_data)
 {
-    return cache->clz->get_or_create_cb(cache, key, user_data);
+    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NULL(key);
+
+    lv_cache_entry_t_ * entry = cache->clz->get_cb(cache, key, user_data);
+    if(entry == NULL) {
+        entry = cache->clz->create_entry_cb(cache, key, user_data);
+    }
+    return entry;
 }
 void   lv_cache_drop_(lv_cache_t_ * cache, const void * key, void * user_data)
 {
-    cache->clz->drop_cb(cache, key, user_data);
+    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NULL(key);
+
+    lv_cache_entry_t_ * entry = cache->clz->get_cb(cache, key, user_data);
+    if(entry == NULL) {
+        return;
+    }
+
+    if(lv_cache_entry_ref_get(entry) == 0) {
+        cache->clz->drop_cb(cache, key, user_data);
+    }
+    else {
+        lv_cache_entry_set_invalid(entry, true);
+        lv_cache_remove_(cache, entry, user_data);
+    }
 }
-void   lv_cache_remove_(lv_cache_t_ * cache, const void * key, void * user_data)
+void   lv_cache_remove_(lv_cache_t_* cache, lv_cache_entry_t_* entry, void * user_data)
 {
-    // TODO: Not implemented yet
+    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NULL(entry);
+
+    cache->clz->remove_cb(cache, entry, user_data);
 }
 void   lv_cache_drop_all_(lv_cache_t_ * cache, void * user_data)
 {
@@ -137,10 +170,15 @@ void     lv_cache_entry_ref_dec(lv_cache_entry_t_ * entry)
 {
     LV_ASSERT_NULL(entry);
     entry->ref_cnt--;
-    if (entry->ref_cnt < 0) {
+    if(entry->ref_cnt < 0) {
         LV_LOG_WARN("lv_cache_entry_ref_dec: ref_cnt(%" LV_PRIu32 ") < 0", entry->ref_cnt);
         entry->ref_cnt = 0;
     }
+}
+int32_t  lv_cache_entry_ref_get(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    return entry->ref_cnt;
 }
 uint32_t lv_cache_entry_get_generation(lv_cache_entry_t_ * entry)
 {
@@ -165,10 +203,41 @@ void     lv_cache_entry_set_node_size(lv_cache_entry_t_ * entry, uint32_t node_s
 {
     entry->node_size = node_size;
 }
+void     lv_cache_entry_set_invalid(lv_cache_entry_t_ * entry, bool is_invalid)
+{
+    LV_ASSERT_NULL(entry);
+    entry->is_invalid = is_invalid;
+}
+bool     lv_cache_entry_is_invalid(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    return entry->is_invalid;
+}
 void  *  lv_cache_entry_get_data(lv_cache_entry_t_ * entry)
 {
     LV_ASSERT_NULL(entry);
     return (uint8_t *)entry - entry->node_size;
+}
+void  * lv_cache_entry_acquire_data(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+    lv_cache_entry_ref_inc(entry);
+    return lv_cache_entry_get_data(entry);
+}
+void    lv_cache_entry_release_data(lv_cache_entry_t_ * entry, void * user_data)
+{
+    LV_ASSERT_NULL(entry);
+    if(lv_cache_entry_ref_get(entry) == 0) {
+        LV_LOG_ERROR("lv_cache_entry_release_data: ref_cnt(%" LV_PRIu32 ") == 0", entry->ref_cnt);
+        return;
+    }
+
+    lv_cache_entry_ref_dec(entry);
+
+    if(lv_cache_entry_ref_get(entry) == 0 && lv_cache_entry_is_invalid(entry)) {
+        lv_cache_t_ * cache = (lv_cache_t_ *)lv_cache_entry_get_cache(entry);
+        lv_cache_drop_(cache, lv_cache_entry_get_data(entry), user_data);
+    }
 }
 lv_cache_entry_t_ * lv_cache_entry_get_entry(void * data, const uint32_t node_size)
 {
