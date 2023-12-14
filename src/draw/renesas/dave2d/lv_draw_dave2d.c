@@ -464,6 +464,11 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     int32_t x;
     int32_t y;
 
+    if (NULL == u->base_unit.target_layer->buf)
+    {
+        return;
+    }
+
     _lv_area_intersect(&clipped_area,  &t->area, u->base_unit.clip_area);
 
     x = 0 - u->base_unit.target_layer->buf_area.x1;
