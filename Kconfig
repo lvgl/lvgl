@@ -369,7 +369,17 @@ menu "LVGL configuration"
 				bool "Use NXP's PXP on iMX RTxxx platforms."
 
 			config LV_USE_DRAW_VG_LITE
-				bool "Use Common VG-Lite GPU."
+				bool "Use VG-Lite GPU."
+
+			config LV_VG_LITE_USE_GPU_INIT
+				bool "Enbale VG-Lite custom external 'gpu_init()' function."
+				default n
+				depends on LV_USE_DRAW_VG_LITE
+
+			config LV_VG_LITE_USE_ASSERT
+				bool "Enable VG-Lite assert."
+				default n
+				depends on LV_USE_DRAW_VG_LITE
 
 			config LV_USE_GPU_SDL
 				bool "Use SDL renderer API"

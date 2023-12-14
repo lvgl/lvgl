@@ -51,7 +51,7 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 
 void lv_draw_vg_lite_init(void)
 {
-#ifdef CONFIG_LV_VG_LITE_GPU_INIT
+#if LV_VG_LITE_USE_GPU_INIT
     extern void gpu_init(void);
     static bool inited = false;
     if(!inited) {
