@@ -360,16 +360,21 @@
 #endif
 
 #if LV_USE_DRAW_VG_LITE
-/* Enable VG-Lite assert. */
-#ifndef LV_VG_LITE_ASSERT_ENABLE
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_VG_LITE_ASSERT_ENABLE
-            #define LV_VG_LITE_ASSERT_ENABLE CONFIG_LV_VG_LITE_ASSERT_ENABLE
-        #else
-            #define LV_VG_LITE_ASSERT_ENABLE 0
-        #endif
+/* Enbale VG-Lite custom external 'gpu_init()' function */
+#ifndef LV_VG_LITE_USE_GPU_INIT
+    #ifdef CONFIG_LV_VG_LITE_USE_GPU_INIT
+        #define LV_VG_LITE_USE_GPU_INIT CONFIG_LV_VG_LITE_USE_GPU_INIT
     #else
-        #define LV_VG_LITE_ASSERT_ENABLE 1
+        #define LV_VG_LITE_USE_GPU_INIT 0
+    #endif
+#endif
+
+/* Enable VG-Lite assert. */
+#ifndef LV_VG_LITE_USE_ASSERT
+    #ifdef CONFIG_LV_VG_LITE_USE_ASSERT
+        #define LV_VG_LITE_USE_ASSERT CONFIG_LV_VG_LITE_USE_ASSERT
+    #else
+        #define LV_VG_LITE_USE_ASSERT 0
     #endif
 #endif
 #endif
