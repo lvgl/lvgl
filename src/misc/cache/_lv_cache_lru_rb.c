@@ -10,6 +10,7 @@
 #include "../lv_rb.h"
 #include "../lv_ll.h"
 #include "../../stdlib/lv_string.h"
+#include "../../stdlib/lv_sprintf.h"
 
 /*********************
  *      DEFINES
@@ -264,7 +265,7 @@ static lv_cache_entry_t_ * create_entry_cb(lv_cache_t_ * cache, const void * key
     void * tail = _lv_ll_get_tail(&lru->ll);
     void * curr = tail;
     while(lru->cache.size >= lru->cache.max_size) {
-        if (curr == NULL) {
+        if(curr == NULL) {
             LV_LOG_ERROR("create_entry_cb: failed to drop cache");
             return NULL;
         }
@@ -272,7 +273,7 @@ static lv_cache_entry_t_ * create_entry_cb(lv_cache_t_ * cache, const void * key
         lv_rb_node_t * tail_node = *(lv_rb_node_t **)curr;
         void * search_key = tail_node->data;
         lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
-        if (lv_cache_entry_ref_get(entry) == 0) {
+        if(lv_cache_entry_ref_get(entry) == 0) {
             cache->clz->drop_cb(cache, search_key, user_data);
             continue;
         }
@@ -355,10 +356,22 @@ static void  drop_all_cb(lv_cache_t_ * cache, void * user_data)
         return;
     }
 
+    uint32_t used_cnt = 0;
     lv_rb_node_t ** node;
     _LV_LL_READ(&lru->ll, node) {
         /*free user handled data and do other clean up*/
-        lru->cache.free_cb((*node)->data, user_data);
+        void * search_key = (*node)->data;
+        lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
+        if(lv_cache_entry_ref_get(entry) == 0) {
+            lru->cache.free_cb(search_key, user_data);
+        }
+        else {
+            LV_LOG_WARN("entry (%p) is still referenced (%" LV_PRId32 ")", entry, lv_cache_entry_ref_get(entry));
+            used_cnt++;
+        }
+    }
+    if (used_cnt > 0) {
+        LV_LOG_WARN("%d entries are still referenced", used_cnt);
     }
 
     lv_rb_destroy(&lru->rb);
