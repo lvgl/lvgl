@@ -131,6 +131,11 @@
 /* Use VG-Lite GPU. */
 #define LV_USE_DRAW_VG_LITE 0
 
+#if LV_USE_DRAW_VG_LITE
+/* Enable VG-Lite assert. */
+#define LV_VG_LITE_ASSERT_ENABLE 0
+#endif
+
 /*=================
  * OPERATING SYSTEM
  *=================*/

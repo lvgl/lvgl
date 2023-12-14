@@ -360,6 +360,11 @@ menu "LVGL configuration"
 			config LV_USE_DRAW_VG_LITE
 				bool "Use Common VG-Lite GPU."
 
+			config LV_VG_LITE_ASSERT_ENABLE
+				bool "Enable VG-Lite assert."
+				default n
+				depends on LV_USE_DRAW_VG_LITE
+
 			config LV_USE_GPU_SDL
 				bool "Use SDL renderer API"
 				default n

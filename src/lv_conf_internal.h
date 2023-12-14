@@ -359,6 +359,21 @@
     #endif
 #endif
 
+#if LV_USE_DRAW_VG_LITE
+/* Enable VG-Lite assert. */
+#ifndef LV_VG_LITE_ASSERT_ENABLE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_VG_LITE_ASSERT_ENABLE
+            #define LV_VG_LITE_ASSERT_ENABLE CONFIG_LV_VG_LITE_ASSERT_ENABLE
+        #else
+            #define LV_VG_LITE_ASSERT_ENABLE 0
+        #endif
+    #else
+        #define LV_VG_LITE_ASSERT_ENABLE 1
+    #endif
+#endif
+#endif
+
 /*=================
  * OPERATING SYSTEM
  *=================*/
