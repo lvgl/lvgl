@@ -69,14 +69,15 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
     LV_ASSERT_NULL(buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
+    uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
 
-    canvas->buf_unaligned = buf;
-    canvas->dsc.header.cf = cf;
-    canvas->dsc.header.w  = w;
-    canvas->dsc.header.h  = h;
-    canvas->dsc.header.stride  = lv_draw_buf_width_to_stride(w, cf);
-    canvas->dsc.data      = lv_draw_buf_align(buf, cf);
-    canvas->dsc.data_size = w * h * lv_color_format_get_size(cf);
+    canvas->buf_unaligned     = buf;
+    canvas->dsc.header.cf     = cf;
+    canvas->dsc.header.w      = w;
+    canvas->dsc.header.h      = h;
+    canvas->dsc.header.stride = stride;
+    canvas->dsc.data          = lv_draw_buf_align(buf, cf);
+    canvas->dsc.data_size     = stride * h;
 
     lv_image_set_src(obj, &canvas->dsc);
     lv_cache_lock();
@@ -91,9 +92,7 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     uint32_t stride = canvas->dsc.header.stride;
     lv_color_format_t cf = canvas->dsc.header.cf;
-    uint32_t pixel_byte = (lv_color_format_get_bpp(cf) + 7) >> 3;
-    uint8_t * data = (uint8_t *)canvas->dsc.data;
-    data += stride * y + x * pixel_byte; /*draw buf goto x,y */
+    uint8_t * data = lv_draw_buf_go_to_xy(canvas->dsc.data, stride, cf, x, y);
 
     if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
         /*Indexed image bpp could be less than 8, calculate again*/
@@ -156,8 +155,9 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    uint8_t px_size = lv_color_format_get_size(canvas->dsc.header.cf);
-    const uint8_t * px = canvas->dsc.data + canvas->dsc.header.w * y * px_size + x * px_size;
+    uint32_t stride = canvas->dsc.header.stride;
+    lv_color_format_t cf = canvas->dsc.header.cf;
+    const uint8_t * px = lv_draw_buf_go_to_xy(canvas->dsc.data, stride, cf, x, y);
     lv_color32_t ret;
 
     switch(canvas->dsc.header.cf) {
@@ -231,15 +231,22 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const void * to_copy, int32_t x, int32_t
         return;
     }
 
-    uint32_t px_size   = lv_color_format_get_size(canvas->dsc.header.cf) >> 3;
-    uint32_t px        = canvas->dsc.header.w * y * px_size + x * px_size;
-    uint8_t * to_copy8 = (uint8_t *)to_copy;
-    int32_t i;
-    for(i = 0; i < h; i++) {
-        lv_memcpy((void *)&canvas->dsc.data[px], to_copy8, w * px_size);
-        px += canvas->dsc.header.w * px_size;
-        to_copy8 += w * px_size;
-    }
+    lv_area_t src_area_to_copy;
+    lv_area_set(&src_area_to_copy, 0, 0, w - 1, h - 1);
+
+    lv_area_t dest_area_to_copy;
+    lv_area_set(&dest_area_to_copy, x, y, x + w - 1, y + h - 1);
+
+    lv_draw_buf_copy(
+        (void *)canvas->dsc.data,
+        canvas->dsc.header.w,
+        canvas->dsc.header.h,
+        &dest_area_to_copy,
+        (void *)to_copy,
+        w,
+        h,
+        &src_area_to_copy,
+        canvas->dsc.header.cf);
 }
 
 void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
@@ -251,7 +258,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     uint32_t x;
     uint32_t y;
 
-    uint32_t stride = lv_draw_buf_width_to_stride(dsc->header.w, dsc->header.cf);
+    uint32_t stride = dsc->header.stride;
 
     if(dsc->header.cf == LV_COLOR_FORMAT_RGB565) {
         uint16_t c16 = lv_color_to_u16(color);
@@ -331,11 +338,8 @@ static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-    canvas->dsc.header.cf          = LV_COLOR_FORMAT_NATIVE;
-    canvas->dsc.header.h           = 0;
-    canvas->dsc.header.w           = 0;
-    canvas->dsc.data_size          = 0;
-    canvas->dsc.data               = NULL;
+    lv_memzero(&canvas->dsc.header, sizeof(canvas->dsc.header));
+    canvas->dsc.header.cf = LV_COLOR_FORMAT_NATIVE;
 
     lv_image_set_src(obj, &canvas->dsc);
 
