@@ -751,15 +751,14 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t rn;
     uint32_t len;
     uint32_t compressed_len;
-    uint8_t * file_buf = NULL;
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     lv_result_t res;
+    uint8_t * file_buf = NULL;
     lv_image_compressed_t * compressed = &decoder_data->compressed;
-    bool is_file = dsc->src_type == LV_IMAGE_SRC_FILE;
 
     lv_memzero(compressed, sizeof(lv_image_compressed_t));
 
-    if(is_file) {
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         lv_fs_file_t * f = decoder_data->f;
 
         if(lv_fs_seek(f, 0, LV_FS_SEEK_END) != LV_FS_RES_OK ||
@@ -823,7 +822,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 
     res = decompress_image(dsc, compressed);
     compressed->data = NULL; /*No need to store the data any more*/
-    if(is_file) lv_free(file_buf);
+    lv_free(file_buf);
     if(res != LV_RESULT_OK) {
         LV_LOG_WARN("Decompress failed");
         return LV_RESULT_INVALID;
