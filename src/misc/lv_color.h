@@ -311,6 +311,337 @@ uint32_t lv_color_to_u32(lv_color_t color);
  */
 LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uint16_t c2, uint8_t mix)
 {
+#define LV_HIGH_SPEED_MIX_RGB565_COLORS (1)   //this switch should be pulled out to CONFIG options   
+
+    
+#if LV_HIGH_SPEED_MIX_RGB565_COLORS 
+    #define NEUTRAL_MASK   (0x07E0F81F)
+    #define NEUTRAL_MASK_1 (NEUTRAL_MASK << 1)
+    #define NEUTRAL_MASK_2 (NEUTRAL_MASK << 2)
+    #define NEUTRAL_MASK_3 (NEUTRAL_MASK << 3)
+    #define NEUTRAL_MASK_4 (NEUTRAL_MASK << 4)
+
+    mix = ((uint16_t) (mix + 4) >> 3);
+    register uint32_t fg;
+    register uint32_t bg;
+
+    switch(mix){
+      case 0: 
+              ret.full = c2.full;                                      // in case of 0 fg does not participate in resulting color (full transparent) 
+              return ret;
+      case 1:
+              fg = c1.full;                                             // multiply 1 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+              bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg =  ((bg << 5) - bg);                          // multiply 31 
+              break;   
+      case 2:
+               fg = (uint32_t)(c1.full << 1);                           // multiply 2 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_1;                     
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg = ((bg << 5) - (bg << 1));                    // multiply 30 
+               break;   
+      case 3:
+               fg = c1.full;
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg += (fg << 1);                               // multiply 3
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg =  ((bg << 5) - (bg << 1) - bg);            // multiply 29 
+               break;   
+      case 4:
+               fg = (uint32_t)(c1.full << 2);                         // multiply 4 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_2; 
+               bg = (uint32_t)(c2.full << 2); 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_2; 
+                       bg =  ((bg << 3) - bg);                        // multiply 28 
+               break;   
+      case 5:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK;
+                       fg +=  (fg << 2);                              // multiply 5  
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += ((bg << 1) + (bg << 3) + (bg << 4));     // multiply 27
+               break;   
+      case 6:
+               fg = (uint32_t)(c1.full << 1); 
+                       fg |=  (fg << 16);
+                       fg &= NEUTRAL_MASK_1; 
+                       fg += (fg << 1);                              // multiply 6
+               bg = (uint32_t)(c2.full << 1); 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_1; 
+                       bg += ((bg << 2) + (bg << 3));                // multiply 26
+               break;   
+      case 7:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK;
+                       fg =  ((fg << 3) - fg);                       // multiply 7
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += ((bg << 3) + (bg << 4));                // multiply 25
+               break;   
+      case 8:
+               fg = (uint32_t)(c1.full << 3);                       // multiply 8
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_3; 
+               bg = (uint32_t)(c2.full << 3); 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_3;
+                       bg += (bg << 1);                             // multiply 24
+               break;   
+      case 9:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg += (fg << 3);                             // multiply 9
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg = ((bg << 4) + (bg << 3) - bg);           // multiply 23
+               break;   
+      case 10:
+               fg = (uint32_t)(c1.full << 1); 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_1; 
+                       fg += (fg << 2);                             // multiply 10
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += ((bg << 4) + (bg << 2) + bg);          // multiply 22
+               break;   
+      case 11:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg += ((fg << 3) + (fg << 1));               // multiply 11
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += ((bg << 4) + (bg << 2));               // multiply 21
+               break;   
+      case 12:
+               fg = (uint32_t)(c1.full << 2); 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_2;                   
+                       fg += (fg << 1);                             // multiply 12
+               bg = (uint32_t)(c2.full << 2); 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_2; 
+                       bg += (bg << 2) ;                            // multiply 20
+               break;   
+      case 13:
+               fg = c1.full;            
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg += ((fg << 3) + (fg << 2));               // multiply 13
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += ((bg << 1) + (bg << 4)) ;              // multiply 19
+               break;   
+      case 14:
+               fg = (uint32_t)(c1.full << 1);                       // multiply 2
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_1; 
+                       fg = ((fg << 3) - fg);                       // total multiply 14    
+               bg = (uint32_t)(c2.full << 1); 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_1; 
+                       bg += (bg << 3);                             // multiply 18
+               break;   
+      case 15:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg = ((fg << 4) - fg);                       // multiply 15
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += (bg << 4);                             // multiply 17
+               break;   
+      case 16:           
+               fg = (uint32_t)(c1.full << 4);                       // mulytiply 16
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_4;                   
+               bg = (uint32_t)(c2.full << 4);                       // mulytiply 16
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_4;                   
+               break;   
+      case 17:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg += (fg << 4);                             // multiply 17
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg = ((bg << 4) - bg);                       // multiply 15
+               break;   
+      case 18:
+               fg = (uint32_t)(c1.full << 1); 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_1; 
+                       fg += (fg << 3);                             // multiply 18
+               bg = (uint32_t)(c2.full << 1); 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_1; 
+                       bg = ((bg << 3) - bg);                       // multiply 14
+               break;   
+      case 19:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg += ((fg << 1) + (fg << 4)) ;             // multiply 19
+               bg = c2.full;    
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += ((bg << 3) + (bg << 2));              // multiply 13
+               break;   
+      case 20:
+               fg = (uint32_t)(c1.full << 2); 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_2; 
+                       fg += (fg << 2) ;                            // multiply 20
+               bg = (uint32_t)(c2.full << 2);                       // multiply 4
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_2; 
+                       bg += (bg << 1);                             // total multiply 12 
+               break;   
+      case 21:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg += ((fg << 4) + (fg << 2));               // multiply 21
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += ((bg << 3) + (bg << 1));               // multiply 11
+               break;   
+      case 22:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg += ((fg << 4) + (fg << 2) + fg);          // multiply 22
+               bg = (uint32_t)(c2.full << 1); 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_1; 
+                       bg += (bg << 2);                            // multiply 10
+               break;   
+      case 23:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg = ((fg << 4) + (fg << 3) - fg);          // multiply 23
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += (bg << 3);                            // multiply 9  
+               break;   
+       case 24:
+               fg = (uint32_t)(c1.full << 3); 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_3; 
+                       fg += (fg << 1);                           // multiply 24
+               bg = (uint32_t)(c2.full << 3);                     // multiply 8       
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_3;                 
+               break;   
+      case 25:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg += ((fg << 3) + (fg << 4));             // multiply 25
+               bg = c2.full; 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg =  ((bg << 3) - bg);                    // multiply 7 
+               break;   
+      case 26:
+               fg = (uint32_t)(c1.full << 1); 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_1; 
+                       fg += ((fg << 2) + (fg << 3));            // multiply 26
+               bg = (uint32_t)(c2.full << 1);        
+                       bg |=  (bg << 16);
+                       bg &= NEUTRAL_MASK_1; 
+                       bg +=  (bg << 1);                         // multiply 6 
+               break;   
+      case 27:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg = ((fg << 5) - (fg << 2) - fg);        // multiply 27
+               bg = c2.full; 
+                       bg |=  (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg +=  (bg << 2);                         // multiply 5
+               break;   
+      case 28:
+               fg = (uint32_t)(c1.full << 2); 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_2; 
+                       fg =  ((fg << 3) - fg);                  // multiply 28 
+               bg = (uint32_t)(c2.full << 2);                   // multiply 4 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_2; 
+               break;   
+      case 29:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg =  ((fg << 5) - (fg << 1) - fg);     // multiply 29 
+               bg = c2.full;  
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+                       bg += (bg << 1);                        // multiply 3
+               break;   
+      case 30:
+               fg = (uint32_t)(c1.full << 1); 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK_1; 
+                       fg =  ((fg << 4) - fg);                 // multiply 30 
+               bg = (uint32_t)(c2.full << 1);                  // multiply 2 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK_1;              
+               break; 
+      case 31:
+               fg = c1.full; 
+                       fg |= (fg << 16);
+                       fg &= NEUTRAL_MASK; 
+                       fg =  ((fg << 5) - fg);                 // multiply 31 
+               bg = c2.full;                                   // multiply 1 
+                       bg |= (bg << 16);
+                       bg &= NEUTRAL_MASK; 
+               break;   
+      case 32: 
+               ret.full = c1.full;                             // for 32 fg is opaque and bg does not participate in resulting color 
+               return ret;
+
+    }
+    
+ bg += fg;
+ bg >>= 5;
+ bg &= NEUTRAL_MASK; 
+ ret.full = (uint16_t)((bg >> 16) | bg);
+ return ret;
+
+#else    
     if(mix == 255) return c1;
     if(mix == 0) return c2;
 
@@ -326,6 +657,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
     ret = (uint16_t)(result >> 16) | result;
 
     return ret;
+#endif    
 }
 
 /**
