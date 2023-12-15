@@ -331,8 +331,8 @@ void lv_deinit(void)
     lv_theme_default_deinit();
 #endif
 
-#if LV_USE_THEME_BASIC
-    lv_theme_basic_deinit();
+#if LV_USE_THEME_SIMPLE
+    lv_theme_simple_deinit();
 #endif
 
 #if LV_USE_THEME_MONO

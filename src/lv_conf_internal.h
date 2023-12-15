@@ -1822,15 +1822,15 @@
 #endif /*LV_USE_THEME_DEFAULT*/
 
 /*A very simple theme that is a good starting point for a custom theme*/
-#ifndef LV_USE_THEME_BASIC
+#ifndef LV_USE_THEME_SIMPLE
     #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_THEME_BASIC
-            #define LV_USE_THEME_BASIC CONFIG_LV_USE_THEME_BASIC
+        #ifdef CONFIG_LV_USE_THEME_SIMPLE
+            #define LV_USE_THEME_SIMPLE CONFIG_LV_USE_THEME_SIMPLE
         #else
-            #define LV_USE_THEME_BASIC 0
+            #define LV_USE_THEME_SIMPLE 0
         #endif
     #else
-        #define LV_USE_THEME_BASIC 1
+        #define LV_USE_THEME_SIMPLE 1
     #endif
 #endif
 

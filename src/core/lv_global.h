@@ -124,8 +124,8 @@ typedef struct _lv_global_t {
     uint32_t log_last_log_time;
 #endif
 
-#if LV_USE_THEME_BASIC
-    struct _my_theme_t * theme_basic;
+#if LV_USE_THEME_SIMPLE
+    struct _my_theme_t * theme_simple;
 #endif
 
 #if LV_USE_THEME_DEFAULT
