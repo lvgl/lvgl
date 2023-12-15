@@ -322,8 +322,8 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
     #define NEUTRAL_MASK_4 (NEUTRAL_MASK << 4)
 
     mix = ((uint16_t) (mix + 4) >> 3);
-    register uint32_t fg;
-    register uint32_t bg;
+    register uint32_t fg = 0;   // linux compiler complains if those are not initialized in instruction bg+=fg after switch structure
+    register uint32_t bg = 0;
 
     switch(mix){
       case 0:                                     // in case of 0 fg does not participate in resulting color (full transparent) 
