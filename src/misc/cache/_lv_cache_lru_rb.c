@@ -21,7 +21,7 @@
  *      TYPEDEFS
  **********************/
 struct _lv_lru_rb_t {
-    lv_cache_t_ cache;
+    lv_cache_t cache;
 
     lv_rb_t rb;
     lv_ll_t ll;
@@ -32,21 +32,21 @@ typedef struct _lv_lru_rb_t lv_lru_rb_t_;
  **********************/
 
 static void * alloc_cb(void);
-static bool  init_cb(lv_cache_t_ * cache);
-static void  destroy_cb(lv_cache_t_ * cache, void * user_data);
+static bool  init_cb(lv_cache_t * cache);
+static void  destroy_cb(lv_cache_t * cache, void * user_data);
 
-static lv_cache_entry_t_ * get_cb(lv_cache_t_ * cache, const void * key, void * user_data);
-static lv_cache_entry_t_ * create_entry_cb(lv_cache_t_ * cache, const void * key, void * user_data);
-static void  remove_cb(lv_cache_t_ * cache, lv_cache_entry_t_ * entry, void * user_data);
-static void  drop_cb(lv_cache_t_ * cache, const void * key, void * user_data);
-static void  drop_all_cb(lv_cache_t_ * cache, void * user_data);
+static lv_cache_entry_t * get_cb(lv_cache_t * cache, const void * key, void * user_data);
+static lv_cache_entry_t * create_entry_cb(lv_cache_t * cache, const void * key, void * user_data);
+static void remove_cb(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data);
+static void drop_cb(lv_cache_t * cache, const void * key, void * user_data);
+static void drop_all_cb(lv_cache_t * cache, void * user_data);
 
 static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data);
 inline static void ** get_lru_node(lv_lru_rb_t_ * lru, lv_rb_node_t * node);
 /**********************
  *  GLOBAL VARIABLES
  **********************/
-const lv_cache_class_t lv_lru_rb_class = {
+const lv_cache_class_t lv_cache_class_lru_rb = {
     .alloc_cb = alloc_cb,
     .init_cb = init_cb,
     .destroy_cb = destroy_cb,
@@ -127,7 +127,7 @@ static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
         goto FAILED_HANDLER3;
 
     void * data = node->data;
-    lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(data, lru->cache.node_size);
+    lv_cache_entry_t * entry = lv_cache_entry_get_entry(data, lru->cache.node_size);
     lv_memcpy(data, key, lru->cache.node_size);
 
     bool alloc_res = lru->cache.create_cb(data, user_data);
@@ -171,7 +171,7 @@ static void * alloc_cb(void)
     return res;
 }
 
-static bool  init_cb(lv_cache_t_ * cache)
+static bool init_cb(lv_cache_t * cache)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
@@ -200,7 +200,7 @@ static bool  init_cb(lv_cache_t_ * cache)
     return lru;
 }
 
-static void  destroy_cb(lv_cache_t_ * cache, void * user_data)
+static void destroy_cb(lv_cache_t * cache, void * user_data)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
@@ -215,7 +215,7 @@ static void  destroy_cb(lv_cache_t_ * cache, void * user_data)
     lv_free(lru);
 }
 
-static lv_cache_entry_t_ * get_cb(lv_cache_t_ * cache, const void * key, void * user_data)
+static lv_cache_entry_t * get_cb(lv_cache_t * cache, const void * key, void * user_data)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
@@ -231,7 +231,7 @@ static lv_cache_entry_t_ * get_cb(lv_cache_t_ * cache, const void * key, void * 
     if(head) {
         lv_rb_node_t * node = *(lv_rb_node_t **)head;
         void * data = node->data;
-        lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(data, cache->node_size);
+        lv_cache_entry_t * entry = lv_cache_entry_get_entry(data, cache->node_size);
         if(lru->cache.compare_cb(data, key) == 0) {
             return entry;
         }
@@ -244,13 +244,13 @@ static lv_cache_entry_t_ * get_cb(lv_cache_t_ * cache, const void * key, void * 
         head = _lv_ll_get_head(&lru->ll);
         _lv_ll_move_before(&lru->ll, lru_node, head);
 
-        lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(node->data, cache->node_size);
+        lv_cache_entry_t * entry = lv_cache_entry_get_entry(node->data, cache->node_size);
         return entry;
     }
     return NULL;
 }
 
-static lv_cache_entry_t_ * create_entry_cb(lv_cache_t_ * cache, const void * key, void * user_data)
+static lv_cache_entry_t * create_entry_cb(lv_cache_t * cache, const void * key, void * user_data)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
@@ -271,7 +271,7 @@ static lv_cache_entry_t_ * create_entry_cb(lv_cache_t_ * cache, const void * key
 
         lv_rb_node_t * tail_node = *(lv_rb_node_t **)curr;
         void * search_key = tail_node->data;
-        lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
+        lv_cache_entry_t * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
         if(lv_cache_entry_ref_get(entry) == 0) {
             cache->clz->drop_cb(cache, search_key, user_data);
             continue;
@@ -288,11 +288,11 @@ static lv_cache_entry_t_ * create_entry_cb(lv_cache_t_ * cache, const void * key
 
     lru->cache.size++;
 
-    lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(new_node->data, cache->node_size);
+    lv_cache_entry_t * entry = lv_cache_entry_get_entry(new_node->data, cache->node_size);
     return entry;
 }
 
-static void  remove_cb(lv_cache_t_ * cache, lv_cache_entry_t_ * entry, void * user_data)
+static void remove_cb(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
@@ -317,7 +317,7 @@ static void  remove_cb(lv_cache_t_ * cache, lv_cache_entry_t_ * entry, void * us
     lru->cache.size--;
 }
 
-static void  drop_cb(lv_cache_t_ * cache, const void * key, void * user_data)
+static void drop_cb(lv_cache_t * cache, const void * key, void * user_data)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
@@ -346,7 +346,7 @@ static void  drop_cb(lv_cache_t_ * cache, const void * key, void * user_data)
     lru->cache.size--;
 }
 
-static void  drop_all_cb(lv_cache_t_ * cache, void * user_data)
+static void drop_all_cb(lv_cache_t * cache, void * user_data)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
@@ -361,7 +361,7 @@ static void  drop_all_cb(lv_cache_t_ * cache, void * user_data)
     _LV_LL_READ(&lru->ll, node) {
         /*free user handled data and do other clean up*/
         void * search_key = (*node)->data;
-        lv_cache_entry_t_ * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
+        lv_cache_entry_t * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
         if(lv_cache_entry_ref_get(entry) == 0) {
             lru->cache.free_cb(search_key, user_data);
         }

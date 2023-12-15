@@ -25,13 +25,13 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_cache_t_;
+struct _lv_cache_t;
 struct _lv_cache_class_t;
-struct _lv_cache_entry_t_;
+struct _lv_cache_entry_t;
 
-typedef struct _lv_cache_t_ lv_cache_t_;
+typedef struct _lv_cache_t lv_cache_t;
 typedef struct _lv_cache_class_t lv_cache_class_t;
-typedef struct _lv_cache_entry_t_ lv_cache_entry_t_;
+typedef struct _lv_cache_entry_t lv_cache_entry_t;
 
 typedef int8_t lv_cache_compare_res_t;
 typedef bool (*lv_cache_create_cb_t)(void * node, void * user_data);
@@ -39,15 +39,15 @@ typedef void (*lv_cache_free_cb_t)(void * node, void * user_data);
 typedef lv_cache_compare_res_t (*lv_cache_compare_cb_t)(const void * a, const void * b);
 
 typedef void * (*lv_cache_alloc_cb_t)(void);
-typedef bool (*lv_cache_init_cb_t)(lv_cache_t_ * cache);
-typedef void (*lv_cache_destroy_cb_t)(lv_cache_t_ * cache, void * user_data);
-typedef lv_cache_entry_t_ * (*lv_cache_get_cb_t)(lv_cache_t_ * cache, const void * key, void * user_data);
-typedef lv_cache_entry_t_ * (*lv_cache_create_entry_cb_t)(lv_cache_t_ * cache, const void * key, void * user_data);
-typedef void (*lv_cache_remove_cb_t)(lv_cache_t_ * cache, lv_cache_entry_t_ * entry, void * user_data);
-typedef void (*lv_cache_drop_cb_t)(lv_cache_t_ * cache, const void * key, void * user_data);
-typedef void (*lv_cache_clear_cb_t)(lv_cache_t_ * cache, void * user_data);
+typedef bool (*lv_cache_init_cb_t)(lv_cache_t * cache);
+typedef void (*lv_cache_destroy_cb_t)(lv_cache_t * cache, void * user_data);
+typedef lv_cache_entry_t * (*lv_cache_get_cb_t)(lv_cache_t * cache, const void * key, void * user_data);
+typedef lv_cache_entry_t * (*lv_cache_create_entry_cb_t)(lv_cache_t * cache, const void * key, void * user_data);
+typedef void (*lv_cache_remove_cb_t)(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data);
+typedef void (*lv_cache_drop_cb_t)(lv_cache_t * cache, const void * key, void * user_data);
+typedef void (*lv_cache_clear_cb_t)(lv_cache_t * cache, void * user_data);
 
-struct _lv_cache_t_ {
+struct _lv_cache_t {
     const lv_cache_class_t * clz;
 
     size_t node_size;

@@ -105,10 +105,10 @@ void lv_draw_sdl_init(void)
     lv_draw_sdl_unit_t * draw_sdl_unit = lv_draw_create_unit(sizeof(lv_draw_sdl_unit_t));
     draw_sdl_unit->base_unit.dispatch_cb = dispatch;
     draw_sdl_unit->base_unit.evaluate_cb = evaluate;
-    draw_sdl_unit->texture_cache = lv_cache_create_(&lv_lru_rb_class, sizeof(cache_data_t), 128,
-                                                    (lv_cache_compare_cb_t)sdl_texture_cache_compare_cb,
-                                                    (lv_cache_create_cb_t)sdl_texture_cache_create_cb,
-                                                    (lv_cache_free_cb_t)sdl_texture_cache_free_cb);
+    draw_sdl_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb, sizeof(cache_data_t), 128,
+                                                   (lv_cache_compare_cb_t)sdl_texture_cache_compare_cb,
+                                                   (lv_cache_create_cb_t)sdl_texture_cache_create_cb,
+                                                   (lv_cache_free_cb_t)sdl_texture_cache_free_cb);
 }
 
 /**********************
@@ -319,7 +319,7 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
     void * user_data_saved = data_to_find.draw_dsc->user_data;
     data_to_find.draw_dsc->user_data = NULL;
 
-    lv_cache_entry_t_ * entry_cached = lv_cache_get_or_create_(u->texture_cache, &data_to_find, u);
+    lv_cache_entry_t * entry_cached = lv_cache_get_or_create(u->texture_cache, &data_to_find, u);
     if(!entry_cached) {
         return;
     }
