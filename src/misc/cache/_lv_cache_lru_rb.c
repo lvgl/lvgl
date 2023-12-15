@@ -370,7 +370,7 @@ static void  drop_all_cb(lv_cache_t_ * cache, void * user_data)
             used_cnt++;
         }
     }
-    if (used_cnt > 0) {
+    if(used_cnt > 0) {
         LV_LOG_WARN("%d entries are still referenced", used_cnt);
     }
 

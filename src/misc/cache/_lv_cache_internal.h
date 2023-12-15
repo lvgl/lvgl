@@ -16,6 +16,7 @@ extern "C" {
 #include "../lv_types.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include "../../osal/lv_os.h"
 
 /*********************
  *      DEFINES
@@ -57,6 +58,8 @@ struct _lv_cache_t_ {
     lv_cache_compare_cb_t compare_cb;
     lv_cache_create_cb_t create_cb;
     lv_cache_free_cb_t free_cb;
+
+    lv_mutex_t lock;
 };
 
 struct _lv_cache_class_t {
