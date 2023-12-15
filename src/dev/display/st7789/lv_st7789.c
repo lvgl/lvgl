@@ -57,7 +57,7 @@ inline lv_st7789_driver_t *lv_st7789_get_driver(lv_display_t *disp)
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t *lv_st7789_create(uint32_t hor_res, uint32_t ver_res, lv_st7789_send_cmd_cb_t send_cmd, lv_st7789_send_cmd_cb_t send_color)
+lv_display_t *lv_st7789_create(uint32_t hor_res, uint32_t ver_res, lv_st7789_send_cmd_cb_t send_cmd_cb, lv_st7789_send_cmd_cb_t send_color_cb)
 {
 	lv_display_t * disp = lv_display_create(hor_res, ver_res);
 	if (disp == NULL) {
