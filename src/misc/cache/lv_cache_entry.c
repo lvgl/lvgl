@@ -63,7 +63,7 @@ void     lv_cache_entry_ref_dec(lv_cache_entry_t_ * entry)
     LV_ASSERT_NULL(entry);
     entry->ref_cnt--;
     if(entry->ref_cnt < 0) {
-        LV_LOG_WARN("lv_cache_entry_ref_dec: ref_cnt(%" LV_PRIu32 ") < 0", entry->ref_cnt);
+        LV_LOG_WARN("ref_cnt(%" LV_PRIu32 ") < 0", entry->ref_cnt);
         entry->ref_cnt = 0;
     }
 }
@@ -123,7 +123,7 @@ void    lv_cache_entry_release_data(lv_cache_entry_t_ * entry, void * user_data)
 {
     LV_ASSERT_NULL(entry);
     if(lv_cache_entry_ref_get(entry) == 0) {
-        LV_LOG_ERROR("lv_cache_entry_release_data: ref_cnt(%" LV_PRIu32 ") == 0", entry->ref_cnt);
+        LV_LOG_ERROR("ref_cnt(%" LV_PRIu32 ") == 0", entry->ref_cnt);
         return;
     }
 
@@ -161,7 +161,7 @@ lv_cache_entry_t_* lv_cache_entry_alloc(const uint32_t node_size, const lv_cache
     void * res = lv_malloc_zeroed(lv_cache_entry_get_size(node_size));
     LV_ASSERT_MALLOC(res)
     if(res == NULL) {
-        LV_LOG_ERROR("lv_cache_entry_alloc: malloc failed");
+        LV_LOG_ERROR("malloc failed");
         return NULL;
     }
     lv_cache_entry_t_ * entry = (lv_cache_entry_t_ *)res;

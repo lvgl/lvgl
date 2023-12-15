@@ -163,7 +163,7 @@ static void * alloc_cb(void)
     void * res = lv_malloc(sizeof(lv_lru_rb_t_));
     LV_ASSERT_MALLOC(res);
     if(res == NULL) {
-        LV_LOG_ERROR("alloc_cb: malloc failed");
+        LV_LOG_ERROR("malloc failed");
         return NULL;
     }
 
@@ -265,7 +265,7 @@ static lv_cache_entry_t_ * create_entry_cb(lv_cache_t_ * cache, const void * key
     void * curr = tail;
     while(lru->cache.size >= lru->cache.max_size) {
         if(curr == NULL) {
-            LV_LOG_ERROR("create_entry_cb: failed to drop cache");
+            LV_LOG_ERROR("failed to drop cache");
             return NULL;
         }
 
