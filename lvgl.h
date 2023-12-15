@@ -35,8 +35,6 @@ extern "C" {
 #include "src/misc/lv_anim_timeline.h"
 #include "src/misc/lv_profiler_builtin.h"
 #include "src/misc/lv_rb.h"
-#include "src/misc/lv_lru_rb.h"
-
 
 #include "src/tick/lv_tick.h"
 

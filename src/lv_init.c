@@ -22,8 +22,6 @@
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
 #include "draw/lv_draw.h"
-#include "misc/lv_cache.h"
-#include "misc/lv_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
 #if LV_USE_DRAW_VGLITE

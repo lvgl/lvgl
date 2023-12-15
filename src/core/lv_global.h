@@ -17,8 +17,6 @@ extern "C" {
 
 #include <stdbool.h>
 
-#include "../misc/lv_cache.h"
-#include "../misc/lv_cache_builtin.h"
 #include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 #include "../draw/sw/lv_draw_sw.h"
@@ -104,8 +102,6 @@ typedef struct _lv_global_t {
     lv_draw_buf_handlers_t draw_buf_handlers;
 
     lv_ll_t img_decoder_ll;
-    lv_cache_manager_t cache_manager;
-    lv_cache_builtin_dsc_t cache_builtin_dsc;
     size_t cache_builtin_max_size;
 
     lv_draw_global_info_t draw_info;

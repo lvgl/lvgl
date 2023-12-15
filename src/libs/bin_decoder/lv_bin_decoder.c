@@ -307,10 +307,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     /*Add it to cache*/
     t = lv_tick_elaps(t);
-    lv_cache_lock();
     lv_cache_entry_t * cache = lv_cache_add(NULL, 0, decoder->cache_data_type, dsc->header.w * dsc->header.h * 4);
     if(cache == NULL) {
-        lv_cache_unlock();
         free_decoder_data(dsc);
         return LV_RESULT_INVALID;
     }
@@ -331,7 +329,6 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     dsc->decoded = lv_cache_get_data(cache); /*@note: Must get from cache to increase reference count.*/
     dsc->cache_entry = cache;
 
-    lv_cache_unlock();
     return res;
 }
 
@@ -347,9 +344,7 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
     if(dsc->cache_entry) {
         /*Decoded data is in cache, release it from cache's callback*/
-        lv_cache_lock();
         lv_cache_release(dsc->cache_entry);
-        lv_cache_unlock();
     }
     else {
         /*Data not in cache, free the memory manually*/
@@ -1027,7 +1022,6 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
 
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 {
-    lv_cache_lock();
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
 
@@ -1035,7 +1029,6 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
         if(cache) {
             dsc->decoded = lv_cache_get_data(cache);
             dsc->cache_entry = cache;     /*Save the cache to release it in decoder_close*/
-            lv_cache_unlock();
             return LV_RESULT_OK;
         }
     }
@@ -1047,12 +1040,10 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
         if(cache) {
             dsc->decoded = lv_cache_get_data(cache);
             dsc->cache_entry = cache;     /*Save the cache to release it in decoder_close*/
-            lv_cache_unlock();
             return LV_RESULT_OK;
         }
     }
 
-    lv_cache_unlock();
     return LV_RESULT_INVALID;
 }
 
