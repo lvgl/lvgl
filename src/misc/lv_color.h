@@ -319,7 +319,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
 #define NEUTRAL_MASK_3 (NEUTRAL_MASK << 3)
 #define NEUTRAL_MASK_4 (NEUTRAL_MASK << 4)
 
-    mix = ((uint16_t) (mix + 4) >> 3);
+    mix = ((uint16_t)(mix + 4) >> 3);
     register uint32_t fg = 0;   // linux compiler complains if those are not initialized in instruction bg+=fg after switch structure
     register uint32_t bg = 0;
 
@@ -333,7 +333,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             bg = c2; 
             bg |= (bg << 16);
             bg &= NEUTRAL_MASK; 
-            bg =  ((bg << 5) - bg);                          // multiply 31 
+            bg = ((bg << 5) - bg);                          // multiply 31 
             break;   
         case 2:
             fg = (uint32_t)(c1 << 1);                                // multiply 2 
@@ -352,7 +352,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             bg = c2; 
             bg |= (bg << 16);
             bg &= NEUTRAL_MASK; 
-            bg =  ((bg << 5) - (bg << 1) - bg);            // multiply 29 
+            bg = ((bg << 5) - (bg << 1) - bg);            // multiply 29 
             break;   
         case 4:
             fg = (uint32_t)(c1 << 2);                              // multiply 4 
@@ -361,13 +361,13 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             bg = (uint32_t)(c2 << 2); 
             bg |= (bg << 16);
             bg &= NEUTRAL_MASK_2; 
-            bg =  ((bg << 3) - bg);                        // multiply 28 
+            bg = ((bg << 3) - bg);                        // multiply 28 
             break;   
         case 5:
             fg = c1; 
             fg |= (fg << 16);
             fg &= NEUTRAL_MASK;
-            fg +=  (fg << 2);                              // multiply 5  
+            fg += (fg << 2);                              // multiply 5  
             bg = c2; 
             bg |= (bg << 16);
             bg &= NEUTRAL_MASK; 
@@ -375,7 +375,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             break;   
         case 6:
             fg = (uint32_t)(c1 << 1); 
-            fg |=  (fg << 16);
+            fg |= (fg << 16);
             fg &= NEUTRAL_MASK_1; 
             fg += (fg << 1);                              // multiply 6
             bg = (uint32_t)(c2 << 1); 
@@ -387,7 +387,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             fg = c1; 
             fg |= (fg << 16);
             fg &= NEUTRAL_MASK;
-            fg =  ((fg << 3) - fg);                       // multiply 7
+            fg = ((fg << 3) - fg);                       // multiply 7
             bg = c2; 
             bg |= (bg << 16);
             bg &= NEUTRAL_MASK; 
@@ -567,7 +567,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             bg = c2; 
             bg |= (bg << 16);
             bg &= NEUTRAL_MASK; 
-            bg =  ((bg << 3) - bg);                    // multiply 7 
+            bg = ((bg << 3) - bg);                    // multiply 7 
             break;   
         case 26:
             fg = (uint32_t)(c1 << 1); 
@@ -575,7 +575,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             fg &= NEUTRAL_MASK_1; 
             fg += ((fg << 2) + (fg << 3));            // multiply 26
             bg = (uint32_t)(c2 << 1);        
-            bg |=  (bg << 16);
+            bg |= (bg << 16);
             bg &= NEUTRAL_MASK_1; 
             bg +=  (bg << 1);                         // multiply 6 
             break;   
@@ -602,7 +602,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             fg = c1; 
             fg |= (fg << 16);
             fg &= NEUTRAL_MASK; 
-            fg =  ((fg << 5) - (fg << 1) - fg);     // multiply 29 
+            fg = ((fg << 5) - (fg << 1) - fg);     // multiply 29 
             bg = c2;  
             bg |= (bg << 16);
             bg &= NEUTRAL_MASK; 
@@ -612,7 +612,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             fg = (uint32_t)(c1 << 1); 
             fg |= (fg << 16);
             fg &= NEUTRAL_MASK_1; 
-            fg =  ((fg << 4) - fg);                 // multiply 30 
+            fg = ((fg << 4) - fg);                 // multiply 30 
             bg = (uint32_t)(c2 << 1);                       // multiply 2 
             bg |= (bg << 16);
             bg &= NEUTRAL_MASK_1;              
@@ -621,7 +621,7 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             fg = c1; 
             fg |= (fg << 16);
             fg &= NEUTRAL_MASK; 
-            fg =  ((fg << 5) - fg);                 // multiply 31 
+            fg = ((fg << 5) - fg);                 // multiply 31 
             bg = c2;                                        // multiply 1 
             bg |= (bg << 16);
             bg &= NEUTRAL_MASK; 
@@ -630,11 +630,11 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
             return c1;      // for 32 fg is opaque and bg does not participate in resulting color 
     }
     
-   bg += fg;
-   bg >>= 5;
-   bg &= NEUTRAL_MASK; 
-   uint16_t ret = (uint16_t)((bg >> 16) | bg);
-   return ret;
+    bg += fg;
+    bg >>= 5;
+    bg &= NEUTRAL_MASK; 
+    uint16_t ret = (uint16_t)((bg >> 16) | bg);
+    return ret;
 #else    
     if(mix == 255) return c1;
     if(mix == 0) return c2;
