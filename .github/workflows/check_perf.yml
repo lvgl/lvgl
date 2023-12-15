@@ -9,8 +9,8 @@ jobs:
 
       - name: SO3-LVGL building the Docker image
         run: |
+          ls -la .
           wget https://raw.githubusercontent.com/smartobjectoriented/so3/40-expand-and-document-lvgl-perf-tests/Dockerfile.lvgl
-          cat Dockerfile.lvgl
           docker build . -f Dockerfile.lvgl -t so3/virt64 --platform linux/amd64
 
       - name: SO3-LVL Running containerized performance check app
