@@ -20,6 +20,7 @@ extern "C" {
 #include "../misc/lv_fs.h"
 #include "../misc/lv_types.h"
 #include "../misc/lv_area.h"
+#include "../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES
@@ -111,7 +112,7 @@ typedef struct _lv_image_decoder_t {
     lv_image_decoder_open_f_t open_cb;
     lv_image_decoder_get_area_cb_t get_area_cb;
     lv_image_decoder_close_f_t close_cb;
-    uint32_t cache_data_type;
+    lv_cache_t * cache;
     void * user_data;
 } lv_image_decoder_t;
 
@@ -150,7 +151,7 @@ typedef struct _lv_image_decoder_dsc_t {
     const char * error_msg;
 
     /**Point to cache entry information*/
-    struct _lv_cache_entry_t * cache_entry;
+    lv_cache_entry_t * cache_entry;
 
     /**Store any custom data here is required*/
     void * user_data;

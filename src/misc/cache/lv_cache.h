@@ -19,6 +19,8 @@ extern "C" {
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "_lv_cache_lru_rb.h"
+
 /*********************
  *      DEFINES
  *********************/
