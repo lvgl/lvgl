@@ -34,11 +34,11 @@ typedef struct {
 static void send_cmd(lv_st7789_driver_t *drv, uint8_t cmd, uint8_t *param, size_t param_size);
 static void send_color(lv_st7789_driver_t *drv, uint8_t cmd, uint8_t *param, size_t param_size);
 static void init(lv_st7789_driver_t * drv);
-static void set_onoff(lv_st7789_driver_t * drv, bool on);
 static void set_mirror(lv_st7789_driver_t * drv, bool mirror_x, bool mirror_y);
 static void set_swap_xy(lv_st7789_driver_t * drv, bool swap);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void res_chg_event_cb(lv_event_t * e);
+static lv_st7789_driver_t *lv_st7789_get_driver(lv_display_t *disp);
 
 /**********************
  *  STATIC VARIABLES
@@ -47,11 +47,6 @@ static void res_chg_event_cb(lv_event_t * e);
 /**********************
  *      MACROS
  **********************/
-
-inline lv_st7789_driver_t *lv_st7789_get_driver(lv_display_t *disp)
-{
-	return (lv_st7789_driver_t *)lv_display_get_driver_data(disp);
-}
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -176,16 +171,6 @@ static void init(lv_st7789_driver_t * drv)
         drv->colmod_reg,
     	}, 1);
     send_cmd(drv, LCD_CMD_DISPON, NULL, 0);
-}
-
-/**
- * Turn display on/off
- * @param drv			LCD driver object
- * @param on			false: turn off, true: turn on
- */
-static void set_onoff(lv_st7789_driver_t * drv, bool on)
-{
-    send_cmd(drv, on ? LCD_CMD_DISPON : LCD_CMD_DISPOFF, NULL, 0);
 }
 
 /**
@@ -323,41 +308,25 @@ static void res_chg_event_cb(lv_event_t * e)
 	case LV_DISPLAY_ROTATION_0:
 		set_swap_xy(drv, false);
 		set_mirror(drv, false, false);
-#if xCONFIG_LCD_TOUCH_ENABLED
-		// Rotate LCD touch
-		esp_lcd_touch_set_mirror_y(tp, false);
-		esp_lcd_touch_set_mirror_x(tp, false);
-#endif
 		break;
 	case LV_DISPLAY_ROTATION_90:
 		set_swap_xy(drv, true);
 		set_mirror(drv, true, false);
-#if xCONFIG_LCD_TOUCH_ENABLED
-		// Rotate LCD touch
-		esp_lcd_touch_set_mirror_y(tp, false);
-		esp_lcd_touch_set_mirror_x(tp, false);
-#endif
 		break;
 	case LV_DISPLAY_ROTATION_180:
 		set_swap_xy(drv, false);
 		set_mirror(drv, true, true);
-#if xCONFIG_LCD_TOUCH_ENABLED
-		// Rotate LCD touch
-		esp_lcd_touch_set_mirror_y(tp, false);
-		esp_lcd_touch_set_mirror_x(tp, false);
-#endif
 		break;
 	case LV_DISPLAY_ROTATION_270:
 		set_swap_xy(drv, true);
 		set_mirror(drv, false, true);
-#if xCONFIG_LCD_TOUCH_ENABLED
-		// Rotate LCD touch
-		esp_lcd_touch_set_mirror_y(tp, false);
-		esp_lcd_touch_set_mirror_x(tp, false);
-#endif
 		break;
     }
 
 }
 
+static inline lv_st7789_driver_t *lv_st7789_get_driver(lv_display_t *disp)
+{
+	return (lv_st7789_driver_t *)lv_display_get_driver_data(disp);
+}
 
