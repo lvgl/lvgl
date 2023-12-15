@@ -67,8 +67,8 @@ lv_display_t *lv_st7789_create(uint32_t hor_res, uint32_t ver_res, lv_st7789_sen
 
     /* init driver struct */
 	drv->disp = disp;
-	drv->send_cmd = send_cmd;
-	drv->send_color = send_color;
+	drv->send_cmd = send_cmd_cb;
+	drv->send_color = send_color_cb;
     lv_display_set_driver_data(disp, (void*)drv);
 
 	/* init controller */
