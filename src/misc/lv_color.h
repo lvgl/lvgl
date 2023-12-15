@@ -311,8 +311,7 @@ uint32_t lv_color_to_u32(lv_color_t color);
  */
 LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uint16_t c2, uint8_t mix)
 {
-#define LV_HIGH_SPEED_MIX_RGB565_COLORS (1)   //this switch should be pulled out to CONFIG options   
-#if LV_HIGH_SPEED_MIX_RGB565_COLORS 
+#if LV_USE_ALTERNATE_MIX_ROUTINE_FOR_RGB565_COLOR_FORMAT==1
 #define NEUTRAL_MASK   (0x07E0F81F)
 #define NEUTRAL_MASK_1 (NEUTRAL_MASK << 1)
 #define NEUTRAL_MASK_2 (NEUTRAL_MASK << 2)
