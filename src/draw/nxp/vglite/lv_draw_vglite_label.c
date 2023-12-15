@@ -73,7 +73,7 @@ void lv_draw_vglite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t 
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_draw_label_iterate_letters(draw_unit, dsc, coords, _draw_vglite_letter);
+    lv_draw_label_iterate_characters(draw_unit, dsc, coords, _draw_vglite_letter);
 }
 
 /**********************

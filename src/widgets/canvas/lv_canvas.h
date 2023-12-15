@@ -61,7 +61,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
  * @param canvas pointer to a canvas object
  * @param w width of the canvas
  * @param h height of the canvas
- * @param cf color format. `LV_IMAGE_CF_...`
+ * @param cf color format. `LV_COLOR_FORMAT...`
  */
 void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, int32_t w, int32_t h, lv_color_format_t cf);
 

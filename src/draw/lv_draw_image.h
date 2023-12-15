@@ -78,20 +78,24 @@ struct _lv_layer_t;
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize an image draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc);
 
 /**
- * Draw an image
+ * Create an image draw task
  * @param layer         pointer to a layer
- * @param dsc           pointer to an initialized `lv_draw_image_dsc_t` variable
+ * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the image
  */
 void lv_draw_image(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**
- * Draw a layer on an other layer
+ * Create a draw task to blend a layer to an other layer
  * @param layer         pointer to a layer
- * @param dsc           pointer to an initialized `lv_draw_image_dsc_t` variable
+ * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the layer
  */
 void lv_draw_layer(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
