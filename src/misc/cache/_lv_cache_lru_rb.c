@@ -140,10 +140,8 @@ static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
 
     lv_memcpy(lru_node, &node, sizeof(void *));
     lv_memcpy(get_lru_node(lru, node), &lru_node, sizeof(void *));
-    lv_cache_entry_set_cache(entry, (const lv_cache_t_ *)lru);
-    lv_cache_entry_ref_reset(entry);
-    lv_cache_entry_set_generation(entry, 0);
-    lv_cache_entry_set_node_size(entry, lru->cache.node_size);
+
+    lv_cache_entry_init(entry, &lru->cache, lru->cache.node_size);
     goto FAILED_HANDLER3;
 
 FAILED_HANDLER1:
@@ -340,7 +338,8 @@ static void  drop_cb(lv_cache_t_ * cache, const void * key, void * user_data)
     lru->cache.free_cb(data, user_data);
 
     void * lru_node = *get_lru_node(lru, node);
-    lv_rb_drop_node(&lru->rb, node);
+    lv_rb_remove_node(&lru->rb, node);
+    lv_cache_entry_delete(lv_cache_entry_get_entry(data, cache->node_size));
     _lv_ll_remove(&lru->ll, lru_node);
     lv_free(lru_node);
 

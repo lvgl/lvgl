@@ -24,7 +24,9 @@ struct _lv_cache_entry_t_ {
     int32_t ref_cnt;
     uint32_t generation;
     uint32_t node_size;
+
     bool is_invalid;
+    lv_mutex_t lock;
 };
 /**********************
  *  STATIC PROTOTYPES
@@ -112,9 +114,9 @@ void  * lv_cache_entry_acquire_data(lv_cache_entry_t_ * entry)
 {
     LV_ASSERT_NULL(entry);
 
-    lv_mutex_lock(&entry->cache->lock);
+    lv_mutex_lock(&entry->lock);
     lv_cache_entry_ref_inc(entry);
-    lv_mutex_unlock(&entry->cache->lock);
+    lv_mutex_unlock(&entry->lock);
     return lv_cache_entry_get_data(entry);
 }
 void    lv_cache_entry_release_data(lv_cache_entry_t_ * entry, void * user_data)
@@ -125,14 +127,14 @@ void    lv_cache_entry_release_data(lv_cache_entry_t_ * entry, void * user_data)
         return;
     }
 
-    lv_mutex_lock(&entry->cache->lock);
+    lv_mutex_lock(&entry->lock);
     lv_cache_entry_ref_dec(entry);
 
     if(lv_cache_entry_ref_get(entry) == 0 && lv_cache_entry_is_invalid(entry)) {
         lv_cache_t_ * cache = (lv_cache_t_ *)lv_cache_entry_get_cache(entry);
         lv_cache_drop_(cache, lv_cache_entry_get_data(entry), user_data);
     }
-    lv_mutex_unlock(&entry->cache->lock);
+    lv_mutex_unlock(&entry->lock);
 }
 lv_cache_entry_t_ * lv_cache_entry_get_entry(void * data, const uint32_t node_size)
 {
@@ -154,7 +156,7 @@ uint32_t lv_cache_entry_get_size(const uint32_t node_size)
 {
     return node_size + sizeof(lv_cache_entry_t_);
 }
-lv_cache_entry_t_ * lv_cache_entry_alloc(const uint32_t node_size)
+lv_cache_entry_t_* lv_cache_entry_alloc(const uint32_t node_size, const lv_cache_t_* cache)
 {
     void * res = lv_malloc_zeroed(lv_cache_entry_get_size(node_size));
     LV_ASSERT_MALLOC(res)
@@ -163,11 +165,26 @@ lv_cache_entry_t_ * lv_cache_entry_alloc(const uint32_t node_size)
         return NULL;
     }
     lv_cache_entry_t_ * entry = (lv_cache_entry_t_ *)res;
-    entry->node_size = node_size;
+    lv_cache_entry_init(entry, cache, node_size);
     return (lv_cache_entry_t_ *)((uint8_t *)entry + node_size);
 }
-void lv_cache_entry_free(lv_cache_entry_t_ * entry)
+void lv_cache_entry_init(lv_cache_entry_t_ * entry, const lv_cache_t_ * cache, const uint32_t node_size)
 {
+    LV_ASSERT_NULL(entry);
+    LV_ASSERT_NULL(cache);
+
+    entry->cache = cache;
+    entry->node_size = node_size;
+    entry->ref_cnt = 0;
+    entry->generation = 0;
+    entry->is_invalid = false;
+    lv_mutex_init(&entry->lock);
+}
+void lv_cache_entry_delete(lv_cache_entry_t_ * entry)
+{
+    LV_ASSERT_NULL(entry);
+
+    lv_mutex_delete(&entry->lock);
     void * data = lv_cache_entry_get_data(entry);
     lv_free(data);
 }

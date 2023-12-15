@@ -40,8 +40,9 @@ void     lv_cache_entry_release_data(lv_cache_entry_t_ * entry, void * user_data
 const lv_cache_t_ * lv_cache_entry_get_cache(const lv_cache_entry_t_ * entry);
 lv_cache_entry_t_ * lv_cache_entry_get_entry(void * data, const uint32_t node_size);
 
-lv_cache_entry_t_ * lv_cache_entry_alloc(const uint32_t node_size);
-void lv_cache_entry_free(lv_cache_entry_t_ * entry);
+lv_cache_entry_t_* lv_cache_entry_alloc(const uint32_t node_size, const lv_cache_t_* cache);
+void lv_cache_entry_init(lv_cache_entry_t_ * entry, const lv_cache_t_ * cache, const uint32_t node_size);
+void lv_cache_entry_delete(lv_cache_entry_t_ * entry);
 /*************************
  *    GLOBAL VARIABLES
  *************************/
