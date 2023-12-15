@@ -1004,7 +1004,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 
                 if(ellipsis_valid && pos.x + letter_w + pinfo->letter_space > ellipsis_width) {
                     for(int ell = 0; ell < 3; ell++) {
-                        lv_draw_letter(layer, &label_draw_dsc, &pos, '.');
+                        lv_draw_character(layer, &label_draw_dsc, &pos, '.');
                         pos.x = pos.x + dot_letter_w + pinfo->letter_space;
                     }
                     if(pos.x <= ellipsis_width) {
@@ -1013,7 +1013,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                     break;
                 }
                 else {
-                    lv_draw_letter(layer, &label_draw_dsc, &pos, letter);
+                    lv_draw_character(layer, &label_draw_dsc, &pos, letter);
                     if(letter_w > 0) {
                         pos.x = pos.x + letter_w + pinfo->letter_space;
                     }

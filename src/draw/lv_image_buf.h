@@ -141,13 +141,13 @@ typedef struct {
  **********************/
 
 /**
- * Set the palette color of an indexed image. Valid only for `LV_IMAGE_CF_INDEXED1/2/4/8`
+ * Set the palette color of an indexed image. Valid only for `LV_COLOR_FORMAT_I1/2/4/8`
  * @param dsc pointer to an image descriptor
  * @param id the palette color to set:
- *   - for `LV_IMAGE_CF_INDEXED1`: 0..1
- *   - for `LV_IMAGE_CF_INDEXED2`: 0..3
- *   - for `LV_IMAGE_CF_INDEXED4`: 0..15
- *   - for `LV_IMAGE_CF_INDEXED8`: 0..255
+ *   - for `LV_COLOR_FORMAT_I1`: 0..1
+ *   - for `LV_COLOR_FORMAT_I2`: 0..3
+ *   - for `LV_COLOR_FORMAT_I4`: 0..15
+ *   - for `LV_COLOR_FORMAT_I8`: 0..255
  * @param c the color to set in lv_color32_t format
  */
 void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c);

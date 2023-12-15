@@ -150,8 +150,8 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 #endif
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
-                                            const lv_area_t * coords)
+void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                      const lv_area_t * coords)
 {
     if(!draw_dsc->tile) {
         _lv_draw_image_normal_helper(draw_unit, draw_dsc, coords, img_draw_core);

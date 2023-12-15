@@ -77,7 +77,7 @@ typedef struct {
 
 /**
  * Call the blend function of the `layer`.
- * @param layer      pointer to a draw context
+ * @param draw_unit     pointer to a draw unit
  * @param dsc           pointer to an initialized blend descriptor
  */
 void lv_draw_sw_blend(struct _lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t * dsc);
