@@ -6,11 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: 'lvgl'
 
       - name: SO3-LVGL building the Docker image
         run: |
-          ls -la .
           wget https://raw.githubusercontent.com/smartobjectoriented/so3/40-expand-and-document-lvgl-perf-tests/Dockerfile.lvgl
+          pwd
+          ls -la .
           docker build . -f Dockerfile.lvgl -t so3/virt64 --platform linux/amd64
 
       - name: SO3-LVL Running containerized performance check app
