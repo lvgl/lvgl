@@ -7,10 +7,11 @@
  *      INCLUDES
  *********************/
 #include "_lv_cache_lru_rb.h"
-#include "../lv_rb.h"
-#include "../lv_ll.h"
-#include "../../stdlib/lv_string.h"
 #include "../../stdlib/lv_sprintf.h"
+#include "../../stdlib/lv_string.h"
+#include "../lv_ll.h"
+#include "../lv_rb.h"
+#include "_lv_cache_entry_internal.h"
 
 /*********************
  *      DEFINES
