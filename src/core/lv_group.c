@@ -48,6 +48,11 @@ void _lv_group_init(void)
     _lv_ll_init(group_ll_p, sizeof(lv_group_t));
 }
 
+void _lv_group_deinit(void)
+{
+    _lv_ll_clear(group_ll_p);
+}
+
 lv_group_t * lv_group_create(void)
 {
     lv_group_t * group = _lv_ll_ins_head(group_ll_p);

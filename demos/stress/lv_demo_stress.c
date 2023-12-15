@@ -32,7 +32,6 @@ static void obj_test_task_cb(lv_timer_t * tmr);
  **********************/
 static lv_obj_t * main_page;
 static lv_obj_t * ta;
-static const char * mbox_buttons[] = {"Ok", "Cancel", ""};
 static uint32_t mem_free_start = 0;
 static int16_t g_state = -1;
 
@@ -79,7 +78,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
 
                 if(mem_free_start == 0)  mem_free_start = mon.free_size;
 
-                LV_LOG_USER("mem leak since start: %d, frag: %3d %%",  mem_free_start - mon.free_size, mon.frag_pct);
+                LV_LOG_USER("mem leak since start: %" LV_PRIu32 ", frag: %3d %%", mem_free_start - mon.free_size, mon.frag_pct);
             }
             break;
         case 0:
@@ -88,7 +87,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_obj_set_size(main_page, LV_HOR_RES / 2, LV_VER_RES);
             lv_obj_set_flex_flow(main_page, LV_FLEX_FLOW_COLUMN);
 
-
             obj = lv_button_create(main_page);
             lv_obj_set_size(obj, 100, 70);
             obj = lv_label_create(obj);
@@ -96,7 +94,8 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 1: {
-                obj = lv_tabview_create(lv_screen_active(), LV_DIR_TOP, 50);
+                obj = lv_tabview_create(lv_screen_active());
+                lv_tabview_set_tab_bar_size(obj, 50);
                 lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
                 lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
                 lv_obj_t * t = lv_tabview_add_tab(obj, "First");
@@ -107,7 +106,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
                 t = lv_tabview_add_tab(obj, LV_SYMBOL_EDIT " Edit");
                 t = lv_tabview_add_tab(obj, LV_SYMBOL_CLOSE);
 
-                lv_tabview_set_act(obj, 1, LV_ANIM_ON);
+                lv_tabview_set_active(obj, 1, LV_ANIM_ON);
                 auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 5 + 30);
             }
             break;
@@ -122,10 +121,10 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             /*Add an infinite width change animation*/
             lv_anim_init(&a);
             lv_anim_set_var(&a, obj);
-            lv_anim_set_time(&a, LV_DEMO_STRESS_TIME_STEP * 2);
+            lv_anim_set_duration(&a, LV_DEMO_STRESS_TIME_STEP * 2);
             lv_anim_set_exec_cb(&a, set_width_anim);
             lv_anim_set_values(&a, 100, 200);
-            lv_anim_set_playback_time(&a, LV_DEMO_STRESS_TIME_STEP * 2);
+            lv_anim_set_playback_duration(&a, LV_DEMO_STRESS_TIME_STEP * 2);
             lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
             lv_anim_start(&a);
 
@@ -199,7 +198,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_anim_init(&a);
             lv_anim_set_var(&a, obj);
             lv_anim_set_values(&a, LV_VER_RES, LV_VER_RES - lv_obj_get_height(obj));
-            lv_anim_set_time(&a, LV_DEMO_STRESS_TIME_STEP + 3);
+            lv_anim_set_duration(&a, LV_DEMO_STRESS_TIME_STEP + 3);
             lv_anim_set_exec_cb(&a, set_y_anim);
             lv_anim_start(&a);
 
@@ -226,9 +225,9 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_anim_init(&a);
             lv_anim_set_var(&a, obj);
             lv_anim_set_values(&a, 180, 400);
-            lv_anim_set_time(&a, LV_DEMO_STRESS_TIME_STEP * 2);
+            lv_anim_set_duration(&a, LV_DEMO_STRESS_TIME_STEP * 2);
             lv_anim_set_delay(&a, LV_DEMO_STRESS_TIME_STEP + 25);
-            lv_anim_set_playback_time(&a, LV_DEMO_STRESS_TIME_STEP * 5);
+            lv_anim_set_playback_duration(&a, LV_DEMO_STRESS_TIME_STEP * 5);
             lv_anim_set_repeat_count(&a, 3);
             lv_anim_set_exec_cb(&a, arc_set_end_angle_anim);
             lv_anim_start(&a);
@@ -241,11 +240,17 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 14:
-            obj = lv_msgbox_create(NULL, "Title", "Some text on the message box with average length", mbox_buttons, true);
-
-            lv_timer_t * msgbox_tmr = lv_timer_create(msgbox_delete, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
-            lv_timer_set_repeat_count(msgbox_tmr, 1);
-            lv_obj_align(obj, LV_ALIGN_RIGHT_MID, -10, 0);
+            obj = lv_msgbox_create(NULL);
+            lv_msgbox_add_title(obj, "Title");
+            lv_msgbox_add_header_button(obj, LV_SYMBOL_AUDIO);
+            lv_msgbox_add_text(obj, "Some text");
+            lv_msgbox_add_footer_button(obj, "Button 1");
+            lv_msgbox_add_footer_button(obj, "Button 2");
+            {
+                lv_timer_t * msgbox_tmr = lv_timer_create(msgbox_delete, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
+                lv_timer_set_repeat_count(msgbox_tmr, 1);
+                lv_obj_align(obj, LV_ALIGN_RIGHT_MID, -10, 0);
+            }
             break;
 
         case 15:
@@ -269,7 +274,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
                 obj = lv_label_create(obj);
                 lv_label_set_text(obj, "Tile: 1;1");
 
-                lv_obj_set_tile_id(tv, 1, 1, LV_ANIM_ON);
+                lv_tileview_set_tile_by_index(tv, 1, 1, LV_ANIM_ON);
             }
             break;
 
@@ -425,7 +430,7 @@ static void auto_delete(lv_obj_t * obj, uint32_t delay)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_time(&a, 0);
+    lv_anim_set_duration(&a, 0);
     lv_anim_set_delay(&a, delay);
     lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);

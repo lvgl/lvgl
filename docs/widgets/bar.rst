@@ -33,7 +33,9 @@ A new value can be set by
 ``lv_bar_set_value(bar, new_value, LV_ANIM_ON/OFF)``. The value is
 interpreted in a range (minimum and maximum values) which can be
 modified with :cpp:expr:`lv_bar_set_range(bar, min, max)`. The default range is
-0..100.
+0..100, and the default drawing direction is from left to right in horizontal mode and
+bottom to top in vertical mode. If the minimum value is greater than the maximum value, like
+100..0, the drawing direction changes to the opposite direction.
 
 The new value in :cpp:func:`lv_bar_set_value` can be set with or without an
 animation depending on the last parameter (``LV_ANIM_ON/OFF``).
@@ -52,16 +54,6 @@ The bar can be one of the following modes:
 
 Events
 ******
-
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following parts:
-
-   -  :cpp:enumerator:`LV_BAR_DRAW_PART_INDICATOR` The indicator of the bar
-
-      -  ``part``: :cpp:enumerator:`LV_PART_INDICATOR`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-
 See the events of the `Base object </widgets/obj>`__ too.
 
 Learn more about :ref:`events`.

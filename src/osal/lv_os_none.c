@@ -36,7 +36,6 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(void *), size_t stack_size,
                            void * user_data)
 {
@@ -55,7 +54,6 @@ lv_result_t lv_thread_delete(lv_thread_t * thread)
     LV_ASSERT(0);
     return LV_RESULT_INVALID;
 }
-
 
 lv_result_t lv_mutex_init(lv_mutex_t * mutex)
 {

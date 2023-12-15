@@ -95,7 +95,6 @@ void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow);
  *      MACROS
  **********************/
 
-
 #endif  /*LV_USE_FLEX*/
 
 #ifdef __cplusplus

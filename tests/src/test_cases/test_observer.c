@@ -18,13 +18,12 @@ void tearDown(void)
 static int32_t prev_v;
 static int32_t current_v;
 
-static void observer_int(lv_subject_t * subject, lv_observer_t * observer)
+static void observer_int(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(observer);
     prev_v = lv_subject_get_previous_int(subject);
     current_v = lv_subject_get_int(subject);
 }
-
 
 void test_observer_add_remove(void)
 {
@@ -42,6 +41,10 @@ void test_observer_add_remove(void)
     lv_subject_set_int(&subject, 15);
     TEST_ASSERT_EQUAL(15, lv_subject_get_int(&subject));
     TEST_ASSERT_EQUAL(10, current_v);   /*The observer cb is not called*/
+
+    static lv_subject_t uninitialized_subject;
+    observer = lv_subject_add_observer(&uninitialized_subject, observer_int, NULL);
+    TEST_ASSERT_EQUAL_PTR(NULL, observer);   /*The observer must be NULL*/
 }
 
 void test_observer_int(void)
@@ -177,7 +180,7 @@ void test_observer_color(void)
 
 static int32_t group_observer_called;
 
-static void group_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void group_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(observer);
     LV_UNUSED(subject);

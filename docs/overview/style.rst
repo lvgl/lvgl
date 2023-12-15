@@ -146,30 +146,6 @@ property. The parents will use their own state to determine the value.
 So if a button is pressed, and the text color comes from here, the
 pressed text color will be used.
 
-Forced value inheritance/default value
-**************************************
-
-Sometimes you may want to force a child object to use the parent's value
-for a given style property. To do this you can use one of the following
-(depending on what type of style you're using):
-
-.. code:: c
-
-   /* regular style */
-   lv_style_set_prop_meta(&style, LV_STYLE_TEXT_COLOR, LV_STYLE_PROP_META_INHERIT);
-   /* local style */
-   lv_obj_set_local_style_prop_meta(child, LV_STYLE_TEXT_COLOR, LV_STYLE_PROP_META_INHERIT, LV_PART_MAIN);
-
-This acts like a value has been set on the style, so setting the value
-of the property afterwards will remove the flag.
-
-You may also want to force the default value of a property to be used,
-without needing to hardcode it in your application. To do this you can
-use the same API but with :cpp:enumerator:`LV_STYLE_PROP_META_INITIAL` instead. In
-future versions of LVGL, this will use the value based upon the current
-theme, but for now it just selects the internal default regardless of
-theme.
-
 Parts
 *****
 

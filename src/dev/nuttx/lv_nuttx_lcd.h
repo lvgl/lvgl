@@ -14,7 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_nuttx_entry.h"
+#include "../../display/lv_display.h"
+
+#if LV_USE_NUTTX
 
 #if LV_USE_NUTTX_LCD
 
@@ -37,6 +39,8 @@ lv_display_t * lv_nuttx_lcd_create(const char * dev_path);
  **********************/
 
 #endif /* LV_USE_NUTTX_LCD */
+
+#endif /* LV_USE_NUTTX*/
 
 #ifdef __cplusplus
 } /* extern "C" */

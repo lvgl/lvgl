@@ -64,7 +64,7 @@ void test_roller_get_selected_option(void)
     char * expected_index_str = "Three";
 
     /* Select the last option, index starts at 0 */
-    uint16_t option_count = lv_roller_get_option_cnt(roller);
+    uint16_t option_count = lv_roller_get_option_count(roller);
     lv_roller_set_selected(roller, option_count - 1, LV_ANIM_OFF);
 
     actual_index = lv_roller_get_selected(roller);
@@ -82,7 +82,7 @@ void test_roller_get_selected_option_truncated_buffer(void)
     char * expected_index_str = "Th";
 
     /* Select the last option, index starts at 0 */
-    uint16_t option_count = lv_roller_get_option_cnt(roller);
+    uint16_t option_count = lv_roller_get_option_count(roller);
     lv_roller_set_selected(roller, option_count - 1, LV_ANIM_OFF);
 
     /* Get the index string */
@@ -98,7 +98,7 @@ void test_roller_infinite_mode_get_selected_option(void)
     int16_t actual_index = 0;
 
     /* Select the last option of page 2 */
-    uint16_t option_count = lv_roller_get_option_cnt(roller_infinite);
+    uint16_t option_count = lv_roller_get_option_count(roller_infinite);
     option_count = (option_count * 2) - 1;
     lv_roller_set_selected(roller_infinite, option_count, LV_ANIM_OFF);
 
@@ -177,7 +177,7 @@ void test_roller_with_overlay_and_bubble_events_enabled(void)
 //    lv_group_add_obj(g, roller_infinite);
 //
 //    /* Select the last option of page 2 */
-//    uint16_t option_count = lv_roller_get_option_cnt(roller_infinite);
+//    uint16_t option_count = lv_roller_get_option_count(roller_infinite);
 //    option_count = (option_count * 2) - 1;
 //    lv_roller_set_selected(roller_infinite, option_count, LV_ANIM_OFF);
 //
@@ -212,7 +212,7 @@ void test_roller_with_overlay_and_bubble_events_enabled(void)
 //    lv_roller_set_selected(roller, 1, LV_ANIM_OFF);
 //    lv_obj_center(roller);
 //
-//    TEST_ASSERT_EQUAL_SCREENSHOT("roller_1.png");
+//    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_1.png");
 //#else
 //    TEST_PASS();
 //#endif

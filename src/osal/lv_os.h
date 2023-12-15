@@ -30,6 +30,10 @@ extern "C" {
 #include "lv_freertos.h"
 #elif LV_USE_OS == LV_OS_CMSIS_RTOS2
 #include "lv_cmsis_rtos2.h"
+#elif LV_USE_OS == LV_OS_RTTHREAD
+#include "lv_rtthread.h"
+#elif LV_USE_OS == LV_OS_WINDOWS
+#include "lv_windows.h"
 #elif LV_USE_OS == LV_OS_CUSTOM
 #include LV_OS_CUSTOM_INCLUDE
 #endif

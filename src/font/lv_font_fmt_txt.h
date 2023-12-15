@@ -59,7 +59,6 @@ typedef _lv_font_fmt_txt_cmap_type_t lv_font_fmt_txt_cmap_type_t;
 typedef uint8_t lv_font_fmt_txt_cmap_type_t;
 #endif /*DOXYGEN*/
 
-
 /**
  * Map codepoints to a `glyph_dsc`s
  * Several formats are supported to optimize memory usage
@@ -122,8 +121,8 @@ typedef struct {
     /*To get a kern value of two code points:
        1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
        2. for(i = 0; i < pair_cnt * 2; i += 2)
-             if(gylph_ids[i] == glyph_id_left &&
-                gylph_ids[i+1] == glyph_id_right)
+             if(glyph_ids[i] == glyph_id_left &&
+                glyph_ids[i+1] == glyph_id_right)
                  return values[i / 2];
      */
     const void * glyph_ids;
@@ -224,7 +223,6 @@ typedef struct {
  */
 const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out);
 
-
 /**
  * Used as `get_glyph_dsc` callback in lvgl's native font format if the font is uncompressed.
  * @param font pointer to font
@@ -236,7 +234,6 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
  */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next);
-
 
 /**********************
  *      MACROS

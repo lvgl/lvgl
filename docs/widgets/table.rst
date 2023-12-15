@@ -43,14 +43,14 @@ Rows and Columns
 ----------------
 
 To explicitly set number of rows and columns use
-:cpp:expr:`lv_table_set_row_cnt(table, row_cnt)` and
-:cpp:expr:`lv_table_set_col_cnt(table, col_cnt)`
+:cpp:expr:`lv_table_set_row_count(table, row_cnt)` and
+:cpp:expr:`lv_table_set_column_count(table, col_cnt)`
 
 Width and Height
 ----------------
 
 The width of the columns can be set with
-:cpp:expr:`lv_table_set_col_width(table, col_id, width)`. The overall width of
+:cpp:expr:`lv_table_set_column_width(table, col_id, width)`. The overall width of
 the Table object will be set to the sum of columns widths.
 
 The height is calculated automatically from the cell styles (font,
@@ -79,16 +79,6 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new cell is selected with
    keys.
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following types:
-
-   -  :cpp:enumerator:`LV_TABLE_DRAW_PART_CELL` The individual cells of the table
-
-      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-      -  ``label_dsc``
-      -  ``id``: current row × col count + current column
 
 See the events of the `Base object </widgets/obj>`__ too.
 

@@ -113,10 +113,9 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
  *    MACROS
  **********************/
 
-
 #include "default/lv_theme_default.h"
 #include "mono/lv_theme_mono.h"
-#include "basic/lv_theme_basic.h"
+#include "simple/lv_theme_simple.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

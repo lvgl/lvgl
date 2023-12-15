@@ -12,7 +12,7 @@ def slider_event_cb(e):
 slider = lv.slider(lv.screen_active())
 slider.set_width(200)                                              # Set the width
 slider.center()                                                    # Align to the center of the parent (screen)
-slider.add_event(slider_event_cb, lv.EVENT.VALUE_CHANGED, None) # Assign an event function
+slider.add_event_cb(slider_event_cb, lv.EVENT.VALUE_CHANGED, None) # Assign an event function
 
 # Create a label above the slider
 label = lv.label(lv.screen_active())

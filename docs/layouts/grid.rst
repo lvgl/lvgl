@@ -43,8 +43,8 @@ For example:
 
 .. code:: c
 
-   static lv_coord_t column_dsc[] = {100, 400, LV_GRID_TEMPLATE_LAST};   /*2 columns with 100 and 400 ps width*/
-   static lv_coord_t row_dsc[] = {100, 100, 100, LV_GRID_TEMPLATE_LAST}; /*3 100 px tall rows*/
+   static int32_t column_dsc[] = {100, 400, LV_GRID_TEMPLATE_LAST};   /*2 columns with 100 and 400 ps width*/
+   static int32_t row_dsc[] = {100, 100, 100, LV_GRID_TEMPLATE_LAST}; /*3 100 px tall rows*/
 
 To set the descriptors on a parent use
 :c:expr:`lv_obj_set_grid_dsc_array(obj, col_dsc, row_dsc)`.
@@ -70,10 +70,10 @@ in its cell. The possible values are:
 
 - :c:enumerator:`LV_GRID_ALIGN_START`: means left on a horizontally and top vertically. (default)
 - :c:enumerator:`LV_GRID_ALIGN_END`: means right on a horizontally and bottom vertically
-- :c:enumerator:`LV_GRID_ALIGN_CENTER`: simply center ``colum_pos`` and ``row_pos``
+- :c:enumerator:`LV_GRID_ALIGN_CENTER`: simply center ``column_pos`` and ``row_pos``
   means the zero based index of the cell into the item should be placed.
 
-``colum_span`` and ``row_span`` means how many tracks should the item
+``column_span`` and ``row_span`` means how many tracks should the item
 involve from the start cell. Must be >= 1.
 
 Grid align

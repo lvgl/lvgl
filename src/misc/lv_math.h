@@ -126,6 +126,12 @@ int64_t lv_pow(int64_t base, int8_t exp);
 int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out);
 
 /**
+ * Set the seed of the pseudo random number generator
+ * @param seed a number to initialize the random generator
+ */
+void lv_rand_set_seed(uint32_t seed);
+
+/**
  * Get a pseudo random number in the given range
  * @param min   the minimum value
  * @param max   the maximum value

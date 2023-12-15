@@ -120,8 +120,17 @@ Move the object with this value in Y direction. Applied after layouts, aligns an
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### transform_scale
-Zoom an objects. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on
+### transform_scale_x
+Zoom an objects horizontally. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
+</ul>
+
+### transform_scale_y
+Zoom an objects vertically. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -154,6 +163,24 @@ Set the pivot point's Y coordinate for transformations. Relative to the object's
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+### transform_skew_x
+Skew an object horizontally. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
+</ul>
+
+### transform_skew_y
+Skew an object vertically. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
 </ul>
 
 ## Padding
@@ -217,7 +244,7 @@ Sets the padding between the columns. Used by the layouts.
 Properties to describe spacing around an object. Very similar to the margin properties in HTML.
 
 ### margin_top
-Sets the margin on the top. The object will keep this space from its siblings in layouts.
+Sets the margin on the top. The object will keep this space from its siblings in layouts. 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -309,19 +336,28 @@ Set the point from which the background's gradient color should start. 0 means t
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### bg_grad
-Set the gradient definition. The pointed instance must exist while the object is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors too.
+### bg_main_opa
+Set the opacity of the first gradient color
 <ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 255</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### bg_dither_mode
-Set the dithering mode of the gradient of the background. The possible values are `LV_DITHER_NONE/ORDERED/ERR_DIFF`.
+### bg_grad_opa
+Set the opacity of the second gradient color
 <ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_DITHER_NONE`</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 255</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+### bg_grad
+Set the gradient definition. The pointed instance must exist while the object is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors too. If it's set other gradient related properties will be ignored'
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
@@ -424,7 +460,7 @@ Sets whether the border should be drawn before or after the children are drawn. 
 Properties to describe the outline. It's like a border but drawn outside of the rectangles.
 
 ### outline_width
-Set the width of the outline in pixels.
+Set the width of the outline in pixels. 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -471,8 +507,8 @@ Set the width of the shadow in pixels. The value should be >= 0.
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
 </ul>
 
-### shadow_ofs_x
-Set an offset on the shadow in pixels in X direction.
+### shadow_offset_x
+Set an offset on the shadow in pixels in X direction. 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -480,8 +516,8 @@ Set an offset on the shadow in pixels in X direction.
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
 </ul>
 
-### shadow_ofs_y
-Set an offset on the shadow in pixels in Y direction.
+### shadow_offset_y
+Set an offset on the shadow in pixels in Y direction. 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -577,7 +613,7 @@ Set the gap between dashes in pixel. Note that dash works only on horizontal and
 </ul>
 
 ### line_rounded
-Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending
+Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -616,7 +652,7 @@ Set the width (thickness) of the arcs in pixel.
 </ul>
 
 ### arc_rounded
-Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending
+Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -673,7 +709,7 @@ Set the opacity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully 
 </ul>
 
 ### text_font
-Set the font of the text (a pointer `lv_font_t *`).
+Set the font of the text (a pointer `lv_font_t *`). 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_FONT_DEFAULT`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
@@ -785,15 +821,6 @@ The animation template for the object's animation. Should be a pointer to `lv_an
 
 ### anim_time
 The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
-<ul>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
-<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
-</ul>
-
-### anim_speed
-The animation speed in pixel/sec. Its meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>

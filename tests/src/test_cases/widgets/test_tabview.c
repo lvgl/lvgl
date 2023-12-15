@@ -18,7 +18,7 @@ void test_tabview_add_several_tabs_no_scroll(void);
 void test_tabview_rename_tab(void);
 void test_tabview_add_several_tabs_hor(void);
 void test_tabview_get_content(void);
-void test_tabview_get_tab_buttons(void);
+void test_tabview_get_tab_bar(void);
 void test_tabview_set_act_non_existent(void);
 void test_tabview_tab2_selected_event(void);
 void test_tabview_update_on_external_scroll(void);
@@ -38,43 +38,52 @@ void tearDown(void)
 
 void test_tabview_create_successful_dir_top(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     TEST_ASSERT_NOT_NULL(tabview);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_01.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_01.png");
 }
 
 void test_tabview_create_successful_dir_bottom(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_BOTTOM, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_BOTTOM);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     TEST_ASSERT_NOT_NULL(tabview);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_02.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_02.png");
 }
 
 void test_tabview_create_successful_dir_left(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_LEFT, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     TEST_ASSERT_NOT_NULL(tabview);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_03.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_03.png");
 }
 
 void test_tabview_create_successful_dir_right(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_RIGHT, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_RIGHT);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     TEST_ASSERT_NOT_NULL(tabview);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_04.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_04.png");
 }
 
 void test_tabview_add_one_tab_empty(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
 
@@ -83,7 +92,9 @@ void test_tabview_add_one_tab_empty(void)
 
 void test_tabview_add_one_tab_empty_hor(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_LEFT, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
 
@@ -92,7 +103,9 @@ void test_tabview_add_one_tab_empty_hor(void)
 
 void test_tabview_add_one_tab_no_scroll(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
 
@@ -100,12 +113,14 @@ void test_tabview_add_one_tab_no_scroll(void)
     const char * content = "Content of the first tab\n";
     lv_label_set_text(label, content);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_05.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_05.png");
 }
 
 void test_tabview_add_one_tab_with_scroll(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
 
@@ -126,12 +141,14 @@ void test_tabview_add_one_tab_with_scroll(void)
                       "\n"
                       "Can you see it?");
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_06.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_06.png");
 }
 
 void test_tabview_add_several_tabs_no_scroll(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
@@ -140,35 +157,39 @@ void test_tabview_add_several_tabs_no_scroll(void)
     lv_obj_t * label1 = lv_label_create(tab1);
     lv_label_set_text(label1, "Content of the first tab\n");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab2);
     LV_UNUSED(tab3);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_07.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_07.png");
 }
 
 void test_tabview_rename_tab(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
     lv_obj_t * tab3 = lv_tabview_add_tab(tabview, "Tab 3");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab1);
     LV_UNUSED(tab2);
     LV_UNUSED(tab3);
 
-    // rename 2nd tab (0-based index)
+    /*rename 2nd tab (0-based index)*/
     lv_tabview_rename_tab(tabview, 1, "2nd Tab");
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_08.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_08.png");
 }
 
 void test_tabview_add_several_tabs_hor(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_LEFT, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
@@ -177,66 +198,70 @@ void test_tabview_add_several_tabs_hor(void)
     lv_obj_t * label1 = lv_label_create(tab1);
     lv_label_set_text(label1, "Content of the first tab\n");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab2);
     LV_UNUSED(tab3);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_09.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_09.png");
 }
 
 void test_tabview_get_content(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
 
     lv_obj_t * content = lv_tabview_get_content(tabview);
 
     TEST_ASSERT_NOT_NULL(content);
 }
 
-void test_tabview_get_tab_buttons(void)
+void test_tabview_get_tab_bar(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
 
-    lv_obj_t * buttons = lv_tabview_get_tab_buttons(tabview);
+    lv_obj_t * tab_bar = lv_tabview_get_tab_bar(tabview);
 
-    TEST_ASSERT_NOT_NULL(buttons);
+    TEST_ASSERT_NOT_NULL(tab_bar);
 }
 
 void test_tabview_set_act_non_existent(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
 
-    lv_tabview_set_act(tabview, 1, LV_ANIM_ON);
+    lv_tabview_set_active(tabview, 1, LV_ANIM_ON);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("tabview_10.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/tabview_10.png");
 }
 
 void test_tabview_tab2_selected_event(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab1);
     LV_UNUSED(tab2);
 
-    lv_tabview_set_act(tabview, 1, LV_ANIM_OFF);
+    lv_tabview_set_active(tabview, 1, LV_ANIM_OFF);
 
-    TEST_ASSERT_EQUAL_UINT16(1, lv_tabview_get_tab_act(tabview));
+    TEST_ASSERT_EQUAL_UINT16(1, lv_tabview_get_tab_active(tabview));
 }
 
 void test_tabview_update_on_external_scroll(void)
 {
-    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+    tabview = lv_tabview_create(active_screen);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_TOP);
+    lv_tabview_set_tab_bar_size(tabview, 50);
 
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
     lv_obj_t * tab3 = lv_tabview_add_tab(tabview, "Tab 3");
     lv_obj_t * tab4 = lv_tabview_add_tab(tabview, "Tab 4");
 
-    // avoid compiler error: unused variable
+    /*avoid compiler error: unused variable*/
     LV_UNUSED(tab1);
     LV_UNUSED(tab2);
     LV_UNUSED(tab4);
@@ -257,7 +282,7 @@ void test_tabview_update_on_external_scroll(void)
 
     TEST_ASSERT_TRUE(lv_obj_is_visible(label1));
     TEST_ASSERT_FALSE(lv_obj_is_visible(label2));
-    TEST_ASSERT_EQUAL_UINT16(2, lv_tabview_get_tab_act(tabview));
+    TEST_ASSERT_EQUAL_UINT16(2, lv_tabview_get_tab_active(tabview));
 }
 
 #endif

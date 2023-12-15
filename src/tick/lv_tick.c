@@ -35,10 +35,6 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * You have to call this function periodically
- * @param tick_period the call period of this function in milliseconds
- */
 LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
 {
     lv_tick_state_t * state_p = &state;
@@ -47,10 +43,6 @@ LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
     state_p->sys_time += tick_period;
 }
 
-/**
- * Get the elapsed milliseconds since start up
- * @return the elapsed milliseconds
- */
 uint32_t lv_tick_get(void)
 {
     lv_tick_state_t * state_p = &state;
@@ -72,11 +64,6 @@ uint32_t lv_tick_get(void)
     return result;
 }
 
-/**
- * Get the elapsed milliseconds since a previous time stamp
- * @param prev_tick a previous time stamp (return value of lv_tick_get() )
- * @return the elapsed milliseconds since 'prev_tick'
- */
 uint32_t lv_tick_elaps(uint32_t prev_tick)
 {
     uint32_t act_time = lv_tick_get();
@@ -93,9 +80,32 @@ uint32_t lv_tick_elaps(uint32_t prev_tick)
     return prev_tick;
 }
 
+void lv_delay_ms(uint32_t ms)
+{
+    if(state.delay_cb) {
+        state.delay_cb(ms);
+    }
+    else {
+        uint32_t t = lv_tick_get();
+        while(lv_tick_elaps(t) < ms) {
+            /*Do something to no call `lv_tick_elaps` too often as it might interfere with interrupts*/
+            volatile uint32_t i;
+            volatile uint32_t x = ms;
+            for(i = 0; i < 100; i++) {
+                x = x * 3;
+            }
+        }
+    }
+}
+
 void lv_tick_set_cb(lv_tick_get_cb_t cb)
 {
     state.tick_get_cb = cb;
+}
+
+void lv_delay_set_cb(lv_delay_cb_t cb)
+{
+    state.delay_cb = cb;
 }
 
 /**********************

@@ -21,7 +21,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -29,14 +28,14 @@ extern "C" {
 struct _lv_observer_t;
 
 typedef enum {
-    LV_SUBJECT_TYPE_NONE =      0,
-    LV_SUBJECT_TYPE_INT =       1,   /**< an int32_t*/
-    LV_SUBJECT_TYPE_POINTER =   2,   /**< a void pointer*/
-    LV_SUBJECT_TYPE_COLOR   =   3,   /**< an lv_color_t*/
-    LV_SUBJECT_TYPE_GROUP  =    4,   /**< an array of subjects*/
-    LV_SUBJECT_TYPE_STRING  =   5,   /**< a char pointer*/
+    LV_SUBJECT_TYPE_INVALID =   0,   /**< indicates subject not initialized yet*/
+    LV_SUBJECT_TYPE_NONE =      1,   /**< a null value like None or NILt*/
+    LV_SUBJECT_TYPE_INT =       2,   /**< an int32_t*/
+    LV_SUBJECT_TYPE_POINTER =   3,   /**< a void pointer*/
+    LV_SUBJECT_TYPE_COLOR   =   4,   /**< an lv_color_t*/
+    LV_SUBJECT_TYPE_GROUP  =    5,   /**< an array of subjects*/
+    LV_SUBJECT_TYPE_STRING  =   6,   /**< a char pointer*/
 } lv_subject_type_t;
-
 
 /**
  * A common type to handle all the various observable types in the same way
@@ -57,13 +56,15 @@ typedef struct {
     lv_subject_value_t value;           /**< Actual value*/
     lv_subject_value_t prev_value;      /**< Previous value*/
     uint32_t notify_restart_query : 1; /**< If an observer deleted start notifying from the beginning. */
+    void * user_data;                   /**< Additional parameter, can be used freely by the user*/
 } lv_subject_t;
 
 /**
   * Callback called when the observed value changes
-  * @param s the lv_observer_t object created when the object was subscribed to the value
+  * @param observer     pointer to the observer of the callback
+  * @param subject      pointer to the subject of the observer
   */
-typedef void (*lv_observer_cb_t)(lv_subject_t * subject, struct _lv_observer_t * observer);
+typedef void (*lv_observer_cb_t)(struct _lv_observer_t * observer, lv_subject_t * subject);
 
 /**
  * The observer object: a descriptor returned when subscribing LVGL widgets to subjects
@@ -236,7 +237,6 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
 lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t observer_cb, lv_obj_t * obj,
                                             void * user_data);
 
-
 /**
  * Add an observer to a subject and also save a target.
  * @param subject       pointer to the subject
@@ -267,6 +267,18 @@ void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj);
  * @return              pointer to the saved target
  */
 void * lv_observer_get_target(lv_observer_t * observer);
+
+/**
+ * Get the target object of the observer.
+ * It's the same as `lv_observer_get_target` and added only
+ * for semantic reasons
+ * @param observer      pointer to an observer
+ * @return              pointer to the saved object target
+ */
+static inline lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
+{
+    return (lv_obj_t *)lv_observer_get_target(observer);
+}
 
 /**
  * Notify all observers of subject

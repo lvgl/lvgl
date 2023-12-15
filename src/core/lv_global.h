@@ -31,6 +31,7 @@ extern "C" {
 #include "../misc/lv_profiler_builtin.h"
 #include "../misc/lv_style.h"
 #include "../misc/lv_timer.h"
+#include "../others/sysmon/lv_sysmon.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED
@@ -66,6 +67,7 @@ struct _lv_freetype_context_t;
 
 typedef struct _lv_global_t {
     bool inited;
+    bool deinit_in_progress;     /**< Can be used e.g. in the LV_EVENT_DELETE to deinit the drivers too */
 
     lv_ll_t disp_ll;
     struct _lv_display_t * disp_refresh;
@@ -118,12 +120,12 @@ typedef struct _lv_global_t {
     lv_log_print_g_cb_t custom_log_print_cb;
 #endif
 
-#if LV_LOG_USE_TIMESTAMP
+#if LV_USE_LOG && LV_LOG_USE_TIMESTAMP
     uint32_t log_last_log_time;
 #endif
 
-#if LV_USE_THEME_BASIC
-    struct _my_theme_t * theme_basic;
+#if LV_USE_THEME_SIMPLE
+    struct _my_theme_t * theme_simple;
 #endif
 
 #if LV_USE_THEME_DEFAULT
@@ -170,18 +172,16 @@ typedef struct _lv_global_t {
     lv_profiler_builtin_ctx_t profiler_context;
 #endif
 
-#if LV_USE_MSG
-    bool msg_restart_notify;
-    unsigned int msg_recursion_counter;
-    lv_ll_t msg_subs_ll;
-#endif
-
 #if LV_USE_FILE_EXPLORER != 0
     lv_style_t fe_list_button_style;
 #endif
 
 #if LV_USE_SYSMON && LV_USE_PERF_MONITOR
-    void * sysmon_perf_info;
+    lv_sysmon_backend_data_t sysmon_perf;
+#endif
+
+#if LV_USE_SYSMON && LV_USE_MEM_MONITOR
+    lv_sysmon_backend_data_t sysmon_mem;
 #endif
 
 #if LV_USE_IME_PINYIN != 0
@@ -192,8 +192,8 @@ typedef struct _lv_global_t {
     void * objid_array;
     uint32_t objid_count;
 #endif
+    void * user_data;
 } lv_global_t;
-
 
 /**********************
  *      MACROS

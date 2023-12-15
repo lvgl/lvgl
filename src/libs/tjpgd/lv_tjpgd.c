@@ -27,7 +27,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args);
 
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area);
@@ -84,7 +85,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 
         if(is_jpg(raw_data, raw_sjpeg_data_size) == true) {
 #if LV_USE_FS_MEMFS
-            header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = img_dsc->header.w;
             header->h = img_dsc->header.h;
@@ -98,7 +98,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     }
     else if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
-        if((strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
+        if((lv_strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (lv_strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
             lv_fs_file_t f;
             lv_fs_res_t res;
             res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
@@ -112,7 +112,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
                 lv_fs_close(&f);
                 return LV_RESULT_INVALID;
             }
-            header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = jd.width;
             header->h = jd.height;
@@ -144,9 +143,11 @@ static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
     return 0;
 }
 
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args)
 {
     LV_UNUSED(decoder);
+    LV_UNUSED(args);
     lv_fs_file_t * f = lv_malloc(sizeof(lv_fs_file_t));
     if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
 #if LV_USE_FS_MEMFS
@@ -168,7 +169,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
     else if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
-        if((strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
+        if((lv_strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (lv_strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
             lv_fs_res_t res;
             res = lv_fs_open(f, fn, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
@@ -184,7 +185,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     JRESULT rc = jd_prepare(jd, input_func, workb_temp, (size_t)TJPGD_WORKBUFF_SIZE, f);
     if(rc) return rc;
 
-    dsc->header.always_zero = 0;
     dsc->header.cf = LV_COLOR_FORMAT_RGB888;
     dsc->header.w = jd->width;
     dsc->header.h = jd->height;
@@ -206,6 +206,9 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     LV_UNUSED(full_area);
 
     JDEC * jd = dsc->user_data;
+    lv_draw_buf_t * decoded = (void *)dsc->decoded;
+    if(decoded == NULL) decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+    dsc->decoded = decoded;
 
     uint32_t  mx, my;
     mx = jd->msx * 8;
@@ -217,10 +220,11 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded_area->x2 = -1;
         jd->scale = 0;
         jd->dcv[2] = jd->dcv[1] = jd->dcv[0] = 0;   /* Initialize DC values */
-        dsc->img_data = jd->workbuf;
         jd->rst = 0;
         jd->rsc = 0;
-        dsc->header.stride = mx * 3;
+        decoded->data = jd->workbuf;
+        decoded->header = dsc->header;
+        decoded->header.stride = mx * 3;
     }
 
     decoded_area->x1 += mx;
@@ -232,6 +236,10 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded_area->y1 += my;
         decoded_area->y2 += my;
     }
+
+    decoded->header.w = mx;
+    decoded->header.h = my;
+    decoded->data_size = decoded->header.stride * decoded->header.h;
 
     /* Process restart interval if enabled */
     JRESULT rc;
@@ -265,6 +273,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     lv_free(jd->device);
     lv_free(jd->pool_original);
     lv_free(jd);
+    lv_free((void *)dsc->decoded);
 }
 
 static int is_jpg(const uint8_t * raw_data, size_t len)

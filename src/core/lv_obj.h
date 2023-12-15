@@ -22,6 +22,7 @@ extern "C" {
 #include "../misc/lv_area.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_assert.h"
+#include "lv_obj_property.h"
 
 /*********************
  *      DEFINES
@@ -47,7 +48,6 @@ enum _lv_state_t {
     LV_STATE_PRESSED     =  0x0020,
     LV_STATE_SCROLLED    =  0x0040,
     LV_STATE_DISABLED    =  0x0080,
-
     LV_STATE_USER_1      =  0x1000,
     LV_STATE_USER_2      =  0x2000,
     LV_STATE_USER_3      =  0x4000,
@@ -92,6 +92,9 @@ typedef uint32_t lv_part_t;
 /**
  * On/Off features controlling the object's behavior.
  * OR-ed values are possible
+ *
+ * Note: update obj flags corresponding properties below
+ * whenever add/remove flags or change bit definition of flags.
  */
 typedef enum {
     LV_OBJ_FLAG_HIDDEN          = (1L << 0),  /**< Make the object hidden. (Like it wasn't there at all)*/
@@ -137,6 +140,65 @@ typedef _lv_obj_flag_t lv_obj_flag_t;
 typedef uint32_t lv_obj_flag_t;
 #endif /*DOXYGEN*/
 
+#if LV_USE_OBJ_PROPERTY
+enum {
+    /*OBJ flag properties */
+    LV_PROPERTY_ID(OBJ, FLAG_START,                 LV_PROPERTY_TYPE_INT,       0),
+    LV_PROPERTY_ID(OBJ, FLAG_HIDDEN,                LV_PROPERTY_TYPE_INT,       0),
+    LV_PROPERTY_ID(OBJ, FLAG_CLICKABLE,             LV_PROPERTY_TYPE_INT,       1),
+    LV_PROPERTY_ID(OBJ, FLAG_CLICK_FOCUSABLE,       LV_PROPERTY_TYPE_INT,       2),
+    LV_PROPERTY_ID(OBJ, FLAG_CHECKABLE,             LV_PROPERTY_TYPE_INT,       3),
+    LV_PROPERTY_ID(OBJ, FLAG_SCROLLABLE,            LV_PROPERTY_TYPE_INT,       4),
+    LV_PROPERTY_ID(OBJ, FLAG_SCROLL_ELASTIC,        LV_PROPERTY_TYPE_INT,       5),
+    LV_PROPERTY_ID(OBJ, FLAG_SCROLL_MOMENTUM,       LV_PROPERTY_TYPE_INT,       6),
+    LV_PROPERTY_ID(OBJ, FLAG_SCROLL_ONE,            LV_PROPERTY_TYPE_INT,       7),
+    LV_PROPERTY_ID(OBJ, FLAG_SCROLL_CHAIN_HOR,      LV_PROPERTY_TYPE_INT,       8),
+    LV_PROPERTY_ID(OBJ, FLAG_SCROLL_CHAIN_VER,      LV_PROPERTY_TYPE_INT,       9),
+    LV_PROPERTY_ID(OBJ, FLAG_SCROLL_ON_FOCUS,       LV_PROPERTY_TYPE_INT,       10),
+    LV_PROPERTY_ID(OBJ, FLAG_SCROLL_WITH_ARROW,     LV_PROPERTY_TYPE_INT,       11),
+    LV_PROPERTY_ID(OBJ, FLAG_SNAPPABLE,             LV_PROPERTY_TYPE_INT,       12),
+    LV_PROPERTY_ID(OBJ, FLAG_PRESS_LOCK,            LV_PROPERTY_TYPE_INT,       13),
+    LV_PROPERTY_ID(OBJ, FLAG_EVENT_BUBBLE,          LV_PROPERTY_TYPE_INT,       14),
+    LV_PROPERTY_ID(OBJ, FLAG_GESTURE_BUBBLE,        LV_PROPERTY_TYPE_INT,       15),
+    LV_PROPERTY_ID(OBJ, FLAG_ADV_HITTEST,           LV_PROPERTY_TYPE_INT,       16),
+    LV_PROPERTY_ID(OBJ, FLAG_IGNORE_LAYOUT,         LV_PROPERTY_TYPE_INT,       17),
+    LV_PROPERTY_ID(OBJ, FLAG_FLOATING,              LV_PROPERTY_TYPE_INT,       18),
+    LV_PROPERTY_ID(OBJ, FLAG_SEND_DRAW_TASK_EVENTS, LV_PROPERTY_TYPE_INT,       19),
+    LV_PROPERTY_ID(OBJ, FLAG_OVERFLOW_VISIBLE,      LV_PROPERTY_TYPE_INT,       20),
+    LV_PROPERTY_ID(OBJ, FLAG_FLEX_IN_NEW_TRACK,     LV_PROPERTY_TYPE_INT,       21),
+    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_1,              LV_PROPERTY_TYPE_INT,       23),
+    LV_PROPERTY_ID(OBJ, FLAG_LAYOUT_2,              LV_PROPERTY_TYPE_INT,       24),
+    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_1,              LV_PROPERTY_TYPE_INT,       25),
+    LV_PROPERTY_ID(OBJ, FLAG_WIDGET_2,              LV_PROPERTY_TYPE_INT,       26),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_1,                LV_PROPERTY_TYPE_INT,       27),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_2,                LV_PROPERTY_TYPE_INT,       28),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_3,                LV_PROPERTY_TYPE_INT,       29),
+    LV_PROPERTY_ID(OBJ, FLAG_USER_4,                LV_PROPERTY_TYPE_INT,       30),
+    LV_PROPERTY_ID(OBJ, FLAG_END,                   LV_PROPERTY_TYPE_INT,       30),
+
+    LV_PROPERTY_ID(OBJ, STATE_START,                LV_PROPERTY_TYPE_INT,       31),
+    LV_PROPERTY_ID(OBJ, STATE_CHECKED,              LV_PROPERTY_TYPE_INT,       31),
+    LV_PROPERTY_ID(OBJ, STATE_FOCUSED,              LV_PROPERTY_TYPE_INT,       32),
+    LV_PROPERTY_ID(OBJ, STATE_FOCUS_KEY,            LV_PROPERTY_TYPE_INT,       33),
+    LV_PROPERTY_ID(OBJ, STATE_EDITED,               LV_PROPERTY_TYPE_INT,       34),
+    LV_PROPERTY_ID(OBJ, STATE_HOVERED,              LV_PROPERTY_TYPE_INT,       35),
+    LV_PROPERTY_ID(OBJ, STATE_PRESSED,              LV_PROPERTY_TYPE_INT,       36),
+    LV_PROPERTY_ID(OBJ, STATE_SCROLLED,             LV_PROPERTY_TYPE_INT,       37),
+    LV_PROPERTY_ID(OBJ, STATE_DISABLED,             LV_PROPERTY_TYPE_INT,       38),
+    /*not used bit8-bit11*/
+    LV_PROPERTY_ID(OBJ, STATE_USER_1,               LV_PROPERTY_TYPE_INT,       43),
+    LV_PROPERTY_ID(OBJ, STATE_USER_2,               LV_PROPERTY_TYPE_INT,       44),
+    LV_PROPERTY_ID(OBJ, STATE_USER_3,               LV_PROPERTY_TYPE_INT,       45),
+    LV_PROPERTY_ID(OBJ, STATE_USER_4,               LV_PROPERTY_TYPE_INT,       46),
+    LV_PROPERTY_ID(OBJ, STATE_ANY,                  LV_PROPERTY_TYPE_INT,       47),
+    LV_PROPERTY_ID(OBJ, STATE_END,                  LV_PROPERTY_TYPE_INT,       47),
+
+    /*OBJ normal properties*/
+    LV_PROPERTY_ID(OBJ, PARENT,                     LV_PROPERTY_TYPE_POINTER,   31),
+
+    LV_PROPERTY_OBJ_END,
+};
+#endif
 
 #include "lv_obj_tree.h"
 #include "lv_obj_pos.h"
@@ -150,28 +212,28 @@ typedef uint32_t lv_obj_flag_t;
 /**
  * Make the base object's class publicly available.
  */
-extern const lv_obj_class_t lv_obj_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
 
 /**
  * Special, rarely used attributes.
  * They are allocated automatically if any elements is set.
  */
 typedef struct {
-    struct _lv_obj_t ** children;       /**< Store the pointer of the children in an array.*/
-    uint32_t child_cnt;                 /**< Number of children*/
+    struct _lv_obj_t ** children;   /**< Store the pointer of the children in an array.*/
     lv_group_t * group_p;
     lv_event_list_t event_list;
 
-    lv_point_t scroll;                  /**< The current X/Y scroll offset*/
+    lv_point_t scroll;              /**< The current X/Y scroll offset*/
 
-    lv_coord_t ext_click_pad;           /**< Extra click padding in all direction*/
-    lv_coord_t ext_draw_size;           /**< EXTend the size in every direction for drawing.*/
+    int32_t ext_click_pad;          /**< Extra click padding in all direction*/
+    int32_t ext_draw_size;          /**< EXTend the size in every direction for drawing.*/
 
-    lv_scrollbar_mode_t scrollbar_mode : 2; /**< How to display scrollbars*/
-    lv_scroll_snap_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally*/
-    lv_scroll_snap_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
-    lv_dir_t scroll_dir : 4;                /**< The allowed scroll direction(s)*/
-    uint8_t layer_type : 2;    /**< Cache the layer type here. Element of @lv_intermediate_layer_type_t */
+    uint16_t child_cnt;             /**< Number of children*/
+    uint16_t scrollbar_mode : 2;    /**< How to display scrollbars, see `lv_scrollbar_mode_t`*/
+    uint16_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally, see `lv_scroll_snap_t`*/
+    uint16_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
+    uint16_t scroll_dir : 4;        /**< The allowed scroll direction(s), see `lv_dir_t`*/
+    uint16_t layer_type : 2;        /**< Cache the layer type here. Element of @lv_intermediate_layer_type_t */
 } _lv_obj_spec_attr_t;
 
 typedef struct _lv_obj_t {
@@ -191,6 +253,7 @@ typedef struct _lv_obj_t {
     lv_obj_flag_t flags;
     lv_state_t state;
     uint16_t layout_inv : 1;
+    uint16_t readjust_scroll_after_layout : 1;
     uint16_t scr_layout_inv : 1;
     uint16_t skip_trans : 1;
     uint16_t style_cnt  : 6;
@@ -210,7 +273,6 @@ typedef struct _lv_obj_t {
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent);
 
-
 /*=====================
  * Setter functions
  *====================*/
@@ -223,7 +285,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent);
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
- * Clear one or more flags
+ * Remove one or more flags
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to set.
  */
@@ -232,10 +294,10 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
 /**
  * Set add or remove one or more flags.
  * @param obj   pointer to an object
- * @param f     OR-ed values from `lv_obj_flag_t` to set.
+ * @param f     OR-ed values from `lv_obj_flag_t` to update.
  * @param v     true: add the flags; false: remove the flags
  */
-void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
+void lv_obj_update_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
 
 /**
  * Add one or more states to the object. The other state bits will remain unchanged.
@@ -420,7 +482,6 @@ void lv_objid_builtin_destroy(void);
 #else
 #  define LV_TRACE_OBJ_CREATE(...)
 #endif
-
 
 #ifdef __cplusplus
 } /*extern "C"*/

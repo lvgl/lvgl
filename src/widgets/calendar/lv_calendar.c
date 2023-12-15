@@ -159,7 +159,7 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
 
     /* The children of the calendar are probably headers.
      * Notify them to let the headers updated to the new date*/
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(child == calendar->btnm) continue;
@@ -234,7 +234,6 @@ lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_
     return LV_RESULT_OK;
 }
 
-
 /**********************
  *  STATIC FUNCTIONS
  **********************/
@@ -281,7 +280,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     calendar->btnm = lv_buttonmatrix_create(obj);
     lv_buttonmatrix_set_map(calendar->btnm, calendar->map);
     lv_buttonmatrix_set_button_ctrl_all(calendar->btnm, LV_BUTTONMATRIX_CTRL_CLICK_TRIG | LV_BUTTONMATRIX_CTRL_NO_REPEAT);
-    lv_obj_add_event(calendar->btnm, draw_part_begin_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(calendar->btnm, draw_part_begin_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_set_width(calendar->btnm, lv_pct(100));
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);

@@ -44,7 +44,6 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_STA
 };
 
 const lv_image_dsc_t img_star = {
-    .header.always_zero = 0,
     .header.w = 30,
     .header.h = 29,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,

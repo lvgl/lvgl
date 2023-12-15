@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ##################################################################
 # sjpeg converter script version 1.0
 # Dependencies: (PYTHON-3)

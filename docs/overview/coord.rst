@@ -40,6 +40,7 @@ model. An object's "box" is built from the following parts:
 - bounding box: the width/height of the elements.
 - border width: the width of the border.
 - padding: space between the sides of the object and its children.
+- margin: space outside of the object (considered only by some layouts)
 - content: the content area which is the size of the bounding box reduced by the border width and padding.
 
 .. image:: /misc/boxmodel.png
@@ -256,10 +257,10 @@ the following functions:
 
 .. code:: c
 
-   lv_coord_t w = lv_obj_get_width(obj);
-   lv_coord_t h = lv_obj_get_height(obj);
-   lv_coord_t content_w = lv_obj_get_content_width(obj);
-   lv_coord_t content_h = lv_obj_get_content_height(obj);
+   int32_t w = lv_obj_get_width(obj);
+   int32_t h = lv_obj_get_height(obj);
+   int32_t content_w = lv_obj_get_content_width(obj);
+   int32_t content_h = lv_obj_get_content_height(obj);
 
 Using styles
 ************

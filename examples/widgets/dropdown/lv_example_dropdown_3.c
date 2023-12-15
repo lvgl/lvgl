@@ -30,14 +30,14 @@ void lv_example_dropdown_3(void)
     lv_dropdown_set_text(dropdown, "Menu");
 
     /*Use a custom image as down icon and flip it when the list is opened*/
-    LV_IMAGE_DECLARE(img_caret_down)
+    LV_IMAGE_DECLARE(img_caret_down);
     lv_dropdown_set_symbol(dropdown, &img_caret_down);
     lv_obj_set_style_transform_rotation(dropdown, 1800, LV_PART_INDICATOR | LV_STATE_CHECKED);
 
     /*In a menu we don't need to show the last clicked item*/
     lv_dropdown_set_selected_highlight(dropdown, false);
 
-    lv_obj_add_event(dropdown, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(dropdown, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 #endif

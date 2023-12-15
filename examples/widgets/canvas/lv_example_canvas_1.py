@@ -17,8 +17,8 @@ rect_dsc.border_width = 2
 rect_dsc.border_opa = lv.OPA._90
 rect_dsc.border_color = lv.color_white()
 rect_dsc.shadow_width = 5
-rect_dsc.shadow_ofs_x = 5
-rect_dsc.shadow_ofs_y = 5
+rect_dsc.shadow_offset_x = 5
+rect_dsc.shadow_offset_y = 5
 
 label_dsc = lv.draw_label_dsc_t()
 label_dsc.init()

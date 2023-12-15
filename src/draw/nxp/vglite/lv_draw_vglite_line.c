@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -112,7 +111,7 @@ static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * poin
     vg_lite_blend_t vglite_blend_mode = vglite_get_blend_mode(dsc->blend_mode);
 
     /*** Init path ***/
-    lv_coord_t width = dsc->width;
+    int32_t width = dsc->width;
 
     int32_t line_path[] = { /*VG line path*/
         VLC_OP_MOVE, point1->x, point1->y,

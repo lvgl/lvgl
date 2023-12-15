@@ -8,11 +8,8 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_STRING == LV_STDLIB_CLIB
 #include "../lv_string.h"
+#include "../lv_mem.h" /*Need lv_malloc*/
 #include <string.h>
-
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-    #include "../lv_mem.h"
-#endif
 
 /*********************
  *      DEFINES
@@ -48,6 +45,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
     memset(dst, v, len);
 }
 
+LV_ATTRIBUTE_FAST_MEM void * lv_memmove(void * dst, const void * src, size_t len)
+{
+    return memmove(dst, src, len);
+}
+
 size_t lv_strlen(const char * str)
 {
     return strlen(str);
@@ -68,23 +70,24 @@ char * lv_strcpy(char * dst, const char * src)
     return strcpy(dst, src);
 }
 
+int32_t lv_strcmp(const char * s1, const char * s2)
+{
+    return strcmp(s1, s2);
+}
+
 char * lv_strdup(const char * src)
 {
-    /*strdup uses malloc, so use the built in malloc if it's enabled */
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    /*strdup uses malloc, so use the lv_malloc when LV_USE_STDLIB_MALLOC is not LV_STDLIB_CLIB */
     size_t len = lv_strlen(src) + 1;
     char * dst = lv_malloc(len);
     if(dst == NULL) return NULL;
 
     lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy when length is known*/
     return dst;
-#else
-    return strdup(src);
-#endif
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_BUILTIN_MEMCPY*/
+#endif /*LV_STDLIB_CLIB*/

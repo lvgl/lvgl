@@ -37,7 +37,7 @@ extern "C" {
  * @note            The position is interpreted on the content area of the parent
  * @note            The values can be set in pixel or in percentage of parent size with `lv_pct(v)`
  */
-void lv_obj_set_pos(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
+void lv_obj_set_pos(struct _lv_obj_t * obj, int32_t x, int32_t y);
 
 /**
  * Set the x coordinate of an object
@@ -48,7 +48,7 @@ void lv_obj_set_pos(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
  * @note            The position is interpreted on the content area of the parent
  * @note            The values can be set in pixel or in percentage of parent size with `lv_pct(v)`
  */
-void lv_obj_set_x(struct _lv_obj_t * obj, lv_coord_t x);
+void lv_obj_set_x(struct _lv_obj_t * obj, int32_t x);
 
 /**
  * Set the y coordinate of an object
@@ -59,7 +59,7 @@ void lv_obj_set_x(struct _lv_obj_t * obj, lv_coord_t x);
  * @note            The position is interpreted on the content area of the parent
  * @note            The values can be set in pixel or in percentage of parent size with `lv_pct(v)`
  */
-void lv_obj_set_y(struct _lv_obj_t * obj, lv_coord_t y);
+void lv_obj_set_y(struct _lv_obj_t * obj, int32_t y);
 
 /**
  * Set the size of an object.
@@ -72,7 +72,7 @@ void lv_obj_set_y(struct _lv_obj_t * obj, lv_coord_t y);
  *                  LV_SIZE_PCT(x)     to set size in percentage of the parent's content area size (the size without paddings).
  *                                      x should be in [0..1000]% range
  */
-void lv_obj_set_size(struct _lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
+void lv_obj_set_size(struct _lv_obj_t * obj, int32_t w, int32_t h);
 
 /**
  * Recalculate the size of the object
@@ -91,7 +91,7 @@ bool lv_obj_refr_size(struct _lv_obj_t * obj);
  *                  lv_pct(x)           to set size in percentage of the parent's content area size (the size without paddings).
  *                                      x should be in [0..1000]% range
  */
-void lv_obj_set_width(struct _lv_obj_t * obj, lv_coord_t w);
+void lv_obj_set_width(struct _lv_obj_t * obj, int32_t w);
 
 /**
  * Set the height of an object
@@ -103,21 +103,21 @@ void lv_obj_set_width(struct _lv_obj_t * obj, lv_coord_t w);
  *                  lv_pct(x)           to set size in percentage of the parent's content area size (the size without paddings).
  *                                      x should be in [0..1000]% range
  */
-void lv_obj_set_height(struct _lv_obj_t * obj, lv_coord_t h);
+void lv_obj_set_height(struct _lv_obj_t * obj, int32_t h);
 
 /**
  * Set the width reduced by the left and right padding and the border width.
  * @param obj       pointer to an object
  * @param w         the width without paddings in pixels
  */
-void lv_obj_set_content_width(struct _lv_obj_t * obj, lv_coord_t w);
+void lv_obj_set_content_width(struct _lv_obj_t * obj, int32_t w);
 
 /**
  * Set the height reduced by the top and bottom padding and the border width.
  * @param obj       pointer to an object
  * @param h         the height without paddings in pixels
  */
-void lv_obj_set_content_height(struct _lv_obj_t * obj, lv_coord_t h);
+void lv_obj_set_content_height(struct _lv_obj_t * obj, int32_t h);
 
 /**
  * Set a layout for an object
@@ -162,7 +162,7 @@ void lv_obj_set_align(struct _lv_obj_t * obj, lv_align_t align);
  * @param x_ofs     x coordinate offset after alignment
  * @param y_ofs     y coordinate offset after alignment
  */
-void lv_obj_align(struct _lv_obj_t * obj, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+void lv_obj_align(struct _lv_obj_t * obj, lv_align_t align, int32_t x_ofs, int32_t y_ofs);
 
 /**
  * Align an object to an other object.
@@ -173,8 +173,8 @@ void lv_obj_align(struct _lv_obj_t * obj, lv_align_t align, lv_coord_t x_ofs, lv
  * @param y_ofs     y coordinate offset after alignment
  * @note            if the position or size of `base` changes `obj` needs to be aligned manually again
  */
-void lv_obj_align_to(struct _lv_obj_t * obj, const struct _lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs,
-                     lv_coord_t y_ofs);
+void lv_obj_align_to(struct _lv_obj_t * obj, const struct _lv_obj_t * base, lv_align_t align, int32_t x_ofs,
+                     int32_t y_ofs);
 
 /**
  * Align an object to the center on its parent.
@@ -185,7 +185,6 @@ static inline void lv_obj_center(struct _lv_obj_t * obj)
 {
     lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
 }
-
 
 /**
  * Copy the coordinates of an object to an area
@@ -204,7 +203,7 @@ void lv_obj_get_coords(const struct _lv_obj_t * obj, lv_area_t * coords);
  * @note            Scrolling of the parent doesn't change the returned value.
  * @note            The returned value is always the distance from the parent even if `obj` is positioned by a layout.
  */
-lv_coord_t lv_obj_get_x(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_x(const struct _lv_obj_t * obj);
 
 /**
  * Get the x2 coordinate of object.
@@ -216,7 +215,7 @@ lv_coord_t lv_obj_get_x(const struct _lv_obj_t * obj);
  * @note            Scrolling of the parent doesn't change the returned value.
  * @note            The returned value is always the distance from the parent even if `obj` is positioned by a layout.
  */
-lv_coord_t lv_obj_get_x2(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_x2(const struct _lv_obj_t * obj);
 
 /**
  * Get the y coordinate of object.
@@ -228,7 +227,7 @@ lv_coord_t lv_obj_get_x2(const struct _lv_obj_t * obj);
  * @note            Scrolling of the parent doesn't change the returned value.
  * @note            The returned value is always the distance from the parent even if `obj` is positioned by a layout.
  */
-lv_coord_t lv_obj_get_y(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_y(const struct _lv_obj_t * obj);
 
 /**
  * Get the y2 coordinate of object.
@@ -240,21 +239,21 @@ lv_coord_t lv_obj_get_y(const struct _lv_obj_t * obj);
  * @note            Scrolling of the parent doesn't change the returned value.
  * @note            The returned value is always the distance from the parent even if `obj` is positioned by a layout.
  */
-lv_coord_t lv_obj_get_y2(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_y2(const struct _lv_obj_t * obj);
 
 /**
  * Get the actually set x coordinate of object, i.e. the offset form the set alignment
  * @param obj       pointer to an object
  * @return          the set x coordinate
  */
-lv_coord_t lv_obj_get_x_aligned(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_x_aligned(const struct _lv_obj_t * obj);
 
 /**
  * Get the actually set y coordinate of object, i.e. the offset form the set alignment
  * @param obj       pointer to an object
  * @return          the set y coordinate
  */
-lv_coord_t lv_obj_get_y_aligned(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_y_aligned(const struct _lv_obj_t * obj);
 
 /**
  * Get the width of an object
@@ -263,7 +262,7 @@ lv_coord_t lv_obj_get_y_aligned(const struct _lv_obj_t * obj);
  *                  call `lv_obj_update_layout(obj)`.
  * @return          the width in pixels
  */
-lv_coord_t lv_obj_get_width(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_width(const struct _lv_obj_t * obj);
 
 /**
  * Get the height of an object
@@ -272,7 +271,7 @@ lv_coord_t lv_obj_get_width(const struct _lv_obj_t * obj);
  *                  call `lv_obj_update_layout(obj)`.
  * @return          the height in pixels
  */
-lv_coord_t lv_obj_get_height(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_height(const struct _lv_obj_t * obj);
 
 /**
  * Get the width reduced by the left and right padding and the border width.
@@ -281,7 +280,7 @@ lv_coord_t lv_obj_get_height(const struct _lv_obj_t * obj);
  *                  call `lv_obj_update_layout(obj)`.
  * @return          the width which still fits into its parent without causing overflow (making the parent scrollable)
  */
-lv_coord_t lv_obj_get_content_width(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_content_width(const struct _lv_obj_t * obj);
 
 /**
  * Get the height reduced by the top and bottom padding and the border width.
@@ -290,7 +289,7 @@ lv_coord_t lv_obj_get_content_width(const struct _lv_obj_t * obj);
  *                  call `lv_obj_update_layout(obj)`.
  * @return          the height which still fits into the parent without causing overflow (making the parent scrollable)
  */
-lv_coord_t lv_obj_get_content_height(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_content_height(const struct _lv_obj_t * obj);
 
 /**
  * Get the area reduced by the paddings and the border width.
@@ -308,7 +307,7 @@ void lv_obj_get_content_coords(const struct _lv_obj_t * obj, lv_area_t * area);
  * @note            This size independent from the real size of the widget.
  *                  It just tells how large the internal ("virtual") content is.
  */
-lv_coord_t lv_obj_get_self_width(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_self_width(const struct _lv_obj_t * obj);
 
 /**
  * Get the height occupied by the "parts" of the widget. E.g. the height of all rows of a table.
@@ -317,7 +316,7 @@ lv_coord_t lv_obj_get_self_width(const struct _lv_obj_t * obj);
  * @note            This size independent from the real size of the widget.
  *                  It just tells how large the internal ("virtual") content is.
  */
-lv_coord_t lv_obj_get_self_height(const struct _lv_obj_t * obj);
+int32_t lv_obj_get_self_height(const struct _lv_obj_t * obj);
 
 /**
  * Handle if the size of the internal ("virtual") content of an object has changed.
@@ -328,10 +327,9 @@ bool lv_obj_refresh_self_size(struct _lv_obj_t * obj);
 
 void lv_obj_refr_pos(struct _lv_obj_t * obj);
 
-void lv_obj_move_to(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
+void lv_obj_move_to(struct _lv_obj_t * obj, int32_t x, int32_t y);
 
-
-void lv_obj_move_children_by(struct _lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff, bool ignore_floating);
+void lv_obj_move_children_by(struct _lv_obj_t * obj, int32_t x_diff, int32_t y_diff, bool ignore_floating);
 
 /**
  * Transform a point using the angle and zoom style properties of an object
@@ -385,7 +383,7 @@ bool lv_obj_is_visible(const struct _lv_obj_t * obj);
  * @param obj       pointer to an object
  * @param size      extended clickable area in all 4 directions [px]
  */
-void lv_obj_set_ext_click_area(struct _lv_obj_t * obj, lv_coord_t size);
+void lv_obj_set_ext_click_area(struct _lv_obj_t * obj, int32_t size);
 
 /**
  * Get the an area where to object can be clicked.
@@ -411,7 +409,7 @@ bool lv_obj_hit_test(struct _lv_obj_t * obj, const lv_point_t * point);
  * @param ref_width     the reference width used when min/max width is in percentage
  * @return              the clamped width
  */
-lv_coord_t lv_clamp_width(lv_coord_t width, lv_coord_t min_width, lv_coord_t max_width, lv_coord_t ref_width);
+int32_t lv_clamp_width(int32_t width, int32_t min_width, int32_t max_width, int32_t ref_width);
 
 /**
  * Clamp a height between min and max height. If the min/max height is in percentage value use the ref_height
@@ -421,7 +419,7 @@ lv_coord_t lv_clamp_width(lv_coord_t width, lv_coord_t min_width, lv_coord_t max
  * @param ref_height     the reference height used when min/max height is in percentage
  * @return              the clamped height
  */
-lv_coord_t lv_clamp_height(lv_coord_t height, lv_coord_t min_height, lv_coord_t max_height, lv_coord_t ref_height);
+int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, int32_t ref_height);
 
 /**********************
  *      MACROS

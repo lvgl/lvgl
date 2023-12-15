@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -160,7 +159,7 @@ static void _rotate_point(int32_t angle, int32_t * x, int32_t * y)
  */
 static void _set_full_arc(vg_arc * fullarc)
 {
-    /* the tangent lenght for the bezier circle approx */
+    /* the tangent length for the bezier circle approx */
     float tang = ((float)fullarc->rad) * BEZIER_OPTIM_CIRCLE;
     switch(fullarc->quarter) {
         case 0:
@@ -572,10 +571,10 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
 
     /* path: max size = 16 cubic bezier (7 words each) */
     int32_t arc_path[16 * 7];
-    lv_memset(arc_path, 0, sizeof(arc_path));
+    lv_memzero(arc_path, sizeof(arc_path));
 
     /*** Init path ***/
-    lv_coord_t width = dsc->width;  /* inner arc radius = outer arc radius - width */
+    int32_t width = dsc->width;  /* inner arc radius = outer arc radius - width */
     uint16_t radius = dsc->radius;
 
     if(width > radius)

@@ -65,9 +65,7 @@ typedef struct {
     drmModePropertyPtr plane_props[128];
     drmModePropertyPtr crtc_props[128];
     drmModePropertyPtr conn_props[128];
-    drm_buffer_t drm_bufs[2]; /* DUMB buffers */
-    uint8_t active_drm_buf_idx; /* double buffering handling */
-    bool inactive_drm_buf_dirty;
+    drm_buffer_t drm_bufs[2]; /*DUMB buffers*/
 } drm_dev_t;
 
 /**********************
@@ -92,7 +90,7 @@ static int drm_open(const char * path);
 static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t connector_id, unsigned int fourcc);
 static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf);
 static int drm_setup_buffers(drm_dev_t * drm_dev);
-static void drm_wait_vsync(drm_dev_t * drm_dev);
+static void drm_flush_wait(lv_display_t * drm_dev);
 static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 
 /**********************
@@ -112,10 +110,9 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
 
 lv_display_t * lv_linux_drm_create(void)
 {
-    drm_dev_t * drm_dev = lv_malloc(sizeof(drm_dev_t));
+    drm_dev_t * drm_dev = lv_malloc_zeroed(sizeof(drm_dev_t));
     LV_ASSERT_MALLOC(drm_dev);
     if(drm_dev == NULL) return NULL;
-    lv_memzero(drm_dev, sizeof(drm_dev_t));
 
     lv_display_t * disp = lv_display_create(800, 480);
     if(disp == NULL) {
@@ -124,6 +121,7 @@ lv_display_t * lv_linux_drm_create(void)
     }
     drm_dev->fd = -1;
     lv_display_set_driver_data(disp, drm_dev);
+    lv_display_set_flush_wait_cb(disp, drm_flush_wait);
     lv_display_set_flush_cb(disp, drm_flush);
 
     return disp;
@@ -151,21 +149,21 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
     LV_LOG_INFO("DRM subsystem and buffer mapped successfully");
 
-    lv_coord_t hor_res = drm_dev->width;
-    lv_coord_t ver_res = drm_dev->height;
-    lv_coord_t width = drm_dev->mmWidth;
+    int32_t hor_res = drm_dev->width;
+    int32_t ver_res = drm_dev->height;
+    int32_t width = drm_dev->mmWidth;
 
-    uint32_t draw_buf_size = hor_res * ver_res / 4; /*1/4 screen sized buffer has the same performance */
-    lv_color_t * draw_buf = malloc(draw_buf_size * sizeof(lv_color_t));
-    LV_ASSERT_MALLOC(draw_buf);
-    lv_display_set_draw_buffers(disp, draw_buf, NULL, draw_buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    size_t buf_size = LV_MIN(drm_dev->drm_bufs[1].size, drm_dev->drm_bufs[0].size);
+    lv_display_set_draw_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
+                                LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, hor_res, ver_res);
 
     if(width) {
         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 25400, width * 1000));
     }
 
-    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", hor_res, ver_res, lv_display_get_dpi(disp));
+    LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
+                hor_res, ver_res, lv_display_get_dpi(disp));
 }
 
 /**********************
@@ -179,7 +177,7 @@ static uint32_t get_plane_property_id(drm_dev_t * drm_dev, const char * name)
     LV_LOG_TRACE("Find plane property: %s", name);
 
     for(i = 0; i < drm_dev->count_plane_props; ++i)
-        if(!strcmp(drm_dev->plane_props[i]->name, name))
+        if(!lv_strcmp(drm_dev->plane_props[i]->name, name))
             return drm_dev->plane_props[i]->prop_id;
 
     LV_LOG_TRACE("Unknown plane property: %s", name);
@@ -194,7 +192,7 @@ static uint32_t get_crtc_property_id(drm_dev_t * drm_dev, const char * name)
     LV_LOG_TRACE("Find crtc property: %s", name);
 
     for(i = 0; i < drm_dev->count_crtc_props; ++i)
-        if(!strcmp(drm_dev->crtc_props[i]->name, name))
+        if(!lv_strcmp(drm_dev->crtc_props[i]->name, name))
             return drm_dev->crtc_props[i]->prop_id;
 
     LV_LOG_TRACE("Unknown crtc property: %s", name);
@@ -209,7 +207,7 @@ static uint32_t get_conn_property_id(drm_dev_t * drm_dev, const char * name)
     LV_LOG_TRACE("Find conn property: %s", name);
 
     for(i = 0; i < drm_dev->count_conn_props; ++i)
-        if(!strcmp(drm_dev->conn_props[i]->name, name))
+        if(!lv_strcmp(drm_dev->conn_props[i]->name, name))
             return drm_dev->conn_props[i]->prop_id;
 
     LV_LOG_TRACE("Unknown conn property: %s", name);
@@ -224,8 +222,12 @@ static void page_flip_handler(int fd, unsigned int sequence, unsigned int tv_sec
     LV_UNUSED(sequence);
     LV_UNUSED(tv_sec);
     LV_UNUSED(tv_usec);
-    LV_UNUSED(user_data);
     LV_LOG_TRACE("flip");
+    drm_dev_t * drm_dev = user_data;
+    if(drm_dev->req) {
+        drmModeAtomicFree(drm_dev->req);
+        drm_dev->req = NULL;
+    }
 }
 
 static int drm_get_plane_props(drm_dev_t * drm_dev)
@@ -379,7 +381,7 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
     drm_add_plane_property(drm_dev, "CRTC_W", drm_dev->width);
     drm_add_plane_property(drm_dev, "CRTC_H", drm_dev->height);
 
-    ret = drmModeAtomicCommit(drm_dev->fd, drm_dev->req, flags, NULL);
+    ret = drmModeAtomicCommit(drm_dev->fd, drm_dev->req, flags, drm_dev);
     if(ret) {
         LV_LOG_ERROR("drmModeAtomicCommit failed: %s (%d)", strerror(errno), errno);
         drmModeAtomicFree(drm_dev->req);
@@ -734,9 +736,7 @@ static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
 
     buf->handle = creq.handle;
     buf->pitch = creq.pitch;
-    LV_LOG_TRACE("pitch %d", buf->pitch);
     buf->size = creq.size;
-    LV_LOG_TRACE("size %d", buf->size);
 
     /* prepare buffer for memory mapping */
     lv_memzero(&mreq, sizeof(mreq));
@@ -748,6 +748,7 @@ static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf)
     }
 
     buf->offset = mreq.offset;
+    LV_LOG_INFO("size %lu pitch %u offset %u", buf->size, buf->pitch, buf->offset);
 
     /* perform actual memory mapping */
     buf->map = mmap(0, creq.size, PROT_READ | PROT_WRITE, MAP_SHARED, drm_dev->fd, mreq.offset);
@@ -777,7 +778,7 @@ static int drm_setup_buffers(drm_dev_t * drm_dev)
 {
     int ret;
 
-    /* Allocate DUMB buffers */
+    /*Allocate DUMB buffers*/
     ret = drm_allocate_dumb(drm_dev, &drm_dev->drm_bufs[0]);
     if(ret)
         return ret;
@@ -789,66 +790,48 @@ static int drm_setup_buffers(drm_dev_t * drm_dev)
     return 0;
 }
 
-static void drm_wait_vsync(drm_dev_t * drm_dev)
+static void drm_flush_wait(lv_display_t * disp)
 {
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
+
     struct pollfd pfd;
     pfd.fd = drm_dev->fd;
     pfd.events = POLLIN;
 
-    int ret;
-    do {
-        ret = poll(&pfd, 1, -1);
-    } while(ret == -1 && errno == EINTR);
+    while(drm_dev->req) {
+        int ret;
+        do {
+            ret = poll(&pfd, 1, -1);
+        } while(ret == -1 && errno == EINTR);
 
-    if(ret > 0)
-        drmHandleEvent(drm_dev->fd, &drm_dev->drm_event_ctx);
-    else
-        LV_LOG_ERROR("poll failed: %s", strerror(errno));
-
-    drmModeAtomicFree(drm_dev->req);
-    drm_dev->req = NULL;
+        if(ret > 0)
+            drmHandleEvent(drm_dev->fd, &drm_dev->drm_event_ctx);
+        else {
+            LV_LOG_ERROR("poll failed: %s", strerror(errno));
+            return;
+        }
+    }
 }
 
 static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
+    if(!lv_display_flush_is_last(disp)) return;
+
+    LV_UNUSED(area);
+    LV_UNUSED(px_map);
     drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
-    drm_buffer_t * fbuf = &drm_dev->drm_bufs[!drm_dev->active_drm_buf_idx];
-    uint32_t w = (area->x2 - area->x1 + 1);
-    uint32_t h = (area->y2 - area->y1 + 1);
-    int i, y;
 
-    LV_LOG_TRACE("x %d:%d y %d:%d w %d h %d", area->x1, area->x2, area->y1, area->y2, w, h);
-
-    /*Wait for last requested buffer swap to complete*/
-    if(drm_dev->req)
-        drm_wait_vsync(drm_dev);
-
-    /*Prepare background buffer for partial update*/
-    if(drm_dev->inactive_drm_buf_dirty && (area->x1 != 0 || area->y1 != 0 || w != drm_dev->width || h != drm_dev->height))
-        lv_memcpy(fbuf->map, drm_dev->drm_bufs[drm_dev->active_drm_buf_idx].map, fbuf->size);
-    drm_dev->inactive_drm_buf_dirty = false;
-
-    /*Flush to background buffer*/
-    for(y = 0, i = area->y1 ; i <= area->y2 ; ++i, ++y) {
-        lv_memcpy(fbuf->map + (area->x1 * (LV_COLOR_DEPTH / 8)) + (fbuf->pitch * i),
-                  px_map + (w * (LV_COLOR_DEPTH / 8) * y),
-                  w * (LV_COLOR_DEPTH / 8));
-    }
-
-    /*Request buffer swap*/
-    if(lv_display_flush_is_last(disp)) {
-        if(drm_dmabuf_set_plane(drm_dev, fbuf)) {
-            LV_LOG_ERROR("Flush fail");
-            return;
+    for(int idx = 0; idx < 2; idx++) {
+        if(drm_dev->drm_bufs[idx].map == px_map) {
+            /*Request buffer swap*/
+            if(drm_dmabuf_set_plane(drm_dev, &drm_dev->drm_bufs[idx])) {
+                LV_LOG_ERROR("Flush fail");
+                return;
+            }
+            else
+                LV_LOG_TRACE("Flush done");
         }
-        else
-            LV_LOG_TRACE("Flush done");
-
-        drm_dev->active_drm_buf_idx = !drm_dev->active_drm_buf_idx;
-        drm_dev->inactive_drm_buf_dirty = true;
     }
-
-    lv_display_flush_ready(disp);
 }
 
 #endif /*LV_USE_LINUX_DRM*/

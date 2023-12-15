@@ -247,8 +247,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_btn_pause_map[] = {
 #endif
 };
 
-lv_image_dsc_t img_lv_demo_music_btn_pause = {
-    .header.always_zero = 0,
+const lv_image_dsc_t img_lv_demo_music_btn_pause = {
     .header.w = 79,
     .header.h = 77,
     //    .data_size = 6083 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,

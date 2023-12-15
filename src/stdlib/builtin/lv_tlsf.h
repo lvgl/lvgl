@@ -105,4 +105,4 @@ int lv_tlsf_check_pool(lv_pool_t pool);
 
 #endif /*LV_TLSF_H*/
 
-#endif /* LV_USE_BUILTIN_MALLOC */
+#endif /*LV_STDLIB_BUILTIN*/

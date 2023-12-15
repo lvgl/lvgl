@@ -59,7 +59,7 @@ void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_ds
     uint32_t area_w = lv_area_get_width(&draw_area);
     lv_opa_t * mask_buf = lv_malloc(area_w);
 
-    lv_coord_t y;
+    int32_t y;
     for(y = draw_area.y1; y <= draw_area.y2; y++) {
         lv_memset(mask_buf, 0xff, area_w);
         lv_draw_sw_mask_res_t res = lv_draw_sw_mask_apply(masks, mask_buf, draw_area.x1, y, area_w);

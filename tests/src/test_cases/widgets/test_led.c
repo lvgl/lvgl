@@ -30,7 +30,7 @@ void test_led_render_1(void)
     lv_obj_align(led, LV_ALIGN_CENTER, 80, 0);
     lv_led_on(led);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("led_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/led_1.png");
 }
 
 void test_led_set_color_works(void)

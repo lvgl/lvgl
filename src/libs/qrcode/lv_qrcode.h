@@ -49,7 +49,7 @@ lv_obj_t * lv_qrcode_create(lv_obj_t * parent);
  * @param obj pointer to a QR code object
  * @param size width and height of the QR code
  */
-void lv_qrcode_set_size(lv_obj_t * obj, lv_coord_t size);
+void lv_qrcode_set_size(lv_obj_t * obj, int32_t size);
 
 /**
  * Set QR code dark color.

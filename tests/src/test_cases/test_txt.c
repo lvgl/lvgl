@@ -127,8 +127,8 @@ void test_txt_get_encoded_next_detect_invalid_4_byte_input(void)
 void test_txt_next_line_should_handle_empty_string(void)
 {
     const lv_font_t * font_ptr = NULL;
-    lv_coord_t letter_space = 0;
-    lv_coord_t max_width = 0;
+    int32_t letter_space = 0;
+    int32_t max_width = 0;
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
 
     uint32_t next_line = _lv_text_get_next_line("", font_ptr, letter_space, max_width, NULL, flag);

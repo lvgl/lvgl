@@ -1,6 +1,5 @@
 #include "../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_IMG
-
+#if LV_BUILD_EXAMPLES && LV_USE_IMAGE
 
 static lv_style_t style_btn;
 
@@ -35,8 +34,6 @@ static void new_theme_init_and_set(void)
     /*Assign the new theme to the current display*/
     lv_display_set_theme(NULL, &th_new);
 }
-
-
 
 /**
  * Extending the current theme

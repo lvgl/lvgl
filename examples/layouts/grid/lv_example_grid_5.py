@@ -35,7 +35,7 @@ for i in range(9):
     a_row.set_values(0, 10)
     a_row.set_repeat_count(lv.ANIM_REPEAT_INFINITE)
     a_row.set_time(500)
-    a_row.set_playback_time(500)
+    a_row.set_playback_duration(500)
     a_row. set_custom_exec_cb(lambda a,val: row_gap_anim(cont,val))
     lv.anim_t.start(a_row)
 
@@ -45,7 +45,7 @@ for i in range(9):
     a_col.set_values(0, 10)
     a_col.set_repeat_count(lv.ANIM_REPEAT_INFINITE)
     a_col.set_time(500)
-    a_col.set_playback_time(500)
+    a_col.set_playback_duration(500)
     a_col. set_custom_exec_cb(lambda a,val: column_gap_anim(cont,val))
     lv.anim_t.start(a_col)
 

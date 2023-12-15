@@ -27,5 +27,5 @@ roller1.set_options("\n".join([
 
 roller1.set_visible_row_count(4)
 roller1.center()
-roller1.add_event(event_handler, lv.EVENT.ALL, None)
+roller1.add_event_cb(event_handler, lv.EVENT.ALL, None)
 

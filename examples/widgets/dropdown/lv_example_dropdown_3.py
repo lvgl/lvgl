@@ -42,5 +42,5 @@ dropdown.set_style_transform_rotation(1800, lv.PART.INDICATOR | lv.STATE.CHECKED
 # In a menu we don't need to show the last clicked item
 dropdown.set_selected_highlight(False)
 
-dropdown.add_event(event_cb, lv.EVENT.VALUE_CHANGED, None)
+dropdown.add_event_cb(event_cb, lv.EVENT.VALUE_CHANGED, None)
 

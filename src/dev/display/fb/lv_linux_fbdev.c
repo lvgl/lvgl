@@ -91,10 +91,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
 lv_display_t * lv_linux_fbdev_create(void)
 {
-    lv_linux_fb_t * dsc = lv_malloc(sizeof(lv_linux_fb_t));
+    lv_linux_fb_t * dsc = lv_malloc_zeroed(sizeof(lv_linux_fb_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_linux_fb_t));
 
     lv_display_t * disp = lv_display_create(800, 480);
     if(disp == NULL) {
@@ -175,7 +174,7 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     LV_LOG_INFO("%dx%d, %dbpp", dsc->vinfo.xres, dsc->vinfo.yres, dsc->vinfo.bits_per_pixel);
 
     /* Figure out the size of the screen in bytes*/
-    dsc->screensize =  dsc->finfo.smem_len; //finfo.line_length * vinfo.yres;
+    dsc->screensize =  dsc->finfo.smem_len;/*finfo.line_length * vinfo.yres;*/
 
     /* Map the device to memory*/
     dsc->fbp = (char *)mmap(0, dsc->screensize, PROT_READ | PROT_WRITE, MAP_SHARED, dsc->fbfd, 0);
@@ -189,9 +188,9 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
     LV_LOG_INFO("The framebuffer device was mapped to memory successfully");
 
-    lv_coord_t hor_res = dsc->vinfo.xres;
-    lv_coord_t ver_res = dsc->vinfo.yres;
-    lv_coord_t width = dsc->vinfo.width;
+    int32_t hor_res = dsc->vinfo.xres;
+    int32_t ver_res = dsc->vinfo.yres;
+    int32_t width = dsc->vinfo.width;
     uint32_t draw_buf_size = hor_res * dsc->vinfo.bits_per_pixel >> 3;
     if(LV_LINUX_FBDEV_BUFFER_COUNT < 1) {
         draw_buf_size *= LV_LINUX_FBDEV_BUFFER_SIZE;
@@ -212,7 +211,8 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));
     }
 
-    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", hor_res, ver_res, lv_display_get_dpi(disp));
+    LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
+                hor_res, ver_res, lv_display_get_dpi(disp));
 }
 
 /**********************
@@ -230,7 +230,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         return;
     }
 
-    lv_coord_t w = lv_area_get_width(area);
+    int32_t w = lv_area_get_width(area);
     uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
     uint32_t color_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * dsc->finfo.line_length;
     uint32_t fb_pos = color_pos + dsc->vinfo.yoffset * dsc->finfo.line_length;

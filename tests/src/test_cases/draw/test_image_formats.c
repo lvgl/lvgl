@@ -2,6 +2,221 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+#include <stdio.h>
+
+static const char * color_formats[] = {
+    "I1", /*7 I1*/
+    "I2", /*8 I2*/
+    "I4", /*9 I4*/
+    "I8", /*10 I8*/
+    "A1", /*11 A1*/
+    "A2", /*12 A2*/
+    "A4", /*13 A4*/
+    "A8", /*14 A8*/
+    "RGB565A8", /*20 RGB565A8*/
+    "RGB565", /*18 RGB565*/
+    "RGB888", /*15 RGB888*/
+    "XRGB8888", /*17 XRGB8888*/
+    "ARGB8888", /*16 ARGB8888*/
+};
+
+static const char * compressions[] = {
+    "UNCOMPRESSED",
+    "RLE",
+    "LZ4"
+};
+
+static const char * modes[] = {
+    "simple",
+    "recolor",
+    "rotate",
+    "rotate_recolor",
+};
+
+static const int stride_align[] = {
+    1,
+    64,
+};
+
+LV_IMAGE_DECLARE(test_I1_NONE_align1);
+LV_IMAGE_DECLARE(test_I2_NONE_align1);
+LV_IMAGE_DECLARE(test_I4_NONE_align1);
+LV_IMAGE_DECLARE(test_I8_NONE_align1);
+LV_IMAGE_DECLARE(test_A1_NONE_align1);
+LV_IMAGE_DECLARE(test_A2_NONE_align1);
+LV_IMAGE_DECLARE(test_A4_NONE_align1);
+LV_IMAGE_DECLARE(test_A8_NONE_align1);
+LV_IMAGE_DECLARE(test_RGB565A8_NONE_align1);
+LV_IMAGE_DECLARE(test_RGB565_NONE_align1);
+LV_IMAGE_DECLARE(test_RGB888_NONE_align1);
+LV_IMAGE_DECLARE(test_XRGB8888_NONE_align1);
+LV_IMAGE_DECLARE(test_ARGB8888_NONE_align1);
+LV_IMAGE_DECLARE(test_I1_RLE_align1);
+LV_IMAGE_DECLARE(test_I2_RLE_align1);
+LV_IMAGE_DECLARE(test_I4_RLE_align1);
+LV_IMAGE_DECLARE(test_I8_RLE_align1);
+LV_IMAGE_DECLARE(test_A1_RLE_align1);
+LV_IMAGE_DECLARE(test_A2_RLE_align1);
+LV_IMAGE_DECLARE(test_A4_RLE_align1);
+LV_IMAGE_DECLARE(test_A8_RLE_align1);
+LV_IMAGE_DECLARE(test_RGB565A8_RLE_align1);
+LV_IMAGE_DECLARE(test_RGB565_RLE_align1);
+LV_IMAGE_DECLARE(test_RGB888_RLE_align1);
+LV_IMAGE_DECLARE(test_XRGB8888_RLE_align1);
+LV_IMAGE_DECLARE(test_ARGB8888_RLE_align1);
+
+LV_IMAGE_DECLARE(test_I1_LZ4_align1);
+LV_IMAGE_DECLARE(test_I2_LZ4_align1);
+LV_IMAGE_DECLARE(test_I4_LZ4_align1);
+LV_IMAGE_DECLARE(test_I8_LZ4_align1);
+LV_IMAGE_DECLARE(test_A1_LZ4_align1);
+LV_IMAGE_DECLARE(test_A2_LZ4_align1);
+LV_IMAGE_DECLARE(test_A4_LZ4_align1);
+LV_IMAGE_DECLARE(test_A8_LZ4_align1);
+LV_IMAGE_DECLARE(test_RGB565A8_LZ4_align1);
+LV_IMAGE_DECLARE(test_RGB565_LZ4_align1);
+LV_IMAGE_DECLARE(test_RGB888_LZ4_align1);
+LV_IMAGE_DECLARE(test_XRGB8888_LZ4_align1);
+LV_IMAGE_DECLARE(test_ARGB8888_LZ4_align1);
+
+LV_IMAGE_DECLARE(test_I1_NONE_align64);
+LV_IMAGE_DECLARE(test_I2_NONE_align64);
+LV_IMAGE_DECLARE(test_I4_NONE_align64);
+LV_IMAGE_DECLARE(test_I8_NONE_align64);
+LV_IMAGE_DECLARE(test_A1_NONE_align64);
+LV_IMAGE_DECLARE(test_A2_NONE_align64);
+LV_IMAGE_DECLARE(test_A4_NONE_align64);
+LV_IMAGE_DECLARE(test_A8_NONE_align64);
+LV_IMAGE_DECLARE(test_RGB565A8_NONE_align64);
+LV_IMAGE_DECLARE(test_RGB565_NONE_align64);
+LV_IMAGE_DECLARE(test_RGB888_NONE_align64);
+LV_IMAGE_DECLARE(test_XRGB8888_NONE_align64);
+LV_IMAGE_DECLARE(test_ARGB8888_NONE_align64);
+
+LV_IMAGE_DECLARE(test_I1_RLE_align64);
+LV_IMAGE_DECLARE(test_I2_RLE_align64);
+LV_IMAGE_DECLARE(test_I4_RLE_align64);
+LV_IMAGE_DECLARE(test_I8_RLE_align64);
+LV_IMAGE_DECLARE(test_A1_RLE_align64);
+LV_IMAGE_DECLARE(test_A2_RLE_align64);
+LV_IMAGE_DECLARE(test_A4_RLE_align64);
+LV_IMAGE_DECLARE(test_A8_RLE_align64);
+LV_IMAGE_DECLARE(test_RGB565A8_RLE_align64);
+LV_IMAGE_DECLARE(test_RGB565_RLE_align64);
+LV_IMAGE_DECLARE(test_RGB888_RLE_align64);
+LV_IMAGE_DECLARE(test_XRGB8888_RLE_align64);
+LV_IMAGE_DECLARE(test_ARGB8888_RLE_align64);
+
+LV_IMAGE_DECLARE(test_I1_LZ4_align64);
+LV_IMAGE_DECLARE(test_I2_LZ4_align64);
+LV_IMAGE_DECLARE(test_I4_LZ4_align64);
+LV_IMAGE_DECLARE(test_I8_LZ4_align64);
+LV_IMAGE_DECLARE(test_A1_LZ4_align64);
+LV_IMAGE_DECLARE(test_A2_LZ4_align64);
+LV_IMAGE_DECLARE(test_A4_LZ4_align64);
+LV_IMAGE_DECLARE(test_A8_LZ4_align64);
+LV_IMAGE_DECLARE(test_RGB565A8_LZ4_align64);
+LV_IMAGE_DECLARE(test_RGB565_LZ4_align64);
+LV_IMAGE_DECLARE(test_RGB888_LZ4_align64);
+LV_IMAGE_DECLARE(test_XRGB8888_LZ4_align64);
+LV_IMAGE_DECLARE(test_ARGB8888_LZ4_align64);
+
+static const void * c_array_images[sizeof(stride_align)][sizeof(compressions)][sizeof(color_formats)] = {
+    {
+        {
+            &test_I1_NONE_align1,
+            &test_I2_NONE_align1,
+            &test_I4_NONE_align1,
+            &test_I8_NONE_align1,
+            &test_A1_NONE_align1,
+            &test_A2_NONE_align1,
+            &test_A4_NONE_align1,
+            &test_A8_NONE_align1,
+            &test_RGB565A8_NONE_align1,
+            &test_RGB565_NONE_align1,
+            &test_RGB888_NONE_align1,
+            &test_XRGB8888_NONE_align1,
+            &test_ARGB8888_NONE_align1,
+        },
+        {
+            &test_I1_RLE_align1,
+            &test_I2_RLE_align1,
+            &test_I4_RLE_align1,
+            &test_I8_RLE_align1,
+            &test_A1_RLE_align1,
+            &test_A2_RLE_align1,
+            &test_A4_RLE_align1,
+            &test_A8_RLE_align1,
+            &test_RGB565A8_RLE_align1,
+            &test_RGB565_RLE_align1,
+            &test_RGB888_RLE_align1,
+            &test_XRGB8888_RLE_align1,
+            &test_ARGB8888_RLE_align1,
+        },
+        {
+            &test_I1_LZ4_align1,
+            &test_I2_LZ4_align1,
+            &test_I4_LZ4_align1,
+            &test_I8_LZ4_align1,
+            &test_A1_LZ4_align1,
+            &test_A2_LZ4_align1,
+            &test_A4_LZ4_align1,
+            &test_A8_LZ4_align1,
+            &test_RGB565A8_LZ4_align1,
+            &test_RGB565_LZ4_align1,
+            &test_RGB888_LZ4_align1,
+            &test_XRGB8888_LZ4_align1,
+            &test_ARGB8888_LZ4_align1,
+        }
+    },
+    {
+        {
+            &test_I1_NONE_align64,
+            &test_I2_NONE_align64,
+            &test_I4_NONE_align64,
+            &test_I8_NONE_align64,
+            &test_A1_NONE_align64,
+            &test_A2_NONE_align64,
+            &test_A4_NONE_align64,
+            &test_A8_NONE_align64,
+            &test_RGB565A8_NONE_align64,
+            &test_RGB565_NONE_align64,
+            &test_RGB888_NONE_align64,
+            &test_XRGB8888_NONE_align64,
+            &test_ARGB8888_NONE_align64,
+        },
+        {
+            &test_I1_RLE_align64,
+            &test_I2_RLE_align64,
+            &test_I4_RLE_align64,
+            &test_I8_RLE_align64,
+            &test_A1_RLE_align64,
+            &test_A2_RLE_align64,
+            &test_A4_RLE_align64,
+            &test_A8_RLE_align64,
+            &test_RGB565A8_RLE_align64,
+            &test_RGB565_RLE_align64,
+            &test_RGB888_RLE_align64,
+            &test_XRGB8888_RLE_align64,
+            &test_ARGB8888_RLE_align64,
+        },
+        {
+            &test_I1_LZ4_align64,
+            &test_I2_LZ4_align64,
+            &test_I4_LZ4_align64,
+            &test_I8_LZ4_align64,
+            &test_A1_LZ4_align64,
+            &test_A2_LZ4_align64,
+            &test_A4_LZ4_align64,
+            &test_A8_LZ4_align64,
+            &test_RGB565A8_LZ4_align64,
+            &test_RGB565_LZ4_align64,
+            &test_RGB888_LZ4_align64,
+            &test_XRGB8888_LZ4_align64,
+            &test_ARGB8888_LZ4_align64,
+        }
+    }
+};
 
 void setUp(void)
 {
@@ -17,7 +232,6 @@ void tearDown(void)
 {
     /* Function run after every test */
 }
-
 
 static void img_create(const char * name, const void * img_src, bool rotate, bool recolor)
 {
@@ -38,114 +252,50 @@ static void img_create(const char * name, const void * img_src, bool rotate, boo
     lv_label_set_text(label, name);
 }
 
-
-void test_image_built_in_decode(void)
+static void bin_image_create(bool rotate, bool recolor, int align, int compress)
 {
-    LV_IMAGE_DECLARE(test_image_cogwheel_i4);
-    LV_IMAGE_DECLARE(test_image_cogwheel_a8);
-    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565);
-    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565a8);
-    LV_IMAGE_DECLARE(test_image_cogwheel_xrgb8888);
-    LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
-
-    img_create("I4", &test_image_cogwheel_i4, false, false);
-    img_create("A8", &test_image_cogwheel_a8, false, false);
-    img_create("RGB565", &test_image_cogwheel_rgb565, false, false);
-    img_create("RGB565A8", &test_image_cogwheel_rgb565a8, false, false);
-    img_create("XRGB8888", &test_image_cogwheel_xrgb8888, false, false);
-    img_create("ARGB8888", &test_image_cogwheel_argb8888, false, false);
-
-    img_create("binI1", "A:src/test_files/binimages/cogwheel.I1.bin", false, false);
-    img_create("binI2", "A:src/test_files/binimages/cogwheel.I2.bin", false, false);
-    img_create("binI4", "A:src/test_files/binimages/cogwheel.I4.bin", false, false);
-    img_create("binI8", "A:src/test_files/binimages/cogwheel.I8.bin", false, false);
-    img_create("binA8", "A:src/test_files/binimages/cogwheel.A8.bin", false, false);
-    img_create("binRGB565A8", "A:src/test_files/binimages/cogwheel.RGB565A8.bin", false, false);
-    img_create("binRGB565", "A:src/test_files/binimages/cogwheel.RGB565.bin", false, false);
-    img_create("binRGB888", "A:src/test_files/binimages/cogwheel.RGB888.bin", false, false);
-    img_create("binXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.bin", false, false);
-    img_create("binARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.bin", false, false);
-
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_simple.png");
+    char name[32];
+    char path[256];
+    int stride = stride_align[align];
+    for(unsigned i = 0; i < sizeof(color_formats) / sizeof(color_formats[0]); i++) {
+        sprintf(name, "bin%s", color_formats[i]);
+        sprintf(path, "A:test_images/stride_align%d/%s/test_%s.bin", stride, compressions[compress], color_formats[i]);
+        img_create(name, path, rotate, recolor);
+    }
 }
 
-void test_image_built_in_decode_rotate(void)
+static void c_array_image_create(bool rotate, bool recolor, int align, int compress)
 {
-    LV_IMAGE_DECLARE(test_image_cogwheel_i4);
-    LV_IMAGE_DECLARE(test_image_cogwheel_a8);
-    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565);
-    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565a8);
-    LV_IMAGE_DECLARE(test_image_cogwheel_xrgb8888);
-    LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
-
-    img_create("I4", &test_image_cogwheel_i4, true, false);
-    img_create("A8", &test_image_cogwheel_a8, true, false);
-    img_create("RGB565", &test_image_cogwheel_rgb565, true, false);
-    img_create("RGB565A8", &test_image_cogwheel_rgb565a8, true, false);
-    img_create("XRGB8888", &test_image_cogwheel_xrgb8888, true, false);
-    img_create("ARGB8888", &test_image_cogwheel_argb8888, true, false);
-
-    /*Only A8 is read to ram thus can rotate for now*/
-    img_create("binA8", "A:src/test_files/binimages/cogwheel.A8.bin", true, false);
-
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rotated.png");
+    char name[32];
+    for(unsigned i = 0; i < sizeof(color_formats) / sizeof(color_formats[0]); i++) {
+        sprintf(name, "%s%s", compressions[compress], color_formats[i]);
+        const void * src = c_array_images[align][compress][i];
+        img_create(name, src, rotate, recolor);
+    }
 }
 
-void test_image_built_in_decode_recolor(void)
+void test_image_formats()
 {
-    LV_IMAGE_DECLARE(test_image_cogwheel_i4);
-    LV_IMAGE_DECLARE(test_image_cogwheel_a8);
-    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565);
-    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565a8);
-    LV_IMAGE_DECLARE(test_image_cogwheel_xrgb8888);
-    LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
+    for(unsigned align = 0; align <= 1; align++) {
+        int stride = stride_align[align];
+        for(unsigned mode = 0; mode <= 3; mode++) {
+            bool rotate = mode & 0x02;
+            bool recolor = mode & 0x01;
+            /*Loop compressions array and do test.*/
+            for(unsigned i = 0; i < sizeof(compressions) / sizeof(compressions[0]); i++) {
+                char reference[256];
+                bin_image_create(rotate, recolor, align, i);
+                snprintf(reference, sizeof(reference), "draw/bin_image_stride%d_%s_%s.png", stride, compressions[i], modes[mode]);
+                TEST_ASSERT_EQUAL_SCREENSHOT(reference);
+                lv_obj_clean(lv_screen_active());
 
-    img_create("I4", &test_image_cogwheel_i4, false, true);
-    img_create("A8", &test_image_cogwheel_a8, false, true);
-    img_create("RGB565", &test_image_cogwheel_rgb565, false, true);
-    img_create("RGB565A8", &test_image_cogwheel_rgb565a8, false, true);
-    img_create("XRGB8888", &test_image_cogwheel_xrgb8888, false, true);
-    img_create("ARGB8888", &test_image_cogwheel_argb8888, false, true);
-
-    img_create("binI1", "A:src/test_files/binimages/cogwheel.I1.bin", false, true);
-    img_create("binI2", "A:src/test_files/binimages/cogwheel.I2.bin", false, true);
-    img_create("binI4", "A:src/test_files/binimages/cogwheel.I4.bin", false, true);
-    img_create("binI8", "A:src/test_files/binimages/cogwheel.I8.bin", false, true);
-    img_create("binA8", "A:src/test_files/binimages/cogwheel.A8.bin", false, true);
-    img_create("binRGB565A8", "A:src/test_files/binimages/cogwheel.RGB565A8.bin", false, true);
-    img_create("binRGB565", "A:src/test_files/binimages/cogwheel.RGB565.bin", false, true);
-    img_create("binRGB888", "A:src/test_files/binimages/cogwheel.RGB888.bin", false, true);
-    img_create("binXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.bin", false, true);
-    img_create("binARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.bin", false, true);
-
-
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_recolor.png");
+                c_array_image_create(rotate, recolor, align, i);
+                snprintf(reference, sizeof(reference), "draw/c_array_image_stride%d_%s_%s.png", stride, compressions[i], modes[mode]);
+                TEST_ASSERT_EQUAL_SCREENSHOT(reference);
+                lv_obj_clean(lv_screen_active());
+            }
+        }
+    }
 }
-
-void test_image_built_in_decode_rotate_and_recolor(void)
-{
-    LV_IMAGE_DECLARE(test_image_cogwheel_i4);
-    LV_IMAGE_DECLARE(test_image_cogwheel_a8);
-    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565);
-    LV_IMAGE_DECLARE(test_image_cogwheel_rgb565a8);
-    LV_IMAGE_DECLARE(test_image_cogwheel_xrgb8888);
-    LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
-
-    img_create("I4", &test_image_cogwheel_i4, true, true);
-    img_create("A8", &test_image_cogwheel_a8, true, true);
-    img_create("RGB565", &test_image_cogwheel_rgb565, true, true);
-    img_create("RGB565A8", &test_image_cogwheel_rgb565a8, true, true);
-    img_create("XRGB8888", &test_image_cogwheel_xrgb8888, true, true);
-    img_create("ARGB8888", &test_image_cogwheel_argb8888, true, true);
-
-    /*Only A8 is read to ram thus can rotate for now*/
-    img_create("binA8", "A:src/test_files/binimages/cogwheel.A8.bin", true, true);
-
-
-    TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rotate_and_recolor.png");
-}
-
-
-
 
 #endif

@@ -35,11 +35,10 @@
  *  STATIC PROTOTYPES
  **********************/
 #if LV_DRAW_SW_COMPLEX
-LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t s,
-                                                         lv_coord_t r);
-LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
+LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, int32_t s,
+                                                         int32_t r);
+LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(int32_t size, int32_t sw, uint16_t * sh_ups_buf);
 #endif /*LV_DRAW_SW_COMPLEX*/
-
 
 /**********************
  *  STATIC VARIABLES
@@ -84,14 +83,13 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 
     /*Get the clamped radius*/
     int32_t r_bg = dsc->radius;
-    lv_coord_t short_side = LV_MIN(lv_area_get_width(&bg_area), lv_area_get_height(&bg_area));
+    int32_t short_side = LV_MIN(lv_area_get_width(&bg_area), lv_area_get_height(&bg_area));
     if(r_bg > short_side >> 1) r_bg = short_side >> 1;
 
     /*Get the clamped radius*/
     int32_t r_sh = dsc->radius;
     short_side = LV_MIN(lv_area_get_width(&core_area), lv_area_get_height(&core_area));
     if(r_sh > short_side >> 1) r_sh = short_side >> 1;
-
 
     /*Get how many pixels are affected by the blur on the corners*/
     int32_t corner_size = dsc->width  + r_sh;
@@ -138,7 +136,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     lv_area_t blend_area;
     lv_area_t clip_area_sub;
     lv_opa_t * sh_buf_tmp;
-    lv_coord_t y;
+    int32_t y;
     bool simple_sub;
 
     lv_draw_sw_blend_dsc_t blend_dsc;
@@ -149,8 +147,8 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     blend_dsc.color = dsc->color;
     blend_dsc.opa = dsc->opa;
 
-    lv_coord_t w_half = shadow_area.x1 + lv_area_get_width(&shadow_area) / 2;
-    lv_coord_t h_half = shadow_area.y1 + lv_area_get_height(&shadow_area) / 2;
+    int32_t w_half = shadow_area.x1 + lv_area_get_width(&shadow_area) / 2;
+    int32_t h_half = shadow_area.y1 + lv_area_get_height(&shadow_area) / 2;
 
     /*Draw the corners if they are on the current clip area and not fully covered by the bg*/
 
@@ -165,7 +163,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        int32_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (clip_area_sub.y1 - shadow_area.y1) * corner_size;
         sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
@@ -208,7 +206,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        int32_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
         sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
@@ -248,7 +246,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        int32_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (clip_area_sub.y1 - blend_area.y1) * corner_size;
 
@@ -293,10 +291,9 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     blend_area.y2 = shadow_area.y2;
     blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
 
-
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        int32_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
         if(w > 0) {
@@ -351,7 +348,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        int32_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (corner_size - 1) * corner_size;
         sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
@@ -408,7 +405,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        int32_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (corner_size - 1) * corner_size;
         sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
@@ -447,7 +444,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        int32_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (clip_area_sub.y1 - blend_area.y1) * corner_size;
         sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
@@ -492,7 +489,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        int32_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
         sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
         sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
@@ -528,11 +525,13 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     blend_area.x2 = shadow_area.x2 - corner_size;
     blend_area.y1 = shadow_area.y1 + corner_size;
     blend_area.y2 = shadow_area.y2 - corner_size;
+    blend_area.y1 = LV_MIN(blend_area.y1, h_half + 1);
+    blend_area.y2 = LV_MAX(blend_area.y2, h_half);
     blend_dsc.mask_buf = mask_buf;
 
     if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        int32_t w = lv_area_get_width(&clip_area_sub);
         if(w > 0) {
             blend_area.x1 = clip_area_sub.x1;
             blend_area.x2 = clip_area_sub.x2;
@@ -568,8 +567,8 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
  * @param sw shadow width
  * @param r radius
  */
-LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t sw,
-                                                         lv_coord_t r)
+LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, int32_t sw,
+                                                         int32_t r)
 {
     int32_t sw_ori = sw;
     int32_t size = sw_ori  + r;
@@ -655,7 +654,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
 
 }
 
-LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf)
+LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(int32_t size, int32_t sw, uint16_t * sh_ups_buf)
 {
     int32_t s_left = sw >> 1;
     int32_t s_right = (sw >> 1);

@@ -94,16 +94,16 @@ void test_switch_animation(void)
 
 void test_switch_should_not_have_extra_draw_size_at_creation(void)
 {
-    lv_coord_t extra_size = _lv_obj_get_ext_draw_size(sw);
+    int32_t extra_size = _lv_obj_get_ext_draw_size(sw);
 
     TEST_ASSERT_EQUAL(0, extra_size);
 }
 
 void test_switch_should_update_extra_draw_size_after_editing_padding(void)
 {
-    lv_coord_t pad = 6;
-    lv_coord_t actual = 0;
-    lv_coord_t expected = pad + _LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
+    int32_t pad = 6;
+    int32_t actual = 0;
+    int32_t expected = pad + _LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
 
     static lv_style_t style_knob;
     lv_style_init(&style_knob);
@@ -122,7 +122,7 @@ void test_switch_should_update_extra_draw_size_after_editing_padding(void)
 /* See #2330 for context */
 void test_switch_should_trigger_value_changed_event_only_once(void)
 {
-    lv_obj_add_event(sw, event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(sw, event_handler, LV_EVENT_ALL, NULL);
     mouse_click_on_switch();
 
     TEST_ASSERT_EQUAL(1, value_changed_event_cnt);

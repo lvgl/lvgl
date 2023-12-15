@@ -20,7 +20,6 @@
  *      TYPEDEFS
  **********************/
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -64,7 +63,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
     /*Close previous gif if any*/
     if(gifobj->gif) {
         lv_cache_lock();
-        lv_cache_invalidate(lv_cache_find(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_PTR, 0, 0));
+        lv_cache_invalidate_by_src(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_POINTER);
         lv_cache_unlock();
 
         gd_close_gif(gifobj->gif);
@@ -85,8 +84,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
     }
 
     gifobj->imgdsc.data = gifobj->gif->canvas;
-    gifobj->imgdsc.header.always_zero = 0;
-    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA;
+    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
     gifobj->imgdsc.header.h = gifobj->gif->height;
     gifobj->imgdsc.header.w = gifobj->gif->width;
     gifobj->last_call = lv_tick_get();
@@ -103,9 +101,33 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 void lv_gif_restart(lv_obj_t * obj)
 {
     lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    if(gifobj->gif == NULL) {
+        LV_LOG_WARN("Gif resource not loaded correctly");
+        return;
+    }
+
     gd_rewind(gifobj->gif);
     lv_timer_resume(gifobj->timer);
     lv_timer_reset(gifobj->timer);
+}
+
+void lv_gif_pause(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+    lv_timer_pause(gifobj->timer);
+}
+
+void lv_gif_resume(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    if(gifobj->gif == NULL) {
+        LV_LOG_WARN("Gif resource not loaded correctly");
+        return;
+    }
+
+    lv_timer_resume(gifobj->timer);
 }
 
 /**********************
@@ -129,7 +151,7 @@ static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_gif_t * gifobj = (lv_gif_t *) obj;
 
     lv_cache_lock();
-    lv_cache_invalidate(lv_cache_find(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_invalidate_by_src(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_POINTER);
     lv_cache_unlock();
 
     if(gifobj->gif)
@@ -157,7 +179,7 @@ static void next_frame_task_cb(lv_timer_t * t)
     gd_render_frame(gifobj->gif, (uint8_t *)gifobj->imgdsc.data);
 
     lv_cache_lock();
-    lv_cache_invalidate(lv_cache_find(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_invalidate_by_src(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_POINTER);
     lv_cache_unlock();
     lv_obj_invalidate(obj);
 }

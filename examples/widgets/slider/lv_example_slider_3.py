@@ -39,7 +39,7 @@ slider.set_mode(lv.slider.MODE.RANGE)
 slider.set_value(70, lv.ANIM.OFF)
 slider.set_left_value(20, lv.ANIM.OFF)
 
-slider.add_event(slider_event_cb, lv.EVENT.ALL, None)
+slider.add_event_cb(slider_event_cb, lv.EVENT.ALL, None)
 slider.add_flag(lv.obj.FLAG.SEND_DRAW_TASK_EVENTS)
 slider.refresh_ext_draw_size()
 

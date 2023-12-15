@@ -35,7 +35,7 @@ label.set_pos(100, 10)
 sw = lv.switch(lv.screen_active())
 sw.center()
 sw.add_state(lv.STATE.CHECKED)
-sw.add_event(lambda e: sw_event_cb(e,label), lv.EVENT.VALUE_CHANGED, None)
+sw.add_event_cb(lambda e: sw_event_cb(e,label), lv.EVENT.VALUE_CHANGED, None)
 
 
 

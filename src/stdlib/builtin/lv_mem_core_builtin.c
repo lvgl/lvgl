@@ -38,7 +38,6 @@
 #endif
 #define state LV_GLOBAL_DEFAULT()->tlsf_state
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -82,16 +81,17 @@ void lv_mem_init(void)
 #else
     state.tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_ADR, LV_MEM_SIZE);
 #endif
+
+#if LV_USE_OS
+    lv_mutex_init(&state.mutex);
+#endif
+
     _lv_ll_init(&state.pool_ll, sizeof(lv_pool_t));
 
     /*Record the first pool*/
     lv_pool_t * pool_p = _lv_ll_ins_tail(&state.pool_ll);
     LV_ASSERT_MALLOC(pool_p);
     *pool_p = lv_tlsf_get_pool(state.tlsf);
-
-#if LV_USE_OS
-    lv_mutex_init(&state.mutex);
-#endif
 
 #if LV_MEM_ADD_JUNK
     LV_LOG_WARN("LV_MEM_ADD_JUNK is enabled which makes LVGL much slower");
@@ -102,7 +102,9 @@ void lv_mem_deinit(void)
 {
     _lv_ll_clear(&state.pool_ll);
     lv_tlsf_destroy(state.tlsf);
-    lv_mem_init();
+#if LV_USE_OS
+    lv_mutex_delete(&state.mutex);
+#endif
 }
 
 lv_mem_pool_t lv_mem_add_pool(void * mem, size_t bytes)
@@ -133,7 +135,6 @@ void lv_mem_remove_pool(lv_mem_pool_t pool)
     }
     LV_LOG_WARN("invalid pool: %p", pool);
 }
-
 
 void * lv_malloc_core(size_t size)
 {
@@ -186,7 +187,7 @@ void lv_free_core(void * p)
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 {
     /*Init the data*/
-    lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
+    lv_memzero(mon_p, sizeof(lv_mem_monitor_t));
     LV_TRACE_MEM("begin");
 
     lv_pool_t * pool_p;
@@ -194,9 +195,9 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
         lv_tlsf_walk_pool(*pool_p, lv_mem_walker, mon_p);
     }
 
-    mon_p->used_pct = 100 - (100U * mon_p->free_size) / mon_p->total_size;
+    mon_p->used_pct = 100 - (uint64_t)100U * mon_p->free_size / mon_p->total_size;
     if(mon_p->free_size > 0) {
-        mon_p->frag_pct = mon_p->free_biggest_size * 100U / mon_p->free_size;
+        mon_p->frag_pct = (uint64_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
         mon_p->frag_pct = 100 - mon_p->frag_pct;
     }
     else {
@@ -207,7 +208,6 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 
     LV_TRACE_MEM("finished");
 }
-
 
 lv_result_t lv_mem_test_core(void)
 {
@@ -260,4 +260,4 @@ static void lv_mem_walker(void * ptr, size_t size, int used, void * user)
             mon_p->free_biggest_size = size;
     }
 }
-#endif /*LV_USE_BUILTIN_MALLOC*/
+#endif /*LV_STDLIB_BUILTIN*/

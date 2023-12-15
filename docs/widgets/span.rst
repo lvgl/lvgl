@@ -48,10 +48,10 @@ the last (or most recent) child.
 Child Count
 -----------
 
-Use the function :cpp:expr:`lv_spangroup_get_child_cnt(spangroup)` to get back
+Use the function :cpp:expr:`lv_spangroup_get_span_count(spangroup)` to get back
 the number of spans the group is maintaining.
 
-e.g. ``uint32_t size = lv_spangroup_get_child_cnt(spangroup)``
+e.g. ``uint32_t size = lv_spangroup_get_span_count(spangroup)``
 
 Text align
 ----------
@@ -88,7 +88,7 @@ The spangroup can be set to one the following modes:
 
 Use :cpp:expr:`lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)` to set object overflow mode.
 
-first line indent
+First line indent
 -----------------
 
 Use :cpp:expr:`lv_spangroup_set_indent(spangroup, 20)` to set the indent of the
@@ -96,7 +96,7 @@ first line. all modes support pixel units, in addition to :cpp:enumerator:`LV_SP
 and :cpp:enumerator:`LV_SPAN_MODE_BREAK` mode supports percentage units
 too.
 
-lines
+Lines
 -----
 
 Use :cpp:expr:`lv_spangroup_set_max_lines(spangroup, 10)` to set the maximum number

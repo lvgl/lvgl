@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -81,6 +80,11 @@ void lv_draw_pxp_init(void)
 #if LV_USE_OS
     lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 8 * 1024, draw_pxp_unit);
 #endif
+}
+
+void lv_draw_pxp_deinit(void)
+{
+    lv_pxp_deinit();
 }
 
 /**********************

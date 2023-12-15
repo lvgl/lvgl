@@ -45,7 +45,6 @@ img_multilang_like_map[] = {
 
 const lv_image_dsc_t img_multilang_like = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .header.always_zero = 0,
     .header.w = 20,
     .header.h = 17,
     .data = img_multilang_like_map,

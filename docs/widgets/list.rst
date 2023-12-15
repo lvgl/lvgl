@@ -15,7 +15,7 @@ Parts and Styles
 - :cpp:enumerator:`LV_PART_MAIN` The main part of the list that uses all the typical background properties
 - :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar. See the `Base objects </widgets/obj>`__ documentation for details.
 
-**Buttons and Texts** See the `Button </widgets/btn>`__\ 's and `Label </widgets/label>`__\ 's documentation.
+**Buttons and Texts** See the `Button </widgets/button>`__\ 's and `Label </widgets/label>`__\ 's documentation.
 
 Usage
 *****
@@ -23,7 +23,7 @@ Usage
 Buttons
 -------
 
-:cpp:expr:`lv_list_add_btn(list, icon, text)` adds a full-width button with an icon
+:cpp:expr:`lv_list_add_button(list, icon, text)` adds a full-width button with an icon
 
 - that can be an image or symbol
 - and a text.

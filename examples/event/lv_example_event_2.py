@@ -19,4 +19,4 @@ button_label.center()
 info_label = lv.label(lv.screen_active())
 info_label.set_text("The last button event:\nNone")
 
-button.add_event(lambda e: event_cb(e,info_label), lv.EVENT.ALL, None)
+button.add_event_cb(lambda e: event_cb(e,info_label), lv.EVENT.ALL, None)

@@ -18,7 +18,7 @@ pwd_ta.set_password_mode(True)
 pwd_ta.set_one_line(True)
 pwd_ta.set_width(lv.pct(45))
 pwd_ta.set_pos(5, 20)
-pwd_ta.add_event(ta_event_cb, lv.EVENT.ALL, None)
+pwd_ta.add_event_cb(ta_event_cb, lv.EVENT.ALL, None)
 
 # Create a label and position it above the text box
 pwd_label = lv.label(lv.screen_active())
@@ -29,7 +29,7 @@ pwd_label.align_to(pwd_ta, lv.ALIGN.OUT_TOP_LEFT, 0, 0)
 text_ta = lv.textarea(lv.screen_active())
 text_ta.set_width(lv.pct(45))
 text_ta.set_one_line(True)
-text_ta.add_event(ta_event_cb, lv.EVENT.ALL, None)
+text_ta.add_event_cb(ta_event_cb, lv.EVENT.ALL, None)
 text_ta.set_password_mode(False)
 
 text_ta.align(lv.ALIGN.TOP_RIGHT, -5, 20)

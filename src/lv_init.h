@@ -34,7 +34,6 @@ extern "C" {
  */
 void lv_init(void);
 
-
 /**
  * Deinit the 'lv' library
  */
@@ -44,7 +43,6 @@ void lv_deinit(void);
  * Returns whether the 'lv' library is currently initialized
  */
 bool lv_is_initialized(void);
-
 
 /**********************
  *      MACROS

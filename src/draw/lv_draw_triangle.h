@@ -29,15 +29,24 @@ typedef struct {
     lv_color_t bg_color;
     lv_grad_dsc_t bg_grad;
 
-    lv_point_t p[3];
+    lv_point_precise_t p[3];
 } lv_draw_triangle_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize a triangle draw descriptor
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * draw_dsc);
 
+/**
+ * Create a triangle draw task
+ * @param layer     pointer to a layer
+ * @param dsc       pointer to an initialized `lv_draw_triangle_dsc_t` variable
+ */
 void lv_draw_triangle(struct _lv_layer_t * layer, const lv_draw_triangle_dsc_t * draw_dsc);
 
 /**********************

@@ -34,8 +34,8 @@ void tearDown(void)
 
 void test_textarea_should_have_valid_documented_default_values(void)
 {
-    lv_coord_t objw = lv_obj_get_width(slider);
-    lv_coord_t objh = lv_obj_get_height(slider);
+    int32_t objw = lv_obj_get_width(slider);
+    int32_t objh = lv_obj_get_height(slider);
 
     /* Horizontal slider */
     TEST_ASSERT_TRUE(objw >= objh);

@@ -36,8 +36,8 @@ static int32_t kern_pair_8_compare(const void * ref, const void * element);
 static int32_t kern_pair_16_compare(const void * ref, const void * element);
 
 #if LV_USE_FONT_COMPRESSED
-    static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter);
-    static inline void decompress_line(uint8_t * out, lv_coord_t w);
+    static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter);
+    static inline void decompress_line(uint8_t * out, int32_t w);
     static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
     static inline void rle_init(const uint8_t * in,  uint8_t bpp);
     static inline uint8_t rle_next(void);
@@ -59,7 +59,6 @@ static const uint8_t opa3_table[8] = {0, 36, 73, 109, 146, 182, 218, 255};
 
 static const uint8_t opa2_table[4] = {0, 85, 170, 255};
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -71,7 +70,6 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
 
 const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out)
 {
@@ -162,15 +160,6 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
     return NULL;
 }
 
-/**
- * Used as `get_glyph_dsc` callback in lvgl's native font format if the font is uncompressed.
- * @param font pointer to font
- * @param dsc_out store the result descriptor here
- * @param unicode_letter a UNICODE letter code
- * @param unicode_letter_next the unicode letter succeeding the letter under test
- * @return true: descriptor is successfully loaded into `dsc_out`.
- *         false: the letter was not found, no data is loaded to `dsc_out`
- */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next)
 {
@@ -346,6 +335,7 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
 }
 
 #if LV_USE_FONT_COMPRESSED
+
 /**
  * The compress a glyph's bitmap
  * @param in the compressed bitmap
@@ -354,7 +344,7 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
  * @param bpp bit per pixel (bpp = 3 will be converted to bpp = 4)
  * @param prefilter true: the lines are XORed
  */
-static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter)
+static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter)
 {
     const lv_opa_t * opa_table;
     switch(bpp) {
@@ -384,8 +374,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
     decompress_line(line_buf1, w);
 
-    lv_coord_t y;
-    lv_coord_t x;
+    int32_t y;
+    int32_t x;
     uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
 
     for(x = 0; x < w; x++) {
@@ -421,9 +411,9 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
  * @param out output buffer
  * @param w width of the line in pixel count
  */
-static inline void decompress_line(uint8_t * out, lv_coord_t w)
+static inline void decompress_line(uint8_t * out, int32_t w)
 {
-    lv_coord_t i;
+    int32_t i;
     for(i = 0; i < w; i++) {
         out[i] = rle_next();
     }
