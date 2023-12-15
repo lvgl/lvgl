@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../disp/lv_disp.h"
+#include "src/display/lv_display.h"
 
 #if LV_USE_ESP_TICK
 
