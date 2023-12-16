@@ -526,7 +526,9 @@ void lv_draw_vector(lv_vector_dsc_t * dsc);
 
 /* Traverser for task list */
 typedef void (*vector_draw_task_cb)(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
+
 void _lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data);
+
 #endif /* LV_USE_VECTOR_GRAPHIC */
 
 #ifdef __cplusplus

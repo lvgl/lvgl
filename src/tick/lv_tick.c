@@ -80,9 +80,32 @@ uint32_t lv_tick_elaps(uint32_t prev_tick)
     return prev_tick;
 }
 
+void lv_delay_ms(uint32_t ms)
+{
+    if(state.delay_cb) {
+        state.delay_cb(ms);
+    }
+    else {
+        uint32_t t = lv_tick_get();
+        while(lv_tick_elaps(t) < ms) {
+            /*Do something to no call `lv_tick_elaps` too often as it might interfere with interrupts*/
+            volatile uint32_t i;
+            volatile uint32_t x = ms;
+            for(i = 0; i < 100; i++) {
+                x = x * 3;
+            }
+        }
+    }
+}
+
 void lv_tick_set_cb(lv_tick_get_cb_t cb)
 {
     state.tick_get_cb = cb;
+}
+
+void lv_delay_set_cb(lv_delay_cb_t cb)
+{
+    state.delay_cb = cb;
 }
 
 /**********************

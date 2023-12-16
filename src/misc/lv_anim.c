@@ -206,7 +206,7 @@ uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_t
 
 uint32_t lv_anim_speed(uint32_t speed)
 {
-    return lv_anim_speed_clamped(speed, 0, 1023);
+    return lv_anim_speed_clamped(speed, 0, 10000);
 }
 
 void lv_anim_refr_now(void)
