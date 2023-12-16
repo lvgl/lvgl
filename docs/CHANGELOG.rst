@@ -15,12 +15,18 @@ As v9 is a major version it contains API breaking changes too. Most of the conce
 IMPORTANT
 ---------
 
-These changes will not result in compiler error, but LVGL might not work due to related issues. So pay extra attention to these:
+If you are updating a v8 project to v9, special care must be taken as some parts
 
-- :cpp:func`lv_display_set_draw_buffers(display, buf1, buf2, buf_size_byte, mode)` is more or less the equivalent of ``lv_disp_draw_buf_init(&draw_buf_dsc, buf1, buf2, buf_size_px)`` from v8, however in **v9 the buffer size is set in bytes**.
+-  will not result in compiler error, but LVGL might not work due to related issues
+-  will result in hard to understand compiler errors
+
+So pay extra attention to these:
+
+- :cpp:func:`lv_display_set_draw_buffers(display, buf1, buf2, buf_size_byte, mode)` is more or less the equivalent of ``lv_disp_draw_buf_init(&draw_buf_dsc, buf1, buf2, buf_size_px)`` from v8, however in **v9 the buffer size is set in bytes**.
 - In v9 ``lv_color_t`` is always RGB888 regardless of ``LV_COLOR_DEPTH``.
 - ``lv_conf.h`` has been changed a lot, so don't forget to update it from ``lv_conf_template.h``
-
+- Be sure ``<stdint.h>`` is **not** included in ``lv_conf.h``. In v9 we have some assembly parts for even better performance and a random include there would mess up the assembly part.
+- The online image converter in not updated yet. Until that use `LVGLImage.py <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`__ .
 
 Main new features
 -----------------
