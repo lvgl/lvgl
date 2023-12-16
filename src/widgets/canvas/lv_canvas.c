@@ -85,7 +85,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
     }
 
     lv_image_set_src(obj, &canvas->dsc);
-//    lv_cache_invalidate_by_src(&canvas->dsc, LV_CACHE_SRC_TYPE_POINTER);
+    //    lv_cache_invalidate_by_src(&canvas->dsc, LV_CACHE_SRC_TYPE_POINTER);
 }
 
 void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
@@ -386,7 +386,7 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
-//    lv_cache_invalidate_by_src(&canvas->dsc, LV_CACHE_SRC_TYPE_POINTER);
+    //    lv_cache_invalidate_by_src(&canvas->dsc, LV_CACHE_SRC_TYPE_POINTER);
 }
 
 #endif

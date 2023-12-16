@@ -197,14 +197,16 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(try_cache(decoder, dsc) == LV_RESULT_OK) return LV_RESULT_OK;
 
     /*Add it to cache*/
-//    t = lv_tick_elaps(t);
+    bin_decoder_cache_data_t search_key;
+    search_key.src_type = dsc->src_type;
+    search_key.src = dsc->src;
 
     bin_decoder_cache_ctx_t ctx = {
         .decoder = decoder,
         .dsc = dsc,
     };
 
-    lv_cache_entry_t * cache_entry = lv_cache_get_or_create(decoder->cache, dsc, &ctx);
+    lv_cache_entry_t * cache_entry = lv_cache_get_or_create(decoder->cache, &search_key, &ctx);
     if(cache_entry == NULL) {
         free_decoder_data(dsc);
         return LV_RESULT_INVALID;
@@ -1088,19 +1090,21 @@ static lv_cache_compare_res_t bin_decoder_cache_compare_cb(const bin_decoder_cac
     if(lhs->src_type == rhs->src_type) {
         if(lhs->src_type == LV_IMAGE_SRC_FILE) {
             int32_t cmp_res = lv_strcmp(lhs->src, rhs->src);
-            if (cmp_res != 0) {
+            if(cmp_res != 0) {
                 return cmp_res > 0 ? 1 : -1;
             }
         }
         else if(lhs->src_type == LV_IMAGE_SRC_VARIABLE) {
-            if (lhs->src != rhs->src) {
+            if(lhs->src != rhs->src) {
                 return lhs->src > rhs->src ? 1 : -1;
             }
         }
         return 0;
-    } else if (lhs->src_type == LV_IMAGE_SRC_FILE && rhs->src_type == LV_IMAGE_SRC_VARIABLE) {
+    }
+    else if(lhs->src_type == LV_IMAGE_SRC_FILE && rhs->src_type == LV_IMAGE_SRC_VARIABLE) {
         return 1;
-    } else if (lhs->src_type == LV_IMAGE_SRC_VARIABLE && rhs->src_type == LV_IMAGE_SRC_FILE) {
+    }
+    else if(lhs->src_type == LV_IMAGE_SRC_VARIABLE && rhs->src_type == LV_IMAGE_SRC_FILE) {
         return -1;
     }
     return 0;
