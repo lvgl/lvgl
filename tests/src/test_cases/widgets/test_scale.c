@@ -233,9 +233,33 @@ void test_scale_linear_section_finds_correct_initial_and_last_tick_indexes(void)
     TEST_FAIL();
 }
 
+/* TODO: Set layer on event, otherwise we dereference a NULL pointer on scale_draw_indicator */
 void test_scale_round_section_finds_correct_initial_and_last_tick_indexes(void)
 {
-    TEST_FAIL();
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+    lv_obj_set_size(scale, 60, 200);
+    lv_scale_set_label_show(scale, true);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_VERTICAL_RIGHT);
+
+    lv_scale_set_total_tick_count(scale, 21);
+    lv_scale_set_major_tick_every(scale, 5);
+
+    lv_scale_set_major_tick_length(scale, 10);
+    lv_scale_set_minor_tick_length(scale, 5);
+    lv_scale_set_range(scale, 0, 100);
+
+    lv_scale_set_post_draw(scale, false);
+
+    lv_obj_send_event(scale, LV_EVENT_DRAW_MAIN, NULL);
+
+    /* Configure section styles */
+    lv_scale_section_t * section = lv_scale_add_section(scale);
+    lv_scale_section_set_range(section, 75, 100);
+
+    TEST_ASSERT_EQUAL(1, section->first_tick_idx_in_section);
+    TEST_ASSERT_EQUAL(1, section->last_tick_idx_in_section);
+    TEST_ASSERT_EQUAL(1, section->first_tick_idx_is_major);
+    TEST_ASSERT_EQUAL(1, section->last_tick_idx_is_major);
 }
 
 #endif
