@@ -184,7 +184,6 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
     inner_area = *orig_inner_area;
 
     if(!_lv_area_intersect(&draw_area, &outer_area, u->base_unit.clip_area)) return;
-    int32_t draw_area_w = lv_area_get_width(&draw_area);
 
 #if LV_USE_OS
     lv_result_t  status;
