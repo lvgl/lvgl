@@ -529,7 +529,7 @@ static void table_draw_task_event_cb(lv_event_t * e)
 
 }
 
-lv_obj_t * table;
+static lv_obj_t * table;
 
 static void summary_create(void)
 {
