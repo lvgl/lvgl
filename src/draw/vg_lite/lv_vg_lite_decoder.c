@@ -145,7 +145,7 @@ lv_result_t lv_vg_lite_decoder_post_process(lv_image_decoder_dsc_t * dsc)
             lv_draw_buf_free((void *)ori_image);
         }
         else {
-            LV_LOG_USER("no need to realign stride: %" LV_PRIu32, stride);
+            LV_LOG_INFO("no need to realign stride: %" LV_PRIu32, stride);
         }
 
         entry->process_state |= LV_VG_LITE_IMAGE_FLAG_ALIGNED;
@@ -387,7 +387,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     cache->src = dsc->src;
     lv_cache_unlock();
 
-    LV_LOG_USER("image %p (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p, cf: %d) decode finish %" LV_PRIu32 "ms",
+    LV_LOG_INFO("image %p (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p, cf: %d) decode finish %" LV_PRIu32 "ms",
                 image_data, width, height, image_buf, cf, cache->weight);
     return LV_RESULT_OK;
 }
@@ -497,7 +497,7 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     cache->src_type = LV_CACHE_SRC_TYPE_PATH;
     lv_cache_unlock();
 
-    LV_LOG_USER("image %s (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p cf: %d) decode finish %" LV_PRIu32 "ms",
+    LV_LOG_INFO("image %s (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p cf: %d) decode finish %" LV_PRIu32 "ms",
                 path, width, height, image_buf, cf, cache->weight);
     return LV_RESULT_OK;
 
