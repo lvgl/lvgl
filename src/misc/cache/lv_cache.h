@@ -39,12 +39,13 @@ lv_cache_t * lv_cache_create(const lv_cache_class_t * cache_class,
                              lv_cache_free_cb_t free_cb);
 void lv_cache_destroy(lv_cache_t * cache, void * user_data);
 
-lv_cache_entry_t * lv_cache_get(lv_cache_t * cache, const void * key, void * user_data);
-lv_cache_entry_t * lv_cache_get_or_create(lv_cache_t * cache, const void * key, void * user_data);
+lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void * user_data);
+lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * key, void * user_data);
 lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * user_data);
-void lv_cache_remove(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data);
+void lv_cache_release(lv_cache_entry_t * entry, void * user_data);
 void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data);
 void lv_cache_drop_all(lv_cache_t * cache, void * user_data);
+
 void lv_cache_set_max_size(lv_cache_t * cache, size_t max_size, void * user_data);
 size_t lv_cache_get_max_size(lv_cache_t * cache, void * user_data);
 size_t lv_cache_get_size(lv_cache_t * cache, void * user_data);

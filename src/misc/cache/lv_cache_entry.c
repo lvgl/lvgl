@@ -48,17 +48,17 @@ struct _lv_cache_entry_t {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_cache_entry_ref_reset(lv_cache_entry_t * entry)
+void lv_cache_entry_reset_ref(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
     entry->ref_cnt = 0;
 }
-void lv_cache_entry_ref_inc(lv_cache_entry_t * entry)
+void lv_cache_entry_inc_ref(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
     entry->ref_cnt++;
 }
-void lv_cache_entry_ref_dec(lv_cache_entry_t * entry)
+void lv_cache_entry_dec_ref(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
     entry->ref_cnt--;
@@ -67,7 +67,7 @@ void lv_cache_entry_ref_dec(lv_cache_entry_t * entry)
         entry->ref_cnt = 0;
     }
 }
-int32_t lv_cache_entry_ref_get(lv_cache_entry_t * entry)
+int32_t lv_cache_entry_get_ref(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
     return entry->ref_cnt;
@@ -116,7 +116,7 @@ void * lv_cache_entry_acquire_data(lv_cache_entry_t * entry)
     LV_ASSERT_NULL(entry);
 
     lv_mutex_lock(&entry->lock);
-    lv_cache_entry_ref_inc(entry);
+    lv_cache_entry_inc_ref(entry);
     lv_mutex_unlock(&entry->lock);
     return lv_cache_entry_get_data(entry);
 }
@@ -124,14 +124,14 @@ void lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data)
 {
     LV_ASSERT_NULL(entry);
     lv_mutex_lock(&entry->lock);
-    if(lv_cache_entry_ref_get(entry) == 0) {
+    if(lv_cache_entry_get_ref(entry) == 0) {
         LV_LOG_ERROR("ref_cnt(%" LV_PRIu32 ") == 0", entry->ref_cnt);
         return;
     }
 
-    lv_cache_entry_ref_dec(entry);
+    lv_cache_entry_dec_ref(entry);
 
-    if(lv_cache_entry_ref_get(entry) == 0 && lv_cache_entry_is_invalid(entry)) {
+    if(lv_cache_entry_get_ref(entry) == 0 && lv_cache_entry_is_invalid(entry)) {
         lv_cache_t * cache = (lv_cache_t *)lv_cache_entry_get_cache(entry);
         lv_cache_drop(cache, lv_cache_entry_get_data(entry), user_data);
     }

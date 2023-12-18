@@ -206,14 +206,14 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         .dsc = dsc,
     };
 
-    lv_cache_entry_t * cache_entry = lv_cache_get_or_create(decoder->cache, &search_key, &ctx);
+    lv_cache_entry_t * cache_entry = lv_cache_acquire_or_create(decoder->cache, &search_key, &ctx);
     if(cache_entry == NULL) {
         free_decoder_data(dsc);
         return LV_RESULT_INVALID;
     }
 
     bin_decoder_cache_data_t * cached_data;
-    cached_data = lv_cache_entry_acquire_data(cache_entry); /*@note: Must get from cache to increase reference count.*/
+    cached_data = lv_cache_entry_get_data(cache_entry); /*@note: Must get from cache to increase reference count.*/
     dsc->decoded = cached_data->decoded; /*@note: Must get from cache to increase reference count.*/
     dsc->cache_entry = cache_entry;
 
@@ -232,7 +232,7 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
     if(dsc->cache_entry) {
         /*Decoded data is in cache, release it from cache's callback*/
-        lv_cache_entry_release_data(dsc->cache_entry, NULL);
+        lv_cache_release(dsc->cache_entry, NULL);
     }
     else {
         /*Data not in cache, free the memory manually*/
@@ -916,10 +916,10 @@ static lv_result_t try_cache(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
     search_key.src_type = dsc->src_type;
     search_key.src = dsc->src;
 
-    lv_cache_entry_t * entry = lv_cache_get(cache, &search_key, NULL);
+    lv_cache_entry_t * entry = lv_cache_acquire(cache, &search_key, NULL);
 
     if(entry) {
-        bin_decoder_cache_data_t * cached_data = lv_cache_entry_acquire_data(entry);
+        bin_decoder_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
         dsc->decoded = cached_data->decoded;
         dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/
         return LV_RESULT_OK;

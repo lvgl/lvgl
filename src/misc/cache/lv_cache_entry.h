@@ -31,12 +31,11 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 uint32_t lv_cache_entry_get_size(const uint32_t node_size);
-int32_t  lv_cache_entry_ref_get(lv_cache_entry_t * entry);
+int32_t  lv_cache_entry_get_ref(lv_cache_entry_t * entry);
 uint32_t lv_cache_entry_get_generation(lv_cache_entry_t * entry);
 uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t * entry);
 bool     lv_cache_entry_is_invalid(lv_cache_entry_t * entry);
-void  *  lv_cache_entry_acquire_data(lv_cache_entry_t * entry);
-void     lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data);
+void  *  lv_cache_entry_get_data(lv_cache_entry_t * entry);
 const lv_cache_t * lv_cache_entry_get_cache(const lv_cache_entry_t * entry);
 lv_cache_entry_t * lv_cache_entry_get_entry(void * data, const uint32_t node_size);
 
