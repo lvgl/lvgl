@@ -290,18 +290,27 @@ class MicroPython_Test(unittest.TestCase):
         def save_apng():
             try:
                 artifact.save(a_png_path)
+            except IndexError:
+                pass
             except:
                 import traceback
 
                 traceback.print_exc()
 
         artifact = apng.APNG()
+        res_img = image.convert('RGB')
+        image.close()
+        res_data = list(res_img.getdata())
+        res_img.close()
 
-        for frame_num, img in enumerate(test_data.result):
-            img = img.convert('RGB')
+        for frame_num, im in enumerate(test_data.result):
+            img = im.convert('RGB')
+            im.close()
             byte_data = list(img.getdata())
             writer = BytesIO()
             img.save(writer, 'PNG')
+            img.close()
+
             writer.seek(0)
             png = apng.PNG.from_bytes(writer.read())
             artifact.append(png)
@@ -316,9 +325,6 @@ class MicroPython_Test(unittest.TestCase):
                     item for sublist in byte_data
                     for item in sublist
                 ])))
-
-            res_img = image.convert('RGB')
-            res_data = list(res_img.getdata())
 
             if res_data == byte_data:
                 save_apng()
