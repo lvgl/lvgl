@@ -672,6 +672,23 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
 }
 #endif
 
+/**
+ * Extend A1/2/4 to A8 with interpolation to reduce rounding error.
+ */
+static inline uint8_t bit_extend(uint8_t value, uint8_t bpp)
+{
+    if(value == 0) return 0;
+
+    uint8_t res = value;
+    uint8_t bpp_now = bpp;
+    while(bpp_now < 8) {
+        res |= value << (8 - bpp_now);
+        bpp_now += bpp;
+    };
+
+    return res;
+}
+
 static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
@@ -720,19 +737,14 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
             /**
              * Rounding error:
              * Take bpp = 4 as example, alpha value of 0x0 to 0x0F should be
-             * mapped to 0x00 to 0xFF, thus the equation should be below Equation 3.
+             * mapped to 0x00 to 0xFF. Using below equation will give us 0x00 to 0xF0
+             * thus causes error. We can simply interpolate the value to fix it.
              *
-             * But it involves division and multiplication, which is slow. So, if
-             * we ignore the rounding errors, Equation1, 2 could be faster. But it
-             * will either has error when alpha is 0xff or 0x00.
-             *
-             * We use Equation 3 here for maximum accuracy.
-             *
-             * Equation 1: *out = ((*in >> shift) & mask) << (8 - bpp);
-             * Equation 2: *out = ((((*in >> shift) & mask) + 1) << (8 - bpp)) - 1;
-             * Equation 3: *out = ((*in >> shift) & mask) * 255 / ((1L << bpp) - 1) ;
+             * Equation: *out = ((*in >> shift) & mask) << (8 - bpp);
+             * Ideal: *out = ((*in >> shift) & mask) * 255 / ((1L << bpp) - 1)
              */
-            *out = ((*in >> shift) & mask) * 255L / ((1L << bpp) - 1) ;
+            uint8_t value = ((*in >> shift) & mask);
+            *out = bit_extend(value, bpp);
             shift += bpp;
             if(shift >= 8) {
                 shift = 0;
