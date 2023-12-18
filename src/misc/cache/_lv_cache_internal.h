@@ -25,10 +25,12 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+struct _lv_cache_ops_t;
 struct _lv_cache_t;
 struct _lv_cache_class_t;
 struct _lv_cache_entry_t;
 
+typedef struct _lv_cache_ops_t lv_cache_ops_t;
 typedef struct _lv_cache_t lv_cache_t;
 typedef struct _lv_cache_class_t lv_cache_class_t;
 typedef struct _lv_cache_entry_t lv_cache_entry_t;
@@ -47,6 +49,12 @@ typedef void (*lv_cache_remove_cb_t)(lv_cache_t * cache, lv_cache_entry_t * entr
 typedef void (*lv_cache_drop_cb_t)(lv_cache_t * cache, const void * key, void * user_data);
 typedef void (*lv_cache_clear_cb_t)(lv_cache_t * cache, void * user_data);
 
+struct _lv_cache_ops_t {
+    lv_cache_compare_cb_t compare_cb;
+    lv_cache_create_cb_t create_cb;
+    lv_cache_free_cb_t free_cb;
+};
+
 struct _lv_cache_t {
     const lv_cache_class_t * clz;
 
@@ -55,9 +63,7 @@ struct _lv_cache_t {
     size_t max_size;
     size_t size;
 
-    lv_cache_compare_cb_t compare_cb;
-    lv_cache_create_cb_t create_cb;
-    lv_cache_free_cb_t free_cb;
+    lv_cache_ops_t ops;
 
     lv_mutex_t lock;
 };

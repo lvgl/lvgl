@@ -34,9 +34,7 @@ extern "C" {
  **********************/
 lv_cache_t * lv_cache_create(const lv_cache_class_t * cache_class,
                              size_t node_size, size_t max_size,
-                             lv_cache_compare_cb_t compare_cb,
-                             lv_cache_create_cb_t create_cb,
-                             lv_cache_free_cb_t free_cb);
+                             lv_cache_ops_t ops);
 void lv_cache_destroy(lv_cache_t * cache, void * user_data);
 
 lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void * user_data);

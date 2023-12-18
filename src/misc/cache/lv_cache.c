@@ -41,9 +41,7 @@
 
 lv_cache_t * lv_cache_create(const lv_cache_class_t * cache_class,
                              size_t node_size, size_t max_size,
-                             lv_cache_compare_cb_t compare_cb,
-                             lv_cache_create_cb_t create_cb,
-                             lv_cache_free_cb_t free_cb)
+                             lv_cache_ops_t ops)
 {
     lv_cache_t * cache = cache_class->alloc_cb();
     LV_ASSERT_MALLOC(cache);
@@ -52,9 +50,7 @@ lv_cache_t * lv_cache_create(const lv_cache_class_t * cache_class,
     cache->node_size = node_size;
     cache->max_size = max_size;
     cache->size = 0;
-    cache->compare_cb = compare_cb;
-    cache->create_cb = create_cb;
-    cache->free_cb = free_cb;
+    cache->ops = ops;
 
     cache->clz->init_cb(cache);
 
@@ -123,7 +119,7 @@ lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * k
         lv_mutex_unlock(&cache->lock);
         return NULL;
     }
-    bool create_res = cache->create_cb(lv_cache_entry_get_data(entry), user_data);
+    bool create_res = cache->ops.create_cb(lv_cache_entry_get_data(entry), user_data);
     if(create_res == false) {
         cache->clz->remove_cb(cache, entry, user_data);
         lv_cache_entry_delete(entry);
@@ -149,7 +145,7 @@ void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data)
 
     if(lv_cache_entry_get_ref(entry) == 0) {
         cache->clz->remove_cb(cache, entry, user_data);
-        cache->free_cb(lv_cache_entry_get_data(entry), user_data);
+        cache->ops.free_cb(lv_cache_entry_get_data(entry), user_data);
         lv_cache_entry_delete(entry);
     }
     else {
@@ -190,17 +186,17 @@ size_t lv_cache_get_free_size(lv_cache_t * cache, void * user_data)
 void lv_cache_set_compare_cb(lv_cache_t * cache, lv_cache_compare_cb_t compare_cb, void * user_data)
 {
     LV_UNUSED(user_data);
-    cache->compare_cb = compare_cb;
+    cache->ops.compare_cb = compare_cb;
 }
 void lv_cache_set_create_cb(lv_cache_t * cache, lv_cache_create_cb_t alloc_cb, void * user_data)
 {
     LV_UNUSED(user_data);
-    cache->create_cb = alloc_cb;
+    cache->ops.create_cb = alloc_cb;
 }
 void lv_cache_set_free_cb(lv_cache_t * cache, lv_cache_free_cb_t free_cb, void * user_data)
 {
     LV_UNUSED(user_data);
-    cache->free_cb = free_cb;
+    cache->ops.free_cb = free_cb;
 }
 /**********************
  *   STATIC FUNCTIONS

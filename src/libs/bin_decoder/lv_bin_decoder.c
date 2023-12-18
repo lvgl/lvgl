@@ -122,11 +122,12 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_set_open_cb(decoder, lv_bin_decoder_open);
     lv_image_decoder_set_get_area_cb(decoder, lv_bin_decoder_get_area);
     lv_image_decoder_set_close_cb(decoder, lv_bin_decoder_close);
-    decoder->cache = lv_cache_create(
-                         &lv_cache_class_lru_rb, sizeof(bin_decoder_cache_data_t), 128,
-                         (lv_cache_compare_cb_t)bin_decoder_cache_compare_cb,
-                         (lv_cache_create_cb_t)bin_decoder_cache_create_cb,
-                         (lv_cache_free_cb_t)bin_decoder_cache_free_cb);
+    decoder->cache = lv_cache_create(&lv_cache_class_lru_rb,
+    sizeof(bin_decoder_cache_data_t), 128, (lv_cache_ops_t) {
+        .compare_cb = (lv_cache_compare_cb_t)bin_decoder_cache_compare_cb,
+        .create_cb = (lv_cache_create_cb_t)bin_decoder_cache_create_cb,
+        .free_cb = (lv_cache_free_cb_t)bin_decoder_cache_free_cb
+    });
 }
 
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)

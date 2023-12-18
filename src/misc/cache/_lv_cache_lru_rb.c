@@ -101,7 +101,7 @@ static void lv_lru_rb_set_compare_cb(lv_lru_rb_t_ * lru, lv_cache_compare_cb_t c
 static void lv_lru_rb_set_free_cb(lv_lru_rb_t_ * lru, lv_cache_free_cb_t free_cb, void * user_data)
 {
     LV_UNUSED(user_data);
-    lru->cache.free_cb = free_cb;
+    lru->cache.ops.free_cb = free_cb;
 }
 
 /**********************
@@ -163,25 +163,25 @@ static bool init_cb(lv_cache_t * cache)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
-    LV_ASSERT_NULL(lru->cache.compare_cb);
-    LV_ASSERT_NULL(lru->cache.free_cb);
+    LV_ASSERT_NULL(lru->cache.ops.compare_cb);
+    LV_ASSERT_NULL(lru->cache.ops.free_cb);
     LV_ASSERT(lru->cache.node_size > 0);
     LV_ASSERT(lru->cache.max_size > 0);
 
     if(lru->cache.node_size == 0 || lru->cache.max_size == 0
-       || lru->cache.compare_cb == NULL || lru->cache.free_cb == NULL) {
+       || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
         return false;
     }
 
     /*add void* to store the ll node pointer*/
-    if(!lv_rb_init(&lru->rb, lru->cache.compare_cb,   lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
+    if(!lv_rb_init(&lru->rb, lru->cache.ops.compare_cb,   lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
         return NULL;
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
 
     lv_lru_rb_set_max_size(lru, lru->cache.max_size, NULL);
-    lv_lru_rb_set_compare_cb(lru, (lv_rb_compare_t)lru->cache.compare_cb, NULL);
-    lv_lru_rb_set_free_cb(lru, lru->cache.free_cb, NULL);
+    lv_lru_rb_set_compare_cb(lru, (lv_rb_compare_t)lru->cache.ops.compare_cb, NULL);
+    lv_lru_rb_set_free_cb(lru, lru->cache.ops.free_cb, NULL);
 
     return lru;
 }
@@ -216,7 +216,7 @@ static lv_cache_entry_t * get_cb(lv_cache_t * cache, const void * key, void * us
         lv_rb_node_t * node = *(lv_rb_node_t **)head;
         void * data = node->data;
         lv_cache_entry_t * entry = lv_cache_entry_get_entry(data, cache->node_size);
-        if(lru->cache.compare_cb(data, key) == 0) {
+        if(lru->cache.ops.compare_cb(data, key) == 0) {
             return entry;
         }
     }
@@ -319,7 +319,7 @@ static void drop_cb(lv_cache_t * cache, const void * key, void * user_data)
 
     void * data = node->data;
 
-    lru->cache.free_cb(data, user_data);
+    lru->cache.ops.free_cb(data, user_data);
 
     void * lru_node = *get_lru_node(lru, node);
     lv_rb_remove_node(&lru->rb, node);
@@ -347,7 +347,7 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
         void * search_key = (*node)->data;
         lv_cache_entry_t * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
         if(lv_cache_entry_get_ref(entry) == 0) {
-            lru->cache.free_cb(search_key, user_data);
+            lru->cache.ops.free_cb(search_key, user_data);
         }
         else {
             LV_LOG_WARN("entry (%p) is still referenced (%" LV_PRId32 ")", entry, lv_cache_entry_get_ref(entry));
