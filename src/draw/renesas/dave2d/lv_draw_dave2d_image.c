@@ -3,7 +3,6 @@
  *
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -106,7 +105,6 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
     lv_area_move(&buffer_area, x, y);
     lv_area_move(&clipped_area, x, y);
 
-
     /* Generate render operations*/
 #if D2_RENDER_EACH_OPERATION
     d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
@@ -133,7 +131,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
     d1_cacheblockflush(u->d2_handle, 0, src_buf,
-            img_stride * decoder_dsc->header.h); //Stride is in bytes, not pixels/texels
+                       img_stride * decoder_dsc->header.h); //Stride is in bytes, not pixels/texels
 #endif
 #endif
 
@@ -255,8 +253,5 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 #endif
 
 }
-
-
-
 
 #endif //LV_USE_DRAW_DAVE2D

@@ -90,6 +90,9 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
     p[1].y -= u->base_unit.target_layer->buf_area.y1;
     p[2].y -= u->base_unit.target_layer->buf_area.y1;
 
+    p[1].y -= 1;
+    p[2].y -= 1;
+
     current_alpha_mode = d2_getalphamode(u->d2_handle);
 
     if(LV_GRAD_DIR_NONE != dsc->bg_grad.dir) {
