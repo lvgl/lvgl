@@ -96,6 +96,7 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_set_open_cb(decoder, lv_bin_decoder_open);
     lv_image_decoder_set_get_area_cb(decoder, lv_bin_decoder_get_area);
     lv_image_decoder_set_close_cb(decoder, lv_bin_decoder_close);
+    decoder->cache_data_type = lv_cache_register_data_type();
 }
 
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
