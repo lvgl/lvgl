@@ -168,8 +168,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(struct _lv_draw_ctx_t * draw_ctx
                     lv_coord_t dash_cnt = dash_start;
                     lv_coord_t i;
                     for(i = 0; i < blend_area_w; i++, dash_cnt++) {
-                        if(dash_cnt <= dsc->dash_width) {
-                            int16_t diff = dsc->dash_width - dash_cnt;
+                        if(dash_cnt < dsc->dash_width) {
+                            int16_t diff = dsc->dash_width - dash_cnt - 1;
                             i += diff;
                             dash_cnt += diff;
                         }
