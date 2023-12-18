@@ -260,12 +260,6 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 ret =  0;
                 break;
             }
-#if 0
-        case LV_DRAW_TASK_TYPE_BG_IMG: {
-                ret = 0;
-                break;
-            }
-#endif
         case LV_DRAW_TASK_TYPE_LAYER: {
                 ret = 0;
                 break;
@@ -273,13 +267,15 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
 #if USE_D2
-                //TODO
-                //                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                //                t->preference_score = 0;
-#endif
-                ret = 0;
-                break;
+            lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
+            if(draw_dsc->header.cf != LV_COLOR_FORMAT_RGB565A8) {
+                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
+                t->preference_score = 0;
             }
+#endif
+            ret = 0;
+            break;
+        }
 
         case LV_DRAW_TASK_TYPE_BORDER: {
 #if USE_D2
@@ -390,6 +386,11 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
 
     if(t->preferred_draw_unit_id != DRAW_UNIT_ID_DAVE2D) {
         return 0;
+    }
+
+    void * buf = lv_draw_layer_alloc_buf(layer);
+    if(buf == NULL) {
+        return -1;
     }
 
 #if  (0 == D2_RENDER_EACH_OPERATION)
