@@ -277,7 +277,7 @@ static inline lv_point_t lv_point_from_precise(const lv_point_precise_t * p)
 static inline lv_point_precise_t lv_point_to_precise(const lv_point_t * p)
 {
     lv_point_precise_t point = {
-        p->x, p->y
+        (lv_value_precise_t)p->x, (lv_value_precise_t)p->y
     };
 
     return point;
