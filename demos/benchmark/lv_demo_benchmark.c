@@ -529,7 +529,6 @@ static void table_draw_task_event_cb(lv_event_t * e)
 
 }
 
-
 static void summary_create(void)
 {
     lv_obj_clean(lv_screen_active());
