@@ -27,9 +27,6 @@ static void * buf_malloc(size_t size, lv_color_format_t color_format);
 static void buf_free(void * buf);
 static void * buf_align(void * buf, lv_color_format_t color_format);
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format);
-static void * buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format, int32_t x,
-                           int32_t y);
-
 static void buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a);
 
 static void buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area_to_copy,
@@ -56,7 +53,6 @@ void _lv_draw_buf_init_handlers(void)
     handlers.align_pointer_cb = buf_align;
     handlers.invalidate_cache_cb = NULL;
     handlers.width_to_stride_cb = width_to_stride;
-    handlers.go_to_xy_cb = buf_go_to_xy;
     handlers.buf_clear_cb = buf_clear;
     handlers.buf_copy_cb = buf_copy;
 }
@@ -92,13 +88,6 @@ void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
 void lv_draw_buf_invalidate_cache(void * buf, uint32_t stride, lv_color_format_t color_format, const lv_area_t * area)
 {
     if(handlers.invalidate_cache_cb) handlers.invalidate_cache_cb(buf, stride, color_format, area);
-}
-
-void * lv_draw_buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format, int32_t x,
-                            int32_t y)
-{
-    if(handlers.go_to_xy_cb) return handlers.go_to_xy_cb(buf, stride, color_format, x, y);
-    else return NULL;
 }
 
 void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a)
@@ -247,16 +236,6 @@ static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format)
     width_byte = w * lv_color_format_get_bpp(color_format);
     width_byte = (width_byte + 7) >> 3; /*Round up*/
     return (width_byte + LV_DRAW_BUF_STRIDE_ALIGN - 1) & ~(LV_DRAW_BUF_STRIDE_ALIGN - 1);
-}
-
-static void * buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format, int32_t x,
-                           int32_t y)
-{
-    const uint8_t * buf_tmp = buf;
-    buf_tmp += stride * y;
-    buf_tmp += x * lv_color_format_get_size(color_format);
-
-    return (void *)buf_tmp;
 }
 
 static void buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a)
