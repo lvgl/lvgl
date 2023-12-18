@@ -416,7 +416,7 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a);
  * @param a pointer to an initialized `lv_anim_t` variable
  * @return delay before the animation in milliseconds
  */
-static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
+static inline uint32_t lv_anim_get_delay(const lv_anim_t * a)
 {
     return -a->act_time;
 }
@@ -426,14 +426,14 @@ static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
  * @param a pointer to an animation.
  * @return the play time in milliseconds.
  */
-uint32_t lv_anim_get_playtime(lv_anim_t * a);
+uint32_t lv_anim_get_playtime(const lv_anim_t * a);
 
 /**
  * Get the duration of an animation
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @return the duration of the animation in milliseconds
  */
-static inline uint32_t lv_anim_get_time(lv_anim_t * a)
+static inline uint32_t lv_anim_get_time(const lv_anim_t * a)
 {
     return a->duration;
 }
@@ -443,7 +443,7 @@ static inline uint32_t lv_anim_get_time(lv_anim_t * a)
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @return the repeat count or `LV_ANIM_REPEAT_INFINITE` for infinite repetition. 0: disabled repetition.
  */
-static inline uint16_t lv_anim_get_repeat_count(lv_anim_t * a)
+static inline uint16_t lv_anim_get_repeat_count(const lv_anim_t * a)
 {
     return a->repeat_cnt;
 }
@@ -453,7 +453,7 @@ static inline uint16_t lv_anim_get_repeat_count(lv_anim_t * a)
  * @param   a pointer to an initialized `lv_anim_t` variable
  * @return  the pointer to the custom user_data of the animation
  */
-static inline void * lv_anim_get_user_data(lv_anim_t * a)
+static inline void * lv_anim_get_user_data(const lv_anim_t * a)
 {
     return a->user_data;
 }

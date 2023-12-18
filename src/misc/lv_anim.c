@@ -128,7 +128,7 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     return new_anim;
 }
 
-uint32_t lv_anim_get_playtime(lv_anim_t * a)
+uint32_t lv_anim_get_playtime(const lv_anim_t * a)
 {
     if(a->repeat_cnt == LV_ANIM_REPEAT_INFINITE) {
         return LV_ANIM_PLAYTIME_INFINITE;
