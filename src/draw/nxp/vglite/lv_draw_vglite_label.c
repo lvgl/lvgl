@@ -107,10 +107,6 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                 return;
             lv_area_move(&blend_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
-            //void * dest_buf = lv_draw_buf_go_to_xy(&layer->draw_buf,
-            //                                       blend_area.x1 - layer->draw_buf_ofs.x,
-            //                                       blend_area.y1 - layer->draw_buf_ofs.y);
-
             const uint8_t * mask_buf = glyph_draw_dsc->bitmap;
             lv_area_t mask_area;
             lv_area_copy(&mask_area, glyph_draw_dsc->letter_coords);
