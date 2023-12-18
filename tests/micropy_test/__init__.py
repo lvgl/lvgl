@@ -278,14 +278,10 @@ class MicroPython_Test(unittest.TestCase):
             log(test_data.error_data)
             self.fail(test_data.error_data)
 
-        artifact_path = os.path.join(
-            ARTIFACT_PATH
-        )
+        if not os.path.exists(ARTIFACT_PATH):
+            os.mkdir(ARTIFACT_PATH)
 
-        if not os.path.exists(artifact_path):
-            os.mkdir(artifact_path)
-
-        a_png_path = os.path.join(artifact_path, 'result.apng')
+        a_png_path = os.path.join(ARTIFACT_PATH, 'result.apng')
 
         def save_apng():
             try:
@@ -315,9 +311,9 @@ class MicroPython_Test(unittest.TestCase):
             png = apng.PNG.from_bytes(writer.read())
             artifact.append(png)
 
-            img.save(os.path.join(artifact_path, f'frame{frame_num}.png'), 'PNG')
+            img.save(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.png'), 'PNG')
 
-            with open(os.path.join(artifact_path, f'frame{frame_num}.bin'), 'wb') as f:
+            with open(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.bin'), 'wb') as f:
                 # have to flatten the data and remove the alpha
                 # from the PIL image it is formatted as
                 # [(r, g, b), (r, g, b)]
