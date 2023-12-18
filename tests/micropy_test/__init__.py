@@ -112,6 +112,7 @@ class MicroPython_Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         os.chdir(os.path.dirname(__file__))
+        cls.exit_event = threading.Event()
 
         log(f'--SETTING UP')
         cls.process = subprocess.Popen(
