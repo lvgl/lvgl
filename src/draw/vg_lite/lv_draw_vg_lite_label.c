@@ -77,13 +77,7 @@ void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t
     }
 #endif /*SUPPORT_OUTLINE_FONT*/
 
-    /* workaround save current font */
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
-    u->cur_font = dsc->font;
-
     lv_draw_label_iterate_letters(draw_unit, dsc, coords, draw_letter_cb);
-
-    u->cur_font = NULL;
 }
 
 /**********************
@@ -109,7 +103,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
         else if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_A8
                 || glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE) {
 #if SUPPORT_OUTLINE_FONT
-            if(lv_freetype_is_outline_font(u->cur_font)) {
+            if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
                 draw_letter_outline(u, glyph_draw_dsc);
             }
             else
@@ -224,13 +218,13 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     lv_coord_t height = lv_area_get_height(dsc->letter_coords);
 
     /* calc convert matrix */
-    float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(u->cur_font));
+    float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
     lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
 
     /* convert to vg-lite coordinate */
-    vg_lite_translate(pos.x, pos.y + height, &matrix);
+    vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + height + dsc->g->ofs_y, &matrix);
 
     /* scale size */
     vg_lite_scale(scale, scale, &matrix);
