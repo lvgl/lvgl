@@ -303,8 +303,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
             arc_area.x2 = core_area.x1;
             arc_area.y2 = core_area.y1;
 
-            if (_lv_area_intersect(&clip_arc, &arc_area, &draw_area))
-            {
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
                 d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                             (d2_border)clip_arc.y2);
                 result = d2_renderwedge(u->d2_handle,
@@ -333,8 +332,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
             arc_area.x2 = core_area.x1;
             arc_area.y2 = core_area.y2 + rout;
 
-            if (_lv_area_intersect(&clip_arc, &arc_area, &draw_area))
-            {
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
 
                 d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                             (d2_border)clip_arc.y2);
@@ -372,8 +370,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                 arc_area.x2 = core_area.x2 + rout;
                 arc_area.y2 = core_area.y1;
 
-                if (_lv_area_intersect(&clip_arc, &arc_area, &draw_area))
-                {
+                if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
 
                     d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                                 (d2_border)clip_arc.y2);
@@ -403,8 +400,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                 arc_area.x2 = core_area.x2 + rout;
                 arc_area.y2 = core_area.y2 + rout;
 
-                if (_lv_area_intersect(&clip_arc, &arc_area, &draw_area))
-                {
+                if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
 
                     d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                                 (d2_border)clip_arc.y2);

@@ -267,15 +267,15 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
 #if USE_D2
-            lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
-            if(draw_dsc->header.cf != LV_COLOR_FORMAT_RGB565A8) {
-                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                t->preference_score = 0;
-            }
+                lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
+                if(draw_dsc->header.cf != LV_COLOR_FORMAT_RGB565A8) {
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
+                    t->preference_score = 0;
+                }
 #endif
-            ret = 0;
-            break;
-        }
+                ret = 0;
+                break;
+            }
 
         case LV_DRAW_TASK_TYPE_BORDER: {
 #if USE_D2

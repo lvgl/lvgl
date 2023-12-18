@@ -114,33 +114,31 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
         arc_area.y2 = LV_MAX3(start_point.y, end_point.y, arc_centre.y);
 
         /* 0 degrees */
-        if ((dsc->end_angle < dsc->start_angle) || ((dsc->start_angle < 360) && (dsc->end_angle > 360)))
-        {
+        if((dsc->end_angle < dsc->start_angle) || ((dsc->start_angle < 360) && (dsc->end_angle > 360))) {
             arc_area.x2 = arc_centre.x + dsc->radius;
         }
 
         /* 90 degrees */
-        if(((dsc->end_angle > 90) && (dsc->start_angle < 90)) || ((dsc->start_angle < 90) && (dsc->end_angle < dsc->start_angle)))
-        {
+        if(((dsc->end_angle > 90) && (dsc->start_angle < 90)) || ((dsc->start_angle < 90) &&
+                                                                  (dsc->end_angle < dsc->start_angle))) {
             arc_area.y2 = arc_centre.y + dsc->radius;
         }
 
         /* 180 degrees */
-        if(((dsc->end_angle > 180) && (dsc->start_angle < 180)) || ((dsc->start_angle < 180) && (dsc->end_angle < dsc->start_angle)))
-        {
+        if(((dsc->end_angle > 180) && (dsc->start_angle < 180)) || ((dsc->start_angle < 180) &&
+                                                                    (dsc->end_angle < dsc->start_angle))) {
             arc_area.x1 = arc_centre.x - dsc->radius;
         }
 
         /* 270 degrees */
-        if(((dsc->end_angle > 270) && (dsc->start_angle < 270)) || ((dsc->start_angle < 270) && (dsc->end_angle < dsc->start_angle)))
-        {
+        if(((dsc->end_angle > 270) && (dsc->start_angle < 270)) || ((dsc->start_angle < 270) &&
+                                                                    (dsc->end_angle < dsc->start_angle))) {
             arc_area.y1 = arc_centre.y - dsc->radius;
         }
 
         draw_arc = _lv_area_intersect(&clip_arc, &arc_area, &clipped_area);
 
-        if (draw_arc)
-        {
+        if(draw_arc) {
 
             result = d2_renderwedge(u->d2_handle,
                                     (d2_point)D2_FIX4(arc_centre.x),

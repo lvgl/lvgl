@@ -177,8 +177,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
             arc_area.x2 = coordinates.x1 + radius;
             arc_area.y2 = coordinates.y1 + radius;
 
-            if (_lv_area_intersect(&clip_arc, &arc_area, &draw_area))
-            {
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
 
                 d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                             (d2_border)clip_arc.y2);
@@ -199,7 +198,6 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                 }
             }
 
-
             arc_centre.x = coordinates.x2 - radius;
             arc_centre.y = coordinates.y1 + radius;
 
@@ -208,8 +206,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
             arc_area.x2 = coordinates.x2;
             arc_area.y2 = coordinates.y1 + radius;
 
-            if (_lv_area_intersect(&clip_arc, &arc_area, &draw_area))
-            {
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
                 d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                             (d2_border)clip_arc.y2);
 
@@ -236,8 +233,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
             arc_area.x2 = coordinates.x2;
             arc_area.y2 = coordinates.y2;
 
-            if (_lv_area_intersect(&clip_arc, &arc_area, &draw_area))
-            {
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
                 d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                             (d2_border)clip_arc.y2);
 
@@ -264,8 +260,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
             arc_area.x2 = coordinates.x1 + radius;
             arc_area.y2 = coordinates.y2;
 
-            if (_lv_area_intersect(&clip_arc, &arc_area, &draw_area))
-            {
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
                 d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                             (d2_border)clip_arc.y2);
 
