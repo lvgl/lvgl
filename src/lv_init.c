@@ -38,6 +38,9 @@
 #if LV_USE_DRAW_SDL
     #include "draw/sdl/lv_draw_sdl.h"
 #endif
+#if LV_USE_DRAW_VG_LITE
+    #include "draw/vg_lite/lv_draw_vg_lite.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -191,6 +194,10 @@ void lv_init(void)
 
     _lv_image_decoder_init();
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
+
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_init();
+#endif
 
     _lv_cache_init();
     _lv_cache_builtin_init();
@@ -355,6 +362,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VGLITE
     lv_draw_vglite_deinit();
+#endif
+
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_deinit();
 #endif
 
 #if LV_USE_DRAW_SW

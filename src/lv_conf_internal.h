@@ -350,6 +350,35 @@
     #endif
 #endif
 
+/* Use VG-Lite GPU. */
+#ifndef LV_USE_DRAW_VG_LITE
+    #ifdef CONFIG_LV_USE_DRAW_VG_LITE
+        #define LV_USE_DRAW_VG_LITE CONFIG_LV_USE_DRAW_VG_LITE
+    #else
+        #define LV_USE_DRAW_VG_LITE 0
+    #endif
+#endif
+
+#if LV_USE_DRAW_VG_LITE
+/* Enbale VG-Lite custom external 'gpu_init()' function */
+#ifndef LV_VG_LITE_USE_GPU_INIT
+    #ifdef CONFIG_LV_VG_LITE_USE_GPU_INIT
+        #define LV_VG_LITE_USE_GPU_INIT CONFIG_LV_VG_LITE_USE_GPU_INIT
+    #else
+        #define LV_VG_LITE_USE_GPU_INIT 0
+    #endif
+#endif
+
+/* Enable VG-Lite assert. */
+#ifndef LV_VG_LITE_USE_ASSERT
+    #ifdef CONFIG_LV_VG_LITE_USE_ASSERT
+        #define LV_VG_LITE_USE_ASSERT CONFIG_LV_VG_LITE_USE_ASSERT
+    #else
+        #define LV_VG_LITE_USE_ASSERT 0
+    #endif
+#endif
+#endif
+
 /*=================
  * OPERATING SYSTEM
  *=================*/

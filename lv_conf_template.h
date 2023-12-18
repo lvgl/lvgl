@@ -128,6 +128,17 @@
 /* Draw using cached SDL textures*/
 #define LV_USE_DRAW_SDL 0
 
+/* Use VG-Lite GPU. */
+#define LV_USE_DRAW_VG_LITE 0
+
+#if LV_USE_DRAW_VG_LITE
+/* Enbale VG-Lite custom external 'gpu_init()' function */
+#define LV_VG_LITE_USE_GPU_INIT 0
+
+/* Enable VG-Lite assert. */
+#define LV_VG_LITE_USE_ASSERT 0
+#endif
+
 /*=================
  * OPERATING SYSTEM
  *=================*/

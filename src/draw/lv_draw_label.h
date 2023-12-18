@@ -87,6 +87,7 @@ typedef struct {
     lv_draw_glyph_bitmap_format_t format;
     const lv_area_t * letter_coords;
     const lv_area_t * bg_coords;
+    const lv_font_glyph_dsc_t * g;
     lv_color_t color;
     lv_opa_t opa;
 } lv_draw_glyph_dsc_t;
