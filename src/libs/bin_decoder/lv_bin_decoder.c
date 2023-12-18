@@ -85,7 +85,7 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
 
 static lv_result_t try_cache(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
-static bool bin_decoder_cache_create_cb(bin_decoder_cache_data_t * node, bin_decoder_cache_ctx_t * ctx);
+static bool bin_decoder_cache_create_cb(bin_decoder_cache_ctx_t * ctx);
 static void bin_decoder_cache_free_cb(bin_decoder_cache_data_t * entry, void * user_data);
 static lv_cache_compare_res_t bin_decoder_cache_compare_cb(const bin_decoder_cache_data_t * lhs,
                                                            const bin_decoder_cache_data_t * rhs);
@@ -125,7 +125,7 @@ void lv_bin_decoder_init(void)
     decoder->cache = lv_cache_create(&lv_cache_class_lru_rb,
     sizeof(bin_decoder_cache_data_t), 128, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)bin_decoder_cache_compare_cb,
-        .create_cb = (lv_cache_create_cb_t)bin_decoder_cache_create_cb,
+        .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t)bin_decoder_cache_free_cb
     });
 }
@@ -207,15 +207,31 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         .dsc = dsc,
     };
 
-    lv_cache_entry_t * cache_entry = lv_cache_acquire_or_create(decoder->cache, &search_key, &ctx);
+    bool create_res = bin_decoder_cache_create_cb(&ctx);
+    if (create_res == false) {
+        return LV_RESULT_INVALID;
+    }
+    if(dsc->decoded == NULL)
+        return LV_RESULT_OK; /*Need to read via get_area_cb*/
+
+    /*@note: Must get from cache to increase reference count.*/
+    lv_cache_entry_t * cache_entry = lv_cache_add(decoder->cache, &search_key, &ctx);
     if(cache_entry == NULL) {
         free_decoder_data(dsc);
         return LV_RESULT_INVALID;
     }
 
     bin_decoder_cache_data_t * cached_data;
-    cached_data = lv_cache_entry_get_data(cache_entry); /*@note: Must get from cache to increase reference count.*/
-    dsc->decoded = cached_data->decoded; /*@note: Must get from cache to increase reference count.*/
+    cached_data = lv_cache_entry_get_data(cache_entry);
+
+    /*Set the cache entry to decoder data*/
+    cached_data->decoded = dsc->decoded;
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
+        cached_data->src = lv_strdup(dsc->src);
+    }
+    cached_data->user_data = dsc->user_data; /*Need to free data on cache invalidate instead of decoder_close*/
+
+    dsc->decoded = cached_data->decoded;
     dsc->cache_entry = cache_entry;
 
     return LV_RESULT_OK;
@@ -929,7 +945,7 @@ static lv_result_t try_cache(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
     return LV_RESULT_INVALID;
 }
 
-static bool bin_decoder_cache_create_cb(bin_decoder_cache_data_t * node, bin_decoder_cache_ctx_t * ctx)
+static bool bin_decoder_cache_create_cb(bin_decoder_cache_ctx_t * ctx)
 {
     lv_image_decoder_t * decoder = ctx->decoder;
     lv_image_decoder_dsc_t * dsc = ctx->dsc;
@@ -1062,14 +1078,6 @@ static bool bin_decoder_cache_create_cb(bin_decoder_cache_data_t * node, bin_dec
         free_decoder_data(dsc);
         return false;
     }
-
-    if(dsc->decoded == NULL) return true; /*Need to read via get_area_cb*/
-
-    node->decoded = dsc->decoded;
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        node->src = lv_strdup(dsc->src);
-    }
-    node->user_data = dsc->user_data; /*Need to free data on cache invalidate instead of decoder_close*/
 
     return true;
 }
