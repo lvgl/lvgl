@@ -259,7 +259,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                               &u->target_buffer, vg_lite_path, VG_LITE_FILL_EVEN_ODD,
+                               &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
                                &matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
 }
 
