@@ -47,8 +47,7 @@ def log(*args):
 
 BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 TEST_PATH = os.path.join(BASE_PATH, 'micropy.py')
-IMG_PATH = os.path.join(BASE_PATH, 'image_compare.png')
-
+IMG_PATH = os.path.join(BASE_PATH, '../ref_imgs/binding.png')
 
 CTRL_C = b'\x03'  # 2 times to exit any running code
 CTRL_D = b'\x04'  # exit paste mode committing and running what has been pasted
