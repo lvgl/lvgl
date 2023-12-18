@@ -67,6 +67,8 @@ jobs:
     - name: Build Unix port
       if: matrix.port == 'unix'
       run: make -j $(nproc) -C ports/unix DEBUG=1
+    - name: Install requirements for the test
+      run: python3 -m pip install pillow apng
     - name: Run tests
       if: success() && matrix.port == 'unix'
       run: |
