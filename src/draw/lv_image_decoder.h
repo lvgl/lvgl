@@ -112,9 +112,19 @@ typedef struct _lv_image_decoder_t {
     lv_image_decoder_open_f_t open_cb;
     lv_image_decoder_get_area_cb_t get_area_cb;
     lv_image_decoder_close_f_t close_cb;
-    lv_cache_t * cache;
+
+    lv_cache_free_cb_t cache_free_cb;
     void * user_data;
 } lv_image_decoder_t;
+
+typedef struct _lv_image_decoder_cache_data_t {
+    const void * src;
+    lv_image_src_t src_type;
+
+    const lv_draw_buf_t * decoded;
+    const lv_image_decoder_t * decoder;
+    void * user_data;
+} lv_image_decoder_cache_data_t;
 
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_image_decoder_dsc_t {
@@ -149,6 +159,8 @@ typedef struct _lv_image_decoder_dsc_t {
     /**A text to display instead of the image when the image can't be opened.
      * Can be set in `open` function or set NULL.*/
     const char * error_msg;
+
+    lv_cache_t * cache;
 
     /**Point to cache entry information*/
     lv_cache_entry_t * cache_entry;
@@ -268,6 +280,12 @@ void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_dec
  * @param close_cb a function to close a decoding session
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
+
+void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb);
+
+lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
+                                                 lv_image_decoder_cache_data_t * search_key,
+                                                 const lv_draw_buf_t * decoded, void * user_data);
 
 /**********************
  *      MACROS

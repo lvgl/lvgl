@@ -52,19 +52,6 @@ typedef struct {
     lv_draw_buf_t * decoded_partial; /*A draw buf for decoded image via get_area_cb*/
 } decoder_data_t;
 
-typedef struct {
-    const void * src;
-    lv_image_src_t src_type;
-
-    const lv_draw_buf_t * decoded;
-    void * user_data;
-} bin_decoder_cache_data_t;
-
-typedef struct {
-    lv_image_decoder_t * decoder;
-    lv_image_decoder_dsc_t * dsc;
-} bin_decoder_cache_ctx_t;
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -83,12 +70,8 @@ static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, 
 
 static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image_compressed_t * compressed);
 
-static lv_result_t try_cache(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
-
-static bool bin_decoder_cache_create_cb(bin_decoder_cache_ctx_t * ctx);
-static void bin_decoder_cache_free_cb(bin_decoder_cache_data_t * entry, void * user_data);
-static lv_cache_compare_res_t bin_decoder_cache_compare_cb(const bin_decoder_cache_data_t * lhs,
-                                                           const bin_decoder_cache_data_t * rhs);
+static bool bin_decoder_decode_data(lv_image_decoder_dsc_t * dsc);
+static void bin_decoder_cache_free_cb(lv_image_decoder_cache_data_t * entry, void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -122,12 +105,7 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_set_open_cb(decoder, lv_bin_decoder_open);
     lv_image_decoder_set_get_area_cb(decoder, lv_bin_decoder_get_area);
     lv_image_decoder_set_close_cb(decoder, lv_bin_decoder_close);
-    decoder->cache = lv_cache_create(&lv_cache_class_lru_rb,
-    sizeof(bin_decoder_cache_data_t), 128, (lv_cache_ops_t) {
-        .compare_cb = (lv_cache_compare_cb_t)bin_decoder_cache_compare_cb,
-        .create_cb = NULL,
-        .free_cb = (lv_cache_free_cb_t)bin_decoder_cache_free_cb
-    });
+    lv_image_decoder_set_cache_free_cb(decoder, (lv_cache_free_cb_t)bin_decoder_cache_free_cb);
 }
 
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
@@ -194,44 +172,20 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 {
     LV_UNUSED(args);
 
-    /*Check the cache first*/
-    if(try_cache(decoder, dsc) == LV_RESULT_OK) return LV_RESULT_OK;
+    bool create_res = bin_decoder_decode_data(dsc);
+    if(create_res == false) return LV_RESULT_INVALID;
+    if(dsc->decoded == NULL) return LV_RESULT_OK; /*Need to read via get_area_cb*/
 
     /*Add it to cache*/
-    bin_decoder_cache_data_t search_key;
+    lv_image_decoder_cache_data_t search_key;
     search_key.src_type = dsc->src_type;
     search_key.src = dsc->src;
 
-    bin_decoder_cache_ctx_t ctx = {
-        .decoder = decoder,
-        .dsc = dsc,
-    };
-
-    bool create_res = bin_decoder_cache_create_cb(&ctx);
-    if (create_res == false) {
-        return LV_RESULT_INVALID;
-    }
-    if(dsc->decoded == NULL)
-        return LV_RESULT_OK; /*Need to read via get_area_cb*/
-
-    /*@note: Must get from cache to increase reference count.*/
-    lv_cache_entry_t * cache_entry = lv_cache_add(decoder->cache, &search_key, &ctx);
+    lv_cache_entry_t * cache_entry = lv_image_decoder_add_to_cache(decoder, &search_key, dsc->decoded, dsc->user_data);
     if(cache_entry == NULL) {
         free_decoder_data(dsc);
         return LV_RESULT_INVALID;
     }
-
-    bin_decoder_cache_data_t * cached_data;
-    cached_data = lv_cache_entry_get_data(cache_entry);
-
-    /*Set the cache entry to decoder data*/
-    cached_data->decoded = dsc->decoded;
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        cached_data->src = lv_strdup(dsc->src);
-    }
-    cached_data->user_data = dsc->user_data; /*Need to free data on cache invalidate instead of decoder_close*/
-
-    dsc->decoded = cached_data->decoded;
     dsc->cache_entry = cache_entry;
 
     return LV_RESULT_OK;
@@ -925,33 +879,12 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
     return LV_RESULT_OK;
 }
 
-static lv_result_t try_cache(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static bool bin_decoder_decode_data(lv_image_decoder_dsc_t * dsc)
 {
-    lv_cache_t * cache = decoder->cache;
-
-    bin_decoder_cache_data_t search_key;
-    search_key.src_type = dsc->src_type;
-    search_key.src = dsc->src;
-
-    lv_cache_entry_t * entry = lv_cache_acquire(cache, &search_key, NULL);
-
-    if(entry) {
-        bin_decoder_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
-        dsc->decoded = cached_data->decoded;
-        dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/
-        return LV_RESULT_OK;
-    }
-
-    return LV_RESULT_INVALID;
-}
-
-static bool bin_decoder_cache_create_cb(bin_decoder_cache_ctx_t * ctx)
-{
-    lv_image_decoder_t * decoder = ctx->decoder;
-    lv_image_decoder_dsc_t * dsc = ctx->dsc;
+    lv_image_decoder_t * decoder = dsc->decoder;
 
     lv_fs_res_t res = LV_RESULT_INVALID;
-    uint32_t t = lv_tick_get();
+    // uint32_t t = lv_tick_get();
 
     /*Open the file if it's a file*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -1082,7 +1015,7 @@ static bool bin_decoder_cache_create_cb(bin_decoder_cache_ctx_t * ctx)
     return true;
 }
 
-static void bin_decoder_cache_free_cb(bin_decoder_cache_data_t * entry, void * user_data)
+static void bin_decoder_cache_free_cb(lv_image_decoder_cache_data_t * entry, void * user_data)
 {
     LV_UNUSED(user_data); /*Unused*/
 
@@ -1091,30 +1024,4 @@ static void bin_decoder_cache_free_cb(bin_decoder_cache_data_t * entry, void * u
     free_decoder_data(&fake);
 
     if(entry->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)entry->src);
-}
-
-static lv_cache_compare_res_t bin_decoder_cache_compare_cb(const bin_decoder_cache_data_t * lhs,
-                                                           const bin_decoder_cache_data_t * rhs)
-{
-    if(lhs->src_type == rhs->src_type) {
-        if(lhs->src_type == LV_IMAGE_SRC_FILE) {
-            int32_t cmp_res = lv_strcmp(lhs->src, rhs->src);
-            if(cmp_res != 0) {
-                return cmp_res > 0 ? 1 : -1;
-            }
-        }
-        else if(lhs->src_type == LV_IMAGE_SRC_VARIABLE) {
-            if(lhs->src != rhs->src) {
-                return lhs->src > rhs->src ? 1 : -1;
-            }
-        }
-        return 0;
-    }
-    else if(lhs->src_type == LV_IMAGE_SRC_FILE && rhs->src_type == LV_IMAGE_SRC_VARIABLE) {
-        return 1;
-    }
-    else if(lhs->src_type == LV_IMAGE_SRC_VARIABLE && rhs->src_type == LV_IMAGE_SRC_FILE) {
-        return -1;
-    }
-    return 0;
 }
