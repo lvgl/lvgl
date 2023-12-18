@@ -93,6 +93,7 @@ uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t * entry)
 }
 void lv_cache_entry_set_node_size(lv_cache_entry_t * entry, uint32_t node_size)
 {
+    LV_ASSERT_NULL(entry);
     entry->node_size = node_size;
 }
 void lv_cache_entry_set_invalid(lv_cache_entry_t * entry, bool is_invalid)
@@ -122,12 +123,12 @@ void * lv_cache_entry_acquire_data(lv_cache_entry_t * entry)
 void lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data)
 {
     LV_ASSERT_NULL(entry);
+    lv_mutex_lock(&entry->lock);
     if(lv_cache_entry_ref_get(entry) == 0) {
         LV_LOG_ERROR("ref_cnt(%" LV_PRIu32 ") == 0", entry->ref_cnt);
         return;
     }
 
-    lv_mutex_lock(&entry->lock);
     lv_cache_entry_ref_dec(entry);
 
     if(lv_cache_entry_ref_get(entry) == 0 && lv_cache_entry_is_invalid(entry)) {

@@ -36,7 +36,7 @@ static bool  init_cb(lv_cache_t * cache);
 static void  destroy_cb(lv_cache_t * cache, void * user_data);
 
 static lv_cache_entry_t * get_cb(lv_cache_t * cache, const void * key, void * user_data);
-static lv_cache_entry_t * create_entry_cb(lv_cache_t * cache, const void * key, void * user_data);
+static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * user_data);
 static void remove_cb(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data);
 static void drop_cb(lv_cache_t * cache, const void * key, void * user_data);
 static void drop_all_cb(lv_cache_t * cache, void * user_data);
@@ -52,7 +52,7 @@ const lv_cache_class_t lv_cache_class_lru_rb = {
     .destroy_cb = destroy_cb,
 
     .get_cb = get_cb,
-    .create_entry_cb = create_entry_cb,
+    .add_cb = add_cb,
     .remove_cb = remove_cb,
     .drop_cb = drop_cb,
     .drop_all_cb = drop_all_cb
@@ -124,15 +124,11 @@ static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
 
     lv_rb_node_t * node = lv_rb_insert(&lru->rb, key);
     if(node == NULL)
-        goto FAILED_HANDLER3;
+        goto FAILED_HANDLER2;
 
     void * data = node->data;
     lv_cache_entry_t * entry = lv_cache_entry_get_entry(data, lru->cache.node_size);
     lv_memcpy(data, key, lru->cache.node_size);
-
-    bool alloc_res = lru->cache.create_cb(data, user_data);
-    if(alloc_res == false)
-        goto FAILED_HANDLER2;
 
     void * lru_node = _lv_ll_ins_head(&lru->ll);
     if(lru_node == NULL)
@@ -142,14 +138,12 @@ static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
     lv_memcpy(get_lru_node(lru, node), &lru_node, sizeof(void *));
 
     lv_cache_entry_init(entry, &lru->cache, lru->cache.node_size);
-    goto FAILED_HANDLER3;
+    goto FAILED_HANDLER2;
 
 FAILED_HANDLER1:
-    lru->cache.free_cb(data, user_data);
-FAILED_HANDLER2:
     lv_rb_drop_node(&lru->rb, node);
     node = NULL;
-FAILED_HANDLER3:
+FAILED_HANDLER2:
     return node;
 }
 
@@ -250,7 +244,7 @@ static lv_cache_entry_t * get_cb(lv_cache_t * cache, const void * key, void * us
     return NULL;
 }
 
-static lv_cache_entry_t * create_entry_cb(lv_cache_t * cache, const void * key, void * user_data)
+static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * user_data)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 

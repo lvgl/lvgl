@@ -80,6 +80,16 @@ lv_cache_entry_t * lv_cache_get(lv_cache_t * cache, const void * key, void * use
     lv_mutex_unlock(&cache->lock);
     return entry;
 }
+lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * user_data)
+{
+    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NULL(key);
+
+    lv_mutex_lock(&cache->lock);
+    lv_cache_entry_t * entry = cache->clz->add_cb(cache, key, user_data);
+    lv_mutex_unlock(&cache->lock);
+    return entry;
+}
 lv_cache_entry_t * lv_cache_get_or_create(lv_cache_t * cache, const void * key, void * user_data)
 {
     LV_ASSERT_NULL(cache);
@@ -87,8 +97,22 @@ lv_cache_entry_t * lv_cache_get_or_create(lv_cache_t * cache, const void * key, 
 
     lv_mutex_lock(&cache->lock);
     lv_cache_entry_t * entry = cache->clz->get_cb(cache, key, user_data);
-    if(entry == NULL) {
-        entry = cache->clz->create_entry_cb(cache, key, user_data);
+    if(entry != NULL) {
+        lv_cache_entry_acquire_data(entry);
+        lv_mutex_unlock(&cache->lock);
+        return entry;
+    }
+    entry = cache->clz->add_cb(cache, key, user_data);
+    if (entry == NULL) {
+        lv_mutex_unlock(&cache->lock);
+        return NULL;
+    }
+    bool create_res = cache->create_cb(lv_cache_entry_get_data(entry), user_data);
+    if (create_res == false) {
+        lv_cache_remove(cache, entry, user_data);
+        entry = NULL;
+    } else {
+        lv_cache_entry_acquire_data(entry);
     }
     lv_mutex_unlock(&cache->lock);
     return entry;
@@ -106,11 +130,12 @@ void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data)
     }
 
     if(lv_cache_entry_ref_get(entry) == 0) {
-        cache->clz->drop_cb(cache, key, user_data);
+        cache->clz->remove_cb(cache, entry, user_data);
+        lv_cache_entry_delete(entry);
     }
     else {
         lv_cache_entry_set_invalid(entry, true);
-        lv_cache_remove(cache, entry, user_data);
+        cache->clz->remove_cb(cache, entry, user_data);
     }
     lv_mutex_unlock(&cache->lock);
 }
