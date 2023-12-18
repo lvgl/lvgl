@@ -68,7 +68,9 @@ jobs:
       if: matrix.port == 'unix'
       run: make -j $(nproc) -C ports/unix DEBUG=1
     - name: Install requirements for the test
-      run: python3 -m pip install pillow apng
+      run: |
+        python3 -m pip install pillow apng
+        mkdir lib/lv_bindings/lvgl/tests/micropy_test/artifacts
     - name: Run tests
       if: success() && matrix.port == 'unix'
       run: |
