@@ -106,6 +106,7 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
     dsc->header.w = w;
     dsc->header.h = h;
     dsc->header.cf = cf;
+    dsc->header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
 
     lv_layer_t layer;
     lv_memzero(&layer, sizeof(layer));
@@ -140,29 +141,22 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
 lv_image_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
 {
     LV_ASSERT_NULL(obj);
-    uint32_t buf_size = lv_snapshot_buf_size_needed(obj, cf);
-    if(buf_size == 0) return NULL;
+    int32_t w = lv_obj_get_width(obj);
+    int32_t h = lv_obj_get_height(obj);
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    w += ext_size * 2;
+    h += ext_size * 2;
+    if(w == 0 || h == 0) return NULL;
 
-    void * buf = lv_draw_buf_malloc(buf_size, cf);
-    LV_ASSERT_MALLOC(buf);
-    if(buf == NULL) {
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(w, h, cf, 0);
+    if(draw_buf == NULL) return NULL;
+
+    if(lv_snapshot_take_to_buf(obj, cf, (lv_image_dsc_t *)draw_buf, draw_buf->data, draw_buf->data_size) != LV_RESULT_OK) {
+        lv_draw_buf_destroy(draw_buf);
         return NULL;
     }
 
-    lv_image_dsc_t * dsc = lv_malloc(sizeof(lv_image_dsc_t));
-    LV_ASSERT_MALLOC(buf);
-    if(dsc == NULL) {
-        lv_draw_buf_free(buf);
-        return NULL;
-    }
-
-    if(lv_snapshot_take_to_buf(obj, cf, dsc, buf, buf_size) != LV_RESULT_OK) {
-        lv_draw_buf_free(buf);
-        lv_free(dsc);
-        return NULL;
-    }
-
-    return dsc;
+    return (lv_image_dsc_t *)draw_buf;
 }
 
 void lv_snapshot_free(lv_image_dsc_t * dsc)
@@ -170,10 +164,7 @@ void lv_snapshot_free(lv_image_dsc_t * dsc)
     if(!dsc)
         return;
 
-    if(dsc->data)
-        lv_draw_buf_free((void *)dsc->data);
-
-    lv_free(dsc);
+    lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
 }
 
 /**********************
