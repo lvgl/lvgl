@@ -76,7 +76,7 @@ static vg_lite_color_t lv_color32_to_vg(lv_color32_t color, lv_opa_t opa)
 static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc)
 {
     lv_draw_vg_lite_unit_t * u = ctx;
-    LV_VG_LITE_ASSERT_BUFFER(&u->target_buffer);
+    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
     /* clear area */
     if(!path) {

@@ -94,7 +94,7 @@ void lv_draw_vg_lite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc
 
     vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
 
-    LV_VG_LITE_ASSERT_BUFFER(&u->target_buffer);
+    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(

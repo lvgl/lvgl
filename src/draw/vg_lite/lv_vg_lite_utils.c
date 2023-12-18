@@ -763,7 +763,7 @@ vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode)
     }
 }
 
-bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer)
+bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
 {
     uint32_t mul;
     uint32_t div;
@@ -803,6 +803,11 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer)
     if((uint32_t)(uintptr_t)buffer->memory != buffer->address) {
         LV_LOG_ERROR("buffer memory(%p) != address(%p)",
                      buffer->memory, (void *)(uintptr_t)buffer->address);
+        return false;
+    }
+
+    if(is_src && buffer->width != lv_vg_lite_width_align(buffer->width)) {
+        LV_LOG_ERROR("buffer width(%d) is not aligned", (int)buffer->width);
         return false;
     }
 

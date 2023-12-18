@@ -151,8 +151,8 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
     vg_lite_color_t color;
     color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
-    LV_VG_LITE_ASSERT_BUFFER(&src_buf);
-    LV_VG_LITE_ASSERT_BUFFER(&u->target_buffer);
+    LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
+    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
     /* If clipping is not required, blit directly */
     if(_lv_area_is_in(&image_area, u->base_unit.clip_area, false)) {
@@ -256,10 +256,10 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
 
     vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(outline);
 
-    LV_VG_LITE_ASSERT_BUFFER(&u->target_buffer);
+    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                               &u->target_buffer, vg_lite_path, VG_LITE_FILL_EVEN_ODD,
+                               &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
                                &matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
 }
 
