@@ -529,13 +529,12 @@ static void table_draw_task_event_cb(lv_event_t * e)
 
 }
 
-lv_obj_t * table;
 
 static void summary_create(void)
 {
     lv_obj_clean(lv_screen_active());
     lv_obj_set_style_pad_hor(lv_screen_active(), 0, 0);
-    table = lv_table_create(lv_screen_active());
+    lv_obj_t * table = lv_table_create(lv_screen_active());
     lv_obj_set_width(table, lv_pct(100));
     lv_obj_set_style_max_height(table, lv_pct(100), 0);
     lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
