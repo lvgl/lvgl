@@ -77,7 +77,7 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
 
     vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
 
-    LV_VG_LITE_ASSERT_BUFFER(&u->target_buffer);
+    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
     if(dsc->grad.dir != LV_GRAD_DIR_NONE) {

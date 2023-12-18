@@ -114,7 +114,7 @@ static void buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t colo
 
         vg_lite_buffer_t dest_buf;
         LV_ASSERT(lv_vg_lite_buffer_init(&dest_buf, buf, w, h, lv_vg_lite_vg_fmt(color_format), false));
-        LV_VG_LITE_ASSERT_BUFFER(&dest_buf);
+        LV_VG_LITE_ASSERT_DEST_BUFFER(&dest_buf);
 
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, a);
@@ -149,11 +149,11 @@ static void buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv
        && LV_VG_LITE_IS_ALIGNED(src_buf, LV_VG_LITE_BUF_ALIGN)) {
         vg_lite_buffer_t dest;
         LV_ASSERT(lv_vg_lite_buffer_init(&dest, dest_buf, dest_w, dest_h, lv_vg_lite_vg_fmt(color_format), false));
-        LV_VG_LITE_ASSERT_BUFFER(&dest);
+        LV_VG_LITE_ASSERT_DEST_BUFFER(&dest);
 
         vg_lite_buffer_t src;
         LV_ASSERT(lv_vg_lite_buffer_init(&src, src_buf, src_w, src_h, lv_vg_lite_vg_fmt(color_format), false));
-        LV_VG_LITE_ASSERT_BUFFER(&src);
+        LV_VG_LITE_ASSERT_SRC_BUFFER(&src);
 
         vg_lite_rectangle_t src_rect;
         lv_vg_lite_rect(&src_rect, src_area_to_copy);

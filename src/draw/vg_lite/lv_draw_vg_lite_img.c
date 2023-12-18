@@ -92,8 +92,8 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
     lv_vg_lite_image_matrix(&matrix, coords->x1, coords->y1, dsc);
 
-    LV_VG_LITE_ASSERT_BUFFER(&src_buf);
-    LV_VG_LITE_ASSERT_BUFFER(&u->target_buffer);
+    LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
+    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
     /* If clipping is not required, blit directly */
     if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && !has_recolor) {
