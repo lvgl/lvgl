@@ -251,6 +251,7 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
 #endif
             lv_cache_drop_all(tiny_ttf_cache, (void *)font->dsc);
             lv_free(ttf);
+            font->dsc = NULL;
         }
     }
 }
