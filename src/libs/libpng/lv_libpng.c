@@ -162,6 +162,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
+        dsc->decoded = decoded;
         dsc->cache_entry = entry;
 
         return LV_RESULT_OK;     /*The image is fully decoded. Return with its pointer*/
