@@ -82,7 +82,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
         lv_image_cache_drop(src);
     }
 
-    lv_image_set_src(obj, &canvas->draw_buf);
+    lv_image_set_src(obj, canvas->draw_buf);
 }
 
 void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
