@@ -343,13 +343,13 @@ class MicroPython_Test(unittest.TestCase):
                 byte_data = list(img.getdata())
                 writer = BytesIO()
                 img.save(writer, 'PNG')
-                img.close()
 
                 writer.seek(0)
                 png = apng.PNG.from_bytes(writer.read())
                 artifact.append(png)
 
                 img.save(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.png'), 'PNG')
+                img.close()
 
                 with open(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.bin'), 'wb') as f:
                     # have to flatten the data and remove the alpha
