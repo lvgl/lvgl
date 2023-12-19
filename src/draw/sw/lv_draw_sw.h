@@ -162,7 +162,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                           int32_t src_w, int32_t src_h, int32_t src_stride,
                           const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t cf, void * dest_buf);
 
-#if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
+#if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 /**
  * Draw vector graphics with SW render.
  * @param draw_unit     pointer to a draw unit
