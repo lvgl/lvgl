@@ -37,10 +37,14 @@ from PIL import Image as Image
 
 DEBUG = 0
 
+debug_log = None
+
 
 def log(*args):
+    args = ' '.join(repr(arg) for arg in args)
+    debug_log.write(args + '\n')
+
     if DEBUG:
-        args = ' '.join(repr(arg) for arg in args)
         sys.stdout.write('\033[31;1m' + args + '\033[0m\n')
         sys.stdout.flush()
 
@@ -108,8 +112,8 @@ class MicroPython_Test(unittest.TestCase):
                 logged = True
                 log('--->', micropy_data)
 
-            if micropy_data.endswith(b'ERROR END') and b'===' not in micropy_data:
-                error_data = micropy_data
+            if micropy_data.endswith(b'\nERROR END\n'):
+                error_data = micropy_data.split(b'\nERROR START\n')[-1].split(b'\nERROR END\n')[0]
                 micropy_data = b''
                 log('---> ERROR: ', error_data)
                 logged = True
@@ -418,4 +422,10 @@ if __name__ == '__main__':
     if not os.path.exists(MICROPYTHON_PATH):
         raise RuntimeError(f'MicroPython binary not found ({MICROPYTHON_PATH})')
 
+    debug_log_path = os.path.join(ARTIFACT_PATH, 'debug.log')
+    debug_log = open(debug_log_path, 'w')
+
     unittest.main(argv=[sys.argv[0], '-v'])
+
+    debug_log.close()
+    print(f'View the debug output in "{debug_log_path}"')

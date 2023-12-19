@@ -66,7 +66,7 @@ jobs:
     # Unix port
     - name: Build Unix port
       if: matrix.port == 'unix'
-      run: make -j $(nproc) -C ports/unix DEBUG=1 MICROPY_LV_USE_LOG=0
+      run: make -j $(nproc) -C ports/unix DEBUG=1 LV_CFLAGS="-DMICROPY_LV_USE_LOG=0"
     - name: Install requirements for the test
       run: |
         python3 -m pip install pillow apng
@@ -77,3 +77,9 @@ jobs:
         export XDG_RUNTIME_DIR=/tmp
         python3 lib/lv_bindings/lvgl/tests/micropy_test/__init__.py --artifact-path=lib/lv_bindings/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-standard/micropython --debug
 
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      if: matrix.port == 'unix'
+      with:
+        name: test-artifacts
+        path: lib/lv_bindings/lvgl/tests/micropy_test/artifacts
