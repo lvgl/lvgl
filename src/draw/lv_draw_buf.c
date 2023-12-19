@@ -27,6 +27,7 @@ static void * buf_malloc(size_t size, lv_color_format_t color_format);
 static void buf_free(void * buf);
 static void * buf_align(void * buf, lv_color_format_t color_format);
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format);
+static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride);
 
 /**********************
  *  STATIC VARIABLES
@@ -136,25 +137,12 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const l
 
 lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
 {
-    uint32_t size;
     lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     LV_ASSERT_MALLOC(draw_buf);
     if(draw_buf == NULL) return NULL;
     if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
 
-    size = stride * h;
-    if(cf == LV_COLOR_FORMAT_RGB565A8) {
-        size += (stride / 2) * h; /*A8 mask*/
-    }
-    else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-        /*@todo we have to include palette right before image data*/
-        size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
-    }
-
-    /*RLE decompression operates on pixel unit, thus add padding to make sure memory is enough*/
-    uint8_t bpp = lv_color_format_get_bpp(cf);
-    bpp = (bpp + 7) >> 3;
-    size += bpp;
+    uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
 
     void * buf = lv_draw_buf_malloc(size, cf);
     LV_ASSERT_MALLOC(buf);
@@ -189,6 +177,28 @@ lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf)
     /*Copy image data*/
     lv_memcpy(new_buf->data, draw_buf->data, size);
     return new_buf;
+}
+
+lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t cf, uint32_t w, uint32_t h,
+                                    uint32_t stride)
+{
+    if(draw_buf == NULL) return NULL;
+
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+    uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+
+    if(size > draw_buf->data_size) {
+        LV_LOG_INFO("Draw buf too small for new shape");
+        return NULL;
+    }
+
+    draw_buf->header.cf = cf;
+    draw_buf->header.w = w;
+    draw_buf->header.h = h;
+    draw_buf->header.stride = stride;
+
+    return draw_buf;
 }
 
 void lv_draw_buf_destroy(lv_draw_buf_t * buf)
@@ -350,4 +360,30 @@ static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format)
     width_byte = w * lv_color_format_get_bpp(color_format);
     width_byte = (width_byte + 7) >> 3; /*Round up*/
     return (width_byte + LV_DRAW_BUF_STRIDE_ALIGN - 1) & ~(LV_DRAW_BUF_STRIDE_ALIGN - 1);
+}
+
+/**
+ * For given width, height, color format, and stride, calculate the size needed for a new draw buffer.
+ */
+static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
+{
+    uint32_t size;
+
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+    size = stride * h;
+    if(cf == LV_COLOR_FORMAT_RGB565A8) {
+        size += (stride / 2) * h; /*A8 mask*/
+    }
+    else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+        /*@todo we have to include palette right before image data*/
+        size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
+    }
+
+    /*RLE decompression operates on pixel unit, thus add padding to make sure memory is enough*/
+    uint8_t bpp = lv_color_format_get_bpp(cf);
+    bpp = (bpp + 7) >> 3;
+    size += bpp;
+
+    return size;
 }
