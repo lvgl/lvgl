@@ -203,7 +203,7 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
     if(dsc->cache_entry) {
         /*Decoded data is in cache, release it from cache's callback*/
-        lv_cache_release(dsc->cache_entry, NULL);
+        lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
     }
     else {
         /*Data not in cache, free the memory manually*/

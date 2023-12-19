@@ -32,7 +32,6 @@ extern "C" {
  **********************/
 uint32_t lv_cache_entry_get_size(const uint32_t node_size);
 int32_t  lv_cache_entry_get_ref(lv_cache_entry_t * entry);
-uint32_t lv_cache_entry_get_generation(lv_cache_entry_t * entry);
 uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t * entry);
 bool     lv_cache_entry_is_invalid(lv_cache_entry_t * entry);
 void  *  lv_cache_entry_get_data(lv_cache_entry_t * entry);

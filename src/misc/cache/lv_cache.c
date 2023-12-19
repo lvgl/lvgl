@@ -67,7 +67,7 @@ void lv_cache_destroy(lv_cache_t * cache, void * user_data)
     cache->clz->destroy_cb(cache, user_data);
     lv_mutex_unlock(&cache->lock);
     lv_mutex_delete(&cache->lock);
-    free(cache);
+    lv_free(cache);
 }
 
 lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void * user_data)
@@ -83,11 +83,17 @@ lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void *
     lv_mutex_unlock(&cache->lock);
     return entry;
 }
-void lv_cache_release(lv_cache_entry_t * entry, void * user_data)
+void lv_cache_release(lv_cache_t* cache, lv_cache_entry_t* entry, void* user_data)
 {
     LV_ASSERT_NULL(entry);
 
+    lv_mutex_lock(&cache->lock);
     lv_cache_entry_release_data(entry, user_data);
+
+    if(lv_cache_entry_get_ref(entry) == 0 && lv_cache_entry_is_invalid(entry)) {
+        lv_cache_drop(cache, lv_cache_entry_get_data(entry), user_data);
+    }
+    lv_mutex_unlock(&cache->lock);
 }
 lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * user_data)
 {

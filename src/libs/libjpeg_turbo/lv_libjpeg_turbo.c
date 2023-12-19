@@ -186,7 +186,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    lv_cache_release(dsc->cache_entry, NULL);
+    lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
 }
 
 static uint8_t * alloc_file(const char * filename, uint32_t * size)

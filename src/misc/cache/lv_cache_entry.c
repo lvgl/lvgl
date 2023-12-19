@@ -22,11 +22,9 @@
 struct _lv_cache_entry_t {
     const lv_cache_t * cache;
     int32_t ref_cnt;
-    uint32_t generation;
     uint32_t node_size;
 
     bool is_invalid;
-    lv_mutex_t lock;
 };
 /**********************
  *  STATIC PROTOTYPES
@@ -72,21 +70,6 @@ int32_t lv_cache_entry_get_ref(lv_cache_entry_t * entry)
     LV_ASSERT_NULL(entry);
     return entry->ref_cnt;
 }
-uint32_t lv_cache_entry_get_generation(lv_cache_entry_t * entry)
-{
-    LV_ASSERT_NULL(entry);
-    return entry->generation;
-}
-void lv_cache_entry_inc_generation(lv_cache_entry_t * entry)
-{
-    LV_ASSERT_NULL(entry);
-    entry->generation++;
-}
-void lv_cache_entry_set_generation(lv_cache_entry_t * entry, uint32_t generation)
-{
-    LV_ASSERT_NULL(entry);
-    entry->generation = generation;
-}
 uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t * entry)
 {
     return entry->node_size;
@@ -115,27 +98,18 @@ void * lv_cache_entry_acquire_data(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
 
-    lv_mutex_lock(&entry->lock);
     lv_cache_entry_inc_ref(entry);
-    lv_mutex_unlock(&entry->lock);
     return lv_cache_entry_get_data(entry);
 }
 void lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data)
 {
     LV_ASSERT_NULL(entry);
-    lv_mutex_lock(&entry->lock);
     if(lv_cache_entry_get_ref(entry) == 0) {
         LV_LOG_ERROR("ref_cnt(%" LV_PRIu32 ") == 0", entry->ref_cnt);
         return;
     }
 
     lv_cache_entry_dec_ref(entry);
-
-    if(lv_cache_entry_get_ref(entry) == 0 && lv_cache_entry_is_invalid(entry)) {
-        lv_cache_t * cache = (lv_cache_t *)lv_cache_entry_get_cache(entry);
-        lv_cache_drop(cache, lv_cache_entry_get_data(entry), user_data);
-    }
-    lv_mutex_unlock(&entry->lock);
 }
 lv_cache_entry_t * lv_cache_entry_get_entry(void * data, const uint32_t node_size)
 {
@@ -177,15 +151,12 @@ void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, con
     entry->cache = cache;
     entry->node_size = node_size;
     entry->ref_cnt = 0;
-    entry->generation = 0;
     entry->is_invalid = false;
-    lv_mutex_init(&entry->lock);
 }
 void lv_cache_entry_delete(lv_cache_entry_t * entry)
 {
     LV_ASSERT_NULL(entry);
 
-    lv_mutex_delete(&entry->lock);
     void * data = lv_cache_entry_get_data(entry);
     lv_free(data);
 }
