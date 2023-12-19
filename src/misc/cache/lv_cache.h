@@ -21,6 +21,7 @@ extern "C" {
 
 #include "_lv_cache_lru_rb.h"
 
+#include "lv_image_cache.h"
 /*********************
  *      DEFINES
  *********************/
