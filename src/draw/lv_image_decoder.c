@@ -64,8 +64,8 @@ void _lv_image_decoder_init(void)
  */
 void _lv_image_decoder_deinit(void)
 {
-    _lv_ll_clear(img_decoder_ll_p);
     lv_cache_destroy(img_cache_p, NULL);
+    _lv_ll_clear(img_decoder_ll_p);
 }
 
 lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
