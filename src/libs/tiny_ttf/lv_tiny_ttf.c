@@ -255,7 +255,7 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
     }
 }
 
-void lv_tiny_ttf_init()
+void lv_tiny_ttf_init(void)
 {
     lv_cache_ops_t ops = {
         .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_cache_compare_cb,
@@ -266,7 +266,7 @@ void lv_tiny_ttf_init()
     tiny_ttf_cache = lv_cache_create(&lv_cache_class_lru_rb, sizeof(tiny_ttf_cache_data_t), 128, ops);
 }
 
-void lv_tiny_ttf_deinit()
+void lv_tiny_ttf_deinit(void)
 {
     lv_cache_destroy(tiny_ttf_cache, NULL);
 }
