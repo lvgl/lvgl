@@ -45,6 +45,10 @@ void lv_draw_pxp_init(void);
 
 void lv_draw_pxp_deinit(void);
 
+void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width, int32_t src_height,
+                        int32_t src_stride, int32_t dest_stride, lv_display_rotation_t rotation,
+                        lv_color_format_t cf);
+
 void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                       const lv_area_t * coords);
 

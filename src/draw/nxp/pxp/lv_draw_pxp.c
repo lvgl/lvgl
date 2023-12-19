@@ -17,6 +17,7 @@
 
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
+#include "lv_pxp_utils.h"
 
 #include "../../../display/lv_display_private.h"
 #if LV_USE_PARALLEL_DRAW_DEBUG
@@ -99,6 +100,61 @@ void lv_draw_pxp_init(void)
 void lv_draw_pxp_deinit(void)
 {
     lv_pxp_deinit();
+}
+
+void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width, int32_t src_height,
+                        int32_t src_stride, int32_t dest_stride, lv_display_rotation_t rotation,
+                        lv_color_format_t cf)
+{
+    lv_pxp_reset();
+
+    /* convert rotation angle */
+    pxp_rotate_degree_t pxp_rotation;
+    switch(rotation) {
+        case LV_DISPLAY_ROTATION_0:
+            pxp_rotation = kPXP_Rotate0;
+            break;
+        case LV_DISPLAY_ROTATION_90:
+            pxp_rotation = kPXP_Rotate90;
+            break;
+        case LV_DISPLAY_ROTATION_180:
+            pxp_rotation = kPXP_Rotate180;
+            break;
+        case LV_DISPLAY_ROTATION_270:
+            pxp_rotation = kPXP_Rotate270;
+            break;
+        default:
+            pxp_rotation = kPXP_Rotate0;
+            break;
+    }
+    PXP_SetRotateConfig(PXP_ID, kPXP_RotateOutputBuffer, pxp_rotation, kPXP_FlipDisable);
+
+    /*Simple blit, no effect - Disable PS buffer*/
+    PXP_SetProcessSurfacePosition(PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
+
+    /*AS buffer - source image*/
+    pxp_as_buffer_config_t asBufferConfig = {
+        .pixelFormat = pxp_get_as_px_format(cf),
+        .bufferAddr = (uint32_t)src_buf,
+        .pitchBytes = src_stride
+    };
+    PXP_SetAlphaSurfaceBufferConfig(PXP_ID, &asBufferConfig);
+    PXP_SetAlphaSurfacePosition(PXP_ID, 0U, 0U, src_width - 1U, src_height - 1U);
+    PXP_EnableAlphaSurfaceOverlayColorKey(PXP_ID, false);
+
+    /*Output buffer.*/
+    pxp_output_buffer_config_t outputBufferConfig = {
+        .pixelFormat = pxp_get_out_px_format(cf),
+        .interlacedMode = kPXP_OutputProgressive,
+        .buffer0Addr = (uint32_t)dest_buf,
+        .buffer1Addr = (uint32_t)0U,
+        .pitchBytes = dest_stride,
+        .width = src_width,
+        .height = src_height
+    };
+    PXP_SetOutputBufferConfig(PXP_ID, &outputBufferConfig);
+
+    lv_pxp_run();
 }
 
 /**********************
