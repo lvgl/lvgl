@@ -199,7 +199,7 @@ static int lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_fb_ctx_t * f
     LV_ASSERT_NULL(disp);
     LV_ASSERT_NULL(loop);
 
-    fb_ctx->fd = (uintptr_t)lv_display_get_user_data(disp);
+    fb_ctx->fd = *(int *)lv_display_get_driver_data(disp);
 
     if(fb_ctx->fd <= 0) {
         LV_LOG_USER("skip uv fb init.");
@@ -271,7 +271,7 @@ static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_input_ctx
         return -EINVAL;
     }
 
-    input_ctx->fd = (uintptr_t)lv_indev_get_user_data(indev);
+    input_ctx->fd = *(int *)lv_indev_get_driver_data(indev);
     if(input_ctx->fd <= 0) {
         return 0;
     }

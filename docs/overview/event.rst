@@ -12,15 +12,17 @@ interesting to the user, e.g. when an object:
 - has its value changed
 - is redrawn, etc.
 
-Add events to the object
-************************
+Besides widgets, events can registered from displays and input devices too.
+
+Add events to a widget
+**********************
 
 The user can assign callback functions to an object to see its events.
 In practice, it looks like this:
 
 .. code:: c
 
-   lv_obj_t * btn = lv_btn_create(lv_screen_active());
+   lv_obj_t * btn = lv_button_create(lv_screen_active());
    lv_obj_add_event_cb(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
 
    ...
@@ -58,11 +60,29 @@ The events will be called in the order as they were added.
 
 Other objects can use the same *event callback*.
 
-Remove event(s) from an object
-******************************
+In the very same way events can attached to the input devices and displays like this
 
-Events can be removed from an object with the
-:cpp:expr:`lv_obj_remove_event(obj, event_cb)` function
+.. code:: c
+
+   lv_display_add_event_cb(disp, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
+   lv_indev_add_event_cb(indev, event_cb, LV_EVENT_CLICKED, NULL);
+
+
+Remove event(s) from widgets
+****************************
+
+.. code:: c
+
+   uint32_t i;
+   uint32_t event_cnt = lv_obj_get_event_count(obj);
+   for(i = 0; i < event_cnt; i++) {
+       lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, i);
+       if(lv_event_dsc_get_cb(event_dsc) == some_event_cb) {
+           lv_obj_remove_event(obj, i);
+           break;
+       }
+   }
+
 
 Event codes
 ***********
@@ -81,70 +101,83 @@ are sent,
 
 The following event codes exist:
 
+
 Input device events
 -------------------
 
--  :cpp:enumerator:`LV_EVENT_PRESSED`: An object has been pressed
--  :cpp:enumerator:`LV_EVENT_PRESSING`: An object is being pressed (called continuously while pressing)
--  :cpp:enumerator:`LV_EVENT_PRESS_LOST`: An object is still being pressed but slid cursor/finger off of the object
--  :cpp:enumerator:`LV_EVENT_SHORT_CLICKED`: An object was pressed for a short period of time, then released. Not called if scrolled.
--  :cpp:enumerator:`LV_EVENT_LONG_PRESSED`: An object has been pressed for at least the ``long_press_time`` specified in the input device driver. Not called if scrolled.
--  :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT`: Called after ``long_press_time`` in every ``long_press_repeat_time`` ms. Not called if scrolled.
--  :cpp:enumerator:`LV_EVENT_CLICKED`: Called on release if an object did not scroll (regardless of long press)
--  :cpp:enumerator:`LV_EVENT_RELEASED`: Called in every case when an object has been released
--  :cpp:enumerator:`LV_EVENT_SCROLL_BEGIN`: Scrolling begins. The event parameter is ``NULL`` or an :cpp:type:`lv_anim_t` ``*`` with a scroll animation descriptor that can be modified if required.
--  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN`: Sent once when the object is released while scrolling but the "momentum" still keeps the content scrolling.
--  :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends.
--  :cpp:enumerator:`LV_EVENT_SCROLL`: An object was scrolled
--  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_active())`
--  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to an object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_active())`
--  :cpp:enumerator:`LV_EVENT_FOCUSED`: An object is focused
--  :cpp:enumerator:`LV_EVENT_DEFOCUSED`: An object is unfocused
--  :cpp:enumerator:`LV_EVENT_LEAVE`: An object is unfocused but still selected
--  :cpp:enumerator:`LV_EVENT_HIT_TEST`: Perform advanced hit-testing. Use :cpp:struct:`lv_hit_test_info_t` ``* a =`` :cpp:expr:`lv_event_get_hit_test_info(e)` and check if ``a->point`` can click the object or not. If not set ``a->res = false``
+-  :cpp:enumerator:`LV_EVENT_PRESSED`: The object has been pressed
+-  :cpp:enumerator:`LV_EVENT_PRESSING`: The object is being pressed (called continuously while pressing)
+-  :cpp:enumerator:`LV_EVENT_PRESS_LOST`: The object is still being pressed but slid cursor/finger off of the object
+-  :cpp:enumerator:`LV_EVENT_SHORT_CLICKED`: The object was pressed for a short period of time, then released it. Not called if scrolled.
+-  :cpp:enumerator:`LV_EVENT_LONG_PRESSED`: Object has been pressed for at least `long_press_time`.  Not called if scrolled.
+-  :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT`: Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.
+-  :cpp:enumerator:`LV_EVENT_CLICKED`: Called on release if not scrolled (regardless to long press)
+-  :cpp:enumerator:`LV_EVENT_RELEASED`: Called in every cases when the object has been released
+-  :cpp:enumerator:`LV_EVENT_SCROLL_BEGIN`: Scrolling begins. The event parameter is a pointer to the animation of the scroll. Can be modified
+-  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN,
+-  :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends
+-  :cpp:enumerator:`LV_EVENT_SCROLL`: Scrolling
+-  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to the object. Get the key with `lv_indev_get_key(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_FOCUSED`: The object is focused
+-  :cpp:enumerator:`LV_EVENT_DEFOCUSED`: The object is defocused
+-  :cpp:enumerator:`LV_EVENT_LEAVE`: The object is defocused but still selected
+-  :cpp:enumerator:`LV_EVENT_HIT_TEST`: Perform advanced hit-testing
+-  :cpp:enumerator:`LV_EVENT_INDEV_RESET`: Indev has been reset
 
 Drawing events
 --------------
 
--  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if an object fully covers an area. The event parameter is :cpp:struct:`lv_cover_check_info_t` ``*``.
--  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around an object (e.g. for a shadow). The event parameter is :cpp:type:`int32_t` ``*`` to store the size. Only overwrite it with a larger value.
--  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`: Starting the main drawing phase.
+-  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if the object fully covers an area. The event parameter is `lv_cover_check_info_t *`.
+-  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around the object (e.g. for shadow). The event parameter is `int32_t *` to store the size.
+-  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`: Starting the main drawing phase
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN`: Perform the main drawing
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_END`: Finishing the main drawing phase
 -  :cpp:enumerator:`LV_EVENT_DRAW_POST_BEGIN`: Starting the post draw phase (when all children are drawn)
 -  :cpp:enumerator:`LV_EVENT_DRAW_POST`: Perform the post draw phase (when all children are drawn)
 -  :cpp:enumerator:`LV_EVENT_DRAW_POST_END`: Finishing the post draw phase (when all children are drawn)
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN`: Starting to draw a part. The event parameter is :cpp:struct:`lv_obj_draw_dsc_t` ``*``. Learn more :ref:`drawing`.
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_END`: Finishing to draw a part. The event parameter is :cpp:struct:`lv_obj_draw_dsc_t` ``*``. Learn more :ref:`drawing`.
-
-In ``LV_EVENT_DRAW_...`` events it's not allowed to adjust the widgets'
-properties. E.g. you can not call :cpp:func:`lv_obj_set_width`. In other words
-only ``get`` functions can be called.
-
-Other events
-------------
-
--  :cpp:enumerator:`LV_EVENT_DELETE`: Object is being deleted
--  :cpp:enumerator:`LV_EVENT_CHILD_CHANGED`: Child was removed/added
--  :cpp:enumerator:`LV_EVENT_CHILD_CREATED`: Child was created, always bubbles up to all parents
--  :cpp:enumerator:`LV_EVENT_CHILD_DELETED`: Child was deleted, always bubbles up to all parents
--  :cpp:enumerator:`LV_EVENT_SIZE_CHANGED`: Object coordinates/size have changed
--  :cpp:enumerator:`LV_EVENT_STYLE_CHANGED`: Object's style has changed
--  :cpp:enumerator:`LV_EVENT_BASE_DIR_CHANGED`: The base dir has changed
--  :cpp:enumerator:`LV_EVENT_GET_SELF_SIZE`: Get the internal size of a widget
--  :cpp:enumerator:`LV_EVENT_SCREEN_UNLOAD_START`: A screen unload started, fired immediately when lv_screen_load/lv_screen_load_anim is called
--  :cpp:enumerator:`LV_EVENT_SCREEN_LOAD_START`: A screen load started, fired when the screen change delay is expired
--  :cpp:enumerator:`LV_EVENT_SCREEN_LOADED`: A screen was loaded, called when all animations are finished
--  :cpp:enumerator:`LV_EVENT_SCREEN_UNLOADED`: A screen was unloaded, called when all animations are finished
+-  :cpp:enumerator:`LV_EVENT_DRAW_TASK_ADDED`: Adding a draw task
 
 Special events
 --------------
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED`: The object's value has changed (i.e. slider moved)
--  :cpp:enumerator:`LV_EVENT_INSERT`: Text is being inserted into the object. The event data is ``char *`` being inserted.
+-  :cpp:enumerator:`LV_EVENT_INSERT`: A text is inserted to the object. The event data is `char *` being inserted.
 -  :cpp:enumerator:`LV_EVENT_REFRESH`: Notify the object to refresh something on it (for the user)
 -  :cpp:enumerator:`LV_EVENT_READY`: A process has finished
--  :cpp:enumerator:`LV_EVENT_CANCEL`: A process has been canceled
+-  :cpp:enumerator:`LV_EVENT_CANCEL`: A process has been cancelled
+
+Other events
+------------
+
+-  :cpp:enumerator:`LV_EVENT_CREATE`: Object is being created
+-  :cpp:enumerator:`LV_EVENT_DELETE`: Object is being deleted
+-  :cpp:enumerator:`LV_EVENT_CHILD_CHANGED`: Child was removed, added, or its size, position were changed
+-  :cpp:enumerator:`LV_EVENT_CHILD_CREATED`: Child was created, always bubbles up to all parents
+-  :cpp:enumerator:`LV_EVENT_CHILD_DELETED`: Child was deleted, always bubbles up to all parents
+-  :cpp:enumerator:`LV_EVENT_SCREEN_UNLOAD_START`: A screen unload started, fired immediately when scr_load is called
+-  :cpp:enumerator:`LV_EVENT_SCREEN_LOAD_START`: A screen load started, fired when the screen change delay is expired
+-  :cpp:enumerator:`LV_EVENT_SCREEN_LOADED`: A screen was loaded
+-  :cpp:enumerator:`LV_EVENT_SCREEN_UNLOADED`: A screen was unloaded
+-  :cpp:enumerator:`LV_EVENT_SIZE_CHANGED`: Object coordinates/size have changed
+-  :cpp:enumerator:`LV_EVENT_STYLE_CHANGED`: Object's style has changed
+-  :cpp:enumerator:`LV_EVENT_LAYOUT_CHANGED`: The children position has changed due to a layout recalculation
+-  :cpp:enumerator:`LV_EVENT_GET_SELF_SIZE`: Get the internal size of a widget
+
+Display events
+--------------
+
+-  :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA,
+-  :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED,
+-  :cpp:enumerator:`LV_EVENT_COLOR_FORMAT_CHANGED,
+-  :cpp:enumerator:`LV_EVENT_REFR_REQUEST,
+-  :cpp:enumerator:`LV_EVENT_REFR_START,
+-  :cpp:enumerator:`LV_EVENT_REFR_READY,
+-  :cpp:enumerator:`LV_EVENT_RENDER_START,
+-  :cpp:enumerator:`LV_EVENT_RENDER_READY,
+-  :cpp:enumerator:`LV_EVENT_FLUSH_START,
+-  :cpp:enumerator:`LV_EVENT_FLUSH_FINISH,
+
 
 Custom events
 -------------
@@ -159,7 +192,7 @@ Sending events
 **************
 
 To manually send events to an object, use
-:cpp:expr:`lv_event_send` ``(obj, <EVENT_CODE> &some_data)``.
+:cpp:expr:`lv_obj_send_event(obj, <EVENT_CODE>, &some_data)`.
 
 For example, this can be used to manually close a message box by
 simulating a button press (although there are simpler ways to do this):
@@ -169,6 +202,10 @@ simulating a button press (although there are simpler ways to do this):
    /*Simulate the press of the first button (indexes start from zero)*/
    uint32_t btn_id = 0;
    lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
+
+The same works for display and input devices with
+:cpp:expr:`lv_display_send_event(obj, <EVENT_CODE>, &some_data)` and
+:cpp:expr:`lv_indev_send_event(obj, <EVENT_CODE>, &some_data)`.
 
 Refresh event
 -------------

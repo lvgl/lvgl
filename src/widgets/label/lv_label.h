@@ -169,7 +169,7 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj);
 /**
  * Get the relative x and y coordinates of a letter
  * @param obj       pointer to a label object
- * @param char_id     index of the character [0 ... text length - 1].
+ * @param char_id   index of the character [0 ... text length - 1].
  *                  Expressed in character index, not byte index (different in UTF-8)
  * @param pos       store the result here (E.g. index = 0 gives 0;0 coordinates if the text if aligned to the left)
  */
@@ -178,11 +178,12 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 /**
  * Get the index of letter on a relative point of a label.
  * @param obj       pointer to label object
- * @param pos_in       pointer to point with coordinates on a the label
+ * @param pos_in    pointer to point with coordinates on a the label
+ * @param bidi      whether to use bidi processed
  * @return          The index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter if aligned to the left)
  *                  Expressed in character index and not byte index (different in UTF-8)
  */
-uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in);
+uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool bidi);
 
 /**
  * Check if a character is drawn under a point.

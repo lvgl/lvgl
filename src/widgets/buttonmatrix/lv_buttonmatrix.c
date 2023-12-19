@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_buttonmatrix.h"
-#if LV_USE_BTNMATRIX != 0
+#if LV_USE_BUTTONMATRIX != 0
 
 #include "../../misc/lv_assert.h"
 #include "../../indev/lv_indev.h"

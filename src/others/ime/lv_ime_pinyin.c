@@ -421,11 +421,6 @@ lv_obj_t * lv_ime_pinyin_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-/**
- * Set the keyboard of Pinyin input method.
- * @param obj  pointer to a Pinyin input method object
- * @param dict pointer to a Pinyin input method keyboard
- */
 void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
 {
     if(kb) {
@@ -442,11 +437,6 @@ void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
     lv_obj_align_to(pinyin_ime->cand_panel, pinyin_ime->kb, LV_ALIGN_OUT_TOP_MID, 0, 0);
 }
 
-/**
- * Set the dictionary of Pinyin input method.
- * @param obj  pointer to a Pinyin input method object
- * @param dict pointer to a Pinyin input method dictionary
- */
 void lv_ime_pinyin_set_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -454,11 +444,6 @@ void lv_ime_pinyin_set_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict)
     init_pinyin_dict(obj, dict);
 }
 
-/**
- * Set mode, 26-key input(k26) or 9-key input(k9).
- * @param obj  pointer to a Pinyin input method object
- * @param mode   the mode from 'lv_keyboard_mode_t'
- */
 void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -482,11 +467,6 @@ void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode)
  * Getter functions
  *====================*/
 
-/**
- * Set the dictionary of Pinyin input method.
- * @param obj  pointer to a Pinyin IME object
- * @return     pointer to the Pinyin IME keyboard
- */
 lv_obj_t * lv_ime_pinyin_get_kb(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -496,11 +476,6 @@ lv_obj_t * lv_ime_pinyin_get_kb(lv_obj_t * obj)
     return pinyin_ime->kb;
 }
 
-/**
- * Set the dictionary of Pinyin input method.
- * @param obj  pointer to a Pinyin input method object
- * @return     pointer to the Pinyin input method candidate panel
- */
 lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

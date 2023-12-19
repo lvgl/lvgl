@@ -188,6 +188,26 @@ void lv_style_set_transform_pivot_y(lv_style_t * style, int32_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_PIVOT_Y = LV_STYLE_TRANSFORM_PIVOT_Y;
 
+void lv_style_set_transform_skew_x(lv_style_t * style, int32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_SKEW_X, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SKEW_X = LV_STYLE_TRANSFORM_SKEW_X;
+
+void lv_style_set_transform_skew_y(lv_style_t * style, int32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_SKEW_Y, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SKEW_Y = LV_STYLE_TRANSFORM_SKEW_Y;
+
 void lv_style_set_pad_top(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {

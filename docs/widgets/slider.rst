@@ -72,22 +72,6 @@ Events
    changed with keys. The event is sent continuously while the slider is
    being dragged.
 -  :cpp:enumerator:`LV_EVENT_RELEASED` Sent when the slider has just been released.
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following parts.
-
-   -  :cpp:enumerator:`LV_SLIDER_DRAW_PART_KNOB` The main (right) knob of the slider
-
-      -  ``part``: :cpp:enumerator:`LV_PART_KNOB`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-      -  ``id``: 0
-
-   -  :cpp:enumerator:`LV_SLIDER_DRAW_PART_KNOB` The left knob of the slider
-
-      -  ``part``: :cpp:enumerator:`LV_PART_KNOB`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-      -  ``id``: 1
 
 See the events of the `Bar </widgets/bar>`__ too.
 

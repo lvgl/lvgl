@@ -82,7 +82,7 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, l
     return obj;
 }
 
-void lv_obj_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t anim_en)
+void lv_tileview_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t anim_en)
 {
     int32_t tx = lv_obj_get_x(tile_obj);
     int32_t ty = lv_obj_get_y(tile_obj);
@@ -95,7 +95,7 @@ void lv_obj_set_tile(lv_obj_t * obj, lv_obj_t * tile_obj, lv_anim_enable_t anim_
     lv_obj_scroll_to(obj, tx, ty, anim_en);
 }
 
-void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim_enable_t anim_en)
+void lv_tileview_set_tile_by_index(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim_enable_t anim_en)
 {
     lv_obj_update_layout(tv);
 
@@ -111,7 +111,7 @@ void lv_obj_set_tile_id(lv_obj_t * tv, uint32_t col_id, uint32_t row_id, lv_anim
         int32_t x = lv_obj_get_x(tile_obj);
         int32_t y = lv_obj_get_y(tile_obj);
         if(x == tx && y == ty) {
-            lv_obj_set_tile(tv, tile_obj, anim_en);
+            lv_tileview_set_tile(tv, tile_obj, anim_en);
             return;
         }
     }

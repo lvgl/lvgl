@@ -73,18 +73,18 @@ void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, i
 
     lv_point_t p[4] = {
         {0, 0},
-        {w - 1, 0},
-        {0, h - 1},
-        {w - 1, h - 1},
+        {w, 0},
+        {0, h},
+        {w, h},
     };
     lv_point_transform(&p[0], angle, scale_x, scale_y, pivot, true);
     lv_point_transform(&p[1], angle, scale_x, scale_y, pivot, true);
     lv_point_transform(&p[2], angle, scale_x, scale_y, pivot, true);
     lv_point_transform(&p[3], angle, scale_x, scale_y, pivot, true);
     res->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
-    res->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
+    res->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x) - 1;
     res->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
-    res->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
+    res->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y) - 1;
 }
 
 /**********************

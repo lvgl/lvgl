@@ -332,6 +332,15 @@
     #endif
 #endif
 
+/* Use Renesas Dave2D on RA  platforms. */
+#ifndef LV_USE_DRAW_DAVE2D
+    #ifdef CONFIG_LV_USE_DRAW_DAVE2D
+        #define LV_USE_DRAW_DAVE2D CONFIG_LV_USE_DRAW_DAVE2D
+    #else
+        #define LV_USE_DRAW_DAVE2D 0
+    #endif
+#endif
+
 /* Draw using cached SDL textures*/
 #ifndef LV_USE_DRAW_SDL
     #ifdef CONFIG_LV_USE_DRAW_SDL
@@ -339,6 +348,35 @@
     #else
         #define LV_USE_DRAW_SDL 0
     #endif
+#endif
+
+/* Use VG-Lite GPU. */
+#ifndef LV_USE_DRAW_VG_LITE
+    #ifdef CONFIG_LV_USE_DRAW_VG_LITE
+        #define LV_USE_DRAW_VG_LITE CONFIG_LV_USE_DRAW_VG_LITE
+    #else
+        #define LV_USE_DRAW_VG_LITE 0
+    #endif
+#endif
+
+#if LV_USE_DRAW_VG_LITE
+/* Enbale VG-Lite custom external 'gpu_init()' function */
+#ifndef LV_VG_LITE_USE_GPU_INIT
+    #ifdef CONFIG_LV_VG_LITE_USE_GPU_INIT
+        #define LV_VG_LITE_USE_GPU_INIT CONFIG_LV_VG_LITE_USE_GPU_INIT
+    #else
+        #define LV_VG_LITE_USE_GPU_INIT 0
+    #endif
+#endif
+
+/* Enable VG-Lite assert. */
+#ifndef LV_VG_LITE_USE_ASSERT
+    #ifdef CONFIG_LV_VG_LITE_USE_ASSERT
+        #define LV_VG_LITE_USE_ASSERT CONFIG_LV_VG_LITE_USE_ASSERT
+    #else
+        #define LV_VG_LITE_USE_ASSERT 0
+    #endif
+#endif
 #endif
 
 /*=================
@@ -1308,27 +1346,27 @@
     #endif
 #endif
 
-#ifndef LV_USE_BTN
+#ifndef LV_USE_BUTTON
     #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_BTN
-            #define LV_USE_BTN CONFIG_LV_USE_BTN
+        #ifdef CONFIG_LV_USE_BUTTON
+            #define LV_USE_BUTTON CONFIG_LV_USE_BUTTON
         #else
-            #define LV_USE_BTN 0
+            #define LV_USE_BUTTON 0
         #endif
     #else
-        #define LV_USE_BTN        1
+        #define LV_USE_BUTTON        1
     #endif
 #endif
 
-#ifndef LV_USE_BTNMATRIX
+#ifndef LV_USE_BUTTONMATRIX
     #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_BTNMATRIX
-            #define LV_USE_BTNMATRIX CONFIG_LV_USE_BTNMATRIX
+        #ifdef CONFIG_LV_USE_BUTTONMATRIX
+            #define LV_USE_BUTTONMATRIX CONFIG_LV_USE_BUTTONMATRIX
         #else
-            #define LV_USE_BTNMATRIX 0
+            #define LV_USE_BUTTONMATRIX 0
         #endif
     #else
-        #define LV_USE_BTNMATRIX  1
+        #define LV_USE_BUTTONMATRIX  1
     #endif
 #endif
 
@@ -1448,27 +1486,27 @@
     #endif
 #endif
 
-#ifndef LV_USE_IMG
+#ifndef LV_USE_IMAGE
     #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_IMG
-            #define LV_USE_IMG CONFIG_LV_USE_IMG
+        #ifdef CONFIG_LV_USE_IMAGE
+            #define LV_USE_IMAGE CONFIG_LV_USE_IMAGE
         #else
-            #define LV_USE_IMG 0
+            #define LV_USE_IMAGE 0
         #endif
     #else
-        #define LV_USE_IMG        1   /*Requires: lv_label*/
+        #define LV_USE_IMAGE      1   /*Requires: lv_label*/
     #endif
 #endif
 
-#ifndef LV_USE_IMGBTN
+#ifndef LV_USE_IMAGEBUTTON
     #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_IMGBTN
-            #define LV_USE_IMGBTN CONFIG_LV_USE_IMGBTN
+        #ifdef CONFIG_LV_USE_IMAGEBUTTON
+            #define LV_USE_IMAGEBUTTON CONFIG_LV_USE_IMAGEBUTTON
         #else
-            #define LV_USE_IMGBTN 0
+            #define LV_USE_IMAGEBUTTON 0
         #endif
     #else
-        #define LV_USE_IMGBTN     1
+        #define LV_USE_IMAGEBUTTON     1
     #endif
 #endif
 
@@ -1813,15 +1851,15 @@
 #endif /*LV_USE_THEME_DEFAULT*/
 
 /*A very simple theme that is a good starting point for a custom theme*/
-#ifndef LV_USE_THEME_BASIC
+#ifndef LV_USE_THEME_SIMPLE
     #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_THEME_BASIC
-            #define LV_USE_THEME_BASIC CONFIG_LV_USE_THEME_BASIC
+        #ifdef CONFIG_LV_USE_THEME_SIMPLE
+            #define LV_USE_THEME_SIMPLE CONFIG_LV_USE_THEME_SIMPLE
         #else
-            #define LV_USE_THEME_BASIC 0
+            #define LV_USE_THEME_SIMPLE 0
         #endif
     #else
-        #define LV_USE_THEME_BASIC 1
+        #define LV_USE_THEME_SIMPLE 1
     #endif
 #endif
 
@@ -2958,6 +2996,8 @@
 
 #ifndef __ASSEMBLY__
 LV_EXPORT_CONST_INT(LV_DPI_DEF);
+LV_EXPORT_CONST_INT(LV_DRAW_BUF_STRIDE_ALIGN);
+LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
 #undef _LV_KCONFIG_PRESENT

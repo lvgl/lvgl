@@ -84,20 +84,6 @@ typedef struct {
 
     int32_t radius;
 
-    const void * src;
-    const void * font;
-    lv_color_t recolor;
-    lv_opa_t opa;
-    lv_opa_t recolor_opa;
-    lv_image_header_t img_header; /*To make it easier for draw_unit to decide if they can draw this image */
-    uint8_t tiled : 1;
-} lv_draw_bg_image_dsc_t;
-
-typedef struct {
-    lv_draw_dsc_base_t base;
-
-    int32_t radius;
-
     lv_color_t color;
     int32_t width;
     lv_opa_t opa;
@@ -123,20 +109,35 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize a rectangle draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
 
+/**
+ * Initialize a fill draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc);
 
+/**
+ * Initialize a border draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc);
 
+/**
+ * Initialize a box shadow draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc);
 
-void lv_draw_bg_image_dsc_init(lv_draw_bg_image_dsc_t * dsc);
-
 /**
- * Draw a rectangle
+ * The rectangle is a wrapper for fill, border, bg. image and box shadow.
+ * Internally fill, border, image and box shadow draw tasks will be created.
  * @param layer         pointer to a layer
- * @param dsc           pointer to an initialized `lv_draw_rect_dsc_t` variable
+ * @param dsc           pointer to an initialized draw descriptor variable
  * @param coords        the coordinates of the rectangle
  */
 void lv_draw_rect(struct _lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);

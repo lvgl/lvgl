@@ -219,7 +219,6 @@ static lv_cache_entry_t * draw_to_texture(lv_draw_sdl_unit_t * u)
             }
         default:
             return NULL;
-            break;
     }
 
     while(dest_layer.draw_task_head) {
@@ -380,7 +379,6 @@ static void execute_drawing(lv_draw_sdl_unit_t * u)
     if(t->type == LV_DRAW_TASK_TYPE_BOX_SHADOW) return;
     if(t->type == LV_DRAW_TASK_TYPE_LINE) return;
     if(t->type == LV_DRAW_TASK_TYPE_TRIANGLE) return;
-    if(t->type == LV_DRAW_TASK_TYPE_BG_IMG) return;
 
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         blend_texture_layer(u);

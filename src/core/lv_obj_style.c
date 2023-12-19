@@ -19,6 +19,7 @@
 #define style_refr LV_GLOBAL_DEFAULT()->style_refresh
 #define style_trans_ll_p &(LV_GLOBAL_DEFAULT()->style_trans_ll)
 #define _style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
+#define STYLE_PROP_SHIFTED(prop) ((uint32_t)1 << ((prop) >> 3))
 
 /**********************
  *      TYPEDEFS
@@ -133,13 +134,13 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     if(lv_style_is_const(style)) {
         lv_style_const_prop_t * props = style->values_and_props;
         for(i = 0; props[i].prop_ptr; i++) {
-            (*prop_is_set) |= (uint32_t)1 << ((*props[i].prop_ptr) >> 2);
+            (*prop_is_set) |= STYLE_PROP_SHIFTED(*props[i].prop_ptr);
         }
     }
     else {
         lv_style_prop_t * props = (lv_style_prop_t *)style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
         for(i = 0; i < style->prop_cnt; i++) {
-            (*prop_is_set) |= (uint32_t)1 << (props[i] >> 2);
+            (*prop_is_set) |= STYLE_PROP_SHIFTED(props[i]);
         }
     }
 #endif
@@ -394,7 +395,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
 
     /*The happy path*/
 #if LV_OBJ_STYLE_CACHE
-    const uint32_t prop_shifted = (uint32_t)1 << (prop >> 2);
+    const uint32_t prop_shifted = STYLE_PROP_SHIFTED(prop);
     if((part == LV_PART_MAIN ? obj->style_main_prop_is_set : obj->style_other_prop_is_set) & prop_shifted)
 #endif
     {
@@ -466,11 +467,12 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
     lv_style_set_prop(style, prop, value);
 
 #if LV_OBJ_STYLE_CACHE
+    uint32_t prop_shifted = STYLE_PROP_SHIFTED(prop);
     if(lv_obj_style_get_selector_part(selector) == LV_PART_MAIN) {
-        obj->style_main_prop_is_set |= (uint32_t)1 << (prop >> 2);
+        obj->style_main_prop_is_set |= prop_shifted;
     }
     else {
-        obj->style_other_prop_is_set |= (uint32_t)1 << (prop >> 2);
+        obj->style_other_prop_is_set |= prop_shifted;
     }
 #endif
 
@@ -562,7 +564,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     lv_anim_set_start_cb(&a, trans_anim_start_cb);
     lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
     lv_anim_set_values(&a, 0x00, 0xFF);
-    lv_anim_set_time(&a, tr_dsc->time);
+    lv_anim_set_duration(&a, tr_dsc->time);
     lv_anim_set_delay(&a, tr_dsc->delay);
     lv_anim_set_path_cb(&a, tr_dsc->path_cb);
     lv_anim_set_early_apply(&a, false);
@@ -650,7 +652,7 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_set_values(&a, 0, LV_OPA_COVER);
     lv_anim_set_exec_cb(&a, fade_anim_cb);
     lv_anim_set_ready_cb(&a, fade_in_anim_ready);
-    lv_anim_set_time(&a, time);
+    lv_anim_set_duration(&a, time);
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
 }
@@ -662,7 +664,7 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_set_var(&a, obj);
     lv_anim_set_values(&a, lv_obj_get_style_opa(obj, 0), LV_OPA_TRANSP);
     lv_anim_set_exec_cb(&a, fade_anim_cb);
-    lv_anim_set_time(&a, time);
+    lv_anim_set_duration(&a, time);
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
 }
@@ -1049,6 +1051,8 @@ static lv_layer_type_t calculate_layer_type(lv_obj_t * obj)
     if(lv_obj_get_style_transform_rotation(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_transform_scale_x(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_transform_scale_y(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_skew_x(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_skew_y(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_opa_layered(obj, 0) != LV_OPA_COVER) return LV_LAYER_TYPE_SIMPLE;
     if(lv_obj_get_style_blend_mode(obj, 0) != LV_BLEND_MODE_NORMAL) return LV_LAYER_TYPE_SIMPLE;
     return LV_LAYER_TYPE_NONE;
@@ -1067,13 +1071,13 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)
             if(lv_style_is_const(style)) {
                 lv_style_const_prop_t * props = style->values_and_props;
                 for(j = 0; props[j].prop_ptr; j++) {
-                    obj->style_main_prop_is_set |= (uint32_t)1 << ((*props[j].prop_ptr) >> 2);
+                    obj->style_main_prop_is_set |= STYLE_PROP_SHIFTED(*props[j].prop_ptr);
                 }
             }
             else {
                 lv_style_prop_t * props = (lv_style_prop_t *)style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
                 for(j = 0; j < style->prop_cnt; j++) {
-                    obj->style_main_prop_is_set |= (uint32_t)1 << (props[j] >> 2);
+                    obj->style_main_prop_is_set |= STYLE_PROP_SHIFTED(props[j]);
                 }
             }
         }
@@ -1087,13 +1091,13 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)
             if(lv_style_is_const(style)) {
                 lv_style_const_prop_t * props = style->values_and_props;
                 for(j = 0; props[j].prop_ptr; j++) {
-                    obj->style_other_prop_is_set |= (uint32_t)1 << ((*props[j].prop_ptr) >> 2);
+                    obj->style_other_prop_is_set |= STYLE_PROP_SHIFTED(*props[j].prop_ptr);
                 }
             }
             else {
                 lv_style_prop_t * props = (lv_style_prop_t *)style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
                 for(j = 0; j < style->prop_cnt; j++) {
-                    obj->style_other_prop_is_set |= (uint32_t)1 << (props[j] >> 2);
+                    obj->style_other_prop_is_set |= STYLE_PROP_SHIFTED(props[j]);
                 }
             }
         }

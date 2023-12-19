@@ -7,7 +7,7 @@ void lv_example_tabview_2(void)
     /*Create a Tab view object*/
     lv_obj_t * tabview;
     tabview = lv_tabview_create(lv_screen_active());
-    lv_tabview_set_tab_position(tabview, LV_DIR_LEFT);
+    lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT);
     lv_tabview_set_tab_bar_size(tabview, 80);
 
     lv_obj_set_style_bg_color(tabview, lv_palette_lighten(LV_PALETTE_RED, 2), 0);

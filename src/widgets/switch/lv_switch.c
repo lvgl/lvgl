@@ -256,7 +256,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
         lv_anim_set_exec_cb(&a, lv_switch_anim_exec_cb);
         lv_anim_set_values(&a, anim_start, anim_end);
         lv_anim_set_ready_cb(&a, lv_switch_anim_ready);
-        lv_anim_set_time(&a, anim_dur);
+        lv_anim_set_duration(&a, anim_dur);
         lv_anim_start(&a);
     }
 }

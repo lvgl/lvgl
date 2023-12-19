@@ -49,11 +49,6 @@ static const uint16_t sin0_90_table[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Return with sinus of an angle
- * @param angle
- * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
- */
 LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_sin(int16_t angle)
 {
     int32_t ret = 0;
@@ -128,15 +123,6 @@ static int32_t do_cubic_bezier(int32_t t, int32_t a, int32_t b, int32_t c)
     return ret;
 }
 
-/**
- * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.
- * @param x time in range of [0..LV_BEZIER_VAL_MAX]
- * @param x1 x of control point 1 in range of [0..LV_BEZIER_VAL_MAX]
- * @param y1 y of control point 1 in range of [0..LV_BEZIER_VAL_MAX]
- * @param x2 x of control point 2 in range of [0..LV_BEZIER_VAL_MAX]
- * @param y2 y of control point 2 in range of [0..LV_BEZIER_VAL_MAX]
- * @return the value calculated
- */
 int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
     int32_t ax, bx, cx, ay, by, cy;
@@ -219,16 +205,6 @@ found:
 #endif
 }
 
-/**
- * Get the square root of a number
- * @param x integer which square root should be calculated
- * @param q store the result here. q->i: integer part, q->f: fractional part in 1/256 unit
- * @param mask optional to skip some iterations if the magnitude of the root is known.
- * Set to 0x8000 by default.
- * If root < 16: mask = 0x80
- * If root < 256: mask = 0x800
- * Else: mask = 0x8000
- */
 LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
 {
     x = x << 8; /*To get 4 bit precision. (sqrt(256) = 16 = 4 bit)*/
@@ -246,12 +222,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
     q->f = (root & 0xf) << 4;
 }
 
-/**
- * Calculate the atan2 of a vector.
- * @param x
- * @param y
- * @return the angle in degree calculated from the given parameters in range of [0..360]
- */
 uint16_t lv_atan2(int x, int y)
 {
     /**
@@ -329,12 +299,6 @@ uint16_t lv_atan2(int x, int y)
     return degree;
 }
 
-/**
- * Calculate the integer exponents.
- * @param base
- * @param power
- * @return base raised to the power exponent
- */
 int64_t lv_pow(int64_t base, int8_t exp)
 {
     int64_t result = 1;
@@ -348,15 +312,6 @@ int64_t lv_pow(int64_t base, int8_t exp)
     return result;
 }
 
-/**
- * Get the mapped of a number given an input and output range
- * @param x integer which mapped value should be calculated
- * @param min_in min input range
- * @param max_in max input range
- * @param min_out min output range
- * @param max_out max output range
- * @return the mapped number
- */
 int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out)
 {
     if(max_in >= min_in && x >= max_in) return max_out;
@@ -376,6 +331,11 @@ int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32
     int32_t delta_out = max_out - min_out;
 
     return ((x - min_in) * delta_out) / delta_in + min_out;
+}
+
+void lv_rand_set_seed(uint32_t seed)
+{
+    rand_seed = seed;
 }
 
 uint32_t lv_rand(uint32_t min, uint32_t max)

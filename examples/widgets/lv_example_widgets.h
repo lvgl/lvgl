@@ -78,7 +78,7 @@ void lv_example_image_2(void);
 void lv_example_image_3(void);
 void lv_example_image_4(void);
 
-void lv_example_imgbtn_1(void);
+void lv_example_imagebutton_1(void);
 
 void lv_example_keyboard_1(void);
 void lv_example_keyboard_2(void);

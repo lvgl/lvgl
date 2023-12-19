@@ -275,7 +275,7 @@ static void gridnav_event_cb(lv_event_t * e)
         lv_gridnav_remove(obj);
     }
     else if(code == LV_EVENT_PRESSED || code == LV_EVENT_PRESSING || code == LV_EVENT_PRESS_LOST ||
-            code == LV_EVENT_LONG_PRESSED || code == LV_EVENT_LONG_PRESSED_REPEAT ||
+            code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED || code == LV_EVENT_LONG_PRESSED_REPEAT ||
             code == LV_EVENT_CLICKED || code == LV_EVENT_RELEASED) {
         if(lv_group_get_focused(lv_obj_get_group(obj)) == obj) {
             /*Forward press/release related event too*/

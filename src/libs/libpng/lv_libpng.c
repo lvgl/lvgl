@@ -27,7 +27,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                 const lv_image_decoder_args_t * args);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
-static const void * decode_png_file(const char * filename);
+static lv_draw_buf_t * decode_png_file(const char * filename);
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
 static void cache_invalidate_cb(lv_cache_entry_t * entry);
 
@@ -135,12 +135,31 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
         uint32_t t = lv_tick_get();
-        const void * decoded_img = decode_png_file(fn);
+        lv_draw_buf_t * decoded = decode_png_file(fn);
+        if(decoded == NULL) {
+            return LV_RESULT_INVALID;
+        }
+
+        /*Stride check and adjustment accordingly*/
+        if(args && args->stride_align) {
+            uint32_t expected = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
+            if(expected != decoded->header.stride) {
+                LV_LOG_INFO("Convert PNG stride to %" LV_PRId32, expected);
+                lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, expected);
+                lv_draw_buf_destroy(decoded);
+                if(aligned == NULL) {
+                    LV_LOG_ERROR("png stride adjust failed");
+                    return LV_RESULT_INVALID;
+                }
+
+                decoded = aligned;
+            }
+        }
+
         t = lv_tick_elaps(t);
 
         lv_cache_lock();
-        lv_cache_entry_t * cache = lv_cache_add(decoded_img, 0, decoder->cache_data_type,
-                                                dsc->header.w * dsc->header.h * sizeof(uint32_t));
+        lv_cache_entry_t * cache = lv_cache_add(decoded, 0, decoder->cache_data_type, decoded->data_size);
         if(cache == NULL) {
             lv_cache_unlock();
             return LV_RESULT_INVALID;
@@ -157,7 +176,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             cache->src = dsc->src;
         }
 
-        dsc->img_data = lv_cache_get_data(cache);
+        dsc->decoded = lv_cache_get_data(cache);
         dsc->cache_entry = cache;
 
         lv_cache_unlock();
@@ -187,7 +206,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 
         lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, fn, LV_CACHE_SRC_TYPE_PATH);
         if(cache) {
-            dsc->img_data = lv_cache_get_data(cache);
+            dsc->decoded = lv_cache_get_data(cache);
             dsc->cache_entry = cache;     /*Save the cache to release it in decoder_close*/
             lv_cache_unlock();
             return LV_RESULT_OK;
@@ -253,7 +272,7 @@ failed:
     return data;
 }
 
-static const void * decode_png_file(const char * filename)
+static lv_draw_buf_t * decode_png_file(const char * filename)
 {
     int ret;
 
@@ -281,33 +300,32 @@ static const void * decode_png_file(const char * filename)
     image.format = PNG_FORMAT_BGRA;
 
     /*Alloc image buffer*/
-    size_t image_size = PNG_IMAGE_SIZE(image);
-    void * image_data = lv_draw_buf_malloc(image_size, LV_COLOR_FORMAT_ARGB8888);
-
-    if(image_data) {
-        /*Start decoding*/
-        ret = png_image_finish_read(&image, NULL, image_data, 0, NULL);
-        if(!ret) {
-            LV_LOG_ERROR("png decode failed: %d", ret);
-            lv_draw_buf_free(image_data);
-            image_data = NULL;
-        }
-    }
-    else {
-        LV_LOG_ERROR("png alloc %zu failed", image_size);
+    lv_draw_buf_t * decoded;
+    decoded = lv_draw_buf_create(image.width, image.height, LV_COLOR_FORMAT_ARGB8888, PNG_IMAGE_ROW_STRIDE(image));
+    if(decoded == NULL) {
+        size_t image_size = PNG_IMAGE_SIZE(image);
+        LV_LOG_ERROR("png draw buff alloc %zu failed: %s", image_size, filename);
+        lv_free(data);
+        return NULL;
     }
 
-    /*free decoder*/
+    /*Start decoding*/
+    ret = png_image_finish_read(&image, NULL, decoded->data, 0, NULL);
     png_image_free(&image);
     lv_free(data);
+    if(!ret) {
+        LV_LOG_ERROR("png decode failed: %d", ret);
+        lv_draw_buf_destroy(decoded);
+        return NULL;
+    }
 
-    return image_data;
+    return decoded;
 }
 
 static void cache_invalidate_cb(lv_cache_entry_t * entry)
 {
     lv_free((void *)entry->src);
-    lv_free((void *)entry->data);
+    lv_draw_buf_destroy((lv_draw_buf_t *)entry->data);
 }
 
 #endif /*LV_USE_LIBPNG*/

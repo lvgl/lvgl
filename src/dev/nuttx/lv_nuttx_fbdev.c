@@ -32,13 +32,14 @@
  **********************/
 
 typedef struct {
+    /* fd should be defined at the beginning */
+    int fd;
     struct fb_videoinfo_s vinfo;
     struct fb_planeinfo_s pinfo;
 
     void * mem;
     void * mem2;
     uint32_t mem2_yoffset;
-    int fd;
 } lv_nuttx_fb_t;
 
 /**********************
@@ -132,11 +133,11 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
 
     lv_display_set_draw_buffers(disp, dsc->mem, dsc->mem2,
                                 (dsc->pinfo.stride * dsc->vinfo.yres), LV_DISP_RENDER_MODE_DIRECT);
-    lv_display_set_user_data(disp, (void *)(uintptr_t)(dsc->fd));
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
 
-    LV_LOG_USER("Resolution is set to %dx%d at %ddpi", dsc->vinfo.xres, dsc->vinfo.yres, lv_display_get_dpi(disp));
+    LV_LOG_USER("Resolution is set to %dx%d at %" LV_PRId32 "dpi",
+                dsc->vinfo.xres, dsc->vinfo.yres, lv_display_get_dpi(disp));
     return 0;
 
 errout:

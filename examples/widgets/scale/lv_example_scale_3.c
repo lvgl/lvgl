@@ -29,7 +29,7 @@ void lv_example_scale_3(void)
     lv_obj_set_style_bg_color(scale_line, lv_palette_lighten(LV_PALETTE_RED, 5), 0);
     lv_obj_set_style_radius(scale_line, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_clip_corner(scale_line, true, 0);
-    lv_obj_align(scale_line, LV_ALIGN_LEFT_MID, LV_PCT(5), 0);
+    lv_obj_align(scale_line, LV_ALIGN_LEFT_MID, LV_PCT(2), 0);
 
     lv_scale_set_label_show(scale_line, true);
 
@@ -40,7 +40,8 @@ void lv_example_scale_3(void)
     lv_scale_set_minor_tick_length(scale_line, 5);
     lv_scale_set_range(scale_line, 10, 40);
 
-    lv_scale_set_round_props(scale_line, 270, 135);
+    lv_scale_set_angle_range(scale_line, 270);
+    lv_scale_set_rotation(scale_line, 135);
 
     needle_line = lv_line_create(scale_line);
 
@@ -51,9 +52,9 @@ void lv_example_scale_3(void)
     lv_anim_init(&anim_scale_line);
     lv_anim_set_var(&anim_scale_line, scale_line);
     lv_anim_set_exec_cb(&anim_scale_line, set_needle_line_value);
-    lv_anim_set_time(&anim_scale_line, 1000);
+    lv_anim_set_duration(&anim_scale_line, 1000);
     lv_anim_set_repeat_count(&anim_scale_line, LV_ANIM_REPEAT_INFINITE);
-    lv_anim_set_playback_time(&anim_scale_line, 1000);
+    lv_anim_set_playback_duration(&anim_scale_line, 1000);
     lv_anim_set_values(&anim_scale_line, 10, 40);
     lv_anim_start(&anim_scale_line);
 
@@ -65,7 +66,7 @@ void lv_example_scale_3(void)
     lv_obj_set_style_bg_color(scale_img, lv_palette_lighten(LV_PALETTE_RED, 5), 0);
     lv_obj_set_style_radius(scale_img, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_clip_corner(scale_img, true, 0);
-    lv_obj_align(scale_img, LV_ALIGN_RIGHT_MID, LV_PCT(-5), 0);
+    lv_obj_align(scale_img, LV_ALIGN_RIGHT_MID, LV_PCT(-2), 0);
 
     lv_scale_set_label_show(scale_img, true);
 
@@ -76,7 +77,8 @@ void lv_example_scale_3(void)
     lv_scale_set_minor_tick_length(scale_img, 5);
     lv_scale_set_range(scale_img, 10, 40);
 
-    lv_scale_set_round_props(scale_img, 270, 135);
+    lv_scale_set_angle_range(scale_img, 270);
+    lv_scale_set_rotation(scale_img, 135);
 
     /* image must point to the right. E.g. -O------>*/
     needle_img = lv_img_create(scale_img);
@@ -88,9 +90,9 @@ void lv_example_scale_3(void)
     lv_anim_init(&anim_scale_img);
     lv_anim_set_var(&anim_scale_img, scale_img);
     lv_anim_set_exec_cb(&anim_scale_img, set_needle_img_value);
-    lv_anim_set_time(&anim_scale_img, 1000);
+    lv_anim_set_duration(&anim_scale_img, 1000);
     lv_anim_set_repeat_count(&anim_scale_img, LV_ANIM_REPEAT_INFINITE);
-    lv_anim_set_playback_time(&anim_scale_img, 1000);
+    lv_anim_set_playback_duration(&anim_scale_img, 1000);
     lv_anim_set_values(&anim_scale_img, 10, 40);
     lv_anim_start(&anim_scale_img);
 }

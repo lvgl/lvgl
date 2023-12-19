@@ -259,12 +259,14 @@ void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_
 
 /**
  * Set the color format of the display.
- * If set to other than `LV_COLOR_FORMAT_NATIVE` the layer's `buffer_convert` function will be used
- * to convert the rendered content to the desired color format.
  * @param disp              pointer to a display
- * @param color_format      By default `LV_COLOR_FORMAT_NATIVE` to render with L8, RGB565, RGB888 or ARGB8888.
- *                          `LV_COLOR_FORMAT_NATIVE_REVERSE` to change endianness.
- *
+ * @param color_format      Possible values are
+ *                          - LV_COLOR_FORMAT_RGB565
+ *                          - LV_COLOR_FORMAT_RGB888
+ *                          - LV_COLOR_FORMAT_XRGB888
+ *                          - LV_COLOR_FORMAT_ARGB888
+ *@note To change the endianness of the rendered image in case of RGB565 format
+ *      (i.e. swap the 2 bytes) call `lv_draw_sw_rgb565_swap` in the flush_cb
  */
 void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format);
 

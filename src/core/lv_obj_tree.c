@@ -124,7 +124,7 @@ void lv_obj_delete_delayed(lv_obj_t * obj, uint32_t delay_ms)
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
     lv_anim_set_exec_cb(&a, NULL);
-    lv_anim_set_time(&a, 1);
+    lv_anim_set_duration(&a, 1);
     lv_anim_set_delay(&a, delay_ms);
     lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);
@@ -592,6 +592,8 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
 static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth)
 {
     lv_obj_tree_walk_res_t res;
+
+#if LV_USE_LOG
     const char * id;
 
 #if LV_USE_OBJ_ID
@@ -604,6 +606,7 @@ static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth)
 
     /*id of `obj0` is an invalid id for builtin id*/
     LV_LOG_USER("parent:%p, obj:%p, id:%s;", (void *)(obj ? obj->parent : NULL), (void *)obj, id);
+#endif /*LV_USE_LOG*/
 
     if(obj && obj->spec_attr && obj->spec_attr->child_cnt) {
         for(uint32_t i = 0; i < obj->spec_attr->child_cnt; i++) {

@@ -39,7 +39,6 @@ typedef enum {
     LV_DRAW_TASK_TYPE_FILL,
     LV_DRAW_TASK_TYPE_BORDER,
     LV_DRAW_TASK_TYPE_BOX_SHADOW,
-    LV_DRAW_TASK_TYPE_BG_IMG,
     LV_DRAW_TASK_TYPE_LABEL,
     LV_DRAW_TASK_TYPE_IMAGE,
     LV_DRAW_TASK_TYPE_LAYER,
@@ -91,7 +90,7 @@ typedef struct _lv_draw_task_t {
      * Set to which extent `preferred_draw_unit_id` is good at this task.
      * 80: means 20% better (faster) than software rendering
      * 100: the default value
-     * 110: means 10% better (faster) than software rendering
+     * 110: means 10% worse (slower) than software rendering
      */
     uint8_t preference_score;
 
@@ -204,8 +203,14 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Used internally to initialize the drawing module
+ */
 void lv_draw_init(void);
 
+/**
+ * Deinitialize the drawing module
+ */
 void lv_draw_deinit(void);
 
 /**
@@ -215,12 +220,35 @@ void lv_draw_deinit(void);
  */
 void * lv_draw_create_unit(size_t size);
 
+/**
+ * Add an empty draw task to the draw task list of a layer.
+ * @param layer     pointer to a layer
+ * @param coords    the coordinates of the draw task
+ * @return          the created draw task which needs to be
+ *                  further configured e.g. by added a draw descriptor
+ */
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords);
 
+/**
+ * Needs to be called when a draw task is created and configured.
+ * It will send an event about the new draw task to the widget
+ * and assign it to a draw unit.
+ * @param layer     pointer to a layer
+ * @param t         poinr to a draw task
+ */
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t);
 
+/**
+ * Try dispatching draw tasks to draw units
+ */
 void lv_draw_dispatch(void);
 
+/**
+ * Used internally to try dispatching draw tasks of a specific layer
+ * @param disp      pointer to a display on which the dispatching was requested
+ * @param layer     pointer to a layer
+ * @return          at least one draw task is being rendered (maybe it was taken earlier)
+ */
 bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer);
 
 /**
@@ -229,6 +257,10 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer);
  */
 void lv_draw_dispatch_wait_for_request(void);
 
+/**
+ * When a draw unit finished a draw task it needs to request dispatching
+ * to let LVGL assign a new draw task to it
+ */
 void lv_draw_dispatch_request(void);
 
 /**

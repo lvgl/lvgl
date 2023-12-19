@@ -79,16 +79,6 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new cell is selected with
    keys.
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following types:
-
-   -  :cpp:enumerator:`LV_TABLE_DRAW_PART_CELL` The individual cells of the table
-
-      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-      -  ``label_dsc``
-      -  ``id``: current row × col count + current column
 
 See the events of the `Base object </widgets/obj>`__ too.
 

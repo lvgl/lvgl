@@ -101,7 +101,7 @@ the Label widget only allows manual text selection with
 Text alignment
 --------------
 
-To horizontally align the lines of a label the `text_align` style property can be used with 
+To horizontally align the lines of a label the `text_align` style property can be used with
 :cpp:expr:`lv_obj_set_style_text_align()` or :cpp:expr:`lv_style_set_text_align()`
 Note that it has a visible effect only if
 
@@ -121,11 +121,8 @@ Custom scrolling animations
 Some aspects of the scrolling animations in long modes
 :cpp:enumerator:`LV_LABEL_LONG_SCROLL` and :cpp:enumerator:`LV_LABEL_LONG_SCROLL_CIRCULAR` can be
 customized by setting the animation property of a style, using
-:cpp:func:`lv_style_set_anim`. Currently, only the start and repeat delay of
-the circular scrolling animation can be customized. If you need to
-customize another aspect of the scrolling animation, feel free to open
-an `issue on Github <https://github.com/lvgl/lvgl/issues>`__ to request
-the feature.
+:cpp:func:`lv_style_set_anim`.
+It will be treated as a template which will be used to create the scroll animatins.
 
 Symbols
 -------

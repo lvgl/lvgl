@@ -206,6 +206,9 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     LV_UNUSED(full_area);
 
     JDEC * jd = dsc->user_data;
+    lv_draw_buf_t * decoded = (void *)dsc->decoded;
+    if(decoded == NULL) decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+    dsc->decoded = decoded;
 
     uint32_t  mx, my;
     mx = jd->msx * 8;
@@ -217,10 +220,11 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded_area->x2 = -1;
         jd->scale = 0;
         jd->dcv[2] = jd->dcv[1] = jd->dcv[0] = 0;   /* Initialize DC values */
-        dsc->img_data = jd->workbuf;
         jd->rst = 0;
         jd->rsc = 0;
-        dsc->header.stride = mx * 3;
+        decoded->data = jd->workbuf;
+        decoded->header = dsc->header;
+        decoded->header.stride = mx * 3;
     }
 
     decoded_area->x1 += mx;
@@ -232,6 +236,10 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded_area->y1 += my;
         decoded_area->y2 += my;
     }
+
+    decoded->header.w = mx;
+    decoded->header.h = my;
+    decoded->data_size = decoded->header.stride * decoded->header.h;
 
     /* Process restart interval if enabled */
     JRESULT rc;
@@ -265,6 +273,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     lv_free(jd->device);
     lv_free(jd->pool_original);
     lv_free(jd);
+    lv_free((void *)dsc->decoded);
 }
 
 static int is_jpg(const uint8_t * raw_data, size_t len)

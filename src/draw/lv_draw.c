@@ -107,6 +107,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 {
+    LV_PROFILER_BEGIN;
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
 
@@ -145,6 +146,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             u = u->next;
         }
     }
+    LV_PROFILER_END;
 }
 
 void lv_draw_dispatch(void)
@@ -169,6 +171,7 @@ void lv_draw_dispatch(void)
 
 bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
 {
+    LV_PROFILER_BEGIN;
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
     lv_draw_task_t * t = layer->draw_task_head;
@@ -255,6 +258,7 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
         }
     }
 
+    LV_PROFILER_END;
     return render_running;
 }
 
@@ -395,8 +399,13 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
 {
-    return lv_draw_buf_go_to_xy(layer->buf, layer->buf_stride, layer->color_format, x, y);
-
+    lv_draw_buf_t tmp;
+    tmp.data = layer->buf;
+    tmp.header.stride = layer->buf_stride;
+    tmp.header.cf = layer->color_format;
+    tmp.header.w = lv_area_get_width(&layer->buf_area);
+    tmp.header.h = lv_area_get_height(&layer->buf_area);
+    return lv_draw_buf_goto_xy(&tmp, x, y);
 }
 
 /**********************

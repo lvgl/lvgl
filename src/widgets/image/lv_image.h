@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_IMG != 0
+#if LV_USE_IMAGE != 0
 
 /*Testing of dependencies*/
 #if LV_USE_LABEL == 0
@@ -83,14 +83,17 @@ typedef uint8_t lv_image_align_t;
 
 #if LV_USE_OBJ_PROPERTY
 enum {
-    LV_PROPERTY_ID(IMAGE, SRC,        LV_PROPERTY_TYPE_POINTER,   0),
+    LV_PROPERTY_ID(IMAGE, SRC,        LV_PROPERTY_TYPE_IMGSRC,    0),
     LV_PROPERTY_ID(IMAGE, OFFSET_X,   LV_PROPERTY_TYPE_INT,       1),
     LV_PROPERTY_ID(IMAGE, OFFSET_Y,   LV_PROPERTY_TYPE_INT,       2),
     LV_PROPERTY_ID(IMAGE, ROTATION,   LV_PROPERTY_TYPE_INT,       3),
     LV_PROPERTY_ID(IMAGE, PIVOT,      LV_PROPERTY_TYPE_POINTER,   4),
     LV_PROPERTY_ID(IMAGE, SCALE,      LV_PROPERTY_TYPE_INT,       5),
-    LV_PROPERTY_ID(IMAGE, ANTIALIAS,  LV_PROPERTY_TYPE_INT,       6),
-    LV_PROPERTY_ID(IMAGE, ALIGN,      LV_PROPERTY_TYPE_INT,       7),
+    LV_PROPERTY_ID(IMAGE, SCALE_X,    LV_PROPERTY_TYPE_INT,       6),
+    LV_PROPERTY_ID(IMAGE, SCALE_Y,    LV_PROPERTY_TYPE_INT,       7),
+    LV_PROPERTY_ID(IMAGE, BLEND_MODE, LV_PROPERTY_TYPE_INT,       8),
+    LV_PROPERTY_ID(IMAGE, ANTIALIAS,  LV_PROPERTY_TYPE_INT,       9),
+    LV_PROPERTY_ID(IMAGE, ALIGN,      LV_PROPERTY_TYPE_INT,       10),
     LV_PROPERTY_IMAGE_END,
 };
 #endif
@@ -318,7 +321,7 @@ lv_image_align_t lv_image_get_align(lv_obj_t * obj);
 /** Use this macro to declare an image in a C file*/
 #define LV_IMAGE_DECLARE(var_name) extern const lv_image_dsc_t var_name
 
-#endif /*LV_USE_IMG*/
+#endif /*LV_USE_IMAGE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

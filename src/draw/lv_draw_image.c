@@ -26,6 +26,11 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                                lv_image_decoder_dsc_t * decoder_dsc,
+                                const lv_area_t * img_area, const lv_area_t * clipped_img_area,
+                                lv_draw_image_core_cb draw_core_cb);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -91,39 +96,148 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     LV_PROFILER_END;
 }
 
-/**
- * Get the type of an image source
- * @param src pointer to an image source:
- *  - pointer to an 'lv_image_t' variable (image stored internally and compiled into the code)
- *  - a path to a file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
- * @return type of the image source LV_IMAGE_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
- */
 lv_image_src_t lv_image_src_get_type(const void * src)
 {
-    lv_image_src_t img_src_type = LV_IMAGE_SRC_UNKNOWN;
-
-    if(src == NULL) return img_src_type;
+    if(src == NULL) return LV_IMAGE_SRC_UNKNOWN;
     const uint8_t * u8_p = src;
 
     /*The first byte shows the type of the image source*/
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
-        img_src_type = LV_IMAGE_SRC_FILE; /*If it's an ASCII character then it's file name*/
+        return LV_IMAGE_SRC_FILE; /*If it's an ASCII character then it's file name*/
     }
     else if(u8_p[0] >= 0x80) {
-        img_src_type = LV_IMAGE_SRC_SYMBOL; /*Symbols begins after 0x7F*/
+        return LV_IMAGE_SRC_SYMBOL; /*Symbols begins after 0x7F*/
     }
     else {
-        img_src_type = LV_IMAGE_SRC_VARIABLE; /*`lv_image_dsc_t` is draw to the first byte < 0x20*/
+        return LV_IMAGE_SRC_VARIABLE; /*`lv_image_dsc_t` is draw to the first byte < 0x20*/
+    }
+}
+
+void _lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                                  const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb)
+{
+    if(draw_core_cb == NULL) {
+        LV_LOG_WARN("draw_core_cb is NULL");
+        return;
     }
 
-    if(LV_IMAGE_SRC_UNKNOWN == img_src_type) {
-        LV_LOG_WARN("unknown image type");
+    lv_area_t draw_area;
+    lv_area_copy(&draw_area, coords);
+    if(draw_dsc->rotation || draw_dsc->scale_x != LV_SCALE_NONE || draw_dsc->scale_y != LV_SCALE_NONE) {
+        int32_t w = lv_area_get_width(coords);
+        int32_t h = lv_area_get_height(coords);
+
+        _lv_image_buf_get_transformed_area(&draw_area, w, h, draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y,
+                                           &draw_dsc->pivot);
+
+        draw_area.x1 += coords->x1;
+        draw_area.y1 += coords->y1;
+        draw_area.x2 += coords->x1;
+        draw_area.y2 += coords->y1;
     }
 
-    return img_src_type;
+    lv_area_t clipped_img_area;
+    if(!_lv_area_intersect(&clipped_img_area, &draw_area, draw_unit->clip_area)) {
+        return;
+    }
+
+    lv_image_decoder_dsc_t decoder_dsc;
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to open image");
+        return;
+    }
+
+    img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, coords, &clipped_img_area, draw_core_cb);
+
+    lv_image_decoder_close(&decoder_dsc);
+}
+
+void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                                 const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb)
+{
+    if(draw_core_cb == NULL) {
+        LV_LOG_WARN("draw_core_cb is NULL");
+        return;
+    }
+
+    lv_image_decoder_dsc_t decoder_dsc;
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_ERROR("Failed to open image");
+        return;
+    }
+
+    int32_t img_w = lv_area_get_width(coords);
+    int32_t img_h = lv_area_get_height(coords);
+
+    lv_area_t tile_area = *coords;
+    int32_t tile_x_start = tile_area.x1;
+
+    while(tile_area.y1 <= draw_unit->clip_area->y2) {
+        while(tile_area.x1 <= draw_unit->clip_area->x2) {
+
+            lv_area_t clipped_img_area;
+            if(_lv_area_intersect(&clipped_img_area, &tile_area, draw_unit->clip_area)) {
+                img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, &tile_area, &clipped_img_area, draw_core_cb);
+            }
+
+            tile_area.x1 += img_w;
+            tile_area.x2 += img_w;
+        }
+
+        tile_area.y1 += img_h;
+        tile_area.y2 += img_h;
+        tile_area.x1 = tile_x_start;
+        tile_area.x2 = tile_x_start + img_w - 1;
+    }
+
+    lv_image_decoder_close(&decoder_dsc);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                                lv_image_decoder_dsc_t * decoder_dsc,
+                                const lv_area_t * img_area, const lv_area_t * clipped_img_area,
+                                lv_draw_image_core_cb draw_core_cb)
+{
+    lv_draw_image_sup_t sup;
+    sup.alpha_color = draw_dsc->recolor;
+    sup.palette = decoder_dsc->palette;
+    sup.palette_size = decoder_dsc->palette_size;
+
+    /*The whole image is available, just draw it*/
+    if(decoder_dsc->decoded || decoder_dsc->img_data) {
+        draw_core_cb(draw_unit, draw_dsc, decoder_dsc, &sup, img_area, clipped_img_area);
+    }
+    /*Draw in smaller pieces*/
+    else {
+        lv_area_t relative_full_area_to_decode = *clipped_img_area;
+        lv_area_move(&relative_full_area_to_decode, -img_area->x1, -img_area->y1);
+
+        lv_area_t relative_decoded_area;
+        relative_decoded_area.x1 = LV_COORD_MIN;
+        relative_decoded_area.y1 = LV_COORD_MIN;
+        relative_decoded_area.x2 = LV_COORD_MIN;
+        relative_decoded_area.y2 = LV_COORD_MIN;
+        lv_result_t res = LV_RESULT_OK;
+
+        while(res == LV_RESULT_OK) {
+            res = lv_image_decoder_get_area(decoder_dsc, &relative_full_area_to_decode, &relative_decoded_area);
+
+            lv_area_t absolute_decoded_area = relative_decoded_area;
+            lv_area_move(&absolute_decoded_area, img_area->x1, img_area->y1);
+            if(res == LV_RESULT_OK) {
+                /*Limit draw area to the current decoded area and draw the image*/
+                lv_area_t clipped_img_area_sub;
+                if(_lv_area_intersect(&clipped_img_area_sub, clipped_img_area, &absolute_decoded_area)) {
+                    draw_core_cb(draw_unit, draw_dsc, decoder_dsc, &sup,
+                                 &absolute_decoded_area, &clipped_img_area_sub);
+                }
+            }
+        }
+    }
+}

@@ -68,8 +68,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_bar_class;
 
 /**
  * Create a bar object
- * @param parent    pointer to an object, it will be the parent of the new bar
- * @return          pointer to the created bar
+ * @param parent        pointer to an object, it will be the parent of the new bar
+ * @return              pointer to the created bar
  */
 lv_obj_t * lv_bar_create(lv_obj_t * parent);
 
@@ -79,9 +79,9 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent);
 
 /**
  * Set a new value on the bar
- * @param obj       pointer to a bar object
- * @param value     new value
- * @param anim      LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
+ * @param obj           pointer to a bar object
+ * @param value         new value
+ * @param anim          LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
 void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 

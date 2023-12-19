@@ -229,8 +229,8 @@ void lv_demo_widgets_start_slideshow(void)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
-    lv_anim_set_time(&a, t);
-    lv_anim_set_playback_time(&a, t);
+    lv_anim_set_duration(&a, t);
+    lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
     lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
@@ -696,8 +696,8 @@ static void analytics_create(lv_obj_t * parent)
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
-    lv_anim_set_time(&a, 4100);
-    lv_anim_set_playback_time(&a, 2700);
+    lv_anim_set_duration(&a, 4100);
+    lv_anim_set_playback_duration(&a, 2700);
     lv_anim_start(&a);
 
     arc = lv_arc_create(scale1);
@@ -712,8 +712,8 @@ static void analytics_create(lv_obj_t * parent)
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
-    lv_anim_set_time(&a, 2600);
-    lv_anim_set_playback_time(&a, 3200);
+    lv_anim_set_duration(&a, 2600);
+    lv_anim_set_playback_duration(&a, 3200);
     lv_anim_start(&a);
 
     arc = lv_arc_create(scale1);
@@ -728,13 +728,13 @@ static void analytics_create(lv_obj_t * parent)
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
-    lv_anim_set_time(&a, 2800);
-    lv_anim_set_playback_time(&a, 1800);
+    lv_anim_set_duration(&a, 2800);
+    lv_anim_set_playback_duration(&a, 1800);
     lv_anim_start(&a);
 
     /*Scale 2*/
     static const char * scale2_text[] = {"0", "10", "20", "30", "40", "50", "60", "70", "80", "90", NULL};
-    lv_scale_set_round_props(scale2, 360, 0);
+    lv_scale_set_angle_range(scale2, 360);
     lv_scale_set_text_src(scale2, scale2_text);
     lv_scale_set_total_tick_count(scale2, 11);
     lv_scale_set_major_tick_length(scale2, 30);
@@ -782,7 +782,8 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_set_major_tick_every(scale3, 4);
     lv_scale_set_minor_tick_length(scale3, 10);
     lv_scale_set_major_tick_length(scale3, 20);
-    lv_scale_set_round_props(scale3, 225, 135);
+    lv_scale_set_angle_range(scale3, 225);
+    lv_scale_set_rotation(scale3, 135);
 
     lv_style_init(&scale3_section1_main_style);
     lv_style_set_arc_width(&scale3_section1_main_style, 8);
@@ -857,9 +858,9 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_values(&a, 10, 60);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_set_exec_cb(&a, scale3_anim_cb);
-    lv_anim_set_var(&a, needle);
-    lv_anim_set_time(&a, 4100);
-    lv_anim_set_playback_time(&a, 800);
+    lv_anim_set_var(&a, scale3);
+    lv_anim_set_duration(&a, 4100);
+    lv_anim_set_playback_duration(&a, 800);
     lv_anim_start(&a);
 
     lv_obj_align(mbps_label, LV_ALIGN_TOP_MID, 10, lv_pct(55));
@@ -1127,7 +1128,7 @@ static void color_changer_event_cb(lv_event_t * e)
             lv_anim_set_var(&a, color_cont);
             lv_anim_set_exec_cb(&a, color_changer_anim_cb);
             lv_anim_set_values(&a, 0, 256);
-            lv_anim_set_time(&a, 200);
+            lv_anim_set_duration(&a, 200);
             lv_anim_start(&a);
         }
         else {
@@ -1136,7 +1137,7 @@ static void color_changer_event_cb(lv_event_t * e)
             lv_anim_set_var(&a, color_cont);
             lv_anim_set_exec_cb(&a, color_changer_anim_cb);
             lv_anim_set_values(&a, 256, 0);
-            lv_anim_set_time(&a, 200);
+            lv_anim_set_duration(&a, 200);
             lv_anim_start(&a);
         }
     }
@@ -1154,7 +1155,7 @@ static void color_event_cb(lv_event_t * e)
             lv_anim_set_var(&a, color_cont);
             lv_anim_set_exec_cb(&a, color_changer_anim_cb);
             lv_anim_set_values(&a, 0, 256);
-            lv_anim_set_time(&a, 200);
+            lv_anim_set_duration(&a, 200);
             lv_anim_start(&a);
         }
     }
@@ -1615,12 +1616,10 @@ static void scale2_timer_cb(lv_timer_t * timer)
 
 static void scale3_anim_cb(void * var, int32_t v)
 {
-    LV_UNUSED(var);
+    lv_obj_t * needle = lv_obj_get_child(var, 0);
+    lv_scale_set_image_needle_value(var, needle, v);
 
-    lv_obj_t * needle = lv_obj_get_child(scale3, 0);
-    lv_scale_set_image_needle_value(scale3, needle, v);
-
-    lv_obj_t * label = lv_obj_get_child(scale3, 1);
+    lv_obj_t * label = lv_obj_get_child(var, 1);
     lv_label_set_text_fmt(label, "%"LV_PRId32, v);
 }
 
@@ -1658,8 +1657,8 @@ static void slideshow_anim_ready_cb(lv_anim_t * a_old)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
-    lv_anim_set_time(&a, t);
-    lv_anim_set_playback_time(&a, t);
+    lv_anim_set_duration(&a, t);
+    lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
     lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);

@@ -211,6 +211,8 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_tabview_set_act                   lv_tabview_set_active
 
 #define lv_tileview_get_tile_act             lv_tileview_get_tile_active
+#define lv_obj_set_tile_id                   lv_obj_set_tile_by_index
+#define lv_obj_set_tile                      lv_obj_set_tile
 
 #define lv_msgbox_get_btns                   lv_msgbox_get_buttons
 
@@ -233,16 +235,26 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 
 #define lv_obj_get_child_cnt                lv_obj_get_child_count
 
-#define lv_obj_get_style_shadow_ofs_x       lv_obj_get_style_shadow_offset_x
-#define lv_obj_get_style_shadow_ofs_y       lv_obj_get_style_shadow_offset_y
-#define lv_obj_get_style_transform_zoom     lv_obj_get_style_transform_scale
-#define lv_obj_get_style_transform_angle    lv_obj_get_style_transform_rotation
+#define lv_obj_get_style_img_opa              lv_obj_get_style_image_opa
+#define lv_obj_get_style_img_recolor          lv_obj_get_style_image_recolor
+#define lv_obj_get_style_img_recolor_filtered lv_obj_get_style_image_recolor_filtered
+#define lv_obj_get_style_img_recolor_opa      lv_obj_get_style_image_recolor_opa
+#define lv_obj_get_style_shadow_ofs_x         lv_obj_get_style_shadow_offset_x
+#define lv_obj_get_style_shadow_ofs_y         lv_obj_get_style_shadow_offset_y
+#define lv_obj_get_style_transform_zoom       lv_obj_get_style_transform_scale
+#define lv_obj_get_style_transform_angle      lv_obj_get_style_transform_rotation
 
+#define lv_obj_set_style_img_opa            lv_obj_set_style_image_opa
+#define lv_obj_set_style_img_recolor        lv_obj_set_style_image_recolor
+#define lv_obj_set_style_img_recolor_opa    lv_obj_set_style_image_recolor_opa
 #define lv_obj_set_style_shadow_ofs_x       lv_obj_set_style_shadow_offset_x
 #define lv_obj_set_style_shadow_ofs_y       lv_obj_set_style_shadow_offset_y
 #define lv_obj_set_style_transform_zoom     lv_obj_set_style_transform_scale
 #define lv_obj_set_style_transform_angle    lv_obj_set_style_transform_rotation
 
+#define lv_style_set_img_opa                lv_style_set_image_opa
+#define lv_style_set_img_recolor            lv_style_set_image_recolor
+#define lv_style_set_img_recolor_opa        lv_style_set_image_recolor_opa
 #define lv_style_set_shadow_ofs_x           lv_style_set_shadow_offset_x
 #define lv_style_set_shadow_ofs_y           lv_style_set_shadow_offset_y
 #define lv_style_set_transform_angle        lv_style_set_transform_rotation

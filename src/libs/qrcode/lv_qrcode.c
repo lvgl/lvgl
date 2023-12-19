@@ -46,11 +46,6 @@ const lv_obj_class_t lv_qrcode_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create an empty QR code (an `lv_canvas`) object.
- * @param parent point to an object where to create the QR code
- * @return pointer to the created QR code object
- */
 lv_obj_t * lv_qrcode_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
@@ -63,11 +58,12 @@ void lv_qrcode_set_size(lv_obj_t * obj, int32_t size)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_image_dsc_t * img_dsc = lv_canvas_get_image(obj);
-    void * buf = (void *)img_dsc->data;
+    void * buf = (void *)lv_canvas_get_buf(obj);
+    if(buf) lv_draw_buf_free(buf);
 
-    uint32_t buf_size = LV_CANVAS_BUF_SIZE(size, size, 1, LV_DRAW_BUF_STRIDE_ALIGN);
-    buf = lv_realloc(buf, buf_size);
+    size_t buf_size = lv_draw_buf_width_to_stride(size, LV_COLOR_FORMAT_I1) * size;
+    buf_size += 8; /*palette*/
+    buf = lv_draw_buf_malloc(buf_size, LV_COLOR_FORMAT_I1);
     LV_ASSERT_MALLOC(buf);
     if(buf == NULL) {
         LV_LOG_ERROR("malloc failed for canvas buffer");
@@ -107,7 +103,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
 
     lv_canvas_set_palette(obj, 0, lv_color_to_32(qrcode->dark_color, 0xff));
     lv_canvas_set_palette(obj, 1, lv_color_to_32(qrcode->light_color, 0xff));
-    lv_color_t c = lv_color_from_int(1);
+    lv_color_t c = lv_color_hex(1);
     lv_canvas_fill_bg(obj, c, LV_OPA_COVER);
 
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RESULT_INVALID;
@@ -118,14 +114,15 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
     if(qr_size <= 0) return LV_RESULT_INVALID;
     int32_t scale = img_dsc->header.w / qr_size;
     if(scale <= 0) return LV_RESULT_INVALID;
-    int32_t remain = img_dsc->header.w % qr_size;
 
-    /* The qr version is incremented by four point */
-    uint32_t version_extend = remain / (scale << 2);
-    if(version_extend && qr_version < qrcodegen_VERSION_MAX) {
-        qr_version = qr_version + version_extend > qrcodegen_VERSION_MAX ?
-                     qrcodegen_VERSION_MAX : qr_version + version_extend;
+    /* Pick the largest QR code that still maintains scale. */
+    for(int32_t i = qr_version + 1; i < qrcodegen_VERSION_MAX; i++) {
+        if(qrcodegen_version2size(i) * scale > img_dsc->header.w)
+            break;
+
+        qr_version = i;
     }
+    qr_size = qrcodegen_version2size(qr_version);
 
     uint8_t * qr0 = lv_malloc(qrcodegen_BUFFER_LEN_FOR_VERSION(qr_version));
     LV_ASSERT_MALLOC(qr0);
@@ -154,7 +151,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
     /* Copy the qr code canvas:
      * A simple `lv_canvas_set_px` would work but it's slow for so many pixels.
      * So buffer 1 byte (8 px) from the qr code and set it in the canvas image */
-    uint32_t row_byte_cnt = (img_dsc->header.w + 7) >> 3;
+    uint32_t row_byte_cnt = img_dsc->header.stride;
     int y;
     for(y = margin; y < scaled + margin; y += scale) {
         uint8_t b = 0;
@@ -167,7 +164,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
             if(aligned == false && (x & 0x7) == 0) aligned = true;
 
             if(aligned == false) {
-                c = lv_color_from_int(a ? 0 : 1);
+                c = lv_color_hex(a ? 0 : 1);
                 lv_canvas_set_px(obj, x, y, c, LV_OPA_COVER);
             }
             else {
@@ -233,7 +230,7 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         return;
     }
 
-    lv_free((void *)lv_canvas_get_image(obj));
+    lv_draw_buf_free((void *)lv_canvas_get_buf(obj));
     img_dsc->data = NULL;
 }
 
