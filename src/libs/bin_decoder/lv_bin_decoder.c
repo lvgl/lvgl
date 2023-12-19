@@ -123,6 +123,17 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
                 return LV_RESULT_INVALID;
             }
 
+            /**
+             * @todo
+             * This is a temp backward compatibility solution after adding
+             * magic in image header.
+             */
+            if(header->magic != LV_IMAGE_HEADER_MAGIC) {
+                LV_LOG_WARN("Legacy bin image detected: %s", (char *)src);
+                header->cf = header->magic;
+                header->magic = LV_IMAGE_HEADER_MAGIC;
+            }
+
             /*File is always read to buf, thus data can be modified.*/
             header->flags |= LV_IMAGE_FLAGS_MODIFIABLE;
         }
