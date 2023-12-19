@@ -232,7 +232,7 @@ static inline bool _lv_color_blend_to_rgb565_with_mask_neon(_lv_draw_sw_blend_fi
 }
 
 extern void lv_color_blend_to_rgb565_mix_mask_opa_neon(asm_dsc_t * dsc);
-static inline bool _lv_color_blend_to_rgb565_mix_mask_opa_neon(_lv_draw_sw_blend_fill_dsc_t * dsc)
+static inline lv_result_t _lv_color_blend_to_rgb565_mix_mask_opa_neon(_lv_draw_sw_blend_fill_dsc_t * dsc)
 {
     asm_dsc_t asm_dsc = {
         .opa = dsc->opa,
