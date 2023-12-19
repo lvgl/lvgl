@@ -3,7 +3,6 @@
 *
  */
 
-
 #ifndef LV_IMAGE_CACHE_H
 #define LV_IMAGE_CACHE_H
 

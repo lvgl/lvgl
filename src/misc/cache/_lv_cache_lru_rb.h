@@ -3,7 +3,6 @@
 *
 */
 
-
 #ifndef LV_CACHE_LRU_RB_H
 #define LV_CACHE_LRU_RB_H
 

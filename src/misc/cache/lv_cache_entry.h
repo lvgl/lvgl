@@ -3,7 +3,6 @@
 *
  */
 
-
 #ifndef LV_CACHE_ENTRY_H
 #define LV_CACHE_ENTRY_H
 

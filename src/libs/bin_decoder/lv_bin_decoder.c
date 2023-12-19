@@ -85,8 +85,6 @@ static void bin_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void 
  *   GLOBAL FUNCTIONS
  **********************/
 
-
-
 /**
  * Initialize the lvgl binary image decoder module
  */

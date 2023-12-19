@@ -86,7 +86,8 @@ typedef struct _tiny_ttf_cache_data_t {
 
 static bool tiny_ttf_cache_create_cb(tiny_ttf_cache_data_t * node, void * user_data);
 static void tiny_ttf_cache_free_cb(tiny_ttf_cache_data_t * node, void * user_data);
-static lv_cache_compare_res_t tiny_ttf_cache_compare_cb(const tiny_ttf_cache_data_t * lhs, const tiny_ttf_cache_data_t * rhs);
+static lv_cache_compare_res_t tiny_ttf_cache_compare_cb(const tiny_ttf_cache_data_t * lhs,
+                                                        const tiny_ttf_cache_data_t * rhs);
 
 static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                  uint32_t unicode_letter_next)
@@ -143,7 +144,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
         .size = font->line_height,
     };
 
-    lv_cache_entry_t * entry = lv_cache_acquire_or_create(tiny_ttf_cache, &search_key, (void*)font->dsc);
+    lv_cache_entry_t * entry = lv_cache_acquire_or_create(tiny_ttf_cache, &search_key, (void *)font->dsc);
 
     if(entry == NULL) {
         LV_LOG_ERROR("cache not allocated\n");
@@ -252,7 +253,8 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
     }
 }
 
-void lv_tiny_ttf_init() {
+void lv_tiny_ttf_init()
+{
     lv_cache_ops_t ops = {
         .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_cache_compare_cb,
         .create_cb = (lv_cache_create_cb_t)tiny_ttf_cache_create_cb,
@@ -302,17 +304,18 @@ static void tiny_ttf_cache_free_cb(tiny_ttf_cache_data_t * node, void * user_dat
 
     lv_draw_buf_free(node->buffer);
 }
-static lv_cache_compare_res_t tiny_ttf_cache_compare_cb(const tiny_ttf_cache_data_t * lhs, const tiny_ttf_cache_data_t * rhs)
+static lv_cache_compare_res_t tiny_ttf_cache_compare_cb(const tiny_ttf_cache_data_t * lhs,
+                                                        const tiny_ttf_cache_data_t * rhs)
 {
-    if (lhs->font != rhs->font) {
+    if(lhs->font != rhs->font) {
         return lhs->font > rhs->font ? 1 : -1;
     }
 
-    if (lhs->unicode != rhs->unicode) {
+    if(lhs->unicode != rhs->unicode) {
         return lhs->unicode > rhs->unicode ? 1 : -1;
     }
 
-    if (lhs->size != rhs->size) {
+    if(lhs->size != rhs->size) {
         return lhs->size > rhs->size ? 1 : -1;
     }
 

@@ -3,7 +3,6 @@
 *
  */
 
-
 #ifndef _LV_CACHE_ENTRY_INTERNAL
 #define _LV_CACHE_ENTRY_INTERNAL
 
