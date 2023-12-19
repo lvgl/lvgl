@@ -86,13 +86,21 @@ class MicroPython_Test(unittest.TestCase):
     @classmethod
     def read_until(cls, marker):
         micropy_data = b''
+        error_data = b''
 
         log('MARKER', marker)
 
         logged = False
 
-        while not micropy_data.endswith(marker) and not cls.exit_event.is_set():
-            char = cls.process.stdout.read(1)
+        while (
+            not micropy_data.endswith(marker) and
+            not cls.exit_event.is_set()
+        ):
+            try:
+                char = cls.process.stdout.read(1)
+            except:  # NOQA
+                break
+
             if char:
                 micropy_data += char
                 logged = False
@@ -100,13 +108,23 @@ class MicroPython_Test(unittest.TestCase):
                 logged = True
                 log('--->', micropy_data)
 
+            if micropy_data.endswith(b'ERROR END') and b'===' not in micropy_data:
+                error_data = micropy_data
+                micropy_data = b''
+                log('---> ERROR: ', error_data)
+                logged = True
+                break
+
         if not logged:
             log('--->', micropy_data)
 
         if cls.exit_event.is_set():
-            log('*** EXIT EVENT SET ***')
+            log('--EXIT EVENT SET')
 
-        return micropy_data.replace(marker, b'')
+        if micropy_data:
+            return micropy_data.replace(marker, b''), error_data
+
+        return micropy_data, error_data
 
     @classmethod
     def setUpClass(cls):
@@ -127,7 +145,10 @@ class MicroPython_Test(unittest.TestCase):
 
         cls.send(b'cd ' + os.path.dirname(__file__).encode('utf-8') + b'\n')
         cls.send(MICROPYTHON_PATH.encode('utf-8') + b'\n')
-        cls.read_until(b'>>>')
+        _, error_data = cls.read_until(b'>>>')
+
+        if error_data:
+            raise RuntimeError(error_data)
 
         log('--MICROPYTHON STARTED')
 
@@ -171,42 +192,61 @@ class MicroPython_Test(unittest.TestCase):
             self.fail('MicroPython failure.')
 
         self.send(CTRL_E)
-        self.read_until(PASTE_PROMPT)
+
+        _, error_data = self.read_until(PASTE_PROMPT)
+        if error_data:
+            self.fail(error_data)
 
         test_code = test_code.split(b'\r\n')
 
         for i, line in enumerate(test_code):
             self.send(line + b'\n')
-            self.read_until(b'\n')
+            _, error_data = self.read_until(b'\n')
+
+            if error_data:
+                self.fail(error_data)
 
             time.sleep(0.002)
 
         # self.read_until(b'# end\n')
 
         def _do(td: TestData):
+            self.send(CTRL_D)
+            td.error_data = b''
             td.watchdog_timer = time.time()
 
             curr_time = capture_start = time.time()
             td.result = []
 
             while (
-                (curr_time - capture_start) * 1000 <= 3000 and
+                (curr_time - capture_start) * 1000 <= 10000 and
                 not self.__class__.exit_event.is_set()
             ):
                 try:
-                    self.read_until(b'FRAME START\n')
+                    _, td.error_data = self.read_until(b'FRAME START\n')
+                    if td.error_data:
+                        break
+
                     fd = []
-                    lne = self.read_until(b'\n')
+
+                    lne, td.error_data = self.read_until(b'\n')
+                    if td.error_data:
+                        break
 
                     while lne != b'FRAME END':
                         td.watchdog_timer = time.time()
                         fd.append(lne)
-                        lne = self.read_until(b'\n')
+                        lne, td.error_data = self.read_until(b'\n')
+
+                        if td.error_data:
+                            break
                         if self.__class__.exit_event.is_set():
                             break
 
                     td.result.append(fd[:])
 
+                    if td.error_data:
+                        break
                     if self.__class__.exit_event.is_set():
                         break
 
@@ -232,18 +272,18 @@ class MicroPython_Test(unittest.TestCase):
         test_data.watchdog_timer = time.time()
 
         t.start()
-        self.send(CTRL_D)
 
         while (
-            (time.time() - test_data.watchdog_timer) * 1000 <= 3000 and
+            (time.time() - test_data.watchdog_timer) * 1000 <= 10000 and
             not test_data.event.is_set()
         ):
             test_data.event.wait(0.05)
 
+        self.send(CTRL_C)
+        self.send(CTRL_C)
+
         if not test_data.event.is_set():
             self.__class__.exit_event.set()
-            self.send(CTRL_C)
-            self.send(CTRL_C)
             # self.read_until(REPL_PROMPT)
 
         width = 800
@@ -271,13 +311,6 @@ class MicroPython_Test(unittest.TestCase):
                 test_data.result.append(None)
                 continue
 
-        self.__class__.exit_event.clear()
-
-        if test_data.error_data:
-            log(f'--TEST FAILED')
-            log(test_data.error_data)
-            self.fail(test_data.error_data)
-
         if not os.path.exists(ARTIFACT_PATH):
             os.mkdir(ARTIFACT_PATH)
 
@@ -300,33 +333,47 @@ class MicroPython_Test(unittest.TestCase):
         res_img.close()
 
         for frame_num, im in enumerate(test_data.result):
-            img = im.convert('RGB')
-            im.close()
-            byte_data = list(img.getdata())
-            writer = BytesIO()
-            img.save(writer, 'PNG')
-            img.close()
+            try:
+                img = im.convert('RGB')
+                im.close()
+                byte_data = list(img.getdata())
+                writer = BytesIO()
+                img.save(writer, 'PNG')
+                img.close()
 
-            writer.seek(0)
-            png = apng.PNG.from_bytes(writer.read())
-            artifact.append(png)
+                writer.seek(0)
+                png = apng.PNG.from_bytes(writer.read())
+                artifact.append(png)
 
-            img.save(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.png'), 'PNG')
+                img.save(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.png'), 'PNG')
 
-            with open(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.bin'), 'wb') as f:
-                # have to flatten the data and remove the alpha
-                # from the PIL image it is formatted as
-                # [(r, g, b), (r, g, b)]
-                f.write(bytes(bytearray([
-                    item for sublist in byte_data
-                    for item in sublist
-                ])))
+                with open(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.bin'), 'wb') as f:
+                    # have to flatten the data and remove the alpha
+                    # from the PIL image it is formatted as
+                    # [(r, g, b), (r, g, b)]
+                    f.write(bytes(bytearray([
+                        item for sublist in byte_data
+                        for item in sublist
+                    ])))
 
-            if res_data == byte_data:
-                save_apng()
-                self.assertEqual(res_data, byte_data, 'Frames do not match')
+                if res_data == byte_data:
+                    save_apng()
+                    self.assertEqual(res_data, byte_data, 'Frames do not match')
+            except:  # NOQA
+                import traceback
+
+                if not test_data.error_data:
+                    test_data.error_data = traceback.format_exc()
+
+                break
 
         save_apng()
+
+        if test_data.error_data:
+            log(f'--TEST FAILED')
+            log(test_data.error_data)
+            self.fail(test_data.error_data)
+
         self.fail('Frame Data does not match')
 
 
