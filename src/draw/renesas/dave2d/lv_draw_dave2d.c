@@ -34,9 +34,6 @@ static void _dave2d_buf_invalidate_cache_cb(void * buf, uint32_t stride, lv_colo
 #endif
 #endif
 
-static  void _dave2d_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area,
-                              void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area, lv_color_format_t color_format);
-
 static int32_t _dave2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
@@ -122,7 +119,6 @@ static void lv_draw_buf_dave2d_init_handlers(void)
     handlers->invalidate_cache_cb = _dave2d_buf_invalidate_cache_cb;
 #endif
 #endif
-    handlers->buf_copy_cb        = _dave2d_buf_copy;
 }
 
 #if defined(RENESAS_CORTEX_M85)
@@ -148,6 +144,11 @@ static void _dave2d_buf_invalidate_cache_cb(void * buf, uint32_t stride, lv_colo
 #endif
 #endif
 
+/**
+ * @todo
+ * LVGL needs to use hardware acceleration for buf_copy and do not affect GPU rendering.
+ */
+#if 0
 static void _dave2d_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area,
                              void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area, lv_color_format_t color_format)
 {
@@ -230,6 +231,7 @@ static void _dave2d_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, 
 #endif
 
 }
+#endif
 
 #define USE_D2 (1)
 
