@@ -25,6 +25,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
 typedef struct {
     lv_draw_dsc_base_t base;
 
@@ -45,8 +46,17 @@ struct _lv_layer_t;
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize an arc draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc);
 
+/**
+ * Create an arc draw task.
+ * @param layer         pointer to a layer
+ * @param dsc           pointer to an initialized draw descriptor variable
+ */
 void lv_draw_arc(struct _lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
 
 /**

@@ -64,6 +64,24 @@ typedef uint8_t lv_opa_t;
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
 
+#define LV_COLOR_FORMAT_GET_BPP(cf) (       \
+                                            (cf) == LV_COLOR_FORMAT_I1 ? 1 :        \
+                                            (cf) == LV_COLOR_FORMAT_A1 ? 1 :        \
+                                            (cf) == LV_COLOR_FORMAT_I2 ? 2 :        \
+                                            (cf) == LV_COLOR_FORMAT_A2 ? 2 :        \
+                                            (cf) == LV_COLOR_FORMAT_I4 ? 4 :        \
+                                            (cf) == LV_COLOR_FORMAT_A4 ? 4 :        \
+                                            (cf) == LV_COLOR_FORMAT_L8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_A8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
+                                            (cf) == LV_COLOR_FORMAT_RGB565A8 ? 24 : \
+                                            (cf) == LV_COLOR_FORMAT_RGB888 ? 24 :   \
+                                            (cf) == LV_COLOR_FORMAT_ARGB8888 ? 32 : \
+                                            (cf) == LV_COLOR_FORMAT_XRGB8888 ? 32 : \
+                                            0                                       \
+                                    )
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -164,15 +182,15 @@ typedef uint8_t lv_color_format_t;
 
 /**
  * Get the pixel size of a color format in bits, bpp
- * @param src_cf a color format (`LV_COLOR_FORMAT_...`)
- * @return the pixel size in bits
+ * @param src_cf    a color format (`LV_COLOR_FORMAT_...`)
+ * @return          the pixel size in bits
  */
 uint8_t lv_color_format_get_bpp(lv_color_format_t cf);
 
 /**
  * Get the pixel size of a color format in bytes
- * @param src_cf a color format (`LV_COLOR_FORMAT_...`)
- * @return the pixel size in bytes
+ * @param src_cf    a color format (`LV_COLOR_FORMAT_...`)
+ * @return          the pixel size in bytes
  */
 static inline uint8_t lv_color_format_get_size(lv_color_format_t cf)
 {
@@ -181,35 +199,57 @@ static inline uint8_t lv_color_format_get_size(lv_color_format_t cf)
 
 /**
  * Check if a color format has alpha channel or not
- * @param src_cf a color format (`LV_IMAGE_CF_...`)
- * @return true: has alpha channel; false: doesn't have alpha channel
+ * @param src_cf    a color format (`LV_COLOR_FORMAT_...`)
+ * @return          true: has alpha channel; false: doesn't have alpha channel
  */
 bool lv_color_format_has_alpha(lv_color_format_t src_cf);
 
+/**
+ * Create an ARGB8888 color from RGB888 + alpha
+ * @param color     an RGB888 color
+ * @param opa       the alpha value
+ * @return          the ARGB8888 color
+ */
 lv_color32_t lv_color_to_32(lv_color_t color, lv_opa_t opa);
 
+/**
+ * Convert an RGB888 color to an integer
+ * @param c     an RGB888 color
+ * @return      `c` as an integer
+ */
 static inline uint32_t lv_color_to_int(lv_color_t c)
 {
     uint8_t * tmp = (uint8_t *) &c;
     return tmp[0] + (tmp[1] << 8) + (tmp[2] << 16);
 }
 
-static inline lv_color_t lv_color_from_int(uint32_t v)
-{
-    void * p = (void *)&v;
-    return *((lv_color_t *)p);
-}
-
+/**
+ * Check if two RGB888 color are equal
+ * @param c1    the first color
+ * @param c2    the second color
+ * @return      true: equal
+ */
 static inline bool lv_color_eq(lv_color_t c1, lv_color_t c2)
 {
     return lv_color_to_int(c1) == lv_color_to_int(c2);
 }
 
+/**
+ * Check if two ARGB8888 color are equal
+ * @param c1    the first color
+ * @param c2    the second color
+ * @return      true: equal
+ */
 static inline bool lv_color32_eq(lv_color32_t c1, lv_color32_t c2)
 {
     return *((uint32_t *)&c1) == *((uint32_t *)&c2);
 }
 
+/**
+ * Create a color from 0x000000..0xffffff input
+ * @param c     the hex input
+ * @return      the color
+ */
 static inline lv_color_t lv_color_hex(uint32_t c)
 {
     lv_color_t ret;
@@ -219,6 +259,13 @@ static inline lv_color_t lv_color_hex(uint32_t c)
     return ret;
 }
 
+/**
+ * Create an RGB888 color
+ * @param r     the red channel (0..255)
+ * @param g     the green channel (0..255)
+ * @param b     the blue channel (0..255)
+ * @return      the color
+ */
 static inline lv_color_t lv_color_make(uint8_t r, uint8_t g, uint8_t b)
 {
     lv_color_t ret;
@@ -228,6 +275,14 @@ static inline lv_color_t lv_color_make(uint8_t r, uint8_t g, uint8_t b)
     return ret;
 }
 
+/**
+ * Create an ARGB8888 color
+ * @param r     the red channel (0..255)
+ * @param g     the green channel (0..255)
+ * @param b     the blue channel (0..255)
+ * @param a     the alpha channel (0..255)
+ * @return      the color
+ */
 static inline lv_color32_t lv_color32_make(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
     lv_color32_t ret;
@@ -238,15 +293,40 @@ static inline lv_color32_t lv_color32_make(uint8_t r, uint8_t g, uint8_t b, uint
     return ret;
 }
 
+/**
+ * Create a color from 0x000..0xfff input
+ * @param c     the hex input (e.g. 0x123 will be 0x112233)
+ * @return      the color
+ */
 static inline lv_color_t lv_color_hex3(uint32_t c)
 {
     return lv_color_make((uint8_t)(((c >> 4) & 0xF0) | ((c >> 8) & 0xF)), (uint8_t)((c & 0xF0) | ((c & 0xF0) >> 4)),
                          (uint8_t)((c & 0xF) | ((c & 0xF) << 4)));
 }
 
+/**
+ * Convert am RGB888 color to RGB565 stored in `uint16_t`
+ * @param color     and RGB888 color
+ * @return          `color` as RGB565 on `uin16_t`
+ */
 uint16_t lv_color_to_u16(lv_color_t color);
+
+/**
+ * Convert am RGB888 color to XRGB8888 stored in `uint32_t`
+ * @param color     and RGB888 color
+ * @return          `color` as XRGB8888 on `uin32_t` (the alpha channel is always set to 0xFF)
+ */
 uint32_t lv_color_to_u32(lv_color_t color);
 
+/**
+ * Mix two RGB565 colors
+ * @param c1        the first color (typically the foreground color)
+ * @param c2        the second color  (typically the background color)
+ * @param mix       0..255, or LV_OPA_0/10/20...
+ * @return          mix == 0: c2
+ *                  mix == 255: c1
+ *                  mix == 128: 0.5 x c1 + 0.5 x c2
+ */
 LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uint16_t c2, uint8_t mix)
 {
     if(mix == 255) return c1;
@@ -266,8 +346,20 @@ LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uin
     return ret;
 }
 
+/**
+ * Mix white to a color
+ * @param c     the base color
+ * @param lvl   the intensity of white (0: no change, 255: fully white)
+ * @return      the mixed color
+ */
 lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl);
 
+/**
+ * Mix black to a color
+ * @param c     the base color
+ * @param lvl   the intensity of black (0: no change, 255: fully black)
+ * @return      the mixed color
+ */
 lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl);
 
 /**
@@ -297,10 +389,19 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
 
 /*Source: https://vuetifyjs.com/en/styles/colors/#material-colors*/
 
+/**
+ * A helper for white color
+ * @return      a white color
+ */
 static inline lv_color_t lv_color_white(void)
 {
     return lv_color_make(0xff, 0xff, 0xff);
 }
+
+/**
+ * A helper for black color
+ * @return      a black color
+ */
 static inline lv_color_t lv_color_black(void)
 {
     return lv_color_make(0x00, 0x00, 0x00);

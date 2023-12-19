@@ -38,14 +38,16 @@ struct _lv_layer_t;
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize a rectangle mask draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * dsc);
 
 /**
- * Draw a line
- * @param point1 first point of the line
- * @param point2 second point of the line
- * @param clip the line will be drawn only in this area
- * @param dsc pointer to an initialized `lv_draw_line_dsc_t` variable
+ * Create a draw task to mask a rectangle from the buffer
+ * @param layer     pointer to a layer
+ * @param dsc       pointer to a draw descriptor
  */
 void lv_draw_mask_rect(struct _lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
 

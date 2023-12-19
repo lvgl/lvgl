@@ -65,7 +65,7 @@ and configured with ``lv_anim_set_...()`` functions.
    lv_anim_set_start_cb(&a, start_cb);
 
    /*When ready, play the animation backward with this duration. Default is 0 (disabled) [ms]*/
-   lv_anim_set_playback_time(&a, time);
+   lv_anim_set_playback_duration(&a, time);
 
    /*Delay before playback. Default is 0 (disabled) [ms]*/
    lv_anim_set_playback_delay(&a, delay);

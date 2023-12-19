@@ -59,11 +59,6 @@ lv_result_t lv_mem_test_core(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Allocate a memory dynamically
- * @param size size of the memory to allocate in bytes
- * @return pointer to the allocated memory
- */
 void * lv_malloc(size_t size)
 {
     LV_TRACE_MEM("allocating %lu bytes", (unsigned long)size);
@@ -121,10 +116,6 @@ void * lv_malloc_zeroed(size_t size)
     return alloc;
 }
 
-/**
- * Free an allocated data
- * @param data pointer to an allocated memory
- */
 void lv_free(void * data)
 {
     LV_TRACE_MEM("freeing %p", data);
@@ -134,13 +125,6 @@ void lv_free(void * data)
     lv_free_core(data);
 }
 
-/**
- * Reallocate a memory with a new size. The old content will be kept.
- * @param data pointer to an allocated memory.
- * Its content will be copied to the new memory block and freed
- * @param new_size the desired new size in byte
- * @return pointer to the new memory
- */
 void * lv_realloc(void * data_p, size_t new_size)
 {
     LV_TRACE_MEM("reallocating %p with %lu size", data_p, (unsigned long)new_size);

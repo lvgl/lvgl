@@ -120,12 +120,12 @@ typedef struct _lv_global_t {
     lv_log_print_g_cb_t custom_log_print_cb;
 #endif
 
-#if LV_LOG_USE_TIMESTAMP
+#if LV_USE_LOG && LV_LOG_USE_TIMESTAMP
     uint32_t log_last_log_time;
 #endif
 
-#if LV_USE_THEME_BASIC
-    struct _my_theme_t * theme_basic;
+#if LV_USE_THEME_SIMPLE
+    struct _my_theme_t * theme_simple;
 #endif
 
 #if LV_USE_THEME_DEFAULT

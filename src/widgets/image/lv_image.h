@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_IMG != 0
+#if LV_USE_IMAGE != 0
 
 /*Testing of dependencies*/
 #if LV_USE_LABEL == 0
@@ -321,7 +321,7 @@ lv_image_align_t lv_image_get_align(lv_obj_t * obj);
 /** Use this macro to declare an image in a C file*/
 #define LV_IMAGE_DECLARE(var_name) extern const lv_image_dsc_t var_name
 
-#endif /*LV_USE_IMG*/
+#endif /*LV_USE_IMAGE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

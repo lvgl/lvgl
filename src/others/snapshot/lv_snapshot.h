@@ -59,7 +59,7 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_color_format_t cf);
  * @param obj       the object to generate snapshot.
  * @param cf        color format for generated image.
  * @param dsc       image descriptor to store the image result.
- * @param buf       the buffer to store image data.
+ * @param buf       the buffer to store image data. It must meet align requirement.
  * @param buf_size  provided buffer size in bytes.
  * @return          LV_RESULT_OK on success, LV_RESULT_INVALID on error.
  */

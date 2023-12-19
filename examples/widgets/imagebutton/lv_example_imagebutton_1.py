@@ -1,38 +1,38 @@
 # Create an image from the png file
 try:
     with open('../../assets/imgbtn_left.png','rb') as f:
-        imgbtn_left_data = f.read()
+        imagebutton_left_data = f.read()
 except:
-    print("Could not find imgbtn_left.png")
+    print("Could not find imagebutton_left.png")
     sys.exit()
 
-imgbtn_left_dsc = lv.image_dsc_t({
-  'data_size': len(imgbtn_left_data),
-  'data': imgbtn_left_data
+imagebutton_left_dsc = lv.image_dsc_t({
+  'data_size': len(imagebutton_left_data),
+  'data': imagebutton_left_data
 })
 
 try:
     with open('../../assets/imgbtn_mid.png','rb') as f:
-        imgbtn_mid_data = f.read()
+        imagebutton_mid_data = f.read()
 except:
-    print("Could not find imgbtn_mid.png")
+    print("Could not find imagebutton_mid.png")
     sys.exit()
 
-imgbtn_mid_dsc = lv.image_dsc_t({
-  'data_size': len(imgbtn_mid_data),
-  'data': imgbtn_mid_data
+imagebutton_mid_dsc = lv.image_dsc_t({
+  'data_size': len(imagebutton_mid_data),
+  'data': imagebutton_mid_data
 })
 
 try:
     with open('../../assets/imgbtn_right.png','rb') as f:
-        imgbtn_right_data = f.read()
+        imagebutton_right_data = f.read()
 except:
     print("Could not find imgtn_right.png")
     sys.exit()
 
-imgbtn_right_dsc = lv.image_dsc_t({
-  'data_size': len(imgbtn_right_data),
-  'data': imgbtn_right_data
+imagebutton_right_dsc = lv.image_dsc_t({
+  'data_size': len(imagebutton_right_data),
+  'data': imagebutton_right_data
 })
 
 # Create a transition animation on width transformation and recolor.
@@ -53,15 +53,15 @@ style_pr.set_image_recolor(lv.color_black())
 style_pr.set_transform_width(20)
 
 # Create an image button
-imgbtn1 = lv.imgbtn(lv.screen_active())
-imgbtn1.set_src(lv.imgbtn.STATE.RELEASED, imgbtn_left_dsc, imgbtn_mid_dsc, imgbtn_right_dsc)
-imgbtn1.add_style(style_def, 0)
-imgbtn1.add_style(style_pr, lv.STATE.PRESSED)
+imagebutton1 = lv.imagebutton(lv.screen_active())
+imagebutton1.set_src(lv.imagebutton.STATE.RELEASED, imagebutton_left_dsc, imagebutton_mid_dsc, imagebutton_right_dsc)
+imagebutton1.add_style(style_def, 0)
+imagebutton1.add_style(style_pr, lv.STATE.PRESSED)
 
-imgbtn1.align(lv.ALIGN.CENTER, 0, 0)
+imagebutton1.align(lv.ALIGN.CENTER, 0, 0)
 
 # Create a label on the image button
-label = lv.label(imgbtn1)
+label = lv.label(imagebutton1)
 label.set_text("Button")
 label.align(lv.ALIGN.CENTER, 0, -4)
 

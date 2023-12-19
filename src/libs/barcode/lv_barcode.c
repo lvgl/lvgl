@@ -133,7 +133,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 
     for(int32_t x = 0; x < barcode_w; x++) {
         lv_color_t color;
-        color = lv_color_from_int(out_buf[x] ? 0 : 1);
+        color = lv_color_hex(out_buf[x] ? 0 : 1);
         for(uint16_t i = 0; i < scale; i++) {
             if(barcode->direction == LV_DIR_HOR) {
                 lv_canvas_set_px(obj, x * scale + i, 0, color, LV_OPA_COVER);

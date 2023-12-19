@@ -96,15 +96,9 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_set_open_cb(decoder, lv_bin_decoder_open);
     lv_image_decoder_set_get_area_cb(decoder, lv_bin_decoder_get_area);
     lv_image_decoder_set_close_cb(decoder, lv_bin_decoder_close);
+    decoder->cache_data_type = lv_cache_register_data_type();
 }
 
-/**
- * Get info about a lvgl binary image
- * @param decoder the decoder where this function belongs
- * @param src the image source: pointer to an `lv_image_dsc_t` variable, a file path or a symbol
- * @param header store the image data here
- * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
- */
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
     LV_UNUSED(decoder); /*Unused*/
@@ -153,13 +147,6 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_OK;
 }
 
-/**
- * Open a lvgl binary image
- * @param decoder the decoder where this function belongs
- * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
- * @param args arguments of how to decode the image.
- * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
- */
 lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                 const lv_image_decoder_args_t * args)
 {
@@ -330,11 +317,6 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     return res;
 }
 
-/**
- * Close the pending decoding. Free resources etc.
- * @param decoder pointer to the decoder the function associated with
- * @param dsc pointer to decoder descriptor
- */
 void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
@@ -690,6 +672,23 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
 }
 #endif
 
+/**
+ * Extend A1/2/4 to A8 with interpolation to reduce rounding error.
+ */
+static inline uint8_t bit_extend(uint8_t value, uint8_t bpp)
+{
+    if(value == 0) return 0;
+
+    uint8_t res = value;
+    uint8_t bpp_now = bpp;
+    while(bpp_now < 8) {
+        res |= value << (8 - bpp_now);
+        bpp_now += bpp;
+    };
+
+    return res;
+}
+
 static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
@@ -738,19 +737,14 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
             /**
              * Rounding error:
              * Take bpp = 4 as example, alpha value of 0x0 to 0x0F should be
-             * mapped to 0x00 to 0xFF, thus the equation should be below Equation 3.
+             * mapped to 0x00 to 0xFF. Using below equation will give us 0x00 to 0xF0
+             * thus causes error. We can simply interpolate the value to fix it.
              *
-             * But it involves division and multiplication, which is slow. So, if
-             * we ignore the rounding errors, Equation1, 2 could be faster. But it
-             * will either has error when alpha is 0xff or 0x00.
-             *
-             * We use Equation 3 here for maximum accuracy.
-             *
-             * Equation 1: *out = ((*in >> shift) & mask) << (8 - bpp);
-             * Equation 2: *out = ((((*in >> shift) & mask) + 1) << (8 - bpp)) - 1;
-             * Equation 3: *out = ((*in >> shift) & mask) * 255 / ((1L << bpp) - 1) ;
+             * Equation: *out = ((*in >> shift) & mask) << (8 - bpp);
+             * Ideal: *out = ((*in >> shift) & mask) * 255 / ((1L << bpp) - 1)
              */
-            *out = ((*in >> shift) & mask) * 255L / ((1L << bpp) - 1) ;
+            uint8_t value = ((*in >> shift) & mask);
+            *out = bit_extend(value, bpp);
             shift += bpp;
             if(shift >= 8) {
                 shift = 0;
@@ -770,15 +764,14 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t rn;
     uint32_t len;
     uint32_t compressed_len;
-    uint8_t * file_buf;
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     lv_result_t res;
+    uint8_t * file_buf = NULL;
     lv_image_compressed_t * compressed = &decoder_data->compressed;
-    bool is_file = dsc->src_type == LV_IMAGE_SRC_FILE;
 
     lv_memzero(compressed, sizeof(lv_image_compressed_t));
 
-    if(is_file) {
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         lv_fs_file_t * f = decoder_data->f;
 
         if(lv_fs_seek(f, 0, LV_FS_SEEK_END) != LV_FS_RES_OK ||
@@ -842,7 +835,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 
     res = decompress_image(dsc, compressed);
     compressed->data = NULL; /*No need to store the data any more*/
-    if(is_file) lv_free(file_buf);
+    lv_free(file_buf);
     if(res != LV_RESULT_OK) {
         LV_LOG_WARN("Decompress failed");
         return LV_RESULT_INVALID;

@@ -47,12 +47,16 @@ struct _lv_layer_t;
  * GLOBAL PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
+/**
+ * Initialize a line draw descriptor
+ * @param dsc       pointer to a draw descriptor
+ */
+void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
 
 /**
- * Draw a line
- * @param layer         pointer to a layer
- * @param dsc           pointer to an initialized `lv_draw_line_dsc_t` variable
+ * Create a line draw task
+ * @param layer     pointer to a layer
+ * @param dsc       pointer to an initialized `lv_draw_line_dsc_t` variable
  */
 void lv_draw_line(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
 

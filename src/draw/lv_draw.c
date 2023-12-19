@@ -399,8 +399,13 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
 {
-    return lv_draw_buf_go_to_xy(layer->buf, layer->buf_stride, layer->color_format, x, y);
-
+    lv_draw_buf_t tmp;
+    tmp.data = layer->buf;
+    tmp.header.stride = layer->buf_stride;
+    tmp.header.cf = layer->color_format;
+    tmp.header.w = lv_area_get_width(&layer->buf_area);
+    tmp.header.h = lv_area_get_height(&layer->buf_area);
+    return lv_draw_buf_goto_xy(&tmp, x, y);
 }
 
 /**********************

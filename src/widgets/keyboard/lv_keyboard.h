@@ -18,12 +18,12 @@ extern "C" {
 #if LV_USE_KEYBOARD
 
 /*Testing of dependencies*/
-#if LV_USE_BTNMATRIX == 0
-#error "lv_kb: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNMATRIX  1) "
+#if LV_USE_BUTTONMATRIX == 0
+#error "lv_buttonmatrix is required. Enable it in lv_conf.h (LV_USE_BUTTONMATRIX  1) "
 #endif
 
 #if LV_USE_TEXTAREA == 0
-#error "lv_kb: lv_ta is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
+#error "lv_textare is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
 #endif
 
 /*********************
@@ -72,8 +72,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_keyboard_class;
 
 /**
  * Create a Keyboard object
- * @param parent pointer to an object, it will be the parent of the new keyboard
- * @return pointer to the created keyboard
+ * @param parent    pointer to an object, it will be the parent of the new keyboard
+ * @return          pointer to the created keyboard
  */
 lv_obj_t * lv_keyboard_create(lv_obj_t * parent);
 
@@ -83,32 +83,32 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * parent);
 
 /**
  * Assign a Text Area to the Keyboard. The pressed characters will be put there.
- * @param kb pointer to a Keyboard object
- * @param ta pointer to a Text Area object to write there
+ * @param kb        pointer to a Keyboard object
+ * @param ta        pointer to a Text Area object to write there
  */
 void lv_keyboard_set_textarea(lv_obj_t * kb, lv_obj_t * ta);
 
 /**
  * Set a new a mode (text or number map)
- * @param kb pointer to a Keyboard object
- * @param mode the mode from 'lv_keyboard_mode_t'
+ * @param kb        pointer to a Keyboard object
+ * @param mode      the mode from 'lv_keyboard_mode_t'
  */
 void lv_keyboard_set_mode(lv_obj_t * kb, lv_keyboard_mode_t mode);
 
 /**
  * Show the button title in a popover when pressed.
- * @param kb pointer to a Keyboard object
- * @param en whether "popovers" mode is enabled
+ * @param kb        pointer to a Keyboard object
+ * @param en        whether "popovers" mode is enabled
  */
 void lv_keyboard_set_popovers(lv_obj_t * kb, bool en);
 
 /**
  * Set a new map for the keyboard
- * @param kb pointer to a Keyboard object
- * @param mode keyboard map to alter 'lv_keyboard_mode_t'
- * @param map pointer to a string array to describe the map.
- *            See 'lv_buttonmatrix_set_map()' for more info.
- * @param ctrl_map
+ * @param kb        pointer to a Keyboard object
+ * @param mode      keyboard map to alter 'lv_keyboard_mode_t'
+ * @param map       pointer to a string array to describe the map.
+ *                  See 'lv_buttonmatrix_set_map()' for more info.
+ * @param ctrl_map  See 'lv_buttonmatrix_set_ctrl_map()' for more info.
 
  */
 void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[],
@@ -120,29 +120,29 @@ void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * ma
 
 /**
  * Assign a Text Area to the Keyboard. The pressed characters will be put there.
- * @param kb pointer to a Keyboard object
- * @return pointer to the assigned Text Area object
+ * @param kb        pointer to a Keyboard object
+ * @return          pointer to the assigned Text Area object
  */
 lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * kb);
 
 /**
  * Set a new a mode (text or number map)
- * @param kb pointer to a Keyboard object
- * @return the current mode from 'lv_keyboard_mode_t'
+ * @param kb        pointer to a Keyboard object
+ * @return          the current mode from 'lv_keyboard_mode_t'
  */
 lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * kb);
 
 /**
  * Tell whether "popovers" mode is enabled or not.
- * @param obj pointer to a Keyboard object
- * @return true: "popovers" mode is enabled; false: disabled
+ * @param obj       pointer to a Keyboard object
+ * @return          true: "popovers" mode is enabled; false: disabled
  */
 bool lv_buttonmatrix_get_popovers(const lv_obj_t * obj);
 
 /**
  * Get the current map of a keyboard
- * @param kb pointer to a keyboard object
- * @return the current map
+ * @param kb        pointer to a keyboard object
+ * @return          the current map
  */
 static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
 {

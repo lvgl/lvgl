@@ -65,26 +65,11 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Register custom print/write function to call when a log is added.
- * It can format its "File path", "Line number" and "Description" as required
- * and send the formatted log message to a console or serial port.
- * @param print_cb a function pointer to print a log
- */
 void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb)
 {
     custom_print_cb = print_cb;
 }
 
-/**
- * Add a log
- * @param level the level of log. (From `lv_log_level_t` enum)
- * @param file name of the file when the log added
- * @param line line number in the source code where the log added
- * @param func name of the function when the log added
- * @param format printf-like format string
- * @param ... parameters for `format`
- */
 void _lv_log_add(lv_log_level_t level, const char * file, int line, const char * func, const char * format, ...)
 {
     if(level >= _LV_LOG_LEVEL_NUM) return; /*Invalid level*/
