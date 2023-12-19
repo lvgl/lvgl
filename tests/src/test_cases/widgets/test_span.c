@@ -35,7 +35,7 @@ void test_spangroup_new_span_with_null_parameter_returns_null_object(void)
     lv_span_t * span = lv_spangroup_new_span(NULL);
 
     TEST_ASSERT(NULL == span);
-    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_child_count(spangroup));
+    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_span_count(spangroup));
 }
 
 void test_spangroup_new_span_with_valid_parameter_returns_not_null_object(void)
@@ -43,7 +43,7 @@ void test_spangroup_new_span_with_valid_parameter_returns_not_null_object(void)
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
     TEST_ASSERT(NULL != span);
-    TEST_ASSERT_EQUAL_INT(1, lv_spangroup_get_child_count(spangroup));
+    TEST_ASSERT_EQUAL_INT(1, lv_spangroup_get_span_count(spangroup));
 }
 
 void test_spangroup_delete_span_span_is_null(void)
@@ -52,7 +52,7 @@ void test_spangroup_delete_span_span_is_null(void)
 
     lv_spangroup_delete_span(spangroup, span);
 
-    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_child_count(spangroup));
+    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_span_count(spangroup));
 }
 
 void test_span_set_text(void)
@@ -200,12 +200,12 @@ void test_spangroup_get_max_line_h(void)
 {
     int32_t max_line;
 
-    max_line = lv_spangroup_get_max_line_h(spangroup);
+    max_line = lv_spangroup_get_max_line_height(spangroup);
 
     TEST_ASSERT_EQUAL(0, (uint32_t)max_line);
 
     (void)lv_spangroup_new_span(spangroup);
-    max_line = lv_spangroup_get_max_line_h(spangroup);
+    max_line = lv_spangroup_get_max_line_height(spangroup);
 
     // TODO: find out why this magic numberdd
     TEST_ASSERT_EQUAL(16, (uint32_t)max_line);
@@ -254,7 +254,7 @@ void test_spangroup_get_child_count(void)
     (void)lv_spangroup_new_span(spangroup);
     (void)lv_spangroup_new_span(spangroup);
 
-    const uint32_t cnt = lv_spangroup_get_child_count(spangroup);
+    const uint32_t cnt = lv_spangroup_get_span_count(spangroup);
 
     TEST_ASSERT_EQUAL(2, cnt);
 }

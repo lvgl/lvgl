@@ -39,14 +39,6 @@ static bool lv_point_within_circle(const lv_area_t * area, const lv_point_t * p)
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Initialize an area
- * @param area_p pointer to an area
- * @param x1 left coordinate of the area
- * @param y1 top coordinate of the area
- * @param x2 right coordinate of the area
- * @param y2 bottom coordinate of the area
- */
 void lv_area_set(lv_area_t * area_p, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
     area_p->x1 = x1;
@@ -55,32 +47,16 @@ void lv_area_set(lv_area_t * area_p, int32_t x1, int32_t y1, int32_t x2, int32_t
     area_p->y2 = y2;
 }
 
-/**
- * Set the width of an area
- * @param area_p pointer to an area
- * @param w the new width of the area (w == 1 makes x1 == x2)
- */
 void lv_area_set_width(lv_area_t * area_p, int32_t w)
 {
     area_p->x2 = area_p->x1 + w - 1;
 }
 
-/**
- * Set the height of an area
- * @param area_p pointer to an area
- * @param h the new height of the area (h == 1 makes y1 == y2)
- */
 void lv_area_set_height(lv_area_t * area_p, int32_t h)
 {
     area_p->y2 = area_p->y1 + h - 1;
 }
 
-/**
- * Set the position of an area (width and height will be kept)
- * @param area_p pointer to an area
- * @param x the new x coordinate of the area
- * @param y the new y coordinate of the area
- */
 void _lv_area_set_pos(lv_area_t * area_p, int32_t x, int32_t y)
 {
     int32_t w = lv_area_get_width(area_p);
@@ -91,11 +67,6 @@ void _lv_area_set_pos(lv_area_t * area_p, int32_t x, int32_t y)
     lv_area_set_height(area_p, h);
 }
 
-/**
- * Return with area of an area (x * y)
- * @param area_p pointer to an area
- * @return size of area
- */
 uint32_t lv_area_get_size(const lv_area_t * area_p)
 {
     uint32_t size;
@@ -121,13 +92,6 @@ void lv_area_move(lv_area_t * area, int32_t x_ofs, int32_t y_ofs)
     area->y2 += y_ofs;
 }
 
-/**
- * Get the common parts of two areas
- * @param res_p pointer to an area, the result will be stored here
- * @param a1_p pointer to the first area
- * @param a2_p pointer to the second area
- * @return false: the two area has NO common parts, res_p is invalid
- */
 bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     /*Get the smaller area from 'a1_p' and 'a2_p'*/
@@ -145,13 +109,6 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
     return union_ok;
 }
 
-/**
- * Get resulting sub areas after removing the common parts of two areas from the first area
- * @param res_p pointer to an array of areas with a count of 4, the resulting areas will be stored here
- * @param a1_p pointer to the first area
- * @param a2_p pointer to the second area
- * @return number of results or -1 if no intersect
- */
 int8_t _lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     /*Areas have no common parts*/
@@ -217,12 +174,6 @@ int8_t _lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t 
     return res_c;
 }
 
-/**
- * Join two areas into a third which involves the other two
- * @param res_p pointer to an area, the result will be stored here
- * @param a1_p pointer to the first area
- * @param a2_p pointer to the second area
- */
 void _lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     a_res_p->x1 = LV_MIN(a1_p->x1, a2_p->x1);
@@ -231,13 +182,6 @@ void _lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t 
     a_res_p->y2 = LV_MAX(a1_p->y2, a2_p->y2);
 }
 
-/**
- * Check if a point is on an area
- * @param a_p pointer to an area
- * @param p_p pointer to a point
- * @param radius radius of area (e.g. for rounded rectangle)
- * @return false:the point is out of the area
- */
 bool _lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, int32_t radius)
 {
     /*First check the basic area*/
@@ -298,12 +242,6 @@ bool _lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, int32_t
     return true;
 }
 
-/**
- * Check if two area has common parts
- * @param a1_p pointer to an area.
- * @param a2_p pointer to an other area
- * @return false: a1_p and a2_p has no common parts
- */
 bool _lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     if((a1_p->x1 <= a2_p->x2) && (a1_p->x2 >= a2_p->x1) && (a1_p->y1 <= a2_p->y2) && (a1_p->y2 >= a2_p->y1)) {
@@ -314,13 +252,6 @@ bool _lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
     }
 }
 
-/**
- * Check if an area is fully on an other
- * @param ain_p pointer to an area which could be in 'aholder_p'
- * @param aholder_p pointer to an area which could involve 'ain_p'
- * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
- * @return true: `ain_p` is fully inside `aholder_p`
- */
 bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, int32_t radius)
 {
     bool is_in = false;
@@ -351,13 +282,6 @@ bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, int32_
     return true;
 }
 
-/**
- * Check if an area is fully out of an other
- * @param aout_p pointer to an area which could be in 'aholder_p'
- * @param aholder_p pointer to an area which could involve 'ain_p'
- * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
- * @return true: `aout_p` is fully outside `aholder_p`
- */
 bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, int32_t radius)
 {
     if(aout_p->x2 < aholder_p->x1 || aout_p->y2 < aholder_p->y1 || aout_p->x1 > aholder_p->x2 ||
@@ -390,13 +314,6 @@ bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b)
     return a->x1 == b->x1 && a->x2 == b->x2 && a->y1 == b->y1 && a->y2 == b->y2;
 }
 
-/**
- * Align an area to an other
- * @param base an area where the other will be aligned
- * @param to_align the area to align
- * @param align `LV_ALIGN_...`
- * @param res x/y coordinates where `to_align` align area should be placed
- */
 void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t align, int32_t ofs_x, int32_t ofs_y)
 {
 

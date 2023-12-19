@@ -1,5 +1,5 @@
 #include "../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_BTN
+#if LV_BUILD_EXAMPLES && LV_USE_BUTTON
 
 static void btn_event_cb(lv_event_t * e)
 {

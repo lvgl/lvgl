@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_IMG && LV_BUILD_EXAMPLES
+#if LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
 void lv_example_image_1(void)
 {

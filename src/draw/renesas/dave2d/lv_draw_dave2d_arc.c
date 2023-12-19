@@ -95,41 +95,87 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
         sin_end   = lv_trigo_sin((int16_t)dsc->end_angle);
         cos_end   = lv_trigo_cos((int16_t)dsc->end_angle);
 
-        result = d2_renderwedge(u->d2_handle,
-                                (d2_point)D2_FIX4(arc_centre.x),
-                                (d2_point) D2_FIX4(arc_centre.y),
-                                (d2_width) D2_FIX4(dsc->radius - dsc->width / 2),
-                                (d2_width) D2_FIX4(dsc->width),
-                                -(d2_s32)(sin_start << 1),
-                                (d2_s32)(cos_start << 1),
-                                (d2_s32)(sin_end << 1),
-                                -(d2_s32)(cos_end << 1),
-                                flags);
-        if(D2_OK != result) {
-            __BKPT(0);
+        bool draw_arc;
+        lv_area_t arc_area;
+        lv_area_t clip_arc;
+        lv_point_t start_point;
+        lv_point_t end_point;
+
+        start_point.x = arc_centre.x + (int16_t)(((dsc->radius) * cos_start) >> LV_TRIGO_SHIFT);
+        start_point.y = arc_centre.y + (int16_t)(((dsc->radius) * sin_start) >> LV_TRIGO_SHIFT);
+
+        end_point.x = arc_centre.x + (int16_t)(((dsc->radius) * cos_end) >> LV_TRIGO_SHIFT);
+        end_point.y = arc_centre.y + (int16_t)(((dsc->radius) * sin_end) >> LV_TRIGO_SHIFT);
+
+        arc_area.x1 = LV_MIN3(start_point.x, end_point.x, arc_centre.x);
+        arc_area.y1 = LV_MIN3(start_point.y, end_point.y, arc_centre.y);
+
+        arc_area.x2 = LV_MAX3(start_point.x, end_point.x, arc_centre.x);
+        arc_area.y2 = LV_MAX3(start_point.y, end_point.y, arc_centre.y);
+
+        /* 0 degrees */
+        if((dsc->end_angle < dsc->start_angle) || ((dsc->start_angle < 360) && (dsc->end_angle > 360))) {
+            arc_area.x2 = arc_centre.x + dsc->radius;
         }
 
-        if(dsc->rounded) {
-            lv_point_t start_coord;
-            lv_point_t end_coord;
+        /* 90 degrees */
+        if(((dsc->end_angle > 90) && (dsc->start_angle < 90)) || ((dsc->start_angle < 90) &&
+                                                                  (dsc->end_angle < dsc->start_angle))) {
+            arc_area.y2 = arc_centre.y + dsc->radius;
+        }
 
-            start_coord.x = arc_centre.x + (int16_t)(((dsc->radius - dsc->width / 2) * cos_start) >> LV_TRIGO_SHIFT);
-            start_coord.y = arc_centre.y + (int16_t)(((dsc->radius - dsc->width / 2) * sin_start) >> LV_TRIGO_SHIFT);
+        /* 180 degrees */
+        if(((dsc->end_angle > 180) && (dsc->start_angle < 180)) || ((dsc->start_angle < 180) &&
+                                                                    (dsc->end_angle < dsc->start_angle))) {
+            arc_area.x1 = arc_centre.x - dsc->radius;
+        }
 
-            /** Render a circle. */
-            d2_rendercircle(u->d2_handle,
-                            (d2_point) D2_FIX4((uint16_t)(start_coord.x)),
-                            (d2_point) D2_FIX4((uint16_t)(start_coord.y)),
-                            (d2_width) D2_FIX4(dsc->width / 2), 0);
+        /* 270 degrees */
+        if(((dsc->end_angle > 270) && (dsc->start_angle < 270)) || ((dsc->start_angle < 270) &&
+                                                                    (dsc->end_angle < dsc->start_angle))) {
+            arc_area.y1 = arc_centre.y - dsc->radius;
+        }
 
-            end_coord.x = arc_centre.x + (int16_t)(((dsc->radius - dsc->width / 2) * cos_end) >> LV_TRIGO_SHIFT);
-            end_coord.y = arc_centre.y + (int16_t)(((dsc->radius - dsc->width / 2) * sin_end) >> LV_TRIGO_SHIFT);
+        draw_arc = _lv_area_intersect(&clip_arc, &arc_area, &clipped_area);
 
-            /** Render a circle. */
-            d2_rendercircle(u->d2_handle,
-                            (d2_point) D2_FIX4((uint16_t)(end_coord.x)),
-                            (d2_point) D2_FIX4((uint16_t)(end_coord.y)),
-                            (d2_width) D2_FIX4(dsc->width / 2), 0);
+        if(draw_arc) {
+
+            result = d2_renderwedge(u->d2_handle,
+                                    (d2_point)D2_FIX4(arc_centre.x),
+                                    (d2_point) D2_FIX4(arc_centre.y),
+                                    (d2_width) D2_FIX4(dsc->radius - dsc->width / 2),
+                                    (d2_width) D2_FIX4(dsc->width),
+                                    -(d2_s32)(sin_start << 1),
+                                    (d2_s32)(cos_start << 1),
+                                    (d2_s32)(sin_end << 1),
+                                    -(d2_s32)(cos_end << 1),
+                                    flags);
+            if(D2_OK != result) {
+                __BKPT(0);
+            }
+
+            if(dsc->rounded) {
+                lv_point_t start_coord;
+                lv_point_t end_coord;
+
+                start_coord.x = arc_centre.x + (int16_t)(((dsc->radius - dsc->width / 2) * cos_start) >> LV_TRIGO_SHIFT);
+                start_coord.y = arc_centre.y + (int16_t)(((dsc->radius - dsc->width / 2) * sin_start) >> LV_TRIGO_SHIFT);
+
+                /** Render a circle. */
+                d2_rendercircle(u->d2_handle,
+                                (d2_point) D2_FIX4((uint16_t)(start_coord.x)),
+                                (d2_point) D2_FIX4((uint16_t)(start_coord.y)),
+                                (d2_width) D2_FIX4(dsc->width / 2), 0);
+
+                end_coord.x = arc_centre.x + (int16_t)(((dsc->radius - dsc->width / 2) * cos_end) >> LV_TRIGO_SHIFT);
+                end_coord.y = arc_centre.y + (int16_t)(((dsc->radius - dsc->width / 2) * sin_end) >> LV_TRIGO_SHIFT);
+
+                /** Render a circle. */
+                d2_rendercircle(u->d2_handle,
+                                (d2_point) D2_FIX4((uint16_t)(end_coord.x)),
+                                (d2_point) D2_FIX4((uint16_t)(end_coord.y)),
+                                (d2_width) D2_FIX4(dsc->width / 2), 0);
+            }
         }
     }
 

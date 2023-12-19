@@ -109,18 +109,35 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize a rectangle draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
 
+/**
+ * Initialize a fill draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc);
 
+/**
+ * Initialize a border draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc);
 
+/**
+ * Initialize a box shadow draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc);
 
 /**
- * Draw a rectangle
+ * The rectangle is a wrapper for fill, border, bg. image and box shadow.
+ * Internally fill, border, image and box shadow draw tasks will be created.
  * @param layer         pointer to a layer
- * @param dsc           pointer to an initialized `lv_draw_rect_dsc_t` variable
+ * @param dsc           pointer to an initialized draw descriptor variable
  * @param coords        the coordinates of the rectangle
  */
 void lv_draw_rect(struct _lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);

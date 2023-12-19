@@ -12,7 +12,7 @@ void lv_draw_dave2d_label(lv_draw_dave2d_unit_t * u, const lv_draw_label_dsc_t *
 
     unit = u;
 
-    lv_draw_label_iterate_letters(&u->base_unit, dsc, coords, lv_draw_dave2d_draw_letter_cb);
+    lv_draw_label_iterate_characters(&u->base_unit, dsc, coords, lv_draw_dave2d_draw_letter_cb);
 
 }
 

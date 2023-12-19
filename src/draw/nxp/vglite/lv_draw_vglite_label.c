@@ -73,7 +73,7 @@ void lv_draw_vglite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t 
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_draw_label_iterate_letters(draw_unit, dsc, coords, _draw_vglite_letter);
+    lv_draw_label_iterate_characters(draw_unit, dsc, coords, _draw_vglite_letter);
 }
 
 /**********************
@@ -106,10 +106,6 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
             if(!_lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
                 return;
             lv_area_move(&blend_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
-
-            //void * dest_buf = lv_draw_buf_go_to_xy(&layer->draw_buf,
-            //                                       blend_area.x1 - layer->draw_buf_ofs.x,
-            //                                       blend_area.y1 - layer->draw_buf_ofs.y);
 
             const uint8_t * mask_buf = glyph_draw_dsc->bitmap;
             lv_area_t mask_area;

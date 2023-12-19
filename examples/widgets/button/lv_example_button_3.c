@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_BTN
+#if LV_BUILD_EXAMPLES && LV_USE_BUTTON
 
 /**
  * Create a style transition on a button to act like a gum when clicked

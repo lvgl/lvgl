@@ -1,4 +1,4 @@
-Image button (lv_imgbtn)
+Image button (lv_imagebutton)
 ========================
 
 Overview
@@ -25,29 +25,29 @@ Image sources
 -------------
 
 To set the image in a state, use the
-:cpp:expr:`lv_imgbtn_set_src(imgbtn, LV_IMGBTN_STATE_..., src_left, src_center, src_right)`.
+:cpp:expr:`lv_imagebutton_set_src(imagebutton, LV_IMAGEBUTTON_STATE_..., src_left, src_center, src_right)`.
 
 The image sources work the same as described in the `Image object </widgets/img>`__
 except that "Symbols" are not supported by the Image button. Any of the sources can ``NULL``.
 
 The possible states are:
 
-- :cpp:enumerator:`LV_IMGBTN_STATE_RELEASED`
-- :cpp:enumerator:`LV_IMGBTN_STATE_PRESSED`
-- :cpp:enumerator:`LV_IMGBTN_STATE_DISABLED`
-- :cpp:enumerator:`LV_IMGBTN_STATE_CHECKED_RELEASED`
-- :cpp:enumerator:`LV_IMGBTN_STATE_CHECKED_PRESSED`
-- :cpp:enumerator:`LV_IMGBTN_STATE_CHECKED_DISABLED`
+- :cpp:enumerator:`LV_IMAGEBUTTON_STATE_RELEASED`
+- :cpp:enumerator:`LV_IMAGEBUTTON_STATE_PRESSED`
+- :cpp:enumerator:`LV_IMAGEBUTTON_STATE_DISABLED`
+- :cpp:enumerator:`LV_IMAGEBUTTON_STATE_CHECKED_RELEASED`
+- :cpp:enumerator:`LV_IMAGEBUTTON_STATE_CHECKED_PRESSED`
+- :cpp:enumerator:`LV_IMAGEBUTTON_STATE_CHECKED_DISABLED`
 
-If you set sources only in :cpp:enumerator:`LV_IMGBTN_STATE_RELEASED`, these sources
-will be used in other states too. If you set e.g. :cpp:enumerator:`LV_IMGBTN_STATE_PRESSED`
+If you set sources only in :cpp:enumerator:`LV_IMAGEBUTTON_STATE_RELEASED`, these sources
+will be used in other states too. If you set e.g. :cpp:enumerator:`LV_IMAGEBUTTON_STATE_PRESSED`
 they will be used in pressed state instead of the released images.
 
 States
 ------
 
 Instead of the regular ``lv_obj_add/remove_state()`` functions the
-:cpp:expr:`lv_imgbtn_set_state(imgbtn, LV_IMGBTN_STATE_...)` functions should be
+:cpp:expr:`lv_imagebutton_set_state(imagebutton, LV_IMAGEBUTTON_STATE_...)` functions should be
 used to manually set a state.
 
 Events
@@ -71,7 +71,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/imgbtn/index.rst
+.. include:: ../examples/widgets/imgagebutton/index.rst
 
 API
 ***

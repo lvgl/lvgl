@@ -38,6 +38,9 @@
 #if LV_USE_DRAW_SDL
     #include "draw/sdl/lv_draw_sdl.h"
 #endif
+#if LV_USE_DRAW_VG_LITE
+    #include "draw/vg_lite/lv_draw_vg_lite.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -87,7 +90,7 @@ static inline void lv_global_init(lv_global_t * global)
     global->style_last_custom_prop_id = (uint32_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     global->area_trans_cache.angle_prev = INT32_MIN;
     global->event_last_register_id = _LV_EVENT_LAST;
-    global->math_rand_seed = 0x1234ABCD;
+    lv_rand_set_seed(0x1234ABCD);
 
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     global->sw_shadow_cache.cache_size = -1;
@@ -191,6 +194,10 @@ void lv_init(void)
 
     _lv_image_decoder_init();
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
+
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_init();
+#endif
 
     _lv_cache_init();
     _lv_cache_builtin_init();
@@ -331,8 +338,8 @@ void lv_deinit(void)
     lv_theme_default_deinit();
 #endif
 
-#if LV_USE_THEME_BASIC
-    lv_theme_basic_deinit();
+#if LV_USE_THEME_SIMPLE
+    lv_theme_simple_deinit();
 #endif
 
 #if LV_USE_THEME_MONO
@@ -355,6 +362,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VGLITE
     lv_draw_vglite_deinit();
+#endif
+
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_deinit();
 #endif
 
 #if LV_USE_DRAW_SW

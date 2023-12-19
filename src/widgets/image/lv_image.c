@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_image.h"
-#if LV_USE_IMG != 0
+#if LV_USE_IMAGE != 0
 
 #include "../../stdlib/lv_string.h"
 

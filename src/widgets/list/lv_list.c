@@ -36,11 +36,15 @@ const lv_obj_class_t lv_list_class = {
 
 const lv_obj_class_t lv_list_button_class = {
     .base_class = &lv_button_class,
+    .width_def = LV_PCT(100),
+    .height_def = LV_SIZE_CONTENT,
     .name = "list-btn",
 };
 
 const lv_obj_class_t lv_list_text_class = {
     .base_class = &lv_label_class,
+    .width_def = LV_PCT(100),
+    .height_def = LV_SIZE_CONTENT,
     .name = "list-text",
 };
 
@@ -68,7 +72,9 @@ lv_obj_t * lv_list_create(lv_obj_t * parent)
 lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 {
     LV_LOG_INFO("begin");
-    lv_obj_t * obj = lv_label_create(list);
+
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_text_class, list);
+    lv_obj_class_init_obj(obj);
     lv_label_set_text(obj, txt);
     return obj;
 }
@@ -78,10 +84,9 @@ lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * t
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_button_class, list);
     lv_obj_class_init_obj(obj);
-    lv_obj_set_size(obj, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
 
-#if LV_USE_IMG == 1
+#if LV_USE_IMAGE == 1
     if(icon) {
         lv_obj_t * img = lv_image_create(obj);
         lv_image_set_src(img, icon);

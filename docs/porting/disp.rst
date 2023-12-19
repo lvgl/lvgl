@@ -179,7 +179,7 @@ In case of RGB565 color format it might be required to swap the 2 bytes
 because the SPI, I2C or 8 bit parallel port periphery sends them in the wrong order.
 
 The ideal solution is configure the hardware to handle the 16 bit data with different byte order,
-however if it's not possible `:cpp:expr:`lv_draw_sw_rgb565_swap(buf, buf_size_in_px)`
+however if it's not possible :cpp:expr:`lv_draw_sw_rgb565_swap(buf, buf_size_in_px)`
 can be called in the ``flush_cb`` to swap the bytes.
 
 If you wish you can also write your own function, or use assembly instructions for

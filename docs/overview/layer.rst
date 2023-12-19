@@ -63,6 +63,11 @@ however, shared among multiple physical displays.** The ``layer_top`` is
 always on top of the default screen (:cpp:func:`lv_screen_active`), and
 ``layer_sys`` is on top of ``layer_top``.
 
+The get these layers use :cpp:func:`lv_layer_top()` and :cpp:func:`lv_layer_sys()`.
+
+These layers work like any other widget, meaning the can be styles, scrolled,
+and any kind of widgets can be created on them.
+
 The ``layer_top`` can be used by the user to create some content visible
 everywhere. For example, a menu bar, a pop-up, etc. If the ``click``
 attribute is enabled, then ``layer_top`` will absorb all user clicks and
@@ -75,6 +80,16 @@ acts as a modal.
 The ``layer_sys`` is also used for similar purposes in LVGL. For
 example, it places the mouse cursor above all layers to be sure it's
 always visible.
+
+
+Bottom layers
+*************
+
+Similarly top and sys. layer bottom layer is also screen size but
+it's located below the active screen. It's visible only if the active screen's
+background opacity is < 255.
+
+The get the bottom layer use :cpp:func:`lv_layer_bottom()`.
 
 API
 ***

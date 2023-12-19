@@ -49,26 +49,26 @@ typedef enum _lv_image_flags_t {
      * For RGB map of the image data, mark if it's pre-multiplied with alpha.
      * For indexed image, this bit indicated palette data is pre-multiplied with alpha.
      */
-    LV_IMAGE_FLAGS_PREMULTIPLIED    = 0x01,
+    LV_IMAGE_FLAGS_PREMULTIPLIED    = (1 << 0),
 
     /**
      * If the image data is malloced and can be processed in place.
      * In image decoder post processing, this flag means we modify it in-place.
      */
-    LV_IMAGE_FLAGS_MODIFIABLE       = 0x02,
+    LV_IMAGE_FLAGS_MODIFIABLE       = (1 << 1),
 
     /**
      * Indicating it's a vector image instead of default raster image.
      * Some of the flags are not usable for vector image, like PREMULTIPLIED.
      */
-    LV_IMAGE_FLAGS_VECTORS          = 0x04,
+    LV_IMAGE_FLAGS_VECTORS          = (1 << 2),
 
     /**
      * The image data is compressed, so decoder needs to decode image firstly.
      * If this flag is set, the whole image will be decompressed upon decode, and
      * `get_area_cb` won't be necessary.
      */
-    LV_IMAGE_FLAGS_COMPRESSED       = 0x08,
+    LV_IMAGE_FLAGS_COMPRESSED       = (1 << 3),
 
     /**
      * Flags reserved for user, lvgl won't use these bits.
@@ -141,13 +141,13 @@ typedef struct {
  **********************/
 
 /**
- * Set the palette color of an indexed image. Valid only for `LV_IMAGE_CF_INDEXED1/2/4/8`
+ * Set the palette color of an indexed image. Valid only for `LV_COLOR_FORMAT_I1/2/4/8`
  * @param dsc pointer to an image descriptor
  * @param id the palette color to set:
- *   - for `LV_IMAGE_CF_INDEXED1`: 0..1
- *   - for `LV_IMAGE_CF_INDEXED2`: 0..3
- *   - for `LV_IMAGE_CF_INDEXED4`: 0..15
- *   - for `LV_IMAGE_CF_INDEXED8`: 0..255
+ *   - for `LV_COLOR_FORMAT_I1`: 0..1
+ *   - for `LV_COLOR_FORMAT_I2`: 0..3
+ *   - for `LV_COLOR_FORMAT_I4`: 0..15
+ *   - for `LV_COLOR_FORMAT_I8`: 0..255
  * @param c the color to set in lv_color32_t format
  */
 void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c);

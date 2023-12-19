@@ -224,12 +224,6 @@ void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
     }
 }
 
-/**
- * Predict where would a scroll throw end
- * @param indev pointer to an input device
- * @param dir `LV_DIR_VER` or `LV_DIR_HOR`
- * @return the difference compared to the current position when the throw would be finished
- */
 int32_t lv_indev_scroll_throw_predict(lv_indev_t * indev, lv_dir_t dir)
 {
     if(indev == NULL) return 0;

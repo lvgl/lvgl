@@ -35,9 +35,6 @@
 
 static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area);
 
-static void _pxp_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
-                          void * src_buf, uint32_t src_stride, const lv_area_t * src_area, lv_color_format_t cf);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -55,7 +52,6 @@ void lv_draw_buf_pxp_init_handlers(void)
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
 
     handlers->invalidate_cache_cb = _invalidate_cache;
-    handlers->buf_copy_cb = _pxp_buf_copy;
 }
 
 /**********************
@@ -69,6 +65,12 @@ static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area)
 
     DEMO_CleanInvalidateCache();
 }
+
+#if 0
+/**
+ * @todo
+ * LVGL needs to use hardware acceleration for buf_copy and do not affect GPU rendering.
+ */
 
 void _pxp_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
                    void * src_buf, uint32_t src_stride, const lv_area_t * src_area,
@@ -94,5 +96,6 @@ void _pxp_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest
 
     lv_pxp_run();
 }
+#endif
 
 #endif /*LV_USE_DRAW_PXP*/
