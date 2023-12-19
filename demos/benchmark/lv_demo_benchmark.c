@@ -31,6 +31,7 @@ typedef struct {
     uint32_t cpu_avg_usage;
     uint32_t fps_avg;
     uint32_t render_avg_time;
+    uint32_t flush_avg_time;
     uint32_t measurement_cnt;
 } scene_dsc_t;
 
@@ -40,10 +41,6 @@ typedef struct {
 
 static void load_scene(uint32_t scene);
 static void next_scene_timer_cb(lv_timer_t * timer);
-
-#if LV_USE_PERF_MONITOR
-void sysmon_perf_observer_cb(uint32_t fps, uint32_t cpu, uint32_t render_time);
-#endif
 
 static void summary_create(void);
 
@@ -361,24 +358,24 @@ static void widgets_demo_cb(void)
  **********************/
 
 static scene_dsc_t scenes[] = {
-    {.name = "Empty screen",               .scene_time = 3000, .create_cb = empty_screen_cb},
-    {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
-    {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
-    {.name = "Multiple rectangles",        .scene_time = 3000, .create_cb = multiple_rectangles_cb},
-    {.name = "Multiple RGB images",        .scene_time = 3000, .create_cb = multiple_rgb_images_cb},
-    {.name = "Multiple ARGB images",       .scene_time = 3000, .create_cb = multiple_argb_images_cb},
-    {.name = "Rotated ARGB images",        .scene_time = 3000, .create_cb = rotated_argb_image_cb},
-    {.name = "Multiple labels",            .scene_time = 3000, .create_cb = multiple_labels_cb},
-    {.name = "Screen sized text",          .scene_time = 5000, .create_cb = screen_sized_text_cb},
-    {.name = "Multiple arcs",              .scene_time = 3000, .create_cb = multiple_arcs_cb},
+    {.name = "Empty screen",               .scene_time = 300, .create_cb = empty_screen_cb},
+    {.name = "Moving wallpaper",           .scene_time = 300, .create_cb = moving_wallpaper_cb},
+    {.name = "Single rectangle",           .scene_time = 300, .create_cb = single_rectangle_cb},
+    {.name = "Multiple rectangles",        .scene_time = 300, .create_cb = multiple_rectangles_cb},
+    {.name = "Multiple RGB images",        .scene_time = 300, .create_cb = multiple_rgb_images_cb},
+    {.name = "Multiple ARGB images",       .scene_time = 300, .create_cb = multiple_argb_images_cb},
+    {.name = "Rotated ARGB images",        .scene_time = 300, .create_cb = rotated_argb_image_cb},
+    {.name = "Multiple labels",            .scene_time = 300, .create_cb = multiple_labels_cb},
+    {.name = "Screen sized text",          .scene_time = 500, .create_cb = screen_sized_text_cb},
+    {.name = "Multiple arcs",              .scene_time = 300, .create_cb = multiple_arcs_cb},
 
-    {.name = "Containers",                 .scene_time = 3000, .create_cb = containers_cb},
-    {.name = "Containers with overlay",    .scene_time = 3000, .create_cb = containers_with_overlay_cb},
-    {.name = "Containers with opa",        .scene_time = 3000, .create_cb = containers_with_opa_cb},
-    {.name = "Containers with opa_layer",  .scene_time = 3000, .create_cb = containers_with_opa_layer_cb},
-    {.name = "Containers with scrolling",  .scene_time = 5000, .create_cb = containers_with_scrolling_cb},
+    {.name = "Containers",                 .scene_time = 300, .create_cb = containers_cb},
+    {.name = "Containers with overlay",    .scene_time = 300, .create_cb = containers_with_overlay_cb},
+    {.name = "Containers with opa",        .scene_time = 300, .create_cb = containers_with_opa_cb},
+    {.name = "Containers with opa_layer",  .scene_time = 300, .create_cb = containers_with_opa_layer_cb},
+    {.name = "Containers with scrolling",  .scene_time = 500, .create_cb = containers_with_scrolling_cb},
 
-    {.name = "Widgets demo",               .scene_time = 20000,           .create_cb = widgets_demo_cb},
+    {.name = "Widgets demo",               .scene_time = 2000,           .create_cb = widgets_demo_cb},
 
     {.name = "", .create_cb = NULL}
 };
@@ -464,20 +461,21 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 }
 
 #if LV_USE_PERF_MONITOR
-void sysmon_perf_observer_cb(uint32_t fps, uint32_t cpu, uint32_t render_time)
+void sysmon_perf_observer_cb(uint32_t fps, uint32_t cpu, uint32_t render_time, uint32_t flush_time)
 {
     lv_label_set_text_fmt(sysmon_label ,
                           "%s: "
                           "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
-                          "%"LV_PRIu32" ms",
+                          "%"LV_PRIu32" ms = %"LV_PRIu32" ms + %"LV_PRIu32" ms",
                           scenes[scene_act].name,
-                         fps, cpu, render_time);
+                         fps, cpu, render_time + flush_time, render_time, flush_time);
 
     /*Ignore the first call as it contains data from the previous scene*/
     if(scenes[scene_act].measurement_cnt != 0) {
         scenes[scene_act].cpu_avg_usage += cpu;
         scenes[scene_act].fps_avg += fps;
         scenes[scene_act].render_avg_time += render_time;
+        scenes[scene_act].flush_avg_time += flush_time;
     }
     scenes[scene_act].measurement_cnt++;
 
@@ -500,14 +498,16 @@ static void summary_create(void)
     lv_table_set_cell_value(table, 0, 1, "Avg. CPU");
     lv_table_set_cell_value(table, 0, 2, "Avg. FPS");
     lv_table_set_cell_value(table, 0, 3, "Avg. render time");
+    lv_table_set_cell_value(table, 0, 4, "Avg. flush time");
 
     lv_obj_update_layout(table);
-    int32_t col_w = lv_obj_get_content_width(table) / 4;
+    int32_t col_w = lv_obj_get_content_width(table) / 5;
 
     lv_table_set_col_width(table, 0, col_w);
     lv_table_set_col_width(table, 1, col_w);
     lv_table_set_col_width(table, 2, col_w);
     lv_table_set_col_width(table, 3, col_w);
+    lv_table_set_col_width(table, 4, col_w);
 
     uint32_t i;
     int32_t total_avg_fps = 0;
@@ -523,17 +523,20 @@ static void summary_create(void)
             lv_table_set_cell_value(table, i + 2, 1, "N/A");
             lv_table_set_cell_value(table, i + 2, 2, "N/A");
             lv_table_set_cell_value(table, i + 2, 3, "N/A");
+            lv_table_set_cell_value(table, i + 2, 4, "N/A");
         }
         else {
             int32_t cnt = scenes[i].measurement_cnt - 1;
             lv_table_set_cell_value_fmt(table, i + 2, 1, "%d %%", scenes[i].cpu_avg_usage / cnt);
             lv_table_set_cell_value_fmt(table, i + 2, 2, "%d FPS", scenes[i].fps_avg / cnt);
             lv_table_set_cell_value_fmt(table, i + 2, 3, "%d ms", scenes[i].render_avg_time / cnt);
+            lv_table_set_cell_value_fmt(table, i + 2, 4, "%d ms", scenes[i].flush_avg_time / cnt);
 
             valid_scene_cnt++;
             total_avg_cpu += scenes[i].cpu_avg_usage / cnt;
             total_avg_fps += scenes[i].fps_avg / cnt;
             total_avg_render_time += scenes[i].render_avg_time / cnt;
+            total_avg_flush_time += scenes[i].flush_avg_time / cnt;
         }
     }
 
@@ -543,11 +546,13 @@ static void summary_create(void)
         lv_table_set_cell_value(table, 1, 1, "N/A");
         lv_table_set_cell_value(table, 1, 2, "N/A");
         lv_table_set_cell_value(table, 1, 3, "N/A");
+        lv_table_set_cell_value(table, 1, 4, "N/A");
     }
     else {
         lv_table_set_cell_value_fmt(table, 1, 1, "%d %%", total_avg_cpu / valid_scene_cnt);
         lv_table_set_cell_value_fmt(table, 1, 2, "%d FPS", total_avg_fps / valid_scene_cnt);
         lv_table_set_cell_value_fmt(table, 1, 3, "%d ms", total_avg_render_time / valid_scene_cnt);
+        lv_table_set_cell_value_fmt(table, 1, 4, "%d ms", total_avg_flush_time / valid_scene_cnt);
     }
 }
 

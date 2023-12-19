@@ -38,6 +38,7 @@ typedef struct {
     uint32_t    fps_sum_all;
     uint32_t    render_cnt;
     uint32_t    render_time_sum;
+    uint32_t    flush_time_sum;
 #if LV_USE_LABEL
     lv_obj_t  * perf_label;
 #endif
@@ -421,13 +422,16 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         perf_monitor.fps_sum_cnt ++;
 
         uint32_t render_time = perf_monitor.render_cnt ? perf_monitor.render_time_sum / perf_monitor.render_cnt : 0;
+        uint32_t flush_time = perf_monitor.render_cnt ? perf_monitor.flush_time_sum / perf_monitor.render_cnt : 0;
+        render_time -= flush_time; /*Flush time was measured in the render time*/
         perf_monitor.render_time_sum = 0;
+        perf_monitor.flush_time_sum = 0;
         perf_monitor.render_cnt = 0;
 
         uint32_t cpu = 100 - lv_timer_get_idle();
-        lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS %"LV_PRIu32"%% CPU\n %"LV_PRIu32"ms", fps, cpu, render_time);
-        void sysmon_perf_observer_cb(uint32_t fps, uint32_t cpu, uint32_t render_time);
-        sysmon_perf_observer_cb(fps, cpu, render_time);
+        lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS %"LV_PRIu32"%% CPU\n %"LV_PRIu32"ms (%"LV_PRIu32" | %"LV_PRIu32")", fps, cpu, render_time + flush_time, render_time, flush_time);
+        void sysmon_perf_observer_cb(uint32_t fps, uint32_t cpu, uint32_t render_time, uint32_t flush_time);
+        sysmon_perf_observer_cb(fps, cpu, render_time, flush_time);
     }
 #endif
 
@@ -1338,7 +1342,9 @@ static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_
         .y2 = area->y2 + drv->offset_y
     };
 
+    uint32_t t = lv_tick_get();
     drv->flush_cb(drv, &offset_area, color_p);
+    perf_monitor.flush_time_sum += lv_tick_elaps(t);
 }
 
 #if LV_USE_PERF_MONITOR
