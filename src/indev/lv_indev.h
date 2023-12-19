@@ -246,11 +246,11 @@ struct _lv_obj_t * lv_indev_get_active_obj(void);
  */
 lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev);
 
- /**
- * Set the input device's event model: event-driven mode or timer mode.
- * @param indev pointer to an input device
- * @param mode the mode of input device
- */
+/**
+* Set the input device's event model: event-driven mode or timer mode.
+* @param indev pointer to an input device
+* @param mode the mode of input device
+*/
 void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode);
 
 /**

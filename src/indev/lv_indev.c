@@ -121,6 +121,7 @@ lv_indev_t * lv_indev_create(void)
 
     indev->disp                 = lv_display_get_default();
     indev->type                 = LV_INDEV_TYPE_NONE;
+    indev->mode                 = LV_INDEV_MODE_TIMER;
     indev->scroll_limit         = LV_INDEV_DEF_SCROLL_LIMIT;
     indev->scroll_throw         = LV_INDEV_DEF_SCROLL_THROW;
     indev->long_press_time      = LV_INDEV_DEF_LONG_PRESS_TIME;
@@ -495,12 +496,10 @@ void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode)
     if(indev->read_timer) {
         if(mode == LV_INDEV_MODE_EVENT) {
             lv_timer_pause(indev->read_timer);
-            lv_timer_set_period(indev->read_timer, LV_INDEV_DEF_LONG_PRESS_REP_TIME);
         }
         else if(mode == LV_INDEV_MODE_TIMER) {
             /* use default timer mode*/
             lv_timer_set_cb(indev->read_timer, lv_indev_read_timer_cb);
-            lv_timer_set_period(indev->read_timer, LV_DEF_REFR_PERIOD);
             lv_timer_resume(indev->read_timer);
         }
     }
