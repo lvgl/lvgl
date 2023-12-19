@@ -109,8 +109,14 @@ def create_ui():
     style_big_font = lv.style_t()
     style_big_font.init()
 
-    # Use a built-in font
-    style_big_font.set_text_font(lv.font_montserrat_24)
+    # Try to load as built in font and if not load it using tiny TTF
+    try:
+        font_montserrat_24 = lv.font_montserrat_24
+    except AttributeError:
+        font_montserrat_24 = lv.font_t()
+        lv.tiny_ttf_create_file(font_montserrat_24, 'A:font_montserrat_24.ttf', 32)
+
+    style_big_font.set_text_font(font_montserrat_24)
 
     # Get the active screen
     scr = lv.screen_active()
