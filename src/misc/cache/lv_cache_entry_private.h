@@ -1,10 +1,10 @@
 /**
-* @file _lv_cache_entry_internal.h
+* @file lv_cache_entry_private.h
 *
  */
 
-#ifndef _LV_CACHE_ENTRY_INTERNAL
-#define _LV_CACHE_ENTRY_INTERNAL
+#ifndef LV_CACHE_ENTRY_PRIVATE
+#define LV_CACHE_ENTRY_PRIVATE
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,4 +48,4 @@ void   lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data);
 } /*extern "C"*/
 #endif
 
-#endif /*_LV_CACHE_ENTRY_INTERNAL*/
+#endif /*LV_CACHE_ENTRY_PRIVATE*/

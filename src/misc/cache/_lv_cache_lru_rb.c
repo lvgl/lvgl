@@ -11,7 +11,7 @@
 #include "../../stdlib/lv_string.h"
 #include "../lv_ll.h"
 #include "../lv_rb.h"
-#include "_lv_cache_entry_internal.h"
+#include "lv_cache_entry_private.h"
 
 /*********************
  *      DEFINES

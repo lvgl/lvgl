@@ -11,7 +11,6 @@
 #include LV_SDL_INCLUDE_PATH
 #include <SDL2/SDL_image.h>
 
-#include <src/misc/cache/_lv_cache_lru_rb.h>
 #include "lv_draw_sdl.h"
 #include "../../core/lv_refr.h"
 #include "../../display/lv_display_private.h"
@@ -67,6 +66,8 @@ static bool sdl_texture_cache_create_cb(cache_data_t * cached_data, void * user_
 
 static void sdl_texture_cache_free_cb(cache_data_t * cached_data, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     lv_free(cached_data->draw_dsc);
     SDL_DestroyTexture(cached_data->texture);
     cached_data->draw_dsc = NULL;
@@ -184,7 +185,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
 
     lv_display_t * disp = _lv_refr_get_disp_refreshing();
 
-    uint32_t tick = lv_tick_get();
     SDL_Texture * texture = NULL;
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL: {
@@ -373,7 +373,7 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     SDL_RenderSetClipRect(renderer, NULL);
 
-    lv_cache_release(entry_cached, u);
+    lv_cache_release(u->texture_cache, entry_cached, u);
 }
 
 static void execute_drawing(lv_draw_sdl_unit_t * u)

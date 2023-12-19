@@ -1,10 +1,10 @@
 /**
-* @file _lv_cache_internal.h
+* @file lv_cache_private.h
 *
 */
 
-#ifndef _LV_CACHE_INTERNAL_H
-#define _LV_CACHE_INTERNAL_H
+#ifndef LV_CACHE_PRIVATE_H
+#define LV_CACHE_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,4 +95,4 @@ struct _lv_cache_class_t {
 } /*extern "C"*/
 #endif
 
-#endif /*_LV_CACHE_INTERNAL_H*/
+#endif /*LV_CACHE_PRIVATE_H*/

@@ -9,9 +9,9 @@
 #include "lv_cache_entry.h"
 #include "../../stdlib/lv_sprintf.h"
 #include "../lv_assert.h"
-#include "_lv_cache_entry_internal.h"
-#include "_lv_cache_internal.h"
 #include "lv_cache.h"
+#include "lv_cache_entry_private.h"
+#include "lv_cache_private.h"
 /*********************
  *      DEFINES
  *********************/
