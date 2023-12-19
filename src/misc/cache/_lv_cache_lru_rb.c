@@ -326,7 +326,7 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
         }
     }
     if(used_cnt > 0) {
-        LV_LOG_WARN("%d entries are still referenced", used_cnt);
+        LV_LOG_WARN("%" LV_PRId32 " entries are still referenced", used_cnt);
     }
 
     lv_rb_destroy(&lru->rb);
