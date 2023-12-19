@@ -456,6 +456,63 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     return lv_style_prop_get_default_inlined(prop);
 }
 
+lv_style_res_t lv_obj_style_prop_set_check(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
+{
+    LV_ASSERT_NULL(obj)
+
+    lv_style_value_t value_act = { .ptr = NULL };
+    lv_style_res_t found;
+
+    /*The happy path*/
+#if LV_OBJ_STYLE_CACHE
+    const uint32_t prop_shifted = STYLE_PROP_SHIFTED(prop);
+    if((part == LV_PART_MAIN ? obj->style_main_prop_is_set : obj->style_other_prop_is_set) & prop_shifted)
+#endif
+    {
+        found = get_prop_core(obj, part, prop, &value_act);
+        if(found == LV_STYLE_RES_FOUND) return LV_STYLE_RES_FOUND;
+    }
+
+    extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
+    bool inheritable = false;
+    if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS) {
+        inheritable = _lv_style_builtin_prop_flag_lookup_table[prop] & LV_STYLE_PROP_FLAG_INHERITABLE;
+    }
+    else {
+        if(_style_custom_prop_flag_lookup_table != NULL) {
+            inheritable = _style_custom_prop_flag_lookup_table[prop - _LV_STYLE_NUM_BUILT_IN_PROPS] &
+                          LV_STYLE_PROP_FLAG_INHERITABLE;
+        }
+    }
+
+    if(inheritable) {
+        /*If not found, check the `MAIN` style first, if already on the MAIN part go to the parent*/
+        if(part != LV_PART_MAIN) part = LV_PART_MAIN;
+        else obj = obj->parent;
+
+        while(obj) {
+#if LV_OBJ_STYLE_CACHE
+            if(obj->style_main_prop_is_set & prop_shifted)
+#endif
+            {
+                found = get_prop_core(obj, part, prop, &value_act);
+                if(found == LV_STYLE_RES_FOUND) return LV_STYLE_RES_FOUND;
+            }
+            /*Check the parent too.*/
+            obj = obj->parent;
+        }
+    }
+    else {
+        /*Get the width and height from the class.
+         * WIDTH and HEIGHT are not inherited so add them in the `else` to skip checking them for inherited properties */
+        if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
+            return LV_STYLE_RES_FOUND;
+        }
+    }
+
+    return LV_STYLE_RES_NOT_FOUND;
+}
+
 void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value,
                                  lv_style_selector_t selector)
 {
