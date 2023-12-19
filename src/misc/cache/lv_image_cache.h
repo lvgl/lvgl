@@ -27,7 +27,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_image_cache_drop(const void * src, const uint8_t src_type);
+void lv_image_cache_drop(const void* src);
 /*************************
  *    GLOBAL VARIABLES
  *************************/

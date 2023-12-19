@@ -36,7 +36,7 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_image_cache_drop(const void * src, const uint8_t src_type)
+void lv_image_cache_drop(const void* src)
 {
     if(src == NULL) {
         lv_cache_drop_all(img_cache_p, NULL);
@@ -45,7 +45,7 @@ void lv_image_cache_drop(const void * src, const uint8_t src_type)
 
     lv_image_decoder_cache_data_t search_key = {
         .src = src,
-        .src_type = src_type,
+        .src_type = lv_image_src_get_type(src),
     };
 
     lv_cache_drop(img_cache_p, &search_key, NULL);
