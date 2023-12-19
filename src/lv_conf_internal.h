@@ -2774,6 +2774,13 @@
             #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL windows are closed*/
         #endif
     #endif
+    #ifndef LV_SDL_MOUSEWHEEL_MODE
+        #ifdef CONFIG_LV_SDL_MOUSEWHEEL_MODE
+            #define LV_SDL_MOUSEWHEEL_MODE CONFIG_LV_SDL_MOUSEWHEEL_MODE
+        #else
+            #define LV_SDL_MOUSEWHEEL_MODE 0    /*0: Encoder, 1: Watch crown*/
+        #endif
+    #endif
 #endif
 
 /*Use X11 to open window on Linux desktop and handle mouse and keyboard*/

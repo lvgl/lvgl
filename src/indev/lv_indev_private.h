@@ -84,6 +84,7 @@ struct _lv_indev_t {
         lv_obj_t * last_pressed; /*The lastly pressed object*/
         lv_area_t scroll_area;
         lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
+        int32_t diff;
 
         /*Flags*/
         lv_dir_t scroll_dir : 4;
@@ -100,10 +101,10 @@ struct _lv_indev_t {
     lv_group_t * group;   /**< Keypad destination group*/
     const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
                                       here by the buttons*/
-
     lv_event_list_t event_list;
     lv_anim_t * scroll_throw_anim;
 };
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

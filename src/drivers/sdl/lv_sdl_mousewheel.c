@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_sdl_mousewheel.h"
-#if LV_USE_SDL
+#if LV_USE_SDL && LV_SDL_MOUSEWHEEL_MODE == 0
 
 #include "../../core/lv_group.h"
 #include "../../indev/lv_indev_private.h"

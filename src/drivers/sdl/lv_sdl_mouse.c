@@ -35,6 +35,9 @@ typedef struct {
     int16_t last_x;
     int16_t last_y;
     bool left_button_down;
+#if LV_SDL_MOUSEWHEEL_MODE == 1
+    int32_t diff;
+#endif
 } lv_sdl_mouse_t;
 
 /**********************
@@ -76,6 +79,10 @@ static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data)
     data->point.x = dsc->last_x;
     data->point.y = dsc->last_y;
     data->state = dsc->left_button_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+#if LV_SDL_MOUSEWHEEL_MODE == 1
+    data->enc_diff = dsc->diff;
+    dsc->diff = 0;
+#endif
 }
 
 static void release_indev_cb(lv_event_t * e)
@@ -101,7 +108,11 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
         case SDL_MOUSEMOTION:
             win_id = event->motion.windowID;
             break;
-
+#if LV_SDL_MOUSEWHEEL_MODE == 1
+        case SDL_MOUSEWHEEL:
+            win_id = event->wheel.windowID;
+            break;
+#endif
         case SDL_FINGERUP:
         case SDL_FINGERDOWN:
         case SDL_FINGERMOTION:
@@ -174,8 +185,19 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
             indev_dev->last_x = (int16_t)((float)hor_res * event->tfinger.x / zoom);
             indev_dev->last_y = (int16_t)((float)ver_res * event->tfinger.y / zoom);
             break;
+        case SDL_MOUSEWHEEL:
+#if LV_SDL_MOUSEWHEEL_MODE == 1
+#ifdef __EMSCRIPTEN__
+            /*Escripten scales it wrong*/
+            if(event->wheel.y < 0) dsc->diff++;
+            if(event->wheel.y > 0) dsc->diff--;
+#else
+            indev_dev->diff = -event->wheel.y;
+#endif  /*LV_SDL_MOUSEWHEEL_MODE*/
+#endif /*LV_SDL_MOUSEWHEEL_MODE == 1*/
+            break;
     }
-    lv_indev_read(indev);
+    //    lv_indev_read(indev);
 }
 
 #endif /*LV_USE_SDL*/

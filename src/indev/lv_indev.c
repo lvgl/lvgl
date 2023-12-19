@@ -64,6 +64,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(lv_indev_t * indev);
 static void indev_proc_release(lv_indev_t * indev);
+static void indev_proc_pointer_diff(lv_indev_t * indev);
 static lv_obj_t * pointer_search_obj(lv_display_t * disp, lv_point_t * p);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static void indev_click_focus(lv_indev_t * indev);
@@ -75,6 +76,7 @@ static lv_result_t send_event(lv_event_code_t code, void * param);
 
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
 static void indev_scroll_throw_anim_cb(void * var, int32_t v);
+<<<<<<< HEAD
 static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim);
 static inline void indev_scroll_throw_anim_reset(lv_indev_t * indev)
 {
@@ -84,6 +86,8 @@ static inline void indev_scroll_throw_anim_reset(lv_indev_t * indev)
         indev->scroll_throw_anim = NULL;
     }
 }
+=======
+>>>>>>> 80ddb6b88 (add crown support)
 
 /**********************
  *  STATIC VARIABLES
@@ -660,6 +664,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     i->pointer.act_point.x = data->point.x;
     i->pointer.act_point.y = data->point.y;
+    i->pointer.diff = data->enc_diff;
 
     if(i->state == LV_INDEV_STATE_PRESSED) {
         indev_proc_press(i);
@@ -668,8 +673,11 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         indev_proc_release(i);
     }
 
+    indev_proc_pointer_diff(i);
+
     i->pointer.last_point.x = i->pointer.act_point.x;
     i->pointer.last_point.y = i->pointer.act_point.y;
+
 }
 
 /**
@@ -1117,8 +1125,9 @@ static void indev_proc_press(lv_indev_t * indev)
     if(new_obj_searched && indev->pointer.last_obj) {
 
         /*Attempt to stop scroll throw animation firstly*/
-        if(!indev->scroll_throw_anim || !lv_anim_delete(indev, indev_scroll_throw_anim_cb)) {
-            indev_scroll_throw_anim_reset(indev);
+        if(indev->scroll_throw_anim) {
+            lv_anim_delete(indev, indev_scroll_throw_anim_cb);
+            indev->scroll_throw_anim = NULL;
         }
 
         _lv_indev_scroll_throw_handler(indev);
@@ -1300,7 +1309,6 @@ static void indev_proc_release(lv_indev_t * indev)
                 lv_point_transform(&indev->pointer.scroll_throw_vect_ori, angle, scale_x, scale_y, &pivot, false);
             }
         }
-
     }
 
     if(scroll_obj) {
@@ -1310,6 +1318,37 @@ static void indev_proc_release(lv_indev_t * indev)
 
         if(indev_reset_check(indev)) return;
     }
+}
+
+static void indev_proc_pointer_diff(lv_indev_t * indev)
+{
+    lv_obj_t * obj = indev->pointer.last_pressed;
+    if(obj == NULL) return;
+    if(indev->pointer.diff == 0) return;
+
+    indev_obj_act = obj;
+
+    bool interactive = lv_obj_is_group_def(obj);
+
+    if(interactive) {
+        uint32_t k = indev->pointer.diff < 0 ? LV_KEY_LEFT : LV_KEY_RIGHT;
+        uint32_t cnt = LV_ABS(indev->pointer.diff);
+        while(cnt) {
+            send_event(LV_EVENT_KEY, &k);
+            cnt--;
+        }
+    }
+    else {
+        int32_t vect = indev->pointer.diff > 0 ? indev->scroll_limit : -indev->scroll_limit;
+        int32_t throw = indev->pointer.diff > 0 ? LV_VER_RES / 8 : -LV_VER_RES / 8;
+        indev->pointer.vect.y = vect;
+        indev->pointer.scroll_throw_vect.y = throw;
+        indev->pointer.scroll_throw_vect_ori.y = throw;
+        indev->pointer.act_obj = obj;
+        _lv_indev_scroll_handler(indev);
+        _lv_indev_scroll_throw_handler(indev);
+    }
+
 }
 
 static lv_obj_t * pointer_search_obj(lv_display_t * disp, lv_point_t * p)
@@ -1563,10 +1602,15 @@ static void indev_scroll_throw_anim_cb(void * var, int32_t v)
         if(indev->scroll_throw_anim) {
             LV_LOG_INFO("stop animation");
             lv_anim_delete(indev, indev_scroll_throw_anim_cb);
+<<<<<<< HEAD
+=======
+            indev->scroll_throw_anim = NULL;
+>>>>>>> 80ddb6b88 (add crown support)
         }
     }
 }
 
+<<<<<<< HEAD
 static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim)
 {
     if(anim) {
@@ -1574,6 +1618,8 @@ static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim)
     }
 }
 
+=======
+>>>>>>> 80ddb6b88 (add crown support)
 static void indev_scroll_throw_anim_start(lv_indev_t * indev)
 {
     LV_ASSERT_NULL(indev);
@@ -1584,8 +1630,11 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_set_duration(&a, 1024);
     lv_anim_set_values(&a, 0, 1024);
     lv_anim_set_exec_cb(&a, indev_scroll_throw_anim_cb);
+<<<<<<< HEAD
     lv_anim_set_completed_cb(&a, indev_scroll_throw_anim_completed_cb);
     lv_anim_set_deleted_cb(&a, indev_scroll_throw_anim_completed_cb);
+=======
+>>>>>>> 80ddb6b88 (add crown support)
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     indev->scroll_throw_anim = lv_anim_start(&a);
