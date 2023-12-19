@@ -79,13 +79,10 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
 
     const void * src = lv_image_get_src(obj);
     if(src) {
-        lv_cache_lock();
-        lv_cache_invalidate_by_src(src, LV_CACHE_SRC_TYPE_POINTER);
-        lv_cache_unlock();
+        lv_image_cache_drop(src, LV_IMAGE_SRC_VARIABLE);
     }
 
-    lv_image_set_src(obj, &canvas->dsc);
-    lv_image_cache_drop(&canvas->dsc, LV_IMAGE_SRC_VARIABLE);
+    lv_image_set_src(obj, &canvas->draw_buf);
 }
 
 void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
@@ -98,9 +95,7 @@ void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 
     const void * src = lv_image_get_src(obj);
     if(src) {
-        lv_cache_lock();
-        lv_cache_invalidate_by_src(src, LV_CACHE_SRC_TYPE_POINTER);
-        lv_cache_unlock();
+        lv_image_cache_drop(src, LV_IMAGE_SRC_VARIABLE);
     }
 
     lv_image_set_src(obj, draw_buf);
@@ -386,7 +381,7 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
-    lv_image_cache_drop(&canvas->dsc, LV_IMAGE_SRC_VARIABLE);
+    lv_image_cache_drop(&canvas->draw_buf, LV_IMAGE_SRC_VARIABLE);
 }
 
 #endif
