@@ -334,7 +334,7 @@ static inline void _lv_rgb888_blend_normal_to_rgb565_helium(_lv_draw_sw_blend_im
 
 
 static inline void _lv_rgb888_blend_normal_to_rgb565_with_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                   uint32_t src_px_size)
+                                                                     uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -357,7 +357,7 @@ static inline void _lv_rgb888_blend_normal_to_rgb565_with_opa_helium(_lv_draw_sw
 
 
 static inline void _lv_rgb888_blend_normal_to_rgb565_with_mask_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                    uint32_t src_px_size)
+                                                                      uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -381,7 +381,7 @@ static inline void _lv_rgb888_blend_normal_to_rgb565_with_mask_helium(_lv_draw_s
 
 
 static inline void _lv_rgb888_blend_normal_to_rgb565_mix_mask_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                       uint32_t src_px_size)
+                                                                         uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -538,7 +538,8 @@ static inline void _lv_color_blend_to_rgb888_with_mask_helium(_lv_draw_sw_blend_
 }
 
 
-static inline void _lv_color_blend_to_rgb888_mix_mask_opa_helium(_lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dst_px_size)
+static inline void _lv_color_blend_to_rgb888_mix_mask_opa_helium(_lv_draw_sw_blend_fill_dsc_t * dsc,
+                                                                 uint32_t dst_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -583,7 +584,7 @@ static inline void _lv_rgb565_blend_normal_to_rgb888_helium(_lv_draw_sw_blend_im
 
 
 static inline void _lv_rgb565_blend_normal_to_rgb888_with_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                   uint32_t dst_px_size)
+                                                                     uint32_t dst_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -606,7 +607,7 @@ static inline void _lv_rgb565_blend_normal_to_rgb888_with_opa_helium(_lv_draw_sw
 
 
 static inline void _lv_rgb565_blend_normal_to_rgb888_with_mask_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                    uint32_t dst_px_size)
+                                                                      uint32_t dst_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -630,7 +631,7 @@ static inline void _lv_rgb565_blend_normal_to_rgb888_with_mask_helium(_lv_draw_s
 
 
 static inline void _lv_rgb565_blend_normal_to_rgb888_mix_mask_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                       uint32_t dst_px_size)
+                                                                         uint32_t dst_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -655,7 +656,7 @@ static inline void _lv_rgb565_blend_normal_to_rgb888_mix_mask_opa_helium(_lv_dra
 
 
 static inline void _lv_rgb888_blend_normal_to_rgb888_helium(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dst_px_size,
-                                                          uint32_t src_px_size)
+                                                            uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -687,7 +688,7 @@ static inline void _lv_rgb888_blend_normal_to_rgb888_helium(_lv_draw_sw_blend_im
 
 
 static inline void _lv_rgb888_blend_normal_to_rgb888_with_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                   uint32_t dst_px_size, uint32_t src_px_size)
+                                                                     uint32_t dst_px_size, uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -720,7 +721,7 @@ static inline void _lv_rgb888_blend_normal_to_rgb888_with_opa_helium(_lv_draw_sw
 
 
 static inline void _lv_rgb888_blend_normal_to_rgb888_with_mask_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                    uint32_t dst_px_size, uint32_t src_px_size)
+                                                                      uint32_t dst_px_size, uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -754,7 +755,7 @@ static inline void _lv_rgb888_blend_normal_to_rgb888_with_mask_helium(_lv_draw_s
 
 
 static inline void _lv_rgb888_blend_normal_to_rgb888_mix_mask_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                       uint32_t dst_px_size, uint32_t src_px_size)
+                                                                         uint32_t dst_px_size, uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -810,7 +811,7 @@ static inline void _lv_argb8888_blend_normal_to_rgb888_helium(_lv_draw_sw_blend_
 
 
 static inline void _lv_argb8888_blend_normal_to_rgb888_with_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                     uint32_t dst_px_size)
+                                                                       uint32_t dst_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -833,7 +834,7 @@ static inline void _lv_argb8888_blend_normal_to_rgb888_with_opa_helium(_lv_draw_
 
 
 static inline void _lv_argb8888_blend_normal_to_rgb888_with_mask_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                      uint32_t dst_px_size)
+                                                                        uint32_t dst_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -857,7 +858,7 @@ static inline void _lv_argb8888_blend_normal_to_rgb888_with_mask_helium(_lv_draw
 
 
 static inline void _lv_argb8888_blend_normal_to_rgb888_mix_mask_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                         uint32_t dst_px_size)
+                                                                           uint32_t dst_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -1040,7 +1041,7 @@ static inline void _lv_rgb888_blend_normal_to_argb8888_helium(_lv_draw_sw_blend_
 
 
 static inline void _lv_rgb888_blend_normal_to_argb8888_with_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                     uint32_t src_px_size)
+                                                                       uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -1063,7 +1064,7 @@ static inline void _lv_rgb888_blend_normal_to_argb8888_with_opa_helium(_lv_draw_
 
 
 static inline void _lv_rgb888_blend_normal_to_argb8888_with_mask_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                      uint32_t src_px_size)
+                                                                        uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
@@ -1087,7 +1088,7 @@ static inline void _lv_rgb888_blend_normal_to_argb8888_with_mask_helium(_lv_draw
 
 
 static inline void _lv_rgb888_blend_normal_to_argb8888_mix_mask_opa_helium(_lv_draw_sw_blend_image_dsc_t * dsc,
-                                                                         uint32_t src_px_size)
+                                                                           uint32_t src_px_size)
 {
 #if 0
     asm_dsc_t asm_dsc = {
