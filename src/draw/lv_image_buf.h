@@ -40,6 +40,11 @@ extern "C" {
 
 #define _LV_ZOOM_INV_UPSCALE 5
 
+/** Magic number for lvgl image, 9 means lvgl version 9
+ *  It must not be a valid ASCII character nor larger than 0x80. See `lv_image_src_get_type`.
+ */
+#define LV_IMAGE_HEADER_MAGIC (0x19)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -89,12 +94,6 @@ typedef enum {
     LV_IMAGE_COMPRESS_LZ4,
 } lv_image_compress_t;
 
-/**
- * The first 8 bit is very important to distinguish the different source types.
- * For more info see `lv_image_get_src_type()` in lv_img.c
- * On big endian systems the order is reversed so cf and always_zero must be at
- * the end of the struct.
- */
 #if LV_BIG_ENDIAN_SYSTEM
 typedef struct {
     uint32_t reserved_2: 16;    /*Reserved to be used later*/
@@ -102,18 +101,13 @@ typedef struct {
     uint32_t h: 16;
     uint32_t w: 16;
     uint32_t flags: 16;         /*Image flags, see `lv_image_flags_t`*/
-    uint32_t reserved_1: 8;     /*Reserved by LVGL for later use*/
-    uint32_t always_zero : 3;   /*It the upper bits of the first byte. Always zero to look like a
-                                  non-printable character*/
-    uint32_t cf : 5;            /*Color format: See `lv_color_format_t`*/
+    uint32_t cf : 8;            /*Color format: See `lv_color_format_t`*/
+    uint32_t magic: 8;          /*Magic number. Must be LV_IMAGE_HEADER_MAGIC*/
 } lv_image_header_t;
 #else
 typedef struct {
-    uint32_t cf : 5;            /*Color format: See `lv_color_format_t`*/
-    uint32_t always_zero : 3;   /*It the upper bits of the first byte. Always zero to look like a
-                                  non-printable character*/
-
-    uint32_t reserved_1: 8;     /*Reserved by LVGL for later use*/
+    uint32_t magic: 8;          /*Magic number. Must be LV_IMAGE_HEADER_MAGIC*/
+    uint32_t cf : 8;            /*Color format: See `lv_color_format_t`*/
     uint32_t flags: 16;         /*Image flags, see `lv_image_flags_t`*/
 
     uint32_t w: 16;
