@@ -36,6 +36,8 @@ typedef struct {
     uint32_t    frame_cnt;
     uint32_t    fps_sum_cnt;
     uint32_t    fps_sum_all;
+    uint32_t    render_cnt;
+    uint32_t    render_time_sum;
 #if LV_USE_LABEL
     lv_obj_t  * perf_label;
 #endif
@@ -320,9 +322,14 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
+
     lv_refr_join_area();
     refr_sync_areas();
+
+    perf_monitor.render_cnt++;
+    uint32_t t = lv_tick_get();
     refr_invalid_areas();
+    perf_monitor.render_time_sum += lv_tick_elaps(t);
 
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
@@ -412,8 +419,15 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
         perf_monitor.fps_sum_all += fps;
         perf_monitor.fps_sum_cnt ++;
+
+        uint32_t render_time = perf_monitor.render_cnt ? perf_monitor.render_time_sum / perf_monitor.render_cnt : 0;
+        perf_monitor.render_time_sum = 0;
+        perf_monitor.render_cnt = 0;
+
         uint32_t cpu = 100 - lv_timer_get_idle();
-        lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS\n%"LV_PRIu32"%% CPU", fps, cpu);
+        lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS %"LV_PRIu32"%% CPU\n %"LV_PRIu32"ms", fps, cpu, render_time);
+        void sysmon_perf_observer_cb(uint32_t fps, uint32_t cpu, uint32_t render_time);
+        sysmon_perf_observer_cb(fps, cpu, render_time);
     }
 #endif
 

@@ -53,6 +53,8 @@ static void meter1_indic2_anim_cb(void * var, int32_t v);
 static void meter1_indic3_anim_cb(void * var, int32_t v);
 static void meter2_timer_cb(lv_timer_t * timer);
 static void meter3_anim_cb(void * var, int32_t v);
+static void scroll_anim_y_cb(void * var, int32_t v);
+static void slideshow_anim_ready_cb(lv_anim_t * a_old);
 
 /**********************
  *  STATIC VARIABLES
@@ -87,7 +89,6 @@ static uint32_t session_tablet = 1000;
 static uint32_t session_mobile = 1000;
 
 static lv_timer_t * meter2_timer;
-
 /**********************
  *      MACROS
  **********************/
@@ -214,9 +215,65 @@ void lv_demo_widgets_close(void)
     lv_style_reset(&style_bullet);
 }
 
+void lv_demo_widgets_start_slideshow(void)
+{
+    lv_obj_update_layout(tv);
+
+    lv_obj_t * cont = lv_tabview_get_content(tv);
+
+    lv_obj_t * tab = lv_obj_get_child(cont, 0);
+
+    int32_t v = lv_obj_get_scroll_bottom(tab);
+    uint32_t t = lv_anim_speed_to_time(lv_disp_get_dpi(NULL), 0, v);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
+    lv_anim_set_time(&a, t);
+    lv_anim_set_playback_time(&a, t);
+    lv_anim_set_values(&a, 0, v);
+    lv_anim_set_var(&a, tab);
+    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_start(&a);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void scroll_anim_y_cb(void * var, int32_t v)
+{
+    lv_obj_scroll_to_y(var, v, LV_ANIM_OFF);
+}
+
+
+static void slideshow_anim_ready_cb(lv_anim_t * a_old)
+{
+    LV_UNUSED(a_old);
+
+    lv_obj_t * cont = lv_tabview_get_content(tv);
+    uint32_t tab_id = lv_tabview_get_tab_act(tv);
+    tab_id += 1;
+    if(tab_id > 2) tab_id = 0;
+    lv_tabview_set_act(tv, tab_id, LV_ANIM_ON);
+
+    lv_obj_t * tab = lv_obj_get_child(cont, tab_id);
+    lv_obj_scroll_to_y(tab, 0, LV_ANIM_OFF);
+    lv_obj_update_layout(tv);
+
+    int32_t v = lv_obj_get_scroll_bottom(tab);
+    uint32_t t = lv_anim_speed_to_time(lv_disp_get_dpi(NULL), 0, v);
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
+    lv_anim_set_time(&a, t);
+    lv_anim_set_playback_time(&a, t);
+    lv_anim_set_values(&a, 0, v);
+    lv_anim_set_var(&a, tab);
+    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_start(&a);
+}
+
 
 static void profile_create(lv_obj_t * parent)
 {
