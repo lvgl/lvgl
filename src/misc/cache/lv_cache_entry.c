@@ -103,6 +103,8 @@ void * lv_cache_entry_acquire_data(lv_cache_entry_t * entry)
 }
 void lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     LV_ASSERT_NULL(entry);
     if(lv_cache_entry_get_ref(entry) == 0) {
         LV_LOG_ERROR("ref_cnt(%" LV_PRIu32 ") == 0", entry->ref_cnt);

@@ -69,46 +69,13 @@ const lv_cache_class_t lv_cache_class_lru_rb = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-static void lv_lru_rb_set_max_size(lv_lru_rb_t_ * lru, size_t max_size, void * user_data)
-{
-    LV_UNUSED(user_data);
-    lru->cache.max_size = max_size;
-}
-
-static size_t lv_lru_rb_get_max_size(lv_lru_rb_t_ * lru, void * user_data)
-{
-    LV_UNUSED(user_data);
-    return lru->cache.max_size;
-}
-
-static size_t lv_lru_rb_get_size(lv_lru_rb_t_ * lru, void * user_data)
-{
-    LV_UNUSED(user_data);
-    return lru->cache.size;
-}
-
-static size_t lv_lru_rb_get_free_size(lv_lru_rb_t_ * lru, void * user_data)
-{
-    return lv_lru_rb_get_max_size(lru, user_data) - lv_lru_rb_get_size(lru, user_data);
-}
-
-static void lv_lru_rb_set_compare_cb(lv_lru_rb_t_ * lru, lv_cache_compare_cb_t compare_cb, void * user_data)
-{
-    LV_UNUSED(user_data);
-    lru->rb.compare = (lv_rb_compare_t)compare_cb;
-}
-
-static void lv_lru_rb_set_free_cb(lv_lru_rb_t_ * lru, lv_cache_free_cb_t free_cb, void * user_data)
-{
-    LV_UNUSED(user_data);
-    lru->cache.ops.free_cb = free_cb;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     LV_ASSERT_NULL(lru);
     LV_ASSERT_NULL(key);
 
@@ -174,20 +141,18 @@ static bool init_cb(lv_cache_t * cache)
     }
 
     /*add void* to store the ll node pointer*/
-    if(!lv_rb_init(&lru->rb, lru->cache.ops.compare_cb,   lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
+    if(!lv_rb_init(&lru->rb, lru->cache.ops.compare_cb, lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
         return NULL;
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
-
-    lv_lru_rb_set_max_size(lru, lru->cache.max_size, NULL);
-    lv_lru_rb_set_compare_cb(lru, (lv_rb_compare_t)lru->cache.ops.compare_cb, NULL);
-    lv_lru_rb_set_free_cb(lru, lru->cache.ops.free_cb, NULL);
 
     return lru;
 }
 
 static void destroy_cb(lv_cache_t * cache, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
     LV_ASSERT_NULL(lru);
@@ -201,6 +166,8 @@ static void destroy_cb(lv_cache_t * cache, void * user_data)
 
 static lv_cache_entry_t * get_cb(lv_cache_t * cache, const void * key, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
     LV_ASSERT_NULL(lru);
@@ -236,6 +203,8 @@ static lv_cache_entry_t * get_cb(lv_cache_t * cache, const void * key, void * us
 
 static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
     LV_ASSERT_NULL(lru);
@@ -278,6 +247,8 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
 
 static void remove_cb(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
     LV_ASSERT_NULL(lru);
