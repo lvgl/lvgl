@@ -333,7 +333,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
             lv_draw_sw_mask_rect((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
-#if LV_USE_VECTOR_GRAPHIC
+#if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
         case LV_DRAW_TASK_TYPE_VECTOR:
             lv_draw_sw_vector((lv_draw_unit_t *)u, t->draw_dsc);
             break;
