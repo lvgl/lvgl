@@ -28,7 +28,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                                 const lv_image_decoder_args_t * args);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static lv_draw_buf_t * decode_png_file(const char * filename);
-static void cache_invalidate_cb(lv_cache_entry_t * entry);
 
 static void png_decoder_cache_free_cb(lv_image_decoder_cache_data_t * entry, void * user_data);
 /**********************

@@ -154,7 +154,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     /*If it's a JPEG file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
-        size_t decoded_size = 0;
         lv_draw_buf_t * decoded = decode_jpeg_file(fn);
         if(decoded == NULL) {
             LV_LOG_WARN("decode jpeg file failed");
