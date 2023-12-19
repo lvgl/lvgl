@@ -24,11 +24,11 @@ extern "C" {
 
 
 #if defined(__IS_COMPILER_ARM_COMPILER_5__)
-    #pragma diag_suppress 174,177,188,68,513,144,1296
+#pragma diag_suppress 174,177,188,68,513,144,1296
 #elif defined(__IS_COMPILER_IAR__)
-    #pragma diag_suppress=Pa093
+#pragma diag_suppress=Pa093
 #elif defined(__IS_COMPILER_GCC__)
-    #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 #endif
 /*********************
  *      DEFINES
