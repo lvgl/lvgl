@@ -11,7 +11,7 @@ fs_driver.fs_register(fs_drv, 'S')
 #
 image_bulb_gif = lv.image_dsc_t(
     {
-        "header": {"always_zero": 0, "w": 0, "h": 0,  "cf": lv.COLOR_FORMAT.RAW},
+        "header": {"w": 0, "h": 0,  "cf": lv.COLOR_FORMAT.RAW},
         "data_size": 0,
         "data": img_bulb_gif_map,
     }
