@@ -39,7 +39,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 static lv_draw_buf_t * decode_jpeg_file(const char * filename);
 static bool get_jpeg_size(const char * filename, uint32_t * width, uint32_t * height);
 static void error_exit(j_common_ptr cinfo);
-static void jpeg_decoder_cache_free_cb(lv_image_decoder_cache_data_t * entry, void * user_data);
+static void jpeg_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -160,7 +160,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
 
-        lv_image_decoder_cache_data_t search_key;
+        lv_image_cache_data_t search_key;
         search_key.src_type = dsc->src_type;
         search_key.src = dsc->src;
 
@@ -443,12 +443,12 @@ static void error_exit(j_common_ptr cinfo)
     longjmp(myerr->jb, 1);
 }
 
-static void jpeg_decoder_cache_free_cb(lv_image_decoder_cache_data_t * entry, void * user_data)
+static void jpeg_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data)
 {
     LV_UNUSED(user_data);
 
-    if(entry->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)entry->src);
-    lv_draw_buf_destroy((lv_draw_buf_t *)entry->decoded);
+    if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
+    lv_draw_buf_destroy((lv_draw_buf_t *)cached_data->decoded);
 }
 
 #endif /*LV_USE_LIBJPEG_TURBO*/

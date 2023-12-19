@@ -124,7 +124,7 @@ typedef struct _lv_image_decoder_cache_data_t {
     const lv_draw_buf_t * decoded;
     const lv_image_decoder_t * decoder;
     void * user_data;
-} lv_image_decoder_cache_data_t;
+} lv_image_cache_data_t;
 
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_image_decoder_dsc_t {
@@ -284,7 +284,7 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
 void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb);
 
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
-                                                 lv_image_decoder_cache_data_t * search_key,
+                                                 lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data);
 
 /**********************

@@ -41,7 +41,7 @@ void lv_cache_destroy(lv_cache_t * cache, void * user_data);
 lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void * user_data);
 lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * key, void * user_data);
 lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * user_data);
-void lv_cache_release(lv_cache_t* cache, lv_cache_entry_t* entry, void* user_data);
+void lv_cache_release(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data);
 void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data);
 void lv_cache_drop_all(lv_cache_t * cache, void * user_data);
 

@@ -29,7 +29,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static lv_draw_buf_t * decode_png_file(const char * filename);
 
-static void png_decoder_cache_free_cb(lv_image_decoder_cache_data_t * entry, void * user_data);
+static void png_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -151,7 +151,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             }
         }
 
-        lv_image_decoder_cache_data_t search_key;
+        lv_image_cache_data_t search_key;
         search_key.src_type = dsc->src_type;
         search_key.src = dsc->src;
 
@@ -285,11 +285,12 @@ static lv_draw_buf_t * decode_png_file(const char * filename)
     return decoded;
 }
 
-static void png_decoder_cache_free_cb(lv_image_decoder_cache_data_t * entry, void * user_data)
+static void png_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data)
 {
     LV_UNUSED(user_data);
 
-    lv_free((void *)entry->src);
-    lv_draw_buf_destroy((lv_draw_buf_t *)entry->decoded);
+    if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
+    lv_draw_buf_destroy((lv_draw_buf_t *)cached_data->decoded);
 }
+
 #endif /*LV_USE_LIBPNG*/

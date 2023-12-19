@@ -28,9 +28,9 @@
  **********************/
 
 static uint32_t img_width_to_stride(lv_image_header_t * header);
-static lv_cache_compare_res_t image_decoder_cache_compare_cb(const lv_image_decoder_cache_data_t * lhs,
-                                                             const lv_image_decoder_cache_data_t * rhs);
-static void image_decoder_cache_free_cb(lv_image_decoder_cache_data_t * entry, void * user_data);
+static lv_cache_compare_res_t image_decoder_cache_compare_cb(const lv_image_cache_data_t * lhs,
+                                                             const lv_image_cache_data_t * rhs);
+static void image_decoder_cache_free_cb(lv_image_cache_data_t * entry, void * user_data);
 
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
 /**********************
@@ -52,7 +52,7 @@ void _lv_image_decoder_init(void)
 {
     _lv_ll_init(img_decoder_ll_p, sizeof(lv_image_decoder_t));
     img_cache_p = lv_cache_create(&lv_cache_class_lru_rb,
-    sizeof(lv_image_decoder_cache_data_t), 128, (lv_cache_ops_t) {
+    sizeof(lv_image_cache_data_t), 128, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)image_decoder_cache_compare_cb,
         .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t)image_decoder_cache_free_cb,
@@ -255,7 +255,7 @@ void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_f
 }
 
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
-                                                 lv_image_decoder_cache_data_t * search_key,
+                                                 lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data)
 {
     lv_cache_entry_t * cache_entry = lv_cache_add(img_cache_p, search_key, NULL);
@@ -263,7 +263,7 @@ lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
         return NULL;
     }
 
-    lv_image_decoder_cache_data_t * cached_data;
+    lv_image_cache_data_t * cached_data;
     cached_data = lv_cache_entry_get_data(cache_entry);
 
     /*Set the cache entry to decoder data*/
@@ -288,8 +288,8 @@ static uint32_t img_width_to_stride(lv_image_header_t * header)
 }
 
 static lv_cache_compare_res_t image_decoder_cache_compare_cb(
-    const lv_image_decoder_cache_data_t * lhs,
-    const lv_image_decoder_cache_data_t * rhs)
+    const lv_image_cache_data_t * lhs,
+    const lv_image_cache_data_t * rhs)
 {
     if(lhs->src_type == rhs->src_type) {
         if(lhs->src_type == LV_IMAGE_SRC_FILE) {
@@ -305,16 +305,10 @@ static lv_cache_compare_res_t image_decoder_cache_compare_cb(
         }
         return 0;
     }
-    else if(lhs->src_type == LV_IMAGE_SRC_FILE && rhs->src_type == LV_IMAGE_SRC_VARIABLE) {
-        return 1;
-    }
-    else if(lhs->src_type == LV_IMAGE_SRC_VARIABLE && rhs->src_type == LV_IMAGE_SRC_FILE) {
-        return -1;
-    }
-    return 0;
+    return lhs->src_type > rhs->src_type ? 1 : -1;
 }
 
-static void image_decoder_cache_free_cb(lv_image_decoder_cache_data_t * entry, void * user_data)
+static void image_decoder_cache_free_cb(lv_image_cache_data_t * entry, void * user_data)
 {
     LV_UNUSED(user_data); /*Unused*/
 
@@ -328,14 +322,14 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 {
     lv_cache_t * cache = dsc->cache;
 
-    lv_image_decoder_cache_data_t search_key;
+    lv_image_cache_data_t search_key;
     search_key.src_type = dsc->src_type;
     search_key.src = dsc->src;
 
     lv_cache_entry_t * entry = lv_cache_acquire(cache, &search_key, NULL);
 
     if(entry) {
-        lv_image_decoder_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
+        lv_image_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
         dsc->decoded = cached_data->decoded;
         dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/
         return LV_RESULT_OK;
