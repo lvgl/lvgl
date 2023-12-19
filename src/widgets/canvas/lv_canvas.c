@@ -74,7 +74,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
     lv_image_header_init(&canvas->static_buf.header, w, h, cf, stride, 0);
     canvas->static_buf.data_size = stride * h;
     canvas->static_buf.data = lv_draw_buf_align(buf, cf);
-    canvas->static_buf._unaligned = buf;
+    canvas->static_buf.unaligned_data = buf;
     canvas->draw_buf = &canvas->static_buf;
 
     const void * src = lv_image_get_src(obj);
@@ -243,7 +243,7 @@ const void * lv_canvas_get_buf(lv_obj_t * obj)
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf)
-        return canvas->draw_buf->_unaligned;
+        return canvas->draw_buf->unaligned_data;
 
     return NULL;
 }

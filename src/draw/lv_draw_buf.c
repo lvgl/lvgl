@@ -139,7 +139,7 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
     draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
     draw_buf->header.stride = stride;
     draw_buf->data = lv_draw_buf_align(buf, cf);
-    draw_buf->_unaligned = buf;
+    draw_buf->unaligned_data = buf;
     draw_buf->data_size = size;
     return draw_buf;
 }
@@ -149,7 +149,7 @@ void lv_draw_buf_destroy(lv_draw_buf_t * buf)
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return;
     if(buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE)
-        lv_draw_buf_free(buf->_unaligned);
+        lv_draw_buf_free(buf->unaligned_data);
 
     lv_free(buf);
 }

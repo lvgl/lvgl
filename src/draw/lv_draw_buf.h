@@ -29,7 +29,7 @@ typedef struct {
     lv_image_header_t header;
     uint32_t data_size;     /*Total buf size in bytes*/
     void * data;
-    void * _unaligned;      /*Unaligned address of data*/
+    void * unaligned_data;  /*Unaligned address of `data`, used internally by lvgl*/
 } lv_draw_buf_t;
 
 /**
@@ -60,7 +60,7 @@ typedef struct {
                                             }, \
                                   .data_size = sizeof(buf_##name), \
                                   .data = buf_##name, \
-                                  ._unaligned = buf_##name, \
+                                  .unaligned_data = buf_##name, \
                                 }
 
 typedef void * (*lv_draw_buf_malloc_cb)(size_t size, lv_color_format_t color_format);
