@@ -18,6 +18,18 @@ extern "C" {
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && !defined(__ASSEMBLY__) && defined(LV_USE_GPU_ARM2D)
 
+#define __ARM_2D_IMPL__
+#include "arm_2d.h"
+#include "__arm_2d_impl.h"
+
+
+#if defined(__IS_COMPILER_ARM_COMPILER_5__)
+    #pragma diag_suppress 174,177,188,68,513,144,1296
+#elif defined(__IS_COMPILER_IAR__)
+    #pragma diag_suppress=Pa093
+#elif defined(__IS_COMPILER_GCC__)
+    #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#endif
 /*********************
  *      DEFINES
  *********************/
