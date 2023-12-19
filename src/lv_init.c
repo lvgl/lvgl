@@ -295,6 +295,10 @@ void lv_init(void)
 #  endif
 #endif
 
+#if LV_USE_TINY_TTF
+    lv_tiny_ttf_init();
+#endif
+
     lv_initialized = true;
 
     LV_LOG_TRACE("finished");

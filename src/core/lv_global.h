@@ -157,6 +157,10 @@ typedef struct _lv_global_t {
     struct _lv_freetype_context_t * ft_context;
 #endif
 
+#if LV_USE_TINY_TTF
+    lv_cache_t * tiny_ttf_cache;
+#endif
+
 #if LV_USE_FONT_COMPRESSED
     lv_font_fmt_rle_t font_fmt_rle;
 #endif
