@@ -81,7 +81,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 {
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
     if(glyph_draw_dsc) {
-        if(glyph_draw_dsc->bitmap == NULL) {
+        if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_INVALID) {
 #if LV_USE_FONT_PLACEHOLDER
             /* Draw a placeholder rectangle*/
             lv_draw_border_dsc_t border_draw_dsc;
@@ -124,13 +124,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
     vg_lite_translate(image_area.x1, image_area.y1, &matrix);
 
     vg_lite_buffer_t src_buf;
-    lv_draw_buf_t draw_buf = { 0 };
-    uint32_t w, h;
-    w = lv_area_get_width(&image_area);
-    h = lv_area_get_height(&image_area);
-    uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
-    lv_image_header_init(&draw_buf.header, w, h, LV_COLOR_FORMAT_A8, stride, 0);
-    draw_buf.data = (void *)dsc->bitmap;
+    lv_draw_buf_t * draw_buf = dsc->glyph_data;
     lv_vg_lite_buffer_from_draw_buf(&src_buf, &draw_buf);
 
     vg_lite_color_t color;
