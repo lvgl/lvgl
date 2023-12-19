@@ -69,6 +69,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
     new_draw_dsc.src = &img_dsc;
 
     lv_draw_sw_image(draw_unit, &new_draw_dsc, coords);
+    lv_image_cache_drop(&img_dsc);
 
 #if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG
     lv_area_t area_rot;
