@@ -22,7 +22,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
+static void cache_drop_internal_no_lock(lv_cache_t * cache, const void * key, void * user_data);
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -91,7 +91,7 @@ void lv_cache_release(lv_cache_t* cache, lv_cache_entry_t* entry, void* user_dat
     lv_cache_entry_release_data(entry, user_data);
 
     if(lv_cache_entry_get_ref(entry) == 0 && lv_cache_entry_is_invalid(entry)) {
-        lv_cache_drop(cache, lv_cache_entry_get_data(entry), user_data);
+        cache_drop_internal_no_lock(cache, lv_cache_entry_get_data(entry), user_data);
     }
     lv_mutex_unlock(&cache->lock);
 }
@@ -143,21 +143,7 @@ void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data)
     LV_ASSERT_NULL(key);
 
     lv_mutex_lock(&cache->lock);
-    lv_cache_entry_t * entry = cache->clz->get_cb(cache, key, user_data);
-    if(entry == NULL) {
-        lv_mutex_unlock(&cache->lock);
-        return;
-    }
-
-    if(lv_cache_entry_get_ref(entry) == 0) {
-        cache->clz->remove_cb(cache, entry, user_data);
-        cache->ops.free_cb(lv_cache_entry_get_data(entry), user_data);
-        lv_cache_entry_delete(entry);
-    }
-    else {
-        lv_cache_entry_set_invalid(entry, true);
-        cache->clz->remove_cb(cache, entry, user_data);
-    }
+    cache_drop_internal_no_lock(cache, key, user_data);
     lv_mutex_unlock(&cache->lock);
 }
 void lv_cache_drop_all(lv_cache_t * cache, void * user_data)
@@ -207,3 +193,20 @@ void lv_cache_set_free_cb(lv_cache_t * cache, lv_cache_free_cb_t free_cb, void *
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static void cache_drop_internal_no_lock(lv_cache_t * cache, const void * key, void * user_data)
+{
+    lv_cache_entry_t * entry = cache->clz->get_cb(cache, key, user_data);
+    if(entry == NULL) {
+        return;
+    }
+
+    if(lv_cache_entry_get_ref(entry) == 0) {
+        cache->clz->remove_cb(cache, entry, user_data);
+        cache->ops.free_cb(lv_cache_entry_get_data(entry), user_data);
+        lv_cache_entry_delete(entry);
+    }
+    else {
+        lv_cache_entry_set_invalid(entry, true);
+        cache->clz->remove_cb(cache, entry, user_data);
+    }
+}
