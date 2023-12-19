@@ -945,13 +945,12 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
     }
 
     uint8_t * img_data;
-    uint32_t input_len = compressed->compressed_size;
     uint32_t out_len = compressed->decompressed_size;
 
     lv_draw_buf_t * decompressed = lv_draw_buf_create(dsc->header.w, dsc->header.h, dsc->header.cf,
                                                       dsc->header.stride);
     if(decompressed == NULL) {
-        LV_LOG_WARN("No memory for decompressed image, input: %" LV_PRIu32 ", output: %" LV_PRIu32, input_len, out_len);
+        LV_LOG_WARN("No memory for decompressed image, input: %" LV_PRIu32 ", output: %" LV_PRIu32, compressed->compressed_size, out_len);
         return LV_RESULT_INVALID;
     }
 
