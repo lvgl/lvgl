@@ -83,6 +83,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
     }
 
     lv_image_set_src(obj, canvas->draw_buf);
+    lv_image_cache_drop(canvas->draw_buf);
 }
 
 void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
@@ -99,6 +100,7 @@ void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
     }
 
     lv_image_set_src(obj, draw_buf);
+    lv_image_cache_drop(draw_buf);
 }
 
 void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv_opa_t opa)
