@@ -336,6 +336,10 @@ void lv_deinit(void)
     lv_freetype_uninit();
 #endif
 
+#if LV_USE_TINY_TTF
+    lv_tiny_ttf_deinit();
+#endif
+
 #if LV_USE_THEME_DEFAULT
     lv_theme_default_deinit();
 #endif

@@ -2,6 +2,7 @@
 #if LV_USE_TINY_TTF
 #include <stdio.h>
 #include "../../core/lv_global.h"
+#include "lv_tiny_ttf.h"
 
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
@@ -248,6 +249,7 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
                 lv_fs_close(&ttf->file);
             }
 #endif
+            lv_cache_drop_all(tiny_ttf_cache, (void *)font->dsc);
             lv_free(ttf);
         }
     }
@@ -262,6 +264,11 @@ void lv_tiny_ttf_init()
     };
 
     tiny_ttf_cache = lv_cache_create(&lv_cache_class_lru_rb, sizeof(tiny_ttf_cache_data_t), 128, ops);
+}
+
+void lv_tiny_ttf_deinit()
+{
+    lv_cache_destroy(tiny_ttf_cache, NULL);
 }
 
 static bool tiny_ttf_cache_create_cb(tiny_ttf_cache_data_t * node, void * user_data)

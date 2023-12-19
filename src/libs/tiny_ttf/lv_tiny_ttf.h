@@ -39,6 +39,8 @@ lv_result_t lv_tiny_ttf_create_file_ex(lv_font_t * font, const char * path, int3
 
 void lv_tiny_ttf_init();
 
+void lv_tiny_ttf_deinit();
+
 /* create a font from the specified data pointer with the specified line height.*/
 lv_result_t lv_tiny_ttf_create_data(lv_font_t * font, const void * data, size_t data_size, int32_t font_size);
 
