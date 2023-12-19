@@ -197,7 +197,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
 #endif /*LV_SDL_MOUSEWHEEL_MODE == 1*/
             break;
     }
-    //    lv_indev_read(indev);
+    lv_indev_read(indev);
 }
 
 #endif /*LV_USE_SDL*/

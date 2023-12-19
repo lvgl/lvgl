@@ -76,7 +76,6 @@ static lv_result_t send_event(lv_event_code_t code, void * param);
 
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
 static void indev_scroll_throw_anim_cb(void * var, int32_t v);
-<<<<<<< HEAD
 static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim);
 static inline void indev_scroll_throw_anim_reset(lv_indev_t * indev)
 {
@@ -86,8 +85,6 @@ static inline void indev_scroll_throw_anim_reset(lv_indev_t * indev)
         indev->scroll_throw_anim = NULL;
     }
 }
-=======
->>>>>>> 80ddb6b88 (add crown support)
 
 /**********************
  *  STATIC VARIABLES
@@ -1602,15 +1599,10 @@ static void indev_scroll_throw_anim_cb(void * var, int32_t v)
         if(indev->scroll_throw_anim) {
             LV_LOG_INFO("stop animation");
             lv_anim_delete(indev, indev_scroll_throw_anim_cb);
-<<<<<<< HEAD
-=======
-            indev->scroll_throw_anim = NULL;
->>>>>>> 80ddb6b88 (add crown support)
         }
     }
 }
 
-<<<<<<< HEAD
 static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim)
 {
     if(anim) {
@@ -1618,8 +1610,6 @@ static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim)
     }
 }
 
-=======
->>>>>>> 80ddb6b88 (add crown support)
 static void indev_scroll_throw_anim_start(lv_indev_t * indev)
 {
     LV_ASSERT_NULL(indev);
@@ -1630,11 +1620,8 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_set_duration(&a, 1024);
     lv_anim_set_values(&a, 0, 1024);
     lv_anim_set_exec_cb(&a, indev_scroll_throw_anim_cb);
-<<<<<<< HEAD
     lv_anim_set_completed_cb(&a, indev_scroll_throw_anim_completed_cb);
     lv_anim_set_deleted_cb(&a, indev_scroll_throw_anim_completed_cb);
-=======
->>>>>>> 80ddb6b88 (add crown support)
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     indev->scroll_throw_anim = lv_anim_start(&a);
