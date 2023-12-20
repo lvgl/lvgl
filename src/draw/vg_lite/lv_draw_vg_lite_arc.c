@@ -186,7 +186,7 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
                                        0,
                                        color,
                                        VG_LITE_FILTER_BI_LINEAR));
-            lv_image_decoder_close(&decoder_dsc);
+            lv_vg_lite_push_image_decoder_dsc(draw_unit, &decoder_dsc);
         }
     }
 

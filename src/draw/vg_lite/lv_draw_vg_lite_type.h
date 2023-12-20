@@ -19,6 +19,7 @@ extern "C" {
 #if LV_USE_DRAW_VG_LITE
 
 #include "../lv_draw.h"
+#include "../../misc/lv_array.h"
 
 #if LV_USE_VG_LITE_THORVG
 #include "../../others/vg_lite_tvg/vg_lite.h"
@@ -37,6 +38,8 @@ extern "C" {
 struct _lv_draw_vg_lite_unit_t {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
+    lv_array_t img_dsc_pending;
+    uint16_t flush_count;
     vg_lite_buffer_t target_buffer;
     vg_lite_matrix_t global_matrix;
     struct _lv_vg_lite_path_t * global_path;
