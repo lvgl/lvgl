@@ -1,6 +1,5 @@
 #define LV_MEM_SIZE         (32 * 1024 * 1024)
 #define LV_SHADOW_CACHE_SIZE    (8 * 1024)
-#define LV_IMAGE_CACHE_DEF_SIZE   32
 #define LV_USE_LOG              1
 #define LV_LOG_LEVEL            LV_LOG_LEVEL_TRACE
 #define LV_LOG_PRINTF           1
@@ -97,3 +96,5 @@
 #define LV_USE_OBJ_ID_BUILTIN   1
 #define LV_USE_OBJ_PROPERTY     1
 #define LV_BIN_DECODER_RAM_LOAD 1
+
+#define LV_CACHE_DEF_SIZE       128

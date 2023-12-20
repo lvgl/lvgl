@@ -273,7 +273,7 @@
  *Used by image decoders such as `lv_lodepng` to keep the decoded image in the memory.
  *Data larger than the size of the cache also can be allocated but
  *will be dropped immediately after usage.*/
-#define LV_CACHE_DEF_SIZE       0
+#define LV_CACHE_DEF_SIZE       32
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/

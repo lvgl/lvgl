@@ -773,7 +773,7 @@
     #ifdef CONFIG_LV_CACHE_DEF_SIZE
         #define LV_CACHE_DEF_SIZE CONFIG_LV_CACHE_DEF_SIZE
     #else
-        #define LV_CACHE_DEF_SIZE       0
+        #define LV_CACHE_DEF_SIZE       32
     #endif
 #endif
 

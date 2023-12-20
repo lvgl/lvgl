@@ -267,7 +267,7 @@ menu "LVGL configuration"
 
 			config LV_CACHE_DEF_SIZE
 				int "Default image cache size. 0 to disable caching."
-				default 0
+				default 32
 				depends on LV_USE_DRAW_SW
 				help
 					If only the built-in image formats are used there is no real advantage of caching.

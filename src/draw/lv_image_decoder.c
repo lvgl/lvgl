@@ -52,7 +52,7 @@ void _lv_image_decoder_init(void)
 {
     _lv_ll_init(img_decoder_ll_p, sizeof(lv_image_decoder_t));
     img_cache_p = lv_cache_create(&lv_cache_class_lru_rb,
-    sizeof(lv_image_cache_data_t), 128, (lv_cache_ops_t) {
+    sizeof(lv_image_cache_data_t), LV_CACHE_DEF_SIZE, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)image_decoder_cache_compare_cb,
         .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t)image_decoder_cache_free_cb,
