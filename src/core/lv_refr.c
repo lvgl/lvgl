@@ -380,7 +380,6 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
     if(disp_refr->inv_p == 0) goto refr_finish;
 
     /*If refresh happened ...*/
-    /*Call monitor cb if present*/
     lv_display_send_event(disp_refr, LV_EVENT_RENDER_READY, NULL);
 
     if(!lv_display_is_double_buffered(disp_refr) ||
