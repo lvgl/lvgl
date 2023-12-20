@@ -7,12 +7,11 @@ entrypoint API is almost the same as the framework.
 Requirements
 Python >= 3.10
 
-apng library
 pillow library
 
-dd the following to the CI prior to the test running
+add the following to the CI prior to the test running
 
-python3 -m pip install pillow, apng
+python3 -m pip install pillow
 
 Example command line to run the test. I suggest doing this from the root of the
 binding directory. It is just a simple location to do it from.
@@ -22,7 +21,6 @@ python3 lib/lv_bindings/lvgl/tests/micropy_test/__init__.py --artifact-path=lib/
 
 """
 import os
-import apng
 import time
 import signal
 import argparse
@@ -31,7 +29,6 @@ import unittest
 import threading
 import subprocess
 
-from io import BytesIO
 from PIL import Image as Image
 
 

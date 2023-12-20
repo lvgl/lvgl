@@ -1,10 +1,8 @@
-import sys
 import io
 
 import lvgl as lv
 import ubinascii
 import fs_driver
-import time
 import sys
 
 
