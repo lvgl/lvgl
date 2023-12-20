@@ -168,12 +168,14 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
 lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                 const lv_image_decoder_args_t * args)
 {
+    LV_UNUSED(decoder);
     LV_UNUSED(args);
 
     bool create_res = bin_decoder_decode_data(dsc);
     if(create_res == false) return LV_RESULT_INVALID;
     if(dsc->decoded == NULL) return LV_RESULT_OK; /*Need to read via get_area_cb*/
 
+#if LV_CACHE_DEF_SIZE > 0
     /*Add it to cache*/
     lv_image_cache_data_t search_key;
     search_key.src_type = dsc->src_type;
@@ -185,6 +187,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         return LV_RESULT_INVALID;
     }
     dsc->cache_entry = cache_entry;
+#endif
 
     return LV_RESULT_OK;
 }

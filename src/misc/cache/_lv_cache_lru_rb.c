@@ -133,7 +133,6 @@ static bool init_cb(lv_cache_t * cache)
     LV_ASSERT_NULL(lru->cache.ops.compare_cb);
     LV_ASSERT_NULL(lru->cache.ops.free_cb);
     LV_ASSERT(lru->cache.node_size > 0);
-    LV_ASSERT(lru->cache.max_size > 0);
 
     if(lru->cache.node_size == 0 || lru->cache.max_size == 0
        || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
@@ -211,6 +210,10 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
     LV_ASSERT_NULL(key);
 
     if(lru == NULL || key == NULL) {
+        return NULL;
+    }
+
+    if(cache->max_size <= 0) {
         return NULL;
     }
 

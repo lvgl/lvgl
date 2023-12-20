@@ -51,12 +51,15 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
 void _lv_image_decoder_init(void)
 {
     _lv_ll_init(img_decoder_ll_p, sizeof(lv_image_decoder_t));
+
+#if LV_CACHE_DEF_SIZE > 0
     img_cache_p = lv_cache_create(&lv_cache_class_lru_rb,
     sizeof(lv_image_cache_data_t), LV_CACHE_DEF_SIZE, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)image_decoder_cache_compare_cb,
         .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t)image_decoder_cache_free_cb,
     });
+#endif
 }
 
 /**
@@ -64,7 +67,9 @@ void _lv_image_decoder_init(void)
  */
 void _lv_image_decoder_deinit(void)
 {
+#if LV_CACHE_DEF_SIZE > 0
     lv_cache_destroy(img_cache_p, NULL);
+#endif
     _lv_ll_clear(img_decoder_ll_p);
 }
 
@@ -149,10 +154,13 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         if(dsc->header.stride == 0) dsc->header.stride = img_width_to_stride(&dsc->header);
 
         dsc->decoder = decoder;
+
+#if LV_CACHE_DEF_SIZE > 0
         dsc->cache = img_cache_p;
 
         /*Check the cache first*/
         if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
+#endif
 
         res = decoder->open_cb(decoder, dsc, args);
 
@@ -255,6 +263,7 @@ void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_f
     decoder->cache_free_cb = cache_free_cb;
 }
 
+#if LV_CACHE_DEF_SIZE > 0
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data)
@@ -277,6 +286,7 @@ lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
 
     return cache_entry;
 }
+#endif
 
 static uint32_t img_width_to_stride(lv_image_header_t * header)
 {

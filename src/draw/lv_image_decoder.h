@@ -283,9 +283,11 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
 
 void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb);
 
+#if LV_CACHE_DEF_SIZE > 0
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data);
+#endif
 
 /**********************
  *      MACROS

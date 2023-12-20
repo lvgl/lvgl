@@ -38,6 +38,7 @@
  **********************/
 void lv_image_cache_drop(const void * src)
 {
+#if LV_CACHE_DEF_SIZE > 0
     if(src == NULL) {
         lv_cache_drop_all(img_cache_p, NULL);
         return;
@@ -49,6 +50,9 @@ void lv_image_cache_drop(const void * src)
     };
 
     lv_cache_drop(img_cache_p, &search_key, NULL);
+#else
+    LV_UNUSED(src);
+#endif
 }
 /**********************
  *   STATIC FUNCTIONS
