@@ -61,6 +61,16 @@
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI_DEF 130     /*[px/inch]*/
 
+/*customize tick-get */
+#if defined(__PERF_COUNTER__) && __PERF_COUNTER__
+    #define LV_GLOBAL_INIT(__GLOBAL_PTR)                                    \
+            do {                                                            \
+                lv_global_init((lv_global_t *)(__GLOBAL_PTR));              \
+                extern uint32_t perfc_tick_get(void);                       \
+                (__GLOBAL_PTR)->tick_state.tick_get_cb = perfc_tick_get;    \
+            } while(0)
+#endif
+
 /*========================
  * RENDERING CONFIGURATION
  *========================*/

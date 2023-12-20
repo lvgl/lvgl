@@ -92,7 +92,7 @@ remove the misleading guide above this code segment.
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
 
-6. Set `LV_FONT_MONTSERRAT_12` and `LV_FONT_MONTSERRAT_16` to `1` (So Widgets and Benchmark can be compiled correctly, this is for improving the out of box experience.)
+6. Set `LV_FONT_MONTSERRAT_12`, `LV_FONT_MONTSERRAT_24` and `LV_FONT_MONTSERRAT_16` to `1` (So Widgets and Benchmark can be compiled correctly, this is for improving the out of box experience.)
 
 
 7. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
@@ -153,6 +153,23 @@ Make sure `LV_MEM_SIZE` is no less than `(256*1024U)`.
     #   define LV_USE_LZ4_EXTERNAL  0
     #endif
     ```
+
+
+11. Add the following code to `HAL SETTINGS`:
+
+```c
+/*customize tick-get */
+#if defined(__PERF_COUNTER__) && __PERF_COUNTER__
+    #define LV_GLOBAL_INIT(__GLOBAL_PTR)                                    \
+            do {                                                            \
+                lv_global_init((lv_global_t *)(__GLOBAL_PTR));              \
+                extern uint32_t perfc_tick_get(void);                       \
+                (__GLOBAL_PTR)->tick_state.tick_get_cb = perfc_tick_get;    \
+            } while(0)
+#endif
+```
+
+
 
 
 11. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
