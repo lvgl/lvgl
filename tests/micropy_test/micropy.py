@@ -5,6 +5,7 @@ import lvgl as lv
 import ubinascii
 import fs_driver
 import time
+import sys
 
 
 if not lv.is_initialized():
@@ -47,8 +48,12 @@ def test_func_wrapper(func):
     return _wrapper
 
 
+CAPTURE_FRAME = False
+
+
 @test_func_wrapper
 def flush(disp, area, color_p):
+
     x1 = area.x1
     x2 = area.x2
     y1 = area.y1
@@ -61,14 +66,18 @@ def flush(disp, area, color_p):
     byte_count = 0
 
     print('FRAME START')
+    sys.stdout.flush()
 
     while byte_count != size:
         chunk_size = min(size - byte_count, 512)
         chunk = data_view[byte_count:chunk_size + byte_count]
         byte_count += chunk_size
         print(ubinascii.hexlify(bytes(chunk)).decode('utf-8'))
+        sys.stdout.flush()
 
     print('FRAME END')
+    sys.stdout.flush()
+
     disp.flush_ready()
 
 
@@ -416,10 +425,8 @@ def draw_to_canvas(canvas):
 
 @test_func_wrapper
 def main():
-    while True:
-        lv.tick_inc(1)
-        lv.task_handler()
-        time.sleep_ms(1)
+    lv.tick_inc(300)
+    lv.refr_now(None)
 
 
 create_ui()

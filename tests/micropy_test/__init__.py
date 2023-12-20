@@ -184,6 +184,10 @@ class MicroPython_Test(unittest.TestCase):
 
     def test_1_image_compare(self):
         image = Image.open(IMG_PATH)
+        res_img = image.convert('RGB')
+        image.close()
+        res_data = list(res_img.getdata())
+        res_img.close()
 
         with open(TEST_PATH, 'rb') as f:
             test_code = f.read()
@@ -219,50 +223,36 @@ class MicroPython_Test(unittest.TestCase):
             td.error_data = b''
             td.watchdog_timer = time.time()
 
-            curr_time = capture_start = time.time()
             td.result = []
 
-            while (
-                (curr_time - capture_start) * 1000 <= 10000 and
-                not self.__class__.exit_event.is_set()
-            ):
-                try:
-                    _, td.error_data = self.read_until(b'FRAME START\n')
-                    if td.error_data:
-                        break
+            try:
+                _, td.error_data = self.read_until(b'FRAME START\n')
+                td.watchdog_timer = time.time()
 
-                    fd = []
+                lne, td.error_data = self.read_until(b'\n')
 
+                while (
+                    b'FRAME END' not in lne and
+                    not td.error_data and
+                    not self.__class__.exit_event.is_set()
+                ):
+                    td.watchdog_timer = time.time()
+                    td.result.append(lne)
                     lne, td.error_data = self.read_until(b'\n')
-                    if td.error_data:
-                        break
 
-                    while lne != b'FRAME END':
-                        td.watchdog_timer = time.time()
-                        fd.append(lne)
-                        lne, td.error_data = self.read_until(b'\n')
-
-                        if td.error_data:
-                            break
-                        if self.__class__.exit_event.is_set():
-                            break
-
-                    td.result.append(fd[:])
-
-                    if td.error_data:
-                        break
-                    if self.__class__.exit_event.is_set():
-                        break
-
-                except:  # NOQA
-                    import traceback
-
-                    traceback.print_exc()
-
-                    td.error_data = traceback.format_exc()
+                if td.error_data:
                     return
 
-                curr_time = time.time()
+                if self.__class__.exit_event.is_set():
+                    return
+
+            except:  # NOQA
+                import traceback
+
+                traceback.print_exc()
+
+                td.error_data = traceback.format_exc()
+                return
 
             td.event.set()
 
@@ -278,107 +268,59 @@ class MicroPython_Test(unittest.TestCase):
         t.start()
 
         while (
-            (time.time() - test_data.watchdog_timer) * 1000 <= 10000 and
+            (time.time() - test_data.watchdog_timer) * 1000 <= 20000 and
             not test_data.event.is_set()
         ):
             test_data.event.wait(0.05)
-
-        self.send(CTRL_C)
-        self.send(CTRL_C)
 
         if not test_data.event.is_set():
             self.__class__.exit_event.set()
             # self.read_until(REPL_PROMPT)
 
+        self.send(CTRL_C)
+        self.send(CTRL_C)
+
         width = 800
         height = 480
 
-        data = test_data.result[:]
-        test_data.result = []
-
-        for frame_data in data:
-            try:
-                frame = bytearray(
-                    b''.join(binascii.unhexlify(lne) for lne in frame_data)
-                )
-
-                # I don't exactly know why the byte order is backwards but it is
-                frame = bytes(bytearray([
-                    item for j in range(0, len(frame), 3)
-                    for item in [frame[j + 2], frame[j + 1], frame[j]]
-                ]))
-
-                img = Image.new('RGB', (width, height))
-                img.frombytes(frame)
-                test_data.result.append(img)
-            except:  # NOQA
-                test_data.result.append(None)
-                continue
-
-        if not os.path.exists(ARTIFACT_PATH):
-            os.mkdir(ARTIFACT_PATH)
-
-        a_png_path = os.path.join(ARTIFACT_PATH, 'result.apng')
-
-        def save_apng():
-            try:
-                artifact.save(a_png_path)
-            except IndexError:
-                pass
-            except:
-                import traceback
-
-                traceback.print_exc()
-
-        artifact = apng.APNG()
-        res_img = image.convert('RGB')
-        image.close()
-        res_data = list(res_img.getdata())
-        res_img.close()
-
-        for frame_num, im in enumerate(test_data.result):
-            try:
-                img = im.convert('RGB')
-                im.close()
-                byte_data = list(img.getdata())
-                writer = BytesIO()
-                img.save(writer, 'PNG')
-
-                writer.seek(0)
-                png = apng.PNG.from_bytes(writer.read())
-                artifact.append(png)
-
-                img.save(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.png'), 'PNG')
-                img.close()
-
-                with open(os.path.join(ARTIFACT_PATH, f'frame{frame_num}.bin'), 'wb') as f:
-                    # have to flatten the data and remove the alpha
-                    # from the PIL image it is formatted as
-                    # [(r, g, b), (r, g, b)]
-                    f.write(bytes(bytearray([
-                        item for sublist in byte_data
-                        for item in sublist
-                    ])))
-
-                if res_data == byte_data:
-                    save_apng()
-                    self.assertEqual(res_data, byte_data, 'Frames do not match')
-            except:  # NOQA
-                import traceback
-
-                if not test_data.error_data:
-                    test_data.error_data = traceback.format_exc()
-
-                break
-
-        save_apng()
-
         if test_data.error_data:
-            log(f'--TEST FAILED')
-            log(test_data.error_data)
             self.fail(test_data.error_data)
 
-        self.fail('Frame Data does not match')
+        try:
+            frame = bytearray(
+                b''.join(binascii.unhexlify(lne) for lne in test_data.result)
+            )
+
+            # I don't exactly know why the byte order is backwards but it is
+            frame = bytes(bytearray([
+                item for j in range(0, len(frame), 3)
+                for item in [frame[j + 2], frame[j + 1], frame[j]]
+            ]))
+
+            image = Image.new('RGB', (width, height))
+            image.frombytes(frame)
+            img = image.convert('RGB')
+            image.close()
+
+            byte_data = list(img.getdata())
+            img.save(os.path.join(ARTIFACT_PATH, f'frame.png'), 'PNG')
+            img.close()
+
+            with open(os.path.join(ARTIFACT_PATH, f'frame.bin'), 'wb') as f:
+                # have to flatten the data and remove the alpha
+                # from the PIL image it is formatted as
+                # [(r, g, b), (r, g, b)]
+                f.write(bytes(bytearray([
+                    item for sublist in byte_data
+                    for item in sublist
+                ])))
+
+        except:  # NOQA
+            import traceback
+
+            self.fail(traceback.format_exc())
+
+        self.assertEqual(res_data, byte_data, 'Frames do not match')
 
 
 cwd = os.path.abspath(os.getcwd())
