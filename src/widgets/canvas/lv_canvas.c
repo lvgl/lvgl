@@ -311,7 +311,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
         uint32_t c32 = lv_color_to_u32(color);
         if(header->cf == LV_COLOR_FORMAT_ARGB8888) {
             c32 &= 0x00ffffff;
-            c32 |= opa << 24;
+            c32 |= (uint32_t)opa << 24;
         }
         for(y = 0; y < header->h; y++) {
             uint32_t * buf32 = (uint32_t *)(data + y * stride);
