@@ -175,6 +175,12 @@ bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at)
     return at->reverse;
 }
 
+uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
+{
+    LV_ASSERT_NULL(at);
+    return at->progress;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
