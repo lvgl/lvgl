@@ -54,7 +54,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void * drawbuf_next_row(const void * buf, ui
  *      MACROS
  **********************/
 
- #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NONE
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NONE
     #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565                            LV_RESULT_INVALID
     #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA                   LV_RESULT_INVALID
     #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK                  LV_RESULT_INVALID
