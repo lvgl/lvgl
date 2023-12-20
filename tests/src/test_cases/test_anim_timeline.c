@@ -272,7 +272,7 @@ void test_anim_timeline_reverse(void)
     lv_anim_set_duration(&a1, 1500);
     lv_anim_timeline_add(anim_timeline, 2000, &a1);
 
-    lv_anim_timeline_set_reverse(anim_timeline, true);
+    lv_anim_timeline_set_progress(anim_timeline, LV_ANIM_TIMELINE_PROGRESS_MAX);
     lv_anim_timeline_start(anim_timeline);    /*0 (3500)*/
 
     lv_refr_now(NULL);
