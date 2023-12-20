@@ -48,7 +48,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                    (d2_s32)u->base_unit.target_layer->buf_stride / lv_color_format_get_size(u->base_unit.target_layer->color_format),
                    (d2_u32)lv_area_get_width(&buffer_area),
                    (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_cf_fb_get());
+                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(u->base_unit.target_layer->color_format));
 
     if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
         float a1;
