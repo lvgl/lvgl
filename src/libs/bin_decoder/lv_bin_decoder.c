@@ -12,7 +12,14 @@
 #include "../../stdlib/lv_string.h"
 #include "../../stdlib/lv_sprintf.h"
 #include "../../libs/rle/lv_rle.h"
-#include "../../libs/lz4/lz4.h"
+
+#if LV_USE_LZ4_EXTERNAL
+    #include <lz4.h>
+#endif
+
+#if LV_USE_LZ4_INTERNAL
+    #include "../../libs/lz4/lz4.h"
+#endif
 
 /*********************
  *      DEFINES
