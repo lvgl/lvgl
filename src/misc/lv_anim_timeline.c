@@ -28,7 +28,7 @@ typedef struct {
 struct _lv_anim_timeline_t {
     lv_anim_timeline_dsc_t * anim_dsc;  /**< Dynamically allocated anim dsc array*/
     uint32_t anim_dsc_cnt;              /**< The length of anim dsc array*/
-    uint16_t progress;                  /**< The progress of the animation timeline, 0~65535 to map 0~100% animation progress*/
+    uint32_t act_time;                  /**< Current time of the animation*/
     bool reverse;                       /**< Reverse playback*/
 };
 
@@ -36,6 +36,8 @@ struct _lv_anim_timeline_t {
  *  STATIC PROTOTYPES
  **********************/
 static void anim_timeline_exec_cb(void * var, int32_t v);
+static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_time);
+static int32_t anim_timeline_path_cb(const lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -84,11 +86,9 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     LV_ASSERT_NULL(at);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
-    uint32_t progress = at->progress;
-    uint32_t remain = at->reverse ? progress : LV_ANIM_TIMELINE_PROGRESS_MAX - progress;
-    uint32_t duration = remain * playtime / LV_ANIM_TIMELINE_PROGRESS_MAX;
-    int32_t start = progress;
-    int32_t end = at->reverse ? 0 : LV_ANIM_TIMELINE_PROGRESS_MAX;
+    uint32_t start = at->act_time;
+    uint32_t end = at->reverse ? 0 : playtime;
+    uint32_t duration = end > start ? end - start : start - end;
 
     lv_anim_t a;
     lv_anim_init(&a);
@@ -96,7 +96,7 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     lv_anim_set_exec_cb(&a, anim_timeline_exec_cb);
     lv_anim_set_values(&a, start, end);
     lv_anim_set_time(&a, duration);
-    lv_anim_set_path_cb(&a, lv_anim_path_linear);
+    lv_anim_set_path_cb(&a, anim_timeline_path_cb);
     lv_anim_start(&a);
     return playtime;
 }
@@ -119,36 +119,8 @@ void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
     LV_ASSERT_NULL(at);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
-    uint32_t act_time = progress * playtime / LV_ANIM_TIMELINE_PROGRESS_MAX;
-
-    at->progress = progress;
-
-    for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
-        lv_anim_t * a = &(at->anim_dsc[i].anim);
-
-        if(a->exec_cb == NULL && a->custom_exec_cb == NULL) {
-            continue;
-        }
-
-        uint32_t start_time = at->anim_dsc[i].start_time;
-        int32_t value = 0;
-        if(act_time < start_time && a->early_apply) {
-            value = a->start_value;
-            if(a->exec_cb) a->exec_cb(a->var, value);
-            if(a->custom_exec_cb) a->custom_exec_cb(a, value);
-        }
-        else if(act_time >= start_time && act_time <= (start_time + a->duration)) {
-            a->act_time = act_time - start_time;
-            value = a->path_cb(a);
-            if(a->exec_cb) a->exec_cb(a->var, value);
-            if(a->custom_exec_cb) a->custom_exec_cb(a, value);
-        }
-        else if(act_time > start_time + a->duration) {
-            value = a->end_value;
-            if(a->exec_cb) a->exec_cb(a->var, value);
-            if(a->custom_exec_cb) a->custom_exec_cb(a, value);
-        }
-    }
+    uint32_t act_time = lv_map(progress, 0, LV_ANIM_TIMELINE_PROGRESS_MAX, 0, playtime);
+    anim_timeline_set_act_time(at, act_time);
 }
 
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
@@ -178,15 +150,48 @@ bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at)
 uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
 {
     LV_ASSERT_NULL(at);
-    return at->progress;
+    uint32_t playtime = lv_anim_timeline_get_playtime(at);
+    return lv_map(at->act_time, 0, playtime, 0, LV_ANIM_TIMELINE_PROGRESS_MAX);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
+static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_time)
+{
+    at->act_time = act_time;
+    for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
+        lv_anim_t * a = &(at->anim_dsc[i].anim);
+
+        if(a->exec_cb == NULL && a->custom_exec_cb == NULL) {
+            continue;
+        }
+
+        uint32_t start_time = at->anim_dsc[i].start_time;
+        int32_t value = 0;
+        if(act_time < start_time && a->early_apply) {
+            value = a->start_value;
+            if(a->exec_cb) a->exec_cb(a->var, value);
+            if(a->custom_exec_cb) a->custom_exec_cb(a, value);
+        }
+        else if(act_time >= start_time && act_time <= (start_time + a->duration)) {
+            a->act_time = act_time - start_time;
+            value = a->path_cb(a);
+            if(a->exec_cb) a->exec_cb(a->var, value);
+            if(a->custom_exec_cb) a->custom_exec_cb(a, value);
+        }
+    }
+}
+
+static int32_t anim_timeline_path_cb(const lv_anim_t * a)
+{
+    /* Directly map original timestamps to avoid loss of accuracy */
+    return lv_map(a->act_time, 0, a->duration, a->start_value, a->end_value);
+}
+
 static void anim_timeline_exec_cb(void * var, int32_t v)
 {
     lv_anim_timeline_t * at = var;
-    lv_anim_timeline_set_progress(at, v);
+    anim_timeline_set_act_time(at, v);
 }
