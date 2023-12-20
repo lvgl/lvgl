@@ -40,30 +40,55 @@ remove the misleading guide above this code segment.
 4. Remove macro definitions for
 
    - LV_USE_DEMO_WIDGETS
+   
    - LV_USE_DEMO_BENCHMARK
+   
    - LV_USE_IME_PINYIN
+   
    - LV_USE_OS
+   
    - LV_USE_FILE_EXPLORER
+   
    - LV_USE_DEMO_WIDGETS
+   
    - LV_USE_DEMO_KEYPAD_AND_ENCODER
+   
    - LV_USE_DEMO_BENCHMARK
+   
    - LV_USE_DEMO_RENDER
+   
    - LV_USE_DEMO_STRESS
+   
    - LV_USE_DEMO_MUSIC
+   
    - LV_USE_DEMO_FLEX_LAYOUT
+   
    - LV_USE_DEMO_MULTILANG
+   
    - LV_USE_DEMO_TRANSFORM
+   
    - LV_USE_DEMO_SCROLL
+   
    - LV_USE_DEMO_VECTOR_GRAPHIC
+   
    - LV_USE_DRAW_VGLITE
+   
    - LV_USE_DRAW_PXP
+   
    - LV_USE_DRAW_SDL
+   
    - LV_USE_SNAPSHOT
+   
    - LV_USE_MONKEY
+   
    - LV_USE_GRIDNAV
+   
    - LV_USE_FRAGMENT
+   
    - LV_USE_IMGFONT
-   - LV_USE_OBSERVER
+   
+     
+   
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
 

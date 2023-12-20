@@ -596,6 +596,7 @@
                 
                 <!-- src/others -->
                 <file category="sourceC"            name="src/others/sysmon/lv_sysmon.c" />
+                <file category="sourceC"            name="src/others/observer/lv_observer.c" />
                 
                 <!-- src/demons -->
                 <file category="sourceC"            name="demos/lv_demos.c" />
@@ -1378,21 +1379,6 @@
 
 /*! \brief enable Monkey test*/
 #define LV_USE_MONKEY           1
-              </RTE_Components_h>
-
-            </component>
-
-            <component Cgroup="Libraries and Others" Csub="Observer"  condition="LVGL-Essential">
-              <description>Add an observer pattern implementation</description>
-              <files>
-                <!-- src/others/observer -->
-                <file category="sourceC"            name="src/others/observer/lv_observer.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable an observer pattern implementation*/
-#define LV_USE_OBSERVER         1
               </RTE_Components_h>
 
             </component>
