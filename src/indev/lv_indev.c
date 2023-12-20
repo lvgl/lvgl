@@ -1181,7 +1181,7 @@ static void indev_proc_press(lv_indev_t * indev)
         indev_gesture(indev);
         if(indev_reset_check(indev)) return;
 
-        if(indev->mode == LV_INDEV_MODE_EVENT && lv_timer_get_paused(indev->read_timer)) {
+        if(indev->mode == LV_INDEV_MODE_EVENT && indev->read_timer && lv_timer_get_paused(indev->read_timer)) {
             lv_timer_resume(indev->read_timer);
         }
 
@@ -1230,7 +1230,7 @@ static void indev_proc_release(lv_indev_t * indev)
     indev_obj_act = indev->pointer.act_obj;
     lv_obj_t * scroll_obj = indev->pointer.scroll_obj;
 
-    if(indev->mode == LV_INDEV_MODE_EVENT && !lv_timer_get_paused(indev->read_timer)) {
+    if(indev->mode == LV_INDEV_MODE_EVENT && indev->read_timer && !lv_timer_get_paused(indev->read_timer)) {
         lv_timer_pause(indev->read_timer);
     }
 
