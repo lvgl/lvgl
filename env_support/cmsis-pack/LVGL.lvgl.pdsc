@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-12-12" version="9.0.0-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev1.pack">
+    <release date="2023-12-20" version="9.0.0-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev1.pack">
       - LVGL 9.0.0-dev
       - New Driver Architecture
       - Other fixes
@@ -542,7 +542,7 @@
                 <!-- src/themes -->
                 <file category="sourceC"            name="src/themes/lv_theme.c" />
                 <file category="sourceC"            name="src/themes/mono/lv_theme_mono.c" />
-                <file category="sourceC"            name="src/themes/basic/lv_theme_basic.c" />
+                <file category="sourceC"            name="src/themes/simple/lv_theme_simple.c" />
                 <file category="sourceC"            name="src/themes/default/lv_theme_default.c" />
                 
                 <!-- src/tick -->
@@ -562,7 +562,7 @@
                 <file category="sourceC"            name="src/widgets/checkbox/lv_checkbox.c" />
                 <file category="sourceC"            name="src/widgets/dropdown/lv_dropdown.c" />
                 <file category="sourceC"            name="src/widgets/image/lv_image.c" />
-                <file category="sourceC"            name="src/widgets/imgbtn/lv_imgbtn.c" />
+                <file category="sourceC"            name="src/widgets/imagebutton/lv_imagebutton.c" />
                 <file category="sourceC"            name="src/widgets/keyboard/lv_keyboard.c" />
                 <file category="sourceC"            name="src/widgets/label/lv_label.c" />
                 <file category="sourceC"            name="src/widgets/led/lv_led.c" />
