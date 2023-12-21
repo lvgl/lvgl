@@ -147,6 +147,9 @@ timeline.
 
 It supports forward and backward playback of the entire animation group,
 using :cpp:expr:`lv_anim_timeline_set_reverse(at, reverse)`.
+Note that if you want to play in reverse from the end of the timeline,
+you need to call :cpp:expr:`lv_anim_timeline_set_progress(at, LV_ANIM_TIMELINE_PROGRESS_MAX)`
+after adding all animations and before starting to play.
 
 Call :cpp:expr:`lv_anim_timeline_stop(at)` to stop the animation timeline.
 
@@ -159,8 +162,9 @@ duration of the entire animation timeline.
 Call :cpp:expr:`lv_anim_timeline_get_reverse(at)` function to get whether to
 reverse the animation timeline.
 
-Call :cpp:expr:`lv_anim_timeline_delete(at)` function to delete the animation
-timeline.
+Call :cpp:expr:`lv_anim_timeline_delete(at)` function to delete the animation timeline.
+**Note**: If you need to delete an object during animation, be sure to delete the
+anim timeline before deleting the object. Otherwise, the program may crash or behave abnormally.
 
 .. image:: /misc/anim-timeline.png
 

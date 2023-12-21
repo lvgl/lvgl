@@ -181,6 +181,11 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
             if(a->exec_cb) a->exec_cb(a->var, value);
             if(a->custom_exec_cb) a->custom_exec_cb(a, value);
         }
+        else if(act_time > start_time + a->duration) {
+            value = a->end_value;
+            if(a->exec_cb) a->exec_cb(a->var, value);
+            if(a->custom_exec_cb) a->custom_exec_cb(a, value);
+        }
     }
 }
 
