@@ -159,7 +159,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     /*If it's a JPEG file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
-        size_t decoded_size = 0;
         uint32_t t = lv_tick_get();
         lv_draw_buf_t * decoded = decode_jpeg_file(fn);
         if(decoded == NULL) {
@@ -169,8 +168,8 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         t = lv_tick_elaps(t);
 
         lv_cache_lock();
-        lv_cache_entry_t * cache = lv_cache_add(decoded, decoded_size, decoder->cache_data_type,
-                                                decoded_size);
+        lv_cache_entry_t * cache = lv_cache_add(decoded, decoded->data_size, decoder->cache_data_type,
+                                                decoded->data_size);
         if(cache == NULL) {
             lv_cache_unlock();
             return LV_RESULT_INVALID;
