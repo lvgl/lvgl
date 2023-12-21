@@ -231,7 +231,6 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     /*If an other screen load animation is in progress
      *make target screen loaded immediately. */
     if(d->scr_to_load) {
-        scr_load_internal(d->scr_to_load);
         lv_anim_del(d->scr_to_load, NULL);
         lv_obj_set_pos(d->scr_to_load, 0, 0);
         lv_obj_remove_local_style_prop(d->scr_to_load, LV_STYLE_OPA, 0);
@@ -240,6 +239,8 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
             lv_obj_del(act_scr);
         }
         act_scr = d->scr_to_load;
+
+        scr_load_internal(d->scr_to_load);
     }
 
     d->scr_to_load = new_scr;
