@@ -29,7 +29,7 @@ typedef struct {
     lv_image_header_t header;
     uint32_t data_size;     /*Total buf size in bytes*/
     void * data;
-    void * _unaligned;      /*Unaligned address of data*/
+    void * unaligned_data;  /*Unaligned address of `data`, used internally by lvgl*/
 } lv_draw_buf_t;
 
 /**
@@ -60,7 +60,7 @@ typedef struct {
                                             }, \
                                   .data_size = sizeof(buf_##name), \
                                   .data = buf_##name, \
-                                  ._unaligned = buf_##name, \
+                                  .unaligned_data = buf_##name, \
                                 }
 
 typedef void * (*lv_draw_buf_malloc_cb)(size_t size, lv_color_format_t color_format);
@@ -74,22 +74,12 @@ typedef void (*lv_draw_buf_invalidate_cache_cb)(void * buf, uint32_t stride, lv_
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
-typedef void (*lv_draw_buf_clear_cb)(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format,
-                                     const lv_area_t * a);
-
-typedef void (*lv_draw_buf_copy_cb)(void * dest_buf, uint32_t dest_w, uint32_t dest_h,
-                                    const lv_area_t * dest_area_to_copy,
-                                    void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area_to_copy,
-                                    lv_color_format_t color_format);
-
 typedef struct {
     lv_draw_buf_malloc_cb buf_malloc_cb;
     lv_draw_buf_free_cb buf_free_cb;
     lv_draw_buf_align_cb align_pointer_cb;
     lv_draw_buf_invalidate_cache_cb invalidate_cache_cb;
     lv_draw_buf_width_to_stride_cb width_to_stride_cb;
-    lv_draw_buf_clear_cb buf_clear_cb;
-    lv_draw_buf_copy_cb buf_copy_cb;
 } lv_draw_buf_handlers_t;
 
 /**********************

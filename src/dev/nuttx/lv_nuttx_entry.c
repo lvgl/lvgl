@@ -57,7 +57,7 @@ static void lv_global_free(void * data)
 lv_global_t * lv_global_default(void)
 {
     static int index = -1;
-    lv_global_t * data;
+    lv_global_t * data = NULL;
 
     if(index < 0) {
         index = task_tls_alloc(lv_global_free);

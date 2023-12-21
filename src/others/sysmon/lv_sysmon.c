@@ -149,11 +149,13 @@ static void perf_update_timer_cb(lv_timer_t * t)
     info->calculated.cpu = 100 - lv_timer_get_idle();
     info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :
                                      0;
-    info->calculated.render_avg_time = info->measured.render_cnt ? (info->measured.render_elaps_sum /
-                                                                    info->measured.render_cnt) : 0;
     info->calculated.flush_avg_time = info->measured.flush_cnt ? (info->measured.flush_elaps_sum / info->measured.flush_cnt)
                                       : 0;
-    info->calculated.render_real_avg_time = info->calculated.render_avg_time + info->calculated.flush_avg_time;
+    info->calculated.render_avg_time = info->measured.render_cnt ? (info->measured.render_elaps_sum /
+                                                                    info->measured.render_cnt) : 0;
+
+    /*Flush time was measured in rendering time*/
+    info->calculated.render_avg_time -= info->calculated.flush_avg_time;
 
     info->calculated.cpu_avg_total = ((info->calculated.cpu_avg_total * (info->calculated.run_cnt - 1)) +
                                       info->calculated.cpu) / info->calculated.run_cnt;
@@ -190,7 +192,8 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
         "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
         "%" LV_PRIu32" ms (%" LV_PRIu32" | %" LV_PRIu32")",
         perf->calculated.fps, perf->calculated.cpu,
-        perf->calculated.render_real_avg_time, perf->calculated.render_avg_time, perf->calculated.flush_avg_time
+        perf->calculated.render_avg_time + perf->calculated.flush_avg_time,
+        perf->calculated.render_avg_time, perf->calculated.flush_avg_time
     );
 #endif /*LV_USE_PERF_MONITOR_LOG_MODE*/
 }

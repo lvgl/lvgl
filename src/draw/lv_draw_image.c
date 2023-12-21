@@ -98,27 +98,19 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
 lv_image_src_t lv_image_src_get_type(const void * src)
 {
-    lv_image_src_t img_src_type = LV_IMAGE_SRC_UNKNOWN;
-
-    if(src == NULL) return img_src_type;
+    if(src == NULL) return LV_IMAGE_SRC_UNKNOWN;
     const uint8_t * u8_p = src;
 
     /*The first byte shows the type of the image source*/
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
-        img_src_type = LV_IMAGE_SRC_FILE; /*If it's an ASCII character then it's file name*/
+        return LV_IMAGE_SRC_FILE; /*If it's an ASCII character then it's file name*/
     }
     else if(u8_p[0] >= 0x80) {
-        img_src_type = LV_IMAGE_SRC_SYMBOL; /*Symbols begins after 0x7F*/
+        return LV_IMAGE_SRC_SYMBOL; /*Symbols begins after 0x7F*/
     }
     else {
-        img_src_type = LV_IMAGE_SRC_VARIABLE; /*`lv_image_dsc_t` is draw to the first byte < 0x20*/
+        return LV_IMAGE_SRC_VARIABLE; /*`lv_image_dsc_t` is draw to the first byte < 0x20*/
     }
-
-    if(LV_IMAGE_SRC_UNKNOWN == img_src_type) {
-        LV_LOG_WARN("unknown image type");
-    }
-
-    return img_src_type;
 }
 
 void _lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,

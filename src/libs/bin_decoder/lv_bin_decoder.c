@@ -12,7 +12,14 @@
 #include "../../stdlib/lv_string.h"
 #include "../../stdlib/lv_sprintf.h"
 #include "../../libs/rle/lv_rle.h"
-#include "../../libs/lz4/lz4.h"
+
+#if LV_USE_LZ4_EXTERNAL
+    #include <lz4.h>
+#endif
+
+#if LV_USE_LZ4_INTERNAL
+    #include "../../libs/lz4/lz4.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -121,6 +128,17 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
             if(res != LV_FS_RES_OK || rn != sizeof(lv_image_header_t)) {
                 LV_LOG_WARN("Read file header failed: %d", res);
                 return LV_RESULT_INVALID;
+            }
+
+            /**
+             * @todo
+             * This is a temp backward compatibility solution after adding
+             * magic in image header.
+             */
+            if(header->magic != LV_IMAGE_HEADER_MAGIC) {
+                LV_LOG_WARN("Legacy bin image detected: %s", (char *)src);
+                header->cf = header->magic;
+                header->magic = LV_IMAGE_HEADER_MAGIC;
             }
 
             /*File is always read to buf, thus data can be modified.*/

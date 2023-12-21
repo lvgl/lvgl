@@ -48,7 +48,7 @@ typedef struct {
         uint32_t refr_elaps_sum;
         uint32_t refr_cnt;
         uint32_t render_start;
-        uint32_t render_elaps_sum;
+        uint32_t render_elaps_sum; /*Contains the flush time too*/
         uint32_t render_cnt;
         uint32_t flush_start;
         uint32_t flush_elaps_sum;
@@ -59,9 +59,8 @@ typedef struct {
         uint32_t fps;
         uint32_t cpu;
         uint32_t refr_avg_time;
-        uint32_t render_avg_time;
-        uint32_t flush_avg_time;
-        uint32_t render_real_avg_time;
+        uint32_t render_avg_time;       /**< Pure rendering time without flush time*/
+        uint32_t flush_avg_time;        /**< Pure flushing time without rendering time*/
         uint32_t cpu_avg_total;
         uint32_t fps_avg_total;
         uint32_t run_cnt;

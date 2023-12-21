@@ -399,8 +399,8 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     }
 
     uint32_t bitmap_size = lv_draw_buf_width_to_stride(g.box_w, LV_COLOR_FORMAT_A8) * g.box_h;
-    bitmap_size = (bitmap_size + 63) &
-                  (~63);   /*Round up to avoid many allocations if the next buffer is just slightly larger*/
+    /*Round up to avoid many allocations if the next buffer is just slightly larger*/
+    bitmap_size = LV_ALIGN_UP(bitmap_size, 64);
     if(dsc->_bitmap_buf_size < bitmap_size) {
         lv_draw_buf_free(dsc->_bitmap_buf_unaligned);
         dsc->_bitmap_buf_unaligned = lv_draw_buf_malloc(bitmap_size, LV_COLOR_FORMAT_A8);
