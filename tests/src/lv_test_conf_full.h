@@ -97,4 +97,4 @@
 #define LV_USE_OBJ_PROPERTY     1
 #define LV_BIN_DECODER_RAM_LOAD 1
 
-#define LV_CACHE_DEF_SIZE       128
+#define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)

@@ -166,6 +166,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_image_cache_data_t search_key;
         search_key.src_type = dsc->src_type;
         search_key.src = dsc->src;
+        search_key.slot.size = decoded->data_size;
 
         lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
 

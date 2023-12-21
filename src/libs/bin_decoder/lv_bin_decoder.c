@@ -180,7 +180,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     lv_image_cache_data_t search_key;
     search_key.src_type = dsc->src_type;
     search_key.src = dsc->src;
-    search_key.slot.size = dsc->decoded->header.w * dsc->decoded->header.h * lv_color_format_get_bpp(dsc->decoded->header.cf) / 8;
+    search_key.slot.size = dsc->decoded->data_size;
 
     lv_cache_entry_t * cache_entry = lv_image_decoder_add_to_cache(decoder, &search_key, dsc->decoded, dsc->user_data);
     if(cache_entry == NULL) {

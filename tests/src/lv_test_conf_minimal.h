@@ -20,4 +20,3 @@
 #define  LV_USE_RLE                     1
 #define  LV_USE_GIF                     1
 #define  LV_USE_QRCODE                  1
-#define  LV_CACHE_DEF_SIZE              32

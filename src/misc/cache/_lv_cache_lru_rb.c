@@ -19,9 +19,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef void (cnt_add_cb_t)(lv_cache_t * cache, const void * data);
-typedef void (cnt_sub_cb_t)(lv_cache_t * cache, const void * data);
-typedef bool (cnt_cmp_cb_t)(lv_cache_t * cache, const void * data);
+typedef uint32_t (get_data_size_cb_t)(const void * data);
 
 struct _lv_lru_rb_t {
     lv_cache_t cache;
@@ -29,9 +27,7 @@ struct _lv_lru_rb_t {
     lv_rb_t rb;
     lv_ll_t ll;
 
-    cnt_add_cb_t * cnt_add_cb;
-    cnt_sub_cb_t * cnt_sub_cb;
-    cnt_cmp_cb_t * cnt_cmp_cb;
+    get_data_size_cb_t * get_data_size_cb;
 };
 typedef struct _lv_lru_rb_t lv_lru_rb_t_;
 /**********************
@@ -52,12 +48,8 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data);
 static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data);
 inline static void ** get_lru_node(lv_lru_rb_t_ * lru, lv_rb_node_t * node);
 
-static void cnt_cnt_add_cb(lv_cache_t * cache, const void * data);
-static void cnt_cnt_sub_cb(lv_cache_t * cache, const void * data);
-static bool cnt_cnt_cmp_cb(lv_cache_t * cache, const void * data);
-static void size_cnt_add_cb(lv_cache_t * cache, const void * data);
-static void size_cnt_sub_cb(lv_cache_t * cache, const void * data);
-static bool size_cnt_cmp_cb(lv_cache_t * cache, const void * data);
+static uint32_t cnt_get_data_size_cb(const void * data);
+static uint32_t size_get_data_size_cb(const void * data);
 
 /**********************
  *  GLOBAL VARIABLES
@@ -162,7 +154,7 @@ static bool init_cnt_cb(lv_cache_t * cache)
     LV_ASSERT_NULL(lru->cache.ops.free_cb);
     LV_ASSERT(lru->cache.node_size > 0);
 
-    if(lru->cache.node_size == 0 || lru->cache.max_size == 0
+    if(lru->cache.node_size <= 0 || lru->cache.max_size <= 0
        || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
         return false;
     }
@@ -173,9 +165,7 @@ static bool init_cnt_cb(lv_cache_t * cache)
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
 
-    lru->cnt_add_cb = cnt_cnt_add_cb;
-    lru->cnt_sub_cb = cnt_cnt_sub_cb;
-    lru->cnt_cmp_cb = cnt_cnt_cmp_cb;
+    lru->get_data_size_cb = cnt_get_data_size_cb;
 
     return lru;
 }
@@ -188,7 +178,7 @@ static bool init_size_cb(lv_cache_t * cache)
     LV_ASSERT_NULL(lru->cache.ops.free_cb);
     LV_ASSERT(lru->cache.node_size > 0);
 
-    if(lru->cache.node_size == 0 || lru->cache.max_size == 0
+    if(lru->cache.node_size <= 0 || lru->cache.max_size <= 0
        || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
         return false;
     }
@@ -199,9 +189,7 @@ static bool init_size_cb(lv_cache_t * cache)
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
 
-    lru->cnt_add_cb = size_cnt_add_cb;
-    lru->cnt_sub_cb = size_cnt_sub_cb;
-    lru->cnt_cmp_cb = size_cnt_cmp_cb;
+    lru->get_data_size_cb = size_get_data_size_cb;
 
     return lru;
 }
@@ -271,13 +259,16 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
         return NULL;
     }
 
-    if(cache->max_size <= 0) {
+    uint32_t data_size = lru->get_data_size_cb(key);
+    if(data_size > lru->cache.max_size) {
+        LV_LOG_ERROR("data size (%" LV_PRIu32 ") is larger than max size (%" LV_PRIu32 ")", data_size,
+                     (uint32_t)lru->cache.max_size);
         return NULL;
     }
 
     void * tail = _lv_ll_get_tail(&lru->ll);
     void * curr = tail;
-    while(lru->cnt_cmp_cb(cache, key)) {
+    while(cache->size + data_size > lru->cache.max_size) {
         if(curr == NULL) {
             LV_LOG_ERROR("failed to drop cache");
             return NULL;
@@ -303,7 +294,7 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
 
     lv_cache_entry_t * entry = lv_cache_entry_get_entry(new_node->data, cache->node_size);
 
-    lru->cnt_add_cb(cache, new_node->data);
+    cache->size += data_size;
 
     return entry;
 }
@@ -332,7 +323,7 @@ static void remove_cb(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_
     _lv_ll_remove(&lru->ll, lru_node);
     lv_free(lru_node);
 
-    lru->cnt_sub_cb(cache, data);
+    cache->size -= lru->get_data_size_cb(data);
 }
 
 static void drop_cb(lv_cache_t * cache, const void * key, void * user_data)
@@ -354,7 +345,7 @@ static void drop_cb(lv_cache_t * cache, const void * key, void * user_data)
     void * data = node->data;
 
     lru->cache.ops.free_cb(data, user_data);
-    lru->cnt_sub_cb(cache, data);
+    cache->size -= lru->get_data_size_cb(data);
 
     lv_cache_entry_t * entry = lv_cache_entry_get_entry(data, cache->node_size);
     void * lru_node = *get_lru_node(lru, node);
@@ -397,41 +388,17 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
     lv_rb_destroy(&lru->rb);
     _lv_ll_clear(&lru->ll);
 
-    lru->cache.size = 0;
+    cache->size = 0;
 }
 
-static void cnt_cnt_add_cb(lv_cache_t * cache, const void * data)
+static uint32_t cnt_get_data_size_cb(const void * data)
 {
     LV_UNUSED(data);
-    cache->size++;
+    return 1;
 }
 
-static void cnt_cnt_sub_cb(lv_cache_t * cache, const void * data)
-{
-    LV_UNUSED(data);
-    cache->size--;
-}
-
-static bool cnt_cnt_cmp_cb(lv_cache_t * cache, const void * data)
-{
-    LV_UNUSED(data);
-    return cache->size >= cache->max_size;
-}
-
-static void size_cnt_add_cb(lv_cache_t * cache, const void * data)
+static uint32_t size_get_data_size_cb(const void * data)
 {
     lv_cache_slot_size_t * slot = (lv_cache_slot_size_t *)data;
-    cache->size += slot->size;
-}
-
-static void size_cnt_sub_cb(lv_cache_t * cache, const void * data)
-{
-    lv_cache_slot_size_t * slot = (lv_cache_slot_size_t *)data;
-    cache->size -= slot->size;
-}
-
-static bool size_cnt_cmp_cb(lv_cache_t * cache, const void * data)
-{
-    lv_cache_slot_size_t * slot = (lv_cache_slot_size_t *)data;
-    return cache->size + slot->size >= cache->max_size;
+    return slot->size;
 }

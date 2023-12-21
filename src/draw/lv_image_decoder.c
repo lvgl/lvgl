@@ -54,7 +54,7 @@ void _lv_image_decoder_init(void)
 
 #if LV_CACHE_DEF_SIZE > 0
     img_cache_p = lv_cache_create(&lv_cache_class_lru_rb_size,
-    sizeof(lv_image_cache_data_t), 50 * 1024, (lv_cache_ops_t) {
+    sizeof(lv_image_cache_data_t), LV_CACHE_DEF_SIZE, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)image_decoder_cache_compare_cb,
         .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t)image_decoder_cache_free_cb,
