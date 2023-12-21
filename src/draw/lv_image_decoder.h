@@ -118,6 +118,8 @@ typedef struct _lv_image_decoder_t {
 } lv_image_decoder_t;
 
 typedef struct _lv_image_decoder_cache_data_t {
+    lv_cache_slot_size_t slot;
+
     const void * src;
     lv_image_src_t src_type;
 

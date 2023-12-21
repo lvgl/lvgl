@@ -288,6 +288,7 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
         lv_cache_entry_t * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
         if(lv_cache_entry_get_ref(entry) == 0) {
             cache->clz->drop_cb(cache, search_key, user_data);
+            curr = _lv_ll_get_tail(&lru->ll);
             continue;
         }
 
@@ -302,7 +303,7 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
 
     lv_cache_entry_t * entry = lv_cache_entry_get_entry(new_node->data, cache->node_size);
 
-    lru->cnt_add_cb(cache, entry);
+    lru->cnt_add_cb(cache, new_node->data);
 
     return entry;
 }
@@ -331,7 +332,7 @@ static void remove_cb(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_
     _lv_ll_remove(&lru->ll, lru_node);
     lv_free(lru_node);
 
-    lru->cnt_sub_cb(cache, entry);
+    lru->cnt_sub_cb(cache, data);
 }
 
 static void drop_cb(lv_cache_t * cache, const void * key, void * user_data)
@@ -353,12 +354,12 @@ static void drop_cb(lv_cache_t * cache, const void * key, void * user_data)
     void * data = node->data;
 
     lru->cache.ops.free_cb(data, user_data);
+    lru->cnt_sub_cb(cache, data);
 
     lv_cache_entry_t * entry = lv_cache_entry_get_entry(data, cache->node_size);
     void * lru_node = *get_lru_node(lru, node);
 
     lv_rb_remove_node(&lru->rb, node);
-    lru->cnt_sub_cb(cache, entry);
     lv_cache_entry_delete(entry);
 
     _lv_ll_remove(&lru->ll, lru_node);
@@ -426,11 +427,11 @@ static void size_cnt_add_cb(lv_cache_t * cache, const void * data)
 static void size_cnt_sub_cb(lv_cache_t * cache, const void * data)
 {
     lv_cache_slot_size_t * slot = (lv_cache_slot_size_t *)data;
-    cache->size += slot->size;
+    cache->size -= slot->size;
 }
 
 static bool size_cnt_cmp_cb(lv_cache_t * cache, const void * data)
 {
     lv_cache_slot_size_t * slot = (lv_cache_slot_size_t *)data;
-    return cache->size + slot->size;
+    return cache->size + slot->size >= cache->max_size;
 }
