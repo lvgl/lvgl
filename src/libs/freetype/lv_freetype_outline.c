@@ -280,7 +280,7 @@ static lv_freetype_cache_node_t * lv_freetype_cache_node_lookup(lv_freetype_cont
     cache->glyph_dsc_cache = lv_cache_create(&lv_cache_class_lru_rb, sizeof(lv_freetype_glyph_dsc_node_t),
                                              LV_FREETYPE_GLYPH_DSC_CACHE_SIZE,
                                              glyph_dsc_cache_ops);
-    cache->glyph_outline_cache = lv_cache_create(&lv_cache_class_lru_rb, sizeof(lv_freetype_outline_node_t),
+    cache->glyph_outline_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_outline_node_t),
                                                  LV_FREETYPE_CACHE_FT_OUTLINES,
                                                  glyph_outline_cache_ops);
 

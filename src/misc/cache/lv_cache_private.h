@@ -25,6 +25,10 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+/*-----------------
+ * Cache entry slot
+ *----------------*/
 struct _lv_cache_ops_t;
 struct _lv_cache_t;
 struct _lv_cache_class_t;
@@ -78,6 +82,18 @@ struct _lv_cache_class_t {
     lv_cache_remove_cb_t remove_cb;
     lv_cache_drop_cb_t drop_cb;
     lv_cache_clear_cb_t drop_all_cb;
+};
+
+/*-----------------
+ * Cache entry slot
+ *----------------*/
+
+struct _lv_cache_slot_size_t;
+
+typedef struct _lv_cache_slot_size_t lv_cache_slot_size_t;
+
+struct _lv_cache_slot_size_t {
+    size_t size;
 };
 /**********************
  * GLOBAL PROTOTYPES

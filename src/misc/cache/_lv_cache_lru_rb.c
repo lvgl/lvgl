@@ -11,7 +11,6 @@
 #include "../../stdlib/lv_string.h"
 #include "../lv_ll.h"
 #include "../lv_rb.h"
-#include "lv_cache_entry_private.h"
 
 /*********************
  *      DEFINES
@@ -20,11 +19,19 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef void (cnt_add_cb_t)(lv_cache_t * cache, const void * data);
+typedef void (cnt_sub_cb_t)(lv_cache_t * cache, const void * data);
+typedef bool (cnt_cmp_cb_t)(lv_cache_t * cache, const void * data);
+
 struct _lv_lru_rb_t {
     lv_cache_t cache;
 
     lv_rb_t rb;
     lv_ll_t ll;
+
+    cnt_add_cb_t * cnt_add_cb;
+    cnt_sub_cb_t * cnt_sub_cb;
+    cnt_cmp_cb_t * cnt_cmp_cb;
 };
 typedef struct _lv_lru_rb_t lv_lru_rb_t_;
 /**********************
@@ -32,7 +39,8 @@ typedef struct _lv_lru_rb_t lv_lru_rb_t_;
  **********************/
 
 static void * alloc_cb(void);
-static bool  init_cb(lv_cache_t * cache);
+static bool init_cnt_cb(lv_cache_t * cache);
+static bool init_size_cb(lv_cache_t * cache);
 static void  destroy_cb(lv_cache_t * cache, void * user_data);
 
 static lv_cache_entry_t * get_cb(lv_cache_t * cache, const void * key, void * user_data);
@@ -43,12 +51,32 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data);
 
 static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data);
 inline static void ** get_lru_node(lv_lru_rb_t_ * lru, lv_rb_node_t * node);
+
+static void cnt_cnt_add_cb(lv_cache_t * cache, const void * data);
+static void cnt_cnt_sub_cb(lv_cache_t * cache, const void * data);
+static bool cnt_cnt_cmp_cb(lv_cache_t * cache, const void * data);
+static void size_cnt_add_cb(lv_cache_t * cache, const void * data);
+static void size_cnt_sub_cb(lv_cache_t * cache, const void * data);
+static bool size_cnt_cmp_cb(lv_cache_t * cache, const void * data);
+
 /**********************
  *  GLOBAL VARIABLES
  **********************/
-const lv_cache_class_t lv_cache_class_lru_rb = {
+const lv_cache_class_t lv_cache_class_lru_rb_count = {
     .alloc_cb = alloc_cb,
-    .init_cb = init_cb,
+    .init_cb = init_cnt_cb,
+    .destroy_cb = destroy_cb,
+
+    .get_cb = get_cb,
+    .add_cb = add_cb,
+    .remove_cb = remove_cb,
+    .drop_cb = drop_cb,
+    .drop_all_cb = drop_all_cb
+};
+
+const lv_cache_class_t lv_cache_class_lru_rb_size = {
+    .alloc_cb = alloc_cb,
+    .init_cb = init_size_cb,
     .destroy_cb = destroy_cb,
 
     .get_cb = get_cb,
@@ -126,7 +154,7 @@ static void * alloc_cb(void)
     return res;
 }
 
-static bool init_cb(lv_cache_t * cache)
+static bool init_cnt_cb(lv_cache_t * cache)
 {
     lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
 
@@ -144,6 +172,36 @@ static bool init_cb(lv_cache_t * cache)
         return NULL;
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
+
+    lru->cnt_add_cb = cnt_cnt_add_cb;
+    lru->cnt_sub_cb = cnt_cnt_sub_cb;
+    lru->cnt_cmp_cb = cnt_cnt_cmp_cb;
+
+    return lru;
+}
+
+static bool init_size_cb(lv_cache_t * cache)
+{
+    lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
+
+    LV_ASSERT_NULL(lru->cache.ops.compare_cb);
+    LV_ASSERT_NULL(lru->cache.ops.free_cb);
+    LV_ASSERT(lru->cache.node_size > 0);
+
+    if(lru->cache.node_size == 0 || lru->cache.max_size == 0
+       || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
+        return false;
+    }
+
+    /*add void* to store the ll node pointer*/
+    if(!lv_rb_init(&lru->rb, lru->cache.ops.compare_cb, lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
+        return NULL;
+    }
+    _lv_ll_init(&lru->ll, sizeof(void *));
+
+    lru->cnt_add_cb = size_cnt_add_cb;
+    lru->cnt_sub_cb = size_cnt_sub_cb;
+    lru->cnt_cmp_cb = size_cnt_cmp_cb;
 
     return lru;
 }
@@ -219,7 +277,7 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
 
     void * tail = _lv_ll_get_tail(&lru->ll);
     void * curr = tail;
-    while(lru->cache.size >= lru->cache.max_size) {
+    while(lru->cnt_cmp_cb(cache, key)) {
         if(curr == NULL) {
             LV_LOG_ERROR("failed to drop cache");
             return NULL;
@@ -242,9 +300,10 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
         return NULL;
     }
 
-    lru->cache.size++;
-
     lv_cache_entry_t * entry = lv_cache_entry_get_entry(new_node->data, cache->node_size);
+
+    lru->cnt_add_cb(cache, entry);
+
     return entry;
 }
 
@@ -272,7 +331,7 @@ static void remove_cb(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_
     _lv_ll_remove(&lru->ll, lru_node);
     lv_free(lru_node);
 
-    lru->cache.size--;
+    lru->cnt_sub_cb(cache, entry);
 }
 
 static void drop_cb(lv_cache_t * cache, const void * key, void * user_data)
@@ -295,13 +354,15 @@ static void drop_cb(lv_cache_t * cache, const void * key, void * user_data)
 
     lru->cache.ops.free_cb(data, user_data);
 
+    lv_cache_entry_t * entry = lv_cache_entry_get_entry(data, cache->node_size);
     void * lru_node = *get_lru_node(lru, node);
+
     lv_rb_remove_node(&lru->rb, node);
-    lv_cache_entry_delete(lv_cache_entry_get_entry(data, cache->node_size));
+    lru->cnt_sub_cb(cache, entry);
+    lv_cache_entry_delete(entry);
+
     _lv_ll_remove(&lru->ll, lru_node);
     lv_free(lru_node);
-
-    lru->cache.size--;
 }
 
 static void drop_all_cb(lv_cache_t * cache, void * user_data)
@@ -336,4 +397,40 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
     _lv_ll_clear(&lru->ll);
 
     lru->cache.size = 0;
+}
+
+static void cnt_cnt_add_cb(lv_cache_t * cache, const void * data)
+{
+    LV_UNUSED(data);
+    cache->size++;
+}
+
+static void cnt_cnt_sub_cb(lv_cache_t * cache, const void * data)
+{
+    LV_UNUSED(data);
+    cache->size--;
+}
+
+static bool cnt_cnt_cmp_cb(lv_cache_t * cache, const void * data)
+{
+    LV_UNUSED(data);
+    return cache->size >= cache->max_size;
+}
+
+static void size_cnt_add_cb(lv_cache_t * cache, const void * data)
+{
+    lv_cache_slot_size_t * slot = (lv_cache_slot_size_t *)data;
+    cache->size += slot->size;
+}
+
+static void size_cnt_sub_cb(lv_cache_t * cache, const void * data)
+{
+    lv_cache_slot_size_t * slot = (lv_cache_slot_size_t *)data;
+    cache->size += slot->size;
+}
+
+static bool size_cnt_cmp_cb(lv_cache_t * cache, const void * data)
+{
+    lv_cache_slot_size_t * slot = (lv_cache_slot_size_t *)data;
+    return cache->size + slot->size;
 }

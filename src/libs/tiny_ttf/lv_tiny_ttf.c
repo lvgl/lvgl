@@ -264,7 +264,7 @@ void lv_tiny_ttf_init(void)
         .free_cb = (lv_cache_free_cb_t)tiny_ttf_cache_free_cb,
     };
 
-    tiny_ttf_cache = lv_cache_create(&lv_cache_class_lru_rb, sizeof(tiny_ttf_cache_data_t), 128, ops);
+    tiny_ttf_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_cache_data_t), 128, ops);
 }
 
 void lv_tiny_ttf_deinit(void)
