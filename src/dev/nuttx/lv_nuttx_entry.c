@@ -82,6 +82,10 @@ void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
     lv_memzero(dsc, sizeof(lv_nuttx_dsc_t));
     dsc->fb_path = "/dev/fb0";
     dsc->input_path = "/dev/input0";
+
+#ifdef CONFIG_UINPUT_TOUCH
+    dsc->utouch_path = "/dev/utouch";
+#endif
 }
 
 void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
@@ -114,11 +118,20 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
         }
     }
 
-    if(dsc && dsc->input_path) {
+    if(dsc) {
 #if LV_USE_NUTTX_TOUCHSCREEN
-        lv_indev_t * indev = lv_nuttx_touchscreen_create(dsc->input_path);
-        if(result) {
-            result->indev = indev;
+        if(dsc->input_path) {
+            lv_indev_t * indev = lv_nuttx_touchscreen_create(dsc->input_path);
+            if(result) {
+                result->indev = indev;
+            }
+        }
+
+        if(dsc->utouch_path) {
+            lv_indev_t * indev = lv_nuttx_touchscreen_create(dsc->utouch_path);
+            if(result) {
+                result->utouch_indev = indev;
+            }
         }
 #endif
     }
