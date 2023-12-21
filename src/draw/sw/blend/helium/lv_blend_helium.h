@@ -315,7 +315,6 @@ static inline lv_result_t _lv_rgb888_blend_normal_to_rgb565_helium(_lv_draw_sw_b
     int16_t des_stride = dsc->dest_stride / sizeof(uint16_t);
     int16_t src_stride = dsc->src_stride / sizeof(uint32_t);
 
-
     __arm_2d_impl_cccn888_to_rgb565((uint32_t *)dsc->src_buf,
                                     src_stride,
                                     (uint16_t *)dsc->dest_buf,
@@ -346,7 +345,6 @@ static inline lv_result_t _lv_rgb888_blend_normal_to_rgb565_with_opa_helium(_lv_
                                     (uint16_t *)tmp_buf,
                                     des_stride,
                                     &draw_size);
-
 
     __arm_2d_impl_rgb565_tile_copy_opacity(tmp_buf,
                                            des_stride,
