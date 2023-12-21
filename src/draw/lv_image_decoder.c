@@ -28,11 +28,14 @@
  **********************/
 
 static uint32_t img_width_to_stride(lv_image_header_t * header);
+
+#if LV_CACHE_DEF_SIZE > 0
 static lv_cache_compare_res_t image_decoder_cache_compare_cb(const lv_image_cache_data_t * lhs,
                                                              const lv_image_cache_data_t * rhs);
 static void image_decoder_cache_free_cb(lv_image_cache_data_t * entry, void * user_data);
 
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
+#endif
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -298,6 +301,7 @@ static uint32_t img_width_to_stride(lv_image_header_t * header)
     }
 }
 
+#if LV_CACHE_DEF_SIZE > 0
 static lv_cache_compare_res_t image_decoder_cache_compare_cb(
     const lv_image_cache_data_t * lhs,
     const lv_image_cache_data_t * rhs)
@@ -348,3 +352,4 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 
     return LV_RESULT_INVALID;
 }
+#endif
