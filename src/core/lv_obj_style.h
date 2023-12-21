@@ -156,14 +156,13 @@ void lv_obj_enable_style_refresh(bool en);
 lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
 
 /**
- * Check if the specified style property is explicitly set for a given object and part.
- * @param obj   Pointer to an object.
- * @param part  A part from which the property should be checked.
- * @param prop  The style property to check.
- * @return      LV_STYLE_RES_NOT_FOUND: the property wasn't found.
- *              LV_STYLE_RES_FOUND: the property was fond.
+ * Check if an object has a specified style property for a given style selector.
+ * @param obj       pointer to an object
+ * @param selector  the style selector to be checked, defining the scope of the style to be examined.
+ * @param prop      the property to be checked.
+ * @return          true if the object has the specified selector and property, false otherwise.
  */
-lv_style_res_t lv_obj_style_prop_set_check(const struct _lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
+bool lv_obj_has_style_prop(const struct _lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop);
 
 /**
  * Set local style property on an object's part and state.

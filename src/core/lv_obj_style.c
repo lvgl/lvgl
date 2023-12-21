@@ -50,7 +50,8 @@ typedef enum {
  **********************/
 static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector);
 static _lv_obj_style_t * get_trans_style(lv_obj_t * obj, uint32_t part);
-static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v);
+static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
+                                    lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
@@ -390,6 +391,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
 {
     LV_ASSERT_NULL(obj)
 
+    lv_style_selector_t selector = part | obj->state;
     lv_style_value_t value_act = { .ptr = NULL };
     lv_style_res_t found;
 
@@ -399,7 +401,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     if((part == LV_PART_MAIN ? obj->style_main_prop_is_set : obj->style_other_prop_is_set) & prop_shifted)
 #endif
     {
-        found = get_prop_core(obj, part, prop, &value_act);
+        found = get_prop_core(obj, selector, prop, &value_act);
         if(found == LV_STYLE_RES_FOUND) return value_act;
     }
 
@@ -425,7 +427,8 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
             if(obj->style_main_prop_is_set & prop_shifted)
 #endif
             {
-                found = get_prop_core(obj, part, prop, &value_act);
+                selector = part | obj->state;
+                found = get_prop_core(obj, selector, prop, &value_act);
                 if(found == LV_STYLE_RES_FOUND) return value_act;
             }
             /*Check the parent too.*/
@@ -456,10 +459,12 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     return lv_style_prop_get_default_inlined(prop);
 }
 
-lv_style_res_t lv_obj_style_prop_set_check(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
+bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
 {
     LV_ASSERT_NULL(obj)
 
+    lv_part_t part = lv_obj_style_get_selector_part(selector);
+    lv_state_t state = lv_obj_style_get_selector_state(selector);
     lv_style_value_t value_act = { .ptr = NULL };
     lv_style_res_t found;
 
@@ -469,8 +474,8 @@ lv_style_res_t lv_obj_style_prop_set_check(const lv_obj_t * obj, lv_part_t part,
     if((part == LV_PART_MAIN ? obj->style_main_prop_is_set : obj->style_other_prop_is_set) & prop_shifted)
 #endif
     {
-        found = get_prop_core(obj, part, prop, &value_act);
-        if(found == LV_STYLE_RES_FOUND) return LV_STYLE_RES_FOUND;
+        found = get_prop_core(obj, selector, prop, &value_act);
+        if(found == LV_STYLE_RES_FOUND) return true;
     }
 
     extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
@@ -487,16 +492,21 @@ lv_style_res_t lv_obj_style_prop_set_check(const lv_obj_t * obj, lv_part_t part,
 
     if(inheritable) {
         /*If not found, check the `MAIN` style first, if already on the MAIN part go to the parent*/
-        if(part != LV_PART_MAIN) part = LV_PART_MAIN;
-        else obj = obj->parent;
+        if(part != LV_PART_MAIN) {
+            part = LV_PART_MAIN;
+            selector = state | part;
+        }
+        else {
+            obj = obj->parent;
+        }
 
         while(obj) {
 #if LV_OBJ_STYLE_CACHE
             if(obj->style_main_prop_is_set & prop_shifted)
 #endif
             {
-                found = get_prop_core(obj, part, prop, &value_act);
-                if(found == LV_STYLE_RES_FOUND) return LV_STYLE_RES_FOUND;
+                found = get_prop_core(obj, selector, prop, &value_act);
+                if(found == LV_STYLE_RES_FOUND) return true;
             }
             /*Check the parent too.*/
             obj = obj->parent;
@@ -506,11 +516,11 @@ lv_style_res_t lv_obj_style_prop_set_check(const lv_obj_t * obj, lv_part_t part,
         /*Get the width and height from the class.
          * WIDTH and HEIGHT are not inherited so add them in the `else` to skip checking them for inherited properties */
         if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
-            return LV_STYLE_RES_FOUND;
+            return true;
         }
     }
 
-    return LV_STYLE_RES_NOT_FOUND;
+    return false;
 }
 
 void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value,
@@ -843,11 +853,13 @@ static _lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t se
     return &obj->styles[0];
 }
 
-static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v)
+static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
+                                    lv_style_value_t * v)
 {
 
     const uint32_t group = (uint32_t)1 << _lv_style_get_prop_group(prop);
-    const lv_state_t state = obj->state;
+    const lv_part_t part = lv_obj_style_get_selector_part(selector);
+    const lv_state_t state = lv_obj_style_get_selector_state(selector);
     const lv_state_t state_inv = ~state;
     const bool skip_trans = obj->skip_trans;
     int32_t weight = -1;

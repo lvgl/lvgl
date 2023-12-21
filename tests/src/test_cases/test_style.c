@@ -117,4 +117,27 @@ void test_style_replacement(void)
     lv_style_reset(&style_blue);
 }
 
+void test_style_has_prop(void)
+{
+    lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_outline_color(&style, lv_color_white());
+
+    /*Create object with style*/
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+
+    TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_COLOR));
+    TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_WIDTH));
+    TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_INDICATOR, LV_STYLE_OUTLINE_COLOR));
+
+    lv_obj_add_style(obj, &style, LV_PART_MAIN);
+    lv_obj_set_style_outline_width(obj, 2, LV_PART_MAIN);
+
+    TEST_ASSERT_EQUAL(true, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_COLOR));
+    TEST_ASSERT_EQUAL(true, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_WIDTH));
+    TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_INDICATOR, LV_STYLE_OUTLINE_COLOR));
+
+    lv_style_reset(&style);
+}
+
 #endif
