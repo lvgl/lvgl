@@ -75,15 +75,18 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         return;
     }
 
-    /* image opa */
-    lv_opa_t opa = dsc->opa;
     vg_lite_color_t color = 0;
-    if(opa < LV_OPA_MAX) {
-        lv_memset(&color, opa, sizeof(color));
+    if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(decoder_dsc.header.cf) || dsc->recolor_opa > LV_OPA_MIN) {
+        /* alpha image and image recolor */
         src_buf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+        color = lv_vg_lite_color(dsc->recolor, LV_OPA_MIX2(dsc->opa, dsc->recolor_opa), true);
+    }
+    else if(dsc->opa < LV_OPA_MAX) {
+        /* normal image opa */
+        src_buf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+        lv_memset(&color, dsc->opa, sizeof(color));
     }
 
-    bool has_recolor = dsc->recolor_opa >= LV_OPA_MIN;
     bool has_trasform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
@@ -96,7 +99,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
     /* If clipping is not required, blit directly */
-    if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && !has_recolor) {
+    if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false)) {
         /* The image area is the coordinates relative to the image itself */
         lv_area_t src_area = *coords;
         lv_area_move(&src_area, -coords->x1, -coords->y1);
@@ -138,7 +141,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    &matrix,
                                    lv_vg_lite_blend_mode(dsc->blend_mode),
                                    VG_LITE_PATTERN_COLOR,
-                                   lv_vg_lite_color(dsc->recolor, dsc->recolor_opa, true),
+                                   0,
                                    color,
                                    filter));
 
