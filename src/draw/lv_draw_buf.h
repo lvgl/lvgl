@@ -198,6 +198,15 @@ void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y);
 lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t stride);
 
 /**
+ * Premultiply draw buffer color with alpha channel.
+ * If it's already premultiplied, return directly.
+ * Only color formats with alpha channel will be processed.
+ *
+ * @return LV_RESULT_OK: premultiply success
+ */
+lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
+
+/**
  * As of now, draw buf share same definition as `lv_image_dsc_t`.
  * And is interchangeable with `lv_image_dsc_t`.
  */
