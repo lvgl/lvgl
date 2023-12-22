@@ -229,6 +229,48 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
     decoder->close_cb = close_cb;
 }
 
+lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
+{
+    if(decoded == NULL) return NULL; /*No need to adjust*/
+
+    lv_image_decoder_args_t * args = &dsc->args;
+    if(args->stride_align && decoded->header.cf != LV_COLOR_FORMAT_RGB565A8) {
+        uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
+        if(decoded->header.stride != stride_expect) {
+            LV_LOG_WARN("Stride mismatch");
+            lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, stride_expect);
+            if(aligned == NULL) {
+                LV_LOG_ERROR("No memory for Stride adjust.");
+                return NULL;
+            }
+
+            decoded = aligned;
+        }
+    }
+
+    /*Premultiply alpha channel*/
+    if(args->premultiply
+       && !lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED) /*Hasn't done yet*/
+      ) {
+        LV_LOG_WARN("Alpha premultiply.");
+        if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_MODIFIABLE)) {
+            /*Do it directly*/
+            lv_draw_buf_premultiply(decoded);
+        }
+        else {
+            decoded = lv_draw_buf_dup(decoded);
+            if(decoded == NULL) {
+                LV_LOG_ERROR("No memory for premulitplying.");
+                return NULL;
+            }
+
+            lv_draw_buf_premultiply(decoded);
+        }
+    }
+
+    return decoded;
+}
+
 static uint32_t img_width_to_stride(lv_image_header_t * header)
 {
     if(header->cf == LV_COLOR_FORMAT_RGB565A8) {
@@ -238,4 +280,3 @@ static uint32_t img_width_to_stride(lv_image_header_t * header)
         return ((uint32_t)header->w * lv_color_format_get_bpp(header->cf) + 7) >> 3;
     }
 }
-
