@@ -166,7 +166,7 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
     draw_buf->header.w = w;
     draw_buf->header.h = h;
     draw_buf->header.cf = cf;
-    draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
+    draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     draw_buf->header.stride = stride;
     draw_buf->data = lv_draw_buf_align(buf, cf);
     draw_buf->unaligned_data = buf;
@@ -178,10 +178,14 @@ void lv_draw_buf_destroy(lv_draw_buf_t * buf)
 {
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return;
-    if(buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE)
-        lv_draw_buf_free(buf->unaligned_data);
 
-    lv_free(buf);
+    if(buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
+        lv_draw_buf_free(buf->unaligned_data);
+        lv_free(buf);
+    }
+    else {
+        LV_LOG_ERROR("draw buffer is not allocated, ignored");
+    }
 }
 
 void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y)
