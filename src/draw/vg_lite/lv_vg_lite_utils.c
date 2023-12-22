@@ -396,6 +396,7 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_NV12:
             return true;
         default:
             break;
@@ -441,6 +442,9 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_XRGB8888:
             return VG_LITE_BGRX8888;
+
+        case LV_COLOR_FORMAT_NV12:
+            return VG_LITE_NV12;
 
         default:
             LV_LOG_ERROR("unsupport color format: %d", cf);
@@ -584,16 +588,21 @@ bool lv_vg_lite_buffer_init(
     buffer->height = height;
     lv_vg_lite_buffer_format_bytes(buffer->format, &mul, &div, &align);
     buffer->stride = LV_VG_LITE_ALIGN((buffer->width * mul / div), align);
-    buffer->memory = (void *)ptr;
-    buffer->address = (uintptr_t)ptr;
 
     if(format == VG_LITE_NV12) {
+        lv_yuv_buf_t * frame_p = (lv_yuv_buf_t *)ptr;
+        buffer->memory = (void *)frame_p->semi_planar.y.buf;
+        buffer->address = (uintptr_t)frame_p->semi_planar.y.buf;
         buffer->yuv.swizzle = VG_LITE_SWIZZLE_UV;
-        buffer->yuv.uv_stride = buffer->stride;
         buffer->yuv.alpha_stride = buffer->stride;
         buffer->yuv.uv_height = buffer->height / 2;
-        buffer->yuv.uv_memory = (uint8_t *)ptr + (buffer->stride * buffer->height);
-        buffer->yuv.uv_planar = (uint32_t)(uintptr_t)buffer->yuv.uv_memory;
+        buffer->yuv.uv_memory = (void *)frame_p->semi_planar.uv.buf;
+        buffer->yuv.uv_planar = (uint32_t)(uintptr_t)frame_p->semi_planar.uv.buf;
+        buffer->yuv.uv_stride = frame_p->semi_planar.uv.stride;
+    }
+    else {
+        buffer->memory = (void *)ptr;
+        buffer->address = (uintptr_t)ptr;
     }
 
     return true;
