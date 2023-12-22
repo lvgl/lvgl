@@ -199,11 +199,11 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
             dyu = (d2_s32)((1 << 1) * lv_trigo_cos((int16_t)angle_low + 90));
         }
 
-        if (LV_SCALE_NONE != draw_dsc->scale_x) {
+        if(LV_SCALE_NONE != draw_dsc->scale_x) {
             dxu = (dxu * LV_SCALE_NONE) / draw_dsc->scale_x;
             dxv = (dxv * LV_SCALE_NONE) / draw_dsc->scale_x;
         }
-        if (LV_SCALE_NONE != draw_dsc->scale_y) {
+        if(LV_SCALE_NONE != draw_dsc->scale_y) {
             dyu = (dyu * LV_SCALE_NONE) / draw_dsc->scale_y;
             dyv = (dyv * LV_SCALE_NONE) / draw_dsc->scale_y;
         }
