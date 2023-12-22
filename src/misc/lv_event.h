@@ -107,6 +107,8 @@ typedef enum {
     LV_EVENT_FLUSH_START,
     LV_EVENT_FLUSH_FINISH,
 
+    LV_EVENT_VSYNC,
+
     _LV_EVENT_LAST,               /** Number of default events*/
 
     LV_EVENT_PREPROCESS = 0x80,   /** This is a flag that can be set with an event so it's processed

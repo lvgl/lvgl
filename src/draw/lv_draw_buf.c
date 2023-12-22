@@ -166,7 +166,7 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
     draw_buf->header.w = w;
     draw_buf->header.h = h;
     draw_buf->header.cf = cf;
-    draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
+    draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     draw_buf->header.stride = stride;
     draw_buf->data = lv_draw_buf_align(buf, cf);
     draw_buf->unaligned_data = buf;
@@ -174,14 +174,32 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
     return draw_buf;
 }
 
+lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf)
+{
+    const lv_image_header_t * header = &draw_buf->header;
+    lv_draw_buf_t * new_buf = lv_draw_buf_create(header->w, header->h, header->cf, header->stride);
+    if(new_buf == NULL) return NULL;
+
+    /*Choose the smaller size to copy*/
+    uint32_t size = LV_MIN(draw_buf->data_size, new_buf->data_size);
+
+    /*Copy image data*/
+    lv_memcpy(new_buf->data, draw_buf->data, size);
+    return new_buf;
+}
+
 void lv_draw_buf_destroy(lv_draw_buf_t * buf)
 {
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return;
-    if(buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE)
-        lv_draw_buf_free(buf->unaligned_data);
 
-    lv_free(buf);
+    if(buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
+        lv_draw_buf_free(buf->unaligned_data);
+        lv_free(buf);
+    }
+    else {
+        LV_LOG_ERROR("draw buffer is not allocated, ignored");
+    }
 }
 
 void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y)
@@ -228,6 +246,69 @@ lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t st
     }
 
     return dst;
+}
+
+lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
+{
+    LV_ASSERT_NULL(draw_buf);
+    if(draw_buf == NULL) return LV_RESULT_INVALID;
+
+    if(draw_buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) return LV_RESULT_INVALID;
+    if((draw_buf->header.flags & LV_IMAGE_FLAGS_MODIFIABLE) == 0) {
+        LV_LOG_WARN("draw buf is not modifiable: 0x%04x", draw_buf->header.flags);
+        return LV_RESULT_INVALID;
+    }
+
+    /*Premultiply color with alpha, do case by case by judging color format*/
+    lv_color_format_t cf = draw_buf->header.cf;
+    if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+        int size = LV_COLOR_INDEXED_PALETTE_SIZE(cf);
+        lv_color32_t * palette = (lv_color32_t *)draw_buf->data;
+        for(int i = 0; i < size; i++) {
+            lv_color_premultiply(&palette[i]);
+        }
+    }
+    else if(cf == LV_COLOR_FORMAT_ARGB8888) {
+        uint32_t h = draw_buf->header.h;
+        uint32_t w = draw_buf->header.w;
+        uint32_t stride = draw_buf->header.stride;
+        uint8_t * line = (uint8_t *)draw_buf->data;
+        for(uint32_t y = 0; y < h; y++) {
+            lv_color32_t * pixel = (lv_color32_t *)line;
+            for(uint32_t x = 0; x < w; x++) {
+                lv_color_premultiply(pixel);
+                pixel++;
+            }
+            line += stride;
+        }
+    }
+    else if(cf == LV_COLOR_FORMAT_RGB565A8) {
+        uint32_t h = draw_buf->header.h;
+        uint32_t w = draw_buf->header.w;
+        uint32_t stride = draw_buf->header.stride;
+        uint32_t alpha_stride = stride / 2;
+        uint8_t * line = (uint8_t *)draw_buf->data;
+        lv_opa_t * alpha = (lv_opa_t *)(line + stride * h);
+        for(uint32_t y = 0; y < h; y++) {
+            lv_color16_t * pixel = (lv_color16_t *)line;
+            for(uint32_t x = 0; x < w; x++) {
+                lv_color16_premultiply(pixel, alpha[x]);
+                pixel++;
+            }
+            line += stride;
+            alpha += alpha_stride;
+        }
+    }
+    else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
+        /*Pass*/
+    }
+    else {
+        LV_LOG_WARN("draw buf has no alpha, cf: %d", cf);
+    }
+
+    draw_buf->header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
+
+    return LV_RESULT_OK;
 }
 
 /**********************

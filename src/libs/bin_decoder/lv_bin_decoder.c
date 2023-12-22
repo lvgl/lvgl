@@ -160,7 +160,9 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
     }
 
     /*For backward compatibility, all images are not premultiplied for now.*/
-    header->flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
+    if(header->magic != LV_IMAGE_HEADER_MAGIC) {
+        header->flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
+    }
 
     return LV_RESULT_OK;
 }
@@ -175,7 +177,23 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(create_res == false) return LV_RESULT_INVALID;
     if(dsc->decoded == NULL) return LV_RESULT_OK; /*Need to read via get_area_cb*/
 
+    lv_draw_buf_t * decoded = (lv_draw_buf_t *)dsc->decoded;
+    lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
+    if(adjusted == NULL) {
+        free_decoder_data(dsc);
+        return LV_RESULT_INVALID;
+    }
+
+    /*The adjusted draw buffer is newly allocated.*/
+    if(adjusted != decoded) {
+        free_decoder_data(dsc);
+        decoder_data_t * decoder_data = get_decoder_data(dsc);
+        decoder_data->decoded = adjusted; /*Now this new buffer need to be free'd on decoder close*/
+    }
+    dsc->decoded = adjusted;
+
 #if LV_CACHE_DEF_SIZE > 0
+
     /*Add it to cache*/
     lv_image_cache_data_t search_key;
     search_key.src_type = dsc->src_type;
@@ -886,7 +904,6 @@ static bool bin_decoder_decode_data(lv_image_decoder_dsc_t * dsc)
     lv_image_decoder_t * decoder = dsc->decoder;
 
     lv_fs_res_t res = LV_RESULT_INVALID;
-    // uint32_t t = lv_tick_get();
 
     /*Open the file if it's a file*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -930,10 +947,10 @@ static bool bin_decoder_decode_data(lv_image_decoder_dsc_t * dsc)
         }
 #if LV_BIN_DECODER_RAM_LOAD
         else if(cf == LV_COLOR_FORMAT_ARGB8888      \
-                || cf == LV_COLOR_FORMAT_XRGB8888   \
-                || cf == LV_COLOR_FORMAT_RGB888     \
-                || cf == LV_COLOR_FORMAT_RGB565     \
-                || cf == LV_COLOR_FORMAT_RGB565A8) {
+            || cf == LV_COLOR_FORMAT_XRGB8888   \
+            || cf == LV_COLOR_FORMAT_RGB888     \
+            || cf == LV_COLOR_FORMAT_RGB565     \
+            || cf == LV_COLOR_FORMAT_RGB565A8) {
             res = decode_rgb(decoder, dsc);
         }
 #else
@@ -985,24 +1002,6 @@ static bool bin_decoder_decode_data(lv_image_decoder_dsc_t * dsc)
             if(decoded->header.stride == 0) {
                 /*Use the auto calculated value from decoder_info callback*/
                 decoded->header.stride = dsc->header.stride;
-            }
-
-            /**
-             * @todo need to convert c-array image stride if not match
-             *
-             * lv_draw_buf_create(); //create new draw buf that meets requirement
-             * lv_draw_buf_copy(); //copy from c-array image to new draw buf
-             */
-            uint32_t stride_expect = lv_draw_buf_width_to_stride(dsc->header.w, dsc->header.cf);
-            if(dsc->header.stride != stride_expect) {
-                LV_LOG_WARN("Stride mismatch");
-#if 0
-                /**
-                 * @fixme ignore for now
-                 */
-                free_decoder_data(dsc);
-                return false;
-#endif
             }
 
             res = LV_RESULT_OK;

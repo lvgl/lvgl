@@ -295,7 +295,7 @@ void lv_vector_path_close(lv_vector_path_t * path)
     LV_ARRAY_APPEND_VALUE(&path->ops, op);
 }
 
-void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, int32_t rx, int32_t ry)
+void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry)
 {
     float x = rect->x1;
     float y = rect->y1;
@@ -305,8 +305,8 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
     float hw = w * 0.5f;
     float hh = h * 0.5f;
 
-    if(rx > hw) rx = (int32_t)hw;
-    if(ry > hh) ry = (int32_t)hh;
+    if(rx > hw) rx = hw;
+    if(ry > hh) ry = hh;
 
     if(rx == 0 && ry == 0) {
         lv_fpoint_t pt = {x, y};
@@ -319,7 +319,7 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
         lv_vector_path_line_to(path, &pt);
         lv_vector_path_close(path);
     }
-    else if(rx == (int32_t)hw && ry == (int32_t)hh) {
+    else if(rx == hw && ry == hh) {
         lv_fpoint_t pt = {x + w * 0.5f, y + h * 0.5f};
         lv_vector_path_append_circle(path, &pt, rx, ry);
     }
@@ -383,7 +383,7 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
     }
 }
 
-void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, int32_t rx, int32_t ry)
+void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, float rx, float ry)
 {
     float krx = rx * 0.552284f;
     float kry = ry * 0.552284f;
