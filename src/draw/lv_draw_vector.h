@@ -276,7 +276,7 @@ void lv_vector_path_close(lv_vector_path_t * path);
  * @param rx                the horizontal radius for rounded rectangle
  * @param ry                the vertical radius for rounded rectangle
  */
-void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, int32_t rx, int32_t ry);
+void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry);
 
 /**
  * Add a circle to the path
@@ -285,7 +285,7 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
  * @param rx                the horizontal radius for circle
  * @param ry                the vertical radius for circle
  */
-void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, int32_t rx, int32_t ry);
+void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, float rx, float ry);
 
 /**
  * Add an sub path to the path
