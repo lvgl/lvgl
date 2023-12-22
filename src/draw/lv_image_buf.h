@@ -76,6 +76,11 @@ typedef enum _lv_image_flags_t {
     LV_IMAGE_FLAGS_COMPRESSED       = (1 << 3),
 
     /**
+     * The image is alloced from heap, thus should be freed after use.
+     */
+    LV_IMAGE_FLAGS_ALLOCATED        = (1 << 4),
+
+    /**
      * Flags reserved for user, lvgl won't use these bits.
      */
     LV_IMAGE_FLAGS_USER1            = 0x1000,

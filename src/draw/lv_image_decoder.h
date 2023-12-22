@@ -121,7 +121,7 @@ typedef struct _lv_image_decoder_dsc_t {
     lv_image_decoder_t * decoder;
 
     /*A copy of parameters of how this image is decoded*/
-    lv_image_decoder_args_t * args;
+    lv_image_decoder_args_t args;
 
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_image_dsc_t` variable*/
     const void * src;
@@ -267,6 +267,15 @@ void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_dec
  * @param close_cb a function to close a decoding session
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
+
+/**
+ * Check the decoded image, make any modification if decoder `args` requires.
+ * @note A new draw buf will be allocated if provided `decoded` is not modifiable or stride mismatch etc.
+ * @param dsc       pointer to a decoder descriptor
+ * @param decoded   pointer to a decoded image to post process to meet dsc->args requirement.
+ * @return          post processed draw buffer, when it differs with `decoded`, it's newly allocated.
+ */
+lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded);
 
 /**********************
  *      MACROS
