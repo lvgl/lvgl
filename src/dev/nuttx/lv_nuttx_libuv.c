@@ -28,6 +28,7 @@ typedef struct {
     int fd;
     bool polling;
     uv_poll_t fb_poll;
+    uv_poll_t vsync_poll;
 } lv_nuttx_uv_fb_ctx_t;
 
 typedef struct {
@@ -49,6 +50,7 @@ static void lv_nuttx_uv_timer_cb(uv_timer_t * handle);
 static int  lv_nuttx_uv_timer_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_ctx);
 static void lv_nuttx_uv_timer_deinit(lv_nuttx_uv_ctx_t * uv_ctx);
 
+static void lv_nuttx_uv_vsync_poll_cb(uv_poll_t * handle, int status, int events);
 static void lv_nuttx_uv_disp_poll_cb(uv_poll_t * handle, int status, int events);
 static void lv_nuttx_uv_disp_refr_req_cb(lv_event_t * e);
 static int  lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_fb_ctx_t * fb_ctx);
@@ -168,6 +170,20 @@ static void lv_nuttx_uv_timer_deinit(lv_nuttx_uv_ctx_t * uv_ctx)
     LV_LOG_USER("Done");
 }
 
+static void lv_nuttx_uv_vsync_poll_cb(uv_poll_t * handle, int status, int events)
+{
+    LV_UNUSED(handle);
+    LV_UNUSED(status);
+    LV_UNUSED(events);
+
+    lv_display_t * d;
+    d = lv_display_get_next(NULL);
+    while(d) {
+        lv_display_send_event(d, LV_EVENT_VSYNC, NULL);
+        d = lv_display_get_next(d);
+    }
+}
+
 static void lv_nuttx_uv_disp_poll_cb(uv_poll_t * handle, int status, int events)
 {
     lv_nuttx_uv_fb_ctx_t * fb_ctx = (lv_nuttx_uv_fb_ctx_t *)(handle->data);
@@ -220,6 +236,10 @@ static int lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_fb_ctx_t * f
     uv_poll_init(loop, &fb_ctx->fb_poll, fb_ctx->fd);
     uv_poll_start(&fb_ctx->fb_poll, UV_WRITABLE, lv_nuttx_uv_disp_poll_cb);
 
+    fb_ctx->vsync_poll.data = fb_ctx;
+    uv_poll_init(loop, &fb_ctx->vsync_poll, fb_ctx->fd);
+    uv_poll_start(&fb_ctx->vsync_poll, UV_PRIORITIZED, lv_nuttx_uv_vsync_poll_cb);
+
     LV_LOG_USER("lvgl fb loop start OK");
 
     /* Register for the invalidate area event */
@@ -235,6 +255,7 @@ static void lv_nuttx_uv_fb_deinit(lv_nuttx_uv_fb_ctx_t * fb_ctx)
 
     if(fb_ctx->fd > 0) {
         uv_close((uv_handle_t *)&fb_ctx->fb_poll, NULL);
+        uv_close((uv_handle_t *)&fb_ctx->vsync_poll, NULL);
     }
     LV_LOG_USER("Done");
 }
