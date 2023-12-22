@@ -174,6 +174,20 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
     return draw_buf;
 }
 
+lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf)
+{
+    const lv_image_header_t * header = &draw_buf->header;
+    lv_draw_buf_t * new_buf = lv_draw_buf_create(header->w, header->h, header->cf, header->stride);
+    if(new_buf == NULL) return NULL;
+
+    /*Choose the smaller size to copy*/
+    uint32_t size = LV_MIN(draw_buf->data_size, new_buf->data_size);
+
+    /*Copy image data*/
+    lv_memcpy(new_buf->data, draw_buf->data, size);
+    return new_buf;
+}
+
 void lv_draw_buf_destroy(lv_draw_buf_t * buf)
 {
     LV_ASSERT_NULL(buf);
