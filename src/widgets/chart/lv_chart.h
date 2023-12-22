@@ -109,7 +109,6 @@ typedef struct {
     uint32_t label_en  : 1;
 } lv_chart_tick_dsc_t;
 
-
 typedef struct {
     lv_obj_t obj;
     lv_ll_t series_ll;     /**< Linked list for the series (stores lv_chart_series_t)*/

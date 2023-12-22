@@ -88,7 +88,8 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
     lv_obj_move_to_index(obj, 0);
 }
 
-static inline lv_cache_entry_t * lv_cache_find_unused(const void * src_ptr, lv_cache_src_type_t src_type, uint32_t param1, uint32_t param2)
+static inline lv_cache_entry_t * lv_cache_find_unused(const void * src_ptr, lv_cache_src_type_t src_type,
+                                                      uint32_t param1, uint32_t param2)
 {
     LV_UNUSED(src_ptr);
     LV_UNUSED(src_type);

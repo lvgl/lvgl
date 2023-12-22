@@ -183,7 +183,6 @@ void lv_chart_set_div_line_count(lv_obj_t * obj, uint8_t hdiv, uint8_t vdiv)
     lv_obj_invalidate(obj);
 }
 
-
 void lv_chart_set_zoom_x(lv_obj_t * obj, uint32_t zoom_x)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -1685,6 +1684,5 @@ lv_chart_tick_dsc_t * get_tick_gsc(lv_obj_t * obj, lv_chart_axis_t axis)
             return NULL;
     }
 }
-
 
 #endif
