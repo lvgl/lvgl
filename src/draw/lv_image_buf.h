@@ -122,6 +122,24 @@ typedef struct {
 } lv_image_header_t;
 #endif
 
+typedef struct {
+    void * buf;
+    uint32_t stride;            /*Number of bytes in a row*/
+} lv_yuv_plane_t;
+
+typedef union {
+    lv_yuv_plane_t yuv;         /*packed format*/
+    struct {
+        lv_yuv_plane_t y;
+        lv_yuv_plane_t u;
+        lv_yuv_plane_t v;
+    } planar;                   /*planar format with 3 plane*/
+    struct {
+        lv_yuv_plane_t y;
+        lv_yuv_plane_t uv;
+    } semi_planar;              /*planar format with 2 plane*/
+} lv_yuv_buf_t;
+
 /**
  * Struct to describe an image. Both decoded and raw image can share
  * the same struct.
