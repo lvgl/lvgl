@@ -115,17 +115,14 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     lv_image_decoder_t * decoder;
     lv_image_decoder_args_t * args_copy = NULL;
 
+    static const lv_image_decoder_args_t def_args = {
+        .stride_align = LV_DRAW_BUF_STRIDE_ALIGN != 1,
+        .premultiply = false,
+        .no_cache = false,
+    };
+
     /*Make a copy of args */
-    if(args) {
-        args_copy = lv_malloc(sizeof(lv_image_decoder_args_t));
-        LV_ASSERT_MALLOC(args_copy);
-        if(args_copy == NULL) {
-            LV_LOG_WARN("Out of memory");
-            return LV_RESULT_INVALID;
-        }
-        lv_memcpy(args_copy, args, sizeof(lv_image_decoder_args_t));
-        dsc->args = args_copy;
-    }
+    dsc->args = args ? *args : def_args;
 
     _LV_LL_READ(img_decoder_ll_p, decoder) {
         /*Info and Open callbacks are required*/
@@ -174,7 +171,6 @@ void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
     if(dsc->decoder) {
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
-        if(dsc->args) lv_free(dsc->args);
 
         if(dsc->src_type == LV_IMAGE_SRC_FILE) {
             lv_free((void *)dsc->src);

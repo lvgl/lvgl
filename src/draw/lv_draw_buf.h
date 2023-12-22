@@ -182,6 +182,13 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const l
 lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride);
 
 /**
+ * Duplicate a draw buf with same image size, stride and color format. Copy the image data too.
+ * @param draw_buf  the draw buf to duplicate
+ * @return          the duplicated draw buf on success, NULL if failed
+ */
+lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf);
+
+/**
  * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_MODIFIABLE in header.
  * Then free the lv_draw_buf_t struct.
  */
@@ -196,6 +203,15 @@ void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y);
  * Adjust the stride of a draw buf.
  */
 lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t stride);
+
+/**
+ * Premultiply draw buffer color with alpha channel.
+ * If it's already premultiplied, return directly.
+ * Only color formats with alpha channel will be processed.
+ *
+ * @return LV_RESULT_OK: premultiply success
+ */
+lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
 
 /**
  * As of now, draw buf share same definition as `lv_image_dsc_t`.

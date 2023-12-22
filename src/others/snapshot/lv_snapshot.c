@@ -100,13 +100,13 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
     lv_area_increase(&snapshot_area, ext_size, ext_size);
 
     lv_memzero(buf, buf_size);
-    lv_memzero(dsc, sizeof(lv_image_dsc_t));
     dsc->data = buf;
     dsc->data_size = buf_size_needed;
+    /*Keep header flags unchanged, because we don't know if it's allocated or not.*/
     dsc->header.w = w;
     dsc->header.h = h;
     dsc->header.cf = cf;
-    dsc->header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
+    dsc->header.magic = LV_IMAGE_HEADER_MAGIC;
 
     lv_layer_t layer;
     lv_memzero(&layer, sizeof(layer));

@@ -407,6 +407,20 @@ static inline lv_color_t lv_color_black(void)
     return lv_color_make(0x00, 0x00, 0x00);
 }
 
+static inline void lv_color_premultiply(lv_color32_t * c)
+{
+    c->red = LV_OPA_MIX2(c->red, c->alpha);
+    c->green = LV_OPA_MIX2(c->green, c->alpha);
+    c->blue = LV_OPA_MIX2(c->blue, c->alpha);
+}
+
+static inline void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a)
+{
+    c->red = LV_OPA_MIX2(c->red, a);
+    c->green = LV_OPA_MIX2(c->green, a);
+    c->blue = LV_OPA_MIX2(c->blue, a);
+}
+
 /**********************
  *      MACROS
  **********************/

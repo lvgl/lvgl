@@ -121,7 +121,7 @@ typedef struct _lv_image_decoder_dsc_t {
     lv_image_decoder_t * decoder;
 
     /*A copy of parameters of how this image is decoded*/
-    lv_image_decoder_args_t * args;
+    lv_image_decoder_args_t args;
 
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_image_dsc_t` variable*/
     const void * src;
