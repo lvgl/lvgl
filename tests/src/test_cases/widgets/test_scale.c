@@ -262,4 +262,36 @@ void test_scale_round_section_finds_correct_initial_and_last_tick_indexes(void)
     TEST_ASSERT_EQUAL(1, section->last_tick_idx_is_major);
 }
 
+void test_scale_set_style(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    static lv_style_t section_minor_tick_style;
+    static lv_style_t section_label_style;
+    static lv_style_t section_main_line_style;
+
+    lv_style_init(&section_label_style);
+    lv_style_init(&section_minor_tick_style);
+    lv_style_init(&section_main_line_style);
+
+    /* Configure section styles */
+    lv_scale_section_t * section = lv_scale_add_section(scale);
+    lv_scale_section_set_range(section, 75, 100);
+
+    lv_scale_section_set_style(section, LV_PART_MAIN, &section_main_line_style);
+    TEST_ASSERT_NOT_NULL(section->main_style);
+    TEST_ASSERT_NULL(section->indicator_style);
+    TEST_ASSERT_NULL(section->items_style);
+
+    lv_scale_section_set_style(section, LV_PART_INDICATOR, &section_label_style);
+    TEST_ASSERT_NOT_NULL(section->main_style);
+    TEST_ASSERT_NOT_NULL(section->indicator_style);
+    TEST_ASSERT_NULL(section->items_style);
+
+    lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
+    TEST_ASSERT_NOT_NULL(section->main_style);
+    TEST_ASSERT_NOT_NULL(section->indicator_style);
+    TEST_ASSERT_NOT_NULL(section->items_style);
+}
+
 #endif
