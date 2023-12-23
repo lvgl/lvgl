@@ -185,11 +185,6 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
         lv_point_transform(&p[2], draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y, &draw_dsc->pivot, true);
         lv_point_transform(&p[3], draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y, &draw_dsc->pivot, true);
 
-        int32_t sin_xv = 0; //0 degrees
-        int32_t cos_xu = (1 << 15);
-        int32_t sin_yv = (1 << 15); //90 degress
-        int32_t cos_yu = 0;
-
         int32_t angle_limited = draw_dsc->rotation;
         if(angle_limited > 3600) angle_limited -= 3600;
         if(angle_limited < 0) angle_limited += 3600;
@@ -197,18 +192,21 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
         int32_t angle_low = angle_limited / 10;
 
         if(0 != angle_low) {
-            sin_xv = lv_trigo_sin((int16_t)angle_low);
-            cos_xu = lv_trigo_cos((int16_t)angle_low);
-            sin_yv = lv_trigo_sin((int16_t)angle_low + 90);
-            cos_yu = lv_trigo_cos((int16_t)angle_low + 90);
+            /* LV_TRIGO_SHIFT is 15, so only need to shift by 1 to get 16:16 fixed point */
+            dxv = (d2_s32)((1 << 1) * lv_trigo_sin((int16_t)angle_low));
+            dxu = (d2_s32)((1 << 1) * lv_trigo_cos((int16_t)angle_low));
+            dyv = (d2_s32)((1 << 1) * lv_trigo_sin((int16_t)angle_low + 90));
+            dyu = (d2_s32)((1 << 1) * lv_trigo_cos((int16_t)angle_low + 90));
         }
 
-        /* LV_TRIGO_SHIFT is 15, so only need to shift by 1 to get 16:16 fixed point */
-        dxu = (d2_s32)((1 << 1) *
-                       cos_xu); /* TODO - Need to handle scaling of the texture based on draw_dsc->scale_x, draw_dsc->scale_y, currently no scaling it is 1:1 */
-        dxv = (d2_s32)((1 << 1) * sin_xv);
-        dyu = (d2_s32)((1 << 1) * cos_yu);
-        dyv = (d2_s32)((1 << 1) * sin_yv);
+        if(LV_SCALE_NONE != draw_dsc->scale_x) {
+            dxu = (dxu * LV_SCALE_NONE) / draw_dsc->scale_x;
+            dxv = (dxv * LV_SCALE_NONE) / draw_dsc->scale_x;
+        }
+        if(LV_SCALE_NONE != draw_dsc->scale_y) {
+            dyu = (dyu * LV_SCALE_NONE) / draw_dsc->scale_y;
+            dyv = (dyv * LV_SCALE_NONE) / draw_dsc->scale_y;
+        }
     }
 
     p[0].x += draw_area.x1;

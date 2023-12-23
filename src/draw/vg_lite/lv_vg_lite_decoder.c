@@ -312,6 +312,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
     bool has_alpha = lv_color_format_has_alpha(cf);
     bool is_indexed = LV_COLOR_FORMAT_IS_INDEXED(cf);
+    bool is_yuv = LV_COLOR_FORMAT_IS_YUV(cf);
     bool is_addr_aligned = (image_data == lv_draw_buf_align((void *)image_data, cf)) ? true : false;
 
     uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
@@ -320,10 +321,10 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     /* When the following conditions are met,
      * there is no need to copy image resource preprocessing.
      */
-    if(is_addr_aligned
-       && is_stride_aligned
-       && !is_indexed
-       && (!has_alpha || (has_alpha && support_blend_normal))) {
+    if((is_addr_aligned
+        && is_stride_aligned
+        && !is_indexed
+        && (!has_alpha || (has_alpha && support_blend_normal))) || is_yuv) {
 
         /*add cache*/
         lv_cache_lock();

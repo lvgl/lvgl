@@ -76,6 +76,11 @@ typedef enum _lv_image_flags_t {
     LV_IMAGE_FLAGS_COMPRESSED       = (1 << 3),
 
     /**
+     * The image is alloced from heap, thus should be freed after use.
+     */
+    LV_IMAGE_FLAGS_ALLOCATED        = (1 << 4),
+
+    /**
      * Flags reserved for user, lvgl won't use these bits.
      */
     LV_IMAGE_FLAGS_USER1            = 0x1000,
@@ -116,6 +121,24 @@ typedef struct {
     uint32_t reserved_2: 16;    /*Reserved to be used later*/
 } lv_image_header_t;
 #endif
+
+typedef struct {
+    void * buf;
+    uint32_t stride;            /*Number of bytes in a row*/
+} lv_yuv_plane_t;
+
+typedef union {
+    lv_yuv_plane_t yuv;         /*packed format*/
+    struct {
+        lv_yuv_plane_t y;
+        lv_yuv_plane_t u;
+        lv_yuv_plane_t v;
+    } planar;                   /*planar format with 3 plane*/
+    struct {
+        lv_yuv_plane_t y;
+        lv_yuv_plane_t uv;
+    } semi_planar;              /*planar format with 2 plane*/
+} lv_yuv_buf_t;
 
 /**
  * Struct to describe an image. Both decoded and raw image can share

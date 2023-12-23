@@ -291,7 +291,8 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
                                     const lv_matrix_t * m)
 {
     lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, p->src, NULL);
+    lv_image_decoder_args_t args = { 0 };
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, p->src, &args);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return;

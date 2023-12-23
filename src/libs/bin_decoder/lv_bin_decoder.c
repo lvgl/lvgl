@@ -160,7 +160,9 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
     }
 
     /*For backward compatibility, all images are not premultiplied for now.*/
-    header->flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
+    if(header->magic != LV_IMAGE_HEADER_MAGIC) {
+        header->flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
+    }
 
     return LV_RESULT_OK;
 }
@@ -276,24 +278,6 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 decoded->header.stride = dsc->header.stride;
             }
 
-            /**
-             * @todo need to convert c-array image stride if not match
-             *
-             * lv_draw_buf_create(); //create new draw buf that meets requirement
-             * lv_draw_buf_copy(); //copy from c-array image to new draw buf
-             */
-            uint32_t stride_expect = lv_draw_buf_width_to_stride(dsc->header.w, dsc->header.cf);
-            if(dsc->header.stride != stride_expect) {
-                LV_LOG_WARN("Stride mismatch");
-#if 0
-                /**
-                 * @fixme ignore for now
-                 */
-                free_decoder_data(dsc);
-                return LV_RESULT_INVALID;
-#endif
-            }
-
             res = LV_RESULT_OK;
         }
     }
@@ -304,6 +288,22 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
 
     if(dsc->decoded == NULL) return LV_RESULT_OK; /*Need to read via get_area_cb*/
+
+    lv_draw_buf_t * decoded = (lv_draw_buf_t *)dsc->decoded;
+    lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
+    if(adjusted == NULL) {
+        free_decoder_data(dsc);
+        return LV_RESULT_INVALID;
+    }
+
+    /*The adjusted draw buffer is newly allocated.*/
+    if(adjusted != decoded) {
+        free_decoder_data(dsc);
+        decoder_data_t * decoder_data = get_decoder_data(dsc);
+        decoder_data->decoded = adjusted; /*Now this new buffer need to be free'd on decoder close*/
+    }
+
+    dsc->decoded = adjusted;
 
     /*Add it to cache*/
     t = lv_tick_elaps(t);
@@ -956,10 +956,9 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
     }
 
     uint8_t * img_data;
+    uint32_t out_len = compressed->decompressed_size;
     uint32_t input_len = compressed->compressed_size;
     LV_UNUSED(input_len);
-    uint32_t out_len = compressed->decompressed_size;
-
     lv_draw_buf_t * decompressed = lv_draw_buf_create(dsc->header.w, dsc->header.h, dsc->header.cf,
                                                       dsc->header.stride);
     if(decompressed == NULL) {
