@@ -172,6 +172,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                                                 decoded->data_size);
         if(cache == NULL) {
             lv_cache_unlock();
+            lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
 
