@@ -947,10 +947,10 @@ static bool bin_decoder_decode_data(lv_image_decoder_dsc_t * dsc)
         }
 #if LV_BIN_DECODER_RAM_LOAD
         else if(cf == LV_COLOR_FORMAT_ARGB8888      \
-            || cf == LV_COLOR_FORMAT_XRGB8888   \
-            || cf == LV_COLOR_FORMAT_RGB888     \
-            || cf == LV_COLOR_FORMAT_RGB565     \
-            || cf == LV_COLOR_FORMAT_RGB565A8) {
+                || cf == LV_COLOR_FORMAT_XRGB8888   \
+                || cf == LV_COLOR_FORMAT_RGB888     \
+                || cf == LV_COLOR_FORMAT_RGB565     \
+                || cf == LV_COLOR_FORMAT_RGB565A8) {
             res = decode_rgb(decoder, dsc);
         }
 #else
