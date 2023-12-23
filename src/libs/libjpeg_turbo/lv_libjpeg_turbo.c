@@ -170,7 +170,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
         lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
 
-        if(cache == NULL) {
+        if(entry == NULL) {
             lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
