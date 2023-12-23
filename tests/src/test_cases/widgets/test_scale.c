@@ -294,4 +294,23 @@ void test_scale_set_style(void)
     TEST_ASSERT_NOT_NULL(section->items_style);
 }
 
+/* The scale internally counts the number of custom labels until it finds the NULL sentinel */
+void test_scale_custom_labels_count(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+    lv_scale_set_label_show(scale, true);
+
+    static const char * custom_labels[] = {"0 °C", "25 °C", "50 °C", "75 °C", "100 °C", NULL};
+    lv_scale_set_text_src(scale, custom_labels);
+
+    lv_scale_t * scale_widget = (lv_scale_t *)scale;
+
+    TEST_ASSERT_EQUAL(5U, scale_widget->custom_label_cnt);
+
+    static const char * animal_labels[] = {"cat", "dog", NULL};
+    lv_scale_set_text_src(scale, animal_labels);
+
+    TEST_ASSERT_EQUAL(2U, scale_widget->custom_label_cnt);
+}
+
 #endif
