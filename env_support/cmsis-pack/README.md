@@ -171,8 +171,30 @@ Make sure `LV_MEM_SIZE` is no less than `(256*1024U)`.
 
 
 
+12. Replace the macro definition:
 
-11. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+```c
+#define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+```
+
+with:
+
+```c
+    #if !defined(LV_USE_DRAW_SW_ASM) && defined(RTE_Acceleration_Arm_2D)
+        /*turn-on helium acceleration when Arm-2D and the Helium-powered device are detected */
+        #if defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
+            #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_HELIUM
+        #endif
+    #endif
+
+    #ifndef LV_USE_DRAW_SW_ASM
+        #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+    #endif
+```
+
+
+
+13. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 
