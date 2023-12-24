@@ -314,6 +314,15 @@
     #endif
 #endif
 
+/* Use Arm-2D on Cortex-M based devices. Please only enable it for Helium Powered devices for now */
+#ifndef LV_USE_DRAW_ARM2D
+    #ifdef CONFIG_LV_USE_DRAW_ARM2D
+        #define LV_USE_DRAW_ARM2D CONFIG_LV_USE_DRAW_ARM2D
+    #else
+        #define LV_USE_DRAW_ARM2D 0
+    #endif
+#endif
+
 /* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE
