@@ -99,7 +99,7 @@ remove the misleading guide above this code segment.
 
 7. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
-#define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE     1
 #define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
