@@ -357,6 +357,30 @@ void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_
  * Getter functions
  *====================*/
 
+lv_scale_mode_t lv_scale_get_mode(lv_obj_t * obj)
+{
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    return scale->mode;
+}
+
+int32_t lv_scale_get_total_tick_count(lv_obj_t * obj)
+{
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    return scale->total_tick_count;
+}
+
+int32_t lv_scale_get_major_tick_every(lv_obj_t * obj)
+{
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    return scale->major_tick_every;
+}
+
+bool lv_scale_get_label_show(lv_obj_t * obj)
+{
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    return scale->label_enabled;
+}
+
 /*=====================
  * Other functions
  *====================*/

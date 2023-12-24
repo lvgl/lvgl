@@ -322,4 +322,59 @@ void test_scale_custom_labels_count(void)
     TEST_ASSERT_EQUAL(2U, scale_widget->custom_label_cnt);
 }
 
+void test_scale_mode(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    lv_scale_mode_t mode = LV_SCALE_MODE_ROUND_INNER;
+    lv_scale_set_mode(scale, mode);
+
+    TEST_ASSERT_EQUAL(mode, lv_scale_get_mode(scale));
+}
+
+void test_scale_total_tick_count(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    int32_t total_tick_count = 42;
+    lv_scale_set_total_tick_count(scale, total_tick_count);
+
+    TEST_ASSERT_EQUAL(total_tick_count, lv_scale_get_total_tick_count(scale));
+}
+
+void test_scale_major_tick_every(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    int32_t major_tick_every = 6;
+    lv_scale_set_major_tick_every(scale, major_tick_every);
+
+    TEST_ASSERT_EQUAL(major_tick_every, lv_scale_get_major_tick_every(scale));
+}
+
+void test_scale_label_show(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    bool label_show = true;
+    lv_scale_set_label_show(scale, label_show);
+
+    TEST_ASSERT_EQUAL(label_show, lv_scale_get_label_show(scale));
+
+    label_show = false;
+    lv_scale_set_label_show(scale, label_show);
+
+    TEST_ASSERT_EQUAL(label_show, lv_scale_get_label_show(scale));
+}
+
+void test_scale_angle_range(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    uint32_t angle_range = 42;
+    lv_scale_set_angle_range(scale, angle_range);
+
+    TEST_ASSERT_EQUAL(angle_range, lv_scale_get_angle_range(scale));
+}
+
 #endif

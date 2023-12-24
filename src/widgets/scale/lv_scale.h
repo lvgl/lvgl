@@ -239,6 +239,34 @@ void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_
  * Getter functions
  *====================*/
 
+/**
+ * Get scale mode. See @ref lv_scale_mode_t
+ * @param obj   pointer the scale object
+ * @return      Scale mode
+ */
+lv_scale_mode_t lv_scale_get_mode(lv_obj_t * obj);
+
+/**
+ * Get scale total tick count (including minor and major ticks)
+ * @param obj   pointer the scale object
+ * @return      Scale total tick count
+ */
+int32_t lv_scale_get_total_tick_count(lv_obj_t * obj);
+
+/**
+ * Gets how often the major tick will be drawn
+ * @param obj   pointer the scale object
+ * @return      Scale major tick every count
+ */
+int32_t lv_scale_get_major_tick_every(lv_obj_t * obj);
+
+/**
+ * Gets label visibility
+ * @param obj   pointer the scale object
+ * @return      true if tick label is enabled, false otherwise
+ */
+bool lv_scale_get_label_show(lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/
