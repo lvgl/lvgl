@@ -267,6 +267,13 @@ int32_t lv_scale_get_major_tick_every(lv_obj_t * obj);
  */
 bool lv_scale_get_label_show(lv_obj_t * obj);
 
+/**
+ * Get angle range of a round scale
+ * @param obj   pointer to a scale object
+ * @return      Scale angle_range
+ */
+uint32_t lv_scale_get_angle_range(lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/

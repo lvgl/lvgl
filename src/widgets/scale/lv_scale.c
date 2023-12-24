@@ -381,6 +381,12 @@ bool lv_scale_get_label_show(lv_obj_t * obj)
     return scale->label_enabled;
 }
 
+uint32_t lv_scale_get_angle_range(lv_obj_t * obj)
+{
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    return scale->angle_range;
+}
+
 /*=====================
  * Other functions
  *====================*/
