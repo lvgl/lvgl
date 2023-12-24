@@ -14,8 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-//#include "../../../../lv_conf_internal.h"
-#include "lvgl.h"
+#include "../../../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && !defined(__ASSEMBLY__) && defined(LV_USE_GPU_ARM2D)
 
