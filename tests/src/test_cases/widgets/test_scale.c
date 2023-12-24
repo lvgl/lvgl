@@ -283,15 +283,24 @@ void test_scale_set_style(void)
     TEST_ASSERT_NULL(section->indicator_style);
     TEST_ASSERT_NULL(section->items_style);
 
+    TEST_ASSERT_EQUAL(section->main_style, &section_main_line_style);
+
     lv_scale_section_set_style(section, LV_PART_INDICATOR, &section_label_style);
     TEST_ASSERT_NOT_NULL(section->main_style);
     TEST_ASSERT_NOT_NULL(section->indicator_style);
     TEST_ASSERT_NULL(section->items_style);
 
+    TEST_ASSERT_EQUAL(section->main_style, &section_main_line_style);
+    TEST_ASSERT_EQUAL(section->indicator_style, &section_label_style);
+
     lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
     TEST_ASSERT_NOT_NULL(section->main_style);
     TEST_ASSERT_NOT_NULL(section->indicator_style);
     TEST_ASSERT_NOT_NULL(section->items_style);
+
+    TEST_ASSERT_EQUAL(section->main_style, &section_main_line_style);
+    TEST_ASSERT_EQUAL(section->indicator_style, &section_label_style);
+    TEST_ASSERT_EQUAL(section->items_style, &section_minor_tick_style);
 }
 
 /* The scale internally counts the number of custom labels until it finds the NULL sentinel */
