@@ -287,6 +287,7 @@ void lv_rb_destroy(lv_rb_t * tree)
             node = parent;
         }
     }
+    tree->root = NULL;
 }
 
 lv_rb_node_t * lv_rb_minimum(lv_rb_t * tree)

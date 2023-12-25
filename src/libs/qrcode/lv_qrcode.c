@@ -221,7 +221,9 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     if(draw_buf == NULL) return;
+    lv_image_cache_drop(draw_buf);
 
+    /*@fixme destroy buffer in cache free_cb.*/
     lv_draw_buf_destroy(draw_buf);
 }
 

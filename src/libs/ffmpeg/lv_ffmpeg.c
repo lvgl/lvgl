@@ -800,9 +800,7 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
         return;
     }
 
-    lv_cache_lock();
-    lv_cache_invalidate_by_src(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_POINTER);
-    lv_cache_unlock();
+    lv_image_cache_drop(lv_image_get_src(obj));
 
     lv_obj_invalidate(obj);
 }
@@ -839,9 +837,7 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
         player->timer = NULL;
     }
 
-    lv_cache_lock();
-    lv_cache_invalidate_by_src(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_POINTER);
-    lv_cache_unlock();
+    lv_image_cache_drop(lv_image_get_src(obj));
 
     ffmpeg_close(player->ffmpeg_ctx);
     player->ffmpeg_ctx = NULL;

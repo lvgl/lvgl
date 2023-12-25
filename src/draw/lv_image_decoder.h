@@ -20,6 +20,7 @@ extern "C" {
 #include "../misc/lv_fs.h"
 #include "../misc/lv_types.h"
 #include "../misc/lv_area.h"
+#include "../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES
@@ -111,9 +112,21 @@ typedef struct _lv_image_decoder_t {
     lv_image_decoder_open_f_t open_cb;
     lv_image_decoder_get_area_cb_t get_area_cb;
     lv_image_decoder_close_f_t close_cb;
-    uint32_t cache_data_type;
+
+    lv_cache_free_cb_t cache_free_cb;
     void * user_data;
 } lv_image_decoder_t;
+
+typedef struct _lv_image_decoder_cache_data_t {
+    lv_cache_slot_size_t slot;
+
+    const void * src;
+    lv_image_src_t src_type;
+
+    const lv_draw_buf_t * decoded;
+    const lv_image_decoder_t * decoder;
+    void * user_data;
+} lv_image_cache_data_t;
 
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_image_decoder_dsc_t {
@@ -149,8 +162,10 @@ typedef struct _lv_image_decoder_dsc_t {
      * Can be set in `open` function or set NULL.*/
     const char * error_msg;
 
+    lv_cache_t * cache;
+
     /**Point to cache entry information*/
-    struct _lv_cache_entry_t * cache_entry;
+    lv_cache_entry_t * cache_entry;
 
     /**Store any custom data here is required*/
     void * user_data;
@@ -267,6 +282,14 @@ void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_dec
  * @param close_cb a function to close a decoding session
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
+
+void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb);
+
+#if LV_CACHE_DEF_SIZE > 0
+lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
+                                                 lv_image_cache_data_t * search_key,
+                                                 const lv_draw_buf_t * decoded, void * user_data);
+#endif
 
 /**
  * Check the decoded image, make any modification if decoder `args` requires.
