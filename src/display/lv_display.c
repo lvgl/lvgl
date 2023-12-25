@@ -107,6 +107,13 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     else {
         disp->theme = lv_theme_default_get();
     }
+#elif LV_USE_THEME_SIMPLE
+    if(lv_theme_simple_is_inited() == false) {
+        disp->theme = lv_theme_simple_init(disp);
+    }
+    else {
+        disp->theme = lv_theme_simple_get();
+    }
 #endif
 
     disp->bottom_layer = lv_obj_create(NULL); /*Create bottom layer on the display*/
@@ -415,6 +422,8 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
 
     disp->color_format = color_format;
     disp->layer_head->color_format = color_format;
+
+    lv_display_send_event(disp, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
 }
 
 lv_color_format_t lv_display_get_color_format(lv_display_t * disp)
@@ -534,7 +543,6 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
     /*If another screen load animation is in progress
      *make target screen loaded immediately. */
     if(d->scr_to_load && act_scr != d->scr_to_load) {
-        scr_load_internal(d->scr_to_load);
         lv_anim_delete(d->scr_to_load, NULL);
         lv_obj_set_pos(d->scr_to_load, 0, 0);
         lv_obj_remove_local_style_prop(d->scr_to_load, LV_STYLE_OPA, 0);
@@ -543,6 +551,8 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
             lv_obj_delete(act_scr);
         }
         act_scr = lv_screen_active(); /*Active screen changed.*/
+
+        scr_load_internal(d->scr_to_load);
     }
 
     d->scr_to_load = new_scr;

@@ -333,27 +333,27 @@ void lv_menu_set_sidebar_page(lv_obj_t * obj, lv_obj_t * page)
     lv_menu_refr(obj);
 }
 
-void lv_menu_set_mode_header(lv_obj_t * obj, lv_menu_mode_header_t mode_header)
+void lv_menu_set_mode_header(lv_obj_t * obj, lv_menu_mode_header_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_menu_t * menu = (lv_menu_t *)obj;
 
-    if(menu->mode_header != mode_header) {
-        menu->mode_header = mode_header;
+    if(menu->mode_header != mode) {
+        menu->mode_header = mode;
         lv_menu_refr_main_header_mode(obj);
         if(menu->sidebar_generated) lv_menu_refr_sidebar_header_mode(obj);
     }
 }
 
-void lv_menu_set_mode_root_back_button(lv_obj_t * obj, lv_menu_mode_root_back_button_t mode_root_back_btn)
+void lv_menu_set_mode_root_back_button(lv_obj_t * obj, lv_menu_mode_root_back_button_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_menu_t * menu = (lv_menu_t *)obj;
 
-    if(menu->mode_root_back_btn != mode_root_back_btn) {
-        menu->mode_root_back_btn = mode_root_back_btn;
+    if(menu->mode_root_back_btn != mode) {
+        menu->mode_root_back_btn = mode;
         lv_menu_refr(obj);
     }
 }

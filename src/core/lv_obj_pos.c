@@ -1033,7 +1033,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
         }
     }
 
-    if(obj->spec_attr) obj->spec_attr->scroll.x = scroll_x_tmp;
+    if(obj->spec_attr) obj->spec_attr->scroll.x = -scroll_x_tmp;
 
     if(child_res == LV_COORD_MIN) return self_w;
     return LV_MAX(child_res, self_w);
@@ -1085,7 +1085,7 @@ static int32_t calc_content_height(lv_obj_t * obj)
         child_res = LV_MAX(child_res, child_res_tmp + lv_obj_get_style_margin_bottom(child, LV_PART_MAIN));
     }
 
-    if(obj->spec_attr) obj->spec_attr->scroll.y = scroll_y_tmp;
+    if(obj->spec_attr) obj->spec_attr->scroll.y = -scroll_y_tmp;
 
     if(child_res == LV_COORD_MIN) return self_h;
     return LV_MAX(self_h, child_res + space_bottom);

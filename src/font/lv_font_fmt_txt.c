@@ -160,15 +160,6 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
     return NULL;
 }
 
-/**
- * Used as `get_glyph_dsc` callback in lvgl's native font format if the font is uncompressed.
- * @param font pointer to font
- * @param dsc_out store the result descriptor here
- * @param unicode_letter a UNICODE letter code
- * @param unicode_letter_next the unicode letter succeeding the letter under test
- * @return true: descriptor is successfully loaded into `dsc_out`.
- *         false: the letter was not found, no data is loaded to `dsc_out`
- */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next)
 {
@@ -344,6 +335,7 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
 }
 
 #if LV_USE_FONT_COMPRESSED
+
 /**
  * The compress a glyph's bitmap
  * @param in the compressed bitmap

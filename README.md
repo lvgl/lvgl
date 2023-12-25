@@ -128,12 +128,12 @@ For more examples check out the [Examples](https://github.com/lvgl/lvgl/tree/mas
 
 ```c
 /*Change the active screen's background color*/
-lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x003a57), LV_PART_MAIN);
+lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
 
 /*Create a white label, set its text and align it to the center*/
-lv_obj_t * label = lv_label_create(lv_scr_act());
+lv_obj_t * label = lv_label_create(lv_screen_active());
 lv_label_set_text(label, "Hello world");
-lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
+lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
 lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 ```
 </details>
@@ -143,11 +143,11 @@ lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
 
 ```python
 # Change the active screen's background color
-scr = lv.scr_act()
+scr = lv.screen_active()
 scr.set_style_bg_color(lv.color_hex(0x003a57), lv.PART.MAIN)
 
 # Create a white label, set its text and align it to the center
-label = lv.label(lv.scr_act())
+label = lv.label(lv.screen_active())
 label.set_text("Hello world")
 label.set_style_text_color(lv.color_hex(0xffffff), lv.PART.MAIN)
 label.align(lv.ALIGN.CENTER, 0, 0)
@@ -163,17 +163,17 @@ label.align(lv.ALIGN.CENTER, 0, 0)
   <summary>C code</summary>
 
 ```c
-lv_obj_t * btn = lv_btn_create(lv_scr_act());                   /*Add a button to the current screen*/
-lv_obj_center(btn);                                             /*Set its position*/
-lv_obj_set_size(btn, 100, 50);                                  /*Set its size*/
-lv_obj_add_event(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
+lv_obj_t * button = lv_button_create(lv_screen_active());                   /*Add a button to the current screen*/
+lv_obj_center(button);                                             /*Set its position*/
+lv_obj_set_size(button, 100, 50);                                  /*Set its size*/
+lv_obj_add_event_cb(button, button_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
 
-lv_obj_t * label = lv_label_create(btn);                        /*Add a label to the button*/
+lv_obj_t * label = lv_label_create(button);                        /*Add a label to the button*/
 lv_label_set_text(label, "Button");                             /*Set the labels text*/
 lv_obj_center(label);                                           /*Align the label to the center*/
 ...
 
-void btn_event_cb(lv_event_t * e)
+void button_event_cb(lv_event_t * e)
 {
   printf("Clicked\n");
 }
@@ -184,16 +184,16 @@ void btn_event_cb(lv_event_t * e)
   <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=926bde43ec7af0146c486de470c53f11f167491e" target="_blank">Online Simulator</a></summary>
 
 ```python
-def btn_event_cb(e):
+def button_event_cb(e):
   print("Clicked")
 
 # Create a Button and a Label
-btn = lv.btn(lv.scr_act())
-btn.center()
-btn.set_size(100, 50)
-btn.add_event(btn_event_cb, lv.EVENT.CLICKED, None)
+button = lv.button(lv.screen_active())
+button.center()
+button.set_size(100, 50)
+button.add_event_cb(button_event_cb, lv.EVENT.CLICKED, None)
 
-label = lv.label(btn)
+label = lv.label(button)
 label.set_text("Button")
 label.center()
 ```
@@ -208,28 +208,28 @@ label.center()
 
 ```c
 
-lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
-lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
+lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
 
 lv_obj_t * cb;
-cb = lv_checkbox_create(lv_scr_act());
+cb = lv_checkbox_create(lv_screen_active());
 lv_checkbox_set_text(cb, "Apple");
-lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
-cb = lv_checkbox_create(lv_scr_act());
+cb = lv_checkbox_create(lv_screen_active());
 lv_checkbox_set_text(cb, "Banana");
 lv_obj_add_state(cb, LV_STATE_CHECKED);
-lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
-cb = lv_checkbox_create(lv_scr_act());
+cb = lv_checkbox_create(lv_screen_active());
 lv_checkbox_set_text(cb, "Lemon");
 lv_obj_add_state(cb, LV_STATE_DISABLED);
-lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 
-cb = lv_checkbox_create(lv_scr_act());
+cb = lv_checkbox_create(lv_screen_active());
 lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "Melon\nand a new line");
-lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 ```
 
 </details>
@@ -250,27 +250,27 @@ def event_handler(e):
         print(txt + ":" + state)
 
 
-lv.scr_act().set_flex_flow(lv.FLEX_FLOW.COLUMN)
-lv.scr_act().set_flex_align(lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.START, lv.FLEX_ALIGN.CENTER)
+lv.screen_active().set_flex_flow(lv.FLEX_FLOW.COLUMN)
+lv.screen_active().set_flex_align(lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.START, lv.FLEX_ALIGN.CENTER)
 
-cb = lv.checkbox(lv.scr_act())
+cb = lv.checkbox(lv.screen_active())
 cb.set_text("Apple")
-cb.add_event(event_handler, lv.EVENT.ALL, None)
+cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
-cb = lv.checkbox(lv.scr_act())
+cb = lv.checkbox(lv.screen_active())
 cb.set_text("Banana")
 cb.add_state(lv.STATE.CHECKED)
-cb.add_event(event_handler, lv.EVENT.ALL, None)
+cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
-cb = lv.checkbox(lv.scr_act())
+cb = lv.checkbox(lv.screen_active())
 cb.set_text("Lemon")
 cb.add_state(lv.STATE.DISABLED)
-cb.add_event(event_handler, lv.EVENT.ALL, None)
+cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
 
-cb = lv.checkbox(lv.scr_act())
+cb = lv.checkbox(lv.screen_active())
 cb.add_state(lv.STATE.CHECKED | lv.STATE.DISABLED)
 cb.set_text("Melon")
-cb.add_event(event_handler, lv.EVENT.ALL, None)
+cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
 ```
 
 </details>
@@ -284,7 +284,7 @@ cb.add_event(event_handler, lv.EVENT.ALL, None)
   <summary>C code</summary>
 
 ```c
-lv_obj_t * slider = lv_slider_create(lv_scr_act());
+lv_obj_t * slider = lv_slider_create(lv_screen_active());
 lv_slider_set_value(slider, 70, LV_ANIM_OFF);
 lv_obj_set_size(slider, 300, 20);
 lv_obj_center(slider);
@@ -328,7 +328,7 @@ lv_obj_set_style_shadow_spread(slider, 2, LV_PART_KNOB);
 
 ```python
 # Create a slider and add the style
-slider = lv.slider(lv.scr_act())
+slider = lv.slider(lv.screen_active())
 slider.set_value(70, lv.ANIM.OFF)
 slider.set_size(300, 20)
 slider.center()
@@ -371,20 +371,20 @@ slider.set_style_shadow_spread(2, lv.PART.KNOB)
   <summary>C code</summary>
 
 ```c
-lv_obj_t * ltr_label = lv_label_create(lv_scr_act());
+lv_obj_t * ltr_label = lv_label_create(lv_screen_active());
 lv_label_set_text(ltr_label, "In modern terminology, a microcontroller is similar to a system on a chip (SoC).");
 lv_obj_set_style_text_font(ltr_label, &lv_font_montserrat_16, 0);
 lv_obj_set_width(ltr_label, 310);
 lv_obj_align(ltr_label, LV_ALIGN_TOP_LEFT, 5, 5);
 
-lv_obj_t * rtl_label = lv_label_create(lv_scr_act());
+lv_obj_t * rtl_label = lv_label_create(lv_screen_active());
 lv_label_set_text(rtl_label,"מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).");
 lv_obj_set_style_base_dir(rtl_label, LV_BASE_DIR_RTL, 0);
 lv_obj_set_style_text_font(rtl_label, &lv_font_dejavu_16_persian_hebrew, 0);
 lv_obj_set_width(rtl_label, 310);
 lv_obj_align(rtl_label, LV_ALIGN_LEFT_MID, 5, 0);
 
-lv_obj_t * cz_label = lv_label_create(lv_scr_act());
+lv_obj_t * cz_label = lv_label_create(lv_screen_active());
 lv_label_set_text(cz_label,
                   "嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。");
 lv_obj_set_style_text_font(cz_label, &lv_font_simsun_16_cjk, 0);
@@ -398,14 +398,14 @@ lv_obj_align(cz_label, LV_ALIGN_BOTTOM_LEFT, 5, -5);
   <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=18bb38200a64e10ead1aa17a65c977fc18131842" target="_blank">Online Simulator</a></summary>
 
 ```python
-ltr_label = lv.label(lv.scr_act())
+ltr_label = lv.label(lv.screen_active())
 ltr_label.set_text("In modern terminology, a microcontroller is similar to a system on a chip (SoC).")
 ltr_label.set_style_text_font(lv.font_montserrat_16, 0);
 
 ltr_label.set_width(310)
 ltr_label.align(lv.ALIGN.TOP_LEFT, 5, 5)
 
-rtl_label = lv.label(lv.scr_act())
+rtl_label = lv.label(lv.screen_active())
 rtl_label.set_text("מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).")
 rtl_label.set_style_base_dir(lv.BASE_DIR.RTL, 0)
 rtl_label.set_style_text_font(lv.font_dejavu_16_persian_hebrew, 0)
@@ -414,7 +414,7 @@ rtl_label.align(lv.ALIGN.LEFT_MID, 5, 0)
 
 font_simsun_16_cjk = lv.font_load("S:../../assets/font/lv_font_simsun_16_cjk.fnt")
 
-cz_label = lv.label(lv.scr_act())
+cz_label = lv.label(lv.screen_active())
 cz_label.set_style_text_font(font_simsun_16_cjk, 0)
 cz_label.set_text("嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。")
 cz_label.set_width(310)

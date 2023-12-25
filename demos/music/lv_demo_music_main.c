@@ -354,7 +354,7 @@ void _lv_demo_music_resume(void)
     lv_anim_set_exec_cb(&a, spectrum_anim_cb);
     lv_anim_set_var(&a, spectrum_obj);
     lv_anim_set_duration(&a, ((spectrum_len - spectrum_i) * 1000) / 30);
-    lv_anim_set_playback_time(&a, 0);
+    lv_anim_set_playback_duration(&a, 0);
     lv_anim_set_ready_cb(&a, spectrum_end_cb);
     lv_anim_start(&a);
 
@@ -587,9 +587,9 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     lv_obj_set_grid_cell(icon, LV_GRID_ALIGN_CENTER, 2, 1, LV_GRID_ALIGN_CENTER, 0, 1);
     lv_obj_add_event_cb(icon, prev_click_event_cb, LV_EVENT_CLICKED, NULL);
 
-    play_obj = lv_imgbtn_create(cont);
-    lv_imgbtn_set_src(play_obj, LV_IMGBTN_STATE_RELEASED, NULL, &img_lv_demo_music_btn_play, NULL);
-    lv_imgbtn_set_src(play_obj, LV_IMGBTN_STATE_CHECKED_RELEASED, NULL, &img_lv_demo_music_btn_pause, NULL);
+    play_obj = lv_imagebutton_create(cont);
+    lv_imagebutton_set_src(play_obj, LV_IMAGEBUTTON_STATE_RELEASED, NULL, &img_lv_demo_music_btn_play, NULL);
+    lv_imagebutton_set_src(play_obj, LV_IMAGEBUTTON_STATE_CHECKED_RELEASED, NULL, &img_lv_demo_music_btn_pause, NULL);
     lv_obj_add_flag(play_obj, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_set_grid_cell(play_obj, LV_GRID_ALIGN_CENTER, 3, 1, LV_GRID_ALIGN_CENTER, 0, 1);
 

@@ -18,8 +18,8 @@ extern "C" {
 #if LV_USE_ANIMIMG != 0
 
 /*Testing of dependencies*/
-#if LV_USE_IMG == 0
-#error "lv_animimg: lv_img is required. Enable it in lv_conf.h (LV_USE_IMG 1)"
+#if LV_USE_IMAGE == 0
+#error "lv_animimg: lv_img is required. Enable it in lv_conf.h (LV_USE_IMAGE 1)"
 #endif
 
 /*********************
@@ -32,7 +32,7 @@ extern "C" {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_animimg_class;
 
-/*Data of image*/
+/*Data of the animimage*/
 typedef struct {
     lv_image_t img;
     lv_anim_t anim;
@@ -69,29 +69,29 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent);
 
 /**
  * Set the image animation images source.
- * @param img pointer to an animation image object
- * @param dsc pointer to a series images
- * @param num images' number
+ * @param img   pointer to an animation image object
+ * @param dsc   pointer to a series images
+ * @param num   images' number
  */
 void lv_animimg_set_src(lv_obj_t * img, const void * dsc[], size_t num);
 
 /**
  * Startup the image animation.
- * @param obj pointer to an animation image object
+ * @param obj   pointer to an animation image object
  */
 void lv_animimg_start(lv_obj_t * obj);
 
 /**
  * Set the image animation duration time. unit:ms
- * @param img pointer to an animation image object
- * @param duration the duration
+ * @param img       pointer to an animation image object
+ * @param duration  the duration in milliseconds
  */
 void lv_animimg_set_duration(lv_obj_t * img, uint32_t duration);
 
 /**
  * Set the image animation repeatedly play times.
- * @param img pointer to an animation image object
- * @param count the number of times to repeat the animation
+ * @param img       pointer to an animation image object
+ * @param count     the number of times to repeat the animation
  */
 void lv_animimg_set_repeat_count(lv_obj_t * img, uint32_t count);
 
@@ -101,29 +101,29 @@ void lv_animimg_set_repeat_count(lv_obj_t * img, uint32_t count);
 
 /**
  * Get the image animation images source.
- * @param img pointer to an animation image object
- * @return a pointer that will point to a series images
+ * @param img   pointer to an animation image object
+ * @return a    pointer that will point to a series images
  */
 const void ** lv_animimg_get_src(lv_obj_t * img);
 
 /**
  * Get the image animation images source.
- * @param img pointer to an animation image object
- * @return the number of source images
+ * @param img   pointer to an animation image object
+ * @return      the number of source images
  */
 uint8_t lv_animimg_get_src_count(lv_obj_t * img);
 
 /**
  * Get the image animation duration time. unit:ms
- * @param img pointer to an animation image object
- * @return the animation duration time
+ * @param img   pointer to an animation image object
+ * @return      the animation duration time
  */
 uint32_t lv_animimg_get_duration(lv_obj_t * img);
 
 /**
  * Get the image animation repeat play times.
- * @param img pointer to an animation image object
- * @return the repeat count
+ * @param img   pointer to an animation image object
+ * @return      the repeat count
  */
 uint32_t lv_animimg_get_repeat_count(lv_obj_t * img);
 

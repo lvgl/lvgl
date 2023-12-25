@@ -887,15 +887,15 @@ menu "LVGL configuration"
 		config LV_USE_BAR
 			bool "Bar."
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_BTN
+		config LV_USE_BUTTON
 			bool "Button."
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_BTNMATRIX
+		config LV_USE_BUTTONMATRIX
 			bool "Button matrix."
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_CANVAS
 			bool "Canvas. Dependencies: lv_img."
-			select LV_USE_IMG
+			select LV_USE_IMAGE
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_CHECKBOX
 			bool "Check Box"
@@ -904,7 +904,7 @@ menu "LVGL configuration"
 			bool "Drop down list. Requires: lv_label."
 			select LV_USE_LABEL
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_IMG
+		config LV_USE_IMAGE
 			bool "Image. Requires: lv_label."
 			select LV_USE_LABEL
 			default y if !LV_CONF_MINIMAL
@@ -958,7 +958,7 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "Extra Widgets"
-		config LV_USE_ANIMIMG
+		config LV_USE_ANIMIMAGE
 			bool "Anim image."
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_CALENDAR
@@ -978,7 +978,7 @@ menu "LVGL configuration"
 		config LV_USE_CHART
 			bool "Chart."
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_IMGBTN
+		config LV_USE_IMAGEBUTTON
 			bool "Imgbtn."
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_OBSERVER
@@ -1041,7 +1041,7 @@ menu "LVGL configuration"
 			int "Default transition time in [ms]"
 			default 80
 			depends on LV_USE_THEME_DEFAULT
-		config LV_USE_THEME_BASIC
+		config LV_USE_THEME_SIMPLE
 			bool "A very simple theme that is a good starting point for a custom theme"
 			default y if !LV_COLOR_DEPTH_1 && !LV_CONF_MINIMAL
 		config LV_USE_THEME_MONO

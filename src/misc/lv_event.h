@@ -98,6 +98,7 @@ typedef enum {
     /** Events of optional LVGL components*/
     LV_EVENT_INVALIDATE_AREA,
     LV_EVENT_RESOLUTION_CHANGED,
+    LV_EVENT_COLOR_FORMAT_CHANGED,
     LV_EVENT_REFR_REQUEST,
     LV_EVENT_REFR_START,
     LV_EVENT_REFR_READY,
@@ -105,6 +106,8 @@ typedef enum {
     LV_EVENT_RENDER_READY,
     LV_EVENT_FLUSH_START,
     LV_EVENT_FLUSH_FINISH,
+
+    LV_EVENT_VSYNC,
 
     _LV_EVENT_LAST,               /** Number of default events*/
 

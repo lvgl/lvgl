@@ -47,6 +47,11 @@ typedef enum {
     LV_INDEV_STATE_PRESSED
 } lv_indev_state_t;
 
+typedef enum {
+    LV_INDEV_MODE_TIMER = 0,
+    LV_INDEV_MODE_EVENT = 1
+} lv_indev_mode_t;
+
 /** Data structure passed to an input driver to fill*/
 typedef struct {
     lv_point_t point; /**< For LV_INDEV_TYPE_POINTER the currently pressed point*/
@@ -242,11 +247,11 @@ struct _lv_obj_t * lv_indev_get_active_obj(void);
 lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev);
 
 /**
- * Delete the read timer associates to indev. This is typically used when
- * indev works in event driven mode instead of polling mode.
- * @param indev pointer to an input device
- */
-void lv_indev_delete_read_timer(lv_indev_t * indev);
+* Set the input device's event model: event-driven mode or timer mode.
+* @param indev pointer to an input device
+* @param mode the mode of input device
+*/
+void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode);
 
 /**
  * Search the most top, clickable object by a point

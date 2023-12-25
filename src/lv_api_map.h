@@ -88,16 +88,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
     lv_obj_move_to_index(obj, 0);
 }
 
-static inline lv_cache_entry_t * lv_cache_find_unused(const void * src_ptr, lv_cache_src_type_t src_type,
-                                                      uint32_t param1, uint32_t param2)
-{
-    LV_UNUSED(src_ptr);
-    LV_UNUSED(src_type);
-    LV_UNUSED(param1);
-    LV_UNUSED(param2);
-    return NULL;
-}
-
 /**********************
  *      MACROS
  **********************/
@@ -245,16 +235,26 @@ static inline lv_cache_entry_t * lv_cache_find_unused(const void * src_ptr, lv_c
 
 #define lv_obj_get_child_cnt                lv_obj_get_child_count
 
-#define lv_obj_get_style_shadow_ofs_x       lv_obj_get_style_shadow_offset_x
-#define lv_obj_get_style_shadow_ofs_y       lv_obj_get_style_shadow_offset_y
-#define lv_obj_get_style_transform_zoom     lv_obj_get_style_transform_scale
-#define lv_obj_get_style_transform_angle    lv_obj_get_style_transform_rotation
+#define lv_obj_get_style_img_opa              lv_obj_get_style_image_opa
+#define lv_obj_get_style_img_recolor          lv_obj_get_style_image_recolor
+#define lv_obj_get_style_img_recolor_filtered lv_obj_get_style_image_recolor_filtered
+#define lv_obj_get_style_img_recolor_opa      lv_obj_get_style_image_recolor_opa
+#define lv_obj_get_style_shadow_ofs_x         lv_obj_get_style_shadow_offset_x
+#define lv_obj_get_style_shadow_ofs_y         lv_obj_get_style_shadow_offset_y
+#define lv_obj_get_style_transform_zoom       lv_obj_get_style_transform_scale
+#define lv_obj_get_style_transform_angle      lv_obj_get_style_transform_rotation
 
+#define lv_obj_set_style_img_opa            lv_obj_set_style_image_opa
+#define lv_obj_set_style_img_recolor        lv_obj_set_style_image_recolor
+#define lv_obj_set_style_img_recolor_opa    lv_obj_set_style_image_recolor_opa
 #define lv_obj_set_style_shadow_ofs_x       lv_obj_set_style_shadow_offset_x
 #define lv_obj_set_style_shadow_ofs_y       lv_obj_set_style_shadow_offset_y
 #define lv_obj_set_style_transform_zoom     lv_obj_set_style_transform_scale
 #define lv_obj_set_style_transform_angle    lv_obj_set_style_transform_rotation
 
+#define lv_style_set_img_opa                lv_style_set_image_opa
+#define lv_style_set_img_recolor            lv_style_set_image_recolor
+#define lv_style_set_img_recolor_opa        lv_style_set_image_recolor_opa
 #define lv_style_set_shadow_ofs_x           lv_style_set_shadow_offset_x
 #define lv_style_set_shadow_ofs_y           lv_style_set_shadow_offset_y
 #define lv_style_set_transform_angle        lv_style_set_transform_rotation
@@ -266,7 +266,6 @@ static inline lv_cache_entry_t * lv_cache_find_unused(const void * src_ptr, lv_c
 #define lv_image_decoder_built_in_close     lv_bin_decoder_close
 
 #define lv_obj_add_event                    lv_obj_add_event_cb
-#define lv_cache_find                       lv_cache_find_unused
 
 /**********************
  *      MACROS

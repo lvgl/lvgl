@@ -90,7 +90,7 @@ static void dave2d_draw_border_simple(lv_draw_dave2d_unit_t * u, const lv_area_t
                    (d2_s32)u->base_unit.target_layer->buf_stride / lv_color_format_get_size(u->base_unit.target_layer->color_format),
                    (d2_u32)lv_area_get_width(&buffer_area),
                    (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_cf_fb_get());
+                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(u->base_unit.target_layer->color_format));
 
     d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(color));
     d2_setalpha(u->d2_handle, opa);
@@ -184,7 +184,6 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
     inner_area = *orig_inner_area;
 
     if(!_lv_area_intersect(&draw_area, &outer_area, u->base_unit.clip_area)) return;
-    int32_t draw_area_w = lv_area_get_width(&draw_area);
 
 #if LV_USE_OS
     lv_result_t  status;
@@ -215,7 +214,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                    (d2_s32)u->base_unit.target_layer->buf_stride / lv_color_format_get_size(u->base_unit.target_layer->color_format),
                    (d2_u32)lv_area_get_width(&buffer_area),
                    (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_cf_fb_get());
+                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(u->base_unit.target_layer->color_format));
 
     d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(color));
     d2_setalpha(u->d2_handle, opa);
@@ -296,35 +295,60 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
 
     if(blend_w > 0) {
         if(left_side || top_side) {
-            result = d2_renderwedge(u->d2_handle,
-                                    (d2_point)D2_FIX4(core_area.x1),
-                                    (d2_point) D2_FIX4(core_area.y1),
-                                    (d2_width) D2_FIX4(rout),
-                                    (d2_width) D2_FIX4((rout - rin)),
-                                    (d2_s32) D2_FIX16(0), // 180 Degrees
-                                    (d2_s32)  D2_FIX16((int16_t) -1),
-                                    (d2_s32)  D2_FIX16((int16_t) -1),//( 270 Degrees
-                                    (d2_s32) D2_FIX16(0),
-                                    flags);
-            if(D2_OK != result) {
-                __BKPT(0);
+            lv_area_t arc_area;
+            lv_area_t clip_arc;
+
+            arc_area.x1 = core_area.x1 - rout;
+            arc_area.y1 = core_area.y1 - rout;
+            arc_area.x2 = core_area.x1;
+            arc_area.y2 = core_area.y1;
+
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+                d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
+                            (d2_border)clip_arc.y2);
+                result = d2_renderwedge(u->d2_handle,
+                                        (d2_point)D2_FIX4(core_area.x1),
+                                        (d2_point) D2_FIX4(core_area.y1),
+                                        (d2_width) D2_FIX4(rout),
+                                        (d2_width) D2_FIX4((rout - rin)),
+                                        (d2_s32) D2_FIX16(0), // 180 Degrees
+                                        (d2_s32)  D2_FIX16((int16_t) -1),
+                                        (d2_s32)  D2_FIX16((int16_t) -1),//( 270 Degrees
+                                        (d2_s32) D2_FIX16(0),
+                                        flags);
+                if(D2_OK != result) {
+                    __BKPT(0);
+                }
             }
 
         }
 
         if(left_side || bottom_side) {
-            result = d2_renderwedge(u->d2_handle,
-                                    (d2_point)D2_FIX4(core_area.x1),
-                                    (d2_point) D2_FIX4(core_area.y2),
-                                    (d2_width) D2_FIX4(rout),
-                                    (d2_width) D2_FIX4((rout - rin)),
-                                    (d2_s32) D2_FIX16((int16_t) -1), //90 degrees
-                                    (d2_s32)  D2_FIX16(0),
-                                    (d2_s32)  D2_FIX16(0), //180 degrees
-                                    (d2_s32) D2_FIX16(1),
-                                    flags);
-            if(D2_OK != result) {
-                __BKPT(0);
+            lv_area_t arc_area;
+            lv_area_t clip_arc;
+
+            arc_area.x1 = core_area.x1 - rout;
+            arc_area.y1 = core_area.y2;
+            arc_area.x2 = core_area.x1;
+            arc_area.y2 = core_area.y2 + rout;
+
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+
+                d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
+                            (d2_border)clip_arc.y2);
+                result = d2_renderwedge(u->d2_handle,
+                                        (d2_point)D2_FIX4(core_area.x1),
+                                        (d2_point) D2_FIX4(core_area.y2),
+                                        (d2_width) D2_FIX4(rout),
+                                        (d2_width) D2_FIX4((rout - rin)),
+                                        (d2_s32) D2_FIX16((int16_t) -1), //90 degrees
+                                        (d2_s32)  D2_FIX16(0),
+                                        (d2_s32)  D2_FIX16(0), //180 degrees
+                                        (d2_s32) D2_FIX16(1),
+                                        flags);
+                if(D2_OK != result) {
+                    __BKPT(0);
+                }
             }
         }
 
@@ -337,35 +361,62 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
 
         if(blend_w > 0) {
             if(right_side || top_side) {
-                result = d2_renderwedge(u->d2_handle,
-                                        (d2_point)D2_FIX4(core_area.x2),
-                                        (d2_point) D2_FIX4(core_area.y1),
-                                        (d2_width) D2_FIX4(rout),
-                                        (d2_width) D2_FIX4((rout - rin)),
-                                        (d2_s32) D2_FIX16((int16_t)1), // 270 Degrees
-                                        (d2_s32)  D2_FIX16(0),
-                                        (d2_s32)  D2_FIX16(0),// 0 degrees
-                                        (d2_s32) D2_FIX16(-1),
-                                        flags);
-                if(D2_OK != result) {
-                    __BKPT(0);
+
+                lv_area_t arc_area;
+                lv_area_t clip_arc;
+
+                arc_area.x1 = core_area.x2;
+                arc_area.y1 = core_area.y1 - rout;
+                arc_area.x2 = core_area.x2 + rout;
+                arc_area.y2 = core_area.y1;
+
+                if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+
+                    d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
+                                (d2_border)clip_arc.y2);
+                    result = d2_renderwedge(u->d2_handle,
+                                            (d2_point)D2_FIX4(core_area.x2),
+                                            (d2_point) D2_FIX4(core_area.y1),
+                                            (d2_width) D2_FIX4(rout),
+                                            (d2_width) D2_FIX4((rout - rin)),
+                                            (d2_s32) D2_FIX16((int16_t)1), // 270 Degrees
+                                            (d2_s32)  D2_FIX16(0),
+                                            (d2_s32)  D2_FIX16(0),// 0 degrees
+                                            (d2_s32) D2_FIX16(-1),
+                                            flags);
+                    if(D2_OK != result) {
+                        __BKPT(0);
+                    }
                 }
 
             }
 
             if(right_side || bottom_side) {
-                result = d2_renderwedge(u->d2_handle,
-                                        (d2_point)D2_FIX4(core_area.x2),
-                                        (d2_point) D2_FIX4(core_area.y2),
-                                        (d2_width) D2_FIX4(rout),
-                                        (d2_width) D2_FIX4((rout - rin)),
-                                        (d2_s32) D2_FIX16(0),// 0 degrees
-                                        (d2_s32)  D2_FIX16(1),
-                                        (d2_s32)  D2_FIX16(1),// 90 degrees
-                                        (d2_s32) D2_FIX16(0),
-                                        flags);
-                if(D2_OK != result) {
-                    __BKPT(0);
+                lv_area_t arc_area;
+                lv_area_t clip_arc;
+
+                arc_area.x1 = core_area.x2;
+                arc_area.y1 = core_area.y2;
+                arc_area.x2 = core_area.x2 + rout;
+                arc_area.y2 = core_area.y2 + rout;
+
+                if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+
+                    d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
+                                (d2_border)clip_arc.y2);
+                    result = d2_renderwedge(u->d2_handle,
+                                            (d2_point)D2_FIX4(core_area.x2),
+                                            (d2_point) D2_FIX4(core_area.y2),
+                                            (d2_width) D2_FIX4(rout),
+                                            (d2_width) D2_FIX4((rout - rin)),
+                                            (d2_s32) D2_FIX16(0),// 0 degrees
+                                            (d2_s32)  D2_FIX16(1),
+                                            (d2_s32)  D2_FIX16(1),// 90 degrees
+                                            (d2_s32) D2_FIX16(0),
+                                            flags);
+                    if(D2_OK != result) {
+                        __BKPT(0);
+                    }
                 }
             }
         }

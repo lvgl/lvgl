@@ -34,6 +34,7 @@ struct _lv_indev_t {
     lv_indev_read_cb_t read_cb;
 
     lv_indev_state_t state; /**< Current state of the input device.*/
+    lv_indev_mode_t mode;
 
     /*Flags*/
     uint8_t long_pr_sent : 1;

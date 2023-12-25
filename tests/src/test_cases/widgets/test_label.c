@@ -522,7 +522,7 @@ void test_label_get_letter_on_left(void)
     const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
     lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
 
-    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point);
+    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point, true);
 
     TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
 }
@@ -535,7 +535,7 @@ void test_label_get_letter_on_center(void)
     const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
     lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
 
-    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point);
+    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point, true);
 
     TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
 }
@@ -548,7 +548,7 @@ void test_label_get_letter_on_right(void)
     const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
     lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
 
-    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point);
+    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point, true);
 
     TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
 }
@@ -566,6 +566,30 @@ void test_label_text_selection(void)
 
     TEST_ASSERT_EQUAL(selection_start, start);
     TEST_ASSERT_EQUAL(selection_end, end);
+}
+
+void test_label_rtl_dot_long_mode(void)
+{
+    const char * message =
+        "מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).";
+
+    lv_obj_t * screen = lv_obj_create(lv_scr_act());
+    lv_obj_remove_style_all(screen);
+    lv_obj_set_size(screen, 800, 480);
+    lv_obj_center(screen);
+    lv_obj_set_style_bg_color(screen, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(screen, LV_OPA_100, 0);
+    lv_obj_set_style_pad_all(screen, 0, 0);
+
+    lv_obj_t * test_label = lv_label_create(screen);
+    lv_obj_set_style_text_font(test_label, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_label_set_long_mode(test_label, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_base_dir(test_label, LV_BASE_DIR_RTL, 0);
+    lv_obj_set_size(test_label, 300, lv_font_dejavu_16_persian_hebrew.line_height);
+    lv_label_set_text(test_label, message);
+    lv_obj_center(test_label);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_rtl_dot_long_mode.png");
 }
 
 #endif

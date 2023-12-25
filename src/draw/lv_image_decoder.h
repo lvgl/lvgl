@@ -20,6 +20,7 @@ extern "C" {
 #include "../misc/lv_fs.h"
 #include "../misc/lv_types.h"
 #include "../misc/lv_area.h"
+#include "../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES
@@ -111,9 +112,21 @@ typedef struct _lv_image_decoder_t {
     lv_image_decoder_open_f_t open_cb;
     lv_image_decoder_get_area_cb_t get_area_cb;
     lv_image_decoder_close_f_t close_cb;
-    uint32_t cache_data_type;
+
+    lv_cache_free_cb_t cache_free_cb;
     void * user_data;
 } lv_image_decoder_t;
+
+typedef struct _lv_image_decoder_cache_data_t {
+    lv_cache_slot_size_t slot;
+
+    const void * src;
+    lv_image_src_t src_type;
+
+    const lv_draw_buf_t * decoded;
+    const lv_image_decoder_t * decoder;
+    void * user_data;
+} lv_image_cache_data_t;
 
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_image_decoder_dsc_t {
@@ -121,7 +134,7 @@ typedef struct _lv_image_decoder_dsc_t {
     lv_image_decoder_t * decoder;
 
     /*A copy of parameters of how this image is decoded*/
-    lv_image_decoder_args_t * args;
+    lv_image_decoder_args_t args;
 
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_image_dsc_t` variable*/
     const void * src;
@@ -149,8 +162,10 @@ typedef struct _lv_image_decoder_dsc_t {
      * Can be set in `open` function or set NULL.*/
     const char * error_msg;
 
+    lv_cache_t * cache;
+
     /**Point to cache entry information*/
-    struct _lv_cache_entry_t * cache_entry;
+    lv_cache_entry_t * cache_entry;
 
     /**Store any custom data here is required*/
     void * user_data;
@@ -198,7 +213,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_drv_register())`)
  *  2) Variable: Pointer to an `lv_image_dsc_t` variable
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
- * @param color The color of the image with `LV_IMAGE_CF_ALPHA_...`
+ * @param color The color of the image with `LV_COLOR_FORMAT_ALPHA_...`
  * @param args args about how the image should be opened.
  * @return LV_RESULT_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
@@ -267,6 +282,23 @@ void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_dec
  * @param close_cb a function to close a decoding session
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
+
+void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb);
+
+#if LV_CACHE_DEF_SIZE > 0
+lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
+                                                 lv_image_cache_data_t * search_key,
+                                                 const lv_draw_buf_t * decoded, void * user_data);
+#endif
+
+/**
+ * Check the decoded image, make any modification if decoder `args` requires.
+ * @note A new draw buf will be allocated if provided `decoded` is not modifiable or stride mismatch etc.
+ * @param dsc       pointer to a decoder descriptor
+ * @param decoded   pointer to a decoded image to post process to meet dsc->args requirement.
+ * @return          post processed draw buffer, when it differs with `decoded`, it's newly allocated.
+ */
+lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded);
 
 /**********************
  *      MACROS

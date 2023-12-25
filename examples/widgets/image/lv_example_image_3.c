@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_IMG && LV_BUILD_EXAMPLES
+#if LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
 static void set_angle(void * img, int32_t v)
 {
@@ -35,7 +35,7 @@ void lv_example_image_3(void)
 
     lv_anim_set_exec_cb(&a, set_zoom);
     lv_anim_set_values(&a, 128, 256);
-    lv_anim_set_playback_time(&a, 3000);
+    lv_anim_set_playback_duration(&a, 3000);
     lv_anim_start(&a);
 }
 

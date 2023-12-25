@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_BTNMATRIX != 0
+#if LV_USE_BUTTONMATRIX != 0
 
 #include "../../core/lv_obj.h"
 
@@ -111,7 +111,7 @@ void lv_buttonmatrix_set_ctrl_map(lv_obj_t * obj, const lv_buttonmatrix_ctrl_t c
 /**
  * Set the selected buttons
  * @param obj        pointer to button matrix object
- * @param btn_id         0 based index of the button to modify. (Not counting new lines)
+ * @param btn_id     0 based index of the button to modify. (Not counting new lines)
  */
 void lv_buttonmatrix_set_selected_button(lv_obj_t * obj, uint32_t btn_id);
 
@@ -213,7 +213,7 @@ bool lv_buttonmatrix_get_one_checked(const lv_obj_t * obj);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_BTNMATRIX*/
+#endif /*LV_USE_BUTTONMATRIX*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

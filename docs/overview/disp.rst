@@ -7,15 +7,12 @@ Displays
 Multiple display support
 ************************
 
-In LVGL you can have multiple displays, each with their own driver and
-objects. The only limitation is that every display needs to have the
-same color depth (as defined in :c:macro:`LV_COLOR_DEPTH`). If the displays are
-different in this regard the rendered image can be converted to the
-correct format in the drivers ``flush_cb``.
+In LVGL you can have multiple displays, each with their own driver,
+widgets and color depth.
 
-Creating more displays is easy: just initialize more display buffers and
-register another driver for every display. When you create the UI, use
-:cpp:expr:`lv_disp_set_default(disp)` to tell the library on which display to
+Creating more displays is easy: just use :cpp:func:`lv_display_create` and
+add set the buffer and the ``flush_cb``. When you create the UI, use
+:cpp:expr:`lv_display_set_default(disp)` to tell the library on which display to
 create objects.
 
 Why would you want multi-display support? Here are some examples:
@@ -38,7 +35,7 @@ hidden if you register only one display. By default, the last created
 :cpp:func:`lv_layer_sys`, :c:macro:`LV_HOR_RES` and :c:macro:`LV_VER_RES` are always applied
 on the most recently created (default) display. If you pass ``NULL`` as
 ``disp`` parameter to display related functions the default display will
-usually be used. E.g. :cpp:expr:`lv_disp_trig_activity(NULL)` will trigger a
+usually be used. E.g. :cpp:expr:`lv_display_trig_activity(NULL)` will trigger a
 user activity on the default display. (See below in `Inactivity <#Inactivity>`__).
 
 Mirror display
@@ -87,7 +84,7 @@ existing screen copied into the new screen.
 To load a screen, use :cpp:expr:`lv_screen_load(scr)`. To get the active screen,
 use :cpp:expr:`lv_screen_active()`. These functions work on the default display. If
 you want to specify which display to work on, use
-:cpp:expr:`lv_disp_get_screen_active(disp)` and :cpp:expr:`lv_disp_load_scr(disp, scr)`. A
+:cpp:expr:`lv_display_get_screen_active(disp)` and :cpp:expr:`lv_display_load_scr(disp, scr)`. A
 screen can be loaded with animations too. Read more
 `here <object.html#load-screens>`__.
 
@@ -120,7 +117,7 @@ UIs:
 - Set the screen's bg_opa to 0:
   :cpp:expr:`lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, 0)`
 - Set a color format with alpha channel. E.g.
-  :cpp:expr:`lv_disp_set_color_format(disp, LV_COLOR_FORMAT_NATIVE_ALPHA)`
+  :cpp:expr:`lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888)`
 
 Features of displays
 ********************
@@ -131,12 +128,12 @@ Inactivity
 A user's inactivity time is measured on each display. Every use of an
 `Input device </overview/indev>`__ (if `associated with the display </porting/indev#other-features>`__) counts as an activity. To
 get time elapsed since the last activity, use
-:cpp:expr:`lv_disp_get_inactive_time(disp)`. If ``NULL`` is passed, the lowest
+:cpp:expr:`lv_display_get_inactive_time(disp)`. If ``NULL`` is passed, the lowest
 inactivity time among all displays will be returned (**NULL isn't just
 the default display**).
 
 You can manually trigger an activity using
-:cpp:expr:`lv_disp_trig_activity(disp)`. If ``disp`` is ``NULL``, the default
+:cpp:expr:`lv_display_trig_activity(disp)`. If ``disp`` is ``NULL``, the default
 screen will be used (**and not all displays**).
 
 Background

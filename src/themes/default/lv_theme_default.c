@@ -593,7 +593,7 @@ static void style_init(struct _my_theme_t * theme)
 #if LV_USE_MSGBOX
     style_init_reset(&theme->styles.msgbox_backdrop_bg);
     lv_style_set_bg_color(&theme->styles.msgbox_backdrop_bg, lv_palette_main(LV_PALETTE_GREY));
-    lv_style_set_bg_opa(&theme->styles.msgbox_backdrop_bg, LV_OPA_100);
+    lv_style_set_bg_opa(&theme->styles.msgbox_backdrop_bg, LV_OPA_50);
 #endif
 #if LV_USE_KEYBOARD
     style_init_reset(&theme->styles.keyboard_button_bg);
@@ -805,7 +805,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
     }
-#if LV_USE_BTN
+#if LV_USE_BUTTON
     else if(lv_obj_check_type(obj, &lv_button_class)) {
 
 #if LV_USE_TABVIEW
@@ -849,7 +849,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_BTNMATRIX
+#if LV_USE_BUTTONMATRIX
     else if(lv_obj_check_type(obj, &lv_buttonmatrix_class)) {
 
 #if LV_USE_CALENDAR

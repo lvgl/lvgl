@@ -60,26 +60,42 @@ typedef struct _lv_draw_image_dsc_t {
     lv_draw_image_sup_t * sup;
 } lv_draw_image_dsc_t;
 
+/**
+ * PErform the actual rendering of a decoded image
+ * @param draw_unit         pointer to a draw unit
+ * @param draw_dsc          the draw descriptor of the image
+ * @param decoder_dsc       pointer to the decoded image's descriptor
+ * @param sup               supplementary data
+ * @param img_coords        the absolute coordinates of the image
+ * @param clipped_img_area  the absolute clip coordinates
+ */
+typedef void (*lv_draw_image_core_cb)(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                                      const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
+                                      const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
 struct _lv_layer_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Initialize an image draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
 void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc);
 
 /**
- * Draw an image
+ * Create an image draw task
  * @param layer         pointer to a layer
- * @param dsc           pointer to an initialized `lv_draw_image_dsc_t` variable
+ * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the image
  */
 void lv_draw_image(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**
- * Draw a layer on an other layer
+ * Create a draw task to blend a layer to an other layer
  * @param layer         pointer to a layer
- * @param dsc           pointer to an initialized `lv_draw_image_dsc_t` variable
+ * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the layer
  */
 void lv_draw_layer(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
@@ -93,6 +109,28 @@ void lv_draw_layer(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, 
  * @return type of the image source LV_IMAGE_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
  */
 lv_image_src_t lv_image_src_get_type(const void * src);
+
+/**
+ * Can be used by draw units to handle the decoding and
+ * prepare everything for the actual image rendering
+ * @param draw_unit     pointer to a draw unit
+ * @param draw_dsc      the draw descriptor of the image
+ * @param coords        the absolute coordinates of the image
+ * @param draw_core_cb  a callback to perform the actual rendering
+ */
+void _lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                                  const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb);
+
+/**
+ * Can be used by draw units for TILED images to handle the decoding and
+ * prepare everything for the actual image rendering
+ * @param draw_unit     pointer to a draw unit
+ * @param draw_dsc      the draw descriptor of the image
+ * @param coords        the absolute coordinates of the image
+ * @param draw_core_cb  a callback to perform the actual rendering
+ */
+void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                                 const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb);
 
 #ifdef __cplusplus
 } /*extern "C"*/

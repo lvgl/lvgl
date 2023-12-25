@@ -177,11 +177,6 @@ static const lv_buttonmatrix_ctrl_t * kb_ctrl[10] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create a Keyboard object
- * @param parent pointer to an object, it will be the parent of the new keyboard
- * @return pointer to the created keyboard
- */
 lv_obj_t * lv_keyboard_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
@@ -194,11 +189,6 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-/**
- * Assign a Text Area to the Keyboard. The pressed characters will be put there.
- * @param kb pointer to a Keyboard object
- * @param ta pointer to a Text Area object to write there
- */
 void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
 {
     if(ta) {
@@ -221,11 +211,6 @@ void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
     }
 }
 
-/**
- * Set a new a mode (text or number map)
- * @param kb pointer to a Keyboard object
- * @param mode the mode from 'lv_keyboard_mode_t'
- */
 void lv_keyboard_set_mode(lv_obj_t * obj, lv_keyboard_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -236,11 +221,6 @@ void lv_keyboard_set_mode(lv_obj_t * obj, lv_keyboard_mode_t mode)
     lv_keyboard_update_map(obj);
 }
 
-/**
- * Show the button title in a popover when pressed.
- * @param kb pointer to a Keyboard object
- * @param en whether "popovers" mode is enabled
- */
 void lv_keyboard_set_popovers(lv_obj_t * obj, bool en)
 {
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
@@ -253,13 +233,6 @@ void lv_keyboard_set_popovers(lv_obj_t * obj, bool en)
     lv_keyboard_update_ctrl_map(obj);
 }
 
-/**
- * Set a new map for the keyboard
- * @param kb pointer to a Keyboard object
- * @param mode keyboard map to alter 'lv_keyboard_mode_t'
- * @param map pointer to a string array to describe the map.
- *            See 'lv_buttonmatrix_set_map()' for more info.
- */
 void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * map[],
                          const lv_buttonmatrix_ctrl_t ctrl_map[])
 {
@@ -273,11 +246,6 @@ void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * m
  * Getter functions
  *====================*/
 
-/**
- * Assign a Text Area to the Keyboard. The pressed characters will be put there.
- * @param kb pointer to a Keyboard object
- * @return pointer to the assigned Text Area object
- */
 lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -285,11 +253,6 @@ lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * obj)
     return keyboard->ta;
 }
 
-/**
- * Set a new a mode (text or number map)
- * @param kb pointer to a Keyboard object
- * @return the current mode from 'lv_keyboard_mode_t'
- */
 lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -297,11 +260,6 @@ lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
     return keyboard->mode;
 }
 
-/**
- * Tell whether "popovers" mode is enabled or not.
- * @param kb pointer to a Keyboard object
- * @return true: "popovers" mode is enabled; false: disabled
- */
 bool lv_buttonmatrix_get_popovers(const lv_obj_t * obj)
 {
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
@@ -312,13 +270,6 @@ bool lv_buttonmatrix_get_popovers(const lv_obj_t * obj)
  * Other functions
  *====================*/
 
-/**
- * Default keyboard event to add characters to the Text area and change the map.
- * If a custom `event_cb` is added to the keyboard this function can be called from it to handle the
- * button clicks
- * @param kb pointer to a keyboard
- * @param event the triggering event
- */
 void lv_keyboard_def_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);

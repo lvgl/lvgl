@@ -29,7 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
-                        const lv_font_t * font, uint32_t letter, lv_draw_letter_cb_t cb);
+                        const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb);
 
 /**********************
  *  STATIC VARIABLES
@@ -61,7 +61,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_label_dsc_t);
 }
 
-void lv_draw_letter_dsc_init(lv_draw_glyph_dsc_t * dsc)
+void lv_draw_glyph_dsc_init(lv_draw_glyph_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_glyph_dsc_t));
 }
@@ -93,8 +93,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label
     LV_PROFILER_END;
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
-                                          const lv_point_t * point, uint32_t unicode_letter)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_character(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
+                                             const lv_point_t * point, uint32_t unicode_letter)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->font == NULL) {
@@ -133,9 +133,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_
     LV_PROFILER_END;
 }
 
-void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
-                                   const lv_area_t * coords,
-                                   lv_draw_letter_cb_t cb)
+void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
+                                      const lv_area_t * coords,
+                                      lv_draw_glyph_cb_t cb)
 {
     const lv_font_t * font = dsc->font;
     int32_t w;
@@ -236,7 +236,7 @@ void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_lab
 
     lv_area_t bg_coords;
     lv_draw_glyph_dsc_t draw_letter_dsc;
-    lv_draw_letter_dsc_init(&draw_letter_dsc);
+    lv_draw_glyph_dsc_init(&draw_letter_dsc);
     draw_letter_dsc.opa = dsc->opa;
     draw_letter_dsc.bg_coords = &bg_coords;
     draw_letter_dsc.color = dsc->color;
@@ -365,7 +365,7 @@ void lv_draw_label_iterate_letters(lv_draw_unit_t * draw_unit, const lv_draw_lab
  **********************/
 
 static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
-                        const lv_font_t * font, uint32_t letter, lv_draw_letter_cb_t cb)
+                        const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb)
 {
     lv_font_glyph_dsc_t g;
 
@@ -399,8 +399,8 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     }
 
     uint32_t bitmap_size = lv_draw_buf_width_to_stride(g.box_w, LV_COLOR_FORMAT_A8) * g.box_h;
-    bitmap_size = (bitmap_size + 63) &
-                  (~63);   /*Round up to avoid many allocations if the next buffer is just slightly larger*/
+    /*Round up to avoid many allocations if the next buffer is just slightly larger*/
+    bitmap_size = LV_ALIGN_UP(bitmap_size, 64);
     if(dsc->_bitmap_buf_size < bitmap_size) {
         lv_draw_buf_free(dsc->_bitmap_buf_unaligned);
         dsc->_bitmap_buf_unaligned = lv_draw_buf_malloc(bitmap_size, LV_COLOR_FORMAT_A8);

@@ -190,7 +190,7 @@ void lv_arc_set_bg_angles(lv_obj_t * obj, lv_value_precise_t start, lv_value_pre
     lv_arc_set_bg_start_angle(obj, start);
 }
 
-void lv_arc_set_rotation(lv_obj_t * obj, uint32_t rotation)
+void lv_arc_set_rotation(lv_obj_t * obj, int32_t rotation)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;

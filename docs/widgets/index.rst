@@ -20,7 +20,7 @@ Widgets
     checkbox
     dropdown
     image
-    imgbtn
+    imagebutton
     keyboard
     label
     led

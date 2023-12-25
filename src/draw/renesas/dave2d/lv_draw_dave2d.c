@@ -34,9 +34,6 @@ static void _dave2d_buf_invalidate_cache_cb(void * buf, uint32_t stride, lv_colo
 #endif
 #endif
 
-static  void _dave2d_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area,
-                              void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area, lv_color_format_t color_format);
-
 static int32_t _dave2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
@@ -122,7 +119,6 @@ static void lv_draw_buf_dave2d_init_handlers(void)
     handlers->invalidate_cache_cb = _dave2d_buf_invalidate_cache_cb;
 #endif
 #endif
-    handlers->buf_copy_cb        = _dave2d_buf_copy;
 }
 
 #if defined(RENESAS_CORTEX_M85)
@@ -148,6 +144,11 @@ static void _dave2d_buf_invalidate_cache_cb(void * buf, uint32_t stride, lv_colo
 #endif
 #endif
 
+/**
+ * @todo
+ * LVGL needs to use hardware acceleration for buf_copy and do not affect GPU rendering.
+ */
+#if 0
 static void _dave2d_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area,
                              void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area, lv_color_format_t color_format)
 {
@@ -230,6 +231,7 @@ static void _dave2d_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, 
 #endif
 
 }
+#endif
 
 #define USE_D2 (1)
 
@@ -260,12 +262,6 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 ret =  0;
                 break;
             }
-#if 0
-        case LV_DRAW_TASK_TYPE_BG_IMG: {
-                ret = 0;
-                break;
-            }
-#endif
         case LV_DRAW_TASK_TYPE_LAYER: {
                 ret = 0;
                 break;
@@ -273,9 +269,11 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
 #if USE_D2
-                //TODO
-                //                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                //                t->preference_score = 0;
+                lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
+                if(draw_dsc->header.cf != LV_COLOR_FORMAT_RGB565A8) {
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
+                    t->preference_score = 0;
+                }
 #endif
                 ret = 0;
                 break;
@@ -390,6 +388,11 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
 
     if(t->preferred_draw_unit_id != DRAW_UNIT_ID_DAVE2D) {
         return 0;
+    }
+
+    void * buf = lv_draw_layer_alloc_buf(layer);
+    if(buf == NULL) {
+        return -1;
     }
 
 #if  (0 == D2_RENDER_EACH_OPERATION)

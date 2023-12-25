@@ -117,13 +117,6 @@ lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl)
     return lv_color_mix(lv_color_black(), c, lvl);
 }
 
-/**
- * Convert a HSV color to RGB
- * @param h hue [0..359]
- * @param s saturation [0..100]
- * @param v value [0..100]
- * @return the given RGB color in RGB (with LV_COLOR_DEPTH depth)
- */
 lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
 {
     h = (uint32_t)((uint32_t)h * 255) / 360;
@@ -182,13 +175,6 @@ lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
     return result;
 }
 
-/**
- * Convert a 32-bit RGB color to HSV
- * @param r8 8-bit red
- * @param g8 8-bit green
- * @param b8 8-bit blue
- * @return the given RGB color in HSV
- */
 lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
 {
     uint16_t r = ((uint32_t)r8 << 10) / 255;

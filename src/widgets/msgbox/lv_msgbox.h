@@ -18,8 +18,8 @@ extern "C" {
 #if LV_USE_MSGBOX
 
 /*Testing of dependencies*/
-#if LV_USE_BTNMATRIX == 0
-#error "lv_mbox: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNMATRIX  1) "
+#if LV_USE_BUTTONMATRIX == 0
+#error "lv_mbox: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BUTTONMATRIX  1) "
 #endif
 
 #if LV_USE_LABEL == 0

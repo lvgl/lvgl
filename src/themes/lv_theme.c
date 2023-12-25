@@ -40,11 +40,6 @@ lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj)
     return lv_display_get_theme(disp);
 }
 
-/**
- * Apply the active theme on an object
- * @param obj pointer to an object
- * @param name the name of the theme element to apply. E.g. `LV_THEME_BTN`
- */
 void lv_theme_apply(lv_obj_t * obj)
 {
     lv_theme_t * th = lv_theme_get_from_obj(obj);
@@ -55,24 +50,11 @@ void lv_theme_apply(lv_obj_t * obj)
     apply_theme_recursion(th, obj);    /*Apply the theme including the base theme(s)*/
 }
 
-/**
- * Set a base theme for a theme.
- * The styles from the base them will be added before the styles of the current theme.
- * Arbitrary long chain of themes can be created by setting base themes.
- * @param new_theme pointer to theme which base should be set
- * @param base pointer to the base theme
- */
 void lv_theme_set_parent(lv_theme_t * new_theme, lv_theme_t * base)
 {
     new_theme->parent = base;
 }
 
-/**
- * Set a callback for a theme.
- * The callback is used to add styles to different objects
- * @param theme pointer to theme which callback should be set
- * @param cb pointer to the callback
- */
 void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb)
 {
     theme->apply_cb = apply_cb;

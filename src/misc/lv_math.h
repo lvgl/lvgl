@@ -27,6 +27,9 @@ extern "C" {
 #define LV_BEZIER_VAL_MAX (1L << LV_BEZIER_VAL_SHIFT) /**< Max time in Bezier functions (not [0..1] to use integers)*/
 #define LV_BEZIER_VAL_FLOAT(f) ((int32_t)((f) * LV_BEZIER_VAL_MAX)) /**< Convert const float number cubic-bezier values to fix-point value*/
 
+/*Align up value x to align, align must be a power of two*/
+#define LV_ALIGN_UP(x, align) (((x) + ((align) - 1)) & ~((align) - 1))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -124,6 +127,12 @@ int64_t lv_pow(int64_t base, int8_t exp);
  * @return the mapped number
  */
 int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out);
+
+/**
+ * Set the seed of the pseudo random number generator
+ * @param seed a number to initialize the random generator
+ */
+void lv_rand_set_seed(uint32_t seed);
 
 /**
  * Get a pseudo random number in the given range

@@ -92,22 +92,6 @@ the same image. This feature can be enabled in the style by setting
 
 The color to mix is set by ``img_recolor``.
 
-Auto-size
----------
-
-If the width or height of the image object is set to :c:macro:`LV_SIZE_CONTENT`
-the object's size will be set according to the size of the image source
-in the respective direction.
-
-Mosaic
-------
-
-If the object's size is greater than the image size in any directions,
-then the image will be repeated like a mosaic. This allows creation a
-large image from only a very narrow source. For example, you can have a
-*300 x 5* image with a special gradient and set it as a wallpaper using
-the mosaic feature.
-
 Offset
 ------
 
@@ -118,19 +102,20 @@ source size. Using the offset parameter a `Texture atlas <https://en.wikipedia.o
 or a "running image" effect can be created by `Animating </overview/animation>`__ the x or y offset.
 
 Transformations
-***************
+---------------
 
 Using the :cpp:expr:`lv_image_set_scale(img, factor)` the images will be zoomed.
-Set ``factor`` to ``256`` or :c:macro:`LV_ZOOM_NONE` to disable zooming. A
+Set ``factor`` to ``256`` or :c:macro:`LV_SCALE_NONE` to disable zooming. A
 larger value enlarges the images (e.g. ``512`` double size), a smaller
 value shrinks it (e.g. ``128`` half size). Fractional scale works as
 well. E.g. ``281`` for 10% enlargement.
 
+:cpp:expr:`lv_image_set_scale_x(img, factor)` and
+:cpp:expr:`lv_image_set_scale_y(img, factor)` also can be used to
+the scale independently horizontally and vertically (non-uniform scale).
+
 To rotate the image use :cpp:expr:`lv_image_set_rotation(img, angle)`. Angle has 0.1
 degree precision, so for 45.8° set 458.
-
-The ``transform_zoom`` and ``transform_angle`` style properties are also
-used to determine the final zoom and angle.
 
 By default, the pivot point of the rotation is the center of the image.
 It can be changed with :cpp:expr:`lv_image_set_pivot(img, pivot_x, pivot_y)`.
@@ -141,9 +126,8 @@ The quality of the transformation can be adjusted with
 the transformations are higher quality but slower.
 
 The transformations require the whole image to be available. Therefore
-indexed images (``LV_IMG_CF_INDEXED_...``), alpha only images
-(``LV_IMG_CF_ALPHA_...``) or images from files can not be transformed.
-In other words transformations work only on true color images stored as
+indexed images (``LV_COLOR_FORMAT_I1/2/4/8_...``), alpha only images cannot be transformed.
+In other words transformations work only on normal (A)RGB or A8 images stored as
 C array, or if a custom `Image decoder </overview/images#image-edecoder>`__
 returns the whole image.
 
@@ -159,28 +143,34 @@ differences are that pure image widget transformation
 - doesn't transform the children of the image widget
 - image is transformed directly without creating an intermediate layer (buffer) to snapshot the widget
 
-Size mode
----------
+Align
+-----
 
-By default, when the image is zoomed or rotated the real coordinates of
-the image object are not changed. The larger content simply overflows
-the object's boundaries. It also means the layouts are not affected the
-by the transformations.
+By default the image widget's width and height is :cpp:expr:`LV_SIZE_CONTENT`.
+It means the the widget will be sized automatically according to the image source.
 
-If you need the object size to be updated to the transformed size set
-:cpp:expr:`lv_image_set_size_mode(img, LV_IMAGE_SIZE_MODE_REAL)`. (The previous mode
-is the default and called :cpp:enumerator:`LV_IMAGE_SIZE_MODE_VIRTUAL`). In this case if
-the width/height of the object is set to :c:macro:`LV_SIZE_CONTENT` the
-object's size will be set to the zoomed and rotated size. If an explicit
-size is set then the overflowing content will be cropped.
+If the widget's width or height is set the smaller value the ``align`` property tells
+how to align the image source inside the widget. The alignment set any of these:
 
-Rounded image
--------------
+- :cpp:expr`LV_IMAGE_ALIGN_DEFAULT` Meaning top left
+- :cpp:expr`LV_IMAGE_ALIGN_TOP_LEFT`
+- :cpp:expr`LV_IMAGE_ALIGN_TOP_MID`
+- :cpp:expr`LV_IMAGE_ALIGN_TOP_RIGHT`
+- :cpp:expr`LV_IMAGE_ALIGN_BOTTOM_LEFT`
+- :cpp:expr`LV_IMAGE_ALIGN_BOTTOM_MID`
+- :cpp:expr`LV_IMAGE_ALIGN_BOTTOM_RIGHT`
+- :cpp:expr`LV_IMAGE_ALIGN_LEFT_MID`
+- :cpp:expr`LV_IMAGE_ALIGN_RIGHT_MID`
+- :cpp:expr`LV_IMAGE_ALIGN_CENTER`
 
-You can use :cpp:func:`lv_obj_set_style_radius` to set radius to an image, and
-enable :cpp:func:`lv_obj_set_style_clip_corner` to clip the content to rounded
-rectangle or circular shape. Please note this will have some negative
-performance impact to CPU based renderers.
+The ``offset`` value is applied after the image source is aligned. For example setting an ``y=-10`` and :cpp:expr`LV_IMAGE_ALIGN_CENTER`
+will move the image source up a little bit from the center of the widget.
+
+Or to automatically scale or tile the image
+- :cpp:expr`LV_IMAGE_ALIGN_STRETCH` Set X and Y scale to fill the widget's area
+- :cpp:expr`LV_IMAGE_ALIGN_TILE` Tile the image to will the widget area. Offset is applied to shift the tiling.
+
+The alignment can be set by :cpp:func:`lv_image_set_align(image, align)`
 
 Events
 ******
