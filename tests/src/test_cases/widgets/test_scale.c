@@ -393,4 +393,16 @@ void test_scale_angle_range(void)
     TEST_ASSERT_EQUAL(angle_range, lv_scale_get_angle_range(scale));
 }
 
+void test_scale_range(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    int32_t min_range = 24;
+    int32_t max_range = 42;
+    lv_scale_set_range(scale, min_range, max_range);
+
+    TEST_ASSERT_EQUAL(min_range, lv_scale_get_range_min_value(scale));
+    TEST_ASSERT_EQUAL(max_range, lv_scale_get_range_max_value(scale));
+}
+
 #endif
