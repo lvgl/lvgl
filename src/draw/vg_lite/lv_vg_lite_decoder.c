@@ -362,7 +362,8 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
 
 failed:
     lv_fs_close(&file);
-    lv_draw_buf_destroy(draw_buf->data);
+    lv_draw_buf_destroy(draw_buf);
+    dsc->decoded = NULL;
 
     return LV_RESULT_INVALID;
 }
