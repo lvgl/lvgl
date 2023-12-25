@@ -66,12 +66,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum {
-    LV_VG_LITE_IMAGE_FLAG_ALLOCED = 1 << 0,
-    LV_VG_LITE_IMAGE_FLAG_ALIGNED = 1 << 1,
-    LV_VG_LITE_IMAGE_FLAG_PRE_MUL = 1 << 2,
-} lv_vg_lite_image_flag_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

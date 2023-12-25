@@ -17,6 +17,8 @@
  *      DEFINES
  *********************/
 
+#define LV_VG_LITE_IMAGE_NO_CACHE LV_IMAGE_FLAGS_USER1
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -37,7 +39,8 @@ typedef struct {
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                 const lv_image_decoder_args_t * args);
-static void decode_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_data);
 static void image_try_self_pre_mul(lv_image_decoder_dsc_t * dsc);
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size);
 static void image_color16_pre_mul(lv_color16_alpha_t * img_data, uint32_t px_size);
@@ -47,7 +50,6 @@ static void image_copy(uint8_t * dest, const uint8_t * src,
 static void image_invalidate_cache(void * buf, uint32_t stride,
                                    uint32_t width, uint32_t height,
                                    lv_color_format_t cf);
-static void cache_invalidate_cb(lv_cache_entry_t * entry);
 
 /**********************
  *  STATIC VARIABLES
@@ -66,8 +68,8 @@ void lv_vg_lite_decoder_init(void)
     lv_image_decoder_t * decoder = lv_image_decoder_create();
     lv_image_decoder_set_info_cb(decoder, decoder_info);
     lv_image_decoder_set_open_cb(decoder, decoder_open);
-    lv_image_decoder_set_close_cb(decoder, decode_close);
-    decoder->cache_data_type = lv_cache_register_data_type();
+    lv_image_decoder_set_close_cb(decoder, decoder_close);
+    lv_image_decoder_set_cache_free_cb(decoder, (lv_cache_free_cb_t)decoder_cache_free);
 }
 
 void lv_vg_lite_decoder_deinit(void)
@@ -81,119 +83,9 @@ void lv_vg_lite_decoder_deinit(void)
     }
 }
 
-lv_result_t lv_vg_lite_decoder_post_process(lv_image_decoder_dsc_t * dsc)
-{
-    lv_color_format_t color_format = dsc->header.cf;
-    lv_result_t res = LV_RESULT_OK;
-
-    /* Only support this color format */
-    switch(color_format) {
-        case LV_COLOR_FORMAT_ARGB8888:
-        case LV_COLOR_FORMAT_XRGB8888:
-        case LV_COLOR_FORMAT_RGB565A8:
-        case LV_COLOR_FORMAT_RGB888:
-        case LV_COLOR_FORMAT_RGB565:
-            break;
-
-        default:
-            return LV_RESULT_OK;
-    }
-
-    lv_cache_entry_t * entry = dsc->cache_entry;
-    if(!entry) {
-        LV_LOG_WARN("No detected cache entry, src_type: %d, src: %p",
-                    dsc->src_type, dsc->src);
-        return LV_RESULT_INVALID;
-    }
-
-    lv_cache_lock();
-
-    /* Check if the image is aligned */
-    if(!(entry->process_state & LV_VG_LITE_IMAGE_FLAG_ALIGNED)) {
-        int32_t image_w = dsc->header.w;
-        int32_t image_h = dsc->header.h;
-        uint32_t width_byte = image_w * lv_color_format_get_size(color_format);
-        uint32_t stride = lv_draw_buf_width_to_stride(image_w, color_format);
-
-        const uint8_t * ori_image = lv_cache_get_data(entry);
-
-        /* Check stride alignment requirements */
-        bool is_aligned = (stride == width_byte)
-                          && (ori_image == lv_draw_buf_align((void *)ori_image, color_format));
-
-        if(!is_aligned) {
-            /* alloc new image */
-            size_t size_bytes = stride * dsc->header.h;
-            uint8_t * new_image = lv_draw_buf_malloc(size_bytes, color_format);
-            if(!new_image) {
-                LV_LOG_ERROR("alloc %zu failed, cf = %d", size_bytes, color_format);
-                res = LV_RESULT_INVALID;
-                goto alloc_failed;
-            }
-
-            /* Replace the image data pointer */
-            entry->data = new_image;
-            dsc->img_data = new_image;
-
-            /* Copy image data */
-            image_copy(new_image, ori_image, stride, width_byte, image_h);
-
-            /* invalidate D-Cache */
-            image_invalidate_cache(new_image, stride, image_w, image_h, color_format);
-
-            /* free memory for old image */
-            lv_draw_buf_free((void *)ori_image);
-        }
-        else {
-            LV_LOG_INFO("no need to realign stride: %" LV_PRIu32, stride);
-        }
-
-        entry->process_state |= LV_VG_LITE_IMAGE_FLAG_ALIGNED;
-    }
-
-    /* Since image_try_self_pre_mul requires width alignment,
-     * premul alpha is placed after the image width alignment process.
-     */
-    image_try_self_pre_mul(dsc);
-
-alloc_failed:
-    lv_cache_unlock();
-
-    return res;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
-{
-    lv_cache_lock();
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        const char * fn = dsc->src;
-
-        lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, fn, LV_CACHE_SRC_TYPE_PATH);
-        if(cache) {
-            dsc->img_data = lv_cache_get_data(cache);
-            dsc->cache_entry = cache; /*Save the cache to release it in decoder_close*/
-            lv_cache_unlock();
-            return LV_RESULT_OK;
-        }
-    }
-
-    if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
-        lv_cache_entry_t * cache = lv_cache_find_by_src(NULL, dsc->src, LV_CACHE_SRC_TYPE_POINTER);
-        if(cache) {
-            dsc->img_data = lv_cache_get_data(cache);
-            dsc->cache_entry = cache;
-            lv_cache_unlock();
-            return LV_RESULT_OK;
-        }
-    }
-
-    lv_cache_unlock();
-    return LV_RESULT_INVALID;
-}
 
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size)
 {
@@ -225,7 +117,7 @@ static void image_try_self_pre_mul(lv_image_decoder_dsc_t * dsc)
         return;
     }
 
-    if(dsc->cache_entry->process_state & LV_VG_LITE_IMAGE_FLAG_PRE_MUL) {
+    if(dsc->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) {
         return;
     }
 
@@ -239,15 +131,16 @@ static void image_try_self_pre_mul(lv_image_decoder_dsc_t * dsc)
     uint32_t stride = lv_draw_buf_width_to_stride(image_w, cf);
     uint32_t aligned_w = lv_vg_lite_width_align(image_w);
     size_t px_size = aligned_w * image_h;
+    void * image_data = dsc->decoded->data;
 
     if(cf == LV_COLOR_FORMAT_ARGB8888) {
-        image_color32_pre_mul((lv_color32_t *)dsc->img_data, px_size);
+        image_color32_pre_mul(image_data, px_size);
     }
     else if(cf == LV_COLOR_FORMAT_RGB565A8) {
-        image_color16_pre_mul((lv_color16_alpha_t *)dsc->img_data, px_size);
+        image_color16_pre_mul(image_data, px_size);
     }
     else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-        lv_color32_t * palette = (lv_color32_t *)dsc->img_data;
+        lv_color32_t * palette = (lv_color32_t *)image_data;
         uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(cf);
         image_color32_pre_mul(palette, palette_size);
     }
@@ -258,9 +151,9 @@ static void image_try_self_pre_mul(lv_image_decoder_dsc_t * dsc)
         LV_LOG_WARN("unsupported cf: %d", cf);
     }
 
-    image_invalidate_cache((void *)dsc->img_data, stride, image_w, image_h, cf);
+    image_invalidate_cache(image_data, stride, image_w, image_h, cf);
 
-    dsc->cache_entry->process_state |= LV_VG_LITE_IMAGE_FLAG_PRE_MUL;
+    dsc->header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
 }
 
 static void image_copy(uint8_t * dest, const uint8_t * src,
@@ -304,8 +197,6 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
     bool support_blend_normal = lv_vg_lite_support_blend_normal();
 
-    uint32_t start = lv_tick_get();
-
     /*In case of uncompressed formats the image stored in the ROM/RAM.
      *So simply give its pointer*/
     const uint8_t * image_data = ((lv_image_dsc_t *)dsc->src)->data;
@@ -326,17 +217,12 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
         && !is_indexed
         && (!has_alpha || (has_alpha && support_blend_normal))) || is_yuv) {
 
-        /*add cache*/
-        lv_cache_lock();
-        lv_cache_entry_t * cache = lv_cache_add(image_data, 0, decoder->cache_data_type, 1);
-        cache->process_state = LV_VG_LITE_IMAGE_FLAG_ALIGNED;
-        cache->weight = lv_tick_elaps(start);
-        cache->src_type = LV_CACHE_SRC_TYPE_POINTER;
-        cache->src = dsc->src;
-
-        dsc->cache_entry = cache;
-        dsc->img_data = lv_cache_get_data(cache);
-        lv_cache_unlock();
+        lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+        LV_ASSERT_MALLOC(draw_buf);
+        lv_image_header_init(&draw_buf->header, width, height, cf, stride, LV_VG_LITE_IMAGE_NO_CACHE);
+        dsc->decoded = draw_buf;
+        draw_buf->data = (void *)image_data;
+        draw_buf->unaligned_data = (void *)image_data;
         return LV_RESULT_OK;
     }
 
@@ -348,16 +234,16 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
      */
     uint32_t palette_size_bytes_aligned = LV_VG_LITE_ALIGN(palette_size_bytes, LV_VG_LITE_BUF_ALIGN);
 
-    size_t image_size = height * stride + palette_size_bytes_aligned;
-
-    void * image_buf = lv_draw_buf_malloc(image_size, cf);
-    if(image_buf == NULL) {
-        LV_LOG_ERROR("alloc %zu failed, cf = %d", image_size, cf);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, cf, stride);
+    if(draw_buf == NULL) {
+        LV_LOG_ERROR("create draw buf failed, cf = %d", cf);
         return LV_RESULT_INVALID;
     }
 
+    dsc->decoded = draw_buf;
+
     const uint8_t * src = image_data;
-    uint8_t * dest = image_buf;
+    uint8_t * dest = draw_buf->data;
 
     /* copy palette */
     if(palette_size_bytes) {
@@ -370,23 +256,11 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
     image_copy(dest, src, stride, width_byte, height);
 
-    lv_cache_lock();
-    lv_cache_entry_t * cache = lv_cache_add(image_buf, 0, decoder->cache_data_type, image_size);
-
-    dsc->img_data = lv_cache_get_data(cache);
-    dsc->cache_entry = cache;
-
     /* premul alpha */
     image_try_self_pre_mul(dsc);
 
     /* invalidate D-Cache */
-    image_invalidate_cache(image_buf, stride, width, height, cf);
-
-    cache->process_state |= LV_VG_LITE_IMAGE_FLAG_ALLOCED | LV_VG_LITE_IMAGE_FLAG_ALIGNED;
-    cache->weight = lv_tick_elaps(start);
-    cache->src_type = LV_CACHE_SRC_TYPE_POINTER;
-    cache->src = dsc->src;
-    lv_cache_unlock();
+    image_invalidate_cache(draw_buf->data, stride, width, height, cf);
 
     LV_LOG_INFO("image %p (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p, cf: %d) decode finish %" LV_PRIu32 "ms",
                 image_data, width, height, image_buf, cf, cache->weight);
@@ -401,8 +275,6 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     int32_t width = dsc->header.w;
     int32_t height = dsc->header.h;
     const char * path = dsc->src;
-
-    uint32_t start = lv_tick_get();
 
     lv_fs_file_t file;
     lv_fs_res_t res = lv_fs_open(&file, path, LV_FS_MODE_RD);
@@ -436,15 +308,14 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
      */
     uint32_t palette_size_bytes_aligned = LV_VG_LITE_ALIGN(palette_size_bytes, LV_VG_LITE_BUF_ALIGN);
 
-    size_t image_size = height * stride + palette_size_bytes_aligned;
-
-    void * image_buf = lv_draw_buf_malloc(image_size, cf);
-    if(image_buf == NULL) {
-        LV_LOG_ERROR("alloc %zu failed, cf = %d", image_size, cf);
-        goto failed;
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, cf, stride);
+    if(draw_buf == NULL) {
+        LV_LOG_ERROR("create draw buf failed, cf = %d", cf);
+        return LV_RESULT_INVALID;
     }
 
-    uint8_t * dest = image_buf;
+    dsc->decoded = draw_buf;
+    uint8_t * dest = draw_buf->data;
 
     /* copy palette */
     if(palette_size_bytes) {
@@ -458,7 +329,7 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
         }
 
         if(!support_blend_normal) {
-            image_color32_pre_mul((lv_color32_t *)image_buf, palette_size);
+            image_color32_pre_mul((lv_color32_t *)dest, palette_size);
         }
 
         /* move to index image map */
@@ -479,36 +350,20 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
 
     lv_fs_close(&file);
 
-    lv_cache_lock();
-    lv_cache_entry_t * cache = lv_cache_add(image_buf, 0, decoder->cache_data_type, image_size);
-
-    dsc->cache_entry = cache;
-    dsc->img_data = lv_cache_get_data(cache);
-
     /* premul alpha */
     image_try_self_pre_mul(dsc);
 
     /* invalidate D-Cache */
-    image_invalidate_cache(image_buf, stride, width, height, cf);
-
-    cache->process_state |= LV_VG_LITE_IMAGE_FLAG_ALLOCED | LV_VG_LITE_IMAGE_FLAG_ALIGNED;
-    cache->weight = lv_tick_elaps(start);
-    cache->invalidate_cb = cache_invalidate_cb;
-    cache->src = lv_strdup(dsc->src);
-    cache->src_type = LV_CACHE_SRC_TYPE_PATH;
-    lv_cache_unlock();
+    image_invalidate_cache(draw_buf->data, stride, width, height, cf);
 
     LV_LOG_INFO("image %s (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p cf: %d) decode finish %" LV_PRIu32 "ms",
-                path, width, height, image_buf, cf, cache->weight);
+                path, width, height, draw_buf->data, cf, cache->weight);
     return LV_RESULT_OK;
 
 failed:
     lv_fs_close(&file);
-
-    if(image_buf) {
-        LV_LOG_INFO("free image_buf: %p", image_buf);
-        lv_draw_buf_free(image_buf);
-    }
+    lv_draw_buf_destroy(draw_buf);
+    dsc->decoded = NULL;
 
     return LV_RESULT_INVALID;
 }
@@ -518,34 +373,68 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 {
     LV_UNUSED(args); /*Unused*/
 
-    /*Check the cache first*/
-    if(try_cache(dsc) == LV_RESULT_OK) {
-        return LV_RESULT_OK;
-    }
+    lv_result_t res = LV_RESULT_INVALID;
 
     switch(dsc->src_type) {
         case LV_IMAGE_SRC_VARIABLE:
-            return decoder_open_variable(decoder, dsc);
+            res = decoder_open_variable(decoder, dsc);
+            break;
         case LV_IMAGE_SRC_FILE:
-            return decoder_open_file(decoder, dsc);
+            res = decoder_open_file(decoder, dsc);
+            break;
+        default:
+            break;
     }
 
-    return LV_RESULT_INVALID;
+#if LV_CACHE_DEF_SIZE > 0
+    if(res == LV_RESULT_OK) {
+        lv_image_cache_data_t search_key;
+        search_key.src_type = dsc->src_type;
+        search_key.src = dsc->src;
+        search_key.slot.size = dsc->decoded->data_size;
+
+        lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, dsc->decoded, NULL);
+
+        if(entry == NULL) {
+            lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
+            dsc->decoded = NULL;
+            return LV_RESULT_INVALID;
+        }
+        dsc->cache_entry = entry;
+    }
+#endif
+
+    return res;
 }
 
-static void decode_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static void decoder_draw_buf_free(lv_draw_buf_t * draw_buf)
+{
+    if(draw_buf->header.flags & LV_VG_LITE_IMAGE_NO_CACHE) {
+        lv_free(draw_buf);
+    }
+    else {
+        lv_draw_buf_destroy(draw_buf);
+    }
+}
+
+static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    lv_cache_lock();
-    lv_cache_release(dsc->cache_entry);
-    lv_cache_unlock();
+#if LV_CACHE_DEF_SIZE > 0
+    lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
+#else
+    decoder_draw_buf_free((lv_draw_buf_t *)dsc->decoded);
+#endif
 }
 
-static void cache_invalidate_cb(lv_cache_entry_t * entry)
+static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_data)
 {
-    if(entry->src_type == LV_CACHE_SRC_TYPE_PATH) lv_free((void *)entry->src);
-    lv_draw_buf_free((void *)entry->data);
+    LV_UNUSED(user_data);
+
+    if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
+
+    decoder_draw_buf_free((lv_draw_buf_t *)cached_data->decoded);
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/

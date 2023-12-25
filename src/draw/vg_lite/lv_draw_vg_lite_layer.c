@@ -62,7 +62,7 @@ void lv_draw_vg_lite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t
     new_draw_dsc.src = &img_dsc;
 
     lv_draw_vg_lite_img(draw_unit, &new_draw_dsc, coords);
-    lv_image_cache_invalidate(&img_dsc);
+    lv_image_cache_drop(&img_dsc);
 }
 
 /**********************

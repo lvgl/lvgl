@@ -34,8 +34,6 @@ void lv_vg_lite_decoder_init(void);
 
 void lv_vg_lite_decoder_deinit(void);
 
-lv_result_t lv_vg_lite_decoder_post_process(lv_image_decoder_dsc_t * dsc);
-
 /**********************
  *      MACROS
  **********************/
