@@ -389,14 +389,14 @@ uint32_t lv_scale_get_angle_range(lv_obj_t * obj)
 
 int32_t lv_scale_get_range_min_value(lv_obj_t * obj)
 {
-	lv_scale_t * scale = (lv_scale_t *)obj;
-	return scale->range_min;
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    return scale->range_min;
 }
 
 int32_t lv_scale_get_range_max_value(lv_obj_t * obj)
 {
-	lv_scale_t * scale = (lv_scale_t *)obj;
-	return scale->range_max;
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    return scale->range_max;
 }
 
 /*=====================

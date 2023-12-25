@@ -276,15 +276,15 @@ uint32_t lv_scale_get_angle_range(lv_obj_t * obj);
 
 /**
  * Get the min range for the given scale section
- * @param obj	pointer to a scale section object
- * @return		section minor range
+ * @param obj   pointer to a scale section object
+ * @return      section minor range
  */
 int32_t lv_scale_get_range_min_value(lv_obj_t * obj);
 
 /**
  * Get the max range for the given scale section
- * @param obj	pointer to a scale section object
- * @return		section max range
+ * @param obj   pointer to a scale section object
+ * @return      section max range
  */
 int32_t lv_scale_get_range_max_value(lv_obj_t * obj);
 
