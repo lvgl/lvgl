@@ -311,7 +311,7 @@ void test_scale_total_tick_count(void)
 {
     lv_obj_t * scale = lv_scale_create(lv_screen_active());
 
-    int32_t total_tick_count = 42;
+    uint32_t total_tick_count = 42;
     lv_scale_set_total_tick_count(scale, total_tick_count);
 
     TEST_ASSERT_EQUAL(total_tick_count, lv_scale_get_total_tick_count(scale));
@@ -321,7 +321,7 @@ void test_scale_major_tick_every(void)
 {
     lv_obj_t * scale = lv_scale_create(lv_screen_active());
 
-    int32_t major_tick_every = 6;
+    uint32_t major_tick_every = 6;
     lv_scale_set_major_tick_every(scale, major_tick_every);
 
     TEST_ASSERT_EQUAL(major_tick_every, lv_scale_get_major_tick_every(scale));

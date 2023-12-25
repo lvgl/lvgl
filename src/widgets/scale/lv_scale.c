@@ -110,7 +110,7 @@ void lv_scale_set_mode(lv_obj_t * obj, lv_scale_mode_t mode)
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_set_total_tick_count(lv_obj_t * obj, int32_t total_tick_count)
+void lv_scale_set_total_tick_count(lv_obj_t * obj, uint32_t total_tick_count)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -120,7 +120,7 @@ void lv_scale_set_total_tick_count(lv_obj_t * obj, int32_t total_tick_count)
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_set_major_tick_every(lv_obj_t * obj, int32_t major_tick_every)
+void lv_scale_set_major_tick_every(lv_obj_t * obj, uint32_t major_tick_every)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -130,7 +130,7 @@ void lv_scale_set_major_tick_every(lv_obj_t * obj, int32_t major_tick_every)
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_set_major_tick_length(lv_obj_t * obj, int32_t major_len)
+void lv_scale_set_major_tick_length(lv_obj_t * obj, uint32_t major_len)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -140,7 +140,7 @@ void lv_scale_set_major_tick_length(lv_obj_t * obj, int32_t major_len)
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_set_minor_tick_length(lv_obj_t * obj, int32_t minor_len)
+void lv_scale_set_minor_tick_length(lv_obj_t * obj, uint32_t minor_len)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;

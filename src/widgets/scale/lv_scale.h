@@ -75,21 +75,22 @@ typedef struct {
     lv_obj_t obj;
     lv_ll_t section_ll;     /**< Linked list for the sections (stores lv_scale_section_t)*/
     const char ** txt_src;
-    int32_t custom_label_cnt;
-    int32_t major_len;
-    int32_t minor_len;
+    lv_scale_mode_t mode;
+    uint32_t major_len;
+    uint32_t minor_len;
     int32_t range_min;
     int32_t range_max;
     uint32_t total_tick_count   : 15;
     uint32_t major_tick_every   : 15;
-    lv_scale_mode_t mode;
     uint32_t label_enabled      : 1;
-    uint32_t post_draw      : 1;
-    int32_t last_tick_width;
-    int32_t first_tick_width;
+    uint32_t post_draw          : 1;
     /* Round scale */
     uint32_t angle_range;
     int32_t rotation;
+    /* Private properties */
+    int32_t custom_label_cnt;
+    int32_t last_tick_width;
+    int32_t first_tick_width;
 } lv_scale_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_scale_class;
@@ -125,14 +126,14 @@ void lv_scale_set_mode(lv_obj_t * obj, lv_scale_mode_t mode);
  * @param obj       pointer the scale object
  * @param total_tick_count    New total tick count
  */
-void lv_scale_set_total_tick_count(lv_obj_t * obj, int32_t total_tick_count);
+void lv_scale_set_total_tick_count(lv_obj_t * obj, uint32_t total_tick_count);
 
 /**
  * Sets how often the major tick will be drawn
  * @param obj                 pointer the scale object
  * @param major_tick_every    the new count for major tick drawing
  */
-void lv_scale_set_major_tick_every(lv_obj_t * obj, int32_t major_tick_every);
+void lv_scale_set_major_tick_every(lv_obj_t * obj, uint32_t major_tick_every);
 
 /**
  * Sets label visibility
@@ -146,14 +147,14 @@ void lv_scale_set_label_show(lv_obj_t * obj, bool show_label);
  * @param obj           pointer the scale object
  * @param major_len     major tick length
  */
-void lv_scale_set_major_tick_length(lv_obj_t * obj, int32_t major_len);
+void lv_scale_set_major_tick_length(lv_obj_t * obj, uint32_t major_len);
 
 /**
  * Sets major tick length
  * @param obj           pointer the scale object
  * @param minor_len     minor tick length
  */
-void lv_scale_set_minor_tick_length(lv_obj_t * obj, int32_t minor_len);
+void lv_scale_set_minor_tick_length(lv_obj_t * obj, uint32_t minor_len);
 
 /**
  * Set the minimal and maximal values on a scale
