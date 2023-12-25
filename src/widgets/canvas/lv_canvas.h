@@ -53,6 +53,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
 
 /**
  * Set a buffer for the canvas.
+ * Use `lv_canvas_set_draw_buf` instead if you need to set a buffer with alignment requirement.
  * @param buf a buffer where the content of the canvas will be.
  * The required size is (lv_image_color_format_get_px_size(cf) * w) / 8 * h)
  * It can be allocated with `lv_malloc()` or
@@ -65,6 +66,13 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
  */
 void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_color_format_t cf);
 
+/**
+ * Set a draw buffer for the canvas. A draw buffer either can be allocated by `lv_draw_buf_create()`
+ * or defined statically by `LV_DRAW_BUF_DEFINE`. When buffer start address and stride has alignment
+ * requirement, it's recommended to use `lv_draw_buf_create`.
+ * @param obj       pointer to a canvas object
+ * @param draw_buf  pointer to a draw buffer
+ */
 void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf);
 
 /**
