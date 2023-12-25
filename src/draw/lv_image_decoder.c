@@ -82,12 +82,6 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
 
     if(src == NULL) return LV_RESULT_INVALID;
 
-    lv_image_src_t src_type = lv_image_src_get_type(src);
-    if(src_type == LV_IMAGE_SRC_VARIABLE) {
-        const lv_image_dsc_t * img_dsc = src;
-        if(img_dsc->data == NULL) return LV_RESULT_INVALID;
-    }
-
     lv_result_t res = LV_RESULT_INVALID;
     lv_image_decoder_t * decoder;
     _LV_LL_READ(img_decoder_ll_p, decoder) {
