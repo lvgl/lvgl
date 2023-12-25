@@ -644,13 +644,18 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     LV_ASSERT_NULL(decoder_dsc);
     LV_ASSERT_NULL(src);
 
-    lv_result_t res = lv_image_decoder_open(decoder_dsc, src, NULL);
+    lv_image_decoder_args_t args;
+    lv_memzero(&args, sizeof(lv_image_decoder_args_t));
+    args.premultiply = !lv_vg_lite_support_blend_normal();
+    args.stride_align = true;
+
+    lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return false;
     }
 
-    const uint8_t * img_data = _lv_image_decoder_get_data(decoder_dsc);
+    const uint8_t * img_data = decoder_dsc->decoded->data;
 
     if(!img_data) {
         lv_image_decoder_close(decoder_dsc);
@@ -664,18 +669,12 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
         return false;
     }
 
-    res = lv_vg_lite_decoder_post_process(decoder_dsc);
-    if(res != LV_RESULT_OK) {
-        LV_LOG_ERROR("Failed to post process image");
-        return false;
-    }
-
     vg_lite_buffer_format_t fmt = lv_vg_lite_vg_fmt(decoder_dsc->header.cf);
 
     uint32_t palette_size = lv_vg_lite_get_palette_size(fmt);
     uint32_t image_offset = 0;
     if(palette_size) {
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (uint32_t *)decoder_dsc->img_data));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (uint32_t *)img_data));
         image_offset = LV_VG_LITE_ALIGN(palette_size * sizeof(uint32_t), LV_VG_LITE_BUF_ALIGN);
     }
 
