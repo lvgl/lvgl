@@ -133,6 +133,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         .stride_align = LV_DRAW_BUF_STRIDE_ALIGN != 1,
         .premultiply = false,
         .no_cache = false,
+        .use_indexed = false,
     };
 
     /*Make a copy of args */

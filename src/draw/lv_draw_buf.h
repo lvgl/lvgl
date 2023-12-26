@@ -226,6 +226,7 @@ static inline bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags
 static inline void lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)
 {
     lv_memcpy(buf, img, sizeof(lv_image_dsc_t));
+    buf->unaligned_data = buf->data;
 }
 
 static inline void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
