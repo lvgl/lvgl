@@ -114,6 +114,15 @@ bool lv_obj_remove_event(struct _lv_obj_t * obj, uint32_t index);
 bool lv_obj_remove_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb);
 
 /**
+ * Remove an event_cb with user_data
+ * @param obj           pointer to a obj
+ * @param event_cb      the event_cb of the event to remove
+ * @param user_data     user_data
+ * @return              the count of the event removed
+ */
+uint32_t lv_obj_remove_event_cb_with_user_data(struct _lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
+
+/**
  * Get the input device passed as parameter to indev related events.
  * @param e     pointer to an event
  * @return      the indev that triggered the event or NULL if called on a not indev related event
