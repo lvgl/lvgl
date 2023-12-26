@@ -39,7 +39,7 @@ typedef struct {
  */
 
 #define _LV_DRAW_BUF_STRIDE(w, cf) \
-    (((w) * LV_COLOR_FORMAT_GET_BPP(cf) + 7) / 8 + (LV_DRAW_BUF_STRIDE_ALIGN) - 1)
+    ((((w) * LV_COLOR_FORMAT_GET_BPP(cf) + 7) / 8 + (LV_DRAW_BUF_STRIDE_ALIGN) - 1) & ~((LV_DRAW_BUF_STRIDE_ALIGN) - 1))
 
 #define _LV_DRAW_BUF_SIZE(w, h, cf) \
     (_LV_DRAW_BUF_STRIDE(w, cf) * (h))
