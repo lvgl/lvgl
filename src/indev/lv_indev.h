@@ -294,6 +294,15 @@ lv_event_dsc_t * lv_indev_get_event_dsc(lv_indev_t * indev, uint32_t index);
 bool lv_indev_remove_event(lv_indev_t * indev, uint32_t index);
 
 /**
+ * Remove an event_cb with user_data
+ * @param indev         pointer to a indev
+ * @param event_cb      the event_cb of the event to remove
+ * @param user_data     user_data
+ * @return              the count of the event removed
+ */
+uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb_t event_cb, void * user_data);
+
+/**
  * Send an event to an indev
  * @param indev         pointer to an indev
  * @param code          an event code. LV_EVENT_...
