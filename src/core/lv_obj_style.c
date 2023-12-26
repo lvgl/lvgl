@@ -63,6 +63,8 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part);
 static void fade_anim_cb(void * obj, int32_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
 static bool style_has_flag(const lv_style_t * style, uint32_t flag);
+static lv_style_res_t get_selector_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
+                                              lv_style_value_t * value_act);
 
 /**********************
  *  STATIC VARIABLES
@@ -395,66 +397,8 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     lv_style_value_t value_act = { .ptr = NULL };
     lv_style_res_t found;
 
-    /*The happy path*/
-#if LV_OBJ_STYLE_CACHE
-    const uint32_t prop_shifted = STYLE_PROP_SHIFTED(prop);
-    if((part == LV_PART_MAIN ? obj->style_main_prop_is_set : obj->style_other_prop_is_set) & prop_shifted)
-#endif
-    {
-        found = get_prop_core(obj, selector, prop, &value_act);
-        if(found == LV_STYLE_RES_FOUND) return value_act;
-    }
-
-    extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
-    bool inheritable = false;
-    if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS) {
-        inheritable = _lv_style_builtin_prop_flag_lookup_table[prop] & LV_STYLE_PROP_FLAG_INHERITABLE;
-    }
-    else {
-        if(_style_custom_prop_flag_lookup_table != NULL) {
-            inheritable = _style_custom_prop_flag_lookup_table[prop - _LV_STYLE_NUM_BUILT_IN_PROPS] &
-                          LV_STYLE_PROP_FLAG_INHERITABLE;
-        }
-    }
-
-    if(inheritable) {
-        /*If not found, check the `MAIN` style first, if already on the MAIN part go to the parent*/
-        if(part != LV_PART_MAIN) part = LV_PART_MAIN;
-        else obj = obj->parent;
-
-        while(obj) {
-#if LV_OBJ_STYLE_CACHE
-            if(obj->style_main_prop_is_set & prop_shifted)
-#endif
-            {
-                selector = part | obj->state;
-                found = get_prop_core(obj, selector, prop, &value_act);
-                if(found == LV_STYLE_RES_FOUND) return value_act;
-            }
-            /*Check the parent too.*/
-            obj = obj->parent;
-        }
-    }
-    else {
-        /*Get the width and height from the class.
-         * WIDTH and HEIGHT are not inherited so add them in the `else` to skip checking them for inherited properties */
-        if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
-            const lv_obj_class_t * cls = obj->class_p;
-            while(cls) {
-                if(prop == LV_STYLE_WIDTH) {
-                    if(cls->width_def != 0) return (lv_style_value_t) {
-                        .num = cls->width_def
-                    };
-                }
-                else {
-                    if(cls->height_def != 0) return (lv_style_value_t) {
-                        .num = cls->height_def
-                    };
-                }
-                cls = cls->base_class;
-            }
-        }
-    }
+    found = get_selector_style_prop(obj, selector, prop, &value_act);
+    if(found == LV_STYLE_RES_FOUND) return value_act;
 
     return lv_style_prop_get_default_inlined(prop);
 }
@@ -463,62 +407,11 @@ bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, l
 {
     LV_ASSERT_NULL(obj)
 
-    lv_part_t part = lv_obj_style_get_selector_part(selector);
-    lv_state_t state = lv_obj_style_get_selector_state(selector);
     lv_style_value_t value_act = { .ptr = NULL };
     lv_style_res_t found;
 
-    /*The happy path*/
-#if LV_OBJ_STYLE_CACHE
-    const uint32_t prop_shifted = STYLE_PROP_SHIFTED(prop);
-    if((part == LV_PART_MAIN ? obj->style_main_prop_is_set : obj->style_other_prop_is_set) & prop_shifted)
-#endif
-    {
-        found = get_prop_core(obj, selector, prop, &value_act);
-        if(found == LV_STYLE_RES_FOUND) return true;
-    }
-
-    extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
-    bool inheritable = false;
-    if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS) {
-        inheritable = _lv_style_builtin_prop_flag_lookup_table[prop] & LV_STYLE_PROP_FLAG_INHERITABLE;
-    }
-    else {
-        if(_style_custom_prop_flag_lookup_table != NULL) {
-            inheritable = _style_custom_prop_flag_lookup_table[prop - _LV_STYLE_NUM_BUILT_IN_PROPS] &
-                          LV_STYLE_PROP_FLAG_INHERITABLE;
-        }
-    }
-
-    if(inheritable) {
-        /*If not found, check the `MAIN` style first, if already on the MAIN part go to the parent*/
-        if(part != LV_PART_MAIN) {
-            part = LV_PART_MAIN;
-            selector = state | part;
-        }
-        else {
-            obj = obj->parent;
-        }
-
-        while(obj) {
-#if LV_OBJ_STYLE_CACHE
-            if(obj->style_main_prop_is_set & prop_shifted)
-#endif
-            {
-                found = get_prop_core(obj, selector, prop, &value_act);
-                if(found == LV_STYLE_RES_FOUND) return true;
-            }
-            /*Check the parent too.*/
-            obj = obj->parent;
-        }
-    }
-    else {
-        /*Get the width and height from the class.
-         * WIDTH and HEIGHT are not inherited so add them in the `else` to skip checking them for inherited properties */
-        if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
-            return true;
-        }
-    }
+    found = get_selector_style_prop(obj, selector, prop, &value_act);
+    if(found == LV_STYLE_RES_FOUND) return true;
 
     return false;
 }
@@ -1208,4 +1101,76 @@ static bool style_has_flag(const lv_style_t * style, uint32_t flag)
         }
     }
     return false;
+}
+
+static lv_style_res_t get_selector_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
+                                              lv_style_value_t * value_act)
+{
+    lv_style_res_t found;
+    lv_part_t part = lv_obj_style_get_selector_part(selector);
+
+    /*The happy path*/
+#if LV_OBJ_STYLE_CACHE
+    const uint32_t prop_shifted = STYLE_PROP_SHIFTED(prop);
+    if((part == LV_PART_MAIN ? obj->style_main_prop_is_set : obj->style_other_prop_is_set) & prop_shifted)
+#endif
+    {
+        found = get_prop_core(obj, selector, prop, value_act);
+        if(found == LV_STYLE_RES_FOUND) return LV_STYLE_RES_FOUND;
+    }
+
+    extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
+    bool inheritable = false;
+    if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS) {
+        inheritable = _lv_style_builtin_prop_flag_lookup_table[prop] & LV_STYLE_PROP_FLAG_INHERITABLE;
+    }
+    else {
+        if(_style_custom_prop_flag_lookup_table != NULL) {
+            inheritable = _style_custom_prop_flag_lookup_table[prop - _LV_STYLE_NUM_BUILT_IN_PROPS] &
+                          LV_STYLE_PROP_FLAG_INHERITABLE;
+        }
+    }
+
+    if(inheritable) {
+        /*If not found, check the `MAIN` style first, if already on the MAIN part go to the parent*/
+        if(part != LV_PART_MAIN) part = LV_PART_MAIN;
+        else obj = obj->parent;
+
+        while(obj) {
+#if LV_OBJ_STYLE_CACHE
+            if(obj->style_main_prop_is_set & prop_shifted)
+#endif
+            {
+                selector = part | obj->state;
+                found = get_prop_core(obj, selector, prop, value_act);
+                if(found == LV_STYLE_RES_FOUND) return LV_STYLE_RES_FOUND;
+            }
+            /*Check the parent too.*/
+            obj = obj->parent;
+        }
+    }
+    else {
+        /*Get the width and height from the class.
+                * WIDTH and HEIGHT are not inherited so add them in the `else` to skip checking them for inherited properties */
+        if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
+            const lv_obj_class_t * cls = obj->class_p;
+            while(cls) {
+                if(prop == LV_STYLE_WIDTH) {
+                    if(cls->width_def != 0)  {
+                        value_act->num = cls->width_def;
+                        return LV_STYLE_RES_FOUND;
+                    }
+                }
+                else {
+                    if(cls->height_def != 0) {
+                        value_act->num = cls->height_def;
+                        return LV_STYLE_RES_FOUND;
+                    }
+                }
+                cls = cls->base_class;
+            }
+        }
+    }
+
+    return LV_STYLE_RES_NOT_FOUND;
 }
