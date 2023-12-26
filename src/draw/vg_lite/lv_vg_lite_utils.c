@@ -581,6 +581,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     lv_memzero(&args, sizeof(lv_image_decoder_args_t));
     args.premultiply = !lv_vg_lite_support_blend_normal();
     args.stride_align = true;
+    args.use_indexed = true;
 
     lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
     if(res != LV_RESULT_OK) {
