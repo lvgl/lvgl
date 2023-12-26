@@ -63,6 +63,7 @@ typedef struct _lv_image_decoder_args_t {
     bool stride_align;      /*Whether stride should be aligned*/
     bool premultiply;       /*Whether image should be premultiplied or not after decoding*/
     bool no_cache;          /*Whether this image should be kept out of cache*/
+    bool use_indexed;       /*Decoded indexed image as is. Convert to ARGB8888 if false.*/
 } lv_image_decoder_args_t;
 
 /**

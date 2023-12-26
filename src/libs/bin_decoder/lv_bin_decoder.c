@@ -58,6 +58,7 @@ typedef struct {
 static decoder_data_t * get_decoder_data(lv_image_decoder_dsc_t * dsc);
 static void free_decoder_data(lv_image_decoder_dsc_t * dsc);
 static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 #if LV_BIN_DECODER_RAM_LOAD
     static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 #endif
@@ -209,8 +210,13 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             res = decode_compressed(decoder, dsc);
         }
         else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-            /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
-            res = decode_indexed(decoder, dsc);
+            if(dsc->args.use_indexed) {
+                /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
+                res = load_indexed(decoder, dsc);
+            }
+            else {
+                res = decode_indexed(decoder, dsc);
+            }
         }
         else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
             res = decode_alpha_only(decoder, dsc);
@@ -249,7 +255,13 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 return LV_RESULT_INVALID;
             }
 
-            res = decode_indexed(decoder, dsc);
+            if(dsc->args.use_indexed) {
+                /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
+                res = load_indexed(decoder, dsc);
+            }
+            else {
+                res = decode_indexed(decoder, dsc);
+            }
         }
         else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
             /*Alpha only image will need decoder data to store pointer to decoded image, to free it when decoder closes*/
@@ -640,6 +652,87 @@ exit_with_buf:
 #endif
 }
 
+static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+{
+#if LV_BIN_DECODER_RAM_LOAD == 0
+    LV_UNUSED(decoder); /*Unused*/
+    LV_UNUSED(dsc); /*Unused*/
+    LV_LOG_ERROR("LV_BIN_DECODER_RAM_LOAD is disabled");
+    return LV_RESULT_INVALID;
+#else
+
+    LV_UNUSED(decoder); /*Unused*/
+
+    lv_result_t res;
+    uint32_t rn;
+    decoder_data_t * decoder_data = dsc->user_data;
+
+    if(dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) {
+        /*The decompressed image is already loaded to RAM*/
+        dsc->decoded = decoder_data->decompressed;
+        return LV_RESULT_OK;
+    }
+
+    if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
+        lv_image_dsc_t * image = (lv_image_dsc_t *)dsc->src;
+        lv_draw_buf_t * decoded = &decoder_data->c_array;
+        dsc->decoded = decoded;
+        lv_draw_buf_from_image(decoded, image);
+
+        if(decoded->header.stride == 0) {
+            /*Use the auto calculated value from decoder_info callback*/
+            decoded->header.stride = dsc->header.stride;
+        }
+
+        return LV_RESULT_OK;
+    }
+
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
+        lv_color_format_t cf = dsc->header.cf;
+        lv_fs_file_t * f = decoder_data->f;
+        lv_draw_buf_t * decoded = lv_draw_buf_create(dsc->header.w, dsc->header.h, cf, dsc->header.stride);
+        if(decoded == NULL) {
+            LV_LOG_ERROR("Draw buffer alloc failed");
+            return LV_RESULT_INVALID;
+        }
+
+        uint8_t * data = decoded->data;
+        uint32_t palette_len = sizeof(lv_color32_t) * LV_COLOR_INDEXED_PALETTE_SIZE(cf);
+        res = fs_read_file_at(f, sizeof(lv_image_header_t), data, palette_len, &rn);
+        if(res != LV_FS_RES_OK || rn != palette_len) {
+            LV_LOG_WARN("Read palette failed: %d", res);
+            lv_draw_buf_destroy(decoded);
+            return LV_RESULT_INVALID;
+        }
+
+        uint32_t data_len = 0;
+        if(lv_fs_seek(f, 0, LV_FS_SEEK_END) != LV_FS_RES_OK ||
+           lv_fs_tell(f, &data_len) != LV_FS_RES_OK) {
+            LV_LOG_WARN("Failed to get file to size");
+            lv_draw_buf_destroy(decoded);
+            return LV_RESULT_INVALID;
+        }
+
+        uint32_t data_offset = sizeof(lv_image_header_t) + palette_len;
+        data_len -= data_offset;
+        data += palette_len;
+        res = fs_read_file_at(f, data_offset, data, data_len, &rn);
+        if(res != LV_FS_RES_OK || rn != data_len) {
+            LV_LOG_WARN("Read indexed image failed: %d", res);
+            lv_draw_buf_destroy(decoded);
+            return LV_RESULT_INVALID;
+        }
+
+        decoder_data->decoded = decoded;
+        dsc->decoded = decoded;
+        return LV_RESULT_OK;
+    }
+
+    LV_LOG_ERROR("Unknown src type: %d", dsc->src_type);
+    return LV_RESULT_INVALID;
+#endif
+}
+
 #if LV_BIN_DECODER_RAM_LOAD
 static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
@@ -853,7 +946,8 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 
     lv_color_format_t cf = dsc->header.cf;
     if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-        res = decode_indexed(decoder, dsc);
+        if(dsc->args.use_indexed) res = load_indexed(decoder, dsc);
+        else res = decode_indexed(decoder, dsc);
     }
     else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
         res = decode_alpha_only(decoder, dsc);
