@@ -203,7 +203,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
     data->draw_buf = lv_draw_buf_create(dsc_out->box_w, dsc_out->box_h, LV_COLOR_FORMAT_A8, stride);
 
     for(int y = 0; y < dsc_out->box_h; ++y) {
-        lv_memcpy(data->draw_buf->data + y * stride, glyph_bitmap->bitmap.buffer + y * dsc_out->box_w,
+        lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * dsc_out->box_w,
                   dsc_out->box_w);
     }
 
