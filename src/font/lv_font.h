@@ -111,6 +111,7 @@ typedef struct _lv_font_t {
 /**
  * Return with the bitmap of a font.
  * @param font_p        pointer to a font
+ * @param g_dsc         pass the lv_font_glyph_dsc_t here
  * @param letter        a UNICODE character code
  * @return pointer to the bitmap of the letter
  */
