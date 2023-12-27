@@ -36,9 +36,10 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-12-12" version="9.0.0-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev1.pack">
+    <release date="2023-12-24" version="9.0.0-dev2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev2.pack">
       - LVGL 9.0.0-dev
       - New Driver Architecture
+      - Adds Helium support
       - Other fixes
     </release>
     <release date="2023-12-05" version="8.3.11" url="https://github.com/lvgl/lvgl/raw/8194d83226c27c84f12dd51e16f5add9939215a5/env_support/cmsis-pack/LVGL.lvgl.8.3.11.pack">
@@ -263,6 +264,12 @@
         <condition id="LVGL-Essential">
             <description>Require LVGL Essential Service</description>
             <require Cclass="LVGL" Cgroup="Essential"/>
+        </condition>
+
+        <condition id="LVGL-Essential-Assets">
+            <description>Require LVGL Essential Service and Demo Assets </description>
+            <require Cclass="LVGL" Cgroup="Essential" />
+            <require Cclass="LVGL" Cgroup="Demos" Csub="Assets" />
         </condition>
 
         <condition id="Arm-2D">
@@ -542,7 +549,7 @@
                 <!-- src/themes -->
                 <file category="sourceC"            name="src/themes/lv_theme.c" />
                 <file category="sourceC"            name="src/themes/mono/lv_theme_mono.c" />
-                <file category="sourceC"            name="src/themes/basic/lv_theme_basic.c" />
+                <file category="sourceC"            name="src/themes/simple/lv_theme_simple.c" />
                 <file category="sourceC"            name="src/themes/default/lv_theme_default.c" />
                 
                 <!-- src/tick -->
@@ -562,7 +569,7 @@
                 <file category="sourceC"            name="src/widgets/checkbox/lv_checkbox.c" />
                 <file category="sourceC"            name="src/widgets/dropdown/lv_dropdown.c" />
                 <file category="sourceC"            name="src/widgets/image/lv_image.c" />
-                <file category="sourceC"            name="src/widgets/imgbtn/lv_imgbtn.c" />
+                <file category="sourceC"            name="src/widgets/imagebutton/lv_imagebutton.c" />
                 <file category="sourceC"            name="src/widgets/keyboard/lv_keyboard.c" />
                 <file category="sourceC"            name="src/widgets/label/lv_label.c" />
                 <file category="sourceC"            name="src/widgets/led/lv_led.c" />
@@ -590,6 +597,7 @@
                 
                 <!-- src/others -->
                 <file category="sourceC"            name="src/others/sysmon/lv_sysmon.c" />
+                <file category="sourceC"            name="src/others/observer/lv_observer.c" />
                 
                 <!-- src/demons -->
                 <file category="sourceC"            name="demos/lv_demos.c" />
@@ -598,7 +606,7 @@
                 <file category="sourceC"            name="src/osal/lv_os_none.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.0.2" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.0" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -1376,21 +1384,6 @@
 
             </component>
 
-            <component Cgroup="Libraries and Others" Csub="Observer"  condition="LVGL-Essential">
-              <description>Add an observer pattern implementation</description>
-              <files>
-                <!-- src/others/observer -->
-                <file category="sourceC"            name="src/others/observer/lv_observer.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable an observer pattern implementation*/
-#define LV_USE_OBSERVER         1
-              </RTE_Components_h>
-
-            </component>
-
             <component Cgroup="Libraries and Others" Csub="Snapshot"  condition="LVGL-Essential">
               <description>Add the API to take snapshot for object</description>
               <files>
@@ -1406,13 +1399,10 @@
 
             </component>
 
-
-            <component Cgroup="Demos" Csub="Benchmark"  condition="LVGL-Essential">
+            <component Cgroup="Demos" Csub="Assets"  condition="LVGL-Essential">
               <description>Add the official benchmark.</description>
               <files>
                 <!-- demos/benchmark -->
-                <file category="sourceC"    name="demos/benchmark/lv_demo_benchmark.c" />
-
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_alpha256.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_argb.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
@@ -1421,60 +1411,8 @@
                 <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_12_compr_az.c.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_16_compr_az.c.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_28_compr_az.c.c" />
-
-                <file category="doc"        name="demos/benchmark/README.md" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable demo:bencharmk */
-#define LV_USE_DEMO_BENCHMARK           1
-              </RTE_Components_h>
-
-            </component>
-
-            <component Cgroup="Demos" Csub="Flex Layout" condition="LVGL-Essential">
-              <description>Add the Flex layout demo</description>
-              <files>
-                <!-- demos/flex_layout -->
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_ctrl_pad.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_flex_loader.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_main.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view_child_node.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view_ctrl_pad.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable the Flex layout demo */
-#define LV_USE_DEMO_FLEX_LAYOUT         1
-              </RTE_Components_h>
-
-            </component>
- 
-             <component Cgroup="Demos" Csub="Keypad Encoder" condition="LVGL-Essential">
-              <description>Add the demonstrate the usage of encoder and keyboard</description>
-              <files>
-                <!-- demos/keypad_encoder -->
-                <file category="sourceC"    name="demos/keypad_encoder/lv_demo_keypad_encoder.c" />
-                <file category="doc"        name="demos/keypad_encoder/README.md" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable the demonstrate the usage of encoder and keyboard */
-#define LV_USE_DEMO_KEYPAD_AND_ENCODER  1
-              </RTE_Components_h>
-
-            </component>
- 
- 
-              <component Cgroup="Demos" Csub="Multi-Language" condition="LVGL-Essential">
-              <description>Add the Smart-phone like multi-language demo.</description>
-              <files>
+                
                 <!-- demos/multilang -->
-                <file category="sourceC"    name="demos/multilang/lv_demo_multilang.c" />
                 <file category="sourceC"    name="demos/multilang/assets/img_multilang_like.c" />
                 <file category="sourceC"    name="demos/multilang/assets/avatars/img_multilang_avatar_1.c" />
                 <file category="sourceC"    name="demos/multilang/assets/avatars/img_multilang_avatar_2.c" />
@@ -1516,26 +1454,8 @@
                 
                 <file category="sourceC"    name="demos/multilang/assets/fonts/font_multilang_large.c" />
                 <file category="sourceC"    name="demos/multilang/assets/fonts/font_multilang_small.c" />
-
                 
-                <file category="doc"        name="demos/multilang/README.md" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable the Smart-phone like multi-language demo */
-#define LV_USE_DEMO_MULTILANG           1
-              </RTE_Components_h>
-
-            </component>
- 
-              <component Cgroup="Demos" Csub="Music Player" condition="LVGL-Essential">
-              <description>Add the music player demo</description>
-              <files>
                 <!-- demos/music -->
-                <file category="sourceC"    name="demos/music/lv_demo_music.c" />
-                <file category="sourceC"    name="demos/music/lv_demo_music_list.c" />
-                <file category="sourceC"    name="demos/music/lv_demo_music_main.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_wave_top_large.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_wave_top.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_wave_bottom_large.c" />
@@ -1580,7 +1500,105 @@
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_btn_list_pause_large.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_btn_list_pause.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_btn_corner_large.c" />
+
+                <!-- demos/widgets -->
+                <file category="sourceC"    name="demos/widgets/assets/img_clothes.c" />
+                <file category="sourceC"    name="demos/widgets/assets/img_demo_widgets_avatar.c" />
+                <file category="sourceC"    name="demos/widgets/assets/img_demo_widgets_needle.c" />
+                <file category="sourceC"    name="demos/widgets/assets/img_lvgl_logo.c" />
+
+                <!-- demos/transform -->
+                <file category="sourceC"    name="demos/transform/assets/img_transform_avatar_15.c" />
                 
+                <!-- demos/vector_graphic -->
+                <file category="sourceC"    name="demos/vector_graphic/assets/img_demo_vector_avatar.c" />
+                
+                <!-- demos/render -->
+                <file category="sourceC"    name="demos/render/assets/img_render_arc_bg.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_argb8888.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb565.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb888.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_xrgb8888.c" />
+              </files>
+
+            </component>
+
+            <component Cgroup="Demos" Csub="Benchmark"  condition="LVGL-Essential-Assets">
+              <description>Add the official benchmark.</description>
+              <files>
+                <!-- demos/benchmark -->
+                <file category="sourceC"    name="demos/benchmark/lv_demo_benchmark.c" />
+                <file category="doc"        name="demos/benchmark/README.md" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable demo:bencharmk */
+#define LV_USE_DEMO_BENCHMARK           1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Demos" Csub="Flex Layout" condition="LVGL-Essential-Assets">
+              <description>Add the Flex layout demo</description>
+              <files>
+                <!-- demos/flex_layout -->
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_ctrl_pad.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_flex_loader.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_main.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view_child_node.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view_ctrl_pad.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the Flex layout demo */
+#define LV_USE_DEMO_FLEX_LAYOUT         1
+              </RTE_Components_h>
+
+            </component>
+ 
+             <component Cgroup="Demos" Csub="Keypad Encoder" condition="LVGL-Essential-Assets">
+              <description>Add the demonstrate the usage of encoder and keyboard</description>
+              <files>
+                <!-- demos/keypad_encoder -->
+                <file category="sourceC"    name="demos/keypad_encoder/lv_demo_keypad_encoder.c" />
+                <file category="doc"        name="demos/keypad_encoder/README.md" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the demonstrate the usage of encoder and keyboard */
+#define LV_USE_DEMO_KEYPAD_AND_ENCODER  1
+              </RTE_Components_h>
+
+            </component>
+ 
+ 
+              <component Cgroup="Demos" Csub="Multi-Language" condition="LVGL-Essential-Assets">
+              <description>Add the Smart-phone like multi-language demo.</description>
+              <files>
+                <!-- demos/multilang -->
+                <file category="sourceC"    name="demos/multilang/lv_demo_multilang.c" />
+                <file category="doc"        name="demos/multilang/README.md" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the Smart-phone like multi-language demo */
+#define LV_USE_DEMO_MULTILANG           1
+              </RTE_Components_h>
+
+            </component>
+ 
+              <component Cgroup="Demos" Csub="Music Player" condition="LVGL-Essential-Assets">
+              <description>Add the music player demo</description>
+              <files>
+                <!-- demos/music -->
+                <file category="sourceC"    name="demos/music/lv_demo_music.c" />
+                <file category="sourceC"    name="demos/music/lv_demo_music_list.c" />
+                <file category="sourceC"    name="demos/music/lv_demo_music_main.c" />
                 <file category="doc"        name="demos/music/README.md" />
               </files>
 
@@ -1592,7 +1610,7 @@
 
             </component>
  
-             <component Cgroup="Demos" Csub="Scroll" condition="LVGL-Essential">
+             <component Cgroup="Demos" Csub="Scroll" condition="LVGL-Essential-Assets">
               <description>Add the demonstration for scroll settings</description>
               <files>
                 <!-- demos/scroll -->
@@ -1607,7 +1625,7 @@
 
             </component>
 
-             <component Cgroup="Demos" Csub="Stress Test" condition="LVGL-Essential">
+             <component Cgroup="Demos" Csub="Stress Test" condition="LVGL-Essential-Assets">
               <description>Add the Stress test for LVGL</description>
               <files>
                 <!-- demos/stress -->
@@ -1622,12 +1640,11 @@
 
             </component>
             
-             <component Cgroup="Demos" Csub="Widget Transform" condition="LVGL-Essential">
+             <component Cgroup="Demos" Csub="Widget Transform" condition="LVGL-Essential-Assets">
               <description>Add the Widget transformation demo</description>
               <files>
                 <!-- demos/transform -->
                 <file category="sourceC"    name="demos/transform/lv_demo_transform.c" />
-                <file category="sourceC"    name="demos/transform/assets/img_transform_avatar_15.c" />
               </files>
 
               <RTE_Components_h>
@@ -1638,12 +1655,11 @@
 
             </component>
  
-              <component Cgroup="Demos" Csub="Vector Graphic" condition="LVGL-Essential">
+              <component Cgroup="Demos" Csub="Vector Graphic" condition="LVGL-Essential-Assets">
               <description>Add the Vector graphic demo</description>
               <files>
                 <!-- demos/vector_graphic -->
                 <file category="sourceC"    name="demos/vector_graphic/lv_demo_vector_graphic.c" />
-                <file category="sourceC"    name="demos/vector_graphic/assets/img_demo_vector_avatar.c" />
               </files>
 
               <RTE_Components_h>
@@ -1654,16 +1670,11 @@
 
             </component>
 
-            <component Cgroup="Demos" Csub="Widgets" condition="LVGL-Essential">
+            <component Cgroup="Demos" Csub="Widgets" condition="LVGL-Essential-Assets">
               <description>Add the demo:widgets</description>
               <files>
                 <!-- demos/widgets -->
                 <file category="sourceC"    name="demos/widgets/lv_demo_widgets.c" />
-
-                <file category="sourceC"    name="demos/widgets/assets/img_clothes.c" />
-                <file category="sourceC"    name="demos/widgets/assets/img_demo_widgets_avatar.c" />
-                <file category="sourceC"    name="demos/widgets/assets/img_demo_widgets_needle.c" />
-                <file category="sourceC"    name="demos/widgets/assets/img_lvgl_logo.c" />
               </files>
 
               <RTE_Components_h>
@@ -1674,18 +1685,11 @@
 
             </component>
             
-            <component Cgroup="Demos" Csub="Render Test" condition="LVGL-Essential">
+            <component Cgroup="Demos" Csub="Render Test" condition="LVGL-Essential-Assets">
               <description>Add the Render test for each primitives. Requires at least 480x272 display</description>
               <files>
                 <!-- demos/render -->
                 <file category="sourceC"    name="demos/render/lv_demo_render.c" />
-
-                <file category="sourceC"    name="demos/render/assets/img_render_arc_bg.c" />
-                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_argb8888.c" />
-                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb565.c" />
-                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb888.c" />
-                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_xrgb8888.c" />
-                
                 <file category="doc"        name="demos/render/README.md" />
               </files>
 

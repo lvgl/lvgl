@@ -65,6 +65,10 @@
  *      MACROS
  **********************/
 
+#ifndef LV_GLOBAL_INIT
+    #define LV_GLOBAL_INIT(__GLOBAL_PTR)    lv_global_init((lv_global_t *)(__GLOBAL_PTR))
+#endif
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -133,7 +137,7 @@ void lv_init(void)
     LV_LOG_INFO("begin");
 
     /*Initialize members of static variable lv_global */
-    lv_global_init(LV_GLOBAL_DEFAULT());
+    LV_GLOBAL_INIT(LV_GLOBAL_DEFAULT());
 
     lv_mem_init();
 
