@@ -825,6 +825,15 @@ lv_timer_t * _lv_display_get_refr_timer(lv_display_t * disp)
     return disp->refr_timer;
 }
 
+void _lv_display_delete_refr_timer(lv_display_t * disp)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp || !disp->refr_timer) return;
+
+    lv_timer_delete(disp->refr_timer);
+    disp->refr_timer = NULL;
+}
+
 void lv_display_set_user_data(lv_display_t * disp, void * user_data)
 {
     if(!disp) disp = lv_display_get_default();
