@@ -1313,32 +1313,38 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
                                                           const bool is_major_tick, const int32_t major_tick_width, const int32_t minor_tick_width)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
+    const bool is_first_tick = 0U == tick_idx;
+    const bool is_last_tick = scale->total_tick_count == tick_idx;
+    const int32_t tick_width = is_major_tick ? major_tick_width : minor_tick_width;
 
-    if(scale->total_tick_count == tick_idx) {
-        if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-            scale->last_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
-        }
-        else if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-            scale->first_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
-        }
-        else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTER == scale->mode)) {
-            /* TODO */
-        }
-        else { /* Nothing to do */ }
+    /* Exit early if tick_idx is not the first nor last tick on the main line */
+    if(((!is_last_tick) && (!is_first_tick))
+       /* Exit early if scale mode is round. It doesn't support main line compensation */
+       || ((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTER == scale->mode))) {
+        return;
     }
-    else if(0U == tick_idx) {
+
+    if(is_last_tick) {
+        /* Mode is vertical */
         if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-            scale->first_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
+            scale->last_tick_width = tick_width;
         }
-        else if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-            scale->last_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
+        /* Mode is horizontal */
+        else {
+            scale->first_tick_width = tick_width;
         }
-        else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTER == scale->mode)) {
-            /* TODO */
-        }
-        else { /* Nothing to do */ }
     }
-    else { /* Nothing to do */ }
+    /* is_first_tick */
+    else {
+        /* Mode is vertical */
+        if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
+            scale->first_tick_width = tick_width;
+        }
+        /* Mode is horizontal */
+        else {
+            scale->last_tick_width = tick_width;
+        }
+    }
 }
 
 /**
