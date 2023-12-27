@@ -62,7 +62,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
     img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
     img_dsc.header.cf = layer_to_draw->color_format;
     img_dsc.header.stride = layer_to_draw->buf_stride;
-    img_dsc.data = layer_to_draw->buf;
+    img_dsc.data = lv_draw_buf_get_data(layer_to_draw->buf);
 
     lv_draw_image_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));
@@ -181,9 +181,9 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     cf = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
 
     if(decoder_dsc->decoded) {
-        src_buf = decoder_dsc->decoded->data;
-        img_stride = decoder_dsc->decoded->header.stride;
-        cf = decoder_dsc->decoded->header.cf;
+        src_buf = lv_draw_buf_get_data(decoder_dsc->decoded);
+        img_stride = lv_draw_buf_get_stride(decoder_dsc->decoded);
+        cf = lv_draw_buf_get_color_format(decoder_dsc->decoded);
     }
 
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));

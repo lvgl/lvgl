@@ -148,10 +148,13 @@ lv_image_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
     h += ext_size * 2;
     if(w == 0 || h == 0) return NULL;
 
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(w, h, cf, 0);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(w, h, cf, LV_DRAW_BUF_STRIDE_AUTO, NULL);
     if(draw_buf == NULL) return NULL;
 
-    if(lv_snapshot_take_to_buf(obj, cf, (lv_image_dsc_t *)draw_buf, draw_buf->data, draw_buf->data_size) != LV_RESULT_OK) {
+    void * buf = lv_draw_buf_get_data(draw_buf);
+    uint32_t buf_size = lv_draw_buf_get_data_size(draw_buf);
+
+    if(lv_snapshot_take_to_buf(obj, cf, (lv_image_dsc_t *)draw_buf, buf, buf_size) != LV_RESULT_OK) {
         lv_draw_buf_destroy(draw_buf);
         return NULL;
     }

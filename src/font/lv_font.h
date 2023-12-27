@@ -38,6 +38,7 @@ extern "C" {
  *-----------------*/
 
 struct _lv_font_t;
+struct _lv_draw_buf_t;
 /** Describes the properties of a glyph.*/
 typedef struct {
     const struct _lv_font_t *
@@ -85,7 +86,8 @@ typedef struct _lv_font_t {
     bool (*get_glyph_dsc)(const struct _lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
-    const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_t *, lv_font_glyph_dsc_t *, uint32_t, uint8_t *);
+    const struct _lv_draw_buf_t * (*get_glyph_bitmap)(const struct _lv_font_t *, lv_font_glyph_dsc_t *, uint32_t,
+                                                      uint8_t *);
 
     /** Release a glyph*/
     void (*release_glyph)(const struct _lv_font_t *, lv_font_glyph_dsc_t *);
@@ -115,8 +117,9 @@ typedef struct _lv_font_t {
  * @param letter        a UNICODE character code
  * @return pointer to the bitmap of the letter
  */
-const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t letter,
-                                         uint8_t * buf_out);
+const struct _lv_draw_buf_t * lv_font_get_glyph_bitmap(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc,
+                                                       uint32_t letter,
+                                                       uint8_t * buf_out);
 
 /**
  * Get the descriptor of a glyph

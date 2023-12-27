@@ -132,8 +132,8 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         lv_area_move(&img_area, dsc->center.x - ofs, dsc->center.y - ofs);
         blend_dsc.src_area = &img_area;
         blend_dsc.src_buf = _lv_image_decoder_get_data(&decoder_dsc);
-        blend_dsc.src_color_format = decoder_dsc.decoded->header.cf;
-        blend_dsc.src_stride = decoder_dsc.decoded->header.stride;
+        blend_dsc.src_color_format = lv_draw_buf_get_color_format(decoder_dsc.decoded);
+        blend_dsc.src_stride = lv_draw_buf_get_stride(decoder_dsc.decoded);
     }
 
     lv_opa_t * circle_mask = NULL;

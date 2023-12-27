@@ -137,8 +137,11 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
         /*Stride check and adjustment accordingly*/
         if(args && args->stride_align) {
-            uint32_t expected = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
-            if(expected != decoded->header.stride) {
+            uint32_t w = lv_draw_buf_get_width(decoded);
+            uint32_t cf = lv_draw_buf_get_color_format(decoded);
+            uint32_t stride = lv_draw_buf_get_stride(decoded);
+            uint32_t expected = lv_draw_buf_width_to_stride(w, cf);
+            if(expected != stride) {
                 LV_LOG_INFO("Convert PNG stride to %" LV_PRId32, expected);
                 lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, expected);
                 lv_draw_buf_destroy(decoded);
@@ -157,7 +160,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_image_cache_data_t search_key;
         search_key.src_type = dsc->src_type;
         search_key.src = dsc->src;
-        search_key.slot.size = decoded->data_size;
+        search_key.slot.size = lv_draw_buf_get_data_size(decoded);
 
         lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
 
@@ -271,7 +274,7 @@ static lv_draw_buf_t * decode_png_file(const char * filename)
 
     /*Alloc image buffer*/
     lv_draw_buf_t * decoded;
-    decoded = lv_draw_buf_create(image.width, image.height, LV_COLOR_FORMAT_ARGB8888, PNG_IMAGE_ROW_STRIDE(image));
+    decoded = lv_draw_buf_create(image.width, image.height, LV_COLOR_FORMAT_ARGB8888, PNG_IMAGE_ROW_STRIDE(image), NULL);
     if(decoded == NULL) {
         size_t image_size = PNG_IMAGE_SIZE(image);
         LV_LOG_ERROR("png draw buff alloc %zu failed: %s", image_size, filename);
@@ -280,7 +283,7 @@ static lv_draw_buf_t * decode_png_file(const char * filename)
     }
 
     /*Start decoding*/
-    ret = png_image_finish_read(&image, NULL, decoded->data, 0, NULL);
+    ret = png_image_finish_read(&image, NULL, lv_draw_buf_get_data(decoded), 0, NULL);
     png_image_free(&image);
     lv_free(data);
     if(!ret) {

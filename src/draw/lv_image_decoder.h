@@ -180,7 +180,7 @@ typedef struct _lv_image_decoder_dsc_t {
  */
 static inline const void * _lv_image_decoder_get_data(const lv_image_decoder_dsc_t * dsc)
 {
-    return dsc->decoded ? dsc->decoded->data : dsc->img_data;
+    return dsc->decoded ? lv_draw_buf_get_data(dsc->decoded) : dsc->img_data;
 }
 
 /**

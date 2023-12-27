@@ -755,17 +755,16 @@ static void blend_mode_cb(lv_obj_t * parent)
     /*Make the parent darker for additive blending*/
     lv_obj_set_style_bg_color(parent, lv_color_hex(0x808080), 0);
 
-    static uint8_t buf_rgb565[LV_CANVAS_BUF_SIZE(36, 30, 16, LV_DRAW_BUF_STRIDE_ALIGN)];
-    static uint8_t buf_rgb888[LV_CANVAS_BUF_SIZE(36, 30, 24, LV_DRAW_BUF_STRIDE_ALIGN)];
-    static uint8_t buf_xrgb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
-    static uint8_t buf_argb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
+    lv_draw_buf_t * buf_rgb565 = lv_draw_buf_create(36, 30, LV_COLOR_FORMAT_RGB565, LV_DRAW_BUF_STRIDE_AUTO, NULL);
+    lv_draw_buf_t * buf_rgb888 = lv_draw_buf_create(36, 30, LV_COLOR_FORMAT_RGB888, LV_DRAW_BUF_STRIDE_AUTO, NULL);
+    lv_draw_buf_t * buf_xrgb8888 = lv_draw_buf_create(36, 30, LV_COLOR_FORMAT_XRGB8888, LV_DRAW_BUF_STRIDE_AUTO, NULL);
+    lv_draw_buf_t * buf_argb8888 = lv_draw_buf_create(36, 30, LV_COLOR_FORMAT_ARGB8888, LV_DRAW_BUF_STRIDE_AUTO, NULL);
 
     /*The canvas will stay in the top left corner to show the original image*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
 
     const char * cf_txt[] = {"RGB565", "RGB888.", "XRGB8888", "ARGB8888"};
-    lv_color_format_t cf_values[] = {LV_COLOR_FORMAT_RGB565, LV_COLOR_FORMAT_RGB888, LV_COLOR_FORMAT_XRGB8888, LV_COLOR_FORMAT_ARGB8888};
-    uint8_t * cf_bufs[] = {buf_rgb565, buf_rgb888, buf_xrgb8888, buf_argb8888};
+    lv_draw_buf_t * cf_bufs[] = {buf_rgb565, buf_rgb888, buf_xrgb8888, buf_argb8888};
     static lv_image_dsc_t image_dscs[4];
 
     const char * mode_txt[] = {"Add.", "Sub.", "Mul."};
@@ -784,7 +783,7 @@ static void blend_mode_cb(lv_obj_t * parent)
         lv_label_set_text(cf_label, cf_txt[cf]);
         lv_obj_set_grid_cell(cf_label, LV_GRID_ALIGN_CENTER, 1 + cf * 2, 2, LV_GRID_ALIGN_CENTER, 0, 1);
 
-        lv_canvas_set_buffer(canvas, cf_bufs[cf], 36, 30, cf_values[cf]);
+        lv_canvas_set_draw_buf(canvas, cf_bufs[cf]);
         create_blend_mode_image_buffer(canvas);
         lv_img_dsc_t * img_src = lv_canvas_get_image(canvas);
         image_dscs[cf] = *img_src;

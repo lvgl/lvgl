@@ -292,9 +292,12 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
     if(decoded == NULL) return NULL; /*No need to adjust*/
 
     lv_image_decoder_args_t * args = &dsc->args;
-    if(args->stride_align && decoded->header.cf != LV_COLOR_FORMAT_RGB565A8) {
-        uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
-        if(decoded->header.stride != stride_expect) {
+    lv_color_format_t cf = lv_draw_buf_get_color_format(decoded);
+    uint32_t w = lv_draw_buf_get_width(decoded);
+    uint32_t stride = lv_draw_buf_get_stride(decoded);
+    if(args->stride_align && cf != LV_COLOR_FORMAT_RGB565A8) {
+        uint32_t stride_expect = lv_draw_buf_width_to_stride(w, cf);
+        if(stride != stride_expect) {
             LV_LOG_WARN("Stride mismatch");
             lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, stride_expect);
             if(aligned == NULL) {

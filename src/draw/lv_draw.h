@@ -142,19 +142,13 @@ typedef struct _lv_draw_unit_t {
 } lv_draw_unit_t;
 
 typedef struct _lv_layer_t  {
-
-    /** The unaligned buffer where drawing will happen*/
-    void * buf_unaligned;
-
-    /** The aligned buffer, result of lv_draw_buf_align(layer->buf_unaligned)*/
-    void * buf;
-
-    uint32_t buf_stride;
+    /* target draw buffer */
+    lv_draw_buf_t * buf;
 
     /** The absolute coordinates of the buffer */
     lv_area_t buf_area;
 
-    /** The color format of the layer. LV_COLOR_FORMAT_...  */
+    uint32_t buf_stride;
     lv_color_format_t color_format;
 
     /**

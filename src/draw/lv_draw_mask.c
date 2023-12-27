@@ -43,7 +43,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * 
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect(struct _lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc)
 {
-    if(!lv_color_format_has_alpha(layer->color_format)) {
+    lv_color_format_t cf = lv_draw_buf_get_color_format(layer->buf);
+    if(!lv_color_format_has_alpha(cf)) {
         LV_LOG_WARN("Only layers with alpha channel can be masked");
         return;
     }

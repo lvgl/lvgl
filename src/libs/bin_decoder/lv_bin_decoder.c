@@ -48,7 +48,6 @@ typedef struct {
     lv_image_compressed_t compressed;
     lv_draw_buf_t * decoded; /*A draw buf to store decoded image*/
     lv_draw_buf_t * decompressed; /*Decompressed data could be used directly, thus must also be draw buf*/
-    lv_draw_buf_t c_array;  /*An C-array image that need to be converted to a draw buf*/
     lv_draw_buf_t * decoded_partial; /*A draw buf for decoded image via get_area_cb*/
 } decoder_data_t;
 
@@ -198,7 +197,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     lv_image_cache_data_t search_key;
     search_key.src_type = dsc->src_type;
     search_key.src = dsc->src;
-    search_key.slot.size = dsc->decoded->data_size;
+    search_key.slot.size = lv_draw_buf_get_data_size(dsc->decoded);
 
     lv_cache_entry_t * cache_entry = lv_image_decoder_add_to_cache(decoder, &search_key, dsc->decoded, dsc->user_data);
     if(cache_entry == NULL) {
@@ -272,11 +271,11 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
 
         len = (len * w_px) / 8;
         decoded = decoder_data->decoded_partial;
-        if(decoded && decoded->header.w == w_px) {
+        if(decoded && lv_draw_buf_get_width(decoded) == w_px) {
             /*Use existing one directly*/
         }
         else {
-            decoded = lv_draw_buf_create(w_px, 1, cf_decoded, 0);
+            decoded = lv_draw_buf_create(w_px, 1, cf_decoded, LV_DRAW_BUF_STRIDE_AUTO, NULL);
             if(decoded == NULL)
                 return LV_RESULT_INVALID;
         }
@@ -291,7 +290,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded = decoder_data->decoded_partial; /*Already alloced*/
     }
 
-    img_data = decoded->data; /*Get the buffer to operate on*/
+    img_data = lv_draw_buf_get_data(decoded); /*Get the buffer to operate on*/
 
     if(decoded_area->y1 > full_area->y2) {
         return LV_RESULT_INVALID;
@@ -347,7 +346,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
 
     if(cf == LV_COLOR_FORMAT_RGB565A8) {
         bpp = 16; /* RGB565 + A8 mask*/
-        uint32_t len = decoded->header.stride;
+        uint32_t len = lv_draw_buf_get_stride(decoded);
         offset += decoded_area->y1 * dsc->header.stride; /*Move to y1*/
         offset += decoded_area->x1 * bpp / 8; /*Move to x1*/
         res = fs_read_file_at(f, offset, img_data, len, NULL);
@@ -426,7 +425,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 
     bool is_compressed = dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED;
     if(is_compressed) {
-        uint8_t * data = decoder_data->decompressed->data;
+        uint8_t * data = lv_draw_buf_get_data(decoder_data->decompressed);
         palette = (lv_color32_t *)data;
         indexed_data = data + palette_len;
     }
@@ -449,7 +448,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
         decoder_data->palette = (void *)palette; /*Need to free when decoder closes*/
 
 #if LV_BIN_DECODER_RAM_LOAD
-        draw_buf_indexed = lv_draw_buf_create(dsc->header.w, dsc->header.h, cf, dsc->header.stride);
+        draw_buf_indexed = lv_draw_buf_create(dsc->header.w, dsc->header.h, cf, dsc->header.stride, NULL);
         if(draw_buf_indexed == NULL) {
             LV_LOG_ERROR("Draw buffer alloc failed");
             goto exit_with_buf;
@@ -488,7 +487,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 #if LV_BIN_DECODER_RAM_LOAD
     /*Convert to ARGB8888, since sw renderer cannot render it directly even it's in RAM*/
     lv_draw_buf_t * decoded = lv_draw_buf_create(dsc->header.w, dsc->header.h, LV_COLOR_FORMAT_ARGB8888,
-                                                 0);
+                                                 LV_DRAW_BUF_STRIDE_AUTO, NULL);
     if(decoded == NULL) {
         LV_LOG_ERROR("No memory for indexed image");
         goto exit_with_buf;
@@ -542,7 +541,7 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
         len += (dsc->header.stride / 2) * dsc->header.h; /*A8 mask*/
     }
 
-    lv_draw_buf_t * decoded = lv_draw_buf_create(dsc->header.w, dsc->header.h, cf, dsc->header.stride);
+    lv_draw_buf_t * decoded = lv_draw_buf_create(dsc->header.w, dsc->header.h, cf, dsc->header.stride, NULL);
     if(decoded == NULL) {
         LV_LOG_ERROR("No memory for rgb file read");
         return LV_RESULT_INVALID;
@@ -594,17 +593,17 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
     lv_draw_buf_t * decoded;
     uint32_t file_len = (uint32_t)dsc->header.stride * dsc->header.h;
 
-    decoded = lv_draw_buf_create(w, dsc->header.h, LV_COLOR_FORMAT_A8, buf_stride);
+    decoded = lv_draw_buf_create(w, dsc->header.h, LV_COLOR_FORMAT_A8, buf_stride, NULL);
     if(decoded == NULL) {
         LV_LOG_ERROR("Out of memory");
         return LV_RESULT_INVALID;
     }
 
-    uint8_t * img_data = decoded->data;
+    uint8_t * img_data = lv_draw_buf_get_data(decoded);
 
     if(dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) {
         /*Copy from image data*/
-        lv_memcpy(img_data, decoder_data->decompressed->data, file_len);
+        lv_memcpy(img_data, lv_draw_buf_get_data(decoder_data->decompressed), file_len);
     }
     else if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         res = fs_read_file_at(decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
@@ -834,19 +833,20 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
     uint32_t input_len = compressed->compressed_size;
     LV_UNUSED(input_len);
     lv_draw_buf_t * decompressed = lv_draw_buf_create(dsc->header.w, dsc->header.h, dsc->header.cf,
-                                                      dsc->header.stride);
+                                                      dsc->header.stride, NULL);
     if(decompressed == NULL) {
         LV_LOG_WARN("No memory for decompressed image, input: %" LV_PRIu32 ", output: %" LV_PRIu32, input_len, out_len);
         return LV_RESULT_INVALID;
     }
 
-    if(decompressed->data_size < out_len) {
-        LV_LOG_WARN("decompressed size mismatch: %" LV_PRIu32 ", %" LV_PRIu32, decompressed->data_size, out_len);
+    uint32_t decompressed_size = lv_draw_buf_get_data_size(decompressed);
+    if(decompressed_size < out_len) {
+        LV_LOG_WARN("decompressed size mismatch: %" LV_PRIu32 ", %" LV_PRIu32, decompressed_size, out_len);
         lv_draw_buf_destroy(decompressed);
         return LV_RESULT_INVALID;
     }
 
-    img_data = decompressed->data;
+    img_data = lv_draw_buf_get_data(decompressed);
 
     if(compressed->method == LV_IMAGE_COMPRESS_RLE) {
 #if LV_USE_RLE
@@ -994,15 +994,12 @@ static bool bin_decoder_decode_data(lv_image_decoder_dsc_t * dsc)
             /*In case of uncompressed formats the image stored in the ROM/RAM.
              *So simply give its pointer*/
 
-            decoder_data_t * decoder_data = get_decoder_data(dsc);
-            lv_draw_buf_t * decoded = &decoder_data->c_array;
-            dsc->decoded = decoded;
-            lv_draw_buf_from_image(decoded, image);
-
-            if(decoded->header.stride == 0) {
-                /*Use the auto calculated value from decoder_info callback*/
-                decoded->header.stride = dsc->header.stride;
-            }
+            // decoder_data_t * decoder_data = get_decoder_data(dsc);
+            // lv_draw_buf_t * decoded = &decoder_data->c_array;
+            // dsc->decoded = decoded;
+            // lv_draw_buf_from_image(decoded, image);
+            dsc->decoded = lv_draw_buf_create(image->header.w, image->header.h, image->header.cf, image->header.stride,
+                                              (void *)image->data);
 
             res = LV_RESULT_OK;
         }

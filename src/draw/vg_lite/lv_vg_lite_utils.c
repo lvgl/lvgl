@@ -586,7 +586,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
         return false;
     }
 
-    const uint8_t * img_data = decoder_dsc->decoded->data;
+    const uint8_t * img_data = lv_draw_buf_get_data(decoder_dsc->decoded);
 
     if(!img_data) {
         lv_image_decoder_close(decoder_dsc);

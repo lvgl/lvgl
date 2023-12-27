@@ -198,13 +198,16 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
 
     lv_freetype_cache_node_t * data = lv_cache_entry_get_data(entry);
     data->glyph_dsc = *dsc_out;
-
-    uint32_t stride = lv_draw_buf_width_to_stride(dsc_out->box_w, LV_COLOR_FORMAT_A8);
-    data->draw_buf = lv_draw_buf_create(dsc_out->box_w, dsc_out->box_h, LV_COLOR_FORMAT_A8, stride);
+    data->draw_buf = lv_draw_buf_create(dsc_out->box_w, dsc_out->box_h, LV_COLOR_FORMAT_A8, LV_DRAW_BUF_STRIDE_AUTO, NULL);
+    const uint8_t * src = glyph_bitmap->bitmap.buffer;
+    uint32_t src_stride = dsc_out->box_w;
+    uint8_t * dest = lv_draw_buf_get_data(data->draw_buf);
+    uint32_t dest_stride = lv_draw_buf_get_stride(data->draw_buf);
 
     for(int y = 0; y < dsc_out->box_h; ++y) {
-        lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * dsc_out->box_w,
-                  dsc_out->box_w);
+        lv_memcpy(dest, src, src_stride);
+        src += src_stride;
+        dest += dest_stride;
     }
 
     dsc_out->entry = NULL;
@@ -235,7 +238,7 @@ static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_f
     g_dsc->entry = entry;
     lv_freetype_cache_node_t * cache_node = lv_cache_entry_get_data(entry);
 
-    return cache_node->draw_buf->data;
+    return lv_draw_buf_get_data(cache_node->draw_buf);
 }
 
 static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)

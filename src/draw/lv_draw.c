@@ -175,6 +175,7 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
     lv_draw_task_t * t = layer->draw_task_head;
+
     while(t) {
         lv_draw_task_t * t_next = t->next;
         if(t->state == LV_DRAW_TASK_STATE_READY) {
@@ -185,15 +186,17 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
             if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
                 lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
                 lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
+                lv_color_format_t cf = lv_draw_buf_get_color_format(layer_drawn->buf);
 
                 if(layer_drawn->buf) {
                     int32_t h = lv_area_get_height(&layer_drawn->buf_area);
                     int32_t w = lv_area_get_width(&layer_drawn->buf_area);
-                    uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer_drawn->color_format);
+                    uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, cf);
 
                     _draw_info.used_memory_for_layers_kb -= get_layer_size_kb(layer_size_byte);
                     LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
-                    lv_draw_buf_free(layer_drawn->buf_unaligned);
+                    lv_draw_buf_destroy(layer_drawn->buf);
+                    layer_drawn->buf = NULL;
                 }
 
                 /*Remove the layer from  the display's*/
@@ -361,23 +364,17 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
-    int32_t w = lv_area_get_width(&layer->buf_area);
-    uint32_t stride = lv_draw_buf_width_to_stride(w, layer->color_format);
-
     /*If the buffer of the layer is not allocated yet, allocate it now*/
     if(layer->buf == NULL) {
+        int32_t w = lv_area_get_width(&layer->buf_area);
         int32_t h = lv_area_get_height(&layer->buf_area);
-        uint32_t layer_size_byte = h * stride;
-        layer->buf_unaligned = lv_draw_buf_malloc(layer_size_byte, layer->color_format);
-
-        if(layer->buf_unaligned == NULL) {
-            LV_LOG_WARN("Allocating %"LV_PRIu32" bytes of layer buffer failed. Try later", layer_size_byte);
+        layer->buf = lv_draw_buf_create(w, h, layer->color_format, LV_DRAW_BUF_STRIDE_AUTO, NULL);
+        if(layer->buf == NULL) {
+            LV_LOG_WARN("Allocating layer buffer failed. Try later");
             return NULL;
         }
 
-        layer->buf = lv_draw_buf_align(layer->buf_unaligned, layer->color_format);
-
-        _draw_info.used_memory_for_layers_kb += get_layer_size_kb(layer_size_byte);
+        _draw_info.used_memory_for_layers_kb += get_layer_size_kb(lv_draw_buf_get_data_size(layer->buf));
         LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
 
         if(lv_color_format_has_alpha(layer->color_format)) {
@@ -386,26 +383,20 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
             a.y1 = 0;
             a.x2 = w - 1;
             a.y2 = h - 1;
-            lv_draw_buf_clear(layer->buf, w, h, layer->color_format, &a);
+            lv_draw_buf_clear(layer->buf, &a);
         }
     }
 
     /*Set the stride also for static allocated buffers as well as for new dynamically allocated*/
-    layer->buf_stride = stride;
+    layer->buf_stride = lv_draw_buf_get_stride(layer->buf);
 
     /*Make sure the buffer address is aligned in case of already allocated buffers*/
-    return lv_draw_buf_align(layer->buf, layer->color_format);
+    return lv_draw_buf_get_data(layer->buf);
 }
 
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
 {
-    lv_draw_buf_t tmp;
-    tmp.data = layer->buf;
-    tmp.header.stride = layer->buf_stride;
-    tmp.header.cf = layer->color_format;
-    tmp.header.w = lv_area_get_width(&layer->buf_area);
-    tmp.header.h = lv_area_get_height(&layer->buf_area);
-    return lv_draw_buf_goto_xy(&tmp, x, y);
+    return lv_draw_buf_goto_xy(layer->buf, x, y);
 }
 
 /**********************

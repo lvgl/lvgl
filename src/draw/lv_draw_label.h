@@ -80,10 +80,7 @@ typedef enum {
 } lv_draw_glyph_bitmap_format_t;
 
 typedef struct {
-    const uint8_t * bitmap;
-    uint8_t * _bitmap_buf_unaligned;
-    uint8_t * bitmap_buf;
-    uint32_t _bitmap_buf_size;
+    lv_draw_buf_t * buf;
     lv_draw_glyph_bitmap_format_t format;
     const lv_area_t * letter_coords;
     const lv_area_t * bg_coords;

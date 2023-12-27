@@ -33,7 +33,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_canvas_class;
 typedef struct {
     lv_image_t img;
     lv_draw_buf_t * draw_buf;
-    lv_draw_buf_t static_buf;
 } lv_canvas_t;
 
 /**********************
@@ -50,21 +49,6 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
 /*=====================
  * Setter functions
  *====================*/
-
-/**
- * Set a buffer for the canvas.
- * Use `lv_canvas_set_draw_buf` instead if you need to set a buffer with alignment requirement.
- * @param buf a buffer where the content of the canvas will be.
- * The required size is (lv_image_color_format_get_px_size(cf) * w) / 8 * h)
- * It can be allocated with `lv_malloc()` or
- * it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
- * it can be an address in RAM or external SRAM
- * @param canvas pointer to a canvas object
- * @param w width of the canvas
- * @param h height of the canvas
- * @param cf color format. `LV_COLOR_FORMAT...`
- */
-void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_color_format_t cf);
 
 /**
  * Set a draw buffer for the canvas. A draw buffer either can be allocated by `lv_draw_buf_create()`
@@ -107,6 +91,11 @@ void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color32_t c);
 
 lv_draw_buf_t * lv_canvas_get_draw_buf(lv_obj_t * obj);
 
+static inline lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * obj)
+{
+    return (lv_image_dsc_t *)lv_canvas_get_draw_buf(obj);
+}
+
 /**
  * Get a pixel's color and opacity
  * @param obj   pointer to a canvas
@@ -116,38 +105,10 @@ lv_draw_buf_t * lv_canvas_get_draw_buf(lv_obj_t * obj);
  */
 lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y);
 
-/**
- * Get the image of the canvas as a pointer to an `lv_image_dsc_t` variable.
- * @param canvas    pointer to a canvas object
- * @return          pointer to the image descriptor.
- */
-lv_image_dsc_t * lv_canvas_get_image(lv_obj_t * canvas);
-
-/**
- * Return the pointer for the buffer.
- * It's recommended to use this function instead of the buffer form the
- * return value of lv_canvas_get_image() as is can be aligned
- * @param canvas    pointer to a canvas object
- * @return          pointer to the buffer
- */
-const void * lv_canvas_get_buf(lv_obj_t * canvas);
-
 /*=====================
  * Other functions
  *====================*/
 
-/**
- * Copy a buffer to the canvas
- * @param canvas    pointer to a canvas object
- * @param to_copy   buffer to copy. The color format has to match with the canvas's buffer color
- * format
- * @param x     left side of the destination position
- * @param y     top side of the destination position
- * @param w     width of the buffer to copy
- * @param h     height of the buffer to copy
- */
-void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, int32_t x, int32_t y, int32_t w,
-                        int32_t h);
 /**
  * Fill the canvas with color
  * @param canvas    pointer to a canvas

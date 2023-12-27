@@ -166,7 +166,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_image_cache_data_t search_key;
         search_key.src_type = dsc->src_type;
         search_key.src = dsc->src;
-        search_key.slot.size = decoded->data_size;
+        search_key.slot.size = lv_draw_buf_get_data_size(decoded);
 
         lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
 
@@ -267,8 +267,6 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
     JSAMPARRAY buffer;  /* Output row buffer */
     int row_stride;     /* physical row width in output buffer */
 
-    uint8_t * output_buffer = NULL;
-
     /* In this example we want to open the input file before doing anything else,
      * so that the setjmp() error recovery below can assume the file is open.
      * VERY IMPORTANT: use "b" option to fopen() if you are on a machine that
@@ -291,10 +289,6 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
     if(setjmp(jerr.jb)) {
 
         LV_LOG_WARN("decoding error");
-
-        if(output_buffer) {
-            lv_draw_buf_free(output_buffer);
-        }
 
         /* If we get here, the JPEG code has signaled an error.
         * We need to clean up the JPEG object, close the input file, and return.
@@ -349,10 +343,12 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
     buffer = (*cinfo.mem->alloc_sarray)
              ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-    decoded = lv_draw_buf_create(cinfo.output_width, cinfo.output_height, LV_COLOR_FORMAT_RGB888, 0);
+    decoded = lv_draw_buf_create(cinfo.output_width, cinfo.output_height, LV_COLOR_FORMAT_RGB888, LV_DRAW_BUF_STRIDE_AUTO,
+                                 NULL);
     if(decoded != NULL) {
-        uint8_t * cur_pos = decoded->data;
-        size_t stride = cinfo.output_width * JPEG_PIXEL_SIZE;
+        uint8_t * dest = lv_draw_buf_get_data(decoded);
+        uint32_t dest_stride = lv_draw_buf_get_stride(decoded);
+        size_t src_stride = cinfo.output_width * JPEG_PIXEL_SIZE;
 
         /* while (scan lines remain to be read) */
         /* jpeg_read_scanlines(...); */
@@ -368,8 +364,8 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
             jpeg_read_scanlines(&cinfo, buffer, 1);
 
             /* Assume put_scanline_someplace wants a pointer and sample count. */
-            lv_memcpy(cur_pos, buffer[0], stride);
-            cur_pos += decoded->header.stride;
+            lv_memcpy(dest, buffer[0], src_stride);
+            dest += dest_stride;
         }
     }
 

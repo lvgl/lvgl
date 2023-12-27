@@ -17,8 +17,6 @@
  *      DEFINES
  *********************/
 
-#define LV_VG_LITE_IMAGE_NO_CACHE LV_IMAGE_FLAGS_USER1
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -131,7 +129,7 @@ static void image_try_self_pre_mul(lv_image_decoder_dsc_t * dsc)
     uint32_t stride = lv_draw_buf_width_to_stride(image_w, cf);
     uint32_t aligned_w = lv_vg_lite_width_align(image_w);
     size_t px_size = aligned_w * image_h;
-    void * image_data = dsc->decoded->data;
+    void * image_data = lv_draw_buf_get_data(dsc->decoded);
 
     if(cf == LV_COLOR_FORMAT_ARGB8888) {
         image_color32_pre_mul(image_data, px_size);
@@ -217,12 +215,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
         && !is_indexed
         && (!has_alpha || (has_alpha && support_blend_normal))) || is_yuv) {
 
-        lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
-        LV_ASSERT_MALLOC(draw_buf);
-        lv_image_header_init(&draw_buf->header, width, height, cf, stride, LV_VG_LITE_IMAGE_NO_CACHE);
-        dsc->decoded = draw_buf;
-        draw_buf->data = (void *)image_data;
-        draw_buf->unaligned_data = (void *)image_data;
+        dsc->decoded = lv_draw_buf_create(dsc->header.w, dsc->header.h, cf, stride, (void *)image_data);
         return LV_RESULT_OK;
     }
 
@@ -234,7 +227,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
      */
     uint32_t palette_size_bytes_aligned = LV_VG_LITE_ALIGN(palette_size_bytes, LV_VG_LITE_BUF_ALIGN);
 
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, cf, stride);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, cf, stride, NULL);
     if(draw_buf == NULL) {
         LV_LOG_ERROR("create draw buf failed, cf = %d", cf);
         return LV_RESULT_INVALID;
@@ -243,7 +236,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     dsc->decoded = draw_buf;
 
     const uint8_t * src = image_data;
-    uint8_t * dest = draw_buf->data;
+    uint8_t * dest = lv_draw_buf_get_data(draw_buf);
 
     /* copy palette */
     if(palette_size_bytes) {
@@ -260,10 +253,8 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     image_try_self_pre_mul(dsc);
 
     /* invalidate D-Cache */
-    image_invalidate_cache(draw_buf->data, stride, width, height, cf);
+    image_invalidate_cache(lv_draw_buf_get_data(draw_buf), stride, width, height, cf);
 
-    LV_LOG_INFO("image %p (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p, cf: %d) decode finish",
-                image_data, width, height, draw_buf->data, cf);
     return LV_RESULT_OK;
 }
 
@@ -308,14 +299,14 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
      */
     uint32_t palette_size_bytes_aligned = LV_VG_LITE_ALIGN(palette_size_bytes, LV_VG_LITE_BUF_ALIGN);
 
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, cf, stride);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, cf, stride, NULL);
     if(draw_buf == NULL) {
         LV_LOG_ERROR("create draw buf failed, cf = %d", cf);
         return LV_RESULT_INVALID;
     }
 
     dsc->decoded = draw_buf;
-    uint8_t * dest = draw_buf->data;
+    uint8_t * dest = lv_draw_buf_get_data(draw_buf);
 
     /* copy palette */
     if(palette_size_bytes) {
@@ -354,10 +345,8 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     image_try_self_pre_mul(dsc);
 
     /* invalidate D-Cache */
-    image_invalidate_cache(draw_buf->data, stride, width, height, cf);
+    image_invalidate_cache(lv_draw_buf_get_data(draw_buf), stride, width, height, cf);
 
-    LV_LOG_INFO("image %s (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p cf: %d) decode finish",
-                path, width, height, draw_buf->data, cf);
     return LV_RESULT_OK;
 
 failed:
@@ -391,7 +380,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_image_cache_data_t search_key;
         search_key.src_type = dsc->src_type;
         search_key.src = dsc->src;
-        search_key.slot.size = dsc->decoded->data_size;
+        search_key.slot.size = lv_draw_buf_get_data_size(dsc->decoded);
 
         lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, dsc->decoded, NULL);
 
@@ -407,16 +396,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     return res;
 }
 
-static void decoder_draw_buf_free(lv_draw_buf_t * draw_buf)
-{
-    if(draw_buf->header.flags & LV_VG_LITE_IMAGE_NO_CACHE) {
-        lv_free(draw_buf);
-    }
-    else {
-        lv_draw_buf_destroy(draw_buf);
-    }
-}
-
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
@@ -424,7 +403,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 #if LV_CACHE_DEF_SIZE > 0
     lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
 #else
-    decoder_draw_buf_free((lv_draw_buf_t *)dsc->decoded);
+    lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
 #endif
 }
 
@@ -434,7 +413,7 @@ static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_
 
     if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
 
-    decoder_draw_buf_free((lv_draw_buf_t *)cached_data->decoded);
+    lv_draw_buf_destroy((lv_draw_buf_t *)cached_data->decoded);
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/

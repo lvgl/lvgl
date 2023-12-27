@@ -12,10 +12,11 @@ void lv_example_canvas_2(void)
     lv_obj_set_style_bg_color(lv_screen_active(), lv_palette_lighten(LV_PALETTE_RED, 5), 0);
 
     /*Create a buffer for the canvas*/
-    LV_DRAW_BUF_DEFINE(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888,
+                                                  LV_DRAW_BUF_STRIDE_AUTO, NULL);
     /*Create a canvas and initialize its palette*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_draw_buf(canvas, &draw_buf);
+    lv_canvas_set_draw_buf(canvas, draw_buf);
     lv_obj_center(canvas);
 
     /*Red background (There is no dedicated alpha channel in indexed images so LV_OPA_COVER is ignored)*/
