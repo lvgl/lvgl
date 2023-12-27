@@ -949,37 +949,43 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             x_ofs = obj->coords.x1 + (pad_right + tick_pad_right);
             y_ofs = obj->coords.y1 + (main_line_dsc.width / 2U) + pad_top;
         }
-        else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
+        /* LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode */
+        else {
             x_ofs = obj->coords.x1 + (pad_left + tick_pad_left);
             y_ofs = obj->coords.y2 + (main_line_dsc.width / 2U) - pad_bottom;
         }
-        else { /* Nothing to do */ }
 
-        if(is_major_tick && ((LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode))) {
-            major_len *= -1;
-        }
-        /* Draw tick lines to the right or top */
-        else if(!is_major_tick && (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode ||
-                                   LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-            minor_len *= -1;
+        /* Adjust length when tick will be drawn on horizontal top or vertical right scales */
+        if((LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
+            if(is_major_tick) {
+                major_len *= -1;
+            }
+            else {
+                minor_len *= -1;
+            }
         }
         else { /* Nothing to do */ }
 
         const int32_t tick_length = is_major_tick ? major_len : minor_len;
+        /* NOTE
+         * Minus 1 because tick count starts at 0
+         * TODO
+         * What if total_tick_count is 1? This will lead to an division by 0 further down */
+        const uint32_t tmp_tick_count = scale->total_tick_count - 1U;
 
-        /* Setup the tick points */
+        /* Calculate the position of the tick points based on the mode and tick index */
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
             /* Vertical position starts at y2 of the scale main line, we start at y2 because the ticks are drawn from bottom to top */
             int32_t vertical_position = obj->coords.y2 - (pad_bottom + tick_pad_bottom);
 
-            if((scale->total_tick_count - 1U) == tick_idx) {
+            /* Position the last tick */
+            if(tmp_tick_count == tick_idx) {
                 vertical_position = y_ofs;
             }
-            /* Increment the tick offset depending of its index */
+            /* Otherwise adjust the tick position depending of its index and number of ticks on the scale */
             else if(0 != tick_idx) {
                 const int32_t scale_total_height = lv_obj_get_height(obj) - (pad_top + pad_bottom + tick_pad_top + tick_pad_bottom);
-                int32_t offset = ((int32_t) tick_idx * (int32_t) scale_total_height) / (int32_t)(
-                                     scale->total_tick_count - 1);
+                const int32_t offset = ((int32_t) tick_idx * (int32_t) scale_total_height) / (int32_t)(tmp_tick_count);
                 vertical_position -= offset;
             }
             else { /* Nothing to do */ }
@@ -992,15 +998,15 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
         else {
             /* Horizontal position starts at x1 of the scale main line */
             int32_t horizontal_position = x_ofs;
-            /* Position the last tick at the x2 scale coordinate */
-            if((scale->total_tick_count - 1U) == tick_idx) {
+
+            /* Position the last tick */
+            if(tmp_tick_count == tick_idx) {
                 horizontal_position = obj->coords.x2 - (pad_left + tick_pad_left);
             }
-            /* Increment the tick offset depending of its index */
+            /* Otherwise adjust the tick position depending of its index and number of ticks on the scale */
             else if(0U != tick_idx) {
                 const int32_t scale_total_width = lv_obj_get_width(obj) - (pad_right + pad_left + tick_pad_right + tick_pad_left);
-                int32_t offset = ((int32_t) tick_idx * (int32_t) scale_total_width) / (int32_t)(
-                                     scale->total_tick_count - 1);
+                const int32_t offset = ((int32_t) tick_idx * (int32_t) scale_total_width) / (int32_t)(tmp_tick_count);
                 horizontal_position += offset;
             }
             else { /* Nothing to do */ }
@@ -1033,11 +1039,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             point_closer_to_arc = radius_edge - main_line_dsc.width;
             adjusted_radio_with_tick_len = point_closer_to_arc - (is_major_tick ? major_len : minor_len);
         }
-        else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode) {
+        /* LV_SCALE_MODE_ROUND_OUTER == scale->mode */
+        else {
             point_closer_to_arc = radius_edge - main_line_dsc.width;
             adjusted_radio_with_tick_len = point_closer_to_arc + (is_major_tick ? major_len : minor_len);
         }
-        else { /* Nothing to do */ }
 
         tick_point_a->x = center_point.x + point_closer_to_arc;
         tick_point_a->y = center_point.y;
