@@ -5326,7 +5326,7 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
                         LodePNGState * state,
                         const unsigned char * in, size_t insize)
 {
-    *out = 0;
+    *out = NULL;
     decodeGeneric(out, w, h, state, in, insize);
     if(state->error) return state->error;
     if(!state->decoder.color_convert || lodepng_color_mode_equal(&state->info_raw, &state->info_png.color)) {
@@ -5350,6 +5350,8 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
 
         lv_draw_buf_t * new_buf = lv_draw_buf_create(*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
         if(new_buf == NULL) {
+            lv_draw_buf_destroy(old_buf);
+            *out = NULL;
             state->error = 83; /*alloc fail*/
             return state->error;
         }
