@@ -182,7 +182,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
 
     lv_draw_buf_t * decoded = decode_png_data(png_data, png_data_size);
-    if (!decoded) {
+    if(!decoded) {
         LV_LOG_WARN("Error decoding PNG\n");
         if(png_data != NULL) {
             lv_free((void *)png_data);
