@@ -600,6 +600,8 @@ static lv_freetype_outline_t outline_create(
     uint32_t size,
     uint32_t strength)
 {
+    LV_UNUSED(size);
+
     LV_ASSERT_NULL(ctx);
     FT_Error error;
 
