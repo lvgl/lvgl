@@ -71,8 +71,11 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
  *   GLOBAL FUNCTIONS
  **********************/
 
-const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out)
+const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
+                                           uint8_t * bitmap_out)
 {
+    LV_UNUSED(g_dsc);
+
     if(unicode_letter == '\t') unicode_letter = ' ';
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
