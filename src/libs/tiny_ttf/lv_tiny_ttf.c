@@ -154,9 +154,19 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, lv_font_g
         return NULL;
     }
 
+    g_dsc->entry = entry;
     tiny_ttf_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
-    lv_cache_release(tiny_ttf_cache, entry, NULL);
     return cached_data->buffer;
+}
+
+static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
+{
+    LV_ASSERT_NULL(font);
+    if(g_dsc->entry == NULL) {
+        return;
+    }
+    lv_cache_release(tiny_ttf_cache, g_dsc->entry, NULL);
+    g_dsc->entry = NULL;
 }
 
 static lv_result_t lv_tiny_ttf_create(lv_font_t * out_font, const char * path, const void * data, size_t data_size,
@@ -205,6 +215,7 @@ static lv_result_t lv_tiny_ttf_create(lv_font_t * out_font, const char * path, c
     lv_memzero(out_font, sizeof(lv_font_t));
     out_font->get_glyph_dsc = ttf_get_glyph_dsc_cb;
     out_font->get_glyph_bitmap = ttf_get_glyph_bitmap_cb;
+    out_font->release_glyph = ttf_release_glyph_cb;
     out_font->dsc = dsc;
     lv_tiny_ttf_set_size(out_font, font_size);
     return LV_RESULT_OK;
