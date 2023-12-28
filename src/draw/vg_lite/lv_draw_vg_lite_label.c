@@ -137,7 +137,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
     lv_vg_lite_buffer_init(
         &src_buf,
         dsc->bitmap,
-        lv_area_get_width(&image_area),
+        lv_vg_lite_width_align(lv_area_get_width(&image_area)),
         lv_area_get_height(&image_area),
         VG_LITE_A8,
         false);
