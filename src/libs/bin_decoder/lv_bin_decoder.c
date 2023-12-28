@@ -193,6 +193,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
     dsc->decoded = adjusted;
 
+    if(dsc->args.no_cache) return LV_RES_OK;
+
 #if LV_CACHE_DEF_SIZE > 0
 
     /*Add it to cache*/
