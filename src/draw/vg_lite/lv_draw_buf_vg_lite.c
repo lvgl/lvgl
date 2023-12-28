@@ -79,6 +79,10 @@ static void * buf_align(void * buf, lv_color_format_t color_format)
 
 static void invalidate_cache(void * buf, uint32_t stride, lv_color_format_t color_format, const lv_area_t * area)
 {
+    LV_UNUSED(buf);
+    LV_UNUSED(stride);
+    LV_UNUSED(color_format);
+    LV_UNUSED(area);
 }
 
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format)
