@@ -60,7 +60,6 @@ struct _lv_freetype_cache_node_t {
 typedef struct _lv_freetype_outline_node_t {
     FT_UInt glyph_index;
     lv_freetype_outline_t outline;
-    lv_ll_node_t * lru_node;
 } lv_freetype_outline_node_t;
 
 /**********************
