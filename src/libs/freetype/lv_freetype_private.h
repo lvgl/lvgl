@@ -77,6 +77,7 @@ typedef struct _lv_freetype_font_dsc_t {
     uint32_t size;
     lv_freetype_font_style_t style;
     lv_freetype_context_t * context;
+    lv_freetype_cache_node_t * cache_node;
     FTC_FaceID face_id;
 } lv_freetype_font_dsc_t;
 
