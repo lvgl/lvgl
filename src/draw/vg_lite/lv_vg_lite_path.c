@@ -204,6 +204,8 @@ void lv_vg_lite_path_get_bonding_box(lv_vg_lite_path_t * path,
 
 static void path_bounds_iter_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len)
 {
+    LV_UNUSED(op_code);
+
     if(len == 0) {
         return;
     }

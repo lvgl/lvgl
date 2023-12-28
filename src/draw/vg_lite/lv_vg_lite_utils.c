@@ -320,6 +320,8 @@ const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op)
 
 static void path_data_print_cb(void * user_data, uint8_t op_code, const float * data, uint32_t len)
 {
+    LV_UNUSED(user_data);
+
     LV_LOG("%s, ", lv_vg_lite_vlc_op_string(op_code));
     for(uint32_t i = 0; i < len; i++) {
         LV_LOG("%0.2f, ", data[i]);
