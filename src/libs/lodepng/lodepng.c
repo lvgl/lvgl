@@ -5359,11 +5359,11 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
 
         if (state->error) {
             lv_draw_buf_destroy(new_buf);
+            *out = NULL;
         }
         else {
             *out = (unsigned char*)new_buf;
         }
-
         lv_draw_buf_destroy(old_buf);
     }
     return state->error;
