@@ -262,8 +262,8 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     /* invalidate D-Cache */
     image_invalidate_cache(draw_buf->data, stride, width, height, cf);
 
-    LV_LOG_INFO("image %p (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p, cf: %d) decode finish %" LV_PRIu32 "ms",
-                image_data, width, height, image_buf, cf, cache->weight);
+    LV_LOG_INFO("image %p (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p, cf: %d) decode finish",
+                image_data, width, height, draw_buf->data, cf);
     return LV_RESULT_OK;
 }
 
@@ -356,8 +356,8 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     /* invalidate D-Cache */
     image_invalidate_cache(draw_buf->data, stride, width, height, cf);
 
-    LV_LOG_INFO("image %s (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p cf: %d) decode finish %" LV_PRIu32 "ms",
-                path, width, height, draw_buf->data, cf, cache->weight);
+    LV_LOG_INFO("image %s (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p cf: %d) decode finish",
+                path, width, height, draw_buf->data, cf);
     return LV_RESULT_OK;
 
 failed:
