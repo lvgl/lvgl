@@ -20,6 +20,7 @@ extern "C" {
 
 #include "lv_symbol_def.h"
 #include "../misc/lv_area.h"
+#include "../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES
@@ -48,6 +49,8 @@ typedef struct {
     int16_t ofs_y;  /**< y offset of the bounding box*/
     uint8_t bpp: 4;  /**< Bit-per-pixel: 1, 2, 4, 8*/
     uint8_t is_placeholder: 1; /** Glyph is missing. But placeholder will still be displayed */
+
+    lv_cache_entry_t * entry;
 } lv_font_glyph_dsc_t;
 
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering.*/
@@ -82,7 +85,10 @@ typedef struct _lv_font_t {
     bool (*get_glyph_dsc)(const struct _lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
-    const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_t *, uint32_t, uint8_t *);
+    const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_t *, lv_font_glyph_dsc_t *, uint32_t, uint8_t *);
+
+    /** Release a glyph*/
+    void (*release_glyph)(const struct _lv_font_t *, lv_font_glyph_dsc_t *);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
     int32_t line_height;         /**< The real line height where any text fits*/
@@ -105,10 +111,12 @@ typedef struct _lv_font_t {
 /**
  * Return with the bitmap of a font.
  * @param font_p        pointer to a font
+ * @param g_dsc         pass the lv_font_glyph_dsc_t here
  * @param letter        a UNICODE character code
  * @return pointer to the bitmap of the letter
  */
-const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font, uint32_t letter, uint8_t * buf_out);
+const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t letter,
+                                         uint8_t * buf_out);
 
 /**
  * Get the descriptor of a glyph

@@ -410,7 +410,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     }
 
     if(g.resolved_font) {
-        dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, letter, dsc->bitmap_buf);
+        dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, &g, letter, dsc->bitmap_buf);
     }
     else {
         dsc->bitmap = NULL;
@@ -422,5 +422,9 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     dsc->g = &g;
 
     cb(draw_unit, dsc, NULL, NULL);
+
+    if(font->release_glyph) {
+        font->release_glyph(font, &g);
+    }
     LV_PROFILER_END;
 }
