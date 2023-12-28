@@ -162,7 +162,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, lv_font_g
 static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
 {
     LV_ASSERT_NULL(font);
-    if (g_dsc->entry == NULL) {
+    if(g_dsc->entry == NULL) {
         return;
     }
     lv_cache_release(tiny_ttf_cache, g_dsc->entry, NULL);
