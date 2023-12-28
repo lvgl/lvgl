@@ -180,6 +180,9 @@ lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf)
     lv_draw_buf_t * new_buf = lv_draw_buf_create(header->w, header->h, header->cf, header->stride);
     if(new_buf == NULL) return NULL;
 
+    new_buf->header.flags = draw_buf->header.flags;
+    new_buf->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
+
     /*Choose the smaller size to copy*/
     uint32_t size = LV_MIN(draw_buf->data_size, new_buf->data_size);
 
