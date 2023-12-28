@@ -70,8 +70,9 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.delete_cb = draw_delete;
 
     lv_vg_lite_path_init(unit);
-
+#if 0
     lv_vg_lite_decoder_init();
+#endif
 }
 
 void lv_draw_vg_lite_deinit(void)
@@ -236,7 +237,9 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_vg_lite_unit_t * unit = (lv_draw_vg_lite_unit_t *)draw_unit;
     lv_vg_lite_path_deinit(unit);
+#if 0
     lv_vg_lite_decoder_deinit();
+#endif
     return 1;
 }
 
