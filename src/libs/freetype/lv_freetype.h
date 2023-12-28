@@ -21,8 +21,7 @@ extern "C" {
  *********************/
 
 #define LV_FREETYPE_CACHE_TYPE_IMAGE    0
-#define LV_FREETYPE_CACHE_TYPE_SBIT     1
-#define LV_FREETYPE_CACHE_TYPE_OUTLINE  2
+#define LV_FREETYPE_CACHE_TYPE_OUTLINE  1
 
 #define LV_FREETYPE_F26DOT6_TO_INT(x)   ((x) >> 6)
 #define LV_FREETYPE_F26DOT6_TO_FLOAT(x) ((float)(x) / 64)

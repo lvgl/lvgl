@@ -2192,7 +2192,6 @@
 
     /*FreeType cache type:
      * LV_FREETYPE_CACHE_TYPE_IMAGE    - Image cache
-     * LV_FREETYPE_CACHE_TYPE_SBIT     - Sbit cache
      * LV_FREETYPE_CACHE_TYPE_OUTLINE  - Outline cache*/
     #ifndef LV_FREETYPE_CACHE_TYPE
         #ifdef CONFIG_LV_FREETYPE_CACHE_TYPE

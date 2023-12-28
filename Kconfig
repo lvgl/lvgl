@@ -1156,8 +1156,6 @@ menu "LVGL configuration"
 
 				config LV_FREETYPE_CACHE_TYPE_IMAGE
 					bool "IMAGE"
-				config LV_FREETYPE_CACHE_TYPE_SBIT
-					bool "SBIT"
 				config LV_FREETYPE_CACHE_TYPE_OUTLINE
 					bool "OUTLINE"
 			endchoice
