@@ -200,17 +200,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     LV_UNUSED(draw_unit);
 
     switch(task->type) {
-#if LV_USE_FREETYPE && LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_OUTLINE
-        case LV_DRAW_TASK_TYPE_LABEL: {
-                const lv_draw_label_dsc_t * label_dsc = task->draw_dsc;
-                if(lv_freetype_is_outline_font(label_dsc->font)) {
-                    task->preference_score = 0;
-                    task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
-                    return 1;
-                }
-                return 0;
-            }
-#endif
+        case LV_DRAW_TASK_TYPE_LABEL:
         case LV_DRAW_TASK_TYPE_FILL:
         case LV_DRAW_TASK_TYPE_BORDER:
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:

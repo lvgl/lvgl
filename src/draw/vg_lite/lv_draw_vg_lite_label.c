@@ -134,14 +134,13 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
     vg_lite_translate(image_area.x1, image_area.y1, &matrix);
 
     vg_lite_buffer_t src_buf;
-    lv_draw_buf_t draw_buf = { 0 };
-    uint32_t w, h;
-    w = lv_area_get_width(&image_area);
-    h = lv_area_get_height(&image_area);
-    uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
-    lv_image_header_init(&draw_buf.header, w, h, LV_COLOR_FORMAT_A8, stride, 0);
-    draw_buf.data = (void *)dsc->bitmap;
-    lv_vg_lite_buffer_from_draw_buf(&src_buf, &draw_buf);
+    lv_vg_lite_buffer_init(
+        &src_buf,
+        dsc->bitmap,
+        lv_vg_lite_width_align(lv_area_get_width(&image_area)),
+        lv_area_get_height(&image_area),
+        VG_LITE_A8,
+        false);
 
     vg_lite_color_t color;
     color = lv_vg_lite_color(dsc->color, dsc->opa, true);
