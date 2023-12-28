@@ -67,7 +67,6 @@ typedef struct _tiny_ttf_cache_data_t {
     uint32_t size;
 
     uint8_t * buffer;
-    uint32_t buffer_size;
 } tiny_ttf_cache_data_t;
 /**********************
  *  STATIC PROTOTYPES
@@ -368,7 +367,6 @@ static bool tiny_ttf_cache_create_cb(tiny_ttf_cache_data_t * node, void * user_d
     stbtt_MakeGlyphBitmap(info, buffer, w, h, stride, dsc->scale, dsc->scale, g1);
 
     node->buffer = buffer;
-    node->buffer_size = szb;
 
     return true;
 }
