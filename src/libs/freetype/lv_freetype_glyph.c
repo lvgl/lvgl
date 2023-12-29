@@ -68,6 +68,13 @@ bool lv_freetype_on_glyph_cache_create(lv_freetype_font_dsc_t * dsc)
     return true;
 }
 
+bool lv_freetype_on_glyph_cache_delete(lv_freetype_font_dsc_t * dsc)
+{
+    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
+    lv_cache_destroy(dsc->context->glyph_cache, NULL);
+    return true;
+}
+
 static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
                                       uint32_t unicode_letter_next)
 {
