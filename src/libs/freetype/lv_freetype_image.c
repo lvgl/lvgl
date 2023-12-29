@@ -111,8 +111,6 @@ bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc)
 void lv_freetype_on_font_delete(lv_freetype_font_dsc_t * dsc)
 {
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-
-    lv_cache_destroy(dsc->context->glyph_cache, NULL);
 }
 
 /**********************
