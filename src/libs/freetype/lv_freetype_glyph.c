@@ -12,6 +12,8 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_USE_FREETYPE
+
 #define LV_FREETYPE_GLYPH_DSC_CACHE_SIZE (LV_FREETYPE_CACHE_FT_OUTLINES * 2)
 /**********************
  *      TYPEDEFS
@@ -179,3 +181,4 @@ static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_
     }
     return 0;
 }
+#endif
