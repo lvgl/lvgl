@@ -109,7 +109,6 @@ bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc)
     }
 
     FT_Face face = ft_size->face;
-    dsc->context->cache_context->face = face;
 
     if(dsc->style & LV_FREETYPE_FONT_STYLE_ITALIC) {
         lv_freetype_italic_transform(face);
@@ -144,10 +143,16 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
-    FT_Face face = dsc->context->cache_context->face;
+    FT_Size ft_size = lv_freetype_lookup_size(dsc);
+    if(!ft_size) {
+        return false;
+    }
+
+    FT_Face face = ft_size->face;
     FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
     FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, unicode_letter);
     dsc_out->is_placeholder = glyph_index == 0;
+    dsc->context->cache_context->face = face;
 
     lv_freetype_cache_node_t search_key = {
         .glyph_index = glyph_index,
@@ -182,9 +187,15 @@ static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_f
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
-    FT_Face face = dsc->context->cache_context->face;
+    FT_Size ft_size = lv_freetype_lookup_size(dsc);
+    if(!ft_size) {
+        return false;
+    }
+
+    FT_Face face = ft_size->face;
     FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
     FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, unicode_letter);
+    dsc->context->cache_context->face = face;
 
     lv_cache_t * cache = dsc->context->cache_context->cache;
 
@@ -193,7 +204,7 @@ static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_f
         .size = dsc->size
     };
 
-    lv_cache_entry_t * entry = lv_cache_acquire_or_create(cache, &search_key, NULL);
+    lv_cache_entry_t * entry = lv_cache_acquire_or_create(cache, &search_key, dsc);
 
     g_dsc->entry = entry;
     lv_freetype_cache_node_t * cache_node = lv_cache_entry_get_data(entry);
@@ -220,7 +231,6 @@ static bool freetype_image_create_cb(lv_freetype_cache_node_t * data, void * use
     FT_Error error;
 
     FT_Face face = dsc->context->cache_context->face;
-
     FT_Set_Pixel_Sizes(face, 0, dsc->size);
     error = FT_Load_Glyph(face, data->glyph_index,  FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL);
     if(error) {
