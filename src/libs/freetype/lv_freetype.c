@@ -157,6 +157,8 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint32_t size, lv_fre
     font->underline_position = FT_F26DOT6_TO_INT(FT_MulFix(scale, ft_size->face->underline_position));
     font->underline_thickness = thickness < 1 ? 1 : thickness;
 
+    lv_freetype_on_glyph_cache_create(dsc);
+
     return font;
 }
 

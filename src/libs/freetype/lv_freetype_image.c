@@ -29,19 +29,12 @@ struct _lv_freetype_cache_node_t {
     FT_UInt glyph_index;
     uint32_t size;
 
-    lv_font_glyph_dsc_t glyph_dsc;
     lv_draw_buf_t * draw_buf;
 };
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
-                                      lv_font_glyph_dsc_t * dsc_out,
-                                      uint32_t unicode_letter,
-                                      uint32_t unicode_letter_next);
-
 static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc,
                                                     uint32_t unicode_letter,
                                                     uint8_t * bitmap_out);
@@ -99,7 +92,6 @@ void lv_freetype_cache_context_delete(lv_freetype_cache_context_t * cache_ctx)
 bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc)
 {
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-    dsc->font.get_glyph_dsc = freetype_get_glyph_dsc_cb;
     dsc->font.get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
     dsc->font.release_glyph = freetype_image_release_cb;
 
@@ -125,58 +117,6 @@ void lv_freetype_on_font_delete(lv_freetype_font_dsc_t * dsc)
  *   STATIC FUNCTIONS
  **********************/
 
-static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
-                                      lv_font_glyph_dsc_t * dsc_out,
-                                      uint32_t unicode_letter,
-                                      uint32_t unicode_letter_next)
-{
-    if(unicode_letter < 0x20) {
-        dsc_out->adv_w = 0;
-        dsc_out->box_h = 0;
-        dsc_out->box_w = 0;
-        dsc_out->ofs_x = 0;
-        dsc_out->ofs_y = 0;
-        dsc_out->bpp = 0;
-        return true;
-    }
-
-    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
-    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-
-    FT_Size ft_size = lv_freetype_lookup_size(dsc);
-    if(!ft_size) {
-        return false;
-    }
-
-    FT_Face face = ft_size->face;
-    FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
-    FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, unicode_letter);
-    dsc_out->is_placeholder = glyph_index == 0;
-    dsc->context->cache_context->face = face;
-
-    lv_freetype_cache_node_t search_key = {
-        .glyph_index = glyph_index,
-        .size = dsc->size,
-    };
-
-    lv_cache_entry_t * entry = lv_cache_acquire_or_create(dsc->context->cache_context->cache, &search_key, dsc);
-    if(entry == NULL) {
-        LV_LOG_ERROR("glyph lookup failed for glyph_index = %u", glyph_index);
-        return false;
-    }
-    lv_freetype_cache_node_t * data = lv_cache_entry_get_data(entry);
-    *dsc_out = data->glyph_dsc;
-
-    if((dsc->style & LV_FREETYPE_FONT_STYLE_ITALIC) && (unicode_letter_next == '\0')) {
-        dsc_out->adv_w = dsc_out->box_w + dsc_out->ofs_x;
-    }
-
-    dsc_out->entry = NULL;
-
-    lv_cache_release(dsc->context->cache_context->cache, entry, NULL);
-    return true;
-}
-
 static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc,
                                                     uint32_t unicode_letter,
                                                     uint8_t * bitmap_out)
@@ -201,7 +141,7 @@ static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_f
 
     lv_freetype_cache_node_t search_key = {
         .glyph_index = glyph_index,
-        .size = dsc->size
+        .size = dsc->size,
     };
 
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(cache, &search_key, dsc);
@@ -252,22 +192,15 @@ static bool freetype_image_create_cb(lv_freetype_cache_node_t * data, void * use
 
     FT_BitmapGlyph glyph_bitmap = (FT_BitmapGlyph)glyph;
 
-    lv_font_glyph_dsc_t * dsc_out = &data->glyph_dsc;
+    uint16_t box_h = glyph_bitmap->bitmap.rows;         /*Height of the bitmap in [px]*/
+    uint16_t box_w = glyph_bitmap->bitmap.width;        /*Width of the bitmap in [px]*/
 
-    dsc_out->adv_w = FT_F16DOT16_TO_INT(glyph_bitmap->root.advance.x);
-    dsc_out->box_h = glyph_bitmap->bitmap.rows;         /*Height of the bitmap in [px]*/
-    dsc_out->box_w = glyph_bitmap->bitmap.width;        /*Width of the bitmap in [px]*/
-    dsc_out->ofs_x = glyph_bitmap->left;                /*X offset of the bitmap in [pf]*/
-    dsc_out->ofs_y = glyph_bitmap->top -
-                     glyph_bitmap->bitmap.rows;         /*Y offset of the bitmap measured from the as line*/
-    dsc_out->bpp = 8;                                   /*Bit per pixel: 1/2/4/8*/
+    uint32_t stride = lv_draw_buf_width_to_stride(box_w, LV_COLOR_FORMAT_A8);
+    data->draw_buf = lv_draw_buf_create(box_w, box_h, LV_COLOR_FORMAT_A8, stride);
 
-    uint32_t stride = lv_draw_buf_width_to_stride(dsc_out->box_w, LV_COLOR_FORMAT_A8);
-    data->draw_buf = lv_draw_buf_create(dsc_out->box_w, dsc_out->box_h, LV_COLOR_FORMAT_A8, stride);
-
-    for(int y = 0; y < dsc_out->box_h; ++y) {
-        lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * dsc_out->box_w,
-                  dsc_out->box_w);
+    for(int y = 0; y < box_h; ++y) {
+        lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * box_w,
+                  box_w);
     }
 
     return true;
