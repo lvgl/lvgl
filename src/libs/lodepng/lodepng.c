@@ -5350,22 +5350,19 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
 
         lv_draw_buf_t * new_buf = lv_draw_buf_create(*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
         if(new_buf == NULL) {
-            lv_draw_buf_destroy(old_buf);
-            *out = NULL;
             state->error = 83; /*alloc fail*/
-            return state->error;
-        }
-
-        state->error = lodepng_convert(new_buf->data, old_buf->data, &state->info_raw,
-                                                &state->info_png.color, *w, *h);
-
-        if (state->error) {
-            lv_draw_buf_destroy(new_buf);
-            *out = NULL;
         }
         else {
-            *out = (unsigned char*)new_buf;
+            state->error = lodepng_convert(new_buf->data, old_buf->data, 
+                                            &state->info_raw, &state->info_png.color, *w, *h);
+            
+            if (state->error) {
+                lv_draw_buf_destroy(new_buf);
+                new_buf = NULL;
+            }
         }
+
+        *out = (unsigned char*)new_buf;
         lv_draw_buf_destroy(old_buf);
     }
     return state->error;
