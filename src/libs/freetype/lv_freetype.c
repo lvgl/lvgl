@@ -157,8 +157,6 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint32_t size, lv_fre
     font->underline_position = FT_F26DOT6_TO_INT(FT_MulFix(scale, ft_size->face->underline_position));
     font->underline_thickness = thickness < 1 ? 1 : thickness;
 
-    lv_freetype_on_glyph_cache_create(dsc);
-
     return font;
 }
 
@@ -171,7 +169,6 @@ void lv_freetype_font_delete(lv_font_t * font)
 
     lv_freetype_on_font_delete(dsc);
     lv_freetype_drop_face_id(dsc->context, dsc->face_id);
-    lv_freetype_on_glyph_cache_delete(dsc);
 
     /* invalidate magic number */
     lv_memzero(dsc, sizeof(lv_freetype_font_dsc_t));

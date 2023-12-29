@@ -69,8 +69,6 @@ typedef struct _lv_freetype_context_t {
     FTC_CMapCache cmap_cache;
     lv_freetype_cache_context_t * cache_context;
     lv_ll_t face_id_ll;
-
-    lv_cache_t * glyph_cache;
 } lv_freetype_context_t;
 
 typedef struct _lv_freetype_font_dsc_t {
@@ -107,9 +105,9 @@ lv_freetype_cache_context_t * lv_freetype_cache_context_create(lv_freetype_conte
 
 void lv_freetype_cache_context_delete(lv_freetype_cache_context_t * cache_ctx);
 
-bool lv_freetype_on_glyph_cache_create(lv_freetype_font_dsc_t * dsc);
+lv_cache_t * lv_freetype_on_glyph_cache_create(lv_freetype_font_dsc_t * dsc);
 
-bool lv_freetype_on_glyph_cache_delete(lv_freetype_font_dsc_t * dsc);
+void lv_freetype_on_glyph_cache_delete(lv_cache_t * cache);
 
 bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc);
 
@@ -118,6 +116,8 @@ void lv_freetype_on_font_delete(lv_freetype_font_dsc_t * dsc);
 void lv_freetype_italic_transform(FT_Face face);
 
 const char * lv_freetype_get_pathname(FTC_FaceID face_id);
+
+lv_cache_t * lv_freetype_get_glyph_cache(const lv_freetype_font_dsc_t * dsc);
 
 /**********************
  *      MACROS

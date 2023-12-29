@@ -46,7 +46,7 @@ static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-bool lv_freetype_on_glyph_cache_create(lv_freetype_font_dsc_t * dsc)
+lv_cache_t * lv_freetype_on_glyph_cache_create(lv_freetype_font_dsc_t * dsc)
 {
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
@@ -56,25 +56,23 @@ bool lv_freetype_on_glyph_cache_create(lv_freetype_font_dsc_t * dsc)
         .compare_cb = (lv_cache_compare_cb_t)freetype_glyph_compare_cb,
     };
 
-    dsc->context->glyph_cache = lv_cache_create(&lv_cache_class_lru_rb_count
-                                                , sizeof(lv_freetype_glyph_cache_data_t),
-                                                LV_FREETYPE_GLYPH_DSC_CACHE_SIZE,
-                                                ops
-                                               );
-    if(dsc->context->glyph_cache == NULL) {
+    lv_cache_t * cache = lv_cache_create(&lv_cache_class_lru_rb_count
+                                         , sizeof(lv_freetype_glyph_cache_data_t),
+                                         LV_FREETYPE_GLYPH_DSC_CACHE_SIZE,
+                                         ops
+                                        );
+    if(cache == NULL) {
         LV_LOG_ERROR("lv_cache_create failed");
-        return false;
+        return NULL;
     }
 
     dsc->font.get_glyph_dsc = freetype_get_glyph_dsc_cb;
-    return true;
+    return cache;
 }
 
-bool lv_freetype_on_glyph_cache_delete(lv_freetype_font_dsc_t * dsc)
+void lv_freetype_on_glyph_cache_delete(lv_cache_t * cache)
 {
-    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-    lv_cache_destroy(dsc->context->glyph_cache, NULL);
-    return true;
+    lv_cache_destroy(cache, NULL);
 }
 
 static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
@@ -101,7 +99,9 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
         .size = dsc->size,
     };
 
-    lv_cache_entry_t * entry = lv_cache_acquire_or_create(dsc->context->glyph_cache, &search_key, dsc);
+    lv_cache_t * glyph_cache = lv_freetype_get_glyph_cache(dsc);
+
+    lv_cache_entry_t * entry = lv_cache_acquire_or_create(glyph_cache, &search_key, dsc);
     if(entry == NULL) {
         LV_LOG_ERROR("glyph lookup failed for unicode = %u", unicode_letter);
         return false;
@@ -115,7 +115,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
 
     g_dsc->entry = NULL;
 
-    lv_cache_release(dsc->context->glyph_cache, entry, NULL);
+    lv_cache_release(glyph_cache, entry, NULL);
     return true;
 }
 
