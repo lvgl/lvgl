@@ -1,4 +1,4 @@
-Image (lv_img)
+Image (lv_image)
 ==============
 
 Overview
@@ -34,7 +34,7 @@ To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 To generate a pixel array from a PNG, JPG or BMP image, use the `Online image converter tool <https://lvgl.io/tools/imageconverter>`__
 and set the converted image with its pointer  :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`
 To make the variable visible in the C file, you need to declare it with
-:cpp:expr:`LV_IMG_DECLARE(converted_img_var)`.
+:cpp:expr:`LV_IMAGE_DECLARE(converted_img_var)`.
 
 To use external files, you also need to convert the image files using
 the online converter tool but now you should select the binary output
@@ -152,23 +152,23 @@ It means the the widget will be sized automatically according to the image sourc
 If the widget's width or height is set the smaller value the ``align`` property tells
 how to align the image source inside the widget. The alignment set any of these:
 
-- :cpp:expr`LV_IMAGE_ALIGN_DEFAULT` Meaning top left
-- :cpp:expr`LV_IMAGE_ALIGN_TOP_LEFT`
-- :cpp:expr`LV_IMAGE_ALIGN_TOP_MID`
-- :cpp:expr`LV_IMAGE_ALIGN_TOP_RIGHT`
-- :cpp:expr`LV_IMAGE_ALIGN_BOTTOM_LEFT`
-- :cpp:expr`LV_IMAGE_ALIGN_BOTTOM_MID`
-- :cpp:expr`LV_IMAGE_ALIGN_BOTTOM_RIGHT`
-- :cpp:expr`LV_IMAGE_ALIGN_LEFT_MID`
-- :cpp:expr`LV_IMAGE_ALIGN_RIGHT_MID`
-- :cpp:expr`LV_IMAGE_ALIGN_CENTER`
+- :cpp:expr:`LV_IMAGE_ALIGN_DEFAULT` Meaning top left
+- :cpp:expr:`LV_IMAGE_ALIGN_TOP_LEFT`
+- :cpp:expr:`LV_IMAGE_ALIGN_TOP_MID`
+- :cpp:expr:`LV_IMAGE_ALIGN_TOP_RIGHT`
+- :cpp:expr:`LV_IMAGE_ALIGN_BOTTOM_LEFT`
+- :cpp:expr:`LV_IMAGE_ALIGN_BOTTOM_MID`
+- :cpp:expr:`LV_IMAGE_ALIGN_BOTTOM_RIGHT`
+- :cpp:expr:`LV_IMAGE_ALIGN_LEFT_MID`
+- :cpp:expr:`LV_IMAGE_ALIGN_RIGHT_MID`
+- :cpp:expr:`LV_IMAGE_ALIGN_CENTER`
 
-The ``offset`` value is applied after the image source is aligned. For example setting an ``y=-10`` and :cpp:expr`LV_IMAGE_ALIGN_CENTER`
+The ``offset`` value is applied after the image source is aligned. For example setting an ``y=-10`` and :cpp:expr:`LV_IMAGE_ALIGN_CENTER`
 will move the image source up a little bit from the center of the widget.
 
 Or to automatically scale or tile the image
-- :cpp:expr`LV_IMAGE_ALIGN_STRETCH` Set X and Y scale to fill the widget's area
-- :cpp:expr`LV_IMAGE_ALIGN_TILE` Tile the image to will the widget area. Offset is applied to shift the tiling.
+- :cpp:expr:`LV_IMAGE_ALIGN_STRETCH` Set X and Y scale to fill the widget's area
+- :cpp:expr:`LV_IMAGE_ALIGN_TILE` Tile the image to will the widget area. Offset is applied to shift the tiling.
 
 The alignment can be set by :cpp:func:`lv_image_set_align(image, align)`
 
