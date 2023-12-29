@@ -273,7 +273,7 @@ static lv_draw_buf_t * decode_png_file(const char * filename)
     lv_draw_buf_t * decoded;
     decoded = lv_draw_buf_create(image.width, image.height, LV_COLOR_FORMAT_ARGB8888, PNG_IMAGE_ROW_STRIDE(image));
     if(decoded == NULL) {
-        LV_LOG_ERROR("png draw buff alloc %" LV_PRIu32 " failed: %s", PNG_IMAGE_SIZE(image), filename);
+        LV_LOG_ERROR("png draw buff alloc %zu failed: %s", (size_t)PNG_IMAGE_SIZE(image), filename);
         lv_free(data);
         return NULL;
     }
