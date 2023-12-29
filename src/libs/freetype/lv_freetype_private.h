@@ -105,9 +105,9 @@ lv_freetype_cache_context_t * lv_freetype_cache_context_create(lv_freetype_conte
 
 void lv_freetype_cache_context_delete(lv_freetype_cache_context_t * cache_ctx);
 
-lv_cache_t * lv_freetype_on_glyph_cache_create(lv_freetype_font_dsc_t * dsc);
+lv_cache_t * lv_freetype_glyph_cache_create(lv_freetype_font_dsc_t * dsc);
 
-void lv_freetype_on_glyph_cache_delete(lv_cache_t * cache);
+void lv_freetype_glyph_cache_delete(lv_cache_t * cache);
 
 bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc);
 

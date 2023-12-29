@@ -108,7 +108,7 @@ bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc)
 
     cache_node->image_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_image_cache_data_t),
                                               LV_FREETYPE_CACHE_FT_OUTLINES, ops);
-    cache_node->glyph_cache = lv_freetype_on_glyph_cache_create(dsc);
+    cache_node->glyph_cache = lv_freetype_glyph_cache_create(dsc);
     if(cache_node->image_cache == NULL || cache_node->glyph_cache == NULL) {
         LV_LOG_ERROR("lv_cache_create failed");
         return NULL;
@@ -123,7 +123,7 @@ void lv_freetype_on_font_delete(lv_freetype_font_dsc_t * dsc)
 {
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
     lv_cache_destroy(dsc->cache_node->image_cache, NULL);
-    lv_freetype_on_glyph_cache_delete(dsc->cache_node->glyph_cache);
+    lv_freetype_glyph_cache_delete(dsc->cache_node->glyph_cache);
     lv_free(dsc->cache_node);
 }
 

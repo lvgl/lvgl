@@ -46,7 +46,7 @@ static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-lv_cache_t * lv_freetype_on_glyph_cache_create(lv_freetype_font_dsc_t * dsc)
+lv_cache_t * lv_freetype_glyph_cache_create(lv_freetype_font_dsc_t * dsc)
 {
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
@@ -70,7 +70,7 @@ lv_cache_t * lv_freetype_on_glyph_cache_create(lv_freetype_font_dsc_t * dsc)
     return cache;
 }
 
-void lv_freetype_on_glyph_cache_delete(lv_cache_t * cache)
+void lv_freetype_glyph_cache_delete(lv_cache_t * cache)
 {
     lv_cache_destroy(cache, NULL);
 }
