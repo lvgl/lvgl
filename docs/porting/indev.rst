@@ -232,8 +232,8 @@ data instead of directly reading the input device. Setting the
 ``data->continue_reading`` flag will tell LVGL there is more data to
 read and it should call ``read_cb`` again.
 
-Decoupling the input device read timer
---------------------------------------
+Switching the input device to event-driven mode
+-----------------------------------------------
 
 Normally the input event is read every :c:macro:`LV_DEF_REFR_PERIOD`
 milliseconds (set in ``lv_conf.h``).  However, in some cases, you might
@@ -244,10 +244,10 @@ You can do this in the following way:
 
 .. code:: c
 
-   /*Delete the original input device read timer*/
-   lv_timer_delete(indev->read_timer);
-   indev->read_timer = NULL;
+   /*Update the input device's running mode to LV_INDEV_MODE_EVENT*/
+   lv_indev_set_mode(indev, LV_INDEV_MODE_EVENT);
 
+   ...
 
    /*Call this anywhere you want to read the input device*/
    lv_indev_read(indev);
