@@ -68,6 +68,16 @@ void lv_style_set_max_height(lv_style_t * style, int32_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_MAX_HEIGHT = LV_STYLE_MAX_HEIGHT;
 
+void lv_style_set_length(lv_style_t * style, int32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_LENGTH, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_LENGTH = LV_STYLE_LENGTH;
+
 void lv_style_set_x(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {

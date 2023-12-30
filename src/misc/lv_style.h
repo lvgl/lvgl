@@ -180,6 +180,7 @@ enum _lv_style_prop_t {
     /*Group 0*/
     LV_STYLE_WIDTH                  = 1,
     LV_STYLE_HEIGHT                 = 2,
+    LV_STYLE_LENGTH                 = 3,
 
     LV_STYLE_MIN_WIDTH              = 4,
     LV_STYLE_MAX_WIDTH              = 5,
