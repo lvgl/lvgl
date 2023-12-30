@@ -18,6 +18,8 @@ Options are passed to the Roller as a string with `lv_roller_set_options(roller,
 
 You can select an option manually with `lv_roller_set_selected(roller, id, LV_ANIM_ON/OFF)`, where *id* is the index of an option.
 
+If the roller has a lot of options then especially in infinite mode the rendered options of the display might look scrambled. In this case `LV_USE_LARGE_COORD` should be enabled in `lv_conf.h`
+
 ### Get selected option
 To get the *index* of the currently selected option use `lv_roller_get_selected(roller)`.
 
