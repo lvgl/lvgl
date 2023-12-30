@@ -1,3 +1,7 @@
+Run `scripts/code-format.py` ([astyle](http://astyle.sourceforge.net/install.html) needs to be installed) and follow the [Code Conventions](https://docs.lvgl.io/master/CODING_STYLE.html)
+
+Help us to review this PR! Anyone can approve it or request changes. Learn more [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/approving-a-pull-request-with-required-reviews).
+
 ### Description of the feature or fix
 
 A clear and concise description of what the bug or new feature is.
@@ -7,5 +11,3 @@ A clear and concise description of what the bug or new feature is.
 - [ ] Add [Examples](https://github.com/lvgl/lvgl/tree/master/examples) if relevant.
 - [ ] Add [Tests](https://github.com/lvgl/lvgl/blob/master/tests/README.md) if applicable.
 - [ ] If you added new options to `lv_conf_template.h` run [lv_conf_internal_gen.py](https://github.com/lvgl/lvgl/blob/release/v8.3/scripts/lv_conf_internal_gen.py) and update [Kconfig](https://github.com/lvgl/lvgl/blob/release/v8.3/Kconfig).
-- [ ] Run `code-format.py` from the scripts folder. [astyle](http://astyle.sourceforge.net/install.html) needs to be installed.
-- [ ] Follow the [Code Conventions](https://docs.lvgl.io/master/CODING_STYLE.html)
