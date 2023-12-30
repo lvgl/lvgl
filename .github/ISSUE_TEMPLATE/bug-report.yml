@@ -13,7 +13,7 @@ body:
     id: version
     attributes:
       label: LVGL version
-      description: See lvgl.h
+      description: See in `lvgl.h` or use `git describe`
       placeholder: e.g. v9.0.0
     validations:
       required: true
