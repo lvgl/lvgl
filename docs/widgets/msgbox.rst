@@ -21,9 +21,9 @@ The message box is built from other widgets, so you can check these
 widgets' documentation for details.
 
 - Background: `lv_obj </widgets/obj>`__
-- Close button: `lv_btn </widgets/btn>`__
+- Close button: `lv_button </widgets/button>`__
 - Title and text: `lv_label </widgets/label>`__
-- Buttons: `lv_btnmatrix </widgets/btnmatrix>`__
+- Buttons: `lv_buttonmatrix </widgets/buttonmatrix>`__
 
 Usage
 *****

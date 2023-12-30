@@ -291,7 +291,7 @@ Here are some examples to set an object's size using a style:
    lv_style_init(&style);
    lv_style_set_width(&style, 100);
 
-   lv_obj_t * btn = lv_btn_create(lv_screen_active());
+   lv_obj_t * btn = lv_button_create(lv_screen_active());
    lv_obj_add_style(btn, &style, LV_PART_MAIN);
 
 As you will see below there are some other great features of size and

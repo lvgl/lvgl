@@ -11,12 +11,12 @@ Usage
 
 Enable :c:macro:`LV_USE_QRCODE` in ``lv_conf.h``.
 
-Use :c:expr:`lv_qrcode_create()` to create a qrcode object, and use
-:c:expr:`lv_qrcode_update()` to generate a QR code.
+Use :cpp:expr:`lv_qrcode_create()` to create a qrcode object, and use
+:cpp:expr:`lv_qrcode_update()` to generate a QR code.
 
 If you need to re-modify the size and color, use
-:c:expr:`lv_qrcode_set_size()` and :c:expr:`lv_qrcode_set_dark/light_color()`, and
-call :c:expr:`lv_qrcode_update()` again to regenerate the QR code.
+:cpp:expr:`lv_qrcode_set_size()` and :cpp:expr:`lv_qrcode_set_dark/light_color()`, and
+call :cpp:expr:`lv_qrcode_update()` again to regenerate the QR code.
 
 Notes
 -----

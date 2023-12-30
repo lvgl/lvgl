@@ -167,16 +167,16 @@ Other events
 Display events
 --------------
 
--  :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA,
--  :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED,
--  :cpp:enumerator:`LV_EVENT_COLOR_FORMAT_CHANGED,
--  :cpp:enumerator:`LV_EVENT_REFR_REQUEST,
--  :cpp:enumerator:`LV_EVENT_REFR_START,
--  :cpp:enumerator:`LV_EVENT_REFR_READY,
--  :cpp:enumerator:`LV_EVENT_RENDER_START,
--  :cpp:enumerator:`LV_EVENT_RENDER_READY,
--  :cpp:enumerator:`LV_EVENT_FLUSH_START,
--  :cpp:enumerator:`LV_EVENT_FLUSH_FINISH,
+-  :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA`
+-  :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED`
+-  :cpp:enumerator:`LV_EVENT_COLOR_FORMAT_CHANGED`
+-  :cpp:enumerator:`LV_EVENT_REFR_REQUEST`
+-  :cpp:enumerator:`LV_EVENT_REFR_START`
+-  :cpp:enumerator:`LV_EVENT_REFR_READY`
+-  :cpp:enumerator:`LV_EVENT_RENDER_START`
+-  :cpp:enumerator:`LV_EVENT_RENDER_READY`
+-  :cpp:enumerator:`LV_EVENT_FLUSH_START`
+-  :cpp:enumerator:`LV_EVENT_FLUSH_FINISH`
 
 
 Custom events

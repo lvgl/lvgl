@@ -28,11 +28,11 @@ The work directory can be set with ``LV_FS_..._PATH``. E.g.
 appended to it.
 
 Cached reading is also supported if ``LV_FS_..._CACHE_SIZE`` is set to
-not ``0`` value. :c:func:`lv_fs_read` caches this size of data to lower the
+not ``0`` value. :cpp:func:`lv_fs_read` caches this size of data to lower the
 number of actual reads from the storage.
 
 To use the memory-mapped file emulation an ``lv_fs_path_ex_t`` object must be
-created and initialized. This object can be passed to :c:func:`lv_fs_open()` as
+created and initialized. This object can be passed to :cpp:func:`lv_fs_open()` as
 the file name:
 
 .. code:: c

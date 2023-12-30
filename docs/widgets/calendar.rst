@@ -19,7 +19,7 @@ attached to the calendar.
 Parts and Styles
 ****************
 
-The calendar object uses the `Button matrix </widgets/btnmatrix>`__
+The calendar object uses the `Button matrix </widgets/buttonmatrix>`__
 object under the hood to arrange the days into a matrix.
 
 - :cpp:enumerator:`LV_PART_MAIN` The background of the calendar. Uses all the background related style properties.
@@ -27,7 +27,7 @@ object under the hood to arrange the days into a matrix.
   buttons and a custom drawer event is added modify the properties of the buttons as follows:
 
   - day names have no border, no background and drawn with a gray color
-  - days of the previous and next month have :cpp:enumerator:`LV_BTNMATRIX_CTRL_DISABLED` flag
+  - days of the previous and next month have :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED` flag
   - today has a thicker border with the theme's primary color - highlighted days have some opacity with the theme's primary color.
 
 Usage

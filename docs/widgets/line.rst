@@ -10,8 +10,7 @@ points.
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` uses all the typical background properties and line
-   style properties.
+-  :cpp:enumerator:`LV_PART_MAIN` uses all the typical background properties and line style properties.
 
 Usage
 *****

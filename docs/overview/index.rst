@@ -19,7 +19,7 @@ Overview
     disp
     color
     font
-    img
+    image
     fs
     anim
     timer

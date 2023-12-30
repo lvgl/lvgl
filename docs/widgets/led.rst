@@ -10,8 +10,7 @@ adjusted. With lower brightness the colors of the LED become darker.
 Parts and Styles
 ****************
 
-The LEDs have only one main part, called :cpp:enumerator:`LV_LED_PART_MAIN` and it
-uses all the typical background style properties.
+-  :cpp:enumerator:`LV_LED_PART_MAIN` uses all the typical background style properties.
 
 Usage
 *****

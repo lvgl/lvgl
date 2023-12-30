@@ -8,7 +8,7 @@ The Tab view object can be used to organize content in tabs. The Tab
 view is built from other widgets:
 
 - Main container: `lv_obj </widgets/obj>`__
-- Tab buttons: an `lv_obj </widgets/obj>`__` with `lv_button </widgets/button>`__ s
+- Tab buttons: an `lv_obj </widgets/obj>`__ with `lv_button </widgets/button>`__
 - Container for the tabs: `lv_obj </widgets/obj>`__
 - Content of the tabs: `lv_obj </widgets/obj>`__
 
@@ -30,8 +30,8 @@ Usage
 Create a Tab view
 -----------------
 
-:cpp:expr:`lv_tabview_create(parent)` creates a new empty
-Tab view.
+:cpp:expr:`lv_tabview_create(parent)` creates a new empty Tab view.
+
 Add tabs
 --------
 

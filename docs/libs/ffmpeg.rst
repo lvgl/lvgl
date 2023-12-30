@@ -2,8 +2,9 @@
 FFmpeg support
 ==============
 
-`FFmpeg <https://www.ffmpeg.org/>`__ A complete, cross-platform solution
-to record, convert and stream audio and video.
+A complete, cross-platform solution to record, convert and stream audio and video.
+
+Detailed introduction: `FFmpeg <https://www.ffmpeg.org/>`__
 
 Install FFmpeg
 --------------

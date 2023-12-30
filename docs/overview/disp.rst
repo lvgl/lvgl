@@ -2,7 +2,7 @@
 Displays
 ========
 
-:important: The basic concept of a *display* in LVGL is explained in the [Porting](/porting/display) section. So before reading further, please read the [Porting](/porting/display) section first.
+:important: The basic concept of a *display* in LVGL is explained in the `Porting </porting/display>`__ section. So before reading further, please read that section first.
 
 Multiple display support
 ************************
@@ -57,7 +57,7 @@ each real display with the truncated area.
 Screens
 *******
 
-Every display has its own set of `screens <overview/object#screen-the-most-basic-parent>`__ and the
+Every display has its own set of `screens </overview/object#screen-the-most-basic-parent>`__ and the
 objects on each screen.
 
 Be sure not to confuse displays and screens:
@@ -74,7 +74,7 @@ i.e. :cpp:expr:`lv_obj_set_pos()`, :cpp:expr:`lv_obj_set_size()` or similar func
 can't be used on screens.
 
 A screen can be created from any object type but the two most typical
-types are `Base object </widgets/obj>`__ and `Image </widgets/img>`__
+types are `Base object </widgets/obj>`__ and `Image </widgets/image>`__
 (to create a wallpaper).
 
 To create a screen, use

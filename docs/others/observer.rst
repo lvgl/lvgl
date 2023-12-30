@@ -6,10 +6,11 @@ Overview
 ********
 
 The ``lv_observer`` module implements a standard `Observer pattern <https://en.wikipedia.org/wiki/Observer_pattern>`__.
+
 It consists of
 
-- subjects: each containing a value
-- observers: attached to subjects to be notified on value change
+- **subjects**: each containing a value
+- **observers**: attached to subjects to be notified on value change
 
 
 A typical use case looks like this:
@@ -72,16 +73,16 @@ Subject
 Subject initialization
 ----------------------
 
-Subjects have to be static or global :c:expr:`lv_subject_t` type variables.
+Subjects have to be static or global :cpp:expr:`lv_subject_t` type variables.
 
-To initialize a subject use :c:expr:`lv_subject_init_<type>(&subject, <params>, init_value)`.
+To initialize a subject use :cpp:expr:`lv_subject_init_<type>(&subject, <params>, init_value)`.
 The following initializations exist for types:
 
-- **Integer** :c:expr:`void lv_subject_init_int(lv_subject_t * subject, int32_t value)`
-- **String** :c:expr:`void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)`
-- **Pointer**  :c:expr:`void lv_subject_init_pointer(lv_subject_t * subject, void * value)`
-- **Color** :c:expr:`void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)`
-- **Group** :c:expr:`void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len)`
+- **Integer** :cpp:expr:`void lv_subject_init_int(lv_subject_t * subject, int32_t value)`
+- **String** :cpp:expr:`void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)`
+- **Pointer**  :cpp:expr:`void lv_subject_init_pointer(lv_subject_t * subject, void * value)`
+- **Color** :cpp:expr:`void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)`
+- **Group** :cpp:expr:`void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len)`
 
 
 Set subject value
@@ -89,10 +90,10 @@ Set subject value
 
 The following functions can be used to set a subject's value:
 
-- **Integer** :c:expr:`void lv_subject_set_int(lv_subject_t * subject, int32_t value)`
-- **String** :c:expr:`void lv_subject_copy_string(lv_subject_t * subject, char * buf)`
-- **Pointer**  :c:expr:`void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)`
-- **Color** :c:expr:`void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)`
+- **Integer** :cpp:expr:`void lv_subject_set_int(lv_subject_t * subject, int32_t value)`
+- **String** :cpp:expr:`void lv_subject_copy_string(lv_subject_t * subject, char * buf)`
+- **Pointer**  :cpp:expr:`void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)`
+- **Color** :cpp:expr:`void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)`
 
 Get subject's value
 -------------------
@@ -100,10 +101,10 @@ Get subject's value
 The following functions can be used to get a subject's value:
 
 
-- **Integer** :c:expr:`int32_t lv_subject_get_int(lv_subject_t * subject)`
-- **String** :c:expr:`const char * lv_subject_get_string(lv_subject_t * subject)`
-- **Pointer**  :c:expr:`const void * lv_subject_get_pointer(lv_subject_t * subject)`
-- **Color** :c:expr:`lv_color_t lv_subject_get_color(lv_subject_t * subject)`
+- **Integer** :cpp:expr:`int32_t lv_subject_get_int(lv_subject_t * subject)`
+- **String** :cpp:expr:`const char * lv_subject_get_string(lv_subject_t * subject)`
+- **Pointer**  :cpp:expr:`const void * lv_subject_get_pointer(lv_subject_t * subject)`
+- **Color** :cpp:expr:`lv_color_t lv_subject_get_color(lv_subject_t * subject)`
 
 
 Get subject's previous value
@@ -112,10 +113,10 @@ Get subject's previous value
 The following functions can be used to get a subject's previous value:
 
 
-- **Integer** :c:expr:`int32_t lv_subject_get_previous_int(lv_subject_t * subject)`
-- **String** :c:expr:`const char * lv_subject_get_previous_string(lv_subject_t * subject)`
-- **Pointer** :c:expr:`const void * lv_subject_get_previous_pointer(lv_subject_t * subject)`
-- **Color** :c:expr:`lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)`
+- **Integer** :cpp:expr:`int32_t lv_subject_get_previous_int(lv_subject_t * subject)`
+- **String** :cpp:expr:`const char * lv_subject_get_previous_string(lv_subject_t * subject)`
+- **Pointer** :cpp:expr:`const void * lv_subject_get_previous_pointer(lv_subject_t * subject)`
+- **Color** :cpp:expr:`lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)`
 
 
 Observer
@@ -144,7 +145,7 @@ Where the observer callback should look like this:
 It's also possible to save a target widget when subscribing to a subject.
 In this case when widget is deleted, it will automatically unsubscribe from the subject.
 
-In the observer callback ``lv_observer_get_target(observer)`` can be used to get the saved widget.
+In the observer callback :cpp:expr:`lv_observer_get_target(observer)` can be used to get the saved widget.
 
 .. code:: c
 

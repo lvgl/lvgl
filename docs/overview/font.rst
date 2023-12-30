@@ -42,7 +42,11 @@ Built-in fonts
 **************
 
 There are several built-in fonts in different sizes, which can be
-enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. ### Normal fonts
+enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. 
+
+Normal fonts
+------------
+
 Containing all the ASCII characters, the degree symbol (U+00B0), the
 bullet symbol (U+2022) and the built-in symbols (see below).
 
@@ -146,10 +150,10 @@ This list summarizes the effect of RTL base direction on objects:
 - Create objects by default on the right
 - ``lv_tabview``: Displays tabs from right to left
 - ``lv_checkbox``: Shows the box on the right
-- ``lv_btnmatrix``: Shows buttons from right to left
+- ``lv_buttonmatrix``: Shows buttons from right to left
 - ``lv_list``: Shows icons on the right
 - ``lv_dropdown``: Aligns options to the right
-- The texts in ``lv_table``, ``lv_btnmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
+- The texts in ``lv_table``, ``lv_buttonmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
 
 Arabic and Persian support
 --------------------------

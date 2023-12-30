@@ -7,8 +7,7 @@ depth, creating colors from hex code, converting between color depths,
 mixing colors, etc.
 
 The type :cpp:type:`lv_color_t` is used to store a color in RGB888 format.
-This type and format is used in almost all APIs regardless to
-:cpp:expr`LV_COLOR_DEPTH`.
+This type and format is used in almost all APIs regardless to :cpp:expr:`LV_COLOR_DEPTH`.
 
 Creating colors
 ***************

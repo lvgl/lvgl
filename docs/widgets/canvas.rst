@@ -4,7 +4,7 @@ Canvas (lv_canvas)
 Overview
 ********
 
-A Canvas inherits from `Image </widgets/img>`__ where the user can draw
+A Canvas inherits from `Image </widgets/image>`__ where the user can draw
 anything. Rectangles, texts, images, lines, arcs can be drawn here using
 lvgl's drawing engine.
 
@@ -74,7 +74,7 @@ Events
 No special events are sent by canvas objects. The same events are sent
 as for the
 
-See the events of the `Images </widgets/img>`__ too.
+See the events of the `Images </widgets/image>`__ too.
 
 Learn more about :ref:`events`.
 

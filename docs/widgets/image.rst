@@ -191,7 +191,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/img/index.rst
+.. include:: ../examples/widgets/image/index.rst
 
 API
 ***

@@ -10,13 +10,18 @@ handles the traversal between pages automatically.
 Parts and Styles
 ****************
 
-The menu widget is built from the following objects: - Main container:
-lv_menu_main_cont - Main header: lv_menu_main_header_cont - Back button:
-`lv_button </widgets/button>`__ - Back button icon: `lv_img </widgets/img>`__ -
-Main page: lv_menu_page - Sidebar container: lv_menu_sidebar_cont -
-Sidebar header: lv_menu_sidebar_header_cont - Back button:
-`lv_button </widgets/button>`__ - Back button icon: `lv_img </widgets/img>`__ -
-Sidebar page: lv_menu_page
+The menu widget is built from the following objects: 
+
+- Main container: :cpp:type:`lv_menu_main_cont`
+- Main header: :cpp:type:`lv_menu_main_header_cont`
+- Back button: `lv_button </widgets/button>`__
+- Back button icon: `lv_img </widgets/image>`__
+- Main page: :cpp:type:`lv_menu_page`
+- Sidebar container: :cpp:type:`lv_menu_sidebar_cont`
+- Sidebar header: :cpp:type:`lv_menu_sidebar_header_cont`
+- Back button: `lv_button </widgets/button>`__
+- Back button icon: `lv_img </widgets/image>`__
+- Sidebar page: :cpp:type:`lv_menu_page`
 
 Usage
 *****

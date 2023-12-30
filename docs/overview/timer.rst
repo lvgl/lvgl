@@ -35,7 +35,7 @@ For example:
      /*Do something with LVGL*/
      if(something_happened) {
        something_happened = false;
-       lv_btn_create(lv_screen_active(), NULL);
+       lv_button_create(lv_screen_active(), NULL);
      }
    }
 

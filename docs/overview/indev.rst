@@ -162,7 +162,7 @@ object. Depending on the object's type, a short or long press of
 :cpp:enumerator:`LV_KEY_ENTER` changes back to *Navigate* mode. Usually, an object
 which cannot be pressed (like a `Slider </widgets/slider>`__) leaves
 *Edit* mode upon a short click. But with objects where a short click has
-meaning (e.g. `Button </widgets/btn>`__), a long press is required.
+meaning (e.g. `Button </widgets/button>`__), a long press is required.
 
 Default group
 ^^^^^^^^^^^^^

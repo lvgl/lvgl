@@ -79,12 +79,6 @@ this implementation detail is unnoticed. This is not the case with
 :cpp:func:`lv_label_set_text_static` must be writable if you plan to use
 :cpp:enumerator:`LV_LABEL_LONG_DOT`.
 
-Text recolor
-------------
-
-In the text, you can use commands to recolor parts of the text. For
-example: ``"Write a #ff0000 red# word"``. This feature can be enabled
-individually for each label by :cpp:func:`lv_label_set_recolor` function.
 
 Text selection
 --------------

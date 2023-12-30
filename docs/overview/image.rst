@@ -149,7 +149,7 @@ Use images
 ----------
 
 The simplest way to use an image in LVGL is to display it with an
-`lv_image </widgets/img>`__ object:
+`lv_image </widgets/image>`__ object:
 
 .. code:: c
 

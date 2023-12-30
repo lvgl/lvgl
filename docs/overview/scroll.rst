@@ -9,8 +9,8 @@ In LVGL scrolling works very intuitively: if an object is outside its
 parent content area (the size without padding), the parent becomes
 scrollable and scrollbar(s) will appear. That's it.
 
-Any object can be scrollable including ``lv_obj_t``, ``lv_img``,
-``lv_btn``, ``lv_meter``, etc
+Any object can be scrollable including ``lv_obj``, ``lv_image``,
+``lv_button``, ``lv_meter``, etc
 
 The object can either be scrolled horizontally or vertically in one
 stroke; diagonal scrolling is not possible.
@@ -103,9 +103,10 @@ It's possible to make an object non-scrollable with
 Non-scrollable objects can still propagate the scrolling (chain) to
 their parents.
 
-The direction in which scrolling happens can be controlled by
-``lv_obj_set_scroll_dir(obj, LV_DIR_...)``. The following values are
-possible for the direction:
+The direction in which scrolling happens can be controlled by ``lv_obj_set_scroll_dir(obj, LV_DIR_...)``. 
+
+The following values are possible for the direction:
+
 - :cpp:enumerator:`LV_DIR_TOP`: only scroll up
 - :cpp:enumerator:`LV_DIR_LEFT`: only scroll left
 - :cpp:enumerator:`LV_DIR_BOTTOM`: only scroll down

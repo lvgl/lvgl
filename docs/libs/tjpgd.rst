@@ -1,13 +1,17 @@
-=============
-TJPGD decoder
-=============
+===============
+TJpgDec decoder
+===============
 
+TJpgDec - Tiny JPEG Decompressor.
 Allow the use of JPG (JPEG) images in LVGL.
+
+Detailed introduction: `TJpgDec <http://elm-chan.org/fsw/tjpgd/>`__
 
 Overview
 --------
 
 -  JPG is decoded in 8x8 tiles.
+-  Only baseline JPG files are supported (no progressive JPG support).
 -  Read from file and C array are implemented.
 -  Only the required portions of the JPG images are decoded,
    therefore they can't be zoomed or rotated.

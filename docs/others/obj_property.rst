@@ -10,7 +10,7 @@ Usage
 -----
 
 Two APIs are provided to get/set widget properties. It can be enabled by setting
-``LV_USE_OBJ_PROPERTY`` to 1 in `lv_conf.h`.
+:c:macro:`LV_USE_OBJ_PROPERTY` to `1` in ``lv_conf.h``.
 
 .. code:: c
 
@@ -31,16 +31,16 @@ Two APIs are provided to get/set widget properties. It can be enabled by setting
 Property ID
 ~~~~~~~~~~~
 
-``lv_prop_id_t`` identifies which property to get/set. ``lv_property_t`` is an enum value
-defined in `lv_obj_property.h` that are grouped by widget class. You can add your own
-widget property ID following same rule and using helper macro ``LV_PROPERTY_ID``.
+:cpp:type:`lv_prop_id_t` identifies which property to get/set. :cpp:type:`lv_property_t` is an enum value
+defined in ``lv_obj_property.h`` that are grouped by widget class. You can add your own
+widget property ID following same rule and using helper macro :c:macro:`LV_PROPERTY_ID`.
 Do make sure the ID is unique across all widgets.
 
 
 Property ID is a 32-bit value. The higher 4bits indicates the property value type.
 The lower 28bits is the property ID.
 
-Note that ``lv_style_prop_t`` is also valid property ID.
+Note that :cpp:type:`lv_style_prop_t` is also valid property ID.
 
 Property Value
 ~~~~~~~~~~~~~~

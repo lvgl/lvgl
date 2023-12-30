@@ -29,7 +29,7 @@ the for many pixels, the color is the same. The algorithm simply counts how many
 repeated data are there and store the count value and the color value.
 If the coming pixels are not repeated, it stores the non-repeat count value and
 original color value. For more details, the script used to compress the image
-can be found from `lvgl/script/LVGLImage.py`.
+can be found from ``lvgl/script/LVGLImage.py``.
 
 .. code:: python
 
@@ -64,7 +64,7 @@ can be found from `lvgl/script/LVGLImage.py`.
 Usage
 -----
 
-To use the RLE Decoder, ensure that `LV_USE_RLE` is defined and set to `1`.
+To use the RLE Decoder, enable it in ``lv_conf.h`` configuration file by setting :c:macro:`LV_USE_RLE` to `1`.
 The RLE image can be used same as other images.
 
 .. code:: c

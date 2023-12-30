@@ -27,7 +27,7 @@ Image sources
 To set the image in a state, use the
 :cpp:expr:`lv_imagebutton_set_src(imagebutton, LV_IMAGEBUTTON_STATE_..., src_left, src_center, src_right)`.
 
-The image sources work the same as described in the `Image object </widgets/img>`__
+The image sources work the same as described in the `Image object </widgets/image>`__
 except that "Symbols" are not supported by the Image button. Any of the sources can ``NULL``.
 
 The possible states are:
@@ -71,7 +71,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/imgagebutton/index.rst
+.. include:: ../examples/widgets/imagebutton/index.rst
 
 API
 ***

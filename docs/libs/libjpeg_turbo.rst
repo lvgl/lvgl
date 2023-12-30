@@ -1,10 +1,11 @@
 =====================
-libjpge-turbo decoder
+libjpeg-turbo decoder
 =====================
 
-libjpeg-turbo is a JPEG image codec that uses SIMD instructions to accelerate baseline JPEG compression and decompression on x86, 
+`libjpeg-turbo <https://libjpeg-turbo.org/>`__ is a JPEG image codec that uses SIMD instructions to accelerate baseline JPEG compression and decompression on x86, 
 x86-64, Arm, PowerPC, and MIPS systems, as well as progressive JPEG compression on x86, x86-64, and Arm systems.
-Detailed introduction: `libjpeg-turbo <https://github.com/libjpeg-turbo/libjpeg-turbo>`__.
+
+Detailed introduction: `libjpeg-turbo <https://github.com/libjpeg-turbo/libjpeg-turbo>`__
 
 Install
 -------

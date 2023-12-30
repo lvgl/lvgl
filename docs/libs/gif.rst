@@ -2,13 +2,14 @@
 GIF decoder
 ===========
 
-Allow using GIF images in LVGL. Based on
-https://github.com/lecram/gifdec
+Allow using GIF images in LVGL.
+
+Detailed introduction: `GIFdec <https://github.com/lecram/gifdec>`__
 
 When enabled in ``lv_conf.h`` with :c:macro:`LV_USE_GIF`
-:c:expr:`lv_gif_create(parent)` can be used to create a gif widget.
+:cpp:expr:`lv_gif_create(parent)` can be used to create a gif widget.
 
-:c:expr:`lv_gif_set_src(obj, src)` works very similarly to :c:func:`lv_image_set_src`.
+:cpp:expr:`lv_gif_set_src(obj, src)` works very similarly to :cpp:func:`lv_image_set_src`.
 As source, it also accepts images as variables (:c:struct:`lv_image_dsc_t`) or
 files.
 

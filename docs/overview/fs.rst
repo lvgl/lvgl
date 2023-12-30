@@ -109,8 +109,8 @@ The example below shows how to read from a file:
 
    lv_fs_close(&f);
 
-*The mode in :cpp:func:`lv_fs_open` can be :cpp:enumerator:`LV_FS_MODE_WR` to open for writes
-only or :cpp:enumerator:`LV_FS_MODE_RD` ``|`` :cpp:enumerator:`LV_FS_MODE_WR` for both*
+The mode in :cpp:func:`lv_fs_open` can be :cpp:enumerator:`LV_FS_MODE_WR` to open for writes
+only or :cpp:enumerator:`LV_FS_MODE_RD` ``|`` :cpp:enumerator:`LV_FS_MODE_WR` for both
 
 This example shows how to read a directory's content. It's up to the
 driver how to mark directories in the result but it can be a good
@@ -144,7 +144,7 @@ practice to insert a ``'/'`` in front of each directory name.
 Use drives for images
 *********************
 
-`Image </widgets/img>`__ objects can be opened from files too (besides
+`Image </widgets/image>`__ objects can be opened from files too (besides
 variables stored in the compiled program).
 
 To use files in image widgets the following callbacks are required:
