@@ -492,8 +492,9 @@ lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp)
     return disp->prev_scr;
 }
 
-void lv_display_load_scr(lv_obj_t * scr)
+void lv_display_load_screen(lv_display_t * disp, lv_obj_t * scr)
 {
+    LV_UNUSED(disp); /*Not required, added just for consistency*/
     lv_screen_load_anim(scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
 }
 
@@ -803,11 +804,11 @@ uint32_t lv_display_get_inactive_time(const lv_display_t * disp)
     return t;
 }
 
-void lv_display_trig_activity(lv_display_t * disp)
+void lv_display_trigger_activity(lv_display_t * disp)
 {
     if(!disp) disp = lv_display_get_default();
     if(!disp) {
-        LV_LOG_WARN("lv_display_trig_activity: no display registered");
+        LV_LOG_WARN("lv_display_trigger_activity: no display registered");
         return;
     }
 

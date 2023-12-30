@@ -334,9 +334,10 @@ struct _lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp);
 
 /**
  * Make a screen active
+ * @param disp      not used can be NULL, added just for consistency
  * @param scr       pointer to a screen
  */
-void lv_display_load_scr(struct _lv_obj_t * scr);
+void lv_display_load_screen(lv_display_t * disp, struct _lv_obj_t * scr);
 
 /**
  * Return the top layer. The top layer is the same on all screens and it is above the normal screen layer.
@@ -413,7 +414,7 @@ static inline struct _lv_obj_t * lv_layer_bottom(void)
  */
 static inline void lv_screen_load(struct _lv_obj_t * scr)
 {
-    lv_display_load_scr(scr);
+    lv_display_load_screen(NULL, scr);
 }
 
 /*---------------------
@@ -495,7 +496,7 @@ uint32_t lv_display_get_inactive_time(const lv_display_t * disp);
  * Manually trigger an activity on a display
  * @param disp      pointer to a display (NULL to use the default display)
  */
-void lv_display_trig_activity(lv_display_t * disp);
+void lv_display_trigger_activity(lv_display_t * disp);
 
 /**
  * Temporarily enable and disable the invalidation of the display.
