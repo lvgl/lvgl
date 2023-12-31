@@ -153,12 +153,24 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
 
     FT_GlyphSlot glyph = ft_size->face->glyph;
 
+#if LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_OUTLINE
     dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->metrics.horiAdvance);
     dsc_out->box_h = FT_F26DOT6_TO_INT(glyph->metrics.height);          /*Height of the bitmap in [px]*/
     dsc_out->box_w = FT_F26DOT6_TO_INT(glyph->metrics.width);           /*Width of the bitmap in [px]*/
     dsc_out->ofs_x = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingX);    /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingY -
                                        glyph->metrics.height);          /*Y offset of the bitmap measured from the as line*/
+#elif LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_BITMAP
+    FT_Bitmap * glyph_bitmap = &ft_size->face->glyph->bitmap;
+
+    dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->advance.x);        /*Width of the glyph in [pf]*/
+    dsc_out->box_h = glyph_bitmap->rows;                         /*Height of the bitmap in [px]*/
+    dsc_out->box_w = glyph_bitmap->width;                        /*Width of the bitmap in [px]*/
+    dsc_out->ofs_x = glyph->bitmap_left;                         /*X offset of the bitmap in [pf]*/
+    dsc_out->ofs_y = glyph->bitmap_top -
+                     dsc_out->box_h;                             /*Y offset of the bitmap measured from the as line*/
+#endif
+
     dsc_out->bpp = 8; /*Bit per pixel: 1/2/4/8*/
     dsc_out->is_placeholder = glyph_index == 0;
     dsc_out->glyph_index = glyph_index;
