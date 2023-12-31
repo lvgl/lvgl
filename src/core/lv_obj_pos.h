@@ -69,7 +69,7 @@ void lv_obj_set_y(struct _lv_obj_t * obj, int32_t y);
  * @note            possible values are:
  *                  pixel               simple set the size accordingly
  *                  LV_SIZE_CONTENT     set the size to involve all children in the given direction
- *                  LV_SIZE_PCT(x)     to set size in percentage of the parent's content area size (the size without paddings).
+ *                  lv_pct(x)           to set size in percentage of the parent's content area size (the size without paddings).
  *                                      x should be in [0..1000]% range
  */
 void lv_obj_set_size(struct _lv_obj_t * obj, int32_t w, int32_t h);
