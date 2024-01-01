@@ -61,7 +61,6 @@ extern "C" {
  **********************/
 
 typedef struct _lv_freetype_cache_node_t lv_freetype_cache_node_t;
-typedef struct _lv_freetype_draw_data_t lv_freetype_draw_data_t;
 
 struct _lv_freetype_cache_node_t {
     const char * pathname;
@@ -77,13 +76,6 @@ struct _lv_freetype_cache_node_t {
 
     /*draw data cache*/
     lv_cache_t * draw_data_cache;
-};
-
-struct _lv_freetype_draw_data_t {
-    uint32_t glyph_index;
-    uint32_t size;
-
-    void * data;
 };
 
 typedef struct _lv_freetype_context_t {
@@ -104,6 +96,7 @@ typedef struct _lv_freetype_font_dsc_t {
     lv_freetype_font_render_mode_t render_mode;
     lv_freetype_context_t * context;
     lv_freetype_cache_node_t * cache_node;
+    lv_cache_entry_t * cache_node_entry;
     FTC_FaceID face_id;
 } lv_freetype_font_dsc_t;
 
@@ -127,13 +120,12 @@ lv_freetype_context_t * lv_freetype_get_context(void);
  */
 FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc);
 
-lv_cache_t * lv_freetype_glyph_cache_create(lv_freetype_font_dsc_t * dsc);
+lv_cache_t* lv_freetype_glyph_cache_create();
 
-void lv_freetype_glyph_cache_delete(lv_cache_t * cache);
+bool lv_freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
+    uint32_t unicode_letter_next);
 
 bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc);
-
-void lv_freetype_on_font_delete(lv_freetype_font_dsc_t * dsc);
 
 void lv_freetype_italic_transform(FT_Face face);
 
