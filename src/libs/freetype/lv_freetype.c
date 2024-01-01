@@ -65,7 +65,7 @@ lv_result_t lv_freetype_init(uint32_t max_faces, uint32_t max_sizes, uint32_t ma
         return LV_RESULT_INVALID;
     }
 
-    ft_ctx = lv_malloc(sizeof(lv_freetype_context_t));
+    ft_ctx = lv_malloc_zeroed(sizeof(lv_freetype_context_t));
     LV_ASSERT_MALLOC(ft_ctx);
     if(!ft_ctx) {
         LV_LOG_ERROR("malloc failed for lv_freetype_context_t");
@@ -190,7 +190,7 @@ void lv_freetype_font_delete(lv_font_t * font)
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
     lv_cache_release(ctx->cache_node_cache, dsc->cache_node_entry, NULL);
-    if (lv_cache_entry_get_ref(dsc->cache_node_entry) == 0) {
+    if(lv_cache_entry_get_ref(dsc->cache_node_entry) == 0) {
         lv_cache_drop(ctx->cache_node_cache, dsc->cache_node, NULL);
     }
 
@@ -283,7 +283,7 @@ static FT_Error lv_freetype_face_requester(FTC_FaceID face_id,
 static void lv_freetype_cleanup(lv_freetype_context_t * ctx)
 {
     LV_ASSERT_NULL(ctx);
-    if (ctx->cache_node_cache) {
+    if(ctx->cache_node_cache) {
         lv_cache_destroy(ctx->cache_node_cache, NULL);
         ctx->cache_node_cache = NULL;
     }
@@ -403,7 +403,7 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
         return lhs->style > rhs->style ? 1 : -1;
     }
 
-    if (lhs->pathname == rhs->pathname) {
+    if(lhs->pathname == rhs->pathname) {
         return 0;
     }
 
