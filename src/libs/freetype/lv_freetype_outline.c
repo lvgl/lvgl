@@ -17,8 +17,6 @@
 
 #define LV_FREETYPE_OUTLINE_REF_SIZE_DEF 128
 
-#define LV_FREETYPE_GLYPH_DSC_CACHE_SIZE (LV_FREETYPE_CACHE_FT_OUTLINES * 2)
-
 #if LV_FREETYPE_CACHE_FT_OUTLINES <= 0
     #error "LV_FREETYPE_CACHE_FT_OUTLINES must be greater than 0"
 #endif
@@ -34,12 +32,6 @@ struct _lv_freetype_cache_context_t {
     void * user_data;
 };
 
-typedef struct _lv_freetype_glyph_dsc_node_t {
-    FT_UInt glyph_index;
-    uint32_t size;
-    lv_font_glyph_dsc_t glyph_dsc;
-} lv_freetype_glyph_dsc_node_t;
-
 struct _lv_freetype_cache_node_t {
     lv_freetype_cache_context_t * cache_context;
 
@@ -48,13 +40,12 @@ struct _lv_freetype_cache_node_t {
     lv_freetype_font_style_t style;
     FT_Face face;
 
+    /*glyph cache*/
+    lv_cache_t * glyph_cache;
+
     /*glyph outline cache*/
     lv_cache_t * glyph_outline_cache;
     int outline_cnt;
-
-    /*glyph size cache*/
-    lv_cache_t * glyph_dsc_cache;
-    int dsc_cnt;
 };
 
 typedef struct _lv_freetype_outline_node_t {
@@ -69,15 +60,12 @@ typedef struct _lv_freetype_outline_node_t {
 static lv_freetype_outline_t outline_create(lv_freetype_context_t * ctx, FT_Face face, FT_UInt glyph_index,
                                             uint32_t size, uint32_t strength);
 static lv_result_t outline_delete(lv_freetype_cache_context_t * cache_context, lv_freetype_outline_t outline);
-static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
-                                      uint32_t unicode_letter_next);
 static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc,
                                                     uint32_t unicode_letter,
                                                     uint8_t * bitmap_out);
 static void freetype_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 
-static lv_freetype_cache_node_t * lv_freetype_cache_node_lookup(lv_freetype_context_t * ctx, const char * pathname,
-                                                                lv_freetype_font_style_t style);
+static lv_freetype_cache_node_t * lv_freetype_cache_node_lookup(lv_freetype_font_dsc_t * dsc, const char * pathname);
 static void lv_freetype_cache_node_drop(lv_freetype_font_dsc_t * dsc);
 static lv_cache_entry_t * lv_freetype_outline_lookup(lv_freetype_font_dsc_t * dsc, uint32_t unicode_letter);
 
@@ -86,12 +74,6 @@ static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, 
 static void freetype_glyph_outline_free_cb(lv_freetype_outline_node_t * node, lv_freetype_font_dsc_t * dsc);
 static lv_cache_compare_res_t freetype_glyph_outline_cmp_cb(const lv_freetype_outline_node_t * node_a,
                                                             const lv_freetype_outline_node_t * node_b);
-
-/*glyph dsc cache lru callbacks*/
-static bool freetype_glyph_dsc_create_cb(lv_freetype_glyph_dsc_node_t * glyph_dsc_node, lv_freetype_font_dsc_t * dsc);
-static void freetype_glyph_dsc_free_cb(lv_freetype_glyph_dsc_node_t * glyph_dsc_node, lv_freetype_font_dsc_t * dsc);
-static lv_cache_compare_res_t freetype_glyph_dsc_cmp_cb(const lv_freetype_glyph_dsc_node_t * node_a,
-                                                        const lv_freetype_glyph_dsc_node_t * node_b);
 
 /**********************
  *  STATIC VARIABLES
@@ -142,8 +124,7 @@ void lv_freetype_cache_context_delete(lv_freetype_cache_context_t * cache_contex
 bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc)
 {
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-    dsc->cache_node = lv_freetype_cache_node_lookup(dsc->context, lv_freetype_get_pathname(dsc->face_id), dsc->style);
-    dsc->font.get_glyph_dsc = freetype_get_glyph_dsc_cb;
+    dsc->cache_node = lv_freetype_cache_node_lookup(dsc, lv_freetype_get_pathname(dsc->face_id));
     dsc->font.get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
     dsc->font.release_glyph = freetype_release_glyph_cb;
     return true;
@@ -206,6 +187,12 @@ bool lv_freetype_is_outline_font(const lv_font_t * font)
     return true;
 }
 
+lv_cache_t * lv_freetype_get_glyph_cache(const lv_freetype_font_dsc_t * dsc)
+{
+    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
+    return dsc->cache_node->glyph_cache;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -214,11 +201,12 @@ bool lv_freetype_is_outline_font(const lv_font_t * font)
  *     FACE CACHE
  *------------------*/
 
-static lv_freetype_cache_node_t * lv_freetype_cache_node_lookup(lv_freetype_context_t * ctx,
-                                                                const char * pathname, lv_freetype_font_style_t style)
+static lv_freetype_cache_node_t * lv_freetype_cache_node_lookup(lv_freetype_font_dsc_t * dsc, const char * pathname)
 {
-    LV_ASSERT_NULL(ctx);
     LV_ASSERT_NULL(pathname);
+
+    lv_freetype_context_t * ctx = dsc->context;
+    lv_freetype_font_style_t style = dsc->style;
 
     lv_freetype_cache_context_t * cache_context = ctx->cache_context;
 
@@ -269,20 +257,13 @@ static lv_freetype_cache_node_t * lv_freetype_cache_node_lookup(lv_freetype_cont
     cache->ref_cnt = 1;
     cache->cache_context = cache_context;
 
-    lv_cache_ops_t glyph_dsc_cache_ops = {
-        .create_cb = (lv_cache_create_cb_t)freetype_glyph_dsc_create_cb,
-        .free_cb = (lv_cache_free_cb_t)freetype_glyph_dsc_free_cb,
-        .compare_cb = (lv_cache_compare_cb_t)freetype_glyph_dsc_cmp_cb,
-    };
     lv_cache_ops_t glyph_outline_cache_ops = {
         .create_cb = (lv_cache_create_cb_t)freetype_glyph_outline_create_cb,
         .free_cb = (lv_cache_free_cb_t)freetype_glyph_outline_free_cb,
         .compare_cb = (lv_cache_compare_cb_t)freetype_glyph_outline_cmp_cb,
     };
 
-    cache->glyph_dsc_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_glyph_dsc_node_t),
-                                             LV_FREETYPE_GLYPH_DSC_CACHE_SIZE,
-                                             glyph_dsc_cache_ops);
+    cache->glyph_cache = lv_freetype_glyph_cache_create(dsc);
     cache->glyph_outline_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_outline_node_t),
                                                  LV_FREETYPE_CACHE_FT_OUTLINES,
                                                  glyph_outline_cache_ops);
@@ -315,110 +296,9 @@ static void lv_freetype_cache_node_drop(lv_freetype_font_dsc_t * dsc)
     lv_ll_t * cache_ll = &cache_node->cache_context->cache_ll;
     _lv_ll_remove(cache_ll, cache_node);
 
-    lv_cache_destroy(cache_node->glyph_dsc_cache, dsc);
     lv_cache_destroy(cache_node->glyph_outline_cache, dsc);
+    lv_freetype_glyph_cache_delete(cache_node->glyph_cache);
     lv_free(cache_node);
-}
-
-/*-------------------
- *  GLYPH DSC CACHE
- *------------------*/
-
-static bool freetype_glyph_dsc_create_cb(lv_freetype_glyph_dsc_node_t * glyph_dsc_node, lv_freetype_font_dsc_t * dsc)
-{
-    lv_font_glyph_dsc_t * dsc_out = &glyph_dsc_node->glyph_dsc;
-
-    FT_UInt glyph_index = glyph_dsc_node->glyph_index;
-    /* cache miss, load dsc */
-    FT_Size ft_size = lv_freetype_lookup_size(dsc);
-    if(!ft_size) {
-        return false;
-    }
-
-    FT_Error error = FT_Load_Glyph(ft_size->face, glyph_index, FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_BITMAP);
-    if(error) {
-        FT_ERROR_MSG("FT_Load_Glyph", error);
-        return false;
-    }
-
-    LV_LOG_INFO("glyph_index = %u, cnt = %d", glyph_index, ++dsc->cache_node->dsc_cnt);
-
-    FT_GlyphSlot glyph = ft_size->face->glyph;
-
-    dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->metrics.horiAdvance);
-    dsc_out->box_h = FT_F26DOT6_TO_INT(glyph->metrics.height);          /*Height of the bitmap in [px]*/
-    dsc_out->box_w = FT_F26DOT6_TO_INT(glyph->metrics.width);           /*Width of the bitmap in [px]*/
-    dsc_out->ofs_x = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingX);    /*X offset of the bitmap in [pf]*/
-    dsc_out->ofs_y = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingY -
-                                       glyph->metrics.height);          /*Y offset of the bitmap measured from the as line*/
-    dsc_out->bpp = 8; /*Bit per pixel: 1/2/4/8*/
-    dsc_out->is_placeholder = glyph_index == 0;
-
-    return true;
-}
-
-static void freetype_glyph_dsc_free_cb(lv_freetype_glyph_dsc_node_t * glyph_dsc_node, lv_freetype_font_dsc_t * dsc)
-{
-    LV_UNUSED(glyph_dsc_node);
-    LV_UNUSED(dsc);
-    LV_LOG_INFO("cnt = %d", --dsc->cache_node->dsc_cnt);
-}
-
-static lv_cache_compare_res_t freetype_glyph_dsc_cmp_cb(const lv_freetype_glyph_dsc_node_t * node_a,
-                                                        const lv_freetype_glyph_dsc_node_t * node_b)
-{
-    if(node_a->glyph_index != node_b->glyph_index)
-        return (node_a->glyph_index > node_b->glyph_index) ? 1 : -1;
-
-    if(node_a->size != node_b->size)
-        return (node_a->size > node_b->size) ? 1 : -1;
-
-    return 0;
-}
-
-static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
-                                      lv_font_glyph_dsc_t * dsc_out,
-                                      uint32_t unicode_letter,
-                                      uint32_t unicode_letter_next)
-{
-    LV_ASSERT_NULL(font);
-    LV_ASSERT_NULL(dsc_out);
-
-    if(unicode_letter < 0x20) {
-        dsc_out->adv_w = 0;
-        dsc_out->box_h = 0;
-        dsc_out->box_w = 0;
-        dsc_out->ofs_x = 0;
-        dsc_out->ofs_y = 0;
-        dsc_out->bpp = 0;
-        return true;
-    }
-
-    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
-    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-
-    lv_freetype_cache_node_t * cache_node = dsc->cache_node;
-
-    FT_UInt charmap_index = FT_Get_Charmap_Index(cache_node->face->charmap);
-    FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, unicode_letter);
-
-    lv_freetype_glyph_dsc_node_t tmp_node;
-    tmp_node.glyph_index = glyph_index;
-    tmp_node.size = dsc->size;
-
-    lv_cache_entry_t * entry = lv_cache_acquire_or_create(cache_node->glyph_dsc_cache, &tmp_node, dsc);
-    if(entry == NULL) {
-        return false;
-    }
-    lv_freetype_glyph_dsc_node_t * new_node = lv_cache_entry_get_data(entry);
-    *dsc_out = new_node->glyph_dsc;
-
-    if((dsc->style & LV_FREETYPE_FONT_STYLE_ITALIC) && (unicode_letter_next == '\0')) {
-        dsc_out->adv_w = dsc_out->box_w + dsc_out->ofs_x;
-    }
-    lv_cache_release(cache_node->glyph_dsc_cache, entry, NULL);
-
-    return true;
 }
 
 /*-------------------
