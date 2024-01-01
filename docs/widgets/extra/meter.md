@@ -5,7 +5,7 @@ The Meter widget can visualize data in very flexible ways. In can show arcs, nee
 
 ## Parts and Styles
 - `LV_PART_MAIN` The background of the Meter. Uses the typical background properties.
-- `LV_PART_TICK` The tick lines a labels using the *line* and *text* style properties.
+- `LV_PART_TICKS` The tick lines a labels using the *line* and *text* style properties.
 - `LV_PART_INDICATOR` The needle line or image using the *line* and *img* style properties, as well as the background properties to draw a square (or circle) on the pivot of the needles. Padding makes the square larger.
 - `LV_PART_ITEMS` The arcs using the *arc* properties.
 
