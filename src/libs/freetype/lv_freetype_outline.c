@@ -9,6 +9,8 @@
 
 #include "lv_freetype_private.h"
 
+#if LV_USE_FREETYPE
+
 /*********************
  *      DEFINES
  *********************/
@@ -38,7 +40,6 @@ static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_f
                                                     uint8_t * bitmap_out);
 static void freetype_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 
-//static void lv_freetype_cache_node_drop(lv_freetype_font_dsc_t * dsc);
 static lv_cache_entry_t * lv_freetype_outline_lookup(lv_freetype_font_dsc_t * dsc, uint32_t unicode_letter);
 
 /*glyph dsc cache lru callbacks*/
@@ -362,3 +363,5 @@ static lv_result_t outline_delete(lv_freetype_context_t * ctx, lv_freetype_outli
 
     return outline_send_event(ctx, LV_EVENT_DELETE, &param);
 }
+
+#endif /*LV_USE_FREETYPE*/
