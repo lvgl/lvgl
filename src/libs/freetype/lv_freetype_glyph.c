@@ -99,7 +99,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
         .size = dsc->size,
     };
 
-    lv_cache_t * glyph_cache = lv_freetype_get_glyph_cache(dsc);
+    lv_cache_t * glyph_cache = dsc->cache_node->glyph_cache;
 
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(glyph_cache, &search_key, dsc);
     if(entry == NULL) {
