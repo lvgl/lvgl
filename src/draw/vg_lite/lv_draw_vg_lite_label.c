@@ -93,12 +93,12 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 #endif
         }
         else if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_A8
-                || glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE) {
+                || glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE
+                || glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_VECTOR) {
             if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
                 draw_letter_outline(u, glyph_draw_dsc);
             }
-            else
-            {
+            else {
                 draw_letter_bitmap(u, glyph_draw_dsc);
             }
         }

@@ -213,6 +213,7 @@ static lv_result_t outline_send_event(lv_freetype_context_t * ctx, lv_event_code
                                       lv_freetype_outline_event_param_t * param)
 {
     if(!ctx->event_cb) {
+        LV_LOG_ERROR("event_cb is not set");
         return LV_RESULT_INVALID;
     }
 
