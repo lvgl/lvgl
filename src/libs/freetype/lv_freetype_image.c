@@ -82,13 +82,6 @@ bool lv_freetype_image_font_create(lv_freetype_font_dsc_t * dsc)
     return true;
 }
 
-void lv_freetype_on_font_delete(lv_freetype_font_dsc_t * dsc)
-{
-    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-    lv_cache_destroy(dsc->cache_node->draw_data_cache, NULL);
-    //    lv_free(dsc->cache_node);
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

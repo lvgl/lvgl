@@ -136,8 +136,8 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
         .render_mode = render_mode,
     };
 
-    lv_cache_entry_t * cached_cache_node = lv_cache_acquire_or_create(ctx->cache_node_cache, &search_key, NULL);
-    if(!cached_cache_node) {
+    lv_cache_entry_t * cache_node_entry = lv_cache_acquire_or_create(ctx->cache_node_cache, &search_key, NULL);
+    if(!cache_node_entry) {
         LV_LOG_ERROR("lv_cache_acquire_or_create failed");
         return NULL;
     }
@@ -154,8 +154,8 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     dsc->size = size;
     dsc->style = style;
     dsc->magic_num = LV_FREETYPE_FONT_DSC_MAGIC_NUM;
-    dsc->cache_node = lv_cache_entry_get_data(cached_cache_node);
-    dsc->cache_node->glyph_cache = lv_freetype_glyph_cache_create(dsc);
+    dsc->cache_node = lv_cache_entry_get_data(cache_node_entry);
+    dsc->cache_node_entry = cache_node_entry;
 
     /* get font info */
     FT_Size ft_size = lv_freetype_lookup_size(dsc);
@@ -176,6 +176,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     int8_t thickness = FT_F26DOT6_TO_INT(FT_MulFix(scale, ft_size->face->underline_thickness));
     font->underline_position = FT_F26DOT6_TO_INT(FT_MulFix(scale, ft_size->face->underline_position));
     font->underline_thickness = thickness < 1 ? 1 : thickness;
+    font->get_glyph_dsc = lv_freetype_get_glyph_dsc_cb;
 
     return font;
 }
@@ -183,13 +184,17 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
 void lv_freetype_font_delete(lv_font_t * font)
 {
     LV_ASSERT_NULL(font);
+    lv_freetype_context_t * ctx = lv_freetype_get_context();
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)(font->dsc);
     LV_ASSERT_NULL(dsc);
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
-    lv_freetype_on_font_delete(dsc);
+    lv_cache_release(ctx->cache_node_cache, dsc->cache_node_entry, NULL);
+    if (lv_cache_entry_get_ref(dsc->cache_node_entry) == 0) {
+        lv_cache_drop(ctx->cache_node_cache, dsc->cache_node, NULL);
+    }
+
     lv_freetype_drop_face_id(dsc->context, dsc->face_id);
-    lv_freetype_glyph_cache_delete(dsc->cache_node->glyph_cache);
 
     /* invalidate magic number */
     lv_memzero(dsc, sizeof(lv_freetype_font_dsc_t));
@@ -278,6 +283,10 @@ static FT_Error lv_freetype_face_requester(FTC_FaceID face_id,
 static void lv_freetype_cleanup(lv_freetype_context_t * ctx)
 {
     LV_ASSERT_NULL(ctx);
+    if (ctx->cache_node_cache) {
+        lv_cache_destroy(ctx->cache_node_cache, NULL);
+        ctx->cache_node_cache = NULL;
+    }
 
     if(ctx->cache_manager) {
         FTC_Manager_Done(ctx->cache_manager);
@@ -349,7 +358,7 @@ static void lv_freetype_drop_face_id(lv_freetype_context_t * ctx, FTC_FaceID fac
 
 static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * user_data)
 {
-
+    LV_UNUSED(user_data);
     lv_freetype_context_t * ctx = lv_freetype_get_context();
 
     /* Cache miss, load face */
@@ -375,12 +384,14 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     }
 
     node->face = face;
+    node->glyph_cache = lv_freetype_glyph_cache_create();
+
     return true;
 }
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)
 {
-    LV_UNUSED(user_data);
-
+    lv_cache_destroy(node->glyph_cache, user_data);
+    lv_cache_destroy(node->draw_data_cache, user_data);
 }
 static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cache_node_t * lhs,
                                                           const lv_freetype_cache_node_t * rhs)
@@ -390,6 +401,10 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
     }
     if(lhs->style != rhs->style) {
         return lhs->style > rhs->style ? 1 : -1;
+    }
+
+    if (lhs->pathname == rhs->pathname) {
+        return 0;
     }
 
     int32_t cmp_res = lv_strcmp(lhs->pathname, rhs->pathname);
