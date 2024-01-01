@@ -64,7 +64,7 @@ void lv_obj_delete(lv_obj_t * obj)
     lv_display_t * disp = NULL;
     bool act_screen_del = false;
     if(par == NULL) {
-        disp = lv_obj_get_disp(obj);
+        disp = lv_obj_get_display(obj);
         if(!disp) return;   /*Shouldn't happen*/
         if(disp->act_scr == obj) act_screen_del = true;
     }
@@ -286,7 +286,7 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
     return (lv_obj_t *)act_par;
 }
 
-lv_display_t * lv_obj_get_disp(const lv_obj_t * obj)
+lv_display_t * lv_obj_get_display(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -529,7 +529,7 @@ static void obj_delete_core(lv_obj_t * obj)
 
     /*Remove the screen for the screen list*/
     if(obj->parent == NULL) {
-        lv_display_t * disp = lv_obj_get_disp(obj);
+        lv_display_t * disp = lv_obj_get_display(obj);
         uint32_t i;
         /*Find the screen in the list*/
         for(i = 0; i < disp->screen_cnt; i++) {

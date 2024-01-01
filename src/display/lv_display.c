@@ -154,8 +154,8 @@ void lv_display_delete(lv_display_t * disp)
     lv_indev_t * indev;
     indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(lv_indev_get_disp(indev) == disp) {
-            lv_indev_set_disp(indev, NULL);
+        if(lv_indev_get_display(indev) == disp) {
+            lv_indev_set_display(indev, NULL);
         }
         indev = lv_indev_get_next(indev);
     }
@@ -534,7 +534,7 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp)
 void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay,
                          bool auto_del)
 {
-    lv_display_t * d = lv_obj_get_disp(new_scr);
+    lv_display_t * d = lv_obj_get_display(new_scr);
     lv_obj_t * act_scr = lv_screen_active();
 
     if(act_scr == new_scr || d->scr_to_load == new_scr) {
@@ -928,7 +928,7 @@ static void scr_load_internal(lv_obj_t * scr)
     LV_ASSERT_NULL(scr);
     if(scr == NULL) return;
 
-    lv_display_t * d = lv_obj_get_disp(scr);
+    lv_display_t * d = lv_obj_get_display(scr);
     if(!d) return;  /*Shouldn't happen, just to be sure*/
 
     lv_obj_t * old_scr = d->act_scr;
@@ -947,7 +947,7 @@ static void scr_load_internal(lv_obj_t * scr)
 
 static void scr_load_anim_start(lv_anim_t * a)
 {
-    lv_display_t * d = lv_obj_get_disp(a->var);
+    lv_display_t * d = lv_obj_get_display(a->var);
 
     d->prev_scr = lv_screen_active();
     d->act_scr = a->var;
@@ -972,7 +972,7 @@ static void set_y_anim(void * obj, int32_t v)
 
 static void scr_anim_ready(lv_anim_t * a)
 {
-    lv_display_t * d = lv_obj_get_disp(a->var);
+    lv_display_t * d = lv_obj_get_display(a->var);
 
     lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL);
     lv_obj_send_event(d->prev_scr, LV_EVENT_SCREEN_UNLOADED, NULL);

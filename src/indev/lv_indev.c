@@ -335,14 +335,14 @@ lv_group_t * lv_indev_get_group(const lv_indev_t * indev)
     return indev->group;
 }
 
-lv_display_t * lv_indev_get_disp(const lv_indev_t * indev)
+lv_display_t * lv_indev_get_display(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;
 
     return indev->disp;
 }
 
-void lv_indev_set_disp(lv_indev_t * indev, lv_display_t * disp)
+void lv_indev_set_display(lv_indev_t * indev, lv_display_t * disp)
 {
     if(indev == NULL) return;
 

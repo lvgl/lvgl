@@ -979,7 +979,7 @@ static void invalidate_button_area(const lv_obj_t * obj, uint32_t btn_idx)
     int32_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
     /*Be sure to have a minimal extra space if row/col_gap is small*/
-    int32_t dpi = lv_display_get_dpi(lv_obj_get_disp(obj));
+    int32_t dpi = lv_display_get_dpi(lv_obj_get_display(obj));
     row_gap = LV_MAX(row_gap, dpi / 10);
     col_gap = LV_MAX(col_gap, dpi / 10);
 
