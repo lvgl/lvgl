@@ -71,7 +71,7 @@ void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t
 #if SUPPORT_OUTLINE_FONT
     static bool is_init = false;
     if(!is_init) {
-        lv_freetype_outline_set_ref_size(PATH_REF_SIZE);
+        //        lv_freetype_outline_set_ref_size(PATH_REF_SIZE);
         lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
         is_init = true;
     }
