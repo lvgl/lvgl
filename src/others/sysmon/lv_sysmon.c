@@ -151,11 +151,10 @@ static void perf_update_timer_cb(lv_timer_t * t)
                                      0;
     info->calculated.flush_avg_time = info->measured.flush_cnt ? (info->measured.flush_elaps_sum / info->measured.flush_cnt)
                                       : 0;
-    info->calculated.render_avg_time = info->measured.render_cnt ? (info->measured.render_elaps_sum /
+    /*Flush time was measured in rendering time so subtract it*/
+    info->calculated.render_avg_time = info->measured.render_cnt ? ((info->measured.render_elaps_sum -
+                                                                     info->measured.flush_elaps_sum) /
                                                                     info->measured.render_cnt) : 0;
-
-    /*Flush time was measured in rendering time*/
-    info->calculated.render_avg_time -= info->calculated.flush_avg_time;
 
     info->calculated.cpu_avg_total = ((info->calculated.cpu_avg_total * (info->calculated.run_cnt - 1)) +
                                       info->calculated.cpu) / info->calculated.run_cnt;

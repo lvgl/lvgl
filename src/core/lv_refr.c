@@ -1034,8 +1034,6 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
         .y2 = area->y2 + disp->offset_y
     };
 
-    //    if(disp->layer_head->buffer_convert) disp->layer_head->buffer_convert(disp->layer_head);
-
     lv_display_send_event(disp, LV_EVENT_FLUSH_START, &offset_area);
     disp->flush_cb(disp, &offset_area, px_map);
     lv_display_send_event(disp, LV_EVENT_FLUSH_FINISH, &offset_area);
