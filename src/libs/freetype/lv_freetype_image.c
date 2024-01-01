@@ -9,6 +9,8 @@
 
 #include "lv_freetype_private.h"
 
+#if LV_USE_FREETYPE
+
 /*********************
  *      DEFINES
  *********************/
@@ -190,3 +192,5 @@ static lv_cache_compare_res_t freetype_image_compare_cb(const lv_freetype_image_
     }
     return 0;
 }
+
+#endif /*LV_USE_FREETYPE*/
