@@ -444,8 +444,8 @@ void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
         return lv_vg_lite_path_append_circle(path, cx, cy, radius, radius);
     }
 
-    start_angle = (start_angle * MATH_PI) / 180.0f;
-    sweep = sweep * MATH_PI / 180.0f;
+    start_angle = MATH_RADIANS(start_angle);
+    sweep = MATH_RADIANS(sweep);
 
     int n_curves = ceil(MATH_FABSF(sweep / MATH_HALF_PI));
     int sweep_sign = (sweep < 0 ? -1 : 1);
