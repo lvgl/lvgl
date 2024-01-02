@@ -206,7 +206,7 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
 
 /**
  * Set the range for the given scale section
- * @param obj           pointer to a scale section object
+ * @param section       pointer to a scale section object
  * @param minor_range   section new minor range
  * @param major_range   section new major range
  */
@@ -214,7 +214,7 @@ void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_rang
 
 /**
  * Set the style of the part for the given scale section
- * @param obj       pointer to a scale section object
+ * @param section   pointer to a scale section object
  * @param part      the part for the section, e.g. LV_PART_INDICATOR
  * @param section_part_style Pointer to the section part style
  */

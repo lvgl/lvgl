@@ -22,6 +22,8 @@
 #define LV_SCALE_LABEL_TXT_LEN          (20U)
 #define LV_SCALE_DEFAULT_ANGLE_RANGE    ((uint32_t) 270U)
 #define LV_SCALE_DEFAULT_ROTATION       ((int32_t) 135U)
+#define LV_SCALE_TICK_IDX_DEFAULT_ID    ((uint32_t) 255U)
+#define LV_SCALE_DEFAULT_LABEL_GAP      ((uint32_t) 15U)
 
 /**********************
  *      TYPEDEFS
@@ -295,8 +297,8 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
     section->items_style = NULL;
     section->minor_range = 0U;
     section->major_range = 0U;
-    section->first_tick_idx_in_section = 255U;
-    section->last_tick_idx_in_section = 255U;
+    section->first_tick_idx_in_section = LV_SCALE_TICK_IDX_DEFAULT_ID;
+    section->last_tick_idx_in_section = LV_SCALE_TICK_IDX_DEFAULT_ID;
     section->first_tick_idx_is_major = 0U;
     section->last_tick_idx_is_major = 0U;
     section->first_tick_in_section_width = 0U;
@@ -587,7 +589,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         /* Major tick */
         major_tick_dsc.raw_end = 0;
 
-        uint32_t label_gap = 15U; /* TODO: Add to style properties */
+        uint32_t label_gap = LV_SCALE_DEFAULT_LABEL_GAP; /* TODO: Add to style properties */
         uint32_t tick_idx = 0;
         uint32_t major_tick_idx = 0;
         for(tick_idx = 0; tick_idx < scale->total_tick_count; tick_idx++) {
@@ -1270,7 +1272,7 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
         lv_scale_section_t * section;
         _LV_LL_READ_BACK(&scale->section_ll, section) {
             if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-                if(section->first_tick_idx_in_section == 255) {
+                if(LV_SCALE_TICK_IDX_DEFAULT_ID == section->first_tick_idx_in_section) {
                     section->first_tick_idx_in_section = tick_idx;
                     section->first_tick_idx_is_major = is_major_tick;
                 }
