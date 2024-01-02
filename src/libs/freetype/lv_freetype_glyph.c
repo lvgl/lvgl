@@ -45,7 +45,7 @@ static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-lv_cache_t * lv_freetype_glyph_cache_create()
+lv_cache_t * lv_freetype_glyph_cache_create(void)
 {
     lv_cache_ops_t ops = {
         .create_cb = (lv_cache_create_cb_t)freetype_glyph_create_cb,
