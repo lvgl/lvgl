@@ -120,65 +120,41 @@ lv_result_t lv_binfont_load_from_buffer(lv_font_t * font, void * buffer, uint32_
 
 void lv_font_free(lv_font_t * font)
 {
-    if(NULL != font) {
-        lv_font_fmt_txt_dsc_t * dsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    if(font == NULL) return;
 
-        if(NULL != dsc) {
+    const lv_font_fmt_txt_dsc_t * dsc = font->dsc;
+    if(dsc == NULL) return;
 
-            if(dsc->kern_classes == 0) {
-                lv_font_fmt_txt_kern_pair_t * kern_dsc =
-                    (lv_font_fmt_txt_kern_pair_t *)dsc->kern_dsc;
-
-                if(NULL != kern_dsc) {
-                    if(kern_dsc->glyph_ids)
-                        lv_free((void *)kern_dsc->glyph_ids);
-
-                    if(kern_dsc->values)
-                        lv_free((void *)kern_dsc->values);
-
-                    lv_free((void *)kern_dsc);
-                }
-            }
-            else {
-                lv_font_fmt_txt_kern_classes_t * kern_dsc =
-                    (lv_font_fmt_txt_kern_classes_t *)dsc->kern_dsc;
-
-                if(NULL != kern_dsc) {
-                    if(kern_dsc->class_pair_values)
-                        lv_free((void *)kern_dsc->class_pair_values);
-
-                    if(kern_dsc->left_class_mapping)
-                        lv_free((void *)kern_dsc->left_class_mapping);
-
-                    if(kern_dsc->right_class_mapping)
-                        lv_free((void *)kern_dsc->right_class_mapping);
-
-                    lv_free((void *)kern_dsc);
-                }
-            }
-
-            lv_font_fmt_txt_cmap_t * cmaps =
-                (lv_font_fmt_txt_cmap_t *)dsc->cmaps;
-
-            if(NULL != cmaps) {
-                for(int i = 0; i < dsc->cmap_num; ++i) {
-                    if(NULL != cmaps[i].glyph_id_ofs_list)
-                        lv_free((void *)cmaps[i].glyph_id_ofs_list);
-                    if(NULL != cmaps[i].unicode_list)
-                        lv_free((void *)cmaps[i].unicode_list);
-                }
-                lv_free(cmaps);
-            }
-
-            if(NULL != dsc->glyph_bitmap) {
-                lv_free((void *)dsc->glyph_bitmap);
-            }
-            if(NULL != dsc->glyph_dsc) {
-                lv_free((void *)dsc->glyph_dsc);
-            }
-            lv_free(dsc);
+    if(dsc->kern_classes == 0) {
+        const lv_font_fmt_txt_kern_pair_t * kern_dsc = dsc->kern_dsc;
+        if(NULL != kern_dsc) {
+            lv_free((void *)kern_dsc->glyph_ids);
+            lv_free((void *)kern_dsc->values);
+            lv_free((void *)kern_dsc);
         }
     }
+    else {
+        const lv_font_fmt_txt_kern_classes_t * kern_dsc = dsc->kern_dsc;
+        if(NULL != kern_dsc) {
+            lv_free((void *)kern_dsc->class_pair_values);
+            lv_free((void *)kern_dsc->left_class_mapping);
+            lv_free((void *)kern_dsc->right_class_mapping);
+            lv_free((void *)kern_dsc);
+        }
+    }
+
+    const lv_font_fmt_txt_cmap_t * cmaps = dsc->cmaps;
+    if(NULL != cmaps) {
+        for(int i = 0; i < dsc->cmap_num; ++i) {
+            lv_free((void *)cmaps[i].glyph_id_ofs_list);
+            lv_free((void *)cmaps[i].unicode_list);
+        }
+        lv_free((void *)cmaps);
+    }
+
+    lv_free((void *)dsc->glyph_bitmap);
+    lv_free((void *)dsc->glyph_dsc);
+    lv_free((void *)dsc);
 }
 
 /**********************
