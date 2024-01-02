@@ -182,6 +182,14 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
 
     lv_draw_buf_t * decoded = decode_png_data(png_data, png_data_size);
+    if(!decoded) {
+        LV_LOG_WARN("Error decoding PNG\n");
+        if(png_data != NULL) {
+            lv_free((void *)png_data);
+        }
+        return LV_RESULT_INVALID;
+    }
+
     /*Stride check and adjustment accordingly*/
     if(args && args->stride_align) {
         uint32_t expected = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
@@ -248,7 +256,7 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
     /*Decode the image in ARGB8888 */
     unsigned error = lodepng_decode32((unsigned char **)&decoded, &png_width, &png_height, png_data, png_data_size);
     if(error) {
-        if(img_data != NULL)  lv_draw_buf_destroy(decoded);
+        if(img_data != NULL) lv_draw_buf_destroy(decoded);
         return NULL;
     }
 
