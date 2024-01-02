@@ -76,6 +76,10 @@ lv_display_t * lv_nuttx_fbdev_create(void)
         return NULL;
     }
     dsc->fd = -1;
+    lv_display_set_color_format(disp, LV_COLOR_FORMAT_NATIVE_WITH_ALPHA);
+    if(lv_color_format_has_alpha(disp->color_format)) {
+        lv_obj_remove_style_all(disp->act_scr);
+    }
     lv_display_set_driver_data(disp, dsc);
     lv_display_add_event_cb(disp, display_release_cb, LV_EVENT_DELETE, disp);
     lv_display_set_flush_cb(disp, flush_cb);
@@ -122,6 +126,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         ret = -errno;
         goto errout;
     }
+    memset(dsc->mem, 0, dsc->pinfo.fblen);
 
     /* double buffer mode */
 
