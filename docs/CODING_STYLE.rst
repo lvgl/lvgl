@@ -1,8 +1,8 @@
 Coding style
 ============
 
-File format
------------
+File template
+-------------
 
 Use `misc/lv_templ.c <https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ.c>`__
 and `misc/lv_templ.h <https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ.h>`__
@@ -18,8 +18,8 @@ Naming conventions
 -  Global names (API):
 
    -  start with *lv*
-   -  followed by module name: *btn*, *label*, *style* etc.
-   -  followed by the action (for functions): *set*, *get*, *refr* etc.
+   -  followed by module name: *button*, *label*, *style* etc.
+   -  followed by the action (for functions): *set*, *get*, etc.
    -  closed with the subject: *name*, *size*, *state* etc.
 
 -  Typedefs
@@ -31,18 +31,27 @@ Naming conventions
 
 -  Abbreviations:
 
-   -  Only words longer or equal than 6 characters can be abbreviated.
-   -  Abbreviate only if it makes the word at least half as long
-   -  Use only very straightforward and well-known abbreviations
-      (e.g. pos: position, def: default, btn: button)
+   -  The following abbreviations are used and allowed:
+
+      - ``dsc`` descriptor
+      - ``param`` parameter
+      - ``indev`` input device
+      - ``anim`` animation
+      - ``buf``  buffer
+      - ``str`` string
+      - ``min/max`` minimum/maximum
+      - ``alloc`` allocate
+      - ``ctrl`` control
+      - ``pos`` position
+   -  Avoid adding new abbreviations
 
 Coding guide
 ------------
 
 -  Functions:
 
-   -  Try to write function shorter than is 50 lines
-   -  Always shorter than 200 lines (except very straightforwards)
+   -  Write function with single responsibility
+   -  Make the functions ``static`` where possible
 
 -  Variables:
 
@@ -57,7 +66,7 @@ Coding guide
 Comments
 --------
 
-Before every function have a comment like this:
+Before every function have in ``.h`` files a comment like this:
 
 .. code:: c
 
@@ -66,7 +75,7 @@ Before every function have a comment like this:
     * @param obj pointer to an object
     * @return pointer to a screen
     */
-   lv_obj_t * lv_obj_get_scr(lv_obj_t * obj);
+   lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
 
 Always use ``/*Something*/`` format and NOT ``//Something``
 
@@ -82,6 +91,38 @@ Short "code summaries" of a few lines are accepted. E.g.
 
 In comments use \` \` when referring to a variable. E.g.
 :literal:`/\*Update the value of \`x_act`*/`
+
+
+API Conventions
+----------------------
+
+To support the auto-generation of bindings, the LVGL C API must
+follow some coding conventions:
+
+- Use ``enum``\ s instead of macros. If inevitable to use ``define``\ s
+  export them with :cpp:expr:`LV_EXPORT_CONST_INT(defined_value)` right after the ``define``.
+- In function arguments use ``type name[]`` declaration for array parameters instead of :cpp:expr:`type * name`
+- Use typed pointers instead of :cpp:expr:`void *` pointers
+- Widget constructor must follow the ``lv_<widget_name>_create(lv_obj_t * parent)`` pattern.
+- Widget members function must start with ``lv_<widget_name>`` and should receive :cpp:expr:`lv_obj_t *` as first
+  argument which is a pointer to widget object itself.
+- ``struct`` APIs should follow the widgets' conventions. That is to receive a pointer to the ``struct`` as the
+  first argument, and the prefix of the ``struct`` name should be used as the prefix of the
+  function name too (e.g. :cpp:expr:`lv_disp_set_default(lv_disp_t * disp)`)
+- Functions and ``struct``\ s which are not part of the public API must begin with underscore in order to mark them as "private".
+- Argument must be named in H files too.
+- Do not ``malloc`` into a static or global variables. Instead declare the variable in ``lv_global_t``
+  structure in ``lv_global.h`` and mark the variable with :cpp:expr:`(LV_GLOBAL_DEFAULT()->variable)` when it's used.
+- To register and use callbacks one of the following needs to be followed.
+
+   - Pass a pointer to a ``struct`` as the first argument of both the registration function and the callback. That
+     ``struct`` must contain ``void * user_data`` field.
+   - The last argument of the registration function must be ``void * user_data`` and the same ``user_data``
+     needs to be passed as the last argument of the callback.
+
+
+To learn more refer to the documentation of `MicroPython <integration/bindings/micropython>`__.
+
 
 Formatting
 ----------
