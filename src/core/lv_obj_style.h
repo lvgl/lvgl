@@ -156,6 +156,15 @@ void lv_obj_enable_style_refresh(bool en);
 lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
 
 /**
+ * Check if an object has a specified style property for a given style selector.
+ * @param obj       pointer to an object
+ * @param selector  the style selector to be checked, defining the scope of the style to be examined.
+ * @param prop      the property to be checked.
+ * @return          true if the object has the specified selector and property, false otherwise.
+ */
+bool lv_obj_has_style_prop(const struct _lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop);
+
+/**
  * Set local style property on an object's part and state.
  * @param obj       pointer to an object
  * @param prop      the property
