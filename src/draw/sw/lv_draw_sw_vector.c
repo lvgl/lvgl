@@ -430,6 +430,12 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
     if(layer->buf == NULL)
         return;
 
+    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888 && \
+       layer->color_format != LV_COLOR_FORMAT_XRGB8888) {
+        LV_LOG_ERROR("unsupported layer color: %d", layer->color_format);
+        return;
+    }
+
     void * buf = layer->buf;
     int32_t width = lv_area_get_width(&layer->buf_area);
     int32_t height = lv_area_get_height(&layer->buf_area);
