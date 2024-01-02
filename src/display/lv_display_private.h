@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../misc/lv_types.h"
 #include "../core/lv_obj.h"
 #include "../draw/lv_draw.h"
 #include "lv_display.h"
@@ -27,8 +28,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-struct _lv_display_t;
 
 struct _lv_display_t {
 
@@ -105,21 +104,21 @@ struct _lv_display_t {
      * Layer
      *--------------------*/
     lv_layer_t * layer_head;
-    void (*layer_init)(struct _lv_display_t * disp, lv_layer_t * layer);
-    void (*layer_deinit)(struct _lv_display_t * disp, lv_layer_t * layer);
+    void (*layer_init)(lv_display_t * disp, lv_layer_t * layer);
+    void (*layer_deinit)(lv_display_t * disp, lv_layer_t * layer);
 
     /*---------------------
      * Screens
      *--------------------*/
 
     /** Screens of the display*/
-    struct _lv_obj_t ** screens;    /**< Array of screen objects.*/
-    struct _lv_obj_t * act_scr;     /**< Currently active screen on this display*/
-    struct _lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
-    struct _lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_screen_load_anim*/
-    struct _lv_obj_t * bottom_layer;    /**< @see lv_display_get_layer_bottom*/
-    struct _lv_obj_t * top_layer;       /**< @see lv_display_get_layer_top*/
-    struct _lv_obj_t * sys_layer;       /**< @see lv_display_get_layer_sys*/
+    lv_obj_t ** screens;    /**< Array of screen objects.*/
+    lv_obj_t * act_scr;     /**< Currently active screen on this display*/
+    lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
+    lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_screen_load_anim*/
+    lv_obj_t * bottom_layer;    /**< @see lv_display_get_layer_bottom*/
+    lv_obj_t * top_layer;       /**< @see lv_display_get_layer_top*/
+    lv_obj_t * sys_layer;       /**< @see lv_display_get_layer_sys*/
     uint32_t screen_cnt;
     uint8_t draw_prev_over_act  : 1;/** 1: Draw previous screen over active screen*/
     uint8_t del_prev  : 1; /** 1: Automatically delete the previous screen when the screen load animation is ready*/
@@ -138,7 +137,7 @@ struct _lv_display_t {
     uint32_t rotation  : 2; /**< Element of  @lv_display_rotation_t*/
 
     /**< The theme assigned to the screen*/
-    struct _lv_theme_t * theme;
+    lv_theme_t * theme;
 
     /** A timer which periodically checks the dirty areas and refreshes them*/
     lv_timer_t * refr_timer;

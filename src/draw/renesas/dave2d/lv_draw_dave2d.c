@@ -403,7 +403,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
         dave2d_execute_dlist_and_flush();
     }
 
-    struct _lv_draw_task_t ** p_new_list_entry;
+    lv_draw_task_t ** p_new_list_entry;
     p_new_list_entry = _lv_ll_ins_tail(&_ll_Dave2D_Tasks);
     *p_new_list_entry = t;
 #endif
@@ -598,8 +598,8 @@ void dave2d_execute_dlist_and_flush(void)
 #endif
 
     d2_s32     result;
-    struct _lv_draw_task_t ** p_list_entry;
-    struct _lv_draw_task_t * p_list_entry1;
+    lv_draw_task_t ** p_list_entry;
+    lv_draw_task_t * p_list_entry1;
 
     // Execute render operations
     result = d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);

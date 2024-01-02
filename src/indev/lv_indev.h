@@ -25,12 +25,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_obj_t;
-struct _lv_display_t;
-struct _lv_group_t;
-struct _lv_indev_t;
-struct _lv_display_t;
-typedef struct _lv_indev_t lv_indev_t;
 
 /** Possible input device types*/
 typedef enum {
@@ -63,7 +57,7 @@ typedef struct {
     bool continue_reading;  /**< If set to true, the read callback is invoked again*/
 } lv_indev_data_t;
 
-typedef void (*lv_indev_read_cb_t)(struct _lv_indev_t * indev, lv_indev_data_t * data);
+typedef void (*lv_indev_read_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -137,9 +131,9 @@ lv_indev_state_t lv_indev_get_state(const lv_indev_t * indev);
 
 lv_group_t * lv_indev_get_group(const lv_indev_t * indev);
 
-struct _lv_display_t * lv_indev_get_disp(const lv_indev_t * indev);
+lv_display_t * lv_indev_get_disp(const lv_indev_t * indev);
 
-void lv_indev_set_disp(lv_indev_t * indev, struct _lv_display_t * disp);
+void lv_indev_set_disp(lv_indev_t * indev, lv_display_t * disp);
 
 void * lv_indev_get_user_data(const lv_indev_t * indev);
 
@@ -150,7 +144,7 @@ void * lv_indev_get_driver_data(const lv_indev_t * indev);
  * @param indev pointer to an input device to reset or NULL to reset all of them
  * @param obj pointer to an object which triggers the reset.
  */
-void lv_indev_reset(lv_indev_t * indev, struct _lv_obj_t * obj);
+void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj);
 
 /**
  * Reset the long press state of an input device
@@ -163,7 +157,7 @@ void lv_indev_reset_long_press(lv_indev_t * indev);
  * @param indev pointer to an input device
  * @param cur_obj pointer to an object to be used as cursor
  */
-void lv_indev_set_cursor(lv_indev_t * indev, struct _lv_obj_t * cur_obj);
+void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj);
 
 /**
  * Set a destination group for a keypad input device (for LV_INDEV_TYPE_KEYPAD)
@@ -216,7 +210,7 @@ lv_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev);
  * @param indev pointer to an input device
  * @return pointer to the currently scrolled object or NULL if no scrolling by this indev
  */
-struct _lv_obj_t * lv_indev_get_scroll_obj(const lv_indev_t * indev);
+lv_obj_t * lv_indev_get_scroll_obj(const lv_indev_t * indev);
 
 /**
  * Get the movement vector of an input device (for LV_INDEV_TYPE_POINTER and
@@ -236,7 +230,7 @@ void lv_indev_wait_release(lv_indev_t * indev);
  * Gets a pointer to the currently active object in the currently processed input device.
  * @return pointer to currently active object or NULL if no active object
  */
-struct _lv_obj_t * lv_indev_get_active_obj(void);
+lv_obj_t * lv_indev_get_active_obj(void);
 
 /**
  * Get a pointer to the indev read timer to
@@ -259,7 +253,7 @@ void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode);
  * @param point pointer to a point for searching the most top child
  * @return pointer to the found object or NULL if there was no suitable object
  */
-struct _lv_obj_t * lv_indev_search_obj(struct _lv_obj_t * obj, lv_point_t * point);
+lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point);
 
 /**
  * Add an event handler to the indev

@@ -17,12 +17,21 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdbool.h>
-#include "../misc/lv_style.h"
 #include "../misc/lv_types.h"
+#include "../misc/lv_style.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_assert.h"
+
+#include "lv_obj_tree.h"
+#include "lv_obj_pos.h"
+#include "lv_obj_scroll.h"
+#include "lv_obj_style.h"
+#include "lv_obj_draw.h"
+#include "lv_obj_class.h"
+#include "lv_obj_event.h"
 #include "lv_obj_property.h"
+#include "lv_group.h"
 
 /*********************
  *      DEFINES
@@ -31,8 +40,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-struct _lv_obj_t;
 
 /**
  * Possible states of a widget.
@@ -56,12 +63,6 @@ enum _lv_state_t {
     LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states*/
 };
 
-#ifdef DOXYGEN
-typedef _lv_state_t lv_state_t;
-#else
-typedef uint16_t lv_state_t;
-#endif /*DOXYGEN*/
-
 /**
  * The possible parts of widgets.
  * The parts can be considered as the internal building block of the widgets.
@@ -82,12 +83,6 @@ enum _lv_part_t {
 
     LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
 };
-
-#ifdef DOXYGEN
-typedef _lv_part_t lv_part_t;
-#else
-typedef uint32_t lv_part_t;
-#endif /*DOXYGEN*/
 
 /**
  * On/Off features controlling the object's behavior.
@@ -133,12 +128,6 @@ typedef enum {
     LV_OBJ_FLAG_USER_3          = (1L << 29), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_4          = (1L << 30), /**< Custom flag, free to use by user*/
 } _lv_obj_flag_t;
-
-#ifdef DOXYGEN
-typedef _lv_obj_flag_t lv_obj_flag_t;
-#else
-typedef uint32_t lv_obj_flag_t;
-#endif /*DOXYGEN*/
 
 #if LV_USE_OBJ_PROPERTY
 enum {
@@ -200,15 +189,6 @@ enum {
 };
 #endif
 
-#include "lv_obj_tree.h"
-#include "lv_obj_pos.h"
-#include "lv_obj_scroll.h"
-#include "lv_obj_style.h"
-#include "lv_obj_draw.h"
-#include "lv_obj_class.h"
-#include "lv_obj_event.h"
-#include "lv_group.h"
-
 /**
  * Make the base object's class publicly available.
  */
@@ -219,7 +199,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
  * They are allocated automatically if any elements is set.
  */
 typedef struct {
-    struct _lv_obj_t ** children;   /**< Store the pointer of the children in an array.*/
+    lv_obj_t ** children;   /**< Store the pointer of the children in an array.*/
     lv_group_t * group_p;
     lv_event_list_t event_list;
 
@@ -236,9 +216,9 @@ typedef struct {
     uint16_t layer_type : 2;        /**< Cache the layer type here. Element of @lv_intermediate_layer_type_t */
 } _lv_obj_spec_attr_t;
 
-typedef struct _lv_obj_t {
+struct _lv_obj_t {
     const lv_obj_class_t * class_p;
-    struct _lv_obj_t * parent;
+    lv_obj_t * parent;
     _lv_obj_spec_attr_t * spec_attr;
     _lv_obj_style_t * styles;
 #if LV_OBJ_STYLE_CACHE
@@ -260,7 +240,7 @@ typedef struct _lv_obj_t {
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
     uint16_t is_deleting : 1;
-} lv_obj_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES

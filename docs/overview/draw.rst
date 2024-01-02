@@ -267,7 +267,7 @@ documentation.
 
     typedef struct {
         lv_draw_ctx_t * draw_ctx;           /**< Draw context*/
-        const struct _lv_obj_class_t * class_p;     /**< The class that sent the event */
+        const lv_obj_class_t * class_p;     /**< The class that sent the event */
         uint32_t type;                      /**< The type if part being draw. Element of `lv_<name>_draw_part_type_t` */
         lv_area_t * draw_area;              /**< The area of the part being drawn*/
         lv_draw_rect_dsc_t *
