@@ -137,39 +137,6 @@ bool lv_freetype_is_outline_font(const lv_font_t * font);
 
 #endif
 
-#if LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_OUTLINE
-
-/**
- * Register a callback function to generate outlines for FreeType fonts.
- *
- * @param cb The callback function to be registered.
- * @param user_data User data to be passed to the callback function.
- * @return The ID of the registered callback function, or a negative value on failure.
- */
-void lv_freetype_outline_add_event(lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
-
-void lv_freetype_outline_set_ref_size(uint32_t size);
-
-uint32_t lv_freetype_outline_get_ref_size(void);
-
-/**
- * Get the scale of a FreeType font.
- *
- * @param font The FreeType font to get the scale of.
- * @return The scale of the FreeType font.
- */
-uint32_t lv_freetype_outline_get_scale(const lv_font_t * font);
-
-/**
- * Check if the font is an outline font.
- *
- * @param font The FreeType font.
- * @return Is outline font on success, otherwise false.
- */
-bool lv_freetype_is_outline_font(const lv_font_t * font);
-
-#endif
-
 /**********************
  *      MACROS
  **********************/
