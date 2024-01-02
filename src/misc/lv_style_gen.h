@@ -21,6 +21,8 @@ void lv_style_set_min_height(lv_style_t * style, int32_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_MIN_HEIGHT;
 void lv_style_set_max_height(lv_style_t * style, int32_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_MAX_HEIGHT;
+void lv_style_set_length(lv_style_t * style, int32_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_LENGTH;
 void lv_style_set_x(lv_style_t * style, int32_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_X;
 void lv_style_set_y(lv_style_t * style, int32_t value);
@@ -252,6 +254,11 @@ extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
 #define LV_STYLE_CONST_MAX_HEIGHT(val) \
     { \
         .prop_ptr = &_lv_style_const_prop_id_MAX_HEIGHT, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_LENGTH(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_LENGTH, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_X(val) \

@@ -30,6 +30,10 @@ props = [
  'style_type': 'num',   'var_type': 'int32_t' , 'default':'LV_COORD_MAX', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets a maximal height. Pixel and percentage values can be used. Percentage values are relative to the height of the parent's content area."},
 
+{'name': 'LENGTH',
+ 'style_type': 'num',   'var_type': 'int32_t' , 'default':'0', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'dsc': "Its meaning depends on the type of the widget. For example in case of lv_scale it means the length of the ticks."},
+
 {'name': 'X',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the X coordinate of the object considering the set `align`. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
