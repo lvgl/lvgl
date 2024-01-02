@@ -120,7 +120,7 @@ lv_freetype_context_t * lv_freetype_get_context(void);
  */
 FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc);
 
-lv_cache_t * lv_freetype_glyph_cache_create();
+lv_cache_t * lv_freetype_glyph_cache_create(void);
 
 bool lv_freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
                                   uint32_t unicode_letter_next);
