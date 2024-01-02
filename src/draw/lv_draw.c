@@ -391,7 +391,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     }
 
     /*Set the stride also for static allocated buffers as well as for new dynamically allocated*/
-    layer->buf_stride = stride;
+    if(layer->buf_stride == 0) layer->buf_stride = stride;
 
     /*Make sure the buffer address is aligned in case of already allocated buffers*/
     return lv_draw_buf_align(layer->buf, layer->color_format);

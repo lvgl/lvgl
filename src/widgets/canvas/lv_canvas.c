@@ -354,7 +354,7 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
     layer->color_format = header->cf;
     layer->buf_area = canvas_area;
     layer->_clip_area = canvas_area;
-    layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+    layer->buf_stride = header->stride;
 }
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
