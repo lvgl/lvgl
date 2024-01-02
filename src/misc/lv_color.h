@@ -179,6 +179,7 @@ typedef uint8_t lv_color_format_t;
 #define LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf) ((cf) >= LV_COLOR_FORMAT_A1 && (cf) <= LV_COLOR_FORMAT_A8)
 #define LV_COLOR_FORMAT_IS_INDEXED(cf) ((cf) >= LV_COLOR_FORMAT_I1 && (cf) <= LV_COLOR_FORMAT_I8)
 #define LV_COLOR_FORMAT_IS_YUV(cf)  ((cf) >= LV_COLOR_FORMAT_YUV_START && (cf) <= LV_COLOR_FORMAT_YUV_END)
+#define LV_COLOR_FORMAT_IS_REGULAR(cf) ((cf) >= LV_COLOR_FORMAT_L8 && (cf) <= LV_COLOR_FORMAT_RGB565A8)
 #define LV_COLOR_INDEXED_PALETTE_SIZE(cf) ((cf) == LV_COLOR_FORMAT_I1 ? 2 :\
                                            (cf) == LV_COLOR_FORMAT_I2 ? 4 :\
                                            (cf) == LV_COLOR_FORMAT_I4 ? 16 :\
