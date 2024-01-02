@@ -78,8 +78,7 @@ types are `Base object </widgets/obj>`__ and `Image </widgets/img>`__
 (to create a wallpaper).
 
 To create a screen, use
-``lv_obj_t * scr = lv_<type>_create(NULL, copy)``. ``copy`` can be an
-existing screen copied into the new screen.
+``lv_obj_t * scr = lv_<type>_create(NULL)``. `NULL` indicates no parent.
 
 To load a screen, use :cpp:expr:`lv_screen_load(scr)`. To get the active screen,
 use :cpp:expr:`lv_screen_active()`. These functions work on the default display. If
