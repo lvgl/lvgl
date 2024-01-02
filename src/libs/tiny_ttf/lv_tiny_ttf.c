@@ -235,9 +235,6 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, g2);
     dsc_out->adv_w = (uint16_t)floor((((float)advw + (float)k) * dsc->scale) +
                                      0.5f); /*Horizontal space required by the glyph in [px]*/
-
-    dsc_out->adv_w = (uint16_t)floor((((float)advw + (float)k) * dsc->scale) +
-                                     0.5f); /*Horizontal space required by the glyph in [px]*/
     dsc_out->box_w = (x2 - x1 + 1);         /*width of the bitmap in [px]*/
     dsc_out->box_h = (y2 - y1 + 1);         /*height of the bitmap in [px]*/
     dsc_out->ofs_x = x1;                    /*X offset of the bitmap in [pf]*/
