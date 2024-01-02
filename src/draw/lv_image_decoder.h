@@ -205,7 +205,7 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
  * @param color The color of the image with `LV_COLOR_FORMAT_ALPHA_...`
  * @param args args about how the image should be opened.
- * @return LV_RESULT_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
+ * @return LV_RESULT_OK: opened the image. `dsc->decoded` and `dsc->header` are set.
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args);
