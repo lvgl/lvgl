@@ -38,7 +38,7 @@ jobs:
       run: python tests/main.py --report test
     - name: Archive screenshot errors
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: screenshot-errors-amd64
         path: |
@@ -102,7 +102,7 @@ jobs:
             env PATH="/usr/lib/ccache:$PATH" NON_AMD64_BUILD=1 ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
       - name: Archive screenshot errors
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
             name: screenshot-errors-${{ matrix.arch }}
             path: |
