@@ -77,7 +77,10 @@ bool lv_freetype_outline_font_create(lv_freetype_font_dsc_t * dsc)
                                                        glyph_outline_cache_ops);
 
     LV_LOG_INFO("outline cache(name: %s, style: 0x%x) create %p, ref_cnt = %d",
-                pathname, style, cache, cache->ref_cnt);
+                dsc->cache_node->pathname,
+                dsc->cache_node->style,
+                dsc->cache_node->draw_data_cache,
+                lv_cache_entry_get_ref(dsc->cache_node_entry));
 
     return true;
 }
@@ -132,7 +135,7 @@ static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, 
         return false;
     }
 
-    LV_LOG_INFO("glyph_index = %u, cnt = %d", node->glyph_index, ++dsc->cache_node->outline_cnt);
+    LV_LOG_INFO("glyph_index = %u", node->glyph_index);
 
     node->outline = outline;
     return true;
