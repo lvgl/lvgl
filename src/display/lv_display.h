@@ -407,7 +407,6 @@ static inline struct _lv_obj_t * lv_layer_bottom(void)
     return lv_display_get_layer_bottom(lv_display_get_default());
 }
 
-
 /*---------------------
  * OTHERS
  *--------------------*/
