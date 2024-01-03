@@ -210,8 +210,13 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             res = decode_compressed(decoder, dsc);
         }
         else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-            /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
-            res = decode_indexed(decoder, dsc);
+            if(dsc->args.use_indexed) {
+                /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
+                res = load_indexed(decoder, dsc);
+            }
+            else {
+                res = decode_indexed(decoder, dsc);
+            }
         }
         else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
             res = decode_alpha_only(decoder, dsc);
@@ -250,7 +255,13 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 return LV_RESULT_INVALID;
             }
 
-            res = decode_indexed(decoder, dsc);
+            if(dsc->args.use_indexed) {
+                /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
+                res = load_indexed(decoder, dsc);
+            }
+            else {
+                res = decode_indexed(decoder, dsc);
+            }
         }
         else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
             /*Alpha only image will need decoder data to store pointer to decoded image, to free it when decoder closes*/
