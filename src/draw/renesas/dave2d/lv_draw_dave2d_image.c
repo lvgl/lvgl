@@ -55,14 +55,16 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
                           const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                           const lv_area_t * img_coords, const lv_area_t * clipped_img_area)
 {
+    if(decoder_dsc->decoded == NULL) return;
 
     lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)u_base;
 
     bool transformed = draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
                        draw_dsc->scale_y != LV_SCALE_NONE ? true : false;
 
-    const uint8_t * src_buf = decoder_dsc->img_data;
-    const lv_image_header_t * header = &decoder_dsc->header;
+    lv_draw_buf_t decoded = decoder_dsc->decoded;
+    const uint8_t * src_buf = decoded->data;
+    const lv_image_header_t * header = &decoder_dsc->decoded.header;
     lv_area_t buffer_area;
     lv_area_t draw_area;
     lv_area_t clipped_area;
@@ -77,14 +79,6 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
     d2_u32 dst_blend_mode;
     uint32_t img_stride = header->stride;
     lv_color_format_t cf = header->cf;
-
-    cf = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
-
-    if(decoder_dsc->decoded) {
-        src_buf = decoder_dsc->decoded->data;
-        img_stride = decoder_dsc->decoded->header.stride;
-        cf = decoder_dsc->decoded->header.cf;
-    }
 
 #if LV_USE_OS
     lv_result_t  status;
@@ -131,7 +125,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
     d1_cacheblockflush(u->d2_handle, 0, src_buf,
-                       img_stride * decoder_dsc->header.h); //Stride is in bytes, not pixels/texels
+                       img_stride * header->h); //Stride is in bytes, not pixels/texels
 #endif
 #endif
 
@@ -162,14 +156,14 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 
     lv_point_t p[4] = { //Points in clockwise order
         {0, 0},
-        {decoder_dsc->header.w - 1, 0},
-        {decoder_dsc->header.w - 1, decoder_dsc->header.h - 1},
-        {0, decoder_dsc->header.h - 1},
+        {header->w - 1, 0},
+        {header->w - 1, header->h - 1},
+        {0, header->h - 1},
     };
 
     d2_settexture(u->d2_handle, (void *)src_buf,
                   (d2_s32)(img_stride / lv_color_format_get_size(header->cf)),
-                  decoder_dsc->header.w,  decoder_dsc->header.h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(header->cf));
+                  header->w,  header->h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(header->cf));
 
     d2_settexturemode(u->d2_handle, d2_tm_filter);
     d2_setfillmode(u->d2_handle, d2_fm_texture);

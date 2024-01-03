@@ -251,13 +251,12 @@ static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_si
 {
     unsigned png_width;             /*Not used, just required by the decoder*/
     unsigned png_height;            /*Not used, just required by the decoder*/
-    uint8_t * img_data = NULL;
+    lv_draw_buf_t * decoded = NULL;
 
-    lv_draw_buf_t * decoded;
     /*Decode the image in ARGB8888 */
     unsigned error = lodepng_decode32((unsigned char **)&decoded, &png_width, &png_height, png_data, png_data_size);
     if(error) {
-        if(img_data != NULL) lv_draw_buf_destroy(decoded);
+        if(decoded != NULL)  lv_draw_buf_destroy(decoded);
         return NULL;
     }
 
