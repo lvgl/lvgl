@@ -489,7 +489,7 @@ uint32_t lv_vg_lite_width_align(uint32_t w)
     return w;
 }
 
-bool lv_vg_lite_buffer_init(
+void lv_vg_lite_buffer_init(
     vg_lite_buffer_t * buffer,
     const void * ptr,
     int32_t width,
@@ -534,8 +534,24 @@ bool lv_vg_lite_buffer_init(
         buffer->memory = (void *)ptr;
         buffer->address = (uintptr_t)ptr;
     }
+}
 
-    return true;
+void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_buf_t * draw_buf)
+{
+    LV_ASSERT_NULL(buffer);
+    LV_ASSERT_NULL(draw_buf);
+
+    const void * ptr = draw_buf->data;
+    int32_t width = draw_buf->header.w;
+    int32_t height = draw_buf->header.h;
+    vg_lite_buffer_format_t format = lv_vg_lite_vg_fmt(draw_buf->header.cf);
+
+    if(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf))
+        ptr += LV_COLOR_INDEXED_PALETTE_SIZE(draw_buf->header.cf) * 4;
+
+    width = lv_vg_lite_width_align(width);
+
+    lv_vg_lite_buffer_init(buffer, ptr, width, height, format, false);
 }
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
@@ -586,40 +602,25 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
         return false;
     }
 
-    const uint8_t * img_data = decoder_dsc->decoded->data;
-
-    if(!img_data) {
+    const lv_draw_buf_t * decoded = decoder_dsc->decoded;
+    if(decoded == NULL || decoded->data == NULL) {
         lv_image_decoder_close(decoder_dsc);
         LV_LOG_ERROR("image data is NULL");
         return false;
     }
 
-    if(!lv_vg_lite_is_src_cf_supported(decoder_dsc->header.cf)) {
+    if(!lv_vg_lite_is_src_cf_supported(decoded->header.cf)) {
         lv_image_decoder_close(decoder_dsc);
-        LV_LOG_ERROR("unsupported color format: %d", decoder_dsc->header.cf);
+        LV_LOG_ERROR("unsupported color format: %d", decoded->header.cf);
         return false;
     }
 
-    vg_lite_buffer_format_t fmt = lv_vg_lite_vg_fmt(decoder_dsc->header.cf);
-
-    uint32_t palette_size = lv_vg_lite_get_palette_size(fmt);
-    uint32_t image_offset = 0;
-    if(palette_size) {
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (uint32_t *)img_data));
-        image_offset = LV_VG_LITE_ALIGN(palette_size * sizeof(uint32_t), LV_VG_LITE_BUF_ALIGN);
+    if(LV_COLOR_FORMAT_IS_INDEXED(decoded->header.cf)) {
+        uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(decoded->header.cf);
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (uint32_t *)decoded->data));
     }
 
-    uint32_t width = lv_vg_lite_width_align(decoder_dsc->header.w);
-    img_data += image_offset;
-
-    LV_ASSERT(lv_vg_lite_buffer_init(
-                  buffer,
-                  img_data,
-                  width,
-                  decoder_dsc->header.h,
-                  fmt,
-                  false));
-
+    lv_vg_lite_buffer_from_draw_buf(buffer, decoded);
     return true;
 }
 

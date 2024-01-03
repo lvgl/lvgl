@@ -106,13 +106,15 @@ uint32_t lv_vg_lite_width_to_stride(uint32_t w, vg_lite_buffer_format_t color_fo
 
 uint32_t lv_vg_lite_width_align(uint32_t w);
 
-bool lv_vg_lite_buffer_init(
+void lv_vg_lite_buffer_init(
     vg_lite_buffer_t * buffer,
     const void * ptr,
     int32_t width,
     int32_t height,
     vg_lite_buffer_format_t format,
     bool tiled);
+
+void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_buf_t * draw_buf);
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
 
