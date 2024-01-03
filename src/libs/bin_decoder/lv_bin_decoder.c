@@ -302,7 +302,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
     dsc->decoded = adjusted;
 
-    if(use_directly) return LV_RESULT_OK; /*Do not put image to cache if it can be used directly.*/
+    if(use_directly || dsc->args.no_cache) return LV_RESULT_OK; /*Do not put image to cache if it can be used directly.*/
 
 #if LV_CACHE_DEF_SIZE > 0
 
