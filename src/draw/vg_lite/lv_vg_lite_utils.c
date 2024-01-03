@@ -320,9 +320,6 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
     switch(cf) {
         case LV_COLOR_FORMAT_A4:
         case LV_COLOR_FORMAT_A8:
-        case LV_COLOR_FORMAT_I1:
-        case LV_COLOR_FORMAT_I2:
-        case LV_COLOR_FORMAT_I4:
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_RGB565A8:
@@ -581,6 +578,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     lv_memzero(&args, sizeof(lv_image_decoder_args_t));
     args.premultiply = !lv_vg_lite_support_blend_normal();
     args.stride_align = true;
+    args.use_indexed = true;
 
     lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
     if(res != LV_RESULT_OK) {
