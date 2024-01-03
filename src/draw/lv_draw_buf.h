@@ -189,6 +189,18 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
 lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf);
 
 /**
+ * Keep using the existing memory, reshape the draw buffer to the given width and height.
+ * Return NULL if data_size is smaller than the required size.
+ * @param draw_buf  pointer to a draw buffer
+ * @param cf        the new color format
+ * @param w         the new width in pixels
+ * @param h         the new height in pixels
+ * @param stride    the stride in bytes for image. Use 0 for automatic calculation.
+ */
+lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t cf, uint32_t w, uint32_t h,
+                                    uint32_t stride);
+
+/**
  * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_MODIFIABLE in header.
  * Then free the lv_draw_buf_t struct.
  */
