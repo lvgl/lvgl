@@ -737,7 +737,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_set_angle_range(scale2, 360);
     lv_scale_set_text_src(scale2, scale2_text);
     lv_scale_set_total_tick_count(scale2, 11);
-    lv_scale_set_major_tick_length(scale2, 30);
+    lv_obj_set_style_length(scale2, 30, LV_PART_INDICATOR);
     lv_scale_set_major_tick_every(scale2, 1);
     arc = lv_arc_create(scale2);
     lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
@@ -780,8 +780,8 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_set_range(scale3, 10, 60);
     lv_scale_set_total_tick_count(scale3, 21);
     lv_scale_set_major_tick_every(scale3, 4);
-    lv_scale_set_minor_tick_length(scale3, 10);
-    lv_scale_set_major_tick_length(scale3, 20);
+    lv_obj_set_style_length(scale3, 10, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale3, 20, LV_PART_INDICATOR);
     lv_scale_set_angle_range(scale3, 225);
     lv_scale_set_rotation(scale3, 135);
 
