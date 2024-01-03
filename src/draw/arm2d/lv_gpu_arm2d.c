@@ -877,12 +877,11 @@ static bool LV_ATTRIBUTE_FAST_MEM arm_2d_copy_normal(lv_color_t * dest_buf,
         }
         /*Handle opa and mask values too*/
         else {
-            __arm_2d_impl_gray8_alpha_blending((uint8_t *)mask,
-                                               mask_stride,
-                                               (uint8_t *)mask,
-                                               mask_stride,
-                                               &copy_size,
-                                               opa);
+            __arm_2d_impl_gray8_colour_filling_with_opacity((uint8_t *)mask,
+                                                            mask_stride,
+                                                            &copy_size,
+                                                            0x00,
+                                                            255 - opa);
 
             __arm_2d_impl_src_msk_copy((color_int *)src_buf,
                                        src_stride,
