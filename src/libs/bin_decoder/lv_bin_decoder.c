@@ -71,7 +71,6 @@ static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, 
 
 static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image_compressed_t * compressed);
 
-static bool bin_decoder_decode_data(lv_image_decoder_dsc_t * dsc);
 static void bin_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data);
 
 /**********************
@@ -174,8 +173,118 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     LV_UNUSED(decoder);
     LV_UNUSED(args);
 
-    bool create_res = bin_decoder_decode_data(dsc);
-    if(create_res == false) return LV_RESULT_INVALID;
+    lv_fs_res_t res = LV_RESULT_INVALID;
+    bool use_directly = false; /*If the image is already decoded and can be used directly*/
+
+    /*Open the file if it's a file*/
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
+        /*Support only "*.bin" files*/
+        if(lv_strcmp(lv_fs_get_ext(dsc->src), "bin")) return LV_RESULT_INVALID;
+
+        /*If the file was open successfully save the file descriptor*/
+        decoder_data_t * decoder_data = get_decoder_data(dsc);
+        if(decoder_data == NULL) {
+            return LV_RESULT_INVALID;
+        }
+
+        dsc->user_data = decoder_data;
+        lv_fs_file_t * f = lv_malloc(sizeof(*f));
+        if(f == NULL) {
+            free_decoder_data(dsc);
+            return LV_RESULT_INVALID;
+        }
+
+        res = lv_fs_open(f, dsc->src, LV_FS_MODE_RD);
+        if(res != LV_FS_RES_OK) {
+            LV_LOG_WARN("Open file failed: %d", res);
+            lv_free(f);
+            free_decoder_data(dsc);
+            return LV_RESULT_INVALID;
+        }
+
+        decoder_data->f = f;    /*Now free_decoder_data will take care of the file*/
+
+        lv_color_format_t cf = dsc->header.cf;
+
+        if(dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) {
+            res = decode_compressed(decoder, dsc);
+        }
+        else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+            /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
+            res = decode_indexed(decoder, dsc);
+        }
+        else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
+            res = decode_alpha_only(decoder, dsc);
+        }
+#if LV_BIN_DECODER_RAM_LOAD
+        else if(cf == LV_COLOR_FORMAT_ARGB8888      \
+                || cf == LV_COLOR_FORMAT_XRGB8888   \
+                || cf == LV_COLOR_FORMAT_RGB888     \
+                || cf == LV_COLOR_FORMAT_RGB565     \
+                || cf == LV_COLOR_FORMAT_RGB565A8) {
+            res = decode_rgb(decoder, dsc);
+        }
+#else
+        else {
+            /* decode them in get_area_cb */
+            res = LV_RESULT_OK;
+        }
+#endif
+    }
+
+    else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
+        /*The variables should have valid data*/
+        lv_image_dsc_t * image = (lv_image_dsc_t *)dsc->src;
+        if(image->data == NULL) {
+            return LV_RESULT_INVALID;
+        }
+
+        lv_color_format_t cf = image->header.cf;
+        if(dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) {
+            res = decode_compressed(decoder, dsc);
+        }
+        else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+            /*Need decoder data to store converted image*/
+            decoder_data_t * decoder_data = get_decoder_data(dsc);
+            if(decoder_data == NULL) {
+                return LV_RESULT_INVALID;
+            }
+
+            res = decode_indexed(decoder, dsc);
+        }
+        else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
+            /*Alpha only image will need decoder data to store pointer to decoded image, to free it when decoder closes*/
+            decoder_data_t * decoder_data = get_decoder_data(dsc);
+            if(decoder_data == NULL) {
+                return LV_RESULT_INVALID;
+            }
+
+            res = decode_alpha_only(decoder, dsc);
+        }
+        else {
+            /*In case of uncompressed formats the image stored in the ROM/RAM.
+             *So simply give its pointer*/
+
+            decoder_data_t * decoder_data = get_decoder_data(dsc);
+            lv_draw_buf_t * decoded = &decoder_data->c_array;
+            dsc->decoded = decoded;
+            lv_draw_buf_from_image(decoded, image);
+
+            if(decoded->header.stride == 0) {
+                /*Use the auto calculated value from decoder_info callback*/
+                decoded->header.stride = dsc->header.stride;
+            }
+
+            res = LV_RESULT_OK;
+            use_directly = true; /*A variable image that can be used directly.*/
+        }
+    }
+
+    if(res != LV_RESULT_OK) {
+        free_decoder_data(dsc);
+        return res;
+    }
+
     if(dsc->decoded == NULL) return LV_RESULT_OK; /*Need to read via get_area_cb*/
 
     lv_draw_buf_t * decoded = (lv_draw_buf_t *)dsc->decoded;
@@ -187,13 +296,14 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     /*The adjusted draw buffer is newly allocated.*/
     if(adjusted != decoded) {
+        use_directly = false; /*Cannot use original image directly*/
         free_decoder_data(dsc);
         decoder_data_t * decoder_data = get_decoder_data(dsc);
         decoder_data->decoded = adjusted; /*Now this new buffer need to be free'd on decoder close*/
     }
     dsc->decoded = adjusted;
 
-    if(dsc->args.no_cache) return LV_RES_OK;
+    if(use_directly || dsc->args.no_cache) return LV_RESULT_OK; /*Do not put image to cache if it can be used directly.*/
 
 #if LV_CACHE_DEF_SIZE > 0
 
@@ -982,134 +1092,6 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
 
     decoder_data->decompressed = decompressed; /*Free on decoder close*/
     return LV_RESULT_OK;
-}
-
-static bool bin_decoder_decode_data(lv_image_decoder_dsc_t * dsc)
-{
-    lv_image_decoder_t * decoder = dsc->decoder;
-
-    lv_fs_res_t res = LV_RESULT_INVALID;
-
-    /*Open the file if it's a file*/
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        /*Support only "*.bin" files*/
-        if(lv_strcmp(lv_fs_get_ext(dsc->src), "bin")) return false;
-
-        /*If the file was open successfully save the file descriptor*/
-        decoder_data_t * decoder_data = get_decoder_data(dsc);
-        if(decoder_data == NULL) {
-            return false;
-        }
-
-        dsc->user_data = decoder_data;
-        lv_fs_file_t * f = lv_malloc(sizeof(*f));
-        if(f == NULL) {
-            free_decoder_data(dsc);
-            return false;
-        }
-
-        res = lv_fs_open(f, dsc->src, LV_FS_MODE_RD);
-        if(res != LV_FS_RES_OK) {
-            LV_LOG_WARN("Open file failed: %d", res);
-            lv_free(f);
-            free_decoder_data(dsc);
-            return false;
-        }
-
-        decoder_data->f = f;    /*Now free_decoder_data will take care of the file*/
-
-        lv_color_format_t cf = dsc->header.cf;
-
-        if(dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) {
-            res = decode_compressed(decoder, dsc);
-        }
-        else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-            if(dsc->args.use_indexed) {
-                /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
-                res = load_indexed(decoder, dsc);
-            }
-            else {
-                res = decode_indexed(decoder, dsc);
-            }
-        }
-        else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
-            res = decode_alpha_only(decoder, dsc);
-        }
-#if LV_BIN_DECODER_RAM_LOAD
-        else if(cf == LV_COLOR_FORMAT_ARGB8888      \
-                || cf == LV_COLOR_FORMAT_XRGB8888   \
-                || cf == LV_COLOR_FORMAT_RGB888     \
-                || cf == LV_COLOR_FORMAT_RGB565     \
-                || cf == LV_COLOR_FORMAT_RGB565A8) {
-            res = decode_rgb(decoder, dsc);
-        }
-#else
-        else {
-            /* decode them in get_area_cb */
-            res = LV_RESULT_OK;
-        }
-#endif
-    }
-
-    else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
-        /*The variables should have valid data*/
-        lv_image_dsc_t * image = (lv_image_dsc_t *)dsc->src;
-        if(image->data == NULL) {
-            return false;
-        }
-
-        lv_color_format_t cf = image->header.cf;
-        if(dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) {
-            res = decode_compressed(decoder, dsc);
-        }
-        else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-            /*Need decoder data to store converted image*/
-            decoder_data_t * decoder_data = get_decoder_data(dsc);
-            if(decoder_data == NULL) {
-                return false;
-            }
-
-            if(dsc->args.use_indexed) {
-                /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
-                res = load_indexed(decoder, dsc);
-            }
-            else {
-                res = decode_indexed(decoder, dsc);
-            }
-        }
-        else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
-            /*Alpha only image will need decoder data to store pointer to decoded image, to free it when decoder closes*/
-            decoder_data_t * decoder_data = get_decoder_data(dsc);
-            if(decoder_data == NULL) {
-                return false;
-            }
-
-            res = decode_alpha_only(decoder, dsc);
-        }
-        else {
-            /*In case of uncompressed formats the image stored in the ROM/RAM.
-             *So simply give its pointer*/
-
-            decoder_data_t * decoder_data = get_decoder_data(dsc);
-            lv_draw_buf_t * decoded = &decoder_data->c_array;
-            dsc->decoded = decoded;
-            lv_draw_buf_from_image(decoded, image);
-
-            if(decoded->header.stride == 0) {
-                /*Use the auto calculated value from decoder_info callback*/
-                decoded->header.stride = dsc->header.stride;
-            }
-
-            res = LV_RESULT_OK;
-        }
-    }
-
-    if(res != LV_RESULT_OK) {
-        free_decoder_data(dsc);
-        return false;
-    }
-
-    return true;
 }
 
 static void bin_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data)
