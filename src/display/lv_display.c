@@ -492,12 +492,6 @@ lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp)
     return disp->prev_scr;
 }
 
-void lv_display_load_screen(lv_display_t * disp, lv_obj_t * scr)
-{
-    LV_UNUSED(disp); /*Not required, added just for consistency*/
-    lv_screen_load_anim(scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
-}
-
 lv_obj_t * lv_display_get_layer_top(lv_display_t * disp)
 {
     if(!disp) disp = lv_display_get_default();
@@ -529,6 +523,11 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp)
     }
 
     return disp->bottom_layer;
+}
+
+void lv_screen_load(struct _lv_obj_t * scr)
+{
+    lv_screen_load_anim(scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
 }
 
 void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay,
