@@ -873,19 +873,6 @@
     #endif
 #endif
 
-/*Required alignment size for buffers*/
-#ifndef LV_ATTRIBUTE_MEM_ALIGN_SIZE
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
-            #define LV_ATTRIBUTE_MEM_ALIGN_SIZE CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
-        #else
-            #define LV_ATTRIBUTE_MEM_ALIGN_SIZE 0
-        #endif
-    #else
-        #define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
-    #endif
-#endif
-
 /*Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
  * E.g. __attribute__((aligned(4)))*/
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
