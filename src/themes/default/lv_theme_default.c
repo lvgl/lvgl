@@ -158,7 +158,7 @@ typedef enum {
     DISP_LARGE = 1,
 } disp_size_t;
 
-typedef struct _my_theme_t {
+struct _my_theme_t {
     lv_theme_t base;
     disp_size_t disp_size;
     int32_t disp_dpi;
@@ -176,7 +176,7 @@ typedef struct _my_theme_t {
     lv_style_transition_dsc_t trans_delayed;
     lv_style_transition_dsc_t trans_normal;
 #endif
-} my_theme_t;
+};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -209,7 +209,7 @@ static lv_color_t grey_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t col
     else return lv_color_mix(lv_palette_lighten(LV_PALETTE_GREY, 2), color, opa);
 }
 
-static void style_init(struct _my_theme_t * theme)
+static void style_init(my_theme_t * theme)
 {
 #if TRANSITION_TIME
     static const lv_style_prop_t trans_props[] = {
@@ -660,7 +660,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
         theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
 
     lv_display_t * new_disp = disp == NULL ? lv_display_get_default() : disp;
     int32_t new_dpi = lv_display_get_dpi(new_disp);
@@ -704,7 +704,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
 void lv_theme_default_deinit(void)
 {
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
     if(theme) {
         if(theme->inited) {
             lv_style_t * theme_styles = (lv_style_t *)(&(theme->styles));
@@ -730,7 +730,7 @@ lv_theme_t * lv_theme_default_get(void)
 
 bool lv_theme_default_is_inited(void)
 {
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
     if(theme == NULL) return false;
     return theme->inited;
 }
@@ -739,7 +739,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
 
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
 
     if(lv_obj_get_parent(obj) == NULL) {
         lv_obj_add_style(obj, &theme->styles.scr, 0);

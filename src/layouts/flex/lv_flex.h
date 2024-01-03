@@ -31,7 +31,6 @@ extern "C" {
  **********************/
 
 /*Can't include lv_obj.h because it includes this header file*/
-struct _lv_obj_t;
 
 typedef enum {
     LV_FLEX_ALIGN_START,
@@ -72,7 +71,7 @@ void lv_flex_init(void);
  * @param obj pointer to an object. The parent must have flex layout else nothing will happen.
  * @param flow an element of `lv_flex_flow_t`.
  */
-void lv_obj_set_flex_flow(struct _lv_obj_t * obj, lv_flex_flow_t flow);
+void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow);
 
 /**
  * Set how to place (where to align) the items and tracks
@@ -81,7 +80,7 @@ void lv_obj_set_flex_flow(struct _lv_obj_t * obj, lv_flex_flow_t flow);
  * @param cross_place where to place the item in their track on the cross axis. `LV_FLEX_ALIGN_START/END/CENTER`
  * @param track_cross_place where to place the tracks in the cross direction. Any value of `lv_flex_align_t`.
  */
-void lv_obj_set_flex_align(struct _lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
+void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
                            lv_flex_align_t track_cross_place);
 
 /**
@@ -89,7 +88,7 @@ void lv_obj_set_flex_align(struct _lv_obj_t * obj, lv_flex_align_t main_place, l
  * @param obj pointer to an object. The parent must have flex layout else nothing will happen.
  * @param grow a value to set how much free space to take proportionally to other growing items.
  */
-void lv_obj_set_flex_grow(struct _lv_obj_t * obj, uint8_t grow);
+void lv_obj_set_flex_grow(lv_obj_t * obj, uint8_t grow);
 
 /**********************
  *      MACROS

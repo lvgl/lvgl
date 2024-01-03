@@ -55,11 +55,11 @@ typedef struct {
 #endif
 } my_theme_styles_t;
 
-typedef struct _my_theme_t {
+struct _my_theme_t {
     lv_theme_t base;
     my_theme_styles_t styles;
     bool inited;
-} my_theme_t;
+};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -79,7 +79,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj);
  *   STATIC FUNCTIONS
  **********************/
 
-static void style_init(struct _my_theme_t * theme, bool dark_bg, const lv_font_t * font)
+static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
 {
     style_init_reset(&theme->styles.scrollbar);
     lv_style_set_bg_opa(&theme->styles.scrollbar, LV_OPA_COVER);
@@ -178,14 +178,14 @@ static void style_init(struct _my_theme_t * theme, bool dark_bg, const lv_font_t
 
 bool lv_theme_mono_is_inited(void)
 {
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
     if(theme == NULL) return false;
     return theme->inited;
 }
 
 void lv_theme_mono_deinit(void)
 {
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
     if(theme) {
         if(theme->inited) {
             lv_style_t * theme_styles = (lv_style_t *)(&(theme->styles));
@@ -208,7 +208,7 @@ lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font
         theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
 
     theme->base.disp = disp;
     theme->base.font_small = LV_FONT_DEFAULT;
@@ -229,7 +229,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
 
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
 
     if(lv_obj_get_parent(obj) == NULL) {
         lv_obj_add_style(obj, &theme->styles.scr, 0);

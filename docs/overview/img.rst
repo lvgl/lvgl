@@ -244,7 +244,7 @@ open/close the PNG files. It should look like this:
     * @param header    image information is set in header parameter
     * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
     */
-   static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+   static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
    {
      /*Check whether the type `src` is known by the decoder*/
      if(is_png(src) == false) return LV_RESULT_INVALID;

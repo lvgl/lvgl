@@ -24,8 +24,8 @@ Two APIs are provided to get/set widget properties. It can be enabled by setting
         };
     } lv_property_t;
 
-    lv_result_t lv_obj_set_property(struct _lv_obj_t * obj, const lv_property_t * value);
-    lv_property_t lv_obj_get_property(struct _lv_obj_t * obj, lv_prop_id_t id);
+    lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value);
+    lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
 
 
 Property ID
