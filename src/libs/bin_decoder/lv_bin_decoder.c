@@ -275,6 +275,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             }
 
             res = LV_RESULT_OK;
+            use_directly = true; /*A variable image that can be used directly.*/
         }
     }
 
@@ -294,11 +295,14 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     /*The adjusted draw buffer is newly allocated.*/
     if(adjusted != decoded) {
+        use_directly = false; /*Cannot use original image directly*/
         free_decoder_data(dsc);
         decoder_data_t * decoder_data = get_decoder_data(dsc);
         decoder_data->decoded = adjusted; /*Now this new buffer need to be free'd on decoder close*/
     }
     dsc->decoded = adjusted;
+
+    if(use_directly) return LV_RESULT_OK; /*Do not put image to cache if it can be used directly.*/
 
 #if LV_CACHE_DEF_SIZE > 0
 
