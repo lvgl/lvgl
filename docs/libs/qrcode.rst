@@ -19,7 +19,8 @@ Use :cpp:func:`lv_qrcode_create` to create a qrcode object, and use
 :cpp:func:`lv_qrcode_update` to generate a QR code.
 
 If you need to re-modify the size and color, use
-:cpp:func:`lv_qrcode_set_size` and :cpp:expr:`lv_qrcode_set_dark/light_color()`, and
+:cpp:func:`lv_qrcode_set_size` and :cpp:func:`lv_qrcode_set_dark_color` or 
+:cpp:func:`lv_qrcode_set_light_color`, and
 call :cpp:func:`lv_qrcode_update` again to regenerate the QR code.
 
 Notes

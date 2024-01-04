@@ -109,7 +109,7 @@ Text alignment
 --------------
 
 To horizontally align the lines of a label the `text_align` style property can be used with
-:cpp:expr:`lv_obj_set_style_text_align()` or :cpp:expr:`lv_style_set_text_align()`
+:cpp:func:`lv_obj_set_style_text_align` or :cpp:func:`lv_style_set_text_align`
 Note that it has a visible effect only if
 
 - the label widget's width is larger than the width of the longest line of the text

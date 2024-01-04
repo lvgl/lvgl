@@ -36,7 +36,7 @@ not ``0`` value. :cpp:func:`lv_fs_read` caches this size of data to lower the
 number of actual reads from the storage.
 
 To use the memory-mapped file emulation an ``lv_fs_path_ex_t`` object must be
-created and initialized. This object can be passed to :cpp:func:`lv_fs_open()` as
+created and initialized. This object can be passed to :cpp:func:`lv_fs_open` as
 the file name:
 
 .. code:: c

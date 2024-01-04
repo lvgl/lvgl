@@ -71,7 +71,7 @@ however, shared among multiple physical displays.** The ``layer_top`` is
 always on top of the default screen (:cpp:func:`lv_screen_active`), and
 ``layer_sys`` is on top of ``layer_top``.
 
-The get these layers use :cpp:func:`lv_layer_top()` and :cpp:func:`lv_layer_sys()`.
+The get these layers use :cpp:func:`lv_layer_top` and :cpp:func:`lv_layer_sys`.
 
 These layers work like any other widget, meaning the can be styles, scrolled,
 and any kind of widgets can be created on them.

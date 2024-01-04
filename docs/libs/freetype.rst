@@ -91,8 +91,8 @@ software, and can be set with reference to the following values:
 They can be combined.eg:
 :cpp:expr:`LV_FREETYPE_FONT_STYLE_BOLD | LV_FREETYPE_FONT_STYLE_ITALIC`.
 
-Use the :cpp:expr:`lv_freetype_font_create()` function to create a font. To
-delete a font, use :cpp:expr:`lv_freetype_font_delete()`. For more detailed usage,
+Use the :cpp:func:`lv_freetype_font_create` function to create a font. To
+delete a font, use :cpp:func:`lv_freetype_font_delete`. For more detailed usage,
 please refer to example code.
 
 .. _freetype_example:

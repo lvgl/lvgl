@@ -78,7 +78,7 @@ Be sure not to confuse displays and screens:
 Screens can be considered the highest level containers which have no
 parent. A screen's size is always equal to its display and their origin
 is (0;0). Therefore, a screen's coordinates can't be changed,
-i.e. :cpp:expr:`lv_obj_set_pos()`, :cpp:expr:`lv_obj_set_size()` or similar functions
+i.e. :cpp:func:`lv_obj_set_pos`, :cpp:func:`lv_obj_set_size` or similar functions
 can't be used on screens.
 
 A screen can be created from any object type but the two most typical
