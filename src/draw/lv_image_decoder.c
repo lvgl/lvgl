@@ -295,7 +295,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
     if(args->stride_align && decoded->header.cf != LV_COLOR_FORMAT_RGB565A8) {
         uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
         if(decoded->header.stride != stride_expect) {
-            LV_LOG_WARN("Stride mismatch");
+            LV_LOG_TRACE("Stride mismatch");
             lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, stride_expect);
             if(aligned == NULL) {
                 LV_LOG_ERROR("No memory for Stride adjust.");
