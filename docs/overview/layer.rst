@@ -98,7 +98,7 @@ Similarly top and sys. layer bottom layer is also screen size but
 it's located below the active screen. It's visible only if the active screen's
 background opacity is < 255.
 
-The get the bottom layer use :cpp:func:`lv_layer_bottom()`.
+The get the bottom layer use :cpp:func:`lv_layer_bottom`.
 
 .. _layers_api:
 
