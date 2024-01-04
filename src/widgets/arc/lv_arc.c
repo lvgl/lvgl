@@ -955,7 +955,7 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise
     /* Distance between background start and end angles is less than tolerance,
      * consider the click inside the arc */
     else if(((smaller_angle - tolerance_deg) <= 0) &&
-            (360 - (bigger_angle + (smaller_angle - tolerance_deg)))) {
+            (360 - (bigger_angle + (smaller_angle - tolerance_deg))) != 0) {
 
         arc->min_close = 1;
         arc->in_out = CLICK_INSIDE_BG_ANGLES;
