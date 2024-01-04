@@ -320,6 +320,8 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
                           file_p->cache->end + 1 - start_position);
             }
         }
+        
+        file_p->cache->file_position += bw_tmp;
     }
 
     return res;
