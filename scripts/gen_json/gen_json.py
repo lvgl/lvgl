@@ -4,6 +4,10 @@ import sys
 base_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, base_path)
 
+project_path = os.path.abspath(os.path.join(base_path, '..', '..'))
+docs_path = os.path.join(project_path, 'docs')
+sys.path.insert(0, docs_path)
+
 import pycparser_monkeypatch  # NOQA
 import pycparser  # NOQA
 import json  # NOQA
@@ -13,7 +17,6 @@ output_path = sys.argv[-1]
 if output_path.endswith('py'):
     raise RuntimeError('you must supply an output directory for the json file')
 
-project_path = os.path.abspath(os.path.join(base_path, '..', '..'))
 fake_libc_path = os.path.join(base_path, 'fake_libc_include')
 lvgl_path = project_path
 lvgl_src_path = os.path.join(lvgl_path, 'src')
@@ -65,7 +68,7 @@ if sys.platform.startswith('win'):
     import pyMSVC  # NOQA
 
     environment = pyMSVC.setup_environment()
-    print(environment)
+    # print(environment)
 
     # compiler to use
     cpp_path = 'cl'
@@ -92,7 +95,7 @@ os.environ[include_path_env_key] = f'{fake_libc_path}{os.pathsep}{os.environ[inc
 
 cpp_args.extend(['/E', '-DPYCPARSER', f'-I"{fake_libc_path}"'])
 cpp_args.extend([f'-I"{item}"' for item in include_dirs])
-print(cpp_args)
+# print(cpp_args)
 ast = pycparser.parse_file(
     lvgl_header_path,
     use_cpp=True,
