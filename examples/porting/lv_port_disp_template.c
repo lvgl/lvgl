@@ -116,28 +116,28 @@ static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t 
 {
     if(disp_flush_enabled) {
 
-    /*
-     * If you meet ALL the criteria below, please set the value 0 to 1 to enable the code segment.
-     *     - If your display device, e.g. a lot of SPI LCD, supports the Window Mode, and
-     *     - You want to use the window mode together with LV_DISPLAY_RENDER_MODE_PARTIAL
-     *     - The macro LV_DRAW_BUF_STRIDE_ALIGN is NOT 1
-     */
-    #if 0
-        /* clip the frame buffer(pointed by px_map) with the width calculated from the area, as 
+        /*
+         * If you meet ALL the criteria below, please set the value 0 to 1 to enable the code segment.
+         *     - If your display device, e.g. a lot of SPI LCD, supports the Window Mode, and
+         *     - You want to use the window mode together with LV_DISPLAY_RENDER_MODE_PARTIAL
+         *     - The macro LV_DRAW_BUF_STRIDE_ALIGN is NOT 1
+         */
+#if 0
+        /* clip the frame buffer(pointed by px_map) with the width calculated from the area, as
          * the buffer stride might be larger than width. */
         do {
             lv_color_format_t color_format = lv_display_get_color_format(disp_drv);
             int32_t width = area->x2 - area->x1 + 1;
             int32_t height = area->y2 - area->y1 + 1;
-            int32_t stride = lv_draw_buf_width_to_stride( width, color_format);
+            int32_t stride = lv_draw_buf_width_to_stride(width, color_format);
             width *= lv_color_format_get_bpp(color_format) >> 3;
 
             if(width == stride) {
                 break;
             }
 
-            uint8_t *src_ptr = px_map;
-            uint8_t *des_ptr = px_map;
+            uint8_t * src_ptr = px_map;
+            uint8_t * des_ptr = px_map;
 
             for(int32_t y = 0; y < height; y++) {
                 lv_memcpy(des_ptr, src_ptr, width);
@@ -146,7 +146,7 @@ static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t 
                 des_ptr += width;
             }
         } while(0);
-    #endif
+#endif
 
         /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
         for(int32_t y = area->y1; y <= area->y2; y++) {
