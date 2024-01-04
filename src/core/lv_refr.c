@@ -345,11 +345,11 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-    if(disp_refr->buf_size_in_bytes == 0) {
+    if(disp_refr->buf_act->data_size == 0) {
         LV_LOG_WARN("disp->buf_size_in_bytes is 0");
         return;
     }
-    if(disp_refr->buf_1 == NULL) {
+    if(disp_refr->buf_1.data == NULL) {
         LV_LOG_WARN("No draw buffer");
         return;
     }
@@ -479,10 +479,10 @@ static void refr_sync_areas(void)
 
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
-    void * buf_off_screen = disp_refr->buf_act;
-    void * buf_on_screen = disp_refr->buf_act == disp_refr->buf_1
-                           ? disp_refr->buf_2
-                           : disp_refr->buf_1;
+    void * buf_off_screen = disp_refr->buf_act->data;
+    void * buf_on_screen = disp_refr->buf_act == &disp_refr->buf_1
+                           ? &disp_refr->buf_2.data
+                           : &disp_refr->buf_1.data;
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
@@ -584,7 +584,7 @@ static void refr_area(const lv_area_t * area_p)
 {
     LV_PROFILER_BEGIN;
     lv_layer_t * layer = disp_refr->layer_head;
-    layer->buf = disp_refr->buf_act;
+    layer->buf = disp_refr->buf_act->data;
 
     /*With full refresh just redraw directly into the buffer*/
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
@@ -630,7 +630,7 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = row + max_row - 1;
-        layer->buf = disp_refr->buf_act;
+        layer->buf = disp_refr->buf_act->data;
         layer->buf_area = sub_area;
         layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
         layer->_clip_area = sub_area;
@@ -647,7 +647,7 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = y2;
-        layer->buf = disp_refr->buf_act;
+        layer->buf = disp_refr->buf_act->data;
         layer->buf_area = sub_area;
         layer->_clip_area = sub_area;
         disp_refr->last_part = 1;
@@ -945,7 +945,7 @@ static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
     bool has_alpha = lv_color_format_has_alpha(disp->color_format);
     uint32_t px_size_disp =  lv_color_format_get_size(disp->color_format);
     uint8_t px_size_render = has_alpha ? sizeof(lv_color32_t) : px_size_disp;
-    int32_t max_row = (uint32_t)disp->buf_size_in_bytes / LV_MAX(px_size_render, px_size_disp) / area_w;
+    int32_t max_row = (uint32_t)disp->buf_act->data_size / LV_MAX(px_size_render, px_size_disp) / area_w;
 
     if(max_row > area_h) max_row = area_h;
 
@@ -1012,11 +1012,11 @@ static void draw_buf_flush(lv_display_t * disp)
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
     if(lv_display_is_double_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
-        if(disp->buf_act == disp->buf_1) {
-            disp->buf_act = disp->buf_2;
+        if(disp->buf_act == &disp->buf_1) {
+            disp->buf_act = &disp->buf_2;
         }
         else {
-            disp->buf_act = disp->buf_1;
+            disp->buf_act = &disp->buf_1;
         }
     }
 }

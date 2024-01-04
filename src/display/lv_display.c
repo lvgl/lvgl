@@ -392,10 +392,20 @@ void lv_display_set_draw_buffers(lv_display_t * disp, void * buf1, void * buf2, 
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
-    disp->buf_1 = buf1;
-    disp->buf_2 = buf2;
-    disp->buf_act = buf1;
-    disp->buf_size_in_bytes = buf_size_in_bytes;
+    LV_ASSERT_MSG(buf1 == lv_draw_buf_align(buf1, disp->color_format), "buf1 must be aligned");
+    LV_ASSERT_MSG(buf2 == lv_draw_buf_align(buf2, disp->color_format), "buf2 must be aligned");
+
+    lv_image_header_init(&disp->buf_1.header, 0, 0, disp->color_format, 0, 0);
+    disp->buf_1.data = buf1;
+    disp->buf_1.unaligned_data = buf1;
+    disp->buf_1.data_size = buf_size_in_bytes;
+
+    lv_image_header_init(&disp->buf_2.header, 0, 0, disp->color_format, 0, 0);
+    disp->buf_2.data = buf2;
+    disp->buf_2.unaligned_data = buf2;
+    disp->buf_2.data_size = buf_size_in_bytes;
+
+    disp->buf_act = &disp->buf_1;
     disp->render_mode = render_mode;
 }
 
@@ -463,7 +473,7 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
 
 bool lv_display_is_double_buffered(lv_display_t * disp)
 {
-    return disp->buf_2 != NULL;
+    return disp->buf_2.data != NULL;
 }
 
 /*---------------------
