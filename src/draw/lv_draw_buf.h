@@ -192,7 +192,7 @@ lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf);
  * Keep using the existing memory, reshape the draw buffer to the given width and height.
  * Return NULL if data_size is smaller than the required size.
  * @param draw_buf  pointer to a draw buffer
- * @param cf        the new color format
+ * @param cf        the new color format, use 0 or LV_COLOR_FORMAT_UNKNOWN to keep using the original color format.
  * @param w         the new width in pixels
  * @param h         the new height in pixels
  * @param stride    the stride in bytes for image. Use 0 for automatic calculation.
