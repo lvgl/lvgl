@@ -1,3 +1,6 @@
+.. _lv_tabview:
+
+====================
 Tabview (lv_tabview)
 ====================
 
@@ -7,10 +10,10 @@ Overview
 The Tab view object can be used to organize content in tabs. The Tab
 view is built from other widgets:
 
-- Main container: `lv_obj </widgets/obj>`__
-- Tab buttons: an `lv_obj </widgets/obj>`__` with `lv_button </widgets/button>`__ s
-- Container for the tabs: `lv_obj </widgets/obj>`__
-- Content of the tabs: `lv_obj </widgets/obj>`__
+- Main container: :ref:`lv_obj`
+- Tab buttons: an :ref:`lv_obj` with :ref:`lv_button`
+- Container for the tabs: :ref:`lv_obj`
+- Content of the tabs: :ref:`lv_obj`
 
 The tab buttons can be positioned on the top, bottom, left and right
 side of the Tab view.
@@ -18,11 +21,15 @@ side of the Tab view.
 A new tab can be selected either by clicking on a tab button or by
 sliding horizontally on the content.
 
+.. _lv_tabview_parts_and_styles:
+
 Parts and Styles
 ****************
 
 There are no special parts on the Tab view but the ``lv_obj`` and
 ``lv_button`` widgets are used to create the Tab view.
+
+.. _lv_tabview_usage:
 
 Usage
 *****
@@ -30,13 +37,13 @@ Usage
 Create a Tab view
 -----------------
 
-:cpp:expr:`lv_tabview_create(parent)` creates a new empty
-Tab view.
+:cpp:expr:`lv_tabview_create(parent)` creates a new empty Tab view.
+
 Add tabs
 --------
 
 New tabs can be added with :cpp:expr:`lv_tabview_add_tab(tabview, "Tab name")`.
-This will return a pointer to an `lv_obj </widgets/obj>`__ object where
+This will return a pointer to an :ref:`lv_obj` object where
 the tab's content can be created.
 
 Rename tabs
@@ -73,7 +80,9 @@ Get the parts
 
 :cpp:expr:`lv_tabview_get_content(tabview)` returns the container for the tabs,
 :cpp:expr:`lv_tabview_get_tab_buttons(tabview)` returns the Tab buttons object
-which is a `Button matrix </widgets/buttonmatrix>`__.
+which is a :ref:`Button matrix <lv_buttonmatrix>`.
+
+.. _lv_tabview_events:
 
 Events
 ******
@@ -84,6 +93,8 @@ Events
 
 Learn more about :ref:`events`.
 
+.. _lv_tabview_keys:
+
 Keys
 ****
 
@@ -92,10 +103,14 @@ to a group if required.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_tabview_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/tabview/index.rst
+
+.. _lv_tabview_api:
 
 API
 ***

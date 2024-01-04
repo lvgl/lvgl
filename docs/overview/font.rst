@@ -1,3 +1,5 @@
+.. _fonts:
+
 =====
 Fonts
 =====
@@ -42,7 +44,11 @@ Built-in fonts
 **************
 
 There are several built-in fonts in different sizes, which can be
-enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. ### Normal fonts
+enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. 
+
+Normal fonts
+------------
+
 Containing all the ASCII characters, the degree symbol (U+00B0), the
 bullet symbol (U+2022) and the built-in symbols (see below).
 
@@ -85,6 +91,8 @@ the `Montserrat <https://fonts.google.com/specimen/Montserrat>`__ font.
 In addition to the ASCII range, the following symbols are also added to
 the built-in fonts from the `FontAwesome <https://fontawesome.com/>`__
 font.
+
+.. _fonts_symbols:
 
 .. image:: /misc/symbols.png
 
@@ -146,10 +154,10 @@ This list summarizes the effect of RTL base direction on objects:
 - Create objects by default on the right
 - ``lv_tabview``: Displays tabs from right to left
 - ``lv_checkbox``: Shows the box on the right
-- ``lv_btnmatrix``: Shows buttons from right to left
+- ``lv_buttonmatrix``: Shows buttons from right to left
 - ``lv_list``: Shows icons on the right
 - ``lv_dropdown``: Aligns options to the right
-- The texts in ``lv_table``, ``lv_btnmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
+- The texts in ``lv_table``, ``lv_buttonmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
 
 Arabic and Persian support
 --------------------------
@@ -285,7 +293,7 @@ to have a special binary format. (Not TTF or WOFF). Use
 `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ with the
 ``--format bin`` option to generate an LVGL compatible font file.
 
-:note: To load a font `LVGL's filesystem </overview/file-system>`__
+:note: To load a font :ref:`LVGL's filesystem <overview_file_system>`
        needs to be enabled and a driver must be added.
 
 Example
@@ -308,7 +316,7 @@ Load a font from a memory buffer at run-time
 This function may be useful to load a font from an external file system, which is not
 supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
 
-:note: To load a font from a buffer `LVGL's filesystem </overview/file-system>`__
+:note: To load a font from a buffer :ref:`LVGL's filesystem <overview_file_system>`
        needs to be enabled and the MEMFS driver must be added.
 
 Example
@@ -407,6 +415,8 @@ font from ``fallback`` to handle.
    lv_font_t *droid_sans_fallback = my_font_load_function();
    /* So now we can display Roboto for supported characters while having wider characters set support */
    roboto->fallback = droid_sans_fallback;
+
+.. _fonts_api:
 
 API
 ***

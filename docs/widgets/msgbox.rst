@@ -1,3 +1,6 @@
+.. _lv_msgbox:
+
+=======================
 Message box (lv_msgbox)
 =======================
 
@@ -14,16 +17,20 @@ will be set automatically to include the text and the buttons.
 The message box can be modal (blocking clicks on the rest of the screen)
 or not modal.
 
+.. _lv_msgbox_parts_and_styles:
+
 Parts and Styles
 ****************
 
 The message box is built from other widgets, so you can check these
 widgets' documentation for details.
 
-- Background: `lv_obj </widgets/obj>`__
-- Close button: `lv_btn </widgets/btn>`__
-- Title and text: `lv_label </widgets/label>`__
-- Buttons: `lv_btnmatrix </widgets/btnmatrix>`__
+- Background: :ref:`lv_obj`
+- Close button: :ref:`lv_button`
+- Title and text: :ref:`lv_label`
+- Buttons: :ref:`lv_buttonmatrix`
+
+.. _lv_msgbox_usage:
 
 Usage
 *****
@@ -58,6 +65,8 @@ Close the message box
 
 :cpp:expr:`lv_msgbox_close(msgbox)` closes (deletes) the message box.
 
+.. _lv_msgbox_events:
+
 Events
 ******
 
@@ -72,6 +81,8 @@ Events
 
 Learn more about :ref:`events`.
 
+.. _lv_msgbox_keys:
+
 Keys
 ****
 
@@ -80,10 +91,14 @@ manually to a group if required.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_msgbox_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/msgbox/index.rst
+
+.. _lv_msgbox_api:
 
 API
 ***

@@ -1,3 +1,5 @@
+.. _overview_image:
+
 ======
 Images
 ======
@@ -41,12 +43,14 @@ registered in LVGL to make file operations. You can add an interface to
 a standard file system (FAT32 on SD card) or you create your simple file
 system to read data from an SPI Flash memory. In every case, a *Drive*
 is just an abstraction to read and/or write data to memory. See the
-`File system </overview/file-system>`__ section to learn more.
+:ref:`File system <overview_file_system>` section to learn more.
 
 Images stored as files are not linked into the resulting executable, and
 must be read into RAM before being drawn. As a result, they are not as
 resource-friendly as images linked at compile time. However, they are
 easier to replace without needing to rebuild the main program.
+
+.. _overview_image_color_formats:
 
 Color formats
 *************
@@ -79,7 +83,7 @@ The bytes of :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` images are stored in the f
     - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
 
 You can store images in a *Raw* format to indicate that it's not encoded
-with one of the built-in color formats and an external `Image decoder <#image-decoder>`__
+with one of the built-in color formats and an external :ref:`Image decoder <overview_image_decoder>`
 needs to be used to decode the image.
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
@@ -143,13 +147,13 @@ variable to display it using LVGL. For example:
    };
 
 Another (possibly simpler) option to create and display an image at
-run-time is to use the `Canvas </widgets/canvas>`__ object.
+run-time is to use the :ref:`Canvas <lv_canvas>` object.
 
 Use images
 ----------
 
 The simplest way to use an image in LVGL is to display it with an
-`lv_image </widgets/img>`__ object:
+:ref:`lv_image` object:
 
 .. code:: c
 
@@ -164,6 +168,8 @@ The simplest way to use an image in LVGL is to display it with an
 If the image was converted with the online converter, you should use
 :cpp:expr:`LV_IMAGE_DECLARE(my_icon_dsc)` to declare the image in the file where
 you want to use it.
+
+.. _overview_image_decoder:
 
 Image decoder
 *************
@@ -436,7 +442,7 @@ See the detailed code below:
     ...
   }
 
-.. _image-caching:
+.. _overview_image_caching:
 
 Image caching
 *************
@@ -575,6 +581,8 @@ following code to replace the LVGL built-in cache manager:
     lv_cache_set_manager(&my_manager);
     lv_cache_unlock();
    }
+
+.. _overview_image_api:
 
 API
 ***

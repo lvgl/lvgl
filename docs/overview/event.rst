@@ -94,7 +94,7 @@ All objects (such as Buttons/Labels/Sliders etc.) regardless their type
 receive the *Input device*, *Drawing* and *Other* events.
 
 However, the *Special events* are specific to a particular widget type.
-See the `widgets' documentation </widgets/index>`__ to learn when they
+See the :ref:`widgets' documentation <widgets>` to learn when they
 are sent,
 
 *Custom events* are added by the user and are never sent by LVGL.
@@ -167,16 +167,16 @@ Other events
 Display events
 --------------
 
--  :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA,
--  :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED,
--  :cpp:enumerator:`LV_EVENT_COLOR_FORMAT_CHANGED,
--  :cpp:enumerator:`LV_EVENT_REFR_REQUEST,
--  :cpp:enumerator:`LV_EVENT_REFR_START,
--  :cpp:enumerator:`LV_EVENT_REFR_READY,
--  :cpp:enumerator:`LV_EVENT_RENDER_START,
--  :cpp:enumerator:`LV_EVENT_RENDER_READY,
--  :cpp:enumerator:`LV_EVENT_FLUSH_START,
--  :cpp:enumerator:`LV_EVENT_FLUSH_FINISH,
+-  :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA`
+-  :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED`
+-  :cpp:enumerator:`LV_EVENT_COLOR_FORMAT_CHANGED`
+-  :cpp:enumerator:`LV_EVENT_REFR_REQUEST`
+-  :cpp:enumerator:`LV_EVENT_REFR_START`
+-  :cpp:enumerator:`LV_EVENT_REFR_READY`
+-  :cpp:enumerator:`LV_EVENT_RENDER_START`
+-  :cpp:enumerator:`LV_EVENT_RENDER_READY`
+-  :cpp:enumerator:`LV_EVENT_FLUSH_START`
+-  :cpp:enumerator:`LV_EVENT_FLUSH_FINISH`
 
 
 Custom events
@@ -242,10 +242,14 @@ The *target* parameter of the event is always the current target object,
 not the original object. To get the original target call
 :cpp:expr:`lv_event_get_target_obj(e)` in the event handler.
 
+.. _events_examples:
+
 Examples
 ********
 
 .. include:: ../examples/event/index.rst
+
+.. _events_api:
 
 API
 ***
