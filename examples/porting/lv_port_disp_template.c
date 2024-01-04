@@ -117,7 +117,7 @@ static void disp_flush(lv_display_t * disp_drv, const lv_area_t * area, uint8_t 
     if(disp_flush_enabled) {
 
     /*
-     * If you meet ALL the criteria below, please set the value 0 to 1 to enable to code segment.
+     * If you meet ALL the criteria below, please set the value 0 to 1 to enable the code segment.
      *     - If your display device, e.g. a lot of SPI LCD, supports the Window Mode, and
      *     - You want to use the window mode together with LV_DISPLAY_RENDER_MODE_PARTIAL
      *     - The macro LV_DRAW_BUF_STRIDE_ALIGN is NOT 1
