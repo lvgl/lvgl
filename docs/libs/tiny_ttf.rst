@@ -9,9 +9,9 @@ Tiny TTF font engine
 Usage
 -----
 
-Allow using TrueType fonts LVGL.
+Allow using TrueType fonts in LVGL.
 
-Detailed introduction: `stb <https://github.com/nothings/stb>`__
+Detailed introduction: https://github.com/nothings/stb
 
 When enabled in ``lv_conf.h`` with :c:macro:`LV_USE_TINY_TTF`
 :cpp:expr:`lv_tiny_ttf_create_data(data, data_size, font_size)` can be used to

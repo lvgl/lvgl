@@ -6,15 +6,18 @@ FFmpeg support
 
 A complete, cross-platform solution to record, convert and stream audio and video.
 
-Detailed introduction: `FFmpeg <https://www.ffmpeg.org/>`__
+Detailed introduction: https://www.ffmpeg.org
 
 Install FFmpeg
 --------------
 
--  Download FFmpeg from `here <https://www.ffmpeg.org/download.html>`__
--  ``./configure --disable-all --disable-autodetect --disable-podpages --disable-asm --enable-avcodec --enable-avformat --enable-decoders --enable-encoders --enable-demuxers --enable-parsers --enable-protocol='file' --enable-swscale --enable-zlib``
--  ``make``
--  ``sudo make install``
+Download first FFmpeg from `here <https://www.ffmpeg.org/download.html>`__, then install it:
+
+.. code:: shell
+
+    ./configure --disable-all --disable-autodetect --disable-podpages --disable-asm --enable-avcodec --enable-avformat --enable-decoders --enable-encoders --enable-demuxers --enable-parsers --enable-protocol='file' --enable-swscale --enable-zlib
+    make
+    sudo make install
 
 Add FFmpeg to your project
 --------------------------
@@ -30,7 +33,7 @@ Enable :c:macro:`LV_USE_FFMPEG` in ``lv_conf.h``.
 
 See the examples below.
 
-Note that, the FFmpeg extension doesn't use LVGL's file system. You can
+:Note: FFmpeg extension doesn't use LVGL's file system. You can
 simply pass the path to the image or video as usual on your operating
 system or platform.
 

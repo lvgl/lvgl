@@ -25,8 +25,8 @@ Parts and Styles
    right or center.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar that is shown when the text is
    too long.
--  :cpp:enumerator:`LV_PART_SELECTED` Determines the style of the `selected
-   text </widgets/label.html#text-selection>`__. Only ``text_color`` and
+-  :cpp:enumerator:`LV_PART_SELECTED` Determines the style of the :ref:`selected
+   text <lv_label_text_selection>`. Only ``text_color`` and
    ``bg_color`` style properties can be used. ``bg_color`` should be set
    directly on the label of the text area.
 -  :cpp:enumerator:`LV_PART_CURSOR` Marks the position where the characters are
@@ -68,8 +68,9 @@ Delete character
 ----------------
 
 To delete a character from the left of the current cursor position use
-:cpp:expr:`lv_textarea_delete_char(textarea)`. To delete from the right use
-:cpp:expr:`lv_textarea_delete_char_forward(textarea)`
+:cpp:expr:`lv_textarea_delete_char(textarea)`.
+
+To delete from the right use :cpp:expr:`lv_textarea_delete_char_forward(textarea)`
 
 Move the cursor
 ---------------
@@ -167,7 +168,7 @@ Events
 -  :cpp:enumerator:`LV_EVENT_READY` Sent when :cpp:enumerator:`LV_KEY_ENTER` is pressed (or sent) to
    a one line text area.
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 

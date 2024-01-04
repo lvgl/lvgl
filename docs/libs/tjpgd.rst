@@ -4,8 +4,7 @@
 Tiny JPEG Decompressor (TJpgDec)
 ================================
 
-TJpgDec - Tiny JPEG Decompressor.
-Allow the use of JPG (JPEG) images in LVGL.
+Allow the use of JPEG (JPG) images in LVGL.
 
 Detailed introduction: `TJpgDec <http://elm-chan.org/fsw/tjpgd/>`__
 
@@ -14,10 +13,10 @@ Detailed introduction: `TJpgDec <http://elm-chan.org/fsw/tjpgd/>`__
 Overview
 --------
 
--  JPG is decoded in 8x8 tiles.
--  Only baseline JPG files are supported (no progressive JPG support).
+-  JPEG is decoded in 8x8 tiles.
+-  Only baseline JPEG files are supported (no progressive JPEG support).
 -  Read from file and C array are implemented.
--  Only the required portions of the JPG images are decoded,
+-  Only the required portions of the JPEG images are decoded,
    therefore they can't be zoomed or rotated.
 
 .. _tjpgd_usage:
@@ -26,21 +25,23 @@ Usage
 -----
 
 If enabled in ``lv_conf.h`` by :c:macro:`LV_USE_TJPGD` LVGL will register a new
-image decoder automatically so JPG files can be used directly
-as image sources. For example:
+image decoder automatically so JPEG files can be used directly
+as image sources.
+
+For example:
 
 .. code:: c
 
    lv_image_set_src(my_img, "S:path/to/picture.jpg");
 
-Note that a file system driver needs to be registered to open images from
-files. Read more about it :ref:`overview_file_system` or just
-enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
+:Note: a file system driver needs to be registered to open images from
+files. Read more about :ref:`overview_file_system` or just
+enable one in ``lv_conf.h`` with ``LV_USE_FS_...`` config.
 
 Converter
 ---------
 
-Converting JPG to C array
+Converting JPEG to C array
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  Use lvgl online tool https://lvgl.io/tools/imageconverter

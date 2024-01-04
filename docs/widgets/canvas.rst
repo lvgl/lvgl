@@ -16,7 +16,7 @@ lvgl's drawing engine.
 Parts and Styles
 ****************
 
-:cpp:enumerator:`LV_PART_MAIN` Uses the typical rectangle style properties and image
+-  :cpp:enumerator:`LV_PART_MAIN` Uses the typical rectangle style properties and image
 style properties.
 
 .. _lv_canvas_usage:

@@ -20,12 +20,12 @@ The menu widget is built from the following objects:
 - Main container: :cpp:type:`lv_menu_main_cont`
 - Main header: :cpp:type:`lv_menu_main_header_cont`
 - Back button: :ref:`lv_button`
-- Back button icon: :ref:`lv_img`
+- Back button icon: :ref:`lv_image`
 - Main page: :cpp:type:`lv_menu_page`
 - Sidebar container: :cpp:type:`lv_menu_sidebar_cont`
 - Sidebar header: :cpp:type:`lv_menu_sidebar_header_cont`
 - Back button: :ref:`lv_button`
-- Back button icon: :ref:`lv_img`
+- Back button icon: :ref:`lv_image`
 - Sidebar page: :cpp:type:`lv_menu_page`
 
 .. _lv_menu_usage:
@@ -70,14 +70,14 @@ Set a menu page in the main area
 --------------------------------
 
 Once a menu page has been created, you can set it to the main area with
-:cpp:expr:`lv_menu_set_page(menu, page)`. NULL to clear main and clear menu
+:cpp:expr:`lv_menu_set_page(menu, page)`. ``NULL`` to clear main and clear menu
 history.
 
 Set a menu page in the sidebar
 ------------------------------
 
 Once a menu page has been created, you can set it to the sidebar with
-:cpp:expr:`lv_menu_set_sidebar_page(menu, page)`. NULL to clear sidebar.
+:cpp:expr:`lv_menu_set_sidebar_page(menu, page)`. ``NULL`` to clear sidebar.
 
 Linking between menu pages
 --------------------------
@@ -115,7 +115,7 @@ Events
    -  :cpp:expr:`lv_menu_back_button_is_root(menu, button)` to check if button is root
       back button
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 

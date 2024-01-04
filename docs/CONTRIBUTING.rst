@@ -37,6 +37,8 @@ Before getting started here are some guidelines to make contribution smoother:
   details instead of sending a pull request directly.
 - Please read and follow the Coding style guide.
 
+.. _contributing_pull_request:
+
 Pull request
 ------------
 
@@ -73,7 +75,7 @@ same way for the other repositories.
    "Fork" button in the top right corner. It will "copy" the ``lvgl``
    repository to your GitHub account (``https://github.com/<YOUR_NAME>?tab=repositories``)
 2. Clone your forked repository.
-3. Add your changes. You can create a *feature branch* from *master* for the updates: ``git checkout -b the-new-feature``
+3. Add your changes. You can create a *feature branch* from *master* for the updates: ``git checkout -b <the-new-feature-branch-name>``
 4. Commit and push your changes to the forked ``lvgl`` repository.
 5. Create a PR on GitHub from the page of your ``lvgl`` repository (``https://github.com/<YOUR_NAME>/lvgl``) by
    clicking the *"New pull request"* button. Don't forget to select the branch where you added your changes.
@@ -82,6 +84,8 @@ same way for the other repositories.
 7. Describe what is in the update. An example code is welcome if applicable.
 8. If you need to make more changes, just update your forked ``lvgl`` repo with new commits.
    They will automatically appear in the PR.
+
+.. _contributing_commit_message_format:
 
 Commit message format
 ~~~~~~~~~~~~~~~~~~~~~
@@ -118,7 +122,7 @@ commit. It's usually one word and can be chosen freely. For example
 
 - use the imperative, present tense: "change" not "changed" nor "changes"
 - don't capitalize the first letter
-- no dot (.) at the end
+- no dot (``.``) at the end
 - max 90 characters
 
 ``<body>`` optional and can be used to describe the details of this
@@ -141,6 +145,8 @@ Some examples:
    The span widget allows mixing different font sizes, colors and styles.
    It's similar to HTML <span>
 - docs(porting): fix typo
+
+.. _contributing_dco:
 
 Developer Certification of Origin (DCO)
 ---------------------------------------
@@ -217,6 +223,8 @@ single line of LVGL code.
 Below we have collected some opportunities about the ways you can
 contribute to LVGL.
 
+.. _contributing_star:
+
 Give LVGL a Star
 ~~~~~~~~~~~~~~~~
 
@@ -235,11 +243,13 @@ Star
 This simple click makes LVGL more visible on GitHub and makes it more
 attractive to other people. So with this, you already helped a lot!
 
+.. _contributing_achieved:
+
 Tell what you have achieved
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Have you already started using LVGL in a
-`Simulator </get-started/platforms/pc-simulator>`__, a development
+:ref:`simulator`, a development
 board, or on your custom hardware? Was it easy or were there some
 obstacles? Are you happy with the result? Showing your project to others
 is a win-win situation because it increases your and LVGL's reputation
@@ -272,6 +282,8 @@ If you don't want to speak about your project publicly, feel free to use
 `Contact form <https://lvgl.io/#contact>`__ on lvgl.io to private
 message to us.
 
+.. _contributing_write_examples:
+
 Write examples
 ~~~~~~~~~~~~~~
 
@@ -279,12 +291,12 @@ As you learn LVGL you will probably play with the features of widgets.
 Why not publish your experiments?
 
 Each widgets' documentation contains examples. For instance, here are
-the examples of the `Drop-down list </widgets/dropdown#examples>`__
+the examples of the :ref:`Drop-down list <lv_dropdown_example>`
 widget. The examples are directly loaded from the
 `lvgl/examples <https://github.com/lvgl/lvgl/tree/master/examples>`__
 folder.
 
-So all you need to do is send a `Pull request <#pull-request>`__ to the
+So all you need to do is send a :ref:`contributing_pull_request` to the
 `lvgl <https://github.com/lvgl/lvgl>`__ repository and follow some
 conventions:
 
@@ -295,6 +307,8 @@ conventions:
 - Update ``index.rst`` in the example's folder with your new example. To see how other examples are added, look in the
   `lvgl/examples/widgets <https://github.com/lvgl/lvgl/tree/master/examples/widgets>`__
   folder.
+
+.. _contributing_improve_docs:
 
 Improve the docs
 ~~~~~~~~~~~~~~~~
@@ -307,6 +321,8 @@ GitHub.
 
 Note that the documentation is also formatted in
 `Markdown <https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet>`__.
+
+.. _contributing_report_bugs:
 
 Report bugs
 ~~~~~~~~~~~
@@ -321,17 +337,21 @@ When filing the issue be sure to fill out the template. It helps find
 the root of the problem while avoiding extensive questions and exchanges
 with other developers.
 
+.. _contributing_send_fixes:
+
 Send fixes
 ~~~~~~~~~~
 
 The beauty of open-source software is you can easily dig in to it to
 understand how it works. You can also fix or adjust it as you wish.
 
-If you found and fixed a bug don't hesitate to send a `Pull
-request <#pull-request>`__ with the fix.
+If you found and fixed a bug don't hesitate to send a 
+:ref:`contributing_pull_request` with the fix.
 
 In your Pull request please also add a line to
-```CHANGELOG.md`` <https://github.com/lvgl/lvgl/blob/master/CHANGELOG.md>`__.
+`CHANGELOG.md <https://github.com/lvgl/lvgl/blob/master/CHANGELOG.md>`__.
+
+.. _contributing_forum:
 
 Join the conversations in the Forum
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -352,6 +372,8 @@ hesitate to share your thoughts and suggestions.
 Participating in the discussions is one of the best ways to become part
 of the project and get to know like-minded people!
 
+.. _contributing_add_features:
+
 Add features
 ~~~~~~~~~~~~
 
@@ -365,7 +387,7 @@ folder. The
 file describes the basics rules of contribution and also lists some
 ideas.
 
-For further ideas take a look at the `Roadmap </ROADMAP>`__ page. If you
+For further ideas take a look at the :ref:`roadmap` page. If you
 are interested in any of them feel free to share your opinion and/or
 participate in the implementation.
 
@@ -379,6 +401,8 @@ When adding a new features the following also needs to be updated:
 - Add description in the `docs <https://github.com/lvgl/lvgl/tree/master/docs>`__
 - Add `examples <https://github.com/lvgl/lvgl/tree/master/examples>`__
 - Update the `changelog <https://github.com/lvgl/lvgl/tree/master/docs/CHANGELOG.md>`__
+
+.. _contributing_become_maintainer:
 
 Become a maintainer
 ~~~~~~~~~~~~~~~~~~~

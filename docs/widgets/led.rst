@@ -47,7 +47,7 @@ the ON and OFF state.
 Events
 ******
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 

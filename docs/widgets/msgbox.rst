@@ -43,9 +43,10 @@ creates a message box.
 
 If ``parent`` is ``NULL`` the message box will be modal. ``title`` and
 ``txt`` are strings for the title and the text. ``btn_txts[]`` is an
-array with the buttons' text. E.g.
-``const char * btn_txts[] = {"Ok", "Cancel", NULL}``. ``add_close_btn``
-can be ``true`` or ``false`` to add/don't add a close button.
+array with the buttons' text.
+
+E.g. :cpp:expr:`const char * btn_txts[] = {"Ok", "Cancel", NULL}`. 
+``add_close_btn`` can be ``true`` or ``false`` to add/don't add a close button.
 
 Get the parts
 -------------

@@ -7,7 +7,7 @@ Button (lv_button)
 Overview
 ********
 
-Buttons have no new features compared to the :ref:`Base object <lv_obj>`__. They are useful for semantic purposes and have
+Buttons have no new features compared to the :ref:`Base object <lv_obj>`. They are useful for semantic purposes and have
 slightly different default settings.
 
 Buttons, by default, differ from Base object in the following ways: -

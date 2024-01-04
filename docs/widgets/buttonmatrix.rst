@@ -40,7 +40,7 @@ Button's text
 There is a text on each button. To specify them a descriptor string
 array, called *map*, needs to be used. The map can be set with
 :cpp:expr:`lv_buttonmatrix_set_map(buttonm, my_map)`. The declaration of a map should
-look like ``const char * map[] = {"button1", "button2", "button3", NULL}``. Note
+look like :cpp:expr:`const char * map[] = {"button1", "button2", "button3", NULL}`. Note
 that the last element has to be either ``NULL`` or an empty string
 (``""``)!
 
@@ -58,7 +58,7 @@ row with :cpp:expr:`lv_buttonmatrix_set_button_width(buttonm, button_id, width)`
 line with two buttons: *buttonA, width = 1* and *buttonB, width = 2*, *buttonA*
 will have 33 % width and *buttonB* will have 66 % width. It's similar to
 how the
-```flex-grow`` <https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow>`__
+`"flex-grow" <https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow>`__
 property works in CSS. The width must be in the [1..15] range and the
 default width is 1.
 
@@ -72,25 +72,24 @@ following parameters:
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: Enabled: send LV_EVENT_VALUE_CHANGE on CLICK, Disabled: send :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on PRESS
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_POPOVER`: Show the button label in a popover when pressing this key
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_RECOLOR`: Enable recoloring of button texts with ``#``. E.g. ``"It's #ff0000 red#"``
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_1`: Custom free to use flag
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_2`: Custom free to use flag
 
 By default, all flags are disabled.
 
 To set or clear a button's control attribute, use
-``lv_buttonmatrix_set_button_ctrl(buttonm, button_id, LV_BUTTONMATRIX_CTRL_...)`` and
-``lv_buttonmatrix_clear_button_ctrl(buttonm, button_id, LV_BUTTONMATRIX_CTRL_...)``
+:cpp:expr:`lv_buttonmatrix_set_button_ctrl(buttonm, button_id, LV_BUTTONMATRIX_CTRL_...)` and
+:cpp:expr:`lv_buttonmatrix_clear_button_ctrl(buttonm, button_id, LV_BUTTONMATRIX_CTRL_...)`
 respectively. More ``LV_BUTTONMATRIX_CTRL_...`` values can be OR-ed
 
 To set/clear the same control attribute for all buttons of a button
-matrix, use ``lv_buttonmatrix_set_button_ctrl_all(buttonm, LV_BUTTONMATRIX_CTRL_...)``
-and ``lv_buttonmatrix_clear_button_ctrl_all(buttonm, LV_BUTTONMATRIX_CTRL_...)``.
+matrix, use :cpp:expr:`lv_buttonmatrix_set_button_ctrl_all(buttonm, LV_BUTTONMATRIX_CTRL_...)`
+and :cpp:expr:`lv_buttonmatrix_clear_button_ctrl_all(buttonm, LV_BUTTONMATRIX_CTRL_...)`.
 
 The set a control map for a button matrix (similarly to the map for the
-text), use ``lv_buttonmatrix_set_ctrl_map(buttonm, ctrl_map)``. An element of
+text), use :cpp:expr:`lv_buttonmatrix_set_ctrl_map(buttonm, ctrl_map)`. An element of
 ``ctrl_map`` should look like
-``ctrl_map[0] = width | LV_BUTTONMATRIX_CTRL_NO_REPEAT |  LV_BUTTONMATRIX_CTRL_CHECHKABLE``.
+:cpp:expr:`ctrl_map[0] = width | LV_BUTTONMATRIX_CTRL_NO_REPEAT |  LV_BUTTONMATRIX_CTRL_CHECHKABLE`.
 The number of elements should be equal to the number of buttons
 (excluding newlines characters).
 
@@ -110,7 +109,7 @@ Events
    repeated after long press. The event parameter is set to the ID of
    the pressed/released button.
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 :cpp:expr:`lv_buttonmatrix_get_selected_button(buttonm)` returns the index of the most
 recently released or focused button or :cpp:enumerator:`LV_BUTTONMATRIX_BUTTON_NONE` if no

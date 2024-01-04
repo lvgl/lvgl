@@ -64,5 +64,3 @@ Example
 
 API
 ***
-
-:ref:`lv_animimg`
