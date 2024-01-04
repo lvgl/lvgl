@@ -19,9 +19,8 @@ else()
 endif()
 
 if (MSVC)
-  if (BUILD_SHARED_LIBS)
-    target_compile_definitions(lvgl PUBLIC LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllimport\))
-  else()
-    target_compile_definitions(lvgl PUBLIC LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllexport\))
-  endif()
+  target_compile_definitions(lvgl
+    PRIVATE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllimport\)
+    PUBLIC LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllexport\)
+  )
 endif()
