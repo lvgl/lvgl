@@ -106,7 +106,7 @@ With :cpp:expr:`lv_image_set_offset_x(img, x_ofs)` and
 :cpp:expr:`lv_image_set_offset_y(img, y_ofs)`, you can add some offset to the
 displayed image. Useful if the object size is smaller than the image
 source size. Using the offset parameter a `Texture atlas <https://en.wikipedia.org/wiki/Texture_atlas>`__
-or a "running image" effect can be created by :ref:`Animating <anim>` the x or y offset.
+or a "running image" effect can be created by :ref:`Animating <animations>` the x or y offset.
 
 Transformations
 ---------------

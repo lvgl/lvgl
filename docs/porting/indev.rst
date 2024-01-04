@@ -262,7 +262,7 @@ Further reading
 ***************
 
 - `lv_port_indev_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_indev_template.c>`__ for a template for your own driver.
-- `INdev features <disp>` to learn more about higher level input device features.
+- `INdev features <indev>` to learn more about higher level input device features.
 
 API
 ***

@@ -262,7 +262,7 @@ Further reading
    for a template for your own driver.
 -  :ref:`Drawing <drawing>` to learn more about how rendering
    works in LVGL.
--  :ref:`Display features <disp>` to learn more about higher
+-  :ref:`Display features <display_features>` to learn more about higher
    level display features.
 
 API
