@@ -393,17 +393,21 @@ void lv_display_set_draw_buffers(lv_display_t * disp, void * buf1, void * buf2, 
     if(disp == NULL) return;
 
     LV_ASSERT_MSG(buf1 == lv_draw_buf_align(buf1, disp->color_format), "buf1 must be aligned");
-    LV_ASSERT_MSG(buf2 == lv_draw_buf_align(buf2, disp->color_format), "buf2 must be aligned");
 
-    lv_image_header_init(&disp->buf_1.header, 0, 0, disp->color_format, 0, 0);
+    uint32_t stride = lv_draw_buf_width_to_stride(disp->hor_res, disp->color_format);
+
+    lv_image_header_init(&disp->buf_1.header, disp->hor_res, disp->ver_res, disp->color_format, stride, 0);
     disp->buf_1.data = buf1;
     disp->buf_1.unaligned_data = buf1;
     disp->buf_1.data_size = buf_size_in_bytes;
 
-    lv_image_header_init(&disp->buf_2.header, 0, 0, disp->color_format, 0, 0);
-    disp->buf_2.data = buf2;
-    disp->buf_2.unaligned_data = buf2;
-    disp->buf_2.data_size = buf_size_in_bytes;
+    if(buf2) {
+        LV_ASSERT_MSG(buf2 == lv_draw_buf_align(buf2, disp->color_format), "buf2 must be aligned");
+        lv_image_header_init(&disp->buf_2.header, disp->hor_res, disp->ver_res, disp->color_format, stride, 0);
+        disp->buf_2.data = buf2;
+        disp->buf_2.unaligned_data = buf2;
+        disp->buf_2.data_size = buf_size_in_bytes;
+    }
 
     disp->buf_act = &disp->buf_1;
     disp->render_mode = render_mode;
