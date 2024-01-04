@@ -252,7 +252,7 @@ display using :cpp:expr:`lv_disp_set_default(disp)`.
 :cpp:func:`lv_screen_active`, :cpp:func:`lv_screen_load` and :cpp:func:`lv_screen_load_anim` operate
 on the default display.
 
-Visit :ref:`Multi-display support <display_multi_display_support>` to learn more.
+Visit :ref:`display_multi_display_support` to learn more.
 
 .. _objects_parts:
 
