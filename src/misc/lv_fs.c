@@ -292,8 +292,37 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
     res = file_p->drv->write_cb(file_p->drv, file_p->file_d, buf, btw, &bw_tmp);
     if(bw != NULL) *bw = bw_tmp;
 
-    if(file_p->drv->cache_size && res == LV_FS_RES_OK)
-        file_p->cache->file_position += bw_tmp;
+    if(file_p->drv->cache_size && res == LV_FS_RES_OK){
+		if(file_p->cache->end >= file_p->cache->start){
+			uint32_t start_position = file_p->cache->file_position;
+			uint32_t end_position = file_p->cache->file_position + bw_tmp - 1;
+			char * cache_buffer = file_p->cache->buffer;
+			char * write_buffer = buf;
+			
+			if(start_position <= file_p->cache->start && end_position >= file_p->cache->end){
+				lv_memcpy(  cache_buffer, 
+							write_buffer + (file_p->cache->start - start_position), 
+							file_p->cache->end + 1 - file_p->cache->start);
+			}
+			else if(start_position >= file_p->cache->start && end_position <= file_p->cache->end){
+				lv_memcpy(  cache_buffer + (start_position - file_p->cache->start), 
+							write_buffer, 
+							end_position + 1 - start_position);
+			}
+			else if(end_position >= file_p->cache->start && end_position <= file_p->cache->end){
+				lv_memcpy(  cache_buffer, 
+							write_buffer + (file_p->cache->start - start_position), 
+							end_position + 1 - file_p->cache->start);
+			}
+			else if(start_position >= file_p->cache->start && start_position <= file_p->cache->end){
+				lv_memcpy(  cache_buffer + (start_position - file_p->cache->start), 
+							write_buffer, 
+							file_p->cache->end + 1 - start_position);
+			}
+		}
+	
+		file_p->cache->file_position += bw_tmp;
+	}
 
     return res;
 }
