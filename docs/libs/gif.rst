@@ -1,3 +1,5 @@
+.. _gif:
+
 ===========
 GIF decoder
 ===========
@@ -30,7 +32,7 @@ For example:
    lv_gif_set_src(obj, "S:path/to/example.gif");
 
 Note that, a file system driver needs to be registered to open images
-from files. Read more about it :ref:`file-system` or just
+from files. Read more about it :ref:`overview_file_system` or just
 enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
 
 Memory requirements
@@ -43,10 +45,14 @@ required:
 - :c:macro:`LV_COLOR_DEPTH` ``16``: 4 x image width x image height
 - :c:macro:`LV_COLOR_DEPTH` ``32``: 5 x image width x image height
 
+.. _gif_example:
+
 Example
 -------
 
 .. include:: ../examples/libs/gif/index.rst
+
+.. _gif_api:
 
 API
 ---

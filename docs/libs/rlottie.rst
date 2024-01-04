@@ -1,8 +1,10 @@
+.. _rlottie:
+
 =============
 Lottie player
 =============
 
-Allows to use Lottie animations in LVGL. Taken from `lv_rlottie <https://github.com/ValentiWorkLearning/lv_rlottie>`__.
+Allows playing Lottie animations in LVGL. Taken from `lv_rlottie <https://github.com/ValentiWorkLearning/lv_rlottie>`__.
 
 LVGL provides the interface to `Samsung/rlottie <https://github.com/Samsung/rlottie>`__ library's C
 API. That is the actual Lottie player is not part of LVGL, it needs to
@@ -36,6 +38,8 @@ given build system.
 
 ESP-IDF example at bottom
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _rlottie_usage:
 
 Usage
 -----
@@ -169,12 +173,12 @@ done properly.
 When picking/designing a lottie animation consider the following
 limitations:
 
-- Build the lottie animation to be sized for the intended size - it can scale/resize, 
-but performance will be best when the base lottie size is as intended
+- Build the lottie animation to be sized for the intended size
+- it can scale/resize, but performance will be best when the base lottie size is as intended
 - Limit total number of frames, the longer the lottie animation is, 
 the more memory it will consume for rendering (rlottie consumes IRAM for rendering)
-- Build the lottie animation for the intended frame rate - default lottie is 60fps, 
-embedded LCDs likely won't go above 30fps
+- Build the lottie animation for the intended frame rate
+- default lottie is 60fps, embedded LCDs likely won't go above 30fps
 
 IDF Setup
 ~~~~~~~~~
@@ -270,11 +274,14 @@ IDF) with the appropriate :cpp:expr:`MALLOC_CAP` call - for SPIRAM usage this is
 
    rlottie->allocated_buf = heap_caps_malloc(allocated_buf_size+1, MALLOC_CAP_SPIRAM);
 
+.. _rlottie_example:
+
 Example
 -------
 
 .. include:: ../examples/libs/rlottie/index.rst
 
+.. _rlottie_api:
 
 API
 ---

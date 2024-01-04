@@ -1,8 +1,10 @@
+.. _disp:
+
 ========
 Displays
 ========
 
-:important: The basic concept of a *display* in LVGL is explained in the `Porting </porting/display>`__ section. So before reading further, please read that section first.
+:important: The basic concept of a *display* in LVGL is explained in the :ref:`porting` section. So before reading further, please read that section first.
 
 Multiple display support
 ************************
@@ -36,7 +38,7 @@ hidden if you register only one display. By default, the last created
 on the most recently created (default) display. If you pass ``NULL`` as
 ``disp`` parameter to display related functions the default display will
 usually be used. E.g. :cpp:expr:`lv_display_trig_activity(NULL)` will trigger a
-user activity on the default display. (See below in `Inactivity <#Inactivity>`__).
+user activity on the default display. (See below in :ref:`Inactivity <disp_inactivity>`).
 
 Mirror display
 --------------
@@ -54,10 +56,12 @@ large display's resolution. 2. In ``flush_cb``, truncate and modify the
 ``area`` parameter for each display. 3. Send the buffer's content to
 each real display with the truncated area.
 
+.. _disp_screens:
+
 Screens
 *******
 
-Every display has its own set of `screens </overview/object#screen-the-most-basic-parent>`__ and the
+Every display has its own set of :ref:`screens <objects_screens>` and the
 objects on each screen.
 
 Be sure not to confuse displays and screens:
@@ -74,7 +78,7 @@ i.e. :cpp:expr:`lv_obj_set_pos()`, :cpp:expr:`lv_obj_set_size()` or similar func
 can't be used on screens.
 
 A screen can be created from any object type but the two most typical
-types are `Base object </widgets/obj>`__ and `Image </widgets/image>`__
+types are :ref:`Base object <lv_obj>` and :ref:`Image <lv_image>`
 (to create a wallpaper).
 
 To create a screen, use
@@ -85,7 +89,7 @@ use :cpp:expr:`lv_screen_active()`. These functions work on the default display.
 you want to specify which display to work on, use
 :cpp:expr:`lv_display_get_screen_active(disp)` and :cpp:expr:`lv_display_load_scr(disp, scr)`. A
 screen can be loaded with animations too. Read more
-`here <object.html#load-screens>`__.
+:ref:`here <objects_load_screens>`.
 
 Screens can be deleted with :cpp:expr:`lv_obj_delete(scr)`, but ensure that you do
 not delete the currently loaded screen.
@@ -118,14 +122,18 @@ UIs:
 - Set a color format with alpha channel. E.g.
   :cpp:expr:`lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888)`
 
+.. _disp_features:
+
 Features of displays
 ********************
+
+.. _disp_inactivity:
 
 Inactivity
 ----------
 
 A user's inactivity time is measured on each display. Every use of an
-`Input device </overview/indev>`__ (if `associated with the display </porting/indev#other-features>`__) counts as an activity. To
+:ref:`Input device <indev>` (if :ref:`associated with the display <porting_indev_other_features>`) counts as an activity. To
 get time elapsed since the last activity, use
 :cpp:expr:`lv_display_get_inactive_time(disp)`. If ``NULL`` is passed, the lowest
 inactivity time among all displays will be returned (**NULL isn't just
@@ -156,6 +164,8 @@ The opacity of the background color or image can be adjusted with
 
 The ``disp`` parameter of these functions can be ``NULL`` to select the
 default display.
+
+.. _disp_api:
 
 API
 ***

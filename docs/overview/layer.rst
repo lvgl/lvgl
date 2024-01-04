@@ -1,6 +1,10 @@
+.. _layers:
+
 ======
 Layers
 ======
+
+.. _layers_creation:
 
 Order of creation
 *****************
@@ -38,6 +42,8 @@ its children.
    /*Delete the second label*/
    lv_obj_delete(label2);
 
+.. _layers_order:
+
 Change order
 ************
 
@@ -53,6 +59,8 @@ There are four explicit ways to bring an object to the foreground:
 
 - Use :cpp:expr:`lv_obj_swap(obj1, obj2)` to swap the relative layer position of two objects.
 - When :cpp:expr:`lv_obj_set_parent(obj, new_parent)` is used, ``obj`` will be on the foreground of the ``new_parent``.
+
+.. _layers_top_and_sys:
 
 Top and sys layers
 ******************
@@ -81,6 +89,7 @@ The ``layer_sys`` is also used for similar purposes in LVGL. For
 example, it places the mouse cursor above all layers to be sure it's
 always visible.
 
+.. _layers_bottom:
 
 Bottom layers
 *************
@@ -90,6 +99,8 @@ it's located below the active screen. It's visible only if the active screen's
 background opacity is < 255.
 
 The get the bottom layer use :cpp:func:`lv_layer_bottom()`.
+
+.. _layers_api:
 
 API
 ***

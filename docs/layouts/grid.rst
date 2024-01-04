@@ -1,3 +1,5 @@
+.. _grid:
+
 ====
 Grid
 ====
@@ -32,6 +34,8 @@ Simple interface
 With the following functions you can easily set a Grid layout on any
 parent.
 
+.. _grid_descriptors:
+
 Grid descriptors
 ----------------
 
@@ -56,6 +60,8 @@ values:
 - :cpp:expr:`LV_GRID_FR(X)` tell what portion of the remaining space
   should be used by this track. Larger value means larger space.
 
+.. _grid_items:
+
 Grid items
 ----------
 
@@ -75,6 +81,8 @@ in its cell. The possible values are:
 
 ``column_span`` and ``row_span`` means how many tracks should the item
 involve from the start cell. Must be >= 1.
+
+.. _grid_align:
 
 Grid align
 ----------
@@ -99,6 +107,7 @@ If there are some empty space the track can be aligned several ways:
 To set the track's alignment use
 :cpp:expr:`lv_obj_set_grid_align(obj, column_align, row_align)`.
 
+.. _grid_subgrid:
 
 Sub grid
 --------
@@ -116,6 +125,7 @@ Limitations:
 
 The sub grid feature works the same as in CSS. For further reference see `this description <https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Subgrid>`__.
 
+.. _grid_style:
 
 Style interface
 ***************
@@ -135,6 +145,8 @@ related style properties exist:
 -  :cpp:enumerator:`GRID_CELL_ROW_POS`
 -  :cpp:enumerator:`GRID_CELL_ROW_SPAN`
 
+.. _grid_padding:
+
 Internal padding
 ----------------
 
@@ -143,6 +155,8 @@ properties can be set on the Grid container style:
 
 -  ``pad_row`` Sets the padding between the rows.
 -  ``pad_column`` Sets the padding between the columns.
+
+.. _grid_other:
 
 Other features
 **************
@@ -156,10 +170,14 @@ swapped. I.e. ``START`` will mean right-most.
 
 The columns will be placed from right to left.
 
+.. _grid_examples:
+
 Example
 *******
 
 .. include:: ../examples/layouts/grid/index.rst
+
+.. _grid_api:
 
 API
 ***

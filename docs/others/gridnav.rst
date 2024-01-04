@@ -1,3 +1,5 @@
+.. _gridnav:
+
 ===============
 Grid navigation
 ===============
@@ -24,11 +26,15 @@ gridnav is focused, the arrow key presses are automatically forwarded to
 the object so that gridnav can process the arrow keys.
 
 To move the focus to the next widget of the group use
-:cpp:expr:`LV_KEY_NEXT/PREV` or :cpp:expr:`lv_group_focus_next/prev()` or the ``TAB``
+:cpp:enumerator:`LV_KEY_NEXT` or :cpp:enumerator:`LV_KEY_PREV`.
+Optionally you can also use :cpp:func:`lv_group_focus_next` 
+or :cpp:func:`lv_group_focus_prev` or the ``TAB``
 key on keyboard as usual.
 
 If the container is scrollable and the focused child is out of the view,
 gridnav will automatically scroll the child into view.
+
+.. _gridnav_usage:
 
 Usage
 -----
@@ -56,10 +62,14 @@ An object needs to be clickable or click focusable
 (:cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` or :cpp:enumerator:`LV_OBJ_FLAG_CLICK_FOCUSABLE`) and not
 hidden (:cpp:enumerator:`LV_OBJ_FLAG_HIDDEN`) to be focusable by gridnav.
 
+.. _gridnav_example:
+
 Example
 -------
 
 .. include:: ../examples/others/gridnav/index.rst
+
+.. _gridnav_api:
 
 API
 ---

@@ -1,10 +1,15 @@
+.. _lv_scale:
+
+================
 Scale (lv_scale)
-===============
+================
 
 Overview
 ********
 
 Scale allows you to have a linear scale with ranges and sections with custom styling.
+
+.. _lv_scale_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -16,6 +21,8 @@ The scale widget is divided in the following three parts:
 - :cpp:enumerator:`LV_PART_INDICATOR` Major ticks and its labels (if enabled). See pink labels and green major ticks in the example image.
 
 .. image:: /misc/scale.png
+
+.. _lv_scale_usage:
 
 Usage
 *****
@@ -47,21 +54,28 @@ For labels the following properties can be configured:
 For lines (main line, major and minor ticks) the following properties can be configured:
 :cpp:expr:`lv_style_set_line_color`, :cpp:expr:`lv_style_set_line_width`.
 
+.. _lv_scale_events:
+
 Events
 ******
 
 No events supported by this widget.
+
+.. _lv_scale_keys:
 
 Keys
 ****
 
 No keys supported by this widget.
 
+.. _lv_scale_example:
 
 Example
 *******
 
 .. include:: ../examples/widgets/scale/index.rst
+
+.. _lv_scale_api:
 
 API
 ***

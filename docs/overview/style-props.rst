@@ -1,3 +1,5 @@
+.. _style_properties:
+
 ================
 Style properties
 ================

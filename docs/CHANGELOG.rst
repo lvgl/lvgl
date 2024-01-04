@@ -39,7 +39,7 @@ Main new features
 - `lv_observer </others/observer>`__ allows to bind data to UI elements and create a uniform and easy to maintain API
 - GitHub CodeSpace integration makes possible to run LVGL in an Online VSCode editor with 3 click. See more `here <https://blog.lvgl.io/2023-04-13/monthly-newsletter>`__
 - Add vector graphics support via ThorVG. It can be used to draw vector graphics to a `Canvas <https://github.com/lvgl/lvgl/blob/master/examples/widgets/canvas/lv_example_canvas_8.c>`__
-- `lv_image </widgets/image>`__ supports aligning, stretching or tiling the image source if the widget is larger or smaller.
+- :ref:`lv_image` supports aligning, stretching or tiling the image source if the widget is larger or smaller.
 
 General API changes
 -------------------

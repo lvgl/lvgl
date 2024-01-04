@@ -1,3 +1,5 @@
+.. _freetype:
+
 ================
 FreeType support
 ================
@@ -57,6 +59,8 @@ FLASH space.
    FT_CSRCS += freetype/src/truetype/truetype.c
    CSRCS += $(FT_CSRCS)
 
+.. _freetype_usage:
+
 Usage
 -----
 
@@ -91,6 +95,8 @@ Use the :cpp:expr:`lv_freetype_font_create()` function to create a font. To
 delete a font, use :cpp:expr:`lv_freetype_font_delete()`. For more detailed usage,
 please refer to example code.
 
+.. _freetype_example:
+
 Example
 -------
 
@@ -101,6 +107,8 @@ Learn more
 
 -  FreeType`tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
 -  LVGL's :ref:`add_font`
+
+.. _freetype_api:
 
 API
 ---

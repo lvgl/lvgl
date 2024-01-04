@@ -1,11 +1,15 @@
-===============
-TJpgDec decoder
-===============
+.. _tjpgd:
+
+================================
+Tiny JPEG Decompressor (TJpgDec)
+================================
 
 TJpgDec - Tiny JPEG Decompressor.
 Allow the use of JPG (JPEG) images in LVGL.
 
 Detailed introduction: `TJpgDec <http://elm-chan.org/fsw/tjpgd/>`__
+
+.. _tjpgd_overview:
 
 Overview
 --------
@@ -15,6 +19,8 @@ Overview
 -  Read from file and C array are implemented.
 -  Only the required portions of the JPG images are decoded,
    therefore they can't be zoomed or rotated.
+
+.. _tjpgd_usage:
 
 Usage
 -----
@@ -28,7 +34,7 @@ as image sources. For example:
    lv_image_set_src(my_img, "S:path/to/picture.jpg");
 
 Note that a file system driver needs to be registered to open images from
-files. Read more about it :ref:`file-system` or just
+files. Read more about it :ref:`overview_file_system` or just
 enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
 
 Converter
@@ -40,11 +46,14 @@ Converting JPG to C array
 -  Use lvgl online tool https://lvgl.io/tools/imageconverter
 -  Color format = RAW, output format = C Array
 
+.. _tjpgd_example:
+
 Example
 -------
 
 .. include:: ../examples/libs/tjpgd/index.rst
 
+.. _tjpgd_api:
 
 API
 ---

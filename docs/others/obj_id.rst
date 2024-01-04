@@ -1,19 +1,23 @@
+.. _obj_id:
+
 ======
 OBJ ID
 ======
 
-LVGL provides an optional field in :cpp:type:`lv_obj_t`` to store the object ID.
+LVGL provides an optional field in :cpp:type:`lv_obj_t` to store the object ID.
 Object ID can be used in many cases, for example, to identify the object.
 Or we can store a program backtrace to where the object is created.
+
+.. _obj_id_usage:
 
 Usage
 -----
 
-Enable this feature by setting :c:macro:`LV_USE_OBJ_ID` to `1`` in ``lv_conf.h``.
+Enable this feature by setting :c:macro:`LV_USE_OBJ_ID` to `1` in ``lv_conf.h``.
 Use the builtin obj ID generator by setting :c:macro:`LV_USE_OBJ_ID_BUILTIN` to `1`.
 Otherwise provide your own custom implementation.
 
-The ID is automatically generated and assigned to :cpp:expr:`obj->id`: during obj's
+The ID is automatically generated and assigned to :cpp:expr:`obj->id` during obj's
 construction by calling API :cpp:expr:`lv_obj_assign_id(obj)` from :cpp:func:`lv_obj_constructor`.
 
 You can directly access the ID by :cpp:expr:`obj->id` or use API :cpp:expr:`lv_obj_stringify_id(obj, buf, len)`

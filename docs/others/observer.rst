@@ -1,6 +1,10 @@
+.. _observer:
+
 ========
 Observer
 ========
+
+.. _observer_overview:
 
 Overview
 ********
@@ -66,6 +70,7 @@ A typical use case looks like this:
     }
 
 
+.. _observer_subject:
 
 Subject
 *******
@@ -75,7 +80,7 @@ Subject initialization
 
 Subjects have to be static or global :cpp:expr:`lv_subject_t` type variables.
 
-To initialize a subject use :cpp:expr:`lv_subject_init_<type>(&subject, <params>, init_value)`.
+To initialize a subject use :cpp:expr:`lv_subject_init_<type>(&subject, params, init_value)`.
 The following initializations exist for types:
 
 - **Integer** :cpp:expr:`void lv_subject_init_int(lv_subject_t * subject, int32_t value)`
@@ -118,6 +123,7 @@ The following functions can be used to get a subject's previous value:
 - **Pointer** :cpp:expr:`const void * lv_subject_get_previous_pointer(lv_subject_t * subject)`
 - **Color** :cpp:expr:`lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)`
 
+.. _observer_observer:
 
 Observer
 ********
@@ -173,6 +179,7 @@ To unsubscribe from a subject with all widgets you can use:
 
     lv_subject_remove_obj(subject, obj)
 
+.. _observer_subject_groups:
 
 Subject groups
 **************
@@ -233,6 +240,7 @@ The above Voltage/Current measurement example looks like this in the practice:
         lv_label_set_text_fmt(label, "%s: %d %s", mode ? "Current" : "Voltage", value, unit);
     }
 
+.. _observer_widget_binding:
 
 Widget binding
 **************
@@ -321,11 +329,14 @@ Bind an integer subject to a drop-down's value
 
     observer = lv_dropdown_bind_value(obj, &subject);
 
+.. _observer_example:
 
 Example
 *******
 
 .. include:: ../examples/others/observer/index.rst
+
+.. _observer_api:
 
 API
 ***

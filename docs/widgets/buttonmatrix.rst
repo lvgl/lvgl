@@ -1,5 +1,8 @@
+.. _lv_buttonmatrix:
+
+===============================
 Button matrix (lv_buttonmatrix)
-============================
+===============================
 
 Overview
 ********
@@ -15,6 +18,8 @@ The Button matrix is added to the default group (if one is set). Besides
 the Button matrix is an editable object to allow selecting and clicking
 the buttons with encoder navigation too.
 
+.. _lv_buttonmatrix_parts_and_styles:
+
 Parts and Styles
 ****************
 
@@ -23,6 +28,8 @@ Parts and Styles
    sets the space between the buttons.
 -  :cpp:enumerator:`LV_PART_ITEMS` The buttons all use the text and typical background
    style properties except translations and transformations.
+
+.. _lv_buttonmatrix_usage:
 
 Usage
 *****
@@ -94,6 +101,8 @@ The "One check" feature can be enabled with
 :cpp:expr:`lv_buttonmatrix_set_one_checked(buttonm, true)` to allow only one button to
 be checked at a time.
 
+.. _lv_buttonmatrix_events:
+
 Events
 ******
 
@@ -112,6 +121,8 @@ text of ``button_id``\ th button.
 
 Learn more about :ref:`events`.
 
+.. _lv_buttonmatrix_keys:
+
 Keys
 ****
 
@@ -129,10 +140,14 @@ won't be activated.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_buttonmatrix_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/buttonmatrix/index.rst
+
+.. _lv_buttonmatrix_api:
 
 API
 ***

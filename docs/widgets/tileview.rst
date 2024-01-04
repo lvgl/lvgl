@@ -1,3 +1,6 @@
+.. _lv_tileview:
+
+=======================
 Tile view (lv_tileview)
 =======================
 
@@ -12,13 +15,17 @@ individually to not allow moving from one tile to another.
 If the Tile view is screen sized, the user interface resembles what you
 may have seen on smartwatches.
 
+.. _lv_tileview_parts_and_styles:
+
 Parts and Styles
 ****************
 
-The Tile view is built from an `lv_obj </widgets/obj>`__ container and
-`lv_obj </widgets/obj>`__ tiles.
+The Tile view is built from an :ref:`lv_obj` container and
+:ref:`lv_obj` tiles.
 
-The parts and styles work the same as for `lv_obj </widgets/obj>`__.
+The parts and styles work the same as for :ref:`lv_obj`.
+
+.. _lv_tileview_usage:
 
 Usage
 *****
@@ -41,12 +48,16 @@ The Tile view can scroll to a tile with
 :cpp:expr:`lv_tileview_set_tile(tileview, tile_obj, LV_ANIM_ON/OFF)` or
 :cpp:expr:`lv_tileview_set_tile_by_index(tileview, col_id, row_id, LV_ANIM_ON/OFF)`
 
+.. _lv_tileview_events:
+
 Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new tile loaded by scrolling.
    :cpp:expr:`lv_tileview_get_tile_active(tabview)` can be used to get current
    tile.
+
+.. _lv_tileview_keys:
 
 Keys
 ****
@@ -55,10 +66,14 @@ Keys
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_tileview_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/tileview/index.rst
+
+.. _lv_tileview_api:
 
 API
 ***

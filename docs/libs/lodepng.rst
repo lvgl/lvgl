@@ -1,3 +1,5 @@
+.. _lodepng:
+
 ===============
 LodePNG decoder
 ===============
@@ -11,13 +13,13 @@ image decoder automatically so PNG files can be directly used as any
 other image sources.
 
 Note that, a file system driver needs to be registered to open images from
-files. Read more about it :ref:`file-system` or just
+files. Read more about it :ref:`overview_file_system` or just
 enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
 
 The whole PNG image is decoded, so ``width x height x 4`` bytes free RAM space is required. 
 The decoded image is stored in RGBA pixel format.
 
-As it might take significant time to decode PNG images LVGL's :ref:`image-caching` feature can be useful.
+As it might take significant time to decode PNG images LVGL's :ref:`overview_image_caching` feature can be useful.
 
 Compress PNG files
 ------------------
@@ -35,10 +37,14 @@ A batch of PNG files can be uploaded also.
 
 Compress PNG site: https://compresspng.com/
 
+.. _lodepng_example:
+
 Example
 -------
 
 .. include:: ../examples/libs/lodepng/index.rst
+
+.. _lodepng_api:
 
 API
 ---

@@ -1,5 +1,8 @@
+.. _rle:
+
+============
 RLE Compress
-===========
+============
 
 LVGL provides a custom RLE compression method. It can be used to reduce binary
 image size. The RLE compression is a lossless compression method.
@@ -60,6 +63,7 @@ can be found from ``lvgl/script/LVGLImage.py``.
 
         return b"".join(compressed_data)
 
+.. _rle_usage:
 
 Usage
 -----
