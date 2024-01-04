@@ -310,7 +310,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
     if(args->premultiply
        && !lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED) /*Hasn't done yet*/
       ) {
-        LV_LOG_WARN("Alpha premultiply.");
+        LV_LOG_TRACE("Alpha premultiply.");
         if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_MODIFIABLE)) {
             /*Do it directly*/
             lv_draw_buf_premultiply(decoded);
