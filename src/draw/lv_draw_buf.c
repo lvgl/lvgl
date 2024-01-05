@@ -134,6 +134,27 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const l
     }
 }
 
+lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride,
+                             void * data, uint32_t data_size)
+{
+    LV_ASSERT_NULL(draw_buf);
+    if(draw_buf == NULL) return LV_RESULT_INVALID;
+
+    lv_memzero(draw_buf, sizeof(lv_draw_buf_t));
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+    if(stride * h > data_size) {
+        LV_LOG_WARN("Data size too small, required: %" LV_PRId32 ", provided: %" LV_PRId32, stride * h,
+                    data_size);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_image_header_init(&draw_buf->header, w, h, cf, stride, 0);
+    draw_buf->data = lv_draw_buf_align(data, cf);
+    draw_buf->unaligned_data = data;
+    draw_buf->data_size = data_size;
+    return LV_RESULT_OK;
+}
+
 lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
 {
     uint32_t size;
