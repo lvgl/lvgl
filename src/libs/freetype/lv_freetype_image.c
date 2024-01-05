@@ -69,7 +69,7 @@ bool lv_freetype_image_font_create(lv_freetype_font_dsc_t * dsc)
         .free_cb = (lv_cache_free_cb_t)freetype_image_free_cb,
     };
 
-    if (dsc->cache_node->draw_data_cache){
+    if(dsc->cache_node->draw_data_cache) {
         return true;
     }
 

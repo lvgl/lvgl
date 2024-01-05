@@ -72,7 +72,7 @@ bool lv_freetype_outline_font_create(lv_freetype_font_dsc_t * dsc)
         .compare_cb = (lv_cache_compare_cb_t)freetype_glyph_outline_cmp_cb,
     };
 
-    if (dsc->cache_node->draw_data_cache) {
+    if(dsc->cache_node->draw_data_cache) {
         return true;
     }
 
