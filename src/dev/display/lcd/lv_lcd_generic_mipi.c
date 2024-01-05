@@ -109,7 +109,7 @@ void lv_lcd_generic_mipi_set_gamma_curve(lv_display_t *disp, uint8_t gamma)
     	}, 1);
 }
 
-void lv_lcd_generic_mipi_send_cmd_list(lv_lcd_generic_mipi_driver_t *drv, uint8_t *cmd_list)
+void lv_lcd_generic_mipi_send_cmd_list(lv_lcd_generic_mipi_driver_t *drv, const uint8_t *cmd_list)
 {
     while (1) {
     	uint8_t cmd = *cmd_list++;
