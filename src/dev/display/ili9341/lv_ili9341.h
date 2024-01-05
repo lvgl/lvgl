@@ -1,12 +1,12 @@
 /*
- * lv_st7789.h
+ * lv_ili9341.h
  *
  * This driver is just a wrapper around the generic MIPI compatible LCD controller driver
  *
  */
 
-#ifndef LV_ST7789_H
-#define LV_ST7789_H
+#ifndef LV_ILI9341_H
+#define LV_ILI9341_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,14 +34,14 @@ extern "C" {
  * @param param			parameter buffer
  * @param param_size	number of bytes of the parameters
  */
-typedef void (*lv_st7789_send_cmd_cb_t)(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size);
+typedef void (*lv_ili9341_send_cmd_cb_t)(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size);
 
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
 
 /**
- * Create an LCD display with ST7789 driver
+ * Create an LCD display with ILI9341 driver
  * @param hor_res		horizontal resolution
  * @param ver_res		vertical resolution
  * @param flags			default configuration settings (mirror, RGB ordering, etc.)
@@ -49,7 +49,7 @@ typedef void (*lv_st7789_send_cmd_cb_t)(lv_display_t *disp, uint8_t *cmd, size_t
  * @param send_color	platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
  * @return          	pointer to the created display
  */
-lv_display_t *lv_st7789_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags, lv_st7789_send_cmd_cb_t send_cmd_cb, lv_st7789_send_cmd_cb_t send_color_cb);
+lv_display_t *lv_ili9341_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags, lv_ili9341_send_cmd_cb_t send_cmd_cb, lv_ili9341_send_cmd_cb_t send_color_cb);
 
 /**
  * Set gap, i.e., the offset of the (0,0) pixel in the VRAM
@@ -57,21 +57,21 @@ lv_display_t *lv_st7789_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t
  * @param x				x offset
  * @param y				y offset
  */
-void lv_st7789_set_gap(lv_display_t *disp, uint16_t x, uint16_t y);
+void lv_ili9341_set_gap(lv_display_t *disp, uint16_t x, uint16_t y);
 
 /**
  * Set color inversion
  * @param disp			display object
  * @param invert		false: normal, true: invert
  */
-void lv_st7789_set_invert(lv_display_t *disp, bool invert);
+void lv_ili9341_set_invert(lv_display_t *disp, bool invert);
 
 /**
  * Set gamma curve
  * @param disp			display object
  * @param gamma			gamma curve
  */
-void lv_st7789_set_gamma_curve(lv_display_t *disp, uint8_t gamma);
+void lv_ili9341_set_gamma_curve(lv_display_t *disp, uint8_t gamma);
 
 /**********************
  * 		OTHERS
@@ -85,4 +85,4 @@ void lv_st7789_set_gamma_curve(lv_display_t *disp, uint8_t gamma);
 } /*extern "C"*/
 #endif
 
-#endif /* LV_ST7789_H */
+#endif /* LV_ILI9341_H */
