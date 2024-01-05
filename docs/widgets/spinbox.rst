@@ -1,3 +1,6 @@
+.. _lv_spinbox:
+
+====================
 Spinbox (lv_spinbox)
 ====================
 
@@ -6,13 +9,14 @@ Overview
 
 The Spinbox contains a number as text which can be increased or
 decreased by *Keys* or API functions. Under the hood the Spinbox is a
-modified `Text area </widgets/textarea>`__.
+modified :ref:`Text area <lv_textarea>`.
+
+.. _lv_spinbox_parts_and_styles:
 
 Parts and Styles
 ****************
 
-The parts of the Spinbox are identical to the `Text
-area </widgets/textarea>`__.
+The parts of the Spinbox are identical to the :ref:`Text area <lv_textarea>`.
 
 Value, range and step
 ---------------------
@@ -52,14 +56,18 @@ rollover mode. If either the minimum or maximum value is reached with
 rollover enabled, the value will change to the other limit. If rollover
 is disabled the value will remain at the minimum or maximum value.
 
+.. _lv_spinbox_events:
+
 Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the value has changed.
 
-See the events of the `Text area </widgets/textarea>`__ too.
+See the events of the :ref:`Text area <lv_textarea>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_spinbox_keys:
 
 Keys
 ****
@@ -71,10 +79,14 @@ Keys
 -  :cpp:enumerator:`LV_KEY_ENTER` With *Encoder* got the net digit. Jump to the first
    after the last.
 
+.. _lv_spinbox_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/spinbox/index.rst
+
+.. _lv_spinbox_api:
 
 API
 ***

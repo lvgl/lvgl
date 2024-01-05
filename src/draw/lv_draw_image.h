@@ -72,7 +72,6 @@ typedef struct _lv_draw_image_dsc_t {
 typedef void (*lv_draw_image_core_cb)(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                                       const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                                       const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
-struct _lv_layer_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -90,7 +89,7 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc);
  * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the image
  */
-void lv_draw_image(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**
  * Create a draw task to blend a layer to an other layer
@@ -98,7 +97,7 @@ void lv_draw_image(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, 
  * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the layer
  */
-void lv_draw_layer(struct _lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**
  * Get the type of an image source

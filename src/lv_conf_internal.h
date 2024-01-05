@@ -25,7 +25,7 @@
 
 #define LV_DRAW_SW_ASM_NONE         0
 #define LV_DRAW_SW_ASM_NEON         1
-#define LV_DRAW_SW_ASM_MVE          2
+#define LV_DRAW_SW_ASM_HELIUM       2
 #define LV_DRAW_SW_ASM_CUSTOM       255
 
 /* Handle special Kconfig options */
@@ -314,6 +314,15 @@
     #endif
 #endif
 
+/* Use Arm-2D on Cortex-M based devices. Please only enable it for Helium Powered devices for now */
+#ifndef LV_USE_DRAW_ARM2D
+    #ifdef CONFIG_LV_USE_DRAW_ARM2D
+        #define LV_USE_DRAW_ARM2D CONFIG_LV_USE_DRAW_ARM2D
+    #else
+        #define LV_USE_DRAW_ARM2D 0
+    #endif
+#endif
+
 /* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE
@@ -348,6 +357,35 @@
     #else
         #define LV_USE_DRAW_SDL 0
     #endif
+#endif
+
+/* Use VG-Lite GPU. */
+#ifndef LV_USE_DRAW_VG_LITE
+    #ifdef CONFIG_LV_USE_DRAW_VG_LITE
+        #define LV_USE_DRAW_VG_LITE CONFIG_LV_USE_DRAW_VG_LITE
+    #else
+        #define LV_USE_DRAW_VG_LITE 0
+    #endif
+#endif
+
+#if LV_USE_DRAW_VG_LITE
+/* Enbale VG-Lite custom external 'gpu_init()' function */
+#ifndef LV_VG_LITE_USE_GPU_INIT
+    #ifdef CONFIG_LV_VG_LITE_USE_GPU_INIT
+        #define LV_VG_LITE_USE_GPU_INIT CONFIG_LV_VG_LITE_USE_GPU_INIT
+    #else
+        #define LV_VG_LITE_USE_GPU_INIT 0
+    #endif
+#endif
+
+/* Enable VG-Lite assert. */
+#ifndef LV_VG_LITE_USE_ASSERT
+    #ifdef CONFIG_LV_VG_LITE_USE_ASSERT
+        #define LV_VG_LITE_USE_ASSERT CONFIG_LV_VG_LITE_USE_ASSERT
+    #else
+        #define LV_VG_LITE_USE_ASSERT 0
+    #endif
+#endif
 #endif
 
 /*=================
@@ -738,8 +776,8 @@
 
 /*Default cache size in bytes.
  *Used by image decoders such as `lv_lodepng` to keep the decoded image in the memory.
- *Data larger than the size of the cache also can be allocated but
- *will be dropped immediately after usage.*/
+ *If size is not set to 0, the decoder will fail to decode when the cache is full.
+ *If size is 0, the cache function is not enabled and the decoded mem will be released immediately after use.*/
 #ifndef LV_CACHE_DEF_SIZE
     #ifdef CONFIG_LV_CACHE_DEF_SIZE
         #define LV_CACHE_DEF_SIZE CONFIG_LV_CACHE_DEF_SIZE
@@ -2154,7 +2192,6 @@
 
     /*FreeType cache type:
      * LV_FREETYPE_CACHE_TYPE_IMAGE    - Image cache
-     * LV_FREETYPE_CACHE_TYPE_SBIT     - Sbit cache
      * LV_FREETYPE_CACHE_TYPE_OUTLINE  - Outline cache*/
     #ifndef LV_FREETYPE_CACHE_TYPE
         #ifdef CONFIG_LV_FREETYPE_CACHE_TYPE

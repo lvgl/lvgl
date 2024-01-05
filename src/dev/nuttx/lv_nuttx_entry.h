@@ -33,11 +33,13 @@ extern "C" {
 typedef struct {
     const char * fb_path;
     const char * input_path;
+    const char * utouch_path;
 } lv_nuttx_dsc_t;
 
 typedef struct {
     lv_display_t * disp;
     lv_indev_t * indev;
+    lv_indev_t * utouch_indev;
 } lv_nuttx_result_t;
 /**********************
  * GLOBAL PROTOTYPES

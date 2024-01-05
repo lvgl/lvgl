@@ -44,11 +44,6 @@ static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf);
 
 static void * _go_to_xy(lv_draw_buf_t * draw_buf, int32_t x, int32_t y);
 
-static void _vglite_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * area);
-
-static void _vglite_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
-                             void * src_buf, uint32_t src_stride, const lv_area_t * src_area, lv_color_format_t cf);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -69,9 +64,6 @@ void lv_draw_buf_vglite_init_handlers(void)
     handlers->align_pointer_cb = _align_buf;
     handlers->invalidate_cache_cb = _invalidate_cache;
     handlers->width_to_stride_cb = _width_to_stride;
-    handlers->go_to_xy_cb = _go_to_xy;
-    handlers->buf_clear_cb = _vglite_buf_clear;
-    handlers->buf_copy_cb = _vglite_buf_copy;
 }
 
 /**********************
@@ -119,17 +111,11 @@ static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)
     return (width_bytes + align_bytes - 1) & ~(align_bytes - 1);
 }
 
-static void * _go_to_xy(lv_draw_buf_t * draw_buf, int32_t x, int32_t y)
-{
-    uint8_t bits_per_pixel = vglite_get_px_size(draw_buf->color_format);
-    uint32_t stride = lv_draw_buf_get_stride(draw_buf);
-    uint8_t * buf_tmp = lv_draw_buf_get_buf(draw_buf);
-
-    buf_tmp += stride * y;
-    buf_tmp += (x * bits_per_pixel) / 8;
-
-    return buf_tmp;
-}
+/**
+ * @todo
+ * LVGL needs to use hardware acceleration for buf_copy and do not affect GPU rendering.
+ */
+#if 0
 
 static void _vglite_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
@@ -189,5 +175,6 @@ static void _vglite_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_are
     /* Disable scissor. */
     vglite_disable_scissor();
 }
+#endif
 
 #endif /*LV_USE_DRAW_VGLITE*/

@@ -14,7 +14,6 @@
 #include "../../misc/lv_log.h"
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_mem.h"
-#include "../../misc/lv_cache.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_color.h"
 #include "../../stdlib/lv_string.h"
@@ -70,6 +69,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
     new_draw_dsc.src = &img_dsc;
 
     lv_draw_sw_image(draw_unit, &new_draw_dsc, coords);
+    lv_image_cache_drop(&img_dsc);
 
 #if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG
     lv_area_t area_rot;
@@ -173,18 +173,11 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                        draw_dsc->scale_y != LV_SCALE_NONE ? true : false;
 
     lv_draw_sw_blend_dsc_t blend_dsc;
-    const uint8_t * src_buf = decoder_dsc->img_data;
-    const lv_image_header_t * header = &decoder_dsc->header;
-    uint32_t img_stride = header->stride;
-    lv_color_format_t cf = header->cf;
-
-    cf = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
-
-    if(decoder_dsc->decoded) {
-        src_buf = decoder_dsc->decoded->data;
-        img_stride = decoder_dsc->decoded->header.stride;
-        cf = decoder_dsc->decoded->header.cf;
-    }
+    const lv_draw_buf_t * decoded = decoder_dsc->decoded;
+    const uint8_t * src_buf = decoded->data;
+    const lv_image_header_t * header = &decoded->header;
+    uint32_t img_stride = decoded->header.stride;
+    lv_color_format_t cf = decoded->header.cf;
 
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
     blend_dsc.opa = draw_dsc->opa;

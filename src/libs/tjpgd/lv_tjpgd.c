@@ -81,9 +81,9 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
         uint8_t * raw_data = (uint8_t *)img_dsc->data;
-        const uint32_t raw_sjpeg_data_size = img_dsc->data_size;
+        const uint32_t raw_data_size = img_dsc->data_size;
 
-        if(is_jpg(raw_data, raw_sjpeg_data_size) == true) {
+        if(is_jpg(raw_data, raw_data_size) == true) {
 #if LV_USE_FS_MEMFS
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = img_dsc->header.w;

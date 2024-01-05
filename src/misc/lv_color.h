@@ -64,6 +64,24 @@ typedef uint8_t lv_opa_t;
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
 
+#define LV_COLOR_FORMAT_GET_BPP(cf) (       \
+                                            (cf) == LV_COLOR_FORMAT_I1 ? 1 :        \
+                                            (cf) == LV_COLOR_FORMAT_A1 ? 1 :        \
+                                            (cf) == LV_COLOR_FORMAT_I2 ? 2 :        \
+                                            (cf) == LV_COLOR_FORMAT_A2 ? 2 :        \
+                                            (cf) == LV_COLOR_FORMAT_I4 ? 4 :        \
+                                            (cf) == LV_COLOR_FORMAT_A4 ? 4 :        \
+                                            (cf) == LV_COLOR_FORMAT_L8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_A8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
+                                            (cf) == LV_COLOR_FORMAT_RGB565A8 ? 24 : \
+                                            (cf) == LV_COLOR_FORMAT_RGB888 ? 24 :   \
+                                            (cf) == LV_COLOR_FORMAT_ARGB8888 ? 32 : \
+                                            (cf) == LV_COLOR_FORMAT_XRGB8888 ? 32 : \
+                                            0                                       \
+                                    )
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -121,6 +139,22 @@ enum _lv_color_format_t {
     LV_COLOR_FORMAT_A2                = 0x0C,
     LV_COLOR_FORMAT_A4                = 0x0D,
 
+    /* reference to https://wiki.videolan.org/YUV/ */
+    /*YUV planar formats*/
+    LV_COLOR_FORMAT_YUV_START         = 0x20,
+    LV_COLOR_FORMAT_I420              = LV_COLOR_FORMAT_YUV_START,  /*YUV420 planar(3 plane)*/
+    LV_COLOR_FORMAT_I422              = 0x21,  /*YUV422 planar(3 plane)*/
+    LV_COLOR_FORMAT_I444              = 0x22,  /*YUV444 planar(3 plane)*/
+    LV_COLOR_FORMAT_I400              = 0x23,  /*YUV400 no chroma channel*/
+    LV_COLOR_FORMAT_NV21              = 0x24,  /*YUV420 planar(2 plane), UV plane in 'V, U, V, U'*/
+    LV_COLOR_FORMAT_NV12              = 0x25,  /*YUV420 planar(2 plane), UV plane in 'U, V, U, V'*/
+
+    /*YUV packed formats*/
+    LV_COLOR_FORMAT_YUY2              = 0x26,  /*YUV422 packed like 'Y U Y V'*/
+    LV_COLOR_FORMAT_UYVY              = 0x27,  /*YUV422 packed like 'U Y V Y'*/
+
+    LV_COLOR_FORMAT_YUV_END           = LV_COLOR_FORMAT_UYVY,
+
     /*Color formats in which LVGL can render*/
 #if LV_COLOR_DEPTH == 8
     LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_L8,
@@ -144,6 +178,7 @@ typedef uint8_t lv_color_format_t;
 
 #define LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf) ((cf) >= LV_COLOR_FORMAT_A1 && (cf) <= LV_COLOR_FORMAT_A8)
 #define LV_COLOR_FORMAT_IS_INDEXED(cf) ((cf) >= LV_COLOR_FORMAT_I1 && (cf) <= LV_COLOR_FORMAT_I8)
+#define LV_COLOR_FORMAT_IS_YUV(cf)  ((cf) >= LV_COLOR_FORMAT_YUV_START && (cf) <= LV_COLOR_FORMAT_YUV_END)
 #define LV_COLOR_INDEXED_PALETTE_SIZE(cf) ((cf) == LV_COLOR_FORMAT_I1 ? 2 :\
                                            (cf) == LV_COLOR_FORMAT_I2 ? 4 :\
                                            (cf) == LV_COLOR_FORMAT_I4 ? 16 :\
@@ -387,6 +422,20 @@ static inline lv_color_t lv_color_white(void)
 static inline lv_color_t lv_color_black(void)
 {
     return lv_color_make(0x00, 0x00, 0x00);
+}
+
+static inline void lv_color_premultiply(lv_color32_t * c)
+{
+    c->red = LV_OPA_MIX2(c->red, c->alpha);
+    c->green = LV_OPA_MIX2(c->green, c->alpha);
+    c->blue = LV_OPA_MIX2(c->blue, c->alpha);
+}
+
+static inline void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a)
+{
+    c->red = LV_OPA_MIX2(c->red, a);
+    c->green = LV_OPA_MIX2(c->green, a);
+    c->blue = LV_OPA_MIX2(c->blue, a);
 }
 
 /**********************

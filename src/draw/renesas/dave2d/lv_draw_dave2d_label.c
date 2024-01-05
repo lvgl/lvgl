@@ -62,7 +62,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
                    (d2_s32)unit->base_unit.target_layer->buf_stride / lv_color_format_get_size(unit->base_unit.target_layer->color_format),
                    (d2_u32)lv_area_get_width(&buffer_area),
                    (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_cf_fb_get());
+                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(unit->base_unit.target_layer->color_format));
 
     current_fillmode = d2_getfillmode(unit->d2_handle);
 

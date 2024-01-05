@@ -1,3 +1,5 @@
+.. _porting_indev:
+
 ======================
 Input device interface
 ======================
@@ -24,7 +26,7 @@ The ``type`` member can be:
 ``read_cb`` is a function pointer which will be called periodically to
 report the current state of an input device.
 
-Visit `Input devices </overview/indev>`__ to learn more about input
+Visit :ref:`Input devices <indev>` to learn more about input
 devices in general.
 
 Touchpad, mouse or any pointer
@@ -187,6 +189,8 @@ should look like ``const lv_point_t points_array[] = { {12,30},{60,90}, ...}``
 When the ``button_read`` callback in the example above changes the ``data->btn_id`` to ``0``
 a press/release action at the first index of the ``points_array`` will be performed (``{12,30}``).
 
+.. _porting_indev_other_features:
+
 Other features
 **************
 
@@ -232,8 +236,8 @@ data instead of directly reading the input device. Setting the
 ``data->continue_reading`` flag will tell LVGL there is more data to
 read and it should call ``read_cb`` again.
 
-Decoupling the input device read timer
---------------------------------------
+Switching the input device to event-driven mode
+-----------------------------------------------
 
 Normally the input event is read every :c:macro:`LV_DEF_REFR_PERIOD`
 milliseconds (set in ``lv_conf.h``).  However, in some cases, you might
@@ -244,10 +248,10 @@ You can do this in the following way:
 
 .. code:: c
 
-   /*Delete the original input device read timer*/
-   lv_timer_delete(indev->read_timer);
-   indev->read_timer = NULL;
+   /*Update the input device's running mode to LV_INDEV_MODE_EVENT*/
+   lv_indev_set_mode(indev, LV_INDEV_MODE_EVENT);
 
+   ...
 
    /*Call this anywhere you want to read the input device*/
    lv_indev_read(indev);
@@ -258,7 +262,7 @@ Further reading
 ***************
 
 - `lv_port_indev_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_indev_template.c>`__ for a template for your own driver.
-- `INdev features </overview/display>`__ to learn more about higher level input device features.
+- `INdev features <indev>` to learn more about higher level input device features.
 
 API
 ***

@@ -1,3 +1,6 @@
+.. _lv_span:
+
+==============
 Span (lv_span)
 ==============
 
@@ -8,10 +11,14 @@ A spangroup is the object that is used to display rich text. Different
 from the label object, ``spangroup`` can render text styled with
 different fonts, colors, and sizes into the spangroup object.
 
+.. _lv_span_parts_and_styles:
+
 Parts and Styles
 ****************
 
 -  :cpp:enumerator:`LV_PART_MAIN` The spangroup has only one part.
+
+.. _lv_span_usage:
 
 Usage
 *****
@@ -103,12 +110,16 @@ Use :cpp:expr:`lv_spangroup_set_max_lines(spangroup, 10)` to set the maximum num
 of lines to be displayed in LV_SPAN_MODE_BREAK mode, negative values
 indicate no limit.
 
+.. _lv_span_events:
+
 Events
 ******
 
 No special events are sent by this widget.
 
 Learn more about :ref:`events`.
+
+.. _lv_span_keys:
 
 Keys
 ****
@@ -117,11 +128,14 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_span_example:
+
 Example
 *******
 
-
 .. include:: ../examples/widgets/span/index.rst
+
+.. _lv_span_api:
 
 API
 ***

@@ -26,7 +26,7 @@ extern "C" {
 
 typedef struct {
     lv_draw_unit_t base_unit;
-    struct _lv_draw_task_t * task_act;
+    lv_draw_task_t * task_act;
 #if LV_USE_OS
     lv_thread_sync_t sync;
     lv_thread_t thread;
@@ -55,8 +55,6 @@ void lv_draw_dave2d_border(lv_draw_dave2d_unit_t * draw_unit, const lv_draw_bord
 
 void lv_draw_dave2d_box_shadow(lv_draw_dave2d_unit_t * draw_unit, const lv_draw_box_shadow_dsc_t * dsc,
                                const lv_area_t * coords);
-
-//void lv_draw_dave2d_bg_image(lv_draw_dave2d_unit_t * draw_unit, const lv_draw_bg_image_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_dave2d_label(lv_draw_dave2d_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 

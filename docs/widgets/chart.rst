@@ -1,3 +1,6 @@
+.. _lv_chart:
+
+================
 Chart (lv_chart)
 ================
 
@@ -10,6 +13,8 @@ charts are supported.
 
 Charts can have: - division lines - 2 y axis - axis ticks and texts on
 ticks - cursors - scrolling and zooming
+
+.. _lv_chart_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -35,6 +40,8 @@ Parts and Styles
 -  :cpp:enumerator:`LV_PART_CURSOR` *Line* properties are used to style the cursors.
    ``width``, ``height``, ``bg_color`` and ``radius`` are used to set
    the appearance of points.
+
+.. _lv_chart_usage:
 
 Usage
 *****
@@ -166,7 +173,7 @@ Note that :cpp:enumerator:`LV_CHART_UPDATE_MODE_SHIFT` also changes the
 Tick marks and labels
 ---------------------
 
-With the help of </widgets/scale>`__ vertical and horizontal scales can be added in a very flexible way.
+With the help of `Scale </widgets/scale>`__, vertical and horizontal scales can be added in a very flexible way.
 See the example below to learn more.
 
 Zoom
@@ -195,6 +202,8 @@ point.
 the cursor at a point. If the point's position changes (new value or
 scrolling) the cursor will move with the point.
 
+.. _lv_chart_events:
+
 Events
 ******
 
@@ -206,6 +215,8 @@ See the events of the `Base object </widgets/obj>`__ too.
 
 Learn more about :ref:`events`.
 
+.. _lv_chart_keys:
+
 Keys
 ****
 
@@ -213,10 +224,14 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_chart_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/chart/index.rst
+
+.. _lv_chart_api:
 
 API
 ***

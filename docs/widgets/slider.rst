@@ -1,5 +1,6 @@
-.. _slider:
+.. _lv_slider:
 
+==================
 Slider (lv_slider)
 ==================
 
@@ -9,6 +10,8 @@ Overview
 The Slider object looks like a `Bar </widgets/bar>`__ supplemented with
 a knob. The knob can be dragged to set a value. Just like Bar, Slider
 can be vertical or horizontal.
+
+.. _lv_slider_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -24,6 +27,8 @@ Parts and Styles
    radius) with side length equal to the smaller side of the slider. The
    knob can be made larger with the ``padding`` values. Padding values
    can be asymmetric too.
+
+.. _lv_slider_usage:
 
 Usage
 *****
@@ -65,6 +70,8 @@ feature is enabled by adding the :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST`:
 
 The extended click area (set by :cpp:expr:`lv_obj_set_ext_click_area(slider, value)`) increases to knob's click area.
 
+.. _lv_slider_events:
+
 Events
 ******
 
@@ -77,6 +84,8 @@ See the events of the `Bar </widgets/bar>`__ too.
 
 Learn more about :ref:`events`.
 
+.. _lv_slider_keys:
+
 Keys
 ****
 
@@ -85,10 +94,14 @@ Keys
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_slider_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/slider/index.rst
+
+.. _lv_slider_api:
 
 API
 ***

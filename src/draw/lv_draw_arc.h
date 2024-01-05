@@ -40,8 +40,6 @@ typedef struct {
     uint8_t rounded : 1;
 } lv_draw_arc_dsc_t;
 
-struct _lv_layer_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -57,7 +55,7 @@ void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc);
  * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized draw descriptor variable
  */
-void lv_draw_arc(struct _lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
+void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc);
 
 /**
  * Get an area the should be invalidated when the arcs angle changed between start_angle and end_ange

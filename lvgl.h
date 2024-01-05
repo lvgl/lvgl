@@ -35,8 +35,6 @@ extern "C" {
 #include "src/misc/lv_anim_timeline.h"
 #include "src/misc/lv_profiler_builtin.h"
 #include "src/misc/lv_rb.h"
-#include "src/misc/lv_lru_rb.h"
-
 
 #include "src/tick/lv_tick.h"
 
@@ -107,7 +105,6 @@ extern "C" {
 #include "src/libs/rlottie/lv_rlottie.h"
 #include "src/libs/ffmpeg/lv_ffmpeg.h"
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
-#include "src/libs/lz4/lz4.h"
 
 #include "src/layouts/lv_layout.h"
 

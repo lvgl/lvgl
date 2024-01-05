@@ -529,13 +529,11 @@ static void table_draw_task_event_cb(lv_event_t * e)
 
 }
 
-lv_obj_t * table;
-
 static void summary_create(void)
 {
     lv_obj_clean(lv_screen_active());
     lv_obj_set_style_pad_hor(lv_screen_active(), 0, 0);
-    table = lv_table_create(lv_screen_active());
+    lv_obj_t * table = lv_table_create(lv_screen_active());
     lv_obj_set_width(table, lv_pct(100));
     lv_obj_set_style_max_height(table, lv_pct(100), 0);
     lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
@@ -576,10 +574,10 @@ static void summary_create(void)
         }
         else {
             int32_t cnt = scenes[i].measurement_cnt - 1;
-            lv_table_set_cell_value_fmt(table, i + 2, 1, "%d %%", scenes[i].cpu_avg_usage / cnt);
-            lv_table_set_cell_value_fmt(table, i + 2, 2, "%d FPS", scenes[i].fps_avg / cnt);
-            lv_table_set_cell_value_fmt(table, i + 2, 3, "%d ms", scenes[i].render_avg_time / cnt);
-            lv_table_set_cell_value_fmt(table, i + 2, 4, "%d ms", scenes[i].flush_avg_time / cnt);
+            lv_table_set_cell_value_fmt(table, i + 2, 1, "%"LV_PRIu32" %%", scenes[i].cpu_avg_usage / cnt);
+            lv_table_set_cell_value_fmt(table, i + 2, 2, "%"LV_PRIu32" FPS", scenes[i].fps_avg / cnt);
+            lv_table_set_cell_value_fmt(table, i + 2, 3, "%"LV_PRIu32" ms", scenes[i].render_avg_time / cnt);
+            lv_table_set_cell_value_fmt(table, i + 2, 4, "%"LV_PRIu32" ms", scenes[i].flush_avg_time / cnt);
 
             valid_scene_cnt++;
             total_avg_cpu += scenes[i].cpu_avg_usage / cnt;
@@ -598,10 +596,10 @@ static void summary_create(void)
         lv_table_set_cell_value(table, 1, 4, "N/A");
     }
     else {
-        lv_table_set_cell_value_fmt(table, 1, 1, "%d %%", total_avg_cpu / valid_scene_cnt);
-        lv_table_set_cell_value_fmt(table, 1, 2, "%d FPS", total_avg_fps / valid_scene_cnt);
-        lv_table_set_cell_value_fmt(table, 1, 3, "%d ms", total_avg_render_time / valid_scene_cnt);
-        lv_table_set_cell_value_fmt(table, 1, 4, "%d ms", total_avg_flush_time / valid_scene_cnt);
+        lv_table_set_cell_value_fmt(table, 1, 1, "%"LV_PRIu32" %%", total_avg_cpu / valid_scene_cnt);
+        lv_table_set_cell_value_fmt(table, 1, 2, "%"LV_PRIu32" FPS", total_avg_fps / valid_scene_cnt);
+        lv_table_set_cell_value_fmt(table, 1, 3, "%"LV_PRIu32" ms", total_avg_render_time / valid_scene_cnt);
+        lv_table_set_cell_value_fmt(table, 1, 4, "%"LV_PRIu32" ms", total_avg_flush_time / valid_scene_cnt);
     }
 }
 

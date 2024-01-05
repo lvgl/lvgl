@@ -50,6 +50,7 @@ struct ffmpeg_context_s {
     int video_dst_linesize[4];
     enum AVPixelFormat video_dst_pix_fmt;
     bool has_alpha;
+    lv_draw_buf_t draw_buf;
 };
 
 #pragma pack(1)
@@ -300,7 +301,13 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         uint8_t * img_data = ffmpeg_get_image_data(ffmpeg_ctx);
 
         dsc->user_data = ffmpeg_ctx;
-        dsc->img_data = img_data;
+        lv_draw_buf_t * decoded = &ffmpeg_ctx->draw_buf;
+        decoded->header = dsc->header;
+        decoded->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE;
+        decoded->data = img_data;
+        decoded->data_size = (uint32_t)dsc->header.stride * dsc->header.h;
+        decoded->unaligned_data = NULL;
+        dsc->decoded = decoded;
 
         /* The image is fully decoded. Return with its pointer */
         return LV_RESULT_OK;
@@ -575,6 +582,7 @@ static int ffmpeg_get_image_header(const char * filepath,
         header->w = video_dec_ctx->width;
         header->h = video_dec_ctx->height;
         header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+        header->stride = header->w * lv_color_format_get_size(header->cf);
 
         ret = 0;
     }
@@ -800,9 +808,7 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
         return;
     }
 
-    lv_cache_lock();
-    lv_cache_invalidate_by_src(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_POINTER);
-    lv_cache_unlock();
+    lv_image_cache_drop(lv_image_get_src(obj));
 
     lv_obj_invalidate(obj);
 }
@@ -839,9 +845,7 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
         player->timer = NULL;
     }
 
-    lv_cache_lock();
-    lv_cache_invalidate_by_src(lv_image_get_src(obj), LV_CACHE_SRC_TYPE_POINTER);
-    lv_cache_unlock();
+    lv_image_cache_drop(lv_image_get_src(obj));
 
     ffmpeg_close(player->ffmpeg_ctx);
     player->ffmpeg_ctx = NULL;

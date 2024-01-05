@@ -139,6 +139,25 @@ bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
     return false;
 }
 
+uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
+{
+    LV_ASSERT_NULL(obj);
+
+    uint32_t event_cnt = lv_obj_get_event_count(obj);
+    uint32_t removed_count = 0;
+    int32_t i;
+
+    for(i = event_cnt - 1; i >= 0; i--) {
+        lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
+        if(dsc && dsc->cb == event_cb && dsc->user_data == user_data) {
+            lv_obj_remove_event(obj, i);
+            removed_count ++;
+        }
+    }
+
+    return removed_count;
+}
+
 lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e)
 {
     return lv_event_get_current_target(e);

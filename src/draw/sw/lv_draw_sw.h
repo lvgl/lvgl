@@ -33,7 +33,7 @@ extern "C" {
 
 typedef struct {
     lv_draw_unit_t base_unit;
-    struct _lv_draw_task_t * task_act;
+    lv_draw_task_t * task_act;
 #if LV_USE_OS
     lv_thread_sync_t sync;
     lv_thread_t thread;
@@ -162,7 +162,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                           int32_t src_w, int32_t src_h, int32_t src_stride,
                           const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t cf, void * dest_buf);
 
-#if LV_USE_VECTOR_GRAPHIC
+#if LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_EXTERNAL || LV_USE_THORVG_INTERNAL)
 /**
  * Draw vector graphics with SW render.
  * @param draw_unit     pointer to a draw unit
@@ -177,7 +177,7 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
  * The bytes will be swapped in place.
  * @param buf_size_px   number of pixels in the buffer
  */
-void lv_draw_sw_rgb565_swap(void * buf, int32_t buf_size_px);
+void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px);
 
 /**
  * Rotate a buffer into an other buffer

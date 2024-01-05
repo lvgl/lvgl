@@ -325,7 +325,7 @@ menu "LVGL configuration"
 		endmenu
 
 		menu "GPU"
-			config LV_USE_GPU_ARM2D
+			config LV_USE_DRAW_ARM2D
 				bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors."
 				default n
 				help
@@ -356,6 +356,19 @@ menu "LVGL configuration"
 
 			config LV_USE_DRAW_PXP
 				bool "Use NXP's PXP on iMX RTxxx platforms."
+
+			config LV_USE_DRAW_VG_LITE
+				bool "Use VG-Lite GPU."
+
+			config LV_VG_LITE_USE_GPU_INIT
+				bool "Enbale VG-Lite custom external 'gpu_init()' function."
+				default n
+				depends on LV_USE_DRAW_VG_LITE
+
+			config LV_VG_LITE_USE_ASSERT
+				bool "Enable VG-Lite assert."
+				default n
+				depends on LV_USE_DRAW_VG_LITE
 
 			config LV_USE_GPU_SDL
 				bool "Use SDL renderer API"
@@ -863,15 +876,15 @@ menu "LVGL configuration"
 		config LV_USE_BAR
 			bool "Bar."
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_BTN
+		config LV_USE_BUTTON
 			bool "Button."
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_BTNMATRIX
+		config LV_USE_BUTTONMATRIX
 			bool "Button matrix."
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_CANVAS
 			bool "Canvas. Dependencies: lv_img."
-			select LV_USE_IMG
+			select LV_USE_IMAGE
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_CHECKBOX
 			bool "Check Box"
@@ -880,7 +893,7 @@ menu "LVGL configuration"
 			bool "Drop down list. Requires: lv_label."
 			select LV_USE_LABEL
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_IMG
+		config LV_USE_IMAGE
 			bool "Image. Requires: lv_label."
 			select LV_USE_LABEL
 			default y if !LV_CONF_MINIMAL
@@ -934,7 +947,7 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "Extra Widgets"
-		config LV_USE_ANIMIMG
+		config LV_USE_ANIMIMAGE
 			bool "Anim image."
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_CALENDAR
@@ -954,7 +967,7 @@ menu "LVGL configuration"
 		config LV_USE_CHART
 			bool "Chart."
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_IMGBTN
+		config LV_USE_IMAGEBUTTON
 			bool "Imgbtn."
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_OBSERVER
@@ -1017,7 +1030,7 @@ menu "LVGL configuration"
 			int "Default transition time in [ms]"
 			default 80
 			depends on LV_USE_THEME_DEFAULT
-		config LV_USE_THEME_BASIC
+		config LV_USE_THEME_SIMPLE
 			bool "A very simple theme that is a good starting point for a custom theme"
 			default y if !LV_COLOR_DEPTH_1 && !LV_CONF_MINIMAL
 		config LV_USE_THEME_MONO
@@ -1143,8 +1156,6 @@ menu "LVGL configuration"
 
 				config LV_FREETYPE_CACHE_TYPE_IMAGE
 					bool "IMAGE"
-				config LV_FREETYPE_CACHE_TYPE_SBIT
-					bool "SBIT"
 				config LV_FREETYPE_CACHE_TYPE_OUTLINE
 					bool "OUTLINE"
 			endchoice

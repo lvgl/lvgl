@@ -114,6 +114,8 @@ void canvas_blend_test(lv_obj_t  * canvas_large, lv_draw_image_dsc_t * img_dsc, 
     lv_canvas_init_layer(canvas_large, &layer);
     lv_draw_image(&layer, img_dsc, &area);
     lv_canvas_finish_layer(canvas_large, &layer);
+
+    lv_image_cache_drop(img);
 }
 
 static void canvas_draw(const char * name, lv_color_format_t large_render_cf)

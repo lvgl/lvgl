@@ -5326,7 +5326,7 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
                         LodePNGState * state,
                         const unsigned char * in, size_t insize)
 {
-    *out = 0;
+    *out = NULL;
     decodeGeneric(out, w, h, state, in, insize);
     if(state->error) return state->error;
     if(!state->decoder.color_convert || lodepng_color_mode_equal(&state->info_raw, &state->info_png.color)) {
@@ -5339,8 +5339,7 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
         }
     }
     else {   /*color conversion needed*/
-        unsigned char * data = *out;
-        size_t outsize;
+        lv_draw_buf_t * old_buf = (lv_draw_buf_t *)*out;
 
         /*TODO: check if this works according to the statement in the documentation: "The converter can convert
         from grayscale input color type, to 8-bit grayscale or grayscale with alpha"*/
@@ -5349,14 +5348,22 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
             return 56; /*unsupported color mode conversion*/
         }
 
-        outsize = lodepng_get_raw_size(*w, *h, &state->info_raw);
-        *out = (unsigned char *)lodepng_malloc(outsize);
-        if(!(*out)) {
+        lv_draw_buf_t * new_buf = lv_draw_buf_create(*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
+        if(new_buf == NULL) {
             state->error = 83; /*alloc fail*/
         }
-        else state->error = lodepng_convert(*out, data, &state->info_raw,
-                                                &state->info_png.color, *w, *h);
-        lodepng_free(data);
+        else {
+            state->error = lodepng_convert(new_buf->data, old_buf->data, 
+                                            &state->info_raw, &state->info_png.color, *w, *h);
+            
+            if (state->error) {
+                lv_draw_buf_destroy(new_buf);
+                new_buf = NULL;
+            }
+        }
+
+        *out = (unsigned char*)new_buf;
+        lv_draw_buf_destroy(old_buf);
     }
     return state->error;
 }

@@ -13,8 +13,8 @@ void lv_example_scale_5(void)
     lv_scale_set_total_tick_count(scale, 10);
     lv_scale_set_major_tick_every(scale, 5);
 
-    lv_scale_set_major_tick_length(scale, 10);
-    lv_scale_set_minor_tick_length(scale, 5);
+    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 25, 35);
 
     static const char * custom_labels[3] = {"One", "Two", NULL};
