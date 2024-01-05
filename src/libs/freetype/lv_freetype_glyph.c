@@ -124,14 +124,9 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
 
     FT_Error error;
 
-    FT_Size ft_size = lv_freetype_lookup_size(dsc);
-    if(!ft_size) {
-        return false;
-    }
-
     lv_font_glyph_dsc_t * dsc_out = &data->glyph_dsc;
 
-    FT_Face face = ft_size->face;
+    FT_Face face = dsc->cache_node->face;
     FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
     FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, data->unicode);
 
@@ -142,7 +137,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
         return false;
     }
 
-    FT_GlyphSlot glyph = ft_size->face->glyph;
+    FT_GlyphSlot glyph = face->glyph;
 
     if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
         dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->metrics.horiAdvance);
@@ -154,7 +149,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
         dsc_out->bpp = LV_VECFONT_BPP; /*Bit per pixel: 1/2/4/8*/
     }
     else if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_BITMAP) {
-        FT_Bitmap * glyph_bitmap = &ft_size->face->glyph->bitmap;
+        FT_Bitmap * glyph_bitmap = &face->glyph->bitmap;
 
         dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->advance.x);        /*Width of the glyph in [pf]*/
         dsc_out->box_h = glyph_bitmap->rows;                         /*Height of the bitmap in [px]*/
