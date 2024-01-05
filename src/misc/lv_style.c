@@ -356,7 +356,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             };
         case LV_STYLE_BG_COLOR:
             return (lv_style_value_t) {
-                .color = black
+                .color = white
             };
         case LV_STYLE_BG_GRAD_COLOR:
         case LV_STYLE_BORDER_COLOR:
@@ -367,7 +367,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_TEXT_COLOR:
         case LV_STYLE_IMAGE_RECOLOR:
             return (lv_style_value_t) {
-                .color = white
+                .color = black
             };
         case LV_STYLE_OPA:
         case LV_STYLE_OPA_LAYERED:
