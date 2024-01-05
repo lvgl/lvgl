@@ -117,7 +117,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
     d1_cacheblockflush(u->d2_handle, 0, src_buf,
-                       img_stride * decoder_dsc->header.h); //Stride is in bytes, not pixels/texels
+                       img_stride * header->h); //Stride is in bytes, not pixels/texels
 #endif
 #endif
 
@@ -125,9 +125,9 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 
         lv_point_t p1[4] = { //Points in clockwise order
             {0, 0},
-            {decoder_dsc->header.w - 1, 0},
-            {decoder_dsc->header.w - 1, decoder_dsc->header.h - 1},
-            {0, decoder_dsc->header.h - 1},
+            {header->w - 1, 0},
+            {header->w - 1, header->h - 1},
+            {0, header->h - 1},
         };
 
         d2_s32 dxu1 = D2_FIX16(1);
@@ -159,7 +159,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 
         d2_settexture(u->d2_handle, (void *)src_buf,
                       (d2_s32)(img_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB565)),
-                      decoder_dsc->header.w,  decoder_dsc->header.h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(LV_COLOR_FORMAT_RGB565));
+                      header->w,  header->h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(LV_COLOR_FORMAT_RGB565));
 
         d2_setblendmode(u->d2_handle, d2_bm_one, d2_bm_zero);
 
@@ -183,7 +183,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
         d2_settexture(u->d2_handle, (void *)(src_buf +  header->h * (header->w * lv_color_format_get_size(
                                                                          LV_COLOR_FORMAT_RGB565))),
                       (d2_s32)(img_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB565)),
-                      decoder_dsc->header.w,  decoder_dsc->header.h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(LV_COLOR_FORMAT_A8));
+                      header->w,  header->h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(LV_COLOR_FORMAT_A8));
 
         d2_renderquad(u->d2_handle,
                       (d2_point)D2_FIX4(p1[0].x),
@@ -198,7 +198,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 
         cf = LV_COLOR_FORMAT_ARGB8888;
         src_buf = p_intermediate_buf;
-        img_stride = decoder_dsc->header.w * lv_color_format_get_size(cf);
+        img_stride = header->w * lv_color_format_get_size(cf);
 
     }
 
@@ -239,14 +239,14 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 
     lv_point_t p[4] = { //Points in clockwise order
         {0, 0},
-        {decoder_dsc->header.w - 1, 0},
-        {decoder_dsc->header.w - 1, decoder_dsc->header.h - 1},
-        {0, decoder_dsc->header.h - 1},
+        {header->w - 1, 0},
+        {header->w - 1, header->h - 1},
+        {0, header->h - 1},
     };
 
     d2_settexture(u->d2_handle, (void *)src_buf,
                   (d2_s32)(img_stride / lv_color_format_get_size(cf)),
-                  decoder_dsc->header.w,  decoder_dsc->header.h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(cf));
+                  header->w,  header->h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(cf));
 
     d2_settexturemode(u->d2_handle, d2_tm_filter);
     d2_setfillmode(u->d2_handle, d2_fm_texture);
