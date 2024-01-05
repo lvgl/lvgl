@@ -119,7 +119,7 @@ typedef struct {
     uint32_t cnt;
 } lv_event_list_t;
 
-typedef struct _lv_event_t {
+struct _lv_event_t {
     void * current_target;
     void * original_target;
     lv_event_code_t code;
@@ -129,7 +129,7 @@ typedef struct _lv_event_t {
     uint8_t deleted : 1;
     uint8_t stop_processing : 1;
     uint8_t stop_bubbling : 1;
-} lv_event_t;
+};
 
 /**
  * @brief Event callback.
