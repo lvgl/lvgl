@@ -121,8 +121,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 #endif
 #endif
 
-    if (LV_COLOR_FORMAT_RGB565A8 == cf)
-    {
+    if(LV_COLOR_FORMAT_RGB565A8 == cf) {
 
         lv_point_t p1[4] = { //Points in clockwise order
             {0, 0},
@@ -140,7 +139,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
         p_intermediate_buf = lv_malloc(size);
 
         d2_framebuffer(u->d2_handle,
-                p_intermediate_buf,
+                       p_intermediate_buf,
                        (d2_s32)header->w,
                        (d2_u32)header->w,
                        (d2_u32)header->h,
@@ -153,7 +152,8 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 
         d2_settextureoperation(u->d2_handle, d2_to_replace, d2_to_copy, d2_to_copy, d2_to_copy);
 
-        d2_settexturemapping(u->d2_handle, D2_FIX4(p1[0].x), D2_FIX4(p1[0].y), D2_FIX16(0), D2_FIX16(0), dxu1, dxv1, dyu1, dyv1);
+        d2_settexturemapping(u->d2_handle, D2_FIX4(p1[0].x), D2_FIX4(p1[0].y), D2_FIX16(0), D2_FIX16(0), dxu1, dxv1, dyu1,
+                             dyv1);
         d2_settexturemode(u->d2_handle, d2_tm_filter);
         d2_setfillmode(u->d2_handle, d2_fm_texture);
 
@@ -176,11 +176,12 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 
         d2_setblendmode(u->d2_handle, d2_bm_zero, d2_bm_one); //Keep the RGB data in the intermediate buffer
 
-        d2_setalphablendmode(  u->d2_handle, d2_bm_one, d2_bm_zero ); //Write SRC alpha, i.e. A8 data
+        d2_setalphablendmode(u->d2_handle, d2_bm_one, d2_bm_zero);    //Write SRC alpha, i.e. A8 data
 
         d2_settextureoperation(u->d2_handle, d2_to_copy, d2_to_copy, d2_to_copy, d2_to_copy);
 
-        d2_settexture(u->d2_handle, (void *)(src_buf +  header->h * (header->w * lv_color_format_get_size(LV_COLOR_FORMAT_RGB565))),
+        d2_settexture(u->d2_handle, (void *)(src_buf +  header->h * (header->w * lv_color_format_get_size(
+                                                                         LV_COLOR_FORMAT_RGB565))),
                       (d2_s32)(img_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB565)),
                       decoder_dsc->header.w,  decoder_dsc->header.h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(LV_COLOR_FORMAT_A8));
 
@@ -319,8 +320,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
     d2_settextureoperation(u->d2_handle, a_texture_op, r_texture_op, g_texture_op, b_texture_op);
     d2_setblendmode(u->d2_handle, src_blend_mode, dst_blend_mode);
 
-    if (NULL != p_intermediate_buf)
-    {
+    if(NULL != p_intermediate_buf) {
         lv_free(p_intermediate_buf);
     }
 
