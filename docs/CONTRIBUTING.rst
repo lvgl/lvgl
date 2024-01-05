@@ -22,9 +22,9 @@ Ways to contribute
 -------------------
 
 - **Spread the Word**: Share your LVGL experience with friends or on social media to boost its visibility.
-- **Start the LVGL `repository <https://github.com/lvgl/lvgl>`__**
+- **Star the LVGL `repository <https://github.com/lvgl/lvgl>`__** Give us a star on GitHub! It helps a lot to LVGL more appealing for newcomers.
 - **Report a bug**: Open a `GitHub Issue <https://github.com/lvgl/lvgl/issues>`__ if something is not working.
-- **Join our `Forum <https://forum.lvgl.io/>`__**: Meet fellow developers and discuss quiestions
+- **Join our `Forum <https://forum.lvgl.io/>`__**: Meet fellow developers and discuss questions
 - **Tell your ideas**: If you miss something from LVGL we would love to hear about it in a `GitHub Issue <https://github.com/lvgl/lvgl/issues>`__
 - **Develop features**: Develop a pitch! Learn more below.
 
@@ -52,7 +52,7 @@ We are working in 8-week cycles, each cycle starting at the beginning of odd mon
 Feature Development Issue
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For each raw idea, there is a dedicated issue where it's being "shaped". Anyone can open an idea/feature request issue and anyone comment with ideas to help the shaping process.
+For each raw idea, there is a dedicated issue where it's being "shaped". Anyone can open an idea/feature request issue and anyone can help the shaping process with comments.
 
 We area using GitHub Labels to show the state of the issue:
 
