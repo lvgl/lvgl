@@ -122,7 +122,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_get_offset_y             lv_display_get_offset_y
 #define lv_disp_get_rotation             lv_display_get_rotation
 #define lv_disp_get_dpi                  lv_display_get_dpi
-#define lv_disp_set_draw_buffers         lv_display_set_draw_buffers
 #define lv_disp_set_flush_cb             lv_display_set_flush_cb
 #define lv_disp_set_color_format         lv_display_set_color_format
 #define lv_disp_get_color_format         lv_display_get_color_format

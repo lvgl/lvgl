@@ -152,6 +152,9 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
     draw_buf->data = lv_draw_buf_align(data, cf);
     draw_buf->unaligned_data = data;
     draw_buf->data_size = data_size;
+    if(draw_buf->data != draw_buf->unaligned_data) {
+        LV_LOG_WARN("Data is not aligned, ignored");
+    }
     return LV_RESULT_OK;
 }
 
