@@ -20,6 +20,7 @@ extern "C" {
 
 #include "lv_symbol_def.h"
 #include "../misc/lv_area.h"
+#include "../misc/lv_types.h"
 #include "../misc/cache/lv_cache.h"
 
 /*********************
@@ -80,7 +81,7 @@ typedef uint8_t lv_font_kerning_t;
 #endif /*DOXYGEN*/
 
 /** Describe the properties of a font*/
-typedef struct _lv_font_t {
+struct _lv_font_t {
     /** Get a glyph's descriptor from a font*/
     bool (*get_glyph_dsc)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
@@ -102,7 +103,7 @@ typedef struct _lv_font_t {
     const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
     const lv_font_t * fallback;   /**< Fallback font for missing glyph. Resolved recursively */
     void * user_data;               /**< Custom user data for font.*/
-} lv_font_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
