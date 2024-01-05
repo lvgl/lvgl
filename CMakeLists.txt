@@ -25,8 +25,8 @@ if (MSVC)
     Check out the docs to learn more about the limitations of CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS
     https://cmake.org/cmake/help/latest/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html#prop_tgt:WINDOWS_EXPORT_ALL_SYMBOLS
 
-    For all files within the library (i.e. basically all lvgl files) we need to use dllimport.
-    For all files from outsider the library (i.e. files which include lvgl headers) we need to use dllexport.
+    For all compiled sources within the library (i.e. basically all lvgl files) we need to use dllimport.
+    For all compiled sources from outside the library (i.e. files which include lvgl headers) we need to use dllexport.
     We can do this by using CMakes PUBLIC and PRIVATE keyword.
   ]]
   target_compile_definitions(lvgl
