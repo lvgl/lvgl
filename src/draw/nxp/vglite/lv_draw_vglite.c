@@ -19,7 +19,6 @@
 #include "lv_vglite_buf.h"
 #include "lv_vglite_utils.h"
 
-#include "../../../display/lv_display_private.h"
 #if LV_USE_PARALLEL_DRAW_DEBUG
     #include "../../../core/lv_global.h"
 #endif
