@@ -216,6 +216,7 @@ static void display_release_cb(lv_event_t * e)
 
         /* clear display buffer */
         if(disp->buf_1) {
+# warning "fix me"
             lv_free(disp->buf_1);
             disp->buf_1 = NULL;
         }

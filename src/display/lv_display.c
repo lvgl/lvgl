@@ -386,25 +386,20 @@ int32_t lv_display_get_dpi(const lv_display_t * disp)
  * BUFFERING
  *--------------------*/
 
-void lv_display_set_draw_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size_in_bytes,
-                                 lv_display_render_mode_t render_mode)
+void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_draw_buf_t * buf2)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
-    LV_ASSERT_MSG(buf1 == lv_draw_buf_align(buf1, disp->color_format), "buf1 must be aligned");
-    disp->buf_1.data = buf1;
-    disp->buf_1.unaligned_data = buf1;
-    disp->buf_1.data_size = buf_size_in_bytes;
+    disp->buf_1 = buf1;
+    disp->buf_2 = buf2;
+    disp->buf_act = disp->buf_1;
+}
 
-    if(buf2) {
-        LV_ASSERT_MSG(buf2 == lv_draw_buf_align(buf2, disp->color_format), "buf2 must be aligned");
-        disp->buf_2.data = buf2;
-        disp->buf_2.unaligned_data = buf2;
-        disp->buf_2.data_size = buf_size_in_bytes;
-    }
-
-    disp->buf_act = &disp->buf_1;
+void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t render_mode)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
     disp->render_mode = render_mode;
 }
 
@@ -472,7 +467,7 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
 
 bool lv_display_is_double_buffered(lv_display_t * disp)
 {
-    return disp->buf_2.data != NULL;
+    return disp->buf_2 != NULL;
 }
 
 /*---------------------
