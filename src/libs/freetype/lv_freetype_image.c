@@ -69,6 +69,10 @@ bool lv_freetype_image_font_create(lv_freetype_font_dsc_t * dsc)
         .free_cb = (lv_cache_free_cb_t)freetype_image_free_cb,
     };
 
+    if(dsc->cache_node->draw_data_cache) {
+        return true;
+    }
+
     dsc->cache_node->draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_image_cache_data_t),
                                                        LV_FREETYPE_CACHE_FT_OUTLINES, ops);
     if(dsc->cache_node->draw_data_cache == NULL || dsc->cache_node->glyph_cache == NULL) {
@@ -162,6 +166,8 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
         lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * box_w,
                   box_w);
     }
+
+    FT_Done_Glyph(glyph);
 
     return true;
 }
