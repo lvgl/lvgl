@@ -16,7 +16,10 @@
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (LV_GLOBAL_DEFAULT()->theme_mono)
+struct _my_theme_t;
+typedef struct _my_theme_t my_theme_t;
+
+#define theme_def ((my_theme_t *)(LV_GLOBAL_DEFAULT()->theme_mono))
 
 #define COLOR_FG      dark_bg ? lv_color_white() : lv_color_black()
 #define COLOR_BG      dark_bg ? lv_color_black() : lv_color_white()
@@ -195,7 +198,7 @@ void lv_theme_mono_deinit(void)
             }
         }
         lv_free(theme_def);
-        theme_def = NULL;
+        LV_GLOBAL_DEFAULT()->theme_default = NULL;
     }
 }
 
@@ -205,7 +208,7 @@ lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_mono_is_inited()) {
-        theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
+        LV_GLOBAL_DEFAULT()->theme_default = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
     my_theme_t * theme = theme_def;
