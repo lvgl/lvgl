@@ -47,7 +47,7 @@ void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * draw_dsc);
  * @param layer     pointer to a layer
  * @param dsc       pointer to an initialized `lv_draw_triangle_dsc_t` variable
  */
-void lv_draw_triangle(struct _lv_layer_t * layer, const lv_draw_triangle_dsc_t * draw_dsc);
+void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * draw_dsc);
 
 /**********************
  *      MACROS

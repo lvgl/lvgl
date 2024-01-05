@@ -126,14 +126,8 @@ _ARMABI time_t time(time_t * time)
  * Get the elapsed milliseconds since start up from perf_counter
  * @return the elapsed milliseconds
  */
-uint32_t $Sub$$lv_tick_get(void)
+uint32_t perfc_tick_get(void)
 {
-    lv_tick_state_t * state_p = &state;
-    
-    if (state_p->tick_get_cb){
-        return state_p->tick_get_cb();
-    }
-
     return (uint32_t)get_system_ms();
 }
 

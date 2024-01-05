@@ -61,12 +61,22 @@
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI_DEF 130     /*[px/inch]*/
 
+/*customize tick-get */
+#if defined(__PERF_COUNTER__) && __PERF_COUNTER__
+    #define LV_GLOBAL_INIT(__GLOBAL_PTR)                                    \
+            do {                                                            \
+                lv_global_init((lv_global_t *)(__GLOBAL_PTR));              \
+                extern uint32_t perfc_tick_get(void);                       \
+                (__GLOBAL_PTR)->tick_state.tick_get_cb = perfc_tick_get;    \
+            } while(0)
+#endif
+
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
 
 /*Align the stride of all layers and images to this bytes*/
-#define LV_DRAW_BUF_STRIDE_ALIGN                4
+#define LV_DRAW_BUF_STRIDE_ALIGN                1
 
 /*Align the start address of draw_buf addresses to this bytes*/
 #define LV_DRAW_BUF_ALIGN                       4
@@ -103,7 +113,17 @@
         #define LV_DRAW_SW_CIRCLE_CACHE_SIZE 4
     #endif
 
-    #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+    #if !defined(LV_USE_DRAW_SW_ASM) && defined(RTE_Acceleration_Arm_2D)
+        /*turn-on helium acceleration when Arm-2D and the Helium-powered device are detected */
+        #if defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
+            #define LV_USE_DRAW_SW_ASM  LV_DRAW_SW_ASM_HELIUM
+            #define LV_USE_DRAW_ARM2D   1
+        #endif
+    #endif
+
+    #ifndef LV_USE_DRAW_SW_ASM
+        #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+    #endif
 
     #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
         #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
@@ -680,6 +700,8 @@
     #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
 #endif
 
+/*1: Enable an observer pattern implementation*/
+#define LV_USE_OBSERVER 1
 
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/

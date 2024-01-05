@@ -33,7 +33,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static FT_Error lv_freetpye_face_requester(FTC_FaceID face_id,
+static FT_Error lv_freetype_face_requester(FTC_FaceID face_id,
                                            FT_Library library,
                                            FT_Pointer req_data,
                                            FT_Face * aface);
@@ -80,7 +80,7 @@ lv_result_t lv_freetype_init(uint32_t max_faces, uint32_t max_sizes, uint32_t ma
                             max_faces,
                             max_sizes,
                             max_kilobytes * 1024,
-                            lv_freetpye_face_requester,
+                            lv_freetype_face_requester,
                             NULL,
                             &ctx->cache_manager);
     if(error) {
@@ -222,7 +222,7 @@ const char * lv_freetype_get_pathname(FTC_FaceID face_id)
  *   STATIC FUNCTIONS
  **********************/
 
-static FT_Error lv_freetpye_face_requester(FTC_FaceID face_id,
+static FT_Error lv_freetype_face_requester(FTC_FaceID face_id,
                                            FT_Library library,
                                            FT_Pointer req_data,
                                            FT_Face * aface)

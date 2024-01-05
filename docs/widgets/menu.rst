@@ -1,3 +1,6 @@
+.. _lv_menu:
+
+==============
 Menu (lv_menu)
 ==============
 
@@ -7,16 +10,25 @@ Overview
 The menu widget can be used to easily create multi-level menus. It
 handles the traversal between pages automatically.
 
+.. _lv_menu_parts_and_styles:
+
 Parts and Styles
 ****************
 
-The menu widget is built from the following objects: - Main container:
-lv_menu_main_cont - Main header: lv_menu_main_header_cont - Back button:
-`lv_button </widgets/button>`__ - Back button icon: `lv_img </widgets/img>`__ -
-Main page: lv_menu_page - Sidebar container: lv_menu_sidebar_cont -
-Sidebar header: lv_menu_sidebar_header_cont - Back button:
-`lv_button </widgets/button>`__ - Back button icon: `lv_img </widgets/img>`__ -
-Sidebar page: lv_menu_page
+The menu widget is built from the following objects: 
+
+- Main container: :cpp:type:`lv_menu_main_cont`
+- Main header: :cpp:type:`lv_menu_main_header_cont`
+- Back button: :ref:`lv_button`
+- Back button icon: :ref:`lv_img`
+- Main page: :cpp:type:`lv_menu_page`
+- Sidebar container: :cpp:type:`lv_menu_sidebar_cont`
+- Sidebar header: :cpp:type:`lv_menu_sidebar_header_cont`
+- Back button: :ref:`lv_button`
+- Back button icon: :ref:`lv_img`
+- Sidebar page: :cpp:type:`lv_menu_page`
+
+.. _lv_menu_usage:
 
 Usage
 *****
@@ -84,6 +96,8 @@ menu:
 - :cpp:expr:`lv_menu_section_create(parent page)` creates a new empty section.
 - :cpp:expr:`lv_menu_separator_create(parent page)` creates a separator.
 
+.. _lv_menu_events:
+
 Events
 ******
 
@@ -105,6 +119,8 @@ See the events of the `Base object </widgets/obj>`__ too.
 
 Learn more about :ref:`events`.
 
+.. _lv_menu_keys:
+
 Keys
 ****
 
@@ -112,10 +128,14 @@ No keys are handled by the menu widget.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_menu_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/menu/index.rst
+
+.. _lv_menu_api:
 
 API
 ***

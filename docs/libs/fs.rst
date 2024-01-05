@@ -1,8 +1,10 @@
+.. _libs_filesystem:
+
 ======================
 File System Interfaces
 ======================
 
-LVGL has a :ref:`file-system` module
+LVGL has a :ref:`overview_file_system` module
 to provide an abstraction layer for various file system drivers.
 
 LVG has built in support for:
@@ -16,6 +18,8 @@ LVG has built in support for:
 You still need to provide the drivers and libraries, this extension
 provides only the bridge between FATFS, STDIO, POSIX, WIN32 and LVGL.
 
+.. _libs_filesystem_usage:
+
 Usage
 *****
 
@@ -28,11 +32,11 @@ The work directory can be set with ``LV_FS_..._PATH``. E.g.
 appended to it.
 
 Cached reading is also supported if ``LV_FS_..._CACHE_SIZE`` is set to
-not ``0`` value. :c:func:`lv_fs_read` caches this size of data to lower the
+not ``0`` value. :cpp:func:`lv_fs_read` caches this size of data to lower the
 number of actual reads from the storage.
 
 To use the memory-mapped file emulation an ``lv_fs_path_ex_t`` object must be
-created and initialized. This object can be passed to :c:func:`lv_fs_open()` as
+created and initialized. This object can be passed to :cpp:func:`lv_fs_open` as
 the file name:
 
 .. code:: c
@@ -47,6 +51,8 @@ the file name:
 
   lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, (void*)buffer, size);
   lv_fs_res_t res = lv_fs_open(&file, (const char *)&mempath, LV_FS_MODE_RD);
+
+.. _libs_filesystem_api:
 
 API
 ***

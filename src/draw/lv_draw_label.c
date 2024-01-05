@@ -399,8 +399,8 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     }
 
     uint32_t bitmap_size = lv_draw_buf_width_to_stride(g.box_w, LV_COLOR_FORMAT_A8) * g.box_h;
-    bitmap_size = (bitmap_size + 63) &
-                  (~63);   /*Round up to avoid many allocations if the next buffer is just slightly larger*/
+    /*Round up to avoid many allocations if the next buffer is just slightly larger*/
+    bitmap_size = LV_ALIGN_UP(bitmap_size, 64);
     if(dsc->_bitmap_buf_size < bitmap_size) {
         lv_draw_buf_free(dsc->_bitmap_buf_unaligned);
         dsc->_bitmap_buf_unaligned = lv_draw_buf_malloc(bitmap_size, LV_COLOR_FORMAT_A8);
@@ -410,7 +410,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     }
 
     if(g.resolved_font) {
-        dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, letter, dsc->bitmap_buf);
+        dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, &g, letter, dsc->bitmap_buf);
     }
     else {
         dsc->bitmap = NULL;
@@ -419,6 +419,12 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     if(g.bpp == LV_IMGFONT_BPP) dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE;
     else dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_A8;
 
+    dsc->g = &g;
+
     cb(draw_unit, dsc, NULL, NULL);
+
+    if(g.resolved_font && font->release_glyph) {
+        font->release_glyph(font, &g);
+    }
     LV_PROFILER_END;
 }

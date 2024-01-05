@@ -72,12 +72,19 @@ d2_s32 lv_draw_dave2d_cf_fb_get(void)
             d2_fb_mode = d2_mode_rgb565;
             break;
         case DISPLAY_IN_FORMAT_32BITS_ARGB8888: ///< ARGB8888, 32 bits
+            d2_fb_mode = d2_mode_argb8888;
+            break;
         case DISPLAY_IN_FORMAT_32BITS_RGB888: ///< RGB888,   32 bits
-        case DISPLAY_IN_FORMAT_16BITS_ARGB1555: ///< ARGB1555, 16 bits
+            d2_fb_mode = d2_mode_rgb888;
+            break;
         case  DISPLAY_IN_FORMAT_16BITS_ARGB4444: ///< ARGB4444, 16 bits
+            d2_fb_mode = d2_mode_argb4444;
+            break;
+        case DISPLAY_IN_FORMAT_16BITS_ARGB1555: ///< ARGB1555, 16 bits
         case DISPLAY_IN_FORMAT_CLUT8 : ///< CLUT8
         case DISPLAY_IN_FORMAT_CLUT4  : ///< CLUT4
         case  DISPLAY_IN_FORMAT_CLUT1  : ///< CLUT1
+            //Not supported as a FB format by Dave2D
             break;
 
         default:

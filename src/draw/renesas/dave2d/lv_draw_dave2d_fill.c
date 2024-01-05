@@ -27,7 +27,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
 #endif
 
     buffer_area = u->base_unit.target_layer->buf_area;
-    coordinates = *coords;
+    lv_area_copy(&coordinates, coords);
 
     x = 0 - u->base_unit.target_layer->buf_area.x1;
     y = 0 - u->base_unit.target_layer->buf_area.y1;
@@ -48,7 +48,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                    (d2_s32)u->base_unit.target_layer->buf_stride / lv_color_format_get_size(u->base_unit.target_layer->color_format),
                    (d2_u32)lv_area_get_width(&buffer_area),
                    (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_cf_fb_get());
+                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(u->base_unit.target_layer->color_format));
 
     if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
         float a1;
@@ -166,73 +166,122 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
             }
         }
         else {
+
+            lv_area_t arc_area;
+            lv_area_t clip_arc;
             arc_centre.x = coordinates.x1 + radius;
             arc_centre.y = coordinates.y1 + radius;
 
-            result = d2_renderwedge(u->d2_handle,
-                                    (d2_point)D2_FIX4(arc_centre.x),
-                                    (d2_point) D2_FIX4(arc_centre.y),
-                                    (d2_width) D2_FIX4(radius),
-                                    (d2_width) D2_FIX4(0),
-                                    (d2_s32) D2_FIX16(0), // 180 Degrees
-                                    (d2_s32)  D2_FIX16((int16_t) -1),
-                                    (d2_s32)  D2_FIX16((int16_t) -1),//( 270 Degrees
-                                    (d2_s32) D2_FIX16(0),
-                                    flags);
-            if(D2_OK != result) {
-                __BKPT(0);
+            arc_area.x1 = coordinates.x1;
+            arc_area.y1 = coordinates.y1;
+            arc_area.x2 = coordinates.x1 + radius;
+            arc_area.y2 = coordinates.y1 + radius;
+
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+
+                d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
+                            (d2_border)clip_arc.y2);
+
+                // d2_renderwedge internally changes the clip rectangle, only draw it if it is in side the current clip rectangle
+                result = d2_renderwedge(u->d2_handle,
+                                        (d2_point)D2_FIX4(arc_centre.x),
+                                        (d2_point) D2_FIX4(arc_centre.y),
+                                        (d2_width) D2_FIX4(radius),
+                                        (d2_width) D2_FIX4(0),
+                                        (d2_s32) D2_FIX16(0), // 180 Degrees
+                                        (d2_s32)  D2_FIX16((int16_t) -1),
+                                        (d2_s32)  D2_FIX16((int16_t) -1),//( 270 Degrees
+                                        (d2_s32) D2_FIX16(0),
+                                        flags);
+                if(D2_OK != result) {
+                    __BKPT(0);
+                }
             }
 
             arc_centre.x = coordinates.x2 - radius;
             arc_centre.y = coordinates.y1 + radius;
 
-            result = d2_renderwedge(u->d2_handle,
-                                    (d2_point)D2_FIX4(arc_centre.x),
-                                    (d2_point) D2_FIX4(arc_centre.y),
-                                    (d2_width) D2_FIX4(radius),
-                                    (d2_width) D2_FIX4(0),
-                                    (d2_s32) D2_FIX16((int16_t)1), // 270 Degrees
-                                    (d2_s32)  D2_FIX16(0),
-                                    (d2_s32)  D2_FIX16(0),// 0 degrees
-                                    (d2_s32) D2_FIX16(-1),
-                                    flags);
-            if(D2_OK != result) {
-                __BKPT(0);
+            arc_area.x1 = coordinates.x2 - radius;
+            arc_area.y1 = coordinates.y1;
+            arc_area.x2 = coordinates.x2;
+            arc_area.y2 = coordinates.y1 + radius;
+
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+                d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
+                            (d2_border)clip_arc.y2);
+
+                result = d2_renderwedge(u->d2_handle,
+                                        (d2_point)D2_FIX4(arc_centre.x),
+                                        (d2_point) D2_FIX4(arc_centre.y),
+                                        (d2_width) D2_FIX4(radius),
+                                        (d2_width) D2_FIX4(0),
+                                        (d2_s32) D2_FIX16((int16_t)1), // 270 Degrees
+                                        (d2_s32)  D2_FIX16(0),
+                                        (d2_s32)  D2_FIX16(0),// 0 degrees
+                                        (d2_s32) D2_FIX16(-1),
+                                        flags);
+                if(D2_OK != result) {
+                    __BKPT(0);
+                }
             }
 
             arc_centre.x = coordinates.x2 - radius;
             arc_centre.y = coordinates.y2 - radius;
 
-            result = d2_renderwedge(u->d2_handle,
-                                    (d2_point)D2_FIX4(arc_centre.x),
-                                    (d2_point) D2_FIX4(arc_centre.y),
-                                    (d2_width) D2_FIX4(radius),
-                                    (d2_width) D2_FIX4(0),
-                                    (d2_s32) D2_FIX16(0),// 0 degrees
-                                    (d2_s32)  D2_FIX16(1),
-                                    (d2_s32)  D2_FIX16(1),// 90 degrees
-                                    (d2_s32) D2_FIX16(0),
-                                    flags);
-            if(D2_OK != result) {
-                __BKPT(0);
+            arc_area.x1 = coordinates.x2 - radius;
+            arc_area.y1 = coordinates.y2 - radius;
+            arc_area.x2 = coordinates.x2;
+            arc_area.y2 = coordinates.y2;
+
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+                d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
+                            (d2_border)clip_arc.y2);
+
+                result = d2_renderwedge(u->d2_handle,
+                                        (d2_point)D2_FIX4(arc_centre.x),
+                                        (d2_point) D2_FIX4(arc_centre.y),
+                                        (d2_width) D2_FIX4(radius),
+                                        (d2_width) D2_FIX4(0),
+                                        (d2_s32) D2_FIX16(0),// 0 degrees
+                                        (d2_s32)  D2_FIX16(1),
+                                        (d2_s32)  D2_FIX16(1),// 90 degrees
+                                        (d2_s32) D2_FIX16(0),
+                                        flags);
+                if(D2_OK != result) {
+                    __BKPT(0);
+                }
             }
 
             arc_centre.x = coordinates.x1 + radius;
             arc_centre.y = coordinates.y2 - radius;
 
-            result = d2_renderwedge(u->d2_handle,
-                                    (d2_point)D2_FIX4(arc_centre.x),
-                                    (d2_point) D2_FIX4(arc_centre.y),
-                                    (d2_width) D2_FIX4(radius),
-                                    (d2_width) D2_FIX4(0),
-                                    (d2_s32) D2_FIX16((int16_t) -1), //90 degrees
-                                    (d2_s32)  D2_FIX16(0),
-                                    (d2_s32)  D2_FIX16(0), //180 degrees
-                                    (d2_s32) D2_FIX16(1),
-                                    flags);
-            if(D2_OK != result) {
-                __BKPT(0);
+            arc_area.x1 = coordinates.x1;
+            arc_area.y1 = coordinates.y2 - radius;
+            arc_area.x2 = coordinates.x1 + radius;
+            arc_area.y2 = coordinates.y2;
+
+            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+                d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
+                            (d2_border)clip_arc.y2);
+
+                result = d2_renderwedge(u->d2_handle,
+                                        (d2_point)D2_FIX4(arc_centre.x),
+                                        (d2_point) D2_FIX4(arc_centre.y),
+                                        (d2_width) D2_FIX4(radius),
+                                        (d2_width) D2_FIX4(0),
+                                        (d2_s32) D2_FIX16((int16_t) -1), //90 degrees
+                                        (d2_s32)  D2_FIX16(0),
+                                        (d2_s32)  D2_FIX16(0), //180 degrees
+                                        (d2_s32) D2_FIX16(1),
+                                        flags);
+                if(D2_OK != result) {
+                    __BKPT(0);
+                }
             }
+
+            /* reset the clip rectangle */
+            d2_cliprect(u->d2_handle, (d2_border)draw_area.x1, (d2_border)draw_area.y1, (d2_border)draw_area.x2,
+                        (d2_border)draw_area.y2);
 
             result = d2_renderbox(u->d2_handle,
                                   (d2_width)D2_FIX4(coordinates.x1 + radius),

@@ -134,25 +134,74 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
     }
 
     bool aa = draw_dsc->antialias;
+    bool is_rotated = draw_dsc->rotation;
 
-    int32_t y;
-    for(y = 0; y < dest_h; y++) {
+    int32_t xs_ups = 0, ys_ups = 0, ys_ups_start = 0, ys_step_256_original = 0;
+    int32_t xs_step_256 = 0, ys_step_256 = 0;
+
+    /*If scaled only make some simplification to avoid rounding errors.
+     *For example if there is a 100x100 image zoomed to 300%
+     *The destination area in X will be x1=0; x2=299
+     *When the step is calculated below it will think that stepping
+     *1/3 pixels on the original image will result in 300% zoom.
+     *However this way the last pixel will be on the 99.67 coordinate.
+     *As it's larger than 99.5 LVGL will start to mix the next coordinate
+     *which is out of the image, so will make the pixel more transparent.
+     *To avoid it in case of scale only limit the coordinates to the 0..297 range,
+     *that is to 0..(src_w-1)*zoom */
+    if(is_rotated == false) {
         int32_t xs1_ups, ys1_ups, xs2_ups, ys2_ups;
 
-        transform_point_upscaled(&tr_dsc, dest_area->x1, dest_area->y1 + y, &xs1_ups, &ys1_ups);
-        transform_point_upscaled(&tr_dsc, dest_area->x2, dest_area->y1 + y, &xs2_ups, &ys2_ups);
+        int32_t x_max = (((src_w - 1 - draw_dsc->pivot.x) * draw_dsc->scale_x) >> 8) + draw_dsc->pivot.x;
+        int32_t y_max = (((src_h - 1 - draw_dsc->pivot.y) * draw_dsc->scale_y) >> 8) + draw_dsc->pivot.y;
+
+        lv_area_t dest_area_limited;
+        dest_area_limited.x1 = dest_area->x1 > x_max ? x_max : dest_area->x1;
+        dest_area_limited.x2 = dest_area->x2 > x_max ? x_max : dest_area->x2;
+        dest_area_limited.y1 = dest_area->y1 > y_max ? y_max : dest_area->y1;
+        dest_area_limited.y2 = dest_area->y2 > y_max ? y_max : dest_area->y2;
+
+        transform_point_upscaled(&tr_dsc, dest_area_limited.x1, dest_area_limited.y1, &xs1_ups, &ys1_ups);
+        transform_point_upscaled(&tr_dsc, dest_area_limited.x2, dest_area_limited.y2, &xs2_ups, &ys2_ups);
 
         int32_t xs_diff = xs2_ups - xs1_ups;
         int32_t ys_diff = ys2_ups - ys1_ups;
-        int32_t xs_step_256 = 0;
-        int32_t ys_step_256 = 0;
+        xs_step_256 = 0;
+        ys_step_256_original = 0;
         if(dest_w > 1) {
             xs_step_256 = (256 * xs_diff) / (dest_w - 1);
-            ys_step_256 = (256 * ys_diff) / (dest_w - 1);
+        }
+        if(dest_h > 1) {
+            ys_step_256_original = (256 * ys_diff) / (dest_h - 1);
         }
 
-        int32_t xs_ups = xs1_ups + 0x80;
-        int32_t ys_ups = ys1_ups + 0x80;
+        xs_ups = xs1_ups + 0x80;
+        ys_ups_start = ys1_ups + 0x80;
+    }
+
+    int32_t y;
+    for(y = 0; y < dest_h; y++) {
+        if(is_rotated == false) {
+            ys_ups = ys_ups_start + ((ys_step_256_original * y) >> 8);
+            ys_step_256 = 0;
+        }
+        else {
+            int32_t xs1_ups, ys1_ups, xs2_ups, ys2_ups;
+            transform_point_upscaled(&tr_dsc, dest_area->x1, dest_area->y1 + y, &xs1_ups, &ys1_ups);
+            transform_point_upscaled(&tr_dsc, dest_area->x2, dest_area->y1 + y, &xs2_ups, &ys2_ups);
+
+            int32_t xs_diff = xs2_ups - xs1_ups;
+            int32_t ys_diff = ys2_ups - ys1_ups;
+            xs_step_256 = 0;
+            ys_step_256 = 0;
+            if(dest_w > 1) {
+                xs_step_256 = (256 * xs_diff) / (dest_w - 1);
+                ys_step_256 = (256 * ys_diff) / (dest_w - 1);
+            }
+
+            xs_ups = xs1_ups + 0x80;
+            ys_ups = ys1_ups + 0x80;
+        }
 
         switch(src_cf) {
             case LV_COLOR_FORMAT_XRGB8888:

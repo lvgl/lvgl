@@ -42,10 +42,11 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter, uint8_t * buf_out)
+const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, lv_font_glyph_dsc_t * g_dsc, uint32_t letter,
+                                         uint8_t * buf_out)
 {
     LV_ASSERT_NULL(font_p);
-    return font_p->get_glyph_bitmap(font_p, letter, buf_out);
+    return font_p->get_glyph_bitmap(font_p, g_dsc, letter, buf_out);
 }
 
 bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,

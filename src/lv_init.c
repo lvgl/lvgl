@@ -22,8 +22,6 @@
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
 #include "draw/lv_draw.h"
-#include "misc/lv_cache.h"
-#include "misc/lv_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
 #if LV_USE_DRAW_VGLITE
@@ -37,6 +35,9 @@
 #endif
 #if LV_USE_DRAW_SDL
     #include "draw/sdl/lv_draw_sdl.h"
+#endif
+#if LV_USE_DRAW_VG_LITE
+    #include "draw/vg_lite/lv_draw_vg_lite.h"
 #endif
 
 /*********************
@@ -63,6 +64,10 @@
 /**********************
  *      MACROS
  **********************/
+
+#ifndef LV_GLOBAL_INIT
+    #define LV_GLOBAL_INIT(__GLOBAL_PTR)    lv_global_init((lv_global_t *)(__GLOBAL_PTR))
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -132,7 +137,7 @@ void lv_init(void)
     LV_LOG_INFO("begin");
 
     /*Initialize members of static variable lv_global */
-    lv_global_init(LV_GLOBAL_DEFAULT());
+    LV_GLOBAL_INIT(LV_GLOBAL_DEFAULT());
 
     lv_mem_init();
 
@@ -192,11 +197,9 @@ void lv_init(void)
     _lv_image_decoder_init();
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
-    _lv_cache_init();
-    _lv_cache_builtin_init();
-    lv_cache_lock();
-    lv_cache_set_max_size(LV_CACHE_DEF_SIZE);
-    lv_cache_unlock();
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_init();
+#endif
 
     /*Test if the IDE has UTF-8 encoding*/
     const char * txt = "Á";
@@ -290,6 +293,10 @@ void lv_init(void)
 #  endif
 #endif
 
+#if LV_USE_TINY_TTF
+    lv_tiny_ttf_init();
+#endif
+
     lv_initialized = true;
 
     LV_LOG_TRACE("finished");
@@ -327,6 +334,10 @@ void lv_deinit(void)
     lv_freetype_uninit();
 #endif
 
+#if LV_USE_TINY_TTF
+    lv_tiny_ttf_deinit();
+#endif
+
 #if LV_USE_THEME_DEFAULT
     lv_theme_default_deinit();
 #endif
@@ -338,10 +349,6 @@ void lv_deinit(void)
 #if LV_USE_THEME_MONO
     lv_theme_mono_deinit();
 #endif
-
-    _lv_cache_builtin_deinit();
-
-    _lv_cache_deinit();
 
     _lv_image_decoder_deinit();
 
@@ -355,6 +362,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VGLITE
     lv_draw_vglite_deinit();
+#endif
+
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_deinit();
 #endif
 
 #if LV_USE_DRAW_SW

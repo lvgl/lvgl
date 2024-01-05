@@ -1,3 +1,5 @@
+.. _bmp:
+
 ===========
 BMP decoder
 ===========
@@ -16,8 +18,10 @@ sources. For example:
    lv_image_set_src(my_img, "S:path/to/picture.bmp");
 
 Note that, a file system driver needs to registered to open images from
-files. Read more about it :ref:`file-system` or just
+files. Read more about it :ref:`overview_file_system` or just
 enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
+
+.. _bmp_limitations:
 
 Limitations
 -----------
@@ -34,10 +38,14 @@ Limitations
 -  Palette is not supported.
 -  Because not the whole image is read in can not be zoomed or rotated.
 
+.. _bmp_example:
+
 Example
 -------
 
 .. include:: ../examples/libs/bmp/index.rst
+
+.. _bmp_api:
 
 API
 ---

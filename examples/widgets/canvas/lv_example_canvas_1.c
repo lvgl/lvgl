@@ -27,10 +27,10 @@ void lv_example_canvas_1(void)
     label_dsc.color = lv_palette_main(LV_PALETTE_ORANGE);
     label_dsc.text = "Some text on text canvas";
     /*Create a buffer for the canvas*/
-    static uint8_t cbuf[LV_CANVAS_BUF_SIZE(CANVAS_WIDTH, CANVAS_HEIGHT, 16, LV_DRAW_BUF_STRIDE_ALIGN)];
+    LV_DRAW_BUF_DEFINE(draw_buf_16bpp, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_RGB565);
 
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_RGB565);
+    lv_canvas_set_draw_buf(canvas, &draw_buf_16bpp);
     lv_obj_center(canvas);
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_GREY, 3), LV_OPA_COVER);
 
@@ -46,26 +46,19 @@ void lv_example_canvas_1(void)
     lv_canvas_finish_layer(canvas, &layer);
 
     /*Test the rotation. It requires another buffer where the original image is stored.
-     *So copy the current image to buffer and rotate it to the canvas*/
-    static uint8_t cbuf_tmp[LV_CANVAS_BUF_SIZE(CANVAS_WIDTH, CANVAS_HEIGHT, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
-
+     *So use previous canvas as image and rotate it to the new canvas*/
+    LV_DRAW_BUF_DEFINE(draw_buf_32bpp, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
     /*Create a canvas and initialize its palette*/
     canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    lv_canvas_set_draw_buf(canvas, &draw_buf_32bpp);
     lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
     lv_obj_center(canvas);
 
-    lv_memcpy(cbuf_tmp, cbuf, sizeof(cbuf_tmp));
-    lv_image_dsc_t img;
-    img.data = (void *)cbuf_tmp;
-    img.header.cf = LV_COLOR_FORMAT_ARGB8888;
-    img.header.w = CANVAS_WIDTH;
-    img.header.h = CANVAS_HEIGHT;
-
-    lv_canvas_finish_layer(canvas, &layer);
-
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_GREY, 1), LV_OPA_COVER);
 
+    lv_canvas_init_layer(canvas, &layer);
+    lv_image_dsc_t img;
+    lv_draw_buf_to_image(&draw_buf_16bpp, &img);
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);
     img_dsc.rotation = 120;

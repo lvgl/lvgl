@@ -28,8 +28,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_layer_t;
-
 /** Store some info to speed up drawing of very large texts
  * It takes a lot of time to get the first visible character because
  * all the previous characters needs to be checked to calculate the positions.
@@ -87,6 +85,7 @@ typedef struct {
     lv_draw_glyph_bitmap_format_t format;
     const lv_area_t * letter_coords;
     const lv_area_t * bg_coords;
+    const lv_font_glyph_dsc_t * g;
     lv_color_t color;
     lv_opa_t opa;
 } lv_draw_glyph_dsc_t;

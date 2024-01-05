@@ -12,8 +12,8 @@
 
 #define  LV_BUILD_EXAMPLES              1
 
-#define LV_USE_THEME_SIMPLE              1
-#define LV_USE_THEME_DEFAULT            0
+#define  LV_USE_THEME_SIMPLE            1
+#define  LV_USE_THEME_DEFAULT           0
 
 #define  LV_USE_LODEPNG                 1
 #define  LV_USE_BMP                     1

@@ -145,8 +145,9 @@ div.body {
 }
 
 .cpp-expr {
-  font-family: monospace;
-  background-color: #dff0ff;
-  padding: 1px;
-  border-radius: 4px;
+  font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,Courier,monospace;
+  color: #e74c3c;
+  padding: 2px 5px;
+  border: 1px solid #e1e4e5;
+  font-size: 75%;
 }

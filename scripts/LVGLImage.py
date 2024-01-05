@@ -325,8 +325,8 @@ class LVGLImageHeader:
     @property
     def binary(self) -> bytearray:
         binary = bytearray()
+        binary += uint8_t(0x19)  # magic number for lvgl version 9
         binary += uint8_t(self.cf.value)
-        binary += uint8_t(0)  # 8bits format
         binary += uint16_t(self.flags)  # 16bits flags
 
         binary += uint16_t(self.w)  # 16bits width
@@ -612,6 +612,7 @@ uint8_t {varname}_map[] = {{
 }};
 
 const lv_img_dsc_t {varname} = {{
+  .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_{self.cf.name},
   .header.flags = {flags},
   .header.w = {self.w},

@@ -32,8 +32,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_canvas_class;
 /*Data of canvas*/
 typedef struct {
     lv_image_t img;
-    lv_image_dsc_t dsc;
-    const void * buf_unaligned;
+    lv_draw_buf_t * draw_buf;
+    lv_draw_buf_t static_buf;
 } lv_canvas_t;
 
 /**********************
@@ -53,6 +53,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
 
 /**
  * Set a buffer for the canvas.
+ * Use `lv_canvas_set_draw_buf` instead if you need to set a buffer with alignment requirement.
  * @param buf a buffer where the content of the canvas will be.
  * The required size is (lv_image_color_format_get_px_size(cf) * w) / 8 * h)
  * It can be allocated with `lv_malloc()` or
@@ -63,7 +64,16 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
  * @param h height of the canvas
  * @param cf color format. `LV_COLOR_FORMAT...`
  */
-void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, int32_t w, int32_t h, lv_color_format_t cf);
+void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_color_format_t cf);
+
+/**
+ * Set a draw buffer for the canvas. A draw buffer either can be allocated by `lv_draw_buf_create()`
+ * or defined statically by `LV_DRAW_BUF_DEFINE`. When buffer start address and stride has alignment
+ * requirement, it's recommended to use `lv_draw_buf_create`.
+ * @param obj       pointer to a canvas object
+ * @param draw_buf  pointer to a draw buffer
+ */
+void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf);
 
 /**
  * Set a pixel's color and opacity
@@ -94,6 +104,8 @@ void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color32_t c);
 /*=====================
  * Getter functions
  *====================*/
+
+lv_draw_buf_t * lv_canvas_get_draw_buf(lv_obj_t * obj);
 
 /**
  * Get a pixel's color and opacity

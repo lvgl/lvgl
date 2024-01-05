@@ -127,7 +127,7 @@ struct _lv_fragment_class_t {
 /**
  * Fragment states
  */
-typedef struct _lv_fragment_managed_states_t  {
+struct _lv_fragment_managed_states_t  {
     /**
      * Class of the fragment
      */
@@ -156,7 +156,7 @@ typedef struct _lv_fragment_managed_states_t  {
      * true if this fragment is in navigation stack that can be popped
      */
     bool in_stack;
-} lv_fragment_managed_states_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES

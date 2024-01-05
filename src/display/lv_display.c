@@ -392,10 +392,19 @@ void lv_display_set_draw_buffers(lv_display_t * disp, void * buf1, void * buf2, 
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
-    disp->buf_1 = buf1;
-    disp->buf_2 = buf2;
-    disp->buf_act = buf1;
-    disp->buf_size_in_bytes = buf_size_in_bytes;
+    LV_ASSERT_MSG(buf1 == lv_draw_buf_align(buf1, disp->color_format), "buf1 must be aligned");
+    disp->buf_1.data = buf1;
+    disp->buf_1.unaligned_data = buf1;
+    disp->buf_1.data_size = buf_size_in_bytes;
+
+    if(buf2) {
+        LV_ASSERT_MSG(buf2 == lv_draw_buf_align(buf2, disp->color_format), "buf2 must be aligned");
+        disp->buf_2.data = buf2;
+        disp->buf_2.unaligned_data = buf2;
+        disp->buf_2.data_size = buf_size_in_bytes;
+    }
+
+    disp->buf_act = &disp->buf_1;
     disp->render_mode = render_mode;
 }
 
@@ -463,7 +472,7 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
 
 bool lv_display_is_double_buffered(lv_display_t * disp)
 {
-    return disp->buf_2 != NULL;
+    return disp->buf_2.data != NULL;
 }
 
 /*---------------------
@@ -543,7 +552,6 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
     /*If another screen load animation is in progress
      *make target screen loaded immediately. */
     if(d->scr_to_load && act_scr != d->scr_to_load) {
-        scr_load_internal(d->scr_to_load);
         lv_anim_delete(d->scr_to_load, NULL);
         lv_obj_set_pos(d->scr_to_load, 0, 0);
         lv_obj_remove_local_style_prop(d->scr_to_load, LV_STYLE_OPA, 0);
@@ -552,6 +560,8 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
             lv_obj_delete(act_scr);
         }
         act_scr = lv_screen_active(); /*Active screen changed.*/
+
+        scr_load_internal(d->scr_to_load);
     }
 
     d->scr_to_load = new_scr;
@@ -706,6 +716,25 @@ bool lv_display_delete_event(lv_display_t * disp, uint32_t index)
     LV_ASSERT_NULL(disp);
 
     return lv_event_remove(&disp->event_list, index);
+}
+
+uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data)
+{
+    LV_ASSERT_NULL(disp);
+
+    uint32_t event_cnt = lv_display_get_event_count(disp);
+    uint32_t removed_count = 0;
+    int32_t i;
+
+    for(i = event_cnt - 1; i >= 0; i--) {
+        lv_event_dsc_t * dsc = lv_display_get_event_dsc(disp, i);
+        if(dsc && dsc->cb == event_cb && dsc->user_data == user_data) {
+            lv_display_delete_event(disp, i);
+            removed_count ++;
+        }
+    }
+
+    return removed_count;
 }
 
 lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, void * param)

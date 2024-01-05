@@ -34,8 +34,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_obj_t;
-
 #define LV_PROPERTY_ID(clz, name, type, index)    LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << 28)
 
 #define LV_PROPERTY_ID_TYPE(id) ((id) >> 28)
@@ -100,9 +98,9 @@ typedef struct {
  * @param value     The property value to set
  * @return          return LV_RESULT_OK if success
  */
-lv_result_t lv_obj_set_property(struct _lv_obj_t * obj, const lv_property_t * value);
+lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value);
 
-lv_result_t lv_obj_set_properties(struct _lv_obj_t * obj, const lv_property_t * value, uint32_t count);
+lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, uint32_t count);
 
 /*=====================
  * Getter functions
@@ -115,7 +113,7 @@ lv_result_t lv_obj_set_properties(struct _lv_obj_t * obj, const lv_property_t * 
  * @param value     pointer to a buffer to store the value
  * @return ? to be discussed, LV_RESULT_OK or LV_RESULT_INVALID
  */
-lv_property_t lv_obj_get_property(struct _lv_obj_t * obj, lv_prop_id_t id);
+lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
 
 /**********************
  *      MACROS
