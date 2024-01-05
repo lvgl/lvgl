@@ -219,10 +219,8 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
         lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
         LV_ASSERT_MALLOC(draw_buf);
-        lv_image_header_init(&draw_buf->header, width, height, cf, stride, LV_VG_LITE_IMAGE_NO_CACHE);
+        lv_draw_buf_init(draw_buf, width, height, cf, stride, (void *)image_data, LV_VG_LITE_IMAGE_NO_CACHE);
         dsc->decoded = draw_buf;
-        draw_buf->data = (void *)image_data;
-        draw_buf->unaligned_data = (void *)image_data;
         return LV_RESULT_OK;
     }
 
