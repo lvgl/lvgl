@@ -63,23 +63,23 @@ void lv_draw_vglite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
-    lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_t clip_area;
+    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    lv_area_t rel_coords;
-    rel_coords.x1 = (int32_t)LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
-    rel_coords.y1 = (int32_t)LV_MIN3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
-    rel_coords.x2 = (int32_t)LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
-    rel_coords.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
+    lv_area_t coords;
+    coords.x1 = (int32_t)LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
+    coords.y1 = (int32_t)LV_MIN3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
+    coords.x2 = (int32_t)LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
+    coords.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
-    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
+    if(!_lv_area_intersect(&clipped_coords, &coords, &clip_area))
         return; /* Fully clipped, nothing to do */
 
-    _vglite_draw_triangle(&rel_coords, &rel_clip_area, dsc);
+    _vglite_draw_triangle(&coords, &clip_area, dsc);
 }
 
 /**********************
@@ -122,8 +122,6 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
     /* Init Color */
     lv_color32_t col32 = lv_color_to_32(dsc->bg_color, dsc->bg_opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
-
-    vglite_set_scissor(clip_area);
 
     vg_lite_linear_gradient_t gradient;
     bool has_gradient = (dsc->bg_grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE);
@@ -177,8 +175,6 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
     }
 
     vglite_run();
-
-    vglite_disable_scissor();
 
     err = vg_lite_clear_path(&path);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");

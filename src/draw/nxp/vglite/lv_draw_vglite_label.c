@@ -128,18 +128,12 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                 /* Set src_vgbuf structure. */
                 vglite_set_src_buf(mask_buf, mask_width, mask_height, mask_stride, LV_COLOR_FORMAT_A8);
 
-                /* Set scissor. */
-                vglite_set_scissor(&blend_area);
-
                 /* Set vgmatrix. */
                 vglite_set_translation_matrix(&blend_area);
 
                 lv_draw_buf_invalidate_cache((void *)mask_buf, mask_stride, LV_COLOR_FORMAT_A8, &mask_area);
 
                 _vglite_draw_letter(&mask_area, glyph_draw_dsc->color, glyph_draw_dsc->opa);
-
-                /* Disable scissor. */
-                vglite_disable_scissor();
             }
         }
         else if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE) {

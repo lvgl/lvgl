@@ -47,7 +47,7 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
  * Draw rectangle background with effects (rounded corners, gradient)
  *
  * @param[in] coords Coordinates of the rectangle background (relative to dest buff)
- * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] clip_area Clip area with relative coordinates to dest buff
  * @param[in] dsc Description of the rectangle background
  *
  */
@@ -73,24 +73,16 @@ void lv_draw_vglite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * 
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
-    lv_area_t rel_coords;
-    lv_area_copy(&rel_coords, coords);
+    lv_area_t relative_coords;
+    lv_area_copy(&relative_coords, coords);
+    lv_area_move(&relative_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    /*If the border fully covers make the bg area 1px smaller to avoid artifacts on the corners*/
-    //if(dsc->border_width > 1 && dsc->border_opa >= (lv_opa_t)LV_OPA_MAX && dsc->radius != 0) {
-    //    rel_coords.x1 += (dsc->border_side & LV_BORDER_SIDE_LEFT) ? 1 : 0;
-    //    rel_coords.y1 += (dsc->border_side & LV_BORDER_SIDE_TOP) ? 1 : 0;
-    //    rel_coords.x2 -= (dsc->border_side & LV_BORDER_SIDE_RIGHT) ? 1 : 0;
-    //    rel_coords.y2 -= (dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? 1 : 0;
-    //}
-    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
-
-    lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_t clip_area;
+    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
+    if(!_lv_area_intersect(&clipped_coords, &relative_coords, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /*
@@ -99,7 +91,7 @@ void lv_draw_vglite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * 
     if((dsc->radius == 0) && (dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE))
         _vglite_fill(&clipped_coords, dsc);
     else
-        _vglite_draw_rect(&rel_coords, &rel_clip_area, dsc);
+        _vglite_draw_rect(&relative_coords, &clip_area, dsc);
 }
 
 /**********************
@@ -189,8 +181,6 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
-    vglite_set_scissor(clip_area);
-
     vg_lite_linear_gradient_t gradient;
     bool has_gradient = (dsc->grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE);
 
@@ -243,8 +233,6 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     }
 
     vglite_run();
-
-    vglite_disable_scissor();
 
     err = vg_lite_clear_path(&path);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");

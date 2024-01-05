@@ -36,7 +36,7 @@
  *
  * @param[in] point1 Starting point with relative coordinates
  * @param[in] point2 Ending point with relative coordinates
- * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] clip_area Clip area with relative coordinates to dest buff
  * @param[in] dsc Line description structure (width, rounded ending, opacity, ...)
  *
  */
@@ -65,21 +65,21 @@ void lv_draw_vglite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * 
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
-    lv_area_t rel_clip_area;
-    rel_clip_area.x1 = LV_MIN(dsc->p1.x, dsc->p2.x) - dsc->width / 2;
-    rel_clip_area.x2 = LV_MAX(dsc->p1.x, dsc->p2.x) + dsc->width / 2;
-    rel_clip_area.y1 = LV_MIN(dsc->p1.y, dsc->p2.y) - dsc->width / 2;
-    rel_clip_area.y2 = LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width / 2;
+    lv_area_t clip_area;
+    clip_area.x1 = LV_MIN(dsc->p1.x, dsc->p2.x) - dsc->width / 2;
+    clip_area.x2 = LV_MAX(dsc->p1.x, dsc->p2.x) + dsc->width / 2;
+    clip_area.y1 = LV_MIN(dsc->p1.y, dsc->p2.y) - dsc->width / 2;
+    clip_area.y2 = LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width / 2;
 
-    if(!_lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_unit->clip_area))
+    if(!_lv_area_intersect(&clip_area, &clip_area, draw_unit->clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    lv_point_t rel_point1 = {dsc->p1.x - layer->buf_area.x1, dsc->p1.y - layer->buf_area.y1};
-    lv_point_t rel_point2 = {dsc->p2.x - layer->buf_area.x1, dsc->p2.y - layer->buf_area.y1};
+    lv_point_t point1 = {dsc->p1.x - layer->buf_area.x1, dsc->p1.y - layer->buf_area.y1};
+    lv_point_t point2 = {dsc->p2.x - layer->buf_area.x1, dsc->p2.y - layer->buf_area.y1};
 
-    _vglite_draw_line(&rel_point1, &rel_point2, &rel_clip_area, dsc);
+    _vglite_draw_line(&point1, &point2, &clip_area, dsc);
 }
 
 /**********************
@@ -140,14 +140,10 @@ static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * poin
     err = vg_lite_update_stroke(&path);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Update stroke failed.");
 
-    vglite_set_scissor(clip_area);
-
     err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vgblend, vgcol);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw line failed.");
 
     vglite_run();
-
-    vglite_disable_scissor();
 
     err = vg_lite_clear_path(&path);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");

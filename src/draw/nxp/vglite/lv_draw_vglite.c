@@ -341,14 +341,22 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 
     vglite_set_dest_buf(layer->buf, buf_width, buf_height, layer->buf_stride, layer->color_format);
 
+    lv_area_t clip_area;
+    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &t->area, draw_unit->clip_area))
+    lv_area_copy(&draw_area, &t->area);
+    lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
+    if(!_lv_area_intersect(&draw_area, &draw_area, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    /* Make area relative to the buffer */
-    lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
     /* Invalidate the drawing area */
     lv_draw_buf_invalidate_cache(layer->buf, layer->buf_stride, layer->color_format, &draw_area);
+
+    /* Set scissor area */
+    vglite_set_scissor(&clip_area);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:
@@ -378,6 +386,9 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
         default:
             break;
     }
+
+    /* Disable scissor */
+    vglite_set_scissor(&layer->buf_area);
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
     /*Layers manage it for themselves*/

@@ -77,7 +77,7 @@ typedef struct _cubic_cont_pt {
  * Draw arc shape with effects
  *
  * @param[in] center Arc center with relative coordinates
- * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] clip_area Clip area with relative coordinates to dest buff
  * @param[in] dsc Arc description structure (width, rounded ending, opacity)
  *
  */
@@ -109,13 +109,13 @@ void lv_draw_vglite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * ds
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
-    lv_point_t rel_center = {dsc->center.x - layer->buf_area.x1, dsc->center.y - layer->buf_area.y1};
+    lv_point_t center = {dsc->center.x - layer->buf_area.x1, dsc->center.y - layer->buf_area.y1};
 
-    lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_t clip_area;
+    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    _vglite_draw_arc(&rel_center, &rel_clip_area, dsc);
+    _vglite_draw_arc(&center, &clip_area, dsc);
 }
 
 /**********************
@@ -678,15 +678,11 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
-    vglite_set_scissor(clip_area);
-
     /*** Draw arc ***/
     err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw arc failed.");
 
     vglite_run();
-
-    vglite_disable_scissor();
 
     err = vg_lite_clear_path(&path);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");

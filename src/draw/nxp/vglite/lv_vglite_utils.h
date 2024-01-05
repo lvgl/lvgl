@@ -48,18 +48,12 @@ extern "C" {
  **********************/
 
 /**
- * Enable scissor and set the clipping box.
+ * Set the clipping box.
  *
  * @param[in] clip_area Clip area with relative coordinates of destination buffer
  *
  */
 static inline void vglite_set_scissor(const lv_area_t * clip_area);
-
-/**
- * Disable scissor.
- *
- */
-static inline void vglite_disable_scissor(void);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -144,12 +138,6 @@ bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf)
 static inline void vglite_set_scissor(const lv_area_t * clip_area)
 {
     vg_lite_set_scissor(clip_area->x1, clip_area->y1, clip_area->x2 + 1, clip_area->y2 + 1);
-}
-
-static inline void vglite_disable_scissor(void)
-{
-    //FIXME
-    vg_lite_set_scissor(0, 0, 720, 1280);
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

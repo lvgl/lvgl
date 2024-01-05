@@ -104,13 +104,12 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
  * By default, image is copied directly, with optional opacity.
  *
  * @param[in] dest_area Area with relative coordinates to dest buffer
- * @param[in] clip_area Clip area with relative coordinates to dest buffer
  * @param[in] src_area Source area with relative coordinates to src buffer
  * @param[in] dsc Image descriptor
  *
  */
-static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * clip_area,
-                                   const lv_area_t * src_area, const lv_draw_image_dsc_t * dsc);
+static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * src_area,
+                                   const lv_draw_image_dsc_t * dsc);
 #endif /*VGLITE_BLIT_SPLIT_ENABLED*/
 
 /**********************
@@ -134,19 +133,19 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     lv_layer_t * layer = draw_unit->target_layer;
     const lv_image_dsc_t * img_dsc = dsc->src;
 
-    lv_area_t rel_coords;
-    lv_area_copy(&rel_coords, coords);
-    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_t relative_coords;
+    lv_area_copy(&relative_coords, coords);
+    lv_area_move(&relative_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_t clip_area;
+    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     if(has_transform)
-        lv_area_copy(&blend_area, &rel_coords);
-    else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
+        lv_area_copy(&blend_area, &relative_coords);
+    else if(!_lv_area_intersect(&blend_area, &relative_coords, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
     const void * src_buf = img_dsc->data;
@@ -173,7 +172,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
                            src_buf, &src_area, src_stride, src_cf, dsc);
 #else
     if(has_transform)
-        _vglite_blit_transform(&blend_area, &rel_clip_area, &src_area, dsc);
+        _vglite_blit_transform(&blend_area, &src_area, dsc);
     else
         _vglite_blit_single(&blend_area, &src_area, dsc);
 #endif
@@ -228,17 +227,11 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
 static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area,
                                 const lv_draw_image_dsc_t * dsc)
 {
-    /* Set scissor. */
-    vglite_set_scissor(dest_area);
-
     /* Set vgmatrix. */
     vglite_set_translation_matrix(dest_area);
 
     /* Start blit. */
     _vglite_blit(src_area, dsc);
-
-    /* Disable scissor. */
-    vglite_disable_scissor();
 }
 
 #if VGLITE_BLIT_SPLIT_ENABLED
@@ -396,20 +389,14 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
     }
 }
 #else
-static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * clip_area,
-                                   const lv_area_t * src_area, const lv_draw_image_dsc_t * dsc)
+static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * src_area,
+                                   const lv_draw_image_dsc_t * dsc)
 {
-    /* Set scissor. */
-    vglite_set_scissor(clip_area);
-
     /* Set vgmatrix. */
     vglite_set_transformation_matrix(dest_area, dsc);
 
     /* Start blit. */
     _vglite_blit(src_area, dsc);
-
-    /* Disable scissor. */
-    vglite_disable_scissor();
 }
 #endif /*VGLITE_BLIT_SPLIT_ENABLED*/
 
