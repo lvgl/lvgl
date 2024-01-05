@@ -676,7 +676,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
        theme->disp_size == new_size &&
        lv_color_eq(theme->base.color_primary, color_primary) &&
        lv_color_eq(theme->base.color_secondary, color_secondary) &&
-       theme->base.flags == dark ? MODE_DARK : 0 &&
+       (theme->base.flags == dark ? MODE_DARK : 0) &&
        theme->base.font_small == font) {
         return (lv_theme_t *) theme;
 
