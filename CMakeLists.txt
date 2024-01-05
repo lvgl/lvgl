@@ -22,7 +22,7 @@ if (MSVC)
   #[[
     unfortunately CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not work for global data. 
     for global data we still need decl specs.
-    Check out the docs to lear more about the limitations of CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS
+    Check out the docs to learn more about the limitations of CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS
     https://cmake.org/cmake/help/latest/prop_tgt/WINDOWS_EXPORT_ALL_SYMBOLS.html#prop_tgt:WINDOWS_EXPORT_ALL_SYMBOLS
 
     For all files within the library (i.e. basically all lvgl files) we need to use dllimport.
