@@ -21,7 +21,7 @@
 struct _my_theme_t;
 typedef struct _my_theme_t my_theme_t;
 
-#define theme_def ((my_theme_t *)(LV_GLOBAL_DEFAULT()->theme_default))
+#define theme_def (*(my_theme_t **)(&LV_GLOBAL_DEFAULT()->theme_default))
 
 #define MODE_DARK 1
 #define RADIUS_DEFAULT _LV_DPX_CALC(theme->disp_dpi, theme->disp_size == DISP_LARGE ? 12 : 8)
@@ -661,7 +661,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
 
     if(!lv_theme_default_is_inited()) {
-        LV_GLOBAL_DEFAULT()->theme_default = lv_malloc_zeroed(sizeof(my_theme_t));
+        theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
     my_theme_t * theme = theme_def;
@@ -719,7 +719,7 @@ void lv_theme_default_deinit(void)
 
         }
         lv_free(theme_def);
-        LV_GLOBAL_DEFAULT()->theme_default = NULL;
+        theme_def = NULL;
     }
 }
 

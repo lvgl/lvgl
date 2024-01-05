@@ -20,7 +20,7 @@
 struct _my_theme_t;
 typedef struct _my_theme_t my_theme_t;
 
-#define theme_def ((my_theme_t *)(LV_GLOBAL_DEFAULT()->theme_simple))
+#define theme_def (*(my_theme_t **)(&LV_GLOBAL_DEFAULT()->theme_simple))
 
 #define COLOR_SCR     lv_palette_lighten(LV_PALETTE_GREY, 4)
 #define COLOR_WHITE   lv_color_white()
@@ -169,7 +169,7 @@ void lv_theme_simple_deinit(void)
             }
         }
         lv_free(theme_def);
-        LV_GLOBAL_DEFAULT()->theme_default = NULL;
+        theme_def = NULL;
     }
 }
 
@@ -179,7 +179,7 @@ lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_simple_is_inited()) {
-        LV_GLOBAL_DEFAULT()->theme_default  = lv_malloc_zeroed(sizeof(my_theme_t));
+        theme_def  = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
     my_theme_t * theme = theme_def;
