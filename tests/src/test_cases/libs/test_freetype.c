@@ -3,6 +3,12 @@
 
 #include "unity/unity.h"
 
+#if __WORDSIZE == 64
+    #define TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT(NAME) TEST_ASSERT_EQUAL_SCREENSHOT("libs/freetype_" NAME ".lp64.png")
+#elif __WORDSIZE == 32
+    #define TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT(NAME) TEST_ASSERT_EQUAL_SCREENSHOT("libs/freetype_" NAME ".lp32.png")
+#endif
+
 static const char * UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_CN =
     "鉴于对人类家庭所有成员的固有尊严及其平等的和不移的权利的承认，乃是世界自由、正义与和平的基础...";
 static const char * UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_EN =
@@ -76,7 +82,8 @@ void test_freetype_rendering_test(void)
     lv_label_set_text(label2, UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_JP);
     lv_obj_align_to(label2, label1, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/freetype1.png");
+    TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT("1");
+
 #else
     TEST_PASS();
 #endif
