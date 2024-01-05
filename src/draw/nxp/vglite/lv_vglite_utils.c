@@ -20,10 +20,6 @@
 
 #include "../../../core/lv_refr.h"
 
-#if VGLITE_TASK_QUEUE
-    #include "vg_lite_gpu.h"
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -62,9 +58,13 @@ bool vglite_cmd_buf_is_flushed(void)
 void vglite_run(void)
 {
 #if VGLITE_TASK_QUEUE
-    vg_lite_gpu_state_t gpu_state = vg_lite_get_gpu_state();
+    vg_lite_error_t err = VG_LITE_SUCCESS;
+    vg_lite_uint32_t gpu_idle = 0;
 
-    if(gpu_state == VG_LITE_GPU_BUSY) {
+    err = vg_lite_get_parameter(VG_LITE_GPU_IDLE_STATE, 1, (vg_lite_pointer)&gpu_idle);
+    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Get GPU idle state failed.");
+
+    if(!gpu_idle) {
         _cmd_buf_flushed = false;
 
         return;
