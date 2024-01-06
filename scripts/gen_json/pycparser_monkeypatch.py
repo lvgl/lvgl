@@ -2,11 +2,14 @@
 
 import sys
 from pycparser import c_ast  # NOQA
+from pycparser.c_generator import CGenerator
 import tempfile
 
 temp_directory = tempfile.mkdtemp(suffix='.lvgl_json')
 
 import doc_builder  # NOQA
+
+generator = CGenerator()
 
 doc_builder.EMIT_WARNINGS = False
 
@@ -68,7 +71,12 @@ STDLIB_TYPES = [
     'intptr_t',
 ]
 
-collected_types = {}
+enums = {}
+functions = {}
+structures = {}
+unions = {}
+typedefs = {}
+macros = {}
 
 
 def is_lib_c_node(n):
@@ -80,499 +88,688 @@ def is_lib_c_node(n):
 
 class ArrayDecl(c_ast.ArrayDecl):
 
-    def to_dict(self):
-        if is_lib_c_node(self):
-            return None
+    def process(self):
+        self.type.process()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def name(self):
+        return None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+        self.type.parent = self
+
+    def to_dict(self):
         if self.dim is None:
             dim = None
         else:
-            dim = self.dim.to_dict()
+            dim = generator.visit(self.dim)
 
         if isinstance(self.type, TypeDecl):
             res = self.type.to_dict()
             res['json_type'] = 'array'
-            res['is_const'] = 'const' in self.dim_quals
-            res['is_pointer'] = False
             res['dim'] = dim
             return res
 
         return {
-            'name': '',
             'type': self.type.to_dict(),
-            'is_const': 'const' in self.dim_quals,
             'dim': dim,
             'json_type': 'array'
         }
 
 
-class ArrayRef(c_ast.ArrayRef):
-
-    def to_dict(self):
-        return None
-
-
-class Assignment(c_ast.Assignment):
-
-    def to_dict(self):
-        return None
-
-
-class Alignas(c_ast.Alignas):
-
-    def to_dict(self):
-        return None
-
-
-class BinaryOp(c_ast.BinaryOp):
-
-    def to_dict(self):
-        return None
-
-
-class Break(c_ast.Break):
-
-    def to_dict(self):
-        return None
-
-
-class Case(c_ast.Case):
-
-    def to_dict(self):
-        return None
-
-
-class Cast(c_ast.Cast):
-
-    def to_dict(self):
-        return None
-
-
-class Compound(c_ast.Compound):
-
-    def to_dict(self):
-        return None
-
-
-class CompoundLiteral(c_ast.CompoundLiteral):
-
-    def to_dict(self):
-        return None
-
-
 class Constant(c_ast.Constant):
 
+    def process(self):
+        pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+        self.type.parent = self
+
     def to_dict(self):
-        return {
-            'value': self.value,
-            'type': self.type,
-            'json_type': 'constant'
-        }
+        if is_lib_c_node(self):
+            return None
+
+        return self.value
 
 
-class Continue(c_ast.Continue):
+collected_types = []
 
-    def to_dict(self):
-        return None
+forward_decls = {}
+used_forward_decl = []
 
 
 class Decl(c_ast.Decl):
 
-    def to_dict(self):
-        if is_lib_c_node(self):
-            return None
-
-        if isinstance(self.type, (Struct, Union)):
-            if (
-                not self.name and
-                not self.type.decls and
-                self.type.name and
-                self.type.name.startswith('_')
-            ):
-                return None
-
-            if not self.name and self.type.name:
-                res = self.type.to_dict()
-                res['is_pointer'] = False
-                res['is_const'] = False
-                return res
-
-        if isinstance(self.type, FuncDecl):
-            res = self.type.to_dict()
-
-            res['name'] = self.name
-            return res
-
-        if isinstance(self.type, Enum):
-            res = self.type.to_dict()
-            res['is_const'] = False
-            res['is_pointer'] = False
-
-            return res
-
-        if self.bitsize is None:
-            bitsize = {
-                "value": None,
-                "type": None,
-                "json_type": "null_type"
-            }
-        else:
-            bitsize = self.bitsize.to_dict()
-
-        if isinstance(self.type, TypeDecl):
-            res = self.type.to_dict()
-            if 'extern' in self.storage:
-                res['json_type'] = 'variable'
-
-                if 'name' in res and res['name']:
-                    docstring = get_var_docs(res['name'])
-
-                    if docstring is not None:
-                        docstring = docstring.description
-                else:
-                    docstring = None
-
-                res['docstring'] = docstring
-            else:
-                res['bitsize'] = bitsize
-
-            if 'declname' in res:
-                res['name'] = res.pop('declname')
-
-            return res
+    def process(self):
+        self.type.process()
 
         if (
-            isinstance(self.type, PtrDecl) and
-            isinstance(self.type.type, FuncDecl)
+            not isinstance(self.parent, (Struct, Union, FuncDecl)) and
+            not isinstance(self.type, (Enum, FuncDef, FuncDecl))
         ):
-            type_dict = self.type.type.to_dict()
-            type_dict['is_pointer'] = True
-            type_dict['json_type'] = 'function_pointer'
-            collected_types[type_dict['name']] = type_dict
-            return type_dict
+            name = self.name
+            t_name = self.type.name
 
-        return {
-            'name': self.name,
-            'is_const': 'const' in self.quals,
-            'is_pointer': False,
-            'type': self.type.to_dict(),
-            'bitsize': bitsize,
-            'json_type': 'decl'
-        }
+            if name is None:
+                name = t_name
 
+            if name == t_name:
+                if isinstance(self.type, (Struct, Union)):
+                    if name not in forward_decls:
+                        res = self.type.to_dict()
+                        forward_decls[name] = res
 
-class DeclList(c_ast.DeclList):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
 
-    def to_dict(self):
-        return None
+    @property
+    def parent(self):
+        return self._parent
 
-
-class Default(c_ast.Default):
-
-    def to_dict(self):
-        return None
-
-
-class DoWhile(c_ast.DoWhile):
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+        self.type.parent = self
 
     def to_dict(self):
-        return None
+        if self.name and self.name == '_silence_gcc_warning':
+            return None
+
+        if not self.name:
+            try:
+                name = self.type.name
+            except AttributeError:
+                name = None
+
+            if name:
+                if name == '_silence_gcc_warning':
+                    return None
+        else:
+            name = self.name
+
+        if isinstance(self.parent, (Struct, Union)):
+            if self.bitsize:
+                bitsize = self.bitsize.to_dict()
+            else:
+                bitsize = None
+
+            res = {
+                'name': name,
+                'json_type': 'field',
+                'type': self.type.to_dict(),
+                'bitsize': bitsize
+            }
+        elif isinstance(self.parent, FuncDecl):
+            res = {
+                'name': name,
+                'json_type': 'arg',
+                'type': self.type.to_dict()
+            }
+
+        elif isinstance(self.type, Enum):
+            res = self.type.to_dict()
+            res['name'] = name
+
+        elif isinstance(self.type, (FuncDef, FuncDecl)):
+            res = self.type.to_dict()
+            res['name'] = name
+
+        else:
+            name = self.name
+            t_name = self.type.name
+
+            if name is None:
+                name = t_name
+
+            if name == t_name:
+                if isinstance(self.type, (Struct, Union)):
+                    if name in used_forward_decl:
+                        if name in forward_decls:
+                            res = forward_decls[name]
+                            del forward_decls[name]
+                        else:
+                            res = None
+                    else:
+                        used_forward_decl.append(name)
+                        res = {
+                            'name': self.name,
+                            'json_type': 'forward_decl',
+                            'type': {
+                                'name': self.type.__class__.__name__.lower(),
+                                'json_type': 'primitive_type'
+                            }
+                        }
+
+                    return res
+            # raise RuntimeError('sanity check')
+
+            res = {
+                'name': name,
+                'json_type': str(type(self)),
+                'type': self.type.to_dict()
+            }
+
+        return res
 
 
 class EllipsisParam(c_ast.EllipsisParam):
 
+    def process(self):
+        pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
     @property
-    def name(self):
-        return 'ellipsis-param'
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
 
     def to_dict(self):
+        if is_lib_c_node(self):
+            return None
+
         return {
-            'special_type': 'ellipsis'
+            'name': '...',
+            'type': {
+                'name': 'ellipsis',
+                'json_type': 'special_type'
+            },
+            'json_type': 'arg'
         }
 
-
-class EmptyStatement(c_ast.EmptyStatement):
-
-    def to_dict(self):
-        return None
+    @property
+    def name(self):
+        return '...'
 
 
 class Enum(c_ast.Enum):
 
+    def process(self):
+        name = self.name
+        parent = self.parent
+
+        while parent is not None and name is None:
+            try:
+                name = parent.name
+            except AttributeError:
+                pass
+
+            parent = parent.parent
+
+        if name and name not in collected_types:
+            collected_types.append(name)
+
+        for item in (self.values or []):
+            item.process()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+        if self.values:
+            self.values.parent = self
+
     def to_dict(self):
 
-        if is_lib_c_node(self):
-            return None
-
-        if self.values:
-            enum_items = self.values.to_dict()
-
-        else:
-            enum_items = []
-
         if self.name:
-            docstring = get_enum_docs(self.name)
-            if docstring is not None:
-                docstring = docstring.description
+            doc_search = get_enum_docs(self.name)
+
+            if doc_search is None:
+                doctsring = None
+            else:
+                docstring = doc_search.description
+
         else:
             docstring = None
 
-        json_type = {
+        res = {
             'name': self.name,
-            'enum_items': enum_items,
+            'type': {
+                'name': 'int',
+                'json_type': 'primitive_type'
+            },
             'json_type': 'enum',
+            'members': [item.to_dict() for item in (self.values or [])],
             'docstring': docstring
         }
 
-        if self.name is not None:
-            collected_types[self.name] = json_type
-
-        return json_type
+        return res
 
 
 class Enumerator(c_ast.Enumerator):
 
-    def __init__(self, name, value, coord=None):
-        self.name = name
-        self.value = value
-        self.coord = coord
+    def process(self):
+        pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
 
     def to_dict(self):
-        if is_lib_c_node(self):
-            return None
+        parent_name = self.parent.name
+        parent = self.parent
 
-        docstring = get_enum_item_docs(self.name)
-        if docstring is not None:
-            docstring = docstring.description
+        while parent is not None and parent_name is None:
+            try:
+                parent_name = parent.name
+            except AttributeError:
+                continue
+
+            parent = parent.parent
+
+        if parent_name and parent_name.startswith('_'):
+            if parent_name[1:] in collected_types:
+                type_ = {
+                    'name': parent_name[1:],
+                    'json_type': 'lv_type'
+                }
+            elif parent_name in collected_types:
+                type_ = {
+                    'name': parent_name,
+                    'json_type': 'lv_type'
+                }
+            else:
+                type_ = {
+                    'name': 'int',
+                    'json_type': 'primitive_type'
+                }
+
+        elif parent_name and parent_name in collected_types:
+            type_ = {
+                'name': parent_name,
+                'json_type': 'lv_type'
+            }
+        else:
+            type_ = {
+                'name': 'int',
+                'json_type': 'primitive_type'
+            }
+
+        doc_search = get_enum_item_docs(self.name)
+
+        if doc_search is None:
+            docstring = None
+        else:
+            docstring = doc_search.description
 
         return {
             'name': self.name,
-            'type': {
-                'name': 'int',
-                'json_type': 'primitive'
-            },
-            'json_type': 'enum_item',
+            'type': type_,
+            'json_type': 'enum_member',
             'docstring': docstring
         }
 
 
 class EnumeratorList(c_ast.EnumeratorList):
 
+    def process(self, indent):
+        pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+
+        for item in (self.enumerators or []):
+            item.parent = value
+
     def to_dict(self):
-        if self.enumerators:
-            return [item.to_dict() for item in self.enumerators]
-        else:
-            return []
+        pass
 
 
-class ExprList(c_ast.ExprList):
+def is_type(obj, type_):
 
-    def to_dict(self):
-        return None
+    if isinstance(obj, type_):
+        return True
+
+    try:
+        return is_type(obj.type, type_)
+
+    except AttributeError:
+        return False
+
+
+found_types = {}
 
 
 class FileAST(c_ast.FileAST):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def name(self):
+        return None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+
     def to_dict(self):
-        res = []
-        for item in self:
-            json_type = item.to_dict()
-            if json_type is None:
+        if is_lib_c_node(self):
+            return None
+
+        items = []
+
+        for item in self.ext:
+            if is_lib_c_node(item):
+                continue
+            try:
+                item.parent = self
+                items.append(item)
+            except AttributeError:
+                pass
+
+        enums = []
+        functions = []
+        structures = []
+        unions = []
+        typedefs = []
+
+        for item in items:
+            item.process()
+            if is_type(item, Enum):
+                enums.append(item)
+            elif is_type(item, FuncDef):
+                functions.append(item)
+            elif is_type(item, Struct):
+                structures.append(item)
+            elif is_type(item, Union):
+                unions.append(item)
+            elif is_type(item, Typedef):
+                if item.is_struct:
+                    structures.append(item.type)
+                if item.is_union:
+                    unions.append(item.type)
+                typedefs.append(item)
+
+            # elif is_type(item, Macro):
+            #     macros = {}
+
+        used_enum_names = []
+        used_func_names = []
+        used_struct_names = []
+        used_union_names = []
+        used_typedef_names = []
+
+        res = {
+            'enums': [],
+            'functions': [],
+            'structures': [],
+            'unions': [],
+            'typedefs': []
+        }
+
+        def _file_obj(obj):
+            type_ = obj['json_type']
+            print(type_)
+            try:
+                if type_ == 'enum':
+                    if obj['name'] not in used_enum_names:
+                        used_enum_names.append(obj['name'])
+                        res['enums'].append(obj)
+            except TypeError:
+                print(obj)
+                raise
+
+            if type_ == 'function':
+                if obj['name'] not in used_func_names:
+                    used_func_names.append(obj['name'])
+                    res['functions'].append(obj)
+
+            if type_ == 'union':
+                if obj['name'] not in used_union_names:
+                    used_union_names.append(obj['name'])
+                    res['unions'].append(obj)
+
+            if type_ == 'struct':
+                if obj['name'] not in used_struct_names:
+                    used_struct_names.append(obj['name'])
+                    res['structures'].append(obj)
+
+            if type_ == 'typedef':
+                if obj['name'] not in used_typedef_names:
+                    used_typedef_names.append(obj['name'])
+                    res['typedefs'].append(obj)
+
+        for enum in enums:
+            if enum is None:
+                continue
+            enum = enum.to_dict()
+            if enum is None:
                 continue
 
-            if isinstance(json_type, list):
-                res.extend(json_type)
-            else:
-                res.append(json_type)
+            _file_obj(enum)
+
+        for struct in structures:
+            if struct is None:
+                continue
+            struct = struct.to_dict()
+            if struct is None:
+                continue
+
+            _file_obj(struct)
+
+        for union in unions:
+            if union is None:
+                continue
+            union = union.to_dict()
+            if union is None:
+                continue
+
+            _file_obj(union)
+
+        for typedef in typedefs:
+            if typedef is None:
+                continue
+
+            if typedef.is_struct:
+                s = typedef.get_struct_union()
+
+
+                if s['name'] and s['name'] not in used_struct_names:
+                    _file_obj(s)
+
+            elif typedef.is_union:
+                u = typedef.get_struct_union()
+
+                if u['name'] and u['name'] not in used_union_names:
+                    _file_obj(u)
+
+            typedef = typedef.to_dict()
+            if typedef is None:
+                continue
+
+            _file_obj(typedef)
+
+        for function in functions:
+            if function is None:
+                continue
+            function = function.to_dict()
+            if function is None:
+                continue
+
+            _file_obj(function)
 
         return res
 
 
-class For(c_ast.For):
-
-    def to_dict(self):
-        return None
-
-
-class FuncCall(c_ast.FuncCall):
-
-    def to_dict(self):
-        return None
-
-
 class FuncDecl(c_ast.FuncDecl):
 
-    def to_dict(self):
-        if is_lib_c_node(self):
-            return None
+    @property
+    def name(self):
+        type_ = self.type
+        while isinstance(type_, PtrDecl):
+            type_ = type_.type
 
-        args = []
+        try:
+            name = type_.name
+        except AttributeError:
+            name = None
+            parent = self.parent
+            while parent is not None and name is None:
+                try:
+                    name = parent.name
+                except AttributeError:
+                    pass
 
-        if isinstance(self.type, TypeDecl):
-            name = self.type.declname
-            type_dict = self.type.to_dict()
+                parent = parent.parent
 
-        elif (
-            isinstance(self.type, PtrDecl) and
-            isinstance(self.type.type, PtrDecl) and
-            isinstance(self.type.type.type, TypeDecl)
-        ):
-            type_dict = self.type.type.type.to_dict()
-            name = type_dict.pop('declname')
-            type_dict['is_pointer'] = True
-            type_dict['json_type'] = 'pointer'
+        return name
 
-            type_dict = {
-                'is_const': type_dict['is_const'],
-                'is_pointer': True,
-                'type': type_dict
-            }
-            type_dict['type']['is_const'] = False
-
-        elif (
-            isinstance(self.type, PtrDecl) and
-            isinstance(self.type.type, TypeDecl)
-        ):
-            name = self.type.type.declname
-            type_dict = self.type.to_dict()
-            type_dict['type'] = self.type.type.type.to_dict()
-        else:
-            name = ''
-            type_dict = self.type.to_dict()
-
-        if 'declname' in type_dict:
-            if type_dict['declname'] and not name:
-                name = type_dict['declname']
-
-            del type_dict['declname']
-
-        if 'name' in type_dict:
-            if type_dict['name'] and not name:
-                name = type_dict['name']
-
-            del type_dict['name']
-
-        type_dict['json_type'] = 'retval'
-
-        if name:
-            docreader = get_func_docs(name)
-            if docreader is not None:
-                docstring = docreader.description
-                ret_docstring = docreader.res_description
-                docargs = docreader.args
-
-            else:
-                ret_docstring = None
-                docstring = None
-                docargs = None
-        else:
-            docargs = None
-            docstring = None
-            ret_docstring = None
+    def process(self):
+        name = self.name
+        if name and name not in collected_types:
+            collected_types.append(name)
 
         for arg in (self.args or []):
-            if isinstance(arg, EllipsisParam) or arg.type is None:
-                arg_dict = arg.to_dict()
+            arg.process()
 
-            elif (
-                isinstance(arg.type, ArrayDecl) and
-                isinstance(arg.type.type, PtrDecl)
+        self.type.process()
 
-            ):
-                arg_dict = arg.to_dict()
-                t_dict = arg_dict['type']['type']['type']['type']
-                arg_dict['is_pointer'] = arg_dict['type']['type']['is_pointer']
-                arg_dict['type']['type'] = t_dict
-                arg_dict['type']['json_type'] = 'array'
-                del arg_dict['type']['name']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
 
-            elif (
-                isinstance(arg.type, PtrDecl) and
-                isinstance(arg.type.type, TypeDecl) and
-                isinstance(arg.type.type.type, (Struct, Union)) and
-                not arg.type.type.type.decls and
-                arg.type.type.type.name.startswith('_')
-            ):
-                t_dict = {
-                    'name': arg.type.type.type.name[1:],
-                    'json_type': 'lv_type'
-                }
+    @property
+    def parent(self):
+        return self._parent
 
-                arg_dict = arg.type.to_dict()
-                arg_dict['type'] = t_dict
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
 
-            elif (
-                isinstance(arg.type, PtrDecl) and
-                isinstance(arg.type.type, TypeDecl)
-            ):
-                arg_dict = arg.type.to_dict()
-                arg_dict['type'] = arg.type.type.type.to_dict()
+        for arg in (self.args or []):
+            arg.parent = self
 
+        self.type.parent = self
+
+    def to_dict(self):
+
+        if self.name:
+            doc_search = get_func_docs(self.name)
+
+            if doc_search is None:
+                docstring = None
             else:
-                arg_dict = arg.type.to_dict()
+                docstring = doc_search.description
+        docstring = None
 
-            arg_dict['json_type'] = 'arg'
-            arg_dict['name'] = arg.name
-
-            if 'declname' in arg_dict:
-                del arg_dict['declname']
-
-            if 'is_pointer' not in arg_dict:
-                arg_dict['is_pointer'] = False
-
-            if arg_dict['name'] and docargs is not None:
-                for darg in docargs:
-                    if darg.name != arg_dict['name']:
-                        continue
-
-                    arg_dict['docstring'] = darg.description
-                    break
-
-                else:
-                    arg_dict['docstring'] = None
-            else:
-                arg_dict['docstring'] = None
-
-            args.append(arg_dict)
-
-        type_dict['docstring'] = ret_docstring
-
-        return {
-            'name': name,
-            'args': args,
-            'type': type_dict,
+        res = {
+            'name': self.name,
+            'args': [arg.to_dict() for arg in (self.args or [])],
             'json_type': 'function',
+            'type': self.type.to_dict(),
             'docstring': docstring
         }
 
-
-found_quals = set()
+        return res
 
 
 class FuncDef(c_ast.FuncDef):
 
-    def to_dict(self):
-        if is_lib_c_node(self):
-            return None
-
-        return self.decl.to_dict()
-
-
-class Goto(c_ast.Goto):
-
-    def to_dict(self):
+    @property
+    def name(self):
         return None
 
+    def process(self):
+        self.decl.process()
 
-class ID(c_ast.ID):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+        self.decl.parent = value
 
     def to_dict(self):
-        return self.name
+        return self.decl.to_dict()
 
 
 class IdentifierType(c_ast.IdentifierType):
 
+    def process(self):
+        pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def name(self):
+        return ' '.join(self.names)
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+
     def to_dict(self):
+        if is_lib_c_node(self):
+            return None
+
         name = ' '.join(self.names)
 
         if name in BASIC_TYPES:
@@ -593,752 +790,359 @@ class IdentifierType(c_ast.IdentifierType):
         }
 
 
-class If(c_ast.If):
-
-    def to_dict(self):
-        return None
-
-
-class InitList(c_ast.InitList):
-
-    def to_dict(self):
-        return None
-
-
-class Label(c_ast.Label):
-
-    def to_dict(self):
-        return None
-
-
-class NamedInitializer(c_ast.NamedInitializer):
-
-    def to_dict(self):
-        return None
-
-
 class ParamList(c_ast.ParamList):
 
+    def process(self):
+        pass
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+        for param in (self.params or []):
+            param.parent = value
+
     def to_dict(self):
-        return [item.to_dict() for item in self]
+        pass
 
 
 class PtrDecl(c_ast.PtrDecl):
 
-    def to_dict(self):
-        if is_lib_c_node(self):
-            return None
-
-        return {
-            'is_pointer': True,
-            'is_const': 'const' in self.quals,
-            'type': self.type.to_dict(),
-            'json_type': 'ptr_decl'
-        }
-
-
-class Return(c_ast.Return):
-
-    def to_dict(self):
+    @property
+    def name(self):
         return None
 
+    def process(self):
+        self.type.process()
 
-class StaticAssert(c_ast.StaticAssert):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+        self.type.parent = self
 
     def to_dict(self):
-        return None
-
-
-class Struct(c_ast.Struct):
-
-    def to_dict(self):
-        if is_lib_c_node(self):
-            return None
-
-        if self.name:
-            docreader = get_struct_docs(self.name)
-            if docreader is not None:
-                docstring = docreader.description
-                docfields = docreader.fields
-            else:
-                docstring = None
-                docfields = None
-
-            if not self.decls:
-                if self.name[1:] in collected_types:
-                    return {
-                        'name': self.name[1:],
-                        'is_const': False,
-                        'is_pointer': False,
-                        'type': 'lv_type',
-                        'docstring': docstring
-
-                    }
-
-                return {
-                    'name': self.name,
-                    'is_const': False,
-                    'is_pointer': False,
-                    'type': 'lv_type',
-                    'docstring': docstring
-                }
-        else:
-            docfields = None
-            docstring = None
-
-        fields = []
-        for field in (self.decls or []):
-            if (
-                isinstance(field.type, PtrDecl) and
-                isinstance(field.type.type, TypeDecl)
-            ):
-                field_dict = field.type.type.to_dict()
-                field_dict['is_pointer'] = True
-                field_dict['is_const'] = (
-                    'const' in field.type.quals or field_dict['is_const']
-                )
-
-                if 'declname' in field_dict:
-                    field_dict['name'] = field_dict.pop('declname')
-
-            elif (
-                isinstance(field.type, PtrDecl) and
-                isinstance(field.type.type, PtrDecl) and
-                isinstance(field.type.type.type, TypeDecl)
-
-            ):
-                field_dict = field.type.type.type.to_dict()
-                field_dict['is_pointer'] = True
-                field_dict['json_type'] = 'pointer'
-
-                if 'declname' in field_dict:
-                    name = field_dict.pop('declname')
-                else:
-                    name = field_dict.pop('name')
-
-                if field.bitsize:
-                    bitsize = field.bitsize.to_dict()
-                else:
-                    bitsize = {
-                        "value": None,
-                        "type": None,
-                        "json_type": "null_type"
-                    }
-
-                field_dict = {
-                    'name': name,
-                    'is_pointer': True,
-                    'bitsize': bitsize,
-                    'is_const': (
-                        'const' in field.type.quals or field_dict['is_const']
-                    ),
-                    'type': field_dict,
-                }
-            else:
-                field_dict = field.to_dict()
-
-            field_dict['json_type'] = 'field'
-
-            if isinstance(field.type, ArrayDecl):
-                if 'type' in field_dict:
-                    if 'declname' in field_dict['type']:
-                        del field_dict['type']['declname']
-
-                    if 'name' in field_dict['type']:
-                        del field_dict['type']['name']
-
-            if docfields:
-                for dfield in docfields:
-                    if dfield.name != field_dict['name']:
-                        continue
-
-                    field_dict['docstring'] = dfield.description
-                    break
-                else:
-                    field_dict['docstring'] = None
-            else:
-                field_dict['docstring'] = None
-
-            fields.append(field_dict)
-
         res = {
-            'name': self.name,
-            'fields': fields,
-            'json_type': 'struct',
-            'docstring': docstring
+            'json_type': 'pointer',
+            'type': self.type.to_dict()
         }
-
-        if fields and self.name and self.name not in collected_types:
-            collected_types[self.name] = res
 
         return res
 
 
-class StructRef(c_ast.StructRef):
+class Struct(c_ast.Struct):
+
+    def process(self):
+        for decl in (self.decls or []):
+            decl.process()
+
+        name = self.name
+        parent = self.parent
+        while parent is not None and name is None:
+            name = parent.name
+            parent = parent.parent
+
+        if name and name not in collected_types:
+            collected_types.append(name)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+
+        for decl in (self.decls or []):
+            decl.parent = self
 
     def to_dict(self):
-        return None
 
+        if self.name:
+            doc_search = get_struct_docs(self.name)
 
-class Switch(c_ast.Switch):
+            if doc_search is None:
+                docstring = None
 
-    def to_dict(self):
-        return None
+            else:
+                docstring = doc_search.description
+        else:
+            docstring = None
 
+        if not self.decls:
+            res = {
+                'name': self.name,
+                'json_type': 'lv_type',
+            }
+        else:
+            res = {
+                'name': self.name,
+                'json_type': 'struct',
+                'fields': [field.to_dict() for field in self.decls],
+                'docstring': docstring
+            }
 
-class TernaryOp(c_ast.TernaryOp):
-
-    def to_dict(self):
-        return None
+        return res
 
 
 class TypeDecl(c_ast.TypeDecl):
 
-    def to_dict(self):
-        if is_lib_c_node(self):
-            return None
+    @property
+    def name(self):
+        return self.declname
 
-        if isinstance(self.type, (Struct, Union)):
-            if self.declname and not self.type.name:
-                res = self.type.to_dict()
+    def process(self):
+        self.type.process()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        parent = value
+
+        while parent is not None:
+            try:
+                if parent.declname == self.declname:
+                    break
+            except AttributeError:
+                pass
+
+            try:
+                if parent.name == self.declname:
+                    break
+            except AttributeError:
+                pass
+
+            parent = parent.parent
+
+        if parent is None:
+            self._parent = value
+
+            self.type.parent = self
+        else:
+            self.type.parent = parent
+
+    def to_dict(self):
+        if self.parent is None:
+            res = self.type.to_dict()
+            if self.declname is not None and not self.type.name:
                 res['name'] = self.declname
 
-                if isinstance(self.type, Struct):
-                    t_docs = get_struct_docs(self.declname)
-                else:
-                    t_docs = get_union_docs(self.declname)
+        elif isinstance(self.type, (Union, Struct)):
+            res = self.type.to_dict()
 
-                if t_docs:
-                    res['docstring'] = t_docs.description
-                    fdocs = t_docs.fields
-                else:
-                    res['docstring'] = None
-                    fdocs = None
-
-                for field in res['fields']:
-                    if 'name' in field and field['name'] and fdocs:
-                        for fdoc in fdocs:
-                            if fdoc.name != field['name']:
-                                continue
-
-                            field['docstring'] = fdoc.description
-                            break
-                        else:
-                            field['docstring'] = None
-                    else:
-                        field['docstring'] = None
-
-                if self.type.decls and self.declname not in collected_types:
-                    collected_types[self.declname] = res
-
-                return res
-
-            if (
-                self.type.name and
-                not self.type.decls and
-                self.type.name.startswith('_')
-            ):
-                type_dict = self.type.to_dict()
-
-                if 'fields' not in type_dict:
-                    return type_dict
-
-                type_dict['name'] = self.type.name[1:]
-                type_dict['json_type'] = 'lv_type'
-
-                del type_dict['fields']
-
-                res = {
-                    'name': self.declname,
-                    'is_const': 'const' in self.quals,
-                    'is_pointer': False,
-                    'type': type_dict,
-                    'json_type': 'type_decl1'
-                }
-
-                return res
-
-        res = {
-            'declname': self.declname,
-            'is_const': 'const' in self.quals,
-            'is_pointer': False,
-            'type': self.type.to_dict(),
-            'json_type': 'type_decl2'
-        }
+            if not self.type.name and self.declname:
+                res['name'] = self.declname
+        else:
+            res = {
+                'name': self.declname,
+                'json_type': str(type(self)),
+                'type': self.type.to_dict()
+            }
 
         return res
 
 
 class Typedef(c_ast.Typedef):
 
+    def process(self):
+        self.type.process()
+
+        if self.name and self.name not in collected_types:
+            collected_types.append(self.name)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+
+        self.type.parent = self
+
+    @property
+    def is_struct(self):
+        return isinstance(self.type, TypeDecl) and isinstance(self.type.type, Struct)
+
+    @property
+    def is_union(self):
+        return isinstance(self.type, TypeDecl) and isinstance(self.type.type, Union)
+
+    def get_struct_union(self):
+        res = self.type.type.to_dict()
+        if not self.type.type.name and self.type.name:
+            res['name'] = self.type.name
+        elif not self.type.type.name:
+            res['name'] = self.name
+
+        return res
+
     def to_dict(self):
-        if is_lib_c_node(self):
-            return None
+        doc_search = get_typedef_docs(self.name)
 
-        if (
-            isinstance(self.type, TypeDecl) and
-            isinstance(self.type.type, (Struct, Union))
-        ):
-            # if not self.type.type.name and self.type.type.decls:
-            #     if isinstance(self.type.type, Struct):
-            #         t_docs = get_struct_docs(self.name)
-            #     else:
-            #         t_docs = get_union_docs(self.name)
-            #
-            #     if t_docs:
-            #         docstring = t_docs.description
-            #         fdocs = t_docs.fields
-            #     else:
-            #         docstring = None
-            #         fdocs = None
-            # else:
-            #     docstring = None
-            #     fdocs = None
+        if doc_search is None:
+            docstring = None
+        else:
+            docstring = doc_search.description
 
-            res1 = self.type.to_dict()
-
-            # if docstring is None:
-            #     t_docs = get_typedef_docs(self.name)
-            #     if t_docs:
-            #         docstring = t_docs.description
-            #     else:
-            #         docstring = None
-            #
-            # if 'docstring' not in res1 or not res1['docstring']:
-            #     res1['docstring'] = docstring
-
-            # for field in res1['fields']:
-            #     if 'name' in field and field['name'] and fdocs:
-            #         for fdoc in fdocs:
-            #             if fdoc.name != field['name']:
-            #                 continue
-            #
-            #             field['docstring'] = fdoc.description
-            #             break
-            #         else:
-            #             field['docstring'] = None
-            #
-            #     else:
-            #         field['docstring'] = None
-
-            if self.type.declname:
-                res1['name'] = self.type.declname
-            elif self.name:
-                res1['name'] = self.name
-
-                collected_types[self.name] = res1
-                return res1
-
-            res2 = {
+        if isinstance(self.type, TypeDecl) and isinstance(self.type.type, (Struct, Union)):
+            res = {
                 'name': self.name,
-                'is_const': 'const' in self.quals,
-                'is_pointer': False,
+                'json_type': 'typedef',
                 'type': {
-                    'name': res1['name'],
+                    'name': self.type.name,
                     'json_type': 'lv_type'
                 },
-                'json_type': 'typedef'
+                'docstring': docstring
             }
-
-            collected_types[self.name] = res2
-
-            if self.type.type.decls:
-                if res1['name'] not in collected_types:
-                    collected_types[res1['name']] = res1
-                return [res1, res2]
-
-            return res2
-
-        if (
-            self.name and
-            isinstance(self.type, TypeDecl)
-        ):
-            if (
-                self.name and
-                self.type.declname
-            ):
-                if self.name == self.type.declname:
-                    res = self.type.to_dict()
-                    res['is_pointer'] = False
-
-                    if 'declname' in res:
-                        del res['declname']
-
-                    res['name'] = self.name
-                    res['json_type'] = 'typedef'
-
-                    col_name = f'_{res["name"]}'
-
-                    if res['name'] and col_name in collected_types:
-                        if collected_types[col_name]['json_type'] == 'enum':
-                            for enum_item in collected_types[col_name]['enum_items']:
-                                enum_item['type']['name'] = res['name']
-                                enum_item['type']['json_type'] = 'lv_type'
-
-                    collected_types[res['name']] = res
-
-                    t_docs = get_typedef_docs(self.name)
-                    if t_docs:
-                        docstring = t_docs.description
-                    else:
-                        docstring = None
-
-                    if 'docstring' not in res or not res['docstring']:
-                        res['docstring'] = docstring
-
-                    return res
-                else:
-                    res1 = self.type.to_dict()
-                    res1['is_pointer'] = False
-                    if 'declname' in res1:
-                        res1['name'] = res1['declname']
-                        del res1['declname']
-
-                    collected_types[res1['name']] = res1
-
-                    t_docs = get_typedef_docs(self.name)
-                    if t_docs:
-                        docstring = t_docs.description
-                    else:
-                        docstring = None
-
-                    if 'docstring' not in res1 or not res1['docstring']:
-                        res1['docstring'] = docstring
-
-                    res1['json_type'] = 'typedecl'
-
-                    res2 = {
-                        'name': self.name,
-                        'type': {
-                            'name': self.type.declname,
-                            'json_type': 'lv_type'
-                        },
-                        'is_pointer': False,
-                        'is_const': False,
-                        'json_type': 'typedef'
-                    }
-                    collected_types[res2['name']] = res2
-
-                    return [res1, res2]
-        if (
-            isinstance(self.type, PtrDecl) and
-            isinstance(self.type.type, TypeDecl)
-        ):
-            if (
-                self.name and
-                self.type.type.declname
-            ):
-                if self.name == self.type.type.declname:
-                    res = self.type.type.to_dict()
-                    res['is_pointer'] = True
-                    del res['declname']
-                    res['name'] = self.name
-                    res['json_type'] = 'typedef'
-
-                    collected_types[res['name']] = res
-
-                    t_docs = get_typedef_docs(self.name)
-                    if t_docs:
-                        docstring = t_docs.description
-                    else:
-                        docstring = None
-
-                    if 'docstring' not in res or not res['docstring']:
-                        res['docstring'] = docstring
-
-                    return res
-                else:
-                    res1 = self.type.type.to_dict()
-                    res1['is_pointer'] = True
-                    res1['name'] = res1['declname']
-                    del res1['declname']
-                    res1['json_type'] = 'typedecl'
-
-                    collected_types[res1['name']] = res1
-
-                    t_docs = get_typedef_docs(self.name)
-                    if t_docs:
-                        docstring = t_docs.description
-                    else:
-                        docstring = None
-
-                    if 'docstring' not in res1 or not res1['docstring']:
-                        res1['docstring'] = docstring
-
-                    res2 = {
-                        'name': self.name,
-                        'type': {
-                            'name': self.type.type.declname,
-                            'json_type': 'lv_type'
-                        },
-                        'is_pointer': False,
-                        'is_const': False,
-                        'json_type': 'typedef'
-                    }
-
-                    collected_types[res2['name']] = res2
-
-                    return [res1, res2]
-
-        if (
-            isinstance(self.type, PtrDecl) and
-            isinstance(self.type.type, FuncDecl)
-        ):
-            res = self.type.type.to_dict()
-            res['is_pointer'] = True
-            res['is_const'] = 'const' in self.quals
-            res['json_type'] = 'function_pointer'
-
-            collected_types[res['name']] = res
-
-            t_docs = get_typedef_docs(self.name)
-            if t_docs:
-                docstring = t_docs.description
-            else:
-                docstring = None
-
-            if 'docstring' not in res or not res['docstring']:
-                res['docstring'] = docstring
-
-            return res
-
-        t_docs = get_typedef_docs(self.name)
-        if t_docs:
-            docstring = t_docs.description
         else:
-            docstring = None
-
-        res = {
-            'name': self.name,
-            'is_const': 'const' in self.quals,
-            'is_pointer': False,
-            'type': self.type.to_dict(),
-            'json_type': 'typedef',
-            'docstring': docstring
-        }
-
-        col_name = f'_{res["name"]}'
-
-        if res['name'] and col_name in collected_types:
-            if collected_types[col_name]['json_type'] == 'enum':
-                for enum_item in collected_types[col_name]['enum_items']:
-                    enum_item['type']['name'] = res['name']
-                    enum_item['type']['json_type'] = 'lv_type'
-
-        if self.name:
-            collected_types[self.name] = res
-
+            res = {
+                'name': self.name,
+                'json_type': 'typedef',
+                'type': self.type.to_dict(),
+                'docstring': docstring
+            }
         return res
 
 
 class Typename(c_ast.Typename):
 
-    def to_dict(self):
-        if is_lib_c_node(self):
-            return None
+    def process(self):
+        self.type.process()
 
-        for item in (self.quals or []):
-            found_quals.add(item)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
 
-        return {
-            'name': self.name,
-            'is_const': 'const' in self.quals,
-            'type': self.type.to_dict(),
-            'json_type': 'typename'
-        }
+    @property
+    def parent(self):
+        return self._parent
 
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
 
-class UnaryOp(c_ast.UnaryOp):
-
-    def to_dict(self):
-        return None
-
-
-class Union(c_ast.Union):
+        self.type.parent = self
 
     def to_dict(self):
-        if is_lib_c_node(self):
-            return None
+        if not self.name and isinstance(self.type, IdentifierType):
+            res = self.type.to_dict()
 
-        if self.name:
-            docreader = get_union_docs(self.name)
-            if docreader is not None:
-                docstring = docreader.description
-                docfields = docreader.fields
-            else:
-                docstring = None
-                docfields = None
-
-            if not self.decls:
-                if self.name[1:] in collected_types:
-                    return {
-                        'name': self.name[1:],
-                        'type': 'lv_type',
-                        'docstring': docstring
-
-                    }
-
-                return {
-                    'name': self.name,
-                    'type': 'lv_type',
-                    'docstring': docstring
-                }
+        elif isinstance(self.parent, FuncDecl):
+            res = {
+                'name': self.name,
+                'json_type': 'arg',
+                'type': self.type.to_dict()
+            }
         else:
-            docfields = None
-            docstring = None
-
-        fields = []
-        for field in (self.decls or []):
-            if (
-                isinstance(field.type, PtrDecl) and
-                isinstance(field.type.type, TypeDecl)
-            ):
-                field_dict = field.type.type.to_dict()
-                field_dict['is_pointer'] = True
-                field_dict['is_const'] = (
-                    'const' in field.type.quals or field_dict['is_const']
-                )
-
-                if 'declname' in field_dict:
-                    field_dict['name'] = field_dict.pop('declname')
-
-            elif (
-                isinstance(field.type, PtrDecl) and
-                isinstance(field.type.type, PtrDecl) and
-                isinstance(field.type.type.type, TypeDecl)
-
-            ):
-                field_dict = field.type.type.type.to_dict()
-                field_dict['is_pointer'] = True
-                field_dict['json_type'] = 'pointer'
-
-                if 'declname' in field_dict:
-                    name = field_dict.pop('declname')
-                else:
-                    name = field_dict.pop('name')
-
-                if field.bitsize:
-                    bitsize = field.bitsize.to_dict()
-                else:
-                    bitsize = {
-                        "value": None,
-                        "type": None,
-                        "json_type": "null_type"
-                    }
-
-                field_dict = {
-                    'name': name,
-                    'is_pointer': True,
-                    'bitsize': bitsize,
-                    'is_const': (
-                        'const' in field.type.quals or field_dict['is_const']
-                    ),
-                    'type': field_dict,
-                }
-            else:
-                field_dict = field.to_dict()
-
-            field_dict['json_type'] = 'field'
-
-            if isinstance(field.type, ArrayDecl):
-                if 'type' in field_dict:
-                    if 'declname' in field_dict['type']:
-                        del field_dict['type']['declname']
-
-                    if 'name' in field_dict['type']:
-                        del field_dict['type']['name']
-
-            if 'name' in field_dict and field_dict['name'] and docfields:
-                for dfield in docfields:
-                    if dfield.name != field_dict['name']:
-                        continue
-
-                    field_dict['docstring'] = dfield.description
-                    break
-                else:
-                    field_dict['docstring'] = None
-            else:
-                field_dict['docstring'] = None
-
-            fields.append(field_dict)
-
-        res = {
-            'name': self.name,
-            'fields': fields,
-            'json_type': 'union',
-            'docstring': docstring
-        }
-
-        if fields and self.name and self.name not in collected_types:
-            collected_types[self.name] = res
+            res = {
+                'name': self.name,
+                'json_type': str(type(self)),
+                'type': self.type.to_dict()
+            }
 
         return res
 
 
-class While(c_ast.While):
+class Union(c_ast.Union):
+
+    def process(self):
+        for field in (self.decls or []):
+            field.process()
+
+        name = self.name
+        parent = self.parent
+        while parent is not None and name is None:
+            try:
+                name = parent.name
+            except AttributeError:
+                pass
+
+            parent = parent.parent
+
+        if name and name not in collected_types:
+            collected_types.append(name)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+
+        for decl in (self.decls or []):
+            decl.parent = self
 
     def to_dict(self):
-        return None
+        if not self.decls:
+            res = {
+                'name': self.name,
+                'json_type': 'lv_type',
+            }
+        else:
+            res = {
+                'name': self.name,
+                'json_type': 'struct',
+                'fields': [field.to_dict() for field in self.decls]
+            }
 
-
-class Pragma(c_ast.Pragma):
-
-    def to_dict(self):
-        return None
+        return res
 
 
 for cls in (
     ArrayDecl,
-    ArrayRef,
-    Assignment,
-    Alignas,
-    BinaryOp,
-    Break,
-    Case,
-    Cast,
-    Compound,
-    CompoundLiteral,
     Constant,
-    Continue,
     Decl,
-    DeclList,
-    Default,
-    DoWhile,
     EllipsisParam,
-    EmptyStatement,
     Enum,
     Enumerator,
     EnumeratorList,
-    ExprList,
     EnumeratorList,
-    ExprList,
     FileAST,
-    For,
-    FuncCall,
     FuncDecl,
     FuncDef,
-    Goto,
-    ID,
     IdentifierType,
-    If,
-    InitList,
-    Label,
-    NamedInitializer,
     ParamList,
     PtrDecl,
-    Return,
-    StaticAssert,
     Struct,
-    StructRef,
-    Switch,
-    TernaryOp,
     TypeDecl,
     Typedef,
     Typename,
-    UnaryOp,
-    Union,
-    While,
-    Pragma
+    Union
 ):
     cls_name = cls.__name__
     setattr(getattr(sys.modules['pycparser.c_parser'], 'c_ast'), cls_name, cls)
