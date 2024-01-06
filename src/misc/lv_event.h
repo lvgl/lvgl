@@ -25,9 +25,8 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_event_t;
 
-typedef void (*lv_event_cb_t)(struct _lv_event_t * e);
+typedef void (*lv_event_cb_t)(lv_event_t * e);
 
 typedef struct {
     lv_event_cb_t cb;
@@ -120,17 +119,17 @@ typedef struct {
     uint32_t cnt;
 } lv_event_list_t;
 
-typedef struct _lv_event_t {
+struct _lv_event_t {
     void * current_target;
     void * original_target;
     lv_event_code_t code;
     void * user_data;
     void * param;
-    struct _lv_event_t * prev;
+    lv_event_t * prev;
     uint8_t deleted : 1;
     uint8_t stop_processing : 1;
     uint8_t stop_bubbling : 1;
-} lv_event_t;
+};
 
 /**
  * @brief Event callback.

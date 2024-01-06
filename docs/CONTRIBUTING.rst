@@ -85,6 +85,8 @@ Workflow
 9. If a pitch is not taken by anyone in the next cool-down phase, it will be closed as stale.
 
 
+.. _contributing_pull_request:
+
 Pull request
 ------------
 
@@ -121,7 +123,7 @@ same way for the other repositories.
    "Fork" button in the top right corner. It will "copy" the ``lvgl``
    repository to your GitHub account (``https://github.com/<YOUR_NAME>?tab=repositories``)
 2. Clone your forked repository.
-3. Add your changes. You can create a *feature branch* from *master* for the updates: ``git checkout -b the-new-feature``
+3. Add your changes. You can create a *feature branch* from *master* for the updates: ``git checkout -b <the-new-feature-branch-name>``
 4. Commit and push your changes to the forked ``lvgl`` repository.
 5. Create a PR on GitHub from the page of your ``lvgl`` repository (``https://github.com/<YOUR_NAME>/lvgl``) by
    clicking the *"New pull request"* button. Don't forget to select the branch where you added your changes.
@@ -130,6 +132,8 @@ same way for the other repositories.
 7. Describe what is in the update. An example code is welcome if applicable.
 8. If you need to make more changes, just update your forked ``lvgl`` repo with new commits.
    They will automatically appear in the PR.
+
+.. _contributing_commit_message_format:
 
 Commit message format
 ~~~~~~~~~~~~~~~~~~~~~
@@ -166,7 +170,7 @@ commit. It's usually one word and can be chosen freely. For example
 
 - use the imperative, present tense: "change" not "changed" nor "changes"
 - don't capitalize the first letter
-- no dot (.) at the end
+- no dot (``.``) at the end
 - max 90 characters
 
 ``<body>`` optional and can be used to describe the details of this
@@ -189,6 +193,8 @@ Some examples:
    The span widget allows mixing different font sizes, colors and styles.
    It's similar to HTML <span>
 - docs(porting): fix typo
+
+.. _contributing_dco:
 
 Developer Certification of Origin (DCO)
 ---------------------------------------
@@ -254,4 +260,3 @@ Use GPL licensed code
 
 The GPL license is not compatible with the MIT license. Therefore, LVGL
 can not accept GPL licensed code.
-

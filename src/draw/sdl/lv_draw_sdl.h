@@ -33,7 +33,7 @@ extern "C" {
 
 typedef struct {
     lv_draw_unit_t base_unit;
-    struct _lv_draw_task_t * task_act;
+    lv_draw_task_t * task_act;
     uint32_t texture_cache_data_type;
     lv_cache_t * texture_cache;
 } lv_draw_sdl_unit_t;

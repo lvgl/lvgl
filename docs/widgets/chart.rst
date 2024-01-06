@@ -1,3 +1,6 @@
+.. _lv_chart:
+
+================
 Chart (lv_chart)
 ================
 
@@ -11,6 +14,8 @@ charts are supported.
 Charts can have: - division lines - 2 y axis - axis ticks and texts on
 ticks - cursors - scrolling and zooming
 
+.. _lv_chart_parts_and_styles:
+
 Parts and Styles
 ****************
 
@@ -20,7 +25,7 @@ Parts and Styles
    charts ``pad_column`` sets the space between the columns of the
    adjacent indices.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar used if the chart is zoomed. See
-   the `Base object </widgets/obj>`__\ 's documentation for details.
+   the :ref:`Base object <lv_obj>`\ 's documentation for details.
 -  :cpp:enumerator:`LV_PART_ITEMS` Refers to the line or bar series.
 
    -  Line chart: The *line* properties are used by the lines.
@@ -36,6 +41,8 @@ Parts and Styles
    ``width``, ``height``, ``bg_color`` and ``radius`` are used to set
    the appearance of points.
 
+.. _lv_chart_usage:
+
 Usage
 *****
 
@@ -44,8 +51,8 @@ Chart type
 
 The following data display types exist:
 
-- :cpp:enumerator:`LV_CHART_TYPE_NONE`:  Do not display any data. Can be used to hide the series.
-- :cpp:enumerator:`LV_CHART_TYPE_LINE`:  Draw lines between the data points and/or points (rectangles or circles) on the data points.
+- :cpp:enumerator:`LV_CHART_TYPE_NONE`: Do not display any data. Can be used to hide the series.
+- :cpp:enumerator:`LV_CHART_TYPE_LINE`: Draw lines between the data points and/or points (rectangles or circles) on the data points.
 - :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw bars.
 - :cpp:enumerator:`LV_CHART_TYPE_SCATTER`: X/Y chart drawing point's and lines between the points. .
 
@@ -60,10 +67,10 @@ You can add any number of series to the charts by
 :cpp:struct:`lv_chart_series_t` structure which contains the chosen ``color`` and
 an array for the data points. ``axis`` can have the following values:
 
-- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_Y` Left axis
-- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_Y` Right axis
-- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_X` Bottom axis
-- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_X` Top axis
+- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_Y`: Left axis
+- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_Y`: Right axis
+- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_X`: Bottom axis
+- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_X`: Top axis
 
 ``axis`` tells which axis's range should be used to scale the values.
 
@@ -166,7 +173,7 @@ Note that :cpp:enumerator:`LV_CHART_UPDATE_MODE_SHIFT` also changes the
 Tick marks and labels
 ---------------------
 
-With the help of </widgets/scale>`__ vertical and horizontal scales can be added in a very flexible way.
+With the help of `Scale </widgets/scale>`__, vertical and horizontal scales can be added in a very flexible way.
 See the example below to learn more.
 
 Zoom
@@ -195,6 +202,8 @@ point.
 the cursor at a point. If the point's position changes (new value or
 scrolling) the cursor will move with the point.
 
+.. _lv_chart_events:
+
 Events
 ******
 
@@ -202,9 +211,11 @@ Events
    :cpp:expr:`lv_chart_get_pressed_point(chart)` returns the zero-based index of
    the pressed point.
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_chart_keys:
 
 Keys
 ****
@@ -213,10 +224,14 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_chart_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/chart/index.rst
+
+.. _lv_chart_api:
 
 API
 ***

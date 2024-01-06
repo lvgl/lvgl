@@ -17,6 +17,7 @@ extern "C" {
 
 #include <stdbool.h>
 
+#include "../misc/lv_types.h"
 #include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 #include "../draw/sw/lv_draw_sw.h"
@@ -48,13 +49,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_display_t;
-struct _lv_group_t;
-struct _my_theme_t;
-struct _lv_indev_t;
-struct _lv_event_t;
-struct _lv_obj_t;
-
 #if LV_USE_SPAN != 0
 struct _snippet_stack;
 #endif
@@ -68,8 +62,8 @@ typedef struct _lv_global_t {
     bool deinit_in_progress;     /**< Can be used e.g. in the LV_EVENT_DELETE to deinit the drivers too */
 
     lv_ll_t disp_ll;
-    struct _lv_display_t * disp_refresh;
-    struct _lv_display_t * disp_default;
+    lv_display_t * disp_refresh;
+    lv_display_t * disp_default;
 
     lv_ll_t style_trans_ll;
     bool style_refresh;
@@ -78,11 +72,11 @@ typedef struct _lv_global_t {
     uint8_t * style_custom_prop_flag_lookup_table;
 
     lv_ll_t group_ll;
-    struct _lv_group_t * group_default;
+    lv_group_t * group_default;
 
     lv_ll_t indev_ll;
-    struct _lv_indev_t * indev_active;
-    struct _lv_obj_t * indev_obj_active;
+    lv_indev_t * indev_active;
+    lv_obj_t * indev_obj_active;
 
     uint32_t layout_count;
     lv_layout_dsc_t * layout_list;
@@ -92,7 +86,7 @@ typedef struct _lv_global_t {
     uint32_t math_rand_seed;
     lv_area_transform_cache_t area_trans_cache;
 
-    struct _lv_event_t * event_header;
+    lv_event_t * event_header;
     uint32_t event_last_register_id;
 
     lv_timer_state_t timer_state;
@@ -125,15 +119,15 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_THEME_SIMPLE
-    struct _my_theme_t * theme_simple;
+    void * theme_simple;
 #endif
 
 #if LV_USE_THEME_DEFAULT
-    struct _my_theme_t * theme_default;
+    void * theme_default;
 #endif
 
 #if LV_USE_THEME_MONO
-    struct _my_theme_t * theme_mono;
+    void * theme_mono;
 #endif
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN

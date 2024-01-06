@@ -32,8 +32,6 @@ typedef struct {
     int32_t radius;
 } lv_draw_mask_rect_dsc_t;
 
-struct _lv_layer_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -49,7 +47,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * 
  * @param layer     pointer to a layer
  * @param dsc       pointer to a draw descriptor
  */
-void lv_draw_mask_rect(struct _lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
+void lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
 
 /**********************
  *      MACROS

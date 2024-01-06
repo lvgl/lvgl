@@ -541,7 +541,7 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(draw_buf);
 
-    const void * ptr = draw_buf->data;
+    const uint8_t * ptr = draw_buf->data;
     int32_t width = draw_buf->header.w;
     int32_t height = draw_buf->header.h;
     vg_lite_buffer_format_t format = lv_vg_lite_vg_fmt(draw_buf->header.cf);
@@ -552,6 +552,11 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     width = lv_vg_lite_width_align(width);
 
     lv_vg_lite_buffer_init(buffer, ptr, width, height, format, false);
+
+    /* Alpha image need to be multiplied by color */
+    if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(draw_buf->header.cf)) {
+        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    }
 }
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)

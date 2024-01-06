@@ -604,7 +604,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     }
     else if(code == LV_EVENT_KEY) {
-        char c = *((char *)lv_event_get_param(e));
+        uint32_t c = lv_event_get_key(e);
 
         int16_t old_value = arc->value;
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -955,7 +955,7 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise
     /* Distance between background start and end angles is less than tolerance,
      * consider the click inside the arc */
     else if(((smaller_angle - tolerance_deg) <= 0) &&
-            (360 - (bigger_angle + (smaller_angle - tolerance_deg)))) {
+            (360 - (bigger_angle + (smaller_angle - tolerance_deg))) != 0) {
 
         arc->min_close = 1;
         arc->in_out = CLICK_INSIDE_BG_ANGLES;

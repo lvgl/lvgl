@@ -1,3 +1,5 @@
+.. _style_properties:
+
 ================
 Style properties
 ================
@@ -1847,7 +1849,7 @@ bg_grad
 ~~~~~~~
 
 Set the gradient definition. The pointed instance must exist while the
-object is alive. NULL to disable. It wraps :cpp:enumerator:`BG_GRAD_COLOR`,
+object is alive. ``NULL`` to disable. It wraps :cpp:enumerator:`BG_GRAD_COLOR`,
 :cpp:enumerator:`BG_GRAD_DIR`, :cpp:enumerator:`BG_MAIN_STOP` and :cpp:enumerator:`BG_GRAD_STOP` into one
 descriptor and allows creating gradients with more colors too.
 
@@ -2744,7 +2746,7 @@ Properties to describe the shadow drawn under the rectangles.
 shadow_width
 ~~~~~~~~~~~~
 
-Set the width of the shadow in pixels. The value should be >= 0.
+Set the width of the shadow in pixels. The value should be ``>= 0``.
 
 .. raw:: html
 

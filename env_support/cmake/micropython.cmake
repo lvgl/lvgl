@@ -13,6 +13,6 @@ target_sources(lvgl_interface INTERFACE ${SOURCES})
 # /home/test/build/lv_micropython/ports/rp2/build-PICO/lv_mp.c:29316:16: error:
 # 'lv_style_transition_dsc_t_path_xcb_callback' defined but not used
 # [-Werror=unused-function] 29316 | STATIC int32_t
-# lv_style_transition_dsc_t_path_xcb_callback(const struct _lv_anim_t * arg0) |
+# lv_style_transition_dsc_t_path_xcb_callback(const lv_anim_t * arg0) |
 # ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 target_compile_options(lvgl_interface INTERFACE -Wno-unused-function)

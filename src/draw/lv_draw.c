@@ -169,7 +169,7 @@ void lv_draw_dispatch(void)
     LV_PROFILER_END;
 }
 
-bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
+bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
 {
     LV_PROFILER_BEGIN;
     /*Remove the finished tasks first*/

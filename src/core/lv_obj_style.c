@@ -151,7 +151,7 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ANY);
 }
 
-bool lv_obj_replace_style(struct _lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style,
+bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style,
                           lv_style_selector_t selector)
 {
     lv_state_t state = lv_obj_style_get_selector_state(selector);
@@ -250,7 +250,7 @@ void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_sele
     }
 }
 
-void lv_obj_remove_style_all(struct _lv_obj_t * obj)
+void lv_obj_remove_style_all(lv_obj_t * obj)
 {
     lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
 }
@@ -629,7 +629,7 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_start(&a);
 }
 
-lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt)
+lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_t part, const char * txt)
 {
     lv_text_align_t align = lv_obj_get_style_text_align(obj, part);
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, part);

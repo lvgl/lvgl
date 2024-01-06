@@ -476,7 +476,7 @@ def obj_style_get(p):
   if 'section' in p: return
 
   cast = style_get_cast(p['style_type'], p['var_type'])
-  print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const struct _lv_obj_t * obj, uint32_t part)")
+  print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const lv_obj_t * obj, uint32_t part)")
   print("{")
   print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
   print("    return " + cast + "v." + p['style_type'] + ";")
@@ -484,7 +484,7 @@ def obj_style_get(p):
   print("")
 
   if 'filtered' in p and p['filtered']:
-    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const struct _lv_obj_t * obj, uint32_t part)")
+    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const lv_obj_t * obj, uint32_t part)")
     print("{")
     print("    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
     print("    return " + cast + "v." + p['style_type'] + ";")
@@ -528,7 +528,7 @@ def local_style_set_c(p):
 
   cast = style_set_cast(p['style_type'])
   print("")
-  print("void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
+  print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
   print("{")
   print("    lv_style_value_t v = {")
   print("        ." + p['style_type'] +" = " + cast + "value")
@@ -539,7 +539,7 @@ def local_style_set_c(p):
 
 def local_style_set_h(p):
   if 'section' in p: return
-  print("void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector);")
+  print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector);")
 
 
 def style_const_set(p):

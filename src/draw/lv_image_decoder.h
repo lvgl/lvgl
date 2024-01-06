@@ -47,8 +47,7 @@ typedef uint8_t lv_image_src_t;
 
 /*Decoder function definitions*/
 struct _lv_image_decoder_dsc_t;
-struct _lv_image_decoder_t;
-struct _lv_cache_entry_t;
+typedef struct _lv_image_decoder_dsc_t lv_image_decoder_dsc_t;
 
 /**
  * Image decoder args.
@@ -73,7 +72,7 @@ typedef struct _lv_image_decoder_args_t {
  * @param header store the info here
  * @return LV_RESULT_OK: info written correctly; LV_RESULT_INVALID: failed
  */
-typedef lv_result_t (*lv_image_decoder_info_f_t)(struct _lv_image_decoder_t * decoder, const void * src,
+typedef lv_result_t (*lv_image_decoder_info_f_t)(lv_image_decoder_t * decoder, const void * src,
                                                  lv_image_header_t * header);
 
 /**
@@ -82,8 +81,8 @@ typedef lv_result_t (*lv_image_decoder_info_f_t)(struct _lv_image_decoder_t * de
  * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
  * @param args arguments of how to decode the image. see `lv_image_decoder_args_t`.
  */
-typedef lv_result_t (*lv_image_decoder_open_f_t)(struct _lv_image_decoder_t * decoder,
-                                                 struct _lv_image_decoder_dsc_t * dsc,
+typedef lv_result_t (*lv_image_decoder_open_f_t)(lv_image_decoder_t * decoder,
+                                                 lv_image_decoder_dsc_t * dsc,
                                                  const lv_image_decoder_args_t * args);
 
 /**
@@ -97,8 +96,8 @@ typedef lv_result_t (*lv_image_decoder_open_f_t)(struct _lv_image_decoder_t * de
  * @param buf a buffer to store the decoded pixels
  * @return LV_RESULT_OK: ok; LV_RESULT_INVALID: failed
  */
-typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(struct _lv_image_decoder_t * decoder,
-                                                      struct _lv_image_decoder_dsc_t * dsc,
+typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(lv_image_decoder_t * decoder,
+                                                      lv_image_decoder_dsc_t * dsc,
                                                       const lv_area_t * full_area, lv_area_t * decoded_area);
 
 /**
@@ -106,9 +105,9 @@ typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(struct _lv_image_decoder_t
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor
  */
-typedef void (*lv_image_decoder_close_f_t)(struct _lv_image_decoder_t * decoder, struct _lv_image_decoder_dsc_t * dsc);
+typedef void (*lv_image_decoder_close_f_t)(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
-typedef struct _lv_image_decoder_t {
+struct _lv_image_decoder_t {
     lv_image_decoder_info_f_t info_cb;
     lv_image_decoder_open_f_t open_cb;
     lv_image_decoder_get_area_cb_t get_area_cb;
@@ -116,7 +115,7 @@ typedef struct _lv_image_decoder_t {
 
     lv_cache_free_cb_t cache_free_cb;
     void * user_data;
-} lv_image_decoder_t;
+};
 
 typedef struct _lv_image_decoder_cache_data_t {
     lv_cache_slot_size_t slot;
@@ -130,7 +129,7 @@ typedef struct _lv_image_decoder_cache_data_t {
 } lv_image_cache_data_t;
 
 /**Describe an image decoding session. Stores data about the decoding*/
-typedef struct _lv_image_decoder_dsc_t {
+struct _lv_image_decoder_dsc_t {
     /**The decoder which was able to open the image source*/
     lv_image_decoder_t * decoder;
 
@@ -168,7 +167,7 @@ typedef struct _lv_image_decoder_dsc_t {
 
     /**Store any custom data here is required*/
     void * user_data;
-} lv_image_decoder_dsc_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES

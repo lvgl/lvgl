@@ -1,3 +1,5 @@
+.. _animations:
+
 ==========
 Animations
 ==========
@@ -15,6 +17,8 @@ The *animator* functions have the following prototype:
 This prototype is compatible with the majority of the property *set*
 functions in LVGL. For example :cpp:expr:`lv_obj_set_x(obj, value)` or
 :cpp:expr:`lv_obj_set_width(obj, value)`
+
+.. _animations_create:
 
 Create an animation
 *******************
@@ -89,6 +93,8 @@ same time. For example, animate the x and y coordinates with
 exist with a given variable and function pair and :cpp:func:`lv_anim_start`
 will remove any existing animations for such a pair.
 
+.. _animations_path:
+
 Animation path
 **************
 
@@ -107,6 +113,8 @@ the following built-in path functions:
 -  :cpp:func:`lv_anim_path_bounce`: bounce back a little from the end value (like
    hitting a wall)
 
+.. _animations_speed_vs_time:
+
 Speed vs time
 *************
 
@@ -120,11 +128,15 @@ For example, :cpp:expr:`lv_anim_speed_to_time(20, 0, 100)` will yield 5000
 milliseconds. For example, in the case of :cpp:func:`lv_obj_set_x` *unit* is
 pixels so *20* means *20 px/sec* speed.
 
+.. _animations_delete:
+
 Delete animations
 *****************
 
 You can delete an animation with :cpp:expr:`lv_anim_delete(var, func)` if you
 provide the animated variable and its animator function.
+
+.. _animations_timeline:
 
 Timeline
 ********
@@ -168,10 +180,14 @@ anim timeline before deleting the object. Otherwise, the program may crash or be
 
 .. image:: /misc/anim-timeline.png
 
+.. _animations_example:
+
 Examples
 ********
 
 .. include:: ../examples/anim/index.rst
+
+.. _animations_api:
 
 API
 ***

@@ -1,3 +1,5 @@
+.. _overview_image:
+
 ======
 Images
 ======
@@ -13,6 +15,8 @@ You can store images in two places
 - as a variable in internal memory (RAM or ROM)
 - as a file
 
+.. _overview_image_variables:
+
 Variables
 ---------
 
@@ -21,7 +25,7 @@ Images stored internally in a variable are composed mainly of an
 
 - **header**:
 
-  - *cf*: Color format. See `below <#color-format>`__
+  - *cf*: Color format. See :ref:`below <overview_image_color_formats>`
   - *w*: width in pixels (<= 2048)
   - *h*: height in pixels (<= 2048)
   - *always zero*: 3 bits which need to be always zero
@@ -32,6 +36,8 @@ Images stored internally in a variable are composed mainly of an
 These are usually stored within a project as C files. They are linked
 into the resulting executable like any other constant data.
 
+.. _overview_image_files:
+
 Files
 -----
 
@@ -41,12 +47,14 @@ registered in LVGL to make file operations. You can add an interface to
 a standard file system (FAT32 on SD card) or you create your simple file
 system to read data from an SPI Flash memory. In every case, a *Drive*
 is just an abstraction to read and/or write data to memory. See the
-`File system </overview/file-system>`__ section to learn more.
+:ref:`File system <overview_file_system>` section to learn more.
 
 Images stored as files are not linked into the resulting executable, and
 must be read into RAM before being drawn. As a result, they are not as
 resource-friendly as images linked at compile time. However, they are
 easier to replace without needing to rebuild the main program.
+
+.. _overview_image_color_formats:
 
 Color formats
 *************
@@ -79,7 +87,7 @@ The bytes of :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` images are stored in the f
     - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
 
 You can store images in a *Raw* format to indicate that it's not encoded
-with one of the built-in color formats and an external `Image decoder <#image-decoder>`__
+with one of the built-in color formats and an external :ref:`Image decoder <overview_image_decoder>`
 needs to be used to decode the image.
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
@@ -103,9 +111,9 @@ Adding an image to LVGL via the online converter is easy.
 
 1. You need to select a *BMP*, *PNG* or *JPG* image first.
 2. Give the image a name that will be used within LVGL.
-3. Select the `Color format <#color-formats>`__.
+3. Select the :ref:`Color format <overview_image_color_formats>`.
 4. Select the type of image you want. Choosing a binary will generate a
-   ``.bin`` file that must be stored separately and read using the `file support <#files>`__.
+   ``.bin`` file that must be stored separately and read using the :ref:`file support <overview_image_files>`.
    Choosing a variable will generate a standard C file that can be linked into your project.
 5. Hit the *Convert* button. Once the conversion is finished, your
    browser will automatically download the resulting file.
@@ -143,13 +151,13 @@ variable to display it using LVGL. For example:
    };
 
 Another (possibly simpler) option to create and display an image at
-run-time is to use the `Canvas </widgets/canvas>`__ object.
+run-time is to use the :ref:`Canvas <lv_canvas>` object.
 
 Use images
 ----------
 
 The simplest way to use an image in LVGL is to display it with an
-`lv_image </widgets/img>`__ object:
+:ref:`lv_image` object:
 
 .. code:: c
 
@@ -165,10 +173,12 @@ If the image was converted with the online converter, you should use
 :cpp:expr:`LV_IMAGE_DECLARE(my_icon_dsc)` to declare the image in the file where
 you want to use it.
 
+.. _overview_image_decoder:
+
 Image decoder
 *************
 
-As you can see in the `Color formats <#color-formats>`__ section, LVGL
+As you can see in the :ref:`overview_image_color_formats` section, LVGL
 supports several built-in image formats. In many cases, these will be
 all you need. LVGL doesn't directly support, however, generic image
 formats like PNG or JPG.
@@ -217,7 +227,7 @@ a fully opaque image, using an alpha channel.
 
 After decoding, the *raw* formats are considered *True color* by the
 library. In other words, the image decoder must decode the *Raw* images
-to *True color* according to the format described in the `Color formats <#color-formats>`__ section.
+to *True color* according to the format described in the :ref:`overview_image_color_formats` section.
 
 
 Register an image decoder
@@ -244,7 +254,7 @@ open/close the PNG files. It should look like this:
     * @param header    image information is set in header parameter
     * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
     */
-   static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+   static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
    {
      /*Check whether the type `src` is known by the decoder*/
      if(is_png(src) == false) return LV_RESULT_INVALID;
@@ -436,7 +446,7 @@ See the detailed code below:
     ...
   }
 
-.. _image-caching:
+.. _overview_image_caching:
 
 Image caching
 *************
@@ -575,6 +585,8 @@ following code to replace the LVGL built-in cache manager:
     lv_cache_set_manager(&my_manager);
     lv_cache_unlock();
    }
+
+.. _overview_image_api:
 
 API
 ***
