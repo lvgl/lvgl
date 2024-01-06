@@ -53,7 +53,7 @@ they will be used in pressed state instead of the released images.
 States
 ------
 
-Instead of the regular :cpp:func:`lv_obj_add_state`and :cpp:func:`lv_obj_remove_state` functions, 
+Instead of the regular :cpp:func:`lv_obj_add_state` and :cpp:func:`lv_obj_remove_state` functions, 
 the :cpp:expr:`lv_imagebutton_set_state(imagebutton, LV_IMAGEBUTTON_STATE_...)` function should be
 used to manually set a state.
 

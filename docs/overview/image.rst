@@ -15,6 +15,8 @@ You can store images in two places
 - as a variable in internal memory (RAM or ROM)
 - as a file
 
+.. _overview_image_variables:
+
 Variables
 ---------
 
@@ -23,7 +25,7 @@ Images stored internally in a variable are composed mainly of an
 
 - **header**:
 
-  - *cf*: Color format. See `below <#color-format>`__
+  - *cf*: Color format. See :ref:`below <overview_image_color_formats>`
   - *w*: width in pixels (<= 2048)
   - *h*: height in pixels (<= 2048)
   - *always zero*: 3 bits which need to be always zero
@@ -33,6 +35,8 @@ Images stored internally in a variable are composed mainly of an
 
 These are usually stored within a project as C files. They are linked
 into the resulting executable like any other constant data.
+
+.. _overview_image_files:
 
 Files
 -----
@@ -107,9 +111,9 @@ Adding an image to LVGL via the online converter is easy.
 
 1. You need to select a *BMP*, *PNG* or *JPG* image first.
 2. Give the image a name that will be used within LVGL.
-3. Select the `Color format <#color-formats>`__.
+3. Select the :ref:`Color format <overview_image_color_formats>`.
 4. Select the type of image you want. Choosing a binary will generate a
-   ``.bin`` file that must be stored separately and read using the `file support <#files>`__.
+   ``.bin`` file that must be stored separately and read using the :ref:`file support <overview_image_files>`.
    Choosing a variable will generate a standard C file that can be linked into your project.
 5. Hit the *Convert* button. Once the conversion is finished, your
    browser will automatically download the resulting file.
@@ -174,7 +178,7 @@ you want to use it.
 Image decoder
 *************
 
-As you can see in the `Color formats <#color-formats>`__ section, LVGL
+As you can see in the :ref:`overview_image_color_formats` section, LVGL
 supports several built-in image formats. In many cases, these will be
 all you need. LVGL doesn't directly support, however, generic image
 formats like PNG or JPG.
@@ -223,7 +227,7 @@ a fully opaque image, using an alpha channel.
 
 After decoding, the *raw* formats are considered *True color* by the
 library. In other words, the image decoder must decode the *Raw* images
-to *True color* according to the format described in the `Color formats <#color-formats>`__ section.
+to *True color* according to the format described in the :ref:`overview_image_color_formats` section.
 
 
 Register an image decoder
