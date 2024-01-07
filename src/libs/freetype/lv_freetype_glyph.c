@@ -9,10 +9,11 @@
 
 #include "lv_freetype_private.h"
 
+#if LV_USE_FREETYPE
+
 /*********************
  *      DEFINES
  *********************/
-#if LV_USE_FREETYPE
 
 #define LV_FREETYPE_GLYPH_DSC_CACHE_SIZE (LV_FREETYPE_CACHE_FT_OUTLINES * 2)
 /**********************
@@ -28,8 +29,6 @@ typedef struct _lv_freetype_glyph_cache_data_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
-                                      uint32_t unicode_letter_next);
 
 static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void * user_data);
 static void freetype_glyph_free_cb(lv_freetype_glyph_cache_data_t * data, void * user_data);
@@ -46,10 +45,8 @@ static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-lv_cache_t * lv_freetype_glyph_cache_create(lv_freetype_font_dsc_t * dsc)
+lv_cache_t * lv_freetype_glyph_cache_create(void)
 {
-    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-
     lv_cache_ops_t ops = {
         .create_cb = (lv_cache_create_cb_t)freetype_glyph_create_cb,
         .free_cb = (lv_cache_free_cb_t)freetype_glyph_free_cb,
@@ -66,17 +63,11 @@ lv_cache_t * lv_freetype_glyph_cache_create(lv_freetype_font_dsc_t * dsc)
         return NULL;
     }
 
-    dsc->font.get_glyph_dsc = freetype_get_glyph_dsc_cb;
     return cache;
 }
 
-void lv_freetype_glyph_cache_delete(lv_cache_t * cache)
-{
-    lv_cache_destroy(cache, NULL);
-}
-
-static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
-                                      uint32_t unicode_letter_next)
+bool lv_freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
+                                  uint32_t unicode_letter_next)
 {
     LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(g_dsc);
@@ -99,7 +90,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
         .size = dsc->size,
     };
 
-    lv_cache_t * glyph_cache = lv_freetype_get_glyph_cache(dsc);
+    lv_cache_t * glyph_cache = dsc->cache_node->glyph_cache;
 
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(glyph_cache, &search_key, dsc);
     if(entry == NULL) {
@@ -133,14 +124,9 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
 
     FT_Error error;
 
-    FT_Size ft_size = lv_freetype_lookup_size(dsc);
-    if(!ft_size) {
-        return false;
-    }
-
     lv_font_glyph_dsc_t * dsc_out = &data->glyph_dsc;
 
-    FT_Face face = ft_size->face;
+    FT_Face face = dsc->cache_node->face;
     FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
     FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, data->unicode);
 
@@ -151,27 +137,29 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
         return false;
     }
 
-    FT_GlyphSlot glyph = ft_size->face->glyph;
+    FT_GlyphSlot glyph = face->glyph;
 
-#if LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_OUTLINE
-    dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->metrics.horiAdvance);
-    dsc_out->box_h = FT_F26DOT6_TO_INT(glyph->metrics.height);          /*Height of the bitmap in [px]*/
-    dsc_out->box_w = FT_F26DOT6_TO_INT(glyph->metrics.width);           /*Width of the bitmap in [px]*/
-    dsc_out->ofs_x = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingX);    /*X offset of the bitmap in [pf]*/
-    dsc_out->ofs_y = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingY -
-                                       glyph->metrics.height);          /*Y offset of the bitmap measured from the as line*/
-#elif LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_BITMAP
-    FT_Bitmap * glyph_bitmap = &ft_size->face->glyph->bitmap;
+    if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
+        dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->metrics.horiAdvance);
+        dsc_out->box_h = FT_F26DOT6_TO_INT(glyph->metrics.height);          /*Height of the bitmap in [px]*/
+        dsc_out->box_w = FT_F26DOT6_TO_INT(glyph->metrics.width);           /*Width of the bitmap in [px]*/
+        dsc_out->ofs_x = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingX);    /*X offset of the bitmap in [pf]*/
+        dsc_out->ofs_y = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingY -
+                                           glyph->metrics.height);          /*Y offset of the bitmap measured from the as line*/
+        dsc_out->bpp = LV_VECFONT_BPP; /*Bit per pixel: 1/2/4/8*/
+    }
+    else if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_BITMAP) {
+        FT_Bitmap * glyph_bitmap = &face->glyph->bitmap;
 
-    dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->advance.x);        /*Width of the glyph in [pf]*/
-    dsc_out->box_h = glyph_bitmap->rows;                         /*Height of the bitmap in [px]*/
-    dsc_out->box_w = glyph_bitmap->width;                        /*Width of the bitmap in [px]*/
-    dsc_out->ofs_x = glyph->bitmap_left;                         /*X offset of the bitmap in [pf]*/
-    dsc_out->ofs_y = glyph->bitmap_top -
-                     dsc_out->box_h;                             /*Y offset of the bitmap measured from the as line*/
-#endif
+        dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->advance.x);        /*Width of the glyph in [pf]*/
+        dsc_out->box_h = glyph_bitmap->rows;                         /*Height of the bitmap in [px]*/
+        dsc_out->box_w = glyph_bitmap->width;                        /*Width of the bitmap in [px]*/
+        dsc_out->ofs_x = glyph->bitmap_left;                         /*X offset of the bitmap in [pf]*/
+        dsc_out->ofs_y = glyph->bitmap_top -
+                         dsc_out->box_h;                             /*Y offset of the bitmap measured from the as line*/
+        dsc_out->bpp = 8; /*Bit per pixel: 1/2/4/8*/
+    }
 
-    dsc_out->bpp = 8; /*Bit per pixel: 1/2/4/8*/
     dsc_out->is_placeholder = glyph_index == 0;
     dsc_out->glyph_index = glyph_index;
 
@@ -193,4 +181,5 @@ static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_
     }
     return 0;
 }
-#endif
+
+#endif /*LV_USE_FREETYPE*/

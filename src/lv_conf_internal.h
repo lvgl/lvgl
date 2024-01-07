@@ -2186,17 +2186,6 @@
         #endif
     #endif
 
-    /*FreeType cache type:
-     * LV_FREETYPE_CACHE_TYPE_IMAGE    - Image cache
-     * LV_FREETYPE_CACHE_TYPE_OUTLINE  - Outline cache*/
-    #ifndef LV_FREETYPE_CACHE_TYPE
-        #ifdef CONFIG_LV_FREETYPE_CACHE_TYPE
-            #define LV_FREETYPE_CACHE_TYPE CONFIG_LV_FREETYPE_CACHE_TYPE
-        #else
-            #define LV_FREETYPE_CACHE_TYPE LV_FREETYPE_CACHE_TYPE_IMAGE
-        #endif
-    #endif
-
     /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
     /* (0:use system defaults) */
     #ifndef LV_FREETYPE_CACHE_FT_FACES

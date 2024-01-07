@@ -23,15 +23,12 @@
 
 #define PATH_QUALITY VG_LITE_MEDIUM
 #define PATH_DATA_COORD_FORMAT VG_LITE_S16
-#define PATH_REF_SIZE 128
 #define FT_F26DOT6_SHIFT 6
 
 /** After converting the font reference size, it is also necessary to scale the 26dot6 data
  * in the path to the real physical size
  */
 #define FT_F26DOT6_TO_PATH_SCALE(x) (LV_FREETYPE_F26DOT6_TO_FLOAT(x) / (1 << FT_F26DOT6_SHIFT))
-
-#define SUPPORT_OUTLINE_FONT (LV_USE_FREETYPE && LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_OUTLINE)
 
 /**********************
  *      TYPEDEFS
@@ -46,10 +43,8 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 
 static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc);
 
-#if SUPPORT_OUTLINE_FONT
-    static void freetype_outline_event_cb(lv_event_t * e);
-    static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc);
-#endif
+static void freetype_outline_event_cb(lv_event_t * e);
+static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -68,14 +63,11 @@ void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
-#if SUPPORT_OUTLINE_FONT
     static bool is_init = false;
     if(!is_init) {
-        lv_freetype_outline_set_ref_size(PATH_REF_SIZE);
         lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
         is_init = true;
     }
-#endif /*SUPPORT_OUTLINE_FONT*/
 
     lv_draw_label_iterate_characters(draw_unit, dsc, coords, draw_letter_cb);
 }
@@ -101,14 +93,12 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 #endif
         }
         else if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_A8
-                || glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE) {
-#if SUPPORT_OUTLINE_FONT
+                || glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE
+                || glyph_draw_dsc->format == LV_DRAW_LETTER_VECTOR_FORMAT) {
             if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
                 draw_letter_outline(u, glyph_draw_dsc);
             }
-            else
-#endif /*SUPPORT_OUTLINE_FONT*/
-            {
+            else {
                 draw_letter_bitmap(u, glyph_draw_dsc);
             }
         }
@@ -207,8 +197,6 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
      */
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 }
-
-#if SUPPORT_OUTLINE_FONT
 
 static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc)
 {
@@ -315,7 +303,5 @@ static void freetype_outline_event_cb(lv_event_t * e)
             break;
     }
 }
-
-#endif /*SUPPORT_OUTLINE_FONT*/
 
 #endif /*LV_USE_DRAW_VG_LITE*/

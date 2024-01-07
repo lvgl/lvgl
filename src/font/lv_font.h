@@ -28,6 +28,7 @@ extern "C" {
 
 /* imgfont identifier */
 #define LV_IMGFONT_BPP 9
+#define LV_VECFONT_BPP 0
 
 /**********************
  *      TYPEDEFS

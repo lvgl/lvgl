@@ -77,6 +77,7 @@ typedef struct {
 typedef enum {
     LV_DRAW_LETTER_BITMAP_FORMAT_A8,
     LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE,
+    LV_DRAW_LETTER_VECTOR_FORMAT,
 } lv_draw_glyph_bitmap_format_t;
 
 typedef struct {

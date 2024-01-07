@@ -1139,15 +1139,6 @@ menu "LVGL configuration"
 			config LV_FREETYPE_USE_LVGL_PORT
 				bool "Let FreeType to use LVGL memory and file porting"
 				default n
-			choice
-				prompt "Freetype cache type"
-				default LV_FREETYPE_CACHE_TYPE_IMAGE
-
-				config LV_FREETYPE_CACHE_TYPE_IMAGE
-					bool "IMAGE"
-				config LV_FREETYPE_CACHE_TYPE_OUTLINE
-					bool "OUTLINE"
-			endchoice
 			config LV_FREETYPE_CACHE_FT_FACES
 				int "The maximum number of FT_Face"
 				default 8
