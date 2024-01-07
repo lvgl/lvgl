@@ -345,11 +345,7 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-    if(disp_refr->buf_act->data_size == 0) {
-        LV_LOG_WARN("disp->buf_size_in_bytes is 0");
-        return;
-    }
-    if(disp_refr->buf_1.data == NULL) {
+    if(disp_refr->buf_act == NULL || disp_refr->buf_act->data == NULL || disp_refr->buf_act->data_size == 0) {
         LV_LOG_WARN("No draw buffer");
         return;
     }
