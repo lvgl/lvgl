@@ -33,6 +33,7 @@ static void lv_svg_node_constructor(const lv_tree_class_t * class_p, lv_tree_nod
     t->xml_id = NULL;
     t->type = LV_SVG_TAG_INVALID;
     lv_array_init(&t->attrs, 4, sizeof(lv_svg_attr_t));
+    t->render_obj = NULL;
 }
 
 static void lv_svg_node_destructor(const lv_tree_class_t * class_p, lv_tree_node_t * node)

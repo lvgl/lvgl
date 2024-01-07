@@ -220,11 +220,14 @@ typedef struct {
     lv_svg_attr_value_t value;
 } lv_svg_attr_t;
 
+struct _lv_svg_render_obj;
+
 typedef struct {
     lv_tree_node_t base;
     char * xml_id; // xml_id or content
     lv_svg_tag_t type;
     lv_array_t attrs;
+    struct _lv_svg_render_obj * render_obj;
 } lv_svg_node_t;
 
 /**********************

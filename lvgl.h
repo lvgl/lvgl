@@ -91,6 +91,9 @@ extern "C" {
 #include "src/others/ime/lv_ime_pinyin.h"
 #include "src/others/file_explorer/lv_file_explorer.h"
 
+#include "src/draw/lv_draw.h"
+#include "src/draw/lv_draw_vector.h"
+
 #include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bin_decoder/lv_bin_decoder.h"
 #include "src/libs/bmp/lv_bmp.h"
@@ -107,6 +110,7 @@ extern "C" {
 #include "src/libs/ffmpeg/lv_ffmpeg.h"
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
 #include "src/libs/svg/lv_svg.h"
+#include "src/libs/svg/lv_svg_render.h"
 
 #include "src/layouts/lv_layout.h"
 
