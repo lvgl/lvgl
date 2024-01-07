@@ -476,11 +476,19 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
     const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(subject);
     lv_obj_t * label = lv_observer_get_target(observer);
 
+    char scene_name[64];
+    if(scenes[scene_act].name[0] != '\0') {
+        lv_snprintf(scene_name, sizeof(scene_name), "%s: ", scenes[scene_act].name);
+    }
+    else {
+        scene_name[0] = '\0';
+    }
+
     lv_label_set_text_fmt(label,
-                          "%s: "
+                          "%s"
                           "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
                           "refr. %" LV_PRIu32" ms = %" LV_PRIu32 "ms render + %" LV_PRIu32" ms flush",
-                          scenes[scene_act].name,
+                          scene_name,
                           info->calculated.fps, info->calculated.cpu,
                           info->calculated.render_avg_time + info->calculated.flush_avg_time,
                           info->calculated.render_avg_time, info->calculated.flush_avg_time);
