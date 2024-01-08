@@ -48,10 +48,6 @@ void lv_pxp_init(void)
 {
     _pxp_cfg = pxp_get_default_cfg();
 
-    if(!_pxp_cfg || !_pxp_cfg->pxp_interrupt_deinit || !_pxp_cfg->pxp_interrupt_init ||
-       !_pxp_cfg->pxp_run || !_pxp_cfg->pxp_wait)
-        LV_LOG_ERROR("PXP configuration error.");
-
     PXP_Init(PXP_ID);
 
     PXP_EnableCsc1(PXP_ID, false); /*Disable CSC1, it is enabled by default.*/

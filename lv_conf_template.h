@@ -155,6 +155,11 @@
 /* Use NXP's PXP on iMX RTxxx platforms. */
 #define LV_USE_DRAW_PXP 0
 
+#if LV_USE_DRAW_PXP
+    /* Enable PXP asserts. */
+    #define LV_USE_PXP_ASSERT 0
+#endif
+
 /* Use Renesas Dave2D on RA  platforms. */
 #define LV_USE_DRAW_DAVE2D 0
 

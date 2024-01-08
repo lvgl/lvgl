@@ -29,6 +29,14 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#if LV_USE_PXP_ASSERT
+#define PXP_ASSERT(expr) LV_ASSERT(expr)
+#define PXP_ASSERT_MSG(expr, msg) LV_ASSERT_MSG(expr, msg)
+#else
+#define PXP_ASSERT(expr)
+#define PXP_ASSERT_MSG(expr, msg) LV_LOG_ERROR(msg)
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

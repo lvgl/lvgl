@@ -56,7 +56,7 @@ pxp_output_pixel_format_t pxp_get_out_px_format(lv_color_format_t cf)
             break;
 
         default:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
+            PXP_ASSERT_MSG(false, "Unsupported color format.");
             break;
     }
 
@@ -72,7 +72,7 @@ pxp_as_pixel_format_t pxp_get_as_px_format(lv_color_format_t cf)
             as_px_format = kPXP_AsPixelFormatRGB565;
             break;
         case LV_COLOR_FORMAT_RGB888:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
+            PXP_ASSERT_MSG(false, "Unsupported color format.");
             break;
         case LV_COLOR_FORMAT_ARGB8888:
             as_px_format = kPXP_AsPixelFormatARGB8888;
@@ -82,7 +82,7 @@ pxp_as_pixel_format_t pxp_get_as_px_format(lv_color_format_t cf)
             break;
 
         default:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
+            PXP_ASSERT_MSG(false, "Unsupported color format.");
             break;
     }
 
@@ -98,14 +98,14 @@ pxp_ps_pixel_format_t pxp_get_ps_px_format(lv_color_format_t cf)
             ps_px_format = kPXP_PsPixelFormatRGB565;
             break;
         case LV_COLOR_FORMAT_RGB888:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
+            PXP_ASSERT_MSG(false, "Unsupported color format.");
             break;
         case LV_COLOR_FORMAT_ARGB8888:
 #if (!(defined(FSL_FEATURE_PXP_HAS_NO_EXTEND_PIXEL_FORMAT) && FSL_FEATURE_PXP_HAS_NO_EXTEND_PIXEL_FORMAT)) && \
     (!(defined(FSL_FEATURE_PXP_V3) && FSL_FEATURE_PXP_V3))
             ps_px_format = kPXP_PsPixelFormatARGB8888;
 #else
-            LV_ASSERT_MSG(false, "Unsupported color format.");
+            PXP_ASSERT_MSG(false, "Unsupported color format.");
 #endif
             break;
         case LV_COLOR_FORMAT_XRGB8888:
@@ -118,7 +118,7 @@ pxp_ps_pixel_format_t pxp_get_ps_px_format(lv_color_format_t cf)
             break;
 
         default:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
+            PXP_ASSERT_MSG(false, "Unsupported color format.");
             break;
     }
 
