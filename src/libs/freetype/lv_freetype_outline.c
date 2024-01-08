@@ -56,38 +56,26 @@ static lv_cache_compare_res_t freetype_glyph_outline_cmp_cb(const lv_freetype_ou
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_freetype_outline_font_create(lv_freetype_font_dsc_t * dsc)
+lv_cache_t * lv_freetype_create_draw_data_outline(void)
 {
-    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-    dsc->font.get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
-    dsc->font.release_glyph = freetype_release_glyph_cb;
-
     lv_cache_ops_t glyph_outline_cache_ops = {
         .create_cb = (lv_cache_create_cb_t)freetype_glyph_outline_create_cb,
         .free_cb = (lv_cache_free_cb_t)freetype_glyph_outline_free_cb,
         .compare_cb = (lv_cache_compare_cb_t)freetype_glyph_outline_cmp_cb,
     };
 
-    if(dsc->cache_node->draw_data_cache) {
-        return true;
-    }
+    lv_cache_t * draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_outline_node_t),
+                                                   LV_FREETYPE_CACHE_FT_GLYPH_CNT,
+                                                   glyph_outline_cache_ops);
 
-    dsc->cache_node->draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_outline_node_t),
-                                                       LV_FREETYPE_CACHE_FT_GLYPH_CNT,
-                                                       glyph_outline_cache_ops);
-    if(dsc->cache_node->draw_data_cache == NULL
-       || dsc->cache_node->glyph_cache == NULL) {
-        LV_LOG_ERROR("draw data cache creating failed");
-        return false;
-    }
+    return draw_data_cache;
+}
 
-    LV_LOG_INFO("outline cache(name: %s, style: 0x%x) create %p, ref_cnt = %d",
-                dsc->cache_node->pathname,
-                dsc->cache_node->style,
-                dsc->cache_node->draw_data_cache,
-                lv_cache_entry_get_ref(dsc->cache_node_entry));
-
-    return true;
+void lv_freetype_set_cbs_outline_font(lv_freetype_font_dsc_t * dsc)
+{
+    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
+    dsc->font.get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
+    dsc->font.release_glyph = freetype_release_glyph_cb;
 }
 
 void lv_freetype_outline_add_event(lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
