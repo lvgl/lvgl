@@ -12,31 +12,27 @@ Multiple display support
 In LVGL you can have multiple displays, each with their own driver,
 widgets and color depth.
 
-Creating more displays is easy: just use :cpp:func:`lv_display_create` and
-add set the buffer and the ``flush_cb``. When you create the UI, use
-:cpp:expr:`lv_display_set_default(disp)` to tell the library on which display to
-create objects.
-
-Why would you want multi-display support? Here are some examples:
-
-- Have a "normal" TFT display with local UI and create "virtual" screens on VNC
-  on demand. (You need to add your VNC driver).
-- Have a large TFT display and a small monochrome display.
-- Have some smaller and simple displays in a large instrument or technology.
-- Have two large TFT displays: one for a customer and one for the shop assistant.
+- Creating more displays is easy: just use :cpp:func:`lv_display_create` and add set the buffer and
+  the ``flush_cb``. When you create the UI, use :cpp:expr:`lv_display_set_default(disp)` to tell the
+  library on which display to create objects.
+- Why would you want multi-display support? Here are some examples:
+  - Have a "normal" TFT display with local UI and create "virtual" screens on VNC
+    on demand. (You need to add your VNC driver).
+  - Have a large TFT display and a small monochrome display.
+  - Have some smaller and simple displays in a large instrument or technology.
+  - Have two large TFT displays: one for a customer and one for the shop assistant.
 
 
-Using more displays can be useful but in most cases it's not required.
-Therefore, the whole concept of multi-display handling is completely
-hidden if you register only one display. By default, the last created
-(and only) display is used.
+Using more displays can be useful but in most cases it's not required. Therefore, the whole concept
+of multi-display handling is completely hidden if you register only one display. By default, the last
+created (and only) display is used.
 
 :cpp:func:`lv_screen_active`, :cpp:func:`lv_screen_load`, :cpp:func:`lv_layer_top`,
 :cpp:func:`lv_layer_sys`, :c:macro:`LV_HOR_RES` and :c:macro:`LV_VER_RES` are always applied
-on the most recently created (default) display. If you pass ``NULL`` as
-``disp`` parameter to display related functions the default display will
-usually be used. E.g. :cpp:expr:`lv_display_trig_activity(NULL)` will trigger a
-user activity on the default display. (See below in :ref:`Inactivity <overview/display/inactivity>`).
+on the most recently created (default) display. If you pass ``NULL`` as ``disp`` parameter to
+display related functions the default display will usually be used. E.g.
+:cpp:expr:`lv_display_trig_activity(NULL)` will trigger a user activity on the default display.
+(See below in :ref:`Inactivity <overview/display/inactivity>`).
 
 Mirror display
 --------------

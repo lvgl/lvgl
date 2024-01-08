@@ -29,6 +29,6 @@ individually as well simultaneously (in LVGL multithreading mode).
 .. toctree::
     :maxdepth: 2
 
-    /overview/renderers/nxp/pxp
-    /overview/renderers/nxp/vglite
+    ../../overview/renderers/nxp/pxp
+    ../../overview/renderers/nxp/vglite
 
