@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST || 1
 #include "../lvgl.h"
 
 #include "unity/unity.h"
@@ -316,6 +316,70 @@ void test_bar_indicator_should_be_drawn_towards_the_min_range_side_after_setting
     int32_t final_pos = bar_ptr->indic_area.x1;
 
     TEST_ASSERT_LESS_THAN(original_pos, final_pos);
+}
+
+static lv_obj_t * styled_bar_create(bool ver, int32_t start_value, int32_t end_value, lv_grad_dir_t grad_dir,
+                                    int32_t bg_radius, int32_t indic_radius, int32_t bg_pad)
+{
+    lv_obj_t * bar = lv_bar_create(lv_screen_active());
+    if(ver) lv_obj_set_size(bar, 100, 30);
+    else lv_obj_set_size(bar, 30, 100);
+    lv_bar_set_range(bar, 0, 200);
+    lv_bar_set_mode(bar, LV_BAR_MODE_RANGE);
+    lv_bar_set_value(bar, end_value, LV_ANIM_OFF);
+    lv_bar_set_start_value(bar, start_value, LV_ANIM_OFF);
+
+    lv_obj_set_style_bg_opa(bar, 255, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(bar, lv_color_hex3(0x0ff), LV_PART_MAIN);
+    lv_obj_set_style_radius(bar, bg_radius, LV_PART_MAIN);
+    lv_obj_set_style_pad_all(bar, bg_pad, LV_PART_MAIN);
+
+    lv_obj_set_style_bg_opa(bar, 128, LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(bar, lv_color_hex3(0xf0f), LV_PART_INDICATOR);
+    lv_obj_set_style_bg_grad_color(bar, lv_color_hex3(0x8f8), LV_PART_INDICATOR);
+    lv_obj_set_style_bg_grad_dir(bar, grad_dir, LV_PART_INDICATOR);
+
+    lv_obj_set_style_border_width(bar, 2, LV_PART_INDICATOR);
+    lv_obj_set_style_border_color(bar, lv_color_hex3(0x0f0), LV_PART_INDICATOR);
+    lv_obj_set_style_outline_width(bar, 2, LV_PART_INDICATOR);
+    lv_obj_set_style_outline_pad(bar, 4, LV_PART_INDICATOR);
+    lv_obj_set_style_outline_color(bar, lv_color_hex3(0xff0), LV_PART_INDICATOR);
+    lv_obj_set_style_shadow_width(bar, 20, LV_PART_INDICATOR);
+    lv_obj_set_style_shadow_spread(bar, 5, LV_PART_INDICATOR);
+    lv_obj_set_style_shadow_color(bar, lv_color_hex3(0xf00), LV_PART_INDICATOR);
+    lv_obj_set_style_radius(bar, indic_radius, LV_PART_INDICATOR);
+
+    return bar;
+}
+
+void test_bar_radius_issue_horizontal(void)
+{
+    lv_obj_clean(active_screen);
+
+    lv_obj_set_flex_flow(active_screen, LV_FLEX_FLOW_COLUMN_WRAP);
+    lv_obj_set_flex_align(active_screen, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_style_pad_row(active_screen, 15, 0);
+    lv_obj_set_style_pad_column(active_screen, 10, 0);
+    lv_obj_set_style_pad_all(active_screen, 15, 0);
+
+    int32_t bar_values[5][2] = {{0, 5}, {0, 100}, {0, 195}, {5, 200}, {195, 200}};
+    int32_t bg_radius[2] = {0, 15};
+    int32_t indic_radius[2] = {0, 15};
+    int32_t bg_pad[3] = {-10, 0, 10};
+
+    uint32_t v;
+    for(v = 0; v < 5; v++) {
+        uint32_t bg_r;
+        for(bg_r = 0; bg_r < 2; bg_r++) {
+            uint32_t indic_r;
+            for(indic_r = 0; indic_r < 2; indic_r++) {
+
+                styled_bar_create(false, bar_values[v][0], bar_values[v][1], LV_GRAD_DIR_NONE, bg_radius[bg_r], indic_radius[indic_r],
+                                  0);
+            }
+        }
+    }
+
 }
 
 #endif
