@@ -23,15 +23,15 @@ with :c:macro:`LV_USE_FLEX` in ``lv_conf.h``.
 Terms
 *****
 
--  tracks: the rows or columns
--  main direction: row or column, the direction in which the items are
+-  **tracks**: the rows or columns
+-  **main direction**: row or column, the direction in which the items are
    placed
--  cross direction: perpendicular to the main direction
--  wrap: if there is no more space in the track a new track is started
--  grow: if set on an item it will grow to fill the remaining space on
+-  **cross direction**: perpendicular to the main direction
+-  **wrap**: if there is no more space in the track a new track is started
+-  **grow**: if set on an item it will grow to fill the remaining space on
    the track. The available space will be distributed among items
    respective to their grow value (larger value means more space)
--  gap: the space between the rows and columns or the items on a track
+-  **gap**: the space between the rows and columns or the items on a track
 
 Simple interface
 ****************
@@ -75,7 +75,7 @@ To manage the placement of the children use
 
 The possible values are:
 
-- :cpp:enumerator:`LV_FLEX_ALIGN_START`: means left on a horizontally and top vertically. (default)
+- :cpp:enumerator:`LV_FLEX_ALIGN_START`: means left on a horizontally and top vertically (default)
 - :cpp:enumerator:`LV_FLEX_ALIGN_END`: means right on a horizontally and bottom vertically
 - :cpp:enumerator:`LV_FLEX_ALIGN_CENTER`: simply center
 - :cpp:enumerator:`LV_FLEX_ALIGN_SPACE_EVENLY`: items are distributed so
@@ -117,8 +117,9 @@ Style interface
 ***************
 
 All the Flex-related values are style properties under the hood and you
-can use them similarly to any other style property. The following flex
-related style properties exist:
+can use them similarly to any other style property.
+
+The following flex related style properties exist:
 
 -  :cpp:enumerator:`FLEX_FLOW`
 -  :cpp:enumerator:`FLEX_MAIN_PLACE`

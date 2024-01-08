@@ -59,7 +59,9 @@ Sort
 
 You can use
 :cpp:expr:`lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_XX)` to set
-sorting method. There are the following sorting methods:
+sorting method. 
+
+There are the following sorting methods:
 
 -  :cpp:enumerator:`LV_EXPLORER_SORT_NONE`
 -  :cpp:enumerator:`LV_EXPLORER_SORT_KIND`
@@ -73,9 +75,9 @@ default sorting to :cpp:enumerator:`LV_EXPLORER_SORT_NONE`. The default is
 Events
 ------
 
--  :cpp:enumerator:`LV_EVENT_READY` sent when a directory is opened. You can customize
+-  :cpp:enumerator:`LV_EVENT_READY` Sent when a directory is opened. You can customize
    the sort.
--  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` sent when an item(file) in the file list
+-  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when an item (file) in the file list
    is clicked.
 
 You can use :cpp:func:`lv_file_explorer_get_cur_path` to get the current path

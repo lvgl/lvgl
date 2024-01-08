@@ -6,7 +6,7 @@ GIF decoder
 
 Allow using GIF images in LVGL.
 
-Detailed introduction: `GIFdec <https://github.com/lecram/gifdec>`__
+Detailed introduction: https://github.com/lecram/gifdec
 
 When enabled in ``lv_conf.h`` with :c:macro:`LV_USE_GIF`
 :cpp:expr:`lv_gif_create(parent)` can be used to create a gif widget.

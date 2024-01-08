@@ -157,7 +157,7 @@ Events
       -  ``draw_area``: the area of the knob
       -  ``rect_dsc``:
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 
@@ -182,5 +182,3 @@ Example
 
 API
 ***
-
-:ref:`lv_arc`
