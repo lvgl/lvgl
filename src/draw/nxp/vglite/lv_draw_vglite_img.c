@@ -26,7 +26,7 @@
  *      DEFINES
  *********************/
 
-#if VGLITE_BLIT_SPLIT_ENABLED
+#if LV_USE_VGLITE_BLIT_SPLIT
 /**
 * BLIT split threshold - BLITs with width or height higher than this value will
 * be done in multiple steps. Value must be multiple of stride alignment in px.
@@ -47,7 +47,7 @@
     do {                                      \
     } while (0)
 #endif
-#endif
+#endif /*LV_USE_VGLITE_BLIT_SPLIT*/
 
 /**********************
  *      TYPEDEFS
@@ -69,7 +69,7 @@
 static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area,
                                 const lv_draw_image_dsc_t * dsc);
 
-#if VGLITE_BLIT_SPLIT_ENABLED
+#if LV_USE_VGLITE_BLIT_SPLIT
 /**
  * Move buffer pointer as close as possible to area, but with respect to alignment requirements.
  *
@@ -110,7 +110,7 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
  */
 static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * src_area,
                                    const lv_draw_image_dsc_t * dsc);
-#endif /*VGLITE_BLIT_SPLIT_ENABLED*/
+#endif /*LV_USE_VGLITE_BLIT_SPLIT*/
 
 /**********************
  *  STATIC VARIABLES
@@ -162,7 +162,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     /* Set src_vgbuf structure. */
     vglite_set_src_buf(src_buf, lv_area_get_width(&src_area), lv_area_get_height(&src_area), src_stride, src_cf);
 
-#if VGLITE_BLIT_SPLIT_ENABLED
+#if LV_USE_VGLITE_BLIT_SPLIT
     void * dest_buf = layer->buf;
     uint32_t dest_stride = layer->buf_stride;
     lv_color_format_t dest_cf = layer->color_format;
@@ -175,7 +175,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
         _vglite_blit_transform(&blend_area, &src_area, dsc);
     else
         _vglite_blit_single(&blend_area, &src_area, dsc);
-#endif
+#endif /*LV_USE_VGLITE_BLIT_SPLIT*/
 }
 
 /**********************
@@ -234,7 +234,7 @@ static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * s
     _vglite_blit(src_area, dsc);
 }
 
-#if VGLITE_BLIT_SPLIT_ENABLED
+#if LV_USE_VGLITE_BLIT_SPLIT
 static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stride, lv_color_format_t cf)
 {
     uint8_t ** buf_u8 = (uint8_t **)buf;
@@ -398,6 +398,6 @@ static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t 
     /* Start blit. */
     _vglite_blit(src_area, dsc);
 }
-#endif /*VGLITE_BLIT_SPLIT_ENABLED*/
+#endif /*LV_USE_VGLITE_BLIT_SPLIT*/
 
 #endif /*LV_USE_DRAW_VGLITE*/

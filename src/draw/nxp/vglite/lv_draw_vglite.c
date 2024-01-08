@@ -242,13 +242,13 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
-#if VGLITE_BLIT_SPLIT_ENABLED
+#if LV_USE_VGLITE_BLIT_SPLIT
                 bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
                                       draw_dsc->scale_y != LV_SCALE_NONE);
 #endif
 
                 if((!_vglite_src_cf_supported(img_dsc->header.cf))
-#if VGLITE_BLIT_SPLIT_ENABLED
+#if LV_USE_VGLITE_BLIT_SPLIT
                    || has_transform
 #endif
                    || (!vglite_buf_aligned(img_dsc->data, img_dsc->header.stride, img_dsc->header.cf))
