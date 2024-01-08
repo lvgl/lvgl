@@ -1145,9 +1145,8 @@ menu "LVGL configuration"
 			config LV_FREETYPE_CACHE_FT_SIZES
 				int "The maximum number of FT_Size"
 				default 8
-			config LV_FREETYPE_CACHE_FT_OUTLINES
-				int "The maximum number of Outline"
-				depends on LV_FREETYPE_CACHE_TYPE_OUTLINE
+			config LV_FREETYPE_CACHE_FT_GLYPH_CNT
+				int "The maximum number of Glyph in count"
 				default 256
 			endmenu
 

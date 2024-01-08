@@ -2202,11 +2202,11 @@
             #define LV_FREETYPE_CACHE_FT_SIZES 8
         #endif
     #endif
-    #ifndef LV_FREETYPE_CACHE_FT_OUTLINES
-        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_OUTLINES
-            #define LV_FREETYPE_CACHE_FT_OUTLINES CONFIG_LV_FREETYPE_CACHE_FT_OUTLINES
+    #ifndef LV_FREETYPE_CACHE_FT_GLYPH_CNT
+        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
+            #define LV_FREETYPE_CACHE_FT_GLYPH_CNT CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
         #else
-            #define LV_FREETYPE_CACHE_FT_OUTLINES 256
+            #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
         #endif
     #endif
 #endif

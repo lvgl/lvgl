@@ -20,6 +20,10 @@
 #define ft_ctx LV_GLOBAL_DEFAULT()->ft_context
 #define LV_FREETYPE_OUTLINE_REF_SIZE_DEF 128
 
+#if LV_FREETYPE_CACHE_FT_GLYPH_CNT <= 0
+    #error "LV_FREETYPE_CACHE_FT_GLYPH_CNT must be greater than 0"
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -161,6 +165,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     FT_Size ft_size = lv_freetype_lookup_size(dsc);
 
     if(!ft_size || !lv_freetype_on_font_create(dsc)) {
+        lv_cache_release(ctx->cache_node_cache, dsc->cache_node_entry, NULL);
         lv_freetype_drop_face_id(ctx, dsc->face_id);
         lv_free(dsc);
         return NULL;
@@ -390,8 +395,14 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 }
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)
 {
-    lv_cache_destroy(node->glyph_cache, user_data);
-    lv_cache_destroy(node->draw_data_cache, user_data);
+    if(node->glyph_cache) {
+        lv_cache_destroy(node->glyph_cache, user_data);
+        node->glyph_cache = NULL;
+    }
+    if(node->draw_data_cache) {
+        lv_cache_destroy(node->draw_data_cache, user_data);
+        node->draw_data_cache = NULL;
+    }
 }
 static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cache_node_t * lhs,
                                                           const lv_freetype_cache_node_t * rhs)

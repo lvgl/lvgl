@@ -15,7 +15,7 @@
  *      DEFINES
  *********************/
 
-#define LV_FREETYPE_GLYPH_DSC_CACHE_SIZE (LV_FREETYPE_CACHE_FT_OUTLINES * 2)
+#define LV_FREETYPE_GLYPH_DSC_CACHE_SIZE (LV_FREETYPE_CACHE_FT_GLYPH_CNT * 2)
 /**********************
  *      TYPEDEFS
  **********************/

@@ -74,10 +74,11 @@ bool lv_freetype_image_font_create(lv_freetype_font_dsc_t * dsc)
     }
 
     dsc->cache_node->draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_image_cache_data_t),
-                                                       LV_FREETYPE_CACHE_FT_OUTLINES, ops);
-    if(dsc->cache_node->draw_data_cache == NULL || dsc->cache_node->glyph_cache == NULL) {
-        LV_LOG_ERROR("lv_cache_create failed");
-        return NULL;
+                                                       LV_FREETYPE_CACHE_FT_GLYPH_CNT, ops);
+    if(dsc->cache_node->draw_data_cache == NULL
+       || dsc->cache_node->glyph_cache == NULL) {
+        LV_LOG_ERROR("draw data cache creating failed");
+        return false;
     }
 
     return true;
