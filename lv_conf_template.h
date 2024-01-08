@@ -662,7 +662,7 @@
     /* (0:use system defaults) */
     #define LV_FREETYPE_CACHE_FT_FACES 8
     #define LV_FREETYPE_CACHE_FT_SIZES 8
-    #define LV_FREETYPE_CACHE_FT_OUTLINES 256
+    #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
 #endif
 
 /* Built-in TTF decoder */
