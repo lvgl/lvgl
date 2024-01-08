@@ -513,7 +513,13 @@ bool lv_display_is_invalidation_enabled(lv_display_t * disp);
  * @param disp      pointer to a display
  * @return          pointer to the display refresher timer. (NULL on error)
  */
-lv_timer_t * _lv_display_get_refr_timer(lv_display_t * disp);
+lv_timer_t * lv_display_get_refr_timer(lv_display_t * disp);
+
+/**
+ * Delete screen refresher timer
+ * @param disp      pointer to a display
+ */
+void lv_display_delete_refr_timer(lv_display_t * disp);
 
 void lv_display_set_user_data(lv_display_t * disp, void * user_data);
 void lv_display_set_driver_data(lv_display_t * disp, void * driver_data);

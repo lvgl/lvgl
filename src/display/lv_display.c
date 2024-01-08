@@ -845,12 +845,21 @@ bool lv_display_is_invalidation_enabled(lv_display_t * disp)
     return (disp->inv_en_cnt > 0);
 }
 
-lv_timer_t * _lv_display_get_refr_timer(lv_display_t * disp)
+lv_timer_t * lv_display_get_refr_timer(lv_display_t * disp)
 {
     if(!disp) disp = lv_display_get_default();
     if(!disp) return NULL;
 
     return disp->refr_timer;
+}
+
+void lv_display_delete_refr_timer(lv_display_t * disp)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp || !disp->refr_timer) return;
+
+    lv_timer_delete(disp->refr_timer);
+    disp->refr_timer = NULL;
 }
 
 void lv_display_set_user_data(lv_display_t * disp, void * user_data)
