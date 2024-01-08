@@ -77,10 +77,10 @@ global or constant variables.
 Custom year list
 ----------------
 
-Sets a custom year list with :cpp:expr:`lv_calendar_set_year_list(calendar, years_list)`
+Sets a custom year list with :cpp:expr:`lv_calendar_header_dropdown_set_year_list(calendar, years_list)`
 where ``years_list`` is a pointer to the custom years list. It can be a constant string
 like ``static const char * years = "2023\n2022\n2021\n2020\n2019";``, 
-or can be generated dynamically into a buffer as well..
+or can be generated dynamically into a buffer as well.
 
 .. _lv_calendar_events:
 
