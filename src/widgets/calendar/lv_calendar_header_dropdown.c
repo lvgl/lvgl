@@ -141,8 +141,8 @@ static void year_event_cb(lv_event_t * e)
     char year_buf[YEAR_STR_BUFFER_LEN] = {0};
     const char * year_p = lv_dropdown_get_options(dropdown);
     strncpy(year_buf, year_p, DIGITS_IN_YEAR);
-    /* year_buf is NULL terminated, so it's safe to use atoi */
-    const uint32_t year = atoi(year_buf);
+    const uint32_t year = (year_buf[0] - '0') * 1000 + (year_buf[1] - '0') * 100 + (year_buf[2] - '0') * 10 +
+                          (year_buf[3] - '0');
 
     lv_calendar_date_t newd = *d;
     newd.year = year - sel;
@@ -163,8 +163,8 @@ static void value_changed_event_cb(lv_event_t * e)
     char year_buf[YEAR_STR_BUFFER_LEN] = {0};
     const char * year_p = lv_dropdown_get_options(year_dd);
     strncpy(year_buf, year_p, DIGITS_IN_YEAR);
-    /* year_buf is NULL terminated, so it's safe to use atoi */
-    const uint32_t year = atoi(year_buf);
+    const uint32_t year = (year_buf[0] - '0') * 1000 + (year_buf[1] - '0') * 100 + (year_buf[2] - '0') * 10 +
+                          (year_buf[3] - '0');
 
     lv_dropdown_set_selected(year_dd, year - cur_date->year);
 
