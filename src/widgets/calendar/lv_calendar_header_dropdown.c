@@ -68,6 +68,16 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent)
     return obj;
 }
 
+void lv_calendar_header_dropdown_set_year_list(lv_obj_t * parent, const char * years_list)
+{
+    lv_obj_t * calendar_header = lv_obj_get_child(parent, 0);
+    lv_obj_t * year_dropdown = lv_obj_get_child(calendar_header, 0);
+    lv_dropdown_clear_options(year_dropdown);
+    lv_dropdown_set_options(year_dropdown, years_list);
+
+    lv_obj_invalidate(parent);
+}
+
 /**********************
  *  STATIC FUNCTIONS
  **********************/

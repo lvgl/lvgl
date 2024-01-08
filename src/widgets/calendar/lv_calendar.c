@@ -83,18 +83,6 @@ void lv_calendar_set_day_names(lv_obj_t * obj, const char * day_names[])
     lv_obj_invalidate(obj);
 }
 
-void lv_calendar_set_year_list(lv_obj_t * obj, const char * years_list)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_t * calendar_header = lv_obj_get_child(obj, 0);
-    lv_obj_t * year_dropdown = lv_obj_get_child(calendar_header, 0);
-    lv_dropdown_clear_options(year_dropdown);
-    lv_dropdown_set_options(year_dropdown, years_list);
-
-    lv_obj_invalidate(obj);
-}
-
 void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, uint32_t day)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

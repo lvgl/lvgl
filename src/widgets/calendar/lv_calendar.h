@@ -103,15 +103,6 @@ void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highli
  */
 void lv_calendar_set_day_names(lv_obj_t * obj, const char ** day_names);
 
-/**
- * Sets a custom year list
- * @param obj           pointer to a calendar object
- * @param years_list    pointer to an const char array with the years list, see lv_dropdown set_options for more information.
- *                      E.g. `const char * years = "2023\n2022\n2021\n2020\n2019"
- *                      Only the pointer will be saved so this variable can't be local which will be destroyed later.
- */
-void lv_calendar_set_year_list(lv_obj_t * obj, const char * years_list);
-
 /*=====================
  * Getter functions
  *====================*/
