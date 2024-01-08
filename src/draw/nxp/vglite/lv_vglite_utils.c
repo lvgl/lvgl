@@ -268,18 +268,12 @@ bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf)
     /* No alignment requirement for destination buffer when using mode VG_LITE_LINEAR */
 
     /* Test for pointer alignment */
-    if((uintptr_t)buf % align_bytes) {
-        LV_LOG_ERROR("Buffer address (0x%x) not aligned to %d bytes.",
-                     (size_t)buf, align_bytes);
+    if((uintptr_t)buf % align_bytes)
         return false;
-    }
 
     /* Test for stride alignment */
-    if(stride == 0 || stride % align_bytes) {
-        LV_LOG_ERROR("Buffer stride (%d bytes) not aligned to %d bytes.",
-                     stride, align_bytes);
+    if(stride == 0 || stride % align_bytes)
         return false;
-    }
 
     return true;
 }
