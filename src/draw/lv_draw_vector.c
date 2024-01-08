@@ -591,7 +591,8 @@ void lv_vector_dsc_set_stroke_dash(lv_vector_dsc_t * dsc, float * dash_pattern, 
         lv_array_clear(dash_array);
         if(lv_array_capacity(dash_array) == 0) {
             LV_ARRAY_INIT_CAPACITY(dash_array, dash_count, float);
-        } else {
+        }
+        else {
             lv_array_resize(dash_array, dash_count);
         }
         for(uint16_t i = 0; i < dash_count; i++) {
