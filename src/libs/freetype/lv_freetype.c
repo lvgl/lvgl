@@ -371,7 +371,7 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     FT_Error error = FT_New_Face(ctx->library, node->pathname, 0, &face);
     if(error) {
         FT_ERROR_MSG("FT_New_Face", error);
-        return NULL;
+        return false;
     }
 
     node->ref_size = LV_FREETYPE_OUTLINE_REF_SIZE_DEF;
@@ -381,7 +381,7 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     if(error) {
         FT_Done_Face(face);
         FT_ERROR_MSG("FT_Set_Char_Size", error);
-        return NULL;
+        return false;
     }
 
     if(node->style & LV_FREETYPE_FONT_STYLE_ITALIC) {

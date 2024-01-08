@@ -75,6 +75,11 @@ bool lv_freetype_outline_font_create(lv_freetype_font_dsc_t * dsc)
     dsc->cache_node->draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_outline_node_t),
                                                        LV_FREETYPE_CACHE_FT_GLYPH_CNT,
                                                        glyph_outline_cache_ops);
+    if(dsc->cache_node->draw_data_cache == NULL
+       || dsc->cache_node->glyph_cache == NULL) {
+        LV_LOG_ERROR("draw data cache creating failed");
+        return false;
+    }
 
     LV_LOG_INFO("outline cache(name: %s, style: 0x%x) create %p, ref_cnt = %d",
                 dsc->cache_node->pathname,
