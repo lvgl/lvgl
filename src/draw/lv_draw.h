@@ -60,9 +60,14 @@ struct _lv_draw_task_t {
     lv_draw_task_type_t type;
 
     /**
-     * The bounding box of the thing to draw
+     * The area where to draw
      */
     lv_area_t area;
+
+    /**
+     * The real draw area. E.g. for shadow, outline, or transformed images it's different from `area`
+     */
+    lv_area_t _real_area;
 
     /** The original area which is updated*/
     lv_area_t clip_area_original;
