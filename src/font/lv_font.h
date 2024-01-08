@@ -111,9 +111,10 @@ struct _lv_font_t {
 
 /**
  * Return with the bitmap of a font.
- * @param font_p        pointer to a font
+ * @param font          pointer to a font
  * @param g_dsc         pass the lv_font_glyph_dsc_t here
  * @param letter        a UNICODE character code
+ * @param buf_out       output buffer
  * @return pointer to the bitmap of the letter
  */
 const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t letter,

@@ -14,9 +14,9 @@ Parts and Styles
 **Background**
 
 - :cpp:enumerator:`LV_PART_MAIN` The main part of the list that uses all the typical background properties
-- :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar. See the :ref:`Base objects <widgets/obj/base object (lv_obj) [0-1]>` documentation for details.
+- :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar. See the :ref:`Base objects <widgets/obj/base object (lv_obj)>` documentation for details.
 
-**Buttons and Texts** See the :ref:`Button <widgets/button/button (lv_button) [0-1]>`\ 's and :ref:`Label <widgets/label/label (lv_label) [0-1]>`\ 's documentation.
+**Buttons and Texts** See the :ref:`Button <widgets/button/button (lv_button)>`\ 's and :ref:`Label <widgets/label/label (lv_label)>`\ 's documentation.
 
 Usage
 *****
@@ -41,14 +41,14 @@ Events
 
 No special events are sent by the List, but sent by the Button as usual.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
 
 No *Keys* are processed by the object type.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

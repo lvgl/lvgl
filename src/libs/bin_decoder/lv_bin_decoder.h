@@ -48,6 +48,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
  * Open a lvgl binary image
  * @param decoder the decoder where this function belongs
  * @param dsc pointer to decoder descriptor. `src`, `style` are already initialized in it.
+ * @param args decoder argumnents/options
  * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
  */
 lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,

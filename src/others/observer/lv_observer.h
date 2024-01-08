@@ -155,7 +155,7 @@ void lv_subject_init_pointer(lv_subject_t * subject, void * value);
 /**
  * Set the value of a pointer subject. It will notify all the observers as well.
  * @param subject   pointer to the subject
- * @param value     the new value
+ * @param ptr       the pointer to set
  */
 void lv_subject_set_pointer(lv_subject_t * subject, void * ptr);
 
@@ -176,14 +176,14 @@ const void * lv_subject_get_previous_pointer(lv_subject_t * subject);
 /**
  * Initialize an color type subject
  * @param subject   pointer to the subject
- * @param value     initial value
+ * @param color     color
  */
 void lv_subject_init_color(lv_subject_t * subject, lv_color_t color);
 
 /**
  * Set the value of a color subject. It will notify all the observers as well.
  * @param subject   pointer to the subject
- * @param value     the new value
+ * @param color     color to set
  */
 void lv_subject_set_color(lv_subject_t * subject, lv_color_t color);
 
@@ -241,7 +241,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
 /**
  * Add an observer to a subject and also save a target.
  * @param subject       pointer to the subject
- * @param observer_cb   the callback to call
+ * @param cb            the callback to call
  * @param target        pointer to any data
  * @param user_data     optional user data
  * @return              pointer to the created observer
@@ -257,7 +257,7 @@ void lv_observer_remove(lv_observer_t * observer);
 
 /**
  * Remove all observers from their subject related to an object
- * @param observer      pointer to an observer
+ * @param subject       pointer to a subject
  * @param obj           pointer to an object
  */
 void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj);
@@ -312,7 +312,7 @@ lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subjec
  * Set an object state if an integer subject's value is equal to a reference value, clear the flag otherwise
  * @param obj           pointer to an object
  * @param subject       pointer to a subject
- * @param flag          a state to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param state         a state to set or clear (e.g. `LV_STATE_CHECKED`)
  * @param ref_value     a reference value to compare the subject's value with
  * @return              pointer to the created observer
  */
@@ -322,7 +322,7 @@ lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, 
  * Set an object state if an integer subject's value is not equal to a reference value, clear the flag otherwise
  * @param obj           pointer to an object
  * @param subject       pointer to a subject
- * @param flag          a state to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param state         a state to set or clear (e.g. `LV_STATE_CHECKED`)
  * @param ref_value     a reference value to compare the subject's value with
  * @return              pointer to the created observer
  */

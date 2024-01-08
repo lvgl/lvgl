@@ -55,9 +55,9 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the checkbox is toggled.
 
-See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj)>` too.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
@@ -70,7 +70,7 @@ The following *Keys* are processed by the 'Buttons': -
 Note that, as usual, the state of :cpp:enumerator:`LV_KEY_ENTER` is translated to
 ``LV_EVENT_PRESSED/PRESSING/RELEASED`` etc.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

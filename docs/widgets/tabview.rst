@@ -8,10 +8,10 @@ Overview
 The Tab view object can be used to organize content in tabs. The Tab
 view is built from other widgets:
 
-- Main container: :ref:`widgets/obj/base object (lv_obj) [0-1]`
-- Tab buttons: an :ref:`widgets/obj/base object (lv_obj) [0-1]` with :ref:`widgets/button/button (lv_button) [0-1]`
-- Container for the tabs: :ref:`widgets/obj/base object (lv_obj) [0-1]`
-- Content of the tabs: :ref:`widgets/obj/base object (lv_obj) [0-1]`
+- Main container: :ref:`widgets/obj/base object (lv_obj)`
+- Tab buttons: an :ref:`widgets/obj/base object (lv_obj)` with :ref:`widgets/button/button (lv_button)`
+- Container for the tabs: :ref:`widgets/obj/base object (lv_obj)`
+- Content of the tabs: :ref:`widgets/obj/base object (lv_obj)`
 
 The tab buttons can be positioned on the top, bottom, left and right
 side of the Tab view.
@@ -22,8 +22,8 @@ sliding horizontally on the content.
 Parts and Styles
 ****************
 
-There are no special parts on the Tab view but the :ref:`widgets/obj/base object (lv_obj) [0-1]` and
-:ref:`widgets/button/button (lv_button) [0-1]`` widgets are used to create the Tab view.
+There are no special parts on the Tab view but the :ref:`widgets/obj/base object (lv_obj)` and
+:ref:`widgets/button/button (lv_button)` widgets are used to create the Tab view.
 
 Usage
 *****
@@ -37,7 +37,7 @@ Add tabs
 --------
 
 New tabs can be added with :cpp:expr:`lv_tabview_add_tab(tabview, "Tab name")`.
-This will return a pointer to an :ref:`widgets/obj/base object (lv_obj) [0-1]` object where
+This will return a pointer to an :ref:`widgets/obj/base object (lv_obj)` object where
 the tab's content can be created.
 
 Rename tabs
@@ -74,7 +74,7 @@ Get the parts
 
 :cpp:expr:`lv_tabview_get_content(tabview)` returns the container for the tabs,
 :cpp:expr:`lv_tabview_get_tab_buttons(tabview)` returns the Tab buttons object
-which is a :ref:`Button matrix <widgets/buttonmatrix/button matrix (lv_buttonmatrix) [0-1]>`.
+which is a :ref:`Button matrix <widgets/buttonmatrix/button matrix (lv_buttonmatrix)>`.
 
 Events
 ******
@@ -83,7 +83,7 @@ Events
    or clicking the tab button. :cpp:expr:`lv_tabview_get_tab_active(tabview)`
    returns the zero based index of the current tab.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
@@ -91,7 +91,7 @@ Keys
 Keys have effect only on the tab buttons (Button matrix). Add manually
 to a group if required.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

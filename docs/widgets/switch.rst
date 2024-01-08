@@ -42,9 +42,9 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the switch changes state.
 
-See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj)>` too.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
@@ -53,7 +53,7 @@ Keys
 -  ``LV_KEY_DOWN/LEFT`` Turns off the slider
 -  :cpp:enumerator:`LV_KEY_ENTER` Toggles the switch
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

@@ -16,10 +16,10 @@ may have seen on smartwatches.
 Parts and Styles
 ****************
 
-The Tile view is built from an :ref:`widgets/obj/base object (lv_obj) [0-1]` container and
-:ref:`widgets/obj/base object (lv_obj) [0-1]` tiles.
+The Tile view is built from an :ref:`widgets/obj/base object (lv_obj)` container and
+:ref:`widgets/obj/base object (lv_obj)` tiles.
 
-The parts and styles work the same as for :ref:`widgets/obj/base object (lv_obj) [0-1]`.
+The parts and styles work the same as for :ref:`widgets/obj/base object (lv_obj)`.
 
 Usage
 *****
@@ -54,7 +54,7 @@ Keys
 
 *Keys* are not handled by the Tile view.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

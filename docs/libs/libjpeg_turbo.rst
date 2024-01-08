@@ -32,7 +32,7 @@ Enable :c:macro:`LV_USE_LIBJPEG_TURBO` in ``lv_conf.h``.
 
 See the examples below.
 It should be noted that each image of this decoder needs to consume ``image width x image height x 3`` bytes of RAM, 
-and it needs to be combined with the :ref:`overview/image/image caching [0-2]` feature to ensure that the memory usage is within a reasonable range.
+and it needs to be combined with the :ref:`overview/image/image caching` feature to ensure that the memory usage is within a reasonable range.
 
 Example
 -------
@@ -42,5 +42,4 @@ Example
 API
 ---
 
-:ref:`libjpeg_turbo`
 

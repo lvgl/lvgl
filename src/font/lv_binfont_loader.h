@@ -29,7 +29,7 @@ extern "C" {
 /**
  * Loads a `lv_font_t` object from a binary font file
  * @param font          pointer to font where to load
- * @param path          path where the font file is located
+ * @param font_name     name of the font
  * @return              LV_RESULT_OK on success; LV_RESULT_INVALID on error
  */
 lv_result_t lv_binfont_load(lv_font_t * font, const char * font_name);

@@ -155,11 +155,23 @@ print('Reading Doxygen output')
 doc_builder.run(
     project_path,
     temp_directory,
+    os.path.join(temp_directory, 'integration'),
+    os.path.join(temp_directory, 'integration', 'bindings'),
+    os.path.join(temp_directory, 'integration', 'bindings', 'micropython'),
+    os.path.join(temp_directory, 'integration', 'chip'),
+    os.path.join(temp_directory, 'integration', 'driver'),
+    os.path.join(temp_directory, 'integration', 'driver', 'display'),
+    os.path.join(temp_directory, 'integration', 'driver', 'touchpad'),
+    os.path.join(temp_directory, 'integration', 'framework'),
+    os.path.join(temp_directory, 'integration', 'ide'),
+    os.path.join(temp_directory, 'integration', 'os'),
     os.path.join(temp_directory, 'layouts'),
     os.path.join(temp_directory, 'libs'),
     os.path.join(temp_directory, 'others'),
+    os.path.join(temp_directory, 'others', 'observer'),
     os.path.join(temp_directory, 'overview'),
     os.path.join(temp_directory, 'overview', 'renderers'),
+    os.path.join(temp_directory, 'overview', 'renderers', 'nxp'),
     os.path.join(temp_directory, 'porting'),
     os.path.join(temp_directory, 'widgets')
 )

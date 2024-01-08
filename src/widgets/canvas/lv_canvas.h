@@ -54,12 +54,12 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
 /**
  * Set a buffer for the canvas.
  * Use `lv_canvas_set_draw_buf` instead if you need to set a buffer with alignment requirement.
+ * @param obj pointer to a canvas object
  * @param buf a buffer where the content of the canvas will be.
  * The required size is (lv_image_color_format_get_px_size(cf) * w) / 8 * h)
  * It can be allocated with `lv_malloc()` or
  * it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
  * it can be an address in RAM or external SRAM
- * @param canvas pointer to a canvas object
  * @param w width of the canvas
  * @param h height of the canvas
  * @param cf color format. `LV_COLOR_FORMAT...`
@@ -150,7 +150,7 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, int32_t x, int3
                         int32_t h);
 /**
  * Fill the canvas with color
- * @param canvas    pointer to a canvas
+ * @param obj       pointer to a canvas
  * @param color     the background color
  * @param opa       the desired opacity
  */

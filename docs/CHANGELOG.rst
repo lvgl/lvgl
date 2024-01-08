@@ -32,12 +32,12 @@ Main new features
 - Run time display color format adjustment with RGB888 support
 - Built-in support ``pthread``, ``FreeRTOS`` and other (RT)OSes which are used during rendering
 - Built-in support LVGL's, C library, and other stdlib's
-- Better parallel rendering architecture. See the details :ref:`here <porting/draw/custom gpu [0-1]>`
+- Better parallel rendering architecture. See the details :ref:`here <porting/draw/custom gpu>`
 - Built in display and touch driver: SDL, Linux Frame buffer,  NuttX LCD and touch drivers, ST7789 and ILI9341 driver are available and more will come soon
-- :ref:`others/observer/observer [0-1]` allows to bind data to UI elements and create a uniform and easy to maintain API
+- :ref:`others/observer/index/observer` allows to bind data to UI elements and create a uniform and easy to maintain API
 - GitHub CodeSpace integration makes possible to run LVGL in an Online VSCode editor with 3 click. See more `here <https://blog.lvgl.io/2023-04-13/monthly-newsletter>`__
 - Add vector graphics support via ThorVG. It can be used to draw vector graphics to a `Canvas <https://github.com/lvgl/lvgl/blob/master/examples/widgets/canvas/lv_example_canvas_8.c>`__
-- :ref:`widgets/image/image (lv_image) [0-1]` supports aligning, stretching or tiling the image source if the widget is larger or smaller.
+- :ref:`widgets/image/image (lv_image)` supports aligning, stretching or tiling the image source if the widget is larger or smaller.
 
 General API changes
 -------------------

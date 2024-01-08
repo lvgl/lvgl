@@ -175,7 +175,7 @@ that tell what LVGL is about to draw. Some fields of these parameters
 can be modified to draw something else or any custom drawing operations
 can be added manually.
 
-A good use case for this is the :ref:`Button matrix <widgets/buttonmatrix/button matrix (lv_buttonmatrix) [0-1]>`
+A good use case for this is the :ref:`Button matrix <widgets/buttonmatrix/button matrix (lv_buttonmatrix)>`
 widget. By default, its buttons can be styled in different states, but
 you can't style the buttons one by one. However, an event is sent for
 every button and you can, for example, tell LVGL to use different colors
@@ -357,3 +357,21 @@ You can simply set the required draw area with
 
 API
 ***
+
+:ref:`lv_draw_arc`
+
+:ref:`lv_draw_buf`
+
+:ref:`lv_draw_image`
+
+:ref:`lv_draw_label`
+
+:ref:`lv_draw_line`
+
+:ref:`lv_draw_mask`
+
+:ref:`lv_draw_rect`
+
+:ref:`lv_draw_triangle`
+
+:ref:`lv_draw_vector`

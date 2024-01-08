@@ -5,7 +5,7 @@ Canvas (lv_canvas)
 Overview
 ********
 
-A Canvas inherits from :ref:`Image <widgets/image/image (lv_image) [0-1]>` where the user can draw
+A Canvas inherits from :ref:`Image <widgets/image/image (lv_image)>` where the user can draw
 anything. Rectangles, texts, images, lines, arcs can be drawn here using
 lvgl's drawing engine.
 
@@ -32,7 +32,7 @@ Or you can use
 
 The canvas supports all the color formats like
 :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` or :cpp:enumerator:`LV_COLOR_FORMAT_I2`. See the full
-list in the :ref:`Color formats <overview/image/color formats [0-2]>` section.
+list in the :ref:`Color formats <overview/image/color formats>` section.
 
 Indexed colors
 --------------
@@ -72,16 +72,16 @@ Events
 No special events are sent by canvas objects. The same events are sent
 as for the
 
-See the events of the :ref:`widgets/image/image (lv_image) [0-1]` too.
+See the events of the :ref:`widgets/image/image (lv_image)` too.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
 
 No *Keys* are processed by the object type.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

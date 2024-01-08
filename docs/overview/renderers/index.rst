@@ -5,9 +5,10 @@ Renderers and GPUs
 .. toctree::
     :maxdepth: 2
 
-    sw
-    sdl
+    draw_sw
+    draw_sdl
     arm2d
-    pxp
     stm32_dma2d
-    vglite
+    draw_dave2d
+    nxp/index
+

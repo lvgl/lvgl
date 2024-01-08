@@ -31,7 +31,7 @@ In practice, it looks like this:
    }
 
 In the example :cpp:enumerator:`LV_EVENT_CLICKED` means that only the click event will
-call ``my_event_cb``. See the :ref:`list of event codes <overview/event/event codes [0-2]>` for
+call ``my_event_cb``. See the :ref:`list of event codes <overview/event/event codes>` for
 all the options. :cpp:enumerator:`LV_EVENT_ALL` can be used to receive all events.
 
 The last parameter of :cpp:func:`lv_obj_add_event` is a pointer to any custom
@@ -96,7 +96,7 @@ All objects (such as Buttons/Labels/Sliders etc.) regardless their type
 receive the *Input device*, *Drawing* and *Other* events.
 
 However, the *Special events* are specific to a particular widget type.
-See the :ref:`widgets' documentation <widgets/index/widgets [0-1]>` to learn when they
+See the :ref:`widgets' documentation <widgets/index/widgets>` to learn when they
 are sent,
 
 *Custom events* are added by the user and are never sent by LVGL.
@@ -229,7 +229,7 @@ contains all data about the event. The following values can be gotten from it:
 - :cpp:expr:`lv_event_get_code(e)`: get the event code
 - :cpp:expr:`lv_event_get_current_target(e)`: get the object to which an event was sent. I.e. the object whose event handler is being called.
 - :cpp:expr:`lv_event_get_target(e)`: get the object that originally triggered the event (different from :cpp:func:`lv_event_get_target`
-  if :ref:`event bubbling <overview/event/event bubbling [0-2]>` is enabled)
+  if :ref:`event bubbling <overview/event/event bubbling>` is enabled)
 - :cpp:expr:`lv_event_get_user_data(e)`: get the pointer passed as the last parameter of :cpp:func:`lv_obj_add_event`.
 - :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_event_send`
 

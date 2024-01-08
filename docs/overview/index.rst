@@ -25,3 +25,4 @@ Overview
     profiler
     renderers/index
     new_widget
+

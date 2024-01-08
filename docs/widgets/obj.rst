@@ -28,7 +28,7 @@ Coordinates
 
 Only a small subset of coordinate settings is described here. To see all
 the features of LVGL (padding, coordinates in styles, layouts, etc)
-visit the :ref:`Coordinates <overview/coord/positions, sizes, and layouts [0-1]>` page.
+visit the :ref:`Coordinates <overview/coord/positions, sizes, and layouts>` page.
 
 Size
 ^^^^
@@ -128,7 +128,7 @@ To get an object's screen use the :cpp:expr:`lv_obj_get_screen(obj)` function.
 Styles
 ------
 
-Be sure to read the :ref:`Style overview <overview/style/styles [0-1]>`. Here only the
+Be sure to read the :ref:`Style overview <overview/style/styles>`. Here only the
 most essential functions are described.
 
 A new style can be added to an object with the
@@ -190,7 +190,7 @@ Some examples:
 Groups
 ------
 
-Read the :ref:`Input devices overview <overview/indev/input devices [0-1]>` to learn more
+Read the :ref:`Input devices overview <overview/indev/input devices>` to learn more
 about *Groups*.
 
 Objects are added to a *group* with :cpp:expr:`lv_group_add_obj(group, obj)`,
@@ -214,7 +214,7 @@ Events
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` when the :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` flag is
    enabled and the object clicked (on transition to/from the checked state)
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 To set an event callback for an object, use
 :cpp:expr:`lv_obj_add_event_cb(obj, event_cb, LV_EVENT_..., user_data)`,
@@ -222,7 +222,7 @@ To set an event callback for an object, use
 To manually send an event to an object, use
 :cpp:expr:`lv_event_send(obj, LV_EVENT_..., param)`
 
-Read the :ref:`Event overview <overview/events/events [0-1]>` to learn more about
+Read the :ref:`Event overview <overview/event/events>` to learn more about
 events.
 
 Keys
@@ -237,10 +237,10 @@ If :cpp:enumerator:`LV_OBJ_FLAG_SCROLLABLE` is enabled, but the object is not ed
 :cpp:enumerator:`LV_KEY_DOWN`, :cpp:enumerator:`LV_KEY_LEFT`, :cpp:enumerator:`LV_KEY_RIGHT`) scroll the object.
 If the object can only scroll vertically, :cpp:enumerator:`LV_KEY_LEFT` and
 :cpp:enumerator:`LV_KEY_RIGHT` will scroll up/down instead, making it compatible with
-an encoder input device. See :ref:`Input devices overview <overview/indev/input devices [0-1]>` for
+an encoder input device. See :ref:`Input devices overview <overview/indev/input devices>` for
 more on encoder behaviors and the edit mode.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 .. |image1| image:: /misc/align.png
 

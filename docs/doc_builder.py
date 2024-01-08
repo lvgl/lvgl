@@ -671,11 +671,15 @@ def run(project_path, temp_directory, *doc_paths):
         )
 
     for folder in doc_paths:
-        items = list(
-            (os.path.splitext(item)[0], os.path.join(folder, item))
-            for item in os.listdir(folder)
-            if item.endswith('rst') and 'index' not in item
-        )
+        items = []
+        for item in os.listdir(folder):
+            if item.endswith('rst'):
+                if item == 'index.rst':
+                    name = os.path.split(folder)[-1]
+                else:
+                    name = os.path.splitext(item)[0]
+
+                items.append((name, os.path.join(folder, item)))
 
         for name, path in items:
             html_includes = set()

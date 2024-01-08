@@ -26,9 +26,6 @@ modules have sophisticated smart hints, even hinting at the types of
 your arguments .
 
 
---------------
-
-
 Why PikaScript + LVGL ?
 -----------------------
 
@@ -134,8 +131,6 @@ LV_CHECKBOX
    print('mem used max: %0.2f kB' % (mem.getMax()))
    print('mem used now: %0.2f kB' % (mem.getNow()))
 
---------------
-
 
 How does it work?
 -----------------
@@ -152,6 +147,7 @@ interface file)
        def set_end_angle(self, angle: int): ...
        def set_bg_angles(self, start: int, end: int): ...
        def set_angles(self, start: int, end: int): ...
+
 
 Then PikaScript's pre-compiler can automatically bind the following C
 functions, simply by naming the functions in the module_class_method
@@ -174,10 +170,11 @@ done automatically.
        lv_arc_set_angles(lv_obj, start, end);
    }
 
+
 To use the module, just ``import pika_lvgl`` and the precompiler will
 automatically scan main.py and bind the ``pika_lvgl`` module
 
-::
+.. code::
 
    $ ./rust-msc-latest-win10.exe
    (pikascript) packages installed:
@@ -188,14 +185,13 @@ automatically scan main.py and bind the ``pika_lvgl`` module
      scanning main.py...
        binding pika_lvgl.pyi...
 
+
 The precompiler is written in Rust, runs on windows and linux, and is
 completely open source.
 
 In addition to binding C modules, the precompiler compiles Python
 scripts to bytecode in the PC, reducing the size of the script and
 increasing its speed.
-
---------------
 
 How can I use it?
 -----------------

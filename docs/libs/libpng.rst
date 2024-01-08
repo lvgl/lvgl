@@ -29,7 +29,7 @@ Enable :c:macro:`LV_USE_LIBPNG` in ``lv_conf.h``.
 
 See the examples below.
 It should be noted that each image of this decoder needs to consume ``width x height x 4`` bytes of RAM, 
-and it needs to be combined with the :ref:`overview/image/image caching [0-2]` feature to ensure that the memory usage is within a reasonable range.
+and it needs to be combined with the :ref:`overview/image/image caching` feature to ensure that the memory usage is within a reasonable range.
 The decoded image is stored in RGBA pixel format.
 
 Example

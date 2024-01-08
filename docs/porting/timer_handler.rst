@@ -50,7 +50,7 @@ In an OS environment, you can use it together with the **delay** or
       os_delay_ms(time_till_next); /* delay to avoid unnecessary polling */
    }
 
-To learn more about timers visit the :ref:`overview/timer/timers [0-1]`
+To learn more about timers visit the :ref:`overview/timer/timers`
 section.
 
 API

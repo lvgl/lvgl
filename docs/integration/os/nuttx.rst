@@ -32,7 +32,6 @@ Highlights of NuttX
 -  **Predictable** - NuttX is a preemptible Realtime kernel, so you can
    use it to create predictable applications for realtime control.
 
---------------
 
 Why NuttX + LVGL?
 -----------------
@@ -41,8 +40,7 @@ Although NuttX has its own graphic library called
 `NX <https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=139629474>`__,
 LVGL is a good alternative because users could find more eye-candy demos
 and they can reuse code from previous projects. LVGL is an
-`Object-Oriented Component
-Based <https://blog.lvgl.io/2018-12-13/extend-lvgl-objects>`__
+`Object-Oriented Component Based <https://blog.lvgl.io/2018-12-13/extend-lvgl-objects>`__
 high-level GUI library, that could fit very well for a RTOS with
 advanced features like NuttX. LVGL is implemented in C and its APIs are
 in C.
@@ -59,6 +57,7 @@ Here are some advantages of using LVGL in NuttX
    on your computer and when it is done, compile it on NuttX and that is
    it.
 
+
 NuttX + LVGL could be used for
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -71,26 +70,23 @@ NuttX + LVGL could be used for
 -  Final products with a touchscreen (and all sorts of bells and
    whistles).
 
---------------
 
 How to get started with NuttX and LVGL?
 ---------------------------------------
 
-There are many boards in the `NuttX
-mainline <https://github.com/apache/incubator-nuttx>`__ with support for
-LVGL. Let's use the
-`STM32F429IDISCOVERY <https://www.st.com/en/evaluation-tools/32f429idiscovery.html>`__
+There are many boards in the `NuttX mainline <https://github.com/apache/incubator-nuttx>`__ with support for
+LVGL. Let's use the `STM32F429IDISCOVERY <https://www.st.com/en/evaluation-tools/32f429idiscovery.html>`__
 as an example because it is a very popular board.
 
 First you need to install the pre-requisites on your system
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let's use the `Windows Subsystem for
-Linux <https://acassis.wordpress.com/2018/01/10/how-to-build-nuttx-on-windows-10/>`__
+Let's use the `Windows Subsystem for Linux <https://acassis.wordpress.com/2018/01/10/how-to-build-nuttx-on-windows-10/>`__
 
 .. code:: shell
 
    $ sudo apt-get install automake bison build-essential flex gcc-arm-none-eabi gperf git libncurses5-dev libtool libusb-dev libusb-1.0.0-dev pkg-config kconfig-frontends openocd
+
 
 Now let's create a workspace to save our files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -100,6 +96,7 @@ Now let's create a workspace to save our files
    $ mkdir ~/nuttxspace
    $ cd ~/nuttxspace
 
+
 Clone the NuttX and Apps repositories:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -107,6 +104,7 @@ Clone the NuttX and Apps repositories:
 
    $ git clone https://github.com/apache/incubator-nuttx nuttx
    $ git clone https://github.com/apache/incubator-nuttx-apps apps
+
 
 Configure NuttX to use the stm32f429i-disco board and the LVGL Demo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,6 +114,7 @@ Configure NuttX to use the stm32f429i-disco board and the LVGL Demo
    $ ./tools/configure.sh stm32f429i-disco:lvgl
    $ make
 
+
 If everything went fine you should have now the file ``nuttx.bin`` to
 flash on your board:
 
@@ -124,6 +123,7 @@ flash on your board:
    $ ls -l nuttx.bin
    -rwxrwxr-x 1 alan alan 287144 Jun 27 09:26 nuttx.bin
 
+
 Flashing the firmware in the board using OpenOCD:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -131,16 +131,16 @@ Flashing the firmware in the board using OpenOCD:
 
    $ sudo openocd -f interface/stlink-v2.cfg -f target/stm32f4x.cfg -c init -c "reset halt" -c "flash write_image erase nuttx.bin 0x08000000"
 
+
 Reset the board and using the 'NSH>' terminal start the LVGL demo:
 
 .. code:: shell
 
    nsh> lvgldemo
 
+
 Where can I find more information?
 ----------------------------------
 
--  This blog post: `LVGL on
-   LPCXpresso54628 <https://acassis.wordpress.com/2018/07/19/running-nuttx-on-lpcxpresso54628-om13098/>`__
--  NuttX mailing list: `Apache NuttX Mailing
-   List <http://nuttx.incubator.apache.org/community/>`__
+-  This blog post: `LVGL on LPCXpresso54628 <https://acassis.wordpress.com/2018/07/19/running-nuttx-on-lpcxpresso54628-om13098/>`__
+-  NuttX mailing list: `Apache NuttX Mailing List <http://nuttx.incubator.apache.org/community/>`__

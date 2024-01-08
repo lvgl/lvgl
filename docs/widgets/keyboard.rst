@@ -5,9 +5,9 @@ Keyboard (lv_keyboard)
 Overview
 ********
 
-The Keyboard object is a special :ref:`Button matrix <widgets/buttonmatrix/button matrix (lv_buttonmatrix) [0-1]>`
+The Keyboard object is a special :ref:`Button matrix <widgets/buttonmatrix/button matrix (lv_buttonmatrix)>`
 with predefined keymaps and other features to realize a virtual keyboard
-to write texts into a :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>`.
+to write texts into a :ref:`Text area <widgets/textarea/text area (lv_textarea)>`.
 
 Parts and Styles
 ****************
@@ -39,7 +39,7 @@ default mode is :cpp:enumerator:`LV_KEYBOARD_MODE_TEXT_UPPER`.
 Assign Text area
 ----------------
 
-You can assign a :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>` to the Keyboard to
+You can assign a :ref:`Text area <widgets/textarea/text area (lv_textarea)>` to the Keyboard to
 automatically put the clicked characters there. To assign the text area,
 use :cpp:expr:`lv_keyboard_set_textarea(kb, ta)`.
 
@@ -66,7 +66,7 @@ New Keymap
 
 You can specify a new map (layout) for the keyboard with
 :cpp:expr:`lv_keyboard_set_map(kb, LV_KEYBOARD_MODE_..., kb_map, kb_ctrl)`. See
-the :ref:`Button matrix <widgets/buttonmatrix/button matrix (lv_buttonmatrix) [0-1]>` for more information about
+the :ref:`Button matrix <widgets/buttonmatrix/button matrix (lv_buttonmatrix)>` for more information about
 creating new maps and ctrls.
 
 Keep in mind that using following keywords will have the same effect as
@@ -100,7 +100,7 @@ with a custom event handler if you wish.
 :note: In 8.0 and newer, adding an event handler to the keyboard does not remove the default event handler.
        This behavior differs from v7, where adding an event handler would always replace the previous one.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
@@ -109,7 +109,7 @@ Keys
    select one.
 -  :cpp:enumerator:`LV_KEY_ENTER` To press/release the selected button.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

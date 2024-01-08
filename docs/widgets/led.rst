@@ -39,16 +39,16 @@ the ON and OFF state.
 Events
 ******
 
-See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj)>` too.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
 
 No *Keys* are processed by the object type.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

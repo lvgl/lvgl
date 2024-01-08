@@ -67,13 +67,73 @@ def run(out_path, print_references):
 
         output = []
 
-        level = 0
-        section_count = 0
-        level_count = 0
-
         found_above = None
         text = None
         found_below = None
+
+        def _eval():
+            if found_above is not None and found_above == found_below:
+                if found_above.startswith(heading):
+                    pass
+                elif found_above.startswith(title):
+                    pass
+                elif found_above.startswith(chapter):
+                    pass
+                else:
+                    print(src_file)
+                    raise RuntimeError()
+
+                ref = f'.. _{ref_file[1:]}/{text.lower().strip().replace(":", "")}:'
+                directive = f':ref:`{ref_file[1:]}/{text.lower().strip().replace(":", "")}`'
+
+                ref_count = 1
+                while ref in used:
+                    ref = f'.. _{ref_file[1:]}/{text.lower().strip().replace(":", "")}{ref_count}:'
+                    directive = f':ref:`{ref_file[1:]}/{text.lower().strip().replace(":", "")}{ref_count}`'
+                    ref_count += 1
+
+                used.append(ref)
+                output.append(ref)
+                output.append('')
+                output.append(found_above)
+            else:
+                if found_below.startswith(section):
+                    pass
+                elif found_below.startswith(sub_section1):
+                    pass
+                elif found_below.startswith(sub_section2):
+                    pass
+                elif found_below.startswith(subsub_section1):
+                    pass
+                elif found_below.startswith(subsub_section2):
+                    pass
+                elif found_below.startswith(paragraph):
+                    pass
+                else:
+                    print('ERROR:', src_file)
+                    raise RuntimeError(found_below)
+
+                ref = f'.. _{ref_file[1:]}/{text.lower().strip().replace(":", "")}:'
+                directive = f':ref:`{ref_file[1:]}/{text.lower().strip().replace(":", "")}`'
+
+                ref_count = 1
+                while ref in used:
+                    ref = f'.. _{ref_file[1:]}/{text.lower().strip().replace(":", "")}{ref_count}:'
+                    directive = f':ref:`{ref_file[1:]}/{text.lower().strip().replace(":", "")}{ref_count}`'
+                    ref_count += 1
+
+                used.append(ref)
+
+                if found_above is None:
+                    output.append(ref)
+                else:
+                    output.append(found_above)
+                    output.append('')
+                    output.append(ref)
+
+                output.append('')
+
+            return ref, directive
 
         for line in data:
             if check_line(line):
@@ -87,125 +147,15 @@ def run(out_path, print_references):
                     found_below = None
 
                 elif found_below and text is not None and text.strip():
-                    if found_above is not None and found_above == found_below:
-                        if found_above.startswith(heading):
-                            if level < 1:
-                                level_count += 1
-                            elif level > 1:
-                                level_count -= 1
-                                section_count += 1
+                    r, d = _eval()
 
-                            level = 1
-                        elif found_above.startswith(title):
-                            if level < 2:
-                                level_count += 1
-                            elif level > 2:
-                                level_count -= 1
-                                section_count += 1
-
-                            level = 2
-                        elif found_above.startswith(chapter):
-                            if level < 3:
-                                level_count += 1
-                            elif level > 3:
-                                level_count -= 1
-                                section_count += 1
-
-                            level = 3
-                        else:
-                            print(src_file)
-                            raise RuntimeError()
-
-                        ref = f'.. _{ref_file[1:]}/{text.lower().strip().replace(":", "")} [{section_count}-{level}]:'
-
-                        directive = f':ref:`{ref_file[1:]}/{text.lower().strip().replace(":", "")} [{section_count}-{level_count}]`'
-
-                        if ref in used:
-                            raise RuntimeError(ref)
-
-                        used.append(ref)
-                        output.append(ref)
-                        output.append('')
-                        output.append(found_above)
-                        found_above = text
-                        text = found_below
-                    else:
-                        if found_below.startswith(section):
-                            if level < 4:
-                                level_count += 1
-                            elif level > 4:
-                                level_count -= 1
-                                section_count += 1
-
-                            level = 4
-                        elif found_below.startswith(sub_section1):
-                            if level < 5:
-                                level_count += 1
-                            elif level > 5:
-                                level_count -= 1
-                                section_count += 1
-
-                            level = 5
-                        elif found_below.startswith(sub_section2):
-                            if level < 5:
-                                level_count += 1
-                            elif level > 5:
-                                level_count -= 1
-                                section_count += 1
-
-                            level = 5
-                        elif found_below.startswith(subsub_section1):
-                            if level < 6:
-                                level_count += 1
-                            elif level > 6:
-                                level_count -= 1
-                                section_count += 1
-
-                            level = 6
-                        elif found_below.startswith(subsub_section2):
-                            if level < 6:
-                                level_count += 1
-                            elif level > 6:
-                                level_count -= 1
-                                section_count += 1
-
-                            level = 6
-                        elif found_below.startswith(paragraph):
-                            if level < 7:
-                                level_count += 1
-
-                            level = 7
-
-                        else:
-                            print('ERROR:', src_file)
-                            print(found_below)
-                            raise RuntimeError()
-
-                        ref = f'.. _{ref_file[1:]}/{text.lower().strip().replace(":", "")} [{section_count}-{level_count}]:'
-                        directive = f':ref:`{ref_file[1:]}/{text.lower().strip().replace(":", "")} [{section_count}-{level_count}]`'
-
-                        if ref in used:
-                            raise RuntimeError(ref)
-
-                        used.append(ref)
-
-                        if found_above is None:
-                            output.append(ref)
-
-                        else:
-                            output.append(found_above)
-                            output.append('')
-                            output.append(ref)
-
-                        output.append('')
-                        found_above = text
-                        text = found_below
-
+                    found_above = text
+                    text = found_below
                     found_below = None
 
                     if print_references:
-                        print(ref)
-                        print(directive)
+                        print(r)
+                        print(d)
                         print()
 
                 if found_above is not None:
@@ -214,9 +164,40 @@ def run(out_path, print_references):
                 found_above = text
                 text = line
 
+        if found_below and (text is None or not text.strip()):
+            if text is not None:
+                output.append(text)
+
+            text = found_below
+            found_below = None
+
+        elif found_below and text is not None and text.strip():
+            r, d = _eval()
+
+            found_above = text
+            text = found_below
+            found_below = None
+
+            if print_references:
+                print(r)
+                print(d)
+                print()
+
+        if found_above is not None:
+            output.append(found_above)
+
+        if text is not None:
+            output.append(text)
+
+        if found_below is not None:
+            output.append(found_below)
+
         if not print_references:
             output = '\n'.join(output)
 
             with open(dst_file, 'wb') as f:
                 f.write(output.encode('utf-8'))
+
+
+
 

@@ -10,8 +10,9 @@ Others
     gridnav
     file_explorer
     fragment
-    observer
+    observer/index
     imgfont
     ime_pinyin
     obj_id
     obj_property
+

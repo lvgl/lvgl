@@ -11,9 +11,9 @@ currently clicked file. The file operation function needs to be
 implemented by the user.
 
 The file list in ``lv_file_explorer`` is based on
-:ref:`widgets/table/table (lv_table) [0-1]`, and the quick access bar is based on
-:ref:`widgets/list/list (lv_list) [0-1]`. Therefore, care should be taken to ensure
-that :ref:`widgets/table/table (lv_table) [0-1]` and :ref:`widgets/list/list (lv_list) [0-1]` are
+:ref:`widgets/table/table (lv_table)`, and the quick access bar is based on
+:ref:`widgets/list/list (lv_list)`. Therefore, care should be taken to ensure
+that :ref:`widgets/table/table (lv_table)` and :ref:`widgets/list/list (lv_list)` are
 enabled.
 
 Usage

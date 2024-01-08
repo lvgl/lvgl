@@ -2,7 +2,8 @@
 Displays
 ========
 
-:important: The basic concept of a *display* in LVGL is explained in the :ref:`porting/index/porting [0-1]` section. So before reading further, please read that section first.
+:important: The basic concept of a *display* in LVGL is explained in the :ref:`porting/index/porting` section.
+            So before reading further, please read that section first.
 
 ************************
 Multiple display support
@@ -25,7 +26,6 @@ Why would you want multi-display support? Here are some examples:
 - Have two large TFT displays: one for a customer and one for the shop assistant.
 
 
-
 Using more displays can be useful but in most cases it's not required.
 Therefore, the whole concept of multi-display handling is completely
 hidden if you register only one display. By default, the last created
@@ -36,7 +36,7 @@ hidden if you register only one display. By default, the last created
 on the most recently created (default) display. If you pass ``NULL`` as
 ``disp`` parameter to display related functions the default display will
 usually be used. E.g. :cpp:expr:`lv_display_trig_activity(NULL)` will trigger a
-user activity on the default display. (See below in :ref:`Inactivity <overview/display/inactivity [0-3]>`).
+user activity on the default display. (See below in :ref:`Inactivity <overview/display/inactivity>`).
 
 Mirror display
 --------------
@@ -57,7 +57,7 @@ each real display with the truncated area.
 Screens
 *******
 
-Every display has its own set of :ref:`screens <overview/obj/screens [0-2]>` and the
+Every display has its own set of :ref:`screens <overview/obj/screens>` and the
 objects on each screen.
 
 Be sure not to confuse displays and screens:
@@ -74,7 +74,7 @@ i.e. :cpp:func:`lv_obj_set_pos`, :cpp:func:`lv_obj_set_size` or similar function
 can't be used on screens.
 
 A screen can be created from any object type but the two most typical
-types are :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` and :ref:`Image <widgets/image/image (lv_image) [0-1]>`
+types are :ref:`Base object <widgets/obj/base object (lv_obj)>` and :ref:`Image <widgets/image/image (lv_image)>`
 (to create a wallpaper).
 
 To create a screen, use
@@ -85,7 +85,7 @@ use :cpp:expr:`lv_screen_active()`. These functions work on the default display.
 you want to specify which display to work on, use
 :cpp:expr:`lv_display_get_screen_active(disp)` and :cpp:expr:`lv_display_load_scr(disp, scr)`. A
 screen can be loaded with animations too. Read more
-:ref:`here <overview/obj/load screens [0-2]>`.
+:ref:`here <overview/obj/load screens>`.
 
 Screens can be deleted with :cpp:expr:`lv_obj_delete(scr)`, but ensure that you do
 not delete the currently loaded screen.
@@ -125,7 +125,7 @@ Inactivity
 ----------
 
 A user's inactivity time is measured on each display. Every use of an
-:ref:`Input device <overview/indev/input devices [0-1]>` (if :ref:`associated with the display <porting_indev_other_features>`) counts as an activity. To
+:ref:`Input device <overview/indev/input devices>` (if :ref:`associated with the display <porting/indev/other features>`) counts as an activity. To
 get time elapsed since the last activity, use
 :cpp:expr:`lv_display_get_inactive_time(disp)`. If ``NULL`` is passed, the lowest
 inactivity time among all displays will be returned (**NULL isn't just

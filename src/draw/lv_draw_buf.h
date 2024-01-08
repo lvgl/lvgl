@@ -100,7 +100,7 @@ lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
 
 /**
  * Allocate a buffer with the given size. It might allocate slightly larger buffer to fulfill the alignment requirements.
- * @param size          the size to allocate in bytes
+ * @param size_bytes    the size to allocate in bytes
  * @param color_format  the color format of the buffer to allocate
  * @return              the allocated buffer.
  * @note The returned value can be saved in draw_buf->buf
@@ -141,7 +141,7 @@ uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
 
 /**
  * Clear an area on the buffer
- * @param draw_buf          pointer to draw buffer
+ * @param buf               pointer to draw buffer
  * @param w                 width of the buffer
  * @param h                 height of the buffer
  * @param color_format      color format of the buffer

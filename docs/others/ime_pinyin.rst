@@ -7,7 +7,7 @@ input) for keyboard object, which supports 26 key and 9 key input modes.
 You can think of ``lv_ime_pinyin`` as a Pinyin input method plug-in for
 keyboard objects.
 
-Normally, an environment where :ref:`widgets/keyboard/keyboard (lv_keyboard) [0-1]` can
+Normally, an environment where :ref:`widgets/keyboard/keyboard (lv_keyboard)` can
 run can also run ``lv_ime_pinyin``. There are two main influencing
 factors: the size of the font file and the size of the dictionary.
 

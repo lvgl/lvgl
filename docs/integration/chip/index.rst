@@ -8,3 +8,4 @@ Chip vendors
     nxp
     stm32
     espressif
+

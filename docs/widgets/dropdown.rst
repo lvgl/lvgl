@@ -133,9 +133,9 @@ the drop-down list:
 - :cpp:enumerator:`LV_EVENT_CANCEL` Sent when the list is closed
 - :cpp:enumerator:`LV_EVENT_READY` Sent when the list is opened
 
-See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj)>` too.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
@@ -145,7 +145,7 @@ Keys
 -  :cpp:enumerator:`LV_KEY_ENTER` Apply the selected option (Sends
    :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` event and closes the drop-down list).
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

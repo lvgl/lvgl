@@ -13,7 +13,7 @@ Parts and Styles
 - :cpp:enumerator:`LV_PART_MAIN` Uses all the typical background properties and the text properties.
   The padding values can be used to add space between the text and the background.
 - :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar that is shown when the text is larger than the widget's size.
-- :cpp:enumerator:`LV_PART_SELECTED` Tells the style of the :ref:`selected text <widgets/label/text selection [0-2]>`.
+- :cpp:enumerator:`LV_PART_SELECTED` Tells the style of the :ref:`selected text <widgets/label/text selection>`.
   Only ``text_color`` and ``bg_color`` style properties can be used.
 
 Usage
@@ -83,7 +83,7 @@ Text selection
 If enabled by :c:macro:`LV_LABEL_TEXT_SELECTION` part of the text can be
 selected. It's similar to when you use your mouse on a PC to select a
 text. The whole mechanism (click and select the text as you drag your
-finger/mouse) is implemented in :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>` and
+finger/mouse) is implemented in :ref:`Text area <widgets/textarea/text area (lv_textarea)>` and
 the Label widget only allows manual text selection with
 :cpp:expr:`lv_label_get_text_selection_start(label, start_char_index)` and
 :cpp:expr:`lv_label_get_text_selection_start(label, end_char_index)`.
@@ -118,23 +118,23 @@ Symbols
 -------
 
 The labels can display symbols alongside letters (or on their own). Read
-the :ref:`overview/font/fonts [0-1]` section to learn more about the symbols.
+the :ref:`overview/font/fonts` section to learn more about the symbols.
 
 Events
 ******
 
 No special events are sent by the Label.
 
-See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj)>` too.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
 
 No *Keys* are processed by the object type.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

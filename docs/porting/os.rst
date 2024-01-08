@@ -5,8 +5,8 @@ Operating system and interrupts
 LVGL is **not thread-safe** by default.
 
 However, in the following conditions it's valid to call LVGL related
-functions: - In *events*. Learn more in :ref:`overview/events/events [0-1]`. -
-In *lv_timer*. Learn more in :ref:`overview/timer/timers [0-1]`.
+functions: - In *events*. Learn more in :ref:`overview/event/events`. -
+In *lv_timer*. Learn more in :ref:`overview/timer/timers`.
 
 Tasks and threads
 -----------------

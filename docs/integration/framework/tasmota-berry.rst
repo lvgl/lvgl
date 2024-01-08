@@ -42,8 +42,6 @@ Berry has the following advantages:
 
 All features are detailed in the `Berry Reference Manual <https://github.com/berry-lang/berry/wiki/Reference>`__
 
---------------
-
 Why LVGL + Tasmota + Berry?
 ---------------------------
 
@@ -70,7 +68,6 @@ A higher level interface compatible with
 `OpenHASP <https://github.com/HASwitchPlate/openHASP>`__
 is also under development.
 
---------------
 
 So what does it look like?
 --------------------------
@@ -90,6 +87,7 @@ A simple example
    btn.center()
    label = lv.label(btn)      # create a label in the button
    label.set_text("Button")   # set a label to the button
+
 
 How can I use it?
 -----------------

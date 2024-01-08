@@ -177,106 +177,11 @@ LVGL C API Coding Conventions
 
 For a summary of coding conventions to follow see the `CODING STYLE <CODING_STYLE>`__.
 
-Memory Management
------------------
-
-| When LVGL runs in Micropython, all dynamic memory allocations (:cpp:func:`lv_malloc`) are handled by Micropython's memory
-  manager which is `garbage-collected <https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)>`__ (GC).
-| To prevent GC from collecting memory prematurely, all dynamic allocated RAM must be reachable by GC.
-| GC is aware of most allocations, except from pointers on the `Data Segment <https://en.wikipedia.org/wiki/Data_segment>`__:
-
-    - Pointers which are global variables
-    - Pointers which are static global variables
-    - Pointers which are static local variables
-
-Such pointers need to be defined in a special way to make them reachable by GC
 
 
-Identify The Problem
-^^^^^^^^^^^^^^^^^^^^
+.. toctree::
+   :maxdepth: 2
 
-Problem happens when an allocated memory's pointer (return value of :cpp:func:`lv_malloc`) is stored only in either **global**,
-**static global** or **static local** pointer variable and not as part of a previously allocated ``struct`` or other variable.
+   memory_management
+   callbacks
 
-
-Solve The Problem
-^^^^^^^^^^^^^^^^^
-
-- Replace the global/static local var with :cpp:expr:`(LV_GLOBAL_DEFAULT()->_var)`
-- Include ``lv_global.h`` on files that use ``LV_GLOBAL_DEFAULT``
-- Add ``_var`` to ``lv_global_t`` on ``lv_global.h``
-
-Example
-^^^^^^^
-
-
-More Information
-^^^^^^^^^^^^^^^^
-
-- `In the README <https://github.com/lvgl/lv_binding_micropython#memory-management>`__
-- `In the Blog <https://blog.lvgl.io/2019-02-20/micropython-bindings#i-need-to-allocate-a-littlevgl-struct-such-as-style-color-etc-how-can-i-do-that-how-do-i-allocatedeallocate-memory-for-it>`__
-
-Callbacks
----------
-
-In C a callback is just a function pointer. But in Micropython we need to register a *Micropython callable object* for each
-callback. Therefore in the Micropython binding we need to register both a function pointer and a Micropython object for every callback.
-
-Therefore we defined a **callback convention** for the LVGL C API that expects lvgl headers to be defined in a certain
-way. Callbacks that are declared according to the convention would allow the binding to register a Micropython object
-next to the function pointer when registering a callback, and access that object when the callback is called.
-
-- The basic idea is that we have ``void * user_data`` field that is used automatically by the Micropython Binding
-  to save the *Micropython callable object* for a callback. This field must be provided when registering the function
-  pointer, and provided to the callback function itself.
-- Although called "user_data", the user is not expected to read/write that field. Instead, the Micropython glue code uses
-  ``user_data`` to automatically keep track of the Micropython callable object. The glue code updates it when the callback
-  is registered, and uses it when the callback is called in order to invoke a call to the original callable object.
-
-There are a few options for defining a callback in LVGL C API:
-
-- Option 1: ``user_data`` in a struct
-
-  - There's a struct that contains a field called ``void * user_data``
-
-    - A pointer to that struct is provided as the **first** argument of a callback registration function
-    - A pointer to that struct is provided as the **first** argument of the callback itself
-
-- Option 2: ``user_data`` as a function argument
-
-  - A parameter called ``void * user_data`` is provided to the registration function as the **last** argument
-
-    - The callback itself receives ``void *`` as the **last** argument
-
-- Option 3: both callback and ``user_data`` are struct fields
-
-  - The API exposes a struct with both function pointer member and ``user_data`` member
-
-    - The function pointer member receives the same struct as its **first** argument
-
-In practice it's also possible to mix these options, for example provide a struct pointer when registering a callback
-(option 1) and provide ``user_data`` argument when calling the callback (options 2),
-**as long as the same ``user_data`` that was registered is passed to the callback when it's called**.
-
-Examples
-^^^^^^^^
-
-- :cpp:type:`lv_anim_t` contains ``user_data`` field. :cpp:func:`lv_anim_set_path_cb`
-  registers `path_cb` callback. Both ``lv_anim_set_path_cb`` and :cpp:type:`lv_anim_path_cb_t`
-  receive :cpp:type:`lv_anim_t` as their first argument
-- ``path_cb`` field can also be assigned directly in the Python code because it's a member
-  of :cpp:type:`lv_anim_t` which contains ``user_data`` field, and :cpp:type:`lv_anim_path_cb_t`
-  receive :cpp:type:`lv_anim_t` as its first argument.
-- :cpp:func:`lv_imgfont_create` registers ``path_cb`` and receives ``user_data`` as the last
-  argument. The callback :cpp:type:`lv_imgfont_get_path_cb_t` also receives the ``user_data`` as the last argument.
-
-
-More Information
-^^^^^^^^^^^^^^^^
-
-- In the `Blog <https://blog.lvgl.io/2019-08-05/micropython-pure-display-driver#using-callbacks>`__
-  and in the `README <https://github.com/lvgl/lv_binding_micropython#callbacks>`__
-- `[v6.0] Callback conventions  #1036 <https://github.com/lvgl/lvgl/issues/1036>`__
-- Various discussions: `here <https://github.com/lvgl/lvgl/pull/3294#issuecomment-1184895335>`__
-  and `here <https://github.com/lvgl/lvgl/issues/1763#issuecomment-762247629>`__
-  and`here <https://github.com/lvgl/lvgl/issues/316#issuecomment-467221587>`__

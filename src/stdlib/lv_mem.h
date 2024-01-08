@@ -112,8 +112,8 @@ void lv_free_core(void * p);
 void * lv_realloc_core(void * p, size_t new_size);
 
 /**
- * Used internally to execute a plain malloc operation
- * @param size      size in bytes to malloc
+ * Used internally to monitor the memory core
+ * @param mon_p      the monitor
  */
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p);
 

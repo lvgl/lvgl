@@ -2,7 +2,7 @@
 File System Interfaces
 ======================
 
-LVGL has a :ref:`overview/fs/file system [0-1]` module
+LVGL has a :ref:`overview/fs/file system` module
 to provide an abstraction layer for various file system drivers.
 
 LVG has built in support for:

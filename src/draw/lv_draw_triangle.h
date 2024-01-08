@@ -38,14 +38,14 @@ typedef struct {
 
 /**
  * Initialize a triangle draw descriptor
- * @param dsc       pointer to a draw descriptor
+ * @param draw_dsc       pointer to a draw descriptor
  */
 void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * draw_dsc);
 
 /**
  * Create a triangle draw task
  * @param layer     pointer to a layer
- * @param dsc       pointer to an initialized `lv_draw_triangle_dsc_t` variable
+ * @param draw_dsc  pointer to an initialized `lv_draw_triangle_dsc_t` variable
  */
 void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * draw_dsc);
 

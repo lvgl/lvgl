@@ -101,7 +101,7 @@ Events
    repeated after long press. The event parameter is set to the ID of
    the pressed/released button.
 
-See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj)>` too.
 
 :cpp:expr:`lv_buttonmatrix_get_selected_button(buttonm)` returns the index of the most
 recently released or focused button or :cpp:enumerator:`LV_BUTTONMATRIX_BUTTON_NONE` if no
@@ -110,7 +110,7 @@ such button.
 :cpp:expr:`lv_buttonmatrix_get_button_text(buttonm, button_id)` returns a pointer to the
 text of ``button_id``\ th button.
 
-Learn more about :ref:`overview/events/events [0-1]`.
+Learn more about :ref:`overview/event/events`.
 
 Keys
 ****
@@ -127,7 +127,7 @@ to the button matrix if used with encoder. This way, the pressed button
 repeat feature is disabled and on leaving edit mode the selected button
 won't be activated.
 
-Learn more about :ref:`overview/indev/keys [0-3]`.
+Learn more about :ref:`overview/indev/keys`.
 
 Example
 *******

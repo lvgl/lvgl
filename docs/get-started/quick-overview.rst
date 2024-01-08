@@ -4,7 +4,7 @@ Quick overview
 
 Here you can learn the most important things about LVGL. You should read
 this first to get a general impression and read the detailed
-:ref:`porting/index/porting [0-1]` and :ref:`overview/index/overview [0-1]` sections
+:ref:`porting/index/porting` and :ref:`overview/index/overview` sections
 after that.
 
 Get started in a simulator
@@ -14,7 +14,7 @@ Instead of porting LVGL to embedded hardware straight away, it's highly
 recommended to get started in a simulator first.
 
 LVGL is ported to many IDEs to be sure you will find your favorite one.
-Go to the :ref:`integration/ide/pc-simulator/simulator on pc [0-1]` section to get ready-to-use projects that can be run
+Go to the :ref:`integration/ide/pc-simulator/simulator on pc` section to get ready-to-use projects that can be run
 on your PC. This way you can save the time of porting for now and get some
 experience with LVGL immediately.
 
@@ -100,7 +100,7 @@ If you would rather try LVGL on your own project follow these steps:
    the main ``while(1)`` loop or in an operating system task. It will
    redraw the screen if required, handle input devices, animation etc.
 
-For a more detailed guide go to the :ref:`porting/index/porting [0-1]`
+For a more detailed guide go to the :ref:`porting/index/porting`
 section.
 
 Learn the basics
@@ -110,7 +110,7 @@ Widgets
 ~~~~~~~
 
 The graphical elements like Buttons, Labels, Sliders, Charts etc. are
-called objects or widgets. Go to :ref:`widgets/index/widgets [0-1]` to see the
+called objects or widgets. Go to :ref:`widgets/index/widgets` to see the
 full list of available widgets.
 
 Every object has a parent object where it is created. For example, if a
@@ -193,14 +193,14 @@ The object that triggered the event can be retrieved with:
 
    lv_obj_t * obj = lv_event_get_target(e);
 
-To learn all features of the events go to the :ref:`overview/events/events [0-1]` section.
+To learn all features of the events go to the :ref:`overview/event/events` section.
 
 Parts
 ~~~~~
 
 Widgets might be built from one or more *parts*. For example, a button
 has only one part called :cpp:enumerator:`LV_PART_MAIN`. However, a
-:ref:`widgets/slider/slider (lv_slider) [0-1]` has :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_INDICATOR`
+:ref:`widgets/slider/slider (lv_slider)` has :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_INDICATOR`
 and :cpp:enumerator:`LV_PART_KNOB`.
 
 By using parts you can apply different styles to sub-elements of a
@@ -258,7 +258,7 @@ configure the style. For example:
    lv_style_set_bg_color(&style1, lv_color_hex(0xa03080))
    lv_style_set_border_width(&style1, 2))
 
-See the full list of properties here :ref:`overview/style/properties [0-2]`.
+See the full list of properties here :ref:`overview/style/properties`.
 
 Styles are assigned using the ORed combination of an object's part and
 state. For example to use this style on the slider's indicator when the
@@ -312,7 +312,7 @@ style which resides inside the object and is used only by the object:
 
    lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | LV_STATE_PRESSED);
 
-To learn all the features of styles see the :ref:`overview/style/styles [0-1]` section.
+To learn all the features of styles see the :ref:`overview/style/styles` section.
 
 Themes
 ~~~~~~
@@ -331,7 +331,7 @@ Examples
 Micropython
 -----------
 
-Learn more about :ref:`integration/bindings/micropython/micropython [0-1]`.
+Learn more about :ref:`integration/bindings/micropython/index/micropython`.
 
 .. code:: python
 

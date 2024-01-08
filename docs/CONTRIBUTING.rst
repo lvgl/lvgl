@@ -237,7 +237,7 @@ Tell what you have achieved
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Have you already started using LVGL in a
-:ref:`integration/ide/pc-simulator/simulator on pc [0-1]`, a development
+:ref:`integration/ide/pc-simulator/simulator on pc`, a development
 board, or on your custom hardware? Was it easy or were there some
 obstacles? Are you happy with the result? Showing your project to others
 is a win-win situation because it increases your and LVGL's reputation
@@ -277,12 +277,12 @@ As you learn LVGL you will probably play with the features of widgets.
 Why not publish your experiments?
 
 Each widgets' documentation contains examples. For instance, here are
-the examples of the :ref:`Drop-down list <widgets/dropdown/example [0-2]>`
+the examples of the :ref:`Drop-down list <widgets/dropdown/example>`
 widget. The examples are directly loaded from the
 `lvgl/examples <https://github.com/lvgl/lvgl/tree/master/examples>`__
 folder.
 
-So all you need to do is send a :ref:`contributing/pull request [0-2]` to the
+So all you need to do is send a :ref:`contributing/pull request` to the
 `lvgl <https://github.com/lvgl/lvgl>`__ repository and follow some
 conventions:
 
@@ -326,7 +326,7 @@ The beauty of open-source software is you can easily dig in to it to
 understand how it works. You can also fix or adjust it as you wish.
 
 If you found and fixed a bug don't hesitate to send a 
-:ref:`contributing/pull request [0-2]` with the fix.
+:ref:`contributing/pull request` with the fix.
 
 In your Pull request please also add a line to
 `CHANGELOG.md <https://github.com/lvgl/lvgl/blob/master/CHANGELOG.md>`__.
@@ -363,7 +363,7 @@ folder. The
 file describes the basics rules of contribution and also lists some
 ideas.
 
-For further ideas take a look at the :ref:`roadmap/roadmap [0-1]` page. If you
+For further ideas take a look at the :ref:`roadmap/roadmap` page. If you
 are interested in any of them feel free to share your opinion and/or
 participate in the implementation.
 
