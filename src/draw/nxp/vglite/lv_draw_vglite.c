@@ -29,7 +29,7 @@
 
 #define DRAW_UNIT_ID_VGLITE 2
 
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
     #define VGLITE_TASK_BUF_SIZE 10
 #endif
 
@@ -37,7 +37,7 @@
  *      TYPEDEFS
  **********************/
 
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
 /**
  * Structure of pending vglite draw task
  */
@@ -82,7 +82,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
     #define _draw_info LV_GLOBAL_DEFAULT()->draw_info
 #endif
 
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
     /*
     * Circular buffer to hold the queued and the flushed tasks.
     * Two indexes, _head and _tail, are used to signal the beginning
@@ -436,7 +436,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 #endif
 }
 
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
 static inline void _vglite_queue_task(lv_draw_task_t * task_act)
 {
     _draw_task_buf[_tail].task = task_act;
@@ -482,7 +482,7 @@ static void _vglite_render_thread_cb(void * ptr)
     while(1) {
         /* Wait for sync if there is no task set. */
         while(u->task_act == NULL
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
               /*
                * Wait for sync if _draw_task_buf is empty.
                * The thread will have to run as much as there are pending tasks.
@@ -502,12 +502,12 @@ static void _vglite_render_thread_cb(void * ptr)
         }
 
         if(u->task_act) {
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
             _vglite_queue_task((void *)u->task_act);
 #endif
             _vglite_execute_drawing(u);
         }
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
         else {
             /*
              * Update the flush status for last pending tasks.
@@ -516,7 +516,7 @@ static void _vglite_render_thread_cb(void * ptr)
             vglite_run();
         }
 #endif
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
         _vglite_signal_task_ready((void *)u->task_act);
 #else
         /* Signal the ready state to dispatcher. */

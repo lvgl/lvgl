@@ -36,7 +36,7 @@
  *  STATIC VARIABLES
  **********************/
 
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
     static volatile bool _cmd_buf_flushed = false;
 #endif
 
@@ -48,7 +48,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
 bool vglite_cmd_buf_is_flushed(void)
 {
     return _cmd_buf_flushed;
@@ -57,7 +57,7 @@ bool vglite_cmd_buf_is_flushed(void)
 
 void vglite_run(void)
 {
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_uint32_t gpu_idle = 0;
 
@@ -72,11 +72,11 @@ void vglite_run(void)
 #endif
 
     /*
-     * If VGLITE_TASK_QUEUE is enabled, simply flush the command buffer and the
+     * If LV_USE_VGLITE_DRAW_ASYNC is enabled, simply flush the command buffer and the
      * vglite draw thread will signal asynchronous the dispatcher for completed tasks.
-     * Without the queue, process the tasks and signal them as complete one by one.
+     * Without draw async, process the tasks and signal them as complete one by one.
      */
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
     LV_ASSERT_MSG(vg_lite_flush() == VG_LITE_SUCCESS, "Flush failed.");
     _cmd_buf_flushed = true;
 #else

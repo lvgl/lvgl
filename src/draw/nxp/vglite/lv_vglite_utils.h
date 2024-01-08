@@ -31,14 +31,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define VGLITE_TASK_QUEUE_ENABLED 1
-
-#if LV_USE_OS && VGLITE_TASK_QUEUE_ENABLED
-#define VGLITE_TASK_QUEUE 1
-#else
-#define VGLITE_TASK_QUEUE 0
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -59,7 +51,7 @@ static inline void vglite_set_scissor(const lv_area_t * clip_area);
  * GLOBAL PROTOTYPES
  **********************/
 
-#if VGLITE_TASK_QUEUE
+#if LV_USE_VGLITE_DRAW_ASYNC
 /**
  * Get VG-Lite command buffer flushed status.
  *

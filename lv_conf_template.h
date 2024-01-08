@@ -67,6 +67,23 @@
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI_DEF 130     /*[px/inch]*/
 
+/*=================
+ * OPERATING SYSTEM
+ *=================*/
+/*Select an operating system to use. Possible options:
+ * - LV_OS_NONE
+ * - LV_OS_PTHREAD
+ * - LV_OS_FREERTOS
+ * - LV_OS_CMSIS_RTOS2
+ * - LV_OS_RTTHREAD
+ * - LV_OS_WINDOWS
+ * - LV_OS_CUSTOM */
+#define LV_USE_OS   LV_OS_NONE
+
+#if LV_USE_OS == LV_OS_CUSTOM
+    #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+#endif
+
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
@@ -125,6 +142,11 @@
 #if LV_USE_DRAW_VGLITE
     /* Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
     #define LV_USE_VGLITE_BLIT_SPLIT 0
+
+    #if LV_USE_OS
+        /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
+        #define LV_USE_VGLITE_DRAW_ASYNC 1
+    #endif
 #endif
 
 /* Use NXP's PXP on iMX RTxxx platforms. */
@@ -155,23 +177,6 @@
 /*Enable YUV support for VG-Lite simulator*/
 #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
 
-#endif
-
-/*=================
- * OPERATING SYSTEM
- *=================*/
-/*Select an operating system to use. Possible options:
- * - LV_OS_NONE
- * - LV_OS_PTHREAD
- * - LV_OS_FREERTOS
- * - LV_OS_CMSIS_RTOS2
- * - LV_OS_RTTHREAD
- * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM */
-#define LV_USE_OS   LV_OS_NONE
-
-#if LV_USE_OS == LV_OS_CUSTOM
-    #define LV_OS_CUSTOM_INCLUDE <stdint.h>
 #endif
 
 /*=======================
