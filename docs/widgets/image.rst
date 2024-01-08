@@ -1,5 +1,3 @@
-.. _lv_image:
-
 ================
 Image (lv_image)
 ================
@@ -13,16 +11,12 @@ from files. Images can display symbols (``LV_SYMBOL_...``) too.
 Using the :ref:`Image decoder interface <overview_image_decoder>` custom image formats
 can be supported as well.
 
-.. _lv_image_parts_and_styles:
-
 Parts and Styles
 ****************
 
 - :cpp:enumerator:`LV_PART_MAIN` A background rectangle that uses the typical
   background style properties and the image itself using the image
   style properties.
-
-.. _lv_image_usage:
 
 Usage
 *****
@@ -41,7 +35,7 @@ To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 To generate a pixel array from a PNG, JPG or BMP image, use the `Online image converter tool <https://lvgl.io/tools/imageconverter>`__
 and set the converted image with its pointer  :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`
 To make the variable visible in the C file, you need to declare it with
-:cpp:macro:`LV_IMAGE_DECLARE(converted_img_var)`.
+:c:macro:`LV_IMAGE_DECLARE(converted_img_var)`.
 
 To use external files, you also need to convert the image files using
 the online converter tool but now you should select the binary output
@@ -183,8 +177,6 @@ Or to automatically scale or tile the image
 
 The alignment can be set by :cpp:func:`lv_image_set_align`
 
-.. _lv_image_events:
-
 Events
 ******
 
@@ -194,8 +186,6 @@ See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 
-.. _lv_image_keys:
-
 Keys
 ****
 
@@ -203,14 +193,10 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
-.. _lv_image_example:
-
 Example
 *******
 
 .. include:: ../examples/widgets/image/index.rst
-
-.. _lv_image_api:
 
 API
 ***

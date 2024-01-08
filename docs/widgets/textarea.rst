@@ -1,5 +1,3 @@
-.. _lv_textarea:
-
 =======================
 Text area (lv_textarea)
 =======================
@@ -13,8 +11,6 @@ can be added to it. Long lines are wrapped and when the text becomes
 long enough the Text area can be scrolled.
 
 One line mode and password modes are supported.
-
-.. _lv_textarea_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -37,8 +33,6 @@ Parts and Styles
    ``anim_time`` style property sets the cursor's blink time.
 -  :cpp:enumerator:`LV_PART_TEXTAREA_PLACEHOLDER` Unique to Text Area, allows styling
    the placeholder text.
-
-.. _lv_textarea_usage:
 
 Usage
 *****
@@ -152,8 +146,6 @@ Any part of the text can be selected if enabled with
 :cpp:expr:`lv_textarea_set_text_selection(textarea, true)`. This works much like
 when you select text on your PC with your mouse.
 
-.. _lv_textarea_events:
-
 Events
 ******
 
@@ -172,8 +164,6 @@ See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 
-.. _lv_textarea_keys:
-
 Keys
 ****
 
@@ -182,14 +172,10 @@ Keys
 
 Learn more about :ref:`indev_keys`.
 
-.. _lv_textarea_example:
-
 Example
 *******
 
 .. include:: ../examples/widgets/textarea/index.rst
-
-.. _lv_textarea_api:
 
 API
 ***

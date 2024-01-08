@@ -1,5 +1,3 @@
-.. _overview_image:
-
 ======
 Images
 ======
@@ -14,8 +12,6 @@ You can store images in two places
 
 - as a variable in internal memory (RAM or ROM)
 - as a file
-
-.. _overview_image_variables:
 
 Variables
 ---------
@@ -36,8 +32,6 @@ Images stored internally in a variable are composed mainly of an
 These are usually stored within a project as C files. They are linked
 into the resulting executable like any other constant data.
 
-.. _overview_image_files:
-
 Files
 -----
 
@@ -53,8 +47,6 @@ Images stored as files are not linked into the resulting executable, and
 must be read into RAM before being drawn. As a result, they are not as
 resource-friendly as images linked at compile time. However, they are
 easier to replace without needing to rebuild the main program.
-
-.. _overview_image_color_formats:
 
 Color formats
 *************
@@ -172,8 +164,6 @@ The simplest way to use an image in LVGL is to display it with an
 If the image was converted with the online converter, you should use
 :cpp:expr:`LV_IMAGE_DECLARE(my_icon_dsc)` to declare the image in the file where
 you want to use it.
-
-.. _overview_image_decoder:
 
 Image decoder
 *************
@@ -446,8 +436,6 @@ See the detailed code below:
     ...
   }
 
-.. _overview_image_caching:
-
 Image caching
 *************
 
@@ -523,7 +511,7 @@ LVGL to cache the image again. Otherwise, there is no easy way of
 detecting that the underlying file changed and LVGL will still draw the
 old image from cache.
 
-To do this, use :cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0));`.
+To do this, use :cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0))`.
 
 Custom cache algorithm
 ----------------------
@@ -585,8 +573,6 @@ following code to replace the LVGL built-in cache manager:
     lv_cache_set_manager(&my_manager);
     lv_cache_unlock();
    }
-
-.. _overview_image_api:
 
 API
 ***

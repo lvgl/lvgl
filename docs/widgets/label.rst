@@ -1,5 +1,3 @@
-.. _lv_label:
-
 ================
 Label (lv_label)
 ================
@@ -9,21 +7,14 @@ Overview
 
 A label is the basic object type that is used to display text.
 
-.. _lv_label_parts_and_styles:
-
 Parts and Styles
 ****************
 
-- :cpp:enumerator:`LV_PART_MAIN` Uses all the typical background properties and the
-   text properties. The padding values can be used to add space between
-   the text and the background.
-- :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar that is shown when the text is
-   larger than the widget's size.
-- :cpp:enumerator:`LV_PART_SELECTED` Tells the style of the 
-  :ref:`selected text <lv_label_text_selection>`. Only ``text_color`` and ``bg_color`` style
-   properties can be used.
-
-.. _lv_label_usage:
+- :cpp:enumerator:`LV_PART_MAIN` Uses all the typical background properties and the text properties.
+  The padding values can be used to add space between the text and the background.
+- :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar that is shown when the text is larger than the widget's size.
+- :cpp:enumerator:`LV_PART_SELECTED` Tells the style of the :ref:`selected text <lv_label_text_selection>`.
+  Only ``text_color`` and ``bg_color`` style properties can be used.
 
 Usage
 *****
@@ -49,16 +40,12 @@ safe to use with :cpp:func:`lv_label_set_text_static` (except when used with
 :cpp:enumerator:`LV_LABEL_LONG_DOT`, as it modifies the buffer in-place), as they are
 stored in ROM memory, which is always accessible.
 
-.. _lv_label_newline:
-
 Newline
 -------
 
 Newline characters are handled automatically by the label object. You
 can use ``\n`` to make a line break. For example:
 ``"line1\nline2\n\nline4"``
-
-.. _lv_label_long_modes:
 
 Long modes
 ----------
@@ -90,8 +77,6 @@ this implementation detail is unnoticed. This is not the case with
 :cpp:func:`lv_label_set_text_static` must be writable if you plan to use
 :cpp:enumerator:`LV_LABEL_LONG_DOT`.
 
-.. _lv_label_text_selection:
-
 Text selection
 --------------
 
@@ -103,8 +88,6 @@ the Label widget only allows manual text selection with
 :cpp:expr:`lv_label_get_text_selection_start(label, start_char_index)` and
 :cpp:expr:`lv_label_get_text_selection_start(label, end_char_index)`.
 
-.. _lv_label_text_alignment:
-
 Text alignment
 --------------
 
@@ -115,16 +98,12 @@ Note that it has a visible effect only if
 - the label widget's width is larger than the width of the longest line of the text
 - the text has multiple lines with non equal line length
 
-.. _lv_label_very_long_texts:
-
 Very long texts
 ---------------
 
 LVGL can efficiently handle very long (e.g. > 40k characters) labels by
 saving some extra data (~12 bytes) to speed up drawing. To enable this
 feature, set ``LV_LABEL_LONG_TXT_HINT   1`` in ``lv_conf.h``.
-
-.. _lv_label_custom_scrolling_animations:
 
 Custom scrolling animations
 ---------------------------
@@ -135,15 +114,11 @@ customized by setting the animation property of a style, using
 :cpp:func:`lv_style_set_anim`.
 It will be treated as a template which will be used to create the scroll animatins.
 
-.. _lv_label_symbols:
-
 Symbols
 -------
 
 The labels can display symbols alongside letters (or on their own). Read
 the :ref:`fonts` section to learn more about the symbols.
-
-.. _lv_label_events:
 
 Events
 ******
@@ -154,8 +129,6 @@ See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 
-.. _lv_label_keys:
-
 Keys
 ****
 
@@ -163,14 +136,10 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
-.. _lv_label_example:
-
 Example
 *******
 
 .. include:: ../examples/widgets/label/index.rst
-
-.. _lv_label_api:
 
 API
 ***

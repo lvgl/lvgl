@@ -1,5 +1,3 @@
-.. _libpng:
-
 ==============
 libpng decoder
 ==============
@@ -24,8 +22,6 @@ Add libpng to your project
     include_directories(${PNG_INCLUDE_DIR})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${PNG_LIBRARIES})
 
-.. _libpng_usage:
-
 Usage
 -----
 
@@ -36,14 +32,10 @@ It should be noted that each image of this decoder needs to consume ``width x he
 and it needs to be combined with the :ref:`overview_image_caching` feature to ensure that the memory usage is within a reasonable range.
 The decoded image is stored in RGBA pixel format.
 
-.. _libpng_example:
-
 Example
 -------
 
 .. include:: ../examples/libs/libpng/index.rst
-
-.. _libpng_api:
 
 API
 ---

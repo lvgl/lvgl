@@ -1,5 +1,3 @@
-.. _obj_property:
-
 ===============
 Widget Property
 ===============
@@ -7,8 +5,6 @@ Widget Property
 Widgets have many properties that can decide what they look like and how they behave.
 For example, the size, position, color, font, etc. are properties of a widget.
 Specially, widget local style is also a property of a widget.
-
-.. _obj_property_usage:
 
 Usage
 -----
@@ -31,8 +27,6 @@ Two APIs are provided to get/set widget properties. It can be enabled by setting
     lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value);
     lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
 
-.. _obj_property_id:
-
 Property ID
 ~~~~~~~~~~~
 
@@ -46,8 +40,6 @@ Property ID is a 32-bit value. The higher 4bits indicates the property value typ
 The lower 28bits is the property ID.
 
 Note that :cpp:type:`lv_style_prop_t` is also valid property ID.
-
-.. _obj_property_value:
 
 Property Value
 ~~~~~~~~~~~~~~

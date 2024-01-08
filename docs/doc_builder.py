@@ -296,7 +296,11 @@ class FILE(object):
 
             cls = globals()[member.attrib['kind'].upper()]
             if cls == ENUM:
-                member.attrib['name'] = member[0].text.strip()
+                if not member[0].text:
+                    member.attrib['name'] = 'UNKNOWN'
+                else:
+                    member.attrib['name'] = member[0].text.strip()
+
                 enums_.append(cls(self, **member.attrib))
             elif cls == ENUMVALUE:
                 if enums_[-1].is_member(member):

@@ -1,5 +1,3 @@
-.. _rlottie:
-
 =============
 Lottie player
 =============
@@ -39,8 +37,6 @@ given build system.
 
 ESP-IDF example at bottom
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _rlottie_usage:
 
 Usage
 -----
@@ -177,7 +173,7 @@ limitations:
 - Build the lottie animation to be sized for the intended size
 - it can scale/resize, but performance will be best when the base lottie size is as intended
 - Limit total number of frames, the longer the lottie animation is, 
-the more memory it will consume for rendering (rlottie consumes IRAM for rendering)
+  the more memory it will consume for rendering (rlottie consumes IRAM for rendering)
 - Build the lottie animation for the intended frame rate
 - default lottie is 60fps, embedded LCDs likely won't go above 30fps
 
@@ -275,14 +271,10 @@ IDF) with the appropriate :cpp:expr:`MALLOC_CAP` call - for SPIRAM usage this is
 
    rlottie->allocated_buf = heap_caps_malloc(allocated_buf_size+1, MALLOC_CAP_SPIRAM);
 
-.. _rlottie_example:
-
 Example
 -------
 
 .. include:: ../examples/libs/rlottie/index.rst
-
-.. _rlottie_api:
 
 API
 ---

@@ -41,13 +41,45 @@ extensions = [
     'breathe',
     'sphinx_sitemap',
     'lv_example',
-    'sphinx_rtd_dark_mode'
+    'sphinx_rtd_dark_mode',
+    "sphinx.ext.autosectionlabel"
 ]
+
+# sphinx.ext.autosectionlabel
+# adds unique references to section headers
+# to view a list of all of the references use
+# python -m sphinx.ext.intersphinx html_out/objects.inv
+autosectionlabel_prefix_document = True
+autosectionlabel_maxdepth = 2
+
 
 default_dark_mode = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+
+# breathe_debug_trace_directives = True
+# breathe_debug_trace_doxygen_ids = True
+# breathe_debug_trace_qualification = True
+
+
+# Only add spelling extension if it is available. We don't know if it is installed as we don't want
+# to put it in the setup.py file as a dependency as we don't want Breathe to be dependent on it as
+# people should be able to use Breathe without 'spelling'. There might be a better way to handle
+# this.
+try:
+    import sphinxcontrib.spelling
+
+    extensions.append("sphinxcontrib.spelling")
+
+    # Configuration for spelling extension
+    spelling_word_list_filename = "spelling_wordlist.txt"
+    spelling_lang = "en_US"
+
+except ImportError:
+    pass
+
 
 # The default language to highlight source code in. The default is 'python'.
 # The value should be a valid Pygments lexer name, see Showing code examples for more details.

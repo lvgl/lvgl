@@ -1,5 +1,3 @@
-.. _obj_id:
-
 ======
 OBJ ID
 ======
@@ -7,8 +5,6 @@ OBJ ID
 LVGL provides an optional field in :cpp:type:`lv_obj_t` to store the object ID.
 Object ID can be used in many cases, for example, to identify the object.
 Or we can store a program backtrace to where the object is created.
-
-.. _obj_id_usage:
 
 Usage
 -----

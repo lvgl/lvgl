@@ -1,11 +1,9 @@
-.. _micropython:
-
 ===========
 Micropython
 ===========
 
 What is Micropython?
---------------------
+====================
 
 `Micropython <http://micropython.org/>`__ is Python for
 microcontrollers. Using Micropython, you can write Python3 code and run
@@ -13,7 +11,7 @@ it even on a bare metal architecture with limited resources.
 
 
 Highlights of Micropython
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=========================
 
 - **Compact**: Fits and runs within just 256k of code space and 16k of RAM. No OS is needed, although you
   can also run it with an OS, if you want.
@@ -31,11 +29,9 @@ Highlights of Micropython
   `machine module <https://docs.micropython.org/en/latest/library/machine.html#classes>`__
   for accessing low-level hardware (I/O pins, ADC, UART, SPI, I2C, RTC, Timers etc.)
 
---------------
-
 
 Why Micropython + LVGL?
------------------------
+=======================
 
 Micropython `does not have a good native high-level GUI library <https://forum.micropython.org/viewtopic.php?f=18&t=5543>`__.
 LVGL is an `Object-Oriented Component Based <https://blog.lvgl.io/2018-12-13/extend-lvgl-objects>`__
@@ -43,8 +39,8 @@ high-level GUI library, which seems to be a natural candidate to map into a high
 LVGL is implemented in C and its APIs are in C.
 
 
-Here are some advantages of using LVGL in Micropython:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Here are some advantages of using LVGL in Micropython
+-----------------------------------------------------
 
 - Develop GUI in Python, a very popular high level language. Use paradigms such as Object-Oriented Programming.
 - Usually, GUI development requires multiple iterations to get things right. With C, each iteration consists of
@@ -52,8 +48,9 @@ Here are some advantages of using LVGL in Micropython:
   **``Change code`` > ``Run``** ! You can even run commands interactively using the
   `REPL <https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>`__ (the interactive prompt)
 
-Micropython + LVGL could be used for:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Micropython + LVGL could be used for
+------------------------------------
 
 - Fast prototyping GUI.
 - Shortening the cycle of changing and fine-tuning the GUI.
@@ -65,11 +62,10 @@ Micropython + LVGL could be used for:
   embedded development.
 - Creating tools to work with LVGL at a higher level (e.g. drag-and-drop designer).
 
---------------
 
 
 So what does it look like?
---------------------------
+==========================
 
 It's very much like the C API, but Object-Oriented for LVGL components.
 
@@ -77,7 +73,7 @@ Let's dive right into an example!
 
 
 A simple example
-~~~~~~~~~~~~~~~~
+----------------
 
 .. code:: python
 
@@ -92,10 +88,10 @@ A simple example
 
 
 How can I use it?
------------------
+=================
 
 Online Simulator
-~~~~~~~~~~~~~~~~
+----------------
 
 If you want to experiment with LVGL + Micropython without downloading
 anything - you can use our online simulator! It's a fully functional
@@ -108,7 +104,7 @@ Many `LVGL examples <https://docs.lvgl.io/master/examples.html>`__ are available
 
 
 PC Simulator
-~~~~~~~~~~~~
+------------
 
 Micropython is ported to many platforms. One notable port is "unix", which allows you to build and run Micropython
 (+LVGL) on a Linux machine. (On a Windows machine you might need Virtual Box or WSL or MinGW or Cygwin etc.)
@@ -117,7 +113,7 @@ Micropython is ported to many platforms. One notable port is "unix", which allow
 
 
 Embedded Platforms
-~~~~~~~~~~~~~~~~~~
+------------------
 
 In the end, the goal is to run it all on an embedded platform. Both Micropython and LVGL can be used on many embedded
 architectures. `lv_micropython <https://github.com/lvgl/lv_micropython>`__ is a fork of Micropython+LVGL and currently
@@ -157,7 +153,7 @@ lv_micropython already contains these drivers:
 
 
 Where can I find more information?
-----------------------------------
+==================================
 
 - ``lv_micropython`` `README <https://github.com/lvgl/lv_micropython>`__
 - ``lv_binding_micropython`` `README <https://github.com/lvgl/lv_binding_micropython>`__
@@ -167,7 +163,7 @@ Where can I find more information?
 
 
 The Micropython Binding is auto generated!
-------------------------------------------
+==========================================
 
 - LVGL is a git submodule inside `lv_micropython <https://github.com/lvgl/lv_micropython>`__
   (LVGL is a git submodule of `lv_binding_micropython <https://github.com/lvgl/lv_binding_micropython>`__
@@ -177,14 +173,12 @@ The Micropython Binding is auto generated!
 
 
 LVGL C API Coding Conventions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 For a summary of coding conventions to follow see the `CODING STYLE <CODING_STYLE>`__.
 
-.. _memory_management:
-
 Memory Management
-~~~~~~~~~~~~~~~~~
+-----------------
 
 | When LVGL runs in Micropython, all dynamic memory allocations (:cpp:func:`lv_malloc`) are handled by Micropython's memory
   manager which is `garbage-collected <https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)>`__ (GC).
@@ -222,10 +216,8 @@ More Information
 - `In the README <https://github.com/lvgl/lv_binding_micropython#memory-management>`__
 - `In the Blog <https://blog.lvgl.io/2019-02-20/micropython-bindings#i-need-to-allocate-a-littlevgl-struct-such-as-style-color-etc-how-can-i-do-that-how-do-i-allocatedeallocate-memory-for-it>`__
 
-.. _callbacks:
-
 Callbacks
-~~~~~~~~~
+---------
 
 In C a callback is just a function pointer. But in Micropython we need to register a *Micropython callable object* for each
 callback. Therefore in the Micropython binding we need to register both a function pointer and a Micropython object for every callback.
@@ -278,7 +270,6 @@ Examples
 - :cpp:func:`lv_imgfont_create` registers ``path_cb`` and receives ``user_data`` as the last
   argument. The callback :cpp:type:`lv_imgfont_get_path_cb_t` also receives the ``user_data`` as the last argument.
 
-.. _more-information-1:
 
 More Information
 ^^^^^^^^^^^^^^^^

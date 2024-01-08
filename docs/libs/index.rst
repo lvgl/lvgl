@@ -1,5 +1,3 @@
-.. _3rd_party_libraries:
-
 ===================
 3rd party libraries
 ===================

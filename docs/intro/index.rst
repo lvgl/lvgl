@@ -1,5 +1,3 @@
-.. _introduction:
-
 ============
 Introduction
 ============
@@ -26,8 +24,6 @@ Key features
 - Tutorials, examples, themes for rapid GUI design
 - Documentation is available online and as PDF
 - Free and open-source under MIT license
-
-.. _requirements:
 
 Requirements
 ------------

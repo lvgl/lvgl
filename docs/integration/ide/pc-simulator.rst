@@ -1,5 +1,3 @@
-.. _simulator:
-
 ===============
 Simulator on PC
 ===============

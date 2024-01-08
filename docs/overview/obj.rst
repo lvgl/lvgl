@@ -1,5 +1,3 @@
-.. _objects:
-
 =======
 Objects
 =======
@@ -15,8 +13,6 @@ You can see all the :ref:`Object types <widgets>` here.
 All objects are referenced using an :cpp:type:`lv_obj_t` pointer as a handle.
 This pointer can later be used to set or get the attributes of the
 object.
-
-.. _objects_attributes:
 
 Attributes
 **********
@@ -64,8 +60,6 @@ functions. For example for a slider:
 The API of the widgets is described in their
 :ref:`Documentation <widgets>` but you can also check the respective
 header files (e.g. *widgets/lv_slider.h*)
-
-.. _objects_working_mechanisms:
 
 Working mechanisms
 ******************
@@ -167,8 +161,6 @@ using :cpp:expr:`lv_obj_clean(obj)`.
 You can use :cpp:expr:`lv_obj_delete_delayed(obj, 1000)` to delete an object after
 some time. The delay is expressed in milliseconds.
 
-.. _objects_screens:
-
 Screens
 *******
 
@@ -192,8 +184,6 @@ There is always an active screen on each display. By default, the
 library creates and loads a "Base object" as a screen for each display.
 
 To get the currently active screen use the :cpp:func:`lv_screen_active` function.
-
-.. _objects_load_screens:
 
 Load screens
 ------------
@@ -254,8 +244,6 @@ on the default display.
 
 Visit :ref:`display_multi_display_support` to learn more.
 
-.. _objects_parts:
-
 Parts
 *****
 
@@ -278,8 +266,6 @@ The following predefined parts exist in LVGL:
 The main purpose of parts is to allow styling the "components" of the
 widgets. They are described in more detail in the
 :ref:`Style overview <styles>` section.
-
-.. _objects_states:
 
 States
 ******
@@ -311,15 +297,11 @@ values can be used as well. E.g.
 To learn more about the states read the related section of the
 :ref:`Style overview <styles>`.
 
-.. _objects_snapshot:
-
 Snapshot
 ********
 
 A snapshot image can be generated for an object together with its
 children. Check details in :ref:`snapshot`.
-
-.. _objects_api:
 
 API
 ***

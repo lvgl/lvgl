@@ -1,5 +1,3 @@
-.. _lv_chart:
-
 ================
 Chart (lv_chart)
 ================
@@ -13,8 +11,6 @@ charts are supported.
 
 Charts can have: - division lines - 2 y axis - axis ticks and texts on
 ticks - cursors - scrolling and zooming
-
-.. _lv_chart_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -40,8 +36,6 @@ Parts and Styles
 -  :cpp:enumerator:`LV_PART_CURSOR` *Line* properties are used to style the cursors.
    ``width``, ``height``, ``bg_color`` and ``radius`` are used to set
    the appearance of points.
-
-.. _lv_chart_usage:
 
 Usage
 *****
@@ -202,8 +196,6 @@ point.
 the cursor at a point. If the point's position changes (new value or
 scrolling) the cursor will move with the point.
 
-.. _lv_chart_events:
-
 Events
 ******
 
@@ -215,8 +207,6 @@ See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 
-.. _lv_chart_keys:
-
 Keys
 ****
 
@@ -224,14 +214,10 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
-.. _lv_chart_example:
-
 Example
 *******
 
 .. include:: ../examples/widgets/chart/index.rst
-
-.. _lv_chart_api:
 
 API
 ***

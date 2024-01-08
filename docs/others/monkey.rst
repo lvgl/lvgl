@@ -1,12 +1,8 @@
-.. _monkey:
-
 ======
 Monkey
 ======
 
 A simple monkey test. Use random input to stress test the application.
-
-.. _monkey_usage:
 
 Usage
 -----
@@ -33,14 +29,10 @@ Note that ``input_range`` has different meanings in different ``type``:
   :cpp:func:`lv_indev_set_button_points` to map the key ID to the coordinates.
 - :cpp:enumerator:`LV_INDEV_TYPE_KEYPAD`: No effect, Send random :ref:`indev_keys`.
 
-.. _monkey_example:
-
 Example
 -------
 
 .. include:: ../examples/others/monkey/index.rst
-
-.. _monkey_api:
 
 API
 ---

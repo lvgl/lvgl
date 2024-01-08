@@ -1,5 +1,3 @@
-.. _lv_checkbox:
-
 ======================
 Checkbox (lv_checkbox)
 ======================
@@ -9,8 +7,6 @@ Overview
 
 The Checkbox object is created from a "tick box" and a label. When the
 Checkbox is clicked the tick box is toggled.
-
-.. _lv_checkbox_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -24,8 +20,6 @@ Parts and Styles
    box larger in the respective directions.
 
 The Checkbox is added to the default group (if it is set).
-
-.. _lv_checkbox_usage:
 
 Usage
 *****
@@ -56,8 +50,6 @@ common state add/clear function:
 To get whether the checkbox is checked or not use:
 :cpp:expr:`lv_obj_has_state(cb, LV_STATE_CHECKED)`.
 
-.. _lv_checkbox_events:
-
 Events
 ******
 
@@ -66,8 +58,6 @@ Events
 See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
-
-.. _lv_checkbox_keys:
 
 Keys
 ****
@@ -82,14 +72,10 @@ Note that, as usual, the state of :cpp:enumerator:`LV_KEY_ENTER` is translated t
 
 Learn more about :ref:`indev_keys`.
 
-.. _lv_checkbox_example:
-
 Example
 *******
 
 .. include:: ../examples/widgets/checkbox/index.rst
-
-.. _lv_checkboxapi:
 
 API
 ***

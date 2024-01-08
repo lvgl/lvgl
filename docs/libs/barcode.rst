@@ -1,5 +1,3 @@
-.. _barcode:
-
 =======
 Barcode
 =======
@@ -7,8 +5,6 @@ Barcode
 Barcode generation with LVGL. Uses
 `code128 <https://github.com/fhunleth/code128>`__ by
 `fhunleth <https://github.com/fhunleth>`__.
-
-.. _barcode_usage:
 
 Usage
 -----
@@ -34,14 +30,10 @@ Notes
    :cpp:expr:`lv_barcode_set_scale(barcode, 2)` means 2x scaling.
 -  The direction adjustment can be :cpp:enumerator:`LV_DIR_HOR` or :cpp:enumerator:`LV_DIR_VER`
 
-.. _barcode_example:
-
 Example
 -------
 
 .. include:: ../examples/libs/barcode/index.rst
-
-.. _barcode_api:
 
 API
 ---

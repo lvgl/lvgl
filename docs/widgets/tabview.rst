@@ -1,5 +1,3 @@
-.. _lv_tabview:
-
 ====================
 Tabview (lv_tabview)
 ====================
@@ -21,15 +19,11 @@ side of the Tab view.
 A new tab can be selected either by clicking on a tab button or by
 sliding horizontally on the content.
 
-.. _lv_tabview_parts_and_styles:
-
 Parts and Styles
 ****************
 
 There are no special parts on the Tab view but the ``lv_obj`` and
 ``lv_button`` widgets are used to create the Tab view.
-
-.. _lv_tabview_usage:
 
 Usage
 *****
@@ -71,7 +65,7 @@ the tab bar can be moved to any sides.
 Set tab bra size
 ----------------
 
-The size of the tab bar can be adjusted by :spp:expr:`lv_tabview_set_tab_bar_size(tabview, size)`
+The size of the tab bar can be adjusted by :cpp:expr:`lv_tabview_set_tab_bar_size(tabview, size)`
 In case of vertical arrangement is means the height of the tab bar, and in horizontal
 arrangement it means the width.
 
@@ -82,8 +76,6 @@ Get the parts
 :cpp:expr:`lv_tabview_get_tab_buttons(tabview)` returns the Tab buttons object
 which is a :ref:`Button matrix <lv_buttonmatrix>`.
 
-.. _lv_tabview_events:
-
 Events
 ******
 
@@ -93,8 +85,6 @@ Events
 
 Learn more about :ref:`events`.
 
-.. _lv_tabview_keys:
-
 Keys
 ****
 
@@ -103,14 +93,10 @@ to a group if required.
 
 Learn more about :ref:`indev_keys`.
 
-.. _lv_tabview_example:
-
 Example
 *******
 
 .. include:: ../examples/widgets/tabview/index.rst
-
-.. _lv_tabview_api:
 
 API
 ***

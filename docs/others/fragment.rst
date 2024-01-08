@@ -1,5 +1,3 @@
-.. _fragment:
-
 ========
 Fragment
 ========
@@ -21,8 +19,6 @@ Fragment Manager is a manager holding references to fragments attached
 to it, and has an internal stack to achieve navigation. You can use
 fragment manager to build navigation stack, or multi pane application
 easily.
-
-.. _fragment_usage:
 
 Usage
 -----
@@ -73,14 +69,10 @@ Fragment Based Navigation
    /* Remove the top most fragment from the stack, and bring back previous one. */
    lv_fragment_manager_pop(manager);
 
-.. _fragment_example:
-
 Example
 -------
 
 .. include:: ../examples/others/fragment/index.rst
-
-.. _fragment_api:
 
 API
 ---

@@ -1,5 +1,3 @@
-.. _indev:
-
 =============
 Input devices
 =============
@@ -15,8 +13,6 @@ An input device usually means:
 
 Pointers
 ********
-
-.. _indev_cursor:
 
 Cursor
 ------
@@ -36,8 +32,6 @@ Pointer input devices (like a mouse) can have a cursor.
 Note that the cursor object should have
 :cpp:expr:`lv_obj_remove_flag(cursor_obj, LV_OBJ_FLAG_CLICKABLE)`. For images,
 *clicking* is disabled by default.
-
-.. _indev_gestures:
 
 Gestures
 --------
@@ -82,16 +76,12 @@ If you did some action on a gesture you can call
 :cpp:expr:`lv_indev_wait_release(lv_indev_active())` in the event handler to
 prevent LVGL sending further input device related events.
 
-.. _indev_keypad_and_encoder:
-
 Keypad and encoder
 ******************
 
 You can fully control the user interface without a touchpad or mouse by
 using a keypad or encoder(s). It works similar to the *TAB* key on the
 PC to select an element in an application or a web page.
-
-.. _indev_groups:
 
 Groups
 ------
@@ -113,8 +103,6 @@ an object to the group use :cpp:expr:`lv_group_add_obj(g, obj)`.
 
 To associate a group with an input device use
 :cpp:expr:`lv_indev_set_group(indev, g)`.
-
-.. _indev_keys:
 
 Keys
 ^^^^
@@ -199,8 +187,6 @@ will be shown.
 For a more detailed description read the
 `Style <https://docs.lvgl.io/master/overview/style.html>`__ section.
 
-
-.. _indev_api:
 
 API
 ***

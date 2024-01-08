@@ -1,5 +1,3 @@
-.. _display_interface:
-
 =================
 Display interface
 =================
@@ -173,7 +171,7 @@ selected color format.
 
 
 Swap endianness
---------------
+---------------
 
 In case of RGB565 color format it might be required to swap the 2 bytes
 because the SPI, I2C or 8 bit parallel port periphery sends them in the wrong order.

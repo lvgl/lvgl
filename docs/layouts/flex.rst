@@ -1,5 +1,3 @@
-.. _flex:
-
 ====
 Flex
 ====
@@ -38,8 +36,6 @@ Simple interface
 
 With the following functions you can set a Flex layout on any parent.
 
-.. _flex_flow:
-
 Flex flow
 ---------
 
@@ -55,8 +51,6 @@ The possible values for ``flex_flow`` are:
 - :cpp:enumerator:`LV_FLEX_FLOW_COLUMN_REVERSE`: Place the children in a column without wrapping but in reversed order
 - :cpp:enumerator:`LV_FLEX_FLOW_ROW_WRAP_REVERSE`: Place the children in a row with wrapping but in reversed order
 - :cpp:enumerator:`LV_FLEX_FLOW_COLUMN_WRAP_REVERSE`: Place the children in a column with wrapping but in reversed order
-
-.. _flex_align:
 
 Flex align
 ----------
@@ -91,8 +85,6 @@ The possible values are:
 - :cpp:enumerator:`LV_FLEX_ALIGN_SPACE_BETWEEN`: items are evenly distributed in
   the track: first item is on the start line, last item on the end line. Not applies to ``track_cross_place``.
 
-.. _flex_grow:
-
 Flex grow
 ---------
 
@@ -111,8 +103,6 @@ Flex grow can be set on a child with
 :cpp:expr:`lv_obj_set_flex_grow(child, value)`. ``value`` needs to be >
 1 or 0 to disable grow on the child.
 
-.. _flex_style:
-
 Style interface
 ***************
 
@@ -127,8 +117,6 @@ The following flex related style properties exist:
 -  :cpp:enumerator:`FLEX_TRACK_PLACE`
 -  :cpp:enumerator:`FLEX_GROW`
 
-.. _flex_padding:
-
 Internal padding
 ----------------
 
@@ -141,8 +129,6 @@ following properties can be set on the flex container style:
 
 These can for example be used if you don't want any padding between your
 objects: :cpp:expr:`lv_style_set_pad_column(&row_container_style,0)`
-
-.. _flex_other:
 
 Other features
 **************
@@ -165,14 +151,10 @@ New track
 You can force Flex to put an item into a new line with
 :cpp:expr:`lv_obj_add_flag(child, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)`.
 
-.. _flex_example:
-
 Example
 *******
 
 .. include:: ../examples/layouts/flex/index.rst
-
-.. _flex_api:
 
 API
 ***

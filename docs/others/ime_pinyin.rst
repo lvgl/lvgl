@@ -1,5 +1,3 @@
-.. _ime_pinyin:
-
 ==========
 Pinyin IME
 ==========
@@ -12,8 +10,6 @@ keyboard objects.
 Normally, an environment where :ref:`lv_keyboard` can
 run can also run ``lv_ime_pinyin``. There are two main influencing
 factors: the size of the font file and the size of the dictionary.
-
-.. _ime_pinyin_example:
 
 Usage
 -----
@@ -79,8 +75,6 @@ Then, write your own dictionary according to the following format:
 **The last item** must end with ``{null, null}``, or it will not work
 properly.
 
-.. _ime_pinyin_apply_new_dictionary:
-
 Apply new dictionary
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -91,8 +85,6 @@ only need to call this function to set up and use your dictionary:
 
        lv_obj_t * pinyin_ime = lv_100ask_pinyin_ime_create(lv_screen_active());
        lv_100ask_pinyin_ime_set_dict(pinyin_ime, your_pinyin_dict);
-
-.. _ime_pinyin_modes:
 
 Modes
 -----
@@ -108,14 +100,10 @@ The ``TEXT`` modes' layout contains buttons to change mode.
 To set the mode manually, use :cpp:expr:`lv_ime_pinyin_set_mode(pinyin_ime, mode)`.
 The default mode is :cpp:enumerator:`LV_IME_PINYIN_MODE_K26`.
 
-.. _ime_pinyin_example:
-
 Example
 -------
 
 .. include:: ../examples/others/ime/index.rst
-
-.. _ime_pinyin_api:
 
 API
 ---

@@ -1,13 +1,10 @@
-.. _display:
-
 ========
 Displays
 ========
 
 :important: The basic concept of a *display* in LVGL is explained in the :ref:`porting` section. So before reading further, please read that section first.
 
-.. _display_multi_display_support:
-
+************************
 Multiple display support
 ************************
 
@@ -27,10 +24,7 @@ Why would you want multi-display support? Here are some examples:
 - Have some smaller and simple displays in a large instrument or technology.
 - Have two large TFT displays: one for a customer and one for the shop assistant.
 
-.. _display_one_display:
 
-Using only one display
-----------------------
 
 Using more displays can be useful but in most cases it's not required.
 Therefore, the whole concept of multi-display handling is completely
@@ -60,8 +54,6 @@ large display's resolution. 2. In ``flush_cb``, truncate and modify the
 ``area`` parameter for each display. 3. Send the buffer's content to
 each real display with the truncated area.
 
-.. _display_screens:
-
 Screens
 *******
 
@@ -86,7 +78,7 @@ types are :ref:`Base object <lv_obj>` and :ref:`Image <lv_image>`
 (to create a wallpaper).
 
 To create a screen, use
-:cpp:expr:`lv_obj_t * scr = lv_<type>_create(NULL)`. ``NULL`` indicates no parent.
+``lv_obj_t * scr = lv_<type>_create(NULL)``. ``NULL`` indicates no parent.
 
 To load a screen, use :cpp:expr:`lv_screen_load(scr)`. To get the active screen,
 use :cpp:expr:`lv_screen_active()`. These functions work on the default display. If
@@ -126,12 +118,8 @@ UIs:
 - Set a color format with alpha channel. E.g.
   :cpp:expr:`lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888)`
 
-.. _display_features:
-
 Features of displays
 ********************
-
-.. _display_inactivity:
 
 Inactivity
 ----------
@@ -168,8 +156,6 @@ The opacity of the background color or image can be adjusted with
 
 The ``disp`` parameter of these functions can be ``NULL`` to select the
 default display.
-
-.. _display_api:
 
 API
 ***

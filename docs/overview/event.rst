@@ -1,5 +1,3 @@
-.. _events:
-
 ======
 Events
 ======
@@ -83,13 +81,16 @@ Remove event(s) from widgets
        }
    }
 
-.. _events_codes:
-
 Event codes
 ***********
 
-The event codes can be grouped into these categories: - Input device
-events - Drawing events - Other events - Special events - Custom events
+The event codes can be grouped into these categories:
+
+- Input device events
+- Drawing events
+- Other events
+- Special events
+- Custom events
 
 All objects (such as Buttons/Labels/Sliders etc.) regardless their type
 receive the *Input device*, *Drawing* and *Other* events.
@@ -118,8 +119,8 @@ Input device events
 -  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN`: 
 -  :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends
 -  :cpp:enumerator:`LV_EVENT_SCROLL`: Scrolling
--  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_active());`
--  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to the object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_active())`
+-  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to the object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_active())`
 -  :cpp:enumerator:`LV_EVENT_FOCUSED`: The object is focused
 -  :cpp:enumerator:`LV_EVENT_DEFOCUSED`: The object is defocused
 -  :cpp:enumerator:`LV_EVENT_LEAVE`: The object is defocused but still selected
@@ -193,7 +194,7 @@ Sending events
 **************
 
 To manually send events to an object, use
-:cpp:expr:`lv_obj_send_event(obj, <EVENT_CODE>, &some_data)`.
+:cpp:expr:`lv_obj_send_event(obj, EVENT_CODE, &some_data)`.
 
 For example, this can be used to manually close a message box by
 simulating a button press (although there are simpler ways to do this):
@@ -205,8 +206,8 @@ simulating a button press (although there are simpler ways to do this):
    lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 
 The same works for display and input devices with
-:cpp:expr:`lv_display_send_event(obj, <EVENT_CODE>, &some_data)` and
-:cpp:expr:`lv_indev_send_event(obj, <EVENT_CODE>, &some_data)`.
+:cpp:expr:`lv_display_send_event(obj, EVENT_CODE, &some_data)` and
+:cpp:expr:`lv_indev_send_event(obj, EVENT_CODE, &some_data)`.
 
 Refresh event
 -------------
@@ -231,8 +232,6 @@ contains all data about the event. The following values can be gotten from it:
 - :cpp:expr:`lv_event_get_user_data(e)`: get the pointer passed as the last parameter of :cpp:func:`lv_obj_add_event`.
 - :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_event_send`
 
-.. _events_bubbling:
-
 Event bubbling
 **************
 
@@ -245,14 +244,10 @@ The *target* parameter of the event is always the current target object,
 not the original object. To get the original target call
 :cpp:expr:`lv_event_get_target_obj(e)` in the event handler.
 
-.. _events_examples:
-
 Examples
 ********
 
 .. include:: ../examples/event/index.rst
-
-.. _events_api:
 
 API
 ***

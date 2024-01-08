@@ -1,13 +1,9 @@
-.. _snapshot:
-
 ========
 Snapshot
 ========
 
 Snapshot provides API to take snapshot image for LVGL object together
 with its children. The image will look exactly like the object on display.
-
-.. _snapshot_usage:
 
 Usage
 -----
@@ -32,7 +28,7 @@ image descriptor.
 
 Take caution to free the snapshot but not delete the image object.
 Before free the memory, be sure to firstly unlink it from image object,
-using :cpp:expr:`lv_image_set_src(NULL)` and :cpp:expr:`lv_cache_invalidate(lv_cache_find(src, LV_CACHE_SRC_TYPE_PTR, 0, 0));`.
+using :cpp:expr:`lv_image_set_src(NULL)` and :cpp:expr:`lv_cache_invalidate(lv_cache_find(src, LV_CACHE_SRC_TYPE_PTR, 0, 0))`.
 
 Below code snippet explains usage of this API.
 
@@ -63,14 +59,10 @@ happen when object size changes. It's recommended to use API
 :cpp:func:`lv_snapshot_buf_size_needed` to check the needed buffer size in byte
 firstly and resize the buffer accordingly.
 
-.. _snapshot_example:
-
 Example
 -------
 
 .. include:: ../examples/others/snapshot/index.rst
-
-.. _snapshot_api:
 
 API
 ---

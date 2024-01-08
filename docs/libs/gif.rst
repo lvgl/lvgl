@@ -1,5 +1,3 @@
-.. _gif:
-
 ===========
 GIF decoder
 ===========
@@ -45,14 +43,10 @@ required:
 - :c:macro:`LV_COLOR_DEPTH` ``16``: 4 x image width x image height
 - :c:macro:`LV_COLOR_DEPTH` ``32``: 5 x image width x image height
 
-.. _gif_example:
-
 Example
 -------
 
 .. include:: ../examples/libs/gif/index.rst
-
-.. _gif_api:
 
 API
 ---

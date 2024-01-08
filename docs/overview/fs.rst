@@ -1,5 +1,3 @@
-.. _overview_file_system:
-
 ===========
 File system
 ===========
@@ -154,8 +152,6 @@ To use files in image widgets the following callbacks are required:
 - read
 - seek
 - tell
-
-.. _overview_file_system_api:
 
 API
 ***

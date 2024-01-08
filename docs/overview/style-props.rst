@@ -1,5 +1,3 @@
-.. _style_properties:
-
 ================
 Style properties
 ================
@@ -2797,7 +2795,7 @@ Ext. draw Yes
    </ul>
 
 shadow_offset_x
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 Set an offset on the shadow in pixels in X direction.
 
@@ -2850,7 +2848,7 @@ Ext. draw Yes
    </ul>
 
 shadow_offset_y
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 
 Set an offset on the shadow in pixels in Y direction.
 

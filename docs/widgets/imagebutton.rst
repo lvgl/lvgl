@@ -1,5 +1,3 @@
-.. _lv_imagebutton:
-
 =============================
 Image button (lv_imagebutton)
 =============================
@@ -14,16 +12,12 @@ of drawing a rectangle.
 You can set a left, right and center image, and the center image will be
 repeated to match the width of the object.
 
-.. _lv_imagebutton_parts_and_styles:
-
 Parts and Styles
 ****************
 
 -  :cpp:enumerator:`LV_PART_MAIN` Refers to the image(s). If background style
    properties are used, a rectangle will be drawn behind the image
    button.
-
-.. _lv_imagebutton_usage:
 
 Usage
 *****
@@ -57,16 +51,12 @@ Instead of the regular :cpp:func:`lv_obj_add_state` and :cpp:func:`lv_obj_remove
 the :cpp:expr:`lv_imagebutton_set_state(imagebutton, LV_IMAGEBUTTON_STATE_...)` function should be
 used to manually set a state.
 
-.. _lv_imagebutton_events:
-
 Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the button is toggled.
 
 Learn more about :ref:`events`.
-
-.. _lv_imagebutton_keys:
 
 Keys
 ****
@@ -79,14 +69,10 @@ Keys
 
 Learn more about :ref:`indev_keys`.
 
-.. _lv_imagebutton_example:
-
 Example
 *******
 
 .. include:: ../examples/widgets/imagebutton/index.rst
-
-.. _lv_imagebutton_api:
 
 API
 ***

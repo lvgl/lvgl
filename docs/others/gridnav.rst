@@ -1,5 +1,3 @@
-.. _gridnav:
-
 ===============
 Grid navigation
 ===============
@@ -34,8 +32,6 @@ key on keyboard as usual.
 If the container is scrollable and the focused child is out of the view,
 gridnav will automatically scroll the child into view.
 
-.. _gridnav_usage:
-
 Usage
 -----
 
@@ -62,14 +58,10 @@ An object needs to be clickable or click focusable
 (:cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` or :cpp:enumerator:`LV_OBJ_FLAG_CLICK_FOCUSABLE`) and not
 hidden (:cpp:enumerator:`LV_OBJ_FLAG_HIDDEN`) to be focusable by gridnav.
 
-.. _gridnav_example:
-
 Example
 -------
 
 .. include:: ../examples/others/gridnav/index.rst
-
-.. _gridnav_api:
 
 API
 ---

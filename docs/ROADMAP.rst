@@ -3,8 +3,6 @@
 
 .. |uncheck| replace:: 🔲
 
-.. _roadmap:
-
 Roadmap
 =======
 

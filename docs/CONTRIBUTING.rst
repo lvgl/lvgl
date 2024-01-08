@@ -1,5 +1,3 @@
-.. _contributing:
-
 Contributing
 ============
 
@@ -36,8 +34,6 @@ Before getting started here are some guidelines to make contribution smoother:
 - For non-trivial fixes and features, it's better to open an issue first to discuss the
   details instead of sending a pull request directly.
 - Please read and follow the Coding style guide.
-
-.. _contributing_pull_request:
 
 Pull request
 ------------
@@ -84,8 +80,6 @@ same way for the other repositories.
 7. Describe what is in the update. An example code is welcome if applicable.
 8. If you need to make more changes, just update your forked ``lvgl`` repo with new commits.
    They will automatically appear in the PR.
-
-.. _contributing_commit_message_format:
 
 Commit message format
 ~~~~~~~~~~~~~~~~~~~~~
@@ -145,8 +139,6 @@ Some examples:
    The span widget allows mixing different font sizes, colors and styles.
    It's similar to HTML <span>
 - docs(porting): fix typo
-
-.. _contributing_dco:
 
 Developer Certification of Origin (DCO)
 ---------------------------------------
@@ -223,8 +215,6 @@ single line of LVGL code.
 Below we have collected some opportunities about the ways you can
 contribute to LVGL.
 
-.. _contributing_star:
-
 Give LVGL a Star
 ~~~~~~~~~~~~~~~~
 
@@ -242,8 +232,6 @@ Star
 
 This simple click makes LVGL more visible on GitHub and makes it more
 attractive to other people. So with this, you already helped a lot!
-
-.. _contributing_achieved:
 
 Tell what you have achieved
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -282,8 +270,6 @@ If you don't want to speak about your project publicly, feel free to use
 `Contact form <https://lvgl.io/#contact>`__ on lvgl.io to private
 message to us.
 
-.. _contributing_write_examples:
-
 Write examples
 ~~~~~~~~~~~~~~
 
@@ -308,8 +294,6 @@ conventions:
   `lvgl/examples/widgets <https://github.com/lvgl/lvgl/tree/master/examples/widgets>`__
   folder.
 
-.. _contributing_improve_docs:
-
 Improve the docs
 ~~~~~~~~~~~~~~~~
 
@@ -321,8 +305,6 @@ GitHub.
 
 Note that the documentation is also formatted in
 `Markdown <https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet>`__.
-
-.. _contributing_report_bugs:
 
 Report bugs
 ~~~~~~~~~~~
@@ -337,8 +319,6 @@ When filing the issue be sure to fill out the template. It helps find
 the root of the problem while avoiding extensive questions and exchanges
 with other developers.
 
-.. _contributing_send_fixes:
-
 Send fixes
 ~~~~~~~~~~
 
@@ -350,8 +330,6 @@ If you found and fixed a bug don't hesitate to send a
 
 In your Pull request please also add a line to
 `CHANGELOG.md <https://github.com/lvgl/lvgl/blob/master/CHANGELOG.md>`__.
-
-.. _contributing_forum:
 
 Join the conversations in the Forum
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -371,8 +349,6 @@ hesitate to share your thoughts and suggestions.
 
 Participating in the discussions is one of the best ways to become part
 of the project and get to know like-minded people!
-
-.. _contributing_add_features:
 
 Add features
 ~~~~~~~~~~~~
@@ -401,8 +377,6 @@ When adding a new features the following also needs to be updated:
 - Add description in the `docs <https://github.com/lvgl/lvgl/tree/master/docs>`__
 - Add `examples <https://github.com/lvgl/lvgl/tree/master/examples>`__
 - Update the `changelog <https://github.com/lvgl/lvgl/tree/master/docs/CHANGELOG.md>`__
-
-.. _contributing_become_maintainer:
 
 Become a maintainer
 ~~~~~~~~~~~~~~~~~~~

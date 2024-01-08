@@ -1,5 +1,3 @@
-.. _qrcode:
-
 =======
 QR code
 =======
@@ -7,8 +5,6 @@ QR code
 QR code generation with LVGL. Uses
 `QR-Code-generator <https://github.com/nayuki/QR-Code-generator>`__ by
 `nayuki <https://github.com/nayuki>`__.
-
-.. _qrcode_usage:
 
 Usage
 -----
@@ -29,14 +25,10 @@ Notes
 -  QR codes with less data are smaller, but they scaled by an integer
    number to best fit to the given size.
 
-.. _qrcode_example:
-
 Example
 -------
 
 .. include:: ../examples/libs/qrcode/index.rst
-
-.. _qrcode_api:
 
 API
 ---

@@ -1,5 +1,3 @@
-.. _drawing:
-
 =======
 Drawing
 =======
@@ -36,8 +34,6 @@ image to show on the display, and rendering happens to the other
 finished. The main difference is that with LVGL you don't have to store
 two frame buffers (which usually requires external RAM) but only smaller
 draw buffer(s) that can easily fit into internal RAM.
-
-.. _drawing_screen_refresh:
 
 Mechanism of screen refreshing
 ******************************
@@ -81,8 +77,6 @@ is the following:
 2. **Two buffers** - LVGL can immediately draw to the second buffer when the first is sent to ``flush_cb`` because the
    flushing should be done by DMA (or similar hardware) in the background.
 3. **Double buffering** - ``flush_cb`` should only swap the addresses of the frame buffers.
-
-.. _drawing_masking:
 
 Masking
 *******
@@ -171,8 +165,6 @@ to be freed when not required anymore.
 :cpp:func:`lv_draw_mask_add` saves only the pointer of the mask so the parameter
 needs to be valid while in use.
 
-.. _drawing_hooks:
-
 Hook drawing
 ************
 
@@ -190,8 +182,6 @@ every button and you can, for example, tell LVGL to use different colors
 on a specific button or to manually draw an image on some buttons.
 
 Each of these events is described in detail below.
-
-.. _drawing_hooks_main:
 
 Main drawing
 ------------
@@ -225,8 +215,6 @@ Called when the main drawing is finished. You can draw anything here as
 well and it's also a good place to remove any masks created in
 :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`.
 
-.. _drawing_hooks_post:
-
 Post drawing
 ------------
 
@@ -254,8 +242,6 @@ LV_EVENT_DRAW_POST_END
 
 Called when post drawing has finished. If masks were not removed in
 :cpp:enumerator:`LV_EVENT_DRAW_MAIN_END` they should be removed here.
-
-.. _drawing_hooks_parts:
 
 Part drawing
 ------------
@@ -317,8 +303,6 @@ LV_EVENT_DRAW_PART_END
 Finish the drawing of a part. This is a good place to draw extra content
 on the part or remove masks added in :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN`.
 
-.. _drawing_hooks_others:
-
 Others
 ------
 
@@ -370,8 +354,6 @@ required for the text.
 
 You can simply set the required draw area with
 :cpp:expr:`lv_event_set_ext_draw_size(e, size)`.
-
-.. _drawing_api:
 
 API
 ***

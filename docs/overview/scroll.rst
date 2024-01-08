@@ -1,5 +1,3 @@
-.. _scroll:
-
 ======
 Scroll
 ======
@@ -74,8 +72,6 @@ base direction.
 
 ``pad_left/right/top/bottom`` sets the spacing around the scrollbars and
 ``width`` sets the scrollbar's width.
-
-.. _scroll_events:
 
 Events
 ------
@@ -277,14 +273,10 @@ an object. Here is an example to see how to handle the event:
      }
    }
 
-.. _scroll_example:
-
 Examples
 ********
 
 .. include:: ../examples/scroll/index.rst
-
-.. _scroll_api:
 
 API
 ***

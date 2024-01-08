@@ -1,5 +1,3 @@
-.. _libs_filesystem:
-
 ======================
 File System Interfaces
 ======================
@@ -17,8 +15,6 @@ LVG has built in support for:
 
 You still need to provide the drivers and libraries, this extension
 provides only the bridge between FATFS, STDIO, POSIX, WIN32 and LVGL.
-
-.. _libs_filesystem_usage:
 
 Usage
 *****
@@ -51,8 +47,6 @@ the file name:
 
   lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, (void*)buffer, size);
   lv_fs_res_t res = lv_fs_open(&file, (const char *)&mempath, LV_FS_MODE_RD);
-
-.. _libs_filesystem_api:
 
 API
 ***

@@ -1,6 +1,6 @@
-===
+***
 NXP
-===
+***
 
 NXP has integrated LVGL into the MCUXpresso SDK packages for general
 purpose and crossover microcontrollers, allowing easy evaluation and
@@ -10,7 +10,7 @@ today and get started with your next GUI application.
 
 
 Creating new project with LVGL
-------------------------------
+==============================
 
 Downloading the MCU SDK example project is recommended as a starting
 point. It comes fully configured with LVGL (and with PXP/VGLite support
@@ -18,7 +18,7 @@ if the modules are present), no additional integration work is required.
 
 
 HW acceleration for NXP iMX RT platforms
-----------------------------------------
+========================================
 
 Depending on the RT platform used, the acceleration can be done by NXP
 PXP (PiXel Pipeline) and/or the Verisilicon GPU through an API named
@@ -27,7 +27,7 @@ individually as well simultaneously (in LVGL multithreading mode).
 
 
 PXP accelerator
-~~~~~~~~~~~~~~~
+---------------
 
 Several drawing features in LVGL can be offloaded to the PXP engine. The
 CPU is available for other operations while the PXP is running. RTOS is
@@ -43,8 +43,8 @@ Supported draw callbacks are available in "src/draw/nxp/pxp/lv_draw_pxp.c":
     pxp_draw_ctx->base_draw.wait_for_finish = lv_draw_pxp_wait_for_finish;
 
 
-Features supported:
-^^^^^^^^^^^^^^^^^^^
+Features supported
+^^^^^^^^^^^^^^^^^^
 
 All operations can be used in conjunction with optional transparency.
 
@@ -65,8 +65,8 @@ All operations can be used in conjunction with optional transparency.
    - Second step is required to handle color keying, alpha channel or to apply transparency
 
 
-Known limitations:
-^^^^^^^^^^^^^^^^^^
+Known limitations
+^^^^^^^^^^^^^^^^^
 
 - Rotation is not supported for images unaligned to blocks of 16x16
   pixels. PXP is set to process 16x16 blocks to optimize the system for
@@ -77,8 +77,8 @@ Known limitations:
   truncated and the final output image can look shifted.
 
 
-Basic configuration:
-^^^^^^^^^^^^^^^^^^^^
+Basic configuration
+^^^^^^^^^^^^^^^^^^^
 
 - Select NXP PXP engine in lv_conf.h: Set :c:macro:`LV_USE_GPU_NXP_PXP` to ``1``
 - Enable default implementation for interrupt handling, PXP start
@@ -88,8 +88,8 @@ Basic configuration:
   will be used, otherwise bare metal code will be included
 
 
-Basic initialization:
-^^^^^^^^^^^^^^^^^^^^^
+Basic initialization
+^^^^^^^^^^^^^^^^^^^^
 
 - If :c:macro:`LV_USE_GPU_NXP_PXP_AUTO_INIT` is enabled, no user code is
   required; PXP is initialized automatically in :cpp:func:`lv_init`
@@ -107,8 +107,8 @@ Basic initialization:
     #endif
 
 
-Project setup:
-^^^^^^^^^^^^^^
+Project setup
+^^^^^^^^^^^^^
 
 - Add PXP related files to project:
 
@@ -126,15 +126,15 @@ Project setup:
    - fsl_cache.c[.h]: CPU cache handling functions
 
 
-Logging:
-^^^^^^^^
+Logging
+^^^^^^^
 
 - By default, :c:macro:`LV_GPU_NXP_PXP_LOG_ERRORS` is enabled so that any PXP error will be seen on SDK debug console
 - By default, :c:macro:`LV_GPU_NXP_PXP_LOG_TRACES` is disabled. Enable it for tracing logs (like PXP limitations)
 
 
-Advanced configuration:
-^^^^^^^^^^^^^^^^^^^^^^^
+Advanced configuration
+^^^^^^^^^^^^^^^^^^^^^^
 
 - Implementation depends on multiple OS-specific functions. The struct
   :cpp:struct:`lv_nxp_pxp_cfg_t` with callback pointers is used as a parameter
@@ -156,7 +156,7 @@ Advanced configuration:
 
 
 VGLite accelerator
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Extra drawing features in LVGL can be handled by the VGLite engine. The
 CPU is available for other operations while the VGLite is running. An
@@ -175,11 +175,9 @@ Supported draw callbacks are available in "src/draw/nxp/vglite/lv_draw_vglite.c"
     vglite_draw_ctx->blend = lv_draw_vglite_blend;
     vglite_draw_ctx->base_draw.wait_for_finish = lv_draw_vglite_wait_for_finish;
 
-.. _features-supported-1:
 
-
-Features supported:
-^^^^^^^^^^^^^^^^^^^
+Features supported
+^^^^^^^^^^^^^^^^^^
 
 All operations can be used in conjunction with optional transparency.
 
@@ -194,11 +192,9 @@ All operations can be used in conjunction with optional transparency.
 - Draw arc with optional rounded ending
 - Draw line or dashed line with optional rounded ending
 
-.. _known-limitations-1:
 
-
-Known limitations:
-^^^^^^^^^^^^^^^^^^
+Known limitations
+^^^^^^^^^^^^^^^^^
 
 - Source image alignment: The byte alignment requirement for a pixel
   depends on the specific pixel format. Both buffer address and buffer
@@ -210,19 +206,15 @@ Known limitations:
   additional alignment requirement for linear buffer layouts
   (:c:macro:`VG_LITE_LINEAR`).
 
-.. _basic-configuration-1:
 
-
-Basic configuration:
-^^^^^^^^^^^^^^^^^^^^
+Basic configuration
+^^^^^^^^^^^^^^^^^^^
 
 - Select NXP VGLite engine in lv_conf.h: Set :c:macro:`LV_USE_GPU_NXP_VG_LITE` to 1
 - :c:macro:`SDK_OS_FREE_RTOS` symbol needs to be defined so that the FreeRTOS implementation will be used
 
-.. _basic-initialization-1:
-
-Basic initialization:
-^^^^^^^^^^^^^^^^^^^^^
+Basic initialization
+^^^^^^^^^^^^^^^^^^^^
 
 - Initialize VGLite before calling :cpp:func:`lv_init` by specifying the
   width/height of tessellation window. Value should be a multiple of
@@ -240,10 +232,8 @@ Basic initialization:
     VG_LITE_COND_STOP(vg_lite_init(64, 64) != VG_LITE_SUCCESS, "VGLite init failed.");
     #endif
 
-.. _project-setup-1:
-
-Project setup:
-^^^^^^^^^^^^^^
+Project setup
+^^^^^^^^^^^^^
 
 - Add VGLite related files to project:
 
@@ -255,19 +245,15 @@ Project setup:
    - src/draw/nxp/vglite/lv_vglite_buf.c[.h]: init/get vglite buffer
    - src/draw/nxp/vglite/lv_vglite_utils.c[.h]: function helpers
 
-.. _logging-1:
-
-Logging:
-^^^^^^^^
+Logging
+^^^^^^^
 
 - By default, :c:macro:`LV_GPU_NXP_VG_LITE_LOG_ERRORS` is enabled so that any VGLite error will be seen on SDK debug console
 - By default, :c:macro:`LV_GPU_NXP_VG_LITE_LOG_TRACES` is disabled. Enable it
   for tracing logs (like blit split workaround or VGLite fallback to CPU due to any error on the driver)
 
-.. _advanced-configuration-1:
-
-Advanced configuration:
-^^^^^^^^^^^^^^^^^^^^^^^
+Advanced configuration
+^^^^^^^^^^^^^^^^^^^^^^
 
 - Area threshold (size limit) is configurable and used to decide
   whether the area will be processed by VGLite or not. Areas smaller

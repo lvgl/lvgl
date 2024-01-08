@@ -1,5 +1,3 @@
-.. _porting_draw:
-
 ==========
 Custom GPU
 ==========
@@ -64,7 +62,9 @@ Hierarchy of modules
 All these together looks like this
 - list of draw units
 - display(s)
+
    - layer(s): Each display has its own list of layers
+
       - draw tasks: Each layer has its own list of draw tasks
 
 References

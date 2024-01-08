@@ -1,5 +1,3 @@
-.. _rle:
-
 ============
 RLE Compress
 ============
@@ -62,8 +60,6 @@ can be found from ``lvgl/script/LVGLImage.py``.
                 index += repeat_cnt * blksize
 
         return b"".join(compressed_data)
-
-.. _rle_usage:
 
 Usage
 -----

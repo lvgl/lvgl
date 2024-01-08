@@ -1,5 +1,3 @@
-.. _get_started:
-
 ===========
 Get started
 ===========
@@ -25,3 +23,4 @@ are learning to use LVGL:
     :maxdepth: 2
 
     quick-overview
+

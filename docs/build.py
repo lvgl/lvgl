@@ -15,6 +15,7 @@ import doc_builder
 import shutil
 import tempfile
 import config_builder
+import add_refs
 
 # due to the modifications that take place to the documentation files
 # when the documentaation builds it is better to copy the source files to a
@@ -54,6 +55,8 @@ clean = 0
 trans = 0
 skip_latex = False
 develop = False
+print_references = False
+
 args = sys.argv[1:]
 
 if len(args) >= 1:
@@ -63,6 +66,8 @@ if len(args) >= 1:
         skip_latex = True
     if 'develop' in args:
         develop = True
+    if 'list-refs' in args:
+        print_references = True
 
 
 def cmd(s):
@@ -74,6 +79,10 @@ def cmd(s):
         print("Exit build due to previous error")
         exit(-1)
 
+
+if print_references:
+    add_refs.run(temp_directory, print_references)
+    sys.exit(0)
 
 # Get the current branch name
 status, br = subprocess.getstatusoutput("git branch")
@@ -121,6 +130,9 @@ config_builder.run()
 
 shutil.copytree('.', temp_directory, dirs_exist_ok=True)
 shutil.copytree(examples_path, os.path.join(temp_directory, 'examples'))
+
+# modifies the .rst files to add references to the sections.
+add_refs.run(temp_directory, False)
 
 with open(os.path.join(temp_directory, 'Doxyfile'), 'rb') as f:
     data = f.read().decode('utf-8')

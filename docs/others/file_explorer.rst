@@ -1,5 +1,3 @@
-.. _file_explorer:
-
 =============
 File Explorer
 =============
@@ -17,8 +15,6 @@ The file list in ``lv_file_explorer`` is based on
 :ref:`lv_list`. Therefore, care should be taken to ensure
 that :ref:`lv_table` and :ref:`lv_list` are
 enabled.
-
-.. _file_explorer_usage:
 
 Usage
 -----
@@ -52,8 +48,6 @@ bar are fixed. Currently, there are the following items:
 -  :cpp:enumerator:`LV_FILE_EXPLORER_QA_MNT`
 -  :cpp:enumerator:`LV_FILE_EXPLORER_QA_FS`
 
-.. _file_explorer_sort:
-
 Sort
 ~~~~
 
@@ -69,8 +63,6 @@ There are the following sorting methods:
 You can customize the sorting. Before custom sort, please set the
 default sorting to :cpp:enumerator:`LV_EXPLORER_SORT_NONE`. The default is
 :cpp:enumerator:`LV_EXPLORER_SORT_NONE`.
-
-.. _file_explorer_events:
 
 Events
 ------
@@ -101,14 +93,10 @@ selected file in the event processing function. For example:
 You can also save the obtained **path** and **file** name into an array
 through functions such as :cpp:func:`strcpy` and :cpp:func:`strcat` for later use.
 
-.. _file_explorer_example:
-
 Example
 -------
 
 .. include:: ../examples/others/file_explorer/index.rst
-
-.. _file_explorer_api:
 
 API
 ---

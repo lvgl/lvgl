@@ -1,5 +1,3 @@
-.. _styles:
-
 ======
 Styles
 ======
@@ -28,8 +26,6 @@ border width, text color and so on. It's similar to a ``class`` in CSS.
 - Unlike CSS (where pseudo-classes describe different states, e.g. ``:focus``),
   in LVGL a property is assigned to a given state.
 - Transitions can be applied when the object changes state.
-
-.. _styles_states:
 
 States
 ******
@@ -109,8 +105,6 @@ Some practical notes:
   Instead, for example, use the background color for pressed and checked
   states and indicate the focused state with a different border color.
 
-.. _styles_cascading:
-
 Cascading styles
 ****************
 
@@ -138,8 +132,6 @@ style (red). When the button is pressed the light-gray color is a better
 match because it describes the current state perfectly, so the button
 will be light-gray.
 
-.. _styles_inheritance:
-
 Inheritance
 ***********
 
@@ -151,8 +143,6 @@ searched in the parents until an object specifies a value for the
 property. The parents will use their own state to determine the value.
 So if a button is pressed, and the text color comes from here, the
 pressed text color will be used.
-
-.. _styles_parts:
 
 Parts
 *****
@@ -178,8 +168,6 @@ For example a :ref:`Slider <lv_slider>` has three parts:
 
 This means all three parts of the slider can have their own styles. See
 later how to add styles to objects and parts.
-
-.. _styles_initialize:
 
 Initialize styles and set/get properties
 ****************************************
@@ -250,8 +238,6 @@ Styles can be built as ``const`` too to save RAM:
 
 Later ``const`` style can be used like any other style but (obviously)
 new properties can not be added.
-
-.. _styles_add_remove:
 
 Add and remove styles to a widget
 *********************************
@@ -345,8 +331,6 @@ To get a final value of property
 
    lv_color_t color = lv_obj_get_style_bg_color(btn, LV_PART_MAIN);
 
-.. _styles_local:
-
 Local styles
 ************
 
@@ -369,8 +353,6 @@ To set a local property use functions like
 
    lv_obj_set_style_bg_color(slider, lv_color_red(), LV_PART_INDICATOR | LV_STATE_FOCUSED);
 
-.. _styles_properties:
-
 Properties
 **********
 
@@ -391,8 +373,6 @@ background properties" are the ones related to:
 - Padding
 - Width and height transformation
 - X and Y translation
-
-.. _styles_transitions:
 
 Transitions
 ***********
@@ -435,8 +415,6 @@ initialized and added to a style:
 
    lv_style_set_transition(&style1, &trans1);
 
-.. _styles_opacity_blend_modes_transformations:
-
 Opacity, Blend modes and Transformations
 ****************************************
 
@@ -470,14 +448,10 @@ if it has radius, ``bg_opa != 255``, has shadow, outline, etc.
 
 The click area of the widget is also transformed accordingly.
 
-.. _styles_color_filter:
-
 Color filter
 ************
 
 TODO
-
-.. _styles_themes:
 
 Themes
 ******
@@ -524,14 +498,10 @@ E.g. default theme -> custom theme -> dark theme.
 
 There is an example for it below.
 
-.. _styles_example:
-
 Examples
 ********
 
 .. include:: ../examples/styles/index.rst
-
-.. _styles_api:
 
 API
 ***

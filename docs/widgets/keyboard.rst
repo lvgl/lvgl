@@ -1,5 +1,3 @@
-.. _lv_keyboard:
-
 ======================
 Keyboard (lv_keyboard)
 ======================
@@ -11,8 +9,6 @@ The Keyboard object is a special :ref:`Button matrix <lv_buttonmatrix>`
 with predefined keymaps and other features to realize a virtual keyboard
 to write texts into a :ref:`Text area <lv_textarea>`.
 
-.. _lv_keyboard_parts_and_styles:
-
 Parts and Styles
 ****************
 
@@ -20,8 +16,6 @@ Similarly to Button matrices Keyboards consist of 2 part:
 
 - :cpp:enumerator:`LV_PART_MAIN` The main part. Uses all the typical background properties
 - :cpp:enumerator:`LV_PART_ITEMS` The buttons. Also uses all typical background properties as well as the *text* properties.
-
-.. _lv_keyboard_usage:
 
 Usage
 *****
@@ -88,8 +82,6 @@ with the original map:
 - ``"abc"`` Load the lower case map.
 - ``"1#"`` Load the lower case map.
 
-.. _lv_keyboard_events:
-
 Events
 ******
 
@@ -110,8 +102,6 @@ with a custom event handler if you wish.
 
 Learn more about :ref:`events`.
 
-.. _lv_keyboard_keys:
-
 Keys
 ****
 
@@ -121,14 +111,10 @@ Keys
 
 Learn more about :ref:`indev_keys`.
 
-.. _lv_keyboard_example:
-
 Example
 *******
 
 .. include:: ../examples/widgets/keyboard/index.rst
-
-.. _lv_keyboard_api:
 
 API
 ***

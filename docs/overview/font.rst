@@ -1,5 +1,3 @@
-.. _fonts:
-
 =====
 Fonts
 =====
@@ -91,8 +89,6 @@ the `Montserrat <https://fonts.google.com/specimen/Montserrat>`__ font.
 In addition to the ASCII range, the following symbols are also added to
 the built-in fonts from the `FontAwesome <https://fontawesome.com/>`__
 font.
-
-.. _fonts_symbols:
 
 .. image:: /misc/symbols.png
 
@@ -199,8 +195,6 @@ match with the library settings. By default, LVGL assumes ``RGB`` order,
 however this can be swapped by setting :c:macro:`LV_SUBPX_BGR`  ``1`` in
 *lv_conf.h*.
 
-.. _fonts_compressed:
-
 Compressed fonts
 ----------------
 
@@ -231,8 +225,6 @@ characters.
 - The Tiny TTF font engine supports GPOS and Kern tables.
 
 To configure kerning at runtime, use :cpp:func:`lv_font_set_kerning`.
-
-.. _add_font:
 
 Add a new font
 **************
@@ -312,7 +304,7 @@ Example
    lv_font_free(&my_font);
 
 Load a font from a memory buffer at run-time
-******************************************
+********************************************
 
 :cpp:func:`lv_binfont_load_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not
@@ -417,8 +409,6 @@ font from ``fallback`` to handle.
    lv_font_t *droid_sans_fallback = my_font_load_function();
    /* So now we can display Roboto for supported characters while having wider characters set support */
    roboto->fallback = droid_sans_fallback;
-
-.. _fonts_api:
 
 API
 ***

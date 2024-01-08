@@ -1,5 +1,3 @@
-.. _widgets:
-
 =======
 Widgets
 =======
@@ -15,7 +13,6 @@ Widgets
     buttonmatrix
     calendar
     chart
-    colorwheel
     canvas
     checkbox
     dropdown
