@@ -78,15 +78,15 @@ creating new maps and ctrls.
 Keep in mind that using following keywords will have the same effect as
 with the original map:
 
-- :c:macro:`LV_SYMBOL_OK` Send ``LV_EVENT_READY`` to the assigned Text area.
+- :c:macro:`LV_SYMBOL_OK` Send :cpp:enumerator:`LV_EVENT_READY` to the assigned Text area.
 - :c:macro:`LV_SYMBOL_CLOSE` or :c:macro:`LV_SYMBOL_KEYBOARD` Send :cpp:enumerator:`LV_EVENT_CANCEL` to the assigned Text area.
 - :c:macro:`LV_SYMBOL_BACKSPACE` Delete on the left.
 - :c:macro:`LV_SYMBOL_LEFT` Move the cursor left.
 - :c:macro:`LV_SYMBOL_RIGHT` Move the cursor right.
 - :c:macro:`LV_SYMBOL_NEW_LINE` New line.
-- *"ABC"* Load the uppercase map.
-- *"abc"* Load the lower case map.
-- *"1#"* Load the lower case map.
+- ``"ABC"`` Load the uppercase map.
+- ``"abc"`` Load the lower case map.
+- ``"1#"`` Load the lower case map.
 
 .. _lv_keyboard_events:
 

@@ -134,15 +134,15 @@ There are some predefined keys which have special meaning:
 - :cpp:enumerator:`LV_KEY_HOME`: Go to the beginning/top (E.g. in a :ref:`Text area <lv_textarea>`)
 - :cpp:enumerator:`LV_KEY_END`: Go to the end (E.g. in a :ref:`Text area <lv_textarea>`)
 
-The most important special keys In your ``read_cb`` function
+The most important special keys in your :cpp:func:`read_cb` function are:
 
- - :cpp:enumerator:`LV_KEY_NEXT`
- - :cpp:enumerator:`LV_KEY_PREV`
- - :cpp:enumerator:`LV_KEY_ENTER`,
- - :cpp:enumerator:`LV_KEY_UP`,
- - :cpp:enumerator:`LV_KEY_DOWN`,
- - :cpp:enumerator:`LV_KEY_LEFT`
- - :cpp:enumerator:`LV_KEY_RIGHT`
+- :cpp:enumerator:`LV_KEY_NEXT`
+- :cpp:enumerator:`LV_KEY_PREV`
+- :cpp:enumerator:`LV_KEY_ENTER`
+- :cpp:enumerator:`LV_KEY_UP`
+- :cpp:enumerator:`LV_KEY_DOWN`
+- :cpp:enumerator:`LV_KEY_LEFT`
+- :cpp:enumerator:`LV_KEY_RIGHT`
 
 You should translate some of your keys to these special keys to support navigation
 in a group and interact with selected objects.

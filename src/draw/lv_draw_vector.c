@@ -588,7 +588,13 @@ void lv_vector_dsc_set_stroke_dash(lv_vector_dsc_t * dsc, float * dash_pattern, 
 {
     lv_array_t * dash_array = &(dsc->current_dsc.stroke_dsc.dash_pattern);
     if(dash_pattern) {
-        LV_ARRAY_INIT_CAPACITY(dash_array, dash_count, float);
+        lv_array_clear(dash_array);
+        if(lv_array_capacity(dash_array) == 0) {
+            LV_ARRAY_INIT_CAPACITY(dash_array, dash_count, float);
+        }
+        else {
+            lv_array_resize(dash_array, dash_count);
+        }
         for(uint16_t i = 0; i < dash_count; i++) {
             LV_ARRAY_APPEND_VALUE(dash_array, dash_pattern[i]);
         }

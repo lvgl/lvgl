@@ -41,7 +41,7 @@ To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 To generate a pixel array from a PNG, JPG or BMP image, use the `Online image converter tool <https://lvgl.io/tools/imageconverter>`__
 and set the converted image with its pointer  :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`
 To make the variable visible in the C file, you need to declare it with
-:cpp:expr:`LV_IMAGE_DECLARE(converted_img_var)`.
+:cpp:macro:`LV_IMAGE_DECLARE(converted_img_var)`.
 
 To use external files, you also need to convert the image files using
 the online converter tool but now you should select the binary output
@@ -71,7 +71,7 @@ Transparency
 The internal (variable) and external images support 2 transparency
 handling methods:
 
--  **Alpha byte** - An alpha byte is added to every pixel that contains
+-  **Alpha byte**: An alpha byte is added to every pixel that contains
    the pixel's opacity
 
 Palette and Alpha index
@@ -135,11 +135,11 @@ the transformations are higher quality but slower.
 The transformations require the whole image to be available. Therefore
 indexed images (``LV_COLOR_FORMAT_I1/2/4/8_...``), alpha only images cannot be transformed.
 In other words transformations work only on normal (A)RGB or A8 images stored as
-C array, or if a custom :ref:`Image decoder <overview_image_decoder>`
+C array, or if a custom :ref:`overview_image_decoder`
 returns the whole image.
 
 Note that the real coordinates of image objects won't change during
-transformation. That is ``lv_obj_get_width/height/x/y()`` will return
+transformation. That is :cpp:expr:`lv_obj_get_width/height/x/y()` will return
 the original, non-zoomed coordinates.
 
 **IMPORTANT** The transformation of the image is independent of the
@@ -153,31 +153,35 @@ differences are that pure image widget transformation
 Align
 -----
 
-By default the image widget's width and height is :cpp:expr:`LV_SIZE_CONTENT`.
+By default the image widget's width and height is :cpp:enumerator:`LV_SIZE_CONTENT`.
 It means the the widget will be sized automatically according to the image source.
 
 If the widget's width or height is set the smaller value the ``align`` property tells
-how to align the image source inside the widget. The alignment set any of these:
+how to align the image source inside the widget.
 
-- :cpp:expr:`LV_IMAGE_ALIGN_DEFAULT` Meaning top left
-- :cpp:expr:`LV_IMAGE_ALIGN_TOP_LEFT`
-- :cpp:expr:`LV_IMAGE_ALIGN_TOP_MID`
-- :cpp:expr:`LV_IMAGE_ALIGN_TOP_RIGHT`
-- :cpp:expr:`LV_IMAGE_ALIGN_BOTTOM_LEFT`
-- :cpp:expr:`LV_IMAGE_ALIGN_BOTTOM_MID`
-- :cpp:expr:`LV_IMAGE_ALIGN_BOTTOM_RIGHT`
-- :cpp:expr:`LV_IMAGE_ALIGN_LEFT_MID`
-- :cpp:expr:`LV_IMAGE_ALIGN_RIGHT_MID`
-- :cpp:expr:`LV_IMAGE_ALIGN_CENTER`
+The alignment set any of these:
 
-The ``offset`` value is applied after the image source is aligned. For example setting an ``y=-10`` and :cpp:expr:`LV_IMAGE_ALIGN_CENTER`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_DEFAULT`: Meaning top left
+- :cpp:enumerator:`LV_IMAGE_ALIGN_TOP_LEFT`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_TOP_MID`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_TOP_RIGHT`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_BOTTOM_LEFT`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_BOTTOM_MID`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_BOTTOM_RIGHT`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_LEFT_MID`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_RIGHT_MID`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_CENTER`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_STRETCH`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_TILE`
+
+The ``offset`` value is applied after the image source is aligned. For example setting an ``y=-10`` and :cpp:enumerator:`LV_IMAGE_ALIGN_CENTER`
 will move the image source up a little bit from the center of the widget.
 
 Or to automatically scale or tile the image
-- :cpp:expr:`LV_IMAGE_ALIGN_STRETCH` Set X and Y scale to fill the widget's area
-- :cpp:expr:`LV_IMAGE_ALIGN_TILE` Tile the image to will the widget area. Offset is applied to shift the tiling.
+- :cpp:enumerator:`LV_IMAGE_ALIGN_STRETCH` Set X and Y scale to fill the widget's area
+- :cpp:enumerator:`LV_IMAGE_ALIGN_TILE` Tile the image to will the widget area. Offset is applied to shift the tiling.
 
-The alignment can be set by :cpp:func:`lv_image_set_align(image, align)`
+The alignment can be set by :cpp:func:`lv_image_set_align`
 
 .. _lv_image_events:
 

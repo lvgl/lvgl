@@ -11,7 +11,7 @@ Overview
 
 The ``lv_observer`` module implements a standard `Observer pattern <https://en.wikipedia.org/wiki/Observer_pattern>`__.
 
-It consists of
+It consists of:
 
 - **subjects**: each containing a value
 - **observers**: attached to subjects to be notified on value change
@@ -78,7 +78,7 @@ Subject
 Subject initialization
 ----------------------
 
-Subjects have to be static or global :cpp:expr:`lv_subject_t` type variables.
+Subjects have to be static or global :cpp:type:`lv_subject_t` type variables.
 
 To initialize a subject use :cpp:expr:`lv_subject_init_<type>(&subject, params, init_value)`.
 The following initializations exist for types:
@@ -285,8 +285,8 @@ Label
 -----
 
 Bind an integer, string, or pointer (pointing to a string) subject to a label.
-An optional format string can be added with 1 format specifier (e.g. "%d °C")
-If the format string is NULL the value will be used directly. In this case on string and pointer type subjects can be used.
+An optional format string can be added with 1 format specifier (e.g. ``"%d °C"``)
+If the format string is ``NULL`` the value will be used directly. In this case on string and pointer type subjects can be used.
 
 .. code:: c
 

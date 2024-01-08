@@ -75,7 +75,7 @@ bullet symbol (U+2022) and the built-in symbols (see below).
 Special fonts
 -------------
 
--  :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a `compressed font <#compress-fonts>`__ with 3 bpp
+-  :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a :ref:`fonts_compressed` with 3 bpp
 -  :c:macro:`LV_FONT_DEJAVU_16_PERSIAN_HEBREW`: 16 px font with normal range + Hebrew, Arabic, Persian letters and all their forms
 -  :c:macro:`LV_FONT_SIMSUN_16_CJK`: 16 px font with normal range plus 1000 of the most common CJK radicals
 -  :c:macro:`LV_FONT_UNSCII_8`: 8 px pixel perfect font with only ASCII characters
@@ -198,6 +198,8 @@ and not above each other. The order of color channels also needs to
 match with the library settings. By default, LVGL assumes ``RGB`` order,
 however this can be swapped by setting :c:macro:`LV_SUBPX_BGR`  ``1`` in
 *lv_conf.h*.
+
+.. _fonts_compressed:
 
 Compressed fonts
 ----------------

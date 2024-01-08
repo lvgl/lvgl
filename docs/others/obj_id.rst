@@ -26,8 +26,9 @@ to get a string representation of the ID.
 Use custom ID generator
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Set :c:macro:`LV_USE_OBJ_ID_BUILTIN` to `0` in ``lv_conf.h``. Below APIs needed to be implemented and
-linked to lvgl.
+Set :c:macro:`LV_USE_OBJ_ID_BUILTIN` to `0` in ``lv_conf.h``. 
+
+Below APIs needed to be implemented and linked to lvgl.
 
 .. code:: c
 

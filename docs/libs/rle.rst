@@ -78,7 +78,7 @@ The RLE image can be used same as other images.
 Generate RLE compressed binary images
 -------------------------------------
 
-The image can be directly generated using script `lvgl/script/LVGLImage.py`
+The image can be directly generated using script ``lvgl/script/LVGLImage.py``
 
 
 .. code:: bash

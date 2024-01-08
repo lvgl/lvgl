@@ -13,11 +13,12 @@ be built separately.
 Build Rlottie
 -------------
 
-To build Samsung's Rlottie C++14-compatible compiler and optionally
+To build Samsung's Rlottie C++14 compatible compiler and optionally
 CMake 3.14 or higher is required.
 
 To build on desktop you can follow the instructions from Rlottie's
 `README <https://github.com/Samsung/rlottie/blob/master/README.md>`__.
+
 In the most basic case it looks like this:
 
 .. code:: shell
@@ -69,7 +70,7 @@ Use Rlottie from raw string data
 format. Instead storing the JSON string, a hex array is stored for the
 following reasons:
 
-- avoid escaping ``"`` in the JSON file
+- avoid escaping ``"`` character in the JSON file
 - some compilers don't support very long strings
 
 ``lvgl/scripts/filetohex.py`` can be used to convert a Lottie file a hex
@@ -160,11 +161,11 @@ probably has minimal issues, but a 300 frame animation playing over 10
 seconds could very easily crash due to lack of memory as rlottie
 renders, depending on the complexity of the animation.
 
-Rlottie will not compile for the IDF using the -02 compiler option at
+Rlottie will not compile for the IDF using the ``-02`` compiler option at
 this time.
 
 For stability in lottie animations, I found that they run best in the
-IDF when enabling :c:macro:`LV_MEM_CUSTOM` (using stdlib.h)
+IDF when enabling :c:macro:`LV_MEM_CUSTOM` (using ``stdlib.h``)
 
 For all its faults, when running right-sized animations, they provide a
 wonderful utility to LVGL on embedded LCDs and can look really good when

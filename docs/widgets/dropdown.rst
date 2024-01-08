@@ -143,7 +143,7 @@ the drop-down list:
 - :cpp:enumerator:`LV_EVENT_CANCEL` Sent when the list is closed
 - :cpp:enumerator:`LV_EVENT_READY` Sent when the list is opened
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 
