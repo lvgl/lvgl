@@ -19,7 +19,7 @@ static const char * UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_JP =
     "人間の家族のすべての構成員の固有の尊厳と平等で譲渡不能な権利とを承認することは、自由と正義と平和の基礎である...";
 
 // Outline data for unicode '龘' (U+9F98)
-static lv_freetype_outline_event_param_t outline_data_U9F98[] = {
+static const lv_freetype_outline_event_param_t outline_data_U9F98[] = {
     {NULL, 1, {6792, 6889}, {0, 0}, {0, 0}},
     {NULL, 2, {7349, 6889}, {0, 0}, {0, 0}},
     {NULL, 2, {7014, 5915}, {0, 0}, {0, 0}},
@@ -464,15 +464,22 @@ void test_freetype_outline_rendering_test(void)
         TEST_FAIL();
     }
 
+    /*Setup outline event for generating outline drawing data*/
     lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, NULL);
+
     lv_font_glyph_dsc_t g;
+
     const lv_ll_t * outline_data;
     outline_data = (lv_ll_t *)lv_font_get_glyph_bitmap(font_italic, &g, 0x9F98, NULL);
 
-    lv_freetype_outline_event_param_t * param;
-
     uint32_t i = 0;
+    lv_freetype_outline_event_param_t * param;
     _LV_LL_READ(outline_data, param) {
+#if OPTION_GENERATE_OUTLINE_DATA
+        // FOR Generate outline data
+        TEST_PRINTF("{NULL, %d, {%d, %d}, {%d, %d}, {%d, %d}}, ", param->type, param->to.x, param->to.y, param->control1.x,
+                    param->control1.y, param->control2.x, param->control2.y);
+#endif
         TEST_ASSERT_EQUAL(param->type, outline_data_U9F98[i].type);
         TEST_ASSERT_EQUAL(param->to.x, outline_data_U9F98[i].to.x);
         TEST_ASSERT_EQUAL(param->to.y, outline_data_U9F98[i].to.y);
@@ -480,14 +487,7 @@ void test_freetype_outline_rendering_test(void)
         TEST_ASSERT_EQUAL(param->control1.y, outline_data_U9F98[i].control1.y);
         TEST_ASSERT_EQUAL(param->control2.x, outline_data_U9F98[i].control2.x);
         TEST_ASSERT_EQUAL(param->control2.y, outline_data_U9F98[i].control2.y);
-
         i++;
-
-#if OPTION_GENERATE_OUTLINE_DATA
-        // FOR Generate outline data
-        TEST_PRINTF("{NULL, %d, {%d, %d}, {%d, %d}, {%d, %d}}, ", param->type, param->to.x, param->to.y, param->control1.x,
-                    param->control1.y, param->control2.x, param->control2.y);
-#endif
     }
 
     font_italic->release_glyph(font_italic, &g);
