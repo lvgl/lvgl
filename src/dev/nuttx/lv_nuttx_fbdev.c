@@ -191,10 +191,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
 #if defined(CONFIG_FB_UPDATE)
     /*May be some direct update command is required*/
+    int yoffset = disp->buf_act == disp->buf_1 ?
+                  0 : dsc->mem2_yoffset;
 
     struct fb_area_s fb_area;
     fb_area.x = area->x1;
-    fb_area.y = area->y1;
+    fb_area.y = area->y1 + yoffset;
     fb_area.w = lv_area_get_width(area);
     fb_area.h = lv_area_get_height(area);
     if(ioctl(dsc->fd, FBIO_UPDATE, (unsigned long)((uintptr_t)&fb_area)) < 0) {
