@@ -67,6 +67,12 @@ looks like ``const char * day_names[7] = {"Su", "Mo", ...};`` Only the
 pointer of the day names is saved so the elements should be static,
 global or constant variables.
 
+Custom year list
+----------------
+
+Sets a custom year list with :cpp:expr:`lv_calendar_set_year_list(calendar, years_list)`
+where ``years_list`` is a pointer to the custom years list ``static const char * years = "2023\n2022\n2021\n2020\n2019";``.
+
 Events
 ******
 
