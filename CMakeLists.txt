@@ -33,8 +33,4 @@ if (MSVC)
     INTERFACE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllimport\)
     PRIVATE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllexport\)
   )
-else()
-  target_compile_definitions(lvgl
-    PUBLIC LV_ATTRIBUTE_EXTERN_DATA  # for all other compilers define macro as empty
-  )
 endif()
