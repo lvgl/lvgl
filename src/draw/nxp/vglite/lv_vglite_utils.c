@@ -48,6 +48,28 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+const char * vglite_error_to_string(vg_lite_error_t error)
+{
+    switch(error) {
+            ENUM_TO_STRING(VG_LITE_SUCCESS);
+            ENUM_TO_STRING(VG_LITE_INVALID_ARGUMENT);
+            ENUM_TO_STRING(VG_LITE_OUT_OF_MEMORY);
+            ENUM_TO_STRING(VG_LITE_NO_CONTEXT);
+            ENUM_TO_STRING(VG_LITE_TIMEOUT);
+            ENUM_TO_STRING(VG_LITE_OUT_OF_RESOURCES);
+            ENUM_TO_STRING(VG_LITE_GENERIC_IO);
+            ENUM_TO_STRING(VG_LITE_NOT_SUPPORT);
+            ENUM_TO_STRING(VG_LITE_ALREADY_EXISTS);
+            ENUM_TO_STRING(VG_LITE_NOT_ALIGNED);
+            ENUM_TO_STRING(VG_LITE_FLEXA_TIME_OUT);
+            ENUM_TO_STRING(VG_LITE_FLEXA_HANDSHAKE_FAIL);
+        default:
+            break;
+    }
+
+    return "VG_LITE_UKNOWN_ERROR";
+}
+
 #if LV_USE_VGLITE_DRAW_ASYNC
 bool vglite_cmd_buf_is_flushed(void)
 {
@@ -58,11 +80,9 @@ bool vglite_cmd_buf_is_flushed(void)
 void vglite_run(void)
 {
 #if LV_USE_VGLITE_DRAW_ASYNC
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_uint32_t gpu_idle = 0;
 
-    err = vg_lite_get_parameter(VG_LITE_GPU_IDLE_STATE, 1, (vg_lite_pointer)&gpu_idle);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Get GPU idle state failed.");
+    VGLITE_CHECK_ERROR(vg_lite_get_parameter(VG_LITE_GPU_IDLE_STATE, 1, (vg_lite_pointer)&gpu_idle));
 
     if(!gpu_idle) {
         _cmd_buf_flushed = false;
@@ -77,10 +97,10 @@ void vglite_run(void)
      * Without draw async, process the tasks and signal them as complete one by one.
      */
 #if LV_USE_VGLITE_DRAW_ASYNC
-    LV_ASSERT_MSG(vg_lite_flush() == VG_LITE_SUCCESS, "Flush failed.");
+    VGLITE_CHECK_ERROR(vg_lite_flush());
     _cmd_buf_flushed = true;
 #else
-    LV_ASSERT_MSG(vg_lite_finish() == VG_LITE_SUCCESS, "Finish failed.");
+    VGLITE_CHECK_ERROR(vg_lite_finish());
 #endif
 }
 
@@ -124,7 +144,7 @@ vg_lite_blend_t vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode)
                 vg_blend_mode = VG_LITE_BLEND_MULTIPLY_LVGL;
                 break;
             default:
-                LV_ASSERT_MSG(false, "Unsupported blend mode.");
+                VGLITE_ASSERT_MSG(false, "Unsupported blend mode.");
                 break;
         }
     }
@@ -143,7 +163,7 @@ vg_lite_blend_t vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode)
                 vg_blend_mode = VG_LITE_BLEND_MULTIPLY;
                 break;
             default:
-                LV_ASSERT_MSG(false, "Unsupported blend mode.");
+                VGLITE_ASSERT_MSG(false, "Unsupported blend mode.");
                 break;
         }
     }
@@ -191,7 +211,7 @@ vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf)
             break;
 
         default:
-            LV_ASSERT_MSG(false, "Unsupported color format.");
+            VGLITE_ASSERT_MSG(false, "Unsupported color format.");
             break;
     }
 
@@ -234,7 +254,7 @@ uint8_t vglite_get_alignment(lv_color_format_t cf)
             break;
 
         default:
-            LV_ASSERT_MSG(false, "Unsupported buffer format.");
+            VGLITE_ASSERT_MSG(false, "Unsupported buffer format.");
             break;
     }
 

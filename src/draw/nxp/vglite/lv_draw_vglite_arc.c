@@ -207,7 +207,7 @@ static void _set_full_arc(vg_arc * fullarc)
             fullarc->p3y = 0;
             break;
         default:
-            LV_ASSERT_MSG(false, "Invalid arc quarter.");
+            VGLITE_ASSERT_MSG(false, "Invalid arc quarter.");
             break;
     }
 }
@@ -562,7 +562,6 @@ static void _add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
 static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_area,
                              const lv_draw_arc_dsc_t * dsc)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_path_t path;
     uint16_t start_angle = dsc->start_angle;
     uint16_t end_angle = dsc->end_angle;
@@ -667,10 +666,9 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
 
     arc_path[pidx++] = VLC_OP_END;
 
-    err = vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, (uint32_t)pidx * sizeof(int32_t), arc_path,
-                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
-                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init path failed.");
+    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, (uint32_t)pidx * sizeof(int32_t), arc_path,
+                                         (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                                         ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
@@ -679,13 +677,11 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     vg_lite_identity(&matrix);
 
     /*** Draw arc ***/
-    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw arc failed.");
+    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
 
-    err = vg_lite_clear_path(&path);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");
+    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

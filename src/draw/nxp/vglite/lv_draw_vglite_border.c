@@ -101,7 +101,6 @@ void lv_draw_vglite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_
 static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip_area,
                                 const lv_draw_border_dsc_t * dsc)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     int32_t radius = dsc->radius;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
@@ -122,10 +121,9 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
     vg_lite_quality_t path_quality = radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;
 
     vg_lite_path_t path;
-    err = vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
-                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
-                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init path failed.");
+    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
+                                         (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                                         ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
@@ -136,22 +134,17 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
     int32_t line_width = dsc->width;
 
     /*** Draw border ***/
-    err = vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Set draw path type failed.");
+    VGLITE_CHECK_ERROR(vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH));
 
-    err = vg_lite_set_stroke(&path, cap_style, join_style, line_width, 8, NULL, 0, 0, vgcol);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Set stroke failed.");
+    VGLITE_CHECK_ERROR(vg_lite_set_stroke(&path, cap_style, join_style, line_width, 8, NULL, 0, 0, vgcol));
 
-    err = vg_lite_update_stroke(&path);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Update stroke failed.");
+    VGLITE_CHECK_ERROR(vg_lite_update_stroke(&path));
 
-    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw border failed.");
+    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
 
-    err = vg_lite_clear_path(&path);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");
+    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

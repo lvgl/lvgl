@@ -156,7 +156,6 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
 
 static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, lv_opa_t opa)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
     vg_lite_buffer_t * mask_vgbuf = vglite_get_src_buf();
 
@@ -176,8 +175,8 @@ static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, l
     vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
 
     /*Blit with font color as paint color*/
-    err = vg_lite_blit_rect(dst_vgbuf, mask_vgbuf, &rect, vgmatrix, VG_LITE_BLEND_SRC_OVER, vgcol, VG_LITE_FILTER_POINT);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw letter failed.");
+    VGLITE_CHECK_ERROR(vg_lite_blit_rect(dst_vgbuf, mask_vgbuf, &rect, vgmatrix, VG_LITE_BLEND_SRC_OVER, vgcol,
+                                         VG_LITE_FILTER_POINT));
 
     vglite_run();
 }

@@ -89,7 +89,6 @@ void lv_draw_vglite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * 
 static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * point2,
                               const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_path_t path;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
     vg_lite_cap_style_t cap_style = (dsc->round_start || dsc->round_end) ? VG_LITE_CAP_ROUND : VG_LITE_CAP_BUTT;
@@ -118,10 +117,9 @@ static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * poin
         VLC_OP_END
     };
 
-    err = vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, sizeof(line_path), line_path,
-                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
-                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init path failed.");
+    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, sizeof(line_path), line_path,
+                                         (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                                         ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
@@ -130,23 +128,18 @@ static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * poin
     vg_lite_identity(&matrix);
 
     /*** Draw line ***/
-    err = vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Set draw path type failed.");
+    VGLITE_CHECK_ERROR(vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH));
 
-    err = vg_lite_set_stroke(&path, cap_style, join_style, width, 8, stroke_dash_pattern, stroke_dash_count,
-                             stroke_dash_phase, vgcol);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Set stroke failed.");
+    VGLITE_CHECK_ERROR(vg_lite_set_stroke(&path, cap_style, join_style, width, 8, stroke_dash_pattern, stroke_dash_count,
+                                          stroke_dash_phase, vgcol));
 
-    err = vg_lite_update_stroke(&path);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Update stroke failed.");
+    VGLITE_CHECK_ERROR(vg_lite_update_stroke(&path));
 
-    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vgblend, vgcol);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw line failed.");
+    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vgblend, vgcol));
 
     vglite_run();
 
-    err = vg_lite_clear_path(&path);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");
+    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

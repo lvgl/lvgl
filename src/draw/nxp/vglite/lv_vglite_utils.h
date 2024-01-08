@@ -31,6 +31,28 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define ENUM_TO_STRING(e) \
+    case (e):             \
+    return #e
+
+#if LV_USE_VGLITE_ASSERT
+#define VGLITE_ASSERT(expr) LV_ASSERT(expr)
+#define VGLITE_ASSERT_MSG(expr, msg) LV_ASSERT_MSG(expr, msg)
+#else
+#define VGLITE_ASSERT(expr)
+#define VGLITE_ASSERT_MSG(expr, msg) LV_LOG_ERROR(msg)
+#endif
+
+#define VGLITE_CHECK_ERROR(function)                                 \
+    do {                                                             \
+        vg_lite_error_t error = function;                            \
+        if(error != VG_LITE_SUCCESS) {                               \
+            LV_LOG_ERROR("Execute '" #function "' error(%d): %s",    \
+                         (int)error, vglite_error_to_string(error)); \
+            VGLITE_ASSERT(false);                                    \
+        }                                                            \
+    } while (0)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -50,6 +72,8 @@ static inline void vglite_set_scissor(const lv_area_t * clip_area);
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+const char * vglite_error_to_string(vg_lite_error_t error);
 
 #if LV_USE_VGLITE_DRAW_ASYNC
 /**

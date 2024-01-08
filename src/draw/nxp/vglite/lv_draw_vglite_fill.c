@@ -100,7 +100,6 @@ void lv_draw_vglite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * 
 
 static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t * dsc)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
@@ -114,8 +113,7 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
             .height = lv_area_get_height(dest_area)
         };
 
-        err = vg_lite_clear(vgbuf, &rect, vgcol);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear failed.");
+        VGLITE_CHECK_ERROR(vg_lite_clear(vgbuf, &rect, vgcol));
 
         vglite_run();
     }
@@ -131,29 +129,25 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
             VLC_OP_END
         };
 
-        err = vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_MEDIUM, sizeof(path_data), path_data,
-                                (vg_lite_float_t) dest_area->x1, (vg_lite_float_t) dest_area->y1,
-                                ((vg_lite_float_t) dest_area->x2) + 1.0f, ((vg_lite_float_t) dest_area->y2) + 1.0f);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init path failed.");
+        VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_MEDIUM, sizeof(path_data), path_data,
+                                             (vg_lite_float_t) dest_area->x1, (vg_lite_float_t) dest_area->y1,
+                                             ((vg_lite_float_t) dest_area->x2) + 1.0f, ((vg_lite_float_t) dest_area->y2) + 1.0f));
 
         vg_lite_matrix_t matrix;
         vg_lite_identity(&matrix);
 
         /*Draw rectangle*/
-        err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw rectangle failed.");
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
 
         vglite_run();
 
-        err = vg_lite_clear_path(&path);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");
+        VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
     }
 }
 
 static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_area,
                               const lv_draw_fill_dsc_t * dsc)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     int32_t width = lv_area_get_width(coords);
     int32_t height = lv_area_get_height(coords);
     int32_t radius = dsc->radius;
@@ -169,10 +163,9 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;
 
     vg_lite_path_t path;
-    err = vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
-                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
-                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init path failed.");
+    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
+                                         (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                                         ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
@@ -203,14 +196,11 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
 
         lv_memzero(&gradient, sizeof(vg_lite_linear_gradient_t));
 
-        err = vg_lite_init_grad(&gradient);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init gradient failed");
+        VGLITE_CHECK_ERROR(vg_lite_init_grad(&gradient));
 
-        err = vg_lite_set_grad(&gradient, cnt, colors, stops);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Set gradient failed.");
+        VGLITE_CHECK_ERROR(vg_lite_set_grad(&gradient, cnt, colors, stops));
 
-        err = vg_lite_update_grad(&gradient);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Update gradient failed.");
+        VGLITE_CHECK_ERROR(vg_lite_update_grad(&gradient));
 
         grad_matrix = vg_lite_get_grad_matrix(&gradient);
         vg_lite_identity(grad_matrix);
@@ -224,23 +214,19 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        err = vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &gradient, VG_LITE_BLEND_SRC_OVER);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw gradient failed.");
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &gradient,
+                                                 VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw rectangle failed.");
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();
 
-    err = vg_lite_clear_path(&path);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");
+    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 
-    if(has_gradient) {
-        err = vg_lite_clear_grad(&gradient);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear gradient failed.");
-    }
+    if(has_gradient)
+        VGLITE_CHECK_ERROR(vg_lite_clear_grad(&gradient));
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

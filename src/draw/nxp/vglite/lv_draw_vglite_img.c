@@ -183,7 +183,6 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
  **********************/
 static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t * dsc)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
     vg_lite_buffer_t * src_vgbuf = vglite_get_src_buf();
 
@@ -218,8 +217,7 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
     vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
     vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
 
-    err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, &rect, vgmatrix, vgblend, vgcol, VG_LITE_FILTER_POINT);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Blit rectangle failed.");
+    VGLITE_CHECK_ERROR(vg_lite_blit_rect(dst_vgbuf, src_vgbuf, &rect, vgmatrix, vgblend, vgcol, VG_LITE_FILTER_POINT));
 
     vglite_run();
 }

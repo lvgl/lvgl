@@ -147,6 +147,9 @@
         /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
         #define LV_USE_VGLITE_DRAW_ASYNC 1
     #endif
+
+    /* Enable VGLite asserts. */
+    #define LV_USE_VGLITE_ASSERT 0
 #endif
 
 /* Use NXP's PXP on iMX RTxxx platforms. */

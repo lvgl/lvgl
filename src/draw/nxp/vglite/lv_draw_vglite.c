@@ -467,7 +467,7 @@ static inline void _vglite_signal_task_ready(lv_draw_task_t * task_act)
     }
 
     if(task_act)
-        LV_ASSERT_MSG(_tail != _head, "VGLite task buffer full.");
+        VGLITE_ASSERT_MSG(_tail != _head, "VGLite task buffer full.");
 }
 #endif
 
