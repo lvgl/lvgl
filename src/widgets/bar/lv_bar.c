@@ -492,9 +492,8 @@ static void draw_indic(lv_event_t * e)
         else {
             draw_rect_dsc.border_opa = 0;
             draw_rect_dsc.outline_opa = 0;
-            draw_rect_dsc.shadow_opa = 0;
-
         }
+        draw_rect_dsc.shadow_opa = 0;
 
         /*If clipped for any reason can the border, outline, and shadow
          *would be clipped and looked ugly so don't draw them*/
