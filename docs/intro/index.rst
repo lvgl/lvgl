@@ -41,7 +41,7 @@ Basically, every modern controller which is able to drive a display is suitable 
     * Static RAM usage: ~2 kB depending on the used features and object types
     * stack: > 2kB (> 8 kB is recommended)
     * Dynamic data (heap): > 2 KB (> 48 kB is recommended if using several objects).
-        Set by :c:macro:`LV_MEM_SIZE` in `lv_conf.h`.
+        Set by :c:macro:`LV_MEM_SIZE` in ``lv_conf.h``.
     * Display buffer:  > *"Horizontal resolution"* pixels (> 10 *"Horizontal resolution"* is recommended)
     * One frame buffer in the MCU or in an external display controller
 * C99 or newer compiler
@@ -196,7 +196,7 @@ LVGL doesn't start, randomly crashes or nothing is drawn on the display. What ca
 * Be sure :cpp:type:`lv_disp_t`, :cpp:type:`lv_indev_t` and :cpp:type:`lv_fs_drv_t` are global or `static`.
 * Be sure your display works without LVGL. E.g. paint it to red on start up.
 * Enable :ref:`logging`
-* Enable asserts in `lv_conf.h` (`LV_USE_ASSERT_...`)
+* Enable asserts in ``lv_conf.h`` (`LV_USE_ASSERT_...`)
 * If you use an RTOS
    * increase the stack size of the task which calls :cpp:func:`lv_timer_handler`
    * Be sure you used a mutex as described here: :ref:`os_interrupt`

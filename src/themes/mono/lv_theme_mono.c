@@ -16,7 +16,10 @@
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (LV_GLOBAL_DEFAULT()->theme_mono)
+struct _my_theme_t;
+typedef struct _my_theme_t my_theme_t;
+
+#define theme_def (*(my_theme_t **)(&LV_GLOBAL_DEFAULT()->theme_mono))
 
 #define COLOR_FG      dark_bg ? lv_color_white() : lv_color_black()
 #define COLOR_BG      dark_bg ? lv_color_black() : lv_color_white()

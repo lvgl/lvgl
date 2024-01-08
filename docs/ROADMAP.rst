@@ -3,6 +3,7 @@
 
 .. |uncheck| replace:: 🔲
 
+.. _roadmap:
 
 Roadmap
 =======
@@ -155,7 +156,7 @@ Others
 - |uncheck| Scene support. See `this comment <https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911>`__
 - |uncheck| Circle layout. #2871
 - |uncheck| Consider `stagger animations <https://greensock.com/docs/v3/Staggers>`__.
-- |uncheck| Add custom indev type. See [here](https://github.com/lvgl/lvgl/issues/3298#issuecomment-1616706654).
+- |uncheck| Add custom indev type. See `here <https://github.com/lvgl/lvgl/issues/3298#issuecomment-1616706654>`__.
 - |uncheck| Automatically recalculate the layout if a coordinate is obtained using `lv_obj_get_width/height/x/y/etc`
 
 Ideas

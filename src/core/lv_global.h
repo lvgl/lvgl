@@ -119,15 +119,15 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_THEME_SIMPLE
-    my_theme_t * theme_simple;
+    void * theme_simple;
 #endif
 
 #if LV_USE_THEME_DEFAULT
-    my_theme_t * theme_default;
+    void * theme_default;
 #endif
 
 #if LV_USE_THEME_MONO
-    my_theme_t * theme_mono;
+    void * theme_mono;
 #endif
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN

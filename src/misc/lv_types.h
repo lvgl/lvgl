@@ -140,9 +140,6 @@ typedef struct _lv_anim_t lv_anim_t;
 struct _lv_font_t;
 typedef struct _lv_font_t lv_font_t;
 
-struct _my_theme_t;
-typedef struct _my_theme_t my_theme_t;
-
 struct _lv_image_decoder_t;
 typedef struct _lv_image_decoder_t lv_image_decoder_t;
 

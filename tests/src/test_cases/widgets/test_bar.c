@@ -71,8 +71,6 @@ void test_bar_should_update_indicator_right_coordinate_based_on_bar_value(void)
     /* Calculate bar indicator right coordinate, using rule of 3 */
     int32_t bar_max_value = lv_bar_get_max_value(bar);
     int32_t indicator_part_width = lv_obj_get_content_width(bar);
-    int32_t sides_padding = lv_obj_get_style_pad_left(bar, LV_PART_MAIN);
-    sides_padding += lv_obj_get_style_pad_right(bar, LV_PART_MAIN);
 
     int32_t expected_coord = (bar_value * indicator_part_width) / bar_max_value;
     /* NOTE: Add 1 to calculation because the coordinates start at 0 */

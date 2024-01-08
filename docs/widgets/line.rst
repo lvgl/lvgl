@@ -1,3 +1,6 @@
+.. _lv_line:
+
+==============
 Line (lv_line)
 ==============
 
@@ -7,11 +10,14 @@ Overview
 The Line object is capable of drawing straight lines between a set of
 points.
 
+.. _lv_line_parts_and_styles:
+
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` uses all the typical background properties and line
-   style properties.
+-  :cpp:enumerator:`LV_PART_MAIN` uses all the typical background properties and line style properties.
+
+.. _lv_line_usage:
 
 Usage
 *****
@@ -44,15 +50,19 @@ counter-intuitive in some cases so the y coordinates can be inverted
 with :cpp:expr:`lv_line_set_y_invert(line, true)`. In this case, *y == 0* will
 be the bottom of the object. *y invert* is disabled by default.
 
+.. _lv_line_events:
+
 Events
 ******
 
 Only the `Generic events <../overview/event.html#generic-events>`__ are
 sent by the object type.
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_line_keys:
 
 Keys
 ****
@@ -61,10 +71,14 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_line_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/line/index.rst
+
+.. _lv_line_api:
 
 API
 ***

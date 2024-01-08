@@ -135,6 +135,27 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const l
     }
 }
 
+lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride,
+                             void * data, uint32_t data_size)
+{
+    LV_ASSERT_NULL(draw_buf);
+    if(draw_buf == NULL) return LV_RESULT_INVALID;
+
+    lv_memzero(draw_buf, sizeof(lv_draw_buf_t));
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+    if(stride * h > data_size) {
+        LV_LOG_WARN("Data size too small, required: %" LV_PRId32 ", provided: %" LV_PRId32, stride * h,
+                    data_size);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_image_header_init(&draw_buf->header, w, h, cf, stride, 0);
+    draw_buf->data = lv_draw_buf_align(data, cf);
+    draw_buf->unaligned_data = data;
+    draw_buf->data_size = data_size;
+    return LV_RESULT_OK;
+}
+
 lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
 {
     lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
@@ -147,6 +168,8 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
     void * buf = lv_draw_buf_malloc(size, cf);
     LV_ASSERT_MALLOC(buf);
     if(buf == NULL) {
+        LV_LOG_WARN("No memory: %"LV_PRIu32"x%"LV_PRIu32", cf: %d, stride: %"LV_PRIu32", %"LV_PRIu32"Byte, ",
+                    w, h, cf, stride, size);
         lv_free(draw_buf);
         return NULL;
     }
@@ -156,6 +179,7 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
     draw_buf->header.cf = cf;
     draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     draw_buf->header.stride = stride;
+    draw_buf->header.magic = LV_IMAGE_HEADER_MAGIC;
     draw_buf->data = lv_draw_buf_align(buf, cf);
     draw_buf->unaligned_data = buf;
     draw_buf->data_size = size;
@@ -184,6 +208,8 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
 {
     if(draw_buf == NULL) return NULL;
 
+    /*If color format is unknown, keep using the original color format.*/
+    if(cf == LV_COLOR_FORMAT_UNKNOWN) cf = draw_buf->header.cf;
     if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
 
     uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
@@ -236,18 +262,23 @@ lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t st
     if(src == NULL) return NULL;
     if(src->data == NULL) return NULL;
 
+    const lv_image_header_t * header = &src->header;
+
+    /*Use global stride*/
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(header->w, header->cf);
+
     /*Check if stride already match*/
-    if(src->header.stride == stride) return NULL;
+    if(header->stride == stride) return NULL;
 
     /*Calculate the minimal stride allowed from bpp*/
-    uint32_t bpp = lv_color_format_get_bpp(src->header.cf);
-    uint32_t min_stride = (src->header.w * bpp + 7) >> 3;
+    uint32_t bpp = lv_color_format_get_bpp(header->cf);
+    uint32_t min_stride = (header->w * bpp + 7) >> 3;
     if(stride < min_stride) {
         LV_LOG_WARN("New stride is too small. min: %" LV_PRId32, min_stride);
         return NULL;
     }
 
-    lv_draw_buf_t * dst = lv_draw_buf_create(src->header.w, src->header.h, src->header.cf, stride);
+    lv_draw_buf_t * dst = lv_draw_buf_create(header->w, header->h, header->cf, stride);
     if(dst == NULL) return NULL;
 
     uint8_t * dst_data = dst->data;

@@ -658,16 +658,11 @@
     /*Let FreeType to use LVGL memory and file porting*/
     #define LV_FREETYPE_USE_LVGL_PORT 0
 
-    /*FreeType cache type:
-     * LV_FREETYPE_CACHE_TYPE_IMAGE    - Image cache
-     * LV_FREETYPE_CACHE_TYPE_OUTLINE  - Outline cache*/
-    #define LV_FREETYPE_CACHE_TYPE LV_FREETYPE_CACHE_TYPE_IMAGE
-
     /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
     /* (0:use system defaults) */
     #define LV_FREETYPE_CACHE_FT_FACES 8
     #define LV_FREETYPE_CACHE_FT_SIZES 8
-    #define LV_FREETYPE_CACHE_FT_OUTLINES 256
+    #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
 #endif
 
 /* Built-in TTF decoder */
