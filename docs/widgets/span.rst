@@ -109,14 +109,14 @@ Events
 
 No special events are sent by this widget.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
 
 No *Keys* are processed by the object type.
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

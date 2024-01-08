@@ -11,13 +11,13 @@ image decoder automatically so PNG files can be directly used as any
 other image sources.
 
 :Note: a file system driver needs to be registered to open images from 
-       files. Read more about it :ref:`overview_file_system` or just
+       files. Read more about it :ref:`overview/fs/file system [0-1]` or just
        enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
 
 The whole PNG image is decoded, so ``width x height x 4`` bytes free RAM space is required. 
 The decoded image is stored in RGBA pixel format.
 
-As it might take significant time to decode PNG images LVGL's :ref:`overview_image_caching` feature can be useful.
+As it might take significant time to decode PNG images LVGL's :ref:`overview/image/image caching [0-2]` feature can be useful.
 
 Compress PNG files
 ------------------
@@ -39,6 +39,4 @@ Example
 
 API
 ---
-
-:ref:`lodepng`
 

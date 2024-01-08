@@ -21,10 +21,10 @@ Parts and Styles
 The message box is built from other widgets, so you can check these
 widgets' documentation for details.
 
-- Background: :ref:`lv_obj`
-- Close button: :ref:`lv_button`
-- Title and text: :ref:`lv_label`
-- Buttons: :ref:`lv_buttonmatrix`
+- Background: :ref:`widgets/obj/base object (lv_obj) [0-1]`
+- Close button: :ref:`widgets/button/button (lv_button) [0-1]`
+- Title and text: :ref:`widgets/label/label (lv_label) [0-1]`
+- Buttons: :ref:`widgets/buttonmatrix/button matrix (lv_buttonmatrix) [0-1]`
 
 Usage
 *****
@@ -72,7 +72,7 @@ Events
    :cpp:expr:`lv_msgbox_get_active_button_text(msgbox)` can be used to get the
    index and text of the clicked button.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
@@ -80,7 +80,7 @@ Keys
 Keys have effect on the close button and button matrix. You can add them
 manually to a group if required.
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

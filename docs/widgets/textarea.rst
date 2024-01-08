@@ -21,8 +21,7 @@ Parts and Styles
    right or center.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar that is shown when the text is
    too long.
--  :cpp:enumerator:`LV_PART_SELECTED` Determines the style of the :ref:`selected
-   text <lv_label_text_selection>`. Only ``text_color`` and
+-  :cpp:enumerator:`LV_PART_SELECTED` Determines the style of the :ref:`selected text <widgets/label/text selection [0-2]>`. Only ``text_color`` and
    ``bg_color`` style properties can be used. ``bg_color`` should be set
    directly on the label of the text area.
 -  :cpp:enumerator:`LV_PART_CURSOR` Marks the position where the characters are
@@ -160,9 +159,9 @@ Events
 -  :cpp:enumerator:`LV_EVENT_READY` Sent when :cpp:enumerator:`LV_KEY_ENTER` is pressed (or sent) to
    a one line text area.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
@@ -170,7 +169,7 @@ Keys
 -  ``LV_KEY_UP/DOWN/LEFT/RIGHT`` Move the cursor
 -  ``Any character`` Add the character to the current cursor position
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

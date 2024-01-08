@@ -10,7 +10,7 @@ The Spinner object is a spinning arc over a ring.
 Parts and Styles
 ****************
 
-The parts are identical to the parts of :ref:`lv_arc`.
+The parts are identical to the parts of :ref:`widgets/arc/arc (lv_arc) [0-1]`.
 
 Usage
 *****
@@ -31,14 +31,14 @@ No special events are sent to the Spinner.
 
 See the events of the `Arc </widgets/arc>`__ too.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
 
 No *Keys* are processed by the object type.
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

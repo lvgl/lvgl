@@ -11,15 +11,15 @@ respective direction.
 
 It doesn't matter how the children are positioned, as only the current x
 and y coordinates are considered. This means that gridnav works with
-manually positioned children, as well as :ref:`flex` and
-:ref:`grid` layouts.
+manually positioned children, as well as :ref:`layouts/flex/flex [0-1]` and
+:ref:`layouts/grid/grid [0-1]` layouts.
 
 Gridnav also works if the children are arranged into a single row or
 column. That makes it useful, for example, to simplify navigation on a
-:ref:`List widget <lv_list>`.
+:ref:`List widget <widgets/list/list (lv_list) [0-1]>`.
 
 Gridnav assumes that the object to which gridnav is added is part of a
-:ref:`group <indev_groups>`. This way, if the object with
+:ref:`group <overview/indev/groups [0-2]>`. This way, if the object with
 gridnav is focused, the arrow key presses are automatically forwarded to
 the object so that gridnav can process the arrow keys.
 

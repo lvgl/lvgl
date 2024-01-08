@@ -9,8 +9,8 @@ In LVGL scrolling works very intuitively: if an object is outside its
 parent content area (the size without padding), the parent becomes
 scrollable and scrollbar(s) will appear. That's it.
 
-Any object can be scrollable including ``lv_obj``, ``lv_image``,
-``lv_button``, ``lv_meter``, etc
+Any object can be scrollable including :ref:`widgets/obj/base object (lv_obj) [0-1]`, :ref:`widgets/image/image (lv_image) [0-1]`,
+:ref:`widgets/button/button (lv_button) [0-1]`, :ref:`widgets/scale/scale (lv_scale) [0-1]`, etc
 
 The object can either be scrolled horizontally or vertically in one
 stroke; diagonal scrolling is not possible.

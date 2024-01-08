@@ -592,7 +592,7 @@ def iter_src(n, p):
     if index_file is not None:
         index_file.write('\n')
         index_file.close()
-        return True
+        return Truea
 
     return False
 

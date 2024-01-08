@@ -8,7 +8,7 @@ Overview
 Images are the basic object to display images from flash (as arrays) or
 from files. Images can display symbols (``LV_SYMBOL_...``) too.
 
-Using the :ref:`Image decoder interface <overview_image_decoder>` custom image formats
+Using the :ref:`Image decoder interface <overview/image/image decoder [0-2]>` custom image formats
 can be supported as well.
 
 Parts and Styles
@@ -28,7 +28,7 @@ To provide maximum flexibility, the source of the image can be:
 
 - a variable in code (a C array with the pixels).
 - a file stored externally (e.g. on an SD card).
-- a text with :ref:`Symbols <fonts_symbols>`.
+- a text with :ref:`Symbols <overview/font/font symbols [0-3]>`.
 
 To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 
@@ -41,10 +41,10 @@ To use external files, you also need to convert the image files using
 the online converter tool but now you should select the binary output
 format. You also need to use LVGL's file system module and register a
 driver with some functions for the basic file operation. Go to the
-:ref:`File system <overview_file_system>` to learn more. To set an image sourced
+:ref:`File system <overview/fs/file system [0-1]>` to learn more. To set an image sourced
 from a file, use :cpp:expr:`lv_image_set_src(img, "S:folder1/my_img.bin")`.
 
-You can also set a symbol similarly to :ref:`Labels <lv_label>`. In
+You can also set a symbol similarly to :ref:`Labels <widgets/label/label (lv_label) [0-1]>`. In
 this case, the image will be rendered as text according to the *font*
 specified in the style. It enables to use of light-weight monochrome
 "letters" instead of real images. You can set symbol like
@@ -78,7 +78,7 @@ supported:
 - **Alpha indexed**: Only alpha values are stored.
 
 These options can be selected in the image converter. To learn more
-about the color formats, read the :ref:`Images <overview_image>` section.
+about the color formats, read the :ref:`Images <overview/image/images [0-1]>` section.
 
 Recolor
 -------
@@ -100,7 +100,7 @@ With :cpp:expr:`lv_image_set_offset_x(img, x_ofs)` and
 :cpp:expr:`lv_image_set_offset_y(img, y_ofs)`, you can add some offset to the
 displayed image. Useful if the object size is smaller than the image
 source size. Using the offset parameter a `Texture atlas <https://en.wikipedia.org/wiki/Texture_atlas>`__
-or a "running image" effect can be created by :ref:`Animating <animations>` the x or y offset.
+or a "running image" effect can be created by :ref:`Animating <overview/animations/animations [0-1]>` the x or y offset.
 
 Transformations
 ---------------
@@ -129,7 +129,7 @@ the transformations are higher quality but slower.
 The transformations require the whole image to be available. Therefore
 indexed images (``LV_COLOR_FORMAT_I1/2/4/8_...``), alpha only images cannot be transformed.
 In other words transformations work only on normal (A)RGB or A8 images stored as
-C array, or if a custom :ref:`overview_image_decoder`
+C array, or if a custom :ref:`overview/image/image decoder [0-2]`
 returns the whole image.
 
 Note that the real coordinates of image objects won't change during
@@ -138,7 +138,7 @@ the original, non-zoomed coordinates.
 
 **IMPORTANT** The transformation of the image is independent of the
 transformation properties coming from styles. (See
-:ref:`here <styles_opacity_blend_modes_transformations>`). The main
+:ref:`here <overview/style/opacity, blend modes and transformations [0-2]>`). The main
 differences are that pure image widget transformation
 
 - doesn't transform the children of the image widget
@@ -182,16 +182,16 @@ Events
 
 No special events are sent by image objects.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
 
 No *Keys* are processed by the object type.
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

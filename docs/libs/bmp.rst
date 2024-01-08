@@ -18,7 +18,7 @@ sources. For example:
    lv_image_set_src(my_img, "S:path/to/picture.bmp");
 
 Note that, a file system driver needs to registered to open images from
-files. Read more about it :ref:`overview_file_system` or just
+files. Read more about it :ref:`overview/fs/file system [0-1]` or just
 enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
 
 Limitations

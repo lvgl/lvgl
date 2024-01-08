@@ -6,12 +6,12 @@ Overview
 ********
 
 The Spinbox contains a number as text which can be increased or decreased by *Keys* or API functions.
-Under the hood the Spinbox is a modified :ref:`Text area <lv_textarea>`.
+Under the hood the Spinbox is a modified :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>`.
 
 Parts and Styles
 ****************
 
-The parts of the Spinbox are identical to the :ref:`Text area <lv_textarea>`.
+The parts of the Spinbox are identical to the :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>`.
 
 Value, range and step
 ---------------------
@@ -50,9 +50,9 @@ Events
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the value has changed.
 
 
-See the events of the :ref:`Text area <lv_textarea>` too.
+See the events of the :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>` too.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****

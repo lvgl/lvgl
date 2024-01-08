@@ -258,9 +258,9 @@ Further reading
 
 -  `lv_port_disp_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c>`__
    for a template for your own driver.
--  :ref:`Drawing <drawing>` to learn more about how rendering
+-  :ref:`Drawing <overview/draw/drawing [0-1]>` to learn more about how rendering
    works in LVGL.
--  :ref:`display_features` to learn more about higher
+-  :ref:`overview/display/features of displays [0-3]` to learn more about higher
    level display features.
 
 API

@@ -50,16 +50,16 @@ Events
 Only the `Generic events <../overview/event.html#generic-events>`__ are
 sent by the object type.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
 
 No *Keys* are processed by the object type.
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

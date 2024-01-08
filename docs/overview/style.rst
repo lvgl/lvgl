@@ -160,7 +160,7 @@ The following predefined parts exist in LVGL:
 - :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. text area's or chart's cursor
 - :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: Custom part identifiers can be added starting from here.
 
-For example a :ref:`Slider <lv_slider>` has three parts:
+For example a :ref:`Slider <widgets/slider/slider (lv_slider) [0-1]>` has three parts:
 
 - Background
 - Indicator
@@ -357,7 +357,7 @@ Properties
 **********
 
 For the full list of style properties click
-:ref:`here <style_properties>`.
+:ref:`here <overview/style-props/style properties [0-1]>`.
 
 Typical background properties
 -----------------------------

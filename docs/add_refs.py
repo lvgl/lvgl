@@ -11,7 +11,7 @@ def iter_path(p):
         dst = src.replace(path, output_path)
         if os.path.isdir(src):
             res.extend(iter_path(src))
-        elif src.endswith('.rst') and 'index.rst' not in src:
+        elif src.endswith('.rst'):
             res.append((src, dst))
     if res:
         dp = p.replace(path, output_path)
@@ -21,15 +21,15 @@ def iter_path(p):
     return res
 
 
-heading = '==='  # above and below
-title = '###'  # above and below
-chapter = '***'  # above and below
-section = '==='  # only below
-sub_section1 = '---'  # only below
-sub_section2 = '***'  # below
-subsub_section1 = '^^^'  # only below
-subsub_section2 = '~~~'  # only below
-paragraph = '"""'  # only below
+heading = '==='  # above and below  1
+title = '###'  # above and below  2
+chapter = '***'  # above and below  3
+section = '==='  # only below  4
+sub_section1 = '---'  # only below  5
+sub_section2 = '***'  # below  5
+subsub_section1 = '^^^'  # only below  6
+subsub_section2 = '~~~'  # only below  6
+paragraph = '"""'  # only below  7
 
 
 def check_line(lne):

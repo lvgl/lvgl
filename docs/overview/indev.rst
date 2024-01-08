@@ -89,9 +89,9 @@ Groups
 Objects you want to control with a keypad or encoder need to be added to
 a *Group*. In every group there is exactly one focused object which
 receives the pressed keys or the encoder actions. For example, if a
-:ref:`Text area <lv_textarea>` is focused and you press some letter
+:ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>` is focused and you press some letter
 on a keyboard, the keys will be sent and inserted into the text area.
-Similarly, if a :ref:`Slider <lv_slider>` is focused and you press
+Similarly, if a :ref:`Slider <widgets/slider/slider (lv_slider) [0-1]>` is focused and you press
 the left or right arrows, the slider's value will be changed.
 
 You need to associate an input device with a group. An input device can
@@ -116,11 +116,11 @@ There are some predefined keys which have special meaning:
 - :cpp:enumerator:`LV_KEY_DOWN`: Decrease value or move downwards
 - :cpp:enumerator:`LV_KEY_RIGHT`: Increase value or move to the right
 - :cpp:enumerator:`LV_KEY_LEFT`: Decrease value or move to the left
-- :cpp:enumerator:`LV_KEY_ESC`: Close or exit (E.g. close a :ref:`Drop down list <lv_dropdown>`)
-- :cpp:enumerator:`LV_KEY_DEL`: Delete (E.g. a character on the right in a :ref:`Text area <lv_textarea>`)
-- :cpp:enumerator:`LV_KEY_BACKSPACE`: Delete a character on the left (E.g. in a :ref:`Text area <lv_textarea>`)
-- :cpp:enumerator:`LV_KEY_HOME`: Go to the beginning/top (E.g. in a :ref:`Text area <lv_textarea>`)
-- :cpp:enumerator:`LV_KEY_END`: Go to the end (E.g. in a :ref:`Text area <lv_textarea>`)
+- :cpp:enumerator:`LV_KEY_ESC`: Close or exit (E.g. close a :ref:`Drop down list <widgets/dropdown/drop-down list (lv_dropdown) [0-1]>`)
+- :cpp:enumerator:`LV_KEY_DEL`: Delete (E.g. a character on the right in a :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>`)
+- :cpp:enumerator:`LV_KEY_BACKSPACE`: Delete a character on the left (E.g. in a :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>`)
+- :cpp:enumerator:`LV_KEY_HOME`: Go to the beginning/top (E.g. in a :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>`)
+- :cpp:enumerator:`LV_KEY_END`: Go to the end (E.g. in a :ref:`Text area <widgets/textarea/text area (lv_textarea) [0-1]>`)
 
 The most important special keys in your :cpp:func:`read_cb` function are:
 
@@ -158,9 +158,9 @@ to *Edit* mode.
 In *Edit* mode, :cpp:enumerator:`LV_KEY_NEXT` and :cpp:enumerator:`LV_KEY_PREV` is usually used to modify an
 object. Depending on the object's type, a short or long press of
 :cpp:enumerator:`LV_KEY_ENTER` changes back to *Navigate* mode. Usually, an object
-which cannot be pressed (like a :ref:`Slider <lv_slider>`) leaves
+which cannot be pressed (like a :ref:`Slider <widgets/slider/slider (lv_slider) [0-1]>`) leaves
 *Edit* mode upon a short click. But with objects where a short click has
-meaning (e.g. :ref:`Button <lv_button>`), a long press is required.
+meaning (e.g. :ref:`Button <widgets/button/button (lv_button) [0-1]>`), a long press is required.
 
 Default group
 ^^^^^^^^^^^^^

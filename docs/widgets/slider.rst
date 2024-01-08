@@ -74,7 +74,7 @@ Events
 
 See the events of the `Bar </widgets/bar>`__ too.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
@@ -82,7 +82,7 @@ Keys
 -  ``LV_KEY_UP/RIGHT`` Increment the slider's value by 1
 -  ``LV_KEY_DOWN/LEFT`` Decrement the slider's value by 1
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

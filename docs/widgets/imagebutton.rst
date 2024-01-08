@@ -56,7 +56,7 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the button is toggled.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
@@ -67,7 +67,7 @@ Keys
    :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` is enabled.
 -  :cpp:enumerator:`LV_KEY_ENTER` Clicks the button
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

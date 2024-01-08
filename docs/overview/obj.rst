@@ -4,11 +4,11 @@ Objects
 
 In LVGL the **basic building blocks** of a user interface are the
 objects, also called *Widgets*. For example a
-:ref:`Button <lv_button>`, :ref:`Label <lv_label>`,
-:ref:`Image <lv_image>`, :ref:`List <lv_list>`,
-:ref:`Chart <lv_chart>` or :ref:`Text area <lv_textarea>`.
+:ref:`Button <widgets/button/button (lv_button) [0-1]>`, :ref:`Label <widgets/label/label (lv_label) [0-1]>`,
+:ref:`Image <widgets/image/image (lv_image) [0-1]>`, :ref:`List <widgets/list/list (lv_list) [0-1]>`,
+:ref:`Chart <widgets/chart/chart (lv_chart) [0-1]>` or :ref:`Text area <widgets/textarea/textarea (lv_textarea) [0-1]>`.
 
-You can see all the :ref:`Object types <widgets>` here.
+You can see all the :ref:`Object types <widgets/index/widgets [0-1]>` here.
 
 All objects are referenced using an :cpp:type:`lv_obj_t` pointer as a handle.
 This pointer can later be used to set or get the attributes of the
@@ -38,7 +38,7 @@ You can set/get these attributes with ``lv_obj_set_...`` and
    lv_obj_set_size(btn1, 100, 50);   /*Set a button's size*/
    lv_obj_set_pos(btn1, 20,30);      /*Set a button's position*/
 
-To see all the available functions visit the :ref:`Base object's documentation <lv_obj>`.
+To see all the available functions visit the :ref:`Base object's documentation <widgets/obj/base object (lv_obj) [0-1]>`.
 
 Specific attributes
 -------------------
@@ -58,7 +58,7 @@ functions. For example for a slider:
    lv_slider_set_value(slider1, 40, LV_ANIM_ON);       /*Set the current value (position)*/
 
 The API of the widgets is described in their
-:ref:`Documentation <widgets>` but you can also check the respective
+:ref:`Documentation <widgets/index/widgets [0-1]>` but you can also check the respective
 header files (e.g. *widgets/lv_slider.h*)
 
 Working mechanisms
@@ -175,7 +175,7 @@ be created like:
    lv_obj_t * scr1 = lv_obj_create(NULL);
 
 Screens can be created with any object type. For example, a
-:ref:`Base object <lv_obj>` or an image to make a wallpaper.
+:ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` or an image to make a wallpaper.
 
 Get the active screen
 ---------------------
@@ -208,7 +208,7 @@ system-level things (e.g. mouse cursor will be placed there with
 The :cpp:func:`lv_layer_top` and :cpp:func:`lv_layer_sys` functions return pointers
 to the top and system layers respectively.
 
-Read the :ref:`Layer overview <layers>` section to learn more
+Read the :ref:`Layer overview <overview/layer/layers [0-1]>` section to learn more
 about layers.
 
 Load screen with animation
@@ -242,14 +242,14 @@ display using :cpp:expr:`lv_disp_set_default(disp)`.
 :cpp:func:`lv_screen_active`, :cpp:func:`lv_screen_load` and :cpp:func:`lv_screen_load_anim` operate
 on the default display.
 
-Visit :ref:`display_multi_display_support` to learn more.
+Visit :ref:`overview/display/multiple display support [0-2]` to learn more.
 
 Parts
 *****
 
 The widgets are built from multiple parts. For example a
-:ref:`Base object <lv_obj>` uses the main and scrollbar parts but a
-:ref:`Slider <lv_slider>` uses the main, indicator and knob parts.
+:ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` uses the main and scrollbar parts but a
+:ref:`Slider <widgets/slider/slider (lv_slider) [0-1]>` uses the main, indicator and knob parts.
 Parts are similar to *pseudo-elements* in CSS.
 
 The following predefined parts exist in LVGL:
@@ -265,7 +265,7 @@ The following predefined parts exist in LVGL:
 
 The main purpose of parts is to allow styling the "components" of the
 widgets. They are described in more detail in the
-:ref:`Style overview <styles>` section.
+:ref:`Style overview <overview/style/styles [0-1]>` section.
 
 States
 ******
@@ -295,13 +295,13 @@ values can be used as well. E.g.
 :cpp:expr:`lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 
 To learn more about the states read the related section of the
-:ref:`Style overview <styles>`.
+:ref:`Style overview <overview/style/styles [0-1]>`.
 
 Snapshot
 ********
 
 A snapshot image can be generated for an object together with its
-children. Check details in :ref:`snapshot`.
+children. Check details in :ref:`others/snapshot/snapshot [0-1]`.
 
 API
 ***

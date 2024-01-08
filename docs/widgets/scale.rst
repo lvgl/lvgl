@@ -81,4 +81,3 @@ Example
 API
 ***
 
-:ref:`lv_scale`

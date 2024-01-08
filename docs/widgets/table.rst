@@ -81,9 +81,9 @@ Events
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new cell is selected with
    keys.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
@@ -98,7 +98,7 @@ Note that, as usual, the state of :cpp:enumerator:`LV_KEY_ENTER` is translated t
 currently selected cell. Row and column will be set to
 :c:macro:`LV_TABLE_CELL_NONE` no cell is selected.
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

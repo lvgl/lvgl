@@ -21,7 +21,7 @@ Images stored internally in a variable are composed mainly of an
 
 - **header**:
 
-  - *cf*: Color format. See :ref:`below <overview_image_color_formats>`
+  - *cf*: Color format. See :ref:`below <overview/image/color formats [0-2]>`
   - *w*: width in pixels (<= 2048)
   - *h*: height in pixels (<= 2048)
   - *always zero*: 3 bits which need to be always zero
@@ -41,7 +41,7 @@ registered in LVGL to make file operations. You can add an interface to
 a standard file system (FAT32 on SD card) or you create your simple file
 system to read data from an SPI Flash memory. In every case, a *Drive*
 is just an abstraction to read and/or write data to memory. See the
-:ref:`File system <overview_file_system>` section to learn more.
+:ref:`File system <overview/fs/file system [0-1]>` section to learn more.
 
 Images stored as files are not linked into the resulting executable, and
 must be read into RAM before being drawn. As a result, they are not as
@@ -103,9 +103,9 @@ Adding an image to LVGL via the online converter is easy.
 
 1. You need to select a *BMP*, *PNG* or *JPG* image first.
 2. Give the image a name that will be used within LVGL.
-3. Select the :ref:`Color format <overview_image_color_formats>`.
+3. Select the :ref:`Color format <overview/image/color formats [0-2]>`.
 4. Select the type of image you want. Choosing a binary will generate a
-   ``.bin`` file that must be stored separately and read using the :ref:`file support <overview_image_files>`.
+   ``.bin`` file that must be stored separately and read using the :ref:`file support <overview/image/files [0-2]>`.
    Choosing a variable will generate a standard C file that can be linked into your project.
 5. Hit the *Convert* button. Once the conversion is finished, your
    browser will automatically download the resulting file.
@@ -143,13 +143,13 @@ variable to display it using LVGL. For example:
    };
 
 Another (possibly simpler) option to create and display an image at
-run-time is to use the :ref:`Canvas <lv_canvas>` object.
+run-time is to use the :ref:`Canvas <widgets/canvas/canvas (lv_canvas) [0-1]>` object.
 
 Use images
 ----------
 
 The simplest way to use an image in LVGL is to display it with an
-:ref:`lv_image` object:
+:ref:`widgets/image/image (lv_image) [0-1]` object:
 
 .. code:: c
 
@@ -168,7 +168,7 @@ you want to use it.
 Image decoder
 *************
 
-As you can see in the :ref:`overview_image_color_formats` section, LVGL
+As you can see in the :ref:`overview/image/color formats [0-2]` section, LVGL
 supports several built-in image formats. In many cases, these will be
 all you need. LVGL doesn't directly support, however, generic image
 formats like PNG or JPG.
@@ -217,7 +217,7 @@ a fully opaque image, using an alpha channel.
 
 After decoding, the *raw* formats are considered *True color* by the
 library. In other words, the image decoder must decode the *Raw* images
-to *True color* according to the format described in the :ref:`overview_image_color_formats` section.
+to *True color* according to the format described in the :ref:`overview/image/color formats [0-2]` section.
 
 
 Register an image decoder
@@ -330,7 +330,7 @@ Manually use an image decoder
 -----------------------------
 
 LVGL will use registered image decoders automatically if you try and
-draw a raw image (i.e. using the ``lv_image`` object) but you can use them
+draw a raw image (i.e. using the :ref:`widgets/image/image (lv_image) [0-1]` object) but you can use them
 manually too. Create an :cpp:type:`lv_image_decoder_dsc_t` variable to describe
 the decoding session and call :cpp:func:`lv_image_decoder_open`.
 
@@ -505,7 +505,7 @@ Clean the cache
 ---------------
 
 Let's say you have loaded a PNG image into a :cpp:struct:`lv_image_dsc_t` ``my_png``
-variable and use it in an ``lv_image`` object. If the image is already
+variable and use it in an :ref:`widgets/image/image (lv_image) [0-1]` object. If the image is already
 cached and you then change the underlying PNG file, you need to notify
 LVGL to cache the image again. Otherwise, there is no easy way of
 detecting that the underlying file changed and LVGL will still draw the

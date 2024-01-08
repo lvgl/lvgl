@@ -60,8 +60,8 @@ It's not mandatory, but we highly appreciate it if you write a few words about y
 
 Although you can get LVGL for free there is a massive amount of work behind it. It's created by a group of volunteers who made it available for you in their free time.
 
-To make the LVGL project sustainable, please consider :ref:`contributing` to the project.
-You can choose from many different ways of contributing See :ref:`contributing` such as simply writing a tweet about you using LVGL, fixing bugs, translating the documentation, or even becoming a maintainer.
+To make the LVGL project sustainable, please consider :ref:`contributing/contributing [0-1]` to the project.
+You can choose from many different ways of contributing See :ref:`contributing/contributing [0-1]` such as simply writing a tweet about you using LVGL, fixing bugs, translating the documentation, or even becoming a maintainer.
 
 Repository layout
 -----------------
@@ -110,7 +110,7 @@ The core repositories have at least the following branches:
 Changelog
 ^^^^^^^^^
 
-The changes are recorded in :ref:`changelog`.
+The changes are recorded in :ref:`changelog/changelog [0-1]`.
 
 Version support
 ^^^^^^^^^^^^^^^
@@ -157,7 +157,7 @@ Before posting a question, please ready this FAQ section as you might find answe
 Is my MCU/hardware supported?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Every MCU which is capable of driving a display via parallel port, SPI, RGB interface or anything else and fulfills the :ref:`requirements` is supported by LVGL.
+Every MCU which is capable of driving a display via parallel port, SPI, RGB interface or anything else and fulfills the :ref:`introduction/index/requirements [0-5]` is supported by LVGL.
 
 This includes:
 
@@ -182,7 +182,7 @@ Some examples of the supported display types:
 * even LED matrices
 * or any other display where you can control the color/state of the pixels
 
-See the :ref:`display_interface` section to learn more.
+See the :ref:`porting/display/display interface [0-1]` section to learn more.
 
 
 LVGL doesn't start, randomly crashes or nothing is drawn on the display. What can be the problem?
@@ -191,11 +191,11 @@ LVGL doesn't start, randomly crashes or nothing is drawn on the display. What ca
 * Try increasing :c:macro:`LV_MEM_SIZE`.
 * Be sure :cpp:type:`lv_disp_t`, :cpp:type:`lv_indev_t` and :cpp:type:`lv_fs_drv_t` are global or `static`.
 * Be sure your display works without LVGL. E.g. paint it to red on start up.
-* Enable :ref:`logging`
+* Enable :ref:`porting/log/logging [0-1]`
 * Enable asserts in ``lv_conf.h`` (`LV_USE_ASSERT_...`)
 * If you use an RTOS
    * increase the stack size of the task which calls :cpp:func:`lv_timer_handler`
-   * Be sure you used a mutex as described here: :ref:`os_interrupt`
+   * Be sure you used a mutex as described here: :ref:`porting/os/operating system and interrupts [0-1]`
 
 
 My display driver is not called. What have I missed?
@@ -203,7 +203,7 @@ My display driver is not called. What have I missed?
 
 Be sure you are calling :cpp:expr:`lv_tick_inc(x)` in an interrupt and :cpp:func:`lv_timer_handler` in your main ``while(1)``.
 
-Learn more in the :ref:`tick` and :ref:`timer` sections.
+Learn more in the :ref:`porting/tick/tick interface [0-1]` and :ref:`porting/timer_handler/timer handler [0-1]` sections.
 
 
 Why is the display driver called only once? Only the upper part of the display is refreshed.
@@ -278,4 +278,4 @@ How to work with an operating system?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To work with an operating system where tasks can interrupt each other (preemptively) you should protect LVGL related function calls with a mutex.
-See the :ref:`os_interrupt` section to learn more.
+See the :ref:`porting/os/operating system and interrupts [0-1]` section to learn more.

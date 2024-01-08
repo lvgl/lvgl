@@ -76,7 +76,7 @@ Events
    date currently being pressed. Returns :cpp:enumerator:`LV_RES_OK` if there is a
    valid pressed date, else :cpp:enumerator:`LV_RES_INVALID`.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
@@ -84,7 +84,7 @@ Keys
 -  ``LV_KEY_RIGHT/UP/LEFT/RIGHT`` To navigate among the buttons to dates
 -  :cpp:enumerator:`LV_KEY_ENTER` To press/release the selected date
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Headers
 *******

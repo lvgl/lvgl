@@ -101,7 +101,7 @@ Learn more
 ----------
 
 -  FreeType`tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
--  LVGL's :ref:`add_font`
+-  LVGL's :ref:`overview/font/add a new font [0-2]`
 
 API
 ---

@@ -21,7 +21,7 @@ Parts and Styles
    charts ``pad_column`` sets the space between the columns of the
    adjacent indices.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar used if the chart is zoomed. See
-   the :ref:`Base object <lv_obj>`\ 's documentation for details.
+   the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>`\ 's documentation for details.
 -  :cpp:enumerator:`LV_PART_ITEMS` Refers to the line or bar series.
 
    -  Line chart: The *line* properties are used by the lines.
@@ -203,16 +203,16 @@ Events
    :cpp:expr:`lv_chart_get_pressed_point(chart)` returns the zero-based index of
    the pressed point.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
 
 No *Keys* are processed by the object type.
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

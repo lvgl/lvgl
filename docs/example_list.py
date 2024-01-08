@@ -143,7 +143,7 @@ def exec(temp_directory):
     # fout.write("```\n")
     # fout.write("\n")
 
-    fout.write('.. _examples:\n\n')
+    fout.write('.. _examples/examples [0-1]:\n\n')
     write_header(0, 'Examples', fout)
 
     for h in h1:

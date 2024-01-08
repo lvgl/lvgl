@@ -14,11 +14,11 @@ Parts and Styles
 The Window is built from other widgets so you can check their
 documentation for details:
 
-- Background: :ref:`lv_obj`
-- Header on the background: :ref:`lv_obj`
-- Title on the header: :ref:`lv_label`
-- Buttons on the header: :ref:`lv_button`
-- Content area on the background: :ref:`lv_obj`
+- Background: :ref:`widgets/obj/base object (lv_obj) [0-1]`
+- Header on the background: :ref:`widgets/obj/base object (lv_obj) [0-1]`
+- Title on the header: :ref:`widgets/label/label (lv_label) [0-1]`
+- Buttons on the header: :ref:`widgets/button/button (lv_button) [0-1]`
+- Content area on the background: :ref:`widgets/obj/base object (lv_obj) [0-1]`
 
 Usage
 *****
@@ -59,14 +59,14 @@ Events
 No special events are sent by the windows, however events can be added
 manually to the return value of :cpp:func:`lv_win_add_button`.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
 
 No *Keys* are handled by the window.
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

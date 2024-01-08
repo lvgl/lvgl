@@ -15,13 +15,13 @@ The menu widget is built from the following objects:
 
 - Main container: :cpp:type:`lv_menu_main_cont`
 - Main header: :cpp:type:`lv_menu_main_header_cont`
-- Back button: :ref:`lv_button`
-- Back button icon: :ref:`lv_image`
+- Back button: :ref:`widgets/button/button (lv_button) [0-1]`
+- Back button icon: :ref:`widgets/image/image (lv_image) [0-1]`
 - Main page: :cpp:type:`lv_menu_page`
 - Sidebar container: :cpp:type:`lv_menu_sidebar_cont`
 - Sidebar header: :cpp:type:`lv_menu_sidebar_header_cont`
-- Back button: :ref:`lv_button`
-- Back button icon: :ref:`lv_image`
+- Back button: :ref:`widgets/button/button (lv_button) [0-1]`
+- Back button icon: :ref:`widgets/image/image (lv_image) [0-1]`
 - Sidebar page: :cpp:type:`lv_menu_page`
 
 Usage
@@ -107,16 +107,16 @@ Events
    -  :cpp:expr:`lv_menu_back_button_is_root(menu, button)` to check if button is root
       back button
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See the events of the :ref:`Base object <widgets/obj/base object (lv_obj) [0-1]>` too.
 
-Learn more about :ref:`events`.
+Learn more about :ref:`overview/events/events [0-1]`.
 
 Keys
 ****
 
 No keys are handled by the menu widget.
 
-Learn more about :ref:`indev_keys`.
+Learn more about :ref:`overview/indev/keys [0-3]`.
 
 Example
 *******

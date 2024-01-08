@@ -175,7 +175,7 @@ that tell what LVGL is about to draw. Some fields of these parameters
 can be modified to draw something else or any custom drawing operations
 can be added manually.
 
-A good use case for this is the :ref:`Button matrix <lv_buttonmatrix>`
+A good use case for this is the :ref:`Button matrix <widgets/buttonmatrix/button matrix (lv_buttonmatrix) [0-1]>`
 widget. By default, its buttons can be styled in different states, but
 you can't style the buttons one by one. However, an event is sent for
 every button and you can, for example, tell LVGL to use different colors

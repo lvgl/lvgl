@@ -12,7 +12,7 @@ Ready to use drivers
 
 LVGL contains prepared drivers for the API of POSIX, standard C,
 Windows, and `FATFS <http://elm-chan.org/fsw/ff/00index_e.html>`__.
-Learn more :ref:`here <libs_filesystem>`.
+Learn more :ref:`here <libs/fs/file system interfaces [0-1]>`.
 
 Adding a driver
 ***************
@@ -142,7 +142,7 @@ practice to insert a ``'/'`` in front of each directory name.
 Use drives for images
 *********************
 
-:ref:`Image <lv_image>` objects can be opened from files too (besides
+:ref:`Image <widgets/image/image (lv_image) [0-1]>` objects can be opened from files too (besides
 variables stored in the compiled program).
 
 To use files in image widgets the following callbacks are required:

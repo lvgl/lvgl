@@ -24,7 +24,7 @@ The ``type`` member can be:
 ``read_cb`` is a function pointer which will be called periodically to
 report the current state of an input device.
 
-Visit :ref:`Input devices <indev>` to learn more about input
+Visit :ref:`Input devices <overview/indev/input devices [0-1]>` to learn more about input
 devices in general.
 
 Touchpad, mouse or any pointer
@@ -258,7 +258,7 @@ Further reading
 ***************
 
 - `lv_port_indev_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_indev_template.c>`__ for a template for your own driver.
-- `INdev features <indev>` to learn more about higher level input device features.
+- :ref:`Indev features <overview/indev/input devices [0-1]>` to learn more about higher level input device features.
 
 API
 ***
