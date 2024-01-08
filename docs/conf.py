@@ -42,15 +42,15 @@ extensions = [
     'sphinx_sitemap',
     'lv_example',
     'sphinx_rtd_dark_mode',
-    "sphinx.ext.autosectionlabel"
+    # "sphinx.ext.autosectionlabel"
 ]
 
 # sphinx.ext.autosectionlabel
 # adds unique references to section headers
 # to view a list of all of the references use
 # python -m sphinx.ext.intersphinx html_out/objects.inv
-autosectionlabel_prefix_document = True
-autosectionlabel_maxdepth = 2
+# autosectionlabel_prefix_document = True
+# autosectionlabel_maxdepth = 2
 
 
 default_dark_mode = False
