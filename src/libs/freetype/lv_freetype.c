@@ -395,8 +395,14 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 }
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)
 {
-    if(node->glyph_cache) lv_cache_destroy(node->glyph_cache, user_data);
-    if(node->draw_data_cache) lv_cache_destroy(node->draw_data_cache, user_data);
+    if(node->glyph_cache) {
+        lv_cache_destroy(node->glyph_cache, user_data);
+        node->glyph_cache = NULL;
+    }
+    if(node->draw_data_cache) {
+        lv_cache_destroy(node->draw_data_cache, user_data);
+        node->draw_data_cache = NULL;
+    }
 }
 static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cache_node_t * lhs,
                                                           const lv_freetype_cache_node_t * rhs)
