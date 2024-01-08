@@ -17,8 +17,9 @@
  *      DEFINES
  *********************/
 
+#define DIGITS_IN_YEAR      (4U)
 /* String for year is 4 digits + NULL terminator, enough until year 9999 */
-#define YEAR_STR_BUFFER_LEN (5U)
+#define YEAR_STR_BUFFER_LEN (DIGITS_IN_YEAR + 1U)
 
 /**********************
  *      TYPEDEFS
@@ -135,10 +136,13 @@ static void year_event_cb(lv_event_t * e)
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);
 
+    /* Get the first year on the options list
+     * NOTE: Assumes the first 4 digits in the option list are numbers */
     char year_buf[YEAR_STR_BUFFER_LEN] = {0};
-    lv_dropdown_get_selected_str(dropdown, year_buf, YEAR_STR_BUFFER_LEN);
+    const char * year_p = lv_dropdown_get_options(dropdown);
+    strncpy(year_buf, year_p, DIGITS_IN_YEAR);
     /* year_buf is NULL terminated, so it's safe to use atoi */
-    uint32_t year = atoi(year_buf);
+    const uint32_t year = atoi(year_buf);
 
     lv_calendar_date_t newd = *d;
     newd.year = year - sel;
@@ -154,10 +158,13 @@ static void value_changed_event_cb(lv_event_t * e)
 
     lv_obj_t * year_dd = lv_obj_get_child(header, 0);
 
+    /* Get the first year on the options list
+     * NOTE: Assumes the first 4 digits in the option list are numbers */
     char year_buf[YEAR_STR_BUFFER_LEN] = {0};
-    lv_dropdown_get_selected_str(year_dd, year_buf, YEAR_STR_BUFFER_LEN);
+    const char * year_p = lv_dropdown_get_options(year_dd);
+    strncpy(year_buf, year_p, DIGITS_IN_YEAR);
     /* year_buf is NULL terminated, so it's safe to use atoi */
-    uint32_t year = atoi(year_buf);
+    const uint32_t year = atoi(year_buf);
 
     lv_dropdown_set_selected(year_dd, year - cur_date->year);
 
