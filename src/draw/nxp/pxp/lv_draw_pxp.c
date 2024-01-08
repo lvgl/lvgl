@@ -92,7 +92,7 @@ void lv_draw_pxp_init(void)
     lv_pxp_init();
 
 #if LV_USE_OS
-    lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 8 * 1024, draw_pxp_unit);
+    lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
 #endif
 }
 
