@@ -45,15 +45,15 @@ void lv_draw_vg_lite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t
 
     /*It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
      *In this case just return. */
-    if(layer->buf == NULL)
+    if(layer->draw_buf == NULL)
         return;
 
     lv_image_dsc_t img_dsc;
     lv_memzero(&img_dsc, sizeof(lv_image_dsc_t));
     img_dsc.header.w = lv_area_get_width(&layer->buf_area);
     img_dsc.header.h = lv_area_get_height(&layer->buf_area);
-    img_dsc.header.cf = layer->color_format;
-    img_dsc.data = layer->buf;
+    img_dsc.header.cf = layer->draw_buf->header.cf;
+    img_dsc.data = layer->draw_buf->data;
 
     /* The GPU output is premultiplied RGB */
     img_dsc.header.flags = LV_IMAGE_FLAGS_PREMULTIPLIED;

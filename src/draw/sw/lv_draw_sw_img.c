@@ -55,14 +55,14 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 
     /*It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
      *In this case just return. */
-    if(layer_to_draw->buf == NULL) return;
+    if(layer_to_draw->draw_buf == NULL) return;
 
     lv_image_dsc_t img_dsc = { 0 };
     img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
     img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
-    img_dsc.header.cf = layer_to_draw->color_format;
-    img_dsc.header.stride = layer_to_draw->buf_stride;
-    img_dsc.data = layer_to_draw->buf;
+    img_dsc.header.cf = layer_to_draw->draw_buf->header.cf;
+    img_dsc.header.stride = layer_to_draw->draw_buf->header.stride;
+    img_dsc.data = layer_to_draw->draw_buf->data;
 
     lv_draw_image_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));

@@ -111,7 +111,11 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
     lv_layer_t layer;
     lv_memzero(&layer, sizeof(layer));
 
-    layer.buf = buf;
+    lv_draw_buf_t draw_buf;
+    lv_memzero(&draw_buf, sizeof(draw_buf));
+    lv_image_header_init(&draw_buf.header, w, h, cf, 0, 0);
+
+    layer.draw_buf = &draw_buf;
     layer.buf_area.x1 = snapshot_area.x1;
     layer.buf_area.y1 = snapshot_area.y1;
     layer.buf_area.x2 = snapshot_area.x1 + w - 1;

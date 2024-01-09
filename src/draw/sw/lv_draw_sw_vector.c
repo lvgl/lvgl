@@ -427,22 +427,22 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
         return;
 
     lv_layer_t * layer = dsc->base.layer;
-    if(layer->buf == NULL)
+    if(layer->draw_buf == NULL)
         return;
 
-    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888 && \
-       layer->color_format != LV_COLOR_FORMAT_XRGB8888) {
-        LV_LOG_ERROR("unsupported layer color: %d", layer->color_format);
+    lv_color_format_t cf = layer->draw_buf->header.cf;
+
+    if(cf != LV_COLOR_FORMAT_ARGB8888 && \
+       cf != LV_COLOR_FORMAT_XRGB8888) {
+        LV_LOG_ERROR("unsupported layer color: %d", cf);
         return;
     }
 
-    void * buf = layer->buf;
+    void * buf = layer->draw_buf->data;
     int32_t width = lv_area_get_width(&layer->buf_area);
     int32_t height = lv_area_get_height(&layer->buf_area);
-    uint32_t stride = layer->buf_stride;
-    stride /= 4;
     Tvg_Canvas * canvas = tvg_swcanvas_create();
-    tvg_swcanvas_set_target(canvas, buf, stride, width, height, TVG_COLORSPACE_ARGB8888);
+    tvg_swcanvas_set_target(canvas, buf, width, width, height, TVG_COLORSPACE_ARGB8888);
 
     lv_ll_t * task_list = dsc->task_list;
     _lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, canvas);

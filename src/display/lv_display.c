@@ -81,7 +81,6 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->layer_head->buf_area.y1 = 0;
     disp->layer_head->buf_area.x2 = hor_res - 1;
     disp->layer_head->buf_area.y2 = ver_res - 1;
-    disp->layer_head->buf_stride = lv_draw_buf_width_to_stride(hor_res, LV_COLOR_FORMAT_NATIVE);
     disp->layer_head->color_format = disp->color_format;
 
     disp->inv_en_cnt = 1;

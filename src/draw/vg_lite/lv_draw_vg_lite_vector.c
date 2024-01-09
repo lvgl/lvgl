@@ -52,7 +52,7 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_tas
         return;
 
     lv_layer_t * layer = dsc->base.layer;
-    if(layer->buf == NULL)
+    if(layer->draw_buf == NULL)
         return;
 
     _lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, draw_unit);
