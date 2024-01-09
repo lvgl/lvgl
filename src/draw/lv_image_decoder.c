@@ -139,6 +139,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         .stride_align = LV_DRAW_BUF_STRIDE_ALIGN != 1,
         .premultiply = false,
         .no_cache = false,
+        .use_indexed = false,
     };
 
     /*Make a copy of args */
@@ -171,7 +172,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         lv_memzero(&dsc->header, sizeof(lv_image_header_t));
 
         dsc->error_msg = NULL;
-        dsc->img_data  = NULL;
         dsc->decoded  = NULL;
         dsc->cache_entry = NULL;
         dsc->user_data = NULL;
@@ -295,7 +295,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
     if(args->stride_align && decoded->header.cf != LV_COLOR_FORMAT_RGB565A8) {
         uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
         if(decoded->header.stride != stride_expect) {
-            LV_LOG_WARN("Stride mismatch");
+            LV_LOG_TRACE("Stride mismatch");
             lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, stride_expect);
             if(aligned == NULL) {
                 LV_LOG_ERROR("No memory for Stride adjust.");
@@ -310,7 +310,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
     if(args->premultiply
        && !lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED) /*Hasn't done yet*/
       ) {
-        LV_LOG_WARN("Alpha premultiply.");
+        LV_LOG_TRACE("Alpha premultiply.");
         if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_MODIFIABLE)) {
             /*Do it directly*/
             lv_draw_buf_premultiply(decoded);

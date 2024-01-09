@@ -322,7 +322,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
     int32_t (*area_get_main_size)(const lv_area_t *) = (f->row ? lv_area_get_width : lv_area_get_height);
     int32_t (*area_get_cross_size)(const lv_area_t *) = (!f->row ? lv_area_get_width : lv_area_get_height);
 
-    typedef int32_t (*margin_func_t)(const struct _lv_obj_t *, uint32_t);
+    typedef int32_t (*margin_func_t)(const lv_obj_t *, uint32_t);
     margin_func_t get_margin_main_start = (f->row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
     margin_func_t get_margin_main_end = (f->row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
     margin_func_t get_margin_cross_start = (!f->row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);

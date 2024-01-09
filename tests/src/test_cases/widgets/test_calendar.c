@@ -181,7 +181,7 @@ void test_calendar_header_arrow_create_gui(void)
 
 void test_calendar_event_key_down_gui(void)
 {
-    char key = LV_KEY_DOWN;
+    uint32_t key = LV_KEY_DOWN;
 
     lv_calendar_set_showed_date(calendar, 2022, 9);
 

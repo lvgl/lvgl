@@ -27,8 +27,8 @@ void test_scale_render_example_1(void)
     lv_scale_set_total_tick_count(scale, 31);
     lv_scale_set_major_tick_every(scale, 5);
 
-    lv_scale_set_major_tick_length(scale, 10);
-    lv_scale_set_minor_tick_length(scale, 5);
+    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 10, 40);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("scale_1.png");
@@ -46,8 +46,8 @@ void test_scale_render_example_2(void)
     lv_scale_set_total_tick_count(scale, 21);
     lv_scale_set_major_tick_every(scale, 5);
 
-    lv_scale_set_major_tick_length(scale, 10);
-    lv_scale_set_minor_tick_length(scale, 5);
+    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 0, 100);
 
     static const char * custom_labels[] = {"0 °C", "25 °C", "50 °C", "75 °C", "100 °C", NULL};
@@ -135,8 +135,8 @@ void test_scale_render_example_3(void)
     lv_scale_set_total_tick_count(scale, 11);
     lv_scale_set_major_tick_every(scale, 5);
 
-    lv_scale_set_major_tick_length(scale, 10);
-    lv_scale_set_minor_tick_length(scale, 5);
+    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 10, 40);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("scale_3.png");
@@ -154,8 +154,8 @@ void test_scale_render_example_4(void)
     lv_scale_set_total_tick_count(scale, 21);
     lv_scale_set_major_tick_every(scale, 5);
 
-    lv_scale_set_major_tick_length(scale, 10);
-    lv_scale_set_minor_tick_length(scale, 5);
+    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 0, 100);
 
     static const char * custom_labels[] = {"0 °C", "25 °C", "50 °C", "75 °C", "100 °C", NULL};

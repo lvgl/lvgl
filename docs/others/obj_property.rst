@@ -1,3 +1,5 @@
+.. _obj_property:
+
 ===============
 Widget Property
 ===============
@@ -6,11 +8,13 @@ Widgets have many properties that can decide what they look like and how they be
 For example, the size, position, color, font, etc. are properties of a widget.
 Specially, widget local style is also a property of a widget.
 
+.. _obj_property_usage:
+
 Usage
 -----
 
 Two APIs are provided to get/set widget properties. It can be enabled by setting
-``LV_USE_OBJ_PROPERTY`` to 1 in `lv_conf.h`.
+:c:macro:`LV_USE_OBJ_PROPERTY` to `1` in ``lv_conf.h``.
 
 .. code:: c
 
@@ -24,23 +28,26 @@ Two APIs are provided to get/set widget properties. It can be enabled by setting
         };
     } lv_property_t;
 
-    lv_result_t lv_obj_set_property(struct _lv_obj_t * obj, const lv_property_t * value);
-    lv_property_t lv_obj_get_property(struct _lv_obj_t * obj, lv_prop_id_t id);
+    lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value);
+    lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
 
+.. _obj_property_id:
 
 Property ID
 ~~~~~~~~~~~
 
-``lv_prop_id_t`` identifies which property to get/set. ``lv_property_t`` is an enum value
-defined in `lv_obj_property.h` that are grouped by widget class. You can add your own
-widget property ID following same rule and using helper macro ``LV_PROPERTY_ID``.
+:cpp:type:`lv_prop_id_t` identifies which property to get/set. :cpp:type:`lv_property_t` is an enum value
+defined in ``lv_obj_property.h`` that are grouped by widget class. You can add your own
+widget property ID following same rule and using helper macro :c:macro:`LV_PROPERTY_ID`.
 Do make sure the ID is unique across all widgets.
 
 
 Property ID is a 32-bit value. The higher 4bits indicates the property value type.
 The lower 28bits is the property ID.
 
-Note that ``lv_style_prop_t`` is also valid property ID.
+Note that :cpp:type:`lv_style_prop_t` is also valid property ID.
+
+.. _obj_property_value:
 
 Property Value
 ~~~~~~~~~~~~~~

@@ -38,7 +38,7 @@ jobs:
       run: python tests/main.py --report test
     - name: Archive screenshot errors
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: screenshot-errors-amd64
         path: |
@@ -94,7 +94,7 @@ jobs:
 
           install: |
             apt-get update -y
-            apt-get install build-essential ccache python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev -q -y
+            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 -q -y
             /usr/sbin/update-ccache-symlinks
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 
@@ -102,7 +102,7 @@ jobs:
             env PATH="/usr/lib/ccache:$PATH" NON_AMD64_BUILD=1 ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
       - name: Archive screenshot errors
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
             name: screenshot-errors-${{ matrix.arch }}
             path: |

@@ -33,7 +33,7 @@ In practice, it looks like this:
    }
 
 In the example :cpp:enumerator:`LV_EVENT_CLICKED` means that only the click event will
-call ``my_event_cb``. See the `list of event codes <#event-codes>`__ for
+call ``my_event_cb``. See the :ref:`list of event codes <events_codes>` for
 all the options. :cpp:enumerator:`LV_EVENT_ALL` can be used to receive all events.
 
 The last parameter of :cpp:func:`lv_obj_add_event` is a pointer to any custom
@@ -83,6 +83,7 @@ Remove event(s) from widgets
        }
    }
 
+.. _events_codes:
 
 Event codes
 ***********
@@ -94,7 +95,7 @@ All objects (such as Buttons/Labels/Sliders etc.) regardless their type
 receive the *Input device*, *Drawing* and *Other* events.
 
 However, the *Special events* are specific to a particular widget type.
-See the `widgets' documentation </widgets/index>`__ to learn when they
+See the :ref:`widgets' documentation <widgets>` to learn when they
 are sent,
 
 *Custom events* are added by the user and are never sent by LVGL.
@@ -114,11 +115,11 @@ Input device events
 -  :cpp:enumerator:`LV_EVENT_CLICKED`: Called on release if not scrolled (regardless to long press)
 -  :cpp:enumerator:`LV_EVENT_RELEASED`: Called in every cases when the object has been released
 -  :cpp:enumerator:`LV_EVENT_SCROLL_BEGIN`: Scrolling begins. The event parameter is a pointer to the animation of the scroll. Can be modified
--  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN,
+-  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN`: 
 -  :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends
 -  :cpp:enumerator:`LV_EVENT_SCROLL`: Scrolling
--  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_active());`
--  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to the object. Get the key with `lv_indev_get_key(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to the object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_active());`
 -  :cpp:enumerator:`LV_EVENT_FOCUSED`: The object is focused
 -  :cpp:enumerator:`LV_EVENT_DEFOCUSED`: The object is defocused
 -  :cpp:enumerator:`LV_EVENT_LEAVE`: The object is defocused but still selected
@@ -128,8 +129,8 @@ Input device events
 Drawing events
 --------------
 
--  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if the object fully covers an area. The event parameter is `lv_cover_check_info_t *`.
--  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around the object (e.g. for shadow). The event parameter is `int32_t *` to store the size.
+-  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if the object fully covers an area. The event parameter is :cpp:type:`lv_cover_check_info_t *`.
+-  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around the object (e.g. for shadow). The event parameter is :cpp:type:`int32_t *` to store the size.
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`: Starting the main drawing phase
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN`: Perform the main drawing
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_END`: Finishing the main drawing phase
@@ -167,16 +168,16 @@ Other events
 Display events
 --------------
 
--  :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA,
--  :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED,
--  :cpp:enumerator:`LV_EVENT_COLOR_FORMAT_CHANGED,
--  :cpp:enumerator:`LV_EVENT_REFR_REQUEST,
--  :cpp:enumerator:`LV_EVENT_REFR_START,
--  :cpp:enumerator:`LV_EVENT_REFR_READY,
--  :cpp:enumerator:`LV_EVENT_RENDER_START,
--  :cpp:enumerator:`LV_EVENT_RENDER_READY,
--  :cpp:enumerator:`LV_EVENT_FLUSH_START,
--  :cpp:enumerator:`LV_EVENT_FLUSH_FINISH,
+-  :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA`
+-  :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED`
+-  :cpp:enumerator:`LV_EVENT_COLOR_FORMAT_CHANGED`
+-  :cpp:enumerator:`LV_EVENT_REFR_REQUEST`
+-  :cpp:enumerator:`LV_EVENT_REFR_START`
+-  :cpp:enumerator:`LV_EVENT_REFR_READY`
+-  :cpp:enumerator:`LV_EVENT_RENDER_START`
+-  :cpp:enumerator:`LV_EVENT_RENDER_READY`
+-  :cpp:enumerator:`LV_EVENT_FLUSH_START`
+-  :cpp:enumerator:`LV_EVENT_FLUSH_FINISH`
 
 
 Custom events
@@ -226,9 +227,11 @@ contains all data about the event. The following values can be gotten from it:
 
 - :cpp:expr:`lv_event_get_code(e)`: get the event code
 - :cpp:expr:`lv_event_get_current_target(e)`: get the object to which an event was sent. I.e. the object whose event handler is being called.
-- :cpp:expr:`lv_event_get_target(e)`: get the object that originally triggered the event (different from :cpp:func:`lv_event_get_target` if `event bubbling <#event-bubbling>`__ is enabled)
+- :cpp:expr:`lv_event_get_target(e)`: get the object that originally triggered the event (different from :cpp:func:`lv_event_get_target` if :ref:`event bubbling <events_bubbling>` is enabled)
 - :cpp:expr:`lv_event_get_user_data(e)`: get the pointer passed as the last parameter of :cpp:func:`lv_obj_add_event`.
 - :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_event_send`
+
+.. _events_bubbling:
 
 Event bubbling
 **************
@@ -242,10 +245,14 @@ The *target* parameter of the event is always the current target object,
 not the original object. To get the original target call
 :cpp:expr:`lv_event_get_target_obj(e)` in the event handler.
 
+.. _events_examples:
+
 Examples
 ********
 
 .. include:: ../examples/event/index.rst
+
+.. _events_api:
 
 API
 ***

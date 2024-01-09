@@ -76,8 +76,6 @@ typedef struct {
     lv_ll_t section_ll;     /**< Linked list for the sections (stores lv_scale_section_t)*/
     const char ** txt_src;
     lv_scale_mode_t mode;
-    uint32_t major_len;
-    uint32_t minor_len;
     int32_t range_min;
     int32_t range_max;
     uint32_t total_tick_count   : 15;
@@ -141,20 +139,6 @@ void lv_scale_set_major_tick_every(lv_obj_t * obj, uint32_t major_tick_every);
  * @param show_label    true/false to enable tick label
  */
 void lv_scale_set_label_show(lv_obj_t * obj, bool show_label);
-
-/**
- * Sets major tick length
- * @param obj           pointer the scale object
- * @param major_len     major tick length
- */
-void lv_scale_set_major_tick_length(lv_obj_t * obj, uint32_t major_len);
-
-/**
- * Sets major tick length
- * @param obj           pointer the scale object
- * @param minor_len     minor tick length
- */
-void lv_scale_set_minor_tick_length(lv_obj_t * obj, uint32_t minor_len);
 
 /**
  * Set the minimal and maximal values on a scale
@@ -222,7 +206,7 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
 
 /**
  * Set the range for the given scale section
- * @param obj           pointer to a scale section object
+ * @param section       pointer to a scale section object
  * @param minor_range   section new minor range
  * @param major_range   section new major range
  */
@@ -230,7 +214,7 @@ void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_rang
 
 /**
  * Set the style of the part for the given scale section
- * @param obj       pointer to a scale section object
+ * @param section   pointer to a scale section object
  * @param part      the part for the section, e.g. LV_PART_INDICATOR
  * @param section_part_style Pointer to the section part style
  */

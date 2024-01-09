@@ -108,6 +108,8 @@ section.
 Learn the basics
 ----------------
 
+.. _quick-overview_widgets:
+
 Widgets
 ~~~~~~~
 
@@ -160,6 +162,8 @@ To see the full API visit the documentation of the widgets or the
 related header file
 (e.g. `lvgl/src/widgets/slider/lv_slider.h <https://github.com/lvgl/lvgl/blob/master/src/widgets/slider/lv_slider.h>`__).
 
+.. _quick-overview_events:
+
 Events
 ~~~~~~
 
@@ -197,18 +201,22 @@ The object that triggered the event can be retrieved with:
 
 To learn all features of the events go to the :ref:`events` section.
 
+.. _quick-overview_parts:
+
 Parts
 ~~~~~
 
 Widgets might be built from one or more *parts*. For example, a button
 has only one part called :cpp:enumerator:`LV_PART_MAIN`. However, a
-:ref:`slider` has :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_INDICATOR`
+:ref:`lv_slider` has :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_INDICATOR`
 and :cpp:enumerator:`LV_PART_KNOB`.
 
 By using parts you can apply different styles to sub-elements of a
 widget. (See below)
 
 Read the widgets' documentation to learn which parts each uses.
+
+.. _quick-overview_states:
 
 States
 ~~~~~~
@@ -241,6 +249,8 @@ To manually add or remove states use:
    lv_obj_add_state(obj, LV_STATE_...);
    lv_obj_remove_state(obj, LV_STATE_...);
 
+.. _quick-overview_styles:
+
 Styles
 ~~~~~~
 
@@ -260,7 +270,7 @@ configure the style. For example:
    lv_style_set_bg_color(&style1, lv_color_hex(0xa03080))
    lv_style_set_border_width(&style1, 2))
 
-See the full list of properties here :ref:`style_properties`.
+See the full list of properties here :ref:`styles_properties`.
 
 Styles are assigned using the ORed combination of an object's part and
 state. For example to use this style on the slider's indicator when the
@@ -316,6 +326,8 @@ style which resides inside the object and is used only by the object:
 
 To learn all the features of styles see the :ref:`styles` section.
 
+.. _quick-overview_themes:
+
 Themes
 ~~~~~~
 
@@ -325,10 +337,14 @@ applied automatically when objects are created.
 The theme for your application is a compile time configuration set in
 ``lv_conf.h``.
 
+.. _quick-overview_examples:
+
 Examples
 --------
 
 .. include:: ../examples/get_started/index.rst
+
+.. _quick-overview_micropython:
 
 Micropython
 -----------

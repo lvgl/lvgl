@@ -20,6 +20,7 @@ extern "C" {
 
 #include "lv_symbol_def.h"
 #include "../misc/lv_area.h"
+#include "../misc/lv_types.h"
 #include "../misc/cache/lv_cache.h"
 
 /*********************
@@ -28,6 +29,7 @@ extern "C" {
 
 /* imgfont identifier */
 #define LV_IMGFONT_BPP 9
+#define LV_VECFONT_BPP 0
 
 /**********************
  *      TYPEDEFS
@@ -37,11 +39,10 @@ extern "C" {
  * General types
  *-----------------*/
 
-struct _lv_font_t;
 /** Describes the properties of a glyph.*/
 typedef struct {
-    const struct _lv_font_t *
-        resolved_font; /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
+    const lv_font_t *
+    resolved_font; /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
     uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width.*/
     uint16_t box_w; /**< Width of the glyph's bounding box*/
     uint16_t box_h; /**< Height of the glyph's bounding box*/
@@ -50,7 +51,8 @@ typedef struct {
     uint8_t bpp: 4;  /**< Bit-per-pixel: 1, 2, 4, 8*/
     uint8_t is_placeholder: 1; /** Glyph is missing. But placeholder will still be displayed */
 
-    lv_cache_entry_t * entry;
+    uint32_t glyph_index; /**< The index of the glyph in the font file. Used by the font cache*/
+    lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
 } lv_font_glyph_dsc_t;
 
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering.*/
@@ -80,15 +82,15 @@ typedef uint8_t lv_font_kerning_t;
 #endif /*DOXYGEN*/
 
 /** Describe the properties of a font*/
-typedef struct _lv_font_t {
+struct _lv_font_t {
     /** Get a glyph's descriptor from a font*/
-    bool (*get_glyph_dsc)(const struct _lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
+    bool (*get_glyph_dsc)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
-    const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_t *, lv_font_glyph_dsc_t *, uint32_t, uint8_t *);
+    const uint8_t * (*get_glyph_bitmap)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t, uint8_t *);
 
     /** Release a glyph*/
-    void (*release_glyph)(const struct _lv_font_t *, lv_font_glyph_dsc_t *);
+    void (*release_glyph)(const lv_font_t *, lv_font_glyph_dsc_t *);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
     int32_t line_height;         /**< The real line height where any text fits*/
@@ -100,9 +102,9 @@ typedef struct _lv_font_t {
     int8_t underline_thickness;     /**< Thickness of the underline*/
 
     const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
-    const struct _lv_font_t * fallback;   /**< Fallback font for missing glyph. Resolved recursively */
+    const lv_font_t * fallback;   /**< Fallback font for missing glyph. Resolved recursively */
     void * user_data;               /**< Custom user data for font.*/
-} lv_font_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES

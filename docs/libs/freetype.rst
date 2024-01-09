@@ -1,9 +1,12 @@
+.. _freetype:
+
 ================
 FreeType support
 ================
 
-Interface to `FreeType <https://www.freetype.org/>`__ to generate font
-bitmaps run time.
+Interface to FreeType library to generate font bitmaps run time.
+
+Detailed introduction: https://www.freetype.org
 
 Add FreeType to your project
 ----------------------------
@@ -16,7 +19,8 @@ For UNIX
 ~~~~~~~~
 
 For UNIX systems, it is recommended to use the way of compiling and installing libraries.
-- Enter the FreeType source code directory.
+
+- Enter the FreeType source code directory
 - ``make``
 - ``sudo make install``
 - Add include path: ``/usr/include/freetype2`` (for GCC: ``-I/usr/include/freetype2 -L/usr/local/lib``)
@@ -56,6 +60,8 @@ FLASH space.
    FT_CSRCS += freetype/src/truetype/truetype.c
    CSRCS += $(FT_CSRCS)
 
+.. _freetype_usage:
+
 Usage
 -----
 
@@ -79,16 +85,18 @@ interface, you can enable :c:macro:`LV_FREETYPE_USE_LVGL_PORT` in
 The font style supports *Italic* and **Bold** fonts processed by
 software, and can be set with reference to the following values:
 
-- :c:enumerator:`LV_FREETYPE_FONT_STYLE_NORMAL`: Default style.
-- :c:enumerator:`LV_FREETYPE_FONT_STYLE_ITALIC`: Italic style.
-- :c:enumerator:`LV_FREETYPE_FONT_STYLE_BOLD`:  Bold style.
+- :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_NORMAL`: Default style.
+- :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_ITALIC`: Italic style.
+- :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_BOLD`:  Bold style.
 
 They can be combined.eg:
-:c:expr:`LV_FREETYPE_FONT_STYLE_BOLD | LV_FREETYPE_FONT_STYLE_ITALIC`.
+:cpp:expr:`LV_FREETYPE_FONT_STYLE_BOLD | LV_FREETYPE_FONT_STYLE_ITALIC`.
 
-Use the :c:expr:`lv_freetype_font_create()` function to create a font. To
-delete a font, use :c:expr:`lv_freetype_font_delete()`. For more detailed usage,
+Use the :cpp:func:`lv_freetype_font_create` function to create a font. To
+delete a font, use :cpp:func:`lv_freetype_font_delete`. For more detailed usage,
 please refer to example code.
+
+.. _freetype_example:
 
 Example
 -------
@@ -100,6 +108,8 @@ Learn more
 
 -  FreeType`tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
 -  LVGL's :ref:`add_font`
+
+.. _freetype_api:
 
 API
 ---

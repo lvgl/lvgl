@@ -8,6 +8,8 @@ As the complexity of the application increases, performance issues such as low F
 causing lag may arise. LVGL has internally set up some hooks for performance measurement to help developers 
 analyze and locate performance issues.
 
+.. _profiler_introduction:
+
 Introduction
 ************
 
@@ -19,6 +21,8 @@ When the buffer is full, the trace system prints the log information through the
 
 The output trace logs are formatted according to Android's `systrace <https://developer.android.com/topic/performance/tracing>`_
 format and can be visualized using `Perfetto <https://ui.perfetto.dev>`_.
+
+.. _profiler_usage:
 
 Usage
 *****
@@ -162,6 +166,8 @@ Users can add their own measured functions:
         LV_PROFILER_END_TAG("do_something_2");
     }
 
+.. _profiler_custom_implementation:
+
 Custom profiler implementation
 ******************************
 
@@ -183,6 +189,8 @@ Taking `NuttX <https://github.com/apache/nuttx>`_ RTOS as an example:
     #define LV_PROFILER_END            sched_note_end(NOTE_TAG_ALWAYS)
     #define LV_PROFILER_BEGIN_TAG(str) sched_note_beginex(NOTE_TAG_ALWAYS, str)
     #define LV_PROFILER_END_TAG(str)   sched_note_endex(NOTE_TAG_ALWAYS, str)
+
+.. _profiler_faq:
 
 FAQ
 ***

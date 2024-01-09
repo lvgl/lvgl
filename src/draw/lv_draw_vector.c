@@ -735,7 +735,7 @@ void _lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb 
         _lv_ll_remove(task_list, task);
 
         if(cb) {
-            cb(data ? data : NULL, task->path, &(task->dsc));
+            cb(data, task->path, &(task->dsc));
         }
 
         if(task->path) {

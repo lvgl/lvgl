@@ -1,18 +1,22 @@
+.. _objects:
+
 =======
 Objects
 =======
 
 In LVGL the **basic building blocks** of a user interface are the
 objects, also called *Widgets*. For example a
-`Button </widgets/btn>`__, `Label </widgets/label>`__,
-`Image </widgets/img>`__, `List </widgets/list>`__,
-`Chart </widgets/chart>`__ or `Text area </widgets/textarea>`__.
+:ref:`Button <lv_button>`, :ref:`Label <lv_label>`,
+:ref:`Image <lv_image>`, :ref:`List <lv_list>`,
+:ref:`Chart <lv_chart>` or :ref:`Text area <lv_textarea>`.
 
-You can see all the `Object types </widgets/index>`__ here.
+You can see all the :ref:`Object types <widgets>` here.
 
 All objects are referenced using an :cpp:type:`lv_obj_t` pointer as a handle.
 This pointer can later be used to set or get the attributes of the
 object.
+
+.. _objects_attributes:
 
 Attributes
 **********
@@ -38,7 +42,7 @@ You can set/get these attributes with ``lv_obj_set_...`` and
    lv_obj_set_size(btn1, 100, 50);   /*Set a button's size*/
    lv_obj_set_pos(btn1, 20,30);      /*Set a button's position*/
 
-To see all the available functions visit the `Base object's documentation </widgets/obj>`__.
+To see all the available functions visit the :ref:`Base object's documentation <lv_obj>`.
 
 Specific attributes
 -------------------
@@ -58,8 +62,10 @@ functions. For example for a slider:
    lv_slider_set_value(slider1, 40, LV_ANIM_ON);       /*Set the current value (position)*/
 
 The API of the widgets is described in their
-`Documentation </widgets/index>`__ but you can also check the respective
+:ref:`Documentation <widgets>` but you can also check the respective
 header files (e.g. *widgets/lv_slider.h*)
+
+.. _objects_working_mechanisms:
 
 Working mechanisms
 ******************
@@ -161,6 +167,8 @@ using :cpp:expr:`lv_obj_clean(obj)`.
 You can use :cpp:expr:`lv_obj_delete_delayed(obj, 1000)` to delete an object after
 some time. The delay is expressed in milliseconds.
 
+.. _objects_screens:
+
 Screens
 *******
 
@@ -175,7 +183,7 @@ be created like:
    lv_obj_t * scr1 = lv_obj_create(NULL);
 
 Screens can be created with any object type. For example, a
-`Base object </widgets/obj>`__ or an image to make a wallpaper.
+:ref:`Base object <lv_obj>` or an image to make a wallpaper.
 
 Get the active screen
 ---------------------
@@ -184,6 +192,8 @@ There is always an active screen on each display. By default, the
 library creates and loads a "Base object" as a screen for each display.
 
 To get the currently active screen use the :cpp:func:`lv_screen_active` function.
+
+.. _objects_load_screens:
 
 Load screens
 ------------
@@ -208,7 +218,7 @@ system-level things (e.g. mouse cursor will be placed there with
 The :cpp:func:`lv_layer_top` and :cpp:func:`lv_layer_sys` functions return pointers
 to the top and system layers respectively.
 
-Read the `Layer overview </overview/layer>`__ section to learn more
+Read the :ref:`Layer overview <layers>` section to learn more
 about layers.
 
 Load screen with animation
@@ -242,14 +252,16 @@ display using :cpp:expr:`lv_disp_set_default(disp)`.
 :cpp:func:`lv_screen_active`, :cpp:func:`lv_screen_load` and :cpp:func:`lv_screen_load_anim` operate
 on the default display.
 
-Visit `Multi-display support </overview/display>`__ to learn more.
+Visit :ref:`display_multi_display_support` to learn more.
+
+.. _objects_parts:
 
 Parts
 *****
 
 The widgets are built from multiple parts. For example a
-`Base object </widgets/obj>`__ uses the main and scrollbar parts but a
-`Slider </widgets/slider>`__ uses the main, indicator and knob parts.
+:ref:`Base object <lv_obj>` uses the main and scrollbar parts but a
+:ref:`Slider <lv_slider>` uses the main, indicator and knob parts.
 Parts are similar to *pseudo-elements* in CSS.
 
 The following predefined parts exist in LVGL:
@@ -265,7 +277,9 @@ The following predefined parts exist in LVGL:
 
 The main purpose of parts is to allow styling the "components" of the
 widgets. They are described in more detail in the
-`Style overview </overview/style>`__ section.
+:ref:`Style overview <styles>` section.
+
+.. _objects_states:
 
 States
 ******
@@ -295,13 +309,17 @@ values can be used as well. E.g.
 :cpp:expr:`lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 
 To learn more about the states read the related section of the
-`Style overview </overview/style>`__.
+:ref:`Style overview <styles>`.
+
+.. _objects_snapshot:
 
 Snapshot
 ********
 
 A snapshot image can be generated for an object together with its
-children. Check details in `Snapshot </others/snapshot>`__.
+children. Check details in :ref:`snapshot`.
+
+.. _objects_api:
 
 API
 ***

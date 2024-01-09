@@ -15,8 +15,8 @@ void lv_example_scale_2(void)
     lv_scale_set_total_tick_count(scale, 21);
     lv_scale_set_major_tick_every(scale, 5);
 
-    lv_scale_set_major_tick_length(scale, 10);
-    lv_scale_set_minor_tick_length(scale, 5);
+    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
+    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
     lv_scale_set_range(scale, 0, 100);
 
     static const char * custom_labels[] = {"0 °C", "25 °C", "50 °C", "75 °C", "100 °C", NULL};

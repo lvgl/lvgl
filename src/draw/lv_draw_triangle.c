@@ -49,7 +49,7 @@ void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * dsc)
     LV_PROFILER_END;
 }
 
-void lv_draw_triangle(struct _lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
+void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
 {
     LV_PROFILER_BEGIN;
     lv_area_t a;

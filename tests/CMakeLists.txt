@@ -6,14 +6,38 @@ if(ESP_PLATFORM)
 
 else()
 
-cmake_minimum_required(VERSION 3.13)
-project(lvgl_tests LANGUAGES C)
+cmake_minimum_required(VERSION 3.18)
+project(lvgl_tests LANGUAGES C CXX)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_C_STANDARD 99)
+
+include(CheckCCompilerFlag)
+include(CheckCXXCompilerFlag)
+function(filter_compiler_options lang options_out)
+    set(options ${ARGN})
+    foreach(option ${options})
+        string(TOUPPER FLAG_SUPPORTED_FOR_${lang}_${option} option_var_name)
+
+        if (${lang} STREQUAL C)
+            check_c_compiler_flag(${option} ${option_var_name})
+        elseif (${lang} STREQUAL CXX)
+            check_cxx_compiler_flag(${option} ${option_var_name})
+        else()
+            message(FATAL_ERROR "Unknown language ${lang}")
+        endif ()
+        if(${option_var_name})
+            list(APPEND ${options_out} ${option})
+        endif()
+    endforeach()
+    set(${options_out} ${${options_out}} PARENT_SCOPE)
+endfunction()
 
 find_program(VALGRIND_EXECUTABLE valgrind)
 if (VALGRIND_EXECUTABLE)
     set(MEMORYCHECK_COMMAND ${VALGRIND_EXECUTABLE})
     set(MEMORYCHECK_COMMAND_OPTIONS --error-exitcode=1)
 endif()
+
 include(CTest)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -64,12 +88,14 @@ elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST_SYSHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address -fsanitize=leak -fsanitize=undefined --coverage)
-    set (TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=leak -fsanitize=undefined)
+    list(APPEND TEST_LIBS -fsanitize=address)
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
-    set (TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=leak -fsanitize=undefined)
+    list(APPEND TEST_LIBS -fsanitize=address)
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
@@ -117,54 +143,36 @@ set(COMPILE_OPTIONS
     -Wunreachable-code
     -Werror=float-conversion
     -Werror=strict-aliasing
+    -Wno-double-promotion
+    -Wno-unused-but-set-parameter
+    -Wno-unreachable-code
     ${BUILD_OPTIONS}
     ${BUILD_TARGET_DEF}
 )
+
+filter_compiler_options(C LVGL_COMPILE_OPTIONS ${COMPILE_OPTIONS})
 
 # Options test cases are compiled with.
-set(LVGL_TESTFILE_COMPILE_OPTIONS
-    ${COMPILE_OPTIONS}
-    -Wno-missing-prototypes
-)
+filter_compiler_options(C LVGL_TESTFILE_COMPILE_OPTIONS ${LVGL_COMPILE_OPTIONS} -Wno-missing-prototypes)
 
-set(LVGL_THORVG_COMPILE_OPTIONS
-    -DLV_CONF_PATH=${LVGL_TEST_DIR}/src/lv_test_conf.h
-    -DLV_BUILD_TEST
-    -pedantic-errors
-    -Wall
-    -Wclobbered
-    -Wdeprecated
-    -Wdouble-promotion
-    -Wempty-body
-    -Werror
-    -Wextra
-    -Wformat-security
-    -Wmaybe-uninitialized
-    -Wpointer-arith
-    -Wmultichar
-    -Wno-pedantic
-    -Wno-unused-parameter
-    -Wreturn-type
-    -Wshift-negative-value
-    -Wsizeof-pointer-memaccess
-    -Wtype-limits
-    -Wundef
-    -Wuninitialized
-    -Wunreachable-code
-    -Werror=float-conversion
-    -Werror=strict-aliasing
-    ${BUILD_OPTIONS}
-    ${BUILD_TARGET_DEF}
+filter_compiler_options(CXX LVGL_THORVG_COMPILE_OPTIONS
+        ${COMPILE_OPTIONS}
+        -Wno-shadow
+        -Wno-unused-parameter
+        -Wno-c++11-extensions
+        -Wno-missing-prototypes
+        -Wno-deprecated-copy-with-user-provided-dtor
+        -Wno-float-conversion
 )
 
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 
 # Include lvgl project file.
 include(${LVGL_DIR}/CMakeLists.txt)
-target_compile_options(lvgl PUBLIC ${COMPILE_OPTIONS})
+target_compile_options(lvgl PUBLIC ${LVGL_COMPILE_OPTIONS})
 target_compile_options(lvgl_thorvg PUBLIC ${LVGL_THORVG_COMPILE_OPTIONS})
 if (TARGET lvgl_examples)
-  target_compile_options(lvgl_examples PUBLIC ${COMPILE_OPTIONS})
+  target_compile_options(lvgl_examples PUBLIC ${LVGL_COMPILE_OPTIONS})
 endif()
 
 
@@ -225,6 +233,14 @@ set(generate_test_runner_config ${CMAKE_CURRENT_SOURCE_DIR}/config.yml)
 find_package(JPEG REQUIRED)
 include_directories(${JPEG_INCLUDE_DIR})
 
+# libpng is required for the png test case
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIR})
+
+# libfreetype is required for the font test case
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+
 # disable test targets for build only tests
 if (ENABLE_TESTS)
     file( GLOB_RECURSE TEST_CASE_FILES src/test_cases/*.c )
@@ -253,7 +269,16 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
-    target_link_libraries(${test_name} PRIVATE test_common lvgl_demos lvgl lvgl_thorvg png ${JPEG_LIBRARIES} m ${TEST_LIBS})
+    target_link_libraries(${test_name} PRIVATE
+            test_common
+            lvgl_demos
+            lvgl
+            lvgl_thorvg
+            ${PNG_LIBRARIES}
+            ${FREETYPE_LIBRARIES}
+            ${JPEG_LIBRARIES}
+            m
+            ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
