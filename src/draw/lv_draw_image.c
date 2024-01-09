@@ -54,14 +54,6 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
 }
 
-void layer_transform(lv_layer_t * layer, lv_area_t * a_out)
-{
-    if(layer->parent) {
-        layer_transform(layer->parent, a_out);
-    }
-
-}
-
 void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_draw_task_t * t = lv_draw_add_task(layer, coords);
