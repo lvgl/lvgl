@@ -66,6 +66,13 @@ void lv_st7789_set_invert(lv_display_t * disp, bool invert);
  */
 void lv_st7789_set_gamma_curve(lv_display_t * disp, uint8_t gamma);
 
+/**
+ * Send list of commands.
+ * @param disp          display object
+ * @param cmd_list      controller and panel-specific commands
+ */
+void lv_st7789_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_list);
+
 /**********************
  *      OTHERS
  **********************/

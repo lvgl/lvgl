@@ -116,6 +116,11 @@ void lv_st7796_set_gamma_curve(lv_display_t * disp, uint8_t gamma)
     LV_UNUSED(gamma);
 }
 
+void lv_st7796_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_list)
+{
+    lv_lcd_generic_mipi_send_cmd_list(disp, cmd_list);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

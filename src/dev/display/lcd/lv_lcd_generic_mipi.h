@@ -206,14 +206,17 @@ void lv_lcd_generic_mipi_set_address_mode(lv_display_t * disp, bool mirror_x, bo
  */
 void lv_lcd_generic_mipi_set_gamma_curve(lv_display_t * disp, uint8_t gamma);
 
+/**
+ * Send list of commands.
+ * @param disp          display object
+ * @param cmd_list      controller and panel-specific commands
+ */
+void lv_lcd_generic_mipi_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_list);
+
 /**********************
  *      OTHERS
  **********************/
 
-/**
- * Send list of commands. Used internally.
- */
-void lv_lcd_generic_mipi_send_cmd_list(lv_lcd_generic_mipi_driver_t * drv, const uint8_t * cmd_list);
 
 /**********************
  *      MACROS
