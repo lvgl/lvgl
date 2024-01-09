@@ -162,7 +162,7 @@ void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning);
  *      MACROS
  **********************/
 
-#define LV_FONT_DECLARE(font_name) extern const lv_font_t font_name;
+#define LV_FONT_DECLARE(font_name) LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_t font_name;
 
 #if LV_FONT_MONTSERRAT_8
 LV_FONT_DECLARE(lv_font_montserrat_8)
