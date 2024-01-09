@@ -29,14 +29,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_draw_vg_lite_unit_t {
+struct _lv_draw_vg_lite_unit_t {
     lv_draw_unit_t base_unit;
-    struct _lv_draw_task_t * task_act;
+    lv_draw_task_t * task_act;
     vg_lite_buffer_t target_buffer;
     vg_lite_matrix_t global_matrix;
     lv_ll_t path_free_ll;
     int path_max_cnt;
-} lv_draw_vg_lite_unit_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES

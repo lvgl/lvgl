@@ -417,6 +417,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     }
     dsc->letter_coords = &letter_coords;
     if(g.bpp == LV_IMGFONT_BPP) dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE;
+    else if(g.bpp == LV_VECFONT_BPP) dsc->format = LV_DRAW_LETTER_VECTOR_FORMAT;
     else dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_A8;
 
     dsc->g = &g;

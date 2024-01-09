@@ -58,11 +58,16 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 
     lv_draw_dave2d_unit_t * u = (lv_draw_dave2d_unit_t *)u_base;
 
+    (void)sup; //remove warning about unused parameter
+
     bool transformed = draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
                        draw_dsc->scale_y != LV_SCALE_NONE ? true : false;
 
-    const uint8_t * src_buf = decoder_dsc->img_data;
-    const lv_image_header_t * header = &decoder_dsc->header;
+    const lv_draw_buf_t * decoded = decoder_dsc->decoded;
+    const uint8_t * src_buf = decoded->data;
+    const lv_image_header_t * header = &decoded->header;
+    uint32_t img_stride = decoded->header.stride;
+    lv_color_format_t cf = decoded->header.cf;
     lv_area_t buffer_area;
     lv_area_t draw_area;
     lv_area_t clipped_area;
@@ -75,16 +80,7 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
     d2_u8 current_fill_mode;
     d2_u32 src_blend_mode;
     d2_u32 dst_blend_mode;
-    uint32_t img_stride = header->stride;
-    lv_color_format_t cf = header->cf;
-
-    cf = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
-
-    if(decoder_dsc->decoded) {
-        src_buf = decoder_dsc->decoded->data;
-        img_stride = decoder_dsc->decoded->header.stride;
-        cf = decoder_dsc->decoded->header.cf;
-    }
+    void * p_intermediate_buf = NULL;
 
 #if LV_USE_OS
     lv_result_t  status;
@@ -118,6 +114,94 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
     src_blend_mode    = d2_getblendmodesrc(u->d2_handle);
     dst_blend_mode    = d2_getblendmodedst(u->d2_handle);
 
+#if defined(RENESAS_CORTEX_M85)
+#if (BSP_CFG_DCACHE_ENABLED)
+    d1_cacheblockflush(u->d2_handle, 0, src_buf,
+                       img_stride * header->h); //Stride is in bytes, not pixels/texels
+#endif
+#endif
+
+    if(LV_COLOR_FORMAT_RGB565A8 == cf) {
+
+        lv_point_t p1[4] = { //Points in clockwise order
+            {0, 0},
+            {header->w - 1, 0},
+            {header->w - 1, header->h - 1},
+            {0, header->h - 1},
+        };
+
+        d2_s32 dxu1 = D2_FIX16(1);
+        d2_s32 dxv1 = D2_FIX16(0);
+        d2_s32 dyu1 = D2_FIX16(0);
+        d2_s32 dyv1 = D2_FIX16(1);
+
+        uint32_t size = header->h * (header->w * lv_color_format_get_size(LV_COLOR_FORMAT_ARGB8888));
+        p_intermediate_buf = lv_malloc(size);
+
+        d2_framebuffer(u->d2_handle,
+                       p_intermediate_buf,
+                       (d2_s32)header->w,
+                       (d2_u32)header->w,
+                       (d2_u32)header->h,
+                       lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(LV_COLOR_FORMAT_ARGB8888));
+
+        d2_cliprect(u->d2_handle, (d2_border)0, (d2_border)0, (d2_border)header->w - 1,
+                    (d2_border)header->h - 1);
+
+        d2_settexopparam(u->d2_handle, d2_cc_alpha, draw_dsc->opa, 0);
+
+        d2_settextureoperation(u->d2_handle, d2_to_replace, d2_to_copy, d2_to_copy, d2_to_copy);
+
+        d2_settexturemapping(u->d2_handle, D2_FIX4(p1[0].x), D2_FIX4(p1[0].y), D2_FIX16(0), D2_FIX16(0), dxu1, dxv1, dyu1,
+                             dyv1);
+        d2_settexturemode(u->d2_handle, d2_tm_filter);
+        d2_setfillmode(u->d2_handle, d2_fm_texture);
+
+        d2_settexture(u->d2_handle, (void *)src_buf,
+                      (d2_s32)(img_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB565)),
+                      header->w,  header->h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(LV_COLOR_FORMAT_RGB565));
+
+        d2_setblendmode(u->d2_handle, d2_bm_one, d2_bm_zero);
+
+        d2_renderquad(u->d2_handle,
+                      (d2_point)D2_FIX4(p1[0].x),
+                      (d2_point)D2_FIX4(p1[0].y),
+                      (d2_point)D2_FIX4(p1[1].x),
+                      (d2_point)D2_FIX4(p1[1].y),
+                      (d2_point)D2_FIX4(p1[2].x),
+                      (d2_point)D2_FIX4(p1[2].y),
+                      (d2_point)D2_FIX4(p1[3].x),
+                      (d2_point)D2_FIX4(p1[3].y),
+                      0);
+
+        d2_setblendmode(u->d2_handle, d2_bm_zero, d2_bm_one); //Keep the RGB data in the intermediate buffer
+
+        d2_setalphablendmode(u->d2_handle, d2_bm_one, d2_bm_zero);    //Write SRC alpha, i.e. A8 data
+
+        d2_settextureoperation(u->d2_handle, d2_to_copy, d2_to_copy, d2_to_copy, d2_to_copy);
+
+        d2_settexture(u->d2_handle, (void *)(src_buf +  header->h * (header->w * lv_color_format_get_size(
+                                                                         LV_COLOR_FORMAT_RGB565))),
+                      (d2_s32)(img_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB565)),
+                      header->w,  header->h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(LV_COLOR_FORMAT_A8));
+
+        d2_renderquad(u->d2_handle,
+                      (d2_point)D2_FIX4(p1[0].x),
+                      (d2_point)D2_FIX4(p1[0].y),
+                      (d2_point)D2_FIX4(p1[1].x),
+                      (d2_point)D2_FIX4(p1[1].y),
+                      (d2_point)D2_FIX4(p1[2].x),
+                      (d2_point)D2_FIX4(p1[2].y),
+                      (d2_point)D2_FIX4(p1[3].x),
+                      (d2_point)D2_FIX4(p1[3].y),
+                      0);
+
+        cf = LV_COLOR_FORMAT_ARGB8888;
+        src_buf = p_intermediate_buf;
+        img_stride = header->w * lv_color_format_get_size(cf);
+
+    }
+
     d2_framebuffer(u->d2_handle,
                    u->base_unit.target_layer->buf,
                    (d2_s32)u->base_unit.target_layer->buf_stride / lv_color_format_get_size(u->base_unit.target_layer->color_format),
@@ -128,20 +212,13 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
     d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1, (d2_border)clipped_area.x2,
                 (d2_border)clipped_area.y2);
 
-#if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
-    d1_cacheblockflush(u->d2_handle, 0, src_buf,
-                       img_stride * decoder_dsc->header.h); //Stride is in bytes, not pixels/texels
-#endif
-#endif
-
     d2_settexopparam(u->d2_handle, d2_cc_alpha, draw_dsc->opa, 0);
 
-    if(LV_COLOR_FORMAT_RGB565 == header->cf) {
+    if(LV_COLOR_FORMAT_RGB565 == cf) {
         d2_settextureoperation(u->d2_handle, d2_to_replace, d2_to_copy, d2_to_copy, d2_to_copy);
     }
     else { //Formats with an alpha channel,
-        d2_settextureoperation(u->d2_handle, d2_to_multiply, d2_to_copy, d2_to_copy, d2_to_copy);
+        d2_settextureoperation(u->d2_handle, d2_to_copy, d2_to_copy, d2_to_copy, d2_to_copy);
     }
 
     if(LV_BLEND_MODE_NORMAL == draw_dsc->blend_mode) { /**< Simply mix according to the opacity value*/
@@ -162,14 +239,14 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
 
     lv_point_t p[4] = { //Points in clockwise order
         {0, 0},
-        {decoder_dsc->header.w - 1, 0},
-        {decoder_dsc->header.w - 1, decoder_dsc->header.h - 1},
-        {0, decoder_dsc->header.h - 1},
+        {header->w - 1, 0},
+        {header->w - 1, header->h - 1},
+        {0, header->h - 1},
     };
 
     d2_settexture(u->d2_handle, (void *)src_buf,
-                  (d2_s32)(img_stride / lv_color_format_get_size(header->cf)),
-                  decoder_dsc->header.w,  decoder_dsc->header.h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(header->cf));
+                  (d2_s32)(img_stride / lv_color_format_get_size(cf)),
+                  header->w,  header->h, lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(cf));
 
     d2_settexturemode(u->d2_handle, d2_tm_filter);
     d2_setfillmode(u->d2_handle, d2_fm_texture);
@@ -242,6 +319,10 @@ static void img_draw_core(lv_draw_unit_t * u_base, const lv_draw_image_dsc_t * d
     d2_setfillmode(u->d2_handle, current_fill_mode);
     d2_settextureoperation(u->d2_handle, a_texture_op, r_texture_op, g_texture_op, b_texture_op);
     d2_setblendmode(u->d2_handle, src_blend_mode, dst_blend_mode);
+
+    if(NULL != p_intermediate_buf) {
+        lv_free(p_intermediate_buf);
+    }
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);

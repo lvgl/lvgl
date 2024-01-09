@@ -179,32 +179,7 @@ The Micropython Binding is auto generated!
 LVGL C API Coding Conventions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To support the auto-generation of the Python API, the LVGL C API must
-follow some coding conventions:
-
-- Use ``enum``\ s instead of macros. If inevitable to use ``define``\ s
-  export them with :cpp:expr:`LV_EXPORT_CONST_INT(defined_value)` right after the ``define``.
-- In function arguments use ``type name[]`` declaration for array parameters instead of :cpp:expr:`type * name`
-- Use typed pointers instead of :cpp:expr:`void *` pointers
-- Widget constructor must follow the ``lv_<widget_name>_create(lv_obj_t * parent)`` pattern.
-- Widget members function must start with ``lv_<module_name>`` and should receive :cpp:expr:`lv_obj_t *` as first
-  argument which is a pointer to widget object itself.
-- ``struct`` APIs should follow the widgets' conventions. That is to receive a pointer to the ``struct`` as the
-  first argument, and the prefix of the ``struct`` name should be used as the prefix of the
-  function name too (e.g. :cpp:expr:`lv_disp_set_default(lv_disp_t * disp)`)
-- Functions and ``struct``\ s which are not part of the public API must begin with underscore in order to mark them as "private".
-- Argument must be named in H files too.
-- Do not ``malloc`` into a static or global variables. Instead declare the variable in ``lv_global_t``
-  structure in ``lv_global.h`` and mark the variable with :cpp:expr:`(LV_GLOBAL_DEFAULT()->variable)` when it's used. **See** :ref:`memory_management`
-- To register and use callbacks one of the following needs to be followed.  **See** :ref:`callbacks`
-
-   - Pass a pointer to a ``struct`` as the first argument of both the registration function and the callback. That
-     ``struct`` must contain ``void * user_data`` field.
-   - The last argument of the registration function must be ``void * user_data`` and the same ``user_data``
-     needs to be passed as the last argument of the callback.
-
-Most of these rules are simple and straightforward but there are two related concepts that worth a deeper look:
-:ref:`memory_management` and :ref:`callbacks`.
+For a summary of coding conventions to follow see the `CODING STYLE <CODING_STYLE>`__.
 
 .. _memory_management:
 

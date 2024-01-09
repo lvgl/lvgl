@@ -140,7 +140,7 @@ void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc);
  * @param dsc           pointer to an initialized draw descriptor variable
  * @param coords        the coordinates of the rectangle
  */
-void lv_draw_rect(struct _lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
  *      MACROS

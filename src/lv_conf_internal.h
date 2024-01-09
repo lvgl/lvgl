@@ -746,16 +746,6 @@
  * Others
  *-----------*/
 
-/*Maximum buffer size to allocate for rotation.
- *Only used if software rotation is enabled in the display driver.*/
-#ifndef LV_DISPLAY_ROT_MAX_BUF
-    #ifdef CONFIG_LV_DISPLAY_ROT_MAX_BUF
-        #define LV_DISPLAY_ROT_MAX_BUF CONFIG_LV_DISPLAY_ROT_MAX_BUF
-    #else
-        #define LV_DISPLAY_ROT_MAX_BUF (10*1024)
-    #endif
-#endif
-
 #ifndef LV_ENABLE_GLOBAL_CUSTOM
     #ifdef CONFIG_LV_ENABLE_GLOBAL_CUSTOM
         #define LV_ENABLE_GLOBAL_CUSTOM CONFIG_LV_ENABLE_GLOBAL_CUSTOM
@@ -1622,18 +1612,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_METER
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_METER
-            #define LV_USE_METER CONFIG_LV_USE_METER
-        #else
-            #define LV_USE_METER 0
-        #endif
-    #else
-        #define LV_USE_METER      1
-    #endif
-#endif
-
 #ifndef LV_USE_MSGBOX
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_MSGBOX
@@ -2190,17 +2168,6 @@
         #endif
     #endif
 
-    /*FreeType cache type:
-     * LV_FREETYPE_CACHE_TYPE_IMAGE    - Image cache
-     * LV_FREETYPE_CACHE_TYPE_OUTLINE  - Outline cache*/
-    #ifndef LV_FREETYPE_CACHE_TYPE
-        #ifdef CONFIG_LV_FREETYPE_CACHE_TYPE
-            #define LV_FREETYPE_CACHE_TYPE CONFIG_LV_FREETYPE_CACHE_TYPE
-        #else
-            #define LV_FREETYPE_CACHE_TYPE LV_FREETYPE_CACHE_TYPE_IMAGE
-        #endif
-    #endif
-
     /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
     /* (0:use system defaults) */
     #ifndef LV_FREETYPE_CACHE_FT_FACES
@@ -2217,11 +2184,11 @@
             #define LV_FREETYPE_CACHE_FT_SIZES 8
         #endif
     #endif
-    #ifndef LV_FREETYPE_CACHE_FT_OUTLINES
-        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_OUTLINES
-            #define LV_FREETYPE_CACHE_FT_OUTLINES CONFIG_LV_FREETYPE_CACHE_FT_OUTLINES
+    #ifndef LV_FREETYPE_CACHE_FT_GLYPH_CNT
+        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
+            #define LV_FREETYPE_CACHE_FT_GLYPH_CNT CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
         #else
-            #define LV_FREETYPE_CACHE_FT_OUTLINES 256
+            #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
         #endif
     #endif
 #endif

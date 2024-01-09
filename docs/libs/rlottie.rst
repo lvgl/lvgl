@@ -1,8 +1,10 @@
+.. _rlottie:
+
 =============
 Lottie player
 =============
 
-Allows to use Lottie animations in LVGL. Taken from this `base repository <https://github.com/ValentiWorkLearning/lv_rlottie>`__
+Allows playing Lottie animations in LVGL. Taken from `lv_rlottie <https://github.com/ValentiWorkLearning/lv_rlottie>`__.
 
 LVGL provides the interface to `Samsung/rlottie <https://github.com/Samsung/rlottie>`__ library's C
 API. That is the actual Lottie player is not part of LVGL, it needs to
@@ -11,11 +13,12 @@ be built separately.
 Build Rlottie
 -------------
 
-To build Samsung's Rlottie C++14-compatible compiler and optionally
+To build Samsung's Rlottie C++14 compatible compiler and optionally
 CMake 3.14 or higher is required.
 
 To build on desktop you can follow the instructions from Rlottie's
 `README <https://github.com/Samsung/rlottie/blob/master/README.md>`__.
+
 In the most basic case it looks like this:
 
 .. code:: shell
@@ -36,6 +39,8 @@ given build system.
 
 ESP-IDF example at bottom
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. _rlottie_usage:
 
 Usage
 -----
@@ -62,9 +67,11 @@ Use Rlottie from raw string data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``lv_example_rlottie_approve.c`` contains an example animation in raw
-format. Instead storing the JSON string a hex array is stored for the
-following reasons: - avoid escaping ``"`` in the JSON file - some
-compilers don't support very long strings
+format. Instead storing the JSON string, a hex array is stored for the
+following reasons:
+
+- avoid escaping ``"`` character in the JSON file
+- some compilers don't support very long strings
 
 ``lvgl/scripts/filetohex.py`` can be used to convert a Lottie file a hex
 array. E.g.:
@@ -93,7 +100,7 @@ Controlling animations
 ----------------------
 
 LVGL provides two functions to control the animation mode:
-:c:func:`lv_rlottie_set_play_mode` and :c:func:`lv_rlottie_set_current_frame`.
+:cpp:func:`lv_rlottie_set_play_mode` and :cpp:func:`lv_rlottie_set_current_frame`.
 You'll combine your intentions when calling the first method, like in
 these examples:
 
@@ -113,7 +120,7 @@ these examples:
 
 The default animation mode is **play forward with loop**.
 
-If you don't enable looping, a :c:enumerator:`LV_EVENT_READY` is sent when the
+If you don't enable looping, a :cpp:enumerator:`LV_EVENT_READY` is sent when the
 animation can not make more progress without looping.
 
 To get the number of frames in an animation or the current frame index,
@@ -129,9 +136,11 @@ Background
 Rlottie can be expensive to render on embedded hardware. Lottie
 animations tend to use a large amount of CPU time and can use large
 portions of RAM. This will vary from lottie to lottie but in general for
-best performance: \* Limit total # of frames in the animation \* Where
-possible, try to avoid bezier type animations \* Limit animation render
-size
+best performance:
+
+- Limit total # of frames in the animation
+- Where possible, try to avoid bezier type animations
+- Limit animation render size
 
 If your ESP32 chip does not have SPIRAM you will face severe limitations
 in render size.
@@ -152,24 +161,25 @@ probably has minimal issues, but a 300 frame animation playing over 10
 seconds could very easily crash due to lack of memory as rlottie
 renders, depending on the complexity of the animation.
 
-Rlottie will not compile for the IDF using the -02 compiler option at
+Rlottie will not compile for the IDF using the ``-02`` compiler option at
 this time.
 
 For stability in lottie animations, I found that they run best in the
-IDF when enabling :c:macro:`LV_MEM_CUSTOM` (using stdlib.h)
+IDF when enabling :c:macro:`LV_MEM_CUSTOM` (using ``stdlib.h``)
 
 For all its faults, when running right-sized animations, they provide a
 wonderful utility to LVGL on embedded LCDs and can look really good when
 done properly.
 
 When picking/designing a lottie animation consider the following
-limitations: - Build the lottie animation to be sized for the intended
-size - it can scale/resize, but performance will be best when the base
-lottie size is as intended - Limit total number of frames, the longer
-the lottie animation is, the more memory it will consume for rendering
-(rlottie consumes IRAM for rendering) - Build the lottie animation for
-the intended frame rate - default lottie is 60fps, embedded LCDs likely
-won't go above 30fps
+limitations:
+
+- Build the lottie animation to be sized for the intended size
+- it can scale/resize, but performance will be best when the base lottie size is as intended
+- Limit total number of frames, the longer the lottie animation is, 
+the more memory it will consume for rendering (rlottie consumes IRAM for rendering)
+- Build the lottie animation for the intended frame rate
+- default lottie is 60fps, embedded LCDs likely won't go above 30fps
 
 IDF Setup
 ~~~~~~~~~
@@ -243,13 +253,13 @@ The Esp-box devkit meets this spec and
 https://github.com/espressif/esp-box is a great starting point to adding
 lottie animations.
 
-you'll need to enable:c:macro:`LV_USE_RLOTTIE` through idf.py menuconfig under
+You will need to enable :c:macro:`LV_USE_RLOTTIE` through **idf.py** menuconfig under
 LVGL component settings.
 
 Additional changes to make use of SPIRAM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-lv_alloc/realloc do not make use of SPIRAM. Given the high memory usage
+:cpp:expr:`lv_alloc/realloc` do not make use of SPIRAM. Given the high memory usage
 of lottie animations, it is recommended to shift as much out of internal
 DRAM into SPIRAM as possible. In order to do so, SPIRAM will need to be
 enabled in the menuconfig options for your given espressif chip.
@@ -257,19 +267,22 @@ enabled in the menuconfig options for your given espressif chip.
 There may be a better solution for this, but for the moment the
 recommendation is to make local modifications to the lvgl component in
 your espressif project. This is as simple as swapping
-lv_alloc/lv_realloc calls in lv_rlottie.c with heap_caps_malloc (for
-IDF) with the appropriate :c:expr:`MALLOC_CAP` call - for SPIRAM usage this is
-:c:expr:`MALLOC_CAP_SPIRAM`.
+:cpp:expr:`lv_alloc/lv_realloc` calls in `lv_rlottie.c`` with :cpp:expr:`heap_caps_malloc` (for
+IDF) with the appropriate :cpp:expr:`MALLOC_CAP` call - for SPIRAM usage this is
+:cpp:expr:`MALLOC_CAP_SPIRAM`.
 
 .. code:: c
 
    rlottie->allocated_buf = heap_caps_malloc(allocated_buf_size+1, MALLOC_CAP_SPIRAM);
+
+.. _rlottie_example:
 
 Example
 -------
 
 .. include:: ../examples/libs/rlottie/index.rst
 
+.. _rlottie_api:
 
 API
 ---

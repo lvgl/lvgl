@@ -595,7 +595,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_KEY) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
-            char c = *((char *)lv_event_get_param(e));
+            uint32_t c = lv_event_get_key(e);
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
             }
@@ -614,7 +614,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_anim_enable_t anim_enable = LV_ANIM_OFF;
             int32_t sl = lv_obj_get_scroll_left(obj);
             int32_t sr = lv_obj_get_scroll_right(obj);
-            char c = *((char *)lv_event_get_param(e));
+            uint32_t c = lv_event_get_key(e);
             if(c == LV_KEY_DOWN) {
                 /*use scroll_to_x/y functions to enforce scroll limits*/
                 lv_obj_scroll_to_y(obj, lv_obj_get_scroll_y(obj) + lv_obj_get_height(obj) / 4, anim_enable);

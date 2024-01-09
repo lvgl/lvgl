@@ -70,11 +70,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
-    lv_memzero(&canvas->static_buf, sizeof(canvas->static_buf));
-    lv_image_header_init(&canvas->static_buf.header, w, h, cf, stride, 0);
-    canvas->static_buf.data_size = stride * h;
-    canvas->static_buf.data = lv_draw_buf_align(buf, cf);
-    canvas->static_buf.unaligned_data = buf;
+    lv_draw_buf_init(&canvas->static_buf, w, h, cf, stride, buf, stride * h);
     canvas->draw_buf = &canvas->static_buf;
 
     const void * src = lv_image_get_src(obj);
@@ -354,7 +350,7 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
     layer->color_format = header->cf;
     layer->buf_area = canvas_area;
     layer->_clip_area = canvas_area;
-    layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+    layer->buf_stride = header->stride;
 }
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)

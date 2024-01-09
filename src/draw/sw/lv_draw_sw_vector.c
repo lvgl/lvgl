@@ -298,13 +298,13 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
         return;
     }
 
-    if(!decoder_dsc.decoded && !decoder_dsc.img_data) {
+    if(!decoder_dsc.decoded) {
         lv_image_decoder_close(&decoder_dsc);
         LV_LOG_ERROR("Image not ready");
         return;
     }
 
-    const uint8_t * src_buf = _lv_image_decoder_get_data(&decoder_dsc);
+    const uint8_t * src_buf = decoder_dsc.decoded->data;
     const lv_image_header_t * header = &decoder_dsc.header;
     lv_color_format_t cf = header->cf;
 
@@ -430,11 +430,19 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
     if(layer->buf == NULL)
         return;
 
+    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888 && \
+       layer->color_format != LV_COLOR_FORMAT_XRGB8888) {
+        LV_LOG_ERROR("unsupported layer color: %d", layer->color_format);
+        return;
+    }
+
     void * buf = layer->buf;
     int32_t width = lv_area_get_width(&layer->buf_area);
     int32_t height = lv_area_get_height(&layer->buf_area);
+    uint32_t stride = layer->buf_stride;
+    stride /= 4;
     Tvg_Canvas * canvas = tvg_swcanvas_create();
-    tvg_swcanvas_set_target(canvas, buf, width, width, height, TVG_COLORSPACE_ARGB8888);
+    tvg_swcanvas_set_target(canvas, buf, stride, width, height, TVG_COLORSPACE_ARGB8888);
 
     lv_ll_t * task_list = dsc->task_list;
     _lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, canvas);

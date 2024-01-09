@@ -555,7 +555,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
 
         invalidate_button_area(obj, btnm->btn_id_sel);
 
-        char c = *((char *)lv_event_get_param(e));
+        uint32_t c = lv_event_get_key(e);
         if(c == LV_KEY_RIGHT) {
             if(btnm->btn_id_sel == LV_BUTTONMATRIX_BUTTON_NONE)  btnm->btn_id_sel = 0;
             else btnm->btn_id_sel++;

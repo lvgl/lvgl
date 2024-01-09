@@ -205,7 +205,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     /* double framebuffer */
 
     if(dsc->mem2 != NULL) {
-        if(disp->buf_act == disp->buf_1) {
+        if(disp->buf_act == &disp->buf_1) {
             dsc->pinfo.yoffset = 0;
         }
         else {

@@ -28,8 +28,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_layer_t;
-
 /** Store some info to speed up drawing of very large texts
  * It takes a lot of time to get the first visible character because
  * all the previous characters needs to be checked to calculate the positions.
@@ -77,6 +75,7 @@ typedef struct {
 typedef enum {
     LV_DRAW_LETTER_BITMAP_FORMAT_A8,
     LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE,
+    LV_DRAW_LETTER_VECTOR_FORMAT,
 } lv_draw_glyph_bitmap_format_t;
 
 typedef struct {

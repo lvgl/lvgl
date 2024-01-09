@@ -1,3 +1,5 @@
+.. _indev:
+
 =============
 Input devices
 =============
@@ -13,6 +15,8 @@ An input device usually means:
 
 Pointers
 ********
+
+.. _indev_cursor:
 
 Cursor
 ------
@@ -32,6 +36,8 @@ Pointer input devices (like a mouse) can have a cursor.
 Note that the cursor object should have
 :cpp:expr:`lv_obj_remove_flag(cursor_obj, LV_OBJ_FLAG_CLICKABLE)`. For images,
 *clicking* is disabled by default.
+
+.. _indev_gestures:
 
 Gestures
 --------
@@ -76,6 +82,8 @@ If you did some action on a gesture you can call
 :cpp:expr:`lv_indev_wait_release(lv_indev_active())` in the event handler to
 prevent LVGL sending further input device related events.
 
+.. _indev_keypad_and_encoder:
+
 Keypad and encoder
 ******************
 
@@ -83,15 +91,17 @@ You can fully control the user interface without a touchpad or mouse by
 using a keypad or encoder(s). It works similar to the *TAB* key on the
 PC to select an element in an application or a web page.
 
+.. _indev_groups:
+
 Groups
 ------
 
 Objects you want to control with a keypad or encoder need to be added to
 a *Group*. In every group there is exactly one focused object which
 receives the pressed keys or the encoder actions. For example, if a
-`Text area </widgets/textarea>`__ is focused and you press some letter
+:ref:`Text area <lv_textarea>` is focused and you press some letter
 on a keyboard, the keys will be sent and inserted into the text area.
-Similarly, if a `Slider </widgets/slider>`__ is focused and you press
+Similarly, if a :ref:`Slider <lv_slider>` is focused and you press
 the left or right arrows, the slider's value will be changed.
 
 You need to associate an input device with a group. An input device can
@@ -118,21 +128,21 @@ There are some predefined keys which have special meaning:
 - :cpp:enumerator:`LV_KEY_DOWN`: Decrease value or move downwards
 - :cpp:enumerator:`LV_KEY_RIGHT`: Increase value or move to the right
 - :cpp:enumerator:`LV_KEY_LEFT`: Decrease value or move to the left
-- :cpp:enumerator:`LV_KEY_ESC`: Close or exit (E.g. close a `Drop down list </widgets/dropdown>`__)
-- :cpp:enumerator:`LV_KEY_DEL`: Delete (E.g. a character on the right in a `Text area </widgets/textarea>`__)
-- :cpp:enumerator:`LV_KEY_BACKSPACE`: Delete a character on the left (E.g. in a `Text area </widgets/textarea>`__)
-- :cpp:enumerator:`LV_KEY_HOME`: Go to the beginning/top (E.g. in a `Text area </widgets/textarea>`__)
-- :cpp:enumerator:`LV_KEY_END`: Go to the end (E.g. in a `Text area </widgets/textarea>`__)
+- :cpp:enumerator:`LV_KEY_ESC`: Close or exit (E.g. close a :ref:`Drop down list <lv_dropdown>`)
+- :cpp:enumerator:`LV_KEY_DEL`: Delete (E.g. a character on the right in a :ref:`Text area <lv_textarea>`)
+- :cpp:enumerator:`LV_KEY_BACKSPACE`: Delete a character on the left (E.g. in a :ref:`Text area <lv_textarea>`)
+- :cpp:enumerator:`LV_KEY_HOME`: Go to the beginning/top (E.g. in a :ref:`Text area <lv_textarea>`)
+- :cpp:enumerator:`LV_KEY_END`: Go to the end (E.g. in a :ref:`Text area <lv_textarea>`)
 
-The most important special keys In your ``read_cb`` function
+The most important special keys in your :cpp:func:`read_cb` function are:
 
- - :cpp:enumerator:`LV_KEY_NEXT`
- - :cpp:enumerator:`LV_KEY_PREV`
- - :cpp:enumerator:`LV_KEY_ENTER`,
- - :cpp:enumerator:`LV_KEY_UP`,
- - :cpp:enumerator:`LV_KEY_DOWN`,
- - :cpp:enumerator:`LV_KEY_LEFT`
- - :cpp:enumerator:`LV_KEY_RIGHT`
+- :cpp:enumerator:`LV_KEY_NEXT`
+- :cpp:enumerator:`LV_KEY_PREV`
+- :cpp:enumerator:`LV_KEY_ENTER`
+- :cpp:enumerator:`LV_KEY_UP`
+- :cpp:enumerator:`LV_KEY_DOWN`
+- :cpp:enumerator:`LV_KEY_LEFT`
+- :cpp:enumerator:`LV_KEY_RIGHT`
 
 You should translate some of your keys to these special keys to support navigation
 in a group and interact with selected objects.
@@ -160,9 +170,9 @@ to *Edit* mode.
 In *Edit* mode, :cpp:enumerator:`LV_KEY_NEXT` and :cpp:enumerator:`LV_KEY_PREV` is usually used to modify an
 object. Depending on the object's type, a short or long press of
 :cpp:enumerator:`LV_KEY_ENTER` changes back to *Navigate* mode. Usually, an object
-which cannot be pressed (like a `Slider </widgets/slider>`__) leaves
+which cannot be pressed (like a :ref:`Slider <lv_slider>`) leaves
 *Edit* mode upon a short click. But with objects where a short click has
-meaning (e.g. `Button </widgets/btn>`__), a long press is required.
+meaning (e.g. :ref:`Button <lv_button>`), a long press is required.
 
 Default group
 ^^^^^^^^^^^^^
@@ -189,6 +199,8 @@ will be shown.
 For a more detailed description read the
 `Style <https://docs.lvgl.io/master/overview/style.html>`__ section.
 
+
+.. _indev_api:
 
 API
 ***

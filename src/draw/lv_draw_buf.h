@@ -174,7 +174,7 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const l
  * that meets specified requirements.
  *
  * @param w         the buffer width in pixels
- * @param h
+ * @param h         the buffer height in pixels
  * @param cf        the color format for image
  * @param stride    the stride in bytes for image. Use 0 for automatic calculation based on
  *                  w, cf, and global stride alignment configuration.
@@ -182,11 +182,37 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const l
 lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride);
 
 /**
+ * Initialize a draw buf with the given buffer and parameters.
+ * @param draw_buf  the draw buf to initialize
+ * @param w         the buffer width in pixels
+ * @param h         the buffer height in pixels
+ * @param cf        the color format
+ * @param stride    the stride in bytes. Use 0 for automatic calculation
+ * @param data      the buffer used for drawing. Unaligned `data` will be aligned internally
+ * @param data_size the size of the buffer in bytes
+ * @return          return LV_RESULT_OK on success, LV_RESULT_INVALID otherwise
+ */
+lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride,
+                             void * data, uint32_t data_size);
+
+/**
  * Duplicate a draw buf with same image size, stride and color format. Copy the image data too.
  * @param draw_buf  the draw buf to duplicate
  * @return          the duplicated draw buf on success, NULL if failed
  */
 lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf);
+
+/**
+ * Keep using the existing memory, reshape the draw buffer to the given width and height.
+ * Return NULL if data_size is smaller than the required size.
+ * @param draw_buf  pointer to a draw buffer
+ * @param cf        the new color format, use 0 or LV_COLOR_FORMAT_UNKNOWN to keep using the original color format.
+ * @param w         the new width in pixels
+ * @param h         the new height in pixels
+ * @param stride    the stride in bytes for image. Use 0 for automatic calculation.
+ */
+lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t cf, uint32_t w, uint32_t h,
+                                    uint32_t stride);
 
 /**
  * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_MODIFIABLE in header.
@@ -226,6 +252,7 @@ static inline bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags
 static inline void lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)
 {
     lv_memcpy(buf, img, sizeof(lv_image_dsc_t));
+    buf->unaligned_data = buf->data;
 }
 
 static inline void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)

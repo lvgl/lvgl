@@ -60,15 +60,32 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_freetype_cache_context_t lv_freetype_cache_context_t;
 typedef struct _lv_freetype_cache_node_t lv_freetype_cache_node_t;
+
+struct _lv_freetype_cache_node_t {
+    const char * pathname;
+    lv_freetype_font_style_t style;
+    lv_freetype_font_render_mode_t render_mode;
+
+    uint32_t ref_size;                  /**< Reference size for calculating outline glyph's real size.*/
+
+    FT_Face face;
+
+    /*glyph cache*/
+    lv_cache_t * glyph_cache;
+
+    /*draw data cache*/
+    lv_cache_t * draw_data_cache;
+};
 
 typedef struct _lv_freetype_context_t {
     FT_Library library;
     FTC_Manager cache_manager;
     FTC_CMapCache cmap_cache;
-    lv_freetype_cache_context_t * cache_context;
     lv_ll_t face_id_ll;
+    lv_event_cb_t event_cb;
+
+    lv_cache_t * cache_node_cache;
 } lv_freetype_context_t;
 
 typedef struct _lv_freetype_font_dsc_t {
@@ -76,8 +93,10 @@ typedef struct _lv_freetype_font_dsc_t {
     lv_font_t font;
     uint32_t size;
     lv_freetype_font_style_t style;
+    lv_freetype_font_render_mode_t render_mode;
     lv_freetype_context_t * context;
     lv_freetype_cache_node_t * cache_node;
+    lv_cache_entry_t * cache_node_entry;
     FTC_FaceID face_id;
 } lv_freetype_font_dsc_t;
 
@@ -101,17 +120,18 @@ lv_freetype_context_t * lv_freetype_get_context(void);
  */
 FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc);
 
-lv_freetype_cache_context_t * lv_freetype_cache_context_create(lv_freetype_context_t * ctx);
-
-void lv_freetype_cache_context_delete(lv_freetype_cache_context_t * cache_ctx);
-
-bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc);
-
-void lv_freetype_on_font_delete(lv_freetype_font_dsc_t * dsc);
-
 void lv_freetype_italic_transform(FT_Face face);
 
 const char * lv_freetype_get_pathname(FTC_FaceID face_id);
+
+lv_cache_t * lv_freetype_create_glyph_cache(void);
+void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc);
+
+lv_cache_t * lv_freetype_create_draw_data_image(void);
+void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc);
+
+lv_cache_t * lv_freetype_create_draw_data_outline(void);
+void lv_freetype_set_cbs_outline_font(lv_freetype_font_dsc_t * dsc);
 
 /**********************
  *      MACROS

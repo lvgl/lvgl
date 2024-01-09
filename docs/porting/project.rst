@@ -127,7 +127,7 @@ Initialization
 To use the graphics library you have to initialize it and setup required
 components. The order of the initialization is:
 
-1. Call :cpp:func:`lv_init()`.
+1. Call :cpp:func:`lv_init`.
 2. Initialize your drivers.
 3. Register the display and input devices drivers in LVGL. Learn more
    about `Display </porting/display>`__ and `Input

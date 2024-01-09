@@ -17,8 +17,6 @@
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
-#include <stdint.h>
-
 #define LV_USE_DEV_VERSION 1
 
 /*====================
@@ -242,10 +240,6 @@
 /*-------------
  * Others
  *-----------*/
-
-/*Maximum buffer size to allocate for rotation.
- *Only used if software rotation is enabled in the display driver.*/
-#define LV_DISPLAY_ROT_MAX_BUF (10*1024)
 
 #define LV_ENABLE_GLOBAL_CUSTOM 0
 #if LV_ENABLE_GLOBAL_CUSTOM
@@ -476,8 +470,6 @@
 #define LV_USE_LIST       1
 
 #define LV_USE_MENU       1
-
-#define LV_USE_METER      1
 
 #define LV_USE_MSGBOX     1
 

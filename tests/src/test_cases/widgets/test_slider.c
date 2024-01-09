@@ -45,7 +45,7 @@ void test_textarea_should_have_valid_documented_default_values(void)
 
 void test_slider_event_keys_right_and_up_increment_value_by_one(void)
 {
-    char key = LV_KEY_RIGHT;
+    uint32_t key = LV_KEY_RIGHT;
     lv_slider_set_value(slider, 10, LV_ANIM_OFF);
     int32_t value = lv_slider_get_value(slider);
 
@@ -61,7 +61,7 @@ void test_slider_event_keys_right_and_up_increment_value_by_one(void)
 
 void test_slider_event_keys_left_and_down_decrement_value_by_one(void)
 {
-    char key = LV_KEY_LEFT;
+    uint32_t key = LV_KEY_LEFT;
     lv_slider_set_value(slider, 10, LV_ANIM_OFF);
     int32_t value = lv_slider_get_value(slider);
 
@@ -77,7 +77,7 @@ void test_slider_event_keys_left_and_down_decrement_value_by_one(void)
 
 void test_slider_event_invalid_key_should_not_change_values(void)
 {
-    char key = LV_KEY_ENTER;
+    uint32_t key = LV_KEY_ENTER;
     lv_slider_set_value(slider, 10, LV_ANIM_OFF);
     int32_t value = lv_slider_get_value(slider);
 

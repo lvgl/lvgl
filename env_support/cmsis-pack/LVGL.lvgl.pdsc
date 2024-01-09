@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-12-24" version="9.0.0-dev2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev2.pack">
+    <release date="2024-01-02" version="9.0.0-dev3" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev3.pack">
       - LVGL 9.0.0-dev
       - New Driver Architecture
       - Adds Helium support
@@ -508,8 +508,6 @@
                 <file category="sourceC"            name="src/misc/lv_array.c" />
                 <file category="sourceC"            name="src/misc/lv_async.c" />
                 <file category="sourceC"            name="src/misc/lv_bidi.c" />
-                <file category="sourceC"            name="src/misc/lv_cache.c" />
-                <file category="sourceC"            name="src/misc/lv_cache_builtin.c" />
                 <file category="sourceC"            name="src/misc/lv_color.c" />
                 <file category="sourceC"            name="src/misc/lv_color_op.c" />
                 <file category="sourceC"            name="src/misc/lv_event.c" />
@@ -517,7 +515,6 @@
                 <file category="sourceC"            name="src/misc/lv_ll.c" />
                 <file category="sourceC"            name="src/misc/lv_log.c" />
                 <file category="sourceC"            name="src/misc/lv_lru.c" />
-                <file category="sourceC"            name="src/misc/lv_lru_rb.c" />
                 <file category="sourceC"            name="src/misc/lv_math.c" />
                 <file category="sourceC"            name="src/misc/lv_palette.c" />
                 <file category="sourceC"            name="src/misc/lv_profiler_builtin.c" />
@@ -529,7 +526,12 @@
                 <file category="sourceC"            name="src/misc/lv_text_ap.c" />
                 <file category="sourceC"            name="src/misc/lv_timer.c" />
                 <file category="sourceC"            name="src/misc/lv_utils.c" />
-
+                
+                <!-- src/misc/cache-->
+                <file category="sourceC"            name="src/misc/cache/_lv_cache_lru_rb.c" />
+                <file category="sourceC"            name="src/misc/cache/lv_cache.c" />
+                <file category="sourceC"            name="src/misc/cache/lv_cache_entry.c" />
+                <file category="sourceC"            name="src/misc/cache/lv_image_cache.c" />
 
                 <!-- src/stdlib-->
                 <file category="sourceC"            name="src/stdlib/lv_mem.c" />
@@ -996,7 +998,6 @@
                 <file category="sourceC"    name="src/libs/freetype/lv_freetype.c" />
                 <file category="sourceC"    name="src/libs/freetype/lv_freetype_image.c" />
                 <file category="sourceC"    name="src/libs/freetype/lv_freetype_outline.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype_sbit.c" />
                 <file category="sourceC"    name="src/libs/freetype/lv_ftsystem.c" />
               </files>
 

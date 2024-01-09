@@ -844,10 +844,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         data->enc_diff = 0;
     }
 
-    /*Refresh the focused object. It might change due to lv_group_focus_prev/next*/
-    indev_obj_act = lv_group_get_focused(g);
-    if(indev_obj_act == NULL) return;
-
     const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
     /*Button press happened*/

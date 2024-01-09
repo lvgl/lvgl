@@ -1,3 +1,5 @@
+.. _coord:
+
 =============================
 Positions, sizes, and layouts
 =============================
@@ -19,6 +21,8 @@ In short this means: - Explicitly set coordinates are stored in styles
 - width/height means the full size, the "content area" is smaller with padding and border width - a subset
   of flexbox and grid layouts are supported
 
+.. _coord_unites:
+
 Units
 -----
 
@@ -30,6 +34,8 @@ Units
 -  :c:macro:`LV_SIZE_CONTENT`: Special value to set the width/height of an
    object to involve all the children. It's similar to ``auto`` in CSS.
    E.g. :cpp:expr:`lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
+
+.. _coord_boxing_model:
 
 Boxing model
 ------------
@@ -51,11 +57,15 @@ keeps a "padding margin" when placing an object's children.
 
 The outline is drawn outside the bounding box.
 
+.. _coord_notes:
+
 Important notes
 ---------------
 
 This section describes special cases in which LVGL's behavior might be
 unexpected.
+
+.. _coord_postponed_coordinate_calculation:
 
 Postponed coordinate calculation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -73,10 +83,12 @@ The size and position might depend on the parent or layout. Therefore
 :cpp:func:`lv_obj_update_layout` recalculates the coordinates of all objects on
 the screen of ``obj``.
 
+.. _coord_removing styles:
+
 Removing styles
 ^^^^^^^^^^^^^^^
 
-As it's described in the `Using styles <#using-styles>`__ section,
+As it's described in the :ref:`coord_using_styles` section,
 coordinates can also be set via style properties. To be more precise,
 under the hood every style coordinate related property is stored as a
 style property. If you use :cpp:expr:`lv_obj_set_x(obj, 20)` LVGL saves ``x=20``
@@ -110,6 +122,8 @@ For example:
    /*obj2 will have 200;100 size in the end */
    lv_obj_remove_style_all(obj2);
    lv_obj_set_size(obj2, 200, 100);
+
+.. _coord_position:
 
 Position
 ********
@@ -213,6 +227,8 @@ Note that, unlike with :cpp:func:`lv_obj_align`, :cpp:func:`lv_obj_align_to` can
 realign the object if its coordinates or the reference object's
 coordinates change.
 
+.. _coord_size:
+
 Size
 ****
 
@@ -262,6 +278,8 @@ the following functions:
    int32_t content_w = lv_obj_get_content_width(obj);
    int32_t content_h = lv_obj_get_content_height(obj);
 
+.. _coord_using_styles:
+
 Using styles
 ************
 
@@ -291,13 +309,15 @@ Here are some examples to set an object's size using a style:
    lv_style_init(&style);
    lv_style_set_width(&style, 100);
 
-   lv_obj_t * btn = lv_btn_create(lv_screen_active());
+   lv_obj_t * btn = lv_button_create(lv_screen_active());
    lv_obj_add_style(btn, &style, LV_PART_MAIN);
 
 As you will see below there are some other great features of size and
 position setting. However, to keep the LVGL API lean, only the most
 common coordinate setting features have a "simple" version and the more
 complex features can be used via styles.
+
+.. _coord_translation:
 
 Translation
 ***********
@@ -365,6 +385,8 @@ The translation actually moves the object. That means it makes the
 scrollbars and :c:macro:`LV_SIZE_CONTENT` sized objects react to the position
 change.
 
+.. _coord_transformation:
+
 Transformation
 **************
 
@@ -388,6 +410,8 @@ This code enlarges a button when it's pressed:
    lv_style_set_transform_height(&style_pressed, 10);
 
    lv_obj_add_style(btn, &style_pressed, LV_STATE_PRESSED);
+
+.. _coord_min_max_size:
 
 Min and Max size
 ----------------
@@ -419,6 +443,8 @@ the parent's content area.
    lv_obj_set_height(obj, lv_pct(100));
    lv_obj_add_style(obj, &style_max_height, LV_STATE_DEFAULT); //Limit the height to half parent height
 
+.. _coord_layout:
+
 Layout
 ******
 
@@ -440,9 +466,13 @@ the given layout.
 Built-in layout
 ---------------
 
-LVGL comes with two very powerful layouts: - Flexbox - Grid
+LVGL comes with two very powerful layouts:
+
+* Flexbox: arrange objects into rows or columns, with support for wrapping and expanding items.
+* Grid: arrange objects into fixed positions in 2D table.
 
 Both are heavily inspired by the CSS layouts with the same name.
+Layouts are described in detail in their own section of documentation.
 
 Flags
 -----
@@ -495,8 +525,12 @@ the update callback. For example:
        lv_style_set_prop(style, LV_STYLE_MY_PROP, v);
    }
 
+.. _coord_example:
+
 Examples
 ********
+
+.. _coord_api:
 
 API
 ***

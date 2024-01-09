@@ -1,15 +1,20 @@
+.. _lv_textarea:
+
+=======================
 Text area (lv_textarea)
 =======================
 
 Overview
 ********
 
-The Text Area is a `Base object <widgets/obj.html>`__ with a
+The Text Area is a `Base object </widgets/obj.html>`__ with a
 `Label </widgets/label.html>`__ and a cursor on it. Texts or characters
 can be added to it. Long lines are wrapped and when the text becomes
 long enough the Text area can be scrolled.
 
 One line mode and password modes are supported.
+
+.. _lv_textarea_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -20,8 +25,8 @@ Parts and Styles
    right or center.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar that is shown when the text is
    too long.
--  :cpp:enumerator:`LV_PART_SELECTED` Determines the style of the `selected
-   text </widgets/label.html#text-selection>`__. Only ``text_color`` and
+-  :cpp:enumerator:`LV_PART_SELECTED` Determines the style of the :ref:`selected
+   text <lv_label_text_selection>`. Only ``text_color`` and
    ``bg_color`` style properties can be used. ``bg_color`` should be set
    directly on the label of the text area.
 -  :cpp:enumerator:`LV_PART_CURSOR` Marks the position where the characters are
@@ -32,6 +37,8 @@ Parts and Styles
    ``anim_time`` style property sets the cursor's blink time.
 -  :cpp:enumerator:`LV_PART_TEXTAREA_PLACEHOLDER` Unique to Text Area, allows styling
    the placeholder text.
+
+.. _lv_textarea_usage:
 
 Usage
 *****
@@ -61,8 +68,9 @@ Delete character
 ----------------
 
 To delete a character from the left of the current cursor position use
-:cpp:expr:`lv_textarea_delete_char(textarea)`. To delete from the right use
-:cpp:expr:`lv_textarea_delete_char_forward(textarea)`
+:cpp:expr:`lv_textarea_delete_char(textarea)`.
+
+To delete from the right use :cpp:expr:`lv_textarea_delete_char_forward(textarea)`
 
 Move the cursor
 ---------------
@@ -144,6 +152,8 @@ Any part of the text can be selected if enabled with
 :cpp:expr:`lv_textarea_set_text_selection(textarea, true)`. This works much like
 when you select text on your PC with your mouse.
 
+.. _lv_textarea_events:
+
 Events
 ******
 
@@ -158,9 +168,11 @@ Events
 -  :cpp:enumerator:`LV_EVENT_READY` Sent when :cpp:enumerator:`LV_KEY_ENTER` is pressed (or sent) to
    a one line text area.
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_textarea_keys:
 
 Keys
 ****
@@ -170,10 +182,14 @@ Keys
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_textarea_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/textarea/index.rst
+
+.. _lv_textarea_api:
 
 API
 ***

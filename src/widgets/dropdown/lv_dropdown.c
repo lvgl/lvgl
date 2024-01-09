@@ -704,7 +704,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         p->y = lv_font_get_line_height(font);
     }
     else if(code == LV_EVENT_KEY) {
-        char c = *((char *)lv_event_get_param(e));
+        uint32_t c = lv_event_get_key(e);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(!lv_dropdown_is_open(obj)) {
                 lv_dropdown_open(obj);

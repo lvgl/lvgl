@@ -219,10 +219,8 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
         lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
         LV_ASSERT_MALLOC(draw_buf);
-        lv_image_header_init(&draw_buf->header, width, height, cf, stride, LV_VG_LITE_IMAGE_NO_CACHE);
+        lv_draw_buf_init(draw_buf, width, height, cf, stride, (void *)image_data, LV_VG_LITE_IMAGE_NO_CACHE);
         dsc->decoded = draw_buf;
-        draw_buf->data = (void *)image_data;
-        draw_buf->unaligned_data = (void *)image_data;
         return LV_RESULT_OK;
     }
 
@@ -386,6 +384,8 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             break;
     }
 
+    if(dsc->args.no_cache) return LV_RES_OK;
+
 #if LV_CACHE_DEF_SIZE > 0
     if(res == LV_RESULT_OK) {
         lv_image_cache_data_t search_key;
@@ -421,11 +421,10 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     LV_UNUSED(decoder); /*Unused*/
 
-#if LV_CACHE_DEF_SIZE > 0
-    lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
-#else
-    decoder_draw_buf_free((lv_draw_buf_t *)dsc->decoded);
-#endif
+    if(dsc->args.no_cache || LV_CACHE_DEF_SIZE == 0)
+        lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
+    else
+        lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
 }
 
 static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_data)

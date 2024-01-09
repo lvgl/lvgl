@@ -169,7 +169,7 @@ void lv_draw_dispatch(void)
     LV_PROFILER_END;
 }
 
-bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
+bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
 {
     LV_PROFILER_BEGIN;
     /*Remove the finished tasks first*/
@@ -391,7 +391,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     }
 
     /*Set the stride also for static allocated buffers as well as for new dynamically allocated*/
-    layer->buf_stride = stride;
+    if(layer->buf_stride == 0) layer->buf_stride = stride;
 
     /*Make sure the buffer address is aligned in case of already allocated buffers*/
     return lv_draw_buf_align(layer->buf, layer->color_format);

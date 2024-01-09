@@ -202,10 +202,11 @@ static void draw_lines(lv_layer_t * layer)
 
 static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 {
-    static uint8_t canvas_buf[LV_CANVAS_BUF_SIZE(640, 480, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas, canvas_buf, 640, 480,
-                         LV_COLOR_FORMAT_ARGB8888);
+    uint32_t stride = 640 * 4 + 128; /*Test non-default stride*/
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(640, 480, LV_COLOR_FORMAT_ARGB8888, stride);
+    TEST_ASSERT_NOT_NULL(draw_buf);
+    lv_canvas_set_draw_buf(canvas, draw_buf);
 
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
@@ -219,6 +220,9 @@ static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
     lv_snprintf(fn_buf, sizeof(fn_buf), "draw/vector_%s.png", name);
     TEST_ASSERT_EQUAL_SCREENSHOT(fn_buf);
 #endif
+    lv_image_cache_drop(draw_buf);
+    lv_draw_buf_destroy(draw_buf);
+    lv_obj_del(canvas);
 }
 
 void test_draw_lines(void)
