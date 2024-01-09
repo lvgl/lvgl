@@ -1389,7 +1389,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_hel
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && !defined(__ASSEMBLY__)*/
+#endif /*!(LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && !defined(__ASSEMBLY__) && LV_USE_DRAW_ARM2D)*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
