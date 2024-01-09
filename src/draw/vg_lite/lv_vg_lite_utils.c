@@ -615,8 +615,8 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     }
 
     if(!lv_vg_lite_is_src_cf_supported(decoded->header.cf)) {
-        lv_image_decoder_close(decoder_dsc);
         LV_LOG_ERROR("unsupported color format: %d", decoded->header.cf);
+        lv_image_decoder_close(decoder_dsc);
         return false;
     }
 
