@@ -23,11 +23,8 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
 
-//#include <deque>
-//#include <thread>
 #include <vector>
 #include <atomic>
-//#include <condition_variable>
 #include "tvgTaskScheduler.h"
 
 /************************************************************************/
