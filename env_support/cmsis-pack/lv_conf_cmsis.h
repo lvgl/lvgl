@@ -480,8 +480,6 @@
 
 #define LV_USE_MENU       1
 
-#define LV_USE_METER      1
-
 #define LV_USE_MSGBOX     1
 
 #define LV_USE_ROLLER     1   /*Requires: lv_label*/
