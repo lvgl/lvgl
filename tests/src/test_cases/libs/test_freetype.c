@@ -511,6 +511,7 @@ void test_freetype_outline_rendering_test(void)
 
     font_italic->release_glyph(font_italic, &g);
 
+    lv_freetype_font_delete(font_italic);
 #else
     TEST_PASS();
 #endif
@@ -527,6 +528,7 @@ static void freetype_outline_event_cb(lv_event_t * e)
             break;
         case LV_EVENT_DELETE:
             _lv_ll_clear(param->outline);
+            lv_free(param->outline);
             break;
         case LV_EVENT_INSERT: {
                 void * entry = _lv_ll_ins_tail(param->outline);
