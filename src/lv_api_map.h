@@ -153,7 +153,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_get_user_data            lv_display_get_user_data
 #define lv_disp_get_driver_data          lv_display_get_driver_data
 #define _lv_disp_refr_timer              _lv_display_refr_timer
-#define _lv_disp_get_refr_timer          _lv_display_get_refr_timer
+#define _lv_disp_get_refr_timer          lv_display_get_refr_timer
 #define lv_disp_render_mode_t            lv_display_render_mode_t
 
 #define lv_timer_del                    lv_timer_delete
