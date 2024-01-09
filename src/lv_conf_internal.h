@@ -1622,18 +1622,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_METER
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_METER
-            #define LV_USE_METER CONFIG_LV_USE_METER
-        #else
-            #define LV_USE_METER 0
-        #endif
-    #else
-        #define LV_USE_METER      1
-    #endif
-#endif
-
 #ifndef LV_USE_MSGBOX
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_MSGBOX

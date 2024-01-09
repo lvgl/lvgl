@@ -115,10 +115,6 @@ typedef struct {
     lv_style_t table_cell;
 #endif
 
-#if LV_USE_METER
-    lv_style_t meter_marker, meter_indic;
-#endif
-
 #if LV_USE_TEXTAREA
     lv_style_t ta_cursor, ta_placeholder;
 #endif
@@ -529,24 +525,6 @@ static void style_init(my_theme_t * theme)
     style_init_reset(&theme->styles.menu_separator);
     lv_style_set_bg_opa(&theme->styles.menu_separator, LV_OPA_TRANSP);
     lv_style_set_pad_ver(&theme->styles.menu_separator, PAD_TINY);
-#endif
-
-#if LV_USE_METER
-    style_init_reset(&theme->styles.meter_marker);
-    lv_style_set_line_width(&theme->styles.meter_marker, _LV_DPX_CALC(theme->disp_dpi, 5));
-    lv_style_set_line_color(&theme->styles.meter_marker, theme->color_text);
-
-    int32_t meter_size = _LV_DPX_CALC(theme->disp_dpi, 20);
-    lv_style_set_size(&theme->styles.meter_marker, meter_size, meter_size);
-
-    meter_size = _LV_DPX_CALC(theme->disp_dpi, 15);
-    lv_style_set_pad_left(&theme->styles.meter_marker, meter_size);
-
-    style_init_reset(&theme->styles.meter_indic);
-    lv_style_set_radius(&theme->styles.meter_indic, LV_RADIUS_CIRCLE);
-    lv_style_set_bg_color(&theme->styles.meter_indic, theme->color_text);
-    lv_style_set_bg_opa(&theme->styles.meter_indic, LV_OPA_COVER);
-    lv_style_set_size(&theme->styles.meter_indic, meter_size, meter_size);
 #endif
 
 #if LV_USE_TABLE
@@ -1024,14 +1002,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.arc_indic_primary, LV_PART_INDICATOR);
     }
 #endif
-
-    //#if LV_USE_METER
-    //    else if(lv_obj_check_type(obj, &lv_meter_class)) {
-    //        lv_obj_add_style(obj, &theme->styles.card, 0);
-    //        lv_obj_add_style(obj, &theme->styles.circle, 0);
-    //        lv_obj_add_style(obj, &theme->styles.meter_indic, LV_PART_INDICATOR);
-    //    }
-    //#endif
 
 #if LV_USE_TEXTAREA
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {
