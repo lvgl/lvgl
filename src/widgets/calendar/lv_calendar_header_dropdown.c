@@ -17,10 +17,6 @@
  *      DEFINES
  *********************/
 
-#define DIGITS_IN_YEAR      (4U)
-/* String for year is 4 digits + NULL terminator, enough until year 9999 */
-#define YEAR_STR_BUFFER_LEN (DIGITS_IN_YEAR + 1U)
-
 /**********************
  *      TYPEDEFS
  **********************/
