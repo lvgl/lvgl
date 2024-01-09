@@ -827,7 +827,8 @@ static AASpans* _AASpans(float ymin, float ymax, const SwImage* image, const SwB
     auto yStart = static_cast<int32_t>(ymin);
     auto yEnd = static_cast<int32_t>(ymax);
 
-    if (!_arrange(image, region, yStart, yEnd)) return nullptr;
+//    if (!_arrange(image, region, yStart, yEnd)) return nullptr;
+    return nullptr;
 
     auto aaSpans = static_cast<AASpans*>(malloc(sizeof(AASpans)));
     aaSpans->yStart = yStart;
