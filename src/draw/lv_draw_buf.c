@@ -87,6 +87,8 @@ void lv_draw_buf_invalidate_cache(void * buf, uint32_t stride, lv_color_format_t
 void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a)
 {
     LV_UNUSED(h);
+    if(lv_area_get_width(a) < 0) return;
+    if(lv_area_get_height(a) < 0) return;
 
     uint8_t px_size = lv_color_format_get_size(color_format);
     uint32_t stride = lv_draw_buf_width_to_stride(w, color_format);
