@@ -477,8 +477,8 @@ static void refr_sync_areas(void)
      *So the active buffer is the off screen buffer where LVGL will render*/
     void * buf_off_screen = disp_refr->buf_act->data;
     void * buf_on_screen = disp_refr->buf_act == &disp_refr->buf_1
-                           ? &disp_refr->buf_2.data
-                           : &disp_refr->buf_1.data;
+                           ? disp_refr->buf_2.data
+                           : disp_refr->buf_1.data;
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
@@ -521,6 +521,7 @@ static void refr_sync_areas(void)
     /*Copy sync areas (if any remaining)*/
     for(sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
         sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
+
         lv_draw_buf_copy(
             buf_off_screen, hor_res, ver_res, sync_area,
             buf_on_screen, hor_res, ver_res, sync_area,
