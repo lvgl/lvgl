@@ -129,6 +129,9 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         t = lv_draw_add_task(layer, coords);
         lv_draw_box_shadow_dsc_t * shadow_dsc = lv_malloc(sizeof(lv_draw_box_shadow_dsc_t));
         t->draw_dsc = shadow_dsc;
+        lv_area_increase(&t->_real_area, dsc->shadow_spread, dsc->shadow_spread);
+        lv_area_increase(&t->_real_area, dsc->shadow_width, dsc->shadow_width);
+        lv_area_move(&t->_real_area, dsc->shadow_offset_x, dsc->shadow_offset_y);
         shadow_dsc->base = dsc->base;
         shadow_dsc->base.dsc_size = sizeof(lv_draw_box_shadow_dsc_t);
         shadow_dsc->radius = dsc->radius;
@@ -255,6 +258,8 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         t = lv_draw_add_task(layer, &outline_coords);
         lv_draw_border_dsc_t * outline_dsc = lv_malloc(sizeof(lv_draw_border_dsc_t));
         t->draw_dsc = outline_dsc;
+        lv_area_increase(&t->_real_area, dsc->outline_width, dsc->outline_width);
+        lv_area_increase(&t->_real_area, dsc->outline_pad, dsc->outline_pad);
         outline_dsc->base = dsc->base;
         outline_dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
         outline_dsc->radius = dsc->radius == LV_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->radius + dsc->outline_width +
