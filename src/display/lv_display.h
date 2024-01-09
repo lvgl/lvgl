@@ -329,15 +329,6 @@ lv_obj_t * lv_display_get_screen_active(lv_display_t * disp);
 lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp);
 
 /**
-<<<<<<< HEAD
-=======
- * Make a screen active
- * @param scr       pointer to a screen
- */
-void lv_display_load_scr(lv_obj_t * scr);
-
-/**
->>>>>>> master
  * Return the top layer. The top layer is the same on all screens and it is above the normal screen layer.
  * @param disp      pointer to display which top layer should be get. (NULL to use the default screen)
  * @return          pointer to the top layer object
