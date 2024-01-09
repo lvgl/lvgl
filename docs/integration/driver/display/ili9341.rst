@@ -5,13 +5,13 @@ ILI9341 LCD Controller driver
 Overview
 -------------
 
-The ILI9341 SOC is a popular TFT LCD controller chip made by Ilitek. It supports TFT LCD panels with a maximum resolution of 240x320 pixels, and 262k (18 bit) colors.
+The `ILI9341 <https://cdn-shop.adafruit.com/datasheets/ILI9341.pdf>`__ SOC is a popular TFT LCD controller chip made by Ilitek. It supports TFT LCD panels with a maximum resolution of 240x320 pixels, and 262k (18 bit) colors.
 It supports both serial and parallel interfaces, including 3/4 line SPI, 8080 type 8/9/16/18 bit parallel, or 6/16/18 bit RGB interfaces. The chip includes display RAM,
 various voltage and timing generators. It has a MIPI DCS compatible register set.
 
-The **ILI9341** LCD controller `driver <https://github.com/lvgl/lvgl/src/dev/display/ili9341>`__ is a platform-agnostic driver. It implements display initialization,
-supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific function to access the controller: one to send
-a command to the controller, and another one to send pixel data. Typically these are implemented by calling the appropriate SDK library functions on the given platform.
+The ILI9341 LCD controller `driver <https://github.com/lvgl/lvgl/src/dev/display/ili9341>`__ is a platform-agnostic driver. It implements display initialization,
+supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
+a command or pixel data to the controller via SPI or parallel bus. Typically these are implemented by calling the appropriate SDK library functions on the given platform.
 
 Prerequisites
 -------------
@@ -23,51 +23,48 @@ Configuring the driver
 
 Enable the ILI9341 driver support in lv_conf.h, by cmake compiler define or by KConfig
 
-    .. code:: c
+.. code:: c
 
-        #define LV_USE_ILI9341  1
+	#define LV_USE_ILI9341  1
 
 Usage
 -----
 
-You need to implement 3 platform dependent functions:
+You need to implement two platform-dependent functions:
 
 .. code:: c
 
-	/* Initialize LCD bus interface */
-	int32_t my_lcd_io_init(void)
-	{
-		...
-	}
-
-	/* Send short command to the LCD. This function must be blocking. */
+	/* Send short command to the LCD. This function shall wait until the transaction finishes. */
 	int32_t my_lcd_send_cmd(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
 	{
 		...
 	}
 
-	/* Send large array of pixel data to the LCD. This function should be non-blocking. If necessary, this function has to implement byte-swapping. */
+	/* Send large array of pixel data to the LCD. If necessary, this function has to do the byte-swapping. This function can do the transfer in the background. */
 	int32_t my_lcd_send_color(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
 	{
 		...
 	}
 
 The only difference between the ``my_lcd_send_cmd()`` and ``my_lcd_send_color()`` functions is that ``my_lcd_send_cmd()`` is used to send short commands and it is expected
-complete the transaction when it returns (in other words, it must be blocking), while ``my_lcd_send_color()`` is only used to send pixel data, and it should preferably use
-DMA to transmit data in the background. While flushing is handled by the driver, it is the user's responsibility to call ``lv_display_flush_ready()`` when the color transfer
-completes (this is usually done in a callback).
+complete the transaction when it returns (in other words, it should be blocking), while ``my_lcd_send_color()`` is only used to send pixel data, and it is recommended to use
+DMA to transmit data in the background. More sophisticated methods can be also implemented, like queing transfers and scheduling them in the background.
+
+Please note that while display flushing is handled by the driver, it is the user's responsibility to call ``lv_display_flush_ready()``
+when the color transfer completes. In case of a DMA transfer this is usually done in a transfer ready callback.
 
 .. note::
-	While it is acceptable to use a blocking implementation for both functions, performance will suffer.
+	While it is acceptable to use a blocking implementation for the pixel transfer as well, performance will suffer.
 
 .. tip::
 	Care must be taken to avoid sending a command while there is an active transfer going on in the background. It is the user's responsibility to implement this either
 	by polling the hardware, polling a global variable (which is reset at the end of the transfer), or by using a semaphore or other locking mechanism.
 
-Please also note that the driver does not handle the draw buffer allocation, because this may be platform-dependent, too.
+Please also note that the driver does not handle the draw buffer allocation, because this may be platform-dependent, too. Thus you need to allocate the buffers and assign them
+to the display object as usual by calling ``lv_display_set_draw_buffers()``.
 
-The driver can be used to create multiple displays simultaneously, however, it is the callback's responsibility to distinguish between them. Normally one would implement a
-separate set of callbacks for each display.  The user must take care of arbitrating the bus when multiple devices are connected to it.
+The driver can be used to create multiple displays. In such a configuration the callbacks must be able to distinguish between the displays. Usually one would
+implement a separate set of callbacks for each display. Also note that the user must take care of arbitrating the bus when multiple devices are connected to it.
 
 Example
 -------
@@ -108,8 +105,8 @@ Advanced topics
 Create flags
 ^^^^^^^^^^^^
 
-The third argument of the ``lv_ili9341_create()`` function is a flag array. This can be used to configure various orientations and RGB ordering if the default settings do not
-work for you. In particular, this driver accepts the following flags:
+The third argument of the ``lv_ili9341_create()`` function is a flag array. This can be used to configure the orientation and RGB ordering of the panel if the default settings
+do not work for you. In particular, the ILI9341 driver accepts the following flags:
 
 .. code:: c
 
@@ -143,7 +140,7 @@ a custom command list to the controller. The commands must be put into a 'uint8_
 
 	lv_ili9341_send_cmd_list(my_disp, init_cmd_list);
 	
-You can add a delay between the commands by using the pseudo-command LV_LCD_CMD_DELAY_MS, which must be followed by the delay given in 10ms units.
-To terminate the command list use a delay with a value of LV_LCD_CMD_EOF, as shown above.
+You can add a delay between the commands by using the pseudo-command ``LV_LCD_CMD_DELAY_MS``, which must be followed by the delay given in 10ms units.
+To terminate the command list use a delay with a value of ``LV_LCD_CMD_EOF``, as shown above.
 
 See an actual example `here <https://github.com/lvgl/lvgl/src/dev/display/ili9341/lv_ili9341.c>`__.
