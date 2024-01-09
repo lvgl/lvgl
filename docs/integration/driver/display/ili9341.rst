@@ -69,9 +69,92 @@ implement a separate set of callbacks for each display. Also note that the user 
 Example
 -------
 
+This is an example implementation on an STM32F746 using STM32CubeIDE and the ST HAL libraries.
+
 .. code:: c
 
 	#include "src/dev/display/ili9341/lv_ili9341.h"
+
+	#define LCD_H_RES		240
+	#define LCD_V_RES		320
+	#define LCD_BUF_LINES	60
+	
+	lv_display_t *my_disp;
+	volatile int my_disp_bus_busy = 0;
+
+	/* DMA transfer ready callback */
+	static void stm32_lcd_color_transfer_ready_cb(SPI_HandleTypeDef *hspi)
+	{
+		/* CS high */
+		HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
+		my_disp_bus_busy = 0;
+		lv_display_flush_ready(my_disp);
+	}
+
+	/* Initialize LCD I/O bus, reset LCD */
+	static int32_t stm32_lcd_io_init(void)
+	{
+		/* Register SPI Tx Complete Callback */
+		HAL_SPI_RegisterCallback(&hspi1, HAL_SPI_TX_COMPLETE_CB_ID, stm32_lcd_color_transfer_ready_cb);
+
+		/* reset LCD */
+		HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_RESET);
+		HAL_Delay(100);
+		HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_SET);
+		HAL_Delay(100);
+
+		HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
+
+		return HAL_OK;
+	}
+
+	static void stm32_lcd_send_cmd(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	{
+		LV_UNUSED(disp);
+		/* Set the SPI in 8-bit mode */
+		hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+		HAL_SPI_Init(&hspi1);
+		/* DCX low (command) */
+		HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_RESET);
+		/* CS low */
+		HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET);
+		/* send command */
+		if (HAL_SPI_Transmit(&hspi1, cmd, cmd_size, BUS_SPI1_POLL_TIMEOUT) == HAL_OK) {
+			/* DCX high (data) */
+			HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
+			/* for short data blocks we use polling transfer */
+			HAL_SPI_Transmit(&hspi1, (uint8_t *)param, (uint16_t)param_size, BUS_SPI1_POLL_TIMEOUT);
+			/* CS high */
+			HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
+		}
+	}
+
+	static void stm32_lcd_send_color(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	{
+		LV_UNUSED(disp);
+		while (my_disp_bus_busy);	/* wait until previous transfer is finished */
+		/* Set the SPI in 8-bit mode */
+		hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+		HAL_SPI_Init(&hspi1);
+		/* DCX low (command) */
+		HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_RESET);
+		/* CS low */
+		HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET);
+		/* send command */
+		if (HAL_SPI_Transmit(&hspi1, cmd, cmd_size, BUS_SPI1_POLL_TIMEOUT) == HAL_OK) {
+			/* DCX high (data) */
+			HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
+			/* for color data use DMA transfer */
+			/* Set the SPI in 16-bit mode to match endianess */
+			hspi1.Init.DataSize = SPI_DATASIZE_16BIT;
+			HAL_SPI_Init(&hspi1);
+			my_disp_bus_busy = 1;
+			HAL_SPI_Transmit_DMA(&hspi1, param, (uint16_t)param_size / 2);
+
+			/* NOTE: CS will be reset in the transfer ready callback */
+		}
+	}
 
 	int main(int argc, char ** argv)
 	{
@@ -81,15 +164,32 @@ Example
 		lv_init();
 
 		/* Initialize LCD bus I/O */
-		if (my_lcd_io_init() != 0)
+		if (stm32_lcd_io_init() != 0)
 			return;
 
 		/* Create the LVGL display object and the LCD display driver */
-		lv_display_t * my_disp = lv_ili9341_create(320, 240, 0, my_lcd_send_cmd, my_lcd_send_color);
+		my_disp = lv_ili9341_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE, stm32_lcd_send_cmd, stm32_lcd_send_color);
+		
+		/* Set display orientation to landscape */
+		lv_display_set_rotation(my_disp, LV_DISPLAY_ROTATION_90);
 
 		/* Configure draw buffers, etc. */
+		lv_color_t * buf1 = NULL;
+		lv_color_t * buf2 = NULL;
 
+		uint32_t buf_size = LCD_H_RES * LCD_BUF_LINES * lv_color_format_get_size(lv_disp_get_color_format(my_disp));
+
+		buf1 = lv_malloc(buf_size);
+		if(buf1 == NULL) {
+			LV_LOG_ERROR("display draw buffer malloc failed");
+			return;
+		}
+		/* Allocate secondary buffer if needed */
 		...
+
+		lv_display_set_draw_buffers(my_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
+
+		ui_init(my_disp);
 
 		while(true) {
 			...
