@@ -1,15 +1,15 @@
 =============================
-ILI9341 LCD Controller driver
+ST7789 LCD Controller driver
 =============================
 
 Overview
 -------------
 
-The `ILI9341 <https://cdn-shop.adafruit.com/datasheets/ILI9341.pdf>`__ SOC is a popular TFT LCD controller chip made by Ilitek. It supports TFT LCD panels with a maximum resolution of 240x320 pixels, and 262k (18 bit) colors.
+The `ST7789 <>`__ SOC is a popular TFT LCD controller chip made by Sitronix. It supports TFT LCD panels with a maximum resolution of 240x320 pixels, and 262k (18 bit) colors.
 It supports both serial and parallel interfaces, including 3/4 line SPI, 8080 type 8/9/16/18 bit parallel, or 6/16/18 bit RGB interfaces. The chip includes display RAM,
 various voltage and timing generators. It has a MIPI DCS compatible register set.
 
-The ILI9341 LCD controller `driver <https://github.com/lvgl/lvgl/src/dev/display/ili9341>`__ is a platform-agnostic driver. It implements display initialization,
+The ST7789 LCD controller `driver <https://github.com/lvgl/lvgl/src/dev/display/st7789>`__ is a platform-agnostic driver. It implements display initialization,
 supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
 a command or pixel data to the controller via SPI or parallel bus. Typically these are implemented by calling the appropriate SDK library functions on the given platform.
 
@@ -21,11 +21,11 @@ There are no prerequisites.
 Configuring the driver
 ----------------------
 
-Enable the ILI9341 driver support in lv_conf.h, by cmake compiler define or by KConfig
+Enable the ST7789 driver support in lv_conf.h, by cmake compiler define or by KConfig
 
 .. code:: c
 
-	#define LV_USE_ILI9341  1
+	#define LV_USE_ST7789  1
 
 Usage
 -----
@@ -73,7 +73,7 @@ This is an example implementation on an STM32F746 using STM32CubeIDE and the ST 
 
 .. code:: c
 
-	#include "src/dev/display/ili9341/lv_ili9341.h"
+	#include "src/dev/display/st7789/lv_st7789.h"
 
 	#define LCD_H_RES		240
 	#define LCD_V_RES		320
@@ -170,7 +170,7 @@ This is an example implementation on an STM32F746 using STM32CubeIDE and the ST 
 			return;
 
 		/* Create the LVGL display object and the LCD display driver */
-		my_disp = lv_ili9341_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE, stm32_lcd_send_cmd, stm32_lcd_send_color);
+		my_disp = lv_st7789_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE, stm32_lcd_send_cmd, stm32_lcd_send_color);
 		
 		/* Set display orientation to landscape */
 		lv_display_set_rotation(my_disp, LV_DISPLAY_ROTATION_90);
@@ -207,8 +207,8 @@ Advanced topics
 Create flags
 ^^^^^^^^^^^^
 
-The third argument of the ``lv_ili9341_create()`` function is a flag array. This can be used to configure the orientation and RGB ordering of the panel if the default settings
-do not work for you. In particular, the ILI9341 driver accepts the following flags:
+The third argument of the ``lv_st7789_create()`` function is a flag array. This can be used to configure the orientation and RGB ordering of the panel if the default settings
+do not work for you. In particular, the ST7789 driver accepts the following flags:
 
 .. code:: c
 
@@ -240,9 +240,9 @@ a custom command list to the controller. The commands must be put into a 'uint8_
 	
 	...
 
-	lv_ili9341_send_cmd_list(my_disp, init_cmd_list);
+	lv_st7789_send_cmd_list(my_disp, init_cmd_list);
 	
 You can add a delay between the commands by using the pseudo-command ``LV_LCD_CMD_DELAY_MS``, which must be followed by the delay given in 10ms units.
 To terminate the command list use a delay with a value of ``LV_LCD_CMD_EOF``, as shown above.
 
-See an actual example `here <https://github.com/lvgl/lvgl/src/dev/display/ili9341/lv_ili9341.c>`__.
+See an actual example `here <https://github.com/lvgl/lvgl/src/dev/display/st7789/lv_st7789.c>`__.

@@ -6,3 +6,4 @@ Display
     :maxdepth: 2
 
     ili9341
+    st7789
