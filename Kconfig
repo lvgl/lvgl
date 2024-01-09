@@ -136,14 +136,6 @@ menu "LVGL configuration"
 			default 0x0
 			depends on LV_USE_BUILTIN_MALLOC
 
-		config LV_MEM_BUF_MAX_NUM
-			int "Number of the memory buffer"
-			default 16
-			help
-				Number of the intermediate memory buffer used during rendering and other
-				internal processing mechanisms.  You will see an error log message if
-				there wasn't enough buffers.
-
 	endmenu
 
 	menu "HAL Settings"
@@ -310,7 +302,7 @@ menu "LVGL configuration"
 					Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
 					The increase in memory consumption is (24 bits * object's width)
 
-			config LV_DISP_ROT_MAX_BUF
+			config LV_DISPLAY_ROT_MAX_BUF
 				int "Maximum buffer size to allocate for rotation"
 				default 10240
 				depends on LV_USE_DRAW_SW
@@ -615,9 +607,6 @@ menu "LVGL configuration"
 				bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
 				help
 					Set this option to configure IRAM as LV_ATTRIBUTE_FAST_MEM
-
-			config LV_USE_LARGE_COORD
-				bool "Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates instead of int16_t"
 		endmenu
 	endmenu
 
@@ -883,7 +872,7 @@ menu "LVGL configuration"
 			bool "Button matrix."
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_CANVAS
-			bool "Canvas. Dependencies: lv_img."
+			bool "Canvas. Dependencies: lv_image."
 			select LV_USE_IMAGE
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_CHECKBOX
@@ -968,7 +957,7 @@ menu "LVGL configuration"
 			bool "Chart."
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_IMAGEBUTTON
-			bool "Imgbtn."
+			bool "ImageButton."
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_OBSERVER
 			bool "Observer."
@@ -1234,14 +1223,14 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_IMGFONT
-			bool "draw img in label or span obj"
+			bool "draw image in label or span obj"
 			default n
 		config LV_IMGFONT_PATH_MAX_LEN
 			int "Imgfont image file path maximum length"
 			depends on LV_USE_IMGFONT
 			default 64
-		config LV_IMGFONT_USE_IMG_CACHE_HEADER
-			bool "Use img cache to buffer header information"
+		config LV_IMGFONT_USE_IMAGE_CACHE_HEADER
+			bool "Use image cache to buffer header information"
 			depends on LV_USE_IMGFONT
 			default n
 
@@ -1542,6 +1531,7 @@ menu "LVGL configuration"
 		config LV_USE_DEMO_VECTOR_GRAPHIC
 			bool "vector graphic demo"
 			default n
+			depends on LV_USE_VECTOR_GRAPHIC
 	endmenu
 
 endmenu
