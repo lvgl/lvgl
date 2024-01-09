@@ -70,10 +70,39 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent)
 
 void lv_calendar_header_dropdown_set_year_list(lv_obj_t * parent, const char * years_list)
 {
-    lv_obj_t * calendar_header = lv_obj_get_child(parent, 0);
-    lv_obj_t * year_dropdown = lv_obj_get_child(calendar_header, 0);
-    lv_dropdown_clear_options(year_dropdown);
-    lv_dropdown_set_options(year_dropdown, years_list);
+    bool child_found = false;
+    uint32_t idx = 0;
+    lv_obj_t * child = NULL;
+
+    const uint32_t calendar_child_count = lv_obj_get_child_count(parent);
+
+    /* Search for the header dropdown */
+    for(idx = 0; idx < calendar_child_count; idx++) {
+        child = lv_obj_get_child(parent, idx);
+        if(lv_obj_check_type(child, &lv_calendar_header_dropdown_class)) {
+            child_found = true;
+            break;
+        }
+    }
+
+    if(!child_found) return;
+
+    child_found = false;
+    const uint32_t header_child_count = lv_obj_get_child_count(child);
+
+    /* Search for the year dropdown */
+    for(idx = 0; idx < header_child_count; idx++) {
+        child = lv_obj_get_child(child, idx);
+        if(lv_obj_check_type(child, &lv_dropdown_class)) {
+            child_found = true;
+            break;
+        }
+    }
+
+    if(!child_found) return;
+
+    lv_dropdown_clear_options(child);
+    lv_dropdown_set_options(child, years_list);
 
     lv_obj_invalidate(parent);
 }
