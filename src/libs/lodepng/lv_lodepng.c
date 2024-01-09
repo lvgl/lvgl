@@ -167,7 +167,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 if(png_data != NULL) {
                     lv_free((void *)png_data);
                 }
-                LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
+                LV_LOG_WARN("error %" LV_PRIu32 ": %s\n", error, lodepng_error_text(error));
                 return LV_RESULT_INVALID;
             }
         }
