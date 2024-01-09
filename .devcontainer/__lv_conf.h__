@@ -241,10 +241,6 @@
  * Others
  *-----------*/
 
-/*Maximum buffer size to allocate for rotation.
- *Only used if software rotation is enabled in the display driver.*/
-#define LV_DISPLAY_ROT_MAX_BUF (10*1024)
-
 #define LV_ENABLE_GLOBAL_CUSTOM 0
 #if LV_ENABLE_GLOBAL_CUSTOM
     /*Header to include for the custom 'lv_global' function"*/

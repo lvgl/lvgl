@@ -302,13 +302,6 @@ menu "LVGL configuration"
 					Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
 					The increase in memory consumption is (24 bits * object's width)
 
-			config LV_DISPLAY_ROT_MAX_BUF
-				int "Maximum buffer size to allocate for rotation"
-				default 10240
-				depends on LV_USE_DRAW_SW
-				help
-					Only used if software rotation is enabled in the display driver.
-
 			config LV_USE_VECTOR_GRAPHIC
 				bool "Use Vector Graphic APIs"
 				default n
