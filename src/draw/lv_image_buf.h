@@ -22,22 +22,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_IMAGE_BUF_SIZE_TRUE_COLOR(w, h) ((LV_COLOR_DEPTH / 8) * (w) * (h))
-#define LV_IMAGE_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) ((LV_COLOR_DEPTH / 8) * (w) * (h))
-#define LV_IMAGE_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (_LV_COLOR_NATIVE_WITH_ALPHA_SIZE * (w) * (h))
-
-/*+ 1: to be sure no fractional row*/
-#define LV_IMAGE_BUF_SIZE_ALPHA_1BIT(w, h) (((((w) + 7) / 8) * (h)))
-#define LV_IMAGE_BUF_SIZE_ALPHA_2BIT(w, h) (((((w) + 3) / 4) * (h)))
-#define LV_IMAGE_BUF_SIZE_ALPHA_4BIT(w, h) (((((w) + 1 ) / 2) * (h)))
-#define LV_IMAGE_BUF_SIZE_ALPHA_8BIT(w, h) (((w) * (h)))
-
-/*4 * X: for palette*/
-#define LV_IMAGE_BUF_SIZE_INDEXED_1BIT(w, h) (LV_IMAGE_BUF_SIZE_ALPHA_1BIT((w), (h)) + 4 * 2)
-#define LV_IMAGE_BUF_SIZE_INDEXED_2BIT(w, h) (LV_IMAGE_BUF_SIZE_ALPHA_2BIT((w), (h)) + 4 * 4)
-#define LV_IMAGE_BUF_SIZE_INDEXED_4BIT(w, h) (LV_IMAGE_BUF_SIZE_ALPHA_4BIT((w), (h)) + 4 * 16)
-#define LV_IMAGE_BUF_SIZE_INDEXED_8BIT(w, h) (LV_IMAGE_BUF_SIZE_ALPHA_8BIT((w), (h)) + 4 * 256)
-
 #define _LV_ZOOM_INV_UPSCALE 5
 
 /** Magic number for lvgl image, 9 means lvgl version 9
@@ -76,7 +60,7 @@ typedef enum _lv_image_flags_t {
     LV_IMAGE_FLAGS_COMPRESSED       = (1 << 3),
 
     /**
-     * The image is alloced from heap, thus should be freed after use.
+     * The image is allocated from heap, thus should be freed after use.
      */
     LV_IMAGE_FLAGS_ALLOCATED        = (1 << 4),
 
