@@ -140,6 +140,10 @@
 
 /* Enable VG-Lite assert. */
 #define LV_VG_LITE_USE_ASSERT 0
+
+/* Simulate VG-Lite hardware using ThorVG */
+#define LV_USE_VG_LITE_THORVG  0
+
 #endif
 
 /*=================

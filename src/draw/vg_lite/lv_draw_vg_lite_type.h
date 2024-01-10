@@ -19,7 +19,12 @@ extern "C" {
 #if LV_USE_DRAW_VG_LITE
 
 #include "../lv_draw.h"
+
+#if LV_USE_VG_LITE_THORVG
+#include "../../dev/vg_lite_tvg/vg_lite.h"
+#else
 #include <vg_lite.h>
+#endif
 
 /*********************
  *      DEFINES
