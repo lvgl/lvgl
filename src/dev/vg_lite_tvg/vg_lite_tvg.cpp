@@ -487,16 +487,23 @@ extern "C" {
 
     vg_lite_error_t vg_lite_upload_buffer(vg_lite_buffer_t * buffer, uint8_t * data[3], uint32_t stride[3])
     {
+        LV_UNUSED(buffer);
+        LV_UNUSED(data);
+        LV_UNUSED(stride);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_map(vg_lite_buffer_t * buffer, vg_lite_map_flag_t flag, int32_t fd)
     {
+        LV_UNUSED(buffer);
+        LV_UNUSED(flag);
+        LV_UNUSED(fd);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_unmap(vg_lite_buffer_t * buffer)
     {
+        LV_UNUSED(buffer);
         return VG_LITE_NOT_SUPPORT;
     }
 
@@ -520,6 +527,7 @@ extern "C" {
                                  vg_lite_color_t color,
                                  vg_lite_filter_t filter)
     {
+        LV_UNUSED(filter);
         auto ctx = vg_lite_ctx::get_instance();
         canvas_set_target(ctx, target);
 
@@ -561,6 +569,7 @@ extern "C" {
                                       vg_lite_color_t color,
                                       vg_lite_filter_t filter)
     {
+        LV_UNUSED(filter);
         auto ctx = vg_lite_ctx::get_instance();
         TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
 
@@ -580,6 +589,8 @@ extern "C" {
 
     vg_lite_error_t vg_lite_init(int32_t tessellation_width, int32_t tessellation_height)
     {
+        LV_UNUSED(tessellation_width);
+        LV_UNUSED(tessellation_height);
 #ifdef LV_VG_LITE_THORVG_THREAD_RENDER
         /* Threads Count */
         auto threads = std::thread::hardware_concurrency();
@@ -690,6 +701,8 @@ extern "C" {
 
     vg_lite_error_t vg_lite_get_register(uint32_t address, uint32_t * result)
     {
+        LV_UNUSED(address);
+        LV_UNUSED(result);
         return VG_LITE_NOT_SUPPORT;
     }
 
@@ -782,11 +795,21 @@ extern "C" {
                                           vg_lite_float_t min_x, vg_lite_float_t min_y,
                                           vg_lite_float_t max_x, vg_lite_float_t max_y)
     {
+        LV_UNUSED(path);
+        LV_UNUSED(data_format);
+        LV_UNUSED(quality);
+        LV_UNUSED(path_length);
+        LV_UNUSED(path_data);
+        LV_UNUSED(min_x);
+        LV_UNUSED(min_y);
+        LV_UNUSED(max_x);
+        LV_UNUSED(max_y);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_clear_path(vg_lite_path_t * path)
     {
+        LV_UNUSED(path);
         return VG_LITE_NOT_SUPPORT;
     }
 
@@ -794,6 +817,9 @@ extern "C" {
                                              vg_lite_uint32_t count,
                                              vg_lite_format_t format)
     {
+        LV_UNUSED(opcode);
+        LV_UNUSED(count);
+        LV_UNUSED(format);
         return 0;
     }
 
@@ -802,11 +828,16 @@ extern "C" {
                                         void * data,
                                         uint32_t seg_count)
     {
+        LV_UNUSED(path);
+        LV_UNUSED(cmd);
+        LV_UNUSED(data);
+        LV_UNUSED(seg_count);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_upload_path(vg_lite_path_t * path)
     {
+        LV_UNUSED(path);
         return VG_LITE_NOT_SUPPORT;
     }
 
@@ -835,6 +866,10 @@ extern "C" {
                                          vg_lite_color_t color,
                                          vg_lite_filter_t filter)
     {
+        LV_UNUSED(pattern_mode);
+        LV_UNUSED(pattern_color);
+        LV_UNUSED(filter);
+
         auto ctx = vg_lite_ctx::get_instance();
         TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
 
@@ -1669,16 +1704,29 @@ Empty_sequence_handler:
                                              vg_lite_blend_t blend,
                                              vg_lite_filter_t filter)
     {
+        LV_UNUSED(target);
+        LV_UNUSED(path);
+        LV_UNUSED(fill_rule);
+        LV_UNUSED(path_matrix);
+        LV_UNUSED(grad);
+        LV_UNUSED(paint_color);
+        LV_UNUSED(blend);
+        LV_UNUSED(filter);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_command_buffer_size(uint32_t size)
     {
+        LV_UNUSED(size);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_scissor(int32_t x, int32_t y, int32_t right, int32_t bottom)
     {
+        LV_UNUSED(x);
+        LV_UNUSED(y);
+        LV_UNUSED(right);
+        LV_UNUSED(bottom);
         return VG_LITE_NOT_SUPPORT;
     }
 
@@ -1700,21 +1748,27 @@ Empty_sequence_handler:
 
     vg_lite_error_t vg_lite_source_global_alpha(vg_lite_global_alpha_t alpha_mode, uint8_t alpha_value)
     {
+        LV_UNUSED(alpha_mode);
+        LV_UNUSED(alpha_value);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_dest_global_alpha(vg_lite_global_alpha_t alpha_mode, uint8_t alpha_value)
     {
+        LV_UNUSED(alpha_mode);
+        LV_UNUSED(alpha_value);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_color_key(vg_lite_color_key4_t colorkey)
     {
+        LV_UNUSED(colorkey);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_flexa_stream_id(uint8_t stream_id)
     {
+        LV_UNUSED(stream_id);
         return VG_LITE_NOT_SUPPORT;
     }
 
@@ -1723,6 +1777,10 @@ Empty_sequence_handler:
                                                                 uint32_t background_segment_count,
                                                                 uint32_t background_segment_size)
     {
+        LV_UNUSED(stream_id);
+        LV_UNUSED(buffer);
+        LV_UNUSED(background_segment_count);
+        LV_UNUSED(background_segment_size);
         return VG_LITE_NOT_SUPPORT;
     }
 
@@ -1753,11 +1811,15 @@ Empty_sequence_handler:
 
     vg_lite_error_t vg_lite_set_tess_buffer(uint32_t physical, uint32_t size)
     {
+        LV_UNUSED(physical);
+        LV_UNUSED(size);
         return VG_LITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_command_buffer(uint32_t physical, uint32_t size)
     {
+        LV_UNUSED(physical);
+        LV_UNUSED(size);
         return VG_LITE_NOT_SUPPORT;
     }
 } /* extern "C" */

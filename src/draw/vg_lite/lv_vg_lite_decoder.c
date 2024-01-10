@@ -270,8 +270,8 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     LV_UNUSED(decoder); /*Unused*/
 
     lv_color_format_t cf = dsc->header.cf;
-    int32_t width = dsc->header.w;
-    int32_t height = dsc->header.h;
+    uint32_t width = dsc->header.w;
+    uint32_t height = dsc->header.h;
     const char * path = dsc->src;
 
     lv_fs_file_t file;

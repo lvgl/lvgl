@@ -109,7 +109,7 @@ vg_lite_error_t vg_lite_scale(vg_lite_float_t scale_x, vg_lite_float_t scale_y, 
 vg_lite_error_t vg_lite_rotate(vg_lite_float_t degrees, vg_lite_matrix_t * matrix)
 {
     /* Convert degrees into radians. */
-    vg_lite_float_t angle = degrees / 180.0f * M_PI;
+    vg_lite_float_t angle = (vg_lite_float_t)(degrees / 180.0f * M_PI);
 
     /* Compuet cosine and sine values. */
     vg_lite_float_t cos_angle = cosf(angle);
