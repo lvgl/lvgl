@@ -184,7 +184,7 @@ static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
 
 void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
 {
-    if(LV_RESULT_INVALID == LV_DRAW_SW_RGB565_SWAP(buf, buf_size_px)) {
+    if(LV_DRAW_SW_RGB565_SWAP(buf, buf_size_px) == LV_RESULT_OK) return;
         uint32_t u32_cnt = buf_size_px / 2;
         uint16_t * buf16 = buf;
         uint32_t * buf32 = buf;
