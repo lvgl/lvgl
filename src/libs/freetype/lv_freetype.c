@@ -411,16 +411,6 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 
     node->ref_size = LV_FREETYPE_OUTLINE_REF_SIZE_DEF;
 
-    if(node->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
-        FT_F26Dot6 pixel_size = FT_INT_TO_F26DOT6(node->ref_size);
-        error = FT_Set_Char_Size(face, 0, pixel_size, 0, 0);
-        if(error) {
-            FT_Done_Face(face);
-            FT_ERROR_MSG("FT_Set_Char_Size", error);
-            return false;
-        }
-    }
-
     if(node->style & LV_FREETYPE_FONT_STYLE_ITALIC) {
         lv_freetype_italic_transform(face);
     }
