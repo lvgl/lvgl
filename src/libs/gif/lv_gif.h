@@ -35,7 +35,7 @@ typedef struct {
     uint32_t last_call;
 } lv_gif_t;
 
-extern const lv_obj_class_t lv_gif_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gif_class;
 
 /**********************
  * GLOBAL PROTOTYPES

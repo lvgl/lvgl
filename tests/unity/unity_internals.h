@@ -684,15 +684,15 @@ UNITY_INTERNAL_PTR UnityDoubleToPtr(const double num);
  * Error Strings We Might Need
  *-------------------------------------------------------*/
 
-extern const char UnityStrOk[];
-extern const char UnityStrPass[];
-extern const char UnityStrFail[];
-extern const char UnityStrIgnore[];
+LV_ATTRIBUTE_EXTERN_DATA extern const char UnityStrOk[];
+LV_ATTRIBUTE_EXTERN_DATA extern const char UnityStrPass[];
+LV_ATTRIBUTE_EXTERN_DATA extern const char UnityStrFail[];
+LV_ATTRIBUTE_EXTERN_DATA extern const char UnityStrIgnore[];
 
-extern const char UnityStrErrFloat[];
-extern const char UnityStrErrDouble[];
-extern const char UnityStrErr64[];
-extern const char UnityStrErrShorthand[];
+LV_ATTRIBUTE_EXTERN_DATA extern const char UnityStrErrFloat[];
+LV_ATTRIBUTE_EXTERN_DATA extern const char UnityStrErrDouble[];
+LV_ATTRIBUTE_EXTERN_DATA extern const char UnityStrErr64[];
+LV_ATTRIBUTE_EXTERN_DATA extern const char UnityStrErrShorthand[];
 
 /*-------------------------------------------------------
  * Test Running Macros
