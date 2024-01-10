@@ -421,6 +421,8 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 }
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)
 {
+    FT_Done_Face(node->face);
+
     if(node->glyph_cache) {
         lv_cache_destroy(node->glyph_cache, user_data);
         node->glyph_cache = NULL;
