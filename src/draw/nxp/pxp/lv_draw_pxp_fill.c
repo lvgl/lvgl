@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2020-2023 NXP
+ * Copyright 2020-2024 NXP
  *
  * SPDX-License-Identifier: MIT
  */
