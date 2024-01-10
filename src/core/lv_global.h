@@ -205,7 +205,7 @@ typedef struct _lv_global_t {
 #endif
 #define LV_GLOBAL_DEFAULT() LV_GLOBAL_CUSTOM()
 #else
-extern lv_global_t lv_global;
+LV_ATTRIBUTE_EXTERN_DATA extern lv_global_t lv_global;
 #define LV_GLOBAL_DEFAULT() (&lv_global)
 #endif
 

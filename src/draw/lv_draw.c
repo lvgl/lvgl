@@ -87,6 +87,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
     lv_draw_task_t * new_task = lv_malloc_zeroed(sizeof(lv_draw_task_t));
 
     new_task->area = *coords;
+    new_task->_real_area = *coords;
     new_task->clip_area = layer->_clip_area;
     new_task->state = LV_DRAW_TASK_STATE_QUEUED;
 
@@ -285,17 +286,17 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 {
     LV_PROFILER_BEGIN;
     /*If the first task is screen sized, there cannot be independent areas*/
-    //    if(layer->draw_task_head) {
-    //        int32_t hor_res = lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
-    //        int32_t ver_res = lv_display_get_vertical_resolution(_lv_refr_get_disp_refreshing());
-    //        lv_draw_task_t * t = layer->draw_task_head;
-    //        if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
-    //           t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
-    //           t->area.y1 <= 0 && t->area.y2 >= ver_res - 1) {
-    //            LV_PROFILER_END;
-    //            return NULL;
-    //        }
-    //    }
+    if(layer->draw_task_head) {
+        int32_t hor_res = lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
+        int32_t ver_res = lv_display_get_vertical_resolution(_lv_refr_get_disp_refreshing());
+        lv_draw_task_t * t = layer->draw_task_head;
+        if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
+           t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
+           t->area.y1 <= 0 && t->area.y2 >= ver_res - 1) {
+            LV_PROFILER_END;
+            return NULL;
+        }
+    }
 
     lv_draw_task_t * t = t_prev ? t_prev->next : layer->draw_task_head;
     while(t) {
@@ -427,7 +428,7 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
     while(t && t != t_check) {
         if(t->state != LV_DRAW_TASK_STATE_READY) {
             lv_area_t a;
-            if(_lv_area_intersect(&a, &t->area, &t_check->area)) {
+            if(_lv_area_intersect(&a, &t->_real_area, &t_check->_real_area)) {
                 LV_PROFILER_END;
                 return false;
             }

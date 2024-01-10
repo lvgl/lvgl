@@ -84,7 +84,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                                 lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
     if(glyph_draw_dsc) {
-        if(glyph_draw_dsc->bitmap == NULL) {
+        if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_INVALID) {
 #if LV_USE_FONT_PLACEHOLDER
             /* Draw a placeholder rectangle*/
             lv_draw_border_dsc_t border_draw_dsc;
@@ -107,11 +107,15 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                 return;
             lv_area_move(&blend_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
-            const uint8_t * mask_buf = glyph_draw_dsc->bitmap;
+            const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
+            const uint8_t * mask_buf = draw_buf->data;
             lv_area_t mask_area;
             lv_area_copy(&mask_area, glyph_draw_dsc->letter_coords);
             lv_area_move(&mask_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
+            /**
+             * @todo check if we can use draw_buf->header.stride directly.
+             */
             uint32_t mask_stride = lv_draw_buf_width_to_stride(
                                        lv_area_get_width(glyph_draw_dsc->letter_coords),
                                        LV_COLOR_FORMAT_A8);
@@ -142,7 +146,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
             img_dsc.angle = 0;
             img_dsc.zoom = LV_ZOOM_NONE;
             img_dsc.opa = glyph_draw_dsc->opa;
-            img_dsc.src = glyph_draw_dsc->bitmap;
+            img_dsc.src = glyph_draw_dsc->glyph_data;
             lv_draw_vglite_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
 #endif
         }

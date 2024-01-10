@@ -445,7 +445,7 @@ static inline void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a)
 #include "lv_palette.h"
 #include "lv_color_op.h"
 
-extern const lv_color_filter_dsc_t lv_color_filter_shade;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_color_filter_dsc_t lv_color_filter_shade;
 
 #ifdef __cplusplus
 } /*extern "C"*/

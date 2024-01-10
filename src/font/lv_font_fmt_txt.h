@@ -216,13 +216,13 @@ typedef struct {
 
 /**
  * Used as `get_glyph_bitmap` callback in lvgl's native font format if the font is uncompressed.
- * @param font              pointer to font
- * @param unicode_letter    a unicode letter whose bitmap should be get
- * @param bitmap_out        pointer to an array to store the output A8 bitmap
+ * @param g_dsc         the glyph descriptor including which font to use etc.
+ * @param letter        a UNICODE character code
+ * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
  * @return pointer to an A8 bitmap (not necessarily bitmap_out) or NULL if `unicode_letter` not found
  */
-const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
-                                           uint8_t * bitmap_out);
+const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
+                                        lv_draw_buf_t * draw_buf);
 
 /**
  * Used as `get_glyph_dsc` callback in lvgl's native font format if the font is uncompressed.

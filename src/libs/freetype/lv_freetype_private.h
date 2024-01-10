@@ -120,20 +120,18 @@ lv_freetype_context_t * lv_freetype_get_context(void);
  */
 FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc);
 
-lv_cache_t * lv_freetype_glyph_cache_create(void);
-
-bool lv_freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
-                                  uint32_t unicode_letter_next);
-
-bool lv_freetype_on_font_create(lv_freetype_font_dsc_t * dsc);
-
 void lv_freetype_italic_transform(FT_Face face);
 
 const char * lv_freetype_get_pathname(FTC_FaceID face_id);
 
-bool lv_freetype_image_font_create(lv_freetype_font_dsc_t * dsc);
+lv_cache_t * lv_freetype_create_glyph_cache(void);
+void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc);
 
-bool lv_freetype_outline_font_create(lv_freetype_font_dsc_t * dsc);
+lv_cache_t * lv_freetype_create_draw_data_image(void);
+void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc);
+
+lv_cache_t * lv_freetype_create_draw_data_outline(void);
+void lv_freetype_set_cbs_outline_font(lv_freetype_font_dsc_t * dsc);
 
 /**********************
  *      MACROS
