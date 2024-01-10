@@ -10,6 +10,7 @@ import doc_builder  # NOQA
 generator = CGenerator()
 
 doc_builder.EMIT_WARNINGS = False
+# doc_builder.DOXYGEN_OUTPUT = False
 
 
 BASIC_TYPES = [

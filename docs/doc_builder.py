@@ -2,7 +2,6 @@ import os
 import sys
 from xml.etree import ElementTree as ET
 
-
 base_path = ''
 xml_path = ''
 
@@ -346,12 +345,55 @@ class NAMESPACE(object):
     def __init__(self, parent, refid, name, **_):
         if name in namespaces:
             self.__dict__.update(namespaces[name].__dict__)
-            return
+        else:
+            namespaces[name] = self
+            self.parent = parent
+            self.refid = refid
+            self.name = name
+            self.description = None
+            self.line_no = None
+            self.file_name = None
+            self.enums = []
+            self.funcs = []
+            self.vars = []
+            self.typedefs = []
+            self.structs = []
+            self.unions = []
+            self.classes = []
 
-        namespaces[name] = self
-        self.parent = parent
-        self.refid = refid
-        self.name = name
+        # root = load_xml(refid)
+        #
+        # for compounddef in root:
+        #     if compounddef.attrib['id'] != refid:
+        #         continue
+        #
+        #     for sectiondef in compounddef:
+        #         if sectiondef.tag != 'sectiondef':
+        #             continue
+        #
+        #         enum
+        #         typedef
+        #         func
+        #         struct
+        #         union
+        #
+        #
+        #         cls = globals()[sectiondef.attrib['kind'].upper()]
+        #         if cls == ENUM:
+        #             if sectiondef[0].text:
+        #                 sectiondef.attrib['name'] = sectiondef[0].text.strip()
+        #                 enums_.append(cls(self, **sectiondef.attrib))
+        #             else:
+        #                 sectiondef.attrib['name'] = None
+        #                 enums_.append(cls(self, **sectiondef.attrib))
+        #
+        #         elif cls == ENUMVALUE:
+        #             if enums_[-1].is_member(sectiondef):
+        #                 enums_[-1].add_member(sectiondef)
+        #
+        #         else:
+        #             sectiondef.attrib['name'] = sectiondef[0].text.strip()
+        #             cls(self, **sectiondef.attrib)
 
     def __str__(self):
         return self.template.format(name=self.name)
@@ -363,6 +405,30 @@ class FUNC_ARG(object):
         self.name = name
         self.type = type
         self.description = None
+
+
+groups = {}
+
+
+class GROUP(object):
+    template = '''\
+.. doxygengroup:: {name}
+    :project: lvgl
+'''
+
+    def __init__(self, parent, refid, name, **_):
+        if name in groups:
+            self.__dict__.update(functions[name].__dict__)
+        else:
+            functions[name] = self
+            self.parent = parent
+            self.refid = refid
+            self.name = name
+            self.description = None
+
+    def __str__(self):
+        return self.template.format(name=self.name)
+
 
 
 class FUNCTION(object):
@@ -404,6 +470,9 @@ class FUNCTION(object):
                         continue
 
                     for memberdef in child:
+                        if 'id' not in memberdef.attrib:
+                            continue
+
                         if memberdef.attrib['id'] == refid:
                             break
                     else:
@@ -614,6 +683,9 @@ class ENUM(object):
                         continue
 
                     for memberdef in child:
+                        if 'id' not in memberdef.attrib:
+                            continue
+
                         if memberdef.attrib['id'] == refid:
                             break
                     else:
@@ -625,7 +697,8 @@ class ENUM(object):
 
                 break
             else:
-                raise RuntimeError('not able to locate enum')
+                return
+                # raise RuntimeError(f'not able to locate enum {name} ({refid})')
 
             for element in memberdef:
                 if element.tag == 'location':
@@ -828,6 +901,9 @@ class TYPEDEF(object):
                         continue
 
                     for memberdef in child:
+                        if 'id' not in memberdef.attrib:
+                            continue
+
                         if memberdef.attrib['id'] == refid:
                             break
                     else:
@@ -1097,10 +1173,7 @@ class XMLSearch(object):
         os.environ['LVGL_URLPATH'] = urlpath
         os.environ['LVGL_GITCOMMIT'] = gitcommit
 
-        print("Running doxygen")
-        result = os.system(f'cd "{temp_directory}" && doxygen Doxyfile')
-        if result != 0:
-            sys.exit(result)
+        subprocess.getoutput(f'cd "{temp_directory}" && doxygen Doxyfile')
 
         xml_path = os.path.join(temp_directory, 'xml')
 
