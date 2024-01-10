@@ -101,7 +101,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
 
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(glyph_cache, &search_key, dsc);
     if(entry == NULL) {
-        LV_LOG_ERROR("glyph lookup failed for unicode = %u", unicode_letter);
+        LV_LOG_ERROR("glyph lookup failed for unicode = 0x%" LV_PRIx32, unicode_letter);
         return false;
     }
     lv_freetype_glyph_cache_data_t * data = lv_cache_entry_get_data(entry);

@@ -128,7 +128,7 @@ static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, 
         return false;
     }
 
-    LV_LOG_INFO("glyph_index = %u", node->glyph_index);
+    LV_LOG_INFO("glyph_index = 0x%" LV_PRIx32, (uint32_t)node->glyph_index);
 
     node->outline = outline;
     return true;
@@ -195,7 +195,7 @@ static lv_cache_entry_t * lv_freetype_outline_lookup(lv_freetype_font_dsc_t * ds
 
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(cache_node->draw_data_cache, &tmp_node, dsc);
     if(!entry) {
-        LV_LOG_ERROR("glyph outline lookup failed for glyph_index = %u", glyph_index);
+        LV_LOG_ERROR("glyph outline lookup failed for glyph_index = 0x%" LV_PRIx32, (uint32_t)glyph_index);
         return NULL;
     }
     return entry;
