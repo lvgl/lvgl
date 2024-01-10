@@ -3,26 +3,13 @@
 import sys
 from pycparser import c_ast  # NOQA
 from pycparser.c_generator import CGenerator
-import tempfile
-
-temp_directory = tempfile.mkdtemp(suffix='.lvgl_json')
+from collections import OrderedDict
 
 import doc_builder  # NOQA
 
 generator = CGenerator()
 
 doc_builder.EMIT_WARNINGS = False
-
-docs = doc_builder.XMLSearch(temp_directory)
-
-get_enum_item_docs = docs.get_enum_item
-get_enum_docs = docs.get_enum
-get_func_docs = docs.get_function
-get_var_docs = docs.get_variable
-get_union_docs = docs.get_union
-get_struct_docs = docs.get_structure
-get_typedef_docs = docs.get_typedef
-get_macro_docs = docs.get_macro
 
 
 BASIC_TYPES = [
@@ -120,11 +107,13 @@ class ArrayDecl(c_ast.ArrayDecl):
             res['dim'] = dim
             return res
 
-        return {
-            'type': self.type.to_dict(),
-            'dim': dim,
-            'json_type': 'array'
-        }
+        res = OrderedDict([
+            ('type', self.type.to_dict()),
+            ('json_type', 'array'),
+            ('dim', dim)
+        ])
+
+        return res
 
 
 class Constant(c_ast.Constant):
@@ -155,29 +144,12 @@ class Constant(c_ast.Constant):
 collected_types = []
 
 forward_decls = {}
-used_forward_decl = []
 
 
 class Decl(c_ast.Decl):
 
     def process(self):
         self.type.process()
-
-        if (
-            not isinstance(self.parent, (Struct, Union, FuncDecl)) and
-            not isinstance(self.type, (Enum, FuncDef, FuncDecl))
-        ):
-            name = self.name
-            t_name = self.type.name
-
-            if name is None:
-                name = t_name
-
-            if name == t_name:
-                if isinstance(self.type, (Struct, Union)):
-                    if name not in forward_decls:
-                        res = self.type.to_dict()
-                        forward_decls[name] = res
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -214,19 +186,18 @@ class Decl(c_ast.Decl):
             else:
                 bitsize = None
 
-            res = {
-                'name': name,
-                'json_type': 'field',
-                'type': self.type.to_dict(),
-                'bitsize': bitsize
-            }
+            res = OrderedDict([
+                ('name', name),
+                ('type', self.type.to_dict()),
+                ('json_type', 'field'),
+                ('bitsize', bitsize)
+            ])
         elif isinstance(self.parent, FuncDecl):
-            res = {
-                'name': name,
-                'json_type': 'arg',
-                'type': self.type.to_dict()
-            }
-
+            res = OrderedDict([
+                ('name', name),
+                ('type', self.type.to_dict()),
+                ('json_type', 'arg'),
+            ])
         elif isinstance(self.type, Enum):
             res = self.type.to_dict()
             res['name'] = name
@@ -236,39 +207,37 @@ class Decl(c_ast.Decl):
             res['name'] = name
 
         else:
-            name = self.name
-            t_name = self.type.name
+            if isinstance(self.type, (Struct, Union)):
+                res = self.type.to_dict()
 
-            if name is None:
-                name = t_name
+                if res['json_type'] == 'forward_decl':
+                    if res['name'] and res['name'] not in forward_decls:
+                        forward_decls[res['name']] = res
 
-            if name == t_name:
-                if isinstance(self.type, (Struct, Union)):
-                    if name in used_forward_decl:
-                        if name in forward_decls:
-                            res = forward_decls[name]
-                            del forward_decls[name]
-                        else:
-                            res = None
-                    else:
-                        used_forward_decl.append(name)
-                        res = {
-                            'name': self.name,
-                            'json_type': 'forward_decl',
-                            'type': {
-                                'name': self.type.__class__.__name__.lower(),
-                                'json_type': 'primitive_type'
-                            }
-                        }
+                    return None
 
-                    return res
-            # raise RuntimeError('sanity check')
+                return res
 
-            res = {
-                'name': name,
-                'json_type': str(type(self)),
-                'type': self.type.to_dict()
-            }
+            if self.name:
+                name = self.name
+            else:
+                name = self.type.name
+
+            doc_search = get_var_docs(name)
+
+            if doc_search is None:
+                docstring = None
+            else:
+                docstring = doc_search.description
+
+            res = OrderedDict([
+                ('name', name),
+                ('type', self.type.to_dict()),
+                ('json_type', 'variable'),
+                ('docstring', docstring),
+                ('quals', self.quals),
+                ('storage', self.storage)
+            ])
 
         return res
 
@@ -294,14 +263,14 @@ class EllipsisParam(c_ast.EllipsisParam):
         if is_lib_c_node(self):
             return None
 
-        return {
-            'name': '...',
-            'type': {
-                'name': 'ellipsis',
-                'json_type': 'special_type'
-            },
-            'json_type': 'arg'
-        }
+        res = OrderedDict([
+            ('name', '...'),
+            ('type', OrderedDict([('name', 'ellipsis'), ('json_type', 'special_type')])),
+            ('json_type', 'arg'),
+            ('docstring', None)
+        ])
+
+        return res
 
     @property
     def name(self):
@@ -348,23 +317,19 @@ class Enum(c_ast.Enum):
             doc_search = get_enum_docs(self.name)
 
             if doc_search is None:
-                doctsring = None
+                docstring = None
             else:
                 docstring = doc_search.description
-
         else:
             docstring = None
 
-        res = {
-            'name': self.name,
-            'type': {
-                'name': 'int',
-                'json_type': 'primitive_type'
-            },
-            'json_type': 'enum',
-            'members': [item.to_dict() for item in (self.values or [])],
-            'docstring': docstring
-        }
+        res = OrderedDict([
+            ('name', self.name),
+            ('type', OrderedDict([('name', 'int'), ('json_type', 'primitive_type')])),
+            ('json_type', 'enum'),
+            ('docstring', docstring),
+            ('members', [item.to_dict() for item in (self.values or [])])
+        ])
 
         return res
 
@@ -400,31 +365,16 @@ class Enumerator(c_ast.Enumerator):
 
         if parent_name and parent_name.startswith('_'):
             if parent_name[1:] in collected_types:
-                type_ = {
-                    'name': parent_name[1:],
-                    'json_type': 'lv_type'
-                }
+                type_ = OrderedDict([('name', parent_name[1:]), ('json_type', 'lvgl_type')])
             elif parent_name in collected_types:
-                type_ = {
-                    'name': parent_name,
-                    'json_type': 'lv_type'
-                }
+                type_ = OrderedDict([('name', parent_name), ('json_type', 'lvgl_type')])
             else:
-                type_ = {
-                    'name': 'int',
-                    'json_type': 'primitive_type'
-                }
+                type_ = OrderedDict([('name', 'int'), ('json_type', 'primitive_type')])
 
         elif parent_name and parent_name in collected_types:
-            type_ = {
-                'name': parent_name,
-                'json_type': 'lv_type'
-            }
+            type_ = OrderedDict([('name',parent_name), ('json_type', 'lvgl_type')])
         else:
-            type_ = {
-                'name': 'int',
-                'json_type': 'primitive_type'
-            }
+            type_ = OrderedDict([('name', 'int'), ('json_type', 'primitive_type')])
 
         doc_search = get_enum_item_docs(self.name)
 
@@ -433,12 +383,14 @@ class Enumerator(c_ast.Enumerator):
         else:
             docstring = doc_search.description
 
-        return {
-            'name': self.name,
-            'type': type_,
-            'json_type': 'enum_member',
-            'docstring': docstring
-        }
+        res = OrderedDict([
+            ('name', self.name),
+            ('type', type_),
+            ('json_type', 'enum_member'),
+            ('docstring', docstring)
+        ])
+
+        return res
 
 
 class EnumeratorList(c_ast.EnumeratorList):
@@ -479,12 +431,45 @@ def is_type(obj, type_):
 
 found_types = {}
 
+get_enum_item_docs = None
+get_enum_docs = None
+get_func_docs = None
+get_var_docs = None
+get_union_docs = None
+get_struct_docs = None
+get_typedef_docs = None
+get_macro_docs = None
+get_macros = None
+
 
 class FileAST(c_ast.FileAST):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._parent = None
+
+    def setup_docs(self, temp_directory):
+        global get_enum_item_docs
+        global get_enum_docs
+        global get_func_docs
+        global get_var_docs
+        global get_union_docs
+        global get_struct_docs
+        global get_typedef_docs
+        global get_macro_docs
+        global get_macros
+
+        docs = doc_builder.XMLSearch(temp_directory)
+
+        get_enum_item_docs = docs.get_enum_item
+        get_enum_docs = docs.get_enum
+        get_func_docs = docs.get_function
+        get_var_docs = docs.get_variable
+        get_union_docs = docs.get_union
+        get_struct_docs = docs.get_structure
+        get_typedef_docs = docs.get_typedef
+        get_macro_docs = docs.get_macro
+        get_macros = docs.get_macros
 
     @property
     def name(self):
@@ -518,131 +503,87 @@ class FileAST(c_ast.FileAST):
         structures = []
         unions = []
         typedefs = []
+        variables = []
 
         for item in items:
             item.process()
-            if is_type(item, Enum):
+            if is_type(item, Typedef):
+                typedefs.append(item)
+            elif is_type(item, Enum):
                 enums.append(item)
             elif is_type(item, FuncDef):
+                functions.append(item)
+            elif is_type(item, FuncDecl):
                 functions.append(item)
             elif is_type(item, Struct):
                 structures.append(item)
             elif is_type(item, Union):
                 unions.append(item)
-            elif is_type(item, Typedef):
-                if item.is_struct:
-                    structures.append(item.type)
-                if item.is_union:
-                    unions.append(item.type)
-                typedefs.append(item)
-
-            # elif is_type(item, Macro):
-            #     macros = {}
-
-        used_enum_names = []
-        used_func_names = []
-        used_struct_names = []
-        used_union_names = []
-        used_typedef_names = []
+            elif is_type(item, Decl):
+                variables.append(item)
+            else:
+                print('UNKNOWN TYPE:')
+                print(item)
+                print(item.to_dict())
 
         res = {
-            'enums': [],
-            'functions': [],
-            'structures': [],
-            'unions': [],
-            'typedefs': []
+            'enums': [
+                enum.to_dict()
+                for enum in enums
+                if enum is not None and enum.to_dict() is not None
+            ],
+            'functions': [
+                func.to_dict()
+                for func in functions
+                if func is not None and func.to_dict() is not None
+            ],
+            'structures': [
+                struct.to_dict()
+                for struct in structures
+                if struct is not None and struct.to_dict() is not None
+            ],
+            'unions': [
+                union.to_dict()
+                for union in unions
+                if union is not None and union.to_dict() is not None
+            ],
+            'variables': [
+                var.to_dict()
+                for var in variables
+                if var is not None and var.to_dict() is not None
+            ],
+            'typedefs': [],
+            'forward_decls': list(forward_decls.values()),
+            'macros': []
         }
-
-        def _file_obj(obj):
-            type_ = obj['json_type']
-            print(type_)
-            try:
-                if type_ == 'enum':
-                    if obj['name'] not in used_enum_names:
-                        used_enum_names.append(obj['name'])
-                        res['enums'].append(obj)
-            except TypeError:
-                print(obj)
-                raise
-
-            if type_ == 'function':
-                if obj['name'] not in used_func_names:
-                    used_func_names.append(obj['name'])
-                    res['functions'].append(obj)
-
-            if type_ == 'union':
-                if obj['name'] not in used_union_names:
-                    used_union_names.append(obj['name'])
-                    res['unions'].append(obj)
-
-            if type_ == 'struct':
-                if obj['name'] not in used_struct_names:
-                    used_struct_names.append(obj['name'])
-                    res['structures'].append(obj)
-
-            if type_ == 'typedef':
-                if obj['name'] not in used_typedef_names:
-                    used_typedef_names.append(obj['name'])
-                    res['typedefs'].append(obj)
-
-        for enum in enums:
-            if enum is None:
-                continue
-            enum = enum.to_dict()
-            if enum is None:
-                continue
-
-            _file_obj(enum)
-
-        for struct in structures:
-            if struct is None:
-                continue
-            struct = struct.to_dict()
-            if struct is None:
-                continue
-
-            _file_obj(struct)
-
-        for union in unions:
-            if union is None:
-                continue
-            union = union.to_dict()
-            if union is None:
-                continue
-
-            _file_obj(union)
 
         for typedef in typedefs:
             if typedef is None:
                 continue
 
-            if typedef.is_struct:
-                s = typedef.get_struct_union()
-
-
-                if s['name'] and s['name'] not in used_struct_names:
-                    _file_obj(s)
-
-            elif typedef.is_union:
-                u = typedef.get_struct_union()
-
-                if u['name'] and u['name'] not in used_union_names:
-                    _file_obj(u)
-
             typedef = typedef.to_dict()
             if typedef is None:
                 continue
 
-            _file_obj(typedef)
+            if isinstance(typedef, list):
+                typedef, obj_dict = typedef
+                if obj_dict['json_type'] == 'struct':
+                    res['structures'].append(obj_dict)
+                elif obj_dict['json_type'] == 'union':
+                    res['unions'].append(obj_dict)
+                elif obj_dict['json_type'] == 'enum':
+                    res['enums'].append(obj_dict)
 
-        for function in functions:
-            if function is None:
-                continue
-            function = function.to_dict()
-            if function is None:
-                continue
+            res['typedefs'].append(typedef)
 
-            _file_obj(function)
+        for macro in get_macros():
+            macro_type = OrderedDict([
+                ('name', macro.name),
+                ('json_type', 'macro'),
+                ('docstring', macro.description)
+            ])
+
+            res['macros'].append(macro_type)
 
         return res
 
@@ -701,20 +642,47 @@ class FuncDecl(c_ast.FuncDecl):
 
         if self.name:
             doc_search = get_func_docs(self.name)
-
             if doc_search is None:
                 docstring = None
+                ret_docstring = None
             else:
                 docstring = doc_search.description
-        docstring = None
+                ret_docstring = doc_search.res_description
 
-        res = {
-            'name': self.name,
-            'args': [arg.to_dict() for arg in (self.args or [])],
-            'json_type': 'function',
-            'type': self.type.to_dict(),
-            'docstring': docstring
-        }
+        else:
+            doc_search = None
+            docstring = None
+            ret_docstring = None
+
+        args = []
+
+        for arg in (self.args or []):
+            arg = arg.to_dict()
+            if arg['name'] and doc_search is not None:
+                for doc_arg in doc_search.args:
+                    if doc_arg.name == arg['name']:
+                        arg['docstring'] = doc_arg.description
+                        break
+                else:
+                    arg['docstring'] = None
+            else:
+                arg['docstring'] = None
+
+            args.append(arg)
+
+        type_dict = OrderedDict([
+            ('type', self.type.to_dict()),
+            ('json_type', 'ret_type'),
+            ('docstring', ret_docstring)
+        ])
+
+        res = OrderedDict([
+            ('name', self.name),
+            ('type', type_dict),
+            ('json_type', 'function'),
+            ('docstring', docstring),
+            ('args', args)
+        ])
 
         return res
 
@@ -777,17 +745,19 @@ class IdentifierType(c_ast.IdentifierType):
         elif name in STDLIB_TYPES:
             json_type = 'stdlib_type'
         elif name in collected_types:
-            json_type = 'lv_type'
+            json_type = 'lvgl_type'
         elif name.startswith('_') and name[1:] in collected_types:
             name = name[1:]
-            json_type = 'lv_type'
+            json_type = 'lvgl_type'
         else:
             json_type = 'unknown_type'
 
-        return {
-            'name': name,
-            'json_type': json_type
-        }
+        res = OrderedDict([
+            ('name', name),
+            ('json_type', json_type),
+        ])
+
+        return res
 
 
 class ParamList(c_ast.ParamList):
@@ -836,10 +806,17 @@ class PtrDecl(c_ast.PtrDecl):
         self.type.parent = self
 
     def to_dict(self):
-        res = {
-            'json_type': 'pointer',
-            'type': self.type.to_dict()
-        }
+        if isinstance(self.type, FuncDecl):
+            res = OrderedDict([
+                ('type', self.type.to_dict()),
+                ('json_type', 'poifunction_pointerter')
+            ])
+
+        else:
+            res = OrderedDict([
+                ('type', self.type.to_dict()),
+                ('json_type', 'pointer')
+            ])
 
         return res
 
@@ -875,30 +852,66 @@ class Struct(c_ast.Struct):
             decl.parent = self
 
     def to_dict(self):
+        if not self.decls:
+            name = self.name
+            if not name:
+                self.name = self.parent.name
 
-        if self.name:
-            doc_search = get_struct_docs(self.name)
-
-            if doc_search is None:
+            if name:
+                struct_doc = get_struct_docs(name)
+                if struct_doc:
+                    docstring = struct_doc.description
+                else:
+                    docstring = None
+            else:
                 docstring = None
 
-            else:
-                docstring = doc_search.description
-        else:
-            docstring = None
+            res = OrderedDict([
+                ('name', name),
+                ('type', OrderedDict([('name', 'struct'), ('json_type', 'primitive_type')])),
+                ('json_type', 'forward_decl'),
+                ('docstring', docstring),
+            ])
 
-        if not self.decls:
-            res = {
-                'name': self.name,
-                'json_type': 'lv_type',
-            }
         else:
-            res = {
-                'name': self.name,
-                'json_type': 'struct',
-                'fields': [field.to_dict() for field in self.decls],
-                'docstring': docstring
-            }
+            if self.name:
+                struct_doc = get_struct_docs(self.name)
+            elif self.parent.name:
+                struct_doc = get_struct_docs(self.parent.name)
+            else:
+                struct_doc = None
+
+            if struct_doc is not None:
+                docstring = struct_doc.description
+            else:
+                docstring = None
+
+            fields = []
+
+            for field in self.decls:
+                field = field.to_dict()
+
+                if struct_doc is not None:
+                    for field_doc in struct_doc.fields:
+                        if field_doc.name == field['name']:
+                            field_docstring = field_doc.description
+                            break
+                    else:
+                        field_docstring = None
+                else:
+                    field_docstring = None
+
+                field['docstring'] = field_docstring
+                field['json_type'] = 'field'
+                fields.append(field)
+
+            res = OrderedDict([
+                ('name', self.name),
+                ('type', OrderedDict([('name', 'struct'), ('json_type', 'primitive_type')])),
+                ('json_type', 'struct'),
+                ('docstring', docstring),
+                ('fields', fields)
+            ])
 
         return res
 
@@ -958,11 +971,11 @@ class TypeDecl(c_ast.TypeDecl):
             if not self.type.name and self.declname:
                 res['name'] = self.declname
         else:
-            res = {
-                'name': self.declname,
-                'json_type': str(type(self)),
-                'type': self.type.to_dict()
-            }
+            res = OrderedDict([
+                ('name', self.declname),
+                ('type', self.type.to_dict()),
+                ('json_type', str(type(self))),
+            ])
 
         return res
 
@@ -1014,23 +1027,95 @@ class Typedef(c_ast.Typedef):
         else:
             docstring = doc_search.description
 
-        if isinstance(self.type, TypeDecl) and isinstance(self.type.type, (Struct, Union)):
-            res = {
-                'name': self.name,
-                'json_type': 'typedef',
-                'type': {
-                    'name': self.type.name,
-                    'json_type': 'lv_type'
-                },
-                'docstring': docstring
-            }
-        else:
-            res = {
-                'name': self.name,
-                'json_type': 'typedef',
-                'type': self.type.to_dict(),
-                'docstring': docstring
-            }
+        if isinstance(self.type, TypeDecl):
+
+            if isinstance(self.type.type, (Struct, Union)):
+                if self.type.type.decls:
+                    if self.type.type.name:
+                        type_dict = self.type.type.to_dict()
+
+                        if not type_dict['docstring']:
+                            type_dict['docstring'] = docstring
+                            docstring = None
+
+                        res = OrderedDict([
+                            ('name', self.name),
+                            ('type', OrderedDict([('name', type_dict['name']), ('json_type', 'lvgl_type')])),
+                            ('json_type', 'typedef'),
+                            ('docstring', docstring),
+                        ])
+
+                        return [
+                            res,
+                            type_dict
+                        ]
+
+                    else:
+                        res = OrderedDict([
+                            ('name', self.name),
+                            ('type', self.type.type.to_dict()),
+                            ('json_type', 'typedef'),
+                            ('docstring', docstring),
+                        ])
+
+                        return res
+                else:
+                    if self.name in forward_decls:
+                        print(self.name, forward_decls[self.name])
+
+                    res = OrderedDict([
+                        ('name', self.name),
+                        ('type', OrderedDict([('name', self.type.type.name), ('json_type', 'lvgl_type')])),
+                        ('json_type', 'typedef'),
+                        ('docstring', docstring),
+                    ])
+
+                    return res
+
+            elif isinstance(self.type.type, Enum):
+                if self.type.type.name:
+                    type_dict = self.type.type.to_dict()
+
+                    if not type_dict['docstring']:
+                        type_dict['docstring'] = docstring
+                        docstring = None
+
+                    if not type_dict['name']:
+                        if self.type.name:
+                            type_dict['name'] = self.type.name
+                        else:
+                            type_dict['name'] = self.name
+
+                    res = OrderedDict([
+                        ('name', self.name),
+                        ('type', OrderedDict([('name', type_dict['name']), ('json_type', 'lvgl_type')])),
+                        ('json_type', 'typedef'),
+                        ('docstring', docstring),
+                    ])
+
+                    return [
+                        res,
+                        type_dict
+                    ]
+                else:
+                    type_dict = self.type.type.to_dict()
+
+                    res = OrderedDict([
+                        ('name', self.name),
+                        ('type', type_dict),
+                        ('json_type', 'typedef'),
+                        ('docstring', docstring),
+                    ])
+
+                    return res
+
+        res = OrderedDict([
+            ('name', self.name),
+            ('type', self.type.to_dict()),
+            ('json_type', 'typedef'),
+            ('docstring', docstring),
+        ])
+
         return res
 
 
@@ -1058,17 +1143,33 @@ class Typename(c_ast.Typename):
             res = self.type.to_dict()
 
         elif isinstance(self.parent, FuncDecl):
-            res = {
-                'name': self.name,
-                'json_type': 'arg',
-                'type': self.type.to_dict()
-            }
+            if self.name and self.parent.name:
+                func_docs = get_func_docs(self.parent.name)
+
+                if func_docs is not None:
+                    for arg in func_docs.args:
+                        if arg.name and arg.name == self.name:
+                            docstring = arg.description
+                            break
+                    else:
+                        docstring = None
+                else:
+                    docstring = None
+            else:
+                docstring = None
+
+            res = OrderedDict([
+                ('name', self.name),
+                ('type', self.type.to_dict()),
+                ('json_type', 'arg'),
+                ('docstring', docstring),
+            ])
         else:
-            res = {
-                'name': self.name,
-                'json_type': str(type(self)),
-                'type': self.type.to_dict()
-            }
+            res = OrderedDict([
+                ('name', self.name),
+                ('type', self.type.to_dict()),
+                ('json_type',  str(type(self))),
+            ])
 
         return res
 
@@ -1109,16 +1210,64 @@ class Union(c_ast.Union):
 
     def to_dict(self):
         if not self.decls:
-            res = {
-                'name': self.name,
-                'json_type': 'lv_type',
-            }
+            name = self.name
+            if not name:
+                self.name = self.parent.name
+
+            if name:
+                union_doc = get_union_docs(name)
+                if union_doc:
+                    docstring = union_doc.description
+                else:
+                    docstring = None
+            else:
+                docstring = None
+
+            res = OrderedDict([
+                ('name', name),
+                ('type', OrderedDict([('name', 'union'), ('json_type', 'primitive_type')])),
+                ('json_type', 'forward_decl'),
+                ('docstring', docstring),
+            ])
         else:
-            res = {
-                'name': self.name,
-                'json_type': 'struct',
-                'fields': [field.to_dict() for field in self.decls]
-            }
+            if self.name:
+                union_doc = get_union_docs(self.name)
+            elif self.parent.name:
+                union_doc = get_union_docs(self.parent.name)
+            else:
+                union_doc = None
+
+            if union_doc is not None:
+                docstring = union_doc.description
+            else:
+                docstring = None
+
+            fields = []
+
+            for field in self.decls:
+                field = field.to_dict()
+
+                if union_doc is not None:
+                    for field_doc in union_doc.fields:
+                        if field_doc.name == field['name']:
+                            field_docstring = field_doc.description
+                            break
+                    else:
+                        field_docstring = None
+                else:
+                    field_docstring = None
+
+                field['docstring'] = field_docstring
+                field['json_type'] = 'field'
+                fields.append(field)
+
+            res = OrderedDict([
+                ('name', self.name),
+                ('type', OrderedDict([('name', 'union'), ('json_type', 'primitive_type')])),
+                ('json_type', 'union'),
+                ('docstring', docstring),
+                ('fields', fields)
+            ])
 
         return res
 

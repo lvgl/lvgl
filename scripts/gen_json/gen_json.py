@@ -1,5 +1,10 @@
 import os
 import sys
+import argparse
+import tempfile
+import shutil
+
+temp_directory = tempfile.mkdtemp(suffix='.lvgl_json')
 
 base_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, base_path)
@@ -11,58 +16,64 @@ sys.path.insert(0, docs_path)
 import pycparser_monkeypatch  # NOQA
 import pycparser  # NOQA
 import json  # NOQA
+import config_builder  # NOQA
 
-output_path = sys.argv[-1]
+parser = argparse.ArgumentParser('-')
+parser.add_argument(
+    '--output-path',
+    dest='output_path',
+    help='output directory for JSON file. If one is not supplied then it will be output stdout',
+    action='store',
+    default=None
+)
+parser.add_argument(
+    '--lvgl-config',
+    dest='lv_conf',
+    help=(
+        'path to lv_conf.h (including file name), if this is not set then a '
+        'config file will be generated that has everything turned on.'
+    ),
+    action='store',
+    default=None
+)
 
-if output_path.endswith('py'):
-    raise RuntimeError('you must supply an output directory for the json file')
+args, extra_args = parser.parse_known_args()
+
+output_path = args.output_path
+output_to_stdout = output_path is None
 
 fake_libc_path = os.path.join(base_path, 'fake_libc_include')
 lvgl_path = project_path
 lvgl_src_path = os.path.join(lvgl_path, 'src')
 lvgl_header_path = os.path.join(lvgl_path, 'lvgl.h')
+lvgl_config_path = args.lv_conf
+
+temp_lvgl = os.path.join(temp_directory, 'lvgl')
+
+os.mkdir(temp_lvgl)
+
+shutil.copytree(lvgl_src_path, os.path.join(temp_lvgl, 'src'))
+shutil.copyfile(lvgl_header_path, os.path.join(temp_lvgl, 'lvgl.h'))
+
+lvgl_header_path = os.path.join(temp_lvgl, 'lvgl.h')
+
+if lvgl_config_path is None:
+    lvgl_config_path = os.path.join(temp_directory, 'lv_conf.h')
+    config_builder.run(lvgl_config_path)
+else:
+    shutil.copyfile(lvgl_config_path, temp_directory)
 
 library_dirs = []
 include_dirs = [project_path]
 cpp_args = ['-DCPYTHON_SDL', '-DLV_LVGL_H_INCLUDE_SIMPLE', '-DLV_USE_DEV_VERSION']
 
-
-lvgl_config_path = os.path.join(project_path, 'lv_conf.h')
-lvgl_config_template_path = os.path.join(project_path, 'lv_conf_template.h')
-
-with open(lvgl_config_template_path, 'r') as f:
-    data = f.read()
-
-data = data.split('\n')
-
-for i, line in enumerate(data):
-    if 'LV_USE' in line or 'LV_FONT' in line:
-        line = [item for item in line.split(' ') if item]
-        for j, item in enumerate(line):
-            if item == '0':
-                line[j] = '1'
-        line = ' '.join(line)
-        data[i] = line
-data = '\n'.join(data)
-
-
-with open(lvgl_config_path, 'w') as f:
-    f.write(data)
-
-
-for arg in sys.argv[:]:
+for arg in extra_args:
     if arg.startswith('-D'):
         cpp_args.append(arg)
-        sys.argv.remove(arg)
-
 
 sdl_temp_path = None
 
 if sys.platform.startswith('win'):
-
-    sdl_temp_path = os.path.join(base_path, 'build')
-    if not os.path.exists(sdl_temp_path):
-        os.mkdir(sdl_temp_path)
 
     import get_sdl2
     import pyMSVC  # NOQA
@@ -72,7 +83,7 @@ if sys.platform.startswith('win'):
 
     # compiler to use
     cpp_path = 'cl'
-    sdl2_include, _ = get_sdl2.get_sdl2(sdl_temp_path)
+    sdl2_include, _ = get_sdl2.get_sdl2(temp_directory)
     include_dirs += [sdl2_include]
     cpp_args.insert(0, '/std:c11')
     include_path_env_key = 'INCLUDE'
@@ -96,6 +107,7 @@ os.environ[include_path_env_key] = f'{fake_libc_path}{os.pathsep}{os.environ[inc
 cpp_args.extend(['/E', '-DPYCPARSER', f'-I"{fake_libc_path}"'])
 cpp_args.extend([f'-I"{item}"' for item in include_dirs])
 # print(cpp_args)
+
 ast = pycparser.parse_file(
     lvgl_header_path,
     use_cpp=True,
@@ -104,18 +116,18 @@ ast = pycparser.parse_file(
     parser=None
 )
 
-if os.path.exists(lvgl_config_path):
-    os.remove(lvgl_config_path)
+ast.setup_docs(temp_directory)
 
 if sdl_temp_path is not None and os.path.exists(sdl_temp_path):
     import shutil
 
     shutil.rmtree(sdl_temp_path)
 
-if not os.path.exists(output_path):
-    os.makedirs(output_path)
+if output_path is not None:
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
 
-output_path = os.path.join(output_path, 'lvgl.json')
+    output_path = os.path.join(output_path, 'lvgl.json')
 
 # print(ast.to_dict())
 

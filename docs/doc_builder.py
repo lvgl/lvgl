@@ -362,7 +362,7 @@ class FUNC_ARG(object):
     def __init__(self, name, type):
         self.name = name
         self.type = type
-        self.description = ''
+        self.description = None
 
 
 class FUNCTION(object):
@@ -383,7 +383,7 @@ class FUNCTION(object):
             self.restype = None
             self.args = []
             self._deps = None
-            self.description = ''
+            self.description = None
             self.res_description = None
             self.file_name = None
             self.line_no = None
@@ -595,7 +595,7 @@ class ENUM(object):
             self.refid = refid
             self.name = name
             self.members = []
-            self.description = ''
+            self.description = None
             self.file_name = None
             self.line_no = None
 
@@ -725,7 +725,7 @@ class DEFINE(object):
             self.parent = parent
             self.refid = refid
             self.name = name
-            self.description = ''
+            self.description = None
             self.file_name = None
             self.line_no = None
 
@@ -1065,28 +1065,24 @@ class XMLSearch(object):
 
     def __init__(self, temp_directory):
         global xml_path
-        import config_builder
         import subprocess
         import re
         import sys
 
-        self.config_builder = config_builder
-
         bp = os.path.abspath(os.path.dirname(__file__))
 
-        cwd = os.getcwd()
-        os.chdir(bp)
-
-        lvgl_path = os.path.abspath(os.path.join(bp, '..'))
+        lvgl_path = os.path.join(temp_directory, 'lvgl')
         src_path = os.path.join(lvgl_path, 'src')
 
-        with open('Doxyfile', 'rb') as f:
+        doxy_path = os.path.join(bp, 'Doxyfile')
+
+        with open(doxy_path, 'rb') as f:
             data = f.read().decode('utf-8')
 
         data = data.replace(
             '#*#*LV_CONF_PATH*#*#',
-            os.path.join(bp, 'lv_conf.h')
-            )
+            os.path.join(temp_directory, 'lv_conf.h')
+        )
         data = data.replace('*#*#SRC#*#*', '"{0}"'.format(src_path))
 
         with open(os.path.join(temp_directory, 'Doxyfile'), 'wb') as f:
@@ -1100,8 +1096,6 @@ class XMLSearch(object):
 
         os.environ['LVGL_URLPATH'] = urlpath
         os.environ['LVGL_GITCOMMIT'] = gitcommit
-
-        config_builder.run()
 
         print("Running doxygen")
         result = os.system(f'cd "{temp_directory}" && doxygen Doxyfile')
@@ -1123,7 +1117,8 @@ class XMLSearch(object):
                 **compound.attrib
             )
 
-        os.chdir(cwd)
+    def get_macros(self):
+        return list(defines.values())
 
     def get_enum_item(self, e_name):
         for enum, obj in enums.items():
@@ -1151,9 +1146,6 @@ class XMLSearch(object):
 
     def get_macro(self, m_name):
         return defines.get(m_name, None)
-
-    def close(self):
-        self.config_builder.cleanup()
 
 
 def run(project_path, temp_directory, *doc_paths):

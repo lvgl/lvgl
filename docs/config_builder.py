@@ -10,7 +10,11 @@ src_config = os.path.abspath(os.path.join(
 ))
 
 
-def run():
+def run(c_path=None):
+    global dst_config
+    if c_path is not None:
+        dst_config = c_path
+
     with open(src_config, 'r') as f:
         data = f.read()
 
