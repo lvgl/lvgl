@@ -346,6 +346,7 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     new_layer->parent = parent_layer;
     new_layer->_clip_area = *area;
     new_layer->buf_area = *area;
+    new_layer->color_format = color_format;
 
     if(disp->layer_head) {
         lv_layer_t * tail = disp->layer_head;
@@ -363,7 +364,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
     /*If the buffer of the layer is already allocated return it*/
     if(layer->draw_buf != NULL) {
-        return layer->draw_buf;
+        return layer->draw_buf->data;
     }
 
     /*If the buffer of the layer is not allocated yet, allocate it now*/

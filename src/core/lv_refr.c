@@ -582,7 +582,7 @@ static void refr_invalid_areas(void)
  * Reshape the draw buffer if required
  * @param layer  pointer to a layer which will be drawn
  */
-static void reshape_layer_draw_buf(lv_layer_t * layer)
+static void layer_reshape_draw_buf(lv_layer_t * layer)
 {
     LV_ASSERT(lv_draw_buf_reshape(
                   layer->draw_buf,
@@ -610,7 +610,7 @@ static void refr_area(const lv_area_t * area_p)
         layer->buf_area.y1 = 0;
         layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
         layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
-        reshape_layer_draw_buf(layer);
+        layer_reshape_draw_buf(layer);
         lv_area_t disp_area;
         lv_area_set(&disp_area, 0, 0, lv_display_get_horizontal_resolution(disp_refr) - 1,
                     lv_display_get_vertical_resolution(disp_refr) - 1);
@@ -650,7 +650,7 @@ static void refr_area(const lv_area_t * area_p)
         layer->draw_buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
         layer->_clip_area = sub_area;
-        reshape_layer_draw_buf(layer);
+        layer_reshape_draw_buf(layer);
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
         if(y2 == row_last) disp_refr->last_part = 1;
@@ -667,7 +667,7 @@ static void refr_area(const lv_area_t * area_p)
         layer->draw_buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
         layer->_clip_area = sub_area;
-        reshape_layer_draw_buf(layer);
+        layer_reshape_draw_buf(layer);
         disp_refr->last_part = 1;
         refr_area_part(layer);
     }
