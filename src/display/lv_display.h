@@ -231,10 +231,15 @@ int32_t lv_display_get_dpi(const lv_display_t * disp);
  * @param disp              pointer to a display
  * @param buf1              first buffer
  * @param buf2              second buffer (can be `NULL`)
+ */
+void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_draw_buf_t * buf2);
+
+/**
+ * Set display render mode
+ * @param disp              pointer to a display
  * @param render_mode       LV_DISPLAY_RENDER_MODE_PARTIAL/DIRECT/FULL
  */
-void lv_display_set_draw_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size_in_bytes,
-                                 lv_display_render_mode_t render_mode);
+void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t render_mode);
 
 /**
  * Set the flush callback which will be called to copy the rendered image to the display.
