@@ -295,7 +295,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             blend_dsc.src_stride = blend_w * lv_color_format_get_size(cf_final);
         }
 
-        if(LV_RESULT_INVALID == LV_DRAW_SW_IMAGE(&draw_dsc, &blend_dsc)) while(blend_area.y1 <= y_last) {
+        if(LV_RESULT_INVALID == LV_DRAW_SW_IMAGE(draw_dsc, &blend_dsc)) while(blend_area.y1 <= y_last) {
                 /*Apply transformations if any or separate the channels*/
                 lv_area_t relative_area;
                 lv_area_copy(&relative_area, &blend_area);
