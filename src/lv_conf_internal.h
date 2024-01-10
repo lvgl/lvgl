@@ -386,6 +386,16 @@
         #define LV_VG_LITE_USE_ASSERT 0
     #endif
 #endif
+
+/* Simulate VG-Lite hardware using ThorVG */
+#ifndef LV_USE_VG_LITE_THORVG
+    #ifdef CONFIG_LV_USE_VG_LITE_THORVG
+        #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
+    #else
+        #define LV_USE_VG_LITE_THORVG  0
+    #endif
+#endif
+
 #endif
 
 /*=================
