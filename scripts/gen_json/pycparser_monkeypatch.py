@@ -810,7 +810,7 @@ class PtrDecl(c_ast.PtrDecl):
         if isinstance(self.type, FuncDecl):
             res = OrderedDict([
                 ('type', self.type.to_dict()),
-                ('json_type', 'poifunction_pointerter')
+                ('json_type', 'function_pointer')
             ])
 
         else:
