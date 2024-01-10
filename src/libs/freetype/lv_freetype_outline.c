@@ -299,7 +299,7 @@ static lv_freetype_outline_t outline_create(
     if(error) {
         FT_Done_Face(face);
         FT_ERROR_MSG("FT_Set_Char_Size", error);
-        return false;
+        return NULL;
     }
 
     /* Load glyph */
