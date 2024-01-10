@@ -345,7 +345,8 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-    if(disp_refr->buf_act == NULL || disp_refr->buf_act->data == NULL || disp_refr->buf_act->data_size == 0) {
+    lv_draw_buf_t * buf_act = disp_refr->buf_act;
+    if(!(buf_act && buf_act->data && buf_act->data_size)) {
         LV_LOG_WARN("No draw buffer");
         return;
     }
@@ -475,10 +476,10 @@ static void refr_sync_areas(void)
 
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
-    void * buf_off_screen = disp_refr->buf_act->data;
-    void * buf_on_screen = disp_refr->buf_act == &disp_refr->buf_1
-                           ? disp_refr->buf_2.data
-                           : disp_refr->buf_1.data;
+    lv_draw_buf_t * on_screen = disp_refr->buf_act;
+    lv_draw_buf_t * off_screen = disp_refr->buf_act == disp_refr->buf_1 ? disp_refr->buf_2 : disp_refr->buf_1;
+    void * buf_off_screen = on_screen->data;
+    void * buf_on_screen = off_screen->data;
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
@@ -518,10 +519,14 @@ static void refr_sync_areas(void)
         }
     }
 
+    lv_area_t disp_area = {0, 0, (int32_t)hor_res - 1, (int32_t)ver_res - 1};
     /*Copy sync areas (if any remaining)*/
     for(sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
         sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
-
+        /**
+         * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
+         */
+        _lv_area_intersect(sync_area, sync_area, &disp_area);
         lv_draw_buf_copy(
             buf_off_screen, hor_res, ver_res, sync_area,
             buf_on_screen, hor_res, ver_res, sync_area,
@@ -1009,11 +1014,11 @@ static void draw_buf_flush(lv_display_t * disp)
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
     if(lv_display_is_double_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
-        if(disp->buf_act == &disp->buf_1) {
-            disp->buf_act = &disp->buf_2;
+        if(disp->buf_act == disp->buf_1) {
+            disp->buf_act = disp->buf_2;
         }
         else {
-            disp->buf_act = &disp->buf_1;
+            disp->buf_act = disp->buf_1;
         }
     }
 }

@@ -66,6 +66,8 @@ typedef struct {
     drmModePropertyPtr crtc_props[128];
     drmModePropertyPtr conn_props[128];
     drm_buffer_t drm_bufs[2]; /*DUMB buffers*/
+    lv_draw_buf_t buf1;
+    lv_draw_buf_t buf2;
 } drm_dev_t;
 
 /**********************
@@ -154,8 +156,11 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
     int32_t width = drm_dev->mmWidth;
 
     size_t buf_size = LV_MIN(drm_dev->drm_bufs[1].size, drm_dev->drm_bufs[0].size);
-    lv_display_set_draw_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
-                                LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_draw_buf_init(&drm_dev->buf1, drm_dev->drm_bufs[0].map, hor_res, ver_res, 0, buf_size);
+    lv_draw_buf_init(&drm_dev->buf2, drm_dev->drm_bufs[1].map, hor_res, ver_res, 0, buf_size);
+
+    lv_display_set_draw_buffers(disp, &drm_dev->buf1, &drm_dev->buf2);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, hor_res, ver_res);
 
     if(width) {
