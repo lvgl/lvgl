@@ -292,10 +292,14 @@ static lv_freetype_outline_t outline_create(
     uint32_t size,
     uint32_t strength)
 {
-    LV_UNUSED(size);
-
     LV_ASSERT_NULL(ctx);
     FT_Error error;
+
+    error = FT_Set_Pixel_Sizes(face, 0, size);
+    if(error) {
+        FT_ERROR_MSG("FT_Set_Char_Size", error);
+        return NULL;
+    }
 
     /* Load glyph */
     error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT | FT_LOAD_NO_BITMAP);
