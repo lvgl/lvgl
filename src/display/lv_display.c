@@ -407,7 +407,11 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         h = buf_size / stride;
-        LV_ASSERT_MSG(h != 0, "the buffer is too small for PARTIAL mode");
+        if(h == 0) {
+            LV_LOG_ERROR("the buffer is too small for PARTIAL mode");
+            LV_ASSERT(0);
+            return;
+        }
     }
     else if(stride * h > buf_size) {
         LV_LOG_ERROR("%s mode requires screen sized buffer(s)",
