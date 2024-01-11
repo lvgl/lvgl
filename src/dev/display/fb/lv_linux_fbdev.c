@@ -197,13 +197,12 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
         draw_buf_size *= ver_res;
     }
 
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(hor_res, ver_res, LV_COLOR_FORMAT_NATIVE, 0);
-    lv_draw_buf_t * draw_buf_2 = NULL;
+    lv_color_t * draw_buf = lv_malloc(draw_buf_size);
+    lv_color_t * draw_buf_2 = NULL;
     if(LV_LINUX_FBDEV_BUFFER_COUNT == 2) {
-        draw_buf_2 = lv_draw_buf_create(hor_res, ver_res, LV_COLOR_FORMAT_NATIVE, 0);
+        draw_buf_2 = lv_malloc(draw_buf_size);
     }
-    lv_display_set_draw_buffers(disp, draw_buf, draw_buf_2);
-    lv_display_set_render_mode(disp, LV_LINUX_FBDEV_RENDER_MODE);
+    lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
     lv_display_set_resolution(disp, hor_res, ver_res);
 
     if(width) {

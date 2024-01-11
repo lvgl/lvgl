@@ -89,7 +89,7 @@ static int _evdev_calibrate(int v, int in_min, int in_max, int out_min, int out_
 
 static lv_point_t _evdev_process_pointer(lv_indev_t * indev, int x, int y)
 {
-    lv_display_t * disp = lv_indev_get_disp(indev);
+    lv_display_t * disp = lv_indev_get_display(indev);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
     LV_ASSERT_NULL(dsc);
 

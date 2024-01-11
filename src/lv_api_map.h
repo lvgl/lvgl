@@ -102,6 +102,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_obj_clear_flag                lv_obj_remove_flag
 #define lv_obj_clear_state               lv_obj_remove_state
 
+#define lv_indev_set_disp                lv_indev_set_display
 #define lv_indev_get_act                 lv_indev_active
 #define lv_scr_act                       lv_screen_active
 #define lv_disp_create                   lv_display_create
@@ -132,7 +133,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_is_double_buffered       lv_display_is_double_buffered
 #define lv_disp_get_scr_act              lv_display_get_screen_active
 #define lv_disp_get_scr_prev             lv_display_get_screen_prev
-#define lv_disp_load_scr                 lv_display_load_scr
+#define lv_disp_load_scr                 lv_screen_load
 #define lv_disp_get_layer_top            lv_display_get_layer_top
 #define lv_disp_get_layer_sys            lv_display_get_layer_sys
 #define lv_disp_get_layer_bottom         lv_display_get_layer_bottom
@@ -144,7 +145,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_set_theme                lv_display_set_theme
 #define lv_disp_get_theme                lv_display_get_theme
 #define lv_disp_get_inactive_time        lv_display_get_inactive_time
-#define lv_disp_trig_activity            lv_display_trig_activity
+#define lv_disp_trig_activity            lv_display_trigger_activity
 #define lv_disp_enable_invalidation      lv_display_enable_invalidation
 #define lv_disp_is_invalidation_enabled  lv_display_is_invalidation_enabled
 #define lv_disp_set_user_data            lv_display_set_user_data
@@ -233,6 +234,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_dropdown_get_option_cnt          lv_dropdown_get_option_count
 
 #define lv_obj_get_child_cnt                lv_obj_get_child_count
+#define lv_obj_get_disp                     lv_obj_get_display
 
 #define lv_obj_get_style_img_opa              lv_obj_get_style_image_opa
 #define lv_obj_get_style_img_recolor          lv_obj_get_style_image_recolor

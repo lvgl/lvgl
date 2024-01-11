@@ -104,7 +104,7 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(lv_indev_get_disp(indev) == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+        if(lv_indev_get_display(indev) == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
             break;
         }
         indev = lv_indev_get_next(indev);
