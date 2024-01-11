@@ -66,6 +66,45 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent)
     return obj;
 }
 
+void lv_calendar_header_dropdown_set_year_list(lv_obj_t * parent, const char * years_list)
+{
+    bool child_found = false;
+    uint32_t idx = 0;
+    lv_obj_t * child = NULL;
+
+    const uint32_t calendar_child_count = lv_obj_get_child_cnt(parent);
+
+    /* Search for the header dropdown */
+    for(idx = 0; idx < calendar_child_count; idx++) {
+        child = lv_obj_get_child(parent, idx);
+        if(lv_obj_check_type(child, &lv_calendar_header_dropdown_class)) {
+            child_found = true;
+            break;
+        }
+    }
+
+    if(!child_found) return;
+
+    child_found = false;
+    const uint32_t header_child_count = lv_obj_get_child_cnt(child);
+
+    /* Search for the year dropdown */
+    for(idx = 0; idx < header_child_count; idx++) {
+        child = lv_obj_get_child(child, idx);
+        if(lv_obj_check_type(child, &lv_dropdown_class)) {
+            child_found = true;
+            break;
+        }
+    }
+
+    if(!child_found) return;
+
+    lv_dropdown_clear_options(child);
+    lv_dropdown_set_options(child, years_list);
+
+    lv_obj_invalidate(parent);
+}
+
 /**********************
  *  STATIC FUNCTIONS
  **********************/
@@ -120,7 +159,14 @@ static void year_event_cb(lv_event_t * e)
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);
     lv_calendar_date_t newd = *d;
-    newd.year = 2023 - sel;
+
+    /* Get the first year on the options list
+     * NOTE: Assumes the first 4 digits in the option list are numbers */
+    const char * year_p = lv_dropdown_get_options(dropdown);
+    const uint32_t year = (year_p[0] - '0') * 1000 + (year_p[1] - '0') * 100 + (year_p[2] - '0') * 10 +
+                          (year_p[3] - '0');
+
+    newd.year = year - sel;
 
     lv_calendar_set_showed_date(calendar, newd.year, newd.month);
 }
@@ -132,7 +178,14 @@ static void value_changed_event_cb(lv_event_t * e)
     const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
 
     lv_obj_t * year_dd = lv_obj_get_child(header, 0);
-    lv_dropdown_set_selected(year_dd, 2023 - cur_date->year);
+
+    /* Get the first year on the options list
+     * NOTE: Assumes the first 4 digits in the option list are numbers */
+    const char * year_p = lv_dropdown_get_options(year_dd);
+    const uint32_t year = (year_p[0] - '0') * 1000 + (year_p[1] - '0') * 100 + (year_p[2] - '0') * 10 +
+                          (year_p[3] - '0');
+
+    lv_dropdown_set_selected(year_dd, year - cur_date->year);
 
     lv_obj_t * month_dd = lv_obj_get_child(header, 1);
     lv_dropdown_set_selected(month_dd, cur_date->month - 1);
