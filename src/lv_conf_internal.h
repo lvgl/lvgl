@@ -833,6 +833,60 @@
     #endif
 #endif
 
+/* VG-Lite Simulator */
+/*Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
+#ifndef LV_USE_VG_LITE_THORVG
+    #ifdef CONFIG_LV_USE_VG_LITE_THORVG
+        #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
+    #else
+        #define LV_USE_VG_LITE_THORVG  0
+    #endif
+#endif
+
+#if LV_USE_VG_LITE_THORVG
+
+    /*Enable LVGL's blend mode support*/
+    #ifndef LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+        #ifdef CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+        #else
+            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
+        #endif
+    #endif
+
+    /*Enable YUV color format support*/
+    #ifndef LV_VG_LITE_THORVG_YUV_SUPPORT
+        #ifdef CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
+            #define LV_VG_LITE_THORVG_YUV_SUPPORT CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
+        #else
+            #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+        #endif
+    #endif
+
+    /*Enable 16 pixels alignment*/
+    #ifndef LV_VG_LITE_THORVG_16PIXELS_ALIGN
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+            #else
+                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
+            #endif
+        #else
+            #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
+        #endif
+    #endif
+
+    /*Enable multi-thread render*/
+    #ifndef LV_VG_LITE_THORVG_THREAD_RENDER
+        #ifdef CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
+            #define LV_VG_LITE_THORVG_THREAD_RENDER CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
+        #else
+            #define LV_VG_LITE_THORVG_THREAD_RENDER 0
+        #endif
+    #endif
+
+#endif
+
 /*=====================
  *  COMPILER SETTINGS
  *====================*/
@@ -2797,60 +2851,6 @@
     #else
         #define LV_USE_EVDEV    0
     #endif
-#endif
-
-/* VG-Lite API Simultor */
-/*Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
-#ifndef LV_USE_VG_LITE_THORVG
-    #ifdef CONFIG_LV_USE_VG_LITE_THORVG
-        #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
-    #else
-        #define LV_USE_VG_LITE_THORVG  0
-    #endif
-#endif
-
-#if LV_USE_VG_LITE_THORVG
-
-    /*Enable LVGL's blend mode support*/
-    #ifndef LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-        #ifdef CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-        #else
-            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
-        #endif
-    #endif
-
-    /*Enable YUV color format support*/
-    #ifndef LV_VG_LITE_THORVG_YUV_SUPPORT
-        #ifdef CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
-            #define LV_VG_LITE_THORVG_YUV_SUPPORT CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
-        #else
-            #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
-        #endif
-    #endif
-
-    /*Enable 16 pixels alignment*/
-    #ifndef LV_VG_LITE_THORVG_16PIXELS_ALIGN
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
-                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
-            #else
-                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
-            #endif
-        #else
-            #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
-        #endif
-    #endif
-
-    /*Enable multi-thread render*/
-    #ifndef LV_VG_LITE_THORVG_THREAD_RENDER
-        #ifdef CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
-            #define LV_VG_LITE_THORVG_THREAD_RENDER CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
-        #else
-            #define LV_VG_LITE_THORVG_THREAD_RENDER 0
-        #endif
-    #endif
-
 #endif
 
 /*==================
