@@ -98,3 +98,8 @@
 #define LV_BIN_DECODER_RAM_LOAD 1
 
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
+
+#define LV_USE_ILI9341		1
+#define LV_USE_ST7735		1
+#define LV_USE_ST7789		1
+#define LV_USE_ST7796		1
