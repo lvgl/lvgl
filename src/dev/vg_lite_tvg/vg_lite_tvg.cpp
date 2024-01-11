@@ -936,7 +936,7 @@ extern "C" {
 
 #if LV_VG_LITE_THORVG_TRACE_API
         LV_LOG_USER("vg_lite_set_linear_grad %p %d %p (%f %f %f %f) %d %d", grad, count, color_ramp,
-                   linear_gradient.X0, linear_gradient.X1, linear_gradient.Y0, linear_gradient.Y1, spread_mode, pre_multiplied);
+                    linear_gradient.X0, linear_gradient.X1, linear_gradient.Y0, linear_gradient.Y1, spread_mode, pre_multiplied);
 #endif
 
         /* Reset the count. */
@@ -1213,7 +1213,7 @@ Empty_sequence_handler:
 
 #if LV_VG_LITE_THORVG_TRACE_API
         LV_LOG_USER("vg_lite_set_radial_grad %p %d %p (%f %f %f %f %f) %d %d", grad, count, color_ramp,
-                   radial_grad.cx, radial_grad.cy, radial_grad.fx, radial_grad.fy, radial_grad.r, spread_mode, pre_multiplied);
+                    radial_grad.cx, radial_grad.cy, radial_grad.fx, radial_grad.fy, radial_grad.r, spread_mode, pre_multiplied);
 #endif
 
         /* Reset the count. */
