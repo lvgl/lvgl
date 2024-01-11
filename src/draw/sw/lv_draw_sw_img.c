@@ -251,14 +251,16 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             else if(cf == LV_COLOR_FORMAT_RGB565) cf_final = LV_COLOR_FORMAT_RGB565A8;
         }
 
-        if(LV_RESULT_OK == LV_DRAW_SW_IMAGE(transformed,
-                                            cf_final,
-                                            src_buf,
-                                            src_w,
-                                            src_h,
-                                            img_stride,
-                                            draw_unit,
-                                            draw_dsc)) {
+        /* check whethr it is possible to accelerate the operation in synchronouse mode */
+        if(LV_RESULT_OK == LV_DRAW_SW_IMAGE(transformed,       /* whether require transform */
+                                            cf_final,          /* image format */
+                                            src_buf,           /* image buffer */
+                                            src_w,             /* image target area width */
+                                            src_h,             /* image target area height */
+                                            img_stride,        /* image stride */
+                                            clipped_img_area,  /* blend area */
+                                            draw_unit,         /* target buffer, buffer width, buffer height, buffer stride */
+                                            draw_dsc)) {       /* opa, recolour_opa and colour */
             return ;
         }
 
