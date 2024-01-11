@@ -44,6 +44,11 @@ static void disp_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px
  *      MACROS
  **********************/
 
+#define DEF_STATIC_DRAW_BUF(__NAME, __WIDTH, __HEIGHT, __FORAMT)   \
+    static uint8_t __NAME##_array[_LV_DRAW_BUF_SIZE((__WIDTH), (__HEIGHT), __FORAMT)];  \
+    static lv_draw_buf_t __NAME;   \
+    lv_draw_buf_init(&__NAME, (__WIDTH), (__HEIGHT), __FORAMT, 0, __NAME##_array, sizeof(__NAME##_array));
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -63,23 +68,24 @@ void lv_port_disp_init(void)
 
     /* Example 1
      * One buffer for partial rendering*/
-    LV_DRAW_BUF_DEFINE(buf_1_1, MY_DISP_HOR_RES, MY_DISP_VER_RES / 10, LV_COLOR_FORMAT_NATIVE); /*A buffer for 1/10 fb*/
+    DEF_STATIC_DRAW_BUF(buf_1_1, MY_DISP_HOR_RES, MY_DISP_VER_RES / 10, LV_COLOR_FORMAT_NATIVE); /*A buffer for 1/10 fb*/
+
     lv_display_set_draw_buffers(disp, &buf_1_1, NULL);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /* Example 2
      * Two buffers for partial rendering
      * In flush_cb DMA or similar hardware should be used to update the display in the background.*/
-    LV_DRAW_BUF_DEFINE(buf_2_1, MY_DISP_HOR_RES, MY_DISP_VER_RES / 10, LV_COLOR_FORMAT_NATIVE); /*A buffer for 1/10 fb*/
-    LV_DRAW_BUF_DEFINE(buf_2_2, MY_DISP_HOR_RES, MY_DISP_VER_RES / 10, LV_COLOR_FORMAT_NATIVE); /*A buffer for 1/10 fb*/
+    DEF_STATIC_DRAW_BUF(buf_2_1, MY_DISP_HOR_RES, MY_DISP_VER_RES / 10, LV_COLOR_FORMAT_NATIVE); /*A buffer for 1/10 fb*/
+    DEF_STATIC_DRAW_BUF(buf_2_2, MY_DISP_HOR_RES, MY_DISP_VER_RES / 10, LV_COLOR_FORMAT_NATIVE); /*A buffer for 1/10 fb*/
     lv_display_set_draw_buffers(disp, &buf_2_1, &buf_2_2);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /* Example 3
      * Two buffers screen sized buffer for double buffering.
      * Both LV_DISPLAY_RENDER_MODE_DIRECT and LV_DISPLAY_RENDER_MODE_FULL works, see their comments*/
-    LV_DRAW_BUF_DEFINE(buf_3_1, MY_DISP_HOR_RES, MY_DISP_VER_RES, LV_COLOR_FORMAT_NATIVE);
-    LV_DRAW_BUF_DEFINE(buf_3_2, MY_DISP_HOR_RES, MY_DISP_VER_RES, LV_COLOR_FORMAT_NATIVE);
+    DEF_STATIC_DRAW_BUF(buf_3_1, MY_DISP_HOR_RES, MY_DISP_VER_RES, LV_COLOR_FORMAT_NATIVE);
+    DEF_STATIC_DRAW_BUF(buf_3_2, MY_DISP_HOR_RES, MY_DISP_VER_RES, LV_COLOR_FORMAT_NATIVE);
     lv_display_set_draw_buffers(disp, &buf_3_1, &buf_3_2);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
 
