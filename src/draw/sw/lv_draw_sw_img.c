@@ -235,8 +235,17 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         blend_dsc.src_color_format = cf;
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
-    /*In the other cases every pixel need to be checked one-by-one*/
-    else {
+    /* check whethr it is possible to accelerate the operation in synchronouse mode */
+    else if(LV_RESULT_INVALID == LV_DRAW_SW_IMAGE(transformed,      /* whether require transform */
+                                                  cf,               /* image format */
+                                                  src_buf,          /* image buffer */
+                                                  img_coords,       /* src_h, src_w, src_x1, src_y1 */
+                                                  img_stride,       /* image stride */
+                                                  clipped_img_area, /* blend area */
+                                                  draw_unit,        /* target buffer, buffer width, buffer height, buffer stride */
+                                                  draw_dsc)) {      /* opa, recolour_opa and colour */
+        /*In the other cases every pixel need to be checked one-by-one*/
+
         lv_area_t blend_area = *clipped_img_area;
         blend_dsc.blend_area = &blend_area;
 
@@ -244,19 +253,6 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         int32_t src_h = lv_area_get_height(img_coords);
         int32_t blend_w = lv_area_get_width(&blend_area);
         int32_t blend_h = lv_area_get_height(&blend_area);
-
-        /* check whethr it is possible to accelerate the operation in synchronouse mode */
-        if(LV_RESULT_OK == LV_DRAW_SW_IMAGE(transformed,        /* whether require transform */
-                                            cf,                 /* image format */
-                                            src_buf,            /* image buffer */
-                                            src_w,              /* image target area width */
-                                            src_h,              /* image target area height */
-                                            img_stride,         /* image stride */
-                                            clipped_img_area,   /* blend area */
-                                            draw_unit,          /* target buffer, buffer width, buffer height, buffer stride */
-                                            draw_dsc)) {        /* opa, recolour_opa and colour */
-            return ;
-        }
 
         lv_color_format_t cf_final = cf;
         if(transformed) {
