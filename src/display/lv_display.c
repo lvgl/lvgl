@@ -412,6 +412,10 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
         return;
     }
 
+    if(LV_DISPLAY_RENDER_MODE_PARTIAL == render_mode) {
+        h = buf_size / stride;
+    }
+
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
     lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
     lv_display_set_draw_buffers(disp, &disp->_static_buf1, buf2 ? &disp->_static_buf2 : NULL);
