@@ -400,7 +400,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
             /*Use existing one directly*/
         }
         else {
-            decoded = lv_draw_buf_create(w_px, 1, cf_decoded, 0);
+            decoded = lv_draw_buf_create(w_px, 1, cf_decoded, LV_STRIDE_AUTO);
             if(decoded == NULL)
                 return LV_RESULT_INVALID;
         }
