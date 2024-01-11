@@ -5,9 +5,11 @@ ILI9341 LCD Controller driver
 Overview
 -------------
 
-The `ILI9341 <https://www.buydisplay.com/download/ic/ILI9341.pdf>`__ SOC is a popular TFT LCD controller chip made by Ilitek. It supports TFT LCD panels with a maximum resolution of 240x320 pixels, and 262k (18 bit) colors.
-It supports both serial and parallel interfaces, including 3/4 line SPI, 8080 type 8/9/16/18 bit parallel, or 6/16/18 bit RGB interfaces. The chip includes display RAM,
-various voltage and timing generators. It has a MIPI DCS compatible register set.
+The `ILI9341 <https://www.buydisplay.com/download/ic/ILI9341.pdf>`__ is a 262,144-color single-chip SOC driver for a-TFT liquid crystal display with resolution of 240RGBx320
+dots, comprising a 720-channel source driver, a 320-channel gate driver, 172,800 bytes GRAM for graphic
+display data of 240RGBx320 dots, and power supply circuit.
+ILI9341 supports parallel 8-/9-/16-/18-bit data bus MCU interface, 6-/16-/18-bit data bus RGB interface and
+3-/4-line serial peripheral interface (SPI).
 
 The ILI9341 LCD controller `driver <https://github.com/lvgl/lvgl/src/dev/display/ili9341>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/doc/integration/drivers/display/gen_mipi.rst>`__.
 It implements display initialization, supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
