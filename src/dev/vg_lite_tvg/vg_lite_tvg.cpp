@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../lv_conf_internal.h"
-#if LV_USE_VG_LITE_THORVG
+#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
 
 #include "vg_lite.h"
 #include "../../lvgl.h"
@@ -19,7 +19,7 @@
 #include <thread>
 #include <vector>
 
-#ifdef LV_VG_LITE_THORVG_YUV_SUPPORT
+#if LV_VG_LITE_THORVG_YUV_SUPPORT
     #include <libyuv/convert_argb.h>
 #endif
 
@@ -46,7 +46,7 @@
     do {                                                              \
         Result res = FUNC;                                            \
         if (res != Result::Success) {                                 \
-            LV_LOG_ERROR("Executed '" #FUNC "' error: %d\n", (int)res);                        \
+            LV_LOG_ERROR("Executed '" #FUNC "' error: %d", (int)res);                        \
             return vg_lite_error_conv(res);                           \
         }                                                             \
     } while (0)
@@ -54,7 +54,7 @@
     do {                                                              \
         Result res = FUNC;                                            \
         if (res != Result::Success) {                                 \
-            LV_LOG_ERROR("Executed '" #FUNC "' error: %d\n", (int)res);\
+            LV_LOG_ERROR("Executed '" #FUNC "' error: %d", (int)res);\
             return res;                                               \
         }                                                             \
     } while (0)
@@ -442,8 +442,8 @@ extern "C" {
 
     vg_lite_error_t vg_lite_allocate(vg_lite_buffer_t * buffer)
     {
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_allocate %p\n", buffer);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_allocate %p", buffer);
 #endif
 
         if(buffer->format == VG_LITE_RGBA8888_ETC2_EAC && (buffer->width % 16 || buffer->height % 4)) {
@@ -660,7 +660,7 @@ extern "C" {
                         ctx->target_px_size);
                     break;
                 default:
-                    TVG_LOG("unsupport format: %d\n", ctx->target_format);
+                    LV_LOG_ERROR("unsupported format: %d", ctx->target_format);
                     LV_ASSERT(false);
                     break;
             }
@@ -741,7 +741,7 @@ extern "C" {
             case gcFEATURE_BIT_VG_LVGL_SUPPORT:
 #endif
 
-#ifdef LV_VG_LITE_THORVG_YUV_SUPPORT
+#if LV_VG_LITE_THORVG_YUV_SUPPORT
             case gcFEATURE_BIT_VG_YUV_INPUT:
 #endif
 
@@ -892,8 +892,8 @@ extern "C" {
     {
         vg_lite_error_t error = VG_LITE_SUCCESS;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_init_grad %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_init_grad %p", grad);
 #endif
 
         /* Set the member values according to driver defaults. */
@@ -934,8 +934,8 @@ extern "C" {
         vg_lite_color_ramp_t * src_ramp_last;
         vg_lite_color_ramp_t * trg_ramp;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_set_linear_grad %p %d %p (%f %f %f %f) %d %d\n", grad, count, color_ramp,
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_set_linear_grad %p %d %p (%f %f %f %f) %d %d", grad, count, color_ramp,
                    linear_gradient.X0, linear_gradient.X1, linear_gradient.Y0, linear_gradient.Y1, spread_mode, pre_multiplied);
 #endif
 
@@ -1054,8 +1054,8 @@ Empty_sequence_handler:
         vg_lite_float_t x0, y0, x1, y1, length;
         vg_lite_error_t error = VG_LITE_SUCCESS;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_update_linear_grad %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_update_linear_grad %p", grad);
 #endif
 
         /* Get shortcuts to the color ramp. */
@@ -1211,8 +1211,8 @@ Empty_sequence_handler:
         vg_lite_color_ramp_t * srcRampLast;
         vg_lite_color_ramp_t * trgRamp;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_set_radial_grad %p %d %p (%f %f %f %f %f) %d %d\n", grad, count, color_ramp,
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_set_radial_grad %p %d %p (%f %f %f %f %f) %d %d", grad, count, color_ramp,
                    radial_grad.cx, radial_grad.cy, radial_grad.fx, radial_grad.fy, radial_grad.r, spread_mode, pre_multiplied);
 #endif
 
@@ -1331,8 +1331,8 @@ Empty_sequence_handler:
         vg_lite_error_t error = VG_LITE_SUCCESS;
         uint32_t align, mul, div;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_update_radial_grad %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_update_radial_grad %p", grad);
 #endif
 
         /* Get shortcuts to the color ramp. */
@@ -1464,8 +1464,8 @@ Empty_sequence_handler:
     {
         uint32_t i;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_set_grad %p %d %p %p\n", grad, count, colors, stops);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_set_grad %p %d %p %p", grad, count, colors, stops);
 #endif
 
         grad->count = 0; /* Opaque B&W gradient */
@@ -1501,8 +1501,8 @@ Empty_sequence_handler:
         int32_t ds, dr, dg, db, da;
         uint32_t * buffer = (uint32_t *)grad->image.memory;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_update_grad %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_update_grad %p", grad);
 #endif
 
         if(grad->count == 0) {
@@ -1570,8 +1570,8 @@ Empty_sequence_handler:
     {
         vg_lite_error_t error = VG_LITE_SUCCESS;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_clear_linear_grad %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_clear_linear_grad %p", grad);
 #endif
 
         grad->count = 0;
@@ -1587,8 +1587,8 @@ Empty_sequence_handler:
     {
         vg_lite_error_t error = VG_LITE_SUCCESS;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_clear_grad %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_clear_grad %p", grad);
 #endif
 
         grad->count = 0;
@@ -1604,8 +1604,8 @@ Empty_sequence_handler:
     {
         vg_lite_error_t error = VG_LITE_SUCCESS;
 
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_clear_radial_grad %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_clear_radial_grad %p", grad);
 #endif
 
         grad->count = 0;
@@ -1619,8 +1619,8 @@ Empty_sequence_handler:
 
     vg_lite_matrix_t * vg_lite_get_linear_grad_matrix(vg_lite_ext_linear_gradient_t * grad)
     {
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_get_linear_grad_matrix %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_get_linear_grad_matrix %p", grad);
 #endif
 
         return &grad->matrix;
@@ -1628,8 +1628,8 @@ Empty_sequence_handler:
 
     vg_lite_matrix_t * vg_lite_get_grad_matrix(vg_lite_linear_gradient_t * grad)
     {
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_get_grad_matrix %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_get_grad_matrix %p", grad);
 #endif
 
         return &grad->matrix;
@@ -1637,8 +1637,8 @@ Empty_sequence_handler:
 
     vg_lite_matrix_t * vg_lite_get_radial_grad_matrix(vg_lite_radial_gradient_t * grad)
     {
-#ifdef LV_VG_LITE_THORVG_TRACE_API
-        VGLITE_LOG("vg_lite_get_radial_grad_matrix %p\n", grad);
+#if LV_VG_LITE_THORVG_TRACE_API
+        LV_LOG_USER("vg_lite_get_radial_grad_matrix %p", grad);
 #endif
 
         return &grad->matrix;
@@ -1911,7 +1911,7 @@ static float vlc_get_arg(const void * data, vg_lite_format_t format)
             return *((float *)data);
 
         default:
-            TVG_LOG("UNKNOW_FORMAT: %d\n", format);
+            LV_LOG_ERROR("UNKNOW_FORMAT: %d", format);
             break;
     }
 
@@ -1930,7 +1930,7 @@ static uint8_t vlc_format_len(vg_lite_format_t format)
         case VG_LITE_FP32:
             return 4;
         default:
-            TVG_LOG("UNKNOW_FORMAT: %d\n", format);
+            LV_LOG_ERROR("UNKNOW_FORMAT: %d", format);
             LV_ASSERT(false);
             break;
     }
@@ -1960,7 +1960,7 @@ static uint8_t vlc_op_arg_len(uint8_t vlc_op)
             VLC_OP_ARG_LEN(LCWARC, 5);
             VLC_OP_ARG_LEN(LCWARC_REL, 5);
         default:
-            TVG_LOG("UNKNOW_VLC_OP: 0x%x", vlc_op);
+            LV_LOG_ERROR("UNKNOW_VLC_OP: 0x%x", vlc_op);
             LV_ASSERT(false);
             break;
     }
@@ -2246,7 +2246,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
                 }
                 break;
 
-#ifdef LV_VG_LITE_THORVG_YUV_SUPPORT
+#if LV_VG_LITE_THORVG_YUV_SUPPORT
             case VG_LITE_NV12: {
                     libyuv::NV12ToARGB((const uint8_t *)source->memory, source->stride, (const uint8_t *)source->yuv.uv_memory,
                                        source->yuv.uv_stride,
@@ -2261,7 +2261,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
                 break;
 
             default:
-                TVG_LOG("unsupport format: %d\n", source->format);
+                LV_LOG_ERROR("unsupported format: %d", source->format);
                 LV_ASSERT(false);
                 break;
         }

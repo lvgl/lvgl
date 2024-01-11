@@ -364,6 +364,16 @@ menu "LVGL configuration"
 					for debugging and testing on PC simulator. Enable LV_USE_THORVG,
 					Either internal ThorVG or external ThorVG library is required.
 
+			config LV_VG_LITE_THORVG_TRACE_API
+				bool "Enable trace log for VG-Lite ThorVG simulator"
+				default n
+				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_VG_LITE_THORVG_YUV_SUPPORT
+				bool "Enable YUV support for VG-Lite ThorVG simulator"
+				default n
+				depends on LV_USE_VG_LITE_THORVG
+
 			config LV_USE_GPU_SDL
 				bool "Use SDL renderer API"
 				default n

@@ -396,6 +396,24 @@
     #endif
 #endif
 
+/* Enable trace log for VG-Lite simulator*/
+#ifndef LV_VG_LITE_THORVG_TRACE_API
+    #ifdef CONFIG_LV_VG_LITE_THORVG_TRACE_API
+        #define LV_VG_LITE_THORVG_TRACE_API CONFIG_LV_VG_LITE_THORVG_TRACE_API
+    #else
+        #define LV_VG_LITE_THORVG_TRACE_API 0
+    #endif
+#endif
+
+/*Enable YUV support for VG-Lite simulator*/
+#ifndef LV_VG_LITE_THORVG_YUV_SUPPORT
+    #ifdef CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
+        #define LV_VG_LITE_THORVG_YUV_SUPPORT CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
+    #else
+        #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+    #endif
+#endif
+
 #endif
 
 /*=================
