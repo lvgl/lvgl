@@ -39,6 +39,8 @@ static void update_src_info(lv_imagebutton_src_info_t * info, const void * src);
 
 const lv_obj_class_t lv_imagebutton_class = {
     .base_class = &lv_obj_class,
+    .width_def = LV_SIZE_CONTENT,
+    .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_imagebutton_t),
     .constructor_cb = lv_imagebutton_constructor,
     .event_cb = lv_imagebutton_event,

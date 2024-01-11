@@ -21,19 +21,15 @@ The parts of the Spinbox are identical to the :ref:`Text area <lv_textarea>`.
 Value, range and step
 ---------------------
 
-:cpp:expr:`lv_spinbox_set_value(spinbox, 1234)` sets a new value on the Spinbox.
-
-:cpp:expr:`lv_spinbox_increment(spinbox)` and :cpp:expr:`lv_spinbox_decrement(spinbox)`
+- :cpp:expr:`lv_spinbox_set_value(spinbox, 1234)` sets a new value on the Spinbox.
+- :cpp:expr:`lv_spinbox_increment(spinbox)` and :cpp:expr:`lv_spinbox_decrement(spinbox)`
 increments/decrements the value of the Spinbox according to the currently selected digit.
-
-:cpp:expr:`lv_spinbox_set_range(spinbox, -1000, 2500)` sets a range. If the
+- :cpp:expr:`lv_spinbox_set_range(spinbox, -1000, 2500)` sets a range. If the
 value is changed by :cpp:func:`lv_spinbox_set_value`, by
 *Keys*,\ ``lv_spinbox_increment/decrement`` this range will be respected.
-
-:cpp:expr:`lv_spinbox_set_step(spinbox, 100)` sets which digits to change on
+- :cpp:expr:`lv_spinbox_set_step(spinbox, 100)` sets which digits to change on
 increment/decrement. Only multiples of ten can be set, and not for example 3.
-
-:cpp:expr:`lv_spinbox_set_cursor_pos(spinbox, 1)` sets the cursor to a specific
+- :cpp:expr:`lv_spinbox_set_cursor_pos(spinbox, 1)` sets the cursor to a specific
 digit to change on increment/decrement. For example position '0' sets the cursor to the least significant digit.
 
 If an encoder is used as input device, the selected digit is shifted to

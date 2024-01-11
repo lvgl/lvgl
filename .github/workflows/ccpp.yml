@@ -16,7 +16,8 @@ jobs:
         # See BUILD_OPTIONS in tests/CMakeLists.txt.
         build_option: ['OPTIONS_16BIT',
                        'OPTIONS_24BIT',
-                       'OPTIONS_FULL_32BIT']
+                       'OPTIONS_FULL_32BIT',
+                       "OPTIONS_VG_LITE"]
     name: Build ${{ matrix.build_option }}
     steps:
     - uses: actions/checkout@v4
@@ -94,7 +95,7 @@ jobs:
 
           install: |
             apt-get update -y
-            apt-get install build-essential ccache python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev -q -y
+            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 -q -y
             /usr/sbin/update-ccache-symlinks
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 

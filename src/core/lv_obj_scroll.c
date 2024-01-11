@@ -305,7 +305,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
 {
     if(dx == 0 && dy == 0) return;
     if(anim_en == LV_ANIM_ON) {
-        lv_display_t * d = lv_obj_get_disp(obj);
+        lv_display_t * d = lv_obj_get_display(obj);
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);

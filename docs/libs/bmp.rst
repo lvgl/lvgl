@@ -4,9 +4,11 @@
 BMP decoder
 ===========
 
-This extension allows the use of BMP images in LVGL. This implementation
-uses `bmp-decoder <https://github.com/caj-johnson/bmp-decoder>`__
-library. The pixels are read on demand (not the whole image is loaded)
+This extension allows the use of BMP images in LVGL. 
+
+Library source: https://github.com/caj-johnson/bmp-decoder
+
+The pixels are read on demand (not the whole image is loaded)
 so using BMP images requires very little RAM.
 
 If enabled in ``lv_conf.h`` by :c:macro:`LV_USE_BMP` LVGL will register a new

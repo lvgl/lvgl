@@ -25,7 +25,7 @@ Parts and Styles
    charts ``pad_column`` sets the space between the columns of the
    adjacent indices.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar used if the chart is zoomed. See
-   the `Base object </widgets/obj>`__\ 's documentation for details.
+   the :ref:`Base object <lv_obj>`\ 's documentation for details.
 -  :cpp:enumerator:`LV_PART_ITEMS` Refers to the line or bar series.
 
    -  Line chart: The *line* properties are used by the lines.
@@ -51,8 +51,8 @@ Chart type
 
 The following data display types exist:
 
-- :cpp:enumerator:`LV_CHART_TYPE_NONE`:  Do not display any data. Can be used to hide the series.
-- :cpp:enumerator:`LV_CHART_TYPE_LINE`:  Draw lines between the data points and/or points (rectangles or circles) on the data points.
+- :cpp:enumerator:`LV_CHART_TYPE_NONE`: Do not display any data. Can be used to hide the series.
+- :cpp:enumerator:`LV_CHART_TYPE_LINE`: Draw lines between the data points and/or points (rectangles or circles) on the data points.
 - :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw bars.
 - :cpp:enumerator:`LV_CHART_TYPE_SCATTER`: X/Y chart drawing point's and lines between the points. .
 
@@ -67,10 +67,10 @@ You can add any number of series to the charts by
 :cpp:struct:`lv_chart_series_t` structure which contains the chosen ``color`` and
 an array for the data points. ``axis`` can have the following values:
 
-- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_Y` Left axis
-- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_Y` Right axis
-- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_X` Bottom axis
-- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_X` Top axis
+- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_Y`: Left axis
+- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_Y`: Right axis
+- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_X`: Bottom axis
+- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_X`: Top axis
 
 ``axis`` tells which axis's range should be used to scale the values.
 
@@ -211,7 +211,7 @@ Events
    :cpp:expr:`lv_chart_get_pressed_point(chart)` returns the zero-based index of
    the pressed point.
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 

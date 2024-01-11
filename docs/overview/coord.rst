@@ -88,7 +88,7 @@ the screen of ``obj``.
 Removing styles
 ^^^^^^^^^^^^^^^
 
-As it's described in the `Using styles <#using-styles>`__ section,
+As it's described in the :ref:`coord_using_styles` section,
 coordinates can also be set via style properties. To be more precise,
 under the hood every style coordinate related property is stored as a
 style property. If you use :cpp:expr:`lv_obj_set_x(obj, 20)` LVGL saves ``x=20``

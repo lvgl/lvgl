@@ -6,13 +6,13 @@ LodePNG decoder
 
 Allow the use of PNG images in LVGL.
 
-Detailed introduction: `lodepng <https://github.com/lvandeve/lodepng>`__
+Detailed introduction: https://github.com/lvandeve/lodepng
 
 If enabled in ``lv_conf.h`` by :c:macro:`LV_USE_LODEPNG` LVGL will register a new
 image decoder automatically so PNG files can be directly used as any
 other image sources.
 
-Note that, a file system driver needs to be registered to open images from
+:Note: a file system driver needs to be registered to open images from 
 files. Read more about it :ref:`overview_file_system` or just
 enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
 
@@ -31,11 +31,8 @@ the image by using 8-bit palette colors, instead of 24/32 bit True color format.
 Because embedded devices have limited (flash) storage, it is recommended 
 to compress images.
 
-There is a very good and free online PNG compressor site, in which the number 
-of colors can be reduced, and in the same time preview the result.
-A batch of PNG files can be uploaded also.
-
-Compress PNG site: https://compresspng.com/
+One option is to use a free online PNG compressor site, 
+for example Compress PNG: https://compresspng.com/
 
 .. _lodepng_example:
 

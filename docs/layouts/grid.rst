@@ -23,10 +23,10 @@ with :c:macro:`LV_USE_GRID` in ``lv_conf.h``.
 Terms
 *****
 
--  tracks: the rows or columns
--  free unit (FR): if set on track's size is set in ``FR`` it will grow
+-  **tracks**: the rows or columns
+-  **free unit (FR)**: if set on track's size is set in ``FR`` it will grow
    to fill the remaining space on the parent.
--  gap: the space between the rows and columns or the items on a track
+-  **gap**: the space between the rows and columns or the items on a track
 
 Simple interface
 ****************
@@ -74,13 +74,13 @@ To do this call
 ``column_align`` and ``row_align`` determine how to align the children
 in its cell. The possible values are:
 
-- :cpp:enumerator:`LV_GRID_ALIGN_START`: means left on a horizontally and top vertically. (default)
+- :cpp:enumerator:`LV_GRID_ALIGN_START`: means left on a horizontally and top vertically (default)
 - :cpp:enumerator:`LV_GRID_ALIGN_END`: means right on a horizontally and bottom vertically
 - :cpp:enumerator:`LV_GRID_ALIGN_CENTER`: simply center ``column_pos`` and ``row_pos``
   means the zero based index of the cell into the item should be placed.
 
 ``column_span`` and ``row_span`` means how many tracks should the item
-involve from the start cell. Must be >= 1.
+involve from the start cell. Must be ``>= 1``.
 
 .. _grid_align:
 
@@ -131,8 +131,9 @@ Style interface
 ***************
 
 All the Grid related values are style properties under the hood and you
-can use them similarly to any other style properties. The following Grid
-related style properties exist:
+can use them similarly to any other style properties.
+
+The following Grid related style properties exist:
 
 -  :cpp:enumerator:`GRID_COLUMN_DSC_ARRAY`
 -  :cpp:enumerator:`GRID_ROW_DSC_ARRAY`

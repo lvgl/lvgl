@@ -50,6 +50,34 @@ void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_ds
         return;
     }
 
+    lv_layer_t * target_layer = draw_unit->target_layer;
+
+    int32_t buf_w = lv_area_get_width(&target_layer->buf_area);
+    int32_t buf_h = lv_area_get_height(&target_layer->buf_area);
+    lv_area_t clear_area;
+
+    /*Clear the top part*/
+    lv_area_set(&clear_area, draw_unit->clip_area->x1, draw_unit->clip_area->y1, draw_unit->clip_area->x2,
+                dsc->area.y1 - 1);
+    lv_area_move(&clear_area, -target_layer->buf_area.x1, -target_layer->buf_area.y1);
+    lv_draw_buf_clear(target_layer->buf, buf_w, buf_h, target_layer->color_format, &clear_area);
+
+    /*Clear the bottom part*/
+    lv_area_set(&clear_area, draw_unit->clip_area->x1, dsc->area.y2 + 1, draw_unit->clip_area->x2,
+                draw_unit->clip_area->y2);
+    lv_area_move(&clear_area, -target_layer->buf_area.x1, -target_layer->buf_area.y1);
+    lv_draw_buf_clear(target_layer->buf, buf_w, buf_h, target_layer->color_format, &clear_area);
+
+    /*Clear the left part*/
+    lv_area_set(&clear_area, draw_unit->clip_area->x1, dsc->area.y1, dsc->area.x1 - 1, dsc->area.y2);
+    lv_area_move(&clear_area, -target_layer->buf_area.x1, -target_layer->buf_area.y1);
+    lv_draw_buf_clear(target_layer->buf, buf_w, buf_h, target_layer->color_format, &clear_area);
+
+    /*Clear the right part*/
+    lv_area_set(&clear_area, dsc->area.x2 + 1, dsc->area.y1, draw_unit->clip_area->x2, dsc->area.y2);
+    lv_area_move(&clear_area, -target_layer->buf_area.x1, -target_layer->buf_area.y1);
+    lv_draw_buf_clear(target_layer->buf, buf_w, buf_h, target_layer->color_format, &clear_area);
+
     lv_draw_sw_mask_radius_param_t param;
     lv_draw_sw_mask_radius_init(&param, &dsc->area, dsc->radius, false);
 
@@ -65,7 +93,6 @@ void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_ds
         lv_draw_sw_mask_res_t res = lv_draw_sw_mask_apply(masks, mask_buf, draw_area.x1, y, area_w);
         if(res == LV_DRAW_SW_MASK_RES_FULL_COVER) continue;
 
-        lv_layer_t * target_layer = draw_unit->target_layer;
         lv_color32_t * c32_buf = lv_draw_layer_go_to_xy(target_layer, draw_area.x1 - target_layer->buf_area.x1,
                                                         y - target_layer->buf_area.y1);
 

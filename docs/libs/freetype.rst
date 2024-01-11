@@ -4,8 +4,9 @@
 FreeType support
 ================
 
-Interface to `FreeType <https://www.freetype.org/>`__ to generate font
-bitmaps run time.
+Interface to FreeType library to generate font bitmaps run time.
+
+Detailed introduction: https://www.freetype.org
 
 Add FreeType to your project
 ----------------------------
@@ -19,7 +20,7 @@ For UNIX
 
 For UNIX systems, it is recommended to use the way of compiling and installing libraries.
 
-- Enter the FreeType source code directory.
+- Enter the FreeType source code directory
 - ``make``
 - ``sudo make install``
 - Add include path: ``/usr/include/freetype2`` (for GCC: ``-I/usr/include/freetype2 -L/usr/local/lib``)
