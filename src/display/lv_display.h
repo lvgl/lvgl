@@ -232,8 +232,8 @@ int32_t lv_display_get_dpi(const lv_display_t * disp);
  * @param buf1              first buffer
  * @param buf2              second buffer (can be `NULL`)
  */
-void lv_display_set_raw_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
-                                lv_display_render_mode_t render_mode);
+void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
+                            lv_display_render_mode_t render_mode);
 
 /**
  * Set the buffers for a display, accept a draw buffer pointer.

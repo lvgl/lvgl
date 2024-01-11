@@ -396,8 +396,8 @@ void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_d
     disp->buf_act = disp->buf_1;
 }
 
-void lv_display_set_raw_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
-                                lv_display_render_mode_t render_mode)
+void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
+                            lv_display_render_mode_t render_mode)
 {
     uint32_t w = lv_display_get_horizontal_resolution(disp);
     uint32_t h = lv_display_get_vertical_resolution(disp);
@@ -406,9 +406,8 @@ void lv_display_set_raw_buffers(lv_display_t * disp, void * buf1, void * buf2, u
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
     if(stride * h > buf_size && render_mode != LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        LV_LOG_ERROR("buffer too small for non partial render mode.");
-        render_mode = LV_DISPLAY_RENDER_MODE_PARTIAL;
-        h = buf_size / stride;
+        LV_ASSERT_MSG(false, "buffer too small for non partial render mode.");
+        return;
     }
 
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);

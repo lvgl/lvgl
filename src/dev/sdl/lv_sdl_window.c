@@ -113,15 +113,15 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 #if LV_SDL_BUF_COUNT == 2
         buf2 = malloc(32 * 1024);
 #endif
-        lv_display_set_raw_buffers(disp, buf1, buf2,
-                                   32 * 1024, LV_DISPLAY_RENDER_MODE_PARTIAL);
+        lv_display_set_buffers(disp, buf1, buf2,
+                               32 * 1024, LV_DISPLAY_RENDER_MODE_PARTIAL);
     }
     /*LV_DISPLAY_RENDER_MODE_DIRECT or FULL */
     else {
         uint32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp),
                                                       lv_display_get_color_format(disp));
-        lv_display_set_raw_buffers(disp, dsc->fb1, dsc->fb2, stride * lv_display_get_vertical_resolution(disp),
-                                   LV_SDL_RENDER_MODE);
+        lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * lv_display_get_vertical_resolution(disp),
+                               LV_SDL_RENDER_MODE);
     }
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
@@ -328,7 +328,7 @@ static void texture_resize(lv_display_t * disp)
         dsc->fb2 = realloc(dsc->fb2, stride * ver_res);
         memset(dsc->fb2, 0x00, stride * ver_res);
 #endif
-        lv_display_set_raw_buffers(disp, dsc->fb1, dsc->fb2, stride * ver_res, LV_SDL_RENDER_MODE);
+        lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * ver_res, LV_SDL_RENDER_MODE);
     }
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
 
