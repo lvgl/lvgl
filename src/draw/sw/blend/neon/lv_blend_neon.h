@@ -23,6 +23,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#if !defined(__ASSEMBLY__)
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc) \
@@ -1280,6 +1281,8 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_neo
     lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_neon(&asm_dsc);
     return LV_RESULT_OK;
 }
+
+#endif /* !defined(__ASSEMBLY__) */
 
 /**********************
  *      MACROS
