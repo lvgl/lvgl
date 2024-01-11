@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-01-10" version="9.0.0-dev4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev4.pack">
+    <release date="2024-01-11" version="9.0.0-dev4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev4.pack">
       - LVGL 9.0.0-dev
       - New Driver Architecture
       - Accelerates SW-Render with NEON and Helium technology for Cortex architectures. 
@@ -423,6 +423,9 @@
                 <file category="sourceC"            name="src/dev/x11/lv_x11_display.c" />
                 <file category="sourceC"            name="src/dev/x11/lv_x11_input.c" />
                 
+                <file category="sourceC"            name="src/dev/vg_lite_tvg/vg_lite_matrix.c" />
+                <file category="sourceCpp"          name="src/dev/vg_lite_tvg/vg_lite_tvg.cpp" />
+
                 <!-- src/dev -->
                 <file category="sourceC"            name="src/display/lv_display.c" />
                 
@@ -615,7 +618,7 @@
                 <file category="sourceC"            name="src/osal/lv_os_none.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.1" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.2" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>

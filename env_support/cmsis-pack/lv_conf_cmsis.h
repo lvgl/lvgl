@@ -130,6 +130,23 @@
     #endif
 #endif
 
+#if LV_USE_DRAW_VG_LITE
+/* Enbale VG-Lite custom external 'gpu_init()' function */
+#define LV_VG_LITE_USE_GPU_INIT 0
+
+/* Enable VG-Lite assert. */
+#define LV_VG_LITE_USE_ASSERT 0
+
+/* Simulate VG-Lite hardware using ThorVG */
+#define LV_USE_VG_LITE_THORVG  0
+
+/* Enable trace log for VG-Lite simulator*/
+#define LV_VG_LITE_THORVG_TRACE_API 0
+
+/*Enable YUV support for VG-Lite simulator*/
+#define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+
+#endif
 
 /*=================
  * OPERATING SYSTEM
