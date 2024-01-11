@@ -406,7 +406,8 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
     if(stride * h > buf_size && render_mode != LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        LV_ASSERT_MSG(false, "buffer too small for non partial render mode.");
+        LV_ASSERT_MSG(false, "buffer too small for full screen in %s mode.",
+                      render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
         return;
     }
 

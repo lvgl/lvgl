@@ -154,8 +154,8 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
     int32_t width = drm_dev->mmWidth;
 
     size_t buf_size = LV_MIN(drm_dev->drm_bufs[1].size, drm_dev->drm_bufs[0].size);
-    lv_display_set_raw_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
-                               LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
+                           LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, hor_res, ver_res);
 
     if(width) {
