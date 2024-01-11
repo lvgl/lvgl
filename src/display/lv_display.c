@@ -405,15 +405,19 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
 
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
-    if(stride * h > buf_size && render_mode != LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    if(LV_DISPLAY_RENDER_MODE_PARTIAL == render_mode) {
+        h = buf_size / stride;
+        if (0 == h) {
+            LV_LOG_ERROR("the buffer is too small for PARTIAL mode");
+            LV_ASSERT(0);
+            return;
+        }
+    }
+    else if(stride * h > buf_size) {
         LV_LOG_ERROR("%s mode requires screen sized buffer(s)",
                      render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
         LV_ASSERT(0);
         return;
-    }
-
-    if(LV_DISPLAY_RENDER_MODE_PARTIAL == render_mode) {
-        h = buf_size / stride;
     }
 
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
