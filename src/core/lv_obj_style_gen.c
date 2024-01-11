@@ -6,7 +6,9 @@
  **********************************************************************
  */
 
+
 #include "lv_obj.h"
+
 
 void lv_obj_set_style_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
@@ -688,8 +690,7 @@ void lv_obj_set_style_opa_layered(lv_obj_t * obj, lv_opa_t value, lv_style_selec
     lv_obj_set_local_style_prop(obj, LV_STYLE_OPA_LAYERED, v, selector);
 }
 
-void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value,
-                                       lv_style_selector_t selector)
+void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -721,8 +722,7 @@ void lv_obj_set_style_anim_time(lv_obj_t * obj, uint32_t value, lv_style_selecto
     lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_TIME, v, selector);
 }
 
-void lv_obj_set_style_transition(lv_obj_t * obj, const lv_style_transition_dsc_t * value,
-                                 lv_style_selector_t selector)
+void lv_obj_set_style_transition(lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
