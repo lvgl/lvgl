@@ -52,9 +52,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void send_cmd(lv_lcd_generic_mipi_driver_t * drv, uint8_t cmd, uint8_t * param, size_t param_size);
-static lv_lcd_generic_mipi_driver_t * get_driver(lv_display_t * disp);
-
 /**********************
  *  STATIC CONSTANTS
  **********************/
@@ -88,8 +85,7 @@ lv_display_t * lv_st7789_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_
                                 lv_st7789_send_cmd_cb_t send_cmd_cb, lv_st7789_send_cmd_cb_t send_color_cb)
 {
     lv_display_t * disp = lv_lcd_generic_mipi_create(hor_res, ver_res, flags, send_cmd_cb, send_color_cb);
-    lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
-    lv_lcd_generic_mipi_send_cmd_list(drv, init_cmd_list);
+    lv_lcd_generic_mipi_send_cmd_list(disp, init_cmd_list);
     return disp;
 }
 
@@ -116,16 +112,5 @@ void lv_st7789_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_list)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static void send_cmd(lv_lcd_generic_mipi_driver_t * drv, uint8_t cmd, uint8_t * param, size_t param_size)
-{
-    uint8_t cmdbuf = cmd;       /* MIPI uses 8 bit commands */
-    drv->send_cmd(drv->disp, &cmdbuf, 1, param, param_size);
-}
-
-static lv_lcd_generic_mipi_driver_t * get_driver(lv_display_t * disp)
-{
-    return (lv_lcd_generic_mipi_driver_t *)lv_display_get_driver_data(disp);
-}
 
 #endif /*LV_USE_ST7789*/
