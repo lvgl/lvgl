@@ -55,6 +55,8 @@ pxp_as_pixel_format_t pxp_get_as_px_format(lv_color_format_t cf);
 
 pxp_ps_pixel_format_t pxp_get_ps_px_format(lv_color_format_t cf);
 
+bool pxp_buf_aligned(const void * buf, uint32_t stride);
+
 /**********************
  *      MACROS
  **********************/
