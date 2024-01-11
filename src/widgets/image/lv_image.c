@@ -284,7 +284,7 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
-    lv_display_t * disp = lv_obj_get_disp(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
@@ -326,7 +326,7 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
-    lv_display_t * disp = lv_obj_get_disp(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
@@ -784,7 +784,7 @@ static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y)
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
-    lv_display_t * disp = lv_obj_get_disp(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
