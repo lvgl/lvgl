@@ -99,6 +99,8 @@ struct _lv_display_t {
     /** Double buffer sync areas (redrawn during last refresh) */
     lv_ll_t sync_areas;
 
+    lv_draw_buf_t _static_buf1; /*Used when user pass in a raw buffer as display draw buffer*/
+    lv_draw_buf_t _static_buf2;
     /*---------------------
      * Layer
      *--------------------*/

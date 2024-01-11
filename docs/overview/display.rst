@@ -41,7 +41,7 @@ hidden if you register only one display. By default, the last created
 :cpp:func:`lv_layer_sys`, :c:macro:`LV_HOR_RES` and :c:macro:`LV_VER_RES` are always applied
 on the most recently created (default) display. If you pass ``NULL`` as
 ``disp`` parameter to display related functions the default display will
-usually be used. E.g. :cpp:expr:`lv_display_trig_activity(NULL)` will trigger a
+usually be used. E.g. :cpp:expr:`lv_display_trigger_activity(NULL)` will trigger a
 user activity on the default display. (See below in :ref:`Inactivity <display_inactivity>`).
 
 Mirror display
@@ -91,7 +91,7 @@ To create a screen, use
 To load a screen, use :cpp:expr:`lv_screen_load(scr)`. To get the active screen,
 use :cpp:expr:`lv_screen_active()`. These functions work on the default display. If
 you want to specify which display to work on, use
-:cpp:expr:`lv_display_get_screen_active(disp)` and :cpp:expr:`lv_display_load_scr(disp, scr)`. A
+:cpp:expr:`lv_display_get_screen_active(disp)` and :cpp:expr:`lv_display_load_screen(disp, scr)`. A
 screen can be loaded with animations too. Read more
 :ref:`here <objects_load_screens>`.
 
@@ -144,7 +144,7 @@ inactivity time among all displays will be returned (**NULL isn't just
 the default display**).
 
 You can manually trigger an activity using
-:cpp:expr:`lv_display_trig_activity(disp)`. If ``disp`` is ``NULL``, the default
+:cpp:expr:`lv_display_trigger_activity(disp)`. If ``disp`` is ``NULL``, the default
 screen will be used (**and not all displays**).
 
 Background

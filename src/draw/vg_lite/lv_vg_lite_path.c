@@ -447,7 +447,7 @@ void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
     start_angle = MATH_RADIANS(start_angle);
     sweep = MATH_RADIANS(sweep);
 
-    int n_curves = ceil(MATH_FABSF(sweep / MATH_HALF_PI));
+    int n_curves = (int)ceil(MATH_FABSF(sweep / MATH_HALF_PI));
     int sweep_sign = (sweep < 0 ? -1 : 1);
     float fract = fmodf(sweep, MATH_HALF_PI);
     fract = (math_zero(fract)) ? MATH_HALF_PI * sweep_sign : fract;
