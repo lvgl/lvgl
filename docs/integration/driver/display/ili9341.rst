@@ -5,12 +5,12 @@ ILI9341 LCD Controller driver
 Overview
 -------------
 
-The `ILI9341 <https://cdn-shop.adafruit.com/datasheets/ILI9341.pdf>`__ SOC is a popular TFT LCD controller chip made by Ilitek. It supports TFT LCD panels with a maximum resolution of 240x320 pixels, and 262k (18 bit) colors.
+The `ILI9341 <https://www.buydisplay.com/download/ic/ILI9341.pdf>`__ SOC is a popular TFT LCD controller chip made by Ilitek. It supports TFT LCD panels with a maximum resolution of 240x320 pixels, and 262k (18 bit) colors.
 It supports both serial and parallel interfaces, including 3/4 line SPI, 8080 type 8/9/16/18 bit parallel, or 6/16/18 bit RGB interfaces. The chip includes display RAM,
 various voltage and timing generators. It has a MIPI DCS compatible register set.
 
-The ILI9341 LCD controller `driver <https://github.com/lvgl/lvgl/src/dev/display/ili9341>`__ is a platform-agnostic driver. It implements display initialization,
-supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
+The ILI9341 LCD controller `driver <https://github.com/lvgl/lvgl/src/dev/display/ili9341>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/doc/integration/drivers/display/gen_mipi.rst>`__.
+It implements display initialization, supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
 a command or pixel data to the controller via SPI or parallel bus. Typically these are implemented by calling the appropriate SDK library functions on the given platform.
 
 Prerequisites
@@ -46,203 +46,21 @@ You need to implement two platform-dependent functions:
 		...
 	}
 
-The only difference between the ``my_lcd_send_cmd()`` and ``my_lcd_send_color()`` functions is that ``my_lcd_send_cmd()`` is used to send short commands and it is expected
-complete the transaction when it returns (in other words, it should be blocking), while ``my_lcd_send_color()`` is only used to send pixel data, and it is recommended to use
-DMA to transmit data in the background. More sophisticated methods can be also implemented, like queing transfers and scheduling them in the background.
-
-Please note that while display flushing is handled by the driver, it is the user's responsibility to call ``lv_display_flush_ready()``
-when the color transfer completes. In case of a DMA transfer this is usually done in a transfer ready callback.
-
-.. note::
-	While it is acceptable to use a blocking implementation for the pixel transfer as well, performance will suffer.
-
-.. tip::
-	Care must be taken to avoid sending a command while there is an active transfer going on in the background. It is the user's responsibility to implement this either
-	by polling the hardware, polling a global variable (which is reset at the end of the transfer), or by using a semaphore or other locking mechanism.
-
-Please also note that the driver does not handle the draw buffer allocation, because this may be platform-dependent, too. Thus you need to allocate the buffers and assign them
-to the display object as usual by calling ``lv_display_set_draw_buffers()``.
-
-The driver can be used to create multiple displays. In such a configuration the callbacks must be able to distinguish between the displays. Usually one would
-implement a separate set of callbacks for each display. Also note that the user must take care of arbitrating the bus when multiple devices are connected to it.
-
-Example
--------
-
-This is an example implementation on an STM32F746 using STM32CubeIDE and the ST HAL libraries.
+To create an ILI9341-based display use the function
 
 .. code:: c
 
-	#include "src/dev/display/ili9341/lv_ili9341.h"
+	/**
+	 * Create an LCD display with ILI9341 driver
+	 * @param hor_res       horizontal resolution
+	 * @param ver_res       vertical resolution
+	 * @param flags         default configuration settings (mirror, RGB ordering, etc.)
+	 * @param send_cmd      platform-dependent function to send a command to the LCD controller (usually uses polling transfer)
+	 * @param send_color    platform-dependent function to send pixel data to the LCD controller (usually uses DMA transfer: must implement a 'ready' callback)
+	 * @return              pointer to the created display
+	 */
+	lv_display_t * lv_ili9341_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
+									lv_ili9341_send_cmd_cb_t send_cmd_cb, lv_ili9341_send_cmd_cb_t send_color_cb);
 
-	#define LCD_H_RES		240
-	#define LCD_V_RES		320
-	#define LCD_BUF_LINES	60
-	
-	lv_display_t *my_disp;
-	volatile int my_disp_bus_busy = 0;
 
-	...
-	
-	/* DMA transfer ready callback */
-	static void stm32_lcd_color_transfer_ready_cb(SPI_HandleTypeDef *hspi)
-	{
-		/* CS high */
-		HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
-		my_disp_bus_busy = 0;
-		lv_display_flush_ready(my_disp);
-	}
-
-	/* Initialize LCD I/O bus, reset LCD */
-	static int32_t stm32_lcd_io_init(void)
-	{
-		/* Register SPI Tx Complete Callback */
-		HAL_SPI_RegisterCallback(&hspi1, HAL_SPI_TX_COMPLETE_CB_ID, stm32_lcd_color_transfer_ready_cb);
-
-		/* reset LCD */
-		HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_RESET);
-		HAL_Delay(100);
-		HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_SET);
-		HAL_Delay(100);
-
-		HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
-
-		return HAL_OK;
-	}
-
-	static void stm32_lcd_send_cmd(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
-	{
-		LV_UNUSED(disp);
-		/* Set the SPI in 8-bit mode */
-		hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-		HAL_SPI_Init(&hspi1);
-		/* DCX low (command) */
-		HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_RESET);
-		/* CS low */
-		HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET);
-		/* send command */
-		if (HAL_SPI_Transmit(&hspi1, cmd, cmd_size, BUS_SPI1_POLL_TIMEOUT) == HAL_OK) {
-			/* DCX high (data) */
-			HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
-			/* for short data blocks we use polling transfer */
-			HAL_SPI_Transmit(&hspi1, (uint8_t *)param, (uint16_t)param_size, BUS_SPI1_POLL_TIMEOUT);
-			/* CS high */
-			HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
-		}
-	}
-
-	static void stm32_lcd_send_color(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
-	{
-		LV_UNUSED(disp);
-		while (my_disp_bus_busy);	/* wait until previous transfer is finished */
-		/* Set the SPI in 8-bit mode */
-		hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-		HAL_SPI_Init(&hspi1);
-		/* DCX low (command) */
-		HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_RESET);
-		/* CS low */
-		HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET);
-		/* send command */
-		if (HAL_SPI_Transmit(&hspi1, cmd, cmd_size, BUS_SPI1_POLL_TIMEOUT) == HAL_OK) {
-			/* DCX high (data) */
-			HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
-			/* for color data use DMA transfer */
-			/* Set the SPI in 16-bit mode to match endianess */
-			hspi1.Init.DataSize = SPI_DATASIZE_16BIT;
-			HAL_SPI_Init(&hspi1);
-			my_disp_bus_busy = 1;
-			HAL_SPI_Transmit_DMA(&hspi1, param, (uint16_t)param_size / 2);
-
-			/* NOTE: CS will be reset in the transfer ready callback */
-		}
-	}
-
-	int main(int argc, char ** argv)
-	{
-		...
-
-		/* Initialize LVGL */
-		lv_init();
-
-		/* Initialize LCD bus I/O */
-		if (stm32_lcd_io_init() != 0)
-			return;
-
-		/* Create the LVGL display object and the LCD display driver */
-		my_disp = lv_ili9341_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE, stm32_lcd_send_cmd, stm32_lcd_send_color);
-		
-		/* Set display orientation to landscape */
-		lv_display_set_rotation(my_disp, LV_DISPLAY_ROTATION_90);
-
-		/* Configure draw buffers, etc. */
-		lv_color_t * buf1 = NULL;
-		lv_color_t * buf2 = NULL;
-
-		uint32_t buf_size = LCD_H_RES * LCD_BUF_LINES * lv_color_format_get_size(lv_disp_get_color_format(my_disp));
-
-		buf1 = lv_malloc(buf_size);
-		if(buf1 == NULL) {
-			LV_LOG_ERROR("display draw buffer malloc failed");
-			return;
-		}
-		/* Allocate secondary buffer if needed */
-		...
-
-		lv_display_set_draw_buffers(my_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
-
-		ui_init(my_disp);
-
-		while(true) {
-			...
-
-			/* Periodically call the lv_timer handler */
-			lv_timer_handler();
-		}
-	}
-
-Advanced topics
----------------
-
-Create flags
-^^^^^^^^^^^^
-
-The third argument of the ``lv_ili9341_create()`` function is a flag array. This can be used to configure the orientation and RGB ordering of the panel if the default settings
-do not work for you. In particular, the ILI9341 driver accepts the following flags:
-
-.. code:: c
-
-	#define LV_LCD_FLAG_NONE                                0x00000000UL
-	#define LV_LCD_FLAG_MIRROR_X                            0x00000001UL
-	#define LV_LCD_FLAG_MIRROR_Y                            0x00000002UL
-	#define LV_LCD_FLAG_BGR                                 0x00000008UL
-
-You can pass multiple flags by ORing them together, e.g., ``LV_LCD_FLAG_MIRROR_X | LV_LCD_FLAG_BGR``.
-
-Custom command lists
-^^^^^^^^^^^^^^^^^^^^
-
-While the driver does its best to initialize the LCD controller correctly, it is possible, that different TFT panels need different configurations. In particular a correct gamma
-setup is crucial for good color reproduction. Unfortunately, finding a good set of parameters is not easy. Usually the manufacturer of the panel provides some example code
-with recommended register settings.
-
-You can use the ``my_lcd_send_cmd()`` function to send an arbitrary command to the LCD controller. To make it easier to send a large number of parameters the driver supports sending
-a custom command list to the controller. The commands must be put into a 'uint8_t' array:
-
-.. code:: c
-
-	static const uint8_t init_cmd_list[] = {
-		<command 1>, <number of parameters>, <parameter 1>, ... <parameter N>,
-		<command 2>, <number of parameters>, <parameter 1>, ... <parameter N>,
-		...
-		LV_LCD_CMD_DELAY_MS, LV_LCD_CMD_EOF		
-	};
-	
-	...
-
-	lv_ili9341_send_cmd_list(my_disp, init_cmd_list);
-	
-You can add a delay between the commands by using the pseudo-command ``LV_LCD_CMD_DELAY_MS``, which must be followed by the delay given in 10ms units.
-To terminate the command list use a delay with a value of ``LV_LCD_CMD_EOF``, as shown above.
-
-See an actual example `here <https://github.com/lvgl/lvgl/src/dev/display/ili9341/lv_ili9341.c>`__.
+For additional details and a working example see the `generic MIPI driver documentation <https://github.com/lvgl/lvgl/doc/integration/drivers/display/gen_mipi.rst>`__.
