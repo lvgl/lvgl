@@ -80,4 +80,32 @@ void test_obj_tree_3(void)
     TEST_ASSERT_EQUAL(lv_obj_get_child(parent2, 0), child1);
 }
 
+/** lv_obj_move_to_index **/
+
+void test_obj_move_to_index_move_to_the_background(void)
+{
+
+}
+
+void test_obj_move_to_index_move_forward(void)
+{
+
+}
+
+/* Tests scenarios when no operation is performed */
+void test_obj_move_to_index_no_operation_when_parent_is_null(void)
+{
+
+}
+
+void test_obj_move_to_index_no_operation_when_index_is_same_or_bigger_than_parent_child_count(void)
+{
+
+}
+
+void test_obj_move_to_index_no_operation_when_new_index_is_the_same_as_previous_index(void)
+{
+
+}
+
 #endif
