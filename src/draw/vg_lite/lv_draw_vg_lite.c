@@ -223,7 +223,9 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             if(!lv_vg_lite_is_src_cf_supported(header.cf)) {
                 return 0;
             }
-            break;
+            task->preference_score = 80;
+            task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+            return 1;
         }
         default:
             break;
