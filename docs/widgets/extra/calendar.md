@@ -45,6 +45,13 @@ Only the array's pointer will be saved so the array should be a static or global
 The name of the days can be adjusted with `lv_calendar_set_day_names(calendar, day_names)` where `day_names` looks like `const char * day_names[7] = {"Su", "Mo", ...};`
 Only the pointer of the day names is saved so the elements should be static, global or constant variables.
 
+### Custom year list
+
+Sets a custom year list with `lv_calendar_header_dropdown_set_year_list(calendar, years_list)`
+where ``years_list`` is a pointer to the custom years list. It can be a constant string
+like ``static const char * years = "2023\n2022\n2021\n2020\n2019";``, 
+or can be generated dynamically into a buffer as well.
+
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent if a date is clicked. `lv_calendar_get_pressed_date(calendar, &date)` set `date` to the date currently being pressed. Returns `LV_RES_OK` if there is a valid pressed date, else `LV_RES_INV`.
 
