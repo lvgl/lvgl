@@ -382,6 +382,7 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
     }
 
     LV_ASSERT(false);
+    return 0;
 }
 
 void lv_vg_lite_buffer_format_bytes(

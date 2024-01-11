@@ -62,10 +62,28 @@ typedef void * lv_user_data_t;
  ***********************/
 
 #define LV_USE_DEV_VERSION
-
 #if !(defined(LV_TEST_OPTION)) || LV_TEST_OPTION == 5
 #define  LV_COLOR_DEPTH     32
 #define  LV_DPI_DEF         160
+#include "lv_test_conf_full.h"
+#elif LV_TEST_OPTION == 6
+#define  LV_COLOR_DEPTH     32
+#define  LV_DPI_DEF         160
+
+#define LV_USE_THORVG_INTERNAL      1
+/* Use VG-Lite GPU. */
+#define LV_USE_DRAW_VG_LITE         1
+
+/* Enbale VG-Lite custom external 'gpu_init()' function */
+#define LV_VG_LITE_USE_GPU_INIT     1
+
+/* Enable VG-Lite assert. */
+#define LV_VG_LITE_USE_ASSERT       1
+
+/* Simulate VG-Lite hardware using ThorVG */
+#define LV_USE_VG_LITE_THORVG       1
+
+#define LV_VG_LITE_THORVG_TRACE_API 1
 #include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 4
 #define  LV_COLOR_DEPTH     24
