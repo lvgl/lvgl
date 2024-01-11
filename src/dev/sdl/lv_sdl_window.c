@@ -126,6 +126,12 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     return disp;
 }
 
+void lv_sdl_window_set_resizeable(lv_display_t * disp, bool value)
+{
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    SDL_SetWindowResizable(dsc->window, value);
+}
+
 void lv_sdl_window_set_zoom(lv_display_t * disp, uint8_t zoom)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
