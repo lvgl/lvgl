@@ -27,13 +27,6 @@
  *      DEFINES
  *********************/
 
-/* Configuration reference. */
-// #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-// #define LV_VG_LITE_THORVG_YUV_SUPPORT
-// #define LV_VG_LITE_THORVG_16PIXELS_ALIGN
-// #define LV_VG_LITE_THORVG_THREAD_RENDER
-// #define LV_VG_LITE_THORVG_TRACE_API
-
 #ifndef LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
     #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
 #endif
@@ -442,10 +435,6 @@ extern "C" {
 
     vg_lite_error_t vg_lite_allocate(vg_lite_buffer_t * buffer)
     {
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_allocate %p", buffer);
-#endif
-
         if(buffer->format == VG_LITE_RGBA8888_ETC2_EAC && (buffer->width % 16 || buffer->height % 4)) {
             return VG_LITE_INVALID_ARGUMENT;
         }
@@ -591,7 +580,7 @@ extern "C" {
     {
         LV_UNUSED(tessellation_width);
         LV_UNUSED(tessellation_height);
-#ifdef LV_VG_LITE_THORVG_THREAD_RENDER
+#if LV_VG_LITE_THORVG_THREAD_RENDER
         /* Threads Count */
         auto threads = std::thread::hardware_concurrency();
         if(threads > 0) {
@@ -737,7 +726,7 @@ extern "C" {
             case gcFEATURE_BIT_VG_DITHER:
             case gcFEATURE_BIT_VG_USE_DST:
 
-#ifdef LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+#if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
             case gcFEATURE_BIT_VG_LVGL_SUPPORT:
 #endif
 
@@ -745,7 +734,7 @@ extern "C" {
             case gcFEATURE_BIT_VG_YUV_INPUT:
 #endif
 
-#ifdef LV_VG_LITE_THORVG_16PIXELS_ALIGN
+#if LV_VG_LITE_THORVG_16PIXELS_ALIGN
             case gcFEATURE_BIT_VG_16PIXELS_ALIGN:
 #endif
                 return 1;
@@ -892,10 +881,6 @@ extern "C" {
     {
         vg_lite_error_t error = VG_LITE_SUCCESS;
 
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_init_grad %p", grad);
-#endif
-
         /* Set the member values according to driver defaults. */
         grad->image.width = VLC_GRADIENT_BUFFER_WIDTH;
         grad->image.height = 1;
@@ -933,11 +918,6 @@ extern "C" {
         vg_lite_color_ramp_t * src_ramp;
         vg_lite_color_ramp_t * src_ramp_last;
         vg_lite_color_ramp_t * trg_ramp;
-
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_set_linear_grad %p %d %p (%f %f %f %f) %d %d", grad, count, color_ramp,
-                    linear_gradient.X0, linear_gradient.X1, linear_gradient.Y0, linear_gradient.Y1, spread_mode, pre_multiplied);
-#endif
 
         /* Reset the count. */
         trg_count = 0;
@@ -1053,10 +1033,6 @@ Empty_sequence_handler:
         uint8_t * bits;
         vg_lite_float_t x0, y0, x1, y1, length;
         vg_lite_error_t error = VG_LITE_SUCCESS;
-
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_update_linear_grad %p", grad);
-#endif
 
         /* Get shortcuts to the color ramp. */
         ramp_length = grad->converted_length;
@@ -1211,11 +1187,6 @@ Empty_sequence_handler:
         vg_lite_color_ramp_t * srcRampLast;
         vg_lite_color_ramp_t * trgRamp;
 
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_set_radial_grad %p %d %p (%f %f %f %f %f) %d %d", grad, count, color_ramp,
-                    radial_grad.cx, radial_grad.cy, radial_grad.fx, radial_grad.fy, radial_grad.r, spread_mode, pre_multiplied);
-#endif
-
         /* Reset the count. */
         trgCount = 0;
 
@@ -1330,10 +1301,6 @@ Empty_sequence_handler:
         uint8_t * bits;
         vg_lite_error_t error = VG_LITE_SUCCESS;
         uint32_t align, mul, div;
-
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_update_radial_grad %p", grad);
-#endif
 
         /* Get shortcuts to the color ramp. */
         ramp_length = grad->converted_length;
@@ -1464,10 +1431,6 @@ Empty_sequence_handler:
     {
         uint32_t i;
 
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_set_grad %p %d %p %p", grad, count, colors, stops);
-#endif
-
         grad->count = 0; /* Opaque B&W gradient */
         if(!count || count > VLC_MAX_GRADIENT_STOPS || colors == NULL || stops == NULL)
             return VG_LITE_SUCCESS;
@@ -1500,10 +1463,6 @@ Empty_sequence_handler:
         int32_t j;
         int32_t ds, dr, dg, db, da;
         uint32_t * buffer = (uint32_t *)grad->image.memory;
-
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_update_grad %p", grad);
-#endif
 
         if(grad->count == 0) {
             /* If no valid stops have been specified (e.g., due to an empty input
@@ -1570,10 +1529,6 @@ Empty_sequence_handler:
     {
         vg_lite_error_t error = VG_LITE_SUCCESS;
 
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_clear_linear_grad %p", grad);
-#endif
-
         grad->count = 0;
         /* Release the image resource. */
         if(grad->image.handle != NULL) {
@@ -1586,10 +1541,6 @@ Empty_sequence_handler:
     vg_lite_error_t vg_lite_clear_grad(vg_lite_linear_gradient_t * grad)
     {
         vg_lite_error_t error = VG_LITE_SUCCESS;
-
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_clear_grad %p", grad);
-#endif
 
         grad->count = 0;
         /* Release the image resource. */
@@ -1604,10 +1555,6 @@ Empty_sequence_handler:
     {
         vg_lite_error_t error = VG_LITE_SUCCESS;
 
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_clear_radial_grad %p", grad);
-#endif
-
         grad->count = 0;
         /* Release the image resource. */
         if(grad->image.handle != NULL) {
@@ -1619,28 +1566,16 @@ Empty_sequence_handler:
 
     vg_lite_matrix_t * vg_lite_get_linear_grad_matrix(vg_lite_ext_linear_gradient_t * grad)
     {
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_get_linear_grad_matrix %p", grad);
-#endif
-
         return &grad->matrix;
     }
 
     vg_lite_matrix_t * vg_lite_get_grad_matrix(vg_lite_linear_gradient_t * grad)
     {
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_get_grad_matrix %p", grad);
-#endif
-
         return &grad->matrix;
     }
 
     vg_lite_matrix_t * vg_lite_get_radial_grad_matrix(vg_lite_radial_gradient_t * grad)
     {
-#if LV_VG_LITE_THORVG_TRACE_API
-        LV_LOG_USER("vg_lite_get_radial_grad_matrix %p", grad);
-#endif
-
         return &grad->matrix;
     }
 
@@ -2183,7 +2118,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
     uint32_t * image_buffer;
     LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN));
 
-#ifdef LV_VG_LITE_THORVG_16PIXELS_ALIGN
+#if LV_VG_LITE_THORVG_16PIXELS_ALIGN
     LV_ASSERT(VG_LITE_IS_ALIGNED(source->width, 16));
 #endif
 
