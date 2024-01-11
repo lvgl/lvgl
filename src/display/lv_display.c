@@ -407,7 +407,7 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
     if(LV_DISPLAY_RENDER_MODE_PARTIAL == render_mode) {
         h = buf_size / stride;
-        if (0 == h) {
+        if(0 == h) {
             LV_LOG_ERROR("the buffer is too small for PARTIAL mode");
             LV_ASSERT(0);
             return;
