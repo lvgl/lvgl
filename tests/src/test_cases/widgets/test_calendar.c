@@ -208,4 +208,16 @@ void test_calendar_get_btnmatrix(void)
     TEST_ASSERT_NOT_NULL(btnm);
 }
 
+void test_calendar_custom_year_list(void)
+{
+    lv_obj_t  * calendar = lv_calendar_create(lv_screen_active());
+
+    lv_calendar_header_dropdown_create(calendar);
+
+    const char * years = "2024\n2023\n2022\n2021\n2020\n2019";
+    lv_calendar_header_dropdown_set_year_list(calendar, years);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_08.png");
+}
+
 #endif
