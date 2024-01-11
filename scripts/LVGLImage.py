@@ -341,9 +341,9 @@ class LVGLImageHeader:
             raise FormatError("invalid header length")
 
         try:
-            self.cf = ColorFormat(data[0] & 0x1f)  # color format
+            self.cf = ColorFormat(data[1] & 0x1f)  # color format
         except ValueError as exc:
-            raise FormatError("invalid color format") from exc
+            raise FormatError(f"invalid color format: {hex(data[0])}") from exc
         self.w = int.from_bytes(data[4:6], 'little')
         self.h = int.from_bytes(data[6:8], 'little')
         self.stride = int.from_bytes(data[8:10], 'little')
