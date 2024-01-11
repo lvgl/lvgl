@@ -18,6 +18,8 @@ extern "C" {
 
 #include "../lcd/lv_lcd_generic_mipi.h"
 
+#if LV_USE_ILI9341
+
 /*********************
  *      DEFINES
  *********************/
@@ -85,5 +87,7 @@ void lv_ili9341_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_list);
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
+
+#endif /*LV_USE_ILI9341*/
 
 #endif /* LV_ILI9341_H */
