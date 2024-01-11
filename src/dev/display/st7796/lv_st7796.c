@@ -31,7 +31,6 @@
 #define CMD_DOCA        0xE8
 #define CMD_CSCON       0xF0
 
-
 /**********************
  *      TYPEDEFS
  **********************/

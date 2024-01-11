@@ -132,7 +132,6 @@ void lv_lcd_generic_mipi_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_
     }
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

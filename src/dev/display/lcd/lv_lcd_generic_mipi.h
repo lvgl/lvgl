@@ -142,7 +142,6 @@ typedef uint32_t lv_lcd_flag_t;
 typedef void (*lv_lcd_send_cmd_cb_t)(lv_display_t * disp, uint8_t * cmd, size_t cmd_size, uint8_t * param,
                                      size_t param_size);
 
-
 /**
  * Generic MIPI compatible LCD driver
  */
@@ -158,7 +157,6 @@ typedef struct {
     bool                    mirror_y;
     bool                    swap_xy;
 } lv_lcd_generic_mipi_driver_t;
-
 
 /**********************
  *  GLOBAL PROTOTYPES
@@ -218,7 +216,6 @@ void lv_lcd_generic_mipi_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_
 /**********************
  *      OTHERS
  **********************/
-
 
 /**********************
  *      MACROS
