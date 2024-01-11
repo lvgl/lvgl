@@ -160,7 +160,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
                 /* draw gradient */
                 lv_area_t grad_area;
-                lv_area_set(&grad_area, min_x, min_y, max_x, max_y);
+                lv_area_set(&grad_area, (int32_t)min_x, (int32_t)min_y, (int32_t)max_x, (int32_t)max_y);
                 lv_vector_gradient_style_t style = dsc->fill_dsc.gradient.style;
                 vg_lite_gradient_spreadmode_t spreadmode = lv_spread_to_vg(dsc->fill_dsc.gradient.spread);
                 LV_UNUSED(spreadmode);
