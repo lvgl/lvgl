@@ -245,23 +245,23 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         int32_t blend_w = lv_area_get_width(&blend_area);
         int32_t blend_h = lv_area_get_height(&blend_area);
 
+        /* check whethr it is possible to accelerate the operation in synchronouse mode */
+        if(LV_RESULT_OK == LV_DRAW_SW_IMAGE(transformed,        /* whether require transform */
+                                            cf,                 /* image format */
+                                            src_buf,            /* image buffer */
+                                            src_w,              /* image target area width */
+                                            src_h,              /* image target area height */
+                                            img_stride,         /* image stride */
+                                            clipped_img_area,   /* blend area */
+                                            draw_unit,          /* target buffer, buffer width, buffer height, buffer stride */
+                                            draw_dsc)) {        /* opa, recolour_opa and colour */
+            return ;
+        }
+
         lv_color_format_t cf_final = cf;
         if(transformed) {
             if(cf == LV_COLOR_FORMAT_RGB888 || cf == LV_COLOR_FORMAT_XRGB8888) cf_final = LV_COLOR_FORMAT_ARGB8888;
             else if(cf == LV_COLOR_FORMAT_RGB565) cf_final = LV_COLOR_FORMAT_RGB565A8;
-        }
-
-        /* check whethr it is possible to accelerate the operation in synchronouse mode */
-        if(LV_RESULT_OK == LV_DRAW_SW_IMAGE(transformed,       /* whether require transform */
-                                            cf_final,          /* image format */
-                                            src_buf,           /* image buffer */
-                                            src_w,             /* image target area width */
-                                            src_h,             /* image target area height */
-                                            img_stride,        /* image stride */
-                                            clipped_img_area,  /* blend area */
-                                            draw_unit,         /* target buffer, buffer width, buffer height, buffer stride */
-                                            draw_dsc)) {       /* opa, recolour_opa and colour */
-            return ;
         }
 
         uint8_t * tmp_buf;
