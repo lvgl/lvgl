@@ -139,16 +139,27 @@ typedef uint32_t lv_lcd_flag_t;
  * @param param         parameter buffer
  * @param param_size    number of bytes of the parameters
  */
-typedef void (*lv_lcd_send_cmd_cb_t)(lv_display_t * disp, uint8_t * cmd, size_t cmd_size, uint8_t * param,
+typedef void (*lv_lcd_send_cmd_cb_t)(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size, const uint8_t * param,
                                      size_t param_size);
+
+/**
+ * Prototype of a platform-dependent callback to transfer pixel data to the LCD controller.
+ * @param disp          display object
+ * @param cmd           command buffer (can handle 16 bit commands as well)
+ * @param cmd_size      number of bytes of the command
+ * @param param         parameter buffer
+ * @param param_size    number of bytes of the parameters
+ */
+typedef void (*lv_lcd_send_color_cb_t)(lv_display_t * disp, const uint8_t * cmd, size_t cmd_size, uint8_t * param,
+                                       size_t param_size);
 
 /**
  * Generic MIPI compatible LCD driver
  */
 typedef struct {
-    lv_display_t      *      disp;          /* the associated LVGL display object */
+    lv_display_t      *     disp;          /* the associated LVGL display object */
     lv_lcd_send_cmd_cb_t    send_cmd;       /* platform-specific implementation to send a command to the LCD controller */
-    lv_lcd_send_cmd_cb_t    send_color;     /* platform-specific implementation to send pixel data to the LCD controller */
+    lv_lcd_send_color_cb_t  send_color;     /* platform-specific implementation to send pixel data to the LCD controller */
     uint16_t                x_gap;          /* x offset of the (0,0) pixel in VRAM */
     uint16_t                y_gap;          /* y offset of the (0,0) pixel in VRAM */
     uint8_t                 madctl_reg;     /* current value of MADCTL register */
@@ -172,7 +183,7 @@ typedef struct {
  * @return              pointer to the created display
  */
 lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
-                                          lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_cmd_cb_t send_color_cb);
+                                          lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_color_cb_t send_color_cb);
 
 /**
  * Set gap, i.e., the offset of the (0,0) pixel in the VRAM

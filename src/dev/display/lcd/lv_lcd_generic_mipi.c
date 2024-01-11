@@ -46,7 +46,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
  **********************/
 
 lv_display_t * lv_lcd_generic_mipi_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
-                                          lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_cmd_cb_t send_color_cb)
+                                          lv_lcd_send_cmd_cb_t send_cmd_cb, lv_lcd_send_color_cb_t send_color_cb)
 {
     lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(disp == NULL) {

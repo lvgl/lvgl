@@ -52,13 +52,13 @@ You need to implement two platform-dependent functions:
 .. code:: c
 
 	/* Send short command to the LCD. This function shall wait until the transaction finishes. */
-	int32_t my_lcd_send_cmd(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	int32_t my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
 	{
 		...
 	}
 
 	/* Send large array of pixel data to the LCD. If necessary, this function has to do the byte-swapping. This function can do the transfer in the background. */
-	int32_t my_lcd_send_color(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	int32_t my_lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
 	{
 		...
 	}
@@ -111,13 +111,13 @@ Example
 	}
 
 	/* Send command to the LCD controller */
-	static void my_lcd_send_cmd(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	static void my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
 	{
 		...
 	}
 
 	/* Send pixel data to the LCD controller */
-	static void my_lcd_send_color(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	static void my_lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
 	{
 		...
 	}
@@ -153,7 +153,7 @@ Example
 		/* Allocate secondary buffer if needed */
 		...
 
-		lv_display_set_draw_buffers(my_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
+		lv_display_set_buffers(my_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
 		ui_init(my_disp);
 

@@ -29,6 +29,7 @@ extern "C" {
  **********************/
 
 typedef lv_lcd_send_cmd_cb_t lv_st7789_send_cmd_cb_t;
+typedef lv_lcd_send_color_cb_t lv_st7789_send_color_cb_t;
 
 /**********************
  *  GLOBAL PROTOTYPES
@@ -44,7 +45,7 @@ typedef lv_lcd_send_cmd_cb_t lv_st7789_send_cmd_cb_t;
  * @return              pointer to the created display
  */
 lv_display_t * lv_st7789_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
-                                lv_st7789_send_cmd_cb_t send_cmd_cb, lv_st7789_send_cmd_cb_t send_color_cb);
+                                lv_st7789_send_cmd_cb_t send_cmd_cb, lv_st7789_send_color_cb_t send_color_cb);
 
 /**
  * Set gap, i.e., the offset of the (0,0) pixel in the VRAM

@@ -28,16 +28,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/**
- * Prototype of a platform-dependent callback to transfer commands and data to the LCD controller.
- * @param disp          display object
- * @param cmd           command buffer (can handle 16 bit commands as well)
- * @param cmd_size      number of bytes of the command
- * @param param         parameter buffer
- * @param param_size    number of bytes of the parameters
- */
-typedef void (*lv_st7735_send_cmd_cb_t)(lv_display_t * disp, uint8_t * cmd, size_t cmd_size, uint8_t * param,
-                                        size_t param_size);
+typedef lv_lcd_send_cmd_cb_t lv_st7735_send_cmd_cb_t;
+typedef lv_lcd_send_color_cb_t lv_st7735_send_color_cb_t;
 
 /**********************
  *  GLOBAL PROTOTYPES
@@ -53,7 +45,7 @@ typedef void (*lv_st7735_send_cmd_cb_t)(lv_display_t * disp, uint8_t * cmd, size
  * @return              pointer to the created display
  */
 lv_display_t * lv_st7735_create(uint32_t hor_res, uint32_t ver_res, lv_lcd_flag_t flags,
-                                lv_st7735_send_cmd_cb_t send_cmd_cb, lv_st7735_send_cmd_cb_t send_color_cb);
+                                lv_st7735_send_cmd_cb_t send_cmd_cb, lv_st7735_send_color_cb_t send_color_cb);
 
 /**
  * Set gap, i.e., the offset of the (0,0) pixel in the VRAM

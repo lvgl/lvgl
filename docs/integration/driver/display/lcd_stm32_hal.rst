@@ -60,7 +60,7 @@ going on in the background. In a more sophisticated implementation this could be
 	}
 
 	/* Send short command to the LCD. This function shall wait until the transaction finishes. */
-	static void my_lcd_send_cmd(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	static void my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
 	{
 		LV_UNUSED(disp);
 		/* Set the SPI in 8-bit mode */
@@ -82,7 +82,7 @@ going on in the background. In a more sophisticated implementation this could be
 	}
 
 	/* Send large array of pixel data to the LCD. If necessary, this function has to do the byte-swapping. This function can do the transfer in the background. */
-	static void my_lcd_send_color(lv_display_t *disp, uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+	static void my_lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
 	{
 		LV_UNUSED(disp);
 		while (my_disp_bus_busy);	/* wait until previous transfer is finished */
