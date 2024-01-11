@@ -1285,7 +1285,6 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_neo
  *      MACROS
  **********************/
 
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
