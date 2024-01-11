@@ -18,4 +18,3 @@ void lv_example_style_7(void)
     lv_obj_center(obj);
 }
 #endif
-

@@ -1588,4 +1588,3 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
 
     indev->scroll_throw_anim = lv_anim_start(&a);
 }
-

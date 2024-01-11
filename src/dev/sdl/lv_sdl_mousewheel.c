@@ -140,4 +140,3 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
 }
 
 #endif /*LV_USE_SDL*/
-
