@@ -17,6 +17,10 @@ extern "C" {
 
 #if LV_USE_MENU
 
+#if LV_USE_FLEX == 0
+#error "LV_USE_FLEX needs to be enabled"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
