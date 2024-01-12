@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2020, 2022, 2023 NXP
+ * Copyright 2020, 2022-2023 NXP
  *
  * SPDX-License-Identifier: MIT
  */
@@ -16,6 +16,7 @@
 #include "lv_pxp_osa.h"
 
 #if LV_USE_DRAW_PXP
+#include "lv_pxp_utils.h"
 #include "../../../misc/lv_log.h"
 #include "fsl_pxp.h"
 
@@ -115,10 +116,7 @@ static void _pxp_interrupt_init(void)
 {
 #if defined(SDK_OS_FREE_RTOS)
     xPXPIdleSemaphore = xSemaphoreCreateBinary();
-    if(xPXPIdleSemaphore == NULL) {
-        LV_LOG_ERROR("xSemaphoreCreateBinary failed!");
-        return;
-    }
+    PXP_ASSERT_MSG(xPXPIdleSemaphore, "xSemaphoreCreateBinary failed!");
 
     NVIC_SetPriority(PXP_IRQ_ID, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1);
 #endif

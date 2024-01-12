@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2023 NXP
+ * Copyright 2023-2024 NXP
  *
  * SPDX-License-Identifier: MIT
  */
@@ -33,7 +33,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area);
+static void _invalidate_cache(void * buf, uint32_t stride, lv_color_format_t cf, const lv_area_t * area);
 
 /**********************
  *  STATIC VARIABLES
@@ -58,44 +58,49 @@ void lv_draw_buf_pxp_init_handlers(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area)
+static void _invalidate_cache(void * buf, uint32_t stride, lv_color_format_t cf, const lv_area_t * area)
 {
-    LV_UNUSED(draw_buf);
-    LV_UNUSED(area);
+    if(area->y1 == 0) {
+        uint16_t size = stride * lv_area_get_height(area);
 
-    DEMO_CleanInvalidateCache();
+        /* Invalidate full buffer. */
+        DEMO_CleanInvalidateCacheByAddr((void *)buf, size);
+        return;
+    }
+
+    const uint8_t * buf_u8 = buf;
+    /* ARM require a 32 byte aligned address. */
+    uint8_t align_bytes = 32;
+    uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
+
+    uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
+    uint16_t offset_x = 0;
+
+    if(area->x1 >= (int32_t)(area->x1 % align_pixels)) {
+        uint16_t shift_x = area->x1 - (area->x1 % align_pixels);
+
+        offset_x = area->x1 - shift_x;
+        buf_u8 += (shift_x * bits_per_pixel) / 8;
+    }
+
+    if(area->y1) {
+        uint16_t shift_y = area->y1;
+
+        buf_u8 += shift_y * stride;
+    }
+
+    /* Area to clear can start from a different offset in buffer.
+     * Invalidate the area line by line.
+     */
+    uint16_t line_pixels = offset_x + lv_area_get_width(area);
+    uint16_t line_size = (line_pixels * bits_per_pixel) / 8;
+    uint16_t area_height = lv_area_get_height(area);
+
+    for(uint16_t y = 0; y < area_height; y++) {
+        const void * line_addr = buf_u8 + y * stride;
+
+        DEMO_CleanInvalidateCacheByAddr((void *)line_addr, line_size);
+    }
 }
-
-#if 0
-/**
- * @todo
- * LVGL needs to use hardware acceleration for buf_copy and do not affect GPU rendering.
- */
-
-void _pxp_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
-                   void * src_buf, uint32_t src_stride, const lv_area_t * src_area,
-                   lv_color_format_t cf)
-{
-    lv_pxp_reset();
-
-    const pxp_pic_copy_config_t picCopyConfig = {
-        .srcPicBaseAddr = (uint32_t)src_buf,
-        .srcPitchBytes = src_stride,
-        .srcOffsetX = src_area->x1,
-        .srcOffsetY = src_area->y1,
-        .destPicBaseAddr = (uint32_t)dest_buf,
-        .destPitchBytes = dest_stride,
-        .destOffsetX = dest_area->x1,
-        .destOffsetY = dest_area->y1,
-        .width = lv_area_get_width(src_area),
-        .height = lv_area_get_height(src_area),
-        .pixelFormat = pxp_get_as_px_format(cf)
-    };
-
-    PXP_StartPictureCopy(PXP_ID, &picCopyConfig);
-
-    lv_pxp_run();
-}
-#endif
 
 #endif /*LV_USE_DRAW_PXP*/
