@@ -468,6 +468,8 @@ void lv_vg_lite_buffer_format_bytes(
             *mul = 3;
             break;
         default:
+            LV_LOG_ERROR("unsupport color format: 0x%" PRIx32, (uint32_t)format);
+            LV_ASSERT(false);
             break;
     }
 }
@@ -812,8 +814,8 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
         return false;
     }
 
-    uint8_t * cur = path->path;
-    uint8_t * end = cur + path->path_length;
+    const uint8_t * cur = path->path;
+    const uint8_t * end = cur + path->path_length;
 
     while(cur < end) {
         /* get op code */
@@ -824,10 +826,19 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
 
         /* get next op code */
         cur += (fmt_len * (1 + arg_len)) ;
+
+        /* break if end */
+        if(op_code == VLC_OP_END) {
+            break;
+        }
+    }
+
+    if(cur != end) {
+        LV_LOG_ERROR("path length(%d) error", (int)path->path_length);
+        return false;
     }
 
     uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
-
     if(end_op_code != VLC_OP_END) {
         LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
         return false;
