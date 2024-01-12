@@ -99,6 +99,11 @@
 
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
 
+#define LV_USE_ILI9341      1
+#define LV_USE_ST7735       1
+#define LV_USE_ST7789       1
+#define LV_USE_ST7796       1
+
 #define LV_USE_FREETYPE 1
 #define LV_FREETYPE_CACHE_SIZE 768
 #define LV_FREETYPE_USE_LVGL_PORT 0
