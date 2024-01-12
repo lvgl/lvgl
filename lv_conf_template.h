@@ -141,15 +141,6 @@
 /* Enable VG-Lite assert. */
 #define LV_VG_LITE_USE_ASSERT 0
 
-/* Simulate VG-Lite hardware using ThorVG */
-#define LV_USE_VG_LITE_THORVG  0
-
-/* Enable trace log for VG-Lite simulator*/
-#define LV_VG_LITE_THORVG_TRACE_API 0
-
-/*Enable YUV support for VG-Lite simulator*/
-#define LV_VG_LITE_THORVG_YUV_SUPPORT 0
-
 #endif
 
 /*=================
@@ -303,6 +294,26 @@
 
 /*Use obj property set/get API*/
 #define LV_USE_OBJ_PROPERTY 0
+
+/* VG-Lite Simulator */
+/*Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
+#define LV_USE_VG_LITE_THORVG  0
+
+#if LV_USE_VG_LITE_THORVG
+
+    /*Enable LVGL's blend mode support*/
+    #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
+
+    /*Enable YUV color format support*/
+    #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+
+    /*Enable 16 pixels alignment*/
+    #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
+
+    /*Enable multi-thread render*/
+    #define LV_VG_LITE_THORVG_THREAD_RENDER 0
+
+#endif
 
 /*=====================
  *  COMPILER SETTINGS
