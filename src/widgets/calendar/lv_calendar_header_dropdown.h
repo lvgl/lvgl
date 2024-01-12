@@ -16,6 +16,10 @@ extern "C" {
 #include "../../core/lv_obj.h"
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_DROPDOWN
 
+#if LV_USE_DROPDOWN == 0
+#error "LV_USE_DROPDOWN needs to be enabled"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

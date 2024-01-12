@@ -189,6 +189,35 @@
     #endif
 #endif
 
+/*=================
+ * OPERATING SYSTEM
+ *=================*/
+/*Select an operating system to use. Possible options:
+ * - LV_OS_NONE
+ * - LV_OS_PTHREAD
+ * - LV_OS_FREERTOS
+ * - LV_OS_CMSIS_RTOS2
+ * - LV_OS_RTTHREAD
+ * - LV_OS_WINDOWS
+ * - LV_OS_CUSTOM */
+#ifndef LV_USE_OS
+    #ifdef CONFIG_LV_USE_OS
+        #define LV_USE_OS CONFIG_LV_USE_OS
+    #else
+        #define LV_USE_OS   LV_OS_NONE
+    #endif
+#endif
+
+#if LV_USE_OS == LV_OS_CUSTOM
+    #ifndef LV_OS_CUSTOM_INCLUDE
+        #ifdef CONFIG_LV_OS_CUSTOM_INCLUDE
+            #define LV_OS_CUSTOM_INCLUDE CONFIG_LV_OS_CUSTOM_INCLUDE
+        #else
+            #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+        #endif
+    #endif
+#endif
+
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
@@ -332,12 +361,58 @@
     #endif
 #endif
 
+#if LV_USE_DRAW_VGLITE
+    /* Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
+    #ifndef LV_USE_VGLITE_BLIT_SPLIT
+        #ifdef CONFIG_LV_USE_VGLITE_BLIT_SPLIT
+            #define LV_USE_VGLITE_BLIT_SPLIT CONFIG_LV_USE_VGLITE_BLIT_SPLIT
+        #else
+            #define LV_USE_VGLITE_BLIT_SPLIT 0
+        #endif
+    #endif
+
+    #if LV_USE_OS
+        /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
+        #ifndef LV_USE_VGLITE_DRAW_ASYNC
+            #ifdef _LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_USE_VGLITE_DRAW_ASYNC
+                    #define LV_USE_VGLITE_DRAW_ASYNC CONFIG_LV_USE_VGLITE_DRAW_ASYNC
+                #else
+                    #define LV_USE_VGLITE_DRAW_ASYNC 0
+                #endif
+            #else
+                #define LV_USE_VGLITE_DRAW_ASYNC 1
+            #endif
+        #endif
+    #endif
+
+    /* Enable VGLite asserts. */
+    #ifndef LV_USE_VGLITE_ASSERT
+        #ifdef CONFIG_LV_USE_VGLITE_ASSERT
+            #define LV_USE_VGLITE_ASSERT CONFIG_LV_USE_VGLITE_ASSERT
+        #else
+            #define LV_USE_VGLITE_ASSERT 0
+        #endif
+    #endif
+#endif
+
 /* Use NXP's PXP on iMX RTxxx platforms. */
 #ifndef LV_USE_DRAW_PXP
     #ifdef CONFIG_LV_USE_DRAW_PXP
         #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
     #else
         #define LV_USE_DRAW_PXP 0
+    #endif
+#endif
+
+#if LV_USE_DRAW_PXP
+    /* Enable PXP asserts. */
+    #ifndef LV_USE_PXP_ASSERT
+        #ifdef CONFIG_LV_USE_PXP_ASSERT
+            #define LV_USE_PXP_ASSERT CONFIG_LV_USE_PXP_ASSERT
+        #else
+            #define LV_USE_PXP_ASSERT 0
+        #endif
     #endif
 #endif
 
@@ -387,62 +462,6 @@
     #endif
 #endif
 
-/* Simulate VG-Lite hardware using ThorVG */
-#ifndef LV_USE_VG_LITE_THORVG
-    #ifdef CONFIG_LV_USE_VG_LITE_THORVG
-        #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
-    #else
-        #define LV_USE_VG_LITE_THORVG  0
-    #endif
-#endif
-
-/* Enable trace log for VG-Lite simulator*/
-#ifndef LV_VG_LITE_THORVG_TRACE_API
-    #ifdef CONFIG_LV_VG_LITE_THORVG_TRACE_API
-        #define LV_VG_LITE_THORVG_TRACE_API CONFIG_LV_VG_LITE_THORVG_TRACE_API
-    #else
-        #define LV_VG_LITE_THORVG_TRACE_API 0
-    #endif
-#endif
-
-/*Enable YUV support for VG-Lite simulator*/
-#ifndef LV_VG_LITE_THORVG_YUV_SUPPORT
-    #ifdef CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
-        #define LV_VG_LITE_THORVG_YUV_SUPPORT CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
-    #else
-        #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
-    #endif
-#endif
-
-#endif
-
-/*=================
- * OPERATING SYSTEM
- *=================*/
-/*Select an operating system to use. Possible options:
- * - LV_OS_NONE
- * - LV_OS_PTHREAD
- * - LV_OS_FREERTOS
- * - LV_OS_CMSIS_RTOS2
- * - LV_OS_RTTHREAD
- * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM */
-#ifndef LV_USE_OS
-    #ifdef CONFIG_LV_USE_OS
-        #define LV_USE_OS CONFIG_LV_USE_OS
-    #else
-        #define LV_USE_OS   LV_OS_NONE
-    #endif
-#endif
-
-#if LV_USE_OS == LV_OS_CUSTOM
-    #ifndef LV_OS_CUSTOM_INCLUDE
-        #ifdef CONFIG_LV_OS_CUSTOM_INCLUDE
-            #define LV_OS_CUSTOM_INCLUDE CONFIG_LV_OS_CUSTOM_INCLUDE
-        #else
-            #define LV_OS_CUSTOM_INCLUDE <stdint.h>
-        #endif
-    #endif
 #endif
 
 /*=======================
@@ -858,6 +877,60 @@
     #else
         #define LV_USE_OBJ_PROPERTY 0
     #endif
+#endif
+
+/* VG-Lite Simulator */
+/*Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
+#ifndef LV_USE_VG_LITE_THORVG
+    #ifdef CONFIG_LV_USE_VG_LITE_THORVG
+        #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
+    #else
+        #define LV_USE_VG_LITE_THORVG  0
+    #endif
+#endif
+
+#if LV_USE_VG_LITE_THORVG
+
+    /*Enable LVGL's blend mode support*/
+    #ifndef LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+        #ifdef CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+        #else
+            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
+        #endif
+    #endif
+
+    /*Enable YUV color format support*/
+    #ifndef LV_VG_LITE_THORVG_YUV_SUPPORT
+        #ifdef CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
+            #define LV_VG_LITE_THORVG_YUV_SUPPORT CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
+        #else
+            #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+        #endif
+    #endif
+
+    /*Enable 16 pixels alignment*/
+    #ifndef LV_VG_LITE_THORVG_16PIXELS_ALIGN
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+            #else
+                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
+            #endif
+        #else
+            #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
+        #endif
+    #endif
+
+    /*Enable multi-thread render*/
+    #ifndef LV_VG_LITE_THORVG_THREAD_RENDER
+        #ifdef CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
+            #define LV_VG_LITE_THORVG_THREAD_RENDER CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
+        #else
+            #define LV_VG_LITE_THORVG_THREAD_RENDER 0
+        #endif
+    #endif
+
 #endif
 
 /*=====================
@@ -2825,6 +2898,45 @@
         #define LV_USE_EVDEV    0
     #endif
 #endif
+
+/*Drivers for LCD devices connected via SPI/parallel port*/
+#ifndef LV_USE_ST7735
+    #ifdef CONFIG_LV_USE_ST7735
+        #define LV_USE_ST7735 CONFIG_LV_USE_ST7735
+    #else
+        #define LV_USE_ST7735		0
+    #endif
+#endif
+#ifndef LV_USE_ST7789
+    #ifdef CONFIG_LV_USE_ST7789
+        #define LV_USE_ST7789 CONFIG_LV_USE_ST7789
+    #else
+        #define LV_USE_ST7789		0
+    #endif
+#endif
+#ifndef LV_USE_ST7796
+    #ifdef CONFIG_LV_USE_ST7796
+        #define LV_USE_ST7796 CONFIG_LV_USE_ST7796
+    #else
+        #define LV_USE_ST7796		0
+    #endif
+#endif
+#ifndef LV_USE_ILI9341
+    #ifdef CONFIG_LV_USE_ILI9341
+        #define LV_USE_ILI9341 CONFIG_LV_USE_ILI9341
+    #else
+        #define LV_USE_ILI9341		0
+    #endif
+#endif
+
+#ifndef LV_USE_GENERIC_MIPI
+    #ifdef CONFIG_LV_USE_GENERIC_MIPI
+        #define LV_USE_GENERIC_MIPI CONFIG_LV_USE_GENERIC_MIPI
+    #else
+        #define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+    #endif
+#endif
+
 
 /*==================
 * EXAMPLES

@@ -148,7 +148,7 @@ lv_image_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
     h += ext_size * 2;
     if(w == 0 || h == 0) return NULL;
 
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(w, h, cf, 0);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(w, h, cf, LV_STRIDE_AUTO);
     if(draw_buf == NULL) return NULL;
 
     if(lv_snapshot_take_to_buf(obj, cf, (lv_image_dsc_t *)draw_buf, draw_buf->data, draw_buf->data_size) != LV_RESULT_OK) {

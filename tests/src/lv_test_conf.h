@@ -83,7 +83,6 @@ typedef void * lv_user_data_t;
 /* Simulate VG-Lite hardware using ThorVG */
 #define LV_USE_VG_LITE_THORVG       1
 
-#define LV_VG_LITE_THORVG_TRACE_API 1
 #include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 4
 #define  LV_COLOR_DEPTH     24

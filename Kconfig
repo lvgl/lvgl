@@ -355,25 +355,6 @@ menu "LVGL configuration"
 				default n
 				depends on LV_USE_DRAW_VG_LITE
 
-			config LV_USE_VG_LITE_THORVG
-				bool "Use ThorVG to simulate VG-Lite hardware."
-				default n
-				depends on LV_USE_DRAW_VG_LITE && LV_USE_THORVG
-				help
-					Use thorvg to simulate VG-Lite hardware behavior, it's useful
-					for debugging and testing on PC simulator. Enable LV_USE_THORVG,
-					Either internal ThorVG or external ThorVG library is required.
-
-			config LV_VG_LITE_THORVG_TRACE_API
-				bool "Enable trace log for VG-Lite ThorVG simulator"
-				default n
-				depends on LV_USE_VG_LITE_THORVG
-
-			config LV_VG_LITE_THORVG_YUV_SUPPORT
-				bool "Enable YUV support for VG-Lite ThorVG simulator"
-				default n
-				depends on LV_USE_VG_LITE_THORVG
-
 			config LV_USE_GPU_SDL
 				bool "Use SDL renderer API"
 				default n
@@ -1284,6 +1265,35 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
+	
+		menuconfig LV_USE_VG_LITE_THORVG
+			bool "VG-Lite Simulator"
+			default n
+			depends on LV_USE_THORVG
+			help
+				Use thorvg to simulate VG-Lite hardware behavior, it's useful
+				for debugging and testing on PC simulator. Enable LV_USE_THORVG,
+				Either internal ThorVG or external ThorVG library is required.
+
+		config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+			bool "Enable LVGL blend mode support"
+			default n
+			depends on LV_USE_VG_LITE_THORVG
+
+		config LV_VG_LITE_THORVG_YUV_SUPPORT
+			bool "Enable YUV color format support"
+			default n
+			depends on LV_USE_VG_LITE_THORVG
+
+		config LV_VG_LITE_THORVG_16PIXELS_ALIGN
+			bool "Enable 16 pixels alignment"
+			default y
+			depends on LV_USE_VG_LITE_THORVG
+
+		config LV_VG_LITE_THORVG_THREAD_RENDER
+			bool "Enable multi-thread render"
+			default n
+			depends on LV_USE_VG_LITE_THORVG
 	endmenu
 
 	menu "Devices"
