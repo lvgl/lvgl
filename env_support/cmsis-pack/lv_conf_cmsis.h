@@ -71,6 +71,14 @@
             } while(0)
 #endif
 
+/*=================
+ * OPERATING SYSTEM
+ *=================*/
+
+#if LV_USE_OS == LV_OS_CUSTOM
+    #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+#endif
+
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
@@ -130,30 +138,22 @@
     #endif
 #endif
 
-#if LV_USE_DRAW_VG_LITE
-/* Enbale VG-Lite custom external 'gpu_init()' function */
-#define LV_VG_LITE_USE_GPU_INIT 0
+#if LV_USE_DRAW_VGLITE
+    /* Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
+    #define LV_USE_VGLITE_BLIT_SPLIT 0
 
-/* Enable VG-Lite assert. */
-#define LV_VG_LITE_USE_ASSERT 0
+    #if LV_USE_OS
+        /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
+        #define LV_USE_VGLITE_DRAW_ASYNC 1
+    #endif
 
-/* Simulate VG-Lite hardware using ThorVG */
-#define LV_USE_VG_LITE_THORVG  0
-
-/* Enable trace log for VG-Lite simulator*/
-#define LV_VG_LITE_THORVG_TRACE_API 0
-
-/*Enable YUV support for VG-Lite simulator*/
-#define LV_VG_LITE_THORVG_YUV_SUPPORT 0
-
+    /* Enable VGLite asserts. */
+    #define LV_USE_VGLITE_ASSERT 0
 #endif
 
-/*=================
- * OPERATING SYSTEM
- *=================*/
-
-#if LV_USE_OS == LV_OS_CUSTOM
-    #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+#if LV_USE_DRAW_PXP
+    /* Enable PXP asserts. */
+    #define LV_USE_PXP_ASSERT 0
 #endif
 
 /*=======================
@@ -796,14 +796,10 @@
 
 #endif
 
-/*Driver for /dev/dri/card*/
-#define LV_USE_LINUX_DRM        0
-
-/*Interface for TFT_eSPI*/
-#define LV_USE_TFT_ESPI         0
-
 /*Driver for evdev input devices*/
 #define LV_USE_EVDEV    0
+
+#define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
 
 /*==================
 * EXAMPLES

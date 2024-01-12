@@ -89,6 +89,18 @@ remove the misleading guide above this code segment.
    
    - LV_USE_IMGFONT
    
+   - LV_USE_LINUX_DRM
+   
+   - LV_USE_TFT_ESPI
+   
+   - LV_USE_ST7735
+   
+   - LV_USE_ST7789
+   
+   - LV_USE_ST7796
+   
+   - LV_USE_ILI9341
+   
      
    
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`

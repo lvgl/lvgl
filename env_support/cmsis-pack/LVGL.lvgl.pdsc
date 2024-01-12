@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-01-11" version="9.0.0-dev4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev4.pack">
+    <release date="2024-01-12" version="9.0.0-dev4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev4.pack">
       - LVGL 9.0.0-dev
       - New Driver Architecture
       - Accelerates SW-Render with NEON and Helium technology for Cortex architectures. 
@@ -404,10 +404,9 @@
                 
                 
                 <!-- src/dev -->
-                <file category="sourceC"            name="src/dev/display/drm/lv_linux_drm.c" />
-                <file category="sourceC"            name="src/dev/display/fb/lv_linux_fbdev.c" />
-                <file category="sourceCpp"          name="src/dev/display/tft_espi/lv_tft_espi.cpp" />
                 <file category="sourceC"            name="src/dev/evdev/lv_evdev.c" />
+                
+                <file category="sourceC"            name="src/dev/display/lcd/lv_lcd_generic_mipi.c" />
                 
                 <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_entry.c" />
                 <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_fbdev.c" />
@@ -422,9 +421,6 @@
                 
                 <file category="sourceC"            name="src/dev/x11/lv_x11_display.c" />
                 <file category="sourceC"            name="src/dev/x11/lv_x11_input.c" />
-                
-                <file category="sourceC"            name="src/dev/vg_lite_tvg/vg_lite_matrix.c" />
-                <file category="sourceCpp"          name="src/dev/vg_lite_tvg/vg_lite_tvg.cpp" />
 
                 <!-- src/dev -->
                 <file category="sourceC"            name="src/display/lv_display.c" />
@@ -466,8 +462,6 @@
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c" />
                 <file category="sourceAsm"          name="src/draw/sw/blend/neon/lv_blend_neon.S"  condition="Helium GNU Assembler"/>
-                <!--file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.c" condition="Helium" /-->
-                
 
                 <!-- src/font -->
                 <file category="sourceC"            name="src/font/lv_binfont_loader.c" />
@@ -610,6 +604,8 @@
                 <!-- src/others -->
                 <file category="sourceC"            name="src/others/sysmon/lv_sysmon.c" />
                 <file category="sourceC"            name="src/others/observer/lv_observer.c" />
+                <file category="sourceC"            name="src/others/vg_lite_tvg/vg_lite_matrix.c" />
+                <file category="sourceCpp"          name="src/others/vg_lite_tvg/vg_lite_tvg.cpp" />
                 
                 <!-- src/demons -->
                 <file category="sourceC"            name="demos/lv_demos.c" />
@@ -646,7 +642,100 @@
                </RTE_Components_h>
 
             </component>
-            
+
+
+            <component Cgroup="Display" Cvariant="Linux DRM" condition="LVGL-Essential">
+              <description>Add the display driver for Linux /dev/dri/card*/  </description>
+              <files>
+                <file category="sourceC"            name="src/dev/display/drm/lv_linux_drm.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for Linux /dev/dri/card*/ */
+#define LV_USE_LINUX_DRM    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="Linux FBDEV" condition="LVGL-Essential">
+              <description>Add the display driver for Linux /dev/fb </description>
+              <files>
+                <file category="sourceC"            name="src/dev/display/fb/lv_linux_fbdev.c" />
+                <file category="sourceCpp"          name="src/dev/display/tft_espi/lv_tft_espi.cpp" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for Linux /dev/fb */
+#define LV_USE_LINUX_FBDEV    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="TFT_eSPI" condition="LVGL-Essential">
+              <description>Add the display driver for TFT_eSPI </description>
+              <files>
+                <file category="sourceCpp"          name="src/dev/display/tft_espi/lv_tft_espi.cpp" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for TFT_eSPI */
+#define LV_USE_TFT_ESPI    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="ILI9341" condition="LVGL-Essential">
+              <description>Add the display driver for ILI9341 </description>
+              <files>
+                <file category="sourceC"            name="src/dev/display/ili9341/lv_ili9341.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for ILI9341 */
+#define LV_USE_ILI9341	    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="st7735" condition="LVGL-Essential">
+              <description>Add the display driver for st7735 </description>
+              <files>
+                <file category="sourceC"            name="src/dev/display/st7735/lv_st7735.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for st7735 */
+#define LV_USE_ST7735	    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="st7789" condition="LVGL-Essential">
+              <description>Add the display driver for st7789 </description>
+              <files>
+                <file category="sourceC"            name="src/dev/display/st7789/lv_st7789.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for st7789 */
+#define LV_USE_ST7789	    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="st7796" condition="LVGL-Essential">
+              <description>Add the display driver for st7796 </description>
+              <files>
+                <file category="sourceC"            name="src/dev/display/st7796/lv_st7796.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for st7796 */
+#define LV_USE_ST7796	    1
+
+              </RTE_Components_h>
+            </component>
+
             <component Cgroup="OS Abstraction Layer" Cvariant="pthreads" condition="LVGL-Essential">
               <description>Add the support for pthreads</description>
               <files>
@@ -829,7 +918,6 @@
               <files>
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_buf_pxp.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp.c" />
-                <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_bg_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_fill.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_layer.c" />
@@ -852,13 +940,13 @@
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_buf_vglite.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
-                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_bg_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_border.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_fill.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_label.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_layer.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_line.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_triangle.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_buf.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_matrix.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_path.c" />
