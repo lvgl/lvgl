@@ -63,6 +63,27 @@ extern "C" {
                                     (__draw_dsc))
 #endif
 
+#ifndef LV_DRAW_SW_RGB565_RECOLOR
+    #define LV_DRAW_SW_RGB565_RECOLOR(__src_buf, __blend_area, __color, __opa)  \
+        _lv_draw_sw_image_recolor_rgb565(   (__src_buf),                        \
+                                            &(__blend_area),                    \
+                                            (__color),                          \
+                                            (__opa))
+#endif
+
+#ifndef LV_DRAW_SW_RGB888_RECOLOR
+    #define LV_DRAW_SW_RGB888_RECOLOR(  __src_buf,                              \
+                                        __blend_area,                           \
+                                        __color,                                \
+                                        __opa,                                  \
+                                        __px_size)                              \
+        _lv_draw_sw_image_recolor_rgb888(   (__src_buf),                        \
+                                            &(__blend_area),                    \
+                                            (__color),                          \
+                                            (__opa),                            \
+                                            (__px_size))
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -479,6 +500,59 @@ static inline lv_result_t _lv_draw_sw_image_helium(
     } while(0);
 
     return result;
+}
+
+static inline lv_result_t _lv_draw_sw_image_recolor_rgb565(
+                                                const uint8_t *src_buf,
+                                                const lv_area_t * blend_area,
+                                                lv_color_t color,
+                                                lv_opa_t opa)
+{
+    int32_t src_w = lv_area_get_width(blend_area);
+    int32_t src_h = lv_area_get_height(blend_area);
+
+    arm_2d_size_t copy_size = {
+        .iWidth = (int16_t)src_w,
+        .iHeight = (int16_t)src_h,
+    };
+
+    __arm_2d_impl_rgb565_colour_filling_with_opacity(
+                    (uint16_t *)src_buf,
+                    src_w,
+                    &copy_size,
+                    lv_color_to_u16(color),
+                    opa);
+
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t _lv_draw_sw_image_recolor_rgb888(
+                                                const uint8_t *src_buf,
+                                                const lv_area_t * blend_area,
+                                                lv_color_t color,
+                                                lv_opa_t opa,
+                                                uint32_t px_size)
+{
+    if(px_size == 3) {
+        return LV_RESULT_INVALID;
+    }
+
+    int32_t src_w = lv_area_get_width(blend_area);
+    int32_t src_h = lv_area_get_height(blend_area);
+
+    arm_2d_size_t copy_size = {
+        .iWidth = (int16_t)src_w,
+        .iHeight = (int16_t)src_h,
+    };
+
+    __arm_2d_impl_cccn888_colour_filling_with_opacity(
+                    (uint32_t *)src_buf,
+                    src_w,
+                    &copy_size,
+                    lv_color_to_u32(color),
+                    opa);
+
+    return LV_RESULT_OK;
 }
 
 #endif /* LV_USE_DRAW_ARM2D */
