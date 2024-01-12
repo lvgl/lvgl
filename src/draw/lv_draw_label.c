@@ -403,13 +403,13 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
         lv_draw_buf_t * draw_buf = NULL;
         if(g.bpp < LV_IMGFONT_BPP) {
             /*Only check draw buf for bitmap glyph*/
-            draw_buf = lv_draw_buf_reshape(dsc->_draw_buf, 0, g.box_w, g.box_h, 0);
+            draw_buf = lv_draw_buf_reshape(dsc->_draw_buf, 0, g.box_w, g.box_h, LV_STRIDE_AUTO);
             if(draw_buf == NULL) {
                 if(dsc->_draw_buf) lv_draw_buf_destroy(dsc->_draw_buf);
 
                 uint32_t h = g.box_h;
                 if(h * g.box_w < 64) h *= 2; /*Alloc a slightly larger buffer*/
-                draw_buf = lv_draw_buf_create(g.box_w, h, LV_COLOR_FORMAT_A8, 0);
+                draw_buf = lv_draw_buf_create(g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
                 LV_ASSERT_MALLOC(draw_buf);
                 draw_buf->header.h = g.box_h;
                 dsc->_draw_buf = draw_buf;
