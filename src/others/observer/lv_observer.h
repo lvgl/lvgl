@@ -329,6 +329,7 @@ lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, 
 lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state,
                                             int32_t ref_value);
 
+#if LV_USE_BUTTON
 /**
  * Set an integer subject to 1 when a button is checked and set it 0 when unchecked.
  * @param obj       pointer to a button
@@ -336,7 +337,9 @@ lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subje
  * @return          pointer to the created observer
  */
 lv_observer_t * lv_button_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
+#endif
 
+#if LV_USE_LABEL
 /**
  * Bind an integer, string, or pointer subject to a label.
  * @param obj       pointer to a label
@@ -348,7 +351,9 @@ lv_observer_t * lv_button_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
  * @note            if the subject is a pointer must point to a `\0` terminated string.
  */
 lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt);
+#endif
 
+#if LV_USE_ARC
 /**
  * Bind an integer subject to an arc's value
  * @param obj       pointer to an arc
@@ -356,7 +361,9 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
  * @return          pointer to the created observer
  */
 lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
 
+#if LV_USE_SLIDER
 /**
  * Bind an integer subject to a slider's value
  * @param obj       pointer to a slider
@@ -364,7 +371,9 @@ lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject);
  * @return          pointer to the created observer
  */
 lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
 
+#if LV_USE_ROLLER
 /**
  * Bind an integer subject to a roller's value
  * @param obj       pointer to a roller
@@ -372,7 +381,9 @@ lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject);
  * @return          pointer to the created observer
  */
 lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
 
+#if LV_USE_DROPDOWN
 /**
  * Bind an integer subject to a dropdown's value
  * @param obj       pointer to a drop down
@@ -380,6 +391,7 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject);
  * @return          pointer to the created observer
  */
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);
+#endif
 
 /**********************
  *      MACROS
