@@ -92,8 +92,9 @@ vg_lite_error_t vg_lite_translate(vg_lite_float_t x, vg_lite_float_t y, vg_lite_
     /* Set translation matrix. */
     vg_lite_matrix_t t = { { {1.0f, 0.0f, x},
             {0.0f, 1.0f, y},
-            {0.0f, 0.0f, 1.0f}
-        }
+            {0.0f, 0.0f, 1.0f},
+        },
+        0.0f, 0.0f, 0.0f
     };
 
     /* Multiply with current matrix. */
@@ -107,8 +108,9 @@ vg_lite_error_t vg_lite_scale(vg_lite_float_t scale_x, vg_lite_float_t scale_y, 
     /* Set scale matrix. */
     vg_lite_matrix_t s = { { {scale_x, 0.0f, 0.0f},
             {0.0f, scale_y, 0.0f},
-            {0.0f, 0.0f, 1.0f}
-        }
+            {0.0f, 0.0f, 1.0f},
+        },
+        0.0f, 0.0f, 0.0f
     };
 
     /* Multiply with current matrix. */
@@ -134,8 +136,9 @@ vg_lite_error_t vg_lite_rotate(vg_lite_float_t degrees, vg_lite_matrix_t * matri
     /* Set rotation matrix. */
     vg_lite_matrix_t r = { { {cos_angle, -sin_angle, 0.0f},
             {sin_angle, cos_angle, 0.0f},
-            {0.0f, 0.0f, 1.0f}
-        }
+            {0.0f, 0.0f, 1.0f},
+        },
+        0.0f, 0.0f, 0.0f
     };
 
     /* Multiply with current matrix. */
