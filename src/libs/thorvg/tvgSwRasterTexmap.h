@@ -824,8 +824,8 @@ static void _rasterPolygonImage(SwSurface* surface, const SwImage* image, const 
 
 static AASpans* _AASpans(float ymin, float ymax, const SwImage* image, const SwBBox* region)
 {
-    auto yStart = static_cast<int32_t>(ymin);
-    auto yEnd = static_cast<int32_t>(ymax);
+    auto yStart = static_cast<int>(ymin);
+    auto yEnd = static_cast<int>(ymax);
 
     if (!_arrange(image, region, yStart, yEnd)) return nullptr;
 

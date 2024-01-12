@@ -9,6 +9,7 @@
 #include "lv_demo_render.h"
 
 #if LV_USE_DEMO_RENDER
+
 #include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 

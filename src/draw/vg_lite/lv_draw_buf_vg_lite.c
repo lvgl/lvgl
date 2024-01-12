@@ -7,6 +7,9 @@
  *      INCLUDES
  *********************/
 
+/*Fix warning for aligned_alloc. See https://stackoverflow.com/questions/29247065/compiler-cant-find-aligned-alloc-function*/
+#define _ISOC11_SOURCE
+
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE

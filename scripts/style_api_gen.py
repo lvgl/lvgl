@@ -390,8 +390,7 @@ props = [
  'dsc': "Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
 
 
-
-{'section': 'Flex', 'dsc':'Flex layout properties.' },
+{'section': 'Flex', 'dsc':'Flex layout properties.',  'guard':'LV_USE_FLEX'},
 
 
 {'name': 'FLEX_FLOW',
@@ -419,7 +418,7 @@ props = [
 
 
 
-{'section': 'Grid', 'dsc':'Grid layout properties.' },
+{'section': 'Grid', 'dsc':'Grid layout properties.', 'guard':'LV_USE_GRID'},
 
 
 {'name': 'GRID_COLUMN_DSC_ARRAY',
@@ -588,6 +587,20 @@ def docs(p):
   print("<li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
   print("</ul>")
 
+def guard_proc(p):
+  global guard
+  if 'section' in p:
+    if guard:
+      guard_close()
+    if 'guard' in p:
+      guard = p['guard']
+      print(f"#if {guard}\n")
+
+def guard_close():
+  global guard
+  if guard:
+    print(f"#endif /*{guard}*/\n")
+  guard = ""
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.h', 'w')
@@ -611,11 +624,17 @@ print("#include \"../misc/lv_area.h\"")
 print("#include \"../misc/lv_style.h\"")
 print("#include \"../core/lv_obj_style.h\"")
 print()
+
+guard = ""
 for p in props:
+  guard_proc(p)
   obj_style_get(p)
+guard_close()
 
 for p in props:
+  guard_proc(p)
   local_style_set_h(p)
+guard_close()
 
 print()
 print('#endif /* LV_OBJ_STYLE_GEN_H */')
@@ -625,16 +644,22 @@ sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.c', 'w')
 print(HEADING)
 print("#include \"lv_obj.h\"")
 print()
+
 for p in props:
+  guard_proc(p)
   local_style_set_c(p)
+guard_close()
 
 sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.c', 'w')
 
 print(HEADING)
 print("#include \"lv_style.h\"")
 print()
+
 for p in props:
+  guard_proc(p)
   style_set_c(p)
+guard_close()
 
 sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.h', 'w')
 
@@ -642,14 +667,19 @@ print(HEADING)
 print('#ifndef LV_STYLE_GEN_H')
 print('#define LV_STYLE_GEN_H')
 print()
-for p in props:
-  style_set_h(p)
 
 for p in props:
+  guard_proc(p)
+  style_set_h(p)
+guard_close()
+
+for p in props:
+  guard_proc(p)
   style_const_set(p)
+guard_close()
+
 print()
 print('#endif /* LV_STYLE_GEN_H */')
-
 
 sys.stdout = open(base_dir + '/../docs/overview/style-props.md', 'w')
 

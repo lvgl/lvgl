@@ -199,7 +199,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     if(decoded_area->y1 == LV_COORD_MIN) {
         *decoded_area = *full_area;
         decoded_area->y2 = decoded_area->y1;
-        if(decoded == NULL) decoded = lv_draw_buf_create(lv_area_get_width(full_area), 1, dsc->header.cf, 0);
+        if(decoded == NULL) decoded = lv_draw_buf_create(lv_area_get_width(full_area), 1, dsc->header.cf, LV_STRIDE_AUTO);
         dsc->decoded = decoded;
     }
     else {
