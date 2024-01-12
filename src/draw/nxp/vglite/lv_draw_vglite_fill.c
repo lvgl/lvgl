@@ -151,6 +151,7 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     int32_t width = lv_area_get_width(coords);
     int32_t height = lv_area_get_height(coords);
     int32_t radius = dsc->radius;
+    lv_opa_t opa = dsc->opa;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
     if(dsc->radius < 0)
@@ -171,7 +172,7 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     vg_lite_identity(&matrix);
 
     /*** Init Color ***/
-    lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
+    lv_color32_t col32 = lv_color_to_32(dsc->color, opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
     vg_lite_linear_gradient_t gradient;
@@ -187,10 +188,14 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
 
         /* Gradient setup */
         vg_lite_uint32_t cnt = LV_MAX(dsc->grad.stops_count, LV_GRADIENT_MAX_STOPS);
+        lv_opa_t opa;
+
         for(uint8_t i = 0; i < cnt; i++) {
             stops[i] = dsc->grad.stops[i].frac;
 
-            col32[i] = lv_color_to_32(dsc->grad.stops[i].color, dsc->grad.stops[i].opa);
+            opa = LV_OPA_MIX2(dsc->grad.stops[i].opa, dsc->opa);
+
+            col32[i] = lv_color_to_32(dsc->grad.stops[i].color, opa);
             colors[i] = vglite_get_color(col32[i], true);
         }
 
