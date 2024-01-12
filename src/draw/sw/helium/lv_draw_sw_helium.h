@@ -76,12 +76,12 @@ extern "C" {
                                         __blend_area,                           \
                                         __color,                                \
                                         __opa,                                  \
-                                        __px_size)                              \
+                                        __cf)                                   \
         _lv_draw_sw_image_recolor_rgb888(   (__src_buf),                        \
                                             &(__blend_area),                    \
                                             (__color),                          \
                                             (__opa),                            \
-                                            (__px_size))
+                                            (__cf))
 #endif
 
 /**********************
@@ -531,9 +531,9 @@ static inline lv_result_t _lv_draw_sw_image_recolor_rgb888(
                                                 const lv_area_t * blend_area,
                                                 lv_color_t color,
                                                 lv_opa_t opa,
-                                                uint32_t px_size)
+                                                lv_color_format_t src_cf)
 {
-    if(px_size == 3) {
+    if(LV_COLOR_FORMAT_XRGB8888 != src_cf) {
         return LV_RESULT_INVALID;
     }
 

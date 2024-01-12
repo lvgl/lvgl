@@ -375,7 +375,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                     }
                 }
                 else  if(cf_final != LV_COLOR_FORMAT_A8) {
-                    if(LV_RESULT_INVALID == LV_DRAW_SW_RGB888_RECOLOR(tmp_buf, blend_area, color, mix, px_size)) {
+                    if(LV_RESULT_INVALID == LV_DRAW_SW_RGB888_RECOLOR(tmp_buf, blend_area, color, mix, cf_final)) {
                         uint32_t size = lv_area_get_size(&blend_area);
                         uint32_t i;
                         uint16_t c_mult[3];
