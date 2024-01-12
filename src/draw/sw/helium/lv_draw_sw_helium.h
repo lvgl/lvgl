@@ -477,7 +477,7 @@ static inline lv_result_t _lv_draw_sw_image_helium(
 
         __RECOLOUR_END()
     } while(0);
-    
+
     return result;
 }
 
