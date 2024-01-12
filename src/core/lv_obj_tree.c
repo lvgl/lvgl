@@ -202,22 +202,28 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
+    /* Check parent validity */
     lv_obj_t * parent = lv_obj_get_parent(obj);
-
     if(!parent) {
         LV_LOG_WARN("parent is NULL");
         return;
     }
 
-    if(index < 0) {
-        index = lv_obj_get_child_count(parent) + index;
-    }
-
+    const uint32_t parent_child_count = lv_obj_get_child_count(parent);
     const int32_t old_index = lv_obj_get_index(obj);
 
-    if(index < 0) return;
-    if(index >= (int32_t) lv_obj_get_child_count(parent)) return;
-    if(index == old_index) return;
+    if(index < 0) {
+        index += parent_child_count;
+    }
+
+    if((index < 0)
+       /* Index is same or bigger than parent child count */
+       || (index >= (int32_t) parent_child_count)
+       /* If both previous and new index are the same */
+       || (index == old_index)) {
+
+        return;
+    }
 
     int32_t i = old_index;
     if(index < old_index) {
