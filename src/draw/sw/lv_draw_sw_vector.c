@@ -87,25 +87,25 @@ static void _set_paint_shape(Tvg_Paint * obj, const lv_vector_path_t * p)
 {
     uint32_t pidx = 0;
     for(uint32_t i = 0; i < p->ops.size; i++) {
-        lv_vector_path_op_t * op = LV_ARRAY_GET(&p->ops, i, uint8_t);
+        lv_vector_path_op_t * op = lv_array_at(&p->ops, i);
         switch(*op) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
-                    lv_fpoint_t * pt = LV_ARRAY_GET(&p->points, pidx, lv_fpoint_t);
+                    lv_fpoint_t * pt = lv_array_at(&p->points, pidx);
                     tvg_shape_move_to(obj, pt->x, pt->y);
                     pidx += 1;
                 }
                 break;
             case LV_VECTOR_PATH_OP_LINE_TO: {
-                    lv_fpoint_t * pt = LV_ARRAY_GET(&p->points, pidx, lv_fpoint_t);
+                    lv_fpoint_t * pt = lv_array_at(&p->points, pidx);
                     tvg_shape_line_to(obj, pt->x, pt->y);
                     pidx += 1;
                 }
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
-                    lv_fpoint_t * pt1 = LV_ARRAY_GET(&p->points, pidx, lv_fpoint_t);
-                    lv_fpoint_t * pt2 = LV_ARRAY_GET(&p->points, pidx + 1, lv_fpoint_t);
+                    lv_fpoint_t * pt1 = lv_array_at(&p->points, pidx);
+                    lv_fpoint_t * pt2 = lv_array_at(&p->points, pidx + 1);
 
-                    lv_fpoint_t * last_pt = LV_ARRAY_GET(&p->points, pidx - 1, lv_fpoint_t);
+                    lv_fpoint_t * last_pt = lv_array_at(&p->points, pidx - 1);
 
                     lv_fpoint_t cp[2];
                     cp[0].x = (last_pt->x + 2 * pt1->x) * (1.0f / 3.0f);
@@ -118,9 +118,9 @@ static void _set_paint_shape(Tvg_Paint * obj, const lv_vector_path_t * p)
                 }
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO: {
-                    lv_fpoint_t * pt1 = LV_ARRAY_GET(&p->points, pidx, lv_fpoint_t);
-                    lv_fpoint_t * pt2 = LV_ARRAY_GET(&p->points, pidx + 1, lv_fpoint_t);
-                    lv_fpoint_t * pt3 = LV_ARRAY_GET(&p->points, pidx + 2, lv_fpoint_t);
+                    lv_fpoint_t * pt1 = lv_array_at(&p->points, pidx);
+                    lv_fpoint_t * pt2 = lv_array_at(&p->points, pidx + 1);
+                    lv_fpoint_t * pt3 = lv_array_at(&p->points, pidx + 2);
 
                     tvg_shape_cubic_to(obj, pt1->x, pt1->y, pt2->x, pt2->y, pt3->x, pt3->y);
                     pidx += 3;
@@ -243,7 +243,7 @@ static void _set_paint_stroke(Tvg_Paint * obj, const lv_vector_stroke_dsc_t * ds
     tvg_shape_set_stroke_join(obj, _lv_stroke_join_to_tvg(dsc->join));
 
     if(!lv_array_is_empty(&dsc->dash_pattern)) {
-        float * dash_array = LV_ARRAY_GET(&dsc->dash_pattern, 0, float);
+        float * dash_array = lv_array_at(&dsc->dash_pattern, 0);
         tvg_shape_set_stroke_dash(obj, dash_array, dsc->dash_pattern.size);
     }
 }
