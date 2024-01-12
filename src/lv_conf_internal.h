@@ -2937,6 +2937,14 @@
     #endif
 #endif
 
+/* LVGL Windows backend */
+#ifndef LV_USE_WINDOWS
+    #ifdef CONFIG_LV_USE_WINDOWS
+        #define LV_USE_WINDOWS CONFIG_LV_USE_WINDOWS
+    #else
+        #define LV_USE_WINDOWS    0
+    #endif
+#endif
 
 /*==================
 * EXAMPLES
