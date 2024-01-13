@@ -317,6 +317,8 @@ static inline lv_result_t _lv_draw_sw_image_helium(
         source_center.iX = draw_dsc->pivot.x;
         source_center.iY = draw_dsc->pivot.y;
         target_center = target_region.tLocation;
+        target_center.iX += draw_dsc->pivot.x;
+        target_center.iY += draw_dsc->pivot.y;
 
         if(LV_COLOR_FORMAT_A8 == src_cf) {
 
