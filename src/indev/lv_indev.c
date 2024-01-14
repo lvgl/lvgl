@@ -487,6 +487,12 @@ lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev)
     return indev->read_timer;
 }
 
+lv_indev_mode_t lv_indev_get_mode(lv_indev_t * indev)
+{
+    if(indev) return indev->mode;
+    return LV_INDEV_MODE_NONE;
+}
+
 void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode)
 {
     if(!indev || indev->mode == mode)

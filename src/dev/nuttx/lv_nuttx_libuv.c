@@ -301,14 +301,15 @@ static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * u
     LV_ASSERT_NULL(uv_ctx);
     LV_ASSERT_NULL(loop);
 
-    if(!indev->read_timer) {
-        LV_LOG_ERROR("indev->read_timer is NULL");
+    if(lv_indev_get_mode(indev) == LV_INDEV_MODE_EVENT) {
+        LV_LOG_ERROR("input device has been running in event-driven mode");
         return -EINVAL;
     }
 
     lv_nuttx_uv_input_ctx_t * input_ctx = &uv_ctx->input_ctx;
     input_ctx->fd = *(int *)lv_indev_get_driver_data(indev);
     if(input_ctx->fd <= 0) {
+        LV_LOG_ERROR("can't get valid input fd");
         return 0;
     }
 

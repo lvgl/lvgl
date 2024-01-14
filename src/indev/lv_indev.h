@@ -42,8 +42,9 @@ typedef enum {
 } lv_indev_state_t;
 
 typedef enum {
-    LV_INDEV_MODE_TIMER = 0,
-    LV_INDEV_MODE_EVENT = 1
+    LV_INDEV_MODE_NONE = 0,
+    LV_INDEV_MODE_TIMER,
+    LV_INDEV_MODE_EVENT,
 } lv_indev_mode_t;
 
 /** Data structure passed to an input driver to fill*/
@@ -246,6 +247,13 @@ lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev);
 * @param mode the mode of input device
 */
 void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode);
+
+/**
+ * Get the input device's running mode.
+ * @param indev pointer to an input device
+ * @return the running mode for the specified input device.
+ */
+lv_indev_mode_t lv_indev_get_mode(lv_indev_t * indev);
 
 /**
  * Search the most top, clickable object by a point
