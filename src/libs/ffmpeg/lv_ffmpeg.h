@@ -24,7 +24,7 @@ extern "C" {
  **********************/
 struct ffmpeg_context_s;
 
-extern const lv_obj_class_t lv_ffmpeg_player_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_ffmpeg_player_class;
 
 typedef struct {
     lv_image_t img;

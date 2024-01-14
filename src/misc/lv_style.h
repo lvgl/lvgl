@@ -606,7 +606,7 @@ static inline bool lv_style_prop_has_flag(lv_style_prop_t prop, uint8_t flag)
  *    GLOBAL VARIABLES
  *************************/
 
-extern const lv_style_prop_t lv_style_const_prop_id_inv;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t lv_style_const_prop_id_inv;
 
 /**********************
  *      MACROS
