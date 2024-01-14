@@ -61,7 +61,6 @@ typedef void * lv_user_data_t;
  * TEST CONFIGS
  ***********************/
 
-#define LV_USE_DEV_VERSION
 #if !(defined(LV_TEST_OPTION)) || LV_TEST_OPTION == 5
 #define  LV_COLOR_DEPTH     32
 #define  LV_DPI_DEF         160
@@ -74,7 +73,7 @@ typedef void * lv_user_data_t;
 /* Use VG-Lite GPU. */
 #define LV_USE_DRAW_VG_LITE         1
 
-/* Enbale VG-Lite custom external 'gpu_init()' function */
+/* Enable VG-Lite custom external 'gpu_init()' function */
 #define LV_VG_LITE_USE_GPU_INIT     1
 
 /* Enable VG-Lite assert. */
