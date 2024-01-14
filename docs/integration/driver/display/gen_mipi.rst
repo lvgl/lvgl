@@ -78,7 +78,7 @@ when the color transfer completes. In case of a DMA transfer this is usually don
 	by polling the hardware, polling a global variable (which is reset at the end of the transfer), or by using a semaphore or other locking mechanism.
 
 Please also note that the driver does not handle the draw buffer allocation, because this may be platform-dependent, too. Thus you need to allocate the buffers and assign them
-to the display object as usual by calling :cpp:func:`lv_display_set_draw_buffers()`.
+to the display object as usual by calling :cpp:func:`lv_display_set_buffers()`.
 
 The driver can be used to create multiple displays. In such a configuration the callbacks must be able to distinguish between the displays. Usually one would
 implement a separate set of callbacks for each display. Also note that the user must take care of arbitrating the bus when multiple devices are connected to it.
@@ -97,11 +97,11 @@ Example
 	#define LCD_H_RES		240
 	#define LCD_V_RES		320
 	#define LCD_BUF_LINES	60
-	
+
 	lv_display_t *my_disp;
 
 	...
-	
+
 
 	/* Initialize LCD I/O bus, reset LCD */
 	static int32_t my_lcd_io_init(void)
@@ -135,7 +135,7 @@ Example
 
 		/* Create the LVGL display object and the LCD display driver */
 		my_disp = lv_lcd_generic_mipi_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE, my_lcd_send_cmd, my_lcd_send_color);
-		
+
 		/* Set display orientation to landscape */
 		lv_display_set_rotation(my_disp, LV_DISPLAY_ROTATION_90);
 
@@ -201,11 +201,11 @@ the generic MIPI driver supports sending a custom command list to the controller
 		...
 		LV_LCD_CMD_DELAY_MS, LV_LCD_CMD_EOF		/* terminate list: this is required! */
 	};
-	
+
 	...
 
 	lv_lcd_generic_mipi_send_cmd_list(my_disp, init_cmd_list);
-	
+
 You can add a delay between the commands by using the pseudo-command ``LV_LCD_CMD_DELAY_MS``, which must be followed by the delay given in 10ms units.
 To terminate the command list you must use a delay with a value of ``LV_LCD_CMD_EOF``, as shown above.
 

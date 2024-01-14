@@ -54,9 +54,9 @@ lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, u
     dsc->tft = new TFT_eSPI(hor_res, ver_res);
     dsc->tft->begin();          /* TFT init */
     dsc->tft->setRotation(3);   /* Landscape orientation, flipped */
-    lv_disp_set_driver_data(disp, (void *)dsc);
-    lv_disp_set_flush_cb(disp, flush_cb);
-    lv_disp_set_draw_buffers(disp, (void *)buf, NULL, buf_size_bytes, LV_DISP_RENDER_MODE_PARTIAL);
+    lv_display_set_driver_data(disp, (void *)dsc);
+    lv_display_set_flush_cb(disp, flush_cb);
+    lv_display_set_buffers(disp, (void *)buf, NULL, buf_size_bytes, LV_DISP_RENDER_MODE_PARTIAL);
     return disp;
 }
 

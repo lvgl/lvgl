@@ -43,7 +43,7 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
   peripherals, and LCD panel, call :cpp:func:`lv_init` to initialise LVGL.
   You can then create the display driver using
   :cpp:func:`lv_disp_create`, and register the frame buffers using
-  :cpp:func:`lv_disp_set_draw_buffers`.
+  :cpp:func:`lv_display_set_buffers`.
 
 .. code:: c
 
@@ -51,8 +51,8 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
    lv_init();
 
    lv_disp_t * disp = lv_disp_create(WIDTH, HEIGHT); /*Basic initialization with horizontal and vertical resolution in pixels*/
-   lv_disp_set_flush_cb(disp, my_flush_cb); /*Set a flush callback to draw to the display*/
-   lv_disp_set_draw_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISP_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
+   lv_display_set_flush_cb(disp, my_flush_cb); /*Set a flush callback to draw to the display*/
+   lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISP_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
 
 - Create some dummy objects to test the output:
 

@@ -239,6 +239,8 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
 
 /**
  * Set the buffers for a display, accept a draw buffer pointer.
+ * Normally use `lv_display_set_buffers` is enough for most cases.
+ * Use this function when an existing lv_draw_buf_t is available.
  * @param disp              pointer to a display
  * @param buf1              first buffer
  * @param buf2              second buffer (can be `NULL`)
