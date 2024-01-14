@@ -133,6 +133,9 @@ extern "C" {
 
 #include "src/dev/evdev/lv_evdev.h"
 
+#include "src/dev/windows/lv_windows_input.h"
+#include "src/dev/windows/lv_windows_display.h"
+
 #include "src/core/lv_global.h"
 /*********************
  *      DEFINES

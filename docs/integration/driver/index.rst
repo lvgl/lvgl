@@ -8,3 +8,4 @@ Drivers
     display/index
     touchpad/index
     X11
+    windows

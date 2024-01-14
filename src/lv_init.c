@@ -39,6 +39,9 @@
 #if LV_USE_DRAW_VG_LITE
     #include "draw/vg_lite/lv_draw_vg_lite.h"
 #endif
+#if LV_USE_WINDOWS
+    #include "src/dev/windows/lv_windows_context.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -183,6 +186,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_SDL
     lv_draw_sdl_init();
+#endif
+
+#if LV_USE_WINDOWS
+    lv_windows_platform_init();
 #endif
 
     _lv_obj_style_init();
