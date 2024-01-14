@@ -16,7 +16,11 @@ extern "C" {
 
 #include "../../../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && !defined(__ASSEMBLY__) && LV_USE_DRAW_ARM2D
+#ifdef LV_DRAW_SW_HELIUM_CUSTOM_INCLUDE
+#include LV_DRAW_SW_HELIUM_CUSTOM_INCLUDE
+#endif
+
+#if LV_USE_DRAW_ARM2D
 
 #define __ARM_2D_IMPL__
 #include "arm_2d.h"
@@ -33,149 +37,245 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc) \
     _lv_color_blend_to_rgb565_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA(dsc) \
     _lv_color_blend_to_rgb565_with_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK(dsc) \
     _lv_color_blend_to_rgb565_with_mask_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565_MIX_MASK_OPA
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_MIX_MASK_OPA(dsc) \
     _lv_color_blend_to_rgb565_mix_mask_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565(dsc)  \
     _lv_rgb565_blend_normal_to_rgb565_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_OPA
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc)  \
     _lv_rgb565_blend_normal_to_rgb565_with_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_MASK
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc)  \
     _lv_rgb565_blend_normal_to_rgb565_with_mask_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc)  \
     _lv_rgb565_blend_normal_to_rgb565_mix_mask_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565(dsc, src_px_size)  \
     _lv_rgb888_blend_normal_to_rgb565_helium(dsc, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_OPA
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc, src_px_size)  \
     _lv_rgb888_blend_normal_to_rgb565_with_opa_helium(dsc, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_MASK
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc, src_px_size)  \
     _lv_rgb888_blend_normal_to_rgb565_with_mask_helium(dsc, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc, src_px_size)  \
     _lv_rgb888_blend_normal_to_rgb565_mix_mask_opa_helium(dsc, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565(dsc)  \
     _lv_argb8888_blend_normal_to_rgb565_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_OPA
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc)  \
     _lv_argb8888_blend_normal_to_rgb565_with_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc)  \
     _lv_argb8888_blend_normal_to_rgb565_with_mask_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc)  \
     _lv_argb8888_blend_normal_to_rgb565_mix_mask_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888(dsc, dst_px_size) \
     _lv_color_blend_to_rgb888_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA(dsc, dst_px_size) \
     _lv_color_blend_to_rgb888_with_opa_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_MASK
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_MASK(dsc, dst_px_size) \
     _lv_color_blend_to_rgb888_with_mask_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888_MIX_MASK_OPA
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_MIX_MASK_OPA(dsc, dst_px_size) \
     _lv_color_blend_to_rgb888_mix_mask_opa_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888(dsc, dst_px_size)  \
     _lv_rgb565_blend_normal_to_rgb888_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_OPA
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_OPA(dsc, dst_px_size)  \
     _lv_rgb565_blend_normal_to_rgb888_with_opa_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_MASK
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_MASK(dsc, dst_px_size)  \
     _lv_rgb565_blend_normal_to_rgb888_with_mask_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(dsc, dst_px_size)  \
     _lv_rgb565_blend_normal_to_rgb888_mix_mask_opa_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888(dsc, dst_px_size, src_px_size)  \
     _lv_rgb888_blend_normal_to_rgb888_helium(dsc, dst_px_size, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_OPA
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_OPA(dsc, dst_px_size, src_px_size)  \
     _lv_rgb888_blend_normal_to_rgb888_with_opa_helium(dsc, dst_px_size, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_MASK
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_MASK(dsc, dst_px_size, src_px_size)  \
     _lv_rgb888_blend_normal_to_rgb888_with_mask_helium(dsc, dst_px_size, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(dsc, dst_px_size, src_px_size)  \
     _lv_rgb888_blend_normal_to_rgb888_mix_mask_opa_helium(dsc, dst_px_size, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888(dsc, dst_px_size)  \
     _lv_argb8888_blend_normal_to_rgb888_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_OPA
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_OPA(dsc, dst_px_size)  \
     _lv_argb8888_blend_normal_to_rgb888_with_opa_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_MASK
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_MASK(dsc, dst_px_size)  \
     _lv_argb8888_blend_normal_to_rgb888_with_mask_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(dsc, dst_px_size)  \
     _lv_argb8888_blend_normal_to_rgb888_mix_mask_opa_helium(dsc, dst_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888
 #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888(dsc) \
     _lv_color_blend_to_argb8888_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_OPA
 #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_OPA(dsc) \
     _lv_color_blend_to_argb8888_with_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_MASK
 #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_MASK(dsc) \
     _lv_color_blend_to_argb8888_with_mask_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_MIX_MASK_OPA
 #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_MIX_MASK_OPA(dsc) \
     _lv_color_blend_to_argb8888_mix_mask_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888(dsc)  \
     _lv_rgb565_blend_normal_to_argb8888_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_OPA
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(dsc)  \
     _lv_rgb565_blend_normal_to_argb8888_with_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_MASK
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc)  \
     _lv_rgb565_blend_normal_to_argb8888_with_mask_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA
 #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(dsc)  \
     _lv_rgb565_blend_normal_to_argb8888_mix_mask_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888(dsc, src_px_size)  \
     _lv_rgb888_blend_normal_to_argb8888_helium(dsc, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(dsc, src_px_size)  \
     _lv_rgb888_blend_normal_to_argb8888_with_opa_helium(dsc, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc, src_px_size)  \
     _lv_rgb888_blend_normal_to_argb8888_with_mask_helium(dsc, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA
 #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(dsc, src_px_size)  \
     _lv_rgb888_blend_normal_to_argb8888_mix_mask_opa_helium(dsc, src_px_size)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888(dsc)  \
     _lv_argb8888_blend_normal_to_argb8888_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(dsc)  \
     _lv_argb8888_blend_normal_to_argb8888_with_opa_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc)  \
     _lv_argb8888_blend_normal_to_argb8888_with_mask_helium(dsc)
+#endif
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(dsc)  \
     _lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_helium(dsc)
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -1336,7 +1436,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_hel
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && !defined(__ASSEMBLY__)*/
+#endif /* LV_USE_DRAW_ARM2D */
 
 #ifdef __cplusplus
 } /*extern "C"*/
