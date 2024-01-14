@@ -1489,6 +1489,10 @@ menu "LVGL configuration"
 		config LV_USE_ILI9341
 			bool "Use ILI9341 LCD driver"
 			default n
+
+		config LV_USE_WINDOWS
+			bool "Use LVGL Windows backend"
+			default n
 	endmenu
 
 	menu "Examples"
