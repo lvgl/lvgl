@@ -126,7 +126,7 @@
         #ifdef CONFIG_LV_MEM_SIZE
             #define LV_MEM_SIZE CONFIG_LV_MEM_SIZE
         #else
-            #define LV_MEM_SIZE (256 * 1024U)          /*[bytes]*/
+            #define LV_MEM_SIZE (64 * 1024U)          /*[bytes]*/
         #endif
     #endif
 
@@ -444,7 +444,7 @@
 #endif
 
 #if LV_USE_DRAW_VG_LITE
-/* Enbale VG-Lite custom external 'gpu_init()' function */
+/* Enable VG-Lite custom external 'gpu_init()' function */
 #ifndef LV_VG_LITE_USE_GPU_INIT
     #ifdef CONFIG_LV_VG_LITE_USE_GPU_INIT
         #define LV_VG_LITE_USE_GPU_INIT CONFIG_LV_VG_LITE_USE_GPU_INIT
