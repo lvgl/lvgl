@@ -65,7 +65,7 @@ You need to implement two platform-dependent functions:
 
 The only difference between the :cpp:func:`my_lcd_send_cmd()` and :cpp:func:`my_lcd_send_color()` functions is that :cpp:func:`my_lcd_send_cmd()` is used to send short commands and it is expected
 complete the transaction when it returns (in other words, it should be blocking), while :cpp:func:`my_lcd_send_color()` is only used to send pixel data, and it is recommended to use
-DMA to transmit data in the background. More sophisticated methods can be also implemented, like queing transfers and scheduling them in the background.
+DMA to transmit data in the background. More sophisticated methods can be also implemented, like queuing transfers and scheduling them in the background.
 
 Please note that while display flushing is handled by the driver, it is the user's responsibility to call :cpp:func:`lv_display_flush_ready()`
 when the color transfer completes. In case of a DMA transfer this is usually done in a transfer ready callback.
@@ -101,7 +101,6 @@ Example
 	lv_display_t *my_disp;
 
 	...
-
 
 	/* Initialize LCD I/O bus, reset LCD */
 	static int32_t my_lcd_io_init(void)
