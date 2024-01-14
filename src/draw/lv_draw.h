@@ -146,13 +146,8 @@ struct _lv_draw_unit_t {
 
 struct _lv_layer_t  {
 
-    /** The unaligned buffer where drawing will happen*/
-    void * buf_unaligned;
-
-    /** The aligned buffer, result of lv_draw_buf_align(layer->buf_unaligned)*/
-    void * buf;
-
-    uint32_t buf_stride;
+    /** Target draw buffer of the layer*/
+    lv_draw_buf_t * draw_buf;
 
     /** The absolute coordinates of the buffer */
     lv_area_t buf_area;

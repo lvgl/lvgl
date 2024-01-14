@@ -346,11 +346,10 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
     lv_area_t canvas_area = {0, 0, header->w - 1,  header->h - 1};
     lv_memzero(layer, sizeof(*layer));
 
-    layer->buf = canvas->draw_buf->data;
+    layer->draw_buf = canvas->draw_buf;
     layer->color_format = header->cf;
     layer->buf_area = canvas_area;
     layer->_clip_area = canvas_area;
-    layer->buf_stride = header->stride;
 }
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)

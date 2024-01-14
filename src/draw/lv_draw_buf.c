@@ -416,10 +416,5 @@ static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format
         size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
     }
 
-    /*RLE decompression operates on pixel unit, thus add padding to make sure memory is enough*/
-    uint8_t bpp = lv_color_format_get_bpp(cf);
-    bpp = (bpp + 7) >> 3;
-    size += bpp;
-
     return size;
 }

@@ -579,6 +579,21 @@ static void refr_invalid_areas(void)
 }
 
 /**
+ * Reshape the draw buffer if required
+ * @param layer  pointer to a layer which will be drawn
+ */
+static void layer_reshape_draw_buf(lv_layer_t * layer)
+{
+    LV_ASSERT(lv_draw_buf_reshape(
+                  layer->draw_buf,
+                  layer->color_format,
+                  lv_area_get_width(&layer->buf_area),
+                  lv_area_get_height(&layer->buf_area),
+                  0)
+              != NULL);
+}
+
+/**
  * Refresh an area if there is Virtual Display Buffer
  * @param area_p  pointer to an area to refresh
  */
@@ -586,7 +601,7 @@ static void refr_area(const lv_area_t * area_p)
 {
     LV_PROFILER_BEGIN;
     lv_layer_t * layer = disp_refr->layer_head;
-    layer->buf = disp_refr->buf_act->data;
+    layer->draw_buf = disp_refr->buf_act;
 
     /*With full refresh just redraw directly into the buffer*/
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
@@ -595,7 +610,7 @@ static void refr_area(const lv_area_t * area_p)
         layer->buf_area.y1 = 0;
         layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
         layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
-        layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+        layer_reshape_draw_buf(layer);
         lv_area_t disp_area;
         lv_area_set(&disp_area, 0, 0, lv_display_get_horizontal_resolution(disp_refr) - 1,
                     lv_display_get_vertical_resolution(disp_refr) - 1);
@@ -632,10 +647,10 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = row + max_row - 1;
-        layer->buf = disp_refr->buf_act->data;
+        layer->draw_buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
-        layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
         layer->_clip_area = sub_area;
+        layer_reshape_draw_buf(layer);
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
         if(y2 == row_last) disp_refr->last_part = 1;
@@ -649,9 +664,10 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = y2;
-        layer->buf = disp_refr->buf_act->data;
+        layer->draw_buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
         layer->_clip_area = sub_area;
+        layer_reshape_draw_buf(layer);
         disp_refr->last_part = 1;
         refr_area_part(layer);
     }
@@ -672,7 +688,7 @@ static void refr_area_part(lv_layer_t * layer)
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
         uint32_t w = lv_area_get_width(&layer->buf_area);
         uint32_t h = lv_area_get_height(&layer->buf_area);
-        lv_draw_buf_clear(layer->buf, w, h, layer->color_format, &disp_refr->refreshed_area);
+        lv_draw_buf_clear(layer->draw_buf->data, w, h, layer->draw_buf->header.cf, &disp_refr->refreshed_area);
     }
 
     lv_obj_t * top_act_scr = NULL;
@@ -1010,7 +1026,7 @@ static void draw_buf_flush(lv_display_t * disp)
     bool flushing_last = disp->flushing_last;
 
     if(disp->flush_cb) {
-        call_flush_cb(disp, &disp->refreshed_area, layer->buf);
+        call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf->data);
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
     if(lv_display_is_double_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
