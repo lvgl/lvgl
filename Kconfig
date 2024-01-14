@@ -346,7 +346,7 @@ menu "LVGL configuration"
 				bool "Use VG-Lite GPU."
 
 			config LV_VG_LITE_USE_GPU_INIT
-				bool "Enbale VG-Lite custom external 'gpu_init()' function."
+				bool "Enable VG-Lite custom external 'gpu_init()' function."
 				default n
 				depends on LV_USE_DRAW_VG_LITE
 
@@ -1265,7 +1265,7 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
-	
+
 		menuconfig LV_USE_VG_LITE_THORVG
 			bool "VG-Lite Simulator"
 			default n
@@ -1472,6 +1472,22 @@ menu "LVGL configuration"
 
 		config LV_USE_EVDEV
 			bool "Use evdev input driver"
+			default n
+
+		config LV_USE_ST7735
+			bool "Use ST7735 LCD driver"
+			default n
+
+		config LV_USE_ST7789
+			bool "Use ST7789 LCD driver"
+			default n
+
+		config LV_USE_ST7796
+			bool "Use ST7796 LCD driver"
+			default n
+
+		config LV_USE_ILI9341
+			bool "Use ILI9341 LCD driver"
 			default n
 	endmenu
 
