@@ -18,7 +18,7 @@ extern "C" {
 
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_ARM2D
+#if LV_USE_DRAW_ARM2D_SYNC
 
 #define __ARM_2D_IMPL__
 #include "arm_2d.h"
@@ -553,7 +553,7 @@ static inline lv_result_t _lv_draw_sw_image_recolor_rgb888(
     return LV_RESULT_OK;
 }
 
-#endif /* LV_USE_DRAW_ARM2D */
+#endif /* LV_USE_DRAW_ARM2D_SYNC */
 
 /* *INDENT-ON* */
 

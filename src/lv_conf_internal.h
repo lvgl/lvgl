@@ -343,12 +343,12 @@
     #endif
 #endif
 
-/* Use Arm-2D on Cortex-M based devices. Please only enable it for Helium Powered devices for now */
-#ifndef LV_USE_DRAW_ARM2D
-    #ifdef CONFIG_LV_USE_DRAW_ARM2D
-        #define LV_USE_DRAW_ARM2D CONFIG_LV_USE_DRAW_ARM2D
+/* Use Arm-2D to accelerate the sw render */
+#ifndef LV_USE_DRAW_ARM2D_SYNC
+    #ifdef CONFIG_LV_USE_DRAW_ARM2D_SYNC
+        #define LV_USE_DRAW_ARM2D_SYNC CONFIG_LV_USE_DRAW_ARM2D_SYNC
     #else
-        #define LV_USE_DRAW_ARM2D 0
+        #define LV_USE_DRAW_ARM2D_SYNC 0
     #endif
 #endif
 

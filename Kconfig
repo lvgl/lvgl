@@ -310,7 +310,7 @@ menu "LVGL configuration"
 		endmenu
 
 		menu "GPU"
-			config LV_USE_DRAW_ARM2D
+			config LV_USE_DRAW_ARM2D_SYNC
 				bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors."
 				default n
 				help

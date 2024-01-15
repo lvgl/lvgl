@@ -16,7 +16,7 @@ extern "C" {
 
 #include "../../../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_ARM2D
+#if LV_USE_DRAW_ARM2D_SYNC
 
 #define __ARM_2D_IMPL__
 #include "arm_2d.h"
@@ -1432,7 +1432,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_hel
  *      MACROS
  **********************/
 
-#endif /* LV_USE_DRAW_ARM2D */
+#endif /* LV_USE_DRAW_ARM2D_SYNC */
 
 #ifdef __cplusplus
 } /*extern "C"*/
