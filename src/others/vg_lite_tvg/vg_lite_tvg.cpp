@@ -130,7 +130,7 @@ class vg_lite_ctx
     public:
         std::unique_ptr<SwCanvas> canvas;
         void * target_buffer;
-        uint32_t target_px_size;
+        vg_lite_uint32_t target_px_size;
         vg_lite_buffer_format_t target_format;
 
     public:
@@ -146,15 +146,15 @@ class vg_lite_ctx
             canvas = SwCanvas::gen();
         }
 
-        uint32_t * get_image_buffer(uint32_t w, uint32_t h)
+        vg_lite_uint32_t * get_image_buffer(vg_lite_uint32_t w, vg_lite_uint32_t h)
         {
             src_buffer.resize(w * h);
             return src_buffer.data();
         }
 
-        uint32_t * get_temp_target_buffer(uint32_t w, uint32_t h)
+        vg_lite_uint32_t * get_temp_target_buffer(vg_lite_uint32_t w, vg_lite_uint32_t h)
         {
-            uint32_t px_size = w * h;
+            vg_lite_uint32_t px_size = w * h;
             if(px_size > dest_buffer.size()) {
 
                 /* During resize, the first address of the vector may change
@@ -166,12 +166,12 @@ class vg_lite_ctx
             return dest_buffer.data();
         }
 
-        uint32_t * get_temp_target_buffer()
+        vg_lite_uint32_t * get_temp_target_buffer()
         {
             return dest_buffer.data();
         }
 
-        void set_CLUT(uint32_t count, const uint32_t * colors)
+        void set_CLUT(vg_lite_uint32_t count, const vg_lite_uint32_t * colors)
         {
             switch(count) {
                 case 2:
@@ -192,7 +192,7 @@ class vg_lite_ctx
             }
         }
 
-        const uint32_t * get_CLUT(vg_lite_buffer_format_t format)
+        const vg_lite_uint32_t * get_CLUT(vg_lite_buffer_format_t format)
         {
             switch(format) {
                 case VG_LITE_INDEX_1:
@@ -223,20 +223,21 @@ class vg_lite_ctx
 
     private:
         /*  */
-        std::vector<uint32_t> src_buffer;
-        std::vector<uint32_t> dest_buffer;
+        std::vector<vg_lite_uint32_t> src_buffer;
+        std::vector<vg_lite_uint32_t> dest_buffer;
 
-        uint32_t clut_2colors[2];
-        uint32_t clut_4colors[4];
-        uint32_t clut_16colors[16];
-        uint32_t clut_256colors[256];
+        vg_lite_uint32_t clut_2colors[2];
+        vg_lite_uint32_t clut_4colors[4];
+        vg_lite_uint32_t clut_16colors[16];
+        vg_lite_uint32_t clut_256colors[256];
 };
 
 template <typename DEST_TYPE, typename SRC_TYPE>
 class vg_lite_converter
 {
     public:
-        typedef void (*converter_cb_t)(DEST_TYPE * dest, const SRC_TYPE * src, uint32_t px_size, uint32_t color);
+        typedef void (*converter_cb_t)(DEST_TYPE * dest, const SRC_TYPE * src, vg_lite_uint32_t px_size,
+                                       vg_lite_uint32_t color);
 
     public:
         vg_lite_converter(converter_cb_t converter)
@@ -244,12 +245,12 @@ class vg_lite_converter
         {
         }
 
-        void convert(vg_lite_buffer_t * dest_buf, const vg_lite_buffer_t * src_buf, uint32_t color = 0)
+        void convert(vg_lite_buffer_t * dest_buf, const vg_lite_buffer_t * src_buf, vg_lite_uint32_t color = 0)
         {
             LV_ASSERT(_converter_cb);
             uint8_t * dest = (uint8_t *)dest_buf->memory;
             const uint8_t * src = (const uint8_t *)src_buf->memory;
-            uint32_t h = src_buf->height;
+            vg_lite_uint32_t h = src_buf->height;
 
             while(h--) {
                 _converter_cb((DEST_TYPE *)dest, (const SRC_TYPE *)src, src_buf->width, color);
@@ -292,9 +293,9 @@ static inline bool math_equal(float a, float b)
 static void ClampColor(FLOATVECTOR4 Source, FLOATVECTOR4 Target, uint8_t Premultiplied);
 static uint8_t PackColorComponent(vg_lite_float_t value);
 static void get_format_bytes(vg_lite_buffer_format_t format,
-                             uint32_t * mul,
-                             uint32_t * div,
-                             uint32_t * bytes_align);
+                             vg_lite_uint32_t * mul,
+                             vg_lite_uint32_t * div,
+                             vg_lite_uint32_t * bytes_align);
 
 /**********************
  *  STATIC VARIABLES
@@ -303,7 +304,7 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
 /* color converters */
 
 static vg_lite_converter<vg_color16_t, vg_color32_t> conv_bgra8888_to_bgr565(
-    [](vg_color16_t * dest, const vg_color32_t * src, uint32_t px_size, uint32_t /* color */)
+    [](vg_color16_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
         dest->red = src->red >> 3;
@@ -315,7 +316,7 @@ static vg_lite_converter<vg_color16_t, vg_color32_t> conv_bgra8888_to_bgr565(
 });
 
 static vg_lite_converter<vg_color16_alpha_t, vg_color32_t> conv_bgra8888_to_bgra5658(
-    [](vg_color16_alpha_t * dest, const vg_color32_t * src, uint32_t px_size, uint32_t /* color */)
+    [](vg_color16_alpha_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
         dest->c.red = src->red >> 3;
@@ -328,7 +329,7 @@ static vg_lite_converter<vg_color16_alpha_t, vg_color32_t> conv_bgra8888_to_bgra
 });
 
 static vg_lite_converter<vg_color32_t, vg_color16_t> conv_bgr565_to_bgra8888(
-    [](vg_color32_t * dest, const vg_color16_t * src, uint32_t px_size, uint32_t /* color */)
+    [](vg_color32_t * dest, const vg_color16_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
         dest->red = src->red << 3;
@@ -341,7 +342,7 @@ static vg_lite_converter<vg_color32_t, vg_color16_t> conv_bgr565_to_bgra8888(
 });
 
 static vg_lite_converter<vg_color32_t, vg_color16_alpha_t> conv_bgra5658_to_bgra8888(
-    [](vg_color32_t * dest, const vg_color16_alpha_t * src, uint32_t px_size, uint32_t /* color */)
+    [](vg_color32_t * dest, const vg_color16_alpha_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
         dest->red = src->c.red << 3;
@@ -354,7 +355,7 @@ static vg_lite_converter<vg_color32_t, vg_color16_alpha_t> conv_bgra5658_to_bgra
 });
 
 static vg_lite_converter<vg_color32_t, vg_color32_t> conv_bgrx8888_to_bgra8888(
-    [](vg_color32_t * dest, const vg_color32_t * src, uint32_t px_size, uint32_t /* color */)
+    [](vg_color32_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
         *dest = *src;
@@ -365,7 +366,7 @@ static vg_lite_converter<vg_color32_t, vg_color32_t> conv_bgrx8888_to_bgra8888(
 });
 
 static vg_lite_converter<vg_color32_t, vg_color24_t> conv_bgr888_to_bgra8888(
-    [](vg_color32_t * dest, const vg_color24_t * src, uint32_t px_size, uint32_t /* color */)
+    [](vg_color32_t * dest, const vg_color24_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
 {
     while(px_size--) {
         dest->red = src->red;
@@ -378,7 +379,7 @@ static vg_lite_converter<vg_color32_t, vg_color24_t> conv_bgr888_to_bgra8888(
 });
 
 static vg_lite_converter<vg_color32_t, uint8_t> conv_alpha8_to_bgra8888(
-    [](vg_color32_t * dest, const uint8_t * src, uint32_t px_size, uint32_t color)
+    [](vg_color32_t * dest, const uint8_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t color)
 {
     while(px_size--) {
         uint8_t alpha = *src;
@@ -392,7 +393,7 @@ static vg_lite_converter<vg_color32_t, uint8_t> conv_alpha8_to_bgra8888(
 });
 
 static vg_lite_converter<vg_color32_t, uint8_t> conv_alpha4_to_bgra8888(
-    [](vg_color32_t * dest, const uint8_t * src, uint32_t px_size, uint32_t color)
+    [](vg_color32_t * dest, const uint8_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t color)
 {
     /* 1 byte -> 2 px */
     px_size /= 2;
@@ -454,14 +455,14 @@ extern "C" {
             buffer->yuv.swizzle = VG_LITE_SWIZZLE_UV;
         }
 
-        uint32_t mul, div, align;
+        vg_lite_uint32_t mul, div, align;
         get_format_bytes(buffer->format, &mul, &div, &align);
-        uint32_t stride = VG_LITE_ALIGN((buffer->width * mul / div), align);
+        vg_lite_uint32_t stride = VG_LITE_ALIGN((buffer->width * mul / div), align);
 
         buffer->stride = stride;
         buffer->memory = aligned_alloc(LV_VG_LITE_THORVG_BUF_ADDR_ALIGN, stride * buffer->height);
         LV_ASSERT(buffer->memory);
-        buffer->address = (uint32_t)(uintptr_t)buffer->memory;
+        buffer->address = (vg_lite_uint32_t)(uintptr_t)buffer->memory;
         buffer->handle = buffer->memory;
         return VG_LITE_SUCCESS;
     }
@@ -474,7 +475,7 @@ extern "C" {
         return VG_LITE_SUCCESS;
     }
 
-    vg_lite_error_t vg_lite_upload_buffer(vg_lite_buffer_t * buffer, uint8_t * data[3], uint32_t stride[3])
+    vg_lite_error_t vg_lite_upload_buffer(vg_lite_buffer_t * buffer, vg_lite_uint8_t * data[3], vg_lite_uint32_t stride[3])
     {
         LV_UNUSED(buffer);
         LV_UNUSED(data);
@@ -599,7 +600,7 @@ extern "C" {
         return VG_LITE_SUCCESS;
     }
 
-    static void picture_bgra8888_to_bgr565(vg_color16_t * dest, const vg_color32_t * src, uint32_t px_size)
+    static void picture_bgra8888_to_bgr565(vg_color16_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
     {
         while(px_size--) {
             dest->red = src->red >> 3;
@@ -610,7 +611,7 @@ extern "C" {
         }
     }
 
-    static void picture_bgra8888_to_bgra5658(vg_color16_alpha_t * dest, const vg_color32_t * src, uint32_t px_size)
+    static void picture_bgra8888_to_bgra5658(vg_color16_alpha_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
     {
         while(px_size--) {
             dest->c.red = src->red >> 3;
@@ -688,7 +689,7 @@ extern "C" {
         return VG_LITE_SUCCESS;
     }
 
-    vg_lite_error_t vg_lite_get_register(uint32_t address, uint32_t * result)
+    vg_lite_error_t vg_lite_get_register(vg_lite_uint32_t address, vg_lite_uint32_t * result)
     {
         LV_UNUSED(address);
         LV_UNUSED(result);
@@ -704,7 +705,7 @@ extern "C" {
         return VG_LITE_SUCCESS;
     }
 
-    uint32_t vg_lite_get_product_info(char * name, uint32_t * chip_id, uint32_t * chip_rev)
+    vg_lite_uint32_t vg_lite_get_product_info(char * name, vg_lite_uint32_t * chip_id, vg_lite_uint32_t * chip_rev)
     {
         strcpy(name, "GCNanoLiteV");
         *chip_id = 0x265;
@@ -712,7 +713,7 @@ extern "C" {
         return 1;
     }
 
-    uint32_t vg_lite_query_feature(vg_lite_feature_t feature)
+    vg_lite_uint32_t vg_lite_query_feature(vg_lite_feature_t feature)
     {
         switch(feature) {
             case gcFEATURE_BIT_VG_IM_INDEX_FORMAT:
@@ -747,7 +748,7 @@ extern "C" {
     vg_lite_error_t vg_lite_init_path(vg_lite_path_t * path,
                                       vg_lite_format_t data_format,
                                       vg_lite_quality_t quality,
-                                      uint32_t path_length,
+                                      vg_lite_uint32_t path_length,
                                       void * path_data,
                                       vg_lite_float_t min_x, vg_lite_float_t min_y,
                                       vg_lite_float_t max_x, vg_lite_float_t max_y)
@@ -779,7 +780,7 @@ extern "C" {
     vg_lite_error_t vg_lite_init_arc_path(vg_lite_path_t * path,
                                           vg_lite_format_t data_format,
                                           vg_lite_quality_t quality,
-                                          uint32_t path_length,
+                                          vg_lite_uint32_t path_length,
                                           void * path_data,
                                           vg_lite_float_t min_x, vg_lite_float_t min_y,
                                           vg_lite_float_t max_x, vg_lite_float_t max_y)
@@ -815,7 +816,7 @@ extern "C" {
     vg_lite_error_t vg_lite_append_path(vg_lite_path_t * path,
                                         uint8_t * cmd,
                                         void * data,
-                                        uint32_t seg_count)
+                                        vg_lite_uint32_t seg_count)
     {
         LV_UNUSED(path);
         LV_UNUSED(cmd);
@@ -830,8 +831,8 @@ extern "C" {
         return VG_LITE_NOT_SUPPORT;
     }
 
-    vg_lite_error_t vg_lite_set_CLUT(uint32_t count,
-                                     uint32_t * colors)
+    vg_lite_error_t vg_lite_set_CLUT(vg_lite_uint32_t count,
+                                     vg_lite_uint32_t * colors)
     {
         if(!vg_lite_query_feature(gcFEATURE_BIT_VG_IM_INDEX_FORMAT)) {
             return VG_LITE_NOT_SUPPORT;
@@ -913,7 +914,7 @@ extern "C" {
             }
         };
 
-        uint32_t i, trg_count;
+        vg_lite_uint32_t i, trg_count;
         vg_lite_float_t prev_stop;
         vg_lite_color_ramp_t * src_ramp;
         vg_lite_color_ramp_t * src_ramp_last;
@@ -1026,10 +1027,10 @@ Empty_sequence_handler:
 
     vg_lite_error_t vg_lite_update_linear_grad(vg_lite_ext_linear_gradient_t * grad)
     {
-        uint32_t ramp_length;
+        vg_lite_uint32_t ramp_length;
         vg_lite_color_ramp_t * color_ramp;
-        uint32_t common, stop;
-        uint32_t i, width;
+        vg_lite_uint32_t common, stop;
+        vg_lite_uint32_t i, width;
         uint8_t * bits;
         vg_lite_float_t x0, y0, x1, y1, length;
         vg_lite_error_t error = VG_LITE_SUCCESS;
@@ -1051,7 +1052,7 @@ Empty_sequence_handler:
             common = 1;
         }
         else {
-            common = (uint32_t)length;
+            common = (vg_lite_uint32_t)length;
         }
 
         for(i = 0; i < ramp_length; ++i) {
@@ -1059,7 +1060,7 @@ Empty_sequence_handler:
                 vg_lite_float_t mul = common * color_ramp[i].stop;
                 vg_lite_float_t frac = mul - (vg_lite_float_t)floor(mul);
                 if(frac > 0.00013f) { /* Suppose error for zero is 0.00013 */
-                    common = MAX(common, (uint32_t)(1.0f / frac + 0.5f));
+                    common = MAX(common, (vg_lite_uint32_t)(1.0f / frac + 0.5f));
                 }
             }
         }
@@ -1181,7 +1182,7 @@ Empty_sequence_handler:
             }
         };
 
-        uint32_t i, trgCount;
+        vg_lite_uint32_t i, trgCount;
         vg_lite_float_t prevStop;
         vg_lite_color_ramp_t * srcRamp;
         vg_lite_color_ramp_t * srcRampLast;
@@ -1294,13 +1295,13 @@ Empty_sequence_handler:
 
     vg_lite_error_t vg_lite_update_radial_grad(vg_lite_radial_gradient_t * grad)
     {
-        uint32_t ramp_length;
+        vg_lite_uint32_t ramp_length;
         vg_lite_color_ramp_t * colorRamp;
-        uint32_t common, stop;
-        uint32_t i, width;
+        vg_lite_uint32_t common, stop;
+        vg_lite_uint32_t i, width;
         uint8_t * bits;
         vg_lite_error_t error = VG_LITE_SUCCESS;
-        uint32_t align, mul, div;
+        vg_lite_uint32_t align, mul, div;
 
         /* Get shortcuts to the color ramp. */
         ramp_length = grad->converted_length;
@@ -1314,7 +1315,7 @@ Empty_sequence_handler:
             common = 1;
         }
         else {
-            common = (uint32_t)grad->radial_grad.r;
+            common = (vg_lite_uint32_t)grad->radial_grad.r;
         }
 
         for(i = 0; i < ramp_length; ++i) {
@@ -1322,7 +1323,7 @@ Empty_sequence_handler:
                 vg_lite_float_t m = common * colorRamp[i].stop;
                 vg_lite_float_t frac = m - (vg_lite_float_t)floor(m);
                 if(frac > 0.00013f) { /* Suppose error for zero is 0.00013 */
-                    common = MAX(common, (uint32_t)(1.0f / frac + 0.5f));
+                    common = MAX(common, (vg_lite_uint32_t)(1.0f / frac + 0.5f));
                 }
             }
         }
@@ -1429,7 +1430,7 @@ Empty_sequence_handler:
                                      vg_lite_uint32_t * colors,
                                      vg_lite_uint32_t * stops)
     {
-        uint32_t i;
+        vg_lite_uint32_t i;
 
         grad->count = 0; /* Opaque B&W gradient */
         if(!count || count > VLC_MAX_GRADIENT_STOPS || colors == NULL || stops == NULL)
@@ -1459,10 +1460,10 @@ Empty_sequence_handler:
         int32_t r0, g0, b0, a0;
         int32_t r1, g1, b1, a1;
         int32_t lr, lg, lb, la;
-        uint32_t i;
+        vg_lite_uint32_t i;
         int32_t j;
         int32_t ds, dr, dg, db, da;
-        uint32_t * buffer = (uint32_t *)grad->image.memory;
+        vg_lite_uint32_t * buffer = (vg_lite_uint32_t *)grad->image.memory;
 
         if(grad->count == 0) {
             /* If no valid stops have been specified (e.g., due to an empty input
@@ -1650,7 +1651,7 @@ Empty_sequence_handler:
         return VG_LITE_NOT_SUPPORT;
     }
 
-    vg_lite_error_t vg_lite_set_command_buffer_size(uint32_t size)
+    vg_lite_error_t vg_lite_set_command_buffer_size(vg_lite_uint32_t size)
     {
         LV_UNUSED(size);
         return VG_LITE_NOT_SUPPORT;
@@ -1675,7 +1676,7 @@ Empty_sequence_handler:
         return VG_LITE_NOT_SUPPORT;
     }
 
-    vg_lite_error_t vg_lite_get_mem_size(uint32_t * size)
+    vg_lite_error_t vg_lite_get_mem_size(vg_lite_uint32_t * size)
     {
         *size = 0;
         return VG_LITE_NOT_SUPPORT;
@@ -1709,8 +1710,8 @@ Empty_sequence_handler:
 
     vg_lite_error_t vg_lite_set_flexa_current_background_buffer(uint8_t stream_id,
                                                                 vg_lite_buffer_t * buffer,
-                                                                uint32_t background_segment_count,
-                                                                uint32_t background_segment_size)
+                                                                vg_lite_uint32_t background_segment_count,
+                                                                vg_lite_uint32_t background_segment_size)
     {
         LV_UNUSED(stream_id);
         LV_UNUSED(buffer);
@@ -1744,14 +1745,14 @@ Empty_sequence_handler:
         return VG_LITE_NOT_SUPPORT;
     }
 
-    vg_lite_error_t vg_lite_set_tess_buffer(uint32_t physical, uint32_t size)
+    vg_lite_error_t vg_lite_set_tess_buffer(vg_lite_uint32_t physical, vg_lite_uint32_t size)
     {
         LV_UNUSED(physical);
         LV_UNUSED(size);
         return VG_LITE_NOT_SUPPORT;
     }
 
-    vg_lite_error_t vg_lite_set_command_buffer(uint32_t physical, uint32_t size)
+    vg_lite_error_t vg_lite_set_command_buffer(vg_lite_uint32_t physical, vg_lite_uint32_t size)
     {
         LV_UNUSED(physical);
         LV_UNUSED(size);
@@ -2012,7 +2013,7 @@ static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_bu
 
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 {
-    uint32_t * target_buffer = nullptr;
+    vg_lite_uint32_t * target_buffer = nullptr;
 
     /* if target_buffer needs to be changed, finish current drawing */
     if(ctx->target_buffer && ctx->target_buffer != target->memory) {
@@ -2023,7 +2024,7 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 
     if(TVG_IS_VG_FMT_SUPPORT(target->format)) {
         /* if target format is supported by VG, use target buffer directly */
-        target_buffer = (uint32_t *)target->memory;
+        target_buffer = (vg_lite_uint32_t *)target->memory;
         ctx->target_buffer = nullptr;
         ctx->target_px_size = 0;
     }
@@ -2035,7 +2036,7 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     }
 
     Result res = ctx->canvas->target(
-                     target_buffer,
+                     (uint32_t *)target_buffer,
                      target->width,
                      target->width,
                      target->height,
@@ -2044,27 +2045,27 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     return res;
 }
 
-static uint32_t width_to_stride(uint32_t w, vg_lite_buffer_format_t color_format)
+static vg_lite_uint32_t width_to_stride(vg_lite_uint32_t w, vg_lite_buffer_format_t color_format)
 {
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN)) {
         w = VG_LITE_ALIGN(w, 16);
     }
 
-    uint32_t mul, div, align;
+    vg_lite_uint32_t mul, div, align;
     get_format_bytes(color_format, &mul, &div, &align);
     return VG_LITE_ALIGN((w * mul / div), align);
 }
 
 static bool decode_indexed_line(
     vg_lite_buffer_format_t color_format,
-    const uint32_t * palette,
+    const vg_lite_uint32_t * palette,
     int32_t x, int32_t y,
-    int32_t w_px, const uint8_t * in, uint32_t * out)
+    int32_t w_px, const uint8_t * in, vg_lite_uint32_t * out)
 {
     uint8_t px_size;
     uint16_t mask;
 
-    uint32_t w_byte = width_to_stride(w_px, color_format);
+    vg_lite_uint32_t w_byte = width_to_stride(w_px, color_format);
 
     in += w_byte * y; /*First pixel*/
     out += w_px * y;
@@ -2115,7 +2116,7 @@ static bool decode_indexed_line(
 static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture, const vg_lite_buffer_t * source,
                            vg_lite_color_t color)
 {
-    uint32_t * image_buffer;
+    vg_lite_uint32_t * image_buffer;
     LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN));
 
 #if LV_VG_LITE_THORVG_16PIXELS_ALIGN
@@ -2123,12 +2124,12 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
 #endif
 
     if(source->format == VG_LITE_BGRA8888 && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE) {
-        image_buffer = (uint32_t *)source->memory;
+        image_buffer = (vg_lite_uint32_t *)source->memory;
     }
     else {
-        uint32_t width = source->width;
-        uint32_t height = source->height;
-        uint32_t px_size = width * height;
+        vg_lite_uint32_t width = source->width;
+        vg_lite_uint32_t height = source->height;
+        vg_lite_uint32_t px_size = width * height;
         image_buffer = ctx->get_image_buffer(width, height);
 
         vg_lite_buffer_t target;
@@ -2144,8 +2145,8 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
             case VG_LITE_INDEX_2:
             case VG_LITE_INDEX_4:
             case VG_LITE_INDEX_8: {
-                    const uint32_t * clut_colors = ctx->get_CLUT(source->format);
-                    for(uint32_t y = 0; y < height; y++) {
+                    const vg_lite_uint32_t * clut_colors = ctx->get_CLUT(source->format);
+                    for(vg_lite_uint32_t y = 0; y < height; y++) {
                         decode_indexed_line(source->format, clut_colors, 0, y, width, (uint8_t *)source->memory, image_buffer);
                     }
                 }
@@ -2185,7 +2186,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
             case VG_LITE_NV12: {
                     libyuv::NV12ToARGB((const uint8_t *)source->memory, source->stride, (const uint8_t *)source->yuv.uv_memory,
                                        source->yuv.uv_stride,
-                                       (uint8_t *)image_buffer, source->width * sizeof(uint32_t), width, height);
+                                       (uint8_t *)image_buffer, source->width * sizeof(vg_lite_uint32_t), width, height);
                 }
                 break;
 #endif
@@ -2214,7 +2215,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
         }
     }
 
-    TVG_CHECK_RETURN_RESULT(picture->load(image_buffer, source->width, source->height, true));
+    TVG_CHECK_RETURN_RESULT(picture->load((uint32_t *)image_buffer, source->width, source->height, true));
 
     return Result::Success;
 }
@@ -2251,9 +2252,9 @@ static uint8_t PackColorComponent(vg_lite_float_t value)
 
 /* Get the bpp information of a color format. */
 static void get_format_bytes(vg_lite_buffer_format_t format,
-                             uint32_t * mul,
-                             uint32_t * div,
-                             uint32_t * bytes_align)
+                             vg_lite_uint32_t * mul,
+                             vg_lite_uint32_t * div,
+                             vg_lite_uint32_t * bytes_align)
 {
     *mul = *div = 1;
     *bytes_align = 4;

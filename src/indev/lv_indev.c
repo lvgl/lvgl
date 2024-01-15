@@ -1564,9 +1564,8 @@ static void indev_scroll_throw_anim_cb(void * var, int32_t v)
 
     if(indev->pointer.scroll_dir == LV_DIR_NONE || indev->pointer.scroll_obj == NULL) {
         if(indev->scroll_throw_anim) {
-            /*hacky*/
             LV_LOG_INFO("stop animation");
-            lv_anim_set_duration(indev->scroll_throw_anim, 0);
+            lv_anim_delete(indev, indev_scroll_throw_anim_cb);
         }
     }
 }

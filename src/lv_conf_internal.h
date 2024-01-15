@@ -737,58 +737,6 @@
     #endif
 #endif
 
-/*------------------
- * STATUS MONITORING
- *------------------*/
-
-/*1: Show CPU usage and FPS count
- * Requires `LV_USE_SYSMON = 1`*/
-#ifndef LV_USE_PERF_MONITOR
-    #ifdef CONFIG_LV_USE_PERF_MONITOR
-        #define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
-    #else
-        #define LV_USE_PERF_MONITOR 0
-    #endif
-#endif
-#if LV_USE_PERF_MONITOR
-    #ifndef LV_USE_PERF_MONITOR_POS
-        #ifdef CONFIG_LV_USE_PERF_MONITOR_POS
-            #define LV_USE_PERF_MONITOR_POS CONFIG_LV_USE_PERF_MONITOR_POS
-        #else
-            #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
-        #endif
-    #endif
-
-    /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
-    #ifndef LV_USE_PERF_MONITOR_LOG_MODE
-        #ifdef CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
-            #define LV_USE_PERF_MONITOR_LOG_MODE CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
-        #else
-            #define LV_USE_PERF_MONITOR_LOG_MODE 0
-        #endif
-    #endif
-#endif
-
-/*1: Show the used memory and the memory fragmentation
- * Requires `LV_USE_BUILTIN_MALLOC = 1`
- * Requires `LV_USE_SYSMON = 1`*/
-#ifndef LV_USE_MEM_MONITOR
-    #ifdef CONFIG_LV_USE_MEM_MONITOR
-        #define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
-    #else
-        #define LV_USE_MEM_MONITOR 0
-    #endif
-#endif
-#if LV_USE_MEM_MONITOR
-    #ifndef LV_USE_MEM_MONITOR_POS
-        #ifdef CONFIG_LV_USE_MEM_MONITOR_POS
-            #define LV_USE_MEM_MONITOR_POS CONFIG_LV_USE_MEM_MONITOR_POS
-        #else
-            #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
-        #endif
-    #endif
-#endif
-
 /*-------------
  * Others
  *-----------*/
@@ -2414,9 +2362,61 @@
     #ifdef CONFIG_LV_USE_SYSMON
         #define LV_USE_SYSMON CONFIG_LV_USE_SYSMON
     #else
-        #define LV_USE_SYSMON   (LV_USE_MEM_MONITOR | LV_USE_PERF_MONITOR)
+        #define LV_USE_SYSMON   0
     #endif
 #endif
+
+#if LV_USE_SYSMON
+
+    /*1: Show CPU usage and FPS count
+     * Requires `LV_USE_SYSMON = 1`*/
+    #ifndef LV_USE_PERF_MONITOR
+        #ifdef CONFIG_LV_USE_PERF_MONITOR
+            #define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
+        #else
+            #define LV_USE_PERF_MONITOR 0
+        #endif
+    #endif
+    #if LV_USE_PERF_MONITOR
+        #ifndef LV_USE_PERF_MONITOR_POS
+            #ifdef CONFIG_LV_USE_PERF_MONITOR_POS
+                #define LV_USE_PERF_MONITOR_POS CONFIG_LV_USE_PERF_MONITOR_POS
+            #else
+                #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+            #endif
+        #endif
+
+        /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
+        #ifndef LV_USE_PERF_MONITOR_LOG_MODE
+            #ifdef CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
+                #define LV_USE_PERF_MONITOR_LOG_MODE CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
+            #else
+                #define LV_USE_PERF_MONITOR_LOG_MODE 0
+            #endif
+        #endif
+    #endif
+
+    /*1: Show the used memory and the memory fragmentation
+     * Requires `LV_USE_BUILTIN_MALLOC = 1`
+     * Requires `LV_USE_SYSMON = 1`*/
+    #ifndef LV_USE_MEM_MONITOR
+        #ifdef CONFIG_LV_USE_MEM_MONITOR
+            #define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
+        #else
+            #define LV_USE_MEM_MONITOR 0
+        #endif
+    #endif
+    #if LV_USE_MEM_MONITOR
+        #ifndef LV_USE_MEM_MONITOR_POS
+            #ifdef CONFIG_LV_USE_MEM_MONITOR_POS
+                #define LV_USE_MEM_MONITOR_POS CONFIG_LV_USE_MEM_MONITOR_POS
+            #else
+                #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
+            #endif
+        #endif
+    #endif
+
+#endif /*LV_USE_SYSMON*/
 
 /*1: Enable the runtime performance profiler*/
 #ifndef LV_USE_PROFILER

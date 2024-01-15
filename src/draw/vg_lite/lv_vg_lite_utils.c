@@ -58,34 +58,34 @@
 void lv_vg_lite_dump_info(void)
 {
     char name[64];
-    uint32_t chip_id;
-    uint32_t chip_rev;
-    uint32_t cid;
+    vg_lite_uint32_t chip_id;
+    vg_lite_uint32_t chip_rev;
+    vg_lite_uint32_t cid;
     vg_lite_get_product_info(name, &chip_id, &chip_rev);
     vg_lite_get_register(0x30, &cid);
     LV_LOG_USER("Product Info: %s"
-                " | Chip ID: 0x%" PRIx32
-                " | Revision: 0x%" PRIx32
-                " | CID: 0x%" PRIx32,
-                name, chip_id, chip_rev, cid);
+                " | Chip ID: 0x%" LV_PRIx32
+                " | Revision: 0x%" LV_PRIx32
+                " | CID: 0x%" LV_PRIx32,
+                name, (uint32_t)chip_id, (uint32_t)chip_rev, (uint32_t)cid);
 
     vg_lite_info_t info;
     vg_lite_get_info(&info);
-    LV_LOG_USER("VGLite API version: 0x%" PRIx32, info.api_version);
-    LV_LOG_USER("VGLite API header version: 0x%" PRIx32, info.header_version);
-    LV_LOG_USER("VGLite release version: 0x%" PRIx32, info.release_version);
+    LV_LOG_USER("VGLite API version: 0x%" LV_PRIx32, (uint32_t)info.api_version);
+    LV_LOG_USER("VGLite API header version: 0x%" LV_PRIx32, (uint32_t)info.header_version);
+    LV_LOG_USER("VGLite release version: 0x%" LV_PRIx32, (uint32_t)info.release_version);
 
     for(int feature = 0; feature < gcFEATURE_COUNT; feature++) {
-        uint32_t ret = vg_lite_query_feature((vg_lite_feature_t)feature);
+        vg_lite_uint32_t ret = vg_lite_query_feature((vg_lite_feature_t)feature);
         LV_UNUSED(ret);
         LV_LOG_USER("Feature-%d: %s\t - %s",
                     feature, lv_vg_lite_feature_string((vg_lite_feature_t)feature),
                     ret ? "YES" : "NO");
     }
 
-    uint32_t mem_avail;
-    vg_lite_mem_avail(&mem_avail);
-    LV_LOG_USER("Memory Avaliable: %" PRId32 " Bytes", mem_avail);
+    vg_lite_uint32_t mem_avail = 0;
+    vg_lite_get_mem_size(&mem_avail);
+    LV_LOG_USER("Memory Avaliable: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
 }
 
 const char * lv_vg_lite_error_string(vg_lite_error_t error)
@@ -625,7 +625,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
 
     if(LV_COLOR_FORMAT_IS_INDEXED(decoded->header.cf)) {
         uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(decoded->header.cf);
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (uint32_t *)decoded->data));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (vg_lite_uint32_t *)decoded->data));
     }
 
     lv_vg_lite_buffer_from_draw_buf(buffer, decoded);
@@ -873,8 +873,8 @@ void lv_vg_lite_draw_linear_grad(
 
     LV_ASSERT(grad->dir != LV_GRAD_DIR_NONE);
 
-    uint32_t colors[VLC_MAX_GRADIENT_STOPS];
-    uint32_t stops[VLC_MAX_GRADIENT_STOPS];
+    vg_lite_uint32_t colors[VLC_MAX_GRADIENT_STOPS];
+    vg_lite_uint32_t stops[VLC_MAX_GRADIENT_STOPS];
 
     /* Gradient setup */
     uint8_t cnt = grad->stops_count;
