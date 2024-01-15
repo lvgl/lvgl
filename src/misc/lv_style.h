@@ -284,7 +284,7 @@ enum _lv_style_prop_t {
     LV_STYLE_COLOR_FILTER_DSC       = 97,
     LV_STYLE_COLOR_FILTER_OPA       = 98,
     LV_STYLE_ANIM                   = 99,
-    LV_STYLE_ANIM_TIME              = 100,
+    LV_STYLE_ANIM_DURATION          = 100,
     LV_STYLE_TRANSITION             = 102,
     LV_STYLE_BLEND_MODE             = 103,
     LV_STYLE_TRANSFORM_WIDTH        = 104,

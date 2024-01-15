@@ -888,15 +888,15 @@ void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value)
 
 const lv_style_prop_t _lv_style_const_prop_id_ANIM = LV_STYLE_ANIM;
 
-void lv_style_set_anim_time(lv_style_t * style, uint32_t value)
+void lv_style_set_anim_duration(lv_style_t * style, uint32_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_ANIM_TIME, v);
+    lv_style_set_prop(style, LV_STYLE_ANIM_DURATION, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_ANIM_TIME = LV_STYLE_ANIM_TIME;
+const lv_style_prop_t _lv_style_const_prop_id_ANIM_DURATION = LV_STYLE_ANIM_DURATION;
 
 void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value)
 {

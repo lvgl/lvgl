@@ -37,11 +37,17 @@ extern "C" {
 
 #if LV_USE_VGLITE_ASSERT
 #define VGLITE_ASSERT(expr) LV_ASSERT(expr)
-#define VGLITE_ASSERT_MSG(expr, msg) LV_ASSERT_MSG(expr, msg)
 #else
 #define VGLITE_ASSERT(expr)
-#define VGLITE_ASSERT_MSG(expr, msg) LV_LOG_ERROR(msg)
 #endif
+
+#define VGLITE_ASSERT_MSG(expr, msg)                                 \
+    do {                                                             \
+        if(!(expr)) {                                                \
+            LV_LOG_ERROR(msg);                                       \
+            VGLITE_ASSERT(false);                                    \
+        }                                                            \
+    } while(0)
 
 #define VGLITE_CHECK_ERROR(function)                                 \
     do {                                                             \

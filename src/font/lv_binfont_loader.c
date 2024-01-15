@@ -78,47 +78,44 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_binfont_load(lv_font_t * font, const char * path)
+lv_font_t * lv_binfont_create(const char * path)
 {
-    LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(path);
-
-    lv_result_t result = LV_RESULT_INVALID;
 
     lv_fs_file_t file;
     lv_fs_res_t fs_res = lv_fs_open(&file, path, LV_FS_MODE_RD);
-    if(fs_res != LV_FS_RES_OK) return result;
+    if(fs_res != LV_FS_RES_OK) return NULL;
 
-    lv_memzero(font, sizeof(lv_font_t));
-    if(lvgl_load_font(&file, font)) {
-        result = LV_RESULT_OK;
-    }
-    else {
-        LV_LOG_WARN("Error loading font file: %s\n", path);
+    lv_font_t * font = lv_malloc_zeroed(sizeof(lv_font_t));
+    LV_ASSERT_MALLOC(font);
+
+    if(!lvgl_load_font(&file, font)) {
+        LV_LOG_WARN("Error loading font file: %s", path);
         /*
         * When `lvgl_load_font` fails it can leak some pointers.
         * All non-null pointers can be assumed as allocated and
-        * `lv_font_free` should free them correctly.
+        * `lv_binfont_destroy` should free them correctly.
         */
-        lv_font_free(font);
+        lv_binfont_destroy(font);
+        font = NULL;
     }
 
     lv_fs_close(&file);
 
-    return result;
+    return font;
 }
 
 #if LV_USE_FS_MEMFS
-lv_result_t lv_binfont_load_from_buffer(lv_font_t * font, void * buffer, uint32_t size)
+lv_font_t * lv_binfont_create_from_buffer(void * buffer, uint32_t size)
 {
     lv_fs_path_ex_t mempath;
 
     lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, buffer, size);
-    return lv_binfont_load(font, (const char *)&mempath);
+    return lv_binfont_create((const char *)&mempath);
 }
 #endif
 
-void lv_font_free(lv_font_t * font)
+void lv_binfont_destroy(lv_font_t * font)
 {
     if(font == NULL) return;
 
@@ -155,6 +152,7 @@ void lv_font_free(lv_font_t * font)
     lv_free((void *)dsc->glyph_bitmap);
     lv_free((void *)dsc->glyph_dsc);
     lv_free((void *)dsc);
+    lv_free(font);
 }
 
 /**********************
@@ -454,9 +452,9 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
  * the pointer should be set on the `lv_font_t` data before any possible return.
  *
  * When something fails, it returns `false` and the memory on the `lv_font_t`
- * still needs to be freed using `lv_font_free`.
+ * still needs to be freed using `lv_binfont_destroy`.
  *
- * `lv_font_free` will assume that all non-null pointers are allocated and
+ * `lv_binfont_destroy` will assume that all non-null pointers are allocated and
  * should be freed.
  */
 static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)

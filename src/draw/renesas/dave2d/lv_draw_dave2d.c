@@ -473,7 +473,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     lv_area_move(&clipped_area, x, y);
 
     /* Invalidate cache */
-    lv_draw_buf_invalidate_cache(layer->buf, layer->buf_stride, layer->color_format, &clipped_area);
+    lv_draw_buf_invalidate_cache(layer->draw_buf->data, layer->draw_buf->header.stride, layer->color_format, &clipped_area);
 #endif
 #endif
 

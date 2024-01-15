@@ -22,13 +22,11 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
 
     d2_u8 current_fillmode;
     lv_area_t clip_area;
-    lv_area_t buffer_area;
     lv_area_t letter_coords;
 
     int32_t x;
     int32_t y;
 
-    buffer_area = unit->base_unit.target_layer->buf_area;
     letter_coords = *glyph_draw_dsc->letter_coords;
 
     bool is_common;
@@ -39,7 +37,6 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
     y = 0 - unit->base_unit.target_layer->buf_area.y1;
 
     lv_area_move(&clip_area, x, y);
-    lv_area_move(&buffer_area, x, y);
     lv_area_move(&letter_coords, x, y);
 
 #if LV_USE_OS
@@ -57,12 +54,8 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
     //
     // Generate render operations
     //
-    d2_framebuffer(unit->d2_handle,
-                   unit->base_unit.target_layer->buf,
-                   (d2_s32)unit->base_unit.target_layer->buf_stride / lv_color_format_get_size(unit->base_unit.target_layer->color_format),
-                   (d2_u32)lv_area_get_width(&buffer_area),
-                   (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(unit->base_unit.target_layer->color_format));
+
+    d2_framebuffer_from_layer(unit->d2_handle, unit->base_unit.target_layer);
 
     current_fillmode = d2_getfillmode(unit->d2_handle);
 

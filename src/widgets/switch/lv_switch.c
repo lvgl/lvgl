@@ -228,7 +228,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    uint32_t anim_dur_full = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+    uint32_t anim_dur_full = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
 
     if(anim_dur_full > 0) {
         bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;

@@ -54,33 +54,24 @@ void lv_draw_pxp_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * d
                        const lv_area_t * coords)
 {
     lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
+    const lv_draw_buf_t * draw_buf = layer_to_draw->draw_buf;
 
-    /*It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
-     *In this case just return. */
-    if(layer_to_draw->buf == NULL)
+    /* It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
+     * In this case just return.
+     */
+    if(draw_buf == NULL)
         return;
 
-    uint32_t width = lv_area_get_width(&layer_to_draw->buf_area);
-    uint32_t height = lv_area_get_height(&layer_to_draw->buf_area);
-    const lv_area_t area = {
+    const lv_area_t area_to_draw = {
         .x1 = 0,
         .y1 = 0,
-        .x2 = width - 1,
-        .y2 = height - 1
+        .x2 = draw_buf->header.w - 1,
+        .y2 = draw_buf->header.h - 1
     };
-    lv_draw_buf_invalidate_cache(layer_to_draw->buf, layer_to_draw->buf_stride, layer_to_draw->color_format, &area);
+    lv_draw_buf_invalidate_cache(draw_buf->data, draw_buf->header.stride, draw_buf->header.cf, &area_to_draw);
 
-    lv_image_dsc_t img_dsc = {0};
-    img_dsc.header.w = width;
-    img_dsc.header.h = height;
-    img_dsc.header.cf = layer_to_draw->color_format;
-    img_dsc.header.stride = layer_to_draw->buf_stride;
-    img_dsc.data = layer_to_draw->buf;
-
-    lv_draw_image_dsc_t new_draw_dsc;
-    lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));
-    new_draw_dsc.src = &img_dsc;
-
+    lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
+    new_draw_dsc.src = draw_buf;
     lv_draw_pxp_img(draw_unit, &new_draw_dsc, coords);
 
 #if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG

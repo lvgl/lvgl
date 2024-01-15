@@ -334,12 +334,11 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
     lv_draw_task_t * t = u->task_act;
     lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
     lv_layer_t * layer = draw_unit->target_layer;
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     /* Set target buffer */
-    uint32_t buf_width = lv_area_get_width(&layer->buf_area);
-    uint32_t buf_height = lv_area_get_height(&layer->buf_area);
-
-    vglite_set_dest_buf(layer->buf, buf_width, buf_height, layer->buf_stride, layer->color_format);
+    vglite_set_dest_buf(draw_buf->data, draw_buf->header.w, draw_buf->header.h, draw_buf->header.stride,
+                        draw_buf->header.cf);
 
     lv_area_t clip_area;
     lv_area_copy(&clip_area, draw_unit->clip_area);
@@ -353,7 +352,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
         return; /*Fully clipped, nothing to do*/
 
     /* Invalidate the drawing area */
-    lv_draw_buf_invalidate_cache(layer->buf, layer->buf_stride, layer->color_format, &draw_area);
+    lv_draw_buf_invalidate_cache(draw_buf->data, draw_buf->header.stride, draw_buf->header.cf, &draw_area);
 
     /* Set scissor area */
     vglite_set_scissor(&clip_area);

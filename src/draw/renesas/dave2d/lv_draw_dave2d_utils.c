@@ -120,6 +120,19 @@ d2_u32 lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(lv_color_format_t colour_format)
     return d2_lvgl_mode;
 }
 
+void d2_framebuffer_from_layer(d2_device * handle, lv_layer_t * layer)
+{
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
+    lv_area_t buffer_area = layer->buf_area;
+    lv_area_move(&buffer_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
+    d2_framebuffer(handle, draw_buf->data,
+                   (d2_s32) draw_buf->header.stride / lv_color_format_get_size(layer->color_format),
+                   (d2_u32)lv_area_get_width(&buffer_area),
+                   (d2_u32)lv_area_get_height(&buffer_area),
+                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(layer->color_format));
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
