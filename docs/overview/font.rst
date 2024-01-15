@@ -302,14 +302,13 @@ Example
 
 .. code:: c
 
-   static lv_font_t my_font;
-   lv_result_t res = lv_binfont_load(&my_font, "X:/path/to/my_font.bin");
-   if(res != LV_RESULT_OK) return;
+   lv_font_t *my_font = lv_binfont_load("X:/path/to/my_font.bin");
+   if(my_font == NULL) return;
 
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(&my_font);
+   lv_font_free(my_font);
 
 Load a font from a memory buffer at run-time
 ******************************************
@@ -325,7 +324,7 @@ Example
 
 .. code:: c
 
-   static lv_font_t my_font;
+   lv_font_t *my_font;
    uint8_t *buf;
    uint32_t bufsize;
 
@@ -333,12 +332,12 @@ Example
    ...
 
    /*Load font from the buffer*/
-   lv_result_t res = lv_binfont_load_from_buffer(&my_font, (void *)buf, buf));
-   if(res != LV_RESULT_OK) return;
+   my_font = lv_binfont_load_from_buffer((void *)buf, buf));
+   if(my_font == NULL) return;
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(&my_font);
+   lv_font_free(my_font);
 
 Add a new font engine
 *********************
