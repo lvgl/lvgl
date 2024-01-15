@@ -6,7 +6,6 @@
  **********************************************************************
  */
 
-
 #ifndef LV_STYLE_GEN_H
 #define LV_STYLE_GEN_H
 
@@ -233,7 +232,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
     void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
     LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
 #endif /*LV_USE_GRID*/
-
 
 #define LV_STYLE_CONST_WIDTH(val) \
     { \
@@ -701,7 +699,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
     }
 #if LV_USE_FLEX
 
-
 #define LV_STYLE_CONST_FLEX_FLOW(val) \
     { \
         .prop_ptr = &_lv_style_const_prop_id_FLEX_FLOW, .value = { .num = (int32_t)val } \
@@ -729,7 +726,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
 #endif /*LV_USE_FLEX*/
 
 #if LV_USE_GRID
-
 
 #define LV_STYLE_CONST_GRID_COLUMN_DSC_ARRAY(val) \
     { \
@@ -781,6 +777,5 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
         .prop_ptr = &_lv_style_const_prop_id_GRID_CELL_ROW_SPAN, .value = { .num = (int32_t)val } \
     }
 #endif /*LV_USE_GRID*/
-
 
 #endif /* LV_STYLE_GEN_H */
