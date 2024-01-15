@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2020-2023 NXP
+ * Copyright 2020-2024 NXP
  *
  * SPDX-License-Identifier: MIT
  */
@@ -47,7 +47,7 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
  * Draw rectangle background with effects (rounded corners, gradient)
  *
  * @param[in] coords Coordinates of the rectangle background (relative to dest buff)
- * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] clip_area Clip area with relative coordinates to dest buff
  * @param[in] dsc Description of the rectangle background
  *
  */
@@ -73,24 +73,16 @@ void lv_draw_vglite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * 
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
-    lv_area_t rel_coords;
-    lv_area_copy(&rel_coords, coords);
+    lv_area_t relative_coords;
+    lv_area_copy(&relative_coords, coords);
+    lv_area_move(&relative_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    /*If the border fully covers make the bg area 1px smaller to avoid artifacts on the corners*/
-    //if(dsc->border_width > 1 && dsc->border_opa >= (lv_opa_t)LV_OPA_MAX && dsc->radius != 0) {
-    //    rel_coords.x1 += (dsc->border_side & LV_BORDER_SIDE_LEFT) ? 1 : 0;
-    //    rel_coords.y1 += (dsc->border_side & LV_BORDER_SIDE_TOP) ? 1 : 0;
-    //    rel_coords.x2 -= (dsc->border_side & LV_BORDER_SIDE_RIGHT) ? 1 : 0;
-    //    rel_coords.y2 -= (dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? 1 : 0;
-    //}
-    lv_area_move(&rel_coords, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
-
-    lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
+    lv_area_t clip_area;
+    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
+    if(!_lv_area_intersect(&clipped_coords, &relative_coords, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /*
@@ -99,7 +91,7 @@ void lv_draw_vglite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * 
     if((dsc->radius == 0) && (dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE))
         _vglite_fill(&clipped_coords, dsc);
     else
-        _vglite_draw_rect(&rel_coords, &rel_clip_area, dsc);
+        _vglite_draw_rect(&relative_coords, &clip_area, dsc);
 }
 
 /**********************
@@ -108,7 +100,6 @@ void lv_draw_vglite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * 
 
 static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t * dsc)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
@@ -122,8 +113,7 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
             .height = lv_area_get_height(dest_area)
         };
 
-        err = vg_lite_clear(vgbuf, &rect, vgcol);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear failed.");
+        VGLITE_CHECK_ERROR(vg_lite_clear(vgbuf, &rect, vgcol));
 
         vglite_run();
     }
@@ -139,32 +129,29 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
             VLC_OP_END
         };
 
-        err = vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_MEDIUM, sizeof(path_data), path_data,
-                                (vg_lite_float_t) dest_area->x1, (vg_lite_float_t) dest_area->y1,
-                                ((vg_lite_float_t) dest_area->x2) + 1.0f, ((vg_lite_float_t) dest_area->y2) + 1.0f);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init path failed.");
+        VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_MEDIUM, sizeof(path_data), path_data,
+                                             (vg_lite_float_t) dest_area->x1, (vg_lite_float_t) dest_area->y1,
+                                             ((vg_lite_float_t) dest_area->x2) + 1.0f, ((vg_lite_float_t) dest_area->y2) + 1.0f));
 
         vg_lite_matrix_t matrix;
         vg_lite_identity(&matrix);
 
         /*Draw rectangle*/
-        err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw rectangle failed.");
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
 
         vglite_run();
 
-        err = vg_lite_clear_path(&path);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");
+        VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
     }
 }
 
 static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_area,
                               const lv_draw_fill_dsc_t * dsc)
 {
-    vg_lite_error_t err = VG_LITE_SUCCESS;
     int32_t width = lv_area_get_width(coords);
     int32_t height = lv_area_get_height(coords);
     int32_t radius = dsc->radius;
+    lv_opa_t opa = dsc->opa;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
     if(dsc->radius < 0)
@@ -177,19 +164,16 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;
 
     vg_lite_path_t path;
-    err = vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
-                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
-                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init path failed.");
+    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
+                                         (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                                         ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
     /*** Init Color ***/
-    lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
+    lv_color32_t col32 = lv_color_to_32(dsc->color, opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
-
-    vglite_set_scissor(clip_area);
 
     vg_lite_linear_gradient_t gradient;
     bool has_gradient = (dsc->grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE);
@@ -198,29 +182,30 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     if(has_gradient) {
         vg_lite_matrix_t * grad_matrix;
 
-        uint32_t colors[2];
-        uint32_t stops[2];
-        lv_color32_t col32[2];
+        vg_lite_uint32_t colors[LV_GRADIENT_MAX_STOPS];
+        vg_lite_uint32_t stops[LV_GRADIENT_MAX_STOPS];
+        lv_color32_t col32[LV_GRADIENT_MAX_STOPS];
 
         /* Gradient setup */
-        uint8_t cnt = LV_MAX(dsc->grad.stops_count, 2);
+        vg_lite_uint32_t cnt = LV_MAX(dsc->grad.stops_count, LV_GRADIENT_MAX_STOPS);
+        lv_opa_t opa;
+
         for(uint8_t i = 0; i < cnt; i++) {
             stops[i] = dsc->grad.stops[i].frac;
 
-            col32[i] = lv_color_to_32(dsc->grad.stops[i].color, dsc->opa);
+            opa = LV_OPA_MIX2(dsc->grad.stops[i].opa, dsc->opa);
+
+            col32[i] = lv_color_to_32(dsc->grad.stops[i].color, opa);
             colors[i] = vglite_get_color(col32[i], true);
         }
 
         lv_memzero(&gradient, sizeof(vg_lite_linear_gradient_t));
 
-        err = vg_lite_init_grad(&gradient);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Init gradient failed");
+        VGLITE_CHECK_ERROR(vg_lite_init_grad(&gradient));
 
-        err = vg_lite_set_grad(&gradient, cnt, colors, stops);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Set gradient failed.");
+        VGLITE_CHECK_ERROR(vg_lite_set_grad(&gradient, cnt, colors, stops));
 
-        err = vg_lite_update_grad(&gradient);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Update gradient failed.");
+        VGLITE_CHECK_ERROR(vg_lite_update_grad(&gradient));
 
         grad_matrix = vg_lite_get_grad_matrix(&gradient);
         vg_lite_identity(grad_matrix);
@@ -234,25 +219,19 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        err = vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &gradient, VG_LITE_BLEND_SRC_OVER);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw gradient failed.");
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &gradient,
+                                                 VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw rectangle failed.");
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();
 
-    vglite_disable_scissor();
+    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 
-    err = vg_lite_clear_path(&path);
-    LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear path failed.");
-
-    if(has_gradient) {
-        err = vg_lite_clear_grad(&gradient);
-        LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear gradient failed.");
-    }
+    if(has_gradient)
+        VGLITE_CHECK_ERROR(vg_lite_clear_grad(&gradient));
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

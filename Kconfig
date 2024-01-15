@@ -1153,27 +1153,27 @@ menu "LVGL configuration"
 			bool "Lottie library"
 		config LV_USE_THORVG
 			bool "ThorVG library"
-            choice
-             prompt "Use ThorVG config"
-             depends on LV_USE_THORVG
-                default LV_USE_THORVG_INTERNAL
-                config LV_USE_THORVG_INTERNAL
-                    bool "Use ThorVG internal"
-                config LV_USE_THORVG_EXTERNAL
-                    bool "Use ThorVG external"
-             endchoice
+			choice
+				prompt "Use ThorVG config"
+				depends on LV_USE_THORVG
+				default LV_USE_THORVG_INTERNAL
+				config LV_USE_THORVG_INTERNAL
+					bool "Use ThorVG internal"
+				config LV_USE_THORVG_EXTERNAL
+					bool "Use ThorVG external"
+			endchoice
 
 		config LV_USE_LZ4
 			bool "Enable LZ4 compress/decompress lib"
-            choice
-             prompt "Choose lvgl built-in LZ4 lib or external lib"
-             depends on LV_USE_LZ4
-                default LV_USE_LZ4_INTERNAL
-                config LV_USE_LZ4_INTERNAL
-                    bool "Use lvgl built-in LZ4 lib"
-                config LV_USE_LZ4_EXTERNAL
-                    bool "Use external LZ4 library"
-             endchoice
+			choice
+				prompt "Choose lvgl built-in LZ4 lib or external lib"
+				depends on LV_USE_LZ4
+				default LV_USE_LZ4_INTERNAL
+				config LV_USE_LZ4_INTERNAL
+					bool "Use lvgl built-in LZ4 lib"
+				config LV_USE_LZ4_EXTERNAL
+					bool "Use external LZ4 library"
+			endchoice
 
 		config LV_USE_FFMPEG
 			bool "FFmpeg library"
@@ -1265,6 +1265,35 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
+	
+		menuconfig LV_USE_VG_LITE_THORVG
+			bool "VG-Lite Simulator"
+			default n
+			depends on LV_USE_THORVG
+			help
+				Use thorvg to simulate VG-Lite hardware behavior, it's useful
+				for debugging and testing on PC simulator. Enable LV_USE_THORVG,
+				Either internal ThorVG or external ThorVG library is required.
+
+		config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+			bool "Enable LVGL blend mode support"
+			default n
+			depends on LV_USE_VG_LITE_THORVG
+
+		config LV_VG_LITE_THORVG_YUV_SUPPORT
+			bool "Enable YUV color format support"
+			default n
+			depends on LV_USE_VG_LITE_THORVG
+
+		config LV_VG_LITE_THORVG_16PIXELS_ALIGN
+			bool "Enable 16 pixels alignment"
+			default y
+			depends on LV_USE_VG_LITE_THORVG
+
+		config LV_VG_LITE_THORVG_THREAD_RENDER
+			bool "Enable multi-thread render"
+			default n
+			depends on LV_USE_VG_LITE_THORVG
 	endmenu
 
 	menu "Devices"

@@ -4,7 +4,7 @@
  */
 #include "../../lv_examples.h"
 
-#if LV_USE_FRAGMENT && LV_USE_WIN && LV_BUILD_EXAMPLES
+#if LV_USE_FRAGMENT && LV_USE_WIN && LV_USE_GRID && LV_BUILD_EXAMPLES
 
 static void sample_fragment_ctor(lv_fragment_t * self, void * args);
 

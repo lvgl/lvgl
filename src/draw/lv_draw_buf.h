@@ -21,6 +21,10 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/*Use this value to let LVGL calculate stride automatically*/
+#define LV_STRIDE_AUTO 0
+LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
+
 /**********************
  *      TYPEDEFS
  **********************/

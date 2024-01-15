@@ -197,7 +197,7 @@ void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir)
     bool now_ver = dir & LV_DIR_VER;
 
     if(was_ver != now_ver) {
-        int32_t dpi = lv_display_get_dpi(lv_obj_get_disp(obj));
+        int32_t dpi = lv_display_get_dpi(lv_obj_get_display(obj));
         if(now_ver) {
             lv_obj_set_size(tab_bar, lv_pct(100), dpi / 2);
         }

@@ -382,6 +382,7 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
     }
 
     LV_ASSERT(false);
+    return 0;
 }
 
 void lv_vg_lite_buffer_format_bytes(
@@ -467,6 +468,8 @@ void lv_vg_lite_buffer_format_bytes(
             *mul = 3;
             break;
         default:
+            LV_LOG_ERROR("unsupport color format: 0x%" PRIx32, (uint32_t)format);
+            LV_ASSERT(false);
             break;
     }
 }
@@ -713,7 +716,7 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
     uint32_t mul;
     uint32_t div;
     uint32_t align;
-    uint32_t stride;
+    int32_t stride;
 
     if(!buffer) {
         LV_LOG_ERROR("buffer is NULL");
@@ -751,7 +754,7 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
         return false;
     }
 
-    if(is_src && buffer->width != lv_vg_lite_width_align(buffer->width)) {
+    if(is_src && buffer->width != (vg_lite_int32_t)lv_vg_lite_width_align(buffer->width)) {
         LV_LOG_ERROR("buffer width(%d) is not aligned", (int)buffer->width);
         return false;
     }
@@ -811,8 +814,8 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
         return false;
     }
 
-    uint8_t * cur = path->path;
-    uint8_t * end = cur + path->path_length;
+    const uint8_t * cur = path->path;
+    const uint8_t * end = cur + path->path_length;
 
     while(cur < end) {
         /* get op code */
@@ -823,10 +826,19 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
 
         /* get next op code */
         cur += (fmt_len * (1 + arg_len)) ;
+
+        /* break if end */
+        if(op_code == VLC_OP_END) {
+            break;
+        }
+    }
+
+    if(cur != end) {
+        LV_LOG_ERROR("path length(%d) error", (int)path->path_length);
+        return false;
     }
 
     uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
-
     if(end_op_code != VLC_OP_END) {
         LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
         return false;
@@ -988,8 +1000,8 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
 lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point)
 {
     lv_point_precise_t p;
-    p.x = point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2];
-    p.y = point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2];
+    p.x = (lv_value_precise_t)(point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]);
+    p.y = (lv_value_precise_t)(point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]);
     return p;
 }
 

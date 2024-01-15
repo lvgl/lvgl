@@ -18,6 +18,10 @@
     #error "LV_FONT_MONTSERRAT_24 is required for lv_demo_benchmark. Enable it in lv_conf.h."
 #endif
 
+#if LV_USE_DEMO_WIDGETS == 0
+    #error "LV_USE_DEMO_WIDGETS needs to be enabled"
+#endif
+
 #include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 

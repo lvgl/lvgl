@@ -19,6 +19,7 @@ extern "C" {
 #include <stdbool.h>
 
 #include "lv_symbol_def.h"
+#include "../draw/lv_draw_buf.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_types.h"
 #include "../misc/cache/lv_cache.h"
@@ -29,7 +30,7 @@ extern "C" {
 
 /* imgfont identifier */
 #define LV_IMGFONT_BPP 9
-#define LV_VECFONT_BPP 0
+#define LV_VECFONT_BPP 10
 
 /**********************
  *      TYPEDEFS
@@ -87,7 +88,7 @@ struct _lv_font_t {
     bool (*get_glyph_dsc)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
-    const uint8_t * (*get_glyph_bitmap)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t, uint8_t *);
+    const void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, uint32_t, lv_draw_buf_t *);
 
     /** Release a glyph*/
     void (*release_glyph)(const lv_font_t *, lv_font_glyph_dsc_t *);
@@ -112,13 +113,13 @@ struct _lv_font_t {
 
 /**
  * Return with the bitmap of a font.
- * @param font_p        pointer to a font
- * @param g_dsc         pass the lv_font_glyph_dsc_t here
+ * @param g_dsc         the glyph descriptor including which font to use etc.
  * @param letter        a UNICODE character code
- * @return pointer to the bitmap of the letter
+ * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
+ * @return pointer to the glyph's data. It can be a draw buffer for bitmap fonts or an image source for imgfonts.
  */
-const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t letter,
-                                         uint8_t * buf_out);
+const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, uint32_t letter,
+                                      lv_draw_buf_t * draw_buf);
 
 /**
  * Get the descriptor of a glyph

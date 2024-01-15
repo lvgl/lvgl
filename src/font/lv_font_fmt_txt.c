@@ -71,10 +71,11 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
  *   GLOBAL FUNCTIONS
  **********************/
 
-const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
-                                           uint8_t * bitmap_out)
+const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
+                                        lv_draw_buf_t * draw_buf)
 {
-    LV_UNUSED(g_dsc);
+    const lv_font_t * font = g_dsc->resolved_font;
+    uint8_t * bitmap_out = draw_buf->data;
 
     if(unicode_letter == '\t') unicode_letter = ' ';
 
@@ -144,7 +145,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, lv_font_glyph
                 bitmap_out_tmp += stride;
             }
         }
-        return bitmap_out;
+        return draw_buf;
     }
     /*Handle compressed bitmap*/
     else {
@@ -152,7 +153,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, lv_font_glyph
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
         decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
-        return bitmap_out;
+        return draw_buf;
 #else /*!LV_USE_FONT_COMPRESSED*/
         LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
         return NULL;

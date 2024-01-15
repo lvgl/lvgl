@@ -22,7 +22,8 @@ If you are updating a v8 project to v9, special care must be taken as some parts
 
 So pay extra attention to these:
 
-- :cpp:func:`lv_display_set_draw_buffers(display, buf1, buf2, buf_size_byte, mode)` is more or less the equivalent of ``lv_disp_draw_buf_init(&draw_buf_dsc, buf1, buf2, buf_size_px)`` from v8, however in **v9 the buffer size is set in bytes**.
+- :cpp:func:`lv_display_set_draw_buffers(display, buf1, buf2)` is more or less the equivalent of ``lv_disp_draw_buf_init(&draw_buf_dsc, buf1, buf2, buf_size_px)`` from v8, however in **v9 the buffer type is lv_draw_buf_t**.
+- Make sure to call :cpp:func:`lv_display_set_render_mode(display, mode)` to set correct render mode.
 - In v9 ``lv_color_t`` is always RGB888 regardless of ``LV_COLOR_DEPTH``.
 - ``lv_conf.h`` has been changed a lot, so don't forget to update it from ``lv_conf_template.h``
 - Be sure ``<stdint.h>`` is **not** included in ``lv_conf.h``. In v9 we have some assembly parts for even better performance and a random include there would mess up the assembly part.
@@ -78,9 +79,10 @@ Display API
 
    lv_display_t * disp = lv_display_create(hor_res, ver_res)
    lv_display_set_flush_cb(disp, flush_cb);
-   lv_display_set_draw_buffers(disp, buf1, buf2, buf_size_in_bytes, mode);
+   lv_display_set_draw_buffers(disp, buf1, buf2);
+   lv_display_set_render_mode(disp, mode);
 
--  Note that now **buf size is in bytes and not pixels**
+-  Note that now **draw buffer can be malloced by `lv_draw_buf_create` or initialized by `lv_draw_buf_init`**
 -  ``mode`` can be:
 
    -  ``LV_DISPLAY_RENDER_MODE_PARTIAL`` This way the buffers can be

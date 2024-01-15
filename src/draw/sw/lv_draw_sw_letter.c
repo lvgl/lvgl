@@ -66,7 +66,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_
                                                  lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
     if(glyph_draw_dsc) {
-        if(glyph_draw_dsc->bitmap == NULL) {
+        if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_INVALID) {
 #if LV_USE_FONT_PLACEHOLDER
             /* Draw a placeholder rectangle*/
             lv_draw_border_dsc_t border_draw_dsc;
@@ -84,8 +84,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_
             lv_memzero(&blend_dsc, sizeof(blend_dsc));
             blend_dsc.color = glyph_draw_dsc->color;
             blend_dsc.opa = glyph_draw_dsc->opa;
-            blend_dsc.mask_buf = glyph_draw_dsc->bitmap;
+            lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
+            blend_dsc.mask_buf = draw_buf->data;
             blend_dsc.mask_area = &mask_area;
+            blend_dsc.mask_stride = draw_buf->header.stride;
             blend_dsc.blend_area = glyph_draw_dsc->letter_coords;
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
 
@@ -99,7 +101,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_
             img_dsc.scale_x = LV_SCALE_NONE;
             img_dsc.scale_y = LV_SCALE_NONE;
             img_dsc.opa = glyph_draw_dsc->opa;
-            img_dsc.src = glyph_draw_dsc->bitmap;
+            img_dsc.src = glyph_draw_dsc->glyph_data;
             lv_draw_sw_image(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
 #endif
         }

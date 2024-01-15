@@ -31,9 +31,9 @@ typedef struct _lv_freetype_outline_node_t {
 static lv_freetype_outline_t outline_create(lv_freetype_context_t * ctx, FT_Face face, FT_UInt glyph_index,
                                             uint32_t size, uint32_t strength);
 static lv_result_t outline_delete(lv_freetype_context_t * ctx, lv_freetype_outline_t outline);
-static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc,
-                                                    uint32_t unicode_letter,
-                                                    uint8_t * bitmap_out);
+static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
+                                                 uint32_t unicode_letter,
+                                                 lv_draw_buf_t * draw_buf);
 static void freetype_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 
 static lv_cache_entry_t * lv_freetype_outline_lookup(lv_freetype_font_dsc_t * dsc, uint32_t unicode_letter);
@@ -128,7 +128,7 @@ static bool freetype_glyph_outline_create_cb(lv_freetype_outline_node_t * node, 
         return false;
     }
 
-    LV_LOG_INFO("glyph_index = %u", node->glyph_index);
+    LV_LOG_INFO("glyph_index = 0x%" LV_PRIx32, (uint32_t)node->glyph_index);
 
     node->outline = outline;
     return true;
@@ -152,11 +152,12 @@ static lv_cache_compare_res_t freetype_glyph_outline_cmp_cb(const lv_freetype_ou
     return node_a->glyph_index > node_b->glyph_index ? 1 : -1;
 }
 
-static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc,
-                                                    uint32_t unicode_letter,
-                                                    uint8_t * bitmap_out)
+static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
+                                                 uint32_t unicode_letter,
+                                                 lv_draw_buf_t * draw_buf)
 {
-    LV_UNUSED(bitmap_out);
+    LV_UNUSED(draw_buf);
+    const lv_font_t * font = g_dsc->resolved_font;
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
     lv_cache_entry_t * entry = lv_freetype_outline_lookup(dsc, unicode_letter);
@@ -194,7 +195,7 @@ static lv_cache_entry_t * lv_freetype_outline_lookup(lv_freetype_font_dsc_t * ds
 
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(cache_node->draw_data_cache, &tmp_node, dsc);
     if(!entry) {
-        LV_LOG_ERROR("glyph outline lookup failed for glyph_index = %u", glyph_index);
+        LV_LOG_ERROR("glyph outline lookup failed for glyph_index = 0x%" LV_PRIx32, (uint32_t)glyph_index);
         return NULL;
     }
     return entry;
@@ -291,10 +292,14 @@ static lv_freetype_outline_t outline_create(
     uint32_t size,
     uint32_t strength)
 {
-    LV_UNUSED(size);
-
     LV_ASSERT_NULL(ctx);
     FT_Error error;
+
+    error = FT_Set_Pixel_Sizes(face, 0, size);
+    if(error) {
+        FT_ERROR_MSG("FT_Set_Char_Size", error);
+        return NULL;
+    }
 
     /* Load glyph */
     error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT | FT_LOAD_NO_BITMAP);
