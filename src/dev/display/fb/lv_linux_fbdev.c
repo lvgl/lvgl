@@ -16,10 +16,10 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 
 #if LV_LINUX_FBDEV_BSD
     #include <sys/fcntl.h>
-    #include <sys/time.h>
     #include <sys/consio.h>
     #include <sys/fbio.h>
 #else
@@ -66,6 +66,7 @@ typedef struct {
  **********************/
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
+static uint32_t tick_get_cb(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -89,6 +90,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
 lv_display_t * lv_linux_fbdev_create(void)
 {
+    static bool inited = false;
+    if(!inited) {
+        lv_tick_set_cb(tick_get_cb),
+                       inited = true;
+    }
+
     lv_linux_fb_t * dsc = lv_malloc_zeroed(sizeof(lv_linux_fb_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
@@ -186,22 +193,40 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 
     LV_LOG_INFO("The framebuffer device was mapped to memory successfully");
 
+    switch(dsc->vinfo.bits_per_pixel) {
+        case 16:
+            lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB565);
+            break;
+        case 24:
+            lv_display_set_color_format(disp, LV_COLOR_FORMAT_RGB888);
+            break;
+        case 32:
+            lv_display_set_color_format(disp, LV_COLOR_FORMAT_XRGB8888);
+            break;
+        default:
+            LV_LOG_WARN("Not supported color format (%d bits)", dsc->vinfo.bits_per_pixel);
+            return;
+    }
+
     int32_t hor_res = dsc->vinfo.xres;
     int32_t ver_res = dsc->vinfo.yres;
     int32_t width = dsc->vinfo.width;
-    uint32_t draw_buf_size = hor_res * dsc->vinfo.bits_per_pixel >> 3;
-    if(LV_LINUX_FBDEV_BUFFER_COUNT < 1) {
+    uint32_t draw_buf_size = hor_res * (dsc->vinfo.bits_per_pixel >> 3);
+    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         draw_buf_size *= LV_LINUX_FBDEV_BUFFER_SIZE;
     }
     else {
         draw_buf_size *= ver_res;
     }
 
-    lv_color_t * draw_buf = lv_malloc(draw_buf_size);
-    lv_color_t * draw_buf_2 = NULL;
+    uint8_t * draw_buf = NULL;
+    uint8_t * draw_buf_2 = NULL;
+    draw_buf = malloc(draw_buf_size);
+
     if(LV_LINUX_FBDEV_BUFFER_COUNT == 2) {
-        draw_buf_2 = lv_malloc(draw_buf_size);
+        draw_buf_2 = malloc(draw_buf_size);
     }
+
     lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
     lv_display_set_resolution(disp, hor_res, ver_res);
 
@@ -251,6 +276,15 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     }
 
     lv_display_flush_ready(disp);
+}
+
+static uint32_t tick_get_cb(void)
+{
+    struct timeval tv_now;
+    gettimeofday(&tv_now, NULL);
+    uint64_t time_ms;
+    time_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
+    return time_ms;
 }
 
 #endif /*LV_USE_LINUX_FBDEV*/
