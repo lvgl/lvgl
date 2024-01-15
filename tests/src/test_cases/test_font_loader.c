@@ -92,22 +92,22 @@ static void common(void)
 
     lv_obj_clean(lv_screen_active());
 
-    lv_font_free(font_1_bin);
-    lv_font_free(font_2_bin);
-    lv_font_free(font_3_bin);
+    lv_binfont_destroy(font_1_bin);
+    lv_binfont_destroy(font_2_bin);
+    lv_binfont_destroy(font_3_bin);
 }
 
 void test_font_loader_with_cache(void)
 {
     /*Test with cache ('A' has cache)*/
 
-    font_1_bin = lv_binfont_load("A:src/test_assets/font_1.fnt");
+    font_1_bin = lv_binfont_create("A:src/test_assets/font_1.fnt");
     TEST_ASSERT_NOT_NULL(font_1_bin);
 
-    font_2_bin = lv_binfont_load("A:src/test_assets/font_2.fnt");
+    font_2_bin = lv_binfont_create("A:src/test_assets/font_2.fnt");
     TEST_ASSERT_NOT_NULL(font_2_bin);
 
-    font_3_bin = lv_binfont_load("A:src/test_assets/font_3.fnt");
+    font_3_bin = lv_binfont_create("A:src/test_assets/font_3.fnt");
     TEST_ASSERT_NOT_NULL(font_3_bin);
 
     common();
@@ -117,13 +117,13 @@ void test_font_loader_no_cache(void)
 {
     /*Test without cache ('B' has NO cache)*/
 
-    font_1_bin = lv_binfont_load("B:src/test_assets/font_1.fnt");
+    font_1_bin = lv_binfont_create("B:src/test_assets/font_1.fnt");
     TEST_ASSERT_NOT_NULL(font_1_bin);
 
-    font_2_bin = lv_binfont_load("B:src/test_assets/font_2.fnt");
+    font_2_bin = lv_binfont_create("B:src/test_assets/font_2.fnt");
     TEST_ASSERT_NOT_NULL(font_2_bin);
 
-    font_3_bin = lv_binfont_load("B:src/test_assets/font_3.fnt");
+    font_3_bin = lv_binfont_create("B:src/test_assets/font_3.fnt");
     TEST_ASSERT_NOT_NULL(font_3_bin);
 
     common();
@@ -133,13 +133,13 @@ void test_font_loader_from_buffer(void)
 {
     /*Test with memfs*/
 
-    font_1_bin = lv_binfont_load_from_buffer((void *)&font_1_buf, sizeof(font_1_buf));
+    font_1_bin = lv_binfont_create_from_buffer((void *)&font_1_buf, sizeof(font_1_buf));
     TEST_ASSERT_NOT_NULL(font_1_bin);
 
-    font_2_bin = lv_binfont_load_from_buffer((void *)&font_2_buf, sizeof(font_2_buf));
+    font_2_bin = lv_binfont_create_from_buffer((void *)&font_2_buf, sizeof(font_2_buf));
     TEST_ASSERT_NOT_NULL(font_2_bin);
 
-    font_3_bin = lv_binfont_load_from_buffer((void *)&font_3_buf, sizeof(font_3_buf));
+    font_3_bin = lv_binfont_create_from_buffer((void *)&font_3_buf, sizeof(font_3_buf));
     TEST_ASSERT_NOT_NULL(font_3_bin);
 
     common();
@@ -155,7 +155,7 @@ void test_font_loader_reload(void)
 
     lv_font_t style_font;
     lv_font_t * font;
-    font = lv_binfont_load("A:src/test_assets/font_2.fnt");
+    font = lv_binfont_create("A:src/test_assets/font_2.fnt");
     TEST_ASSERT_NOT_NULL(font);
     lv_memcpy(&style_font, font, sizeof(lv_font_t));
 
@@ -163,9 +163,9 @@ void test_font_loader_reload(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("font_loader_2.png");
 
-    lv_font_free(font);
+    lv_binfont_destroy(font);
 
-    font = lv_binfont_load("A:src/test_assets/font_3.fnt");
+    font = lv_binfont_create("A:src/test_assets/font_3.fnt");
     TEST_ASSERT_NOT_NULL(font);
     lv_memcpy(&style_font, font, sizeof(lv_font_t));
 
@@ -175,7 +175,7 @@ void test_font_loader_reload(void)
 
     lv_obj_delete(label);
 
-    lv_font_free(font);
+    lv_binfont_destroy(font);
 }
 
 static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
