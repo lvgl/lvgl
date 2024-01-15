@@ -34,8 +34,8 @@ void lv_draw_dave2d_mask_rect(lv_draw_dave2d_unit_t * u, const lv_draw_mask_rect
 #endif
 
     d2_framebuffer(u->d2_handle,
-                   u->base_unit.target_layer->buf,
-                   lv_area_get_width(&u->base_unit.target_layer->buf_area),
+                   u->base_unit.target_layer->draw_buf->data,
+                   (d2_s32)u->base_unit.target_layer->draw_buf->header.stride,
                    (d2_u32)lv_area_get_width(&u->base_unit.target_layer->buf_area),
                    (d2_u32)lv_area_get_height(&u->base_unit.target_layer->buf_area),
                    lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(u->base_unit.target_layer->color_format));
