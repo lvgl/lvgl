@@ -48,8 +48,6 @@ extern "C" {
 /* use arm-2d as the default helium acceleration */
 #include "lv_draw_sw_arm2d.h"
 
-/* *INDENT-ON* */
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
