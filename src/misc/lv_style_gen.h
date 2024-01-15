@@ -6,6 +6,7 @@
  **********************************************************************
  */
 
+
 #ifndef LV_STYLE_GEN_H
 #define LV_STYLE_GEN_H
 
@@ -185,8 +186,8 @@ void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value);
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_COLOR_FILTER_OPA;
 void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value);
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_ANIM;
-void lv_style_set_anim_time(lv_style_t * style, uint32_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_ANIM_TIME;
+void lv_style_set_anim_duration(lv_style_t * style, uint32_t value);
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_ANIM_DURATION;
 void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value);
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_TRANSITION;
 void lv_style_set_blend_mode(lv_style_t * style, lv_blend_mode_t value);
@@ -232,6 +233,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
     void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
     LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
 #endif /*LV_USE_GRID*/
+
 
 #define LV_STYLE_CONST_WIDTH(val) \
     { \
@@ -673,9 +675,9 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
         .prop_ptr = &_lv_style_const_prop_id_ANIM, .value = { .ptr = val } \
     }
 
-#define LV_STYLE_CONST_ANIM_TIME(val) \
+#define LV_STYLE_CONST_ANIM_DURATION(val) \
     { \
-        .prop_ptr = &_lv_style_const_prop_id_ANIM_TIME, .value = { .num = (int32_t)val } \
+        .prop_ptr = &_lv_style_const_prop_id_ANIM_DURATION, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_TRANSITION(val) \
@@ -698,6 +700,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
         .prop_ptr = &_lv_style_const_prop_id_BASE_DIR, .value = { .num = (int32_t)val } \
     }
 #if LV_USE_FLEX
+
 
 #define LV_STYLE_CONST_FLEX_FLOW(val) \
     { \
@@ -726,6 +729,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
 #endif /*LV_USE_FLEX*/
 
 #if LV_USE_GRID
+
 
 #define LV_STYLE_CONST_GRID_COLUMN_DSC_ARRAY(val) \
     { \
@@ -777,5 +781,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
         .prop_ptr = &_lv_style_const_prop_id_GRID_CELL_ROW_SPAN, .value = { .num = (int32_t)val } \
     }
 #endif /*LV_USE_GRID*/
+
 
 #endif /* LV_STYLE_GEN_H */

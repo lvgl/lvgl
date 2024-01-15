@@ -1039,7 +1039,7 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c)
 static void start_cursor_blink(lv_obj_t * obj)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    uint32_t blink_time = lv_obj_get_style_anim_time(obj, LV_PART_CURSOR);
+    uint32_t blink_time = lv_obj_get_style_anim_duration(obj, LV_PART_CURSOR);
     if(blink_time == 0) {
         lv_anim_delete(obj, cursor_blink_anim_cb);
         ta->cursor.show = 1;

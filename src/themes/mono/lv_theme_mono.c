@@ -111,7 +111,7 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
     lv_style_set_arc_width(&theme->styles.card, 2);
     lv_style_set_arc_color(&theme->styles.card, COLOR_FG);
     lv_style_set_outline_color(&theme->styles.card, COLOR_FG);
-    lv_style_set_anim_time(&theme->styles.card, 300);
+    lv_style_set_anim_duration(&theme->styles.card, 300);
 
     style_init_reset(&theme->styles.pr);
     lv_style_set_border_width(&theme->styles.pr, BORDER_W_PR);
@@ -163,7 +163,7 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
     lv_style_set_border_color(&theme->styles.ta_cursor, COLOR_FG);
     lv_style_set_border_width(&theme->styles.ta_cursor, 2);
     lv_style_set_bg_opa(&theme->styles.ta_cursor, LV_OPA_TRANSP);
-    lv_style_set_anim_time(&theme->styles.ta_cursor, 500);
+    lv_style_set_anim_duration(&theme->styles.ta_cursor, 500);
 #endif
 
 #if LV_USE_CHART

@@ -605,7 +605,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
 
     LV_IMAGE_DECLARE(img_lv_demo_music_slider_knob);
     slider_obj = lv_slider_create(cont);
-    lv_obj_set_style_anim_time(slider_obj, 100, 0);
+    lv_obj_set_style_anim_duration(slider_obj, 100, 0);
     lv_obj_add_flag(slider_obj, LV_OBJ_FLAG_CLICKABLE); /*No input from the slider*/
 
 #if LV_DEMO_MUSIC_LARGE == 0
