@@ -209,9 +209,15 @@ with:
     #endif
 ```
 
+13. Update macro `LV_PROFILER_INCLUDE`:
+
+```c
+#define LV_PROFILER_INCLUDE "src/misc/lv_profiler_builtin.h"
+```
 
 
-13. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+
+14. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 
