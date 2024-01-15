@@ -225,10 +225,9 @@ static void draw_vector(lv_layer_t * layer)
 
 void lv_demo_vector_graphic(void)
 {
-    static uint8_t canvas_buf[LV_CANVAS_BUF_SIZE(WIDTH, HEIGHT, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
-
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(WIDTH, HEIGHT, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, canvas_buf, WIDTH, HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    lv_canvas_set_draw_buf(canvas, draw_buf);
 
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
