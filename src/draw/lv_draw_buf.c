@@ -26,6 +26,8 @@
 static void * buf_malloc(size_t size, lv_color_format_t color_format);
 static void buf_free(void * buf);
 static void * buf_align(void * buf, lv_color_format_t color_format);
+static void * draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format);
+static void draw_buf_free(void * buf);
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format);
 static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride);
 
@@ -60,17 +62,6 @@ uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
 {
     if(handlers.width_to_stride_cb) return handlers.width_to_stride_cb(w, color_format);
     else return 0;
-}
-
-void * lv_draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format)
-{
-    if(handlers.buf_malloc_cb) return handlers.buf_malloc_cb(size_bytes, color_format);
-    else return NULL;
-}
-
-void lv_draw_buf_free(void * buf)
-{
-    if(handlers.buf_free_cb) handlers.buf_free_cb(buf);
 }
 
 void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
@@ -189,7 +180,7 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
 
     uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
 
-    void * buf = lv_draw_buf_malloc(size, cf);
+    void * buf = draw_buf_malloc(size, cf);
     LV_ASSERT_MALLOC(buf);
     if(buf == NULL) {
         LV_LOG_WARN("No memory: %"LV_PRIu32"x%"LV_PRIu32", cf: %d, stride: %"LV_PRIu32", %"LV_PRIu32"Byte, ",
@@ -257,7 +248,7 @@ void lv_draw_buf_destroy(lv_draw_buf_t * buf)
     if(buf == NULL) return;
 
     if(buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
-        lv_draw_buf_free(buf->unaligned_data);
+        draw_buf_free(buf->unaligned_data);
         lv_free(buf);
     }
     else {
@@ -415,6 +406,17 @@ static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format)
     width_byte = w * lv_color_format_get_bpp(color_format);
     width_byte = (width_byte + 7) >> 3; /*Round up*/
     return (width_byte + LV_DRAW_BUF_STRIDE_ALIGN - 1) & ~(LV_DRAW_BUF_STRIDE_ALIGN - 1);
+}
+
+static void * draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format)
+{
+    if(handlers.buf_malloc_cb) return handlers.buf_malloc_cb(size_bytes, color_format);
+    else return NULL;
+}
+
+static void draw_buf_free(void * buf)
+{
+    if(handlers.buf_free_cb) handlers.buf_free_cb(buf);
 }
 
 /**
