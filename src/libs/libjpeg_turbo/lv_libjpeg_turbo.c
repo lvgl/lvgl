@@ -268,7 +268,7 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
     JSAMPARRAY buffer;  /* Output row buffer */
     int row_stride;     /* physical row width in output buffer */
 
-    uint8_t * output_buffer = NULL;
+    lv_draw_buf_t * decoded = NULL;
 
     /* In this example we want to open the input file before doing anything else,
      * so that the setjmp() error recovery below can assume the file is open.
@@ -293,8 +293,8 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
 
         LV_LOG_WARN("decoding error");
 
-        if(output_buffer) {
-            lv_draw_buf_free(output_buffer);
+        if(decoded) {
+            lv_draw_buf_destroy(decoded);
         }
 
         /* If we get here, the JPEG code has signaled an error.
@@ -344,7 +344,6 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
      * In this example, we need to make an output work buffer of the right size.
      */
     /* JSAMPLEs per row in output buffer */
-    lv_draw_buf_t * decoded;
     row_stride = cinfo.output_width * cinfo.output_components;
     /* Make a one-row-high sample array that will go away when done with image */
     buffer = (*cinfo.mem->alloc_sarray)

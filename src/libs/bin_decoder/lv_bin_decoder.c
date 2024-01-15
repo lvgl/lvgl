@@ -640,8 +640,9 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 exit_with_buf:
     if(dsc->src_type == LV_IMAGE_SRC_FILE && !is_compressed) {
         lv_free((void *)palette);
-        lv_draw_buf_free((void *)indexed_data);
     }
+
+    if(draw_buf_indexed) lv_draw_buf_destroy(draw_buf_indexed);
     return LV_RESULT_INVALID;
 #else
     LV_UNUSED(stride);
@@ -759,7 +760,7 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
     res = fs_read_file_at(f, sizeof(lv_image_header_t), img_data, len, &rn);
     if(res != LV_FS_RES_OK || rn != len) {
         LV_LOG_WARN("Read rgb file failed: %d", res);
-        lv_draw_buf_free(img_data);
+        lv_draw_buf_destroy(decoded);
         return LV_RESULT_INVALID;
     }
 
