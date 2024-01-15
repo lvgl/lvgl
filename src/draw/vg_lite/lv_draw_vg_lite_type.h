@@ -39,8 +39,8 @@ struct _lv_draw_vg_lite_unit_t {
     lv_draw_task_t * task_act;
     vg_lite_buffer_t target_buffer;
     vg_lite_matrix_t global_matrix;
-    lv_ll_t path_free_ll;
-    int path_max_cnt;
+    struct _lv_vg_lite_path_t * global_path;
+    bool path_in_use;
 };
 
 /**********************
