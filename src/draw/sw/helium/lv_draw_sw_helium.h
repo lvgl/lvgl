@@ -250,7 +250,7 @@ static inline lv_result_t _lv_draw_sw_image_helium(
 //                                            layer, 
 //                                            blend_area.x1 - layer->buf_area.x1,
 //                                            blend_area.y1 - layer->buf_area.y1);
-        uint8_t *des_buf = (uint8_t *)layer->draw_buf->data;
+        uint8_t *des_buf = (uint8_t *)lv_draw_layer_go_to_xy(layer, 0, 0);
         uint8_t opa = draw_dsc->opa;
 
         /* ------------- prepare parameters for arm-2d APIs - END ----------- */
