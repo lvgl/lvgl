@@ -1,7 +1,3 @@
-**IMPORTANT NOTE** The next major version (v9.0.0) is developed in the master branch.
-The last stable version is available in the [release/v8.3](https://github.com/lvgl/lvgl/tree/release/v8.3) branch.
-
----
 
 <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
 

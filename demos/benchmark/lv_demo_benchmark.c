@@ -558,6 +558,14 @@ static void summary_create(void)
     lv_table_set_cell_value(table, 0, 2, "Avg. FPS");
     lv_table_set_cell_value(table, 0, 3, "Avg. time (render + flush)");
 
+    /* csv log */
+    LV_LOG("Benchmark Summary (%"LV_PRIu32".%"LV_PRIu32".%"LV_PRIu32" %s)\r\n",
+           LVGL_VERSION_MAJOR,
+           LVGL_VERSION_MINOR,
+           LVGL_VERSION_PATCH,
+           LVGL_VERSION_INFO);
+    LV_LOG("Name, Avg. CPU, Avg. FPS, Avg. time, render time, flush time\r\n");
+
     lv_obj_update_layout(table);
     int32_t col_w = lv_obj_get_content_width(table) / 4;
 
@@ -591,6 +599,15 @@ static void summary_create(void)
             lv_table_set_cell_value_fmt(table, i + 2, 3, "%"LV_PRIu32" ms (%"LV_PRIu32" + %"LV_PRIu32")",
                                         render_time + flush_time, render_time, flush_time);
 
+            /* csv log */
+            LV_LOG("%s, %"LV_PRIu32"%%, %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32"\r\n",
+                   scenes[i].name,
+                   scenes[i].cpu_avg_usage / cnt,
+                   scenes[i].fps_avg / cnt,
+                   render_time + flush_time,
+                   render_time,
+                   flush_time);
+
             valid_scene_cnt++;
             total_avg_cpu += scenes[i].cpu_avg_usage / cnt;
             total_avg_fps += scenes[i].fps_avg / cnt;
@@ -614,6 +631,13 @@ static void summary_create(void)
         uint32_t flush_time = total_avg_flush_time / valid_scene_cnt;
         lv_table_set_cell_value_fmt(table, 1, 3, "%"LV_PRIu32" ms (%"LV_PRIu32" + %"LV_PRIu32")",
                                     render_time + flush_time, render_time, flush_time);
+        /* csv log */
+        LV_LOG("All scenes avg.,%"LV_PRIu32"%%, %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32"\r\n",
+               total_avg_cpu / valid_scene_cnt,
+               total_avg_fps / valid_scene_cnt,
+               render_time + flush_time,
+               render_time,
+               flush_time);
     }
 }
 

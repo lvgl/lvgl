@@ -271,6 +271,15 @@
         #endif
     #endif
 
+    /* Use Arm-2D to accelerate the sw render */
+    #ifndef LV_USE_DRAW_ARM2D_SYNC
+        #ifdef CONFIG_LV_USE_DRAW_ARM2D_SYNC
+            #define LV_USE_DRAW_ARM2D_SYNC CONFIG_LV_USE_DRAW_ARM2D_SYNC
+        #else
+            #define LV_USE_DRAW_ARM2D_SYNC      0
+        #endif
+    #endif
+
     /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
      * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
      * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
@@ -281,7 +290,7 @@
         #ifdef CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
             #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
         #else
-            #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)   /*[bytes]*/
+            #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)   /*[bytes]*/
         #endif
     #endif
 
@@ -340,15 +349,6 @@
                 #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
             #endif
         #endif
-    #endif
-#endif
-
-/* Use Arm-2D on Cortex-M based devices. Please only enable it for Helium Powered devices for now */
-#ifndef LV_USE_DRAW_ARM2D
-    #ifdef CONFIG_LV_USE_DRAW_ARM2D
-        #define LV_USE_DRAW_ARM2D CONFIG_LV_USE_DRAW_ARM2D
-    #else
-        #define LV_USE_DRAW_ARM2D 0
     #endif
 #endif
 

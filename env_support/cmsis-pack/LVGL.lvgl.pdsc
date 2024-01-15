@@ -36,11 +36,13 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-01-13" version="9.0.0-dev4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev4.pack">
-      - LVGL 9.0.0-dev
-      - New Driver Architecture
+    <release date="2024-01-15" version="9.0.0-rc" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-rc.pack">
+      - LVGL 9.0.0-rc
+      - Implements a New Render Architecture that enables parallel processing
       - Accelerates SW-Render with NEON and Helium technology for Cortex architectures. 
-      - Adds supports for GPUs: VG-Lite, PXP and Dave2D
+      - Adds supports for GPUs: VG-Lite, PXP, Dave2D and etc.
+      - Adds display drivers
+      - Adds Demos for benchmarks, render test etc,
       - Other fixes
     </release>
     <release date="2023-12-05" version="8.3.11" url="https://github.com/lvgl/lvgl/raw/8194d83226c27c84f12dd51e16f5add9939215a5/env_support/cmsis-pack/LVGL.lvgl.8.3.11.pack">
@@ -78,10 +80,6 @@
       - Fix GPU support for NXP PXP and NXP VGLite
       - Rework stm32 DMA2D support
       - Various fixes
-    </release>
-    <release date="2023-01-15" version="1.1.0-alpha" url="https://github.com/lvgl/lvgl/raw/4e3f341b882e0453d3da5cce6bb1b6357e52e3e7/env_support/cmsis-pack/LVGL.lvgl.1.1.0-alpha.pack">
-      - LVGL 9.0.0-dev
-      - Monthly update for January
     </release>
     <release date="2022-12-31" version="1.0.12" url="https://github.com/lvgl/lvgl/raw/7d0de1aabeabd4c71231895df7a503a3313b4619/env_support/cmsis-pack/LVGL.lvgl.1.0.12.pack">
       - LVGL 9.0.0-dev
@@ -269,7 +267,7 @@
 
         <condition id="LVGL-Essential-Assets">
             <description>Require LVGL Essential Service and Demo Assets </description>
-            <require Cclass="LVGL" Cgroup="Essential" />
+            <require condition="LVGL-Essential"/>
             <require Cclass="LVGL" Cgroup="Demos" Csub="Assets" />
         </condition>
 
@@ -279,67 +277,73 @@
         </condition>
 
         <condition id="LVGL-GPU-STM32-DMA2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for STM32-DMA2D</description>
+            <require condition="LVGL-Essential"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-SWM341-DMA2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for SWM341-DMA2D</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-PXP">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for NXP-PXP</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>-->
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-VGLite">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for NXP-VGLite</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>-->
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-GD32-IPA">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for GD32-IPA</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
         
         <condition id="LVGL-GPU-Renesas-Dave2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for Renesas-Dave2D</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>-->
         </condition>
@@ -614,7 +618,7 @@
                 <file category="sourceC"            name="src/osal/lv_os_none.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.2" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.3" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -643,6 +647,20 @@
 
             </component>
 
+            <component Cgroup="Display" Cvariant="Windows Backend" condition="LVGL-Essential">
+              <description>Add the display driver for Windows backend  </description>
+              <files>
+                <file category="sourceC"            name="src/dev/windows/lv_windows_context.c" />
+                <file category="sourceC"            name="src/dev/windows/lv_windows_display.c" />
+                <file category="sourceC"            name="src/dev/windows/lv_windows_input.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for Windows backend*/ */
+#define LV_USE_WINDOWS    1
+
+              </RTE_Components_h>
+            </component>
 
             <component Cgroup="Display" Cvariant="Linux DRM" condition="LVGL-Essential">
               <description>Add the display driver for Linux /dev/dri/card*/  </description>
@@ -957,6 +975,36 @@
 
 /*! \brief enable NXP VGLite */
 #define LV_USE_DRAW_VGLITE          1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Acceleration" Csub="GPU VG-Lite">
+              <description>An hardware acceleration from VG-Lite GPU</description>
+              <files>
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_buf_vg_lite.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_arc.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_border.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_box_shadow.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_fill.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_img.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_label.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_layer.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_line.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_mask_rect.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_triangle.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_vector.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_decoder.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_math.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_path.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_utils.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable VG-Lite GPU */
+#define LV_USE_DRAW_VG_LITE          1
               </RTE_Components_h>
 
             </component>
