@@ -115,19 +115,21 @@ void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
 
 void lv_tiny_ttf_destroy(lv_font_t * font)
 {
-    if(font != NULL) {
-        if(font->dsc != NULL) {
-            ttf_font_desc_t * ttf = (ttf_font_desc_t *)font->dsc;
+    LV_ASSERT_NULL(font);
+
+    if(font->dsc != NULL) {
+        ttf_font_desc_t * ttf = (ttf_font_desc_t *)font->dsc;
 #if LV_TINY_TTF_FILE_SUPPORT != 0
-            if(ttf->stream.file != NULL) {
-                lv_fs_close(&ttf->file);
-            }
-#endif
-            lv_cache_drop_all(tiny_ttf_cache, (void *)font->dsc);
-            lv_free(ttf);
-            font->dsc = NULL;
+        if(ttf->stream.file != NULL) {
+            lv_fs_close(&ttf->file);
         }
+#endif
+        lv_cache_drop_all(tiny_ttf_cache, (void *)font->dsc);
+        lv_free(ttf);
+        font->dsc = NULL;
     }
+
+    lv_free(font);
 }
 
 void lv_tiny_ttf_init(void)
