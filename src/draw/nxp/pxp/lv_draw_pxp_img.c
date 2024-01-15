@@ -67,6 +67,7 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
     const lv_image_dsc_t * img_dsc = dsc->src;
 
     lv_area_t rel_coords;
@@ -94,9 +95,9 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     int32_t src_stride = img_dsc->header.stride;
     lv_color_format_t src_cf = img_dsc->header.cf;
 
-    uint8_t * dest_buf = layer->buf;
-    int32_t dest_stride = layer->buf_stride;
-    lv_color_format_t dest_cf = layer->color_format;
+    uint8_t * dest_buf = draw_buf->data;
+    int32_t dest_stride = draw_buf->header.stride;
+    lv_color_format_t dest_cf = draw_buf->header.cf;
     bool has_recolor = (dsc->recolor_opa > LV_OPA_MIN);
 
     if(has_recolor && !has_transform)
