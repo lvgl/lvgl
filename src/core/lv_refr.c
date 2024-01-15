@@ -478,8 +478,6 @@ static void refr_sync_areas(void)
      *So the active buffer is the off screen buffer where LVGL will render*/
     lv_draw_buf_t * on_screen = disp_refr->buf_act;
     lv_draw_buf_t * off_screen = disp_refr->buf_act == disp_refr->buf_1 ? disp_refr->buf_2 : disp_refr->buf_1;
-    void * buf_off_screen = on_screen->data;
-    void * buf_on_screen = off_screen->data;
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
@@ -527,11 +525,7 @@ static void refr_sync_areas(void)
          * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
          */
         _lv_area_intersect(sync_area, sync_area, &disp_area);
-        lv_draw_buf_copy(
-            buf_off_screen, hor_res, ver_res, sync_area,
-            buf_on_screen, hor_res, ver_res, sync_area,
-            lv_display_get_color_format(disp_refr)
-        );
+        lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
     }
 
     /*Clear sync areas*/
