@@ -73,6 +73,8 @@ remove the misleading guide above this code segment.
    
    - LV_USE_DRAW_VGLITE
    
+   - LV_USE_DRAW_VG_LITE
+   
    - LV_USE_DRAW_PXP
    
    - LV_USE_DRAW_SDL
@@ -115,7 +117,7 @@ remove the misleading guide above this code segment.
 #define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
-Make sure `LV_MEM_SIZE` is no less than `(256*1024U)`.
+Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
 
 8. Remove following macro definitions in the `3rd party libraries` section:
 
