@@ -4,7 +4,6 @@
 void lv_draw_dave2d_mask_rect(lv_draw_dave2d_unit_t * u, const lv_draw_mask_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_area_t clipped_area;
-    lv_area_t buffer_area;
     lv_area_t coordinates;
     int32_t x;
     int32_t y;
@@ -14,11 +13,9 @@ void lv_draw_dave2d_mask_rect(lv_draw_dave2d_unit_t * u, const lv_draw_mask_rect
     x = 0 - u->base_unit.target_layer->buf_area.x1;
     y = 0 - u->base_unit.target_layer->buf_area.y1;
 
-    buffer_area = u->base_unit.target_layer->buf_area;
     coordinates = *coords;
 
     lv_area_move(&clipped_area, x, y);
-    lv_area_move(&buffer_area, x, y);
     lv_area_move(&coordinates, x, y);
 
 #if LV_USE_OS
@@ -33,12 +30,7 @@ void lv_draw_dave2d_mask_rect(lv_draw_dave2d_unit_t * u, const lv_draw_mask_rect
     d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
 #endif
 
-    d2_framebuffer(u->d2_handle,
-                   u->base_unit.target_layer->buf,
-                   lv_area_get_width(&u->base_unit.target_layer->buf_area),
-                   (d2_u32)lv_area_get_width(&u->base_unit.target_layer->buf_area),
-                   (d2_u32)lv_area_get_height(&u->base_unit.target_layer->buf_area),
-                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(u->base_unit.target_layer->color_format));
+    d2_framebuffer_from_layer(u->d2_handle, u->base_unit.target_layer);
 
     d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1, (d2_border)clipped_area.x2,
                 (d2_border)clipped_area.y2);
