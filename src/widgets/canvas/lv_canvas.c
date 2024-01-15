@@ -246,36 +246,18 @@ const void * lv_canvas_get_buf(lv_obj_t * obj)
  * Other functions
  *====================*/
 
-void lv_canvas_copy_buf(lv_obj_t * obj, const void * to_copy, int32_t x, int32_t y, int32_t w, int32_t h)
+void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_buf_t * dest_buf,
+                        const lv_area_t * dest_area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(to_copy);
+    LV_ASSERT_NULL(canvas_area && dest_buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
-    lv_image_header_t * header = &canvas->draw_buf->header;
-    if(x + w - 1 >= (int32_t)header->w || y + h - 1 >= (int32_t)header->h) {
-        LV_LOG_WARN("x or y out of the canvas");
-        return;
-    }
+    LV_ASSERT_MSG(canvas->draw_buf->header.cf != dest_buf->header.cf, "Color formats must be the same");
 
-    lv_area_t src_area_to_copy;
-    lv_area_set(&src_area_to_copy, 0, 0, w - 1, h - 1);
-
-    lv_area_t dest_area_to_copy;
-    lv_area_set(&dest_area_to_copy, x, y, x + w - 1, y + h - 1);
-
-    lv_draw_buf_copy(
-        canvas->draw_buf->data,
-        header->w,
-        header->h,
-        &dest_area_to_copy,
-        (void *)to_copy,
-        w,
-        h,
-        &src_area_to_copy,
-        header->cf);
+    lv_draw_buf_copy(canvas->draw_buf, canvas_area, dest_buf, dest_area);
 }
 
 void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)

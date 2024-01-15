@@ -84,54 +84,73 @@ void lv_draw_buf_invalidate_cache(void * buf, uint32_t stride, lv_color_format_t
     if(handlers.invalidate_cache_cb) handlers.invalidate_cache_cb(buf, stride, color_format, area);
 }
 
-void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a)
+void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
 {
-    LV_UNUSED(h);
-    if(lv_area_get_width(a) < 0) return;
-    if(lv_area_get_height(a) < 0) return;
+    LV_ASSERT_NULL(draw_buf);
+    if(a && lv_area_get_width(a) < 0) return;
+    if(a && lv_area_get_height(a) < 0) return;
 
-    uint8_t px_size = lv_color_format_get_size(color_format);
-    uint32_t stride = lv_draw_buf_width_to_stride(w, color_format);
-    uint8_t * bufc =  buf;
+    const lv_image_header_t * header = &draw_buf->header;
+    uint32_t stride = header->stride;
 
-    /*Got the first pixel of each buffer*/
-    bufc += stride * a->y1;
-    bufc += a->x1 * px_size;
-
-    uint32_t line_length = lv_area_get_width(a) * px_size;
-    int32_t y;
-    for(y = a->y1; y <= a->y2; y++) {
-        lv_memzero(bufc, line_length);
-        bufc += stride;
+    if(a == NULL) {
+        lv_memzero(draw_buf->data, header->h * stride);
     }
-
+    else {
+        uint8_t * bufc;
+        uint32_t line_length;
+        int32_t start_y, end_y;
+        uint8_t px_size = lv_color_format_get_size(header->cf);
+        bufc = lv_draw_buf_goto_xy(draw_buf, a->x1, a->y1);
+        line_length = lv_area_get_width(a) * px_size;
+        start_y = a->y1;
+        end_y = a->y2;
+        for(; start_y <= end_y; start_y++) {
+            lv_memzero(bufc, line_length);
+            bufc += stride;
+        }
+    }
 }
 
-void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area_to_copy,
-                      void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area_to_copy,
-                      lv_color_format_t color_format)
+void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                      const lv_draw_buf_t * src, const lv_area_t * src_area)
 {
-    LV_UNUSED(dest_h);
-    LV_UNUSED(src_h);
+    uint8_t * dest_bufc;
+    uint8_t * src_bufc;
+    int32_t line_width;
 
-    uint8_t px_size = lv_color_format_get_size(color_format);
-    uint8_t * dest_bufc =  dest_buf;
-    uint8_t * src_bufc =  src_buf;
+    if(dest_area == NULL) line_width = dest->header.w;
+    else line_width = lv_area_get_width(dest_area);
 
-    uint32_t dest_stride = lv_draw_buf_width_to_stride(dest_w, color_format);
-    uint32_t src_stride = lv_draw_buf_width_to_stride(src_w, color_format);
+    /*Check source and dest area have same width*/
+    if((src_area == NULL && line_width != src->header.w) || \
+       (src_area != NULL && line_width != lv_area_get_width(src_area))) {
+        LV_ASSERT_MSG(0, "Source and destination areas have different width");
+        return;
+    }
 
-    /*Got the first pixel of each buffer*/
-    dest_bufc += dest_stride * dest_area_to_copy->y1;
-    dest_bufc += dest_area_to_copy->x1 * px_size;
+    if(src_area) src_bufc = lv_draw_buf_goto_xy(src, src_area->x1, src_area->y1);
+    else src_bufc = src->data;
 
-    src_bufc += src_stride * src_area_to_copy->y1;
-    src_bufc += src_area_to_copy->x1 * px_size;
+    if(dest_area) dest_bufc = lv_draw_buf_goto_xy(dest, dest_area->x1, dest_area->y1);
+    else dest_bufc = dest->data;
 
-    uint32_t line_length = lv_area_get_width(dest_area_to_copy) * px_size;
-    int32_t y;
-    for(y = dest_area_to_copy->y1; y <= dest_area_to_copy->y2; y++) {
-        lv_memcpy(dest_bufc, src_bufc, line_length);
+    int32_t start_y, end_y;
+    if(dest_area) {
+        start_y = dest_area->y1;
+        end_y = dest_area->y2;
+    }
+    else {
+        start_y = 0;
+        end_y = dest->header.h - 1;
+    }
+
+    uint32_t dest_stride = dest->header.stride;
+    uint32_t src_stride = src->header.stride;
+    line_width *= lv_color_format_get_size(dest->header.cf); /*Pixel to bytes*/
+
+    for(; start_y <= end_y; start_y++) {
+        lv_memcpy(dest_bufc, src_bufc, line_width);
         dest_bufc += dest_stride;
         src_bufc += src_stride;
     }
@@ -246,7 +265,7 @@ void lv_draw_buf_destroy(lv_draw_buf_t * buf)
     }
 }
 
-void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y)
+void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 {
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return NULL;
