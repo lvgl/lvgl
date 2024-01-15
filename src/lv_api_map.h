@@ -236,6 +236,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_obj_get_child_cnt                lv_obj_get_child_count
 #define lv_obj_get_disp                     lv_obj_get_display
 
+#define lv_obj_get_style_anim_time            lv_obj_get_style_anim_duration
 #define lv_obj_get_style_img_opa              lv_obj_get_style_image_opa
 #define lv_obj_get_style_img_recolor          lv_obj_get_style_image_recolor
 #define lv_obj_get_style_img_recolor_filtered lv_obj_get_style_image_recolor_filtered
@@ -245,6 +246,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_obj_get_style_transform_zoom       lv_obj_get_style_transform_scale
 #define lv_obj_get_style_transform_angle      lv_obj_get_style_transform_rotation
 
+#define lv_obj_set_style_anim_time          lv_obj_set_style_anim_duration
 #define lv_obj_set_style_img_opa            lv_obj_set_style_image_opa
 #define lv_obj_set_style_img_recolor        lv_obj_set_style_image_recolor
 #define lv_obj_set_style_img_recolor_opa    lv_obj_set_style_image_recolor_opa
@@ -253,6 +255,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_obj_set_style_transform_zoom     lv_obj_set_style_transform_scale
 #define lv_obj_set_style_transform_angle    lv_obj_set_style_transform_rotation
 
+#define lv_style_set_anim_time              lv_style_set_anim_duration
 #define lv_style_set_img_opa                lv_style_set_image_opa
 #define lv_style_set_img_recolor            lv_style_set_image_recolor
 #define lv_style_set_img_recolor_opa        lv_style_set_image_recolor_opa

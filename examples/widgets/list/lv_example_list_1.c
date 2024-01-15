@@ -21,7 +21,7 @@ void lv_example_list_1(void)
     /*Add buttons to the list*/
     lv_obj_t * btn;
     lv_list_add_text(list1, "File");
-    btn = lv_list_add_button(list1, LV_SYMBOL_FILE, "New    aaaaaaaaaaaaaaaaaa      ssssssdd ddddddd");
+    btn = lv_list_add_button(list1, LV_SYMBOL_FILE, "New");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
     btn = lv_list_add_button(list1, LV_SYMBOL_DIRECTORY, "Open");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
