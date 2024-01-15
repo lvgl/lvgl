@@ -276,27 +276,26 @@ static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g
     g_dsc->entry = NULL;
 }
 
-static lv_result_t lv_tiny_ttf_create(lv_font_t * out_font, const char * path, const void * data, size_t data_size,
-                                      int32_t font_size,
+static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size, int32_t font_size,
                                       size_t cache_size)
 {
     LV_UNUSED(data_size);
     LV_UNUSED(cache_size);
     if((path == NULL && data == NULL) || 0 >= font_size) {
         LV_LOG_ERROR("tiny_ttf: invalid argument\n");
-        return LV_RESULT_INVALID;
+        return NULL;
     }
     ttf_font_desc_t * dsc = lv_malloc_zeroed(sizeof(ttf_font_desc_t));
     if(dsc == NULL) {
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
-        return LV_RESULT_INVALID;
+        return NULL;
     }
 #if LV_TINY_TTF_FILE_SUPPORT != 0
     if(path != NULL) {
         if(LV_FS_RES_OK != lv_fs_open(&dsc->file, path, LV_FS_MODE_RD)) {
             lv_free(dsc);
             LV_LOG_ERROR("tiny_ttf: unable to open %s\n", path);
-            return LV_RESULT_INVALID;
+            return NULL;
         }
         dsc->stream.file = &dsc->file;
     }
@@ -307,7 +306,7 @@ static lv_result_t lv_tiny_ttf_create(lv_font_t * out_font, const char * path, c
     if(0 == stbtt_InitFont(&dsc->info, &dsc->stream, stbtt_GetFontOffsetForIndex(&dsc->stream, 0))) {
         lv_free(dsc);
         LV_LOG_ERROR("tiny_ttf: init failed\n");
-        return LV_RESULT_INVALID;
+        return NULL;
     }
 
 #else
@@ -315,63 +314,40 @@ static lv_result_t lv_tiny_ttf_create(lv_font_t * out_font, const char * path, c
     if(0 == stbtt_InitFont(&dsc->info, dsc->stream, stbtt_GetFontOffsetForIndex(dsc->stream, 0))) {
         lv_free(dsc);
         LV_LOG_ERROR("tiny_ttf: init failed\n");
-        return LV_RESULT_INVALID;
+        return NULL;
     }
 #endif
 
-    lv_memzero(out_font, sizeof(lv_font_t));
+    lv_font_t * out_font = lv_malloc_zeroed(sizeof(lv_font_t));
+    if(out_font == NULL) {
+        lv_free(dsc);
+        LV_LOG_ERROR("tiny_ttf: out of memory\n");
+        return NULL;
+    }
     out_font->get_glyph_dsc = ttf_get_glyph_dsc_cb;
     out_font->get_glyph_bitmap = ttf_get_glyph_bitmap_cb;
     out_font->release_glyph = ttf_release_glyph_cb;
     out_font->dsc = dsc;
     lv_tiny_ttf_set_size(out_font, font_size);
-    return LV_RESULT_OK;
+    return out_font;
 }
-
-/*-----------------
- * Cache Callbacks
- *----------------*/
-
-static bool tiny_ttf_cache_create_cb(tiny_ttf_cache_data_t * node, void * user_data)
+#if LV_TINY_TTF_FILE_SUPPORT != 0
+lv_font_t * lv_tiny_ttf_create_file_ex(const char * path, int32_t font_size, size_t cache_size)
 {
-
-    ttf_font_desc_t * dsc = (ttf_font_desc_t *)user_data;
-    uint32_t unicode_letter = node->unicode;
-
-    const stbtt_fontinfo * info = (const stbtt_fontinfo *)&dsc->info;
-    int g1 = stbtt_FindGlyphIndex(info, (int)unicode_letter);
-    if(g1 == 0) {
-        /* Glyph not found */
-        return false;
-    }
-    int x1, y1, x2, y2;
-    stbtt_GetGlyphBitmapBox(info, g1, dsc->scale, dsc->scale, &x1, &y1, &x2, &y2);
-    int w, h;
-    w = x2 - x1 + 1;
-    h = y2 - y1 + 1;
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
-    if(NULL == draw_buf) {
-        LV_LOG_ERROR("tiny_ttf: out of memory\n");
-        return false;
-    }
-
-    lv_image_header_t * header = &draw_buf->header;
-    uint32_t stride = header->stride;
-
-    /**
-     * @todo use `lv_draw_buf_clear` instead.
-     */
-    memset(draw_buf->data, 0, h * stride);
-    stbtt_MakeGlyphBitmap(info, draw_buf->data, w, h, stride, dsc->scale, dsc->scale, g1);
-
-    node->draw_buf = draw_buf;
-    return true;
+    return lv_tiny_ttf_create(path, NULL, 0, font_size, cache_size);
 }
-static void tiny_ttf_cache_free_cb(tiny_ttf_cache_data_t * node, void * user_data)
+lv_font_t * lv_tiny_ttf_create_file(const char * path, int32_t font_size)
 {
-    LV_UNUSED(user_data);
-
-    lv_draw_buf_destroy(node->draw_buf);
+    return lv_tiny_ttf_create(path, NULL, 0, font_size, 0);
+}
+#endif
+lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size, size_t cache_size)
+{
+    return lv_tiny_ttf_create(NULL, data, data_size, font_size, cache_size);
+}
+lv_font_t * lv_tiny_ttf_create_data(const void * data, size_t data_size, int32_t font_size)
+{
+    return lv_tiny_ttf_create(NULL, data, data_size, font_size, 0);
 }
 static lv_cache_compare_res_t tiny_ttf_cache_compare_cb(const tiny_ttf_cache_data_t * lhs,
                                                         const tiny_ttf_cache_data_t * rhs)
