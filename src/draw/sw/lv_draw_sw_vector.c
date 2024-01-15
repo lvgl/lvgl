@@ -318,6 +318,7 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     tvg_picture_load_raw(img, (uint32_t *)src_buf, header->w, header->h, true);
     Tvg_Paint * clip_path = tvg_paint_duplicate(obj);
     tvg_paint_set_composite_method(img, clip_path, TVG_COMPOSITE_METHOD_CLIP_PATH);
+    tvg_paint_set_opacity(img, p->opa);
 
     Tvg_Matrix mtx;
     _lv_matrix_to_tvg(&mtx, m);
