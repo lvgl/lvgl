@@ -236,6 +236,16 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_obj_get_child_cnt                lv_obj_get_child_count
 #define lv_obj_get_disp                     lv_obj_get_display
 
+#define LV_STYLE_ANIM_TIME            LV_STYLE_ANIM_DURATION
+#define LV_STYLE_IMG_OPA              LV_STYLE_IMAGE_OPA
+#define LV_STYLE_IMG_RECOLOR          LV_STYLE_IMAGE_RECOLOR
+#define LV_STYLE_IMG_RECOLOR_FILTERED LV_STYLE_IMAGE_RECOLOR_FILTERED
+#define LV_STYLE_IMG_RECOLOR_OPA      LV_STYLE_IMAGE_RECOLOR_OPA
+#define LV_STYLE_SHADOW_OFS_X         LV_STYLE_SHADOW_OFFSET_X
+#define LV_STYLE_SHADOW_OFS_Y         LV_STYLE_SHADOW_OFFSET_Y
+#define LV_STYLE_TRANSFORM_ZOOM       LV_STYLE_TRANSFORM_SCALE
+#define LV_STYLE_TRANSFORM_ANGLE      LV_STYLE_TRANSFORM_ROTATION
+
 #define lv_obj_get_style_anim_time            lv_obj_get_style_anim_duration
 #define lv_obj_get_style_img_opa              lv_obj_get_style_image_opa
 #define lv_obj_get_style_img_recolor          lv_obj_get_style_image_recolor
