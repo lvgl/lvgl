@@ -165,7 +165,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 2 + 70);
 
             obj = lv_slider_create(main_page);
-            lv_obj_set_style_anim_time(obj, LV_DEMO_STRESS_TIME_STEP * 8, 0);
+            lv_obj_set_style_anim_duration(obj, LV_DEMO_STRESS_TIME_STEP * 8, 0);
             lv_slider_set_value(obj, 5000, LV_ANIM_ON);    /*Animate to out of range value*/
             auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 5 + 22);
 

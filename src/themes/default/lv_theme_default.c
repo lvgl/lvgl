@@ -399,10 +399,10 @@ static void style_init(my_theme_t * theme)
     lv_style_set_radius(&theme->styles.knob, LV_RADIUS_CIRCLE);
 
     style_init_reset(&theme->styles.anim);
-    lv_style_set_anim_time(&theme->styles.anim, 200);
+    lv_style_set_anim_duration(&theme->styles.anim, 200);
 
     style_init_reset(&theme->styles.anim_fast);
-    lv_style_set_anim_time(&theme->styles.anim_fast, 120);
+    lv_style_set_anim_duration(&theme->styles.anim_fast, 120);
 
 #if LV_USE_ARC
     style_init_reset(&theme->styles.arc_indic);
@@ -540,7 +540,7 @@ static void style_init(my_theme_t * theme)
     lv_style_set_border_width(&theme->styles.ta_cursor, _LV_DPX_CALC(theme->disp_dpi, 2));
     lv_style_set_pad_left(&theme->styles.ta_cursor, - _LV_DPX_CALC(theme->disp_dpi, 1));
     lv_style_set_border_side(&theme->styles.ta_cursor, LV_BORDER_SIDE_LEFT);
-    lv_style_set_anim_time(&theme->styles.ta_cursor, 400);
+    lv_style_set_anim_duration(&theme->styles.ta_cursor, 400);
 
     style_init_reset(&theme->styles.ta_placeholder);
     lv_style_set_text_color(&theme->styles.ta_placeholder,

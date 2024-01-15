@@ -133,7 +133,7 @@ static void style_init(my_theme_t * theme)
     lv_style_set_border_color(&theme->styles.ta_cursor, COLOR_DIM);
     lv_style_set_border_width(&theme->styles.ta_cursor, 2);
     lv_style_set_bg_opa(&theme->styles.ta_cursor, LV_OPA_TRANSP);
-    lv_style_set_anim_time(&theme->styles.ta_cursor, 500);
+    lv_style_set_anim_duration(&theme->styles.ta_cursor, 500);
 #endif
 }
 
