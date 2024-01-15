@@ -176,10 +176,13 @@ void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
         return;
     }
 
-    int32_t img_w = lv_area_get_width(coords);
-    int32_t img_h = lv_area_get_height(coords);
+    int32_t img_w = draw_dsc->header.w;
+    int32_t img_h = draw_dsc->header.h;
 
     lv_area_t tile_area = *coords;
+    lv_area_set_width(&tile_area, img_w);
+    lv_area_set_height(&tile_area, img_h);
+
     int32_t tile_x_start = tile_area.x1;
 
     while(tile_area.y1 <= draw_unit->clip_area->y2) {
