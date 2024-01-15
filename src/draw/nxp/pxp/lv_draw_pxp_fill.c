@@ -53,6 +53,7 @@ void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     lv_area_t rel_coords;
     lv_area_copy(&rel_coords, coords);
@@ -66,7 +67,7 @@ void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc
     if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    _pxp_fill(layer->buf, &blend_area, layer->buf_stride, layer->color_format, dsc);
+    _pxp_fill(draw_buf->data, &blend_area, draw_buf->header.stride, draw_buf->header.cf, dsc);
 }
 
 /**********************

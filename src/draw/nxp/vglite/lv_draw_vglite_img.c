@@ -163,9 +163,9 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     vglite_set_src_buf(src_buf, lv_area_get_width(&src_area), lv_area_get_height(&src_area), src_stride, src_cf);
 
 #if LV_USE_VGLITE_BLIT_SPLIT
-    void * dest_buf = layer->buf;
-    uint32_t dest_stride = layer->buf_stride;
-    lv_color_format_t dest_cf = layer->color_format;
+    void * dest_buf = layer->draw_buf->data;
+    uint32_t dest_stride = layer->draw_buf->header.stride;
+    lv_color_format_t dest_cf = layer->draw_buf->header.cf;
 
     if(!has_transform)
         _vglite_blit_split(dest_buf, &blend_area, dest_stride, dest_cf,
