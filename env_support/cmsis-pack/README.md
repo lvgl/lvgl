@@ -117,7 +117,7 @@ remove the misleading guide above this code segment.
 #define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
-Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
+Make sure `LV_MEM_SIZE` is no less than `(96*1024U)`.
 
 8. Remove following macro definitions in the `3rd party libraries` section:
 
