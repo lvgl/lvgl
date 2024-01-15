@@ -328,13 +328,11 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
 
     if(tmr) {
         disp_refr = tmr->user_data;
-#if LV_USE_PERF_MONITOR == 0 && LV_USE_MEM_MONITOR == 0
         /**
          * Ensure the timer does not run again automatically.
          * This is done before refreshing in case refreshing invalidates something else.
          */
         lv_timer_pause(tmr);
-#endif
     }
     else {
         disp_refr = lv_display_get_default();
