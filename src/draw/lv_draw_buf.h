@@ -146,12 +146,9 @@ uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
 /**
  * Clear an area on the buffer
  * @param draw_buf          pointer to draw buffer
- * @param w                 width of the buffer
- * @param h                 height of the buffer
- * @param color_format      color format of the buffer
  * @param a                 the area to clear, or NULL to clear the whole buffer
  */
-void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a);
+void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a);
 
 /**
  * Copy an area from a buffer to an other

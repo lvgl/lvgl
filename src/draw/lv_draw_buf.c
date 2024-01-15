@@ -84,27 +84,32 @@ void lv_draw_buf_invalidate_cache(void * buf, uint32_t stride, lv_color_format_t
     if(handlers.invalidate_cache_cb) handlers.invalidate_cache_cb(buf, stride, color_format, area);
 }
 
-void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a)
+void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
 {
-    LV_UNUSED(h);
-    if(lv_area_get_width(a) < 0) return;
-    if(lv_area_get_height(a) < 0) return;
+    LV_ASSERT_NULL(draw_buf);
+    if(a && lv_area_get_width(a) < 0) return;
+    if(a && lv_area_get_height(a) < 0) return;
 
-    uint8_t px_size = lv_color_format_get_size(color_format);
-    uint32_t stride = lv_draw_buf_width_to_stride(w, color_format);
-    uint8_t * bufc =  buf;
+    const lv_image_header_t * header = &draw_buf->header;
+    uint32_t stride = header->stride;
 
-    /*Got the first pixel of each buffer*/
-    bufc += stride * a->y1;
-    bufc += a->x1 * px_size;
-
-    uint32_t line_length = lv_area_get_width(a) * px_size;
-    int32_t y;
-    for(y = a->y1; y <= a->y2; y++) {
-        lv_memzero(bufc, line_length);
-        bufc += stride;
+    if(a == NULL) {
+        lv_memzero(draw_buf->data, header->h * stride);
     }
-
+    else {
+        uint8_t * bufc;
+        uint32_t line_length;
+        int32_t start_y, end_y;
+        uint8_t px_size = lv_color_format_get_size(header->cf);
+        bufc = lv_draw_buf_goto_xy(draw_buf, a->x1, a->y1);
+        line_length = lv_area_get_width(a) * px_size;
+        start_y = a->y1;
+        end_y = a->y2;
+        for(; start_y <= end_y; start_y++) {
+            lv_memzero(bufc, line_length);
+            bufc += stride;
+        }
+    }
 }
 
 void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,

@@ -384,7 +384,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         a.y1 = 0;
         a.x2 = w - 1;
         a.y2 = h - 1;
-        lv_draw_buf_clear(layer->draw_buf->data, w, h, layer->color_format, &a);
+        lv_draw_buf_clear(layer->draw_buf, &a);
     }
 
     return layer->draw_buf->data;
