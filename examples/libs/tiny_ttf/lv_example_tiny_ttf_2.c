@@ -6,14 +6,11 @@
  */
 void lv_example_tiny_ttf_2(void)
 {
-    static lv_font_t font;
-    lv_result_t res = lv_tiny_ttf_create_file(&font, "A:lvgl/examples/libs/tiny_ttf/Ubuntu-Medium.ttf", 30);
-    if(res == LV_RESULT_INVALID) return;
-
     /*Create style with the new font*/
     static lv_style_t style;
     lv_style_init(&style);
-    lv_style_set_text_font(&style, &font);
+    lv_font_t * font = lv_tiny_ttf_create_file("A:lvgl/examples/libs/tiny_ttf/Ubuntu-Medium.ttf", 30);
+    lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
 
     /*Create a label with the new style*/
