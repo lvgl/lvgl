@@ -115,8 +115,7 @@ def create_ui():
     try:
         font_montserrat_24 = lv.font_montserrat_24
     except AttributeError:
-        font_montserrat_24 = lv.font_t()
-        lv.tiny_ttf_create_file(font_montserrat_24, 'A:font_montserrat_24.ttf', 32)
+        font_montserrat_24 = lv.tiny_ttf_create_file('A:font_montserrat_24.ttf', 32)
 
     style_big_font.set_text_font(font_montserrat_24)
 
