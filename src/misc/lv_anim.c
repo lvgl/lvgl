@@ -379,11 +379,11 @@ static void anim_timer(lv_timer_t * param)
                     a->current_value = new_value;
                     /*Apply the calculated value*/
                     if(a->exec_cb) a->exec_cb(a->var, new_value);
-                    if(a->custom_exec_cb) a->custom_exec_cb(a, new_value);
+                    if(!state.anim_list_changed && a->custom_exec_cb) a->custom_exec_cb(a, new_value);
                 }
 
                 /*If the time is elapsed the animation is ready*/
-                if(a->act_time >= a->duration) {
+                if(!state.anim_list_changed && a->act_time >= a->duration) {
                     anim_ready_handler(a);
                 }
             }
