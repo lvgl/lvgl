@@ -71,7 +71,7 @@ lv_display_t * lv_windows_create_display(
                         &data,
                         0,
                         NULL);
-    LV_ASSERT_NULL(thread);
+    LV_ASSERT(thread);
 
     WaitForSingleObjectEx(data.mutex, INFINITE, FALSE);
 
@@ -154,7 +154,7 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
     ShowWindow(window_handle, SW_SHOW);
     UpdateWindow(window_handle);
 
-    LV_ASSERT_NULL(SetEvent(data->mutex));
+    LV_ASSERT(SetEvent(data->mutex));
 
     data = NULL;
 

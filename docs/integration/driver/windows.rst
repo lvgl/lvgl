@@ -35,7 +35,9 @@ Application Mode
 Prerequisites
 -------------
 
-The minimum Windows OS version this driver supported is Windows Server 2003, or Windows XP with East Asian language support installed because the input method integration support need that.
+The tested minimum Windows OS requirement for this driver is Windows XP RTM.
+
+According to the Windows GDI API this driver used. Maybe the minimum Windows OS requirement for this driver is Windows 2000 RTM.
 
 Configure Windows driver
 --------------------

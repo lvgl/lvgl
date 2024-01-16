@@ -97,12 +97,12 @@ void lv_windows_platform_init(void)
     window_class.cbWndExtra = 0;
     window_class.hInstance = NULL;
     window_class.hIcon = NULL;
-    window_class.hCursor = LoadCursorW(NULL, IDC_ARROW);
+    window_class.hCursor = LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
     window_class.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     window_class.lpszMenuName = NULL;
     window_class.lpszClassName = L"LVGL.Window";
     window_class.hIconSm = NULL;
-    LV_ASSERT_NULL(RegisterClassExW(&window_class));
+    LV_ASSERT(RegisterClassExW(&window_class));
 }
 
 lv_windows_window_context_t * lv_windows_get_window_context(
