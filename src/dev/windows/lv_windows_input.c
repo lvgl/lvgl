@@ -15,10 +15,6 @@
 
 #include <windowsx.h>
 
-#if _MSC_VER >= 1200
-    #pragma comment(lib, "Imm32.lib")
-#endif
-
 #include "../../widgets/textarea/lv_textarea.h"
 #include "../../widgets/keyboard/lv_keyboard.h"
 
@@ -475,6 +471,85 @@ static void lv_windows_push_key_to_keyboard_queue(
     }
 }
 
+static HIMC lv_windows_imm_get_context(
+    HWND window_handle)
+{
+    HMODULE module_handle = GetModuleHandleW(L"imm32.dll");
+    if(!module_handle) {
+        return FALSE;
+    }
+
+    typedef HIMC(WINAPI * function_type)(HWND);
+
+    function_type function = (function_type)(
+                                 GetProcAddress(module_handle, "ImmGetContext"));
+    if(!function) {
+        return FALSE;
+    }
+
+    return function(window_handle);
+}
+
+static BOOL lv_windows_imm_release_context(
+    HWND window_handle,
+    HIMC imm_context_handle)
+{
+    HMODULE module_handle = GetModuleHandleW(L"imm32.dll");
+    if(!module_handle) {
+        return FALSE;
+    }
+
+    typedef BOOL(WINAPI * function_type)(HWND, HIMC);
+
+    function_type function = (function_type)(
+                                 GetProcAddress(module_handle, "ImmReleaseContext"));
+    if(!function) {
+        return FALSE;
+    }
+
+    return function(window_handle, imm_context_handle);
+}
+
+static HIMC lv_windows_imm_associate_context(
+    HWND window_handle,
+    HIMC imm_context_handle)
+{
+    HMODULE module_handle = GetModuleHandleW(L"imm32.dll");
+    if(!module_handle) {
+        return FALSE;
+    }
+
+    typedef HIMC(WINAPI * function_type)(HWND, HIMC);
+
+    function_type function = (function_type)(
+                                 GetProcAddress(module_handle, "ImmAssociateContext"));
+    if(!function) {
+        return FALSE;
+    }
+
+    return function(window_handle, imm_context_handle);
+}
+
+static BOOL lv_windows_imm_set_composition_window(
+    HIMC imm_context_handle,
+    LPCOMPOSITIONFORM composition_form)
+{
+    HMODULE module_handle = GetModuleHandleW(L"imm32.dll");
+    if(!module_handle) {
+        return FALSE;
+    }
+
+    typedef BOOL(WINAPI * function_type)(HIMC, LPCOMPOSITIONFORM);
+
+    function_type function = (function_type)(
+                                 GetProcAddress(module_handle, "ImmSetCompositionWindow"));
+    if(!function) {
+        return FALSE;
+    }
+
+    return function(imm_context_handle, composition_form);
+}
+
 bool lv_windows_keypad_device_window_message_handler(
     HWND hWnd,
     UINT uMsg,
@@ -602,10 +677,14 @@ bool lv_windows_keypad_device_window_message_handler(
             }
         case WM_IME_SETCONTEXT: {
                 if(wParam == TRUE) {
-                    HIMC input_method_context_handle = ImmGetContext(hWnd);
-                    if(input_method_context_handle) {
-                        ImmAssociateContext(hWnd, input_method_context_handle);
-                        ImmReleaseContext(hWnd, input_method_context_handle);
+                    HIMC imm_context_handle = lv_windows_imm_get_context(hWnd);
+                    if(imm_context_handle) {
+                        lv_windows_imm_associate_context(
+                            hWnd,
+                            imm_context_handle);
+                        lv_windows_imm_release_context(
+                            hWnd,
+                            imm_context_handle);
                     }
                 }
 
@@ -613,8 +692,8 @@ bool lv_windows_keypad_device_window_message_handler(
                 break;
             }
         case WM_IME_STARTCOMPOSITION: {
-                HIMC input_method_context_handle = ImmGetContext(hWnd);
-                if(input_method_context_handle) {
+                HIMC imm_context_handle = lv_windows_imm_get_context(hWnd);
+                if(imm_context_handle) {
                     lv_obj_t * textarea_object = NULL;
                     lv_obj_t * focused_object = lv_group_get_focused(
                                                     lv_group_get_default());
@@ -645,12 +724,12 @@ bool lv_windows_keypad_device_window_message_handler(
                             label_object->coords.y1 + textarea->cursor.area.y1;
                     }
 
-                    ImmSetCompositionWindow(
-                        input_method_context_handle,
+                    lv_windows_imm_set_composition_window(
+                        imm_context_handle,
                         &composition_form);
-                    ImmReleaseContext(
+                    lv_windows_imm_release_context(
                         hWnd,
-                        input_method_context_handle);
+                        imm_context_handle);
                 }
 
                 *plResult = DefWindowProcW(hWnd, uMsg, wParam, wParam);
