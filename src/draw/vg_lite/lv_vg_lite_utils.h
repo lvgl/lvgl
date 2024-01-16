@@ -29,7 +29,9 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_VG_LITE_BUF_ALIGN 64
+#if LV_DRAW_BUF_ALIGN != 64
+#error "LV_DRAW_BUF_ALIGN must be 64"
+#endif
 
 #define LV_VG_LITE_IS_ERROR(err) (err > 0)
 
