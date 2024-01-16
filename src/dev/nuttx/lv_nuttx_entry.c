@@ -13,6 +13,7 @@
 #include <time.h>
 #include <nuttx/tls.h>
 #include <syslog.h>
+#include "lv_nuttx_cache.h"
 
 #include "../../../lvgl.h"
 
@@ -94,6 +95,8 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
     lv_log_register_print_cb(syslog_print);
 #endif
     lv_tick_set_cb(millis);
+
+    lv_nuttx_cache_init();
 
     if(result) {
         lv_memzero(result, sizeof(lv_nuttx_result_t));
