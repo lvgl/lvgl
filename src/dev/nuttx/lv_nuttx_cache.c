@@ -59,7 +59,7 @@ static void invalidate_cache(void * buf, uint32_t stride, lv_color_format_t colo
     lv_uintptr_t end;
 
     if(area) {
-        int32_t h = lv_area_get_width(area);
+        int32_t h = lv_area_get_height(area);
         start = (lv_uintptr_t)buf + area->y1 * stride;
         end = start + h * stride;
     }
