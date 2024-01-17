@@ -43,8 +43,10 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 
 static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc);
 
-static void freetype_outline_event_cb(lv_event_t * e);
-static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc);
+#if LV_USE_FREETYPE
+    static void freetype_outline_event_cb(lv_event_t * e);
+    static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc);
+#endif /* LV_USE_FREETYPE */
 
 /**********************
  *  STATIC VARIABLES
@@ -63,11 +65,13 @@ void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
+#if LV_USE_FREETYPE
     static bool is_init = false;
     if(!is_init) {
         lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
         is_init = true;
     }
+#endif /* LV_USE_FREETYPE */
 
     lv_draw_label_iterate_characters(draw_unit, dsc, coords, draw_letter_cb);
 }
@@ -81,26 +85,46 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 {
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
     if(glyph_draw_dsc) {
-        if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_INVALID) {
+
+        switch(glyph_draw_dsc->format) {
+            case LV_DRAW_LETTER_BITMAP_FORMAT_A8: {
+                    draw_letter_bitmap(u, glyph_draw_dsc);
+                }
+                break;
+
+#if LV_USE_FREETYPE
+            case LV_DRAW_LETTER_VECTOR_FORMAT: {
+                    if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
+                        draw_letter_outline(u, glyph_draw_dsc);
+                    }
+                }
+                break;
+#endif /* LV_USE_FREETYPE */
+
+            case LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE: {
+                    lv_draw_image_dsc_t img_dsc;
+                    lv_draw_image_dsc_init(&img_dsc);
+                    img_dsc.opa = glyph_draw_dsc->opa;
+                    img_dsc.src = glyph_draw_dsc->glyph_data;
+                    lv_draw_vg_lite_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
+                }
+                break;
+
 #if LV_USE_FONT_PLACEHOLDER
-            /* Draw a placeholder rectangle*/
-            lv_draw_border_dsc_t border_draw_dsc;
-            lv_draw_border_dsc_init(&border_draw_dsc);
-            border_draw_dsc.opa = glyph_draw_dsc->opa;
-            border_draw_dsc.color = glyph_draw_dsc->color;
-            border_draw_dsc.width = 1;
-            lv_draw_vg_lite_border(draw_unit, &border_draw_dsc, glyph_draw_dsc->bg_coords);
-#endif
-        }
-        else if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_A8
-                || glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE
-                || glyph_draw_dsc->format == LV_DRAW_LETTER_VECTOR_FORMAT) {
-            if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
-                draw_letter_outline(u, glyph_draw_dsc);
-            }
-            else {
-                draw_letter_bitmap(u, glyph_draw_dsc);
-            }
+            case LV_DRAW_LETTER_BITMAP_FORMAT_INVALID: {
+                    /* Draw a placeholder rectangle*/
+                    lv_draw_border_dsc_t border_draw_dsc;
+                    lv_draw_border_dsc_init(&border_draw_dsc);
+                    border_draw_dsc.opa = glyph_draw_dsc->opa;
+                    border_draw_dsc.color = glyph_draw_dsc->color;
+                    border_draw_dsc.width = 1;
+                    lv_draw_vg_lite_border(draw_unit, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                }
+                break;
+#endif /* LV_USE_FONT_PLACEHOLDER */
+
+            default:
+                break;
         }
     }
 
@@ -189,6 +213,8 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
      */
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 }
+
+#if LV_USE_FREETYPE
 
 static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc)
 {
@@ -299,5 +325,7 @@ static void freetype_outline_event_cb(lv_event_t * e)
             break;
     }
 }
+
+#endif /* LV_USE_FREETYPE */
 
 #endif /*LV_USE_DRAW_VG_LITE*/
