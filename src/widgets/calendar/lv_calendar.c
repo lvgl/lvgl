@@ -296,7 +296,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
 static void draw_task_added_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_draw_task_t * draw_task = lv_event_get_param(e);
     if(((lv_draw_dsc_base_t *)draw_task->draw_dsc)->part != LV_PART_ITEMS) return;
 

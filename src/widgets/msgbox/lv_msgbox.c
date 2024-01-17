@@ -270,7 +270,7 @@ void lv_msgbox_close_async(lv_obj_t * obj)
 
 static void msgbox_close_click_event_cb(lv_event_t * e)
 {
-    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_current_target(e);
     lv_obj_t * mbox = lv_obj_get_parent(lv_obj_get_parent(btn));
     lv_msgbox_close(mbox);
 }

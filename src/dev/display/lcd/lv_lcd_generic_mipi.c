@@ -317,7 +317,7 @@ static void set_rotation(lv_lcd_generic_mipi_driver_t * drv, lv_display_rotation
  */
 static void res_chg_event_cb(lv_event_t * e)
 {
-    lv_display_t * disp = lv_event_get_target(e);
+    lv_display_t * disp = lv_event_get_current_target(e);
     lv_lcd_generic_mipi_driver_t * drv = get_driver(disp);
 
     uint16_t hor_res = lv_display_get_horizontal_resolution(disp);

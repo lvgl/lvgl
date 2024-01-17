@@ -880,7 +880,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_FOCUSED) {
         start_cursor_blink(obj);
@@ -924,7 +924,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
 static void label_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * label = lv_event_get_target(e);
+    lv_obj_t * label = lv_event_get_current_target(e);
     lv_obj_t * ta = lv_obj_get_parent(label);
 
     if(code == LV_EVENT_STYLE_CHANGED || code == LV_EVENT_SIZE_CHANGED) {
@@ -1144,7 +1144,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
     lv_indev_t * click_source = lv_indev_active();
     if(click_source == NULL) return;
 
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     if(ta->cursor.click_pos == 0) return;
 
@@ -1279,7 +1279,7 @@ static lv_result_t insert_handler(lv_obj_t * obj, const char * txt)
 
 static void draw_placeholder(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
     const char * txt = lv_label_get_text(ta->label);
@@ -1305,7 +1305,7 @@ static void draw_placeholder(lv_event_t * e)
 
 static void draw_cursor(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
     const char * txt = lv_label_get_text(ta->label);

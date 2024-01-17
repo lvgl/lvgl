@@ -260,7 +260,7 @@ static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void draw_indic(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     lv_layer_t * layer = lv_event_get_layer(e);
@@ -560,7 +560,7 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         int32_t indic_size;

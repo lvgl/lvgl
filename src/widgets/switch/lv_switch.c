@@ -117,7 +117,7 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         int32_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
@@ -145,7 +145,7 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_main(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     lv_layer_t * layer = lv_event_get_layer(e);
