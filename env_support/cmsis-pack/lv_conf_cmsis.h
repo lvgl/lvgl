@@ -712,16 +712,6 @@
     #define LV_PROFILER_END_TAG   LV_PROFILER_BUILTIN_END_TAG
 #endif
 
-
-/*1: Support using images as font in label or span widgets */
-#if LV_USE_IMGFONT
-    /*Imgfont image file path maximum length*/
-    #define LV_IMGFONT_PATH_MAX_LEN 64
-
-    /*1: Use img cache to buffer header information*/
-    #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
-#endif
-
 /*1: Enable an observer pattern implementation*/
 #define LV_USE_OBSERVER 1
 
