@@ -164,4 +164,22 @@ void test_obj_move_to_index_no_operation_when_new_index_is_the_same_as_previous_
     TEST_ASSERT_EQUAL(1, lv_obj_get_index(child2));
 }
 
+void test_obj_move_to_index_no_operation_when_requested_negative_index_is_greater_than_child_count(void)
+{
+    lv_obj_t * parent = NULL;
+    lv_obj_t * child1 = NULL;
+    lv_obj_t * child2 = NULL;
+
+    parent = lv_obj_create(lv_screen_active());
+    /* index is 0 */
+    child1 = lv_obj_create(parent);
+    /* index is 1 */
+    child2 = lv_obj_create(parent);
+
+    lv_obj_move_to_index(child1, -4);
+
+    TEST_ASSERT_EQUAL(0, lv_obj_get_index(child1));
+    TEST_ASSERT_EQUAL(1, lv_obj_get_index(child2));
+}
+
 #endif

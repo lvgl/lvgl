@@ -216,6 +216,7 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
         index += parent_child_count;
     }
 
+    /* Index was negative and the absolute value is greater than parent child count */
     if((index < 0)
        /* Index is same or bigger than parent child count */
        || (index >= (int32_t) parent_child_count)
