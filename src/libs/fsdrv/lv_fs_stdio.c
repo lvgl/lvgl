@@ -45,7 +45,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path);
-static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn);
+static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len);
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 
 /**********************
@@ -273,7 +273,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
  * @param fn pointer to a buffer to store the filename
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
+static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len)
 {
     LV_UNUSED(drv);
     dir_handle_t * handle = (dir_handle_t *)dir_p;
@@ -283,17 +283,17 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
         entry = readdir(handle->dir_p);
         if(entry) {
             /*Note, DT_DIR is not defined in C99*/
-            if(entry->d_type == DT_DIR) lv_snprintf(fn, lv_strlen(entry->d_name) + 2, "/%s", entry->d_name);
-            else lv_strcpy(fn, entry->d_name);
+            if(entry->d_type == DT_DIR) lv_snprintf(fn, fn_len, "/%s", entry->d_name);
+            else lv_strncpy(fn, entry->d_name, fn_len);
         }
         else {
-            lv_strcpy(fn, "");
+            lv_strncpy(fn, "", fn_len);
         }
     } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
 #else
-    lv_strcpy(fn, handle->next_fn);
+    lv_strncpy(fn, handle->next_fn, fn_len);
 
-    lv_strcpy(handle->next_fn, "");
+    lv_strncpy(handle->next_fn, "", fn_len);
     WIN32_FIND_DATAA fdata;
 
     if(FindNextFileA(handle->dir_p, &fdata) == false) return LV_FS_RES_OK;

@@ -125,7 +125,7 @@ practice to insert a ``'/'`` in front of each directory name.
 
    char fn[256];
    while(1) {
-       res = lv_fs_dir_read(&dir, fn);
+       res = lv_fs_dir_read(&dir, fn, sizeof(fn));
        if(res != LV_FS_RES_OK) {
            my_error_handling();
            break;
