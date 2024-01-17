@@ -216,6 +216,32 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
 
 }
 
+void lv_draw_sw_rgb565_to_l1(void * buf, uint32_t buf_size_px)
+{
+    if(buf_size_px & 0x7) {
+        LV_LOG_WARN("buf_size_px must be multiple of 8");
+        return;
+    }
+
+    uint8_t * out = buf;
+    lv_color16_t * in = buf;
+    uint32_t i;
+    for(i = 0; i < buf_size_px; i += 8) {
+        *out = 0;
+        if(in[0].blue > 16)(*out) |= (1 << 7);
+        if(in[1].blue > 16)(*out) |= (1 << 6);
+        if(in[2].blue > 16)(*out) |= (1 << 5);
+        if(in[3].blue > 16)(*out) |= (1 << 4);
+        if(in[4].blue > 16)(*out) |= (1 << 3);
+        if(in[5].blue > 16)(*out) |= (1 << 2);
+        if(in[6].blue > 16)(*out) |= (1 << 1);
+        if(in[7].blue > 16)(*out) |= (1 << 0);
+
+        in += 8;
+        out += 1;
+    }
+}
+
 void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_sride,
                        int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format)
 {

@@ -180,6 +180,15 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
 void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px);
 
 /**
+ * This is helper to easily convert RGB565 color to 1 bit monochrome.
+ * The conversation is done in-place.
+ * The bits are in a row.
+ * @param buf           the source buffer with RGB565 data, the output 1 bit data will be written here as well
+ * @param buf_size_px   number of pixels in the buffer. Must be multiple of 8.
+ */
+void lv_draw_sw_rgb565_to_l1(void * buf, uint32_t buf_size_px);
+
+/**
  * Rotate a buffer into an other buffer
  * @param src           the source buffer
  * @param dest          the destination buffer
