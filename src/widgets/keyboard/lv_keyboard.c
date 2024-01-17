@@ -272,7 +272,7 @@ bool lv_buttonmatrix_get_popovers(const lv_obj_t * obj)
 
 void lv_keyboard_def_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;

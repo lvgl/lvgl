@@ -564,7 +564,7 @@ static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(lv_obj_event_base(MY_CLASS, e) != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
     if(code == LV_EVENT_DRAW_MAIN) {
@@ -615,7 +615,7 @@ static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_main(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_layer_t * layer = lv_event_get_layer(e);
 
     lv_draw_span(obj, layer);

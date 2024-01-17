@@ -403,7 +403,7 @@ static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e
         if(res != LV_RESULT_OK) return;
     }
 
-    lv_obj_t * label = lv_event_get_target(e);
+    lv_obj_t * label = lv_event_get_current_target(e);
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /*If the selected text has a larger font it needs some extra space to draw it*/
         int32_t * s = lv_event_get_param(e);
@@ -423,7 +423,7 @@ static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e
 static void draw_main(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     if(code == LV_EVENT_DRAW_MAIN) {
         /*Draw the selected rectangle*/
         lv_layer_t * layer = lv_event_get_layer(e);
@@ -498,7 +498,7 @@ static void draw_label(lv_event_t * e)
 {
     /* Split the drawing of the label into  an upper (above the selected area)
      * and a lower (below the selected area)*/
-    lv_obj_t * label_obj = lv_event_get_target(e);
+    lv_obj_t * label_obj = lv_event_get_current_target(e);
     lv_obj_t * roller = lv_obj_get_parent(label_obj);
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);

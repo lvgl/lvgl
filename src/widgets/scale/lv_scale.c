@@ -441,7 +441,7 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t event_code = lv_event_get_code(event);
-    lv_obj_t * obj = lv_event_get_target(event);
+    lv_obj_t * obj = lv_event_get_current_target(event);
     lv_scale_t * scale = (lv_scale_t *) obj;
     LV_UNUSED(scale);
 

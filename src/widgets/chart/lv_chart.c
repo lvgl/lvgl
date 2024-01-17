@@ -650,7 +650,7 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(code == LV_EVENT_PRESSED) {

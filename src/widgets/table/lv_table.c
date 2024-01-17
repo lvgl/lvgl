@@ -535,7 +535,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_table_t * table = (lv_table_t *)obj;
 
     if(code == LV_EVENT_STYLE_CHANGED) {
@@ -647,7 +647,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_main(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_table_t * table = (lv_table_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
     lv_area_t clip_area;

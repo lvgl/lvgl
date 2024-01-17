@@ -1039,7 +1039,7 @@ static bool is_out_anim(lv_screen_load_anim_t anim_type)
 static void disp_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_display_t * disp = lv_event_get_target(e);
+    lv_display_t * disp = lv_event_get_current_target(e);
     switch(code) {
         case LV_EVENT_REFR_REQUEST:
             if(disp->refr_timer) lv_timer_resume(disp->refr_timer);

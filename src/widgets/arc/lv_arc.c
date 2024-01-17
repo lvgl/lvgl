@@ -444,8 +444,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
-    lv_arc_t * arc = (lv_arc_t *)lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
+    lv_arc_t * arc = (lv_arc_t *)obj;
     if(code == LV_EVENT_PRESSING) {
         lv_indev_t * indev = lv_indev_active();
         if(indev == NULL) return;
@@ -670,7 +670,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void lv_arc_draw(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
     lv_layer_t * layer = lv_event_get_layer(e);
