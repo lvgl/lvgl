@@ -18,7 +18,7 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
-    lv_font_t * font;
+    lv_font_t font;
     lv_imgfont_get_path_cb_t path_cb;
     void * user_data;
 } imgfont_dsc_t;
@@ -51,15 +51,14 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb,
     LV_ASSERT_MSG(LV_IMGFONT_PATH_MAX_LEN > sizeof(lv_image_dsc_t),
                   "LV_IMGFONT_PATH_MAX_LEN must be greater than sizeof(lv_image_dsc_t)");
 
-    size_t size = sizeof(imgfont_dsc_t) + sizeof(lv_font_t);
-    imgfont_dsc_t * dsc = lv_malloc_zeroed(size);
+    imgfont_dsc_t * dsc = lv_malloc_zeroed(sizeof(imgfont_dsc_t));
+    LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
 
-    dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(imgfont_dsc_t));
     dsc->path_cb = path_cb;
     dsc->user_data = user_data;
 
-    lv_font_t * font = dsc->font;
+    lv_font_t * font = &dsc->font;
     font->dsc = dsc;
     font->get_glyph_dsc = imgfont_get_glyph_dsc;
     font->get_glyph_bitmap = imgfont_get_glyph_bitmap;
@@ -69,7 +68,7 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb,
     font->underline_position = 0;
     font->underline_thickness = 0;
 
-    return dsc->font;
+    return font;
 }
 
 void lv_imgfont_destroy(lv_font_t * font)
@@ -92,7 +91,7 @@ static const void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, uint32
 
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
     int32_t offset_y = 0;
-    const void * img_src = dsc->path_cb(dsc->font, unicode, 0, &offset_y, dsc->user_data);
+    const void * img_src = dsc->path_cb(font, unicode, 0, &offset_y, dsc->user_data);
     return img_src;
 }
 
@@ -107,7 +106,7 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
 
     int32_t offset_y = 0;
 
-    const void * img_src = dsc->path_cb(dsc->font, unicode, unicode_next, &offset_y, dsc->user_data);
+    const void * img_src = dsc->path_cb(font, unicode, unicode_next, &offset_y, dsc->user_data);
     if(img_src == NULL) return false;
 
     const lv_image_header_t * img_header;
