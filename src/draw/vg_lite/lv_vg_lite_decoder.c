@@ -200,6 +200,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     /*In case of uncompressed formats the image stored in the ROM/RAM.
      *So simply give its pointer*/
     const uint8_t * image_data = ((lv_image_dsc_t *)dsc->src)->data;
+    uint32_t image_data_size = ((lv_image_dsc_t *)dsc->src)->data_size;
 
     bool has_alpha = lv_color_format_has_alpha(cf);
     bool is_indexed = LV_COLOR_FORMAT_IS_INDEXED(cf);
@@ -219,7 +220,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
         lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
         LV_ASSERT_MALLOC(draw_buf);
-        lv_draw_buf_init(draw_buf, width, height, cf, stride, (void *)image_data, LV_VG_LITE_IMAGE_NO_CACHE);
+        lv_draw_buf_init(draw_buf, width, height, cf, stride, (void *)image_data, image_data_size);
         dsc->decoded = draw_buf;
         return LV_RESULT_OK;
     }
