@@ -227,15 +227,17 @@ void lv_draw_sw_rgb565_to_l1(void * buf, uint32_t buf_size_px)
     lv_color16_t * in = buf;
     uint32_t i;
     for(i = 0; i < buf_size_px; i += 8) {
-        *out = 0;
-        if(in[0].blue > 16)(*out) |= (1 << 7);
-        if(in[1].blue > 16)(*out) |= (1 << 6);
-        if(in[2].blue > 16)(*out) |= (1 << 5);
-        if(in[3].blue > 16)(*out) |= (1 << 4);
-        if(in[4].blue > 16)(*out) |= (1 << 3);
-        if(in[5].blue > 16)(*out) |= (1 << 2);
-        if(in[6].blue > 16)(*out) |= (1 << 1);
-        if(in[7].blue > 16)(*out) |= (1 << 0);
+        uint8_t tmp = 0;
+        if(in[0].blue > 16)tmp |= (1 << 7);
+        if(in[1].blue > 16)tmp |= (1 << 6);
+        if(in[2].blue > 16)tmp |= (1 << 5);
+        if(in[3].blue > 16)tmp |= (1 << 4);
+        if(in[4].blue > 16)tmp |= (1 << 3);
+        if(in[5].blue > 16)tmp |= (1 << 2);
+        if(in[6].blue > 16)tmp |= (1 << 1);
+        if(in[7].blue > 16)tmp |= (1 << 0);
+
+        *out = tmp;
 
         in += 8;
         out += 1;
