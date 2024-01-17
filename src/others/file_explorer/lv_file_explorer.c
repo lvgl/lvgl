@@ -544,7 +544,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
     lv_table_set_cell_value(explorer->file_table, 1, 1, "0");
 
     while(1) {
-        res = lv_fs_dir_read(&dir, fn);
+        res = lv_fs_dir_read(&dir, fn, sizeof(fn));
         if(res != LV_FS_RES_OK) {
             LV_LOG_USER("Driver, file or directory is not exists %d!", res);
             break;
