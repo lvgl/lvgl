@@ -220,33 +220,54 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
 {
     lv_vg_lite_path_set_quality(dest, lv_quality_to_vg(src->quality));
 
+    /* init bounds */
+    float min_x = __FLT_MAX__;
+    float min_y = __FLT_MAX__;
+    float max_x = __FLT_MIN__;
+    float max_y = __FLT_MIN__;
+
+#define CMP_BOUNDS(point)                           \
+    do {                                            \
+        if((point)->x < min_x) min_x = (point)->x;  \
+        if((point)->y < min_y) min_y = (point)->y;  \
+        if((point)->x > max_x) max_x = (point)->x;  \
+        if((point)->y > max_y) max_y = (point)->y;  \
+    } while(0)
+
     uint32_t pidx = 0;
     for(uint32_t i = 0; i < src->ops.size; i++) {
         lv_vector_path_op_t * op = LV_ARRAY_GET(&src->ops, i, uint8_t);
         switch(*op) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
-                    lv_fpoint_t * pt = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
+                    const lv_fpoint_t * pt = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
+                    CMP_BOUNDS(pt);
                     lv_vg_lite_path_move_to(dest, pt->x, pt->y);
                     pidx += 1;
                 }
                 break;
             case LV_VECTOR_PATH_OP_LINE_TO: {
-                    lv_fpoint_t * pt = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
+                    const lv_fpoint_t * pt = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
+                    CMP_BOUNDS(pt);
                     lv_vg_lite_path_line_to(dest, pt->x, pt->y);
                     pidx += 1;
                 }
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
-                    lv_fpoint_t * pt1 = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
-                    lv_fpoint_t * pt2 = LV_ARRAY_GET(&src->points, pidx + 1, lv_fpoint_t);
+                    const lv_fpoint_t * pt1 = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
+                    const lv_fpoint_t * pt2 = LV_ARRAY_GET(&src->points, pidx + 1, lv_fpoint_t);
+                    CMP_BOUNDS(pt1);
+                    CMP_BOUNDS(pt2);
                     lv_vg_lite_path_quad_to(dest, pt1->x, pt1->y, pt2->x, pt2->y);
                     pidx += 2;
                 }
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO: {
-                    lv_fpoint_t * pt1 = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
-                    lv_fpoint_t * pt2 = LV_ARRAY_GET(&src->points, pidx + 1, lv_fpoint_t);
-                    lv_fpoint_t * pt3 = LV_ARRAY_GET(&src->points, pidx + 2, lv_fpoint_t);
+                    const lv_fpoint_t * pt1 = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
+                    const lv_fpoint_t * pt2 = LV_ARRAY_GET(&src->points, pidx + 1, lv_fpoint_t);
+                    const lv_fpoint_t * pt3 = LV_ARRAY_GET(&src->points, pidx + 2, lv_fpoint_t);
+                    CMP_BOUNDS(pt1);
+                    CMP_BOUNDS(pt2);
+                    CMP_BOUNDS(pt3);
                     lv_vg_lite_path_cubic_to(dest, pt1->x, pt1->y, pt2->x, pt2->y, pt3->x, pt3->y);
                     pidx += 3;
                 }
@@ -259,7 +280,7 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
     }
 
     lv_vg_lite_path_end(dest);
-    lv_vg_lite_path_update_bonding_box(dest);
+    lv_vg_lite_path_set_bonding_box(dest, min_x, min_y, max_x, max_y);
 }
 
 static vg_lite_blend_t lv_blend_to_vg(lv_vector_blend_t blend)
