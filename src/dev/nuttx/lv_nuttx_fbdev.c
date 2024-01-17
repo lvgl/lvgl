@@ -134,7 +134,8 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
 
     /* double buffer mode */
 
-    if(dsc->pinfo.yres_virtual == (dsc->vinfo.yres * 2)) {
+    bool double_buffer = dsc->pinfo.yres_virtual == (dsc->vinfo.yres * 2);
+    if(double_buffer) {
         if((ret = fbdev_init_mem2(dsc)) < 0) {
             goto errout;
         }
@@ -142,7 +143,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         lv_draw_buf_init(&dsc->buf2, w, h, LV_COLOR_FORMAT_NATIVE, stride, dsc->mem2, data_size);
     }
 
-    lv_display_set_draw_buffers(disp, &dsc->buf1, &dsc->buf2);
+    lv_display_set_draw_buffers(disp, &dsc->buf1, double_buffer ? &dsc->buf2 : NULL);
     lv_display_set_render_mode(disp, LV_DISP_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
