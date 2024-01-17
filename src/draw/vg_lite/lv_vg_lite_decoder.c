@@ -231,7 +231,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     /* Since the palette and index image are next to each other,
      * the palette size needs to be aligned to ensure that the image is aligned.
      */
-    uint32_t palette_size_bytes_aligned = LV_VG_LITE_ALIGN(palette_size_bytes, LV_VG_LITE_BUF_ALIGN);
+    uint32_t palette_size_bytes_aligned = LV_VG_LITE_ALIGN(palette_size_bytes, LV_DRAW_BUF_ALIGN);
 
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, cf, stride);
     if(draw_buf == NULL) {
@@ -305,7 +305,7 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     /* Since the palette and index image are next to each other,
      * the palette size needs to be aligned to ensure that the image is aligned.
      */
-    uint32_t palette_size_bytes_aligned = LV_VG_LITE_ALIGN(palette_size_bytes, LV_VG_LITE_BUF_ALIGN);
+    uint32_t palette_size_bytes_aligned = LV_VG_LITE_ALIGN(palette_size_bytes, LV_DRAW_BUF_ALIGN);
 
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, cf, stride);
     if(draw_buf == NULL) {
