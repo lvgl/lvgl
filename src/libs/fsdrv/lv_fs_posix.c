@@ -253,10 +253,10 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
         }
         else {
             if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                sprintf(next_fn, "/%s", fdata.cFileName);
+                lv_snprintf(next_fn, sizeof(next_fn), "/%s", fdata.cFileName);
             }
             else {
-                sprintf(next_fn, "%s", fdata.cFileName);
+                lv_snprintf(next_fn, sizeof(next_fn), "%s", fdata.cFileName);
             }
             break;
         }
@@ -291,9 +291,9 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         }
     } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
 #else
-    lv_strcpy(fn, next_fn, fn_len);
+    lv_strncpy(fn, next_fn, fn_len);
 
-    lv_strcpy(next_fn, "", fn_len);
+    lv_strncpy(next_fn, "", fn_len);
     WIN32_FIND_DATA fdata;
 
     if(FindNextFile(dir_p, &fdata) == false) return LV_FS_RES_OK;
@@ -303,10 +303,10 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         }
         else {
             if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                sprintf(next_fn, "/%s", fdata.cFileName);
+                lv_snprintf(next_fn, sizeof(next_fn), "/%s", fdata.cFileName);
             }
             else {
-                sprintf(next_fn, "%s", fdata.cFileName);
+                lv_snprintf(next_fn, sizeof(next_fn), "%s", fdata.cFileName);
             }
             break;
         }
