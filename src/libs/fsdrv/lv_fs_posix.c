@@ -13,14 +13,9 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/types.h>
-#ifndef WIN32
-    #include <dirent.h>
-    #include <unistd.h>
-#else
-    #include <windows.h>
-#endif
+#include <dirent.h>
+#include <unistd.h>
 
-#include "../../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
@@ -218,10 +213,6 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
 }
 
-#ifdef WIN32
-    static char next_fn[256];
-#endif
-
 /**
  * Initialize a 'fs_read_dir_t' variable for directory reading
  * @param drv pointer to a driver where this function belongs
@@ -232,38 +223,10 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
     LV_UNUSED(drv);
 
-#ifndef WIN32
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
     lv_snprintf(buf, sizeof(buf), LV_FS_POSIX_PATH "%s", path);
     return opendir(buf);
-#else
-    HANDLE d = INVALID_HANDLE_VALUE;
-    WIN32_FIND_DATA fdata;
-
-    /*Make the path relative to the current directory (the projects root folder)*/
-    char buf[256];
-    lv_snprintf(buf, sizeof(buf), LV_FS_POSIX_PATH "%s\\*", path);
-
-    lv_strcpy(next_fn, "");
-    d = FindFirstFile(buf, &fdata);
-    do {
-        if(lv_strcmp(fdata.cFileName, ".") == 0 || lv_strcmp(fdata.cFileName, "..") == 0) {
-            continue;
-        }
-        else {
-            if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                lv_snprintf(next_fn, sizeof(next_fn), "/%s", fdata.cFileName);
-            }
-            else {
-                lv_snprintf(next_fn, sizeof(next_fn), "%s", fdata.cFileName);
-            }
-            break;
-        }
-    } while(FindNextFileA(d, &fdata));
-
-    return d;
-#endif
 }
 
 /**
@@ -278,7 +241,6 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 {
     LV_UNUSED(drv);
 
-#ifndef WIN32
     struct dirent * entry;
     do {
         entry = readdir(dir_p);
@@ -290,29 +252,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
             lv_strncpy(fn, "", fn_len);
         }
     } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
-#else
-    lv_strncpy(fn, next_fn, fn_len);
 
-    lv_strncpy(next_fn, "", fn_len);
-    WIN32_FIND_DATA fdata;
-
-    if(FindNextFile(dir_p, &fdata) == false) return LV_FS_RES_OK;
-    do {
-        if(lv_strcmp(fdata.cFileName, ".") == 0 || lv_strcmp(fdata.cFileName, "..") == 0) {
-            continue;
-        }
-        else {
-            if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                lv_snprintf(next_fn, sizeof(next_fn), "/%s", fdata.cFileName);
-            }
-            else {
-                lv_snprintf(next_fn, sizeof(next_fn), "%s", fdata.cFileName);
-            }
-            break;
-        }
-    } while(FindNextFile(dir_p, &fdata));
-
-#endif
     return LV_FS_RES_OK;
 }
 
@@ -325,11 +265,8 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
     LV_UNUSED(drv);
-#ifndef WIN32
+
     closedir(dir_p);
-#else
-    FindClose(dir_p);
-#endif
     return LV_FS_RES_OK;
 }
 #else /*LV_USE_FS_POSIX == 0*/
