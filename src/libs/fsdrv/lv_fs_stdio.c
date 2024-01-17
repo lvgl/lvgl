@@ -283,7 +283,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
         entry = readdir(handle->dir_p);
         if(entry) {
             /*Note, DT_DIR is not defined in C99*/
-            if(entry->d_type == DT_DIR) snprintf(fn, strlen(entry->d_name), "/%s", entry->d_name);
+            if(entry->d_type == DT_DIR) lv_snprintf(fn, lv_strlen(entry->d_name) + 2, "/%s", entry->d_name);
             else lv_strcpy(fn, entry->d_name);
         }
         else {
