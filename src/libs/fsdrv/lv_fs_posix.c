@@ -96,9 +96,9 @@ void lv_fs_posix_init(void)
 
 /**
  * Open a file
- * @param drv pointer to a driver where this function belongs
- * @param path path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
- * @param mode read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
+ * @param drv   pointer to a driver where this function belongs
+ * @param path  path to the file beginning with the driver letter (e.g. S:/folder/file.txt)
+ * @param mode  read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
  * @return a file handle or -1 in case of fail
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -122,8 +122,8 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
 /**
  * Close an opened file
- * @param drv pointer to a driver where this function belongs
- * @param file_p a file handle. (opened with fs_open)
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    a file handle. (opened with fs_open)
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
@@ -136,11 +136,11 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 
 /**
  * Read data from an opened file
- * @param drv pointer to a driver where this function belongs
- * @param file_p a file handle variable.
- * @param buf pointer to a memory block where to store the read data
- * @param btr number of Bytes To Read
- * @param br the real number of read bytes (Byte Read)
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    a file handle variable.
+ * @param buf       pointer to a memory block where to store the read data
+ * @param btr       number of Bytes To Read
+ * @param br        the real number of read bytes (Byte Read)
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
@@ -153,11 +153,11 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 
 /**
  * Write into a file
- * @param drv pointer to a driver where this function belongs
- * @param file_p a file handle variable
- * @param buf pointer to a buffer with the bytes to write
- * @param btw Bytes To Write
- * @param bw the number of real written bytes (Bytes Written). NULL if unused.
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    a file handle variable
+ * @param buf       pointer to a buffer with the bytes to write
+ * @param btw       Bytes To Write
+ * @param bw        the number of real written bytes (Bytes Written). NULL if unused.
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
@@ -169,9 +169,9 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 
 /**
  * Set the read write pointer. Also expand the file size if necessary.
- * @param drv pointer to a driver where this function belongs
- * @param file_p a file handle variable. (opened with fs_open )
- * @param pos the new position of read write pointer
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    a file handle variable. (opened with fs_open )
+ * @param pos       the new position of read write pointer
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
@@ -199,9 +199,9 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 
 /**
  * Give the position of the read write pointer
- * @param drv pointer to a driver where this function belongs
- * @param file_p a file handle variable.
- * @param pos_p pointer to to store the result
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    a file handle variable.
+ * @param pos_p     pointer to to store the result
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
@@ -215,8 +215,8 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 
 /**
  * Initialize a 'fs_read_dir_t' variable for directory reading
- * @param drv pointer to a driver where this function belongs
- * @param path path to a directory
+ * @param drv   pointer to a driver where this function belongs
+ * @param path  path to a directory
  * @return pointer to an initialized 'DIR' or 'HANDLE' variable
  */
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
@@ -232,9 +232,10 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 /**
  * Read the next filename from a directory.
  * The name of the directories will begin with '/'
- * @param drv pointer to a driver where this function belongs
- * @param dir_p pointer to an initialized 'DIR' or 'HANDLE' variable
- * @param fn pointer to a buffer to store the filename
+ * @param drv       pointer to a driver where this function belongs
+ * @param dir_p     pointer to an initialized 'DIR' or 'HANDLE' variable
+ * @param fn        pointer to a buffer to store the filename
+ * @param fn_len    length of the buffer to store the filename
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len)
@@ -258,7 +259,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 
 /**
  * Close the directory reading
- * @param drv pointer to a driver where this function belongs
+ * @param drv   pointer to a driver where this function belongs
  * @param dir_p pointer to an initialized 'DIR' or 'HANDLE' variable
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
