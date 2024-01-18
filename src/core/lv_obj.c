@@ -372,11 +372,8 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
             lv_free(obj->spec_attr->children);
             obj->spec_attr->children = NULL;
         }
-        if(obj->spec_attr->event_list.dsc) {
-            lv_free(obj->spec_attr->event_list.dsc);
-            obj->spec_attr->event_list.dsc = NULL;
-            obj->spec_attr->event_list.cnt = 0;
-        }
+
+        lv_event_remove_all(&obj->spec_attr->event_list);
 
         lv_free(obj->spec_attr);
         obj->spec_attr = NULL;

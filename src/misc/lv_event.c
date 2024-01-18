@@ -65,14 +65,15 @@ lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preproces
     if(list == NULL) return LV_RESULT_OK;
 
     uint32_t i = 0;
-    for(i = 0; i < list->cnt; i++) {
-        if(list->dsc[i].cb == NULL) continue;
-        bool is_preprocessed = (list->dsc[i].filter & LV_EVENT_PREPROCESS) != 0;
+    lv_event_dsc_t * dsc = lv_array_at(list, 0);
+    for(i = 0; i < lv_array_size(list); i++) {
+        if(dsc[i].cb == NULL) continue;
+        bool is_preprocessed = (dsc[i].filter & LV_EVENT_PREPROCESS) != 0;
         if(is_preprocessed != preprocess) continue;
-        lv_event_code_t filter = list->dsc[i].filter & ~LV_EVENT_PREPROCESS;
+        lv_event_code_t filter = dsc[i].filter & ~LV_EVENT_PREPROCESS;
         if(filter == LV_EVENT_ALL || filter == e->code) {
-            e->user_data = list->dsc[i].user_data;
-            list->dsc[i].cb(e);
+            e->user_data = dsc[i].user_data;
+            dsc[i].cb(e);
             if(e->stop_processing) return LV_RESULT_OK;
 
             /*Stop if the object is deleted*/
@@ -86,27 +87,29 @@ lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preproces
 void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter,
                   void * user_data)
 {
-    list->cnt++;
-    list->dsc = lv_realloc(list->dsc, list->cnt * sizeof(lv_event_dsc_t));
-    LV_ASSERT_MALLOC(list->dsc);
-    if(list->dsc == NULL) return;
+    lv_event_dsc_t dsc = { 0 };
+    dsc.cb = cb;
+    dsc.filter = filter;
+    dsc.user_data = user_data;
 
-    list->dsc[list->cnt - 1].cb = cb;
-    list->dsc[list->cnt - 1].filter = filter;
-    list->dsc[list->cnt - 1].user_data = user_data;
+    if(lv_array_size(list) == 0) {
+        /*event list hasn't been initialized.*/
+        lv_array_init(list, 1, sizeof(lv_event_dsc_t));
+    }
+
+    lv_array_push_back(list, &dsc);
 }
 
 uint32_t lv_event_get_count(lv_event_list_t * list)
 {
     LV_ASSERT_NULL(list);
-    return list->cnt;
+    return lv_array_size(list);
 }
 
 lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index)
 {
     LV_ASSERT_NULL(list);
-    if(index >= list->cnt) return NULL;
-    else return &list->dsc[index];
+    return lv_array_at(list, index);
 }
 
 lv_event_cb_t lv_event_dsc_get_cb(lv_event_dsc_t * dsc)
@@ -125,27 +128,13 @@ void * lv_event_dsc_get_user_data(lv_event_dsc_t * dsc)
 bool lv_event_remove(lv_event_list_t * list, uint32_t index)
 {
     LV_ASSERT_NULL(list);
-    if(index >= list->cnt) return false;
-
-    /*Shift the remaining event handlers forward*/
-    uint32_t i;
-    for(i = index; i < list->cnt - 1; i++) {
-        list->dsc[i] = list->dsc[i + 1];
-    }
-    list->cnt--;
-    list->dsc = lv_realloc(list->dsc, list->cnt * sizeof(lv_event_dsc_t));
-    LV_ASSERT_MALLOC(list->dsc);
-    return true;
+    return lv_array_remove(list, index);
 }
 
 void lv_event_remove_all(lv_event_list_t * list)
 {
     LV_ASSERT_NULL(list);
-    if(list && list->dsc) {
-        lv_free(list->dsc);
-        list->dsc = NULL;
-        list->cnt = 0;
-    }
+    lv_array_deinit(list);
 }
 
 void * lv_event_get_current_target(lv_event_t * e)

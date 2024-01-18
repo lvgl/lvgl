@@ -18,6 +18,8 @@ extern "C" {
 #include "lv_types.h"
 #include "../lv_conf_internal.h"
 
+#include "lv_array.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -114,10 +116,7 @@ typedef enum {
                                       before the class default event processing */
 } lv_event_code_t;
 
-typedef struct {
-    lv_event_dsc_t * dsc;
-    uint32_t cnt;
-} lv_event_list_t;
+typedef lv_array_t lv_event_list_t;
 
 struct _lv_event_t {
     void * current_target;
