@@ -487,7 +487,6 @@ bool lv_display_get_antialiasing(lv_display_t * disp)
 LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 {
     disp->flushing = 0;
-    disp->flushing_last = 0;
 }
 
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)

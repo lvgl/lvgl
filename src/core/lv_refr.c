@@ -475,8 +475,8 @@ static void refr_sync_areas(void)
 
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
-    lv_draw_buf_t * on_screen = disp_refr->buf_act;
-    lv_draw_buf_t * off_screen = disp_refr->buf_act == disp_refr->buf_1 ? disp_refr->buf_2 : disp_refr->buf_1;
+    lv_draw_buf_t * off_screen = disp_refr->buf_act;
+    lv_draw_buf_t * on_screen = disp_refr->buf_act == disp_refr->buf_1 ? disp_refr->buf_2 : disp_refr->buf_1;
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
@@ -1061,6 +1061,7 @@ static void wait_for_flushing(lv_display_t * disp)
     else {
         while(disp->flushing);
     }
+    disp->flushing_last = 0;
 
     LV_LOG_TRACE("end");
     LV_PROFILER_END;
