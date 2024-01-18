@@ -62,7 +62,7 @@ The draw buffers can be set with
 -  ``render_mode``
 
    -  :cpp:enumerator:`LV_DISP_RENDER_MODE_PARTIAL` Use the buffer(s) to render the
-      screen is smaller parts. This way the buffers can be smaller then
+      screen in smaller parts. This way the buffers can be smaller then
       the display to save RAM. At least 1/10 screen size buffer(s) are
       recommended. In ``flush_cb`` the rendered images needs to be
       copied to the given area of the display. In this mode if a button is pressed
@@ -70,7 +70,7 @@ The draw buffers can be set with
    -  :cpp:enumerator:`LV_DISP_RENDER_MODE_DIRECT` The buffer(s) has to be screen
       sized and LVGL will render into the correct location of the
       buffer. This way the buffer always contain the whole image. If two
-      buffer are used the rendered ares are automatically copied to the
+      buffer are used the rendered areas are automatically copied to the
       other buffer after flushing. Due to this in ``flush_cb`` typically
       only a frame buffer address needs to be changed. If a button is pressed
       only the button's area will be redrawn.
