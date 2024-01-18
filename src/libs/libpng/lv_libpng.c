@@ -135,20 +135,16 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
 
-        /*Stride check and adjustment accordingly*/
-        if(args && args->stride_align) {
-            uint32_t expected = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
-            if(expected != decoded->header.stride) {
-                LV_LOG_INFO("Convert PNG stride to %" LV_PRId32, expected);
-                lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, expected);
-                lv_draw_buf_destroy(decoded);
-                if(aligned == NULL) {
-                    LV_LOG_ERROR("png stride adjust failed");
-                    return LV_RESULT_INVALID;
-                }
+        lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
+        if(adjusted == NULL) {
+            lv_draw_buf_destroy(decoded);
+            return LV_RESULT_INVALID;
+        }
 
-                decoded = aligned;
-            }
+        /*The adjusted draw buffer is newly allocated.*/
+        if(adjusted != decoded) {
+            lv_draw_buf_destroy(decoded);
+            decoded = adjusted;
         }
 
         dsc->decoded = decoded;

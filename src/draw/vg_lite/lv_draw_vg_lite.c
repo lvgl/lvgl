@@ -108,7 +108,7 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
             lv_draw_vg_lite_box_shadow(draw_unit, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_vg_lite_img(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_img(draw_unit, t->draw_dsc, &t->area, false);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
             lv_draw_vg_lite_arc(draw_unit, t->draw_dsc, &t->area);
@@ -200,7 +200,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         case LV_DRAW_TASK_TYPE_LINE:
         case LV_DRAW_TASK_TYPE_ARC:
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            // case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
             // case LV_DRAW_TASK_TYPE_MASK_BITMAP:
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:

@@ -38,7 +38,7 @@ static void scr_load_anim_start(lv_anim_t * a);
 static void opa_scale_anim(void * obj, int32_t v);
 static void set_x_anim(void * obj, int32_t v);
 static void set_y_anim(void * obj, int32_t v);
-static void scr_anim_ready(lv_anim_t * a);
+static void scr_anim_completed(lv_anim_t * a);
 static bool is_out_anim(lv_screen_load_anim_t a);
 static void disp_event_cb(lv_event_t * e);
 
@@ -487,7 +487,6 @@ bool lv_display_get_antialiasing(lv_display_t * disp)
 LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 {
     disp->flushing = 0;
-    disp->flushing_last = 0;
 }
 
 LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
@@ -620,7 +619,7 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
     lv_anim_init(&a_new);
     lv_anim_set_var(&a_new, new_scr);
     lv_anim_set_start_cb(&a_new, scr_load_anim_start);
-    lv_anim_set_ready_cb(&a_new, scr_anim_ready);
+    lv_anim_set_completed_cb(&a_new, scr_anim_completed);
     lv_anim_set_duration(&a_new, time);
     lv_anim_set_delay(&a_new, delay);
 
@@ -1012,7 +1011,7 @@ static void set_y_anim(void * obj, int32_t v)
     lv_obj_set_y(obj, v);
 }
 
-static void scr_anim_ready(lv_anim_t * a)
+static void scr_anim_completed(lv_anim_t * a)
 {
     lv_display_t * d = lv_obj_get_display(a->var);
 
@@ -1039,7 +1038,7 @@ static bool is_out_anim(lv_screen_load_anim_t anim_type)
 static void disp_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_display_t * disp = lv_event_get_current_target(e);
+    lv_display_t * disp = lv_event_get_target(e);
     switch(code) {
         case LV_EVENT_REFR_REQUEST:
             if(disp->refr_timer) lv_timer_resume(disp->refr_timer);

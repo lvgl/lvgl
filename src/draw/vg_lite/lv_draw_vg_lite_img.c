@@ -41,7 +41,7 @@
  **********************/
 
 void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
-                         const lv_area_t * coords)
+                         const lv_area_t * coords, bool no_cache)
 {
     if(dsc->opa <= LV_OPA_MIN) {
         return;
@@ -71,7 +71,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
 
     vg_lite_buffer_t src_buf;
     lv_image_decoder_dsc_t decoder_dsc;
-    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src)) {
+    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache)) {
         return;
     }
 

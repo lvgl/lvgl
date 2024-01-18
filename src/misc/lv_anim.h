@@ -112,7 +112,7 @@ typedef void (*lv_anim_exec_xcb_t)(void *, int32_t);
 typedef void (*lv_anim_custom_exec_cb_t)(lv_anim_t *, int32_t);
 
 /** Callback to call when the animation is ready*/
-typedef void (*lv_anim_ready_cb_t)(lv_anim_t *);
+typedef void (*lv_anim_completed_cb_t)(lv_anim_t *);
 
 /** Callback to call when the animation really stars (considering `delay`)*/
 typedef void (*lv_anim_start_cb_t)(lv_anim_t *);
@@ -137,7 +137,7 @@ struct _lv_anim_t {
     lv_anim_custom_exec_cb_t custom_exec_cb;/**< Function to execute to animate,
                                                  same purpose as exec_cb but different parameters*/
     lv_anim_start_cb_t start_cb;         /**< Call it when the animation is starts (considering `delay`)*/
-    lv_anim_ready_cb_t ready_cb;         /**< Call it when the animation is ready*/
+    lv_anim_completed_cb_t completed_cb; /**< Call it when the animation is fully completed*/
     lv_anim_deleted_cb_t deleted_cb;     /**< Call it when the animation is deleted*/
     lv_anim_get_value_cb_t get_value_cb; /**< Get the current value in relative mode*/
     void * user_data;                    /**< Custom user data*/
@@ -297,13 +297,13 @@ static inline void lv_anim_set_get_value_cb(lv_anim_t * a, lv_anim_get_value_cb_
 }
 
 /**
- * Set a function call when the animation is ready
- * @param a         pointer to an initialized `lv_anim_t` variable
- * @param ready_cb  a function call when the animation is ready
+ * Set a function call when the animation is completed
+ * @param a             pointer to an initialized `lv_anim_t` variable
+ * @param completed_cb  a function call when the animation is fully completed
  */
-static inline void lv_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_cb)
+static inline void lv_anim_set_completed_cb(lv_anim_t * a, lv_anim_completed_cb_t completed_cb)
 {
-    a->ready_cb = ready_cb;
+    a->completed_cb = completed_cb;
 }
 
 /**

@@ -228,6 +228,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
  * @param drv       pointer to a driver where this function belongs
  * @param rddir_p   pointer to an initialized 'lv_fs_dir_t' variable
  * @param fn        pointer to a buffer to store the filename
+ * @param fn_len    length of the buffer to store the filename
  * @return          LV_FS_RES_OK: no error or  any error from @lv_fs_res_t enum
  */
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * rddir_p, char * fn, uint32_t fn_len)

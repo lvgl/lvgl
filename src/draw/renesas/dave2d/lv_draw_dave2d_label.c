@@ -88,9 +88,10 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
             //            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             //lv_draw_sw_blend(u, &blend_dsc);
 
+            lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
+
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
-            lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
             d1_cacheblockflush(unit->d2_handle, 0, draw_buf->data, draw_buf->data_size);
 #endif
 #endif

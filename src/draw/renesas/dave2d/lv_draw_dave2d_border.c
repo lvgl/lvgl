@@ -279,6 +279,10 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
     blend_w = lv_area_get_width(&blend_area);
 
     if(blend_w > 0) {
+        d2_s32 aa;
+        aa = d2_getantialiasing(u->d2_handle);
+        d2_setantialiasing(u->d2_handle, 0); //Don't blend with the background according to coverage value
+
         if(left_side || top_side) {
             lv_area_t arc_area;
             lv_area_t clip_arc;
@@ -405,6 +409,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                 }
             }
         }
+        d2_setantialiasing(u->d2_handle, aa); //restore original setting
     }
 
     //
