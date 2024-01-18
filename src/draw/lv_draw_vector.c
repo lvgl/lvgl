@@ -437,11 +437,9 @@ void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t 
     uint32_t point_size = lv_array_size(&path->points);
     uint32_t npoint_size = lv_array_size(&subpath->points);
 
-    lv_array_resize(&path->ops, ops_size + nops_size);
     lv_array_concat(&path->ops, &subpath->ops);
     path->ops.size = ops_size + nops_size;
 
-    lv_array_resize(&path->points, point_size + npoint_size);
     lv_array_concat(&path->points, &subpath->points);
     path->points.size = point_size + npoint_size;
 }

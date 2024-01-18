@@ -128,7 +128,7 @@ lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
     uint32_t size = other->size;
     if(array->size + size > array->capacity) {
         /*array is full*/
-        return LV_RESULT_INVALID;
+        lv_array_resize(array, array->size + size);
     }
 
     uint8_t * data = array->data + array->size * array->element_size;

@@ -87,10 +87,8 @@ void test_array_concat(void)
         lv_array_push_back(&b, &i);
     }
 
-    /*Concat without enough capacity should fail.*/
-    TEST_ASSERT_TRUE(lv_array_concat(&a, &b) == LV_RESULT_INVALID);
-    lv_array_resize(&a, 8);
     TEST_ASSERT_TRUE(lv_array_concat(&a, &b) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_UINT32(8, lv_array_size(&a));
 
     for(int32_t i = 0; i < 8; i++) {
         int32_t * v = lv_array_at(&a, i);
