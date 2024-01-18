@@ -66,7 +66,7 @@ void lv_obj_delete_delayed(lv_obj_t * obj, uint32_t delay_ms);
  * A function to be easily used in animation ready callback to delete an object when the animation is ready
  * @param a         pointer to the animation
  */
-void lv_obj_delete_anim_ready_cb(lv_anim_t * a);
+void lv_obj_delete_anim_completed_cb(lv_anim_t * a);
 
 /**
  * Helper function for asynchronously deleting objects.

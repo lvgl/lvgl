@@ -50,6 +50,7 @@ typedef lv_image_dsc_t              lv_img_dsc_t;
 typedef lv_display_t                lv_disp_t;
 typedef lv_display_rotation_t       lv_disp_rotation_t;
 typedef lv_display_render_mode_t    lv_disp_render_t;
+typedef lv_anim_completed_cb_t      lv_anim_ready_cb_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -160,6 +161,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 
 #define lv_anim_del                     lv_anim_delete
 #define lv_anim_del_all                 lv_anim_delete_all
+#define lv_anim_set_ready_cb            lv_anim_set_completed_cb
 
 #define lv_group_del                    lv_group_delete
 

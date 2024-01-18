@@ -282,7 +282,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_anim_set_delay(&a, INTRO_TIME + 1000);
     lv_anim_set_values(&a, 1, LV_SCALE_NONE);
     lv_anim_set_exec_cb(&a, _image_set_zoom_anim_cb);
-    lv_anim_set_ready_cb(&a, NULL);
+    lv_anim_set_completed_cb(&a, NULL);
     lv_anim_start(&a);
 
     /* Create an intro from a logo + label */
@@ -305,7 +305,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_anim_set_duration(&a, 400);
     lv_anim_set_delay(&a, INTRO_TIME + 800);
     lv_anim_set_values(&a, LV_SCALE_NONE, 10);
-    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);
 
     lv_obj_update_layout(main_cont);
@@ -355,7 +355,7 @@ void _lv_demo_music_resume(void)
     lv_anim_set_var(&a, spectrum_obj);
     lv_anim_set_duration(&a, ((spectrum_len - spectrum_i) * 1000) / 30);
     lv_anim_set_playback_duration(&a, 0);
-    lv_anim_set_ready_cb(&a, spectrum_end_cb);
+    lv_anim_set_completed_cb(&a, spectrum_end_cb);
     lv_anim_start(&a);
 
     if(sec_counter_timer) lv_timer_resume(sec_counter_timer);
@@ -713,7 +713,7 @@ static void track_load(uint32_t id)
     }
 #endif
     lv_anim_set_exec_cb(&a, _obj_set_x_anim_cb);
-    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);
 
     lv_anim_set_path_cb(&a, lv_anim_path_linear);
@@ -721,7 +721,7 @@ static void track_load(uint32_t id)
     lv_anim_set_duration(&a, 500);
     lv_anim_set_values(&a, LV_SCALE_NONE, LV_SCALE_NONE / 2);
     lv_anim_set_exec_cb(&a, _image_set_zoom_anim_cb);
-    lv_anim_set_ready_cb(&a, NULL);
+    lv_anim_set_completed_cb(&a, NULL);
     lv_anim_start(&a);
 
     album_image_obj = album_image_create(spectrum_obj);
@@ -732,7 +732,7 @@ static void track_load(uint32_t id)
     lv_anim_set_delay(&a, 100);
     lv_anim_set_values(&a, LV_SCALE_NONE / 4, LV_SCALE_NONE);
     lv_anim_set_exec_cb(&a, _image_set_zoom_anim_cb);
-    lv_anim_set_ready_cb(&a, NULL);
+    lv_anim_set_completed_cb(&a, NULL);
     lv_anim_start(&a);
 
     lv_anim_init(&a);

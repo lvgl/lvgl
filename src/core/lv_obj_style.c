@@ -57,11 +57,11 @@ static void refresh_children_style(lv_obj_t * obj);
 static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
 static void trans_anim_cb(void * _tr, int32_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
-static void trans_anim_ready_cb(lv_anim_t * a);
+static void trans_anim_completed_cb(lv_anim_t * a);
 static lv_layer_type_t calculate_layer_type(lv_obj_t * obj);
 static void full_cache_refresh(lv_obj_t * obj, lv_part_t part);
 static void fade_anim_cb(void * obj, int32_t v);
-static void fade_in_anim_ready(lv_anim_t * a);
+static void fade_in_anim_completed(lv_anim_t * a);
 static bool style_has_flag(const lv_style_t * style, uint32_t flag);
 static lv_style_res_t get_selector_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
                                               lv_style_value_t * value_act);
@@ -522,7 +522,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     lv_anim_set_var(&a, tr);
     lv_anim_set_exec_cb(&a, trans_anim_cb);
     lv_anim_set_start_cb(&a, trans_anim_start_cb);
-    lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, trans_anim_completed_cb);
     lv_anim_set_values(&a, 0x00, 0xFF);
     lv_anim_set_duration(&a, tr_dsc->time);
     lv_anim_set_delay(&a, tr_dsc->delay);
@@ -611,7 +611,7 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_set_var(&a, obj);
     lv_anim_set_values(&a, 0, LV_OPA_COVER);
     lv_anim_set_exec_cb(&a, fade_anim_cb);
-    lv_anim_set_ready_cb(&a, fade_in_anim_ready);
+    lv_anim_set_completed_cb(&a, fade_in_anim_completed);
     lv_anim_set_duration(&a, time);
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
@@ -970,7 +970,7 @@ static void trans_anim_start_cb(lv_anim_t * a)
 
 }
 
-static void trans_anim_ready_cb(lv_anim_t * a)
+static void trans_anim_completed_cb(lv_anim_t * a)
 {
     trans_t * tr = a->var;
     lv_obj_t * obj = tr->obj;
@@ -1075,7 +1075,7 @@ static void fade_anim_cb(void * obj, int32_t v)
     lv_obj_set_style_opa(obj, v, 0);
 }
 
-static void fade_in_anim_ready(lv_anim_t * a)
+static void fade_in_anim_completed(lv_anim_t * a)
 {
     lv_obj_remove_local_style_prop(a->var, LV_STYLE_OPA, 0);
 }

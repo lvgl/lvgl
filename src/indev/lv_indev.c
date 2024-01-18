@@ -75,7 +75,7 @@ static lv_result_t send_event(lv_event_code_t code, void * param);
 
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
 static void indev_scroll_throw_anim_cb(void * var, int32_t v);
-static void indev_scroll_throw_anim_ready_cb(lv_anim_t * anim);
+static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim);
 static inline void indev_scroll_throw_anim_reset(lv_indev_t * indev)
 {
     if(indev) {
@@ -1570,7 +1570,7 @@ static void indev_scroll_throw_anim_cb(void * var, int32_t v)
     }
 }
 
-static void indev_scroll_throw_anim_ready_cb(lv_anim_t * anim)
+static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim)
 {
     if(anim) {
         indev_scroll_throw_anim_reset((lv_indev_t *)anim->var);
@@ -1587,8 +1587,8 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_set_duration(&a, 1024);
     lv_anim_set_values(&a, 0, 1024);
     lv_anim_set_exec_cb(&a, indev_scroll_throw_anim_cb);
-    lv_anim_set_ready_cb(&a, indev_scroll_throw_anim_ready_cb);
-    lv_anim_set_deleted_cb(&a, indev_scroll_throw_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, indev_scroll_throw_anim_completed_cb);
+    lv_anim_set_deleted_cb(&a, indev_scroll_throw_anim_completed_cb);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     indev->scroll_throw_anim = lv_anim_start(&a);
