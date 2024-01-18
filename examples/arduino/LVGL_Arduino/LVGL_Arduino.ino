@@ -2,7 +2,10 @@
  *Be sure to read the docs here: https://docs.lvgl.io/master/get-started/platforms/arduino.html  */
 
 #include <lvgl.h>
+
+#if LV_USE_TFT_ESPI
 #include <TFT_eSPI.h>
+#endif
 
 /*To use the built-in examples and demos of LVGL uncomment the includes below respectively.
  *You also need to copy `lvgl/examples` to `lvgl/src/examples`. Similarly for the demos `lvgl/demos` to `lvgl/src/demos`.
@@ -12,132 +15,117 @@
 //#include <examples/lv_examples.h>
 //#include <demos/lv_demos.h>
 
-/*Change to your screen resolution*/
-static const uint16_t screenWidth  = 480;
-static const uint16_t screenHeight = 320;
+/*Set to your screen resolution*/
+#define TFT_HOR_RES   320
+#define TFT_VER_RES   240
 
-static lv_disp_draw_buf_t draw_buf;
-static lv_color_t buf[ screenWidth * screenHeight / 10 ];
-
-TFT_eSPI tft = TFT_eSPI(screenWidth, screenHeight); /* TFT instance */
+/*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
+#define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
 
 #if LV_USE_LOG != 0
-/* Serial debugging */
 void my_print( lv_log_level_t level, const char * buf )
 {
     LV_UNUSED(level);
+    Serial.println(buf);
     Serial.flush();
 }
 #endif
 
-/* Display flushing */
-void my_disp_flush( lv_disp_t *disp, const lv_area_t *area, lv_color_t *color_p )
+/* LVGL calls it when a rendered image needs to copied to the display*/
+void my_disp_flush( lv_display_t *disp, const lv_area_t *area, uint8_t * px_map)
 {
-    uint32_t w = ( area->x2 - area->x1 + 1 );
-    uint32_t h = ( area->y2 - area->y1 + 1 );
+    /*Copy `px map` to the `area`*/
 
-    tft.startWrite();
-    tft.setAddrWindow( area->x1, area->y1, w, h );
-    tft.pushColors( ( uint16_t * )&color_p->full, w * h, true );
-    tft.endWrite();
+    /*For example ("my_..." functions needs to be implemented by you)
+    uint32_t w = lv_area_get_width(area);
+    uint32_t h = lv_area_get_height(area);
 
-    lv_disp_flush_ready( disp );
+    my_set_window(area->x1, area->y1, w, h);
+    my_draw_bitmaps(px_map, w * h);
+     */
+
+    /*Call it to tell LVGL you are ready*/
+    lv_disp_flush_ready(disp);
 }
 
 /*Read the touchpad*/
-void my_touchpad_read( lv_indev_t * indev_driver, lv_indev_data_t * data )
+void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
 {
-    uint16_t touchX, touchY;
+    /*For example  ("my_..." functions needs to be implemented by you)
+    int32_t x, y;
+    bool touched = my_get_touch( &x, &y );
 
-    bool touched = tft.getTouch( &touchX, &touchY, 600 );
+    if(!touched) {
+        data->state = LV_INDEV_STATE_RELEASED;
+    } else {
+        data->state = LV_INDEV_STATE_PRESSED;
 
-    if( !touched )
-    {
-        data->state = LV_INDEV_STATE_REL;
+        data->point.x = x;
+        data->point.y = y;
     }
-    else
-    {
-        data->state = LV_INDEV_STATE_PR;
-
-        /*Set the coordinates*/
-        data->point.x = touchX;
-        data->point.y = touchY;
-
-        Serial.print( "Data x " );
-        Serial.println( touchX );
-
-        Serial.print( "Data y " );
-        Serial.println( touchY );
-    }
+     */
 }
 
 void setup()
 {
-    Serial.begin( 115200 ); /* prepare for possible serial debug */
-
     String LVGL_Arduino = "Hello Arduino! ";
     LVGL_Arduino += String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
 
+    Serial.begin( 115200 );
     Serial.println( LVGL_Arduino );
-    Serial.println( "I am LVGL_Arduino" );
 
     lv_init();
 
+    /* register print function for debugging */
 #if LV_USE_LOG != 0
-    lv_log_register_print_cb( my_print ); /* register print function for debugging */
+    lv_log_register_print_cb( my_print );
 #endif
 
-    tft.begin();          /* TFT init */
-    tft.setRotation( 3 ); /* Landscape orientation, flipped */
-
-    /*Set the touchscreen calibration data,
-     the actual data for your display can be acquired using
-     the Generic -> Touch_calibrate example from the TFT_eSPI library*/
-    uint16_t calData[5] = { 275, 3620, 264, 3532, 1 };
-    tft.setTouch( calData );
-
-    lv_disp_draw_buf_init( &draw_buf, buf, NULL, screenWidth * screenHeight / 10 );
-
-    /*Initialize the display*/
-    static lv_disp_t disp_drv;
-    lv_disp_drv_init( &disp_drv );
-    /*Change the following line to your display resolution*/
-    disp_drv.hor_res = screenWidth;
-    disp_drv.ver_res = screenHeight;
-    disp_drv.flush_cb = my_disp_flush;
-    disp_drv.draw_buf = &draw_buf;
-    lv_disp_drv_register( &disp_drv );
+    uint8_t draw_buf[DRAW_BUF_SIZE];
+    lv_display_t * disp;
+#if LV_USE_TFT_ESPI
+    /*TFT_eSPI can be enabled lv_conf.h to initialize the display in a simple way*/
+    disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, DRAW_BUF_SIZE);
+#else
+    /*Else create a display yourself*/
+    disp = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
+    lv_display_set_flush_cb(disp, my_disp_flush);
+    lv_display_set_buffers(disp, draw_buf, NULL, DRAW_BUF_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
+#endif
 
     /*Initialize the (dummy) input device driver*/
-    static lv_indev_t indev_drv;
-    lv_indev_drv_init( &indev_drv );
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = my_touchpad_read;
-    lv_indev_drv_register( &indev_drv );
+    lv_indev_t * indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
+    lv_indev_set_read_cb(indev, my_touchpad_read);
 
-    /* Create simple label */
-    //lv_obj_t *label = lv_label_create( lv_scr_act() );
-    //lv_label_set_text( label, LVGL_Arduino.c_str() );
-    //lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
- 
-    /* Try an example. See all the examples 
-     * online: https://docs.lvgl.io/master/examples.html
-     * source codes: https://github.com/lvgl/lvgl/tree/e7f88efa5853128bf871dde335c0ca8da9eb7731/examples */
-     //lv_example_btn_1();
-   
-     /*Or try out a demo. Don't forget to enable the demos in lv_conf.h. E.g. LV_USE_DEMOS_WIDGETS*/
-    lv_demo_widgets();               
-    // lv_demo_benchmark();          
-    // lv_demo_keypad_encoder();     
-    // lv_demo_music();              
-    // lv_demo_printer();
-    // lv_demo_stress();             
+    /* Create a simple label
+     * ---------------------
+     lv_obj_t *label = lv_label_create( lv_scr_act() );
+     lv_label_set_text( label, "Hello Arduino, I'm LVGL!" );
+     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
+
+     * Try an example. See all the examples
+     *  - Online: https://docs.lvgl.io/master/examples.html
+     *  - Source codes: https://github.com/lvgl/lvgl/tree/master/examples
+     * ----------------------------------------------------------------
+
+     lv_example_btn_1();
+
+     * Or try out a demo. Don't forget to enable the demos in lv_conf.h. E.g. LV_USE_DEMOS_WIDGETS
+     * -------------------------------------------------------------------------------------------
+
+     lv_demo_widgets();
+     */
+
+    lv_obj_t *label = lv_label_create( lv_scr_act() );
+    lv_label_set_text( label, "Hello Arduino, I'm LVGL!" );
+    lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 
     Serial.println( "Setup done" );
 }
 
 void loop()
 {
-    lv_timer_handler(); /* let the GUI do its work */
+    lv_timer_handler(); /* let the UI do its work */
     delay( 5 );
 }

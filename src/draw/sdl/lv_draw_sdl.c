@@ -15,7 +15,7 @@
 #include "../../core/lv_refr.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
-#include "../../dev/sdl/lv_sdl_window.h"
+#include "../../drivers/sdl/lv_sdl_window.h"
 
 /*********************
  *      DEFINES

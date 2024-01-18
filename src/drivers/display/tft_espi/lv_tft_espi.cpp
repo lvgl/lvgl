@@ -25,7 +25,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 
 /**********************
  *  STATIC VARIABLES
@@ -39,13 +39,13 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes)
+lv_display_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes)
 {
-    lv_tft_espi_t * dsc = lv_malloc_zeroed(sizeof(lv_tft_espi_t));
+    lv_tft_espi_t * dsc = (lv_tft_espi_t *)lv_malloc_zeroed(sizeof(lv_tft_espi_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
 
-    lv_disp_t * disp = lv_disp_create(hor_res, ver_res);
+    lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(disp == NULL) {
         lv_free(dsc);
         return NULL;
@@ -56,7 +56,7 @@ lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, u
     dsc->tft->setRotation(3);   /* Landscape orientation, flipped */
     lv_display_set_driver_data(disp, (void *)dsc);
     lv_display_set_flush_cb(disp, flush_cb);
-    lv_display_set_buffers(disp, (void *)buf, NULL, buf_size_bytes, LV_DISP_RENDER_MODE_PARTIAL);
+    lv_display_set_buffers(disp, (void *)buf, NULL, buf_size_bytes, LV_DISPLAY_RENDER_MODE_PARTIAL);
     return disp;
 }
 
@@ -64,19 +64,19 @@ lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, u
  *   STATIC FUNCTIONS
  **********************/
 
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    lv_tft_espi_t * dsc = (lv_tft_espi_t *)lv_disp_get_driver_data(disp);
+    lv_tft_espi_t * dsc = (lv_tft_espi_t *)lv_display_get_driver_data(disp);
 
     uint32_t w = (area->x2 - area->x1 + 1);
     uint32_t h = (area->y2 - area->y1 + 1);
 
     dsc->tft->startWrite();
     dsc->tft->setAddrWindow(area->x1, area->y1, w, h);
-    dsc->tft->pushColors((uint16_t *)&color_p->full, w * h, true);
+    dsc->tft->pushColors((uint16_t *)px_map, w * h, true);
     dsc->tft->endWrite();
 
-    lv_disp_flush_ready(disp);
+    lv_display_flush_ready(disp);
 
 }
 

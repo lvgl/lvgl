@@ -92,7 +92,7 @@ extern "C" {
 #define LV_LCD_BIT_RGB_ORDER__RGB                       0                                   /* RGB/BGR Order: RGB */
 #define LV_LCD_BIT_RGB_ORDER__BGR                       LV_LCD_MASK_RGB_ORDER               /* RGB/BGR Order: BGR */
 #define LV_LCD_BIT_LINE_ADDRESS_ORDER__TTOB             0                                   /* Line Address Order: LCD Refresh Top to Bottom */
-#define LV_LCD_BIT_LINE_ADDRESS_ORDER__BTOT             LV_LCD_MASK_LINE_ADDRESS_ORDER      /* Line Address Order: LCD Refresh Botton to Top */
+#define LV_LCD_BIT_LINE_ADDRESS_ORDER__BTOT             LV_LCD_MASK_LINE_ADDRESS_ORDER      /* Line Address Order: LCD Refresh Bottom to Top */
 #define LV_LCD_BIT_PAGE_COLUMN_ORDER__NORMAL            0                                   /* Page/Column Order: Normal Mode */
 #define LV_LCD_BIT_PAGE_COLUMN_ORDER__REVERSE           LV_LCD_MASK_PAGE_COLUMN_ORDER       /* Page/Column Order: Reverse Mode */
 #define LV_LCD_BIT_COLUMN_ADDRESS_ORDER__LTOR           0                                   /* Column Address Order: Left to Right */

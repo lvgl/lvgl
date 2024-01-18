@@ -40,7 +40,7 @@
     #include "draw/vg_lite/lv_draw_vg_lite.h"
 #endif
 #if LV_USE_WINDOWS
-    #include "dev/windows/lv_windows_context.h"
+    #include "drivers/windows/lv_windows_context.h"
 #endif
 
 /*********************
