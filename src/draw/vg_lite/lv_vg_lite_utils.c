@@ -388,7 +388,7 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
 {
     switch(cf) {
         case LV_COLOR_FORMAT_A4:
-        case LV_COLOR_FORMAT_A8:
+        /* case LV_COLOR_FORMAT_A8: */
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_RGB565A8:
