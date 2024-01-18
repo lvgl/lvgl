@@ -192,7 +192,7 @@ class ColorFormat(Enum):
 
     @property
     def is_luma_only(self) -> bool:
-        return self in (ColorFormat.L8,)
+        return self in (ColorFormat.L8, )
 
 
 def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
@@ -387,6 +387,11 @@ class LVGLCompressData:
         return bin
 
 
+class FileFormat(Enum):
+    BINARY = 0x00
+    C_ARRAY = 0x01
+
+
 class LVGLImage:
 
     def __init__(self,
@@ -446,7 +451,7 @@ class LVGLImage:
                 padding = b'\x00' * (new_stride - current_stride)
                 for i in range(h):
                     data_out.append(data_in[i * current_stride:(i + 1) *
-                                                               current_stride])
+                                            current_stride])
                     data_out.append(padding)
             return b''.join(data_out)
 
@@ -545,16 +550,12 @@ class LVGLImage:
             logging.info(f"mkdir of {dir} for {filename}")
             os.makedirs(dir)
 
-    def to_bin(self,
-               filename: str,
-               compress: CompressMethod = CompressMethod.NONE):
-        """
-        Write this image to file, filename should be ended with '.bin'
-        """
-        self._check_ext(filename, ".bin")
-        self._check_dir(filename)
-
-        with open(filename, "wb+") as f:
+    def generate_file_data(self,
+                           targetname: str,
+                           format: FileFormat,
+                           compress: CompressMethod = CompressMethod.NONE):
+        compressed = LVGLCompressData(self.cf, compress, self.data)
+        if format is FileFormat.BINARY:
             bin = bytearray()
             flags = 0
             flags |= 0x08 if compress != CompressMethod.NONE else 0
@@ -565,30 +566,16 @@ class LVGLImage:
                                      self.stride,
                                      flags=flags)
             bin += header.binary
-            compressed = LVGLCompressData(self.cf, compress, self.data)
             bin += compressed.compressed
+            return bin
 
-            f.write(bin)
-
-        return self
-
-    def to_c_array(self,
-                   filename: str,
-                   compress: CompressMethod = CompressMethod.NONE):
-        self._check_ext(filename, ".c")
-        self._check_dir(filename)
-
-        varname = path.basename(filename).split('.')[0]
-        varname = varname.replace("-", "_")
-        varname = varname.replace(".", "_")
-
-        flags = "0"
-        if compress is not CompressMethod.NONE:
-            flags += " | LV_IMAGE_FLAGS_COMPRESSED"
-
-        compressed = LVGLCompressData(self.cf, compress, self.data)
-
-        header = f'''
+        elif format is FileFormat.C_ARRAY:
+            varname = targetname.replace("-", "_")
+            varname = targetname.replace(".", "_")
+            flags = "0"
+            if compress is not CompressMethod.NONE:
+                flags += " | LV_IMAGE_FLAGS_COMPRESSED"
+            header = f"""
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
 #else
@@ -607,9 +594,9 @@ class LVGLImage:
 static const
 LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST
 uint8_t {varname}_map[] = {{
-'''
+"""
 
-        ending = f'''
+            ending = f"""
 }};
 
 const lv_img_dsc_t {varname} = {{
@@ -623,29 +610,61 @@ const lv_img_dsc_t {varname} = {{
   .data = {varname}_map,
 }};
 
-'''
+"""
 
-        def write_binary(f, data, stride):
-            for i, v in enumerate(data):
-                if i % stride == 0:
-                    f.write("\n    ")
-                f.write(f"0x{v:02x},")
-            f.write("\n")
+            def format_binary(data, stride):
+                result = ""
+                for i, v in enumerate(data):
+                    if i % stride == 0:
+                        result += "\n    "
+                    result += f"0x{v:02x},"
+                result += "\n"
+                return result
 
-        with open(filename, "w+") as f:
-            f.write(header)
-
+            result = header
             if compress is not CompressMethod.NONE:
-                write_binary(f, compressed.compressed, 16)
+                result += format_binary(compressed.compressed, 16)
             else:
                 # write palette separately
                 ncolors = self.cf.ncolors
                 if ncolors:
-                    write_binary(f, self.data[:ncolors * 4], 16)
+                    result += format_binary(self.data[:ncolors * 4], 16)
 
-                write_binary(f, self.data[ncolors * 4:], self.stride)
+                result += format_binary(self.data[ncolors * 4:], self.stride)
 
-            f.write(ending)
+            result += ending
+
+            return result.encode(encoding="utf-8")
+        else:
+            raise Exception(f"Invalid file format: {format}")
+
+    def to_bin(self,
+               filename: str,
+               compress: CompressMethod = CompressMethod.NONE):
+        """
+        Write this image to file, filename should be ended with '.bin'
+        """
+        self._check_ext(filename, ".bin")
+        self._check_dir(filename)
+
+        with open(filename, "wb+") as f:
+            bin = self.generate_file_data(filename, FileFormat.BINARY, compress)
+
+            f.write(bin)
+
+        return self
+
+    def to_c_array(self,
+                   filename: str,
+                   compress: CompressMethod = CompressMethod.NONE):
+        self._check_ext(filename, ".c")
+        self._check_dir(filename)
+
+        varname = path.basename(filename).split('.')[0]
+        file_data = self.generate_file_data(varname, FileFormat.C_ARRAY,
+                                            compress)
+        with open(filename, "bw+") as f:
+            f.write(file_data)
 
         return self
 
@@ -792,7 +811,7 @@ const lv_img_dsc_t {varname} = {{
                     rawdata += uint8_t(e)
         else:
             shift = 8 - cf.bpp
-            mask = 2 ** cf.bpp - 1
+            mask = 2**cf.bpp - 1
             rows = [[(a >> shift) & mask for a in row[3::4]] for row in rows]
             for row in png.pack_rows(rows, cf.bpp):
                 rawdata += row
@@ -929,7 +948,7 @@ class RLEImage(LVGLImage):
                 ctrl_byte = uint8_t(nonrepeat_cnt | 0x80)
                 compressed_data.append(ctrl_byte)
                 compressed_data.append(memview[index:index +
-                                                     nonrepeat_cnt * blksize])
+                                               nonrepeat_cnt * blksize])
                 index += nonrepeat_cnt * blksize
             else:
                 ctrl_byte = uint8_t(repeat_cnt)
