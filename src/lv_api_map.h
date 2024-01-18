@@ -104,16 +104,11 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_indev_set_disp                lv_indev_set_display
 #define lv_indev_get_act                 lv_indev_active
 #define lv_scr_act                       lv_screen_active
-#define lv_disp_create                   lv_display_create
 #define lv_disp_remove                   lv_display_delete
 #define lv_disp_set_default              lv_display_set_default
 #define lv_disp_get_default              lv_display_get_default
 #define lv_disp_get_next                 lv_display_get_next
-#define lv_disp_set_res                  lv_display_set_resolution
-#define lv_disp_set_physical_res         lv_display_set_physical_resolution
-#define lv_disp_set_offset               lv_display_set_offset
 #define lv_disp_set_rotation             lv_display_set_rotation
-#define lv_disp_set_dpi                  lv_display_set_dpi
 #define lv_disp_get_hor_res              lv_display_get_horizontal_resolution
 #define lv_disp_get_ver_res              lv_display_get_vertical_resolution
 #define lv_disp_get_physical_hor_res     lv_display_get_physical_horizontal_resolution
@@ -122,24 +117,14 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_get_offset_y             lv_display_get_offset_y
 #define lv_disp_get_rotation             lv_display_get_rotation
 #define lv_disp_get_dpi                  lv_display_get_dpi
-#define lv_disp_set_flush_cb             lv_display_set_flush_cb
-#define lv_disp_set_color_format         lv_display_set_color_format
-#define lv_disp_get_color_format         lv_display_get_color_format
-#define lv_disp_set_antialiasing         lv_display_set_antialiasing
 #define lv_disp_get_antialiasing         lv_display_get_antialiasing
 #define lv_disp_flush_ready              lv_display_flush_ready
 #define lv_disp_flush_is_last            lv_display_flush_is_last
-#define lv_disp_is_double_buffered       lv_display_is_double_buffered
 #define lv_disp_get_scr_act              lv_display_get_screen_active
 #define lv_disp_get_scr_prev             lv_display_get_screen_prev
 #define lv_disp_load_scr                 lv_screen_load
 #define lv_disp_get_layer_top            lv_display_get_layer_top
 #define lv_disp_get_layer_sys            lv_display_get_layer_sys
-#define lv_disp_get_layer_bottom         lv_display_get_layer_bottom
-#define lv_disp_add_event                lv_display_add_event_cb
-#define lv_disp_get_event_count          lv_display_get_event_count
-#define lv_disp_get_event_dsc            lv_display_get_event_dsc
-#define lv_disp_remove_event             lv_display_delete_event
 #define lv_disp_send_event               lv_display_send_event
 #define lv_disp_set_theme                lv_display_set_theme
 #define lv_disp_get_theme                lv_display_get_theme
@@ -147,13 +132,8 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_trig_activity            lv_display_trigger_activity
 #define lv_disp_enable_invalidation      lv_display_enable_invalidation
 #define lv_disp_is_invalidation_enabled  lv_display_is_invalidation_enabled
-#define lv_disp_set_user_data            lv_display_set_user_data
-#define lv_disp_set_driver_data          lv_display_set_driver_data
-#define lv_disp_get_user_data            lv_display_get_user_data
-#define lv_disp_get_driver_data          lv_display_get_driver_data
 #define _lv_disp_refr_timer              _lv_display_refr_timer
 #define _lv_disp_get_refr_timer          lv_display_get_refr_timer
-#define lv_disp_render_mode_t            lv_display_render_mode_t
 
 #define lv_timer_del                    lv_timer_delete
 
