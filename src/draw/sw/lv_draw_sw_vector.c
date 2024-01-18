@@ -391,7 +391,7 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
         _lv_area_to_tvg(&rc, &dsc->scissor_area);
 
         _tvg_color c;
-        _lv_color_to_tvg(&c, &dsc->fill_dsc.color, LV_OPA_COVER);
+        _lv_color_to_tvg(&c, &dsc->fill_dsc.color, dsc->fill_dsc.opa);
 
         Tvg_Matrix mtx = {
             1.0f, 0.0f, 0.0f,

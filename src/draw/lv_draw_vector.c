@@ -195,6 +195,23 @@ void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * m)
     _multiply_matrix(matrix, m);
 }
 
+void lv_matrix_map_point(lv_fpoint_t * point, const lv_matrix_t * matrix)
+{
+    float x = point->x;
+    float y = point->y;
+
+    point->x = x * matrix->m[0][0] + y * matrix->m[1][0] + matrix->m[0][2];
+    point->y = x * matrix->m[0][1] + y * matrix->m[1][1] + matrix->m[1][2];
+}
+
+void lv_matrix_map_path(lv_vector_path_t * path, const lv_matrix_t * matrix)
+{
+    for(uint32_t i = 0; i < path->points.size; i++) {
+        lv_fpoint_t * pt = LV_ARRAY_GET(&path->points, i, lv_fpoint_t);
+        lv_matrix_map_point(pt, matrix);
+    }
+}
+
 /* path functions */
 lv_vector_path_t * lv_vector_path_create(lv_vector_path_quality_t quality)
 {
@@ -293,6 +310,27 @@ void lv_vector_path_close(lv_vector_path_t * path)
 
     uint8_t op = LV_VECTOR_PATH_OP_CLOSE;
     LV_ARRAY_APPEND_VALUE(&path->ops, op);
+}
+
+void lv_vector_path_get_bounding(lv_area_t * area, const lv_vector_path_t * path)
+{
+    uint32_t len = lv_array_length(&path->points);
+    lv_fpoint_t * p0 = LV_ARRAY_GET(&path->points, 0, lv_fpoint_t);
+    float x1 = p0->x; float x2 = p0->x;
+    float y1 = p0->y; float y2 = p0->y;
+
+    for(uint32_t i = 1; i < len; i++) {
+        lv_fpoint_t * p = LV_ARRAY_GET(&path->points, i, lv_fpoint_t);
+        if(p->x < x1) x1 = p->x;
+        if(p->y < y1) y1 = p->y;
+        if(p->x > x2) x2 = p->x;
+        if(p->y > y2) y2 = p->y;
+    }
+
+    area->x1 = (int32_t)x1;
+    area->y1 = (int32_t)y1;
+    area->x2 = (int32_t)x2;
+    area->y2 = (int32_t)y2;
 }
 
 void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry)
@@ -438,12 +476,12 @@ void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t 
     uint32_t npoint_size = lv_array_length(&subpath->points);
 
     lv_array_resize(&path->ops, ops_size + nops_size);
-    uint8_t * start_ops = lv_array_get(&path->ops, ops_size - 1) + sizeof(lv_vector_path_op_t);
+    uint8_t * start_ops = path->ops.size == 0 ? path->ops.data : lv_array_get(&path->ops, ops_size - 1) + sizeof(lv_vector_path_op_t);
     lv_memcpy(start_ops, lv_array_get(&subpath->ops, 0), nops_size * sizeof(lv_vector_path_op_t));
     path->ops.size = ops_size + nops_size;
 
     lv_array_resize(&path->points, point_size + npoint_size);
-    uint8_t * start_pt = lv_array_get(&path->points, point_size - 1) + sizeof(lv_fpoint_t);
+    uint8_t * start_pt = path->points.size == 0 ? path->points.data : lv_array_get(&path->points, point_size - 1) + sizeof(lv_fpoint_t);
     lv_memcpy(start_pt, lv_array_get(&subpath->points, 0), npoint_size * sizeof(lv_fpoint_t));
     path->points.size = point_size + npoint_size;
 }
@@ -686,6 +724,7 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
     lv_memset(new_task, 0, sizeof(_lv_vector_draw_task));
 
     new_task->dsc.fill_dsc.color = dsc->current_dsc.fill_dsc.color;
+    new_task->dsc.fill_dsc.opa = dsc->current_dsc.fill_dsc.opa;
     lv_area_copy(&(new_task->dsc.scissor_area), rect);
 }
 
