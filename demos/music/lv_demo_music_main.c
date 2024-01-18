@@ -807,7 +807,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
 #else
         int32_t r_in = 160;
 #endif
-        r_in = (r_in * lv_image_get_zoom(album_image_obj)) >> 8;
+        r_in = (r_in * lv_image_get_scale(album_image_obj)) >> 8;
         for(i = 0; i < BAR_CNT; i++) r[i] = r_in + min_a + 77;
 
         uint32_t s;
