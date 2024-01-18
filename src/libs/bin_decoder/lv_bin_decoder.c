@@ -46,10 +46,10 @@ typedef struct {
     lv_color32_t * palette;
     lv_opa_t * opa;
     lv_image_compressed_t compressed;
-    lv_draw_buf_t * decoded; /*A draw buf to store decoded image*/
-    lv_draw_buf_t * decompressed; /*Decompressed data could be used directly, thus must also be draw buf*/
-    lv_draw_buf_t c_array;  /*An C-array image that need to be converted to a draw buf*/
-    lv_draw_buf_t * decoded_partial; /*A draw buf for decoded image via get_area_cb*/
+    lv_draw_buf_t * decoded;            /*A draw buf to store decoded image*/
+    lv_draw_buf_t * decompressed;       /*Decompressed data could be used directly, thus must also be draw buf*/
+    lv_draw_buf_t c_array;              /*An C-array image that need to be converted to a draw buf*/
+    lv_draw_buf_t * decoded_partial;    /*A draw buf for decoded image via get_area_cb*/
 } decoder_data_t;
 
 /**********************
@@ -330,6 +330,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         return LV_RESULT_INVALID;
     }
     dsc->cache_entry = cache_entry;
+    decoder_data_t * decoder_data = get_decoder_data(dsc);
+    decoder_data->decoded = NULL; /*Cache will take care of it*/
 #endif
 
     return LV_RESULT_OK;
@@ -345,14 +347,13 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
         decoder_data->decoded_partial = NULL;
     }
 
+    free_decoder_data(dsc);
+
     if(dsc->cache_entry) {
         /*Decoded data is in cache, release it from cache's callback*/
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
     }
-    else {
-        /*Data not in cache, free the memory manually*/
-        free_decoder_data(dsc);
-    }
+
 }
 
 lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
@@ -520,18 +521,18 @@ static decoder_data_t * get_decoder_data(lv_image_decoder_dsc_t * dsc)
 static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
 {
     decoder_data_t * decoder_data = dsc->user_data;
-    if(decoder_data) {
-        if(decoder_data->f) {
-            lv_fs_close(decoder_data->f);
-            lv_free(decoder_data->f);
-        }
+    if(decoder_data == NULL) return;
 
-        if(decoder_data->decoded) lv_draw_buf_destroy(decoder_data->decoded);
-        if(decoder_data->decompressed) lv_draw_buf_destroy(decoder_data->decompressed);
-        lv_free(decoder_data->palette);
-        lv_free(decoder_data);
-        dsc->user_data = NULL;
+    if(decoder_data->f) {
+        lv_fs_close(decoder_data->f);
+        lv_free(decoder_data->f);
     }
+
+    if(decoder_data->decoded) lv_draw_buf_destroy(decoder_data->decoded);
+    if(decoder_data->decompressed) lv_draw_buf_destroy(decoder_data->decompressed);
+    lv_free(decoder_data->palette);
+    lv_free(decoder_data);
+    dsc->user_data = NULL;
 }
 
 static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
@@ -671,6 +672,10 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->header.flags & LV_IMAGE_FLAGS_COMPRESSED) {
         /*The decompressed image is already loaded to RAM*/
         dsc->decoded = decoder_data->decompressed;
+
+        /*Transfer ownership to decoded pointer because it's the final data we use.*/
+        decoder_data->decoded = decoder_data->decompressed;
+        decoder_data->decompressed = NULL;
         return LV_RESULT_OK;
     }
 
@@ -956,6 +961,10 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     else {
         /*The decompressed data is the original image data.*/
         dsc->decoded = decoder_data->decompressed;
+
+        /*Transfer ownership of decompressed to `decoded` since it can be used directly*/
+        decoder_data->decoded = decoder_data->decompressed;
+        decoder_data->decompressed = NULL;
         res = LV_RESULT_OK;
     }
 
@@ -1118,9 +1127,6 @@ static void bin_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void 
 {
     LV_UNUSED(user_data); /*Unused*/
 
-    lv_image_decoder_dsc_t fake = { 0 };
-    fake.user_data = cached_data->user_data;
-    free_decoder_data(&fake);
-
+    lv_draw_buf_destroy((lv_draw_buf_t *)cached_data->decoded);
     if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
 }
