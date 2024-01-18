@@ -130,7 +130,7 @@ html_theme_options = {
 
 
 # For site map generation
-html_baseurl = f"https://docs.lvgl.io/{os.environ['LVGL_URLPATH']}/en/html/"
+html_baseurl = f"https://docs.lvgl.io/{os.environ['LVGL_URLPATH']}/"
 
 sitemap_url_scheme = "{link}"
 
