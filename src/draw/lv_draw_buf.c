@@ -181,7 +181,7 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
     uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
 
     void * buf = draw_buf_malloc(size, cf);
-    LV_ASSERT_MALLOC(buf);
+    /*Do not assert here as LVGL or the app might just want to try creating a draw_buf*/
     if(buf == NULL) {
         LV_LOG_WARN("No memory: %"LV_PRIu32"x%"LV_PRIu32", cf: %d, stride: %"LV_PRIu32", %"LV_PRIu32"Byte, ",
                     w, h, cf, stride, size);
