@@ -5,7 +5,7 @@ Windows Display/Inputs driver
 Overview
 -------------
 
-The **Windows** display/input `driver <https://github.com/lvgl/lvgl/src/dev/windows>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in a Windows Win32 window.
+The **Windows** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/windows>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in a Windows Win32 window.
 
 The main purpose for this driver is for testing/debugging the LVGL application in a **Windows** simulation window via **simulator mode**, or developing a standard **Windows** desktop application with LVGL via **application mode**.
 

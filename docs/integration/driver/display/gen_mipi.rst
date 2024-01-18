@@ -92,7 +92,7 @@ Example
 
 .. code:: c
 
-	#include "src/dev/display/st7789/lv_st7789.h"
+	#include "src/drivers/display/st7789/lv_st7789.h"
 
 	#define LCD_H_RES		240
 	#define LCD_V_RES		320
@@ -208,4 +208,4 @@ the generic MIPI driver supports sending a custom command list to the controller
 You can add a delay between the commands by using the pseudo-command ``LV_LCD_CMD_DELAY_MS``, which must be followed by the delay given in 10ms units.
 To terminate the command list you must use a delay with a value of ``LV_LCD_CMD_EOF``, as shown above.
 
-See an actual example of sending a command list `here <https://github.com/lvgl/lvgl/src/dev/display/st7789/lv_st7789.c>`__.
+See an actual example of sending a command list `here <https://github.com/lvgl/lvgl/src/drivers/display/st7789/lv_st7789.c>`__.

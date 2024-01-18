@@ -113,28 +113,9 @@ extern "C" {
 
 #include "src/themes/lv_theme.h"
 
+#include "src/drivers/lv_drivers.h"
+
 #include "src/lv_api_map.h"
-
-#include "src/dev/sdl/lv_sdl_window.h"
-#include "src/dev/sdl/lv_sdl_mouse.h"
-#include "src/dev/sdl/lv_sdl_mousewheel.h"
-#include "src/dev/sdl/lv_sdl_keyboard.h"
-
-#include "src/dev/x11/lv_x11.h"
-
-#include "src/dev/display/drm/lv_linux_drm.h"
-#include "src/dev/display/fb/lv_linux_fbdev.h"
-
-#include "src/dev/nuttx/lv_nuttx_entry.h"
-#include "src/dev/nuttx/lv_nuttx_fbdev.h"
-#include "src/dev/nuttx/lv_nuttx_touchscreen.h"
-#include "src/dev/nuttx/lv_nuttx_lcd.h"
-#include "src/dev/nuttx/lv_nuttx_libuv.h"
-
-#include "src/dev/evdev/lv_evdev.h"
-
-#include "src/dev/windows/lv_windows_input.h"
-#include "src/dev/windows/lv_windows_display.h"
 
 #include "src/core/lv_global.h"
 /*********************

@@ -13,7 +13,7 @@ RAM read/write operation with no external operation clock to minimize power cons
 because of the integrated power supply circuits necessary to drive liquid crystal, it is possible to make a
 display system with fewer components.
 
-The ST7735 LCD controller `driver <https://github.com/lvgl/lvgl/src/dev/display/st7735>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/doc/integration/drivers/display/gen_mipi.rst>`__.
+The ST7735 LCD controller `driver <https://github.com/lvgl/lvgl/src/drivers/display/st7735>`__ is a platform-agnostic driver, based on the `generic MIPI driver <https://github.com/lvgl/lvgl/doc/integration/drivers/display/gen_mipi.rst>`__.
 It implements display initialization, supports display rotation and implements the display flush callback. The user needs to implement only two platform-specific functions to send
 a command or pixel data to the controller via SPI or parallel bus. Typically these are implemented by calling the appropriate SDK library functions on the given platform.
 
