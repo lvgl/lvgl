@@ -254,7 +254,7 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
                     const lv_fpoint_t * pt1 = lv_array_at(&src->points, pidx);
-                    const lv_fpoint_t * pt2 = lv_array_at(&src->points, pidx);
+                    const lv_fpoint_t * pt2 = lv_array_at(&src->points, pidx + 1);
                     CMP_BOUNDS(pt1);
                     CMP_BOUNDS(pt2);
                     lv_vg_lite_path_quad_to(dest, pt1->x, pt1->y, pt2->x, pt2->y);
