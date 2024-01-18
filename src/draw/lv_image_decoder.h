@@ -123,7 +123,7 @@ typedef struct _lv_image_decoder_cache_data_t {
     const void * src;
     lv_image_src_t src_type;
 
-    lv_draw_buf_t * decoded;
+    const lv_draw_buf_t * decoded;
     const lv_image_decoder_t * decoder;
     void * user_data;
 } lv_image_cache_data_t;

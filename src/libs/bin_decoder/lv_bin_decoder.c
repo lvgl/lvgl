@@ -1127,6 +1127,6 @@ static void bin_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void 
 {
     LV_UNUSED(user_data); /*Unused*/
 
-    lv_draw_buf_destroy(cached_data->decoded);
+    lv_draw_buf_destroy((lv_draw_buf_t *)cached_data->decoded);
     if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
 }
