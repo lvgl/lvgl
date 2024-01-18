@@ -236,25 +236,25 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
 
     uint32_t pidx = 0;
     for(uint32_t i = 0; i < src->ops.size; i++) {
-        lv_vector_path_op_t * op = LV_ARRAY_GET(&src->ops, i, uint8_t);
+        lv_vector_path_op_t * op = lv_array_at(&src->ops, i);
         switch(*op) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
-                    const lv_fpoint_t * pt = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
+                    const lv_fpoint_t * pt = lv_array_at(&src->points, pidx);
                     CMP_BOUNDS(pt);
                     lv_vg_lite_path_move_to(dest, pt->x, pt->y);
                     pidx += 1;
                 }
                 break;
             case LV_VECTOR_PATH_OP_LINE_TO: {
-                    const lv_fpoint_t * pt = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
+                    const lv_fpoint_t * pt = lv_array_at(&src->points, pidx);
                     CMP_BOUNDS(pt);
                     lv_vg_lite_path_line_to(dest, pt->x, pt->y);
                     pidx += 1;
                 }
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
-                    const lv_fpoint_t * pt1 = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
-                    const lv_fpoint_t * pt2 = LV_ARRAY_GET(&src->points, pidx + 1, lv_fpoint_t);
+                    const lv_fpoint_t * pt1 = lv_array_at(&src->points, pidx);
+                    const lv_fpoint_t * pt2 = lv_array_at(&src->points, pidx + 1);
                     CMP_BOUNDS(pt1);
                     CMP_BOUNDS(pt2);
                     lv_vg_lite_path_quad_to(dest, pt1->x, pt1->y, pt2->x, pt2->y);
@@ -262,9 +262,9 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
                 }
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO: {
-                    const lv_fpoint_t * pt1 = LV_ARRAY_GET(&src->points, pidx, lv_fpoint_t);
-                    const lv_fpoint_t * pt2 = LV_ARRAY_GET(&src->points, pidx + 1, lv_fpoint_t);
-                    const lv_fpoint_t * pt3 = LV_ARRAY_GET(&src->points, pidx + 2, lv_fpoint_t);
+                    const lv_fpoint_t * pt1 = lv_array_at(&src->points, pidx);
+                    const lv_fpoint_t * pt2 = lv_array_at(&src->points, pidx + 1);
+                    const lv_fpoint_t * pt3 = lv_array_at(&src->points, pidx + 2);
                     CMP_BOUNDS(pt1);
                     CMP_BOUNDS(pt2);
                     CMP_BOUNDS(pt3);

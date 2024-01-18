@@ -169,12 +169,12 @@ struct _lv_anim_t {
  **********************/
 
 /**
- * Init. the animation module
+ * Init the animation module
  */
 void _lv_anim_core_init(void);
 
 /**
- * Deinit. the animation module
+ * Deinit the animation module
  */
 void _lv_anim_core_deinit(void);
 
