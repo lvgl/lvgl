@@ -217,16 +217,16 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
             return 1;
         case LV_DRAW_TASK_TYPE_IMAGE: {
-            lv_draw_image_dsc_t * dsc = task->draw_dsc;
-            lv_image_header_t header = { 0 };
-            lv_image_decoder_get_info(dsc->src, &header);
-            if(!lv_vg_lite_is_src_cf_supported(header.cf)) {
-                return 0;
+                lv_draw_image_dsc_t * dsc = task->draw_dsc;
+                lv_image_header_t header = { 0 };
+                lv_image_decoder_get_info(dsc->src, &header);
+                if(!lv_vg_lite_is_src_cf_supported(header.cf)) {
+                    return 0;
+                }
+                task->preference_score = 80;
+                task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+                return 1;
             }
-            task->preference_score = 80;
-            task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
-            return 1;
-        }
         default:
             break;
     }

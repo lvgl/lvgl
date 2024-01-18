@@ -155,6 +155,8 @@ enum _lv_color_format_t {
 
     LV_COLOR_FORMAT_YUV_END           = LV_COLOR_FORMAT_UYVY,
 
+    LV_COLOR_FORMAT_ETC2_EAC          = 0x30,
+
     /*Color formats in which LVGL can render*/
 #if LV_COLOR_DEPTH == 8
     LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_L8,

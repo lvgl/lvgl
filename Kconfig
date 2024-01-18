@@ -1123,6 +1123,9 @@ menu "LVGL configuration"
 		config LV_USE_RLE
 			bool "LVGL's version of RLE compression method"
 
+		config LV_USE_ETC2
+			bool "ETC2 decoder library"
+
 		config LV_USE_QRCODE
 			bool "QR code library"
 
