@@ -42,7 +42,7 @@ static lv_result_t release_handler(lv_obj_t * obj);
 static void inf_normalize(lv_obj_t * obj_scrl);
 static lv_obj_t * get_label(const lv_obj_t * obj);
 static int32_t get_selected_label_width(const lv_obj_t * obj);
-static void scroll_anim_ready_cb(lv_anim_t * a);
+static void scroll_anim_completed_cb(lv_anim_t * a);
 static void set_y_anim(void * obj, int32_t v);
 static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
 
@@ -623,7 +623,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
         lv_anim_set_exec_cb(&a, set_y_anim);
         lv_anim_set_values(&a, lv_obj_get_y(label), new_y);
         lv_anim_set_duration(&a, anim_time);
-        lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
+        lv_anim_set_completed_cb(&a, scroll_anim_completed_cb);
         lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
         lv_anim_start(&a);
     }
@@ -763,7 +763,7 @@ static int32_t get_selected_label_width(const lv_obj_t * obj)
     return size.x;
 }
 
-static void scroll_anim_ready_cb(lv_anim_t * a)
+static void scroll_anim_completed_cb(lv_anim_t * a)
 {
     lv_obj_t * obj = lv_obj_get_parent(a->var); /*The label is animated*/
     inf_normalize(obj);

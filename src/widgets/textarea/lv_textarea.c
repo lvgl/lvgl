@@ -50,7 +50,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void label_event_cb(lv_event_t * e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
-static void pwd_char_hider_anim_ready(lv_anim_t * a);
+static void pwd_char_hider_anim_completed(lv_anim_t * a);
 static void pwd_char_hider(lv_obj_t * obj);
 static bool char_is_accepted(lv_obj_t * obj, uint32_t c);
 static void start_cursor_blink(lv_obj_t * obj);
@@ -971,7 +971,7 @@ static void pwd_char_hider_anim(void * obj, int32_t x)
  * Call when an animation is ready to convert all characters to '*'
  * @param a pointer to the animation
  */
-static void pwd_char_hider_anim_ready(lv_anim_t * a)
+static void pwd_char_hider_anim_completed(lv_anim_t * a)
 {
     lv_obj_t * obj = a->var;
     pwd_char_hider(obj);
@@ -1365,7 +1365,7 @@ static void auto_hide_characters(lv_obj_t * obj)
         lv_anim_set_duration(&a, ta->pwd_show_time);
         lv_anim_set_values(&a, 0, 1);
         lv_anim_set_path_cb(&a, lv_anim_path_step);
-        lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
+        lv_anim_set_completed_cb(&a, pwd_char_hider_anim_completed);
         lv_anim_start(&a);
     }
 }
