@@ -2172,6 +2172,15 @@
     #endif
 #endif
 
+/*ETC2 decoder library*/
+#ifndef LV_USE_ETC2
+    #ifdef CONFIG_LV_USE_ETC2
+        #define LV_USE_ETC2 CONFIG_LV_USE_ETC2
+    #else
+        #define LV_USE_ETC2 0
+    #endif
+#endif
+
 /*QR code library*/
 #ifndef LV_USE_QRCODE
     #ifdef CONFIG_LV_USE_QRCODE

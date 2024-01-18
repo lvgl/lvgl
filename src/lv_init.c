@@ -21,6 +21,7 @@
 #include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
+#include "libs/etc2/lv_etc2.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
@@ -285,6 +286,10 @@ void lv_init(void)
     lv_bmp_init();
 #endif
 
+#if LV_USE_ETC2
+    lv_etc2_init();
+#endif
+
     /*Make FFMPEG last because the last converter will be checked first and
      *it's superior to any other */
 #if LV_USE_FFMPEG
@@ -373,6 +378,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VG_LITE
     lv_draw_vg_lite_deinit();
+#endif
+
+#if LV_USE_ETC2
+    lv_etc2_deinit();
 #endif
 
 #if LV_USE_DRAW_SW

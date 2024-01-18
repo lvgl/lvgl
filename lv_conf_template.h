@@ -654,6 +654,9 @@
 /*RLE decompress library*/
 #define LV_USE_RLE 0
 
+/*ETC2 decoder library*/
+#define LV_USE_ETC2 0
+
 /*QR code library*/
 #define LV_USE_QRCODE 0
 
