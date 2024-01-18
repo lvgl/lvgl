@@ -305,7 +305,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_anim_set_duration(&a, 400);
     lv_anim_set_delay(&a, INTRO_TIME + 800);
     lv_anim_set_values(&a, LV_SCALE_NONE, 10);
-    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_completed_cb);
     lv_anim_start(&a);
 
     lv_obj_update_layout(main_cont);
@@ -713,14 +713,13 @@ static void track_load(uint32_t id)
     }
 #endif
     lv_anim_set_exec_cb(&a, _obj_set_x_anim_cb);
-    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_completed_cb);
     lv_anim_start(&a);
 
     lv_anim_set_path_cb(&a, lv_anim_path_linear);
     lv_anim_set_var(&a, album_image_obj);
     lv_anim_set_duration(&a, 500);
     lv_anim_set_values(&a, LV_SCALE_NONE, LV_SCALE_NONE / 2);
-
     lv_anim_set_exec_cb(&a, _image_set_scale_anim_cb);
     lv_anim_set_completed_cb(&a, NULL);
     lv_anim_start(&a);

@@ -54,7 +54,7 @@ static void scale3_anim_cb(void * var, int32_t v);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void delete_timer_event_cb(lv_event_t * e);
-static void slideshow_anim_ready_cb(lv_anim_t * a_old);
+static void slideshow_anim_completed_cb(lv_anim_t * a_old);
 static void scale3_delete_event_cb(lv_event_t * e);
 static void tabview_delete_event_cb(lv_event_t * e);
 
@@ -233,7 +233,7 @@ void lv_demo_widgets_start_slideshow(void)
     lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
-    lv_anim_set_completed_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);
     lv_anim_start(&a);
 }
 
@@ -1637,7 +1637,7 @@ static void delete_timer_event_cb(lv_event_t * e)
     }
 }
 
-static void slideshow_anim_ready_cb(lv_anim_t * a_old)
+static void slideshow_anim_completed_cb(lv_anim_t * a_old)
 {
     LV_UNUSED(a_old);
 
@@ -1661,7 +1661,7 @@ static void slideshow_anim_ready_cb(lv_anim_t * a_old)
     lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
-    lv_anim_set_completed_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);
     lv_anim_start(&a);
 }
 

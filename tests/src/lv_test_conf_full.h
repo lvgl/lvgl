@@ -88,6 +88,7 @@
 #define LV_USE_DEMO_TRANSFORM   1
 #define LV_USE_DEMO_MULTILANG   1
 #define LV_USE_DEMO_RENDER      1
+#define LV_USE_DEMO_MUSIC       1
 #define LV_USE_DEMO_BENCHMARK   1
 #define LV_USE_DEMO_SCROLL      1
 #define LV_USE_DEMO_VECTOR_GRAPHIC  1

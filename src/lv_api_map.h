@@ -207,6 +207,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 
 #define lv_obj_get_child_cnt                lv_obj_get_child_count
 #define lv_obj_get_disp                     lv_obj_get_display
+#define lv_obj_delete_anim_ready_cb         lv_obj_delete_anim_completed_cb
 
 #define LV_STYLE_ANIM_TIME            LV_STYLE_ANIM_DURATION
 #define LV_STYLE_IMG_OPA              LV_STYLE_IMAGE_OPA
