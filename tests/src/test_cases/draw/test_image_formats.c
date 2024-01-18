@@ -246,7 +246,7 @@ static void img_create(const char * name, const void * img_src, bool rotate, boo
     lv_image_set_src(img, img_src);
     lv_obj_set_style_image_recolor(img, lv_palette_main(LV_PALETTE_RED), 0);   /*For A8*/
     if(recolor) lv_obj_set_style_image_recolor_opa(img, LV_OPA_70, 0);
-    if(rotate) lv_image_set_angle(img, 450);
+    if(rotate) lv_image_set_rotation(img, 450);
 
     lv_obj_t * label = lv_label_create(cont);
     lv_label_set_text(label, name);

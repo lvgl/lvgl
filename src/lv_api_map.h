@@ -37,7 +37,6 @@ extern "C" {
 #define LV_BTNMATRIX_CTRL_CHECKED      LV_BUTTONMATRIX_CTRL_CHECKED
 #define LV_BTNMATRIX_CTRL_CLICK_TRIG   LV_BUTTONMATRIX_CTRL_CLICK_TRIG
 #define LV_BTNMATRIX_CTRL_POPOVER      LV_BUTTONMATRIX_CTRL_POPOVER
-#define LV_BTNMATRIX_CTRL_RECOLOR      LV_BUTTONMATRIX_CTRL_RECOLOR
 #define LV_BTNMATRIX_CTRL_CUSTOM_1     LV_BUTTONMATRIX_CTRL_CUSTOM_1
 #define LV_BTNMATRIX_CTRL_CUSTOM_2     LV_BUTTONMATRIX_CTRL_CUSTOM_2
 
@@ -111,7 +110,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_get_default              lv_display_get_default
 #define lv_disp_get_next                 lv_display_get_next
 #define lv_disp_set_res                  lv_display_set_resolution
-#define lv_disp_set_physical_res         lv_display_set_physical_res
+#define lv_disp_set_physical_res         lv_display_set_physical_resolution
 #define lv_disp_set_offset               lv_display_set_offset
 #define lv_disp_set_rotation             lv_display_set_rotation
 #define lv_disp_set_dpi                  lv_display_set_dpi
@@ -137,7 +136,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_get_layer_top            lv_display_get_layer_top
 #define lv_disp_get_layer_sys            lv_display_get_layer_sys
 #define lv_disp_get_layer_bottom         lv_display_get_layer_bottom
-#define lv_disp_add_event                lv_display_add_event
+#define lv_disp_add_event                lv_display_add_event_cb
 #define lv_disp_get_event_count          lv_display_get_event_count
 #define lv_disp_get_event_dsc            lv_display_get_event_dsc
 #define lv_disp_remove_event             lv_display_delete_event
@@ -170,19 +169,17 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_img_set_src        lv_image_set_src
 #define lv_img_set_offset_x   lv_image_set_offset_x
 #define lv_img_set_offset_y   lv_image_set_offset_y
-#define lv_img_set_angle      lv_image_set_angle
+#define lv_img_set_angle      lv_image_set_rotation
 #define lv_img_set_pivot      lv_image_set_pivot
-#define lv_img_set_zoom       lv_image_set_zoom
+#define lv_img_set_zoom       lv_image_set_scale
 #define lv_img_set_antialias  lv_image_set_antialias
-#define lv_img_set_size_mode  lv_image_set_size_mode
 #define lv_img_get_src        lv_image_get_src
 #define lv_img_get_offset_x   lv_image_get_offset_x
 #define lv_img_get_offset_y   lv_image_get_offset_y
-#define lv_img_get_angle      lv_image_get_angle
+#define lv_img_get_angle      lv_image_get_rotation
 #define lv_img_get_pivot      lv_image_get_pivot
-#define lv_img_get_zoom       lv_image_get_zoom
+#define lv_img_get_zoom       lv_image_get_scale
 #define lv_img_get_antialias  lv_image_get_antialias
-#define lv_img_get_size_mode  lv_image_get_size_mode
 
 #define lv_list_set_btn_text lv_list_set_button_text
 #define lv_list_get_btn_text lv_list_get_button_text
@@ -206,20 +203,13 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_btnmatrix_has_button_ctrl         lv_buttonmatrix_has_button_ctrl
 #define lv_btnmatrix_get_one_checked         lv_buttonmatrix_get_one_checked
 
-#define lv_tabview_get_tab_btns              lv_tabview_get_tab_buttons
-#define lv_tabview_get_act                   lv_tabview_get_active
+#define lv_tabview_get_tab_btns              lv_tabview_get_tab_bar
+#define lv_tabview_get_tab_act               lv_tabview_get_tab_active
 #define lv_tabview_set_act                   lv_tabview_set_active
 
 #define lv_tileview_get_tile_act             lv_tileview_get_tile_active
-#define lv_obj_set_tile_id                   lv_obj_set_tile_by_index
-#define lv_obj_set_tile                      lv_obj_set_tile
-
-#define lv_msgbox_get_btns                   lv_msgbox_get_buttons
-
-#define lv_image_set_angle                  lv_image_set_rotation
-#define lv_image_get_angle                  lv_image_get_rotation
-#define lv_image_set_zoom                   lv_image_set_scale
-#define lv_image_get_zoom                   lv_image_get_scale
+#define lv_obj_set_tile_id                   lv_tileview_set_tile_by_index
+#define lv_obj_set_tile                      lv_tileview_set_tile
 
 #define lv_roller_set_visible_row_cnt       lv_roller_set_visible_row_count
 #define lv_roller_get_option_cnt            lv_roller_get_option_count
@@ -239,11 +229,9 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define LV_STYLE_ANIM_TIME            LV_STYLE_ANIM_DURATION
 #define LV_STYLE_IMG_OPA              LV_STYLE_IMAGE_OPA
 #define LV_STYLE_IMG_RECOLOR          LV_STYLE_IMAGE_RECOLOR
-#define LV_STYLE_IMG_RECOLOR_FILTERED LV_STYLE_IMAGE_RECOLOR_FILTERED
 #define LV_STYLE_IMG_RECOLOR_OPA      LV_STYLE_IMAGE_RECOLOR_OPA
 #define LV_STYLE_SHADOW_OFS_X         LV_STYLE_SHADOW_OFFSET_X
 #define LV_STYLE_SHADOW_OFS_Y         LV_STYLE_SHADOW_OFFSET_Y
-#define LV_STYLE_TRANSFORM_ZOOM       LV_STYLE_TRANSFORM_SCALE
 #define LV_STYLE_TRANSFORM_ANGLE      LV_STYLE_TRANSFORM_ROTATION
 
 #define lv_obj_get_style_anim_time            lv_obj_get_style_anim_duration
@@ -253,7 +241,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_obj_get_style_img_recolor_opa      lv_obj_get_style_image_recolor_opa
 #define lv_obj_get_style_shadow_ofs_x         lv_obj_get_style_shadow_offset_x
 #define lv_obj_get_style_shadow_ofs_y         lv_obj_get_style_shadow_offset_y
-#define lv_obj_get_style_transform_zoom       lv_obj_get_style_transform_scale
 #define lv_obj_get_style_transform_angle      lv_obj_get_style_transform_rotation
 
 #define lv_obj_set_style_anim_time          lv_obj_set_style_anim_duration
