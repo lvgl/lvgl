@@ -417,7 +417,7 @@ static void anim_completed_handler(lv_anim_t * a)
     if(a->repeat_cnt == 0 && (a->playback_duration == 0 || a->playback_now == 1)) {
 
         /*Delete the animation from the list.
-         * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
+         * This way the `completed_cb` will see the animations like it's animation is already deleted*/
         _lv_ll_remove(anim_ll_p, a);
         /*Flag that the list has changed*/
         anim_mark_list_change();
