@@ -308,6 +308,8 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
 
     /*Premultiply alpha channel*/
     if(args->premultiply
+       && !LV_COLOR_FORMAT_IS_ALPHA_ONLY(decoded->header.cf)
+       && lv_color_format_has_alpha(decoded->header.cf)
        && !lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED) /*Hasn't done yet*/
       ) {
         LV_LOG_TRACE("Alpha premultiply.");
