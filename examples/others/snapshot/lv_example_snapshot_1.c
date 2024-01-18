@@ -30,7 +30,7 @@ void lv_example_snapshot_1(void)
     lv_obj_t * snapshot_obj = lv_image_create(root);
     lv_obj_set_style_bg_color(snapshot_obj, lv_palette_main(LV_PALETTE_PURPLE), 0);
     lv_obj_set_style_bg_opa(snapshot_obj, LV_OPA_100, 0);
-    lv_image_set_zoom(snapshot_obj, 128);
+    lv_image_set_scale(snapshot_obj, 128);
     lv_image_set_rotation(snapshot_obj, 300);
 
     /*Create the container and its children*/

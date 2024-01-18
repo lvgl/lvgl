@@ -216,7 +216,7 @@ void lv_indev_read(lv_indev_t * indev_p)
     do {
         /*Read the data*/
         indev_read_core(indev_p, &data);
-        continue_reading = data.continue_reading;
+        continue_reading = indev_p->mode != LV_INDEV_MODE_EVENT && data.continue_reading;
 
         /*The active object might be deleted even in the read function*/
         indev_proc_reset_query_handler(indev_p);
