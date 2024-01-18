@@ -398,27 +398,29 @@ void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_d
 void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
                             lv_display_render_mode_t render_mode)
 {
+    LV_ASSERT_MSG(buf1 != NULL, "Null buffer");
+    lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t w = lv_display_get_horizontal_resolution(disp);
     uint32_t h = lv_display_get_vertical_resolution(disp);
-    LV_ASSERT(w != 0 && h != 0);
 
-    lv_color_format_t cf = lv_display_get_color_format(disp);
+    LV_ASSERT_MSG(w != 0 && h != 0, "display resolution is 0");
+
+    /* buf1 or buf2 is not aligned according to LV_DRAW_BUF_ALIGN */
+    LV_ASSERT_MSG(buf1 == lv_draw_buf_align(buf1, cf), "buf1 is not aligned: %p", buf1);
+    LV_ASSERT_MSG(buf2 == NULL || buf2 == lv_draw_buf_align(buf2, cf), "buf2 is not aligned: %p", buf2);
+
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /* for partial mode, we calculate the height based on the buf_size and stride */
         h = buf_size / stride;
     }
-    else if(stride * h > buf_size) {
-        LV_LOG_ERROR("%s mode requires screen sized buffer(s)",
-                     render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
-        LV_ASSERT(0);
+    else {
+        LV_ASSERT_MSG(stride * h < buf_size, "%s mode requires screen sized buffer(s)",
+                      render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
         return;
     }
 
-    if(h == 0) {
-        LV_ASSERT_MSG(h != 0, "the buffer is too small");
-        return;
-    }
+    LV_ASSERT_MSG(h != 0, "the buffer is too small");
 
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
     lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
