@@ -592,7 +592,8 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     }
 }
 
-bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src)
+bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
+                                  bool no_cache)
 {
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(decoder_dsc);
@@ -603,6 +604,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     args.premultiply = !lv_vg_lite_support_blend_normal();
     args.stride_align = true;
     args.use_indexed = true;
+    args.no_cache = no_cache;
 
     lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
     if(res != LV_RESULT_OK) {
