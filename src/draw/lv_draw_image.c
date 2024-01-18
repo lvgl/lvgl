@@ -27,7 +27,7 @@
  **********************/
 
 static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
-                                lv_image_decoder_dsc_t * decoder_dsc,
+                                lv_image_decoder_dsc_t * decoder_dsc, lv_area_t * relative_decoded_area,
                                 const lv_area_t * img_area, const lv_area_t * clipped_img_area,
                                 lv_draw_image_core_cb draw_core_cb);
 
@@ -156,7 +156,7 @@ void _lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_imag
         return;
     }
 
-    img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, coords, &clipped_img_area, draw_core_cb);
+    img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, NULL, coords, &clipped_img_area, draw_core_cb);
 
     lv_image_decoder_close(&decoder_dsc);
 }
@@ -185,12 +185,20 @@ void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
 
     int32_t tile_x_start = tile_area.x1;
 
+    lv_area_t relative_decoded_area = {
+        .x1 = LV_COORD_MIN,
+        .y1 = LV_COORD_MIN,
+        .x2 = LV_COORD_MIN,
+        .y2 = LV_COORD_MIN,
+    };
+
     while(tile_area.y1 <= draw_unit->clip_area->y2) {
         while(tile_area.x1 <= draw_unit->clip_area->x2) {
 
             lv_area_t clipped_img_area;
             if(_lv_area_intersect(&clipped_img_area, &tile_area, draw_unit->clip_area)) {
-                img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, &tile_area, &clipped_img_area, draw_core_cb);
+                img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, &relative_decoded_area, &tile_area, &clipped_img_area,
+                                    draw_core_cb);
             }
 
             tile_area.x1 += img_w;
@@ -211,7 +219,7 @@ void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
  **********************/
 
 static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
-                                lv_image_decoder_dsc_t * decoder_dsc,
+                                lv_image_decoder_dsc_t * decoder_dsc, lv_area_t * relative_decoded_area,
                                 const lv_area_t * img_area, const lv_area_t * clipped_img_area,
                                 lv_draw_image_core_cb draw_core_cb)
 {
@@ -221,25 +229,25 @@ static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_
     sup.palette_size = decoder_dsc->palette_size;
 
     /*The whole image is available, just draw it*/
-    if(decoder_dsc->decoded) {
+    if(decoder_dsc->decoded && (relative_decoded_area == NULL || relative_decoded_area->x1 == LV_COORD_MIN)) {
         draw_core_cb(draw_unit, draw_dsc, decoder_dsc, &sup, img_area, clipped_img_area);
     }
     /*Draw in smaller pieces*/
     else {
         lv_area_t relative_full_area_to_decode = *clipped_img_area;
         lv_area_move(&relative_full_area_to_decode, -img_area->x1, -img_area->y1);
-
-        lv_area_t relative_decoded_area;
-        relative_decoded_area.x1 = LV_COORD_MIN;
-        relative_decoded_area.y1 = LV_COORD_MIN;
-        relative_decoded_area.x2 = LV_COORD_MIN;
-        relative_decoded_area.y2 = LV_COORD_MIN;
+        lv_area_t tmp;
+        if(relative_decoded_area == NULL) relative_decoded_area = &tmp;
+        relative_decoded_area->x1 = LV_COORD_MIN;
+        relative_decoded_area->y1 = LV_COORD_MIN;
+        relative_decoded_area->x2 = LV_COORD_MIN;
+        relative_decoded_area->y2 = LV_COORD_MIN;
         lv_result_t res = LV_RESULT_OK;
 
         while(res == LV_RESULT_OK) {
-            res = lv_image_decoder_get_area(decoder_dsc, &relative_full_area_to_decode, &relative_decoded_area);
+            res = lv_image_decoder_get_area(decoder_dsc, &relative_full_area_to_decode, relative_decoded_area);
 
-            lv_area_t absolute_decoded_area = relative_decoded_area;
+            lv_area_t absolute_decoded_area = *relative_decoded_area;
             lv_area_move(&absolute_decoded_area, img_area->x1, img_area->y1);
             if(res == LV_RESULT_OK) {
                 /*Limit draw area to the current decoded area and draw the image*/
