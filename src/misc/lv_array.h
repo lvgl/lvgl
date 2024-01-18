@@ -140,7 +140,7 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end);
 
 /**
  * Concatenate two arrays. Adds new elements to the end of the array.
- * @note The destination array must be large enough to hold the result.
+ * @note The destination array is automatically expanded as necessary.
  * @param array pointer to an `lv_array_t` variable
  * @param other pointer to the array to concatenate
  * @return LV_RESULT_OK: success, otherwise: error
