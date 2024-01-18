@@ -52,7 +52,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
                                        _lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, _lv_bar_anim_t * bar_anim);
 static void lv_bar_anim(void * bar, int32_t value);
-static void lv_bar_anim_ready(lv_anim_t * a);
+static void lv_bar_anim_completed(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -597,7 +597,7 @@ static void lv_bar_anim(void * var, int32_t value)
     lv_obj_invalidate(bar_anim->bar);
 }
 
-static void lv_bar_anim_ready(lv_anim_t * a)
+static void lv_bar_anim_completed(lv_anim_t * a)
 {
     _lv_bar_anim_t * var = a->var;
     lv_obj_t * obj = (lv_obj_t *)var->bar;
@@ -645,7 +645,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
         lv_anim_set_var(&a, anim_info);
         lv_anim_set_exec_cb(&a, lv_bar_anim);
         lv_anim_set_values(&a, LV_BAR_ANIM_STATE_START, LV_BAR_ANIM_STATE_END);
-        lv_anim_set_ready_cb(&a, lv_bar_anim_ready);
+        lv_anim_set_completed_cb(&a, lv_bar_anim_completed);
         lv_anim_set_duration(&a, lv_obj_get_style_anim_duration(obj, LV_PART_MAIN));
         lv_anim_start(&a);
     }

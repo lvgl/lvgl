@@ -820,7 +820,7 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
                 dest->act_time = src->act_time;
             dest->repeat_cnt = src->repeat_cnt;
             dest->repeat_delay = src->repeat_delay;
-            dest->ready_cb = src->ready_cb;
+            dest->completed_cb = src->completed_cb;
             dest->playback_delay = src->playback_delay;
             break;
         case LV_LABEL_LONG_SCROLL_CIRCULAR:
@@ -829,7 +829,7 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
                 dest->act_time = src->act_time;
             dest->repeat_cnt = src->repeat_cnt;
             dest->repeat_delay = src->repeat_delay;
-            dest->ready_cb = src->ready_cb;
+            dest->completed_cb = src->completed_cb;
             break;
         default:
             break;

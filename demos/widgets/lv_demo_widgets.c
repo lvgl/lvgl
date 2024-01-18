@@ -233,7 +233,7 @@ void lv_demo_widgets_start_slideshow(void)
     lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
-    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, slideshow_anim_ready_cb);
     lv_anim_start(&a);
 }
 
@@ -1661,7 +1661,7 @@ static void slideshow_anim_ready_cb(lv_anim_t * a_old)
     lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
-    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, slideshow_anim_ready_cb);
     lv_anim_start(&a);
 }
 

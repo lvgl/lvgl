@@ -106,7 +106,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
                     lv_draw_image_dsc_init(&img_dsc);
                     img_dsc.opa = glyph_draw_dsc->opa;
                     img_dsc.src = glyph_draw_dsc->glyph_data;
-                    lv_draw_vg_lite_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
+                    lv_draw_vg_lite_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords, false);
                 }
                 break;
 

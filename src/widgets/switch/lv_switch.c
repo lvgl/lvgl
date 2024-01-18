@@ -46,7 +46,7 @@ static void draw_main(lv_event_t * e);
 
 static void lv_switch_anim_exec_cb(void * sw, int32_t value);
 static void lv_switch_trigger_anim(lv_obj_t * obj);
-static void lv_switch_anim_ready(lv_anim_t * a);
+static void lv_switch_anim_completed(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -212,7 +212,7 @@ static void lv_switch_anim_exec_cb(void * var, int32_t value)
 /**
  * Resets the switch's animation state to "no animation in progress".
  */
-static void lv_switch_anim_ready(lv_anim_t * a)
+static void lv_switch_anim_completed(lv_anim_t * a)
 {
     lv_switch_t * sw = a->var;
     sw->anim_state = LV_SWITCH_ANIM_STATE_INV;
@@ -255,7 +255,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
         lv_anim_set_var(&a, sw);
         lv_anim_set_exec_cb(&a, lv_switch_anim_exec_cb);
         lv_anim_set_values(&a, anim_start, anim_end);
-        lv_anim_set_ready_cb(&a, lv_switch_anim_ready);
+        lv_anim_set_completed_cb(&a, lv_switch_anim_completed);
         lv_anim_set_duration(&a, anim_dur);
         lv_anim_start(&a);
     }
