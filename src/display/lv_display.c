@@ -413,14 +413,12 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /* for partial mode, we calculate the height based on the buf_size and stride */
         h = buf_size / stride;
+        LV_ASSERT_MSG(h != 0, "the buffer is too small");
     }
     else {
-        LV_ASSERT_MSG(stride * h < buf_size, "%s mode requires screen sized buffer(s)",
+        LV_ASSERT_MSG(stride * h <= buf_size, "%s mode requires screen sized buffer(s)",
                       render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
-        return;
     }
-
-    LV_ASSERT_MSG(h != 0, "the buffer is too small");
 
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
     lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
