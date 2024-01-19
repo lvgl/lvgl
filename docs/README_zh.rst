@@ -89,7 +89,7 @@ SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也
    `Grid布局 <https://docs.lvgl.io/master/layouts/grid.html>`__
    可以响应式自动调整小控件的大小和位置。
 -  文本支持UTF-8编码，支持CJK、泰语、印地语、阿拉伯语和波斯语书写系统。
--  换行、紧排、文本滚动、亚像素渲染、拼音输入法、文本表情符号。
+-  支持自动换行、字距调整、文本滚动、亚像素渲染、拼音输入法、文本表情符号。
 -  渲染引擎支持动画、抗锯齿、不透明度、平滑滚动、阴影、图像转换等。
 -  支持鼠标、触摸板、小键盘、键盘、外部按钮、编码器\ `输入设备 <https://docs.lvgl.io/master/porting/indev.html>`__\ 。
 -  支持\ `多显示器 <https://docs.lvgl.io/master/overview/disp.html#multiple-display-support>`__\ 。
