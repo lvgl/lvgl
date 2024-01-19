@@ -117,8 +117,8 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     dsc->src_type = src_type;
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        size_t fnlen = lv_strlen(src);
-        dsc->src = lv_malloc(fnlen + 1);
+        size_t fn_len = lv_strlen(src);
+        dsc->src = lv_malloc(fn_len + 1);
         LV_ASSERT_MALLOC(dsc->src);
         if(dsc->src == NULL) {
             LV_LOG_WARN("Out of memory");
@@ -133,7 +133,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     lv_result_t res = LV_RESULT_INVALID;
 
     lv_image_decoder_t * decoder;
-    lv_image_decoder_args_t * args_copy = NULL;
 
     static const lv_image_decoder_args_t def_args = {
         .stride_align = LV_DRAW_BUF_STRIDE_ALIGN != 1,
@@ -180,8 +179,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE)
         lv_free((void *)dsc->src);
-
-    if(args_copy) lv_free(args_copy);
 
     return res;
 }
