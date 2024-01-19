@@ -48,7 +48,7 @@
 
 **成熟且知名**\ 
 
-LVGL 是最流行的免费开源嵌入式图形库，可以为任何 MCU、MPU 和显示类型创建漂亮的 UI。它得到了行业领先供应商和项目的支持，如 Arm、STM32、NXP、Espressif、Nuvoton、Arduino、RT-Thread、Zephyr、NuttX、Adafruit等。
+LVGL 是最流行的免费开源嵌入式图形库，可以为任何 MCU、MPU 和显示类型创建漂亮的 UI。它得到了行业领先供应商和项目的支持，如 Arm、STM32、NXP、Espressif、Nuvoton、Arduino、RT-Thread、Zephyr、NuttX、Adafruit 等。
 
 **功能丰富**\ 
 
@@ -101,12 +101,12 @@ SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。�
    在 MCU 上的更轻更简单的 Python 版本
 -  未使用自定义生成系统。您可以在构建项目的其他文件时构建 LVGL。
 -  支持开箱即用的 Make 和 \ `CMake <https://docs.lvgl.io/master/get-started/platforms/cmake.html>`__\  编译系统。
--  支持在\ `PC 上开发 <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的 UI 代码。
+-  支持在 \ `PC 上开发 <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的 UI 代码。
 -  支持使用我们的 \ `Emscripten 移植 <https://github.com/lvgl/lv_web_emscripten>`__\  从而将 C 写的 UI 代码转换为 HTML 文件。
 
 **文档、工具和服务**
 
--  包含\ `100 多个简单示例 <https://docs.lvgl.io/master/index.html>`__\ 的详细\ `文档 <https://docs.lvgl.io/>`__
+-  包含 \ `100 多个简单示例 <https://docs.lvgl.io/master/index.html>`__\ 的详细\ `文档 <https://docs.lvgl.io/>`__
 -  `SquareLine Studio <https://squareline.io/>`__ -
    一款专业且易于使用的UI编辑器软件，可加快和简化 UI 开发。
 -  `服务 <https://lvgl.io/services>`__
