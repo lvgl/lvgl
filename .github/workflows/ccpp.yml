@@ -95,8 +95,7 @@ jobs:
 
           install: |
             apt-get update -y
-            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 pngquant python3-pip
- -q -y
+            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 pngquant python3-pip -q -y
             pip install pypng lz4
             /usr/sbin/update-ccache-symlinks
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
