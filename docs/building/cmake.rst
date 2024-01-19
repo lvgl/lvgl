@@ -12,6 +12,7 @@ https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
 Prerequsites
 ---------
 You need to install
+
 - CMake
 - Ninja (for Linux builds). Be sure to Add ninja to your PATH
 
@@ -21,6 +22,7 @@ How to build this project using cmake
 
 
 The recommended way to build this project is to use the provided CMakePresets.json. This file contains 2 configurations
+
 - a windows (msvc) build using Visual Studio
 - a linux (gcc) build using Ninja
 
@@ -30,6 +32,7 @@ Build with IDE
 ------
 
 The recommend way for consuming CMakePresets is a CMakePresets aware IDE such as
+
 - VS 2022
 - VS CODE
 - CLion
