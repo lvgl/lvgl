@@ -36,7 +36,7 @@ jobs:
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Run tests
-      run: python tests/main.py --report test
+      run: python tests/main.py --report --update-image test
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v4
@@ -95,7 +95,9 @@ jobs:
 
           install: |
             apt-get update -y
-            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 -q -y
+            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 pngquant python3-pip
+ -q -y
+            pip install pypng lz4
             /usr/sbin/update-ccache-symlinks
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 
