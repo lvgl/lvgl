@@ -84,7 +84,7 @@ SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也
 -  30+内置\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__:
     按钮、标签、滑块、图表、键盘、仪表、弧形、表格等等。
 -  灵活的\ `样式系统 <https://docs.lvgl.io/master/overview/style.html>`__
-   具有约100个样式属性，可在任何状态下自定义小部件的任何部分。
+   支持约100个样式属性，可在任何状态下自定义小控件的任何部分。
 -  `Flexbox <https://docs.lvgl.io/master/layouts/flex.html>`__ and
    `网格 <https://docs.lvgl.io/master/layouts/grid.html>`__
    像布局引擎一样，以响应的方式自动调整小部件的大小和位置。
