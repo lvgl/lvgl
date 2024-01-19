@@ -83,7 +83,7 @@ SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。�
 -  30+ 内置\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__:
     按钮、标签、滑块、图表、键盘、仪表、弧形、表格等等。
 -  灵活的\ `样式系统 <https://docs.lvgl.io/master/overview/style.html>`__
-   支持约100个样式属性，可在任何状态下自定义小控件的任何部分。
+   支持约 100 个样式属性，可在任何状态下自定义小控件的任何部分。
 -  `Flex 布局 <https://docs.lvgl.io/master/layouts/flex.html>`__ 和
    `Grid 布局 <https://docs.lvgl.io/master/layouts/grid.html>`__
    可以响应式自动调整小控件的大小和位置。
@@ -463,7 +463,7 @@ Hello world 标签
    </details>
    <br>
 
-英语、希伯来语（混合 LTR-RTL ）和中文
+英语、希伯来语（ 双向文本排版 ）和中文
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/kisvegabor/test/raw/master/readme_example_5.png
@@ -598,7 +598,7 @@ LVGL 是一个开放的项目，我们非常欢迎您的贡献。有很多方法
 
 有关贡献的详细说明，请访问文件的\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 部分。
 
-已经有300多人在 LVGL 留下了痕迹。期待你成为他们中的一员！并在下列贡献者中看到你！ 🙂
+已经有 300 多人在 LVGL 留下了痕迹。期待你成为他们中的一员！并在下列贡献者中看到你！ 🙂
 
 .. raw:: html
 
