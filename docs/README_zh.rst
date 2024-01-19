@@ -75,7 +75,7 @@ SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也
 -  可以编译到任何MCU或MPU，使用任何RTOS或者操作系统。
 -  支持单色、ePaper、OLED或TFT显示器，甚至显示器。
    `移植指南 <https://docs.lvgl.io/master/porting/project.html>`__
--  根据MIT许可证，因此您也可以在商业项目中轻松使用它。
+-  该项目使用MIT许可证，因此您可以在商业项目中轻松使用它。
 -  只需要32kB的RAM和128kB的Flash，一个帧缓冲区，以及至少1/10屏幕大小的渲染缓冲区。
 -  支持操作系统、外部存储器和GPU，但不是必需的。
 
