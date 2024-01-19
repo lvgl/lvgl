@@ -315,18 +315,17 @@ void lv_vector_path_close(lv_vector_path_t * path)
 void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area)
 {
     uint32_t len = lv_array_size(&path->points);
-    lv_fpoint_t * p0 = lv_array_at(&path->points, 0);
-    float x1 = p0->x;
-    float x2 = p0->x;
-    float y1 = p0->y;
-    float y2 = p0->y;
+    lv_fpoint_t * p = lv_array_at(&path->points, 0);
+    float x1 = p[0].x;
+    float x2 = p[0].x;
+    float y1 = p[0].y;
+    float y2 = p[0].y;
 
     for(uint32_t i = 1; i < len; i++) {
-        lv_fpoint_t * p = lv_array_at(&path->points, i);
-        if(p->x < x1) x1 = p->x;
-        if(p->y < y1) y1 = p->y;
-        if(p->x > x2) x2 = p->x;
-        if(p->y > y2) y2 = p->y;
+        if(p[i].x < x1) x1 = p[i].x;
+        if(p[i].y < y1) y1 = p[i].y;
+        if(p[i].x > x2) x2 = p[i].x;
+        if(p[i].y > y2) y2 = p[i].y;
     }
 
     area->x1 = (int32_t)x1;
