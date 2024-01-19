@@ -52,8 +52,8 @@ LVGL 是最流行的免费开源嵌入式图形库，可以为任何 MCU、MPU �
 
 **功能丰富**\ 
 
-它拥有创建现代美观GUI的所有功能：30多个内置控件、强大的样式系统、Web 启发的布局管理器和支持多种语言的排版系统。要将 LVGL 集成到您的平台中，您只需要至少32 KB
-RAM 和128 KB Flash、C 编译器、帧缓冲区和至少1/10屏幕大小的渲染缓冲区。
+它拥有创建现代美观 GUI 的所有功能：30 多个内置控件、强大的样式系统、Web 启发的布局管理器和支持多种语言的排版系统。要将 LVGL 集成到您的平台中，您只需要至少 32 KB
+RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的渲染缓冲区。
 
 **UI编辑器**\
 
@@ -75,12 +75,12 @@ SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。�
 -  支持单色、ePaper、OLED 、TFT 显示器或者模拟器。
    `移植指南 <https://docs.lvgl.io/master/porting/project.html>`__
 -  该项目使用 MIT 许可证，因此您可以在商业项目中轻松使用它。
--  仅需32 KB RAM 和128 KB Flash，一个帧缓冲区，以及至少1/10屏幕大小的渲染缓冲区。
+-  仅需 32 KB RAM 和 128 KB Flash，一个帧缓冲区，以及至少 1/10 屏幕大小的渲染缓冲区。
 -  支持使用可选的操作系统、外部存储器和 GPU。
 
 **控件、样式、布局等**
 
--  30+内置\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__:
+-  30+ 内置\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__:
     按钮、标签、滑块、图表、键盘、仪表、弧形、表格等等。
 -  灵活的\ `样式系统 <https://docs.lvgl.io/master/overview/style.html>`__
    支持约100个样式属性，可在任何状态下自定义小控件的任何部分。
@@ -96,17 +96,17 @@ SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。�
 **绑定和构建支持**
 
 -  `Microython 绑定 <https://blog.lvgl.io/2019-02-20/micropython-bindings>`__
-   公开 LVGL API
+   公开 LVGL的API
 -  `PikaScript 绑定 <https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl>`__
-   在MCU上的更轻更简单的 Python 版本
+   在 MCU 上的更轻更简单的 Python 版本
 -  未使用自定义生成系统。您可以在构建项目的其他文件时构建 LVGL。
--  支持开箱即用的Make和\ `CMake <https://docs.lvgl.io/master/get-started/platforms/cmake.html>`__\ 编译系统。
+-  支持开箱即用的 Make 和 \ `CMake <https://docs.lvgl.io/master/get-started/platforms/cmake.html>`__\  编译系统。
 -  支持在\ `PC 上开发 <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的UI代码。
--  支持使用我们的\ `Emscripten 移植 <https://github.com/lvgl/lv_web_emscripten>`__\ 从而将 C 写的 UI 代码转换为 HTML 文件。
+-  支持使用我们的 \ `Emscripten 移植 <https://github.com/lvgl/lv_web_emscripten>`__\  从而将 C 写的 UI 代码转换为 HTML 文件。
 
 **文档、工具和服务**
 
--  包含\ `100多个简单示例 <https://docs.lvgl.io/master/index.html>`__\ 的详细\ `文档 <https://docs.lvgl.io/>`__
+-  包含\ `100 多个简单示例 <https://docs.lvgl.io/master/index.html>`__\ 的详细\ `文档 <https://docs.lvgl.io/>`__
 -  `SquareLine Studio <https://squareline.io/>`__ -
    一款专业且易于使用的UI编辑器软件，可加快和简化 UI 开发。
 -  `服务 <https://lvgl.io/services>`__
@@ -125,7 +125,7 @@ SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。�
 
 **如何捐赠？**\  
 
-我们使用\ `GitHub Sponsors <https://github.com/sponsors/lvgl>`__\ ，您可以轻松发送一次性或定期捐款。您还可以以透明的方式查看我们的所有费用。
+我们使用 \ `GitHub Sponsors <https://github.com/sponsors/lvgl>`__\ ，您可以轻松发送一次性或定期捐款。您还可以以透明的方式查看我们的所有费用。
 
 **如何获得捐款报酬？**\ 
 
@@ -135,7 +135,7 @@ SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。�
 
 |Sponsors of LVGL|
 
-**支持LVGL的个人**\  
+**支持 LVGL 的个人**\  
 
 |Backers of LVGL|
 
@@ -533,40 +533,40 @@ Hello world 标签
 
    </details>
 
-.. _arrow_forward-使用lvgl过程:
+.. _arrow_forward-使用 lvgl 过程:
 
 ▶️ 使用 LVGL 过程
 ---------------
 
 此列表将指导您逐步开始使用 LVGL。
 
-**熟悉LVGL**
+**熟悉 LVGL**
 
-1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解 LVGL 的实际操作（3分钟）
-2. 阅读\ `文档 <https://docs.lvgl.io/master/intro/index.html>`__\ 的简介页（5分钟）
+1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解 LVGL 的实际操作（ 3 分钟）
+2. 阅读\ `文档 <https://docs.lvgl.io/master/intro/index.html>`__\ 的简介页（ 5 分钟）
 3. 熟悉\ `快速概览 <https://docs.lvgl.io/master/get-started/quick-overview.html>`__
-   页面上的基本知识（15分钟）
+   页面上的基本知识（ 15 分钟）
 
-**开始使用LVGL**
+**开始使用 LVGL**
 
 4. 设置\ `模拟器 <https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator>`__
-   (10 minutes)（10分钟）
+   (10 minutes)（ 10 分钟）
 5. 尝试一些\ `示例 <https://github.com/lvgl/lvgl/tree/master/examples>`__
 6. 将LVGL端口连接到线路板。请参阅\ `移植 <https://docs.lvgl.io/master/porting/index.html>`__\ 指南，或查看现成的\ `项目 <https://github.com/lvgl?q=lv_port_>`__
 
 **成为专业人士**
 
-7. 阅读\ `概述 <https://docs.lvgl.io/master/overview/index.html>`__\ 页面以更好地了解图书馆（2-3小时）
+7. 阅读\ `概述 <https://docs.lvgl.io/master/overview/index.html>`__\ 页面以更好地了解图书馆（ 2-3 小时）
 8. 查看\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__\ 的文档以查看其功能和用法
 
 **获得帮助并帮助他人**
 
 9.  如果您有问题，请访问\ `论坛 <http://forum.lvgl.io/>`__
-10. 阅读\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 指南，了解如何帮助提高 LVGL（15分钟）
+10. 阅读\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 指南，了解如何帮助提高 LVGL（ 15 分钟）
 
 **获取更多**
 
-11. 下载并试用\ `SquareLine Studio <https://squareline.io/>`__.
+11. 下载并试用 \ `SquareLine Studio <https://squareline.io/>`__.
 12. 联系我们获取\ `服务 <https://lvgl.io/services>`__.
 
 .. _handshake-服务:
@@ -583,7 +583,7 @@ LVGL LLC 的成立旨在为 LVGL 库提供坚实的背景，并提供多种类�
 -  **咨询和支持**
    我们也可以通过咨询来支持您，以避免在 UI 开发过程中出现昂贵和耗时的错误。
 -  **板子认证**
-   对于提供开发板或生产套件的公司，我们会进行板子认证，展示板如何运行LVGL。
+   对于提供开发板或生产套件的公司，我们会进行板子认证，展示板如何运行 LVGL 。
 
 查看我们的 \ `Demos <https://lvgl.io/demos>`__\  作为参考。有关更多信息，请查看\ `服务页面 <https://lvgl.io/services>`__\ 。
 
