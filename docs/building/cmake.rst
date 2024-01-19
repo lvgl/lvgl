@@ -14,7 +14,7 @@ Prerequsites
 You need to install
 
 - CMake
-- Ninja (for Linux builds). Be sure to Add ninja to your PATH
+- Ninja (for Linux builds). Be sure to Add ninja to your PATH!
 
 
 How to build this project using cmake
@@ -34,7 +34,7 @@ Build with IDE
 The recommend way for consuming CMakePresets is a CMakePresets aware IDE such as
 
 - VS 2022
-- VS CODE
+- VS Code
 - CLion
 
 Simply load this project into your IDE and select your desired preset and you are good to go.
