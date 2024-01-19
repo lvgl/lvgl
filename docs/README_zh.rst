@@ -72,7 +72,7 @@ SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。�
 
 -  一个完全可移植的 C（C++ 兼容）库，没有外部依赖关系。
 -  可以编译到任何 MCU 或 MPU，使用任何 RTOS 或者操作系统。
--  支持单色、ePaper、OLED 、TFT 显示器或者模拟器。
+-  支持单色、ePaper、OLED、TFT 显示器或者模拟器。
    `移植指南 <https://docs.lvgl.io/master/porting/project.html>`__
 -  该项目使用 MIT 许可证，因此您可以在商业项目中轻松使用它。
 -  仅需 32 KB RAM 和 128 KB Flash，一个帧缓冲区，以及至少 1/10 屏幕大小的渲染缓冲区。
@@ -101,7 +101,7 @@ SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。�
    在 MCU 上的更轻更简单的 Python 版本
 -  未使用自定义生成系统。您可以在构建项目的其他文件时构建 LVGL。
 -  支持开箱即用的 Make 和 \ `CMake <https://docs.lvgl.io/master/get-started/platforms/cmake.html>`__\  编译系统。
--  支持在\ `PC 上开发 <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的UI代码。
+-  支持在\ `PC 上开发 <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的 UI 代码。
 -  支持使用我们的 \ `Emscripten 移植 <https://github.com/lvgl/lv_web_emscripten>`__\  从而将 C 写的 UI 代码转换为 HTML 文件。
 
 **文档、工具和服务**
@@ -171,8 +171,7 @@ LVGL 可用于以下几种：
 
 请参阅创建小部件、使用布局和应用样式的一些示例。您将找到 C 和 MicroPython 代码，以及在在线 MicroPython 编辑器中尝试或编辑示例的链接。
 
-如果要查看更多示例，可查看\ `Examples <https://github.com/lvgl/lvgl/tree/master/examples>`__
-文件夹。
+如果要查看更多示例，可查看 \ `Examples <https://github.com/lvgl/lvgl/tree/master/examples>`__  文件夹。
 
 Hello world 标签
 ~~~~~~~~~~~~~~~~
@@ -542,26 +541,26 @@ Hello world 标签
 
 **熟悉 LVGL**
 
-1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解 LVGL 的实际操作（ 3 分钟 ）
-2. 阅读\ `文档 <https://docs.lvgl.io/master/intro/index.html>`__\ 的简介页（ 5 分钟 ）
+1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解 LVGL 的实际操作（3 分钟）
+2. 阅读\ `文档 <https://docs.lvgl.io/master/intro/index.html>`__\ 的简介页（5 分钟）
 3. 熟悉\ `快速概览 <https://docs.lvgl.io/master/get-started/quick-overview.html>`__
-   页面上的基本知识（ 15 分钟 ）
+   页面上的基本知识（15 分钟）
 
 **开始使用 LVGL**
 
-4. 设置\ `模拟器 <https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator>`__  （ 10 分钟 ）
+4. 设置\ `模拟器 <https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator>`__  （10 分钟）
 5. 尝试一些\ `示例 <https://github.com/lvgl/lvgl/tree/master/examples>`__
 6. 将LVGL端口连接到线路板。请参阅\ `移植 <https://docs.lvgl.io/master/porting/index.html>`__\ 指南，或查看现成的\ `项目 <https://github.com/lvgl?q=lv_port_>`__
 
 **成为专业人士**
 
-7. 阅读\ `概述 <https://docs.lvgl.io/master/overview/index.html>`__\ 页面以更好地了解图书馆（ 2-3 小时 ）
+7. 阅读\ `概述 <https://docs.lvgl.io/master/overview/index.html>`__\ 页面以更好地了解图书馆（2-3 小时）
 8. 查看\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__\ 的文档以查看其功能和用法
 
 **获得帮助并帮助他人**
 
 9.  如果您有问题，请访问\ `论坛 <http://forum.lvgl.io/>`__
-10. 阅读\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 指南，了解如何帮助提高 LVGL（ 15 分钟 ）
+10. 阅读\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 指南，了解如何帮助提高 LVGL（15 分钟）
 
 **获取更多**
 
@@ -578,11 +577,11 @@ LVGL LLC 的成立旨在为 LVGL 库提供坚实的背景，并提供多种类�
 -  **平面设计**
    我们的内部图形设计师是创造美丽现代设计的专家，适合您的产品和硬件资源。
 -  ** UI 实现**
-   我们还可以根据您或我们创建的设计来实现您的 UI 。您可以确信，我们将充分利用您的硬件和 LVGL 。如果 LVGL 中缺少某个功能或小部件，请不要担心，我们会为您实现它。
+   我们还可以根据您或我们创建的设计来实现您的 UI。您可以确信，我们将充分利用您的硬件和 LVGL。如果 LVGL 中缺少某个功能或小部件，请不要担心，我们会为您实现它。
 -  **咨询和支持**
    我们也可以通过咨询来支持您，以避免在 UI 开发过程中出现昂贵和耗时的错误。
 -  **板子认证**
-   对于提供开发板或生产套件的公司，我们会进行板子认证，展示板如何运行 LVGL 。
+   对于提供开发板或生产套件的公司，我们会进行板子认证，展示板如何运行 LVGL。
 
 查看我们的 \ `Demos <https://lvgl.io/demos>`__\  作为参考。有关更多信息，请查看\ `服务页面 <https://lvgl.io/services>`__\ 。
 
