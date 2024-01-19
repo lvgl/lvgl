@@ -99,7 +99,6 @@ typedef struct _lv_global_t {
 
 #if LV_CACHE_DEF_SIZE > 0
     lv_cache_t * img_cache;
-    size_t cache_builtin_max_size;
 #endif
 
     lv_draw_global_info_t draw_info;
