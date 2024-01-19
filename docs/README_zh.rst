@@ -48,20 +48,20 @@
 
 **成熟且知名**\ 
 
-LVGL是最流行的免费开源嵌入式图形库，可以为任何MCU、MPU和显示类型创建漂亮的UI。它得到了行业领先供应商和项目的支持，如Arm、STM32、NXP、Espressif、Nuvoton、Arduino、RT-Thread、Zephyr、NuttX、Adafruit等。
+LVGL 是最流行的免费开源嵌入式图形库，可以为任何 MCU、MPU 和显示类型创建漂亮的 UI。它得到了行业领先供应商和项目的支持，如 Arm、STM32、NXP、Espressif、Nuvoton、Arduino、RT-Thread、Zephyr、NuttX、Adafruit等。
 
 **功能丰富**\ 
 
-它拥有创建现代美观GUI的所有功能：30多个内置控件、强大的样式系统、Web启发的布局管理器和支持多种语言的排版系统。要将LVGL集成到您的平台中，您只需要至少32kB
-RAM和128kB Flash、C编译器、帧缓冲区和至少1/10屏幕大小的渲染缓冲区。
+它拥有创建现代美观GUI的所有功能：30多个内置控件、强大的样式系统、Web 启发的布局管理器和支持多种语言的排版系统。要将 LVGL 集成到您的平台中，您只需要至少32 kB
+RAM 和128 kB Flash、C 编译器、帧缓冲区和至少1/10屏幕大小的渲染缓冲区。
 
 **UI编辑器**\
 
-SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也在Windows、Linux和MacOS上运行，无需注册，免费试用。
+SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。它也在 Windows 、Linux 和 MacOS 上运行，无需注册，免费试用。
 
 **服务**\ 
 
-我们的团队随时准备为您提供图形设计、UI实现和咨询服务。如果您在开发下一个GUI项目时需要一些支持，请与我们联系。
+我们的团队随时准备为您提供图形设计、UI 实现和咨询服务。如果您在开发下一个 GUI 项目时需要一些支持，请与我们联系。
 
 .. _rocket-特性:
 
@@ -70,13 +70,13 @@ SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也
 
 **免费和可移植性**
 
--  一个完全可移植的C（C++兼容）库，没有外部依赖关系。
--  可以编译到任何MCU或MPU，使用任何RTOS或者操作系统。
--  支持单色、ePaper、OLED或TFT显示器，甚至显示器。
+-  一个完全可移植的 C（C++ 兼容）库，没有外部依赖关系。
+-  可以编译到任何 MCU 或 MPU，使用任何 RTOS 或者操作系统。
+-  支持单色、ePaper、OLED 或 TFT 显示器，甚至显示器。
    `移植指南 <https://docs.lvgl.io/master/porting/project.html>`__
--  该项目使用MIT许可证，因此您可以在商业项目中轻松使用它。
--  仅需32kB RAM和128kB Flash，一个帧缓冲区，以及至少1/10屏幕大小的渲染缓冲区。
--  支持使用可选的操作系统、外部存储器和GPU。
+-  该项目使用 MIT 许可证，因此您可以在商业项目中轻松使用它。
+-  仅需32 kB RAM 和128 kB Flash，一个帧缓冲区，以及至少1/10屏幕大小的渲染缓冲区。
+-  支持使用可选的操作系统、外部存储器和 GPU。
 
 **控件、样式、布局等**
 
@@ -84,10 +84,10 @@ SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也
     按钮、标签、滑块、图表、键盘、仪表、弧形、表格等等。
 -  灵活的\ `样式系统 <https://docs.lvgl.io/master/overview/style.html>`__
    支持约100个样式属性，可在任何状态下自定义小控件的任何部分。
--  `Flex布局 <https://docs.lvgl.io/master/layouts/flex.html>`__ 和
-   `Grid布局 <https://docs.lvgl.io/master/layouts/grid.html>`__
+-  `Flex 布局 <https://docs.lvgl.io/master/layouts/flex.html>`__ 和
+   `Grid 布局 <https://docs.lvgl.io/master/layouts/grid.html>`__
    可以响应式自动调整小控件的大小和位置。
--  文本支持UTF-8编码，支持CJK、泰语、印地语、阿拉伯语和波斯语书写系统。
+-  文本支持 UTF-8 编码，支持 CJK、泰语、印地语、阿拉伯语和波斯语书写系统。
 -  支持自动换行、字距调整、文本滚动、亚像素渲染、拼音输入法、文本表情符号。
 -  渲染引擎支持动画、抗锯齿、不透明度、平滑滚动、阴影、图形变换等。
 -  支持鼠标、触摸板、小键盘、键盘、外部按钮、编码器\ `输入设备 <https://docs.lvgl.io/master/porting/indev.html>`__\ 。
@@ -96,32 +96,32 @@ SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也
 **绑定和构建支持**
 
 -  `Microython绑定 <https://blog.lvgl.io/2019-02-20/micropython-bindings>`__
-   公开LVGL API
+   公开 LVGL API
 -  `PikaScript绑定 <https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl>`__
-   在MCU上的更轻更简单的Python版本
--  未使用自定义生成系统。您可以在构建项目的其他文件时构建LVGL。
+   在MCU上的更轻更简单的 Python 版本
+-  未使用自定义生成系统。您可以在构建项目的其他文件时构建 LVGL。
 -  支持开箱即用的Make和\ `CMake <https://docs.lvgl.io/master/get-started/platforms/cmake.html>`__\ 编译系统。
--  支持在\ `PC上开发 <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的UI代码。
--  支持使用我们的\ `Emscripten移植 <https://github.com/lvgl/lv_web_emscripten>`__\ 从而将C写的UI代码转换为HTML文件。
+-  支持在\ `PC 上开发 <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的UI代码。
+-  支持使用我们的\ `Emscripten 移植 <https://github.com/lvgl/lv_web_emscripten>`__\ 从而将 C 写的 UI 代码转换为 HTML 文件。
 
 **文档、工具和服务**
 
 -  包含\ `100多个简单示例 <https://docs.lvgl.io/master/index.html>`__\ 的详细\ `文档 <https://docs.lvgl.io/>`__
 -  `SquareLine Studio <https://squareline.io/>`__ -
-   一款专业且易于使用的UI编辑器软件，可加快和简化UI开发。
+   一款专业且易于使用的UI编辑器软件，可加快和简化 UI 开发。
 -  `服务 <https://lvgl.io/services>`__
-   如用户界面设计、实施和咨询，使UI开发更简单、更快。
+   如用户界面设计、实施和咨询，使 UI 开发更简单、更快。
 
 .. _heart-赞助:
 
 ❤️ 赞助
 -------
 
-如果LVGL为您节省了大量时间和金钱，或者您只是在使用它时玩得很开心，请考虑\ `支持它的开发 <https://github.com/sponsors/lvgl>`__\ 。
+如果 LVGL 为您节省了大量时间和金钱，或者您只是在使用它时玩得很开心，请考虑\ `支持它的开发 <https://github.com/sponsors/lvgl>`__\ 。
 
 **我们为什么要捐款？**\ 
 
-我们的目标是为LVGL做得最多的人提供经济补偿。这意味着不仅维护人员，而且任何实现伟大功能的人都应该从累积的资金中获得报酬。我们用捐款来支付服务器和相关服务等运营成本。
+我们的目标是为 LVGL 做得最多的人提供经济补偿。这意味着不仅维护人员，而且任何实现伟大功能的人都应该从累积的资金中获得报酬。我们用捐款来支付服务器和相关服务等运营成本。
 
 **如何捐赠？**\  
 
@@ -129,9 +129,9 @@ SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也
 
 **如何获得捐款报酬？**\ 
 
-如果有人实施或修复了一个标记为\ `赞助 <https://github.com/lvgl/lvgl/labels/Sponsored>`__\ 的问题，他或她将获得该工作的报酬。我们估计问题所需的时间、复杂性和重要性，并据此设定价格。直接评论一个赞助的问题，说“嗨，我想处理它。这就是我计划修复/实施它的方式…”。当维护人员批准并合并工作时，就认为它已经准备好了。之后，您可以在\ `opencollective.com <https://opencollective.com/lvgl>`__\ 上提交并支付费用，几天后您将收到付款。
+如果有人实施或修复了一个标记为\ `赞助 <https://github.com/lvgl/lvgl/labels/Sponsored>`__\ 的问题，他或她将获得该工作的报酬。我们估计问题所需的时间、复杂性和重要性，并据此设定价格。直接评论一个赞助的问题，说“嗨，我想处理它。这就是我计划修复/实施它的方式…”。当维护人员批准并合并工作时，就认为它已经准备好了。之后，您可以在 \ `opencollective.com <https://opencollective.com/lvgl>`__\  上提交并支付费用，几天后您将收到付款。
 
-**支持LVGL的组织**\ 
+**支持 LVGL 的组织**\ 
 
 |Sponsors of LVGL|
 
@@ -144,7 +144,7 @@ SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也
 📦 支持包
 ---------
 
-LVGL可用于以下几种：
+LVGL 可用于以下几种：
 
 -  `Arduino
    library <https://docs.lvgl.io/master/integration/framework/arduino.html>`__
@@ -169,7 +169,7 @@ LVGL可用于以下几种：
 🤖 示例
 -------
 
-请参阅创建小部件、使用布局和应用样式的一些示例。您将找到C和MicroPython代码，以及在在线MicroPython编辑器中尝试或编辑示例的链接。
+请参阅创建小部件、使用布局和应用样式的一些示例。您将找到 C 和 MicroPython 代码，以及在在线 MicroPython 编辑器中尝试或编辑示例的链接。
 
 如果要查看更多示例，可查看\ `Examples <https://github.com/lvgl/lvgl/tree/master/examples>`__
 文件夹。
@@ -463,7 +463,7 @@ Hello world 标签
    </details>
    <br>
 
-英语、希伯来语（混合LTR-RTL）和中文
+英语、希伯来语（混合 LTR-RTL ）和中文
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: https://github.com/kisvegabor/test/raw/master/readme_example_5.png
@@ -535,14 +535,14 @@ Hello world 标签
 
 .. _arrow_forward-使用lvgl过程:
 
-▶️ 使用LVGL过程
+▶️ 使用 LVGL 过程
 ---------------
 
-此列表将指导您逐步开始使用LVGL。
+此列表将指导您逐步开始使用 LVGL。
 
 **熟悉LVGL**
 
-1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解LVGL的实际操作（3分钟）
+1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解 LVGL 的实际操作（3分钟）
 2. 阅读\ `文档 <https://docs.lvgl.io/master/intro/index.html>`__\ 的简介页（5分钟）
 3. 熟悉\ `快速概览 <https://docs.lvgl.io/master/get-started/quick-overview.html>`__
    页面上的基本知识（15分钟）
@@ -562,7 +562,7 @@ Hello world 标签
 **获得帮助并帮助他人**
 
 9.  如果您有问题，请访问\ `论坛 <http://forum.lvgl.io/>`__
-10. 阅读\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 指南，了解如何帮助提高LVGL（15分钟）
+10. 阅读\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 指南，了解如何帮助提高 LVGL（15分钟）
 
 **获取更多**
 
@@ -574,15 +574,14 @@ Hello world 标签
 🤝 服务
 -------
 
-LVGL
-LLC的成立旨在为LVGL库提供坚实的背景，并提供多种类型的服务来帮助您进行UI开发。凭借在用户界面和图形行业超过15年的经验，我们可以帮助您将UI提升到一个新的水平。
+LVGL LLC 的成立旨在为 LVGL 库提供坚实的背景，并提供多种类型的服务来帮助您进行 UI 开发。凭借在用户界面和图形行业超过15年的经验，我们可以帮助您将 UI 提升到一个新的水平。
 
 -  **平面设计**
    我们的内部图形设计师是创造美丽现代设计的专家，适合您的产品和硬件资源。
--  **UI实现**
-   我们还可以根据您或我们创建的设计来实现您的UI。您可以确信，我们将充分利用您的硬件和LVGL。如果LVGL中缺少某个功能或小部件，请不要担心，我们会为您实现它。
+-  ** UI 实现**
+   我们还可以根据您或我们创建的设计来实现您的 UI 。您可以确信，我们将充分利用您的硬件和 LVGL。如果 LVGL 中缺少某个功能或小部件，请不要担心，我们会为您实现它。
 -  **咨询和支持**
-   我们也可以通过咨询来支持您，以避免在UI开发过程中出现昂贵和耗时的错误。
+   我们也可以通过咨询来支持您，以避免在 UI 开发过程中出现昂贵和耗时的错误。
 -  **板子认证**
    对于提供开发板或生产套件的公司，我们会进行板子认证，展示板如何运行LVGL。
 
@@ -595,11 +594,11 @@ LLC的成立旨在为LVGL库提供坚实的背景，并提供多种类型的服�
 🌟 贡献
 -------
 
-LVGL是一个开放的项目，我们非常欢迎您的贡献。有很多方法可以帮助您，从简单地谈论您的项目，到编写示例、改进文档、修复错误，甚至在LVGL组织下托管您自己的项目。
+LVGL 是一个开放的项目，我们非常欢迎您的贡献。有很多方法可以帮助您，从简单地谈论您的项目，到编写示例、改进文档、修复错误，甚至在 LVGL 组织下托管您自己的项目。
 
 有关贡献的详细说明，请访问文件的\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 部分。
 
-已经有300多人在LVGL留下了痕迹。期待你成为他们中的一员！并在下列贡献者中看到你！ 🙂
+已经有300多人在 LVGL 留下了痕迹。期待你成为他们中的一员！并在下列贡献者中看到你！ 🙂
 
 .. raw:: html
 
