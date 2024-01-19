@@ -316,8 +316,10 @@ void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area
 {
     uint32_t len = lv_array_size(&path->points);
     lv_fpoint_t * p0 = lv_array_at(&path->points, 0);
-    float x1 = p0->x; float x2 = p0->x;
-    float y1 = p0->y; float y2 = p0->y;
+    float x1 = p0->x;
+    float x2 = p0->x;
+    float y1 = p0->y;
+    float y2 = p0->y;
 
     for(uint32_t i = 1; i < len; i++) {
         lv_fpoint_t * p = lv_array_at(&path->points, i);
