@@ -17,8 +17,7 @@
 .. raw:: html
 
    <h1 align="center">
-
-轻量级通用型图形库
+      轻量级通用型图形库
 
 .. raw:: html
 
