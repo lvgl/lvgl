@@ -542,27 +542,26 @@ Hello world 标签
 
 **熟悉 LVGL**
 
-1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解 LVGL 的实际操作（ 3 分钟）
-2. 阅读\ `文档 <https://docs.lvgl.io/master/intro/index.html>`__\ 的简介页（ 5 分钟）
+1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解 LVGL 的实际操作（ 3 分钟 ）
+2. 阅读\ `文档 <https://docs.lvgl.io/master/intro/index.html>`__\ 的简介页（ 5 分钟 ）
 3. 熟悉\ `快速概览 <https://docs.lvgl.io/master/get-started/quick-overview.html>`__
-   页面上的基本知识（ 15 分钟）
+   页面上的基本知识（ 15 分钟 ）
 
 **开始使用 LVGL**
 
-4. 设置\ `模拟器 <https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator>`__
-   (10 minutes)（ 10 分钟）
+4. 设置\ `模拟器 <https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator>`__  （ 10 分钟 ）
 5. 尝试一些\ `示例 <https://github.com/lvgl/lvgl/tree/master/examples>`__
 6. 将LVGL端口连接到线路板。请参阅\ `移植 <https://docs.lvgl.io/master/porting/index.html>`__\ 指南，或查看现成的\ `项目 <https://github.com/lvgl?q=lv_port_>`__
 
 **成为专业人士**
 
-7. 阅读\ `概述 <https://docs.lvgl.io/master/overview/index.html>`__\ 页面以更好地了解图书馆（ 2-3 小时）
+7. 阅读\ `概述 <https://docs.lvgl.io/master/overview/index.html>`__\ 页面以更好地了解图书馆（ 2-3 小时 ）
 8. 查看\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__\ 的文档以查看其功能和用法
 
 **获得帮助并帮助他人**
 
 9.  如果您有问题，请访问\ `论坛 <http://forum.lvgl.io/>`__
-10. 阅读\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 指南，了解如何帮助提高 LVGL（ 15 分钟）
+10. 阅读\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 指南，了解如何帮助提高 LVGL（ 15 分钟 ）
 
 **获取更多**
 
@@ -579,7 +578,7 @@ LVGL LLC 的成立旨在为 LVGL 库提供坚实的背景，并提供多种类�
 -  **平面设计**
    我们的内部图形设计师是创造美丽现代设计的专家，适合您的产品和硬件资源。
 -  ** UI 实现**
-   我们还可以根据您或我们创建的设计来实现您的 UI 。您可以确信，我们将充分利用您的硬件和 LVGL。如果 LVGL 中缺少某个功能或小部件，请不要担心，我们会为您实现它。
+   我们还可以根据您或我们创建的设计来实现您的 UI 。您可以确信，我们将充分利用您的硬件和 LVGL 。如果 LVGL 中缺少某个功能或小部件，请不要担心，我们会为您实现它。
 -  **咨询和支持**
    我们也可以通过咨询来支持您，以避免在 UI 开发过程中出现昂贵和耗时的错误。
 -  **板子认证**
