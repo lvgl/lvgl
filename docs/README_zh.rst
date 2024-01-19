@@ -99,7 +99,7 @@ SquareLine Studio是一款专业但价格合理的LVGL拖放UI编辑器。它也
 -  `Microython绑定 <https://blog.lvgl.io/2019-02-20/micropython-bindings>`__
    公开LVGL API
 -  `PikaScript绑定 <https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl>`__
-   python在MCU上更轻更容易。
+   在MCU上的更轻更简单的Python版本
 -  未使用自定义生成系统。您可以在构建项目的其他文件时构建LVGL。
 -  对Make和\ `CMake <https://docs.lvgl.io/master/get-started/platforms/cmake.html>`__\ 的支持是开箱即用的。
 -  在\ `PC上开发 <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__\ ，并在嵌入式硬件上使用相同的UI代码。
