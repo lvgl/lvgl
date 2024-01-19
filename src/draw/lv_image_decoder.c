@@ -117,14 +117,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     dsc->src_type = src_type;
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        size_t fn_len = lv_strlen(src);
-        dsc->src = lv_malloc(fn_len + 1);
-        LV_ASSERT_MALLOC(dsc->src);
-        if(dsc->src == NULL) {
-            LV_LOG_WARN("Out of memory");
-            return LV_RESULT_INVALID;
-        }
-        lv_strcpy((char *)dsc->src, src);
+        dsc->src = lv_strdup(src);
     }
     else {
         dsc->src = src;
