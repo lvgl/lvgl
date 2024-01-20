@@ -2,15 +2,7 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "_base", 
-      "hidden" : true,
-      "cacheVariables": {
-        "USE_STANDALONE_BUILD" : "ON"
-      }
-    },
-    {
       "name": "windows-base",
-      "inherits": "_base",
       "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "installDir": "${sourceDir}/build/install/${presetName}",
@@ -32,9 +24,8 @@
     },
     {
       "name": "linux-base",
-      "inherits": "_base",
       "displayName": "Linux",
-      "description": "Hiermit wird das Windows-Subsystem für Linux (WSL) oder ein Linux-Remotesystem als Ziel verwendet.",
+      "description": "Setup WSL or native linux",
       "generator": "Ninja Multi-Config",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "installDir": "${sourceDir}/build/${presetName}",
@@ -93,28 +84,24 @@
     {
       "name": "windows-base_dbg",
       "displayName": "Debug",
-      "description": "Beschreibung der benutzerdefinierten Testvoreinstellung",
       "configurePreset": "windows-base",
       "configuration": "Debug"
     },
     {
       "name": "windows-base_rel",
       "displayName": "Release",
-      "description": "Beschreibung der benutzerdefinierten Testvoreinstellung",
       "configurePreset": "windows-base",
       "configuration": "Release"
     },
     {
       "name": "linux-base_dbg",
       "displayName": "Debug",
-      "description": "Beschreibung der benutzerdefinierten Testvoreinstellung",
       "configurePreset": "linux-base",
       "configuration": "Debug"
     },
     {
       "name": "linux-base_rel",
       "displayName": "Release",
-      "description": "Beschreibung der benutzerdefinierten Testvoreinstellung",
       "configurePreset": "linux-base",
       "configuration": "Release"
     }
