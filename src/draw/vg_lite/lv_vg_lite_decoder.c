@@ -374,7 +374,6 @@ failed:
  */
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-    LV_UNUSED(args); /*Unused*/
 
     lv_result_t res = LV_RESULT_INVALID;
 
