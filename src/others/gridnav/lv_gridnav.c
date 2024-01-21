@@ -85,9 +85,11 @@ void lv_gridnav_remove(lv_obj_t * obj)
     }
 
     if(event_dsc) {
-        lv_free(lv_event_dsc_get_user_data(event_dsc));
-        lv_obj_remove_event(obj, i);
-
+        if(lv_event_dsc_get_cb(event_dsc) == gridnav_event_cb) {
+            lv_free(lv_event_dsc_get_user_data(event_dsc));
+            lv_obj_remove_event(obj, i);
+            
+        }
     }
 }
 
