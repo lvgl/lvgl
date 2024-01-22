@@ -97,10 +97,7 @@ void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_ds
                                                         y - buf_area->y1);
 
         if(res == LV_DRAW_SW_MASK_RES_TRANSP) {
-            uint32_t i;
-            for(i = 0; i < area_w; i++) {
-                c32_buf[i].alpha = 0x00;
-            }
+            lv_memzero(c32_buf, area_w * sizeof(lv_color32_t));
         }
         else {
             uint32_t i;

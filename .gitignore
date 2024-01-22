@@ -28,3 +28,4 @@ tests/report/
 .vscode
 .idea
 *.bak
+tests/test_images/

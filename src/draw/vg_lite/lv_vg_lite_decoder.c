@@ -37,8 +37,7 @@ typedef struct {
  **********************/
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_data);
 static void image_try_self_pre_mul(lv_image_decoder_dsc_t * dsc);
@@ -367,10 +366,14 @@ failed:
     return LV_RESULT_INVALID;
 }
 
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args)
+/**
+ * Decode an image using the vg_lite gpu.
+ * @param decoder pointer to the decoder
+ * @param dsc     pointer to the decoder descriptor
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
+ */
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-    LV_UNUSED(args); /*Unused*/
 
     lv_result_t res = LV_RESULT_INVALID;
 

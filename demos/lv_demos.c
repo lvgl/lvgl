@@ -6,13 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifdef _MSC_VER
-    #include <io.h>
-#endif
-
 #include "lv_demos.h"
 
 /*********************
@@ -105,7 +98,7 @@ bool lv_demos_create(char * info[], int size)
     else if(entry_info == NULL && info) {
         const char * name = info[0];
         for(int i = 0; i < demos_count; i++) {
-            if(strcmp(name, demos_entry_info[i].name) == 0) {
+            if(lv_strcmp(name, demos_entry_info[i].name) == 0) {
                 entry_info = &demos_entry_info[i];
             }
         }

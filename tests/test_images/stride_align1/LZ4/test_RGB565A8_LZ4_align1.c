@@ -153,6 +153,7 @@ uint8_t test_RGB565A8_LZ4_align1_map[] = {
 };
 
 const lv_img_dsc_t test_RGB565A8_LZ4_align1 = {
+  .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_RGB565A8,
   .header.flags = 0 | LV_IMAGE_FLAGS_COMPRESSED,
   .header.w = 71,

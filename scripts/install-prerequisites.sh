@@ -6,4 +6,5 @@
 #
 # Note: This script is run by the CI workflows.
 sudo apt update
-sudo apt install gcc python3 libpng-dev ruby-full gcovr cmake libjpeg-turbo8-dev libfreetype6-dev
+sudo apt install gcc python3 libpng-dev ruby-full gcovr cmake libjpeg-turbo8-dev libfreetype6-dev pngquant
+pip3 install pypng lz4
