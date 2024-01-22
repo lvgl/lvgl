@@ -6,7 +6,7 @@ Arm-2D is not a GPU but **an abstraction layer for 2D GPUs dedicated to
 Microcontrollers**. It supports all Cortex-M processors ranging from
 Cortex-M0 to the latest Cortex-M85.
 
-Arm-2D accelerates LVGL9 with too modes: **Synchronous Mode** and
+Arm-2D accelerates LVGL9 with two modes: **Synchronous Mode** and
 **Asynchronous Mode**. 
 - When **Helium** and **ACI (Arm Custom Instruction)** are available, it is recommend
   to use **Synchronous Mode** to accelerate LVGL. 
