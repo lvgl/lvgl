@@ -771,6 +771,16 @@
     #endif
 #endif
 
+/*Default number of image header cache entries. The cache is used to store the headers of images
+ *The main logic is like `LV_CACHE_DEF_SIZE` but for image headers.*/
+#ifndef LV_IMAGE_HEADER_CACHE_DEF_CNT
+    #ifdef CONFIG_LV_IMAGE_HEADER_CACHE_DEF_CNT
+        #define LV_IMAGE_HEADER_CACHE_DEF_CNT CONFIG_LV_IMAGE_HEADER_CACHE_DEF_CNT
+    #else
+        #define LV_IMAGE_HEADER_CACHE_DEF_CNT 0
+    #endif
+#endif
+
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
 #ifndef LV_GRADIENT_MAX_STOPS
@@ -2365,8 +2375,15 @@
         #define LV_USE_SYSMON   0
     #endif
 #endif
-
 #if LV_USE_SYSMON
+    /*Get the idle percentage. E.g. uint32_t my_get_idle(void);*/
+    #ifndef LV_SYSMON_GET_IDLE
+        #ifdef CONFIG_LV_SYSMON_GET_IDLE
+            #define LV_SYSMON_GET_IDLE CONFIG_LV_SYSMON_GET_IDLE
+        #else
+            #define LV_SYSMON_GET_IDLE lv_timer_get_idle
+        #endif
+    #endif
 
     /*1: Show CPU usage and FPS count
      * Requires `LV_USE_SYSMON = 1`*/

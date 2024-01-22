@@ -269,6 +269,18 @@ menu "LVGL configuration"
 					save the continuous open/decode of images.
 					However the opened images might consume additional RAM.
 
+			config LV_IMAGE_HEADER_CACHE_DEF_CNT
+				int "Default image header cache count. 0 to disable caching."
+				default 0
+				depends on LV_USE_DRAW_SW
+				help
+					If only the built-in image formats are used there is no real advantage of caching.
+					(I.e. no new image decoder is added).
+
+					With complex image decoders (e.g. PNG or JPG) caching can
+					save the continuous getting header information of images.
+					However the records of opened images headers might consume additional RAM.
+
 			config LV_GRADIENT_MAX_STOPS
 				int "Number of stops allowed per gradient."
 				default 2

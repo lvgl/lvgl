@@ -224,7 +224,7 @@ void lv_timer_enable(bool en);
  * Get idle percentage
  * @return the lv_timer idle in percentage
  */
-uint8_t lv_timer_get_idle(void);
+uint32_t lv_timer_get_idle(void);
 
 /**
  * Get the time remaining until the next timer will run
