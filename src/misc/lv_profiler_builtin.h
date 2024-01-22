@@ -62,6 +62,7 @@ typedef struct {
     uint32_t item_num;                     /**< Number of profiler items in the array */
     uint32_t cur_index;                    /**< Index of the current profiler item */
     lv_profiler_builtin_config_t config;   /**< Configuration for the built-in profiler */
+    bool enable;                           /**< Whether the built-in profiler is enabled */
 } lv_profiler_builtin_ctx_t;
 
 /**********************
@@ -84,6 +85,12 @@ void lv_profiler_builtin_init(const lv_profiler_builtin_config_t * config);
  * @brief Uninitialize the built-in profiler
  */
 void lv_profiler_builtin_uninit(void);
+
+/**
+ * @brief Enable or disable the built-in profiler
+ * @param enable true to enable the built-in profiler, false to disable
+ */
+void lv_profiler_builtin_set_enable(bool enable);
 
 /**
  * @brief Flush the profiling data to the console
