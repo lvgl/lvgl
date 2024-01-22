@@ -113,7 +113,7 @@ This list summarizes the effect of RTL base direction on objects:
 - `lv_btnmatrix`: Shows buttons from right to left
 - `lv_list`: Shows icons on the right
 - `lv_dropdown`: Aligns options to the right
-- `lv_bar`: Shows progres from right to left
+- `lv_bar`: Shows progress from right to left
 - The texts in `lv_table`, `lv_btnmatrix`, `lv_keyboard`, `lv_tabview`, `lv_dropdown`, `lv_roller` are "BiDi processed" to be displayed correctly
 
 ### Arabic and Persian support
