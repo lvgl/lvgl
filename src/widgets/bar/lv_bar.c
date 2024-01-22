@@ -469,7 +469,7 @@ static void draw_indic(lv_event_t * e)
      *
      */
 
-    bool mask_needed = true;
+    bool mask_needed = false;
     if(hor && draw_rect_dsc.bg_grad.dir == LV_GRAD_DIR_HOR) mask_needed = true;
     else if(!hor && draw_rect_dsc.bg_grad.dir == LV_GRAD_DIR_VER) mask_needed = true;
 
