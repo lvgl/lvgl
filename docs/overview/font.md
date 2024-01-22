@@ -99,11 +99,12 @@ This means it's enough to set the base direction of a screen and every object wi
 
 The default base direction for screens can be set by `LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other objects inherit the base direction from their parent.
 
-To set an object's base direction use `lv_obj_set_base_dir(obj, base_dir)`.  The possible base directions are:
-- `LV_BIDI_DIR_LTR`: Left to Right base direction
-- `LV_BIDI_DIR_RTL`: Right to Left base direction
-- `LV_BIDI_DIR_AUTO`: Auto detect base direction
-- `LV_BIDI_DIR_INHERIT`: Inherit base direction from the parent (or a default value for non-screen objects)
+To set an object's base direction use `lv_obj_set_style_base_dir(obj, base_dir,selector)`.  The possible base directions are:
+- `LV_BASE_DIR_LTR`: Left to Right base direction
+- `LV_BASE_DIR_RTL`: Right to Left base direction
+- `LV_BASE_DIR_AUTO`: Auto detect base direction
+- `LV_BASE_DIR_NEUTRAL`
+- `LV_BASE_DIR_WEAK`
 
 This list summarizes the effect of RTL base direction on objects:
 - Create objects by default on the right
@@ -112,6 +113,7 @@ This list summarizes the effect of RTL base direction on objects:
 - `lv_btnmatrix`: Shows buttons from right to left
 - `lv_list`: Shows icons on the right
 - `lv_dropdown`: Aligns options to the right
+- `lv_bar`: Shows progress from right to left
 - The texts in `lv_table`, `lv_btnmatrix`, `lv_keyboard`, `lv_tabview`, `lv_dropdown`, `lv_roller` are "BiDi processed" to be displayed correctly
 
 ### Arabic and Persian support
