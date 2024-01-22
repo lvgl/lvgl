@@ -258,7 +258,7 @@ void _lv_timer_core_deinit(void)
     _lv_ll_clear(timer_ll_p);
 }
 
-uint8_t lv_timer_get_idle(void)
+uint32_t lv_timer_get_idle(void)
 {
     return state.idle_last;
 }

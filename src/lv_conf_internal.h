@@ -2375,8 +2375,15 @@
         #define LV_USE_SYSMON   0
     #endif
 #endif
-
 #if LV_USE_SYSMON
+    /*Get the idle percentage. E.g. uint32_t my_get_idle(void);*/
+    #ifndef LV_SYSMON_GET_IDLE
+        #ifdef CONFIG_LV_SYSMON_GET_IDLE
+            #define LV_SYSMON_GET_IDLE CONFIG_LV_SYSMON_GET_IDLE
+        #else
+            #define LV_SYSMON_GET_IDLE lv_timer_get_idle
+        #endif
+    #endif
 
     /*1: Show CPU usage and FPS count
      * Requires `LV_USE_SYSMON = 1`*/
