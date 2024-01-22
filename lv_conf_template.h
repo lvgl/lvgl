@@ -608,7 +608,7 @@
 /*API for CreateFile, ReadFile, etc*/
 #define LV_USE_FS_WIN32   _MSC_VER ? 1 : 0 
 #if LV_USE_FS_WIN32
-    #define LV_FS_WIN32_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_WIN32_LETTER 'A'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
     #define LV_FS_WIN32_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
     #define LV_FS_WIN32_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
