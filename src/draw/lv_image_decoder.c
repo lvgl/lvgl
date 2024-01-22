@@ -352,7 +352,7 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         entry = lv_cache_add(img_header_cache_p, &search_key, NULL);
 
         if(entry == NULL) {
-            if(src_type == LV_IMAGE_SRC_FILE) lv_free((void *)src);
+            if(src_type == LV_IMAGE_SRC_FILE) lv_free((void *)search_key.src);
             return NULL;
         }
 
