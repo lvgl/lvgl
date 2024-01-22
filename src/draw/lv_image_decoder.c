@@ -29,6 +29,14 @@
 
 static uint32_t img_width_to_stride(lv_image_header_t * header);
 
+/**
+ * Get the header info of an image source, and return the a pointer to the decoder that can open it.
+ * @param src       The image source (e.g. a filename or a pointer to a C array)
+ * @param header    The header of the image
+ * @return The decoder that can open the image source or NULL if not found (or can't open it).
+ */
+static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_header_t * header);
+
 #if LV_CACHE_DEF_SIZE > 0
 static lv_cache_compare_res_t image_decoder_cache_compare_cb(const lv_image_cache_data_t * lhs,
                                                              const lv_image_cache_data_t * rhs);
@@ -78,29 +86,10 @@ void _lv_image_decoder_deinit(void)
 
 lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
 {
-    lv_memzero(header, sizeof(lv_image_header_t));
+    lv_image_decoder_t * decoder = image_decoder_get_info(src, header);
+    if(decoder == NULL) return LV_RESULT_INVALID;
 
-    if(src == NULL) return LV_RESULT_INVALID;
-
-    lv_image_src_t src_type = lv_image_src_get_type(src);
-    if(src_type == LV_IMAGE_SRC_VARIABLE) {
-        const lv_image_dsc_t * img_dsc = src;
-        if(img_dsc->data == NULL) return LV_RESULT_INVALID;
-    }
-
-    lv_result_t res = LV_RESULT_INVALID;
-    lv_image_decoder_t * decoder;
-    _LV_LL_READ(img_decoder_ll_p, decoder) {
-        if(decoder->info_cb) {
-            res = decoder->info_cb(decoder, src, header);
-            if(res == LV_RESULT_OK) {
-                if(header->stride == 0) header->stride = img_width_to_stride(header);
-                break;
-            }
-        }
-    }
-
-    return res;
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args)
@@ -108,70 +97,38 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     lv_memzero(dsc, sizeof(lv_image_decoder_dsc_t));
 
     if(src == NULL) return LV_RESULT_INVALID;
-    lv_image_src_t src_type = lv_image_src_get_type(src);
-    if(src_type == LV_IMAGE_SRC_VARIABLE) {
-        const lv_image_dsc_t * img_dsc = src;
-        if(img_dsc->data == NULL) return LV_RESULT_INVALID;
-    }
+    dsc->src = src;
+    dsc->src_type = lv_image_src_get_type(src);
 
-    dsc->src_type = src_type;
+#if LV_CACHE_DEF_SIZE > 0
+    dsc->cache = img_cache_p;
+    /*
+     * Check the cache first
+     * If the image is found in the cache, just return it.*/
+    if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
+#endif
 
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        dsc->src = lv_strdup(src);
-    }
-    else {
-        dsc->src = src;
-    }
+    /*Find the decoder that can open the image source, and get the header info in the same time.*/
+    dsc->decoder = image_decoder_get_info(src, &dsc->header);
+    if(dsc->decoder == NULL) return LV_RESULT_INVALID;
 
-    lv_result_t res = LV_RESULT_INVALID;
+    /*Duplicate the source if it's a file*/
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) dsc->src = lv_strdup(dsc->src);
 
-    lv_image_decoder_t * decoder;
-
-    static const lv_image_decoder_args_t def_args = {
+    /*Make a copy of args*/
+    dsc->args = args ? *args : (lv_image_decoder_args_t) {
         .stride_align = LV_DRAW_BUF_STRIDE_ALIGN != 1,
         .premultiply = false,
         .no_cache = false,
         .use_indexed = false,
     };
 
-    /*Make a copy of args */
-    dsc->args = args ? *args : def_args;
-
-    _LV_LL_READ(img_decoder_ll_p, decoder) {
-        /*Info and Open callbacks are required*/
-        if(decoder->info_cb == NULL || decoder->open_cb == NULL) continue;
-
-        res = decoder->info_cb(decoder, src, &dsc->header);
-        if(res != LV_RESULT_OK) continue;
-
-        if(dsc->header.stride == 0) dsc->header.stride = img_width_to_stride(&dsc->header);
-
-        dsc->decoder = decoder;
-
-#if LV_CACHE_DEF_SIZE > 0
-        dsc->cache = img_cache_p;
-
-        /*Check the cache first*/
-        if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
-#endif
-
-        res = decoder->open_cb(decoder, dsc);
-
-        /*Opened successfully. It is a good decoder for this image source*/
-        if(res == LV_RESULT_OK) return res;
-
-        /*Prepare for the next loop*/
-        lv_memzero(&dsc->header, sizeof(lv_image_header_t));
-
-        dsc->error_msg = NULL;
-        dsc->decoded  = NULL;
-        dsc->cache_entry = NULL;
-        dsc->user_data = NULL;
-        dsc->time_to_open = 0;
-    }
-
-    if(dsc->src_type == LV_IMAGE_SRC_FILE)
-        lv_free((void *)dsc->src);
+    /*
+     * We assume that if a decoder can get the info, it can open the image.
+     * If decoder open failed, free the source and return error.
+     * If decoder open succeed, add the image to cache if enabled.
+     * */
+    lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
 
     return res;
 }
@@ -319,6 +276,36 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
     }
 
     return decoded;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_header_t * header)
+{
+    lv_memzero(header, sizeof(lv_image_header_t));
+
+    if(src == NULL) return NULL;
+
+    lv_image_src_t src_type = lv_image_src_get_type(src);
+    if(src_type == LV_IMAGE_SRC_VARIABLE) {
+        const lv_image_dsc_t * img_dsc = src;
+        if(img_dsc->data == NULL) return NULL;
+    }
+
+    lv_image_decoder_t * decoder;
+    _LV_LL_READ(img_decoder_ll_p, decoder) {
+        /*Info and Open callbacks are required*/
+        if(decoder->info_cb && decoder->open_cb) {
+            lv_result_t res = decoder->info_cb(decoder, src, header);
+            if(res == LV_RESULT_OK) {
+                if(header->stride == 0) header->stride = img_width_to_stride(header);
+                return decoder;
+            }
+        }
+    }
+    return NULL;
 }
 
 static uint32_t img_width_to_stride(lv_image_header_t * header)
