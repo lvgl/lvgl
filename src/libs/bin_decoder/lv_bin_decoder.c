@@ -167,15 +167,11 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_OK;
 }
 
-/**
- * Decode an image from a binary file
- * @param decoder pointer to the decoder
- * @param dsc     pointer to the decoder descriptor
- * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
- */
-lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args)
 {
     LV_UNUSED(decoder);
+    LV_UNUSED(args);
 
     lv_fs_res_t res = LV_RESULT_INVALID;
     bool use_directly = false; /*If the image is already decoded and can be used directly*/

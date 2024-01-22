@@ -305,7 +305,7 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     }
 
     const uint8_t * src_buf = decoder_dsc.decoded->data;
-    const lv_image_header_t * header = &decoder_dsc.decoded->header;
+    const lv_image_header_t * header = &decoder_dsc.header;
     lv_color_format_t cf = header->cf;
 
     if(cf != LV_COLOR_FORMAT_ARGB8888) {

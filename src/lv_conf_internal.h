@@ -771,16 +771,6 @@
     #endif
 #endif
 
-/*Default number of image header cache entries. The cache is used to store the headers of images
- *The main logic is like `LV_CACHE_DEF_SIZE` but for image headers.*/
-#ifndef LV_IMAGE_HEADER_CACHE_DEF_CNT
-    #ifdef CONFIG_LV_IMAGE_HEADER_CACHE_DEF_CNT
-        #define LV_IMAGE_HEADER_CACHE_DEF_CNT CONFIG_LV_IMAGE_HEADER_CACHE_DEF_CNT
-    #else
-        #define LV_IMAGE_HEADER_CACHE_DEF_CNT 0
-    #endif
-#endif
-
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
 #ifndef LV_GRADIENT_MAX_STOPS

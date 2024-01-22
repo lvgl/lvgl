@@ -126,9 +126,9 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         lv_image_decoder_open(&decoder_dsc, dsc->img_src, NULL);
         img_area.x1 = 0;
         img_area.y1 = 0;
-        img_area.x2 = decoder_dsc.decoded->header.w - 1;
-        img_area.y2 = decoder_dsc.decoded->header.h - 1;
-        int32_t ofs = decoder_dsc.decoded->header.w / 2;
+        img_area.x2 = decoder_dsc.header.w - 1;
+        img_area.y2 = decoder_dsc.header.h - 1;
+        int32_t ofs = decoder_dsc.header.w / 2;
         lv_area_move(&img_area, dsc->center.x - ofs, dsc->center.y - ofs);
         blend_dsc.src_area = &img_area;
         blend_dsc.src_buf = decoder_dsc.decoded->data;
