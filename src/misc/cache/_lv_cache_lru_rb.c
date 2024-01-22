@@ -377,7 +377,7 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
             lru->cache.ops.free_cb(search_key, user_data);
         }
         else {
-            LV_LOG_WARN("entry (%p) is still referenced (%" LV_PRId32 ")", entry, lv_cache_entry_get_ref(entry));
+            LV_LOG_WARN("entry (%p) is still referenced (%" LV_PRId32 ")", (void *)entry, lv_cache_entry_get_ref(entry));
             used_cnt++;
         }
     }
