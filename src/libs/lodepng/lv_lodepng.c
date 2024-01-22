@@ -25,7 +25,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt);
 static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size);
@@ -149,9 +150,11 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
  * @param dsc       decoded image descriptor
  * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
  */
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args)
 {
     LV_UNUSED(decoder);
+    LV_UNUSED(args);
 
     const uint8_t * png_data = NULL;
     size_t png_data_size = 0;

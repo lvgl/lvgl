@@ -67,7 +67,8 @@ struct lv_image_pixel_color_s {
  **********************/
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
@@ -269,15 +270,11 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_INVALID;
 }
 
-/**
- * Decode an image using ffmpeg library
- * @param decoder pointer to the decoder
- * @param dsc     pointer to the decoder descriptor
- * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
- */
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                const lv_image_decoder_args_t * args)
 {
     LV_UNUSED(decoder);
+    LV_UNUSED(args);
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * path = dsc->src;
