@@ -155,7 +155,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
 #endif
 
-        res = decoder->open_cb(decoder, dsc, args);
+        res = decoder->open_cb(decoder, dsc);
 
         /*Opened successfully. It is a good decoder for this image source*/
         if(res == LV_RESULT_OK) return res;
