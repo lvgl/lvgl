@@ -129,6 +129,24 @@ install(
   PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
 
 
+# Install library thorvg
+if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+  set_target_properties(
+    lvgl_thorvg
+    PROPERTIES OUTPUT_NAME lvgl_thorvg
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+  
+  install(
+    TARGETS lvgl_thorvg
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif()
+
 # Install library demos
 if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
   set_target_properties(
