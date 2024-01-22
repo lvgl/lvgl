@@ -144,15 +144,18 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
             break;
     }
 }
+uint32_t lv_os_get_idle_percent(void);
 
 static void perf_update_timer_cb(lv_timer_t * t)
 {
+    uint32_t LV_SYSMON_GET_IDLE(void);
+
     lv_sysmon_perf_info_t * info = lv_timer_get_user_data(t);
     info->calculated.run_cnt++;
 
     info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt /
                                                                info->measured.refr_interval_sum) : 0;
-    info->calculated.cpu = 100 - lv_timer_get_idle();
+    info->calculated.cpu = 100 - LV_SYSMON_GET_IDLE();
     info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :
                                      0;
     info->calculated.flush_avg_time = info->measured.flush_cnt ? (info->measured.flush_elaps_sum / info->measured.flush_cnt)

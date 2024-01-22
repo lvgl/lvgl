@@ -487,13 +487,9 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
             //lv_draw_dave2d_box_shadow(u, t->draw_dsc, &t->area);
             break;
-#if 0
-        case LV_DRAW_TASK_TYPE_BG_IMG:
-            //lv_draw_dave2d_bg_image(u, t->draw_dsc, &t->area);
-            break;
-#endif
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_dave2d_label(u, t->draw_dsc, &t->area);
+            /*based on lv_demo_benchmark SW render is faster*/
+            //lv_draw_dave2d_label(u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
             lv_draw_dave2d_image(u, t->draw_dsc, &t->area);
