@@ -350,7 +350,7 @@
 /*Prefix all global extern data with this*/
 #ifndef LV_ATTRIBUTE_EXTERN_DATA
   #define LV_ATTRIBUTE_EXTERN_DATA
-#endif // !LV_ATTRIBUTE_EXTERN_DATA
+#endif /*LV_ATTRIBUTE_EXTERN_DATA*/
 
 
 /* Use `float` as `lv_value_precise_t` */
