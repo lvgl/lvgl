@@ -171,14 +171,14 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         if(dsc->rounded) {
             if(blend_area.y1 >= round_area_1.y1 && blend_area.y1 <= round_area_1.y2) {
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
-                    lv_memset(mask_buf, 0x00, blend_w);
+                    lv_memzero(mask_buf, blend_w);
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 add_circle(circle_mask, &blend_area, &round_area_1, mask_buf, width);
             }
             if(blend_area.y1 >= round_area_2.y1 && blend_area.y1 <= round_area_2.y2) {
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
-                    lv_memset(mask_buf, 0x00, blend_w);
+                    lv_memzero(mask_buf, blend_w);
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 add_circle(circle_mask, &blend_area, &round_area_2, mask_buf, width);
