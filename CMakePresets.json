@@ -2,15 +2,22 @@
   "version": 3,
   "configurePresets": [
     {
+      "name": "_base",
+      "hidden": true,
+      "cacheVariables": {
+        "LV_CONF_PATH": "${sourceDir}/lv_conf_template.h"
+      }
+    },
+    {
       "name": "windows-base",
+      "inherits": "_base",
       "generator": "Visual Studio 17 2022",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "installDir": "${sourceDir}/build/install/${presetName}",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl.exe",
         "CMAKE_CXX_COMPILER": "cl.exe",
-        "BUILD_SHARED_LIBS": "ON",
-        "LV_CONF_PATH": "${sourceDir}/examples/config/lv_conf_win.h"
+        "BUILD_SHARED_LIBS": "ON"
       },
       "condition": {
         "type": "equals",
@@ -24,6 +31,7 @@
     },
     {
       "name": "linux-base",
+      "inherits": "_base",
       "displayName": "Linux",
       "description": "Setup WSL or native linux",
       "generator": "Ninja Multi-Config",
@@ -40,8 +48,7 @@
         }
       },
       "cacheVariables": {
-        "BUILD_SHARED_LIBS": "ON",
-        "LV_CONF_PATH": "${sourceDir}/examples/config/lv_conf_linux.h"
+        "BUILD_SHARED_LIBS": "ON"
       }
     }
   ],

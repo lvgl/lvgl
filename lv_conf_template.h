@@ -12,7 +12,7 @@
  */
 
 /* clang-format off */
-#if 0 /*Set it to "1" to enable content*/
+#if 1 /*Set it to "1" to enable content*/
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
@@ -603,7 +603,7 @@
 #endif
 
 /*API for CreateFile, ReadFile, etc*/
-#define LV_USE_FS_WIN32 0
+#define LV_USE_FS_WIN32   _MSC_VER ? 1 : 0 
 #if LV_USE_FS_WIN32
     #define LV_FS_WIN32_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
     #define LV_FS_WIN32_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
@@ -887,7 +887,7 @@
 #define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
 
 /* LVGL Windows backend */
-#define LV_USE_WINDOWS    0
+#define LV_USE_WINDOWS  _MSC_VER ? 1 : 0  
 
 /*==================
 * EXAMPLES
