@@ -36,8 +36,8 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-01-15" version="9.0.0-rc" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-rc.pack">
-      - LVGL 9.0.0-rc
+    <release date="2024-01-22" version="9.0.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
+      - LVGL 9.0.0
       - Implements a New Render Architecture that enables parallel processing
       - Accelerates SW-Render with NEON and Helium technology for Cortex architectures. 
       - Adds supports for GPUs: VG-Lite, PXP, Dave2D and etc.
@@ -407,26 +407,27 @@
                 <file category="sourceC"            name="src/core/lv_refr.c" />
                 
                 
-                <!-- src/dev -->
-                <file category="sourceC"            name="src/dev/evdev/lv_evdev.c" />
+                <!-- src/drivers -->
+                <file category="sourceC"            name="src/drivers/evdev/lv_evdev.c" />
                 
-                <file category="sourceC"            name="src/dev/display/lcd/lv_lcd_generic_mipi.c" />
+                <file category="sourceC"            name="src/drivers/display/lcd/lv_lcd_generic_mipi.c" />
                 
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_entry.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_fbdev.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_lcd.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_libuv.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_touchscreen.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_entry.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_cache.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_fbdev.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_lcd.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_libuv.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_touchscreen.c" />
                 
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_keyboard.c" />
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_mouse.c" />
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_mousewheel.c" />
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_window.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_keyboard.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_mouse.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_mousewheel.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_window.c" />
                 
-                <file category="sourceC"            name="src/dev/x11/lv_x11_display.c" />
-                <file category="sourceC"            name="src/dev/x11/lv_x11_input.c" />
+                <file category="sourceC"            name="src/drivers/x11/lv_x11_display.c" />
+                <file category="sourceC"            name="src/drivers/x11/lv_x11_input.c" />
 
-                <!-- src/dev -->
+                <!-- src/drivers -->
                 <file category="sourceC"            name="src/display/lv_display.c" />
                 
 
@@ -650,9 +651,9 @@
             <component Cgroup="Display" Cvariant="Windows Backend" condition="LVGL-Essential">
               <description>Add the display driver for Windows backend  </description>
               <files>
-                <file category="sourceC"            name="src/dev/windows/lv_windows_context.c" />
-                <file category="sourceC"            name="src/dev/windows/lv_windows_display.c" />
-                <file category="sourceC"            name="src/dev/windows/lv_windows_input.c" />
+                <file category="sourceC"            name="src/drivers/windows/lv_windows_context.c" />
+                <file category="sourceC"            name="src/drivers/windows/lv_windows_display.c" />
+                <file category="sourceC"            name="src/drivers/windows/lv_windows_input.c" />
               </files>
 
               <RTE_Components_h>
@@ -665,7 +666,7 @@
             <component Cgroup="Display" Cvariant="Linux DRM" condition="LVGL-Essential">
               <description>Add the display driver for Linux /dev/dri/card*/  </description>
               <files>
-                <file category="sourceC"            name="src/dev/display/drm/lv_linux_drm.c" />
+                <file category="sourceC"            name="src/drivers/display/drm/lv_linux_drm.c" />
               </files>
 
               <RTE_Components_h>
@@ -678,8 +679,8 @@
             <component Cgroup="Display" Cvariant="Linux FBDEV" condition="LVGL-Essential">
               <description>Add the display driver for Linux /dev/fb </description>
               <files>
-                <file category="sourceC"            name="src/dev/display/fb/lv_linux_fbdev.c" />
-                <file category="sourceCpp"          name="src/dev/display/tft_espi/lv_tft_espi.cpp" />
+                <file category="sourceC"            name="src/drivers/display/fb/lv_linux_fbdev.c" />
+                <file category="sourceCpp"          name="src/drivers/display/tft_espi/lv_tft_espi.cpp" />
               </files>
 
               <RTE_Components_h>
@@ -692,7 +693,7 @@
             <component Cgroup="Display" Cvariant="TFT_eSPI" condition="LVGL-Essential">
               <description>Add the display driver for TFT_eSPI </description>
               <files>
-                <file category="sourceCpp"          name="src/dev/display/tft_espi/lv_tft_espi.cpp" />
+                <file category="sourceCpp"          name="src/drivers/display/tft_espi/lv_tft_espi.cpp" />
               </files>
 
               <RTE_Components_h>
@@ -705,7 +706,7 @@
             <component Cgroup="Display" Cvariant="ILI9341" condition="LVGL-Essential">
               <description>Add the display driver for ILI9341 </description>
               <files>
-                <file category="sourceC"            name="src/dev/display/ili9341/lv_ili9341.c" />
+                <file category="sourceC"            name="src/drivers/display/ili9341/lv_ili9341.c" />
               </files>
 
               <RTE_Components_h>
@@ -718,7 +719,7 @@
             <component Cgroup="Display" Cvariant="st7735" condition="LVGL-Essential">
               <description>Add the display driver for st7735 </description>
               <files>
-                <file category="sourceC"            name="src/dev/display/st7735/lv_st7735.c" />
+                <file category="sourceC"            name="src/drivers/display/st7735/lv_st7735.c" />
               </files>
 
               <RTE_Components_h>
@@ -731,7 +732,7 @@
             <component Cgroup="Display" Cvariant="st7789" condition="LVGL-Essential">
               <description>Add the display driver for st7789 </description>
               <files>
-                <file category="sourceC"            name="src/dev/display/st7789/lv_st7789.c" />
+                <file category="sourceC"            name="src/drivers/display/st7789/lv_st7789.c" />
               </files>
 
               <RTE_Components_h>
@@ -744,7 +745,7 @@
             <component Cgroup="Display" Cvariant="st7796" condition="LVGL-Essential">
               <description>Add the display driver for st7796 </description>
               <files>
-                <file category="sourceC"            name="src/dev/display/st7796/lv_st7796.c" />
+                <file category="sourceC"            name="src/drivers/display/st7796/lv_st7796.c" />
               </files>
 
               <RTE_Components_h>
