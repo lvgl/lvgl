@@ -125,6 +125,14 @@ typedef struct _lv_image_decoder_cache_data_t {
     void * user_data;
 } lv_image_cache_data_t;
 
+typedef struct _lv_image_decoder_header_cache_data_t {
+    const void * src;
+    lv_image_src_t src_type;
+
+    lv_image_header_t header;
+    lv_image_decoder_t * decoder;
+} lv_image_header_cache_data_t;
+
 /**Describe an image decoding session. Stores data about the decoding*/
 struct _lv_image_decoder_dsc_t {
     /**The decoder which was able to open the image source*/

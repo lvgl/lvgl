@@ -18,6 +18,7 @@
  *********************/
 #define img_decoder_ll_p &(LV_GLOBAL_DEFAULT()->img_decoder_ll)
 #define img_cache_p (LV_GLOBAL_DEFAULT()->img_cache)
+#define img_header_cache_p (LV_GLOBAL_DEFAULT()->img_header_cache)
 
 /**********************
  *      TYPEDEFS
@@ -36,6 +37,12 @@ static uint32_t img_width_to_stride(lv_image_header_t * header);
  * @return The decoder that can open the image source or NULL if not found (or can't open it).
  */
 static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_header_t * header);
+
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+static lv_cache_compare_res_t image_decoder_header_cache_compare_cb(const lv_image_header_cache_data_t * lhs,
+                                                                    const lv_image_header_cache_data_t * rhs);
+static void image_decoder_header_cache_free_cb(lv_image_header_cache_data_t * entry, void * user_data);
+#endif
 
 #if LV_CACHE_DEF_SIZE > 0
 static lv_cache_compare_res_t image_decoder_cache_compare_cb(const lv_image_cache_data_t * lhs,
@@ -70,6 +77,16 @@ void _lv_image_decoder_init(void)
         .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t)image_decoder_cache_free_cb,
     });
+
+#endif
+
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+    img_header_cache_p = lv_cache_create(&lv_cache_class_lru_rb_count,
+    sizeof(lv_image_header_cache_data_t), LV_IMAGE_HEADER_CACHE_DEF_CNT, (lv_cache_ops_t) {
+        .compare_cb = (lv_cache_compare_cb_t)image_decoder_header_cache_compare_cb,
+        .create_cb = NULL,
+        .free_cb = (lv_cache_free_cb_t)image_decoder_header_cache_free_cb
+    });
 #endif
 }
 
@@ -80,6 +97,10 @@ void _lv_image_decoder_deinit(void)
 {
 #if LV_CACHE_DEF_SIZE > 0
     lv_cache_destroy(img_cache_p, NULL);
+#endif
+
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+    lv_cache_destroy(img_header_cache_p, NULL);
 #endif
     _lv_ll_clear(img_decoder_ll_p);
 }
@@ -295,17 +316,51 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
     }
 
     lv_image_decoder_t * decoder;
+
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+    lv_image_header_cache_data_t search_key;
+    search_key.src_type = src_type;
+    search_key.src = src;
+
+    lv_cache_entry_t * entry = lv_cache_acquire(img_header_cache_p, &search_key, NULL);
+
+    if(entry) {
+        lv_image_header_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
+        *header = cached_data->header;
+        decoder = cached_data->decoder;
+        lv_cache_release(img_header_cache_p, entry, NULL);
+        return decoder;
+    }
+#endif
+
     _LV_LL_READ(img_decoder_ll_p, decoder) {
         /*Info and Open callbacks are required*/
         if(decoder->info_cb && decoder->open_cb) {
             lv_result_t res = decoder->info_cb(decoder, src, header);
             if(res == LV_RESULT_OK) {
                 if(header->stride == 0) header->stride = img_width_to_stride(header);
-                return decoder;
+                break;
             }
         }
     }
-    return NULL;
+
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+    if(decoder) {
+        if(src_type == LV_IMAGE_SRC_FILE) search_key.src = lv_strdup(src);
+        search_key.decoder = decoder;
+        search_key.header = *header;
+        entry = lv_cache_add(img_header_cache_p, &search_key, NULL);
+
+        if(entry == NULL) {
+            if(src_type == LV_IMAGE_SRC_FILE) lv_free((void *)search_key.src);
+            return NULL;
+        }
+
+        lv_cache_release(img_header_cache_p, entry, NULL);
+    }
+#endif
+
+    return decoder;
 }
 
 static uint32_t img_width_to_stride(lv_image_header_t * header)
@@ -318,26 +373,50 @@ static uint32_t img_width_to_stride(lv_image_header_t * header)
     }
 }
 
+#if LV_CACHE_DEF_SIZE > 0 || LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+inline static lv_cache_compare_res_t image_decoder_common_compare(const void * lhs_src, lv_image_src_t lhs_src_type,
+                                                                  const void * rhs_src, lv_image_src_t rhs_src_type)
+{
+    if(lhs_src_type == rhs_src_type) {
+        if(lhs_src_type == LV_IMAGE_SRC_FILE) {
+            int32_t cmp_res = lv_strcmp(lhs_src, rhs_src);
+            if(cmp_res != 0) {
+                return cmp_res > 0 ? 1 : -1;
+            }
+        }
+        else if(lhs_src_type == LV_IMAGE_SRC_VARIABLE) {
+            if(lhs_src != rhs_src) {
+                return lhs_src > rhs_src ? 1 : -1;
+            }
+        }
+        return 0;
+    }
+    return lhs_src_type > rhs_src_type ? 1 : -1;
+}
+#endif
+
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+static lv_cache_compare_res_t image_decoder_header_cache_compare_cb(
+    const lv_image_header_cache_data_t * lhs,
+    const lv_image_header_cache_data_t * rhs)
+{
+    return image_decoder_common_compare(lhs->src, lhs->src_type, rhs->src, rhs->src_type);
+}
+
+static void image_decoder_header_cache_free_cb(lv_image_header_cache_data_t * entry, void * user_data)
+{
+    LV_UNUSED(user_data); /*Unused*/
+
+    if(entry->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)entry->src);
+}
+#endif
+
 #if LV_CACHE_DEF_SIZE > 0
 static lv_cache_compare_res_t image_decoder_cache_compare_cb(
     const lv_image_cache_data_t * lhs,
     const lv_image_cache_data_t * rhs)
 {
-    if(lhs->src_type == rhs->src_type) {
-        if(lhs->src_type == LV_IMAGE_SRC_FILE) {
-            int32_t cmp_res = lv_strcmp(lhs->src, rhs->src);
-            if(cmp_res != 0) {
-                return cmp_res > 0 ? 1 : -1;
-            }
-        }
-        else if(lhs->src_type == LV_IMAGE_SRC_VARIABLE) {
-            if(lhs->src != rhs->src) {
-                return lhs->src > rhs->src ? 1 : -1;
-            }
-        }
-        return 0;
-    }
-    return lhs->src_type > rhs->src_type ? 1 : -1;
+    return image_decoder_common_compare(lhs->src, lhs->src_type, rhs->src, rhs->src_type);
 }
 
 static void image_decoder_cache_free_cb(lv_image_cache_data_t * entry, void * user_data)
