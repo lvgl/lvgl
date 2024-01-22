@@ -79,11 +79,8 @@ typedef lv_result_t (*lv_image_decoder_info_f_t)(lv_image_decoder_t * decoder, c
  * Open an image for decoding. Prepare it as it is required to read it later
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
- * @param args arguments of how to decode the image. see `lv_image_decoder_args_t`.
  */
-typedef lv_result_t (*lv_image_decoder_open_f_t)(lv_image_decoder_t * decoder,
-                                                 lv_image_decoder_dsc_t * dsc,
-                                                 const lv_image_decoder_args_t * args);
+typedef lv_result_t (*lv_image_decoder_open_f_t)(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 /**
  * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
