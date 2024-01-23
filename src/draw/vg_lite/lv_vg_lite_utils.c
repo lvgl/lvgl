@@ -13,6 +13,7 @@
 
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_path.h"
+#include "lv_draw_vg_lite_type.h"
 #include <string.h>
 
 /*********************
@@ -596,6 +597,29 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     }
 }
 
+void lv_vg_lite_push_image_decoder_dsc(lv_draw_unit_t * draw_unit, lv_image_decoder_dsc_t * img_dsc)
+{
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+    lv_array_push_back(&u->img_dsc_pending, img_dsc);
+}
+
+void lv_vg_lite_clear_image_decoder_dsc(lv_draw_unit_t * draw_unit)
+{
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+    lv_array_t * arr = &u->img_dsc_pending;
+    uint32_t size = lv_array_size(arr);
+    if(size == 0) {
+        return;
+    }
+
+    /* Close all pending image decoder dsc */
+    for(uint32_t i = 0; i < size; i++) {
+        lv_image_decoder_dsc_t * img_dsc = lv_array_at(arr, i);
+        lv_image_decoder_close(img_dsc);
+    }
+    lv_array_clear(arr);
+}
+
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
                                   bool no_cache)
 {
@@ -1024,6 +1048,31 @@ void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 void lv_vg_lite_disable_scissor(void)
 {
     vg_lite_disable_scissor();
+}
+
+void lv_vg_lite_flush(lv_draw_unit_t * draw_unit)
+{
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+
+    u->flush_count++;
+    if(u->flush_count < LV_VG_LITE_FLUSH_MAX_COUNT) {
+        /* Do not flush too often */
+        return;
+    }
+
+    LV_VG_LITE_CHECK_ERROR(vg_lite_flush());
+    u->flush_count = 0;
+}
+
+void lv_vg_lite_finish(lv_draw_unit_t * draw_unit)
+{
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+
+    LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
+
+    /* Clear image decoder dsc reference */
+    lv_vg_lite_clear_image_decoder_dsc(draw_unit);
+    u->flush_count = 0;
 }
 
 /**********************

@@ -214,7 +214,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
      * You need to wait for the GPU to finish using the buffer before releasing it.
      * Later, use the font cache for management to improve efficiency.
      */
-    LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
+    lv_vg_lite_finish(&u->base_unit);
 }
 
 #if LV_USE_FREETYPE

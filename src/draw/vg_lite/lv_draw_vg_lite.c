@@ -68,6 +68,7 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.dispatch_cb = draw_dispatch;
     unit->base_unit.evaluate_cb = draw_evaluate;
     unit->base_unit.delete_cb = draw_delete;
+    lv_array_init(&unit->img_dsc_pending, 4, sizeof(lv_image_decoder_dsc_t));
 
     lv_vg_lite_path_init(unit);
 #if 0
@@ -135,21 +136,15 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
             break;
     }
 
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    /* Layers manage it for themselves. */
-    if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
-    }
-#endif
-
-    LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
+    lv_vg_lite_flush(draw_unit);
 }
 
 static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
-    lv_draw_vg_lite_unit_t * draw_vg_lite_unit = (lv_draw_vg_lite_unit_t *)draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     /* Return immediately if it's busy with draw task. */
-    if(draw_vg_lite_unit->task_act) {
+    if(u->task_act) {
         return 0;
     }
 
@@ -158,6 +153,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     /* Return 0 is no selection, some tasks can be supported by other units. */
     if(!t || t->preferred_draw_unit_id != VG_LITE_DRAW_UNIT_ID) {
+        lv_vg_lite_finish(draw_unit);
         return -1;
     }
 
@@ -172,16 +168,16 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_vg_lite_unit->base_unit.target_layer = layer;
-    draw_vg_lite_unit->base_unit.clip_area = &t->clip_area;
-    draw_vg_lite_unit->task_act = t;
+    u->base_unit.target_layer = layer;
+    u->base_unit.clip_area = &t->clip_area;
+    u->task_act = t;
 
-    draw_execute(draw_vg_lite_unit);
+    draw_execute(u);
 
-    draw_vg_lite_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
-    draw_vg_lite_unit->task_act = NULL;
+    u->task_act->state = LV_DRAW_TASK_STATE_READY;
+    u->task_act = NULL;
 
-    /* The draw unit is free now. Request a new dispatching as it can get a new task. */
+    /*The draw unit is free now. Request a new dispatching as it can get a new task*/
     lv_draw_dispatch_request();
 
     return 1;
@@ -228,6 +224,7 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_vg_lite_unit_t * unit = (lv_draw_vg_lite_unit_t *)draw_unit;
+    lv_array_deinit(&unit->img_dsc_pending);
     lv_vg_lite_path_deinit(unit);
 #if 0
     lv_vg_lite_decoder_deinit();
