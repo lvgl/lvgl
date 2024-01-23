@@ -462,6 +462,15 @@
     #endif
 #endif
 
+/* VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
+#ifndef LV_VG_LITE_FLUSH_MAX_COUNT
+    #ifdef CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
+        #define LV_VG_LITE_FLUSH_MAX_COUNT CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
+    #else
+        #define LV_VG_LITE_FLUSH_MAX_COUNT 8
+    #endif
+#endif
+
 #endif
 
 /*=======================

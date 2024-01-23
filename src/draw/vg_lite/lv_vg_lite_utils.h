@@ -124,6 +124,10 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
 
+void lv_vg_lite_push_image_decoder_dsc(lv_draw_unit_t * draw_unit, lv_image_decoder_dsc_t * img_dsc);
+
+void lv_vg_lite_clear_image_decoder_dsc(lv_draw_unit_t * draw_unit);
+
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
                                   bool no_cache);
 
@@ -167,6 +171,10 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 void lv_vg_lite_set_scissor_area(const lv_area_t * area);
 
 void lv_vg_lite_disable_scissor(void);
+
+void lv_vg_lite_flush(lv_draw_unit_t * draw_unit);
+
+void lv_vg_lite_finish(lv_draw_unit_t * draw_unit);
 
 /**********************
  *      MACROS

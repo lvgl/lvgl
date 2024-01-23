@@ -153,7 +153,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                                                recolor,
                                                vg_color,
                                                VG_LITE_FILTER_BI_LINEAR));
-                    lv_image_decoder_close(&decoder_dsc);
+                    lv_vg_lite_push_image_decoder_dsc(&u->base_unit, &decoder_dsc);
                 }
             }
             break;
