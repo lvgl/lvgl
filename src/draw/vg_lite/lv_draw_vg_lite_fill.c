@@ -57,6 +57,8 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
         return;
     }
 
+    LV_PROFILER_BEGIN;
+
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
     lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
@@ -92,6 +94,7 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
     }
     else { /* normal fill */
         vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
+        LV_PROFILER_BEGIN_TAG("vg_lite_draw");
         LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                    &u->target_buffer,
                                    vg_lite_path,
@@ -99,9 +102,12 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
                                    &matrix,
                                    VG_LITE_BLEND_SRC_OVER,
                                    color));
+        LV_PROFILER_END_TAG("vg_lite_draw");
     }
 
     lv_vg_lite_path_drop(u, path);
+
+    LV_PROFILER_END;
 }
 
 /**********************

@@ -69,6 +69,8 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
         return; /*Fully clipped, nothing to do*/
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     int32_t dash_width = dsc->dash_width;
@@ -193,6 +195,7 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
+    LV_PROFILER_BEGIN_TAG("vg_lite_draw");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                &u->target_buffer,
                                vg_lite_path,
@@ -200,8 +203,11 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
                                &matrix,
                                VG_LITE_BLEND_SRC_OVER,
                                color));
+    LV_PROFILER_END_TAG("vg_lite_draw");
 
     lv_vg_lite_path_drop(u, path);
+
+    LV_PROFILER_END;
 }
 
 /**********************

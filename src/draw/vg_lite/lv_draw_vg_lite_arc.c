@@ -83,6 +83,8 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
         return;
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
     lv_vg_lite_path_set_quality(path, VG_LITE_HIGH);
     lv_vg_lite_path_set_bonding_box_area(path, &clip_area);
@@ -160,6 +162,7 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
+    LV_PROFILER_BEGIN_TAG("vg_lite_draw");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                &u->target_buffer,
                                vg_lite_path,
@@ -167,6 +170,7 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
                                &matrix,
                                VG_LITE_BLEND_SRC_OVER,
                                color));
+    LV_PROFILER_END_TAG("vg_lite_draw");
 
     if(dsc->img_src) {
         vg_lite_buffer_t src_buf;
@@ -174,6 +178,7 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
         if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false)) {
             vg_lite_matrix_t path_matrix;
             vg_lite_identity(&path_matrix);
+            LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
             LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
                                        &u->target_buffer,
                                        vg_lite_path,
@@ -186,11 +191,13 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
                                        0,
                                        color,
                                        VG_LITE_FILTER_BI_LINEAR));
+            LV_PROFILER_END_TAG("vg_lite_draw_pattern");
             lv_vg_lite_push_image_decoder_dsc(draw_unit, &decoder_dsc);
         }
     }
 
     lv_vg_lite_path_drop(u, path);
+    LV_PROFILER_END;
 }
 
 /**********************
