@@ -1077,10 +1077,6 @@ void lv_vg_lite_finish(lv_draw_unit_t * draw_unit)
 {
     LV_PROFILER_BEGIN;
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
-    if(u->flush_count == 0) {
-        LV_PROFILER_END;
-        return;
-    }
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
