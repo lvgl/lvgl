@@ -33,4 +33,15 @@ if (MSVC)
     INTERFACE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllimport\)
     PRIVATE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllexport\)
   )
+
+  #[[
+    GCC and Clang have added some (non std compliant) extensions to their preprocessor.
+    ##VA_ARGS__ is one of them. It is used in lvgl to support variadic macros.
+    if no argument is passed to the macro, the MSVC preprocessor will not remove the trailing comma.
+    This will result in a syntax error.
+    To fix this we need to enable the /Zc:preprocessor flag. This will make the MSVC preprocessor behave like the GCC/Clang preprocessor.
+    In C++20 and C23 __VA_OPT__ is introduced. Making this behaviour standard.
+    But for now we will stick with this preprocessor flag.
+  ]]
+  target_compile_options(lvgl PUBLIC /Zc:preprocessor)
 endif()
