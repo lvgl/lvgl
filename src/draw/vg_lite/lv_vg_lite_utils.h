@@ -18,6 +18,8 @@ extern "C" {
 
 #if LV_USE_DRAW_VG_LITE
 
+#include "../../misc/lv_profiler.h"
+
 #include <stdbool.h>
 #if LV_USE_VG_LITE_THORVG
 #include "../../others/vg_lite_tvg/vg_lite.h"

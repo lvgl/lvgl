@@ -655,7 +655,9 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
 
     if(LV_COLOR_FORMAT_IS_INDEXED(decoded->header.cf)) {
         uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(decoded->header.cf);
+        LV_PROFILER_BEGIN_TAG("vg_lite_set_CLUT");
         LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (vg_lite_uint32_t *)decoded->data));
+        LV_PROFILER_END_TAG("vg_lite_set_CLUT");
     }
 
     lv_vg_lite_buffer_from_draw_buf(buffer, decoded);
@@ -901,6 +903,8 @@ void lv_vg_lite_draw_linear_grad(
     LV_ASSERT_NULL(area);
     LV_ASSERT_NULL(grad);
 
+    LV_PROFILER_BEGIN;
+
     LV_ASSERT(grad->dir != LV_GRAD_DIR_NONE);
 
     vg_lite_uint32_t colors[VLC_MAX_GRADIENT_STOPS];
@@ -924,7 +928,10 @@ void lv_vg_lite_draw_linear_grad(
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_init_grad(&gradient));
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_grad(&gradient, cnt, colors, stops));
+
+    LV_PROFILER_BEGIN_TAG("vg_lite_update_grad");
     LV_VG_LITE_CHECK_ERROR(vg_lite_update_grad(&gradient));
+    LV_PROFILER_END_TAG("vg_lite_update_grad");
 
     vg_lite_matrix_t * grad_matrix = vg_lite_get_grad_matrix(&gradient);
     vg_lite_identity(grad_matrix);
@@ -938,6 +945,7 @@ void lv_vg_lite_draw_linear_grad(
         vg_lite_scale(lv_area_get_width(area) / 256.0f, 1, grad_matrix);
     }
 
+    LV_PROFILER_BEGIN_TAG("vg_lite_draw_grad");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw_grad(
                                buffer,
                                path,
@@ -945,8 +953,10 @@ void lv_vg_lite_draw_linear_grad(
                                (vg_lite_matrix_t *)matrix,
                                &gradient,
                                blend));
+    LV_PROFILER_END_TAG("vg_lite_draw_grad");
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_clear_grad(&gradient));
+    LV_PROFILER_END;
 }
 
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult)
@@ -1052,20 +1062,24 @@ void lv_vg_lite_disable_scissor(void)
 
 void lv_vg_lite_flush(lv_draw_unit_t * draw_unit)
 {
+    LV_PROFILER_BEGIN;
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     u->flush_count++;
     if(u->flush_count < LV_VG_LITE_FLUSH_MAX_COUNT) {
         /* Do not flush too often */
+        LV_PROFILER_END;
         return;
     }
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_flush());
     u->flush_count = 0;
+    LV_PROFILER_END;
 }
 
 void lv_vg_lite_finish(lv_draw_unit_t * draw_unit)
 {
+    LV_PROFILER_BEGIN;
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
@@ -1073,6 +1087,7 @@ void lv_vg_lite_finish(lv_draw_unit_t * draw_unit)
     /* Clear image decoder dsc reference */
     lv_vg_lite_clear_image_decoder_dsc(draw_unit);
     u->flush_count = 0;
+    LV_PROFILER_END;
 }
 
 /**********************
