@@ -195,6 +195,23 @@ void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * m)
     _multiply_matrix(matrix, m);
 }
 
+void lv_matrix_transform_point(const lv_matrix_t * matrix, lv_fpoint_t * point)
+{
+    float x = point->x;
+    float y = point->y;
+
+    point->x = x * matrix->m[0][0] + y * matrix->m[1][0] + matrix->m[0][2];
+    point->y = x * matrix->m[0][1] + y * matrix->m[1][1] + matrix->m[1][2];
+}
+
+void lv_matrix_transform_path(const lv_matrix_t * matrix, lv_vector_path_t * path)
+{
+    for(uint32_t i = 0; i < path->points.size; i++) {
+        lv_fpoint_t * pt = lv_array_at(&path->points, i);
+        lv_matrix_transform_point(matrix, pt);
+    }
+}
+
 /* path functions */
 lv_vector_path_t * lv_vector_path_create(lv_vector_path_quality_t quality)
 {
@@ -293,6 +310,28 @@ void lv_vector_path_close(lv_vector_path_t * path)
 
     uint8_t op = LV_VECTOR_PATH_OP_CLOSE;
     lv_array_push_back(&path->ops, &op);
+}
+
+void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area)
+{
+    uint32_t len = lv_array_size(&path->points);
+    lv_fpoint_t * p = lv_array_at(&path->points, 0);
+    float x1 = p[0].x;
+    float x2 = p[0].x;
+    float y1 = p[0].y;
+    float y2 = p[0].y;
+
+    for(uint32_t i = 1; i < len; i++) {
+        if(p[i].x < x1) x1 = p[i].x;
+        if(p[i].y < y1) y1 = p[i].y;
+        if(p[i].x > x2) x2 = p[i].x;
+        if(p[i].y > y2) y2 = p[i].y;
+    }
+
+    area->x1 = (int32_t)x1;
+    area->y1 = (int32_t)y1;
+    area->x2 = (int32_t)x2;
+    area->y2 = (int32_t)y2;
 }
 
 void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry)
@@ -682,6 +721,7 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
     lv_memset(new_task, 0, sizeof(_lv_vector_draw_task));
 
     new_task->dsc.fill_dsc.color = dsc->current_dsc.fill_dsc.color;
+    new_task->dsc.fill_dsc.opa = dsc->current_dsc.fill_dsc.opa;
     lv_area_copy(&(new_task->dsc.scissor_area), rect);
 }
 
