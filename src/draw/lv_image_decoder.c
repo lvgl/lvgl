@@ -442,6 +442,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     if(entry) {
         lv_image_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
         dsc->decoded = cached_data->decoded;
+        dsc->decoder = (lv_image_decoder_t *)cached_data->decoder;
         dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/
         return LV_RESULT_OK;
     }
