@@ -59,6 +59,7 @@ typedef struct {
     char * fbp;
     long int screensize;
     int fbfd;
+    bool force_refresh;
 } lv_linux_fb_t;
 
 /**********************
@@ -238,6 +239,12 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
                 hor_res, ver_res, lv_display_get_dpi(disp));
 }
 
+void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
+{
+    lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
+    dsc->force_refresh = enabled;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -272,6 +279,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
             lv_memcpy(&fbp[fb_pos], color_p, w * px_size);
             fb_pos += dsc->finfo.line_length;
             color_p += w * px_size;
+        }
+    }
+
+    if(dsc->force_refresh) {
+        dsc->vinfo.activate |= FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
+        if(ioctl(dsc->fbfd, FBIOPUT_VSCREENINFO, &(dsc->vinfo)) == -1) {
+            perror("Error setting var screen info");
         }
     }
 

@@ -84,6 +84,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->layer_head->color_format = disp->color_format;
 
     disp->inv_en_cnt = 1;
+    disp->last_activity_time = lv_tick_get();
 
     _lv_ll_init(&disp->sync_areas, sizeof(lv_area_t));
 

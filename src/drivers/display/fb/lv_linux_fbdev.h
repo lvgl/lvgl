@@ -33,6 +33,12 @@ lv_display_t * lv_linux_fbdev_create(void);
 
 void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file);
 
+/**
+ * Force the display to be refreshed on every change.
+ * Expected to be used with LV_DISPLAY_RENDER_MODE_DIRECT or LV_DISPLAY_RENDER_MODE_FULL.
+ */
+void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled);
+
 /**********************
  *      MACROS
  **********************/
