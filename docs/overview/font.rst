@@ -142,7 +142,7 @@ The default base direction for screens can be set by
 :c:macro:`LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other objects inherit the
 base direction from their parent.
 
-To set an object's base direction use :cpp:expr:`lv_obj_set_base_dir(obj, base_dir)`.
+To set an object's base direction use :cpp:expr:`lv_obj_set_style_base_dir(obj, base_dir, selector)`.
 The possible base directions are:
 
 - :cpp:enumerator:`LV_BASE_DIR_LTR`: Left to Right base direction
