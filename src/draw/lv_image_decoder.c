@@ -151,6 +151,12 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
      * */
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
 
+    /*Free the source if it's a file*/
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
+        lv_free((void *)dsc->src);
+        dsc->src = NULL;
+    }
+
     return res;
 }
 
@@ -167,11 +173,6 @@ void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
     if(dsc->decoder) {
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
-
-        if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-            lv_free((void *)dsc->src);
-            dsc->src = NULL;
-        }
     }
 }
 
@@ -444,6 +445,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     if(entry) {
         lv_image_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
         dsc->decoded = cached_data->decoded;
+        dsc->decoder = (lv_image_decoder_t *)cached_data->decoder;
         dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/
         return LV_RESULT_OK;
     }
