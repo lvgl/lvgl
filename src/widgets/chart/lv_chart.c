@@ -1358,16 +1358,16 @@ static void draw_y_ticks(lv_obj_t * obj, lv_layer_t * layer, lv_chart_axis_t axi
 
             /*set the area at some distance of the major tick len left of the tick*/
             lv_area_t a;
-            a.y1 = line_dsc.p2.y - size.y / 2;
-            a.y2 = line_dsc.p2.y + size.y / 2;
+            a.y1 = (int32_t)(line_dsc.p2.y - size.y / 2);
+            a.y2 = (int32_t)(line_dsc.p2.y + size.y / 2);
 
             if(!sec_axis) {
-                a.x1 = line_dsc.p2.x - size.x - label_gap;
-                a.x2 = line_dsc.p2.x - label_gap;
+                a.x1 = (int32_t)(line_dsc.p2.x - size.x - label_gap);
+                a.x2 = (int32_t)(line_dsc.p2.x - label_gap);
             }
             else {
-                a.x1 = line_dsc.p2.x + label_gap;
-                a.x2 = line_dsc.p2.x + size.x + label_gap;
+                a.x1 = (int32_t)(line_dsc.p2.x + label_gap);
+                a.x2 = (int32_t)(line_dsc.p2.x + size.x + label_gap);
             }
 
             if(a.y2 >= obj->coords.y1 &&
@@ -1479,14 +1479,14 @@ static void draw_x_ticks(lv_obj_t * obj, lv_layer_t * layer, lv_chart_axis_t axi
 
             /*set the area at some distance of the major tick len under of the tick*/
             lv_area_t a;
-            a.x1 = (line_dsc.p2.x - size.x / 2);
-            a.x2 = (line_dsc.p2.x + size.x / 2);
+            a.x1 = (int32_t)(line_dsc.p2.x - size.x / 2);
+            a.x2 = (int32_t)(line_dsc.p2.x + size.x / 2);
             if(sec_axis) {
-                a.y2 = line_dsc.p2.y - label_gap;
+                a.y2 = (int32_t)(line_dsc.p2.y - label_gap);
                 a.y1 = a.y2 - size.y;
             }
             else {
-                a.y1 = line_dsc.p2.y + label_gap;
+                a.y1 = (int32_t)(line_dsc.p2.y + label_gap);
                 a.y2 = a.y1 + size.y;
             }
 
