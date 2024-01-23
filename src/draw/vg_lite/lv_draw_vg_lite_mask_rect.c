@@ -48,6 +48,8 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
         return;
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_draw_sw_mask_radius_param_t param;
     lv_draw_sw_mask_radius_init(&param, &dsc->area, dsc->radius, false);
 
@@ -85,6 +87,8 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
 
     lv_free(mask_buf);
     lv_draw_sw_mask_free_param(&param);
+
+    LV_PROFILER_END;
 }
 
 /**********************

@@ -69,9 +69,12 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         return;
     }
 
+    LV_PROFILER_BEGIN;
+
     vg_lite_buffer_t src_buf;
     lv_image_decoder_dsc_t decoder_dsc;
     if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache)) {
+        LV_PROFILER_END;
         return;
     }
 
@@ -107,6 +110,8 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         /* rect is used to crop the pixel-aligned padding area */
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, &src_area);
+
+        LV_PROFILER_BEGIN_TAG("vg_lite_blit_rect");
         LV_VG_LITE_CHECK_ERROR(vg_lite_blit_rect(
                                    &u->target_buffer,
                                    &src_buf,
@@ -115,6 +120,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    lv_vg_lite_blend_mode(dsc->blend_mode),
                                    color,
                                    filter));
+        LV_PROFILER_END_TAG("vg_lite_blit_rect");
     }
     else {
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_S16);
@@ -132,6 +138,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         vg_lite_matrix_t path_matrix;
         vg_lite_identity(&path_matrix);
 
+        LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
         LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
                                    &u->target_buffer,
                                    vg_lite_path,
@@ -144,11 +151,13 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    0,
                                    color,
                                    filter));
+        LV_PROFILER_END_TAG("vg_lite_draw_pattern");
 
         lv_vg_lite_path_drop(u, path);
     }
 
     lv_vg_lite_push_image_decoder_dsc(draw_unit, &decoder_dsc);
+    LV_PROFILER_END;
 }
 
 /**********************
