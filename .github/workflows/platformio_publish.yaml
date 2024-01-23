@@ -16,5 +16,7 @@ jobs:
           python-version: '3.9'
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
+      - name: Switch to the development version
+        run: pio upgrade --dev
       - name: Publish
         run: pio pkg publish --owner lvgl .
