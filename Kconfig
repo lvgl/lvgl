@@ -367,6 +367,13 @@ menu "LVGL configuration"
 				default n
 				depends on LV_USE_DRAW_VG_LITE
 
+			config LV_VG_LITE_FLUSH_MAX_COUNT
+				int "VG-Lite flush commit trigger threshold."
+				default 8
+				depends on LV_USE_DRAW_VG_LITE
+				help
+					GPU will try to batch these many draw tasks.
+
 			config LV_USE_GPU_SDL
 				bool "Use SDL renderer API"
 				default n
@@ -1214,6 +1221,10 @@ menu "LVGL configuration"
 			bool "Enable the built-in profiler"
 			depends on LV_USE_PROFILER
 			default y
+		config LV_PROFILER_BUILTIN_BUF_SIZE
+			int "Default profiler trace buffer size in bytes"
+			depends on LV_USE_PROFILER_BUILTIN
+			default 16384
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
 			depends on LV_USE_PROFILER

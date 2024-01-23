@@ -225,6 +225,35 @@ static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
     lv_obj_del(canvas);
 }
 
+void test_transform(void)
+{
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    lv_matrix_translate(&matrix, 100, 100);
+
+    lv_fpoint_t p = {10, 10};
+    lv_matrix_transform_point(&matrix, &p);
+
+    TEST_ASSERT_EQUAL_FLOAT(110.0f, p.x);
+    TEST_ASSERT_EQUAL_FLOAT(110.0f, p.y);
+
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+    lv_vector_path_move_to(path, &p);
+
+    lv_fpoint_t p2 = {20, 20};
+    lv_vector_path_line_to(path, &p2);
+    lv_matrix_transform_path(&matrix, path);
+
+    lv_fpoint_t * pt = lv_array_at(&path->points, 0);
+
+    TEST_ASSERT_EQUAL_FLOAT(210.0f, pt[0].x);
+    TEST_ASSERT_EQUAL_FLOAT(210.0f, pt[0].y);
+    TEST_ASSERT_EQUAL_FLOAT(120.0f, pt[1].x);
+    TEST_ASSERT_EQUAL_FLOAT(120.0f, pt[1].y);
+
+    lv_vector_path_delete(path);
+}
+
 void test_draw_lines(void)
 {
     canvas_draw("draw_lines", draw_lines);
