@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2022, 2023 NXP
+ * Copyright 2022-2024 NXP
  *
  * SPDX-License-Identifier: MIT
  */
@@ -25,10 +25,39 @@ extern "C" {
 #include "../../sw/lv_draw_sw.h"
 
 #include "vg_lite.h"
+#include "vg_lite_options.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#define ENUM_TO_STRING(e) \
+    case (e):             \
+    return #e
+
+#if LV_USE_VGLITE_ASSERT
+#define VGLITE_ASSERT(expr) LV_ASSERT(expr)
+#else
+#define VGLITE_ASSERT(expr)
+#endif
+
+#define VGLITE_ASSERT_MSG(expr, msg)                                 \
+    do {                                                             \
+        if(!(expr)) {                                                \
+            LV_LOG_ERROR(msg);                                       \
+            VGLITE_ASSERT(false);                                    \
+        }                                                            \
+    } while(0)
+
+#define VGLITE_CHECK_ERROR(function)                                 \
+    do {                                                             \
+        vg_lite_error_t error = function;                            \
+        if(error != VG_LITE_SUCCESS) {                               \
+            LV_LOG_ERROR("Execute '" #function "' error(%d): %s",    \
+                         (int)error, vglite_error_to_string(error)); \
+            VGLITE_ASSERT(false);                                    \
+        }                                                            \
+    } while (0)
 
 /**********************
  *      TYPEDEFS
@@ -39,24 +68,20 @@ extern "C" {
  **********************/
 
 /**
- * Enable scissor and set the clipping box.
+ * Set the clipping box.
  *
  * @param[in] clip_area Clip area with relative coordinates of destination buffer
  *
  */
 static inline void vglite_set_scissor(const lv_area_t * clip_area);
 
-/**
- * Disable scissor.
- *
- */
-static inline void vglite_disable_scissor(void);
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-#if LV_USE_OS
+const char * vglite_error_to_string(vg_lite_error_t error);
+
+#if LV_USE_VGLITE_DRAW_ASYNC
 /**
  * Get VG-Lite command buffer flushed status.
  *
@@ -65,7 +90,7 @@ bool vglite_cmd_buf_is_flushed(void);
 #endif
 
 /**
- * Clear cache and flush command to VG-Lite.
+ * Flush command to VG-Lite.
  *
  */
 void vglite_run(void);
@@ -103,16 +128,6 @@ vg_lite_blend_t vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode);
 vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf);
 
 /**
- * Get vglite buffer pixel size.
- *
- * @param[in] cf Color format
- *
- * @retval Bits per pixel
- *
- */
-uint8_t vglite_get_px_size(lv_color_format_t cf);
-
-/**
  * Get vglite buffer alignment.
  *
  * @param[in] cf Color format
@@ -144,15 +159,7 @@ bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf)
 
 static inline void vglite_set_scissor(const lv_area_t * clip_area)
 {
-    vg_lite_enable_scissor();
-    vg_lite_set_scissor((int32_t)clip_area->x1, (int32_t)clip_area->y1,
-                        (int32_t)lv_area_get_width(clip_area),
-                        (int32_t)lv_area_get_height(clip_area));
-}
-
-static inline void vglite_disable_scissor(void)
-{
-    vg_lite_disable_scissor();
+    vg_lite_set_scissor(clip_area->x1, clip_area->y1, clip_area->x2 + 1, clip_area->y2 + 1);
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

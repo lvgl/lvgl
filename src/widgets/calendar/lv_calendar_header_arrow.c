@@ -102,7 +102,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void month_event_cb(lv_event_t * e)
 {
-    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_current_target(e);
 
     lv_obj_t * header = lv_obj_get_parent(btn);
     lv_obj_t * calendar = lv_obj_get_parent(header);
@@ -139,7 +139,7 @@ static void month_event_cb(lv_event_t * e)
 
 static void value_changed_event_cb(lv_event_t * e)
 {
-    lv_obj_t * header = lv_event_get_target(e);
+    lv_obj_t * header = lv_event_get_current_target(e);
     lv_obj_t * calendar = lv_obj_get_parent(header);
 
     const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
@@ -148,4 +148,3 @@ static void value_changed_event_cb(lv_event_t * e)
 }
 
 #endif /*LV_USE_CALENDAR_HEADER_ARROW*/
-

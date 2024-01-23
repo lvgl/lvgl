@@ -420,7 +420,7 @@ static void init_style(lv_obj_t * obj)
 static void quick_access_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_current_target(e);
     lv_obj_t * obj = lv_event_get_user_data(e);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
@@ -457,7 +457,7 @@ static void quick_access_event_handler(lv_event_t * e)
 static void quick_access_area_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * area = lv_event_get_target(e);
+    lv_obj_t * area = lv_event_get_current_target(e);
     lv_obj_t * obj = lv_event_get_user_data(e);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
@@ -544,7 +544,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
     lv_table_set_cell_value(explorer->file_table, 1, 1, "0");
 
     while(1) {
-        res = lv_fs_dir_read(&dir, fn);
+        res = lv_fs_dir_read(&dir, fn, sizeof(fn));
         if(res != LV_FS_RES_OK) {
             LV_LOG_USER("Driver, file or directory is not exists %d!", res);
             break;

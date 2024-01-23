@@ -28,8 +28,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_layer_t;
-
 /** Store some info to speed up drawing of very large texts
  * It takes a lot of time to get the first visible character because
  * all the previous characters needs to be checked to calculate the positions.
@@ -75,22 +73,21 @@ typedef struct {
 } lv_draw_label_dsc_t;
 
 typedef enum {
+    LV_DRAW_LETTER_BITMAP_FORMAT_INVALID,
     LV_DRAW_LETTER_BITMAP_FORMAT_A8,
     LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE,
     LV_DRAW_LETTER_VECTOR_FORMAT,
 } lv_draw_glyph_bitmap_format_t;
 
 typedef struct {
-    const uint8_t * bitmap;
-    uint8_t * _bitmap_buf_unaligned;
-    uint8_t * bitmap_buf;
-    uint32_t _bitmap_buf_size;
+    void * glyph_data;  /*Depends on `format` field, it could be image source or draw buf of bitmap or vector data.*/
     lv_draw_glyph_bitmap_format_t format;
     const lv_area_t * letter_coords;
     const lv_area_t * bg_coords;
     const lv_font_glyph_dsc_t * g;
     lv_color_t color;
     lv_opa_t opa;
+    lv_draw_buf_t * _draw_buf; /*a shared draw buf for get_bitmap, do not use it directly, use glyph_data instead*/
 } lv_draw_glyph_dsc_t;
 
 /**

@@ -16,7 +16,8 @@ jobs:
         # See BUILD_OPTIONS in tests/CMakeLists.txt.
         build_option: ['OPTIONS_16BIT',
                        'OPTIONS_24BIT',
-                       'OPTIONS_FULL_32BIT']
+                       'OPTIONS_FULL_32BIT',
+                       "OPTIONS_VG_LITE"]
     name: Build ${{ matrix.build_option }}
     steps:
     - uses: actions/checkout@v4
@@ -35,10 +36,10 @@ jobs:
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Run tests
-      run: python tests/main.py --report test
+      run: python tests/main.py --report --update-image test
     - name: Archive screenshot errors
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: screenshot-errors-amd64
         path: |
@@ -94,7 +95,8 @@ jobs:
 
           install: |
             apt-get update -y
-            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 -q -y
+            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 pngquant python3-pip -q -y
+            pip install pypng lz4
             /usr/sbin/update-ccache-symlinks
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 
@@ -102,7 +104,7 @@ jobs:
             env PATH="/usr/lib/ccache:$PATH" NON_AMD64_BUILD=1 ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
       - name: Archive screenshot errors
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
             name: screenshot-errors-${{ matrix.arch }}
             path: |

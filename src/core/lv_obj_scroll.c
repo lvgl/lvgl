@@ -33,7 +33,7 @@
  **********************/
 static void scroll_x_anim(void * obj, int32_t v);
 static void scroll_y_anim(void * obj, int32_t v);
-static void scroll_anim_ready_cb(lv_anim_t * a);
+static void scroll_completed_completed_cb(lv_anim_t * a);
 static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_point_t * scroll_value,
                                   lv_anim_enable_t anim_en);
 
@@ -239,7 +239,7 @@ int32_t lv_obj_get_scroll_right(lv_obj_t * obj)
     return LV_MAX(child_res, self_w);
 }
 
-void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end)
+void lv_obj_get_scroll_end(lv_obj_t * obj, lv_point_t * end)
 {
     lv_anim_t * a;
     a = lv_anim_get(obj, scroll_x_anim);
@@ -305,11 +305,11 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
 {
     if(dx == 0 && dy == 0) return;
     if(anim_en == LV_ANIM_ON) {
-        lv_display_t * d = lv_obj_get_disp(obj);
+        lv_display_t * d = lv_obj_get_display(obj);
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
-        lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
+        lv_anim_set_completed_cb(&a, scroll_completed_completed_cb);
 
         if(dx) {
             uint32_t t = lv_anim_speed_clamped((lv_display_get_horizontal_resolution(d)) >> 1, SCROLL_ANIM_TIME_MIN,
@@ -675,7 +675,7 @@ static void scroll_y_anim(void * obj, int32_t v)
     _lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
 }
 
-static void scroll_anim_ready_cb(lv_anim_t * a)
+static void scroll_completed_completed_cb(lv_anim_t * a)
 {
     lv_obj_send_event(a->var, LV_EVENT_SCROLL_END, NULL);
 }

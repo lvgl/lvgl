@@ -31,7 +31,7 @@ typedef struct {
     lv_color_t light_color;
 } lv_qrcode_t;
 
-extern const lv_obj_class_t lv_qrcode_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_qrcode_class;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -22,8 +22,7 @@ If you are updating a v8 project to v9, special care must be taken as some parts
 
 So pay extra attention to these:
 
-- :cpp:func:`lv_display_set_draw_buffers(display, buf1, buf2)` is more or less the equivalent of ``lv_disp_draw_buf_init(&draw_buf_dsc, buf1, buf2, buf_size_px)`` from v8, however in **v9 the buffer type is lv_draw_buf_t**.
-- Make sure to call :cpp:func:`lv_display_set_render_mode(display, mode)` to set correct render mode.
+- :cpp:func:`lv_display_set_buffers(display, buf1, buf2, buf_size_byte, mode)` is more or less the equivalent of ``lv_disp_draw_buf_init(&draw_buf_dsc, buf1, buf2, buf_size_px)`` from v8, however in **v9 the buffer size is set in bytes**.
 - In v9 ``lv_color_t`` is always RGB888 regardless of ``LV_COLOR_DEPTH``.
 - ``lv_conf.h`` has been changed a lot, so don't forget to update it from ``lv_conf_template.h``
 - Be sure ``<stdint.h>`` is **not** included in ``lv_conf.h``. In v9 we have some assembly parts for even better performance and a random include there would mess up the assembly part.
@@ -35,12 +34,12 @@ Main new features
 - Run time display color format adjustment with RGB888 support
 - Built-in support ``pthread``, ``FreeRTOS`` and other (RT)OSes which are used during rendering
 - Built-in support LVGL's, C library, and other ``stdlib``s
-- Better parallel rendering architecture. See the details `here </porting/draw>`__
+- Better parallel rendering architecture. See the details :ref:`here <porting_draw>`
 - Built in display and touch driver: SDL, Linux Frame buffer,  NuttX LCD and touch drivers, ST7789 and ILI9341 driver are available and more will come soon
-- `lv_observer </others/observer>`__ allows to bind data to UI elements and create a uniform and easy to maintain API
+- :ref:`observer` allows to bind data to UI elements and create a uniform and easy to maintain API
 - GitHub CodeSpace integration makes possible to run LVGL in an Online VSCode editor with 3 click. See more `here <https://blog.lvgl.io/2023-04-13/monthly-newsletter>`__
 - Add vector graphics support via ThorVG. It can be used to draw vector graphics to a `Canvas <https://github.com/lvgl/lvgl/blob/master/examples/widgets/canvas/lv_example_canvas_8.c>`__
-- `lv_image </widgets/image>`__ supports aligning, stretching or tiling the image source if the widget is larger or smaller.
+- :ref:`lv_image` supports aligning, stretching or tiling the image source if the widget is larger or smaller.
 
 General API changes
 -------------------
@@ -79,8 +78,7 @@ Display API
 
    lv_display_t * disp = lv_display_create(hor_res, ver_res)
    lv_display_set_flush_cb(disp, flush_cb);
-   lv_display_set_draw_buffers(disp, buf1, buf2);
-   lv_display_set_render_mode(disp, mode);
+   lv_display_set_buffers(disp, buf1, buf2, buf_size_in_bytes, mode);
 
 -  Note that now **draw buffer can be malloced by `lv_draw_buf_create` or initialized by `lv_draw_buf_init`**
 -  ``mode`` can be:

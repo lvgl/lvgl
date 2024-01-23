@@ -181,7 +181,7 @@ void test_calendar_header_arrow_create_gui(void)
 
 void test_calendar_event_key_down_gui(void)
 {
-    char key = LV_KEY_DOWN;
+    uint32_t key = LV_KEY_DOWN;
 
     lv_calendar_set_showed_date(calendar, 2022, 9);
 
@@ -206,6 +206,18 @@ void test_calendar_get_btnmatrix(void)
     lv_obj_t * btnm = lv_calendar_get_btnmatrix(calendar);
 
     TEST_ASSERT_NOT_NULL(btnm);
+}
+
+void test_calendar_custom_year_list(void)
+{
+    lv_obj_t  * calendar = lv_calendar_create(lv_screen_active());
+
+    lv_calendar_header_dropdown_create(calendar);
+
+    const char * years = "2024\n2023\n2022\n2021\n2020\n2019";
+    lv_calendar_header_dropdown_set_year_list(calendar, years);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_08.png");
 }
 
 #endif

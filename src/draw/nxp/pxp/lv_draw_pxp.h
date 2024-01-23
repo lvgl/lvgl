@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2022, 2023 NXP
+ * Copyright 2022-2024 NXP
  *
  * SPDX-License-Identifier: MIT
  */
@@ -33,16 +33,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef lv_layer_t lv_pxp_layer_t;
-
-typedef struct {
-    lv_draw_unit_t base_unit;
-    struct _lv_draw_task_t * task_act;
-#if LV_USE_OS
-    lv_thread_sync_t sync;
-    lv_thread_t thread;
-#endif
-} lv_draw_pxp_unit_t;
+typedef lv_draw_sw_unit_t lv_draw_pxp_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -54,8 +45,9 @@ void lv_draw_pxp_init(void);
 
 void lv_draw_pxp_deinit(void);
 
-void lv_draw_pxp_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_image_dsc_t * dsc,
-                        const lv_area_t * coords);
+void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width, int32_t src_height,
+                        int32_t src_stride, int32_t dest_stride, lv_display_rotation_t rotation,
+                        lv_color_format_t cf);
 
 void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                       const lv_area_t * coords);

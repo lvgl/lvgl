@@ -33,7 +33,7 @@
  **********************/
 static void anim_timer(lv_timer_t * param);
 static void anim_mark_list_change(void);
-static void anim_ready_handler(lv_anim_t * a);
+static void anim_completed_handler(lv_anim_t * a);
 static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
                                          int32_t y1, int32_t x2, int32_t y2);
 static uint32_t convert_speed_to_time(uint32_t speed, int32_t start, int32_t end);
@@ -165,7 +165,7 @@ lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
     return NULL;
 }
 
-struct _lv_timer_t * lv_anim_get_timer(void)
+lv_timer_t * lv_anim_get_timer(void)
 {
     return state.timer;
 }
@@ -343,7 +343,7 @@ static void anim_timer(lv_timer_t * param)
         a->last_timer_run = lv_tick_get();
 
         /*It can be set by `lv_anim_delete()` typically in `end_cb`. If set then an animation delete
-         * happened in `anim_ready_handler` which could make this linked list reading corrupt
+         * happened in `anim_completed_handler` which could make this linked list reading corrupt
          * because the list is changed meanwhile
          */
         state.anim_list_changed = false;
@@ -379,12 +379,12 @@ static void anim_timer(lv_timer_t * param)
                     a->current_value = new_value;
                     /*Apply the calculated value*/
                     if(a->exec_cb) a->exec_cb(a->var, new_value);
-                    if(a->custom_exec_cb) a->custom_exec_cb(a, new_value);
+                    if(!state.anim_list_changed && a->custom_exec_cb) a->custom_exec_cb(a, new_value);
                 }
 
                 /*If the time is elapsed the animation is ready*/
-                if(a->act_time >= a->duration) {
-                    anim_ready_handler(a);
+                if(!state.anim_list_changed && a->act_time >= a->duration) {
+                    anim_completed_handler(a);
                 }
             }
         }
@@ -400,11 +400,11 @@ static void anim_timer(lv_timer_t * param)
 }
 
 /**
- * Called when an animation is ready to do the necessary thinks
+ * Called when an animation is completed to do the necessary things
  * e.g. repeat, play back, delete etc.
  * @param a pointer to an animation descriptor
  */
-static void anim_ready_handler(lv_anim_t * a)
+static void anim_completed_handler(lv_anim_t * a)
 {
     /*In the end of a forward anim decrement repeat cnt.*/
     if(a->playback_now == 0 && a->repeat_cnt > 0 && a->repeat_cnt != LV_ANIM_REPEAT_INFINITE) {
@@ -417,13 +417,13 @@ static void anim_ready_handler(lv_anim_t * a)
     if(a->repeat_cnt == 0 && (a->playback_duration == 0 || a->playback_now == 1)) {
 
         /*Delete the animation from the list.
-         * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
+         * This way the `completed_cb` will see the animations like it's animation is already deleted*/
         _lv_ll_remove(anim_ll_p, a);
         /*Flag that the list has changed*/
         anim_mark_list_change();
 
         /*Call the callback function at the end*/
-        if(a->ready_cb != NULL) a->ready_cb(a);
+        if(a->completed_cb != NULL) a->completed_cb(a);
         if(a->deleted_cb != NULL) a->deleted_cb(a);
         lv_free(a);
     }

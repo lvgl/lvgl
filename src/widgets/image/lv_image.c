@@ -284,7 +284,7 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
-    lv_display_t * disp = lv_obj_get_disp(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
@@ -326,7 +326,7 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
-    lv_display_t * disp = lv_obj_get_disp(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
@@ -582,7 +582,7 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_result_t res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RESULT_OK) return;
 
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_image_t * img = (lv_image_t *)obj;
     lv_point_t pivot_px;
     lv_image_get_pivot(obj, &pivot_px);
@@ -652,7 +652,7 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
 static void draw_image(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_image_t * img = (lv_image_t *)obj;
     if(code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
@@ -784,7 +784,7 @@ static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y)
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
-    lv_display_t * disp = lv_obj_get_disp(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);

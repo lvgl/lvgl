@@ -82,6 +82,67 @@ typedef float lv_value_precise_t;
 typedef int32_t lv_value_precise_t;
 #endif
 
+/**
+ * Typedefs from various lvgl modules.
+ * They are defined here to avoid circular dependencies.
+ */
+
+struct _lv_obj_t;
+typedef struct _lv_obj_t lv_obj_t;
+
+#ifdef DOXYGEN
+typedef _lv_state_t lv_state_t;
+typedef _lv_part_t lv_part_t;
+typedef _lv_obj_flag_t lv_obj_flag_t;
+#else
+typedef uint16_t lv_state_t;
+typedef uint32_t lv_part_t;
+typedef uint32_t lv_obj_flag_t;
+#endif /*DOXYGEN*/
+
+struct _lv_obj_class_t;
+typedef struct _lv_obj_class_t lv_obj_class_t;
+
+struct _lv_group_t;
+typedef struct _lv_group_t lv_group_t;
+
+#ifdef DOXYGEN
+typedef _lv_key_t lv_key_t;
+#else
+typedef uint8_t lv_key_t;
+#endif /*DOXYGEN*/
+
+struct _lv_display_t;
+typedef struct _lv_display_t lv_display_t;
+
+struct _lv_layer_t;
+typedef struct _lv_layer_t lv_layer_t;
+struct _lv_draw_unit_t;
+typedef struct _lv_draw_unit_t lv_draw_unit_t;
+struct _lv_draw_task_t;
+typedef struct _lv_draw_task_t lv_draw_task_t;
+
+struct _lv_indev_t;
+typedef struct _lv_indev_t lv_indev_t;
+
+struct _lv_event_t;
+typedef struct _lv_event_t lv_event_t;
+
+struct _lv_timer_t;
+typedef struct _lv_timer_t lv_timer_t;
+
+struct _lv_theme_t;
+typedef struct _lv_theme_t lv_theme_t;
+
+struct _lv_anim_t;
+typedef struct _lv_anim_t lv_anim_t;
+
+struct _lv_font_t;
+typedef struct _lv_font_t lv_font_t;
+
+struct _lv_image_decoder_t;
+typedef struct _lv_image_decoder_t lv_image_decoder_t;
+
 #endif /*__ASSEMBLY__*/
 
 /**********************

@@ -57,6 +57,15 @@ Sets a maximal height. Pixel and percentage values can be used. Percentage value
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
+### length
+Its meaning depends on the type of the widget. For example in case of lv_scale it means the length of the ticks.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
+</ul>
+
 ### x
 Set the X coordinate of the object considering the set `align`. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area.
 <ul>
@@ -244,7 +253,7 @@ Sets the padding between the columns. Used by the layouts.
 Properties to describe spacing around an object. Very similar to the margin properties in HTML.
 
 ### margin_top
-Sets the margin on the top. The object will keep this space from its siblings in layouts. 
+Sets the margin on the top. The object will keep this space from its siblings in layouts.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -460,7 +469,7 @@ Sets whether the border should be drawn before or after the children are drawn. 
 Properties to describe the outline. It's like a border but drawn outside of the rectangles.
 
 ### outline_width
-Set the width of the outline in pixels. 
+Set the width of the outline in pixels.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -508,7 +517,7 @@ Set the width of the shadow in pixels. The value should be >= 0.
 </ul>
 
 ### shadow_offset_x
-Set an offset on the shadow in pixels in X direction. 
+Set an offset on the shadow in pixels in X direction.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -517,7 +526,7 @@ Set an offset on the shadow in pixels in X direction.
 </ul>
 
 ### shadow_offset_y
-Set an offset on the shadow in pixels in Y direction. 
+Set an offset on the shadow in pixels in Y direction.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -613,7 +622,7 @@ Set the gap between dashes in pixel. Note that dash works only on horizontal and
 </ul>
 
 ### line_rounded
-Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending 
+Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -652,7 +661,7 @@ Set the width (thickness) of the arcs in pixel.
 </ul>
 
 ### arc_rounded
-Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending 
+Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -709,7 +718,7 @@ Set the opacity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully 
 </ul>
 
 ### text_font
-Set the font of the text (a pointer `lv_font_t *`). 
+Set the font of the text (a pointer `lv_font_t *`).
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_FONT_DEFAULT`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
@@ -819,8 +828,8 @@ The animation template for the object's animation. Should be a pointer to `lv_an
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### anim_time
-The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
+### anim_duration
+The animation duration in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>

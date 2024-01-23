@@ -101,12 +101,6 @@ void _lv_sysmon_builtin_deinit(void);
  *      MACROS
  **********************/
 
-#else
-
-#if LV_USE_PERF_MONITOR || LV_USE_MEM_MONITOR
-#warning "lv_sysmon: lv_sysmon is required. Enable it in lv_conf.h (LV_USE_SYSMON  1)"
-#endif
-
 #endif /*LV_USE_SYSMON*/
 
 #ifdef __cplusplus

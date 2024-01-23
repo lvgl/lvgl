@@ -4,7 +4,6 @@
 void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_area_t draw_area;
-    lv_area_t buffer_area;
     lv_area_t coordinates;
     bool is_common;
     int32_t x;
@@ -26,14 +25,12 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
     }
 #endif
 
-    buffer_area = u->base_unit.target_layer->buf_area;
     lv_area_copy(&coordinates, coords);
 
     x = 0 - u->base_unit.target_layer->buf_area.x1;
     y = 0 - u->base_unit.target_layer->buf_area.y1;
 
     lv_area_move(&draw_area, x, y);
-    lv_area_move(&buffer_area, x, y);
     lv_area_move(&coordinates, x, y);
 
     //
@@ -43,12 +40,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
     d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
 #endif
 
-    d2_framebuffer(u->d2_handle,
-                   u->base_unit.target_layer->buf,
-                   (d2_s32)u->base_unit.target_layer->buf_stride / lv_color_format_get_size(u->base_unit.target_layer->color_format),
-                   (d2_u32)lv_area_get_width(&buffer_area),
-                   (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(u->base_unit.target_layer->color_format));
+    d2_framebuffer_from_layer(u->d2_handle, u->base_unit.target_layer);
 
     if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
         float a1;

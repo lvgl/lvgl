@@ -250,7 +250,7 @@ static void inactive_timer_cb(lv_timer_t * t)
     }
 
     if(lv_display_get_inactive_time(NULL) > 8000) {
-        lv_display_trig_activity(NULL);
+        lv_display_trigger_activity(NULL);
         lv_obj_scroll_by(cont, 100, 0, LV_ANIM_ON);
         lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
         scrolled = true;
@@ -282,7 +282,7 @@ static void scroll_event_cb(lv_event_t * e)
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_exec_cb(&a, shrink_anim_cb);
-        lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
+        lv_anim_set_completed_cb(&a, lv_obj_delete_anim_completed_cb);
         lv_anim_set_values(&a, 255, 0);
         lv_anim_set_duration(&a, 400);
         lv_anim_set_var(&a, cont);

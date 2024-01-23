@@ -36,9 +36,13 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-12-12" version="9.0.0-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev1.pack">
-      - LVGL 9.0.0-dev
-      - New Driver Architecture
+    <release date="2024-01-22" version="9.0.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
+      - LVGL 9.0.0
+      - Implements a New Render Architecture that enables parallel processing
+      - Accelerates SW-Render with NEON and Helium technology for Cortex architectures. 
+      - Adds supports for GPUs: VG-Lite, PXP, Dave2D and etc.
+      - Adds display drivers
+      - Adds Demos for benchmarks, render test etc,
       - Other fixes
     </release>
     <release date="2023-12-05" version="8.3.11" url="https://github.com/lvgl/lvgl/raw/8194d83226c27c84f12dd51e16f5add9939215a5/env_support/cmsis-pack/LVGL.lvgl.8.3.11.pack">
@@ -76,10 +80,6 @@
       - Fix GPU support for NXP PXP and NXP VGLite
       - Rework stm32 DMA2D support
       - Various fixes
-    </release>
-    <release date="2023-01-15" version="1.1.0-alpha" url="https://github.com/lvgl/lvgl/raw/4e3f341b882e0453d3da5cce6bb1b6357e52e3e7/env_support/cmsis-pack/LVGL.lvgl.1.1.0-alpha.pack">
-      - LVGL 9.0.0-dev
-      - Monthly update for January
     </release>
     <release date="2022-12-31" version="1.0.12" url="https://github.com/lvgl/lvgl/raw/7d0de1aabeabd4c71231895df7a503a3313b4619/env_support/cmsis-pack/LVGL.lvgl.1.0.12.pack">
       - LVGL 9.0.0-dev
@@ -265,69 +265,87 @@
             <require Cclass="LVGL" Cgroup="Essential"/>
         </condition>
 
+        <condition id="LVGL-Essential-Assets">
+            <description>Require LVGL Essential Service and Demo Assets </description>
+            <require condition="LVGL-Essential"/>
+            <require Cclass="LVGL" Cgroup="Demos" Csub="Assets" />
+        </condition>
+
         <condition id="Arm-2D">
             <description>Require Arm-2D Support</description>
             <require Cclass="Acceleration" Cgroup="Arm-2D"/>
         </condition>
 
-        <condition id="LVGL-GPU-Arm-2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
-        </condition>
-
         <condition id="LVGL-GPU-STM32-DMA2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for STM32-DMA2D</description>
+            <require condition="LVGL-Essential"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-SWM341-DMA2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for SWM341-DMA2D</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-PXP">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for NXP-PXP</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>-->
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-VGLite">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for NXP-VGLite</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>-->
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-GD32-IPA">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for GD32-IPA</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
+        </condition>
+        
+        <condition id="LVGL-GPU-Renesas-Dave2D">
+            <description>Condition for Renesas-Dave2D</description>
+            <require condition="LVGL-Essential"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>-->
         </condition>
 
     </conditions>
@@ -389,27 +407,27 @@
                 <file category="sourceC"            name="src/core/lv_refr.c" />
                 
                 
-                <!-- src/dev -->
-                <file category="sourceC"            name="src/dev/display/drm/lv_linux_drm.c" />
-                <file category="sourceC"            name="src/dev/display/fb/lv_linux_fbdev.c" />
-                <file category="sourceCpp"          name="src/dev/display/tft_espi/lv_tft_espi.cpp" />
-                <file category="sourceC"            name="src/dev/evdev/lv_evdev.c" />
+                <!-- src/drivers -->
+                <file category="sourceC"            name="src/drivers/evdev/lv_evdev.c" />
                 
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_entry.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_fbdev.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_lcd.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_libuv.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_touchscreen.c" />
+                <file category="sourceC"            name="src/drivers/display/lcd/lv_lcd_generic_mipi.c" />
                 
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_keyboard.c" />
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_mouse.c" />
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_mousewheel.c" />
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_window.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_entry.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_cache.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_fbdev.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_lcd.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_libuv.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_touchscreen.c" />
                 
-                <file category="sourceC"            name="src/dev/x11/lv_x11_display.c" />
-                <file category="sourceC"            name="src/dev/x11/lv_x11_input.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_keyboard.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_mouse.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_mousewheel.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_window.c" />
                 
-                <!-- src/dev -->
+                <file category="sourceC"            name="src/drivers/x11/lv_x11_display.c" />
+                <file category="sourceC"            name="src/drivers/x11/lv_x11_input.c" />
+
+                <!-- src/drivers -->
                 <file category="sourceC"            name="src/display/lv_display.c" />
                 
 
@@ -449,8 +467,6 @@
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c" />
                 <file category="sourceAsm"          name="src/draw/sw/blend/neon/lv_blend_neon.S"  condition="Helium GNU Assembler"/>
-                <!--file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.c" condition="Helium" /-->
-                
 
                 <!-- src/font -->
                 <file category="sourceC"            name="src/font/lv_binfont_loader.c" />
@@ -501,8 +517,6 @@
                 <file category="sourceC"            name="src/misc/lv_array.c" />
                 <file category="sourceC"            name="src/misc/lv_async.c" />
                 <file category="sourceC"            name="src/misc/lv_bidi.c" />
-                <file category="sourceC"            name="src/misc/lv_cache.c" />
-                <file category="sourceC"            name="src/misc/lv_cache_builtin.c" />
                 <file category="sourceC"            name="src/misc/lv_color.c" />
                 <file category="sourceC"            name="src/misc/lv_color_op.c" />
                 <file category="sourceC"            name="src/misc/lv_event.c" />
@@ -510,7 +524,6 @@
                 <file category="sourceC"            name="src/misc/lv_ll.c" />
                 <file category="sourceC"            name="src/misc/lv_log.c" />
                 <file category="sourceC"            name="src/misc/lv_lru.c" />
-                <file category="sourceC"            name="src/misc/lv_lru_rb.c" />
                 <file category="sourceC"            name="src/misc/lv_math.c" />
                 <file category="sourceC"            name="src/misc/lv_palette.c" />
                 <file category="sourceC"            name="src/misc/lv_profiler_builtin.c" />
@@ -522,7 +535,12 @@
                 <file category="sourceC"            name="src/misc/lv_text_ap.c" />
                 <file category="sourceC"            name="src/misc/lv_timer.c" />
                 <file category="sourceC"            name="src/misc/lv_utils.c" />
-
+                
+                <!-- src/misc/cache-->
+                <file category="sourceC"            name="src/misc/cache/_lv_cache_lru_rb.c" />
+                <file category="sourceC"            name="src/misc/cache/lv_cache.c" />
+                <file category="sourceC"            name="src/misc/cache/lv_cache_entry.c" />
+                <file category="sourceC"            name="src/misc/cache/lv_image_cache.c" />
 
                 <!-- src/stdlib-->
                 <file category="sourceC"            name="src/stdlib/lv_mem.c" />
@@ -542,7 +560,7 @@
                 <!-- src/themes -->
                 <file category="sourceC"            name="src/themes/lv_theme.c" />
                 <file category="sourceC"            name="src/themes/mono/lv_theme_mono.c" />
-                <file category="sourceC"            name="src/themes/basic/lv_theme_basic.c" />
+                <file category="sourceC"            name="src/themes/simple/lv_theme_simple.c" />
                 <file category="sourceC"            name="src/themes/default/lv_theme_default.c" />
                 
                 <!-- src/tick -->
@@ -562,7 +580,7 @@
                 <file category="sourceC"            name="src/widgets/checkbox/lv_checkbox.c" />
                 <file category="sourceC"            name="src/widgets/dropdown/lv_dropdown.c" />
                 <file category="sourceC"            name="src/widgets/image/lv_image.c" />
-                <file category="sourceC"            name="src/widgets/imgbtn/lv_imgbtn.c" />
+                <file category="sourceC"            name="src/widgets/imagebutton/lv_imagebutton.c" />
                 <file category="sourceC"            name="src/widgets/keyboard/lv_keyboard.c" />
                 <file category="sourceC"            name="src/widgets/label/lv_label.c" />
                 <file category="sourceC"            name="src/widgets/led/lv_led.c" />
@@ -590,6 +608,9 @@
                 
                 <!-- src/others -->
                 <file category="sourceC"            name="src/others/sysmon/lv_sysmon.c" />
+                <file category="sourceC"            name="src/others/observer/lv_observer.c" />
+                <file category="sourceC"            name="src/others/vg_lite_tvg/vg_lite_matrix.c" />
+                <file category="sourceCpp"          name="src/others/vg_lite_tvg/vg_lite_tvg.cpp" />
                 
                 <!-- src/demons -->
                 <file category="sourceC"            name="demos/lv_demos.c" />
@@ -598,7 +619,7 @@
                 <file category="sourceC"            name="src/osal/lv_os_none.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.0.2" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.3" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -626,7 +647,114 @@
                </RTE_Components_h>
 
             </component>
-            
+
+            <component Cgroup="Display" Cvariant="Windows Backend" condition="LVGL-Essential">
+              <description>Add the display driver for Windows backend  </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/windows/lv_windows_context.c" />
+                <file category="sourceC"            name="src/drivers/windows/lv_windows_display.c" />
+                <file category="sourceC"            name="src/drivers/windows/lv_windows_input.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for Windows backend*/ */
+#define LV_USE_WINDOWS    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="Linux DRM" condition="LVGL-Essential">
+              <description>Add the display driver for Linux /dev/dri/card*/  </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/drm/lv_linux_drm.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for Linux /dev/dri/card*/ */
+#define LV_USE_LINUX_DRM    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="Linux FBDEV" condition="LVGL-Essential">
+              <description>Add the display driver for Linux /dev/fb </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/fb/lv_linux_fbdev.c" />
+                <file category="sourceCpp"          name="src/drivers/display/tft_espi/lv_tft_espi.cpp" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for Linux /dev/fb */
+#define LV_USE_LINUX_FBDEV    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="TFT_eSPI" condition="LVGL-Essential">
+              <description>Add the display driver for TFT_eSPI </description>
+              <files>
+                <file category="sourceCpp"          name="src/drivers/display/tft_espi/lv_tft_espi.cpp" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for TFT_eSPI */
+#define LV_USE_TFT_ESPI    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="ILI9341" condition="LVGL-Essential">
+              <description>Add the display driver for ILI9341 </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/ili9341/lv_ili9341.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for ILI9341 */
+#define LV_USE_ILI9341	    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="st7735" condition="LVGL-Essential">
+              <description>Add the display driver for st7735 </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/st7735/lv_st7735.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for st7735 */
+#define LV_USE_ST7735	    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="st7789" condition="LVGL-Essential">
+              <description>Add the display driver for st7789 </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/st7789/lv_st7789.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for st7789 */
+#define LV_USE_ST7789	    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="st7796" condition="LVGL-Essential">
+              <description>Add the display driver for st7796 </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/st7796/lv_st7796.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for st7796 */
+#define LV_USE_ST7796	    1
+
+              </RTE_Components_h>
+            </component>
+
             <component Cgroup="OS Abstraction Layer" Cvariant="pthreads" condition="LVGL-Essential">
               <description>Add the support for pthreads</description>
               <files>
@@ -781,13 +909,34 @@
               </files>
             </component>
 
+            <component Cgroup="Acceleration" Csub="GPU Renesas-Dave2D"  condition="LVGL-GPU-Renesas-Dave2D">
+              <description>An hardware acceleration from Renesas Dave2D</description>
+              <files>
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_arc.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_border.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_fill.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_image.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_label.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_line.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_mask_rectangle.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_triangle.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_utils.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable Renesas Dave2D */
+#define LV_USE_DRAW_DAVE2D  1
+              </RTE_Components_h>
+
+            </component>
 
             <component Cgroup="Acceleration" Csub="GPU NXP-PXP"  condition="LVGL-GPU-NXP-PXP">
               <description>An hardware acceleration from NXP-PXP</description>
               <files>
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_buf_pxp.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp.c" />
-                <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_bg_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_fill.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_layer.c" />
@@ -810,17 +959,16 @@
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_buf_vglite.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
-                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_bg_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_border.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_fill.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_label.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_layer.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_line.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_triangle.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_buf.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_matrix.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_path.c" />
-                <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_buf.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_utils.c" />
               </files>
 
@@ -828,6 +976,36 @@
 
 /*! \brief enable NXP VGLite */
 #define LV_USE_DRAW_VGLITE          1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Acceleration" Csub="GPU VG-Lite">
+              <description>An hardware acceleration from VG-Lite GPU</description>
+              <files>
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_buf_vg_lite.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_arc.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_border.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_box_shadow.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_fill.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_img.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_label.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_layer.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_line.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_mask_rect.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_triangle.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_vector.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_decoder.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_math.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_path.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_utils.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable VG-Lite GPU */
+#define LV_USE_DRAW_VG_LITE          1
               </RTE_Components_h>
 
             </component>
@@ -988,7 +1166,6 @@
                 <file category="sourceC"    name="src/libs/freetype/lv_freetype.c" />
                 <file category="sourceC"    name="src/libs/freetype/lv_freetype_image.c" />
                 <file category="sourceC"    name="src/libs/freetype/lv_freetype_outline.c" />
-                <file category="sourceC"    name="src/libs/freetype/lv_freetype_sbit.c" />
                 <file category="sourceC"    name="src/libs/freetype/lv_ftsystem.c" />
               </files>
 
@@ -1391,21 +1568,6 @@
 
             </component>
 
-            <component Cgroup="Libraries and Others" Csub="Observer"  condition="LVGL-Essential">
-              <description>Add an observer pattern implementation</description>
-              <files>
-                <!-- src/others/observer -->
-                <file category="sourceC"            name="src/others/observer/lv_observer.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable an observer pattern implementation*/
-#define LV_USE_OBSERVER         1
-              </RTE_Components_h>
-
-            </component>
-
             <component Cgroup="Libraries and Others" Csub="Snapshot"  condition="LVGL-Essential">
               <description>Add the API to take snapshot for object</description>
               <files>
@@ -1421,13 +1583,10 @@
 
             </component>
 
-
-            <component Cgroup="Demos" Csub="Benchmark"  condition="LVGL-Essential">
+            <component Cgroup="Demos" Csub="Assets"  condition="LVGL-Essential">
               <description>Add the official benchmark.</description>
               <files>
                 <!-- demos/benchmark -->
-                <file category="sourceC"    name="demos/benchmark/lv_demo_benchmark.c" />
-
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_alpha256.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_argb.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
@@ -1436,60 +1595,8 @@
                 <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_12_compr_az.c.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_16_compr_az.c.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_28_compr_az.c.c" />
-
-                <file category="doc"        name="demos/benchmark/README.md" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable demo:bencharmk */
-#define LV_USE_DEMO_BENCHMARK           1
-              </RTE_Components_h>
-
-            </component>
-
-            <component Cgroup="Demos" Csub="Flex Layout" condition="LVGL-Essential">
-              <description>Add the Flex layout demo</description>
-              <files>
-                <!-- demos/flex_layout -->
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_ctrl_pad.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_flex_loader.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_main.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view_child_node.c" />
-                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view_ctrl_pad.c" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable the Flex layout demo */
-#define LV_USE_DEMO_FLEX_LAYOUT         1
-              </RTE_Components_h>
-
-            </component>
- 
-             <component Cgroup="Demos" Csub="Keypad Encoder" condition="LVGL-Essential">
-              <description>Add the demonstrate the usage of encoder and keyboard</description>
-              <files>
-                <!-- demos/keypad_encoder -->
-                <file category="sourceC"    name="demos/keypad_encoder/lv_demo_keypad_encoder.c" />
-                <file category="doc"        name="demos/keypad_encoder/README.md" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable the demonstrate the usage of encoder and keyboard */
-#define LV_USE_DEMO_KEYPAD_AND_ENCODER  1
-              </RTE_Components_h>
-
-            </component>
- 
- 
-              <component Cgroup="Demos" Csub="Multi-Language" condition="LVGL-Essential">
-              <description>Add the Smart-phone like multi-language demo.</description>
-              <files>
+                
                 <!-- demos/multilang -->
-                <file category="sourceC"    name="demos/multilang/lv_demo_multilang.c" />
                 <file category="sourceC"    name="demos/multilang/assets/img_multilang_like.c" />
                 <file category="sourceC"    name="demos/multilang/assets/avatars/img_multilang_avatar_1.c" />
                 <file category="sourceC"    name="demos/multilang/assets/avatars/img_multilang_avatar_2.c" />
@@ -1531,26 +1638,8 @@
                 
                 <file category="sourceC"    name="demos/multilang/assets/fonts/font_multilang_large.c" />
                 <file category="sourceC"    name="demos/multilang/assets/fonts/font_multilang_small.c" />
-
                 
-                <file category="doc"        name="demos/multilang/README.md" />
-              </files>
-
-              <RTE_Components_h>
-
-/*! \brief enable the Smart-phone like multi-language demo */
-#define LV_USE_DEMO_MULTILANG           1
-              </RTE_Components_h>
-
-            </component>
- 
-              <component Cgroup="Demos" Csub="Music Player" condition="LVGL-Essential">
-              <description>Add the music player demo</description>
-              <files>
                 <!-- demos/music -->
-                <file category="sourceC"    name="demos/music/lv_demo_music.c" />
-                <file category="sourceC"    name="demos/music/lv_demo_music_list.c" />
-                <file category="sourceC"    name="demos/music/lv_demo_music_main.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_wave_top_large.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_wave_top.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_wave_bottom_large.c" />
@@ -1595,7 +1684,105 @@
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_btn_list_pause_large.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_btn_list_pause.c" />
                 <file category="sourceC"    name="demos/music/assets/img_lv_demo_music_btn_corner_large.c" />
+
+                <!-- demos/widgets -->
+                <file category="sourceC"    name="demos/widgets/assets/img_clothes.c" />
+                <file category="sourceC"    name="demos/widgets/assets/img_demo_widgets_avatar.c" />
+                <file category="sourceC"    name="demos/widgets/assets/img_demo_widgets_needle.c" />
+                <file category="sourceC"    name="demos/widgets/assets/img_lvgl_logo.c" />
+
+                <!-- demos/transform -->
+                <file category="sourceC"    name="demos/transform/assets/img_transform_avatar_15.c" />
                 
+                <!-- demos/vector_graphic -->
+                <file category="sourceC"    name="demos/vector_graphic/assets/img_demo_vector_avatar.c" />
+                
+                <!-- demos/render -->
+                <file category="sourceC"    name="demos/render/assets/img_render_arc_bg.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_argb8888.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb565.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb888.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_xrgb8888.c" />
+              </files>
+
+            </component>
+
+            <component Cgroup="Demos" Csub="Benchmark"  condition="LVGL-Essential-Assets">
+              <description>Add the official benchmark.</description>
+              <files>
+                <!-- demos/benchmark -->
+                <file category="sourceC"    name="demos/benchmark/lv_demo_benchmark.c" />
+                <file category="doc"        name="demos/benchmark/README.md" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable demo:bencharmk */
+#define LV_USE_DEMO_BENCHMARK           1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Demos" Csub="Flex Layout" condition="LVGL-Essential-Assets">
+              <description>Add the Flex layout demo</description>
+              <files>
+                <!-- demos/flex_layout -->
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_ctrl_pad.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_flex_loader.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_main.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view_child_node.c" />
+                <file category="sourceC"    name="demos/flex_layout/lv_demo_flex_layout_view_ctrl_pad.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the Flex layout demo */
+#define LV_USE_DEMO_FLEX_LAYOUT         1
+              </RTE_Components_h>
+
+            </component>
+ 
+             <component Cgroup="Demos" Csub="Keypad Encoder" condition="LVGL-Essential-Assets">
+              <description>Add the demonstrate the usage of encoder and keyboard</description>
+              <files>
+                <!-- demos/keypad_encoder -->
+                <file category="sourceC"    name="demos/keypad_encoder/lv_demo_keypad_encoder.c" />
+                <file category="doc"        name="demos/keypad_encoder/README.md" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the demonstrate the usage of encoder and keyboard */
+#define LV_USE_DEMO_KEYPAD_AND_ENCODER  1
+              </RTE_Components_h>
+
+            </component>
+ 
+ 
+              <component Cgroup="Demos" Csub="Multi-Language" condition="LVGL-Essential-Assets">
+              <description>Add the Smart-phone like multi-language demo.</description>
+              <files>
+                <!-- demos/multilang -->
+                <file category="sourceC"    name="demos/multilang/lv_demo_multilang.c" />
+                <file category="doc"        name="demos/multilang/README.md" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the Smart-phone like multi-language demo */
+#define LV_USE_DEMO_MULTILANG           1
+              </RTE_Components_h>
+
+            </component>
+ 
+              <component Cgroup="Demos" Csub="Music Player" condition="LVGL-Essential-Assets">
+              <description>Add the music player demo</description>
+              <files>
+                <!-- demos/music -->
+                <file category="sourceC"    name="demos/music/lv_demo_music.c" />
+                <file category="sourceC"    name="demos/music/lv_demo_music_list.c" />
+                <file category="sourceC"    name="demos/music/lv_demo_music_main.c" />
                 <file category="doc"        name="demos/music/README.md" />
               </files>
 
@@ -1607,7 +1794,7 @@
 
             </component>
  
-             <component Cgroup="Demos" Csub="Scroll" condition="LVGL-Essential">
+             <component Cgroup="Demos" Csub="Scroll" condition="LVGL-Essential-Assets">
               <description>Add the demonstration for scroll settings</description>
               <files>
                 <!-- demos/scroll -->
@@ -1622,7 +1809,7 @@
 
             </component>
 
-             <component Cgroup="Demos" Csub="Stress Test" condition="LVGL-Essential">
+             <component Cgroup="Demos" Csub="Stress Test" condition="LVGL-Essential-Assets">
               <description>Add the Stress test for LVGL</description>
               <files>
                 <!-- demos/stress -->
@@ -1637,12 +1824,11 @@
 
             </component>
             
-             <component Cgroup="Demos" Csub="Widget Transform" condition="LVGL-Essential">
+             <component Cgroup="Demos" Csub="Widget Transform" condition="LVGL-Essential-Assets">
               <description>Add the Widget transformation demo</description>
               <files>
                 <!-- demos/transform -->
                 <file category="sourceC"    name="demos/transform/lv_demo_transform.c" />
-                <file category="sourceC"    name="demos/transform/assets/img_transform_avatar_15.c" />
               </files>
 
               <RTE_Components_h>
@@ -1653,12 +1839,11 @@
 
             </component>
  
-              <component Cgroup="Demos" Csub="Vector Graphic" condition="LVGL-Essential">
+              <component Cgroup="Demos" Csub="Vector Graphic" condition="LVGL-Essential-Assets">
               <description>Add the Vector graphic demo</description>
               <files>
                 <!-- demos/vector_graphic -->
                 <file category="sourceC"    name="demos/vector_graphic/lv_demo_vector_graphic.c" />
-                <file category="sourceC"    name="demos/vector_graphic/assets/img_demo_vector_avatar.c" />
               </files>
 
               <RTE_Components_h>
@@ -1669,16 +1854,11 @@
 
             </component>
 
-            <component Cgroup="Demos" Csub="Widgets" condition="LVGL-Essential">
+            <component Cgroup="Demos" Csub="Widgets" condition="LVGL-Essential-Assets">
               <description>Add the demo:widgets</description>
               <files>
                 <!-- demos/widgets -->
                 <file category="sourceC"    name="demos/widgets/lv_demo_widgets.c" />
-
-                <file category="sourceC"    name="demos/widgets/assets/img_clothes.c" />
-                <file category="sourceC"    name="demos/widgets/assets/img_demo_widgets_avatar.c" />
-                <file category="sourceC"    name="demos/widgets/assets/img_demo_widgets_needle.c" />
-                <file category="sourceC"    name="demos/widgets/assets/img_lvgl_logo.c" />
               </files>
 
               <RTE_Components_h>
@@ -1689,18 +1869,11 @@
 
             </component>
             
-            <component Cgroup="Demos" Csub="Render Test" condition="LVGL-Essential">
+            <component Cgroup="Demos" Csub="Render Test" condition="LVGL-Essential-Assets">
               <description>Add the Render test for each primitives. Requires at least 480x272 display</description>
               <files>
                 <!-- demos/render -->
                 <file category="sourceC"    name="demos/render/lv_demo_render.c" />
-
-                <file category="sourceC"    name="demos/render/assets/img_render_arc_bg.c" />
-                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_argb8888.c" />
-                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb565.c" />
-                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb888.c" />
-                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_xrgb8888.c" />
-                
                 <file category="doc"        name="demos/render/README.md" />
               </files>
 

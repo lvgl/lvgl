@@ -269,11 +269,8 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
 #if USE_D2
-                lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
-                if(draw_dsc->header.cf != LV_COLOR_FORMAT_RGB565A8) {
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                    t->preference_score = 0;
-                }
+                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
+                t->preference_score = 0;
 #endif
                 ret = 0;
                 break;
@@ -403,7 +400,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
         dave2d_execute_dlist_and_flush();
     }
 
-    struct _lv_draw_task_t ** p_new_list_entry;
+    lv_draw_task_t ** p_new_list_entry;
     p_new_list_entry = _lv_ll_ins_tail(&_ll_Dave2D_Tasks);
     *p_new_list_entry = t;
 #endif
@@ -476,7 +473,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     lv_area_move(&clipped_area, x, y);
 
     /* Invalidate cache */
-    lv_draw_buf_invalidate_cache(layer->buf, layer->buf_stride, layer->color_format, &clipped_area);
+    lv_draw_buf_invalidate_cache(layer->draw_buf->data, layer->draw_buf->header.stride, layer->color_format, &clipped_area);
 #endif
 #endif
 
@@ -598,8 +595,8 @@ void dave2d_execute_dlist_and_flush(void)
 #endif
 
     d2_s32     result;
-    struct _lv_draw_task_t ** p_list_entry;
-    struct _lv_draw_task_t * p_list_entry1;
+    lv_draw_task_t ** p_list_entry;
+    lv_draw_task_t * p_list_entry1;
 
     // Execute render operations
     result = d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);

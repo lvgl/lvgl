@@ -118,20 +118,20 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     blend_dsc.opa = dsc->opa;
     blend_dsc.blend_area = &blend_area;
     blend_dsc.mask_area = &blend_area;
+    lv_image_decoder_dsc_t decoder_dsc;
     if(dsc->img_src == NULL) {
         blend_dsc.color = dsc->color;
     }
     else {
-        lv_image_decoder_dsc_t decoder_dsc;
         lv_image_decoder_open(&decoder_dsc, dsc->img_src, NULL);
         img_area.x1 = 0;
         img_area.y1 = 0;
-        img_area.x2 = decoder_dsc.header.w - 1;
-        img_area.y2 = decoder_dsc.header.h - 1;
-        int32_t ofs = decoder_dsc.header.w / 2;
+        img_area.x2 = decoder_dsc.decoded->header.w - 1;
+        img_area.y2 = decoder_dsc.decoded->header.h - 1;
+        int32_t ofs = decoder_dsc.decoded->header.w / 2;
         lv_area_move(&img_area, dsc->center.x - ofs, dsc->center.y - ofs);
         blend_dsc.src_area = &img_area;
-        blend_dsc.src_buf = _lv_image_decoder_get_data(&decoder_dsc);
+        blend_dsc.src_buf = decoder_dsc.decoded->data;
         blend_dsc.src_color_format = decoder_dsc.decoded->header.cf;
         blend_dsc.src_stride = decoder_dsc.decoded->header.stride;
     }
@@ -171,14 +171,14 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         if(dsc->rounded) {
             if(blend_area.y1 >= round_area_1.y1 && blend_area.y1 <= round_area_1.y2) {
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
-                    lv_memset(mask_buf, 0x00, blend_w);
+                    lv_memzero(mask_buf, blend_w);
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 add_circle(circle_mask, &blend_area, &round_area_1, mask_buf, width);
             }
             if(blend_area.y1 >= round_area_2.y1 && blend_area.y1 <= round_area_2.y2) {
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
-                    lv_memset(mask_buf, 0x00, blend_w);
+                    lv_memzero(mask_buf, blend_w);
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 add_circle(circle_mask, &blend_area, &round_area_2, mask_buf, width);
@@ -198,6 +198,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     }
 
     lv_free(mask_buf);
+    if(dsc->img_src) lv_image_decoder_close(&decoder_dsc);
     if(circle_mask) lv_free(circle_mask);
 #else
     LV_LOG_WARN("Can't draw arc with LV_DRAW_SW_COMPLEX == 0");

@@ -40,43 +40,84 @@ remove the misleading guide above this code segment.
 4. Remove macro definitions for
 
    - LV_USE_DEMO_WIDGETS
+   
    - LV_USE_DEMO_BENCHMARK
+   
    - LV_USE_IME_PINYIN
+   
    - LV_USE_OS
+   
    - LV_USE_FILE_EXPLORER
+   
    - LV_USE_DEMO_WIDGETS
+   
    - LV_USE_DEMO_KEYPAD_AND_ENCODER
+   
    - LV_USE_DEMO_BENCHMARK
+   
    - LV_USE_DEMO_RENDER
+   
    - LV_USE_DEMO_STRESS
+   
    - LV_USE_DEMO_MUSIC
+   
    - LV_USE_DEMO_FLEX_LAYOUT
+   
    - LV_USE_DEMO_MULTILANG
+   
    - LV_USE_DEMO_TRANSFORM
+   
    - LV_USE_DEMO_SCROLL
+   
    - LV_USE_DEMO_VECTOR_GRAPHIC
+   
    - LV_USE_DRAW_VGLITE
+   
+   - LV_USE_DRAW_VG_LITE
+   
    - LV_USE_DRAW_PXP
+   
    - LV_USE_DRAW_SDL
+   
+   - LV_USE_DRAW_ARM2D
+   
    - LV_USE_SNAPSHOT
+   
    - LV_USE_MONKEY
+   
    - LV_USE_GRIDNAV
+   
    - LV_USE_FRAGMENT
+   
    - LV_USE_IMGFONT
-   - LV_USE_OBSERVER
+   
+   - LV_USE_LINUX_DRM
+   
+   - LV_USE_TFT_ESPI
+   
+   - LV_USE_ST7735
+   
+   - LV_USE_ST7789
+   
+   - LV_USE_ST7796
+   
+   - LV_USE_ILI9341
+   
+     
+   
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
 
-6. Set `LV_FONT_MONTSERRAT_12` and `LV_FONT_MONTSERRAT_16` to `1` (So Widgets and Benchmark can be compiled correctly, this is for improving the out of box experience.)
+6. Set `LV_FONT_MONTSERRAT_12`, `LV_FONT_MONTSERRAT_24` and `LV_FONT_MONTSERRAT_16` to `1` (So Widgets and Benchmark can be compiled correctly, this is for improving the out of box experience.)
 
 
 7. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
-#define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE     1
 #define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
-Make sure `LV_MEM_SIZE` is no less than `(256*1024U)`.
+Make sure `LV_MEM_SIZE` is no less than `(96*1024U)`.
 
 8. Remove following macro definitions in the `3rd party libraries` section:
 
@@ -130,7 +171,53 @@ Make sure `LV_MEM_SIZE` is no less than `(256*1024U)`.
     ```
 
 
-11. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+11. Add the following code to `HAL SETTINGS`:
+
+```c
+/*customize tick-get */
+#if defined(__PERF_COUNTER__) && __PERF_COUNTER__
+    #define LV_GLOBAL_INIT(__GLOBAL_PTR)                                    \
+            do {                                                            \
+                lv_global_init((lv_global_t *)(__GLOBAL_PTR));              \
+                extern uint32_t perfc_tick_get(void);                       \
+                (__GLOBAL_PTR)->tick_state.tick_get_cb = perfc_tick_get;    \
+            } while(0)
+#endif
+```
+
+
+
+12. Replace the macro definition:
+
+```c
+#define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+```
+
+with:
+
+```c
+    #if !defined(LV_USE_DRAW_SW_ASM) && defined(RTE_Acceleration_Arm_2D)
+        /*turn-on helium acceleration when Arm-2D and the Helium-powered device are detected */
+        #if defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
+            #define LV_USE_DRAW_SW_ASM  LV_DRAW_SW_ASM_HELIUM
+            #define LV_USE_DRAW_ARM2D   1
+        #endif
+    #endif
+
+    #ifndef LV_USE_DRAW_SW_ASM
+        #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+    #endif
+```
+
+13. Update macro `LV_PROFILER_INCLUDE`:
+
+```c
+#define LV_PROFILER_INCLUDE "src/misc/lv_profiler_builtin.h"
+```
+
+
+
+14. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 

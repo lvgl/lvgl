@@ -40,6 +40,9 @@
 #if LV_USE_DRAW_VG_LITE
     #include "draw/vg_lite/lv_draw_vg_lite.h"
 #endif
+#if LV_USE_WINDOWS
+    #include "drivers/windows/lv_windows_context.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -65,6 +68,10 @@
 /**********************
  *      MACROS
  **********************/
+
+#ifndef LV_GLOBAL_INIT
+    #define LV_GLOBAL_INIT(__GLOBAL_PTR)    lv_global_init((lv_global_t *)(__GLOBAL_PTR))
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -134,7 +141,7 @@ void lv_init(void)
     LV_LOG_INFO("begin");
 
     /*Initialize members of static variable lv_global */
-    lv_global_init(LV_GLOBAL_DEFAULT());
+    LV_GLOBAL_INIT(LV_GLOBAL_DEFAULT());
 
     lv_mem_init();
 
@@ -180,6 +187,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_SDL
     lv_draw_sdl_init();
+#endif
+
+#if LV_USE_WINDOWS
+    lv_windows_platform_init();
 #endif
 
     _lv_obj_style_init();

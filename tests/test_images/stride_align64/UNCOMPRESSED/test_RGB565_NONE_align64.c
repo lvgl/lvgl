@@ -84,6 +84,7 @@ uint8_t test_RGB565_NONE_align64_map[] = {
 };
 
 const lv_img_dsc_t test_RGB565_NONE_align64 = {
+  .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_RGB565,
   .header.flags = 0,
   .header.w = 71,

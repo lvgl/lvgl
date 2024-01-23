@@ -180,6 +180,7 @@ enum _lv_style_prop_t {
     /*Group 0*/
     LV_STYLE_WIDTH                  = 1,
     LV_STYLE_HEIGHT                 = 2,
+    LV_STYLE_LENGTH                 = 3,
 
     LV_STYLE_MIN_WIDTH              = 4,
     LV_STYLE_MAX_WIDTH              = 5,
@@ -283,7 +284,7 @@ enum _lv_style_prop_t {
     LV_STYLE_COLOR_FILTER_DSC       = 97,
     LV_STYLE_COLOR_FILTER_OPA       = 98,
     LV_STYLE_ANIM                   = 99,
-    LV_STYLE_ANIM_TIME              = 100,
+    LV_STYLE_ANIM_DURATION          = 100,
     LV_STYLE_TRANSITION             = 102,
     LV_STYLE_BLEND_MODE             = 103,
     LV_STYLE_TRANSFORM_WIDTH        = 104,
@@ -605,7 +606,7 @@ static inline bool lv_style_prop_has_flag(lv_style_prop_t prop, uint8_t flag)
  *    GLOBAL VARIABLES
  *************************/
 
-extern const lv_style_prop_t lv_style_const_prop_id_inv;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t lv_style_const_prop_id_inv;
 
 /**********************
  *      MACROS

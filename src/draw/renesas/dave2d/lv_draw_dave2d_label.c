@@ -22,13 +22,11 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
 
     d2_u8 current_fillmode;
     lv_area_t clip_area;
-    lv_area_t buffer_area;
     lv_area_t letter_coords;
 
     int32_t x;
     int32_t y;
 
-    buffer_area = unit->base_unit.target_layer->buf_area;
     letter_coords = *glyph_draw_dsc->letter_coords;
 
     bool is_common;
@@ -39,7 +37,6 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
     y = 0 - unit->base_unit.target_layer->buf_area.y1;
 
     lv_area_move(&clip_area, x, y);
-    lv_area_move(&buffer_area, x, y);
     lv_area_move(&letter_coords, x, y);
 
 #if LV_USE_OS
@@ -57,12 +54,8 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
     //
     // Generate render operations
     //
-    d2_framebuffer(unit->d2_handle,
-                   unit->base_unit.target_layer->buf,
-                   (d2_s32)unit->base_unit.target_layer->buf_stride / lv_color_format_get_size(unit->base_unit.target_layer->color_format),
-                   (d2_u32)lv_area_get_width(&buffer_area),
-                   (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(unit->base_unit.target_layer->color_format));
+
+    d2_framebuffer_from_layer(unit->d2_handle, unit->base_unit.target_layer);
 
     current_fillmode = d2_getfillmode(unit->d2_handle);
 
@@ -70,7 +63,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
                 (d2_border)clip_area.y2);
 
     if(glyph_draw_dsc) {
-        if(glyph_draw_dsc->bitmap == NULL) {
+        if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_INVALID) {
 #if LV_USE_FONT_PLACEHOLDER
             /* Draw a placeholder rectangle*/
             lv_draw_border_dsc_t border_draw_dsc;
@@ -89,18 +82,20 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
             //            lv_memzero(&blend_dsc, sizeof(blend_dsc));
             //            blend_dsc.color = glyph_draw_dsc->color;
             //            blend_dsc.opa = glyph_draw_dsc->opa;
-            //            blend_dsc.mask_buf = glyph_draw_dsc->bitmap;
+            //            blend_dsc.mask_buf = glyph_draw_dsc->glyph_data;
             //            blend_dsc.mask_area = &mask_area;
             //            blend_dsc.blend_area = glyph_draw_dsc->letter_coords;
             //            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             //lv_draw_sw_blend(u, &blend_dsc);
 
+            lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
+
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
-            d1_cacheblockflush(unit->d2_handle, 0, glyph_draw_dsc->bitmap, glyph_draw_dsc->_bitmap_buf_size);
+            d1_cacheblockflush(unit->d2_handle, 0, draw_buf->data, draw_buf->data_size);
 #endif
 #endif
-            d2_settexture(unit->d2_handle, (void *)glyph_draw_dsc->bitmap,
+            d2_settexture(unit->d2_handle, (void *)draw_buf->data,
                           (d2_s32)lv_draw_buf_width_to_stride((uint32_t)lv_area_get_width(&letter_coords), LV_COLOR_FORMAT_A8),
                           lv_area_get_width(&letter_coords),  lv_area_get_height(&letter_coords), d2_mode_alpha8);
             d2_settexopparam(unit->d2_handle, d2_cc_red, glyph_draw_dsc->color.red, 0);
@@ -132,7 +127,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
             img_dsc.scale_x = LV_SCALE_NONE;
             img_dsc.scale_y = LV_SCALE_NONE;
             img_dsc.opa = glyph_draw_dsc->opa;
-            img_dsc.src = glyph_draw_dsc->bitmap;
+            img_dsc.src = glyph_draw_dsc->glyph_data;
             //lv_draw_sw_image(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
 #endif
         }

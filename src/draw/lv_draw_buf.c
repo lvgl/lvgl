@@ -26,7 +26,10 @@
 static void * buf_malloc(size_t size, lv_color_format_t color_format);
 static void buf_free(void * buf);
 static void * buf_align(void * buf, lv_color_format_t color_format);
+static void * draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format);
+static void draw_buf_free(void * buf);
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format);
+static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride);
 
 /**********************
  *  STATIC VARIABLES
@@ -61,17 +64,6 @@ uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
     else return 0;
 }
 
-void * lv_draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format)
-{
-    if(handlers.buf_malloc_cb) return handlers.buf_malloc_cb(size_bytes, color_format);
-    else return NULL;
-}
-
-void lv_draw_buf_free(void * buf)
-{
-    if(handlers.buf_free_cb) handlers.buf_free_cb(buf);
-}
-
 void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
 {
     if(handlers.align_pointer_cb) return handlers.align_pointer_cb(data, color_format);
@@ -83,52 +75,73 @@ void lv_draw_buf_invalidate_cache(void * buf, uint32_t stride, lv_color_format_t
     if(handlers.invalidate_cache_cb) handlers.invalidate_cache_cb(buf, stride, color_format, area);
 }
 
-void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a)
+void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
 {
-    LV_UNUSED(h);
+    LV_ASSERT_NULL(draw_buf);
+    if(a && lv_area_get_width(a) < 0) return;
+    if(a && lv_area_get_height(a) < 0) return;
 
-    uint8_t px_size = lv_color_format_get_size(color_format);
-    uint32_t stride = lv_draw_buf_width_to_stride(w, color_format);
-    uint8_t * bufc =  buf;
+    const lv_image_header_t * header = &draw_buf->header;
+    uint32_t stride = header->stride;
 
-    /*Got the first pixel of each buffer*/
-    bufc += stride * a->y1;
-    bufc += a->x1 * px_size;
-
-    uint32_t line_length = lv_area_get_width(a) * px_size;
-    int32_t y;
-    for(y = a->y1; y <= a->y2; y++) {
-        lv_memzero(bufc, line_length);
-        bufc += stride;
+    if(a == NULL) {
+        lv_memzero(draw_buf->data, header->h * stride);
     }
-
+    else {
+        uint8_t * bufc;
+        uint32_t line_length;
+        int32_t start_y, end_y;
+        uint8_t px_size = lv_color_format_get_size(header->cf);
+        bufc = lv_draw_buf_goto_xy(draw_buf, a->x1, a->y1);
+        line_length = lv_area_get_width(a) * px_size;
+        start_y = a->y1;
+        end_y = a->y2;
+        for(; start_y <= end_y; start_y++) {
+            lv_memzero(bufc, line_length);
+            bufc += stride;
+        }
+    }
 }
 
-void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area_to_copy,
-                      void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area_to_copy,
-                      lv_color_format_t color_format)
+void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                      const lv_draw_buf_t * src, const lv_area_t * src_area)
 {
-    LV_UNUSED(dest_h);
-    LV_UNUSED(src_h);
+    uint8_t * dest_bufc;
+    uint8_t * src_bufc;
+    int32_t line_width;
 
-    uint8_t px_size = lv_color_format_get_size(color_format);
-    uint8_t * dest_bufc =  dest_buf;
-    uint8_t * src_bufc =  src_buf;
+    if(dest_area == NULL) line_width = dest->header.w;
+    else line_width = lv_area_get_width(dest_area);
 
-    uint32_t dest_stride = lv_draw_buf_width_to_stride(dest_w, color_format);
-    uint32_t src_stride = lv_draw_buf_width_to_stride(src_w, color_format);
+    /*Check source and dest area have same width*/
+    if((src_area == NULL && line_width != src->header.w) || \
+       (src_area != NULL && line_width != lv_area_get_width(src_area))) {
+        LV_ASSERT_MSG(0, "Source and destination areas have different width");
+        return;
+    }
 
-    /*Got the first pixel of each buffer*/
-    dest_bufc += dest_stride * dest_area_to_copy->y1;
-    dest_bufc += dest_area_to_copy->x1 * px_size;
+    if(src_area) src_bufc = lv_draw_buf_goto_xy(src, src_area->x1, src_area->y1);
+    else src_bufc = src->data;
 
-    src_bufc += src_stride * src_area_to_copy->y1;
-    src_bufc += src_area_to_copy->x1 * px_size;
+    if(dest_area) dest_bufc = lv_draw_buf_goto_xy(dest, dest_area->x1, dest_area->y1);
+    else dest_bufc = dest->data;
 
-    uint32_t line_length = lv_area_get_width(dest_area_to_copy) * px_size;
-    int32_t y;
-    for(y = dest_area_to_copy->y1; y <= dest_area_to_copy->y2; y++) {
-        lv_memcpy(dest_bufc, src_bufc, line_length);
+    int32_t start_y, end_y;
+    if(dest_area) {
+        start_y = dest_area->y1;
+        end_y = dest_area->y2;
+    }
+    else {
+        start_y = 0;
+        end_y = dest->header.h - 1;
+    }
+
+    uint32_t dest_stride = dest->header.stride;
+    uint32_t src_stride = src->header.stride;
+    line_width *= lv_color_format_get_size(dest->header.cf); /*Pixel to bytes*/
+
+    for(; start_y <= end_y; start_y++) {
+        lv_memcpy(dest_bufc, src_bufc, line_width);
         dest_bufc += dest_stride;
         src_bufc += src_stride;
     }
@@ -160,29 +173,18 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
 
 lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
 {
-    uint32_t size;
     lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     LV_ASSERT_MALLOC(draw_buf);
     if(draw_buf == NULL) return NULL;
     if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
 
-    size = stride * h;
-    if(cf == LV_COLOR_FORMAT_RGB565A8) {
-        size += (stride / 2) * h; /*A8 mask*/
-    }
-    else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-        /*@todo we have to include palette right before image data*/
-        size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
-    }
+    uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
 
-    /*RLE decompression operates on pixel unit, thus add padding to make sure memory is enough*/
-    uint8_t bpp = lv_color_format_get_bpp(cf);
-    bpp = (bpp + 7) >> 3;
-    size += bpp;
-
-    void * buf = lv_draw_buf_malloc(size, cf);
-    LV_ASSERT_MALLOC(buf);
+    void * buf = draw_buf_malloc(size, cf);
+    /*Do not assert here as LVGL or the app might just want to try creating a draw_buf*/
     if(buf == NULL) {
+        LV_LOG_WARN("No memory: %"LV_PRIu32"x%"LV_PRIu32", cf: %d, stride: %"LV_PRIu32", %"LV_PRIu32"Byte, ",
+                    w, h, cf, stride, size);
         lv_free(draw_buf);
         return NULL;
     }
@@ -192,6 +194,7 @@ lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf,
     draw_buf->header.cf = cf;
     draw_buf->header.flags = LV_IMAGE_FLAGS_MODIFIABLE | LV_IMAGE_FLAGS_ALLOCATED;
     draw_buf->header.stride = stride;
+    draw_buf->header.magic = LV_IMAGE_HEADER_MAGIC;
     draw_buf->data = lv_draw_buf_align(buf, cf);
     draw_buf->unaligned_data = buf;
     draw_buf->data_size = size;
@@ -215,13 +218,37 @@ lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf)
     return new_buf;
 }
 
+lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t cf, uint32_t w, uint32_t h,
+                                    uint32_t stride)
+{
+    if(draw_buf == NULL) return NULL;
+
+    /*If color format is unknown, keep using the original color format.*/
+    if(cf == LV_COLOR_FORMAT_UNKNOWN) cf = draw_buf->header.cf;
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+    uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+
+    if(size > draw_buf->data_size) {
+        LV_LOG_INFO("Draw buf too small for new shape");
+        return NULL;
+    }
+
+    draw_buf->header.cf = cf;
+    draw_buf->header.w = w;
+    draw_buf->header.h = h;
+    draw_buf->header.stride = stride;
+
+    return draw_buf;
+}
+
 void lv_draw_buf_destroy(lv_draw_buf_t * buf)
 {
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return;
 
     if(buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
-        lv_draw_buf_free(buf->unaligned_data);
+        draw_buf_free(buf->unaligned_data);
         lv_free(buf);
     }
     else {
@@ -229,7 +256,7 @@ void lv_draw_buf_destroy(lv_draw_buf_t * buf)
     }
 }
 
-void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y)
+void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 {
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return NULL;
@@ -250,18 +277,23 @@ lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t st
     if(src == NULL) return NULL;
     if(src->data == NULL) return NULL;
 
+    const lv_image_header_t * header = &src->header;
+
+    /*Use global stride*/
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(header->w, header->cf);
+
     /*Check if stride already match*/
-    if(src->header.stride == stride) return NULL;
+    if(header->stride == stride) return NULL;
 
     /*Calculate the minimal stride allowed from bpp*/
-    uint32_t bpp = lv_color_format_get_bpp(src->header.cf);
-    uint32_t min_stride = (src->header.w * bpp + 7) >> 3;
+    uint32_t bpp = lv_color_format_get_bpp(header->cf);
+    uint32_t min_stride = (header->w * bpp + 7) >> 3;
     if(stride < min_stride) {
         LV_LOG_WARN("New stride is too small. min: %" LV_PRId32, min_stride);
         return NULL;
     }
 
-    lv_draw_buf_t * dst = lv_draw_buf_create(src->header.w, src->header.h, src->header.cf, stride);
+    lv_draw_buf_t * dst = lv_draw_buf_create(header->w, header->h, header->cf, stride);
     if(dst == NULL) return NULL;
 
     uint8_t * dst_data = dst->data;
@@ -374,4 +406,36 @@ static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format)
     width_byte = w * lv_color_format_get_bpp(color_format);
     width_byte = (width_byte + 7) >> 3; /*Round up*/
     return (width_byte + LV_DRAW_BUF_STRIDE_ALIGN - 1) & ~(LV_DRAW_BUF_STRIDE_ALIGN - 1);
+}
+
+static void * draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format)
+{
+    if(handlers.buf_malloc_cb) return handlers.buf_malloc_cb(size_bytes, color_format);
+    else return NULL;
+}
+
+static void draw_buf_free(void * buf)
+{
+    if(handlers.buf_free_cb) handlers.buf_free_cb(buf);
+}
+
+/**
+ * For given width, height, color format, and stride, calculate the size needed for a new draw buffer.
+ */
+static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
+{
+    uint32_t size;
+
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+    size = stride * h;
+    if(cf == LV_COLOR_FORMAT_RGB565A8) {
+        size += (stride / 2) * h; /*A8 mask*/
+    }
+    else if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+        /*@todo we have to include palette right before image data*/
+        size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
+    }
+
+    return size;
 }

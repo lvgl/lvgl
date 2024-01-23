@@ -52,7 +52,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
                                        _lv_bar_anim_t * anim_info, lv_anim_enable_t en);
 static void lv_bar_init_anim(lv_obj_t * bar, _lv_bar_anim_t * bar_anim);
 static void lv_bar_anim(void * bar, int32_t value);
-static void lv_bar_anim_ready(lv_anim_t * a);
+static void lv_bar_anim_completed(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -260,7 +260,7 @@ static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
 static void draw_indic(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
     lv_layer_t * layer = lv_event_get_layer(e);
@@ -288,6 +288,7 @@ static void draw_indic(lv_event_t * e)
     int32_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
     int32_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
     int32_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+
     /*Respect padding and minimum width/height too*/
     lv_area_copy(&bar->indic_area, &bar_coords);
     bar->indic_area.x1 += bg_left;
@@ -304,11 +305,11 @@ static void draw_indic(lv_event_t * e)
         bar->indic_area.x2 = bar->indic_area.x1 + LV_BAR_SIZE_MIN;
     }
 
-    int32_t indicw = lv_area_get_width(&bar->indic_area);
-    int32_t indich = lv_area_get_height(&bar->indic_area);
+    int32_t indic_max_w = lv_area_get_width(&bar->indic_area);
+    int32_t indic_max_h = lv_area_get_height(&bar->indic_area);
 
     /*Calculate the indicator length*/
-    int32_t anim_length = hor ? indicw : indich;
+    int32_t anim_length = hor ? indic_max_w : indic_max_h;
 
     int32_t anim_cur_value_x, anim_start_value_x;
 
@@ -356,7 +357,7 @@ static void draw_indic(lv_event_t * e)
     }
 
     /**
-     * The drawing drection of the bar can be reversed only when one of the two conditions(value inversion
+     * The drawing direction of the bar can be reversed only when one of the two conditions(value inversion
      * or horizontal direction base dir is LV_BASE_DIR_RTL) is met.
     */
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
@@ -441,34 +442,107 @@ static void draw_indic(lv_event_t * e)
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
     int32_t indic_radius = draw_rect_dsc.radius;
-    short_side = LV_MIN(indicw, indich);
+    short_side = LV_MIN(lv_area_get_width(&bar->indic_area), lv_area_get_height(&bar->indic_area));
     if(indic_radius > short_side >> 1) indic_radius = short_side >> 1;
 
-    /*TODO handle clipping from gradient*/
-    /*The radius of the bg and the indicator can make a strange shape where
-    *it'd be very difficult to draw shadow.
-    *Draw this strange shape as a layer without shadow*/
-    if(((hor && lv_area_get_width(&bar->indic_area) < indic_radius * 2) ||
-        (!hor && lv_area_get_height(&bar->indic_area) < indic_radius * 2))) {
-        draw_rect_dsc.shadow_width = 0;
+    /*Cases:
+     * Simple:
+     *   - indicator area is the same or smaller then the bg
+     *   - indicator has the same or larger radius than the bg
+     *   - what to do? just draw the indicator
+     * Radius issue:
+     *   - indicator area is the same or smaller then bg
+     *   - indicator has smaller radius than the bg and the indicator overflows on the corners
+     *   - what to do? draw the indicator on a layer and clip to bg radius
+     * Larger indicator:
+     *   - indicator area is the larger then the bg
+     *   - radius doesn't matter
+     *   - shadow doesn't matter
+     *   - what to do? just draw the indicator
+     * Shadow:
+     *   - indicator area is the same or smaller then the bg
+     *   - indicator has the same or larger radius than the bg (shadow needs to be drawn on strange clipped shape)
+     *   - what to do? don't draw the shadow if the indicator is too small has strange shape
+     * Gradient:
+     *   - the indicator has a gradient
+     *   - what to do? draw it on a bg sized layer clip the indicator are from the gradient
+     *
+     */
 
-        lv_area_t indic_clip_area;
-        if(_lv_area_intersect(&indic_clip_area, &indic_area, &layer->_clip_area)) {
-            lv_layer_t * layer_indic = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &indic_area);
+    bool gradient = false;
+    if(hor && draw_rect_dsc.bg_grad.dir == LV_GRAD_DIR_HOR) gradient = true;
+    else if(!hor && draw_rect_dsc.bg_grad.dir == LV_GRAD_DIR_VER) gradient = true;
 
-            lv_draw_rect(layer_indic, &draw_rect_dsc, &indic_area);
+    bool radius_issue = true;
+    /*The indicator is fully drawn if it's larger than the bg*/
+    if((bg_left < 0 || bg_right < 0 || bg_top < 0 || bg_bottom < 0)) radius_issue = false;
+    else if(indic_radius >= bg_radius) radius_issue = false;
+    else if(_lv_area_is_in(&indic_area, &bar_coords, bg_radius)) radius_issue = false;
 
-            lv_draw_mask_rect_dsc_t mask_dsc;
-            lv_draw_mask_rect_dsc_init(&mask_dsc);
-            mask_dsc.area = obj->coords;
+    if(radius_issue || gradient) {
+        if(!radius_issue) {
+            /*Draw only the shadow*/
+            lv_draw_rect_dsc_t draw_tmp_dsc = draw_rect_dsc;
+            draw_tmp_dsc.border_opa = 0;
+            draw_tmp_dsc.outline_opa = 0;
+            draw_tmp_dsc.bg_opa = 0;
+            draw_tmp_dsc.bg_image_opa = 0;
+            lv_draw_rect(layer, &draw_tmp_dsc, &indic_area);
+        }
+        else {
+            draw_rect_dsc.border_opa = 0;
+            draw_rect_dsc.outline_opa = 0;
+        }
+        draw_rect_dsc.shadow_opa = 0;
+
+        /*If clipped for any reason can the border, outline, and shadow
+         *would be clipped and looked ugly so don't draw them*/
+        lv_draw_rect_dsc_t draw_tmp_dsc = draw_rect_dsc;
+        draw_tmp_dsc.border_opa = 0;
+        draw_tmp_dsc.outline_opa = 0;
+        draw_tmp_dsc.shadow_opa = 0;
+        lv_area_t indic_draw_area = indic_area;
+        if(gradient) {
+            if(hor) {
+                indic_draw_area.x1 = bar_coords.x1 + bg_left;
+                indic_draw_area.x2 = bar_coords.x2 - bg_right;
+            }
+            else {
+                indic_draw_area.y1 = bar_coords.y1 + bg_top;
+                indic_draw_area.y2 = bar_coords.y2 - bg_bottom;
+            }
+            draw_tmp_dsc.radius = 0;
+        }
+
+        lv_layer_t * layer_indic = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &indic_draw_area);
+
+        lv_draw_rect(layer_indic, &draw_tmp_dsc, &indic_draw_area);
+
+        lv_draw_mask_rect_dsc_t mask_dsc;
+        lv_draw_mask_rect_dsc_init(&mask_dsc);
+        if(radius_issue) {
+            mask_dsc.area = bar_coords;
             mask_dsc.radius = bg_radius;
             lv_draw_mask_rect(layer_indic, &mask_dsc);
-
-            lv_draw_image_dsc_t layer_draw_dsc;
-            lv_draw_image_dsc_init(&layer_draw_dsc);
-            layer_draw_dsc.src = layer_indic;
-            lv_draw_layer(layer, &layer_draw_dsc, &indic_area);
         }
+
+        if(gradient) {
+            mask_dsc.area = indic_area;
+            mask_dsc.radius = indic_radius;
+            lv_draw_mask_rect(layer_indic, &mask_dsc);
+        }
+
+        lv_draw_image_dsc_t layer_draw_dsc;
+        lv_draw_image_dsc_init(&layer_draw_dsc);
+        layer_draw_dsc.src = layer_indic;
+        lv_draw_layer(layer, &layer_draw_dsc, &indic_draw_area);
+
+        /*Add the border, outline, and shadow only to the indicator area.
+         *They might have disabled if there is a radius_issue*/
+        draw_tmp_dsc = draw_rect_dsc;
+        draw_tmp_dsc.bg_opa = 0;
+        draw_tmp_dsc.bg_image_opa = 0;
+        lv_draw_rect(layer, &draw_tmp_dsc, &indic_area);
     }
     else {
         lv_draw_rect(layer, &draw_rect_dsc, &indic_area);
@@ -486,7 +560,7 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         int32_t indic_size;
@@ -504,7 +578,7 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         int32_t pad = LV_MIN4(bg_left, bg_right, bg_top, bg_bottom);
         if(pad < 0) {
-            *s = LV_MAX(*s, -pad);
+            *s = *s - pad;
         }
     }
     else if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
@@ -523,7 +597,7 @@ static void lv_bar_anim(void * var, int32_t value)
     lv_obj_invalidate(bar_anim->bar);
 }
 
-static void lv_bar_anim_ready(lv_anim_t * a)
+static void lv_bar_anim_completed(lv_anim_t * a)
 {
     _lv_bar_anim_t * var = a->var;
     lv_obj_t * obj = (lv_obj_t *)var->bar;
@@ -571,8 +645,8 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
         lv_anim_set_var(&a, anim_info);
         lv_anim_set_exec_cb(&a, lv_bar_anim);
         lv_anim_set_values(&a, LV_BAR_ANIM_STATE_START, LV_BAR_ANIM_STATE_END);
-        lv_anim_set_ready_cb(&a, lv_bar_anim_ready);
-        lv_anim_set_duration(&a, lv_obj_get_style_anim_time(obj, LV_PART_MAIN));
+        lv_anim_set_completed_cb(&a, lv_bar_anim_completed);
+        lv_anim_set_duration(&a, lv_obj_get_style_anim_duration(obj, LV_PART_MAIN));
         lv_anim_start(&a);
     }
 }

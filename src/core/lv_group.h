@@ -18,8 +18,8 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "../misc/lv_ll.h"
 #include "../misc/lv_types.h"
+#include "../misc/lv_ll.h"
 
 /*********************
  *      DEFINES
@@ -40,29 +40,20 @@ enum _lv_key_t {
     LV_KEY_END       = 3,   /*0x03, ETX*/
 };
 
-#ifdef DOXYGEN
-typedef _lv_key_t lv_key_t;
-#else
-typedef uint8_t lv_key_t;
-#endif /*DOXYGEN*/
-
 /**********************
  *      TYPEDEFS
  **********************/
 
-struct _lv_obj_t;
-struct _lv_group_t;
-
-typedef void (*lv_group_focus_cb_t)(struct _lv_group_t *);
-typedef void (*lv_group_edge_cb_t)(struct _lv_group_t *, bool);
+typedef void (*lv_group_focus_cb_t)(lv_group_t *);
+typedef void (*lv_group_edge_cb_t)(lv_group_t *, bool);
 
 /**
  * Groups can be used to logically hold objects so that they can be individually focused.
  * They are NOT for laying out objects on a screen (try layouts for that).
  */
-typedef struct _lv_group_t {
+struct _lv_group_t {
     lv_ll_t obj_ll;        /**< Linked list to store the objects in the group*/
-    struct _lv_obj_t ** obj_focus; /**< The object in focus*/
+    lv_obj_t ** obj_focus; /**< The object in focus*/
 
     lv_group_focus_cb_t focus_cb;              /**< A function to call when a new object is focused (optional)*/
     lv_group_edge_cb_t  edge_cb;               /**< A function to call when an edge is reached, no more focus
@@ -77,7 +68,7 @@ typedef struct _lv_group_t {
                                    deletion.*/
     uint8_t wrap : 1;           /**< 1: Focus next/prev can wrap at end of list. 0: Focus next/prev stops at end
                                    of list.*/
-} lv_group_t;
+};
 
 typedef enum {
     LV_GROUP_REFOCUS_POLICY_NEXT = 0,
@@ -89,13 +80,13 @@ typedef enum {
  **********************/
 
 /**
- * Init. the group module
+ * Init the group module
  * @remarks Internal function, do not call directly.
  */
 void _lv_group_init(void);
 
 /**
- * Deinit. the group module
+ * Deinit the group module
  * @remarks Internal function, do not call directly.
  */
 void _lv_group_deinit(void);
@@ -129,20 +120,20 @@ lv_group_t * lv_group_get_default(void);
  * @param group     pointer to a group
  * @param obj       pointer to an object to add
  */
-void lv_group_add_obj(lv_group_t * group, struct _lv_obj_t * obj);
+void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj);
 
 /**
  * Swap 2 object in a group. The object must be in the same group
  * @param obj1  pointer to an object
  * @param obj2  pointer to an other object
  */
-void lv_group_swap_obj(struct _lv_obj_t * obj1, struct _lv_obj_t * obj2);
+void lv_group_swap_obj(lv_obj_t * obj1, lv_obj_t * obj2);
 
 /**
  * Remove an object from its group
  * @param obj       pointer to an object to remove
  */
-void lv_group_remove_obj(struct _lv_obj_t * obj);
+void lv_group_remove_obj(lv_obj_t * obj);
 
 /**
  * Remove all objects from a group
@@ -154,7 +145,7 @@ void lv_group_remove_all_objs(lv_group_t * group);
  * Focus on an object (defocus the current)
  * @param obj       pointer to an object to focus on
  */
-void lv_group_focus_obj(struct _lv_obj_t * obj);
+void lv_group_focus_obj(lv_obj_t * obj);
 
 /**
  * Focus the next object in a group (defocus the current)
@@ -224,7 +215,7 @@ void lv_group_set_wrap(lv_group_t * group, bool en);
  * @param group         pointer to a group
  * @return              pointer to the focused object
  */
-struct _lv_obj_t * lv_group_get_focused(const lv_group_t * group);
+lv_obj_t * lv_group_get_focused(const lv_group_t * group);
 
 /**
  * Get the focus callback function of a group

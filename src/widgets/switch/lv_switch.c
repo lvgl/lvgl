@@ -46,7 +46,7 @@ static void draw_main(lv_event_t * e);
 
 static void lv_switch_anim_exec_cb(void * sw, int32_t value);
 static void lv_switch_trigger_anim(lv_obj_t * obj);
-static void lv_switch_anim_ready(lv_anim_t * a);
+static void lv_switch_anim_completed(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -117,7 +117,7 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         int32_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
@@ -145,7 +145,7 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_main(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     lv_layer_t * layer = lv_event_get_layer(e);
@@ -212,7 +212,7 @@ static void lv_switch_anim_exec_cb(void * var, int32_t value)
 /**
  * Resets the switch's animation state to "no animation in progress".
  */
-static void lv_switch_anim_ready(lv_anim_t * a)
+static void lv_switch_anim_completed(lv_anim_t * a)
 {
     lv_switch_t * sw = a->var;
     sw->anim_state = LV_SWITCH_ANIM_STATE_INV;
@@ -228,7 +228,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    uint32_t anim_dur_full = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+    uint32_t anim_dur_full = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
 
     if(anim_dur_full > 0) {
         bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
@@ -255,7 +255,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
         lv_anim_set_var(&a, sw);
         lv_anim_set_exec_cb(&a, lv_switch_anim_exec_cb);
         lv_anim_set_values(&a, anim_start, anim_end);
-        lv_anim_set_ready_cb(&a, lv_switch_anim_ready);
+        lv_anim_set_completed_cb(&a, lv_switch_anim_completed);
         lv_anim_set_duration(&a, anim_dur);
         lv_anim_start(&a);
     }

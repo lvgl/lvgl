@@ -54,7 +54,7 @@ static void scale3_anim_cb(void * var, int32_t v);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void delete_timer_event_cb(lv_event_t * e);
-static void slideshow_anim_ready_cb(lv_anim_t * a_old);
+static void slideshow_anim_completed_cb(lv_anim_t * a_old);
 static void scale3_delete_event_cb(lv_event_t * e);
 static void tabview_delete_event_cb(lv_event_t * e);
 
@@ -233,7 +233,7 @@ void lv_demo_widgets_start_slideshow(void)
     lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
-    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);
     lv_anim_start(&a);
 }
 
@@ -737,7 +737,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_set_angle_range(scale2, 360);
     lv_scale_set_text_src(scale2, scale2_text);
     lv_scale_set_total_tick_count(scale2, 11);
-    lv_scale_set_major_tick_length(scale2, 30);
+    lv_obj_set_style_length(scale2, 30, LV_PART_INDICATOR);
     lv_scale_set_major_tick_every(scale2, 1);
     arc = lv_arc_create(scale2);
     lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
@@ -780,8 +780,8 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_set_range(scale3, 10, 60);
     lv_scale_set_total_tick_count(scale3, 21);
     lv_scale_set_major_tick_every(scale3, 4);
-    lv_scale_set_minor_tick_length(scale3, 10);
-    lv_scale_set_major_tick_length(scale3, 20);
+    lv_obj_set_style_length(scale3, 10, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale3, 20, LV_PART_INDICATOR);
     lv_scale_set_angle_range(scale3, 225);
     lv_scale_set_rotation(scale3, 135);
 
@@ -1637,7 +1637,7 @@ static void delete_timer_event_cb(lv_event_t * e)
     }
 }
 
-static void slideshow_anim_ready_cb(lv_anim_t * a_old)
+static void slideshow_anim_completed_cb(lv_anim_t * a_old)
 {
     LV_UNUSED(a_old);
 
@@ -1661,7 +1661,7 @@ static void slideshow_anim_ready_cb(lv_anim_t * a_old)
     lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
-    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);
     lv_anim_start(&a);
 }
 

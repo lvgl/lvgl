@@ -1,12 +1,8 @@
-**IMPORTANT NOTE** The next major version (v9.0.0) is developed in the master branch.
-The last stable version is available in the [release/v8.3](https://github.com/lvgl/lvgl/tree/release/v8.3) branch.
-
----
 
 <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
 
 <p align="right">
-  <b>English</b> | <a href="./docs/README_zh.md">中文</a> | <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a>
+  <b>English</b> | <a href="./docs/README_zh.rst">中文</a> | <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a>
 </p>
 
 <br>
@@ -104,7 +100,7 @@ LVGL is available as:
 - [Arduino library](https://docs.lvgl.io/master/integration/framework/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
 - [Zephyr library](https://docs.lvgl.io/master/integration/os/zephyr.html)
-- [ESP32 component](https://components.espressif.com/components/lvgl/lvgl)
+- [ESP-IDF(ESP32) component](https://components.espressif.com/components/lvgl/lvgl)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
 - [NuttX library](https://docs.lvgl.io/master/integration/os/nuttx.html)
 - [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
@@ -434,7 +430,7 @@ This list will guide you to get started with LVGL step-by-step.
 
 **Start to Use LVGL**
 
-  4. Set up a [Simulator](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) (10 minutes)
+  4. Set up a [Simulator](https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator) (10 minutes)
   5. Try out some [Examples](https://github.com/lvgl/lvgl/tree/master/examples)
   6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_)
 

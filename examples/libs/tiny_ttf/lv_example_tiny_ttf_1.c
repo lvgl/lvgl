@@ -9,14 +9,11 @@ void lv_example_tiny_ttf_1(void)
     extern const uint8_t ubuntu_font[];
     extern const int ubuntu_font_size;
 
-    static lv_font_t font;
-    lv_result_t res = lv_tiny_ttf_create_data(&font, ubuntu_font, ubuntu_font_size, 30);
-    if(res == LV_RESULT_INVALID) return;
-
     /*Create style with the new font*/
     static lv_style_t style;
     lv_style_init(&style);
-    lv_style_set_text_font(&style, &font);
+    lv_font_t * font = lv_tiny_ttf_create_data(ubuntu_font, ubuntu_font_size, 30);
+    lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
 
     /*Create a label with the new style*/

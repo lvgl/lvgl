@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v8.0
+# Kconfig file for LVGL v9.0.0
 
 menu "LVGL configuration"
 
@@ -269,6 +269,18 @@ menu "LVGL configuration"
 					save the continuous open/decode of images.
 					However the opened images might consume additional RAM.
 
+			config LV_IMAGE_HEADER_CACHE_DEF_CNT
+				int "Default image header cache count. 0 to disable caching."
+				default 0
+				depends on LV_USE_DRAW_SW
+				help
+					If only the built-in image formats are used there is no real advantage of caching.
+					(I.e. no new image decoder is added).
+
+					With complex image decoders (e.g. PNG or JPG) caching can
+					save the continuous getting header information of images.
+					However the records of opened images headers might consume additional RAM.
+
 			config LV_GRADIENT_MAX_STOPS
 				int "Number of stops allowed per gradient."
 				default 2
@@ -302,13 +314,6 @@ menu "LVGL configuration"
 					Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
 					The increase in memory consumption is (24 bits * object's width)
 
-			config LV_DISPLAY_ROT_MAX_BUF
-				int "Maximum buffer size to allocate for rotation"
-				default 10240
-				depends on LV_USE_DRAW_SW
-				help
-					Only used if software rotation is enabled in the display driver.
-
 			config LV_USE_VECTOR_GRAPHIC
 				bool "Use Vector Graphic APIs"
 				default n
@@ -317,7 +322,7 @@ menu "LVGL configuration"
 		endmenu
 
 		menu "GPU"
-			config LV_USE_GPU_ARM2D
+			config LV_USE_DRAW_ARM2D_SYNC
 				bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors."
 				default n
 				help
@@ -353,7 +358,7 @@ menu "LVGL configuration"
 				bool "Use VG-Lite GPU."
 
 			config LV_VG_LITE_USE_GPU_INIT
-				bool "Enbale VG-Lite custom external 'gpu_init()' function."
+				bool "Enable VG-Lite custom external 'gpu_init()' function."
 				default n
 				depends on LV_USE_DRAW_VG_LITE
 
@@ -499,70 +504,6 @@ menu "LVGL configuration"
 			config LV_USE_FLOAT
 				bool "Use float as lv_value_precise_t."
 				default n
-
-			config LV_USE_PERF_MONITOR
-				bool "Show CPU usage and FPS count."
-				depends on LV_USE_SYSMON
-
-			choice
-				prompt "Performance monitor position."
-				depends on LV_USE_PERF_MONITOR
-				default LV_PERF_MONITOR_ALIGN_BOTTOM_RIGHT
-
-				config LV_PERF_MONITOR_ALIGN_TOP_LEFT
-					bool "Top left"
-				config LV_PERF_MONITOR_ALIGN_TOP_MID
-					bool "Top middle"
-				config LV_PERF_MONITOR_ALIGN_TOP_RIGHT
-					bool "Top right"
-				config LV_PERF_MONITOR_ALIGN_BOTTOM_LEFT
-					bool "Bottom left"
-				config LV_PERF_MONITOR_ALIGN_BOTTOM_MID
-					bool "Bottom middle"
-				config LV_PERF_MONITOR_ALIGN_BOTTOM_RIGHT
-					bool "Bottom right"
-				config LV_PERF_MONITOR_ALIGN_LEFT_MID
-					bool "Left middle"
-				config LV_PERF_MONITOR_ALIGN_RIGHT_MID
-					bool "Right middle"
-				config LV_PERF_MONITOR_ALIGN_CENTER
-					bool "Center"
-			endchoice
-
-			config LV_USE_PERF_MONITOR_LOG_MODE
-				bool "Prints performance data using log"
-				depends on LV_USE_PERF_MONITOR
-				default n
-
-			config LV_USE_MEM_MONITOR
-				bool "Show the used memory and the memory fragmentation."
-				depends on !LV_MEM_CUSTOM
-				depends on LV_USE_SYSMON
-
-			choice
-				prompt "Memory monitor position."
-				depends on LV_USE_MEM_MONITOR
-				default LV_MEM_MONITOR_ALIGN_BOTTOM_LEFT
-
-				config LV_MEM_MONITOR_ALIGN_TOP_LEFT
-					bool "Top left"
-				config LV_MEM_MONITOR_ALIGN_TOP_MID
-					bool "Top middle"
-				config LV_MEM_MONITOR_ALIGN_TOP_RIGHT
-					bool "Top right"
-				config LV_MEM_MONITOR_ALIGN_BOTTOM_LEFT
-					bool "Bottom left"
-				config LV_MEM_MONITOR_ALIGN_BOTTOM_MID
-					bool "Bottom middle"
-				config LV_MEM_MONITOR_ALIGN_BOTTOM_RIGHT
-					bool "Bottom right"
-				config LV_MEM_MONITOR_ALIGN_LEFT_MID
-					bool "Left middle"
-				config LV_MEM_MONITOR_ALIGN_RIGHT_MID
-					bool "Right middle"
-				config LV_MEM_MONITOR_ALIGN_CENTER
-					bool "Center"
-			endchoice
 
 			config LV_USE_REFR_DEBUG
 				bool "Draw random colored rectangles over the redrawn areas."
@@ -974,9 +915,6 @@ menu "LVGL configuration"
 		config LV_USE_MENU
 			bool "Menu."
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_METER
-			bool "Meter."
-			default y if !LV_CONF_MINIMAL
 		config LV_USE_MSGBOX
 			bool "Msgbox."
 			default y if !LV_CONF_MINIMAL
@@ -1166,27 +1104,27 @@ menu "LVGL configuration"
 			bool "Lottie library"
 		config LV_USE_THORVG
 			bool "ThorVG library"
-            choice
-             prompt "Use ThorVG config"
-             depends on LV_USE_THORVG
-                default LV_USE_THORVG_INTERNAL
-                config LV_USE_THORVG_INTERNAL
-                    bool "Use ThorVG internal"
-                config LV_USE_THORVG_EXTERNAL
-                    bool "Use ThorVG external"
-             endchoice
+			choice
+				prompt "Use ThorVG config"
+				depends on LV_USE_THORVG
+				default LV_USE_THORVG_INTERNAL
+				config LV_USE_THORVG_INTERNAL
+					bool "Use ThorVG internal"
+				config LV_USE_THORVG_EXTERNAL
+					bool "Use ThorVG external"
+			endchoice
 
 		config LV_USE_LZ4
 			bool "Enable LZ4 compress/decompress lib"
-            choice
-             prompt "Choose lvgl built-in LZ4 lib or external lib"
-             depends on LV_USE_LZ4
-                default LV_USE_LZ4_INTERNAL
-                config LV_USE_LZ4_INTERNAL
-                    bool "Use lvgl built-in LZ4 lib"
-                config LV_USE_LZ4_EXTERNAL
-                    bool "Use external LZ4 library"
-             endchoice
+			choice
+				prompt "Choose lvgl built-in LZ4 lib or external lib"
+				depends on LV_USE_LZ4
+				default LV_USE_LZ4_INTERNAL
+				config LV_USE_LZ4_INTERNAL
+					bool "Use lvgl built-in LZ4 lib"
+				config LV_USE_LZ4_EXTERNAL
+					bool "Use external LZ4 library"
+			endchoice
 
 		config LV_USE_FFMPEG
 			bool "FFmpeg library"
@@ -1204,6 +1142,70 @@ menu "LVGL configuration"
 		config LV_USE_SYSMON
 			bool "Enable system monitor component"
 			default n
+
+		config LV_USE_PERF_MONITOR
+			bool "Show CPU usage and FPS count."
+			depends on LV_USE_SYSMON
+
+		choice
+			prompt "Performance monitor position."
+			depends on LV_USE_PERF_MONITOR
+			default LV_PERF_MONITOR_ALIGN_BOTTOM_RIGHT
+
+			config LV_PERF_MONITOR_ALIGN_TOP_LEFT
+				bool "Top left"
+			config LV_PERF_MONITOR_ALIGN_TOP_MID
+				bool "Top middle"
+			config LV_PERF_MONITOR_ALIGN_TOP_RIGHT
+				bool "Top right"
+			config LV_PERF_MONITOR_ALIGN_BOTTOM_LEFT
+				bool "Bottom left"
+			config LV_PERF_MONITOR_ALIGN_BOTTOM_MID
+				bool "Bottom middle"
+			config LV_PERF_MONITOR_ALIGN_BOTTOM_RIGHT
+				bool "Bottom right"
+			config LV_PERF_MONITOR_ALIGN_LEFT_MID
+				bool "Left middle"
+			config LV_PERF_MONITOR_ALIGN_RIGHT_MID
+				bool "Right middle"
+			config LV_PERF_MONITOR_ALIGN_CENTER
+				bool "Center"
+		endchoice
+
+		config LV_USE_PERF_MONITOR_LOG_MODE
+			bool "Prints performance data using log"
+			depends on LV_USE_PERF_MONITOR
+			default n
+
+		config LV_USE_MEM_MONITOR
+			bool "Show the used memory and the memory fragmentation."
+			depends on !LV_MEM_CUSTOM
+			depends on LV_USE_SYSMON
+
+		choice
+			prompt "Memory monitor position."
+			depends on LV_USE_MEM_MONITOR
+			default LV_MEM_MONITOR_ALIGN_BOTTOM_LEFT
+
+			config LV_MEM_MONITOR_ALIGN_TOP_LEFT
+				bool "Top left"
+			config LV_MEM_MONITOR_ALIGN_TOP_MID
+				bool "Top middle"
+			config LV_MEM_MONITOR_ALIGN_TOP_RIGHT
+				bool "Top right"
+			config LV_MEM_MONITOR_ALIGN_BOTTOM_LEFT
+				bool "Bottom left"
+			config LV_MEM_MONITOR_ALIGN_BOTTOM_MID
+				bool "Bottom middle"
+			config LV_MEM_MONITOR_ALIGN_BOTTOM_RIGHT
+				bool "Bottom right"
+			config LV_MEM_MONITOR_ALIGN_LEFT_MID
+				bool "Left middle"
+			config LV_MEM_MONITOR_ALIGN_RIGHT_MID
+				bool "Right middle"
+			config LV_MEM_MONITOR_ALIGN_CENTER
+				bool "Center"
+		endchoice
 
 		config LV_USE_MONKEY
 			bool "Enable Monkey test"
@@ -1230,14 +1232,6 @@ menu "LVGL configuration"
 
 		config LV_USE_IMGFONT
 			bool "draw image in label or span obj"
-			default n
-		config LV_IMGFONT_PATH_MAX_LEN
-			int "Imgfont image file path maximum length"
-			depends on LV_USE_IMGFONT
-			default 64
-		config LV_IMGFONT_USE_IMAGE_CACHE_HEADER
-			bool "Use image cache to buffer header information"
-			depends on LV_USE_IMGFONT
 			default n
 
 		config LV_USE_IME_PINYIN
@@ -1278,6 +1272,35 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
+
+		menuconfig LV_USE_VG_LITE_THORVG
+			bool "VG-Lite Simulator"
+			default n
+			depends on LV_USE_THORVG
+			help
+				Use thorvg to simulate VG-Lite hardware behavior, it's useful
+				for debugging and testing on PC simulator. Enable LV_USE_THORVG,
+				Either internal ThorVG or external ThorVG library is required.
+
+		config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+			bool "Enable LVGL blend mode support"
+			default n
+			depends on LV_USE_VG_LITE_THORVG
+
+		config LV_VG_LITE_THORVG_YUV_SUPPORT
+			bool "Enable YUV color format support"
+			default n
+			depends on LV_USE_VG_LITE_THORVG
+
+		config LV_VG_LITE_THORVG_16PIXELS_ALIGN
+			bool "Enable 16 pixels alignment"
+			default y
+			depends on LV_USE_VG_LITE_THORVG
+
+		config LV_VG_LITE_THORVG_THREAD_RENDER
+			bool "Enable multi-thread render"
+			default n
+			depends on LV_USE_VG_LITE_THORVG
 	endmenu
 
 	menu "Devices"
@@ -1456,6 +1479,26 @@ menu "LVGL configuration"
 
 		config LV_USE_EVDEV
 			bool "Use evdev input driver"
+			default n
+
+		config LV_USE_ST7735
+			bool "Use ST7735 LCD driver"
+			default n
+
+		config LV_USE_ST7789
+			bool "Use ST7789 LCD driver"
+			default n
+
+		config LV_USE_ST7796
+			bool "Use ST7796 LCD driver"
+			default n
+
+		config LV_USE_ILI9341
+			bool "Use ILI9341 LCD driver"
+			default n
+
+		config LV_USE_WINDOWS
+			bool "Use LVGL Windows backend"
 			default n
 	endmenu
 

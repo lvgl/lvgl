@@ -328,11 +328,10 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
 
     if(tmr) {
         disp_refr = tmr->user_data;
-#if LV_USE_PERF_MONITOR == 0 && LV_USE_MEM_MONITOR == 0
-        /**
-         * Ensure the timer does not run again automatically.
+        /* Ensure the timer does not run again automatically.
          * This is done before refreshing in case refreshing invalidates something else.
-         */
+         * However if the performance monitor is enabled keep the timer running to count the FPS.*/
+#if !(defined(LV_USE_PERF_MONITOR) && LV_USE_PERF_MONITOR)
         lv_timer_pause(tmr);
 #endif
     }
@@ -476,10 +475,8 @@ static void refr_sync_areas(void)
 
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
-    lv_draw_buf_t * on_screen = disp_refr->buf_act;
-    lv_draw_buf_t * off_screen = disp_refr->buf_act == disp_refr->buf_1 ? disp_refr->buf_2 : disp_refr->buf_1;
-    void * buf_off_screen = on_screen->data;
-    void * buf_on_screen = off_screen->data;
+    lv_draw_buf_t * off_screen = disp_refr->buf_act;
+    lv_draw_buf_t * on_screen = disp_refr->buf_act == disp_refr->buf_1 ? disp_refr->buf_2 : disp_refr->buf_1;
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
@@ -527,11 +524,7 @@ static void refr_sync_areas(void)
          * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
          */
         _lv_area_intersect(sync_area, sync_area, &disp_area);
-        lv_draw_buf_copy(
-            buf_off_screen, hor_res, ver_res, sync_area,
-            buf_on_screen, hor_res, ver_res, sync_area,
-            lv_display_get_color_format(disp_refr)
-        );
+        lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
     }
 
     /*Clear sync areas*/
@@ -579,6 +572,21 @@ static void refr_invalid_areas(void)
 }
 
 /**
+ * Reshape the draw buffer if required
+ * @param layer  pointer to a layer which will be drawn
+ */
+static void layer_reshape_draw_buf(lv_layer_t * layer)
+{
+    LV_ASSERT(lv_draw_buf_reshape(
+                  layer->draw_buf,
+                  layer->color_format,
+                  lv_area_get_width(&layer->buf_area),
+                  lv_area_get_height(&layer->buf_area),
+                  0)
+              != NULL);
+}
+
+/**
  * Refresh an area if there is Virtual Display Buffer
  * @param area_p  pointer to an area to refresh
  */
@@ -586,7 +594,7 @@ static void refr_area(const lv_area_t * area_p)
 {
     LV_PROFILER_BEGIN;
     lv_layer_t * layer = disp_refr->layer_head;
-    layer->buf = disp_refr->buf_act->data;
+    layer->draw_buf = disp_refr->buf_act;
 
     /*With full refresh just redraw directly into the buffer*/
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
@@ -595,7 +603,7 @@ static void refr_area(const lv_area_t * area_p)
         layer->buf_area.y1 = 0;
         layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
         layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
-        layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+        layer_reshape_draw_buf(layer);
         lv_area_t disp_area;
         lv_area_set(&disp_area, 0, 0, lv_display_get_horizontal_resolution(disp_refr) - 1,
                     lv_display_get_vertical_resolution(disp_refr) - 1);
@@ -632,10 +640,10 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = row + max_row - 1;
-        layer->buf = disp_refr->buf_act->data;
+        layer->draw_buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
-        layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
         layer->_clip_area = sub_area;
+        layer_reshape_draw_buf(layer);
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
         if(y2 == row_last) disp_refr->last_part = 1;
@@ -649,9 +657,10 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = y2;
-        layer->buf = disp_refr->buf_act->data;
+        layer->draw_buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
         layer->_clip_area = sub_area;
+        layer_reshape_draw_buf(layer);
         disp_refr->last_part = 1;
         refr_area_part(layer);
     }
@@ -670,9 +679,7 @@ static void refr_area_part(lv_layer_t * layer)
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
-        uint32_t w = lv_area_get_width(&layer->buf_area);
-        uint32_t h = lv_area_get_height(&layer->buf_area);
-        lv_draw_buf_clear(layer->buf, w, h, layer->color_format, &disp_refr->refreshed_area);
+        lv_draw_buf_clear(layer->draw_buf, &disp_refr->refreshed_area);
     }
 
     lv_obj_t * top_act_scr = NULL;
@@ -1010,7 +1017,7 @@ static void draw_buf_flush(lv_display_t * disp)
     bool flushing_last = disp->flushing_last;
 
     if(disp->flush_cb) {
-        call_flush_cb(disp, &disp->refreshed_area, layer->buf);
+        call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf->data);
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
     if(lv_display_is_double_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
@@ -1036,8 +1043,6 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
         .y2 = area->y2 + disp->offset_y
     };
 
-    //    if(disp->layer_head->buffer_convert) disp->layer_head->buffer_convert(disp->layer_head);
-
     lv_display_send_event(disp, LV_EVENT_FLUSH_START, &offset_area);
     disp->flush_cb(disp, &offset_area, px_map);
     lv_display_send_event(disp, LV_EVENT_FLUSH_FINISH, &offset_area);
@@ -1056,6 +1061,7 @@ static void wait_for_flushing(lv_display_t * disp)
     else {
         while(disp->flushing);
     }
+    disp->flushing_last = 0;
 
     LV_LOG_TRACE("end");
     LV_PROFILER_END;

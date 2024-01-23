@@ -21,10 +21,10 @@
  *      DEFINES
  *********************/
 
-#define PI 3.1415926535897932384626433832795
-#define TWO_PI 6.283185307179586476925286766559
-#define DEG_TO_RAD 0.017453292519943295769236907684886
-#define RAD_TO_DEG 57.295779513082320876798154814105
+#define PI 3.1415926535897932384626433832795f
+#define TWO_PI 6.283185307179586476925286766559f
+#define DEG_TO_RAD 0.017453292519943295769236907684886f
+#define RAD_TO_DEG 57.295779513082320876798154814105f
 #define radians(deg) ((deg) * DEG_TO_RAD)
 #define degrees(rad) ((rad) * RAD_TO_DEG)
 
@@ -171,7 +171,7 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
     if(dsc->img_src) {
         vg_lite_buffer_t src_buf;
         lv_image_decoder_dsc_t decoder_dsc;
-        if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src)) {
+        if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false)) {
             vg_lite_matrix_t path_matrix;
             vg_lite_identity(&path_matrix);
             LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(

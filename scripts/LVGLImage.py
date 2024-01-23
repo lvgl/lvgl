@@ -54,22 +54,22 @@ class Error(Exception):
 
 
 class FormatError(Error):
-    '''
+    """
     Problem with input filename format.
     BIN filename does not conform to standard lvgl bin image format
-    '''
+    """
 
 
 class ParameterError(Error):
-    '''
+    """
     Parameter for LVGL image not correct
-    '''
+    """
 
 
 class PngQuant:
-    '''
+    """
     Compress PNG file to 8bit mode using `pngquant`
-    '''
+    """
 
     def __init__(self, ncolors=256, dither=True, exec_path="") -> None:
         executable = path.join(exec_path, "pngquant")
@@ -123,9 +123,9 @@ class ColorFormat(Enum):
 
     @property
     def bpp(self) -> int:
-        '''
+        """
         Return bit per pixel for this cf
-        '''
+        """
         cf_map = {
             ColorFormat.UNKNOWN: 0x00,
             ColorFormat.L8: 8,
@@ -150,9 +150,10 @@ class ColorFormat(Enum):
 
     @property
     def ncolors(self) -> int:
-        '''
+        """
         Return number of colors in palette if cf is indexed1/2/4/8.
-        Return zero if cf is not indexed format        '''
+        Return zero if cf is not indexed format
+        """
 
         cf_map = {
             ColorFormat.I1: 2,
@@ -164,9 +165,9 @@ class ColorFormat(Enum):
 
     @property
     def is_indexed(self) -> bool:
-        '''
+        """
         Return if cf is indexed color format
-        '''
+        """
         return self.ncolors != 0
 
     @property
@@ -191,14 +192,14 @@ class ColorFormat(Enum):
 
     @property
     def is_luma_only(self) -> bool:
-        return self in (ColorFormat.L8, )
+        return self in (ColorFormat.L8,)
 
 
 def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
-    '''
+    """
     Unpack lvgl 1/2/4/8/16/32 bpp color to png color: alpha map, grey scale,
     or R,G,B,(A) map
-    '''
+    """
     ret = []
     bpp = cf.bpp
     if bpp == 8:
@@ -341,9 +342,9 @@ class LVGLImageHeader:
             raise FormatError("invalid header length")
 
         try:
-            self.cf = ColorFormat(data[0] & 0x1f)  # color format
+            self.cf = ColorFormat(data[1] & 0x1f)  # color format
         except ValueError as exc:
-            raise FormatError("invalid color format") from exc
+            raise FormatError(f"invalid color format: {hex(data[0])}") from exc
         self.w = int.from_bytes(data[4:6], 'little')
         self.h = int.from_bytes(data[6:8], 'little')
         self.stride = int.from_bytes(data[8:10], 'little')
@@ -401,9 +402,9 @@ class LVGLImage:
                 f" (12+{self.data_len})Byte'")
 
     def adjust_stride(self, stride: int = 0, align: int = 1):
-        '''
+        """
         Stride can be set directly, or by stride alignment in bytes
-        '''
+        """
         if self.stride == 0:
             #  stride can only be 0, when LVGLImage is created with empty data
             logging.warning("Cannot adjust stride for empty image")
@@ -445,7 +446,7 @@ class LVGLImage:
                 padding = b'\x00' * (new_stride - current_stride)
                 for i in range(h):
                     data_out.append(data_in[i * current_stride:(i + 1) *
-                                            current_stride])
+                                                               current_stride])
                     data_out.append(padding)
             return b''.join(data_out)
 
@@ -469,9 +470,9 @@ class LVGLImage:
 
     @property
     def data_len(self) -> int:
-        '''
+        """
         Return data_len in byte of this image, excluding image header
-        '''
+        """
 
         # palette is always in ARGB format, 4Byte per color
         p = self.cf.ncolors * 4 if self.is_indexed and self.w * self.h else 0
@@ -494,9 +495,9 @@ class LVGLImage:
                  h: int,
                  data: bytes,
                  stride: int = 0):
-        '''
+        """
         Directly set LVGL image parameters
-        '''
+        """
 
         if w > 0xffff or h > 0xffff:
             raise ParameterError(f"w, h overflow: {w}x{h}")
@@ -523,9 +524,9 @@ class LVGLImage:
                              data[len(header.binary):], header.stride)
 
     def from_bin(self, filename: str):
-        '''
+        """
         Read from existing bin file and update image parameters
-        '''
+        """
 
         if not filename.endswith(".bin"):
             raise FormatError("filename not ended with '.bin'")
@@ -547,9 +548,9 @@ class LVGLImage:
     def to_bin(self,
                filename: str,
                compress: CompressMethod = CompressMethod.NONE):
-        '''
+        """
         Write this image to file, filename should be ended with '.bin'
-        '''
+        """
         self._check_ext(filename, ".bin")
         self._check_dir(filename)
 
@@ -590,6 +591,8 @@ class LVGLImage:
         header = f'''
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
+#elif defined(LV_BUILD_TEST)
+#include "../lvgl.h"
 #else
 #include "lvgl/lvgl.h"
 #endif
@@ -704,10 +707,10 @@ const lv_img_dsc_t {varname} = {{
                  filename: str,
                  cf: ColorFormat = None,
                  background: int = 0x00_00_00):
-        '''
+        """
         Create lvgl image from png file.
         If cf is none, used I1/2/4/8 based on palette size
-        '''
+        """
 
         self.background = background
 
@@ -791,7 +794,7 @@ const lv_img_dsc_t {varname} = {{
                     rawdata += uint8_t(e)
         else:
             shift = 8 - cf.bpp
-            mask = 2**cf.bpp - 1
+            mask = 2 ** cf.bpp - 1
             rows = [[(a >> shift) & mask for a in row[3::4]] for row in rows]
             for row in png.pack_rows(rows, cf.bpp):
                 rawdata += row
@@ -897,9 +900,9 @@ class RLEImage(LVGLImage):
         super().__init__(cf, w, h, data)
 
     def to_rle(self, filename: str):
-        '''
+        """
         Compress this image to file, filename should be ended with '.rle'
-        '''
+        """
         self._check_ext(filename, ".rle")
         self._check_dir(filename)
 
@@ -928,7 +931,7 @@ class RLEImage(LVGLImage):
                 ctrl_byte = uint8_t(nonrepeat_cnt | 0x80)
                 compressed_data.append(ctrl_byte)
                 compressed_data.append(memview[index:index +
-                                               nonrepeat_cnt * blksize])
+                                                     nonrepeat_cnt * blksize])
                 index += nonrepeat_cnt * blksize
             else:
                 ctrl_byte = uint8_t(repeat_cnt)

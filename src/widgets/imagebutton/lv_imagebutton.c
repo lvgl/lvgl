@@ -39,6 +39,8 @@ static void update_src_info(lv_imagebutton_src_info_t * info, const void * src);
 
 const lv_obj_class_t lv_imagebutton_class = {
     .base_class = &lv_obj_class,
+    .width_def = LV_SIZE_CONTENT,
+    .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_imagebutton_t),
     .constructor_cb = lv_imagebutton_constructor,
     .event_cb = lv_imagebutton_event,
@@ -151,7 +153,7 @@ static void lv_imagebutton_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
         refr_image(obj);
     }
@@ -176,7 +178,7 @@ static void lv_imagebutton_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_main(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
 

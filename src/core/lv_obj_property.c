@@ -20,15 +20,15 @@
  *      TYPEDEFS
  **********************/
 
-typedef void (*lv_property_set_int_t)(struct _lv_obj_t *, int32_t);
-typedef void (*lv_property_set_pointer_t)(struct _lv_obj_t *, const void *);
-typedef void (*lv_property_set_color_t)(struct _lv_obj_t *, lv_color_t);
-typedef lv_result_t (*lv_property_setter_t)(struct _lv_obj_t *, lv_prop_id_t, const lv_property_t *);
+typedef void (*lv_property_set_int_t)(lv_obj_t *, int32_t);
+typedef void (*lv_property_set_pointer_t)(lv_obj_t *, const void *);
+typedef void (*lv_property_set_color_t)(lv_obj_t *, lv_color_t);
+typedef lv_result_t (*lv_property_setter_t)(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
 
-typedef int32_t (*lv_property_get_int_t)(const struct _lv_obj_t *);
-typedef void * (*lv_property_get_pointer_t)(const struct _lv_obj_t *);
-typedef lv_color_t (*lv_property_get_color_t)(const struct _lv_obj_t *);
-typedef lv_result_t (*lv_property_getter_t)(const struct _lv_obj_t *, lv_prop_id_t, lv_property_t *);
+typedef int32_t (*lv_property_get_int_t)(const lv_obj_t *);
+typedef void * (*lv_property_get_pointer_t)(const lv_obj_t *);
+typedef lv_color_t (*lv_property_get_color_t)(const lv_obj_t *);
+typedef lv_result_t (*lv_property_getter_t)(const lv_obj_t *, lv_prop_id_t, lv_property_t *);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -65,7 +65,7 @@ lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
     return obj_property(obj, value->id, (lv_property_t *)value, true);
 }
 
-lv_result_t lv_obj_set_properties(struct _lv_obj_t * obj, const lv_property_t * value, uint32_t count)
+lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, uint32_t count)
 {
     for(uint32_t i = 0; i < count; i++) {
         lv_result_t result = lv_obj_set_property(obj, &value[i]);

@@ -1,3 +1,5 @@
+.. _flex:
+
 ====
 Flex
 ====
@@ -13,7 +15,7 @@ the item(s) fill the remaining space with respect to min/max width and
 height.
 
 To make an object flex container call
-:c:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX)`.
+:cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX)`.
 
 Note that the flex layout feature of LVGL needs to be globally enabled
 with :c:macro:`LV_USE_FLEX` in ``lv_conf.h``.
@@ -21,45 +23,49 @@ with :c:macro:`LV_USE_FLEX` in ``lv_conf.h``.
 Terms
 *****
 
--  tracks: the rows or columns
--  main direction: row or column, the direction in which the items are
+-  **tracks**: the rows or columns
+-  **main direction**: row or column, the direction in which the items are
    placed
--  cross direction: perpendicular to the main direction
--  wrap: if there is no more space in the track a new track is started
--  grow: if set on an item it will grow to fill the remaining space on
+-  **cross direction**: perpendicular to the main direction
+-  **wrap**: if there is no more space in the track a new track is started
+-  **grow**: if set on an item it will grow to fill the remaining space on
    the track. The available space will be distributed among items
    respective to their grow value (larger value means more space)
--  gap: the space between the rows and columns or the items on a track
+-  **gap**: the space between the rows and columns or the items on a track
 
 Simple interface
 ****************
 
 With the following functions you can set a Flex layout on any parent.
 
+.. _flex_flow:
+
 Flex flow
 ---------
 
-:c:expr:`lv_obj_set_flex_flow(obj, flex_flow)`
+:cpp:expr:`lv_obj_set_flex_flow(obj, flex_flow)`
 
 The possible values for ``flex_flow`` are:
 
-- :c:enumerator:`LV_FLEX_FLOW_ROW`: Place the children in a row without wrapping
-- :c:enumerator:`LV_FLEX_FLOW_COLUMN`: Place the children in a column without wrapping
-- :c:enumerator:`LV_FLEX_FLOW_ROW_WRAP`: Place the children in a row with wrapping
-- :c:enumerator:`LV_FLEX_FLOW_COLUMN_WRAP`: Place the children in a column with wrapping
-- :c:enumerator:`LV_FLEX_FLOW_ROW_REVERSE`: Place the children in a row without wrapping but in reversed order
-- :c:enumerator:`LV_FLEX_FLOW_COLUMN_REVERSE`: Place the children in a column without wrapping but in reversed order
-- :c:enumerator:`LV_FLEX_FLOW_ROW_WRAP_REVERSE`: Place the children in a row with wrapping but in reversed order
-- :c:enumerator:`LV_FLEX_FLOW_COLUMN_WRAP_REVERSE`: Place the children in a column with wrapping but in reversed order
+- :cpp:enumerator:`LV_FLEX_FLOW_ROW`: Place the children in a row without wrapping
+- :cpp:enumerator:`LV_FLEX_FLOW_COLUMN`: Place the children in a column without wrapping
+- :cpp:enumerator:`LV_FLEX_FLOW_ROW_WRAP`: Place the children in a row with wrapping
+- :cpp:enumerator:`LV_FLEX_FLOW_COLUMN_WRAP`: Place the children in a column with wrapping
+- :cpp:enumerator:`LV_FLEX_FLOW_ROW_REVERSE`: Place the children in a row without wrapping but in reversed order
+- :cpp:enumerator:`LV_FLEX_FLOW_COLUMN_REVERSE`: Place the children in a column without wrapping but in reversed order
+- :cpp:enumerator:`LV_FLEX_FLOW_ROW_WRAP_REVERSE`: Place the children in a row with wrapping but in reversed order
+- :cpp:enumerator:`LV_FLEX_FLOW_COLUMN_WRAP_REVERSE`: Place the children in a column with wrapping but in reversed order
+
+.. _flex_align:
 
 Flex align
 ----------
 
 To manage the placement of the children use
-:c:expr:`lv_obj_set_flex_align(obj,  main_place, cross_place, track_cross_place)`
+:cpp:expr:`lv_obj_set_flex_align(obj,  main_place, cross_place, track_cross_place)`
 
 -  ``main_place`` determines how to distribute the items in their track
-   on the main axis. E.g. flush the items to the right on :c:enumerator:`LV_FLEX_FLOW_ROW_WRAP`. (It's called
+   on the main axis. E.g. flush the items to the right on :cpp:enumerator:`LV_FLEX_FLOW_ROW_WRAP`. (It's called
    ``justify-content`` in CSS)
 -  ``cross_place`` determines how to distribute the items in their track
    on the cross axis. E.g. if the items have different height place them
@@ -69,21 +75,23 @@ To manage the placement of the children use
 
 The possible values are:
 
-- :c:enumerator:`LV_FLEX_ALIGN_START`: means left on a horizontally and top vertically. (default)
-- :c:enumerator:`LV_FLEX_ALIGN_END`: means right on a horizontally and bottom vertically
-- :c:enumerator:`LV_FLEX_ALIGN_CENTER`: simply center
-- :c:enumerator:`LV_FLEX_ALIGN_SPACE_EVENLY`: items are distributed so
+- :cpp:enumerator:`LV_FLEX_ALIGN_START`: means left on a horizontally and top vertically (default)
+- :cpp:enumerator:`LV_FLEX_ALIGN_END`: means right on a horizontally and bottom vertically
+- :cpp:enumerator:`LV_FLEX_ALIGN_CENTER`: simply center
+- :cpp:enumerator:`LV_FLEX_ALIGN_SPACE_EVENLY`: items are distributed so
   that the spacing between any two items (and the space to the edges) is
   equal. Does not apply to ``track_cross_place``.
-- :c:enumerator:`LV_FLEX_ALIGN_SPACE_AROUND`: items are evenly
+- :cpp:enumerator:`LV_FLEX_ALIGN_SPACE_AROUND`: items are evenly
   distributed in the track with equal space around them. Note that
   visually the spaces aren't equal, since all the items have equal space
   on both sides. The first item will have one unit of space against the
   container edge, but two units of space between the next item because
   that next item has its own spacing that applies. Not applies to
   ``track_cross_place``.
-- :c:enumerator:`LV_FLEX_ALIGN_SPACE_BETWEEN`: items are evenly distributed in
+- :cpp:enumerator:`LV_FLEX_ALIGN_SPACE_BETWEEN`: items are evenly distributed in
   the track: first item is on the start line, last item on the end line. Not applies to ``track_cross_place``.
+
+.. _flex_grow:
 
 Flex grow
 ---------
@@ -91,27 +99,35 @@ Flex grow
 Flex grow can be used to make one or more children fill the available
 space on the track. When more children have grow parameters, the
 available space will be distributed proportionally to the grow values.
-For example, there is 400 px remaining space and 4 objects with grow: -
-``A`` with grow = 1 - ``B`` with grow = 1 - ``C`` with grow = 2
+For example, there is 400 px remaining space and 4 objects with grow: 
+
+- ``A`` with grow = 1
+- ``B`` with grow = 1
+- ``C`` with grow = 2
 
 ``A`` and ``B`` will have 100 px size, and ``C`` will have 200 px size.
 
 Flex grow can be set on a child with
-:c:expr:`lv_obj_set_flex_grow(child, value)`. ``value`` needs to be >
+:cpp:expr:`lv_obj_set_flex_grow(child, value)`. ``value`` needs to be >
 1 or 0 to disable grow on the child.
+
+.. _flex_style:
 
 Style interface
 ***************
 
 All the Flex-related values are style properties under the hood and you
-can use them similarly to any other style property. The following flex
-related style properties exist:
+can use them similarly to any other style property.
 
--  :c:enumerator:`FLEX_FLOW`
--  :c:enumerator:`FLEX_MAIN_PLACE`
--  :c:enumerator:`FLEX_CROSS_PLACE`
--  :c:enumerator:`FLEX_TRACK_PLACE`
--  :c:enumerator:`FLEX_GROW`
+The following flex related style properties exist:
+
+-  :cpp:enumerator:`FLEX_FLOW`
+-  :cpp:enumerator:`FLEX_MAIN_PLACE`
+-  :cpp:enumerator:`FLEX_CROSS_PLACE`
+-  :cpp:enumerator:`FLEX_TRACK_PLACE`
+-  :cpp:enumerator:`FLEX_GROW`
+
+.. _flex_padding:
 
 Internal padding
 ----------------
@@ -124,7 +140,9 @@ following properties can be set on the flex container style:
 -  ``pad_column`` Sets the padding between the columns.
 
 These can for example be used if you don't want any padding between your
-objects: :c:expr:`lv_style_set_pad_column(&row_container_style,0)`
+objects: :cpp:expr:`lv_style_set_pad_column(&row_container_style,0)`
+
+.. _flex_other:
 
 Other features
 **************
@@ -133,9 +151,9 @@ RTL
 ---
 
 If the base direction of the container is set the
-:c:enumerator:`LV_BASE_DIR_RTL` the meaning of
-:c:enumerator:`LV_FLEX_ALIGN_START` and
-:c:enumerator:`LV_FLEX_ALIGN_END` is swapped on ``ROW`` layouts. I.e.
+:cpp:enumerator:`LV_BASE_DIR_RTL` the meaning of
+:cpp:enumerator:`LV_FLEX_ALIGN_START` and
+:cpp:enumerator:`LV_FLEX_ALIGN_END` is swapped on ``ROW`` layouts. I.e.
 ``START`` will mean right.
 
 The items on ``ROW`` layouts, and tracks of ``COLUMN`` layouts will be
@@ -145,12 +163,16 @@ New track
 ---------
 
 You can force Flex to put an item into a new line with
-:c:expr:`lv_obj_add_flag(child, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)`.
+:cpp:expr:`lv_obj_add_flag(child, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)`.
+
+.. _flex_example:
 
 Example
 *******
 
 .. include:: ../examples/layouts/flex/index.rst
+
+.. _flex_api:
 
 API
 ***

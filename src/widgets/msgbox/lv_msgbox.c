@@ -142,7 +142,7 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
         if(mbox->header == NULL) return NULL;
         lv_obj_class_init_obj(mbox->header);
 
-        lv_obj_set_size(mbox->header, lv_pct(100), lv_display_get_dpi(lv_obj_get_disp(obj)) / 3);
+        lv_obj_set_size(mbox->header, lv_pct(100), lv_display_get_dpi(lv_obj_get_display(obj)) / 3);
         lv_obj_set_flex_flow(mbox->header, LV_FLEX_FLOW_ROW);
         lv_obj_set_flex_align(mbox->header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
         lv_obj_move_to_index(mbox->header, 0);
@@ -270,7 +270,7 @@ void lv_msgbox_close_async(lv_obj_t * obj)
 
 static void msgbox_close_click_event_cb(lv_event_t * e)
 {
-    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_current_target(e);
     lv_obj_t * mbox = lv_obj_get_parent(lv_obj_get_parent(btn));
     lv_msgbox_close(mbox);
 }

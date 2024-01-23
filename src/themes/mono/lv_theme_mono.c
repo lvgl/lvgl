@@ -16,7 +16,10 @@
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (LV_GLOBAL_DEFAULT()->theme_mono)
+struct _my_theme_t;
+typedef struct _my_theme_t my_theme_t;
+
+#define theme_def (*(my_theme_t **)(&LV_GLOBAL_DEFAULT()->theme_mono))
 
 #define COLOR_FG      dark_bg ? lv_color_white() : lv_color_black()
 #define COLOR_BG      dark_bg ? lv_color_black() : lv_color_white()
@@ -55,11 +58,11 @@ typedef struct {
 #endif
 } my_theme_styles_t;
 
-typedef struct _my_theme_t {
+struct _my_theme_t {
     lv_theme_t base;
     my_theme_styles_t styles;
     bool inited;
-} my_theme_t;
+};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -79,7 +82,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj);
  *   STATIC FUNCTIONS
  **********************/
 
-static void style_init(struct _my_theme_t * theme, bool dark_bg, const lv_font_t * font)
+static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
 {
     style_init_reset(&theme->styles.scrollbar);
     lv_style_set_bg_opa(&theme->styles.scrollbar, LV_OPA_COVER);
@@ -108,7 +111,7 @@ static void style_init(struct _my_theme_t * theme, bool dark_bg, const lv_font_t
     lv_style_set_arc_width(&theme->styles.card, 2);
     lv_style_set_arc_color(&theme->styles.card, COLOR_FG);
     lv_style_set_outline_color(&theme->styles.card, COLOR_FG);
-    lv_style_set_anim_time(&theme->styles.card, 300);
+    lv_style_set_anim_duration(&theme->styles.card, 300);
 
     style_init_reset(&theme->styles.pr);
     lv_style_set_border_width(&theme->styles.pr, BORDER_W_PR);
@@ -160,7 +163,7 @@ static void style_init(struct _my_theme_t * theme, bool dark_bg, const lv_font_t
     lv_style_set_border_color(&theme->styles.ta_cursor, COLOR_FG);
     lv_style_set_border_width(&theme->styles.ta_cursor, 2);
     lv_style_set_bg_opa(&theme->styles.ta_cursor, LV_OPA_TRANSP);
-    lv_style_set_anim_time(&theme->styles.ta_cursor, 500);
+    lv_style_set_anim_duration(&theme->styles.ta_cursor, 500);
 #endif
 
 #if LV_USE_CHART
@@ -178,14 +181,14 @@ static void style_init(struct _my_theme_t * theme, bool dark_bg, const lv_font_t
 
 bool lv_theme_mono_is_inited(void)
 {
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
     if(theme == NULL) return false;
     return theme->inited;
 }
 
 void lv_theme_mono_deinit(void)
 {
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
     if(theme) {
         if(theme->inited) {
             lv_style_t * theme_styles = (lv_style_t *)(&(theme->styles));
@@ -208,7 +211,7 @@ lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font
         theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
 
     theme->base.disp = disp;
     theme->base.font_small = LV_FONT_DEFAULT;
@@ -229,7 +232,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
 
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
 
     if(lv_obj_get_parent(obj) == NULL) {
         lv_obj_add_style(obj, &theme->styles.scr, 0);
@@ -430,12 +433,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.edit, LV_STATE_EDITED);
     }
 #endif
-
-    //#if LV_USE_METER
-    //    else if(lv_obj_check_type(obj, &lv_meter_class)) {
-    //        lv_obj_add_style(obj, &theme->styles.card, 0);
-    //    }
-    //#endif
 
 #if LV_USE_TEXTAREA
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {

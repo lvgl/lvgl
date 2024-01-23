@@ -7,8 +7,13 @@ import subprocess
 import sys
 import os
 from itertools import chain
+from pathlib import Path
 
 lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
+lvgl_script_path = os.path.join(lvgl_test_dir, "../scripts")
+sys.path.append(lvgl_script_path)
+
+from LVGLImage import LVGLImage, ColorFormat, CompressMethod
 
 # Key values must match variable names in CMakeLists.txt.
 build_only_options = {
@@ -16,6 +21,7 @@ build_only_options = {
     'OPTIONS_16BIT': 'Minimal config, 16 bit color depth',
     'OPTIONS_24BIT': 'Normal config, 24 bit color depth',
     'OPTIONS_FULL_32BIT': 'Full config, 32 bit color depth',
+    'OPTIONS_VG_LITE': 'VG-Lite simulator with full config, 32 bit color depth',
 }
 
 test_options = {
@@ -138,6 +144,31 @@ def generate_code_coverage_report():
     print("Done: See %s" % html_report_file, flush=True)
 
 
+def generate_test_images():
+    invalids = (ColorFormat.UNKNOWN, ColorFormat.TRUECOLOR, ColorFormat.TRUECOLOR_ALPHA)
+    formats = [i for i in ColorFormat if i not in invalids]
+    png_path = os.path.join(lvgl_test_dir, "test_images/pngs")
+    pngs = list(Path(png_path).rglob("*.[pP][nN][gG]"))
+    print(f"png files: {pngs}")
+
+    align_options = [1, 64]
+
+    for align in align_options:
+        for compress in CompressMethod:
+            compress_name = compress.name if compress != CompressMethod.NONE else "UNCOMPRESSED"
+            outputs = os.path.join(lvgl_test_dir, f"test_images/stride_align{align}/{compress_name}/")
+            os.makedirs(outputs, exist_ok=True)
+            for fmt in formats:
+                for png in pngs:
+                    img = LVGLImage().from_png(png, cf=fmt, background=0xffffff)
+                    img.adjust_stride(align=16)
+                    output = os.path.join(outputs, f"{Path(png).stem}_{fmt.name}.bin")
+                    img.to_bin(output, compress=compress)
+                    output = os.path.join(outputs, f"{Path(png).stem}_{fmt.name}_{compress.name}_align{align}.c")
+                    img.to_c_array(output, compress=compress)
+                    print(f"converting {os.path.basename(png)}, format: {fmt.name}, compress: {compress_name}")
+
+
 if __name__ == "__main__":
     epilog = '''This program builds and optionally runs the LVGL test programs.
     There are two types of LVGL tests: "build", and "test". The build-only
@@ -160,8 +191,13 @@ if __name__ == "__main__":
                         help='build: compile build tests, test: compile/run executable tests.')
     parser.add_argument('--test-suite', default=None,
                         help='select test suite to run')
+    parser.add_argument('--update-image', action='store_true', default=False,
+                        help='Update test image using LVGLImage.py script')
 
     args = parser.parse_args()
+
+    if args.update_image:
+        generate_test_images()
 
     if args.build_options:
         options_to_build = args.build_options

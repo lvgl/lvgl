@@ -6,16 +6,23 @@ if(ESP_PLATFORM)
 
 else()
 
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 project(lvgl_tests LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 99)
+
+set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address)
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 function(filter_compiler_options lang options_out)
     set(options ${ARGN})
     foreach(option ${options})
+        if (option IN_LIST FLAG_CHECK_WHITELIST)
+            list(APPEND ${options_out} ${option})
+            continue()
+        endif ()
+
         string(TOUPPER FLAG_SUPPORTED_FOR_${lang}_${option} option_var_name)
 
         if (${lang} STREQUAL C)
@@ -42,6 +49,10 @@ include(CTest)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+
+set(LVGL_TEST_OPTIONS_VG_LITE
+    -DLV_TEST_OPTION=6
+)
 
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
     -DLV_TEST_OPTION=1
@@ -78,7 +89,9 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     --coverage
 )
 
-if (OPTIONS_NORMAL_8BIT)
+if (OPTIONS_VG_LITE)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE})
+elseif (OPTIONS_NORMAL_8BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_NORMAL_8BIT})
 elseif (OPTIONS_16BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_16BIT})
@@ -88,14 +101,12 @@ elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST_SYSHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address -fsanitize=leak -fsanitize=undefined --coverage)
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=leak -fsanitize=undefined)
-    list(APPEND TEST_LIBS -fsanitize=address)
+    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=leak -fsanitize=undefined)
-    list(APPEND TEST_LIBS -fsanitize=address)
+    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
@@ -212,6 +223,7 @@ add_library(test_common
         src/test_assets/test_arc_bg.c
         src/test_assets/test_img_lvgl_logo_png.c
         src/test_assets/test_img_lvgl_logo_jpg.c
+        src/test_assets/test_img_emoji_F617.c
         src/test_assets/ubuntu_font.c
         src/test_assets/kern_one_otf.c
         unity/unity_support.c

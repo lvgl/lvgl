@@ -1,0 +1,18 @@
+---
+name: Development discussion
+description: Share your ideas related to development of LVGL
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Introduce the problem
+      placeholder: A clear and concise description of the problem. Also mention some examples and use cases if possible.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposal
+      placeholder: If you already have an idea about the solution share it here
+    validations:
+      required: false

@@ -87,25 +87,25 @@ static void _set_paint_shape(Tvg_Paint * obj, const lv_vector_path_t * p)
 {
     uint32_t pidx = 0;
     for(uint32_t i = 0; i < p->ops.size; i++) {
-        lv_vector_path_op_t * op = LV_ARRAY_GET(&p->ops, i, uint8_t);
+        lv_vector_path_op_t * op = lv_array_at(&p->ops, i);
         switch(*op) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
-                    lv_fpoint_t * pt = LV_ARRAY_GET(&p->points, pidx, lv_fpoint_t);
+                    lv_fpoint_t * pt = lv_array_at(&p->points, pidx);
                     tvg_shape_move_to(obj, pt->x, pt->y);
                     pidx += 1;
                 }
                 break;
             case LV_VECTOR_PATH_OP_LINE_TO: {
-                    lv_fpoint_t * pt = LV_ARRAY_GET(&p->points, pidx, lv_fpoint_t);
+                    lv_fpoint_t * pt = lv_array_at(&p->points, pidx);
                     tvg_shape_line_to(obj, pt->x, pt->y);
                     pidx += 1;
                 }
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
-                    lv_fpoint_t * pt1 = LV_ARRAY_GET(&p->points, pidx, lv_fpoint_t);
-                    lv_fpoint_t * pt2 = LV_ARRAY_GET(&p->points, pidx + 1, lv_fpoint_t);
+                    lv_fpoint_t * pt1 = lv_array_at(&p->points, pidx);
+                    lv_fpoint_t * pt2 = lv_array_at(&p->points, pidx + 1);
 
-                    lv_fpoint_t * last_pt = LV_ARRAY_GET(&p->points, pidx - 1, lv_fpoint_t);
+                    lv_fpoint_t * last_pt = lv_array_at(&p->points, pidx - 1);
 
                     lv_fpoint_t cp[2];
                     cp[0].x = (last_pt->x + 2 * pt1->x) * (1.0f / 3.0f);
@@ -118,9 +118,9 @@ static void _set_paint_shape(Tvg_Paint * obj, const lv_vector_path_t * p)
                 }
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO: {
-                    lv_fpoint_t * pt1 = LV_ARRAY_GET(&p->points, pidx, lv_fpoint_t);
-                    lv_fpoint_t * pt2 = LV_ARRAY_GET(&p->points, pidx + 1, lv_fpoint_t);
-                    lv_fpoint_t * pt3 = LV_ARRAY_GET(&p->points, pidx + 2, lv_fpoint_t);
+                    lv_fpoint_t * pt1 = lv_array_at(&p->points, pidx);
+                    lv_fpoint_t * pt2 = lv_array_at(&p->points, pidx + 1);
+                    lv_fpoint_t * pt3 = lv_array_at(&p->points, pidx + 2);
 
                     tvg_shape_cubic_to(obj, pt1->x, pt1->y, pt2->x, pt2->y, pt3->x, pt3->y);
                     pidx += 3;
@@ -243,7 +243,7 @@ static void _set_paint_stroke(Tvg_Paint * obj, const lv_vector_stroke_dsc_t * ds
     tvg_shape_set_stroke_join(obj, _lv_stroke_join_to_tvg(dsc->join));
 
     if(!lv_array_is_empty(&dsc->dash_pattern)) {
-        float * dash_array = LV_ARRAY_GET(&dsc->dash_pattern, 0, float);
+        float * dash_array = lv_array_at(&dsc->dash_pattern, 0);
         tvg_shape_set_stroke_dash(obj, dash_array, dsc->dash_pattern.size);
     }
 }
@@ -298,14 +298,14 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
         return;
     }
 
-    if(!decoder_dsc.decoded && !decoder_dsc.img_data) {
+    if(!decoder_dsc.decoded) {
         lv_image_decoder_close(&decoder_dsc);
         LV_LOG_ERROR("Image not ready");
         return;
     }
 
-    const uint8_t * src_buf = _lv_image_decoder_get_data(&decoder_dsc);
-    const lv_image_header_t * header = &decoder_dsc.header;
+    const uint8_t * src_buf = decoder_dsc.decoded->data;
+    const lv_image_header_t * header = &decoder_dsc.decoded->header;
     lv_color_format_t cf = header->cf;
 
     if(cf != LV_COLOR_FORMAT_ARGB8888) {
@@ -318,6 +318,7 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
     tvg_picture_load_raw(img, (uint32_t *)src_buf, header->w, header->h, true);
     Tvg_Paint * clip_path = tvg_paint_duplicate(obj);
     tvg_paint_set_composite_method(img, clip_path, TVG_COMPOSITE_METHOD_CLIP_PATH);
+    tvg_paint_set_opacity(img, p->opa);
 
     Tvg_Matrix mtx;
     _lv_matrix_to_tvg(&mtx, m);
@@ -427,14 +428,24 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
         return;
 
     lv_layer_t * layer = dsc->base.layer;
-    if(layer->buf == NULL)
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
+    if(draw_buf == NULL)
         return;
 
-    void * buf = layer->buf;
+    lv_color_format_t cf = draw_buf->header.cf;
+
+    if(cf != LV_COLOR_FORMAT_ARGB8888 && \
+       cf != LV_COLOR_FORMAT_XRGB8888) {
+        LV_LOG_ERROR("unsupported layer color: %d", cf);
+        return;
+    }
+
+    void * buf = draw_buf->data;
     int32_t width = lv_area_get_width(&layer->buf_area);
     int32_t height = lv_area_get_height(&layer->buf_area);
+    uint32_t stride = draw_buf->header.stride;
     Tvg_Canvas * canvas = tvg_swcanvas_create();
-    tvg_swcanvas_set_target(canvas, buf, width, width, height, TVG_COLORSPACE_ARGB8888);
+    tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
 
     lv_ll_t * task_list = dsc->task_list;
     _lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, canvas);

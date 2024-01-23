@@ -66,7 +66,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'LVGL'
-copyright = '2023, LVGL Kft'
+copyright = '2024, LVGL Kft'
 author = 'LVGL community'
 
 
@@ -130,7 +130,7 @@ html_theme_options = {
 
 
 # For site map generation
-html_baseurl = f"https://docs.lvgl.io/{os.environ['LVGL_URLPATH']}/en/html/"
+html_baseurl = f"https://docs.lvgl.io/{os.environ['LVGL_URLPATH']}/"
 
 sitemap_url_scheme = "{link}"
 

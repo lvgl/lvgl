@@ -708,7 +708,7 @@ static void lv_menu_refr_main_header_mode(lv_obj_t * obj)
 
 static void lv_menu_load_page_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_menu_load_page_event_data_t * event_data = lv_event_get_user_data(e);
     lv_menu_t * menu = (lv_menu_t *)(event_data->menu);
     lv_obj_t * page = event_data->page;
@@ -758,7 +758,7 @@ static void lv_menu_back_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     /* LV_EVENT_CLICKED */
     if(code == LV_EVENT_CLICKED) {
-        lv_obj_t * obj = lv_event_get_target(e);
+        lv_obj_t * obj = lv_event_get_current_target(e);
         lv_menu_t * menu = (lv_menu_t *)lv_event_get_user_data(e);
 
         if(!(obj == menu->main_header_back_btn || obj == menu->sidebar_header_back_btn)) return;

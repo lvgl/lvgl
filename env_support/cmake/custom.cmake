@@ -19,7 +19,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.S)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
-file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp)
+file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/*.cpp)
 
 # Build LVGL library
 add_library(lvgl ${SOURCES})
@@ -73,6 +73,9 @@ file(GLOB LVGL_PUBLIC_HEADERS "${CMAKE_SOURCE_DIR}/lv_conf.h"
 if("${LIB_INSTALL_DIR}" STREQUAL "")
   set(LIB_INSTALL_DIR "lib")
 endif()
+if("${RUNTIME_INSTALL_DIR}" STREQUAL "")
+  set(RUNTIME_INSTALL_DIR "bin")
+endif()
 if("${INC_INSTALL_DIR}" STREQUAL "")
   set(INC_INSTALL_DIR "include/lvgl")
 endif()
@@ -101,5 +104,5 @@ install(
   TARGETS lvgl
   ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
   LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
-  RUNTIME DESTINATION "${LIB_INSTALL_DIR}"
+  RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
   PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")

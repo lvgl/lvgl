@@ -14,6 +14,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "../tick/lv_tick.h"
+#include "lv_types.h"
 #include "lv_ll.h"
 
 #include <stdint.h>
@@ -32,12 +33,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_timer_t;
-
 /**
  * Timers execute this type of functions.
  */
-typedef void (*lv_timer_cb_t)(struct _lv_timer_t *);
+typedef void (*lv_timer_cb_t)(lv_timer_t *);
 
 /**
  * Timer handler resume this type of function.
@@ -47,7 +46,7 @@ typedef void (*lv_timer_handler_resume_cb_t)(void * data);
 /**
  * Descriptor of a lv_timer
  */
-typedef struct _lv_timer_t {
+struct _lv_timer_t {
     uint32_t period; /**< How often the timer should run*/
     uint32_t last_run; /**< Last time the timer ran*/
     lv_timer_cb_t timer_cb; /**< Timer function*/
@@ -55,7 +54,7 @@ typedef struct _lv_timer_t {
     int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
     uint32_t paused : 1;
     uint32_t auto_delete : 1;
-} lv_timer_t;
+};
 
 typedef struct {
     lv_ll_t timer_ll; /*Linked list to store the lv_timers*/
@@ -225,7 +224,7 @@ void lv_timer_enable(bool en);
  * Get idle percentage
  * @return the lv_timer idle in percentage
  */
-uint8_t lv_timer_get_idle(void);
+uint32_t lv_timer_get_idle(void);
 
 /**
  * Get the time remaining until the next timer will run

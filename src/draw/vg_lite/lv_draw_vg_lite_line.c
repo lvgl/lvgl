@@ -60,10 +60,10 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     float half_w = dsc->width * 0.5f;
 
     lv_area_t rel_clip_area;
-    rel_clip_area.x1 = LV_MIN(p1_x, p2_x) - half_w;
-    rel_clip_area.x2 = LV_MAX(p1_x, p2_x) + half_w;
-    rel_clip_area.y1 = LV_MIN(p1_y, p2_y) - half_w;
-    rel_clip_area.y2 = LV_MAX(p1_y, p2_y) + half_w;
+    rel_clip_area.x1 = (int32_t)(LV_MIN(p1_x, p2_x) - half_w);
+    rel_clip_area.x2 = (int32_t)(LV_MAX(p1_x, p2_x) + half_w);
+    rel_clip_area.y1 = (int32_t)(LV_MIN(p1_y, p2_y) - half_w);
+    rel_clip_area.y2 = (int32_t)(LV_MAX(p1_y, p2_y) + half_w);
 
     if(!_lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_unit->clip_area)) {
         return; /*Fully clipped, nothing to do*/
@@ -85,7 +85,7 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
 
     int32_t ndash = 0;
     if(dash_width && dash_l * inv_dl < 1.0f) {
-        ndash = (1.0f / inv_dl + dash_l - 1) / dash_l;
+        ndash = (int32_t)((1.0f / inv_dl + dash_l - 1) / dash_l);
     }
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);

@@ -1,3 +1,6 @@
+.. _lv_span:
+
+==============
 Span (lv_span)
 ==============
 
@@ -8,10 +11,14 @@ A spangroup is the object that is used to display rich text. Different
 from the label object, ``spangroup`` can render text styled with
 different fonts, colors, and sizes into the spangroup object.
 
+.. _lv_span_parts_and_styles:
+
 Parts and Styles
 ****************
 
 -  :cpp:enumerator:`LV_PART_MAIN` The spangroup has only one part.
+
+.. _lv_span_usage:
 
 Usage
 *****
@@ -40,7 +47,7 @@ child span at index ``id``. In addition, ``id`` can be negative to index
 from the end of the spangroup where ``-1`` is the youngest child, ``-2``
 is second youngest, etc.
 
-e.g. ``lv_span_t* span = lv_spangroup_get_child(spangroup, 0)`` will
+E.g. ``lv_span_t* span = lv_spangroup_get_child(spangroup, 0)`` will
 return the first child of the spangroup.
 ``lv_span_t* span = lv_spangroup_get_child(spangroup, -1)`` will return
 the last (or most recent) child.
@@ -51,19 +58,19 @@ Child Count
 Use the function :cpp:expr:`lv_spangroup_get_span_count(spangroup)` to get back
 the number of spans the group is maintaining.
 
-e.g. ``uint32_t size = lv_spangroup_get_span_count(spangroup)``
+E.g. ``uint32_t size = lv_spangroup_get_span_count(spangroup)``
 
 Text align
 ----------
 
-like label object, the spangroup can be set to one the following modes:
+Like label object, the spangroup can be set to one the following modes:
 
-- :cpp:enumerator:`LV_TEXT_ALIGN_LEFT` Align text to left.
-- :cpp:enumerator:`LV_TEXT_ALIGN_CENTER` Align text to center.
-- :cpp:enumerator:`LV_TEXT_ALIGN_RIGHT` Align text to right.
-- :cpp:enumerator:`LV_TEXT_ALIGN_AUTO` Align text auto.
+- :cpp:enumerator:`LV_TEXT_ALIGN_LEFT` Align to left.
+- :cpp:enumerator:`LV_TEXT_ALIGN_CENTER` Align to center.
+- :cpp:enumerator:`LV_TEXT_ALIGN_RIGHT` Align to right.
+- :cpp:enumerator:`LV_TEXT_ALIGN_AUTO` Align auto.
 
-use function :cpp:expr:`lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER)`
+Use function :cpp:expr:`lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER)`
 to set text align.
 
 Modes
@@ -71,11 +78,11 @@ Modes
 
 The spangroup can be set to one the following modes:
 
-- :cpp:enumerator:`LV_SPAN_MODE_FIXED` fixes the object size.
+- :cpp:enumerator:`LV_SPAN_MODE_FIXED` Fixes the object size.
 - :cpp:enumerator:`LV_SPAN_MODE_EXPAND` Expand the object size to the text size but stay on a single line.
 - :cpp:enumerator:`LV_SPAN_MODE_BREAK` Keep width, break the too long lines and auto expand height.
 
-Use :cpp:expr:`lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK)` to set
+Use the function :cpp:expr:`lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK)` to set
 object mode.
 
 Overflow
@@ -84,14 +91,14 @@ Overflow
 The spangroup can be set to one the following modes:
 
 - :cpp:enumerator:`LV_SPAN_OVERFLOW_CLIP` truncates the text at the limit of the area.
-- :cpp:enumerator:`LV_SPAN_OVERFLOW_ELLIPSIS` will display an ellipsis(``...``) when text overflows the area.
+- :cpp:enumerator:`LV_SPAN_OVERFLOW_ELLIPSIS` will display an ellipsis (``...``) when text overflows the area.
 
-Use :cpp:expr:`lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)` to set object overflow mode.
+Use function :cpp:expr:`lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)` to set object overflow mode.
 
 First line indent
 -----------------
 
-Use :cpp:expr:`lv_spangroup_set_indent(spangroup, 20)` to set the indent of the
+Use function :cpp:expr:`lv_spangroup_set_indent(spangroup, 20)` to set the indent of the
 first line. all modes support pixel units, in addition to :cpp:enumerator:`LV_SPAN_MODE_FIXED`
 and :cpp:enumerator:`LV_SPAN_MODE_BREAK` mode supports percentage units
 too.
@@ -99,9 +106,11 @@ too.
 Lines
 -----
 
-Use :cpp:expr:`lv_spangroup_set_max_lines(spangroup, 10)` to set the maximum number
-of lines to be displayed in LV_SPAN_MODE_BREAK mode, negative values
+Use function :cpp:expr:`lv_spangroup_set_max_lines(spangroup, 10)` to set the maximum number
+of lines to be displayed in :cpp:enumerator::`LV_SPAN_MODE_BREAK` mode, negative values
 indicate no limit.
+
+.. _lv_span_events:
 
 Events
 ******
@@ -110,6 +119,8 @@ No special events are sent by this widget.
 
 Learn more about :ref:`events`.
 
+.. _lv_span_keys:
+
 Keys
 ****
 
@@ -117,11 +128,14 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_span_example:
+
 Example
 *******
 
-
 .. include:: ../examples/widgets/span/index.rst
+
+.. _lv_span_api:
 
 API
 ***

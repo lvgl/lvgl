@@ -16,18 +16,15 @@ void tearDown(void)
 void test_tiny_ttf_rendering_test(void)
 {
 #if LV_USE_TINY_TTF
-    static lv_font_t font;
-
     /*Create a font*/
     extern const uint8_t ubuntu_font[];
     extern size_t ubuntu_font_size;
-    lv_result_t res = lv_tiny_ttf_create_data(&font, ubuntu_font, ubuntu_font_size, 30);
-    TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
+    lv_font_t * font = lv_tiny_ttf_create_data(ubuntu_font, ubuntu_font_size, 30);
 
     /*Create style with the new font*/
     static lv_style_t style;
     lv_style_init(&style);
-    lv_style_set_text_font(&style, &font);
+    lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
     lv_style_set_bg_opa(&style, LV_OPA_COVER);
     lv_style_set_bg_color(&style, lv_color_hex(0xffaaaa));
@@ -43,7 +40,7 @@ void test_tiny_ttf_rendering_test(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/tiny_ttf_1.png");
 
     lv_obj_del(label);
-    lv_tiny_ttf_destroy(&font);
+    lv_tiny_ttf_destroy(font);
 #else
     TEST_PASS();
 #endif
@@ -54,16 +51,10 @@ void test_tiny_ttf_kerning()
 #if LV_USE_TINY_TTF
     extern const uint8_t kern_one_otf[];
     extern size_t kern_one_otf_size;
-    lv_font_t font_normal;
-    lv_font_t font_none;
-    lv_result_t res;
-    res = lv_tiny_ttf_create_data(&font_normal, kern_one_otf, kern_one_otf_size, 80);
-    TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
+    lv_font_t * font_normal = lv_tiny_ttf_create_data(kern_one_otf, kern_one_otf_size, 80);
+    lv_font_t * font_none = lv_tiny_ttf_create_data(kern_one_otf, kern_one_otf_size, 80);
+    lv_font_set_kerning(font_none, LV_FONT_KERNING_NONE);
 
-    res = lv_tiny_ttf_create_data(&font_none, kern_one_otf, kern_one_otf_size, 80);
-    TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
-
-    lv_font_set_kerning(&font_none, LV_FONT_KERNING_NONE);
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, lv_pct(90), lv_pct(90));
     lv_obj_center(cont);
@@ -72,17 +63,17 @@ void test_tiny_ttf_kerning()
 
     lv_obj_t * label_normal = lv_label_create(cont);
     lv_label_set_text(label_normal, "ıTuTuTı");
-    lv_obj_set_style_text_font(label_normal, &font_normal, LV_PART_MAIN);
+    lv_obj_set_style_text_font(label_normal, font_normal, LV_PART_MAIN);
 
     lv_obj_t * label_none = lv_label_create(cont);
     lv_label_set_text(label_none, "ıTuTuTı");
-    lv_obj_set_style_text_font(label_none, &font_none, LV_PART_MAIN);
+    lv_obj_set_style_text_font(label_none, font_none, LV_PART_MAIN);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/tiny_ttf_2.png");
 
     lv_obj_del(cont);
-    lv_tiny_ttf_destroy(&font_normal);
-    lv_tiny_ttf_destroy(&font_none);
+    lv_tiny_ttf_destroy(font_normal);
+    lv_tiny_ttf_destroy(font_none);
 #else
     TEST_PASS();
 #endif

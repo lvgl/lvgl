@@ -1,3 +1,6 @@
+.. _lv_calendar:
+
+======================
 Calendar (lv_calendar)
 ======================
 
@@ -16,10 +19,12 @@ To make the Calendar flexible, by default it doesn't show the current
 year or month. Instead, there are optional "headers" that can be
 attached to the calendar.
 
+.. _lv_calendar_parts_and_styles:
+
 Parts and Styles
 ****************
 
-The calendar object uses the `Button matrix </widgets/btnmatrix>`__
+The calendar object uses the `Button matrix </widgets/buttonmatrix>`__
 object under the hood to arrange the days into a matrix.
 
 - :cpp:enumerator:`LV_PART_MAIN` The background of the calendar. Uses all the background related style properties.
@@ -27,8 +32,10 @@ object under the hood to arrange the days into a matrix.
   buttons and a custom drawer event is added modify the properties of the buttons as follows:
 
   - day names have no border, no background and drawn with a gray color
-  - days of the previous and next month have :cpp:enumerator:`LV_BTNMATRIX_CTRL_DISABLED` flag
+  - days of the previous and next month have :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED` flag
   - today has a thicker border with the theme's primary color - highlighted days have some opacity with the theme's primary color.
+
+.. _lv_calendar_usage:
 
 Usage
 *****
@@ -67,6 +74,16 @@ looks like ``const char * day_names[7] = {"Su", "Mo", ...};`` Only the
 pointer of the day names is saved so the elements should be static,
 global or constant variables.
 
+Custom year list
+----------------
+
+Sets a custom year list with :cpp:expr:`lv_calendar_header_dropdown_set_year_list(calendar, years_list)`
+where ``years_list`` is a pointer to the custom years list. It can be a constant string
+like ``static const char * years = "2023\n2022\n2021\n2020\n2019";``, 
+or can be generated dynamically into a buffer as well.
+
+.. _lv_calendar_events:
+
 Events
 ******
 
@@ -77,6 +94,8 @@ Events
 
 Learn more about :ref:`events`.
 
+.. _lv_calendar_keys:
+
 Keys
 ****
 
@@ -84,6 +103,8 @@ Keys
 -  :cpp:enumerator:`LV_KEY_ENTER` To press/release the selected date
 
 Learn more about :ref:`indev_keys`.
+
+.. _lv_calendar_header:
 
 Headers
 *******
@@ -104,10 +125,14 @@ Drop-down
 :cpp:expr:`lv_calendar_header_dropdown_create(calendar)` creates a header that
 contains 2 drop-drown lists: one for the year and another for the month.
 
+.. _lv_calendar_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/calendar/index.rst
+
+.. _lv_calendar_api:
 
 API
 ***

@@ -18,6 +18,12 @@ scripts/install-prerequisites.sh
 3. Clean prior test build, build all build-only tests,
    run executable tests, and generate code coverage
    report `./tests/main.py --clean --report build test`.
+4. You can re-generate the test images by adding option `--update-image`.
+   It relies on scripts/LVGLImage.py, which requires pngquant and pypng.
+   You can run below command firstly and follow instructions in logs to install them.
+   `./tests/main.py --update-image test`
+   Note that different version of pngquant may generate different images.
+   As of now the generated image on CI uses pngquant 2.13.1-1.
 
 For full information on running tests run: `./tests/main.py --help`.
 

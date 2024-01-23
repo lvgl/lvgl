@@ -24,9 +24,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt);
 static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size);
@@ -77,7 +76,7 @@ void lv_lodepng_deinit(void)
  * @param header    image information is set in header parameter
  * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
  */
-static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
     (void) decoder; /*Unused*/
     lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
@@ -150,11 +149,9 @@ static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void
  * @param dsc       decoded image descriptor
  * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
  */
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(args);
 
     const uint8_t * png_data = NULL;
     size_t png_data_size = 0;
@@ -182,27 +179,29 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
 
     lv_draw_buf_t * decoded = decode_png_data(png_data, png_data_size);
-    /*Stride check and adjustment accordingly*/
-    if(args && args->stride_align) {
-        uint32_t expected = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
-        if(expected != decoded->header.stride) {
-            LV_LOG_INFO("Convert PNG stride to %" LV_PRId32, expected);
-            lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, expected);
-            lv_draw_buf_destroy(decoded);
-            if(aligned == NULL) {
-                LV_LOG_ERROR("png stride adjust failed");
-                return LV_RESULT_INVALID;
-            }
 
-            decoded = aligned;
-        }
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)png_data);
+
+    if(!decoded) {
+        LV_LOG_WARN("Error decoding PNG\n");
+        return LV_RESULT_INVALID;
     }
 
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        lv_free((void *)png_data);
+    lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
+    if(adjusted == NULL) {
+        lv_draw_buf_destroy(decoded);
+        return LV_RESULT_INVALID;
+    }
+
+    /*The adjusted draw buffer is newly allocated.*/
+    if(adjusted != decoded) {
+        lv_draw_buf_destroy(decoded);
+        decoded = adjusted;
     }
 
     dsc->decoded = decoded;
+
+    if(dsc->args.no_cache) return LV_RES_OK;
 
 #if LV_CACHE_DEF_SIZE > 0
     lv_image_cache_data_t search_key;
@@ -231,24 +230,22 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     LV_UNUSED(decoder);
 
-#if LV_CACHE_DEF_SIZE > 0
-    lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
-#else
-    lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
-#endif
+    if(dsc->args.no_cache || LV_CACHE_DEF_SIZE == 0)
+        lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
+    else
+        lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
 }
 
 static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size)
 {
     unsigned png_width;             /*Not used, just required by the decoder*/
     unsigned png_height;            /*Not used, just required by the decoder*/
-    uint8_t * img_data = NULL;
+    lv_draw_buf_t * decoded = NULL;
 
-    lv_draw_buf_t * decoded;
     /*Decode the image in ARGB8888 */
     unsigned error = lodepng_decode32((unsigned char **)&decoded, &png_width, &png_height, png_data, png_data_size);
     if(error) {
-        if(img_data != NULL)  lv_draw_buf_destroy(decoded);
+        if(decoded != NULL)  lv_draw_buf_destroy(decoded);
         return NULL;
     }
 

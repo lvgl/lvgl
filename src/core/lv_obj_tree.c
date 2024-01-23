@@ -64,7 +64,7 @@ void lv_obj_delete(lv_obj_t * obj)
     lv_display_t * disp = NULL;
     bool act_screen_del = false;
     if(par == NULL) {
-        disp = lv_obj_get_disp(obj);
+        disp = lv_obj_get_display(obj);
         if(!disp) return;   /*Shouldn't happen*/
         if(disp->act_scr == obj) act_screen_del = true;
     }
@@ -126,11 +126,11 @@ void lv_obj_delete_delayed(lv_obj_t * obj, uint32_t delay_ms)
     lv_anim_set_exec_cb(&a, NULL);
     lv_anim_set_duration(&a, 1);
     lv_anim_set_delay(&a, delay_ms);
-    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_completed_cb);
     lv_anim_start(&a);
 }
 
-void lv_obj_delete_anim_ready_cb(lv_anim_t * a)
+void lv_obj_delete_anim_completed_cb(lv_anim_t * a)
 {
     lv_obj_delete(a->var);
 }
@@ -202,22 +202,31 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
+    /* Check parent validity */
     lv_obj_t * parent = lv_obj_get_parent(obj);
-
     if(!parent) {
         LV_LOG_WARN("parent is NULL");
         return;
     }
 
+    const uint32_t parent_child_count = lv_obj_get_child_count(parent);
+    /* old_index only can be 0 or greater, this point can not be reached if the parent is not null */
+    const int32_t old_index = lv_obj_get_index(obj);
+    LV_ASSERT(0 <= old_index);
+
     if(index < 0) {
-        index = lv_obj_get_child_count(parent) + index;
+        index += parent_child_count;
     }
 
-    const int32_t old_index = lv_obj_get_index(obj);
+    /* Index was negative and the absolute value is greater than parent child count */
+    if((index < 0)
+       /* Index is same or bigger than parent child count */
+       || (index >= (int32_t) parent_child_count)
+       /* If both previous and new index are the same */
+       || (index == old_index)) {
 
-    if(index < 0) return;
-    if(index >= (int32_t) lv_obj_get_child_count(parent)) return;
-    if(index == old_index) return;
+        return;
+    }
 
     int32_t i = old_index;
     if(index < old_index) {
@@ -286,7 +295,7 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj)
     return (lv_obj_t *)act_par;
 }
 
-lv_display_t * lv_obj_get_disp(const lv_obj_t * obj)
+lv_display_t * lv_obj_get_display(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -409,14 +418,16 @@ int32_t lv_obj_get_index(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    if(parent == NULL) return 0xFFFFFFFF;
+    if(parent == NULL) return -1;
 
     int32_t i = 0;
     for(i = 0; i < parent->spec_attr->child_cnt; i++) {
         if(parent->spec_attr->children[i] == obj) return i;
     }
 
-    return -1; /*Shouldn't happen*/
+    /*Shouldn't reach this point*/
+    LV_ASSERT(0);
+    return -1;
 }
 
 int32_t lv_obj_get_index_by_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
@@ -529,7 +540,7 @@ static void obj_delete_core(lv_obj_t * obj)
 
     /*Remove the screen for the screen list*/
     if(obj->parent == NULL) {
-        lv_display_t * disp = lv_obj_get_disp(obj);
+        lv_display_t * disp = lv_obj_get_display(obj);
         uint32_t i;
         /*Find the screen in the list*/
         for(i = 0; i < disp->screen_cnt; i++) {

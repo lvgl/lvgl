@@ -50,6 +50,7 @@ struct ffmpeg_context_s {
     int video_dst_linesize[4];
     enum AVPixelFormat video_dst_pix_fmt;
     bool has_alpha;
+    lv_draw_buf_t draw_buf;
 };
 
 #pragma pack(1)
@@ -66,8 +67,7 @@ struct lv_image_pixel_color_s {
  **********************/
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
@@ -269,11 +269,15 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_INVALID;
 }
 
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args)
+/**
+ * Decode an image using ffmpeg library
+ * @param decoder pointer to the decoder
+ * @param dsc     pointer to the decoder descriptor
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
+ */
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(args);
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * path = dsc->src;
@@ -300,7 +304,13 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         uint8_t * img_data = ffmpeg_get_image_data(ffmpeg_ctx);
 
         dsc->user_data = ffmpeg_ctx;
-        dsc->img_data = img_data;
+        lv_draw_buf_t * decoded = &ffmpeg_ctx->draw_buf;
+        decoded->header = dsc->header;
+        decoded->header.flags |= LV_IMAGE_FLAGS_MODIFIABLE;
+        decoded->data = img_data;
+        decoded->data_size = (uint32_t)dsc->header.stride * dsc->header.h;
+        decoded->unaligned_data = NULL;
+        dsc->decoded = decoded;
 
         /* The image is fully decoded. Return with its pointer */
         return LV_RESULT_OK;
@@ -575,6 +585,7 @@ static int ffmpeg_get_image_header(const char * filepath,
         header->w = video_dec_ctx->width;
         header->h = video_dec_ctx->height;
         header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+        header->stride = header->w * lv_color_format_get_size(header->cf);
 
         ret = 0;
     }

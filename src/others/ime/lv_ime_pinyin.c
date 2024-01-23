@@ -603,7 +603,7 @@ static void lv_ime_pinyin_destructor(const lv_obj_class_t * class_p, lv_obj_t * 
 static void lv_ime_pinyin_kb_event(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * kb = lv_event_get_target(e);
+    lv_obj_t * kb = lv_event_get_current_target(e);
     lv_obj_t * obj = lv_event_get_user_data(e);
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
@@ -739,7 +739,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
 static void lv_ime_pinyin_cand_panel_event(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * cand_panel = lv_event_get_target(e);
+    lv_obj_t * cand_panel = lv_event_get_current_target(e);
     lv_obj_t * obj = (lv_obj_t *)lv_event_get_user_data(e);
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
@@ -842,7 +842,7 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
 static void lv_ime_pinyin_style_change_event(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 

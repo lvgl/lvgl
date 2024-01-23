@@ -1,3 +1,5 @@
+.. _fonts:
+
 =====
 Fonts
 =====
@@ -42,7 +44,11 @@ Built-in fonts
 **************
 
 There are several built-in fonts in different sizes, which can be
-enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. ### Normal fonts
+enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. 
+
+Normal fonts
+------------
+
 Containing all the ASCII characters, the degree symbol (U+00B0), the
 bullet symbol (U+2022) and the built-in symbols (see below).
 
@@ -69,7 +75,7 @@ bullet symbol (U+2022) and the built-in symbols (see below).
 Special fonts
 -------------
 
--  :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a `compressed font <#compress-fonts>`__ with 3 bpp
+-  :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a :ref:`fonts_compressed` with 3 bpp
 -  :c:macro:`LV_FONT_DEJAVU_16_PERSIAN_HEBREW`: 16 px font with normal range + Hebrew, Arabic, Persian letters and all their forms
 -  :c:macro:`LV_FONT_SIMSUN_16_CJK`: 16 px font with normal range plus 1000 of the most common CJK radicals
 -  :c:macro:`LV_FONT_UNSCII_8`: 8 px pixel perfect font with only ASCII characters
@@ -85,6 +91,8 @@ the `Montserrat <https://fonts.google.com/specimen/Montserrat>`__ font.
 In addition to the ASCII range, the following symbols are also added to
 the built-in fonts from the `FontAwesome <https://fontawesome.com/>`__
 font.
+
+.. _fonts_symbols:
 
 .. image:: /misc/symbols.png
 
@@ -146,10 +154,10 @@ This list summarizes the effect of RTL base direction on objects:
 - Create objects by default on the right
 - ``lv_tabview``: Displays tabs from right to left
 - ``lv_checkbox``: Shows the box on the right
-- ``lv_btnmatrix``: Shows buttons from right to left
+- ``lv_buttonmatrix``: Shows buttons from right to left
 - ``lv_list``: Shows icons on the right
 - ``lv_dropdown``: Aligns options to the right
-- The texts in ``lv_table``, ``lv_btnmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
+- The texts in ``lv_table``, ``lv_buttonmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
 
 Arabic and Persian support
 --------------------------
@@ -190,6 +198,8 @@ and not above each other. The order of color channels also needs to
 match with the library settings. By default, LVGL assumes ``RGB`` order,
 however this can be swapped by setting :c:macro:`LV_SUBPX_BGR`  ``1`` in
 *lv_conf.h*.
+
+.. _fonts_compressed:
 
 Compressed fonts
 ----------------
@@ -280,42 +290,41 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
 Load a font at run-time
 ***********************
 
-:cpp:func:`lv_binfont_load` can be used to load a font from a file. The font needs
+:cpp:func:`lv_binfont_create` can be used to load a font from a file. The font needs
 to have a special binary format. (Not TTF or WOFF). Use
 `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ with the
 ``--format bin`` option to generate an LVGL compatible font file.
 
-:note: To load a font `LVGL's filesystem </overview/file-system>`__
+:note: To load a font :ref:`LVGL's filesystem <overview_file_system>`
        needs to be enabled and a driver must be added.
 
 Example
 
 .. code:: c
 
-   static lv_font_t my_font;
-   lv_result_t res = lv_binfont_load(&my_font, "X:/path/to/my_font.bin");
-   if(res != LV_RESULT_OK) return;
+   lv_font_t *my_font = lv_binfont_create("X:/path/to/my_font.bin");
+   if(my_font == NULL) return;
 
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(&my_font);
+   lv_binfont_destroy(my_font);
 
 Load a font from a memory buffer at run-time
 ******************************************
 
-:cpp:func:`lv_binfont_load_from_buffer` can be used to load a font from a memory buffer.
+:cpp:func:`lv_binfont_create_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not
 supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
 
-:note: To load a font from a buffer `LVGL's filesystem </overview/file-system>`__
+:note: To load a font from a buffer :ref:`LVGL's filesystem <overview_file_system>`
        needs to be enabled and the MEMFS driver must be added.
 
 Example
 
 .. code:: c
 
-   static lv_font_t my_font;
+   lv_font_t *my_font;
    uint8_t *buf;
    uint32_t bufsize;
 
@@ -323,12 +332,12 @@ Example
    ...
 
    /*Load font from the buffer*/
-   lv_result_t res = lv_binfont_load_from_buffer(&my_font, (void *)buf, buf));
-   if(res != LV_RESULT_OK) return;
+   my_font = lv_binfont_create_from_buffer((void *)buf, buf));
+   if(my_font == NULL) return;
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(&my_font);
+   lv_binfont_destroy(my_font);
 
 Add a new font engine
 *********************
@@ -407,6 +416,8 @@ font from ``fallback`` to handle.
    lv_font_t *droid_sans_fallback = my_font_load_function();
    /* So now we can display Roboto for supported characters while having wider characters set support */
    roboto->fallback = droid_sans_fallback;
+
+.. _fonts_api:
 
 API
 ***

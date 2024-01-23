@@ -6,9 +6,9 @@ static void set_angle(void * img, int32_t v)
     lv_image_set_rotation(img, v);
 }
 
-static void set_zoom(void * img, int32_t v)
+static void set_scale(void * img, int32_t v)
 {
-    lv_image_set_zoom(img, v);
+    lv_image_set_scale(img, v);
 }
 
 /**
@@ -33,7 +33,7 @@ void lv_example_image_3(void)
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);
 
-    lv_anim_set_exec_cb(&a, set_zoom);
+    lv_anim_set_exec_cb(&a, set_scale);
     lv_anim_set_values(&a, 128, 256);
     lv_anim_set_playback_duration(&a, 3000);
     lv_anim_start(&a);

@@ -58,34 +58,34 @@
 void lv_vg_lite_dump_info(void)
 {
     char name[64];
-    uint32_t chip_id;
-    uint32_t chip_rev;
-    uint32_t cid;
+    vg_lite_uint32_t chip_id;
+    vg_lite_uint32_t chip_rev;
+    vg_lite_uint32_t cid;
     vg_lite_get_product_info(name, &chip_id, &chip_rev);
     vg_lite_get_register(0x30, &cid);
     LV_LOG_USER("Product Info: %s"
-                " | Chip ID: 0x%" PRIx32
-                " | Revision: 0x%" PRIx32
-                " | CID: 0x%" PRIx32,
-                name, chip_id, chip_rev, cid);
+                " | Chip ID: 0x%" LV_PRIx32
+                " | Revision: 0x%" LV_PRIx32
+                " | CID: 0x%" LV_PRIx32,
+                name, (uint32_t)chip_id, (uint32_t)chip_rev, (uint32_t)cid);
 
     vg_lite_info_t info;
     vg_lite_get_info(&info);
-    LV_LOG_USER("VGLite API version: 0x%" PRIx32, info.api_version);
-    LV_LOG_USER("VGLite API header version: 0x%" PRIx32, info.header_version);
-    LV_LOG_USER("VGLite release version: 0x%" PRIx32, info.release_version);
+    LV_LOG_USER("VGLite API version: 0x%" LV_PRIx32, (uint32_t)info.api_version);
+    LV_LOG_USER("VGLite API header version: 0x%" LV_PRIx32, (uint32_t)info.header_version);
+    LV_LOG_USER("VGLite release version: 0x%" LV_PRIx32, (uint32_t)info.release_version);
 
     for(int feature = 0; feature < gcFEATURE_COUNT; feature++) {
-        uint32_t ret = vg_lite_query_feature((vg_lite_feature_t)feature);
+        vg_lite_uint32_t ret = vg_lite_query_feature((vg_lite_feature_t)feature);
         LV_UNUSED(ret);
         LV_LOG_USER("Feature-%d: %s\t - %s",
                     feature, lv_vg_lite_feature_string((vg_lite_feature_t)feature),
                     ret ? "YES" : "NO");
     }
 
-    uint32_t mem_avail;
-    vg_lite_mem_avail(&mem_avail);
-    LV_LOG_USER("Memory Avaliable: %" PRId32 " Bytes", mem_avail);
+    vg_lite_uint32_t mem_avail = 0;
+    vg_lite_get_mem_size(&mem_avail);
+    LV_LOG_USER("Memory Avaliable: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
 }
 
 const char * lv_vg_lite_error_string(vg_lite_error_t error)
@@ -219,75 +219,6 @@ const char * lv_vg_lite_buffer_format_string(vg_lite_buffer_format_t format)
             break;
     }
     return "UNKNOW_BUFFER_FORMAT";
-}
-
-const char * lv_vg_lite_filter_string(vg_lite_filter_t filter)
-{
-    switch(filter) {
-            VG_LITE_ENUM_TO_STRING(FILTER_POINT);
-            VG_LITE_ENUM_TO_STRING(FILTER_LINEAR);
-            VG_LITE_ENUM_TO_STRING(FILTER_BI_LINEAR);
-        default:
-            break;
-    }
-    return "UNKNOW_FILTER";
-}
-
-const char * lv_vg_lite_blend_string(vg_lite_blend_t blend)
-{
-    switch(blend) {
-            VG_LITE_ENUM_TO_STRING(BLEND_NONE); /*! S, i.e. no blending. */
-            VG_LITE_ENUM_TO_STRING(BLEND_SRC_OVER); /*! S + (1 - Sa) * D */
-            VG_LITE_ENUM_TO_STRING(BLEND_DST_OVER); /*! (1 - Da) * S + D */
-            VG_LITE_ENUM_TO_STRING(BLEND_SRC_IN); /*! Da * S */
-            VG_LITE_ENUM_TO_STRING(BLEND_DST_IN); /*! Sa * D */
-            VG_LITE_ENUM_TO_STRING(BLEND_SCREEN); /*! S + D - S * D */
-            VG_LITE_ENUM_TO_STRING(BLEND_MULTIPLY); /*! S * (1 - Da) + D * (1 - Sa) + S * D */
-            VG_LITE_ENUM_TO_STRING(BLEND_ADDITIVE); /*! S + D */
-            VG_LITE_ENUM_TO_STRING(BLEND_SUBTRACT); /*! D * (1 - S) */
-            VG_LITE_ENUM_TO_STRING(BLEND_SUBTRACT_LVGL); /*! D - S */
-            VG_LITE_ENUM_TO_STRING(BLEND_NORMAL_LVGL); /*! S * Sa + (1 - Sa) * D  */
-            VG_LITE_ENUM_TO_STRING(BLEND_ADDITIVE_LVGL); /*! (S + D) * Sa + D * (1 - Sa) */
-            VG_LITE_ENUM_TO_STRING(BLEND_MULTIPLY_LVGL); /*! (S * D) * Sa + D * (1 - Sa) */
-        default:
-            break;
-    }
-    return "UNKNOW_BLEND";
-}
-
-const char * lv_vg_lite_global_alpha_string(vg_lite_global_alpha_t global_alpha)
-{
-    switch(global_alpha) {
-            VG_LITE_ENUM_TO_STRING(NORMAL);
-            VG_LITE_ENUM_TO_STRING(GLOBAL);
-            VG_LITE_ENUM_TO_STRING(SCALED);
-        default:
-            break;
-    }
-    return "UNKNOW_GLOBAL_ALPHA";
-}
-
-const char * lv_vg_lite_fill_rule_string(vg_lite_fill_t fill_rule)
-{
-    switch(fill_rule) {
-            VG_LITE_ENUM_TO_STRING(FILL_NON_ZERO);
-            VG_LITE_ENUM_TO_STRING(FILL_EVEN_ODD);
-        default:
-            break;
-    }
-    return "UNKNOW_FILL";
-}
-
-const char * lv_vg_lite_image_mode_string(vg_lite_buffer_image_mode_t image_mode)
-{
-    switch(image_mode) {
-            VG_LITE_ENUM_TO_STRING(NORMAL_IMAGE_MODE);
-            VG_LITE_ENUM_TO_STRING(NONE_IMAGE_MODE);
-            VG_LITE_ENUM_TO_STRING(MULTIPLY_IMAGE_MODE);
-        default:
-            break;
-    }
-    return "UNKNOW_IMAGE_MODE";
 }
 
 const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op)
@@ -455,6 +386,7 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
     }
 
     LV_ASSERT(false);
+    return 0;
 }
 
 void lv_vg_lite_buffer_format_bytes(
@@ -540,6 +472,8 @@ void lv_vg_lite_buffer_format_bytes(
             *mul = 3;
             break;
         default:
+            LV_LOG_ERROR("unsupport color format: 0x%" PRIx32, (uint32_t)format);
+            LV_ASSERT(false);
             break;
     }
 }
@@ -614,7 +548,7 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(draw_buf);
 
-    const void * ptr = draw_buf->data;
+    const uint8_t * ptr = draw_buf->data;
     int32_t width = draw_buf->header.w;
     int32_t height = draw_buf->header.h;
     vg_lite_buffer_format_t format = lv_vg_lite_vg_fmt(draw_buf->header.cf);
@@ -625,6 +559,11 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     width = lv_vg_lite_width_align(width);
 
     lv_vg_lite_buffer_init(buffer, ptr, width, height, format, false);
+
+    /* Alpha image need to be multiplied by color */
+    if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(draw_buf->header.cf)) {
+        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    }
 }
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
@@ -657,7 +596,8 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     }
 }
 
-bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src)
+bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
+                                  bool no_cache)
 {
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(decoder_dsc);
@@ -668,6 +608,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     args.premultiply = !lv_vg_lite_support_blend_normal();
     args.stride_align = true;
     args.use_indexed = true;
+    args.no_cache = no_cache;
 
     lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
     if(res != LV_RESULT_OK) {
@@ -690,7 +631,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
 
     if(LV_COLOR_FORMAT_IS_INDEXED(decoded->header.cf)) {
         uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(decoded->header.cf);
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (uint32_t *)decoded->data));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (vg_lite_uint32_t *)decoded->data));
     }
 
     lv_vg_lite_buffer_from_draw_buf(buffer, decoded);
@@ -781,7 +722,7 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
     uint32_t mul;
     uint32_t div;
     uint32_t align;
-    uint32_t stride;
+    int32_t stride;
 
     if(!buffer) {
         LV_LOG_ERROR("buffer is NULL");
@@ -819,13 +760,13 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
         return false;
     }
 
-    if(is_src && buffer->width != lv_vg_lite_width_align(buffer->width)) {
+    if(is_src && buffer->width != (vg_lite_int32_t)lv_vg_lite_width_align(buffer->width)) {
         LV_LOG_ERROR("buffer width(%d) is not aligned", (int)buffer->width);
         return false;
     }
 
-    if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, LV_VG_LITE_BUF_ALIGN)) {
-        LV_LOG_ERROR("buffer address(%p) is not aligned to %d", buffer->memory, LV_VG_LITE_BUF_ALIGN);
+    if(!LV_VG_LITE_IS_ALIGNED(buffer->memory, LV_DRAW_BUF_ALIGN)) {
+        LV_LOG_ERROR("buffer address(%p) is not aligned to %d", buffer->memory, LV_DRAW_BUF_ALIGN);
         return false;
     }
 
@@ -879,8 +820,8 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
         return false;
     }
 
-    uint8_t * cur = path->path;
-    uint8_t * end = cur + path->path_length;
+    const uint8_t * cur = path->path;
+    const uint8_t * end = cur + path->path_length;
 
     while(cur < end) {
         /* get op code */
@@ -891,10 +832,19 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
 
         /* get next op code */
         cur += (fmt_len * (1 + arg_len)) ;
+
+        /* break if end */
+        if(op_code == VLC_OP_END) {
+            break;
+        }
+    }
+
+    if(cur != end) {
+        LV_LOG_ERROR("path length(%d) error", (int)path->path_length);
+        return false;
     }
 
     uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
-
     if(end_op_code != VLC_OP_END) {
         LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
         return false;
@@ -929,8 +879,8 @@ void lv_vg_lite_draw_linear_grad(
 
     LV_ASSERT(grad->dir != LV_GRAD_DIR_NONE);
 
-    uint32_t colors[VLC_MAX_GRADIENT_STOPS];
-    uint32_t stops[VLC_MAX_GRADIENT_STOPS];
+    vg_lite_uint32_t colors[VLC_MAX_GRADIENT_STOPS];
+    vg_lite_uint32_t stops[VLC_MAX_GRADIENT_STOPS];
 
     /* Gradient setup */
     uint8_t cnt = grad->stops_count;
@@ -1056,8 +1006,8 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
 lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point)
 {
     lv_point_precise_t p;
-    p.x = point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2];
-    p.y = point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2];
+    p.x = (lv_value_precise_t)(point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]);
+    p.y = (lv_value_precise_t)(point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]);
     return p;
 }
 

@@ -44,8 +44,6 @@ typedef struct {
     lv_blend_mode_t blend_mode;     /**< E.g. LV_BLEND_MODE_ADDITIVE*/
 } lv_draw_sw_blend_dsc_t;
 
-struct _lv_draw_unit_t;
-
 typedef struct {
     void * dest_buf;
     int32_t dest_w;
@@ -80,7 +78,7 @@ typedef struct {
  * @param draw_unit     pointer to a draw unit
  * @param dsc           pointer to an initialized blend descriptor
  */
-void lv_draw_sw_blend(struct _lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t * dsc);
+void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t * dsc);
 
 /**********************
  *      MACROS

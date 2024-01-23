@@ -165,7 +165,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 2 + 70);
 
             obj = lv_slider_create(main_page);
-            lv_obj_set_style_anim_time(obj, LV_DEMO_STRESS_TIME_STEP * 8, 0);
+            lv_obj_set_style_anim_duration(obj, LV_DEMO_STRESS_TIME_STEP * 8, 0);
             lv_slider_set_value(obj, 5000, LV_ANIM_ON);    /*Animate to out of range value*/
             auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 5 + 22);
 
@@ -432,9 +432,8 @@ static void auto_delete(lv_obj_t * obj, uint32_t delay)
     lv_anim_set_var(&a, obj);
     lv_anim_set_duration(&a, 0);
     lv_anim_set_delay(&a, delay);
-    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_completed_cb);
     lv_anim_start(&a);
-
 }
 
 static void msgbox_delete(lv_timer_t * tmr)

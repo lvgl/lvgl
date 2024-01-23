@@ -246,7 +246,7 @@ static void img_create(const char * name, const void * img_src, bool rotate, boo
     lv_image_set_src(img, img_src);
     lv_obj_set_style_image_recolor(img, lv_palette_main(LV_PALETTE_RED), 0);   /*For A8*/
     if(recolor) lv_obj_set_style_image_recolor_opa(img, LV_OPA_70, 0);
-    if(rotate) lv_image_set_angle(img, 450);
+    if(rotate) lv_image_set_rotation(img, 450);
 
     lv_obj_t * label = lv_label_create(cont);
     lv_label_set_text(label, name);
@@ -258,8 +258,9 @@ static void bin_image_create(bool rotate, bool recolor, int align, int compress)
     char path[256];
     int stride = stride_align[align];
     for(unsigned i = 0; i < sizeof(color_formats) / sizeof(color_formats[0]); i++) {
-        sprintf(name, "bin%s", color_formats[i]);
-        sprintf(path, "A:test_images/stride_align%d/%s/test_%s.bin", stride, compressions[compress], color_formats[i]);
+        lv_snprintf(name, sizeof(name), "bin%s", color_formats[i]);
+        lv_snprintf(path, sizeof(path), "A:test_images/stride_align%d/%s/test_%s.bin", stride, compressions[compress],
+                    color_formats[i]);
         img_create(name, path, rotate, recolor);
     }
 }
@@ -268,7 +269,7 @@ static void c_array_image_create(bool rotate, bool recolor, int align, int compr
 {
     char name[32];
     for(unsigned i = 0; i < sizeof(color_formats) / sizeof(color_formats[0]); i++) {
-        sprintf(name, "%s%s", compressions[compress], color_formats[i]);
+        lv_snprintf(name, sizeof(name), "%s%s", compressions[compress], color_formats[i]);
         const void * src = c_array_images[align][compress][i];
         img_create(name, src, rotate, recolor);
     }
@@ -285,12 +286,13 @@ void test_image_formats()
             for(unsigned i = 0; i < sizeof(compressions) / sizeof(compressions[0]); i++) {
                 char reference[256];
                 bin_image_create(rotate, recolor, align, i);
-                snprintf(reference, sizeof(reference), "draw/bin_image_stride%d_%s_%s.png", stride, compressions[i], modes[mode]);
+                lv_snprintf(reference, sizeof(reference), "draw/bin_image_stride%d_%s_%s.png", stride, compressions[i], modes[mode]);
                 TEST_ASSERT_EQUAL_SCREENSHOT(reference);
                 lv_obj_clean(lv_screen_active());
 
                 c_array_image_create(rotate, recolor, align, i);
-                snprintf(reference, sizeof(reference), "draw/c_array_image_stride%d_%s_%s.png", stride, compressions[i], modes[mode]);
+                lv_snprintf(reference, sizeof(reference), "draw/c_array_image_stride%d_%s_%s.png", stride, compressions[i],
+                            modes[mode]);
                 TEST_ASSERT_EQUAL_SCREENSHOT(reference);
                 lv_obj_clean(lv_screen_active());
             }

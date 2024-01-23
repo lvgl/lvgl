@@ -41,7 +41,7 @@
  **********************/
 
 void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
-                         const lv_area_t * coords)
+                         const lv_area_t * coords, bool no_cache)
 {
     if(dsc->opa <= LV_OPA_MIN) {
         return;
@@ -71,12 +71,12 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
 
     vg_lite_buffer_t src_buf;
     lv_image_decoder_dsc_t decoder_dsc;
-    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src)) {
+    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache)) {
         return;
     }
 
     vg_lite_color_t color = 0;
-    if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(decoder_dsc.header.cf) || dsc->recolor_opa > LV_OPA_MIN) {
+    if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(decoder_dsc.decoded->header.cf) || dsc->recolor_opa > LV_OPA_MIN) {
         /* alpha image and image recolor */
         src_buf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
         color = lv_vg_lite_color(dsc->recolor, LV_OPA_MIX2(dsc->opa, dsc->recolor_opa), true);

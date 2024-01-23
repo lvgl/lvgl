@@ -43,7 +43,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_line(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
 {
     LV_PROFILER_BEGIN;
     lv_area_t a;

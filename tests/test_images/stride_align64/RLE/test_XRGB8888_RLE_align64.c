@@ -794,6 +794,7 @@ uint8_t test_XRGB8888_RLE_align64_map[] = {
 };
 
 const lv_img_dsc_t test_XRGB8888_RLE_align64 = {
+  .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_XRGB8888,
   .header.flags = 0 | LV_IMAGE_FLAGS_COMPRESSED,
   .header.w = 71,

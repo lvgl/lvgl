@@ -1,0 +1,37 @@
+---
+name: Bug Report
+description: File a bug report
+body:
+  - type: markdown
+    id: intro
+    attributes:
+      value: >
+        Be sure to read the
+        [FAQ](https://docs.lvgl.io/master/intro/index.html#faq), and the realted
+        part of the [Documentation](https://docs.lvgl.io/) first.
+  - type: input
+    id: version
+    attributes:
+      label: LVGL version
+      description: See in `lvgl.h` or use `git describe`
+      placeholder: e.g. v9.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: code-snippet
+    attributes:
+      label: How to reproduce?
+      description: If applicable add a code snippet to reproduce the issue
+      placeholder: |
+        ```c
+         your code here
+        ```  
+    validations:
+      required: false

@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2023 NXP
+ * Copyright 2023-2024 NXP
  *
  * SPDX-License-Identifier: MIT
  */
@@ -29,33 +29,11 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/**
- * Enable BLIT quality degradation workaround for RT595,
- * recommended for screen's dimension > 352 pixels.
- */
-#define RT595_BLIT_WRKRND_ENABLED 1
-
-/* Internal compound symbol */
-#if (defined(CPU_MIMXRT595SFFOB) || defined(CPU_MIMXRT595SFFOB_cm33) || \
-    defined(CPU_MIMXRT595SFFOC) || defined(CPU_MIMXRT595SFFOC_cm33)) && \
-    RT595_BLIT_WRKRND_ENABLED
-#define VGLITE_BLIT_SPLIT_ENABLED 1
-#else
-#define VGLITE_BLIT_SPLIT_ENABLED 0
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    lv_draw_unit_t base_unit;
-    struct _lv_draw_task_t * task_act;
-#if LV_USE_OS
-    lv_thread_sync_t sync;
-    lv_thread_t thread;
-#endif
-} lv_draw_vglite_unit_t;
+typedef lv_draw_sw_unit_t lv_draw_vglite_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -69,9 +47,6 @@ void lv_draw_vglite_deinit(void);
 
 void lv_draw_vglite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc,
                         const lv_area_t * coords);
-
-void lv_draw_vglite_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_image_dsc_t * dsc,
-                           const lv_area_t * coords);
 
 void lv_draw_vglite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_t * dsc,
                            const lv_area_t * coords);
@@ -89,6 +64,8 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                           const lv_area_t * coords);
 
 void lv_draw_vglite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc);
+
+void lv_draw_vglite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_t * dsc);
 
 /**********************
  *      MACROS

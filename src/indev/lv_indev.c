@@ -75,7 +75,7 @@ static lv_result_t send_event(lv_event_code_t code, void * param);
 
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
 static void indev_scroll_throw_anim_cb(void * var, int32_t v);
-static void indev_scroll_throw_anim_ready_cb(lv_anim_t * anim);
+static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim);
 static inline void indev_scroll_throw_anim_reset(lv_indev_t * indev)
 {
     if(indev) {
@@ -128,7 +128,6 @@ lv_indev_t * lv_indev_create(void)
     indev->long_press_repeat_time  = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
     indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
-
     return indev;
 }
 
@@ -216,7 +215,7 @@ void lv_indev_read(lv_indev_t * indev_p)
     do {
         /*Read the data*/
         indev_read_core(indev_p, &data);
-        continue_reading = data.continue_reading;
+        continue_reading = indev_p->mode != LV_INDEV_MODE_EVENT && data.continue_reading;
 
         /*The active object might be deleted even in the read function*/
         indev_proc_reset_query_handler(indev_p);
@@ -335,14 +334,14 @@ lv_group_t * lv_indev_get_group(const lv_indev_t * indev)
     return indev->group;
 }
 
-lv_display_t * lv_indev_get_disp(const lv_indev_t * indev)
+lv_display_t * lv_indev_get_display(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;
 
     return indev->disp;
 }
 
-void lv_indev_set_disp(lv_indev_t * indev, lv_display_t * disp)
+void lv_indev_set_display(lv_indev_t * indev, lv_display_t * disp)
 {
     if(indev == NULL) return;
 
@@ -485,6 +484,12 @@ lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev)
     }
 
     return indev->read_timer;
+}
+
+lv_indev_mode_t lv_indev_get_mode(lv_indev_t * indev)
+{
+    if(indev) return indev->mode;
+    return LV_INDEV_MODE_NONE;
 }
 
 void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode)
@@ -843,10 +848,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(data->state != LV_INDEV_STATE_RELEASED) {
         data->enc_diff = 0;
     }
-
-    /*Refresh the focused object. It might change due to lv_group_focus_prev/next*/
-    indev_obj_act = lv_group_get_focused(g);
-    if(indev_obj_act == NULL) return;
 
     const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
@@ -1562,14 +1563,13 @@ static void indev_scroll_throw_anim_cb(void * var, int32_t v)
 
     if(indev->pointer.scroll_dir == LV_DIR_NONE || indev->pointer.scroll_obj == NULL) {
         if(indev->scroll_throw_anim) {
-            /*hacky*/
             LV_LOG_INFO("stop animation");
-            lv_anim_set_duration(indev->scroll_throw_anim, 0);
+            lv_anim_delete(indev, indev_scroll_throw_anim_cb);
         }
     }
 }
 
-static void indev_scroll_throw_anim_ready_cb(lv_anim_t * anim)
+static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim)
 {
     if(anim) {
         indev_scroll_throw_anim_reset((lv_indev_t *)anim->var);
@@ -1586,10 +1586,9 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_set_duration(&a, 1024);
     lv_anim_set_values(&a, 0, 1024);
     lv_anim_set_exec_cb(&a, indev_scroll_throw_anim_cb);
-    lv_anim_set_ready_cb(&a, indev_scroll_throw_anim_ready_cb);
-    lv_anim_set_deleted_cb(&a, indev_scroll_throw_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, indev_scroll_throw_anim_completed_cb);
+    lv_anim_set_deleted_cb(&a, indev_scroll_throw_anim_completed_cb);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     indev->scroll_throw_anim = lv_anim_start(&a);
 }
-

@@ -27,8 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area);
@@ -81,9 +80,9 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
         uint8_t * raw_data = (uint8_t *)img_dsc->data;
-        const uint32_t raw_sjpeg_data_size = img_dsc->data_size;
+        const uint32_t raw_data_size = img_dsc->data_size;
 
-        if(is_jpg(raw_data, raw_sjpeg_data_size) == true) {
+        if(is_jpg(raw_data, raw_data_size) == true) {
 #if LV_USE_FS_MEMFS
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = img_dsc->header.w;
@@ -143,11 +142,15 @@ static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
     return 0;
 }
 
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args)
+/**
+ * Decode a JPG image and return the decoded data.
+ * @param decoder pointer to the decoder
+ * @param dsc     pointer to the decoder descriptor
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
+ */
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(args);
     lv_fs_file_t * f = lv_malloc(sizeof(lv_fs_file_t));
     if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
 #if LV_USE_FS_MEMFS

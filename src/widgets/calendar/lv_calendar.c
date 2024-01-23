@@ -28,7 +28,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void draw_part_begin_event_cb(lv_event_t * e);
+static void draw_task_added_event_cb(lv_event_t * e);
 
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
 static uint8_t get_month_length(int32_t year, int32_t month);
@@ -280,8 +280,9 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     calendar->btnm = lv_buttonmatrix_create(obj);
     lv_buttonmatrix_set_map(calendar->btnm, calendar->map);
     lv_buttonmatrix_set_button_ctrl_all(calendar->btnm, LV_BUTTONMATRIX_CTRL_CLICK_TRIG | LV_BUTTONMATRIX_CTRL_NO_REPEAT);
-    lv_obj_add_event_cb(calendar->btnm, draw_part_begin_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(calendar->btnm, draw_task_added_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_set_width(calendar->btnm, lv_pct(100));
+    lv_obj_add_flag(calendar->btnm, LV_OBJ_FLAG_EVENT_BUBBLE | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);
@@ -291,42 +292,52 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, calendar->today.day);
 #endif
 
-    lv_obj_add_flag(calendar->btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 }
 
-static void draw_part_begin_event_cb(lv_event_t * e)
+static void draw_task_added_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_draw_task_t * draw_task = lv_event_get_param(e);
-    if(draw_task->type != LV_DRAW_TASK_TYPE_FILL) return;
+    if(((lv_draw_dsc_base_t *)draw_task->draw_dsc)->part != LV_PART_ITEMS) return;
 
-    lv_draw_rect_dsc_t * rect_draw_dsc;
-    rect_draw_dsc = draw_task->draw_dsc;
+    lv_draw_fill_dsc_t * fill_draw_dsc = NULL;
+    lv_draw_border_dsc_t * border_draw_dsc = NULL;
 
-    if(rect_draw_dsc->base.part == LV_PART_ITEMS) {
-        /*Day name styles*/
-        if(rect_draw_dsc->base.id1 < 7) {
-            rect_draw_dsc->bg_opa = LV_OPA_TRANSP;
-            rect_draw_dsc->border_opa = LV_OPA_TRANSP;
-        }
-        else if(lv_buttonmatrix_has_button_ctrl(obj, rect_draw_dsc->base.id1, LV_BUTTONMATRIX_CTRL_DISABLED)) {
-            rect_draw_dsc->bg_opa = LV_OPA_TRANSP;
-            rect_draw_dsc->border_opa = LV_OPA_TRANSP;
-        }
+    if(draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
+        fill_draw_dsc = draw_task->draw_dsc;
+    }
+    else if(draw_task->type == LV_DRAW_TASK_TYPE_BORDER) {
+        border_draw_dsc = draw_task->draw_dsc;
+    }
+    else {
+        return;
+    }
 
-        if(lv_buttonmatrix_has_button_ctrl(obj, rect_draw_dsc->base.id1, LV_CALENDAR_CTRL_HIGHLIGHT)) {
-            rect_draw_dsc->bg_opa = LV_OPA_40;
-            rect_draw_dsc->bg_color = lv_theme_get_color_primary(obj);
-            if(lv_buttonmatrix_get_selected_button(obj) == rect_draw_dsc->base.id1) {
-                rect_draw_dsc->bg_opa = LV_OPA_70;
-            }
-        }
+    int32_t id = ((lv_draw_dsc_base_t *)draw_task->draw_dsc)->id1;
 
-        if(lv_buttonmatrix_has_button_ctrl(obj, rect_draw_dsc->base.id1, LV_CALENDAR_CTRL_TODAY)) {
-            rect_draw_dsc->border_opa = LV_OPA_COVER;
-            rect_draw_dsc->border_color = lv_theme_get_color_primary(obj);
-            rect_draw_dsc->border_width += 1;
+    /*Day name styles*/
+    if(id < 7) {
+        if(fill_draw_dsc) fill_draw_dsc->opa = LV_OPA_TRANSP;
+        if(border_draw_dsc) border_draw_dsc->opa = LV_OPA_TRANSP;
+    }
+    else if(lv_buttonmatrix_has_button_ctrl(obj, id, LV_BUTTONMATRIX_CTRL_DISABLED)) {
+        if(fill_draw_dsc) fill_draw_dsc->opa = LV_OPA_TRANSP;
+        if(border_draw_dsc) border_draw_dsc->opa = LV_OPA_TRANSP;
+    }
+
+    if(lv_buttonmatrix_has_button_ctrl(obj, id, LV_CALENDAR_CTRL_HIGHLIGHT)) {
+        if(border_draw_dsc) border_draw_dsc->color = lv_theme_get_color_primary(obj);
+        if(fill_draw_dsc) fill_draw_dsc->opa = LV_OPA_40;
+        if(fill_draw_dsc) fill_draw_dsc->color = lv_theme_get_color_primary(obj);
+        if(lv_buttonmatrix_get_selected_button(obj) == (uint32_t)id) {
+            if(fill_draw_dsc) fill_draw_dsc->opa = LV_OPA_70;
         }
+    }
+
+    if(lv_buttonmatrix_has_button_ctrl(obj, id, LV_CALENDAR_CTRL_TODAY)) {
+        if(border_draw_dsc) border_draw_dsc->opa = LV_OPA_COVER;
+        if(border_draw_dsc) border_draw_dsc->color = lv_theme_get_color_primary(obj);
+        if(border_draw_dsc) border_draw_dsc->width += 1;
     }
 }
 

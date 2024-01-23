@@ -35,7 +35,7 @@ static void f_gif_read(gd_GIF * gif, void * buf, size_t len);
 static int f_gif_seek(gd_GIF * gif, size_t pos, int k);
 static void f_gif_close(gd_GIF * gif);
 
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_MVE
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
     #include "gifdec_mve.h"
 #endif
 

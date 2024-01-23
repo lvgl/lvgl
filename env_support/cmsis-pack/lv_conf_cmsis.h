@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.0.0-dev
+ * Configuration file for v9.0.0
  */
 
 /* clang-format off */
@@ -36,7 +36,7 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (256 * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (96 * 1024U)          /*[bytes]*/
 
     /*Size of the memory expand for `lv_malloc()` in bytes*/
     #define LV_MEM_POOL_EXPAND_SIZE 0
@@ -61,12 +61,30 @@
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI_DEF 130     /*[px/inch]*/
 
+/*customize tick-get */
+#if defined(__PERF_COUNTER__) && __PERF_COUNTER__
+    #define LV_GLOBAL_INIT(__GLOBAL_PTR)                                    \
+            do {                                                            \
+                lv_global_init((lv_global_t *)(__GLOBAL_PTR));              \
+                extern uint32_t perfc_tick_get(void);                       \
+                (__GLOBAL_PTR)->tick_state.tick_get_cb = perfc_tick_get;    \
+            } while(0)
+#endif
+
+/*=================
+ * OPERATING SYSTEM
+ *=================*/
+
+#if LV_USE_OS == LV_OS_CUSTOM
+    #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+#endif
+
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
 
 /*Align the stride of all layers and images to this bytes*/
-#define LV_DRAW_BUF_STRIDE_ALIGN                4
+#define LV_DRAW_BUF_STRIDE_ALIGN                1
 
 /*Align the start address of draw_buf addresses to this bytes*/
 #define LV_DRAW_BUF_ALIGN                       4
@@ -103,20 +121,51 @@
         #define LV_DRAW_SW_CIRCLE_CACHE_SIZE 4
     #endif
 
-    #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+    #if !defined(LV_USE_DRAW_SW_ASM) && defined(RTE_Acceleration_Arm_2D)
+        /*turn-on helium acceleration when Arm-2D and the Helium-powered device are detected */
+        #if defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
+            #define LV_USE_DRAW_SW_ASM  LV_DRAW_SW_ASM_HELIUM
+            #define LV_USE_DRAW_ARM2D_SYNC  1
+        #endif
+    #endif
+
+    #ifndef LV_USE_DRAW_SW_ASM
+        #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+    #endif
 
     #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
         #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
     #endif
 #endif
 
+#if LV_USE_DRAW_VGLITE
+    /* Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
+    #define LV_USE_VGLITE_BLIT_SPLIT 0
 
-/*=================
- * OPERATING SYSTEM
- *=================*/
+    #if LV_USE_OS
+        /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
+        #define LV_USE_VGLITE_DRAW_ASYNC 1
+    #endif
 
-#if LV_USE_OS == LV_OS_CUSTOM
-    #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+    /* Enable VGLite asserts. */
+    #define LV_USE_VGLITE_ASSERT 0
+#endif
+
+#if LV_USE_DRAW_PXP
+    /* Enable PXP asserts. */
+    #define LV_USE_PXP_ASSERT 0
+#endif
+
+/* Use VG-Lite GPU. */
+#define LV_USE_DRAW_VG_LITE 0
+
+#if LV_USE_DRAW_VG_LITE
+/* Enable VG-Lite custom external 'gpu_init()' function */
+#define LV_VG_LITE_USE_GPU_INIT 0
+
+/* Enable VG-Lite assert. */
+#define LV_VG_LITE_USE_ASSERT 0
+
 #endif
 
 /*=======================
@@ -196,35 +245,9 @@
  *For layers add the index number of the draw unit on black background.*/
 #define LV_USE_PARALLEL_DRAW_DEBUG 0
 
-/*------------------
- * STATUS MONITORING
- *------------------*/
-
-/*1: Show CPU usage and FPS count
- * Requires `LV_USE_SYSMON = 1`*/
-#define LV_USE_PERF_MONITOR 0
-#if LV_USE_PERF_MONITOR
-    #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
-
-    /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
-    #define LV_USE_PERF_MONITOR_LOG_MODE 0
-#endif
-
-/*1: Show the used memory and the memory fragmentation
- * Requires `LV_USE_BUILTIN_MALLOC = 1`
- * Requires `LV_USE_SYSMON = 1`*/
-#define LV_USE_MEM_MONITOR 0
-#if LV_USE_MEM_MONITOR
-    #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
-#endif
-
 /*-------------
  * Others
  *-----------*/
-
-/*Maximum buffer size to allocate for rotation.
- *Only used if software rotation is enabled in the display driver.*/
-#define LV_DISPLAY_ROT_MAX_BUF (10*1024)
 
 #define LV_ENABLE_GLOBAL_CUSTOM 0
 #if LV_ENABLE_GLOBAL_CUSTOM
@@ -237,6 +260,10 @@
  *Data larger than the size of the cache also can be allocated but
  *will be dropped immediately after usage.*/
 #define LV_CACHE_DEF_SIZE       0
+
+/*Default number of image header cache entries. The cache is used to store the headers of images
+ *The main logic is like `LV_CACHE_DEF_SIZE` but for image headers.*/
+#define LV_IMAGE_HEADER_CACHE_DEF_CNT 0
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
@@ -314,7 +341,7 @@
 #define LV_FONT_MONTSERRAT_18 0
 #define LV_FONT_MONTSERRAT_20 0
 #define LV_FONT_MONTSERRAT_22 0
-#define LV_FONT_MONTSERRAT_24 0
+#define LV_FONT_MONTSERRAT_24 1
 #define LV_FONT_MONTSERRAT_26 0
 #define LV_FONT_MONTSERRAT_28 0
 #define LV_FONT_MONTSERRAT_30 0
@@ -459,8 +486,6 @@
 #define LV_USE_LIST       1
 
 #define LV_USE_MENU       1
-
-#define LV_USE_METER      1
 
 #define LV_USE_MSGBOX     1
 
@@ -640,9 +665,30 @@
  * OTHERS
  *==================*/
 
-
 /*1: Enable system monitor component*/
-#define LV_USE_SYSMON   (LV_USE_MEM_MONITOR | LV_USE_PERF_MONITOR)
+#define LV_USE_SYSMON   0
+
+#if LV_USE_SYSMON
+
+    /*1: Show CPU usage and FPS count
+     * Requires `LV_USE_SYSMON = 1`*/
+    #define LV_USE_PERF_MONITOR 0
+    #if LV_USE_PERF_MONITOR
+        #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+
+        /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
+        #define LV_USE_PERF_MONITOR_LOG_MODE 0
+    #endif
+
+    /*1: Show the used memory and the memory fragmentation
+     * Requires `LV_USE_BUILTIN_MALLOC = 1`
+     * Requires `LV_USE_SYSMON = 1`*/
+    #define LV_USE_MEM_MONITOR 0
+    #if LV_USE_MEM_MONITOR
+        #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
+    #endif
+
+#endif /*LV_USE_SYSMON*/
 
 /*1: Enable the runtime performance profiler*/
 #define LV_USE_PROFILER 0
@@ -655,7 +701,7 @@
     #endif
 
     /*Header to include for the profiler*/
-    #define LV_PROFILER_INCLUDE "lvgl/src/misc/lv_profiler_builtin.h"
+    #define LV_PROFILER_INCLUDE "src/misc/lv_profiler_builtin.h"
 
     /*Profiler start point function*/
     #define LV_PROFILER_BEGIN    LV_PROFILER_BUILTIN_BEGIN
@@ -670,16 +716,8 @@
     #define LV_PROFILER_END_TAG   LV_PROFILER_BUILTIN_END_TAG
 #endif
 
-
-/*1: Support using images as font in label or span widgets */
-#if LV_USE_IMGFONT
-    /*Imgfont image file path maximum length*/
-    #define LV_IMGFONT_PATH_MAX_LEN 64
-
-    /*1: Use img cache to buffer header information*/
-    #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
-#endif
-
+/*1: Enable an observer pattern implementation*/
+#define LV_USE_OBSERVER 1
 
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
@@ -763,14 +801,10 @@
 
 #endif
 
-/*Driver for /dev/dri/card*/
-#define LV_USE_LINUX_DRM        0
-
-/*Interface for TFT_eSPI*/
-#define LV_USE_TFT_ESPI         0
-
 /*Driver for evdev input devices*/
 #define LV_USE_EVDEV    0
+
+#define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
 
 /*==================
 * EXAMPLES

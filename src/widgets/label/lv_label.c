@@ -672,7 +672,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     const lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if((code == LV_EVENT_STYLE_CHANGED) || (code == LV_EVENT_SIZE_CHANGED)) {
         /*Revert dots for proper refresh*/
@@ -716,7 +716,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_main(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_label_t * label = (lv_label_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
 
@@ -820,7 +820,7 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
                 dest->act_time = src->act_time;
             dest->repeat_cnt = src->repeat_cnt;
             dest->repeat_delay = src->repeat_delay;
-            dest->ready_cb = src->ready_cb;
+            dest->completed_cb = src->completed_cb;
             dest->playback_delay = src->playback_delay;
             break;
         case LV_LABEL_LONG_SCROLL_CIRCULAR:
@@ -829,7 +829,7 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
                 dest->act_time = src->act_time;
             dest->repeat_cnt = src->repeat_cnt;
             dest->repeat_delay = src->repeat_delay;
-            dest->ready_cb = src->ready_cb;
+            dest->completed_cb = src->completed_cb;
             break;
         default:
             break;
@@ -869,7 +869,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
     /*In scroll mode start an offset animation*/
     if(label->long_mode == LV_LABEL_LONG_SCROLL) {
         const lv_anim_t * anim_template = lv_obj_get_style_anim(obj, LV_PART_MAIN);
-        uint32_t anim_time = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+        uint32_t anim_time = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
         if(anim_time == 0) anim_time = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
         lv_anim_init(&a);
@@ -980,7 +980,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
     /*In roll inf. mode keep the size but start offset animations*/
     else if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
         const lv_anim_t * anim_template = lv_obj_get_style_anim(obj, LV_PART_MAIN);
-        uint32_t anim_time = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+        uint32_t anim_time = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
         if(anim_time == 0) anim_time = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
         lv_anim_init(&a);

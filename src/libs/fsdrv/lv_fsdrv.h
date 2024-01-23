@@ -56,4 +56,3 @@ void lv_fs_memfs_init(void);
 #endif
 
 #endif /*LV_FSDRV_H*/
-

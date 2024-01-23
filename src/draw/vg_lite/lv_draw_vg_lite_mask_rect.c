@@ -68,10 +68,7 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
                                                         y - target_layer->buf_area.y1);
 
         if(res == LV_DRAW_SW_MASK_RES_TRANSP) {
-            uint32_t i;
-            for(i = 0; i < area_w; i++) {
-                c32_buf[i].alpha = 0x00;
-            }
+            lv_memzero(c32_buf, area_w * sizeof(lv_color32_t));
         }
         else {
             uint32_t i;
@@ -79,6 +76,9 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
                 if(mask_buf[i] != LV_OPA_COVER) {
                     c32_buf[i].alpha = LV_OPA_MIX2(c32_buf[i].alpha, mask_buf[i]);
                 }
+
+                /*Pre-multiply the alpha*/
+                lv_color_premultiply(&c32_buf[i]);
             }
         }
     }

@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2020-2023 NXP
+ * Copyright 2020-2024 NXP
  *
  * SPDX-License-Identifier: MIT
  */
@@ -53,24 +53,21 @@ void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     lv_area_t rel_coords;
     lv_area_copy(&rel_coords, coords);
-    lv_area_move(&rel_coords, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
+    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
+    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
     if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    uint8_t * dest_buf = layer->draw_buf.buf;
-    int32_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
-    lv_color_format_t dest_cf = layer->draw_buf.color_format;
-
-    _pxp_fill(dest_buf, &blend_area, dest_stride, dest_cf, dsc);
+    _pxp_fill(draw_buf->data, &blend_area, draw_buf->header.stride, draw_buf->header.cf, dsc);
 }
 
 /**********************
