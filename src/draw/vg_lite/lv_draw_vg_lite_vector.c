@@ -250,7 +250,8 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
 
     uint32_t pidx = 0;
     lv_vector_path_op_t * op = lv_array_front(&src->ops);
-    for(uint32_t i = 0; i < lv_array_size(&src->ops); i++) {
+    uint32_t size = lv_array_size(&src->ops);
+    for(uint32_t i = 0; i < size; i++) {
         switch(op[i]) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
                     const lv_fpoint_t * pt = lv_array_at(&src->points, pidx);

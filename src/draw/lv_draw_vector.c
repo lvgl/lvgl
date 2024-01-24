@@ -207,7 +207,8 @@ void lv_matrix_transform_point(const lv_matrix_t * matrix, lv_fpoint_t * point)
 void lv_matrix_transform_path(const lv_matrix_t * matrix, lv_vector_path_t * path)
 {
     lv_fpoint_t * pt = lv_array_front(&path->points);
-    for(uint32_t i = 0; i < lv_array_size(&path->points); i++) {
+    uint32_t size = lv_array_size(&path->points);
+    for(uint32_t i = 0; i < size; i++) {
         lv_matrix_transform_point(matrix, &pt[i]);
     }
 }

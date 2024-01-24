@@ -87,7 +87,8 @@ static void _set_paint_shape(Tvg_Paint * obj, const lv_vector_path_t * p)
 {
     uint32_t pidx = 0;
     lv_vector_path_op_t * op = lv_array_front(&p->ops);
-    for(uint32_t i = 0; i < lv_array_size(&p->ops); i++) {
+    uint32_t size = lv_array_size(&p->ops);
+    for(uint32_t i = 0; i < size; i++) {
         switch(op[i]) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
                     lv_fpoint_t * pt = lv_array_at(&p->points, pidx);
