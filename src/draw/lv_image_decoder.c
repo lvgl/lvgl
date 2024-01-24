@@ -133,9 +133,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     dsc->decoder = image_decoder_get_info(src, &dsc->header);
     if(dsc->decoder == NULL) return LV_RESULT_INVALID;
 
-    /*Duplicate the source if it's a file*/
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) dsc->src = lv_strdup(dsc->src);
-
     /*Make a copy of args*/
     dsc->args = args ? *args : (lv_image_decoder_args_t) {
         .stride_align = LV_DRAW_BUF_STRIDE_ALIGN != 1,
@@ -167,11 +164,6 @@ void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
     if(dsc->decoder) {
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
-
-        if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-            lv_free((void *)dsc->src);
-            dsc->src = NULL;
-        }
     }
 }
 
@@ -447,6 +439,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     if(entry) {
         lv_image_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
         dsc->decoded = cached_data->decoded;
+        dsc->decoder = (lv_image_decoder_t *)cached_data->decoder;
         dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/
         return LV_RESULT_OK;
     }
