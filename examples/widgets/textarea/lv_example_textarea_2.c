@@ -47,7 +47,6 @@ void lv_example_textarea_2(void)
     lv_obj_set_style_text_font(pwd_ta, &lv_font_dejavu_16_persian_hebrew, 0);
 #endif
 
-
 }
 
 static void ta_event_cb(lv_event_t * e)
