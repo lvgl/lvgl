@@ -53,7 +53,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void * lv_memcpy(void * dst, const void * src, size_t len)
+void * LV_ATTRIBUTE_FAST_MEM lv_memcpy(void * dst, const void * src, size_t len)
 {
     uint8_t * d8 = dst;
     const uint8_t * s8 = src;
@@ -115,7 +115,7 @@ LV_ATTRIBUTE_FAST_MEM void * lv_memcpy(void * dst, const void * src, size_t len)
     return dst;
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
+void LV_ATTRIBUTE_FAST_MEM lv_memset(void * dst, uint8_t v, size_t len)
 {
     uint8_t * d8 = (uint8_t *)dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
@@ -145,7 +145,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM void * lv_memmove(void * dst, const void * src, size_t len)
+void * LV_ATTRIBUTE_FAST_MEM lv_memmove(void * dst, const void * src, size_t len)
 {
     if(dst < src || (char *)dst > ((char *)src + len)) {
         return lv_memcpy(dst, src, len);
