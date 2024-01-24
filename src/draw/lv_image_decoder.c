@@ -319,6 +319,8 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         const lv_image_dsc_t * img_dsc = src;
         if(img_dsc->data == NULL) return NULL;
     }
+#else
+    LV_UNUSED(src_type);
 #endif
 
     lv_image_decoder_t * decoder;
