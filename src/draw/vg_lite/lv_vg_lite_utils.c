@@ -609,9 +609,9 @@ void lv_vg_lite_clear_image_decoder_dsc(lv_draw_unit_t * draw_unit)
     }
 
     /* Close all pending image decoder dsc */
+    lv_image_decoder_dsc_t * img_dsc = lv_array_front(arr);
     for(uint32_t i = 0; i < size; i++) {
-        lv_image_decoder_dsc_t * img_dsc = lv_array_at(arr, i);
-        lv_image_decoder_close(img_dsc);
+        lv_image_decoder_close(&img_dsc[i]);
     }
     lv_array_clear(arr);
 }
