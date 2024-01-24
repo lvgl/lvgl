@@ -262,6 +262,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             if(dsc->args.use_indexed) {
                 /*Palette for indexed image and whole image of A8 image are always loaded to RAM for simplicity*/
                 res = load_indexed(decoder, dsc);
+                use_directly = true; /*If draw unit supports indexed image, it can be used directly.*/
             }
             else {
                 res = decode_indexed(decoder, dsc);
