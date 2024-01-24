@@ -358,16 +358,24 @@ void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
         LV_LOG_WARN("Subject not initialized yet");
         return;
     }
+
     while(lv_obj_remove_event_cb(obj, unsubscribe_on_delete_cb));
+
+#if LV_USE_BUTTON
     while(lv_obj_remove_event_cb(obj, btn_value_changed_event_cb));
+#endif /*LV_USE_BUTTON*/
+
+#if LV_USE_ARC
     while(lv_obj_remove_event_cb(obj, arc_value_changed_event_cb));
+#endif /*LV_USE_ARC*/
+
 #if LV_USE_ROLLER
     while(lv_obj_remove_event_cb(obj, roller_value_changed_event_cb));
-#endif
+#endif /*LV_USE_ROLLER*/
 
 #if LV_USE_DROPDOWN
     while(lv_obj_remove_event_cb(obj, dropdown_value_changed_event_cb));
-#endif
+#endif /*LV_USE_DROPDOWN*/
 
     lv_observer_t * observer = _lv_ll_get_head(&subject->subs_ll);
     while(observer) {
