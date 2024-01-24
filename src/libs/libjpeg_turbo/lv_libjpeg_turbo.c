@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define JPEG_PIXEL_SIZE 3 /* RGB888 */
+#define JPEG_PIXEL_SIZE 4 /* XRGB888 */
 #define JPEG_SIGNATURE 0xFFD8FF
 #define IS_JPEG_SIGNATURE(x) (((x) & 0x00FFFFFF) == JPEG_SIGNATURE)
 
@@ -320,7 +320,7 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
 
     /* set parameters for decompression */
 
-    cinfo.out_color_space = JCS_EXT_BGR;
+    cinfo.out_color_space = JCS_EXT_BGRX;
 
     /* In this example, we don't need to change any of the defaults set by
      * jpeg_read_header(), so we do nothing here.
@@ -346,7 +346,7 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
     buffer = (*cinfo.mem->alloc_sarray)
              ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-    decoded = lv_draw_buf_create(cinfo.output_width, cinfo.output_height, LV_COLOR_FORMAT_RGB888, LV_STRIDE_AUTO);
+    decoded = lv_draw_buf_create(cinfo.output_width, cinfo.output_height, LV_COLOR_FORMAT_XRGB8888, LV_STRIDE_AUTO);
     if(decoded != NULL) {
         uint8_t * cur_pos = decoded->data;
         size_t stride = cinfo.output_width * JPEG_PIXEL_SIZE;
