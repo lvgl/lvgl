@@ -14,6 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#if LV_USE_NUTTX
+
 /*********************
  *      DEFINES
  *********************/
@@ -31,6 +33,8 @@ void lv_nuttx_profiler_init(void);
 /**********************
  *      MACROS
  **********************/
+
+#endif /* LV_USE_NUTTX */
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -10,6 +10,8 @@
 #include "lv_nuttx_profiler.h"
 #include "../../../lvgl.h"
 
+#if LV_USE_NUTTX
+
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
 #include <nuttx/arch.h>
@@ -94,3 +96,5 @@ static void flush_cb(const char * buf)
 }
 
 #endif
+
+#endif /* LV_USE_NUTTX */
