@@ -255,6 +255,9 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 
 #define lv_obj_add_event                    lv_obj_add_event_cb
 
+#define lv_image_set_angle                  lv_image_set_rotation
+#define lv_image_set_zoom                   lv_image_set_scale
+
 /**********************
  *      MACROS
  **********************/
