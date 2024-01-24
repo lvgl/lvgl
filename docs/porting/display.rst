@@ -26,7 +26,7 @@ An example ``flush_cb`` looks like this:
    {
        /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one
         *`put_px` is just an example, it needs to be implemented by you.*/
-       uint16_t * buf16 = (uint16_t)px_map; /*Let's say it's a 16 bit (RGB565) display*/
+       uint16_t * buf16 = (uint16_t *)px_map; /*Let's say it's a 16 bit (RGB565) display*/
        int32_t x, y;
        for(y = area->y1; y <= area->y2; y++) {
            for(x = area->x1; x <= area->x2; x++) {

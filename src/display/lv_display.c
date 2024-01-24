@@ -406,8 +406,8 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
     LV_ASSERT_MSG(w != 0 && h != 0, "display resolution is 0");
 
     /* buf1 or buf2 is not aligned according to LV_DRAW_BUF_ALIGN */
-    LV_ASSERT_MSG(buf1 == lv_draw_buf_align(buf1, cf), "buf1 is not aligned: %p", buf1);
-    LV_ASSERT_MSG(buf2 == NULL || buf2 == lv_draw_buf_align(buf2, cf), "buf2 is not aligned: %p", buf2);
+    LV_ASSERT_FORMAT_MSG(buf1 == lv_draw_buf_align(buf1, cf), "buf1 is not aligned: %p", buf1);
+    LV_ASSERT_FORMAT_MSG(buf2 == NULL || buf2 == lv_draw_buf_align(buf2, cf), "buf2 is not aligned: %p", buf2);
 
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
@@ -416,8 +416,8 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
         LV_ASSERT_MSG(h != 0, "the buffer is too small");
     }
     else {
-        LV_ASSERT_MSG(stride * h <= buf_size, "%s mode requires screen sized buffer(s)",
-                      render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
+        LV_ASSERT_FORMAT_MSG(stride * h <= buf_size, "%s mode requires screen sized buffer(s)",
+                             render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
     }
 
     lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);

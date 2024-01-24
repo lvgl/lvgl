@@ -133,9 +133,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     dsc->decoder = image_decoder_get_info(src, &dsc->header);
     if(dsc->decoder == NULL) return LV_RESULT_INVALID;
 
-    /*Duplicate the source if it's a file*/
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) dsc->src = lv_strdup(dsc->src);
-
     /*Make a copy of args*/
     dsc->args = args ? *args : (lv_image_decoder_args_t) {
         .stride_align = LV_DRAW_BUF_STRIDE_ALIGN != 1,
@@ -167,11 +164,6 @@ void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
     if(dsc->decoder) {
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
-
-        if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-            lv_free((void *)dsc->src);
-            dsc->src = NULL;
-        }
     }
 }
 
@@ -318,18 +310,20 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
     lv_image_decoder_t * decoder;
 
 #if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
-    lv_image_header_cache_data_t search_key;
-    search_key.src_type = src_type;
-    search_key.src = src;
+    if(src_type == LV_IMAGE_SRC_FILE) {
+        lv_image_header_cache_data_t search_key;
+        search_key.src_type = src_type;
+        search_key.src = src;
 
-    lv_cache_entry_t * entry = lv_cache_acquire(img_header_cache_p, &search_key, NULL);
+        lv_cache_entry_t * entry = lv_cache_acquire(img_header_cache_p, &search_key, NULL);
 
-    if(entry) {
-        lv_image_header_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
-        *header = cached_data->header;
-        decoder = cached_data->decoder;
-        lv_cache_release(img_header_cache_p, entry, NULL);
-        return decoder;
+        if(entry) {
+            lv_image_header_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
+            *header = cached_data->header;
+            decoder = cached_data->decoder;
+            lv_cache_release(img_header_cache_p, entry, NULL);
+            return decoder;
+        }
     }
 #endif
 
@@ -345,8 +339,11 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
     }
 
 #if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
-    if(decoder) {
-        if(src_type == LV_IMAGE_SRC_FILE) search_key.src = lv_strdup(src);
+    if(src_type == LV_IMAGE_SRC_FILE && decoder) {
+        lv_cache_entry_t * entry;
+        lv_image_header_cache_data_t search_key;
+        search_key.src_type = src_type;
+        search_key.src = lv_strdup(src);
         search_key.decoder = decoder;
         search_key.header = *header;
         entry = lv_cache_add(img_header_cache_p, &search_key, NULL);
@@ -442,6 +439,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     if(entry) {
         lv_image_cache_data_t * cached_data = lv_cache_entry_get_data(entry);
         dsc->decoded = cached_data->decoded;
+        dsc->decoder = (lv_image_decoder_t *)cached_data->decoder;
         dsc->cache_entry = entry;     /*Save the cache to release it in decoder_close*/
         return LV_RESULT_OK;
     }

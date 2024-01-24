@@ -932,7 +932,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 break;
         }
 
-        lv_style_value_t old_value;
+        lv_style_value_t old_value = {0};
         bool refr = true;
         if(lv_style_get_prop(obj->styles[i].style, tr->prop, &old_value)) {
             if(value_final.ptr == old_value.ptr && lv_color_eq(value_final.color, old_value.color) &&

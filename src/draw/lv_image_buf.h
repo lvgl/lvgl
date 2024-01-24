@@ -183,6 +183,7 @@ static inline void lv_image_header_init(lv_image_header_t * header, uint32_t w, 
     header->cf = cf;
     header->stride = stride;
     header->flags = flags;
+    header->magic = LV_IMAGE_HEADER_MAGIC;
 }
 /**********************
  *      MACROS

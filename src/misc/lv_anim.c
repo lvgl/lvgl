@@ -39,7 +39,6 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
 static uint32_t convert_speed_to_time(uint32_t speed, int32_t start, int32_t end);
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(lv_anim_t * a_current);
-static bool delete_core(void * var, void * cb, bool custom_exec_cb);
 
 /**********************
  *  STATIC VARIABLES
@@ -144,7 +143,27 @@ uint32_t lv_anim_get_playtime(const lv_anim_t * a)
 
 bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
 {
-    return delete_core(var, exec_cb, false);
+    lv_anim_t * a;
+    bool del_any = false;
+    a        = _lv_ll_get_head(anim_ll_p);
+    while(a != NULL) {
+        bool del = false;
+        if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
+            _lv_ll_remove(anim_ll_p, a);
+            if(a->deleted_cb != NULL) a->deleted_cb(a);
+            lv_free(a);
+            anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
+                                       the linked list*/
+            del_any = true;
+            del = true;
+        }
+
+        /*Always start from the head on delete, because we don't know
+         *how `anim_ll_p` was changes in `a->deleted_cb` */
+        a = del ? _lv_ll_get_head(anim_ll_p) : _lv_ll_get_next(anim_ll_p, a);
+    }
+
+    return del_any;
 }
 
 void lv_anim_delete_all(void)
@@ -523,32 +542,6 @@ static bool remove_concurrent_anims(lv_anim_t * a_current)
             /*Read by `anim_timer`. It need to know if a delete occurred in the linked list*/
             anim_mark_list_change();
 
-            del_any = true;
-            del = true;
-        }
-
-        /*Always start from the head on delete, because we don't know
-         *how `anim_ll_p` was changes in `a->deleted_cb` */
-        a = del ? _lv_ll_get_head(anim_ll_p) : _lv_ll_get_next(anim_ll_p, a);
-    }
-
-    return del_any;
-}
-
-static bool delete_core(void * var, void * cb, bool custom_exec_cb)
-{
-    lv_anim_t * a;
-    bool del_any = false;
-    a        = _lv_ll_get_head(anim_ll_p);
-    while(a != NULL) {
-        bool del = false;
-        void * a_cb = custom_exec_cb ? (void *)a->custom_exec_cb : (void *)a->exec_cb;
-        if((a->var == var || var == NULL) && (a_cb == cb || cb == NULL)) {
-            _lv_ll_remove(anim_ll_p, a);
-            if(a->deleted_cb != NULL) a->deleted_cb(a);
-            lv_free(a);
-            anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
-                                       the linked list*/
             del_any = true;
             del = true;
         }

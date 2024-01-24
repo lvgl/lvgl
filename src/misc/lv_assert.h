@@ -42,10 +42,18 @@ extern "C" {
         }                                                      \
     } while(0)
 
-#define LV_ASSERT_MSG(expr, format, ...)                                                \
+#define LV_ASSERT_MSG(expr, msg)                                         \
+    do {                                                                 \
+        if(!(expr)) {                                                    \
+            LV_LOG_ERROR("Asserted at expression: %s (%s)", #expr, msg); \
+            LV_ASSERT_HANDLER                                            \
+        }                                                                \
+    } while(0)
+
+#define LV_ASSERT_FORMAT_MSG(expr, format, ...)                                         \
     do {                                                                                \
         if(!(expr)) {                                                                   \
-            LV_LOG_ERROR("Asserted at expression: %s " format , #expr, ##__VA_ARGS__);  \
+            LV_LOG_ERROR("Asserted at expression: %s " format , #expr, __VA_ARGS__);    \
             LV_ASSERT_HANDLER                                                           \
         }                                                                               \
     } while(0)
