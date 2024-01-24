@@ -65,7 +65,7 @@ lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preproces
     if(list == NULL) return LV_RESULT_OK;
 
     uint32_t i = 0;
-    lv_event_dsc_t * dsc = lv_array_at(list, 0);
+    lv_event_dsc_t * dsc = lv_array_front(list);
     for(i = 0; i < lv_array_size(list); i++) {
         if(dsc[i].cb == NULL) continue;
         bool is_preprocessed = (dsc[i].filter & LV_EVENT_PREPROCESS) != 0;

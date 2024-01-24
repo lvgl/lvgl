@@ -86,9 +86,9 @@ static void _set_paint_matrix(Tvg_Paint * obj, const Tvg_Matrix * m)
 static void _set_paint_shape(Tvg_Paint * obj, const lv_vector_path_t * p)
 {
     uint32_t pidx = 0;
-    for(uint32_t i = 0; i < p->ops.size; i++) {
-        lv_vector_path_op_t * op = lv_array_at(&p->ops, i);
-        switch(*op) {
+    lv_vector_path_op_t * op = lv_array_front(&p->ops);
+    for(uint32_t i = 0; i < lv_array_size(&p->ops); i++) {
+        switch(op[i]) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
                     lv_fpoint_t * pt = lv_array_at(&p->points, pidx);
                     tvg_shape_move_to(obj, pt->x, pt->y);
@@ -243,7 +243,7 @@ static void _set_paint_stroke(Tvg_Paint * obj, const lv_vector_stroke_dsc_t * ds
     tvg_shape_set_stroke_join(obj, _lv_stroke_join_to_tvg(dsc->join));
 
     if(!lv_array_is_empty(&dsc->dash_pattern)) {
-        float * dash_array = lv_array_at(&dsc->dash_pattern, 0);
+        float * dash_array = lv_array_front(&dsc->dash_pattern);
         tvg_shape_set_stroke_dash(obj, dash_array, dsc->dash_pattern.size);
     }
 }

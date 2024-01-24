@@ -206,9 +206,9 @@ void lv_matrix_transform_point(const lv_matrix_t * matrix, lv_fpoint_t * point)
 
 void lv_matrix_transform_path(const lv_matrix_t * matrix, lv_vector_path_t * path)
 {
-    for(uint32_t i = 0; i < path->points.size; i++) {
-        lv_fpoint_t * pt = lv_array_at(&path->points, i);
-        lv_matrix_transform_point(matrix, pt);
+    lv_fpoint_t * pt = lv_array_front(&path->points);
+    for(uint32_t i = 0; i < lv_array_size(&path->points); i++) {
+        lv_matrix_transform_point(matrix, &pt[i]);
     }
 }
 
@@ -315,7 +315,7 @@ void lv_vector_path_close(lv_vector_path_t * path)
 void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area)
 {
     uint32_t len = lv_array_size(&path->points);
-    lv_fpoint_t * p = lv_array_at(&path->points, 0);
+    lv_fpoint_t * p = lv_array_front(&path->points);
     float x1 = p[0].x;
     float x2 = p[0].x;
     float y1 = p[0].y;
