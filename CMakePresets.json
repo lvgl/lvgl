@@ -5,7 +5,7 @@
       "name": "_base",
       "hidden": true,
       "cacheVariables": {
-        "LV_CONF_PATH": "${sourceDir}/lv_conf_template.h"
+        "LV_CONF_SKIP": true
       }
     },
     {

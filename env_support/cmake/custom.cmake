@@ -35,6 +35,11 @@ if(LV_CONF_PATH)
   target_compile_definitions(lvgl PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
 endif()
 
+# Add definition of LV_CONF_SKIP only if needed
+if(LV_CONF_SKIP)
+  target_compile_definitions(lvgl PUBLIC LV_CONF_SKIP=1)
+endif()
+
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
 
