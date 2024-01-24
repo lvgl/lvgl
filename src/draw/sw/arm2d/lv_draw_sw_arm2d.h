@@ -200,11 +200,19 @@ static inline lv_result_t _lv_draw_sw_image_helium(
            ||  (LV_COLOR_FORMAT_RGB565A8 == src_cf))) {
             break;
         }
+    #if 0 /* a temporary patch */
         if((LV_COLOR_FORMAT_XRGB8888 == des_cf)
         && !(  (LV_COLOR_FORMAT_ARGB8888 == src_cf)
            ||  (LV_COLOR_FORMAT_XRGB8888 == src_cf))) {
             break;
         }
+    #else
+        if((LV_COLOR_FORMAT_XRGB8888 == des_cf)
+        || (LV_COLOR_FORMAT_RGB888 == des_cf)
+        || (LV_COLOR_FORMAT_ARGB8888 == des_cf)) {
+            break;
+        }
+    #endif
 
         /* ------------- prepare parameters for arm-2d APIs - BEGIN --------- */
 
@@ -399,6 +407,7 @@ static inline lv_result_t _lv_draw_sw_image_helium(
             LV_ASSERT(LV_COLOR_FORMAT_RGB565 == des_cf);
 
             if(opa >= LV_OPA_MAX) {
+            #if ARM_2D_VERSION >= 10106
                 arm_2d_rgb565_tile_transform_only(
                     &source_tile,
                     &target_tile,
@@ -406,8 +415,21 @@ static inline lv_result_t _lv_draw_sw_image_helium(
                     source_center,
                     ARM_2D_ANGLE((draw_dsc->rotation / 10.0f)),
                     draw_dsc->scale_x / 256.0f,
-                    &target_center
-                    );
+                    &target_center);
+            #else
+
+                arm_2dp_rgb565_tile_transform_only_prepare(
+                                    NULL,
+                                    &source_tile,
+                                    source_center,
+                                    ARM_2D_ANGLE((draw_dsc->rotation / 10.0f)),
+                                    (float)(draw_dsc->scale_x / 256.0f));
+
+                arm_2dp_tile_transform(NULL,
+                                       &target_tile,
+                                       NULL,
+                                       &target_center);
+            #endif
             }
             else {
                 arm_2d_rgb565_tile_transform_only_with_opacity(
@@ -423,6 +445,7 @@ static inline lv_result_t _lv_draw_sw_image_helium(
             }
 
         }
+    #if 0  /* a temporary patch */
         else if(LV_COLOR_FORMAT_ARGB8888 == src_cf) {
             LV_ASSERT(LV_COLOR_FORMAT_XRGB8888 == des_cf);
 
@@ -488,6 +511,7 @@ static inline lv_result_t _lv_draw_sw_image_helium(
             }
 
         }
+    #endif
         else {
             break;
         }
