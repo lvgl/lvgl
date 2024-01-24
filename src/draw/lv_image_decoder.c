@@ -313,10 +313,13 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
     if(src == NULL) return NULL;
 
     lv_image_src_t src_type = lv_image_src_get_type(src);
+    /* miwear could set NULL data variable type of image */
+#if 0
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
         if(img_dsc->data == NULL) return NULL;
     }
+#endif
 
     lv_image_decoder_t * decoder;
 
