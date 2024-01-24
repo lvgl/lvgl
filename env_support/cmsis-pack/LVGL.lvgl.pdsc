@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-01-22" version="9.0.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
+    <release date="2024-01-24" version="9.0.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
       - LVGL 9.0.0
       - Implements a New Render Architecture that enables parallel processing
       - Accelerates SW-Render with NEON and Helium technology for Cortex architectures. 
