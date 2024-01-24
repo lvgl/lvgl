@@ -133,9 +133,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     dsc->decoder = image_decoder_get_info(src, &dsc->header);
     if(dsc->decoder == NULL) return LV_RESULT_INVALID;
 
-    /*Duplicate the source if it's a file*/
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) dsc->src = lv_strdup(dsc->src);
-
     /*Make a copy of args*/
     dsc->args = args ? *args : (lv_image_decoder_args_t) {
         .stride_align = LV_DRAW_BUF_STRIDE_ALIGN != 1,
@@ -150,12 +147,6 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
      * If decoder open succeed, add the image to cache if enabled.
      * */
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
-
-    /*Free the source if it's a file*/
-    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        lv_free((void *)dsc->src);
-        dsc->src = NULL;
-    }
 
     return res;
 }
