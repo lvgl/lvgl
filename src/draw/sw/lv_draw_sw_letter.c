@@ -31,7 +31,7 @@
  **********************/
 
 static void /* LV_ATTRIBUTE_FAST_MEM */ draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
-                                                 lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
+                                                       lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
 
 /**********************
  *  STATIC VARIABLES

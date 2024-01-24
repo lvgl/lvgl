@@ -46,17 +46,18 @@ typedef struct {
 
 static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
 
-static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, const uint8_t src_px_size);
+static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc,
+                                                           const uint8_t src_px_size);
 
 static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
 
 static inline lv_color32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color_32_32_mix(lv_color32_t fg, lv_color32_t bg,
-                                                                    lv_color_mix_alpha_cache_t * cache);
+                                                                          lv_color_mix_alpha_cache_t * cache);
 
 static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache);
 
 static inline void /* LV_ATTRIBUTE_FAST_MEM */ blend_non_normal_pixel(lv_color32_t * dest, lv_color32_t src,
-                                                                lv_blend_mode_t mode, lv_color_mix_alpha_cache_t * cache);
+                                                                      lv_blend_mode_t mode, lv_color_mix_alpha_cache_t * cache);
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
 /**********************

@@ -129,7 +129,7 @@ void lv_draw_glyph_dsc_init(lv_draw_glyph_dsc_t * dsc);
  * @param coords        coordinates of the character
  */
 void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
-                                         const lv_area_t * coords);
+                                               const lv_area_t * coords);
 
 /**
  * Crate a draw task to render a single character
@@ -139,7 +139,7 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_label(lv_layer_t * layer, const lv_draw
  * @param unicode_letter the letter to draw
  */
 void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_character(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
-                                             const lv_point_t * point, uint32_t unicode_letter);
+                                                   const lv_point_t * point, uint32_t unicode_letter);
 
 /**
  * Should be used during rendering the characters to get the position and other

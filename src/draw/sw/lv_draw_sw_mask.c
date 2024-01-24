@@ -33,29 +33,29 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_line(lv_opa_t * mask_buf, int32_t abs_x,
-                                                                     int32_t abs_y, int32_t len,
-                                                                     lv_draw_sw_mask_line_param_t * param);
+                                                                           int32_t abs_y, int32_t len,
+                                                                           lv_draw_sw_mask_line_param_t * param);
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_radius(lv_opa_t * mask_buf, int32_t abs_x,
-                                                                       int32_t abs_y, int32_t len,
-                                                                       lv_draw_sw_mask_radius_param_t * param);
+                                                                             int32_t abs_y, int32_t len,
+                                                                             lv_draw_sw_mask_radius_param_t * param);
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_angle(lv_opa_t * mask_buf, int32_t abs_x,
-                                                                      int32_t abs_y, int32_t len,
-                                                                      lv_draw_sw_mask_angle_param_t * param);
+                                                                            int32_t abs_y, int32_t len,
+                                                                            lv_draw_sw_mask_angle_param_t * param);
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_fade(lv_opa_t * mask_buf, int32_t abs_x,
-                                                                     int32_t abs_y, int32_t len,
-                                                                     lv_draw_sw_mask_fade_param_t * param);
+                                                                           int32_t abs_y, int32_t len,
+                                                                           lv_draw_sw_mask_fade_param_t * param);
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_map(lv_opa_t * mask_buf, int32_t abs_x,
-                                                                    int32_t abs_y, int32_t len,
-                                                                    lv_draw_sw_mask_map_param_t * param);
+                                                                          int32_t abs_y, int32_t len,
+                                                                          lv_draw_sw_mask_map_param_t * param);
 
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ line_mask_flat(lv_opa_t * mask_buf, int32_t abs_x,
-                                                                  int32_t abs_y,
-                                                                  int32_t len,
-                                                                  lv_draw_sw_mask_line_param_t * p);
+                                                                        int32_t abs_y,
+                                                                        int32_t len,
+                                                                        lv_draw_sw_mask_line_param_t * p);
 static lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ line_mask_steep(lv_opa_t * mask_buf, int32_t abs_x,
-                                                                   int32_t abs_y,
-                                                                   int32_t len,
-                                                                   lv_draw_sw_mask_line_param_t * p);
+                                                                         int32_t abs_y,
+                                                                         int32_t len,
+                                                                         lv_draw_sw_mask_line_param_t * p);
 
 static void circ_init(lv_point_t * c, int32_t * tmp, int32_t radius);
 static bool circ_cont(lv_point_t * c);
