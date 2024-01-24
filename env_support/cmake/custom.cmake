@@ -51,6 +51,9 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     if(LV_CONF_PATH)
         target_compile_definitions(lvgl_thorvg PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
     endif()
+    if(LV_CONF_SKIP)
+      target_compile_definitions(lvgl_thorvg PUBLIC LV_CONF_SKIP=1)
+    endif()
 endif()
 
 # Build LVGL example library
