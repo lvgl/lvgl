@@ -46,7 +46,7 @@ typedef struct _lv_gradient_cache_t {
  * @param frac      The current part used in the range. frac is in [0; range]
  */
 
-LV_ATTRIBUTE_FAST_MEM void lv_gradient_color_calculate(const lv_grad_dsc_t * dsc, int32_t range,
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_gradient_color_calculate(const lv_grad_dsc_t * dsc, int32_t range,
                                                        int32_t frac, lv_grad_color_t * color_out, lv_opa_t * opa_out);
 
 /** Get a gradient cache from the given parameters */
