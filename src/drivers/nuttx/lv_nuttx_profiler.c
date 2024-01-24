@@ -10,7 +10,7 @@
 #include "lv_nuttx_profiler.h"
 #include "../../../lvgl.h"
 
-#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+#if LV_USE_NUTTX && LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
 #include <nuttx/arch.h>
 #include <stdio.h>
