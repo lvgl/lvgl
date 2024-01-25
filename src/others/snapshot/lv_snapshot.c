@@ -39,38 +39,41 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_color_format_t cf)
+/**
+ * Create a draw buffer for object to store the snapshot image.
+ */
+lv_draw_buf_t * lv_snapshot_draw_buf_create(lv_obj_t * obj, lv_color_format_t cf)
 {
-    LV_ASSERT_NULL(obj);
-    switch(cf) {
-        case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_RGB888:
-        case LV_COLOR_FORMAT_XRGB8888:
-        case LV_COLOR_FORMAT_ARGB8888:
-            break;
-        default:
-            LV_LOG_WARN("Not supported color format");
-            return 0;
-    }
-
     lv_obj_update_layout(obj);
-
-    /*Width and height determine snapshot image size.*/
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
     w += ext_size * 2;
     h += ext_size * 2;
+    if(w == 0 || h == 0) return NULL;
 
-    return lv_draw_buf_width_to_stride(w, cf) * h;
+    return lv_draw_buf_create(w, h, cf, LV_STRIDE_AUTO);
 }
 
-lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf,
-                                    uint32_t buf_size)
+lv_result_t lv_snapshot_draw_buf_reshape(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
+{
+    lv_obj_update_layout(obj);
+    int32_t w = lv_obj_get_width(obj);
+    int32_t h = lv_obj_get_height(obj);
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    w += ext_size * 2;
+    h += ext_size * 2;
+    if(w == 0 || h == 0) return LV_RESULT_INVALID;
+
+    draw_buf = lv_draw_buf_reshape(draw_buf, LV_COLOR_FORMAT_UNKNOWN, w, h, LV_STRIDE_AUTO);
+    return draw_buf == NULL ? LV_RESULT_INVALID : LV_RESULT_OK;
+}
+
+lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT_NULL(obj);
-    LV_ASSERT_NULL(dsc);
-    LV_ASSERT_NULL(buf);
+    LV_ASSERT_NULL(draw_buf);
+    lv_result_t res;
 
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
@@ -83,39 +86,23 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
             return LV_RESULT_INVALID;
     }
 
-    uint32_t buf_size_needed = lv_snapshot_buf_size_needed(obj, cf);
-    if(buf_size_needed == 0 || buf_size < buf_size_needed) return LV_RESULT_INVALID;
+    res = lv_snapshot_draw_buf_reshape(obj, draw_buf);
+    if(res != LV_RESULT_OK) return res;
 
-    LV_ASSERT_MSG(buf == lv_draw_buf_align(buf, cf), "Buffer is not aligned");
-
-    /*Width and height determine snapshot image size.*/
-    int32_t w = lv_obj_get_width(obj);
-    int32_t h = lv_obj_get_height(obj);
-    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
-    w += ext_size * 2;
-    h += ext_size * 2;
+    /* clear draw buffer*/
+    lv_draw_buf_clear(draw_buf, NULL);
 
     lv_area_t snapshot_area;
+    int32_t w = draw_buf->header.w;
+    int32_t h = draw_buf->header.h;
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
     lv_obj_get_coords(obj, &snapshot_area);
     lv_area_increase(&snapshot_area, ext_size, ext_size);
-
-    lv_memzero(buf, buf_size);
-    dsc->data = buf;
-    dsc->data_size = buf_size_needed;
-    /*Keep header flags unchanged, because we don't know if it's allocated or not.*/
-    dsc->header.w = w;
-    dsc->header.h = h;
-    dsc->header.cf = cf;
-    dsc->header.magic = LV_IMAGE_HEADER_MAGIC;
-    dsc->header.stride = lv_draw_buf_width_to_stride(w, cf);
 
     lv_layer_t layer;
     lv_memzero(&layer, sizeof(layer));
 
-    lv_draw_buf_t draw_buf;
-    lv_draw_buf_from_image(&draw_buf, dsc);
-
-    layer.draw_buf = &draw_buf;
+    layer.draw_buf = draw_buf;
     layer.buf_area.x1 = snapshot_area.x1;
     layer.buf_area.y1 = snapshot_area.y1;
     layer.buf_area.x2 = snapshot_area.x1 + w - 1;
@@ -142,34 +129,18 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
     return LV_RESULT_OK;
 }
 
-lv_image_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
+lv_draw_buf_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
 {
     LV_ASSERT_NULL(obj);
-    lv_obj_update_layout(obj);
-    int32_t w = lv_obj_get_width(obj);
-    int32_t h = lv_obj_get_height(obj);
-    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
-    w += ext_size * 2;
-    h += ext_size * 2;
-    if(w == 0 || h == 0) return NULL;
-
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(w, h, cf, LV_STRIDE_AUTO);
+    lv_draw_buf_t * draw_buf = lv_snapshot_draw_buf_create(obj, cf);
     if(draw_buf == NULL) return NULL;
 
-    if(lv_snapshot_take_to_buf(obj, cf, (lv_image_dsc_t *)draw_buf, draw_buf->data, draw_buf->data_size) != LV_RESULT_OK) {
+    if(lv_snapshot_take_to_buf(obj, cf, draw_buf) != LV_RESULT_OK) {
         lv_draw_buf_destroy(draw_buf);
         return NULL;
     }
 
-    return (lv_image_dsc_t *)draw_buf;
-}
-
-void lv_snapshot_free(lv_image_dsc_t * dsc)
-{
-    if(!dsc)
-        return;
-
-    lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
+    return draw_buf;
 }
 
 /**********************
