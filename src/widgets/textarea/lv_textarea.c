@@ -121,7 +121,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
     if(c != 0) while(*letter_buf == 0) ++letter_buf;
 
     // The byte order may or may not need to be swapped here to get correct c_uni below,
-    // since lv_textarea_add_text is ordering bytes correctly bfore calling lv_textarea_add_char.
+    // since lv_textarea_add_text is ordering bytes correctly before calling lv_textarea_add_char.
     // Assume swapping is needed if MSB is zero. May not be foolproof.
     if((c != 0) && ((c & 0xff000000) == 0)) {
         c2 = ((c >> 24) & 0xff) | // move byte 3 to byte 0
