@@ -282,9 +282,16 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
              *So simply give its pointer*/
 
             decoder_data_t * decoder_data = get_decoder_data(dsc);
-            lv_draw_buf_t * decoded = &decoder_data->c_array;
+            lv_draw_buf_t * decoded;
+            if(image->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
+                decoded = (lv_draw_buf_t *)image;
+            }
+            else {
+                decoded = &decoder_data->c_array;
+                lv_draw_buf_from_image(decoded, image);
+            }
+
             dsc->decoded = decoded;
-            lv_draw_buf_from_image(decoded, image);
 
             if(decoded->header.stride == 0) {
                 /*Use the auto calculated value from decoder_info callback*/
@@ -686,9 +693,16 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
         lv_image_dsc_t * image = (lv_image_dsc_t *)dsc->src;
-        lv_draw_buf_t * decoded = &decoder_data->c_array;
+        lv_draw_buf_t * decoded;
+        if(image->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
+            decoded = (lv_draw_buf_t *)image;
+        }
+        else {
+            decoded = &decoder_data->c_array;
+            lv_draw_buf_from_image(decoded, image);
+        }
+
         dsc->decoded = decoded;
-        lv_draw_buf_from_image(decoded, image);
 
         if(decoded->header.stride == 0) {
             /*Use the auto calculated value from decoder_info callback*/
