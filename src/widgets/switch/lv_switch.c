@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_switch_class
+#define MY_CLASS (&lv_switch_class)
 
 #define LV_SWITCH_IS_ANIMATING(sw) (((sw)->anim_state) != LV_SWITCH_ANIM_STATE_INV)
 

@@ -25,7 +25,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_dropdown_class
+#define MY_CLASS (&lv_dropdown_class)
 #define MY_CLASS_LIST &lv_dropdownlist_class
 
 #define LV_DROPDOWN_PR_NONE 0xFFFF

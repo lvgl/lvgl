@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_line_class
+#define MY_CLASS (&lv_line_class)
 
 /**********************
  *      TYPEDEFS

@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_bar_class
+#define MY_CLASS (&lv_bar_class)
 
 /** hor. pad and ver. pad cannot make the indicator smaller than this [px]*/
 #define LV_BAR_SIZE_MIN  4

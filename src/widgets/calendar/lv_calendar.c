@@ -18,7 +18,7 @@
 #define LV_CALENDAR_CTRL_TODAY      LV_BUTTONMATRIX_CTRL_CUSTOM_1
 #define LV_CALENDAR_CTRL_HIGHLIGHT  LV_BUTTONMATRIX_CTRL_CUSTOM_2
 
-#define MY_CLASS &lv_calendar_class
+#define MY_CLASS (&lv_calendar_class)
 
 /**********************
  *      TYPEDEFS

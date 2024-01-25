@@ -15,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj_class
+#define MY_CLASS (&lv_obj_class)
 #define style_refr LV_GLOBAL_DEFAULT()->style_refresh
 #define style_trans_ll_p &(LV_GLOBAL_DEFAULT()->style_trans_ll)
 #define _style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table

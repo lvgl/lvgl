@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_scale_class
+#define MY_CLASS (&lv_scale_class)
 
 #define LV_SCALE_LABEL_TXT_LEN          (20U)
 #define LV_SCALE_DEFAULT_ANGLE_RANGE    ((uint32_t) 270U)

@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_checkbox_class
+#define MY_CLASS (&lv_checkbox_class)
 
 /**********************
  *      TYPEDEFS

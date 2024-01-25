@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_led_class
+#define MY_CLASS (&lv_led_class)
 
 /**********************
  *      TYPEDEFS

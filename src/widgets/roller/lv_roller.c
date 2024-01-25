@@ -20,7 +20,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_roller_class
+#define MY_CLASS (&lv_roller_class)
 #define MY_CLASS_LABEL &lv_roller_label_class
 #define EXTRA_INF_SIZE      1000 /*[px]: add the options multiple times until getting this height*/
 

@@ -21,7 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_table_class
+#define MY_CLASS (&lv_table_class)
 
 /**********************
  *      TYPEDEFS

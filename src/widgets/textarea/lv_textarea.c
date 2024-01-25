@@ -23,7 +23,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_textarea_class
+#define MY_CLASS (&lv_textarea_class)
 
 /*Test configuration*/
 #ifndef LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
