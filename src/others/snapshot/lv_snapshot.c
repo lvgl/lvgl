@@ -145,6 +145,7 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
 lv_image_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
 {
     LV_ASSERT_NULL(obj);
+    lv_obj_update_layout(obj);
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
     int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
