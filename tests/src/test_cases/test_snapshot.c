@@ -14,7 +14,7 @@ void test_snapshot_should_not_leak_memory(void)
     uint32_t final_available_memory = 0;
     lv_mem_monitor_t monitor;
 
-    lv_image_dsc_t * snapshots[NUM_SNAPSHOTS] = {NULL};
+    lv_draw_buf_t * snapshots[NUM_SNAPSHOTS] = {NULL};
 
     lv_mem_monitor(&monitor);
     initial_available_memory = monitor.free_size;
@@ -25,7 +25,7 @@ void test_snapshot_should_not_leak_memory(void)
     }
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
-        lv_snapshot_free(snapshots[idx]);
+        lv_draw_buf_destroy(snapshots[idx]);
     }
 
     lv_mem_monitor(&monitor);
