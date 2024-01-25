@@ -104,7 +104,7 @@ static inline lv_result_t _lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_form
     if(res == LV_RESULT_OK) {
         lv_image_header_t * header = &draw_buf.header;
         dsc->header = *header;
-        dsc->data = draw_buf.data;
+        dsc->data = (const uint8_t *)draw_buf.data;
         dsc->data_size = draw_buf.data_size;
     }
     return res;
