@@ -39,6 +39,9 @@
  **********************/
 void lv_image_cache_drop(const void * src)
 {
+    /*If user invalidate image, the header cache should be invalidated too.*/
+    lv_image_header_cache_drop(src);
+
 #if LV_CACHE_DEF_SIZE > 0
     if(src == NULL) {
         lv_cache_drop_all(img_cache_p, NULL);
