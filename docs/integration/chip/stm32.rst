@@ -42,7 +42,7 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
 - In your ``main()`` function, after initialising your CPU,
   peripherals, and LCD panel, call :cpp:func:`lv_init` to initialise LVGL.
   You can then create the display driver using
-  :cpp:func:`lv_disp_create`, and register the frame buffers using
+  :cpp:func:`lv_display_create`, and register the frame buffers using
   :cpp:func:`lv_display_set_buffers`.
 
 .. code:: c
@@ -50,9 +50,9 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
    //Initialise LVGL UI library
    lv_init();
 
-   lv_disp_t * disp = lv_disp_create(WIDTH, HEIGHT); /*Basic initialization with horizontal and vertical resolution in pixels*/
+   lv_display_t * disp = lv_display_create(WIDTH, HEIGHT); /*Basic initialization with horizontal and vertical resolution in pixels*/
    lv_display_set_flush_cb(disp, my_flush_cb); /*Set a flush callback to draw to the display*/
-   lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISP_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
+   lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
 
 - Create some dummy objects to test the output:
 
@@ -107,7 +107,7 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
 
 .. code:: c
 
-   void my_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
+   void my_flush_cb(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p)
    {
      //Set the drawing region
      set_draw_window(area->x1, area->y1, area->x2, area->y2);
@@ -133,7 +133,7 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
 
      /* IMPORTANT!!!
      * Inform the graphics library that you are ready with the flushing*/
-     lv_disp_flush_ready(disp);
+     lv_display_flush_ready(disp);
    }
 
 FreeRTOS Example
@@ -242,7 +242,7 @@ variables:
 
 .. code:: c
 
-   void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+   void my_flush_cb(lv_display_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
    {
      //Set the drawing region
      set_draw_window(area->x1, area->y1, area->x2, area->y2);
@@ -265,5 +265,5 @@ variables:
 
      /* IMPORTANT!!!
       * Inform the graphics library that you are ready with the flushing*/
-     lv_disp_flush_ready(disp_drv);
+     lv_display_flush_ready(disp_drv);
    }

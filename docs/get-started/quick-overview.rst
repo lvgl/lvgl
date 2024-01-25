@@ -60,7 +60,7 @@ If you would rather try LVGL on your own project follow these steps:
    disp_drv.ver_res = MY_DISP_VER_RES;   /*Set the vertical resolution of the display*/
    lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
 
-   void my_disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
+   void my_disp_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p)
    {
        int32_t x, y;
        /*It's a very slow but simple implementation.
@@ -72,7 +72,7 @@ If you would rather try LVGL on your own project follow these steps:
            }
        }
 
-       lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
+       lv_display_flush_ready(disp);         /* Indicate you are ready with the flushing*/
    }
 
 -  Implement and register a function which can read an input device.

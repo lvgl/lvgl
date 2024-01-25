@@ -220,7 +220,7 @@ Associating with a display
 
 Every input device is associated with a display. By default, a new input
 device is added to the last display created or explicitly selected
-(using :cpp:func:`lv_disp_set_default`). The associated display is stored and
+(using :cpp:func:`lv_display_set_default`). The associated display is stored and
 can be changed in ``disp`` field of the driver.
 
 Buffered reading
@@ -256,7 +256,7 @@ You can do this in the following way:
    /*Call this anywhere you want to read the input device*/
    lv_indev_read(indev);
 
-.. note:: that :cpp:func:`lv_indev_read`, :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_disp_refr_timer` can not run at the same time.
+.. note:: that :cpp:func:`lv_indev_read`, :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_display_refr_timer` can not run at the same time.
 
 Further reading
 ***************

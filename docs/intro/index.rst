@@ -193,7 +193,7 @@ LVGL doesn't start, randomly crashes or nothing is drawn on the display. What ca
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Try increasing :c:macro:`LV_MEM_SIZE`.
-* Be sure :cpp:type:`lv_disp_t`, :cpp:type:`lv_indev_t` and :cpp:type:`lv_fs_drv_t` are global or `static`.
+* Be sure :cpp:type:`lv_display_t`, :cpp:type:`lv_indev_t` and :cpp:type:`lv_fs_drv_t` are global or `static`.
 * Be sure your display works without LVGL. E.g. paint it to red on start up.
 * Enable :ref:`logging`
 * Enable asserts in ``lv_conf.h`` (`LV_USE_ASSERT_...`)
@@ -213,7 +213,7 @@ Learn more in the :ref:`tick` and :ref:`timer` sections.
 Why is the display driver called only once? Only the upper part of the display is refreshed.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Be sure you are calling :cpp:expr:`lv_disp_flush_ready(drv)` at the end of your "*display flush callback*".
+Be sure you are calling :cpp:expr:`lv_display_flush_ready(drv)` at the end of your "*display flush callback*".
 
 
 Why do I see only garbage on the screen?

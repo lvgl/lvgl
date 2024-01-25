@@ -135,7 +135,7 @@ pointer to the active screen.
 
 If you have multiple displays, it's important to know that the screen
 functions operate on the most recently created display or the one
-explicitly selected with :cpp:func:`lv_disp_set_default`.
+explicitly selected with :cpp:func:`lv_display_set_default`.
 
 To get an object's screen use the :cpp:expr:`lv_obj_get_screen(obj)` function.
 

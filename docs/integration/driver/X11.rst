@@ -66,7 +66,7 @@ Usage
         ...
 
         /* initialize X11 display driver */
-        lv_disp_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+        lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
 
         /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
         lv_x11_inputs_create(disp, NULL);
@@ -103,7 +103,7 @@ Usage
         ...
 
         /* initialize X11 display driver */
-        lv_disp_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+        lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
         lv_display_add_event_cb(disp, on_close_cb, LV_EVENT_DELETE, disp);
 
         /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
