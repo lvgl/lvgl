@@ -64,10 +64,12 @@ lv_result_t lv_snapshot_draw_buf_reshape(lv_obj_t * obj, lv_draw_buf_t * draw_bu
 /**
  * Take snapshot for object with its children, save image info to provided buffer.
  * @param obj       the object to generate snapshot.
- * @param draw_buf  the draw buffer to store the image result.
+ * @param cf        color format for new snapshot image.
+ *                  It could differ with cf of `draw_buf` as long as the new cf will fit in.
+ * @param draw_buf  the draw buffer to store the image result. It's reshaped automatically.
  * @return          LV_RESULT_OK on success, LV_RESULT_INVALID on error.
  */
-lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf);
+lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_draw_buf_t * draw_buf);
 
 /**
  * Legacy API, use `lv_draw_buf_destroy` instead.
@@ -98,7 +100,7 @@ static inline lv_result_t _lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_form
     lv_draw_buf_t draw_buf;
     LV_LOG_WARN("Legacy API, use lv_snapshot_take_to_buf instead.");
     lv_draw_buf_init(&draw_buf, 1, 1, cf, buf_size, buf, buf_size);
-    lv_result_t res = lv_snapshot_take_to_buf(obj, &draw_buf);
+    lv_result_t res = lv_snapshot_take_to_buf(obj, cf, &draw_buf);
     if(res == LV_RESULT_OK) {
         lv_image_header_t * header = &draw_buf.header;
         dsc->header = *header;

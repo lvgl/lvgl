@@ -69,11 +69,10 @@ lv_result_t lv_snapshot_draw_buf_reshape(lv_obj_t * obj, lv_draw_buf_t * draw_bu
     return draw_buf == NULL ? LV_RESULT_INVALID : LV_RESULT_OK;
 }
 
-lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
+lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_NULL(draw_buf);
-    lv_color_format_t cf = draw_buf->header.cf;
     lv_result_t res;
 
     switch(cf) {
@@ -136,7 +135,7 @@ lv_draw_buf_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
     lv_draw_buf_t * draw_buf = lv_snapshot_draw_buf_create(obj, cf);
     if(draw_buf == NULL) return NULL;
 
-    if(lv_snapshot_take_to_buf(obj, draw_buf) != LV_RESULT_OK) {
+    if(lv_snapshot_take_to_buf(obj, cf, draw_buf) != LV_RESULT_OK) {
         lv_draw_buf_destroy(draw_buf);
         return NULL;
     }

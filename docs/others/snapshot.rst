@@ -52,7 +52,7 @@ Use Existing Buffer
 ~~~~~~~~~~~~~~~~~~~
 
 If the snapshot needs update now and then, or simply caller provides memory, use API
-``lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf);``
+``lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_draw_buf_t * draw_buf);``
 for this case. It's caller's responsibility to create and destroy the draw buffer.
 
 If snapshot is generated successfully, the image descriptor is updated
