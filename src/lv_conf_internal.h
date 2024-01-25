@@ -2906,6 +2906,44 @@
     #endif
 #endif
 
+/*Driver for libinput input devices*/
+#ifndef LV_USE_LIBINPUT
+    #ifdef CONFIG_LV_USE_LIBINPUT
+        #define LV_USE_LIBINPUT CONFIG_LV_USE_LIBINPUT
+    #else
+        #define LV_USE_LIBINPUT    0
+    #endif
+#endif
+
+#if LV_USE_LIBINPUT
+    #ifndef LV_LIBINPUT_BSD
+        #ifdef CONFIG_LV_LIBINPUT_BSD
+            #define LV_LIBINPUT_BSD CONFIG_LV_LIBINPUT_BSD
+        #else
+            #define LV_LIBINPUT_BSD    0
+        #endif
+    #endif
+
+    /*Full keyboard support*/
+    #ifndef LV_LIBINPUT_XKB
+        #ifdef CONFIG_LV_LIBINPUT_XKB
+            #define LV_LIBINPUT_XKB CONFIG_LV_LIBINPUT_XKB
+        #else
+            #define LV_LIBINPUT_XKB             0
+        #endif
+    #endif
+    #if LV_LIBINPUT_XKB
+        /*"setxkbmap -query" can help find the right values for your keyboard*/
+        #ifndef LV_LIBINPUT_XKB_KEY_MAP
+            #ifdef CONFIG_LV_LIBINPUT_XKB_KEY_MAP
+                #define LV_LIBINPUT_XKB_KEY_MAP CONFIG_LV_LIBINPUT_XKB_KEY_MAP
+            #else
+                #define LV_LIBINPUT_XKB_KEY_MAP { .rules = NULL, .model = "pc101", .layout = "us", .variant = NULL, .options = NULL }
+            #endif
+        #endif
+    #endif
+#endif
+
 /*Drivers for LCD devices connected via SPI/parallel port*/
 #ifndef LV_USE_ST7735
     #ifdef CONFIG_LV_USE_ST7735
