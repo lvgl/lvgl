@@ -13,6 +13,7 @@
  *      DEFINES
  *********************/
 #define img_cache_p (LV_GLOBAL_DEFAULT()->img_cache)
+#define img_header_cache_p (LV_GLOBAL_DEFAULT()->img_header_cache)
 /**********************
  *      TYPEDEFS
  **********************/
@@ -54,6 +55,26 @@ void lv_image_cache_drop(const void * src)
     LV_UNUSED(src);
 #endif
 }
+
+void lv_image_header_cache_drop(const void * src)
+{
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+    if(src == NULL) {
+        lv_cache_drop_all(img_header_cache_p, NULL);
+        return;
+    }
+
+    lv_image_header_cache_data_t search_key = {
+        .src = src,
+        .src_type = lv_image_src_get_type(src),
+    };
+
+    lv_cache_drop(img_header_cache_p, &search_key, NULL);
+#else
+    LV_UNUSED(src);
+#endif
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
