@@ -379,12 +379,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     }
 
     if(lv_color_format_has_alpha(layer->color_format)) {
-        lv_area_t a;
-        a.x1 = 0;
-        a.y1 = 0;
-        a.x2 = w - 1;
-        a.y2 = h - 1;
-        lv_draw_buf_clear(layer->draw_buf, &a);
+        lv_draw_buf_clear(layer->draw_buf, NULL);
     }
 
     return layer->draw_buf->data;
