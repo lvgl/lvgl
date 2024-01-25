@@ -120,14 +120,14 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 #if LV_BIG_ENDIAN_SYSTEM
     if(c != 0) while(*letter_buf == 0) ++letter_buf;
 
-    // The byte order may or may not need to be swapped here to get correct c_uni below,
-    // since lv_textarea_add_text is ordering bytes correctly before calling lv_textarea_add_char.
-    // Assume swapping is needed if MSB is zero. May not be foolproof.
+    /*The byte order may or may not need to be swapped here to get correct c_uni below,
+      since lv_textarea_add_text is ordering bytes correctly before calling lv_textarea_add_char.
+      Assume swapping is needed if MSB is zero. May not be foolproof. */
     if((c != 0) && ((c & 0xff000000) == 0)) {
-        c2 = ((c >> 24) & 0xff) | // move byte 3 to byte 0
-             ((c << 8) & 0xff0000) | // move byte 1 to byte 2
-             ((c >> 8) & 0xff00) | // move byte 2 to byte 1
-             ((c << 24) & 0xff000000); // byte 0 to byte 3
+        c2 = ((c >> 24) & 0xff) | /*move byte 3 to byte 0*/
+             ((c << 8) & 0xff0000) | /*move byte 1 to byte 2*/
+             ((c >> 8) & 0xff00) | /*move byte 2 to byte 1*/
+             ((c << 24) & 0xff000000); /*byte 0 to byte 3*/
     }
 #endif
 
