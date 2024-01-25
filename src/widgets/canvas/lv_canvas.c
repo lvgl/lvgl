@@ -158,10 +158,7 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t id, lv_color32_t c)
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-    lv_image_dsc_t dsc;
-    lv_draw_buf_to_image(canvas->draw_buf, &dsc);
-
-    lv_image_buf_set_palette(&dsc, id, c);
+    lv_draw_buf_set_palette(canvas->draw_buf, id, c);
     lv_obj_invalidate(obj);
 }
 
