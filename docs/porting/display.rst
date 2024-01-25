@@ -54,27 +54,27 @@ Draw buffers
 ------------
 
 The draw buffers can be set with
-:cpp:expr:`lv_display_set_buffers(display, buf1, buf2, buf_size_px, render_mode)`
+:cpp:expr:`lv_display_set_buffers(display, buf1, buf2, buf_size_byte, render_mode)`
 
 -  ``buf1`` a buffer where LVGL can render
 -  ``buf2`` a second optional buffer (see more details below)
 -  ``buf_size_byte`` size of the buffer(s) in bytes
 -  ``render_mode``
 
-   -  :cpp:enumerator:`LV_DISP_RENDER_MODE_PARTIAL` Use the buffer(s) to render the
+   -  :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` Use the buffer(s) to render the
       screen in smaller parts. This way the buffers can be smaller then
       the display to save RAM. At least 1/10 screen size buffer(s) are
       recommended. In ``flush_cb`` the rendered images needs to be
       copied to the given area of the display. In this mode if a button is pressed
       only the button's area will be redrawn.
-   -  :cpp:enumerator:`LV_DISP_RENDER_MODE_DIRECT` The buffer(s) has to be screen
+   -  :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_DIRECT` The buffer(s) has to be screen
       sized and LVGL will render into the correct location of the
       buffer. This way the buffer always contain the whole image. If two
       buffer are used the rendered areas are automatically copied to the
       other buffer after flushing. Due to this in ``flush_cb`` typically
       only a frame buffer address needs to be changed. If a button is pressed
       only the button's area will be redrawn.
-   -  :cpp:enumerator:`LV_DISP_RENDER_MODE_FULL` The buffer(s) has to be screen
+   -  :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_FULL` The buffer(s) has to be screen
       sized and LVGL will always redraw the whole screen even if only 1
       pixel has been changed. If two screen sized draw buffers are
       provided, LVGL's display handling works like "traditional" double
@@ -86,7 +86,7 @@ Example:
 .. code:: c
 
    static uint16_t buf[LCD_HOR_RES * LCD_VER_RES / 10];
-   lv_display_set_buffers(disp, buf, NULL, sizeof(buf), LV_DISP_RENDER_MODE_PARTIAL);
+   lv_display_set_buffers(disp, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
 One buffer
 ^^^^^^^^^^
@@ -144,7 +144,7 @@ LVGL supports rotation of the display in 90 degree increments. You can
 select whether you would like software rotation or hardware rotation.
 
 The orientation of the display can be changed with
-``lv_disp_set_rotation(disp, LV_DISPLAY_ROTATION_0/90/180/270)``.
+``lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0/90/180/270)``.
 LVGL will swap the horizontal and vertical resolutions internally
 according to the set degree. When changing the rotation
 :cpp:expr:`LV_EVENT_SIZE_CHANGED` is sent to the display to allow
@@ -219,13 +219,13 @@ You can do this in the following way:
 
 
    /*Call this anywhere you want to refresh the dirty areas*/
-   _lv_disp_refr_timer(NULL);
+   _lv_display_refr_timer(NULL);
 
-If you have multiple displays call :cpp:expr:`lv_disp_set_default(disp1)` to
-select the display to refresh before :cpp:expr:`_lv_disp_refr_timer(NULL)`.
+If you have multiple displays call :cpp:expr:`lv_display_set_default(disp1)` to
+select the display to refresh before :cpp:expr:`_lv_display_refr_timer(NULL)`.
 
 
-.. note:: that :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_disp_refr_timer` can not  run at the same time.
+.. note:: that :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_display_refr_timer` can not  run at the same time.
 
 
 If the performance monitor is enabled, the value of :c:macro:`LV_DEF_REFR_PERIOD` needs to be set to be

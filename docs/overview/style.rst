@@ -505,7 +505,7 @@ example shows how to set the "default" theme:
                                            false,    /*Light or dark mode*/
                                            &lv_font_montserrat_10, &lv_font_montserrat_14, &lv_font_montserrat_18); /*Small, normal, large fonts*/
 
-   lv_disp_set_theme(display, th); /*Assign the theme to the display*/
+   lv_display_set_theme(display, th); /*Assign the theme to the display*/
 
 The included themes are enabled in ``lv_conf.h``. If the default theme
 is enabled by :c:macro:`LV_USE_THEME_DEFAULT` LVGL automatically initializes

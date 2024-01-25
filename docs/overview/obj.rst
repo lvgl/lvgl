@@ -246,8 +246,8 @@ Handling multiple displays
 
 Screens are created on the currently selected *default display*. The
 *default display* is the last registered display with
-:cpp:func:`lv_disp_drv_register`. You can also explicitly select a new default
-display using :cpp:expr:`lv_disp_set_default(disp)`.
+:cpp:func:`lv_display_create`. You can also explicitly select a new default
+display using :cpp:expr:`lv_display_set_default(disp)`.
 
 :cpp:func:`lv_screen_active`, :cpp:func:`lv_screen_load` and :cpp:func:`lv_screen_load_anim` operate
 on the default display.
