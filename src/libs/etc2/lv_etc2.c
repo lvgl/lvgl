@@ -37,8 +37,7 @@
 
 static uint16_t read_big_endian_uint16(const uint8_t * buf);
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static lv_draw_buf_t * decode_etc2_file(const char * filename, lv_image_decoder_dsc_t * dsc);
 static void etc2_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data);
@@ -133,11 +132,9 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
     return LV_RES_INV;
 }
 
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
-    LV_UNUSED(args); /*Unused*/
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
