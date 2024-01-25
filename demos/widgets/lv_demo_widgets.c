@@ -1504,14 +1504,8 @@ static void chart_event_cb(lv_event_t * e)
             if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
                 txt_area.y2 = draw_task->area.y1 - LV_DPX(15);
                 txt_area.y1 = txt_area.y2 - text_size.y;
-                if(ser == lv_chart_get_series_next(obj, NULL)) {
-                    txt_area.x1 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2;
-                    txt_area.x2 = txt_area.x1 + text_size.x;
-                }
-                else {
-                    txt_area.x2 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2;
-                    txt_area.x1 = txt_area.x2 - text_size.x;
-                }
+                txt_area.x1 = draw_task->area.x1 + (lv_area_get_width(&draw_task->area) - text_size.x) / 2;
+                txt_area.x2 = txt_area.x1 + text_size.x;
             }
             else {
                 txt_area.x1 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2 - text_size.x / 2;

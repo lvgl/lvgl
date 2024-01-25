@@ -1083,7 +1083,10 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
             col_a.x2 = col_a.x1 + col_w - 1;
             x_act += col_w + ser_gap;
 
-            if(col_a.x2 < clip_area.x1) continue;
+            if(col_a.x2 < clip_area.x1) {
+                col_dsc.base.id1++;
+                continue;
+            }
             if(col_a.x1 > clip_area.x2) break;
 
             col_dsc.bg_color = ser->color;
