@@ -54,7 +54,7 @@ Draw buffers
 ------------
 
 The draw buffers can be set with
-:cpp:expr:`lv_display_set_buffers(display, buf1, buf2, buf_size_px, render_mode)`
+:cpp:expr:`lv_display_set_buffers(display, buf1, buf2, buf_size_byte, render_mode)`
 
 -  ``buf1`` a buffer where LVGL can render
 -  ``buf2`` a second optional buffer (see more details below)
