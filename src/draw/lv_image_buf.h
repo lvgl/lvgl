@@ -131,7 +131,7 @@ typedef union {
  * Image is also identical to lv_draw_buf_t for now.
  * Ideally, decoded image should be lv_draw_buf_t.
  */
-typedef struct {
+typedef const struct {
     lv_image_header_t header; /**< A header describing the basics of the image*/
     uint32_t data_size;     /**< Size of the image in bytes*/
     const uint8_t * data;   /**< Pointer to the data of the image*/

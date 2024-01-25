@@ -90,7 +90,7 @@ static void canvas_basic_render(uint8_t * canvas_buf, lv_color_format_t render_c
 void canvas_blend_test(lv_obj_t  * canvas_large, lv_draw_image_dsc_t * img_dsc, const char * name_main,
                        const char * name_sub, lv_color_format_t small_render_cf, uint32_t idx)
 {
-    lv_image_dsc_t * img = (lv_image_dsc_t *)img_dsc->src;
+    lv_draw_buf_t * img = (lv_draw_buf_t *)img_dsc->src;
     img->header.cf = small_render_cf;
     img->header.stride = lv_draw_buf_width_to_stride(180, small_render_cf);
     canvas_basic_render((uint8_t *)img->data, small_render_cf, name_main, name_sub);
@@ -129,10 +129,8 @@ static void canvas_draw(const char * name, lv_color_format_t large_render_cf)
     lv_canvas_set_buffer(canvas2, lv_draw_buf_align(canvas2_buf, large_render_cf), 768, 390, large_render_cf);
     lv_canvas_fill_bg(canvas2, lv_palette_lighten(LV_PALETTE_BLUE_GREY, 2), LV_OPA_COVER);
 
-    lv_image_dsc_t img = { 0 };
-    img.header.w = 180;
-    img.header.h = 180;
-    img.data = lv_draw_buf_align(canvas_buf, LV_COLOR_FORMAT_ARGB8888);
+    lv_draw_buf_t img;
+    lv_draw_buf_init(&img, 180, 180, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO, canvas_buf, sizeof(canvas_buf));
 
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);

@@ -55,7 +55,7 @@ void lv_image_buf_free(lv_image_dsc_t * dsc)
         if(dsc->data != NULL)
             lv_free((void *)dsc->data);
 
-        lv_free(dsc);
+        lv_free((void *)dsc);
     }
 }
 

@@ -83,33 +83,6 @@ static inline void lv_snapshot_free(lv_image_dsc_t * dsc)
     lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
 }
 
-/**
- * Legacy API, use lv_snapshot_take_to_buf instead.
- * Take snapshot for object with its children, save image info to provided buffer.
- * @param obj       the object to generate snapshot.
- * @param cf        color format for generated image.
- * @param dsc       image descriptor to store the image result.
- * @param buf       the buffer to store image data. It must meet align requirement.
- * @param buf_size  provided buffer size in bytes.
- * @return          LV_RESULT_OK on success, LV_RESULT_INVALID on error.
- */
-static inline lv_result_t _lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc,
-                                                   void * buf,
-                                                   uint32_t buf_size)
-{
-    lv_draw_buf_t draw_buf;
-    LV_LOG_WARN("Legacy API, use lv_snapshot_take_to_buf instead.");
-    lv_draw_buf_init(&draw_buf, 1, 1, cf, buf_size, buf, buf_size);
-    lv_result_t res = lv_snapshot_take_to_buf(obj, cf, &draw_buf);
-    if(res == LV_RESULT_OK) {
-        lv_image_header_t * header = &draw_buf.header;
-        dsc->header = *header;
-        dsc->data = (const uint8_t *)draw_buf.data;
-        dsc->data_size = draw_buf.data_size;
-    }
-    return res;
-}
-
 /**********************
  *      MACROS
  **********************/
