@@ -917,6 +917,13 @@ void * lv_display_get_driver_data(lv_display_t * disp)
     return disp->driver_data;
 }
 
+lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) return NULL;
+    return disp->buf_act;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
