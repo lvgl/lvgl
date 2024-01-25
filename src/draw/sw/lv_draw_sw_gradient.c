@@ -79,7 +79,7 @@ lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * g, int32_t w, int32_t h)
     return item;
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_gradient_color_calculate(const lv_grad_dsc_t * dsc, int32_t range,
+void LV_ATTRIBUTE_FAST_MEM lv_gradient_color_calculate(const lv_grad_dsc_t * dsc, int32_t range,
                                                        int32_t frac, lv_grad_color_t * color_out, lv_opa_t * opa_out)
 {
     lv_grad_color_t tmp;

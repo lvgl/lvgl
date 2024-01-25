@@ -113,7 +113,7 @@ typedef void(*lv_draw_glyph_cb_t)(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_
  * Initialize a label draw descriptor
  * @param dsc       pointer to a draw descriptor
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
 
 /**
  * Initialize a glyph draw descriptor.
@@ -128,8 +128,8 @@ void lv_draw_glyph_dsc_init(lv_draw_glyph_dsc_t * dsc);
  * @param dsc           pointer to draw descriptor
  * @param coords        coordinates of the character
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
-                                         const lv_area_t * coords);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
+                                               const lv_area_t * coords);
 
 /**
  * Crate a draw task to render a single character
@@ -138,8 +138,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label
  * @param point          position of the label
  * @param unicode_letter the letter to draw
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_character(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
-                                             const lv_point_t * point, uint32_t unicode_letter);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_character(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
+                                                   const lv_point_t * point, uint32_t unicode_letter);
 
 /**
  * Should be used during rendering the characters to get the position and other

@@ -40,7 +40,7 @@ typedef struct {
  * Initialize a rectangle mask draw descriptor.
  * @param dsc       pointer to a draw descriptor
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * dsc);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * dsc);
 
 /**
  * Create a draw task to mask a rectangle from the buffer

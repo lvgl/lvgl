@@ -113,7 +113,7 @@ typedef struct {
  * Initialize a rectangle draw descriptor.
  * @param dsc       pointer to a draw descriptor
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
 
 /**
  * Initialize a fill draw descriptor.

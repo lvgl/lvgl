@@ -200,9 +200,10 @@ void lv_draw_sw_mask_deinit(void);
  * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
-LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf, int32_t abs_x,
-                                                                  int32_t abs_y,
-                                                                  int32_t len);
+lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf,
+                                                                        int32_t abs_x,
+                                                                        int32_t abs_y,
+                                                                        int32_t len);
 
 //! @endcond
 
