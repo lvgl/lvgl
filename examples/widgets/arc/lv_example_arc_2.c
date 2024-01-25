@@ -31,7 +31,6 @@ void lv_example_arc_2(void)
     lv_anim_start(&a);
 
 
-
 }
 
 #endif

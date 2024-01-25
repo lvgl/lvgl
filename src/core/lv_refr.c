@@ -429,7 +429,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         perf_monitor.render_cnt = 0;
 
         uint32_t cpu = 100 - lv_timer_get_idle();
-        lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS %"LV_PRIu32"%% CPU\n %"LV_PRIu32"ms (%"LV_PRIu32" | %"LV_PRIu32")", fps, cpu, render_time + flush_time, render_time, flush_time);
+        lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS %"LV_PRIu32"%% CPU\n %"LV_PRIu32"ms (%"LV_PRIu32" | %"LV_PRIu32")",
+                              fps, cpu, render_time + flush_time, render_time, flush_time);
         void sysmon_perf_observer_cb(uint32_t fps, uint32_t cpu, uint32_t render_time, uint32_t flush_time);
         sysmon_perf_observer_cb(fps, cpu, render_time, flush_time);
     }
@@ -555,7 +556,7 @@ static void refr_sync_areas(void)
     lv_area_t res[4] = {0};
     int8_t res_c, j;
     uint32_t i;
-    lv_area_t * sync_area, *new_area, *next_area;
+    lv_area_t * sync_area, * new_area, * next_area;
     for(i = 0; i < disp_refr->inv_p; i++) {
         /*Skip joined areas*/
         if(disp_refr->inv_area_joined[i]) continue;

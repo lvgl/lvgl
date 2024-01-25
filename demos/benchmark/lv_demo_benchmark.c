@@ -178,7 +178,7 @@ static void multiple_labels_cb(void)
 
     lv_point_t s;
     lv_txt_get_size(&s, "Hello LVGL!", lv_obj_get_style_text_font(lv_scr_act(), 0), 0, 0, LV_COORD_MAX,
-                     LV_TEXT_FLAG_NONE);
+                    LV_TEXT_FLAG_NONE);
 
     uint32_t cnt = (lv_disp_get_hor_res(NULL) - 16) / (s.x + 30);
     cnt = cnt * ((lv_disp_get_ver_res(NULL) - 200) / (s.y + 50));
@@ -406,10 +406,10 @@ void lv_demo_benchmark(void)
     lv_obj_set_style_pad_gap(lv_scr_act(), 8, 0);
 
     sysmon_label  = lv_label_create(lv_layer_top());
-    lv_obj_set_style_bg_opa(sysmon_label , LV_OPA_COVER, 0);
-    lv_obj_set_style_bg_color(sysmon_label , lv_color_white(), 0);
-    lv_obj_set_style_text_color(sysmon_label , lv_color_black(), 0);
-    lv_obj_set_width(sysmon_label , lv_pct(100));
+    lv_obj_set_style_bg_opa(sysmon_label, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(sysmon_label, lv_color_white(), 0);
+    lv_obj_set_style_text_color(sysmon_label, lv_color_black(), 0);
+    lv_obj_set_width(sysmon_label, lv_pct(100));
 
     load_scene(scene_act);
 
@@ -464,12 +464,12 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 void sysmon_perf_observer_cb(uint32_t fps, uint32_t cpu, uint32_t render_time, uint32_t flush_time)
 {
     if(sysmon_label) {
-        lv_label_set_text_fmt(sysmon_label ,
+        lv_label_set_text_fmt(sysmon_label,
                               "%s: "
                               "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
                               "%"LV_PRIu32" ms = %"LV_PRIu32" ms + %"LV_PRIu32" ms",
                               scenes[scene_act].name,
-                             fps, cpu, render_time + flush_time, render_time, flush_time);
+                              fps, cpu, render_time + flush_time, render_time, flush_time);
     }
 
     /*Ignore the first call as it contains data from the previous scene*/

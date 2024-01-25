@@ -2,7 +2,6 @@
 #if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
 
-
 /**
  * Show how to style a slider.
  */

@@ -122,8 +122,8 @@ static void stack_blur_job(lv_opa_t * src, unsigned int w, unsigned int h, unsig
 
         for(y = minY; y < maxY; y++) {
             sum_r =
-                sum_in_r =
-                    sum_out_r = 0;
+            sum_in_r =
+            sum_out_r = 0;
 
             src_ptr = src + stride * y; // start of line (0,y)
 
@@ -189,8 +189,8 @@ static void stack_blur_job(lv_opa_t * src, unsigned int w, unsigned int h, unsig
 
         for(x = minX; x < maxX; x++) {
             sum_r =
-                sum_in_r =
-                    sum_out_r = 0;
+            sum_in_r =
+            sum_out_r = 0;
 
             src_ptr = src + x; // x,0
             for(i = 0; i <= radius; i++) {

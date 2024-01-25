@@ -94,8 +94,6 @@ void lv_example_gridnav_3(void)
     lv_label_set_text(label, "Button 4");
 
 
-
-
 }
 
 #endif

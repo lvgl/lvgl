@@ -37,7 +37,6 @@ static void new_theme_init_and_set(void)
 }
 
 
-
 /**
  * Extending the current theme
  */
