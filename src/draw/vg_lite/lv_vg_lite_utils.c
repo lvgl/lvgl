@@ -325,11 +325,16 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
     switch(cf) {
         case LV_COLOR_FORMAT_A4:
         case LV_COLOR_FORMAT_A8:
-        case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
             return true;
+
+        case LV_COLOR_FORMAT_I1:
+        case LV_COLOR_FORMAT_I2:
+        case LV_COLOR_FORMAT_I4:
+        case LV_COLOR_FORMAT_I8:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_IM_INDEX_FORMAT) ? true : false;
 
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_RGB888:
@@ -560,8 +565,12 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     int32_t height = draw_buf->header.h;
     vg_lite_buffer_format_t format = lv_vg_lite_vg_fmt(draw_buf->header.cf);
 
-    if(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf))
-        ptr += LV_COLOR_INDEXED_PALETTE_SIZE(draw_buf->header.cf) * 4;
+    if(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {
+        uint32_t palette_size_bytes = LV_COLOR_INDEXED_PALETTE_SIZE(draw_buf->header.cf) * sizeof(uint32_t);
+
+        /* Skip palette */
+        ptr += LV_VG_LITE_ALIGN(palette_size_bytes, LV_DRAW_BUF_ALIGN);
+    }
 
     width = lv_vg_lite_width_align(width);
 
