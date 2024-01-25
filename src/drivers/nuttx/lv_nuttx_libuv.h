@@ -33,6 +33,7 @@ typedef struct {
     void * loop;
     lv_display_t * disp;
     lv_indev_t * indev;
+    lv_indev_t * uindev;
 } lv_nuttx_uv_t;
 
 /**********************

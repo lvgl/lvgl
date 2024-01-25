@@ -41,6 +41,7 @@ typedef struct {
     uv_timer_t uv_timer;
     lv_nuttx_uv_fb_ctx_t fb_ctx;
     lv_nuttx_uv_input_ctx_t input_ctx;
+    lv_nuttx_uv_input_ctx_t uinput_ctx;
     int32_t ref_count;
 } lv_nuttx_uv_ctx_t;
 
@@ -61,6 +62,10 @@ static void lv_nuttx_uv_fb_deinit(lv_nuttx_uv_ctx_t * uv_ctx);
 static void lv_nuttx_uv_input_poll_cb(uv_poll_t * handle, int status, int events);
 static int lv_nuttx_uv_input_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_ctx);
 static void lv_nuttx_uv_input_deinit(lv_nuttx_uv_ctx_t * uv_ctx);
+
+static void lv_nuttx_uv_uinput_poll_cb(uv_poll_t * handle, int status, int events);
+static int lv_nuttx_uv_uinput_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_ctx);
+static void lv_nuttx_uv_uinput_deinit(lv_nuttx_uv_ctx_t * uv_ctx);
 
 /**********************
  *  STATIC VARIABLES
@@ -98,6 +103,11 @@ void * lv_nuttx_uv_init(lv_nuttx_uv_t * uv_info)
         goto err_out;
     }
 
+    if((ret = lv_nuttx_uv_uinput_init(uv_info, uv_ctx)) < 0) {
+        LV_LOG_ERROR("lv_nuttx_uv_uinput_init fail : %d", ret);
+        goto err_out;
+    }
+
     return uv_ctx;
 
 err_out:
@@ -111,6 +121,7 @@ void lv_nuttx_uv_deinit(void ** data)
 
     if(uv_ctx == NULL) return;
     lv_nuttx_uv_input_deinit(uv_ctx);
+    lv_nuttx_uv_uinput_deinit(uv_ctx);
     lv_nuttx_uv_fb_deinit(uv_ctx);
     lv_nuttx_uv_timer_deinit(uv_ctx);
     *data = NULL;
@@ -331,6 +342,67 @@ static void lv_nuttx_uv_input_deinit(lv_nuttx_uv_ctx_t * uv_ctx)
     lv_nuttx_uv_input_ctx_t * input_ctx = &uv_ctx->input_ctx;
     if(input_ctx->fd > 0) {
         uv_close((uv_handle_t *)&input_ctx->input_poll, lv_nuttx_uv_deinit_cb);
+    }
+    LV_LOG_USER("Done");
+}
+
+static void lv_nuttx_uv_uinput_poll_cb(uv_poll_t * handle, int status, int events)
+{
+    lv_indev_t * indev = ((lv_nuttx_uv_ctx_t *)(handle->data))->uinput_ctx.indev;
+
+    if(status < 0) {
+        LV_LOG_WARN("uinput poll error: %s ", uv_strerror(status));
+        return;
+    }
+
+    if(events & UV_READABLE) {
+        lv_indev_read(indev);
+    }
+}
+
+static int lv_nuttx_uv_uinput_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_ctx)
+{
+    uv_loop_t * loop = uv_info->loop;
+    lv_indev_t * uindev = uv_info->uindev;
+
+    if(uindev == NULL) {
+        LV_LOG_USER("skip uv uinput init.");
+        return 0;
+    }
+
+    LV_ASSERT_NULL(uv_ctx);
+    LV_ASSERT_NULL(loop);
+
+    if(lv_indev_get_mode(uindev) == LV_INDEV_MODE_EVENT) {
+        LV_LOG_ERROR("uinput device has been running in event-driven mode");
+        return -EINVAL;
+    }
+
+    lv_nuttx_uv_input_ctx_t * uinput_ctx = &uv_ctx->uinput_ctx;
+    uinput_ctx->fd = *(int *)lv_indev_get_driver_data(uindev);
+    if(uinput_ctx->fd <= 0) {
+        LV_LOG_ERROR("can't get valid uinput fd");
+        return 0;
+    }
+
+    uinput_ctx->indev = uindev;
+    lv_indev_set_mode(uindev, LV_INDEV_MODE_EVENT);
+
+    uinput_ctx->input_poll.data = uv_ctx;
+    uv_poll_init(loop, &uinput_ctx->input_poll, uinput_ctx->fd);
+    uv_ctx->ref_count++;
+    uv_poll_start(&uinput_ctx->input_poll, UV_READABLE, lv_nuttx_uv_uinput_poll_cb);
+
+    LV_LOG_USER("lvgl uinput loop start OK");
+
+    return 0;
+}
+
+static void lv_nuttx_uv_uinput_deinit(lv_nuttx_uv_ctx_t * uv_ctx)
+{
+    lv_nuttx_uv_input_ctx_t * uinput_ctx = &uv_ctx->uinput_ctx;
+    if(uinput_ctx->fd > 0) {
+        uv_close((uv_handle_t *)&uinput_ctx->input_poll, lv_nuttx_uv_deinit_cb);
     }
     LV_LOG_USER("Done");
 }
