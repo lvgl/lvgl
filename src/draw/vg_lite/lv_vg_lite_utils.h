@@ -31,10 +31,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#if LV_DRAW_BUF_ALIGN != 64
-#error "LV_DRAW_BUF_ALIGN must be 64"
-#endif
-
 #define LV_VG_LITE_IS_ERROR(err) (err > 0)
 
 #define VLC_GET_OP_CODE(ptr) (*((uint8_t*)ptr))

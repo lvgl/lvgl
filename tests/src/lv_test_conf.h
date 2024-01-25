@@ -82,9 +82,6 @@ typedef void * lv_user_data_t;
 /* Simulate VG-Lite hardware using ThorVG */
 #define LV_USE_VG_LITE_THORVG       1
 
-/* VG-Lite GPU buffer alignment. */
-#define LV_DRAW_BUF_ALIGN           64
-
 #include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 4
 #define  LV_COLOR_DEPTH     24
@@ -109,10 +106,8 @@ typedef void * lv_user_data_t;
 /*Use a large value be sure any issues will cause crash*/
 #define LV_DRAW_BUF_STRIDE_ALIGN                64
 
-#if !defined(LV_DRAW_BUF_ALIGN)
 /*Use non power of 2 to avoid the case when `malloc` returns aligned pointer by default, and use a large value be sure any issues will cause crash*/
 #define LV_DRAW_BUF_ALIGN                       852
-#endif
 
 /*For screenshots*/
 #undef LV_USE_PERF_MONITOR
