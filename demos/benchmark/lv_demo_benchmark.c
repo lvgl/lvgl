@@ -463,12 +463,14 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 #if LV_USE_PERF_MONITOR
 void sysmon_perf_observer_cb(uint32_t fps, uint32_t cpu, uint32_t render_time, uint32_t flush_time)
 {
-    lv_label_set_text_fmt(sysmon_label ,
-                          "%s: "
-                          "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
-                          "%"LV_PRIu32" ms = %"LV_PRIu32" ms + %"LV_PRIu32" ms",
-                          scenes[scene_act].name,
-                         fps, cpu, render_time + flush_time, render_time, flush_time);
+    if(sysmon_label) {
+        lv_label_set_text_fmt(sysmon_label ,
+                              "%s: "
+                              "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
+                              "%"LV_PRIu32" ms = %"LV_PRIu32" ms + %"LV_PRIu32" ms",
+                              scenes[scene_act].name,
+                             fps, cpu, render_time + flush_time, render_time, flush_time);
+    }
 
     /*Ignore the first call as it contains data from the previous scene*/
     if(scenes[scene_act].measurement_cnt != 0) {
