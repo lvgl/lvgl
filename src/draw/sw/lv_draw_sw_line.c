@@ -152,7 +152,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_hor(lv_draw_unit_t * draw_unit, cons
                     i += diff;
                     dash_cnt += diff;
                 }
-                else if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
+                else if(dash_cnt > dsc->dash_gap + dsc->dash_width) {
                     dash_cnt = 0;
                 }
                 else {
