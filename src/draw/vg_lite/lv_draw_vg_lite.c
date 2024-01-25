@@ -84,6 +84,18 @@ void lv_draw_vg_lite_deinit(void)
  *   STATIC FUNCTIONS
  **********************/
 
+static bool check_image_is_supported(const lv_draw_image_dsc_t * dsc)
+{
+    lv_image_header_t header;
+    lv_result_t res = lv_image_decoder_get_info(dsc->src, &header);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_TRACE("get image info failed");
+        return false;
+    }
+
+    return lv_vg_lite_is_src_cf_supported(header.cf);
+}
+
 static void draw_execute(lv_draw_vg_lite_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
@@ -197,28 +209,28 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         case LV_DRAW_TASK_TYPE_ARC:
         case LV_DRAW_TASK_TYPE_TRIANGLE:
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
-            // case LV_DRAW_TASK_TYPE_MASK_BITMAP:
+
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
 #endif
-            task->preference_score = 80;
-            task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
-            return 1;
+            break;
+
         case LV_DRAW_TASK_TYPE_IMAGE: {
-                lv_draw_image_dsc_t * dsc = task->draw_dsc;
-                lv_image_header_t header = { 0 };
-                lv_image_decoder_get_info(dsc->src, &header);
-                if(!lv_vg_lite_is_src_cf_supported(header.cf)) {
+                if(!check_image_is_supported(task->draw_dsc)) {
                     return 0;
                 }
-                task->preference_score = 80;
-                task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
-                return 1;
             }
-        default:
             break;
+
+        default:
+            /*The draw unit is not able to draw this task. */
+            return 0;
     }
-    return 0;
+
+    /* The draw unit is able to draw this task. */
+    task->preference_score = 80;
+    task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+    return 1;
 }
 
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)

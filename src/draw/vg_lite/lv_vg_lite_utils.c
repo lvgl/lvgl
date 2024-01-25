@@ -305,14 +305,18 @@ bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
 {
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_RGB565A8:
-        case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
             return true;
+
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGB888:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? true : false;
+
         default:
             break;
     }
+
     return false;
 }
 
@@ -323,16 +327,22 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
         /* case LV_COLOR_FORMAT_A8: */
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_RGB565A8:
-        case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
-        case LV_COLOR_FORMAT_NV12:
         case LV_COLOR_FORMAT_ETC2_EAC:
             return true;
+
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGB888:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? true : false;
+
+        case LV_COLOR_FORMAT_NV12:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_YUV_INPUT) ? true : false;
+
         default:
             break;
     }
+
     return false;
 }
 
