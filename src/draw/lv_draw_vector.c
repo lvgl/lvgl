@@ -80,7 +80,9 @@ static void _multiply_matrix(lv_matrix_t * matrix, const lv_matrix_t * mul)
         }
     }
 
-    lv_memcpy(matrix, &tmp, sizeof(lv_matrix_t));
+    // lv_memcpy(matrix, &tmp, sizeof(lv_matrix_t));
+    lv_memcpy(matrix, &tmp, sizeof(float) * 9);
+
 }
 
 static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_t * src)
@@ -134,6 +136,10 @@ void lv_matrix_identity(lv_matrix_t * matrix)
     matrix->m[2][0] = 0.0f;
     matrix->m[2][1] = 0.0f;
     matrix->m[2][2] = 1.0f;
+
+    matrix->scale_x = 1.0f;
+    matrix->scale_y = 1.0f;
+    matrix->angle = 0.0f;
 }
 
 void lv_matrix_translate(lv_matrix_t * matrix, float dx, float dy)
@@ -165,6 +171,9 @@ void lv_matrix_scale(lv_matrix_t * matrix, float scale_x, float scale_y)
     };
 
     _multiply_matrix(matrix, &scm);
+
+    matrix->scale_x = matrix->scale_x * scale_x;
+    matrix->scale_y = matrix->scale_y * scale_y;
 }
 
 void lv_matrix_rotate(lv_matrix_t * matrix, float degree)
@@ -181,6 +190,12 @@ void lv_matrix_rotate(lv_matrix_t * matrix, float degree)
     };
 
     _multiply_matrix(matrix, &rtm);
+
+    matrix->angle = matrix->angle + degree;
+    if(matrix->angle >= 360) {
+        uint32_t count = (uint32_t)matrix->angle / 360;
+        matrix->angle = matrix->angle - count * 360;
+    }
 }
 
 void lv_matrix_skew(lv_matrix_t * matrix, float skew_x, float skew_y)
@@ -203,6 +218,14 @@ void lv_matrix_skew(lv_matrix_t * matrix, float skew_x, float skew_y)
 void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * m)
 {
     _multiply_matrix(matrix, m);
+
+    matrix->scale_x = matrix->scale_x * m->scale_x;
+    matrix->scale_y = matrix->scale_y * m->scale_y;
+    matrix->angle += m->angle;
+    if(matrix->angle >= 360) {
+        uint32_t count = (uint32_t)matrix->angle / 360;
+        matrix->angle = matrix->angle - count * 360;
+    }
 }
 
 void lv_matrix_transform_point(const lv_matrix_t * matrix, lv_fpoint_t * point)
