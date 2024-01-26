@@ -105,6 +105,9 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
 
     lv_vg_lite_buffer_from_draw_buf(&u->target_buffer, layer->draw_buf);
 
+    /* VG-Lite will output premultiplied image, set the flag correspondingly. */
+    lv_draw_buf_set_flag(layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+
     vg_lite_identity(&u->global_matrix);
     vg_lite_translate(-layer->buf_area.x1, -layer->buf_area.y1, &u->global_matrix);
 

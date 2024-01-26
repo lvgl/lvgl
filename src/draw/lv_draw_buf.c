@@ -298,9 +298,10 @@ lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t st
 
     uint32_t offset = LV_COLOR_INDEXED_PALETTE_SIZE(header->cf) * 4;
     if(offset) lv_memcpy(dst->data, src->data, offset);
-
-    uint8_t * dst_data = dst->data + offset;
-    const uint8_t * src_data = src->data + offset;
+    uint8_t * dst_data = dst->data;
+    dst_data += offset;
+    const uint8_t * src_data = src->data;
+    src_data += offset;
     for(int32_t y = 0; y < src->header.h; y++) {
         lv_memcpy(dst_data, src_data, min_stride);
         src_data += src->header.stride;
