@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MV_CLASS &lv_list
+#define MY_CLASS (&lv_list)
 
 /**********************
  *      TYPEDEFS

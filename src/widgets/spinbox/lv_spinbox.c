@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS    &lv_spinbox_class
+#define MY_CLASS (&lv_spinbox_class)
 #define LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES (LV_SPINBOX_MAX_DIGIT_COUNT + 8U)
 #define LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES (LV_SPINBOX_MAX_DIGIT_COUNT + 4U)
 
