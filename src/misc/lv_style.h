@@ -135,6 +135,7 @@ enum _lv_grad_dir_t {
     LV_GRAD_DIR_NONE, /**< No gradient (the `grad_color` property is ignored)*/
     LV_GRAD_DIR_VER,  /**< Vertical (top to bottom) gradient*/
     LV_GRAD_DIR_HOR,  /**< Horizontal (left to right) gradient*/
+    LV_GRAD_DIR_DIAGONAL,  /**< Diagonal (any angle) gradient*/
 };
 
 #ifdef DOXYGEN
@@ -154,6 +155,7 @@ typedef struct {
 
 /** A descriptor of a gradient. */
 typedef struct {
+    lv_area_t            grad_area;                    /**< gradient area */
     lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS]; /**< A gradient stop array */
     uint8_t              stops_count;                  /**< The number of used stops in the array */
     lv_grad_dir_t        dir : 3;                      /**< The gradient direction.

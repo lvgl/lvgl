@@ -11,6 +11,7 @@
 
 #include "vg_lite.h"
 #include "../../lvgl.h"
+#include "../../draw/vg_lite/lv_vg_lite_utils.h"
 #include "../../libs/thorvg/thorvg.h"
 #include <float.h>
 #include <math.h>
@@ -1606,30 +1607,68 @@ Empty_sequence_handler:
         auto ctx = vg_lite_ctx::get_instance();
         TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
 
+#if 0
+        //Shape2
+        auto shape2 = tvg::Shape::gen();
+        shape2->appendRect(10, 10, 200, 200);
+        shape2->translate(100, 100);
+        shape2->scale(2);
+
+        //LinearGradient
+        auto fill2 = tvg::LinearGradient::gen();
+        fill2->linear(10, 10, 400, 400);
+
+        //Gradient Color Stops
+        tvg::Fill::ColorStop colorStops2[2];
+        colorStops2[0] = {0, 255, 0, 0, 255};
+        colorStops2[1] = {1, 0, 255, 0, 255};
+
+        fill2->colorStops(colorStops2, 2);
+        shape2->fill(std::move(fill2));
+        TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape2)));
+
+        shape2 = tvg::Shape::gen();
+        shape2->appendRect(212, 10, 200, 200);
+        // shape2->scale(2);
+        shape2->fill(std::move(fill2));
+        TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape2)));
+        return VG_LITE_SUCCESS;
+#endif
         auto shape = Shape::gen();
         TVG_CHECK_RETURN_VG_ERROR(shape_append_path(shape, path, matrix));
         TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(matrix)));
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
-        float x_min = path->bounding_box[0];
-        float y_min = path->bounding_box[1];
-        float x_max = path->bounding_box[2];
-        float y_max = path->bounding_box[3];
+        vg_lite_matrix_t inverse_matrix = { 0 };
+        lv_vg_lite_matrix_inverse(&inverse_matrix, matrix);
+        lv_vg_lite_matrix_multiply(&inverse_matrix, &grad->matrix);
+        LV_LOG_WARN(".");
 
+        float angle = (inverse_matrix.angle / 180.0f) * 3.141592654f;;
+        float scale = inverse_matrix.scaleX;
+        float dlen = 256 * scale;
+        float x_min = inverse_matrix.m[0][2];
+        float y_min = inverse_matrix.m[1][2];
+        float x_max = x_min + dlen * cosf(angle);
+        float y_max = y_min + dlen * sinf(angle);
         auto linearGrad = LinearGradient::gen();
+        linearGrad->linear(x_min, y_min, x_max, y_max);
+        LV_LOG_WARN("path coords {%.2f, %.2f}, {%.2f, %.2f}", path->bounding_box[0], path->bounding_box[1], path->bounding_box[2], path->bounding_box[3]);
+        LV_LOG_WARN("coords {%.2f, %.2f}, {%.2f, %.2f}", x_min, y_min, x_max, y_max);
+        LV_LOG_WARN("angle %.2f, scale %.2f dlen %.2f", inverse_matrix.angle, scale, dlen);
 
-        if(matrix->m[0][1] != 0) {
-            /* vertical */
-            linearGrad->linear(x_min, y_min, x_min, y_max);
-        }
-        else {
-            /* horizontal */
-            linearGrad->linear(x_min, y_min, x_max, y_min);
-        }
+        // if(matrix->m[0][1] != 0) {
+        //     /* vertical */
+        //     linearGrad->linear(x_min, y_min, x_min, y_max);
+        // }
+        // else {
+        //     /* horizontal */
+        //     linearGrad->linear(x_min, y_min, x_max, y_min);
+        // }
 
-        linearGrad->transform(matrix_conv(&grad->matrix));
-        linearGrad->spread(FillSpread::Reflect);
+        // linearGrad->transform(matrix_conv(matrix));
+        linearGrad->spread(FillSpread::Pad);
 
         tvg::Fill::ColorStop colorStops[VLC_MAX_GRADIENT_STOPS];
         for(vg_lite_uint32_t i = 0; i < grad->count; i++) {

@@ -100,7 +100,6 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     /* transform matrix */
     vg_lite_matrix_t matrix;
     lv_matrix_to_vg(&matrix, &dsc->matrix);
-
     /* convert path */
     lv_vg_lite_path_t * lv_vg_path = lv_vg_lite_path_get(u, VG_LITE_FP32);
     lv_path_to_vg(lv_vg_path, path);
@@ -189,8 +188,8 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
             break;
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
                 /* draw gradient */
-                lv_area_t grad_area;
-                lv_area_set(&grad_area, (int32_t)min_x, (int32_t)min_y, (int32_t)max_x, (int32_t)max_y);
+                lv_area_t path_area;
+                lv_area_set(&path_area, (int32_t)min_x, (int32_t)min_y, (int32_t)max_x, (int32_t)max_y);
                 lv_vector_gradient_style_t style = dsc->fill_dsc.gradient.style;
                 vg_lite_gradient_spreadmode_t spreadmode = lv_spread_to_vg(dsc->fill_dsc.gradient.spread);
                 LV_UNUSED(spreadmode);
@@ -199,7 +198,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                     lv_vg_lite_draw_linear_grad(
                         &u->target_buffer,
                         vg_path,
-                        &grad_area,
+                        &path_area,
                         &dsc->fill_dsc.gradient.grad,
                         &matrix,
                         fill,

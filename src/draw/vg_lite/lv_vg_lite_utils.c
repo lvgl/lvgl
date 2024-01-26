@@ -15,6 +15,7 @@
 #include "lv_vg_lite_path.h"
 #include "lv_draw_vg_lite_type.h"
 #include <string.h>
+#include <math.h>
 
 /*********************
  *      DEFINES
@@ -35,6 +36,10 @@
 #define FEATURE_ENUM_TO_STRING(e) \
     case (gcFEATURE_BIT_VG_##e):  \
     return #e
+
+#ifndef M_PI
+    #define M_PI 3.1415926f
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -908,6 +913,17 @@ bool lv_vg_lite_16px_align(void)
     return vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN);
 }
 
+static void print_matrix(vg_lite_matrix_t* matrix)
+{
+    return;
+    LV_LOG_WARN("matrix is : ");
+    // for (uint8_t i = 0; i < 3; i++)
+    // {
+    //     LV_LOG_WARN("%.2f %.2f %.2f", matrix->m[i][0], matrix->m[i][1],matrix->m[i][2]);
+    // }
+    LV_LOG_WARN("start {%.2f, %.2f} scale {%.2f, %.2f} angle %.2f", matrix->m[0][2], matrix->m[1][2], matrix->scaleX, matrix->scaleY, matrix->angle);
+}
+
 void lv_vg_lite_draw_linear_grad(
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
@@ -954,15 +970,21 @@ void lv_vg_lite_draw_linear_grad(
 
     vg_lite_matrix_t * grad_matrix = vg_lite_get_grad_matrix(&gradient);
     vg_lite_identity(grad_matrix);
-    vg_lite_translate(area->x1, area->y1, grad_matrix);
-
-    if(grad->dir == LV_GRAD_DIR_VER) {
-        vg_lite_scale(1, lv_area_get_height(area) / 256.0f, grad_matrix);
-        vg_lite_rotate(90, grad_matrix);
-    }
-    else {   /*LV_GRAD_DIR_HOR*/
-        vg_lite_scale(lv_area_get_width(area) / 256.0f, 1, grad_matrix);
-    }
+    lv_memcpy(grad_matrix, matrix, sizeof(vg_lite_matrix_t));
+    // vg_lite_translate(area->x1, area->y1, grad_matrix);
+    print_matrix(grad_matrix);
+    vg_lite_translate(grad->grad_area.x1, grad->grad_area.y1, grad_matrix);
+    print_matrix(grad_matrix);
+    int32_t dx = grad->grad_area.x2 - grad->grad_area.x1;
+    int32_t dy = grad->grad_area.y2 - grad->grad_area.y1;
+    float grad_len = sqrtf(dx * dx + dy * dy);
+    float scale = grad_len / 256.0f;
+    float angle = atan2(dy, dx) * (180 / M_PI);
+    vg_lite_rotate(angle, grad_matrix);
+    vg_lite_scale(scale, scale, grad_matrix);
+    print_matrix(grad_matrix);
+    // LV_LOG_WARN("matrix :");
+    // print_matrix(matrix);
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(buffer);
     LV_VG_LITE_ASSERT_SRC_BUFFER(&gradient.image);
@@ -999,7 +1021,15 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
     }
 
     /* Copy temporary matrix into result. */
-    lv_memcpy(matrix, &temp, sizeof(temp));
+    lv_memcpy(matrix->m, &temp.m, sizeof(temp.m));
+
+    matrix->scaleX = matrix->scaleX * mult->scaleX;
+    matrix->scaleY = matrix->scaleY * mult->scaleY;
+    matrix->angle += mult->angle;
+    if(matrix->angle >= 360) {
+        vg_lite_uint32_t count = (vg_lite_uint32_t)matrix->angle / 360;
+        matrix->angle = matrix->angle - count * 360;
+    }
 }
 
 void lv_vg_lite_matrix_flip_y(vg_lite_matrix_t * matrix)
@@ -1025,6 +1055,9 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
         result->m[2][1] = 0.0f;
         result->m[2][2] = 1.0f;
 
+        result->scaleX = 1.0f;
+        result->scaleY = 1.0f;
+        result->angle = 0.0f;
         /* Success. */
         return true;
     }
@@ -1055,6 +1088,14 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
     result->m[2][0] = is_affine ? 0.0f : d * det02;
     result->m[2][1] = is_affine ? 0.0f : d * ((matrix->m[2][0] * matrix->m[0][1]) - (matrix->m[0][0] * matrix->m[2][1]));
     result->m[2][2] = is_affine ? 1.0f : d * ((matrix->m[0][0] * matrix->m[1][1]) - (matrix->m[1][0] * matrix->m[0][1]));
+
+    result->scaleX = 1 / matrix->scaleX;
+    result->scaleY = 1 / matrix->scaleY;
+    result->angle =  -matrix->angle;
+    if(result->angle >= 360) {
+        vg_lite_uint32_t count = (vg_lite_uint32_t)result->angle / 360;
+        result->angle = result->angle - count * 360;
+    }
 
     /* Success. */
     return true;
