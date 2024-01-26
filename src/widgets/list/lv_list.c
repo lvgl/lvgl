@@ -19,8 +19,8 @@
  *      DEFINES
  *********************/
 #define MY_CLASS        (&lv_list_class)
-#define MY_CLASS_BUTTON (&lv_list_class)
-#define MY_CLASS_TEXT   (&lv_list_class)
+#define MY_CLASS_BUTTON (&lv_list_button_class)
+#define MY_CLASS_TEXT   (&lv_list_text_class)
 
 /**********************
  *      TYPEDEFS
