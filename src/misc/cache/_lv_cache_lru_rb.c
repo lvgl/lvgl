@@ -44,6 +44,9 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
 static void remove_cb(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data);
 static void drop_cb(lv_cache_t * cache, const void * key, void * user_data);
 static void drop_all_cb(lv_cache_t * cache, void * user_data);
+static lv_cache_entry_t * get_victim_cb(lv_cache_t * cache, void * user_data);
+static lv_cache_reserve_cond_res_t reserve_cond_cb(lv_cache_t * cache, const void * key, size_t reserved_size,
+                                                   void * user_data);
 
 static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data);
 inline static void ** get_lru_node(lv_lru_rb_t_ * lru, lv_rb_node_t * node);
@@ -63,7 +66,9 @@ const lv_cache_class_t lv_cache_class_lru_rb_count = {
     .add_cb = add_cb,
     .remove_cb = remove_cb,
     .drop_cb = drop_cb,
-    .drop_all_cb = drop_all_cb
+    .drop_all_cb = drop_all_cb,
+    .get_victim_cb = get_victim_cb,
+    .reserve_cond_cb = reserve_cond_cb
 };
 
 const lv_cache_class_t lv_cache_class_lru_rb_size = {
@@ -75,7 +80,9 @@ const lv_cache_class_t lv_cache_class_lru_rb_size = {
     .add_cb = add_cb,
     .remove_cb = remove_cb,
     .drop_cb = drop_cb,
-    .drop_all_cb = drop_all_cb
+    .drop_all_cb = drop_all_cb,
+    .get_victim_cb = get_victim_cb,
+    .reserve_cond_cb = reserve_cond_cb
 };
 /**********************
  *  STATIC VARIABLES
@@ -259,34 +266,6 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
         return NULL;
     }
 
-    uint32_t data_size = lru->get_data_size_cb(key);
-    if(data_size > lru->cache.max_size) {
-        LV_LOG_ERROR("data size (%" LV_PRIu32 ") is larger than max size (%" LV_PRIu32 ")", data_size,
-                     (uint32_t)lru->cache.max_size);
-        return NULL;
-    }
-
-    void * tail = _lv_ll_get_tail(&lru->ll);
-    void * curr = tail;
-    while(cache->size + data_size > lru->cache.max_size) {
-        if(curr == NULL) {
-            LV_LOG_ERROR("failed to drop cache");
-            return NULL;
-        }
-
-        lv_rb_node_t * tail_node = *(lv_rb_node_t **)curr;
-        void * search_key = tail_node->data;
-        lv_cache_entry_t * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
-        if(lv_cache_entry_get_ref(entry) == 0) {
-            cache->clz->drop_cb(cache, search_key, user_data);
-            curr = _lv_ll_get_tail(&lru->ll);
-            continue;
-        }
-
-        curr = _lv_ll_get_prev(&lru->ll, curr);
-    }
-
-    /*cache miss*/
     lv_rb_node_t * new_node = alloc_new_node(lru, (void *)key, user_data);
     if(new_node == NULL) {
         return NULL;
@@ -294,7 +273,7 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
 
     lv_cache_entry_t * entry = lv_cache_entry_get_entry(new_node->data, cache->node_size);
 
-    cache->size += data_size;
+    cache->size += lru->get_data_size_cb(key);
 
     return entry;
 }
@@ -389,6 +368,50 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
     _lv_ll_clear(&lru->ll);
 
     cache->size = 0;
+}
+
+static lv_cache_entry_t * get_victim_cb(lv_cache_t * cache, void * user_data)
+{
+    LV_UNUSED(user_data);
+
+    lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
+
+    LV_ASSERT_NULL(lru);
+
+    lv_rb_node_t ** tail;
+    _LV_LL_READ_BACK(&lru->ll, tail) {
+        lv_rb_node_t * tail_node = *tail;
+        lv_cache_entry_t * entry = lv_cache_entry_get_entry(tail_node->data, cache->node_size);
+        if(lv_cache_entry_get_ref(entry) == 0) {
+            return entry;
+        }
+    }
+
+    return NULL;
+}
+
+static lv_cache_reserve_cond_res_t reserve_cond_cb(lv_cache_t * cache, const void * key, size_t reserved_size,
+                                                   void * user_data)
+{
+    LV_UNUSED(user_data);
+
+    lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
+
+    LV_ASSERT_NULL(lru);
+
+    if(lru == NULL) {
+        return LV_CACHE_RESERVE_COND_ERROR;
+    }
+
+    uint32_t data_size = key ? lru->get_data_size_cb(key) : 0;
+    if(data_size > lru->cache.max_size) {
+        LV_LOG_ERROR("data size (%" LV_PRIu32 ") is larger than max size (%" LV_PRIu32 ")", data_size, lru->cache.max_size);
+        return LV_CACHE_RESERVE_COND_TOO_LARGE;
+    }
+
+    return cache->size + reserved_size + data_size > lru->cache.max_size
+           ? LV_CACHE_RESERVE_COND_NEED_VICTIM
+           : LV_CACHE_RESERVE_COND_OK;
 }
 
 static uint32_t cnt_get_data_size_cb(const void * data)
