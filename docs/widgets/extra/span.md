@@ -37,7 +37,7 @@ like label object, the spangroup can be set to one the following modes:
 use function `lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER)` to set text align.
 
 ### Modes
-The spangroup can be set to one the following modes:
+The spangroup can be set to one of the following modes:
 - `LV_SPAN_MODE_FIXED` fixes the object size.
 - `LV_SPAN_MODE_EXPAND` Expand the object size to the text size but stay on a single line.
 - `LV_SPAN_MODE_BREAK` Keep width, break the too long lines and auto expand height.
@@ -45,14 +45,14 @@ The spangroup can be set to one the following modes:
 Use `lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK)` to set object mode.
 
 ### Overflow
-The spangroup can be set to one the following modes:
+The spangroup can be set to one of the following modes:
 - `LV_SPAN_OVERFLOW_CLIP` truncates the text at the limit of the area.
 - `LV_SPAN_OVERFLOW_ELLIPSIS` will display an ellipsis(`...`) when text overflows the area.
 
 Use `lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)` to set object overflow mode.
 
 ### first line indent
-Use `lv_spangroup_set_indent(spangroup, 20)` to set the indent of the first line. all modes support pixel units, in addition to LV_SPAN_MODE_FIXED and LV_SPAN_MODE_BREAK mode supports percentage units too.
+Use `lv_spangroup_set_indent(spangroup, 20)` to set the indent of the first line. All modes support pixel units, in addition to LV_SPAN_MODE_FIXED and LV_SPAN_MODE_BREAK mode supports percentage units too.
 
 ### lines
 Use `lv_spangroup_set_lines(spangroup, 10)` to set the maximum number of lines to be displayed in LV_SPAN_MODE_BREAK mode, negative values indicate no limit.
