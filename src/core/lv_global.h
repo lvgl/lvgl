@@ -57,6 +57,10 @@ struct _snippet_stack;
 struct _lv_freetype_context_t;
 #endif
 
+#if LV_USE_NUTTX
+struct _lv_nuttx_ctx_t;
+#endif
+
 typedef struct _lv_global_t {
     bool inited;
     bool deinit_in_progress;     /**< Can be used e.g. in the LV_EVENT_DELETE to deinit the drivers too */
@@ -193,6 +197,11 @@ typedef struct _lv_global_t {
     void * objid_array;
     uint32_t objid_count;
 #endif
+
+#if LV_USE_NUTTX
+    struct _lv_nuttx_ctx_t * nuttx_ctx;
+#endif
+
     void * user_data;
 } lv_global_t;
 
