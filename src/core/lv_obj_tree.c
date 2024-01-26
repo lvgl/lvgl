@@ -20,7 +20,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj_class
+#define MY_CLASS (&lv_obj_class)
 #define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
 #define OBJ_DUMP_STRING_LEN 128

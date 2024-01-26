@@ -21,7 +21,7 @@
  *      DEFINES
  *********************/
 #define LV_MSGBOX_FLAG_AUTO_PARENT  LV_OBJ_FLAG_WIDGET_1        /*Mark that the parent was automatically created*/
-#define MY_CLASS    &lv_msgbox_class
+#define MY_CLASS (&lv_msgbox_class)
 
 /**********************
  *      TYPEDEFS

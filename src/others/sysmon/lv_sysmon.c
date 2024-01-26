@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_sysmon_class
+#define MY_CLASS (&lv_sysmon_class)
 
 #define SYSMON_REFR_PERIOD_DEF 300 /* ms */
 

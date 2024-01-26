@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS    &lv_keyboard_class
+#define MY_CLASS (&lv_keyboard_class)
 #define LV_KB_BTN(width) LV_BUTTONMATRIX_CTRL_POPOVER | width
 
 /**********************

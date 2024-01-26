@@ -27,7 +27,7 @@
  *********************/
 #define LV_OBJX_NAME "lv_animimg"
 
-#define MY_CLASS &lv_animimg_class
+#define MY_CLASS (&lv_animimg_class)
 
 /**********************
  *      TYPEDEFS

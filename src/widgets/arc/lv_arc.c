@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_arc_class
+#define MY_CLASS (&lv_arc_class)
 
 #define VALUE_UNSET INT16_MIN
 #define CLICK_OUTSIDE_BG_ANGLES ((uint32_t) 0x00U)

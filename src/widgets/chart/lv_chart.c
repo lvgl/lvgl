@@ -14,7 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_chart_class
+#define MY_CLASS (&lv_chart_class)
 
 #define LV_CHART_HDIV_DEF 3
 #define LV_CHART_VDIV_DEF 5
