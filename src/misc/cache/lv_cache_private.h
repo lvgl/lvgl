@@ -26,9 +26,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*-----------------
- * Cache entry slot
- *----------------*/
+typedef enum {
+    LV_CACHE_RESERVE_COND_OK,
+    LV_CACHE_RESERVE_COND_TOO_LARGE,
+    LV_CACHE_RESERVE_COND_NEED_VICTIM,
+    LV_CACHE_RESERVE_COND_ERROR
+} lv_cache_reserve_cond_res_t;
+
 struct _lv_cache_ops_t;
 struct _lv_cache_t;
 struct _lv_cache_class_t;
@@ -52,6 +56,9 @@ typedef lv_cache_entry_t * (*lv_cache_add_cb_t)(lv_cache_t * cache, const void *
 typedef void (*lv_cache_remove_cb_t)(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data);
 typedef void (*lv_cache_drop_cb_t)(lv_cache_t * cache, const void * key, void * user_data);
 typedef void (*lv_cache_clear_cb_t)(lv_cache_t * cache, void * user_data);
+typedef lv_cache_entry_t * (*lv_cache_get_victim_cb)(lv_cache_t * cache, void * user_data);
+typedef lv_cache_reserve_cond_res_t (*lv_cache_reserve_cond_cb)(lv_cache_t * cache, const void * key, size_t size,
+                                                                void * user_data);
 
 struct _lv_cache_ops_t {
     lv_cache_compare_cb_t compare_cb;
@@ -62,10 +69,10 @@ struct _lv_cache_ops_t {
 struct _lv_cache_t {
     const lv_cache_class_t * clz;
 
-    size_t node_size;
+    uint32_t node_size;
 
-    size_t max_size;
-    size_t size;
+    uint32_t max_size;
+    uint32_t size;
 
     lv_cache_ops_t ops;
 
@@ -82,6 +89,8 @@ struct _lv_cache_class_t {
     lv_cache_remove_cb_t remove_cb;
     lv_cache_drop_cb_t drop_cb;
     lv_cache_clear_cb_t drop_all_cb;
+    lv_cache_get_victim_cb get_victim_cb;
+    lv_cache_reserve_cond_cb reserve_cond_cb;
 };
 
 /*-----------------
