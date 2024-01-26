@@ -38,7 +38,7 @@ Learn more about [Events](/overview/event).
 ## Keys
 - `LV_KEY_LEFT/RIGHT` With *Keypad* move the cursor left/right. With *Encoder* decrement/increment the selected digit.
 - `LV_KEY_UP/DOWN` With *Keypad* and *Encoder* increment/decrement the value.
-- `LV_KEY_ENTER` With *Encoder* got the net digit. Jump to the first after the last.
+- `LV_KEY_ENTER` With *Encoder* got the next digit. Jump to the first after the last.
 
 ## Example
 
