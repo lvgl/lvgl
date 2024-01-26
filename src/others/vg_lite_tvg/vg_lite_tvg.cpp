@@ -156,11 +156,6 @@ class vg_lite_ctx
         {
             vg_lite_uint32_t px_size = w * h;
             if(px_size > dest_buffer.size()) {
-
-                /* During resize, the first address of the vector may change
-                 * to ensure that there is no unfinished drawing.
-                 */
-                LV_ASSERT(target_buffer == nullptr);
                 dest_buffer.resize(w * h);
             }
             return dest_buffer.data();
@@ -623,6 +618,17 @@ extern "C" {
         }
     }
 
+    static void picture_bgra8888_to_bgr888(vg_color24_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
+    {
+        while(px_size--) {
+            dest->red = src->red;
+            dest->green = src->green;
+            dest->blue = src->blue;
+            src++;
+            dest++;
+        }
+    }
+
     vg_lite_error_t vg_lite_finish(void)
     {
         vg_lite_ctx * ctx = vg_lite_ctx::get_instance();
@@ -634,31 +640,42 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->sync());
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->clear(true));
 
-        /* If target_buffer is not in a format supported by thorvg, software conversion is required. */
-        if(ctx->target_buffer) {
-            switch(ctx->target_format) {
-                case VG_LITE_BGR565:
-                    picture_bgra8888_to_bgr565(
-                        (vg_color16_t *)ctx->target_buffer,
-                        (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                        ctx->target_px_size);
-                    break;
-                case VG_LITE_BGRA5658:
-                    picture_bgra8888_to_bgra5658(
-                        (vg_color16_alpha_t *)ctx->target_buffer,
-                        (const vg_color32_t *)ctx->get_temp_target_buffer(),
-                        ctx->target_px_size);
-                    break;
-                default:
-                    LV_LOG_ERROR("unsupported format: %d", ctx->target_format);
-                    LV_ASSERT(false);
-                    break;
-            }
+        /* make sure target buffer is valid */
+        LV_ASSERT_NULL(ctx->target_buffer);
 
-            /* finish convert, clean target buffer info */
-            ctx->target_buffer = nullptr;
-            ctx->target_px_size = 0;
+        /* If target_buffer is not in a format supported by thorvg, software conversion is required. */
+        switch(ctx->target_format) {
+            case VG_LITE_BGR565:
+                picture_bgra8888_to_bgr565(
+                    (vg_color16_t *)ctx->target_buffer,
+                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                    ctx->target_px_size);
+                break;
+            case VG_LITE_BGRA5658:
+                picture_bgra8888_to_bgra5658(
+                    (vg_color16_alpha_t *)ctx->target_buffer,
+                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                    ctx->target_px_size);
+                break;
+            case VG_LITE_BGR888:
+                picture_bgra8888_to_bgr888(
+                    (vg_color24_t *)ctx->target_buffer,
+                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                    ctx->target_px_size);
+                break;
+            case VG_LITE_BGRA8888:
+            case VG_LITE_BGRX8888:
+                /* No conversion required. */
+                break;
+            default:
+                LV_LOG_ERROR("unsupported format: %d", ctx->target_format);
+                LV_ASSERT(false);
+                break;
         }
+
+        /* finish convert, clean target buffer info */
+        ctx->target_buffer = nullptr;
+        ctx->target_px_size = 0;
 
         return VG_LITE_SUCCESS;
     }
@@ -2013,30 +2030,28 @@ static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_bu
 
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 {
-    vg_lite_uint32_t * target_buffer = nullptr;
+    void * tvg_target_buffer = nullptr;
 
     /* if target_buffer needs to be changed, finish current drawing */
     if(ctx->target_buffer && ctx->target_buffer != target->memory) {
         vg_lite_finish();
     }
 
+    ctx->target_buffer = target->memory;
     ctx->target_format = target->format;
+    ctx->target_px_size = target->width * target->height;
 
     if(TVG_IS_VG_FMT_SUPPORT(target->format)) {
         /* if target format is supported by VG, use target buffer directly */
-        target_buffer = (vg_lite_uint32_t *)target->memory;
-        ctx->target_buffer = nullptr;
-        ctx->target_px_size = 0;
+        tvg_target_buffer = target->memory;
     }
     else {
         /* if target format is not supported by VG, use internal buffer */
-        target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
-        ctx->target_buffer = target->memory;
-        ctx->target_px_size = target->width * target->height;
+        tvg_target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
     }
 
     Result res = ctx->canvas->target(
-                     (uint32_t *)target_buffer,
+                     (uint32_t *)tvg_target_buffer,
                      target->width,
                      target->width,
                      target->height,
