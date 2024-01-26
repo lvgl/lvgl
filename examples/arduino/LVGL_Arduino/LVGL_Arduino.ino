@@ -21,6 +21,7 @@
 
 /*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
 #define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
+uint8_t draw_buf[DRAW_BUF_SIZE];
 
 #if LV_USE_LOG != 0
 void my_print( lv_log_level_t level, const char * buf )
@@ -81,7 +82,6 @@ void setup()
     lv_log_register_print_cb( my_print );
 #endif
 
-    uint8_t draw_buf[DRAW_BUF_SIZE];
     lv_display_t * disp;
 #if LV_USE_TFT_ESPI
     /*TFT_eSPI can be enabled lv_conf.h to initialize the display in a simple way*/
@@ -126,6 +126,7 @@ void setup()
 
 void loop()
 {
-    lv_timer_handler(); /* let the UI do its work */
-    delay( 5 );
+    lv_task_handler(); /* let the GUI do its work */
+    lv_tick_inc(5); /* tell LVGL how much time has passed */
+    delay(5); /* let this time pass */
 }
