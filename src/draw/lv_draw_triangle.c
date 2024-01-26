@@ -49,6 +49,11 @@ void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * dsc)
     LV_PROFILER_END;
 }
 
+lv_draw_triangle_dsc_t * lv_draw_task_get_triangle_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_TRIANGLE ? (lv_draw_triangle_dsc_t *)task->draw_dsc : NULL;
+}
+
 void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
 {
     LV_PROFILER_BEGIN;

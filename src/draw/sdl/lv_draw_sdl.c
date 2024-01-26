@@ -344,8 +344,8 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     SDL_SetRenderTarget(renderer, layer_get_texture(dest_layer));
 
-    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
-        lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
+    lv_draw_image_dsc_t * draw_dsc = lv_draw_task_get_image_dsc(t);
+    if(draw_dsc) {
         lv_area_t image_area;
         image_area.x1 = 0;
         image_area.y1 = 0;

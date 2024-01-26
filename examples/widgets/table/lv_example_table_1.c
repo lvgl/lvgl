@@ -12,30 +12,30 @@ static void draw_event_cb(lv_event_t * e)
 
         /*Make the texts in the first cell center aligned*/
         if(row == 0) {
-            if(draw_task->type == LV_DRAW_TASK_TYPE_LABEL) {
-                lv_draw_label_dsc_t * label_draw_dsc = draw_task->draw_dsc;
+            lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
+            if(label_draw_dsc) {
                 label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
             }
-            if(draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
-                lv_draw_rect_dsc_t * rect_draw_dsc = draw_task->draw_dsc;
-                rect_draw_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_BLUE), rect_draw_dsc->bg_color, LV_OPA_20);
-                rect_draw_dsc->bg_opa = LV_OPA_COVER;
+            lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
+            if(fill_draw_dsc) {
+                fill_draw_dsc->color = lv_color_mix(lv_palette_main(LV_PALETTE_BLUE), fill_draw_dsc->color, LV_OPA_20);
+                fill_draw_dsc->opa = LV_OPA_COVER;
             }
         }
         /*In the first column align the texts to the right*/
         else if(col == 0) {
-            if(draw_task->type == LV_DRAW_TASK_TYPE_LABEL) {
-                lv_draw_label_dsc_t * label_draw_dsc = draw_task->draw_dsc;
+            lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);
+            if(label_draw_dsc) {
                 label_draw_dsc->align = LV_TEXT_ALIGN_RIGHT;
             }
         }
 
         /*Make every 2nd row grayish*/
         if((row != 0 && row % 2) == 0) {
-            if(draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
-                lv_draw_rect_dsc_t * rect_draw_dsc = draw_task->draw_dsc;
-                rect_draw_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_GREY), rect_draw_dsc->bg_color, LV_OPA_10);
-                rect_draw_dsc->bg_opa = LV_OPA_COVER;
+            lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
+            if(fill_draw_dsc) {
+                fill_draw_dsc->color = lv_color_mix(lv_palette_main(LV_PALETTE_GREY), fill_draw_dsc->color, LV_OPA_10);
+                fill_draw_dsc->opa = LV_OPA_COVER;
             }
         }
     }

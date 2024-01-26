@@ -1412,13 +1412,12 @@ static void chart_event_cb(lv_event_t * e)
         lv_draw_task_t * draw_task = lv_event_get_param(e);
         lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
 
-        if(base_dsc->part == LV_PART_ITEMS && draw_task->type == LV_DRAW_TASK_TYPE_LINE) {
+        lv_draw_line_dsc_t * draw_line_dsc = lv_draw_task_get_line_dsc(draw_task);
+        if(base_dsc->part == LV_PART_ITEMS && draw_line_dsc) {
             const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
             if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
 
-            lv_draw_line_dsc_t * draw_line_dsc = draw_task->draw_dsc;
             lv_draw_triangle_dsc_t tri_dsc;
-
             lv_draw_triangle_dsc_init(&tri_dsc);
             tri_dsc.p[0].x = (int32_t)draw_line_dsc->p1.x;
             tri_dsc.p[0].y = (int32_t)draw_line_dsc->p1.y;

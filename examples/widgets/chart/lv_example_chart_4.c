@@ -7,9 +7,12 @@ static void draw_event_cb(lv_event_t * e)
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
 
-    if(base_dsc->part == LV_PART_ITEMS && draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
-        lv_draw_fill_dsc_t * fill_dsc = draw_task->draw_dsc;
+    if(base_dsc->part != LV_PART_ITEMS) {
+        return;
+    }
 
+    lv_draw_fill_dsc_t * fill_dsc = lv_draw_task_get_fill_dsc(draw_task);
+    if(fill_dsc) {
         lv_obj_t * chart = lv_event_get_target(e);
         int32_t * y_array = lv_chart_get_y_array(chart, lv_chart_get_series_next(chart, NULL));
         int32_t v = y_array[base_dsc->id2];

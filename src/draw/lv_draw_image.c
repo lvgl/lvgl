@@ -54,6 +54,11 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
 }
 
+lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_IMAGE ? (lv_draw_image_dsc_t *)task->draw_dsc : NULL;
+}
+
 void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_draw_task_t * t = lv_draw_add_task(layer, coords);
