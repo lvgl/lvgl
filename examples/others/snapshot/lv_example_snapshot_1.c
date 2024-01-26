@@ -9,7 +9,7 @@ static void event_cb(lv_event_t * e)
     if(snapshot_obj) {
         lv_draw_buf_t * snapshot = (lv_draw_buf_t *)lv_image_get_src(snapshot_obj);
         if(snapshot) {
-            lv_snapshot_free(snapshot);
+            lv_draw_buf_destroy(snapshot);
         }
 
         /*Update the snapshot, we know parent of object is the container.*/

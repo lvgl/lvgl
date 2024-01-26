@@ -102,10 +102,7 @@ static inline lv_result_t _lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_form
     lv_draw_buf_init(&draw_buf, 1, 1, cf, buf_size, buf, buf_size);
     lv_result_t res = lv_snapshot_take_to_buf(obj, cf, &draw_buf);
     if(res == LV_RESULT_OK) {
-        lv_image_header_t * header = &draw_buf.header;
-        dsc->header = *header;
-        dsc->data = (const uint8_t *)draw_buf.data;
-        dsc->data_size = draw_buf.data_size;
+        lv_memcpy((void *)dsc, &draw_buf, sizeof(lv_image_dsc_t));
     }
     return res;
 }
