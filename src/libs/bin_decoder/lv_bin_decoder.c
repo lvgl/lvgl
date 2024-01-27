@@ -653,6 +653,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 exit_with_buf:
     if(dsc->src_type == LV_IMAGE_SRC_FILE && !is_compressed) {
         lv_free((void *)palette);
+        decoder_data->palette = NULL;
     }
 
     if(draw_buf_indexed) lv_draw_buf_destroy(draw_buf_indexed);
