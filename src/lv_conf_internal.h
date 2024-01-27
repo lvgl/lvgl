@@ -2982,15 +2982,6 @@
         #define LV_USE_DEMO_WIDGETS 0
     #endif
 #endif
-#if LV_USE_DEMO_WIDGETS
-    #ifndef LV_DEMO_WIDGETS_SLIDESHOW
-        #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-            #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-        #else
-            #define LV_DEMO_WIDGETS_SLIDESHOW 0
-        #endif
-    #endif
-#endif
 
 /*Demonstrate the usage of encoder and keyboard*/
 #ifndef LV_USE_DEMO_KEYPAD_AND_ENCODER

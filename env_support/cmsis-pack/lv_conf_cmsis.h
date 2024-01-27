@@ -820,11 +820,6 @@
  * DEMO USAGE
  ====================*/
 
-/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
-#if LV_USE_DEMO_WIDGETS
-    #define LV_DEMO_WIDGETS_SLIDESHOW 0
-#endif
-
 /*Music player demo*/
 #if LV_USE_DEMO_MUSIC
     #define LV_DEMO_MUSIC_SQUARE    0
