@@ -309,6 +309,18 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
 void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, float rx, float ry);
 
 /**
+ * Add a arc to the path
+ * @param path              pointer to a path
+ * @param c                 pointer to a `lv_fpoint_t` variable for center of the circle
+ * @param radius            the radius for arc
+ * @param start_angle       the start angle for arc
+ * @param sweep             the sweep angle for arc, could be negative
+ * @param pie               true: draw a pie, false: draw a arc
+ */
+void lv_vector_path_append_arc(lv_vector_path_t * path, const lv_fpoint_t * c, float radius, float start_angle,
+                               float sweep, bool pie);
+
+/**
  * Add an sub path to the path
  * @param path              pointer to a path
  * @param subpath           pointer to another path which will be added

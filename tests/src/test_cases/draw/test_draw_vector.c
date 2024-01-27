@@ -94,6 +94,38 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_dsc_set_fill_rule(ctx, LV_VECTOR_FILL_EVENODD);
     lv_vector_dsc_add_path(ctx, path);
 
+    lv_vector_path_clear(path);
+    lv_vector_dsc_identity(ctx);
+    lv_vector_dsc_set_blend_mode(ctx, LV_VECTOR_BLEND_SRC_OVER);
+
+    rect = (lv_area_t) {
+        500, 50, 550, 100
+    };
+    lv_vector_dsc_set_fill_color(ctx, lv_color_lighten(lv_color_black(), 50));
+    lv_vector_clear_area(ctx, &rect); // clear screen
+
+    lv_fpoint_t p = {500, 100}; /* Center */
+    lv_vector_dsc_set_stroke_color(ctx, lv_color_make(0x00, 0xff, 0xff));
+    lv_vector_dsc_set_stroke_opa(ctx, LV_OPA_COVER);
+    lv_vector_dsc_set_stroke_width(ctx, 2.0f);
+    lv_vector_dsc_set_stroke_dash(ctx, NULL, 0);
+    lv_vector_dsc_set_fill_opa(ctx, LV_OPA_TRANSP);
+    lv_vector_path_move_to(path, &p);
+    lv_fpoint_t temp = {p.x + 50, p.y};
+    lv_vector_path_line_to(path, &temp);
+    lv_vector_path_append_arc(path, &p, 50, 0, -90, false);
+    lv_vector_path_line_to(path, &p);
+    lv_vector_path_close(path);
+
+    lv_vector_dsc_add_path(ctx, path);
+
+    /* Below code has same effect as above one but with solid fill */
+    lv_vector_dsc_set_fill_color(ctx, lv_color_make(0xFF, 0x00, 0x00));
+    lv_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
+    lv_vector_path_clear(path);
+    lv_vector_path_append_arc(path, &p, 50, 45, 45, true);
+    lv_vector_dsc_add_path(ctx, path); // draw a path
+
     lv_draw_vector(ctx);
     lv_vector_path_delete(path);
     lv_vector_dsc_delete(ctx);

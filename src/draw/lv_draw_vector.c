@@ -14,6 +14,23 @@
 #include "../stdlib/lv_string.h"
 #include <stdbool.h>
 #include <math.h>
+#include <float.h>
+
+#define MATH_PI  3.14159265358979323846f
+#define MATH_HALF_PI 1.57079632679489661923f
+#define MATH_TWO_PI 6.28318530717958647692f
+#define DEG_TO_RAD 0.017453292519943295769236907684886f
+#define RAD_TO_DEG 57.295779513082320876798154814105f
+
+#define MATH_TANF(x) tanf(x)
+#define MATH_SINF(x) sinf(x)
+#define MATH_COSF(x) cosf(x)
+#define MATH_ASINF(x) asinf(x)
+#define MATH_FABSF(x) fabsf(x)
+#define MATH_SQRTF(x) sqrtf(x)
+
+#define MATH_RADIANS(deg) ((deg) * DEG_TO_RAD)
+#define MATH_DEGRESS(rad) ((rad) * RAD_TO_DEG)
 
 /*********************
 *      DEFINES
@@ -467,6 +484,92 @@ void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c
     lv_vector_path_cubic_to(path, &pt, &pt2, &pt3);
 
     lv_vector_path_close(path);
+}
+
+/**
+ * Add a arc to the path
+ * @param path              pointer to a path
+ * @param c                 pointer to a `lv_fpoint_t` variable for center of the circle
+ * @param radius            the radius for arc
+ * @param start_angle       the start angle for arc
+ * @param sweep             the sweep angle for arc, could be negative
+ * @param pie               true: draw a pie, false: draw a arc
+ */
+void lv_vector_path_append_arc(lv_vector_path_t * path, const lv_fpoint_t * c, float radius, float start_angle,
+                               float sweep, bool pie)
+{
+    float cx = c->x;
+    float cy = c->y;
+
+    /* just circle */
+    if(sweep >= 360.0f || sweep <= -360.0f) {
+        lv_vector_path_append_circle(path, c, radius, radius);
+        return;
+    }
+
+    start_angle = MATH_RADIANS(start_angle);
+    sweep = MATH_RADIANS(sweep);
+
+    int n_curves = (int)ceil(MATH_FABSF(sweep / MATH_HALF_PI));
+    float sweep_sign = sweep < FLT_EPSILON ? -1.f : 1.f;
+    float fract = fmodf(sweep, MATH_HALF_PI);
+    fract = (MATH_FABSF(fract) < FLT_EPSILON) ? MATH_HALF_PI * sweep_sign : fract;
+
+    /* Start from here */
+    lv_fpoint_t start = {
+        .x = radius * MATH_COSF(start_angle),
+        .y = radius * MATH_SINF(start_angle),
+    };
+
+    if(pie) {
+        lv_vector_path_move_to(path, &(lv_fpoint_t) {
+            cx, cy
+        });
+        lv_vector_path_line_to(path, &(lv_fpoint_t) {
+            start.x + cx, start.y + cy
+        });
+    }
+    else {
+        lv_vector_path_move_to(path, &(lv_fpoint_t) {
+            start.x + cx, start.y + cy
+        });
+    }
+
+    for(int i = 0; i < n_curves; ++i) {
+        float end_angle = start_angle + ((i != n_curves - 1) ? MATH_HALF_PI * sweep_sign : fract);
+        float end_x = radius * MATH_COSF(end_angle);
+        float end_y = radius * MATH_SINF(end_angle);
+
+        /* variables needed to calculate bezier control points */
+
+        /** get bezier control points using article:
+         * (http://itc.ktu.lt/index.php/ITC/article/view/11812/6479)
+         */
+        float ax = start.x;
+        float ay = start.y;
+        float bx = end_x;
+        float by = end_y;
+        float q1 = ax * ax + ay * ay;
+        float q2 = ax * bx + ay * by + q1;
+        float k2 = (4.0f / 3.0f) * ((MATH_SQRTF(2 * q1 * q2) - q2) / (ax * by - ay * bx));
+
+        /* Next start point is the current end point */
+        start.x = end_x;
+        start.y = end_y;
+
+        end_x += cx;
+        end_y += cy;
+
+        lv_fpoint_t ctrl1 = {ax - k2 * ay + cx, ay + k2 * ax + cy};
+        lv_fpoint_t ctrl2 = {bx + k2 * by + cx, by - k2 * bx + cy};
+        lv_fpoint_t end = {end_x, end_y};
+        lv_vector_path_cubic_to(path, &ctrl1, &ctrl2, &end);
+        start_angle = end_angle;
+    }
+
+    if(pie) {
+        lv_vector_path_close(path);
+    }
 }
 
 void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t * subpath)
