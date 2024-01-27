@@ -1520,10 +1520,6 @@ menu "LVGL configuration"
 		config LV_USE_DEMO_WIDGETS
 			bool "Show some widget"
 			default n
-		config LV_DEMO_WIDGETS_SLIDESHOW
-			bool "Enable slide show"
-			depends on LV_USE_DEMO_WIDGETS
-			default n
 
 		config LV_USE_DEMO_KEYPAD_AND_ENCODER
 			bool "Demonstrate the usage of encoder and keyboard"
