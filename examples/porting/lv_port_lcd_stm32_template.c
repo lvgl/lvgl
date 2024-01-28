@@ -67,7 +67,7 @@ void lv_port_display_init(void)
         return;
 
     /* Create the LVGL display object and the ST7789 LCD display driver */
-    lcd_disp = lv_st7789_create(MY_DISP_HOR_RES, MY_DISP_VER_RES, 0, lcd_send_cmd, lcd_send_color);
+    lcd_disp = lv_st7789_create(MY_DISP_HOR_RES, MY_DISP_VER_RES, LV_LCD_FLAG_NONE, lcd_send_cmd, lcd_send_color);
     lv_display_set_rotation(lcd_disp, LV_DISPLAY_ROTATION_270);     /* set landscape orientation */
 
     /* Example: two dynamically allocated buffers for partial rendering */

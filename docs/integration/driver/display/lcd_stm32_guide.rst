@@ -262,7 +262,7 @@ Step-by-step instructions
 				return;
 
 			/* Create the LVGL display object and the LCD display driver */
-			lcd_disp = lv_st7789_create(LCD_H_RES, LCD_V_RES, 0, lcd_send_cmd, lcd_send_color);
+			lcd_disp = lv_st7789_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE, lcd_send_cmd, lcd_send_color);
 			lv_display_set_rotation(lcd_disp, LV_DISPLAY_ROTATION_270);
 
 			/* Allocate draw buffers on the heap. In this example we use two partial buffers of 1/10th size of the screen */
