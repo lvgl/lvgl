@@ -29,3 +29,4 @@ tests/report/
 .idea
 *.bak
 tests/test_images/
+.vs/

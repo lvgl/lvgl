@@ -30,10 +30,6 @@ fout.write(
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
-#ifndef _MSC_VER
-  #define _MSC_VER 0
-#endif
-
 /*Config options*/
 #define LV_OS_NONE          0
 #define LV_OS_PTHREAD       1

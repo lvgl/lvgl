@@ -355,10 +355,7 @@
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning /*The default value just prevents GCC warning*/
 
 /*Prefix all global extern data with this*/
-#ifndef LV_ATTRIBUTE_EXTERN_DATA
-  #define LV_ATTRIBUTE_EXTERN_DATA
-#endif /*LV_ATTRIBUTE_EXTERN_DATA*/
-
+#define LV_ATTRIBUTE_EXTERN_DATA
 
 /* Use `float` as `lv_value_precise_t` */
 #define LV_USE_FLOAT            0
@@ -613,9 +610,9 @@
 #endif
 
 /*API for CreateFile, ReadFile, etc*/
-#define LV_USE_FS_WIN32   _MSC_VER ? 1 : 0 
+#define LV_USE_FS_WIN32 0
 #if LV_USE_FS_WIN32
-    #define LV_FS_WIN32_LETTER 'A'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_WIN32_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
     #define LV_FS_WIN32_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
     #define LV_FS_WIN32_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
@@ -912,7 +909,7 @@
 #define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
 
 /* LVGL Windows backend */
-#define LV_USE_WINDOWS  _MSC_VER ? 1 : 0  
+#define LV_USE_WINDOWS    0
 
 /*==================
 * EXAMPLES

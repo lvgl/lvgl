@@ -8,10 +8,6 @@
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
-#ifndef _MSC_VER
-  #define _MSC_VER 0
-#endif
-
 /*Config options*/
 #define LV_OS_NONE          0
 #define LV_OS_PTHREAD       1
@@ -1006,15 +1002,12 @@
 
 /*Prefix all global extern data with this*/
 #ifndef LV_ATTRIBUTE_EXTERN_DATA
-  #ifndef LV_ATTRIBUTE_EXTERN_DATA
-      #ifdef CONFIG_LV_ATTRIBUTE_EXTERN_DATA
-          #define LV_ATTRIBUTE_EXTERN_DATA CONFIG_LV_ATTRIBUTE_EXTERN_DATA
-      #else
-          #define LV_ATTRIBUTE_EXTERN_DATA
-      #endif
-  #endif
-#endif /*LV_ATTRIBUTE_EXTERN_DATA*/
-
+    #ifdef CONFIG_LV_ATTRIBUTE_EXTERN_DATA
+        #define LV_ATTRIBUTE_EXTERN_DATA CONFIG_LV_ATTRIBUTE_EXTERN_DATA
+    #else
+        #define LV_ATTRIBUTE_EXTERN_DATA
+    #endif
+#endif
 
 /* Use `float` as `lv_value_precise_t` */
 #ifndef LV_USE_FLOAT
@@ -2043,7 +2036,7 @@
     #ifdef CONFIG_LV_USE_FS_WIN32
         #define LV_USE_FS_WIN32 CONFIG_LV_USE_FS_WIN32
     #else
-        #define LV_USE_FS_WIN32   _MSC_VER ? 1 : 0 
+        #define LV_USE_FS_WIN32 0
     #endif
 #endif
 #if LV_USE_FS_WIN32
@@ -2051,7 +2044,7 @@
         #ifdef CONFIG_LV_FS_WIN32_LETTER
             #define LV_FS_WIN32_LETTER CONFIG_LV_FS_WIN32_LETTER
         #else
-            #define LV_FS_WIN32_LETTER 'A'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+            #define LV_FS_WIN32_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
         #endif
     #endif
     #ifndef LV_FS_WIN32_PATH
@@ -2994,7 +2987,7 @@
     #ifdef CONFIG_LV_USE_WINDOWS
         #define LV_USE_WINDOWS CONFIG_LV_USE_WINDOWS
     #else
-        #define LV_USE_WINDOWS  _MSC_VER ? 1 : 0  
+        #define LV_USE_WINDOWS    0
     #endif
 #endif
 
