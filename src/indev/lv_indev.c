@@ -693,7 +693,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     indev_obj_act = lv_group_get_focused(g);
     if(indev_obj_act == NULL) return;
 
-    bool dis = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+    const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
     /*Save the last key to compare it with the current latter on RELEASE*/
     uint32_t prev_key = i->keypad.last_key;
@@ -725,7 +725,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             lv_group_focus_prev(g);
             if(indev_reset_check(i)) return;
         }
-        else if(!dis) {
+        else if(is_enabled) {
             /*Simulate a press on the object if ENTER was pressed*/
             if(data->key == LV_KEY_ENTER) {
                 /*Send the ENTER as a normal KEY*/
@@ -750,7 +750,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Pressing*/
-    else if(!dis && data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
+    else if(is_enabled && data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
 
         if(data->key == LV_KEY_ENTER) {
             if(send_event(LV_EVENT_PRESSING, indev_act) == LV_RESULT_INVALID) return;
@@ -795,7 +795,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Release happened*/
-    else if(!dis && data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
+    else if(is_enabled && data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
         LV_LOG_INFO("%" LV_PRIu32 " key is released", data->key);
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
@@ -849,7 +849,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         data->enc_diff = 0;
     }
 
-    const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+    const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
     /*Button press happened*/
     if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_RELEASED) {
@@ -862,7 +862,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                                           lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
             if(lv_group_get_editing(g) == true || editable_or_scrollable == false) {
 
-                if(!is_disabled) {
+                if(is_enabled) {
                     if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
                 }
             }
@@ -880,7 +880,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             lv_group_send_data(g, LV_KEY_ESC);
             if(indev_reset_check(i)) return;
 
-            if(!is_disabled) {
+            if(is_enabled) {
                 if(send_event(LV_EVENT_CANCEL, indev_act) == LV_RESULT_INVALID) return;
             }
         }
@@ -913,7 +913,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 }
                 /*If not editable then just send a long press event*/
                 else {
-                    if(!is_disabled) {
+                    if(is_enabled) {
                         if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
                     }
                 }
@@ -927,7 +927,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->longpr_rep_timestamp = lv_tick_get();
 
             if(data->key == LV_KEY_ENTER) {
-                if(!is_disabled) {
+                if(is_enabled) {
                     if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
                 }
             }
@@ -957,15 +957,15 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             /*The button was released on a non-editable object. Just send enter*/
             if(editable_or_scrollable == false) {
-                if(!is_disabled) {
+                if(is_enabled) {
                     if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
                 }
 
-                if(i->long_pr_sent == 0 && !is_disabled) {
+                if(i->long_pr_sent == 0 && is_enabled) {
                     if(send_event(LV_EVENT_SHORT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
                 }
 
-                if(!is_disabled) {
+                if(is_enabled) {
                     if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
                 }
 
@@ -974,7 +974,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             else if(lv_group_get_editing(g)) {
                 /*Ignore long pressed enter release because it comes from mode switch*/
                 if(!i->long_pr_sent || lv_group_get_obj_count(g) <= 1) {
-                    if(!is_disabled) {
+                    if(is_enabled) {
                         if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
                         if(send_event(LV_EVENT_SHORT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
                         if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
@@ -1164,8 +1164,8 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.vect.x         = 0;
             indev->pointer.vect.y         = 0;
 
-            const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-            if(!is_disabled) {
+            const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+            if(is_enabled) {
                 if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
             }
 
@@ -1188,9 +1188,9 @@ static void indev_proc_press(lv_indev_t * indev)
     indev->pointer.scroll_throw_vect_ori = indev->pointer.scroll_throw_vect;
 
     if(indev_obj_act) {
-        const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+        const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
-        if(!is_disabled) {
+        if(is_enabled) {
             if(send_event(LV_EVENT_PRESSING, indev_act) == LV_RESULT_INVALID) return;
         }
 
@@ -1209,7 +1209,7 @@ static void indev_proc_press(lv_indev_t * indev)
         if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 0) {
             /*Send a long press event if enough time elapsed*/
             if(lv_tick_elaps(indev->pr_timestamp) > indev_act->long_press_time) {
-                if(!is_disabled) {
+                if(is_enabled) {
                     if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
                 }
                 /*Mark it to do not send the event again*/
@@ -1222,7 +1222,7 @@ static void indev_proc_press(lv_indev_t * indev)
 
         if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 1) {
             if(lv_tick_elaps(indev->longpr_rep_timestamp) > indev_act->long_press_repeat_time) {
-                if(!is_disabled) {
+                if(is_enabled) {
                     if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
                 }
                 indev->longpr_rep_timestamp = lv_tick_get();
@@ -1257,13 +1257,13 @@ static void indev_proc_release(lv_indev_t * indev)
     if(indev_obj_act) {
         LV_LOG_INFO("released");
 
-        const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+        const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
-        if(!is_disabled) {
+        if(is_enabled) {
             if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
         }
 
-        if(!is_disabled) {
+        if(is_enabled) {
             if(scroll_obj == NULL) {
                 if(indev->long_pr_sent == 0) {
                     if(send_event(LV_EVENT_SHORT_CLICKED, indev_act) == LV_RESULT_INVALID) return;

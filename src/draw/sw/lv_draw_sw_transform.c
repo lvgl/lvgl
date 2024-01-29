@@ -384,10 +384,7 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
             ys_fract = ys_fract - 0x80;
         }
 
-        const lv_color32_t * src_c32 = (const lv_color32_t *)src;
-        src_c32 += (ys_int * src_stride) + xs_int;
-
-        src_c32 = (const lv_color32_t *)(src + ys_int * src_stride + xs_int * 4);
+        const lv_color32_t * src_c32 = (const lv_color32_t *)(src + ys_int * src_stride + xs_int * 4);
 
         dest_c32[x] = src_c32[0];
 

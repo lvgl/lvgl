@@ -30,8 +30,8 @@
  *  STATIC PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
-                                                 lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
+static void /* LV_ATTRIBUTE_FAST_MEM */ draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+                                                       lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
 
 /**********************
  *  STATIC VARIABLES
@@ -62,7 +62,7 @@ void lv_draw_sw_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * ds
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                                  lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
     if(glyph_draw_dsc) {

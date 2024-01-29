@@ -23,7 +23,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_label_class
+#define MY_CLASS (&lv_label_class)
 
 #define LV_LABEL_DEF_SCROLL_SPEED   lv_anim_speed_clamped(40, 300, 10000)
 #define LV_LABEL_SCROLL_DELAY       300

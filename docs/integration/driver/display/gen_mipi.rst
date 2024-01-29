@@ -142,7 +142,7 @@ Example
 		lv_color_t * buf1 = NULL;
 		lv_color_t * buf2 = NULL;
 
-		uint32_t buf_size = LCD_H_RES * LCD_BUF_LINES * lv_color_format_get_size(lv_disp_get_color_format(my_disp));
+		uint32_t buf_size = LCD_H_RES * LCD_BUF_LINES * lv_color_format_get_size(lv_display_get_color_format(my_disp));
 
 		buf1 = lv_malloc(buf_size);
 		if(buf1 == NULL) {

@@ -79,6 +79,8 @@
 #define LV_USE_LZ4              1
 #define LV_USE_LZ4_INTERNAL     1
 #define LV_USE_VECTOR_GRAPHIC   1
+#define LV_USE_PROFILER         1
+#define LV_PROFILER_INCLUDE     "lv_profiler_builtin.h"
 
 #define LV_BUILD_EXAMPLES       1
 #define LV_USE_DEMO_WIDGETS     1
@@ -104,6 +106,8 @@
 #define LV_USE_ST7735       1
 #define LV_USE_ST7789       1
 #define LV_USE_ST7796       1
+#define LV_USE_LIBINPUT     1
+#define LV_LIBINPUT_XKB     1
 
 #define LV_USE_FREETYPE 1
 #define LV_FREETYPE_CACHE_SIZE 768

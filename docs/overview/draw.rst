@@ -77,7 +77,7 @@ display under the rest of the button too.
 The difference between buffering modes regarding the drawing mechanism
 is the following:
 
-1. **One buffer** - LVGL needs to wait for :cpp:func:`lv_disp_flush_ready` (called from ``flush_cb``) before starting to redraw the next part.
+1. **One buffer** - LVGL needs to wait for :cpp:func:`lv_display_flush_ready` (called from ``flush_cb``) before starting to redraw the next part.
 2. **Two buffers** - LVGL can immediately draw to the second buffer when the first is sent to ``flush_cb`` because the
    flushing should be done by DMA (or similar hardware) in the background.
 3. **Double buffering** - ``flush_cb`` should only swap the addresses of the frame buffers.

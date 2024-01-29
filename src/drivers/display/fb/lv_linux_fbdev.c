@@ -59,6 +59,7 @@ typedef struct {
     char * fbp;
     long int screensize;
     int fbfd;
+    bool force_refresh;
 } lv_linux_fb_t;
 
 /**********************
@@ -92,8 +93,8 @@ lv_display_t * lv_linux_fbdev_create(void)
 {
     static bool inited = false;
     if(!inited) {
-        lv_tick_set_cb(tick_get_cb),
-                       inited = true;
+        lv_tick_set_cb(tick_get_cb);
+        inited = true;
     }
 
     lv_linux_fb_t * dsc = lv_malloc_zeroed(sizeof(lv_linux_fb_t));
@@ -230,12 +231,18 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
     lv_display_set_resolution(disp, hor_res, ver_res);
 
-    if(width) {
+    if(width > 0) {
         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));
     }
 
     LV_LOG_INFO("Resolution is set to %" LV_PRId32 "x%" LV_PRId32 " at %" LV_PRId32 "dpi",
                 hor_res, ver_res, lv_display_get_dpi(disp));
+}
+
+void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
+{
+    lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
+    dsc->force_refresh = enabled;
 }
 
 /**********************
@@ -272,6 +279,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
             lv_memcpy(&fbp[fb_pos], color_p, w * px_size);
             fb_pos += dsc->finfo.line_length;
             color_p += w * px_size;
+        }
+    }
+
+    if(dsc->force_refresh) {
+        dsc->vinfo.activate |= FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
+        if(ioctl(dsc->fbfd, FBIOPUT_VSCREENINFO, &(dsc->vinfo)) == -1) {
+            perror("Error setting var screen info");
         }
     }
 

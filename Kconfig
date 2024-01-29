@@ -1489,6 +1489,20 @@ menu "LVGL configuration"
 			bool "Use evdev input driver"
 			default n
 
+		config LV_USE_LIBINPUT
+    		bool "Use libinput input driver"
+			default n
+
+		config LV_LIBINPUT_BSD
+			bool "Use the BSD variant of the libinput input driver"
+			depends on LV_USE_LIBINPUT
+			default n
+
+		config LV_LIBINPUT_XKB
+			bool "Enable full keyboard support via XKB"
+			depends on LV_USE_LIBINPUT
+			default n
+
 		config LV_USE_ST7735
 			bool "Use ST7735 LCD driver"
 			default n
@@ -1519,10 +1533,6 @@ menu "LVGL configuration"
 	menu "Demos"
 		config LV_USE_DEMO_WIDGETS
 			bool "Show some widget"
-			default n
-		config LV_DEMO_WIDGETS_SLIDESHOW
-			bool "Enable slide show"
-			depends on LV_USE_DEMO_WIDGETS
 			default n
 
 		config LV_USE_DEMO_KEYPAD_AND_ENCODER

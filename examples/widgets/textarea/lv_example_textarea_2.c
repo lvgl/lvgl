@@ -39,6 +39,14 @@ void lv_example_textarea_2(void)
     lv_obj_set_size(kb,  LV_HOR_RES, LV_VER_RES / 2);
 
     lv_keyboard_set_textarea(kb, pwd_ta); /*Focus it on one of the text areas to start*/
+
+    /*The keyboard will show Arabic characters if they are enabled */
+#if LV_USE_ARABIC_PERSIAN_CHARS && LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+    lv_obj_set_style_text_font(kb, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_set_style_text_font(text_ta, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_set_style_text_font(pwd_ta, &lv_font_dejavu_16_persian_hebrew, 0);
+#endif
+
 }
 
 static void ta_event_cb(lv_event_t * e)

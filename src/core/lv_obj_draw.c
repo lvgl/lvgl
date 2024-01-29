@@ -15,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj_class
+#define MY_CLASS (&lv_obj_class)
 
 /**********************
  *      TYPEDEFS
@@ -291,8 +291,6 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
     int32_t s_old = _lv_obj_get_ext_draw_size(obj);
     int32_t s_new = 0;
     lv_obj_send_event(obj, LV_EVENT_REFR_EXT_DRAW_SIZE, &s_new);
-
-    if(s_new != s_old) lv_obj_invalidate(obj);
 
     /*Store the result if the special attrs already allocated*/
     if(obj->spec_attr) {

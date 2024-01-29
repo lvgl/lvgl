@@ -38,11 +38,13 @@ extern "C" {
 typedef struct {
     lv_subject_t subject;
     lv_timer_t * timer;
+    bool inited;
 } lv_sysmon_backend_data_t;
 
 #if LV_USE_PERF_MONITOR
 typedef struct {
     struct {
+        bool inited;
         uint32_t refr_start;
         uint32_t refr_interval_sum;
         uint32_t refr_elaps_sum;

@@ -61,12 +61,17 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_label_dsc_t);
 }
 
+lv_draw_label_dsc_t * lv_draw_task_get_label_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_LABEL ? (lv_draw_label_dsc_t *)task->draw_dsc : NULL;
+}
+
 void lv_draw_glyph_dsc_init(lv_draw_glyph_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_glyph_dsc_t));
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
+void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
                                          const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -93,7 +98,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label
     LV_PROFILER_END;
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_character(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
+void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
                                              const lv_point_t * point, uint32_t unicode_letter)
 {
     if(dsc->opa <= LV_OPA_MIN) return;

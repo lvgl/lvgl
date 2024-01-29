@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.0.0
+ * Configuration file for v9.0.1-dev
  */
 
 /*
@@ -889,6 +889,20 @@
 /*Driver for evdev input devices*/
 #define LV_USE_EVDEV    0
 
+/*Driver for libinput input devices*/
+#define LV_USE_LIBINPUT    0
+
+#if LV_USE_LIBINPUT
+    #define LV_LIBINPUT_BSD    0
+
+    /*Full keyboard support*/
+    #define LV_LIBINPUT_XKB             0
+    #if LV_LIBINPUT_XKB
+        /*"setxkbmap -query" can help find the right values for your keyboard*/
+        #define LV_LIBINPUT_XKB_KEY_MAP { .rules = NULL, .model = "pc101", .layout = "us", .variant = NULL, .options = NULL }
+    #endif
+#endif
+
 /*Drivers for LCD devices connected via SPI/parallel port*/
 #define LV_USE_ST7735		0
 #define LV_USE_ST7789		0
@@ -913,9 +927,6 @@
 
 /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #define LV_USE_DEMO_WIDGETS 0
-#if LV_USE_DEMO_WIDGETS
-    #define LV_DEMO_WIDGETS_SLIDESHOW 0
-#endif
 
 /*Demonstrate the usage of encoder and keyboard*/
 #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0

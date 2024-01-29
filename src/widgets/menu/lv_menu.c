@@ -13,7 +13,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_menu_class
+#define MY_CLASS (&lv_menu_class)
 
 #include "../../core/lv_obj.h"
 #include "../../layouts/lv_layout.h"

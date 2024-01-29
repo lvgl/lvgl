@@ -46,7 +46,7 @@ typedef struct _lv_color_filter_dsc_t {
  * @param mix The ratio of the colors. 0: full `c2`, 255: full `c1`, 127: half `c1` and half`c2`
  * @return the mixed color
  */
-LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
+static inline lv_color_t LV_ATTRIBUTE_FAST_MEM lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
 

@@ -27,7 +27,6 @@ extern "C" {
 #include "../misc/lv_color_op.h"
 #include "../misc/lv_ll.h"
 #include "../misc/lv_log.h"
-#include "../misc/lv_profiler_builtin.h"
 #include "../misc/lv_style.h"
 #include "../misc/lv_timer.h"
 #include "../others/sysmon/lv_sysmon.h"
@@ -55,6 +54,10 @@ struct _snippet_stack;
 
 #if LV_USE_FREETYPE
 struct _lv_freetype_context_t;
+#endif
+
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+struct _lv_profiler_builtin_ctx_t;
 #endif
 
 typedef struct _lv_global_t {
@@ -170,7 +173,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
-    lv_profiler_builtin_ctx_t profiler_context;
+    struct _lv_profiler_builtin_ctx_t * profiler_context;
 #endif
 
 #if LV_USE_FILE_EXPLORER != 0

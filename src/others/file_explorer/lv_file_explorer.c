@@ -14,7 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_file_explorer_class
+#define MY_CLASS (&lv_file_explorer_class)
 
 #define FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH       (22)
 #define FILE_EXPLORER_BROWSER_AREA_WIDTH            (100 - FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH)

@@ -14,7 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS    &lv_gif_class
+#define MY_CLASS (&lv_gif_class)
 
 /**********************
  *      TYPEDEFS

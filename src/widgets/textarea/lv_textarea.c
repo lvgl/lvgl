@@ -23,7 +23,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_textarea_class
+#define MY_CLASS (&lv_textarea_class)
 
 /*Test configuration*/
 #ifndef LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
@@ -116,14 +116,25 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 
     const char * letter_buf = (char *)&u32_buf;
 
+    uint32_t c2 = c;
 #if LV_BIG_ENDIAN_SYSTEM
     if(c != 0) while(*letter_buf == 0) ++letter_buf;
+
+    /*The byte order may or may not need to be swapped here to get correct c_uni below,
+      since lv_textarea_add_text is ordering bytes correctly before calling lv_textarea_add_char.
+      Assume swapping is needed if MSB is zero. May not be foolproof. */
+    if((c != 0) && ((c & 0xff000000) == 0)) {
+        c2 = ((c >> 24) & 0xff) | /*move byte 3 to byte 0*/
+             ((c << 8) & 0xff0000) | /*move byte 1 to byte 2*/
+             ((c >> 8) & 0xff00) | /*move byte 2 to byte 1*/
+             ((c << 24) & 0xff000000); /*byte 0 to byte 3*/
+    }
 #endif
 
     lv_result_t res = insert_handler(obj, letter_buf);
     if(res != LV_RESULT_OK) return;
 
-    uint32_t c_uni = _lv_text_encoded_next((const char *)&c, NULL);
+    uint32_t c_uni = _lv_text_encoded_next((const char *)&c2, NULL);
 
     if(char_is_accepted(obj, c_uni) == false) {
         LV_LOG_INFO("Character is not accepted by the text area (too long text or not in the accepted list)");

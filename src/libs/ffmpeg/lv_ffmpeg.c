@@ -29,7 +29,7 @@
     #error Unsupported  LV_COLOR_DEPTH
 #endif
 
-#define MY_CLASS &lv_ffmpeg_player_class
+#define MY_CLASS (&lv_ffmpeg_player_class)
 
 #define FRAME_DEF_REFR_PERIOD   33  /*[ms]*/
 

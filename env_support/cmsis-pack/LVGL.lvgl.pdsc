@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-01-22" version="9.0.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
+    <release date="2024-01-25" version="9.0.1-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.1-dev1.pack">
+      - LVGL 9.0.1-dev
+      - Minor fixes
+    </release>
+    <release date="2024-01-24" version="9.0.0" url="https://github.com/lvgl/lvgl/raw/b255eeabf00fa2316084e308e596e7ecabbaff4d/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
       - LVGL 9.0.0
       - Implements a New Render Architecture that enables parallel processing
       - Accelerates SW-Render with NEON and Helium technology for Cortex architectures. 
@@ -45,6 +49,7 @@
       - Adds Demos for benchmarks, render test etc,
       - Other fixes
     </release>
+    
     <release date="2023-12-05" version="8.3.11" url="https://github.com/lvgl/lvgl/raw/8194d83226c27c84f12dd51e16f5add9939215a5/env_support/cmsis-pack/LVGL.lvgl.8.3.11.pack">
       - LVGL 8.3.11
       - Add LittleFS Library to LVGL8
@@ -270,6 +275,12 @@
             <require condition="LVGL-Essential"/>
             <require Cclass="LVGL" Cgroup="Demos" Csub="Assets" />
         </condition>
+        
+        <condition id="Demo-Benchmark">
+            <description>Dependency of Benchmark</description>
+            <require condition="LVGL-Essential-Assets"/>
+            <require Cclass="LVGL" Cgroup="Demos" Csub="Widgets" />
+        </condition>
 
         <condition id="Arm-2D">
             <description>Require Arm-2D Support</description>
@@ -380,7 +391,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.0.0">
+        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.0.1-dev">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="Essential">
@@ -1692,7 +1703,7 @@
 
             </component>
 
-            <component Cgroup="Demos" Csub="Benchmark"  condition="LVGL-Essential-Assets">
+            <component Cgroup="Demos" Csub="Benchmark"  condition="Demo-Benchmark">
               <description>Add the official benchmark.</description>
               <files>
                 <!-- demos/benchmark -->

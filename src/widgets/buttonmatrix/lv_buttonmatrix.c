@@ -21,7 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_buttonmatrix_class
+#define MY_CLASS (&lv_buttonmatrix_class)
 
 #define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI_DEF / 10)
 #define LV_BUTTONMATRIX_WIDTH_MASK 0x000F

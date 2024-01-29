@@ -23,18 +23,26 @@ void lv_example_keyboard_1(void)
     lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
 
     /*Create a text area. The keyboard will write here*/
-    lv_obj_t * ta;
-    ta = lv_textarea_create(lv_screen_active());
-    lv_obj_align(ta, LV_ALIGN_TOP_LEFT, 10, 10);
-    lv_obj_add_event_cb(ta, ta_event_cb, LV_EVENT_ALL, kb);
-    lv_textarea_set_placeholder_text(ta, "Hello");
-    lv_obj_set_size(ta, 140, 80);
+    lv_obj_t * ta1;
+    ta1 = lv_textarea_create(lv_screen_active());
+    lv_obj_align(ta1, LV_ALIGN_TOP_LEFT, 10, 10);
+    lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_textarea_set_placeholder_text(ta1, "Hello");
+    lv_obj_set_size(ta1, 140, 80);
 
-    ta = lv_textarea_create(lv_screen_active());
-    lv_obj_align(ta, LV_ALIGN_TOP_RIGHT, -10, 10);
-    lv_obj_add_event_cb(ta, ta_event_cb, LV_EVENT_ALL, kb);
-    lv_obj_set_size(ta, 140, 80);
+    lv_obj_t * ta2;
+    ta2 = lv_textarea_create(lv_screen_active());
+    lv_obj_align(ta2, LV_ALIGN_TOP_RIGHT, -10, 10);
+    lv_obj_add_event_cb(ta2, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_set_size(ta2, 140, 80);
 
-    lv_keyboard_set_textarea(kb, ta);
+    lv_keyboard_set_textarea(kb, ta1);
+
+    /*The keyboard will show Arabic characters if they are enabled */
+#if LV_USE_ARABIC_PERSIAN_CHARS && LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+    lv_obj_set_style_text_font(kb, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_set_style_text_font(ta1, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_set_style_text_font(ta2, &lv_font_dejavu_16_persian_hebrew, 0);
+#endif
 }
 #endif

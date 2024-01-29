@@ -15,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS    &lv_ime_pinyin_class
+#define MY_CLASS (&lv_ime_pinyin_class)
 #define cand_len LV_GLOBAL_DEFAULT()->ime_cand_len
 
 /**********************

@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.0.0
+ * Configuration file for v9.0.1-dev
  */
 
 /* clang-format off */
@@ -165,6 +165,9 @@
 
 /* Enable VG-Lite assert. */
 #define LV_VG_LITE_USE_ASSERT 0
+
+/* VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
+#define LV_VG_LITE_FLUSH_MAX_COUNT 8
 
 #endif
 
@@ -816,11 +819,6 @@
 /*===================
  * DEMO USAGE
  ====================*/
-
-/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
-#if LV_USE_DEMO_WIDGETS
-    #define LV_DEMO_WIDGETS_SLIDESHOW 0
-#endif
 
 /*Music player demo*/
 #if LV_USE_DEMO_MUSIC

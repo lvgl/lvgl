@@ -35,17 +35,17 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void * lv_memcpy(void * dst, const void * src, size_t len)
+void * LV_ATTRIBUTE_FAST_MEM lv_memcpy(void * dst, const void * src, size_t len)
 {
     return memcpy(dst, src, len);
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
+void LV_ATTRIBUTE_FAST_MEM lv_memset(void * dst, uint8_t v, size_t len)
 {
     memset(dst, v, len);
 }
 
-LV_ATTRIBUTE_FAST_MEM void * lv_memmove(void * dst, const void * src, size_t len)
+void * LV_ATTRIBUTE_FAST_MEM lv_memmove(void * dst, const void * src, size_t len)
 {
     return memmove(dst, src, len);
 }

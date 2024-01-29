@@ -57,7 +57,7 @@ Interrupts
 ----------
 
 Try to avoid calling LVGL functions from interrupt handlers (except
-:cpp:func:`lv_tick_inc` and :cpp:func:`lv_disp_flush_ready`). But if you need to do
+:cpp:func:`lv_tick_inc` and :cpp:func:`lv_display_flush_ready`). But if you need to do
 this you have to disable the interrupt which uses LVGL functions while
 :cpp:func:`lv_timer_handler` is running.
 

@@ -83,6 +83,18 @@ void lv_draw_vg_lite_deinit(void)
  *   STATIC FUNCTIONS
  **********************/
 
+static bool check_image_is_supported(const lv_draw_image_dsc_t * dsc)
+{
+    lv_image_header_t header;
+    lv_result_t res = lv_image_decoder_get_info(dsc->src, &header);
+    if(res != LV_RESULT_OK) {
+        LV_LOG_TRACE("get image info failed");
+        return false;
+    }
+
+    return lv_vg_lite_is_src_cf_supported(header.cf);
+}
+
 static void draw_execute(lv_draw_vg_lite_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
@@ -91,6 +103,9 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
     lv_layer_t * layer = u->base_unit.target_layer;
 
     lv_vg_lite_buffer_from_draw_buf(&u->target_buffer, layer->draw_buf);
+
+    /* VG-Lite will output premultiplied image, set the flag correspondingly. */
+    lv_draw_buf_set_flag(layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
 
     vg_lite_identity(&u->global_matrix);
     vg_lite_translate(-layer->buf_area.x1, -layer->buf_area.y1, &u->global_matrix);
@@ -191,23 +206,33 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         case LV_DRAW_TASK_TYPE_FILL:
         case LV_DRAW_TASK_TYPE_BORDER:
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-        case LV_DRAW_TASK_TYPE_IMAGE:
         case LV_DRAW_TASK_TYPE_LAYER:
         case LV_DRAW_TASK_TYPE_LINE:
         case LV_DRAW_TASK_TYPE_ARC:
         case LV_DRAW_TASK_TYPE_TRIANGLE:
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
-            // case LV_DRAW_TASK_TYPE_MASK_BITMAP:
+
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
 #endif
-            task->preference_score = 80;
-            task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
-            return 1;
-        default:
             break;
+
+        case LV_DRAW_TASK_TYPE_IMAGE: {
+                if(!check_image_is_supported(task->draw_dsc)) {
+                    return 0;
+                }
+            }
+            break;
+
+        default:
+            /*The draw unit is not able to draw this task. */
+            return 0;
     }
-    return 0;
+
+    /* The draw unit is able to draw this task. */
+    task->preference_score = 80;
+    task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+    return 1;
 }
 
 static int32_t draw_delete(lv_draw_unit_t * draw_unit)

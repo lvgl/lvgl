@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS    &lv_keyboard_class
+#define MY_CLASS (&lv_keyboard_class)
 #define LV_KB_BTN(width) LV_BUTTONMATRIX_CTRL_POPOVER | width
 
 /**********************
@@ -90,6 +90,7 @@ static const lv_buttonmatrix_ctrl_t default_kb_ctrl_uc_map[] = {
 #endif
     LV_BUTTONMATRIX_CTRL_CHECKED | 2, 6, LV_BUTTONMATRIX_CTRL_CHECKED | 2, LV_KEYBOARD_CTRL_BUTTON_FLAGS | 2
 };
+
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
 static const char * const default_kb_map_ar[] = {
     "1#", "ض", "ص", "ث", "ق", "ف", "غ", "ع", "ه", "خ", "ح", "ج", "\n",
