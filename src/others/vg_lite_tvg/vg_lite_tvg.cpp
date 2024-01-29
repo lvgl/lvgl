@@ -1640,34 +1640,20 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
-        vg_lite_matrix_t inverse_matrix = { 0 };
-        lv_vg_lite_matrix_inverse(&inverse_matrix, matrix);
-        lv_vg_lite_matrix_multiply(&inverse_matrix, &grad->matrix);
-        LV_LOG_WARN(".");
+        vg_lite_matrix_t grad_matrix = { 0 };
+        lv_vg_lite_matrix_inverse(&grad_matrix, matrix);
+        lv_vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
 
-        float angle = (inverse_matrix.angle / 180.0f) * 3.141592654f;;
-        float scale = inverse_matrix.scaleX;
+        float angle = (grad_matrix.angle / 180.0f) * 3.141592654f;;
+        float scale = grad_matrix.scaleX;
         float dlen = 256 * scale;
-        float x_min = inverse_matrix.m[0][2];
-        float y_min = inverse_matrix.m[1][2];
+        float x_min = grad_matrix.m[0][2];
+        float y_min = grad_matrix.m[1][2];
         float x_max = x_min + dlen * cosf(angle);
         float y_max = y_min + dlen * sinf(angle);
+
         auto linearGrad = LinearGradient::gen();
         linearGrad->linear(x_min, y_min, x_max, y_max);
-        LV_LOG_WARN("path coords {%.2f, %.2f}, {%.2f, %.2f}", path->bounding_box[0], path->bounding_box[1], path->bounding_box[2], path->bounding_box[3]);
-        LV_LOG_WARN("coords {%.2f, %.2f}, {%.2f, %.2f}", x_min, y_min, x_max, y_max);
-        LV_LOG_WARN("angle %.2f, scale %.2f dlen %.2f", inverse_matrix.angle, scale, dlen);
-
-        // if(matrix->m[0][1] != 0) {
-        //     /* vertical */
-        //     linearGrad->linear(x_min, y_min, x_min, y_max);
-        // }
-        // else {
-        //     /* horizontal */
-        //     linearGrad->linear(x_min, y_min, x_max, y_min);
-        // }
-
-        // linearGrad->transform(matrix_conv(matrix));
         linearGrad->spread(FillSpread::Pad);
 
         tvg::Fill::ColorStop colorStops[VLC_MAX_GRADIENT_STOPS];

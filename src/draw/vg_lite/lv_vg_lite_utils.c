@@ -913,17 +913,6 @@ bool lv_vg_lite_16px_align(void)
     return vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN);
 }
 
-static void print_matrix(vg_lite_matrix_t* matrix)
-{
-    return;
-    LV_LOG_WARN("matrix is : ");
-    // for (uint8_t i = 0; i < 3; i++)
-    // {
-    //     LV_LOG_WARN("%.2f %.2f %.2f", matrix->m[i][0], matrix->m[i][1],matrix->m[i][2]);
-    // }
-    LV_LOG_WARN("start {%.2f, %.2f} scale {%.2f, %.2f} angle %.2f", matrix->m[0][2], matrix->m[1][2], matrix->scaleX, matrix->scaleY, matrix->angle);
-}
-
 void lv_vg_lite_draw_linear_grad(
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
@@ -971,20 +960,32 @@ void lv_vg_lite_draw_linear_grad(
     vg_lite_matrix_t * grad_matrix = vg_lite_get_grad_matrix(&gradient);
     vg_lite_identity(grad_matrix);
     lv_memcpy(grad_matrix, matrix, sizeof(vg_lite_matrix_t));
-    // vg_lite_translate(area->x1, area->y1, grad_matrix);
-    print_matrix(grad_matrix);
-    vg_lite_translate(grad->grad_area.x1, grad->grad_area.y1, grad_matrix);
-    print_matrix(grad_matrix);
-    int32_t dx = grad->grad_area.x2 - grad->grad_area.x1;
-    int32_t dy = grad->grad_area.y2 - grad->grad_area.y1;
+    lv_area_t grad_area = grad->grad_area;
+    float x_min = path->bounding_box[0];
+    float y_min = path->bounding_box[1];
+    float x_max = path->bounding_box[2];
+    float y_max = path->bounding_box[3];
+
+    if (grad->dir == LV_GRAD_DIR_VER) {
+        grad_area.x1 = x_min;
+        grad_area.y1 = y_min;
+        grad_area.x2 = x_min;
+        grad_area.y2 = y_max;
+    } else if (grad->dir == LV_GRAD_DIR_HOR) {
+        grad_area.x1 = x_min;
+        grad_area.y1 = y_min;
+        grad_area.x2 = x_max;
+        grad_area.y2 = y_min;
+    }
+
+    vg_lite_translate(grad_area.x1, grad_area.y1, grad_matrix);
+    int32_t dx = grad_area.x2 - grad_area.x1;
+    int32_t dy = grad_area.y2 - grad_area.y1;
     float grad_len = sqrtf(dx * dx + dy * dy);
     float scale = grad_len / 256.0f;
     float angle = atan2(dy, dx) * (180 / M_PI);
     vg_lite_rotate(angle, grad_matrix);
     vg_lite_scale(scale, scale, grad_matrix);
-    print_matrix(grad_matrix);
-    // LV_LOG_WARN("matrix :");
-    // print_matrix(matrix);
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(buffer);
     LV_VG_LITE_ASSERT_SRC_BUFFER(&gradient.image);
