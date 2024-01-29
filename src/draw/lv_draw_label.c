@@ -61,6 +61,11 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_label_dsc_t);
 }
 
+lv_draw_label_dsc_t * lv_draw_task_get_label_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_LABEL ? (lv_draw_label_dsc_t *)task->draw_dsc : NULL;
+}
+
 void lv_draw_glyph_dsc_init(lv_draw_glyph_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_glyph_dsc_t));

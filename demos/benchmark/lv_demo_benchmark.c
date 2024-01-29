@@ -517,24 +517,24 @@ static void table_draw_task_event_cb(lv_event_t * e)
 
     int32_t row = draw_dsc_base->id1;
     if(row == 0) {
-        if(t->type == LV_DRAW_TASK_TYPE_FILL) {
-            lv_draw_fill_dsc_t * draw_dsc_fill = t->draw_dsc;
+        lv_draw_fill_dsc_t * draw_dsc_fill = lv_draw_task_get_fill_dsc(t);
+        if(draw_dsc_fill) {
             draw_dsc_fill->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
         }
-        else if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
-            lv_draw_label_dsc_t * draw_dsc_label = t->draw_dsc;
+        lv_draw_label_dsc_t * draw_dsc_label = lv_draw_task_get_label_dsc(t);
+        if(draw_dsc_label) {
             draw_dsc_label->color = lv_color_white();
         }
     }
     else if(row == 1) {
-        if(t->type == LV_DRAW_TASK_TYPE_BORDER) {
-            lv_draw_border_dsc_t * draw_dsc_border = t->draw_dsc;
+        lv_draw_border_dsc_t * draw_dsc_border = lv_draw_task_get_border_dsc(t);
+        if(draw_dsc_border) {
             draw_dsc_border->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
             draw_dsc_border->width = 2;
             draw_dsc_border->side = LV_BORDER_SIDE_BOTTOM;
         }
-        else if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
-            lv_draw_label_dsc_t * draw_dsc_label = t->draw_dsc;
+        lv_draw_label_dsc_t * draw_dsc_label = lv_draw_task_get_label_dsc(t);
+        if(draw_dsc_label) {
             draw_dsc_label->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
         }
     }

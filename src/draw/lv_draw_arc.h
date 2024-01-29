@@ -51,6 +51,13 @@ typedef struct {
 void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc);
 
 /**
+ * Try to get an arc draw descriptor from a draw task.
+ * @param task      draw task
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_ARC
+ */
+lv_draw_arc_dsc_t * lv_draw_task_get_arc_dsc(lv_draw_task_t * task);
+
+/**
  * Create an arc draw task.
  * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized draw descriptor variable

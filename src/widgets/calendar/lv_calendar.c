@@ -300,16 +300,10 @@ static void draw_task_added_event_cb(lv_event_t * e)
     lv_draw_task_t * draw_task = lv_event_get_param(e);
     if(((lv_draw_dsc_base_t *)draw_task->draw_dsc)->part != LV_PART_ITEMS) return;
 
-    lv_draw_fill_dsc_t * fill_draw_dsc = NULL;
-    lv_draw_border_dsc_t * border_draw_dsc = NULL;
+    lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
+    lv_draw_border_dsc_t * border_draw_dsc = lv_draw_task_get_border_dsc(draw_task);
 
-    if(draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
-        fill_draw_dsc = draw_task->draw_dsc;
-    }
-    else if(draw_task->type == LV_DRAW_TASK_TYPE_BORDER) {
-        border_draw_dsc = draw_task->draw_dsc;
-    }
-    else {
+    if(!fill_draw_dsc && !border_draw_dsc) {
         return;
     }
 
