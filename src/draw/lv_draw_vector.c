@@ -80,9 +80,7 @@ static void _multiply_matrix(lv_matrix_t * matrix, const lv_matrix_t * mul)
         }
     }
 
-    // lv_memcpy(matrix, &tmp, sizeof(lv_matrix_t));
     lv_memcpy(matrix, &tmp, sizeof(float) * 9);
-
 }
 
 static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_t * src)
@@ -155,7 +153,8 @@ void lv_matrix_translate(lv_matrix_t * matrix, float dx, float dy)
             {1.0f, 0.0f, dx},
             {0.0f, 1.0f, dy},
             {0.0f, 0.0f, 1.0f},
-        }
+        },
+        0.0f, 0.0f, 0.0f,
     };
 
     _multiply_matrix(matrix, &tlm);
@@ -167,7 +166,8 @@ void lv_matrix_scale(lv_matrix_t * matrix, float scale_x, float scale_y)
             {scale_x, 0.0f, 0.0f},
             {0.0f, scale_y, 0.0f},
             {0.0f, 0.0f, 1.0f},
-        }
+        },
+        0.0f, 0.0f, 0.0f,
     };
 
     _multiply_matrix(matrix, &scm);
@@ -186,7 +186,8 @@ void lv_matrix_rotate(lv_matrix_t * matrix, float degree)
             {cos_r, -sin_r, 0.0f},
             {sin_r, cos_r, 0.0f},
             {0.0f, 0.0f, 1.0f},
-        }
+        },
+        0.0f, 0.0f, 0.0f,
     };
 
     _multiply_matrix(matrix, &rtm);
@@ -209,7 +210,8 @@ void lv_matrix_skew(lv_matrix_t * matrix, float skew_x, float skew_y)
             {1.0f, tan_x, 0.0f},
             {tan_y, 1.0f, 0.0f},
             {0.0f, 0.0f, 1.0f},
-        }
+        },
+        0.0f, 0.0f, 0.0f,
     };
 
     _multiply_matrix(matrix, &skm);

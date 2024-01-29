@@ -1607,33 +1607,6 @@ Empty_sequence_handler:
         auto ctx = vg_lite_ctx::get_instance();
         TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
 
-#if 0
-        //Shape2
-        auto shape2 = tvg::Shape::gen();
-        shape2->appendRect(10, 10, 200, 200);
-        shape2->translate(100, 100);
-        shape2->scale(2);
-
-        //LinearGradient
-        auto fill2 = tvg::LinearGradient::gen();
-        fill2->linear(10, 10, 400, 400);
-
-        //Gradient Color Stops
-        tvg::Fill::ColorStop colorStops2[2];
-        colorStops2[0] = {0, 255, 0, 0, 255};
-        colorStops2[1] = {1, 0, 255, 0, 255};
-
-        fill2->colorStops(colorStops2, 2);
-        shape2->fill(std::move(fill2));
-        TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape2)));
-
-        shape2 = tvg::Shape::gen();
-        shape2->appendRect(212, 10, 200, 200);
-        // shape2->scale(2);
-        shape2->fill(std::move(fill2));
-        TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape2)));
-        return VG_LITE_SUCCESS;
-#endif
         auto shape = Shape::gen();
         TVG_CHECK_RETURN_VG_ERROR(shape_append_path(shape, path, matrix));
         TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(matrix)));
