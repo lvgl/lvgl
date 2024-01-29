@@ -1640,7 +1640,7 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
-        vg_lite_matrix_t grad_matrix = { 0 };
+        vg_lite_matrix_t grad_matrix;
         vg_lite_identity(&grad_matrix);
         lv_vg_lite_matrix_inverse(&grad_matrix, matrix);
         lv_vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);

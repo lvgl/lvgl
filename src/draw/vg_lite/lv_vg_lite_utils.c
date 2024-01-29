@@ -984,7 +984,7 @@ void lv_vg_lite_draw_linear_grad(
     int32_t dy = grad_area.y2 - grad_area.y1;
     float grad_len = sqrtf(dx * dx + dy * dy);
     float scale = grad_len / 256.0f;
-    float angle = atan2f(dy, dx) * (180 / M_PI);
+    float angle = (float)(atan2f(dy, dx) * (180.0f / M_PI));
     vg_lite_rotate(angle, grad_matrix);
     vg_lite_scale(scale, scale, grad_matrix);
 
