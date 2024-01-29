@@ -104,8 +104,6 @@ class CompressMethod(Enum):
 
 class ColorFormat(Enum):
     UNKNOWN = 0x00
-    TRUECOLOR = 0x04
-    TRUECOLOR_ALPHA = 0x05
     L8 = 0x06
     I1 = 0x07
     I2 = 0x08
@@ -142,8 +140,6 @@ class ColorFormat(Enum):
             ColorFormat.RGB565: 16,
             ColorFormat.RGB565A8: 16,  # 16bpp + a8 map
             ColorFormat.RGB888: 24,
-            ColorFormat.TRUECOLOR: 32,
-            ColorFormat.TRUECOLOR_ALPHA: 32,
         }
 
         return cf_map[self]
@@ -179,16 +175,13 @@ class ColorFormat(Enum):
         return self.is_alpha_only or self in (
             ColorFormat.ARGB8888,
             ColorFormat.XRGB8888,  # const alpha: 0xff
-            ColorFormat.TRUECOLOR,  # const alpha: 0xff
-            ColorFormat.TRUECOLOR_ALPHA,
             ColorFormat.RGB565A8)
 
     @property
     def is_colormap(self) -> bool:
         return self in (ColorFormat.ARGB8888, ColorFormat.RGB888,
                         ColorFormat.XRGB8888, ColorFormat.RGB565A8,
-                        ColorFormat.RGB565, ColorFormat.TRUECOLOR_ALPHA,
-                        ColorFormat.TRUECOLOR)
+                        ColorFormat.RGB565)
 
     @property
     def is_luma_only(self) -> bool:
@@ -819,11 +812,11 @@ const lv_img_dsc_t {varname} = {{
 
     def _png_to_colormap(self, cf, filename: str):
 
-        if cf in (ColorFormat.ARGB8888, ColorFormat.TRUECOLOR_ALPHA):
+        if cf == ColorFormat.ARGB8888:
 
             def pack(r, g, b, a):
                 return uint32_t((a << 24) | (r << 16) | (g << 8) | (b << 0))
-        elif cf in (ColorFormat.XRGB8888, ColorFormat.TRUECOLOR):
+        elif cf == ColorFormat.XRGB8888:
 
             def pack(r, g, b, a):
                 r, g, b, a = color_pre_multiply(r, g, b, a, self.background)
@@ -1064,8 +1057,7 @@ def main():
         default="I8",
         choices=[
             "L8", "I1", "I2", "I4", "I8", "A1", "A2", "A4", "A8", "ARGB8888",
-            "XRGB8888", "RGB565", "RGB565A8", "RGB888", "TRUECOLOR",
-            "TRUECOLOR_ALPHA", "AUTO"
+            "XRGB8888", "RGB565", "RGB565A8", "RGB888", "AUTO"
         ])
 
     parser.add_argument('--compress',

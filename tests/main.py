@@ -145,7 +145,7 @@ def generate_code_coverage_report():
 
 
 def generate_test_images():
-    invalids = (ColorFormat.UNKNOWN, ColorFormat.TRUECOLOR, ColorFormat.TRUECOLOR_ALPHA)
+    invalids = (ColorFormat.UNKNOWN,)
     formats = [i for i in ColorFormat if i not in invalids]
     png_path = os.path.join(lvgl_test_dir, "test_images/pngs")
     pngs = list(Path(png_path).rglob("*.[pP][nN][gG]"))
