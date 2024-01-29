@@ -23,6 +23,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static void cache_drop_internal_no_lock(lv_cache_t * cache, const void * key, void * user_data);
+static bool cache_evict_one_internal_no_lock(lv_cache_t * cache, void * user_data);
+static lv_cache_entry_t * cache_add_internal_no_lock(lv_cache_t * cache, const void * key, void * user_data);
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -106,11 +108,12 @@ lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * use
     LV_ASSERT_NULL(key);
 
     lv_mutex_lock(&cache->lock);
-    lv_cache_entry_t * entry = cache->clz->add_cb(cache, key, user_data);
+    lv_cache_entry_t * entry = cache_add_internal_no_lock(cache, key, user_data);
     if(entry != NULL) {
         lv_cache_entry_acquire_data(entry);
     }
     lv_mutex_unlock(&cache->lock);
+
     return entry;
 }
 lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * key, void * user_data)
@@ -125,7 +128,7 @@ lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * k
         lv_mutex_unlock(&cache->lock);
         return entry;
     }
-    entry = cache->clz->add_cb(cache, key, user_data);
+    entry = cache_add_internal_no_lock(cache, key, user_data);
     if(entry == NULL) {
         lv_mutex_unlock(&cache->lock);
         return NULL;
@@ -142,6 +145,16 @@ lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * k
     lv_mutex_unlock(&cache->lock);
     return entry;
 }
+void lv_cache_reserve(lv_cache_t * cache, uint32_t reserved_size, void * user_data)
+{
+    LV_ASSERT_NULL(cache);
+
+    for(lv_cache_reserve_cond_res_t reserve_cond_res = cache->clz->reserve_cond_cb(cache, NULL, reserved_size, user_data);
+        reserve_cond_res == LV_CACHE_RESERVE_COND_NEED_VICTIM;
+        reserve_cond_res = cache->clz->reserve_cond_cb(cache, NULL, reserved_size, user_data))
+        cache_evict_one_internal_no_lock(cache, user_data);
+
+}
 void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data)
 {
     LV_ASSERT_NULL(cache);
@@ -150,6 +163,16 @@ void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data)
     lv_mutex_lock(&cache->lock);
     cache_drop_internal_no_lock(cache, key, user_data);
     lv_mutex_unlock(&cache->lock);
+}
+bool lv_cache_evict_one(lv_cache_t * cache, void * user_data)
+{
+    LV_ASSERT_NULL(cache);
+
+    lv_mutex_lock(&cache->lock);
+    bool res = cache_evict_one_internal_no_lock(cache, user_data);
+    lv_mutex_unlock(&cache->lock);
+
+    return res;
 }
 void lv_cache_drop_all(lv_cache_t * cache, void * user_data)
 {
@@ -195,9 +218,11 @@ void lv_cache_set_free_cb(lv_cache_t * cache, lv_cache_free_cb_t free_cb, void *
     LV_UNUSED(user_data);
     cache->ops.free_cb = free_cb;
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
 static void cache_drop_internal_no_lock(lv_cache_t * cache, const void * key, void * user_data)
 {
     lv_cache_entry_t * entry = cache->clz->get_cb(cache, key, user_data);
@@ -214,4 +239,36 @@ static void cache_drop_internal_no_lock(lv_cache_t * cache, const void * key, vo
         lv_cache_entry_set_invalid(entry, true);
         cache->clz->remove_cb(cache, entry, user_data);
     }
+}
+
+static bool cache_evict_one_internal_no_lock(lv_cache_t * cache, void * user_data)
+{
+    lv_cache_entry_t * victim = cache->clz->get_victim_cb(cache, user_data);
+
+    if(victim == NULL) {
+        LV_LOG_ERROR("No victim found");
+        return false;
+    }
+
+    cache->clz->remove_cb(cache, victim, user_data);
+    cache->ops.free_cb(lv_cache_entry_get_data(victim), user_data);
+    lv_cache_entry_delete(victim);
+    return true;
+}
+
+static lv_cache_entry_t * cache_add_internal_no_lock(lv_cache_t * cache, const void * key, void * user_data)
+{
+    lv_cache_reserve_cond_res_t reserve_cond_res = cache->clz->reserve_cond_cb(cache, key, 0, user_data);
+    if(reserve_cond_res == LV_CACHE_RESERVE_COND_TOO_LARGE) {
+        LV_LOG_ERROR("data %p is too large that exceeds max size (%" LV_PRIu32 ")", key, cache->max_size);
+    }
+
+    for(; reserve_cond_res == LV_CACHE_RESERVE_COND_NEED_VICTIM;
+        reserve_cond_res = cache->clz->reserve_cond_cb(cache, key, 0, user_data))
+        if(cache_evict_one_internal_no_lock(cache, user_data) == false)
+            return NULL;
+
+    lv_cache_entry_t * entry = cache->clz->add_cb(cache, key, user_data);
+
+    return entry;
 }
