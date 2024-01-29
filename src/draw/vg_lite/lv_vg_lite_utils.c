@@ -961,10 +961,10 @@ void lv_vg_lite_draw_linear_grad(
     vg_lite_identity(grad_matrix);
     lv_memcpy(grad_matrix, matrix, sizeof(vg_lite_matrix_t));
     lv_area_t grad_area = grad->grad_area;
-    float x_min = path->bounding_box[0];
-    float y_min = path->bounding_box[1];
-    float x_max = path->bounding_box[2];
-    float y_max = path->bounding_box[3];
+    int32_t x_min = (int32_t)(path->bounding_box[0]);
+    int32_t y_min = (int32_t)(path->bounding_box[1]);
+    int32_t x_max = (int32_t)(path->bounding_box[2]);
+    int32_t y_max = (int32_t)(path->bounding_box[3]);
 
     if(grad->dir == LV_GRAD_DIR_VER) {
         grad_area.x1 = x_min;
@@ -984,7 +984,7 @@ void lv_vg_lite_draw_linear_grad(
     int32_t dy = grad_area.y2 - grad_area.y1;
     float grad_len = sqrtf(dx * dx + dy * dy);
     float scale = grad_len / 256.0f;
-    float angle = atan2(dy, dx) * (180 / M_PI);
+    float angle = atan2f(dy, dx) * (180 / M_PI);
     vg_lite_rotate(angle, grad_matrix);
     vg_lite_scale(scale, scale, grad_matrix);
 
