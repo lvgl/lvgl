@@ -966,12 +966,13 @@ void lv_vg_lite_draw_linear_grad(
     float x_max = path->bounding_box[2];
     float y_max = path->bounding_box[3];
 
-    if (grad->dir == LV_GRAD_DIR_VER) {
+    if(grad->dir == LV_GRAD_DIR_VER) {
         grad_area.x1 = x_min;
         grad_area.y1 = y_min;
         grad_area.x2 = x_min;
         grad_area.y2 = y_max;
-    } else if (grad->dir == LV_GRAD_DIR_HOR) {
+    }
+    else if(grad->dir == LV_GRAD_DIR_HOR) {
         grad_area.x1 = x_min;
         grad_area.y1 = y_min;
         grad_area.x2 = x_max;
