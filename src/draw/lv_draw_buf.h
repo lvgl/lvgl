@@ -224,6 +224,16 @@ static inline bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags
     return draw_buf->header.flags & flag;
 }
 
+static inline void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    draw_buf->header.flags |= flag;
+}
+
+static inline void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    draw_buf->header.flags &= ~flag;
+}
+
 /**
  * As of now, draw buf share same definition as `lv_image_dsc_t`.
  * And is interchangeable with `lv_image_dsc_t`.
