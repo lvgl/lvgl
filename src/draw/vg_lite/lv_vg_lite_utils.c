@@ -965,6 +965,9 @@ void lv_vg_lite_draw_linear_grad(
                                blend));
     LV_PROFILER_END_TAG("vg_lite_draw_grad");
 
+    /* Wait for the GPU drawing to complete before releasing the image memory in the gradient. */
+    LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
+
     LV_VG_LITE_CHECK_ERROR(vg_lite_clear_grad(&gradient));
     LV_PROFILER_END;
 }
