@@ -182,8 +182,8 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_area_t area;
         lv_obj_get_coords(obj, &area);
-        int32_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
-        int32_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
+        lv_value_precise_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
+        lv_value_precise_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
 
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
