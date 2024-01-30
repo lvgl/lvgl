@@ -100,14 +100,14 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     float head_end_x = p1_x - w2_dx;
     float head_end_y = p1_y + w2_dy;
 
-    /* tali point */
-    float tali_start_x = p2_x - w2_dx;
-    float tali_start_y = p2_y + w2_dy;
-    float tali_end_x = p2_x + w2_dx;
-    float tali_end_y = p2_y - w2_dy;
+    /* tail point */
+    float tail_start_x = p2_x - w2_dx;
+    float tail_start_y = p2_y + w2_dy;
+    float tail_end_x = p2_x + w2_dx;
+    float tail_end_y = p2_y - w2_dy;
 
     /*
-          head_start        tali_end
+          head_start        tail_end
               *-----------------*
              /|                 |\
             / |                 | \
@@ -115,7 +115,7 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
             \ |                 | /
              \|                 |/
               *-----------------*
-          head_end          tali_start
+          head_end          tail_start
     */
 
     /* move to start point */
@@ -143,23 +143,23 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     }
 
     /* draw line body */
-    lv_vg_lite_path_line_to(path, tali_start_x, tali_start_y);
+    lv_vg_lite_path_line_to(path, tail_start_x, tail_start_y);
 
     /* draw line tail */
     if(dsc->round_end) {
         float arc_cx = p2_x + w2_dy;
         float arc_cy = p2_y + w2_dx;
         lv_vg_lite_path_append_arc_right_angle(path,
-                                               tali_start_x, tali_start_y,
+                                               tail_start_x, tail_start_y,
                                                p2_x, p2_y,
                                                arc_cx, arc_cy);
         lv_vg_lite_path_append_arc_right_angle(path,
                                                arc_cx, arc_cy,
                                                p2_x, p2_y,
-                                               tali_end_x, tali_end_y);
+                                               tail_end_x, tail_end_y);
     }
     else {
-        lv_vg_lite_path_line_to(path, tali_end_x, tali_end_y);
+        lv_vg_lite_path_line_to(path, tail_end_x, tail_end_y);
     }
 
     /* close draw line body */
