@@ -10,7 +10,7 @@ This project uses CMakePresets to ensure an easy build.  Find out more on Cmake 
 https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
 
 Prerequsites
----------
+----------
 You need to install
 
 - CMake
@@ -18,7 +18,7 @@ You need to install
 
 
 How to build this project using cmake
----------
+----------
 
 
 The recommended way to build this project is to use the provided CMakePresets.json. This file contains 2 configurations
@@ -29,7 +29,7 @@ The recommended way to build this project is to use the provided CMakePresets.js
 More configurations will be added once available.
 
 Build with IDE
-------
+----------
 
 The recommend way for consuming CMakePresets is a CMakePresets aware IDE such as
 
@@ -41,7 +41,7 @@ Simply load this project into your IDE and select your desired preset and you ar
 
 
 Build with CMake GUI
-------
+----------
 Open this project with CMake GUI and select your desired preset.
 When hitting the generate button, CMake will create solution files (for VS) or Ninja Files (for Linux Ninja Build)
 
@@ -63,7 +63,7 @@ If you use cmake to install lvgl 3 folders will be created.
 
 
 Build with Command line
-------
+----------
 
 You can also build your project using the command line.
 Run the follwoing commands
