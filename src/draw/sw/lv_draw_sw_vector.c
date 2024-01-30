@@ -189,19 +189,19 @@ static void _lv_gradient_to_tvg(Tvg_Paint * obj, Tvg_Gradient * gradient, const 
         lv_area_t grad_area = g->grad.grad_area;
         if(grad_area.x1 == 0 && grad_area.y1 == 0
            && grad_area.x2 == 0 && grad_area.y2 == 0) {
-            grad_area.x1 = x;
-            grad_area.y1 = y;
+            grad_area.x1 = (int32_t)x;
+            grad_area.y1 = (int32_t)y;
             if(g->grad.dir == LV_GRAD_DIR_VER) {
-                grad_area.x2 = x;
-                grad_area.y2 = y + h;
+                grad_area.x2 = (int32_t)x;
+                grad_area.y2 = (int32_t)(y + h);
             }
             else if(g->grad.dir == LV_GRAD_DIR_HOR) {
-                grad_area.x2 = x + w;
-                grad_area.y2 = h;
+                grad_area.x2 = (int32_t)(x + w);
+                grad_area.y2 = (int32_t)y;
             }
             else {
-                grad_area.x2 = x + w;
-                grad_area.y2 = y + h;
+                grad_area.x2 = (int32_t)(x + w);
+                grad_area.y2 = (int32_t)(y + h);
             }
         }
         tvg_linear_gradient_set(gradient, grad_area.x1, grad_area.y1, grad_area.x2, grad_area.y2);
