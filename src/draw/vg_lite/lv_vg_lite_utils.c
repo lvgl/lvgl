@@ -967,8 +967,8 @@ void lv_vg_lite_draw_linear_grad(
     int32_t y_max = (int32_t)(path->bounding_box[3]);
 
     /* Gradient area is {{0, 0}. {0, 0}}, which means the area is consistent with the path area. */
-    if (grad_area.x1 == 0 && grad_area.y1 == 0
-            && grad_area.x2 == 0 && grad_area.y2 == 0) {
+    if(grad_area.x1 == 0 && grad_area.y1 == 0
+       && grad_area.x2 == 0 && grad_area.y2 == 0) {
         grad_area.x1 = x_min;
         grad_area.y1 = y_min;
         if(grad->dir == LV_GRAD_DIR_VER) {
@@ -978,7 +978,8 @@ void lv_vg_lite_draw_linear_grad(
         else if(grad->dir == LV_GRAD_DIR_HOR) {
             grad_area.x2 = x_max;
             grad_area.y2 = y_min;
-        } else {
+        }
+        else {
             grad_area.x2 = x_max;
             grad_area.y2 = y_max;
         }

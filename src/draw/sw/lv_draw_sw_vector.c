@@ -182,12 +182,13 @@ static void _lv_gradient_to_tvg(Tvg_Paint * obj, Tvg_Gradient * gradient, const 
     float x, y, w, h;
     tvg_paint_get_bounds(obj, &x, &y, &w, &h, false);
 
-    if (g->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
+    if(g->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
         tvg_radial_gradient_set(gradient, g->cx + x, g->cy + y, g->cr);
-    } else {
+    }
+    else {
         lv_area_t grad_area = g->grad.grad_area;
-        if (grad_area.x1 == 0 && grad_area.y1 == 0
-                && grad_area.x2 == 0 && grad_area.y2 == 0) {
+        if(grad_area.x1 == 0 && grad_area.y1 == 0
+           && grad_area.x2 == 0 && grad_area.y2 == 0) {
             grad_area.x1 = x;
             grad_area.y1 = y;
             if(g->grad.dir == LV_GRAD_DIR_VER) {
@@ -197,7 +198,8 @@ static void _lv_gradient_to_tvg(Tvg_Paint * obj, Tvg_Gradient * gradient, const 
             else if(g->grad.dir == LV_GRAD_DIR_HOR) {
                 grad_area.x2 = x + w;
                 grad_area.y2 = h;
-            } else {
+            }
+            else {
                 grad_area.x2 = x + w;
                 grad_area.y2 = y + h;
             }
