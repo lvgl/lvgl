@@ -14,6 +14,7 @@
 #include <nuttx/tls.h>
 #include <syslog.h>
 #include "lv_nuttx_cache.h"
+#include "lv_nuttx_image_cache.h"
 #include "lv_nuttx_profiler.h"
 
 #include "../../../lvgl.h"
@@ -21,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-
+#define nuttx_ctx_p (LV_GLOBAL_DEFAULT()->nuttx_ctx)
 /**********************
  *      TYPEDEFS
  **********************/
@@ -92,12 +93,19 @@ void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc)
 
 void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 {
+    nuttx_ctx_p = lv_malloc_zeroed(sizeof(lv_nuttx_ctx_t));
+    LV_ASSERT_MALLOC(nuttx_ctx_p);
+
 #if LV_USE_LOG
     lv_log_register_print_cb(syslog_print);
 #endif
     lv_tick_set_cb(millis);
 
     lv_nuttx_cache_init();
+
+#if LV_CACHE_DEF_SIZE > 0
+    lv_nuttx_image_cache_init();
+#endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
     lv_nuttx_profiler_init();
