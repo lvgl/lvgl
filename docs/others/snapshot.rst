@@ -26,13 +26,13 @@ Free the Image
 ~~~~~~~~~~~~~~
 
 The memory :cpp:func:`lv_snapshot_take` uses are dynamically allocated using
-:cpp:func:`lv_malloc`. Use API :cpp:func:`lv_snapshot_free` to free the memory it
+:cpp:func:`lv_draw_buf_create`. Use API :cpp:func:`lv_draw_buf_destroy` to free the memory it
 takes. This will firstly free memory the image data takes, then the
 image descriptor.
 
-Take caution to free the snapshot but not delete the image object.
-Before free the memory, be sure to firstly unlink it from image object,
-using :cpp:expr:`lv_image_set_src(NULL)` and :cpp:expr:`lv_cache_invalidate(lv_cache_find(src, LV_CACHE_SRC_TYPE_PTR, 0, 0));`.
+The snapshot image which is the draw buffer returned by :cpp:func:`lv_snapshot_take`
+normally won't be added to cache because it can be drawn directly. So you don't need
+to invalidate cache by :cpp:func:`lv_image_cache_drop` before destroy the draw buffer.
 
 Below code snippet explains usage of this API.
 
@@ -40,9 +40,9 @@ Below code snippet explains usage of this API.
 
    void update_snapshot(lv_obj_t * obj, lv_obj_t * img_snapshot)
    {
-       lv_image_dsc_t* snapshot = (void*)lv_image_get_src(img_snapshot);
+       lv_draw_buf_t* snapshot = (void*)lv_image_get_src(img_snapshot);
        if(snapshot) {
-           lv_snapshot_free(snapshot);
+           lv_draw_buf_destroy(snapshot);
        }
        snapshot = lv_snapshot_take(obj, LV_COLOR_FORMAT_ARGB8888);
        lv_image_set_src(img_snapshot, snapshot);
@@ -52,16 +52,16 @@ Use Existing Buffer
 ~~~~~~~~~~~~~~~~~~~
 
 If the snapshot needs update now and then, or simply caller provides memory, use API
-``lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf, uint32_t buf_size);``
-for this case. It's caller's responsibility to alloc/free the memory.
+``lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, lv_draw_buf_t * draw_buf);``
+for this case. It's caller's responsibility to create and destroy the draw buffer.
 
 If snapshot is generated successfully, the image descriptor is updated
 and image data will be stored to provided ``buf``.
 
 Note that snapshot may fail if provided buffer is not enough, which may
 happen when object size changes. It's recommended to use API
-:cpp:func:`lv_snapshot_buf_size_needed` to check the needed buffer size in byte
-firstly and resize the buffer accordingly.
+:cpp:func:`lv_snapshot_reshape_draw_buf` to prepare the buffer firstly and if it
+fails, destroy the existing draw buffer and call `lv_snapshot_take` directly.
 
 .. _snapshot_example:
 
