@@ -177,6 +177,35 @@ static Tvg_Stroke_Fill _lv_spread_to_tvg(lv_vector_gradient_spread_t sp)
     }
 }
 
+static void _lv_gradient_to_tvg(Tvg_Paint * obj, Tvg_Gradient * gradient, const lv_vector_gradient_t * g)
+{
+    float x, y, w, h;
+    tvg_paint_get_bounds(obj, &x, &y, &w, &h, false);
+
+    if (g->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
+        tvg_radial_gradient_set(gradient, g->cx + x, g->cy + y, g->cr);
+    } else {
+        lv_area_t grad_area = g->grad.grad_area;
+        if (grad_area.x1 == 0 && grad_area.y1 == 0
+                && grad_area.x2 == 0 && grad_area.y2 == 0) {
+            grad_area.x1 = x;
+            grad_area.y1 = y;
+            if(g->grad.dir == LV_GRAD_DIR_VER) {
+                grad_area.x2 = x;
+                grad_area.y2 = y + h;
+            }
+            else if(g->grad.dir == LV_GRAD_DIR_HOR) {
+                grad_area.x2 = x + w;
+                grad_area.y2 = h;
+            } else {
+                grad_area.x2 = x + w;
+                grad_area.y2 = y + h;
+            }
+        }
+        tvg_linear_gradient_set(gradient, grad_area.x1, grad_area.y1, grad_area.x2, grad_area.y2);
+    }
+}
+
 static void _setup_gradient(Tvg_Gradient * gradient, const lv_vector_gradient_t * grad,
                             const lv_matrix_t * matrix)
 {
@@ -214,14 +243,7 @@ static void _set_paint_stroke_gradient(Tvg_Paint * obj, const lv_vector_gradient
     }
     else {
         grad = tvg_linear_gradient_new();
-
-        if(g->grad.dir == LV_GRAD_DIR_VER) {
-            tvg_linear_gradient_set(grad, x, y, x, y + h);
-        }
-        else {
-            tvg_linear_gradient_set(grad, x, y, x + w, y);
-        }
-
+        _lv_gradient_to_tvg(obj, grad, g);
         _setup_gradient(grad, g, m);
         tvg_shape_set_stroke_linear_gradient(obj, grad);
     }
@@ -263,26 +285,17 @@ static Tvg_Fill_Rule _lv_fill_rule_to_tvg(lv_vector_fill_t rule)
 
 static void _set_paint_fill_gradient(Tvg_Paint * obj, const lv_vector_gradient_t * g, const lv_matrix_t * m)
 {
-    float x, y, w, h;
-    tvg_paint_get_bounds(obj, &x, &y, &w, &h, false);
-
     Tvg_Gradient * grad = NULL;
     if(g->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
         grad = tvg_radial_gradient_new();
-        tvg_radial_gradient_set(grad, g->cx + x, g->cy + y, g->cr);
+        _lv_gradient_to_tvg(obj, grad, g);
         _setup_gradient(grad, g, m);
         tvg_shape_set_radial_gradient(obj, grad);
     }
     else {
         grad = tvg_linear_gradient_new();
 
-        if(g->grad.dir == LV_GRAD_DIR_VER) {
-            tvg_linear_gradient_set(grad, x, y, x, y + h);
-        }
-        else {
-            tvg_linear_gradient_set(grad, x, y, x + w, y);
-        }
-
+        _lv_gradient_to_tvg(obj, grad, g);
         _setup_gradient(grad, g, m);
         tvg_shape_set_linear_gradient(obj, grad);
     }
