@@ -21,7 +21,7 @@
  *      DEFINES
  *********************/
 
-#define PATH_QUALITY VG_LITE_HIGH
+#define PATH_QUALITY VG_LITE_MEDIUM
 #define PATH_DATA_COORD_FORMAT VG_LITE_S16
 #define FT_F26DOT6_SHIFT 6
 
@@ -88,15 +88,14 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 {
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
     if(glyph_draw_dsc) {
-
         switch(glyph_draw_dsc->format) {
-            case LV_DRAW_LETTER_BITMAP_FORMAT_A8: {
+            case LV_FONT_GLYPH_FORMAT_A1 ... LV_FONT_GLYPH_FORMAT_A8: {
                     draw_letter_bitmap(u, glyph_draw_dsc);
                 }
                 break;
 
 #if LV_USE_FREETYPE
-            case LV_DRAW_LETTER_VECTOR_FORMAT: {
+            case LV_FONT_GLYPH_FORMAT_VECTOR: {
                     if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
                         draw_letter_outline(u, glyph_draw_dsc);
                     }
@@ -104,7 +103,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
                 break;
 #endif /* LV_USE_FREETYPE */
 
-            case LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE: {
+            case LV_FONT_GLYPH_FORMAT_IMAGE: {
                     lv_draw_image_dsc_t image_dsc;
                     lv_draw_image_dsc_init(&image_dsc);
                     image_dsc.opa = glyph_draw_dsc->opa;
@@ -114,7 +113,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
                 break;
 
 #if LV_USE_FONT_PLACEHOLDER
-            case LV_DRAW_LETTER_BITMAP_FORMAT_INVALID: {
+            case LV_FONT_GLYPH_FORMAT_NONE: {
                     /* Draw a placeholder rectangle*/
                     lv_draw_border_dsc_t border_draw_dsc;
                     lv_draw_border_dsc_init(&border_draw_dsc);
@@ -155,9 +154,6 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
     vg_lite_buffer_t src_buf;
     lv_draw_buf_t * draw_buf = dsc->glyph_data;
     lv_vg_lite_buffer_from_draw_buf(&src_buf, draw_buf);
-
-    /* Alpha pictures need to be multiplied by color */
-    src_buf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
 
     vg_lite_color_t color;
     color = lv_vg_lite_color(dsc->color, dsc->opa, true);
@@ -246,6 +242,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
 
     lv_vg_lite_path_t * outline = (lv_vg_lite_path_t *)dsc->glyph_data;
     lv_point_t pos = {dsc->letter_coords->x1, dsc->letter_coords->y1};
+
     /* calc convert matrix */
     float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
     vg_lite_matrix_t matrix;
@@ -341,7 +338,6 @@ static void freetype_outline_event_cb(lv_event_t * e)
     switch(code) {
         case LV_EVENT_CREATE:
             param->outline = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
-            lv_vg_lite_path_set_quality(param->outline, PATH_QUALITY);
             break;
         case LV_EVENT_DELETE:
             lv_vg_lite_path_destroy(param->outline);

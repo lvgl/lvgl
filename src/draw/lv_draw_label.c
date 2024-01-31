@@ -401,7 +401,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
 
     if(g.resolved_font) {
         lv_draw_buf_t * draw_buf = NULL;
-        if(g.format < LV_FONT_GLYPH_FORMAT_IMAGE) {
+        if(LV_FONT_GLYPH_FORMAT_NONE < g.format && g.format < LV_FONT_GLYPH_FORMAT_IMAGE) {
             /*Only check draw buf for bitmap glyph*/
             draw_buf = lv_draw_buf_reshape(dsc->_draw_buf, 0, g.box_w, g.box_h, LV_STRIDE_AUTO);
             if(draw_buf == NULL) {
@@ -417,21 +417,10 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
         }
 
         dsc->glyph_data = (void *)lv_font_get_glyph_bitmap(&g, letter, draw_buf);
-        if(dsc->glyph_data == NULL) {
-            dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_INVALID;
-        }
-        else if(g.format == LV_FONT_GLYPH_FORMAT_IMAGE) {
-            dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE;
-        }
-        else if(g.format == LV_FONT_GLYPH_FORMAT_VECTOR) {
-            dsc->format = LV_DRAW_LETTER_VECTOR_FORMAT;
-        }
-        else {
-            dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_A8;
-        }
+        dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
     }
     else {
-        dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_INVALID;
+        dsc->format = LV_FONT_GLYPH_FORMAT_NONE;
     }
 
     dsc->letter_coords = &letter_coords;
