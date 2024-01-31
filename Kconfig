@@ -239,8 +239,10 @@ menu "LVGL configuration"
 					bool "0: NONE"
 				config LV_DRAW_SW_ASM_NEON
 					bool "1: NEON"
+					depends on ARM_HAVE_NEON
 				config LV_DRAW_SW_ASM_MVE
 					bool "2: MVE"
+					depends on ARM_HAVE_MVE
 				config LV_DRAW_SW_ASM_CUSTOM
 					bool "255: CUSTOM"
 			endchoice
