@@ -137,15 +137,13 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                 vg_lite_buffer_t image_buffer;
                 lv_image_decoder_dsc_t decoder_dsc;
                 if(lv_vg_lite_buffer_open_image(&image_buffer, &decoder_dsc, dsc->fill_dsc.img_dsc.src, false)) {
+                    /* Calculate pattern matrix. Should start from path bond box, and also apply fill matrix. */
                     lv_matrix_t m = dsc->matrix;
                     lv_matrix_translate(&m, min_x, min_y);
                     lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
 
-                    vg_lite_matrix_t src_matrix;
-                    lv_matrix_to_vg(&src_matrix, &m);
-
-                    vg_lite_matrix_t path_matrix;
-                    vg_lite_identity(&path_matrix);
+                    vg_lite_matrix_t pattern_matrix;
+                    lv_matrix_to_vg(&pattern_matrix, &m);
 
                     vg_lite_color_t recolor = lv_vg_lite_color(dsc->fill_dsc.img_dsc.recolor, dsc->fill_dsc.img_dsc.recolor_opa, true);
 
@@ -154,9 +152,9 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                                                &u->target_buffer,
                                                vg_path,
                                                fill,
-                                               &path_matrix,
+                                               &matrix,
                                                &image_buffer,
-                                               &src_matrix,
+                                               &pattern_matrix,
                                                blend,
                                                VG_LITE_PATTERN_COLOR,
                                                recolor,
