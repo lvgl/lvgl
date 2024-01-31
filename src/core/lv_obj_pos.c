@@ -764,7 +764,7 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
 
 void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
 {
-	lv_obj_transform_point_array(obj, p, 1, recursive, inv);
+    lv_obj_transform_point_array(obj, p, 1, recursive, inv);
 }
 
 void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t p[], size_t p_count, bool recursive, bool inv)
@@ -1140,8 +1140,8 @@ static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p
         pivot.y = (LV_COORD_GET_PCT(pivot.y) * lv_area_get_height(&obj->coords)) / 100;
     }
 
-		pivot.x = obj->coords.x1 + pivot.x;
-		pivot.y = obj->coords.y1 + pivot.y;
+    pivot.x = obj->coords.x1 + pivot.x;
+    pivot.y = obj->coords.y1 + pivot.y;
 
     if(inv) {
         angle = -angle;
