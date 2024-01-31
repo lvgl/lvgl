@@ -179,6 +179,11 @@
 /* VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
 #define LV_VG_LITE_FLUSH_MAX_COUNT 8
 
+/* Enable border to simulate shadow
+ * NOTE: which usually improves performance,
+ * but does not guarantee the same rendering quality as the software. */
+#define LV_VG_LITE_USE_BOX_SHADOW 0
+
 #endif
 
 /*=======================

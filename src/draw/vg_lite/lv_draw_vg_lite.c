@@ -206,7 +206,9 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
         case LV_DRAW_TASK_TYPE_LABEL:
         case LV_DRAW_TASK_TYPE_FILL:
         case LV_DRAW_TASK_TYPE_BORDER:
+#if LV_VG_LITE_USE_BOX_SHADOW
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+#endif
         case LV_DRAW_TASK_TYPE_LAYER:
         case LV_DRAW_TASK_TYPE_LINE:
         case LV_DRAW_TASK_TYPE_ARC:
