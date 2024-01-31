@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_types.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 
 /*********************
  *      DEFINES
@@ -97,12 +98,6 @@ typedef _lv_dir_t lv_dir_t;
 #else
 typedef uint8_t lv_dir_t;
 #endif /*DOXYGEN*/
-
-typedef struct  {
-    int32_t angle_prev;
-    int32_t sinma;
-    int32_t cosma;
-} lv_area_transform_cache_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -263,6 +258,9 @@ bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b);
 void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t align, int32_t ofs_x, int32_t ofs_y);
 
 void lv_point_transform(lv_point_t * p, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
+                        bool zoom_first);
+
+void lv_point_array_transform(lv_point_t * p, size_t p_count, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
                         bool zoom_first);
 
 static inline lv_point_t lv_point_from_precise(const lv_point_precise_t * p)
