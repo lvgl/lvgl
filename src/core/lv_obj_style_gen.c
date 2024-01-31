@@ -690,8 +690,7 @@ void lv_obj_set_style_opa_layered(lv_obj_t * obj, lv_opa_t value, lv_style_selec
     lv_obj_set_local_style_prop(obj, LV_STYLE_OPA_LAYERED, v, selector);
 }
 
-void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value,
-                                       lv_style_selector_t selector)
+void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -753,6 +752,14 @@ void lv_obj_set_style_base_dir(lv_obj_t * obj, lv_base_dir_t value, lv_style_sel
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_BASE_DIR, v, selector);
+}
+
+void lv_obj_set_style_bitmap_mask_src(lv_obj_t * obj, const lv_image_dsc_t * value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BITMAP_MASK_SRC, v, selector);
 }
 #if LV_USE_FLEX
 
