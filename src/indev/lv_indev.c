@@ -1339,16 +1339,16 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
     bool editable = lv_obj_is_editable(obj);
 
     if(editable) {
-    	int32_t sensitivity = indev->rotary_adjust_divider;
+        int32_t sensitivity = indev->rotary_adjust_divider;
         int32_t diff = indev->pointer.diff / sensitivity;
-		send_event(LV_EVENT_ROTARY, &diff);
+        send_event(LV_EVENT_ROTARY, &diff);
     }
     else {
 
-    	int32_t sensitivity = indev->rotary_scroll_sensitvity;
-    	int32_t throw = indev->pointer.diff * sensitivity;
+        int32_t sensitivity = indev->rotary_scroll_sensitvity;
+        int32_t throw = indev->pointer.diff * sensitivity;
 
-    	int32_t vect = indev->pointer.diff > 0 ? indev->scroll_limit : -indev->scroll_limit;
+        int32_t vect = indev->pointer.diff > 0 ? indev->scroll_limit : -indev->scroll_limit;
         indev->pointer.vect.y = vect;
         indev->pointer.scroll_throw_vect.y = throw;
         indev->pointer.scroll_throw_vect_ori.y = throw;

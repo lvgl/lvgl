@@ -622,7 +622,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         int32_t r = lv_event_get_rotary_diff(e);
 
         int32_t old_value = arc->value;
-		lv_arc_set_value(obj, lv_arc_get_value(obj) + r);
+        lv_arc_set_value(obj, lv_arc_get_value(obj) + r);
         if(old_value != arc->value) {
             res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RESULT_OK) return;
