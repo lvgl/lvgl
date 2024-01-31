@@ -65,9 +65,9 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
 
     int32_t w = lv_area_get_width(coords);
     int32_t h = lv_area_get_height(coords);
-    int32_t r = dsc->radius;
-    if(r) {
-        int32_t r_short = LV_MIN(w, h) / 2;
+    float r = dsc->radius;
+    if(dsc->radius) {
+        float r_short = LV_MIN(w, h) / 2.0f;
         r = LV_MIN(r, r_short);
     }
 
