@@ -1,10 +1,10 @@
 /**
- * @file lv_blend_to_neon.h
+ * @file lv_blend_neon.h
  *
  */
 
-#ifndef LV_BLEND_TO_NEON_H
-#define LV_BLEND_TO_NEON_H
+#ifndef LV_BLEND_NEON_H
+#define LV_BLEND_NEON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1292,4 +1292,4 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_neo
 } /*extern "C"*/
 #endif
 
-#endif /*LV_BLEND_TO_NEON_H*/
+#endif /*LV_BLEND_NEON_H*/
