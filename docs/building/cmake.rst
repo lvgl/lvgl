@@ -63,7 +63,7 @@ If you use cmake to install lvgl 3 folders will be created.
 
 
 Build with Command line
-----------
+-----------------------
 
 You can also build your project using the command line.
 Run the follwoing commands
