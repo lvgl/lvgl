@@ -51,6 +51,7 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
     dsc->scale_x = LV_SCALE_NONE;
     dsc->scale_y = LV_SCALE_NONE;
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
+    dsc->original_area.x2 = LV_COORD_MIN;   /*Indicate invalid area by default by setting a negative size*/
     dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
 }
 

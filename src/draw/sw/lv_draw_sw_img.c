@@ -244,7 +244,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         blend_dsc.mask_stride = draw_dsc->bitmap_mask_src->header.stride;
 
         const lv_area_t * original_area;
-        if(draw_dsc->original_area.x1 == LV_COORD_MIN) original_area = img_coords;
+        if(lv_area_get_width(&draw_dsc->original_area) < 0) original_area = img_coords;
         else original_area = &draw_dsc->original_area;
 
         lv_area_t a = {0, 0, draw_dsc->bitmap_mask_src->header.w - 1, draw_dsc->bitmap_mask_src->header.h - 1};
