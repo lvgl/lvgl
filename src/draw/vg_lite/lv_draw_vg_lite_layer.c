@@ -58,6 +58,11 @@ void lv_draw_vg_lite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t
     lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
     new_draw_dsc.src = layer->draw_buf;
     lv_draw_vg_lite_img(draw_unit, &new_draw_dsc, coords, true);
+
+    /* Wait for the GPU drawing to complete here,
+     * otherwise it may cause the drawing to fail. */
+    lv_vg_lite_finish(draw_unit);
+
     LV_PROFILER_END;
 }
 
