@@ -41,7 +41,7 @@ Simply load this project into your IDE and select your desired preset and you ar
 
 
 Build with CMake GUI
-----------
+--------------------
 Open this project with CMake GUI and select your desired preset.
 When hitting the generate button, CMake will create solution files (for VS) or Ninja Files (for Linux Ninja Build)
 
