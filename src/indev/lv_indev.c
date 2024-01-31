@@ -49,7 +49,6 @@
 /**< Rotary diff count will be multiples by this value when scrolling to get scroll throw size*/
 #define LV_INDEV_DEF_ROTARY_SCROLL_SENSITVITY      LV_DPI_DEF / 4
 
-
 #if LV_INDEV_DEF_SCROLL_THROW <= 0
     #warning "LV_INDEV_DEF_SCROLL_THROW must be greater than 0"
 #endif
@@ -681,7 +680,6 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     else {
         indev_proc_release(i);
     }
-
 
     i->pointer.last_point.x = i->pointer.act_point.x;
     i->pointer.last_point.y = i->pointer.act_point.y;
