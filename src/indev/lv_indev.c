@@ -43,6 +43,13 @@
 /*Gesture min velocity at release before swipe (pixels)*/
 #define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
 
+/**< Rotary diff count will be divided by this value when widgets are adjusted*/
+#define LV_INDEV_DEF_ROTARY_ADJUST_DIVIDER         1
+
+/**< Rotary diff count will be multiples by this value when scrolling to get scroll throw size*/
+#define LV_INDEV_DEF_ROTARY_SCROLL_SENSITVITY      LV_DPI_DEF
+
+
 #if LV_INDEV_DEF_SCROLL_THROW <= 0
     #warning "LV_INDEV_DEF_SCROLL_THROW must be greater than 0"
 #endif
@@ -1328,19 +1335,19 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
     bool interactive = lv_obj_is_group_def(obj);
 
     if(interactive) {
-        uint32_t k = indev->pointer.diff < 0 ? LV_KEY_LEFT : LV_KEY_RIGHT;
-        uint32_t cnt = LV_ABS(indev->pointer.diff);
-        while(cnt) {
-            send_event(LV_EVENT_KEY, &k);
-            cnt--;
-        }
+    	int32_t sensitivity = indev->rotary_adjust_divider;
+        int32_t diff = indev->pointer.diff / sensitivity;
+		send_event(LV_EVENT_ROTARY, &diff);
     }
     else {
-        int32_t vect = indev->pointer.diff > 0 ? indev->scroll_limit : -indev->scroll_limit;
-        int32_t throw = indev->pointer.diff > 0 ? LV_VER_RES / 8 : -LV_VER_RES / 8;
+
+    	int32_t sensitivity = indev->rotary_scroll_sensitvity;
+    	int32_t diff = indev->pointer.diff * sensitivity;
+
+    	int32_t vect = indev->pointer.diff > 0 ? indev->scroll_limit : -indev->scroll_limit;
         indev->pointer.vect.y = vect;
-        indev->pointer.scroll_throw_vect.y = throw;
-        indev->pointer.scroll_throw_vect_ori.y = throw;
+        indev->pointer.scroll_throw_vect.y = sensitivity;
+        indev->pointer.scroll_throw_vect_ori.y = sensitivity;
         indev->pointer.act_obj = obj;
         _lv_indev_scroll_handler(indev);
         _lv_indev_scroll_throw_handler(indev);

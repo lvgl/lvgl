@@ -69,6 +69,12 @@ struct _lv_indev_t {
     /**< Repeated trigger period in long press [ms]*/
     uint16_t long_press_repeat_time;
 
+    /**< Rotary diff count will be divided by this value when widgets are adjusted*/
+    int32_t rotary_adjust_divider;
+
+    /**< Rotary diff count will be multiples by this value when scrolling to get scroll throw size*/
+    int32_t rotary_scroll_sensitvity;
+
     struct {
         /*Pointer and button data*/
         lv_point_t act_point; /**< Current point of input device.*/
