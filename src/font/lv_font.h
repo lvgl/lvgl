@@ -40,6 +40,30 @@ extern "C" {
  * General types
  *-----------------*/
 
+/** The font format.*/
+enum _lv_font_glyph_format_t {
+    LV_FONT_GLYPH_FORMAT_NONE   = 0, /**< Maybe not visible*/
+
+    /**< Legacy simple formats*/
+    LV_FONT_GLYPH_FORMAT_A1     = 0x01, /**< 1 bit per pixel*/
+    LV_FONT_GLYPH_FORMAT_A2     = 0x02, /**< 2 bit per pixel*/
+    LV_FONT_GLYPH_FORMAT_A4     = 0x04, /**< 4 bit per pixel*/
+    LV_FONT_GLYPH_FORMAT_A8     = 0x08, /**< 8 bit per pixel*/
+
+    LV_FONT_GLYPH_FORMAT_IMAGE  = 0x09, /**< Image format*/
+
+    /**< Advanced formats*/
+    LV_FONT_GLYPH_FORMAT_VECTOR = 0x0A, /**< Vectorial format*/
+    LV_FONT_GLYPH_FORMAT_SVG    = 0x0B, /**< SVG format*/
+    LV_FONT_GLYPH_FORMAT_CUSTOM = 0xFF, /**< Custom format*/
+};
+
+#ifdef DOXYGEN
+typedef _lv_font_glyph_format_t lv_font_glyph_format_t;
+#else
+typedef uint8_t lv_font_glyph_format_t;
+#endif /*DOXYGEN*/
+
 /** Describes the properties of a glyph.*/
 typedef struct {
     const lv_font_t *
@@ -49,8 +73,8 @@ typedef struct {
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
-    uint8_t bpp: 4;  /**< Bit-per-pixel: 1, 2, 4, 8*/
-    uint8_t is_placeholder: 1; /** Glyph is missing. But placeholder will still be displayed */
+    lv_font_glyph_format_t format;  /**< Font format of the glyph see @lv_font_glyph_format_t*/
+    uint8_t is_placeholder: 1; /**< Glyph is missing. But placeholder will still be displayed*/
 
     uint32_t glyph_index; /**< The index of the glyph in the font file. Used by the font cache*/
     lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
