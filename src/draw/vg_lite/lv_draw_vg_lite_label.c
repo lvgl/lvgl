@@ -88,15 +88,14 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 {
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
     if(glyph_draw_dsc) {
-
         switch(glyph_draw_dsc->format) {
-            case LV_DRAW_LETTER_BITMAP_FORMAT_A8: {
+            case LV_FONT_GLYPH_FORMAT_A1 ... LV_FONT_GLYPH_FORMAT_A8: {
                     draw_letter_bitmap(u, glyph_draw_dsc);
                 }
                 break;
 
 #if LV_USE_FREETYPE
-            case LV_DRAW_LETTER_VECTOR_FORMAT: {
+            case LV_FONT_GLYPH_FORMAT_VECTOR: {
                     if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
                         draw_letter_outline(u, glyph_draw_dsc);
                     }
@@ -104,7 +103,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
                 break;
 #endif /* LV_USE_FREETYPE */
 
-            case LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE: {
+            case LV_FONT_GLYPH_FORMAT_IMAGE: {
                     lv_draw_image_dsc_t img_dsc;
                     lv_draw_image_dsc_init(&img_dsc);
                     img_dsc.opa = glyph_draw_dsc->opa;
@@ -114,7 +113,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
                 break;
 
 #if LV_USE_FONT_PLACEHOLDER
-            case LV_DRAW_LETTER_BITMAP_FORMAT_INVALID: {
+            case LV_FONT_GLYPH_FORMAT_NONE: {
                     /* Draw a placeholder rectangle*/
                     lv_draw_border_dsc_t border_draw_dsc;
                     lv_draw_border_dsc_init(&border_draw_dsc);
