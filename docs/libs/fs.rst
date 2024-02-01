@@ -14,6 +14,7 @@ LVG has built in support for:
 - POSIX (Linux and Windows using POSIX function .e.g ``open``, ``read``)
 - WIN32 (Windows using Win32 API function .e.g ``CreateFileA``, ``ReadFile``)
 - MEMFS (read a file from a memory buffer)
+- LITTLEFS (a little fail-safe filesystem designed for microcontrollers)
 
 You still need to provide the drivers and libraries, this extension
 provides only the bridge between FATFS, STDIO, POSIX, WIN32 and LVGL.

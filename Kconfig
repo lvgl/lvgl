@@ -1057,6 +1057,13 @@ menu "LVGL configuration"
 			default 0
 			depends on LV_USE_FS_MEMFS
 
+		config LV_USE_FS_LITTLEFS
+			bool "File system on top of littlefs API"
+		config LV_FS_LITTLEFS_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			default 0
+			depends on LV_USE_FS_LITTLEFS
+
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
 

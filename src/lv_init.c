@@ -265,6 +265,10 @@ void lv_init(void)
     lv_fs_memfs_init();
 #endif
 
+#if LV_USE_FS_LITTLEFS
+    lv_fs_littlefs_init();
+#endif
+
 #if LV_USE_LODEPNG
     lv_lodepng_init();
 #endif
