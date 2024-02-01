@@ -940,14 +940,7 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise
 
     /* Angle is between both background angles */
     if((smaller_angle <= angle) && (angle <= bigger_angle)) {
-
-        if(((bigger_angle - smaller_angle) / 2) >= angle) {
-            arc->min_close = 1;
-        }
-        else {
-            arc->min_close = 0;
-        }
-
+        arc->min_close = (((bigger_angle - smaller_angle) / 2) >= angle) == false;
         arc->in_out = CLICK_INSIDE_BG_ANGLES;
 
         return true;
