@@ -469,11 +469,10 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(arc->dragging == false) {
             int32_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
             r -= indic_width;
-            /*Add some more sensitive area if there is no advanced git testing.
+            /*Add some more sensitive area if there is no advanced hit testing.
              * (Advanced hit testing is more precise)*/
             if(lv_obj_has_flag(obj, LV_OBJ_FLAG_ADV_HITTEST)) {
                 r -= indic_width;
-
             }
             else {
                 r -= LV_MAX(r / 4, indic_width);
@@ -503,7 +502,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         angle -= arc->rotation;
         angle -= arc->bg_angle_start;  /*Make the angle relative to the start angle*/
 
-        /* If we click near the bg_angle_start the angle will be close to 360° instead of an small angle */
+        /* If we click near the bg_angle_start the angle will be close to 360° instead of a small angle */
         if(angle < 0) angle += 360;
 
         const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
