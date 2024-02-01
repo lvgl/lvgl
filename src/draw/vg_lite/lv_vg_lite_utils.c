@@ -814,18 +814,27 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
         return false;
     }
 
-    if(!(buffer->image_mode == VG_LITE_NORMAL_IMAGE_MODE
-         || buffer->image_mode == VG_LITE_NONE_IMAGE_MODE
-         || buffer->image_mode == VG_LITE_MULTIPLY_IMAGE_MODE)) {
-        LV_LOG_ERROR("buffer image_mode(%d) is invalid", (int)buffer->image_mode);
-        return false;
+    switch(buffer->image_mode) {
+        case VG_LITE_ZERO:
+        case VG_LITE_NORMAL_IMAGE_MODE:
+        case VG_LITE_MULTIPLY_IMAGE_MODE:
+        case VG_LITE_STENCIL_MODE:
+        case VG_LITE_NONE_IMAGE_MODE:
+        case VG_LITE_RECOLOR_MODE:
+            break;
+        default:
+            LV_LOG_ERROR("buffer image_mode(%d) is invalid", (int)buffer->image_mode);
+            return false;
     }
 
-    if(!(buffer->transparency_mode == VG_LITE_IMAGE_OPAQUE
-         || buffer->transparency_mode == VG_LITE_IMAGE_TRANSPARENT)) {
-        LV_LOG_ERROR("buffer transparency_mode(%d) is invalid",
-                     (int)buffer->transparency_mode);
-        return false;
+    switch(buffer->transparency_mode) {
+        case VG_LITE_IMAGE_OPAQUE:
+        case VG_LITE_IMAGE_TRANSPARENT:
+            break;
+        default:
+            LV_LOG_ERROR("buffer transparency_mode(%d) is invalid",
+                         (int)buffer->transparency_mode);
+            return false;
     }
 
     return true;
@@ -954,6 +963,10 @@ void lv_vg_lite_draw_linear_grad(
     else {   /*LV_GRAD_DIR_HOR*/
         vg_lite_scale(lv_area_get_width(area) / 256.0f, 1, grad_matrix);
     }
+
+    LV_VG_LITE_ASSERT_DEST_BUFFER(buffer);
+    LV_VG_LITE_ASSERT_SRC_BUFFER(&gradient.image);
+    LV_VG_LITE_ASSERT_PATH(path);
 
     LV_PROFILER_BEGIN_TAG("vg_lite_draw_grad");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw_grad(
