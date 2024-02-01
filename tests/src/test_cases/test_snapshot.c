@@ -49,7 +49,7 @@ void test_snapshot_take_snapshot_immidiately_after_obj_create(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("snapshot_0.png");
 
     lv_obj_center(img_obj);
-    lv_image_set_align(img_obj, LV_IMAGE_ALIGN_CENTER);
+    lv_image_set_inner_align(img_obj, LV_IMAGE_ALIGN_CENTER);
     lv_image_set_rotation(img_obj, 450);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("snapshot_1.png");

@@ -228,7 +228,7 @@ void lv_image_set_antialias(lv_obj_t * obj, bool antialias);
  * @note            if image_align is `LV_IMAGE_ALIGN_STRETCH` or `LV_IMAGE_ALIGN_FIT`
  *                  rotation, scale and pivot will be overwritten and controlled internally.
  */
-void lv_image_set_align(lv_obj_t * obj, lv_image_align_t align);
+void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align);
 
 /*=====================
  * Getter functions
@@ -312,7 +312,7 @@ bool lv_image_get_antialias(lv_obj_t * obj);
  * @param obj       pointer to an image object
  * @return          element of @ref lv_image_align_t
  */
-lv_image_align_t lv_image_get_align(lv_obj_t * obj);
+lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj);
 
 /**********************
  *      MACROS
