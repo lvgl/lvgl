@@ -21,7 +21,7 @@
  *      DEFINES
  *********************/
 
-#define PATH_QUALITY VG_LITE_MEDIUM
+#define PATH_QUALITY VG_LITE_HIGH
 #define PATH_DATA_COORD_FORMAT VG_LITE_S16
 #define FT_F26DOT6_SHIFT 6
 
@@ -338,6 +338,7 @@ static void freetype_outline_event_cb(lv_event_t * e)
     switch(code) {
         case LV_EVENT_CREATE:
             param->outline = lv_vg_lite_path_create(PATH_DATA_COORD_FORMAT);
+            lv_vg_lite_path_set_quality(param->outline, PATH_QUALITY);
             break;
         case LV_EVENT_DELETE:
             lv_vg_lite_path_destroy(param->outline);
