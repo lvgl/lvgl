@@ -180,6 +180,9 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
             vg_lite_identity(&path_matrix);
             lv_vg_lite_matrix_multiply(&path_matrix, &u->global_matrix);
 
+            /* move image to center */
+            vg_lite_translate(cx - radius_out, cy - radius_out, &matrix);
+
             LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
             LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
                                        &u->target_buffer,
