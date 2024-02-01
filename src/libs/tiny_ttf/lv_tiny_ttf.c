@@ -194,7 +194,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
         dsc_out->box_h = 0; /*height of the bitmap in [px]*/
         dsc_out->ofs_x = 0; /*X offset of the bitmap in [pf]*/
         dsc_out->ofs_y = 0; /*Y offset of the bitmap in [pf]*/
-        dsc_out->format = LV_FONT_GLYPH_FORMAT_NONE;
+        dsc_out->bpp = 0;
         dsc_out->is_placeholder = false;
         return true;
     }
@@ -220,7 +220,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     dsc_out->box_h = (y2 - y1 + 1);         /*height of the bitmap in [px]*/
     dsc_out->ofs_x = x1;                    /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = -y2;                   /*Y offset of the bitmap measured from the as line*/
-    dsc_out->format = LV_FONT_GLYPH_FORMAT_A8;
+    dsc_out->bpp = 8;                       /*Bits per pixel: 1/2/4/8*/
     dsc_out->is_placeholder = false;
     return true; /*true: glyph found; false: glyph was not found*/
 }

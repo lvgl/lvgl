@@ -204,7 +204,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->box_w = gdsc->box_w;
     dsc_out->ofs_x = gdsc->ofs_x;
     dsc_out->ofs_y = gdsc->ofs_y;
-    dsc_out->format = (uint8_t)fdsc->bpp;
+    dsc_out->bpp   = (uint8_t)fdsc->bpp;
     dsc_out->is_placeholder = false;
 
     if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;

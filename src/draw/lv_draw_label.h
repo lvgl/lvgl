@@ -72,9 +72,16 @@ typedef struct {
     lv_draw_label_hint_t * hint;
 } lv_draw_label_dsc_t;
 
+typedef enum {
+    LV_DRAW_LETTER_BITMAP_FORMAT_INVALID,
+    LV_DRAW_LETTER_BITMAP_FORMAT_A8,
+    LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE,
+    LV_DRAW_LETTER_VECTOR_FORMAT,
+} lv_draw_glyph_bitmap_format_t;
+
 typedef struct {
     void * glyph_data;  /*Depends on `format` field, it could be image source or draw buf of bitmap or vector data.*/
-    lv_font_glyph_format_t format;
+    lv_draw_glyph_bitmap_format_t format;
     const lv_area_t * letter_coords;
     const lv_area_t * bg_coords;
     const lv_font_glyph_dsc_t * g;
