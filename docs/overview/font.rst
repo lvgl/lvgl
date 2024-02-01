@@ -13,15 +13,18 @@ For example:
 
    lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /*Set a larger font*/
 
-Fonts have a **bpp (bits per pixel)** property. It shows how many bits
-are used to describe a pixel in a font. The value stored for a pixel
-determines the pixel's opacity. This way, with higher *bpp*, the edges
-of the letter can be smoother. The possible *bpp* values are 1, 2, 4 and
-8 (higher values mean better quality).
+Fonts have a **format** property. It describes how the glyph draw data is stored.
+It has *2* categories: `Legacy simple format` and `Advanced format`.
+In the legacy simple format, the font is stored in a simple array of bitmaps.
+In the advanced format, the font is stored in a different way like `Vector`, `SVG`, etc.
 
-The *bpp* property also affects the amount of memory needed to store a
-font. For example, *bpp = 4* makes a font nearly four times larger
-compared to *bpp = 1*.
+In the legacy simple format, the value stored for a pixel determines the pixel's opacity.
+This way, with higher *bpp (bit per pixel)*, the edges of the letter can be smoother.
+The possible *bpp* values are 1, 2, 4 and 8 (higher values mean better quality).
+
+The *format* property also affects the amount of memory needed to store a
+font. For example, *format = LV_FONT_GLYPH_FORMAT_A4* makes a font nearly four times larger
+compared to *format = LV_FONT_GLYPH_FORMAT_A1*.
 
 Unicode support
 ***************
@@ -382,7 +385,7 @@ To do this, a custom :cpp:type:`lv_font_t` variable needs to be created:
        dsc_out->box_w = 6;         /*Width of the bitmap in [px]*/
        dsc_out->ofs_x = 0;         /*X offset of the bitmap in [pf]*/
        dsc_out->ofs_y = 3;         /*Y offset of the bitmap measured from the as line*/
-       dsc_out->bpp   = 2;         /*Bits per pixel: 1/2/4/8*/
+       dsc_out->format= LV_FONT_GLYPH_FORMAT_A2;
 
        return true;                /*true: glyph found; false: glyph was not found*/
    }

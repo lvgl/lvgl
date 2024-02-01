@@ -102,7 +102,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     dsc_out->box_h = font_p->line_height;
     dsc_out->ofs_x = 0;
     dsc_out->ofs_y = 0;
-    dsc_out->bpp   = 1;
+    dsc_out->format = LV_FONT_GLYPH_FORMAT_A1;
     dsc_out->is_placeholder = true;
 
     return false;
