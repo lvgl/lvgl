@@ -34,10 +34,6 @@
     #error "Cannot use DMA2D with LV_COLOR_DEPTH other than 16 or 32"
 #endif
 
-#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
-    #define LV_STM32_DMA2D_USE_M7_CACHE
-#endif
-
 #if defined (LV_STM32_DMA2D_USE_M7_CACHE)
     // Cortex-M7 DCache present
     #define __lv_gpu_stm32_dma2d_clean_cache(address, offset, width, height, pixel_size) _lv_gpu_stm32_dma2d_clean_cache(address, offset, width, height, pixel_size)

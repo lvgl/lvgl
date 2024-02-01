@@ -31,6 +31,10 @@ extern "C" {
 #define LV_STM32_DMA2D_STATIC static
 #endif
 
+#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
+    #define LV_STM32_DMA2D_USE_M7_CACHE
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
