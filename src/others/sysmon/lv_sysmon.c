@@ -126,31 +126,33 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
             info->measured.refr_cnt++;
             break;
         case LV_EVENT_RENDER_START:
-        	info->measured.render_in_progress = 1;
+            info->measured.render_in_progress = 1;
             info->measured.render_start = lv_tick_get();
             break;
         case LV_EVENT_RENDER_READY:
-        	info->measured.render_in_progress = 0;
+            info->measured.render_in_progress = 0;
             info->measured.render_elaps_sum += lv_tick_elaps(info->measured.render_start);
             info->measured.render_cnt++;
             break;
         case LV_EVENT_FLUSH_START:
         case LV_EVENT_FLUSH_WAIT_START:
-        	if(info->measured.render_in_progress) {
-        		info->measured.flush_in_render_start = lv_tick_get();
-        	} else {
-        		info->measured.flush_not_in_render_start = lv_tick_get();
-        	}
+            if(info->measured.render_in_progress) {
+                info->measured.flush_in_render_start = lv_tick_get();
+            }
+            else {
+                info->measured.flush_not_in_render_start = lv_tick_get();
+            }
             break;
         case LV_EVENT_FLUSH_FINISH:
         case LV_EVENT_FLUSH_WAIT_FINISH:
-        	if(info->measured.render_in_progress) {
-				info->measured.flush_in_render_elaps_sum += lv_tick_elaps(info->measured.flush_in_render_start);
-				info->measured.flush_in_render_cnt++;
-        	} else {
-				info->measured.flush_not_in_render_elaps_sum += lv_tick_elaps(info->measured.flush_not_in_render_start);
-				info->measured.flush_not_in_render_cnt++;
-        	}
+            if(info->measured.render_in_progress) {
+                info->measured.flush_in_render_elaps_sum += lv_tick_elaps(info->measured.flush_in_render_start);
+                info->measured.flush_in_render_cnt++;
+            }
+            else {
+                info->measured.flush_not_in_render_elaps_sum += lv_tick_elaps(info->measured.flush_not_in_render_start);
+                info->measured.flush_not_in_render_cnt++;
+            }
             break;
         default:
             break;
@@ -186,9 +188,9 @@ static void perf_update_timer_cb(lv_timer_t * t)
                                      0;
 
     uint32_t flush_in_render_avg = info->measured.flush_in_render_cnt ?
-    								(info->measured.flush_in_render_elaps_sum / info->measured.flush_in_render_cnt) : 0;
+                                   (info->measured.flush_in_render_elaps_sum / info->measured.flush_in_render_cnt) : 0;
     uint32_t flush_not_in_render_avg = info->measured.flush_not_in_render_cnt ?
-    								(info->measured.flush_not_in_render_elaps_sum / info->measured.flush_not_in_render_cnt) : 0;
+                                       (info->measured.flush_not_in_render_elaps_sum / info->measured.flush_not_in_render_cnt) : 0;
 
     info->calculated.flush_avg_time = flush_in_render_avg + flush_not_in_render_avg;
 

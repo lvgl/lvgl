@@ -58,7 +58,7 @@ typedef struct {
         uint32_t flush_not_in_render_start;
         uint32_t flush_not_in_render_elaps_sum;
         uint32_t flush_not_in_render_cnt;
-        uint32_t render_in_progress	:1;
+        uint32_t render_in_progress : 1;
     } measured;
 
     struct {
