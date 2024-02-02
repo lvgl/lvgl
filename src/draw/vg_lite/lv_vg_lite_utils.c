@@ -1060,17 +1060,17 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 
 void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 {
-    vg_lite_enable_scissor();
-    vg_lite_set_scissor(
-        area->x1,
-        area->y1,
-        lv_area_get_width(area),
-        lv_area_get_height(area));
+    LV_VG_LITE_CHECK_ERROR(vg_lite_enable_scissor());
+    LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
+                               area->x1,
+                               area->y1,
+                               lv_area_get_width(area),
+                               lv_area_get_height(area)));
 }
 
 void lv_vg_lite_disable_scissor(void)
 {
-    vg_lite_disable_scissor();
+    LV_VG_LITE_CHECK_ERROR(vg_lite_disable_scissor());
 }
 
 void lv_vg_lite_flush(lv_draw_unit_t * draw_unit)
