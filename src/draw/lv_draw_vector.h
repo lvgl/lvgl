@@ -97,9 +97,6 @@ typedef struct {
 
 typedef struct {
     float m[3][3];
-    float scale_x;
-    float scale_y;
-    float angle;
 } lv_matrix_t;
 
 typedef struct {

@@ -124,6 +124,11 @@ typedef struct {
     uint8_t alpha;
 } vg_color32_t;
 
+typedef struct {
+    vg_lite_float_t x;
+    vg_lite_float_t y;
+} vg_lite_fpoint_t;
+
 #pragma pack()
 
 class vg_lite_ctx
@@ -292,6 +297,8 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
                              vg_lite_uint32_t * mul,
                              vg_lite_uint32_t * div,
                              vg_lite_uint32_t * bytes_align);
+
+static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, const vg_lite_fpoint_t * point);
 
 /**********************
  *  STATIC VARIABLES
@@ -1618,8 +1625,18 @@ Empty_sequence_handler:
         lv_vg_lite_matrix_inverse(&grad_matrix, matrix);
         lv_vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
 
-        float angle = (grad_matrix.angle / 180.0f) * 3.141592654f;;
-        float scale = grad_matrix.scaleX;
+        vg_lite_fpoint_t p1 = {0.0f, 0.0f};
+        vg_lite_fpoint_t p2 = {1.0f, 0};
+
+        vg_lite_fpoint_t p1_trans = p1;
+        vg_lite_fpoint_t p2_trans = p2;
+
+        p1_trans = matrix_transform_point(&grad_matrix, &p1);
+        p2_trans = matrix_transform_point(&grad_matrix, &p2);
+        float dx = (p2_trans.x - p1_trans.x);
+        float dy = (p2_trans.y - p1_trans.y);
+        float scale = sqrtf(dx * dx + dy * dy);
+        float angle = (float)(atan2f(dy, dx));
         float dlen = 256 * scale;
         float x_min = grad_matrix.m[0][2];
         float y_min = grad_matrix.m[1][2];
@@ -2417,4 +2434,13 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
             break;
     }
 }
+
+static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, const vg_lite_fpoint_t * point)
+{
+    vg_lite_fpoint_t p;
+    p.x = (vg_lite_float_t)(point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]);
+    p.y = (vg_lite_float_t)(point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]);
+    return p;
+}
+
 #endif
