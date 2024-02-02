@@ -77,7 +77,6 @@ static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
     if(dev->dummy_read) {
         dev->dummy_read = false;
         data->state = LV_INDEV_STATE_RELEASED;
-        data->continue_reading = len > 0;
     }
     /*Send the pressed character*/
     else if(len > 0) {
@@ -85,7 +84,6 @@ static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
         data->state = LV_INDEV_STATE_PRESSED;
         data->key = dev->buf[0];
         memmove(dev->buf, dev->buf + 1, len);
-        data->continue_reading = true;
     }
 }
 
@@ -152,7 +150,15 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
             break;
 
     }
-    lv_indev_read(indev);
+
+    size_t len = lv_strlen(dsc->buf);
+    while(len) {
+        lv_indev_read(indev);
+
+        /*Call again to handle dummy read in `sdl_keyboard_read`*/
+        lv_indev_read(indev);
+        len--;
+    }
 }
 
 /**
