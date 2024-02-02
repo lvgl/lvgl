@@ -734,7 +734,6 @@ extern "C" {
     {
         switch(feature) {
             case gcFEATURE_BIT_VG_IM_INDEX_FORMAT:
-            case gcFEATURE_BIT_VG_SCISSOR:
             case gcFEATURE_BIT_VG_BORDER_CULLING:
             case gcFEATURE_BIT_VG_RGBA2_FORMAT:
             case gcFEATURE_BIT_VG_IM_FASTCLAER:
