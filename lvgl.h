@@ -115,7 +115,8 @@ extern "C" {
 
 #include "src/drivers/lv_drivers.h"
 
-#include "src/lv_api_map.h"
+#include "src/lv_api_map_v8.h"
+#include "src/lv_api_map_v9_0.h"
 
 #include "src/core/lv_global.h"
 /*********************

@@ -84,8 +84,8 @@ static const lv_property_ops_t properties[] = {
     },
     {
         .id = LV_PROPERTY_IMAGE_ALIGN,
-        .setter = lv_image_set_align,
-        .getter = lv_image_get_align,
+        .setter = lv_image_set_inner_align,
+        .getter = lv_image_get_inner_align,
     },
 };
 #endif
@@ -413,7 +413,7 @@ void lv_image_set_antialias(lv_obj_t * obj, bool antialias)
     lv_obj_invalidate(obj);
 }
 
-void lv_image_set_align(lv_obj_t * obj, lv_image_align_t align)
+void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -522,7 +522,7 @@ bool lv_image_get_antialias(lv_obj_t * obj)
     return img->antialias ? true : false;
 }
 
-lv_image_align_t lv_image_get_align(lv_obj_t * obj)
+lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

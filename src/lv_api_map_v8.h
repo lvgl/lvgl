@@ -1,10 +1,10 @@
 /**
- * @file lv_api_map.h
+ * @file lv_api_map_v8.h
  *
  */
 
-#ifndef LV_API_MAP_H
-#define LV_API_MAP_H
+#ifndef LV_API_MAP_V8_H
+#define LV_API_MAP_V8_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -263,4 +263,4 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 } /*extern "C"*/
 #endif
 
-#endif /*LV_API_MAP_H*/
+#endif /*LV_API_MAP_V8_H*/

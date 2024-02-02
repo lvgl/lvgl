@@ -78,7 +78,7 @@ static void moving_wallpaper_cb(void)
     lv_obj_t * img = lv_img_create(lv_screen_active());
     lv_obj_set_size(img, lv_pct(150), lv_pct(150));
     lv_image_set_src(img, &img_benchmark_cogwheel_rgb);
-    lv_image_set_align(img, LV_IMAGE_ALIGN_TILE);
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TILE);
     shake_anim(img, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
