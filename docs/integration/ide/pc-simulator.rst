@@ -158,3 +158,28 @@ to run the project. Now a window should appear in the middle of your
 screen.
 
 Now you are ready to use LVGL and begin development on your PC.
+
+
+Using SDL manually
+------------------
+
+In case you don't use a supported IDE, you can also use LVGL's SDL support manually:
+
+.. code:: cmake
+
+    #include <lvgl.h>
+    #include <unistd.h>
+
+    int main()
+    {
+        lv_init();
+        lv_display_t *display = lv_sdl_window_create(800, 600);
+        lv_indev_t *mouse = lv_sdl_mouse_create();
+        lv_indev_t *keyboard = lv_sdl_keyboard_create();
+        ...
+
+        while (true) {
+            uint32_t ms_delay = lv_timer_handler();
+            usleep(ms_delay * 1000);
+        }
+    }
