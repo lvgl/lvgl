@@ -313,7 +313,6 @@ bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_XRGB8888:
             return true;
 
-        case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_RGB888:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? true : false;
 
@@ -336,7 +335,6 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_ETC2_EAC:
             return true;
 
-        case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_RGB888:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_24BIT) ? true : false;
 
@@ -376,9 +374,6 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_RGB565:
             return VG_LITE_BGR565;
-
-        case LV_COLOR_FORMAT_RGB565A8:
-            return VG_LITE_BGRA5658;
 
         case LV_COLOR_FORMAT_RGB888:
             return VG_LITE_BGR888;
