@@ -153,11 +153,11 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
 
     size_t len = lv_strlen(dsc->buf);
     while(len) {
-    	lv_indev_read(indev);
+        lv_indev_read(indev);
 
-    	/*Call again to handle dummy read in `sdl_keyboard_read`*/
-    	lv_indev_read(indev);
-    	len--;
+        /*Call again to handle dummy read in `sdl_keyboard_read`*/
+        lv_indev_read(indev);
+        len--;
     }
 }
 
