@@ -132,7 +132,8 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         lv_point_precise_t p1 = { dsc->scissor_area.x1, dsc->scissor_area.y1 };
         lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
 
-        lv_point_precise_t p2 = { dsc->scissor_area.x2, dsc->scissor_area.y2 };
+        /* vg-lite bounding_box will crop the pixels on the edge, so +1px is needed here */
+        lv_point_precise_t p2 = { dsc->scissor_area.x2 + 1, dsc->scissor_area.y2 + 1 };
         lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
 
         lv_vg_lite_path_set_bonding_box(lv_vg_path, p1_res.x, p1_res.y, p2_res.x, p2_res.y);
