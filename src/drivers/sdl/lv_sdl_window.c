@@ -31,10 +31,12 @@
 typedef struct {
     SDL_Window * window;
     SDL_Renderer * renderer;
+#if LV_USE_DRAW_SDL == 0
     SDL_Texture * texture;
     uint8_t * fb1;
     uint8_t * fb2;
     uint8_t * fb_act;
+#endif
     uint8_t zoom;
     uint8_t ignore_size_chg;
 } lv_sdl_window_t;
@@ -45,7 +47,9 @@ typedef struct {
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static void window_create(lv_display_t * disp);
 static void window_update(lv_display_t * disp);
-static void texture_resize(lv_display_t * disp);
+#if LV_USE_DRAW_SDL == 0
+    static void texture_resize(lv_display_t * disp);
+#endif
 static void sdl_event_handler(lv_timer_t * t);
 static void release_disp_cb(lv_event_t * e);
 
@@ -107,6 +111,8 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     window_create(disp);
 
     lv_display_set_flush_cb(disp, flush_cb);
+
+#if LV_USE_DRAW_SDL == 0
     if(LV_SDL_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         uint8_t * buf1 = malloc(32 * 1024);
         uint8_t * buf2 = NULL;
@@ -123,6 +129,14 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * lv_display_get_vertical_resolution(disp),
                                LV_SDL_RENDER_MODE);
     }
+#else /*/*LV_USE_DRAW_SDL == 1*/
+    uint32_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp),
+                                                  lv_display_get_color_format(disp));
+    /*It will render directly to default Texture, so the buffer is not used, so just set something*/
+    static uint8_t dummy_buf[1];
+    lv_display_set_buffers(disp, dummy_buf, NULL, stride * lv_display_get_vertical_resolution(disp),
+                           LV_SDL_RENDER_MODE);
+#endif /*LV_USE_DRAW_SDL == 0*/
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
     return disp;
@@ -191,6 +205,7 @@ void lv_sdl_quit()
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
+#if LV_USE_DRAW_SDL == 0
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     if(LV_SDL_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         int32_t y;
@@ -206,7 +221,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
             fb_tmp += fb_stride;
         }
     }
-
     /* TYPICALLY YOU DO NOT NEED THIS
      * If it was the last part to refresh update the texture of the window.*/
     if(lv_display_flush_is_last(disp)) {
@@ -215,6 +229,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         }
         window_update(disp);
     }
+#else
+    if(lv_display_flush_is_last(disp)) {
+        window_update(disp);
+    }
+#endif /*LV_USE_DRAW_SDL == 0*/
 
     /*IMPORTANT! It must be called to tell the system the flush is ready*/
     lv_display_flush_ready(disp);
@@ -288,6 +307,7 @@ static void window_create(lv_display_t * disp)
                                    hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
+#if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 
     uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
@@ -295,9 +315,12 @@ static void window_create(lv_display_t * disp)
 #if LV_SDL_BUF_COUNT == 2
     lv_memset(dsc->fb2, 0xff, hor_res * ver_res * px_size);
 #endif
+#endif /*LV_USE_DRAW_SDL == 0*/
     /*Some platforms (e.g. Emscripten) seem to require setting the size again */
     SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
+#if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
+#endif /*LV_USE_DRAW_SDL == 0*/
 }
 
 static void window_update(lv_display_t * disp)
@@ -316,6 +339,7 @@ static void window_update(lv_display_t * disp)
     SDL_RenderPresent(dsc->renderer);
 }
 
+#if LV_USE_DRAW_SDL == 0
 static void texture_resize(lv_display_t * disp)
 {
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
@@ -354,6 +378,7 @@ static void texture_resize(lv_display_t * disp)
                                      SDL_TEXTUREACCESS_STATIC, hor_res, ver_res);
     SDL_SetTextureBlendMode(dsc->texture, SDL_BLENDMODE_BLEND);
 }
+#endif
 
 static void res_chg_event_cb(lv_event_t * e)
 {
@@ -366,7 +391,9 @@ static void res_chg_event_cb(lv_event_t * e)
         SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
     }
 
+#if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
+#endif
 }
 
 static void release_disp_cb(lv_event_t * e)
@@ -378,11 +405,15 @@ static void release_disp_cb(lv_event_t * e)
     lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
 
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+#if LV_USE_DRAW_SDL == 0
     SDL_DestroyTexture(dsc->texture);
+#endif
     SDL_DestroyRenderer(dsc->renderer);
     SDL_DestroyWindow(dsc->window);
+#if LV_USE_DRAW_SDL == 0
     if(dsc->fb1) free(dsc->fb1);
     if(dsc->fb2) free(dsc->fb2);
+#endif
     lv_free(dsc);
     lv_display_set_driver_data(disp, NULL);
 }
