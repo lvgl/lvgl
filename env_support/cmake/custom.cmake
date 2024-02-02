@@ -35,6 +35,11 @@ if(LV_CONF_PATH)
   target_compile_definitions(lvgl PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
 endif()
 
+# Add definition of LV_CONF_SKIP only if needed
+if(LV_CONF_SKIP)
+  target_compile_definitions(lvgl PUBLIC LV_CONF_SKIP=1)
+endif()
+
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
 
@@ -45,6 +50,9 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
     if(LV_CONF_PATH)
         target_compile_definitions(lvgl_thorvg PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
+    endif()
+    if(LV_CONF_SKIP)
+      target_compile_definitions(lvgl_thorvg PUBLIC LV_CONF_SKIP=1)
     endif()
 endif()
 
@@ -80,11 +88,31 @@ if("${INC_INSTALL_DIR}" STREQUAL "")
   set(INC_INSTALL_DIR "include/lvgl")
 endif()
 
+#Install headers
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src"
   DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
   FILES_MATCHING
   PATTERN "*.h")
+
+# install example headers
+if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
+  install(
+    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+    FILES_MATCHING
+    PATTERN "*.h")
+endif()
+
+# install demo headers
+if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
+  install(
+    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/demos"
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+    FILES_MATCHING
+    PATTERN "*.h")
+endif()
+
 
 configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" lvgl.pc @ONLY)
 
@@ -92,12 +120,13 @@ install(
   FILES "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
   DESTINATION "${LIB_INSTALL_DIR}/pkgconfig/")
 
+# Install library
 set_target_properties(
   lvgl
   PROPERTIES OUTPUT_NAME lvgl
              ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
              LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
              PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
 
 install(
@@ -106,3 +135,58 @@ install(
   LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
   RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
   PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+
+
+# Install library thorvg
+if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+  set_target_properties(
+    lvgl_thorvg
+    PROPERTIES OUTPUT_NAME lvgl_thorvg
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+  
+  install(
+    TARGETS lvgl_thorvg
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif()
+
+# Install library demos
+if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
+  set_target_properties(
+    lvgl_demos
+    PROPERTIES OUTPUT_NAME lvgl_demos
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+  
+  install(
+    TARGETS lvgl_demos
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif()
+
+#install library examples
+if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
+  set_target_properties(
+    lvgl_examples
+    PROPERTIES OUTPUT_NAME lvgl_examples
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+  
+  install(
+    TARGETS lvgl_examples
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif()
