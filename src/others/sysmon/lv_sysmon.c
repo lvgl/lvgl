@@ -186,8 +186,8 @@ static void perf_update_timer_cb(lv_timer_t * t)
                                      0;
 
     info->calculated.flush_avg_time = info->measured.render_cnt ?
-    		                         ((info->measured.flush_in_render_elaps_sum + info->measured.flush_not_in_render_elaps_sum)
-    		                        		 / info->measured.render_cnt) : 0;
+                                      ((info->measured.flush_in_render_elaps_sum + info->measured.flush_not_in_render_elaps_sum)
+                                       / info->measured.render_cnt) : 0;
     /*Flush time was measured in rendering time so subtract it*/
     info->calculated.render_avg_time = info->measured.render_cnt ? ((info->measured.render_elaps_sum -
                                                                      info->measured.flush_in_render_elaps_sum) /
