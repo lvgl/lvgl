@@ -292,6 +292,9 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
                                &matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
     LV_PROFILER_END_TAG("vg_lite_draw");
 
+    /* Flush in time to avoid accumulation of drawing commands */
+    lv_vg_lite_flush(&u->base_unit);
+
     LV_PROFILER_END;
 }
 

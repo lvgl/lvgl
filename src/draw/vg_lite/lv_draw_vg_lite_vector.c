@@ -220,6 +220,9 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
             break;
     }
 
+    /* Flush in time to avoid accumulation of drawing commands */
+    lv_vg_lite_flush(&u->base_unit);
+
     /* drop path */
     lv_vg_lite_path_drop(u, lv_vg_path);
 
