@@ -848,7 +848,7 @@ static void _set_attr(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * dsc, con
                             lv_array_resize(dash_array, len);
                         }
                         for(uint32_t i = 0; i < len; i++) {
-                            lv_array_push_back(dash_array, (uint8_t*)&(dashs[i]));
+                            lv_array_push_back(dash_array, (uint8_t *)(&dashs[i]));
                         }
                     }
                 }
@@ -934,9 +934,11 @@ static void _set_gradient_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * 
         lv_matrix_rotate(mtx, rot);
 
         if(grad->units == LV_SVG_GRADIENT_UNITS_USER_SPACE) {
-            float sx = (x2-x1) / w;
-            lv_matrix_translate(mtx, x1-bounds.x1, y1-bounds.y1);
-            lv_matrix_scale(mtx, sx, sx);
+            float sx = (x2 - x1) / w;
+            float sy = (y2 - y1) / h;
+            float s = MAX(sx, sy);
+            lv_matrix_scale(mtx, s, s);
+            lv_matrix_translate(mtx, x1 - bounds.x1, y1 - bounds.y1);
         }
     }
 }
@@ -2022,7 +2024,7 @@ static void _lv_svg_doc_walk_after_cb(const lv_tree_node_t * node, void * data)
                 if((lv_array_size(&text->contents) + 1) > lv_array_capacity(&text->contents)) {
                     lv_array_resize(&text->contents, text->contents.capacity << 1);
                 }
-                lv_array_push_back(&text->contents, (uint8_t*)&(svg_node->render_obj));
+                lv_array_push_back(&text->contents, (uint8_t *)(&svg_node->render_obj));
             }
         }
     }

@@ -281,6 +281,23 @@ void test_draw_shapes(void)
     lv_svg_node_delete(svg);
 
 
+    const char * svg_shapes_11 = \
+                                "<svg width=\'800\' height=\'800\' viewBox=\'0 0 800 800\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'>"
+                                "<rect x=\'10\' y=\'10\' width=\'200\' height=\'200\' fill=\'url(#paint0_linear_13691_50971)\'/>"
+                                "<rect x=\'212\' y=\'10\' width=\'200\' height=\'200\' fill=\'url(#paint0_linear_13691_50971)\'/>"
+                                "<rect x=\'10\' y=\'212\' width=\'200\' height=\'200\' fill=\'url(#paint0_linear_13691_50971)\'/>"
+                                "<rect x=\'212\' y=\'212\' width=\'200\' height=\'200\' fill=\'url(#paint0_linear_13691_50971)\'/>"
+                                "<defs><linearGradient id=\'paint0_linear_13691_50971\' x1=\'10\' y1=\'10\' "
+                                "x2=\'400\' y2=\'400\' gradientUnits=\'userSpaceOnUse\' >"
+                                "<stop offset=\'0\' stop-color=\'red\' stop-opacity=\'1\'/>"
+                                "<stop offset=\'1\' stop-color=\'green\' stop-opacity=\'1\'/>"
+                                "</linearGradient></defs></svg>";
+
+    svg = lv_svg_load_data(svg_shapes_11, lv_strlen(svg_shapes_11));
+    TEST_ASSERT_NOT_EQUAL(NULL, svg);
+    draw_svg(svg);
+    draw_snapshot(SNAPSHOT_NAME(svg_shapes_11));
+    lv_svg_node_delete(svg);
 }
 
 void test_draw_image(void)
