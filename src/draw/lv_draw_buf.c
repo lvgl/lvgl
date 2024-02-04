@@ -362,6 +362,21 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
             alpha += alpha_stride;
         }
     }
+    else if(cf == LV_COLOR_FORMAT_ARGB8565) {
+        uint32_t h = draw_buf->header.h;
+        uint32_t w = draw_buf->header.w;
+        uint32_t stride = draw_buf->header.stride;
+        uint8_t * line = (uint8_t *)draw_buf->data;
+        for(uint32_t y = 0; y < h; y++) {
+            uint8_t * pixel = line;
+            for(uint32_t x = 0; x < w; x++) {
+                uint8_t alpha = pixel[2];
+                lv_color16_premultiply((lv_color16_t *)pixel, alpha);
+                pixel += 3;
+            }
+            line += stride;
+        }
+    }
     else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
         /*Pass*/
     }

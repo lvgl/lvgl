@@ -76,6 +76,7 @@ typedef uint8_t lv_opa_t;
                                             (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
                                             (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \
+                                            (cf) == LV_COLOR_FORMAT_ARGB8565 ? 24 : \
                                             (cf) == LV_COLOR_FORMAT_RGB888 ? 24 :   \
                                             (cf) == LV_COLOR_FORMAT_ARGB8888 ? 32 : \
                                             (cf) == LV_COLOR_FORMAT_XRGB8888 ? 32 : \
@@ -127,6 +128,7 @@ enum _lv_color_format_t {
 
     /*2 byte (+alpha) formats*/
     LV_COLOR_FORMAT_RGB565            = 0x12,
+    LV_COLOR_FORMAT_ARGB8565          = 0x13,   /**< Not supported by sw renderer yet. */
     LV_COLOR_FORMAT_RGB565A8          = 0x14    /**< Color array followed by Alpha array*/,
 
     /*3 byte (+alpha) formats*/
