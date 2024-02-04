@@ -1321,6 +1321,11 @@ menu "LVGL configuration"
 			default y
 			depends on LV_USE_VG_LITE_THORVG
 
+		config LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+			int "Buffer address alignment"
+			default 64
+			depends on LV_USE_VG_LITE_THORVG
+
 		config LV_VG_LITE_THORVG_THREAD_RENDER
 			bool "Enable multi-thread render"
 			default n

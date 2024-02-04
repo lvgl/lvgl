@@ -900,6 +900,15 @@
         #endif
     #endif
 
+    /*Buffer address alignment*/
+    #ifndef LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+        #ifdef CONFIG_LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+            #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN CONFIG_LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+        #else
+            #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
+        #endif
+    #endif
+
     /*Enable multi-thread render*/
     #ifndef LV_VG_LITE_THORVG_THREAD_RENDER
         #ifdef CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER

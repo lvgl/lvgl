@@ -27,10 +27,6 @@
  *      DEFINES
  *********************/
 
-#ifndef LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
-    #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
-#endif
-
 #define TVG_CANVAS_ENGINE CanvasEngine::Sw
 #define TVG_COLOR(COLOR) B(COLOR), G(COLOR), R(COLOR), A(COLOR)
 #define TVG_IS_VG_FMT_SUPPORT(fmt) ((fmt) == VG_LITE_BGRA8888 || (fmt) == VG_LITE_BGRX8888)
