@@ -62,6 +62,7 @@ uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
             return 16;
 
+        case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_RGB888:
             return 24;
         case LV_COLOR_FORMAT_ARGB8888:
