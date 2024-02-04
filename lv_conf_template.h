@@ -318,6 +318,9 @@
     /*Enable 16 pixels alignment*/
     #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
 
+    /*Buffer address alignment*/
+    #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
+
     /*Enable multi-thread render*/
     #define LV_VG_LITE_THORVG_THREAD_RENDER 0
 
