@@ -82,6 +82,9 @@ typedef void * lv_user_data_t;
 /* Simulate VG-Lite hardware using ThorVG */
 #define LV_USE_VG_LITE_THORVG       1
 
+/* Enable performance monitor log mode for build test */
+#define LV_USE_PERF_MONITOR_LOG_MODE 1
+
 #include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 4
 #define  LV_COLOR_DEPTH     24
