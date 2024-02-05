@@ -115,8 +115,8 @@ struct _lv_indev_t {
 /**
  * Find a scrollable object based on the current scroll vector in the indev.
  * In handles scroll propagation to the parent if needed, and scroll directions too.
- * @param indev		pointer to an indev
- * @return			the found scrollable object or NULL if not found.
+ * @param indev     pointer to an indev
+ * @return          the found scrollable object or NULL if not found.
  */
 lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev);
 

@@ -6,9 +6,7 @@
  **********************************************************************
  */
 
-
 #include "lv_style.h"
-
 
 void lv_style_set_width(lv_style_t * style, int32_t value)
 {
@@ -961,7 +959,6 @@ void lv_style_set_rotary_sensitivity(lv_style_t * style, uint32_t value)
 const lv_style_prop_t _lv_style_const_prop_id_ROTARY_SENSITIVITY = LV_STYLE_ROTARY_SENSITIVITY;
 #if LV_USE_FLEX
 
-
 void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value)
 {
     lv_style_value_t v = {
@@ -1014,7 +1011,6 @@ const lv_style_prop_t _lv_style_const_prop_id_FLEX_GROW = LV_STYLE_FLEX_GROW;
 #endif /*LV_USE_FLEX*/
 
 #if LV_USE_GRID
-
 
 void lv_style_set_grid_column_dsc_array(lv_style_t * style, const int32_t * value)
 {
@@ -1116,4 +1112,3 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN = LV_STYLE_GRID_CELL_ROW_SPAN;
 #endif /*LV_USE_GRID*/
-

@@ -411,9 +411,9 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
                 .num = 256
             };
         default:
-        	return (lv_style_value_t) {
-        		.ptr = NULL
-        	};
+            return (lv_style_value_t) {
+                .ptr = NULL
+            };
     }
 }
 
