@@ -1335,22 +1335,22 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
     if(editable) {
         uint32_t indev_sensitivity = indev->rotary_sensitvity;
         uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(indev_obj_act, 0);
-        int32_t diff = (uint32_t)((uint32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
+        int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
         send_event(LV_EVENT_ROTARY, &diff);
     }
     else {
 
         int32_t vect = indev->pointer.diff > 0 ? indev->scroll_limit : -indev->scroll_limit;
         indev->pointer.vect.y = vect;
-
+        indev->pointer.act_obj = obj;
         lv_obj_t * scroll_obj = lv_indev_find_scroll_obj(indev);
+        if(scroll_obj == NULL) return;
         uint32_t indev_sensitivity = indev->rotary_sensitvity;
         uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(scroll_obj, 0);
-        int32_t diff = (uint32_t)((uint32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
+        int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
 
         indev->pointer.scroll_throw_vect.y = diff;
         indev->pointer.scroll_throw_vect_ori.y = diff;
-        indev->pointer.act_obj = obj;
         _lv_indev_scroll_handler(indev);
     }
 

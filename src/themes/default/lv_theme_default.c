@@ -75,6 +75,7 @@ typedef struct {
     lv_style_t circle;
     lv_style_t no_radius;
     lv_style_t clip_corner;
+    lv_style_t rotary_scroll;
 #if LV_THEME_DEFAULT_GROW
     lv_style_t grow;
 #endif
@@ -263,7 +264,7 @@ static void style_init(my_theme_t * theme)
     lv_style_set_text_font(&theme->styles.scr, theme->base.font_normal);
     lv_style_set_pad_row(&theme->styles.scr, PAD_SMALL);
     lv_style_set_pad_column(&theme->styles.scr, PAD_SMALL);
-    lv_style_set_rotary_sensitivity(&theme->styles.scr, theme->disp_dpi / 4);
+    lv_style_set_rotary_sensitivity(&theme->styles.scr, theme->disp_dpi / 4 * 256);
 
     style_init_reset(&theme->styles.card);
     lv_style_set_radius(&theme->styles.card, RADIUS_DEFAULT);
@@ -278,7 +279,6 @@ static void style_init(my_theme_t * theme)
     lv_style_set_pad_column(&theme->styles.card, PAD_SMALL);
     lv_style_set_line_color(&theme->styles.card, lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_line_width(&theme->styles.card, _LV_DPX_CALC(theme->disp_dpi, 1));
-    lv_style_set_rotary_sensitivity(&theme->styles.card, theme->disp_dpi / 4);
 
     style_init_reset(&theme->styles.outline_primary);
     lv_style_set_outline_color(&theme->styles.outline_primary, theme->base.color_primary);
@@ -387,6 +387,9 @@ static void style_init(my_theme_t * theme)
 
     style_init_reset(&theme->styles.no_radius);
     lv_style_set_radius(&theme->styles.no_radius, 0);
+
+    style_init_reset(&theme->styles.rotary_scroll);
+    lv_style_set_rotary_sensitivity(&theme->styles.rotary_scroll, theme->disp_dpi / 4 * 256);
 
 #if LV_THEME_DEFAULT_GROW
     style_init_reset(&theme->styles.grow);
@@ -737,7 +740,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_t * parent = lv_obj_get_parent(obj);
         /*Tabview content area*/
         if(parent && lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_index(obj) == 1) {
-            return;
+        	return;
         }
         /*Tabview button container*/
         else if(lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_index(obj) == 0) {
@@ -749,6 +752,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         /*Tabview pages*/
         else if(parent && lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
             lv_obj_add_style(obj, &theme->styles.pad_normal, 0);
+            lv_obj_add_style(obj, &theme->styles.rotary_scroll, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
             lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
             return;
