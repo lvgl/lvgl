@@ -225,6 +225,11 @@ L           .qn  q4
 .endm
 
 .macro blend src_bpp, dst_bpp, mask, opa, mode
+.if (mask == 0) && (opa == 2) && (dst_bpp < 32)
+    vhadd.u8        D_B, D_B, S_B
+    vhadd.u8        D_G, D_G, S_G
+    vhadd.u8        D_R, D_R, S_R
+.else
 .if dst_bpp < 32
     vmvn            D_A, S_A
     premult         S, S_A
@@ -255,6 +260,7 @@ L           .qn  q4
     vqadd.u8        D_B, D_B, S_B
     vqadd.u8        D_G, D_G, S_G
     vqadd.u8        D_R, D_R, S_R
+.endif
 .if dst_bpp == 31
     vmov.u8         D_A, #0xFF
 .endif
@@ -303,7 +309,9 @@ L           .qn  q4
     ldst                ld, dst_bpp, DST, D, S, 1, 0
     .if mask
         ldst            ld, 8, MASK, S, D, 1, 0, !
-        .if opa
+        .if opa == 2
+            vshr.u8     S_A, S_A, #1
+        .elseif opa == 1
         .if dst_bpp == 32
             vpush       {d14-d15}
         .endif
@@ -313,11 +321,11 @@ L           .qn  q4
             vpop        {d14-d15}
         .endif
         .endif
-    .else
+    .elseif opa == 1
         vdup.8          S_A, OPA
     .endif
     blend               src_bpp, dst_bpp, mask, opa, mode
-    .if (dst_bpp == 32) || (mask && opa)
+    .if (dst_bpp == 32) || mask || (opa == 1)
         load_index      dst_bpp, D, S
     .endif
     ldst                st, dst_bpp, DST, D, S, 1, 0, !
@@ -377,6 +385,16 @@ L           .qn  q4
 .endif
 .endm
 
+.macro next src_bpp, mask
+    add         DST_ADDR, DST_ADDR, DST_STRIDE
+.if src_bpp > 0
+    add         SRC_ADDR, SRC_ADDR, SRC_STRIDE
+.endif
+.if mask
+    add         MASK_ADDR, MASK_ADDR, MASK_STRIDE
+.endif
+.endm
+
 .macro blender src_bpp, dst_bpp, mask, opa, mode
     enter
     init        src_bpp, dst_bpp, mask, opa
@@ -386,15 +404,21 @@ L           .qn  q4
 .if mask || opa || (src_bpp == 32)
     preload     DST, dst_bpp
 .endif
+.if opa && (src_bpp < 32) && (dst_bpp < 32)
+4:
+@ 50% OPA can be accelerated (OPA == 0x7F/0x80)
+    add         TMP, OPA, #1
+    tst         TMP, #0x7E
+    bne         3f
+    blend_line  src_bpp, dst_bpp, mask, 2, mode
+    next        src_bpp, mask
+    subs        H, #1
+    bne         4b
+    b           0f
+.endif
 3:
     blend_line  src_bpp, dst_bpp, mask, opa, mode
-    add         DST_ADDR, DST_ADDR, DST_STRIDE
-.if src_bpp > 0
-    add         SRC_ADDR, SRC_ADDR, SRC_STRIDE
-.endif
-.if mask
-    add         MASK_ADDR, MASK_ADDR, MASK_STRIDE
-.endif
+    next        src_bpp, mask
     subs        H, #1
     bne         3b
 0:
