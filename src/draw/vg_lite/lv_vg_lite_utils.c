@@ -1092,11 +1092,22 @@ void lv_vg_lite_flush(lv_draw_unit_t * draw_unit)
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     u->flush_count++;
+
+#if LV_VG_LITE_FLUSH_MAX_COUNT
     if(u->flush_count < LV_VG_LITE_FLUSH_MAX_COUNT) {
         /* Do not flush too often */
         LV_PROFILER_END;
         return;
     }
+#else
+    vg_lite_uint32_t is_gpu_idle = 0;
+    LV_VG_LITE_CHECK_ERROR(vg_lite_get_parameter(VG_LITE_GPU_IDLE_STATE, 1, (vg_lite_pointer)&is_gpu_idle));
+    if(!is_gpu_idle) {
+        /* Do not flush if GPU is busy */
+        LV_PROFILER_END;
+        return;
+    }
+#endif
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_flush());
     u->flush_count = 0;

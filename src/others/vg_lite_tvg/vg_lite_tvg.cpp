@@ -1774,6 +1774,26 @@ Empty_sequence_handler:
         LV_UNUSED(size);
         return VG_LITE_NOT_SUPPORT;
     }
+
+    vg_lite_error_t vg_lite_get_parameter(vg_lite_param_type_t type,
+                                          vg_lite_int32_t count,
+                                          vg_lite_float_t * params)
+    {
+        switch(type) {
+            case VG_LITE_GPU_IDLE_STATE:
+                if(count != 1 || params == NULL) {
+                    return VG_LITE_INVALID_ARGUMENT;
+                }
+
+                *(vg_lite_uint32_t *)params = 1;
+                return VG_LITE_SUCCESS;
+
+            default:
+                break;
+        }
+
+        return VG_LITE_NOT_SUPPORT;
+    }
 } /* extern "C" */
 
 /**********************
