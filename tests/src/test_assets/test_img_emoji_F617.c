@@ -1,6 +1,6 @@
 #include "../../lvgl.h"
 
-#if LV_BUILD_EXAMPLES
+#if LV_BUILD_TEST
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
@@ -244,4 +244,4 @@ const lv_image_dsc_t emoji_F617 = {
     .data = emoji_F617_map,
 };
 
-#endif /*LV_BUILD_EXAMPLES*/
+#endif /*LV_BUILD_TEST*/
