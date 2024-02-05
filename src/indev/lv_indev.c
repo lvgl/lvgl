@@ -398,14 +398,14 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group)
 {
-    if(indev->type == LV_INDEV_TYPE_KEYPAD || indev->type == LV_INDEV_TYPE_ENCODER) {
+    if(indev && (indev->type == LV_INDEV_TYPE_KEYPAD || indev->type == LV_INDEV_TYPE_ENCODER)) {
         indev->group = group;
     }
 }
 
 void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t points[])
 {
-    if(indev->type == LV_INDEV_TYPE_BUTTON) {
+    if(indev && indev->type == LV_INDEV_TYPE_BUTTON) {
         indev->btn_points = points;
     }
 }
@@ -415,9 +415,8 @@ void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
     if(indev == NULL) {
         point->x = 0;
         point->y = 0;
-        return;
     }
-    if(indev->type != LV_INDEV_TYPE_POINTER && indev->type != LV_INDEV_TYPE_BUTTON) {
+    else if(indev->type != LV_INDEV_TYPE_POINTER && indev->type != LV_INDEV_TYPE_BUTTON) {
         point->x = -1;
         point->y = -1;
     }
@@ -434,10 +433,12 @@ lv_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev)
 
 uint32_t lv_indev_get_key(const lv_indev_t * indev)
 {
-    if(indev->type != LV_INDEV_TYPE_KEYPAD)
-        return 0;
-    else
-        return indev->keypad.last_key;
+    uint32_t key = 0;
+
+    if(indev && indev->type == LV_INDEV_TYPE_KEYPAD)
+        key = indev->keypad.last_key;
+
+    return key;
 }
 
 lv_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
