@@ -559,7 +559,7 @@ static void summary_create(void)
     lv_table_set_cell_value(table, 0, 3, "Avg. time (render + flush)");
 
     /* csv log */
-    LV_LOG("Benchmark Summary (%"LV_PRIu32".%"LV_PRIu32".%"LV_PRIu32" %s)\r\n",
+    LV_LOG("Benchmark Summary (%"LV_PRId32".%"LV_PRId32".%"LV_PRId32" %s)\r\n",
            LVGL_VERSION_MAJOR,
            LVGL_VERSION_MINOR,
            LVGL_VERSION_PATCH,
