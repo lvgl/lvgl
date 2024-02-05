@@ -188,7 +188,7 @@ class ColorFormat(Enum):
 
     @property
     def is_luma_only(self) -> bool:
-        return self in (ColorFormat.L8,)
+        return self in (ColorFormat.L8, )
 
 
 def bit_extend(value, bpp):
@@ -254,14 +254,10 @@ def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
         pixels = [(data[2 * i + 1] << 8) | data[2 * i]
                   for i in range(len(data) // 2)]
 
-        values_5bit = [x * 8 for x in range(32)]
-        values_5bit[-1] = 255
-        values_6bit = [x * 4 for x in range(64)]
-        values_6bit[-1] = 255
         for p in pixels:
-            ret.append(values_5bit[(p >> 11) & 0x1f])  # R
-            ret.append(values_6bit[(p >> 5) & 0x3f])  # G
-            ret.append(values_5bit[(p >> 0) & 0x1f])  # B
+            ret.append(bit_extend((p >> 11) & 0x1f, 5))  # R
+            ret.append(bit_extend((p >> 5) & 0x3f, 6))  # G
+            ret.append(bit_extend((p >> 0) & 0x1f, 5))  # B
     elif bpp == 24:
         if cf == ColorFormat.RGB888:
             B = data[0::3]
@@ -276,10 +272,6 @@ def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
             pixels = [(pixel_data[2 * i + 1] << 8) | pixel_data[2 * i]
                       for i in range(len(pixel_data) // 2)]
 
-            values_5bit = [x * 8 for x in range(32)]
-            values_5bit[-1] = 255
-            values_6bit = [x * 4 for x in range(64)]
-            values_6bit[-1] = 255
             for a, p in zip(pixel_alpha, pixels):
                 ret.append(bit_extend((p >> 11) & 0x1f, 5))  # R
                 ret.append(bit_extend((p >> 5) & 0x3f, 6))  # G
@@ -289,11 +281,6 @@ def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
             L = data[0::3]
             H = data[1::3]
             A = data[2::3]
-
-            values_5bit = [x * 8 for x in range(32)]
-            values_5bit[-1] = 255
-            values_6bit = [x * 4 for x in range(64)]
-            values_6bit[-1] = 255
 
             for h, l, a in zip(H, L, A):
                 p = (h << 8) | (l)
@@ -428,8 +415,9 @@ class LVGLImage:
         self.set_data(cf, w, h, data)
 
     def __repr__(self) -> str:
-        return (f"'LVGL image {self.w}x{self.h}, {self.cf.name}, stride: {self.stride}"
-                f" (12+{self.data_len})Byte'")
+        return (
+            f"'LVGL image {self.w}x{self.h}, {self.cf.name}, stride: {self.stride}"
+            f" (12+{self.data_len})Byte'")
 
     def adjust_stride(self, stride: int = 0, align: int = 1):
         """
@@ -476,7 +464,7 @@ class LVGLImage:
                 padding = b'\x00' * (new_stride - current_stride)
                 for i in range(h):
                     data_out.append(data_in[i * current_stride:(i + 1) *
-                                                               current_stride])
+                                            current_stride])
                     data_out.append(padding)
             return b''.join(data_out)
 
@@ -825,7 +813,7 @@ const lv_img_dsc_t {varname} = {{
                     rawdata += uint8_t(e)
         else:
             shift = 8 - cf.bpp
-            mask = 2 ** cf.bpp - 1
+            mask = 2**cf.bpp - 1
             rows = [[(a >> shift) & mask for a in row[3::4]] for row in rows]
             for row in png.pack_rows(rows, cf.bpp):
                 rawdata += row
@@ -969,7 +957,7 @@ class RLEImage(LVGLImage):
                 ctrl_byte = uint8_t(nonrepeat_cnt | 0x80)
                 compressed_data.append(ctrl_byte)
                 compressed_data.append(memview[index:index +
-                                                     nonrepeat_cnt * blksize])
+                                               nonrepeat_cnt * blksize])
                 index += nonrepeat_cnt * blksize
             else:
                 ctrl_byte = uint8_t(repeat_cnt)
@@ -1170,7 +1158,9 @@ def main():
 def test():
     logging.basicConfig(level=logging.INFO)
     f = "pngs/cogwheel.RGB565A8.png"
-    img = LVGLImage().from_png(f, cf=ColorFormat.ARGB8565, background=0xFF_FF_00)
+    img = LVGLImage().from_png(f,
+                               cf=ColorFormat.ARGB8565,
+                               background=0xFF_FF_00)
     img.adjust_stride(align=16)
     img.to_bin("output/cogwheel.ARGB8565.bin")
     img.to_c_array("output/cogwheel-abc.c")  # file name is used as c var name
