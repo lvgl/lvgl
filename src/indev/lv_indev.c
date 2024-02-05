@@ -111,7 +111,7 @@ lv_indev_t * lv_indev_create(void)
 
     lv_indev_t * indev = _lv_ll_ins_head(indev_ll_head);
     LV_ASSERT_MALLOC(indev);
-    if(!indev) {
+    if(indev == NULL) {
         return NULL;
     }
 
@@ -305,7 +305,7 @@ void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data)
 
 lv_indev_read_cb_t lv_indev_get_read_cb(lv_indev_t * indev)
 {
-    if(!indev) {
+    if(indev == NULL) {
         LV_LOG_WARN("lv_indev_get_read_cb: indev was NULL");
         return NULL;
     }
@@ -478,7 +478,7 @@ lv_obj_t * lv_indev_get_active_obj(void)
 
 lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev)
 {
-    if(!indev) {
+    if(indev == NULL) {
         LV_LOG_WARN("lv_indev_get_read_timer: indev was NULL");
         return NULL;
     }
@@ -494,7 +494,7 @@ lv_indev_mode_t lv_indev_get_mode(lv_indev_t * indev)
 
 void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode)
 {
-    if(!indev || indev->mode == mode)
+    if(indev == NULL || indev->mode == mode)
         return;
 
     indev->mode = mode;
