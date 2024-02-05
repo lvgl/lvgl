@@ -32,7 +32,7 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
 typedef struct {
     lv_image_header_t header;
     uint32_t data_size;     /*Total buf size in bytes*/
-    void * data;
+    uint8_t * data;
     void * unaligned_data;  /*Unaligned address of `data`, used internally by lvgl*/
 } lv_draw_buf_t;
 

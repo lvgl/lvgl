@@ -303,12 +303,8 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
 
     if(stride > header->stride) {
         /*Copy from the last line to the first*/
-        uint8_t * src_data = src->data;
-        src_data += offset;
-        src_data += header->stride * (header->h - 1);
-        uint8_t * dst_data = src->data;
-        dst_data += offset;
-        dst_data += stride * (header->h - 1);
+        uint8_t * src_data = src->data + offset + header->stride * (header->h - 1);
+        uint8_t * dst_data = src->data + offset + stride * (header->h - 1);
         for(; src_data != src->data;) {
             lv_memmove(dst_data, src_data, min_stride);
             src_data -= header->stride;
@@ -317,10 +313,8 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
     }
     else {
         /*Copy from the first line to the last*/
-        uint8_t * src_data = src->data;
-        uint8_t * dst_data = src->data;
-        src_data += offset;
-        dst_data += offset;
+        uint8_t * src_data = src->data + offset;
+        uint8_t * dst_data = src->data + offset;
         for(uint32_t y = 0; y < header->h; y++) {
             lv_memmove(dst_data, src_data, min_stride);
             src_data += header->stride;
