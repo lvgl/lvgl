@@ -13,6 +13,7 @@
 
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_path.h"
+#include "lv_vg_lite_grad.h"
 #include "lv_draw_vg_lite_type.h"
 #include <string.h>
 
@@ -39,11 +40,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct {
-    vg_lite_linear_gradient_t grad;
-    bool in_use;
-} gradient_item_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -918,142 +914,6 @@ bool lv_vg_lite_16px_align(void)
     return vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN);
 }
 
-static vg_lite_linear_gradient_t * lv_vg_lite_linear_grad_get(struct _lv_draw_vg_lite_unit_t * u)
-{
-    LV_ASSERT_NULL(u);
-
-    uint32_t size = lv_array_size(&u->grad_pending);
-    gradient_item_t * item = lv_array_front(&u->grad_pending);
-    for(uint32_t i = 0; i < size; i++) {
-        if(!item[i].in_use) {
-            /* Mark as in use */
-            item[i].in_use = true;
-            LV_LOG_TRACE("get gradient: %p", &item[i].grad);
-
-            /* return the gradient */
-            return &item[i].grad;
-        }
-    }
-
-    /* No free gradient, create a new one */
-    gradient_item_t new_item;
-    lv_memzero(&new_item, sizeof(new_item));
-    LV_VG_LITE_CHECK_ERROR(vg_lite_init_grad(&new_item.grad));
-    LV_ASSERT(lv_array_push_back(&u->grad_pending, &new_item) == LV_RESULT_OK);
-
-    /* Get the last one */
-    gradient_item_t * back = lv_array_back(&u->grad_pending);
-    LV_ASSERT_NULL(back);
-    return &back->grad;
-}
-
-static void lv_vg_lite_linear_grad_drop_all(struct _lv_draw_vg_lite_unit_t * u)
-{
-    LV_ASSERT_NULL(u);
-
-    uint32_t size = lv_array_size(&u->grad_pending);
-    gradient_item_t * item = lv_array_front(&u->grad_pending);
-    for(uint32_t i = 0; i < size; i++) {
-        if(item[i].in_use) {
-            LV_LOG_TRACE("drop gradient: %p", &item[i].grad);
-            item[i].in_use = false;
-        }
-    }
-}
-
-void lv_vg_lite_linear_grad_init(struct _lv_draw_vg_lite_unit_t * u)
-{
-    LV_ASSERT_NULL(u);
-    lv_array_init(&u->grad_pending, 4, sizeof(gradient_item_t));
-}
-
-void lv_vg_lite_linear_grad_deinit(struct _lv_draw_vg_lite_unit_t * u)
-{
-    LV_ASSERT_NULL(u);
-
-    /* Clear all pending gradients */
-    uint32_t size = lv_array_size(&u->grad_pending);
-    gradient_item_t * item = lv_array_front(&u->grad_pending);
-    for(uint32_t i = 0; i < size; i++) {
-        LV_ASSERT_MSG(!item[i].in_use, "gradient is still in use");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_clear_grad(&item[i].grad));
-    }
-
-    /* Deinit array */
-    lv_array_deinit(&u->grad_pending);
-}
-
-void lv_vg_lite_draw_linear_grad(
-    struct _lv_draw_vg_lite_unit_t * u,
-    vg_lite_buffer_t * buffer,
-    vg_lite_path_t * path,
-    const lv_area_t * area,
-    const lv_grad_dsc_t * grad,
-    const vg_lite_matrix_t * matrix,
-    vg_lite_fill_t fill,
-    vg_lite_blend_t blend)
-{
-    LV_ASSERT_NULL(buffer);
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(area);
-    LV_ASSERT_NULL(grad);
-
-    LV_PROFILER_BEGIN;
-
-    LV_ASSERT(grad->dir != LV_GRAD_DIR_NONE);
-
-    vg_lite_uint32_t colors[VLC_MAX_GRADIENT_STOPS];
-    vg_lite_uint32_t stops[VLC_MAX_GRADIENT_STOPS];
-
-    /* Gradient setup */
-    uint8_t cnt = grad->stops_count;
-    LV_ASSERT(cnt < VLC_MAX_GRADIENT_STOPS);
-    for(uint8_t i = 0; i < cnt; i++) {
-        stops[i] = grad->stops[i].frac;
-        const lv_color_t * c = &grad->stops[i].color;
-        lv_opa_t opa = grad->stops[i].opa;
-
-        /* lvgl color -> gradient color */
-        lv_color_t grad_color = lv_color_make(c->blue, c->green, c->red);
-        colors[i] = lv_vg_lite_color(grad_color, opa, true);
-    }
-
-    vg_lite_linear_gradient_t * gradient = lv_vg_lite_linear_grad_get(u);
-    LV_VG_LITE_CHECK_ERROR(vg_lite_set_grad(gradient, cnt, colors, stops));
-
-    LV_PROFILER_BEGIN_TAG("vg_lite_update_grad");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_update_grad(gradient));
-    LV_PROFILER_END_TAG("vg_lite_update_grad");
-
-    vg_lite_matrix_t * grad_matrix = vg_lite_get_grad_matrix(gradient);
-    vg_lite_identity(grad_matrix);
-    vg_lite_translate(area->x1, area->y1, grad_matrix);
-
-    if(grad->dir == LV_GRAD_DIR_VER) {
-        vg_lite_scale(1, lv_area_get_height(area) / 256.0f, grad_matrix);
-        vg_lite_rotate(90, grad_matrix);
-    }
-    else {   /*LV_GRAD_DIR_HOR*/
-        vg_lite_scale(lv_area_get_width(area) / 256.0f, 1, grad_matrix);
-    }
-
-    LV_VG_LITE_ASSERT_DEST_BUFFER(buffer);
-    LV_VG_LITE_ASSERT_SRC_BUFFER(&gradient.image);
-    LV_VG_LITE_ASSERT_PATH(path);
-
-    LV_PROFILER_BEGIN_TAG("vg_lite_draw_grad");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_draw_grad(
-                               buffer,
-                               path,
-                               fill,
-                               (vg_lite_matrix_t *)matrix,
-                               gradient,
-                               blend));
-    LV_PROFILER_END_TAG("vg_lite_draw_grad");
-
-    LV_PROFILER_END;
-}
-
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult)
 {
     vg_lite_matrix_t temp;
@@ -1194,7 +1054,7 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
-    /* Clear all pending gradients */
+    /* Clear all gradient caches */
     lv_vg_lite_linear_grad_drop_all(u);
 
     /* Clear image decoder dsc reference */

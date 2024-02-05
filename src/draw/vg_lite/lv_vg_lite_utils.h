@@ -151,20 +151,6 @@ bool lv_vg_lite_support_blend_normal(void);
 
 bool lv_vg_lite_16px_align(void);
 
-void lv_vg_lite_linear_grad_init(struct _lv_draw_vg_lite_unit_t * u);
-
-void lv_vg_lite_linear_grad_deinit(struct _lv_draw_vg_lite_unit_t * u);
-
-void lv_vg_lite_draw_linear_grad(
-    struct _lv_draw_vg_lite_unit_t * u,
-    vg_lite_buffer_t * buffer,
-    vg_lite_path_t * path,
-    const lv_area_t * area,
-    const lv_grad_dsc_t * grad,
-    const vg_lite_matrix_t * matrix,
-    vg_lite_fill_t fill,
-    vg_lite_blend_t blend);
-
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 
 void lv_vg_lite_matrix_flip_y(vg_lite_matrix_t * matrix);

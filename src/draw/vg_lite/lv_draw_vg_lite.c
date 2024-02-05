@@ -16,6 +16,7 @@
 #include "lv_vg_lite_path.h"
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_decoder.h"
+#include "lv_vg_lite_grad.h"
 
 /*********************
  *      DEFINES
@@ -70,7 +71,7 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.delete_cb = draw_delete;
     lv_array_init(&unit->img_dsc_pending, 4, sizeof(lv_image_decoder_dsc_t));
 
-    lv_vg_lite_linear_grad_init(unit);
+    lv_vg_lite_grad_init(unit);
 
     lv_vg_lite_path_init(unit);
 
@@ -243,7 +244,7 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 {
     lv_draw_vg_lite_unit_t * unit = (lv_draw_vg_lite_unit_t *)draw_unit;
     lv_array_deinit(&unit->img_dsc_pending);
-    lv_vg_lite_linear_grad_deinit(unit);
+    lv_vg_lite_grad_deinit(unit);
     lv_vg_lite_path_deinit(unit);
     lv_vg_lite_decoder_deinit();
     return 1;
