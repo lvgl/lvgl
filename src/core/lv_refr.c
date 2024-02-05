@@ -36,9 +36,12 @@ typedef struct {
     uint32_t    frame_cnt;
     uint32_t    fps_sum_cnt;
     uint32_t    fps_sum_all;
+    uint32_t    refr_cnt;
     uint32_t    render_cnt;
     uint32_t    render_time_sum;
-    uint32_t    flush_time_sum;
+    uint32_t    flush_time_in_render_sum;
+    uint32_t    flush_time_not_in_render_sum;
+    uint32_t    in_render :1;
 #if LV_USE_LABEL
     lv_obj_t  * perf_label;
 #endif
@@ -323,15 +326,20 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
+    perf_monitor.refr_cnt++;
+    if(disp_refr->inv_p == 0) goto skip_render;
 
     lv_refr_join_area();
     refr_sync_areas();
 
     perf_monitor.render_cnt++;
     uint32_t t = lv_tick_get();
+    perf_monitor.in_render = 1;
     refr_invalid_areas();
+    perf_monitor.in_render = 0;
     perf_monitor.render_time_sum += lv_tick_elaps(t);
 
+skip_render:
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
 
@@ -393,40 +401,15 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
     else {
         perf_monitor.perf_last_time = lv_tick_get();
-        uint32_t fps_limit;
-        uint32_t fps;
+        uint32_t fps = (1000 * perf_monitor.refr_cnt) / 300;
 
-        if(disp_refr->refr_timer) {
-            fps_limit = 1000 / disp_refr->refr_timer->period;
-        }
-        else {
-            fps_limit = 1000 / LV_DISP_DEF_REFR_PERIOD;
-        }
-
-        if(perf_monitor.elaps_sum == 0) {
-            perf_monitor.elaps_sum = 1;
-        }
-        if(perf_monitor.frame_cnt == 0) {
-            fps = fps_limit;
-        }
-        else {
-            fps = (1000 * perf_monitor.frame_cnt) / perf_monitor.elaps_sum;
-        }
-        perf_monitor.elaps_sum = 0;
-        perf_monitor.frame_cnt = 0;
-        if(fps > fps_limit) {
-            fps = fps_limit;
-        }
-
-        perf_monitor.fps_sum_all += fps;
-        perf_monitor.fps_sum_cnt ++;
-
-        uint32_t render_time = perf_monitor.render_cnt ? perf_monitor.render_time_sum / perf_monitor.render_cnt : 0;
-        uint32_t flush_time = perf_monitor.render_cnt ? perf_monitor.flush_time_sum / perf_monitor.render_cnt : 0;
-        render_time -= flush_time; /*Flush time was measured in the render time*/
+        uint32_t render_time = perf_monitor.render_cnt ? (perf_monitor.render_time_sum - perf_monitor.flush_time_in_render_sum) / perf_monitor.render_cnt : 0;
+        uint32_t flush_time = perf_monitor.render_cnt ? (perf_monitor.flush_time_in_render_sum + perf_monitor.flush_time_not_in_render_sum) / perf_monitor.render_cnt : 0;
         perf_monitor.render_time_sum = 0;
-        perf_monitor.flush_time_sum = 0;
+        perf_monitor.flush_time_in_render_sum = 0;
+        perf_monitor.flush_time_not_in_render_sum = 0;
         perf_monitor.render_cnt = 0;
+        perf_monitor.refr_cnt = 0;
 
         uint32_t cpu = 100 - lv_timer_get_idle();
         lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS %"LV_PRIu32"%% CPU\n %"LV_PRIu32"ms (%"LV_PRIu32" | %"LV_PRIu32")",
@@ -607,8 +590,6 @@ static void refr_invalid_areas(void)
 {
     px_num = 0;
 
-    if(disp_refr->inv_p == 0) return;
-
     /*Find the last area which will be drawn*/
     int32_t i;
     int32_t last_i = 0;
@@ -727,9 +708,15 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
     bool full_sized = draw_buf->size == (uint32_t)disp_refr->driver->hor_res * disp_refr->driver->ver_res;
     if((draw_buf->buf1 && !draw_buf->buf2) ||
        (draw_buf->buf1 && draw_buf->buf2 && full_sized)) {
+
+    	uint32_t t = lv_tick_get();
+
         while(draw_buf->flushing) {
             if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
         }
+
+        if(perf_monitor.in_render) perf_monitor.flush_time_in_render_sum += lv_tick_elaps(t);
+        else perf_monitor.flush_time_not_in_render_sum += lv_tick_elaps(t);
 
         /*If the screen is transparent initialize it when the flushing is ready*/
 #if LV_COLOR_SCREEN_TRANSP
@@ -1274,9 +1261,15 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
             /*Flush the completed area to the display*/
             call_flush_cb(drv, area, rot_buf == NULL ? color_p : rot_buf);
             /*FIXME: Rotation forces legacy behavior where rendering and flushing are done serially*/
+
+        	uint32_t t = lv_tick_get();
+
             while(draw_buf->flushing) {
                 if(drv->wait_cb) drv->wait_cb(drv);
             }
+            if(perf_monitor.in_render) perf_monitor.flush_time_in_render_sum += lv_tick_elaps(t);
+            else perf_monitor.flush_time_not_in_render_sum += lv_tick_elaps(t);
+
             color_p += area_w * height;
             row += height;
         }
@@ -1300,9 +1293,14 @@ static void draw_buf_flush(lv_disp_t * disp)
      * and driver is ready to receive the new buffer */
     bool full_sized = draw_buf->size == (uint32_t)disp_refr->driver->hor_res * disp_refr->driver->ver_res;
     if(draw_buf->buf1 && draw_buf->buf2 && !full_sized) {
+    	uint32_t t = lv_tick_get();
+
         while(draw_buf->flushing) {
             if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
         }
+        if(perf_monitor.in_render) perf_monitor.flush_time_in_render_sum += lv_tick_elaps(t);
+        else perf_monitor.flush_time_not_in_render_sum += lv_tick_elaps(t);
+
     }
 
     draw_buf->flushing = 1;
@@ -1345,7 +1343,8 @@ static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_
 
     uint32_t t = lv_tick_get();
     drv->flush_cb(drv, &offset_area, color_p);
-    perf_monitor.flush_time_sum += lv_tick_elaps(t);
+    if(perf_monitor.in_render) perf_monitor.flush_time_in_render_sum += lv_tick_elaps(t);
+    else perf_monitor.flush_time_not_in_render_sum += lv_tick_elaps(t);
 }
 
 #if LV_USE_PERF_MONITOR
