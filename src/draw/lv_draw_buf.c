@@ -75,8 +75,13 @@ void lv_draw_buf_invalidate_cache(lv_draw_buf_t * draw_buf, const lv_area_t * ar
     if(handlers.invalidate_cache_cb) {
         LV_ASSERT_NULL(draw_buf);
         const lv_image_header_t * header = &draw_buf->header;
-        lv_area_t full = {0, 0, header->w - 1, header->h - 1};
-        if(area == NULL) area = &full;
+        lv_area_t full;
+        if(area == NULL) {
+            full = (lv_area_t) {
+                0, 0, header->w - 1, header->h - 1
+            };
+            area = &full;
+        }
         handlers.invalidate_cache_cb(draw_buf, area);
     }
 }
