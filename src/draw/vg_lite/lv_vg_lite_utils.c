@@ -986,15 +986,16 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
 {
     vg_lite_matrix_t temp;
     int row, column;
+    const vg_lite_float_t (*m)[3] = matrix->m;
 
     /* Process all rows. */
     for(row = 0; row < 3; row++) {
         /* Process all columns. */
         for(column = 0; column < 3; column++) {
             /* Compute matrix entry. */
-            temp.m[row][column] = (matrix->m[row][0] * mult->m[0][column])
-                                  + (matrix->m[row][1] * mult->m[1][column])
-                                  + (matrix->m[row][2] * mult->m[2][column]);
+            temp.m[row][column] = (m[row][0] * mult->m[0][column])
+                                  + (m[row][1] * mult->m[1][column])
+                                  + (m[row][2] * mult->m[2][column]);
         }
     }
 
@@ -1029,12 +1030,14 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
         return true;
     }
 
-    det00 = (matrix->m[1][1] * matrix->m[2][2]) - (matrix->m[2][1] * matrix->m[1][2]);
-    det01 = (matrix->m[2][0] * matrix->m[1][2]) - (matrix->m[1][0] * matrix->m[2][2]);
-    det02 = (matrix->m[1][0] * matrix->m[2][1]) - (matrix->m[2][0] * matrix->m[1][1]);
+    const vg_lite_float_t (*m)[3] = matrix->m;
+
+    det00 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
+    det01 = m[2][0] * m[1][2] - m[1][0] * m[2][2];
+    det02 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
 
     /* Compute determinant. */
-    d = (matrix->m[0][0] * det00) + (matrix->m[0][1] * det01) + (matrix->m[0][2] * det02);
+    d = m[0][0] * det00 + m[0][1] * det01 + m[0][2] * det02;
 
     /* Return 0 if there is no inverse matrix. */
     if(d == 0.0f)
@@ -1044,17 +1047,17 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
     d = 1.0f / d;
 
     /* Determine if the matrix is affine. */
-    is_affine = (matrix->m[2][0] == 0.0f) && (matrix->m[2][1] == 0.0f) && (matrix->m[2][2] == 1.0f);
+    is_affine = (m[2][0] == 0.0f) && (m[2][1] == 0.0f) && (m[2][2] == 1.0f);
 
     result->m[0][0] = d * det00;
-    result->m[0][1] = d * ((matrix->m[2][1] * matrix->m[0][2]) - (matrix->m[0][1] * matrix->m[2][2]));
-    result->m[0][2] = d * ((matrix->m[0][1] * matrix->m[1][2]) - (matrix->m[1][1] * matrix->m[0][2]));
+    result->m[0][1] = d * ((m[2][1] * m[0][2]) - (m[0][1] * m[2][2]));
+    result->m[0][2] = d * ((m[0][1] * m[1][2]) - (m[1][1] * m[0][2]));
     result->m[1][0] = d * det01;
-    result->m[1][1] = d * ((matrix->m[0][0] * matrix->m[2][2]) - (matrix->m[2][0] * matrix->m[0][2]));
-    result->m[1][2] = d * ((matrix->m[1][0] * matrix->m[0][2]) - (matrix->m[0][0] * matrix->m[1][2]));
+    result->m[1][1] = d * ((m[0][0] * m[2][2]) - (m[2][0] * m[0][2]));
+    result->m[1][2] = d * ((m[1][0] * m[0][2]) - (m[0][0] * m[1][2]));
     result->m[2][0] = is_affine ? 0.0f : d * det02;
-    result->m[2][1] = is_affine ? 0.0f : d * ((matrix->m[2][0] * matrix->m[0][1]) - (matrix->m[0][0] * matrix->m[2][1]));
-    result->m[2][2] = is_affine ? 1.0f : d * ((matrix->m[0][0] * matrix->m[1][1]) - (matrix->m[1][0] * matrix->m[0][1]));
+    result->m[2][1] = is_affine ? 0.0f : d * ((m[2][0] * m[0][1]) - (m[0][0] * m[2][1]));
+    result->m[2][2] = is_affine ? 1.0f : d * ((m[0][0] * m[1][1]) - (m[1][0] * m[0][1]));
 
     /* Success. */
     return true;
@@ -1063,8 +1066,9 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
 lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point)
 {
     lv_point_precise_t p;
-    p.x = (lv_value_precise_t)(point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]);
-    p.y = (lv_value_precise_t)(point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]);
+    const vg_lite_float_t (*m)[3] = matrix->m;
+    p.x = (lv_value_precise_t)(point->x * m[0][0] + point->y * m[0][1] + m[0][2]);
+    p.y = (lv_value_precise_t)(point->x * m[1][0] + point->y * m[1][1] + m[1][2]);
     return p;
 }
 
