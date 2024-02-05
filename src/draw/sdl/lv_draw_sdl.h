@@ -17,7 +17,7 @@ extern "C" {
 
 #if LV_USE_DRAW_SDL
 
-#include <src/misc/cache/lv_cache.h>
+#include "../../misc/cache/lv_cache.h"
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
 #include "../../display/lv_display.h"

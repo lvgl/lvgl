@@ -174,11 +174,11 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
 
     lv_layer_t dest_layer;
     lv_memzero(&dest_layer, sizeof(dest_layer));
-    dest_layer.buf = lv_draw_buf_align(sdl_render_buf, LV_COLOR_FORMAT_ARGB8888);
+    lv_draw_buf_t draw_buf;
+    dest_layer.draw_buf = &draw_buf;
+    lv_draw_buf_init(dest_layer.draw_buf, lv_area_get_width(&task->area), lv_area_get_height(&task->area),
+                     LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO, sdl_render_buf, sizeof(sdl_render_buf));
     dest_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
-
-    lv_area_t a;
-    _lv_area_intersect(&a, u->base_unit.clip_area, &task->area);
     dest_layer.buf_area = task->area;
     dest_layer._clip_area = task->area;
     lv_memzero(sdl_render_buf, lv_area_get_size(&dest_layer.buf_area) * 4 + 100);
@@ -224,7 +224,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
             break;
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * image_dsc = task->draw_dsc;
-                //              SDL_Surface* loadImage(std::string path) {
                 const char * path = image_dsc->src;
                 SDL_Surface * surface = IMG_Load(&path[2]);
                 if(surface == NULL) {
@@ -307,6 +306,7 @@ static void blend_texture_layer(lv_draw_sdl_unit_t * u)
 
 static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 {
+
     lv_draw_task_t * t = u->task_act;
 
     cache_data_t data_to_find;
