@@ -263,6 +263,7 @@ static void style_init(my_theme_t * theme)
     lv_style_set_text_font(&theme->styles.scr, theme->base.font_normal);
     lv_style_set_pad_row(&theme->styles.scr, PAD_SMALL);
     lv_style_set_pad_column(&theme->styles.scr, PAD_SMALL);
+    lv_style_set_rotary_sensitivity(&theme->styles.scr, theme->disp_dpi / 4);
 
     style_init_reset(&theme->styles.card);
     lv_style_set_radius(&theme->styles.card, RADIUS_DEFAULT);
@@ -277,6 +278,7 @@ static void style_init(my_theme_t * theme)
     lv_style_set_pad_column(&theme->styles.card, PAD_SMALL);
     lv_style_set_line_color(&theme->styles.card, lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_line_width(&theme->styles.card, _LV_DPX_CALC(theme->disp_dpi, 1));
+    lv_style_set_rotary_sensitivity(&theme->styles.card, theme->disp_dpi / 4);
 
     style_init_reset(&theme->styles.outline_primary);
     lv_style_set_outline_color(&theme->styles.outline_primary, theme->base.color_primary);

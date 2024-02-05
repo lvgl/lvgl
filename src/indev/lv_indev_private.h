@@ -69,11 +69,8 @@ struct _lv_indev_t {
     /**< Repeated trigger period in long press [ms]*/
     uint16_t long_press_repeat_time;
 
-    /**< Rotary diff count will be divided by this value when widgets are adjusted*/
-    int32_t rotary_adjust_divider;
-
-    /**< Rotary diff count will be multiples by this value when scrolling to get scroll throw size*/
-    int32_t rotary_scroll_sensitvity;
+    /**< Rotary diff count will be multiplied by this value and divided by 256*/
+    int32_t rotary_sensitvity;
 
     struct {
         /*Pointer and button data*/
@@ -114,6 +111,14 @@ struct _lv_indev_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Find a scrollable object based on the current scroll vector in the indev.
+ * In handles scroll propagation to the parent if needed, and scroll directions too.
+ * @param indev		pointer to an indev
+ * @return			the found scrollable object or NULL if not found.
+ */
+lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev);
 
 /**********************
  *      MACROS

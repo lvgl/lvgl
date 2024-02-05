@@ -43,11 +43,8 @@
 /*Gesture min velocity at release before swipe (pixels)*/
 #define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
 
-/**< Rotary diff count will be divided by this value when widgets are adjusted*/
-#define LV_INDEV_DEF_ROTARY_ADJUST_DIVIDER         1
-
-/**< Rotary diff count will be multiples by this value when scrolling to get scroll throw size*/
-#define LV_INDEV_DEF_ROTARY_SCROLL_SENSITVITY      LV_DPI_DEF / 4
+/**< Rotary diff count will be multipled by this and divided by 256 */
+#define LV_INDEV_DEF_ROTARY_SENSITIVITY         256
 
 #if LV_INDEV_DEF_SCROLL_THROW <= 0
     #warning "LV_INDEV_DEF_SCROLL_THROW must be greater than 0"
@@ -137,8 +134,7 @@ lv_indev_t * lv_indev_create(void)
     indev->long_press_repeat_time  = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
     indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
-    indev->rotary_adjust_divider  = LV_INDEV_DEF_ROTARY_ADJUST_DIVIDER;
-    indev->rotary_scroll_sensitvity  = LV_INDEV_DEF_ROTARY_SCROLL_SENSITVITY;
+    indev->rotary_sensitvity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
     return indev;
 }
 
@@ -1337,19 +1333,23 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
     bool editable = lv_obj_is_editable(obj);
 
     if(editable) {
-        int32_t sensitivity = indev->rotary_adjust_divider;
-        int32_t diff = indev->pointer.diff / sensitivity;
+        uint32_t indev_sensitivity = indev->rotary_sensitvity;
+        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(indev_obj_act, 0);
+        int32_t diff = (uint32_t)((uint32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
         send_event(LV_EVENT_ROTARY, &diff);
     }
     else {
 
-        int32_t sensitivity = indev->rotary_scroll_sensitvity;
-        int32_t throw = indev->pointer.diff * sensitivity;
-
         int32_t vect = indev->pointer.diff > 0 ? indev->scroll_limit : -indev->scroll_limit;
         indev->pointer.vect.y = vect;
-        indev->pointer.scroll_throw_vect.y = throw;
-        indev->pointer.scroll_throw_vect_ori.y = throw;
+
+        lv_obj_t * scroll_obj = lv_indev_find_scroll_obj(indev);
+        uint32_t indev_sensitivity = indev->rotary_sensitvity;
+        uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(scroll_obj, 0);
+        int32_t diff = (uint32_t)((uint32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
+
+        indev->pointer.scroll_throw_vect.y = diff;
+        indev->pointer.scroll_throw_vect_ori.y = diff;
         indev->pointer.act_obj = obj;
         _lv_indev_scroll_handler(indev);
     }
