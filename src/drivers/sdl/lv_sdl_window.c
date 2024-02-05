@@ -211,12 +211,13 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         int32_t y;
         uint8_t * fb_tmp = dsc->fb_act;
         uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
-        uint32_t px_map_stride = lv_area_get_width(area) * px_size;
+        uint32_t px_map_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), lv_display_get_color_format(disp));
+        uint32_t data_size = lv_area_get_width(area) * px_size;
         int32_t fb_stride = lv_display_get_horizontal_resolution(disp) * px_size;
         fb_tmp += area->y1 * fb_stride;
         fb_tmp += area->x1 * px_size;
         for(y = area->y1; y <= area->y2; y++) {
-            lv_memcpy(fb_tmp, px_map, px_map_stride);
+            lv_memcpy(fb_tmp, px_map, data_size);
             px_map += px_map_stride;
             fb_tmp += fb_stride;
         }

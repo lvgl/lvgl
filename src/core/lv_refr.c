@@ -952,9 +952,9 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 {
     bool has_alpha = lv_color_format_has_alpha(disp->color_format);
-    uint32_t px_size_disp =  lv_color_format_get_size(disp->color_format);
-    uint8_t px_size_render = has_alpha ? sizeof(lv_color32_t) : px_size_disp;
-    int32_t max_row = (uint32_t)disp->buf_act->data_size / LV_MAX(px_size_render, px_size_disp) / area_w;
+    lv_color_format_t cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : disp->color_format;
+    uint32_t stride = lv_draw_buf_width_to_stride(area_w, cf);
+    int32_t max_row = (uint32_t)disp->buf_act->data_size / stride;
 
     if(max_row > area_h) max_row = area_h;
 
