@@ -190,22 +190,22 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     lv_indev_read(timer->user_data);
 }
 
-void lv_indev_read(lv_indev_t * indev_p)
+void lv_indev_read(lv_indev_t * indev)
 {
-    if(!indev_p) return;
+    if(indev == NULL) return;
 
     LV_TRACE_INDEV("begin");
 
-    indev_act = indev_p;
+    indev_act = indev;
 
     /*Read and process all indevs*/
-    if(indev_p->disp == NULL) return; /*Not assigned to any displays*/
+    if(indev->disp == NULL) return; /*Not assigned to any displays*/
 
     /*Handle reset query before processing the point*/
-    indev_proc_reset_query_handler(indev_p);
+    indev_proc_reset_query_handler(indev);
 
-    if(indev_p->disabled ||
-       indev_p->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
+    if(indev->disabled ||
+       indev->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
 
     LV_PROFILER_BEGIN;
 
@@ -214,37 +214,37 @@ void lv_indev_read(lv_indev_t * indev_p)
 
     do {
         /*Read the data*/
-        indev_read_core(indev_p, &data);
-        continue_reading = indev_p->mode != LV_INDEV_MODE_EVENT && data.continue_reading;
+        indev_read_core(indev, &data);
+        continue_reading = indev->mode != LV_INDEV_MODE_EVENT && data.continue_reading;
 
         /*The active object might be deleted even in the read function*/
-        indev_proc_reset_query_handler(indev_p);
+        indev_proc_reset_query_handler(indev);
         indev_obj_act = NULL;
 
-        indev_p->state = data.state;
+        indev->state = data.state;
 
         /*Save the last activity time*/
-        if(indev_p->state == LV_INDEV_STATE_PRESSED) {
-            indev_p->disp->last_activity_time = lv_tick_get();
+        if(indev->state == LV_INDEV_STATE_PRESSED) {
+            indev->disp->last_activity_time = lv_tick_get();
         }
-        else if(indev_p->type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
-            indev_p->disp->last_activity_time = lv_tick_get();
+        else if(indev->type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
+            indev->disp->last_activity_time = lv_tick_get();
         }
 
-        if(indev_p->type == LV_INDEV_TYPE_POINTER) {
-            indev_pointer_proc(indev_p, &data);
+        if(indev->type == LV_INDEV_TYPE_POINTER) {
+            indev_pointer_proc(indev, &data);
         }
-        else if(indev_p->type == LV_INDEV_TYPE_KEYPAD) {
-            indev_keypad_proc(indev_p, &data);
+        else if(indev->type == LV_INDEV_TYPE_KEYPAD) {
+            indev_keypad_proc(indev, &data);
         }
-        else if(indev_p->type == LV_INDEV_TYPE_ENCODER) {
-            indev_encoder_proc(indev_p, &data);
+        else if(indev->type == LV_INDEV_TYPE_ENCODER) {
+            indev_encoder_proc(indev, &data);
         }
-        else if(indev_p->type == LV_INDEV_TYPE_BUTTON) {
-            indev_button_proc(indev_p, &data);
+        else if(indev->type == LV_INDEV_TYPE_BUTTON) {
+            indev_button_proc(indev, &data);
         }
         /*Handle reset query if it happened in during processing*/
-        indev_proc_reset_query_handler(indev_p);
+        indev_proc_reset_query_handler(indev);
     } while(continue_reading);
 
     /*End of indev processing, so no act indev*/
