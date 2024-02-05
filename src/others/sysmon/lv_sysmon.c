@@ -126,18 +126,31 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
             info->measured.refr_cnt++;
             break;
         case LV_EVENT_RENDER_START:
+            info->measured.render_in_progress = 1;
             info->measured.render_start = lv_tick_get();
             break;
         case LV_EVENT_RENDER_READY:
+            info->measured.render_in_progress = 0;
             info->measured.render_elaps_sum += lv_tick_elaps(info->measured.render_start);
             info->measured.render_cnt++;
             break;
         case LV_EVENT_FLUSH_START:
-            info->measured.flush_start = lv_tick_get();
+        case LV_EVENT_FLUSH_WAIT_START:
+            if(info->measured.render_in_progress) {
+                info->measured.flush_in_render_start = lv_tick_get();
+            }
+            else {
+                info->measured.flush_not_in_render_start = lv_tick_get();
+            }
             break;
         case LV_EVENT_FLUSH_FINISH:
-            info->measured.flush_elaps_sum += lv_tick_elaps(info->measured.flush_start);
-            info->measured.flush_cnt++;
+        case LV_EVENT_FLUSH_WAIT_FINISH:
+            if(info->measured.render_in_progress) {
+                info->measured.flush_in_render_elaps_sum += lv_tick_elaps(info->measured.flush_in_render_start);
+            }
+            else {
+                info->measured.flush_not_in_render_elaps_sum += lv_tick_elaps(info->measured.flush_not_in_render_start);
+            }
             break;
         default:
             break;
@@ -171,11 +184,13 @@ static void perf_update_timer_cb(lv_timer_t * t)
     info->calculated.cpu = 100 - LV_SYSMON_GET_IDLE();
     info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :
                                      0;
-    info->calculated.flush_avg_time = info->measured.flush_cnt ? (info->measured.flush_elaps_sum / info->measured.flush_cnt)
-                                      : 0;
+
+    info->calculated.flush_avg_time = info->measured.render_cnt ?
+                                      ((info->measured.flush_in_render_elaps_sum + info->measured.flush_not_in_render_elaps_sum)
+                                       / info->measured.render_cnt) : 0;
     /*Flush time was measured in rendering time so subtract it*/
     info->calculated.render_avg_time = info->measured.render_cnt ? ((info->measured.render_elaps_sum -
-                                                                     info->measured.flush_elaps_sum) /
+                                                                     info->measured.flush_in_render_elaps_sum) /
                                                                     info->measured.render_cnt) : 0;
 
     info->calculated.cpu_avg_total = ((info->calculated.cpu_avg_total * (info->calculated.run_cnt - 1)) +

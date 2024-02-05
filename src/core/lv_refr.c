@@ -1055,6 +1055,8 @@ static void wait_for_flushing(lv_display_t * disp)
     LV_PROFILER_BEGIN;
     LV_LOG_TRACE("begin");
 
+    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
+
     if(disp->flush_wait_cb) {
         disp->flush_wait_cb(disp);
     }
@@ -1062,6 +1064,8 @@ static void wait_for_flushing(lv_display_t * disp)
         while(disp->flushing);
     }
     disp->flushing_last = 0;
+
+    lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_FINISH, NULL);
 
     LV_LOG_TRACE("end");
     LV_PROFILER_END;
