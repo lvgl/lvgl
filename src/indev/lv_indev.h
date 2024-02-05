@@ -64,6 +64,10 @@ typedef void (*lv_indev_read_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Create an indev
+ * @return Pointer to the created indev or NULL when allocation failed
+ */
 lv_indev_t * lv_indev_create(void);
 
 /**
