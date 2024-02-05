@@ -380,7 +380,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
     lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     /* Invalidate only the drawing area */
-    lv_draw_buf_invalidate_cache(draw_buf->data, draw_buf->header.stride, draw_buf->header.cf, &draw_area);
+    lv_draw_buf_invalidate_cache(draw_buf, &draw_area);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:

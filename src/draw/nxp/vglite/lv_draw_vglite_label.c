@@ -134,7 +134,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                         /* Set vgmatrix. */
                         vglite_set_translation_matrix(&blend_area);
 
-                        lv_draw_buf_invalidate_cache((void *)mask_buf, mask_stride, LV_COLOR_FORMAT_A8, &mask_area);
+                        lv_draw_buf_invalidate_cache(draw_buf, &mask_area);
 
                         _vglite_draw_letter(&mask_area, glyph_draw_dsc->color, glyph_draw_dsc->opa);
                     }

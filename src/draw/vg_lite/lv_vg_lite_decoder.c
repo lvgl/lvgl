@@ -44,9 +44,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_data);
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size);
-static void image_invalidate_cache(void * buf, uint32_t stride,
-                                   uint32_t width, uint32_t height,
-                                   lv_color_format_t cf);
 
 /**********************
  *  STATIC VARIABLES
@@ -90,16 +87,6 @@ static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size)
         lv_color_premultiply(img_data);
         img_data++;
     }
-}
-
-static void image_invalidate_cache(void * buf, uint32_t stride,
-                                   uint32_t width, uint32_t height,
-                                   lv_color_format_t cf)
-{
-    width = lv_vg_lite_width_align(width);
-    lv_area_t image_area;
-    lv_area_set(&image_area, 0, 0, width - 1, height - 1);
-    lv_draw_buf_invalidate_cache(buf, stride, cf, &image_area);
 }
 
 static uint32_t image_stride(const lv_image_header_t * header)
@@ -250,8 +237,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     }
 
     /* invalidate D-Cache */
-    image_invalidate_cache(draw_buf->data, dest_stride, width, height, DEST_IMG_FORMAT);
-
+    lv_draw_buf_invalidate_cache(draw_buf, NULL);
     LV_LOG_INFO("image %p (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p, cf: %d) decode finish",
                 image_data, width, height, draw_buf->data, src_cf);
 
@@ -349,7 +335,7 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     lv_fs_close(&file);
 
     /* invalidate D-Cache */
-    image_invalidate_cache(draw_buf->data, dest_stride, width, height, src_header.cf);
+    lv_draw_buf_invalidate_cache(draw_buf, NULL);
 
     LV_LOG_INFO("image %s (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p cf: %d) decode finish",
                 path, width, height, draw_buf->data, src_header.cf);
