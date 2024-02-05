@@ -258,6 +258,8 @@ You can do this in the following way:
 
 .. note:: that :cpp:func:`lv_indev_read`, :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_display_refr_timer` can not run at the same time.
 
+.. note:: For devices in event-driven mode, `data->continue_reading` is ignored.
+
 Further reading
 ***************
 
