@@ -172,9 +172,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
 {
     lv_draw_task_t * task = u->task_act;
 
-    lv_area_t a;
-    _lv_area_intersect(&a, u->base_unit.clip_area, &task->area);
-
     lv_layer_t dest_layer;
     lv_memzero(&dest_layer, sizeof(dest_layer));
     lv_draw_buf_t draw_buf;
@@ -227,7 +224,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
             break;
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * image_dsc = task->draw_dsc;
-                //              SDL_Surface* loadImage(std::string path) {
                 const char * path = image_dsc->src;
                 SDL_Surface * surface = IMG_Load(&path[2]);
                 if(surface == NULL) {
