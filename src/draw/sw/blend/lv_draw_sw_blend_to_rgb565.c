@@ -245,32 +245,22 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(_lv_draw_sw_blend_fi
     /*Masked with full opacity*/
     else if(mask && opa >= LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK(dsc)) {
-            uint32_t c32 = color16 + ((uint32_t)color16 << 16);
             for(y = 0; y < h; y++) {
-                for(x = 0; x < w && ((lv_uintptr_t)(mask) & 0x3); x++) {
+                x = 0;
+                if((lv_uintptr_t)(mask) & 0x1) {
                     dest_buf_u16[x] = lv_color_16_16_mix(color16, dest_buf_u16[x], mask[x]);
+                    x++;
                 }
 
-                for(; x <= w - 4; x += 4) {
-                    uint32_t mask32 = *((uint32_t *)&mask[x]);
-                    if(mask32 == 0xFFFFFFFF) {
-                        if((lv_uintptr_t)&dest_buf_u16[x] & 0x3) {
-                            dest_buf_u16[x] = color16;
-                            uint32_t * d32 = (uint32_t *)(&dest_buf_u16[x + 1]);
-                            *d32 = c32;
-                            dest_buf_u16[x + 3] = color16;
-                        }
-                        else {
-                            uint32_t * dest32 = (uint32_t *)&dest_buf_u16[x];
-                            dest32[0] = c32;
-                            dest32[1] = c32;
-                        }
+                for(; x <= w - 2; x += 2) {
+                    uint16_t mask16 = *((uint16_t *)&mask[x]);
+                    if(mask16 == 0xFFFF) {
+                        dest_buf_u16[x + 0] = color16;
+                        dest_buf_u16[x + 1] = color16;
                     }
-                    else if(mask32) {
+                    else if(mask16 != 0) {
                         dest_buf_u16[x + 0] = lv_color_16_16_mix(color16, dest_buf_u16[x + 0], mask[x + 0]);
                         dest_buf_u16[x + 1] = lv_color_16_16_mix(color16, dest_buf_u16[x + 1], mask[x + 1]);
-                        dest_buf_u16[x + 2] = lv_color_16_16_mix(color16, dest_buf_u16[x + 2], mask[x + 2]);
-                        dest_buf_u16[x + 3] = lv_color_16_16_mix(color16, dest_buf_u16[x + 3], mask[x + 3]);
                     }
                 }
 
