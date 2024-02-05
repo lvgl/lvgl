@@ -117,6 +117,8 @@ lv_indev_t * lv_indev_create(void)
 
     lv_memzero(indev, sizeof(lv_indev_t));
     indev->reset_query  = 1;
+    indev->enabled = 1;
+
     indev->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
 
     indev->disp                 = lv_display_get_default();
@@ -204,8 +206,8 @@ void lv_indev_read(lv_indev_t * indev)
     /*Handle reset query before processing the point*/
     indev_proc_reset_query_handler(indev);
 
-    if(indev->disabled ||
-       indev->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
+    if((indev->enabled == 0) ||
+       (indev->disp->prev_scr != NULL)) return; /*Input disabled or screen animation active*/
 
     LV_PROFILER_BEGIN;
 
@@ -257,15 +259,15 @@ void lv_indev_read(lv_indev_t * indev)
 
 void lv_indev_enable(lv_indev_t * indev, bool en)
 {
-    uint8_t enable = en ? 0 : 1;
+    const uint8_t enable = en ? 1U : 0U;
 
     if(indev) {
-        indev->disabled = enable;
+        indev->enabled = enable;
     }
     else {
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
-            i->disabled = enable;
+            i->enabled = enable;
             i = lv_indev_get_next(i);
         }
     }
