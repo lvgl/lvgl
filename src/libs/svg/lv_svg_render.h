@@ -54,7 +54,7 @@ void lv_svg_render_init(const lv_svg_render_hal_t * hal);
 lv_svg_render_obj_t * lv_svg_render_create(const lv_svg_node_t * svg_doc);
 void lv_svg_render_delete(lv_svg_render_obj_t * render);
 
-void lv_draw_svg_render(lv_layer_t * layer, const lv_svg_render_obj_t * render);
+void lv_draw_svg_render(lv_vector_dsc_t * dsc, const lv_svg_render_obj_t * render);
 void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc);
 
 /**********************

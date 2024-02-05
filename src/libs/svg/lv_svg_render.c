@@ -59,6 +59,9 @@ static void _deinit_draw_dsc(lv_vector_draw_dsc_t * dsc);
 static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_t * src);
 static void _prepare_render(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc);
 static void _special_render(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc);
+#if LV_USE_FREETYPE
+    static void _freetype_outline_cb(lv_event_t * e);
+#endif
 
 typedef struct {
     lv_svg_render_obj_t base;
@@ -214,6 +217,9 @@ void lv_svg_render_init(const lv_svg_render_hal_t * hal)
 {
     if(hal) {
         hal_funcs = *hal;
+#if LV_USE_FREETYPE
+        lv_freetype_outline_add_event(_freetype_outline_cb, LV_EVENT_ALL, NULL);
+#endif
     }
 }
 
@@ -938,7 +944,7 @@ static void _set_gradient_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * 
             float sy = (y2 - y1) / h;
             float s = MAX(sx, sy);
             lv_matrix_scale(mtx, s, s);
-            lv_matrix_translate(mtx, x1 - bounds.x1, y1 - bounds.y1);
+            lv_matrix_translate(mtx, -bounds.x1, -bounds.y1);
         }
     }
 }
@@ -1269,7 +1275,7 @@ static void _render_viewport(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * 
     LV_UNUSED(matrix);
 
     lv_svg_render_viewport_t * view = (lv_svg_render_viewport_t *)obj;
-    lv_memcpy(&dsc->current_dsc.matrix, &obj->matrix, sizeof(lv_matrix_t));
+    lv_matrix_multiply(&dsc->current_dsc.matrix, &obj->matrix);
     if(view->viewport_fill) {
         lv_area_t rc = {0, 0, (int32_t)view->width, (int32_t)view->height};
         lv_vector_clear_area(dsc, &rc);
@@ -2047,7 +2053,7 @@ static void _lv_svg_doc_walk_after_cb(const lv_tree_node_t * node, void * data)
 }
 
 #if LV_USE_FREETYPE
-static void freetype_outline_cb(lv_event_t * e)
+static void _freetype_outline_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
@@ -2153,29 +2159,21 @@ void lv_svg_render_delete(lv_svg_render_obj_t * list)
     }
 }
 
-void lv_draw_svg_render(lv_layer_t * layer, const lv_svg_render_obj_t * render)
+void lv_draw_svg_render(lv_vector_dsc_t * dsc, const lv_svg_render_obj_t * render)
 {
-    if(!render) {
+    if(!render || !dsc) {
         return;
     }
-
-#if LV_USE_FREETYPE
-    lv_freetype_outline_add_event(freetype_outline_cb, LV_EVENT_ALL, NULL);
-#endif
-
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
 
     const lv_svg_render_obj_t * cur = render;
     while(cur) {
         if(cur->render && ((cur->flags & 3) == _RENDER_NORMAL)) {
-            _prepare_render(cur, ctx);
-            cur->render(cur, ctx, NULL);
+            _prepare_render(cur, dsc);
+            cur->render(cur, dsc, NULL);
         }
         cur = cur->next;
     }
-    lv_draw_vector(ctx);
-
-    lv_vector_dsc_delete(ctx);
+    lv_draw_vector(dsc);
 }
 
 void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc)
@@ -2184,9 +2182,11 @@ void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc)
         return;
     }
 
+    lv_vector_dsc_t * dsc = lv_vector_dsc_create(layer);
     lv_svg_render_obj_t * list = lv_svg_render_create(svg_doc);
-    lv_draw_svg_render(layer, list);
+    lv_draw_svg_render(dsc, list);
     lv_svg_render_delete(list);
+    lv_vector_dsc_delete(dsc);
 }
 
 /**********************
