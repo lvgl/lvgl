@@ -8,6 +8,7 @@
  *********************/
 #include "lv_draw_sw.h"
 #include "../../misc/lv_math.h"
+#include "../../misc/lv_types.h"
 #include "../../hal/lv_hal_disp.h"
 #include "../../core/lv_refr.h"
 
@@ -25,294 +26,294 @@
 
 /* GRAY8 */
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_GRAY8
-    #define LV_DRAW_SW_COLOR_BLEND_TO_GRAY8(...)                            LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_GRAY8(...)                            LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_GRAY8_WITH_OPA
-    #define LV_DRAW_SW_COLOR_BLEND_TO_GRAY8_WITH_OPA(...)                   LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_GRAY8_WITH_OPA(...)                   LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_GRAY8_WITH_MASK
-    #define LV_DRAW_SW_COLOR_BLEND_TO_GRAY8_WITH_MASK(...)                  LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_GRAY8_WITH_MASK(...)                  LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_GRAY8_MIX_MASK_OPA
-    #define LV_DRAW_SW_COLOR_BLEND_TO_GRAY8_MIX_MASK_OPA(...)               LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_GRAY8_MIX_MASK_OPA(...)               LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8
-    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8(...)                     LV_RESULT_INVALID
+    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8(...)                     LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8_WITH_OPA
-    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8_WITH_OPA(...)            LV_RESULT_INVALID
+    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8_WITH_OPA(...)            LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8_WITH_MASK
-    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8_WITH_MASK(...)           LV_RESULT_INVALID
+    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8_WITH_MASK(...)           LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA
-    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA(...)        LV_RESULT_INVALID
+    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA(...)        LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8(...)                    LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8(...)                    LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8_WITH_OPA
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8_WITH_OPA(...)           LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8_WITH_OPA(...)           LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8_WITH_MASK
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8_WITH_MASK(...)          LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8_WITH_MASK(...)          LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA(...)       LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA(...)       LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8(...)                    LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8(...)                    LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8_WITH_OPA
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8_WITH_OPA(...)           LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8_WITH_OPA(...)           LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8_WITH_MASK
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8_WITH_MASK(...)          LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8_WITH_MASK(...)          LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA(...)       LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA(...)       LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8(...)                  LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8(...)                  LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8_WITH_OPA
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8_WITH_OPA(...)         LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8_WITH_OPA(...)         LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8_WITH_MASK
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8_WITH_MASK(...)        LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8_WITH_MASK(...)        LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA(...)     LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_GRAY8_MIX_MASK_OPA(...)     LV_RES_INV
 #endif
 
 /* RGB565 */
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565
-    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565(...)                           LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565(...)                           LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA
-    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA(...)                  LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA(...)                  LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK
-    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK(...)                 LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK(...)                 LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565_MIX_MASK_OPA
-    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_MIX_MASK_OPA(...)              LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_MIX_MASK_OPA(...)              LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565(...)                   LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565(...)                   LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_OPA
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_OPA(...)          LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_OPA(...)          LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_MASK
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_MASK(...)         LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_MASK(...)         LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(...)      LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(...)      LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565(...)                   LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565(...)                   LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_OPA
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_OPA(...)          LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_OPA(...)          LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_MASK
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_MASK(...)         LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_MASK(...)         LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(...)      LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(...)      LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565(...)                 LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565(...)                 LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_OPA
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_OPA(...)        LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_OPA(...)        LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK(...)       LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK(...)       LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(...)    LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(...)    LV_RES_INV
 #endif
 
 /* RGB888 */
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888
-    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888(...)                           LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888(...)                           LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA
-    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA(...)                  LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA(...)                  LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_MASK
-    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_MASK(...)                 LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_MASK(...)                 LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888_MIX_MASK_OPA
-    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_MIX_MASK_OPA(...)              LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_MIX_MASK_OPA(...)              LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888(...)                   LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888(...)                   LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_OPA
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_OPA(...)          LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_OPA(...)          LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_MASK
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_MASK(...)         LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_MASK(...)         LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(...)      LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(...)      LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888(...)                   LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888(...)                   LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_OPA
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_OPA(...)          LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_OPA(...)          LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_MASK
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_MASK(...)         LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_MASK(...)         LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(...)      LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(...)      LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888(...)                 LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888(...)                 LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_OPA
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_OPA(...)        LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_OPA(...)        LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_MASK
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_MASK(...)       LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_MASK(...)       LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(...)    LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(...)    LV_RES_INV
 #endif
 
 /* RGBA8888 */
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888
-    #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888(...)                         LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888(...)                         LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_OPA
-    #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_OPA(...)                LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_OPA(...)                LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_MASK
-    #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_MASK(...)               LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_MASK(...)               LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_MIX_MASK_OPA
-    #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_MIX_MASK_OPA(...)            LV_RESULT_INVALID
+    #define LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_MIX_MASK_OPA(...)            LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888
-    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888(...)                  LV_RESULT_INVALID
+    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888(...)                  LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888_WITH_OPA
-    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(...)         LV_RESULT_INVALID
+    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(...)         LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888_WITH_MASK
-    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(...)        LV_RESULT_INVALID
+    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(...)        LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA
-    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)     LV_RESULT_INVALID
+    #define LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)     LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888(...)                 LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888(...)                 LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_OPA
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(...)        LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(...)        LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_MASK
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(...)       LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(...)       LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA
-    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)    LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)    LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888(...)                 LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888(...)                 LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(...)        LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(...)        LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(...)       LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(...)       LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA
-    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)    LV_RESULT_INVALID
+    #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)    LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888(...)               LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888(...)               LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(...)      LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(...)      LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(...)     LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(...)     LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA
-    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)  LV_RESULT_INVALID
+    #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)  LV_RES_INV
 #endif
 
 #if LV_COLOR_DEPTH == 8
@@ -752,7 +753,7 @@ static LV_ATTRIBUTE_FAST_MEM void fill_normal(lv_color_t * dest_buf, const lv_ar
     /*No mask*/
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
-            if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND(dsc)) {
+            if(LV_RES_INV == LV_DRAW_SW_COLOR_BLEND(dsc)) {
                 for(y = 0; y < h; y++) {
                     lv_color_fill(dest_buf, color, w);
                     dest_buf += dest_stride;
@@ -774,7 +775,7 @@ static LV_ATTRIBUTE_FAST_MEM void fill_normal(lv_color_t * dest_buf, const lv_ar
             /* update dsc */
             dsc->opa = opa;
 #endif
-            if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_WITH_OPA(dsc)) {
+            if(LV_RES_INV == LV_DRAW_SW_COLOR_BLEND_WITH_OPA(dsc)) {
                 uint16_t color_premult[3];
                 lv_color_premult(color, opa, color_premult);
                 lv_opa_t opa_inv = 255 - opa;
@@ -799,7 +800,7 @@ static LV_ATTRIBUTE_FAST_MEM void fill_normal(lv_color_t * dest_buf, const lv_ar
 #endif
         /*Only the mask matters*/
         if(opa >= LV_OPA_MAX) {
-            if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_WITH_MASK(dsc)) {
+            if(LV_RES_INV == LV_DRAW_SW_COLOR_BLEND_WITH_MASK(dsc)) {
                 int32_t x_end4 = w - 4;
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w && ((lv_uintptr_t)(mask) & 0x3); x++) {
@@ -851,7 +852,7 @@ static LV_ATTRIBUTE_FAST_MEM void fill_normal(lv_color_t * dest_buf, const lv_ar
             }
         }
         /*With opacity*/
-        else if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_MIX_MASK_OPA(dsc)) {
+        else if(LV_RES_INV == LV_DRAW_SW_COLOR_BLEND_MIX_MASK_OPA(dsc)) {
             /*Buffer the result color to avoid recalculating the same color*/
             lv_color_t last_dest_color;
             lv_color_t last_res_color;
@@ -973,7 +974,7 @@ static void LV_ATTRIBUTE_FAST_MEM fill_argb(lv_color_t * dest_buf, const lv_area
     /*No mask*/
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
-            if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888(dsc)) {
+            if(LV_RES_INV == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888(dsc)) {
                 for(x = 0; x < w; x++) {
                     lv_memcpy(dest_buf8, ctmp, LV_IMG_PX_SIZE_ALPHA_BYTE);
                     dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
@@ -988,7 +989,7 @@ static void LV_ATTRIBUTE_FAST_MEM fill_argb(lv_color_t * dest_buf, const lv_area
             }
         }
         /*Has opacity*/
-        else if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_OPA(dsc)) {
+        else if(LV_RES_INV == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_OPA(dsc)) {
             uint8_t * dest_buf8_row = dest_buf8;
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
@@ -1004,7 +1005,7 @@ static void LV_ATTRIBUTE_FAST_MEM fill_argb(lv_color_t * dest_buf, const lv_area
     else {
         /*Only the mask matters*/
         if(opa >= LV_OPA_MAX) {
-            if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_MASK(dsc)) {
+            if(LV_RES_INV == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_WITH_MASK(dsc)) {
                 uint8_t * dest_buf8_row = dest_buf8;
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
@@ -1018,7 +1019,7 @@ static void LV_ATTRIBUTE_FAST_MEM fill_argb(lv_color_t * dest_buf, const lv_area
             }
         }
         /*With opacity*/
-        else if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_MIX_MASK_OPA(dsc)) {
+        else if(LV_RES_INV == LV_DRAW_SW_COLOR_BLEND_TO_ARGB8888_MIX_MASK_OPA(dsc)) {
             /*Buffer the result color to avoid recalculating the same color*/
             lv_opa_t last_mask = LV_OPA_TRANSP;
             lv_opa_t opa_tmp = LV_OPA_TRANSP;
@@ -1168,7 +1169,7 @@ static void LV_ATTRIBUTE_FAST_MEM map_normal(lv_color_t * dest_buf, const lv_are
     /*Simple fill (maybe with opacity), no masking*/
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
-            if(LV_RESULT_INVALID == LV_DRAW_SW_BLEND_NORMAL(dsc)) {
+            if(LV_RES_INV == LV_DRAW_SW_BLEND_NORMAL(dsc)) {
                 for(y = 0; y < h; y++) {
                     lv_memcpy(dest_buf, src_buf, w * sizeof(lv_color_t));
                     dest_buf += dest_stride;
@@ -1176,7 +1177,7 @@ static void LV_ATTRIBUTE_FAST_MEM map_normal(lv_color_t * dest_buf, const lv_are
                 }
             }
         }
-        else if(LV_RESULT_INVALID == LV_DRAW_SW_BLEND_NORMAL_WITH_OPA(dsc)) {
+        else if(LV_RES_INV == LV_DRAW_SW_BLEND_NORMAL_WITH_OPA(dsc)) {
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     dest_buf[x] = lv_color_mix(src_buf[x], dest_buf[x], opa);
@@ -1190,7 +1191,7 @@ static void LV_ATTRIBUTE_FAST_MEM map_normal(lv_color_t * dest_buf, const lv_are
     else {
         /*Only the mask matters*/
         if(opa > LV_OPA_MAX) {
-            if(LV_RESULT_INVALID == LV_DRAW_SW_BLEND_NORMAL_WITH_MASK(dsc)) {
+            if(LV_RES_INV == LV_DRAW_SW_BLEND_NORMAL_WITH_MASK(dsc)) {
                 int32_t x_end4 = w - 4;
 
                 for(y = 0; y < h; y++) {
@@ -1236,7 +1237,7 @@ static void LV_ATTRIBUTE_FAST_MEM map_normal(lv_color_t * dest_buf, const lv_are
             }
         }
         /*Handle opa and mask values too*/
-        else if(LV_RESULT_INVALID == LV_DRAW_SW_BLEND_NORMAL_MIX_MASK_OPA(dsc)) {
+        else if(LV_RES_INV == LV_DRAW_SW_BLEND_NORMAL_MIX_MASK_OPA(dsc)) {
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     if(mask[x]) {
@@ -1288,7 +1289,7 @@ static void LV_ATTRIBUTE_FAST_MEM map_argb(lv_color_t * dest_buf, const lv_area_
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
             if(blend_fp == NULL && LV_COLOR_DEPTH == 32) {
-                if(LV_RESULT_INVALID == LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888(dsc, 4)) {
+                if(LV_RES_INV == LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888(dsc, 4)) {
                     for(y = 0; y < h; y++) {
                         lv_memcpy(dest_buf, src_buf, w * sizeof(lv_color_t));
                         dest_buf += dest_stride;
@@ -1296,7 +1297,7 @@ static void LV_ATTRIBUTE_FAST_MEM map_argb(lv_color_t * dest_buf, const lv_area_
                     }
                 }
             }
-            else if((blend_fp != NULL) || ((blend_fp == NULL) && (LV_RESULT_INVALID == LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888(dsc)))) {
+            else if((blend_fp != NULL) || ((blend_fp == NULL) && (LV_RES_INV == LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888(dsc)))) {
                 uint8_t * dest_buf8_row = dest_buf8;
                 for(y = 0; y < h; y++) {
                     if(blend_fp == NULL) {
@@ -1320,7 +1321,7 @@ static void LV_ATTRIBUTE_FAST_MEM map_argb(lv_color_t * dest_buf, const lv_area_
         }
         /*No mask but opacity*/
         else if((blend_fp != NULL) || ((blend_fp == NULL) &&
-                                       (LV_RESULT_INVALID == LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(dsc)))) {
+                                       (LV_RES_INV == LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(dsc)))) {
             uint8_t * dest_buf8_row = dest_buf8;
             for(y = 0; y < h; y++) {
                 if(blend_fp == NULL) {
@@ -1347,7 +1348,7 @@ static void LV_ATTRIBUTE_FAST_MEM map_argb(lv_color_t * dest_buf, const lv_area_
         /*Only the mask matters*/
         if(opa > LV_OPA_MAX) {
             if((blend_fp != NULL) || ((blend_fp == NULL) &&
-                                      (LV_RESULT_INVALID == LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc)))) {
+                                      (LV_RES_INV == LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(dsc)))) {
                 uint8_t * dest_buf8_row = dest_buf8;
                 for(y = 0; y < h; y++) {
                     if(blend_fp == NULL) {
@@ -1371,7 +1372,7 @@ static void LV_ATTRIBUTE_FAST_MEM map_argb(lv_color_t * dest_buf, const lv_area_
         }
         /*Handle opa and mask values too*/
         else if((blend_fp != NULL) || ((blend_fp == NULL) &&
-                                       (LV_RESULT_INVALID == LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(dsc)))) {
+                                       (LV_RES_INV == LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(dsc)))) {
             uint8_t * dest_buf8_row = dest_buf8;
             for(y = 0; y < h; y++) {
                 if(blend_fp == NULL) {
