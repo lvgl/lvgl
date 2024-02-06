@@ -42,7 +42,7 @@ typedef struct {
     void * dest_buf;
     int32_t dest_w;
     int32_t dest_h;
-    lv_coord_t dest_stride
+    lv_coord_t dest_stride;
     const lv_opa_t * mask_buf;      /**< NULL if ignored, or an alpha mask to apply on `blend_area`*/
     lv_coord_t mask_stride;
     lv_color_t color;               /**< Fill color*/
