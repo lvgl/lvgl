@@ -9,6 +9,13 @@ jobs:
         with:
           path: 'lvgl'
 
+      - name: Pick-up the LVGL branch to be tested
+        run: |
+          wget https://github.com/lvgl/lvgl/archive/refs/heads/release/v8.3.zip
+          unzip v8.3.zip
+          mv lvgl-release* lvgl_base
+  
+
       - name: SO3-LVGL building the Docker image
         run: |
           wget https://raw.githubusercontent.com/smartobjectoriented/so3/40-expand-and-document-lvgl-perf-tests/Dockerfile.lvgl
