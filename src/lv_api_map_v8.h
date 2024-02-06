@@ -257,6 +257,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
  */
 static inline void lv_snapshot_free(lv_image_dsc_t * dsc)
 {
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy directly.");
     lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
 }
 
@@ -275,6 +276,7 @@ static inline lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_forma
                                                   void * buf,
                                                   uint32_t buf_size)
 {
+    LV_LOG_WARN("Deprecated API, use lv_snapshot_take_to_draw_buf instead.");
     lv_draw_buf_t draw_buf;
     lv_draw_buf_init(&draw_buf, 1, 1, cf, buf_size, buf, buf_size);
     lv_result_t res = lv_snapshot_take_to_draw_buf(obj, cf, &draw_buf);
@@ -290,6 +292,7 @@ static inline lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_forma
  */
 static inline void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
 {
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
     lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
 }
 
@@ -299,6 +302,7 @@ static inline void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv
  */
 static inline void lv_image_buf_free(lv_image_dsc_t * dsc)
 {
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
     if(dsc != NULL) {
         if(dsc->data != NULL)
             lv_free((void *)dsc->data);
