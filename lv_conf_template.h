@@ -710,9 +710,6 @@
 /* Enable ThorVG by assuming that its installed and linked to the project */
 #define LV_USE_THORVG_EXTERNAL 0
 
-/*Enable LZ4 compress/decompress lib*/
-#define LV_USE_LZ4  0
-
 /*Use lvgl built-in LZ4 lib*/
 #define LV_USE_LZ4_INTERNAL  0
 

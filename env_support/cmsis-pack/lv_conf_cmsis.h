@@ -648,8 +648,6 @@
 
 /*Enable LZ4 compress/decompress lib*/
 #ifndef LV_USE_LZ4
-#   define LV_USE_LZ4  0
-
 /*Use lvgl built-in LZ4 lib*/
 #   define LV_USE_LZ4_INTERNAL  0
 
