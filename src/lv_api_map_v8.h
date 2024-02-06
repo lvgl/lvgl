@@ -260,6 +260,7 @@ static inline void lv_snapshot_free(lv_image_dsc_t * dsc)
     lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
 }
 
+#if LV_USE_SNAPSHOT
 /**
  * Deprecated API, use lv_snapshot_take_to_draw_buf instead.
  * Take snapshot for object with its children, save image info to provided buffer.
@@ -282,6 +283,7 @@ static inline lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_forma
     }
     return res;
 }
+#endif
 
 /**
  * Deprecated API, use lv_draw_buf_set_palette instead.
