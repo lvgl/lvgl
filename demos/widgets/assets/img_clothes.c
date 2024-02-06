@@ -251,6 +251,7 @@ const lv_image_dsc_t img_clothes = {
     .header.h = 56,
     .header.cf = LV_COLOR_DEPTH == 16 ? LV_COLOR_FORMAT_RGB565A8 : LV_COLOR_FORMAT_ARGB8888,
     .data = img_clothes_map,
+    .data_size = sizeof(img_clothes_map),
 };
 
 #endif

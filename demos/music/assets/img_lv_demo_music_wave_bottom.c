@@ -54,9 +54,9 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_wave_bottom_map[] = {
 const lv_image_dsc_t img_lv_demo_music_wave_bottom = {
     .header.w = 272,
     .header.h = 42,
-    .data_size = 11424 * LV_COLOR_DEPTH / 8,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_wave_bottom_map,
+    .data_size = sizeof(img_lv_demo_music_wave_bottom_map),
 };
 
 #endif /*LV_USE_DEMO_MUSIC*/

@@ -50,6 +50,7 @@ const lv_image_dsc_t img_emoji_camera_with_flash = {
     .header.w = 18,
     .header.h = 19,
     .data = img_emoji_camera_with_flash_map,
+    .data_size = sizeof(img_emoji_camera_with_flash_map),
 };
 
 #endif

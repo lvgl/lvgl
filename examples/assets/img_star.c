@@ -48,6 +48,7 @@ const lv_image_dsc_t img_star = {
     .header.h = 29,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_star_map,
+    .data_size = sizeof(img_star_map),
 };
 
 #endif /* LV_BUILD_EXAMPLES */

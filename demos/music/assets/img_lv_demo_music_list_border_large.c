@@ -26,9 +26,9 @@ img_lv_demo_music_list_border_map[] = {
 const lv_image_dsc_t img_lv_demo_music_list_border = {
     .header.w = 479,
     .header.h = 7,
-    .data_size = 3353 * LV_COLOR_DEPTH / 8,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_list_border_map,
+    .data_size = sizeof(img_lv_demo_music_list_border_map),
 };
 
 #endif

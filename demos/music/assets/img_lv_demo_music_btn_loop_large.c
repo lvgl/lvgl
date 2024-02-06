@@ -53,9 +53,9 @@ img_lv_demo_music_btn_loop_map[] = {
 const lv_image_dsc_t img_lv_demo_music_btn_loop = {
     .header.w = 37,
     .header.h = 36,
-    .data_size = 1332 * LV_COLOR_DEPTH / 8,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_btn_loop_map,
+    .data_size = sizeof(img_lv_demo_music_btn_loop_map),
 };
 
 #endif

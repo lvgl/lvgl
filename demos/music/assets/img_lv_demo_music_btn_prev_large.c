@@ -128,9 +128,9 @@ img_lv_demo_music_btn_prev_map[] = {
 const lv_image_dsc_t img_lv_demo_music_btn_prev = {
     .header.w = 110,
     .header.h = 110,
-    .data_size = 12100 * LV_COLOR_DEPTH / 8,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_btn_prev_map,
+    .data_size = sizeof(img_lv_demo_music_btn_prev_map),
 };
 
 #endif

@@ -428,9 +428,9 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_RGB uint8_t img_cog
 const lv_image_dsc_t img_cogwheel_rgb = {
     .header.w = 100,
     .header.h = 100,
-    .data_size = 10000 * LV_COLOR_DEPTH / 8,
     .header.cf = LV_COLOR_FORMAT_NATIVE,
     .data = img_cogwheel_rgb_map,
+    .data_size = sizeof(img_cogwheel_rgb_map),
 };
 
 #endif /* LV_BUILD_EXAMPLES */

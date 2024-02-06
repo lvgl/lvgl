@@ -48,6 +48,7 @@ const lv_image_dsc_t img_multilang_like = {
     .header.w = 20,
     .header.h = 17,
     .data = img_multilang_like_map,
+    .data_size = sizeof(img_multilang_like_map),
 };
 
 #endif

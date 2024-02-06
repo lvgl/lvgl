@@ -184,4 +184,5 @@ const lv_image_dsc_t img_demo_vector_avatar = {
     .header.w = 160,
     .header.h = 154,
     .data = img_demo_vector_avatar_map,
+    .data_size = sizeof(img_demo_vector_avatar_map),
 };

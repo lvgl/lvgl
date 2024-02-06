@@ -15,9 +15,9 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_list_border_map[] = {
 const lv_image_dsc_t img_lv_demo_music_list_border = {
     .header.w = 272,
     .header.h = 4,
-    .data_size = 1088 * LV_COLOR_DEPTH / 8,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_list_border_map,
+    .data_size = sizeof(img_lv_demo_music_list_border_map),
 };
 
 #endif /*LV_USE_DEMO_MUSIC*/

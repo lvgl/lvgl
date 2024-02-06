@@ -188,6 +188,7 @@ const lv_image_dsc_t animimg003 = {
     .header.h = 170,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = animimg003_map,
+    .data_size = sizeof(animimg003_map),
 };
 
 #endif /* LV_BUILD_EXAMPLES */
