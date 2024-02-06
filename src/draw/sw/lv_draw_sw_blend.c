@@ -350,17 +350,17 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
 /**********************
  *      MACROS
  **********************/
-#define FILL_NORMAL_MASK_PX(color)                                                          \
-    if(*mask == LV_OPA_COVER) *dest_buf = color;                                 \
-    else *dest_buf = lv_color_mix(color, *dest_buf, *mask);            \
-    mask++;                                                         \
+#define FILL_NORMAL_MASK_PX(color)                                                  \
+    if(*mask == LV_OPA_COVER) *dest_buf = color;                                    \
+    else *dest_buf = lv_color_mix(color, *dest_buf, *mask);                         \
+    mask++;                                                                         \
     dest_buf++;
 
-#define MAP_NORMAL_MASK_PX(x)                                                          \
+#define MAP_NORMAL_MASK_PX(x)                                                       \
     if(*mask_tmp_x) {          \
-        if(*mask_tmp_x == LV_OPA_COVER) dest_buf[x] = src_buf[x];                                 \
-        else dest_buf[x] = lv_color_mix(src_buf[x], dest_buf[x], *mask_tmp_x);            \
-    }                                                                                               \
+        if(*mask_tmp_x == LV_OPA_COVER) dest_buf[x] = src_buf[x];                   \
+        else dest_buf[x] = lv_color_mix(src_buf[x], dest_buf[x], *mask_tmp_x);      \
+    }                                                                               \
     mask_tmp_x++;
 
 
@@ -441,42 +441,65 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx,
 
     lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
+    if(dsc->src_buf == NULL) {
+        _lv_draw_sw_blend_fill_dsc_t fill_dsc;
 
-    if(disp->driver->set_px_cb) {
-        if(dsc->src_buf == NULL) {
+        fill_dsc.dest_buf = dest_buf;
+        fill_dsc.dest_w = lv_area_get_width(&blend_area);
+        fill_dsc.dest_h = lv_area_get_height(&blend_area);
+        fill_dsc.dest_stride = dest_stride;
+        fill_dsc.mask_buf = mask;
+        fill_dsc.mask_stride = mask_stride;
+        fill_dsc.opa = dsc->opa;
+        fill_dsc.color = dsc->color;
+
+        if(disp->driver->set_px_cb) {
             fill_set_px(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
         }
-        else {
-            map_set_px(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride);
-        }
-    }
-#if LV_COLOR_SCREEN_TRANSP
-    else if(disp->driver->screen_transp) {
-        if(dsc->src_buf == NULL) {
+    #if LV_COLOR_SCREEN_TRANSP
+        else if(disp->driver->screen_transp) {
             fill_argb(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
         }
-        else {
-            map_argb(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride, dsc->blend_mode);
-        }
-    }
-#endif
-    else if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
-        if(dsc->src_buf == NULL) {
+    #endif
+        else if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
             fill_normal(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
         }
+    #if LV_DRAW_COMPLEX
         else {
-            map_normal(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride);
-        }
-    }
-    else {
-#if LV_DRAW_COMPLEX
-        if(dsc->src_buf == NULL) {
             fill_blended(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride, dsc->blend_mode);
         }
+    #endif
+    } else {
+        _lv_draw_sw_blend_image_dsc_t image_dsc;
+
+        image_dsc.dest_buf = dest_buf;
+        image_dsc.dest_w = lv_area_get_width(&blend_area);
+        image_dsc.dest_h = lv_area_get_height(&blend_area);
+        image_dsc.dest_stride = dest_stride;
+        image_dsc.mask_buf = mask;
+        image_dsc.mask_stride = mask_stride;
+        image_dsc.src_buf = src_buf;
+        image_dsc.src_stride = src_stride;
+        image_dsc.src_color_format = LV_IMG_CF_TRUE_COLOR;
+        image_dsc.opa = dsc->opa;
+        image_dsc.blend_mode = dsc->blend_mode;
+
+        if(disp->driver->set_px_cb) {
+            map_set_px(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride);
+        }
+    #if LV_COLOR_SCREEN_TRANSP
+        else if(disp->driver->screen_transp) {
+            map_argb(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride, dsc->blend_mode);
+        }
+    #endif
+        else if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
+            map_normal(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride);
+        }
+    #if LV_DRAW_COMPLEX
         else {
             map_blended(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride, dsc->blend_mode);
         }
-#endif
+    #endif
     }
 }
 

@@ -38,6 +38,31 @@ typedef struct {
     lv_blend_mode_t blend_mode;     /**< E.g. LV_BLEND_MODE_ADDITIVE*/
 } lv_draw_sw_blend_dsc_t;
 
+typedef struct {
+    void * dest_buf;
+    int32_t dest_w;
+    int32_t dest_h;
+    lv_coord_t dest_stride
+    const lv_opa_t * mask_buf;      /**< NULL if ignored, or an alpha mask to apply on `blend_area`*/
+    lv_coord_t mask_stride;
+    lv_color_t color;               /**< Fill color*/
+    lv_opa_t opa;                    /**< The overall opacity*/
+} _lv_draw_sw_blend_fill_dsc_t;
+
+typedef struct {
+    void * dest_buf;
+    int32_t dest_w;
+    int32_t dest_h;
+    lv_coord_t dest_stride;
+    const lv_opa_t * mask_buf;
+    lv_coord_t mask_stride;
+    const void * src_buf;
+    lv_coord_t src_stride;
+    lv_img_cf_t src_color_format;
+    lv_opa_t opa;
+    lv_blend_mode_t blend_mode;
+} _lv_draw_sw_blend_image_dsc_t;
+
 struct _lv_draw_ctx_t;
 
 /**********************
