@@ -36,9 +36,10 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-01-25" version="9.0.1-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.1-dev1.pack">
+    <release date="2024-02-06" version="9.0.1-dev2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.1-dev2.pack">
       - LVGL 9.0.1-dev
-      - Minor fixes
+      - Improves benchmark statistics.
+      - Some fixes
     </release>
     <release date="2024-01-24" version="9.0.0" url="https://github.com/lvgl/lvgl/raw/b255eeabf00fa2316084e308e596e7ecabbaff4d/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
       - LVGL 9.0.0
@@ -391,7 +392,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.0.1-dev">
+        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.0.1-dev2">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="Essential">
@@ -630,7 +631,7 @@
                 <file category="sourceC"            name="src/osal/lv_os_none.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.3" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.4" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
