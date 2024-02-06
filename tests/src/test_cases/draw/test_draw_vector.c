@@ -47,7 +47,7 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_dsc_identity(ctx);
     lv_vector_dsc_translate(ctx, 0, 150);
 
-    lv_grad_dsc_t grad;
+    lv_grad_dsc_t grad = { 0 };
     grad.dir = LV_GRAD_DIR_HOR;
     grad.stops_count = 2;
     grad.stops[0].color = lv_color_hex(0xffffff);
@@ -208,7 +208,7 @@ static void draw_lines(lv_layer_t * layer)
     lv_vector_path_clear(path);
     lv_vector_path_append_rect(path, &rect1, 0, 0);
 
-    lv_grad_dsc_t grad;
+    lv_grad_dsc_t grad = { 0 };
     grad.dir = LV_GRAD_DIR_HOR;
     grad.stops_count = 2;
     grad.stops[0].color = lv_color_hex(0xff0000);
@@ -226,6 +226,70 @@ static void draw_lines(lv_layer_t * layer)
     lv_vector_dsc_set_stroke_join(ctx, LV_VECTOR_STROKE_JOIN_MITER);
     lv_vector_dsc_set_stroke_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_REFLECT);
     lv_vector_dsc_add_path(ctx, path); // draw a path
+
+    lv_draw_vector(ctx);
+    lv_vector_path_delete(path);
+    lv_vector_dsc_delete(ctx);
+}
+
+static void draw_gradient(lv_layer_t * layer)
+{
+    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+
+    lv_area_t bg = {0, 0, 640, 480};
+    lv_vector_dsc_set_fill_color(ctx, lv_color_white());
+    lv_vector_clear_area(ctx, &bg);
+
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+    lv_grad_dsc_t grad = { 0 };
+    lv_area_t grad_area = {10, 10, 412, 412};
+    grad.grad_area = grad_area;
+    grad.dir = LV_GRAD_DIR_DIAGONAL;
+    grad.stops_count = 2;
+    grad.stops[0].color = lv_color_hex(0xff0000);
+    grad.stops[0].opa = LV_OPA_COVER;
+    grad.stops[0].frac = 0;
+    grad.stops[1].color = lv_color_hex(0x00ff00);
+    grad.stops[1].opa = LV_OPA_COVER;
+    grad.stops[1].frac = 255;
+
+    lv_area_t rect = {10, 10, 210, 210};
+    lv_vector_path_append_rect(path, &rect, 0, 0);
+    lv_vector_dsc_set_fill_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_PAD);
+    lv_vector_dsc_add_path(ctx, path); // draw a path
+
+    lv_vector_path_clear(path);
+    lv_area_t rect1 = {212, 10, 412, 210};
+    lv_vector_path_append_rect(path, &rect1, 0, 0);
+    lv_vector_dsc_set_fill_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_PAD);
+    lv_vector_dsc_add_path(ctx, path);
+
+    lv_vector_path_clear(path);
+    lv_area_t rect2 = {10, 212, 210, 412};
+    lv_vector_path_append_rect(path, &rect2, 0, 0);
+    lv_vector_dsc_set_fill_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_PAD);
+    lv_vector_dsc_add_path(ctx, path);
+
+    lv_vector_path_clear(path);
+    lv_area_t rect3 = {212, 212, 412, 412};
+    lv_vector_path_append_rect(path, &rect3, 0, 0);
+    lv_vector_dsc_set_fill_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_PAD);
+    lv_vector_dsc_add_path(ctx, path);
+
+    lv_vector_path_clear(path);
+    lv_memzero(&grad.grad_area, sizeof(grad.grad_area));
+    grad.dir = LV_GRAD_DIR_HOR;
+    lv_area_t rect4 = {460, 10, 620, 210};
+    lv_vector_path_append_rect(path, &rect4, 0, 0);
+    lv_vector_dsc_set_fill_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_PAD);
+    lv_vector_dsc_add_path(ctx, path);
+
+    lv_vector_path_clear(path);
+    grad.dir = LV_GRAD_DIR_VER;
+    lv_area_t rect5 = {460, 212, 620, 412};
+    lv_vector_path_append_rect(path, &rect5, 0, 0);
+    lv_vector_dsc_set_fill_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_PAD);
+    lv_vector_dsc_add_path(ctx, path);
 
     lv_draw_vector(ctx);
     lv_vector_path_delete(path);
@@ -294,5 +358,10 @@ void test_draw_lines(void)
 void test_draw_shapes(void)
 {
     canvas_draw("draw_shapes", draw_shapes);
+}
+
+void test_draw_gradient(void)
+{
+    canvas_draw("draw_gradient", draw_gradient);
 }
 #endif
