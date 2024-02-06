@@ -42,22 +42,22 @@ typedef struct {
     void * dest_buf;
     int32_t dest_w;
     int32_t dest_h;
-    lv_coord_t dest_stride;
+    int32_t dest_stride;            /**< dest stride in bytes */
     const lv_opa_t * mask_buf;      /**< NULL if ignored, or an alpha mask to apply on `blend_area`*/
-    lv_coord_t mask_stride;
+    int32_t mask_stride;            /**< mask stride in bytes */
     lv_color_t color;               /**< Fill color*/
-    lv_opa_t opa;                    /**< The overall opacity*/
+    lv_opa_t opa;                   /**< The overall opacity*/
 } _lv_draw_sw_blend_fill_dsc_t;
 
 typedef struct {
     void * dest_buf;
     int32_t dest_w;
     int32_t dest_h;
-    lv_coord_t dest_stride;
+    int32_t dest_stride;            /**< dest stride in bytes */
     const lv_opa_t * mask_buf;
-    lv_coord_t mask_stride;
+    int32_t mask_stride;            /**< mask stride in bytes */
     const void * src_buf;
-    lv_coord_t src_stride;
+    int32_t src_stride;             /**< source stride in bytes */
     lv_opa_t opa;
     lv_blend_mode_t blend_mode;
 } _lv_draw_sw_blend_image_dsc_t;
