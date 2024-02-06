@@ -58,7 +58,6 @@ typedef struct {
     lv_coord_t mask_stride;
     const void * src_buf;
     lv_coord_t src_stride;
-    lv_img_cf_t src_color_format;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode;
 } _lv_draw_sw_blend_image_dsc_t;

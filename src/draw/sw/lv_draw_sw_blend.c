@@ -480,7 +480,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx,
         image_dsc.mask_stride = mask_stride;
         image_dsc.src_buf = src_buf;
         image_dsc.src_stride = src_stride;
-        image_dsc.src_color_format = LV_IMG_CF_TRUE_COLOR;
         image_dsc.opa = dsc->opa;
         image_dsc.blend_mode = dsc->blend_mode;
 
