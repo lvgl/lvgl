@@ -1030,14 +1030,6 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
 
     /* Copy temporary matrix into result. */
     lv_memcpy(matrix->m, &temp.m, sizeof(temp.m));
-
-    matrix->scaleX = matrix->scaleX * mult->scaleX;
-    matrix->scaleY = matrix->scaleY * mult->scaleY;
-    matrix->angle += mult->angle;
-    if(matrix->angle >= 360) {
-        vg_lite_uint32_t count = (vg_lite_uint32_t)matrix->angle / 360;
-        matrix->angle = matrix->angle - count * 360;
-    }
 }
 
 void lv_vg_lite_matrix_flip_y(vg_lite_matrix_t * matrix)
@@ -1063,9 +1055,6 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
         result->m[2][1] = 0.0f;
         result->m[2][2] = 1.0f;
 
-        result->scaleX = 1.0f;
-        result->scaleY = 1.0f;
-        result->angle = 0.0f;
         /* Success. */
         return true;
     }
@@ -1096,14 +1085,6 @@ bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t
     result->m[2][0] = is_affine ? 0.0f : d * det02;
     result->m[2][1] = is_affine ? 0.0f : d * ((matrix->m[2][0] * matrix->m[0][1]) - (matrix->m[0][0] * matrix->m[2][1]));
     result->m[2][2] = is_affine ? 1.0f : d * ((matrix->m[0][0] * matrix->m[1][1]) - (matrix->m[1][0] * matrix->m[0][1]));
-
-    result->scaleX = 1 / matrix->scaleX;
-    result->scaleY = 1 / matrix->scaleY;
-    result->angle =  -matrix->angle;
-    if(result->angle >= 360) {
-        vg_lite_uint32_t count = (vg_lite_uint32_t)result->angle / 360;
-        result->angle = result->angle - count * 360;
-    }
 
     /* Success. */
     return true;

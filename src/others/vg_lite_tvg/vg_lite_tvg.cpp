@@ -11,7 +11,6 @@
 
 #include "vg_lite.h"
 #include "../../lvgl.h"
-#include "../../draw/vg_lite/lv_vg_lite_utils.h"
 #include "../../libs/thorvg/thorvg.h"
 #include <float.h>
 #include <math.h>
@@ -299,6 +298,8 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
                              vg_lite_uint32_t * bytes_align);
 
 static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, const vg_lite_fpoint_t * point);
+static bool vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
+static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 
 /**********************
  *  STATIC VARIABLES
@@ -1622,8 +1623,8 @@ Empty_sequence_handler:
 
         vg_lite_matrix_t grad_matrix;
         vg_lite_identity(&grad_matrix);
-        lv_vg_lite_matrix_inverse(&grad_matrix, matrix);
-        lv_vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
+        vg_lite_matrix_inverse(&grad_matrix, matrix);
+        vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
 
         vg_lite_fpoint_t p1 = {0.0f, 0.0f};
         vg_lite_fpoint_t p2 = {1.0f, 0};
@@ -2441,6 +2442,79 @@ static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, 
     p.x = (vg_lite_float_t)(point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]);
     p.y = (vg_lite_float_t)(point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]);
     return p;
+}
+
+static bool vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix)
+{
+    vg_lite_float_t det00, det01, det02;
+    vg_lite_float_t d;
+    bool is_affine;
+
+    /* Test for identity matrix. */
+    if(matrix == NULL) {
+        result->m[0][0] = 1.0f;
+        result->m[0][1] = 0.0f;
+        result->m[0][2] = 0.0f;
+        result->m[1][0] = 0.0f;
+        result->m[1][1] = 1.0f;
+        result->m[1][2] = 0.0f;
+        result->m[2][0] = 0.0f;
+        result->m[2][1] = 0.0f;
+        result->m[2][2] = 1.0f;
+
+        /* Success. */
+        return true;
+    }
+
+    det00 = (matrix->m[1][1] * matrix->m[2][2]) - (matrix->m[2][1] * matrix->m[1][2]);
+    det01 = (matrix->m[2][0] * matrix->m[1][2]) - (matrix->m[1][0] * matrix->m[2][2]);
+    det02 = (matrix->m[1][0] * matrix->m[2][1]) - (matrix->m[2][0] * matrix->m[1][1]);
+
+    /* Compute determinant. */
+    d = (matrix->m[0][0] * det00) + (matrix->m[0][1] * det01) + (matrix->m[0][2] * det02);
+
+    /* Return 0 if there is no inverse matrix. */
+    if(d == 0.0f)
+        return false;
+
+    /* Compute reciprocal. */
+    d = 1.0f / d;
+
+    /* Determine if the matrix is affine. */
+    is_affine = (matrix->m[2][0] == 0.0f) && (matrix->m[2][1] == 0.0f) && (matrix->m[2][2] == 1.0f);
+
+    result->m[0][0] = d * det00;
+    result->m[0][1] = d * ((matrix->m[2][1] * matrix->m[0][2]) - (matrix->m[0][1] * matrix->m[2][2]));
+    result->m[0][2] = d * ((matrix->m[0][1] * matrix->m[1][2]) - (matrix->m[1][1] * matrix->m[0][2]));
+    result->m[1][0] = d * det01;
+    result->m[1][1] = d * ((matrix->m[0][0] * matrix->m[2][2]) - (matrix->m[2][0] * matrix->m[0][2]));
+    result->m[1][2] = d * ((matrix->m[1][0] * matrix->m[0][2]) - (matrix->m[0][0] * matrix->m[1][2]));
+    result->m[2][0] = is_affine ? 0.0f : d * det02;
+    result->m[2][1] = is_affine ? 0.0f : d * ((matrix->m[2][0] * matrix->m[0][1]) - (matrix->m[0][0] * matrix->m[2][1]));
+    result->m[2][2] = is_affine ? 1.0f : d * ((matrix->m[0][0] * matrix->m[1][1]) - (matrix->m[1][0] * matrix->m[0][1]));
+
+    /* Success. */
+    return true;
+}
+
+static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult)
+{
+    vg_lite_matrix_t temp;
+    int row, column;
+
+    /* Process all rows. */
+    for(row = 0; row < 3; row++) {
+        /* Process all columns. */
+        for(column = 0; column < 3; column++) {
+            /* Compute matrix entry. */
+            temp.m[row][column] = (matrix->m[row][0] * mult->m[0][column])
+                                  + (matrix->m[row][1] * mult->m[1][column])
+                                  + (matrix->m[row][2] * mult->m[2][column]);
+        }
+    }
+
+    /* Copy temporary matrix into result. */
+    lv_memcpy(matrix->m, &temp.m, sizeof(temp.m));
 }
 
 #endif
