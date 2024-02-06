@@ -110,6 +110,9 @@ static void multiple_rgb_images_cb(void)
     uint32_t hor_cnt = (lv_disp_get_hor_res(NULL) - 16) / 116;
     uint32_t ver_cnt = (lv_disp_get_ver_res(NULL) - 116) / 116;
 
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
     uint32_t y;
     for(y = 0; y < ver_cnt; y++) {
         uint32_t x;
@@ -133,6 +136,9 @@ static void multiple_argb_images_cb(void)
     uint32_t hor_cnt = (lv_disp_get_hor_res(NULL) - 16) / 116;
     uint32_t ver_cnt = (lv_disp_get_ver_res(NULL) - 116) / 116;
 
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
     uint32_t y;
     for(y = 0; y < ver_cnt; y++) {
         uint32_t x;
@@ -155,6 +161,9 @@ static void rotated_argb_image_cb(void)
     LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
     uint32_t hor_cnt = (lv_disp_get_hor_res(NULL) - 16) / 116;
     uint32_t ver_cnt = (lv_disp_get_ver_res(NULL) - 116) / 116;
+
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
 
     uint32_t y;
     for(y = 0; y < ver_cnt; y++) {
@@ -223,6 +232,9 @@ static void multiple_arcs_cb(void)
     uint32_t hor_cnt = (lv_disp_get_hor_res(NULL) - 16) / lv_dpx(160);
     uint32_t ver_cnt = (lv_disp_get_ver_res(NULL) - 16) / lv_dpx(160);
 
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
     uint32_t y;
     for(y = 0; y < ver_cnt; y++) {
         uint32_t x;
@@ -254,6 +266,9 @@ static void containers_cb(void)
     uint32_t hor_cnt = (lv_disp_get_hor_res(NULL) - 16) / 300;
     uint32_t ver_cnt = (lv_disp_get_ver_res(NULL) - 16) / 150;
 
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
     uint32_t y;
     for(y = 0; y < ver_cnt; y++) {
         uint32_t x;
@@ -272,6 +287,9 @@ static void containers_with_overlay_cb(void)
 
     uint32_t hor_cnt = (lv_disp_get_hor_res(NULL) - 16) / 300;
     uint32_t ver_cnt = (lv_disp_get_ver_res(NULL) - 16) / 150;
+
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
 
     uint32_t y;
     for(y = 0; y < ver_cnt; y++) {
@@ -295,6 +313,9 @@ static void containers_with_opa_cb(void)
     uint32_t hor_cnt = (lv_disp_get_hor_res(NULL) - 16) / 300;
     uint32_t ver_cnt = (lv_disp_get_ver_res(NULL) - 16) / 150;
 
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
     uint32_t y;
     for(y = 0; y < ver_cnt; y++) {
         uint32_t x;
@@ -314,6 +335,9 @@ static void containers_with_opa_layer_cb(void)
 
     uint32_t hor_cnt = (lv_disp_get_hor_res(NULL) - 16) / 300;
     uint32_t ver_cnt = (lv_disp_get_ver_res(NULL) - 16) / 150;
+
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
 
     uint32_t y;
     for(y = 0; y < ver_cnt; y++) {
