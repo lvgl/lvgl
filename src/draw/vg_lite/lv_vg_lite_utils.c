@@ -958,7 +958,6 @@ void lv_vg_lite_draw_linear_grad(
     LV_PROFILER_END_TAG("vg_lite_update_grad");
 
     vg_lite_matrix_t * grad_matrix = vg_lite_get_grad_matrix(&gradient);
-    vg_lite_identity(grad_matrix);
     lv_memcpy(grad_matrix, matrix, sizeof(vg_lite_matrix_t));
     lv_area_t grad_area = grad->grad_area;
     int32_t x_min = (int32_t)(path->bounding_box[0]);
