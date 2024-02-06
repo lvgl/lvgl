@@ -302,18 +302,21 @@ static void fill_set_px(lv_color_t * dest_buf, const lv_area_t * blend_area, lv_
 
 static void /* LV_ATTRIBUTE_FAST_MEM */ fill_normal(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                                     lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa,
-                                                    const lv_opa_t * mask, lv_coord_t mask_stride);
+                                                    const lv_opa_t * mask, lv_coord_t mask_stride,
+                                                    _lv_draw_sw_blend_fill_dsc_t * dsc);
 
 
 #if LV_COLOR_SCREEN_TRANSP
 static void /* LV_ATTRIBUTE_FAST_MEM */ fill_argb(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                                   lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa,
-                                                  const lv_opa_t * mask, lv_coord_t mask_stride);
+                                                  const lv_opa_t * mask, lv_coord_t mask_stride,
+                                                  _lv_draw_sw_blend_fill_dsc_t * dsc);
 #endif /*LV_COLOR_SCREEN_TRANSP*/
 
 #if LV_DRAW_COMPLEX
 static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride, lv_color_t color,
-                         lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode);
+                         lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode,
+                         _lv_draw_sw_blend_fill_dsc_t * dsc);
 #endif  /*LV_DRAW_COMPLEX*/
 
 static void map_set_px(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
@@ -323,20 +326,22 @@ static void map_set_px(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_co
 static void /* LV_ATTRIBUTE_FAST_MEM */ map_normal(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                                    lv_coord_t dest_stride, const lv_color_t * src_buf,
                                                    lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask,
-                                                   lv_coord_t mask_stride);
+                                                   lv_coord_t mask_stride, _lv_draw_sw_blend_image_dsc_t * dsc);
 
 #if LV_COLOR_SCREEN_TRANSP
 static void /* LV_ATTRIBUTE_FAST_MEM */ map_argb(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                                  lv_coord_t dest_stride, const lv_color_t * src_buf,
                                                  lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask,
-                                                 lv_coord_t mask_stride, lv_blend_mode_t blend_mode);
+                                                 lv_coord_t mask_stride, lv_blend_mode_t blend_mode,
+                                                 _lv_draw_sw_blend_image_dsc_t * dsc);
 
 #endif /*LV_COLOR_SCREEN_TRANSP*/
 
 #if LV_DRAW_COMPLEX
 static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                         const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa,
-                        const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode);
+                        const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode,
+                        _lv_draw_sw_blend_image_dsc_t * dsc);
 
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
@@ -458,15 +463,15 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx,
         }
     #if LV_COLOR_SCREEN_TRANSP
         else if(disp->driver->screen_transp) {
-            fill_argb(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
+            fill_argb(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride, &fill_dsc);
         }
     #endif
         else if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
-            fill_normal(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
+            fill_normal(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride, &fill_dsc);
         }
     #if LV_DRAW_COMPLEX
         else {
-            fill_blended(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride, dsc->blend_mode);
+            fill_blended(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride, dsc->blend_mode, &fill_dsc);
         }
     #endif
     } else {
@@ -488,15 +493,15 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx,
         }
     #if LV_COLOR_SCREEN_TRANSP
         else if(disp->driver->screen_transp) {
-            map_argb(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride, dsc->blend_mode);
+            map_argb(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride, dsc->blend_mode, &image_dsc);
         }
     #endif
         else if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
-            map_normal(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride);
+            map_normal(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride, &image_dsc);
         }
     #if LV_DRAW_COMPLEX
         else {
-            map_blended(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride, dsc->blend_mode);
+            map_blended(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride, dsc->blend_mode, &image_dsc);
         }
     #endif
     }
@@ -542,10 +547,12 @@ static void fill_set_px(lv_color_t * dest_buf, const lv_area_t * blend_area, lv_
 
 static LV_ATTRIBUTE_FAST_MEM void fill_normal(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                               lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa,
-                                              const lv_opa_t * mask, lv_coord_t mask_stride)
+                                              const lv_opa_t * mask, lv_coord_t mask_stride,
+                                              _lv_draw_sw_blend_fill_dsc_t * dsc)
 {
     int32_t w = lv_area_get_width(dest_area);
     int32_t h = lv_area_get_height(dest_area);
+    (void)dsc;
 
     int32_t x;
     int32_t y;
@@ -748,11 +755,13 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
 
 static void LV_ATTRIBUTE_FAST_MEM fill_argb(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                             lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa,
-                                            const lv_opa_t * mask, lv_coord_t mask_stride)
+                                            const lv_opa_t * mask, lv_coord_t mask_stride,
+                                            _lv_draw_sw_blend_fill_dsc_t * dsc)
 {
     uint8_t * dest_buf8 = (uint8_t *) dest_buf;
     int32_t w = lv_area_get_width(dest_area);
     int32_t h = lv_area_get_height(dest_area);
+    (void)dsc;
 
     int32_t x;
     int32_t y;
@@ -834,11 +843,12 @@ static void LV_ATTRIBUTE_FAST_MEM fill_argb(lv_color_t * dest_buf, const lv_area
 #if LV_DRAW_COMPLEX
 static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area,
                          lv_coord_t dest_stride, lv_color_t color, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride,
-                         lv_blend_mode_t blend_mode)
+                         lv_blend_mode_t blend_mode, _lv_draw_sw_blend_fill_dsc_t * dsc)
 {
 
     int32_t w = lv_area_get_width(dest_area);
     int32_t h = lv_area_get_height(dest_area);
+    (void)dsc;
 
     int32_t x;
     int32_t y;
@@ -942,11 +952,12 @@ static void map_set_px(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_co
 static void LV_ATTRIBUTE_FAST_MEM map_normal(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                              lv_coord_t dest_stride, const lv_color_t * src_buf,
                                              lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask,
-                                             lv_coord_t mask_stride)
+                                             lv_coord_t mask_stride, _lv_draw_sw_blend_image_dsc_t * dsc)
 
 {
     int32_t w = lv_area_get_width(dest_area);
     int32_t h = lv_area_get_height(dest_area);
+    (void)dsc;
 
     int32_t x;
     int32_t y;
@@ -1040,13 +1051,15 @@ static void LV_ATTRIBUTE_FAST_MEM map_normal(lv_color_t * dest_buf, const lv_are
 static void LV_ATTRIBUTE_FAST_MEM map_argb(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                            lv_coord_t dest_stride, const lv_color_t * src_buf,
                                            lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask,
-                                           lv_coord_t mask_stride, lv_blend_mode_t blend_mode)
+                                           lv_coord_t mask_stride, lv_blend_mode_t blend_mode,
+                                           _lv_draw_sw_blend_image_dsc_t * dsc)
 
 {
     uint8_t * dest_buf8 = (uint8_t *) dest_buf;
 
     int32_t w = lv_area_get_width(dest_area);
     int32_t h = lv_area_get_height(dest_area);
+    (void)dsc;
 
     int32_t x;
     int32_t y;
@@ -1181,11 +1194,13 @@ static void LV_ATTRIBUTE_FAST_MEM map_argb(lv_color_t * dest_buf, const lv_area_
 #if LV_DRAW_COMPLEX
 static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                         const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa,
-                        const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode)
+                        const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode,
+                        _lv_draw_sw_blend_image_dsc_t * dsc)
 {
 
     int32_t w = lv_area_get_width(dest_area);
     int32_t h = lv_area_get_height(dest_area);
+    (void)dsc;
 
     int32_t x;
     int32_t y;
