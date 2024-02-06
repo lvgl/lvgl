@@ -99,9 +99,9 @@ void lv_indev_read_timer_cb(lv_timer_t * timer);
 /**
  * Enable or disable one or all input devices (default enabled)
  * @param indev pointer to an input device or NULL to enable/disable all of them
- * @param en true to enable, false to disable
+ * @param enable true to enable, false to disable
  */
-void lv_indev_enable(lv_indev_t * indev, bool en);
+void lv_indev_enable(lv_indev_t * indev, bool enable);
 
 /**
  * Get the currently processed input device. Can be used in action functions too.

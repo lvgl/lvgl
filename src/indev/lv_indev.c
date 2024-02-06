@@ -257,17 +257,15 @@ void lv_indev_read(lv_indev_t * indev)
     LV_PROFILER_END;
 }
 
-void lv_indev_enable(lv_indev_t * indev, bool en)
+void lv_indev_enable(lv_indev_t * indev, bool enable)
 {
-    const uint8_t enable = en ? 1U : 0U;
-
     if(indev) {
-        indev->enabled = enable;
+        indev->enabled = (uint8_t) enable;
     }
     else {
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
-            i->enabled = enable;
+            i->enabled = (uint8_t) enable;
             i = lv_indev_get_next(i);
         }
     }
