@@ -272,7 +272,7 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
                 if(masked && transformed)  return 0;
 
                 lv_color_format_t cf = draw_dsc->header.cf;
-                if(masked && (cf == LV_COLOR_FORMAT_A8 && cf == LV_COLOR_FORMAT_RGB565A8)) {
+                if(masked && (cf == LV_COLOR_FORMAT_A8 || cf == LV_COLOR_FORMAT_RGB565A8)) {
                     return 0;
                 }
             }
