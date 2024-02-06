@@ -26,11 +26,11 @@
 #define MAX_BUF_SIZE (uint32_t) lv_disp_get_hor_res(_lv_refr_get_disp_refreshing())
 
 #ifndef LV_DRAW_SW_IMAGE
-    #define LV_DRAW_SW_IMAGE(...)   LV_RESULT_INVALID
+    #define LV_DRAW_SW_IMAGE(...)   LV_RES_INV
 #endif
 
 #ifndef LV_DRAW_SW_RECOLOR
-    #define LV_DRAW_SW_RECOLOR(...)  LV_RESULT_INVALID
+    #define LV_DRAW_SW_RECOLOR(...)  LV_RES_INV
 #endif
 
 /**********************
@@ -110,12 +110,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
     }
 #endif
     /* check whethr it is possible to accelerate the operation in synchronouse mode */
-    else if(LV_RESULT_INVALID == LV_DRAW_SW_IMAGE(transform,        /* whether require transform */
-                                                  cf,               /* image format */
-                                                  src_buf,          /* image buffer */
-                                                  coords,           /* src_h, src_w, src_x1, src_y1 */
-                                                  draw_ctx,         /* target buffer, buffer width, buffer height, buffer stride */
-                                                  draw_dsc)) {      /* opa, recolour_opa and colour */
+    else if(LV_RES_INV == LV_DRAW_SW_IMAGE(transform,        /* whether require transform */
+                                           cf,               /* image format */
+                                           src_buf,          /* image buffer */
+                                           coords,           /* src_h, src_w, src_x1, src_y1 */
+                                           draw_ctx,         /* target buffer, buffer width, buffer height, buffer stride */
+                                           draw_dsc)) {      /* opa, recolour_opa and colour */
     /*In the other cases every pixel need to be checked one-by-one*/
         blend_area.x1 = draw_ctx->clip_area->x1;
         blend_area.x2 = draw_ctx->clip_area->x2;
@@ -176,7 +176,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                 lv_color_premult(recolor, recolor_opa, premult_v);
                 recolor_opa = 255 - recolor_opa;
 
-                if(LV_RESULT_INVALID == LV_DRAW_SW_RECOLOR(cf, rgb_buf, blend_area, recolor, recolor_opa)) {
+                if(LV_RES_INV == LV_DRAW_SW_RECOLOR(cf, rgb_buf, blend_area, recolor, recolor_opa)) {
                     uint16_t premult_v[3];
                     uint32_t i;
                     for(i = 0; i < buf_size; i++) {
