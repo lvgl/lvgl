@@ -13,7 +13,7 @@ body:
     id: success-criteria
     attributes:
       label: Success criteria
-      placeholder: Ideally something measurable, efor example make something 20% faster/smaller/shorter/etc.
+      placeholder: Ideally something measurable, for example make something 20% faster/smaller/shorter/etc.
     validations:
       required: true
   - type: textarea

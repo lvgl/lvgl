@@ -26,10 +26,10 @@ Ways to contribute
 - **Report a bug**: Open a `GitHub Issue <https://github.com/lvgl/lvgl/issues>`__ if something is not working.
 - **Join our `Forum <https://forum.lvgl.io/>`__**: Meet fellow developers and discuss questions
 - **Tell your ideas**: If you miss something from LVGL we would love to hear about it in a `GitHub Issue <https://github.com/lvgl/lvgl/issues>`__
-- **Develop features**: Help to deign or develop a feature. See below.
+- **Develop features**: Help to design or develop a feature. See below.
 
 
-Mid and large scale issues are discussed in [Feature planning](https://github.com/lvgl/lvgl/issues/new?assignees=&labels=&projects=&template=feat-planning.yml) issues. 
+Mid and large scale issues are discussed in [Feature planning](https://github.com/lvgl/lvgl/issues/new?assignees=&labels=&projects=&template=feat-planning.yml) issues.
 
 An issue can be developed when all the questions in the issue template are answered and there is no objection from any core member.
 
