@@ -270,12 +270,12 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
     return data + x * lv_color_format_get_size(buf->header.cf);
 }
 
-lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t stride)
+lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
 {
     LV_ASSERT_NULL(src);
     LV_ASSERT_NULL(src->data);
-    if(src == NULL) return NULL;
-    if(src->data == NULL) return NULL;
+    if(src == NULL) return LV_RESULT_INVALID;
+    if(src->data == NULL) return LV_RESULT_INVALID;
 
     const lv_image_header_t * header = &src->header;
 
@@ -283,32 +283,48 @@ lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t st
     if(stride == 0) stride = lv_draw_buf_width_to_stride(header->w, header->cf);
 
     /*Check if stride already match*/
-    if(header->stride == stride) return NULL;
+    if(header->stride == stride) return LV_RESULT_OK;
 
     /*Calculate the minimal stride allowed from bpp*/
     uint32_t bpp = lv_color_format_get_bpp(header->cf);
     uint32_t min_stride = (header->w * bpp + 7) >> 3;
     if(stride < min_stride) {
         LV_LOG_WARN("New stride is too small. min: %" LV_PRId32, min_stride);
-        return NULL;
+        return LV_RESULT_INVALID;
     }
 
-    lv_draw_buf_t * dst = lv_draw_buf_create(header->w, header->h, header->cf, stride);
-    if(dst == NULL) return NULL;
+    /*Check if buffer has enough space. */
+    uint32_t new_size = _calculate_draw_buf_size(header->w, header->h, header->cf, stride);
+    if(new_size > src->data_size) {
+        return LV_RESULT_INVALID;
+    }
 
     uint32_t offset = LV_COLOR_INDEXED_PALETTE_SIZE(header->cf) * 4;
-    if(offset) lv_memcpy(dst->data, src->data, offset);
-    uint8_t * dst_data = dst->data;
-    dst_data += offset;
-    const uint8_t * src_data = src->data;
-    src_data += offset;
-    for(int32_t y = 0; y < src->header.h; y++) {
-        lv_memcpy(dst_data, src_data, min_stride);
-        src_data += src->header.stride;
-        dst_data += dst->header.stride;
+
+    if(stride > header->stride) {
+        /*Copy from the last line to the first*/
+        uint8_t * src_data = src->data + offset + header->stride * (header->h - 1);
+        uint8_t * dst_data = src->data + offset + stride * (header->h - 1);
+        for(; src_data != src->data;) {
+            lv_memmove(dst_data, src_data, min_stride);
+            src_data -= header->stride;
+            dst_data -= stride;
+        }
+    }
+    else {
+        /*Copy from the first line to the last*/
+        uint8_t * src_data = src->data + offset;
+        uint8_t * dst_data = src->data + offset;
+        for(uint32_t y = 0; y < header->h; y++) {
+            lv_memmove(dst_data, src_data, min_stride);
+            src_data += header->stride;
+            dst_data += stride;
+        }
     }
 
-    return dst;
+    src->header.stride = stride;
+
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)

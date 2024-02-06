@@ -32,7 +32,7 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
 typedef struct {
     lv_image_header_t header;
     uint32_t data_size;     /*Total buf size in bytes*/
-    void * data;
+    uint8_t * data;
     void * unaligned_data;  /*Unaligned address of `data`, used internally by lvgl*/
 } lv_draw_buf_t;
 
@@ -206,9 +206,12 @@ void lv_draw_buf_destroy(lv_draw_buf_t * buf);
 void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y);
 
 /**
- * Adjust the stride of a draw buf.
+ * Adjust the stride of a draw buf in place.
+ * @param src       pointer to a draw buffer
+ * @param stride    the new stride in bytes for image. Use LV_STRIDE_AUTO for automatic calculation.
+ * @return          LV_RESULT_OK: success or LV_RESULT_INVALID: failed
  */
-lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t stride);
+lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride);
 
 /**
  * Premultiply draw buffer color with alpha channel.

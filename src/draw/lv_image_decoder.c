@@ -256,13 +256,17 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
         uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
         if(decoded->header.stride != stride_expect) {
             LV_LOG_TRACE("Stride mismatch");
-            lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, stride_expect);
-            if(aligned == NULL) {
-                LV_LOG_ERROR("No memory for Stride adjust.");
-                return NULL;
-            }
+            lv_result_t res = lv_draw_buf_adjust_stride(decoded, stride_expect);
+            if(res != LV_RESULT_OK) {
+                lv_draw_buf_t * aligned = lv_draw_buf_create(decoded->header.w, decoded->header.h, decoded->header.cf, stride_expect);
+                if(aligned == NULL) {
+                    LV_LOG_ERROR("No memory for Stride adjust.");
+                    return NULL;
+                }
 
-            decoded = aligned;
+                lv_draw_buf_copy(aligned, NULL, decoded, NULL);
+                decoded = aligned;
+            }
         }
     }
 
