@@ -335,7 +335,7 @@
     #endif
 
     #ifndef LV_DRAW_SW_BLEND_NORMAL
-        #define LV_DRAW_SW_GRAY8_BLEND_NORMAL                   LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8
+        #define LV_DRAW_SW_BLEND_NORMAL                         LV_DRAW_SW_GRAY8_BLEND_NORMAL_TO_GRAY8
     #endif
 
     #ifndef LV_DRAW_SW_BLEND_NORMAL_WITH_OPA
