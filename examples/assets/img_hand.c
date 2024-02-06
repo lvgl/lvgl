@@ -27,6 +27,7 @@ const lv_image_dsc_t img_hand = {
     .header.h = 9,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_hand_map,
+    .data_size = sizeof(img_hand_map),
 };
 
 #endif /* LV_BUILD_EXAMPLES */

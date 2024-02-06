@@ -50,6 +50,7 @@ const lv_image_dsc_t img_emoji_rocket = {
     .header.w = 16,
     .header.h = 19,
     .data = img_emoji_rocket_map,
+    .data_size = sizeof(img_emoji_rocket_map),
 };
 
 #endif

@@ -51,6 +51,7 @@ const lv_image_dsc_t img_caret_down = {
     .header.h = 8,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_caret_down_map,
+    .data_size = sizeof(img_caret_down_map),
 };
 
 #endif /* LV_BUILD_EXAMPLES */

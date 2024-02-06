@@ -69,6 +69,7 @@ const lv_image_dsc_t imagebutton_left = {
     .header.h = 50,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = imagebutton_left_map,
+    .data_size = sizeof(imagebutton_left_map),
 };
 
 #endif /* LV_BUILD_EXAMPLES */

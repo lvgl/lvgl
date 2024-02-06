@@ -427,6 +427,7 @@ const lv_image_dsc_t img_benchmark_cogwheel_argb = {
     //    .data_size = 10000 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
     .header.cf = LV_COLOR_DEPTH == 16 ? LV_COLOR_FORMAT_RGB565A8 : LV_COLOR_FORMAT_ARGB8888,
     .data = img_benchmark_cogwheel_argb_map,
+    .data_size = sizeof(img_benchmark_cogwheel_argb_map),
 };
 
 #endif

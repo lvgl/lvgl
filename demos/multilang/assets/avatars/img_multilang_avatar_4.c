@@ -159,6 +159,7 @@ const lv_image_dsc_t img_multilang_avatar_4 = {
     .header.w = 128,
     .header.h = 128,
     .data = img_multilang_avatar_4_map,
+    .data_size = sizeof(img_multilang_avatar_4_map),
 };
 
 #endif

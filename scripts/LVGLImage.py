@@ -621,7 +621,7 @@ const lv_img_dsc_t {varname} = {{
   .header.w = {self.w},
   .header.h = {self.h},
   .header.stride = {self.stride},
-  .data_size = {len(compressed.compressed)},
+  .data_size = sizeof({varname}_map),
   .data = {varname}_map,
 }};
 

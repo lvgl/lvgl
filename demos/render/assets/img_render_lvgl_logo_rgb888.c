@@ -199,6 +199,6 @@ const lv_img_dsc_t img_render_lvgl_logo_rgb888 = {
     .header.cf = LV_COLOR_FORMAT_RGB888,
     .header.w = 30,
     .header.h = 30,
-    .data_size = 900 * 3,
     .data = img_render_lvgl_logo_rgb888_map,
+    .data_size = sizeof(img_render_lvgl_logo_rgb888_map),
 };
