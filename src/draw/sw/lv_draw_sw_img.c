@@ -116,7 +116,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                                            coords,           /* src_h, src_w, src_x1, src_y1 */
                                            draw_ctx,         /* target buffer, buffer width, buffer height, buffer stride */
                                            draw_dsc)) {      /* opa, recolour_opa and colour */
-    /*In the other cases every pixel need to be checked one-by-one*/
+        /*In the other cases every pixel need to be checked one-by-one*/
         blend_area.x1 = draw_ctx->clip_area->x1;
         blend_area.x2 = draw_ctx->clip_area->x2;
         blend_area.y1 = draw_ctx->clip_area->y1;
