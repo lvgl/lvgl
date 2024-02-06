@@ -10,6 +10,11 @@
 
 #include <stdint.h>
 
+#define LV_DRAW_SW_ASM_NONE         0
+#define LV_DRAW_SW_ASM_NEON         1
+#define LV_DRAW_SW_ASM_HELIUM       2
+#define LV_DRAW_SW_ASM_CUSTOM       255
+
 /* Handle special Kconfig options */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -409,6 +414,24 @@
         #define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
     #else
         #define LV_DISP_ROT_MAX_BUF (10*1024)
+    #endif
+#endif
+
+#ifndef LV_USE_DRAW_SW_ASM
+    #ifdef CONFIG_LV_USE_DRAW_SW_ASM
+        #define LV_USE_DRAW_SW_ASM CONFIG_LV_USE_DRAW_SW_ASM
+    #else
+        #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+    #endif
+#endif
+
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
+    #ifndef LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+        #ifdef CONFIG_LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+            #define LV_DRAW_SW_ASM_CUSTOM_INCLUDE CONFIG_LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+        #else
+            #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
+        #endif
     #endif
 #endif
 

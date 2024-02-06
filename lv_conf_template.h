@@ -172,6 +172,12 @@
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
+#define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
+    #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
+#endif
+
 /*-------------
  * GPU
  *-----------*/
