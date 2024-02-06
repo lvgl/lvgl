@@ -118,9 +118,9 @@ lv_indev_t * lv_indev_active(void);
 void lv_indev_set_type(lv_indev_t * indev, lv_indev_type_t indev_type);
 
 /**
- * Set a function pointer to read input device data to the indev
+ * Set a callback function to read input device data to the indev
  * @param indev pointer to an input device
- * @param read_cb pointer to function pointer to read input device data
+ * @param read_cb pointer to callback function to read input device data
  */
 void lv_indev_set_read_cb(lv_indev_t * indev,  lv_indev_read_cb_t read_cb);
 
@@ -153,9 +153,9 @@ void lv_indev_set_display(lv_indev_t * indev, struct _lv_display_t * disp);
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev);
 
 /**
- * Get a pointer to the function to read input device data to the indev
+ * Get the callback function to read input device data to the indev
  * @param indev pointer to an input device
- * @return Pointer to function pointer to read input device data or NULL if indev is NULL
+ * @return Pointer to callback function to read input device data or NULL if indev is NULL
  */
 lv_indev_read_cb_t lv_indev_get_read_cb(lv_indev_t * indev);
 
