@@ -118,11 +118,11 @@ In summary, to enable transparent screens and displays for OSD menu-like
 UIs:
 
 - Set the screen's ``bg_opa`` to transparent:
-  :cpp:expr:`lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_TRANSP, 0)`
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_TRANSP, LV_PART_MAIN)`
 - Set the bottom layer's ``bg_opa`` to transparent:
-  :cpp:expr:`lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_TRANSP, 0)`
-- Set the screen's bg_opa to 0:
-  :cpp:expr:`lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, 0)`
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, LV_PART_MAIN)`
+- Set the screen's ``bg_opa`` to 0:
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_0, LV_PART_MAIN)`
 - Set a color format with alpha channel. E.g.
   :cpp:expr:`lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888)`
 
