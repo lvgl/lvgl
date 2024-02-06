@@ -417,6 +417,39 @@
     #ifndef LV_DRAW_SW_BLEND_NORMAL_MIX_MASK_OPA
         #define LV_DRAW_SW_BLEND_NORMAL_MIX_MASK_OPA            LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
     #endif
+#else
+
+    #ifndef LV_DRAW_SW_COLOR_BLEND
+        #define LV_DRAW_SW_COLOR_BLEND(...)                     LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_COLOR_BLEND_WITH_OPA
+        #define LV_DRAW_SW_COLOR_BLEND_WITH_OPA(...)            LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_COLOR_BLEND_WITH_MASK
+        #define LV_DRAW_SW_COLOR_BLEND_WITH_MASK(...)           LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_COLOR_BLEND_MIX_MASK_OPA
+        #define LV_DRAW_SW_COLOR_BLEND_MIX_MASK_OPA(...)        LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_BLEND_NORMAL
+        #define LV_DRAW_SW_BLEND_NORMAL(...)                    LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_BLEND_NORMAL_WITH_OPA
+        #define LV_DRAW_SW_BLEND_NORMAL_WITH_OPA(...)           LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_BLEND_NORMAL_WITH_MASK
+        #define LV_DRAW_SW_BLEND_NORMAL_WITH_MASK(...)          LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_BLEND_NORMAL_MIX_MASK_OPA
+        #define LV_DRAW_SW_BLEND_NORMAL_MIX_MASK_OPA(...)       LV_RES_INV
+    #endif
 
 #endif
 
@@ -474,8 +507,25 @@
         #define LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA    LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA
     #endif
 
-#endif
+#elif LV_COLOR_SCREEN_TRANSP
 
+    #ifndef LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888
+        #define LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888(...)                LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_WITH_OPA
+        #define LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_WITH_OPA(...)       LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_WITH_MASK
+        #define LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_WITH_MASK(...)      LV_RES_INV
+    #endif
+
+    #ifndef LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA
+        #define LV_DRAW_SW_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(...)   LV_RES_INV
+    #endif
+
+#endif
 
 /**********************
  *      TYPEDEFS
