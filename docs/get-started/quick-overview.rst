@@ -352,14 +352,14 @@ Learn more about :ref:`micropython`.
 
 .. code:: python
 
+   # Initialize
+   import display_driver
    import lvgl as lv
 
-   # Create a Button and a Label
+   # Create a button with a label
    scr = lv.obj()
-   btn = lv.btn(scr)
-   btn.align(lv.screen_active(), lv.ALIGN.CENTER, 0, 0)
+   btn = lv.button(scr)
+   btn.align(lv.ALIGN.CENTER, 0, 0)
    label = lv.label(btn)
-   label.set_text("Button")
-
-   # Load the screen
+   label.set_text('Hello World!')
    lv.screen_load(scr)
