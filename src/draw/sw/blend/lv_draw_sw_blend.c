@@ -93,6 +93,11 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
             return;
         }
 
+        if(blend_dsc->mask_area && !_lv_area_intersect(&blend_area, &blend_area, blend_dsc->mask_area)) {
+            LV_PROFILER_END;
+            return;
+        }
+
         _lv_draw_sw_blend_image_dsc_t image_dsc;
         image_dsc.dest_w = lv_area_get_width(&blend_area);
         image_dsc.dest_h = lv_area_get_height(&blend_area);

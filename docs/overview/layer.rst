@@ -142,6 +142,11 @@ The following style properties trigger the creation of a "Transform layer":
 - ``transform_skew_y``
 - ``transform_rotate``
 
+Clip corner
+-----------
+
+The ``clip_corner`` style property also makes LVGL to create a 2 layers with radius height for the top and bottom part of the widget.
+
 .. _layers_api:
 
 API
