@@ -16,7 +16,7 @@ Draw task
 ---------
 
 
-When :cpp:expr`lv_draw_rect`, :cpp:expr`lv_draw_label` or similar functions are called
+When :cpp:expr:`lv_draw_rect`, :cpp:expr:`lv_draw_label` or similar functions are called
 LVGL creates a so called draw task.
 
 Draw unit
