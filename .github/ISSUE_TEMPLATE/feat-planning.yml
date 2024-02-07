@@ -1,0 +1,54 @@
+---
+name: Feature planning
+description: Discuss and design new features
+body:
+  - type: textarea
+    id: whatproblem
+    attributes:
+      label: Problem to solve
+      placeholder: A clear and concise description of the problem. Also mention some examples and use cases if possible.
+    validations:
+      required: true
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: Success criteria
+      placeholder: Ideally something measurable, for example make something 20% faster/smaller/shorter/etc.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution outline
+      placeholder: A rough description of how to implement it.
+    validations:
+      required: true
+  - type: textarea
+    id: rabbit-holes
+    attributes:
+      label: Rabbit holes
+      placeholder: Possible issues and difficulties that we already see.
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing
+      placeholder: How will we test this feature?
+    validations:
+      required: true
+  - type: textarea
+    id: teaching
+    attributes:
+      label: Teaching
+      placeholder: How will we teach this feature/how will the user know about it (docs, examples, etc)?
+    validations:
+      required: true
+  - type: textarea
+    id: considerations
+    attributes:
+      label: Considerations
+      placeholder: Other approaches that we have considered but dropped (just for the record).
+    validations:
+      required: false
+
