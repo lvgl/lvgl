@@ -52,7 +52,6 @@ typedef struct {
 #endif
 } my_theme_styles_t;
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -159,7 +158,6 @@ static void style_init(bool dark_bg, const lv_font_t * font)
 #endif
 }
 
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -195,7 +193,6 @@ lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t 
 
     return (lv_theme_t *)&theme;
 }
-
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {

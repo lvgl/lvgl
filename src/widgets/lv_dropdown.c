@@ -79,7 +79,6 @@ const lv_obj_class_t lv_dropdownlist_class = {
     .base_class = &lv_obj_class
 };
 
-
 /**********************
  *      MACROS
  **********************/
@@ -425,7 +424,6 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
 
     return -1;
 }
-
 
 const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
@@ -778,7 +776,6 @@ static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * 
     }
 }
 
-
 static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
@@ -1012,7 +1009,6 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, ui
     list_obj->state = state_orig;
     list_obj->skip_trans = 0;
 }
-
 
 static lv_res_t btn_release_handler(lv_obj_t * obj)
 {

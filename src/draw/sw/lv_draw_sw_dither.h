@@ -15,7 +15,6 @@ extern "C" {
  *********************/
 #include "../../core/lv_obj_pos.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -39,7 +38,6 @@ typedef void (*lv_dither_func_t)(struct _lv_gradient_cache_t * grad, lv_coord_t 
 
 #endif
 
-
 /**********************
  *    PROTOTYPES
  **********************/
@@ -62,7 +60,6 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_dither_err_diff_ver(struct _lv_gradient_cach
 
 #endif /* _DITHER_GRADIENT */
 #endif
-
 
 #ifdef __cplusplus
 } /*extern "C"*/

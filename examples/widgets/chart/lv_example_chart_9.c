@@ -1,7 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_CHART && LV_DRAW_COMPLEX && LV_BUILD_EXAMPLES
 
-
 static void add_data(lv_timer_t * t)
 {
     lv_obj_t * chart = t->user_data;

@@ -6,7 +6,6 @@
 #ifndef LV_DRAW_SDL_IMG_H
 #define LV_DRAW_SDL_IMG_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

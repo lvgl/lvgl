@@ -49,7 +49,6 @@ static void change_event_cb(lv_event_t * e)
     else lv_table_add_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
 }
 
-
 /**
  * A very light-weighted list created from table
  */

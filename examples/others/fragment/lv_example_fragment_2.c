@@ -66,7 +66,6 @@ void lv_example_fragment_2(void)
     lv_obj_add_event_cb(pop_btn, sample_pop_click, LV_EVENT_CLICKED, manager);
 }
 
-
 static void sample_fragment_ctor(lv_fragment_t * self, void * args)
 {
     LV_UNUSED(args);

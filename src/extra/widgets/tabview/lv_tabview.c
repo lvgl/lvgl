@@ -284,7 +284,6 @@ static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
         }
     }
 
-
     lv_mem_free(tabview->map);
     tabview->map = NULL;
 }
@@ -302,7 +301,6 @@ static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_tabview_set_act(target, lv_tabview_get_tab_act(target), LV_ANIM_OFF);
     }
 }
-
 
 static void btns_value_changed_event_cb(lv_event_t * e)
 {

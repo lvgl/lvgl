@@ -110,7 +110,6 @@ void lv_img_set_offset_x(lv_obj_t * obj, lv_coord_t x);
  */
 void lv_img_set_offset_y(lv_obj_t * obj, lv_coord_t y);
 
-
 /**
  * Set the rotation angle of the image.
  * The image will be rotated around the set pivot set by `lv_img_set_pivot()`
@@ -128,7 +127,6 @@ void lv_img_set_angle(lv_obj_t * obj, int16_t angle);
  * @param y         rotation center y of the image
  */
 void lv_img_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
-
 
 /**
  * Set the zoom factor of the image.

@@ -424,7 +424,6 @@ static lv_point_t lv_img_get_transformed_size(lv_obj_t * obj)
 {
     lv_img_t * img = (lv_img_t *)obj;
 
-
     lv_area_t area_transform;
     _lv_img_buf_get_transformed_area(&area_transform, img->w, img->h,
                                      img->angle, img->zoom, &img->pivot);

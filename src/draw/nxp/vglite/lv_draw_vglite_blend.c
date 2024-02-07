@@ -405,7 +405,6 @@ static lv_res_t lv_vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_are
                       lv_area_get_width(dest_area), lv_area_get_height(dest_area),
                       (uintptr_t)src_buf, (uintptr_t)dest_buf);
 
-
     lv_coord_t width = lv_area_get_width(src_area);
     lv_coord_t height = lv_area_get_height(src_area);
 

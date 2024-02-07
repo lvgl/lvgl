@@ -118,7 +118,6 @@ typedef struct _lv_disp_drv_t {
 
     void (*clear_cb)(struct _lv_disp_drv_t * disp_drv, uint8_t * buf, uint32_t size);
 
-
     /** OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the
      * number of flushed pixels*/
     void (*monitor_cb)(struct _lv_disp_drv_t * disp_drv, uint32_t time, uint32_t px);
@@ -312,7 +311,6 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp);
  * @return dpi of the display
  */
 lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp);
-
 
 /**
  * Set the rotation of this display.

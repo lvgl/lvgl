@@ -40,7 +40,6 @@ void _lv_demo_music_album_next(bool next);
  **********************/
 #endif /*LV_USE_DEMO_MUSIC*/
 
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

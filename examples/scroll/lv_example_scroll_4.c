@@ -1,7 +1,6 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_LIST
 
-
 /**
  * Styling the scrollbars
  */
@@ -27,7 +26,6 @@ void lv_example_scroll_4(void)
                       "Suspendisse vestibulum consectetur nunc ut commodo. \n"
                       "Fusce molestie rhoncus nisi sit amet tincidunt. \n"
                       "Suspendisse a nunc ut magna ornare volutpat.");
-
 
     /*Remove the style of scrollbar to have clean start*/
     lv_obj_remove_style(obj, NULL, LV_PART_SCROLLBAR | LV_STATE_ANY);

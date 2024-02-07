@@ -24,7 +24,6 @@ static void radio_event_handler(lv_event_t * e)
     LV_LOG_USER("Selected radio buttons: %d, %d", (int)active_index_1, (int)active_index_2);
 }
 
-
 static void radiobutton_create(lv_obj_t * parent, const char * txt)
 {
     lv_obj_t * obj = lv_checkbox_create(parent);
@@ -43,7 +42,6 @@ void lv_example_checkbox_2(void)
      * `LV_EVENT_CLICKED` on the container.
      * A variable is passed as event user data where the index of the active
      * radiobutton is saved */
-
 
     lv_style_init(&style_radio);
     lv_style_set_radius(&style_radio, LV_RADIUS_CIRCLE);
@@ -81,6 +79,5 @@ void lv_example_checkbox_2(void)
     /*Make the first checkbox checked*/
     lv_obj_add_state(lv_obj_get_child(cont2, 0), LV_STATE_CHECKED);
 }
-
 
 #endif

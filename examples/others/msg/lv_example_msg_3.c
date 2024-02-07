@@ -69,12 +69,10 @@ void lv_example_msg_3(void)
     lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_ALL, NULL);
     lv_msg_subsribe_obj(MSG_UPDATE, slider, NULL);
 
-
     /* As there are new UI elements that don't know the system's state
      * send an UPDATE REQUEST message which will trigger an UPDATE message with the current value*/
     lv_msg_send(MSG_UPDATE_REQUEST, NULL);
 }
-
 
 static void value_handler(void * s, lv_msg_t * m)
 {
@@ -105,7 +103,6 @@ static void value_handler(void * s, lv_msg_t * m)
         lv_msg_send(MSG_UPDATE, &value);
     }
 }
-
 
 static void btn_event_cb(lv_event_t * e)
 {

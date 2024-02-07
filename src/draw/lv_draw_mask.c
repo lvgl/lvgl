@@ -1049,8 +1049,6 @@ static lv_draw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_angle(lv_opa_t * ma
     }
 }
 
-
-
 static lv_draw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x,
                                                                     lv_coord_t abs_y, lv_coord_t len,
                                                                     lv_draw_mask_radius_param_t * p)
@@ -1103,7 +1101,6 @@ static lv_draw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_radius(lv_opa_t * m
         return LV_DRAW_MASK_RES_CHANGED;
     }
     //    printf("exec: x:%d.. %d, y:%d: r:%d, %s\n", abs_x, abs_x + len - 1, abs_y, p->cfg.radius, p->cfg.outer ? "inv" : "norm");
-
 
     //    if( abs_x == 276 && abs_x + len - 1 == 479 && abs_y == 63 && p->cfg.radius == 5 && p->cfg.outer == 1) {
     //        char x = 0;
@@ -1518,7 +1515,6 @@ static lv_opa_t * get_next_line(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_
     return &c->cir_opa[c->opa_start_on_y[y]];
 }
 
-
 static inline lv_opa_t LV_ATTRIBUTE_FAST_MEM mask_mix(lv_opa_t mask_act, lv_opa_t mask_new)
 {
     if(mask_new >= LV_OPA_MAX) return mask_act;
@@ -1526,6 +1522,5 @@ static inline lv_opa_t LV_ATTRIBUTE_FAST_MEM mask_mix(lv_opa_t mask_act, lv_opa_
 
     return LV_UDIV255(mask_act * mask_new);// >> 8);
 }
-
 
 #endif /*LV_DRAW_COMPLEX*/

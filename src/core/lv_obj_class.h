@@ -20,7 +20,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -85,7 +84,6 @@ bool lv_obj_is_group_def(struct _lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
-
 
 #ifdef __cplusplus
 } /*extern "C"*/

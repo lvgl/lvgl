@@ -14,7 +14,6 @@
  *   STATIC FUNCTIONS
  **********************/
 
-
 #if _DITHER_GRADIENT
 
 void LV_ATTRIBUTE_FAST_MEM lv_dither_none(lv_grad_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
@@ -38,7 +37,6 @@ static const uint8_t dither_ordered_threshold_matrix[8 * 8] = {
     10, 58,  6, 54,  9, 57,  5, 53,
     42, 26, 38, 22, 41, 25, 37, 21
 }; /* Shift by 6 to normalize */
-
 
 void LV_ATTRIBUTE_FAST_MEM lv_dither_ordered_hor(lv_grad_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
 {

@@ -658,7 +658,6 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&fake_disp);
 
-
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_CHROMA_KEY;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
@@ -791,7 +790,6 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_img_cache_invalidate_src(&canvas->dsc);
 }
 
-
 static void init_fake_disp(lv_obj_t * canvas, lv_disp_t * disp, lv_disp_drv_t * drv, lv_area_t * clip_area)
 {
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
@@ -830,7 +828,5 @@ static void deinit_fake_disp(lv_obj_t * canvas, lv_disp_t * disp)
     lv_draw_sw_deinit_ctx(disp->driver, disp->driver->draw_ctx);
     lv_mem_free(disp->driver->draw_ctx);
 }
-
-
 
 #endif

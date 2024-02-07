@@ -58,7 +58,6 @@ extern "C" {
 #define LV_GPU_NXP_VG_LITE_LOG_TRACES 0
 #endif
 
-
 /* The optimal Bezier control point offset for radial unit
  * see: https://spencermortensen.com/articles/bezier-circle/
  **/
@@ -86,7 +85,6 @@ static inline void lv_vglite_set_scissor(const lv_area_t * clip_area);
  * Disable scissor.
  */
 static inline void lv_vglite_disable_scissor(void);
-
 
 /**********************
  * GLOBAL PROTOTYPES

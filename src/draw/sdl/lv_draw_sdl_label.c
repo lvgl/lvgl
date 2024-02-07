@@ -41,7 +41,6 @@ typedef struct {
 
 static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint32_t letter);
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/

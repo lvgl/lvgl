@@ -138,7 +138,6 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     return obj;
 }
 
-
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

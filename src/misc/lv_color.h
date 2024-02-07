@@ -254,7 +254,6 @@ typedef struct _lv_color_filter_dsc_t {
     void * user_data;
 } lv_color_filter_dsc_t;
 
-
 typedef enum {
     LV_PALETTE_RED,
     LV_PALETTE_PINK,

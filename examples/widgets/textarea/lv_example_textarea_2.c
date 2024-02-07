@@ -29,7 +29,6 @@ void lv_example_textarea_2(void)
     lv_obj_add_event_cb(text_ta, ta_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_align(text_ta, LV_ALIGN_TOP_RIGHT, -5, 20);
 
-
     /*Create a label and position it above the text box*/
     lv_obj_t * oneline_label = lv_label_create(lv_scr_act());
     lv_label_set_text(oneline_label, "Text:");

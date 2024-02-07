@@ -8,7 +8,6 @@ void lv_example_bar_5(void)
 {
     lv_obj_t * label;
 
-
     lv_obj_t * bar_ltr = lv_bar_create(lv_scr_act());
     lv_obj_set_size(bar_ltr, 200, 20);
     lv_bar_set_value(bar_ltr, 70, LV_ANIM_OFF);

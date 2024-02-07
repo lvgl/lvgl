@@ -24,7 +24,6 @@ extern "C" {
 #error LVGL needs at least 2 stops for gradients. Please increase the LV_GRADIENT_MAX_STOPS
 #endif
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -58,7 +57,6 @@ typedef struct _lv_gradient_cache_t {
 #endif
 #endif
 } lv_grad_t;
-
 
 /**********************
  *      PROTOTYPES

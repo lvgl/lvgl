@@ -264,7 +264,6 @@ static void rgb565a8_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src
 }
 #endif
 
-
 static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                             int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                             int32_t x_end, lv_color_t * cbuf, uint8_t * abuf, lv_img_cf_t cf)
@@ -340,7 +339,6 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
 
         const uint8_t * src_tmp = src;
         src_tmp += (ys_int * src_stride * px_size) + xs_int * px_size;
-
 
         if(xs_int + x_next >= 0 &&
            xs_int + x_next <= src_w - 1 &&
@@ -493,4 +491,3 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
 }
 
 #endif
-
