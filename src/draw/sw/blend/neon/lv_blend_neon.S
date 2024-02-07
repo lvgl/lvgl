@@ -1,5 +1,5 @@
 /**
- * @file lv_blend_to_neon.S
+ * @file lv_blend_neon.S
  *
  */
 

@@ -104,6 +104,9 @@
     /* Use Arm-2D to accelerate the sw render */
     #define LV_USE_DRAW_ARM2D_SYNC      0
 
+    /* Enable native helium assembly to be compiled */
+    #define LV_USE_NATIVE_HELIUM_ASM    1
+
     /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
      * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
      * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers

@@ -131,9 +131,9 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         }
     }
 
+    lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_display_set_buffers(disp, dsc->mem, dsc->mem2,
                            (dsc->pinfo.stride * dsc->vinfo.yres), LV_DISP_RENDER_MODE_DIRECT);
-    lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
 
     LV_LOG_USER("Resolution is set to %dx%d at %" LV_PRId32 "dpi",
