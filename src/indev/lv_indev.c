@@ -111,12 +111,14 @@ lv_indev_t * lv_indev_create(void)
 
     lv_indev_t * indev = _lv_ll_ins_head(indev_ll_head);
     LV_ASSERT_MALLOC(indev);
-    if(!indev) {
+    if(indev == NULL) {
         return NULL;
     }
 
     lv_memzero(indev, sizeof(lv_indev_t));
     indev->reset_query  = 1;
+    indev->enabled = 1;
+
     indev->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
 
     indev->disp                 = lv_display_get_default();
@@ -190,22 +192,22 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     lv_indev_read(timer->user_data);
 }
 
-void lv_indev_read(lv_indev_t * indev_p)
+void lv_indev_read(lv_indev_t * indev)
 {
-    if(!indev_p) return;
+    if(indev == NULL) return;
 
     LV_TRACE_INDEV("begin");
 
-    indev_act = indev_p;
+    indev_act = indev;
 
     /*Read and process all indevs*/
-    if(indev_p->disp == NULL) return; /*Not assigned to any displays*/
+    if(indev->disp == NULL) return; /*Not assigned to any displays*/
 
     /*Handle reset query before processing the point*/
-    indev_proc_reset_query_handler(indev_p);
+    indev_proc_reset_query_handler(indev);
 
-    if(indev_p->disabled ||
-       indev_p->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
+    if((indev->enabled == 0) ||
+       (indev->disp->prev_scr != NULL)) return; /*Input disabled or screen animation active*/
 
     LV_PROFILER_BEGIN;
 
@@ -214,37 +216,37 @@ void lv_indev_read(lv_indev_t * indev_p)
 
     do {
         /*Read the data*/
-        indev_read_core(indev_p, &data);
-        continue_reading = indev_p->mode != LV_INDEV_MODE_EVENT && data.continue_reading;
+        indev_read_core(indev, &data);
+        continue_reading = indev->mode != LV_INDEV_MODE_EVENT && data.continue_reading;
 
         /*The active object might be deleted even in the read function*/
-        indev_proc_reset_query_handler(indev_p);
+        indev_proc_reset_query_handler(indev);
         indev_obj_act = NULL;
 
-        indev_p->state = data.state;
+        indev->state = data.state;
 
         /*Save the last activity time*/
-        if(indev_p->state == LV_INDEV_STATE_PRESSED) {
-            indev_p->disp->last_activity_time = lv_tick_get();
+        if(indev->state == LV_INDEV_STATE_PRESSED) {
+            indev->disp->last_activity_time = lv_tick_get();
         }
-        else if(indev_p->type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
-            indev_p->disp->last_activity_time = lv_tick_get();
+        else if(indev->type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
+            indev->disp->last_activity_time = lv_tick_get();
         }
 
-        if(indev_p->type == LV_INDEV_TYPE_POINTER) {
-            indev_pointer_proc(indev_p, &data);
+        if(indev->type == LV_INDEV_TYPE_POINTER) {
+            indev_pointer_proc(indev, &data);
         }
-        else if(indev_p->type == LV_INDEV_TYPE_KEYPAD) {
-            indev_keypad_proc(indev_p, &data);
+        else if(indev->type == LV_INDEV_TYPE_KEYPAD) {
+            indev_keypad_proc(indev, &data);
         }
-        else if(indev_p->type == LV_INDEV_TYPE_ENCODER) {
-            indev_encoder_proc(indev_p, &data);
+        else if(indev->type == LV_INDEV_TYPE_ENCODER) {
+            indev_encoder_proc(indev, &data);
         }
-        else if(indev_p->type == LV_INDEV_TYPE_BUTTON) {
-            indev_button_proc(indev_p, &data);
+        else if(indev->type == LV_INDEV_TYPE_BUTTON) {
+            indev_button_proc(indev, &data);
         }
         /*Handle reset query if it happened in during processing*/
-        indev_proc_reset_query_handler(indev_p);
+        indev_proc_reset_query_handler(indev);
     } while(continue_reading);
 
     /*End of indev processing, so no act indev*/
@@ -255,17 +257,15 @@ void lv_indev_read(lv_indev_t * indev_p)
     LV_PROFILER_END;
 }
 
-void lv_indev_enable(lv_indev_t * indev, bool en)
+void lv_indev_enable(lv_indev_t * indev, bool enable)
 {
-    uint8_t enable = en ? 0 : 1;
-
     if(indev) {
-        indev->disabled = enable;
+        indev->enabled = (uint8_t) enable;
     }
     else {
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
-            i->disabled = enable;
+            i->enabled = (uint8_t) enable;
             i = lv_indev_get_next(i);
         }
     }
@@ -305,7 +305,7 @@ void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data)
 
 lv_indev_read_cb_t lv_indev_get_read_cb(lv_indev_t * indev)
 {
-    if(!indev) {
+    if(indev == NULL) {
         LV_LOG_WARN("lv_indev_get_read_cb: indev was NULL");
         return NULL;
     }
@@ -396,14 +396,14 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
 
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group)
 {
-    if(indev->type == LV_INDEV_TYPE_KEYPAD || indev->type == LV_INDEV_TYPE_ENCODER) {
+    if(indev && (indev->type == LV_INDEV_TYPE_KEYPAD || indev->type == LV_INDEV_TYPE_ENCODER)) {
         indev->group = group;
     }
 }
 
 void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t points[])
 {
-    if(indev->type == LV_INDEV_TYPE_BUTTON) {
+    if(indev && indev->type == LV_INDEV_TYPE_BUTTON) {
         indev->btn_points = points;
     }
 }
@@ -413,9 +413,8 @@ void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
     if(indev == NULL) {
         point->x = 0;
         point->y = 0;
-        return;
     }
-    if(indev->type != LV_INDEV_TYPE_POINTER && indev->type != LV_INDEV_TYPE_BUTTON) {
+    else if(indev->type != LV_INDEV_TYPE_POINTER && indev->type != LV_INDEV_TYPE_BUTTON) {
         point->x = -1;
         point->y = -1;
     }
@@ -432,10 +431,12 @@ lv_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev)
 
 uint32_t lv_indev_get_key(const lv_indev_t * indev)
 {
-    if(indev->type != LV_INDEV_TYPE_KEYPAD)
-        return 0;
-    else
-        return indev->keypad.last_key;
+    uint32_t key = 0;
+
+    if(indev && indev->type == LV_INDEV_TYPE_KEYPAD)
+        key = indev->keypad.last_key;
+
+    return key;
 }
 
 lv_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
@@ -478,7 +479,7 @@ lv_obj_t * lv_indev_get_active_obj(void)
 
 lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev)
 {
-    if(!indev) {
+    if(indev == NULL) {
         LV_LOG_WARN("lv_indev_get_read_timer: indev was NULL");
         return NULL;
     }
@@ -494,7 +495,7 @@ lv_indev_mode_t lv_indev_get_mode(lv_indev_t * indev)
 
 void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode)
 {
-    if(!indev || indev->mode == mode)
+    if(indev == NULL || indev->mode == mode)
         return;
 
     indev->mode = mode;
