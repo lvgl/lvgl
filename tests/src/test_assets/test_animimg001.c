@@ -191,4 +191,4 @@ const lv_image_dsc_t test_animimg001 = {
     .data = test_animimg001_map,
 };
 
-#endif /* LV_BUILD_EXAMPLES */
+#endif /* LV_BUILD_TEST */

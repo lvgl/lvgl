@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#if LV_BUILD_TEST
+
 /*TestKERNOne.otf from https://github.com/unicode-org/text-rendering-tests*/
 const uint8_t test_kern_one_otf[] = {
     0x4f, 0x54, 0x54, 0x4f, 0x00, 0x0a, 0x00, 0x80, 0x00, 0x03, 0x00, 0x20, 0x43, 0x46, 0x46, 0x20,
@@ -93,3 +95,5 @@ const uint8_t test_kern_one_otf[] = {
 };
 
 const size_t test_kern_one_otf_size = sizeof(test_kern_one_otf);
+
+#endif /*LV_BUILD_TEST*/
