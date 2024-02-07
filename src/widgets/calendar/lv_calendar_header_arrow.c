@@ -142,9 +142,11 @@ static void value_changed_event_cb(lv_event_t * e)
     lv_obj_t * header = lv_event_get_current_target(e);
     lv_obj_t * calendar = lv_obj_get_parent(header);
 
-    const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
+    const lv_calendar_date_t * date = lv_calendar_get_showed_date(calendar);
     lv_obj_t * label = lv_obj_get_child(header, 1);
-    lv_label_set_text_fmt(label, "%d %s", cur_date->year, month_names_def[cur_date->month - 1]);
+    if(date->year > 0 && date->month >= 1 && date->month <= 12) {
+        lv_label_set_text_fmt(label, "%d %s", date->year, month_names_def[date->month - 1]);
+    }
 }
 
 #endif /*LV_USE_CALENDAR_HEADER_ARROW*/
