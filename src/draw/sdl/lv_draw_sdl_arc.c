@@ -67,7 +67,6 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
     area_in.x2 -= dsc->width;
     area_in.y2 -= dsc->width;
 
-
     while(start_angle >= 360) start_angle -= 360;
     while(end_angle >= 360) end_angle -= 360;
 

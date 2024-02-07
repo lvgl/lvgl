@@ -36,7 +36,6 @@ struct _lv_fragment_manager_t {
     lv_ll_t stack;
 };
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -257,7 +256,6 @@ static void item_del_fragment(lv_fragment_managed_states_t * item)
     lv_fragment_del(instance);
     item->instance = NULL;
 }
-
 
 static lv_fragment_managed_states_t * fragment_attach(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
                                                       lv_obj_t * const * container)

@@ -296,7 +296,6 @@ lv_timer_t * lv_indev_get_read_timer(lv_disp_t * indev)
     return indev->refr_timer;
 }
 
-
 lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 {
     lv_obj_t * found_p = NULL;
@@ -984,7 +983,6 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
         proc->types.pointer.act_obj = NULL;
         proc->pr_timestamp          = 0;
         proc->longpr_rep_timestamp  = 0;
-
 
         /*Get the transformed vector with this object*/
         if(scroll_obj) {

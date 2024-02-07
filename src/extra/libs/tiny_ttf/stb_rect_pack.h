@@ -97,7 +97,6 @@ typedef int            stbrp_coord;
 #pragma GCC diagnostic ignored "-Wunused-function"
 #endif
 
-
 STBRP_DEF int stbrp_pack_rects(stbrp_context * context, stbrp_rect * rects, int num_rects);
 // Assign packed locations to rectangles. The rectangles are of type
 // 'stbrp_rect' defined below, stored in the array 'rects', and there
@@ -136,7 +135,6 @@ struct stbrp_rect {
 
 }; // 16 bytes, nominally
 
-
 STBRP_DEF void stbrp_init_target(stbrp_context * context, int width, int height, stbrp_node * nodes, int num_nodes);
 // Initialize a rectangle packer to:
 //    pack a rectangle that is 'width' by 'height' in dimensions
@@ -163,7 +161,6 @@ STBRP_DEF void stbrp_setup_allow_out_of_mem(stbrp_context * context, int allow_o
 // change the handling of the out-of-temp-memory scenario, described above.
 // If you call init again, this will be reset to the default (false).
 
-
 STBRP_DEF void stbrp_setup_heuristic(stbrp_context * context, int heuristic);
 // Optionally select which packing heuristic the library should use. Different
 // heuristics will produce better/worse results for different data sets.
@@ -174,7 +171,6 @@ enum {
     STBRP_HEURISTIC_Skyline_BL_sortHeight = STBRP_HEURISTIC_Skyline_default,
     STBRP_HEURISTIC_Skyline_BF_sortHeight
 };
-
 
 //////////////////////////////////////////////////////////////////////////////
 //

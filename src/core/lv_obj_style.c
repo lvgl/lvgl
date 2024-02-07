@@ -283,7 +283,6 @@ void lv_obj_set_local_style_prop_meta(lv_obj_t * obj, lv_style_prop_t prop, uint
     lv_obj_refresh_style(obj, selector, prop);
 }
 
-
 lv_style_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
                                            lv_style_selector_t selector)
 {
@@ -377,7 +376,6 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
 #endif
     lv_anim_start(&a);
 }
-
 
 lv_style_value_t _lv_obj_style_apply_color_filter(const lv_obj_t * obj, uint32_t part, lv_style_value_t v)
 {
@@ -487,7 +485,6 @@ lv_part_t lv_obj_style_get_selector_part(lv_style_selector_t selector)
     return selector & 0xFF0000;
 }
 
-
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt)
 {
     lv_text_align_t align = lv_obj_get_style_text_align(obj, part);
@@ -528,7 +525,6 @@ lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
     if(opa_final >= LV_OPA_MAX) return LV_OPA_COVER;
     return opa_final;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -601,7 +597,6 @@ static _lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t se
     obj->styles[0].selector = selector;
     return &obj->styles[0];
 }
-
 
 static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v)
 {
@@ -896,5 +891,3 @@ static void fade_in_anim_ready(lv_anim_t * a)
 {
     lv_obj_remove_local_style_prop(a->var, LV_STYLE_OPA, 0);
 }
-
-

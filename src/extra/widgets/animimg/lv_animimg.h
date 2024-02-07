@@ -41,7 +41,6 @@ typedef struct {
     int8_t  pic_count;
 } lv_animimg_t;
 
-
 /*Image parts*/
 enum {
     LV_ANIM_IMG_PART_MAIN,

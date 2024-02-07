@@ -560,7 +560,6 @@ static void lv_obj_draw(lv_event_t * e)
 
         lv_draw_rect(draw_ctx, &draw_dsc, &coords);
 
-
 #if LV_DRAW_COMPLEX
         if(clip_corner) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));

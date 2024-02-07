@@ -46,7 +46,6 @@ void lv_example_gridnav_3(void)
     label = lv_label_create(btn);
     lv_label_set_text(label, "Button 2");
 
-
     /*Create an other container with long text to show how LV_GRIDNAV_CTRL_SCROLL_FIRST works*/
     lv_obj_t * cont_sub1 = lv_obj_create(cont_main);
     lv_obj_set_size(cont_sub1, lv_pct(100), 100);
@@ -92,9 +91,6 @@ void lv_example_gridnav_3(void)
     lv_group_remove_obj(btn);
     label = lv_label_create(btn);
     lv_label_set_text(label, "Button 4");
-
-
-
 
 }
 

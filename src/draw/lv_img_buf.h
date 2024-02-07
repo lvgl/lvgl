@@ -104,7 +104,6 @@ enum {
 };
 typedef uint8_t lv_img_cf_t;
 
-
 /**
  * The first 8 bit is very important to distinguish the different source types.
  * For more info see `lv_img_get_src_type()` in lv_img.c

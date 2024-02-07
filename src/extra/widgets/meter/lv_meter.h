@@ -211,7 +211,6 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t 
 lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale, uint16_t width, lv_color_t color,
                                         int16_t r_mod);
 
-
 /**
  * Add a scale line indicator the scale. It will modify the ticks.
  * @param obj           pointer to a meter object

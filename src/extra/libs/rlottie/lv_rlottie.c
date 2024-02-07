@@ -150,7 +150,6 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_obj_update_layout(obj);
 }
 
-
 static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);

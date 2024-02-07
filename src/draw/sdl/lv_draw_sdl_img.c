@@ -88,7 +88,6 @@ static void calc_draw_part(SDL_Texture * texture, const lv_draw_sdl_img_header_t
  *      MACROS
  **********************/
 
-
 static void apply_recolor_opa(SDL_Texture * texture, const lv_draw_img_dsc_t * draw_dsc);
 
 /**********************
@@ -328,7 +327,6 @@ static void draw_img_simple(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture, cons
         SDL_RenderSetClipRect(ctx->renderer, NULL);
     }
 }
-
 
 static void draw_img_rounded(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture, const lv_draw_sdl_img_header_t * header,
                              const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords, const lv_area_t * clip,

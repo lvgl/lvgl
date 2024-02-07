@@ -179,7 +179,6 @@ static lv_color_t color_card;
 static lv_color_t color_grey;
 static bool inited = false;
 
-
 /**********************
  *      MACROS
  **********************/
@@ -187,7 +186,6 @@ static bool inited = false;
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t c, lv_opa_t opa)
 {
@@ -628,7 +626,6 @@ static void style_init(void)
     lv_style_set_transform_width(&styles->list_item_grow, PAD_DEF);
 #endif
 
-
 #if LV_USE_LED
     style_init_reset(&styles->led);
     lv_style_set_bg_opa(&styles->led, LV_OPA_COVER);
@@ -694,7 +691,6 @@ bool lv_theme_default_is_inited(void)
     return  LV_GC_ROOT(_lv_theme_default_styles) == NULL ? false : true;
 }
 
-
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
@@ -738,7 +734,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
             return;
         }
 #endif
-
 
 #if LV_USE_CALENDAR
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
@@ -977,7 +972,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->knob, LV_PART_KNOB);
     }
 #endif
-
 
 #if LV_USE_SPINNER
     else if(lv_obj_check_type(obj, &lv_spinner_class)) {

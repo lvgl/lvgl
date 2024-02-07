@@ -101,7 +101,6 @@ void lv_obj_init_draw_label_dsc(struct _lv_obj_t * obj, uint32_t part, lv_draw_l
  */
 void lv_obj_init_draw_img_dsc(struct _lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t * draw_dsc);
 
-
 /**
  * Initialize a line draw descriptor from an object's styles in its current state
  * @param obj pointer to an object
@@ -157,7 +156,6 @@ void lv_obj_refresh_ext_draw_size(struct _lv_obj_t * obj);
  * @return          the size extended draw area around the real coordinates
  */
 lv_coord_t _lv_obj_get_ext_draw_size(const struct _lv_obj_t * obj);
-
 
 lv_layer_type_t _lv_obj_get_layer_type(const struct _lv_obj_t * obj);
 

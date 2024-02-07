@@ -37,7 +37,6 @@ enum {
 };
 typedef uint8_t lv_scrollbar_mode_t;
 
-
 /** Scroll span align options. Tells where to align the snappable children when scroll stops.*/
 enum {
     LV_SCROLL_SNAP_NONE,    /**< Do not align, leave where it is*/
@@ -248,7 +247,6 @@ void lv_obj_scroll_to_view(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
  * @param anim_en   LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
  */
 void lv_obj_scroll_to_view_recursive(struct _lv_obj_t * obj, lv_anim_enable_t anim_en);
-
 
 /**
  * Low level function to scroll by given x and y coordinates.

@@ -358,7 +358,6 @@ static const size_t block_size_min =
     sizeof(block_header_t) - sizeof(block_header_t *);
 static const size_t block_size_max = tlsf_cast(size_t, 1) << FL_INDEX_MAX;
 
-
 /* The TLSF control structure. */
 typedef struct control_t {
     /* Empty lists point at this block to indicate they are free. */

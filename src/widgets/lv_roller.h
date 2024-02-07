@@ -52,7 +52,6 @@ typedef struct {
 
 extern const lv_obj_class_t lv_roller_class;
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -109,7 +108,6 @@ uint16_t lv_roller_get_selected(const lv_obj_t * obj);
  * @param buf_size  size of `buf` in bytes. 0: to ignore it.
  */
 void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size);
-
 
 /**
  * Get the options of a roller

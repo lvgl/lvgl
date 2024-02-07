@@ -34,7 +34,6 @@ void lv_example_btnmatrix_3(void)
     lv_style_set_radius(&style_bg, LV_RADIUS_CIRCLE);
     lv_style_set_border_width(&style_bg, 0);
 
-
     static lv_style_t style_btn;
     lv_style_init(&style_btn);
     lv_style_set_radius(&style_btn, 0);

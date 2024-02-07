@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -48,8 +47,6 @@ typedef struct {
 } _lv_draw_mask_saved_t;
 
 typedef _lv_draw_mask_saved_t _lv_draw_mask_saved_arr_t[_LV_MASK_MAX_NUM];
-
-
 
 #if LV_DRAW_COMPLEX == 0
 static inline  uint8_t lv_draw_mask_get_cnt(void)
@@ -179,7 +176,6 @@ typedef struct {
     _lv_draw_mask_radius_circle_dsc_t * circle;
 } lv_draw_mask_radius_param_t;
 
-
 typedef struct {
     /*The first element must be the common descriptor*/
     _lv_draw_mask_common_dsc_t dsc;
@@ -193,7 +189,6 @@ typedef struct {
     } cfg;
 
 } lv_draw_mask_fade_param_t;
-
 
 typedef struct _lv_draw_mask_map_param_t {
     /*The first element must be the common descriptor*/
@@ -214,7 +209,6 @@ typedef struct {
         uint16_t point_cnt;
     } cfg;
 } lv_draw_mask_polygon_param_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -301,7 +295,6 @@ void _lv_draw_mask_cleanup(void);
  * @return number of active masks
  */
 uint8_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_get_cnt(void);
-
 
 /**
  * Check if there is any added draw mask

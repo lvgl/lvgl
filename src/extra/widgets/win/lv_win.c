@@ -9,7 +9,6 @@
 #include "lv_win.h"
 #if LV_USE_WIN
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -107,4 +106,3 @@ static void lv_win_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 }
 
 #endif
-

@@ -86,7 +86,6 @@ typedef enum {
 
     _LV_EVENT_LAST,               /** Number of default events*/
 
-
     LV_EVENT_PREPROCESS = 0x80,   /** This is a flag that can be set with an event so it's processed
                                       before the class default event processing */
 } lv_event_code_t;
@@ -222,7 +221,6 @@ uint32_t lv_event_register_id(void);
  * @param obj pointer to an object to mark as deleted
  */
 void _lv_event_mark_deleted(struct _lv_obj_t * obj);
-
 
 /**
  * Add an event handler function for an object.

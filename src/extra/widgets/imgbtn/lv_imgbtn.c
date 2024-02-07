@@ -112,7 +112,6 @@ void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
  * Getter functions
  *====================*/
 
-
 /**
  * Get the left image in a given state
  * @param obj pointer to an image button object
@@ -156,7 +155,6 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
     return imgbtn->img_src_right[state];
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -172,7 +170,6 @@ static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     imgbtn->act_cf = LV_IMG_CF_UNKNOWN;
 }
-
 
 static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
@@ -274,7 +271,6 @@ static void draw_main(lv_event_t * e)
         clip_area_center.x2 = coords.x2 - right_w;
         clip_area_center.y1 = coords.y1;
         clip_area_center.y2 = coords.y2;
-
 
         bool comm_res;
         comm_res = _lv_area_intersect(&clip_area_center, &clip_area_center, draw_ctx->clip_area);

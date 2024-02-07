@@ -160,7 +160,6 @@ void lv_colorwheel_set_mode_fixed(lv_obj_t * obj, bool fixed)
  * Getter functions
  *====================*/
 
-
 /**
  * Get the current selected hsv of a color wheel.
  * @param colorwheel pointer to color wheel object
@@ -535,8 +534,6 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(info->res != LV_COVER_RES_MASKED) info->res = LV_COVER_RES_NOT_COVER;
     }
 }
-
-
 
 static void next_color_mode(lv_obj_t * obj)
 {
