@@ -50,6 +50,7 @@ const lv_image_dsc_t img_emoji_cat_face = {
     .header.w = 18,
     .header.h = 19,
     .data = img_emoji_cat_face_map,
+    .data_size = sizeof(img_emoji_cat_face_map),
 };
 
 #endif

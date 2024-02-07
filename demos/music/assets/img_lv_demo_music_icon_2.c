@@ -36,9 +36,9 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_icon_2_map[] = {
 const lv_image_dsc_t img_lv_demo_music_icon_2 = {
     .header.w = 24,
     .header.h = 24,
-    .data_size = 576 * LV_COLOR_DEPTH / 8,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_icon_2_map,
+    .data_size = sizeof(img_lv_demo_music_icon_2_map),
 };
 
 #endif /*LV_USE_DEMO_MUSIC*/

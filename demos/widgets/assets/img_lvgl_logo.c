@@ -62,6 +62,7 @@ const lv_image_dsc_t img_lvgl_logo = {
     .header.h = 43,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lvgl_logo_map,
+    .data_size = sizeof(img_lvgl_logo_map),
 };
 
 #endif

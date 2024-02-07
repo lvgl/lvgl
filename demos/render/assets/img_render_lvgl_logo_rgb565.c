@@ -60,6 +60,6 @@ const lv_img_dsc_t img_render_lvgl_logo_rgb565 = {
     .header.cf = LV_COLOR_FORMAT_RGB565,
     .header.w = 30,
     .header.h = 30,
-    .data_size = 900 * 2,
     .data = img_render_lvgl_logo_rgb565_map,
+    .data_size = sizeof(img_render_lvgl_logo_rgb565_map),
 };

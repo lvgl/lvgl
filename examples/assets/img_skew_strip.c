@@ -87,6 +87,7 @@ const lv_image_dsc_t img_skew_strip = {
     .header.h = 20,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_skew_strip_map,
+    .data_size = sizeof(img_skew_strip_map),
 };
 
 #endif /* LV_BUILD_EXAMPLES */

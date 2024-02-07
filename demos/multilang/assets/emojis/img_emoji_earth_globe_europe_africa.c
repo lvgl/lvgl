@@ -50,6 +50,7 @@ const lv_image_dsc_t img_emoji_earth_globe_europe_africa = {
     .header.w = 19,
     .header.h = 19,
     .data = img_emoji_earth_globe_europe_africa_map,
+    .data_size = sizeof(img_emoji_earth_globe_europe_africa_map),
 };
 
 #endif

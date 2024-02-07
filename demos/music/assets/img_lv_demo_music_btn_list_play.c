@@ -71,9 +71,9 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_btn_list_play_map[] = {
 const lv_image_dsc_t img_lv_demo_music_btn_list_play = {
     .header.w = 58,
     .header.h = 60,
-    .data_size = 3480 * LV_COLOR_DEPTH / 8,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_btn_list_play_map,
+    .data_size = sizeof(img_lv_demo_music_btn_list_play_map),
 };
 
 

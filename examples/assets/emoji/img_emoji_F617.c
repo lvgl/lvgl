@@ -242,6 +242,6 @@ const lv_image_dsc_t emoji_F617 = {
     .header.cf = LV_COLOR_FORMAT_NATIVE,
     .header.w = 72,
     .header.h = 72,
-    .data_size = 5184 * LV_COLOR_DEPTH / 8,
     .data = emoji_F617_map,
+    .data_size = sizeof(emoji_F617_map),
 };

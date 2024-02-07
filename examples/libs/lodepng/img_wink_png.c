@@ -338,9 +338,9 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_PNG_DEC
 const lv_image_dsc_t img_wink_png = {
     .header.w = 50,
     .header.h = 50,
-    .data_size = 5158,
     .header.cf = LV_COLOR_FORMAT_RAW_ALPHA,
     .data = img_wink_png_map,
+    .data_size = sizeof(img_wink_png_map),
 };
 
 #endif /*LV_USE_LODEPNG && LV_BUILD_EXAMPLES*/
