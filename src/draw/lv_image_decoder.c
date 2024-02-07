@@ -422,11 +422,22 @@ static lv_cache_compare_res_t image_decoder_cache_compare_cb(
 
 static void image_decoder_cache_free_cb(lv_image_cache_data_t * entry, void * user_data)
 {
-    LV_UNUSED(user_data); /*Unused*/
-
     const lv_image_decoder_t * decoder = entry->decoder;
-    if(decoder && decoder->cache_free_cb) {
+    if(decoder == NULL) return; /* Why ? */
+
+    if(decoder->cache_free_cb) {
+        /* Decoder wants to free the cache by itself. */
         decoder->cache_free_cb(entry, user_data);
+    }
+    else {
+        /* Destroy the decoded draw buffer if necessary. */
+        lv_draw_buf_t * decoded = (lv_draw_buf_t *)entry->decoded;
+        if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_ALLOCATED)) {
+            lv_draw_buf_destroy(decoded);
+        }
+
+        /*Free the duplicated file name*/
+        if(entry->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)entry->src);
     }
 }
 

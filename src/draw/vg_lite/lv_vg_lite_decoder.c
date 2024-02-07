@@ -17,13 +17,6 @@
  *      DEFINES
  *********************/
 
-/**********************
- *      TYPEDEFS
- **********************/
-
-/* If the original image can directly satisfy the GPU requirements, there is no need to create a copy */
-#define LV_VG_LITE_IMAGE_NO_DUP LV_IMAGE_FLAGS_USER1
-
 /* VG_LITE_INDEX1, 2, and 4 require endian flipping + bit flipping,
  * so for simplicity, they are uniformly converted to I8 for display.
  */
@@ -36,13 +29,20 @@
     LV_VG_LITE_ALIGN(LV_COLOR_INDEXED_PALETTE_SIZE(DEST_IMG_FORMAT) * sizeof(lv_color32_t), LV_DRAW_BUF_ALIGN)
 
 /**********************
+ *      TYPEDEFS
+ **********************/
+
+typedef struct {
+    lv_draw_buf_t yuv;  /*A draw buffer struct for yuv variable image*/
+} decoder_data_t;
+
+/**********************
  *  STATIC PROTOTYPES
  **********************/
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
-static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_data);
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size);
 
 /**********************
@@ -63,7 +63,7 @@ void lv_vg_lite_decoder_init(void)
     lv_image_decoder_set_info_cb(decoder, decoder_info);
     lv_image_decoder_set_open_cb(decoder, decoder_open);
     lv_image_decoder_set_close_cb(decoder, decoder_close);
-    lv_image_decoder_set_cache_free_cb(decoder, (lv_cache_free_cb_t)decoder_cache_free);
+    lv_image_decoder_set_cache_free_cb(decoder, NULL); /*Use general cache free method*/
 }
 
 void lv_vg_lite_decoder_deinit(void)
@@ -185,13 +185,20 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
     /* if is YUV format, no need to copy */
     if(LV_COLOR_FORMAT_IS_YUV(src_cf)) {
-        lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
-        LV_ASSERT_MALLOC(draw_buf);
+        decoder_data_t * decoder_data = dsc->user_data;
+        if(decoder_data == NULL) {
+            decoder_data = lv_malloc_zeroed(sizeof(decoder_data_t));
+            LV_ASSERT_MALLOC(decoder_data);
+        }
+        lv_draw_buf_t * draw_buf = &decoder_data->yuv;
         uint32_t stride = lv_draw_buf_width_to_stride(width, src_cf);
         lv_draw_buf_init(draw_buf, width, height, src_cf, stride, (void *)image_data, image_data_size);
 
-        /* mark no dup */
-        draw_buf->header.flags |= LV_VG_LITE_IMAGE_NO_DUP;
+        /* Use alloced bit to indicate we should not free the memory */
+        draw_buf->header.flags &= ~LV_IMAGE_FLAGS_ALLOCATED;
+
+        /* Do not add this kind of image to cache, since its life is managed by user. */
+        dsc->args.no_cache = true;
 
         dsc->decoded = draw_buf;
         return LV_RESULT_OK;
@@ -354,9 +361,8 @@ failed:
 
 static void decoder_draw_buf_free(lv_draw_buf_t * draw_buf)
 {
-    if(draw_buf->header.flags & LV_VG_LITE_IMAGE_NO_DUP) {
-        /* free draw buf struct only */
-        lv_free(draw_buf);
+    if((draw_buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) == 0) {
+        /* This must be the yuv variable image. */
         return;
     }
 
@@ -413,16 +419,9 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
     if(dsc->args.no_cache || LV_CACHE_DEF_SIZE == 0)
         decoder_draw_buf_free((lv_draw_buf_t *)dsc->decoded);
+    if(decoder->user_data) free(decoder->user_data);
     else
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
-}
-
-static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_data)
-{
-    LV_UNUSED(user_data);
-
-    if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
-    decoder_draw_buf_free((lv_draw_buf_t *)cached_data->decoded);
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/

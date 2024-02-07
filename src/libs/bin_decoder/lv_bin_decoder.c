@@ -71,8 +71,6 @@ static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, 
 
 static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image_compressed_t * compressed);
 
-static void bin_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -103,7 +101,7 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_set_open_cb(decoder, lv_bin_decoder_open);
     lv_image_decoder_set_get_area_cb(decoder, lv_bin_decoder_get_area);
     lv_image_decoder_set_close_cb(decoder, lv_bin_decoder_close);
-    lv_image_decoder_set_cache_free_cb(decoder, (lv_cache_free_cb_t)bin_decoder_cache_free_cb);
+    lv_image_decoder_set_cache_free_cb(decoder, NULL); /*Use general cache free method*/
 }
 
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
@@ -1143,12 +1141,4 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
 
     decoder_data->decompressed = decompressed; /*Free on decoder close*/
     return LV_RESULT_OK;
-}
-
-static void bin_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data)
-{
-    LV_UNUSED(user_data); /*Unused*/
-
-    lv_draw_buf_destroy((lv_draw_buf_t *)cached_data->decoded);
-    if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
 }

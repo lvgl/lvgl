@@ -278,6 +278,15 @@ void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_dec
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
 
+/**
+ * Set a custom method to free cache data.
+ * Normally this is not needed. If the custom decoder allocates additional memory other than dsc->decoded
+ * draw buffer, then you need to register your own method to free it. By default the cache entry is free'ed
+ * in `image_decoder_cache_free_cb`.
+ *
+ * @param decoder pointer to the image decoder
+ * @param cache_free_cb the custom callback to free cache data. Refer to `image_decoder_cache_free_cb`.
+ */
 void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb);
 
 #if LV_CACHE_DEF_SIZE > 0

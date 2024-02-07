@@ -29,7 +29,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt);
 static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size);
-static void lodepng_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -51,7 +50,6 @@ void lv_lodepng_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
-    lv_image_decoder_set_cache_free_cb(dec, (lv_cache_free_cb_t)lodepng_decoder_cache_free_cb);
 }
 
 void lv_lodepng_deinit(void)
@@ -269,14 +267,6 @@ static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt)
         img_argb[i].blue = img_argb[i].red;
         img_argb[i].red = blue;
     }
-}
-
-static void lodepng_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data)
-{
-    LV_UNUSED(user_data);
-
-    if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
-    lv_draw_buf_destroy((lv_draw_buf_t *)cached_data->decoded);
 }
 
 #endif /*LV_USE_LODEPNG*/
