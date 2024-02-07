@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#if LV_BUILD_TEST
 
 const uint8_t ubuntu_font[] = {
     0x00, 0x01, 0x00, 0x00, 0x00, 0x11, 0x01, 0x00, 0x00, 0x04, 0x00, 0x10, 0x44, 0x53, 0x49, 0x47,
@@ -11968,3 +11969,4 @@ const uint8_t ubuntu_font[] = {
 };
 
 size_t ubuntu_font_size = sizeof(ubuntu_font);
+#endif /*LV_BUILD_TEST*/

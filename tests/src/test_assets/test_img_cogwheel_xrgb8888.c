@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-
+#if LV_BUILD_TEST
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
@@ -121,3 +121,5 @@ const lv_image_dsc_t test_image_cogwheel_xrgb8888 = {
     .data_size = 10000 * 4,
     .data = test_image_cogwheel_xrgb8888_map,
 };
+
+#endif /*LV_BUILD_TEST*/
