@@ -3,7 +3,7 @@
     position 0, 7252 bytes   */
 #if LV_BUILD_TEST
 
-unsigned char const font_2_buf[7252] = {
+unsigned char const test_font_2_buf[7252] = {
     44,   0,   0,   0, 104, 101,  97, 100,   1,   0,   0,   0,   4,   0,   8,   0,
     8,   0, 254, 255,   8,   0, 254, 255,   0,   0, 254, 255,   8,   0,   0,   0,
     16,   0,   0,   0,   1,   4,   4,   4,   9,   0,   0,   0, 164,   0,   0,   0,

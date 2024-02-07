@@ -17,9 +17,9 @@ void test_tiny_ttf_rendering_test(void)
 {
 #if LV_USE_TINY_TTF
     /*Create a font*/
-    extern const uint8_t ubuntu_font[];
-    extern size_t ubuntu_font_size;
-    lv_font_t * font = lv_tiny_ttf_create_data(ubuntu_font, ubuntu_font_size, 30);
+    extern const uint8_t test_ubuntu_font[];
+    extern size_t test_ubuntu_font_size;
+    lv_font_t * font = lv_tiny_ttf_create_data(test_ubuntu_font, test_ubuntu_font_size, 30);
 
     /*Create style with the new font*/
     static lv_style_t style;
@@ -49,10 +49,10 @@ void test_tiny_ttf_rendering_test(void)
 void test_tiny_ttf_kerning()
 {
 #if LV_USE_TINY_TTF
-    extern const uint8_t kern_one_otf[];
-    extern size_t kern_one_otf_size;
-    lv_font_t * font_normal = lv_tiny_ttf_create_data(kern_one_otf, kern_one_otf_size, 80);
-    lv_font_t * font_none = lv_tiny_ttf_create_data(kern_one_otf, kern_one_otf_size, 80);
+    extern const uint8_t test_kern_one_otf[];
+    extern size_t test_kern_one_otf_size;
+    lv_font_t * font_normal = lv_tiny_ttf_create_data(test_kern_one_otf, test_kern_one_otf_size, 80);
+    lv_font_t * font_none = lv_tiny_ttf_create_data(test_kern_one_otf, test_kern_one_otf_size, 80);
     lv_font_set_kerning(font_none, LV_FONT_KERNING_NONE);
 
     lv_obj_t * cont = lv_obj_create(lv_screen_active());
