@@ -252,6 +252,13 @@ menu "LVGL configuration"
 				default 2 if LV_DRAW_SW_ASM_HELIUM
 				default 255 if LV_DRAW_SW_ASM_CUSTOM
 
+			config LV_USE_NATIVE_HELIUM_ASM
+				bool	"Enable native helium assembly"
+				default y
+				depends on LV_DRAW_SW_ASM_HELIUM
+				help
+					Disabling this allows arm2d to work on its own (for testing only)
+
 			config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 				string "Set the custom asm include file"
 				default ""

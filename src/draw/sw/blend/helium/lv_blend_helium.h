@@ -23,8 +23,6 @@ extern "C" {
 #include LV_DRAW_SW_HELIUM_CUSTOM_INCLUDE
 #endif
 
-#define USE_NATIVE_ASSEMBLY 1
-
 #if !defined(__ASSEMBLY__)
 
 /* Use arm2d functions if present */
@@ -34,7 +32,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#if USE_NATIVE_ASSEMBLY
+#if LV_USE_NATIVE_HELIUM_ASM
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc) \
@@ -1293,7 +1291,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_hel
     return LV_RESULT_OK;
 }
 
-#endif /* USE_NATIVE_ASSEMBLY */
+#endif /* LV_USE_NATIVE_HELIUM_ASM */
 
 #endif /* !defined(__ASSEMBLY__) */
 

@@ -9,7 +9,7 @@
 
 #include "lv_blend_helium.h"
 
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE && USE_NATIVE_ASSEMBLY
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE && LV_USE_NATIVE_HELIUM_ASM
 
 .data
 reciprocal:
@@ -470,4 +470,4 @@ export_set rgb888, argb8888, 24, 32, normal
 export_set xrgb8888, argb8888, 31, 32, normal
 export_set argb8888, argb8888, 32, 32, normal
 
-#endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE && USE_NATIVE_ASSEMBLY*/
+#endif /*LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM && defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE && LV_USE_NATIVE_HELIUM_ASM*/

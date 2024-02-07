@@ -280,6 +280,19 @@
         #endif
     #endif
 
+    /* Enable native helium assembly to be compiled */
+    #ifndef LV_USE_NATIVE_HELIUM_ASM
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_NATIVE_HELIUM_ASM
+                #define LV_USE_NATIVE_HELIUM_ASM CONFIG_LV_USE_NATIVE_HELIUM_ASM
+            #else
+                #define LV_USE_NATIVE_HELIUM_ASM 0
+            #endif
+        #else
+            #define LV_USE_NATIVE_HELIUM_ASM    1
+        #endif
+    #endif
+
     /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
      * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
      * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
