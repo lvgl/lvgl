@@ -43,7 +43,6 @@ typedef struct {
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
-static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_data);
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size);
 static void image_invalidate_cache(void * buf, uint32_t stride,
                                    uint32_t width, uint32_t height,
@@ -67,7 +66,7 @@ void lv_vg_lite_decoder_init(void)
     lv_image_decoder_set_info_cb(decoder, decoder_info);
     lv_image_decoder_set_open_cb(decoder, decoder_open);
     lv_image_decoder_set_close_cb(decoder, decoder_close);
-    lv_image_decoder_set_cache_free_cb(decoder, (lv_cache_free_cb_t)decoder_cache_free);
+    lv_image_decoder_set_cache_free_cb(decoder, NULL); /*Use general cache free method*/
 }
 
 void lv_vg_lite_decoder_deinit(void)
@@ -437,14 +436,6 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     if(decoder->user_data) free(decoder->user_data);
     else
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
-}
-
-static void decoder_cache_free(lv_image_cache_data_t * cached_data, void * user_data)
-{
-    LV_UNUSED(user_data);
-
-    if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
-    decoder_draw_buf_free((lv_draw_buf_t *)cached_data->decoded);
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/
