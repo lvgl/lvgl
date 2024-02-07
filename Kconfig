@@ -69,9 +69,14 @@ menu "LVGL configuration"
 
 	endmenu
 
+	config LV_USE_CLIB
+		bool
+		default n
+
 	menu "Memory settings"
 		choice
 			prompt "Malloc functions source"
+			default LV_USE_CLIB_MALLOC if LV_USE_CLIB
 			default LV_USE_BUILTIN_MALLOC
 
 		config LV_USE_BUILTIN_MALLOC
@@ -93,6 +98,7 @@ menu "LVGL configuration"
 
 		choice
 			prompt "String functions source"
+			default LV_USE_CLIB_STRING if LV_USE_CLIB
 			default LV_USE_BUILTIN_STRING
 
 		config LV_USE_BUILTIN_STRING
@@ -108,6 +114,7 @@ menu "LVGL configuration"
 
 		choice
 			prompt "Sprintf functions source"
+			default LV_USE_CLIB_SPRINTF if LV_USE_CLIB
 			default LV_USE_BUILTIN_SPRINTF
 
 		config LV_USE_BUILTIN_SPRINTF
