@@ -58,8 +58,12 @@ void lv_draw_buf_pxp_init_handlers(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void _invalidate_cache(void * buf, uint32_t stride, lv_color_format_t cf, const lv_area_t * area)
+static void _invalidate_cache(lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
+    const lv_image_header_t * header = &draw_buf->header;
+    uint32_t stride = header->stride;
+    lv_color_format_t cf = header->cf;
+
     if(area->y1 == 0) {
         uint16_t size = stride * lv_area_get_height(area);
 

@@ -68,7 +68,7 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         .x2 = draw_buf->header.w - 1,
         .y2 = draw_buf->header.h - 1
     };
-    lv_draw_buf_invalidate_cache(draw_buf->data, draw_buf->header.stride, draw_buf->header.cf, &area_to_draw);
+    lv_draw_buf_invalidate_cache(draw_buf, &area_to_draw);
 
     lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
     new_draw_dsc.src = draw_buf;

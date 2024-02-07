@@ -352,7 +352,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
         return; /*Fully clipped, nothing to do*/
 
     /* Invalidate the drawing area */
-    lv_draw_buf_invalidate_cache(draw_buf->data, draw_buf->header.stride, draw_buf->header.cf, &draw_area);
+    lv_draw_buf_invalidate_cache(draw_buf, &draw_area);
 
     /* Set scissor area */
     vglite_set_scissor(&clip_area);

@@ -70,9 +70,20 @@ void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
     else return NULL;
 }
 
-void lv_draw_buf_invalidate_cache(void * buf, uint32_t stride, lv_color_format_t color_format, const lv_area_t * area)
+void lv_draw_buf_invalidate_cache(lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
-    if(handlers.invalidate_cache_cb) handlers.invalidate_cache_cb(buf, stride, color_format, area);
+    if(handlers.invalidate_cache_cb) {
+        LV_ASSERT_NULL(draw_buf);
+        const lv_image_header_t * header = &draw_buf->header;
+        lv_area_t full;
+        if(area == NULL) {
+            full = (lv_area_t) {
+                0, 0, header->w - 1, header->h - 1
+            };
+            area = &full;
+        }
+        handlers.invalidate_cache_cb(draw_buf, area);
+    }
 }
 
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
