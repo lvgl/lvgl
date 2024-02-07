@@ -189,10 +189,10 @@ static bool grad_create_cb(grad_item_t * item, void * user_data)
 
     LV_PROFILER_BEGIN;
 
-    vg_lite_error_t error = vg_lite_init_grad(&item->vg_grad);
-    if(error != VG_LITE_SUCCESS) {
+    vg_lite_error_t err = vg_lite_init_grad(&item->vg_grad);
+    if(err != VG_LITE_SUCCESS) {
         LV_PROFILER_END;
-        LV_LOG_ERROR("init grad error(%d): %s", (int)error, lv_vg_lite_error_string(error));
+        LV_LOG_ERROR("init grad error(%d): %s", (int)err, lv_vg_lite_error_string(err));
         return false;
     }
 
