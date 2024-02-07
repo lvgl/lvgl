@@ -7,7 +7,7 @@ menu "LVGL configuration"
 	# lv_conf_kconfig.h files are used instead.
 	config LV_CONF_SKIP
 		bool "Check this to not use custom lv_conf.h"
-		default n
+		default y
 
 	config LV_CONF_MINIMAL
 		bool "LVGL minimal configuration."
