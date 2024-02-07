@@ -46,7 +46,7 @@ void lv_vg_lite_draw_linear_grad(
     vg_lite_fill_t fill,
     vg_lite_blend_t blend);
 
-void lv_vg_lite_linear_grad_drop_all(struct _lv_draw_vg_lite_unit_t * u);
+void lv_vg_lite_linear_grad_release_all(struct _lv_draw_vg_lite_unit_t * u);
 
 /**********************
  *      MACROS

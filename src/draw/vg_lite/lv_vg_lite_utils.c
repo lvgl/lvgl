@@ -1055,7 +1055,7 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
     /* Clear all gradient caches */
-    lv_vg_lite_linear_grad_drop_all(u);
+    lv_vg_lite_linear_grad_release_all(u);
 
     /* Clear image decoder dsc reference */
     lv_vg_lite_clear_image_decoder_dsc(u);

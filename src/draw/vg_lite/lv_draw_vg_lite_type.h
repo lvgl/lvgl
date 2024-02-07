@@ -39,6 +39,7 @@ struct _lv_draw_vg_lite_unit_t {
     lv_draw_task_t * task_act;
     lv_array_t img_dsc_pending;
     lv_cache_t * grad_cache;
+    lv_array_t grad_pending;
     uint16_t flush_count;
     vg_lite_buffer_t target_buffer;
     vg_lite_matrix_t global_matrix;
