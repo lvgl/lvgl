@@ -91,7 +91,7 @@ void lv_obj_remove_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_se
  */
 static inline void lv_obj_remove_style_all(struct _lv_obj_t * obj)
 {
-    lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
+    lv_obj_remove_style(obj, NULL, (lv_style_selector_t)LV_PART_ANY | (lv_style_selector_t)LV_STATE_ANY);
 }
 
 /**
