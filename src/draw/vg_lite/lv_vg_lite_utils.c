@@ -13,6 +13,7 @@
 
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_path.h"
+#include "lv_vg_lite_grad.h"
 #include "lv_draw_vg_lite_type.h"
 #include <string.h>
 
@@ -607,15 +608,15 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     }
 }
 
-void lv_vg_lite_push_image_decoder_dsc(lv_draw_unit_t * draw_unit, lv_image_decoder_dsc_t * img_dsc)
+void lv_vg_lite_push_image_decoder_dsc(struct _lv_draw_vg_lite_unit_t * u, lv_image_decoder_dsc_t * img_dsc)
 {
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+    LV_ASSERT_NULL(u);
+    LV_ASSERT_NULL(img_dsc);
     lv_array_push_back(&u->img_dsc_pending, img_dsc);
 }
 
-void lv_vg_lite_clear_image_decoder_dsc(lv_draw_unit_t * draw_unit)
+void lv_vg_lite_clear_image_decoder_dsc(struct _lv_draw_vg_lite_unit_t * u)
 {
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
     lv_array_t * arr = &u->img_dsc_pending;
     uint32_t size = lv_array_size(arr);
     if(size == 0) {
@@ -908,75 +909,6 @@ bool lv_vg_lite_16px_align(void)
     return vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN);
 }
 
-void lv_vg_lite_draw_linear_grad(
-    vg_lite_buffer_t * buffer,
-    vg_lite_path_t * path,
-    const lv_area_t * area,
-    const lv_grad_dsc_t * grad,
-    const vg_lite_matrix_t * matrix,
-    vg_lite_fill_t fill,
-    vg_lite_blend_t blend,
-    const vg_lite_matrix_t * grad_matrix)
-{
-    LV_ASSERT_NULL(buffer);
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(area);
-    LV_ASSERT_NULL(grad);
-
-    LV_PROFILER_BEGIN;
-
-    LV_ASSERT(grad->dir != LV_GRAD_DIR_NONE);
-
-    vg_lite_uint32_t colors[VLC_MAX_GRADIENT_STOPS];
-    vg_lite_uint32_t stops[VLC_MAX_GRADIENT_STOPS];
-
-    /* Gradient setup */
-    uint8_t cnt = grad->stops_count;
-    LV_ASSERT(cnt < VLC_MAX_GRADIENT_STOPS);
-    for(uint8_t i = 0; i < cnt; i++) {
-        stops[i] = grad->stops[i].frac;
-        const lv_color_t * c = &grad->stops[i].color;
-        lv_opa_t opa = grad->stops[i].opa;
-
-        /* lvgl color -> gradient color */
-        lv_color_t grad_color = lv_color_make(c->blue, c->green, c->red);
-        colors[i] = lv_vg_lite_color(grad_color, opa, true);
-    }
-
-    vg_lite_linear_gradient_t gradient;
-    lv_memzero(&gradient, sizeof(gradient));
-
-    LV_VG_LITE_CHECK_ERROR(vg_lite_init_grad(&gradient));
-    LV_VG_LITE_CHECK_ERROR(vg_lite_set_grad(&gradient, cnt, colors, stops));
-
-    LV_PROFILER_BEGIN_TAG("vg_lite_update_grad");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_update_grad(&gradient));
-    LV_PROFILER_END_TAG("vg_lite_update_grad");
-
-    vg_lite_matrix_t * gradient_matrix = vg_lite_get_grad_matrix(&gradient);
-    *gradient_matrix = *grad_matrix;
-
-    LV_VG_LITE_ASSERT_DEST_BUFFER(buffer);
-    LV_VG_LITE_ASSERT_SRC_BUFFER(&gradient.image);
-    LV_VG_LITE_ASSERT_PATH(path);
-
-    LV_PROFILER_BEGIN_TAG("vg_lite_draw_grad");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_draw_grad(
-                               buffer,
-                               path,
-                               fill,
-                               (vg_lite_matrix_t *)matrix,
-                               &gradient,
-                               blend));
-    LV_PROFILER_END_TAG("vg_lite_draw_grad");
-
-    /* Wait for the GPU drawing to complete before releasing the image memory in the gradient. */
-    LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
-
-    LV_VG_LITE_CHECK_ERROR(vg_lite_clear_grad(&gradient));
-    LV_PROFILER_END;
-}
-
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult)
 {
     vg_lite_matrix_t temp;
@@ -1078,10 +1010,10 @@ void lv_vg_lite_disable_scissor(void)
     LV_VG_LITE_CHECK_ERROR(vg_lite_disable_scissor());
 }
 
-void lv_vg_lite_flush(lv_draw_unit_t * draw_unit)
+void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 {
+    LV_ASSERT_NULL(u);
     LV_PROFILER_BEGIN;
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     u->flush_count++;
 
@@ -1106,15 +1038,18 @@ void lv_vg_lite_flush(lv_draw_unit_t * draw_unit)
     LV_PROFILER_END;
 }
 
-void lv_vg_lite_finish(lv_draw_unit_t * draw_unit)
+void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 {
+    LV_ASSERT_NULL(u);
     LV_PROFILER_BEGIN;
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
+    /* Clear all gradient caches */
+    lv_vg_lite_linear_grad_release_all(u);
+
     /* Clear image decoder dsc reference */
-    lv_vg_lite_clear_image_decoder_dsc(draw_unit);
+    lv_vg_lite_clear_image_decoder_dsc(u);
     u->flush_count = 0;
     LV_PROFILER_END;
 }

@@ -14,6 +14,7 @@
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_path.h"
 #include "lv_vg_lite_utils.h"
+#include "lv_vg_lite_grad.h"
 
 /*********************
  *      DEFINES
@@ -183,7 +184,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                                                VG_LITE_FILTER_BI_LINEAR));
                     LV_PROFILER_END_TAG("vg_lite_draw_pattern");
 
-                    lv_vg_lite_push_image_decoder_dsc(&u->base_unit, &decoder_dsc);
+                    lv_vg_lite_push_image_decoder_dsc(u, &decoder_dsc);
                 }
             }
             break;
@@ -204,6 +205,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                     lv_matrix_to_vg(&grad_matrix, &m);
 
                     lv_vg_lite_draw_linear_grad(
+                        u,
                         &u->target_buffer,
                         vg_path,
                         &grad_area,

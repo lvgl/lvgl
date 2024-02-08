@@ -157,7 +157,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         lv_vg_lite_path_drop(u, path);
     }
 
-    lv_vg_lite_push_image_decoder_dsc(draw_unit, &decoder_dsc);
+    lv_vg_lite_push_image_decoder_dsc(u, &decoder_dsc);
     LV_PROFILER_END;
 }
 
