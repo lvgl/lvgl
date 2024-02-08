@@ -4,7 +4,7 @@
 Layers
 ======
 
-In LVGL "layers"" can be interpreted in various ways:
+In LVGL "layers" can be interpreted in various ways:
 
 1. The order of widget creation naturally creates a layering of widgets
 2. Permanent screen-sized layers can be also used
