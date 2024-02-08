@@ -166,6 +166,13 @@ menu "LVGL configuration"
 			help
 				Align the start address of draw_buf addresses to this bytes.
 
+			config LV_DRAW_TRANSFORM_USE_MATRIX
+				bool "Using matrix for transformations"
+				default n
+				depends on LV_USE_MATRIX
+				help
+					Requirements: The rendering engine needs to support 2.5D transformations.
+
 			config LV_USE_OS
 				int "Default operating system to use"
 				default 0
@@ -324,6 +331,7 @@ menu "LVGL configuration"
 			config LV_USE_VECTOR_GRAPHIC
 				bool "Use Vector Graphic APIs"
 				default n
+				depends on LV_USE_MATRIX
 				help
 					Enable drawing support vector graphic APIs.
 		endmenu
@@ -525,6 +533,10 @@ menu "LVGL configuration"
 		menu "Others"
 			config LV_USE_FLOAT
 				bool "Use float as lv_value_precise_t."
+				default n
+
+			config LV_USE_MATRIX
+				bool "Enable matrix operations"
 				default n
 
 			config LV_USE_REFR_DEBUG

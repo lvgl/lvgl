@@ -89,6 +89,9 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
     new_task->area = *coords;
     new_task->_real_area = *coords;
     new_task->clip_area = layer->_clip_area;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    new_task->matrix = layer->matrix;
+#endif
     new_task->state = LV_DRAW_TASK_STATE_QUEUED;
 
     /*Find the tail*/
