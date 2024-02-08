@@ -14,6 +14,7 @@
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_path.h"
 #include "lv_draw_vg_lite_type.h"
+#include "lv_vg_lite_grad.h"
 
 /*********************
  *      DEFINES
@@ -77,6 +78,7 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
 
     if(dsc->bg_grad.dir != LV_GRAD_DIR_NONE) {
         lv_vg_lite_draw_linear_grad(
+            u,
             &u->target_buffer,
             vg_lite_path,
             &tri_area,
