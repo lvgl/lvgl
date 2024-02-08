@@ -45,12 +45,12 @@ jobs:
         path: |
              tests/ref_imgs/**/*_err.png
              test_screenshot_error.h
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
-      with:
-        fail_ci_if_error: true
-        verbose: true
+#    - name: Upload coverage to Codecov
+#      uses: codecov/codecov-action@v4
+#      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
+#      with:
+#        fail_ci_if_error: true
+#        verbose: true
   test-cross:
     # The host should always be linux
     runs-on: ubuntu-latest
