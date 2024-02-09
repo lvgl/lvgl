@@ -34,26 +34,26 @@ typedef enum _lv_image_flags_t {
      * For RGB map of the image data, mark if it's pre-multiplied with alpha.
      * For indexed image, this bit indicated palette data is pre-multiplied with alpha.
      */
-    LV_IMAGE_FLAGS_PREMULTIPLIED    = 0x01,
+    LV_IMAGE_FLAGS_PREMULTIPLIED    = 0x0001,
     /**
      * The image data is compressed, so decoder needs to decode image firstly.
      * If this flag is set, the whole image will be decompressed upon decode, and
      * `get_area_cb` won't be necessary.
      */
-    LV_IMAGE_FLAGS_COMPRESSED       = 0x08,
+    LV_IMAGE_FLAGS_COMPRESSED       = 0x0008,
 
     /*Below flags are applicable only for draw buffer header.*/
 
     /**
      * The image is allocated from heap, thus should be freed after use.
      */
-    LV_IMAGE_FLAGS_ALLOCATED        = 0x0100,
+    LV_IMAGE_FLAGS_ALLOCATED        = 0x0010,
 
     /**
      * If the image data is malloced and can be processed in place.
      * In image decoder post processing, this flag means we modify it in-place.
      */
-    LV_IMAGE_FLAGS_MODIFIABLE       = 0x0200,
+    LV_IMAGE_FLAGS_MODIFIABLE       = 0x0020,
 
     /**
      * Flags reserved for user, lvgl won't use these bits.
