@@ -148,9 +148,8 @@ void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
  * @param scale_y zoom in y direction, (256 no zoom)
  * @param pivot x,y pivot coordinates of rotation
  */
-void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle, uint16_t scale_x,
-                                        uint16_t scale_y,
-                                        const lv_point_t * pivot);
+void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
+                                        uint16_t scale_x, uint16_t scale_y, const lv_point_t * pivot);
 
 #ifdef __cplusplus
 } /*extern "C"*/

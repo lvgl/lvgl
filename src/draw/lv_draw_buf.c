@@ -162,7 +162,6 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
     }
 
     lv_image_header_t * header = &draw_buf->header;
-    lv_memzero(header, sizeof(*header));
     header->w = w;
     header->h = h;
     header->cf = cf;
@@ -396,7 +395,7 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
     return LV_RESULT_OK;
 }
 
-void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t id, lv_color32_t c)
+void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color)
 {
     LV_ASSERT_NULL(draw_buf);
     if(draw_buf == NULL) return;
@@ -407,7 +406,7 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t id, lv_color32_t 
     }
 
     uint8_t * buf = (uint8_t *)draw_buf->data;
-    lv_memcpy(&buf[id * sizeof(c)], &c, sizeof(c));
+    lv_memcpy(&buf[index * sizeof(color)], &color, sizeof(color));
 }
 
 /**********************

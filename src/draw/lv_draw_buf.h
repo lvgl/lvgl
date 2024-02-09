@@ -254,14 +254,14 @@ static inline void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_
 /**
  * Set the palette color of an indexed image. Valid only for `LV_COLOR_FORMAT_I1/2/4/8`
  * @param draw_buf pointer to an image descriptor
- * @param id the palette color to set:
+ * @param index the palette color to set:
  *   - for `LV_COLOR_FORMAT_I1`: 0..1
  *   - for `LV_COLOR_FORMAT_I2`: 0..3
  *   - for `LV_COLOR_FORMAT_I4`: 0..15
  *   - for `LV_COLOR_FORMAT_I8`: 0..255
- * @param c the color to set in lv_color32_t format
+ * @param color the color to set in lv_color32_t format
  */
-void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t id, lv_color32_t c);
+void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color);
 
 /**********************
  *      MACROS
