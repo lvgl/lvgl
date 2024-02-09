@@ -633,7 +633,7 @@ uint8_t {varname}_map[] = {{
         ending = f'''
 }};
 
-const lv_img_dsc_t {varname} = {{
+const lv_image_dsc_t {varname} = {{
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_{self.cf.name},
   .header.flags = {flags},
