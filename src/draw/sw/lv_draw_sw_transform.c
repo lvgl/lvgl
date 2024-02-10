@@ -88,8 +88,6 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
     point_transform_dsc_t tr_dsc;
     tr_dsc.angle = -draw_dsc->rotation;
-    //    tr_dsc.scale_x = (256 * 256) / draw_dsc->scale_x;
-    //    tr_dsc.scale_y = (256 * 256) / draw_dsc->scale_y;
     tr_dsc.scale_x = draw_dsc->scale_x;
     tr_dsc.scale_y = draw_dsc->scale_y;
     tr_dsc.pivot = draw_dsc->pivot;
