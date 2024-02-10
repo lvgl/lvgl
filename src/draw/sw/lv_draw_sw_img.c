@@ -179,6 +179,8 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     bool transformed = draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
                        draw_dsc->scale_y != LV_SCALE_NONE ? true : false;
 
+    bool masked = draw_dsc->bitmap_mask_src != NULL;
+
     lv_draw_sw_blend_dsc_t blend_dsc;
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
     const uint8_t * src_buf = decoded->data;
@@ -191,7 +193,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     blend_dsc.blend_mode = draw_dsc->blend_mode;
     blend_dsc.src_stride = img_stride;
 
-    if(!transformed && cf == LV_COLOR_FORMAT_A8) {
+    if(!transformed && !masked && cf == LV_COLOR_FORMAT_A8) {
         lv_area_t clipped_coords;
         if(!_lv_area_intersect(&clipped_coords, img_coords, draw_unit->clip_area)) return;
 
@@ -205,7 +207,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         blend_dsc.blend_area = img_coords;
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
-    else if(!transformed && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa <= LV_OPA_MIN) {
+    else if(!transformed && !masked && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa <= LV_OPA_MIN) {
         int32_t src_h = lv_area_get_height(img_coords);
         int32_t src_w = lv_area_get_width(img_coords);
         blend_dsc.src_area = img_coords;
@@ -225,14 +227,33 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
     /*The simplest case just copy the pixels into the draw_buf. Blending will convert the colors if needed*/
-    else if(!transformed && draw_dsc->recolor_opa <= LV_OPA_MIN) {
+    else if(!transformed && !masked && draw_dsc->recolor_opa <= LV_OPA_MIN) {
         blend_dsc.src_area = img_coords;
         blend_dsc.src_buf = src_buf;
         blend_dsc.blend_area = img_coords;
         blend_dsc.src_color_format = cf;
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
-    /* check whethr it is possible to accelerate the operation in synchronouse mode */
+    /*Handle masked RGB565, RGB888, XRGB888, or ARGB8888 images*/
+    else if(!transformed && masked && draw_dsc->recolor_opa <= LV_OPA_MIN) {
+        blend_dsc.src_area = img_coords;
+        blend_dsc.src_buf = src_buf;
+        blend_dsc.blend_area = img_coords;
+        blend_dsc.src_color_format = cf;
+        blend_dsc.mask_buf = draw_dsc->bitmap_mask_src->data;
+        blend_dsc.mask_stride = draw_dsc->bitmap_mask_src->header.stride;
+
+        const lv_area_t * original_area;
+        if(lv_area_get_width(&draw_dsc->original_area) < 0) original_area = img_coords;
+        else original_area = &draw_dsc->original_area;
+
+        lv_area_t a = {0, 0, draw_dsc->bitmap_mask_src->header.w - 1, draw_dsc->bitmap_mask_src->header.h - 1};
+        lv_area_align(original_area, &a, LV_ALIGN_CENTER, 0, 0);
+        blend_dsc.mask_area = &a;
+        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+        lv_draw_sw_blend(draw_unit, &blend_dsc);
+    }
+    /* check whether it is possible to accelerate the operation in synchronouse mode */
     else if(LV_RESULT_INVALID == LV_DRAW_SW_IMAGE(transformed,      /* whether require transform */
                                                   cf,               /* image format */
                                                   src_buf,          /* image buffer */

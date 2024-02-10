@@ -55,9 +55,14 @@ typedef struct _lv_draw_image_dsc_t {
     lv_opa_t opa;
     lv_blend_mode_t blend_mode : 4;
 
-    uint16_t antialias      : 1;
-    uint16_t tile           : 1;
+    uint16_t antialias          : 1;
+    uint16_t tile               : 1;
     lv_draw_image_sup_t * sup;
+
+    /** Might be used to indicate the original size of the image if only a small portion is rendered now.
+     * Used when a part of a layer is rendered to show the total layer size*/
+    lv_area_t original_area;
+    const lv_image_dsc_t * bitmap_mask_src;
 } lv_draw_image_dsc_t;
 
 /**

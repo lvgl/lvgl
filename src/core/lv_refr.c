@@ -820,18 +820,17 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
 }
 
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
-                                  lv_area_t * layer_area_out)
+                                  lv_area_t * layer_area_out, lv_area_t * obj_draw_size_out)
 {
     int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
-    lv_area_t obj_coords_ext;
-    lv_obj_get_coords(obj, &obj_coords_ext);
-    lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
+    lv_obj_get_coords(obj, obj_draw_size_out);
+    lv_area_increase(obj_draw_size_out, ext_draw_size, ext_draw_size);
 
     if(layer_type == LV_LAYER_TYPE_TRANSFORM) {
         /*Get the transformed area and clip it to the current clip area.
          *This area needs to be updated on the screen.*/
         lv_area_t clip_coords_for_obj;
-        lv_area_t tranf_coords = obj_coords_ext;
+        lv_area_t tranf_coords = *obj_draw_size_out;
         lv_obj_get_transformed_area(obj, &tranf_coords, false, false);
         if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &tranf_coords)) {
             return LV_RESULT_INVALID;
@@ -842,7 +841,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
          *in order to cover transformed area after transformation.*/
         lv_area_t inverse_clip_coords_for_obj = clip_coords_for_obj;
         lv_obj_get_transformed_area(obj, &inverse_clip_coords_for_obj, false, true);
-        if(!_lv_area_intersect(&inverse_clip_coords_for_obj, &inverse_clip_coords_for_obj, &obj_coords_ext)) {
+        if(!_lv_area_intersect(&inverse_clip_coords_for_obj, &inverse_clip_coords_for_obj, obj_draw_size_out)) {
             return LV_RESULT_INVALID;
         }
 
@@ -851,7 +850,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
     }
     else if(layer_type == LV_LAYER_TYPE_SIMPLE) {
         lv_area_t clip_coords_for_obj;
-        if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &obj_coords_ext)) {
+        if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, obj_draw_size_out)) {
             return LV_RESULT_INVALID;
         }
         *layer_area_out = clip_coords_for_obj;
@@ -891,7 +890,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         if(opa < LV_OPA_MIN) return;
 
         lv_area_t layer_area_full;
-        lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full);
+        lv_area_t obj_draw_size;
+        lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full, &obj_draw_size);
         if(res != LV_RESULT_OK) return;
 
         /*Simple layers can be subdivied into smaller layers*/
@@ -940,6 +940,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             layer_draw_dsc.skew_y = lv_obj_get_style_transform_skew_y(obj, 0);
             layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
             layer_draw_dsc.antialias = disp_refr->antialiasing;
+            layer_draw_dsc.bitmap_mask_src = lv_obj_get_style_bitmap_mask_src(obj, 0);
+            layer_draw_dsc.original_area = obj_draw_size;
             layer_draw_dsc.src = new_layer;
 
             lv_draw_layer(layer, &layer_draw_dsc, &layer_area_act);

@@ -4,6 +4,12 @@
 Layers
 ======
 
+In LVGL "layers" can be interpreted in various ways:
+
+1. The order of widget creation naturally creates a layering of widgets
+2. Permanent screen-sized layers can be also used
+3. For some draw operations LVGL renders a widget and all its children into a buffer (a.k.a. layer) first
+
 .. _layers_creation:
 
 Order of creation
@@ -45,7 +51,7 @@ its children.
 .. _layers_order:
 
 Change order
-************
+------------
 
 There are four explicit ways to bring an object to the foreground:
 
@@ -60,10 +66,12 @@ There are four explicit ways to bring an object to the foreground:
 - Use :cpp:expr:`lv_obj_swap(obj1, obj2)` to swap the relative layer position of two objects.
 - When :cpp:expr:`lv_obj_set_parent(obj, new_parent)` is used, ``obj`` will be on the foreground of the ``new_parent``.
 
+Screen-like layers
+******************
 .. _layers_top_and_sys:
 
 Top and sys layers
-******************
+------------------
 
 LVGL uses two special layers named ``layer_top`` and ``layer_sys``. Both
 are visible and common on all screens of a display. **They are not,
@@ -92,13 +100,52 @@ always visible.
 .. _layers_bottom:
 
 Bottom layers
-*************
+-------------
 
 Similarly top and sys. layer bottom layer is also screen size but
 it's located below the active screen. It's visible only if the active screen's
 background opacity is < 255.
 
 The get the bottom layer use :cpp:func:`lv_layer_bottom`.
+
+Draw layers
+***********
+
+Some style properties make LVGL to allocate a buffer and render a widget and its children there first. Later that layer will be merged to the screen or its parent layer after applying some transformations or other modifications.
+
+Simple layer
+------------
+
+The following style properties trigger the creation of a "Simple layer":
+
+- ``opa_layered``
+- ``bitmap_mask_src``
+- ``blend_mode``
+
+
+In this case widget will be sliced into ``LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE`` sized chunks.
+
+If there is no memory for a new chunk, LVGL will try allocating layer when an other chunk is rendered and freed.
+
+
+Transformed layer
+---------------
+
+When the widget is transformed a larger part of the widget needs to rendered to provide enough data for transformation. LVGL tries to render as small area of the widget as possible, but due to the nature of transformations no slicing is possible in this case.
+
+
+The following style properties trigger the creation of a "Transform layer":
+
+- ``transform_scale_x``
+- ``transform_scale_y``
+- ``transform_skew_x``
+- ``transform_skew_y``
+- ``transform_rotate``
+
+Clip corner
+-----------
+
+The ``clip_corner`` style property also makes LVGL to create a 2 layers with radius height for the top and bottom part of the widget.
 
 .. _layers_api:
 
