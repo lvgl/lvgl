@@ -925,10 +925,22 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
                                                           area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE, &layer_area_act);
             lv_obj_redraw(new_layer, obj);
 
+            lv_point_t pivot = {
+                .x = lv_obj_get_style_transform_pivot_x(obj, 0),
+                .y = lv_obj_get_style_transform_pivot_y(obj, 0)
+            };
+
+            if(LV_COORD_IS_PCT(pivot.x)) {
+                pivot.x = (LV_COORD_GET_PCT(pivot.x) * lv_area_get_width(&obj->coords)) / 100;
+            }
+            if(LV_COORD_IS_PCT(pivot.y)) {
+                pivot.y = (LV_COORD_GET_PCT(pivot.y) * lv_area_get_height(&obj->coords)) / 100;
+            }
+
             lv_draw_image_dsc_t layer_draw_dsc;
             lv_draw_image_dsc_init(&layer_draw_dsc);
-            layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->buf_area.x1;
-            layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->buf_area.y1;
+            layer_draw_dsc.pivot.x = obj->coords.x1 + pivot.x - new_layer->buf_area.x1;
+            layer_draw_dsc.pivot.y = obj->coords.y1 + pivot.y - new_layer->buf_area.y1;
 
             layer_draw_dsc.opa = opa;
             layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, 0);
