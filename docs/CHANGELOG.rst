@@ -27,6 +27,9 @@ So pay extra attention to these:
 - ``lv_conf.h`` has been changed a lot, so don't forget to update it from ``lv_conf_template.h``
 - Be sure ``<stdint.h>`` is **not** included in ``lv_conf.h``. In v9 we have some assembly parts for even better performance and a random include there would mess up the assembly part.
 - The online image converter in not updated yet. Until that use `LVGLImage.py <https://github.com/lvgl/lvgl/blob/master/scripts/LVGLImage.py>`__ .
+- Run time dithering is rendering due its complexity and lack of GPU support. Smaller dithered and tiled images can be used as background images as a replacement.
+- STM32's DMA2D (Chrom-ART) support is removed for now. It will be added again when an official partnership starts with ST too.
+- SJPG was removed as the original TJPGD support decoding tile-by-tile. (typically a tile is 8x8 pixels)
 
 Main new features
 -----------------
