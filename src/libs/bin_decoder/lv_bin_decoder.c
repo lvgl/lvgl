@@ -1069,24 +1069,12 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
     uint32_t out_len = compressed->decompressed_size;
     uint32_t input_len = compressed->compressed_size;
     LV_UNUSED(input_len);
+    LV_UNUSED(out_len);
 
-    /**
-     * @todo
-     * FIXME, RLE compressed image needs extra memory because decompression operates on
-     * pixel unit not byte unit. Should optimize RLE decompress to not write to extra memory.
-     */
-    dsc->header.h += 1;
     lv_draw_buf_t * decompressed = lv_draw_buf_create(dsc->header.w, dsc->header.h, dsc->header.cf,
                                                       dsc->header.stride);
     if(decompressed == NULL) {
         LV_LOG_WARN("No memory for decompressed image, input: %" LV_PRIu32 ", output: %" LV_PRIu32, input_len, out_len);
-        return LV_RESULT_INVALID;
-    }
-
-    dsc->header.h -= 1; /*Change it back*/
-    if(decompressed->data_size < out_len) {
-        LV_LOG_WARN("decompressed size mismatch: %" LV_PRIu32 ", %" LV_PRIu32, decompressed->data_size, out_len);
-        lv_draw_buf_destroy(decompressed);
         return LV_RESULT_INVALID;
     }
 
