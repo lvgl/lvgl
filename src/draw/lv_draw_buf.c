@@ -230,7 +230,7 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
     uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
 
     if(size > draw_buf->data_size) {
-        LV_LOG_INFO("Draw buf too small for new shape");
+        LV_LOG_TRACE("Draw buf too small for new shape");
         return NULL;
     }
 
