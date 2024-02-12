@@ -24,8 +24,7 @@
 <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
 <a href="https://forum.lvgl.io" title="Get help and help others">Forum</a> |
 <a href="https://lvgl.io/demos" title="Demos running in your browser">Demos</a> |
-<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> |
-<a href="https://squareline.io/" title="UI Editor for LVGL">SquareLine Studio</a>
+<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> 
 </p>
 <br>
 
@@ -36,9 +35,6 @@ LVGL is the most popular free and open source embedded graphics library to creat
 
 **Feature Rich**<br>
 It has all the features to create modern and beautiful GUIs: 30+ built-in widgets, a powerful style system, web inspired layout managers, and a typography system supporting many languages. To integrate LVGL into your platform, all you need is at least 32kB RAM and 128 kB Flash, a C compiler, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
-
-**UI Editor**<br>
-SquareLine Studio is a professional yet affordable drag and drop UI editor for LVGL. It runs on Windows, Linux and MacOS too and you can try it out even without registering to the website.
 
 **Services**<br>
 Our team is ready to help you with graphics design, UI implementation and consulting services. Contact us if you need some support during the development of your next GUI project.
@@ -73,7 +69,6 @@ Our team is ready to help you with graphics design, UI implementation and consul
 
 **Docs, Tools, and Services**
   - Detailed [Documentation](https://docs.lvgl.io/) with [100+ simple examples](https://docs.lvgl.io/master/index.html)
-  - [SquareLine Studio](https://squareline.io/) - A professional and easy-to-use UI editor software to speed up and simplify the UI development.
   - [Services](https://lvgl.io/services) such as User interface design, Implementation and Consulting to make UI development simpler and faster.
 
 ## :heart: Sponsor
@@ -443,11 +438,6 @@ This list will guide you to get started with LVGL step-by-step.
 
   9. If you have questions go to the [Forum](http://forum.lvgl.io/)
   10. Read the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) guide to see how you can help to improve LVGL (15 minutes)
-
-**Go for More**
-
-  11. Download and try out [SquareLine Studio](https://squareline.io/).
-  12. Contact us for [Services](https://lvgl.io/services).
 
 
 ## :handshake: Services
