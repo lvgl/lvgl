@@ -1,5 +1,9 @@
 .. raw:: html
 
+   <p align="left">
+     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
+   </p>
+
    <p align="right">
      <a href="../README.md">English</a>| <b>中文</b>| <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a>
    </p>
@@ -36,8 +40,7 @@
    <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">文档</a> |
    <a href="https://forum.lvgl.io" title="Get help and help others">论坛</a> |
    <a href="https://lvgl.io/demos" title="Demos running in your browser">示例</a> |
-   <a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">服务</a> |
-   <a href="https://squareline.io/" title="UI Editor for LVGL">SquareLine Studio</a>
+   <a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">服务</a>
    </p>
    <br>
 
@@ -54,10 +57,6 @@ LVGL 是最流行的免费开源嵌入式图形库，可以为任何 MCU、MPU �
 
 它拥有创建现代美观 GUI 的所有功能：30 多个内置控件、强大的样式系统、Web 启发的布局管理器和支持多种语言的排版系统。要将 LVGL 集成到您的平台中，您只需要至少 32 KB
 RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的渲染缓冲区。
-
-**UI编辑器**\
-
-SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。它也在 Windows 、Linux 和 MacOS 上运行，无需注册，免费试用。
 
 **服务**\ 
 
@@ -107,8 +106,6 @@ SquareLine Studio 是一款专业但价格合理的 LVGL 拖放 UI 编辑器。�
 **文档、工具和服务**
 
 -  包含 \ `100 多个简单示例 <https://docs.lvgl.io/master/index.html>`__\ 的详细\ `文档 <https://docs.lvgl.io/>`__
--  `SquareLine Studio <https://squareline.io/>`__ -
-   一款专业且易于使用的UI编辑器软件，可加快和简化 UI 开发。
 -  `服务 <https://lvgl.io/services>`__
    如用户界面设计、实施和咨询，使 UI 开发更简单、更快。
 
@@ -562,11 +559,6 @@ Hello world 标签
 9.  如果您有问题，请访问\ `论坛 <http://forum.lvgl.io/>`__
 10. 阅读\ `贡献 <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ 指南，了解如何帮助提高 LVGL（15 分钟）
 
-**获取更多**
-
-11. 下载并试用 \ `SquareLine Studio <https://squareline.io/>`__.
-12. 联系我们获取\ `服务 <https://lvgl.io/services>`__.
-
 .. _handshake-服务:
 
 🤝 服务
@@ -576,7 +568,7 @@ LVGL LLC 的成立旨在为 LVGL 库提供坚实的背景，并提供多种类�
 
 -  **平面设计**
    我们的内部图形设计师是创造美丽现代设计的专家，适合您的产品和硬件资源。
--  ** UI 实现**
+-  **UI 实现**
    我们还可以根据您或我们创建的设计来实现您的 UI。您可以确信，我们将充分利用您的硬件和 LVGL。如果 LVGL 中缺少某个功能或小部件，请不要担心，我们会为您实现它。
 -  **咨询和支持**
    我们也可以通过咨询来支持您，以避免在 UI 开发过程中出现昂贵和耗时的错误。
