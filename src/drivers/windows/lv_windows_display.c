@@ -126,6 +126,10 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
         window_style &= ~(WS_SIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME);
     }
 
+    // ask Windows how big a window needs to be for hor_res and ver_res
+    RECT rect = { 0, 0, data->hor_res, data->ver_res };
+    AdjustWindowRect(&rect, window_style, false);
+
     HWND window_handle = CreateWindowExW(
                              WS_EX_CLIENTEDGE,
                              L"LVGL.Window",
@@ -133,8 +137,8 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
                              window_style,
                              CW_USEDEFAULT,
                              0,
-                             data->hor_res,
-                             data->ver_res,
+                             rect.right - rect.left,
+                             rect.bottom - rect.top,
                              NULL,
                              NULL,
                              NULL,
