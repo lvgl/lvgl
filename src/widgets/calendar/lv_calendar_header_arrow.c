@@ -13,6 +13,7 @@
 #include "../button/lv_button.h"
 #include "../label/lv_label.h"
 #include "../../layouts/flex/lv_flex.h"
+#include "../../misc/lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -111,6 +112,9 @@ static void month_event_cb(lv_event_t * e)
     d = lv_calendar_get_showed_date(calendar);
     lv_calendar_date_t newd = *d;
 
+    LV_ASSERT_FORMAT_MSG(newd.year >= 0 && newd.month >= 1 && newd.month <= 12,
+                         "Invalid date: %d-%d", newd.year, newd.month);
+
     /*The last child is the right button*/
     if(lv_obj_get_child(header, 0) == btn) {
         if(newd.month == 1) {
@@ -142,9 +146,12 @@ static void value_changed_event_cb(lv_event_t * e)
     lv_obj_t * header = lv_event_get_current_target(e);
     lv_obj_t * calendar = lv_obj_get_parent(header);
 
-    const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
+    const lv_calendar_date_t * date = lv_calendar_get_showed_date(calendar);
+    LV_ASSERT_FORMAT_MSG(date->year >= 0 && date->month >= 1 && date->month <= 12,
+                         "Invalid date: %d-%d", date->year, date->month);
+
     lv_obj_t * label = lv_obj_get_child(header, 1);
-    lv_label_set_text_fmt(label, "%d %s", cur_date->year, month_names_def[cur_date->month - 1]);
+    lv_label_set_text_fmt(label, "%d %s", date->year, month_names_def[date->month - 1]);
 }
 
 #endif /*LV_USE_CALENDAR_HEADER_ARROW*/
