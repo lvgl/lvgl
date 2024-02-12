@@ -60,7 +60,9 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
         static int my_get_cpu_cb(void)
         {
-            return (int)syscall(SYS_getcpu);
+            int cpu_id = 0;
+            syscall(SYS_getcpu, &cpu_id, NULL);
+            return cpu_id;
         }
 
         void my_profiler_init(void)
