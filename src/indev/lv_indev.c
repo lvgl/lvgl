@@ -44,7 +44,7 @@
 #define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
 
 #if LV_INDEV_DEF_SCROLL_THROW <= 0
-    #warning "LV_INDEV_DRAG_THROW must be greater than 0"
+    #warning "LV_INDEV_DEF_SCROLL_THROW must be greater than 0"
 #endif
 
 #define indev_act LV_GLOBAL_DEFAULT()->indev_active
