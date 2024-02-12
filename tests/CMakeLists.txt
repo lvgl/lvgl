@@ -209,23 +209,23 @@ add_library(test_common
         src/test_assets/test_img_cogwheel_rgb565a8.c
         src/test_assets/test_img_cogwheel_xrgb8888.c
         src/test_assets/test_img_cogwheel_argb8888.c
-        src/test_assets/font_1.c
-        src/test_assets/font_2.c
-        src/test_assets/font_3.c
+        src/test_assets/test_font_1.c
+        src/test_assets/test_font_2.c
+        src/test_assets/test_font_3.c
         src/test_assets/test_font_montserrat_ascii_1bpp.c
         src/test_assets/test_font_montserrat_ascii_2bpp.c
         src/test_assets/test_font_montserrat_ascii_4bpp.c
         src/test_assets/test_font_montserrat_ascii_4bpp_compressed.c
-        src/test_assets/font_1_bin.c
-        src/test_assets/font_2_bin.c
-        src/test_assets/font_3_bin.c
+        src/test_assets/test_font_1_bin.c
+        src/test_assets/test_font_2_bin.c
+        src/test_assets/test_font_3_bin.c
         src/test_assets/test_img_caret_down.c
         src/test_assets/test_arc_bg.c
         src/test_assets/test_img_lvgl_logo_png.c
         src/test_assets/test_img_lvgl_logo_jpg.c
         src/test_assets/test_img_emoji_F617.c
-        src/test_assets/ubuntu_font.c
-        src/test_assets/kern_one_otf.c
+        src/test_assets/test_ubuntu_font.c
+        src/test_assets/test_kern_one_otf.c
         unity/unity_support.c
         unity/unity.c
         ${TEST_IMAGES_SRC}

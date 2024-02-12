@@ -1,4 +1,5 @@
 #include "../../../lvgl.h"
+#if LV_BUILD_TEST
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
@@ -326,3 +327,4 @@ const lv_image_dsc_t test_arc_bg = {
     .data_size = 0,
     .data = test_arc_bg_map,
 };
+#endif /*LV_BUILD_TEST*/

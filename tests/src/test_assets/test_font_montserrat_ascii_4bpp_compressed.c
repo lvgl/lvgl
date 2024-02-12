@@ -5,6 +5,7 @@
  ******************************************************************************/
 
 #include "../../../lvgl.h"
+#if LV_BUILD_TEST
 
 #ifndef TEST_FONT_MONTSERRAT_ASCII_4BPP_COMPRESSED
     #define TEST_FONT_MONTSERRAT_ASCII_4BPP_COMPRESSED 1
@@ -847,7 +848,6 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     0x0, 0x2f, 0x66, 0xc8, 0x0
 };
 
-
 /*---------------------
  *  GLYPH DESCRIPTION
  *--------------------*/
@@ -955,8 +955,6 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
  *  CHARACTER MAPPING
  *--------------------*/
 
-
-
 /*Collect the unicode lists and glyph_id offsets*/
 static const lv_font_fmt_txt_cmap_t cmaps[] = {
     {
@@ -968,7 +966,6 @@ static const lv_font_fmt_txt_cmap_t cmaps[] = {
 /*-----------------
  *    KERNING
  *----------------*/
-
 
 /*Map glyph_ids to kern left classes*/
 static const uint8_t kern_left_class_mapping[] = {
@@ -1366,7 +1363,6 @@ static const int8_t kern_class_values[] = {
     0, 0, 0, 1, 0, -3, -3, 0
 };
 
-
 /*Collect the kern class' data in one place*/
 static const lv_font_fmt_txt_kern_classes_t kern_classes = {
     .class_pair_values   = kern_class_values,
@@ -1401,7 +1397,6 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
 #endif
 };
 
-
 /*-----------------
  *  PUBLIC FONT
  *----------------*/
@@ -1426,7 +1421,6 @@ lv_font_t test_font_montserrat_ascii_4bpp_compressed = {
     .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 };
 
-
-
 #endif /*#if TEST_FONT_MONTSERRAT_ASCII_4BPP_COMPRESSED*/
 
+#endif /*LV_BUILD_TEST*/

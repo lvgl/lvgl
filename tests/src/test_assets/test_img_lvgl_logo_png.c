@@ -1,5 +1,5 @@
 #include "../../..//lvgl.h"
-
+#if LV_BUILD_TEST
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
@@ -165,3 +165,5 @@ const lv_image_dsc_t test_img_lvgl_logo_png = {
     .data_size = 1873,
     .data = test_img_lvgl_logo_png_map,
 };
+
+#endif /*LV_BUILD_TEST*/
