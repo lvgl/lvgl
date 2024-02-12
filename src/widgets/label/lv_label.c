@@ -278,7 +278,6 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     }
 
     lv_text_flag_t flag = get_label_flags(label);
-    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
 
     const uint32_t byte_id = _lv_text_encoded_get_byte_id(txt, char_id);
     /*Search the line of the index letter*/
@@ -378,7 +377,6 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     int32_t y = 0;
 
     lv_text_flag_t flag = get_label_flags(label);
-    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
 
     /*Search the line of the index letter*/;
     while(txt[line_start] != '\0') {
@@ -487,7 +485,6 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     const int32_t letter_height    = lv_font_get_line_height(font);
 
     lv_text_flag_t flag = get_label_flags(label);
-    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
 
     /*Search the line of the index letter*/
     int32_t y = 0;
@@ -701,6 +698,8 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
             else w = lv_obj_get_content_width(obj);
 
+            w = LV_MIN(w, lv_obj_get_style_max_width(obj, 0));
+
             lv_text_get_size(&label->size_cache, label->text, font, letter_space, line_space, w, flag);
             label->invalid_size_cache = false;
         }
@@ -723,9 +722,7 @@ static void draw_main(lv_event_t * e)
     lv_area_t txt_coords;
     lv_obj_get_content_coords(obj, &txt_coords);
 
-    lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
-    if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
-    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
+    lv_text_flag_t flag = get_label_flags(label);
 
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);
@@ -858,9 +855,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
     /*Calc. the height and longest line*/
     lv_point_t size;
-    lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
-    if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
-    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
+    lv_text_flag_t flag = get_label_flags(label);
 
     lv_text_get_size(&size, label->text, font, letter_space, line_space, max_w, flag);
 
@@ -1251,6 +1246,13 @@ static lv_text_flag_t get_label_flags(lv_label_t * label)
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
 
     if(label->expand) flag |= LV_TEXT_FLAG_EXPAND;
+
+    lv_obj_t * obj = (lv_obj_t *) label;
+    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT &&
+       lv_obj_get_style_max_width(obj, LV_PART_MAIN) == LV_COORD_MAX &&
+       !obj->w_layout) {
+        flag |= LV_TEXT_FLAG_FIT;
+    }
 
     return flag;
 }
