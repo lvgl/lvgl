@@ -242,6 +242,13 @@ static void draw_vector(lv_layer_t * layer)
     lv_vector_dsc_delete(ctx);
 }
 
+static void delete_event_cb(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_target(e);
+    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
+    lv_draw_buf_destroy(draw_buf);
+}
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -259,6 +266,7 @@ void lv_demo_vector_graphic(void)
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(WIDTH, HEIGHT, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
     lv_canvas_set_draw_buf(canvas, draw_buf);
+    lv_obj_add_event_cb(canvas, delete_event_cb, LV_EVENT_DELETE, NULL);
 
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
