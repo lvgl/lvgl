@@ -30,10 +30,7 @@ void setUp(void)
 
 void tearDown(void)
 {
-    lv_obj_delete(label);
-    lv_obj_delete(long_label);
-    lv_obj_delete(long_label_multiline);
-    lv_obj_delete(empty_label);
+    lv_obj_clean(lv_screen_active());
 }
 
 void test_label_creation(void)
@@ -590,6 +587,26 @@ void test_label_rtl_dot_long_mode(void)
     lv_obj_center(test_label);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_rtl_dot_long_mode.png");
+}
+
+void test_label_max_width(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * test_label1 = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label1, long_text);
+    lv_obj_set_width(test_label1, 600);
+    lv_obj_set_style_max_width(test_label1, 200, LV_PART_MAIN);
+
+    lv_obj_t * test_label2 = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label2, long_text);
+    lv_obj_set_width(test_label2, 600);
+    lv_obj_set_height(test_label2, 50);
+    lv_obj_set_x(test_label2, 300);
+    lv_obj_set_style_max_width(test_label2, 200, LV_PART_MAIN);
+    lv_label_set_long_mode(test_label2, LV_LABEL_LONG_DOT);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_max_width.png");
 }
 
 #endif
