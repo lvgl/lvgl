@@ -60,3 +60,9 @@ The best way to profile some code is to create a new test application with 2 kin
 * Setup: Those files define functions that prepare the resources necessary for the execution of the profiled functions. For example, if a profiled function needs to provide a configuration structure to one of its dependencies, the structure can be initialised and configured in it and then passed to the profiling function to be given to the function that requires it. Those files are compiled normally
 * Profiling: Those files contain functions whose entry and exit time will be timestamped. They use the functions that should be profiled with the parameters given to them by the Setup functions. Those files are compiled using the "-p flag"
 * The main of the application should be in a Setup file but may also be in a Profiling file if one wants to calculate the overall execution time. Please note however that whatever time is reported also measures the execution time of all the timestamping functions calls
+
+Known Limitations
+^^^^^^^^^^^^^^^^^^
+
+* The current _mcount implementation is done in aarch64 assembly and is thus only compatible with ARM64 platforms
+* The current _mcount implementation breaks the program if it makes use of a function with more than 7 parameters. Functions with 8 or more parameters are given some of their values through the stack in a way that is not possible to detect with our current implementation. This results in the values being shifted and replaced by the stack of _mcount_exit
