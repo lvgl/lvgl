@@ -162,7 +162,7 @@ const lv_image_dsc_t test_img_lvgl_logo_png = {
     .header.cf = LV_COLOR_FORMAT_RAW_ALPHA,
     .header.w = 105,
     .header.h = 33,
-    .data_size = 1873,
+    .data_size = sizeof(test_img_lvgl_logo_png_map),
     .data = test_img_lvgl_logo_png_map,
 };
 

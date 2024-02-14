@@ -324,7 +324,14 @@ const lv_image_dsc_t test_arc_bg = {
     .header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
     .header.w = 100,
     .header.h = 100,
-    .data_size = 0,
+#if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
+    .header.stride = 200,
+#elif LV_COLOR_DEPTH == 16
+    .header.stride = 300,
+#elif LV_COLOR_DEPTH == 32
+    .header.stride = 400,
+#endif
+    .data_size = sizeof(test_arc_bg_map),
     .data = test_arc_bg_map,
 };
 #endif /*LV_BUILD_TEST*/
