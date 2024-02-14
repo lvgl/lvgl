@@ -73,7 +73,7 @@ lv_result_t lv_thread_init(lv_thread_t * pxThread, lv_thread_prio_t xSchedPriori
     BaseType_t xTaskCreateStatus = xTaskCreate(
                                        prvRunThread,
                                        pcTASK_NAME,
-                                       (uint16_t)usStackSize,
+                                       (configSTACK_DEPTH_TYPE)(usStackSize / sizeof(StackType_t)),
                                        (void *)pxThread,
                                        tskIDLE_PRIORITY + xSchedPriority,
                                        &pxThread->xTaskHandle);
