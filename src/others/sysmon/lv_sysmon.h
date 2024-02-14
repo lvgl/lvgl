@@ -56,6 +56,7 @@ typedef struct {
         uint32_t flush_in_render_elaps_sum;
         uint32_t flush_not_in_render_start;
         uint32_t flush_not_in_render_elaps_sum;
+        uint32_t last_report_timestamp;
         uint32_t render_in_progress : 1;
     } measured;
 

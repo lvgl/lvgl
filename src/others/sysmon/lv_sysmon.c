@@ -179,8 +179,14 @@ static void perf_update_timer_cb(lv_timer_t * t)
     lv_sysmon_perf_info_t * info = lv_timer_get_user_data(t);
     info->calculated.run_cnt++;
 
-    info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt /
-                                                               info->measured.refr_interval_sum) : 0;
+    uint32_t time_since_last_report = lv_tick_elaps(info->measured.last_report_timestamp);
+    lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(NULL);
+    uint32_t disp_refr_period = disp_refr_timer->period;
+
+    info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt / time_since_last_report) : 0;
+    info->calculated.fps = LV_MIN(info->calculated.fps,
+                                  1000 / disp_refr_period);   /*Limit due to possible off-by-one error*/
+
     info->calculated.cpu = 100 - LV_SYSMON_GET_IDLE();
     info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :
                                      0;
@@ -206,6 +212,8 @@ static void perf_update_timer_cb(lv_timer_t * t)
     info->calculated.cpu_avg_total = prev_info.calculated.cpu_avg_total;
     info->calculated.fps_avg_total = prev_info.calculated.fps_avg_total;
     info->calculated.run_cnt = prev_info.calculated.run_cnt;
+
+    info->measured.last_report_timestamp = lv_tick_get();
 }
 
 static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
