@@ -360,15 +360,18 @@ static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const cha
     node = _lv_ll_ins_tail(ll_p);
     LV_ASSERT_MALLOC(node);
 
-    if(LV_FS_MEMFS_LETTER == pathname[0]) {
-        len = sizeof(lv_fs_path_ex_t);
+#if LV_USE_FS_MEMFS
+    if(pathname[0] == LV_FS_MEMFS_LETTER) {
+        node->pathname = lv_malloc(sizeof(lv_fs_path_ex_t));
+        LV_ASSERT_MALLOC(node->pathname);
+        lv_memcpy(node->pathname, pathname, sizeof(lv_fs_path_ex_t));
     }
-    else {
-        len++;
+    else
+#endif
+    {
+        node->pathname = lv_strdup(pathname);
+        LV_ASSERT_NULL(node->pathname);
     }
-    node->pathname = lv_malloc(len);
-    LV_ASSERT_MALLOC(node->pathname);
-    memcpy(node->pathname, pathname, len);
 
     LV_LOG_INFO("add face_id: %s", node->pathname);
 
