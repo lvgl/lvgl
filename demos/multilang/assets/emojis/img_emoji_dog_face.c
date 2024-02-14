@@ -49,6 +49,7 @@ const lv_image_dsc_t img_emoji_dog_face = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .header.w = 18,
     .header.h = 19,
+    .header.stride = 72,
     .data = img_emoji_dog_face_map,
     .data_size = sizeof(img_emoji_dog_face_map),
 };

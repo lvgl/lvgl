@@ -36,6 +36,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_icon_4_map[] = {
 const lv_image_dsc_t img_lv_demo_music_icon_4 = {
     .header.w = 24,
     .header.h = 24,
+    .header.stride = 96,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_icon_4_map,
     .data_size = sizeof(img_lv_demo_music_icon_4_map),

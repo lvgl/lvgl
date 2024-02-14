@@ -183,6 +183,7 @@ const lv_image_dsc_t img_demo_vector_avatar = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .header.w = 160,
     .header.h = 154,
+    .header.stride = 640,
     .data = img_demo_vector_avatar_map,
     .data_size = sizeof(img_demo_vector_avatar_map),
 };
