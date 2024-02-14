@@ -253,6 +253,9 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
     _move_buf_close_to_area((void **)&src_buf, src_area, src_stride, src_cf);
     _move_buf_close_to_area(&dest_buf, dest_area, dest_stride, dest_cf);
 
+    /* Set clip area */
+    vglite_set_scissor(dest_area);
+
     /* If we're in limit, do a single BLIT */
     if((src_area->x2 < VGLITE_BLIT_SPLIT_THR) &&
        (src_area->y2 < VGLITE_BLIT_SPLIT_THR)) {
@@ -273,6 +276,8 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
                      lv_area_get_width(src_area), lv_area_get_height(src_area),
                      lv_area_get_width(dest_area), lv_area_get_height(dest_area),
                      (uintptr_t)src_buf, (uintptr_t)dest_buf);
+
+        return;
     };
 
     /* Split the BLIT into multiple tiles */
