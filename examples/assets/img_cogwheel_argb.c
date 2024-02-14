@@ -117,6 +117,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_ARGB uint8_t img_co
 const lv_image_dsc_t img_cogwheel_argb = {
     .header.w = 100,
     .header.h = 100,
+    .header.stride = 400,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_cogwheel_argb_map,
     .data_size = sizeof(img_cogwheel_argb_map),
