@@ -141,9 +141,12 @@ void * lv_malloc_core(size_t size)
 #if LV_USE_OS
     lv_mutex_lock(&state.mutex);
 #endif
-    state.cur_used += size;
-    state.max_used = LV_MAX(state.cur_used, state.max_used);
     void * p = lv_tlsf_malloc(state.tlsf, size);
+
+    if(p) {
+        state.cur_used += lv_tlsf_block_size(p);
+        state.max_used = LV_MAX(state.cur_used, state.max_used);
+    }
 
 #if LV_USE_OS
     lv_mutex_unlock(&state.mutex);
@@ -157,8 +160,14 @@ void * lv_realloc_core(void * p, size_t new_size)
     lv_mutex_lock(&state.mutex);
 #endif
 
+    size_t old_size = lv_tlsf_block_size(p);
     void * p_new = lv_tlsf_realloc(state.tlsf, p, new_size);
 
+    if(p_new) {
+        state.cur_used -= old_size;
+        state.cur_used += lv_tlsf_block_size(p_new);
+        state.max_used = LV_MAX(state.cur_used, state.max_used);
+    }
 #if LV_USE_OS
     lv_mutex_unlock(&state.mutex);
 #endif
@@ -175,7 +184,8 @@ void lv_free_core(void * p)
 #if LV_MEM_ADD_JUNK
     lv_memset(p, 0xbb, lv_tlsf_block_size(data));
 #endif
-    size_t size = lv_tlsf_free(state.tlsf, p);
+    size_t size = lv_tlsf_block_size(p);
+    lv_tlsf_free(state.tlsf, p);
     if(state.cur_used > size) state.cur_used -= size;
     else state.cur_used = 0;
 
