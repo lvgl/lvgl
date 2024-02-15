@@ -51,6 +51,7 @@ img_lv_demo_music_icon_3_map[] = {
 const lv_image_dsc_t img_lv_demo_music_icon_3 = {
     .header.w = 34,
     .header.h = 32,
+    .header.stride = 136,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_icon_3_map,
     .data_size = sizeof(img_lv_demo_music_icon_3_map),

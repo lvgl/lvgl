@@ -54,6 +54,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_wave_top_map[] = {
 const lv_image_dsc_t img_lv_demo_music_wave_top = {
     .header.w = 272,
     .header.h = 42,
+    .header.stride = 1088,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_wave_top_map,
     .data_size = sizeof(img_lv_demo_music_wave_top_map),

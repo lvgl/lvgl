@@ -160,6 +160,7 @@ img_lv_demo_music_btn_pause_map[] = {
 const lv_image_dsc_t img_lv_demo_music_btn_pause = {
     .header.w = 141,
     .header.h = 142,
+    .header.stride = 564,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_btn_pause_map,
     .data_size = sizeof(img_lv_demo_music_btn_pause_map),

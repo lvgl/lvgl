@@ -49,6 +49,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_slider_knob_map[] = {
 const lv_image_dsc_t img_lv_demo_music_slider_knob = {
     .header.w = 36,
     .header.h = 38,
+    .header.stride = 144,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_slider_knob_map,
     .data_size = sizeof(img_lv_demo_music_slider_knob_map),

@@ -67,6 +67,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMGBTN_
 const lv_image_dsc_t imagebutton_left = {
     .header.w = 8,
     .header.h = 50,
+    .header.stride = 32,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = imagebutton_left_map,
     .data_size = sizeof(imagebutton_left_map),

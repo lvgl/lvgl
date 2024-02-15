@@ -85,6 +85,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_SKE
 const lv_image_dsc_t img_skew_strip = {
     .header.w = 80,
     .header.h = 20,
+    .header.stride = 320,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_skew_strip_map,
     .data_size = sizeof(img_skew_strip_map),

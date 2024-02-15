@@ -134,7 +134,8 @@ const lv_image_dsc_t test_image_cogwheel_i4 = {
     .header.cf = LV_COLOR_FORMAT_I4,
     .header.w = 100,
     .header.h = 100,
-    .data_size = 5064,
+    .header.stride = 50,
+    .data_size = sizeof(test_image_cogwheel_i4_map),
     .data = test_image_cogwheel_i4_map,
 };
 

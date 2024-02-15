@@ -35,6 +35,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_DEMO_WIDGETS_NEEDLE uint8_t 
 const lv_image_dsc_t img_demo_widgets_needle = {
     .header.w = 100,
     .header.h = 9,
+    .header.stride = 400,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data =  img_demo_widgets_needle_map,
 };

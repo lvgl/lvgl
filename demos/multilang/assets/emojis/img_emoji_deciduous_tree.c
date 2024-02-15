@@ -49,6 +49,7 @@ const lv_image_dsc_t img_emoji_deciduous_tree = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .header.w = 16,
     .header.h = 19,
+    .header.stride = 64,
     .data = img_emoji_deciduous_tree_map,
     .data_size = sizeof(img_emoji_deciduous_tree_map),
 };

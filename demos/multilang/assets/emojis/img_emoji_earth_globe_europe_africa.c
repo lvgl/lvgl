@@ -49,6 +49,7 @@ const lv_image_dsc_t img_emoji_earth_globe_europe_africa = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .header.w = 19,
     .header.h = 19,
+    .header.stride = 76,
     .data = img_emoji_earth_globe_europe_africa_map,
     .data_size = sizeof(img_emoji_earth_globe_europe_africa_map),
 };

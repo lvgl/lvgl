@@ -118,7 +118,8 @@ const lv_image_dsc_t test_image_cogwheel_rgb565 = {
     .header.cf = LV_COLOR_FORMAT_RGB565,
     .header.w = 100,
     .header.h = 100,
-    .data_size = 10000 * 2,
+    .header.stride = 200,
+    .data_size = sizeof(test_image_cogwheel_rgb565_map),
     .data = test_image_cogwheel_rgb565_map,
 };
 
