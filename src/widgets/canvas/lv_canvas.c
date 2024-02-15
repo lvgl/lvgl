@@ -152,13 +152,13 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     lv_obj_invalidate(obj);
 }
 
-void lv_canvas_set_palette(lv_obj_t * obj, uint8_t id, lv_color32_t c)
+void lv_canvas_set_palette(lv_obj_t * obj, uint8_t index, lv_color32_t color)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
-    lv_draw_buf_set_palette(canvas->draw_buf, id, c);
+    lv_draw_buf_set_palette(canvas->draw_buf, index, color);
     lv_obj_invalidate(obj);
 }
 

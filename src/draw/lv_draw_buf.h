@@ -263,6 +263,30 @@ static inline void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_
  */
 void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color);
 
+/**
+ * @deprecated Use lv_draw_buf_set_palette instead.
+ */
+static inline void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
+{
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
+    lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
+}
+
+/**
+ * @deprecated Use lv_draw_buffer_create/destroy instead.
+ * Free the data pointer and dsc struct of an image.
+ */
+static inline void lv_image_buf_free(lv_image_dsc_t * dsc)
+{
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
+    if(dsc != NULL) {
+        if(dsc->data != NULL)
+            lv_free((void *)dsc->data);
+
+        lv_free((void *)dsc);
+    }
+}
+
 /**********************
  *      MACROS
  **********************/
