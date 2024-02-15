@@ -149,7 +149,7 @@ void _lv_event_pop(lv_event_t * e);
 lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
 
 lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
-lv_result_t lv_event_delete(lv_event_list_t * list, lv_event_dsc_t * dsc);
+bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc);
 
 uint32_t lv_event_get_count(lv_event_list_t * list);
 

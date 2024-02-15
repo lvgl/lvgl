@@ -138,12 +138,12 @@ bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
     return false;
 }
 
-lv_result_t lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc)
+bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_NULL(dsc);
-    if(obj->spec_attr == NULL) return LV_RESULT_INVALID;
-    return lv_event_delete(&obj->spec_attr->event_list, dsc);
+    if(obj->spec_attr == NULL) return false;
+    return lv_event_remove_dsc(&obj->spec_attr->event_list, dsc);
 }
 
 uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)

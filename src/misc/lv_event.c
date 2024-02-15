@@ -104,7 +104,7 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
     return dsc;
 }
 
-lv_result_t lv_event_delete(lv_event_list_t * list, lv_event_dsc_t * dsc)
+bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc)
 {
     LV_ASSERT_NULL(list);
     LV_ASSERT_NULL(dsc);
@@ -113,13 +113,13 @@ lv_result_t lv_event_delete(lv_event_list_t * list, lv_event_dsc_t * dsc)
     lv_event_dsc_t ** events = lv_array_front(list);
     for(int i = 0; i < size; i++) {
         if(events[i] == dsc) {
+            lv_free(dsc);
             lv_array_remove(list, i);
-            lv_free(events[i]);
-            return LV_RESULT_OK;
+            return true;
         }
     }
 
-    return LV_RESULT_INVALID;
+    return false;
 }
 
 uint32_t lv_event_get_count(lv_event_list_t * list)
@@ -133,7 +133,7 @@ lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index)
     LV_ASSERT_NULL(list);
     lv_event_dsc_t ** dsc;
     dsc = lv_array_at(list, index);
-    return *dsc;
+    return dsc ? *dsc : NULL;
 }
 
 lv_event_cb_t lv_event_dsc_get_cb(lv_event_dsc_t * dsc)

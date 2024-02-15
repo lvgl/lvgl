@@ -111,7 +111,7 @@ bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index);
 
 bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
 
-lv_result_t lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc);
+bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc);
 
 /**
  * Remove an event_cb with user_data
