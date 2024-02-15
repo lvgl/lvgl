@@ -439,13 +439,14 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
 }
 
 #define _LV_TRANSFORM_TRIGO_SHIFT 10
-void lv_point_transform(lv_point_t * p, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
+
+void lv_point_transform(lv_point_t * point, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
                         bool zoom_first)
 {
-    lv_point_array_transform(p, 1, angle, scale_x, scale_y, pivot, zoom_first);
+    lv_point_array_transform(point, 1, angle, scale_x, scale_y, pivot, zoom_first);
 }
 
-void lv_point_array_transform(lv_point_t * p, size_t p_count, int32_t angle, int32_t scale_x, int32_t scale_y,
+void lv_point_array_transform(lv_point_t * points, size_t count, int32_t angle, int32_t scale_x, int32_t scale_y,
                               const lv_point_t * pivot,
                               bool zoom_first)
 {
@@ -453,16 +454,16 @@ void lv_point_array_transform(lv_point_t * p, size_t p_count, int32_t angle, int
         return;
     }
     uint32_t i;
-    for(i = 0; i < p_count; i++) {
-        p[i].x -= pivot->x;
-        p[i].y -= pivot->y;
+    for(i = 0; i < count; i++) {
+        points[i].x -= pivot->x;
+        points[i].y -= pivot->y;
 
     }
 
     if(angle == 0) {
-        for(i = 0; i < p_count; i++) {
-            p[i].x = (((int32_t)(p[i].x) * scale_x) >> 8) + pivot->x;
-            p[i].y = (((int32_t)(p[i].y) * scale_y) >> 8) + pivot->y;
+        for(i = 0; i < count; i++) {
+            points[i].x = (((int32_t)(points[i].x) * scale_x) >> 8) + pivot->x;
+            points[i].y = (((int32_t)(points[i].y) * scale_y) >> 8) + pivot->y;
         }
         return;
     }
@@ -486,23 +487,23 @@ void lv_point_array_transform(lv_point_t * p, size_t p_count, int32_t angle, int
     int32_t cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
     cosma = cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
 
-    for(i = 0; i < p_count; i++) {
-        int32_t x = p[i].x;
-        int32_t y = p[i].y;
+    for(i = 0; i < count; i++) {
+        int32_t x = points[i].x;
+        int32_t y = points[i].y;
         if(scale_x == 256 && scale_y == 256) {
-            p[i].x = ((cosma * x - sinma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
-            p[i].y = ((sinma * x + cosma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
+            points[i].x = ((cosma * x - sinma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+            points[i].y = ((sinma * x + cosma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
         }
         else {
             if(zoom_first) {
                 x *= scale_x;
                 y *= scale_y;
-                p[i].x = (((cosma * x - sinma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
-                p[i].y = (((sinma * x + cosma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
+                points[i].x = (((cosma * x - sinma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
+                points[i].y = (((sinma * x + cosma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
             }
             else {
-                p[i].x = (((cosma * x - sinma * y) * scale_x) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
-                p[i].y = (((sinma * x + cosma * y) * scale_y) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
+                points[i].x = (((cosma * x - sinma * y) * scale_x) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
+                points[i].y = (((sinma * x + cosma * y) * scale_y) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
             }
         }
     }

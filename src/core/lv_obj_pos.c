@@ -767,24 +767,24 @@ void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive
     lv_obj_transform_point_array(obj, p, 1, recursive, inv);
 }
 
-void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t p[], size_t p_count, bool recursive, bool inv)
+void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], size_t count, bool recursive, bool inverse)
 {
     if(obj) {
         lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
         bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
-        if(inv) {
-            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), p, p_count, recursive, inv);
-            if(do_tranf) transform_point_array(obj, p, p_count, inv);
+        if(inverse) {
+            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, recursive, inverse);
+            if(do_tranf) transform_point_array(obj, points, count, inverse);
         }
         else {
-            if(do_tranf) transform_point_array(obj, p, p_count, inv);
-            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), p, p_count, recursive, inv);
+            if(do_tranf) transform_point_array(obj, points, count, inverse);
+            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, recursive, inverse);
         }
     }
 }
 
 void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive,
-                                 bool inv)
+                                 bool inverse)
 {
     lv_point_t p[4] = {
         {area->x1, area->y1},
@@ -793,7 +793,7 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool re
         {area->x2 + 1, area->y2 + 1},
     };
 
-    lv_obj_transform_point_array(obj, p, 4, recursive, inv);
+    lv_obj_transform_point_array(obj, p, 4, recursive, inverse);
 
     area->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
     area->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);

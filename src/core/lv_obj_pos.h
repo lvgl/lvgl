@@ -343,21 +343,22 @@ void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive
 /**
  * Transform an array of points using the angle and zoom style properties of an object
  * @param obj           pointer to an object whose style properties should be used
- * @param p             the array of points to transform, the result will be written back here too
- * @param p_count       number of points in the array
+ * @param points        the array of points to transform, the result will be written back here too
+ * @param count         number of points in the array
  * @param recursive     consider the transformation properties of the parents too
- * @param inv           do the inverse of the transformation (-angle and 1/zoom)
+ * @param inverse       do the inverse of the transformation (-angle and 1/zoom)
  */
-void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t p[], size_t p_count, bool recursive, bool inv);
+void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], size_t count, bool recursive,
+                                  bool inverse);
 
 /**
  * Transform an area using the angle and zoom style properties of an object
  * @param obj           pointer to an object whose style properties should be used
  * @param area          an area to transform, the result will be written back here too
  * @param recursive     consider the transformation properties of the parents too
- * @param inv           do the inverse of the transformation (-angle and 1/zoom)
+ * @param inverse       do the inverse of the transformation (-angle and 1/zoom)
  */
-void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive, bool inv);
+void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive, bool inverse);
 
 /**
  * Mark an area of an object as invalid.
