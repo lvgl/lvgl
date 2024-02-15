@@ -336,7 +336,10 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         if(decoder->info_cb && decoder->open_cb) {
             lv_result_t res = decoder->info_cb(decoder, src, header);
             if(res == LV_RESULT_OK) {
-                if(header->stride == 0) header->stride = img_width_to_stride(header);
+                if(header->stride == 0) {
+                    LV_LOG_INFO("Image decoder didn't set stride. Calculate it from width.");
+                    header->stride = img_width_to_stride(header);
+                }
                 break;
             }
         }
