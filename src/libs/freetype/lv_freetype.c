@@ -362,6 +362,9 @@ static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const cha
 
 #if LV_USE_FS_MEMFS
     if(pathname[0] == LV_FS_MEMFS_LETTER) {
+#if !LV_FREETYPE_USE_LVGL_PORT
+        LV_LOG_WARN("LV_FREETYPE_USE_LVGL_PORT is not enabled");
+#endif
         node->pathname = lv_malloc(sizeof(lv_fs_path_ex_t));
         LV_ASSERT_MALLOC(node->pathname);
         lv_memcpy(node->pathname, pathname, sizeof(lv_fs_path_ex_t));
