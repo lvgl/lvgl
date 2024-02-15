@@ -82,7 +82,7 @@ lv_result_t lv_array_remove(lv_array_t * array, uint32_t index)
     uint8_t * start = lv_array_at(array, index);
     uint8_t * remaining = start + array->element_size;
     uint32_t remaining_size = (array->size - index - 1) * array->element_size;
-    lv_memcpy(start, remaining, remaining_size);
+    lv_memmove(start, remaining, remaining_size);
     lv_array_resize(array, array->size - 1);
     return LV_RESULT_OK;
 }
