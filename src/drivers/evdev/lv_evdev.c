@@ -114,7 +114,12 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
     /*Update dsc with buffered events*/
     struct input_event in = { 0 };
+    bool got_button_event = false;
     while(read(dsc->fd, &in, sizeof(in)) > 0) {
+        if(in.type == EV_SYN && got_button_event) {
+            /* force processing of button events to make sure we don't miss any, see #5211 */
+            break;
+        }
         if(in.type == EV_REL) {
             if(in.code == REL_X) dsc->root_x += in.value;
             else if(in.code == REL_Y) dsc->root_y += in.value;
@@ -131,6 +136,7 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
             if(in.code == BTN_MOUSE || in.code == BTN_TOUCH) {
                 if(in.value == 0) dsc->state = LV_INDEV_STATE_RELEASED;
                 else if(in.value == 1) dsc->state = LV_INDEV_STATE_PRESSED;
+                if(in.code == BTN_TOUCH) got_button_event = true;
             }
             else {
                 dsc->key = _evdev_process_key(in.code);
