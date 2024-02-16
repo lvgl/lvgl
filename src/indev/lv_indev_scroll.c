@@ -56,6 +56,7 @@ void _lv_indev_scroll_handler(lv_indev_t * indev)
 
         init_scroll_limits(indev);
 
+        lv_obj_remove_state(indev->pointer.act_obj, LV_STATE_PRESSED);
         lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_BEGIN, NULL);
         if(indev->reset_query) return;
     }
