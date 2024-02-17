@@ -50,11 +50,9 @@ void test_switch_should_not_leak_memory_after_deletion(void)
 {
     size_t idx = 0;
     uint32_t initial_available_memory = 0;
-    lv_mem_monitor_t monitor;
     lv_obj_t * switches[SWITCHES_CNT] = {NULL};
 
-    lv_mem_monitor(&monitor);
-    initial_available_memory = monitor.free_size;
+    initial_available_memory = lv_test_get_free_mem();
 
     for(idx = 0; idx < SWITCHES_CNT; idx++) {
         switches[idx] = lv_switch_create(scr);
