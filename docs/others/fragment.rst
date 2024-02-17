@@ -47,7 +47,7 @@ Create Fragment Class
            /* Create view objects */
            .create_obj_cb = sample_fragment_create_obj,
            /* IMPORTANT: size of your fragment struct */
-           .instance_size = sizeof(struct sample_fragment_t)
+           .instance_size = sizeof(struct sample_fragment_t),
    };
 
 Use ``lv_fragment_manager``
@@ -84,4 +84,3 @@ Example
 
 API
 ---
-
