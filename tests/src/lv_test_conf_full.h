@@ -105,8 +105,14 @@
 #define LV_USE_ST7735       1
 #define LV_USE_ST7789       1
 #define LV_USE_ST7796       1
-#define LV_USE_LIBINPUT     1
-#define LV_LIBINPUT_XKB     1
+
+#ifndef LV_USE_LIBINPUT
+    #define LV_USE_LIBINPUT     1
+#endif
+
+#ifndef LV_LIBINPUT_XKB
+    #define LV_LIBINPUT_XKB     1
+#endif
 
 #define LV_USE_FREETYPE 1
 #define LV_FREETYPE_CACHE_SIZE 768
