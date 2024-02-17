@@ -16,7 +16,6 @@ sys.path.insert(0, docs_path)
 
 import pycparser_monkeypatch  # NOQA
 import pycparser  # NOQA
-import config_builder  # NOQA
 
 DEVELOP = False
 
@@ -73,8 +72,43 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
     pp_file = os.path.join(temp_directory, 'lvgl.pp')
 
     if lvgl_config_path is None:
-        lvgl_config_path = os.path.join(temp_directory, 'lv_conf.h')
-        config_builder.run(lvgl_config_path)
+        lvgl_config_path = os.path.join(lvgl_path, 'lv_conf_template.h')
+
+        with open(lvgl_config_path, 'rb') as f:
+            data = f.read().decode('utf-8').split('\n')
+
+        for i, line in enumerate(data):
+            if line.startswith('#if 0'):
+                data[i] = '#if 1'
+            else:
+                for item in (
+                    'LV_USE_LOG',
+                    'LV_USE_OBJ_ID',
+                    'LV_USE_OBJ_ID_BUILTIN',
+                    'LV_USE_FLOAT',
+                    'LV_USE_BIDI',
+                    'LV_USE_LODEPNG',
+                    'LV_USE_LIBPNG',
+                    'LV_USE_BMP',
+                    'LV_USE_TJPGD',
+                    'LV_USE_LIBJPEG_TURBO',
+                    'LV_USE_GIF',
+                    'LV_BIN_DECODER_RAM_LOAD',
+                    'LV_USE_RLE',
+                    'LV_USE_QRCODE',
+                    'LV_USE_BARCODE',
+                    'LV_USE_TINY_TTF',
+                    'LV_USE_GRIDNAV',
+                    'LV_USE_FRAGMENT',
+                    'LV_USE_IMGFONT',
+                    'LV_USE_SNAPSHOT',
+                    'LV_USE_FREETYPE'
+                ):
+                    if line.startswith(f'#define {item}'):
+                        data[i] = f'#define {item} 1'
+
+        with open(os.path.join(temp_directory, 'lv_conf.h'), 'wb') as f:
+            f.write('\n'.join(data).encode('utf-8'))
     else:
         shutil.copyfile(lvgl_config_path, temp_directory)
 
@@ -121,6 +155,38 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
 
     cparser = pycparser.CParser()
     ast = cparser.parse(pp_data, lvgl_header_path)
+
+    forward_struct_decls = {}
+
+    for item in ast.ext[:]:
+        if (
+            isinstance(item, pycparser_monkeypatch.Decl) and
+            item.name is None and
+            isinstance(item.type, (pycparser_monkeypatch.Struct, pycparser_monkeypatch.Union)) and
+            item.type.name is not None
+        ):
+            if item.type.decls is None:
+                forward_struct_decls[item.type.name] = [item]
+            else:
+                if item.type.name in forward_struct_decls:
+                    decs = forward_struct_decls[item.type.name]
+                    if len(decs) == 2:
+                        decl, td = decs
+
+                        td.type.type.decls = item.type.decls[:]
+
+                        ast.ext.remove(decl)
+                        ast.ext.remove(item)
+        elif (
+            isinstance(item, pycparser_monkeypatch.Typedef) and
+            isinstance(item.type, pycparser_monkeypatch.TypeDecl) and
+            item.name and item.type.declname and item.name == item.type.declname and
+            isinstance(item.type.type, (pycparser_monkeypatch.Struct, pycparser_monkeypatch.Union)) and
+            item.type.type.decls is None
+        ):
+            if item.type.type.name in forward_struct_decls:
+                forward_struct_decls[item.type.type.name].append(item)
+
     ast.setup_docs(temp_directory)
 
     if not output_to_stdout and output_path is None:
@@ -177,7 +243,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--develop',
         dest='develop',
-        help='this option leavs the temporary folder in place.',
+        help='this option leaves the temporary folder in place.',
         action='store_true',
     )
 
