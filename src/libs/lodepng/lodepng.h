@@ -30,7 +30,7 @@ freely, subject to the following restrictions:
 
 #include "../../../lvgl.h"
 #if LV_USE_LODEPNG
-extern const char * LODEPNG_VERSION_STRING;
+LV_ATTRIBUTE_EXTERN_DATA extern const char * LODEPNG_VERSION_STRING;
 
 /*
 The following #defines are used to create code sections. They can be disabled
@@ -295,7 +295,7 @@ struct _LodePNGDecompressSettings {
     const void * custom_context; /*optional custom settings for custom functions*/
 };
 
-extern const LodePNGDecompressSettings lodepng_default_decompress_settings;
+LV_ATTRIBUTE_EXTERN_DATA extern const LodePNGDecompressSettings lodepng_default_decompress_settings;
 void lodepng_decompress_settings_init(LodePNGDecompressSettings * settings);
 #endif /*LODEPNG_COMPILE_DECODER*/
 
@@ -328,7 +328,7 @@ struct _LodePNGCompressSettings { /*deflate = compress*/
     const void * custom_context; /*optional custom settings for custom functions*/
 };
 
-extern const LodePNGCompressSettings lodepng_default_compress_settings;
+LV_ATTRIBUTE_EXTERN_DATA extern const LodePNGCompressSettings lodepng_default_compress_settings;
 void lodepng_compress_settings_init(LodePNGCompressSettings * settings);
 #endif /*LODEPNG_COMPILE_ENCODER*/
 

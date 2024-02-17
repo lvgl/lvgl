@@ -79,11 +79,8 @@ typedef lv_result_t (*lv_image_decoder_info_f_t)(lv_image_decoder_t * decoder, c
  * Open an image for decoding. Prepare it as it is required to read it later
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
- * @param args arguments of how to decode the image. see `lv_image_decoder_args_t`.
  */
-typedef lv_result_t (*lv_image_decoder_open_f_t)(lv_image_decoder_t * decoder,
-                                                 lv_image_decoder_dsc_t * dsc,
-                                                 const lv_image_decoder_args_t * args);
+typedef lv_result_t (*lv_image_decoder_open_f_t)(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 /**
  * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
@@ -127,6 +124,14 @@ typedef struct _lv_image_decoder_cache_data_t {
     const lv_image_decoder_t * decoder;
     void * user_data;
 } lv_image_cache_data_t;
+
+typedef struct _lv_image_decoder_header_cache_data_t {
+    const void * src;
+    lv_image_src_t src_type;
+
+    lv_image_header_t header;
+    lv_image_decoder_t * decoder;
+} lv_image_header_cache_data_t;
 
 /**Describe an image decoding session. Stores data about the decoding*/
 struct _lv_image_decoder_dsc_t {
@@ -273,6 +278,15 @@ void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_dec
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
 
+/**
+ * Set a custom method to free cache data.
+ * Normally this is not needed. If the custom decoder allocates additional memory other than dsc->decoded
+ * draw buffer, then you need to register your own method to free it. By default the cache entry is free'ed
+ * in `image_decoder_cache_free_cb`.
+ *
+ * @param decoder pointer to the image decoder
+ * @param cache_free_cb the custom callback to free cache data. Refer to `image_decoder_cache_free_cb`.
+ */
 void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb);
 
 #if LV_CACHE_DEF_SIZE > 0

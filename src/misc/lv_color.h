@@ -75,7 +75,8 @@ typedef uint8_t lv_opa_t;
                                             (cf) == LV_COLOR_FORMAT_A8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
-                                            (cf) == LV_COLOR_FORMAT_RGB565A8 ? 24 : \
+                                            (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \
+                                            (cf) == LV_COLOR_FORMAT_ARGB8565 ? 24 : \
                                             (cf) == LV_COLOR_FORMAT_RGB888 ? 24 :   \
                                             (cf) == LV_COLOR_FORMAT_ARGB8888 ? 32 : \
                                             (cf) == LV_COLOR_FORMAT_XRGB8888 ? 32 : \
@@ -127,6 +128,7 @@ enum _lv_color_format_t {
 
     /*2 byte (+alpha) formats*/
     LV_COLOR_FORMAT_RGB565            = 0x12,
+    LV_COLOR_FORMAT_ARGB8565          = 0x13,   /**< Not supported by sw renderer yet. */
     LV_COLOR_FORMAT_RGB565A8          = 0x14    /**< Color array followed by Alpha array*/,
 
     /*3 byte (+alpha) formats*/
@@ -344,7 +346,7 @@ uint32_t lv_color_to_u32(lv_color_t color);
  *                  mix == 255: c1
  *                  mix == 128: 0.5 x c1 + 0.5 x c2
  */
-LV_ATTRIBUTE_FAST_MEM static inline uint16_t lv_color_16_16_mix(uint16_t c1, uint16_t c2, uint8_t mix)
+static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_16_16_mix(uint16_t c1, uint16_t c2, uint8_t mix)
 {
     if(mix == 255) return c1;
     if(mix == 0) return c2;
@@ -445,7 +447,7 @@ static inline void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a)
 #include "lv_palette.h"
 #include "lv_color_op.h"
 
-extern const lv_color_filter_dsc_t lv_color_filter_shade;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_color_filter_dsc_t lv_color_filter_shade;
 
 #ifdef __cplusplus
 } /*extern "C"*/

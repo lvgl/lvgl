@@ -23,7 +23,7 @@ jobs:
     - name: Clone lv_micropython
       run: |
         git clone https://github.com/lvgl/lv_micropython.git .
-        git checkout feat/multi-instance
+        git checkout master
     - name: Initialize lv_bindings submodule
       run: git submodule update --init --recursive lib/lv_bindings
     - name: Update ${{ matrix.port }} port submodules
@@ -52,7 +52,7 @@ jobs:
     # STM32 & RPi Pico port
     - name: arm-none-eabi-gcc
       if: matrix.port == 'stm32' || matrix.port == 'rp2'
-      uses: carlosperate/arm-none-eabi-gcc-action@v1.8.0
+      uses: carlosperate/arm-none-eabi-gcc-action@v1.8.1
       with:
         release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
     - name: Build STM32 port

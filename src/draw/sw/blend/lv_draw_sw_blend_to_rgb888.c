@@ -36,17 +36,20 @@
  *  STATIC PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
+static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
 
-LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, const uint8_t dest_px_size,
-                                                     uint32_t src_px_size);
+static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc,
+                                                           const uint8_t dest_px_size,
+                                                           uint32_t src_px_size);
 
-LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
+static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc,
+                                                             uint32_t dest_px_size);
 
-LV_ATTRIBUTE_FAST_MEM static inline void lv_color_24_24_mix(const uint8_t * src, uint8_t * dest, uint8_t mix);
+static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_color_24_24_mix(const uint8_t * src, uint8_t * dest, uint8_t mix);
 
-LV_ATTRIBUTE_FAST_MEM static inline void blend_non_normal_pixel(uint8_t * dest, lv_color32_t src, lv_blend_mode_t mode);
-LV_ATTRIBUTE_FAST_MEM static inline void * drawbuf_next_row(const void * buf, uint32_t stride);
+static inline void /* LV_ATTRIBUTE_FAST_MEM */ blend_non_normal_pixel(uint8_t * dest, lv_color32_t src,
+                                                                      lv_blend_mode_t mode);
+static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
 /**********************
  *  STATIC VARIABLES
@@ -56,22 +59,67 @@ LV_ATTRIBUTE_FAST_MEM static inline void * drawbuf_next_row(const void * buf, ui
  *      MACROS
  **********************/
 
-#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NONE
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888
     #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888(...)                           LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA
     #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA(...)                  LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_MASK
     #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_MASK(...)                 LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB888_MIX_MASK_OPA
     #define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_MIX_MASK_OPA(...)              LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888
     #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888(...)                   LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_OPA
     #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_OPA(...)          LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_MASK
     #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_MASK(...)         LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
     #define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(...)      LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888
     #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888(...)                   LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_OPA
     #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_OPA(...)          LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_MASK
     #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_MASK(...)         LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
     #define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(...)      LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888
     #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888(...)                 LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_OPA
     #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_OPA(...)        LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_MASK
     #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_MASK(...)       LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA
     #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(...)    LV_RESULT_INVALID
 #endif
 
@@ -79,7 +127,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void * drawbuf_next_row(const void * buf, ui
  *   GLOBAL FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_rgb888(_lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(_lv_draw_sw_blend_fill_dsc_t * dsc, uint32_t dest_px_size)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
@@ -206,7 +254,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_rgb888(_lv_draw_sw_blend_fi
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_image_to_rgb888(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_rgb888(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
 {
 
     switch(dsc->src_color_format) {
@@ -232,7 +280,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_image_to_rgb888(_lv_draw_sw_blend_im
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
+static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
@@ -328,7 +376,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, const uint8_t dest_px_size,
+static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, const uint8_t dest_px_size,
                                                      uint32_t src_px_size)
 {
     int32_t w = dsc->dest_w * dest_px_size;
@@ -426,7 +474,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
+static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
@@ -509,7 +557,7 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static inline void blend_non_normal_pixel(uint8_t * dest, lv_color32_t src, lv_blend_mode_t mode)
+static inline void LV_ATTRIBUTE_FAST_MEM blend_non_normal_pixel(uint8_t * dest, lv_color32_t src, lv_blend_mode_t mode)
 {
     uint8_t res[3] = {0, 0, 0};
     switch(mode) {
@@ -535,7 +583,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void blend_non_normal_pixel(uint8_t * dest, 
     lv_color_24_24_mix(res, dest, src.alpha);
 }
 
-LV_ATTRIBUTE_FAST_MEM static inline void lv_color_24_24_mix(const uint8_t * src, uint8_t * dest, uint8_t mix)
+static inline void LV_ATTRIBUTE_FAST_MEM lv_color_24_24_mix(const uint8_t * src, uint8_t * dest, uint8_t mix)
 {
 
     if(mix == 0) return;
@@ -553,7 +601,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_24_24_mix(const uint8_t * src,
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static inline void * drawbuf_next_row(const void * buf, uint32_t stride)
+static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, uint32_t stride)
 {
     return (void *)((uint8_t *)buf + stride);
 }

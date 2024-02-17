@@ -828,8 +828,8 @@ The animation template for the object's animation. Should be a pointer to `lv_an
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### anim_time
-The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
+### anim_duration
+The animation duration in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -870,6 +870,15 @@ Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/R
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_BASE_DIR_AUTO`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+### bitmap_mask_src
+If set a layer will be created for the widget and the layer will be masked with this A8 bitmap mask.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 

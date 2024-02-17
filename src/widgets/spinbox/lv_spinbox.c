@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS    &lv_spinbox_class
+#define MY_CLASS (&lv_spinbox_class)
 #define LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES (LV_SPINBOX_MAX_DIGIT_COUNT + 8U)
 #define LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES (LV_SPINBOX_MAX_DIGIT_COUNT + 4U)
 
@@ -303,7 +303,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     const lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     if(code == LV_EVENT_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/

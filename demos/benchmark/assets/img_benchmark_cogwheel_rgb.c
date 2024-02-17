@@ -325,9 +325,16 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_RGB uint8_t img_ben
 const lv_image_dsc_t img_benchmark_cogwheel_rgb = {
     .header.w = 100,
     .header.h = 100,
-    .data_size = 10000 * LV_COLOR_DEPTH / 8,
+#if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
+    .header.stride = 100,
+#elif LV_COLOR_DEPTH == 16
+    .header.stride = 200,
+#elif LV_COLOR_DEPTH == 32
+    .header.stride = 400,
+#endif
     .header.cf = LV_COLOR_FORMAT_NATIVE,
     .data = img_benchmark_cogwheel_rgb_map,
+    .data_size = sizeof(img_benchmark_cogwheel_rgb_map),
 };
 
 #endif

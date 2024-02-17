@@ -52,12 +52,7 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
     //
     // Generate render operations
     //
-    d2_framebuffer(u->d2_handle,
-                   u->base_unit.target_layer->buf,
-                   (d2_s32)u->base_unit.target_layer->buf_stride / lv_color_format_get_size(u->base_unit.target_layer->color_format),
-                   (d2_u32)lv_area_get_width(&buffer_area),
-                   (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(u->base_unit.target_layer->color_format));
+    d2_framebuffer_from_layer(u->d2_handle, u->base_unit.target_layer);
 
     d2_setalpha(u->d2_handle, dsc->opa);
 

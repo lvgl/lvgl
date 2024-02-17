@@ -37,30 +37,29 @@ If you would rather try LVGL on your own project follow these steps:
    timing of LVGL. Alternatively, register a ``tick_get_cb`` with
    :cpp:func:`lv_tick_set_cb` so that LVGL can retrieve the current time directly.
 -  Call :cpp:func:`lv_init`
+-  Create a display.
+
+.. code:: c
+
+   lv_display_t *display = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
+
 -  Create a draw buffer: LVGL will render the graphics here first, and
    send the rendered image to the display. The buffer size can be set
    freely but 1/10 screen size is a good starting point.
 
 .. code:: c
 
-   static lv_disp_draw_buf_t draw_buf;
    static lv_color_t buf1[MY_DISP_HOR_RES * MY_DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
-   lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_RES / 10);  /*Initialize the display buffer.*/
+   lv_display_set_buffers(display, buf1, NULL, sizeof(buf1));  /*Initialize the display buffer.*/
 
 -  Implement and register a function which can copy the rendered image
    to an area of your display:
 
 .. code:: c
 
-   static lv_disp_t disp_drv;        /*Descriptor of a display driver*/
-   lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
-   disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
-   disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
-   disp_drv.hor_res = MY_DISP_HOR_RES;   /*Set the horizontal resolution of the display*/
-   disp_drv.ver_res = MY_DISP_VER_RES;   /*Set the vertical resolution of the display*/
-   lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+   lv_display_set_flush_cb(display, my_disp_flush);
 
-   void my_disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
+   void my_disp_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p)
    {
        int32_t x, y;
        /*It's a very slow but simple implementation.
@@ -72,7 +71,7 @@ If you would rather try LVGL on your own project follow these steps:
            }
        }
 
-       lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
+       lv_display_flush_ready(disp);         /* Indicate you are ready with the flushing*/
    }
 
 -  Implement and register a function which can read an input device.
@@ -353,14 +352,14 @@ Learn more about :ref:`micropython`.
 
 .. code:: python
 
+   # Initialize
+   import display_driver
    import lvgl as lv
 
-   # Create a Button and a Label
+   # Create a button with a label
    scr = lv.obj()
-   btn = lv.btn(scr)
-   btn.align(lv.screen_active(), lv.ALIGN.CENTER, 0, 0)
+   btn = lv.button(scr)
+   btn.align(lv.ALIGN.CENTER, 0, 0)
    label = lv.label(btn)
-   label.set_text("Button")
-
-   # Load the screen
+   label.set_text('Hello World!')
    lv.screen_load(scr)

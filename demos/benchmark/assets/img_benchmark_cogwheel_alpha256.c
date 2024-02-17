@@ -133,8 +133,9 @@ const lv_image_dsc_t img_benchmark_cogwheel_alpha256 = {
     .header.cf = LV_COLOR_FORMAT_A8,
     .header.w = 100,
     .header.h = 100,
-    .data_size = 10000,
+    .header.stride = 100,
     .data = img_benchmark_cogwheel_alpha256_map,
+    .data_size = sizeof(img_benchmark_cogwheel_alpha256_map),
 };
 
 #endif

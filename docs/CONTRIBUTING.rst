@@ -22,68 +22,27 @@ Ways to contribute
 -------------------
 
 - **Spread the Word**: Share your LVGL experience with friends or on social media to boost its visibility.
-- **Star the LVGL `repository <https://github.com/lvgl/lvgl>`__** Give us a star on GitHub! It helps a lot to LVGL more appealing for newcomers.
+- **Star LVGL**   Give us a star on `GitHub <https://github.com/lvgl/lvgl>`__ ! It helps a lot to LVGL more appealing for newcomers.
 - **Report a bug**: Open a `GitHub Issue <https://github.com/lvgl/lvgl/issues>`__ if something is not working.
-- **Join our `Forum <https://forum.lvgl.io/>`__**: Meet fellow developers and discuss questions
+- **Join our** `Forum <https://forum.lvgl.io/>`__ : Meet fellow developers and discuss questions
 - **Tell your ideas**: If you miss something from LVGL we would love to hear about it in a `GitHub Issue <https://github.com/lvgl/lvgl/issues>`__
-- **Develop features**: Develop a pitch! Learn more below.
+- **Develop features**: Help to design or develop a feature. See below.
 
 
-Feature development workflow
-----------------------------
+Mid and large scale issues are discussed in `Feature planning <https://github.com/lvgl/lvgl/issues/new?assignees=&labels=&projects=&template=feat-planning.yml>`__ issues.
 
-Terminology
-~~~~~~~~~~~
-
-- **Shaping**: Convert raw ideas into something that can be developed. It includes examining opportunities, finding similar feature requests, roughly planning how it shall be implemented, tested, and taught through docs and examples.
-- **Pitch**: A document that is the result of shaping.
-
-Schedule
-~~~~~~~~
-
-We are working in 8-week cycles, each cycle starting at the beginning of odd months (e.g, a cycle could be from March to April).
-
-- **Weeks 1-2: Cool Down** (A relaxed period to step back, plan, fix bugs, and make a release):
-  - Close the previous development phase: Feature stop, bug fixes, release, discuss anything that can be improved.
-  - Prepare for the next development phase: Ideas, shaping, pitch creation.
-- **Weeks 3-8: Develop** Work on the planned pitches.
+An issue can be developed when all the questions in the issue template are answered and there is no objection from any core member.
 
 
-Feature Development Issue
-~~~~~~~~~~~~~~~~~~~~~~~~~
+We are using GitHub Labels to show the state of the issue:
 
-For each raw idea, there is a dedicated issue where it's being "shaped". Anyone can open an idea/feature request issue and anyone can help the shaping process with comments.
-
-We area using GitHub Labels to show the state of the issue:
-
-- ``shaping``: Still discussing how to approach it.
-- ``pitched``: We have come to a conclusion and created a pitch.
+- ``planning``: Still discussing how to approach it.
+- ``outlined``: We have come to a conclusion and the feature is ready to be developed.
 - ``request-change(<user-name>)``: Each core member has a dedicated label, and when they request a change, they add their label.
 - ``under development``: It's being developed by someone (can be developed only if no change is requested by the end of the cool-down phase).
 - ``ready``: The pitch is developed and merged into master.
 - ``stale``: Inactive, can be warmed up.
 - ``rejected``: Not interested in this feature for some reason.
-
-Pitch Files
-~~~~~~~~~~~
-
-There is a `pitches <https://github.com/lvgl/lvgl/tree/pitches>`__ branch in the LVGL repository which contains the already finished and the planned pitch Markdown files.
-
-See the `Template Pitch <https://github.com/lvgl/lvgl/blob/pitches/__pitch_template.md>`__ file to see how a pitch looks like.
-
-Workflow
-~~~~~~~~
-
-1. Someone opens a new issue with an idea.
-2. Others jump in to comment on it. Core members play an important role in really understanding the problem and possible solutions, and request changes if needed. This is the shaping phase.
-3. It might take any length of time to shape an idea, but finally, it will be either converted to a pitch (created by a core member or a community member) or will become stale and closed.
-4. Pitches are typically created during the cool-down phase. Once we have a pitch, the development of the pitch can be undertaken by anyone (original author of the idea, other community member, core member). If someone applies for the development of the pitch, he/she will be marked as Responsible in the issue.
-5. Create a new branch for the developed pitch and continuously merge there via PRs.
-6. A pitch is ready if tests, docs, and examples are added.
-7. Finally, a PR is created against the ``master`` branch, which needs to be approved by the core members.
-8. Anything merged to the ``master`` branch by the end of the Development phase will be part of the release. Anything not ready can be continued; however, if it takes too long, it should be reviewed and shaped again.
-9. If a pitch is not taken by anyone in the next cool-down phase, it will be closed as stale.
-
 
 .. _contributing_pull_request:
 

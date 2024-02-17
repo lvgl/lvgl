@@ -62,6 +62,8 @@ void lv_draw_vg_lite_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_sh
     lv_area_t draw_area;
     if(!_lv_area_intersect(&draw_area, &shadow_area, draw_unit->clip_area)) return;
 
+    LV_PROFILER_BEGIN;
+
     lv_draw_border_dsc_t border_dsc;
     lv_draw_border_dsc_init(&border_dsc);
     border_dsc.width = 3;
@@ -88,6 +90,7 @@ void lv_draw_vg_lite_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_sh
             lv_draw_vg_lite_fill(draw_unit, &fill_dsc, &core_area);
         }
     }
+    LV_PROFILER_END;
 }
 
 /**********************

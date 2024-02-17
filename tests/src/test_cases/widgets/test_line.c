@@ -110,4 +110,39 @@ void test_line_basic_render(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/line_1.png");
 }
 
+void test_line_dash_gap(void)
+{
+    static lv_point_precise_t line_points1[3] = { {50, 50}, {250, 50}, {250, 250} };
+    static lv_point_precise_t line_points2[3] = { {50, 250}, {50, 50}, {250, 50} };
+
+    lv_obj_t * line1;
+    line1 = lv_line_create(lv_screen_active());
+    lv_line_set_points(line1, line_points1, 3);
+    lv_obj_set_style_line_width(line1, 1, LV_PART_MAIN);
+    lv_obj_set_style_line_dash_width(line1, 1, LV_PART_MAIN);
+    lv_obj_set_style_line_dash_gap(line1, 1, LV_PART_MAIN);
+
+    lv_obj_align(line1, LV_ALIGN_LEFT_MID, 0, 0);
+
+    lv_obj_t * line2;
+    line2 = lv_line_create(lv_screen_active());
+    lv_line_set_points(line2, line_points2, 3);
+    lv_obj_set_style_line_width(line2, 2, LV_PART_MAIN);
+    lv_obj_set_style_line_dash_width(line2, 2, LV_PART_MAIN);
+    lv_obj_set_style_line_dash_gap(line2, 2, LV_PART_MAIN);
+
+    lv_obj_center(line2);
+
+    lv_obj_t * line3;
+    line3 = lv_line_create(lv_screen_active());
+    lv_line_set_points(line3, line_points2, 3);
+    lv_obj_set_style_line_width(line3, 5, LV_PART_MAIN);
+    lv_obj_set_style_line_dash_width(line3, 3, LV_PART_MAIN);
+    lv_obj_set_style_line_dash_gap(line3, 1, LV_PART_MAIN);
+
+    lv_obj_align(line3, LV_ALIGN_RIGHT_MID, 0, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/line_2.png");
+}
+
 #endif

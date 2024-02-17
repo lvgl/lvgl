@@ -19,6 +19,12 @@ static lv_obj_t * create_panel(int32_t radius, bool transform)
     lv_obj_set_style_pad_all(parent, 3, 0);
     lv_obj_set_style_radius(parent, radius, 0);
     lv_obj_set_style_clip_corner(parent, true, 0);
+    lv_obj_set_style_shadow_color(parent, lv_color_hex(0x888888), 0);
+    lv_obj_set_style_shadow_width(parent, 30, 0);
+    lv_obj_set_style_shadow_spread(parent, 10, 0);
+    lv_obj_set_style_outline_color(parent, lv_color_hex(0xff0000), 0);
+    lv_obj_set_style_outline_width(parent, 2, 0);
+    lv_obj_set_style_outline_pad(parent, 5, 0);
     if(transform) lv_obj_set_style_transform_rotation(parent, 300, 0);
 
     lv_obj_t * label = lv_label_create(parent);
@@ -35,7 +41,7 @@ static lv_obj_t * create_panel(int32_t radius, bool transform)
     return parent;
 }
 
-void test_func_1(void)
+void test_clip_corner_1(void)
 {
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
@@ -52,7 +58,7 @@ void test_func_1(void)
     create_panel(30, true);
     create_panel(100, true);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("clip_corner_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("draw/clip_corner_1.png");
 
 }
 

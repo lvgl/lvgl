@@ -115,10 +115,6 @@ typedef struct {
     lv_style_t table_cell;
 #endif
 
-#if LV_USE_METER
-    lv_style_t meter_marker, meter_indic;
-#endif
-
 #if LV_USE_TEXTAREA
     lv_style_t ta_cursor, ta_placeholder;
 #endif
@@ -403,10 +399,10 @@ static void style_init(my_theme_t * theme)
     lv_style_set_radius(&theme->styles.knob, LV_RADIUS_CIRCLE);
 
     style_init_reset(&theme->styles.anim);
-    lv_style_set_anim_time(&theme->styles.anim, 200);
+    lv_style_set_anim_duration(&theme->styles.anim, 200);
 
     style_init_reset(&theme->styles.anim_fast);
-    lv_style_set_anim_time(&theme->styles.anim_fast, 120);
+    lv_style_set_anim_duration(&theme->styles.anim_fast, 120);
 
 #if LV_USE_ARC
     style_init_reset(&theme->styles.arc_indic);
@@ -531,24 +527,6 @@ static void style_init(my_theme_t * theme)
     lv_style_set_pad_ver(&theme->styles.menu_separator, PAD_TINY);
 #endif
 
-#if LV_USE_METER
-    style_init_reset(&theme->styles.meter_marker);
-    lv_style_set_line_width(&theme->styles.meter_marker, _LV_DPX_CALC(theme->disp_dpi, 5));
-    lv_style_set_line_color(&theme->styles.meter_marker, theme->color_text);
-
-    int32_t meter_size = _LV_DPX_CALC(theme->disp_dpi, 20);
-    lv_style_set_size(&theme->styles.meter_marker, meter_size, meter_size);
-
-    meter_size = _LV_DPX_CALC(theme->disp_dpi, 15);
-    lv_style_set_pad_left(&theme->styles.meter_marker, meter_size);
-
-    style_init_reset(&theme->styles.meter_indic);
-    lv_style_set_radius(&theme->styles.meter_indic, LV_RADIUS_CIRCLE);
-    lv_style_set_bg_color(&theme->styles.meter_indic, theme->color_text);
-    lv_style_set_bg_opa(&theme->styles.meter_indic, LV_OPA_COVER);
-    lv_style_set_size(&theme->styles.meter_indic, meter_size, meter_size);
-#endif
-
 #if LV_USE_TABLE
     style_init_reset(&theme->styles.table_cell);
     lv_style_set_border_width(&theme->styles.table_cell, _LV_DPX_CALC(theme->disp_dpi, 1));
@@ -562,7 +540,7 @@ static void style_init(my_theme_t * theme)
     lv_style_set_border_width(&theme->styles.ta_cursor, _LV_DPX_CALC(theme->disp_dpi, 2));
     lv_style_set_pad_left(&theme->styles.ta_cursor, - _LV_DPX_CALC(theme->disp_dpi, 1));
     lv_style_set_border_side(&theme->styles.ta_cursor, LV_BORDER_SIDE_LEFT);
-    lv_style_set_anim_time(&theme->styles.ta_cursor, 400);
+    lv_style_set_anim_duration(&theme->styles.ta_cursor, 400);
 
     style_init_reset(&theme->styles.ta_placeholder);
     lv_style_set_text_color(&theme->styles.ta_placeholder,
@@ -808,14 +786,16 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_TABVIEW
         lv_obj_t * parent = lv_obj_get_parent(obj);
-        if(parent && lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
-            lv_obj_add_style(obj, &theme->styles.pressed, LV_STATE_PRESSED);
-            lv_obj_add_style(obj, &theme->styles.bg_color_primary_muted, LV_STATE_CHECKED);
-            lv_obj_add_style(obj, &theme->styles.tab_btn, LV_STATE_CHECKED);
-            lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
-            lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
-            lv_obj_add_style(obj, &theme->styles.tab_bg_focus, LV_STATE_FOCUS_KEY);
-            return;
+        if(parent && lv_obj_get_index(parent) == 0) { /*Tabview header*/
+            if(lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
+                lv_obj_add_style(obj, &theme->styles.pressed, LV_STATE_PRESSED);
+                lv_obj_add_style(obj, &theme->styles.bg_color_primary_muted, LV_STATE_CHECKED);
+                lv_obj_add_style(obj, &theme->styles.tab_btn, LV_STATE_CHECKED);
+                lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
+                lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
+                lv_obj_add_style(obj, &theme->styles.tab_bg_focus, LV_STATE_FOCUS_KEY);
+                return;
+            }
         }
 
 #endif
@@ -1024,14 +1004,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.arc_indic_primary, LV_PART_INDICATOR);
     }
 #endif
-
-    //#if LV_USE_METER
-    //    else if(lv_obj_check_type(obj, &lv_meter_class)) {
-    //        lv_obj_add_style(obj, &theme->styles.card, 0);
-    //        lv_obj_add_style(obj, &theme->styles.circle, 0);
-    //        lv_obj_add_style(obj, &theme->styles.meter_indic, LV_PART_INDICATOR);
-    //    }
-    //#endif
 
 #if LV_USE_TEXTAREA
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {

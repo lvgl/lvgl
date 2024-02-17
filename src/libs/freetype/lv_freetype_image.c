@@ -29,9 +29,9 @@ typedef struct _lv_freetype_image_cache_data_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc,
-                                                    uint32_t unicode_letter,
-                                                    uint8_t * bitmap_out);
+static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
+                                                 uint32_t unicode_letter,
+                                                 lv_draw_buf_t * draw_buf);
 
 static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void * user_data);
 static void freetype_image_free_cb(lv_freetype_image_cache_data_t * node, void * user_data);
@@ -51,49 +51,38 @@ static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_freetype_image_font_create(lv_freetype_font_dsc_t * dsc)
+lv_cache_t * lv_freetype_create_draw_data_image(void)
 {
-    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-    dsc->font.get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
-    dsc->font.release_glyph = freetype_image_release_cb;
-
-    FT_Face face = dsc->cache_node->face;
-
-    if(dsc->style & LV_FREETYPE_FONT_STYLE_ITALIC) {
-        lv_freetype_italic_transform(face);
-    }
-
     lv_cache_ops_t ops = {
         .compare_cb = (lv_cache_compare_cb_t)freetype_image_compare_cb,
         .create_cb = (lv_cache_create_cb_t)freetype_image_create_cb,
         .free_cb = (lv_cache_free_cb_t)freetype_image_free_cb,
     };
 
-    if(dsc->cache_node->draw_data_cache) {
-        return true;
-    }
+    lv_cache_t * draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_image_cache_data_t),
+                                                   LV_FREETYPE_CACHE_FT_GLYPH_CNT, ops);
 
-    dsc->cache_node->draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_image_cache_data_t),
-                                                       LV_FREETYPE_CACHE_FT_OUTLINES, ops);
-    if(dsc->cache_node->draw_data_cache == NULL || dsc->cache_node->glyph_cache == NULL) {
-        LV_LOG_ERROR("lv_cache_create failed");
-        return NULL;
-    }
+    return draw_data_cache;
+}
 
-    return true;
+void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc)
+{
+    LV_ASSERT_FREETYPE_FONT_DSC(dsc);
+    dsc->font.get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
+    dsc->font.release_glyph = freetype_image_release_cb;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc,
-                                                    uint32_t unicode_letter,
-                                                    uint8_t * bitmap_out)
+static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
+                                                 uint32_t unicode_letter,
+                                                 lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(unicode_letter);
-    LV_UNUSED(bitmap_out);
-
+    LV_UNUSED(draw_buf);
+    const lv_font_t * font = g_dsc->resolved_font;
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
@@ -113,7 +102,7 @@ static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, lv_f
     g_dsc->entry = entry;
     lv_freetype_image_cache_data_t * cache_node = lv_cache_entry_get_data(entry);
 
-    return cache_node->draw_buf->data;
+    return cache_node->draw_buf;
 }
 
 static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)

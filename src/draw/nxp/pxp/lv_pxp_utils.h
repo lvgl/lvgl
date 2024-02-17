@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2023 NXP
+ * Copyright 2023-2024 NXP
  *
  * SPDX-License-Identifier: MIT
  */
@@ -29,6 +29,20 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#if LV_USE_PXP_ASSERT
+#define PXP_ASSERT(expr) LV_ASSERT(expr)
+#else
+#define PXP_ASSERT(expr)
+#endif
+
+#define PXP_ASSERT_MSG(expr, msg)                                    \
+    do {                                                             \
+        if(!(expr)) {                                                \
+            LV_LOG_ERROR(msg);                                       \
+            PXP_ASSERT(false);                                       \
+        }                                                            \
+    } while(0)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -46,6 +60,8 @@ pxp_output_pixel_format_t pxp_get_out_px_format(lv_color_format_t cf);
 pxp_as_pixel_format_t pxp_get_as_px_format(lv_color_format_t cf);
 
 pxp_ps_pixel_format_t pxp_get_ps_px_format(lv_color_format_t cf);
+
+bool pxp_buf_aligned(const void * buf, uint32_t stride);
 
 /**********************
  *      MACROS

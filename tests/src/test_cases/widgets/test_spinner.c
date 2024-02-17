@@ -26,7 +26,7 @@ void test_spinner_spinning(void)
         lv_task_handler();
 
         char filename[32];
-        snprintf(filename, sizeof(filename), "widgets/spinner_%02d.png", i);
+        lv_snprintf(filename, sizeof(filename), "widgets/spinner_%02d.png", i);
         TEST_ASSERT_EQUAL_SCREENSHOT(filename);
     }
 }

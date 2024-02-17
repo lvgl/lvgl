@@ -40,6 +40,7 @@ extern "C" {
 typedef struct {
     lv_obj_t obj;
     const void * src;   /**< Image source: Pointer to an array or a file or a symbol*/
+    const lv_image_dsc_t * bitmap_mask_src; /**< Pointer to an A8 bitmap mask */
     lv_point_t offset;
     int32_t w;          /**< Width of the image (Handled by the library)*/
     int32_t h;          /**< Height of the image (Handled by the library)*/
@@ -228,7 +229,14 @@ void lv_image_set_antialias(lv_obj_t * obj, bool antialias);
  * @note            if image_align is `LV_IMAGE_ALIGN_STRETCH` or `LV_IMAGE_ALIGN_FIT`
  *                  rotation, scale and pivot will be overwritten and controlled internally.
  */
-void lv_image_set_align(lv_obj_t * obj, lv_image_align_t align);
+void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align);
+
+/**
+ * Set an A8 bitmap mask for the image.
+ * @param obj       pointer to an image object
+ * @param src       an lv_image_dsc_t bitmap mask source.
+ */
+void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src);
 
 /*=====================
  * Getter functions
@@ -312,7 +320,14 @@ bool lv_image_get_antialias(lv_obj_t * obj);
  * @param obj       pointer to an image object
  * @return          element of @ref lv_image_align_t
  */
-lv_image_align_t lv_image_get_align(lv_obj_t * obj);
+lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj);
+
+/**
+ * Get the bitmap mask source.
+ * @param obj       pointer to an image object
+ * @return          an lv_image_dsc_t bitmap mask source.
+ */
+const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj);
 
 /**********************
  *      MACROS

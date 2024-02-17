@@ -22,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_slider_class
+#define MY_CLASS (&lv_slider_class)
 
 #define LV_SLIDER_KNOB_COORD(is_reversed, area) (is_reversed ? area.x1 : area.x2)
 #define LV_SLIDER_KNOB_COORD_VERTICAL(is_reversed, area) (is_reversed ? area.y2 : area.y1)
@@ -110,7 +110,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
     lv_slider_mode_t type = lv_slider_get_mode(obj);
 
@@ -231,7 +231,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_knob(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
 

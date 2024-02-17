@@ -35,7 +35,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_line_dsc_t));
     dsc->width = 1;
@@ -43,7 +43,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
+lv_draw_line_dsc_t * lv_draw_task_get_line_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_LINE ? (lv_draw_line_dsc_t *)task->draw_dsc : NULL;
+}
+
+void LV_ATTRIBUTE_FAST_MEM lv_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
 {
     LV_PROFILER_BEGIN;
     lv_area_t a;

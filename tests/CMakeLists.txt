@@ -6,16 +6,23 @@ if(ESP_PLATFORM)
 
 else()
 
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 project(lvgl_tests LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 99)
+
+set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address)
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 function(filter_compiler_options lang options_out)
     set(options ${ARGN})
     foreach(option ${options})
+        if (option IN_LIST FLAG_CHECK_WHITELIST)
+            list(APPEND ${options_out} ${option})
+            continue()
+        endif ()
+
         string(TOUPPER FLAG_SUPPORTED_FOR_${lang}_${option} option_var_name)
 
         if (${lang} STREQUAL C)
@@ -42,6 +49,10 @@ include(CTest)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+
+set(LVGL_TEST_OPTIONS_VG_LITE
+    -DLV_TEST_OPTION=6
+)
 
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
     -DLV_TEST_OPTION=1
@@ -78,7 +89,9 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     --coverage
 )
 
-if (OPTIONS_NORMAL_8BIT)
+if (OPTIONS_VG_LITE)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE})
+elseif (OPTIONS_NORMAL_8BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_NORMAL_8BIT})
 elseif (OPTIONS_16BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_16BIT})
@@ -88,14 +101,12 @@ elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST_SYSHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address -fsanitize=leak -fsanitize=undefined --coverage)
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=leak -fsanitize=undefined)
-    list(APPEND TEST_LIBS -fsanitize=address)
+    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=leak -fsanitize=undefined)
-    list(APPEND TEST_LIBS -fsanitize=address)
+    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
@@ -198,22 +209,23 @@ add_library(test_common
         src/test_assets/test_img_cogwheel_rgb565a8.c
         src/test_assets/test_img_cogwheel_xrgb8888.c
         src/test_assets/test_img_cogwheel_argb8888.c
-        src/test_assets/font_1.c
-        src/test_assets/font_2.c
-        src/test_assets/font_3.c
+        src/test_assets/test_font_1.c
+        src/test_assets/test_font_2.c
+        src/test_assets/test_font_3.c
         src/test_assets/test_font_montserrat_ascii_1bpp.c
         src/test_assets/test_font_montserrat_ascii_2bpp.c
         src/test_assets/test_font_montserrat_ascii_4bpp.c
         src/test_assets/test_font_montserrat_ascii_4bpp_compressed.c
-        src/test_assets/font_1_bin.c
-        src/test_assets/font_2_bin.c
-        src/test_assets/font_3_bin.c
+        src/test_assets/test_font_1_bin.c
+        src/test_assets/test_font_2_bin.c
+        src/test_assets/test_font_3_bin.c
         src/test_assets/test_img_caret_down.c
         src/test_assets/test_arc_bg.c
         src/test_assets/test_img_lvgl_logo_png.c
         src/test_assets/test_img_lvgl_logo_jpg.c
-        src/test_assets/ubuntu_font.c
-        src/test_assets/kern_one_otf.c
+        src/test_assets/test_img_emoji_F617.c
+        src/test_assets/test_ubuntu_font.c
+        src/test_assets/test_kern_one_otf.c
         unity/unity_support.c
         unity/unity.c
         ${TEST_IMAGES_SRC}
@@ -240,6 +252,14 @@ include_directories(${PNG_INCLUDE_DIR})
 # libfreetype is required for the font test case
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
+
+# libinput is required for the libinput device driver test case
+find_package(Libinput REQUIRED)
+include_directories(${LIBINPUT_INCLUDE_DIRS})
+
+# libxkbcommon is required for the libinput device driver test case
+find_package(PkgConfig)
+pkg_check_modules(xkbcommon REQUIRED xkbcommon)
 
 # disable test targets for build only tests
 if (ENABLE_TESTS)
@@ -276,6 +296,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             lvgl_thorvg
             ${PNG_LIBRARIES}
             ${FREETYPE_LIBRARIES}
+            ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             m
             ${TEST_LIBS})

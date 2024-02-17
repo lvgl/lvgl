@@ -68,19 +68,18 @@ Set tab bar position
 Using the :cpp:expr:`lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT/RIGHT/TOP/BOTTOM)`
 the tab bar can be moved to any sides.
 
-Set tab bra size
+Set tab bar size
 ----------------
 
-The size of the tab bar can be adjusted by :spp:expr:`lv_tabview_set_tab_bar_size(tabview, size)`
+The size of the tab bar can be adjusted by :cpp:expr:`lv_tabview_set_tab_bar_size(tabview, size)`
 In case of vertical arrangement is means the height of the tab bar, and in horizontal
 arrangement it means the width.
 
 Get the parts
 -------------
 
-:cpp:expr:`lv_tabview_get_content(tabview)` returns the container for the tabs,
-:cpp:expr:`lv_tabview_get_tab_buttons(tabview)` returns the Tab buttons object
-which is a :ref:`Button matrix <lv_buttonmatrix>`.
+- :cpp:expr:`lv_tabview_get_content(tabview)` returns the container for tabs content
+- :cpp:expr:`lv_tabview_get_tab_bar(tabview)` returns the container for tabs buttons
 
 .. _lv_tabview_events:
 
@@ -98,8 +97,8 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-Keys have effect only on the tab buttons (Button matrix). Add manually
-to a group if required.
+Keys have effect only on the tab buttons.
+Add manually to a group if required.
 
 Learn more about :ref:`indev_keys`.
 

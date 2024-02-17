@@ -1,6 +1,6 @@
 #include "../../../lvgl.h"
 
-#if LV_BUILD_EXAMPLES && LV_USE_ANIMIMG
+#if LV_BUILD_TEST && LV_USE_ANIMIMG
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
@@ -187,8 +187,9 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_ANIMIMG
 const lv_image_dsc_t test_animimg003 = {
     .header.w = 130,
     .header.h = 170,
+    .header.stride = 520,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = test_animimg003_map,
 };
 
-#endif /* LV_BUILD_EXAMPLES */
+#endif /* LV_BUILD_TEST */

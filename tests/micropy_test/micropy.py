@@ -83,15 +83,10 @@ disp_drv = lv.display_create(WIDTH, HEIGHT)
 disp_drv.set_flush_cb(flush)
 disp_drv.set_color_format(lv.COLOR_FORMAT.RGB888)
 
+buf = lv.draw_buf_create(WIDTH, HEIGHT, lv.COLOR_FORMAT.RGB888, 0)
 color_size = lv.color_format_get_size(disp_drv.get_color_format())
-
-buf = bytearray(WIDTH * HEIGHT * color_size)
-disp_drv.set_draw_buffers(
-    buf,
-    None,
-    WIDTH * HEIGHT * color_size,
-    lv.DISPLAY_RENDER_MODE.FULL
-    )
+disp_drv.set_draw_buffers(buf, None)
+disp_drv.set_render_mode(lv.DISPLAY_RENDER_MODE.FULL)
 
 
 @test_func_wrapper
@@ -120,8 +115,7 @@ def create_ui():
     try:
         font_montserrat_24 = lv.font_montserrat_24
     except AttributeError:
-        font_montserrat_24 = lv.font_t()
-        lv.tiny_ttf_create_file(font_montserrat_24, 'A:font_montserrat_24.ttf', 32)
+        font_montserrat_24 = lv.tiny_ttf_create_file('A:font_montserrat_24.ttf', 32)
 
     style_big_font.set_text_font(font_montserrat_24)
 

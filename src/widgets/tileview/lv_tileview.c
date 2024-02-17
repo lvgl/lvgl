@@ -70,8 +70,7 @@ lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, l
 
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_tileview_tile_class, tv);
     lv_obj_class_init_obj(obj);
-    lv_obj_set_pos(obj, col_id * lv_obj_get_content_width(tv),
-                   row_id * lv_obj_get_content_height(tv));
+    lv_obj_set_pos(obj, lv_pct(col_id * 100), lv_pct(row_id * 100));
 
     lv_tileview_tile_t * tile = (lv_tileview_tile_t *)obj;
     tile->dir = dir;
@@ -151,7 +150,7 @@ static void lv_tileview_tile_constructor(const lv_obj_class_t * class_p, lv_obj_
 static void tileview_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_tileview_t * tv = (lv_tileview_t *) obj;
 
     if(code == LV_EVENT_SCROLL_END) {

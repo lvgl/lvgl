@@ -433,7 +433,7 @@ typedef enum {
 *
 * \return A new Tvg_Canvas object.
 */
-TVG_API Tvg_Canvas* tvg_swcanvas_create();
+TVG_API Tvg_Canvas* tvg_swcanvas_create(void);
 
 
 /*!
@@ -1037,7 +1037,7 @@ TVG_API Tvg_Result tvg_paint_get_blend_method(const Tvg_Paint* paint, Tvg_Blend_
 *
 * \return A new shape object.
 */
-TVG_API Tvg_Paint* tvg_shape_new();
+TVG_API Tvg_Paint* tvg_shape_new(void);
 
 
 /*!
@@ -1712,7 +1712,7 @@ TVG_API Tvg_Result tvg_shape_get_gradient(const Tvg_Paint* paint, Tvg_Gradient**
 *
 * \return A new linear gradient object.
 */
-TVG_API Tvg_Gradient* tvg_linear_gradient_new();
+TVG_API Tvg_Gradient* tvg_linear_gradient_new(void);
 
 
 /*!
@@ -1734,7 +1734,7 @@ TVG_API Tvg_Gradient* tvg_linear_gradient_new();
 *
 * \return A new radial gradient object.
 */
-TVG_API Tvg_Gradient* tvg_radial_gradient_new();
+TVG_API Tvg_Gradient* tvg_radial_gradient_new(void);
 
 
 /*!
@@ -1956,7 +1956,7 @@ TVG_API Tvg_Result tvg_gradient_del(Tvg_Gradient* grad);
 *
 * \return A new picture object.
 */
-TVG_API Tvg_Paint* tvg_picture_new();
+TVG_API Tvg_Paint* tvg_picture_new(void);
 
 
 /*!
@@ -2063,7 +2063,7 @@ TVG_API Tvg_Result tvg_picture_get_size(const Tvg_Paint* paint, float* w, float*
 *
 * \return A new scene object.
 */
-TVG_API Tvg_Paint* tvg_scene_new();
+TVG_API Tvg_Paint* tvg_scene_new(void);
 
 
 /*!
@@ -2141,7 +2141,7 @@ TVG_API Tvg_Result tvg_scene_clear(Tvg_Paint* scene, bool free);
 *
 * \return A new Tvg_Saver object.
 */
-TVG_API Tvg_Saver* tvg_saver_new();
+TVG_API Tvg_Saver* tvg_saver_new(void);
 
 
 /*!
@@ -2223,7 +2223,7 @@ TVG_API Tvg_Result tvg_saver_del(Tvg_Saver* saver);
 *
 * \return Tvg_Animation A new Tvg_Animation object.
 */
-TVG_API Tvg_Animation* tvg_animation_new();
+TVG_API Tvg_Animation* tvg_animation_new(void);
 
 
 /*!

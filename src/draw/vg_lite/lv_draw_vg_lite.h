@@ -52,7 +52,7 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
                           const lv_area_t * coords);
 
 void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
-                         const lv_area_t * coords);
+                         const lv_area_t * coords, bool no_cache);
 
 void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
                            const lv_area_t * coords);

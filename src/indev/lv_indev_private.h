@@ -36,7 +36,7 @@ struct _lv_indev_t {
     /*Flags*/
     uint8_t long_pr_sent : 1;
     uint8_t reset_query : 1;
-    uint8_t disabled : 1;
+    uint8_t enabled : 1;
     uint8_t wait_until_release : 1;
 
     uint32_t pr_timestamp;         /**< Pressed time stamp*/

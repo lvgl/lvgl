@@ -33,13 +33,11 @@ typedef struct error_mgr_s {
  *  STATIC PROTOTYPES
  **********************/
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static lv_draw_buf_t * decode_jpeg_file(const char * filename);
 static bool get_jpeg_size(const char * filename, uint32_t * width, uint32_t * height);
 static void error_exit(j_common_ptr cinfo);
-static void jpeg_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -61,7 +59,7 @@ void lv_libjpeg_turbo_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
-    lv_image_decoder_set_cache_free_cb(dec, (lv_cache_free_cb_t)jpeg_decoder_cache_free_cb);
+    lv_image_decoder_set_cache_free_cb(dec, NULL); /*Use general cache free method*/
 }
 
 void lv_libjpeg_turbo_deinit(void)
@@ -141,15 +139,13 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 
 /**
  * Open a JPEG image and return the decided image
- * @param src can be file name or pointer to a C array
- * @param style style of the image object (unused now but certain formats might use it)
- * @return pointer to the decoded image or  `LV_IMAGE_DECODER_OPEN_FAIL` if failed
+ * @param decoder pointer to the decoder
+ * @param dsc     pointer to the decoder descriptor
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
  */
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
-    LV_UNUSED(args); /*Unused*/
 
     /*If it's a JPEG file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -268,7 +264,7 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
     JSAMPARRAY buffer;  /* Output row buffer */
     int row_stride;     /* physical row width in output buffer */
 
-    uint8_t * output_buffer = NULL;
+    lv_draw_buf_t * decoded = NULL;
 
     /* In this example we want to open the input file before doing anything else,
      * so that the setjmp() error recovery below can assume the file is open.
@@ -293,8 +289,8 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
 
         LV_LOG_WARN("decoding error");
 
-        if(output_buffer) {
-            lv_draw_buf_free(output_buffer);
+        if(decoded) {
+            lv_draw_buf_destroy(decoded);
         }
 
         /* If we get here, the JPEG code has signaled an error.
@@ -344,13 +340,12 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
      * In this example, we need to make an output work buffer of the right size.
      */
     /* JSAMPLEs per row in output buffer */
-    lv_draw_buf_t * decoded;
     row_stride = cinfo.output_width * cinfo.output_components;
     /* Make a one-row-high sample array that will go away when done with image */
     buffer = (*cinfo.mem->alloc_sarray)
              ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
 
-    decoded = lv_draw_buf_create(cinfo.output_width, cinfo.output_height, LV_COLOR_FORMAT_RGB888, 0);
+    decoded = lv_draw_buf_create(cinfo.output_width, cinfo.output_height, LV_COLOR_FORMAT_RGB888, LV_STRIDE_AUTO);
     if(decoded != NULL) {
         uint8_t * cur_pos = decoded->data;
         size_t stride = cinfo.output_width * JPEG_PIXEL_SIZE;
@@ -450,14 +445,6 @@ static void error_exit(j_common_ptr cinfo)
     error_mgr_t * myerr = (error_mgr_t *)cinfo->err;
     (*cinfo->err->output_message)(cinfo);
     longjmp(myerr->jb, 1);
-}
-
-static void jpeg_decoder_cache_free_cb(lv_image_cache_data_t * cached_data, void * user_data)
-{
-    LV_UNUSED(user_data);
-
-    if(cached_data->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)cached_data->src);
-    lv_draw_buf_destroy((lv_draw_buf_t *)cached_data->decoded);
 }
 
 #endif /*LV_USE_LIBJPEG_TURBO*/

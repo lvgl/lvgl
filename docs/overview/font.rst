@@ -13,15 +13,18 @@ For example:
 
    lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /*Set a larger font*/
 
-Fonts have a **bpp (bits per pixel)** property. It shows how many bits
-are used to describe a pixel in a font. The value stored for a pixel
-determines the pixel's opacity. This way, with higher *bpp*, the edges
-of the letter can be smoother. The possible *bpp* values are 1, 2, 4 and
-8 (higher values mean better quality).
+Fonts have a **format** property. It describes how the glyph draw data is stored.
+It has *2* categories: `Legacy simple format` and `Advanced format`.
+In the legacy simple format, the font is stored in a simple array of bitmaps.
+In the advanced format, the font is stored in a different way like `Vector`, `SVG`, etc.
 
-The *bpp* property also affects the amount of memory needed to store a
-font. For example, *bpp = 4* makes a font nearly four times larger
-compared to *bpp = 1*.
+In the legacy simple format, the value stored for a pixel determines the pixel's opacity.
+This way, with higher *bpp (bit per pixel)*, the edges of the letter can be smoother.
+The possible *bpp* values are 1, 2, 4 and 8 (higher values mean better quality).
+
+The *format* property also affects the amount of memory needed to store a
+font. For example, *format = LV_FONT_GLYPH_FORMAT_A4* makes a font nearly four times larger
+compared to *format = LV_FONT_GLYPH_FORMAT_A1*.
 
 Unicode support
 ***************
@@ -142,7 +145,7 @@ The default base direction for screens can be set by
 :c:macro:`LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other objects inherit the
 base direction from their parent.
 
-To set an object's base direction use :cpp:expr:`lv_obj_set_base_dir(obj, base_dir)`.
+To set an object's base direction use :cpp:expr:`lv_obj_set_style_base_dir(obj, base_dir, selector)`.
 The possible base directions are:
 
 - :cpp:enumerator:`LV_BASE_DIR_LTR`: Left to Right base direction
@@ -290,7 +293,7 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
 Load a font at run-time
 ***********************
 
-:cpp:func:`lv_binfont_load` can be used to load a font from a file. The font needs
+:cpp:func:`lv_binfont_create` can be used to load a font from a file. The font needs
 to have a special binary format. (Not TTF or WOFF). Use
 `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ with the
 ``--format bin`` option to generate an LVGL compatible font file.
@@ -302,19 +305,18 @@ Example
 
 .. code:: c
 
-   static lv_font_t my_font;
-   lv_result_t res = lv_binfont_load(&my_font, "X:/path/to/my_font.bin");
-   if(res != LV_RESULT_OK) return;
+   lv_font_t *my_font = lv_binfont_create("X:/path/to/my_font.bin");
+   if(my_font == NULL) return;
 
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(&my_font);
+   lv_binfont_destroy(my_font);
 
 Load a font from a memory buffer at run-time
 ******************************************
 
-:cpp:func:`lv_binfont_load_from_buffer` can be used to load a font from a memory buffer.
+:cpp:func:`lv_binfont_create_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not
 supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
 
@@ -325,7 +327,7 @@ Example
 
 .. code:: c
 
-   static lv_font_t my_font;
+   lv_font_t *my_font;
    uint8_t *buf;
    uint32_t bufsize;
 
@@ -333,12 +335,12 @@ Example
    ...
 
    /*Load font from the buffer*/
-   lv_result_t res = lv_binfont_load_from_buffer(&my_font, (void *)buf, buf));
-   if(res != LV_RESULT_OK) return;
+   my_font = lv_binfont_create_from_buffer((void *)buf, buf));
+   if(my_font == NULL) return;
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(&my_font);
+   lv_binfont_destroy(my_font);
 
 Add a new font engine
 *********************
@@ -383,7 +385,7 @@ To do this, a custom :cpp:type:`lv_font_t` variable needs to be created:
        dsc_out->box_w = 6;         /*Width of the bitmap in [px]*/
        dsc_out->ofs_x = 0;         /*X offset of the bitmap in [pf]*/
        dsc_out->ofs_y = 3;         /*Y offset of the bitmap measured from the as line*/
-       dsc_out->bpp   = 2;         /*Bits per pixel: 1/2/4/8*/
+       dsc_out->format= LV_FONT_GLYPH_FORMAT_A2;
 
        return true;                /*true: glyph found; false: glyph was not found*/
    }

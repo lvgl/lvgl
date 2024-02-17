@@ -7,9 +7,9 @@ static void event_cb(lv_event_t * e)
     lv_obj_t * img = lv_event_get_target(e);
 
     if(snapshot_obj) {
-        lv_image_dsc_t * snapshot = (void *)lv_image_get_src(snapshot_obj);
+        lv_draw_buf_t * snapshot = (lv_draw_buf_t *)lv_image_get_src(snapshot_obj);
         if(snapshot) {
-            lv_snapshot_free(snapshot);
+            lv_draw_buf_destroy(snapshot);
         }
 
         /*Update the snapshot, we know parent of object is the container.*/
@@ -30,7 +30,7 @@ void lv_example_snapshot_1(void)
     lv_obj_t * snapshot_obj = lv_image_create(root);
     lv_obj_set_style_bg_color(snapshot_obj, lv_palette_main(LV_PALETTE_PURPLE), 0);
     lv_obj_set_style_bg_opa(snapshot_obj, LV_OPA_100, 0);
-    lv_image_set_zoom(snapshot_obj, 128);
+    lv_image_set_scale(snapshot_obj, 128);
     lv_image_set_rotation(snapshot_obj, 300);
 
     /*Create the container and its children*/

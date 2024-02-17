@@ -19,6 +19,7 @@ extern "C" {
 #include <stdbool.h>
 
 #include "lv_symbol_def.h"
+#include "../draw/lv_draw_buf.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_types.h"
 #include "../misc/cache/lv_cache.h"
@@ -29,7 +30,7 @@ extern "C" {
 
 /* imgfont identifier */
 #define LV_IMGFONT_BPP 9
-#define LV_VECFONT_BPP 0
+#define LV_VECFONT_BPP 10
 
 /**********************
  *      TYPEDEFS
@@ -38,6 +39,30 @@ extern "C" {
 /*------------------
  * General types
  *-----------------*/
+
+/** The font format.*/
+enum _lv_font_glyph_format_t {
+    LV_FONT_GLYPH_FORMAT_NONE   = 0, /**< Maybe not visible*/
+
+    /**< Legacy simple formats*/
+    LV_FONT_GLYPH_FORMAT_A1     = 0x01, /**< 1 bit per pixel*/
+    LV_FONT_GLYPH_FORMAT_A2     = 0x02, /**< 2 bit per pixel*/
+    LV_FONT_GLYPH_FORMAT_A4     = 0x04, /**< 4 bit per pixel*/
+    LV_FONT_GLYPH_FORMAT_A8     = 0x08, /**< 8 bit per pixel*/
+
+    LV_FONT_GLYPH_FORMAT_IMAGE  = 0x09, /**< Image format*/
+
+    /**< Advanced formats*/
+    LV_FONT_GLYPH_FORMAT_VECTOR = 0x0A, /**< Vectorial format*/
+    LV_FONT_GLYPH_FORMAT_SVG    = 0x0B, /**< SVG format*/
+    LV_FONT_GLYPH_FORMAT_CUSTOM = 0xFF, /**< Custom format*/
+};
+
+#ifdef DOXYGEN
+typedef _lv_font_glyph_format_t lv_font_glyph_format_t;
+#else
+typedef uint8_t lv_font_glyph_format_t;
+#endif /*DOXYGEN*/
 
 /** Describes the properties of a glyph.*/
 typedef struct {
@@ -48,8 +73,8 @@ typedef struct {
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
-    uint8_t bpp: 4;  /**< Bit-per-pixel: 1, 2, 4, 8*/
-    uint8_t is_placeholder: 1; /** Glyph is missing. But placeholder will still be displayed */
+    lv_font_glyph_format_t format;  /**< Font format of the glyph see @lv_font_glyph_format_t*/
+    uint8_t is_placeholder: 1; /**< Glyph is missing. But placeholder will still be displayed*/
 
     uint32_t glyph_index; /**< The index of the glyph in the font file. Used by the font cache*/
     lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
@@ -87,7 +112,7 @@ struct _lv_font_t {
     bool (*get_glyph_dsc)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
-    const uint8_t * (*get_glyph_bitmap)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t, uint8_t *);
+    const void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, uint32_t, lv_draw_buf_t *);
 
     /** Release a glyph*/
     void (*release_glyph)(const lv_font_t *, lv_font_glyph_dsc_t *);
@@ -112,13 +137,13 @@ struct _lv_font_t {
 
 /**
  * Return with the bitmap of a font.
- * @param font_p        pointer to a font
- * @param g_dsc         pass the lv_font_glyph_dsc_t here
+ * @param g_dsc         the glyph descriptor including which font to use etc.
  * @param letter        a UNICODE character code
- * @return pointer to the bitmap of the letter
+ * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
+ * @return pointer to the glyph's data. It can be a draw buffer for bitmap fonts or an image source for imgfonts.
  */
-const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t letter,
-                                         uint8_t * buf_out);
+const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, uint32_t letter,
+                                      lv_draw_buf_t * draw_buf);
 
 /**
  * Get the descriptor of a glyph
@@ -162,7 +187,7 @@ void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning);
  *      MACROS
  **********************/
 
-#define LV_FONT_DECLARE(font_name) extern const lv_font_t font_name;
+#define LV_FONT_DECLARE(font_name) LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_t font_name;
 
 #if LV_FONT_MONTSERRAT_8
 LV_FONT_DECLARE(lv_font_montserrat_8)

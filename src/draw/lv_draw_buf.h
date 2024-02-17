@@ -21,6 +21,10 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/*Use this value to let LVGL calculate stride automatically*/
+#define LV_STRIDE_AUTO 0
+LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -28,7 +32,7 @@ extern "C" {
 typedef struct {
     lv_image_header_t header;
     uint32_t data_size;     /*Total buf size in bytes*/
-    void * data;
+    uint8_t * data;
     void * unaligned_data;  /*Unaligned address of `data`, used internally by lvgl*/
 } lv_draw_buf_t;
 
@@ -69,8 +73,7 @@ typedef void (*lv_draw_buf_free_cb)(void * draw_buf);
 
 typedef void * (*lv_draw_buf_align_cb)(void * buf, lv_color_format_t color_format);
 
-typedef void (*lv_draw_buf_invalidate_cache_cb)(void * buf, uint32_t stride, lv_color_format_t color_format,
-                                                const lv_area_t * area);
+typedef void (*lv_draw_buf_invalidate_cache_cb)(lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
@@ -99,22 +102,6 @@ void _lv_draw_buf_init_handlers(void);
 lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
 
 /**
- * Allocate a buffer with the given size. It might allocate slightly larger buffer to fulfill the alignment requirements.
- * @param size          the size to allocate in bytes
- * @param color_format  the color format of the buffer to allocate
- * @return              the allocated buffer.
- * @note The returned value can be saved in draw_buf->buf
- * @note lv_draw_buf_align can be sued the align the returned pointer
- */
-void * lv_draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format);
-
-/**
- * Free a buffer allocated by lv_draw_buf_malloc
- * @param buf      pointer to a buffer
- */
-void lv_draw_buf_free(void  * buf);
-
-/**
  * Align the address of a buffer. The buffer needs to be large enough for the real data after alignment
  * @param buf           the data to align
  * @param color_format  the color format of the buffer
@@ -124,12 +111,11 @@ void * lv_draw_buf_align(void * buf, lv_color_format_t color_format);
 
 /**
  * Invalidate the cache of the buffer
- * @param buf          a memory address to invalidate
- * @param stride       stride of the buffer
- * @param color_format color format of the buffer
- * @param area         the area to invalidate in the buffer
+ * @param draw_buf     the draw buffer needs to be invalidated
+ * @param area         the area to invalidate in the buffer,
+ *                     use NULL to invalidate the whole draw buffer address range
  */
-void lv_draw_buf_invalidate_cache(void * buf, uint32_t stride, lv_color_format_t color_format, const lv_area_t * area);
+void lv_draw_buf_invalidate_cache(lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 /**
  * Calculate the stride in bytes based on a width and color format
@@ -142,29 +128,21 @@ uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
 /**
  * Clear an area on the buffer
  * @param draw_buf          pointer to draw buffer
- * @param w                 width of the buffer
- * @param h                 height of the buffer
- * @param color_format      color format of the buffer
  * @param a                 the area to clear, or NULL to clear the whole buffer
  */
-void lv_draw_buf_clear(void * buf, uint32_t w, uint32_t h, lv_color_format_t color_format, const lv_area_t * a);
+void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a);
 
 /**
  * Copy an area from a buffer to an other
- * @param dest_buf          pointer to the destination buffer)
- * @param dest_w            width of the destination buffer in pixels
- * @param dest_h            height of the destination buffer in pixels
- * @param dest_area_to_copy the area to copy from the destination buffer
- * @param src_buf           pointer to the source buffer
- * @param src_w             width of the source buffer in pixels
- * @param src_h             height of the source buffer in pixels
- * @param src_area_to_copy  the area to copy from the destination buffer
- * @param color_format      the color format, should be the same for both buffers
- * @note `dest_area_to_copy` and `src_area_to_copy` should have the same width and height
+ * @param dest      pointer to the destination draw buffer
+ * @param dest_area the area to copy from the destination buffer, if NULL, use the whole buffer
+ * @param src       pointer to the source draw buffer
+ * @param src_area  the area to copy from the destination buffer, if NULL, use the whole buffer
+ * @note `dest_area` and `src_area` should have the same width and height
+ * @note  `dest` and `src` should have same color format. Color converting is not supported fow now.
  */
-void lv_draw_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, const lv_area_t * dest_area_to_copy,
-                      void * src_buf,  uint32_t src_w, uint32_t src_h, const lv_area_t * src_area_to_copy,
-                      lv_color_format_t color_format);
+void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
+                      const lv_draw_buf_t * src, const lv_area_t * src_area);
 
 /**
  * Note: Eventually, lv_draw_buf_malloc/free will be kept as private.
@@ -223,12 +201,15 @@ void lv_draw_buf_destroy(lv_draw_buf_t * buf);
 /**
  * Return pointer to the buffer at the given coordinates
  */
-void * lv_draw_buf_goto_xy(lv_draw_buf_t * buf, uint32_t x, uint32_t y);
+void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y);
 
 /**
- * Adjust the stride of a draw buf.
+ * Adjust the stride of a draw buf in place.
+ * @param src       pointer to a draw buffer
+ * @param stride    the new stride in bytes for image. Use LV_STRIDE_AUTO for automatic calculation.
+ * @return          LV_RESULT_OK: success or LV_RESULT_INVALID: failed
  */
-lv_draw_buf_t * lv_draw_buf_adjust_stride(const lv_draw_buf_t * src, uint32_t stride);
+lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride);
 
 /**
  * Premultiply draw buffer color with alpha channel.
@@ -242,6 +223,16 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
 static inline bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
 {
     return draw_buf->header.flags & flag;
+}
+
+static inline void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    draw_buf->header.flags |= flag;
+}
+
+static inline void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    draw_buf->header.flags &= ~flag;
 }
 
 /**

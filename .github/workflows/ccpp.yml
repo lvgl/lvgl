@@ -16,7 +16,8 @@ jobs:
         # See BUILD_OPTIONS in tests/CMakeLists.txt.
         build_option: ['OPTIONS_16BIT',
                        'OPTIONS_24BIT',
-                       'OPTIONS_FULL_32BIT']
+                       'OPTIONS_FULL_32BIT',
+                       "OPTIONS_VG_LITE"]
     name: Build ${{ matrix.build_option }}
     steps:
     - uses: actions/checkout@v4
@@ -35,7 +36,7 @@ jobs:
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Run tests
-      run: python tests/main.py --report test
+      run: python tests/main.py --report --update-image test
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v4
@@ -44,12 +45,12 @@ jobs:
         path: |
              tests/ref_imgs/**/*_err.png
              test_screenshot_error.h
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
-      with:
-        fail_ci_if_error: true
-        verbose: true
+#    - name: Upload coverage to Codecov
+#      uses: codecov/codecov-action@v4
+#      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
+#      with:
+#        fail_ci_if_error: true
+#        verbose: true
   test-cross:
     # The host should always be linux
     runs-on: ubuntu-latest
@@ -64,14 +65,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: Setup cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.ccache
           key: lvgl_ci_cross_test_ccache_${{ matrix.arch }}_${{ github.sha }}
           restore-keys: |
             lvgl_ci_cross_test_ccache_${{ matrix.arch }}
-      - uses: uraimo/run-on-arch-action@v2.6.0
+      - uses: uraimo/run-on-arch-action@v2.7.1
         name: Run tests
         id: build
         with:
@@ -94,7 +95,8 @@ jobs:
 
           install: |
             apt-get update -y
-            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 -q -y
+            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 pngquant python3-pip libinput-dev libxkbcommon-dev pkg-config -q -y
+            pip install pypng lz4
             /usr/sbin/update-ccache-symlinks
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 

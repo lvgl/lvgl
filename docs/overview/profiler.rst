@@ -42,6 +42,8 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
     .. code:: c
 
+        #include <sys/syscall.h>
+        #include <sys/types.h>
         #include <time.h>
 
         static uint32_t my_get_tick_us_cb(void)
@@ -51,12 +53,26 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
             return ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
         }
 
+        static int my_get_tid_cb(void)
+        {
+            return (int)syscall(SYS_gettid);
+        }
+
+        static int my_get_cpu_cb(void)
+        {
+            int cpu_id = 0;
+            syscall(SYS_getcpu, &cpu_id, NULL);
+            return cpu_id;
+        }
+
         void my_profiler_init(void)
         {
             lv_profiler_builtin_config_t config;
             lv_profiler_builtin_config_init(&config);
             config.tick_per_sec = 1000000; /* One second is equal to 1000000 microseconds */
             config.tick_get_cb = my_get_tick_us_cb;
+            config.tid_get_cb = my_get_tid_cb;
+            config.cpu_get_cb = my_get_cpu_cb;
             lv_profiler_builtin_init(&config);
         }
 
@@ -202,8 +218,7 @@ Please check the completeness of the logs. If the logs are incomplete, it may be
 
 1. Serial port reception errors caused by a high baud rate. You need to reduce the baud rate.
 2. Data corruption caused by other thread logs inserted during the printing of trace logs. You need to disable the log output of other threads or refer to the configuration above to use a separate log output interface.
-3. Cross-thread calling of :c:macro:`LV_PROFILER_BEGIN/END`.The built-in LVGL profiler is designed for single-threaded use, so calling it from multiple threads can lead to thread safety issues. If you need to use it in a multi-threaded environment, you can use profiler interfaces provided by your operating system that ensure thread safety.
-4. Make sure that the string passed in by c:macro:`LV_PROFILER_BEGIN_TAG/END_TAG` is not a local variable on the stack or a string in shared memory, because currently only the string address is recorded and the content is not copied.
+3. Make sure that the string passed in by :c:macro:`LV_PROFILER_BEGIN_TAG/END_TAG` is not a local variable on the stack or a string in shared memory, because currently only the string address is recorded and the content is not copied.
 
 Function execution time displayed as 0s in Perfetto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

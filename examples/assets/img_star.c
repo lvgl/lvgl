@@ -46,8 +46,10 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_STA
 const lv_image_dsc_t img_star = {
     .header.w = 30,
     .header.h = 29,
+    .header.stride = 120,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_star_map,
+    .data_size = sizeof(img_star_map),
 };
 
 #endif /* LV_BUILD_EXAMPLES */

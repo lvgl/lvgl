@@ -55,9 +55,14 @@ typedef struct _lv_draw_image_dsc_t {
     lv_opa_t opa;
     lv_blend_mode_t blend_mode : 4;
 
-    uint16_t antialias      : 1;
-    uint16_t tile           : 1;
+    uint16_t antialias          : 1;
+    uint16_t tile               : 1;
     lv_draw_image_sup_t * sup;
+
+    /** Might be used to indicate the original size of the image if only a small portion is rendered now.
+     * Used when a part of a layer is rendered to show the total layer size*/
+    lv_area_t original_area;
+    const lv_image_dsc_t * bitmap_mask_src;
 } lv_draw_image_dsc_t;
 
 /**
@@ -82,6 +87,13 @@ typedef void (*lv_draw_image_core_cb)(lv_draw_unit_t * draw_unit, const lv_draw_
  * @param dsc       pointer to a draw descriptor
  */
 void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc);
+
+/**
+ * Try to get an image draw descriptor from a draw task.
+ * @param task      draw task
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_IMAGE
+ */
+lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task);
 
 /**
  * Create an image draw task

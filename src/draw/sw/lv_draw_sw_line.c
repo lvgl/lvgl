@@ -26,9 +26,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc);
-LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc);
-LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ draw_line_skew(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ draw_line_hor(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ draw_line_ver(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -97,7 +97,7 @@ void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM draw_line_hor(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
 {
     int32_t w = dsc->width - 1;
     int32_t w_half0 = w >> 1;
@@ -152,7 +152,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, cons
                     i += diff;
                     dash_cnt += diff;
                 }
-                else if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
+                else if(dash_cnt > dsc->dash_gap + dsc->dash_width) {
                     dash_cnt = 0;
                 }
                 else {
@@ -172,7 +172,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, cons
 #endif /*LV_DRAW_SW_COMPLEX*/
 }
 
-LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM draw_line_ver(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
 {
     int32_t w = dsc->width - 1;
     int32_t w_half0 = w >> 1;
@@ -243,7 +243,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
 #endif /*LV_DRAW_SW_COMPLEX*/
 }
 
-LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM draw_line_skew(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
 {
 #if LV_DRAW_SW_COMPLEX
     /*Keep the great y in p1*/

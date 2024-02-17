@@ -6,7 +6,6 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
     lv_area_t clipped_area;
     d2_u32      flags = 0;
     d2_u8 current_alpha_mode = 0;
-    lv_area_t buffer_area;
     int32_t x;
     int32_t y;
 
@@ -29,10 +28,7 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
     x = 0 - u->base_unit.target_layer->buf_area.x1;
     y = 0 - u->base_unit.target_layer->buf_area.y1;
 
-    buffer_area = u->base_unit.target_layer->buf_area;
-
     lv_area_move(&clipped_area, x, y);
-    lv_area_move(&buffer_area, x, y);
 
 #if D2_RENDER_EACH_OPERATION
     d2_selectrenderbuffer(u->d2_handle, u->renderbuffer);
@@ -146,12 +142,7 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
 
     }
 
-    d2_framebuffer(u->d2_handle,
-                   u->base_unit.target_layer->buf,
-                   (d2_s32)u->base_unit.target_layer->buf_stride / lv_color_format_get_size(u->base_unit.target_layer->color_format),
-                   (d2_u32)lv_area_get_width(&buffer_area),
-                   (d2_u32)lv_area_get_height(&buffer_area),
-                   lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(u->base_unit.target_layer->color_format));
+    d2_framebuffer_from_layer(u->d2_handle, u->base_unit.target_layer);
 
     d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1, (d2_border)clipped_area.x2,
                 (d2_border)clipped_area.y2);

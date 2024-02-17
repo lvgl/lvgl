@@ -23,7 +23,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_textarea_class
+#define MY_CLASS (&lv_textarea_class)
 
 /*Test configuration*/
 #ifndef LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
@@ -50,7 +50,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void label_event_cb(lv_event_t * e);
 static void cursor_blink_anim_cb(void * obj, int32_t show);
 static void pwd_char_hider_anim(void * obj, int32_t x);
-static void pwd_char_hider_anim_ready(lv_anim_t * a);
+static void pwd_char_hider_anim_completed(lv_anim_t * a);
 static void pwd_char_hider(lv_obj_t * obj);
 static bool char_is_accepted(lv_obj_t * obj, uint32_t c);
 static void start_cursor_blink(lv_obj_t * obj);
@@ -116,14 +116,25 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 
     const char * letter_buf = (char *)&u32_buf;
 
+    uint32_t c2 = c;
 #if LV_BIG_ENDIAN_SYSTEM
     if(c != 0) while(*letter_buf == 0) ++letter_buf;
+
+    /*The byte order may or may not need to be swapped here to get correct c_uni below,
+      since lv_textarea_add_text is ordering bytes correctly before calling lv_textarea_add_char.
+      Assume swapping is needed if MSB is zero. May not be foolproof. */
+    if((c != 0) && ((c & 0xff000000) == 0)) {
+        c2 = ((c >> 24) & 0xff) | /*move byte 3 to byte 0*/
+             ((c << 8) & 0xff0000) | /*move byte 1 to byte 2*/
+             ((c >> 8) & 0xff00) | /*move byte 2 to byte 1*/
+             ((c << 24) & 0xff000000); /*byte 0 to byte 3*/
+    }
 #endif
 
     lv_result_t res = insert_handler(obj, letter_buf);
     if(res != LV_RESULT_OK) return;
 
-    uint32_t c_uni = _lv_text_encoded_next((const char *)&c, NULL);
+    uint32_t c_uni = _lv_text_encoded_next((const char *)&c2, NULL);
 
     if(char_is_accepted(obj, c_uni) == false) {
         LV_LOG_INFO("Character is not accepted by the text area (too long text or not in the accepted list)");
@@ -880,7 +891,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_FOCUSED) {
         start_cursor_blink(obj);
@@ -924,7 +935,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
 static void label_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * label = lv_event_get_target(e);
+    lv_obj_t * label = lv_event_get_current_target(e);
     lv_obj_t * ta = lv_obj_get_parent(label);
 
     if(code == LV_EVENT_STYLE_CHANGED || code == LV_EVENT_SIZE_CHANGED) {
@@ -971,7 +982,7 @@ static void pwd_char_hider_anim(void * obj, int32_t x)
  * Call when an animation is ready to convert all characters to '*'
  * @param a pointer to the animation
  */
-static void pwd_char_hider_anim_ready(lv_anim_t * a)
+static void pwd_char_hider_anim_completed(lv_anim_t * a)
 {
     lv_obj_t * obj = a->var;
     pwd_char_hider(obj);
@@ -1039,7 +1050,7 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c)
 static void start_cursor_blink(lv_obj_t * obj)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    uint32_t blink_time = lv_obj_get_style_anim_time(obj, LV_PART_CURSOR);
+    uint32_t blink_time = lv_obj_get_style_anim_duration(obj, LV_PART_CURSOR);
     if(blink_time == 0) {
         lv_anim_delete(obj, cursor_blink_anim_cb);
         ta->cursor.show = 1;
@@ -1144,7 +1155,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
     lv_indev_t * click_source = lv_indev_active();
     if(click_source == NULL) return;
 
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     if(ta->cursor.click_pos == 0) return;
 
@@ -1279,7 +1290,7 @@ static lv_result_t insert_handler(lv_obj_t * obj, const char * txt)
 
 static void draw_placeholder(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
     const char * txt = lv_label_get_text(ta->label);
@@ -1305,7 +1316,7 @@ static void draw_placeholder(lv_event_t * e)
 
 static void draw_cursor(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
     const char * txt = lv_label_get_text(ta->label);
@@ -1365,7 +1376,7 @@ static void auto_hide_characters(lv_obj_t * obj)
         lv_anim_set_duration(&a, ta->pwd_show_time);
         lv_anim_set_values(&a, 0, 1);
         lv_anim_set_path_cb(&a, lv_anim_path_step);
-        lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
+        lv_anim_set_completed_cb(&a, pwd_char_hider_anim_completed);
         lv_anim_start(&a);
     }
 }

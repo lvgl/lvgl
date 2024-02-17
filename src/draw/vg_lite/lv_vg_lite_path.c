@@ -20,7 +20,6 @@
  *********************/
 
 #define PATH_KAPPA 0.552284f
-#define PATH_MAX_CNT 32
 
 /* Magic number from https://spencermortensen.com/articles/bezier-circle/ */
 #define PATH_ARC_MAGIC 0.55191502449351f
@@ -40,8 +39,6 @@ struct _lv_vg_lite_path_t {
     size_t mem_size;
     uint8_t format_len;
 };
-
-typedef struct _lv_vg_lite_path_t * lv_vg_lite_path_ref_t;
 
 typedef struct {
     float min_x;
@@ -69,25 +66,21 @@ typedef struct {
 void lv_vg_lite_path_init(struct _lv_draw_vg_lite_unit_t * unit)
 {
     LV_ASSERT_NULL(unit);
-    _lv_ll_init(&unit->path_free_ll, sizeof(lv_vg_lite_path_ref_t));
+    unit->global_path = lv_vg_lite_path_create(VG_LITE_FP32);
+    unit->path_in_use = false;
 }
 
 void lv_vg_lite_path_deinit(struct _lv_draw_vg_lite_unit_t * unit)
 {
     LV_ASSERT_NULL(unit);
-
-    lv_ll_t * ll_p = &unit->path_free_ll;
-    lv_vg_lite_path_ref_t * path_ref;
-
-    _LV_LL_READ(ll_p, path_ref) {
-        lv_vg_lite_path_destroy(*path_ref);
-    }
-
-    _lv_ll_clear(ll_p);
+    LV_ASSERT(!unit->path_in_use);
+    lv_vg_lite_path_destroy(unit->global_path);
+    unit->global_path = NULL;
 }
 
 lv_vg_lite_path_t * lv_vg_lite_path_create(vg_lite_format_t data_format)
 {
+    LV_PROFILER_BEGIN;
     lv_vg_lite_path_t * path = lv_malloc_zeroed(sizeof(lv_vg_lite_path_t));
     LV_ASSERT_MALLOC(path);
     path->format_len = lv_vg_lite_path_format_len(data_format);
@@ -99,68 +92,44 @@ lv_vg_lite_path_t * lv_vg_lite_path_create(vg_lite_format_t data_format)
                   NULL,
                   0, 0, 0, 0)
               == VG_LITE_SUCCESS);
+    LV_PROFILER_END;
     return path;
 }
 
 void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path)
 {
+    LV_PROFILER_BEGIN;
     LV_ASSERT_NULL(path);
     if(path->base.path != NULL) {
         lv_free(path->base.path);
         path->base.path = NULL;
     }
     lv_free(path);
+    LV_PROFILER_END;
 }
 
 lv_vg_lite_path_t * lv_vg_lite_path_get(struct _lv_draw_vg_lite_unit_t * unit, vg_lite_format_t data_format)
 {
     LV_ASSERT_NULL(unit);
-
-    unit->path_max_cnt++;
-    LV_ASSERT(unit->path_max_cnt < PATH_MAX_CNT);
-
-    lv_ll_t * ll_p = &unit->path_free_ll;
-
-    lv_vg_lite_path_ref_t * path_ref = _lv_ll_get_head(ll_p);
-    if(path_ref) {
-        lv_vg_lite_path_t * path = *path_ref;
-        lv_vg_lite_path_reset(path, data_format);
-        _lv_ll_remove(ll_p, path_ref);
-        lv_free(path_ref);
-
-        return path;
-    }
-
-    return lv_vg_lite_path_create(data_format);
+    LV_ASSERT_NULL(unit->global_path);
+    LV_ASSERT(!unit->path_in_use);
+    lv_vg_lite_path_reset(unit->global_path, data_format);
+    unit->path_in_use = true;
+    return unit->global_path;
 }
 
 void lv_vg_lite_path_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * path)
 {
     LV_ASSERT_NULL(unit);
     LV_ASSERT_NULL(path);
-
-    unit->path_max_cnt--;
-    LV_ASSERT(unit->path_max_cnt >= 0);
-
-    lv_ll_t * ll_p = &unit->path_free_ll;
-
-    uint32_t len = _lv_ll_get_len(ll_p);
-    if(len >= PATH_MAX_CNT) {
-        lv_vg_lite_path_ref_t * tail = _lv_ll_get_tail(ll_p);
-        lv_vg_lite_path_destroy(*tail);
-        _lv_ll_remove(ll_p, tail);
-        lv_free(tail);
-    }
-
-    lv_vg_lite_path_ref_t * head = _lv_ll_ins_head(ll_p);
-    LV_ASSERT_MALLOC(head);
-    *head = path;
+    LV_ASSERT(unit->global_path == path);
+    LV_ASSERT(unit->path_in_use);
+    unit->path_in_use = false;
 }
 
 void lv_vg_lite_path_reset(lv_vg_lite_path_t * path, vg_lite_format_t data_format)
 {
     LV_ASSERT_NULL(path);
-    lv_memzero(path->base.path, path->mem_size);
     path->base.path_length = 0;
     path->base.format = data_format;
     path->base.quality = VG_LITE_MEDIUM;
@@ -240,6 +209,8 @@ bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path)
         return false;
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_vg_lite_path_bounds_t bounds;
 
     /* init bounds */
@@ -253,6 +224,8 @@ bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path)
 
     /* set bounds */
     lv_vg_lite_path_set_bonding_box(path, bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y);
+
+    LV_PROFILER_END;
 
     return true;
 }
@@ -358,6 +331,7 @@ void lv_vg_lite_path_append_rect(
     float w, float h,
     float rx, float ry)
 {
+    LV_PROFILER_BEGIN;
     const float half_w = w * 0.5f;
     const float half_h = h * 0.5f;
 
@@ -374,12 +348,15 @@ void lv_vg_lite_path_append_rect(
         lv_vg_lite_path_line_to(path, x + w, y + h);
         lv_vg_lite_path_line_to(path, x, y + h);
         lv_vg_lite_path_close(path);
+        LV_PROFILER_END;
         return;
     }
 
     /*circle*/
     if(math_equal(rx, half_w) && math_equal(ry, half_h)) {
-        return lv_vg_lite_path_append_circle(path, x + (w * 0.5f), y + (h * 0.5f), rx, ry);
+        lv_vg_lite_path_append_circle(path, x + (w * 0.5f), y + (h * 0.5f), rx, ry);
+        LV_PROFILER_END;
+        return;
     }
 
     /*rounded rectangle*/
@@ -395,6 +372,7 @@ void lv_vg_lite_path_append_rect(
     lv_vg_lite_path_line_to(path, x, y + ry);
     lv_vg_lite_path_cubic_to(path, x, y + ry - hry, x + rx - hrx, y, x + rx, y);
     lv_vg_lite_path_close(path);
+    LV_PROFILER_END;
 }
 
 void lv_vg_lite_path_append_circle(
@@ -402,6 +380,7 @@ void lv_vg_lite_path_append_circle(
     float cx, float cy,
     float rx, float ry)
 {
+    LV_PROFILER_BEGIN;
     /* https://learn.microsoft.com/zh-cn/xamarin/xamarin-forms/user-interface/graphics/skiasharp/curves/beziers */
     float rx_kappa = rx * PATH_KAPPA;
     float ry_kappa = ry * PATH_KAPPA;
@@ -412,6 +391,7 @@ void lv_vg_lite_path_append_circle(
     lv_vg_lite_path_cubic_to(path, cx - rx_kappa, cy + ry, cx - rx, cy + ry_kappa, cx - rx, cy);
     lv_vg_lite_path_cubic_to(path, cx - rx, cy - ry_kappa, cx - rx_kappa, cy - ry, cx, cy - ry);
     lv_vg_lite_path_close(path);
+    LV_PROFILER_END;
 }
 
 void lv_vg_lite_path_append_arc_right_angle(lv_vg_lite_path_t * path,
@@ -419,6 +399,7 @@ void lv_vg_lite_path_append_arc_right_angle(lv_vg_lite_path_t * path,
                                             float center_x, float center_y,
                                             float end_x, float end_y)
 {
+    LV_PROFILER_BEGIN;
     float dx1 = center_x - start_x;
     float dy1 = center_y - start_y;
     float dx2 = end_x - center_x;
@@ -430,6 +411,7 @@ void lv_vg_lite_path_append_arc_right_angle(lv_vg_lite_path_t * path,
                              start_x - c * dy1, start_y + c * dx1,
                              end_x - c * dy2, end_y + c * dx2,
                              end_x, end_y);
+    LV_PROFILER_END;
 }
 
 void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
@@ -439,15 +421,18 @@ void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
                                 float sweep,
                                 bool pie)
 {
+    LV_PROFILER_BEGIN;
     /* just circle */
     if(sweep >= 360.0f || sweep <= -360.0f) {
-        return lv_vg_lite_path_append_circle(path, cx, cy, radius, radius);
+        lv_vg_lite_path_append_circle(path, cx, cy, radius, radius);
+        LV_PROFILER_END;
+        return;
     }
 
     start_angle = MATH_RADIANS(start_angle);
     sweep = MATH_RADIANS(sweep);
 
-    int n_curves = ceil(MATH_FABSF(sweep / MATH_HALF_PI));
+    int n_curves = (int)ceil(MATH_FABSF(sweep / MATH_HALF_PI));
     int sweep_sign = (sweep < 0 ? -1 : 1);
     float fract = fmodf(sweep, MATH_HALF_PI);
     fract = (math_zero(fract)) ? MATH_HALF_PI * sweep_sign : fract;
@@ -501,6 +486,8 @@ void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
     if(pie) {
         lv_vg_lite_path_close(path);
     }
+
+    LV_PROFILER_END;
 }
 
 uint8_t lv_vg_lite_vlc_op_arg_len(uint8_t vlc_op)

@@ -22,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_templ_class
+#define MY_CLASS (&lv_templ_class)
 
 /**********************
  *      TYPEDEFS

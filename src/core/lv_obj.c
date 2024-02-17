@@ -25,7 +25,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj_class
+#define MY_CLASS (&lv_obj_class)
 #define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
 #define STYLE_TRANSITION_MAX 32
@@ -372,11 +372,8 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
             lv_free(obj->spec_attr->children);
             obj->spec_attr->children = NULL;
         }
-        if(obj->spec_attr->event_list.dsc) {
-            lv_free(obj->spec_attr->event_list.dsc);
-            obj->spec_attr->event_list.dsc = NULL;
-            obj->spec_attr->event_list.cnt = 0;
-        }
+
+        lv_event_remove_all(&obj->spec_attr->event_list);
 
         lv_free(obj->spec_attr);
         obj->spec_attr = NULL;
@@ -390,7 +387,7 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_obj_draw(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     if(code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res == LV_COVER_RES_MASKED) return;
@@ -427,19 +424,18 @@ static void lv_obj_draw(lv_event_t * e)
                 info->res = LV_COVER_RES_NOT_COVER;
                 return;
             }
-            const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad(obj, 0);
-            if(grad_dsc) {
-                uint32_t i;
-                for(i = 0; i < grad_dsc->stops_count; i++) {
-                    if(grad_dsc->stops[i].opa < LV_OPA_MAX) {
-                        info->res = LV_COVER_RES_NOT_COVER;
-                        return;
-                    }
+        }
+        const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad(obj, 0);
+        if(grad_dsc) {
+            uint32_t i;
+            for(i = 0; i < grad_dsc->stops_count; i++) {
+                if(grad_dsc->stops[i].opa < LV_OPA_MAX) {
+                    info->res = LV_COVER_RES_NOT_COVER;
+                    return;
                 }
             }
         }
         info->res = LV_COVER_RES_COVER;
-
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_layer_t * layer = lv_event_get_layer(e);

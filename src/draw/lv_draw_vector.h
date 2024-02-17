@@ -206,6 +206,20 @@ void lv_matrix_skew(lv_matrix_t * matrix, float skew_x, float skew_y);
 void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * matrix2);
 
 /**
+ * Transform the coordinates of a point using given matrix
+ * @param matrix           pointer to a matrix
+ * @param point            pointer to a point
+ */
+void lv_matrix_transform_point(const lv_matrix_t * matrix, lv_fpoint_t * point);
+
+/**
+ * Transform all the coordinates of a path using given matrix
+ * @param matrix           pointer to a matrix
+ * @param path             pointer to a path
+ */
+void lv_matrix_transform_path(const lv_matrix_t * matrix, lv_vector_path_t * path);
+
+/**
  * Create a vector graphic path object
  * @param quality       the quality hint of path
  * @return              pointer to the created path object
@@ -270,6 +284,13 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
 void lv_vector_path_close(lv_vector_path_t * path);
 
 /**
+ * Get the bounding box of a path
+ * @param path              pointer to a path
+ * @param area              pointer to a `lv_area_t` variable for bounding box
+ */
+void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area);
+
+/**
  * Add a rectangle to the path
  * @param path              pointer to a path
  * @param rect              pointer to a `lv_area_t` variable
@@ -286,6 +307,18 @@ void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect,
  * @param ry                the vertical radius for circle
  */
 void lv_vector_path_append_circle(lv_vector_path_t * path, const lv_fpoint_t * c, float rx, float ry);
+
+/**
+ * Add a arc to the path
+ * @param path              pointer to a path
+ * @param c                 pointer to a `lv_fpoint_t` variable for center of the circle
+ * @param radius            the radius for arc
+ * @param start_angle       the start angle for arc
+ * @param sweep             the sweep angle for arc, could be negative
+ * @param pie               true: draw a pie, false: draw a arc
+ */
+void lv_vector_path_append_arc(lv_vector_path_t * path, const lv_fpoint_t * c, float radius, float start_angle,
+                               float sweep, bool pie);
 
 /**
  * Add an sub path to the path

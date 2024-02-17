@@ -109,6 +109,7 @@ const lv_image_dsc_t img_transform_avatar_15 = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .header.w = 80,
     .header.h = 80,
-    .data_size = 0,
+    .header.stride = 320,
     .data = img_transform_avatar_15_map,
+    .data_size = sizeof(img_transform_avatar_15_map),
 };

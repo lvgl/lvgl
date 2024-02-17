@@ -15,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj_class
+#define MY_CLASS (&lv_obj_class)
 #define style_refr LV_GLOBAL_DEFAULT()->style_refresh
 #define style_trans_ll_p &(LV_GLOBAL_DEFAULT()->style_trans_ll)
 #define _style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
@@ -57,11 +57,11 @@ static void refresh_children_style(lv_obj_t * obj);
 static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
 static void trans_anim_cb(void * _tr, int32_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
-static void trans_anim_ready_cb(lv_anim_t * a);
+static void trans_anim_completed_cb(lv_anim_t * a);
 static lv_layer_type_t calculate_layer_type(lv_obj_t * obj);
 static void full_cache_refresh(lv_obj_t * obj, lv_part_t part);
 static void fade_anim_cb(void * obj, int32_t v);
-static void fade_in_anim_ready(lv_anim_t * a);
+static void fade_in_anim_completed(lv_anim_t * a);
 static bool style_has_flag(const lv_style_t * style, uint32_t flag);
 static lv_style_res_t get_selector_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
                                               lv_style_value_t * value_act);
@@ -522,7 +522,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     lv_anim_set_var(&a, tr);
     lv_anim_set_exec_cb(&a, trans_anim_cb);
     lv_anim_set_start_cb(&a, trans_anim_start_cb);
-    lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, trans_anim_completed_cb);
     lv_anim_set_values(&a, 0x00, 0xFF);
     lv_anim_set_duration(&a, tr_dsc->time);
     lv_anim_set_delay(&a, tr_dsc->delay);
@@ -611,7 +611,7 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_set_var(&a, obj);
     lv_anim_set_values(&a, 0, LV_OPA_COVER);
     lv_anim_set_exec_cb(&a, fade_anim_cb);
-    lv_anim_set_ready_cb(&a, fade_in_anim_ready);
+    lv_anim_set_completed_cb(&a, fade_in_anim_completed);
     lv_anim_set_duration(&a, time);
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
@@ -932,7 +932,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 break;
         }
 
-        lv_style_value_t old_value;
+        lv_style_value_t old_value = {0};
         bool refr = true;
         if(lv_style_get_prop(obj->styles[i].style, tr->prop, &old_value)) {
             if(value_final.ptr == old_value.ptr && lv_color_eq(value_final.color, old_value.color) &&
@@ -970,7 +970,7 @@ static void trans_anim_start_cb(lv_anim_t * a)
 
 }
 
-static void trans_anim_ready_cb(lv_anim_t * a)
+static void trans_anim_completed_cb(lv_anim_t * a)
 {
     trans_t * tr = a->var;
     lv_obj_t * obj = tr->obj;
@@ -1016,6 +1016,7 @@ static lv_layer_type_t calculate_layer_type(lv_obj_t * obj)
     if(lv_obj_get_style_transform_skew_x(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_transform_skew_y(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_opa_layered(obj, 0) != LV_OPA_COVER) return LV_LAYER_TYPE_SIMPLE;
+    if(lv_obj_get_style_bitmap_mask_src(obj, 0) != NULL) return LV_LAYER_TYPE_SIMPLE;
     if(lv_obj_get_style_blend_mode(obj, 0) != LV_BLEND_MODE_NORMAL) return LV_LAYER_TYPE_SIMPLE;
     return LV_LAYER_TYPE_NONE;
 }
@@ -1075,7 +1076,7 @@ static void fade_anim_cb(void * obj, int32_t v)
     lv_obj_set_style_opa(obj, v, 0);
 }
 
-static void fade_in_anim_ready(lv_anim_t * a)
+static void fade_in_anim_completed(lv_anim_t * a)
 {
     lv_obj_remove_local_style_prop(a->var, LV_STYLE_OPA, 0);
 }

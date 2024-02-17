@@ -6,20 +6,31 @@ Arm-2D is not a GPU but **an abstraction layer for 2D GPUs dedicated to
 Microcontrollers**. It supports all Cortex-M processors ranging from
 Cortex-M0 to the latest Cortex-M85.
 
+Arm-2D accelerates LVGL9 with two modes: **Synchronous Mode** and
+**Asynchronous Mode**. 
+- When **Helium** and **ACI (Arm Custom Instruction)** are available, it is recommend
+  to use **Synchronous Mode** to accelerate LVGL. 
+- When Arm-2D backed 2D-GPUs are available, for example, **DMAC-350 based 2D
+  GPUs**, it is recommend to use **Asynchronous Mode** to accelerate LVGL.
+
 Arm-2D is an open-source project on Github. For more, please refer to:
 https://github.com/ARM-software/Arm-2D.
 
 How to Use
 **********
 
-In general, you can set the macro :c:macro:`LV_USE_GPU_ARM2D` to ``1`` in
-``lv_conf.h`` to enable Arm-2D acceleration for LVGL.
+In general:
+- you can set the macro :c:macro:`LV_USE_DRAW_ARM2D_SYNC` to ``1`` in
+  ``lv_conf.h`` to enable Arm-2D synchronous acceleration for LVGL. 
+- You can set 
+  the macro :c:macro:`LV_USE_DRAW_ARM2D_ASYNC` to ``1`` in ``lv_conf.h`` to enable 
+  Arm-2D Asynchronous acceleration for LVGL. 
 
 If you are using
 `CMSIS-Pack <https://github.com/lvgl/lvgl/tree/master/env_support/cmsis-pack>`__
 to deploy the LVGL. You don't have to define the macro
-:c:macro:`LV_USE_GPU_ARM2D` manually, instead, please select the component
-``GPU Arm-2D`` in the **RTE** dialog. This step will define the macro for us.
+:c:macro:`LV_USE_DRAW_ARM2D_SYNC` manually, instead the lv_conf_cmsis.h will
+check the environment and set the :c:macro:`LV_USE_DRAW_ARM2D_SYNC` accordingly.
 
 Design Considerations
 *********************
@@ -31,13 +42,13 @@ LVGL (sometimes worse) for regular Cortex-M processors.
 
 **We highly recommend you enable Arm-2D acceleration for LVGL** when:
 
--  The target processors are **Cortex-M55** and/or **Cortex-M85**
+-  The target processors are **Cortex-M55**, **Cortex-M52** and **Cortex-M85**
 -  The target processors support
    `Helium <https://developer.arm.com/documentation/102102/0103/?lang=en>`__.
 -  The device vendor provides an arm-2d compliant driver for their
-   propriotory 2D accelerators and/or customized instruction set.
+   propriotory 2D accelerators and/or ACI(Arm Customized Instruction).
 -  The target device contains
-   `DMA-350 <https://community.arm.com/arm-community-blogs/b/internet-of-things-blog/posts/arm-corelink-dma-350-next-generation-direct-memory-access-for-endpoint-ai>`__
+   `DMAC-350 <https://community.arm.com/arm-community-blogs/b/internet-of-things-blog/posts/arm-corelink-dma-350-next-generation-direct-memory-access-for-endpoint-ai>`__
 
 Examples
 ********
