@@ -587,6 +587,12 @@ static void _read_keypad(lv_libinput_t * dsc, struct libinput_event * event)
                 case KEY_TAB:
                     evt->key_val = LV_KEY_NEXT;
                     break;
+                case KEY_HOME:
+                    evt->key_val = LV_KEY_HOME;
+                    break;
+                case KEY_END:
+                    evt->key_val = LV_KEY_END;
+                    break;
                 default:
                     evt->key_val = 0;
                     break;
