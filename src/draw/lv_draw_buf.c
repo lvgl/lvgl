@@ -172,7 +172,14 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
         return LV_RESULT_INVALID;
     }
 
-    lv_image_header_init(&draw_buf->header, w, h, cf, stride, 0);
+    lv_image_header_t * header = &draw_buf->header;
+    header->w = w;
+    header->h = h;
+    header->cf = cf;
+    header->stride = stride;
+    header->flags = 0;
+    header->magic = LV_IMAGE_HEADER_MAGIC;
+
     draw_buf->data = lv_draw_buf_align(data, cf);
     draw_buf->unaligned_data = data;
     draw_buf->data_size = data_size;
@@ -272,8 +279,7 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return NULL;
 
-    uint8_t * data = buf->data;
-    data += buf->header.stride * y;
+    uint8_t * data = buf->data + buf->header.stride * y;
 
     if(x == 0)
         return data;
@@ -414,6 +420,20 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
     draw_buf->header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
 
     return LV_RESULT_OK;
+}
+
+void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color)
+{
+    LV_ASSERT_NULL(draw_buf);
+    if(draw_buf == NULL) return;
+
+    if(!LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {
+        LV_LOG_WARN("Not indexed color format");
+        return;
+    }
+
+    uint8_t * buf = (uint8_t *)draw_buf->data;
+    lv_memcpy(&buf[index * sizeof(color)], &color, sizeof(color));
 }
 
 /**********************

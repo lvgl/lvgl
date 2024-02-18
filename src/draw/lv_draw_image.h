@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_draw.h"
 #include "lv_image_decoder.h"
-#include "lv_image_buf.h"
+#include "lv_draw_buf.h"
 #include "../misc/lv_style.h"
 
 /*********************
@@ -142,6 +142,19 @@ void _lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_imag
  */
 void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb);
+
+/**
+ * Get the area of a rectangle if its rotated and scaled
+ * @param res store the coordinates here
+ * @param w width of the rectangle to transform
+ * @param h height of the rectangle to transform
+ * @param angle angle of rotation
+ * @param scale_x zoom in x direction, (256 no zoom)
+ * @param scale_y zoom in y direction, (256 no zoom)
+ * @param pivot x,y pivot coordinates of rotation
+ */
+void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
+                                        uint16_t scale_x, uint16_t scale_y, const lv_point_t * pivot);
 
 #ifdef __cplusplus
 } /*extern "C"*/

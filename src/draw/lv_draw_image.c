@@ -220,6 +220,33 @@ void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
     lv_image_decoder_close(&decoder_dsc);
 }
 
+void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
+                                        uint16_t scale_x, uint16_t scale_y, const lv_point_t * pivot)
+{
+    if(angle == 0 && scale_x == LV_SCALE_NONE && scale_y == LV_SCALE_NONE) {
+        res->x1 = 0;
+        res->y1 = 0;
+        res->x2 = w - 1;
+        res->y2 = h - 1;
+        return;
+    }
+
+    lv_point_t p[4] = {
+        {0, 0},
+        {w, 0},
+        {0, h},
+        {w, h},
+    };
+    lv_point_transform(&p[0], angle, scale_x, scale_y, pivot, true);
+    lv_point_transform(&p[1], angle, scale_x, scale_y, pivot, true);
+    lv_point_transform(&p[2], angle, scale_x, scale_y, pivot, true);
+    lv_point_transform(&p[3], angle, scale_x, scale_y, pivot, true);
+    res->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
+    res->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x) - 1;
+    res->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
+    res->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y) - 1;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

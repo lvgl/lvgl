@@ -15,7 +15,8 @@ extern "C" {
  *********************/
 #include "../misc/lv_area.h"
 #include "../misc/lv_color.h"
-#include "lv_image_buf.h"
+#include "../stdlib/lv_string.h"
+#include "lv_image_dsc.h"
 
 /*********************
  *      DEFINES
@@ -193,7 +194,7 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
                                     uint32_t stride);
 
 /**
- * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_MODIFIABLE in header.
+ * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_ALLOCATED in header.
  * Then free the lv_draw_buf_t struct.
  */
 void lv_draw_buf_destroy(lv_draw_buf_t * buf);
@@ -248,7 +249,43 @@ static inline void lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_ds
 
 static inline void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
 {
-    lv_memcpy(img, buf, sizeof(lv_image_dsc_t));
+    lv_memcpy((void *)img, buf, sizeof(lv_image_dsc_t));
+}
+
+/**
+ * Set the palette color of an indexed image. Valid only for `LV_COLOR_FORMAT_I1/2/4/8`
+ * @param draw_buf pointer to an image descriptor
+ * @param index the palette color to set:
+ *   - for `LV_COLOR_FORMAT_I1`: 0..1
+ *   - for `LV_COLOR_FORMAT_I2`: 0..3
+ *   - for `LV_COLOR_FORMAT_I4`: 0..15
+ *   - for `LV_COLOR_FORMAT_I8`: 0..255
+ * @param color the color to set in lv_color32_t format
+ */
+void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color);
+
+/**
+ * @deprecated Use lv_draw_buf_set_palette instead.
+ */
+static inline void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
+{
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
+    lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
+}
+
+/**
+ * @deprecated Use lv_draw_buffer_create/destroy instead.
+ * Free the data pointer and dsc struct of an image.
+ */
+static inline void lv_image_buf_free(lv_image_dsc_t * dsc)
+{
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
+    if(dsc != NULL) {
+        if(dsc->data != NULL)
+            lv_free((void *)dsc->data);
+
+        lv_free((void *)dsc);
+    }
 }
 
 /**********************
