@@ -142,7 +142,7 @@ set(COMPILE_OPTIONS
     -Wmissing-prototypes
     -Wpointer-arith
     -Wmultichar
-    -Wno-pedantic # ignored for now, we convert functions to pointers for propertis table.
+    -Wpedantic
     -Wreturn-type
     -Wshadow
     -Wshift-negative-value

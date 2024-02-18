@@ -5,6 +5,7 @@
 
 void test_obj_property_fail_on_invalid_id(void)
 {
+#if LV_USE_OBJ_PROPERTY
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_property_t prop = { };
 
@@ -23,10 +24,12 @@ void test_obj_property_fail_on_invalid_id(void)
     prop.id = LV_PROPERTY_OBJ_PARENT; /* Valid ID */
     prop.ptr = lv_screen_active();
     TEST_ASSERT_EQUAL_INT(LV_RESULT_OK, lv_obj_set_property(obj, &prop));
+#endif
 }
 
 void test_obj_property_set_get_should_match(void)
 {
+#if LV_USE_OBJ_PROPERTY
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_t * root = lv_obj_create(lv_screen_active());
     lv_property_t prop = { };
@@ -88,10 +91,12 @@ void test_obj_property_set_get_should_match(void)
     TEST_ASSERT_TRUE(lv_obj_set_property(img, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_UINT16(0x1234, lv_img_get_offset_x(img));
     TEST_ASSERT_EQUAL_UINT16(0x1234, lv_obj_get_property(img, LV_PROPERTY_IMAGE_OFFSET_X).num);
+#endif
 }
 
 void test_obj_property_flag(void)
 {
+#if LV_USE_OBJ_PROPERTY
     const struct {
         uint32_t flag;
         uint32_t id;
@@ -152,10 +157,12 @@ void test_obj_property_flag(void)
         TEST_ASSERT_FALSE(lv_obj_get_property(obj, properties[i].id).num);
         TEST_ASSERT_FALSE(lv_obj_has_flag(obj, properties[i].flag));
     }
+#endif
 }
 
 void test_obj_property_state(void)
 {
+#if LV_USE_OBJ_PROPERTY
     const struct {
         uint32_t state;
         uint32_t id;
@@ -198,6 +205,7 @@ void test_obj_property_state(void)
         TEST_ASSERT_FALSE(lv_obj_get_property(obj, states[i].id).num);
         TEST_ASSERT_FALSE(lv_obj_get_state(obj) & states[i].state);
     }
+#endif
 }
 
 #endif

@@ -216,7 +216,7 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
     }
 
     lv_canvas_set_draw_buf(obj, new_buf);
-    LV_LOG_INFO("set canvas buffer: %p, width = %d", new_buf, (int)w);
+    LV_LOG_INFO("set canvas buffer: %p, width = %d", (void *)new_buf, (int)w);
 
     if(old_buf != NULL) lv_draw_buf_destroy(old_buf);
     return true;
