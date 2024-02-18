@@ -28,7 +28,7 @@ typedef struct sample_fragment_t {
 static const lv_fragment_class_t sample_cls = {
     .constructor_cb = sample_fragment_ctor,
     .create_obj_cb = sample_fragment_create_obj,
-    .instance_size = sizeof(sample_fragment_t)
+    .instance_size = sizeof(sample_fragment_t),
 };
 
 static lv_obj_t * container = NULL;

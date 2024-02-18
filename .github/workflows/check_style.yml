@@ -18,6 +18,7 @@ jobs:
         with:
           repository: szepeviktor/astyle
           path: astyle
+          ref: v3.4.10
       - name: Install astyle
         run: |
           cd astyle/build/gcc/
