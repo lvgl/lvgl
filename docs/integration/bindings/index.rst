@@ -10,3 +10,4 @@ Bindings
    cpp
    pikascript
    javascript
+   api_json

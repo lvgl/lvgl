@@ -106,12 +106,14 @@ class ArrayDecl(c_ast.ArrayDecl):
             res = self.type.to_dict()
             res['json_type'] = 'array'
             res['dim'] = dim
+            res['quals'].extend(self.dim_quals)
             return res
 
         res = OrderedDict([
             ('type', self.type.to_dict()),
             ('json_type', 'array'),
-            ('dim', dim)
+            ('dim', dim),
+            ('quals', self.dim_quals)
         ])
 
         return res
@@ -211,6 +213,11 @@ class Decl(c_ast.Decl):
             if isinstance(self.type, (Struct, Union)):
                 res = self.type.to_dict()
 
+                if 'quals' in res:
+                    res['quals'].extend(self.quals)
+                else:
+                    res['quals'] = self.quals
+
                 if res['json_type'] == 'forward_decl':
                     if res['name'] and res['name'] not in forward_decls:
                         forward_decls[res['name']] = res
@@ -230,6 +237,20 @@ class Decl(c_ast.Decl):
                 docstring = ''
             else:
                 docstring = doc_search.description
+
+            if isinstance(self.type, PtrDecl) and isinstance(self.type.type, FuncDecl):
+                type_dict = self.type.type.to_dict()
+                type_dict['json_type'] = 'function_pointer'
+
+                if docstring:
+                    type_dict['docstring'] = docstring
+
+                if 'quals' in type_dict:
+                    type_dict['quals'].extend(self.quals)
+                else:
+                    type_dict['quals'] = self.quals
+
+                return type_dict
 
             res = OrderedDict([
                 ('name', name),
@@ -850,16 +871,19 @@ class PtrDecl(c_ast.PtrDecl):
 
     def to_dict(self):
         if isinstance(self.type, FuncDecl):
-            res = OrderedDict([
-                ('type', self.type.to_dict()),
-                ('json_type', 'function_pointer')
-            ])
-
+            type_dict = self.type.to_dict()
+            type_dict['json_type'] = 'function_pointer'
+            res = type_dict
         else:
             res = OrderedDict([
                 ('type', self.type.to_dict()),
                 ('json_type', 'pointer')
             ])
+
+        if 'quals' in res:
+            res['quals'].extend(self.quals)
+        else:
+            res['quals'] = self.quals
 
         return res
 
@@ -1020,8 +1044,9 @@ class TypeDecl(c_ast.TypeDecl):
                 ('json_type', str(type(self))),
             ])
 
-        return res
+        res['quals'] = self.quals
 
+        return res
 
 class Typedef(c_ast.Typedef):
 
@@ -1074,6 +1099,11 @@ class Typedef(c_ast.Typedef):
             type_dict = self.type.type.to_dict()
             type_dict['json_type'] = 'function_pointer'
             type_dict['name'] = self.name
+            if 'quals' in type_dict:
+                type_dict['quals'].extend(self.quals)
+            else:
+                type_dict['quals'] = self.quals
+
             if (
                 'docstring' not in type_dict or
                 not type_dict['docstring']
@@ -1085,6 +1115,13 @@ class Typedef(c_ast.Typedef):
         if isinstance(self.type, TypeDecl):
             type_dict = self.type.type.to_dict()
 
+            if 'quals' in type_dict:
+                type_dict['quals'].extend(self.quals)
+            else:
+                type_dict['quals'] = self.quals
+
+            type_dict['quals'].extend(self.type.quals)
+
             if 'docstring' not in type_dict:
                 type_dict['docstring'] = ''
 
@@ -1094,6 +1131,11 @@ class Typedef(c_ast.Typedef):
             if type_dict['name'] in _structures:
                 _structures[type_dict['name']]['name'] = self.name
 
+                if 'quals' in _structures[type_dict['name']]:
+                    _structures[type_dict['name']]['quals'].extend(type_dict['quals'])
+                else:
+                    _structures[type_dict['name']]['quals'] = type_dict['quals']
+
                 if type_dict['docstring'] and not _structures[type_dict['name']]['docstring']:
                     _structures[type_dict['name']]['docstring'] = type_dict['docstring']
 
@@ -1102,6 +1144,11 @@ class Typedef(c_ast.Typedef):
             if type_dict['name'] in _unions:
                 _unions[type_dict['name']]['name'] = self.name
 
+                if 'quals' in _unions[type_dict['name']]:
+                    _unions[type_dict['name']]['quals'].extend(type_dict['quals'])
+                else:
+                    _unions[type_dict['name']]['quals'] = type_dict['quals']
+
                 if type_dict['docstring'] and not _structures[type_dict['name']]['docstring']:
                     _structures[type_dict['name']]['docstring'] = type_dict['docstring']
 
@@ -1109,6 +1156,11 @@ class Typedef(c_ast.Typedef):
 
             if type_dict['name'] in _enums:
                 _enums[type_dict['name']]['name'] = self.name
+
+                if 'quals' in _enums[type_dict['name']]:
+                    _enums[type_dict['name']]['quals'].extend(type_dict['quals'])
+                else:
+                    _enums[type_dict['name']]['quals'] = type_dict['quals']
 
                 if type_dict['docstring'] and not _enums[type_dict['name']]['docstring']:
                     _enums[type_dict['name']]['docstring'] = type_dict['docstring']
@@ -1132,6 +1184,7 @@ class Typedef(c_ast.Typedef):
                     ('type', OrderedDict([('name', self.type.type.name), ('json_type', 'lvgl_type')])),
                     ('json_type', 'typedef'),
                     ('docstring', docstring),
+                    ('quals', self.quals + self.type.quals)
                 ])
 
                 return [res, self.type.type.to_dict()]
@@ -1216,6 +1269,11 @@ class Typedef(c_ast.Typedef):
             #         return res
         type_dict = self.type.to_dict()
 
+        if 'quals' in type_dict:
+            type_dict['quals'].extend(self.quals)
+        else:
+            type_dict['quals'] = self.quals
+
         if docstring and 'docstring' in type_dict and not type_dict['docstring']:
             type_dict['docstring'] = docstring
 
@@ -1226,11 +1284,15 @@ class Typedef(c_ast.Typedef):
                 type_dict['name'] = self.name
                 return type_dict
 
+        quals = type_dict['quals']
+        del type_dict['quals']
+
         res = OrderedDict([
             ('name', self.name),
             ('type', type_dict),
             ('json_type', 'typedef'),
             ('docstring', docstring),
+            ('quals', quals)
         ])
 
         return res
@@ -1258,6 +1320,7 @@ class Typename(c_ast.Typename):
     def to_dict(self):
         if not self.name and isinstance(self.type, IdentifierType):
             res = self.type.to_dict()
+            res['quals'] = self.quals
 
         elif isinstance(self.parent, FuncDecl):
             if self.name and self.parent.name:
@@ -1280,12 +1343,14 @@ class Typename(c_ast.Typename):
                 ('type', self.type.to_dict()),
                 ('json_type', 'arg'),
                 ('docstring', docstring),
+                ('quals', self.quals)
             ])
         else:
             res = OrderedDict([
                 ('name', self.name),
                 ('type', self.type.to_dict()),
                 ('json_type',  str(type(self))),
+                ('quals', self.quals)
             ])
 
         return res
