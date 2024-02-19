@@ -589,6 +589,51 @@ void test_label_rtl_dot_long_mode(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_rtl_dot_long_mode.png");
 }
 
+void test_label_long_mode(void)
+{
+    lv_obj_t * label1 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);
+    lv_label_set_text(label1, "123456789");
+    lv_obj_set_size(label1, 70, 25);
+    lv_obj_align(label1, LV_ALIGN_CENTER, 0, -100);
+    lv_obj_set_style_bg_color(label1, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(label1, LV_OPA_100, LV_PART_MAIN);
+
+    lv_obj_t * label2 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label2, LV_LABEL_LONG_DOT);
+    lv_label_set_text(label2, "123456789");
+    lv_obj_set_size(label2, 70, 25);
+    lv_obj_align(label2, LV_ALIGN_CENTER, 0, -50);
+    lv_obj_set_style_bg_color(label2, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(label2, LV_OPA_100, LV_PART_MAIN);
+
+    lv_obj_t * label3 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label3, LV_LABEL_LONG_SCROLL);
+    lv_label_set_text(label3, "123456789");
+    lv_obj_set_size(label3, 70, 25);
+    lv_obj_center(label3);
+    lv_obj_set_style_bg_color(label3, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(label3, LV_OPA_100, LV_PART_MAIN);
+
+    lv_obj_t * label4 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label4, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_text(label4, "123456789");
+    lv_obj_set_size(label4, 70, 25);
+    lv_obj_align(label4, LV_ALIGN_CENTER, 0, 50);
+    lv_obj_set_style_bg_color(label4, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(label4, LV_OPA_100, LV_PART_MAIN);
+
+    lv_obj_t * label5 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label5, LV_LABEL_LONG_CLIP);
+    lv_label_set_text(label5, "123456789");
+    lv_obj_set_size(label5, 70, 25);
+    lv_obj_align(label5, LV_ALIGN_CENTER, 0, 100);
+    lv_obj_set_style_bg_color(label5, lv_palette_main(LV_PALETTE_BLUE), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(label5, LV_OPA_100, LV_PART_MAIN);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_long_mode.png");
+}
+
 void test_label_max_width(void)
 {
     lv_obj_clean(lv_screen_active());
