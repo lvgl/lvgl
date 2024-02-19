@@ -419,9 +419,10 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
     if(dsc->args.no_cache || LV_CACHE_DEF_SIZE == 0)
         decoder_draw_buf_free((lv_draw_buf_t *)dsc->decoded);
-    if(decoder->user_data) free(decoder->user_data);
     else
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
+
+    if(decoder->user_data) free(decoder->user_data);
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/
