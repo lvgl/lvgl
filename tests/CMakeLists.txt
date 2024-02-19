@@ -174,6 +174,7 @@ filter_compiler_options(CXX LVGL_THORVG_COMPILE_OPTIONS
         -Wno-missing-prototypes
         -Wno-deprecated-copy-with-user-provided-dtor
         -Wno-float-conversion
+        -Wno-pedantic
 )
 
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
