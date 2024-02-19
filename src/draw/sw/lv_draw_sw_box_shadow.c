@@ -9,6 +9,8 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
+#if LV_DRAW_SW_COMPLEX
+
 #include "blend/lv_draw_sw_blend.h"
 #include "../../core/lv_global.h"
 #include "../../misc/lv_math.h"
@@ -34,11 +36,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_DRAW_SW_COMPLEX
 static void /* LV_ATTRIBUTE_FAST_MEM */ shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, int32_t s,
                                                                int32_t r);
 static void /* LV_ATTRIBUTE_FAST_MEM */ shadow_blur_corner(int32_t size, int32_t sw, uint16_t * sh_ups_buf);
-#endif /*LV_DRAW_SW_COMPLEX*/
 
 /**********************
  *  STATIC VARIABLES
@@ -552,13 +552,10 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     lv_free(sh_buf);
     lv_free(mask_buf);
 }
-#endif /*LV_USE_DRAW_SW*/
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-#if LV_DRAW_SW_COMPLEX
 
 /**
  * Calculate a blurred corner
@@ -726,4 +723,18 @@ static void LV_ATTRIBUTE_FAST_MEM shadow_blur_corner(int32_t size, int32_t sw, u
 
     lv_free(sh_ups_blur_buf);
 }
+
+#else /*LV_DRAW_SW_COMPLEX*/
+
+void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    LV_UNUSED(coords);
+
+    LV_LOG_WARN("LV_DRAW_SW_COMPLEX needs to be enabled");
+}
+
 #endif /*LV_DRAW_SW_COMPLEX*/
+
+#endif /*LV_DRAW_USE_SW*/

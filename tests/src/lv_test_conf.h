@@ -100,6 +100,7 @@ typedef void * lv_user_data_t;
 #elif LV_TEST_OPTION == 1
 #define  LV_COLOR_DEPTH     1
 #define  LV_DPI_DEF         30
+#define  LV_DRAW_SW_COMPLEX 0
 #include "lv_test_conf_minimal.h"
 #endif
 
