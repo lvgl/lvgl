@@ -591,6 +591,8 @@ void test_label_rtl_dot_long_mode(void)
 
 void test_label_long_mode(void)
 {
+    lv_obj_clean(lv_screen_active());
+
     lv_obj_t * label1 = lv_label_create(lv_screen_active());
     lv_label_set_long_mode(label1, LV_LABEL_LONG_WRAP);
     lv_label_set_text(label1, "123456789");
