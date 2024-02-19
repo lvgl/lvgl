@@ -295,23 +295,25 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
     if(src->data == NULL) return LV_RESULT_INVALID;
 
     const lv_image_header_t * header = &src->header;
+    uint32_t w = header->w;
+    uint32_t h = header->h;
 
     /*Use global stride*/
-    if(stride == 0) stride = lv_draw_buf_width_to_stride(header->w, header->cf);
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(w, header->cf);
 
     /*Check if stride already match*/
     if(header->stride == stride) return LV_RESULT_OK;
 
     /*Calculate the minimal stride allowed from bpp*/
     uint32_t bpp = lv_color_format_get_bpp(header->cf);
-    uint32_t min_stride = (header->w * bpp + 7) >> 3;
+    uint32_t min_stride = (w * bpp + 7) >> 3;
     if(stride < min_stride) {
         LV_LOG_WARN("New stride is too small. min: %" LV_PRId32, min_stride);
         return LV_RESULT_INVALID;
     }
 
     /*Check if buffer has enough space. */
-    uint32_t new_size = _calculate_draw_buf_size(header->w, header->h, header->cf, stride);
+    uint32_t new_size = _calculate_draw_buf_size(w, h, header->cf, stride);
     if(new_size > src->data_size) {
         return LV_RESULT_INVALID;
     }
@@ -320,9 +322,9 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
 
     if(stride > header->stride) {
         /*Copy from the last line to the first*/
-        uint8_t * src_data = src->data + offset + header->stride * (header->h - 1);
-        uint8_t * dst_data = src->data + offset + stride * (header->h - 1);
-        for(; src_data != src->data;) {
+        uint8_t * src_data = src->data + offset + header->stride * (h - 1);
+        uint8_t * dst_data = src->data + offset + stride * (h - 1);
+        for(uint32_t y = 0; y < h; y++) {
             lv_memmove(dst_data, src_data, min_stride);
             src_data -= header->stride;
             dst_data -= stride;
@@ -332,7 +334,7 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
         /*Copy from the first line to the last*/
         uint8_t * src_data = src->data + offset;
         uint8_t * dst_data = src->data + offset;
-        for(uint32_t y = 0; y < header->h; y++) {
+        for(uint32_t y = 0; y < h; y++) {
             lv_memmove(dst_data, src_data, min_stride);
             src_data += header->stride;
             dst_data += stride;
