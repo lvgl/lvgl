@@ -70,7 +70,7 @@ void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
     else return NULL;
 }
 
-void lv_draw_buf_invalidate_cache(lv_draw_buf_t * draw_buf, const lv_area_t * area)
+void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     if(handlers.invalidate_cache_cb) {
         LV_ASSERT_NULL(draw_buf);
