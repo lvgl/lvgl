@@ -123,10 +123,13 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
 
 #if LV_CACHE_DEF_SIZE > 0
     dsc->cache = img_cache_p;
-    /*
-     * Check the cache first
-     * If the image is found in the cache, just return it.*/
-    if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
+    /*Try cache first, unless we are told to ignore cache.*/
+    if(!(args && args->no_cache)) {
+        /*
+        * Check the cache first
+        * If the image is found in the cache, just return it.*/
+        if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
+    }
 #endif
 
     /*Find the decoder that can open the image source, and get the header info in the same time.*/
