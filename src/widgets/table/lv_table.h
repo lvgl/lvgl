@@ -52,7 +52,7 @@ typedef uint32_t lv_table_cell_ctrl_t;
 typedef struct {
     lv_table_cell_ctrl_t ctrl;
     void * user_data; /**< Custom user data*/
-    char txt[];
+    char * txt;
 } lv_table_cell_t;
 
 /*Data of table*/
