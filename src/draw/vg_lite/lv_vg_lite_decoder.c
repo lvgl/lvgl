@@ -34,6 +34,7 @@
 
 typedef struct {
     lv_draw_buf_t yuv;  /*A draw buffer struct for yuv variable image*/
+    lv_draw_buf_t *draw_buf; /*The draw buffer created during decoding, need to destroy it when decoder closes */
 } decoder_data_t;
 
 /**********************
@@ -43,6 +44,7 @@ typedef struct {
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static decoder_data_t * get_decoder_data(lv_image_decoder_dsc_t * dsc);
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size);
 
 /**********************
@@ -80,6 +82,36 @@ void lv_vg_lite_decoder_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/**
+ * Return the decoder user data, malloc a new one if not exist.
+ */
+static decoder_data_t * get_decoder_data(lv_image_decoder_dsc_t * dsc)
+{
+    decoder_data_t * data = dsc->user_data;
+    if(data == NULL) {
+        data = lv_malloc_zeroed(sizeof(decoder_data_t));
+        LV_ASSERT_MALLOC(data);
+        if(data == NULL) {
+            LV_LOG_ERROR("Out of memory");
+            return NULL;
+        }
+
+        dsc->user_data = data;
+    }
+
+    return data;
+}
+
+static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
+{
+    decoder_data_t * decoder_data = dsc->user_data;
+    if(decoder_data == NULL) return;
+
+    if(decoder_data->draw_buf) lv_draw_buf_destroy(decoder_data->draw_buf);
+    lv_free(decoder_data);
+    dsc->user_data = NULL;
+}
 
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size)
 {
@@ -156,7 +188,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     }
 
     if(LV_COLOR_FORMAT_IS_INDEXED(header->cf)) {
-        header->cf = DEST_IMG_FORMAT;
         return LV_RESULT_OK;
     }
 
@@ -182,14 +213,10 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
      *So simply give its pointer*/
     const uint8_t * image_data = ((lv_image_dsc_t *)dsc->src)->data;
     uint32_t image_data_size = ((lv_image_dsc_t *)dsc->src)->data_size;
+    decoder_data_t * decoder_data = get_decoder_data(dsc);
 
     /* if is YUV format, no need to copy */
     if(LV_COLOR_FORMAT_IS_YUV(src_cf)) {
-        decoder_data_t * decoder_data = dsc->user_data;
-        if(decoder_data == NULL) {
-            decoder_data = lv_malloc_zeroed(sizeof(decoder_data_t));
-            LV_ASSERT_MALLOC(decoder_data);
-        }
         lv_draw_buf_t * draw_buf = &decoder_data->yuv;
         uint32_t stride = lv_draw_buf_width_to_stride(width, src_cf);
         lv_draw_buf_init(draw_buf, width, height, src_cf, stride, (void *)image_data, image_data_size);
@@ -199,7 +226,6 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
 
         /* Do not add this kind of image to cache, since its life is managed by user. */
         dsc->args.no_cache = true;
-
         dsc->decoded = draw_buf;
         return LV_RESULT_OK;
     }
@@ -210,6 +236,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
         return LV_RESULT_INVALID;
     }
     dsc->decoded = draw_buf;
+    decoder_data->draw_buf = draw_buf; /*Record it for later to destroy*/
 
     uint32_t src_stride = image_stride(&src_img_buf.header);
     uint32_t dest_stride = draw_buf->header.stride;
@@ -288,6 +315,8 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t dest_stride = draw_buf->header.stride;
 
     dsc->decoded = draw_buf;
+    decoder_data_t * decoder_data = get_decoder_data(dsc);
+    decoder_data->draw_buf = draw_buf; /*Record it for later to destroy*/
     uint8_t * dest = draw_buf->data;
 
     /* index format only */
@@ -353,7 +382,7 @@ failed:
         lv_free(src_temp);
     }
     lv_fs_close(&file);
-    lv_draw_buf_destroy(draw_buf);
+    free_decoder_data(dsc);
     dsc->decoded = NULL;
 
     return LV_RESULT_INVALID;
@@ -390,6 +419,26 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             break;
     }
 
+    if(res != LV_RESULT_OK) {
+        return res;
+    }
+
+    decoder_data_t * decoder_data = get_decoder_data(dsc);
+    lv_draw_buf_t * decoded = (lv_draw_buf_t *)dsc->decoded;
+    lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
+    if(adjusted == NULL) {
+        free_decoder_data(dsc);
+        return LV_RESULT_INVALID;
+    }
+
+    if(adjusted != decoded) {
+        /*The adjusted draw buffer is newly allocated.*/
+        free_decoder_data(dsc);
+        decoder_data->draw_buf = adjusted; /*Now this new buffer need to be free'd on decoder close*/
+    }
+
+    dsc->decoded = adjusted;
+
     if(dsc->args.no_cache) return res;
 
 #if LV_CACHE_DEF_SIZE > 0
@@ -407,6 +456,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
         dsc->cache_entry = entry;
+        decoder_data->draw_buf = NULL; /*The cache will take over the ownership of the draw buffer*/
     }
 #endif
 
@@ -417,12 +467,14 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    if(dsc->args.no_cache || LV_CACHE_DEF_SIZE == 0)
-        decoder_draw_buf_free((lv_draw_buf_t *)dsc->decoded);
-    else
+#if LV_CACHE_DEF_SIZE > 0
+    if(dsc->cache_entry) {
+        /*Decoded data is in cache, release it from cache's callback*/
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
+    }
+#endif
 
-    if(decoder->user_data) free(decoder->user_data);
+    free_decoder_data(dsc);
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/
