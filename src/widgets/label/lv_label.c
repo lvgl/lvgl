@@ -773,7 +773,6 @@ static void draw_main(lv_event_t * e)
     const lv_area_t clip_area_ori = layer->_clip_area;
     layer->_clip_area = txt_clip;
     lv_draw_label(layer, &label_draw_dsc, &txt_coords);
-    layer->_clip_area = txt_clip;
 
     if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
         lv_point_t size;
