@@ -102,11 +102,11 @@
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
 
 #ifndef LV_USE_LINUX_DRM
-#define LV_USE_LINUX_DRM    1
+    #define LV_USE_LINUX_DRM    1
 #endif
 
 #ifndef LV_USE_LINUX_FBDEV
-#define LV_USE_LINUX_FBDEV  1
+    #define LV_USE_LINUX_FBDEV  1
 #endif
 
 #define LV_USE_ILI9341      1
