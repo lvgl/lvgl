@@ -117,5 +117,16 @@ void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_ds
  *   STATIC FUNCTIONS
  **********************/
 
+#else /*LV_DRAW_SW_COMPLEX*/
+
+void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    LV_UNUSED(coords);
+
+    LV_LOG_WARN("LV_DRAW_SW_COMPLEX needs to be enabled");
+}
+
 #endif /*LV_DRAW_SW_COMPLEX*/
 #endif /*LV_USE_DRAW_SW*/

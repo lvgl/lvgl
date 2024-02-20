@@ -270,5 +270,16 @@ static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, l
     }
 }
 
+#else /*LV_DRAW_SW_COMPLEX*/
+
+void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    LV_UNUSED(coords);
+
+    LV_LOG_WARN("LV_DRAW_SW_COMPLEX needs to be enabled");
+}
+
 #endif /*LV_DRAW_SW_COMPLEX*/
 #endif /*LV_USE_DRAW_SW*/
