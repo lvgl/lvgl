@@ -120,6 +120,54 @@ static void x11_inp_event_handler(lv_timer_t * t)
                     if(len < (sizeof(xd->kb_buffer) - 2 /* space for 1 char + '\0' */)) {
                         KeySym key;
                         int n = XLookupString(&event.xkey, &xd->kb_buffer[len], sizeof(xd->kb_buffer) - (len + 1), &key, NULL);
+                        n += !!key;
+                        switch(key) {
+                            case XK_Home:
+                            case XK_KP_Home:
+                                xd->kb_buffer[len] = LV_KEY_HOME;
+                                break;
+                            case XK_Left:
+                            case XK_KP_Left:
+                                xd->kb_buffer[len] = LV_KEY_LEFT;
+                                break;
+                            case XK_Up:
+                            case XK_KP_Up:
+                                xd->kb_buffer[len] = LV_KEY_UP;
+                                break;
+                            case XK_Right:
+                            case XK_KP_Right:
+                                xd->kb_buffer[len] = LV_KEY_RIGHT;
+                                break;
+                            case XK_Down:
+                            case XK_KP_Down:
+                                xd->kb_buffer[len] = LV_KEY_DOWN;
+                                break;
+                            case XK_Prior:
+                            case XK_KP_Prior:
+                                xd->kb_buffer[len] = LV_KEY_PREV;
+                                break;
+                            case XK_Next:
+                            case XK_KP_Next:
+                                xd->kb_buffer[len] = LV_KEY_NEXT;
+                                break;
+                            case XK_End:
+                            case XK_KP_End:
+                                xd->kb_buffer[len] = LV_KEY_END;
+                                break;
+                            case XK_BackSpace:
+                                xd->kb_buffer[len] = LV_KEY_BACKSPACE;
+                                break;
+                            case XK_Escape:
+                                xd->kb_buffer[len] = LV_KEY_ESC;
+                                break;
+                            case XK_Delete:
+                            case XK_KP_Delete:
+                                xd->kb_buffer[len] = LV_KEY_DEL;
+                                break;
+                            case XK_KP_Enter:
+                                xd->kb_buffer[len] = LV_KEY_ENTER;
+                                break;
+                        }
                         xd->kb_buffer[len + n] = '\0';
                     }
                 }
