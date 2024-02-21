@@ -24,6 +24,7 @@ function(filter_compiler_options lang options_out)
         endif ()
 
         string(TOUPPER FLAG_SUPPORTED_FOR_${lang}_${option} option_var_name)
+        string(REPLACE "-" "_" option_var_name ${option_var_name})
 
         if (${lang} STREQUAL C)
             check_c_compiler_flag(${option} ${option_var_name})
