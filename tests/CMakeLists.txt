@@ -11,7 +11,7 @@ project(lvgl_tests LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 99)
 
-set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address)
+set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address -Werror)
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
@@ -142,7 +142,7 @@ set(COMPILE_OPTIONS
     -Wmissing-prototypes
     -Wpointer-arith
     -Wmultichar
-    -Wno-pedantic # ignored for now, we convert functions to pointers for propertis table.
+    -Wpedantic
     -Wreturn-type
     -Wshadow
     -Wshift-negative-value
@@ -174,6 +174,7 @@ filter_compiler_options(CXX LVGL_THORVG_COMPILE_OPTIONS
         -Wno-missing-prototypes
         -Wno-deprecated-copy-with-user-provided-dtor
         -Wno-float-conversion
+        -Wno-pedantic
 )
 
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
