@@ -29,7 +29,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u);
 
 #if defined(RENESAS_CORTEX_M85)
     #if (BSP_CFG_DCACHE_ENABLED)
-        static void _dave2d_buf_invalidate_cache_cb(lv_draw_buf_t * draw_buf, const lv_area_t * area);
+        static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
     #endif
 #endif
 
@@ -122,7 +122,7 @@ static void lv_draw_buf_dave2d_init_handlers(void)
 
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
-static void _dave2d_buf_invalidate_cache_cb(lv_draw_buf_t * draw_buf, const lv_area_t * area)
+static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     const lv_image_header_t * header = &draw_buf->header;
     uint32_t stride = header->stride;
