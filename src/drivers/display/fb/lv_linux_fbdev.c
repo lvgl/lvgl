@@ -26,6 +26,9 @@
     #include <linux/fb.h>
 #endif /* LV_LINUX_FBDEV_BSD */
 
+#include "../../../display/lv_display_private.h"
+#include "../../../draw/sw/lv_draw_sw.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -253,15 +256,50 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 {
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
 
-    if(dsc->fbp == NULL ||
-       area->x2 < 0 || area->y2 < 0 ||
-       area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
+    if(dsc->fbp == NULL) {
         lv_display_flush_ready(disp);
         return;
     }
 
     int32_t w = lv_area_get_width(area);
-    uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
+    int32_t h = lv_area_get_height(area);
+    lv_color_format_t cf = lv_display_get_color_format(disp);
+    uint32_t px_size = lv_color_format_get_size(cf);
+
+    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+    uint8_t * rotated_color_p = NULL;
+
+    /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
+    if(rotation != LV_DISPLAY_ROTATION_0 && LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        /* Rotate the pixel buffer */
+        uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
+        uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
+        rotated_color_p = malloc(w * h * px_size);
+        if(rotation == LV_DISPLAY_ROTATION_90) {
+            lv_draw_sw_rotate(color_p, rotated_color_p, w, h, w_stride, h_stride, rotation, cf);
+        }
+        if(rotation == LV_DISPLAY_ROTATION_180) {
+            lv_draw_sw_rotate(color_p, rotated_color_p, w, h, w_stride, w_stride, rotation, cf);
+        }
+        if(rotation == LV_DISPLAY_ROTATION_270) {
+            lv_draw_sw_rotate(color_p, rotated_color_p, w, h, w_stride, h_stride, rotation, cf);
+        }
+        color_p = rotated_color_p;
+
+        /* Rotate the area */
+        lv_display_rotate_area(disp, (lv_area_t *)area);
+        if(rotation != LV_DISPLAY_ROTATION_180) {
+            w = lv_area_get_width(area);
+            h = lv_area_get_height(area);
+        }
+    }
+
+    /* Ensure that we're within the framebuffer's bounds */
+    if(area->x2 < 0 || area->y2 < 0 || area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
+        lv_display_flush_ready(disp);
+        return;
+    }
+
     uint32_t color_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * dsc->finfo.line_length;
     uint32_t fb_pos = color_pos + dsc->vinfo.yoffset * dsc->finfo.line_length;
 
@@ -275,6 +313,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         }
     }
     else {
+        w = lv_area_get_width(area);
         for(y = area->y1; y <= area->y2; y++) {
             lv_memcpy(&fbp[fb_pos], color_p, w * px_size);
             fb_pos += dsc->finfo.line_length;
@@ -287,6 +326,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         if(ioctl(dsc->fbfd, FBIOPUT_VSCREENINFO, &(dsc->vinfo)) == -1) {
             perror("Error setting var screen info");
         }
+    }
+
+    /* Clean up temporary pixel buffer used for software rotation */
+    if(rotated_color_p != NULL) {
+        free(rotated_color_p);
     }
 
     lv_display_flush_ready(disp);
