@@ -293,7 +293,7 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
     uint8_t * data = buf->data;
 
     /*Skip palette*/
-    data += LV_COLOR_INDEXED_PALETTE_SIZE(buf->header.cf) * 4;
+    data += LV_COLOR_INDEXED_PALETTE_SIZE(buf->header.cf) * sizeof(lv_color32_t);
     data += buf->header.stride * y;
 
     if(x == 0) return data;
