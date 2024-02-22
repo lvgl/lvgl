@@ -9,8 +9,6 @@
 #include "lv_linux_drm.h"
 #if LV_USE_LINUX_DRM
 
-#include "../../../lv_api_map.h"
-
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>

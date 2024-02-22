@@ -259,16 +259,30 @@ find_package(Libinput OPTIONAL_COMPONENTS)
 include_directories(${LIBINPUT_INCLUDE_DIRS})
 
 if (NOT LIBINPUT_FOUND)
-message("libinput is not found, defaulting to 0")
-add_definitions(-DLV_USE_LIBINPUT=0)
+    message("libinput not found, defaulting to 0")
+    add_definitions(-DLV_USE_LIBINPUT=0)
 endif()
 
 find_package(PkgConfig)
 pkg_check_modules(xkbcommon pkg_check_modules xkbcommon)
 
 if (NOT xkbcommon_FOUND)
-message("xkbcommon is not found, defaulting to 0")
-add_definitions(-DLV_LIBINPUT_XKB=0)
+    message("xkbcommon not found, defaulting to 0")
+    add_definitions(-DLV_LIBINPUT_XKB=0)
+endif()
+
+# libdrm is required for the DRM display driver test case
+include(${CMAKE_CURRENT_LIST_DIR}/FindLibDRM.cmake)
+if(Libdrm_FOUND)
+    include_directories(${Libdrm_INCLUDE_DIRS})
+else()
+    message("libdrm not found, defaulting to 0")
+    add_definitions(-DLV_USE_LINUX_DRM=0)
+endif()
+
+# If we are running on mac, set LV_USE_LINUX_FBDEV to 0
+if(APPLE)
+    add_definitions(-DLV_USE_LINUX_FBDEV=0)
 endif()
 
 # disable test targets for build only tests
@@ -310,6 +324,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             lvgl_thorvg
             ${PNG_LIBRARIES}
             ${FREETYPE_LIBRARIES}
+            ${LIBDRM_LIBRARIES}
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             m
