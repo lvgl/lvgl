@@ -131,7 +131,7 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
     /* For indexed image, copy the palette if we are copying full image area*/
     if(dest_area == NULL || src_area == NULL) {
         if(LV_COLOR_FORMAT_IS_INDEXED(dest->header.cf)) {
-            lv_memcpy(dest->data, src->data, LV_COLOR_INDEXED_PALETTE_SIZE(dest->header.cf) * 4);
+            lv_memcpy(dest->data, src->data, LV_COLOR_INDEXED_PALETTE_SIZE(dest->header.cf) * sizeof(lv_color32_t));
         }
     }
 
