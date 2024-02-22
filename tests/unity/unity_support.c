@@ -1,12 +1,12 @@
 /**
- * @file lv_test_assert.c
- *
- * Copyright 2002-2010 Guillaume Cottenceau.
- *
- * This software may be freely redistributed under the terms
- * of the X11 license.
- *
- */
+* @file lv_test_assert.c
+*
+* Copyright 2002-2010 Guillaume Cottenceau.
+*
+* This software may be freely redistributed under the terms
+* of the X11 license.
+*
+*/
 
 /*********************
  *      INCLUDES
@@ -431,7 +431,7 @@ static void create_folders_if_needed(const char * path)
     char current_path[1024] = {'\0'}; // Adjust the size as needed
     struct stat st;
 
-    while(token != NULL && *ptr != '\0') {
+    while(token && ptr && *ptr != '\0') {
         strcat(current_path, token);
         strcat(current_path, "/");
 
