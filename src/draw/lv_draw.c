@@ -253,8 +253,19 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
         lv_draw_unit_t * u = _draw_info.unit_head;
         while(u) {
             int32_t taken_cnt = u->dispatch_cb(u, layer);
+#if LV_USE_OS
             if(taken_cnt >= 0) render_running = true;
             u = u->next;
+#else
+            if(taken_cnt >= 0) {
+                render_running = true;
+                break;
+            }
+            else {
+                /*If the unit is not suitable for the layer, try the next unit*/
+                u = u->next;
+            }
+#endif
         }
     }
 
