@@ -75,7 +75,7 @@ void test_checkbox_should_return_dynamically_allocated_text(void)
 
 void test_checkbox_should_allocate_memory_for_static_text(void)
 {
-    uint32_t initial_available_memory = 0;
+    size_t initial_available_memory = 0;
     const char * static_text = "Keep me while you exist";
 
     lv_mem_monitor_t m1;

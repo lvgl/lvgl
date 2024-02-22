@@ -10,8 +10,8 @@
 void test_snapshot_should_not_leak_memory(void)
 {
     uint32_t idx = 0;
-    uint32_t initial_available_memory = 0;
-    uint32_t final_available_memory = 0;
+    size_t initial_available_memory = 0;
+    size_t final_available_memory = 0;
     lv_mem_monitor_t monitor;
 
     lv_draw_buf_t * snapshots[NUM_SNAPSHOTS] = {NULL};

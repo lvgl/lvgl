@@ -268,14 +268,14 @@ static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_obj_t * label = lv_observer_get_target(observer);
     const lv_mem_monitor_t * mon = lv_subject_get_pointer(subject);
 
-    uint32_t used_size = mon->total_size - mon->free_size;;
-    uint32_t used_kb = used_size / 1024;
-    uint32_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
-    uint32_t max_used_kb = mon->max_used / 1024;
-    uint32_t max_used_kb_tenth = (mon->max_used - (max_used_kb * 1024)) / 102;
+    size_t used_size = mon->total_size - mon->free_size;;
+    size_t used_kb = used_size / 1024;
+    size_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
+    size_t max_used_kb = mon->max_used / 1024;
+    size_t max_used_kb_tenth = (mon->max_used - (max_used_kb * 1024)) / 102;
     lv_label_set_text_fmt(label,
-                          "%"LV_PRIu32 ".%"LV_PRIu32 " kB (%d%%)\n"
-                          "%"LV_PRIu32 ".%"LV_PRIu32 " kB max, %d%% frag.",
+                          "%zu.%zu kB (%d%%)\n"
+                          "%zu.%zu kB max, %d%% frag.",
                           used_kb, used_kb_tenth, mon->used_pct,
                           max_used_kb, max_used_kb_tenth,
                           mon->frag_pct);
