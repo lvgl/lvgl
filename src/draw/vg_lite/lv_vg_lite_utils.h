@@ -156,7 +156,8 @@ void lv_vg_lite_draw_linear_grad(
     const lv_grad_dsc_t * grad,
     const vg_lite_matrix_t * matrix,
     vg_lite_fill_t fill,
-    vg_lite_blend_t blend);
+    vg_lite_blend_t blend,
+    const vg_lite_matrix_t * grad_matrix);
 
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 

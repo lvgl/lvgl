@@ -2173,7 +2173,6 @@ void lv_draw_svg_render(lv_vector_dsc_t * dsc, const lv_svg_render_obj_t * rende
         }
         cur = cur->next;
     }
-    lv_draw_vector(dsc);
 }
 
 void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc)
@@ -2185,6 +2184,7 @@ void lv_draw_svg(lv_layer_t * layer, const lv_svg_node_t * svg_doc)
     lv_vector_dsc_t * dsc = lv_vector_dsc_create(layer);
     lv_svg_render_obj_t * list = lv_svg_render_create(svg_doc);
     lv_draw_svg_render(dsc, list);
+    lv_draw_vector(dsc);
     lv_svg_render_delete(list);
     lv_vector_dsc_delete(dsc);
 }

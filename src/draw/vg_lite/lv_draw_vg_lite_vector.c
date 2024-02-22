@@ -196,6 +196,13 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                 LV_UNUSED(spreadmode);
 
                 if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
+                    lv_matrix_t m = dsc->matrix;
+                    lv_matrix_translate(&m, min_x, min_y);
+                    lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
+
+                    vg_lite_matrix_t grad_matrix;
+                    lv_matrix_to_vg(&grad_matrix, &m);
+
                     lv_vg_lite_draw_linear_grad(
                         &u->target_buffer,
                         vg_path,
@@ -203,7 +210,8 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                         &dsc->fill_dsc.gradient.grad,
                         &matrix,
                         fill,
-                        blend);
+                        blend,
+                        &grad_matrix);
                 }
                 else if(style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
                     if(vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {

@@ -76,6 +76,18 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
     lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
 
     if(dsc->bg_grad.dir != LV_GRAD_DIR_NONE) {
+        vg_lite_matrix_t grad_matrix;
+        vg_lite_identity(&grad_matrix);
+        vg_lite_translate(tri_area.x1, tri_area.y1, &grad_matrix);
+
+        if(dsc->bg_grad.dir == LV_GRAD_DIR_VER) {
+            vg_lite_scale(1, lv_area_get_height(&tri_area) / 256.0f, &grad_matrix);
+            vg_lite_rotate(90, &grad_matrix);
+        }
+        else {   /*LV_GRAD_DIR_HOR*/
+            vg_lite_scale(lv_area_get_width(&tri_area) / 256.0f, 1, &grad_matrix);
+        }
+
         lv_vg_lite_draw_linear_grad(
             &u->target_buffer,
             vg_lite_path,
@@ -83,7 +95,8 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
             &dsc->bg_grad,
             &matrix,
             VG_LITE_FILL_EVEN_ODD,
-            VG_LITE_BLEND_SRC_OVER);
+            VG_LITE_BLEND_SRC_OVER,
+            &grad_matrix);
     }
     else { /* normal fill */
         vg_lite_color_t color = lv_vg_lite_color(dsc->bg_color, dsc->bg_opa, true);
