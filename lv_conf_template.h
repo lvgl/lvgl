@@ -184,6 +184,11 @@
  * but does not guarantee the same rendering quality as the software. */
 #define LV_VG_LITE_USE_BOX_SHADOW 0
 
+/* VG-Lite gradient image maximum cache number.
+ * NOTE: The memory usage of a single gradient image is 4K bytes.
+ */
+#define LV_VG_LITE_GRAD_CACHE_SIZE 32
+
 #endif
 
 /*=======================

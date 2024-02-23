@@ -384,6 +384,13 @@ menu "LVGL configuration"
 					which usually improves performance,
 					but does not guarantee the same rendering quality as the software.
 
+			config LV_VG_LITE_GRAD_CACHE_SIZE
+				int "VG-Lite gradient image maximum cache number."
+				default 32
+				depends on LV_USE_DRAW_VG_LITE
+				help
+					The memory usage of a single gradient image is 4K bytes.
+
 			config LV_USE_GPU_SDL
 				bool "Use SDL renderer API"
 				default n
