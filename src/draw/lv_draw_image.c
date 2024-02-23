@@ -95,9 +95,6 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     lv_draw_task_t * t = lv_draw_add_task(layer, coords);
     t->draw_dsc = new_image_dsc;
     t->type = LV_DRAW_TASK_TYPE_IMAGE;
-    if(LV_IMAGE_SRC_FILE == lv_image_src_get_type(new_image_dsc->src)) {
-        new_image_dsc->src = lv_strdup(new_image_dsc->src);
-    }
 
     _lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
                                        dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);

@@ -221,14 +221,6 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
                 }
             }
 
-            if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
-                lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
-                if(LV_IMAGE_SRC_FILE == lv_image_src_get_type(draw_image_dsc->src) && draw_image_dsc->src) {
-                    lv_free((void *)draw_image_dsc->src);
-                    draw_image_dsc->src = NULL;
-                }
-            }
-
             lv_free(t->draw_dsc);
             lv_free(t);
         }
