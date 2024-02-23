@@ -75,20 +75,44 @@ void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u)
     lv_cache_destroy(u->grad_cache, NULL);
 }
 
+void lv_vg_lite_grad_area_to_matrix(vg_lite_matrix_t * grad_matrix, const lv_area_t * area, lv_grad_dir_t dir)
+{
+    LV_ASSERT_NULL(grad_matrix);
+    LV_ASSERT_NULL(area);
+
+    vg_lite_identity(grad_matrix);
+    vg_lite_translate(area->x1, area->y1, grad_matrix);
+
+    switch(dir) {
+        case LV_GRAD_DIR_VER:
+            vg_lite_scale(1, lv_area_get_height(area) / 256.0f, grad_matrix);
+            vg_lite_rotate(90, grad_matrix);
+            break;
+
+        case LV_GRAD_DIR_HOR:
+            vg_lite_scale(lv_area_get_width(area) / 256.0f, 1, grad_matrix);
+            break;
+
+        default:
+            break;
+    }
+}
+
 void lv_vg_lite_draw_linear_grad(
     struct _lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
-    const lv_area_t * area,
     const lv_grad_dsc_t * grad,
+    const vg_lite_matrix_t * grad_matrix,
     const vg_lite_matrix_t * matrix,
     vg_lite_fill_t fill,
     vg_lite_blend_t blend)
 {
+    LV_ASSERT_NULL(u);
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(area);
     LV_ASSERT_NULL(grad);
+    LV_ASSERT_NULL(grad_matrix);
     LV_ASSERT_NULL(matrix);
 
     LV_PROFILER_BEGIN;
@@ -101,22 +125,9 @@ void lv_vg_lite_draw_linear_grad(
         return;
     }
 
-    vg_lite_matrix_t * grad_matrix = vg_lite_get_grad_matrix(gradient);
-    vg_lite_identity(grad_matrix);
-    vg_lite_translate(area->x1, area->y1, grad_matrix);
-
-    if(grad->dir == LV_GRAD_DIR_VER) {
-        vg_lite_scale(1, lv_area_get_height(area) / 256.0f, grad_matrix);
-        vg_lite_rotate(90, grad_matrix);
-    }
-    else if(grad->dir == LV_GRAD_DIR_HOR) {
-        vg_lite_scale(lv_area_get_width(area) / 256.0f, 1, grad_matrix);
-    }
-    else {
-        LV_LOG_ERROR("Unknown gradient direction: %d", (int)grad->dir);
-        LV_PROFILER_END;
-        return;
-    }
+    vg_lite_matrix_t * grad_mat_p = vg_lite_get_grad_matrix(gradient);
+    LV_ASSERT_NULL(grad_mat_p);
+    *grad_mat_p = *grad_matrix;
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(buffer);
     LV_VG_LITE_ASSERT_SRC_BUFFER(&gradient->image);

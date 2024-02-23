@@ -293,7 +293,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     LV_PROFILER_END_TAG("vg_lite_draw");
 
     /* Flush in time to avoid accumulation of drawing commands */
-    lv_vg_lite_flush(&u->base_unit);
+    lv_vg_lite_flush(u);
 
     LV_PROFILER_END;
 }

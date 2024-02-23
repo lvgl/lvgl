@@ -190,30 +190,27 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
             break;
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
                 /* draw gradient */
-                lv_area_t grad_area;
-                lv_area_set(&grad_area, (int32_t)min_x, (int32_t)min_y, (int32_t)max_x, (int32_t)max_y);
                 lv_vector_gradient_style_t style = dsc->fill_dsc.gradient.style;
                 vg_lite_gradient_spreadmode_t spreadmode = lv_spread_to_vg(dsc->fill_dsc.gradient.spread);
                 LV_UNUSED(spreadmode);
 
+                lv_matrix_t m = dsc->matrix;
+                lv_matrix_translate(&m, min_x, min_y);
+                lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
+
+                vg_lite_matrix_t grad_matrix;
+                lv_matrix_to_vg(&grad_matrix, &m);
+
                 if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
-                    lv_matrix_t m = dsc->matrix;
-                    lv_matrix_translate(&m, min_x, min_y);
-                    lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
-
-                    vg_lite_matrix_t grad_matrix;
-                    lv_matrix_to_vg(&grad_matrix, &m);
-
                     lv_vg_lite_draw_linear_grad(
                         u,
                         &u->target_buffer,
                         vg_path,
-                        &grad_area,
                         &dsc->fill_dsc.gradient.grad,
+                        &grad_matrix,
                         &matrix,
                         fill,
-                        blend,
-                        &grad_matrix);
+                        blend);
                 }
                 else if(style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
                     if(vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {
@@ -231,7 +228,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     }
 
     /* Flush in time to avoid accumulation of drawing commands */
-    lv_vg_lite_flush(&u->base_unit);
+    lv_vg_lite_flush(u);
 
     /* drop path */
     lv_vg_lite_path_drop(u, lv_vg_path);
