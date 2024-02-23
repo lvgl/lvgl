@@ -20,6 +20,8 @@
     #include "neon/lv_blend_neon.h"
 #elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_HELIUM
     #include "helium/lv_blend_helium.h"
+#elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_ARM2D
+    #include "arm2d/lv_blend_arm2d.h"
 #elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
     #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 #endif
