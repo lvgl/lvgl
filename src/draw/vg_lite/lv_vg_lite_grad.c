@@ -209,7 +209,7 @@ static bool grad_create_cb(grad_item_t * item, void * user_data)
 
         /* lvgl color -> gradient color */
         lv_color_t grad_color = lv_color_make(c->blue, c->green, c->red);
-        colors[i] = lv_vg_lite_color(grad_color, opa, true);
+        colors[i] = lv_vg_lite_color(grad_color, opa, false);
     }
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_grad(&item->vg_grad, cnt, colors, stops));
