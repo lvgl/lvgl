@@ -1,12 +1,12 @@
 /**
- * @file lv_test_assert.c
- *
- * Copyright 2002-2010 Guillaume Cottenceau.
- *
- * This software may be freely redistributed under the terms
- * of the X11 license.
- *
- */
+* @file lv_test_assert.c
+*
+* Copyright 2002-2010 Guillaume Cottenceau.
+*
+* This software may be freely redistributed under the terms
+* of the X11 license.
+*
+*/
 
 /*********************
  *      INCLUDES
@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <sys/stat.h>
 #include "unity.h"
 #define PNG_DEBUG 3
 #include <png.h>
@@ -52,6 +53,7 @@ static int read_png_file(png_image_t * p, const char * file_name);
 static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
 static void png_release(png_image_t * p);
 static void buf_to_xrgb8888(const uint8_t * buf_in, uint8_t * buf_out, lv_color_format_t cf_in);
+static void create_folders_if_needed(const char * path) ;
 
 /**********************
  *  STATIC VARIABLES
@@ -130,6 +132,8 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
 
     char fn_ref_full[256];
     lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
+
+    create_folders_if_needed(fn_ref_full);
 
     lv_refr_now(NULL);
 
@@ -412,6 +416,39 @@ static void buf_to_xrgb8888(const uint8_t * buf_in, uint8_t * buf_out, lv_color_
             buf_out += 800 * 4;
         }
     }
+}
+
+static void create_folders_if_needed(const char * path)
+{
+    char * ptr;
+    char * pathCopy = strdup(path);
+    if(pathCopy == NULL) {
+        perror("Error duplicating path");
+        exit(EXIT_FAILURE);
+    }
+
+    char * token = strtok_r(pathCopy, "/", &ptr);
+    char current_path[1024] = {'\0'}; // Adjust the size as needed
+    struct stat st;
+
+    while(token && ptr && *ptr != '\0') {
+        strcat(current_path, token);
+        strcat(current_path, "/");
+
+        if(stat(current_path, &st) != 0) {
+            // Folder doesn't exist, create it
+            if(mkdir(current_path, 0777) != 0) {
+                perror("Error creating folder");
+                free(pathCopy);
+                exit(EXIT_FAILURE);
+            }
+            printf("Created folder: %s\n", current_path);
+        }
+
+        token = strtok_r(NULL, "/", &ptr);
+    }
+
+    free(pathCopy);
 }
 
 #endif
