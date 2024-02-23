@@ -43,9 +43,7 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     add_library(lvgl_thorvg ${THORVG_SOURCES})
     add_library(lvgl::thorvg ALIAS lvgl_thorvg)
     target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
-    if(LV_CONF_PATH)
-        target_compile_definitions(lvgl_thorvg PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
-    endif()
+    target_link_libraries(lvgl_thorvg PUBLIC lvgl)
 endif()
 
 # Build LVGL example library
@@ -106,3 +104,58 @@ install(
   LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
   RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
   PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+
+
+# Install library thorvg
+if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+  set_target_properties(
+    lvgl_thorvg
+    PROPERTIES OUTPUT_NAME lvgl_thorvg
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+
+  install(
+    TARGETS lvgl_thorvg
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif()
+
+# Install library demos
+if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
+  set_target_properties(
+    lvgl_demos
+    PROPERTIES OUTPUT_NAME lvgl_demos
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+
+  install(
+    TARGETS lvgl_demos
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif()
+
+#install library examples
+if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
+  set_target_properties(
+    lvgl_examples
+    PROPERTIES OUTPUT_NAME lvgl_examples
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
+
+  install(
+    TARGETS lvgl_examples
+    ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+    LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+    RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
+    PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif()
