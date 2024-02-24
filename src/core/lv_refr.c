@@ -679,7 +679,11 @@ static void refr_area_part(lv_layer_t * layer)
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
-        lv_draw_buf_clear(layer->draw_buf, &disp_refr->refreshed_area);
+        /*The area always starts at 0;0*/
+        lv_area_t a = disp_refr->refreshed_area;
+        lv_area_move(&a, -disp_refr->refreshed_area.x1, -disp_refr->refreshed_area.y1);
+
+        lv_draw_buf_clear(layer->draw_buf, &a);
     }
 
     lv_obj_t * top_act_scr = NULL;
