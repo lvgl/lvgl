@@ -63,7 +63,7 @@ extern "C" {
  *-----------------*/
 
 #ifdef LV_USE_ASSERT_NULL
-#warning "LV_USE_ASSERT_NULL is renamed to LV_USE_ASSERT_NOT_NULL. Update your lv_conf.h.
+#warning "LV_USE_ASSERT_NULL is renamed to LV_USE_ASSERT_NOT_NULL. Update your lv_conf.h."
 #endif
 
 #if LV_USE_ASSERT_NOT_NULL

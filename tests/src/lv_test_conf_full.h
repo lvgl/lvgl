@@ -5,7 +5,7 @@
 #define LV_LOG_PRINTF           1
 #define LV_USE_FONT_SUBPX       1
 #define LV_FONT_SUBPX_BGR       1
-#define LV_USE_ASSERT_NULL      1
+#define LV_USE_ASSERT_NOT_NULL  1
 #define LV_USE_ASSERT_MALLOC    1
 #define LV_USE_ASSERT_MEM_INTEGRITY     1
 #define LV_USE_ASSERT_OBJ               1
