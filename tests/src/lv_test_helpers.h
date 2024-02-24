@@ -12,7 +12,7 @@
 #else
 #define LV_HEAP_CHECK(x) x
 
-static inline uint32_t lv_test_get_free_mem(void)
+static inline size_t lv_test_get_free_mem(void)
 {
     lv_mem_monitor_t m1;
     lv_mem_monitor(&m1);

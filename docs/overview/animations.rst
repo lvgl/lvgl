@@ -57,7 +57,7 @@ and configured with ``lv_anim_set_...()`` functions.
    lv_anim_set_delay(&a, delay);
 
    /*Set path (curve). Default is linear*/
-   lv_anim_set_path(&a, lv_anim_path_ease_in);
+   lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
 
    /*Set a callback to indicate when the animation is completed.*/
    lv_anim_set_completed_cb(&a, completed_cb);

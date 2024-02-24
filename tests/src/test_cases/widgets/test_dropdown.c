@@ -110,7 +110,7 @@ void test_dropdown_set_options(void)
 
     lv_mem_monitor_t m2;
     lv_mem_monitor(&m2);
-    TEST_ASSERT_UINT32_WITHIN(48, m1.free_size, m2.free_size);
+    TEST_ASSERT_UINT_WITHIN(48, m1.free_size, m2.free_size);
 }
 
 void test_dropdown_select(void)

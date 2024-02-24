@@ -218,8 +218,11 @@ void test_spangroup_draw(void)
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
     lv_obj_set_width(spangroup, 100);
     lv_span_t * span_1 = lv_spangroup_new_span(spangroup);
-    lv_span_t * span_2 = lv_spangroup_new_span(spangroup);
     lv_span_set_text(span_1, "This text is over 100 pixels width");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_01.png");
+
+    lv_span_t * span_2 = lv_spangroup_new_span(spangroup);
     lv_span_set_text(span_2, "This text is also over 100 pixels width");
     lv_style_set_text_decor(&span_2->style, LV_TEXT_DECOR_STRIKETHROUGH);
 

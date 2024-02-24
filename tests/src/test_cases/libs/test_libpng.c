@@ -34,7 +34,7 @@ void test_libpng_1(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/png_2.png");
 
-    uint32_t mem_before = lv_test_get_free_mem();
+    size_t mem_before = lv_test_get_free_mem();
     for(uint32_t i = 0; i < 20; i++) {
         create_images();
 

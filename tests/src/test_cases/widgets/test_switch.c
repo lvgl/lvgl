@@ -49,7 +49,7 @@ void test_switch_should_have_default_state_after_being_created(void)
 void test_switch_should_not_leak_memory_after_deletion(void)
 {
     size_t idx = 0;
-    uint32_t initial_available_memory = 0;
+    size_t initial_available_memory = 0;
     lv_obj_t * switches[SWITCHES_CNT] = {NULL};
 
     initial_available_memory = lv_test_get_free_mem();

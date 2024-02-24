@@ -445,9 +445,6 @@ void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
         lv_vg_lite_path_move_to(path, cx, cy);
         lv_vg_lite_path_line_to(path, start_x + cx, start_y + cy);
     }
-    else {
-        lv_vg_lite_path_move_to(path, start_x + cx, start_y + cy);
-    }
 
     for(int i = 0; i < n_curves; ++i) {
         float end_angle = start_angle + ((i != n_curves - 1) ? MATH_HALF_PI * sweep_sign : fract);
