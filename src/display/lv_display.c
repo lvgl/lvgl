@@ -945,6 +945,8 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
     if(rotation == LV_DISPLAY_ROTATION_180) {
         area->y2 = disp->ver_res - area->y1 - 1;
         area->y1 = area->y2 - h + 1;
+        area->x2 = disp->hor_res - area->x1 - 1;
+        area->x1 = area->x2 - w + 1;
     }
 
     if(rotation == LV_DISPLAY_ROTATION_270) {
