@@ -123,7 +123,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         LV_PROFILER_END_TAG("vg_lite_blit_rect");
     }
     else {
-        lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_S16);
+        lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
         lv_vg_lite_path_append_rect(
             path,
             clip_area.x1, clip_area.y1,
