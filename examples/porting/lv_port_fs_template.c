@@ -64,7 +64,6 @@ void lv_port_fs_init(void)
      * Register the file system interface in LVGL
      *--------------------------------------------------*/
 
-    /*Add a simple drive to open images*/
     static lv_fs_drv_t fs_drv;
     lv_fs_drv_init(&fs_drv);
 
@@ -195,8 +194,8 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 /**
  * Give the position of the read write pointer
  * @param drv       pointer to a driver where this function belongs
- * @param file_p    pointer to a file_t variable.
- * @param pos_p     pointer to to store the result
+ * @param file_p    pointer to a file_t variable
+ * @param pos_p     pointer to store the result
  * @return          LV_FS_RES_OK: no error or  any error from @lv_fs_res_t enum
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
