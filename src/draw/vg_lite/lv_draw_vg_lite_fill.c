@@ -84,12 +84,14 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
     if(dsc->grad.dir != LV_GRAD_DIR_NONE) {
+        vg_lite_matrix_t grad_matrix;
+        lv_vg_lite_grad_area_to_matrix(&grad_matrix, coords, dsc->grad.dir);
         lv_vg_lite_draw_linear_grad(
             u,
             &u->target_buffer,
             vg_lite_path,
-            coords,
             &dsc->grad,
+            &grad_matrix,
             &matrix,
             VG_LITE_FILL_EVEN_ODD,
             VG_LITE_BLEND_SRC_OVER);
