@@ -262,7 +262,7 @@ static void x11_mousewheel_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 static lv_indev_t * lv_x11_keyboard_create(lv_display_t * disp)
 {
     lv_indev_t * indev = lv_indev_create();
-    LV_ASSERT_OBJ(indev, MY_CLASS);
+    LV_ASSERT_NULL(indev);
     if(NULL != indev) {
         lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
         lv_indev_set_read_cb(indev, x11_keyboard_read_cb);
