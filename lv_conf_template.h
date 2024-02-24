@@ -17,6 +17,11 @@
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
+/*If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
+#if  0 && defined(__ASSEMBLY__)
+#include "my_include.h"
+#endif
+
 /*====================
    COLOR SETTINGS
  *====================*/

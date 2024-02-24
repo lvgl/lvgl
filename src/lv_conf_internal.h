@@ -73,6 +73,11 @@
  * Start parsing lv_conf_template.h
  -----------------------------------*/
 
+/*If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
+#if  0 && defined(__ASSEMBLY__)
+#include "my_include.h"
+#endif
+
 /*====================
    COLOR SETTINGS
  *====================*/
