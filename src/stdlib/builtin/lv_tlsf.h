@@ -1,4 +1,4 @@
-#include "../../lv_conf_internal.h"
+﻿#include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #ifndef LV_TLSF_H
@@ -60,8 +60,8 @@ typedef struct {
     lv_mutex_t mutex;
 #endif
     lv_tlsf_t tlsf;
-    uint32_t cur_used;
-    uint32_t max_used;
+    size_t cur_used;
+    size_t max_used;
     lv_ll_t  pool_ll;
 } lv_tlsf_state_t;
 

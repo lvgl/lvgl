@@ -92,13 +92,13 @@ void lv_example_table_2(void)
     lv_mem_monitor_t mon2;
     lv_mem_monitor(&mon2);
 
-    uint32_t mem_used = mon1.free_size - mon2.free_size;
+    size_t mem_used = mon1.free_size - mon2.free_size;
 
     uint32_t elaps = lv_tick_elaps(t);
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text_fmt(label, "%"LV_PRIu32" items were created in %"LV_PRIu32" ms\n"
-                          "using %"LV_PRIu32" bytes of memory",
+                          "using %zu bytes of memory",
                           (uint32_t)ITEM_CNT, elaps, mem_used);
 
     lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -10);

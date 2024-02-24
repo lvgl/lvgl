@@ -29,7 +29,7 @@ void test_event_should_not_memory_lean(void)
     lv_mem_monitor_t monitor;
     lv_mem_monitor(&monitor);
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    uint32_t initial_free_size = monitor.free_size;
+    size_t initial_free_size = monitor.free_size;
 
     for(int i = 0; i < 10; i++) {
         lv_obj_add_event_cb(obj, NULL, LV_EVENT_ALL, NULL);
