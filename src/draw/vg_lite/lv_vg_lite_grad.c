@@ -53,7 +53,7 @@ static lv_cache_compare_res_t grad_compare_cb(const grad_item_t * lhs, const gra
 
 void lv_vg_lite_grad_init(struct _lv_draw_vg_lite_unit_t * u)
 {
-    LV_ASSERT_NULL(u);
+    LV_ASSERT_NOT_NULL(u);
 
     lv_cache_ops_t ops = {
         .compare_cb = (lv_cache_compare_cb_t)grad_compare_cb,
@@ -62,14 +62,14 @@ void lv_vg_lite_grad_init(struct _lv_draw_vg_lite_unit_t * u)
     };
 
     u->grad_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(grad_item_t), LV_VG_LITE_GRAD_CACHE_SIZE, ops);
-    LV_ASSERT_NULL(u->grad_cache);
+    LV_ASSERT_NOT_NULL(u->grad_cache);
 
     lv_array_init(&u->grad_pending, 4, sizeof(lv_cache_entry_t *));
 }
 
 void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u)
 {
-    LV_ASSERT_NULL(u);
+    LV_ASSERT_NOT_NULL(u);
     lv_vg_lite_linear_grad_release_all(u);
     lv_array_deinit(&u->grad_pending);
     lv_cache_destroy(u->grad_cache, NULL);
@@ -85,16 +85,16 @@ void lv_vg_lite_draw_linear_grad(
     vg_lite_fill_t fill,
     vg_lite_blend_t blend)
 {
-    LV_ASSERT_NULL(buffer);
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(area);
-    LV_ASSERT_NULL(grad);
-    LV_ASSERT_NULL(matrix);
+    LV_ASSERT_NOT_NULL(buffer);
+    LV_ASSERT_NOT_NULL(path);
+    LV_ASSERT_NOT_NULL(area);
+    LV_ASSERT_NOT_NULL(grad);
+    LV_ASSERT_NOT_NULL(matrix);
 
     LV_PROFILER_BEGIN;
 
     vg_lite_linear_gradient_t * gradient = lv_vg_lite_linear_grad_get(u, grad);
-    LV_ASSERT_NULL(gradient);
+    LV_ASSERT_NOT_NULL(gradient);
     if(!gradient) {
         LV_LOG_ERROR("Failed to get linear gradient");
         LV_PROFILER_END;
@@ -137,7 +137,7 @@ void lv_vg_lite_draw_linear_grad(
 
 void lv_vg_lite_linear_grad_release_all(struct _lv_draw_vg_lite_unit_t * u)
 {
-    LV_ASSERT_NULL(u);
+    LV_ASSERT_NOT_NULL(u);
     lv_array_t * arr = &u->grad_pending;
     uint32_t size = lv_array_size(arr);
     if(size == 0) {
@@ -160,8 +160,8 @@ void lv_vg_lite_linear_grad_release_all(struct _lv_draw_vg_lite_unit_t * u)
 static vg_lite_linear_gradient_t * lv_vg_lite_linear_grad_get(struct _lv_draw_vg_lite_unit_t * u,
                                                               const lv_grad_dsc_t * grad)
 {
-    LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(grad);
+    LV_ASSERT_NOT_NULL(u);
+    LV_ASSERT_NOT_NULL(grad);
 
     grad_item_t search_key;
     lv_memzero(&search_key, sizeof(grad_item_t));

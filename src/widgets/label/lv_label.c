@@ -136,7 +136,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(fmt);
+    LV_ASSERT_NOT_NULL(fmt);
 
     lv_obj_invalidate(obj);
     lv_label_t * label = (lv_label_t *)obj;
@@ -253,7 +253,7 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj)
 void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(pos);
+    LV_ASSERT_NOT_NULL(pos);
 
     lv_label_t * label = (lv_label_t *)obj;
     const char * txt = lv_label_get_text(obj);
@@ -357,7 +357,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
 {
     LV_UNUSED(bidi);
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(pos_in);
+    LV_ASSERT_NOT_NULL(pos_in);
     lv_label_t * label = (lv_label_t *)obj;
 
     lv_point_t pos;
@@ -470,7 +470,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
 bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(pos);
+    LV_ASSERT_NOT_NULL(pos);
 
     lv_area_t txt_coords;
     lv_obj_get_content_coords(obj, &txt_coords);
@@ -570,7 +570,7 @@ uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj)
 void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(txt);
+    LV_ASSERT_NOT_NULL(txt);
 
     lv_label_t * label = (lv_label_t *)obj;
 

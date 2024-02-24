@@ -80,7 +80,7 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
 
 lv_font_t * lv_binfont_create(const char * path)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
 
     lv_fs_file_t file;
     lv_fs_res_t fs_res = lv_fs_open(&file, path, LV_FS_MODE_RD);

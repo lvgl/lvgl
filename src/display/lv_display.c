@@ -718,34 +718,34 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
 void lv_display_add_event_cb(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
-    LV_ASSERT_NULL(disp);
+    LV_ASSERT_NOT_NULL(disp);
 
     lv_event_add(&disp->event_list, event_cb, filter, user_data);
 }
 
 uint32_t lv_display_get_event_count(lv_display_t * disp)
 {
-    LV_ASSERT_NULL(disp);
+    LV_ASSERT_NOT_NULL(disp);
     return lv_event_get_count(&disp->event_list);
 }
 
 lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 {
-    LV_ASSERT_NULL(disp);
+    LV_ASSERT_NOT_NULL(disp);
     return lv_event_get_dsc(&disp->event_list, index);
 
 }
 
 bool lv_display_delete_event(lv_display_t * disp, uint32_t index)
 {
-    LV_ASSERT_NULL(disp);
+    LV_ASSERT_NOT_NULL(disp);
 
     return lv_event_remove(&disp->event_list, index);
 }
 
 uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data)
 {
-    LV_ASSERT_NULL(disp);
+    LV_ASSERT_NOT_NULL(disp);
 
     uint32_t event_cnt = lv_display_get_event_count(disp);
     uint32_t removed_count = 0;
@@ -974,7 +974,7 @@ static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_d
 static void scr_load_internal(lv_obj_t * scr)
 {
     /*scr must not be NULL, but d->act_scr might be*/
-    LV_ASSERT_NULL(scr);
+    LV_ASSERT_NOT_NULL(scr);
     if(scr == NULL) return;
 
     lv_display_t * d = lv_obj_get_display(scr);

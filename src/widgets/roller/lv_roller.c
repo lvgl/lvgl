@@ -91,7 +91,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * parent)
 void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(options);
+    LV_ASSERT_NOT_NULL(options);
 
     lv_roller_t * roller = (lv_roller_t *)obj;
     lv_obj_t * label = get_label(obj);

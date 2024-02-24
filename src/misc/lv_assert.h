@@ -62,10 +62,14 @@ extern "C" {
  * ASSERTS
  *-----------------*/
 
-#if LV_USE_ASSERT_NULL
-#   define LV_ASSERT_NULL(p) LV_ASSERT_MSG(p != NULL, "NULL pointer");
+#ifdef LV_USE_ASSERT_NULL
+#warning "LV_USE_ASSERT_NULL is renamed to LV_USE_ASSERT_NOT_NULL. Update your lv_conf.h.
+#endif
+
+#if LV_USE_ASSERT_NOT_NULL
+#   define LV_ASSERT_NOT_NULL(p) LV_ASSERT_MSG(p != NULL, "NULL pointer");
 #else
-#   define LV_ASSERT_NULL(p)
+#   define LV_ASSERT_NOT_NULL(p)
 #endif
 
 #if LV_USE_ASSERT_MALLOC

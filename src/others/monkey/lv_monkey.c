@@ -80,37 +80,37 @@ lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
 
 lv_indev_t * lv_monkey_get_indev(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_ASSERT_NOT_NULL(monkey);
     return monkey->indev;
 }
 
 void lv_monkey_set_enable(lv_monkey_t * monkey, bool en)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_ASSERT_NOT_NULL(monkey);
     en ? lv_timer_resume(monkey->timer) : lv_timer_pause(monkey->timer);
 }
 
 bool lv_monkey_get_enable(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_ASSERT_NOT_NULL(monkey);
     return !monkey->timer->paused;
 }
 
 void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_ASSERT_NOT_NULL(monkey);
     monkey->user_data = user_data;
 }
 
 void * lv_monkey_get_user_data(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_ASSERT_NOT_NULL(monkey);
     return monkey->user_data;
 }
 
 void lv_monkey_delete(lv_monkey_t * monkey)
 {
-    LV_ASSERT_NULL(monkey);
+    LV_ASSERT_NOT_NULL(monkey);
 
     lv_timer_delete(monkey->timer);
     lv_indev_delete(monkey->indev);

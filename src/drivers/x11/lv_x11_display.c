@@ -113,7 +113,7 @@ static inline lv_color32_t get_px(color_t p)
 static void x11_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT_NOT_NULL(xd);
 
     static const lv_area_t inv_area = { .x1 = 0xFFFF,
                                         .x2 = 0,
@@ -167,7 +167,7 @@ static void x11_resolution_evt_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_user_data(e);
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT_NOT_NULL(xd);
 
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
@@ -222,7 +222,7 @@ static void x11_disp_delete_evt_cb(lv_event_t * e)
 static void x11_hide_cursor(lv_display_t * disp)
 {
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT_NOT_NULL(xd);
 
     XColor black = { .red = 0, .green = 0, .blue = 0 };
     char empty_data[] = { 0 };
@@ -250,7 +250,7 @@ static void x11_event_handler(lv_timer_t * t)
 {
     lv_display_t * disp = lv_timer_get_user_data(t);
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT_NOT_NULL(xd);
 
     /* handle all outstanding X events */
     XEvent event;
@@ -290,7 +290,7 @@ static void x11_event_handler(lv_timer_t * t)
 static void * x11_tick_thread(void * data)
 {
     x11_disp_data_t * xd = data;
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT_NOT_NULL(xd);
 
     while(!xd->terminated) {
         usleep(5000);
@@ -302,7 +302,7 @@ static void * x11_tick_thread(void * data)
 static void x11_window_create(lv_display_t * disp, char const * title)
 {
     x11_disp_data_t * xd = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT_NOT_NULL(xd);
 
     /* setup display/screen */
     xd->hdr.display = XOpenDisplay(NULL);

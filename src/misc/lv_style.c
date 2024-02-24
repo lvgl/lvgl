@@ -229,7 +229,7 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
     }
     last_custom_prop_id++;
     /* This should never happen - we should bail out above */
-    LV_ASSERT_NULL(_lv_style_custom_prop_flag_lookup_table);
+    LV_ASSERT_NOT_NULL(_lv_style_custom_prop_flag_lookup_table);
     _lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
     return last_custom_prop_id;
 }

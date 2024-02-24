@@ -46,7 +46,7 @@ extern "C" {
 #define LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc) ((dsc)->magic_num == LV_FREETYPE_FONT_DSC_MAGIC_NUM)
 #define LV_ASSERT_FREETYPE_FONT_DSC(dsc)                                                   \
     do {                                                                                   \
-        LV_ASSERT_NULL(dsc);                                                               \
+        LV_ASSERT_NOT_NULL(dsc);                                                               \
         LV_ASSERT_MSG(LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc), "Invalid font descriptor"); \
     } while (0)
 

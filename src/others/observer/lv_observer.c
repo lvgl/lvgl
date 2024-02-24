@@ -286,7 +286,7 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
 lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t cb, lv_obj_t * obj,
                                             void * user_data)
 {
-    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NOT_NULL(subject);
     if(subject->type == LV_SUBJECT_TYPE_INVALID) {
         LV_LOG_WARN("Subject not initialized yet");
         return NULL;
@@ -315,7 +315,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
 lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t cb, void * target,
                                                     void * user_data)
 {
-    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NOT_NULL(subject);
     if(subject->type == LV_SUBJECT_TYPE_INVALID) {
         LV_LOG_WARN("Subject not initialized yet");
         return NULL;
@@ -339,7 +339,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 
 void lv_observer_remove(lv_observer_t * observer)
 {
-    LV_ASSERT_NULL(observer);
+    LV_ASSERT_NOT_NULL(observer);
 
     observer->subject->notify_restart_query = 1;
 
@@ -353,7 +353,7 @@ void lv_observer_remove(lv_observer_t * observer)
 
 void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NOT_NULL(subject);
     if(subject->type == LV_SUBJECT_TYPE_INVALID) {
         LV_LOG_WARN("Subject not initialized yet");
         return;
@@ -389,14 +389,14 @@ void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
 
 void * lv_observer_get_target(lv_observer_t * observer)
 {
-    LV_ASSERT_NULL(observer);
+    LV_ASSERT_NOT_NULL(observer);
 
     return observer->target;
 }
 
 void lv_subject_notify(lv_subject_t * subject)
 {
-    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NOT_NULL(subject);
 
     lv_observer_t * observer;
     _LV_LL_READ(&(subject->subs_ll), observer) {

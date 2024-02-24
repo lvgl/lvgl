@@ -677,15 +677,15 @@
 
 /*Enable asserts if an operation is failed or an invalid data is found.
  *If LV_USE_LOG is enabled an error message will be printed on failure*/
-#ifndef LV_USE_ASSERT_NULL
+#ifndef LV_USE_ASSERT_NOT_NULL
     #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ASSERT_NULL
-            #define LV_USE_ASSERT_NULL CONFIG_LV_USE_ASSERT_NULL
+        #ifdef CONFIG_LV_USE_ASSERT_NOT_NULL
+            #define LV_USE_ASSERT_NOT_NULL CONFIG_LV_USE_ASSERT_NOT_NULL
         #else
-            #define LV_USE_ASSERT_NULL 0
+            #define LV_USE_ASSERT_NOT_NULL 0
         #endif
     #else
-        #define LV_USE_ASSERT_NULL          1   /*Check if the parameter is NULL. (Very fast, recommended)*/
+        #define LV_USE_ASSERT_NOT_NULL      1   /*Check if the parameter is NULL. (Very fast, recommended)*/
     #endif
 #endif
 #ifndef LV_USE_ASSERT_MALLOC

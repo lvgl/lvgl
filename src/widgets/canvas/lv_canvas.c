@@ -66,7 +66,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent)
 void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_color_format_t cf)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(buf);
+    LV_ASSERT_NOT_NULL(buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     uint32_t stride = lv_draw_buf_width_to_stride(w, cf);
@@ -85,7 +85,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
 void lv_canvas_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(draw_buf);
+    LV_ASSERT_NOT_NULL(draw_buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     canvas->draw_buf = draw_buf;
@@ -247,7 +247,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
                         const lv_area_t * dest_area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(canvas_area && dest_buf);
+    LV_ASSERT_NOT_NULL(canvas_area && dest_buf);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
@@ -316,8 +316,8 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
 
 void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
 {
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_NULL(layer);
+    LV_ASSERT_NOT_NULL(obj);
+    LV_ASSERT_NOT_NULL(layer);
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 

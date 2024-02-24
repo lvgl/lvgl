@@ -130,7 +130,7 @@ void lv_freetype_uninit(void)
 lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
                                     lv_freetype_font_style_t style)
 {
-    LV_ASSERT_NULL(pathname);
+    LV_ASSERT_NOT_NULL(pathname);
     LV_ASSERT(size > 0);
 
     size_t pathname_len = lv_strlen(pathname);
@@ -195,10 +195,10 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
 
 void lv_freetype_font_delete(lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    LV_ASSERT_NOT_NULL(font);
     lv_freetype_context_t * ctx = lv_freetype_get_context();
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)(font->dsc);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
     lv_cache_release(ctx->cache_node_cache, dsc->cache_node_entry, NULL);
@@ -241,7 +241,7 @@ FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc)
 
 void lv_freetype_italic_transform(FT_Face face)
 {
-    LV_ASSERT_NULL(face);
+    LV_ASSERT_NOT_NULL(face);
     FT_Matrix matrix;
     matrix.xx = FT_INT_TO_F16DOT16(1);
     matrix.xy = 0x5800;
@@ -252,7 +252,7 @@ void lv_freetype_italic_transform(FT_Face face)
 
 const char * lv_freetype_get_pathname(FTC_FaceID face_id)
 {
-    LV_ASSERT_NULL(face_id);
+    LV_ASSERT_NOT_NULL(face_id);
     return (const char *)face_id;
 }
 
@@ -322,7 +322,7 @@ static FT_Error lv_freetype_face_requester(FTC_FaceID face_id,
 
 static void lv_freetype_cleanup(lv_freetype_context_t * ctx)
 {
-    LV_ASSERT_NULL(ctx);
+    LV_ASSERT_NOT_NULL(ctx);
     if(ctx->cache_node_cache) {
         lv_cache_destroy(ctx->cache_node_cache, NULL);
         ctx->cache_node_cache = NULL;
@@ -373,7 +373,7 @@ static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const cha
 #endif
     {
         node->pathname = lv_strdup(pathname);
-        LV_ASSERT_NULL(node->pathname);
+        LV_ASSERT_NOT_NULL(node->pathname);
     }
 
     LV_LOG_INFO("add face_id: %s", node->pathname);

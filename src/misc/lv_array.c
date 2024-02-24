@@ -114,7 +114,7 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
 void lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 {
     uint8_t * data = lv_realloc(array->data, new_capacity * array->element_size);
-    LV_ASSERT_NULL(data);
+    LV_ASSERT_NOT_NULL(data);
     array->data = data;
     array->capacity = new_capacity;
     if(array->size > new_capacity) {
@@ -124,7 +124,7 @@ void lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
 {
-    LV_ASSERT_NULL(array->data);
+    LV_ASSERT_NOT_NULL(array->data);
     uint32_t size = other->size;
     if(array->size + size > array->capacity) {
         /*array is full*/
@@ -139,7 +139,7 @@ lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
 
 lv_result_t lv_array_push_back(lv_array_t * array, const void * element)
 {
-    LV_ASSERT_NULL(array->data);
+    LV_ASSERT_NOT_NULL(array->data);
 
     if(array->size == array->capacity) {
         /*array is full*/
@@ -158,7 +158,7 @@ void * lv_array_at(const lv_array_t * array, uint32_t index)
         return NULL;
     }
 
-    LV_ASSERT_NULL(array->data);
+    LV_ASSERT_NOT_NULL(array->data);
     return array->data + index * array->element_size;
 }
 

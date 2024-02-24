@@ -95,7 +95,7 @@ void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction)
 lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(data);
+    LV_ASSERT_NOT_NULL(data);
 
     lv_result_t res = LV_RESULT_INVALID;
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
@@ -205,7 +205,7 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
 static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
 {
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NOT_NULL(obj);
     LV_ASSERT(w > 0);
 
     lv_draw_buf_t * old_buf = lv_canvas_get_draw_buf(obj);

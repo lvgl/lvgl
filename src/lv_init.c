@@ -77,7 +77,7 @@
  **********************/
 static inline void lv_global_init(lv_global_t * global)
 {
-    LV_ASSERT_NULL(global);
+    LV_ASSERT_NOT_NULL(global);
 
     if(global == NULL) {
         LV_LOG_ERROR("lv_global cannot be null");
@@ -105,7 +105,7 @@ static inline void lv_global_init(lv_global_t * global)
 
 static inline void _lv_cleanup_devices(lv_global_t * global)
 {
-    LV_ASSERT_NULL(global);
+    LV_ASSERT_NOT_NULL(global);
 
     if(global) {
         /* cleanup indev and display */

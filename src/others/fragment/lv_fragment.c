@@ -24,8 +24,8 @@ static void cb_delete_assertion(lv_event_t * event);
 
 lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
 {
-    LV_ASSERT_NULL(cls);
-    LV_ASSERT_NULL(cls->create_obj_cb);
+    LV_ASSERT_NOT_NULL(cls);
+    LV_ASSERT_NOT_NULL(cls->create_obj_cb);
     LV_ASSERT(cls->instance_size >= sizeof(lv_fragment_t));
     lv_fragment_t * instance = lv_malloc_zeroed(cls->instance_size);
     instance->cls = cls;
@@ -38,7 +38,7 @@ lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
 
 void lv_fragment_delete(lv_fragment_t * fragment)
 {
-    LV_ASSERT_NULL(fragment);
+    LV_ASSERT_NOT_NULL(fragment);
     if(fragment->managed) {
         lv_fragment_manager_remove(fragment->managed->manager, fragment);
         return;
@@ -57,22 +57,22 @@ void lv_fragment_delete(lv_fragment_t * fragment)
 
 lv_fragment_manager_t * lv_fragment_get_manager(lv_fragment_t * fragment)
 {
-    LV_ASSERT_NULL(fragment);
-    LV_ASSERT_NULL(fragment->managed);
+    LV_ASSERT_NOT_NULL(fragment);
+    LV_ASSERT_NOT_NULL(fragment->managed);
     return fragment->managed->manager;
 }
 
 lv_obj_t * const * lv_fragment_get_container(lv_fragment_t * fragment)
 {
-    LV_ASSERT_NULL(fragment);
-    LV_ASSERT_NULL(fragment->managed);
+    LV_ASSERT_NOT_NULL(fragment);
+    LV_ASSERT_NOT_NULL(fragment->managed);
     return fragment->managed->container;
 }
 
 lv_fragment_t * lv_fragment_get_parent(lv_fragment_t * fragment)
 {
-    LV_ASSERT_NULL(fragment);
-    LV_ASSERT_NULL(fragment->managed);
+    LV_ASSERT_NOT_NULL(fragment);
+    LV_ASSERT_NOT_NULL(fragment->managed);
     return lv_fragment_manager_get_parent_fragment(fragment->managed->manager);
 }
 
@@ -84,7 +84,7 @@ lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container
     }
     const lv_fragment_class_t * cls = fragment->cls;
     lv_obj_t * obj = cls->create_obj_cb(fragment, container);
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NOT_NULL(obj);
     fragment->obj = obj;
     lv_fragment_manager_create_obj(fragment->child_manager);
     if(states) {
@@ -99,7 +99,7 @@ lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container
 
 void lv_fragment_delete_obj(lv_fragment_t * fragment)
 {
-    LV_ASSERT_NULL(fragment);
+    LV_ASSERT_NOT_NULL(fragment);
     lv_fragment_manager_delete_obj(fragment->child_manager);
     lv_fragment_managed_states_t * states = fragment->managed;
     if(states) {
@@ -119,7 +119,7 @@ void lv_fragment_delete_obj(lv_fragment_t * fragment)
 
         LV_ASSERT(cb_removed);
     }
-    LV_ASSERT_NULL(fragment->obj);
+    LV_ASSERT_NOT_NULL(fragment->obj);
     const lv_fragment_class_t * cls = fragment->cls;
     if(cls->obj_will_delete_cb) {
         cls->obj_will_delete_cb(fragment, fragment->obj);
@@ -136,8 +136,8 @@ void lv_fragment_delete_obj(lv_fragment_t * fragment)
 
 void lv_fragment_recreate_obj(lv_fragment_t * fragment)
 {
-    LV_ASSERT_NULL(fragment);
-    LV_ASSERT_NULL(fragment->managed);
+    LV_ASSERT_NOT_NULL(fragment);
+    LV_ASSERT_NOT_NULL(fragment->managed);
     lv_fragment_delete_obj(fragment);
     lv_fragment_create_obj(fragment, *fragment->managed->container);
 }

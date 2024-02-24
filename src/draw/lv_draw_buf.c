@@ -73,7 +73,7 @@ void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
 void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     if(handlers.invalidate_cache_cb) {
-        LV_ASSERT_NULL(draw_buf);
+        LV_ASSERT_NOT_NULL(draw_buf);
         const lv_image_header_t * header = &draw_buf->header;
         lv_area_t full;
         if(area == NULL) {
@@ -88,7 +88,7 @@ void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_
 
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
 {
-    LV_ASSERT_NULL(draw_buf);
+    LV_ASSERT_NOT_NULL(draw_buf);
     if(a && lv_area_get_width(a) < 0) return;
     if(a && lv_area_get_height(a) < 0) return;
 
@@ -161,7 +161,7 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
 lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride,
                              void * data, uint32_t data_size)
 {
-    LV_ASSERT_NULL(draw_buf);
+    LV_ASSERT_NOT_NULL(draw_buf);
     if(draw_buf == NULL) return LV_RESULT_INVALID;
 
     lv_memzero(draw_buf, sizeof(lv_draw_buf_t));
@@ -262,7 +262,7 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
 
 void lv_draw_buf_destroy(lv_draw_buf_t * buf)
 {
-    LV_ASSERT_NULL(buf);
+    LV_ASSERT_NOT_NULL(buf);
     if(buf == NULL) return;
 
     if(buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
@@ -276,7 +276,7 @@ void lv_draw_buf_destroy(lv_draw_buf_t * buf)
 
 void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 {
-    LV_ASSERT_NULL(buf);
+    LV_ASSERT_NOT_NULL(buf);
     if(buf == NULL) return NULL;
 
     uint8_t * data = buf->data + buf->header.stride * y;
@@ -289,8 +289,8 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 
 lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
 {
-    LV_ASSERT_NULL(src);
-    LV_ASSERT_NULL(src->data);
+    LV_ASSERT_NOT_NULL(src);
+    LV_ASSERT_NOT_NULL(src->data);
     if(src == NULL) return LV_RESULT_INVALID;
     if(src->data == NULL) return LV_RESULT_INVALID;
 
@@ -346,7 +346,7 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
 
 lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
 {
-    LV_ASSERT_NULL(draw_buf);
+    LV_ASSERT_NOT_NULL(draw_buf);
     if(draw_buf == NULL) return LV_RESULT_INVALID;
 
     if(draw_buf->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) return LV_RESULT_INVALID;
@@ -424,7 +424,7 @@ lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf)
 
 void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color)
 {
-    LV_ASSERT_NULL(draw_buf);
+    LV_ASSERT_NOT_NULL(draw_buf);
     if(draw_buf == NULL) return;
 
     if(!LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {

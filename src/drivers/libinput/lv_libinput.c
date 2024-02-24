@@ -381,7 +381,7 @@ lv_libinput_event_t * _create_event(lv_libinput_t * dsc)
 static void _read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_libinput_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
 
     pthread_mutex_lock(&dsc->event_lock);
 
@@ -602,7 +602,7 @@ static void _read_keypad(lv_libinput_t * dsc, struct libinput_event * event)
                 /* Only record button state when actual output is produced to prevent widgets from refreshing */
                 evt->pressed = (key_state == LIBINPUT_KEY_STATE_RELEASED) ? LV_INDEV_STATE_RELEASED : LV_INDEV_STATE_PRESSED;
 
-                // just release the key immediatly after it got pressed.
+                // just release the key immediately after it got pressed.
                 // but don't handle special keys where holding a key makes sense
                 if(evt->key_val != LV_KEY_BACKSPACE &&
                    evt->key_val != LV_KEY_UP &&

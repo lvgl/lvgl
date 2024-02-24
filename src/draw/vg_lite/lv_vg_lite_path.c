@@ -65,14 +65,14 @@ typedef struct {
 
 void lv_vg_lite_path_init(struct _lv_draw_vg_lite_unit_t * unit)
 {
-    LV_ASSERT_NULL(unit);
+    LV_ASSERT_NOT_NULL(unit);
     unit->global_path = lv_vg_lite_path_create(VG_LITE_FP32);
     unit->path_in_use = false;
 }
 
 void lv_vg_lite_path_deinit(struct _lv_draw_vg_lite_unit_t * unit)
 {
-    LV_ASSERT_NULL(unit);
+    LV_ASSERT_NOT_NULL(unit);
     LV_ASSERT(!unit->path_in_use);
     lv_vg_lite_path_destroy(unit->global_path);
     unit->global_path = NULL;
@@ -99,7 +99,7 @@ lv_vg_lite_path_t * lv_vg_lite_path_create(vg_lite_format_t data_format)
 void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path)
 {
     LV_PROFILER_BEGIN;
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     if(path->base.path != NULL) {
         lv_free(path->base.path);
         path->base.path = NULL;
@@ -110,8 +110,8 @@ void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path)
 
 lv_vg_lite_path_t * lv_vg_lite_path_get(struct _lv_draw_vg_lite_unit_t * unit, vg_lite_format_t data_format)
 {
-    LV_ASSERT_NULL(unit);
-    LV_ASSERT_NULL(unit->global_path);
+    LV_ASSERT_NOT_NULL(unit);
+    LV_ASSERT_NOT_NULL(unit->global_path);
     LV_ASSERT(!unit->path_in_use);
     lv_vg_lite_path_reset(unit->global_path, data_format);
     unit->path_in_use = true;
@@ -120,8 +120,8 @@ lv_vg_lite_path_t * lv_vg_lite_path_get(struct _lv_draw_vg_lite_unit_t * unit, v
 
 void lv_vg_lite_path_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * path)
 {
-    LV_ASSERT_NULL(unit);
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(unit);
+    LV_ASSERT_NOT_NULL(path);
     LV_ASSERT(unit->global_path == path);
     LV_ASSERT(unit->path_in_use);
     unit->path_in_use = false;
@@ -129,7 +129,7 @@ void lv_vg_lite_path_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path
 
 void lv_vg_lite_path_reset(lv_vg_lite_path_t * path, vg_lite_format_t data_format)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     path->base.path_length = 0;
     path->base.format = data_format;
     path->base.quality = VG_LITE_MEDIUM;
@@ -138,7 +138,7 @@ void lv_vg_lite_path_reset(lv_vg_lite_path_t * path, vg_lite_format_t data_forma
 
 vg_lite_path_t * lv_vg_lite_path_get_path(lv_vg_lite_path_t * path)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     return &path->base;
 }
 
@@ -146,7 +146,7 @@ void lv_vg_lite_path_set_bonding_box(lv_vg_lite_path_t * path,
                                      float min_x, float min_y,
                                      float max_x, float max_y)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     path->base.bounding_box[0] = min_x;
     path->base.bounding_box[1] = min_y;
     path->base.bounding_box[2] = max_x;
@@ -155,8 +155,8 @@ void lv_vg_lite_path_set_bonding_box(lv_vg_lite_path_t * path,
 
 void lv_vg_lite_path_set_bonding_box_area(lv_vg_lite_path_t * path, const lv_area_t * area)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(area);
+    LV_ASSERT_NOT_NULL(path);
+    LV_ASSERT_NOT_NULL(area);
     lv_vg_lite_path_set_bonding_box(path, area->x1, area->y1, area->x2 + 1, area->y2 + 1);
 }
 
@@ -164,7 +164,7 @@ void lv_vg_lite_path_get_bonding_box(lv_vg_lite_path_t * path,
                                      float * min_x, float * min_y,
                                      float * max_x, float * max_y)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     if(min_x) *min_x = path->base.bounding_box[0];
     if(min_y) *min_y = path->base.bounding_box[1];
     if(max_x) *max_x = path->base.bounding_box[2];
@@ -203,7 +203,7 @@ static void path_bounds_iter_cb(void * user_data, uint8_t op_code, const float *
 
 bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
 
     if(!path->format_len) {
         return false;
@@ -232,14 +232,14 @@ bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path)
 
 void lv_vg_lite_path_set_quality(lv_vg_lite_path_t * path, vg_lite_quality_t quality)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     path->base.quality = quality;
 }
 
 static void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * data, size_t len)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(data);
+    LV_ASSERT_NOT_NULL(path);
+    LV_ASSERT_NOT_NULL(data);
 
     if(path->base.path_length + len > path->mem_size) {
         if(path->mem_size == 0) {
@@ -278,7 +278,7 @@ static void lv_vg_lite_path_append_point(lv_vg_lite_path_t * path, float x, floa
 void lv_vg_lite_path_move_to(lv_vg_lite_path_t * path,
                              float x, float y)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     lv_vg_lite_path_append_op(path, VLC_OP_MOVE);
     lv_vg_lite_path_append_point(path, x, y);
 }
@@ -286,7 +286,7 @@ void lv_vg_lite_path_move_to(lv_vg_lite_path_t * path,
 void lv_vg_lite_path_line_to(lv_vg_lite_path_t * path,
                              float x, float y)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     lv_vg_lite_path_append_op(path, VLC_OP_LINE);
     lv_vg_lite_path_append_point(path, x, y);
 }
@@ -295,7 +295,7 @@ void lv_vg_lite_path_quad_to(lv_vg_lite_path_t * path,
                              float cx, float cy,
                              float x, float y)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     lv_vg_lite_path_append_op(path, VLC_OP_QUAD);
     lv_vg_lite_path_append_point(path, cx, cy);
     lv_vg_lite_path_append_point(path, x, y);
@@ -306,7 +306,7 @@ void lv_vg_lite_path_cubic_to(lv_vg_lite_path_t * path,
                               float cx2, float cy2,
                               float x, float y)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     lv_vg_lite_path_append_op(path, VLC_OP_CUBIC);
     lv_vg_lite_path_append_point(path, cx1, cy1);
     lv_vg_lite_path_append_point(path, cx2, cy2);
@@ -315,13 +315,13 @@ void lv_vg_lite_path_cubic_to(lv_vg_lite_path_t * path,
 
 void lv_vg_lite_path_close(lv_vg_lite_path_t * path)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     lv_vg_lite_path_append_op(path, VLC_OP_CLOSE);
 }
 
 void lv_vg_lite_path_end(lv_vg_lite_path_t * path)
 {
-    LV_ASSERT_NULL(path);
+    LV_ASSERT_NOT_NULL(path);
     lv_vg_lite_path_append_op(path, VLC_OP_END);
 }
 
@@ -542,8 +542,8 @@ uint8_t lv_vg_lite_path_format_len(vg_lite_format_t format)
 
 void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_iter_cb_t cb, void * user_data)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(cb);
+    LV_ASSERT_NOT_NULL(path);
+    LV_ASSERT_NOT_NULL(cb);
 
     uint8_t fmt_len = lv_vg_lite_path_format_len(path->format);
     uint8_t * cur = path->path;

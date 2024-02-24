@@ -46,8 +46,8 @@ static void rb_delete_color(lv_rb_t * tree, lv_rb_node_t * node1, lv_rb_node_t *
 
 bool lv_rb_init(lv_rb_t * tree, lv_rb_compare_t compare, size_t node_size)
 {
-    LV_ASSERT_NULL(tree);
-    LV_ASSERT_NULL(compare);
+    LV_ASSERT_NOT_NULL(tree);
+    LV_ASSERT_NOT_NULL(compare);
     LV_ASSERT(node_size > 0);
 
     if(tree == NULL || compare == NULL || node_size == 0) {
@@ -65,7 +65,7 @@ bool lv_rb_init(lv_rb_t * tree, lv_rb_compare_t compare, size_t node_size)
 
 lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * key)
 {
-    LV_ASSERT_NULL(tree);
+    LV_ASSERT_NOT_NULL(tree);
     if(tree == NULL) {
         return NULL;
     }
@@ -102,7 +102,7 @@ lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * key)
 
 lv_rb_node_t * lv_rb_find(lv_rb_t * tree, const void * key)
 {
-    LV_ASSERT_NULL(tree);
+    LV_ASSERT_NOT_NULL(tree);
     if(tree == NULL) {
         return NULL;
     }
@@ -209,13 +209,13 @@ void * lv_rb_remove_node(lv_rb_t * tree, lv_rb_node_t * node)
 
 void * lv_rb_remove(lv_rb_t * tree, const void * key)
 {
-    LV_ASSERT_NULL(tree);
+    LV_ASSERT_NOT_NULL(tree);
     if(tree == NULL) {
         return NULL;
     }
 
     lv_rb_node_t * node = lv_rb_find(tree, key);
-    LV_ASSERT_NULL(node);
+    LV_ASSERT_NOT_NULL(node);
     if(node == NULL) {
         LV_LOG_WARN("rb delete %d not found", (int)(uintptr_t)key);
         return NULL;
@@ -226,7 +226,7 @@ void * lv_rb_remove(lv_rb_t * tree, const void * key)
 
 bool lv_rb_drop_node(lv_rb_t * tree, lv_rb_node_t * node)
 {
-    LV_ASSERT_NULL(tree);
+    LV_ASSERT_NOT_NULL(tree);
     if(tree == NULL) {
         return false;
     }
@@ -241,7 +241,7 @@ bool lv_rb_drop_node(lv_rb_t * tree, lv_rb_node_t * node)
 
 bool lv_rb_drop(lv_rb_t * tree, const void * key)
 {
-    LV_ASSERT_NULL(tree);
+    LV_ASSERT_NOT_NULL(tree);
     if(tree == NULL) {
         return false;
     }
@@ -256,7 +256,7 @@ bool lv_rb_drop(lv_rb_t * tree, const void * key)
 
 void lv_rb_destroy(lv_rb_t * tree)
 {
-    LV_ASSERT_NULL(tree);
+    LV_ASSERT_NOT_NULL(tree);
 
     if(tree == NULL) {
         return;
@@ -292,7 +292,7 @@ void lv_rb_destroy(lv_rb_t * tree)
 
 lv_rb_node_t * lv_rb_minimum(lv_rb_t * tree)
 {
-    LV_ASSERT_NULL(tree);
+    LV_ASSERT_NOT_NULL(tree);
     if(tree == NULL) {
         return NULL;
     }
@@ -301,7 +301,7 @@ lv_rb_node_t * lv_rb_minimum(lv_rb_t * tree)
 
 lv_rb_node_t * lv_rb_maximum(lv_rb_t * tree)
 {
-    LV_ASSERT_NULL(tree);
+    LV_ASSERT_NOT_NULL(tree);
     if(tree == NULL) {
         return NULL;
     }
@@ -484,7 +484,7 @@ static void rb_insert_color(lv_rb_t * tree, lv_rb_node_t * node)
 
 static void rb_delete_color(lv_rb_t * tree, lv_rb_node_t * node1, lv_rb_node_t * node2)
 {
-    LV_ASSERT_NULL(tree);
+    LV_ASSERT_NOT_NULL(tree);
     if(tree == NULL) {
         return;
     }

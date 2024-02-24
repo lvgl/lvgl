@@ -135,7 +135,7 @@ lv_indev_t * lv_indev_create(void)
 
 void lv_indev_delete(lv_indev_t * indev)
 {
-    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NOT_NULL(indev);
 
     lv_indev_send_event(indev, LV_EVENT_DELETE, NULL);
     lv_event_remove_all(&(indev->event_list));
@@ -549,34 +549,34 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 
 void lv_indev_add_event_cb(lv_indev_t * indev, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
-    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NOT_NULL(indev);
 
     lv_event_add(&indev->event_list, event_cb, filter, user_data);
 }
 
 uint32_t lv_indev_get_event_count(lv_indev_t * indev)
 {
-    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NOT_NULL(indev);
     return lv_event_get_count(&indev->event_list);
 }
 
 lv_event_dsc_t * lv_indev_get_event_dsc(lv_indev_t * indev, uint32_t index)
 {
-    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NOT_NULL(indev);
     return lv_event_get_dsc(&indev->event_list, index);
 
 }
 
 bool lv_indev_remove_event(lv_indev_t * indev, uint32_t index)
 {
-    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NOT_NULL(indev);
 
     return lv_event_remove(&indev->event_list, index);
 }
 
 uint32_t lv_indev_remove_event_cb_with_user_data(lv_indev_t * indev, lv_event_cb_t event_cb, void * user_data)
 {
-    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NOT_NULL(indev);
 
     uint32_t event_cnt = lv_indev_get_event_count(indev);
     uint32_t removed_count = 0;
@@ -1556,7 +1556,7 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
 
 static void indev_scroll_throw_anim_cb(void * var, int32_t v)
 {
-    LV_ASSERT_NULL(var);
+    LV_ASSERT_NOT_NULL(var);
     LV_UNUSED(v);
     lv_indev_t * indev = (lv_indev_t *)var;
 
@@ -1579,7 +1579,7 @@ static void indev_scroll_throw_anim_completed_cb(lv_anim_t * anim)
 
 static void indev_scroll_throw_anim_start(lv_indev_t * indev)
 {
-    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NOT_NULL(indev);
 
     lv_anim_t a;
     lv_anim_init(&a);

@@ -102,28 +102,28 @@ lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_
 
 uint32_t lv_obj_get_event_count(lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NOT_NULL(obj);
     if(obj->spec_attr == NULL) return 0;
     return lv_event_get_count(&obj->spec_attr->event_list);
 }
 
 lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NOT_NULL(obj);
     if(obj->spec_attr == NULL) return NULL;
     return lv_event_get_dsc(&obj->spec_attr->event_list, index);
 }
 
 bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NOT_NULL(obj);
     if(obj->spec_attr == NULL) return false;
     return lv_event_remove(&obj->spec_attr->event_list, index);
 }
 
 bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NOT_NULL(obj);
 
     uint32_t event_cnt = lv_obj_get_event_count(obj);
     uint32_t i;
@@ -140,15 +140,15 @@ bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 
 bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc)
 {
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(obj);
+    LV_ASSERT_NOT_NULL(dsc);
     if(obj->spec_attr == NULL) return false;
     return lv_event_remove_dsc(&obj->spec_attr->event_list, dsc);
 }
 
 uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
 {
-    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NOT_NULL(obj);
 
     uint32_t event_cnt = lv_obj_get_event_count(obj);
     uint32_t removed_count = 0;

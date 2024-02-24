@@ -117,7 +117,7 @@ void lv_dropdown_set_text(lv_obj_t * obj, const char * txt)
 void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(options);
+    LV_ASSERT_NOT_NULL(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
@@ -164,7 +164,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(options);
+    LV_ASSERT_NOT_NULL(options);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
@@ -193,7 +193,7 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(option);
+    LV_ASSERT_NOT_NULL(option);
 
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 

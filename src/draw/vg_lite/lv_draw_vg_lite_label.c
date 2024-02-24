@@ -299,7 +299,7 @@ static void vg_lite_outline_push(const lv_freetype_outline_event_param_t * param
 {
     LV_PROFILER_BEGIN;
     lv_vg_lite_path_t * outline = param->outline;
-    LV_ASSERT_NULL(outline);
+    LV_ASSERT_NOT_NULL(outline);
 
     lv_freetype_outline_type_t type = param->type;
     switch(type) {

@@ -391,7 +391,7 @@ static inline lv_style_value_t lv_style_prop_get_default_inlined(lv_style_prop_t
 
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
-    LV_ASSERT_NULL(obj)
+    LV_ASSERT_NOT_NULL(obj)
 
     lv_style_selector_t selector = part | obj->state;
     lv_style_value_t value_act = { .ptr = NULL };
@@ -405,7 +405,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
 
 bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
 {
-    LV_ASSERT_NULL(obj)
+    LV_ASSERT_NOT_NULL(obj)
 
     lv_style_value_t value_act = { .ptr = NULL };
     lv_style_res_t found;

@@ -201,7 +201,7 @@ static void x11_inp_delete_evt_cb(lv_event_t * e)
 static x11_inp_data_t * x11_input_get_user_data(lv_display_t * disp)
 {
     _x11_user_hdr_t * disp_hdr = lv_display_get_driver_data(disp);
-    LV_ASSERT_NULL(disp_hdr);
+    LV_ASSERT_NOT_NULL(disp_hdr);
     x11_inp_data_t ** inp_data = &disp_hdr->inp_data;
 
     /* create input data set if initial call */
@@ -262,7 +262,7 @@ static void x11_mousewheel_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 static lv_indev_t * lv_x11_keyboard_create(lv_display_t * disp)
 {
     lv_indev_t * indev = lv_indev_create();
-    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NOT_NULL(indev);
     if(NULL != indev) {
         lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
         lv_indev_set_read_cb(indev, x11_keyboard_read_cb);
@@ -309,7 +309,7 @@ static lv_indev_t * lv_x11_mousewheel_create(lv_display_t * disp)
 void lv_x11_inputs_create(lv_display_t * disp, lv_image_dsc_t const * mouse_img)
 {
     x11_inp_data_t * xd = x11_input_get_user_data(disp);
-    LV_ASSERT_NULL(xd);
+    LV_ASSERT_NOT_NULL(xd);
 
     xd->inp_group = lv_group_create();
     lv_group_set_default(xd->inp_group);

@@ -67,7 +67,7 @@ lv_cache_t * lv_cache_create(const lv_cache_class_t * cache_class,
 
 void lv_cache_destroy(lv_cache_t * cache, void * user_data)
 {
-    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NOT_NULL(cache);
 
     lv_mutex_lock(&cache->lock);
     cache->clz->destroy_cb(cache, user_data);
@@ -78,8 +78,8 @@ void lv_cache_destroy(lv_cache_t * cache, void * user_data)
 
 lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void * user_data)
 {
-    LV_ASSERT_NULL(cache);
-    LV_ASSERT_NULL(key);
+    LV_ASSERT_NOT_NULL(cache);
+    LV_ASSERT_NOT_NULL(key);
 
     lv_mutex_lock(&cache->lock);
     lv_cache_entry_t * entry = cache->clz->get_cb(cache, key, user_data);
@@ -91,7 +91,7 @@ lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void *
 }
 void lv_cache_release(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data)
 {
-    LV_ASSERT_NULL(entry);
+    LV_ASSERT_NOT_NULL(entry);
 
     lv_mutex_lock(&cache->lock);
     lv_cache_entry_release_data(entry, user_data);
@@ -104,8 +104,8 @@ void lv_cache_release(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_
 }
 lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * user_data)
 {
-    LV_ASSERT_NULL(cache);
-    LV_ASSERT_NULL(key);
+    LV_ASSERT_NOT_NULL(cache);
+    LV_ASSERT_NOT_NULL(key);
 
     lv_mutex_lock(&cache->lock);
     lv_cache_entry_t * entry = cache_add_internal_no_lock(cache, key, user_data);
@@ -118,8 +118,8 @@ lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * use
 }
 lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * key, void * user_data)
 {
-    LV_ASSERT_NULL(cache);
-    LV_ASSERT_NULL(key);
+    LV_ASSERT_NOT_NULL(cache);
+    LV_ASSERT_NOT_NULL(key);
 
     lv_mutex_lock(&cache->lock);
     lv_cache_entry_t * entry = cache->clz->get_cb(cache, key, user_data);
@@ -147,7 +147,7 @@ lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * k
 }
 void lv_cache_reserve(lv_cache_t * cache, uint32_t reserved_size, void * user_data)
 {
-    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NOT_NULL(cache);
 
     for(lv_cache_reserve_cond_res_t reserve_cond_res = cache->clz->reserve_cond_cb(cache, NULL, reserved_size, user_data);
         reserve_cond_res == LV_CACHE_RESERVE_COND_NEED_VICTIM;
@@ -157,8 +157,8 @@ void lv_cache_reserve(lv_cache_t * cache, uint32_t reserved_size, void * user_da
 }
 void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data)
 {
-    LV_ASSERT_NULL(cache);
-    LV_ASSERT_NULL(key);
+    LV_ASSERT_NOT_NULL(cache);
+    LV_ASSERT_NOT_NULL(key);
 
     lv_mutex_lock(&cache->lock);
     cache_drop_internal_no_lock(cache, key, user_data);
@@ -166,7 +166,7 @@ void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data)
 }
 bool lv_cache_evict_one(lv_cache_t * cache, void * user_data)
 {
-    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NOT_NULL(cache);
 
     lv_mutex_lock(&cache->lock);
     bool res = cache_evict_one_internal_no_lock(cache, user_data);
@@ -176,7 +176,7 @@ bool lv_cache_evict_one(lv_cache_t * cache, void * user_data)
 }
 void lv_cache_drop_all(lv_cache_t * cache, void * user_data)
 {
-    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NOT_NULL(cache);
 
     lv_mutex_lock(&cache->lock);
     cache->clz->drop_all_cb(cache, user_data);

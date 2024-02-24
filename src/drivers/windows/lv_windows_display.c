@@ -119,7 +119,7 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
     void * parameter)
 {
     lv_windows_create_display_data_t * data = parameter;
-    LV_ASSERT_NULL(data);
+    LV_ASSERT_NOT_NULL(data);
 
     DWORD window_style = WS_OVERLAPPEDWINDOW;
     if(data->simulator_mode) {

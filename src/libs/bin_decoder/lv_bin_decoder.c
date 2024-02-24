@@ -445,7 +445,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         if(dsc->src_type == LV_IMAGE_SRC_FILE) {
             offset += sizeof(lv_image_header_t); /*File image starts with image header*/
             buf = lv_malloc(len);
-            LV_ASSERT_NULL(buf);
+            LV_ASSERT_NOT_NULL(buf);
             if(buf == NULL)
                 return LV_RESULT_INVALID;
 

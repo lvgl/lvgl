@@ -100,7 +100,7 @@ lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_c
 
 void lv_lru_delete(lv_lru_t * cache)
 {
-    LV_ASSERT_NULL(cache);
+    LV_ASSERT_NOT_NULL(cache);
 
     // free each of the cached items, and the hash table
     lv_lru_item_t * item = NULL, * next = NULL;

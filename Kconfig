@@ -500,7 +500,7 @@ menu "LVGL configuration"
 		endmenu
 
 		menu "Asserts"
-			config LV_USE_ASSERT_NULL
+			config LV_USE_ASSERT_NOT_NULL
 				bool "Check if the parameter is NULL. (Very fast, recommended)"
 				default y if !LV_CONF_MINIMAL
 

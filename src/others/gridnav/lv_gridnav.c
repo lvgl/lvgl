@@ -90,7 +90,7 @@ void lv_gridnav_remove(lv_obj_t * obj)
 
 void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable_t anim_en)
 {
-    LV_ASSERT_NULL(to_focus);
+    LV_ASSERT_NOT_NULL(to_focus);
 
     uint32_t i;
     uint32_t event_cnt = lv_obj_get_event_count(cont);

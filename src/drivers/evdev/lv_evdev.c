@@ -91,7 +91,7 @@ static lv_point_t _evdev_process_pointer(lv_indev_t * indev, int x, int y)
 {
     lv_display_t * disp = lv_indev_get_display(indev);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
 
     int swapped_x = dsc->swap_axes ? y : x;
     int swapped_y = dsc->swap_axes ? x : y;
@@ -110,7 +110,7 @@ static lv_point_t _evdev_process_pointer(lv_indev_t * indev, int x, int y)
 static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
 
     /*Update dsc with buffered events*/
     struct input_event in = { 0 };
@@ -196,14 +196,14 @@ err_after_malloc:
 void lv_evdev_set_swap_axes(lv_indev_t * indev, bool swap_axes)
 {
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
     dsc->swap_axes = swap_axes;
 }
 
 void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_x, int max_y)
 {
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
     dsc->min_x = min_x;
     dsc->min_y = min_y;
     dsc->max_x = max_x;
@@ -213,7 +213,7 @@ void lv_evdev_set_calibration(lv_indev_t * indev, int min_x, int min_y, int max_
 void lv_evdev_delete(lv_indev_t * indev)
 {
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
     close(dsc->fd);
     lv_free(dsc);
 

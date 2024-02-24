@@ -174,7 +174,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(txt);
+    LV_ASSERT_NOT_NULL(txt);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
@@ -281,7 +281,7 @@ void lv_textarea_delete_char_forward(lv_obj_t * obj)
 void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(txt);
+    LV_ASSERT_NOT_NULL(txt);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
@@ -327,7 +327,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
 void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(txt);
+    LV_ASSERT_NOT_NULL(txt);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
@@ -446,7 +446,7 @@ void lv_textarea_set_password_mode(lv_obj_t * obj, bool en)
 void lv_textarea_set_password_bullet(lv_obj_t * obj, const char * bullet)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(bullet);
+    LV_ASSERT_NOT_NULL(bullet);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 

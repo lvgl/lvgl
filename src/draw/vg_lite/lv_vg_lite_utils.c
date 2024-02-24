@@ -87,7 +87,7 @@ void lv_vg_lite_dump_info(void)
 
     vg_lite_uint32_t mem_avail = 0;
     vg_lite_get_mem_size(&mem_avail);
-    LV_LOG_USER("Memory Avaliable: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
+    LV_LOG_USER("Memory Available: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
 }
 
 const char * lv_vg_lite_error_string(vg_lite_error_t error)
@@ -394,7 +394,7 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
             return VG_LITE_NV12;
 
         default:
-            LV_LOG_ERROR("unsupport color format: %d", cf);
+            LV_LOG_ERROR("unsupported color format: %d", cf);
             break;
     }
 
@@ -485,7 +485,7 @@ void lv_vg_lite_buffer_format_bytes(
             *mul = 3;
             break;
         default:
-            LV_LOG_ERROR("unsupport color format: 0x%" PRIx32, (uint32_t)format);
+            LV_LOG_ERROR("unsupported color format: 0x%" PRIx32, (uint32_t)format);
             LV_ASSERT(false);
             break;
     }
@@ -520,8 +520,8 @@ void lv_vg_lite_buffer_init(
     uint32_t mul;
     uint32_t div;
     uint32_t align;
-    LV_ASSERT_NULL(buffer);
-    LV_ASSERT_NULL(ptr);
+    LV_ASSERT_NOT_NULL(buffer);
+    LV_ASSERT_NOT_NULL(ptr);
 
     lv_memzero(buffer, sizeof(vg_lite_buffer_t));
 
@@ -558,8 +558,8 @@ void lv_vg_lite_buffer_init(
 
 void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_buf_t * draw_buf)
 {
-    LV_ASSERT_NULL(buffer);
-    LV_ASSERT_NULL(draw_buf);
+    LV_ASSERT_NOT_NULL(buffer);
+    LV_ASSERT_NOT_NULL(draw_buf);
 
     const uint8_t * ptr = draw_buf->data;
     int32_t width = draw_buf->header.w;
@@ -585,8 +585,8 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc)
 {
-    LV_ASSERT_NULL(matrix);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(matrix);
+    LV_ASSERT_NOT_NULL(dsc);
 
     int32_t rotation = dsc->rotation;
     int32_t scale_x = dsc->scale_x;
@@ -615,8 +615,8 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
 
 void lv_vg_lite_push_image_decoder_dsc(struct _lv_draw_vg_lite_unit_t * u, lv_image_decoder_dsc_t * img_dsc)
 {
-    LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(img_dsc);
+    LV_ASSERT_NOT_NULL(u);
+    LV_ASSERT_NOT_NULL(img_dsc);
     lv_array_push_back(&u->img_dsc_pending, img_dsc);
 }
 
@@ -639,9 +639,9 @@ void lv_vg_lite_clear_image_decoder_dsc(struct _lv_draw_vg_lite_unit_t * u)
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
                                   bool no_cache)
 {
-    LV_ASSERT_NULL(buffer);
-    LV_ASSERT_NULL(decoder_dsc);
-    LV_ASSERT_NULL(src);
+    LV_ASSERT_NOT_NULL(buffer);
+    LV_ASSERT_NOT_NULL(decoder_dsc);
+    LV_ASSERT_NOT_NULL(src);
 
     lv_image_decoder_args_t args;
     lv_memzero(&args, sizeof(lv_image_decoder_args_t));
@@ -1021,7 +1021,7 @@ void lv_vg_lite_disable_scissor(void)
 
 void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 {
-    LV_ASSERT_NULL(u);
+    LV_ASSERT_NOT_NULL(u);
     LV_PROFILER_BEGIN;
 
     u->flush_count++;
@@ -1049,7 +1049,7 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 
 void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 {
-    LV_ASSERT_NULL(u);
+    LV_ASSERT_NOT_NULL(u);
     LV_PROFILER_BEGIN;
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());

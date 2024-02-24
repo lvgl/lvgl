@@ -52,7 +52,7 @@ void lv_nuttx_cache_init(void)
 
 static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
-    LV_ASSERT_NULL(draw_buf);
+    LV_ASSERT_NOT_NULL(draw_buf);
     void * buf = draw_buf->data;
     uint32_t stride = draw_buf->header.stride;
     lv_color_format_t cf = draw_buf->header.cf;

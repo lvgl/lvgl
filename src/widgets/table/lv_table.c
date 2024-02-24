@@ -88,7 +88,7 @@ lv_obj_t * lv_table_create(lv_obj_t * parent)
 void lv_table_set_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col, const char * txt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(txt);
+    LV_ASSERT_NOT_NULL(txt);
 
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -123,7 +123,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint32_t row, uint32_t col, const c
 void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, const char * fmt, ...)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(fmt);
+    LV_ASSERT_NOT_NULL(fmt);
 
     lv_table_t * table = (lv_table_t *)obj;
     if(col >= table->col_cnt) {

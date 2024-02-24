@@ -89,7 +89,7 @@ void lv_freetype_outline_add_event(lv_event_cb_t event_cb, lv_event_code_t filte
 
 uint32_t lv_freetype_outline_get_scale(const lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    LV_ASSERT_NOT_NULL(font);
     const lv_freetype_font_dsc_t * dsc = font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
@@ -98,7 +98,7 @@ uint32_t lv_freetype_outline_get_scale(const lv_font_t * font)
 
 bool lv_freetype_is_outline_font(const lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    LV_ASSERT_NOT_NULL(font);
     const lv_freetype_font_dsc_t * dsc = font->dsc;
     if(!LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc)) {
         return false;
@@ -173,7 +173,7 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
 
 static void freetype_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
 {
-    LV_ASSERT_NULL(font);
+    LV_ASSERT_NOT_NULL(font);
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
 
     if(g_dsc->entry == NULL) {
@@ -292,7 +292,7 @@ static lv_freetype_outline_t outline_create(
     uint32_t size,
     uint32_t strength)
 {
-    LV_ASSERT_NULL(ctx);
+    LV_ASSERT_NOT_NULL(ctx);
     FT_Error error;
 
     error = FT_Set_Pixel_Sizes(face, 0, size);

@@ -199,7 +199,7 @@ uint32_t lv_chart_get_point_count(const lv_obj_t * obj)
 
 uint32_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
     LV_UNUSED(obj);
 
     return ser->start_point;
@@ -207,8 +207,8 @@ uint32_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * se
 
 void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_point_t * p_out)
 {
-    LV_ASSERT_NULL(obj);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(obj);
+    LV_ASSERT_NOT_NULL(ser);
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
@@ -336,7 +336,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
 void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(series);
+    LV_ASSERT_NOT_NULL(series);
 
     lv_chart_t * chart    = (lv_chart_t *)obj;
     if(!series->y_ext_buf_assigned && series->y_points) lv_free(series->y_points);
@@ -351,7 +351,7 @@ void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
 void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
 {
     LV_ASSERT_OBJ(chart, MY_CLASS);
-    LV_ASSERT_NULL(series);
+    LV_ASSERT_NOT_NULL(series);
 
     series->hidden = hide ? 1 : 0;
     lv_chart_refresh(chart);
@@ -360,7 +360,7 @@ void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hid
 void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_color_t color)
 {
     LV_ASSERT_OBJ(chart, MY_CLASS);
-    LV_ASSERT_NULL(series);
+    LV_ASSERT_NOT_NULL(series);
 
     series->color = color;
     lv_chart_refresh(chart);
@@ -369,7 +369,7 @@ void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_
 void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(id >= chart->point_cnt) return;
@@ -409,7 +409,7 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
 
 void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * pos)
 {
-    LV_ASSERT_NULL(cursor);
+    LV_ASSERT_NOT_NULL(cursor);
     LV_UNUSED(chart);
 
     cursor->pos = *pos;
@@ -419,7 +419,7 @@ void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_po
 
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser, uint32_t point_id)
 {
-    LV_ASSERT_NULL(cursor);
+    LV_ASSERT_NOT_NULL(cursor);
     LV_UNUSED(chart);
 
     cursor->point_id = point_id;
@@ -431,7 +431,7 @@ void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_
 
 lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor)
 {
-    LV_ASSERT_NULL(cursor);
+    LV_ASSERT_NOT_NULL(cursor);
     LV_UNUSED(chart);
 
     return cursor->pos;
@@ -444,7 +444,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
 void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     uint32_t i;
@@ -458,7 +458,7 @@ void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t val
 void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     ser->y_points[ser->start_point] = value;
@@ -470,7 +470,7 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t va
 void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, int32_t x_value, int32_t y_value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
@@ -488,7 +488,7 @@ void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, int32_t x
 void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
     if(id >= chart->point_cnt) return;
@@ -500,7 +500,7 @@ void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t
                                int32_t y_value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
     if(chart->type != LV_CHART_TYPE_SCATTER) {
@@ -517,7 +517,7 @@ void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t
 void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
 
     if(!ser->y_ext_buf_assigned && ser->y_points) lv_free(ser->y_points);
     ser->y_ext_buf_assigned = true;
@@ -528,7 +528,7 @@ void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t a
 void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
 
     if(!ser->x_ext_buf_assigned && ser->x_points) lv_free(ser->x_points);
     ser->x_ext_buf_assigned = true;
@@ -540,7 +540,7 @@ int32_t * lv_chart_get_y_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
     LV_UNUSED(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
     return ser->y_points;
 }
 
@@ -548,7 +548,7 @@ int32_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
     LV_UNUSED(obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NOT_NULL(ser);
     return ser->x_points;
 }
 

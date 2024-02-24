@@ -60,7 +60,7 @@ lv_anim_timeline_t * lv_anim_timeline_create(void)
 
 void lv_anim_timeline_delete(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_ASSERT_NOT_NULL(at);
 
     lv_anim_timeline_pause(at);
 
@@ -70,7 +70,7 @@ void lv_anim_timeline_delete(lv_anim_timeline_t * at)
 
 void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, const lv_anim_t * a)
 {
-    LV_ASSERT_NULL(at);
+    LV_ASSERT_NOT_NULL(at);
 
     at->anim_dsc_cnt++;
     at->anim_dsc = lv_realloc(at->anim_dsc, at->anim_dsc_cnt * sizeof(lv_anim_timeline_dsc_t));
@@ -83,7 +83,7 @@ void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, const lv
 
 uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_ASSERT_NOT_NULL(at);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
     uint32_t start = at->act_time;
@@ -103,20 +103,20 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
 
 void lv_anim_timeline_pause(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_ASSERT_NOT_NULL(at);
 
     lv_anim_delete(at, anim_timeline_exec_cb);
 }
 
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse)
 {
-    LV_ASSERT_NULL(at);
+    LV_ASSERT_NOT_NULL(at);
     at->reverse = reverse;
 }
 
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 {
-    LV_ASSERT_NULL(at);
+    LV_ASSERT_NOT_NULL(at);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
     uint32_t act_time = lv_map(progress, 0, LV_ANIM_TIMELINE_PROGRESS_MAX, 0, playtime);
@@ -125,7 +125,7 @@ void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 
 uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_ASSERT_NOT_NULL(at);
 
     uint32_t playtime = 0;
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
@@ -143,13 +143,13 @@ uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
 
 bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_ASSERT_NOT_NULL(at);
     return at->reverse;
 }
 
 uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
 {
-    LV_ASSERT_NULL(at);
+    LV_ASSERT_NOT_NULL(at);
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
     return lv_map(at->act_time, 0, playtime, 0, LV_ANIM_TIMELINE_PROGRESS_MAX);
 }

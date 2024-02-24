@@ -76,8 +76,8 @@ void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc)
 static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
                                       uint32_t unicode_letter_next)
 {
-    LV_ASSERT_NULL(font);
-    LV_ASSERT_NULL(g_dsc);
+    LV_ASSERT_NOT_NULL(font);
+    LV_ASSERT_NOT_NULL(g_dsc);
 
     if(unicode_letter < 0x20) {
         g_dsc->adv_w  = 0;

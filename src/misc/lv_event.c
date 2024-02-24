@@ -89,7 +89,7 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
                               void * user_data)
 {
     lv_event_dsc_t * dsc = lv_malloc(sizeof(lv_event_dsc_t));
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
 
     dsc->cb = cb;
     dsc->filter = filter;
@@ -106,8 +106,8 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
 
 bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc)
 {
-    LV_ASSERT_NULL(list);
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(list);
+    LV_ASSERT_NOT_NULL(dsc);
 
     int size = lv_array_size(list);
     lv_event_dsc_t ** events = lv_array_front(list);
@@ -124,13 +124,13 @@ bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc)
 
 uint32_t lv_event_get_count(lv_event_list_t * list)
 {
-    LV_ASSERT_NULL(list);
+    LV_ASSERT_NOT_NULL(list);
     return lv_array_size(list);
 }
 
 lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index)
 {
-    LV_ASSERT_NULL(list);
+    LV_ASSERT_NOT_NULL(list);
     lv_event_dsc_t ** dsc;
     dsc = lv_array_at(list, index);
     return dsc ? *dsc : NULL;
@@ -138,20 +138,20 @@ lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index)
 
 lv_event_cb_t lv_event_dsc_get_cb(lv_event_dsc_t * dsc)
 {
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
     return dsc->cb;
 }
 
 void * lv_event_dsc_get_user_data(lv_event_dsc_t * dsc)
 {
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
     return dsc->user_data;
 
 }
 
 bool lv_event_remove(lv_event_list_t * list, uint32_t index)
 {
-    LV_ASSERT_NULL(list);
+    LV_ASSERT_NOT_NULL(list);
     lv_event_dsc_t * dsc = lv_event_get_dsc(list, index);
     lv_free(dsc);
     return lv_array_remove(list, index);
@@ -159,7 +159,7 @@ bool lv_event_remove(lv_event_list_t * list, uint32_t index)
 
 void lv_event_remove_all(lv_event_list_t * list)
 {
-    LV_ASSERT_NULL(list);
+    LV_ASSERT_NOT_NULL(list);
     int size = lv_array_size(list);
     lv_event_dsc_t ** dsc = lv_array_front(list);
     for(int i = 0; i < size; i++) {

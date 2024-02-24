@@ -70,7 +70,7 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb,
 
 void lv_imgfont_destroy(lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
+    LV_ASSERT_NOT_NULL(font);
 
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
     lv_free(dsc);
@@ -95,10 +95,10 @@ static const void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, uint32
 static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out,
                                   uint32_t unicode, uint32_t unicode_next)
 {
-    LV_ASSERT_NULL(font);
+    LV_ASSERT_NOT_NULL(font);
 
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
-    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NOT_NULL(dsc);
     if(dsc->path_cb == NULL) return false;
 
     int32_t offset_y = 0;

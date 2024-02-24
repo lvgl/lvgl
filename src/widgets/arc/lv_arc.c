@@ -353,7 +353,7 @@ int32_t lv_arc_get_knob_offset(const lv_obj_t * obj)
 void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, int32_t r_offset)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(obj_to_align);
+    LV_ASSERT_NOT_NULL(obj_to_align);
 
     lv_obj_update_layout(obj);
 
@@ -374,7 +374,7 @@ void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, in
 void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, int32_t r_offset)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(obj_to_rotate);
+    LV_ASSERT_NOT_NULL(obj_to_rotate);
 
     lv_obj_update_layout(obj);
 
