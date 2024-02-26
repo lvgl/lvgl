@@ -505,7 +505,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(_lv_draw_sw_blend_image_dsc
                     case LV_BLEND_MODE_MULTIPLY:
                         res = ((dest_buf_c16[dest_x].red * (src_buf_u8[src_x + 2] >> 3)) >> 5) << 11;
                         res += ((dest_buf_c16[dest_x].green * (src_buf_u8[src_x + 1] >> 2)) >> 6) << 5;
-                        res += (dest_buf_c16[dest_x].blue * (src_buf_u8[src_x + 1] >> 3)) >> 5;
+                        res += (dest_buf_c16[dest_x].blue * (src_buf_u8[src_x + 0] >> 3)) >> 5;
                         break;
                     default:
                         LV_LOG_WARN("Not supported blend mode: %d", dsc->blend_mode);
