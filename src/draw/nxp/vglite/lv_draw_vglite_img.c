@@ -161,7 +161,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     uint32_t src_stride = img_dsc->header.stride;
 
     /* Set src_vgbuf structure. */
-    vglite_set_src_buf(src_buf, lv_area_get_width(&src_area), lv_area_get_height(&src_area), src_stride, src_cf);
+    vglite_set_src_buf(src_buf, img_dsc->header.w, img_dsc->header.h, src_stride, src_cf);
 
 #if LV_USE_VGLITE_BLIT_SPLIT
     void * dest_buf = layer->draw_buf->data;
