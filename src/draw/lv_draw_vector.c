@@ -331,7 +331,15 @@ void lv_vector_path_close(lv_vector_path_t * path)
 
 void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area)
 {
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(area);
+
     uint32_t len = lv_array_size(&path->points);
+    if(len == 0) {
+        lv_memzero(area, sizeof(lv_area_t));
+        return;
+    }
+
     lv_fpoint_t * p = lv_array_at(&path->points, 0);
     float x1 = p[0].x;
     float x2 = p[0].x;
