@@ -47,7 +47,7 @@ extern "C" {
  * - 4 cubics for the corners
  * - 4 lines for the sides
  * - 1 end for the path end */
-#define RECT_PATH_DATA_MAX_SIZE 1 * MOVE_PATH_DATA_SIZE + 4 * CUBIC_PATH_DATA_SIZE + 4 * LINE_PATH_DATA_SIZE + 1 * END_PATH_DATA_SIZE
+#define RECT_PATH_DATA_MAX_SIZE (1 * MOVE_PATH_DATA_SIZE + 4 * CUBIC_PATH_DATA_SIZE + 4 * LINE_PATH_DATA_SIZE + 1 * END_PATH_DATA_SIZE)
 
 /* Maximum possible arc path size
  * is in the rounded arc case:
