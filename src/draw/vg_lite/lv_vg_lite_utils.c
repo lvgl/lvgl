@@ -13,6 +13,7 @@
 
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_path.h"
+#include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_grad.h"
 #include "lv_draw_vg_lite_type.h"
 #include <string.h>
@@ -44,6 +45,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static void image_dsc_free_cb(void * dsc, void * user_data);
 
 /**********************
  *  STATIC VARIABLES
@@ -608,29 +611,6 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     }
 }
 
-void lv_vg_lite_push_image_decoder_dsc(struct _lv_draw_vg_lite_unit_t * u, lv_image_decoder_dsc_t * img_dsc)
-{
-    LV_ASSERT_NULL(u);
-    LV_ASSERT_NULL(img_dsc);
-    lv_array_push_back(&u->img_dsc_pending, img_dsc);
-}
-
-void lv_vg_lite_clear_image_decoder_dsc(struct _lv_draw_vg_lite_unit_t * u)
-{
-    lv_array_t * arr = &u->img_dsc_pending;
-    uint32_t size = lv_array_size(arr);
-    if(size == 0) {
-        return;
-    }
-
-    /* Close all pending image decoder dsc */
-    for(uint32_t i = 0; i < size; i++) {
-        lv_image_decoder_dsc_t * img_dsc = lv_array_at(arr, i);
-        lv_image_decoder_close(img_dsc);
-    }
-    lv_array_clear(arr);
-}
-
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
                                   bool no_cache)
 {
@@ -673,6 +653,18 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
 
     lv_vg_lite_buffer_from_draw_buf(buffer, decoded);
     return true;
+}
+
+void lv_vg_lite_image_dsc_init(struct _lv_draw_vg_lite_unit_t * unit)
+{
+    unit->image_dsc_pending = lv_vg_lite_pending_create(sizeof(lv_image_decoder_dsc_t), 4);
+    lv_vg_lite_pending_set_free_cb(unit->image_dsc_pending, image_dsc_free_cb, NULL);
+}
+
+void lv_vg_lite_image_dsc_deinit(struct _lv_draw_vg_lite_unit_t * unit)
+{
+    lv_vg_lite_pending_destroy(unit->image_dsc_pending);
+    unit->image_dsc_pending = NULL;
 }
 
 void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area)
@@ -1062,11 +1054,11 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
-    /* Clear all gradient caches */
-    lv_vg_lite_linear_grad_release_all(u);
+    /* Clear all gradient caches reference */
+    lv_vg_lite_pending_remove_all(u->grad_pending);
 
     /* Clear image decoder dsc reference */
-    lv_vg_lite_clear_image_decoder_dsc(u);
+    lv_vg_lite_pending_remove_all(u->image_dsc_pending);
     u->flush_count = 0;
     LV_PROFILER_END;
 }
@@ -1074,5 +1066,11 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void image_dsc_free_cb(void * dsc, void * user_data)
+{
+    LV_UNUSED(user_data);
+    lv_image_decoder_close(dsc);
+}
 
 #endif /*LV_USE_DRAW_VG_LITE*/

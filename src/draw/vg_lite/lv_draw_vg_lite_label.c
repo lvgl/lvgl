@@ -105,11 +105,11 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 #endif /* LV_USE_FREETYPE */
 
             case LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE: {
-                    lv_draw_image_dsc_t img_dsc;
-                    lv_draw_image_dsc_init(&img_dsc);
-                    img_dsc.opa = glyph_draw_dsc->opa;
-                    img_dsc.src = glyph_draw_dsc->glyph_data;
-                    lv_draw_vg_lite_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords, false);
+                    lv_draw_image_dsc_t image_dsc;
+                    lv_draw_image_dsc_init(&image_dsc);
+                    image_dsc.opa = glyph_draw_dsc->opa;
+                    image_dsc.src = glyph_draw_dsc->glyph_data;
+                    lv_draw_vg_lite_img(draw_unit, &image_dsc, glyph_draw_dsc->letter_coords, false);
                 }
                 break;
 

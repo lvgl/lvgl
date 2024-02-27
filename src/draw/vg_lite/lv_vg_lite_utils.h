@@ -125,12 +125,14 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
 
-void lv_vg_lite_push_image_decoder_dsc(struct _lv_draw_vg_lite_unit_t * u, lv_image_decoder_dsc_t * img_dsc);
-
-void lv_vg_lite_clear_image_decoder_dsc(struct _lv_draw_vg_lite_unit_t * u);
+void lv_vg_lite_image_dec_init(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
 
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
                                   bool no_cache);
+
+void lv_vg_lite_image_dsc_init(struct _lv_draw_vg_lite_unit_t * unit);
+
+void lv_vg_lite_image_dsc_deinit(struct _lv_draw_vg_lite_unit_t * unit);
 
 vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode);
 
