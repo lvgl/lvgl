@@ -57,11 +57,13 @@ typedef struct {
     static uint8_t buf_##name[_LV_DRAW_BUF_SIZE(_w, _h, _cf)]; \
     static lv_draw_buf_t name = { \
                                   .header = { \
-                                              .w = (_w), \
-                                              .h = (_h), \
+                                              .magic = LV_IMAGE_HEADER_MAGIC, \
                                               .cf = (_cf), \
                                               .flags = LV_IMAGE_FLAGS_MODIFIABLE, \
+                                              .w = (_w), \
+                                              .h = (_h), \
                                               .stride = _LV_DRAW_BUF_STRIDE(_w, _cf), \
+                                              .reserved_2 = 0, \
                                             }, \
                                   .data_size = sizeof(buf_##name), \
                                   .data = buf_##name, \
