@@ -22,6 +22,7 @@
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
+#define ABS(a) fabsf(a)
 
 #define CALC_BOUNDS(p, bounds) \
     do { \
@@ -940,8 +941,8 @@ static void _set_gradient_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * 
         lv_matrix_rotate(mtx, rot);
 
         if(grad->units == LV_SVG_GRADIENT_UNITS_USER_SPACE) {
-            float sx = (x2 - x1) / w;
-            float sy = (y2 - y1) / h;
+            float sx = ABS((x2 - x1) / w);
+            float sy = ABS((y2 - y1) / h);
             float s = MAX(sx, sy);
             lv_matrix_scale(mtx, s, s);
             lv_matrix_translate(mtx, -bounds.x1, -bounds.y1);
