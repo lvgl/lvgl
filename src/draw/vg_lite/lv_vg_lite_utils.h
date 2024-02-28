@@ -54,6 +54,7 @@ extern "C" {
 #define LV_VG_LITE_ASSERT_PATH(path) LV_VG_LITE_ASSERT(lv_vg_lite_path_check(path))
 #define LV_VG_LITE_ASSERT_SRC_BUFFER(buffer) LV_VG_LITE_ASSERT(lv_vg_lite_buffer_check(buffer, true))
 #define LV_VG_LITE_ASSERT_DEST_BUFFER(buffer) LV_VG_LITE_ASSERT(lv_vg_lite_buffer_check(buffer, false))
+#define LV_VG_LITE_ASSERT_MATRIX(matrix) LV_VG_LITE_ASSERT(lv_vg_lite_matrix_check(matrix))
 
 #define LV_VG_LITE_ALIGN(number, align_bytes) \
     (((number) + ((align_bytes)-1)) & ~((align_bytes)-1))
@@ -144,6 +145,8 @@ void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area);
 bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src);
 
 bool lv_vg_lite_path_check(const vg_lite_path_t * path);
+
+bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix);
 
 /* Wrapper */
 
