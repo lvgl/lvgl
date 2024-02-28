@@ -297,7 +297,7 @@ void lv_vg_lite_buffer_dump_info(const vg_lite_buffer_t * buffer)
 void lv_vg_lite_matrix_dump_info(const vg_lite_matrix_t * matrix)
 {
     for(int i = 0; i < 3; i++) {
-        LV_LOG_USER("| %0.2f, %0.2f, %0.2f |",
+        LV_LOG_USER("| %f, %f, %f |",
                     (matrix)->m[i][0], (matrix)->m[i][1], (matrix)->m[i][2]);
     }
 }
@@ -893,6 +893,23 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
     uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
     if(end_op_code != VLC_OP_END) {
         LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
+        return false;
+    }
+
+    return true;
+}
+
+bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix)
+{
+    if(matrix == NULL) {
+        LV_LOG_ERROR("matrix is NULL");
+        return false;
+    }
+
+    vg_lite_matrix_t result;
+    if(!lv_vg_lite_matrix_inverse(&result, matrix)) {
+        LV_LOG_ERROR("matrix is not invertible");
+        lv_vg_lite_matrix_dump_info(matrix);
         return false;
     }
 

@@ -162,6 +162,7 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
+    LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     LV_PROFILER_BEGIN_TAG("vg_lite_draw");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
@@ -183,6 +184,8 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
 
             /* move image to center */
             vg_lite_translate(cx - radius_out, cy - radius_out, &matrix);
+
+            LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
             LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
             LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
