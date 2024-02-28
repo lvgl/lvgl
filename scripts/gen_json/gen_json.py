@@ -110,6 +110,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
                     ):
                         if line.startswith(f'#define {item}'):
                             data[i] = f'#define {item} 1'
+                            break
 
             with open(os.path.join(temp_directory, 'lv_conf.h'), 'wb') as f:
                 f.write('\n'.join(data).encode('utf-8'))
@@ -132,7 +133,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
 
         elif sys.platform.startswith('darwin'):
             include_path_env_key = 'C_INCLUDE_PATH'
-            cpp_cmd = ['clang', '-std=c11', f'-o "{pp_file}"']
+            cpp_cmd = ['clang', '-std=c11', '-DINT32_MIN=0x80000000', f'-o "{pp_file}"']
         else:
             include_path_env_key = 'C_INCLUDE_PATH'
             cpp_cmd = ['gcc', '-std=c11', '-Wno-incompatible-pointer-types', f'-o "{pp_file}"']
@@ -155,7 +156,18 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
         cpp_cmd.append(f'"{lvgl_header_path}"')
         cpp_cmd = ' '.join(cpp_cmd)
 
-        subprocess.getoutput(cpp_cmd)
+        p = subprocess.Popen(cpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate()
+        exit_code = p.returncode
+
+        if not os.path.exists(pp_file):
+            sys.stdout.write(out.decode('utf-8').strip() + '\n')
+            sys.stdout.write('EXIT CODE: ' + str(exit_code) + '\n')
+            sys.stderr.write(err.decode('utf-8').strip() + '\n')
+            sys.stdout.flush()
+            sys.stderr.flush()
+
+            raise RuntimeError('Unknown Failure')
 
         with open(pp_file, 'r') as f:
             pp_data = f.read()
