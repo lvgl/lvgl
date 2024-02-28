@@ -133,10 +133,10 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
 
         elif sys.platform.startswith('darwin'):
             include_path_env_key = 'C_INCLUDE_PATH'
-            cpp_cmd = ['clang', '-std=c11', '-DINT32_MIN=0x80000000', f'-o "{pp_file}"']
+            cpp_cmd = ['clang', '-std=c11', '-E', '-DINT32_MIN=0x80000000', f'-o "{pp_file}"']
         else:
             include_path_env_key = 'C_INCLUDE_PATH'
-            cpp_cmd = ['gcc', '-std=c11', '-Wno-incompatible-pointer-types', f'-o "{pp_file}"']
+            cpp_cmd = ['gcc', '-std=c11', '-E', '-Wno-incompatible-pointer-types', f'-o "{pp_file}"']
 
         if include_path_env_key not in os.environ:
             os.environ[include_path_env_key] = ''
