@@ -14,8 +14,6 @@
 #include "../../misc/lv_assert.h"
 #include "../../stdlib/lv_string.h"
 
-#include <stdlib.h>
-
 /*********************
  *      DEFINES
  *********************/

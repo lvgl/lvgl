@@ -166,6 +166,25 @@
     #endif
 #endif  /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
+#ifndef LV_STDINT_INCLUDE
+    #define LV_STDINT_INCLUDE       <stdint.h>
+#endif
+#ifndef LV_STDDEF_INCLUDE
+    #define LV_STDDEF_INCLUDE       <stddef.h>
+#endif
+#ifndef LV_STDBOOL_INCLUDE
+    #define LV_STDBOOL_INCLUDE      <stdbool.h>
+#endif
+#ifndef LV_INTTYPES_INCLUDE
+    #define LV_INTTYPES_INCLUDE     <inttypes.h>
+#endif
+#ifndef LV_LIMITS_INCLUDE
+    #define LV_LIMITS_INCLUDE       <limits.h>
+#endif
+#ifndef LV_STDARG_INCLUDE
+    #define LV_STDARG_INCLUDE       <stdarg.h>
+#endif
+
 /*====================
    HAL SETTINGS
  *====================*/

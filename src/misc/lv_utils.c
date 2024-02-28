@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
-
 #include "lv_utils.h"
 #include "lv_fs.h"
 #include "cache/lv_image_cache.h"
+
+#include LV_STDDEF_INCLUDE
 
 /*********************
  *      DEFINES

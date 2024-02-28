@@ -6,8 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdlib.h>
-
 #include "lv_obj.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"

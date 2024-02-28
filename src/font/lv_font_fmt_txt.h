@@ -13,10 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
 #include "lv_font.h"
+#include LV_STDINT_INCLUDE
+#include LV_STDDEF_INCLUDE
+#include LV_STDBOOL_INCLUDE
 
 /*********************
  *      DEFINES

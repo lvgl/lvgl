@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_tick.h"
-#include <stddef.h>
+#include LV_STDDEF_INCLUDE
 #include "../core/lv_global.h"
 
 /*********************

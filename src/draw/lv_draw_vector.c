@@ -12,7 +12,7 @@
 
 #include "../misc/lv_ll.h"
 #include "../stdlib/lv_string.h"
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 #include <math.h>
 #include <float.h>
 

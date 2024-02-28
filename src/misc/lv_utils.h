@@ -17,7 +17,7 @@ extern "C" {
 #include "lv_types.h"
 #include "../draw/lv_draw_buf.h"
 
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 
 /*********************
  *      DEFINES

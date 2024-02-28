@@ -19,8 +19,7 @@
 #include "../misc/lv_log.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
-#include <stdint.h>
-#include <string.h>
+#include LV_STDINT_INCLUDE
 
 /*********************
  *      DEFINES

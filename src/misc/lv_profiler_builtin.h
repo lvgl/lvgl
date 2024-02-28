@@ -18,9 +18,9 @@ extern "C" {
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include LV_STDBOOL_INCLUDE
+#include LV_STDDEF_INCLUDE
+#include LV_STDINT_INCLUDE
 
 /*********************
  *      DEFINES

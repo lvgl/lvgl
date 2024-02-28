@@ -1,7 +1,7 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
-#include <limits.h>
+#include LV_LIMITS_INCLUDE
 #include "lv_tlsf.h"
 #include "../../stdlib/lv_string.h"
 #include "../../misc/lv_log.h"

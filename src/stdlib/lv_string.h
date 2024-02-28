@@ -14,8 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include <stdint.h>
-#include <stddef.h>
+#include LV_STDINT_INCLUDE
+#include LV_STDDEF_INCLUDE
 
 /*********************
  *      DEFINES
@@ -56,6 +56,15 @@ void lv_memset(void * dst, uint8_t v, size_t len);
  * @return Pointer to the destination array.
  */
 void * lv_memmove(void * dst, const void * src, size_t len);
+
+/**
+ * @brief This function will compare two memory blocks
+ * @param p1 Pointer to the first memory block
+ * @param p2 Pointer to the second memory block
+ * @param len Number of bytes to compare
+ * @return The difference between the value of the first unmatching byte.
+ */
+int32_t lv_memcmp(const void * p1, const void * p2, size_t len);
 
 /**
  * Same as `memset(dst, 0x00, len)`.
@@ -113,6 +122,15 @@ char * lv_strdup(const char * src);
  * @return A pointer to the new allocated string. NULL if failed.
  */
 char * lv_strdup(const char * src);
+
+/**
+ * @brief Copies the string pointed to by src, including the terminating null character,
+ *        to the end of the string pointed to by dst.
+ * @param dst Pointer to the destination string where the content is to be appended.
+ * @param src Pointer to the source of data to be copied.
+ * @return A pointer to the destination string, which is dst.
+ */
+char * lv_strcat(char * dst, const char * src);
 
 /**********************
  *      MACROS

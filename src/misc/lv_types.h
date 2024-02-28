@@ -16,7 +16,7 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 #ifndef __ASSEMBLY__
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
 #endif
 
 /*********************

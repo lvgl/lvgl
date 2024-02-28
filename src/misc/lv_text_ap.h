@@ -13,9 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
 #include "lv_text.h"
 #include "../draw/lv_draw.h"
+#include LV_STDDEF_INCLUDE
 
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
 

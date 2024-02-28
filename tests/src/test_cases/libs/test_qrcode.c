@@ -4,6 +4,7 @@
 #include "unity/unity.h"
 
 #if LV_USE_QRCODE
+#include <string.h>
 
 static lv_obj_t * active_screen = NULL;
 

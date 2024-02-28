@@ -6,8 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
 #include "lv_draw_sw.h"
+#include LV_STDBOOL_INCLUDE
+
 #if LV_USE_DRAW_SW
 
 #include "../../misc/lv_math.h"

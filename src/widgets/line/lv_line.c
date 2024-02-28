@@ -12,9 +12,8 @@
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
 #include "../../draw/lv_draw.h"
-#include <stdbool.h>
-#include <stdint.h>
-#include <string.h>
+#include LV_STDBOOL_INCLUDE
+#include LV_STDINT_INCLUDE
 
 /*********************
  *      DEFINES

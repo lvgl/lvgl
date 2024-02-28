@@ -13,12 +13,13 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
-#include <stdint.h>
 #include "lv_types.h"
 #include "../lv_conf_internal.h"
 
 #include "lv_array.h"
+
+#include LV_STDBOOL_INCLUDE
+#include LV_STDINT_INCLUDE
 
 /*********************
  *      DEFINES
