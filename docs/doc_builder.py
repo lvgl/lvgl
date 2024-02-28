@@ -783,6 +783,29 @@ class ENUM(object):
 defines = {}
 
 
+def build_define(element):
+    define = None
+
+    if element.text:
+        define = element.text.strip()
+
+    for item in element:
+        ds = build_define(item)
+        if ds:
+            if define:
+                define += ' ' + ds
+            else:
+                define = ds.strip()
+
+    if element.tail:
+        if define:
+            define += ' ' + element.tail.strip()
+        else:
+            define = element.tail.strip()
+
+    return define
+
+
 class DEFINE(object):
     template = '''\
 .. doxygendefine:: {name}
@@ -801,6 +824,8 @@ class DEFINE(object):
             self.description = None
             self.file_name = None
             self.line_no = None
+            self.params = None
+            self.initializer = None
 
         if parent is not None:
             root = load_xml(parent.refid)
@@ -835,8 +860,24 @@ class DEFINE(object):
                     self.file_name = element.attrib['file']
                     self.line_no = element.attrib['line']
 
-                if element.tag == 'detaileddescription':
+                elif element.tag == 'detaileddescription':
                     self.description = build_docstring(element)
+
+                elif element.tag == 'param':
+                    for child in element:
+                        if child.tag == 'defname':
+                            if self.params is None:
+                                self.params = []
+
+                            if child.text:
+                                self.params.append(child.text)
+
+                elif element.tag == 'initializer':
+                    initializer = build_define(element)
+                    if initializer is None:
+                        self.initializer = ''
+                    else:
+                        self.initializer = initializer
 
             if not self.description:
                 warn(MISSING_MACRO, self.name)

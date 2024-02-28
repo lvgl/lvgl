@@ -614,6 +614,12 @@ class FileAST(c_ast.FileAST):
                 print(item)
                 print(item.to_dict())
 
+        for tdef_name in _typedefs.keys():
+            if '_' + tdef_name in _enums:
+                enum_dict = _enums['_' + tdef_name]
+                for member in enum_dict['members']:
+                    member['type']['name'] = tdef_name
+
         res = {
             'enums': enums,
             'functions': functions,
@@ -642,7 +648,9 @@ class FileAST(c_ast.FileAST):
             macro_type = OrderedDict([
                 ('name', macro.name),
                 ('json_type', 'macro'),
-                ('docstring', macro.description)
+                ('docstring', macro.description),
+                ('params', macro.params),
+                ('initializer', macro.initializer)
             ])
 
             res['macros'].append(macro_type)
@@ -1047,6 +1055,7 @@ class TypeDecl(c_ast.TypeDecl):
         res['quals'] = self.quals
 
         return res
+
 
 class Typedef(c_ast.Typedef):
 
