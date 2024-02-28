@@ -114,6 +114,8 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
         float end_x = radius_in * MATH_COSF(end_angle_rad) + cx;
         float end_y = radius_in * MATH_SINF(end_angle_rad) + cy;
 
+        lv_vg_lite_path_move_to(path, start_x, start_y);
+
         /* radius_out arc */
         lv_vg_lite_path_append_arc(path,
                                    cx, cy,
@@ -134,7 +136,6 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
                                    false);
 
         /* close arc */
-        lv_vg_lite_path_line_to(path, start_x, start_y);
         lv_vg_lite_path_close(path);
 
         /* draw round */

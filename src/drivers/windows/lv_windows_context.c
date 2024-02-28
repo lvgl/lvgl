@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_windows_context.c
  *
  */
@@ -25,6 +25,8 @@
  **********************/
 
 static uint32_t lv_windows_tick_count_callback(void);
+
+static void lv_windows_delay_callback(uint32_t ms);
 
 static void lv_windows_check_display_existence_timer_callback(
     lv_timer_t * timer);
@@ -72,6 +74,8 @@ void lv_windows_platform_init(void)
 {
     lv_tick_set_cb(lv_windows_tick_count_callback);
 
+    lv_delay_set_cb(lv_windows_delay_callback);
+
     lv_timer_create(
         lv_windows_check_display_existence_timer_callback,
         200,
@@ -118,7 +122,33 @@ lv_windows_window_context_t * lv_windows_get_window_context(
 
 static uint32_t lv_windows_tick_count_callback(void)
 {
-    return GetTickCount();
+    LARGE_INTEGER Frequency;
+    if(QueryPerformanceFrequency(&Frequency)) {
+        LARGE_INTEGER PerformanceCount;
+        if(QueryPerformanceCounter(&PerformanceCount)) {
+            return (uint32_t)(PerformanceCount.QuadPart * 1000 / Frequency.QuadPart);
+        }
+    }
+
+    return (uint32_t)GetTickCount64();
+}
+
+static void lv_windows_delay_callback(uint32_t ms)
+{
+    HANDLE timer_handle = CreateWaitableTimerExW(
+                              NULL,
+                              NULL,
+                              CREATE_WAITABLE_TIMER_MANUAL_RESET |
+                              CREATE_WAITABLE_TIMER_HIGH_RESOLUTION,
+                              TIMER_ALL_ACCESS);
+    if(timer_handle) {
+        LARGE_INTEGER due_time;
+        due_time.QuadPart = -((int64_t)ms) * 1000 * 10;
+        SetWaitableTimer(timer_handle, &due_time, 0, NULL, NULL, FALSE);
+        WaitForSingleObject(timer_handle, INFINITE);
+
+        CloseHandle(timer_handle);
+    }
 }
 
 static void lv_windows_check_display_existence_timer_callback(

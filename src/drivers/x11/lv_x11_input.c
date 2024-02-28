@@ -120,6 +120,54 @@ static void x11_inp_event_handler(lv_timer_t * t)
                     if(len < (sizeof(xd->kb_buffer) - 2 /* space for 1 char + '\0' */)) {
                         KeySym key;
                         int n = XLookupString(&event.xkey, &xd->kb_buffer[len], sizeof(xd->kb_buffer) - (len + 1), &key, NULL);
+                        n += !!key;
+                        switch(key) {
+                            case XK_Home:
+                            case XK_KP_Home:
+                                xd->kb_buffer[len] = LV_KEY_HOME;
+                                break;
+                            case XK_Left:
+                            case XK_KP_Left:
+                                xd->kb_buffer[len] = LV_KEY_LEFT;
+                                break;
+                            case XK_Up:
+                            case XK_KP_Up:
+                                xd->kb_buffer[len] = LV_KEY_UP;
+                                break;
+                            case XK_Right:
+                            case XK_KP_Right:
+                                xd->kb_buffer[len] = LV_KEY_RIGHT;
+                                break;
+                            case XK_Down:
+                            case XK_KP_Down:
+                                xd->kb_buffer[len] = LV_KEY_DOWN;
+                                break;
+                            case XK_Prior:
+                            case XK_KP_Prior:
+                                xd->kb_buffer[len] = LV_KEY_PREV;
+                                break;
+                            case XK_Next:
+                            case XK_KP_Next:
+                                xd->kb_buffer[len] = LV_KEY_NEXT;
+                                break;
+                            case XK_End:
+                            case XK_KP_End:
+                                xd->kb_buffer[len] = LV_KEY_END;
+                                break;
+                            case XK_BackSpace:
+                                xd->kb_buffer[len] = LV_KEY_BACKSPACE;
+                                break;
+                            case XK_Escape:
+                                xd->kb_buffer[len] = LV_KEY_ESC;
+                                break;
+                            case XK_Delete:
+                            case XK_KP_Delete:
+                                xd->kb_buffer[len] = LV_KEY_DEL;
+                                break;
+                            case XK_KP_Enter:
+                                xd->kb_buffer[len] = LV_KEY_ENTER;
+                                break;
+                        }
                         xd->kb_buffer[len + n] = '\0';
                     }
                 }
@@ -214,7 +262,7 @@ static void x11_mousewheel_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 static lv_indev_t * lv_x11_keyboard_create(lv_display_t * disp)
 {
     lv_indev_t * indev = lv_indev_create();
-    LV_ASSERT_OBJ(indev, MY_CLASS);
+    LV_ASSERT_NULL(indev);
     if(NULL != indev) {
         lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
         lv_indev_set_read_cb(indev, x11_keyboard_read_cb);

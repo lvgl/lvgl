@@ -40,6 +40,9 @@ typedef struct {
     void * mem;
     void * mem2;
     uint32_t mem2_yoffset;
+
+    lv_draw_buf_t buf1;
+    lv_draw_buf_t buf2;
 } lv_nuttx_fb_t;
 
 /**********************
@@ -123,17 +126,26 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         goto errout;
     }
 
+    uint32_t w = dsc->vinfo.xres;
+    uint32_t h = dsc->vinfo.yres;
+    uint32_t stride = dsc->pinfo.stride;
+    uint32_t data_size = h * stride;
+    lv_draw_buf_init(&dsc->buf1, w, h, LV_COLOR_FORMAT_NATIVE, stride, dsc->mem, data_size);
+
     /* double buffer mode */
 
-    if(dsc->pinfo.yres_virtual == (dsc->vinfo.yres * 2)) {
+    bool double_buffer = dsc->pinfo.yres_virtual == (dsc->vinfo.yres * 2);
+    if(double_buffer) {
         if((ret = fbdev_init_mem2(dsc)) < 0) {
             goto errout;
         }
+
+        lv_draw_buf_init(&dsc->buf2, w, h, LV_COLOR_FORMAT_NATIVE, stride, dsc->mem2, data_size);
     }
 
+    lv_display_set_draw_buffers(disp, &dsc->buf1, double_buffer ? &dsc->buf2 : NULL);
+    lv_display_set_render_mode(disp, LV_DISP_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
-    lv_display_set_buffers(disp, dsc->mem, dsc->mem2,
-                           (dsc->pinfo.stride * dsc->vinfo.yres), LV_DISP_RENDER_MODE_DIRECT);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
 
     LV_LOG_USER("Resolution is set to %dx%d at %" LV_PRId32 "dpi",
@@ -191,10 +203,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
 #if defined(CONFIG_FB_UPDATE)
     /*May be some direct update command is required*/
+    int yoffset = disp->buf_act == disp->buf_1 ?
+                  0 : dsc->mem2_yoffset;
 
     struct fb_area_s fb_area;
     fb_area.x = area->x1;
-    fb_area.y = area->y1;
+    fb_area.y = area->y1 + yoffset;
     fb_area.w = lv_area_get_width(area);
     fb_area.h = lv_area_get_height(area);
     if(ioctl(dsc->fd, FBIO_UPDATE, (unsigned long)((uintptr_t)&fb_area)) < 0) {
@@ -205,7 +219,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     /* double framebuffer */
 
     if(dsc->mem2 != NULL) {
-        if(disp->buf_act == &disp->buf_1) {
+        if(disp->buf_act == disp->buf_1) {
             dsc->pinfo.yoffset = 0;
         }
         else {

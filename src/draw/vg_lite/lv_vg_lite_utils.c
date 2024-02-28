@@ -918,7 +918,7 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
 {
     vg_lite_matrix_t temp;
     int row, column;
-    const vg_lite_float_t (*m)[3] = matrix->m;
+    vg_lite_float_t (*m)[3] = matrix->m;
 
     /* Process all rows. */
     for(row = 0; row < 3; row++) {

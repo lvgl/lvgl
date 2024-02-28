@@ -31,6 +31,7 @@ void lv_example_imagebutton_1(void)
     lv_obj_add_style(imagebutton1, &style_def, 0);
     lv_obj_add_style(imagebutton1, &style_pr, LV_STATE_PRESSED);
 
+    lv_obj_set_width(imagebutton1, 100);
     lv_obj_align(imagebutton1, LV_ALIGN_CENTER, 0, 0);
 
     /*Create a label on the image button*/

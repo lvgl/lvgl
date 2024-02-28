@@ -26,7 +26,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void invalidate_cache(lv_draw_buf_t * draw_buf, const lv_area_t * area);
+static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 /**********************
  *  STATIC VARIABLES
@@ -50,12 +50,11 @@ void lv_nuttx_cache_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void invalidate_cache(lv_draw_buf_t * draw_buf, const lv_area_t * area)
+static void invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     LV_ASSERT_NULL(draw_buf);
     void * buf = draw_buf->data;
     uint32_t stride = draw_buf->header.stride;
-    lv_color_format_t cf = draw_buf->header.cf;
 
     lv_uintptr_t start;
     lv_uintptr_t end;

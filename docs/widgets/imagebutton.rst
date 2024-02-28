@@ -37,6 +37,10 @@ To set the image in a state, use the
 The image sources work the same as described in the `Image object </widgets/image>`__
 except that "Symbols" are not supported by the Image button. Any of the sources can ``NULL``.
 
+If only ``src_center`` is specified, the width of the widget will be set automatically to the
+width of the image. However, if all three sources are set, the width needs to be set by the user
+(using e.g. :cpp:expr:`lv_obj_set_width`) and the center image will be tiled to fill the given size.
+
 The possible states are:
 
 - :cpp:enumerator:`LV_IMAGEBUTTON_STATE_RELEASED`
@@ -53,7 +57,7 @@ they will be used in pressed state instead of the released images.
 States
 ------
 
-Instead of the regular :cpp:func:`lv_obj_add_state` and :cpp:func:`lv_obj_remove_state` functions, 
+Instead of the regular :cpp:func:`lv_obj_add_state` and :cpp:func:`lv_obj_remove_state` functions,
 the :cpp:expr:`lv_imagebutton_set_state(imagebutton, LV_IMAGEBUTTON_STATE_...)` function should be
 used to manually set a state.
 

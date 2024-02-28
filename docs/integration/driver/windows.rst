@@ -35,12 +35,14 @@ Application Mode
 Prerequisites
 -------------
 
-The tested minimum Windows OS requirement for this driver is Windows XP RTM.
+The minimum Windows OS requirement for this driver is Windows Vista RTM.
 
-According to the Windows GDI API this driver used. Maybe the minimum Windows OS requirement for this driver is Windows 2000 RTM.
+If you use Windows API shim libraries like `YY-Thunks <https://github.com/Chuyu-Team/YY-Thunks>`__, the tested minimum Windows OS requirement for this driver is Windows XP RTM.
+
+According to the Windows GDI API this driver used. Maybe the minimum Windows OS requirement limitation for this driver is Windows 2000 RTM.
 
 Configure Windows driver
---------------------
+------------------------
 
 Enable the Windows driver support in lv_conf.h, by cmake compiler define or by KConfig
 
@@ -100,7 +102,7 @@ Usage
         while (1)
         {
             uint32_t time_till_next = lv_timer_handler();
-            Sleep(time_till_next);
+            lv_delay_ms(time_till_next);
         }
 
         return 0;

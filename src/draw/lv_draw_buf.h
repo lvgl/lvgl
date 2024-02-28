@@ -15,7 +15,8 @@ extern "C" {
  *********************/
 #include "../misc/lv_area.h"
 #include "../misc/lv_color.h"
-#include "lv_image_buf.h"
+#include "../stdlib/lv_string.h"
+#include "lv_image_dsc.h"
 
 /*********************
  *      DEFINES
@@ -56,11 +57,13 @@ typedef struct {
     static uint8_t buf_##name[_LV_DRAW_BUF_SIZE(_w, _h, _cf)]; \
     static lv_draw_buf_t name = { \
                                   .header = { \
-                                              .w = (_w), \
-                                              .h = (_h), \
+                                              .magic = LV_IMAGE_HEADER_MAGIC, \
                                               .cf = (_cf), \
                                               .flags = LV_IMAGE_FLAGS_MODIFIABLE, \
+                                              .w = (_w), \
+                                              .h = (_h), \
                                               .stride = _LV_DRAW_BUF_STRIDE(_w, _cf), \
+                                              .reserved_2 = 0, \
                                             }, \
                                   .data_size = sizeof(buf_##name), \
                                   .data = buf_##name, \
@@ -73,7 +76,7 @@ typedef void (*lv_draw_buf_free_cb)(void * draw_buf);
 
 typedef void * (*lv_draw_buf_align_cb)(void * buf, lv_color_format_t color_format);
 
-typedef void (*lv_draw_buf_invalidate_cache_cb)(lv_draw_buf_t * draw_buf, const lv_area_t * area);
+typedef void (*lv_draw_buf_invalidate_cache_cb)(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
@@ -115,7 +118,7 @@ void * lv_draw_buf_align(void * buf, lv_color_format_t color_format);
  * @param area         the area to invalidate in the buffer,
  *                     use NULL to invalidate the whole draw buffer address range
  */
-void lv_draw_buf_invalidate_cache(lv_draw_buf_t * draw_buf, const lv_area_t * area);
+void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 /**
  * Calculate the stride in bytes based on a width and color format
@@ -193,7 +196,7 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
                                     uint32_t stride);
 
 /**
- * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_MODIFIABLE in header.
+ * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_ALLOCATED in header.
  * Then free the lv_draw_buf_t struct.
  */
 void lv_draw_buf_destroy(lv_draw_buf_t * buf);
@@ -248,7 +251,43 @@ static inline void lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_ds
 
 static inline void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
 {
-    lv_memcpy(img, buf, sizeof(lv_image_dsc_t));
+    lv_memcpy((void *)img, buf, sizeof(lv_image_dsc_t));
+}
+
+/**
+ * Set the palette color of an indexed image. Valid only for `LV_COLOR_FORMAT_I1/2/4/8`
+ * @param draw_buf pointer to an image descriptor
+ * @param index the palette color to set:
+ *   - for `LV_COLOR_FORMAT_I1`: 0..1
+ *   - for `LV_COLOR_FORMAT_I2`: 0..3
+ *   - for `LV_COLOR_FORMAT_I4`: 0..15
+ *   - for `LV_COLOR_FORMAT_I8`: 0..255
+ * @param color the color to set in lv_color32_t format
+ */
+void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32_t color);
+
+/**
+ * @deprecated Use lv_draw_buf_set_palette instead.
+ */
+static inline void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
+{
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
+    lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
+}
+
+/**
+ * @deprecated Use lv_draw_buffer_create/destroy instead.
+ * Free the data pointer and dsc struct of an image.
+ */
+static inline void lv_image_buf_free(lv_image_dsc_t * dsc)
+{
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
+    if(dsc != NULL) {
+        if(dsc->data != NULL)
+            lv_free((void *)dsc->data);
+
+        lv_free((void *)dsc);
+    }
 }
 
 /**********************

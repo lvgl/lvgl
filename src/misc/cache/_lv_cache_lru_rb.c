@@ -3,6 +3,43 @@
 *
 */
 
+/***************************************************************************\
+*                                                                           *
+*                                             ┏ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┓ *
+* ┏ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━          ┌ ─ ─ ─ ┐                *
+*             ┌ ─ ─ ─ ─ ─ ─ ─            ┃    ┃      Cache   insert       ┃ *
+* ┃               RB Tree    │                     │Hitting│  head          *
+*             └ ─ ─ ─ ─ ─ ─ ─            ┃    ┃     ─ ─ ─ ─               ┃ *
+* ┃      ┌─┬─┬─┬─┐                                  ┌─────┐                 *
+*     ┌──│◄│B│►│ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┃─ ─ ╋ ─ ─▶│  B  │               ┃ *
+* ┃   │  └─┴─┴─┴─┘                                  └──▲──┘                 *
+*     │       │                          ┃    ┃        │                  ┃ *
+* ┃   │       │                                     ┌──┴──┐                 *
+*     │       └──────┐                ┌ ─┃─ ─ ╋ ─ ─▶│  E  │               ┃ *
+* ┃   ▼         ┌ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐   └──▲──┘                 *
+*  ┌─┬─┬─┬─┐         ▼                │  ┃    ┃        │                  ┃ *
+* ┃│◄│A│►│ │─ ─ ┘ ┌─┬─┬─┬─┐                     │   ┌──┴──┐                 *
+*  └─┴─┴─┴─┘  ┌───│◄│D│►│ │─ ─ ─ ─ ─ ─│─ ╋ ┐  ┃  ─ ▶│  A  │ ┌ ─ ─ ─ ─ ─ ┐ ┃ *
+* ┃           │   └─┴─┴─┴─┘                         └──▲──┘      LRU        *
+*             │        │              │  ┃ │  ┃        │    │   Cache   │ ┃ *
+* ┃           ▼        └──────┐                     ┌──┴──┐  ─ ─ ─ ─ ─ ─    *
+*          ┌─┬─┬─┬─┐          ▼       │  ┃ └ ─┃─ ─ ▶│  D  │               ┃ *
+* ┃        │◄│C│►│ │─ ─    ┌─┬─┬─┬─┐                └──▲──┘                 *
+*          └─┴─┴─┴─┘   │   │◄│E│►│ │─ ┘  ┃    ┃        │                  ┃ *
+* ┃                        └─┴─┴─┴─┘                ┌──┴──┐                 *
+*                      │        │      ─ ╋ ─ ─┃─ ─ ▶│  C  │               ┃ *
+* ┃                     ─ ─ ─ ─ ┼ ─ ─ ┘             └──▲──┘                 *
+*                               ▼        ┃    ┃   ┌ ─ ─│─ ─ ┐             ┃ *
+* ┃                          ┌─┬─┬─┬─┐              ┌──┴──┐                 *
+*                            │◄│F│►│ │─ ─┃─ ─ ╋ ─ ┼▶│  F  │ │             ┃ *
+* ┃                          └─┴─┴─┴─┘              └─────┘                 *
+*                                        ┃    ┃   └ ─ ─ ─ ─ ┘             ┃ *
+* ┃                                                 remove                  *
+*                                        ┃    ┃      tail                 ┃ *
+* ┗ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━      ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━  *
+*                                                                           *
+\***************************************************************************/
+
 /*********************
  *      INCLUDES
  *********************/
@@ -168,13 +205,13 @@ static bool init_cnt_cb(lv_cache_t * cache)
 
     /*add void* to store the ll node pointer*/
     if(!lv_rb_init(&lru->rb, lru->cache.ops.compare_cb, lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
-        return NULL;
+        return false;
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
 
     lru->get_data_size_cb = cnt_get_data_size_cb;
 
-    return lru;
+    return true;
 }
 
 static bool init_size_cb(lv_cache_t * cache)
@@ -192,13 +229,13 @@ static bool init_size_cb(lv_cache_t * cache)
 
     /*add void* to store the ll node pointer*/
     if(!lv_rb_init(&lru->rb, lru->cache.ops.compare_cb, lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
-        return NULL;
+        return false;
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
 
     lru->get_data_size_cb = size_get_data_size_cb;
 
-    return lru;
+    return true;
 }
 
 static void destroy_cb(lv_cache_t * cache, void * user_data)

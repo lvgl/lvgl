@@ -150,13 +150,13 @@ differences are that pure image widget transformation
 - doesn't transform the children of the image widget
 - image is transformed directly without creating an intermediate layer (buffer) to snapshot the widget
 
-Align
------
+Inner align
+-----------
 
 By default the image widget's width and height is :cpp:enumerator:`LV_SIZE_CONTENT`.
-It means the the widget will be sized automatically according to the image source.
+It means that the widget will be sized automatically according to the image source.
 
-If the widget's width or height is set the smaller value the ``align`` property tells
+If the widget's width or height is set the larger value the ``inner_align`` property tells
 how to align the image source inside the widget.
 
 The alignment set any of these:
@@ -174,14 +174,16 @@ The alignment set any of these:
 - :cpp:enumerator:`LV_IMAGE_ALIGN_STRETCH`
 - :cpp:enumerator:`LV_IMAGE_ALIGN_TILE`
 
-The ``offset`` value is applied after the image source is aligned. For example setting an ``y=-10`` and :cpp:enumerator:`LV_IMAGE_ALIGN_CENTER`
-will move the image source up a little bit from the center of the widget.
+The ``offset`` value is applied after the image source is aligned. For example setting an ``y=-10``
+and :cpp:enumerator:`LV_IMAGE_ALIGN_CENTER` will move the image source up a little bit
+from the center of the widget.
 
 Or to automatically scale or tile the image
+
 - :cpp:enumerator:`LV_IMAGE_ALIGN_STRETCH` Set X and Y scale to fill the widget's area
 - :cpp:enumerator:`LV_IMAGE_ALIGN_TILE` Tile the image to will the widget area. Offset is applied to shift the tiling.
 
-The alignment can be set by :cpp:func:`lv_image_set_align`
+The alignment can be set by :cpp:func:`lv_image_set_inner_align`
 
 .. _lv_image_events:
 

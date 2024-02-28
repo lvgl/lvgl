@@ -96,17 +96,31 @@
 
 #define LV_USE_OBJ_ID           1
 #define LV_USE_OBJ_ID_BUILTIN   1
-#define LV_USE_OBJ_PROPERTY     1
+#define LV_USE_OBJ_PROPERTY     0
 #define LV_BIN_DECODER_RAM_LOAD 1
 
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
+
+#ifndef LV_USE_LINUX_DRM
+    #define LV_USE_LINUX_DRM    1
+#endif
+
+#ifndef LV_USE_LINUX_FBDEV
+    #define LV_USE_LINUX_FBDEV  1
+#endif
 
 #define LV_USE_ILI9341      1
 #define LV_USE_ST7735       1
 #define LV_USE_ST7789       1
 #define LV_USE_ST7796       1
-#define LV_USE_LIBINPUT     1
-#define LV_LIBINPUT_XKB     1
+
+#ifndef LV_USE_LIBINPUT
+    #define LV_USE_LIBINPUT     1
+#endif
+
+#ifndef LV_LIBINPUT_XKB
+    #define LV_LIBINPUT_XKB     1
+#endif
 
 #define LV_USE_FREETYPE 1
 #define LV_FREETYPE_CACHE_SIZE 768

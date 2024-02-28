@@ -36,6 +36,8 @@ typedef struct {
     uint8_t * fb1;
     uint8_t * fb2;
     uint8_t * fb_act;
+    uint8_t * buf1;
+    uint8_t * buf2;
 #endif
     uint8_t zoom;
     uint8_t ignore_size_chg;
@@ -114,12 +116,11 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 
 #if LV_USE_DRAW_SDL == 0
     if(LV_SDL_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        uint8_t * buf1 = malloc(32 * 1024);
-        uint8_t * buf2 = NULL;
+        dsc->buf1 = malloc(32 * 1024);
 #if LV_SDL_BUF_COUNT == 2
-        buf2 = malloc(32 * 1024);
+        dsc->buf2 = malloc(32 * 1024);
 #endif
-        lv_display_set_buffers(disp, buf1, buf2,
+        lv_display_set_buffers(disp, dsc->buf1, dsc->buf2,
                                32 * 1024, LV_DISPLAY_RENDER_MODE_PARTIAL);
     }
     /*LV_DISPLAY_RENDER_MODE_DIRECT or FULL */
@@ -414,6 +415,8 @@ static void release_disp_cb(lv_event_t * e)
 #if LV_USE_DRAW_SDL == 0
     if(dsc->fb1) free(dsc->fb1);
     if(dsc->fb2) free(dsc->fb2);
+    if(dsc->buf1) free(dsc->buf1);
+    if(dsc->buf2) free(dsc->buf2);
 #endif
     lv_free(dsc);
     lv_display_set_driver_data(disp, NULL);

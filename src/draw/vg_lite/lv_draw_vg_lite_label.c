@@ -89,7 +89,10 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
     if(glyph_draw_dsc) {
         switch(glyph_draw_dsc->format) {
-            case LV_FONT_GLYPH_FORMAT_A1 ... LV_FONT_GLYPH_FORMAT_A8: {
+            case LV_FONT_GLYPH_FORMAT_A1:
+            case LV_FONT_GLYPH_FORMAT_A2:
+            case LV_FONT_GLYPH_FORMAT_A4:
+            case LV_FONT_GLYPH_FORMAT_A8: {
                     draw_letter_bitmap(u, glyph_draw_dsc);
                 }
                 break;
@@ -288,6 +291,9 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
                                &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
                                &matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
     LV_PROFILER_END_TAG("vg_lite_draw");
+
+    /* Flush in time to avoid accumulation of drawing commands */
+    lv_vg_lite_flush(u);
 
     LV_PROFILER_END;
 }

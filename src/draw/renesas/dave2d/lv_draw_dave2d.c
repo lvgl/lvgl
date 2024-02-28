@@ -29,7 +29,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u);
 
 #if defined(RENESAS_CORTEX_M85)
     #if (BSP_CFG_DCACHE_ENABLED)
-        static void _dave2d_buf_invalidate_cache_cb(lv_draw_buf_t * draw_buf, const lv_area_t * area);
+        static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
     #endif
 #endif
 
@@ -122,15 +122,15 @@ static void lv_draw_buf_dave2d_init_handlers(void)
 
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
-static void _dave2d_buf_invalidate_cache_cb(lv_draw_buf_t * draw_buf, const lv_area_t * area)
+static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     const lv_image_header_t * header = &draw_buf->header;
     uint32_t stride = header->stride;
     lv_color_format_t cf = header->cf;
 
-    uint8_t * address = buf;
+    uint8_t * address = draw_buf->data;
     int32_t i = 0;
-    uint32_t bytes_per_pixel = lv_color_format_get_size(color_format);
+    uint32_t bytes_per_pixel = lv_color_format_get_size(cf);
     int32_t width = lv_area_get_width(area);
     int32_t lines = lv_area_get_height(area);
     int32_t bytes_to_flush_per_line = (int32_t)width * (int32_t)bytes_per_pixel;

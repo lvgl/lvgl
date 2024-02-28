@@ -90,7 +90,7 @@ def build_tests(options_name, build_type, clean):
         created_build_dir = True
     os.chdir(build_dir)
     if created_build_dir:
-        subprocess.check_call(['cmake', '-DCMAKE_BUILD_TYPE=%s' % build_type,
+        subprocess.check_call(['cmake', '-GNinja', '-DCMAKE_BUILD_TYPE=%s' % build_type,
                                '-D%s=1' % options_name, '..'])
     subprocess.check_call(['cmake', '--build', build_dir,
                            '--parallel', str(os.cpu_count())])

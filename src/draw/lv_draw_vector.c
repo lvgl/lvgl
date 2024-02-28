@@ -325,7 +325,15 @@ void lv_vector_path_close(lv_vector_path_t * path)
 
 void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area)
 {
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(area);
+
     uint32_t len = lv_array_size(&path->points);
+    if(len == 0) {
+        lv_memzero(area, sizeof(lv_area_t));
+        return;
+    }
+
     lv_fpoint_t * p = lv_array_front(&path->points);
     float x1 = p[0].x;
     float x2 = p[0].x;
@@ -520,11 +528,6 @@ void lv_vector_path_append_arc(lv_vector_path_t * path, const lv_fpoint_t * c, f
             cx, cy
         });
         lv_vector_path_line_to(path, &(lv_fpoint_t) {
-            start.x + cx, start.y + cy
-        });
-    }
-    else {
-        lv_vector_path_move_to(path, &(lv_fpoint_t) {
             start.x + cx, start.y + cy
         });
     }

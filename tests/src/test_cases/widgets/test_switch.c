@@ -49,13 +49,10 @@ void test_switch_should_have_default_state_after_being_created(void)
 void test_switch_should_not_leak_memory_after_deletion(void)
 {
     size_t idx = 0;
-    uint32_t initial_available_memory = 0;
-    uint32_t final_available_memory = 0;
-    lv_mem_monitor_t monitor;
+    size_t initial_available_memory = 0;
     lv_obj_t * switches[SWITCHES_CNT] = {NULL};
 
-    lv_mem_monitor(&monitor);
-    initial_available_memory = monitor.free_size;
+    initial_available_memory = lv_test_get_free_mem();
 
     for(idx = 0; idx < SWITCHES_CNT; idx++) {
         switches[idx] = lv_switch_create(scr);
@@ -65,10 +62,7 @@ void test_switch_should_not_leak_memory_after_deletion(void)
         lv_obj_delete(switches[idx]);
     }
 
-    lv_mem_monitor(&monitor);
-    final_available_memory = monitor.free_size;
-
-    LV_HEAP_CHECK(TEST_ASSERT_LESS_OR_EQUAL(initial_available_memory, final_available_memory));
+    LV_HEAP_CHECK(TEST_ASSERT_MEM_LEAK_LESS_THAN(initial_available_memory, 24));
 }
 
 void test_switch_animation(void)

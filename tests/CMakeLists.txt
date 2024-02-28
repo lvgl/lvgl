@@ -11,7 +11,7 @@ project(lvgl_tests LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 99)
 
-set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address)
+set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address -Werror)
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
@@ -24,6 +24,7 @@ function(filter_compiler_options lang options_out)
         endif ()
 
         string(TOUPPER FLAG_SUPPORTED_FOR_${lang}_${option} option_var_name)
+        string(REPLACE "-" "_" option_var_name ${option_var_name})
 
         if (${lang} STREQUAL C)
             check_c_compiler_flag(${option} ${option_var_name})
@@ -142,7 +143,7 @@ set(COMPILE_OPTIONS
     -Wmissing-prototypes
     -Wpointer-arith
     -Wmultichar
-    -Wno-pedantic # ignored for now, we convert functions to pointers for propertis table.
+    -Wpedantic
     -Wreturn-type
     -Wshadow
     -Wshift-negative-value
@@ -174,6 +175,7 @@ filter_compiler_options(CXX LVGL_THORVG_COMPILE_OPTIONS
         -Wno-missing-prototypes
         -Wno-deprecated-copy-with-user-provided-dtor
         -Wno-float-conversion
+        -Wno-pedantic
 )
 
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
@@ -254,12 +256,35 @@ find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
 # libinput is required for the libinput device driver test case
-find_package(Libinput REQUIRED)
+find_package(Libinput OPTIONAL_COMPONENTS)
 include_directories(${LIBINPUT_INCLUDE_DIRS})
 
-# libxkbcommon is required for the libinput device driver test case
+if (NOT LIBINPUT_FOUND)
+    message("libinput not found, defaulting to 0")
+    add_definitions(-DLV_USE_LIBINPUT=0)
+endif()
+
 find_package(PkgConfig)
-pkg_check_modules(xkbcommon REQUIRED xkbcommon)
+pkg_check_modules(xkbcommon pkg_check_modules xkbcommon)
+
+if (NOT xkbcommon_FOUND)
+    message("xkbcommon not found, defaulting to 0")
+    add_definitions(-DLV_LIBINPUT_XKB=0)
+endif()
+
+# libdrm is required for the DRM display driver test case
+include(${CMAKE_CURRENT_LIST_DIR}/FindLibDRM.cmake)
+if(Libdrm_FOUND)
+    include_directories(${Libdrm_INCLUDE_DIRS})
+else()
+    message("libdrm not found, defaulting to 0")
+    add_definitions(-DLV_USE_LINUX_DRM=0)
+endif()
+
+# If we are running on mac, set LV_USE_LINUX_FBDEV to 0
+if(APPLE)
+    add_definitions(-DLV_USE_LINUX_FBDEV=0)
+endif()
 
 # disable test targets for build only tests
 if (ENABLE_TESTS)
@@ -274,6 +299,10 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     if (${test_name} STREQUAL "_test_template")
         continue()
     endif()
+
+    # gather all test cases
+    list(APPEND TEST_CASES ${test_name})
+
     # Create path to auto-generated source file.
     set(test_runner_fname ${CMAKE_CURRENT_BINARY_DIR}/${test_name}_Runner.c)
     # Run ruby to generate source in build directory
@@ -296,6 +325,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             lvgl_thorvg
             ${PNG_LIBRARIES}
             ${FREETYPE_LIBRARIES}
+            ${LIBDRM_LIBRARIES}
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             m
@@ -308,5 +338,12 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         WORKING_DIRECTORY ${LVGL_TEST_DIR}
         COMMAND ${test_name})
 endforeach( test_case_fname ${TEST_CASE_FILES} )
+
+add_custom_target(run
+    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --timeout 300
+    WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}
+    DEPENDS ${TEST_CASES}
+    USES_TERMINAL
+)
 
 endif()

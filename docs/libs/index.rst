@@ -22,3 +22,4 @@
     rlottie
     ffmpeg
     rle
+    lfs
