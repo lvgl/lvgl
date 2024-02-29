@@ -160,9 +160,10 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
 
         cpp_cmd.extend(['-DPYCPARSER', f'-I"{fake_libc_path}"'])
         cpp_cmd.extend([f'-I"{item}"' for item in include_dirs])
-
         cpp_cmd.append(f'"{lvgl_header_path}"')
-        cpp_cmd = ' '.join(cpp_cmd)
+
+        if sys.platform.startswith('win'):
+            cpp_cmd = ' '.join(cpp_cmd)
 
         p = subprocess.Popen(
             cpp_cmd,
