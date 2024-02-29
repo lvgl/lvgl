@@ -937,12 +937,14 @@ static void _set_gradient_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * 
         float x2 = grad->x2 > 1.0f ? grad->x2 : grad->x2 * w;
         float y2 = grad->y2 > 1.0f ? grad->y2 : grad->y2 * h;
 
-        int32_t rot = (int32_t)(atan2f(y2 - y1, x2 - x1) * 180.0f / (float)M_PI);
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        float rot = atan2f(ABS(dy), ABS(dx)) * 180.0f / (float)M_PI;
         lv_matrix_rotate(mtx, rot);
 
         if(grad->units == LV_SVG_GRADIENT_UNITS_USER_SPACE) {
-            float sx = ABS((x2 - x1) / w);
-            float sy = ABS((y2 - y1) / h);
+            float sx = ABS(dx / w);
+            float sy = ABS(dy / h);
             float s = MAX(sx, sy);
             lv_matrix_scale(mtx, s, s);
             lv_matrix_translate(mtx, -bounds.x1, -bounds.y1);
