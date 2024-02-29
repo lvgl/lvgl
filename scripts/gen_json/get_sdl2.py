@@ -3,7 +3,6 @@
 import zipfile
 import io
 import os
-import sys
 
 
 SDL2_URL = 'https://github.com/libsdl-org/SDL/releases/download/release-2.26.5/SDL2-devel-2.26.5-VC.zip'  # NOQA

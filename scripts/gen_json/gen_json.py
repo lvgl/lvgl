@@ -133,15 +133,23 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
 
         elif sys.platform.startswith('darwin'):
             include_path_env_key = 'C_INCLUDE_PATH'
-            cpp_cmd = ['clang', '-std=c11', '-E', '-DINT32_MIN=0x80000000', f'-o "{pp_file}"']
+            cpp_cmd = [
+                'clang', '-std=c11', '-E', '-DINT32_MIN=0x80000000',
+                f'-o "{pp_file}"'
+            ]
         else:
             include_path_env_key = 'C_INCLUDE_PATH'
-            cpp_cmd = ['gcc', '-std=c11', '-E', '-Wno-incompatible-pointer-types', f'-o "{pp_file}"']
+            cpp_cmd = [
+                'gcc', '-std=c11', '-E', '-Wno-incompatible-pointer-types',
+                f'-o "{pp_file}"'
+            ]
 
         if include_path_env_key not in os.environ:
             os.environ[include_path_env_key] = ''
 
-        os.environ[include_path_env_key] = f'{fake_libc_path}{os.pathsep}{os.environ[include_path_env_key]}'
+        os.environ[include_path_env_key] = (
+            f'{fake_libc_path}{os.pathsep}{os.environ[include_path_env_key]}'
+        )
 
         cpp_cmd.extend(compiler_args)
         cpp_cmd.extend([
@@ -156,7 +164,11 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
         cpp_cmd.append(f'"{lvgl_header_path}"')
         cpp_cmd = ' '.join(cpp_cmd)
 
-        p = subprocess.Popen(cpp_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            cpp_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
         out, err = p.communicate()
         exit_code = p.returncode
 
@@ -175,10 +187,10 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
         cparser = pycparser.CParser()
         ast = cparser.parse(pp_data, lvgl_header_path)
 
-        # This code block is to handle how pycparser handles forward declarations
-        # and combining the forward declarations with the actual types so any
-        # information that is contained in the type gets properly attached to the
-        # forward declaration
+        # This code block is to handle how pycparser handles forward
+        # declarations and combining the forward declarations with the actual
+        # types so any information that is contained in the type gets properly
+        # attached to the forward declaration
 
         forward_struct_decls = {}
 
@@ -186,7 +198,10 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
             if (
                 isinstance(item, pycparser_monkeypatch.Decl) and
                 item.name is None and
-                isinstance(item.type, (pycparser_monkeypatch.Struct, pycparser_monkeypatch.Union)) and
+                isinstance(
+                    item.type,
+                    (pycparser_monkeypatch.Struct, pycparser_monkeypatch.Union)
+                ) and
                 item.type.name is not None
             ):
                 if item.type.decls is None:
@@ -204,8 +219,13 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
             elif (
                 isinstance(item, pycparser_monkeypatch.Typedef) and
                 isinstance(item.type, pycparser_monkeypatch.TypeDecl) and
-                item.name and item.type.declname and item.name == item.type.declname and
-                isinstance(item.type.type, (pycparser_monkeypatch.Struct, pycparser_monkeypatch.Union)) and
+                item.name and
+                item.type.declname and
+                item.name == item.type.declname and
+                isinstance(
+                    item.type.type,
+                    (pycparser_monkeypatch.Struct, pycparser_monkeypatch.Union)
+                ) and
                 item.type.type.decls is None
             ):
                 if item.type.type.name in forward_struct_decls:
