@@ -116,7 +116,7 @@ lv_group_t * lv_group_get_default(void)
 
 void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
-    LV_ASSERT_NULL(group);
+    if(group == NULL) return;
 
     LV_LOG_TRACE("begin");
 
@@ -316,7 +316,7 @@ lv_result_t lv_group_send_data(lv_group_t * group, uint32_t c)
 
 void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
 {
-    LV_ASSERT_NULL(group);
+    if(group == NULL) return;
 
     group->focus_cb = focus_cb;
 }
