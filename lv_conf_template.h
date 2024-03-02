@@ -516,6 +516,18 @@
 
 #define LV_USE_KEYBOARD   1
 
+/*1: Enable Pinyin input method*/
+/*Requires: lv_keyboard*/
+#define LV_USE_KEYBOARD_PINYIN 1
+#if LV_USE_KEYBOARD_PINYIN
+    /*1: Use default thesaurus*/
+    /*If you do not use the default thesaurus, be sure to use `lv_keyboard_pinyin` after setting the thesauruss*/
+    #define LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT 1
+
+    /*1: Use extend candidate button matrix*/
+    #define LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX 1
+#endif
+
 #define LV_USE_LABEL      1
 #if LV_USE_LABEL
     #define LV_LABEL_TEXT_SELECTION 1 /*Enable selecting text of the label*/

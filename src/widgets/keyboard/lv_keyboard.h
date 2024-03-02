@@ -17,6 +17,10 @@ extern "C" {
 
 #if LV_USE_KEYBOARD
 
+#if LV_USE_KEYBOARD_PINYIN
+#include "lv_keyboard_pinyin.h"
+#endif
+
 /*Testing of dependencies*/
 #if LV_USE_BUTTONMATRIX == 0
 #error "lv_buttonmatrix is required. Enable it in lv_conf.h (LV_USE_BUTTONMATRIX  1) "
@@ -24,6 +28,16 @@ extern "C" {
 
 #if LV_USE_TEXTAREA == 0
 #error "lv_textare is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
+#endif
+
+#if LV_USE_KEYBOARD_PINYIN
+#if LV_USE_BUTTON == 0
+#error "lv_button is required. Enable it in lv_conf.h (LV_USE_BUTTON  1) "
+#endif
+
+#if LV_USE_IMAGE == 0
+#error "lv_image is required. Enable it in lv_conf.h (LV_USE_IMAGE  1) "
+#endif
 #endif
 
 /*********************
@@ -41,6 +55,9 @@ enum _lv_keyboard_mode_t {
     LV_KEYBOARD_MODE_TEXT_UPPER,
     LV_KEYBOARD_MODE_SPECIAL,
     LV_KEYBOARD_MODE_NUMBER,
+#if LV_USE_KEYBOARD_PINYIN
+    LV_KEYBOARD_MODE_PINYIN,
+#endif
     LV_KEYBOARD_MODE_USER_1,
     LV_KEYBOARD_MODE_USER_2,
     LV_KEYBOARD_MODE_USER_3,
@@ -49,6 +66,14 @@ enum _lv_keyboard_mode_t {
     LV_KEYBOARD_MODE_TEXT_ARABIC
 #endif
 };
+
+#if LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT == 0
+typedef struct
+{
+	char * pinyin_list;
+	const char * pinyin_mb_list;
+} lv_keyboard_pinyin_dict_t;
+#endif
 
 #ifdef DOXYGEN
 typedef _lv_keyboard_mode_t lv_keyboard_mode_t;
@@ -62,6 +87,23 @@ typedef struct {
     lv_obj_t * ta;              /*Pointer to the assigned text area*/
     lv_keyboard_mode_t mode;    /*Key map type*/
     uint8_t popovers : 1;       /*Show button titles in popovers on press*/
+#if LV_USE_KEYBOARD_PINYIN
+    const lv_keyboard_pinyin_dict_t **dict;
+    lv_obj_t * candidate_cont;
+    lv_obj_t * pinyin_label;
+    lv_obj_t * candidate_btnm_cont;
+    lv_obj_t * candidate_btnm;
+    uint16_t candidate_num; /*Number of chinese characters*/
+    char ** candidate_btnm_map;
+#if LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX
+    lv_obj_t * ext_btn;
+    lv_obj_t * ext_img;
+    lv_obj_t * ext_candidate_btnm_cont;
+    lv_obj_t * ext_candidate_btnm;
+    uint16_t ext_candidate_num; /*Number of chinese characters (include "\n")*/
+    char ** ext_candidate_btnm_map;
+#endif
+#endif
 } lv_keyboard_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_keyboard_class;
@@ -113,6 +155,22 @@ void lv_keyboard_set_popovers(lv_obj_t * kb, bool en);
  */
 void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[],
                          const lv_buttonmatrix_ctrl_t ctrl_map[]);
+
+#if LV_USE_KEYBOARD_PINYIN
+/**
+ * Set the font for the keyboard
+ * @param kb   pointer to a Keyboard object
+ * @param dict pointer to a font
+ */
+void lv_keyboard_set_font(lv_obj_t * kb, const lv_font_t * font);
+
+/**
+ * Set the dictionary of Pinyin input method
+ * @param kb   pointer to a Keyboard object
+ * @param dict pointer to a Pinyin input method dictionary
+ */
+void lv_keyboard_set_pinyin_dict(lv_obj_t * kb, const lv_keyboard_pinyin_dict_t ** dict);
+#endif
 
 /*=====================
  * Getter functions
