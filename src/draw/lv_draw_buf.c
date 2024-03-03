@@ -121,8 +121,19 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
     uint8_t * src_bufc;
     int32_t line_width;
 
+    /*Source and dest color format must be same. Color conversion is not supported yet.*/
+    LV_ASSERT_FORMAT_MSG(dest->header.cf == src->header.cf, "Color format mismatch: %d != %d",
+                         dest->header.cf, src->header.cf);
+
     if(dest_area == NULL) line_width = dest->header.w;
     else line_width = lv_area_get_width(dest_area);
+
+    /* For indexed image, copy the palette if we are copying full image area*/
+    if(dest_area == NULL || src_area == NULL) {
+        if(LV_COLOR_FORMAT_IS_INDEXED(dest->header.cf)) {
+            lv_memcpy(dest->data, src->data, LV_COLOR_INDEXED_PALETTE_SIZE(dest->header.cf) * sizeof(lv_color32_t));
+        }
+    }
 
     /*Check source and dest area have same width*/
     if((src_area == NULL && line_width != src->header.w) || \
@@ -132,10 +143,10 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
     }
 
     if(src_area) src_bufc = lv_draw_buf_goto_xy(src, src_area->x1, src_area->y1);
-    else src_bufc = src->data;
+    else src_bufc = lv_draw_buf_goto_xy(src, 0, 0);
 
     if(dest_area) dest_bufc = lv_draw_buf_goto_xy(dest, dest_area->x1, dest_area->y1);
-    else dest_bufc = dest->data;
+    else dest_bufc = lv_draw_buf_goto_xy(dest, 0, 0);
 
     int32_t start_y, end_y;
     if(dest_area) {
@@ -149,10 +160,10 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
 
     uint32_t dest_stride = dest->header.stride;
     uint32_t src_stride = src->header.stride;
-    line_width *= lv_color_format_get_size(dest->header.cf); /*Pixel to bytes*/
+    uint32_t line_bytes = (line_width * lv_color_format_get_bpp(dest->header.cf) + 7) >> 3;
 
     for(; start_y <= end_y; start_y++) {
-        lv_memcpy(dest_bufc, src_bufc, line_width);
+        lv_memcpy(dest_bufc, src_bufc, line_bytes);
         dest_bufc += dest_stride;
         src_bufc += src_stride;
     }
@@ -279,10 +290,13 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
     LV_ASSERT_NULL(buf);
     if(buf == NULL) return NULL;
 
-    uint8_t * data = buf->data + buf->header.stride * y;
+    uint8_t * data = buf->data;
 
-    if(x == 0)
-        return data;
+    /*Skip palette*/
+    data += LV_COLOR_INDEXED_PALETTE_SIZE(buf->header.cf) * sizeof(lv_color32_t);
+    data += buf->header.stride * y;
+
+    if(x == 0) return data;
 
     return data + x * lv_color_format_get_size(buf->header.cf);
 }
