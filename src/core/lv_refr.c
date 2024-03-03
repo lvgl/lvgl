@@ -831,7 +831,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
          *This area needs to be updated on the screen.*/
         lv_area_t clip_coords_for_obj;
         lv_area_t tranf_coords = *obj_draw_size_out;
-        lv_obj_get_transformed_area(obj, &tranf_coords, false, false);
+        lv_obj_get_transformed_area(obj, &tranf_coords, LV_OBJ_POINT_TRANSFORM_FLAG_NONE);
         if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &tranf_coords)) {
             return LV_RESULT_INVALID;
         }
@@ -840,7 +840,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
          *It will tell which area of the non-transformed widget needs to be redrawn
          *in order to cover transformed area after transformation.*/
         lv_area_t inverse_clip_coords_for_obj = clip_coords_for_obj;
-        lv_obj_get_transformed_area(obj, &inverse_clip_coords_for_obj, false, true);
+        lv_obj_get_transformed_area(obj, &inverse_clip_coords_for_obj, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE);
         if(!_lv_area_intersect(&inverse_clip_coords_for_obj, &inverse_clip_coords_for_obj, obj_draw_size_out)) {
             return LV_RESULT_INVALID;
         }

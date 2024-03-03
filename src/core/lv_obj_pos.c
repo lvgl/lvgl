@@ -762,29 +762,31 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
     }
 }
 
-void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
+void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, lv_obj_point_transform_flag_t flags)
 {
-    lv_obj_transform_point_array(obj, p, 1, recursive, inv);
+    lv_obj_transform_point_array(obj, p, 1, flags);
 }
 
-void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], size_t count, bool recursive, bool inverse)
+void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], size_t count,
+                                  lv_obj_point_transform_flag_t flags)
 {
     if(obj) {
         lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
         bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
+        bool recursive = flags & LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE;
+        bool inverse = flags & LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE;
         if(inverse) {
-            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, recursive, inverse);
+            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
             if(do_tranf) transform_point_array(obj, points, count, inverse);
         }
         else {
             if(do_tranf) transform_point_array(obj, points, count, inverse);
-            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, recursive, inverse);
+            if(recursive) lv_obj_transform_point_array(lv_obj_get_parent(obj), points, count, flags);
         }
     }
 }
 
-void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive,
-                                 bool inverse)
+void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_point_transform_flag_t flags)
 {
     lv_point_t p[4] = {
         {area->x1, area->y1},
@@ -793,7 +795,7 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool re
         {area->x2 + 1, area->y2 + 1},
     };
 
-    lv_obj_transform_point_array(obj, p, 4, recursive, inverse);
+    lv_obj_transform_point_array(obj, p, 4, flags);
 
     area->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
     area->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
@@ -859,7 +861,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     /*The area is not on the object*/
     if(!_lv_area_intersect(area, area, &obj_coords)) return false;
 
-    lv_obj_get_transformed_area(obj, area, true, false);
+    lv_obj_get_transformed_area(obj, area, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
 
     /*Truncate recursively to the parents*/
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -874,7 +876,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
             lv_area_increase(&parent_coords, parent_ext_size, parent_ext_size);
         }
 
-        lv_obj_get_transformed_area(parent, &parent_coords, true, false);
+        lv_obj_get_transformed_area(parent, &parent_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
         if(!_lv_area_intersect(area, area, &parent_coords)) return false;
 
         parent = lv_obj_get_parent(parent);
