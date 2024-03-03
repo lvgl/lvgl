@@ -563,7 +563,8 @@ static void show_dir(lv_obj_t * obj, const char * path)
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_IMAGE "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "1");
         }
-        else if((is_end_with(fn, ".mp3") == true) || (is_end_with(fn, ".MP3") == true)) {
+        else if((is_end_with(fn, ".mp3") == true) || (is_end_with(fn, ".MP3") == true) || \
+                (is_end_with(fn, ".wav") == true) || (is_end_with(fn, ".WAV") == true)) {
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_AUDIO "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "2");
         }
