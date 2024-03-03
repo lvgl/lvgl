@@ -22,6 +22,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
 typedef enum {
     /** No flags */
     LV_OBJ_POINT_TRANSFORM_FLAG_NONE = 0x00,

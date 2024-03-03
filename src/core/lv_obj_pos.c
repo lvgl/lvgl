@@ -815,6 +815,8 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 
     if(!lv_obj_area_is_visible(obj, &area_tmp)) return;
     if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) {
+        /*Make the area slightly larger to avoid rounding errors.
+         *5 is an empirical value*/
         lv_area_increase(&area_tmp, 5, 5);
     }
 
@@ -1131,6 +1133,8 @@ static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p
     int32_t angle = lv_obj_get_style_transform_rotation(obj, 0);
     int32_t scale_x = lv_obj_get_style_transform_scale_x_safe(obj, 0);
     int32_t scale_y = lv_obj_get_style_transform_scale_y_safe(obj, 0);
+    if(scale_x == 0) scale_x = 1;
+    if(scale_y == 0) scale_y = 1;
 
     if(angle == 0 && scale_x == LV_SCALE_NONE && scale_y == LV_SCALE_NONE) return;
 
