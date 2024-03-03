@@ -60,7 +60,6 @@ int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
     return rt_memcmp(p1, p2, len);
 }
 
-
 char * lv_strncpy(char * dst, const char * src, size_t dest_size)
 {
     return rt_strncpy(dst, src, dest_size);
