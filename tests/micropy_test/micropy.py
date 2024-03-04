@@ -110,6 +110,19 @@ def event_callback(e):
 
 
 @test_func_wrapper
+def test_event():
+    scr = lv.screen_active()
+
+    scr.add_event_cb(event_callback, lv.EVENT.CLICKED, None)
+
+    lv.event_send(scr, lv.EVENT.CLICKED, None)
+
+    if not event_flag:
+        raise RuntimeError('Event failure')
+
+
+
+@test_func_wrapper
 def create_ui():
     # Create a colors
     c1 = lv.color_hex(0xff0000)
@@ -130,15 +143,6 @@ def create_ui():
 
     # Get the active screen
     scr = lv.screen_active()
-
-    scr.add_event_cb(event_callback, lv.EVENT.CLICKED, None)
-
-    lv.event_send(scr, lv.EVENT.CLICKED, None)
-    lv.tick_inc(1)
-    lv.task_handler()
-
-    if not event_flag:
-        raise RuntimeError('Event failure')
 
     # Declare static array of integers, and test grid setting options
     gird_cols = [300, GRID_FR(3), GRID_FR(2), lv.GRID_TEMPLATE_LAST]
@@ -439,6 +443,7 @@ def main():
     lv.refr_now(None)
 
 
+test_event()
 create_ui()
 main()
 # end
