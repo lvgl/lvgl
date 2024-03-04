@@ -100,6 +100,15 @@ def CANVAS_BUF_SIZE(w, h, bpp, stride):
             stride - 1)) * h + lv.DRAW_BUF_ALIGN
 
 
+event_flag = False
+
+
+@test_func_wrapper
+def event_callback(e):
+    global event_flag
+    event_flag = True
+
+
 @test_func_wrapper
 def create_ui():
     # Create a colors
@@ -121,6 +130,15 @@ def create_ui():
 
     # Get the active screen
     scr = lv.screen_active()
+
+    scr.add_event_cb(event_callback, lv.EVENT.CLICKED, None)
+
+    lv.event_send(scr, lv.EVENT.CLICKED, None)
+    lv.tick_inc(1)
+    lv.task_handler()
+
+    if not event_flag:
+        raise RuntimeError('Event failure')
 
     # Declare static array of integers, and test grid setting options
     gird_cols = [300, GRID_FR(3), GRID_FR(2), lv.GRID_TEMPLATE_LAST]
