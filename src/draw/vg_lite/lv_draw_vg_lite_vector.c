@@ -196,7 +196,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
                 if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
                     vg_lite_matrix_t grad_matrix;
-                    lv_area_t grad_area = { min_x, min_y, max_x, max_y};
+                    lv_area_t grad_area = { (int32_t)min_x, (int32_t)min_y, (int32_t)max_x, (int32_t)max_y};
                     lv_vg_lite_grad_area_to_matrix(&grad_matrix, &grad_area, dsc->fill_dsc.gradient.grad.dir);
                     lv_vg_lite_draw_linear_grad(
                         u,
