@@ -68,10 +68,9 @@ enum _lv_keyboard_mode_t {
 };
 
 #if LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT == 0
-typedef struct
-{
-	char * pinyin_list;
-	const char * pinyin_mb_list;
+typedef struct {
+    char * pinyin_list;
+    const char * pinyin_mb_list;
 } lv_keyboard_pinyin_dict_t;
 #endif
 
@@ -88,7 +87,7 @@ typedef struct {
     lv_keyboard_mode_t mode;    /*Key map type*/
     uint8_t popovers : 1;       /*Show button titles in popovers on press*/
 #if LV_USE_KEYBOARD_PINYIN
-    const lv_keyboard_pinyin_dict_t **dict;
+    const lv_keyboard_pinyin_dict_t ** dict;
     lv_obj_t * candidate_cont;
     lv_obj_t * pinyin_label;
     lv_obj_t * candidate_btnm_cont;

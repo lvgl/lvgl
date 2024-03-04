@@ -95,7 +95,7 @@ static const char lv_pinyin_mb_dao   [] = {"到道倒刀岛盗稻捣悼导蹈祷
 static const char lv_pinyin_mb_de    [] = {"的地得德底锝"};
 static const char lv_pinyin_mb_deng  [] = {"等灯邓登澄瞪凳蹬磴镫噔嶝戥簦"};
 static const char lv_pinyin_mb_di    [] = {"地第底低敌抵滴帝递嫡弟缔堤的涤提笛迪狄翟蒂觌邸谛诋嘀柢骶羝氐棣睇娣荻碲镝坻籴砥"};
-static const char lv_pinyin_mb_dia	 [] = {"嗲"};
+static const char lv_pinyin_mb_dia   [] = {"嗲"};
 static const char lv_pinyin_mb_dian  [] = {"点电店殿淀掂颠垫碘惦奠典佃靛滇甸踮钿坫阽癫簟玷巅癜"};
 static const char lv_pinyin_mb_diao  [] = {"掉钓叼吊雕调刁碉凋鸟铞铫鲷貂"};
 static const char lv_pinyin_mb_die   [] = {"爹跌叠碟蝶迭谍牒堞瓞揲蹀耋鲽垤喋"};
@@ -199,7 +199,7 @@ static const char lv_pinyin_mb_le    [] = {"了乐勒肋仂叻泐鳓"};
 static const char lv_pinyin_mb_lei   [] = {"类累泪雷垒勒擂蕾肋镭儡磊缧诔耒酹羸嫘檑嘞"};
 static const char lv_pinyin_mb_leng  [] = {"冷棱楞塄愣"};
 static const char lv_pinyin_mb_li    [] = {"里离力立李例哩理利梨厘礼历丽吏犁黎篱狸漓鲤莉荔栗厉励砾傈俐痢粒沥隶璃俪俚郦坜苈莅蓠鹂笠鳢缡跞蜊锂悝澧粝枥蠡鬲呖砺嫠篥疠疬猁藜溧鲡戾栎唳醴轹詈骊罹逦喱雳黧蛎娌"};
-static const char lv_pinyin_mb_lia	 [] = {"俩"};
+static const char lv_pinyin_mb_lia   [] = {"俩"};
 static const char lv_pinyin_mb_lian  [] = {"连联练莲恋脸炼链敛怜廉帘镰涟蠊琏殓蔹鲢奁潋臁裢濂裣楝"};
 static const char lv_pinyin_mb_liang [] = {"两亮辆凉粮梁量良晾谅俩粱墚靓踉椋魉莨"};
 static const char lv_pinyin_mb_liao  [] = {"了料撩聊撂疗廖燎辽僚寥镣潦钌蓼尥寮缭獠鹩嘹"};
@@ -942,7 +942,7 @@ static const lv_keyboard_pinyin_dict_t lv_pinyin_dict_end[] = {
     {NULL, NULL}
 };
 
-const lv_keyboard_pinyin_dict_t *lv_def_pinyin_dict[] = {
+const lv_keyboard_pinyin_dict_t * lv_def_pinyin_dict[] = {
     lv_pinyin_dict_a,
     lv_pinyin_dict_b,
     lv_pinyin_dict_c,

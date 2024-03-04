@@ -37,17 +37,16 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct
-{
-	char * pinyin_list;
-	const char * pinyin_mb_list;
+typedef struct {
+    char * pinyin_list;
+    const char * pinyin_mb_list;
 } lv_keyboard_pinyin_dict_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-extern const lv_keyboard_pinyin_dict_t *lv_def_pinyin_dict[];
+extern const lv_keyboard_pinyin_dict_t * lv_def_pinyin_dict[];
 
 /*=====================
  * Setter functions

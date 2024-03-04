@@ -14,9 +14,9 @@
 #include "../../misc/lv_assert.h"
 #include "../../stdlib/lv_string.h"
 #if LV_USE_KEYBOARD_PINYIN
-#include "lv_keyboard_pinyin.h"
-#include "../button/lv_button.h"
-#include "../image/lv_image.h"
+    #include "lv_keyboard_pinyin.h"
+    #include "../button/lv_button.h"
+    #include "../image/lv_image.h"
 #endif
 
 #include <stdlib.h>
@@ -41,11 +41,11 @@ static void lv_keyboard_update_map(lv_obj_t * obj);
 static void lv_keyboard_update_ctrl_map(lv_obj_t * obj);
 
 #if LV_USE_KEYBOARD_PINYIN
-static void lv_keyboard_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+    static void lv_keyboard_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
-static void lv_keyboard_proc_pinyin(lv_keyboard_t * keyboard);
+    static void lv_keyboard_proc_pinyin(lv_keyboard_t * keyboard);
 
-static void lv_keyboard_hidden_candidate(lv_keyboard_t * keyboard);
+    static void lv_keyboard_hidden_candidate(lv_keyboard_t * keyboard);
 #endif
 
 /**********************
@@ -65,26 +65,26 @@ const lv_obj_class_t lv_keyboard_class = {
 
 #if LV_USE_KEYBOARD_PINYIN
 static const char * const default_en_kb_map_lc[] = {" ", "\n", /*candidate content*/
-                                                 "1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
-                                                 "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
-                                                 "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
-                                                 LV_SYMBOL_KEYBOARD,  "Zh",
+                                                    "1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
+                                                    "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
+                                                    "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
+                                                    LV_SYMBOL_KEYBOARD,  "Zh",
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-                                                 "أب",
+                                                    "أب",
 #endif
-                                                 LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""
-                                                };
+                                                    LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""
+                                                   };
 
 static const char * const default_zh_kb_map_lc[] = {" ", "\n", /*candidate content*/
-                                                 "1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
-                                                 "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
-                                                 "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
-                                                 LV_SYMBOL_KEYBOARD, "En",
+                                                    "1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
+                                                    "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
+                                                    "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
+                                                    LV_SYMBOL_KEYBOARD, "En",
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-                                                 "أب",
+                                                    "أب",
 #endif
-                                                 LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""
-                                                };
+                                                    LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""
+                                                   };
 
 static const lv_buttonmatrix_ctrl_t default_kb_ctrl_lc_map[] = {
     LV_BUTTONMATRIX_CTRL_HIDDEN,
@@ -551,7 +551,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
             if(input_pinyin_len > 0) {
                 lv_label_cut_text(keyboard->pinyin_label, (input_pinyin_len - 1), 1);
 
-                if (input_pinyin_len - 1 == 0) {
+                if(input_pinyin_len - 1 == 0) {
                     lv_obj_add_flag(keyboard->candidate_cont, LV_OBJ_FLAG_HIDDEN);
 
                     goto update_candidate;
@@ -594,7 +594,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
             lv_textarea_add_text(keyboard->ta, txt);
         }
         else {
-            if (*txt < 'a' || *txt > 'z') goto update_candidate;
+            if(*txt < 'a' || *txt > 'z') goto update_candidate;
 
             if(lv_obj_has_flag(keyboard->candidate_cont, LV_OBJ_FLAG_HIDDEN)) {
                 lv_obj_remove_flag(keyboard->candidate_cont, LV_OBJ_FLAG_HIDDEN);
@@ -671,7 +671,7 @@ static char * lv_keyboard_search_chinese(size_t * candidate_num, lv_keyboard_t *
         if((pinyin_str[i] >= 'A') && (pinyin_str[i] <= 'Z')) {
             new_pinyin_str[i] = pinyin_str[i] + 32;
         }
-        else if((pinyin_str[i] >= 'a') && (pinyin_str[i]<='z')) {
+        else if((pinyin_str[i] >= 'a') && (pinyin_str[i] <= 'z')) {
             new_pinyin_str[i] = pinyin_str[i];
         }
         else {
@@ -749,7 +749,7 @@ static void lv_keyboard_proc_ext_candidate_btnm_map(lv_keyboard_t * keyboard)
 {
     int32_t cont_width = lv_obj_get_width(keyboard->candidate_btnm_cont);
     int32_t btnm_width = lv_obj_get_width(keyboard->candidate_btnm);
-    if (btnm_width <= cont_width) {
+    if(btnm_width <= cont_width) {
         lv_obj_add_flag(keyboard->ext_btn, LV_OBJ_FLAG_HIDDEN);
         return;
     }
@@ -829,7 +829,7 @@ static void lv_keyboard_candidate_btnm_event_cb(lv_event_t * e)
     if(code == LV_EVENT_CLICKED) {
         uint32_t id = lv_buttonmatrix_get_selected_button(keyboard->candidate_btnm);
         const char * txt = lv_buttonmatrix_get_button_text(keyboard->candidate_btnm, id);
-        if ((txt == NULL) || (lv_strcmp(txt, " ") == 0)) return;
+        if((txt == NULL) || (lv_strcmp(txt, " ") == 0)) return;
         lv_textarea_add_text(keyboard->ta, txt);
 
         lv_label_set_text(keyboard->pinyin_label, "");
@@ -846,7 +846,7 @@ static void lv_keyboard_ext_candidate_btnm_event_cb(lv_event_t * e)
     if(code == LV_EVENT_CLICKED) {
         uint32_t id = lv_buttonmatrix_get_selected_button(keyboard->ext_candidate_btnm);
         const char * txt = lv_buttonmatrix_get_button_text(keyboard->ext_candidate_btnm, id);
-        if ((txt == NULL) || (lv_strcmp(txt, " ") == 0)) return;
+        if((txt == NULL) || (lv_strcmp(txt, " ") == 0)) return;
         lv_textarea_add_text(keyboard->ta, txt);
 
         lv_label_set_text(keyboard->pinyin_label, "");
@@ -876,7 +876,7 @@ static void lv_keyboard_hidden_candidate(lv_keyboard_t * keyboard)
 }
 
 #if LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX
-static void lv_keyboard_ext_btn_event_cb(lv_event_t *e)
+static void lv_keyboard_ext_btn_event_cb(lv_event_t * e)
 {
     lv_keyboard_t * keyboard = (lv_keyboard_t *)lv_event_get_user_data(e);
 
@@ -995,7 +995,8 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_add_flag(keyboard->ext_candidate_btnm_cont, LV_OBJ_FLAG_HIDDEN);
     lv_obj_remove_flag(keyboard->ext_candidate_btnm_cont, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     lv_obj_set_flex_flow(keyboard->ext_candidate_btnm_cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(keyboard->ext_candidate_btnm_cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+    lv_obj_set_flex_align(keyboard->ext_candidate_btnm_cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER,
+                          LV_FLEX_ALIGN_START);
     lv_obj_set_flex_grow(keyboard->ext_candidate_btnm_cont, 1);
 
     lv_obj_add_style(keyboard->ext_candidate_btnm_cont, &pinyin_default_style, 0);
@@ -1039,6 +1040,10 @@ static void lv_keyboard_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         lv_obj_delete(keyboard->candidate_cont);
 
     lv_keyboard_free_candidate_btnm_map(keyboard);
+
+#if LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX
+    lv_keyboard_free_ext_candidate_btnm_map(keyboard);
+#endif
 }
 #endif
 
