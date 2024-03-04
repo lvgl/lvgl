@@ -194,14 +194,10 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                 vg_lite_gradient_spreadmode_t spreadmode = lv_spread_to_vg(dsc->fill_dsc.gradient.spread);
                 LV_UNUSED(spreadmode);
 
-                lv_matrix_t m = dsc->matrix;
-                lv_matrix_translate(&m, min_x, min_y);
-                lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
-
-                vg_lite_matrix_t grad_matrix;
-                lv_matrix_to_vg(&grad_matrix, &m);
-
                 if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
+                    vg_lite_matrix_t grad_matrix;
+                    lv_area_t grad_area = { min_x, min_y, max_x, max_y};
+                    lv_vg_lite_grad_area_to_matrix(&grad_matrix, &grad_area, dsc->fill_dsc.gradient.grad.dir);
                     lv_vg_lite_draw_linear_grad(
                         u,
                         &u->target_buffer,
