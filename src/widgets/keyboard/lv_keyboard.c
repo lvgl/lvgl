@@ -54,6 +54,7 @@ static void lv_keyboard_hidden_candidate(lv_keyboard_t * keyboard);
 
 const lv_obj_class_t lv_keyboard_class = {
     .constructor_cb = lv_keyboard_constructor,
+    .destructor_cb = lv_keyboard_destructor,
     .width_def = LV_PCT(100),
     .height_def = LV_PCT(50),
     .instance_size = sizeof(lv_keyboard_t),
@@ -403,7 +404,6 @@ void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * m
 void lv_keyboard_set_font(lv_obj_t * obj, const lv_font_t * font)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
 
     lv_obj_set_style_text_font(obj, font, 0);
 }
@@ -684,15 +684,15 @@ static char * lv_keyboard_search_chinese(size_t * candidate_num, lv_keyboard_t *
         return NULL;
     }
 
-    lv_keyboard_pinyin_dict_t * pinyin_head = (lv_keyboard_pinyin_dict_t *)keyboard->dict[*pinyin_str - 'a'];
-    lv_keyboard_pinyin_dict_t * pinyin_tail = (lv_keyboard_pinyin_dict_t *)keyboard->dict[*pinyin_str - 'a' + 1];
+    lv_keyboard_pinyin_dict_t * pinyin_head = (lv_keyboard_pinyin_dict_t *)keyboard->dict[*new_pinyin_str - 'a'];
+    lv_keyboard_pinyin_dict_t * pinyin_tail = (lv_keyboard_pinyin_dict_t *)keyboard->dict[*new_pinyin_str - 'a' + 1];
 
     size_t i = 0;
     for(; pinyin_head < pinyin_tail; pinyin_head++) {
         for(i = 0; i < pinyin_str_len - 1; i++) {
             if((*pinyin_head).pinyin_list == NULL) return NULL;
 
-            if(*((*pinyin_head).pinyin_list + i) != pinyin_str[i + 1]) break;
+            if(*((*pinyin_head).pinyin_list + i) != new_pinyin_str[i + 1]) break;
         }
 
         /*perfect match*/
@@ -779,7 +779,7 @@ static void lv_keyboard_proc_ext_candidate_btnm_map(lv_keyboard_t * keyboard)
         return;
     }
 
-    for(size_t i = 0; i < keyboard->ext_candidate_num; i++) {
+    for(uint16_t i = 0; i < keyboard->ext_candidate_num; i++) {
         keyboard->ext_candidate_btnm_map[i] = (char *)lv_malloc(4 * sizeof(char));
         if(keyboard->ext_candidate_btnm_map[i] == NULL) {
             lv_keyboard_free_ext_candidate_btnm_map(keyboard);
@@ -794,7 +794,7 @@ static void lv_keyboard_proc_ext_candidate_btnm_map(lv_keyboard_t * keyboard)
     lv_strcpy(keyboard->ext_candidate_btnm_map[keyboard->ext_candidate_num - 1], "");
 
     bool has_hidden_btn = false;
-    for(size_t i = 0; i < (keyboard->ext_candidate_num - 1); i++) {
+    for(uint16_t i = 0; i < (keyboard->ext_candidate_num - 1); i++) {
         if(lv_strcmp(keyboard->ext_candidate_btnm_map[i], "\n") == 0) {
             continue;
         }
@@ -811,7 +811,7 @@ static void lv_keyboard_proc_ext_candidate_btnm_map(lv_keyboard_t * keyboard)
     lv_buttonmatrix_set_map(keyboard->ext_candidate_btnm, (const char **)keyboard->ext_candidate_btnm_map);
 
     if(has_hidden_btn) {
-        for(size_t i = 0; i < (keyboard->ext_candidate_num - 1); i++) {
+        for(uint16_t i = 0; i < (keyboard->ext_candidate_num - 1); i++) {
             if(lv_strcmp(keyboard->ext_candidate_btnm_map[i], " ") == 0) {
                 lv_buttonmatrix_set_button_ctrl(keyboard->ext_candidate_btnm, (i - (row_num - 1)),
                                                 LV_BUTTONMATRIX_CTRL_DISABLED);
@@ -936,7 +936,9 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_style_set_pad_all(&pinyin_default_style, 0);
     lv_style_set_pad_gap(&pinyin_default_style, 0);
     lv_style_set_radius(&pinyin_default_style, 0);
+#if LV_FONT_SIMSUN_16_CJK
     lv_style_set_text_font(&pinyin_default_style, &lv_font_simsun_16_cjk);
+#endif
 
     keyboard->candidate_cont = lv_obj_create(obj);
     lv_obj_set_size(keyboard->candidate_cont, LV_PCT(100), LV_PCT(15));
