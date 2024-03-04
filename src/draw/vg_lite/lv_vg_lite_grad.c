@@ -17,8 +17,6 @@
  *      DEFINES
  *********************/
 
-#define LV_VG_LITE_GRAD_CACHE_SIZE 16
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -180,6 +178,13 @@ static vg_lite_linear_gradient_t * lv_vg_lite_linear_grad_get(struct _lv_draw_vg
 
     lv_cache_entry_t * cache_node_entry = lv_cache_acquire(u->grad_cache, &search_key, NULL);
     if(cache_node_entry == NULL) {
+        /* check if the cache is full */
+        size_t free_size = lv_cache_get_free_size(u->grad_cache, NULL);
+        if(free_size == 0) {
+            LV_LOG_INFO("grad cache is full, release all pending cache entries");
+            lv_vg_lite_finish(u);
+        }
+
         cache_node_entry = lv_cache_acquire_or_create(u->grad_cache, &search_key, NULL);
         if(cache_node_entry == NULL) {
             LV_LOG_ERROR("grad cache creating failed");
