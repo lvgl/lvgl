@@ -91,7 +91,6 @@ typedef struct _lv_global_t {
 
     uint32_t memory_zero;
     uint32_t math_rand_seed;
-    lv_area_transform_cache_t area_trans_cache;
 
     lv_event_t * event_header;
     uint32_t event_last_register_id;

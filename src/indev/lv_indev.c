@@ -519,7 +519,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
 
     lv_point_t p_trans = *point;
-    lv_obj_transform_point(obj, &p_trans, false, true);
+    lv_obj_transform_point(obj, &p_trans, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE);
 
     bool hit_test_ok = lv_obj_hit_test(obj, &p_trans);
 
