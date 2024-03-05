@@ -1639,7 +1639,7 @@ Empty_sequence_handler:
         float y_min = grad_matrix.m[1][2];
         float x_max = x_min + dlen * cosf(angle);
         float y_max = y_min + dlen * sinf(angle);
-        LV_LOG_INFO("linear gradient {%.2f, %.2f} ~ {%.2f, %.2f}", x_min, y_min, x_max, y_max);
+        LV_LOG_TRACE("linear gradient {%.2f, %.2f} ~ {%.2f, %.2f}", x_min, y_min, x_max, y_max);
         auto linearGrad = LinearGradient::gen();
         linearGrad->linear(x_min, y_min, x_max, y_max);
         linearGrad->spread(FillSpread::Pad);
