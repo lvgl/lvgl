@@ -15,6 +15,7 @@ There are two ways to provide the tick to LVGL:
    - Arduino: ``lv_tick_set_cb(millis);``
    - FreeRTOS: ``lv_tick_set_cb(xTaskGetTickCount);``
    - STM32: ``lv_tick_set_cb(HAL_GetTick);``
+   - ESP32: ``lv_tick_set_cb(my_tick_get_cb);``, where ``my_tick_get_cb`` is a wrapper for ``esp_timer_get_time() / 1000;``
 
 2. Call ``lv_tick_inc(x)`` periodically, where ``x`` is the elapsed milliseconds since the last call. ``lv_tick_inc`` should be called from a high priority interrupt.
 
