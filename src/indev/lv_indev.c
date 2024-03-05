@@ -700,7 +700,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
-
     /*Save the previous state so we can detect state changes below and also set the last state now
      *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
      *for the next time*/
