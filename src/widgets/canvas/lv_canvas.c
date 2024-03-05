@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_canvas.c
  *
  */
@@ -121,6 +121,9 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
 
         *buf &= ~(1 << bit);
         *buf |= c_int << bit;
+    }
+    else if(cf == LV_COLOR_FORMAT_L8) {
+        *data = lv_color_luminance(color);
     }
     else if(cf == LV_COLOR_FORMAT_A8) {
         *data = opa;
@@ -300,6 +303,15 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
                 buf8[x + 0] = color.blue;
                 buf8[x + 1] = color.green;
                 buf8[x + 2] = color.red;
+            }
+        }
+    }
+    else if(header->cf == LV_COLOR_FORMAT_L8) {
+        uint8_t c8 = lv_color_luminance(color);
+        for(y = 0; y < header->h; y++) {
+            uint8_t * buf = (uint8_t *)(data + y * stride);
+            for(x = 0; x < header->w; x++) {
+                buf[x] = c8;
             }
         }
     }
