@@ -28,7 +28,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt);
-static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size);
+static lv_draw_buf_t * decode_png_data(lv_image_decoder_dsc_t * dsc, const void * png_data, size_t png_data_size);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -176,7 +176,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         return LV_RESULT_INVALID;
     }
 
-    lv_draw_buf_t * decoded = decode_png_data(png_data, png_data_size);
+    lv_draw_buf_t * decoded = decode_png_data(dsc, png_data, png_data_size);
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)png_data);
 
@@ -234,11 +234,64 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
 }
 
-static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size)
+static lv_draw_buf_t * decode_png8_data(const void * png_data, size_t png_data_size)
+{
+    LodePNGState state;
+    LodePNGColorMode * color;
+    unsigned error;
+    unsigned int png_width;         /*Will be the width of the decoded image*/
+    unsigned int png_height;        /*Will be the width of the decoded image*/
+    lv_draw_buf_t * decoded;
+
+    /*Check if png is in palette mode*/
+    lodepng_state_init(&state);
+    error = lodepng_inspect(NULL, NULL, &state, png_data, png_data_size);
+    if(error) {
+        LV_LOG_WARN("inspect png failed: %s", lodepng_error_text(error));
+        lodepng_state_cleanup(&state);
+        return NULL;
+    }
+    color = &state.info_png.color;
+    if(color->colortype != LCT_PALETTE || color->bitdepth != 8) {
+        lodepng_state_cleanup(&state);
+        return NULL;
+    }
+
+    state.decoder.color_convert = 0; /* Do not convert color */
+    error = lodepng_decode((unsigned char **)&decoded, &png_width, &png_height, &state, png_data, png_data_size);
+
+    if(color->palette == NULL || color->palettesize == 0) {
+        LV_LOG_WARN("PNG palette is empty");
+        lodepng_state_cleanup(&state);
+        if(decoded) lv_draw_buf_destroy(decoded);
+        return NULL;
+    }
+
+    /* copy palette */
+    lv_memcpy(decoded->data, color->palette, color->palettesize * 4);
+    /* LODPNG palette is not in ARGB, need to revert B and R */
+
+    lv_color32_t * img_argb = (lv_color32_t *)decoded->data;
+    uint32_t i;
+    for(i = 0; i < color->palettesize; i++) {
+        uint8_t blue = img_argb[i].blue;
+        img_argb[i].blue = img_argb[i].red;
+        img_argb[i].red = blue;
+    }
+
+    return (lv_draw_buf_t *)decoded;
+}
+
+static lv_draw_buf_t * decode_png_data(lv_image_decoder_dsc_t * dsc, const void * png_data, size_t png_data_size)
 {
     unsigned png_width;             /*Not used, just required by the decoder*/
     unsigned png_height;            /*Not used, just required by the decoder*/
     lv_draw_buf_t * decoded = NULL;
+
+    if(dsc->args.use_indexed) {
+        decoded = decode_png8_data(png_data, png_data_size);
+        if(decoded) return decoded;
+    }
 
     /*Decode the image in ARGB8888 */
     unsigned error = lodepng_decode32((unsigned char **)&decoded, &png_width, &png_height, png_data, png_data_size);

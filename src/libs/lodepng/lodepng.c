@@ -5306,8 +5306,26 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
     if(!state->error && scanlines_size != expected_size) state->error = 91; /*decompressed size doesn't match prediction*/
     lodepng_free(idat);
 
+    uint32_t offset = 0;
     if(!state->error) {
-        lv_draw_buf_t * decoded = lv_draw_buf_create(*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
+        LodePNGColorMode * color;
+        color = &state->info_png.color;
+        lv_draw_buf_t * decoded;
+        lv_color_format_t cf;
+        uint32_t stride;
+
+        if (state->decoder.color_convert == 0 && color->colortype == LCT_PALETTE && color->bitdepth == 8) {
+            /* Only process indexed 8 image. */
+            cf = LV_COLOR_FORMAT_I8;
+            stride = (*w * lv_color_format_get_bpp(cf) + 7) >> 3;
+            offset = 1024;
+        }
+        else {
+            cf = LV_COLOR_FORMAT_ARGB8888;
+            stride = *w * 4;
+        }
+
+        decoded = lv_draw_buf_create(*w, *h, cf, stride);
         if(decoded) {
             *out = (unsigned char*)decoded;
             outsize = decoded->data_size;
@@ -5316,8 +5334,8 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
     }
     if(!state->error) {
         lv_draw_buf_t * decoded = (lv_draw_buf_t *)*out;
-        lodepng_memset(decoded->data, 0, outsize);
-        state->error = postProcessScanlines(decoded->data, scanlines, *w, *h, &state->info_png);
+        lodepng_memset(decoded->data + offset, 0, outsize - offset);
+        state->error = postProcessScanlines(decoded->data + offset, scanlines, *w, *h, &state->info_png);
     }
     lodepng_free(scanlines);
 }
@@ -5353,9 +5371,9 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
             state->error = 83; /*alloc fail*/
         }
         else {
-            state->error = lodepng_convert(new_buf->data, old_buf->data, 
+            state->error = lodepng_convert(new_buf->data, old_buf->data,
                                             &state->info_raw, &state->info_png.color, *w, *h);
-            
+
             if (state->error) {
                 lv_draw_buf_destroy(new_buf);
                 new_buf = NULL;
