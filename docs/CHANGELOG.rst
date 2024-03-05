@@ -30,6 +30,7 @@ So pay extra attention to these:
 - Run time dithering is rendering due its complexity and lack of GPU support. Smaller dithered and tiled images can be used as background images as a replacement.
 - STM32's DMA2D (Chrom-ART) support is removed for now. It will be added again when an official partnership starts with ST too.
 - SJPG was removed as the original TJPGD support decoding tile-by-tile. (typically a tile is 8x8 pixels)
+- ``LV_COLOR_DEPTH 8`` is not supported yet. In v8 it meant RGB332, in v9 it will be used for L8.
 
 Main new features
 -----------------
