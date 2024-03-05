@@ -75,7 +75,7 @@ jobs:
       if: success() && matrix.port == 'unix'
       run: |
         export XDG_RUNTIME_DIR=/tmp
-        python3 lib/lv_bindings/lvgl/tests/micropy_test/__init__.py --artifact-path=lib/lv_bindings/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-standard/micropython
+        python3 lib/lv_bindings/lvgl/tests/micropy_test/__init__.py --artifact-path=lib/lv_bindings/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-standard/micropython --debug
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
