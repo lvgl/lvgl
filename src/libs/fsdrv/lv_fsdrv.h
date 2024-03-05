@@ -51,6 +51,10 @@ void lv_fs_memfs_init(void);
 void lv_fs_littlefs_init(void);
 #endif
 
+#if LV_USE_FS_ARDUINO_LITTLEFS
+void lv_fs_arduino_littlefs_init(void);
+#endif
+
 /**********************
  *      MACROS
  **********************/
