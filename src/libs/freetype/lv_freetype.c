@@ -250,6 +250,11 @@ void lv_freetype_italic_transform(FT_Face face)
     FT_Set_Transform(face, &matrix, NULL);
 }
 
+int32_t lv_freetype_italic_transform_on_pos(lv_point_t point)
+{
+    return point.x + FT_F16DOT16_TO_INT(point.y * 0x5800);
+}
+
 const char * lv_freetype_get_pathname(FTC_FaceID face_id)
 {
     LV_ASSERT_NULL(face_id);
