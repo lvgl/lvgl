@@ -530,6 +530,10 @@ void lv_vector_path_append_arc(lv_vector_path_t * path, const lv_fpoint_t * c, f
         lv_vector_path_line_to(path, &(lv_fpoint_t) {
             start.x + cx, start.y + cy
         });
+    } else {
+        lv_vector_path_move_to(path, &(lv_fpoint_t) {
+            start.x + cx, start.y + cy
+        });
     }
     else {
         lv_vector_path_move_to(path, &(lv_fpoint_t) {
