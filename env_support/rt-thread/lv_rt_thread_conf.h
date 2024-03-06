@@ -13,8 +13,6 @@
 
 #ifdef __RTTHREAD__
 
-#include <lvgl.h>
-
 #define LV_RTTHREAD_INCLUDE <rtthread.h>
 #include LV_RTTHREAD_INCLUDE
 
