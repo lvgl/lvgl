@@ -1,8 +1,8 @@
 .. _arduino_littlefs:
 
-==============
+================
 Arduino littlefs
-==============
+================
 
 LittleFS is a little fail-safe filesystem designed for microcontrollers and integrated in the Arduino framework 
 when used with ESP32 and ESP8266.
