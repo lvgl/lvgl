@@ -13,6 +13,7 @@
 
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_path.h"
+#include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_grad.h"
 
@@ -187,7 +188,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                                                VG_LITE_FILTER_BI_LINEAR));
                     LV_PROFILER_END_TAG("vg_lite_draw_pattern");
 
-                    lv_vg_lite_push_image_decoder_dsc(u, &decoder_dsc);
+                    lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
                 }
             }
             break;
