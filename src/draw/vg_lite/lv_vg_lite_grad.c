@@ -130,6 +130,8 @@ void lv_vg_lite_draw_linear_grad(
     LV_VG_LITE_ASSERT_DEST_BUFFER(buffer);
     LV_VG_LITE_ASSERT_SRC_BUFFER(&gradient->image);
     LV_VG_LITE_ASSERT_PATH(path);
+    LV_VG_LITE_ASSERT_MATRIX(grad_mat_p);
+    LV_VG_LITE_ASSERT_MATRIX(matrix);
 
     LV_PROFILER_BEGIN_TAG("vg_lite_draw_grad");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw_grad(

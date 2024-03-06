@@ -75,6 +75,7 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
     lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
+    LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     if(dsc->bg_grad.dir != LV_GRAD_DIR_NONE) {
         vg_lite_matrix_t grad_matrix;
