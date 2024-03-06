@@ -157,13 +157,6 @@ void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * ma
 
 #if LV_USE_KEYBOARD_PINYIN
 /**
- * Set the font for the keyboard
- * @param kb   pointer to a Keyboard object
- * @param dict pointer to a font
- */
-void lv_keyboard_set_font(lv_obj_t * kb, const lv_font_t * font);
-
-/**
  * Set the dictionary of Pinyin input method
  * @param kb   pointer to a Keyboard object
  * @param dict pointer to a Pinyin input method dictionary

@@ -401,13 +401,6 @@ void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * m
 }
 
 #if LV_USE_KEYBOARD_PINYIN
-void lv_keyboard_set_font(lv_obj_t * obj, const lv_font_t * font)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_obj_set_style_text_font(obj, font, 0);
-}
-
 void lv_keyboard_set_pinyin_dict(lv_obj_t * obj, const lv_keyboard_pinyin_dict_t ** dict)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
