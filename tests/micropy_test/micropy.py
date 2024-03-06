@@ -115,11 +115,10 @@ def test_event():
 
     scr.add_event_cb(event_callback, lv.EVENT.CLICKED, None)
 
-    lv.event_send(scr, lv.EVENT.CLICKED, None)
+    scr.send_event(lv.EVENT.CLICKED, None)
 
     if not event_flag:
         raise RuntimeError('Event failure')
-
 
 
 @test_func_wrapper
