@@ -243,12 +243,6 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     path_clip_area.x2++;
     path_clip_area.y2++;
 
-    /* draw bounding box for debug */
-    // lv_draw_fill_dsc_t fill_dsc;
-    // lv_draw_fill_dsc_init(&fill_dsc);
-    // fill_dsc.color = lv_palette_main(LV_PALETTE_AMBER);
-    // lv_draw_vg_lite_fill(u, &fill_dsc, &path_clip_area);
-
     lv_vg_lite_path_t * outline = (lv_vg_lite_path_t *)dsc->glyph_data;
     lv_point_t pos = {dsc->letter_coords->x1, dsc->letter_coords->y1};
 
