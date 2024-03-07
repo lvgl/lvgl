@@ -341,7 +341,6 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                int32_t x_end, uint8_t * dest_buf, bool aa)
 {
-    //    lv_memzero(dest_buf, x_end * 4);
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
     lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf;
@@ -530,6 +529,9 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
             }
             else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
                 abuf[x] = (a * (0xFF - ys_fract)) >> 8;
+            }
+            else {
+                abuf[x] = a;
             }
         }
     }
