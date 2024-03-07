@@ -1,0 +1,40 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+
+-   repo: local
+    hooks:
+    # Run astyle over the staged files with c and h extension found in the directories
+    # listed in the files regex pattern. Ignoring the files in the exclude pattern.
+    -   id: format-source
+        name: Formatting source files
+        entry: astyle --options=scripts/code-format.cfg --ignore-exclude-errors
+        stages: [ commit ]
+        language: system
+        pass_filenames: true
+        verbose: true
+        files: |
+          (?x)^(
+              demos/ |
+              examples/ |
+              src/ |
+              tests/
+          )
+        exclude: |
+          (?x)^(
+              src/libs/ |
+              src/lv_conf_internal.h
+           )
+        types_or: ["c", "header"]
+-   repo: https://github.com/crate-ci/typos
+    rev: v1.16.20
+    hooks:
+    -   id: typos
+        exclude: |
+            (?x)^(
+                src/libs/
+             )

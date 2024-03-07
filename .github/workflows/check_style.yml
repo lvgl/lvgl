@@ -1,0 +1,38 @@
+name: Verify code formatting
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify-formatting:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Checkout astyle
+        uses: actions/checkout@v4
+        with:
+          repository: szepeviktor/astyle
+          path: astyle
+          ref: v3.4.12
+      - name: Install astyle
+        run: |
+          cd astyle/build/gcc/
+          make
+          sudo make install
+          astyle --version
+      - name: Format code
+        run: python code-format.py
+        working-directory: scripts
+      - name: Check that repository is clean
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! (git diff --exit-code --color=always | tee /tmp/lvgl_diff.patch); then
+            echo "Please apply the preceding diff to your code or run scripts/code-format.py"
+            exit 1
+          fi

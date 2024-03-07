@@ -1,0 +1,135 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master, release/v8.* ]
+  pull_request:
+    branches: [ master, release/v8.* ]
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # A valid option parameter to the cmake file.
+        # See BUILD_OPTIONS in tests/CMakeLists.txt.
+        build_option: ['OPTIONS_16BIT',
+                       'OPTIONS_24BIT',
+                       'OPTIONS_FULL_32BIT',
+                       "OPTIONS_VG_LITE"]
+    name: Build ${{ matrix.build_option }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install prerequisites
+      run: scripts/install-prerequisites.sh
+    - name: Building ${{ matrix.build_option }}
+      run: python tests/main.py --build-option=${{ matrix.build_option }} build
+
+  test-native:
+    runs-on: ubuntu-latest
+    name: amd64 Executable Tests
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install prerequisites
+      run: scripts/install-prerequisites.sh
+    - name: Fix kernel mmap rnd bits
+      # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
+      # high-entropy ASLR in much newer kernels that GitHub runners are
+      # using leading to random crashes: https://reviews.llvm.org/D148280
+      run: sudo sysctl vm.mmap_rnd_bits=28
+    - name: Run tests
+      run: python tests/main.py --report --update-image test
+    - name: Archive screenshot errors
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: screenshot-errors-amd64
+        path: |
+             tests/ref_imgs/**/*_err.png
+             test_screenshot_error.h
+#    - name: Upload coverage to Codecov
+#      uses: codecov/codecov-action@v4
+#      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
+#      with:
+#        fail_ci_if_error: true
+#        verbose: true
+  test-cross:
+    # The host should always be linux
+    runs-on: ubuntu-latest
+    name: ${{ matrix.arch }} Executable Tests
+
+    # Run steps on a matrix of 3 arch/distro combinations
+    strategy:
+      matrix:
+        include:
+          - arch: aarch64
+            distro: ubuntu22.04
+          - arch: armv6
+            distro: bullseye
+          - arch: armv7
+            distro: bullseye
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ammaraskar/gcc-problem-matcher@master
+      - name: Setup cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ccache
+          key: lvgl_ci_cross_test_ccache_${{ matrix.arch }}_${{ github.sha }}
+          restore-keys: |
+            lvgl_ci_cross_test_ccache_${{ matrix.arch }}
+      - uses: uraimo/run-on-arch-action@v2.7.1
+        name: Run tests
+        id: build
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
+
+          # Not required, but speeds up builds
+          githubToken: ${{ github.token }}
+
+          # The shell to run commands with in the container
+          shell: /bin/bash
+
+          # Create cached/volume directories on host
+          setup: |
+            mkdir -p ~/.ccache
+
+          # Mount cached directories in the container for faster builds
+          dockerRunArgs: |
+            --volume "${HOME}/.ccache:/root/.ccache"
+
+          install: |
+            apt-get update -y
+            if [[ "${{ matrix.distro }}" == "ubuntu22.04" ]]; then
+              apt-get install libjpeg-turbo8-dev -q -y
+            else
+              apt-get install libjpeg62-turbo-dev -q -y
+            fi
+            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libfreetype6-dev libasan6 pngquant python3-pip libinput-dev libxkbcommon-dev libdrm-dev pkg-config ninja-build -q -y
+            pip install pypng lz4
+            /usr/sbin/update-ccache-symlinks
+            echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
+
+          run: |
+            if [[ "${{ matrix.distro }}" == "ubuntu22.04" ]]; then
+              # ASan in llvm 14 provided in ubuntu-22.04 is incompatible with
+              # high-entropy ASLR configured in much newer kernels that GitHub
+              # runners are using leading to random crashes:
+              #   https://github.com/actions/runner-images/issues/9491
+              # can remove this once the issue is fixed.
+              sysctl -w vm.mmap_rnd_bits=28
+            fi
+            env PATH="/usr/lib/ccache:$PATH" NON_AMD64_BUILD=1 ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+      - name: Archive screenshot errors
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+            name: screenshot-errors-${{ matrix.arch }}
+            path: |
+                tests/ref_imgs/**/*_err.png
+                test_screenshot_error.h

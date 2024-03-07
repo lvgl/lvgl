@@ -1,0 +1,17 @@
+{
+	"name": "lvgl",
+	"version": "9.0.1-dev",
+	"keywords": "graphics, gui, embedded, tft, lvgl",
+	"description": "Graphics library to create embedded GUI with easy-to-use graphical elements, beautiful visual effects and low memory footprint. It offers anti-aliasing, opacity, and animations using only one frame buffer.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lvgl/lvgl.git"
+	},
+	"build": {
+		"includeDir": "."
+	},
+	"license": "MIT",
+	"homepage": "https://lvgl.io",
+	"frameworks": "*",
+	"platforms": "*"
+}

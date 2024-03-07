@@ -1,0 +1,89 @@
+name: Build docs
+on:
+  push:
+    branches:
+    - master
+    - 'release/*'
+env:
+  EM_VERSION: 2.0.4
+  EM_CACHE_FOLDER: 'emsdk-cache'
+jobs:
+  build-and-deploy:
+    if: github.repository == 'lvgl/lvgl'
+    runs-on: ubuntu-latest
+    concurrency: docs-build-and-deploy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Cache Python packages
+        uses: actions/cache@v4
+        with:
+          # Cache the Python package environment, excluding pip and setuptools installed by setup-python
+          path: |
+            ~/.cache/pip
+            ${{ env.pythonLocation }}/bin/*
+            ${{ env.pythonLocation }}/include
+            ${{ env.pythonLocation }}/lib/python*/site-packages/*
+            !${{ env.pythonLocation }}/bin/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
+            !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+          key: ${{ env.pythonLocation }}-${{ hashFiles('docs/requirements.txt') }}
+      - name: Install Doxygen and Latex dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install doxygen texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
+      - name: Install requirements
+        run: |
+          pip install -r docs/requirements.txt
+      - name: Setup Emscripten cache
+        id: cache-system-libraries
+        uses: actions/cache@v4
+        with:
+          path: ${{env.EM_CACHE_FOLDER}}
+          key: ${{env.EM_VERSION}}-${{ runner.os }}
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: ${{env.EM_VERSION}}
+          actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1
+      - name: Build examples (with cache)
+        run: scripts/build_html_examples.sh
+      - name: Build docs
+        run: docs/build.py skip_latex
+      - name: Remove .doctrees
+        run: rm -rf out_html/.doctrees
+      - name: Retrieve version
+        run: |
+          echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
+        id: version
+      - name: Deploy to subfolder
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        with:
+          token: ${{ secrets.LVGL_BOT_TOKEN }}
+          repository-name: lvgl/docs
+          branch: gh-pages # The branch the action should deploy to.
+          folder: out_html  # The folder the action should deploy.
+          target-folder: ${{ steps.version.outputs.VERSION_NAME }}
+          git-config-name: lvgl-bot
+          git-config-email: lvgl-bot@users.noreply.github.com
+          single-commit: true
+      - name: Deploy to master
+        if: github.ref == 'refs/heads/master'
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        with:
+          token: ${{ secrets.LVGL_BOT_TOKEN }}
+          repository-name: lvgl/docs
+          branch: gh-pages # The branch the action should deploy to.
+          folder: out_html  # The folder the action should deploy.
+          target-folder: master
+          git-config-name: lvgl-bot
+          git-config-email: lvgl-bot@users.noreply.github.com
+          commit: true

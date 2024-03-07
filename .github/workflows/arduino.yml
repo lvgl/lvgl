@@ -1,0 +1,15 @@
+name: Arduino Lint
+on:
+  push:
+    branches: [ master, release/v8.* ]
+  pull_request:
+    branches: [ master, release/v8.* ]
+jobs:
+  lint:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/arduino-lint-action@v1
+        with:
+          library-manager: update

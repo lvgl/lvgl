@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://docs.lvgl.io
+    about: Be sure to read to documentation first
+  - name: Forum
+    url: https://forum.lvgl.io
+    about: For topics like How-to, Getting started, Feature request
+  - name: CONTRIBUTING.md
+    url: https://github.com/lvgl/lvgl/blob/master/docs/CONTRIBUTING.md#faq-about-contributing
+    about: The basic rules of contributing
+  - name: CODING_STYLE.md
+    url: https://github.com/lvgl/lvgl/blob/master/docs/CODING_STYLE.md
+    about: Quick summary of LVGL's code style

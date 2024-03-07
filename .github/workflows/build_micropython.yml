@@ -1,0 +1,84 @@
+name: Micropython CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    name: Build ${{ matrix.port }} port
+    runs-on: ubuntu-20.04
+    continue-on-error: true
+    strategy:
+      matrix:
+        port: ['unix', 'esp32', 'stm32', 'rp2']
+    steps:
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install Dependencies
+      run: |
+        sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
+        sudo apt-get update -y -qq
+        sudo apt-get install libsdl2-dev parallel libfreetype-dev librlottie-dev libavformat-dev libavcodec-dev libswscale-dev libavutil-dev
+    - name: Clone lv_micropython
+      run: |
+        git clone https://github.com/lvgl/lv_micropython.git .
+        git checkout master
+    - name: Initialize lv_bindings submodule
+      run: git submodule update --init --recursive lib/lv_bindings
+    - name: Update ${{ matrix.port }} port submodules
+      if: matrix.port != 'esp32' && matrix.port != 'rp2'
+      run: make -C ports/${{ matrix.port }} DEBUG=1 USER_C_MODULES=../../lib/lv_bindings/bindings.cmake submodules
+    - name: Checkout LVGL submodule
+      working-directory: ./lib/lv_bindings/lvgl
+      run: |
+        git fetch --force ${{ github.event.repository.html_url }} "+refs/heads/*:refs/remotes/origin/*"
+        git fetch --force ${{ github.event.repository.html_url }} "+refs/pull/*:refs/remotes/origin/pr/*"
+        git checkout ${{ github.sha }} || git checkout ${{ github.event.pull_request.head.sha }}
+        git submodule update --init --recursive
+    - name: Build mpy-cross
+      run: make -j $(nproc) -C mpy-cross
+
+    # ESP32 port
+    - name: Setup ESP-IDF
+      if: matrix.port == 'esp32'
+      run: |
+        source tools/ci.sh && ci_esp32_idf44_setup
+    - name: Build ESP32 port
+      if: matrix.port == 'esp32'
+      run: |
+        source tools/ci.sh && ci_esp32_build
+
+    # STM32 & RPi Pico port
+    - name: arm-none-eabi-gcc
+      if: matrix.port == 'stm32' || matrix.port == 'rp2'
+      uses: carlosperate/arm-none-eabi-gcc-action@v1.8.1
+      with:
+        release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
+    - name: Build STM32 port
+      if: matrix.port == 'stm32'
+      run: make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC
+    - name: Build Raspberry Pi PICO port
+      if: matrix.port == 'rp2'
+      run: |
+        make -C ports/rp2 BOARD=PICO submodules
+        make -j $(nproc) -C ports/rp2 BOARD=PICO USER_C_MODULES=../../lib/lv_bindings/bindings.cmake
+    # Unix port
+    - name: Build Unix port
+      if: matrix.port == 'unix'
+      run: make -j $(nproc) -C ports/unix DEBUG=1 LV_CFLAGS="-DMICROPY_LV_USE_LOG=0"
+    - name: Install requirements for the test
+      run: |
+        python3 -m pip install pillow
+        mkdir lib/lv_bindings/lvgl/tests/micropy_test/artifacts
+    - name: Run tests
+      if: success() && matrix.port == 'unix'
+      run: |
+        export XDG_RUNTIME_DIR=/tmp
+        python3 lib/lv_bindings/lvgl/tests/micropy_test/__init__.py --artifact-path=lib/lv_bindings/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-standard/micropython
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-artifacts
+        path: lib/lv_bindings/lvgl/tests/micropy_test/artifacts

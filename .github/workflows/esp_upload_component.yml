@@ -1,0 +1,23 @@
+name: Push LVGL release to Espressif Component Service
+
+# If the commit is tagged, it will be uploaded. Other scenario silently fail.
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  upload_components:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      - name: Upload component to component registry
+        uses: espressif/upload-components-ci-action@v1
+        with:
+          name: "lvgl"
+          version: ${{ github.ref_name }}
+          namespace: "lvgl"
+          api_token: ${{ secrets.ESP_IDF_COMPONENT_API_TOKEN }}
