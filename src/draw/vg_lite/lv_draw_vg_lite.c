@@ -103,7 +103,8 @@ static inline bool check_font_is_supported(const lv_draw_label_dsc_t * dsc)
 {
     const lv_font_fmt_txt_dsc_t * font_dsc = dsc->font->dsc;
     if(!font_dsc) return true;
-    if(!(font_dsc->bpp == 0 || font_dsc->bpp == LV_IMGFONT_BPP || font_dsc->bpp == LV_VECFONT_BPP)) {
+    if(!(font_dsc->bpp == 0 || font_dsc->bpp == LV_FONT_GLYPH_FORMAT_VECTOR ||
+         font_dsc->bpp == LV_FONT_GLYPH_FORMAT_IMAGE)) {
         LV_LOG_TRACE("only support image font and vector font");
         return false;
     }
