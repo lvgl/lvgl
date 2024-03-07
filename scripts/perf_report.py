@@ -1,3 +1,19 @@
+"""
+	Compares the execution time of the functions in a file with the thresholds given in another file.
+	Optionnaly compares the execution times with previous executions
+
+	Prints 3 types of messages:
+	- FAIL: A function failed to respect the threshold set
+	- WARN:
+		- No threshold was set for a function
+		- No perfect match for a function-parent pair was found and no default threshold (function but no parent) was set
+		- A function slowed down since last time it was executed
+	- INFO:
+		- Using a default threshold for a function
+		- No previous execution found for a function-parent pair
+"""
+
+
 import os
 import sys
 
@@ -12,17 +28,14 @@ class FuncData:
 		self.time = time # Function's execution time
 
 	def __str__(self) -> str:
-		my_str = "FuncData object{\nname:" 
-		my_str += str(self.name) 
-		my_str += "\nparent:" 
-		my_str += str(self.parent) 
-		my_str += "\ninfo:" 
-		my_str += str(self.info) 
-		my_str += "\ntime:" 
-		my_str += str(self.time) 
-		my_str += "\n}"
+		my_str = ""
+		if len(parent) != 0:
+			my_str += f'{parent}/'
+		my_str += f'self.name '
+		if len(self.info) > 0:
+			my_str += f'({self.info.replace(" ", "_")}) '
+		my_str += f'| {self.time}'
 		return my_str
-
 
 	def from_string(string: str) -> 'FuncData':
 		func_data = FuncData()
@@ -59,11 +72,12 @@ class FuncData:
 
 """
 	Input files are expected to have the following format:
-	One header line with no defined format
+	1 header line with no defined format
 	N lines with function data following the "[parent/]<name> [(info)] | <time>" format
 	
-	parent and info are optionnal. 
-	time is expected to be a single value convertible to float. Eventual excess values will be discarded
+	Parent and info are optionnal.
+	Only one time is supported per function-parent pair
+	Time is expected to be a single value convertible to float. Eventual excess values will be discarded
 """
 
 def get_func_data_from_file(file: str) -> dict[dict[float]]:
@@ -87,6 +101,14 @@ def get_func_data_from_file(file: str) -> dict[dict[float]]:
 	
 	return data
 
+
+"""
+	Compares the current execution time with the selected threshold
+	Threshold is selected based on correspondance with the execution time's function-parent pair:
+	- If a perfect match (function-parent) exists, select it
+	- If a default threshold is given for this function select it
+	- Otherwise, print a WARN message
+"""
 def check_threshold(exec_times: dict[dict[float]], 
 					thresholds: dict[dict[float]], 
 					func: str, 
@@ -94,7 +116,7 @@ def check_threshold(exec_times: dict[dict[float]],
 	if func not in thresholds.keys():
 		print(f'WARN: No threshold set for function {func}')
 		return True
-	
+	# Select threshold
 	if parent in thresholds[func].keys():
 		threshold = thresholds[func][parent]
 	elif "" in thresholds[func].keys():
@@ -103,7 +125,7 @@ def check_threshold(exec_times: dict[dict[float]],
 	else:
 		print(f'WARN: No default threshold set for function {func} called from {parent}')
 		return True
-			
+	# Compare set threshold to calculated execution time
 	exec_time = exec_times[func][parent]
 	if exec_time > threshold:
 		print(f'FAIL: Function {func} called from {parent} executed in {exec_time}s but threshold is set to {threshold}s')
@@ -111,16 +133,22 @@ def check_threshold(exec_times: dict[dict[float]],
 	
 	return True
 
+
+"""
+	Compares the current and previous execution time of the given function-parent pair
+	Function-parent pair must match exactely otherwise the script considers that no previous execution exists
+"""
 def check_prev_exec(exec_times: dict[dict[float]], 
 					prv_exec_times: dict[dict[float]], 
 					func: str, 
 					parent: str):
 	try:
+		# Compare Current to previous execution
 		exec_time = exec_times[func][parent]
 		prev_exec_time = prev_exec_times[func][parent]
 		if exec_time > prev_exec_time:
 			print(f'WARN: Function {func} called from {parent} slowed from {prev_exec_time}s to {exec_time}s')
-	except KeyError:
+	except KeyError: # No record of similar previous execution
 		print(f'INFO: No previous execution of function {func} called from {parent}')
 	return
 
