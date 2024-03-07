@@ -20,6 +20,9 @@
 #define ft_ctx LV_GLOBAL_DEFAULT()->ft_context
 #define LV_FREETYPE_OUTLINE_REF_SIZE_DEF 128
 
+/**< This value is from the FreeType's function `FT_GlyphSlot_Oblique` in `ftsynth.c` */
+#define LV_FREETYPE_OBLIQUE_SLANT_DEF 0x5800
+
 #if LV_FREETYPE_CACHE_FT_GLYPH_CNT <= 0
     #error "LV_FREETYPE_CACHE_FT_GLYPH_CNT must be greater than 0"
 #endif
@@ -244,10 +247,15 @@ void lv_freetype_italic_transform(FT_Face face)
     LV_ASSERT_NULL(face);
     FT_Matrix matrix;
     matrix.xx = FT_INT_TO_F16DOT16(1);
-    matrix.xy = 0x5800;
+    matrix.xy = LV_FREETYPE_OBLIQUE_SLANT_DEF;
     matrix.yx = 0;
     matrix.yy = FT_INT_TO_F16DOT16(1);
     FT_Set_Transform(face, &matrix, NULL);
+}
+
+int32_t lv_freetype_italic_transform_on_pos(lv_point_t point)
+{
+    return point.x + FT_F16DOT16_TO_INT(point.y * LV_FREETYPE_OBLIQUE_SLANT_DEF);
 }
 
 const char * lv_freetype_get_pathname(FTC_FaceID face_id)
