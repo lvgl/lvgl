@@ -121,6 +121,7 @@ lv_freetype_context_t * lv_freetype_get_context(void);
 FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc);
 
 void lv_freetype_italic_transform(FT_Face face);
+int32_t lv_freetype_italic_transform_on_pos(lv_point_t point);
 
 const char * lv_freetype_get_pathname(FTC_FaceID face_id);
 
