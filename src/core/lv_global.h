@@ -163,8 +163,8 @@ typedef struct _lv_global_t {
     lv_fs_drv_t littlefs_fs_drv;
 #endif
 
-#if LV_USE_FS_ARDUINO_LITTLEFS
-    lv_fs_drv_t arduino_littlefs_fs_drv;
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    lv_fs_drv_t arduino_esp_littlefs_fs_drv;
 #endif
 
 #if LV_USE_FREETYPE

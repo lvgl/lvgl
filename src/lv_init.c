@@ -268,8 +268,8 @@ void lv_init(void)
     lv_fs_littlefs_init();
 #endif
 
-#if LV_USE_FS_ARDUINO_LITTLEFS
-    lv_fs_arduino_littlefs_init();
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    lv_fs_arduino_esp_littlefs_init();
 #endif
 
 #if LV_USE_LODEPNG
