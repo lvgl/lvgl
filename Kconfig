@@ -1164,6 +1164,10 @@ menu "LVGL configuration"
 			bool "Dump format"
 			depends on LV_USE_FFMPEG
 			default n
+
+		config LV_USE_RND_UNICODES
+			bool "Enable random Unicode characters"
+			default n
 	endmenu
 
 	menu "Others"

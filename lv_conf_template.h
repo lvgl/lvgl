@@ -743,6 +743,9 @@
     #define LV_FFMPEG_DUMP_FORMAT 0
 #endif
 
+/*Use lvgl unicode random generator*/
+#define LV_USE_RND_UNICODES 0
+
 /*==================
  * OTHERS
  *==================*/
