@@ -21,7 +21,7 @@
 #define LV_FREETYPE_OUTLINE_REF_SIZE_DEF 128
 
 /**< This value is from the FreeType's function `FT_GlyphSlot_Oblique` in `ftsynth.c` */
-#define LV_FREETYPE_OBLIQUE_SLANT_DEF 0x5800
+#define LV_FREETYPE_OBLIQUE_SLANT_DEF 0x0366A
 
 #if LV_FREETYPE_CACHE_FT_GLYPH_CNT <= 0
     #error "LV_FREETYPE_CACHE_FT_GLYPH_CNT must be greater than 0"
