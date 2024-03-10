@@ -12,6 +12,8 @@
 
 #include "rnd_unicodes/src/library.h"
 
+#define UNICODE_MAX_VALUE 0x10FFFF
+
 /*********************
  *      DEFINES
  *********************/
@@ -51,7 +53,7 @@ const uint32_t LV_RND_UNICODE_ALPHANUM_AND_CJK_TABLE_LEN = sizeof(LV_RND_UNICODE
 
 uint32_t RANDOM_CALL_PROCESS(void)
 {
-    return lv_rand(0, 0xFFFFFFFFU);
+    return lv_rand(0, UNICODE_MAX_VALUE);
 }
 
 int lv_random_utf8_chars(uint8_t * buf, int buf_len, const uint32_t * ranges, uint32_t range_num, int char_num)
