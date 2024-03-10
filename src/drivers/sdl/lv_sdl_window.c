@@ -225,7 +225,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
             int32_t buf_size = w * h * px_size;
 
             /* (Re)allocate temporary buffer if needed */
-            if (!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
+            if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
                 dsc->rotated_buf = realloc(dsc->rotated_buf, buf_size);
                 dsc->rotated_buf_size = buf_size;
             }

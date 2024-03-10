@@ -274,7 +274,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     if(rotation != LV_DISPLAY_ROTATION_0 && LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /* (Re)allocate temporary buffer if needed */
         int32_t buf_size = w * h * px_size;
-        if (!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
+        if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
             dsc->rotated_buf = realloc(dsc->rotated_buf, buf_size);
             dsc->rotated_buf_size = buf_size;
         }
