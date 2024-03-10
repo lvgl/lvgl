@@ -39,6 +39,8 @@ typedef struct {
     uint8_t * fb_act;
     uint8_t * buf1;
     uint8_t * buf2;
+    uint8_t * rotated_buf;
+    int32_t rotated_buf_size;
 #endif
     uint8_t zoom;
     uint8_t ignore_size_chg;
@@ -211,8 +213,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     lv_color_format_t cf = lv_display_get_color_format(disp);
 
-    uint8_t * rotated_buf = NULL;
-
     if(LV_SDL_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         lv_display_rotation_t rotation = lv_display_get_rotation(disp);
         uint32_t px_size = lv_color_format_get_size(cf);
@@ -222,20 +222,25 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
             int32_t h = lv_area_get_height(area);
             uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
             uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
+            int32_t buf_size = w * h * px_size;
 
-            rotated_buf = malloc(w * h * px_size);
+            /* (Re)allocate temporary buffer if needed */
+            if (!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
+                dsc->rotated_buf = realloc(dsc->rotated_buf, buf_size);
+                dsc->rotated_buf_size = buf_size;
+            }
 
             if(rotation == LV_DISPLAY_ROTATION_90) {
-                lv_draw_sw_rotate(px_map, rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+                lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
             }
             if(rotation == LV_DISPLAY_ROTATION_180) {
-                lv_draw_sw_rotate(px_map, rotated_buf, w, h, w_stride, w_stride, rotation, cf);
+                lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
             }
             if(rotation == LV_DISPLAY_ROTATION_270) {
-                lv_draw_sw_rotate(px_map, rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+                lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
             }
 
-            px_map = rotated_buf;
+            px_map = dsc->rotated_buf;
 
             lv_display_rotate_area(disp, (lv_area_t *)area);
         }
@@ -253,10 +258,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
             lv_memcpy(fb_tmp, px_map, px_map_line_bytes);
             px_map += px_map_stride;
             fb_tmp += fb_stride;
-        }
-
-        if(rotated_buf) {
-            free(rotated_buf);
         }
     }
 

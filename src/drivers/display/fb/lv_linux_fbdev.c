@@ -60,6 +60,8 @@ typedef struct {
     struct fb_fix_screeninfo finfo;
 #endif /* LV_LINUX_FBDEV_BSD */
     char * fbp;
+    uint8_t * rotated_buf;
+    int32_t rotated_buf_size;
     long int screensize;
     int fbfd;
     bool force_refresh;
@@ -267,24 +269,30 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     uint32_t px_size = lv_color_format_get_size(cf);
 
     lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-    uint8_t * rotated_color_p = NULL;
 
     /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
     if(rotation != LV_DISPLAY_ROTATION_0 && LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        /* (Re)allocate temporary buffer if needed */
+        int32_t buf_size = w * h * px_size;
+        if (!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
+            dsc->rotated_buf = realloc(dsc->rotated_buf, buf_size);
+            dsc->rotated_buf_size = buf_size;
+        }
+
         /* Rotate the pixel buffer */
         uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
         uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
-        rotated_color_p = malloc(w * h * px_size);
+
         if(rotation == LV_DISPLAY_ROTATION_90) {
-            lv_draw_sw_rotate(color_p, rotated_color_p, w, h, w_stride, h_stride, rotation, cf);
+            lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
         }
         if(rotation == LV_DISPLAY_ROTATION_180) {
-            lv_draw_sw_rotate(color_p, rotated_color_p, w, h, w_stride, w_stride, rotation, cf);
+            lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
         }
         if(rotation == LV_DISPLAY_ROTATION_270) {
-            lv_draw_sw_rotate(color_p, rotated_color_p, w, h, w_stride, h_stride, rotation, cf);
+            lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
         }
-        color_p = rotated_color_p;
+        color_p = dsc->rotated_buf;
 
         /* Rotate the area */
         lv_display_rotate_area(disp, (lv_area_t *)area);
@@ -326,11 +334,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         if(ioctl(dsc->fbfd, FBIOPUT_VSCREENINFO, &(dsc->vinfo)) == -1) {
             perror("Error setting var screen info");
         }
-    }
-
-    /* Clean up temporary pixel buffer used for software rotation */
-    if(rotated_color_p != NULL) {
-        free(rotated_color_p);
     }
 
     lv_display_flush_ready(disp);
