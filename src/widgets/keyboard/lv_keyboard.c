@@ -922,16 +922,18 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_color_t keyboard_bg_color = lv_obj_get_style_bg_color(obj, 0);
 
     static lv_style_t pinyin_default_style;
-    lv_style_init(&pinyin_default_style);
-    lv_style_set_bg_opa(&pinyin_default_style, keyboard_bg_opa);
-    lv_style_set_bg_color(&pinyin_default_style, keyboard_bg_color);
-    lv_style_set_border_width(&pinyin_default_style, 0);
-    lv_style_set_pad_all(&pinyin_default_style, 0);
-    lv_style_set_pad_gap(&pinyin_default_style, 0);
-    lv_style_set_radius(&pinyin_default_style, 0);
+    if(pinyin_default_style.prop_cnt < 1) {
+        lv_style_init(&pinyin_default_style);
+        lv_style_set_bg_opa(&pinyin_default_style, keyboard_bg_opa);
+        lv_style_set_bg_color(&pinyin_default_style, keyboard_bg_color);
+        lv_style_set_border_width(&pinyin_default_style, 0);
+        lv_style_set_pad_all(&pinyin_default_style, 0);
+        lv_style_set_pad_gap(&pinyin_default_style, 0);
+        lv_style_set_radius(&pinyin_default_style, 0);
 #if LV_FONT_SIMSUN_16_CJK
-    lv_style_set_text_font(&pinyin_default_style, &lv_font_simsun_16_cjk);
+        lv_style_set_text_font(&pinyin_default_style, &lv_font_simsun_16_cjk);
 #endif
+    }
 
     keyboard->candidate_cont = lv_obj_create(obj);
     lv_obj_set_size(keyboard->candidate_cont, LV_PCT(100), LV_PCT(15));
