@@ -649,6 +649,11 @@ static void lv_keyboard_free_ext_candidate_btnm_map(lv_keyboard_t * keyboard)
 
 static char * lv_keyboard_search_chinese(size_t * candidate_num, lv_keyboard_t * keyboard, const char * pinyin_str)
 {
+    if(keyboard->dict == NULL) {
+        LV_LOG_ERROR("keyboard pinyin dict is NULL");
+        return NULL;
+    }
+
     /*illegal data*/
     if(*pinyin_str == '\0')    return NULL;
     if(*pinyin_str == 'i')     return NULL;
@@ -656,8 +661,9 @@ static char * lv_keyboard_search_chinese(size_t * candidate_num, lv_keyboard_t *
     if(*pinyin_str == 'v')     return NULL;
     if(*pinyin_str == ' ')     return NULL;
 
-    size_t pinyin_str_len = strlen(pinyin_str);
-    char new_pinyin_str[pinyin_str_len + 1];
+    size_t pinyin_str_len = lv_strlen(pinyin_str);
+    char *new_pinyin_str = (char *)lv_malloc(pinyin_str_len + 1);
+    LV_ASSERT_NULL(new_pinyin_str);
 
     /*pinyin to lower case*/
     for(size_t i = 0; i < pinyin_str_len; i++) {
@@ -668,47 +674,46 @@ static char * lv_keyboard_search_chinese(size_t * candidate_num, lv_keyboard_t *
             new_pinyin_str[i] = pinyin_str[i];
         }
         else {
+            lv_free(new_pinyin_str);
             return NULL;
         }
     }
 
-    if(keyboard->dict == NULL) {
-        LV_LOG_ERROR("keyboard pinyin dict is NULL");
-        return NULL;
-    }
-
-    lv_keyboard_pinyin_dict_t * pinyin_head = (lv_keyboard_pinyin_dict_t *)keyboard->dict[*new_pinyin_str - 'a'];
-    lv_keyboard_pinyin_dict_t * pinyin_tail = (lv_keyboard_pinyin_dict_t *)keyboard->dict[*new_pinyin_str - 'a' + 1];
+    const lv_keyboard_pinyin_dict_t * pinyin_head = keyboard->dict[*new_pinyin_str - 'a'];
+    const lv_keyboard_pinyin_dict_t * pinyin_tail = keyboard->dict[*new_pinyin_str - 'a' + 1];
 
     size_t i = 0;
     for(; pinyin_head < pinyin_tail; pinyin_head++) {
         for(i = 0; i < pinyin_str_len - 1; i++) {
-            if((*pinyin_head).pinyin_list == NULL) return NULL;
+            if(pinyin_head->pinyin_list == NULL) {
+                lv_free(new_pinyin_str);
+                return NULL;
+            }
 
-            if(*((*pinyin_head).pinyin_list + i) != new_pinyin_str[i + 1]) break;
+            if(pinyin_head->pinyin_list[i] != new_pinyin_str[i + 1]) break;
         }
 
         /*perfect match*/
         if(i == (pinyin_str_len - 1)) {
             /*The Chinese character in UTF-8 encoding format is 3 bytes*/
-            *candidate_num = strlen((const char *)(*pinyin_head).pinyin_mb_list) / 3;
-
-            return (char *)(*pinyin_head).pinyin_mb_list;
+            *candidate_num = lv_strlen(pinyin_head->pinyin_mb_list) / 3;
+            lv_free(new_pinyin_str);
+            return (char *)pinyin_head->pinyin_mb_list;
         }
     }
 
+    lv_free(new_pinyin_str);
     return NULL;
 }
 
 static void lv_keyboard_proc_pinyin(lv_keyboard_t * keyboard)
 {
     char * input_pinyin = lv_label_get_text(keyboard->pinyin_label);
-    if(lv_strlen(input_pinyin) == 0) {
-        return;
-    }
+    if(input_pinyin == NULL || lv_strlen(input_pinyin) == 0) return;
 
     size_t candidate_num = 0;
     char * candidate_str = lv_keyboard_search_chinese(&candidate_num, keyboard, input_pinyin);
+    if(candidate_str == NULL || lv_strlen(candidate_str) == 0 || candidate_num == 0) return;
 
     lv_keyboard_free_candidate_btnm_map(keyboard);
     keyboard->candidate_num = candidate_num;
@@ -719,14 +724,11 @@ static void lv_keyboard_proc_pinyin(lv_keyboard_t * keyboard)
     }
 
     for(size_t i = 0; i < candidate_num; i++) {
-        keyboard->candidate_btnm_map[i] = (char *)lv_malloc(4 * sizeof(char));
-        if(keyboard->candidate_btnm_map[i] == NULL) {
-            lv_keyboard_free_candidate_btnm_map(keyboard);
-            return;
-        }
-
-        lv_memcpy(keyboard->candidate_btnm_map[i], candidate_str + i * 3, 3);
-        keyboard->candidate_btnm_map[i][3] = '\0';
+        char * str = (char *)lv_malloc(4);
+        LV_ASSERT_NULL(str);
+        lv_memcpy(str, candidate_str + i * 3, 3);
+        str[3] = '\0';
+        keyboard->candidate_btnm_map[i] = str;
     }
 
     keyboard->candidate_btnm_map[keyboard->candidate_num] = "";
