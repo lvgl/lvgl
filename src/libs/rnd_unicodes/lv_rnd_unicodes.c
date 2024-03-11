@@ -8,7 +8,7 @@
  *********************/
 #include "lv_rnd_unicodes.h"
 
-#ifdef LV_USE_RND_UNICODES
+#if LV_USE_RND_UNICODES
 
 #include "rnd_unicodes/src/library.h"
 
