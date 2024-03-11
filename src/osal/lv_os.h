@@ -26,7 +26,7 @@ extern "C" {
 #include "lv_os_none.h"
 #elif LV_USE_OS == LV_OS_PTHREAD
 #include "lv_pthread.h"
-#elif LV_USE_OS == LV_OS_FREERTOS
+#elif LV_USE_OS == LV_OS_FREERTOS || LV_USE_OS == LV_OS_FREERTOS_ESP
 #include "lv_freertos.h"
 #elif LV_USE_OS == LV_OS_CMSIS_RTOS2
 #include "lv_cmsis_rtos2.h"

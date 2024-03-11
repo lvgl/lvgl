@@ -14,11 +14,16 @@
  *********************/
 #include "lv_os.h"
 
+#if LV_USE_OS == LV_OS_FREERTOS || LV_USE_OS == LV_OS_FREERTOS_ESP
+
+
 #if LV_USE_OS == LV_OS_FREERTOS
-
 #include "atomic.h"
-#include "../misc/lv_log.h"
+#elif LV_USE_OS == LV_OS_FREERTOS_ESP
+#include "freertos/atomic.h"
+#endif
 
+#include "../misc/lv_log.h"
 /*********************
  *      DEFINES
  *********************/
@@ -54,6 +59,10 @@ static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OS == LV_OS_FREERTOS_ESP
+static portMUX_TYPE critSectionMux = portMUX_INITIALIZER_UNLOCKED;
+#endif
 
 /**********************
  *      MACROS
@@ -336,8 +345,11 @@ static void prvCheckMutexInit(lv_mutex_t * pxMutex)
     if(pxMutex->xIsInitialized == pdFALSE) {
         /* Mutex initialization must be in a critical section to prevent two threads
          * from initializing it at the same time. */
+#if LV_USE_OS == LV_OS_FREERTOS
         taskENTER_CRITICAL();
-
+#elif LV_USE_OS == LV_OS_FREERTOS_ESP
+        taskENTER_CRITICAL(&critSectionMux);
+#endif
         /* Check again that the mutex is still uninitialized, i.e. it wasn't
          * initialized while this function was waiting to enter the critical
          * section. */
@@ -346,7 +358,11 @@ static void prvCheckMutexInit(lv_mutex_t * pxMutex)
         }
 
         /* Exit the critical section. */
+#if LV_USE_OS == LV_OS_FREERTOS
         taskEXIT_CRITICAL();
+#elif LV_USE_OS == LV_OS_FREERTOS_ESP
+        taskEXIT_CRITICAL(&critSectionMux);
+#endif
     }
 }
 
@@ -385,7 +401,11 @@ static void prvCheckCondInit(lv_thread_sync_t * pxCond)
     if(pxCond->xIsInitialized == pdFALSE) {
         /* Cond initialization must be in a critical section to prevent two
          * threads from initializing it at the same time. */
+#if LV_USE_OS == LV_OS_FREERTOS
         taskENTER_CRITICAL();
+#elif LV_USE_OS == LV_OS_FREERTOS_ESP
+        taskENTER_CRITICAL(&critSectionMux);
+#endif
 
         /* Check again that the condition is still uninitialized, i.e. it wasn't
          * initialized while this function was waiting to enter the critical
@@ -395,7 +415,11 @@ static void prvCheckCondInit(lv_thread_sync_t * pxCond)
         }
 
         /* Exit the critical section. */
+#if LV_USE_OS == LV_OS_FREERTOS
         taskEXIT_CRITICAL();
+#elif LV_USE_OS == LV_OS_FREERTOS_ESP
+        taskEXIT_CRITICAL(&critSectionMux);
+#endif
     }
 }
 
