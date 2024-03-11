@@ -1116,8 +1116,8 @@ static void indev_proc_press(lv_indev_t * indev)
         new_obj_searched = true;
     }
 
-    /*The last object might have scroll throw. Stop it manually*/
-    if(new_obj_searched && indev->pointer.last_obj) {
+    /*The scroll object might have scroll throw. Stop it manually*/
+    if(new_obj_searched && indev->pointer.scroll_obj) {
 
         /*Attempt to stop scroll throw animation firstly*/
         if(!indev->scroll_throw_anim || !lv_anim_delete(indev, indev_scroll_throw_anim_cb)) {
@@ -1158,6 +1158,7 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.scroll_sum.x     = 0;
             indev->pointer.scroll_sum.y     = 0;
             indev->pointer.scroll_dir = LV_DIR_NONE;
+            indev->pointer.scroll_obj = NULL;
             indev->pointer.gesture_dir = LV_DIR_NONE;
             indev->pointer.gesture_sent   = 0;
             indev->pointer.gesture_sum.x  = 0;
@@ -1350,6 +1351,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->pointer.scroll_sum.x        = 0;
         indev->pointer.scroll_sum.y        = 0;
         indev->pointer.scroll_dir = LV_DIR_NONE;
+        indev->pointer.scroll_obj = NULL;
         indev->pointer.scroll_throw_vect.x = 0;
         indev->pointer.scroll_throw_vect.y = 0;
         indev->pointer.gesture_sum.x     = 0;
