@@ -59,8 +59,13 @@ jobs:
     # Run steps on a matrix of 3 arch/distro combinations
     strategy:
       matrix:
-        arch: [ 'aarch64', 'armv6', 'armv7' ]
-
+        include:
+          - arch: aarch64
+            distro: ubuntu22.04
+          - arch: armv6
+            distro: bullseye
+          - arch: armv7
+            distro: bullseye
     steps:
       - uses: actions/checkout@v4
       - uses: ammaraskar/gcc-problem-matcher@master
@@ -77,7 +82,7 @@ jobs:
         id: build
         with:
           arch: ${{ matrix.arch }}
-          distro: bullseye
+          distro: ${{ matrix.distro }}
 
           # Not required, but speeds up builds
           githubToken: ${{ github.token }}
@@ -95,7 +100,12 @@ jobs:
 
           install: |
             apt-get update -y
-            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev libfreetype6-dev libasan6 pngquant python3-pip libinput-dev libxkbcommon-dev libdrm-dev pkg-config ninja-build -q -y
+            if [[ "${{ matrix.distro }}" == "ubuntu22.04" ]]; then
+              apt-get install libjpeg-turbo8-dev -q -y
+            else
+              apt-get install libjpeg62-turbo-dev -q -y
+            fi
+            apt-get install build-essential ccache libgcc-10-dev python3 libpng-dev ruby-full gcovr cmake libfreetype6-dev libasan6 pngquant python3-pip libinput-dev libxkbcommon-dev libdrm-dev pkg-config ninja-build -q -y
             pip install pypng lz4
             /usr/sbin/update-ccache-symlinks
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
