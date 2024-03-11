@@ -63,7 +63,7 @@ void lv_nuttx_image_cache_init(void)
     ctx = lv_malloc_zeroed(sizeof(lv_nuttx_ctx_image_cache_t));
     LV_ASSERT_MALLOC(ctx);
 
-    ctx->mem_size = LV_CACHE_DEF_SIZE;
+    ctx->mem_size = lv_cache_get_max_size(img_cache_p, NULL);
     ctx->mem = malloc(ctx->mem_size);
     LV_ASSERT_MALLOC(ctx->mem);
 
