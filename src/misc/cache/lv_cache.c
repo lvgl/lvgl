@@ -261,6 +261,7 @@ static lv_cache_entry_t * cache_add_internal_no_lock(lv_cache_t * cache, const v
     lv_cache_reserve_cond_res_t reserve_cond_res = cache->clz->reserve_cond_cb(cache, key, 0, user_data);
     if(reserve_cond_res == LV_CACHE_RESERVE_COND_TOO_LARGE) {
         LV_LOG_ERROR("data %p is too large that exceeds max size (%" LV_PRIu32 ")", key, cache->max_size);
+        return NULL;
     }
 
     for(; reserve_cond_res == LV_CACHE_RESERVE_COND_NEED_VICTIM;
