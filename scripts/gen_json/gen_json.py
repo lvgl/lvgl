@@ -14,6 +14,7 @@ project_path = os.path.abspath(os.path.join(base_path, '..', '..'))
 docs_path = os.path.join(project_path, 'docs')
 sys.path.insert(0, docs_path)
 
+import create_fake_lib_c  # NOQA
 import pycparser_monkeypatch  # NOQA
 import pycparser  # NOQA
 
@@ -60,7 +61,6 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
         t.start()
 
     temp_directory = tempfile.mkdtemp(suffix='.lvgl_json')
-    fake_libc_path = os.path.join(base_path, 'fake_libc_include')
     lvgl_path = project_path
     lvgl_src_path = os.path.join(lvgl_path, 'src')
     lvgl_header_path = os.path.join(lvgl_path, 'lvgl.h')
@@ -68,7 +68,6 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
 
     try:
         os.mkdir(temp_lvgl)
-
         shutil.copytree(lvgl_src_path, os.path.join(temp_lvgl, 'src'))
         shutil.copyfile(lvgl_header_path, os.path.join(temp_lvgl, 'lvgl.h'))
 
@@ -144,11 +143,20 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
                 f'-o "{pp_file}"'
             ]
 
+        fake_libc_path = create_fake_lib_c.run(temp_directory)
+
         if include_path_env_key not in os.environ:
             os.environ[include_path_env_key] = ''
 
         os.environ[include_path_env_key] = (
             f'{fake_libc_path}{os.pathsep}{os.environ[include_path_env_key]}'
+        )
+
+        if 'PATH' not in os.environ:
+            os.environ['PATH'] = ''
+
+        os.environ['PATH'] = (
+            f'{fake_libc_path}{os.pathsep}{os.environ["PATH"]}'
         )
 
         cpp_cmd.extend(compiler_args)
@@ -168,7 +176,8 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
         p = subprocess.Popen(
             cpp_cmd,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stderr=subprocess.PIPE,
+            env=os.environ
         )
         out, err = p.communicate()
         exit_code = p.returncode
@@ -264,7 +273,19 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
             event.set()  # NOQA
             t.join()  # NOQA
 
+        print()
+        try:
+            print(cpp_cmd)
+            print()
+        except:  # NOQA
+            pass
+
+        for key, value in os.environ.items():
+            print(key + ':', value)
+
+        print()
         import traceback
+
         traceback.print_exc()
         print()
 
