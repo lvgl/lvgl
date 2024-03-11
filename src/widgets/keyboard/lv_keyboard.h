@@ -17,7 +17,7 @@ extern "C" {
 
 #if LV_USE_KEYBOARD
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
 #include "lv_keyboard_pinyin.h"
 #endif
 
@@ -30,7 +30,7 @@ extern "C" {
 #error "lv_textare is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
 #endif
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
 #if LV_USE_BUTTON == 0
 #error "lv_button is required. Enable it in lv_conf.h (LV_USE_BUTTON  1) "
 #endif
@@ -55,7 +55,7 @@ enum _lv_keyboard_mode_t {
     LV_KEYBOARD_MODE_TEXT_UPPER,
     LV_KEYBOARD_MODE_SPECIAL,
     LV_KEYBOARD_MODE_NUMBER,
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
     LV_KEYBOARD_MODE_PINYIN,
 #endif
     LV_KEYBOARD_MODE_USER_1,
@@ -86,7 +86,7 @@ typedef struct {
     lv_obj_t * ta;              /*Pointer to the assigned text area*/
     lv_keyboard_mode_t mode;    /*Key map type*/
     uint8_t popovers : 1;       /*Show button titles in popovers on press*/
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
     const lv_keyboard_pinyin_dict_t ** dict;
     lv_obj_t * candidate_cont;
     lv_obj_t * pinyin_label;
@@ -155,7 +155,7 @@ void lv_keyboard_set_popovers(lv_obj_t * kb, bool en);
 void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[],
                          const lv_buttonmatrix_ctrl_t ctrl_map[]);
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
 /**
  * Set the dictionary of Pinyin input method
  * @param kb   pointer to a Keyboard object

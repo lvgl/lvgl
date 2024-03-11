@@ -13,7 +13,7 @@
 #include "../textarea/lv_textarea.h"
 #include "../../misc/lv_assert.h"
 #include "../../stdlib/lv_string.h"
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
     #include "lv_keyboard_pinyin.h"
     #include "../button/lv_button.h"
     #include "../image/lv_image.h"
@@ -40,7 +40,7 @@ static void lv_keyboard_update_map(lv_obj_t * obj);
 
 static void lv_keyboard_update_ctrl_map(lv_obj_t * obj);
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
     static void lv_keyboard_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
     static void lv_keyboard_proc_pinyin(lv_keyboard_t * keyboard);
@@ -63,7 +63,7 @@ const lv_obj_class_t lv_keyboard_class = {
     .name = "keyboard",
 };
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
 static const char * const default_en_kb_map_lc[] = {" ", "\n", /*candidate content*/
                                                     "1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
                                                     "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
@@ -160,7 +160,7 @@ static const lv_buttonmatrix_ctrl_t default_kb_ctrl_spec_map[] = {
 #endif
     LV_BUTTONMATRIX_CTRL_CHECKED | 2, 6, LV_BUTTONMATRIX_CTRL_CHECKED | 2, LV_KEYBOARD_CTRL_BUTTON_FLAGS | 2
 };
-#else /*LV_USE_KEYBOARD_PINYIN*/
+#else /*LV_KEYBOARD_PINYIN*/
 static const char * const default_kb_map_lc[] = {"1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
                                                  "ABC", "a", "s", "d", "f", "g", "h", "j", "k", "l", LV_SYMBOL_NEW_LINE, "\n",
                                                  "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
@@ -239,7 +239,7 @@ static const lv_buttonmatrix_ctrl_t default_kb_ctrl_spec_map[] = {
 #endif
     LV_BUTTONMATRIX_CTRL_CHECKED | 2, 6, LV_BUTTONMATRIX_CTRL_CHECKED | 2, LV_KEYBOARD_CTRL_BUTTON_FLAGS | 2
 };
-#endif /*LV_USE_KEYBOARD_PINYIN*/
+#endif /*LV_KEYBOARD_PINYIN*/
 
 static const char * const default_kb_map_num[] = {"1", "2", "3", LV_SYMBOL_KEYBOARD, "\n",
                                                   "4", "5", "6", LV_SYMBOL_OK, "\n",
@@ -254,7 +254,7 @@ static const lv_buttonmatrix_ctrl_t default_kb_ctrl_num_map[] = {
     1, 1, 1, 1, 1
 };
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
 static const char * * kb_map[11] = {
     (const char * *)default_en_kb_map_lc,
     (const char * *)default_kb_map_uc,
@@ -285,7 +285,7 @@ static const lv_buttonmatrix_ctrl_t * kb_ctrl[11] = {
 #endif
     NULL
 };
-#else /*LV_USE_KEYBOARD_PINYIN*/
+#else /*LV_KEYBOARD_PINYIN*/
 static const char * * kb_map[10] = {
     (const char * *)default_kb_map_lc,
     (const char * *)default_kb_map_uc,
@@ -314,7 +314,7 @@ static const lv_buttonmatrix_ctrl_t * kb_ctrl[10] = {
 #endif
     NULL
 };
-#endif /*LV_USE_KEYBOARD_PINYIN*/
+#endif /*LV_KEYBOARD_PINYIN*/
 
 /**********************
  *      MACROS
@@ -400,7 +400,7 @@ void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * m
     lv_keyboard_update_map(obj);
 }
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
 void lv_keyboard_set_pinyin_dict(lv_obj_t * obj, const lv_keyboard_pinyin_dict_t ** dict)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -496,7 +496,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
         }
         goto update_candidate;
     }
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
     else if(lv_strcmp(txt, "Zh") == 0) {
         keyboard->mode = LV_KEYBOARD_MODE_PINYIN;
         lv_buttonmatrix_set_map(obj, kb_map[LV_KEYBOARD_MODE_PINYIN]);
@@ -515,7 +515,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
     if(keyboard->ta == NULL) return;
 
     if(lv_strcmp(txt, "Enter") == 0 || lv_strcmp(txt, LV_SYMBOL_NEW_LINE) == 0) {
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
         lv_textarea_add_text(keyboard->ta, lv_label_get_text(keyboard->pinyin_label));
         lv_label_set_text(keyboard->pinyin_label, "");
         lv_obj_add_flag(keyboard->candidate_cont, LV_OBJ_FLAG_HIDDEN);
@@ -534,7 +534,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
         lv_textarea_cursor_right(keyboard->ta);
     }
     else if(lv_strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
         if(keyboard->mode != LV_KEYBOARD_MODE_PINYIN) {
             lv_textarea_delete_char(keyboard->ta);
         }
@@ -582,7 +582,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
         }
     }
     else {
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
         if(keyboard->mode != LV_KEYBOARD_MODE_PINYIN) {
             lv_textarea_add_text(keyboard->ta, txt);
         }
@@ -611,7 +611,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
     }
 
 update_candidate:
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
     lv_keyboard_hidden_candidate(keyboard);
 #else
     return;
@@ -622,7 +622,7 @@ update_candidate:
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
 static void lv_keyboard_free_candidate_btnm_map(lv_keyboard_t * keyboard)
 {
     if(keyboard->candidate_num != 0) {
@@ -899,7 +899,7 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     keyboard->ta         = NULL;
     keyboard->mode       = LV_KEYBOARD_MODE_TEXT_LOWER;
     keyboard->popovers   = 0;
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
     keyboard->dict = NULL;
     keyboard->candidate_num = 0;
     keyboard->candidate_btnm_map = NULL;
@@ -913,7 +913,7 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_add_event_cb(obj, lv_keyboard_def_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_style_base_dir(obj, LV_BASE_DIR_LTR, 0);
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
 #if LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT
     keyboard->dict = lv_def_pinyin_dict;
 #endif
@@ -1017,12 +1017,12 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_add_event_cb(keyboard->ext_btn, lv_keyboard_ext_btn_event_cb, LV_EVENT_VALUE_CHANGED, obj);
     lv_obj_add_event_cb(keyboard->ext_candidate_btnm, lv_keyboard_ext_candidate_btnm_event_cb, LV_EVENT_CLICKED, obj);
 #endif
-#endif /*LV_USE_KEYBOARD_PINYIN*/
+#endif /*LV_KEYBOARD_PINYIN*/
 
     lv_keyboard_update_map(obj);
 }
 
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
 static void lv_keyboard_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);

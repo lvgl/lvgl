@@ -1624,18 +1624,18 @@
 
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
-#ifndef LV_USE_KEYBOARD_PINYIN
+#ifndef LV_KEYBOARD_PINYIN
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_KEYBOARD_PINYIN
-            #define LV_USE_KEYBOARD_PINYIN CONFIG_LV_USE_KEYBOARD_PINYIN
+            #define LV_KEYBOARD_PINYIN CONFIG_LV_USE_KEYBOARD_PINYIN
         #else
-            #define LV_USE_KEYBOARD_PINYIN 0
+            #define LV_KEYBOARD_PINYIN 0
         #endif
     #else
-        #define LV_USE_KEYBOARD_PINYIN 1
+        #define LV_KEYBOARD_PINYIN 1
     #endif
 #endif
-#if LV_USE_KEYBOARD_PINYIN
+#if LV_KEYBOARD_PINYIN
     /*1: Use default thesaurus*/
     /*If you do not use the default thesaurus, be sure to use `lv_keyboard_pinyin` after setting the thesauruss*/
     #ifndef LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT

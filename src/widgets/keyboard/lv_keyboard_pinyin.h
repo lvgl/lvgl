@@ -25,8 +25,8 @@ extern "C" {
 #error "lv_keyboard is required. Enable it in lv_conf.h (LV_USE_KEYBOARD  1) "
 #endif
 
-#if LV_USE_KEYBOARD_PINYIN == 0
-#error "lv_keyboard is required. Enable it in lv_conf.h (LV_USE_KEYBOARD_PINYIN  1) "
+#if LV_KEYBOARD_PINYIN == 0
+#error "lv_keyboard is required. Enable it in lv_conf.h (LV_KEYBOARD_PINYIN  1) "
 #endif
 
 /*********************
