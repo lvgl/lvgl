@@ -148,6 +148,7 @@ struct _lv_display_t {
 
     /** The area being refreshed*/
     lv_area_t refreshed_area;
+    uint32_t vsync_count;
 };
 
 /**********************

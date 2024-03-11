@@ -109,6 +109,7 @@ typedef enum {
     LV_EVENT_FLUSH_FINISH,
 
     LV_EVENT_VSYNC,
+    LV_EVENT_VSYNC_REQUEST,
 
     _LV_EVENT_LAST,                 /** Number of default events*/
 
