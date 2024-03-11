@@ -77,6 +77,9 @@ void setup()
 
     lv_init();
 
+    /*Set a tick source so that LVGL will know how much time elapsed. */
+    lv_tick_set_cb(millis);
+
     /* register print function for debugging */
 #if LV_USE_LOG != 0
     lv_log_register_print_cb( my_print );
@@ -127,6 +130,5 @@ void setup()
 void loop()
 {
     lv_task_handler(); /* let the GUI do its work */
-    lv_tick_inc(5); /* tell LVGL how much time has passed */
     delay(5); /* let this time pass */
 }
