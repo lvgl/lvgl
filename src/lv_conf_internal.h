@@ -495,6 +495,15 @@
 
 #endif
 
+/* Use G2D GPU. */
+#ifndef LV_USE_DRAW_G2D
+    #ifdef CONFIG_LV_USE_DRAW_G2D
+        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+    #else
+        #define LV_USE_DRAW_G2D 0
+    #endif
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/

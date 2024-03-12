@@ -404,6 +404,9 @@ menu "LVGL configuration"
 				default 8388608
 				help
 					Texture cache size, 8MB by default.
+
+			config LV_USE_DRAW_G2D
+				bool "Use Sunxi G2D platform"
 		endmenu
 
 		menu "Logging"
