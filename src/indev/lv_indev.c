@@ -688,6 +688,10 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->keypad.last_state = LV_INDEV_STATE_RELEASED; /*To skip the processing of release*/
     }
 
+    /*Save the last key. *It must be done here else `lv_indev_get_key` will return the last key in events*/
+    uint32_t prev_key = i->keypad.last_key;
+    i->keypad.last_key = data->key;
+
     lv_group_t * g = i->group;
     if(g == NULL) return;
 
@@ -695,13 +699,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(indev_obj_act == NULL) return;
 
     const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-
-    /*Save the last key to compare it with the current latter on RELEASE*/
-    uint32_t prev_key = i->keypad.last_key;
-
-    /*Save the last key.
-     *It must be done here else `lv_indev_get_key` will return the last key in events*/
-    i->keypad.last_key = data->key;
 
     /*Save the previous state so we can detect state changes below and also set the last state now
      *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
