@@ -215,6 +215,13 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
                 ret.alpha = px[0];
                 break;
             }
+        case LV_COLOR_FORMAT_L8: {
+                ret.red = *px;
+                ret.green = *px;
+                ret.blue = *px;
+                ret.alpha = 0xFF;
+                break;
+            }
         default:
             lv_memzero(&ret, sizeof(lv_color32_t));
             break;
