@@ -1,9 +1,3 @@
-:note: **NOTA IMPORTANTE** A próxima versão principal (v9.0.0) está sendo
-       desenvolvida na branch master. A última versão estável está disponível
-       na branch `release/v8.3 <https://github.com/lvgl/lvgl/tree/release/v8.3>`__.
-
---------------
-
 .. raw:: html
 
    <p align="left">
