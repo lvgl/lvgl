@@ -214,9 +214,7 @@ You can do this in the following way:
 .. code:: c
 
    /*Delete the original display refresh timer*/
-   lv_timer_delete(disp->refr_timer);
-   disp->refr_timer = NULL;
-
+   lv_display_delete_refr_timer(disp);
 
    /*Call this anywhere you want to refresh the dirty areas*/
    _lv_display_refr_timer(NULL);
