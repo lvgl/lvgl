@@ -271,6 +271,7 @@ static FillRule fill_rule_conv(vg_lite_fill_t fill);
 static BlendMethod blend_method_conv(vg_lite_blend_t blend);
 static StrokeCap stroke_cap_conv(vg_lite_cap_style_t cap);
 static StrokeJoin stroke_join_conv(vg_lite_join_style_t join);
+static FillSpread fill_spread_conv(vg_lite_gradient_spreadmode_t spread);
 static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t * path, vg_lite_matrix_t * matrix);
 static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_buffer_t * target,
                                 const vg_lite_rectangle_t * rect);
@@ -808,6 +809,8 @@ extern "C" {
             case gcFEATURE_BIT_VG_24BIT:
             case gcFEATURE_BIT_VG_DITHER:
             case gcFEATURE_BIT_VG_USE_DST:
+            case gcFEATURE_BIT_VG_RADIAL_GRADIENT:
+            case gcFEATURE_BIT_VG_IM_REPEAT_REFLECT:
 
 #if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
             case gcFEATURE_BIT_VG_LVGL_SUPPORT:
@@ -1736,15 +1739,34 @@ Empty_sequence_handler:
                                              vg_lite_blend_t blend,
                                              vg_lite_filter_t filter)
     {
-        LV_UNUSED(target);
-        LV_UNUSED(path);
-        LV_UNUSED(fill_rule);
-        LV_UNUSED(path_matrix);
-        LV_UNUSED(grad);
-        LV_UNUSED(paint_color);
-        LV_UNUSED(blend);
-        LV_UNUSED(filter);
-        return VG_LITE_NOT_SUPPORT;
+        auto ctx = vg_lite_ctx::get_instance();
+        TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
+
+        auto shape = Shape::gen();
+        TVG_CHECK_RETURN_VG_ERROR(shape_append_path(shape, path, path_matrix));
+        TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(path_matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
+        TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
+
+        auto radialGrad = RadialGradient::gen();
+        TVG_CHECK_RETURN_VG_ERROR(radialGrad->transform(matrix_conv(&grad->matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(radialGrad->radial(grad->radial_grad.cx, grad->radial_grad.cy, grad->radial_grad.r));
+        TVG_CHECK_RETURN_VG_ERROR(radialGrad->spread(fill_spread_conv(grad->spread_mode)));
+
+        tvg::Fill::ColorStop colorStops[VLC_MAX_COLOR_RAMP_STOPS];
+        for(vg_lite_uint32_t i = 0; i < grad->ramp_length; i++) {
+            colorStops[i].offset = grad->color_ramp[i].stop;
+            colorStops[i].r = grad->color_ramp[i].red * 255.0f;
+            colorStops[i].g = grad->color_ramp[i].green * 255.0f;
+            colorStops[i].b = grad->color_ramp[i].blue * 255.0f;
+            colorStops[i].a = grad->color_ramp[i].alpha * 255.0f;
+        }
+        TVG_CHECK_RETURN_VG_ERROR(radialGrad->colorStops(colorStops, grad->ramp_length));
+
+        TVG_CHECK_RETURN_VG_ERROR(shape->fill(std::move(radialGrad)));
+        TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
+
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_set_command_buffer_size(vg_lite_uint32_t size)
@@ -1977,6 +1999,20 @@ static StrokeJoin stroke_join_conv(vg_lite_join_style_t join)
     }
 
     return StrokeJoin::Bevel;
+}
+
+static FillSpread fill_spread_conv(vg_lite_gradient_spreadmode_t spread)
+{
+    switch(spread) {
+        case VG_LITE_GRADIENT_SPREAD_PAD:
+            return FillSpread::Pad;
+        case VG_LITE_GRADIENT_SPREAD_REPEAT:
+            return FillSpread::Repeat;
+        case VG_LITE_GRADIENT_SPREAD_REFLECT:
+            return FillSpread::Reflect;
+        default:
+            return FillSpread::Pad;
+    }
 }
 
 static float vlc_get_arg(const void * data, vg_lite_format_t format)
