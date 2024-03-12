@@ -195,12 +195,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_l8(_lv_draw_sw_blend_fill_d
     /*Opacity only*/
     else if(mask == NULL && opa < LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_L8_WITH_OPA(dsc)) {
-            uint32_t color8 = (lv_color_luminance(dsc->color) * opa) >> 8;
+            uint32_t color8 = lv_color_luminance(dsc->color);
             uint8_t * dest_buf = dsc->dest_buf;
 
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
-                    dest_buf[x] = LV_MIN(color8 + dest_buf[x], 255);
+                    lv_color_8_8_mix(color8, &dest_buf[x], opa);
                 }
                 dest_buf = drawbuf_next_row(dest_buf, dest_stride);
             }
