@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../../lvgl.h"
 #include "lv_freetype_private.h"
 
 #if LV_USE_FREETYPE

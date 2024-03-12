@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl.h"
+#include "misc/lv_types.h"
 
 /*********************
  *      DEFINES

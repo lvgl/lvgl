@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_barcode.h"
+#include "../../lvgl.h"
+
 #if LV_USE_BARCODE
 
 #include "code128.h"
