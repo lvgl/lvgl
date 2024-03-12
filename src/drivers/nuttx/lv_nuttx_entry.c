@@ -103,7 +103,7 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 
     lv_nuttx_cache_init();
 
-#if LV_CACHE_DEF_SIZE > 0
+#if LV_CACHE_DEF_SIZE > 0 && LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
     lv_nuttx_image_cache_init();
 #endif
 

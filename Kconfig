@@ -1457,6 +1457,11 @@ menu "LVGL configuration"
 			bool "Use Nuttx to open window and handle touchscreen"
 			default n
 
+		config LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+			bool "Use independent image heap"
+			depends on LV_USE_NUTTX
+			default n
+
 		config LV_USE_NUTTX_LIBUV
 			bool "Use uv loop to replace default timer loop and other fb/indev timers"
 			depends on LV_USE_NUTTX
