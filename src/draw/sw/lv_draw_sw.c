@@ -473,12 +473,12 @@ static void rotate90_argb8888(const uint32_t * src, uint32_t * dst, int32_t srcW
 static void rotate180_argb8888(const uint32_t * src, uint32_t * dst, int32_t width, int32_t height, int32_t src_stride,
                                int32_t dest_stride)
 {
+    LV_UNUSED(dest_stride);
     if(LV_RESULT_OK == LV_DRAW_SW_ROTATE180_ARGB8888(src, dst, srcWidth, srcHeight, srcStride, dstStride)) {
         return ;
     }
 
     src_stride /= sizeof(uint32_t);
-    dest_stride /= sizeof(uint32_t);
 
     for(int32_t y = 0; y < height; ++y) {
         int32_t dstIndex = (height - y - 1) * src_stride;

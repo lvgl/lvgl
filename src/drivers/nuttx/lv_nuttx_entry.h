@@ -78,6 +78,12 @@ void lv_nuttx_init_custom(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result
 
 #endif /* LV_USE_NUTTX_CUSTOM_INIT */
 
+/**
+ * Get the idle percentage of the system.
+ * @return The idle percentage of the system.
+ */
+uint32_t lv_nuttx_get_idle(void);
+
 /**********************
  *      MACROS
  **********************/

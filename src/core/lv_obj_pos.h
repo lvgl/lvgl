@@ -23,6 +23,20 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef enum {
+    /** No flags */
+    LV_OBJ_POINT_TRANSFORM_FLAG_NONE = 0x00,
+
+    /** Consider the transformation properties of the parents too */
+    LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE = 0x01,
+
+    /** Execute the inverse of the transformation (-angle and 1/zoom) */
+    LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE = 0x02,
+
+    /** Both inverse and recursive*/
+    LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE_RECURSIVE = 0x03,
+} lv_obj_point_transform_flag_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -335,19 +349,27 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
  * Transform a point using the angle and zoom style properties of an object
  * @param obj           pointer to an object whose style properties should be used
  * @param p             a point to transform, the result will be written back here too
- * @param recursive     consider the transformation properties of the parents too
- * @param inv           do the inverse of the transformation (-angle and 1/zoom)
+ * @param flags         OR-ed valued of :cpp:enum:`lv_obj_point_transform_flag_t`
  */
-void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv);
+void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, lv_obj_point_transform_flag_t flags);
+
+/**
+ * Transform an array of points using the angle and zoom style properties of an object
+ * @param obj           pointer to an object whose style properties should be used
+ * @param points        the array of points to transform, the result will be written back here too
+ * @param count         number of points in the array
+ * @param flags         OR-ed valued of :cpp:enum:`lv_obj_point_transform_flag_t`
+ */
+void lv_obj_transform_point_array(const lv_obj_t * obj, lv_point_t points[], size_t count,
+                                  lv_obj_point_transform_flag_t flags);
 
 /**
  * Transform an area using the angle and zoom style properties of an object
  * @param obj           pointer to an object whose style properties should be used
  * @param area          an area to transform, the result will be written back here too
- * @param recursive     consider the transformation properties of the parents too
- * @param inv           do the inverse of the transformation (-angle and 1/zoom)
+ * @param flags         OR-ed valued of :cpp:enum:`lv_obj_point_transform_flag_t`
  */
-void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive, bool inv);
+void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, lv_obj_point_transform_flag_t flags);
 
 /**
  * Mark an area of an object as invalid.

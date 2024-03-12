@@ -235,7 +235,7 @@ lv_obj_t * lv_msgbox_get_footer(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
-    return mbox->header;
+    return mbox->footer;
 }
 
 lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj)

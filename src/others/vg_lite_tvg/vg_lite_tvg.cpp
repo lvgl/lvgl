@@ -119,6 +119,11 @@ typedef struct {
     uint8_t alpha;
 } vg_color32_t;
 
+typedef struct {
+    vg_lite_float_t x;
+    vg_lite_float_t y;
+} vg_lite_fpoint_t;
+
 #pragma pack()
 
 class vg_lite_ctx
@@ -287,6 +292,10 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
                              vg_lite_uint32_t * mul,
                              vg_lite_uint32_t * div,
                              vg_lite_uint32_t * bytes_align);
+
+static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, const vg_lite_fpoint_t * point);
+static bool vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
+static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 
 /**********************
  *  STATIC VARIABLES
@@ -1608,24 +1617,32 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
-        float x_min = path->bounding_box[0];
-        float y_min = path->bounding_box[1];
-        float x_max = path->bounding_box[2];
-        float y_max = path->bounding_box[3];
+        vg_lite_matrix_t grad_matrix;
+        vg_lite_identity(&grad_matrix);
+        vg_lite_matrix_inverse(&grad_matrix, matrix);
+        vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
 
+        vg_lite_fpoint_t p1 = {0.0f, 0.0f};
+        vg_lite_fpoint_t p2 = {1.0f, 0};
+
+        vg_lite_fpoint_t p1_trans = p1;
+        vg_lite_fpoint_t p2_trans = p2;
+
+        p1_trans = matrix_transform_point(&grad_matrix, &p1);
+        p2_trans = matrix_transform_point(&grad_matrix, &p2);
+        float dx = (p2_trans.x - p1_trans.x);
+        float dy = (p2_trans.y - p1_trans.y);
+        float scale = sqrtf(dx * dx + dy * dy);
+        float angle = (float)(atan2f(dy, dx));
+        float dlen = 256 * scale;
+        float x_min = grad_matrix.m[0][2];
+        float y_min = grad_matrix.m[1][2];
+        float x_max = x_min + dlen * cosf(angle);
+        float y_max = y_min + dlen * sinf(angle);
+        LV_LOG_TRACE("linear gradient {%.2f, %.2f} ~ {%.2f, %.2f}", x_min, y_min, x_max, y_max);
         auto linearGrad = LinearGradient::gen();
-
-        if(matrix->m[0][1] != 0) {
-            /* vertical */
-            linearGrad->linear(x_min, y_min, x_min, y_max);
-        }
-        else {
-            /* horizontal */
-            linearGrad->linear(x_min, y_min, x_max, y_min);
-        }
-
-        linearGrad->transform(matrix_conv(&grad->matrix));
-        linearGrad->spread(FillSpread::Reflect);
+        linearGrad->linear(x_min, y_min, x_max, y_max);
+        linearGrad->spread(FillSpread::Pad);
 
         tvg::Fill::ColorStop colorStops[VLC_MAX_GRADIENT_STOPS];
         for(vg_lite_uint32_t i = 0; i < grad->count; i++) {
@@ -2434,4 +2451,86 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
             break;
     }
 }
+
+static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, const vg_lite_fpoint_t * point)
+{
+    vg_lite_fpoint_t p;
+    p.x = (vg_lite_float_t)(point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]);
+    p.y = (vg_lite_float_t)(point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]);
+    return p;
+}
+
+static bool vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix)
+{
+    vg_lite_float_t det00, det01, det02;
+    vg_lite_float_t d;
+    bool is_affine;
+
+    /* Test for identity matrix. */
+    if(matrix == NULL) {
+        result->m[0][0] = 1.0f;
+        result->m[0][1] = 0.0f;
+        result->m[0][2] = 0.0f;
+        result->m[1][0] = 0.0f;
+        result->m[1][1] = 1.0f;
+        result->m[1][2] = 0.0f;
+        result->m[2][0] = 0.0f;
+        result->m[2][1] = 0.0f;
+        result->m[2][2] = 1.0f;
+
+        /* Success. */
+        return true;
+    }
+
+    det00 = (matrix->m[1][1] * matrix->m[2][2]) - (matrix->m[2][1] * matrix->m[1][2]);
+    det01 = (matrix->m[2][0] * matrix->m[1][2]) - (matrix->m[1][0] * matrix->m[2][2]);
+    det02 = (matrix->m[1][0] * matrix->m[2][1]) - (matrix->m[2][0] * matrix->m[1][1]);
+
+    /* Compute determinant. */
+    d = (matrix->m[0][0] * det00) + (matrix->m[0][1] * det01) + (matrix->m[0][2] * det02);
+
+    /* Return 0 if there is no inverse matrix. */
+    if(d == 0.0f)
+        return false;
+
+    /* Compute reciprocal. */
+    d = 1.0f / d;
+
+    /* Determine if the matrix is affine. */
+    is_affine = (matrix->m[2][0] == 0.0f) && (matrix->m[2][1] == 0.0f) && (matrix->m[2][2] == 1.0f);
+
+    result->m[0][0] = d * det00;
+    result->m[0][1] = d * ((matrix->m[2][1] * matrix->m[0][2]) - (matrix->m[0][1] * matrix->m[2][2]));
+    result->m[0][2] = d * ((matrix->m[0][1] * matrix->m[1][2]) - (matrix->m[1][1] * matrix->m[0][2]));
+    result->m[1][0] = d * det01;
+    result->m[1][1] = d * ((matrix->m[0][0] * matrix->m[2][2]) - (matrix->m[2][0] * matrix->m[0][2]));
+    result->m[1][2] = d * ((matrix->m[1][0] * matrix->m[0][2]) - (matrix->m[0][0] * matrix->m[1][2]));
+    result->m[2][0] = is_affine ? 0.0f : d * det02;
+    result->m[2][1] = is_affine ? 0.0f : d * ((matrix->m[2][0] * matrix->m[0][1]) - (matrix->m[0][0] * matrix->m[2][1]));
+    result->m[2][2] = is_affine ? 1.0f : d * ((matrix->m[0][0] * matrix->m[1][1]) - (matrix->m[1][0] * matrix->m[0][1]));
+
+    /* Success. */
+    return true;
+}
+
+static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult)
+{
+    vg_lite_matrix_t temp;
+    int row, column;
+
+    /* Process all rows. */
+    for(row = 0; row < 3; row++) {
+        /* Process all columns. */
+        for(column = 0; column < 3; column++) {
+            /* Compute matrix entry. */
+            temp.m[row][column] = (matrix->m[row][0] * mult->m[0][column])
+                                  + (matrix->m[row][1] * mult->m[1][column])
+                                  + (matrix->m[row][2] * mult->m[2][column]);
+        }
+    }
+
+    /* Copy temporary matrix into result. */
+    lv_memcpy(matrix->m, &temp.m, sizeof(temp.m));
+}
+
 #endif

@@ -73,6 +73,11 @@
  * Start parsing lv_conf_template.h
  -----------------------------------*/
 
+/*If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
+#if  0 && defined(__ASSEMBLY__)
+#include "my_include.h"
+#endif
+
 /*====================
    COLOR SETTINGS
  *====================*/
@@ -492,6 +497,17 @@
         #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
     #else
         #define LV_VG_LITE_USE_BOX_SHADOW 0
+    #endif
+#endif
+
+/* VG-Lite gradient image maximum cache number.
+ * NOTE: The memory usage of a single gradient image is 4K bytes.
+ */
+#ifndef LV_VG_LITE_GRAD_CACHE_SIZE
+    #ifdef CONFIG_LV_VG_LITE_GRAD_CACHE_SIZE
+        #define LV_VG_LITE_GRAD_CACHE_SIZE CONFIG_LV_VG_LITE_GRAD_CACHE_SIZE
+    #else
+        #define LV_VG_LITE_GRAD_CACHE_SIZE 32
     #endif
 #endif
 

@@ -12,6 +12,7 @@
 
 #include <time.h>
 #include <nuttx/tls.h>
+#include <nuttx/clock.h>
 #include <syslog.h>
 #include "lv_nuttx_cache.h"
 #include "lv_nuttx_image_cache.h"
@@ -157,6 +158,26 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
     lv_nuttx_init_custom(dsc, result);
 #endif
 }
+
+#ifdef CONFIG_SCHED_CPULOAD
+
+uint32_t lv_nuttx_get_idle(void)
+{
+    struct cpuload_s cpuload;
+    int ret = clock_cpuload(0, &cpuload);
+    if(ret < 0) {
+        LV_LOG_WARN("clock_cpuload failed: %d", ret);
+        return 0;
+    }
+
+    uint32_t idle = cpuload.active * 100 / cpuload.total;
+    LV_LOG_TRACE("active = %" LV_PRIu32 ", total = %" LV_PRIu32,
+                 cpuload.active, cpuload.total);
+
+    return idle;
+}
+
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

@@ -150,6 +150,13 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
         dsc_out->ofs_y = FT_F26DOT6_TO_INT(glyph->metrics.horiBearingY -
                                            glyph->metrics.height);          /*Y offset of the bitmap measured from the as line*/
         dsc_out->format = LV_FONT_GLYPH_FORMAT_VECTOR;
+
+        /*Transform the glyph to italic if required*/
+        if(dsc->style & LV_FREETYPE_FONT_STYLE_ITALIC) {
+            dsc_out->box_w = lv_freetype_italic_transform_on_pos((lv_point_t) {
+                dsc_out->box_w, dsc_out->box_h
+            });
+        }
     }
     else if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_BITMAP) {
         FT_Bitmap * glyph_bitmap = &face->glyph->bitmap;

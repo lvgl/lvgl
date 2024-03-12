@@ -300,12 +300,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     /*Cache the layer type*/
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && is_layer_refr) {
-        lv_layer_type_t layer_type = calculate_layer_type(obj);
-        if(obj->spec_attr) obj->spec_attr->layer_type = layer_type;
-        else if(layer_type != LV_LAYER_TYPE_NONE) {
-            lv_obj_allocate_spec_attr(obj);
-            obj->spec_attr->layer_type = layer_type;
-        }
+        _lv_obj_update_layer_type(obj);
     }
 
     if(prop == LV_STYLE_PROP_ANY || is_ext_draw) {
@@ -668,6 +663,16 @@ lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
     if(opa_final <= LV_OPA_MIN) return LV_OPA_TRANSP;
     if(opa_final >= LV_OPA_MAX) return LV_OPA_COVER;
     return opa_final;
+}
+
+void _lv_obj_update_layer_type(lv_obj_t * obj)
+{
+    lv_layer_type_t layer_type = calculate_layer_type(obj);
+    if(obj->spec_attr) obj->spec_attr->layer_type = layer_type;
+    else if(layer_type != LV_LAYER_TYPE_NONE) {
+        lv_obj_allocate_spec_attr(obj);
+        obj->spec_attr->layer_type = layer_type;
+    }
 }
 
 /**********************

@@ -558,7 +558,9 @@ def style_const_set(p):
 def docs(p):
   if "section" in p:
     print("")
-    print("## " + p['section'])
+    print(p['section'])
+    print("-" * len(p['section']))
+    print("")
     print(p['dsc'])
     return
 
@@ -575,20 +577,26 @@ def docs(p):
   e = "No"
   if p["ext_draw"]: e = "Yes"
 
-  li_style = "style='display:inline; margin-right: 20px; margin-left: 0px"
+  li_style = "style='display:inline-block; margin-right: 20px; margin-left: 0px"
 
   dsc = p['dsc']
 
   print("")
-  print("### " + p["name"].lower())
+  print(p["name"].lower())
+  print("~" * len(p["name"].lower()))
+  print("")
   print(dsc)
 
-  print("<ul>")
-  print("<li " + li_style + "'><strong>Default</strong> " + d + "</li>")
-  print("<li " + li_style + "'><strong>Inherited</strong> " + i + "</li>")
-  print("<li " + li_style + "'><strong>Layout</strong> " + l + "</li>")
-  print("<li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
-  print("</ul>")
+
+  print("")
+  print(".. raw:: html")
+  print("")
+  print("  <ul>")
+  print("  <li " + li_style + "'><strong>Default</strong> " + d + "</li>")
+  print("  <li " + li_style + "'><strong>Inherited</strong> " + i + "</li>")
+  print("  <li " + li_style + "'><strong>Layout</strong> " + l + "</li>")
+  print("  <li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
+  print("  </ul>")
 
 def guard_proc(p):
   global guard
@@ -597,7 +605,7 @@ def guard_proc(p):
       guard_close()
     if 'guard' in p:
       guard = p['guard']
-      print(f"#if {guard}\n")
+      print(f"#if {guard}")
 
 def guard_close():
   global guard
@@ -684,8 +692,11 @@ guard_close()
 print()
 print('#endif /* LV_STYLE_GEN_H */')
 
-sys.stdout = open(base_dir + '/../docs/overview/style-props.md', 'w')
+sys.stdout = open(base_dir + '/../docs/overview/style-props.rst', 'w')
 
-print('# Style properties')
+print('================')
+print('Style properties')
+print('================')
+
 for p in props:
   docs(p)

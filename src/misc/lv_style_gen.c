@@ -6,7 +6,9 @@
  **********************************************************************
  */
 
+
 #include "lv_style.h"
+
 
 void lv_style_set_width(lv_style_t * style, int32_t value)
 {
@@ -1102,3 +1104,4 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN = LV_STYLE_GRID_CELL_ROW_SPAN;
 #endif /*LV_USE_GRID*/
+

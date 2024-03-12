@@ -6,6 +6,7 @@
  **********************************************************************
  */
 
+
 #ifndef LV_STYLE_GEN_H
 #define LV_STYLE_GEN_H
 
@@ -198,7 +199,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BA
 void lv_style_set_bitmap_mask_src(lv_style_t * style, const lv_image_dsc_t * value);
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BITMAP_MASK_SRC;
 #if LV_USE_FLEX
-
     void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value);
     LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_FLOW;
     void lv_style_set_flex_main_place(lv_style_t * style, lv_flex_align_t value);
@@ -212,7 +212,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BI
 #endif /*LV_USE_FLEX*/
 
 #if LV_USE_GRID
-
     void lv_style_set_grid_column_dsc_array(lv_style_t * style, const int32_t * value);
     LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_COLUMN_DSC_ARRAY;
     void lv_style_set_grid_column_align(lv_style_t * style, lv_grid_align_t value);
@@ -234,6 +233,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BI
     void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
     LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
 #endif /*LV_USE_GRID*/
+
 
 #define LV_STYLE_CONST_WIDTH(val) \
     { \
@@ -784,5 +784,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BI
         .prop_ptr = &_lv_style_const_prop_id_GRID_CELL_ROW_SPAN, .value = { .num = (int32_t)val } \
     }
 #endif /*LV_USE_GRID*/
+
 
 #endif /* LV_STYLE_GEN_H */
