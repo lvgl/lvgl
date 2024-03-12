@@ -8,7 +8,7 @@ Display
     fbdev
     gen_mipi
     ili9341
-    lcd_stm32_hal
+    lcd_stm32_guide
     st7735
     st7789
     st7796
