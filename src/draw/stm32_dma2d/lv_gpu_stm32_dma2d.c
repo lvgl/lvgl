@@ -56,7 +56,7 @@ static dma2d_color_format_t lv_color_format_to_dma2d_color_format(lv_img_cf_t co
 static lv_point_t lv_area_get_offset(const lv_area_t * area1, const lv_area_t * area2);
 
 lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
-                                                       const lv_area_t * src_area, const void * src);
+                                 const lv_area_t * src_area, const void * src);
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride,
                                                            const lv_area_t * draw_area, lv_color_t color, lv_opa_t opa);
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_stride,
@@ -315,7 +315,7 @@ static dma2d_color_format_t lv_color_format_to_dma2d_color_format(lv_img_cf_t co
 }
 
 lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
-                                                       const lv_area_t * src_area, const void * src)
+                                 const lv_area_t * src_area, const void * src)
 {
     //if(lv_img_src_get_type(src) != LV_IMG_SRC_VARIABLE) return LV_RES_INV;
     return LV_RES_INV;
@@ -581,7 +581,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * d
  * @param src_offset src offset in relation to dst, useful when src is larger than draw_area
  */
 void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
-                                                            const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset)
+                                      const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset)
 {
     LV_ASSERT_MSG(!isDma2dInProgess, "dma2d transfer has not finished"); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
@@ -664,7 +664,7 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_await_dma_transfer_finish(lv_disp
 #if defined (LV_STM32_DMA2D_USE_M7_CACHE)
 // Cortex-M7 DCache present
 void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
-                                                                lv_coord_t height, uint8_t pixel_size)
+                                          lv_coord_t height, uint8_t pixel_size)
 {
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint16_t stride = pixel_size * (width + offset); // in bytes
@@ -694,7 +694,7 @@ void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset, l
 }
 
 void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
-                                                           lv_coord_t height, uint8_t pixel_size)
+                                     lv_coord_t height, uint8_t pixel_size)
 {
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint16_t stride = pixel_size * (width + offset); // in bytes
