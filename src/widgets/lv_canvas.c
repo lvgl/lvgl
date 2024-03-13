@@ -189,20 +189,18 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
     lv_color_t * cbuf = lv_mem_alloc(dest_img->header.w * sizeof(lv_color_t));
     lv_opa_t * abuf = lv_mem_alloc(dest_img->header.w * sizeof(lv_opa_t));
     for(y = 0; y < dest_img->header.h; y++) {
-        if(y + offset_y >= 0) {
-            lv_draw_sw_transform(NULL, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
-                                 &draw_dsc, canvas->dsc.header.cf, cbuf, abuf);
+        lv_draw_sw_transform(NULL, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
+                             &draw_dsc, canvas->dsc.header.cf, cbuf, abuf);
 
-            for(x = 0; x < dest_img->header.w; x++) {
-                if(abuf[x]) {
-                    lv_img_buf_set_px_color(dest_img, x, y, cbuf[x]);
-                    lv_img_buf_set_px_alpha(dest_img, x, y, abuf[x]);
-                }
+        for(x = 0; x < dest_img->header.w; x++) {
+            if(abuf[x]) {
+                lv_img_buf_set_px_color(dest_img, x, y, cbuf[x]);
+                lv_img_buf_set_px_alpha(dest_img, x, y, abuf[x]);
             }
-
-            dest_area.y1++;
-            dest_area.y2++;
         }
+
+        dest_area.y1++;
+        dest_area.y2++;
     }
     lv_mem_free(cbuf);
     lv_mem_free(abuf);
