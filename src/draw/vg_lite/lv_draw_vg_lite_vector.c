@@ -370,13 +370,6 @@ static void lv_stroke_to_vg(lv_vg_lite_path_t * dest, const lv_vector_stroke_dsc
             lv_color32_to_vg(dsc->color, dsc->opa))
     );
 
-    if(dsc->style == LV_VECTOR_DRAW_STYLE_SOLID) {
-
-    }
-    else {   /*gradient*/
-
-    }
-
     LV_VG_LITE_CHECK_ERROR(vg_lite_update_stroke(path));
 }
 
