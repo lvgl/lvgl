@@ -18,9 +18,9 @@
 
 
 #if LV_USE_OS == LV_OS_FREERTOS
-#include "atomic.h"
+    #include "atomic.h"
 #elif LV_USE_OS == LV_OS_FREERTOS_ESP
-#include "freertos/atomic.h"
+    #include "freertos/atomic.h"
 #endif
 
 #include "../misc/lv_log.h"
@@ -61,7 +61,7 @@ static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
  **********************/
 
 #if LV_USE_OS == LV_OS_FREERTOS_ESP
-static portMUX_TYPE critSectionMux = portMUX_INITIALIZER_UNLOCKED;
+    static portMUX_TYPE critSectionMux = portMUX_INITIALIZER_UNLOCKED;
 #endif
 
 /**********************
