@@ -10,6 +10,9 @@ from collections import namedtuple
 from docutils import nodes
 from sphinx.transforms.post_transforms import SphinxPostTransform
 
+URL_BASE = {
+    "zh_CN": "https://lvgl.100ask.net/"
+}
 
 class translation_link(nodes.Element):
     """Node for "link_to_translation" role."""
@@ -27,10 +30,6 @@ class TranslationLinkNodeTransform(SphinxPostTransform):
     default_priority = 0
 
     def run(self, **kwargs):
-
-        URL_BASE = ''
-        URL_BASE_ZH_CN = 'https://lvgl.100ask.net/'
-
         # Only output relative links if building HTML
         for node in self.document.traverse(translation_link):
             if 'html' in self.app.builder.name:
@@ -38,13 +37,9 @@ class TranslationLinkNodeTransform(SphinxPostTransform):
                 (language, link_text) = text.split(':')
                 env = self.document.settings.env
                 docname = env.docname
-                doc_path = env.doc2path(docname, False)
+                #doc_path = env.doc2path(docname, False)
                 urlpath = os.environ['LVGL_URLPATH']+'/'
-
-                if language == "zh_CN":
-                    URL_BASE = URL_BASE_ZH_CN
-
-                return_path = URL_BASE+urlpath
+                return_path = URL_BASE.get(language, "") + urlpath
                 
                 url = '{}.html'.format(os.path.join(return_path, docname))
 
