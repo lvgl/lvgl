@@ -187,8 +187,8 @@ static lv_cache_entry_t * lv_freetype_outline_lookup(lv_freetype_font_dsc_t * ds
 {
     lv_freetype_cache_node_t * cache_node = dsc->cache_node;
 
-    FT_UInt charmap_index = FT_Get_Charmap_Index(cache_node->face->charmap);
-    FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, unicode_letter);
+    FT_Face face = cache_node->face;
+    FT_UInt glyph_index = FT_Get_Char_Index(face, unicode_letter);
 
     lv_freetype_outline_node_t tmp_node;
     tmp_node.glyph_index = glyph_index;

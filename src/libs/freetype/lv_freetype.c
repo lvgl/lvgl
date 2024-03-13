@@ -40,10 +40,6 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static FT_Error lv_freetype_face_requester(FTC_FaceID face_id,
-                                           FT_Library library,
-                                           FT_Pointer req_data,
-                                           FT_Face * aface);
 static void lv_freetype_cleanup(lv_freetype_context_t * ctx);
 static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const char * pathname);
 static void lv_freetype_drop_face_id(lv_freetype_context_t * ctx, FTC_FaceID face_id);
@@ -66,7 +62,7 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_freetype_init(uint32_t max_faces, uint32_t max_sizes, uint32_t max_kilobytes)
+lv_result_t lv_freetype_init(void)
 {
     if(ft_ctx) {
         LV_LOG_WARN("freetype already initialized");
@@ -86,26 +82,6 @@ lv_result_t lv_freetype_init(uint32_t max_faces, uint32_t max_sizes, uint32_t ma
     error = FT_Init_FreeType(&ctx->library);
     if(error) {
         FT_ERROR_MSG("FT_Init_FreeType", error);
-        return LV_RESULT_INVALID;
-    }
-
-    error = FTC_Manager_New(ctx->library,
-                            max_faces,
-                            max_sizes,
-                            max_kilobytes * 1024,
-                            lv_freetype_face_requester,
-                            NULL,
-                            &ctx->cache_manager);
-    if(error) {
-        FT_ERROR_MSG("FTC_Manager_New", error);
-        lv_freetype_cleanup(ctx);
-        return LV_RESULT_INVALID;
-    }
-
-    error = FTC_CMapCache_New(ctx->cache_manager, &ctx->cmap_cache);
-    if(error) {
-        FT_ERROR_MSG("FTC_CMapCache_New", error);
-        lv_freetype_cleanup(ctx);
         return LV_RESULT_INVALID;
     }
 
@@ -221,27 +197,6 @@ lv_freetype_context_t * lv_freetype_get_context(void)
     return LV_GLOBAL_DEFAULT()->ft_context;
 }
 
-FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc)
-{
-    FT_Error error;
-    lv_freetype_context_t * ctx = dsc->context;
-
-    FT_Size ft_size;
-    struct FTC_ScalerRec_ scaler;
-    scaler.face_id = dsc->face_id;
-    scaler.width = dsc->size;
-    scaler.height = dsc->size;
-    scaler.pixel = 1;
-    error = FTC_Manager_LookupSize(ctx->cache_manager, &scaler, &ft_size);
-
-    if(error) {
-        FT_ERROR_MSG("FTC_Manager_LookupSize", error);
-        return NULL;
-    }
-
-    return ft_size;
-}
-
 void lv_freetype_italic_transform(FT_Face face)
 {
     LV_ASSERT_NULL(face);
@@ -310,35 +265,12 @@ static void freetype_on_font_set_cbs(lv_freetype_font_dsc_t * dsc)
     }
 }
 
-static FT_Error lv_freetype_face_requester(FTC_FaceID face_id,
-                                           FT_Library library,
-                                           FT_Pointer req_data,
-                                           FT_Face * aface)
-{
-    LV_UNUSED(library);
-    LV_UNUSED(req_data);
-
-    const char * pathname = lv_freetype_get_pathname(face_id);
-
-    FT_Error error = FT_New_Face(library, pathname, 0, aface);
-    if(error) {
-        FT_ERROR_MSG("FT_New_Face", error);
-        LV_LOG_ERROR("error pathname = %s", pathname);
-    }
-    return error;
-}
-
 static void lv_freetype_cleanup(lv_freetype_context_t * ctx)
 {
     LV_ASSERT_NULL(ctx);
     if(ctx->cache_node_cache) {
         lv_cache_destroy(ctx->cache_node_cache, NULL);
         ctx->cache_node_cache = NULL;
-    }
-
-    if(ctx->cache_manager) {
-        FTC_Manager_Done(ctx->cache_manager);
-        ctx->cache_manager = NULL;
     }
 
     if(ctx->library) {
@@ -401,7 +333,6 @@ static void lv_freetype_drop_face_id(lv_freetype_context_t * ctx, FTC_FaceID fac
             if(node->ref_cnt == 0) {
                 LV_LOG_INFO("drop face_id: %s", node->pathname);
                 _lv_ll_remove(ll_p, node);
-                FTC_Manager_RemoveFaceID(ctx->cache_manager, face_id);
                 lv_free(node->pathname);
                 lv_free(node);
             }

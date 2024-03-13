@@ -80,8 +80,6 @@ struct _lv_freetype_cache_node_t {
 
 typedef struct _lv_freetype_context_t {
     FT_Library library;
-    FTC_Manager cache_manager;
-    FTC_CMapCache cmap_cache;
     lv_ll_t face_id_ll;
     lv_event_cb_t event_cb;
 

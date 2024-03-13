@@ -130,8 +130,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
     lv_font_glyph_dsc_t * dsc_out = &data->glyph_dsc;
 
     FT_Face face = dsc->cache_node->face;
-    FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
-    FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, data->unicode);
+    FT_UInt glyph_index = FT_Get_Char_Index(face, data->unicode);
 
     FT_Set_Pixel_Sizes(face, 0, dsc->size);
     error = FT_Load_Glyph(face, glyph_index,  FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_BITMAP);
