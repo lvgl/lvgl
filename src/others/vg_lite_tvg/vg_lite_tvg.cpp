@@ -732,13 +732,11 @@ extern "C" {
         }
 
         if(!path->stroke) {
-            path->stroke = (vg_lite_stroke_t *)malloc(sizeof(vg_lite_stroke_t));
+            path->stroke = (vg_lite_stroke_t *)lv_malloc_zeroed(sizeof(vg_lite_stroke_t));
 
             if(!path->stroke) {
                 return VG_LITE_OUT_OF_RESOURCES;
             }
-
-            memset(path->stroke, 0, sizeof(vg_lite_stroke_t));
         }
 
         path->stroke->cap_style = cap_style;
@@ -886,7 +884,7 @@ extern "C" {
         LV_ASSERT_NULL(path);
 
         if(path->stroke) {
-            free(path->stroke);
+            lv_free(path->stroke);
             path->stroke = NULL;
         }
 
