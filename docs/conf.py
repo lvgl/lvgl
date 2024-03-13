@@ -41,7 +41,8 @@ extensions = [
     'breathe',
     'sphinx_sitemap',
     'lv_example',
-    'sphinx_rtd_dark_mode'
+    'sphinx_rtd_dark_mode',
+    'link_roles'
 ]
 
 default_dark_mode = False
