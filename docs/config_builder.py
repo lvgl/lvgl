@@ -10,20 +10,34 @@ src_config = os.path.abspath(os.path.join(
 ))
 
 
-def run():
+def run(c_path=None):
+    global dst_config
+
+    if c_path is not None:
+        dst_config = c_path
+
     with open(src_config, 'r') as f:
         data = f.read()
 
     data = data.split('\n')
 
     for i, line in enumerate(data):
-        if 'LV_USE' in line or 'LV_FONT' in line:
+        if 'LV_USE_PROFILER' in line:
+            continue
+
+        if 'LV_USE' in line or 'LV_FONT' in line and '#define' in line:
             line = [item for item in line.split(' ') if item]
+
             for j, item in enumerate(line):
                 if item == '0':
                     line[j] = '1'
+
             line = ' '.join(line)
             data[i] = line
+        elif line.startswith('#if 0'):
+            line = line.replace('#if 0', '#if 1')
+            data[i] = line
+
     data = '\n'.join(data)
 
     with open(dst_config, 'w') as f:
