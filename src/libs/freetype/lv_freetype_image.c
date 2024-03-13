@@ -87,8 +87,7 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
     FT_Face face = dsc->cache_node->face;
-    FT_UInt charmap_index = FT_Get_Charmap_Index(face->charmap);
-    FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, unicode_letter);
+    FT_UInt glyph_index = FT_Get_Char_Index(face, unicode_letter);
 
     lv_cache_t * cache = dsc->cache_node->draw_data_cache;
 

@@ -76,13 +76,9 @@ typedef struct {
 
 /**
  * Initialize the freetype library.
- * @param max_faces Maximum number of opened FT_Face objects managed by this cache instance. Use 0 for defaults.
- * @param max_sizes Maximum number of opened FT_Size objects managed by this cache instance. Use 0 for defaults.
- * @param max_kilobytes Maximum number of kilobytes to use for cached data nodes. Use 0 for defaults.
- *                  Note that this value does not account for managed FT_Face and FT_Size objects.
  * @return LV_RESULT_OK on success, otherwise LV_RESULT_INVALID.
  */
-lv_result_t lv_freetype_init(uint32_t max_faces, uint32_t max_sizes, uint32_t max_kilobytes);
+lv_result_t lv_freetype_init(void);
 
 /**
  * Uninitialize the freetype library
