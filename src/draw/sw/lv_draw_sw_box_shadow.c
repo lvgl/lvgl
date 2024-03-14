@@ -645,7 +645,7 @@ static void LV_ATTRIBUTE_FAST_MEM shadow_draw_corner_buf(const lv_area_t * coord
     int32_t x;
     lv_opa_t * res_buf = (lv_opa_t *)sh_buf;
     for(x = 0; x < size * size; x++) {
-        res_buf[x] = sh_buf[x];
+        res_buf[x] = (lv_opa_t) sh_buf[x];
     }
 #endif
 

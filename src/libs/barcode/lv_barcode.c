@@ -115,7 +115,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
         return LV_RESULT_INVALID;
     }
 
-    int32_t barcode_w = code128_encode_gs1(data, out_buf, len);
+    int32_t barcode_w = (int32_t) code128_encode_gs1(data, out_buf, len);
     LV_LOG_INFO("barcode width = %d", (int)barcode_w);
 
     LV_ASSERT(barcode->scale > 0);
