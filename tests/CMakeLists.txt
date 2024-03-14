@@ -289,9 +289,19 @@ endif()
 
 # disable test targets for build only tests
 if (ENABLE_TESTS)
-    file( GLOB_RECURSE TEST_CASE_FILES src/test_cases/*.c )
+    file(GLOB_RECURSE TEST_CASE_FILES src/test_cases/*.c)
+    file(GLOB_RECURSE TEST_LIBS_FILES src/test_libs/*.c)
 else()
     set(TEST_CASE_FILES)
+    set(TEST_LIBS_FILES)
+endif()
+
+# build a test libs target
+if (TEST_LIBS_FILES)
+    add_library(test_libs STATIC ${TEST_LIBS_FILES})
+    target_include_directories(test_libs PUBLIC ${TEST_INCLUDE_DIRS} "src/test_libs")
+    target_compile_options(test_libs PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
+    list(APPEND TEST_LIBS test_libs)
 endif()
 
 foreach( test_case_fname ${TEST_CASE_FILES} )
