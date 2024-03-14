@@ -201,7 +201,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BI
 void lv_style_set_rotary_sensitivity(lv_style_t * style, uint32_t value);
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_ROTARY_SENSITIVITY;
 #if LV_USE_FLEX
-<<<<<<< HEAD
     void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value);
     LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_FLOW;
     void lv_style_set_flex_main_place(lv_style_t * style, lv_flex_align_t value);
@@ -235,43 +234,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_RO
     LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_Y_ALIGN;
     void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
     LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
-=======
-
-void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_FLOW;
-void lv_style_set_flex_main_place(lv_style_t * style, lv_flex_align_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_MAIN_PLACE;
-void lv_style_set_flex_cross_place(lv_style_t * style, lv_flex_align_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_CROSS_PLACE;
-void lv_style_set_flex_track_place(lv_style_t * style, lv_flex_align_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_TRACK_PLACE;
-void lv_style_set_flex_grow(lv_style_t * style, uint8_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_GROW;
-#endif /*LV_USE_FLEX*/
-
-#if LV_USE_GRID
-
-void lv_style_set_grid_column_dsc_array(lv_style_t * style, const int32_t * value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_COLUMN_DSC_ARRAY;
-void lv_style_set_grid_column_align(lv_style_t * style, lv_grid_align_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_COLUMN_ALIGN;
-void lv_style_set_grid_row_dsc_array(lv_style_t * style, const int32_t * value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_ROW_DSC_ARRAY;
-void lv_style_set_grid_row_align(lv_style_t * style, lv_grid_align_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_ROW_ALIGN;
-void lv_style_set_grid_cell_column_pos(lv_style_t * style, int32_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_COLUMN_POS;
-void lv_style_set_grid_cell_x_align(lv_style_t * style, lv_grid_align_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_X_ALIGN;
-void lv_style_set_grid_cell_column_span(lv_style_t * style, int32_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_COLUMN_SPAN;
-void lv_style_set_grid_cell_row_pos(lv_style_t * style, int32_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_POS;
-void lv_style_set_grid_cell_y_align(lv_style_t * style, lv_grid_align_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_Y_ALIGN;
-void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
->>>>>>> 6e905817b (add LV_STYLE_ROTARY_SENSITIVITY)
 #endif /*LV_USE_GRID*/
 
 
@@ -751,7 +713,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GR
     }
 #if LV_USE_FLEX
 
-
 #define LV_STYLE_CONST_FLEX_FLOW(val) \
     { \
         .prop_ptr = &_lv_style_const_prop_id_FLEX_FLOW, .value = { .num = (int32_t)val } \
@@ -779,7 +740,6 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GR
 #endif /*LV_USE_FLEX*/
 
 #if LV_USE_GRID
-
 
 #define LV_STYLE_CONST_GRID_COLUMN_DSC_ARRAY(val) \
     { \
