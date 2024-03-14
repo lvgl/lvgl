@@ -36,6 +36,11 @@ jobs:
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
+    - name: Fix kernel mmap rnd bits
+      # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
+      # high-entropy ASLR in much newer kernels that GitHub runners are
+      # using leading to random crashes: https://reviews.llvm.org/D148280
+      run: sudo sysctl vm.mmap_rnd_bits=28
     - name: Run tests
       run: python tests/main.py --report test
     - name: Upload coverage to Codecov
@@ -93,4 +98,12 @@ jobs:
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 
           run: |
+            if [[ "${{ matrix.distro }}" == "ubuntu22.04" ]]; then
+              # ASan in llvm 14 provided in ubuntu-22.04 is incompatible with
+              # high-entropy ASLR configured in much newer kernels that GitHub
+              # runners are using leading to random crashes:
+              #   https://github.com/actions/runner-images/issues/9491
+              # can remove this once the issue is fixed.
+              sysctl -w vm.mmap_rnd_bits=28
+            fi
             env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
