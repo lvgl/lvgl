@@ -775,7 +775,7 @@ static int f_gif_seek(gd_GIF * gif, size_t pos, int k)
 {
     if(gif->is_file) {
         lv_fs_seek(&gif->fd, pos, k);
-        uint32_t x;
+        size_t x;
         lv_fs_tell(&gif->fd, &x);
         return x;
     }

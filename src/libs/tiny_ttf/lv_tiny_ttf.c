@@ -156,7 +156,7 @@ void lv_tiny_ttf_deinit(void)
 static void ttf_cb_stream_read(ttf_cb_stream_t * stream, void * data, size_t to_read)
 {
     if(stream->file != NULL) {
-        uint32_t br;
+        size_t br;
         lv_fs_read(stream->file, data, to_read, &br);
     }
     else {

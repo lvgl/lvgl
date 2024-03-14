@@ -129,12 +129,12 @@ static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
     if(!f) return 0;
 
     if(buff) {
-        uint32_t rn = 0;
+        size_t rn = 0;
         lv_fs_read(f, buff, (uint32_t)ndata, &rn);
         return rn;
     }
     else {
-        uint32_t pos;
+        size_t pos;
         lv_fs_tell(f, &pos);
         lv_fs_seek(f, (uint32_t)(ndata + pos),  LV_FS_SEEK_SET);
         return ndata;
