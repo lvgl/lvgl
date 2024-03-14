@@ -269,7 +269,7 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
 
     /* get real src header */
     lv_image_header_t src_header;
-    uint32_t header_br = 0;
+    size_t header_br = 0;
     res = lv_fs_read(&file, &src_header, sizeof(src_header), &header_br);
     if(res != LV_FS_RES_OK || header_br != sizeof(src_header)) {
         LV_LOG_ERROR("read %s lv_image_header_t failed", path);
@@ -300,11 +300,11 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t palette_size_bytes = palette_size * sizeof(lv_color32_t);
 
     /* read palette */
-    uint32_t palette_br = 0;
+    size_t palette_br = 0;
     res = lv_fs_read(&file, dest, palette_size_bytes, &palette_br);
     if(res != LV_FS_RES_OK || palette_br != palette_size_bytes) {
         LV_LOG_ERROR("read %s (palette: %" LV_PRIu32 ", br: %" LV_PRIu32 ") failed",
-                     path, palette_size_bytes, palette_br);
+                     path, palette_size_bytes, (uint32_t)palette_br);
         goto failed;
     }
 
@@ -324,11 +324,11 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     dest += DEST_IMG_OFFSET;
 
     for(uint32_t y = 0; y < height; y++) {
-        uint32_t br = 0;
+        size_t br = 0;
         res = lv_fs_read(&file, src_temp, src_stride, &br);
         if(res != LV_FS_RES_OK || br != src_stride) {
             LV_LOG_ERROR("read %s (y: %" LV_PRIu32 ", src_stride: %" LV_PRIu32 ", br: %" LV_PRIu32 ") failed",
-                         path, y, src_stride, br);
+                         path, y, src_stride, (uint32_t)br);
             goto failed;
         }
 

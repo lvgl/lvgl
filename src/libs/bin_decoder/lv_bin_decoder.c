@@ -915,7 +915,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
         }
 
         if(compressed->compressed_size != compressed_len) {
-            LV_LOG_WARN("Compressed size mismatch: %" LV_PRIu32" != %" LV_PRIu32, compressed->compressed_size, compressed_len);
+            LV_LOG_WARN("Compressed size mismatch: %" LV_PRIu32" != %" LV_PRIu32, compressed->compressed_size, (uint32_t)compressed_len);
             return LV_RESULT_INVALID;
         }
 
@@ -947,7 +947,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
         lv_memcpy(compressed, image->data, len);
         compressed->data = image->data + len;
         if(compressed->compressed_size != compressed_len) {
-            LV_LOG_WARN("Compressed size mismatch: %" LV_PRIu32" != %" LV_PRIu32, compressed->compressed_size, compressed_len);
+            LV_LOG_WARN("Compressed size mismatch: %" LV_PRIu32" != %" LV_PRIu32, compressed->compressed_size, (uint32_t)compressed_len);
             return LV_RESULT_INVALID;
         }
     }
