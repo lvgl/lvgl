@@ -193,7 +193,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
             if(event->wheel.y > 0) dsc->diff--;
 #else
             indev_dev->diff = -event->wheel.y;
-#endif  /*LV_SDL_MOUSEWHEEL_MODE*/
+#endif  /*__EMSCRIPTEN__*/
 #endif /*LV_SDL_MOUSEWHEEL_MODE == 1*/
             break;
     }
