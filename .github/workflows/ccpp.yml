@@ -106,7 +106,7 @@ jobs:
               # runners are using leading to random crashes:
               #   https://github.com/actions/runner-images/issues/9491
               # can remove this once the issue is fixed.
-              sudo sysctl -w vm.mmap_rnd_bits=28
+              sysctl -w vm.mmap_rnd_bits=28
               apt-get install libjpeg-turbo8-dev -q -y
             else
               apt-get install libjpeg62-turbo-dev -q -y
