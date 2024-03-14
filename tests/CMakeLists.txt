@@ -297,9 +297,12 @@ else()
 endif()
 
 # build a test libs target
-add_library(test_libs STATIC ${TEST_LIBS_FILES})
-target_include_directories(test_libs PUBLIC ${TEST_INCLUDE_DIRS} "src/test_libs")
-target_compile_options(test_libs PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
+if (TEST_LIBS_FILES)
+    add_library(test_libs STATIC ${TEST_LIBS_FILES})
+    target_include_directories(test_libs PUBLIC ${TEST_INCLUDE_DIRS} "src/test_libs")
+    target_compile_options(test_libs PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
+    list(APPEND TEST_LIBS test_libs)
+endif()
 
 foreach( test_case_fname ${TEST_CASE_FILES} )
     # If test file is foo/bar/baz.c then test_name is "baz".
@@ -328,7 +331,6 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     )
     target_link_libraries(${test_name} PRIVATE
             test_common
-            test_libs
             lvgl_demos
             lvgl
             lvgl_thorvg
