@@ -113,12 +113,12 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
         }
 
         uint32_t jpg_signature = 0;
-        uint32_t rn;
+        size_t rn;
         lv_fs_read(&f, &jpg_signature, sizeof(jpg_signature), &rn);
         lv_fs_close(&f);
 
         if(rn != sizeof(jpg_signature)) {
-            LV_LOG_WARN("file: %s signature len = %" LV_PRIu32 " error", fn, rn);
+            LV_LOG_WARN("file: %s signature len = %" LV_PRIu32 " error", fn, (uint32_t)rn);
             return LV_RESULT_INVALID;
         }
 
@@ -211,8 +211,8 @@ static uint8_t * read_file(const char * filename, uint32_t * size)
 {
     uint8_t * data = NULL;
     lv_fs_file_t f;
-    uint32_t data_size;
-    uint32_t rn;
+    size_t data_size;
+    size_t rn;
     lv_fs_res_t res;
 
     *size = 0;
