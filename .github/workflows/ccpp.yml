@@ -101,6 +101,12 @@ jobs:
           install: |
             apt-get update -y
             if [[ "${{ matrix.distro }}" == "ubuntu22.04" ]]; then
+              # ASan in llvm 14 provided in ubuntu-22.04 is incompatible with
+              # high-entropy ASLR configured in much newer kernels that GitHub
+              # runners are using leading to random crashes:
+              #   https://github.com/actions/runner-images/issues/9491
+              # can remove this once the issue is fixed.
+              sudo sysctl -w vm.mmap_rnd_bits=28
               apt-get install libjpeg-turbo8-dev -q -y
             else
               apt-get install libjpeg62-turbo-dev -q -y
