@@ -241,7 +241,7 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, size_t b
     }
 
     if(res == LV_FS_RES_OK) {
-        file_p->cache->file_position += (uint32_t)*br;
+        file_p->cache->file_position += (uint32_t) * br;
     }
 
     return res;
