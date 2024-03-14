@@ -269,6 +269,8 @@ static vg_lite_error_t vg_lite_error_conv(Result result);
 static Matrix matrix_conv(const vg_lite_matrix_t * matrix);
 static FillRule fill_rule_conv(vg_lite_fill_t fill);
 static BlendMethod blend_method_conv(vg_lite_blend_t blend);
+static StrokeCap stroke_cap_conv(vg_lite_cap_style_t cap);
+static StrokeJoin stroke_join_conv(vg_lite_join_style_t join);
 static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t * path, vg_lite_matrix_t * matrix);
 static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_buffer_t * target,
                                 const vg_lite_rectangle_t * rect);
@@ -711,6 +713,65 @@ extern "C" {
         return VG_LITE_SUCCESS;
     }
 
+    vg_lite_error_t vg_lite_set_stroke(vg_lite_path_t * path,
+                                       vg_lite_cap_style_t cap_style,
+                                       vg_lite_join_style_t join_style,
+                                       vg_lite_float_t line_width,
+                                       vg_lite_float_t miter_limit,
+                                       vg_lite_float_t * dash_pattern,
+                                       vg_lite_uint32_t pattern_count,
+                                       vg_lite_float_t dash_phase,
+                                       vg_lite_color_t color)
+    {
+        if(!path || line_width <= 0) {
+            return VG_LITE_INVALID_ARGUMENT;
+        }
+
+        if(miter_limit < 1.0f) {
+            miter_limit = 1.0f;
+        }
+
+        if(!path->stroke) {
+            path->stroke = (vg_lite_stroke_t *)lv_malloc_zeroed(sizeof(vg_lite_stroke_t));
+
+            if(!path->stroke) {
+                return VG_LITE_OUT_OF_RESOURCES;
+            }
+        }
+
+        path->stroke->cap_style = cap_style;
+        path->stroke->join_style = join_style;
+        path->stroke->line_width = line_width;
+        path->stroke->miter_limit = miter_limit;
+        path->stroke->half_width = line_width / 2.0f;
+        path->stroke->miter_square = path->stroke->miter_limit * path->stroke->miter_limit;
+        path->stroke->dash_pattern = dash_pattern;
+        path->stroke->pattern_count = pattern_count;
+        path->stroke->dash_phase = dash_phase;
+        path->stroke_color = color;
+        return VG_LITE_SUCCESS;
+    }
+
+    vg_lite_error_t vg_lite_update_stroke(vg_lite_path_t * path)
+    {
+        LV_UNUSED(path);
+        return VG_LITE_SUCCESS;
+    }
+
+    vg_lite_error_t vg_lite_set_path_type(vg_lite_path_t * path, vg_lite_path_type_t path_type)
+    {
+        if(!path ||
+           (path_type != VG_LITE_DRAW_FILL_PATH &&
+            path_type != VG_LITE_DRAW_STROKE_PATH &&
+            path_type != VG_LITE_DRAW_FILL_STROKE_PATH)
+          )
+            return VG_LITE_INVALID_ARGUMENT;
+
+        path->path_type = path_type;
+
+        return VG_LITE_SUCCESS;
+    }
+
     vg_lite_error_t vg_lite_get_register(vg_lite_uint32_t address, vg_lite_uint32_t * result)
     {
         LV_UNUSED(address);
@@ -820,7 +881,13 @@ extern "C" {
 
     vg_lite_error_t vg_lite_clear_path(vg_lite_path_t * path)
     {
-        LV_UNUSED(path);
+        LV_ASSERT_NULL(path);
+
+        if(path->stroke) {
+            lv_free(path->stroke);
+            path->stroke = NULL;
+        }
+
         return VG_LITE_NOT_SUPPORT;
     }
 
@@ -1880,6 +1947,38 @@ static BlendMethod blend_method_conv(vg_lite_blend_t blend)
     return BlendMethod::Normal;
 }
 
+static StrokeCap stroke_cap_conv(vg_lite_cap_style_t cap)
+{
+    switch(cap) {
+        case VG_LITE_CAP_SQUARE:
+            return StrokeCap::Square;
+        case VG_LITE_CAP_ROUND:
+            return StrokeCap::Round;
+        case VG_LITE_CAP_BUTT:
+            return StrokeCap::Butt;
+        default:
+            break;
+    }
+
+    return StrokeCap::Square;
+}
+
+static StrokeJoin stroke_join_conv(vg_lite_join_style_t join)
+{
+    switch(join) {
+        case VG_LITE_JOIN_BEVEL:
+            return StrokeJoin::Bevel;
+        case VG_LITE_JOIN_ROUND:
+            return StrokeJoin::Round;
+        case VG_LITE_JOIN_MITER:
+            return StrokeJoin::Miter;
+        default:
+            break;
+    }
+
+    return StrokeJoin::Bevel;
+}
+
 static float vlc_get_arg(const void * data, vg_lite_format_t format)
 {
     switch(format) {
@@ -1951,6 +2050,29 @@ static uint8_t vlc_op_arg_len(uint8_t vlc_op)
     }
 
     return 0;
+}
+
+static Result shape_set_stroke(std::unique_ptr<Shape> & shape, const vg_lite_path_t * path)
+{
+    /* if path is not a stroke, return */
+    if(path->path_type == VG_LITE_DRAW_ZERO
+       || path->path_type == VG_LITE_DRAW_FILL_PATH) {
+        return Result::Success;
+    }
+
+    LV_ASSERT_NULL(path->stroke);
+    TVG_CHECK_RETURN_RESULT(shape->stroke(path->stroke->line_width));
+    TVG_CHECK_RETURN_RESULT(shape->strokeMiterlimit(path->stroke->miter_limit));
+    TVG_CHECK_RETURN_RESULT(shape->stroke(stroke_cap_conv(path->stroke->cap_style)));
+    TVG_CHECK_RETURN_RESULT(shape->stroke(stroke_join_conv(path->stroke->join_style)));
+    TVG_CHECK_RETURN_RESULT(shape->stroke(TVG_COLOR(path->stroke_color)));
+
+    if(path->stroke->pattern_count) {
+        LV_ASSERT_NULL(path->stroke->dash_pattern);
+        TVG_CHECK_RETURN_RESULT(shape->stroke(path->stroke->dash_pattern, path->stroke->pattern_count));
+    }
+
+    return Result::Success;
 }
 
 static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t * path, vg_lite_matrix_t * matrix)
@@ -2035,6 +2157,8 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
        && math_equal(x_max, __FLT_MAX__) && math_equal(y_max, __FLT_MAX__)) {
         return Result::Success;
     }
+
+    TVG_CHECK_RETURN_RESULT(shape_set_stroke(shape, path));
 
     auto cilp = Shape::gen();
     TVG_CHECK_RETURN_RESULT(cilp->appendRect(x_min, y_min, x_max - x_min, y_max - y_min, 0, 0));

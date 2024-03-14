@@ -194,7 +194,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
 #ifndef LV_USE_THORVG
-    #define LV_USE_THORVG  (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)
+    #define LV_USE_THORVG  (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
 #endif
 
 /*If running without lv_conf.h add typedefs with default value*/
