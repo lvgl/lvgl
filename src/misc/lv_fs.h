@@ -87,10 +87,10 @@ struct _lv_fs_drv_t {
 
     void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
     lv_fs_res_t (*close_cb)(lv_fs_drv_t * drv, void * file_p);
-    lv_fs_res_t (*read_cb)(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
-    lv_fs_res_t (*write_cb)(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
-    lv_fs_res_t (*seek_cb)(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
-    lv_fs_res_t (*tell_cb)(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
+    lv_fs_res_t (*read_cb)(lv_fs_drv_t * drv, void * file_p, void * buf, size_t btr, size_t * br);
+    lv_fs_res_t (*write_cb)(lv_fs_drv_t * drv, void * file_p, const void * buf, size_t btw, size_t * bw);
+    lv_fs_res_t (*seek_cb)(lv_fs_drv_t * drv, void * file_p, size_t pos, lv_fs_whence_t whence);
+    lv_fs_res_t (*tell_cb)(lv_fs_drv_t * drv, void * file_p, size_t * pos_p);
 
     void * (*dir_open_cb)(lv_fs_drv_t * drv, const char * path);
     lv_fs_res_t (*dir_read_cb)(lv_fs_drv_t * drv, void * rddir_p, char * fn, uint32_t fn_len);
@@ -202,7 +202,7 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p);
  * @param br        the number of real read bytes (Bytes Read). NULL if unused.
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t * br);
+lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, size_t btr, size_t * br);
 
 /**
  * Write into a file
@@ -212,7 +212,7 @@ lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t
  * @param bw        the number of real written bytes (Bytes Written). NULL if unused.
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, uint32_t * bw);
+lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, size_t btw, size_t * bw);
 
 /**
  * Set the position of the 'cursor' (read write pointer) in a file
@@ -221,7 +221,7 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
  * @param whence    tells from where set the position. See @lv_fs_whence_t
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whence);
+lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, size_t pos, lv_fs_whence_t whence);
 
 /**
  * Give the position of the read write pointer
@@ -229,7 +229,7 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
  * @param pos       pointer to store the position of the read write pointer
  * @return          LV_FS_RES_OK or any error from 'fs_res_t'
  */
-lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos);
+lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, size_t * pos);
 
 /**
  * Initialize a 'fs_dir_t' variable for directory reading

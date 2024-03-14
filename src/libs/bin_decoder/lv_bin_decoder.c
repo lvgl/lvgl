@@ -67,7 +67,7 @@ static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_
                                        int32_t w_px, const uint8_t * in, lv_color32_t * out);
 static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
-static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, uint32_t btr, uint32_t * br);
+static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, size_t pos, void * buff, size_t btr, size_t * br);
 
 static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image_compressed_t * compressed);
 
@@ -120,7 +120,7 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
         if(res == LV_FS_RES_OK) {
-            uint32_t rn;
+            size_t rn;
             res = lv_fs_read(&f, header, sizeof(lv_image_header_t), &rn);
             lv_fs_close(&f);
             if(res != LV_FS_RES_OK || rn != sizeof(lv_image_header_t)) {
@@ -551,11 +551,11 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 {
     LV_UNUSED(decoder); /*Unused*/
     lv_result_t res;
-    uint32_t rn;
+    size_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
     lv_fs_file_t * f = decoder_data->f;
     lv_color_format_t cf = dsc->header.cf;
-    uint32_t palette_len = sizeof(lv_color32_t) * LV_COLOR_INDEXED_PALETTE_SIZE(cf);
+    size_t palette_len = sizeof(lv_color32_t) * LV_COLOR_INDEXED_PALETTE_SIZE(cf);
     const lv_color32_t * palette;
     const uint8_t * indexed_data = NULL;
     lv_draw_buf_t * draw_buf_indexed = NULL;
@@ -816,7 +816,7 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
 {
     LV_UNUSED(decoder);
     lv_result_t res;
-    uint32_t rn;
+    size_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
     uint8_t bpp = lv_color_format_get_bpp(dsc->header.cf);
     uint32_t w = (dsc->header.stride * 8) / bpp;
@@ -884,9 +884,9 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
 
 static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-    uint32_t rn;
-    uint32_t len;
-    uint32_t compressed_len;
+    size_t rn;
+    size_t len;
+    size_t compressed_len;
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     lv_result_t res;
     uint8_t * file_buf = NULL;
@@ -1039,7 +1039,7 @@ static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_
     return LV_RESULT_OK;
 }
 
-static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, void * buff, uint32_t btr, uint32_t * br)
+static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, size_t pos, void * buff, size_t btr, size_t * br)
 {
     lv_fs_res_t res;
     if(br) *br = 0;
