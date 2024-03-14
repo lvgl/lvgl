@@ -8,7 +8,6 @@
  *********************/
 #include "lv_rnd_unicodes.h"
 
-#if LV_USE_RND_UNICODES
 
 #include "rnd_unicodes/src/library.h"
 
@@ -64,5 +63,3 @@ int lv_random_utf8_chars(uint8_t * buf, int buf_len, const uint32_t * ranges, ui
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-#endif /*LV_USE_RND_UNICODES*/

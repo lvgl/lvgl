@@ -1,9 +1,10 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "rnd_unicodes/lv_rnd_unicodes.h"
 
 #include "unity/unity.h"
 
-#if LV_USE_FREETYPE && LV_USE_RND_UNICODES
+#if LV_USE_FREETYPE
 
 #if __WORDSIZE == 64
 #define TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT(INDEX) \

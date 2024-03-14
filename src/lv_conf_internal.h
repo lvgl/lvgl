@@ -2421,15 +2421,6 @@
     #endif
 #endif
 
-/*Use lvgl unicode random generator*/
-#ifndef LV_USE_RND_UNICODES
-    #ifdef CONFIG_LV_USE_RND_UNICODES
-        #define LV_USE_RND_UNICODES CONFIG_LV_USE_RND_UNICODES
-    #else
-        #define LV_USE_RND_UNICODES 0
-    #endif
-#endif
-
 /*==================
  * OTHERS
  *==================*/

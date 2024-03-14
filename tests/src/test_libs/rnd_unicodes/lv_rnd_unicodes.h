@@ -13,9 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
-
-#if LV_USE_RND_UNICODES
+#include "../lvgl.h"
 
 /*********************
  *      DEFINES
@@ -50,8 +48,6 @@ int lv_random_utf8_chars(uint8_t * buf, int buf_len, const uint32_t * ranges, ui
 /**********************
  *      MACROS
  **********************/
-
-#endif /*LV_USE_RND_UNICODES*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
