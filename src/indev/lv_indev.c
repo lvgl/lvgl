@@ -43,7 +43,7 @@
 /*Gesture min velocity at release before swipe (pixels)*/
 #define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
 
-/**< Rotary diff count will be multipled by this and divided by 256 */
+/**< Rotary diff count will be multiplied by this and divided by 256 */
 #define LV_INDEV_DEF_ROTARY_SENSITIVITY         256
 
 #if LV_INDEV_DEF_SCROLL_THROW <= 0
@@ -1587,7 +1587,8 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
        code == LV_EVENT_CLICKED ||
        code == LV_EVENT_RELEASED ||
        code == LV_EVENT_LONG_PRESSED ||
-       code == LV_EVENT_LONG_PRESSED_REPEAT) {
+       code == LV_EVENT_LONG_PRESSED_REPEAT ||
+       code == LV_EVENT_ROTARY) {
         lv_indev_send_event(indev_act, code, indev_obj_act);
         if(indev_reset_check(indev_act)) return LV_RESULT_INVALID;
     }
