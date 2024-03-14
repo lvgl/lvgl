@@ -16,6 +16,7 @@
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_grad.h"
+#include "lv_vg_lite_math.h"
 
 /*********************
  *      DEFINES
@@ -32,9 +33,12 @@
 static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
 static void lv_matrix_to_vg(vg_lite_matrix_t * desy, const lv_matrix_t * src);
 static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src);
+static void lv_stroke_to_vg(lv_vg_lite_path_t * dest, const lv_vector_stroke_dsc_t * dsc);
 static vg_lite_blend_t lv_blend_to_vg(lv_vector_blend_t blend);
 static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule);
 static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread);
+static vg_lite_cap_style_t lv_stroke_cap_to_vg(lv_vector_stroke_cap_t cap);
+static vg_lite_join_style_t lv_stroke_join_to_vg(lv_vector_stroke_join_t join);
 
 /**********************
  *  STATIC VARIABLES
@@ -113,6 +117,9 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     /* convert blend mode and fill rule */
     vg_lite_blend_t blend = lv_blend_to_vg(dsc->blend_mode);
     vg_lite_fill_t fill = lv_fill_to_vg(dsc->fill_dsc.fill_rule);
+
+    /* convert stroke style */
+    lv_stroke_to_vg(lv_vg_path, &dsc->stroke_dsc);
 
     /* get path bounds */
     float min_x, min_y, max_x, max_y;
@@ -336,6 +343,36 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
     LV_PROFILER_END;
 }
 
+static void lv_stroke_to_vg(lv_vg_lite_path_t * dest, const lv_vector_stroke_dsc_t * dsc)
+{
+    LV_ASSERT_NULL(dest);
+    LV_ASSERT_NULL(dsc);
+
+    /* if width is 0, no need to set stroke */
+    if(math_zero(dsc->width)) {
+        return;
+    }
+
+    vg_lite_path_t * path = lv_vg_lite_path_get_path(dest);
+
+    LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(path, VG_LITE_DRAW_STROKE_PATH));
+
+    LV_VG_LITE_CHECK_ERROR(
+        vg_lite_set_stroke(
+            path,
+            lv_stroke_cap_to_vg(dsc->cap),
+            lv_stroke_join_to_vg(dsc->join),
+            dsc->width,
+            dsc->miter_limit,
+            lv_array_front(&dsc->dash_pattern),
+            dsc->dash_pattern.size,
+            dsc->width / 2,
+            lv_color32_to_vg(dsc->color, dsc->opa))
+    );
+
+    LV_VG_LITE_CHECK_ERROR(vg_lite_update_stroke(path));
+}
+
 static vg_lite_blend_t lv_blend_to_vg(lv_vector_blend_t blend)
 {
     switch(blend) {
@@ -385,6 +422,34 @@ static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t
             return VG_LITE_GRADIENT_SPREAD_REFLECT;
         default:
             return VG_LITE_GRADIENT_SPREAD_FILL;
+    }
+}
+
+static vg_lite_cap_style_t lv_stroke_cap_to_vg(lv_vector_stroke_cap_t cap)
+{
+    switch(cap) {
+        case LV_VECTOR_STROKE_CAP_SQUARE:
+            return VG_LITE_CAP_SQUARE;
+        case LV_VECTOR_STROKE_CAP_ROUND:
+            return VG_LITE_CAP_ROUND;
+        case LV_VECTOR_STROKE_CAP_BUTT:
+            return VG_LITE_CAP_BUTT;
+        default:
+            return VG_LITE_CAP_SQUARE;
+    }
+}
+
+static vg_lite_join_style_t lv_stroke_join_to_vg(lv_vector_stroke_join_t join)
+{
+    switch(join) {
+        case LV_VECTOR_STROKE_JOIN_BEVEL:
+            return VG_LITE_JOIN_BEVEL;
+        case LV_VECTOR_STROKE_JOIN_ROUND:
+            return VG_LITE_JOIN_ROUND;
+        case LV_VECTOR_STROKE_JOIN_MITER:
+            return VG_LITE_JOIN_MITER;
+        default:
+            return VG_LITE_JOIN_BEVEL;
     }
 }
 

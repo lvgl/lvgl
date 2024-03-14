@@ -103,6 +103,10 @@ void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path)
     if(path->base.path != NULL) {
         lv_free(path->base.path);
         path->base.path = NULL;
+
+        if(path->base.stroke) {
+            LV_LOG_ERROR("can't free stroke path");
+        }
     }
     lv_free(path);
     LV_PROFILER_END;
@@ -133,6 +137,7 @@ void lv_vg_lite_path_reset(lv_vg_lite_path_t * path, vg_lite_format_t data_forma
     path->base.path_length = 0;
     path->base.format = data_format;
     path->base.quality = VG_LITE_MEDIUM;
+    path->base.path_type = VG_LITE_DRAW_ZERO;
     path->format_len = lv_vg_lite_path_format_len(data_format);
 }
 
