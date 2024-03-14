@@ -3,6 +3,8 @@
 
 #include "unity/unity.h"
 
+#if LV_USE_FREETYPE
+
 #if __WORDSIZE == 64
     #define TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT(NAME) TEST_ASSERT_EQUAL_SCREENSHOT("libs/freetype_" NAME ".lp64.png")
 #elif __WORDSIZE == 32
@@ -400,7 +402,6 @@ void tearDown(void)
 
 void test_freetype_bitmap_rendering_test(void)
 {
-#if LV_USE_FREETYPE
     /*Create a font*/
     lv_font_t * font_italic = lv_freetype_font_create("./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
                                                       LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
@@ -455,15 +456,10 @@ void test_freetype_bitmap_rendering_test(void)
     lv_obj_align_to(label2, label1, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
     TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT("1");
-
-#else
-    TEST_PASS();
-#endif
 }
 
 void test_freetype_outline_rendering_test(void)
 {
-#if LV_USE_FREETYPE
     /*Create a font*/
     lv_font_t * font_italic = lv_freetype_font_create("./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
                                                       LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
@@ -512,9 +508,6 @@ void test_freetype_outline_rendering_test(void)
     font_italic->release_glyph(font_italic, &g);
 
     lv_freetype_font_delete(font_italic);
-#else
-    TEST_PASS();
-#endif
 }
 
 static void freetype_outline_event_cb(lv_event_t * e)
@@ -574,5 +567,25 @@ static void vegravis_generate_vector_ops_string(lv_freetype_outline_event_param_
     }
 }
 #endif
+
+#else
+
+void setUp(void)
+{
+}
+
+void tearDown(void)
+{
+}
+
+void test_freetype_bitmap_rendering_test(void)
+{
+}
+
+void test_freetype_outline_rendering_test(void)
+{
+}
+
+#endif /*LV_USE_FREETYPE*/
 
 #endif
