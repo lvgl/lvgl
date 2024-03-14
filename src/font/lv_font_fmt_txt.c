@@ -243,7 +243,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 
             if(p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
-                glyph_id = fdsc->cmaps[i].glyph_id_start + ofs;
+                glyph_id = fdsc->cmaps[i].glyph_id_start + (uint32_t) ofs;
             }
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
