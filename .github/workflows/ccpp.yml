@@ -117,7 +117,7 @@ jobs:
               # runners are using leading to random crashes:
               #   https://github.com/actions/runner-images/issues/9491
               # can remove this once the issue is fixed.
-              sysctl -w vm.mmap_rnd_bits=28
+              sysctl -w vm.mmap_rnd_bits=18
             fi
             env PATH="/usr/lib/ccache:$PATH" NON_AMD64_BUILD=1 ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
       - name: Archive screenshot errors
