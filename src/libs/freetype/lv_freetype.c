@@ -216,12 +216,6 @@ int32_t lv_freetype_italic_transform_on_pos(lv_point_t point)
     return point.x + FT_F16DOT16_TO_INT(point.y * LV_FREETYPE_OBLIQUE_SLANT_DEF);
 }
 
-const char * lv_freetype_get_pathname(FTC_FaceID face_id)
-{
-    LV_ASSERT_NULL(face_id);
-    return (const char *)face_id;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
