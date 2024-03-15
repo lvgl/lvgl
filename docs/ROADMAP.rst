@@ -46,7 +46,7 @@ Architecture
   (see `here <https://github.com/lvgl/lvgl/issues/3379#issuecomment-1140886258>`__)
 - |check| Reconsider masks. There should be a generic high level mask API which is independent of the drawing engine.
   `#4059 <https://github.com/lvgl/lvgl/issues/4059>`__
-- |check| `get_glyph_bitmap` should return an a8 bitmap that can be blended immediately.
+- |check| `glyph_acquire_draw_data` should return an a8 bitmap that can be blended immediately.
   (see `here <https://github.com/lvgl/lvgl/pull/3390#pullrequestreview-990710921>`__)
 - |check| Make LVGL render independent areas in parallel.
   `#4016 <https://github.com/lvgl/lvgl/issues/4016>`__

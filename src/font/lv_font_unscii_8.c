@@ -460,8 +460,8 @@ const lv_font_t lv_font_unscii_8 = {
 #else
 lv_font_t lv_font_unscii_8 = {
 #endif
-    .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
-    .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
+    .glyph_get_info = lv_font_glyph_get_info_fmt_txt,    /*Function pointer to get glyph's data*/
+    .glyph_acquire_draw_data = lv_font_glyph_acquire_draw_data_fmt_txt,    /*Function pointer to get glyph's bitmap*/
     .line_height = 9,          /*The maximum line height required by the font*/
     .base_line = 0,             /*Baseline measured from the bottom of the line*/
 #if !(LVGL_VERSION_MAJOR == 6 && LVGL_VERSION_MINOR == 0)
@@ -471,7 +471,7 @@ lv_font_t lv_font_unscii_8 = {
     .underline_position = 0,
     .underline_thickness = 0,
 #endif
-    .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
+    .dsc = &font_dsc           /*The custom font data. Will be accessed by `glyph_get_info/glyph_acquire_draw_data` */
 };
 
 #endif /*#if LV_FONT_UNSCII_8*/

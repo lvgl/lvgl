@@ -28,11 +28,13 @@ typedef struct _lv_freetype_outline_node_t {
  *  STATIC PROTOTYPES
  **********************/
 
+static const void * freetype_outline_glyph_acquire_draw_data_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+static void freetype_outline_glyph_release_draw_data_cb(lv_font_glyph_dsc_t * g_dsc);
+
 static lv_freetype_outline_t outline_create(lv_freetype_context_t * ctx, FT_Face face, FT_UInt glyph_index,
                                             uint32_t size, uint32_t strength);
+
 static lv_result_t outline_delete(lv_freetype_context_t * ctx, lv_freetype_outline_t outline);
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
-static void freetype_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 
 static lv_cache_entry_t * lv_freetype_outline_lookup(lv_freetype_font_dsc_t * dsc, FT_UInt glyph_index);
 
@@ -72,8 +74,8 @@ lv_cache_t * lv_freetype_create_draw_data_outline(uint32_t cache_size)
 void lv_freetype_set_cbs_outline_font(lv_freetype_font_dsc_t * dsc)
 {
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-    dsc->font.get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
-    dsc->font.release_glyph = freetype_release_glyph_cb;
+    dsc->font.glyph_acquire_draw_data = freetype_outline_glyph_acquire_draw_data_cb;
+    dsc->font.glyph_release_draw_data = freetype_outline_glyph_release_draw_data_cb;
 }
 
 void lv_freetype_outline_add_event(lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
@@ -150,7 +152,7 @@ static lv_cache_compare_res_t freetype_glyph_outline_cmp_cb(const lv_freetype_ou
     return node_a->glyph_index > node_b->glyph_index ? 1 : -1;
 }
 
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+static const void * freetype_outline_glyph_acquire_draw_data_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(draw_buf);
 
@@ -168,10 +170,9 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv
     return node ? node->outline : NULL;
 }
 
-static void freetype_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
+static void freetype_outline_glyph_release_draw_data_cb(lv_font_glyph_dsc_t * g_dsc)
 {
-    LV_ASSERT_NULL(font);
-    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
+    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)g_dsc->resolved_font->dsc;
 
     if(g_dsc->entry == NULL) {
         return;

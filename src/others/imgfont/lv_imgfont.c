@@ -26,9 +26,9 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
-static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out,
-                                  uint32_t unicode, uint32_t unicode_next);
+static const void * imgfont_glyph_get_draw_data(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+static bool imgfont_glyph_get_info(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out,
+                                   uint32_t unicode, uint32_t unicode_next);
 
 /**********************
  *  STATIC VARIABLES
@@ -56,8 +56,8 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb,
 
     lv_font_t * font = &dsc->font;
     font->dsc = dsc;
-    font->get_glyph_dsc = imgfont_get_glyph_dsc;
-    font->get_glyph_bitmap = imgfont_get_glyph_bitmap;
+    font->glyph_get_info = imgfont_glyph_get_info;
+    font->glyph_acquire_draw_data = imgfont_glyph_get_draw_data;
     font->subpx = LV_FONT_SUBPX_NONE;
     font->line_height = height;
     font->base_line = 0;
@@ -79,7 +79,7 @@ void lv_imgfont_destroy(lv_font_t * font)
  *   STATIC FUNCTIONS
  **********************/
 
-static const void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+static const void * imgfont_glyph_get_draw_data(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(draw_buf);
 
@@ -87,8 +87,8 @@ static const void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_dra
     return img_src;
 }
 
-static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out,
-                                  uint32_t unicode, uint32_t unicode_next)
+static bool imgfont_glyph_get_info(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out,
+                                   uint32_t unicode, uint32_t unicode_next)
 {
     LV_ASSERT_NULL(font);
 

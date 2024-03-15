@@ -29,14 +29,15 @@ typedef struct _lv_freetype_image_cache_data_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void * user_data);
 static void freetype_image_free_cb(lv_freetype_image_cache_data_t * node, void * user_data);
 static lv_cache_compare_res_t freetype_image_compare_cb(const lv_freetype_image_cache_data_t * lhs,
                                                         const lv_freetype_image_cache_data_t * rhs);
 
-static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
+static const void * freetype_image_glyph_acquire_draw_data_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+static void freetype_image_glyph_release_draw_data_cb(lv_font_glyph_dsc_t * g_dsc);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -66,15 +67,15 @@ lv_cache_t * lv_freetype_create_draw_data_image(uint32_t cache_size)
 void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc)
 {
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-    dsc->font.get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
-    dsc->font.release_glyph = freetype_image_release_cb;
+    dsc->font.glyph_acquire_draw_data = freetype_image_glyph_acquire_draw_data_cb;
+    dsc->font.glyph_release_draw_data = freetype_image_glyph_release_draw_data_cb;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+static const void * freetype_image_glyph_acquire_draw_data_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(draw_buf);
     const lv_font_t * font = g_dsc->resolved_font;
@@ -98,10 +99,9 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv
     return cache_node->draw_buf;
 }
 
-static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
+static void freetype_image_glyph_release_draw_data_cb(lv_font_glyph_dsc_t * g_dsc)
 {
-    LV_ASSERT_NULL(font);
-    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
+    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)g_dsc->resolved_font->dsc;
     lv_cache_release(dsc->cache_node->draw_data_cache, g_dsc->entry, NULL);
     g_dsc->entry = NULL;
 }

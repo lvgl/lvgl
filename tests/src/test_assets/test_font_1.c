@@ -1361,14 +1361,14 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
 
 /*Initialize a public general font descriptor*/
 lv_font_t test_font_1 = {
-    .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
-    .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
+    .glyph_get_info = lv_font_glyph_get_info_fmt_txt,    /*Function pointer to get glyph's data*/
+    .glyph_acquire_draw_data = lv_font_glyph_acquire_draw_data_fmt_txt,    /*Function pointer to get glyph's bitmap*/
     .line_height = 10,          /*The maximum line height required by the font*/
     .base_line = 2,             /*Baseline measured from the bottom of the line*/
 #if !(LVGL_VERSION_MAJOR == 6 && LVGL_VERSION_MINOR == 0)
     .subpx = LV_FONT_SUBPX_NONE,
 #endif
-    .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
+    .dsc = &font_dsc           /*The custom font data. Will be accessed by `glyph_get_info/glyph_acquire_draw_data` */
 };
 
 #endif /*#if FONT_1*/

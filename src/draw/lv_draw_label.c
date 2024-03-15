@@ -112,7 +112,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
     LV_PROFILER_BEGIN;
 
     lv_font_glyph_dsc_t g;
-    lv_font_get_glyph_dsc(dsc->font, &g, unicode_letter, 0);
+    lv_font_glyph_get_glyph_info(dsc->font, &g, unicode_letter, 0);
 
     lv_area_t a;
     a.x1 = point->x;
@@ -379,7 +379,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
         return;
 
     LV_PROFILER_BEGIN;
-    bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, '\0');
+    bool g_ret = lv_font_glyph_get_glyph_info(font, &g, letter, '\0');
     if(g_ret == false) {
         /*Add warning if the dsc is not found*/
         LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
@@ -421,7 +421,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
             }
         }
 
-        dsc->glyph_data = (void *) lv_font_get_glyph_bitmap(&g, draw_buf);
+        dsc->glyph_data = (void *) lv_font_glyph_acquire_draw_data(&g, draw_buf);
         dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
     }
     else {
@@ -432,8 +432,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     dsc->g = &g;
     cb(draw_unit, dsc, NULL, NULL);
 
-    if(g.resolved_font && font->release_glyph) {
-        font->release_glyph(font, &g);
-    }
+    lv_font_glyph_release_draw_data(&g);
+
     LV_PROFILER_END;
 }

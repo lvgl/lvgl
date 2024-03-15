@@ -75,7 +75,7 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
  *   GLOBAL FUNCTIONS
  **********************/
 
-const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+const void * lv_font_glyph_acquire_draw_data_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     const lv_font_t * font = g_dsc->resolved_font;
     uint8_t * bitmap_out = draw_buf->data;
@@ -165,8 +165,8 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     return NULL;
 }
 
-bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
-                                   uint32_t unicode_letter_next)
+bool lv_font_glyph_get_info_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
+                                    uint32_t unicode_letter_next)
 {
     /*It fixes a strange compiler optimization issue: https://github.com/lvgl/lvgl/issues/4370*/
     bool is_tab = unicode_letter == '\t';

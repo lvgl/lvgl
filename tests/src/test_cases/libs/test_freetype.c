@@ -476,10 +476,10 @@ void test_freetype_outline_rendering_test(void)
 
     lv_font_glyph_dsc_t g;
 
-    lv_font_get_glyph_dsc(font_italic, &g, 0x9F98, '\0');
+    lv_font_glyph_get_glyph_info(font_italic, &g, 0x9F98, '\0');
 
     const lv_ll_t * outline_data;
-    outline_data = (lv_ll_t *) lv_font_get_glyph_bitmap(&g, NULL);
+    outline_data = (lv_ll_t *) lv_font_glyph_acquire_draw_data(&g, NULL);
 
     uint32_t i = 0;
     lv_freetype_outline_event_param_t * param;
@@ -505,7 +505,7 @@ void test_freetype_outline_rendering_test(void)
         i++;
     }
 
-    font_italic->release_glyph(font_italic, &g);
+    lv_font_glyph_release_draw_data(&g);
 
     lv_freetype_font_delete(font_italic);
 }

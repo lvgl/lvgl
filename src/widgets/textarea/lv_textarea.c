@@ -640,7 +640,7 @@ const char * lv_textarea_get_password_bullet(lv_obj_t * obj)
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
 
     /*If the textarea's font has the bullet character use it else fallback to "*"*/
-    if(lv_font_get_glyph_dsc(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0))
+    if(lv_font_glyph_get_glyph_info(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0))
         return LV_SYMBOL_BULLET;
     return "*";
 }
