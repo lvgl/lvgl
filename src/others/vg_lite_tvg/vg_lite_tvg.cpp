@@ -888,7 +888,7 @@ extern "C" {
             path->stroke = NULL;
         }
 
-        return VG_LITE_NOT_SUPPORT;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_uint32_t vg_lite_get_path_length(vg_lite_uint8_t * opcode,
