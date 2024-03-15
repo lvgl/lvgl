@@ -2285,15 +2285,6 @@
     #endif
 #endif
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters in kilobytes*/
-    #ifndef LV_FREETYPE_CACHE_SIZE
-        #ifdef CONFIG_LV_FREETYPE_CACHE_SIZE
-            #define LV_FREETYPE_CACHE_SIZE CONFIG_LV_FREETYPE_CACHE_SIZE
-        #else
-            #define LV_FREETYPE_CACHE_SIZE 768
-        #endif
-    #endif
-
     /*Let FreeType to use LVGL memory and file porting*/
     #ifndef LV_FREETYPE_USE_LVGL_PORT
         #ifdef CONFIG_LV_FREETYPE_USE_LVGL_PORT
@@ -2303,22 +2294,8 @@
         #endif
     #endif
 
-    /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
-    /* (0:use system defaults) */
-    #ifndef LV_FREETYPE_CACHE_FT_FACES
-        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_FACES
-            #define LV_FREETYPE_CACHE_FT_FACES CONFIG_LV_FREETYPE_CACHE_FT_FACES
-        #else
-            #define LV_FREETYPE_CACHE_FT_FACES 8
-        #endif
-    #endif
-    #ifndef LV_FREETYPE_CACHE_FT_SIZES
-        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-            #define LV_FREETYPE_CACHE_FT_SIZES CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-        #else
-            #define LV_FREETYPE_CACHE_FT_SIZES 8
-        #endif
-    #endif
+    /*Cache count of the glyphs in FreeType. It means the number of glyphs that can be cached.
+     *The higher the value, the more memory will be used.*/
     #ifndef LV_FREETYPE_CACHE_FT_GLYPH_CNT
         #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
             #define LV_FREETYPE_CACHE_FT_GLYPH_CNT CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT

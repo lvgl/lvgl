@@ -1103,21 +1103,9 @@ menu "LVGL configuration"
 
 		config LV_USE_FREETYPE
 			bool "FreeType library"
-		config LV_FREETYPE_CACHE_SIZE
-			int "Memory used by FreeType to cache characters in kilobytes"
-			default 768
-			depends on LV_USE_FREETYPE
 		config LV_FREETYPE_USE_LVGL_PORT
 			bool "Let FreeType to use LVGL memory and file porting"
 			default n
-			depends on LV_USE_FREETYPE
-		config LV_FREETYPE_CACHE_FT_FACES
-			int "The maximum number of FT_Face"
-			default 8
-			depends on LV_USE_FREETYPE
-		config LV_FREETYPE_CACHE_FT_SIZES
-			int "The maximum number of FT_Size"
-			default 8
 			depends on LV_USE_FREETYPE
 		config LV_FREETYPE_CACHE_FT_GLYPH_CNT
 			int "The maximum number of Glyph in count"
