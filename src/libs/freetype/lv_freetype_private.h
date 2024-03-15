@@ -107,19 +107,8 @@ typedef struct _lv_freetype_font_dsc_t {
  */
 lv_freetype_context_t * lv_freetype_get_context(void);
 
-/**
- * Look up a FreeType size object for a given font descriptor and size.
- *
- * @param dsc The font descriptor to use.
- * @param size The size of the font.
- * @return A pointer to the FreeType size object.
- */
-FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc);
-
 void lv_freetype_italic_transform(FT_Face face);
 int32_t lv_freetype_italic_transform_on_pos(lv_point_t point);
-
-const char * lv_freetype_get_pathname(FTC_FaceID face_id);
 
 lv_cache_t * lv_freetype_create_glyph_cache(uint32_t cache_size);
 void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc);
