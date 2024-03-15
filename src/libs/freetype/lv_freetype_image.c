@@ -29,9 +29,7 @@ typedef struct _lv_freetype_image_cache_data_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
-                                                 uint32_t unicode_letter,
-                                                 lv_draw_buf_t * draw_buf);
+static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void * user_data);
 static void freetype_image_free_cb(lv_freetype_image_cache_data_t * node, void * user_data);
@@ -76,18 +74,14 @@ void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc)
  *   STATIC FUNCTIONS
  **********************/
 
-static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
-                                                 uint32_t unicode_letter,
-                                                 lv_draw_buf_t * draw_buf)
+static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
-    LV_UNUSED(unicode_letter);
     LV_UNUSED(draw_buf);
     const lv_font_t * font = g_dsc->resolved_font;
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
-    FT_Face face = dsc->cache_node->face;
-    FT_UInt glyph_index = FT_Get_Char_Index(face, unicode_letter);
+    FT_UInt glyph_index = (FT_UInt)g_dsc->glyph_index;
 
     lv_cache_t * cache = dsc->cache_node->draw_data_cache;
 

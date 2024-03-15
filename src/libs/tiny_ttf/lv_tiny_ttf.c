@@ -63,7 +63,7 @@ typedef struct ttf_font_desc {
 
 typedef struct _tiny_ttf_cache_data_t {
     lv_font_t * font;
-    uint32_t unicode;
+    uint32_t glyph_index;
     uint32_t size;
     lv_draw_buf_t * draw_buf;
 } tiny_ttf_cache_data_t;
@@ -72,8 +72,7 @@ typedef struct _tiny_ttf_cache_data_t {
  **********************/
 static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                  uint32_t unicode_letter_next);
-static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
-                                            uint32_t unicode_letter, lv_draw_buf_t * draw_buf);
+static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size,
                                       int32_t font_size,
@@ -222,17 +221,18 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     dsc_out->ofs_y = -y2;                   /*Y offset of the bitmap measured from the as line*/
     dsc_out->format = LV_FONT_GLYPH_FORMAT_A8;
     dsc_out->is_placeholder = false;
+    dsc_out->glyph_index = g1;
     return true; /*true: glyph found; false: glyph was not found*/
 }
 
-static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc,
-                                            uint32_t unicode_letter, lv_draw_buf_t * draw_buf)
+static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(draw_buf);
+    uint32_t glyph_index = (uint32_t)g_dsc->glyph_index;
     const lv_font_t * font = g_dsc->resolved_font;
     tiny_ttf_cache_data_t search_key = {
         .font = (lv_font_t *)font,
-        .unicode = unicode_letter,
+        .glyph_index = glyph_index,
         .size = font->line_height,
     };
 
@@ -340,10 +340,9 @@ static bool tiny_ttf_cache_create_cb(tiny_ttf_cache_data_t * node, void * user_d
 {
 
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)user_data;
-    uint32_t unicode_letter = node->unicode;
 
     const stbtt_fontinfo * info = (const stbtt_fontinfo *)&dsc->info;
-    int g1 = stbtt_FindGlyphIndex(info, (int)unicode_letter);
+    int g1 = (int)node->glyph_index;
     if(g1 == 0) {
         /* Glyph not found */
         return false;
@@ -382,8 +381,8 @@ static lv_cache_compare_res_t tiny_ttf_cache_compare_cb(const tiny_ttf_cache_dat
         return lhs->font > rhs->font ? 1 : -1;
     }
 
-    if(lhs->unicode != rhs->unicode) {
-        return lhs->unicode > rhs->unicode ? 1 : -1;
+    if(lhs->glyph_index != rhs->glyph_index) {
+        return lhs->glyph_index > rhs->glyph_index ? 1 : -1;
     }
 
     if(lhs->size != rhs->size) {

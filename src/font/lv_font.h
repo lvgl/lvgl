@@ -72,7 +72,7 @@ typedef struct {
     lv_font_glyph_format_t format;  /**< Font format of the glyph see @lv_font_glyph_format_t*/
     uint8_t is_placeholder: 1; /**< Glyph is missing. But placeholder will still be displayed*/
 
-    uint32_t glyph_index; /**< The index of the glyph in the font file. Used by the font cache*/
+    uint64_t glyph_index; /**< The index of the glyph in the font file. Used by the font cache*/
     lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
 } lv_font_glyph_dsc_t;
 
@@ -108,7 +108,7 @@ struct _lv_font_t {
     bool (*get_glyph_dsc)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
-    const void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, uint32_t, lv_draw_buf_t *);
+    const void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, lv_draw_buf_t *);
 
     /** Release a glyph*/
     void (*release_glyph)(const lv_font_t *, lv_font_glyph_dsc_t *);
@@ -133,13 +133,12 @@ struct _lv_font_t {
 
 /**
  * Return with the bitmap of a font.
- * @param g_dsc         the glyph descriptor including which font to use etc.
- * @param letter        a UNICODE character code
+ * @note You must call @lv_font_get_glyph_dsc to get @g_dsc (@lv_font_glyph_dsc_t) before you can call this function.
+ * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
  * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
  * @return pointer to the glyph's data. It can be a draw buffer for bitmap fonts or an image source for imgfonts.
  */
-const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, uint32_t letter,
-                                      lv_draw_buf_t * draw_buf);
+const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /**
  * Get the descriptor of a glyph
