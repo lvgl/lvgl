@@ -78,7 +78,7 @@ typedef struct {
  * Initialize the freetype library.
  * @return LV_RESULT_OK on success, otherwise LV_RESULT_INVALID.
  */
-lv_result_t lv_freetype_init(void);
+lv_result_t lv_freetype_init(uint32_t max_glyph_cnt);
 
 /**
  * Uninitialize the freetype library

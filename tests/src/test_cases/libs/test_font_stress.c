@@ -151,7 +151,7 @@ static void update_cb(void)
 
 void setUp(void)
 {
-    lv_freetype_init(0, 0, 0);
+    lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
 
     g_ctx.par = lv_scr_act();
 

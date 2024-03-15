@@ -56,7 +56,7 @@ static lv_cache_compare_res_t freetype_glyph_outline_cmp_cb(const lv_freetype_ou
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_cache_t * lv_freetype_create_draw_data_outline(void)
+lv_cache_t * lv_freetype_create_draw_data_outline(uint32_t cache_size)
 {
     lv_cache_ops_t glyph_outline_cache_ops = {
         .create_cb = (lv_cache_create_cb_t)freetype_glyph_outline_create_cb,
@@ -65,7 +65,7 @@ lv_cache_t * lv_freetype_create_draw_data_outline(void)
     };
 
     lv_cache_t * draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_outline_node_t),
-                                                   LV_FREETYPE_CACHE_FT_GLYPH_CNT,
+                                                   cache_size,
                                                    glyph_outline_cache_ops);
 
     return draw_data_cache;

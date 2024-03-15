@@ -43,7 +43,7 @@ typedef struct {
 static void lv_freetype_cleanup(lv_freetype_context_t * ctx);
 static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const char * pathname);
 static void lv_freetype_drop_face_id(lv_freetype_context_t * ctx, FTC_FaceID face_id);
-static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc);
+static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc, uint32_t max_glyph_cnt);
 static void freetype_on_font_set_cbs(lv_freetype_font_dsc_t * dsc);
 
 static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * user_data);
@@ -62,7 +62,7 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_freetype_init(void)
+lv_result_t lv_freetype_init(uint32_t max_glyph_cnt)
 {
     if(ft_ctx) {
         LV_LOG_WARN("freetype already initialized");
@@ -77,6 +77,9 @@ lv_result_t lv_freetype_init(void)
     }
 
     lv_freetype_context_t * ctx = lv_freetype_get_context();
+
+    ctx->max_glyph_cnt = max_glyph_cnt;
+
     FT_Error error;
 
     error = FT_Init_FreeType(&ctx->library);
@@ -147,7 +150,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     dsc->cache_node = lv_cache_entry_get_data(cache_node_entry);
     dsc->cache_node_entry = cache_node_entry;
 
-    if(cache_hitting == false && freetype_on_font_create(dsc) == false) {
+    if(cache_hitting == false && freetype_on_font_create(dsc, ctx->max_glyph_cnt) == false) {
         lv_cache_release(ctx->cache_node_cache, dsc->cache_node_entry, NULL);
         lv_freetype_drop_face_id(ctx, dsc->face_id);
         lv_free(dsc);
@@ -223,9 +226,13 @@ const char * lv_freetype_get_pathname(FTC_FaceID face_id)
  *   STATIC FUNCTIONS
  **********************/
 
-static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc)
+static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc, uint32_t max_glyph_cnt)
 {
-    lv_cache_t * glyph_cache = lv_freetype_create_glyph_cache();
+    /*
+     * Glyph info uses a small amount of memory, and uses glyph info more frequently,
+     * so it plans to use twice the maximum number of caches here to
+     * get a better info acquisition performance.*/
+    lv_cache_t * glyph_cache = lv_freetype_create_glyph_cache(max_glyph_cnt * 2);
     if(glyph_cache == NULL) {
         LV_LOG_ERROR("glyph cache creating failed");
         return false;
@@ -234,10 +241,10 @@ static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc)
 
     lv_cache_t * draw_data_cache = NULL;
     if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_BITMAP) {
-        draw_data_cache = lv_freetype_create_draw_data_image();
+        draw_data_cache = lv_freetype_create_draw_data_image(max_glyph_cnt);
     }
     else if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
-        draw_data_cache = lv_freetype_create_draw_data_outline();
+        draw_data_cache = lv_freetype_create_draw_data_outline(max_glyph_cnt);
     }
     else {
         LV_LOG_ERROR("unknown render mode");

@@ -38,10 +38,6 @@ extern "C" {
     LV_LOG_ERROR(msg " error(0x%x)", (int)error_code)
 #endif
 
-#if LV_FREETYPE_CACHE_SIZE <= 0
-#error "LV_FREETYPE_CACHE_SIZE must > 0"
-#endif
-
 #define LV_FREETYPE_FONT_DSC_MAGIC_NUM 0x5F5F4654 /* '__FT' */
 #define LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc) ((dsc)->magic_num == LV_FREETYPE_FONT_DSC_MAGIC_NUM)
 #define LV_ASSERT_FREETYPE_FONT_DSC(dsc)                                                   \
@@ -83,6 +79,8 @@ typedef struct _lv_freetype_context_t {
     lv_ll_t face_id_ll;
     lv_event_cb_t event_cb;
 
+    uint32_t max_glyph_cnt;
+
     lv_cache_t * cache_node_cache;
 } lv_freetype_context_t;
 
@@ -123,13 +121,13 @@ int32_t lv_freetype_italic_transform_on_pos(lv_point_t point);
 
 const char * lv_freetype_get_pathname(FTC_FaceID face_id);
 
-lv_cache_t * lv_freetype_create_glyph_cache(void);
+lv_cache_t * lv_freetype_create_glyph_cache(uint32_t cache_size);
 void lv_freetype_set_cbs_glyph(lv_freetype_font_dsc_t * dsc);
 
-lv_cache_t * lv_freetype_create_draw_data_image(void);
+lv_cache_t * lv_freetype_create_draw_data_image(uint32_t cache_size);
 void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc);
 
-lv_cache_t * lv_freetype_create_draw_data_outline(void);
+lv_cache_t * lv_freetype_create_draw_data_outline(uint32_t cache_size);
 void lv_freetype_set_cbs_outline_font(lv_freetype_font_dsc_t * dsc);
 
 /**********************

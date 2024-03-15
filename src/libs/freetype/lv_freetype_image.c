@@ -51,7 +51,7 @@ static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_cache_t * lv_freetype_create_draw_data_image(void)
+lv_cache_t * lv_freetype_create_draw_data_image(uint32_t cache_size)
 {
     lv_cache_ops_t ops = {
         .compare_cb = (lv_cache_compare_cb_t)freetype_image_compare_cb,
@@ -60,7 +60,7 @@ lv_cache_t * lv_freetype_create_draw_data_image(void)
     };
 
     lv_cache_t * draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_image_cache_data_t),
-                                                   LV_FREETYPE_CACHE_FT_GLYPH_CNT, ops);
+                                                   cache_size, ops);
 
     return draw_data_cache;
 }

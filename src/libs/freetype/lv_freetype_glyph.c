@@ -15,7 +15,6 @@
  *      DEFINES
  *********************/
 
-#define LV_FREETYPE_GLYPH_DSC_CACHE_SIZE (LV_FREETYPE_CACHE_FT_GLYPH_CNT * 2)
 /**********************
  *      TYPEDEFS
  **********************/
@@ -49,7 +48,7 @@ static lv_cache_compare_res_t freetype_glyph_compare_cb(const lv_freetype_glyph_
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_cache_t * lv_freetype_create_glyph_cache(void)
+lv_cache_t * lv_freetype_create_glyph_cache(uint32_t cache_size)
 {
     lv_cache_ops_t ops = {
         .create_cb = (lv_cache_create_cb_t)freetype_glyph_create_cb,
@@ -58,7 +57,7 @@ lv_cache_t * lv_freetype_create_glyph_cache(void)
     };
 
     lv_cache_t * glyph_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_glyph_cache_data_t),
-                                               LV_FREETYPE_GLYPH_DSC_CACHE_SIZE, ops);
+                                               cache_size, ops);
 
     return glyph_cache;
 }
