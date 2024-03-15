@@ -2136,9 +2136,7 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
                 break;
 
             case VLC_OP_CLOSE:
-            case VLC_OP_END: {
-                    TVG_CHECK_RETURN_RESULT(shape->close());
-                }
+                TVG_CHECK_RETURN_RESULT(shape->close());
                 break;
 
             default:
