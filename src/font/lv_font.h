@@ -63,16 +63,19 @@ typedef uint8_t lv_font_glyph_format_t;
 /** Describes the properties of a glyph.*/
 typedef struct {
     const lv_font_t *
-    resolved_font; /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
+    resolved_font;  /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
     uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width.*/
     uint16_t box_w; /**< Width of the glyph's bounding box*/
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
     lv_font_glyph_format_t format;  /**< Font format of the glyph see @lv_font_glyph_format_t*/
-    uint8_t is_placeholder: 1; /**< Glyph is missing. But placeholder will still be displayed*/
+    uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
 
-    uint64_t glyph_index; /**< The index of the glyph in the font file. Used by the font cache*/
+    union {
+        uint32_t index;       /**< Unicode code point*/
+        const void * src;     /**< Pointer to the source data used by image fonts*/
+    } gid;                    /**< The index of the glyph in the font file. Used by the font cache*/
     lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
 } lv_font_glyph_dsc_t;
 

@@ -81,7 +81,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     uint8_t * bitmap_out = draw_buf->data;
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-    uint32_t gid = (uint32_t)g_dsc->glyph_index;
+    uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
@@ -203,7 +203,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->ofs_y = gdsc->ofs_y;
     dsc_out->format = (uint8_t)fdsc->bpp;
     dsc_out->is_placeholder = false;
-    dsc_out->glyph_index = gid;
+    dsc_out->gid.index = gid;
 
     if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
 

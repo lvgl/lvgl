@@ -81,7 +81,7 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
-    FT_UInt glyph_index = (FT_UInt)g_dsc->glyph_index;
+    FT_UInt glyph_index = (FT_UInt)g_dsc->gid.index;
 
     lv_cache_t * cache = dsc->cache_node->draw_data_cache;
 

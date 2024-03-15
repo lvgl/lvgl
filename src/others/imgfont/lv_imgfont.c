@@ -83,7 +83,7 @@ static const void * imgfont_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_dra
 {
     LV_UNUSED(draw_buf);
 
-    const void * img_src = (const void *)(lv_uintptr_t)g_dsc->glyph_index;
+    const void * img_src = g_dsc->gid.src;
     return img_src;
 }
 
@@ -113,7 +113,7 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
     dsc_out->ofs_x  = 0;
     dsc_out->ofs_y  = offset_y;
     dsc_out->format = LV_FONT_GLYPH_FORMAT_IMAGE;   /* is image identifier */
-    dsc_out->glyph_index = (uint64_t)(lv_uintptr_t *)img_src;
+    dsc_out->gid.src = img_src;
 
     return true;
 }

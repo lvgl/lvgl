@@ -157,7 +157,7 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv
     const lv_font_t * font = g_dsc->resolved_font;
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
-    lv_cache_entry_t * entry = lv_freetype_outline_lookup(dsc, (FT_UInt)g_dsc->glyph_index);
+    lv_cache_entry_t * entry = lv_freetype_outline_lookup(dsc, (FT_UInt)g_dsc->gid.index);
     if(entry == NULL) {
         return NULL;
     }

@@ -221,14 +221,14 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     dsc_out->ofs_y = -y2;                   /*Y offset of the bitmap measured from the as line*/
     dsc_out->format = LV_FONT_GLYPH_FORMAT_A8;
     dsc_out->is_placeholder = false;
-    dsc_out->glyph_index = g1;
+    dsc_out->gid.index = (uint32_t)g1;
     return true; /*true: glyph found; false: glyph was not found*/
 }
 
 static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_UNUSED(draw_buf);
-    uint32_t glyph_index = (uint32_t)g_dsc->glyph_index;
+    uint32_t glyph_index = g_dsc->gid.index;
     const lv_font_t * font = g_dsc->resolved_font;
     tiny_ttf_cache_data_t search_key = {
         .font = (lv_font_t *)font,
