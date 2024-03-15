@@ -241,7 +241,7 @@ static int lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_c
 
     /* Remove default refr timer. */
 
-    lv_timer_del(disp->refr_timer);
+    lv_timer_delete(disp->refr_timer);
     disp->refr_timer = NULL;
 
     fb_ctx->fb_poll.data = uv_ctx;

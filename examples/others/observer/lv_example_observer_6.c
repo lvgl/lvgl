@@ -175,7 +175,7 @@ static lv_obj_t * my_button_create(lv_obj_t * parent, const char * text, lv_even
         lv_subject_add_observer_with_target(&theme_subject, my_button_style_observer_cb, &styles, NULL);
     }
 
-    lv_obj_t * btn = lv_btn_create(parent);
+    lv_obj_t * btn = lv_button_create(parent);
     lv_obj_remove_style_all(btn);
     lv_obj_add_style(btn, &styles.style_main, 0);
     lv_obj_add_style(btn, &styles.style_pressed, LV_STATE_PRESSED);

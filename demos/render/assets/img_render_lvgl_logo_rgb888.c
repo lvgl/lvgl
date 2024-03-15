@@ -195,7 +195,7 @@ img_render_lvgl_logo_rgb888_map[] = {
     0xe7, 0xe6, 0xe6, 0xfb, 0xfa, 0xfa, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe,
 };
 
-const lv_img_dsc_t img_render_lvgl_logo_rgb888 = {
+const lv_image_dsc_t img_render_lvgl_logo_rgb888 = {
     .header.cf = LV_COLOR_FORMAT_RGB888,
     .header.w = 30,
     .header.h = 30,

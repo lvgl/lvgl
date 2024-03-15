@@ -46,7 +46,7 @@ void my_disp_flush( lv_display_t *disp, const lv_area_t *area, uint8_t * px_map)
      */
 
     /*Call it to tell LVGL you are ready*/
-    lv_disp_flush_ready(disp);
+    lv_display_flush_ready(disp);
 }
 
 /*Read the touchpad*/
@@ -103,7 +103,7 @@ void setup()
 
     /* Create a simple label
      * ---------------------
-     lv_obj_t *label = lv_label_create( lv_scr_act() );
+     lv_obj_t *label = lv_label_create( lv_screen_active() );
      lv_label_set_text( label, "Hello Arduino, I'm LVGL!" );
      lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 
@@ -120,7 +120,7 @@ void setup()
      lv_demo_widgets();
      */
 
-    lv_obj_t *label = lv_label_create( lv_scr_act() );
+    lv_obj_t *label = lv_label_create( lv_screen_active() );
     lv_label_set_text( label, "Hello Arduino, I'm LVGL!" );
     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 
@@ -129,6 +129,6 @@ void setup()
 
 void loop()
 {
-    lv_task_handler(); /* let the GUI do its work */
+    lv_timer_handler(); /* let the GUI do its work */
     delay(5); /* let this time pass */
 }
