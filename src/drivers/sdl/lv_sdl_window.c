@@ -366,20 +366,29 @@ static void texture_resize(lv_display_t * disp)
 
     SDL_PixelFormatEnum px_format;
 
-    switch(lv_color_format_get_size(lv_display_get_color_format(disp)) * 8) {
-        case 32:
-            px_format = SDL_PIXELFORMAT_RGB888; /*same as SDL_PIXELFORMAT_RGB888, but it's not supported in older versions*/
+    switch(lv_display_get_color_format(disp)) {
+        case LV_COLOR_FORMAT_RGB888:
+            /* SDL_PIXELFORMAT_RGB888 is set as SDL_PIXELFORMAT_XRGB8888 in
+               SDL so to get RGB888 we use the RGB24 format instead */
+            px_format = SDL_PIXELFORMAT_RGB24;
             break;
-        case 24:
-            px_format = SDL_PIXELFORMAT_BGR24;
+        case LV_COLOR_FORMAT_ARGB8888:
+            px_format = SDL_PIXELFORMAT_ARGB8888;
             break;
-        case 16:
+        case LV_COLOR_FORMAT_XRGB8888:
+            px_format = SDL_PIXELFORMAT_XRGB8888;
+            break;
+        case LV_COLOR_FORMAT_RGB565:
             px_format = SDL_PIXELFORMAT_RGB565;
             break;
         default:
+            /*
+             * unsopported pixel formats
+             * LV_COLOR_FORMAT_ARGB8565
+             * LV_COLOR_FORMAT_RGB565A8
+             */
             return;
     }
-    //    px_format = SDL_PIXELFORMAT_BGR24;
 
     dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
                                      SDL_TEXTUREACCESS_STATIC, hor_res, ver_res);
