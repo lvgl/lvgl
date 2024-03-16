@@ -399,7 +399,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     int32_t w_px = lv_area_get_width(full_area);
     uint8_t * img_data = NULL;
     lv_draw_buf_t * decoded = NULL;
-    uint32_t offset = 12;	/*Skip the image header*/
+    uint32_t offset = 12;   /*Skip the image header*/
 
     /*We only support read line by line for now*/
     if(decoded_area->y1 == LV_COORD_MIN) {
