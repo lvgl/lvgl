@@ -154,7 +154,7 @@ menu "LVGL configuration"
 			default 4 if LV_OS_RTTHREAD
 			default 5 if LV_OS_WINDOWS
 			default 255 if LV_OS_CUSTOM
-		
+
 		config LV_OS_CUSTOM_INCLUDE
 			string "Custom OS include header"
 			default "stdint.h"
