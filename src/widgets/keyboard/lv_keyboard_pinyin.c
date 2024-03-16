@@ -10,7 +10,7 @@
  *********************/
 #include "lv_keyboard_pinyin.h"
 
-#if LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT
+#if (LV_KEYBOARD_PINYIN && LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT)
 
 #include <stdio.h>
 #include <string.h>

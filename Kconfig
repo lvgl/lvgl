@@ -931,7 +931,7 @@ menu "LVGL configuration"
 		config LV_KEYBOARD_PINYIN
 			bool "Use keyboard pinyin"
 			depends on LV_USE_KEYBOARD
-			default y
+			default n
 		config LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT
 			bool "Use keyboard pinyin use default dict"
 			depends on LV_KEYBOARD_PINYIN
@@ -939,7 +939,7 @@ menu "LVGL configuration"
 		config LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX
 			bool "Use keyboard pinyin use external button matrix"
 			depends on LV_KEYBOARD_PINYIN
-			default y
+			default n
 		config LV_USE_LED
 			bool "LED."
 			default y if !LV_CONF_MINIMAL

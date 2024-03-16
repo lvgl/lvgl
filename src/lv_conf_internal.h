@@ -1625,14 +1625,10 @@
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
 #ifndef LV_KEYBOARD_PINYIN
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_KEYBOARD_PINYIN
-            #define LV_KEYBOARD_PINYIN CONFIG_LV_USE_KEYBOARD_PINYIN
-        #else
-            #define LV_KEYBOARD_PINYIN 0
-        #endif
+    #ifdef CONFIG_LV_KEYBOARD_PINYIN
+        #define LV_KEYBOARD_PINYIN CONFIG_LV_KEYBOARD_PINYIN
     #else
-        #define LV_KEYBOARD_PINYIN 1
+        #define LV_KEYBOARD_PINYIN 0
     #endif
 #endif
 #if LV_KEYBOARD_PINYIN
@@ -1652,14 +1648,10 @@
 
     /*1: Use extend candidate button matrix*/
     #ifndef LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX
-                #define LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX CONFIG_LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX
-            #else
-                #define LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX 0
-            #endif
+        #ifdef CONFIG_LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX
+            #define LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX CONFIG_LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX
         #else
-            #define LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX 1
+            #define LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX 0
         #endif
     #endif
 #endif

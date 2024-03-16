@@ -30,7 +30,7 @@ extern "C" {
 #error "lv_textare is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
 #endif
 
-#if LV_KEYBOARD_PINYIN
+#if (LV_KEYBOARD_PINYIN && LV_KEYBOARD_PINYIN_USE_EXT_BUTTONMATRIX)
 #if LV_USE_BUTTON == 0
 #error "lv_button is required. Enable it in lv_conf.h (LV_USE_BUTTON  1) "
 #endif
@@ -55,30 +55,30 @@ enum _lv_keyboard_mode_t {
     LV_KEYBOARD_MODE_TEXT_UPPER,
     LV_KEYBOARD_MODE_SPECIAL,
     LV_KEYBOARD_MODE_NUMBER,
-#if LV_KEYBOARD_PINYIN
-    LV_KEYBOARD_MODE_PINYIN,
-#endif
     LV_KEYBOARD_MODE_USER_1,
     LV_KEYBOARD_MODE_USER_2,
     LV_KEYBOARD_MODE_USER_3,
     LV_KEYBOARD_MODE_USER_4,
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-    LV_KEYBOARD_MODE_TEXT_ARABIC
+    LV_KEYBOARD_MODE_TEXT_ARABIC,
 #endif
+#if LV_KEYBOARD_PINYIN == 1
+    LV_KEYBOARD_MODE_PINYIN,
+#endif
+    LV_KEYBOARD_MODE_MAX,
 };
-
-#if LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT == 0
-typedef struct {
-    char * pinyin_list;
-    const char * pinyin_mb_list;
-} lv_keyboard_pinyin_dict_t;
-#endif
-
 #ifdef DOXYGEN
 typedef _lv_keyboard_mode_t lv_keyboard_mode_t;
 #else
 typedef uint8_t lv_keyboard_mode_t;
 #endif /*DOXYGEN*/
+
+#if LV_KEYBOARD_PINYIN && LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT == 0
+typedef struct {
+    char * pinyin_list;
+    const char * pinyin_mb_list;
+} lv_keyboard_pinyin_dict_t;
+#endif
 
 /*Data of keyboard*/
 typedef struct {

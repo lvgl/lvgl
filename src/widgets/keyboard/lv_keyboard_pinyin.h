@@ -16,18 +16,9 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT
+#if (LV_KEYBOARD_PINYIN && LV_KEYBOARD_PINYIN_USE_DEFAULT_DICT)
 
 #include <stddef.h>
-
-/*Testing of dependencies*/
-#if LV_USE_KEYBOARD == 0
-#error "lv_keyboard is required. Enable it in lv_conf.h (LV_USE_KEYBOARD  1) "
-#endif
-
-#if LV_KEYBOARD_PINYIN == 0
-#error "lv_keyboard is required. Enable it in lv_conf.h (LV_KEYBOARD_PINYIN  1) "
-#endif
 
 /*********************
  *      DEFINES
