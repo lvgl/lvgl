@@ -21,16 +21,16 @@ extern "C" {
  *********************/
 #include "lv_os.h"
 
-#if LV_USE_OS == LV_OS_FREERTOS || LV_USE_OS == LV_OS_FREERTOS_ESP
-
 #if LV_USE_OS == LV_OS_FREERTOS
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
-#elif LV_USE_OS == LV_OS_FREERTOS_ESP
+
+#if (ESP_PLATFORM)
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#else
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 #endif
 
 /*********************
@@ -81,7 +81,7 @@ typedef struct {
  *      MACROS
  **********************/
 
-#endif /*LV_USE_OS == LV_OS_FREERTOS || LV_USE_OS == LV_OS_FREERTOS_ESP*/
+#endif /*LV_USE_OS == LV_OS_FREERTOS*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

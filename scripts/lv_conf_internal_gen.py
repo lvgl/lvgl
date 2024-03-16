@@ -34,10 +34,9 @@ fout.write(
 #define LV_OS_NONE          0
 #define LV_OS_PTHREAD       1
 #define LV_OS_FREERTOS      2
-#define LV_OS_FREERTOS_ESP  3
-#define LV_OS_CMSIS_RTOS2   4
-#define LV_OS_RTTHREAD      5
-#define LV_OS_WINDOWS       6
+#define LV_OS_CMSIS_RTOS2   3
+#define LV_OS_RTTHREAD      4
+#define LV_OS_WINDOWS       5
 #define LV_OS_CUSTOM        255
 
 #define LV_STDLIB_BUILTIN           0

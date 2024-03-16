@@ -135,14 +135,12 @@ menu "LVGL configuration"
 				bool "1: PTHREAD"
 			config LV_OS_FREERTOS
 				bool "2: FREERTOS"
-            config LV_OS_FREERTOS_ESP
-                bool "3: FREERTOS_ESP"
 			config LV_OS_CMSIS_RTOS2
-				bool "4: CMSIS_RTOS2"
+				bool "3: CMSIS_RTOS2"
 			config LV_OS_RTTHREAD
-				bool "5: RTTHREAD"
+				bool "4: RTTHREAD"
 			config LV_OS_WINDOWS
-				bool "6: WINDOWS"
+				bool "5: WINDOWS"
 			config LV_OS_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
@@ -152,10 +150,9 @@ menu "LVGL configuration"
 			default 0 if LV_OS_NONE
 			default 1 if LV_OS_PTHREAD
 			default 2 if LV_OS_FREERTOS
-            default 3 if LV_OS_FREERTOS_ESP
-			default 4 if LV_OS_CMSIS_RTOS2
-			default 5 if LV_OS_RTTHREAD
-			default 6 if LV_OS_WINDOWS
+			default 3 if LV_OS_CMSIS_RTOS2
+			default 4 if LV_OS_RTTHREAD
+			default 5 if LV_OS_WINDOWS
 			default 255 if LV_OS_CUSTOM
 
 		config LV_OS_CUSTOM_INCLUDE

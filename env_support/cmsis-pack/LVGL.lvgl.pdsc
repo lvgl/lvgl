@@ -779,7 +779,6 @@
  * - LV_OS_NONE
  * - LV_OS_PTHREAD
  * - LV_OS_FREERTOS
- * - LV_OS_FREERTOS_ESP
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
@@ -803,37 +802,12 @@
  * - LV_OS_NONE
  * - LV_OS_PTHREAD
  * - LV_OS_FREERTOS
- * - LV_OS_FREERTOS_ESP
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_FREERTOS
-
-              </RTE_Components_h>
-
-            </component>
-
-            <component Cgroup="OS Abstraction Layer" Cvariant="FreeRTOS-ESP" isDefaultVariant="true" condition="LVGL-Essential">
-              <description>Add the support for FreeRTOS of Espressif</description>
-              <files>
-                <file category="sourceC"      name="src/osal/lv_freertos.c"/>
-              </files>
-
-              <RTE_Components_h>
-
-/*   Select an operating system to use. Possible options:
- * - LV_OS_NONE
- * - LV_OS_PTHREAD
- * - LV_OS_FREERTOS
- * - LV_OS_FREERTOS_ESP
- * - LV_OS_CMSIS_RTOS2
- * - LV_OS_RTTHREAD
- * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM
- */
-#define LV_USE_OS   LV_OS_FREERTOS_ESP
 
               </RTE_Components_h>
 
@@ -847,12 +821,10 @@
 
               <RTE_Components_h>
 
-
 /*   Select an operating system to use. Possible options:
  * - LV_OS_NONE
  * - LV_OS_PTHREAD
  * - LV_OS_FREERTOS
- * - LV_OS_FREERTOS_ESP
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
@@ -876,7 +848,6 @@
  * - LV_OS_NONE
  * - LV_OS_PTHREAD
  * - LV_OS_FREERTOS
- * - LV_OS_FREERTOS_ESP
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
@@ -900,7 +871,6 @@
  * - LV_OS_NONE
  * - LV_OS_PTHREAD
  * - LV_OS_FREERTOS
- * - LV_OS_FREERTOS_ESP
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
@@ -925,7 +895,6 @@
  * - LV_OS_NONE
  * - LV_OS_PTHREAD
  * - LV_OS_FREERTOS
- * - LV_OS_FREERTOS_ESP
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
