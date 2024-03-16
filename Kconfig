@@ -154,7 +154,7 @@ menu "LVGL configuration"
 			default 4 if LV_OS_RTTHREAD
 			default 5 if LV_OS_WINDOWS
 			default 255 if LV_OS_CUSTOM
-		
+
 		config LV_OS_CUSTOM_INCLUDE
 			string "Custom OS include header"
 			default "stdint.h"
@@ -173,6 +173,15 @@ menu "LVGL configuration"
 			default 4
 		help
 			Align the start address of draw_buf addresses to this bytes.
+
+		config LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+			int "Optimal size to buffer the widget with opacity"
+			default 24576
+			depends on LV_USE_DRAW_SW
+			help
+				If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
+				it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+				"Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be drawn in chunks.
 
 		config LV_USE_DRAW_SW
 			bool "Enable software rendering"
@@ -201,15 +210,6 @@ menu "LVGL configuration"
 			depends on LV_USE_DRAW_SW
 			help
 				Disabling this allows arm2d to work on its own (for testing only)
-
-		config LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
-			int "Optimal size to buffer the widget with opacity"
-			default 24576
-			depends on LV_USE_DRAW_SW
-			help
-				If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
-				it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
-				"Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be drawn in chunks.
 
 		config LV_DRAW_SW_COMPLEX
 			bool "Enable complex draw engine"
@@ -1087,7 +1087,7 @@ menu "LVGL configuration"
 		config LV_GIF_CACHE_DECODE_DATA
 			bool "Use extra 16KB RAM to cache decoded data to accerlate"
 			depends on LV_USE_GIF
-		
+
 		config LV_BIN_DECODER_RAM_LOAD
 			bool "Decode whole image to RAM for bin decoder"
 			default n
@@ -1306,7 +1306,7 @@ menu "LVGL configuration"
 			string "SDL include path"
 			depends on LV_USE_SDL
 			default "SDL2/SDL.h"
-	
+
 		choice
 			prompt "SDL rendering mode"
 			depends on LV_USE_SDL
@@ -1323,7 +1323,7 @@ menu "LVGL configuration"
 			config LV_SDL_RENDER_MODE_FULL
 				bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
 		endchoice
-		
+
 		choice
 			prompt "SDL buffer size"
 			depends on LV_USE_SDL
