@@ -49,7 +49,6 @@ void lv_libpng_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
-    lv_image_decoder_set_cache_free_cb(dec, NULL); /*Use general cache free method*/
 }
 
 void lv_libpng_deinit(void)

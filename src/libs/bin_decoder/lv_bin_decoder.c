@@ -101,7 +101,6 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_set_open_cb(decoder, lv_bin_decoder_open);
     lv_image_decoder_set_get_area_cb(decoder, lv_bin_decoder_get_area);
     lv_image_decoder_set_close_cb(decoder, lv_bin_decoder_close);
-    lv_image_decoder_set_cache_free_cb(decoder, NULL); /*Use general cache free method*/
 }
 
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)

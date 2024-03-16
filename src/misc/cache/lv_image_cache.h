@@ -28,6 +28,18 @@ extern "C" {
  **********************/
 
 /**
+ * Initialize image cache.
+ * @return true: initialization succeeded, false: failed.
+ */
+bool lv_image_cache_init(void);
+
+/**
+ * Initialize image header cache.
+ * @return true: initialization succeeded, false: failed.
+ */
+bool lv_image_header_cache_init(void);
+
+/**
  * Invalidate image cache. Use NULL to invalidate all images.
  * @param src pointer to an image source.
  */
