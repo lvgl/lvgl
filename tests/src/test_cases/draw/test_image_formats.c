@@ -22,8 +22,10 @@ static const char * color_formats[] = {
 
 static const char * compressions[] = {
     "UNCOMPRESSED",
+#if LV_BIN_DECODER_RAM_LOAD == 1
     "RLE",
     "LZ4"
+#endif
 };
 
 static const char * modes[] = {
