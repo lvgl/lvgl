@@ -224,6 +224,18 @@ extern "C" {
 #endif
 
 /*------------------
+ * SDL
+ *-----------------*/
+
+#ifdef CONFIG_LV_SDL_RENDER_MODE_PARTIAL
+#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
+#elif defined(CONFIG_LV_SDL_RENDER_MODE_DIRECT)
+#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
+#elif defined(CONFIG_LV_SDL_RENDER_MODE_FULL)
+#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
+#endif
+
+/*------------------
  * LINUX FBDEV
  *-----------------*/
 

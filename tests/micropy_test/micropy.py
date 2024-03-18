@@ -100,6 +100,27 @@ def CANVAS_BUF_SIZE(w, h, bpp, stride):
             stride - 1)) * h + lv.DRAW_BUF_ALIGN
 
 
+event_flag = False
+
+
+@test_func_wrapper
+def event_callback(e):
+    global event_flag
+    event_flag = True
+
+
+@test_func_wrapper
+def test_event():
+    scr = lv.screen_active()
+
+    scr.add_event_cb(event_callback, lv.EVENT.CLICKED, None)
+
+    scr.send_event(lv.EVENT.CLICKED, None)
+
+    if not event_flag:
+        raise RuntimeError('Event failure')
+
+
 @test_func_wrapper
 def create_ui():
     # Create a colors
@@ -421,6 +442,7 @@ def main():
     lv.refr_now(None)
 
 
+test_event()
 create_ui()
 main()
 # end

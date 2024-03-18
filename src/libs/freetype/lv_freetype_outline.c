@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../../lvgl.h"
 #include "lv_freetype_private.h"
 
 #if LV_USE_FREETYPE
@@ -56,7 +57,7 @@ static lv_cache_compare_res_t freetype_glyph_outline_cmp_cb(const lv_freetype_ou
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_cache_t * lv_freetype_create_draw_data_outline(void)
+lv_cache_t * lv_freetype_create_draw_data_outline(uint32_t cache_size)
 {
     lv_cache_ops_t glyph_outline_cache_ops = {
         .create_cb = (lv_cache_create_cb_t)freetype_glyph_outline_create_cb,
@@ -65,7 +66,7 @@ lv_cache_t * lv_freetype_create_draw_data_outline(void)
     };
 
     lv_cache_t * draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_outline_node_t),
-                                                   LV_FREETYPE_CACHE_FT_GLYPH_CNT,
+                                                   cache_size,
                                                    glyph_outline_cache_ops);
 
     return draw_data_cache;
@@ -187,8 +188,8 @@ static lv_cache_entry_t * lv_freetype_outline_lookup(lv_freetype_font_dsc_t * ds
 {
     lv_freetype_cache_node_t * cache_node = dsc->cache_node;
 
-    FT_UInt charmap_index = FT_Get_Charmap_Index(cache_node->face->charmap);
-    FT_UInt glyph_index = FTC_CMapCache_Lookup(dsc->context->cmap_cache, dsc->face_id, charmap_index, unicode_letter);
+    FT_Face face = cache_node->face;
+    FT_UInt glyph_index = FT_Get_Char_Index(face, unicode_letter);
 
     lv_freetype_outline_node_t tmp_node;
     tmp_node.glyph_index = glyph_index;

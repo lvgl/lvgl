@@ -586,6 +586,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     lv_image_set_src(icon, &img_lv_demo_music_btn_prev);
     lv_obj_set_grid_cell(icon, LV_GRID_ALIGN_CENTER, 2, 1, LV_GRID_ALIGN_CENTER, 0, 1);
     lv_obj_add_event_cb(icon, prev_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_flag(icon, LV_OBJ_FLAG_CLICKABLE);
 
     play_obj = lv_imagebutton_create(cont);
     lv_imagebutton_set_src(play_obj, LV_IMAGEBUTTON_STATE_RELEASED, NULL, &img_lv_demo_music_btn_play, NULL);

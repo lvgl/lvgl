@@ -20,6 +20,9 @@
 #define ft_ctx LV_GLOBAL_DEFAULT()->ft_context
 #define LV_FREETYPE_OUTLINE_REF_SIZE_DEF 128
 
+/**< This value is from the FreeType's function `FT_GlyphSlot_Oblique` in `ftsynth.c` */
+#define LV_FREETYPE_OBLIQUE_SLANT_DEF 0x0366A
+
 #if LV_FREETYPE_CACHE_FT_GLYPH_CNT <= 0
     #error "LV_FREETYPE_CACHE_FT_GLYPH_CNT must be greater than 0"
 #endif
@@ -37,14 +40,10 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static FT_Error lv_freetype_face_requester(FTC_FaceID face_id,
-                                           FT_Library library,
-                                           FT_Pointer req_data,
-                                           FT_Face * aface);
 static void lv_freetype_cleanup(lv_freetype_context_t * ctx);
 static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const char * pathname);
 static void lv_freetype_drop_face_id(lv_freetype_context_t * ctx, FTC_FaceID face_id);
-static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc);
+static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc, uint32_t max_glyph_cnt);
 static void freetype_on_font_set_cbs(lv_freetype_font_dsc_t * dsc);
 
 static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * user_data);
@@ -63,7 +62,7 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_freetype_init(uint32_t max_faces, uint32_t max_sizes, uint32_t max_kilobytes)
+lv_result_t lv_freetype_init(uint32_t max_glyph_cnt)
 {
     if(ft_ctx) {
         LV_LOG_WARN("freetype already initialized");
@@ -78,31 +77,14 @@ lv_result_t lv_freetype_init(uint32_t max_faces, uint32_t max_sizes, uint32_t ma
     }
 
     lv_freetype_context_t * ctx = lv_freetype_get_context();
+
+    ctx->max_glyph_cnt = max_glyph_cnt;
+
     FT_Error error;
 
     error = FT_Init_FreeType(&ctx->library);
     if(error) {
         FT_ERROR_MSG("FT_Init_FreeType", error);
-        return LV_RESULT_INVALID;
-    }
-
-    error = FTC_Manager_New(ctx->library,
-                            max_faces,
-                            max_sizes,
-                            max_kilobytes * 1024,
-                            lv_freetype_face_requester,
-                            NULL,
-                            &ctx->cache_manager);
-    if(error) {
-        FT_ERROR_MSG("FTC_Manager_New", error);
-        lv_freetype_cleanup(ctx);
-        return LV_RESULT_INVALID;
-    }
-
-    error = FTC_CMapCache_New(ctx->cache_manager, &ctx->cmap_cache);
-    if(error) {
-        FT_ERROR_MSG("FTC_CMapCache_New", error);
-        lv_freetype_cleanup(ctx);
         return LV_RESULT_INVALID;
     }
 
@@ -168,7 +150,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     dsc->cache_node = lv_cache_entry_get_data(cache_node_entry);
     dsc->cache_node_entry = cache_node_entry;
 
-    if(cache_hitting == false && freetype_on_font_create(dsc) == false) {
+    if(cache_hitting == false && freetype_on_font_create(dsc, ctx->max_glyph_cnt) == false) {
         lv_cache_release(ctx->cache_node_cache, dsc->cache_node_entry, NULL);
         lv_freetype_drop_face_id(ctx, dsc->face_id);
         lv_free(dsc);
@@ -218,51 +200,33 @@ lv_freetype_context_t * lv_freetype_get_context(void)
     return LV_GLOBAL_DEFAULT()->ft_context;
 }
 
-FT_Size lv_freetype_lookup_size(const lv_freetype_font_dsc_t * dsc)
-{
-    FT_Error error;
-    lv_freetype_context_t * ctx = dsc->context;
-
-    FT_Size ft_size;
-    struct FTC_ScalerRec_ scaler;
-    scaler.face_id = dsc->face_id;
-    scaler.width = dsc->size;
-    scaler.height = dsc->size;
-    scaler.pixel = 1;
-    error = FTC_Manager_LookupSize(ctx->cache_manager, &scaler, &ft_size);
-
-    if(error) {
-        FT_ERROR_MSG("FTC_Manager_LookupSize", error);
-        return NULL;
-    }
-
-    return ft_size;
-}
-
 void lv_freetype_italic_transform(FT_Face face)
 {
     LV_ASSERT_NULL(face);
     FT_Matrix matrix;
     matrix.xx = FT_INT_TO_F16DOT16(1);
-    matrix.xy = 0x5800;
+    matrix.xy = LV_FREETYPE_OBLIQUE_SLANT_DEF;
     matrix.yx = 0;
     matrix.yy = FT_INT_TO_F16DOT16(1);
     FT_Set_Transform(face, &matrix, NULL);
 }
 
-const char * lv_freetype_get_pathname(FTC_FaceID face_id)
+int32_t lv_freetype_italic_transform_on_pos(lv_point_t point)
 {
-    LV_ASSERT_NULL(face_id);
-    return (const char *)face_id;
+    return point.x + FT_F16DOT16_TO_INT(point.y * LV_FREETYPE_OBLIQUE_SLANT_DEF);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc)
+static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc, uint32_t max_glyph_cnt)
 {
-    lv_cache_t * glyph_cache = lv_freetype_create_glyph_cache();
+    /*
+     * Glyph info uses a small amount of memory, and uses glyph info more frequently,
+     * so it plans to use twice the maximum number of caches here to
+     * get a better info acquisition performance.*/
+    lv_cache_t * glyph_cache = lv_freetype_create_glyph_cache(max_glyph_cnt * 2);
     if(glyph_cache == NULL) {
         LV_LOG_ERROR("glyph cache creating failed");
         return false;
@@ -271,10 +235,10 @@ static bool freetype_on_font_create(lv_freetype_font_dsc_t * dsc)
 
     lv_cache_t * draw_data_cache = NULL;
     if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_BITMAP) {
-        draw_data_cache = lv_freetype_create_draw_data_image();
+        draw_data_cache = lv_freetype_create_draw_data_image(max_glyph_cnt);
     }
     else if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
-        draw_data_cache = lv_freetype_create_draw_data_outline();
+        draw_data_cache = lv_freetype_create_draw_data_outline(max_glyph_cnt);
     }
     else {
         LV_LOG_ERROR("unknown render mode");
@@ -302,35 +266,12 @@ static void freetype_on_font_set_cbs(lv_freetype_font_dsc_t * dsc)
     }
 }
 
-static FT_Error lv_freetype_face_requester(FTC_FaceID face_id,
-                                           FT_Library library,
-                                           FT_Pointer req_data,
-                                           FT_Face * aface)
-{
-    LV_UNUSED(library);
-    LV_UNUSED(req_data);
-
-    const char * pathname = lv_freetype_get_pathname(face_id);
-
-    FT_Error error = FT_New_Face(library, pathname, 0, aface);
-    if(error) {
-        FT_ERROR_MSG("FT_New_Face", error);
-        LV_LOG_ERROR("error pathname = %s", pathname);
-    }
-    return error;
-}
-
 static void lv_freetype_cleanup(lv_freetype_context_t * ctx)
 {
     LV_ASSERT_NULL(ctx);
     if(ctx->cache_node_cache) {
         lv_cache_destroy(ctx->cache_node_cache, NULL);
         ctx->cache_node_cache = NULL;
-    }
-
-    if(ctx->cache_manager) {
-        FTC_Manager_Done(ctx->cache_manager);
-        ctx->cache_manager = NULL;
     }
 
     if(ctx->library) {
@@ -393,7 +334,6 @@ static void lv_freetype_drop_face_id(lv_freetype_context_t * ctx, FTC_FaceID fac
             if(node->ref_cnt == 0) {
                 LV_LOG_INFO("drop face_id: %s", node->pathname);
                 _lv_ll_remove(ll_p, node);
-                FTC_Manager_RemoveFaceID(ctx->cache_manager, face_id);
                 lv_free(node->pathname);
                 lv_free(node);
             }

@@ -91,25 +91,25 @@ void lv_obj_set_scroll_snap_y(lv_obj_t * obj, lv_scroll_snap_t align)
 
 lv_scrollbar_mode_t lv_obj_get_scrollbar_mode(const lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->scrollbar_mode;
+    if(obj->spec_attr) return (lv_scrollbar_mode_t) obj->spec_attr->scrollbar_mode;
     else return LV_SCROLLBAR_MODE_AUTO;
 }
 
 lv_dir_t lv_obj_get_scroll_dir(const lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->scroll_dir;
+    if(obj->spec_attr) return (lv_dir_t) obj->spec_attr->scroll_dir;
     else return LV_DIR_ALL;
 }
 
 lv_scroll_snap_t lv_obj_get_scroll_snap_x(const lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->scroll_snap_x;
+    if(obj->spec_attr) return (lv_scroll_snap_t) obj->spec_attr->scroll_snap_x;
     else return LV_SCROLL_SNAP_NONE;
 }
 
 lv_scroll_snap_t lv_obj_get_scroll_snap_y(const lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->scroll_snap_y;
+    if(obj->spec_attr) return (lv_scroll_snap_t) obj->spec_attr->scroll_snap_y;
     else return LV_SCROLL_SNAP_NONE;
 }
 

@@ -116,13 +116,6 @@ int32_t lv_strcmp(const char * s1, const char * s2);
 char * lv_strdup(const char * src);
 
 /**
- * @brief Duplicate a string by allocating a new one and copying the content.
- * @param src Pointer to the source of data to be copied.
- * @return A pointer to the new allocated string. NULL if failed.
- */
-char * lv_strdup(const char * src);
-
-/**
  * @brief Copies the string pointed to by src, including the terminating null character,
  *        to the end of the string pointed to by dst.
  * @param dst Pointer to the destination string where the content is to be appended.

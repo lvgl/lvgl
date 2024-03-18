@@ -46,7 +46,7 @@ void test_tiny_ttf_rendering_test(void)
 #endif
 }
 
-void test_tiny_ttf_kerning()
+void test_tiny_ttf_kerning(void)
 {
 #if LV_USE_TINY_TTF
     extern const uint8_t test_kern_one_otf[];

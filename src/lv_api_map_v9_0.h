@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl.h"
+#include "misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -32,6 +32,10 @@ extern "C" {
  **********************/
 #define lv_image_set_align               lv_image_set_inner_align
 #define lv_image_get_align               lv_image_get_inner_align
+
+#ifndef LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+#define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
+#endif
 
 /**********************
  *      MACROS

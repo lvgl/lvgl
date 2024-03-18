@@ -34,6 +34,7 @@ static lv_cache_compare_res_t compare_cb(const test_data * lhs, const test_data 
 
 static void free_cb(test_data * node, void * user_data)
 {
+    LV_UNUSED(user_data);
     lv_free(node->data);
 }
 

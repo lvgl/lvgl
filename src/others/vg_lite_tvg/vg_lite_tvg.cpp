@@ -119,6 +119,11 @@ typedef struct {
     uint8_t alpha;
 } vg_color32_t;
 
+typedef struct {
+    vg_lite_float_t x;
+    vg_lite_float_t y;
+} vg_lite_fpoint_t;
+
 #pragma pack()
 
 class vg_lite_ctx
@@ -264,6 +269,8 @@ static vg_lite_error_t vg_lite_error_conv(Result result);
 static Matrix matrix_conv(const vg_lite_matrix_t * matrix);
 static FillRule fill_rule_conv(vg_lite_fill_t fill);
 static BlendMethod blend_method_conv(vg_lite_blend_t blend);
+static StrokeCap stroke_cap_conv(vg_lite_cap_style_t cap);
+static StrokeJoin stroke_join_conv(vg_lite_join_style_t join);
 static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t * path, vg_lite_matrix_t * matrix);
 static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_buffer_t * target,
                                 const vg_lite_rectangle_t * rect);
@@ -287,6 +294,10 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
                              vg_lite_uint32_t * mul,
                              vg_lite_uint32_t * div,
                              vg_lite_uint32_t * bytes_align);
+
+static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, const vg_lite_fpoint_t * point);
+static bool vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
+static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 
 /**********************
  *  STATIC VARIABLES
@@ -702,6 +713,65 @@ extern "C" {
         return VG_LITE_SUCCESS;
     }
 
+    vg_lite_error_t vg_lite_set_stroke(vg_lite_path_t * path,
+                                       vg_lite_cap_style_t cap_style,
+                                       vg_lite_join_style_t join_style,
+                                       vg_lite_float_t line_width,
+                                       vg_lite_float_t miter_limit,
+                                       vg_lite_float_t * dash_pattern,
+                                       vg_lite_uint32_t pattern_count,
+                                       vg_lite_float_t dash_phase,
+                                       vg_lite_color_t color)
+    {
+        if(!path || line_width <= 0) {
+            return VG_LITE_INVALID_ARGUMENT;
+        }
+
+        if(miter_limit < 1.0f) {
+            miter_limit = 1.0f;
+        }
+
+        if(!path->stroke) {
+            path->stroke = (vg_lite_stroke_t *)lv_malloc_zeroed(sizeof(vg_lite_stroke_t));
+
+            if(!path->stroke) {
+                return VG_LITE_OUT_OF_RESOURCES;
+            }
+        }
+
+        path->stroke->cap_style = cap_style;
+        path->stroke->join_style = join_style;
+        path->stroke->line_width = line_width;
+        path->stroke->miter_limit = miter_limit;
+        path->stroke->half_width = line_width / 2.0f;
+        path->stroke->miter_square = path->stroke->miter_limit * path->stroke->miter_limit;
+        path->stroke->dash_pattern = dash_pattern;
+        path->stroke->pattern_count = pattern_count;
+        path->stroke->dash_phase = dash_phase;
+        path->stroke_color = color;
+        return VG_LITE_SUCCESS;
+    }
+
+    vg_lite_error_t vg_lite_update_stroke(vg_lite_path_t * path)
+    {
+        LV_UNUSED(path);
+        return VG_LITE_SUCCESS;
+    }
+
+    vg_lite_error_t vg_lite_set_path_type(vg_lite_path_t * path, vg_lite_path_type_t path_type)
+    {
+        if(!path ||
+           (path_type != VG_LITE_DRAW_FILL_PATH &&
+            path_type != VG_LITE_DRAW_STROKE_PATH &&
+            path_type != VG_LITE_DRAW_FILL_STROKE_PATH)
+          )
+            return VG_LITE_INVALID_ARGUMENT;
+
+        path->path_type = path_type;
+
+        return VG_LITE_SUCCESS;
+    }
+
     vg_lite_error_t vg_lite_get_register(vg_lite_uint32_t address, vg_lite_uint32_t * result)
     {
         LV_UNUSED(address);
@@ -811,8 +881,14 @@ extern "C" {
 
     vg_lite_error_t vg_lite_clear_path(vg_lite_path_t * path)
     {
-        LV_UNUSED(path);
-        return VG_LITE_NOT_SUPPORT;
+        LV_ASSERT_NULL(path);
+
+        if(path->stroke) {
+            lv_free(path->stroke);
+            path->stroke = NULL;
+        }
+
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_uint32_t vg_lite_get_path_length(vg_lite_uint8_t * opcode,
@@ -1608,24 +1684,32 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
         TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
 
-        float x_min = path->bounding_box[0];
-        float y_min = path->bounding_box[1];
-        float x_max = path->bounding_box[2];
-        float y_max = path->bounding_box[3];
+        vg_lite_matrix_t grad_matrix;
+        vg_lite_identity(&grad_matrix);
+        vg_lite_matrix_inverse(&grad_matrix, matrix);
+        vg_lite_matrix_multiply(&grad_matrix, &grad->matrix);
 
+        vg_lite_fpoint_t p1 = {0.0f, 0.0f};
+        vg_lite_fpoint_t p2 = {1.0f, 0};
+
+        vg_lite_fpoint_t p1_trans = p1;
+        vg_lite_fpoint_t p2_trans = p2;
+
+        p1_trans = matrix_transform_point(&grad_matrix, &p1);
+        p2_trans = matrix_transform_point(&grad_matrix, &p2);
+        float dx = (p2_trans.x - p1_trans.x);
+        float dy = (p2_trans.y - p1_trans.y);
+        float scale = sqrtf(dx * dx + dy * dy);
+        float angle = (float)(atan2f(dy, dx));
+        float dlen = 256 * scale;
+        float x_min = grad_matrix.m[0][2];
+        float y_min = grad_matrix.m[1][2];
+        float x_max = x_min + dlen * cosf(angle);
+        float y_max = y_min + dlen * sinf(angle);
+        LV_LOG_TRACE("linear gradient {%.2f, %.2f} ~ {%.2f, %.2f}", x_min, y_min, x_max, y_max);
         auto linearGrad = LinearGradient::gen();
-
-        if(matrix->m[0][1] != 0) {
-            /* vertical */
-            linearGrad->linear(x_min, y_min, x_min, y_max);
-        }
-        else {
-            /* horizontal */
-            linearGrad->linear(x_min, y_min, x_max, y_min);
-        }
-
-        linearGrad->transform(matrix_conv(&grad->matrix));
-        linearGrad->spread(FillSpread::Reflect);
+        linearGrad->linear(x_min, y_min, x_max, y_max);
+        linearGrad->spread(FillSpread::Pad);
 
         tvg::Fill::ColorStop colorStops[VLC_MAX_GRADIENT_STOPS];
         for(vg_lite_uint32_t i = 0; i < grad->count; i++) {
@@ -1863,6 +1947,38 @@ static BlendMethod blend_method_conv(vg_lite_blend_t blend)
     return BlendMethod::Normal;
 }
 
+static StrokeCap stroke_cap_conv(vg_lite_cap_style_t cap)
+{
+    switch(cap) {
+        case VG_LITE_CAP_SQUARE:
+            return StrokeCap::Square;
+        case VG_LITE_CAP_ROUND:
+            return StrokeCap::Round;
+        case VG_LITE_CAP_BUTT:
+            return StrokeCap::Butt;
+        default:
+            break;
+    }
+
+    return StrokeCap::Square;
+}
+
+static StrokeJoin stroke_join_conv(vg_lite_join_style_t join)
+{
+    switch(join) {
+        case VG_LITE_JOIN_BEVEL:
+            return StrokeJoin::Bevel;
+        case VG_LITE_JOIN_ROUND:
+            return StrokeJoin::Round;
+        case VG_LITE_JOIN_MITER:
+            return StrokeJoin::Miter;
+        default:
+            break;
+    }
+
+    return StrokeJoin::Bevel;
+}
+
 static float vlc_get_arg(const void * data, vg_lite_format_t format)
 {
     switch(format) {
@@ -1936,6 +2052,29 @@ static uint8_t vlc_op_arg_len(uint8_t vlc_op)
     return 0;
 }
 
+static Result shape_set_stroke(std::unique_ptr<Shape> & shape, const vg_lite_path_t * path)
+{
+    /* if path is not a stroke, return */
+    if(path->path_type == VG_LITE_DRAW_ZERO
+       || path->path_type == VG_LITE_DRAW_FILL_PATH) {
+        return Result::Success;
+    }
+
+    LV_ASSERT_NULL(path->stroke);
+    TVG_CHECK_RETURN_RESULT(shape->stroke(path->stroke->line_width));
+    TVG_CHECK_RETURN_RESULT(shape->strokeMiterlimit(path->stroke->miter_limit));
+    TVG_CHECK_RETURN_RESULT(shape->stroke(stroke_cap_conv(path->stroke->cap_style)));
+    TVG_CHECK_RETURN_RESULT(shape->stroke(stroke_join_conv(path->stroke->join_style)));
+    TVG_CHECK_RETURN_RESULT(shape->stroke(TVG_COLOR(path->stroke_color)));
+
+    if(path->stroke->pattern_count) {
+        LV_ASSERT_NULL(path->stroke->dash_pattern);
+        TVG_CHECK_RETURN_RESULT(shape->stroke(path->stroke->dash_pattern, path->stroke->pattern_count));
+    }
+
+    return Result::Success;
+}
+
 static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t * path, vg_lite_matrix_t * matrix)
 {
     uint8_t fmt_len = vlc_format_len(path->format);
@@ -1997,9 +2136,7 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
                 break;
 
             case VLC_OP_CLOSE:
-            case VLC_OP_END: {
-                    TVG_CHECK_RETURN_RESULT(shape->close());
-                }
+                TVG_CHECK_RETURN_RESULT(shape->close());
                 break;
 
             default:
@@ -2018,6 +2155,8 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
        && math_equal(x_max, __FLT_MAX__) && math_equal(y_max, __FLT_MAX__)) {
         return Result::Success;
     }
+
+    TVG_CHECK_RETURN_RESULT(shape_set_stroke(shape, path));
 
     auto cilp = Shape::gen();
     TVG_CHECK_RETURN_RESULT(cilp->appendRect(x_min, y_min, x_max - x_min, y_max - y_min, 0, 0));
@@ -2434,4 +2573,86 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
             break;
     }
 }
+
+static vg_lite_fpoint_t matrix_transform_point(const vg_lite_matrix_t * matrix, const vg_lite_fpoint_t * point)
+{
+    vg_lite_fpoint_t p;
+    p.x = (vg_lite_float_t)(point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]);
+    p.y = (vg_lite_float_t)(point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]);
+    return p;
+}
+
+static bool vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix)
+{
+    vg_lite_float_t det00, det01, det02;
+    vg_lite_float_t d;
+    bool is_affine;
+
+    /* Test for identity matrix. */
+    if(matrix == NULL) {
+        result->m[0][0] = 1.0f;
+        result->m[0][1] = 0.0f;
+        result->m[0][2] = 0.0f;
+        result->m[1][0] = 0.0f;
+        result->m[1][1] = 1.0f;
+        result->m[1][2] = 0.0f;
+        result->m[2][0] = 0.0f;
+        result->m[2][1] = 0.0f;
+        result->m[2][2] = 1.0f;
+
+        /* Success. */
+        return true;
+    }
+
+    det00 = (matrix->m[1][1] * matrix->m[2][2]) - (matrix->m[2][1] * matrix->m[1][2]);
+    det01 = (matrix->m[2][0] * matrix->m[1][2]) - (matrix->m[1][0] * matrix->m[2][2]);
+    det02 = (matrix->m[1][0] * matrix->m[2][1]) - (matrix->m[2][0] * matrix->m[1][1]);
+
+    /* Compute determinant. */
+    d = (matrix->m[0][0] * det00) + (matrix->m[0][1] * det01) + (matrix->m[0][2] * det02);
+
+    /* Return 0 if there is no inverse matrix. */
+    if(d == 0.0f)
+        return false;
+
+    /* Compute reciprocal. */
+    d = 1.0f / d;
+
+    /* Determine if the matrix is affine. */
+    is_affine = (matrix->m[2][0] == 0.0f) && (matrix->m[2][1] == 0.0f) && (matrix->m[2][2] == 1.0f);
+
+    result->m[0][0] = d * det00;
+    result->m[0][1] = d * ((matrix->m[2][1] * matrix->m[0][2]) - (matrix->m[0][1] * matrix->m[2][2]));
+    result->m[0][2] = d * ((matrix->m[0][1] * matrix->m[1][2]) - (matrix->m[1][1] * matrix->m[0][2]));
+    result->m[1][0] = d * det01;
+    result->m[1][1] = d * ((matrix->m[0][0] * matrix->m[2][2]) - (matrix->m[2][0] * matrix->m[0][2]));
+    result->m[1][2] = d * ((matrix->m[1][0] * matrix->m[0][2]) - (matrix->m[0][0] * matrix->m[1][2]));
+    result->m[2][0] = is_affine ? 0.0f : d * det02;
+    result->m[2][1] = is_affine ? 0.0f : d * ((matrix->m[2][0] * matrix->m[0][1]) - (matrix->m[0][0] * matrix->m[2][1]));
+    result->m[2][2] = is_affine ? 1.0f : d * ((matrix->m[0][0] * matrix->m[1][1]) - (matrix->m[1][0] * matrix->m[0][1]));
+
+    /* Success. */
+    return true;
+}
+
+static void vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult)
+{
+    vg_lite_matrix_t temp;
+    int row, column;
+
+    /* Process all rows. */
+    for(row = 0; row < 3; row++) {
+        /* Process all columns. */
+        for(column = 0; column < 3; column++) {
+            /* Compute matrix entry. */
+            temp.m[row][column] = (matrix->m[row][0] * mult->m[0][column])
+                                  + (matrix->m[row][1] * mult->m[1][column])
+                                  + (matrix->m[row][2] * mult->m[2][column]);
+        }
+    }
+
+    /* Copy temporary matrix into result. */
+    lv_memcpy(matrix->m, &temp.m, sizeof(temp.m));
+}
+
 #endif

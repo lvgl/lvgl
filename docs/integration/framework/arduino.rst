@@ -41,7 +41,6 @@ installed, follow these configuration steps:
 2. Go to ``lvgl`` and copy ``lv_conf_template.h`` as ``lv_conf.h`` into the Arduino Libraries directory next to the ``lvgl`` library folder.
 3. Open ``lv_conf.h`` and change the first ``#if 0`` to ``#if 1`` to enable the content of the file
 4. Set the color depth of you display in :c:macro:`LV_COLOR_DEPTH`
-5. Set :c:macro:`LV_TICK_CUSTOM`
 
 Finally the layout with ``lv_conf.h`` should look like this:
 

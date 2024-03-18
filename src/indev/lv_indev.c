@@ -519,7 +519,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
 
     lv_point_t p_trans = *point;
-    lv_obj_transform_point(obj, &p_trans, false, true);
+    lv_obj_transform_point(obj, &p_trans, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE);
 
     bool hit_test_ok = lv_obj_hit_test(obj, &p_trans);
 
@@ -688,6 +688,10 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->keypad.last_state = LV_INDEV_STATE_RELEASED; /*To skip the processing of release*/
     }
 
+    /*Save the last key. *It must be done here else `lv_indev_get_key` will return the last key in events*/
+    uint32_t prev_key = i->keypad.last_key;
+    i->keypad.last_key = data->key;
+
     lv_group_t * g = i->group;
     if(g == NULL) return;
 
@@ -695,13 +699,6 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(indev_obj_act == NULL) return;
 
     const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-
-    /*Save the last key to compare it with the current latter on RELEASE*/
-    uint32_t prev_key = i->keypad.last_key;
-
-    /*Save the last key.
-     *It must be done here else `lv_indev_get_key` will return the last key in events*/
-    i->keypad.last_key = data->key;
 
     /*Save the previous state so we can detect state changes below and also set the last state now
      *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
@@ -1116,8 +1113,8 @@ static void indev_proc_press(lv_indev_t * indev)
         new_obj_searched = true;
     }
 
-    /*The last object might have scroll throw. Stop it manually*/
-    if(new_obj_searched && indev->pointer.last_obj) {
+    /*The scroll object might have scroll throw. Stop it manually*/
+    if(new_obj_searched && indev->pointer.scroll_obj) {
 
         /*Attempt to stop scroll throw animation firstly*/
         if(!indev->scroll_throw_anim || !lv_anim_delete(indev, indev_scroll_throw_anim_cb)) {
@@ -1158,6 +1155,7 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.scroll_sum.x     = 0;
             indev->pointer.scroll_sum.y     = 0;
             indev->pointer.scroll_dir = LV_DIR_NONE;
+            indev->pointer.scroll_obj = NULL;
             indev->pointer.gesture_dir = LV_DIR_NONE;
             indev->pointer.gesture_sent   = 0;
             indev->pointer.gesture_sum.x  = 0;
@@ -1350,6 +1348,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->pointer.scroll_sum.x        = 0;
         indev->pointer.scroll_sum.y        = 0;
         indev->pointer.scroll_dir = LV_DIR_NONE;
+        indev->pointer.scroll_obj = NULL;
         indev->pointer.scroll_throw_vect.x = 0;
         indev->pointer.scroll_throw_vect.y = 0;
         indev->pointer.gesture_sum.x     = 0;

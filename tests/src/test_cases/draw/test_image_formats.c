@@ -275,7 +275,7 @@ static void c_array_image_create(bool rotate, bool recolor, int align, int compr
     }
 }
 
-void test_image_formats()
+void test_image_formats(void)
 {
     for(unsigned align = 0; align <= 1; align++) {
         int stride = stride_align[align];

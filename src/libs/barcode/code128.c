@@ -531,7 +531,7 @@ size_t code128_encode_raw(const char * s, char * out, size_t maxlength)
     // Compute the checksum
     int sum = codes[0];
     for(i = 1; i < num_codes; i++)
-        sum += codes[i] * i;
+        sum += (int)(codes[i] * i);
     out += code128_append_code(sum % 103, out);
 
     // Finalize the code.
