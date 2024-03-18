@@ -22,6 +22,7 @@ extern "C" {
 #define LV_USE_STDLIB_SPRINTF       LV_STDLIB_CLIB
 #define LV_USE_OS                   LV_OS_PTHREAD
 #define LV_OBJ_STYLE_CACHE          0
+#define LV_BIN_DECODER_RAM_LOAD     1   /* Run test with bin image loaded to RAM */
 #endif
 
 #ifdef LVGL_CI_USING_DEF_HEAP
@@ -29,6 +30,7 @@ extern "C" {
 #define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
 #define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
 #define LV_OBJ_STYLE_CACHE      1
+#define LV_BIN_DECODER_RAM_LOAD 0
 #endif
 
 #ifdef MICROPYTHON
