@@ -15,19 +15,18 @@ def get_arg():
                         help='The output trace file. If not provided, defaults to \'<log_file>.systrace\'.')
 
     args = parser.parse_args()
-
-    print('log_file: ' + args.log_file)
-
-    if not args.trace_file:
-        log_file = Path(args.log_file)
-        args.trace_file = log_file.with_suffix('.systrace').as_posix()
-    print('trace_file: ' + args.trace_file)
-
     return args
 
 
 if __name__ == '__main__':
     args = get_arg()
+
+    if not args.trace_file:
+        log_file = Path(args.log_file)
+        args.trace_file = log_file.with_suffix('.systrace').as_posix()
+
+    print('log_file  :', args.log_file)
+    print('trace_file:', args.trace_file)
 
     with open(args.log_file, 'r') as f:
         content = f.read()
