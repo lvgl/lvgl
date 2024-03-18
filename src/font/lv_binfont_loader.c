@@ -238,7 +238,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
         switch(cmap_table[i].format_type) {
             case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL: {
-                    uint8_t ids_size = sizeof(uint8_t) * cmap_table[i].data_entries_count;
+                    uint8_t ids_size = (uint8_t)(sizeof(uint8_t) * cmap_table[i].data_entries_count);
                     uint8_t * glyph_id_ofs_list = lv_malloc(ids_size);
 
                     cmap->glyph_id_ofs_list = glyph_id_ofs_list;
@@ -482,8 +482,8 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     font->get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt;
     font->get_glyph_bitmap = lv_font_get_bitmap_fmt_txt;
     font->subpx = font_header.subpixels_mode;
-    font->underline_position = font_header.underline_position;
-    font->underline_thickness = font_header.underline_thickness;
+    font->underline_position = (int8_t) font_header.underline_position;
+    font->underline_thickness = (int8_t) font_header.underline_thickness;
 
     font_dsc->bpp = font_header.bits_per_pixel;
     font_dsc->kern_scale = font_header.kerning_scale;

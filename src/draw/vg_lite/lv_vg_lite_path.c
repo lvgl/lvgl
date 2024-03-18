@@ -104,9 +104,8 @@ void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path)
         lv_free(path->base.path);
         path->base.path = NULL;
 
-        if(path->base.stroke) {
-            LV_LOG_ERROR("can't free stroke path");
-        }
+        /* clear remaining path data */
+        LV_VG_LITE_CHECK_ERROR(vg_lite_clear_path(&path->base));
     }
     lv_free(path);
     LV_PROFILER_END;

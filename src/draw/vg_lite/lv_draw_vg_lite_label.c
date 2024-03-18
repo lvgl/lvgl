@@ -9,7 +9,7 @@
 
 #include "lv_draw_vg_lite.h"
 
-#include "../../libs/freetype/lv_freetype.h"
+#include "../../lvgl.h"
 
 #if LV_USE_DRAW_VG_LITE
 

@@ -782,7 +782,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_PTHREAD
 
@@ -805,7 +805,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_FREERTOS
 
@@ -828,7 +828,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_CMSIS_RTOS2
 
@@ -851,7 +851,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_RTTHREAD
 
@@ -874,7 +874,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_WINDOWS
 
@@ -898,7 +898,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS               LV_OS_CUSTOM
 #define LV_OS_CUSTOM_INCLUDE    "lv_os_custom.h"

@@ -24,7 +24,7 @@
  *      DEFINES
  *********************/
 #if LV_COLOR_DEPTH == 32
-    #define DRM_FOURCC DRM_FORMAT_ARGB8888
+    #define DRM_FOURCC DRM_FORMAT_XRGB8888
 #elif LV_COLOR_DEPTH == 16
     #define DRM_FOURCC DRM_FORMAT_RGB565
 #else

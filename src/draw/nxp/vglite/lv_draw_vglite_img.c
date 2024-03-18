@@ -19,6 +19,7 @@
 #include "lv_vglite_buf.h"
 #include "lv_vglite_matrix.h"
 #include "lv_vglite_utils.h"
+#include "lv_vglite_path.h"
 
 #include "../../../misc/lv_log.h"
 
@@ -57,18 +58,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-/**
- * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
- * By default, image is copied directly, with optional opacity.
- *
- * @param[in] dest_area Destination area with relative coordinates to dest buffer
- * @param[in] src_area Source area with relative coordinates to src buffer
- * @param[in] dsc Image descriptor
- *
- */
-static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area,
-                                const lv_draw_image_dsc_t * dsc);
-
 #if LV_USE_VGLITE_BLIT_SPLIT
 /**
  * Move buffer pointer as close as possible to area, but with respect to alignment requirements.
@@ -98,19 +87,31 @@ static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stri
 static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t dest_stride, lv_color_format_t dest_cf,
                                const void * src_buf, lv_area_t * src_area, uint32_t src_stride, lv_color_format_t src_cf,
                                const lv_draw_image_dsc_t * dsc);
-#else
+#endif /*LV_USE_VGLITE_BLIT_SPLIT*/
+
 /**
- * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
- * By default, image is copied directly, with optional opacity.
+ * VGlite blit - fill a path with an image pattern
  *
- * @param[in] dest_area Area with relative coordinates to dest buffer
+ *
+ * @param[in] dest_area Destination area with relative coordinates to dest buffer
+ * @param[in] clip_area Clip area with relative coordinates to dest buff
+ * @param[in] coords Coordinates of the image (relative to dest buff)
+ * @param[in] dsc Image descriptor
+ *
+ */
+static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * coords,
+                                 const lv_draw_image_dsc_t * dsc);
+
+/**
+ * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with or without effects.
+ *
  * @param[in] src_area Source area with relative coordinates to src buffer
  * @param[in] dsc Image descriptor
  *
  */
-static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * src_area,
-                                   const lv_draw_image_dsc_t * dsc);
-#endif /*LV_USE_VGLITE_BLIT_SPLIT*/
+static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t * dsc);
+
+static vg_lite_color_t _vglite_recolor(const lv_draw_image_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -160,7 +161,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     uint32_t src_stride = img_dsc->header.stride;
 
     /* Set src_vgbuf structure. */
-    vglite_set_src_buf(src_buf, lv_area_get_width(&src_area), lv_area_get_height(&src_area), src_stride, src_cf);
+    vglite_set_src_buf(src_buf, img_dsc->header.w, img_dsc->header.h, src_stride, src_cf);
 
 #if LV_USE_VGLITE_BLIT_SPLIT
     void * dest_buf = layer->draw_buf->data;
@@ -171,10 +172,12 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
         _vglite_blit_split(dest_buf, &blend_area, dest_stride, dest_cf,
                            src_buf, &src_area, src_stride, src_cf, dsc);
 #else
-    if(has_transform)
-        _vglite_blit_transform(&blend_area, &src_area, dsc);
+    vglite_set_transformation_matrix(&blend_area, dsc);
+    bool is_tiled = dsc->tile;
+    if(is_tiled)
+        _vglite_draw_pattern(&clip_area, &relative_coords, dsc);
     else
-        _vglite_blit_single(&blend_area, &src_area, dsc);
+        _vglite_blit(&src_area, dsc);
 #endif /*LV_USE_VGLITE_BLIT_SPLIT*/
 }
 
@@ -196,23 +199,7 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
     src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
     src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
-    lv_color_t color;
-    lv_opa_t opa;
-
-    bool has_recolor = (dsc->recolor_opa > LV_OPA_MIN);
-    if(has_recolor) {
-        color = dsc->recolor;
-        opa = LV_OPA_MIX2(dsc->recolor_opa, dsc->opa);
-    }
-    else {
-        color.red = 0xFF;
-        color.green = 0xFF;
-        color.blue = 0xFF;
-        opa = dsc->opa;
-    }
-
-    lv_color32_t col32 = lv_color_to_32(color, opa);
-    vg_lite_color_t vgcol = vglite_get_color(col32, false);
+    vg_lite_color_t vgcol = _vglite_recolor(dsc);
 
     vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
     vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
@@ -220,16 +207,6 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
     VGLITE_CHECK_ERROR(vg_lite_blit_rect(dst_vgbuf, src_vgbuf, &rect, vgmatrix, vgblend, vgcol, VG_LITE_FILTER_POINT));
 
     vglite_run();
-}
-
-static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area,
-                                const lv_draw_image_dsc_t * dsc)
-{
-    /* Set vgmatrix. */
-    vglite_set_translation_matrix(dest_area);
-
-    /* Start blit. */
-    _vglite_blit(src_area, dsc);
 }
 
 #if LV_USE_VGLITE_BLIT_SPLIT
@@ -276,6 +253,9 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
     _move_buf_close_to_area((void **)&src_buf, src_area, src_stride, src_cf);
     _move_buf_close_to_area(&dest_buf, dest_area, dest_stride, dest_cf);
 
+    /* Set clip area */
+    vglite_set_scissor(dest_area);
+
     /* If we're in limit, do a single BLIT */
     if((src_area->x2 < VGLITE_BLIT_SPLIT_THR) &&
        (src_area->y2 < VGLITE_BLIT_SPLIT_THR)) {
@@ -284,7 +264,8 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
         vglite_set_dest_buf_ptr(dest_buf);
         vglite_set_src_buf_ptr(src_buf);
 
-        _vglite_blit_single(dest_area, src_area, dsc);
+        vglite_set_transformation_matrix(dest_area, dsc);
+        _vglite_blit(src_area, dsc);
 
         VGLITE_TRACE("Single "
                      "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -295,6 +276,8 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
                      lv_area_get_width(src_area), lv_area_get_height(src_area),
                      lv_area_get_width(dest_area), lv_area_get_height(dest_area),
                      (uintptr_t)src_buf, (uintptr_t)dest_buf);
+
+        return;
     };
 
     /* Split the BLIT into multiple tiles */
@@ -371,7 +354,8 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
             vglite_set_dest_buf_ptr(tile_dest_buf);
             vglite_set_src_buf_ptr(tile_src_buf);
 
-            _vglite_blit_single(&tile_dest_area, &tile_src_area, dsc);
+            vglite_set_transformation_matrix(&tile_dest_area, dsc);
+            _vglite_blit(&tile_src_area, dsc);
 
             VGLITE_TRACE("Tile [%d, %d] "
                          "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -386,16 +370,72 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
         }
     }
 }
-#else
-static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * src_area,
-                                   const lv_draw_image_dsc_t * dsc)
-{
-    /* Set vgmatrix. */
-    vglite_set_transformation_matrix(dest_area, dsc);
-
-    /* Start blit. */
-    _vglite_blit(src_area, dsc);
-}
 #endif /*LV_USE_VGLITE_BLIT_SPLIT*/
+
+static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * coords,
+                                 const lv_draw_image_dsc_t * dsc)
+{
+    /* Target buffer */
+    vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
+
+    /* Path to draw */
+    int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
+    uint32_t path_data_size;
+    vglite_create_rect_path_data(path_data, &path_data_size, 0, coords);
+    vg_lite_quality_t path_quality = VG_LITE_MEDIUM;
+
+    vg_lite_path_t path;
+    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
+                                         (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                                         ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
+
+    /* Path Matrix */
+    vg_lite_matrix_t path_matrix;
+    vg_lite_identity(&path_matrix);
+
+    /* Pattern Image */
+    vg_lite_buffer_t * src_vgbuf = vglite_get_src_buf();
+    src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+
+    /* Pattern matrix */
+    vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
+
+    /* Blend mode */
+    vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
+
+    vg_lite_color_t vgcol = _vglite_recolor(dsc);
+
+    /* Filter */
+    bool has_trasform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
+    vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
+
+    /* Draw Pattern */
+    VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, &path_matrix,
+                                            src_vgbuf, vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
+                                            0, vgcol, filter));
+}
+
+static vg_lite_color_t _vglite_recolor(const lv_draw_image_dsc_t * dsc)
+{
+    lv_color_t color;
+    lv_opa_t opa;
+
+    bool has_recolor = (dsc->recolor_opa > LV_OPA_MIN);
+    if(has_recolor) {
+        color = dsc->recolor;
+        opa = LV_OPA_MIX2(dsc->recolor_opa, dsc->opa);
+    }
+    else {
+        color.red = 0xFF;
+        color.green = 0xFF;
+        color.blue = 0xFF;
+        opa = dsc->opa;
+    }
+
+    lv_color32_t col32 = lv_color_to_32(color, opa);
+
+    return vglite_get_color(col32, false);
+}
 
 #endif /*LV_USE_DRAW_VGLITE*/

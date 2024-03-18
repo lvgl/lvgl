@@ -906,8 +906,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         if(layer_type == LV_LAYER_TYPE_SIMPLE) {
             int32_t w = lv_area_get_width(&layer_area_full);
             uint8_t px_size = lv_color_format_get_size(disp_refr->color_format);
-            max_rgb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / px_size;
-            max_argb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color32_t);
+            max_rgb_row_height = LV_DRAW_LAYER_SIMPLE_BUF_SIZE / w / px_size;
+            max_argb_row_height = LV_DRAW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color32_t);
         }
 
         lv_area_t layer_area_act;

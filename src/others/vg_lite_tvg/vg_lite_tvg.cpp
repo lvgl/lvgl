@@ -888,7 +888,7 @@ extern "C" {
             path->stroke = NULL;
         }
 
-        return VG_LITE_NOT_SUPPORT;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_uint32_t vg_lite_get_path_length(vg_lite_uint8_t * opcode,
@@ -2136,9 +2136,7 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
                 break;
 
             case VLC_OP_CLOSE:
-            case VLC_OP_END: {
-                    TVG_CHECK_RETURN_RESULT(shape->close());
-                }
+                TVG_CHECK_RETURN_RESULT(shape->close());
                 break;
 
             default:

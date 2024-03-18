@@ -1,10 +1,8 @@
-#define LV_MEM_SIZE         (32 * 1024 * 1024)
-#define LV_SHADOW_CACHE_SIZE    (8 * 1024)
+#define LV_MEM_SIZE                     (32 * 1024 * 1024)
+#define LV_DRAW_SW_SHADOW_CACHE_SIZE    8
 #define LV_USE_LOG              1
 #define LV_LOG_LEVEL            LV_LOG_LEVEL_TRACE
 #define LV_LOG_PRINTF           1
-#define LV_USE_FONT_SUBPX       1
-#define LV_FONT_SUBPX_BGR       1
 #define LV_USE_ASSERT_NULL      1
 #define LV_USE_ASSERT_MALLOC    1
 #define LV_USE_ASSERT_MEM_INTEGRITY     1
@@ -123,8 +121,5 @@
 #endif
 
 #define LV_USE_FREETYPE 1
-#define LV_FREETYPE_CACHE_SIZE 768
 #define LV_FREETYPE_USE_LVGL_PORT 0
-#define LV_FREETYPE_CACHE_FT_FACES 8
-#define LV_FREETYPE_CACHE_FT_SIZES 8
-#define LV_FREETYPE_CACHE_FT_OUTLINES 10
+#define LV_FREETYPE_CACHE_FT_GLYPH_CNT 10

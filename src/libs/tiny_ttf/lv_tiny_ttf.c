@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_tiny_ttf.h"
+#include "../../lvgl.h"
 
 #if LV_USE_TINY_TTF
 

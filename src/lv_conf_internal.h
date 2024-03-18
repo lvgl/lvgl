@@ -249,6 +249,20 @@
     #endif
 #endif
 
+/* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
+ * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+ * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
+ * and can't be drawn in chunks. */
+
+/*The target buffer size for simple layer chunks.*/
+#ifndef LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+    #ifdef CONFIG_LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+        #define LV_DRAW_LAYER_SIMPLE_BUF_SIZE CONFIG_LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+    #else
+        #define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)   /*[bytes]*/
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
@@ -295,20 +309,6 @@
             #endif
         #else
             #define LV_USE_NATIVE_HELIUM_ASM    1
-        #endif
-    #endif
-
-    /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
-     * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
-     * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
-     * and can't be drawn in chunks. */
-
-    /*The target buffer size for simple layer chunks.*/
-    #ifndef LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
-        #ifdef CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
-            #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
-        #else
-            #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)   /*[bytes]*/
         #endif
     #endif
 
@@ -2285,15 +2285,6 @@
     #endif
 #endif
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters in kilobytes*/
-    #ifndef LV_FREETYPE_CACHE_SIZE
-        #ifdef CONFIG_LV_FREETYPE_CACHE_SIZE
-            #define LV_FREETYPE_CACHE_SIZE CONFIG_LV_FREETYPE_CACHE_SIZE
-        #else
-            #define LV_FREETYPE_CACHE_SIZE 768
-        #endif
-    #endif
-
     /*Let FreeType to use LVGL memory and file porting*/
     #ifndef LV_FREETYPE_USE_LVGL_PORT
         #ifdef CONFIG_LV_FREETYPE_USE_LVGL_PORT
@@ -2303,22 +2294,8 @@
         #endif
     #endif
 
-    /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
-    /* (0:use system defaults) */
-    #ifndef LV_FREETYPE_CACHE_FT_FACES
-        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_FACES
-            #define LV_FREETYPE_CACHE_FT_FACES CONFIG_LV_FREETYPE_CACHE_FT_FACES
-        #else
-            #define LV_FREETYPE_CACHE_FT_FACES 8
-        #endif
-    #endif
-    #ifndef LV_FREETYPE_CACHE_FT_SIZES
-        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-            #define LV_FREETYPE_CACHE_FT_SIZES CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-        #else
-            #define LV_FREETYPE_CACHE_FT_SIZES 8
-        #endif
-    #endif
+    /*Cache count of the glyphs in FreeType. It means the number of glyphs that can be cached.
+     *The higher the value, the more memory will be used.*/
     #ifndef LV_FREETYPE_CACHE_FT_GLYPH_CNT
         #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
             #define LV_FREETYPE_CACHE_FT_GLYPH_CNT CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT

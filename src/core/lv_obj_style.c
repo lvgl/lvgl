@@ -759,7 +759,7 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t se
     const lv_part_t part = lv_obj_style_get_selector_part(selector);
     const lv_state_t state = lv_obj_style_get_selector_state(selector);
     const lv_state_t state_inv = ~state;
-    const bool skip_trans = obj->skip_trans;
+    const bool skip_trans = (const bool) obj->skip_trans;
     int32_t weight = -1;
     lv_style_res_t found;
     uint32_t i;
