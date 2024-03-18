@@ -1,8 +1,12 @@
 .. raw:: html
 
-   <p align="right">
+   <p align="left">
+     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
+   </p>
 
-English \| 中文 \| Português do Brasil \| 日本語
+   <p align="right">
+     <a href="../README.md">English</a>| <a href="./README_zh.rst">中文</a>| <a href="./README_pt_BR.rst">Português do Brasil</a> | <b>日本語</b>
+   </p>
 
 .. raw:: html
 

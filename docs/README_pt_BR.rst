@@ -1,14 +1,12 @@
-:note: **NOTA IMPORTANTE** A próxima versão principal (v9.0.0) está sendo
-       desenvolvida na branch master. A última versão estável está disponível
-       na branch `release/v8.3 <https://github.com/lvgl/lvgl/tree/release/v8.3>`__.
-
---------------
-
 .. raw:: html
 
-   <p align="right">
+   <p align="left">
+     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
+   </p>
 
-English \| 中文 \| Português do Brasil \| 日本語
+   <p align="right">
+     <a href="../README.md">English</a>| <a href="./README_zh.rst">中文</a>| <b>Português do Brasil</b> | <a href="./README_jp.rst">日本語</a>
+   </p>
 
 .. raw:: html
 
