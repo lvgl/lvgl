@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_win.h"
+#include "../../lvgl.h"
 #if LV_USE_WIN
 
 /*********************

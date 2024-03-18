@@ -12,7 +12,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../misc/lv_types.h"
+#include "../../misc/lv_event.h"
+#include <stdbool.h>
 
 #if LV_USE_FREETYPE
 

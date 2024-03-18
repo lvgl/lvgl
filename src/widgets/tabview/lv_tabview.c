@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_tabview.h"
+#include "../../lvgl.h"
+
 #if LV_USE_TABVIEW
 
 #include "../../misc/lv_assert.h"
