@@ -18,9 +18,6 @@ extern "C" {
 
 #include "lv_array.h"
 
-#include LV_STDBOOL_INCLUDE
-#include LV_STDINT_INCLUDE
-
 /*********************
  *      DEFINES
  *********************/

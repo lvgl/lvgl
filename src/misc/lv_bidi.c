@@ -8,9 +8,9 @@
  *********************/
 #include "lv_bidi.h"
 #include "lv_text.h"
+#include "lv_types.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
-#include LV_STDDEF_INCLUDE
 
 #if LV_USE_BIDI
 

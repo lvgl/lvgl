@@ -10,7 +10,7 @@
 #include "../core/lv_obj.h"
 #include "../core/lv_global.h"
 #include "../indev/lv_indev.h"
-#include LV_STDDEF_INCLUDE
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES

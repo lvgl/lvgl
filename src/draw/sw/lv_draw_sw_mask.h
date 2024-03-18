@@ -16,7 +16,7 @@ extern "C" {
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_math.h"
-#include LV_STDBOOL_INCLUDE
+#include "../../misc/lv_types.h"
 
 /*********************
  *      DEFINES

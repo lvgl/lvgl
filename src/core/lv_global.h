@@ -37,7 +37,7 @@ extern "C" {
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
 
-#include LV_STDBOOL_INCLUDE
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES

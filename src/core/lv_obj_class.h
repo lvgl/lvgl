@@ -16,8 +16,6 @@ extern "C" {
 #include "../misc/lv_types.h"
 #include "../misc/lv_area.h"
 #include "lv_obj_property.h"
-#include LV_STDINT_INCLUDE
-#include LV_STDBOOL_INCLUDE
 
 /*********************
  *      DEFINES

@@ -8,11 +8,9 @@
  *********************/
 #include "../lvgl.h"
 #include "../misc/lv_fs.h"
+#include "../misc/lv_types.h"
 #include "../stdlib/lv_string.h"
 #include "lv_binfont_loader.h"
-
-#include LV_STDINT_INCLUDE
-#include LV_STDBOOL_INCLUDE
 
 /**********************
  *      TYPEDEFS

@@ -11,9 +11,8 @@
 #if LV_USE_LINE != 0
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
+#include "../../misc/lv_types.h"
 #include "../../draw/lv_draw.h"
-#include LV_STDBOOL_INCLUDE
-#include LV_STDINT_INCLUDE
 
 /*********************
  *      DEFINES

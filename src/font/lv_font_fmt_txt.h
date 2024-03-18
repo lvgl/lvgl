@@ -14,9 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_font.h"
-#include LV_STDINT_INCLUDE
-#include LV_STDDEF_INCLUDE
-#include LV_STDBOOL_INCLUDE
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES

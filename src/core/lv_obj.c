@@ -17,9 +17,9 @@
 #include "../misc/lv_assert.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
+#include "../misc/lv_types.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
-#include LV_STDINT_INCLUDE
 
 /*********************
  *      DEFINES

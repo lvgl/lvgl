@@ -28,9 +28,7 @@
     #define LV_PRIX32 "X"
 #endif
 
-#include LV_STDBOOL_INCLUDE
-#include LV_STDARG_INCLUDE
-#include LV_STDDEF_INCLUDE
+#include "../misc/lv_types.h"
 
 #ifdef __cplusplus
 extern "C" {

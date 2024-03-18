@@ -22,8 +22,6 @@ extern "C" {
 #include "lv_assert.h"
 #include "lv_bidi.h"
 #include "../layouts/lv_layout.h"
-#include LV_STDBOOL_INCLUDE
-#include LV_STDINT_INCLUDE
 
 /*********************
  *      DEFINES
