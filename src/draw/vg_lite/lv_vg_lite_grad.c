@@ -239,7 +239,7 @@ static lv_cache_compare_res_t grad_compare_cb(const grad_item_t * lhs, const gra
     }
 
     int cmp_res = lv_memcmp(lhs->lv_grad.stops, rhs->lv_grad.stops,
-                         sizeof(lv_gradient_stop_t) * lhs->lv_grad.stops_count);
+                            sizeof(lv_gradient_stop_t) * lhs->lv_grad.stops_count);
     if(cmp_res != 0) {
         return cmp_res > 0 ? 1 : -1;
     }
