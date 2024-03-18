@@ -50,24 +50,32 @@ static void image_header_cache_free_cb(lv_image_header_cache_data_t * entry, voi
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_image_cache_init(void)
+lv_result_t lv_image_cache_init(void)
 {
 #if LV_CACHE_DEF_SIZE > 0
+    if(img_cache_p != NULL) {
+        return LV_RESULT_OK;
+    }
+
     img_cache_p = lv_cache_create(&lv_cache_class_lru_rb_size,
     sizeof(lv_image_cache_data_t), LV_CACHE_DEF_SIZE, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t) image_cache_compare_cb,
         .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t) image_cache_free_cb,
     });
-    return img_cache_p != NULL;
+    return img_cache_p != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
 #else
-    return false;
+    return LV_RESULT_INVALID;
 #endif
 }
 
-bool lv_image_header_cache_init(void)
+lv_result_t lv_image_header_cache_init(void)
 {
 #if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+    if(img_header_cache_p != NULL) {
+        return LV_RESULT_OK;
+    }
+
     img_header_cache_p = lv_cache_create(&lv_cache_class_lru_rb_count,
     sizeof(lv_image_header_cache_data_t), LV_IMAGE_HEADER_CACHE_DEF_CNT, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t) image_header_cache_compare_cb,
@@ -75,9 +83,9 @@ bool lv_image_header_cache_init(void)
         .free_cb = (lv_cache_free_cb_t) image_header_cache_free_cb
     });
 
-    return img_header_cache_p != NULL;
+    return img_header_cache_p != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
 #else
-    return false;
+    return LV_RESULT_INVALID;
 #endif
 }
 
