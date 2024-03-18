@@ -18,7 +18,7 @@ def get_arg():
 
     print('log_file: ' + args.log_file)
 
-    if args.trace_file is None:
+    if not args.trace_file:
         log_file = Path(args.log_file)
         args.trace_file = log_file.with_suffix('.systrace').as_posix()
     print('trace_file: ' + args.trace_file)
