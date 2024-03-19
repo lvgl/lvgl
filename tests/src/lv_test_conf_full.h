@@ -56,6 +56,7 @@
 #define LV_USE_FS_MEMFS     1
 #define LV_FS_MEMFS_LETTER  'M'
 
+#define LV_USE_MONKEY       1
 #define LV_USE_RLE          1
 #define LV_USE_LODEPNG      1
 #define LV_USE_LIBPNG       1
