@@ -390,7 +390,7 @@ props = [
  'dsc': "Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
 
 {'name': 'BITMAP_MASK_SRC',
- 'style_type': 'ptr',   'var_type': 'const lv_image_dsc_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'ptr',   'var_type': 'const void *', 'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "If set a layer will be created for the widget and the layer will be masked with this A8 bitmap mask."},
 
 {'section': 'Flex', 'dsc':'Flex layout properties.',  'guard':'LV_USE_FLEX'},
