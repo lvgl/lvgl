@@ -15,8 +15,8 @@ extern "C" {
  *********************/
 
 #if defined(_RTE_)
-    #include "Pre_Include_Global.h"
-    #include "lv_conf_cmsis.h"
+#include "Pre_Include_Global.h"
+#include "lv_conf_cmsis.h"
 #endif
 
 #include "../../../../lv_conf_internal.h"
