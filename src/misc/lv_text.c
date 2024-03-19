@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include <stdarg.h>
-#include "lv_text.h"
+#include "lv_text_private.h"
 #include "lv_text_ap.h"
 #include "lv_math.h"
 #include "lv_log.h"
@@ -55,23 +55,23 @@
  *  GLOBAL VARIABLES
  **********************/
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
-    uint8_t (*_lv_text_encoded_size)(const char *)                   = lv_text_utf8_size;
-    uint32_t (*_lv_text_unicode_to_encoded)(uint32_t)                = lv_text_unicode_to_utf8;
-    uint32_t (*_lv_text_encoded_conv_wc)(uint32_t)                   = lv_text_utf8_conv_wc;
-    uint32_t (*_lv_text_encoded_next)(const char *, uint32_t *)      = lv_text_utf8_next;
-    uint32_t (*_lv_text_encoded_prev)(const char *, uint32_t *)      = lv_text_utf8_prev;
-    uint32_t (*_lv_text_encoded_get_byte_id)(const char *, uint32_t) = lv_text_utf8_get_byte_id;
-    uint32_t (*_lv_text_encoded_get_char_id)(const char *, uint32_t) = lv_text_utf8_get_char_id;
-    uint32_t (*_lv_text_get_encoded_length)(const char *)            = lv_text_utf8_get_length;
+    uint8_t (*const _lv_text_encoded_size)(const char *)                   = lv_text_utf8_size;
+    uint32_t (*const _lv_text_unicode_to_encoded)(uint32_t)                = lv_text_unicode_to_utf8;
+    uint32_t (*const _lv_text_encoded_conv_wc)(uint32_t)                   = lv_text_utf8_conv_wc;
+    uint32_t (*const _lv_text_encoded_next)(const char *, uint32_t *)      = lv_text_utf8_next;
+    uint32_t (*const _lv_text_encoded_prev)(const char *, uint32_t *)      = lv_text_utf8_prev;
+    uint32_t (*const _lv_text_encoded_get_byte_id)(const char *, uint32_t) = lv_text_utf8_get_byte_id;
+    uint32_t (*const _lv_text_encoded_get_char_id)(const char *, uint32_t) = lv_text_utf8_get_char_id;
+    uint32_t (*const _lv_text_get_encoded_length)(const char *)            = lv_text_utf8_get_length;
 #elif LV_TXT_ENC == LV_TXT_ENC_ASCII
-    uint8_t (*_lv_text_encoded_size)(const char *)                   = lv_text_iso8859_1_size;
-    uint32_t (*_lv_text_unicode_to_encoded)(uint32_t)                = lv_text_unicode_to_iso8859_1;
-    uint32_t (*_lv_text_encoded_conv_wc)(uint32_t)                   = lv_text_iso8859_1_conv_wc;
-    uint32_t (*_lv_text_encoded_next)(const char *, uint32_t *)      = lv_text_iso8859_1_next;
-    uint32_t (*_lv_text_encoded_prev)(const char *, uint32_t *)      = lv_text_iso8859_1_prev;
-    uint32_t (*_lv_text_encoded_get_byte_id)(const char *, uint32_t) = lv_text_iso8859_1_get_byte_id;
-    uint32_t (*_lv_text_encoded_get_char_id)(const char *, uint32_t)     = lv_text_iso8859_1_get_char_id;
-    uint32_t (*_lv_text_get_encoded_length)(const char *)            = lv_text_iso8859_1_get_length;
+    uint8_t (*const _lv_text_encoded_size)(const char *)                   = lv_text_iso8859_1_size;
+    uint32_t (*const _lv_text_unicode_to_encoded)(uint32_t)                = lv_text_unicode_to_iso8859_1;
+    uint32_t (*const _lv_text_encoded_conv_wc)(uint32_t)                   = lv_text_iso8859_1_conv_wc;
+    uint32_t (*const _lv_text_encoded_next)(const char *, uint32_t *)      = lv_text_iso8859_1_next;
+    uint32_t (*const _lv_text_encoded_prev)(const char *, uint32_t *)      = lv_text_iso8859_1_prev;
+    uint32_t (*const _lv_text_encoded_get_byte_id)(const char *, uint32_t) = lv_text_iso8859_1_get_byte_id;
+    uint32_t (*const _lv_text_encoded_get_char_id)(const char *, uint32_t)     = lv_text_iso8859_1_get_char_id;
+    uint32_t (*const _lv_text_get_encoded_length)(const char *)            = lv_text_iso8859_1_get_length;
 
 #endif
 

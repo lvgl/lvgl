@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_font.h"
-#include "../misc/lv_text.h"
+#include "../misc/lv_text_private.h"
 #include "../misc/lv_utils.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_assert.h"

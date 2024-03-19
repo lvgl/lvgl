@@ -17,6 +17,7 @@
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_bidi.h"
 #include "../../misc/lv_text_ap.h"
+#include "../../misc/lv_text_private.h"
 #include "../../stdlib/lv_sprintf.h"
 #include "../../stdlib/lv_string.h"
 

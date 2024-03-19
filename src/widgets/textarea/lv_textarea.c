@@ -16,7 +16,7 @@
 #include "../../draw/lv_draw.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_anim.h"
-#include "../../misc/lv_text.h"
+#include "../../misc/lv_text_private.h"
 #include "../../misc/lv_math.h"
 #include "../../stdlib/lv_string.h"
 

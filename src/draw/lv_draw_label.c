@@ -11,6 +11,7 @@
 #include "../misc/lv_math.h"
 #include "../core/lv_obj_event.h"
 #include "../misc/lv_bidi.h"
+#include "../misc/lv_text_private.h"
 #include "../misc/lv_assert.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
