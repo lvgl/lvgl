@@ -13,7 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_cache_private.h"
+
+#include "../../lv_conf_internal.h"
+#include <stdbool.h>
 
 #if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
 
