@@ -200,7 +200,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
     }
 
     uint32_t line_end = line_start + lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL,
-                                                            dsc->flag);
+                                                           dsc->flag);
 
     /*Go the first visible line*/
     while(pos.y + line_height_font < draw_unit->clip_area->y1) {

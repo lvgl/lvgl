@@ -42,7 +42,7 @@ extern "C" {
  * they are different)
  */
 uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font, int32_t letter_space,
-                                int32_t max_width, int32_t * used_width, lv_text_flag_t flag);
+                               int32_t max_width, int32_t * used_width, lv_text_flag_t flag);
 
 /**
  * Insert a string into an other
@@ -259,7 +259,6 @@ extern uint32_t (*const lv_text_encoded_get_char_id)(const char *, uint32_t);
  * @return number of characters
  */
 extern uint32_t (*const lv_text_get_encoded_length)(const char *);
-
 
 /**********************
  *      MACROS
