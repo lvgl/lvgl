@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-12-05" version="8.3.11" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.11.pack">
+    <release date="2024-03-19" version="8.4.0" url="https://github.com/lvgl/lvgl/raw/v8.4.0/env_support/cmsis-pack/LVGL.lvgl.8.4.0.pack">
+      - LVGL 8.4.0
+      - Some minor fixes
+    </release>
+    <release date="2023-12-05" version="8.3.11" url="https://github.com/lvgl/lvgl/raw/v8.3.11/env_support/cmsis-pack/LVGL.lvgl.8.3.11.pack">
       - LVGL 8.3.11
       - Add LittleFS Library to LVGL8
       - Backport Tiny TTF to LVGL8
@@ -310,7 +314,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.11">
+        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.4.0">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="lvgl" Csub="Essential" >
@@ -443,7 +447,7 @@
                 <file category="sourceC"            name="src/widgets/lv_textarea.c" />
 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.4" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.5" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>

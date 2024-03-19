@@ -35,7 +35,9 @@ remove the misleading guide above this code segment.
 #define LV_CONF_H
 
 #include <stdint.h>
-#include "RTE_Components.h"
+#if defined(_RTE_)
+    #include "RTE_Components.h"
+#endif
 ...
 ```
 
