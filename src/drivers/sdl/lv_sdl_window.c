@@ -253,7 +253,9 @@ static void sdl_event_handler(lv_timer_t * t)
     SDL_Event event;
     while(SDL_PollEvent(&event)) {
         _lv_sdl_mouse_handler(&event);
+#if LV_SDL_MOUSEWHEEL_MODE == LV_SDL_MOUSEWHEEL_MODE_ENCODER
         _lv_sdl_mousewheel_handler(&event);
+#endif
         _lv_sdl_keyboard_handler(&event);
 
         if(event.type == SDL_WINDOWEVENT) {
