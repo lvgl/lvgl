@@ -42,10 +42,12 @@ lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*c
                            void * user_data)
 {
     LV_UNUSED(prio);
-    LV_UNUSED(stack_size);
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, stack_size);
     thread->callback = callback;
     thread->user_data = user_data;
-    pthread_create(&thread->thread, NULL, generic_callback, thread);
+    pthread_create(&thread->thread, &attr, generic_callback, thread);
     return LV_RESULT_OK;
 }
 

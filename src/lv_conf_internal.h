@@ -370,6 +370,15 @@
     #endif
 #endif
 
+/* flexible set draw thread stacksize. */
+#ifndef LV_DRAW_THREAD_STACKSIZE
+    #ifdef CONFIG_LV_DRAW_THREAD_STACKSIZE
+        #define LV_DRAW_THREAD_STACKSIZE CONFIG_LV_DRAW_THREAD_STACKSIZE
+    #else
+        #define LV_DRAW_THREAD_STACKSIZE 4096
+    #endif
+#endif
+
 /* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE
