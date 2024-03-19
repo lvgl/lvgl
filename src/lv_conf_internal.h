@@ -208,6 +208,15 @@
     #endif
 #endif
 
+#ifndef LV_DRAW_THREAD_STACKSIZE
+    #ifdef CONFIG_LV_DRAW_THREAD_STACKSIZE
+        #define LV_DRAW_THREAD_STACKSIZE CONFIG_LV_DRAW_THREAD_STACKSIZE
+    #else
+        #define LV_DRAW_THREAD_STACKSIZE 4096
+    #endif
+#endif
+
+
 #if LV_USE_OS == LV_OS_CUSTOM
     #ifndef LV_OS_CUSTOM_INCLUDE
         #ifdef CONFIG_LV_OS_CUSTOM_INCLUDE
