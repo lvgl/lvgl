@@ -658,7 +658,7 @@ bool lv_windows_keypad_device_window_message_handler(
                         }
 
                         uint32_t lvgl_code_point =
-                            _lv_text_unicode_to_encoded(code_point);
+                            lv_text_unicode_to_encoded(code_point);
 
                         lv_windows_push_key_to_keyboard_queue(
                             context,
