@@ -738,6 +738,19 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
     }
+    else if(code == LV_EVENT_ROTARY) {
+        if(!lv_dropdown_is_open(obj)) {
+            lv_dropdown_open(obj);
+        }
+        else {
+            int32_t r = lv_event_get_rotary_diff(e);
+            int32_t new_id = dropdown->sel_opt_id + r;
+            new_id = LV_CLAMP(0, new_id, (int32_t)dropdown->option_cnt - 1);
+
+            dropdown->sel_opt_id = new_id;
+            position_to_selected(obj);
+        }
+    }
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
     }
