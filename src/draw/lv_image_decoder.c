@@ -61,8 +61,14 @@ void _lv_image_decoder_init(void)
 {
     _lv_ll_init(img_decoder_ll_p, sizeof(lv_image_decoder_t));
 
+    /*Initialize the cache*/
+#if LV_CACHE_DEF_SIZE > 0
     lv_image_cache_init();
+#endif
+
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
     lv_image_header_cache_init();
+#endif
 }
 
 /**
