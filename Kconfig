@@ -200,7 +200,8 @@ menu "LVGL configuration"
 		config LV_DRAW_THREAD_STACKSIZE
 			int "stack size of draw thread"
 			default 32768
-
+			depends on LV_USE_OS > 0
+			
 		config LV_USE_DRAW_ARM2D_SYNC
 			bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors"
 			default n
