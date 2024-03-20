@@ -61,7 +61,7 @@ typedef struct {
 #endif /* LV_LINUX_FBDEV_BSD */
     char * fbp;
     uint8_t * rotated_buf;
-    int32_t rotated_buf_size;
+    size_t rotated_buf_size;
     long int screensize;
     int fbfd;
     bool force_refresh;
@@ -273,7 +273,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
     if(rotation != LV_DISPLAY_ROTATION_0 && LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /* (Re)allocate temporary buffer if needed */
-        int32_t buf_size = w * h * px_size;
+        size_t buf_size = w * h * px_size;
         if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
             dsc->rotated_buf = realloc(dsc->rotated_buf, buf_size);
             dsc->rotated_buf_size = buf_size;
@@ -283,14 +283,18 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
         uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
 
-        if(rotation == LV_DISPLAY_ROTATION_90) {
-            lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-        }
-        if(rotation == LV_DISPLAY_ROTATION_180) {
-            lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
-        }
-        if(rotation == LV_DISPLAY_ROTATION_270) {
-            lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+        switch(rotation) {
+            case LV_DISPLAY_ROTATION_0:
+                break;
+            case LV_DISPLAY_ROTATION_90:
+                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+                break;
+            case LV_DISPLAY_ROTATION_180:
+                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
+                break;
+            case LV_DISPLAY_ROTATION_270:
+                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+                break;
         }
         color_p = dsc->rotated_buf;
 

@@ -40,7 +40,7 @@ typedef struct {
     uint8_t * buf1;
     uint8_t * buf2;
     uint8_t * rotated_buf;
-    int32_t rotated_buf_size;
+    size_t rotated_buf_size;
 #endif
     uint8_t zoom;
     uint8_t ignore_size_chg;
@@ -222,7 +222,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
             int32_t h = lv_area_get_height(area);
             uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
             uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
-            int32_t buf_size = w * h * px_size;
+            size_t buf_size = w * h * px_size;
 
             /* (Re)allocate temporary buffer if needed */
             if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
@@ -230,14 +230,18 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
                 dsc->rotated_buf_size = buf_size;
             }
 
-            if(rotation == LV_DISPLAY_ROTATION_90) {
-                lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-            }
-            if(rotation == LV_DISPLAY_ROTATION_180) {
-                lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
-            }
-            if(rotation == LV_DISPLAY_ROTATION_270) {
-                lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+            switch(rotation) {
+                case LV_DISPLAY_ROTATION_0:
+                    break;
+                case LV_DISPLAY_ROTATION_90:
+                    lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+                    break;
+                case LV_DISPLAY_ROTATION_180:
+                    lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
+                    break;
+                case LV_DISPLAY_ROTATION_270:
+                    lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+                    break;
             }
 
             px_map = dsc->rotated_buf;
@@ -249,7 +253,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         uint32_t px_map_line_bytes = lv_area_get_width(area) * px_size;
 
         uint8_t * fb_tmp = dsc->fb_act;
-        int32_t fb_stride = disp->hor_res * px_size;
+        uint32_t fb_stride = disp->hor_res * px_size;
         fb_tmp += area->y1 * fb_stride;
         fb_tmp += area->x1 * px_size;
 
@@ -386,7 +390,7 @@ static void texture_resize(lv_display_t * disp)
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
 
     dsc->fb1 = realloc(dsc->fb1, stride * disp->ver_res);
-    memset(dsc->fb1, 0x00, stride * disp->ver_res);
+    lv_memzero(dsc->fb1, stride * disp->ver_res);
 
     if(LV_SDL_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         dsc->fb_act = dsc->fb1;
