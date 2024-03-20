@@ -472,7 +472,6 @@ static void place_content(lv_flex_align_t place, int32_t max_size, int32_t conte
 {
     if(item_cnt <= 1) {
         switch(place) {
-            case LV_FLEX_ALIGN_SPACE_BETWEEN:
             case LV_FLEX_ALIGN_SPACE_AROUND:
             case LV_FLEX_ALIGN_SPACE_EVENLY:
                 place = LV_FLEX_ALIGN_CENTER;
@@ -492,7 +491,7 @@ static void place_content(lv_flex_align_t place, int32_t max_size, int32_t conte
             *start_pos += max_size - content_size;
             break;
         case LV_FLEX_ALIGN_SPACE_BETWEEN:
-            *gap = (int32_t)(max_size - content_size) / (int32_t)(item_cnt - 1);
+            if(item_cnt > 1) *gap = (int32_t)(max_size - content_size) / (int32_t)(item_cnt - 1);
             break;
         case LV_FLEX_ALIGN_SPACE_AROUND:
             *gap += (int32_t)(max_size - content_size) / (int32_t)(item_cnt);
