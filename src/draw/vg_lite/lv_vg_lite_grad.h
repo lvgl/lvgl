@@ -34,8 +34,8 @@ extern "C" {
 
 void lv_vg_lite_grad_init(
     struct _lv_draw_vg_lite_unit_t * u,
-    uint32_t linear_grad_cache_size,
-    uint32_t radial_grad_cache_size);
+    uint32_t linear_grad_cache_cnt,
+    uint32_t radial_grad_cache_cnt);
 
 void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u);
 

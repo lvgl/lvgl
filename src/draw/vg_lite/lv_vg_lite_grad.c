@@ -81,11 +81,11 @@ static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t
 
 void lv_vg_lite_grad_init(
     struct _lv_draw_vg_lite_unit_t * u,
-    uint32_t linear_grad_cache_size,
-    uint32_t radial_grad_cache_size)
+    uint32_t linear_grad_cache_cnt,
+    uint32_t radial_grad_cache_cnt)
 {
     LV_ASSERT_NULL(u);
-    LV_UNUSED(radial_grad_cache_size);
+    LV_UNUSED(radial_grad_cache_cnt);
 
     /* Create the cache for linear gradients */
     {
@@ -96,7 +96,7 @@ void lv_vg_lite_grad_init(
         };
 
         u->linear_grad_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(linear_grad_item_t),
-                                               linear_grad_cache_size,
+                                               linear_grad_cache_cnt,
                                                ops);
         u->linear_grad_pending = lv_vg_lite_pending_create(sizeof(lv_cache_entry_t *), 4);
         lv_vg_lite_pending_set_free_cb(u->linear_grad_pending, grad_cache_release_cb, u->linear_grad_cache);
@@ -113,7 +113,7 @@ void lv_vg_lite_grad_init(
         };
 
         u->radial_grad_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(radial_grad_item_t),
-                                               radial_grad_cache_size,
+                                               radial_grad_cache_cnt,
                                                ops);
         u->radial_grad_pending = lv_vg_lite_pending_create(sizeof(lv_cache_entry_t *), 4);
         lv_vg_lite_pending_set_free_cb(u->radial_grad_pending, grad_cache_release_cb, u->radial_grad_cache);
@@ -505,8 +505,8 @@ static lv_cache_compare_res_t radial_grad_compare_cb(const radial_grad_item_t * 
         return lhs->lv_grad.grad.stops_count > rhs->lv_grad.grad.stops_count ? 1 : -1;
     }
 
-    int cmp_res = memcmp(lhs->lv_grad.grad.stops, rhs->lv_grad.grad.stops,
-                         sizeof(lv_gradient_stop_t) * lhs->lv_grad.grad.stops_count);
+    int cmp_res = lv_memcmp(lhs->lv_grad.grad.stops, rhs->lv_grad.grad.stops,
+                            sizeof(lv_gradient_stop_t) * lhs->lv_grad.grad.stops_count);
     if(cmp_res != 0) {
         return cmp_res > 0 ? 1 : -1;
     }
