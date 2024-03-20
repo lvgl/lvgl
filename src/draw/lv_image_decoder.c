@@ -38,9 +38,7 @@ static uint32_t img_width_to_stride(lv_image_header_t * header);
  */
 static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_header_t * header);
 
-#if LV_CACHE_DEF_SIZE > 0
-    static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
-#endif
+static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -57,14 +55,13 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
 /**
  * Initialize the image decoder module
  */
-void _lv_image_decoder_init(void)
+void _lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_count)
 {
     _lv_ll_init(img_decoder_ll_p, sizeof(lv_image_decoder_t));
 
     /*Initialize the cache*/
-    lv_image_cache_init(0);
-//    lv_image_header_cache_init(LV_IMAGE_HEADER_CACHE_DEF_CNT);
-    lv_image_header_cache_init(0);
+    lv_image_cache_init(image_cache_size);
+    lv_image_header_cache_init(image_header_count);
 }
 
 /**
@@ -94,16 +91,16 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     dsc->src = src;
     dsc->src_type = lv_image_src_get_type(src);
 
-#if LV_CACHE_DEF_SIZE > 0
-    dsc->cache = img_cache_p;
-    /*Try cache first, unless we are told to ignore cache.*/
-    if(!(args && args->no_cache)) {
-        /*
-        * Check the cache first
-        * If the image is found in the cache, just return it.*/
-        if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
+    if(lv_image_cache_is_disabled() == false) {
+        dsc->cache = img_cache_p;
+        /*Try cache first, unless we are told to ignore cache.*/
+        if(!(args && args->no_cache)) {
+            /*
+            * Check the cache first
+            * If the image is found in the cache, just return it.*/
+            if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
+        }
     }
-#endif
 
     /*Find the decoder that can open the image source, and get the header info in the same time.*/
     dsc->decoder = image_decoder_get_info(src, &dsc->header);
@@ -193,7 +190,6 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
     decoder->close_cb = close_cb;
 }
 
-#if LV_CACHE_DEF_SIZE > 0
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data)
@@ -216,7 +212,6 @@ lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
 
     return cache_entry;
 }
-#endif
 
 lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_draw_buf_t * decoded)
 {
@@ -283,7 +278,7 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
     }
 
     lv_image_decoder_t * decoder;
-    bool is_header_cache_disabled = lv_cache_is_disabled(img_header_cache_p);
+    bool is_header_cache_disabled = lv_image_header_cache_is_disabled();
 
     if(!is_header_cache_disabled && src_type == LV_IMAGE_SRC_FILE) {
         lv_image_header_cache_data_t search_key;
@@ -345,7 +340,6 @@ static uint32_t img_width_to_stride(lv_image_header_t * header)
     }
 }
 
-#if LV_CACHE_DEF_SIZE > 0
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 {
     lv_cache_t * cache = dsc->cache;
@@ -366,4 +360,3 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 
     return LV_RESULT_INVALID;
 }
-#endif

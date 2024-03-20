@@ -88,6 +88,11 @@ void lv_image_cache_drop(const void * src)
     lv_cache_drop(img_cache_p, &search_key, NULL);
 }
 
+bool lv_image_cache_is_disabled(void)
+{
+    return lv_cache_is_disabled(img_cache_p);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

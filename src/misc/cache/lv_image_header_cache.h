@@ -49,6 +49,12 @@ void lv_image_header_cache_resize(uint32_t new_size, bool evict_now);
  */
 void lv_image_header_cache_drop(const void * src);
 
+/**
+ * Return true if the image header cache is disabled.
+ * @return true: disabled, false: enabled.
+ */
+bool lv_image_header_cache_is_disabled(void);
+
 /*************************
  *    GLOBAL VARIABLES
  *************************/

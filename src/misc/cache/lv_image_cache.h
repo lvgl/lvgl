@@ -17,8 +17,6 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 #include "../lv_types.h"
 
-#if LV_CACHE_DEF_SIZE > 0
-
 /*********************
  *      DEFINES
  *********************/
@@ -44,13 +42,17 @@ lv_result_t lv_image_cache_init(uint32_t size);
  */
 void lv_image_cache_resize(uint32_t new_size, bool evict_now);
 
-#endif /*LV_CACHE_DEF_SIZE > 0*/
-
 /**
  * Invalidate image cache. Use NULL to invalidate all images.
  * @param src pointer to an image source.
  */
 void lv_image_cache_drop(const void * src);
+
+/**
+ * Return true if the image cache is disabled.
+ * @return true: disabled, false: enabled.
+ */
+bool lv_image_cache_is_disabled(void);
 
 /*************************
  *    GLOBAL VARIABLES
