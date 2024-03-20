@@ -36,7 +36,6 @@ static void lv_path_opa_to_vg(lv_vg_lite_path_t * dest, const lv_vector_draw_dsc
 static void lv_stroke_to_vg(lv_vg_lite_path_t * dest, const lv_vector_stroke_dsc_t * dsc);
 static vg_lite_blend_t lv_blend_to_vg(lv_vector_blend_t blend);
 static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule);
-static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread);
 static vg_lite_cap_style_t lv_stroke_cap_to_vg(lv_vector_stroke_cap_t cap);
 static vg_lite_join_style_t lv_stroke_join_to_vg(lv_vector_stroke_join_t join);
 
@@ -205,8 +204,6 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
                 /* draw gradient */
                 lv_vector_gradient_style_t style = dsc->fill_dsc.gradient.style;
-                vg_lite_gradient_spreadmode_t spreadmode = lv_spread_to_vg(dsc->fill_dsc.gradient.spread);
-                LV_UNUSED(spreadmode);
 
                 if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
                     vg_lite_matrix_t grad_matrix, fill_matrix;
@@ -229,12 +226,23 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                         blend);
                 }
                 else if(style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
-                    if(vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {
-                        /* TODO: radial gradient */
-                    }
-                    else {
-                        LV_LOG_WARN("radial gradient is not supported");
-                    }
+                    vg_lite_matrix_t grad_matrix;
+                    lv_matrix_to_vg(&grad_matrix, &dsc->fill_dsc.matrix);
+
+                    /* add min_x, min_y to gradient center */
+                    lv_vector_gradient_t new_grad = dsc->fill_dsc.gradient;
+                    new_grad.cx += min_x;
+                    new_grad.cy += min_y;
+
+                    lv_vg_lite_draw_radial_grad(
+                        u,
+                        &u->target_buffer,
+                        vg_path,
+                        &new_grad,
+                        &grad_matrix,
+                        &matrix,
+                        fill,
+                        blend);
                 }
             }
             break;
@@ -428,20 +436,6 @@ static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule)
             return VG_LITE_FILL_EVEN_ODD;
         default:
             return VG_LITE_FILL_NON_ZERO;
-    }
-}
-
-static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread)
-{
-    switch(spread) {
-        case LV_VECTOR_GRADIENT_SPREAD_PAD:
-            return VG_LITE_GRADIENT_SPREAD_PAD;
-        case LV_VECTOR_GRADIENT_SPREAD_REPEAT:
-            return VG_LITE_GRADIENT_SPREAD_REPEAT;
-        case LV_VECTOR_GRADIENT_SPREAD_REFLECT:
-            return VG_LITE_GRADIENT_SPREAD_REFLECT;
-        default:
-            return VG_LITE_GRADIENT_SPREAD_FILL;
     }
 }
 
