@@ -124,6 +124,18 @@ char * lv_strdup(const char * src);
  */
 char * lv_strcat(char * dst, const char * src);
 
+/**
+ * @brief Copies up to src_len characters from the string pointed to by src
+ *        to the end of the string pointed to by dst.
+ *        A terminating null character is appended to dst even if no null character
+ *        was encountered in src after src_len characters were copied.
+ * @param dst Pointer to the destination string where the content is to be appended.
+ * @param src Pointer to the source of data to be copied.
+ * @param src_len Maximum number of characters from src to be copied to the end of dst.
+ * @return A pointer to the destination string, which is dst.
+ */
+char * lv_strncat(char * dst, const char * src, size_t src_len);
+
 /**********************
  *      MACROS
  **********************/
