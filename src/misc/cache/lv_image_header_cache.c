@@ -8,9 +8,10 @@
  *********************/
 #include "../lv_assert.h"
 #include "lv_image_header_cache.h"
-#include "../../core/lv_global.h"
 
 #if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
+
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES

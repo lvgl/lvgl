@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../lv_conf_internal.h"
-#include <stdbool.h>
+#include "../lv_types.h"
 
 #if LV_CACHE_DEF_SIZE > 0
 
