@@ -17,8 +17,6 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 #include "../lv_types.h"
 
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
-
 /*********************
  *      DEFINES
  *********************/
@@ -35,7 +33,7 @@ extern "C" {
  * Initialize image header cache.
  * @return LV_RESULT_OK: initialization succeeded, LV_RESULT_INVALID: failed.
  */
-lv_result_t lv_image_header_cache_init(void);
+lv_result_t lv_image_header_cache_init(uint32_t count);
 
 /**
  * Resize image header cache.
@@ -43,8 +41,6 @@ lv_result_t lv_image_header_cache_init(void);
  * @param evict_now true: evict the image headers should be removed by the eviction policy, false: wait for the next cache cleanup.
  */
 void lv_image_header_cache_resize(uint32_t new_size, bool evict_now);
-
-#endif /*LV_IMAGE_HEADER_CACHE_DEF_CNT > 0*/
 
 /**
  * Invalidate image header cache. Use NULL to invalidate all image headers.

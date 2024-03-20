@@ -62,13 +62,9 @@ void _lv_image_decoder_init(void)
     _lv_ll_init(img_decoder_ll_p, sizeof(lv_image_decoder_t));
 
     /*Initialize the cache*/
-#if LV_CACHE_DEF_SIZE > 0
-    lv_image_cache_init();
-#endif
-
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
-    lv_image_header_cache_init();
-#endif
+    lv_image_cache_init(0);
+//    lv_image_header_cache_init(LV_IMAGE_HEADER_CACHE_DEF_CNT);
+    lv_image_header_cache_init(0);
 }
 
 /**
@@ -76,13 +72,9 @@ void _lv_image_decoder_init(void)
  */
 void _lv_image_decoder_deinit(void)
 {
-#if LV_CACHE_DEF_SIZE > 0
     lv_cache_destroy(img_cache_p, NULL);
-#endif
-
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
     lv_cache_destroy(img_header_cache_p, NULL);
-#endif
+
     _lv_ll_clear(img_decoder_ll_p);
 }
 
@@ -291,9 +283,9 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
     }
 
     lv_image_decoder_t * decoder;
+    bool is_header_cache_disabled = lv_cache_is_disabled(img_header_cache_p);
 
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
-    if(src_type == LV_IMAGE_SRC_FILE) {
+    if(!is_header_cache_disabled && src_type == LV_IMAGE_SRC_FILE) {
         lv_image_header_cache_data_t search_key;
         search_key.src_type = src_type;
         search_key.src = src;
@@ -308,7 +300,6 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
             return decoder;
         }
     }
-#endif
 
     _LV_LL_READ(img_decoder_ll_p, decoder) {
         /*Info and Open callbacks are required*/
@@ -324,8 +315,7 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         }
     }
 
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
-    if(src_type == LV_IMAGE_SRC_FILE && decoder) {
+    if(!is_header_cache_disabled && src_type == LV_IMAGE_SRC_FILE && decoder) {
         lv_cache_entry_t * entry;
         lv_image_header_cache_data_t search_key;
         search_key.src_type = src_type;
@@ -341,7 +331,6 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
 
         lv_cache_release(img_header_cache_p, entry, NULL);
     }
-#endif
 
     return decoder;
 }

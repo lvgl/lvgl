@@ -35,7 +35,7 @@ extern "C" {
  * Initialize image cache.
  * @return LV_RESULT_OK: initialization succeeded, LV_RESULT_INVALID: failed.
  */
-lv_result_t lv_image_cache_init(void);
+lv_result_t lv_image_cache_init(uint32_t size);
 
 /**
  * Resize image cache.

@@ -169,6 +169,14 @@ size_t lv_cache_get_size(lv_cache_t * cache, void * user_data);
 size_t lv_cache_get_free_size(lv_cache_t * cache, void * user_data);
 
 /**
+ * Return true if the cache is disabled.
+ * Disabled cache means that when the max_size of the cache is 0. In this case, all cache operations will be no-op.
+ * @param cache         The cache object pointer to check if it's disabled.
+ * @return              Returns true if the cache is disabled, false otherwise.
+ */
+bool lv_cache_is_disabled(lv_cache_t * cache);
+
+/**
  * Set the compare callback of the cache.
  * @param cache         The cache object pointer to set the compare callback.
  * @param compare_cb    The compare callback to set.
