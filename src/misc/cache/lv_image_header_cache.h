@@ -37,6 +37,7 @@ lv_result_t lv_image_header_cache_init(uint32_t count);
 
 /**
  * Resize image header cache.
+ * If set to 0, the cache is disabled.
  * @param new_size  new size of the cache in count of image headers.
  * @param evict_now true: evict the image headers should be removed by the eviction policy, false: wait for the next cache cleanup.
  */

@@ -37,6 +37,7 @@ lv_result_t lv_image_cache_init(uint32_t size);
 
 /**
  * Resize image cache.
+ * If set to 0, the cache will be disabled.
  * @param new_size  new size of the cache in bytes.
  * @param evict_now true: evict the images should be removed by the eviction policy, false: wait for the next cache cleanup.
  */
