@@ -32,7 +32,6 @@ enum {
 };
 typedef uint8_t lv_colorwheel_mode_t;
 
-
 /*Data of color picker*/
 typedef struct {
     lv_obj_t obj;
@@ -139,4 +138,3 @@ bool lv_colorwheel_get_color_mode_fixed(lv_obj_t * obj);
 #endif
 
 #endif /*LV_COLORWHEEL_H*/
-

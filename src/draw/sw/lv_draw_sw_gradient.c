@@ -47,7 +47,6 @@ static lv_res_t find_item(lv_grad_t * c, void * ctx);
 static void free_item(lv_grad_t * c);
 static  uint32_t compute_key(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord_t h);
 
-
 /**********************
  *   STATIC VARIABLE
  **********************/
@@ -227,7 +226,6 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord
     }
     return item;
 }
-
 
 /**********************
  *     FUNCTIONS

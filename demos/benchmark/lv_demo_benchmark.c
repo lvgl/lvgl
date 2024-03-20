@@ -226,7 +226,6 @@ static void shadow_small_ofs_cb(void)
     rect_create(&style_common);
 }
 
-
 static void shadow_large_cb(void)
 {
     lv_style_reset(&style_common);
@@ -249,7 +248,6 @@ static void shadow_large_ofs_cb(void)
     lv_style_set_shadow_spread(&style_common, SHADOW_SPREAD_LARGE);
     rect_create(&style_common);
 }
-
 
 static void img_rgb_cb(void)
 {
@@ -292,7 +290,6 @@ static void img_alpha_cb(void)
     lv_style_set_img_opa(&style_common, opa_mode ? LV_OPA_50 : LV_OPA_COVER);
     img_create(&style_common, &img_benchmark_cogwheel_alpha16, false, false, false);
 }
-
 
 static void img_rgb_recolor_cb(void)
 {
@@ -382,7 +379,6 @@ static void img_rgb_zoom_aa_cb(void)
     lv_style_set_img_opa(&style_common, opa_mode ? LV_OPA_50 : LV_OPA_COVER);
     img_create(&style_common, &img_benchmark_cogwheel_rgb, false, true, true);
 
-
 }
 
 static void img_argb_zoom_cb(void)
@@ -395,7 +391,6 @@ static void img_argb_zoom_cb(void)
     img_create(&style_common, &img_benchmark_cogwheel_argb, false, true, false);
 #endif
 }
-
 
 static void img_argb_zoom_aa_cb(void)
 {
@@ -462,7 +457,6 @@ static void txt_large_compr_cb(void)
 
 }
 
-
 static void line_cb(void)
 {
     lv_style_reset(&style_common);
@@ -489,7 +483,6 @@ static void arc_thick_cb(void)
     arc_create(&style_common);
 
 }
-
 
 static void sub_rectangle_cb(void)
 {
@@ -562,8 +555,6 @@ static void sub_text_cb(void)
     lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
     txt_create(&style_common);
 }
-
-
 
 /**********************
  *  STATIC VARIABLES
@@ -702,7 +693,6 @@ static void benchmark_init(void)
     lv_obj_update_layout(scr);
 }
 
-
 void lv_demo_benchmark(void)
 {
     benchmark_init();
@@ -749,7 +739,6 @@ void lv_demo_benchmark_run_scene(int_fast16_t scene_no)
         lv_timer_set_repeat_count(t, 1);
     }
 }
-
 
 void lv_demo_benchmark_set_finished_cb(finished_cb_t * finished_cb)
 {
@@ -799,7 +788,6 @@ static void generate_report(void)
         weight_opa_sum += w;
     }
 
-
     fps_sum = fps_normal_sum + fps_opa_sum;
     weight_sum = weight_normal_sum + weight_opa_sum;
 
@@ -815,7 +803,6 @@ static void generate_report(void)
 
     lv_obj_clean(lv_scr_act());
     scene_bg = NULL;
-
 
     lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
 
@@ -851,7 +838,6 @@ static void generate_report(void)
     //        lv_obj_add_style(table, LV_TABLE_PART_CELL2, &style_cell_slow);
     //        lv_obj_add_style(table, LV_TABLE_PART_CELL3, &style_cell_very_slow);
     //        lv_obj_add_style(table, LV_TABLE_PART_CELL4, &style_cell_title);
-
 
     uint16_t row = 0;
     lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
@@ -938,7 +924,6 @@ static void generate_report(void)
 
         lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
         lv_table_set_cell_value(table, row, 1, buf);
-
 
         if(scenes[i].fps_opa < 10) {
             //                lv_table_set_cell_type(table, row, 0, 3);
@@ -1051,7 +1036,6 @@ static void next_scene_timer_cb(lv_timer_t * timer)
     }
 }
 
-
 static void rect_create(lv_style_t * style)
 {
     uint32_t i;
@@ -1068,7 +1052,6 @@ static void rect_create(lv_style_t * style)
         fall_anim(obj);
     }
 }
-
 
 static void img_create(lv_style_t * style, const void * src, bool rotate, bool zoom, bool aa)
 {
@@ -1088,7 +1071,6 @@ static void img_create(lv_style_t * style, const void * src, bool rotate, bool z
     }
 }
 
-
 static void txt_create(lv_style_t * style)
 {
     uint32_t i;
@@ -1104,7 +1086,6 @@ static void txt_create(lv_style_t * style)
     }
 }
 
-
 static void line_create(lv_style_t * style)
 {
     static lv_point_t points[OBJ_NUM][LINE_POINT_NUM];
@@ -1119,7 +1100,6 @@ static void line_create(lv_style_t * style)
             points[i][j].y = rnd_next(LINE_POINT_DIFF_MIN, LINE_POINT_DIFF_MAX);
         }
 
-
         lv_obj_t * obj = lv_line_create(scene_bg);
         lv_obj_remove_style_all(obj);
         lv_obj_add_style(obj, style, 0);
@@ -1131,7 +1111,6 @@ static void line_create(lv_style_t * style)
 
     }
 }
-
 
 static void arc_anim_end_angle_cb(void * var, int32_t v)
 {
@@ -1165,7 +1144,6 @@ static void arc_create(lv_style_t * style)
         fall_anim(obj);
     }
 }
-
 
 static void fall_anim_y_cb(void * var, int32_t v)
 {

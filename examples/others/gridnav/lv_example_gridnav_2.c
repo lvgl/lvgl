@@ -16,7 +16,6 @@ void lv_example_gridnav_2(void)
     lv_obj_set_style_bg_color(list1, lv_palette_lighten(LV_PALETTE_BLUE, 5), LV_STATE_FOCUSED);
     lv_group_add_obj(lv_group_get_default(), list1);
 
-
     char buf[32];
     uint32_t i;
     for(i = 0; i < 15; i++) {

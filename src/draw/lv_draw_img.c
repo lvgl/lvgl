@@ -351,7 +351,6 @@ static lv_res_t LV_ATTRIBUTE_FAST_MEM decode_and_draw(lv_draw_ctx_t * draw_ctx,
     return LV_RES_OK;
 }
 
-
 static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg)
 {
     lv_draw_rect_dsc_t rect_dsc;

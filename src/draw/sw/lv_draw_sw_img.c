@@ -41,7 +41,6 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                                                   const lv_draw_img_dsc_t * draw_dsc,
                                                   const lv_area_t * coords, const uint8_t * src_buf,

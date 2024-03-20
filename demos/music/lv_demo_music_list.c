@@ -130,7 +130,6 @@ lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent)
     return list;
 }
 
-
 void _lv_demo_music_list_close(void)
 {
     lv_style_reset(&style_scrollbar);
@@ -218,7 +217,6 @@ static lv_obj_t * add_list_btn(lv_obj_t * parent, uint32_t track_id)
     return btn;
 }
 
-
 static void btn_click_event_cb(lv_event_t * e)
 {
     lv_obj_t * btn = lv_event_get_target(e);
@@ -228,4 +226,3 @@ static void btn_click_event_cb(lv_event_t * e)
     _lv_demo_music_play(idx);
 }
 #endif /*LV_USE_DEMO_MUSIC*/
-

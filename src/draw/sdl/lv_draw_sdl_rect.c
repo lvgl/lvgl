@@ -357,7 +357,6 @@ void lv_draw_sdl_rect_bg_frag_draw_corners(lv_draw_sdl_ctx_t * ctx, SDL_Texture 
     }
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -700,7 +699,6 @@ static void draw_shadow(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
         SDL_DestroyTexture(texture);
     }
 }
-
 
 static void draw_border(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc)

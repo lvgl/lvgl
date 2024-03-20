@@ -220,7 +220,6 @@ bool _lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p);
  */
 bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coord_t radius);
 
-
 /**
  * Check if an area is fully out of an other
  * @param aout_p pointer to an area which could be in 'aholder_p'

@@ -232,7 +232,6 @@ lv_res_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t *
     return LV_RES_OK;
 }
 
-
 /**********************
  *  STATIC FUNCTIONS
  **********************/

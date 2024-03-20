@@ -922,8 +922,6 @@ static void label_event_cb(lv_event_t * e)
     }
 }
 
-
-
 /**
  * Called to blink the cursor
  * @param ta pointer to a text area
@@ -1308,7 +1306,6 @@ static void draw_cursor(lv_event_t * e)
     /*Draw he cursor according to the type*/
     lv_area_t cur_area;
     lv_area_copy(&cur_area, &ta->cursor.area);
-
 
     cur_area.x1 += ta->label->coords.x1;
     cur_area.y1 += ta->label->coords.y1;

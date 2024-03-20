@@ -6,7 +6,6 @@
 #ifndef LV_DRAW_SDL_PRIV_H
 #define LV_DRAW_SDL_PRIV_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -61,16 +61,15 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf);
 
 /** Take snapshot for object with its children, save image info to provided buffer.
  *
- * @param obj    The object to generate snapshot.
- * @param cf     color format for generated image.
- * @param dsc    image descriptor to store the image result.
- * @param buff   the buffer to store image data.
- * @param buff_size provided buffer size in bytes.
+ * @param obj      The object to generate snapshot.
+ * @param cf       color format for generated image.
+ * @param dsc      image descriptor to store the image result.
+ * @param buf      the buffer to store image data.
+ * @param buf_size provided buffer size in bytes.
  *
  * @return LV_RES_OK on success, LV_RES_INV on error.
  */
-lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buf, uint32_t buff_size);
-
+lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buf, uint32_t buf_size);
 
 /**********************
  *      MACROS

@@ -91,7 +91,7 @@ void lv_obj_remove_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_se
  */
 static inline void lv_obj_remove_style_all(struct _lv_obj_t * obj)
 {
-    lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
+    lv_obj_remove_style(obj, NULL, (lv_style_selector_t)LV_PART_ANY | (lv_style_selector_t)LV_STATE_ANY);
 }
 
 /**
@@ -242,7 +242,6 @@ static inline lv_coord_t lv_obj_get_style_transform_zoom_safe(const struct _lv_o
     return zoom != 0 ? zoom : 1;
 }
 
-
 /**
  * Get the `opa` style property from all parents and multiply and `>> 8` them.
  * @param obj       the object whose opacity should be get
@@ -250,7 +249,6 @@ static inline lv_coord_t lv_obj_get_style_transform_zoom_safe(const struct _lv_o
  * @return          the final opacity considering the parents' opacity too
  */
 lv_opa_t lv_obj_get_style_opa_recursive(const struct _lv_obj_t * obj, lv_part_t part);
-
 
 /**********************
  *      MACROS

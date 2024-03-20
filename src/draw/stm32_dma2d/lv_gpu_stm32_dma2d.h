@@ -31,6 +31,10 @@ extern "C" {
 #define LV_STM32_DMA2D_STATIC static
 #endif
 
+#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
+#define LV_STM32_DMA2D_USE_M7_CACHE
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -53,6 +57,16 @@ struct _lv_disp_drv_t;
 void lv_draw_stm32_dma2d_init(void);
 void lv_draw_stm32_dma2d_ctx_init(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
 void lv_draw_stm32_dma2d_ctx_deinit(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
+                                      const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset);
+
+#if defined (LV_STM32_DMA2D_USE_M7_CACHE)
+void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset,
+                                          lv_coord_t width, lv_coord_t height, uint8_t pixel_size);
+void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
+                                     lv_coord_t height, uint8_t pixel_size);
+#endif
+
 
 /**********************
  *      MACROS

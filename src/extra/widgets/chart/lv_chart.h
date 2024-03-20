@@ -98,7 +98,6 @@ typedef struct {
     uint32_t label_en  : 1;
 } lv_chart_tick_dsc_t;
 
-
 typedef struct {
     lv_obj_t obj;
     lv_ll_t series_ll;     /**< Linked list for the series (stores lv_chart_series_t)*/
@@ -314,8 +313,6 @@ void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint16_
  * @return          the next series or NULL if there is no more.
  */
 lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * chart, const lv_chart_series_t * ser);
-
-
 
 /*=====================
  * Cursor

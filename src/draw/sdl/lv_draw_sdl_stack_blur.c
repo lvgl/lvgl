@@ -122,8 +122,8 @@ static void stack_blur_job(lv_opa_t * src, unsigned int w, unsigned int h, unsig
 
         for(y = minY; y < maxY; y++) {
             sum_r =
-                sum_in_r =
-                    sum_out_r = 0;
+            sum_in_r =
+            sum_out_r = 0;
 
             src_ptr = src + stride * y; // start of line (0,y)
 
@@ -134,7 +134,6 @@ static void stack_blur_job(lv_opa_t * src, unsigned int w, unsigned int h, unsig
                 sum_out_r += src_ptr[0];
             }
 
-
             for(i = 1; i <= radius; i++) {
                 if(i <= wm) src_ptr += 1;
                 stack_ptr = &stack[i + radius];
@@ -142,7 +141,6 @@ static void stack_blur_job(lv_opa_t * src, unsigned int w, unsigned int h, unsig
                 sum_r += src_ptr[0] * (radius + 1 - i);
                 sum_in_r += src_ptr[0];
             }
-
 
             sp = radius;
             xp = radius;
@@ -189,8 +187,8 @@ static void stack_blur_job(lv_opa_t * src, unsigned int w, unsigned int h, unsig
 
         for(x = minX; x < maxX; x++) {
             sum_r =
-                sum_in_r =
-                    sum_out_r = 0;
+            sum_in_r =
+            sum_out_r = 0;
 
             src_ptr = src + x; // x,0
             for(i = 0; i <= radius; i++) {

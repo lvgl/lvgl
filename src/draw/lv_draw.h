@@ -88,14 +88,11 @@ typedef struct _lv_draw_ctx_t  {
     void (*draw_letter)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
                         uint32_t letter);
 
-
     void (*draw_line)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
                       const lv_point_t * point2);
 
-
     void (*draw_polygon)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc,
                          const lv_point_t * points, uint16_t point_cnt);
-
 
     /**
      * Get an area of a transformed image (zoomed and/or rotated)
@@ -196,7 +193,6 @@ typedef struct _lv_draw_ctx_t  {
  **********************/
 
 void lv_draw_init(void);
-
 
 void lv_draw_wait_for_finish(lv_draw_ctx_t * draw_ctx);
 

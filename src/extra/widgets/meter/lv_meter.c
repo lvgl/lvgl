@@ -549,7 +549,6 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
     }
 }
 
-
 static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area)
 {
     lv_meter_t * meter = (lv_meter_t *)obj;
@@ -650,7 +649,6 @@ static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_va
                                                                                                        end_angle), indic->type_data.arc.width, rounded, &a);
     lv_obj_invalidate_area(obj, &a);
 }
-
 
 static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value)
 {

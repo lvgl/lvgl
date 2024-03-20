@@ -254,7 +254,6 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
     buf[c] = '\0';
 }
 
-
 /**
  * Get the options of a roller
  * @param roller pointer to roller object
@@ -266,7 +265,6 @@ const char * lv_roller_get_options(const lv_obj_t * obj)
 
     return lv_label_get_text(get_label(obj));
 }
-
 
 /**
  * Get the total number of options
@@ -289,7 +287,6 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -445,7 +442,6 @@ static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e
         draw_label(e);
     }
 }
-
 
 static void draw_main(lv_event_t * e)
 {
@@ -747,7 +743,6 @@ static void inf_normalize(lv_obj_t * obj)
 
         lv_obj_t * label = get_label(obj);
 
-
         lv_coord_t sel_y1 = roller->sel_opt_id * (font_h + line_space);
         lv_coord_t mid_y1 = h / 2 - font_h / 2;
         lv_coord_t new_y = mid_y1 - sel_y1;
@@ -759,7 +754,6 @@ static lv_obj_t * get_label(const lv_obj_t * obj)
 {
     return lv_obj_get_child(obj, 0);
 }
-
 
 static lv_coord_t get_selected_label_width(const lv_obj_t * obj)
 {
@@ -779,7 +773,6 @@ static void scroll_anim_ready_cb(lv_anim_t * a)
     lv_obj_t * obj = lv_obj_get_parent(a->var); /*The label is animated*/
     inf_normalize(obj);
 }
-
 
 static void set_y_anim(void * obj, int32_t v)
 {

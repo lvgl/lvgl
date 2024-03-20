@@ -17,7 +17,6 @@ extern "C" {
 
 #if LV_USE_LED
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -111,6 +110,5 @@ uint8_t lv_led_get_brightness(const lv_obj_t * obj);
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
-
 
 #endif /*LV_LED_H*/

@@ -178,7 +178,6 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
     return LV_RES_OK;
 }
 
-
 void lv_qrcode_delete(lv_obj_t * qrcode)
 {
     lv_obj_del(qrcode);

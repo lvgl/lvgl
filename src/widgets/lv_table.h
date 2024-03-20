@@ -143,7 +143,6 @@ void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w);
  */
 void lv_table_add_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table_cell_ctrl_t ctrl);
 
-
 /**
  * Clear control bits of the cell.
  * @param obj       pointer to a Table object

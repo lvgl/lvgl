@@ -416,7 +416,6 @@ static void obj_del_core(lv_obj_t * obj)
     lv_mem_free(obj);
 }
 
-
 static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data)
 {
     lv_obj_tree_walk_res_t res = LV_OBJ_TREE_WALK_NEXT;

@@ -1,11 +1,11 @@
 # Meter (lv_meter)
 
 ## Overview
-The Meter widget can visualize data in very flexible ways. In can show arcs, needles, ticks lines and labels.
+The Meter widget can visualize data in very flexible ways. It can show arcs, needles, ticks lines and labels.
 
 ## Parts and Styles
 - `LV_PART_MAIN` The background of the Meter. Uses the typical background properties.
-- `LV_PART_TICK` The tick lines a labels using the *line* and *text* style properties.
+- `LV_PART_TICKS` The tick lines a labels using the *line* and *text* style properties.
 - `LV_PART_INDICATOR` The needle line or image using the *line* and *img* style properties, as well as the background properties to draw a square (or circle) on the pivot of the needles. Padding makes the square larger.
 - `LV_PART_ITEMS` The arcs using the *arc* properties.
 
@@ -18,7 +18,7 @@ The Scale has minor and major ticks and labels on the major ticks. Later indicat
 
 Any number of scales can be added to Meter.
 
-The minor tick lines can be configured with: `lv_meter_set_scale_ticks(meter, scale, tick_count, line_width, tick_length, ctick_olor)`.
+The minor tick lines can be configured with: `lv_meter_set_scale_ticks(meter, scale, tick_count, line_width, tick_length, tick_color)`.
 
 To add major tick lines use `lv_meter_set_scale_major_ticks(meter, scale, nth_major, tick_width, tick_length, tick_color, label_gap)`. `nth_major` to specify how many minor ticks to skip to draw a major tick.
 
@@ -46,7 +46,7 @@ All the indicator add functions return `lv_meter_indicator_t *`.
 `lv_meter_set_indicator_value(meter, inidicator, value)` sets the value of the indicator.
 
 #### Arc
-`indic = lv_meter_add_arc(meter, scale, arc_width, arc_color, r_mod)` adds and arc indicator. . By default, the radius of the arc is the same as the scale's radius but `r_mod` changes the radius.
+`indic = lv_meter_add_arc(meter, scale, arc_width, arc_color, r_mod)` adds an arc indicator. By default, the radius of the arc is the same as the scale's radius but `r_mod` changes the radius.
 
 `lv_meter_set_indicator_start_value(meter, indic, value)` and `lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the value of the indicator.
 

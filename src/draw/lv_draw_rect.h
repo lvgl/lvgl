@@ -76,7 +76,6 @@ struct _lv_draw_ctx_t;
 
 void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
 
-
 /**
  * Draw a rectangle
  * @param coords the coordinates of the rectangle

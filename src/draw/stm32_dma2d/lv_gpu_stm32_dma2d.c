@@ -34,10 +34,6 @@
     #error "Cannot use DMA2D with LV_COLOR_DEPTH other than 16 or 32"
 #endif
 
-#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
-    #define LV_STM32_DMA2D_USE_M7_CACHE
-#endif
-
 #if defined (LV_STM32_DMA2D_USE_M7_CACHE)
     // Cortex-M7 DCache present
     #define __lv_gpu_stm32_dma2d_clean_cache(address, offset, width, height, pixel_size) _lv_gpu_stm32_dma2d_clean_cache(address, offset, width, height, pixel_size)
@@ -59,9 +55,8 @@ static void lv_draw_stm32_dma2d_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_d
 static dma2d_color_format_t lv_color_format_to_dma2d_color_format(lv_img_cf_t color_format);
 static lv_point_t lv_area_get_offset(const lv_area_t * area1, const lv_area_t * area2);
 
-LV_STM32_DMA2D_STATIC void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx);
-LV_STM32_DMA2D_STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
-                                                       const lv_area_t * src_area, const void * src);
+lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
+                                 const lv_area_t * src_area, const void * src);
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride,
                                                            const lv_area_t * draw_area, lv_color_t color, lv_opa_t opa);
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_stride,
@@ -70,17 +65,8 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dst_buf, lv_coord_t dst_stride,
                                                             const lv_area_t * draw_area, const lv_opa_t * mask_buf, lv_coord_t mask_stride, const lv_point_t * mask_offset,
                                                             lv_color_t color, lv_opa_t opa);
-LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
-                                                            const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset);
 LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_await_dma_transfer_finish(lv_disp_drv_t * disp_drv);
 LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_start_dma_transfer(void);
-
-#if defined (LV_STM32_DMA2D_USE_M7_CACHE)
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset,
-                                                                lv_coord_t width, lv_coord_t height, uint8_t pixel_size);
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
-                                                           lv_coord_t height, uint8_t pixel_size);
-#endif
 
 #if defined(LV_STM32_DMA2D_TEST)
     LV_STM32_DMA2D_STATIC bool _lv_gpu_stm32_dwt_init(void);
@@ -127,8 +113,6 @@ void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     dma2d_draw_ctx->blend = lv_draw_stm32_dma2d_blend;
     dma2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_stm32_dma2d_img_decoded;
     //dma2d_draw_ctx->base_draw.draw_img = lv_draw_stm32_dma2d_img;
-    // Note: currently it does not make sense use lv_gpu_stm32_dma2d_wait_cb() since waiting starts right after the dma2d transfer
-    //dma2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_stm32_dma2d_wait_cb;
     dma2d_draw_ctx->base_draw.buffer_copy = lv_draw_stm32_dma2d_buffer_copy;
 }
 
@@ -330,8 +314,8 @@ static dma2d_color_format_t lv_color_format_to_dma2d_color_format(lv_img_cf_t co
     }
 }
 
-LV_STM32_DMA2D_STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
-                                                       const lv_area_t * src_area, const void * src)
+lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
+                                 const lv_area_t * src_area, const void * src)
 {
     //if(lv_img_src_get_type(src) != LV_IMG_SRC_VARIABLE) return LV_RES_INV;
     return LV_RES_INV;
@@ -366,13 +350,6 @@ LV_STM32_DMA2D_STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx,
     _lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, img->data, img->header.w,
                                    &src_offset, img_dsc->opa, bitmapColorFormat, ignoreBitmapAlpha);
     return LV_RES_OK;
-}
-
-LV_STM32_DMA2D_STATIC void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
-{
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    _lv_gpu_stm32_dma2d_await_dma_transfer_finish(disp->driver);
-    lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
 /**********************
@@ -603,8 +580,8 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * d
  * @brief Copies src (foreground) map to the dst (background) map.
  * @param src_offset src offset in relation to dst, useful when src is larger than draw_area
  */
-LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
-                                                            const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset)
+void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
+                                      const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset)
 {
     LV_ASSERT_MSG(!isDma2dInProgess, "dma2d transfer has not finished"); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
@@ -686,8 +663,8 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_await_dma_transfer_finish(lv_disp
 
 #if defined (LV_STM32_DMA2D_USE_M7_CACHE)
 // Cortex-M7 DCache present
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
-                                                                lv_coord_t height, uint8_t pixel_size)
+void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
+                                          lv_coord_t height, uint8_t pixel_size)
 {
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint16_t stride = pixel_size * (width + offset); // in bytes
@@ -716,8 +693,8 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address
     __ISB();
 }
 
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
-                                                           lv_coord_t height, uint8_t pixel_size)
+void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
+                                     lv_coord_t height, uint8_t pixel_size)
 {
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint16_t stride = pixel_size * (width + offset); // in bytes

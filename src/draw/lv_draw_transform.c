@@ -48,7 +48,6 @@ void lv_draw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, co
 
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

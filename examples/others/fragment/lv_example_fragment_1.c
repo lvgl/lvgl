@@ -23,7 +23,7 @@ static const lv_fragment_class_t sample_cls = {
     .constructor_cb = sample_fragment_ctor,
     .create_obj_cb = sample_fragment_create_obj,
     .instance_size = sizeof(struct sample_fragment_t)
-};
+    };
 
 void lv_example_fragment_1(void)
 {
@@ -36,7 +36,6 @@ void lv_example_fragment_1(void)
     lv_fragment_t * fragment = lv_fragment_create(&sample_cls, "Fragment");
     lv_fragment_manager_replace(manager, fragment, &root);
 }
-
 
 static void sample_fragment_ctor(lv_fragment_t * self, void * args)
 {

@@ -189,20 +189,18 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
     lv_color_t * cbuf = lv_mem_alloc(dest_img->header.w * sizeof(lv_color_t));
     lv_opa_t * abuf = lv_mem_alloc(dest_img->header.w * sizeof(lv_opa_t));
     for(y = 0; y < dest_img->header.h; y++) {
-        if(y + offset_y >= 0) {
-            lv_draw_sw_transform(NULL, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
-                                 &draw_dsc, canvas->dsc.header.cf, cbuf, abuf);
+        lv_draw_sw_transform(NULL, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
+                             &draw_dsc, canvas->dsc.header.cf, cbuf, abuf);
 
-            for(x = 0; x < dest_img->header.w; x++) {
-                if(abuf[x]) {
-                    lv_img_buf_set_px_color(dest_img, x, y, cbuf[x]);
-                    lv_img_buf_set_px_alpha(dest_img, x, y, abuf[x]);
-                }
+        for(x = 0; x < dest_img->header.w; x++) {
+            if(abuf[x]) {
+                lv_img_buf_set_px_color(dest_img, x, y, cbuf[x]);
+                lv_img_buf_set_px_alpha(dest_img, x, y, abuf[x]);
             }
-
-            dest_area.y1++;
-            dest_area.y2++;
         }
+
+        dest_area.y1++;
+        dest_area.y2++;
     }
     lv_mem_free(cbuf);
     lv_mem_free(abuf);
@@ -658,7 +656,6 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&fake_disp);
 
-
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_CHROMA_KEY;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
@@ -791,7 +788,6 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_img_cache_invalidate_src(&canvas->dsc);
 }
 
-
 static void init_fake_disp(lv_obj_t * canvas, lv_disp_t * disp, lv_disp_drv_t * drv, lv_area_t * clip_area)
 {
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
@@ -830,7 +826,5 @@ static void deinit_fake_disp(lv_obj_t * canvas, lv_disp_t * disp)
     lv_draw_sw_deinit_ctx(disp->driver, disp->driver->draw_ctx);
     lv_mem_free(disp->driver->draw_ctx);
 }
-
-
 
 #endif

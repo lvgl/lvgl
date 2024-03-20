@@ -91,7 +91,6 @@ static inline void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t 
  */
 void lv_canvas_set_px_opa(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_opa_t opa);
 
-
 /**
  * Set the palette color of a canvas with index format. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`
  * @param canvas pointer to canvas object
