@@ -92,7 +92,14 @@ char * lv_strcat(char * dst, const char * src)
 
 char * lv_strncat(char * dst, const char * src, size_t src_len)
 {
-    return lv_strncpy(dst + lv_strlen(dst), src, src_len);
+    char * tmp = dst;
+    dst += lv_strlen(dst);
+    while(src_len != 0 && *src != '\0') {
+        src_len--;
+        *dst++ = *src++;
+    }
+    *dst = '\0';
+    return tmp;
 }
 
 /**********************
