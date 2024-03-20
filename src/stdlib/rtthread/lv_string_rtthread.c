@@ -87,7 +87,10 @@ char * lv_strdup(const char * src)
 
 char * lv_strcat(char * dst, const char * src)
 {
-    return strcat(dst, src);
+    /*Since RT-thread does not have rt_strcat,
+    the following code is used instead.*/
+    lv_strcpy(dst + lv_strlen(dst), src);
+    return dst;
 }
 
 /**********************
