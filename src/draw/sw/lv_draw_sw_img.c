@@ -240,7 +240,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         lv_area_t mask_area;
         lv_result_t decoder_res = lv_image_decoder_open(&mask_decoder_dsc, draw_dsc->bitmap_mask_src, NULL);
         if(decoder_res == LV_RESULT_OK && mask_decoder_dsc.decoded) {
-            if(mask_decoder_dsc.decoded->header.cf != LV_COLOR_FORMAT_A8) {
+            if(mask_decoder_dsc.decoded->header.cf == LV_COLOR_FORMAT_A8) {
                 const lv_draw_buf_t * mask_img = mask_decoder_dsc.decoded;
                 blend_dsc.mask_buf = mask_img->data;
                 blend_dsc.mask_stride = mask_img->header.stride;
