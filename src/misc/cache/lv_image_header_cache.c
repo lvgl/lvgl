@@ -1,5 +1,5 @@
 /**
-* @file lv_image_cache.c
+* @file lv_image_header_cache.c
 *
  */
 
@@ -7,18 +7,16 @@
  *      INCLUDES
  *********************/
 #include "../lv_assert.h"
-#include "lv_image_cache.h"
 #include "lv_image_header_cache.h"
-
-#if LV_CACHE_DEF_SIZE > 0
-
 #include "../../core/lv_global.h"
+
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
 
 /*********************
  *      DEFINES
  *********************/
 
-#define img_cache_p (LV_GLOBAL_DEFAULT()->img_cache)
+#define img_header_cache_p (LV_GLOBAL_DEFAULT()->img_header_cache)
 
 /**********************
  *      TYPEDEFS
@@ -28,9 +26,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_cache_compare_res_t image_cache_compare_cb(const lv_image_cache_data_t * lhs,
-                                                     const lv_image_cache_data_t * rhs);
-static void image_cache_free_cb(lv_image_cache_data_t * entry, void * user_data);
+static lv_cache_compare_res_t image_header_cache_compare_cb(const lv_image_header_cache_data_t * lhs,
+                                                            const lv_image_header_cache_data_t * rhs);
+static void image_header_cache_free_cb(lv_image_header_cache_data_t * entry, void * user_data);
 
 /**********************
  *  GLOBAL VARIABLES
@@ -48,48 +46,46 @@ static void image_cache_free_cb(lv_image_cache_data_t * entry, void * user_data)
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_image_cache_init(void)
+lv_result_t lv_image_header_cache_init(void)
 {
-    if(img_cache_p != NULL) {
+    if(img_header_cache_p != NULL) {
         return LV_RESULT_OK;
     }
 
-    img_cache_p = lv_cache_create(&lv_cache_class_lru_rb_size,
-    sizeof(lv_image_cache_data_t), LV_CACHE_DEF_SIZE, (lv_cache_ops_t) {
-        .compare_cb = (lv_cache_compare_cb_t) image_cache_compare_cb,
+    img_header_cache_p = lv_cache_create(&lv_cache_class_lru_rb_count,
+    sizeof(lv_image_header_cache_data_t), LV_IMAGE_HEADER_CACHE_DEF_CNT, (lv_cache_ops_t) {
+        .compare_cb = (lv_cache_compare_cb_t) image_header_cache_compare_cb,
         .create_cb = NULL,
-        .free_cb = (lv_cache_free_cb_t) image_cache_free_cb,
+        .free_cb = (lv_cache_free_cb_t) image_header_cache_free_cb
     });
-    return img_cache_p != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
+
+    return img_header_cache_p != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-void lv_image_cache_resize(uint32_t new_size, bool evict_now)
+void lv_image_header_cache_resize(uint32_t new_size, bool evict_now)
 {
-    lv_cache_set_max_size(img_cache_p, new_size, NULL);
+    lv_cache_set_max_size(img_header_cache_p, new_size, NULL);
     if(evict_now) {
-        lv_cache_reserve(img_cache_p, new_size, NULL);
+        lv_cache_reserve(img_header_cache_p, new_size, NULL);
     }
 }
 
 #endif
 
-void lv_image_cache_drop(const void * src)
+void lv_image_header_cache_drop(const void * src)
 {
-    /*If user invalidate image, the header cache should be invalidated too.*/
-    lv_image_header_cache_drop(src);
-
-#if LV_CACHE_DEF_SIZE > 0
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
     if(src == NULL) {
-        lv_cache_drop_all(img_cache_p, NULL);
+        lv_cache_drop_all(img_header_cache_p, NULL);
         return;
     }
 
-    lv_image_cache_data_t search_key = {
+    lv_image_header_cache_data_t search_key = {
         .src = src,
         .src_type = lv_image_src_get_type(src),
     };
 
-    lv_cache_drop(img_cache_p, &search_key, NULL);
+    lv_cache_drop(img_header_cache_p, &search_key, NULL);
 #else
     LV_UNUSED(src);
 #endif
@@ -99,7 +95,8 @@ void lv_image_cache_drop(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_CACHE_DEF_SIZE > 0
+
+#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
 
 inline static lv_cache_compare_res_t image_cache_common_compare(const void * lhs_src, lv_image_src_t lhs_src_type,
                                                                 const void * rhs_src, lv_image_src_t rhs_src_type)
@@ -121,24 +118,18 @@ inline static lv_cache_compare_res_t image_cache_common_compare(const void * lhs
     return lhs_src_type > rhs_src_type ? 1 : -1;
 }
 
-static lv_cache_compare_res_t image_cache_compare_cb(
-    const lv_image_cache_data_t * lhs,
-    const lv_image_cache_data_t * rhs)
+static lv_cache_compare_res_t image_header_cache_compare_cb(
+    const lv_image_header_cache_data_t * lhs,
+    const lv_image_header_cache_data_t * rhs)
 {
     return image_cache_common_compare(lhs->src, lhs->src_type, rhs->src, rhs->src_type);
 }
 
-static void image_cache_free_cb(lv_image_cache_data_t * entry, void * user_data)
+static void image_header_cache_free_cb(lv_image_header_cache_data_t * entry, void * user_data)
 {
-    LV_UNUSED(user_data);
+    LV_UNUSED(user_data); /*Unused*/
 
-    /* Destroy the decoded draw buffer if necessary. */
-    lv_draw_buf_t * decoded = (lv_draw_buf_t *)entry->decoded;
-    if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_ALLOCATED)) {
-        lv_draw_buf_destroy(decoded);
-    }
-
-    /*Free the duplicated file name*/
     if(entry->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)entry->src);
 }
+
 #endif
