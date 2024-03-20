@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.0.1-dev
+ * Configuration file for v9.1.0
  */
 
 /*
@@ -118,8 +118,8 @@
     #define LV_USE_DRAW_ARM2D_SYNC      0
 
     /* Enable native helium assembly to be compiled */
-    #define LV_USE_NATIVE_HELIUM_ASM    1
-
+    #define LV_USE_NATIVE_HELIUM_ASM    0
+    
     /* 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only
      * 1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too */
     #define LV_DRAW_SW_COMPLEX          1
