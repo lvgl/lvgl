@@ -243,7 +243,7 @@ char * lv_strncat(char * dst, const char * src, size_t src_len)
     while(*dst != '\0') {
         dst++;
     }
-    while (src_len != 0 && *src != '\0') {
+    while(src_len != 0 && *src != '\0') {
         src_len--;
         *dst++ = *src++;
     }
