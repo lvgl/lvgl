@@ -13,6 +13,8 @@
 
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_pending.h"
+#include "../../misc/lv_types.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -236,8 +238,8 @@ static lv_cache_compare_res_t grad_compare_cb(const grad_item_t * lhs, const gra
         return lhs->lv_grad.stops_count > rhs->lv_grad.stops_count ? 1 : -1;
     }
 
-    int cmp_res = memcmp(lhs->lv_grad.stops, rhs->lv_grad.stops,
-                         sizeof(lv_gradient_stop_t) * lhs->lv_grad.stops_count);
+    int cmp_res = lv_memcmp(lhs->lv_grad.stops, rhs->lv_grad.stops,
+                            sizeof(lv_gradient_stop_t) * lhs->lv_grad.stops_count);
     if(cmp_res != 0) {
         return cmp_res > 0 ? 1 : -1;
     }

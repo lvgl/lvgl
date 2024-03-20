@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <xf86drm.h>
 #include <xf86drmMode.h>

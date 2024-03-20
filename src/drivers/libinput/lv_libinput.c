@@ -22,6 +22,7 @@
 #include <dirent.h>
 #include <libinput.h>
 #include <pthread.h>
+#include <string.h>
 
 #if LV_LIBINPUT_BSD
     #include <dev/evdev/input.h>

@@ -9,7 +9,6 @@
 #include "lv_textarea.h"
 #if LV_USE_TEXTAREA != 0
 
-#include <string.h>
 #include "../../core/lv_group.h"
 #include "../../core/lv_refr.h"
 #include "../../indev/lv_indev.h"

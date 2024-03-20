@@ -13,8 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
-#include <stdint.h>
 #include "../font/lv_font.h"
 #include "lv_color.h"
 #include "lv_area.h"

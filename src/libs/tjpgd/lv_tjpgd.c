@@ -13,6 +13,7 @@
 #include "tjpgd.h"
 #include "lv_tjpgd.h"
 #include "../../misc/lv_fs.h"
+#include <string.h>
 
 /*********************
  *      DEFINES

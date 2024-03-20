@@ -10,6 +10,7 @@
 #if LV_USE_RLOTTIE
 
 #include <rlottie_capi.h>
+#include <string.h>
 
 /*********************
 *      DEFINES

@@ -124,6 +124,48 @@
     #endif
 #endif
 
+#ifndef LV_STDINT_INCLUDE
+    #ifdef CONFIG_LV_STDINT_INCLUDE
+        #define LV_STDINT_INCLUDE CONFIG_LV_STDINT_INCLUDE
+    #else
+        #define LV_STDINT_INCLUDE       <stdint.h>
+    #endif
+#endif
+#ifndef LV_STDDEF_INCLUDE
+    #ifdef CONFIG_LV_STDDEF_INCLUDE
+        #define LV_STDDEF_INCLUDE CONFIG_LV_STDDEF_INCLUDE
+    #else
+        #define LV_STDDEF_INCLUDE       <stddef.h>
+    #endif
+#endif
+#ifndef LV_STDBOOL_INCLUDE
+    #ifdef CONFIG_LV_STDBOOL_INCLUDE
+        #define LV_STDBOOL_INCLUDE CONFIG_LV_STDBOOL_INCLUDE
+    #else
+        #define LV_STDBOOL_INCLUDE      <stdbool.h>
+    #endif
+#endif
+#ifndef LV_INTTYPES_INCLUDE
+    #ifdef CONFIG_LV_INTTYPES_INCLUDE
+        #define LV_INTTYPES_INCLUDE CONFIG_LV_INTTYPES_INCLUDE
+    #else
+        #define LV_INTTYPES_INCLUDE     <inttypes.h>
+    #endif
+#endif
+#ifndef LV_LIMITS_INCLUDE
+    #ifdef CONFIG_LV_LIMITS_INCLUDE
+        #define LV_LIMITS_INCLUDE CONFIG_LV_LIMITS_INCLUDE
+    #else
+        #define LV_LIMITS_INCLUDE       <limits.h>
+    #endif
+#endif
+#ifndef LV_STDARG_INCLUDE
+    #ifdef CONFIG_LV_STDARG_INCLUDE
+        #define LV_STDARG_INCLUDE CONFIG_LV_STDARG_INCLUDE
+    #else
+        #define LV_STDARG_INCLUDE       <stdarg.h>
+    #endif
+#endif
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/

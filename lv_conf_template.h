@@ -44,6 +44,12 @@
 #define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
 #define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
 
+#define LV_STDINT_INCLUDE       <stdint.h>
+#define LV_STDDEF_INCLUDE       <stddef.h>
+#define LV_STDBOOL_INCLUDE      <stdbool.h>
+#define LV_INTTYPES_INCLUDE     <inttypes.h>
+#define LV_LIMITS_INCLUDE       <limits.h>
+#define LV_STDARG_INCLUDE       <stdarg.h>
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/

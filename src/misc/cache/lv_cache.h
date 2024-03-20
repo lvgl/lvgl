@@ -15,8 +15,7 @@ extern "C" {
  *********************/
 #include "lv_cache_entry.h"
 #include "lv_cache_private.h"
-#include <stdbool.h>
-#include <stdlib.h>
+#include "../lv_types.h"
 
 #include "_lv_cache_lru_rb.h"
 

@@ -19,10 +19,6 @@ extern "C" {
 #include "lv_timer.h"
 #include "lv_ll.h"
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stddef.h>
-
 /*********************
  *      DEFINES
  *********************/

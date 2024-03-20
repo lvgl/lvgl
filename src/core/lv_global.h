@@ -15,8 +15,6 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#include <stdbool.h>
-
 #include "../misc/lv_types.h"
 #include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
@@ -38,6 +36,8 @@ extern "C" {
 
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
+
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES

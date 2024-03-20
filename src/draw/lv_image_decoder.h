@@ -15,7 +15,6 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#include <stdint.h>
 #include "lv_draw_buf.h"
 #include "../misc/lv_fs.h"
 #include "../misc/lv_types.h"

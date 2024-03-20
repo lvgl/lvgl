@@ -11,6 +11,7 @@
 
 #include "lv_libpng.h"
 #include <png.h>
+#include <string.h>
 
 /*********************
  *      DEFINES
