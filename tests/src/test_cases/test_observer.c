@@ -422,6 +422,8 @@ void test_observer_arc_value(void)
 
     lv_obj_update_layout(obj);
     lv_test_mouse_release();
+    lv_test_indev_wait(100);
+
     lv_test_mouse_move_to(65, 10);
     lv_test_mouse_press();
     lv_test_indev_wait(100);
@@ -446,9 +448,12 @@ void test_observer_slider_value(void)
 
     lv_obj_update_layout(obj);
     lv_test_mouse_release();
+    lv_test_indev_wait(100);
+
     lv_test_mouse_move_to(65, 10);
     lv_test_mouse_press();
     lv_test_indev_wait(100);
+
     lv_test_mouse_move_to(75, 10);
     lv_test_mouse_press();
     lv_test_indev_wait(100);
