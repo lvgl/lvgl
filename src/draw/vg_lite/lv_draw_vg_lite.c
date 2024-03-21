@@ -87,6 +87,16 @@ void lv_draw_vg_lite_deinit(void)
  *   STATIC FUNCTIONS
  **********************/
 
+static bool check_border_is_supported(const lv_draw_border_dsc_t * dsc)
+{
+    /* Drawing with rounded corners and specified border side is not supported. */
+    if(dsc->radius && dsc->side != LV_BORDER_SIDE_FULL) {
+        return false;
+    }
+
+    return true;
+}
+
 static bool check_image_is_supported(const lv_draw_image_dsc_t * dsc)
 {
     lv_image_header_t header;
@@ -214,7 +224,6 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_LABEL:
         case LV_DRAW_TASK_TYPE_FILL:
-        case LV_DRAW_TASK_TYPE_BORDER:
 #if LV_VG_LITE_USE_BOX_SHADOW
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
 #endif
@@ -231,6 +240,13 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 if(!check_image_is_supported(task->draw_dsc)) {
+                    return 0;
+                }
+            }
+            break;
+
+        case LV_DRAW_TASK_TYPE_BORDER: {
+                if(!check_border_is_supported(task->draw_dsc)) {
                     return 0;
                 }
             }

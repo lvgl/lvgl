@@ -74,9 +74,34 @@ void lv_draw_vg_lite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc
                                 r_out, r_out);
 
     /* inner rect */
+    int32_t x_offset = 0;
+    int32_t y_offset = 0;
+    int32_t w_inner = w;
+    int32_t h_inner = h;
+
+    if(dsc->side & LV_BORDER_SIDE_TOP) {
+        y_offset += border_w;
+        h_inner -= border_w;
+    }
+
+    if(dsc->side & LV_BORDER_SIDE_LEFT) {
+        x_offset += border_w;
+        w_inner -= border_w;
+    }
+
+    if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
+        h_inner -= border_w;
+    }
+
+    if(dsc->side & LV_BORDER_SIDE_RIGHT) {
+        w_inner -= border_w;
+    }
+
     lv_vg_lite_path_append_rect(path,
-                                coords->x1 + border_w, coords->y1 + border_w,
-                                w - border_w * 2, h - border_w * 2,
+                                coords->x1 + x_offset,
+                                coords->y1 + y_offset,
+                                w_inner,
+                                h_inner,
                                 r_in, r_in);
 
     lv_vg_lite_path_end(path);
