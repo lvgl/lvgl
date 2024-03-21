@@ -97,6 +97,8 @@ void _lv_sysmon_builtin_deinit(void)
  *   STATIC FUNCTIONS
  **********************/
 
+#if _USE_PERF_MONITOR || _USE_MEM_MONITOR
+
 static lv_obj_t * _lv_sysmon_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
@@ -108,6 +110,8 @@ static lv_obj_t * _lv_sysmon_create(lv_obj_t * parent)
     lv_label_set_text(label, "?");
     return label;
 }
+
+#endif
 
 #if _USE_PERF_MONITOR
 
