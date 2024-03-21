@@ -19,7 +19,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS (&lv_sysmon_class)
 
 #define SYSMON_REFR_PERIOD_DEF 300 /* ms */
 
@@ -93,7 +92,12 @@ void _lv_sysmon_builtin_deinit(void)
 #endif
 }
 
-lv_obj_t * lv_sysmon_create(lv_obj_t * parent)
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static lv_obj_t * _lv_sysmon_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * label = lv_label_create(parent);
@@ -104,10 +108,6 @@ lv_obj_t * lv_sysmon_create(lv_obj_t * parent)
     lv_label_set_text(label, "?");
     return label;
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 #if _USE_PERF_MONITOR
 
@@ -163,7 +163,7 @@ static void perf_update_timer_cb(lv_timer_t * t)
     if(!sysmon_perf.inited && lv_display_get_default()) {
         lv_display_add_event_cb(lv_display_get_default(), perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
 
-        lv_obj_t * obj1 = lv_sysmon_create(lv_layer_sys());
+        lv_obj_t * obj1 = _lv_sysmon_create(lv_layer_sys());
         lv_obj_align(obj1, LV_USE_PERF_MONITOR_POS, 0, 0);
         lv_subject_add_observer_obj(&sysmon_perf.subject, perf_observer_cb, obj1, NULL);
 #if LV_USE_PERF_MONITOR_LOG_MODE
@@ -250,7 +250,7 @@ static void mem_update_timer_cb(lv_timer_t * t)
 {
     /*Wait for a display*/
     if(!sysmon_mem.inited && lv_display_get_default()) {
-        lv_obj_t * obj2 = lv_sysmon_create(lv_layer_sys());
+        lv_obj_t * obj2 = _lv_sysmon_create(lv_layer_sys());
         lv_obj_align(obj2, LV_USE_MEM_MONITOR_POS, 0, 0);
         lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, obj2, NULL);
         sysmon_mem.inited = true;
