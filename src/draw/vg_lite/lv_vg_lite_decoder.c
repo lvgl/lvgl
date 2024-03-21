@@ -12,6 +12,8 @@
 #if LV_USE_DRAW_VG_LITE
 
 #include "lv_vg_lite_utils.h"
+#include <stdlib.h>
+#include <string.h>
 
 /*********************
  *      DEFINES
@@ -63,7 +65,6 @@ void lv_vg_lite_decoder_init(void)
     lv_image_decoder_set_info_cb(decoder, decoder_info);
     lv_image_decoder_set_open_cb(decoder, decoder_open);
     lv_image_decoder_set_close_cb(decoder, decoder_close);
-    lv_image_decoder_set_cache_free_cb(decoder, NULL); /*Use general cache free method*/
 }
 
 void lv_vg_lite_decoder_deinit(void)

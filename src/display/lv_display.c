@@ -924,6 +924,37 @@ lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp)
     return disp->buf_act;
 }
 
+void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
+{
+    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+
+    int32_t w = lv_area_get_width(area);
+    int32_t h = lv_area_get_height(area);
+
+    switch(rotation) {
+        case LV_DISPLAY_ROTATION_0:
+            return;
+        case LV_DISPLAY_ROTATION_90:
+            area->y2 = disp->ver_res - area->x1 - 1;
+            area->x1 = area->y1;
+            area->x2 = area->x1 + h - 1;
+            area->y1 = area->y2 - w + 1;
+            break;
+        case LV_DISPLAY_ROTATION_180:
+            area->y2 = disp->ver_res - area->y1 - 1;
+            area->y1 = area->y2 - h + 1;
+            area->x2 = disp->hor_res - area->x1 - 1;
+            area->x1 = area->x2 - w + 1;
+            break;
+        case LV_DISPLAY_ROTATION_270:
+            area->x1 = disp->hor_res - area->y2 - 1;
+            area->y2 = area->x2;
+            area->x2 = area->x1 + h - 1;
+            area->y1 = area->y2 - w + 1;
+            break;
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

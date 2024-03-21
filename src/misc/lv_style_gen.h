@@ -202,6 +202,8 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BASE_DIR;
 void lv_style_set_bitmap_mask_src(lv_style_t * style, const lv_image_dsc_t * value);
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_BITMAP_MASK_SRC;
+void lv_style_set_rotary_sensitivity(lv_style_t * style, uint32_t value);
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_ROTARY_SENSITIVITY;
 #if LV_USE_FLEX
 void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value);
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_FLOW;
@@ -707,6 +709,11 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_GR
 #define LV_STYLE_CONST_BITMAP_MASK_SRC(val) \
     { \
         .prop_ptr = &_lv_style_const_prop_id_BITMAP_MASK_SRC, .value = { .ptr = val } \
+    }
+
+#define LV_STYLE_CONST_ROTARY_SENSITIVITY(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_ROTARY_SENSITIVITY, .value = { .num = (int32_t)val } \
     }
 #if LV_USE_FLEX
 

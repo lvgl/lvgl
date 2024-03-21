@@ -440,7 +440,7 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
     span_text_check(&cur_txt);
     uint32_t cur_txt_ofs = 0;
     lv_snippet_t snippet;   /* use to save cur_span info and push it to stack */
-    memset(&snippet, 0, sizeof(snippet));
+    lv_memset(&snippet, 0, sizeof(snippet));
 
     int32_t line_cnt = 0;
     int32_t lines = spans->lines < 0 ? INT32_MAX : spans->lines;
@@ -656,7 +656,7 @@ static void lv_snippet_push(lv_snippet_t * item)
 {
     struct _snippet_stack * stack_p = snippet_stack;
     if(stack_p->index < LV_SPAN_SNIPPET_STACK_SIZE) {
-        memcpy(&stack_p->stack[stack_p->index], item, sizeof(lv_snippet_t));
+        lv_memcpy(&stack_p->stack[stack_p->index], item, sizeof(lv_snippet_t));
         stack_p->index++;
     }
     else {

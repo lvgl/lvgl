@@ -13,7 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
 #include "../misc/lv_types.h"
 #include "../misc/lv_event.h"
 #include "../indev/lv_indev.h"
@@ -150,6 +149,13 @@ const lv_area_t * lv_event_get_old_size(lv_event_t * e);
  * @return      the triggering key or NULL if called on an unrelated event
  */
 uint32_t lv_event_get_key(lv_event_t * e);
+
+/**
+ * Get the signed rotary encoder diff. passed as parameter to an event. Can be used in `LV_EVENT_ROTARY`
+ * @param e     pointer to an event
+ * @return      the triggering key or NULL if called on an unrelated event
+ */
+int32_t lv_event_get_rotary_diff(lv_event_t * e);
 
 /**
  * Get the animation descriptor of a scrolling. Can be used in `LV_EVENT_SCROLL_BEGIN`

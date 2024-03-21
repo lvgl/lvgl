@@ -9,8 +9,7 @@
 #include "lv_log.h"
 #if LV_USE_LOG
 
-#include <stdarg.h>
-#include <string.h>
+#include "../misc/lv_types.h"
 #include "../stdlib/lv_sprintf.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"

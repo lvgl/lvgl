@@ -50,6 +50,11 @@ void * LV_ATTRIBUTE_FAST_MEM lv_memmove(void * dst, const void * src, size_t len
     return memmove(dst, src, len);
 }
 
+int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
+{
+    return memcmp(p1, p2, len);
+}
+
 size_t lv_strlen(const char * str)
 {
     return strlen(str);
@@ -84,6 +89,11 @@ char * lv_strdup(const char * src)
 
     lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy when length is known*/
     return dst;
+}
+
+char * lv_strcat(char * dst, const char * src)
+{
+    return strcat(dst, src);
 }
 
 /**********************

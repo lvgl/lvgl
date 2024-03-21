@@ -19,4 +19,4 @@ jobs:
       - name: Switch to the development version
         run: pio upgrade --dev
       - name: Publish
-        run: pio pkg publish --owner lvgl .
+        run: pio pkg publish --no-interactive --owner lvgl .

@@ -242,6 +242,19 @@ uint32_t lv_event_get_key(lv_event_t * e)
     }
 }
 
+int32_t lv_event_get_rotary_diff(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_ROTARY) {
+        int32_t * r = lv_event_get_param(e);
+        if(r) return *r;
+        else return 0;
+    }
+    else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
+}
+
 lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e)
 {
     if(e->code == LV_EVENT_SCROLL_BEGIN) {

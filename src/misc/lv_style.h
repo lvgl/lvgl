@@ -13,8 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
-#include <stdint.h>
 #include "../font/lv_font.h"
 #include "lv_color.h"
 #include "lv_area.h"
@@ -298,8 +296,8 @@ enum _lv_style_prop_t {
     LV_STYLE_TRANSFORM_PIVOT_Y      = 112,
     LV_STYLE_TRANSFORM_SKEW_X       = 113,
     LV_STYLE_TRANSFORM_SKEW_Y       = 114,
-
     LV_STYLE_BITMAP_MASK_SRC        = 115,
+    LV_STYLE_ROTARY_SENSITIVITY     = 116,
 
 #if LV_USE_FLEX
     LV_STYLE_FLEX_FLOW              = 125,

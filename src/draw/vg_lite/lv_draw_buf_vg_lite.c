@@ -12,6 +12,7 @@
 #if LV_USE_DRAW_VG_LITE
 
 #include "lv_vg_lite_utils.h"
+#include <string.h>
 
 /*********************
  *      DEFINES

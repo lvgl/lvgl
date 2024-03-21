@@ -5,7 +5,7 @@
    </p>
 
    <p align="right">
-     <a href="../README.md">English</a>| <b>中文</b>| <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a>
+     <a href="../README.md">English</a>| <b>中文</b>| <a href="./README_pt_BR.rst">Português do Brasil</a> | <a href="./README_jp.rst">日本語</a>
    </p>
 
 .. raw:: html
@@ -82,10 +82,10 @@ RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的�
 -  30+ 内置\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__:
     按钮、标签、滑块、图表、键盘、仪表、弧形、表格等等。
 -  灵活的\ `样式系统 <https://docs.lvgl.io/master/overview/style.html>`__
-   支持约 100 个样式属性，可在任何状态下自定义小控件的任何部分。
+   支持约 100 个样式属性，可在任何状态下自定义控件的任何部分。
 -  `Flex 布局 <https://docs.lvgl.io/master/layouts/flex.html>`__ 和
    `Grid 布局 <https://docs.lvgl.io/master/layouts/grid.html>`__
-   可以响应式自动调整小控件的大小和位置。
+   可以响应式自动调整控件的大小和位置。
 -  文本支持 UTF-8 编码，支持 CJK、泰语、印地语、阿拉伯语和波斯语书写系统。
 -  支持自动换行、字距调整、文本滚动、亚像素渲染、拼音输入法、文本表情符号。
 -  渲染引擎支持动画、抗锯齿、不透明度、平滑滚动、阴影、图形变换等。
@@ -166,7 +166,7 @@ LVGL 可用于以下几种：
 🤖 示例
 -------
 
-请参阅创建小部件、使用布局和应用样式的一些示例。您将找到 C 和 MicroPython 代码，以及在在线 MicroPython 编辑器中尝试或编辑示例的链接。
+请参阅创建控件、使用布局和应用样式的一些示例。您将找到 C 和 MicroPython 代码，以及在在线 MicroPython 编辑器中尝试或编辑示例的链接。
 
 如果要查看更多示例，可查看 \ `Examples <https://github.com/lvgl/lvgl/tree/master/examples>`__  文件夹。
 
@@ -569,7 +569,7 @@ LVGL LLC 的成立旨在为 LVGL 库提供坚实的背景，并提供多种类�
 -  **平面设计**
    我们的内部图形设计师是创造美丽现代设计的专家，适合您的产品和硬件资源。
 -  **UI 实现**
-   我们还可以根据您或我们创建的设计来实现您的 UI。您可以确信，我们将充分利用您的硬件和 LVGL。如果 LVGL 中缺少某个功能或小部件，请不要担心，我们会为您实现它。
+   我们还可以根据您或我们创建的设计来实现您的 UI。您可以确信，我们将充分利用您的硬件和 LVGL。如果 LVGL 中缺少某个功能或控件，请不要担心，我们会为您实现它。
 -  **咨询和支持**
    我们也可以通过咨询来支持您，以避免在 UI 开发过程中出现昂贵和耗时的错误。
 -  **板子认证**

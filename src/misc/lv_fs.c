@@ -8,7 +8,6 @@
  *********************/
 #include "lv_fs.h"
 
-#include <string.h>
 #include "../misc/lv_assert.h"
 #include "../stdlib/lv_string.h"
 #include "lv_ll.h"
