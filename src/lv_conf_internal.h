@@ -370,7 +370,7 @@
     #endif
 #endif
 
-/* Set stack size of drawing thread. Unit is byte.*/
+/* Set stack size of drawing thread. Unit is byte. If Thorvg is enabled, 128kB is required tested on simulator.*/
 #ifndef LV_DRAW_THREAD_STACKSIZE
     #ifdef CONFIG_LV_DRAW_THREAD_STACKSIZE
         #define LV_DRAW_THREAD_STACKSIZE CONFIG_LV_DRAW_THREAD_STACKSIZE
