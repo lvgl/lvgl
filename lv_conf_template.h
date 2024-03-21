@@ -144,7 +144,7 @@
     #endif
 #endif
 
-/* Set stacksize of drawing thread. */
+/* Set stack size of drawing thread. Unit is byte.*/
 #define LV_DRAW_THREAD_STACKSIZE 32768
 
 /* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */

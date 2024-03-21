@@ -370,7 +370,7 @@
     #endif
 #endif
 
-/* Set stacksize of drawing thread. */
+/* Set stack size of drawing thread. Unit is byte.*/
 #ifndef LV_DRAW_THREAD_STACKSIZE
     #ifdef CONFIG_LV_DRAW_THREAD_STACKSIZE
         #define LV_DRAW_THREAD_STACKSIZE CONFIG_LV_DRAW_THREAD_STACKSIZE
