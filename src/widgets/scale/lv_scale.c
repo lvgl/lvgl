@@ -173,7 +173,8 @@ void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation)
     lv_obj_invalidate(obj);
 }
 
-lv_scale_line_needle_t * lv_scale_add_line_needle(lv_obj_t * obj) {
+lv_scale_line_needle_t * lv_scale_add_line_needle(lv_obj_t * obj)
+{
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -393,7 +394,8 @@ int32_t lv_scale_get_range_max_value(lv_obj_t * obj)
     return scale->range_max;
 }
 
-lv_obj_t * lv_scale_line_needle_get_line(lv_scale_line_needle_t * line_needle) {
+lv_obj_t * lv_scale_line_needle_get_line(lv_scale_line_needle_t * line_needle)
+{
     return line_needle->line;
 }
 
