@@ -27,7 +27,7 @@
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
-static lv_draw_buf_t * decode_png_file(const char * filename);
+static lv_draw_buf_t * decode_png_file(lv_image_decoder_dsc_t * dsc, const char * filename);
 
 /**********************
  *  STATIC VARIABLES
@@ -126,7 +126,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     /*If it's a PNG file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
-        lv_draw_buf_t * decoded = decode_png_file(fn);
+        lv_draw_buf_t * decoded = decode_png_file(dsc, fn);
         if(decoded == NULL) {
             return LV_RESULT_INVALID;
         }
@@ -235,7 +235,7 @@ failed:
     return data;
 }
 
-static lv_draw_buf_t * decode_png_file(const char * filename)
+static lv_draw_buf_t * decode_png_file(lv_image_decoder_dsc_t * dsc, const char * filename)
 {
     int ret;
 
@@ -259,24 +259,34 @@ static lv_draw_buf_t * decode_png_file(const char * filename)
         return NULL;
     }
 
-    /*Set color format*/
-    image.format = PNG_FORMAT_BGRA;
+    lv_color_format_t cf;
+    if(dsc->args.use_indexed && (image.format & PNG_FORMAT_FLAG_COLORMAP)) {
+        cf = LV_COLOR_FORMAT_I8;
+        image.format = PNG_FORMAT_BGRA_COLORMAP;
+    }
+    else {
+        cf = LV_COLOR_FORMAT_ARGB8888;
+        image.format = PNG_FORMAT_BGRA;
+    }
 
     /*Alloc image buffer*/
     lv_draw_buf_t * decoded;
-    decoded = lv_draw_buf_create(image.width, image.height, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    decoded = lv_draw_buf_create(image.width, image.height, cf, LV_STRIDE_AUTO);
     if(decoded == NULL) {
         LV_LOG_ERROR("alloc PNG_IMAGE_SIZE(%" LV_PRIu32 ") failed: %s", (uint32_t)PNG_IMAGE_SIZE(image), filename);
         lv_free(data);
         return NULL;
     }
 
+    void * palette = decoded->data;
+    void * map = decoded->data + LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t);
+
     /*Start decoding*/
-    ret = png_image_finish_read(&image, NULL, decoded->data, decoded->header.stride, NULL);
+    ret = png_image_finish_read(&image, NULL, map, decoded->header.stride, palette);
     png_image_free(&image);
     lv_free(data);
     if(!ret) {
-        LV_LOG_ERROR("png decode failed: %d", ret);
+        LV_LOG_ERROR("png decode failed: %s", image.message);
         lv_draw_buf_destroy(decoded);
         return NULL;
     }
