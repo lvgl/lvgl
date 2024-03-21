@@ -59,6 +59,7 @@ static lv_result_t insert_handler(lv_obj_t * obj, const char * txt);
 static void draw_placeholder(lv_event_t * e);
 static void draw_cursor(lv_event_t * e);
 static void auto_hide_characters(lv_obj_t * obj);
+static void auto_hide_characters_cancel(lv_obj_t * obj);
 static inline bool is_valid_but_non_printable_char(const uint32_t letter);
 
 /**********************
@@ -316,8 +317,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
 
-        /*Auto hide characters*/
-        auto_hide_characters(obj);
+        pwd_char_hider(obj);
     }
 
     lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
@@ -469,7 +469,7 @@ void lv_textarea_set_password_bullet(lv_obj_t * obj, const char * bullet)
         ta->pwd_bullet[txt_len] = '\0';
     }
 
-    lv_obj_invalidate(obj);
+    pwd_char_hider(obj);
 }
 
 void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
@@ -544,6 +544,7 @@ void lv_textarea_set_password_show_time(lv_obj_t * obj, uint32_t time)
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     ta->pwd_show_time = time;
+    pwd_char_hider(obj);
 }
 
 void lv_textarea_set_align(lv_obj_t * obj, lv_text_align_t align)
@@ -1016,6 +1017,8 @@ static void pwd_char_hider(lv_obj_t * obj)
     lv_label_set_text(ta->label, txt_tmp);
     lv_free(txt_tmp);
 
+    auto_hide_characters_cancel(obj);
+
     refr_cursor_area(obj);
 }
 
@@ -1378,6 +1381,11 @@ static void auto_hide_characters(lv_obj_t * obj)
         lv_anim_set_completed_cb(&a, pwd_char_hider_anim_completed);
         lv_anim_start(&a);
     }
+}
+
+static void auto_hide_characters_cancel(lv_obj_t * obj)
+{
+    lv_anim_delete(obj, pwd_char_hider_anim);
 }
 
 static inline bool is_valid_but_non_printable_char(const uint32_t letter)
