@@ -31,6 +31,7 @@ extern "C" {
 
 /**
  * Initialize image cache.
+ * @param  size size of the cache in bytes.
  * @return LV_RESULT_OK: initialization succeeded, LV_RESULT_INVALID: failed.
  */
 lv_result_t lv_image_cache_init(uint32_t size);
@@ -50,10 +51,10 @@ void lv_image_cache_resize(uint32_t new_size, bool evict_now);
 void lv_image_cache_drop(const void * src);
 
 /**
- * Return true if the image cache is disabled.
- * @return true: disabled, false: enabled.
+ * Return true if the image cache is enabled.
+ * @return true: enabled, false: disabled.
  */
-bool lv_image_cache_is_disabled(void);
+bool lv_image_cache_is_enabled(void);
 
 /*************************
  *    GLOBAL VARIABLES

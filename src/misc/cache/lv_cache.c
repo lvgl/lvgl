@@ -224,9 +224,9 @@ size_t lv_cache_get_free_size(lv_cache_t * cache, void * user_data)
     LV_UNUSED(user_data);
     return cache->max_size - cache->size;
 }
-bool lv_cache_is_disabled(lv_cache_t * cache)
+bool lv_cache_is_enabled(lv_cache_t * cache)
 {
-    return cache->max_size == 0;
+    return cache->max_size > 0;
 }
 void lv_cache_set_compare_cb(lv_cache_t * cache, lv_cache_compare_cb_t compare_cb, void * user_data)
 {

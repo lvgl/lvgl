@@ -327,7 +327,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(use_directly || dsc->args.no_cache) return LV_RESULT_OK; /*Do not put image to cache if it can be used directly.*/
 
     /*If the image cache is disabled, just return the decoded image*/
-    if(lv_image_cache_is_disabled() == true) return LV_RESULT_OK;
+    if(!lv_image_cache_is_enabled()) return LV_RESULT_OK;
 
     /*Add it to cache*/
     lv_image_cache_data_t search_key;

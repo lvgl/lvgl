@@ -31,6 +31,7 @@ extern "C" {
 
 /**
  * Initialize image header cache.
+ * @param  count initial size of the cache in count of image headers.
  * @return LV_RESULT_OK: initialization succeeded, LV_RESULT_INVALID: failed.
  */
 lv_result_t lv_image_header_cache_init(uint32_t count);
@@ -38,10 +39,10 @@ lv_result_t lv_image_header_cache_init(uint32_t count);
 /**
  * Resize image header cache.
  * If set to 0, the cache is disabled.
- * @param new_size  new size of the cache in count of image headers.
+ * @param count  new max count of cached image headers.
  * @param evict_now true: evict the image headers should be removed by the eviction policy, false: wait for the next cache cleanup.
  */
-void lv_image_header_cache_resize(uint32_t new_size, bool evict_now);
+void lv_image_header_cache_resize(uint32_t count, bool evict_now);
 
 /**
  * Invalidate image header cache. Use NULL to invalidate all image headers.
@@ -51,10 +52,10 @@ void lv_image_header_cache_resize(uint32_t new_size, bool evict_now);
 void lv_image_header_cache_drop(const void * src);
 
 /**
- * Return true if the image header cache is disabled.
- * @return true: disabled, false: enabled.
+ * Return true if the image header cache is enabled.
+ * @return true: enabled, false: disabled.
  */
-bool lv_image_header_cache_is_disabled(void);
+bool lv_image_header_cache_is_enabled(void);
 
 /*************************
  *    GLOBAL VARIABLES

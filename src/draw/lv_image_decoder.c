@@ -91,7 +91,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     dsc->src = src;
     dsc->src_type = lv_image_src_get_type(src);
 
-    if(lv_image_cache_is_disabled() == false) {
+    if(lv_image_cache_is_enabled()) {
         dsc->cache = img_cache_p;
         /*Try cache first, unless we are told to ignore cache.*/
         if(!(args && args->no_cache)) {
@@ -278,9 +278,9 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
     }
 
     lv_image_decoder_t * decoder;
-    bool is_header_cache_disabled = lv_image_header_cache_is_disabled();
+    bool is_header_cache_enabled = lv_image_header_cache_is_enabled();
 
-    if(!is_header_cache_disabled && src_type == LV_IMAGE_SRC_FILE) {
+    if(is_header_cache_enabled && src_type == LV_IMAGE_SRC_FILE) {
         lv_image_header_cache_data_t search_key;
         search_key.src_type = src_type;
         search_key.src = src;
@@ -310,7 +310,7 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         }
     }
 
-    if(!is_header_cache_disabled && src_type == LV_IMAGE_SRC_FILE && decoder) {
+    if(is_header_cache_enabled && src_type == LV_IMAGE_SRC_FILE && decoder) {
         lv_cache_entry_t * entry;
         lv_image_header_cache_data_t search_key;
         search_key.src_type = src_type;

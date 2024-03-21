@@ -178,6 +178,8 @@ struct _lv_image_decoder_dsc_t {
 
 /**
  * Initialize the image decoder module
+ * @param image_cache_size    Image cache size in bytes. 0 to disable cache.
+ * @param image_header_count  Number of header cache entries. 0 to disable header cache.
  */
 void _lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_count);
 

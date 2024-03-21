@@ -88,9 +88,9 @@ void lv_image_cache_drop(const void * src)
     lv_cache_drop(img_cache_p, &search_key, NULL);
 }
 
-bool lv_image_cache_is_disabled(void)
+bool lv_image_cache_is_enabled(void)
 {
-    return lv_cache_is_disabled(img_cache_p);
+    return lv_cache_is_enabled(img_cache_p);
 }
 
 /**********************

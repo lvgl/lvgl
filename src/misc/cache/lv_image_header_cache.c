@@ -62,11 +62,11 @@ lv_result_t lv_image_header_cache_init(uint32_t count)
     return img_header_cache_p != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-void lv_image_header_cache_resize(uint32_t new_size, bool evict_now)
+void lv_image_header_cache_resize(uint32_t count, bool evict_now)
 {
-    lv_cache_set_max_size(img_header_cache_p, new_size, NULL);
+    lv_cache_set_max_size(img_header_cache_p, count, NULL);
     if(evict_now) {
-        lv_cache_reserve(img_header_cache_p, new_size, NULL);
+        lv_cache_reserve(img_header_cache_p, count, NULL);
     }
 }
 
@@ -85,9 +85,9 @@ void lv_image_header_cache_drop(const void * src)
     lv_cache_drop(img_header_cache_p, &search_key, NULL);
 }
 
-bool lv_image_header_cache_is_disabled(void)
+bool lv_image_header_cache_is_enabled(void)
 {
-    return lv_cache_is_disabled(img_header_cache_p);
+    return lv_cache_is_enabled(img_header_cache_p);
 }
 
 /**********************
