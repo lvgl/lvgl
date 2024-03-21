@@ -3,12 +3,12 @@
 
 LV_IMAGE_DECLARE(img_hand);
 
-lv_obj_t * needle_line;
+lv_scale_line_needle_t * line_needle;
 lv_obj_t * needle_img;
 
 static void set_needle_line_value(void * obj, int32_t v)
 {
-    lv_scale_set_line_needle_value(obj, needle_line, 60, v);
+    lv_scale_set_line_needle_value(obj, line_needle, 60, v);
 }
 
 static void set_needle_img_value(void * obj, int32_t v)
@@ -43,10 +43,11 @@ void lv_example_scale_3(void)
     lv_scale_set_angle_range(scale_line, 270);
     lv_scale_set_rotation(scale_line, 135);
 
-    needle_line = lv_line_create(scale_line);
+    line_needle = lv_scale_add_line_needle(scale_line);
 
-    lv_obj_set_style_line_width(needle_line, 6, LV_PART_MAIN);
-    lv_obj_set_style_line_rounded(needle_line, true, LV_PART_MAIN);
+    lv_obj_t * line_needle_line = lv_scale_line_needle_get_line(line_needle);
+    lv_obj_set_style_line_width(line_needle_line, 6, LV_PART_MAIN);
+    lv_obj_set_style_line_rounded(line_needle_line, true, LV_PART_MAIN);
 
     lv_anim_t anim_scale_line;
     lv_anim_init(&anim_scale_line);

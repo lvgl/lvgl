@@ -173,14 +173,26 @@ void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation)
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
-                                    int32_t value)
+lv_scale_line_needle_t * lv_scale_add_line_needle(lv_obj_t * obj) {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    lv_scale_line_needle_t * line_needle = _lv_ll_ins_head(&scale->line_needle_ll);
+    LV_ASSERT_MALLOC(line_needle);
+    if(line_needle == NULL) return NULL;
+
+    line_needle->line = lv_line_create(obj);
+
+    return line_needle;
+}
+
+void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_scale_line_needle_t * line_needle,
+                                    int32_t needle_length, int32_t value)
 {
     int32_t angle;
     int32_t scale_width, scale_height;
     int32_t actual_needle_length;
     int32_t needle_length_x, needle_length_y;
-    static lv_point_precise_t needle_line_points[2];
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -189,7 +201,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
         return;
     }
 
-    lv_obj_align(needle_line, LV_ALIGN_TOP_LEFT, 0, 0);
+    lv_obj_align(line_needle->line, LV_ALIGN_TOP_LEFT, 0, 0);
 
     scale_width = lv_obj_get_style_width(obj, LV_PART_MAIN);
     scale_height = lv_obj_get_style_height(obj, LV_PART_MAIN);
@@ -224,12 +236,12 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     needle_length_x = (actual_needle_length * lv_trigo_cos(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
     needle_length_y = (actual_needle_length * lv_trigo_sin(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
 
-    needle_line_points[0].x = scale_width / 2;
-    needle_line_points[0].y = scale_height / 2;
-    needle_line_points[1].x = scale_width / 2 + needle_length_x;
-    needle_line_points[1].y = scale_height / 2 + needle_length_y;
+    line_needle->line_points[0].x = scale_width / 2;
+    line_needle->line_points[0].y = scale_height / 2;
+    line_needle->line_points[1].x = scale_width / 2 + needle_length_x;
+    line_needle->line_points[1].y = scale_height / 2 + needle_length_y;
 
-    lv_line_set_points(needle_line, needle_line_points, 2);
+    lv_line_set_points(line_needle->line, line_needle->line_points, 2);
 }
 
 void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value)
@@ -381,6 +393,10 @@ int32_t lv_scale_get_range_max_value(lv_obj_t * obj)
     return scale->range_max;
 }
 
+lv_obj_t * lv_scale_line_needle_get_line(lv_scale_line_needle_t * line_needle) {
+    return line_needle->line;
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -397,6 +413,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     _lv_ll_init(&scale->section_ll, sizeof(lv_scale_section_t));
+    _lv_ll_init(&scale->line_needle_ll, sizeof(lv_scale_section_t));
 
     scale->total_tick_count = LV_SCALE_TOTAL_TICK_COUNT_DEFAULT;
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
@@ -421,6 +438,7 @@ static void lv_scale_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_scale_t * scale = (lv_scale_t *)obj;
+
     lv_scale_section_t * section;
     while(scale->section_ll.head) {
         section = _lv_ll_get_head(&scale->section_ll);
@@ -428,6 +446,14 @@ static void lv_scale_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         lv_free(section);
     }
     _lv_ll_clear(&scale->section_ll);
+
+    lv_scale_line_needle_t * line_needle;
+    while(scale->line_needle_ll.head) {
+        line_needle = _lv_ll_get_head(&scale->line_needle_ll);
+        _lv_ll_remove(&scale->line_needle_ll, line_needle);
+        lv_free(line_needle);
+    }
+    _lv_ll_clear(&scale->line_needle_ll);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

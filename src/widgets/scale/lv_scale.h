@@ -72,8 +72,14 @@ typedef struct {
 } lv_scale_section_t;
 
 typedef struct {
+    lv_obj_t * line;
+    lv_point_precise_t line_points[2];
+} lv_scale_line_needle_t;
+
+typedef struct {
     lv_obj_t obj;
     lv_ll_t section_ll;     /**< Linked list for the sections (stores lv_scale_section_t)*/
+    lv_ll_t line_needle_ll;
     const char ** txt_src;
     lv_scale_mode_t mode;
     int32_t range_min;
@@ -163,16 +169,23 @@ void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range);
 void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation);
 
 /**
+ * Add a line needle to the given scale
+ * @param obj       pointer to a scale object
+ * @return          pointer to the new line needle
+ */
+lv_scale_line_needle_t * lv_scale_add_line_needle(lv_obj_t * obj);
+
+/**
  * Point the needle to the corresponding value through the line
  * @param obj              pointer to a scale object
- * @param needle_line      needle_line of the scale
+ * @param line_needle      pointer to a scale line needle
  * @param needle_length    length of the needle
  *                         needle_length>0 needle_length=needle_length;
  *                         needle_length<0 needle_length=radius-|needle_length|;
  * @param value            needle to point to the corresponding value
  */
-void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
-                                    int32_t value);
+void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_scale_line_needle_t * line_needle,
+                                    int32_t needle_length, int32_t value);
 
 /**
  * Point the needle to the corresponding value through the image,
@@ -272,6 +285,13 @@ int32_t lv_scale_get_range_min_value(lv_obj_t * obj);
  * @return      section max range
  */
 int32_t lv_scale_get_range_max_value(lv_obj_t * obj);
+
+/**
+ * Get the line object associated with a scale line needle
+ * @param obj   pointer to a scale line needle object
+ * @return      line object
+ */
+lv_obj_t * lv_scale_line_needle_get_line(lv_scale_line_needle_t * line_needle);
 
 /**********************
  *      MACROS
