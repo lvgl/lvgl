@@ -37,6 +37,8 @@ extern "C" {
 #define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
 #endif
 
+#define lv_button_bind_checked           lv_obj_bind_checked
+
 /**********************
  *      MACROS
  **********************/
