@@ -408,6 +408,15 @@
     #endif
 #endif
 
+/* Set stack size of drawing thread. Unit is byte. If Thorvg is enabled, 128kB is required tested on simulator.*/
+#ifndef LV_DRAW_THREAD_STACKSIZE
+    #ifdef CONFIG_LV_DRAW_THREAD_STACKSIZE
+        #define LV_DRAW_THREAD_STACKSIZE CONFIG_LV_DRAW_THREAD_STACKSIZE
+    #else
+        #define LV_DRAW_THREAD_STACKSIZE 32768
+    #endif
+#endif
+
 /* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE
