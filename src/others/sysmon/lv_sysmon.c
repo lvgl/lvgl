@@ -92,7 +92,6 @@ void _lv_sysmon_builtin_deinit(void)
 #endif
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -123,7 +122,7 @@ void lv_sysmon_show_performance()
         lv_subject_add_observer_obj(&sysmon_perf.subject, perf_observer_cb, sysmon_perf.label, NULL);
         sysmon_perf.inited = true;
     }
-    
+
 #if LV_USE_PERF_MONITOR_LOG_MODE
     lv_obj_add_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
 #else
@@ -276,7 +275,7 @@ void lv_sysmon_show_memory()
         lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, sysmon_mem.label, NULL);
         sysmon_mem.inited = true;
     }
-    
+
     lv_obj_remove_flag(sysmon_mem.label, LV_OBJ_FLAG_HIDDEN);
 }
 
