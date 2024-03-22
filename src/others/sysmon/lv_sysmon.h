@@ -38,6 +38,7 @@ extern "C" {
 typedef struct {
     lv_subject_t subject;
     lv_timer_t * timer;
+    lv_obj_t * label;
     bool inited;
 } lv_sysmon_backend_data_t;
 
@@ -77,6 +78,34 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+#if LV_USE_SYSMON && LV_USE_PERF_MONITOR
+
+/**
+ * Show system performance monitor: CPU usage and FPS count
+ */
+void lv_sysmon_show_performance();
+
+/**
+ * Hide system performance monitor
+ */
+void lv_sysmon_hide_performance();
+
+#endif
+
+#if LV_USE_SYSMON && LV_USE_MEM_MONITOR
+
+/**
+ * Show system memory monitor: used memory and the memory fragmentation
+ */
+void lv_sysmon_show_memory();
+
+/**
+ * Hide system memory monitor
+ */
+void lv_sysmon_hide_memory();
+
+#endif
 
 /**
  * Initialize built-in system monitor, such as performance and memory monitor.
