@@ -3,6 +3,7 @@
 
 #include "unity/unity.h"
 #include "lv_test_indev.h"
+#include <string.h>
 
 #define OPTION_BUFFER_SZ        (20U)
 #define OPTION_SMALL_BUFFER_SZ  (3U)

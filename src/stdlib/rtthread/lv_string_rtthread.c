@@ -55,6 +55,11 @@ size_t lv_strlen(const char * str)
     return rt_strlen(str);
 }
 
+int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
+{
+    return rt_memcmp(p1, p2, len);
+}
+
 char * lv_strncpy(char * dst, const char * src, size_t dest_size)
 {
     return rt_strncpy(dst, src, dest_size);
@@ -72,17 +77,17 @@ int32_t lv_strcmp(const char * s1, const char * s2)
 
 char * lv_strdup(const char * src)
 {
-    /*strdup uses rt_malloc, so use the lv_malloc when LV_USE_STDLIB_MALLOC is not LV_STDLIB_RTTHREAD */
-#if LV_USE_STDLIB_MALLOC != LV_STDLIB_RTTHREAD
     size_t len = lv_strlen(src) + 1;
     char * dst = lv_malloc(len);
     if(dst == NULL) return NULL;
 
-    lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy when length is known*/
+    lv_memcpy(dst, src, len); /*memcpy is faster than strncpy when length is known*/
     return dst;
-#else
-    return rt_strdup(src);
-#endif
+}
+
+char * lv_strcat(char * dst, const char * src)
+{
+    return strcat(dst, src);
 }
 
 /**********************

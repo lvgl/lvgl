@@ -380,6 +380,16 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
     }
+    else if(code == LV_EVENT_ROTARY) {
+        int32_t r = lv_event_get_rotary_diff(e);
+        int32_t new_id = roller->sel_opt_id + r;
+        new_id = LV_CLAMP(0, new_id, (int32_t)roller->option_cnt - 1);
+        if((int32_t)roller->sel_opt_id != new_id) {
+            uint32_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
+            lv_roller_set_selected(obj, new_id, LV_ANIM_ON);
+            roller->sel_opt_id_ori = ori_id;
+        }
+    }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_obj_t * label = get_label(obj);
         lv_obj_refresh_ext_draw_size(label);

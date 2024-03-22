@@ -6,10 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_rlottie.h"
+#include "../../lvgl.h"
 #if LV_USE_RLOTTIE
 
 #include <rlottie_capi.h>
+#include <string.h>
 
 /*********************
 *      DEFINES

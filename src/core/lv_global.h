@@ -15,8 +15,6 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#include <stdbool.h>
-
 #include "../misc/lv_types.h"
 #include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
@@ -38,6 +36,8 @@ extern "C" {
 
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
+
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -103,13 +103,8 @@ typedef struct _lv_global_t {
 
     lv_ll_t img_decoder_ll;
 
-#if LV_CACHE_DEF_SIZE > 0
     lv_cache_t * img_cache;
-#endif
-
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
     lv_cache_t * img_header_cache;
-#endif
 
     lv_draw_global_info_t draw_info;
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
@@ -161,6 +156,10 @@ typedef struct _lv_global_t {
 
 #if LV_USE_FS_LITTLEFS
     lv_fs_drv_t littlefs_fs_drv;
+#endif
+
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    lv_fs_drv_t arduino_esp_littlefs_fs_drv;
 #endif
 
 #if LV_USE_FREETYPE

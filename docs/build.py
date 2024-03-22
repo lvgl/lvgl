@@ -15,6 +15,7 @@ import doc_builder
 import shutil
 import tempfile
 import config_builder
+import add_translation
 
 # due to the modifications that take place to the documentation files
 # when the documentaation builds it is better to copy the source files to a
@@ -76,7 +77,7 @@ def cmd(s):
 
 
 # Get the current branch name
-status, br = subprocess.getstatusoutput("git branch")
+status, br = subprocess.getstatusoutput("git branch --show-current")
 _, gitcommit = subprocess.getstatusoutput("git rev-parse HEAD")
 br = re.sub('\* ', '', br)
 
@@ -134,6 +135,9 @@ with open(os.path.join(temp_directory, 'Doxyfile'), 'wb') as f:
 
 print("Generate the list of examples")
 ex.exec(temp_directory)
+
+print("Add translation")
+add_translation.exec(temp_directory)
 
 print("Running doxygen")
 cmd('cd "{0}" && doxygen Doxyfile'.format(temp_directory))

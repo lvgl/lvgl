@@ -2,7 +2,7 @@
 
 <!--
 /****************************************************************************
-*  Copyright 2022 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)       *
+*  Copyright 2024 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)       *
 *                                                                           *
 *  Licensed under the Apache License, Version 2.0 (the "License");          *
 *  you may not use this file except in compliance with the License.         *
@@ -20,7 +20,7 @@
 -->
 
 
-<package schemaVersion="1.7.28" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.28/schema/PACK.xsd">
+<package schemaVersion="1.7.31" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.31/schema/PACK.xsd">
   <vendor>LVGL</vendor>
   <name>lvgl</name>
   <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
@@ -36,12 +36,15 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-02-06" version="9.0.1-dev2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.1-dev2.pack">
-      - LVGL 9.0.1-dev
-      - Improves benchmark statistics.
-      - Some fixes
+    <release date="2024-03-19" version="9.1.0" url="https://github.com/lvgl/lvgl/raw/v9.1.0/env_support/cmsis-pack/LVGL.lvgl.9.1.0.pack">
+      - LVGL 9.1.0
+      - See Change Log
     </release>
-    <release date="2024-01-24" version="9.0.0" url="https://github.com/lvgl/lvgl/raw/b255eeabf00fa2316084e308e596e7ecabbaff4d/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
+    <release date="2024-03-19" version="8.4.0" url="https://github.com/lvgl/lvgl/raw/v8.4.0/env_support/cmsis-pack/LVGL.lvgl.8.4.0.pack">
+      - LVGL 8.4.0
+      - Some minor fixes
+    </release>
+    <release date="2024-01-24" version="9.0.0" url="https://github.com/lvgl/lvgl/raw/v9.0.0/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
       - LVGL 9.0.0
       - Implements a New Render Architecture that enables parallel processing
       - Accelerates SW-Render with NEON and Helium technology for Cortex architectures. 
@@ -236,7 +239,7 @@
         </condition>
         
         <condition id="NEON">
-            <description>Support All Cortex-M based processors</description>
+            <description>Support NEON based processors</description>
             <accept  Dcore="Cortex-A8"/>
             <accept  Dcore="Cortex-A9"/>
             <accept  Dcore="Cortex-A15"/>
@@ -251,19 +254,22 @@
             <accept  Dcore="Cortex-A73"/>
         </condition>
         
-        <condition id="Helium GNU Assembler">
-            <require condition="NEON" />
-            <require condition="GNU Assembler" />
-        </condition>
-
         <condition id="Helium">
-            <description>Support All Cortex-M based processors</description>
-            <!--
+            <description>Support Helium based processors</description>
             <accept  Dcore="Cortex-M52"/>
-            -->
             <accept  Dcore="Cortex-M55"/>
             <accept  Dcore="Cortex-M85"/>
             <accept  Dcore="ARMV81MML"/>
+        </condition>
+        
+        <condition id="NEON GNU Assembler">
+            <require condition="NEON" />
+            <require condition="GNU Assembler" />
+        </condition>
+        
+        <condition id="Helium GNU Assembler">
+            <require condition="Helium" />
+            <require condition="GNU Assembler" />
         </condition>
 
         <condition id="LVGL-Essential">
@@ -392,7 +398,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.0.1-dev2">
+        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.1.0">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="Essential">
@@ -430,6 +436,7 @@
                 <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_lcd.c" />
                 <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_libuv.c" />
                 <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_touchscreen.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_image_cache.c" />
                 
                 <file category="sourceC"            name="src/drivers/sdl/lv_sdl_keyboard.c" />
                 <file category="sourceC"            name="src/drivers/sdl/lv_sdl_mouse.c" />
@@ -438,6 +445,9 @@
                 
                 <file category="sourceC"            name="src/drivers/x11/lv_x11_display.c" />
                 <file category="sourceC"            name="src/drivers/x11/lv_x11_input.c" />
+                
+                <file category="sourceC"            name="src/drivers/libinput/lv_libinput.c" />
+                <file category="sourceC"            name="src/drivers/libinput/lv_xkb.c" />
 
                 <!-- src/drivers -->
                 <file category="sourceC"            name="src/display/lv_display.c" />
@@ -454,7 +464,6 @@
                 <file category="sourceC"            name="src/draw/lv_draw_rect.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_triangle.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_vector.c" />
-                <file category="sourceC"            name="src/draw/lv_image_buf.c" />
                 <file category="sourceC"            name="src/draw/lv_image_decoder.c" />
                 
                 <!-- src/draw/sw -->
@@ -478,7 +487,8 @@
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_argb8888.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c" />
-                <file category="sourceAsm"          name="src/draw/sw/blend/neon/lv_blend_neon.S"  condition="Helium GNU Assembler"/>
+                <file category="sourceAsm"          name="src/draw/sw/blend/neon/lv_blend_neon.S"  condition="NEON GNU Assembler"/>
+                <file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.S"  condition="Helium GNU Assembler"/>
 
                 <!-- src/font -->
                 <file category="sourceC"            name="src/font/lv_binfont_loader.c" />
@@ -631,7 +641,7 @@
                 <file category="sourceC"            name="src/osal/lv_os_none.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.4" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.5" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -782,7 +792,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_PTHREAD
 
@@ -805,7 +815,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_FREERTOS
 
@@ -828,7 +838,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_CMSIS_RTOS2
 
@@ -851,7 +861,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_RTTHREAD
 
@@ -874,7 +884,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_WINDOWS
 
@@ -898,7 +908,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS               LV_OS_CUSTOM
 #define LV_OS_CUSTOM_INCLUDE    "lv_os_custom.h"
@@ -907,15 +917,33 @@
 
             </component>
 
-            <component Cgroup="Porting"  condition="LVGL-Essential">
-              <description>Porting Templates</description>
+            <component Cgroup="Porting"  Csub="Display" Cvariant="Generic" isDefaultVariant="true" condition="LVGL-Essential">
+              <description>Porting Templates for display devices.</description>
               <files>
                 <file category="header"     name="examples/porting/lv_port_disp_template.h" attr="config" version="2.1.0" />
                 <file category="sourceC"    name="examples/porting/lv_port_disp_template.c" attr="config" version="2.1.0" />
-
+              </files>
+            </component>
+            
+            <component Cgroup="Porting"  Csub="Display" Cvariant="STM32" condition="LVGL-Essential">
+              <description>Porting Templates for STM32 devices.</description>
+              <files>
+                <file category="header"     name="examples/porting/lv_port_lcd_stm32_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"    name="examples/porting/lv_port_lcd_stm32_template.c" attr="config" version="1.0.0" />
+              </files>
+            </component>
+            
+            <component Cgroup="Porting"  Csub="Input" Cvariant="Generic" isDefaultVariant="true" condition="LVGL-Essential">
+              <description>Porting Templates for input devices.</description>
+              <files>
                 <file category="header"     name="examples/porting/lv_port_indev_template.h" attr="config" version="2.1.0" />
                 <file category="sourceC"    name="examples/porting/lv_port_indev_template.c" attr="config" version="2.1.0" />
-
+              </files>
+            </component>
+            
+            <component Cgroup="Porting"  Csub="File System" Cvariant="Generic" isDefaultVariant="true" condition="LVGL-Essential">
+              <description>Porting Templates for the file system.</description>
+              <files>
                 <file category="header"     name="examples/porting/lv_port_fs_template.h" attr="config" version="2.1.0" />
                 <file category="sourceC"    name="examples/porting/lv_port_fs_template.c" attr="config" version="2.1.0" />
               </files>
@@ -1011,6 +1039,8 @@
                 <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_decoder.c" />
                 <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_math.c" />
                 <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_path.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_grad.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_pending.c" />
                 <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_utils.c" />
               </files>
 
@@ -1246,6 +1276,21 @@
 
 /*! \brief enable STDIO file access */
 #define LV_USE_FS_STDIO         1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="LittleFs" condition="LVGL-Essential">
+              <description>Add API for file access via LittleFs</description>
+              <files>
+                <!-- src/libs/fsdrv -->
+                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_littlefs.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable LittleFs file access */
+#define LV_USE_FS_LITTLEFS      1
               </RTE_Components_h>
 
             </component>
@@ -1709,7 +1754,7 @@
               <files>
                 <!-- demos/benchmark -->
                 <file category="sourceC"    name="demos/benchmark/lv_demo_benchmark.c" />
-                <file category="doc"        name="demos/benchmark/README.md" />
+                <file category="doc"        name="demos/README.md" />
               </files>
 
               <RTE_Components_h>
@@ -1762,7 +1807,6 @@
               <files>
                 <!-- demos/multilang -->
                 <file category="sourceC"    name="demos/multilang/lv_demo_multilang.c" />
-                <file category="doc"        name="demos/multilang/README.md" />
               </files>
 
               <RTE_Components_h>
@@ -1780,7 +1824,7 @@
                 <file category="sourceC"    name="demos/music/lv_demo_music.c" />
                 <file category="sourceC"    name="demos/music/lv_demo_music_list.c" />
                 <file category="sourceC"    name="demos/music/lv_demo_music_main.c" />
-                <file category="doc"        name="demos/music/README.md" />
+                <file category="doc"        name="demos/README.md" />
               </files>
 
               <RTE_Components_h>
@@ -1871,7 +1915,7 @@
               <files>
                 <!-- demos/render -->
                 <file category="sourceC"    name="demos/render/lv_demo_render.c" />
-                <file category="doc"        name="demos/render/README.md" />
+                <file category="doc"        name="demos/README.md" />
               </files>
 
               <RTE_Components_h>

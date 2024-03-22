@@ -406,9 +406,13 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             return (lv_style_value_t) {
                 .num = LV_COORD_MAX
             };
+        case LV_STYLE_ROTARY_SENSITIVITY:
+            return (lv_style_value_t) {
+                .num = 256
+            };
         default:
             return (lv_style_value_t) {
-                .ptr = 0
+                .ptr = NULL
             };
     }
 }

@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 #include "../display/lv_display.h"
-#include <stdbool.h>
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES

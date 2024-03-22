@@ -6,12 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
-
 #include "lv_group.h"
 #include "../core/lv_obj.h"
 #include "../core/lv_global.h"
 #include "../indev/lv_indev.h"
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -173,8 +172,9 @@ void lv_group_swap_obj(lv_obj_t * obj1, lv_obj_t * obj2)
         else if((*obj_i) == obj2)(*obj_i) = obj1;
     }
 
-    if(*g1->obj_focus == obj1) lv_group_focus_obj(obj2);
-    else if(*g1->obj_focus == obj2) lv_group_focus_obj(obj1);
+    lv_obj_t * focused = lv_group_get_focused(g1);
+    if(focused == obj1) lv_group_focus_obj(obj2);
+    else if(focused == obj2) lv_group_focus_obj(obj1);
 
 }
 

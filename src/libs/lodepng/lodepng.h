@@ -26,6 +26,10 @@ freely, subject to the following restrictions:
 #ifndef LODEPNG_H
 #define LODEPNG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <string.h> /*for size_t*/
 
 #include "../../../lvgl.h"
@@ -1091,6 +1095,10 @@ TODO:
 */
 
 #endif /*LV_USE_LODEPNG*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /*LODEPNG_H inclusion guard*/
 

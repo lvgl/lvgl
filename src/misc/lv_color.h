@@ -17,8 +17,6 @@ extern "C" {
 #include "lv_assert.h"
 #include "lv_math.h"
 #include "lv_types.h"
-#include <stdint.h>
-#include <stdbool.h>
 
 /*********************
  *      DEFINES
@@ -350,6 +348,7 @@ static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_16_16_mix(uint16_t c1, uin
 {
     if(mix == 255) return c1;
     if(mix == 0) return c2;
+    if(c1 == c2) return c1;
 
     uint16_t ret;
 
