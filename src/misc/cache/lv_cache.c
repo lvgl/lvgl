@@ -82,6 +82,12 @@ lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void *
     LV_ASSERT_NULL(key);
 
     lv_mutex_lock(&cache->lock);
+
+    if(cache->size == 0) {
+        lv_mutex_unlock(&cache->lock);
+        return NULL;
+    }
+
     lv_cache_entry_t * entry = cache->clz->get_cb(cache, key, user_data);
     if(entry != NULL) {
         lv_cache_entry_acquire_data(entry);
@@ -108,6 +114,11 @@ lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * use
     LV_ASSERT_NULL(key);
 
     lv_mutex_lock(&cache->lock);
+    if(cache->max_size == 0) {
+        lv_mutex_unlock(&cache->lock);
+        return NULL;
+    }
+
     lv_cache_entry_t * entry = cache_add_internal_no_lock(cache, key, user_data);
     if(entry != NULL) {
         lv_cache_entry_acquire_data(entry);
@@ -122,12 +133,22 @@ lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * k
     LV_ASSERT_NULL(key);
 
     lv_mutex_lock(&cache->lock);
-    lv_cache_entry_t * entry = cache->clz->get_cb(cache, key, user_data);
-    if(entry != NULL) {
-        lv_cache_entry_acquire_data(entry);
-        lv_mutex_unlock(&cache->lock);
-        return entry;
+    lv_cache_entry_t * entry = NULL;
+
+    if(cache->size != 0) {
+        entry = cache->clz->get_cb(cache, key, user_data);
+        if(entry != NULL) {
+            lv_cache_entry_acquire_data(entry);
+            lv_mutex_unlock(&cache->lock);
+            return entry;
+        }
     }
+
+    if(cache->max_size == 0) {
+        lv_mutex_unlock(&cache->lock);
+        return NULL;
+    }
+
     entry = cache_add_internal_no_lock(cache, key, user_data);
     if(entry == NULL) {
         lv_mutex_unlock(&cache->lock);
@@ -202,6 +223,10 @@ size_t lv_cache_get_free_size(lv_cache_t * cache, void * user_data)
 {
     LV_UNUSED(user_data);
     return cache->max_size - cache->size;
+}
+bool lv_cache_is_enabled(lv_cache_t * cache)
+{
+    return cache->max_size > 0;
 }
 void lv_cache_set_compare_cb(lv_cache_t * cache, lv_cache_compare_cb_t compare_cb, void * user_data)
 {

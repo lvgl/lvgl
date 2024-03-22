@@ -103,13 +103,8 @@ typedef struct _lv_global_t {
 
     lv_ll_t img_decoder_ll;
 
-#if LV_CACHE_DEF_SIZE > 0
     lv_cache_t * img_cache;
-#endif
-
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
     lv_cache_t * img_header_cache;
-#endif
 
     lv_draw_global_info_t draw_info;
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0

@@ -178,8 +178,10 @@ struct _lv_image_decoder_dsc_t {
 
 /**
  * Initialize the image decoder module
+ * @param image_cache_size    Image cache size in bytes. 0 to disable cache.
+ * @param image_header_count  Number of header cache entries. 0 to disable header cache.
  */
-void _lv_image_decoder_init(void);
+void _lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_count);
 
 /**
  * Deinitialize the image decoder module
@@ -276,11 +278,9 @@ void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_dec
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
 
-#if LV_CACHE_DEF_SIZE > 0
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data);
-#endif
 
 /**
  * Check the decoded image, make any modification if decoder `args` requires.

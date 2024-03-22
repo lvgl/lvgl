@@ -137,6 +137,7 @@ bool lv_cache_evict_one(lv_cache_t * cache, void * user_data);
 /**
  * Set the maximum size of the cache.
  * If the current cache size is greater than the new maximum size, the cache's policy will be used to evict entries until the new maximum size is reached.
+ * If set to 0, the cache will be disabled.
  * @note But this behavior will happen only new entries are added to the cache.
  * @param cache         The cache object pointer to set the maximum size.
  * @param max_size      The new maximum size of the cache.
@@ -167,6 +168,14 @@ size_t lv_cache_get_size(lv_cache_t * cache, void * user_data);
  * @return              Returns the free size of the cache.
  */
 size_t lv_cache_get_free_size(lv_cache_t * cache, void * user_data);
+
+/**
+ * Return true if the cache is enabled.
+ * Disabled cache means that when the max_size of the cache is 0. In this case, all cache operations will be no-op.
+ * @param cache         The cache object pointer to check if it's disabled.
+ * @return              Returns true if the cache is enabled, false otherwise.
+ */
+bool lv_cache_is_enabled(lv_cache_t * cache);
 
 /**
  * Set the compare callback of the cache.

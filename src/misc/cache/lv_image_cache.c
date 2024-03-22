@@ -6,14 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../lv_assert.h"
-#include "lv_image_header_cache.h"
+#include "../../core/lv_global.h"
 
 #include "lv_image_cache.h"
-
-#if LV_CACHE_DEF_SIZE > 0
-
-#include "../../core/lv_global.h"
+#include "lv_image_header_cache.h"
 
 /*********************
  *      DEFINES
@@ -49,14 +47,14 @@ static void image_cache_free_cb(lv_image_cache_data_t * entry, void * user_data)
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_image_cache_init(void)
+lv_result_t lv_image_cache_init(uint32_t size)
 {
     if(img_cache_p != NULL) {
         return LV_RESULT_OK;
     }
 
     img_cache_p = lv_cache_create(&lv_cache_class_lru_rb_size,
-    sizeof(lv_image_cache_data_t), LV_CACHE_DEF_SIZE, (lv_cache_ops_t) {
+    sizeof(lv_image_cache_data_t), size, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t) image_cache_compare_cb,
         .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t) image_cache_free_cb,
@@ -72,14 +70,11 @@ void lv_image_cache_resize(uint32_t new_size, bool evict_now)
     }
 }
 
-#endif
-
 void lv_image_cache_drop(const void * src)
 {
     /*If user invalidate image, the header cache should be invalidated too.*/
     lv_image_header_cache_drop(src);
 
-#if LV_CACHE_DEF_SIZE > 0
     if(src == NULL) {
         lv_cache_drop_all(img_cache_p, NULL);
         return;
@@ -91,16 +86,16 @@ void lv_image_cache_drop(const void * src)
     };
 
     lv_cache_drop(img_cache_p, &search_key, NULL);
-#else
-    LV_UNUSED(src);
-#endif
+}
+
+bool lv_image_cache_is_enabled(void)
+{
+    return lv_cache_is_enabled(img_cache_p);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-#if LV_CACHE_DEF_SIZE > 0
 
 inline static lv_cache_compare_res_t image_cache_common_compare(const void * lhs_src, lv_image_src_t lhs_src_type,
                                                                 const void * rhs_src, lv_image_src_t rhs_src_type)
@@ -142,4 +137,3 @@ static void image_cache_free_cb(lv_image_cache_data_t * entry, void * user_data)
     /*Free the duplicated file name*/
     if(entry->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)entry->src);
 }
-#endif

@@ -173,7 +173,10 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
         if(dsc->args.no_cache) return LV_RES_OK;
 
-#if LV_CACHE_DEF_SIZE > 0
+        /*If the image cache is disabled, just return the decoded image*/
+        if(!lv_image_cache_is_enabled()) return LV_RESULT_OK;
+
+        /*Add the decoded image to the cache*/
         lv_image_cache_data_t search_key;
         search_key.src_type = dsc->src_type;
         search_key.src = dsc->src;
@@ -186,7 +189,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
         dsc->cache_entry = entry;
-#endif
         return LV_RESULT_OK;    /*If not returned earlier then it failed*/
     }
 
@@ -200,7 +202,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    if(dsc->args.no_cache || LV_CACHE_DEF_SIZE == 0)
+    if(dsc->args.no_cache || !lv_image_cache_is_enabled())
         lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
     else
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
