@@ -421,7 +421,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
             }
         }
 
-        dsc->glyph_data = (void *)lv_font_get_glyph_bitmap(&g, letter, draw_buf);
+        dsc->glyph_data = (void *) lv_font_get_glyph_bitmap(&g, draw_buf);
         dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
     }
     else {
