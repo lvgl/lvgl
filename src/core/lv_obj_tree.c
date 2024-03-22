@@ -485,7 +485,8 @@ static void lv_obj_delete_async_cb(void * obj)
 static void obj_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 {
     /*Wait for release to avoid accidentally triggering other obj to be clicked*/
-    lv_indev_wait_release(indev);
+    if (indev->proc.state != LV_INDEV_STATE_RELEASED)
+        lv_indev_wait_release(indev);
 
     /*Reset the input device*/
     lv_indev_reset(indev, obj);
