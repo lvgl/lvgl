@@ -78,34 +78,37 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+#if LV_USE_SYSMON
 
-#if LV_USE_SYSMON && LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR
 
 /**
  * Show system performance monitor: CPU usage and FPS count
  */
-void lv_sysmon_show_performance();
+void lv_sysmon_show_performance(void);
 
 /**
  * Hide system performance monitor
  */
-void lv_sysmon_hide_performance();
+void lv_sysmon_hide_performance(void);
 
-#endif
+#endif /*LV_USE_PERF_MONITOR*/
 
-#if LV_USE_SYSMON && LV_USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
 
 /**
  * Show system memory monitor: used memory and the memory fragmentation
  */
-void lv_sysmon_show_memory();
+void lv_sysmon_show_memory(void);
 
 /**
  * Hide system memory monitor
  */
-void lv_sysmon_hide_memory();
+void lv_sysmon_hide_memory(void);
 
-#endif
+#endif /*LV_USE_MEM_MONITOR*/
+
+#endif /*LV_USE_SYSMON*/
 
 /**
  * Initialize built-in system monitor, such as performance and memory monitor.

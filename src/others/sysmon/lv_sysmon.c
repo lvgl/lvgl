@@ -92,6 +92,58 @@ void _lv_sysmon_builtin_deinit(void)
 #endif
 }
 
+#if _USE_PERF_MONITOR
+
+void lv_sysmon_show_performance(void)
+{
+    if(!sysmon_perf.inited) {
+        sysmon_perf.label = _lv_sysmon_create_label(lv_layer_sys());
+        lv_obj_align(sysmon_perf.label, LV_USE_PERF_MONITOR_POS, 0, 0);
+        lv_subject_add_observer_obj(&sysmon_perf.subject, perf_observer_cb, sysmon_perf.label, NULL);
+        sysmon_perf.inited = true;
+    }
+
+#if LV_USE_PERF_MONITOR_LOG_MODE
+    lv_obj_add_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
+#else
+    lv_obj_remove_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
+#endif
+}
+
+void lv_sysmon_hide_performance(void)
+{
+    if(!sysmon_perf.inited) {
+        return;
+    }
+    lv_obj_add_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
+}
+
+#endif
+
+#if _USE_MEM_MONITOR
+
+void lv_sysmon_show_memory(void)
+{
+    if(!sysmon_mem.inited) {
+        sysmon_mem.label = _lv_sysmon_create_label(lv_layer_sys());
+        lv_obj_align(sysmon_mem.label, LV_USE_MEM_MONITOR_POS, 0, 0);
+        lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, sysmon_mem.label, NULL);
+        sysmon_mem.inited = true;
+    }
+
+    lv_obj_remove_flag(sysmon_mem.label, LV_OBJ_FLAG_HIDDEN);
+}
+
+void lv_sysmon_hide_memory(void)
+{
+    if(!sysmon_mem.inited) {
+        return;
+    }
+    lv_obj_add_flag(sysmon_mem.label, LV_OBJ_FLAG_HIDDEN);
+}
+
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -113,30 +165,6 @@ static lv_obj_t * _lv_sysmon_create_label(lv_obj_t * parent)
 #endif
 
 #if _USE_PERF_MONITOR
-
-void lv_sysmon_show_performance()
-{
-    if(!sysmon_perf.inited) {
-        sysmon_perf.label = _lv_sysmon_create_label(lv_layer_sys());
-        lv_obj_align(sysmon_perf.label, LV_USE_PERF_MONITOR_POS, 0, 0);
-        lv_subject_add_observer_obj(&sysmon_perf.subject, perf_observer_cb, sysmon_perf.label, NULL);
-        sysmon_perf.inited = true;
-    }
-
-#if LV_USE_PERF_MONITOR_LOG_MODE
-    lv_obj_add_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
-#else
-    lv_obj_remove_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
-#endif
-}
-
-void lv_sysmon_hide_performance()
-{
-    if(!sysmon_perf.inited) {
-        return;
-    }
-    lv_obj_add_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
-}
 
 static void perf_monitor_disp_event_cb(lv_event_t * e)
 {
@@ -266,26 +294,6 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 #endif
 
 #if _USE_MEM_MONITOR
-
-void lv_sysmon_show_memory()
-{
-    if(!sysmon_mem.inited) {
-        sysmon_mem.label = _lv_sysmon_create_label(lv_layer_sys());
-        lv_obj_align(sysmon_mem.label, LV_USE_MEM_MONITOR_POS, 0, 0);
-        lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, sysmon_mem.label, NULL);
-        sysmon_mem.inited = true;
-    }
-
-    lv_obj_remove_flag(sysmon_mem.label, LV_OBJ_FLAG_HIDDEN);
-}
-
-void lv_sysmon_hide_memory()
-{
-    if(!sysmon_mem.inited) {
-        return;
-    }
-    lv_obj_add_flag(sysmon_mem.label, LV_OBJ_FLAG_HIDDEN);
-}
 
 static void mem_update_timer_cb(lv_timer_t * t)
 {
