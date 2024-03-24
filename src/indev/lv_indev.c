@@ -657,33 +657,33 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         LV_LOG_WARN("Y is %d which is greater than ver. res", (int)data->point.y);
     }
 
-    #if LV_USE_HOVER
+#if LV_USE_HOVER
     if((i->pointer.last_point.x != data->point.x || i->pointer.last_point.y != data->point.y)) {
-    	/*Move the cursor if set and moved*/
+        /*Move the cursor if set and moved*/
         if(i->cursor != NULL) lv_obj_set_pos(i->cursor, data->point.x, data->point.y);
-    	/*Hover detection*/
-    	static lv_obj_t *hv_last[3] = {[0] = NULL, [1] = NULL, [2] = NULL};
-		lv_obj_t *layer[3];    //except layer bottom
-		layer[0] = lv_layer_sys();
-		layer[1] = lv_layer_top();
-		layer[2] = lv_screen_active();
-    	lv_obj_t **last = hv_last, **l = layer;
-    	for(uint8_t h = 0; h < 3; h++, last++){
-			lv_obj_t *hv = lv_indev_search_obj(*l++, &data->point);
-			if(*last != hv){
-				lv_obj_send_event(hv, LV_EVENT_HOVERED, i);
-				lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, i);
-				*last = hv;
-			}
-    	}
-    }    
-    #else
+        /*Hover detection*/
+        static lv_obj_t * hv_last[3] = {[0] = NULL, [1] = NULL, [2] = NULL};
+        lv_obj_t * layer[3];   //except layer bottom
+        layer[0] = lv_layer_sys();
+        layer[1] = lv_layer_top();
+        layer[2] = lv_screen_active();
+        lv_obj_t ** last = hv_last, ** l = layer;
+        for(uint8_t h = 0; h < 3; h++, last++) {
+            lv_obj_t * hv = lv_indev_search_obj(*l++, &data->point);
+            if(*last != hv) {
+                lv_obj_send_event(hv, LV_EVENT_HOVERED, i);
+                lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, i);
+                *last = hv;
+            }
+        }
+    }
+#else
     /*Move the cursor if set and moved*/
     if(i->cursor != NULL &&
        (i->pointer.last_point.x != data->point.x || i->pointer.last_point.y != data->point.y)) {
         lv_obj_set_pos(i->cursor, data->point.x, data->point.y);
     }
-    #endif
+#endif
     i->pointer.act_point.x = data->point.x;
     i->pointer.act_point.y = data->point.y;
     i->pointer.diff = data->enc_diff;

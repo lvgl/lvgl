@@ -575,6 +575,9 @@
  * FEATURE CONFIGURATION
  *=======================*/
 
+/*-------------
+ * Hover
+ *-----------*/
 #ifndef LV_USE_HOVER
     #ifdef CONFIG_LV_USE_HOVER
         #define LV_USE_HOVER CONFIG_LV_USE_HOVER
