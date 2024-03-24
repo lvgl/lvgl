@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.1.0
+ * Configuration file for v9.1.1-dev
  */
 
 /* clang-format off */
@@ -147,6 +147,9 @@
         #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
     #endif
 #endif
+
+/* Set stack size of drawing thread. Unit is byte. If Thorvg is enabled, 128kB is required tested on simulator.*/
+#define LV_DRAW_THREAD_STACKSIZE 32768
 
 #if LV_USE_DRAW_VGLITE
     /* Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
@@ -646,6 +649,11 @@
 /*API for LittleFs. */
 #if LV_USE_FS_LITTLEFS
     #define LV_FS_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+#endif
+
+/*API for Arduino LittleFs. */
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
 #endif
 
 /*GIF decoder library*/
