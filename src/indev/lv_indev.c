@@ -683,7 +683,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
        (i->pointer.last_point.x != data->point.x || i->pointer.last_point.y != data->point.y)) {
         lv_obj_set_pos(i->cursor, data->point.x, data->point.y);
     }
-    #end
+    #endif
     i->pointer.act_point.x = data->point.x;
     i->pointer.act_point.y = data->point.y;
     i->pointer.diff = data->enc_diff;
