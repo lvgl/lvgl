@@ -54,10 +54,9 @@
     static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-static lv_obj_t * _lv_sysmon_create_label(lv_obj_t * parent);
+#if _USE_PERF_MONITOR || _USE_MEM_MONITOR
+    static lv_obj_t * _lv_sysmon_create_label(lv_obj_t * parent);
+#endif
 
 /**********************
  *  STATIC VARIABLES
