@@ -55,6 +55,11 @@
 #endif
 
 /**********************
+ *  STATIC PROTOTYPES
+ **********************/
+static lv_obj_t * _lv_sysmon_create_label(lv_obj_t * parent);
+
+/**********************
  *  STATIC VARIABLES
  **********************/
 
