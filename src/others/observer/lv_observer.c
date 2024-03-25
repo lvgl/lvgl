@@ -34,10 +34,7 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
                                         int32_t ref_value, bool inv);
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
-
-#if LV_USE_BUTTON
-    static void btn_value_changed_event_cb(lv_event_t * e);
-#endif
+static void obj_value_changed_event_cb(lv_event_t * e);
 
 #if LV_USE_LABEL
     static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -360,10 +357,7 @@ void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
     }
 
     while(lv_obj_remove_event_cb(obj, unsubscribe_on_delete_cb));
-
-#if LV_USE_BUTTON
-    while(lv_obj_remove_event_cb(obj, btn_value_changed_event_cb));
-#endif /*LV_USE_BUTTON*/
+    while(lv_obj_remove_event_cb(obj, obj_value_changed_event_cb));
 
 #if LV_USE_ARC
     while(lv_obj_remove_event_cb(obj, arc_value_changed_event_cb));
@@ -440,14 +434,12 @@ lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subje
     return observable;
 }
 
-#if LV_USE_BUTTON
-lv_observer_t * lv_button_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
+lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 1, false);
-    lv_obj_add_event_cb(obj, btn_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, obj_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
     return observable;
 }
-#endif /*LV_USE_BUTTON*/
 
 #if LV_USE_LABEL
 lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
@@ -606,17 +598,13 @@ static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     }
 }
 
-#if LV_USE_BUTTON
-
-static void btn_value_changed_event_cb(lv_event_t * e)
+static void obj_value_changed_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_current_target(e);
     lv_subject_t * subject = lv_event_get_user_data(e);
 
     lv_subject_set_int(subject, lv_obj_has_state(obj, LV_STATE_CHECKED));
 }
-
-#endif /*LV_USE_BUTTON*/
 
 #if LV_USE_LABEL
 
