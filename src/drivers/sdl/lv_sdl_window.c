@@ -399,8 +399,8 @@ static void texture_resize(lv_display_t * disp)
     }
     else {
 #if LV_SDL_BUF_COUNT == 2
-        dsc->fb2 = realloc(dsc->fb2, stride * ver_res);
-        memset(dsc->fb2, 0x00, stride * ver_res);
+        dsc->fb2 = realloc(dsc->fb2, stride * disp->ver_res);
+        memset(dsc->fb2, 0x00, stride * disp->ver_res);
 #endif
         lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
     }
