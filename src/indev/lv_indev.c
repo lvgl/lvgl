@@ -662,14 +662,13 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*Move the cursor if set and moved*/
         if(i->cursor != NULL) lv_obj_set_pos(i->cursor, data->point.x, data->point.y);
         /*Hover detection*/
-        static lv_obj_t * hv_last[3] = {[0] = NULL, [1] = NULL, [2] = NULL};
         lv_obj_t * layer[3];   //except layer bottom
         layer[0] = lv_layer_sys();
         layer[1] = lv_layer_top();
         layer[2] = lv_screen_active();
-        lv_obj_t ** last = hv_last, ** l = layer;
+        lv_obj_t ** last = lv_global.hv_last;
         for(uint8_t h = 0; h < 3; h++, last++) {
-            lv_obj_t * hv = lv_indev_search_obj(*l++, &data->point);
+            lv_obj_t * hv = lv_indev_search_obj(layer[h], &data->point);
             if(*last != hv) {
                 if(lv_obj_is_valid(hv)) lv_obj_send_event(hv, LV_EVENT_HOVERED, i);
                 if(lv_obj_is_valid(*last)) lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, i);
