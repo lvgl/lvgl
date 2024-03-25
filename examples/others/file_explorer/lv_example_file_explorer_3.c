@@ -50,18 +50,8 @@ static void file_explorer_event_handler(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
         const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
-        uint16_t path_len = strlen(cur_path);
-        uint16_t fn_len = strlen(sel_fn);
 
-        if((path_len + fn_len) <= LV_FILE_EXPLORER_PATH_MAX_LEN) {
-            char file_info[LV_FILE_EXPLORER_PATH_MAX_LEN];
-
-            strcpy(file_info, cur_path);
-            strcat(file_info, sel_fn);
-
-            LV_LOG_USER("%s", file_info);
-        }
-        else    LV_LOG_USER("%s%s", cur_path, sel_fn);
+        LV_LOG_USER("%s%s", cur_path, sel_fn);
     }
     else if(code == LV_EVENT_READY) {
         lv_obj_t * tb = lv_file_explorer_get_file_table(obj);

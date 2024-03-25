@@ -90,6 +90,18 @@ char * lv_strcat(char * dst, const char * src)
     return strcat(dst, src);
 }
 
+char * lv_strncat(char * dst, const char * src, size_t src_len)
+{
+    char * tmp = dst;
+    dst += lv_strlen(dst);
+    while(src_len != 0 && *src != '\0') {
+        src_len--;
+        *dst++ = *src++;
+    }
+    *dst = '\0';
+    return tmp;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
