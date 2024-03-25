@@ -59,7 +59,7 @@
 
 ## Configure Demos Entry
 
-"demos/lv_demos.c" provides `lv_demos_create` and `lv_demos_usage` to simplify the creation of demos.
+"demos/lv_demos.c" provides `lv_demos_create` and `lv_demos_show_help` to simplify the creation of demos.
 
 If you build your main program named `lv_demos`, then you can run the widgets demo by running `lv_demos widgets` and the benchmark demo by running `lv_demos benchmark 1`.
 
@@ -93,7 +93,7 @@ int main(int argc, char ** argv)
   }
 
   if (!lv_demos_create(&argv[1], argc - 1)) {
-    lv_demos_usage();
+    lv_demos_show_help();
     goto demo_end;
   }
 
