@@ -1,3 +1,10 @@
+set(LVGL_VERSION_MAJOR "9")
+set(LVGL_VERSION_MINOR "1")
+set(LVGL_VERSION_PATCH "0")
+set(LVGL_VERSION_INFO  "dev")
+set(LVGL_VERSION ${LVGL_VERSION_MAJOR}.${LVGL_VERSION_MINOR}.${LVGL_VERSION_PATCH})
+set(LVGL_SOVERSION ${LVGL_VERSION_MAJOR})
+
 # Option to define LV_LVGL_H_INCLUDE_SIMPLE, default: ON
 option(LV_LVGL_H_INCLUDE_SIMPLE
        "Use #include \"lvgl.h\" instead of #include \"../../lvgl.h\"" ON)
@@ -41,7 +48,7 @@ if(LV_CONF_SKIP)
 endif()
 
 # Include root and optional parent path of LV_CONF_PATH
-target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
+target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 
 if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
@@ -110,6 +117,7 @@ endif()
 
 
 configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" lvgl.pc @ONLY)
+configure_file("${LVGL_ROOT_DIR}/version.h.in" version.h @ONLY)
 
 install(
   FILES "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
@@ -119,6 +127,8 @@ install(
 set_target_properties(
   lvgl
   PROPERTIES OUTPUT_NAME lvgl
+             VERSION ${LVGL_VERSION}
+             SOVERSION ${LVGL_SOVERSION}
              ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
              LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
              RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
@@ -137,6 +147,8 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
   set_target_properties(
     lvgl_thorvg
     PROPERTIES OUTPUT_NAME lvgl_thorvg
+               VERSION ${LVGL_VERSION}
+               SOVERSION ${LVGL_SOVERSION}
                ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
                LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
@@ -155,6 +167,8 @@ if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
   set_target_properties(
     lvgl_demos
     PROPERTIES OUTPUT_NAME lvgl_demos
+               VERSION ${LVGL_VERSION}
+               SOVERSION ${LVGL_SOVERSION}
                ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
                LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
@@ -173,6 +187,8 @@ if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
   set_target_properties(
     lvgl_examples
     PROPERTIES OUTPUT_NAME lvgl_examples
+               VERSION ${LVGL_VERSION}
+               SOVERSION ${LVGL_SOVERSION}
                ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
                LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
