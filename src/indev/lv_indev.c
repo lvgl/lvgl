@@ -671,8 +671,8 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         for(uint8_t h = 0; h < 3; h++, last++) {
             lv_obj_t * hv = lv_indev_search_obj(*l++, &data->point);
             if(*last != hv) {
-                lv_obj_send_event(hv, LV_EVENT_HOVERED, i);
-                lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, i);
+                if(lv_obj_is_valid(hv)) lv_obj_send_event(hv, LV_EVENT_HOVERED, i);
+                if(lv_obj_is_valid(*last)) lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, i);
                 *last = hv;
             }
         }
