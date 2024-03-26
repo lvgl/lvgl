@@ -146,7 +146,7 @@ struct _lv_anim_t {
     uint32_t playback_delay;     /**< Wait before play back*/
     uint32_t playback_duration;      /**< Duration of playback animation*/
     uint32_t repeat_delay;       /**< Wait before repeat*/
-    uint16_t repeat_cnt;         /**< Repeat count for the animation*/
+    uint32_t repeat_cnt;         /**< Repeat count for the animation*/
     union _lv_anim_path_para_t {
         lv_anim_bezier3_para_t bezier3; /**< Parameter used when path is custom_bezier*/
     } parameter;
@@ -345,7 +345,7 @@ static inline void lv_anim_set_playback_delay(lv_anim_t * a, uint32_t delay)
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param cnt       repeat count or `LV_ANIM_REPEAT_INFINITE` for infinite repetition. 0: to disable repetition.
  */
-static inline void lv_anim_set_repeat_count(lv_anim_t * a, uint16_t cnt)
+static inline void lv_anim_set_repeat_count(lv_anim_t * a, uint32_t cnt)
 {
     a->repeat_cnt = cnt;
 }
@@ -437,7 +437,7 @@ static inline uint32_t lv_anim_get_time(const lv_anim_t * a)
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @return the repeat count or `LV_ANIM_REPEAT_INFINITE` for infinite repetition. 0: disabled repetition.
  */
-static inline uint16_t lv_anim_get_repeat_count(const lv_anim_t * a)
+static inline uint32_t lv_anim_get_repeat_count(const lv_anim_t * a)
 {
     return a->repeat_cnt;
 }

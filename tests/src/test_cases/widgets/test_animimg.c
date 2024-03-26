@@ -85,7 +85,7 @@ void test_animimg_set_repeat_count_infinite(void)
 {
     lv_animimg_set_repeat_count(animimg, LV_ANIM_REPEAT_INFINITE);
 
-    uint16_t actual_count = lv_animimg_get_repeat_count(animimg);
+    uint32_t actual_count = lv_animimg_get_repeat_count(animimg);
 
     TEST_ASSERT_EQUAL_UINT16(actual_count, LV_ANIM_REPEAT_INFINITE);
 }
