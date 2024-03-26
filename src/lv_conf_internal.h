@@ -2249,6 +2249,38 @@
     #endif
 #endif
 
+/*API for Arduino Sd. */
+#ifndef LV_USE_FS_ARDUINO_SD
+    #ifdef CONFIG_LV_USE_FS_ARDUINO_SD
+        #define LV_USE_FS_ARDUINO_SD CONFIG_LV_USE_FS_ARDUINO_SD
+    #else
+        #define LV_USE_FS_ARDUINO_SD 0
+    #endif
+#endif
+#if LV_USE_FS_ARDUINO_SD
+    #ifndef LV_FS_ARDUINO_SD_LETTER
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_LETTER
+            #define LV_FS_ARDUINO_SD_LETTER CONFIG_LV_FS_ARDUINO_SD_LETTER
+        #else
+            #define LV_FS_ARDUINO_SD_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+    #ifndef LV_FS_ARDUINO_SD_CS_PIN
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_CS_PIN
+            #define LV_FS_ARDUINO_SD_CS_PIN CONFIG_LV_FS_ARDUINO_SD_CS_PIN
+        #else
+            #define LV_FS_ARDUINO_SD_CS_PIN 0     /*Set the pin connected to the chip select line of the SD card */
+        #endif
+    #endif
+    #ifndef LV_FS_ARDUINO_SD_FREQUENCY
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_FREQUENCY
+            #define LV_FS_ARDUINO_SD_FREQUENCY CONFIG_LV_FS_ARDUINO_SD_FREQUENCY
+        #else
+            #define LV_FS_ARDUINO_SD_FREQUENCY 40000000     /*Set the frequency used by the chip of the SD CARD */
+        #endif
+    #endif
+#endif
+
 /*LODEPNG decoder library*/
 #ifndef LV_USE_LODEPNG
     #ifdef CONFIG_LV_USE_LODEPNG
