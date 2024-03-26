@@ -126,6 +126,7 @@ Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
     - \#define LV_USE_FS_WIN32 0
     - \#define LV_USE_FS_FATFS 0
     - #define LV_USE_FS_LITTLEFS 0
+    - #define LV_USE_FS_ARDUINO_ESP_LITTLEFS 0
     - #define LV_USE_FS_MEMFS 0
     - \#define LV_USE_LODEPNG 0
     - #define LV_USE_LIBPNG 0
