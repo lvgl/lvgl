@@ -24,17 +24,17 @@ CFLAGS = -Werror  -I$(LVGL_PATH)/.. -I$(CURDIR) \
 	-target $(ARCH)-unknown-windows -ffreestanding -fshort-wchar  -mno-red-zone  -fno-stack-protector -fno-stack-check -mno-red-zone \
 	-DLV_CONF_SKIP=1 \
 	-DLV_BUILD_TEST=1 \
-	-DLV_USE_DEV_VERSION \
-	-DCONFIG_LV_USE_STDLIB_MALLOC=LV_STDLIB_BUILTIN \
-	-DCONFIG_LV_USE_STDLIB_STRING=LV_STDLIB_BUILTIN \
-	-DCONFIG_LV_USE_STDLIB_SPRINTF=LV_STDLIB_BUILTIN \
-	-DCONFIG_LV_STDINT_INCLUDE=\"efi.h\" \
-	-DCONFIG_LV_STDINT_INCLUDE=\"efi.h\" \
-	-DCONFIG_LV_STDDEF_INCLUDE=\"efi.h\" \
-	-DCONFIG_LV_STDBOOL_INCLUDE=\"efi.h\" \
-	-DCONFIG_LV_INTTYPES_INCLUDE=\"efi.h\" \
-	-DCONFIG_LV_LIMITS_INCLUDE=\"efi.h\" \
-	-DCONFIG_LV_STDARG_INCLUDE=\"efi.h\"
+	-DLV_COLOR_DEPTH=32 \
+	-DLV_USE_STDLIB_MALLOC=LV_STDLIB_BUILTIN \
+	-DLV_USE_STDLIB_STRING=LV_STDLIB_BUILTIN \
+	-DLV_USE_STDLIB_SPRINTF=LV_STDLIB_BUILTIN \
+	-DLV_STDINT_INCLUDE=\"efi.h\" \
+	-DLV_STDINT_INCLUDE=\"efi.h\" \
+	-DLV_STDDEF_INCLUDE=\"efi.h\" \
+	-DLV_STDBOOL_INCLUDE=\"efi.h\" \
+	-DLV_INTTYPES_INCLUDE=\"efi.h\" \
+	-DLV_LIMITS_INCLUDE=\"efi.h\" \
+	-DLV_STDARG_INCLUDE=\"efi.h\"
 
 LDFLAGS = -target $(ARCH)-unknown-windows -nostdlib -Wl,-entry:efi_main -Wl,-subsystem:efi_application -fuse-ld=lld-link
 
