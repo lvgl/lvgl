@@ -585,13 +585,11 @@ void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t 
 
 /* draw dsc functions */
 
-lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer)
+lv_vector_dsc_t * lv_vector_dsc_create(void)
 {
     lv_vector_dsc_t * dsc = lv_malloc(sizeof(lv_vector_dsc_t));
     LV_ASSERT_MALLOC(dsc);
     lv_memzero(dsc, sizeof(lv_vector_dsc_t));
-
-    dsc->layer = layer;
 
     lv_vector_fill_dsc_t * fill_dsc = &(dsc->current_dsc.fill_dsc);
     fill_dsc->style = LV_VECTOR_DRAW_STYLE_SOLID;
@@ -611,9 +609,9 @@ lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer)
     lv_matrix_identity(&(stroke_dsc->matrix)); /*identity matrix*/
 
     dsc->current_dsc.blend_mode = LV_VECTOR_BLEND_SRC_OVER;
-    dsc->current_dsc.scissor_area = layer->_clip_area;
     lv_matrix_identity(&(dsc->current_dsc.matrix)); /*identity matrix*/
     dsc->tasks.task_list = NULL;
+    lv_area_set(&dsc->current_dsc.scissor_area, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MAX, LV_COORD_MAX);
     return dsc;
 }
 
@@ -778,11 +776,6 @@ void lv_vector_dsc_set_stroke_radial_gradient(lv_vector_dsc_t * dsc, const lv_gr
 /* draw functions */
 void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path)
 {
-    lv_area_t rect;
-    if(!_lv_area_intersect(&rect, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
-        return;
-    }
-
     if(dsc->current_dsc.fill_dsc.opa == 0
        && dsc->current_dsc.stroke_dsc.opa == 0) {
         return;
@@ -797,20 +790,14 @@ void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path
     _lv_vector_draw_task * new_task = (_lv_vector_draw_task *)_lv_ll_ins_tail(dsc->tasks.task_list);
     lv_memset(new_task, 0, sizeof(_lv_vector_draw_task));
 
-    new_task->path = lv_vector_path_create(0);
+    new_task->path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
 
     _copy_draw_dsc(&(new_task->dsc), &(dsc->current_dsc));
     lv_vector_path_copy(new_task->path, path);
-    new_task->dsc.scissor_area = rect;
 }
 
 void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
 {
-    lv_area_t r;
-    if(!_lv_area_intersect(&r, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
-        return;
-    }
-
     if(!dsc->tasks.task_list) {
         dsc->tasks.task_list = lv_malloc(sizeof(lv_ll_t));
         LV_ASSERT_MALLOC(dsc->tasks.task_list);
@@ -825,15 +812,29 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
     lv_area_copy(&(new_task->dsc.scissor_area), rect);
 }
 
-void lv_draw_vector(lv_vector_dsc_t * dsc)
+void lv_draw_vector(lv_layer_t * layer, lv_vector_dsc_t * dsc, const lv_area_t * coords)
 {
     if(!dsc->tasks.task_list) {
         return;
     }
 
-    lv_layer_t * layer = dsc->layer;
+    lv_ll_t * task_list = dsc->tasks.task_list;
+    _lv_vector_draw_task * task = _lv_ll_get_head(task_list);
+    _lv_vector_draw_task * next_task = NULL;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area));
+    while(task != NULL) {
+        next_task = _lv_ll_get_next(task_list, task);
+
+        if(coords) {
+            lv_matrix_translate(&task->dsc.matrix, coords->x1, coords->y1);
+        }
+
+        _lv_area_intersect(&task->dsc.scissor_area, &task->dsc.scissor_area, &layer->_clip_area);
+
+        task = next_task;
+    }
+
+    lv_draw_task_t * t = lv_draw_add_task(layer, &layer->_clip_area);
     t->type = LV_DRAW_TASK_TYPE_VECTOR;
     t->draw_dsc = lv_malloc(sizeof(lv_draw_vector_task_dsc_t));
     lv_memcpy(t->draw_dsc, &(dsc->tasks), sizeof(lv_draw_vector_task_dsc_t));

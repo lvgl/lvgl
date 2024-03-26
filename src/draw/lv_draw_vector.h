@@ -151,7 +151,6 @@ typedef struct {
 } lv_draw_vector_task_dsc_t;
 
 typedef struct {
-    lv_layer_t * layer;
     lv_vector_draw_dsc_t current_dsc;
     /* private data */
     lv_draw_vector_task_dsc_t tasks;
@@ -332,7 +331,7 @@ void lv_vector_path_append_path(lv_vector_path_t * path, const lv_vector_path_t 
  * @param layer         pointer to a layer
  * @return              pointer to the created descriptor
  */
-lv_vector_dsc_t * lv_vector_dsc_create(lv_layer_t * layer);
+lv_vector_dsc_t * lv_vector_dsc_create(void);
 
 /**
  * Delete the vector graphic descriptor
@@ -555,7 +554,7 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect);
  * Draw all the vector graphic paths
  * @param dsc           pointer to a vector graphic descriptor
  */
-void lv_draw_vector(lv_vector_dsc_t * dsc);
+void lv_draw_vector(lv_layer_t * layer, lv_vector_dsc_t * dsc, const lv_area_t * coords);
 
 /* Traverser for task list */
 typedef void (*vector_draw_task_cb)(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
