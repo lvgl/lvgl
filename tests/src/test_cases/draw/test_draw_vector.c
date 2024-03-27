@@ -16,7 +16,7 @@ void tearDown(void)
 
 static void draw_shapes(lv_layer_t * layer)
 {
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+    lv_vector_dsc_t * ctx = lv_vector_dsc_create();
 
     lv_area_t rect = {0, 0, 640, 480};
     lv_vector_dsc_set_fill_color(ctx, lv_color_white());
@@ -126,14 +126,14 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_path_append_arc(path, &p, 50, 45, 45, true);
     lv_vector_dsc_add_path(ctx, path); // draw a path
 
-    lv_draw_vector(ctx);
+    lv_draw_vector(layer, ctx, NULL);
     lv_vector_path_delete(path);
     lv_vector_dsc_delete(ctx);
 }
 
 static void draw_lines(lv_layer_t * layer)
 {
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+    lv_vector_dsc_t * ctx = lv_vector_dsc_create();
 
     lv_area_t rect = {0, 0, 640, 480};
     lv_vector_dsc_set_fill_color(ctx, lv_color_white());
@@ -227,7 +227,7 @@ static void draw_lines(lv_layer_t * layer)
     lv_vector_dsc_set_stroke_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_REFLECT);
     lv_vector_dsc_add_path(ctx, path); // draw a path
 
-    lv_draw_vector(ctx);
+    lv_draw_vector(layer, ctx, NULL);
     lv_vector_path_delete(path);
     lv_vector_dsc_delete(ctx);
 }
