@@ -2,9 +2,9 @@
 #if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
 #if LV_USE_FLOAT
-#define my_PRIprecise "f"
+    #define my_PRIprecise "f"
 #else
-#define my_PRIprecise LV_PRId32
+    #define my_PRIprecise LV_PRId32
 #endif
 
 static lv_obj_t * scale;
@@ -69,7 +69,7 @@ void lv_example_scale_6(void)
     lv_scale_set_total_tick_count(scale, 61);
     lv_scale_set_major_tick_every(scale, 5);
 
-    static const char *hour_ticks[] = {"12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", NULL};
+    static const char * hour_ticks[] = {"12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", NULL};
     lv_scale_set_text_src(scale, hour_ticks);
 
     static lv_style_t indicator_style;
@@ -104,7 +104,6 @@ void lv_example_scale_6(void)
 
     lv_scale_set_angle_range(scale, 360);
     lv_scale_set_rotation(scale, 270);
-
 
     minute_hand = lv_line_create(scale);
 
