@@ -229,12 +229,8 @@ char * lv_strdup(const char * src)
 
 char * lv_strcat(char * dst, const char * src)
 {
-    char * tmp = dst;
-    while(*dst != '\0') {
-        dst++;
-    }
-    lv_strcpy(dst, src);
-    return tmp;
+    lv_strcpy(dst + lv_strlen(dst), src);
+    return dst;
 }
 
 char * lv_strncat(char * dst, const char * src, size_t src_len)
