@@ -48,7 +48,7 @@ void test_read(void)
     /*Use an odd size to make sure it's not aligned with the drivier's'cache size*/
     uint8_t buf[79];
     uint32_t cnt = 0;
-    uint32_t br = 1;
+    size_t br = 1;
     while(br) {
         res = lv_fs_read(&fa, buf, sizeof(buf), &br);
         TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
@@ -89,7 +89,7 @@ static void read_range(lv_fs_file_t * f, uint32_t from, uint32_t to)
 
     uint32_t len = to - from + 1;
     uint8_t buf_rd[256];
-    uint32_t br;
+    size_t br;
     lv_fs_read(f, buf_rd, len, &br);
 
     TEST_ASSERT_EQUAL(br, len);
@@ -103,7 +103,7 @@ static void read_range(lv_fs_file_t * f, uint32_t from, uint32_t to)
 static void read_next(lv_fs_file_t * f, uint32_t from, uint32_t len)
 {
     uint8_t buf_rd[256];
-    uint32_t br;
+    size_t br;
     lv_fs_read(f, buf_rd, len, &br);
 
     TEST_ASSERT_EQUAL(br, len);

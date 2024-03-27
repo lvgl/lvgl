@@ -70,7 +70,7 @@ lv_result_t lv_draw_buf_save_to_file(const lv_draw_buf_t * draw_buf, const char 
     /*Image content modified, invalidate image cache.*/
     lv_image_cache_drop(path);
 
-    uint32_t bw;
+    size_t bw;
     res = lv_fs_write(&file, &draw_buf->header, sizeof(draw_buf->header), &bw);
     if(res != LV_FS_RES_OK || bw != sizeof(draw_buf->header)) {
         LV_LOG_ERROR("write draw_buf->header failed");

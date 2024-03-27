@@ -40,10 +40,10 @@ typedef struct {
  **********************/
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
-static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
-static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
-static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
-static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
+static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, size_t btr, size_t * br);
+static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, size_t btw, size_t * bw);
+static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, size_t pos, lv_fs_whence_t whence);
+static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, size_t * pos_p);
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path);
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len);
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
@@ -143,7 +143,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
+static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, size_t btr, size_t * br)
 {
     LV_UNUSED(drv);
     *br = fread(buf, 1, btr, file_p);
@@ -159,7 +159,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
  * @param bw        the number of real written bytes (Bytes Written). NULL if unused.
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
+static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, size_t btw, size_t * bw)
 {
     LV_UNUSED(drv);
     *bw = fwrite(buf, 1, btw, file_p);
@@ -174,7 +174,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
+static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, size_t pos, lv_fs_whence_t whence)
 {
     LV_UNUSED(drv);
     int w;
@@ -192,7 +192,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
             return LV_FS_RES_INV_PARAM;
     }
 
-    fseek(file_p, pos, w);
+    fseek(file_p, (long) pos, w);
     return LV_FS_RES_OK;
 }
 
@@ -204,7 +204,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
+static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, size_t * pos_p)
 {
     LV_UNUSED(drv);
     *pos_p = ftell(file_p);

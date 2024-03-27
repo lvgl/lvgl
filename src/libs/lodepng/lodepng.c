@@ -365,7 +365,7 @@ static long lodepng_filesize(const char * filename)
     lv_fs_file_t f;
     lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) return -1;
-    uint32_t size = 0;
+    size_t size = 0;
     if(lv_fs_seek(&f, 0, LV_FS_SEEK_END) != 0) {
         lv_fs_close(&f);
         return -1;
@@ -383,7 +383,7 @@ static unsigned lodepng_buffer_file(unsigned char * out, size_t size, const char
     lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) return 78;
 
-    uint32_t br;
+    size_t br;
     res = lv_fs_read(&f, out, size, &br);
     lv_fs_close(&f);
 
@@ -412,7 +412,7 @@ unsigned lodepng_save_file(const unsigned char * buffer, size_t buffersize, cons
     lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_WR);
     if(res != LV_FS_RES_OK) return 79;
 
-    uint32_t bw;
+    size_t bw;
     res = lv_fs_write(&f, buffer, buffersize, &bw);
     lv_fs_close(&f);
     return 0;

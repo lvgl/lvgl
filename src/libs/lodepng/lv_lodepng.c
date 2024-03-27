@@ -95,7 +95,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 
             lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
 
-            uint32_t rn;
+            size_t rn;
             lv_fs_read(&f, &size, 8, &rn);
             lv_fs_close(&f);
 
