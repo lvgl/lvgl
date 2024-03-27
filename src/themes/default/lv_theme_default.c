@@ -739,11 +739,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_TABVIEW
         lv_obj_t * parent = lv_obj_get_parent(obj);
         /*Tabview content area*/
-        if(parent && lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_index(obj) == 1) {
+        if(parent && lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_child(parent, 1) == obj) {
             return;
         }
         /*Tabview button container*/
-        else if(lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_index(obj) == 0) {
+        else if(lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_child(parent, 0) == obj) {
             lv_obj_add_style(obj, &theme->styles.bg_color_white, 0);
             lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
             lv_obj_add_style(obj, &theme->styles.tab_bg_focus, LV_STATE_FOCUS_KEY);
@@ -761,13 +761,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_WIN
         /*Header*/
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class) && lv_obj_get_index(obj) == 0) {
+        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class) && lv_obj_get_child(parent, 0) == obj) {
             lv_obj_add_style(obj, &theme->styles.bg_color_grey, 0);
             lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
             return;
         }
         /*Content*/
-        else if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class) && lv_obj_get_index(obj) == 1) {
+        else if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class) && lv_obj_get_child(parent, 1) == obj) {
             lv_obj_add_style(obj, &theme->styles.scr, 0);
             lv_obj_add_style(obj, &theme->styles.pad_normal, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
@@ -791,9 +791,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_button_class)) {
 
 #if LV_USE_TABVIEW
-        lv_obj_t * parent = lv_obj_get_parent(obj);
-        if(parent && lv_obj_get_index(parent) == 0) { /*Tabview header*/
-            if(lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
+        lv_obj_t * tv_header = lv_obj_get_parent(obj);
+        lv_obj_t * tv = tv_header ? lv_obj_get_parent(tv_header) : NULL;
+        if(tv && tv_header && lv_obj_get_child(tv, 0) == tv_header) {
+            if(lv_obj_check_type(tv, &lv_tabview_class)) {
                 lv_obj_add_style(obj, &theme->styles.pressed, LV_STATE_PRESSED);
                 lv_obj_add_style(obj, &theme->styles.bg_color_primary_muted, LV_STATE_CHECKED);
                 lv_obj_add_style(obj, &theme->styles.tab_btn, LV_STATE_CHECKED);

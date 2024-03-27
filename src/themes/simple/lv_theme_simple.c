@@ -231,12 +231,12 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_WIN
         /*Header*/
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class) && lv_obj_get_index(obj) == 0) {
+        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class) && lv_obj_get_child(parent, 0) == obj) {
             lv_obj_add_style(obj, &theme->styles.light, 0);
             return;
         }
         /*Content*/
-        else if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class) && lv_obj_get_index(obj) == 1) {
+        else if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class) && lv_obj_get_child(parent, 1) == obj) {
             lv_obj_add_style(obj, &theme->styles.light, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
             return;
