@@ -27,7 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num, bool mutable);
+static void line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num, bool mut);
 static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
 /**********************
@@ -122,7 +122,7 @@ lv_point_precise_t * lv_line_get_points_mutable(lv_obj_t * obj)
         LV_LOG_ERROR("the line point array is not mutable");
         return NULL;
     }
-    return line->point_array.mutable;
+    return line->point_array.mut;
 }
 
 bool lv_line_get_y_invert(const lv_obj_t * obj)
@@ -155,14 +155,14 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num, bool mutable)
+static void line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num, bool mut)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_line_t * line = (lv_line_t *)obj;
     line->point_array.constant = points;
     line->point_num      = point_num;
-    line->point_array_is_mutable = mutable;
+    line->point_array_is_mutable = mut;
 
     lv_obj_refresh_self_size(obj);
 
