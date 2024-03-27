@@ -19,5 +19,5 @@ jobs:
     - name: Install clang
       run: sudo apt-get install clang lld
     - name: Build
-      working-directory: tests/makefile
+      working-directory: tests/makefile_uefi
       run: make -j
