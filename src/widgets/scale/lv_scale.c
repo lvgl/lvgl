@@ -226,7 +226,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     needle_length_x = (actual_needle_length * lv_trigo_cos(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
     needle_length_y = (actual_needle_length * lv_trigo_sin(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
 
-    if(lv_line_get_point_array_is_mutable(needle_line) && lv_line_get_point_count(needle_line) >= 2) {
+    if(lv_line_is_point_array_mutable(needle_line) && lv_line_get_point_count(needle_line) >= 2) {
         needle_line_points = lv_line_get_points_mutable(needle_line);
     }
 

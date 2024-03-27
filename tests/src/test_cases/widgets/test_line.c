@@ -149,14 +149,14 @@ void test_line_point_array_getters_and_setters(void)
     const lv_point_precise_t points[3] = {{10, 20}, {30, 40}, {50, 60}};
     lv_line_set_points(line, points, 3);
     TEST_ASSERT_EQUAL_UINT32(3, lv_line_get_point_count(line));
-    TEST_ASSERT_FALSE(lv_line_get_point_array_is_mutable(line));
+    TEST_ASSERT_FALSE(lv_line_is_point_array_mutable(line));
     TEST_ASSERT_EQUAL_PTR(points, lv_line_get_points(line));
     TEST_ASSERT_NULL(lv_line_get_points_mutable(line));
 
     lv_point_precise_t points_mutable[2] = {{10, 20}, {30, 40}};
     lv_line_set_points_mutable(line, points_mutable, 2);
     TEST_ASSERT_EQUAL_UINT32(2, lv_line_get_point_count(line));
-    TEST_ASSERT_TRUE(lv_line_get_point_array_is_mutable(line));
+    TEST_ASSERT_TRUE(lv_line_is_point_array_mutable(line));
     TEST_ASSERT_EQUAL_PTR(points_mutable, lv_line_get_points(line));
     TEST_ASSERT_EQUAL_PTR(points_mutable, lv_line_get_points_mutable(line));
 }

@@ -97,15 +97,14 @@ const lv_point_precise_t * lv_line_get_points(lv_obj_t * obj);
 uint32_t lv_line_get_point_count(lv_obj_t * obj);
 
 /**
- * Get the mutability of the stored point array pointer.
+ * Check the mutability of the stored point array pointer.
  * @param obj           pointer to a line object
  * @return              true: the point array pointer is mutable, false: constant
  */
-bool lv_line_get_point_array_is_mutable(lv_obj_t * obj);
+bool lv_line_is_point_array_mutable(lv_obj_t * obj);
 
 /**
- * Get a pointer to the mutable array of points.
- * It is an error if this is called when the array is not mutable.
+ * Get a pointer to the mutable array of points or NULL if it is not mutable
  * @param obj           pointer to a line object
  * @return              pointer to the array of points. NULL if not mutable.
  */

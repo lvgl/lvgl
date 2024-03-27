@@ -34,7 +34,6 @@ static void timer_cb(lv_timer_t * timer)
      */
 
     /* the scale will store the minute hand line points in `minute_hand_points` */
-    lv_line_set_points_mutable(minute_hand, minute_hand_points, 2); /* only needs to be set once */
     lv_scale_set_line_needle_value(scale, minute_hand, 60, minute);
     /* log the points that were stored in the array */
     LV_LOG_USER(
@@ -106,6 +105,7 @@ void lv_example_scale_6(void)
     lv_scale_set_rotation(scale, 270);
 
     minute_hand = lv_line_create(scale);
+    lv_line_set_points_mutable(minute_hand, minute_hand_points, 2);
 
     lv_obj_set_style_line_width(minute_hand, 3, 0);
     lv_obj_set_style_line_rounded(minute_hand, true, 0);

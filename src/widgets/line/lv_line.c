@@ -105,7 +105,7 @@ uint32_t lv_line_get_point_count(lv_obj_t * obj)
     return line->point_num;
 }
 
-bool lv_line_get_point_array_is_mutable(lv_obj_t * obj)
+bool lv_line_is_point_array_mutable(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -119,7 +119,7 @@ lv_point_precise_t * lv_line_get_points_mutable(lv_obj_t * obj)
 
     lv_line_t * line = (lv_line_t *)obj;
     if(!line->point_array_is_mutable) {
-        LV_LOG_ERROR("the line point array is not mutable");
+        LV_LOG_WARN("the line point array is not mutable");
         return NULL;
     }
     return line->point_array.mut;

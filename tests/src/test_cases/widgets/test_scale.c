@@ -376,7 +376,7 @@ void test_scale_set_line_needle_value(void)
     TEST_ASSERT_EQUAL_UINT32(2, lv_line_get_point_count(line));
     const lv_point_precise_t * allocated_points_array = lv_line_get_points(line);
     TEST_ASSERT_NOT_NULL(allocated_points_array);
-    TEST_ASSERT_TRUE(lv_line_get_point_array_is_mutable(line));
+    TEST_ASSERT_TRUE(lv_line_is_point_array_mutable(line));
     TEST_ASSERT_EQUAL_PTR(allocated_points_array, lv_line_get_points_mutable(line));
 
     /* test the scale using the line's pre-set mutable array */
