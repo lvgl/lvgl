@@ -313,6 +313,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
     }
 
     if(ta->pwd_mode) {
+        lv_free(ta->pwd_tmp);
         ta->pwd_tmp = lv_strdup(txt);
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
@@ -423,6 +424,7 @@ void lv_textarea_set_password_mode(lv_obj_t * obj, bool en)
     /*Pwd mode is now enabled*/
     if(en) {
         char * txt = lv_label_get_text(ta->label);
+        lv_free(ta->pwd_tmp);
         ta->pwd_tmp = lv_strdup(txt);
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
