@@ -44,11 +44,12 @@ jobs:
           path: prev_performance_data.txt
           repository: actions/toolkit
           run-id: ${{ steps.prev_success_run.outputs.ID }}
+        continue-on-error: true
       
       - name: Performance report generation
         id: perf_report
         run: |
-          python3 perf_report.py perf_check*.txt lvgl/tests prev_performance_data.txt > perf_report.txt
+          python3 perf_report.py perf_check*.txt lvgl/tests/perf/func_threshold.txt prev_performance_data.txt | tee perf_report.txt
         continue-on-error: true
 
       - name: Store performance report as artifact
