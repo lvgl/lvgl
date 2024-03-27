@@ -99,10 +99,10 @@ void * lv_draw_buf_align_user(const lv_draw_buf_handlers_t * handlers, void * da
 
 void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
-    lv_draw_buff_invalidate_cache_user(&default_handlers, draw_buf, area);
+    lv_draw_buf_invalidate_cache_user(&default_handlers, draw_buf, area);
 }
 
-void lv_draw_buff_invalidate_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
+void lv_draw_buf_invalidate_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
                                         const lv_area_t * area)
 {
     if(handlers->invalidate_cache_cb) {

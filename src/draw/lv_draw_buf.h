@@ -159,7 +159,7 @@ void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_
  * @param draw_buf     the draw buffer needs to be invalidated
  * @param area         the area to invalidate in the buffer,
  */
-void lv_draw_buff_invalidate_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
+void lv_draw_buf_invalidate_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
                                         const lv_area_t * area);
 
 /**
