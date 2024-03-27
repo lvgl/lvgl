@@ -331,10 +331,10 @@ static lv_obj_t * image_obj_create(lv_obj_t * parent, int32_t col, int32_t row, 
 
 static void image_core_cb(lv_obj_t * parent, bool recolor)
 {
-    LV_IMG_DECLARE(img_render_lvgl_logo_xrgb8888);
-    LV_IMG_DECLARE(img_render_lvgl_logo_rgb888);
-    LV_IMG_DECLARE(img_render_lvgl_logo_rgb565);
-    LV_IMG_DECLARE(img_render_lvgl_logo_argb8888);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_xrgb8888);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb888);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
     const void * srcs[] = {
         &img_render_lvgl_logo_argb8888,
         &img_render_lvgl_logo_xrgb8888,

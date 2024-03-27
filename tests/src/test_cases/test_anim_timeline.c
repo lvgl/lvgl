@@ -23,7 +23,7 @@ void tearDown(void)
 
 void test_anim_timeline_progress_1(void)
 {
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 100, 100);
     lv_obj_set_pos(obj, 30, 40);
 
@@ -83,7 +83,7 @@ void test_anim_timeline_progress_1(void)
 
 void test_anim_timeline_progress_2(void)
 {
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 100, 100);
     lv_anim_t a1;
     lv_anim_init(&a1);
@@ -147,7 +147,7 @@ void test_anim_timeline_progress_2(void)
 
 void test_anim_timeline_start(void)
 {
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 100, 100);
 
     lv_obj_set_pos(obj, 70, 70);
@@ -238,7 +238,7 @@ void test_anim_timeline_start(void)
 
 void test_anim_timeline_reverse(void)
 {
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 100, 100);
 
     lv_obj_set_pos(obj, 70, 70);

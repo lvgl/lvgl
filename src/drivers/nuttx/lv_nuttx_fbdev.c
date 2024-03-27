@@ -144,7 +144,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     }
 
     lv_display_set_draw_buffers(disp, &dsc->buf1, double_buffer ? &dsc->buf2 : NULL);
-    lv_display_set_render_mode(disp, LV_DISP_RENDER_MODE_DIRECT);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
 

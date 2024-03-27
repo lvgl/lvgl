@@ -77,8 +77,8 @@ Usage
         {
             ...
 
-            /* Periodically call the lv_task handler */
-            lv_task_handler();
+            /* Periodically call the lv_timer handler */
+            lv_timer_handler();
         }
     }
 
@@ -107,7 +107,7 @@ Usage
         lv_display_add_event_cb(disp, on_close_cb, LV_EVENT_DELETE, disp);
 
         /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
-        LV_IMG_DECLARE(my_mouse_cursor_icon);
+        LV_IMAGE_DECLARE(my_mouse_cursor_icon);
         lv_x11_inputs_create(disp, &my_mouse_cursor_icon);
 
         #if !LV_X11_DIRECT_EXIT
@@ -121,7 +121,7 @@ Usage
         {
             ...
 
-            /* Periodically call the lv_task handler */
-            lv_task_handler();
+            /* Periodically call the lv_timer handler */
+            lv_timer_handler();
         }
     }

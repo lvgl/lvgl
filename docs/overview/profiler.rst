@@ -134,7 +134,7 @@ You will obtain a processed text file named `trace.systrace`, which roughly cont
         # tracer: nop
         #
         LVGL-1 [0] 2892.002993: tracing_mark_write: B|1|lv_timer_handler
-        LVGL-1 [0] 2892.002993: tracing_mark_write: B|1|_lv_disp_refr_timer
+        LVGL-1 [0] 2892.002993: tracing_mark_write: B|1|_lv_display_refr_timer
         LVGL-1 [0] 2892.003459: tracing_mark_write: B|1|refr_invalid_areas
         LVGL-1 [0] 2892.003461: tracing_mark_write: B|1|lv_draw_rect
         LVGL-1 [0] 2892.003550: tracing_mark_write: E|1|lv_draw_rect

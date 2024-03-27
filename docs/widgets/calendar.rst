@@ -89,8 +89,8 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent if a date is clicked.
    :cpp:expr:`lv_calendar_get_pressed_date(calendar, &date)` set ``date`` to the
-   date currently being pressed. Returns :cpp:enumerator:`LV_RES_OK` if there is a
-   valid pressed date, else :cpp:enumerator:`LV_RES_INVALID`.
+   date currently being pressed. Returns :cpp:enumerator:`LV_RESULT_OK` if there is a
+   valid pressed date, else :cpp:enumerator:`LV_RESULT_INVALID`.
 
 Learn more about :ref:`events`.
 

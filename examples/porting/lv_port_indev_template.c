@@ -186,10 +186,10 @@ static void touchpad_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
     /*Save the pressed coordinates and the state*/
     if(touchpad_is_pressed()) {
         touchpad_get_xy(&last_x, &last_y);
-        data->state = LV_INDEV_STATE_PR;
+        data->state = LV_INDEV_STATE_PRESSED;
     }
     else {
-        data->state = LV_INDEV_STATE_REL;
+        data->state = LV_INDEV_STATE_RELEASED;
     }
 
     /*Set the last pressed coordinates*/
@@ -232,10 +232,10 @@ static void mouse_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
 
     /*Get whether the mouse button is pressed or released*/
     if(mouse_is_pressed()) {
-        data->state = LV_INDEV_STATE_PR;
+        data->state = LV_INDEV_STATE_PRESSED;
     }
     else {
-        data->state = LV_INDEV_STATE_REL;
+        data->state = LV_INDEV_STATE_RELEASED;
     }
 }
 
@@ -277,7 +277,7 @@ static void keypad_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
     /*Get whether the a key is pressed and save the pressed key*/
     uint32_t act_key = keypad_get_key();
     if(act_key != 0) {
-        data->state = LV_INDEV_STATE_PR;
+        data->state = LV_INDEV_STATE_PRESSED;
 
         /*Translate the keys to LVGL control characters according to your key definitions*/
         switch(act_key) {
@@ -301,7 +301,7 @@ static void keypad_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
         last_key = act_key;
     }
     else {
-        data->state = LV_INDEV_STATE_REL;
+        data->state = LV_INDEV_STATE_RELEASED;
     }
 
     data->key = last_key;
@@ -339,7 +339,7 @@ static void encoder_handler(void)
     /*Your code comes here*/
 
     encoder_diff += 0;
-    encoder_state = LV_INDEV_STATE_REL;
+    encoder_state = LV_INDEV_STATE_RELEASED;
 }
 
 /*------------------
@@ -362,11 +362,11 @@ static void button_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
     int8_t btn_act = button_get_pressed_id();
 
     if(btn_act >= 0) {
-        data->state = LV_INDEV_STATE_PR;
+        data->state = LV_INDEV_STATE_PRESSED;
         last_btn = btn_act;
     }
     else {
-        data->state = LV_INDEV_STATE_REL;
+        data->state = LV_INDEV_STATE_RELEASED;
     }
 
     /*Save the last pressed button's ID*/

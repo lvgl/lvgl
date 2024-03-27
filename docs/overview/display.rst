@@ -159,7 +159,7 @@ adjusted with :cpp:expr:`lv_obj_set_style_bg_color(obj, color)`;
 
 The display background image is a path to a file or a pointer to an
 :cpp:struct:`lv_image_dsc_t` variable (converted image data) to be used as
-wallpaper. It can be set with :cpp:expr:`lv_obj_set_style_bg_img_src(obj, &my_img)`;
+wallpaper. It can be set with :cpp:expr:`lv_obj_set_style_bg_image_src(obj, &my_img)`;
 If a background image is configured the background won't be filled with
 ``bg_color``.
 

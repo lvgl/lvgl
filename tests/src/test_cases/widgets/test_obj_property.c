@@ -89,7 +89,7 @@ void test_obj_property_set_get_should_match(void)
     prop.id = LV_PROPERTY_IMAGE_OFFSET_X;
     prop.num = 0x1234;
     TEST_ASSERT_TRUE(lv_obj_set_property(img, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_UINT16(0x1234, lv_img_get_offset_x(img));
+    TEST_ASSERT_EQUAL_UINT16(0x1234, lv_image_get_offset_x(img));
     TEST_ASSERT_EQUAL_UINT16(0x1234, lv_obj_get_property(img, LV_PROPERTY_IMAGE_OFFSET_X).num);
 #endif
 }

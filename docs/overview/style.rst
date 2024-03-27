@@ -219,8 +219,8 @@ To get a property's value from a style:
 .. code:: c
 
    lv_style_value_t v;
-   lv_res_t res = lv_style_get_prop(&style, LV_STYLE_BG_COLOR, &v);
-   if(res == LV_RES_OK) {  /*Found*/
+   lv_result_t res = lv_style_get_prop(&style, LV_STYLE_BG_COLOR, &v);
+   if(res == LV_RESULT_OK) {  /*Found*/
        do_something(v.color);
    }
 

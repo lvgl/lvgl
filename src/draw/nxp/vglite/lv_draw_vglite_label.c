@@ -142,10 +142,8 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                 break;
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
 #if LV_USE_IMGFONT
-                    lv_draw_img_dsc_t img_dsc;
-                    lv_draw_img_dsc_init(&img_dsc);
-                    img_dsc.angle = 0;
-                    img_dsc.zoom = LV_ZOOM_NONE;
+                    lv_draw_image_dsc_t img_dsc;
+                    lv_draw_image_dsc_init(&img_dsc);
                     img_dsc.opa = glyph_draw_dsc->opa;
                     img_dsc.src = glyph_draw_dsc->glyph_data;
                     lv_draw_vglite_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);

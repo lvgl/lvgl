@@ -31,7 +31,7 @@ Here is some pseudocode to illustrate the concept:
        while(1) {
            uint32_t time_till_next;
            mutex_lock(&lvgl_mutex);
-           time_till_next = lv_task_handler();
+           time_till_next = lv_timer_handler();
            mutex_unlock(&lvgl_mutex);
            thread_sleep(time_till_next); /* sleep for a while */
        }
