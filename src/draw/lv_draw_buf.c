@@ -103,7 +103,7 @@ void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_
 }
 
 void lv_draw_buf_invalidate_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
-                                        const lv_area_t * area)
+                                       const lv_area_t * area)
 {
     if(handlers->invalidate_cache_cb) {
         LV_ASSERT_NULL(draw_buf);
