@@ -9,6 +9,9 @@ extern "C" {
 #endif
 
 #include "tjpgdcnf.h"
+
+#if LV_USE_TJPGD
+
 #include <string.h>
 #include <stdint.h>
 
@@ -95,6 +98,7 @@ JRESULT jd_mcu_output(JDEC * jd, int (*outfunc)(JDEC *, void *, JRECT *), unsign
 
 JRESULT jd_restart(JDEC * jd, uint16_t rstn);
 
+#endif
 
 #ifdef __cplusplus
 }
