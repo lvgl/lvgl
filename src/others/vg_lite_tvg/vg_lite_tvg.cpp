@@ -1739,6 +1739,9 @@ Empty_sequence_handler:
                                              vg_lite_blend_t blend,
                                              vg_lite_filter_t filter)
     {
+        LV_UNUSED(paint_color);
+        LV_UNUSED(filter);
+
         auto ctx = vg_lite_ctx::get_instance();
         TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
 
