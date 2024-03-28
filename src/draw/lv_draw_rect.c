@@ -118,7 +118,10 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     if(dsc->bg_image_opa <= LV_OPA_MIN || dsc->bg_image_src == NULL) has_bg_img = false;
     else has_bg_img = true;
 
-    if(dsc->border_opa <= LV_OPA_MIN || dsc->border_width == 0 || dsc->border_post == true) has_border = false;
+    if(dsc->border_opa <= LV_OPA_MIN
+       || dsc->border_width == 0
+       || dsc->border_post == true
+       || dsc->border_side == LV_BORDER_SIDE_NONE) has_border = false;
     else has_border = true;
 
     if(dsc->outline_opa <= LV_OPA_MIN || dsc->outline_width == 0) has_outline = false;
