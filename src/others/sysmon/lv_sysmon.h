@@ -38,6 +38,7 @@ extern "C" {
 typedef struct {
     lv_subject_t subject;
     lv_timer_t * timer;
+    lv_obj_t * label;
     bool inited;
 } lv_sysmon_backend_data_t;
 
@@ -77,20 +78,37 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+#if LV_USE_SYSMON
+
+#if LV_USE_PERF_MONITOR
 
 /**
- * Create a system monitor object.
- * @param parent pointer to an object, it will be the parent of the new system monitor
- * @return       pointer to the new system monitor object
+ * Show system performance monitor: CPU usage and FPS count
  */
-lv_obj_t * lv_sysmon_create(lv_obj_t * parent);
+void lv_sysmon_show_performance(void);
 
 /**
- * Set the refresh period of the system monitor object
- * @param obj    pointer to a system monitor object
- * @param period the refresh period in milliseconds
+ * Hide system performance monitor
  */
-void lv_sysmon_set_refr_period(lv_obj_t * obj, uint32_t period);
+void lv_sysmon_hide_performance(void);
+
+#endif /*LV_USE_PERF_MONITOR*/
+
+#if LV_USE_MEM_MONITOR
+
+/**
+ * Show system memory monitor: used memory and the memory fragmentation
+ */
+void lv_sysmon_show_memory(void);
+
+/**
+ * Hide system memory monitor
+ */
+void lv_sysmon_hide_memory(void);
+
+#endif /*LV_USE_MEM_MONITOR*/
+
+#endif /*LV_USE_SYSMON*/
 
 /**
  * Initialize built-in system monitor, such as performance and memory monitor.

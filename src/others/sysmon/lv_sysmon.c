@@ -19,7 +19,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS (&lv_sysmon_class)
 
 #define SYSMON_REFR_PERIOD_DEF 300 /* ms */
 
@@ -53,6 +52,10 @@
 #if _USE_MEM_MONITOR
     static void mem_update_timer_cb(lv_timer_t * t);
     static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
+
+#if _USE_PERF_MONITOR || _USE_MEM_MONITOR
+    static lv_obj_t * _lv_sysmon_create_label(lv_obj_t * parent);
 #endif
 
 /**********************
@@ -93,7 +96,65 @@ void _lv_sysmon_builtin_deinit(void)
 #endif
 }
 
-lv_obj_t * lv_sysmon_create(lv_obj_t * parent)
+#if _USE_PERF_MONITOR
+
+void lv_sysmon_show_performance(void)
+{
+    if(!sysmon_perf.inited) {
+        sysmon_perf.label = _lv_sysmon_create_label(lv_layer_sys());
+        lv_obj_align(sysmon_perf.label, LV_USE_PERF_MONITOR_POS, 0, 0);
+        lv_subject_add_observer_obj(&sysmon_perf.subject, perf_observer_cb, sysmon_perf.label, NULL);
+        sysmon_perf.inited = true;
+    }
+
+#if LV_USE_PERF_MONITOR_LOG_MODE
+    lv_obj_add_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
+#else
+    lv_obj_remove_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
+#endif
+}
+
+void lv_sysmon_hide_performance(void)
+{
+    if(!sysmon_perf.inited) {
+        return;
+    }
+    lv_obj_add_flag(sysmon_perf.label, LV_OBJ_FLAG_HIDDEN);
+}
+
+#endif
+
+#if _USE_MEM_MONITOR
+
+void lv_sysmon_show_memory(void)
+{
+    if(!sysmon_mem.inited) {
+        sysmon_mem.label = _lv_sysmon_create_label(lv_layer_sys());
+        lv_obj_align(sysmon_mem.label, LV_USE_MEM_MONITOR_POS, 0, 0);
+        lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, sysmon_mem.label, NULL);
+        sysmon_mem.inited = true;
+    }
+
+    lv_obj_remove_flag(sysmon_mem.label, LV_OBJ_FLAG_HIDDEN);
+}
+
+void lv_sysmon_hide_memory(void)
+{
+    if(!sysmon_mem.inited) {
+        return;
+    }
+    lv_obj_add_flag(sysmon_mem.label, LV_OBJ_FLAG_HIDDEN);
+}
+
+#endif
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+#if _USE_PERF_MONITOR || _USE_MEM_MONITOR
+
+static lv_obj_t * _lv_sysmon_create_label(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * label = lv_label_create(parent);
@@ -105,9 +166,7 @@ lv_obj_t * lv_sysmon_create(lv_obj_t * parent)
     return label;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
+#endif
 
 #if _USE_PERF_MONITOR
 
@@ -163,13 +222,7 @@ static void perf_update_timer_cb(lv_timer_t * t)
     if(!sysmon_perf.inited && lv_display_get_default()) {
         lv_display_add_event_cb(lv_display_get_default(), perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
 
-        lv_obj_t * obj1 = lv_sysmon_create(lv_layer_sys());
-        lv_obj_align(obj1, LV_USE_PERF_MONITOR_POS, 0, 0);
-        lv_subject_add_observer_obj(&sysmon_perf.subject, perf_observer_cb, obj1, NULL);
-#if LV_USE_PERF_MONITOR_LOG_MODE
-        lv_obj_add_flag(obj1, LV_OBJ_FLAG_HIDDEN);
-#endif
-        sysmon_perf.inited = true;
+        lv_sysmon_show_performance();
     }
 
     if(!sysmon_perf.inited) return;
@@ -250,10 +303,7 @@ static void mem_update_timer_cb(lv_timer_t * t)
 {
     /*Wait for a display*/
     if(!sysmon_mem.inited && lv_display_get_default()) {
-        lv_obj_t * obj2 = lv_sysmon_create(lv_layer_sys());
-        lv_obj_align(obj2, LV_USE_MEM_MONITOR_POS, 0, 0);
-        lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, obj2, NULL);
-        sysmon_mem.inited = true;
+        lv_sysmon_show_memory();
     }
 
     if(!sysmon_mem.inited) return;
