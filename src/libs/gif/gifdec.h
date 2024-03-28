@@ -5,10 +5,10 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
 #include "../../misc/lv_fs.h"
 
 #if LV_USE_GIF
+#include <stdint.h>
 
 typedef struct _gd_Palette {
     int size;

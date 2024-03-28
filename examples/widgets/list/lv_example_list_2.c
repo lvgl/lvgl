@@ -1,7 +1,6 @@
-#include <stdlib.h>
-
 #include "../../lv_examples.h"
 #if LV_USE_LIST && LV_BUILD_EXAMPLES
+#include <stdlib.h>
 
 static lv_obj_t * list1;
 static lv_obj_t * list2;

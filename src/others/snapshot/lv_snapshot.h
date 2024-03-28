@@ -13,16 +13,17 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../../core/lv_obj.h"
+
+#if LV_USE_SNAPSHOT
+
 #include <stdint.h>
 #include <stddef.h>
-
-#include "../../core/lv_obj.h"
 
 /*********************
  *      DEFINES
  *********************/
 
-#if LV_USE_SNAPSHOT
 /**********************
  *      TYPEDEFS
  **********************/

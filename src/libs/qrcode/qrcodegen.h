@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include "../../../lvgl.h"
+#ifdef LV_USE_QRCODE
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -316,4 +319,6 @@ int qrcodegen_getMinFitVersion(enum qrcodegen_Ecc ecl, size_t dataLen);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

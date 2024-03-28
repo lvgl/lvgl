@@ -21,11 +21,13 @@
  *   Software.
  */
 
+#include "qrcodegen.h"
+#include "../../misc/lv_assert.h"
+
+#if LV_USE_QRCODE
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-#include "qrcodegen.h"
-#include "../../misc/lv_assert.h"
 
 #ifndef QRCODEGEN_TEST
     #define testable static  // Keep functions private
@@ -1111,3 +1113,4 @@ int qrcodegen_version2size(int version)
 
     return ((version - 1) * 4 + 21);
 }
+#endif
