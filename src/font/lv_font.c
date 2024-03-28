@@ -50,6 +50,15 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, uint32_t lett
     return font_p->get_glyph_bitmap(g_dsc, letter, draw_buf);
 }
 
+void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
+{
+    const lv_font_t * font = g_dsc->resolved_font;
+
+    if(font != NULL && font->release_glyph) {
+        font->release_glyph(font, g_dsc);
+    }
+}
+
 bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
                            uint32_t letter_next)
 {
