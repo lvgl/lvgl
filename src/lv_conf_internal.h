@@ -305,6 +305,17 @@
     #endif
 #endif
 
+/* The stack size of the drawing thread.
+ * NOTE: FreeType req. stack size >= 24KB.
+ */
+#ifndef LV_DRAW_THREAD_STACK_SIZE
+    #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
+        #define LV_DRAW_THREAD_STACK_SIZE CONFIG_LV_DRAW_THREAD_STACK_SIZE
+    #else
+        #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /*[bytes]*/
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
@@ -405,15 +416,6 @@
                 #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
             #endif
         #endif
-    #endif
-#endif
-
-/* Set stack size of drawing thread. Unit is byte. If Thorvg is enabled, 128kB is required tested on simulator.*/
-#ifndef LV_DRAW_THREAD_STACKSIZE
-    #ifdef CONFIG_LV_DRAW_THREAD_STACKSIZE
-        #define LV_DRAW_THREAD_STACKSIZE CONFIG_LV_DRAW_THREAD_STACKSIZE
-    #else
-        #define LV_DRAW_THREAD_STACKSIZE 32768
     #endif
 #endif
 
@@ -3298,6 +3300,12 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #ifndef LV_USE_THORVG
     #define LV_USE_THORVG  (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+#endif
+
+#if LV_USE_OS
+    #if LV_USE_FREETYPE && LV_DRAW_THREAD_STACK_SIZE < (24 * 1024)
+        #warning "LV_DRAW_THREAD_STACK_SIZE is too small for FreeType. Please increase it to at least 24KB"
+    #endif
 #endif
 
 /*If running without lv_conf.h add typedefs with default value*/

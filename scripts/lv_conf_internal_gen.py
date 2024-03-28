@@ -197,6 +197,12 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_THORVG  (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
 #endif
 
+#if LV_USE_OS
+    #if LV_USE_FREETYPE && LV_DRAW_THREAD_STACK_SIZE < (24 * 1024)
+        #warning "LV_DRAW_THREAD_STACK_SIZE is too small for FreeType. Please increase it to at least 24KB"
+    #endif
+#endif
+
 /*If running without lv_conf.h add typedefs with default value*/
 #ifdef LV_CONF_SKIP
     #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
