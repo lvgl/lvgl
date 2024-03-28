@@ -222,7 +222,7 @@ static void draw_arc(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
 
 static void draw_vector(lv_layer_t * layer)
 {
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+    lv_vector_dsc_t * ctx = lv_vector_dsc_create();
 
     lv_area_t rect = {0, 100, 300, 300};
     lv_vector_dsc_set_fill_color(ctx, lv_color_lighten(lv_color_black(), 50));
@@ -237,7 +237,7 @@ static void draw_vector(lv_layer_t * layer)
     draw_gradient(ctx, path);
     draw_blend(ctx, path);
     draw_arc(ctx, path);
-    lv_draw_vector(ctx); // submit draw
+    lv_draw_vector(layer, ctx, NULL); // submit draw
     lv_vector_path_delete(path);
     lv_vector_dsc_delete(ctx);
 }
