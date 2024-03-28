@@ -116,6 +116,7 @@ void lv_example_scale_2(void);
 void lv_example_scale_3(void);
 void lv_example_scale_4(void);
 void lv_example_scale_5(void);
+void lv_example_scale_6(void);
 
 void lv_example_slider_1(void);
 void lv_example_slider_2(void);

@@ -60,6 +60,8 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
 static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
                                           const uint16_t major_tick_idx);
 
+static void scale_free_line_needle_points_cb(lv_event_t * e);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -180,7 +182,7 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     int32_t scale_width, scale_height;
     int32_t actual_needle_length;
     int32_t needle_length_x, needle_length_y;
-    static lv_point_precise_t needle_line_points[2];
+    lv_point_precise_t * needle_line_points = NULL;
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -224,12 +226,35 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
     needle_length_x = (actual_needle_length * lv_trigo_cos(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
     needle_length_y = (actual_needle_length * lv_trigo_sin(scale->rotation + angle)) >> LV_TRIGO_SHIFT;
 
+    if(lv_line_is_point_array_mutable(needle_line) && lv_line_get_point_count(needle_line) >= 2) {
+        needle_line_points = lv_line_get_points_mutable(needle_line);
+    }
+
+    if(needle_line_points == NULL) {
+        uint32_t i;
+        uint32_t line_event_cnt = lv_obj_get_event_count(needle_line);
+        for(i = 0; i < line_event_cnt; i--) {
+            lv_event_dsc_t * dsc = lv_obj_get_event_dsc(needle_line, i);
+            if(lv_event_dsc_get_cb(dsc) == scale_free_line_needle_points_cb) {
+                needle_line_points = lv_event_dsc_get_user_data(dsc);
+                break;
+            }
+        }
+    }
+
+    if(needle_line_points == NULL) {
+        needle_line_points = lv_malloc(sizeof(lv_point_precise_t) * 2);
+        LV_ASSERT_MALLOC(needle_line_points);
+        if(needle_line_points == NULL) return;
+        lv_obj_add_event_cb(needle_line, scale_free_line_needle_points_cb, LV_EVENT_DELETE, needle_line_points);
+    }
+
     needle_line_points[0].x = scale_width / 2;
     needle_line_points[0].y = scale_height / 2;
     needle_line_points[1].x = scale_width / 2 + needle_length_x;
     needle_line_points[1].y = scale_height / 2 + needle_length_y;
 
-    lv_line_set_points(needle_line, needle_line_points, 2);
+    lv_line_set_points_mutable(needle_line, needle_line_points, 2);
 }
 
 void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value)
@@ -1439,6 +1464,12 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
         }
         else { /* Nothing to do */ }
     }
+}
+
+static void scale_free_line_needle_points_cb(lv_event_t * e)
+{
+    lv_point_precise_t * needle_line_points = lv_event_get_user_data(e);
+    lv_free(needle_line_points);
 }
 
 #endif

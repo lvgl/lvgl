@@ -27,9 +27,13 @@ extern "C" {
 /*Data of line*/
 typedef struct {
     lv_obj_t obj;
-    const lv_point_precise_t * point_array;     /**< Pointer to an array with the points of the line*/
+    union {
+        const lv_point_precise_t * constant;
+        lv_point_precise_t * mut;
+    } point_array;                      /**< Pointer to an array with the points of the line*/
     uint32_t point_num;                 /**< Number of points in 'point_array'*/
     uint32_t y_inv : 1;                  /**< 1: y == 0 will be on the bottom*/
+    uint32_t point_array_is_mutable : 1; /**< whether the point array is const or mutable*/
 } lv_line_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_line_class;
@@ -58,6 +62,14 @@ lv_obj_t * lv_line_create(lv_obj_t * parent);
 void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num);
 
 /**
+ * Set a non-const array of points. Identical to `lv_line_set_points` except the array may be retrieved by `lv_line_get_points_mutable`.
+ * @param obj           pointer to a line object
+ * @param points        a non-const array of points. Only the address is saved, so the array needs to be alive while the line exists.
+ * @param point_num     number of points in 'point_a'
+ */
+void lv_line_set_points_mutable(lv_obj_t * obj, lv_point_precise_t points[], uint32_t point_num);
+
+/**
  * Enable (or disable) the y coordinate inversion.
  * If enabled then y will be subtracted from the height of the object,
  * therefore the y = 0 coordinate will be on the bottom.
@@ -69,6 +81,34 @@ void lv_line_set_y_invert(lv_obj_t * obj, bool en);
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get the pointer to the array of points.
+ * @param obj           pointer to a line object
+ * @return              const pointer to the array of points
+ */
+const lv_point_precise_t * lv_line_get_points(lv_obj_t * obj);
+
+/**
+ * Get the number of points in the array of points.
+ * @param obj           pointer to a line object
+ * @return              number of points in array of points
+ */
+uint32_t lv_line_get_point_count(lv_obj_t * obj);
+
+/**
+ * Check the mutability of the stored point array pointer.
+ * @param obj           pointer to a line object
+ * @return              true: the point array pointer is mutable, false: constant
+ */
+bool lv_line_is_point_array_mutable(lv_obj_t * obj);
+
+/**
+ * Get a pointer to the mutable array of points or NULL if it is not mutable
+ * @param obj           pointer to a line object
+ * @return              pointer to the array of points. NULL if not mutable.
+ */
+lv_point_precise_t * lv_line_get_points_mutable(lv_obj_t * obj);
 
 /**
  * Get the y inversion attribute

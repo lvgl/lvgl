@@ -364,4 +364,43 @@ void test_scale_range(void)
     TEST_ASSERT_EQUAL(max_range, lv_scale_get_range_max_value(scale));
 }
 
+void test_scale_set_line_needle_value(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+
+    lv_obj_t * line = lv_line_create(scale);
+
+    /* test the scale alocating the array */
+    lv_scale_set_line_needle_value(scale, line, 50, 35);
+    TEST_ASSERT_EQUAL_UINT32(2, lv_line_get_point_count(line));
+    const lv_point_precise_t * allocated_points_array = lv_line_get_points(line);
+    TEST_ASSERT_NOT_NULL(allocated_points_array);
+    TEST_ASSERT_TRUE(lv_line_is_point_array_mutable(line));
+    TEST_ASSERT_EQUAL_PTR(allocated_points_array, lv_line_get_points_mutable(line));
+
+    /* test the scale using the line's pre-set mutable array */
+    lv_point_precise_t provided_points_array[2] = {{-100, -100}, {-100, -100}};
+    lv_line_set_points_mutable(line, provided_points_array, 2);
+    lv_scale_set_line_needle_value(scale, line, 20, 20);
+    TEST_ASSERT(
+        provided_points_array[0].x != -100 || provided_points_array[0].y != -100
+        || provided_points_array[1].x != -100 || provided_points_array[1].y != -100
+    );
+    TEST_ASSERT_EQUAL_PTR(provided_points_array, lv_line_get_points_mutable(line));
+
+    provided_points_array[0].x = -100;
+    provided_points_array[0].y = -100;
+    provided_points_array[1].x = -100;
+    provided_points_array[1].y = -100;
+    /* set the line array to an immutable one. The scale will switch back to its allocated one */
+    lv_line_set_points(line, provided_points_array, 2); /* immutable setter */
+    lv_scale_set_line_needle_value(scale, line, 10, 30);
+    TEST_ASSERT_EQUAL_PTR(allocated_points_array, lv_line_get_points_mutable(line));
+    TEST_ASSERT(
+        provided_points_array[0].x == -100 && provided_points_array[0].y == -100
+        && provided_points_array[1].x == -100 && provided_points_array[1].y == -100
+    );
+}
+
 #endif
