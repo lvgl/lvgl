@@ -505,7 +505,7 @@ void test_freetype_outline_rendering_test(void)
         i++;
     }
 
-    font_italic->release_glyph(font_italic, &g);
+    lv_font_glyph_release_draw_data(&g);
 
     lv_freetype_font_delete(font_italic);
 }

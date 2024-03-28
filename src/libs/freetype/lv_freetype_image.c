@@ -37,7 +37,7 @@ static void freetype_image_free_cb(lv_freetype_image_cache_data_t * node, void *
 static lv_cache_compare_res_t freetype_image_compare_cb(const lv_freetype_image_cache_data_t * lhs,
                                                         const lv_freetype_image_cache_data_t * rhs);
 
-static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
+static void freetype_image_release_cb(lv_font_glyph_dsc_t * g_dsc);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -68,7 +68,7 @@ void lv_freetype_set_cbs_image_font(lv_freetype_font_dsc_t * dsc)
 {
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
     dsc->font.get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
-    dsc->font.release_glyph = freetype_image_release_cb;
+    dsc->font.glyph_release_draw_data = freetype_image_release_cb;
 }
 
 /**********************
@@ -99,10 +99,9 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv
     return cache_node->draw_buf;
 }
 
-static void freetype_image_release_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
+static void freetype_image_release_cb(lv_font_glyph_dsc_t * g_dsc)
 {
-    LV_ASSERT_NULL(font);
-    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
+    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)g_dsc->resolved_font->dsc;
     lv_cache_release(dsc->cache_node->draw_data_cache, g_dsc->entry, NULL);
     g_dsc->entry = NULL;
 }

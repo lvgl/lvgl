@@ -53,8 +53,8 @@ void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
 {
     const lv_font_t * font = g_dsc->resolved_font;
 
-    if(font != NULL && font->release_glyph) {
-        font->release_glyph(font, g_dsc);
+    if(font != NULL && font->glyph_release_draw_data) {
+        font->glyph_release_draw_data(g_dsc);
     }
 }
 
