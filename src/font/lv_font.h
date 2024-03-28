@@ -153,6 +153,13 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out
                            uint32_t letter_next);
 
 /**
+ * Release the bitmap of a font.
+ * @note You must call @lv_font_get_glyph_dsc to get @g_dsc (@lv_font_glyph_dsc_t) before you can call this function.
+ * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
+ */
+void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc);
+
+/**
  * Get the width of a glyph with kerning
  * @param font          pointer to a font
  * @param letter        a UNICODE letter
