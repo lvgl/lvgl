@@ -46,9 +46,16 @@ typedef struct {
     const char * map[8 * 7];
 #ifdef LV_USE_CALENDAR_CHINESE
     bool use_chinese_calendar;
+
+    /* 7 * 6: A week has 7 days, and the calendar displays 6 weeks in total.
+       20: Including the number of dates, line breaks, names for each day,
+       and reserving several spaces for addresses.*/
     char nums [7 * 6][20];
 #else
-    char nums [7 * 6][4];
+    /* 7 * 6: A week has 7 days, and the calendar displays 6 weeks in total.
+       20: Including the number of dates, and reserving several spaces for
+       addresses.*/
+    char nums [7 * 6][4];/**/
 #endif
 } lv_calendar_t;
 

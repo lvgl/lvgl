@@ -24,6 +24,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    lv_calendar_date_t today;
+    bool leep_month;
+} lv_calendar_chinese_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -41,6 +46,13 @@ void lv_calendar_set_chinese_mode(lv_obj_t * obj, bool en);
  * @return            return the name of the day
  */
 const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian);
+
+/**
+ * Get the chinese time of the gregorian time (reference: https://www.cnblogs.com/liyang31tg/p/4123171.html)
+ * @param gregorian   need to convert to chinese time in gregorian time
+ * @return            return the chinese time of the gregorian time
+ */
+lv_calendar_chinese_t lv_calendar_gregorian_to_chinese(lv_calendar_date_t * gregorian);
 
 /**********************
  *      MACROS
