@@ -44,7 +44,12 @@ typedef struct {
     lv_calendar_date_t * highlighted_dates; /**< Apply different style on these days (pointer to user-defined array)*/
     size_t highlighted_dates_num;          /**< Number of elements in `highlighted_days`*/
     const char * map[8 * 7];
+#ifdef LV_USE_CALENDAR_CHINESE
+    bool use_chinese_calendar;
+    char nums [7 * 6][20];
+#else
     char nums [7 * 6][4];
+#endif
 } lv_calendar_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_class;
@@ -162,6 +167,7 @@ lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_
 
 #include "lv_calendar_header_arrow.h"
 #include "lv_calendar_header_dropdown.h"
+#include "lv_calendar_chinese.h"
 
 #endif  /*LV_USE_CALENDAR*/
 

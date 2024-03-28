@@ -34,6 +34,7 @@
 #define LV_FONT_MONTSERRAT_48   1
 #define LV_FONT_MONTSERRAT_28_COMPRESSED    1
 #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW    1
+#define LV_FONT_SIMSUN_14_CJK   1
 #define LV_FONT_SIMSUN_16_CJK   1
 #define LV_FONT_UNSCII_8        1
 #define LV_FONT_UNSCII_16       1
@@ -45,6 +46,8 @@
 #define LV_USE_PERF_MONITOR         1
 #define LV_USE_MEM_MONITOR          1
 #define LV_LABEL_TEXT_SELECTION     1
+
+#define LV_USE_CALENDAR_CHINESE 1
 
 #define LV_USE_FLEX 1
 #define LV_USE_GRID 1

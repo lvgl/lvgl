@@ -134,17 +134,79 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
     uint8_t day_first = get_day_of_week(d.year, d.month, 1);
     uint8_t c;
     for(i = day_first, c = 1; i < act_mo_len + day_first; i++, c++) {
-        lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
+#if LV_USE_CALENDAR_CHINESE
+        if(calendar->use_chinese_calendar) {
+            lv_calendar_date_t chinese_calendar_temp;
+            chinese_calendar_temp = d;
+            chinese_calendar_temp.day = c;
+            const char * day_name = lv_calendar_get_day_name(&chinese_calendar_temp);
+            if(day_name != NULL)
+                lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]),
+                            "%d\n%s",
+                            c,
+                            day_name);
+            else
+                lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
+        }
+        else
+#endif
+            lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
     }
 
     uint8_t prev_mo_len = get_month_length(d.year, d.month - 1);
     for(i = 0, c = prev_mo_len - day_first + 1; i < day_first; i++, c++) {
-        lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
+#if LV_USE_CALENDAR_CHINESE
+        if(calendar->use_chinese_calendar) {
+            lv_calendar_date_t chinese_calendar_temp;
+            if(d.month == 1) {
+                chinese_calendar_temp.month = 12;
+                chinese_calendar_temp.year = d.year - 1;
+            }
+            else {
+                chinese_calendar_temp.month = d.month - 1;
+                chinese_calendar_temp.year = d.year;
+            }
+            chinese_calendar_temp.day = c;
+            const char * day_name = lv_calendar_get_day_name(&chinese_calendar_temp);
+            if(day_name != NULL)
+                lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]),
+                            "%d\n%s",
+                            c,
+                            day_name);
+            else
+                lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
+        }
+        else
+#endif
+            lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
         lv_buttonmatrix_set_button_ctrl(calendar->btnm, i + 7, LV_BUTTONMATRIX_CTRL_DISABLED);
     }
 
     for(i = day_first + act_mo_len, c = 1; i < 6 * 7; i++, c++) {
-        lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
+#if LV_USE_CALENDAR_CHINESE
+        if(calendar->use_chinese_calendar) {
+            lv_calendar_date_t chinese_calendar_temp;
+            if(d.month == 12) {
+                chinese_calendar_temp.month = 1;
+                chinese_calendar_temp.year = d.year + 1;
+            }
+            else {
+                chinese_calendar_temp.month = d.month + 1;
+                chinese_calendar_temp.year = d.year;
+            }
+            chinese_calendar_temp.day = c;
+            const char * day_name = lv_calendar_get_day_name(&chinese_calendar_temp);
+            if(day_name != NULL)
+                lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]),
+                            "%d\n%s",
+                            c,
+                            day_name);
+            else
+                lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
+        }
+        else
+#endif
+            lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
         lv_buttonmatrix_set_button_ctrl(calendar->btnm, i + 7, LV_BUTTONMATRIX_CTRL_DISABLED);
     }
 
@@ -284,6 +346,8 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);
+
+    lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
 
     lv_calendar_set_showed_date(obj, calendar->showed_date.year, calendar->showed_date.month);
     lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, calendar->today.day);
