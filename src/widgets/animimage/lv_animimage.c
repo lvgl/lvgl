@@ -94,7 +94,7 @@ void lv_animimg_set_duration(lv_obj_t * obj, uint32_t duration)
     lv_anim_set_playback_delay(&animimg->anim, duration);
 }
 
-void lv_animimg_set_repeat_count(lv_obj_t * obj, uint16_t count)
+void lv_animimg_set_repeat_count(lv_obj_t * obj, uint32_t count)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
@@ -126,7 +126,7 @@ uint32_t lv_animimg_get_duration(lv_obj_t * obj)
     return lv_anim_get_time(&animimg->anim);
 }
 
-uint16_t lv_animimg_get_repeat_count(lv_obj_t * obj)
+uint32_t lv_animimg_get_repeat_count(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
