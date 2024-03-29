@@ -119,7 +119,7 @@ static void touchscreen_read(lv_indev_t * drv, lv_indev_data_t * data)
     lv_nuttx_touchscreen_t * touchscreen = drv->driver_data;
     struct touch_sample_s sample;
 
-    /* 
+    /*
      * Note: Since it is necessary to avoid multi-processing click events
      * caused by redundant continue_reading, a two-unit sample sliding window
      * algorithm is used here. continue_reading is only activated when there
