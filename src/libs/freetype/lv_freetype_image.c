@@ -14,7 +14,7 @@
 
 #include "../../core/lv_global.h"
 
-#define draw_font_buf_handlers &(LV_GLOBAL_DEFAULT()->draw_font_buf_handlers)
+#define draw_buf_handlers_font &(LV_GLOBAL_DEFAULT()->draw_buf_handlers_font)
 
 /*********************
  *      DEFINES
@@ -147,7 +147,7 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     uint16_t box_w = glyph_bitmap->bitmap.width;        /*Width of the bitmap in [px]*/
 
     uint32_t stride = lv_draw_buf_width_to_stride(box_w, LV_COLOR_FORMAT_A8);
-    data->draw_buf = lv_draw_buf_create_user(draw_font_buf_handlers, box_w, box_h, LV_COLOR_FORMAT_A8, stride);
+    data->draw_buf = lv_draw_buf_create_user(draw_buf_handlers_font, box_w, box_h, LV_COLOR_FORMAT_A8, stride);
 
     for(int y = 0; y < box_h; ++y) {
         lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * box_w,
@@ -161,7 +161,7 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
 static void freetype_image_free_cb(lv_freetype_image_cache_data_t * data, void * user_data)
 {
     LV_UNUSED(user_data);
-    lv_draw_buf_destroy_user(draw_font_buf_handlers, data->draw_buf);
+    lv_draw_buf_destroy_user(draw_buf_handlers_font, data->draw_buf);
 }
 static lv_cache_compare_res_t freetype_image_compare_cb(const lv_freetype_image_cache_data_t * lhs,
                                                         const lv_freetype_image_cache_data_t * rhs)
