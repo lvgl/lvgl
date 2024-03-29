@@ -550,11 +550,11 @@
 /* VG-Lite linear gradient image maximum cache number.
  * NOTE: The memory usage of a single gradient image is 4K bytes.
  */
-#ifndef LV_VG_LITE_LINEAER_GRAD_CACHE_CNT
-    #ifdef CONFIG_LV_VG_LITE_LINEAER_GRAD_CACHE_CNT
-        #define LV_VG_LITE_LINEAER_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_LINEAER_GRAD_CACHE_CNT
+#ifndef LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+    #ifdef CONFIG_LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+        #define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
     #else
-        #define LV_VG_LITE_LINEAER_GRAD_CACHE_CNT 32
+        #define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT 32
     #endif
 #endif
 
