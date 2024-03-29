@@ -359,7 +359,7 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
     free_decoder_data(dsc);
 
-    if(dsc->cache_entry) {
+    if(dsc->cache && dsc->cache_entry) {
         /*Decoded data is in cache, release it from cache's callback*/
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
     }
@@ -403,20 +403,15 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     /*We only support read line by line for now*/
     if(decoded_area->y1 == LV_COORD_MIN) {
         /*Indexed image is converted to ARGB888*/
+        lv_color_format_t cf_decoded = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
 
         decoded = decoder_data->decoded_partial;
-        if(decoded && decoded->header.w == w_px) {
-            /*Use existing one directly*/
+        if(decoded && decoded->header.w != w_px) {
+            lv_draw_buf_destroy(decoded);
+            decoded = NULL;
         }
-        else {
-            if(decoded) {
-                lv_draw_buf_destroy(decoded);
-            }
-            lv_color_format_t cf_decoded = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
-            decoded = lv_draw_buf_create(w_px, 1, cf_decoded, LV_STRIDE_AUTO);
-            if(decoded == NULL)
-                return LV_RESULT_INVALID;
-        }
+        if(decoded == NULL) decoded = lv_draw_buf_create(w_px, 1, cf_decoded, LV_STRIDE_AUTO);
+        if(decoded == NULL) return LV_RESULT_INVALID;
 
         *decoded_area = *full_area;
         decoded_area->y2 = decoded_area->y1;
