@@ -81,10 +81,14 @@ lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void *
     LV_ASSERT_NULL(cache);
     LV_ASSERT_NULL(key);
 
+    LV_PROFILER_BEGIN;
+
     lv_mutex_lock(&cache->lock);
 
     if(cache->size == 0) {
         lv_mutex_unlock(&cache->lock);
+
+        LV_PROFILER_END;
         return NULL;
     }
 
@@ -93,11 +97,15 @@ lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void *
         lv_cache_entry_acquire_data(entry);
     }
     lv_mutex_unlock(&cache->lock);
+
+    LV_PROFILER_END;
     return entry;
 }
 void lv_cache_release(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data)
 {
     LV_ASSERT_NULL(entry);
+
+    LV_PROFILER_BEGIN;
 
     lv_mutex_lock(&cache->lock);
     lv_cache_entry_release_data(entry, user_data);
@@ -107,15 +115,21 @@ void lv_cache_release(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_
         lv_cache_entry_delete(entry);
     }
     lv_mutex_unlock(&cache->lock);
+
+    LV_PROFILER_END;
 }
 lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * user_data)
 {
     LV_ASSERT_NULL(cache);
     LV_ASSERT_NULL(key);
 
+    LV_PROFILER_BEGIN;
+
     lv_mutex_lock(&cache->lock);
     if(cache->max_size == 0) {
         lv_mutex_unlock(&cache->lock);
+
+        LV_PROFILER_END;
         return NULL;
     }
 
@@ -125,12 +139,15 @@ lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * use
     }
     lv_mutex_unlock(&cache->lock);
 
+    LV_PROFILER_END;
     return entry;
 }
 lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * key, void * user_data)
 {
     LV_ASSERT_NULL(cache);
     LV_ASSERT_NULL(key);
+
+    LV_PROFILER_BEGIN;
 
     lv_mutex_lock(&cache->lock);
     lv_cache_entry_t * entry = NULL;
@@ -140,18 +157,24 @@ lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * k
         if(entry != NULL) {
             lv_cache_entry_acquire_data(entry);
             lv_mutex_unlock(&cache->lock);
+
+            LV_PROFILER_END;
             return entry;
         }
     }
 
     if(cache->max_size == 0) {
         lv_mutex_unlock(&cache->lock);
+
+        LV_PROFILER_END;
         return NULL;
     }
 
     entry = cache_add_internal_no_lock(cache, key, user_data);
     if(entry == NULL) {
         lv_mutex_unlock(&cache->lock);
+
+        LV_PROFILER_END;
         return NULL;
     }
     bool create_res = cache->ops.create_cb(lv_cache_entry_get_data(entry), user_data);
@@ -164,44 +187,60 @@ lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * k
         lv_cache_entry_acquire_data(entry);
     }
     lv_mutex_unlock(&cache->lock);
+
+    LV_PROFILER_END;
     return entry;
 }
 void lv_cache_reserve(lv_cache_t * cache, uint32_t reserved_size, void * user_data)
 {
     LV_ASSERT_NULL(cache);
 
+    LV_PROFILER_BEGIN;
+
     for(lv_cache_reserve_cond_res_t reserve_cond_res = cache->clz->reserve_cond_cb(cache, NULL, reserved_size, user_data);
         reserve_cond_res == LV_CACHE_RESERVE_COND_NEED_VICTIM;
         reserve_cond_res = cache->clz->reserve_cond_cb(cache, NULL, reserved_size, user_data))
         cache_evict_one_internal_no_lock(cache, user_data);
 
+    LV_PROFILER_END;
 }
 void lv_cache_drop(lv_cache_t * cache, const void * key, void * user_data)
 {
     LV_ASSERT_NULL(cache);
     LV_ASSERT_NULL(key);
 
+    LV_PROFILER_BEGIN;
+
     lv_mutex_lock(&cache->lock);
     cache_drop_internal_no_lock(cache, key, user_data);
     lv_mutex_unlock(&cache->lock);
+
+    LV_PROFILER_END;
 }
 bool lv_cache_evict_one(lv_cache_t * cache, void * user_data)
 {
     LV_ASSERT_NULL(cache);
 
+    LV_PROFILER_BEGIN;
+
     lv_mutex_lock(&cache->lock);
     bool res = cache_evict_one_internal_no_lock(cache, user_data);
     lv_mutex_unlock(&cache->lock);
 
+    LV_PROFILER_END;
     return res;
 }
 void lv_cache_drop_all(lv_cache_t * cache, void * user_data)
 {
     LV_ASSERT_NULL(cache);
 
+    LV_PROFILER_BEGIN;
+
     lv_mutex_lock(&cache->lock);
     cache->clz->drop_all_cb(cache, user_data);
     lv_mutex_unlock(&cache->lock);
+
+    LV_PROFILER_END;
 }
 
 void lv_cache_set_max_size(lv_cache_t * cache, size_t max_size, void * user_data)
