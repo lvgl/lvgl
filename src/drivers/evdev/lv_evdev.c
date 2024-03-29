@@ -187,9 +187,15 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
             dsc->min_x = absinfo.minimum;
             dsc->max_x = absinfo.maximum;
         }
+        else {
+            LV_LOG_ERROR("ioctl EVIOCGABS(ABS_X) failed: %s", strerror(errno));
+        }
         if(ioctl(dsc->fd, EVIOCGABS(ABS_Y), &absinfo) == 0) {
             dsc->min_y = absinfo.minimum;
             dsc->max_y = absinfo.maximum;
+        }
+        else {
+            LV_LOG_ERROR("ioctl EVIOCGABS(ABS_Y) failed: %s", strerror(errno));
         }
     }
 
