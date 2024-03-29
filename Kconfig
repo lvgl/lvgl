@@ -340,7 +340,7 @@ menu "LVGL configuration"
 				which usually improves performance,
 				but does not guarantee the same rendering quality as the software.
 
-		config LV_VG_LITE_LINEAER_GRAD_CACHE_CNT
+		config LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
 			int "VG-Lite linear gradient image maximum cache number."
 			default 32
 			depends on LV_USE_DRAW_VG_LITE
@@ -353,12 +353,6 @@ menu "LVGL configuration"
 			depends on LV_USE_DRAW_VG_LITE
 			help
 				The memory usage of a single gradient image is radial grad radius * 4 bytes.
-
-		config LV_USE_VECTOR_GRAPHIC
-			bool "Use Vector Graphic APIs"
-			default n
-			help
-				Enable drawing support vector graphic APIs.
 	endmenu
 
 	menu "Feature Configuration"
@@ -1148,6 +1142,13 @@ menu "LVGL configuration"
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
+
+		config LV_USE_VECTOR_GRAPHIC
+			bool "Enable Vector Graphic APIs"
+			default n
+			help
+				Enable drawing support vector graphic APIs.
+	
 		config LV_USE_THORVG
 			bool "ThorVG library"
 			choice
