@@ -67,6 +67,12 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
      */
 }
 
+/*use Arduinos millis() as tick source*/
+uint32_t my_tick(void)
+{
+    return millis();
+}
+
 void setup()
 {
     String LVGL_Arduino = "Hello Arduino! ";
@@ -78,7 +84,7 @@ void setup()
     lv_init();
 
     /*Set a tick source so that LVGL will know how much time elapsed. */
-    lv_tick_set_cb(millis);
+    lv_tick_set_cb(my_tick);
 
     /* register print function for debugging */
 #if LV_USE_LOG != 0
