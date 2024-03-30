@@ -1,5 +1,5 @@
 /*Using LVGL with Arduino requires some extra steps:
- *Be sure to read the docs here: https://docs.lvgl.io/master/get-started/platforms/arduino.html  */
+ *Be sure to read the docs here: https://docs.lvgl.io/master/integration/framework/arduino.html  */
 
 #include <lvgl.h>
 
@@ -15,9 +15,10 @@
 //#include <examples/lv_examples.h>
 //#include <demos/lv_demos.h>
 
-/*Set to your screen resolution*/
+/*Set to your screen resolution and rotation*/
 #define TFT_HOR_RES   320
 #define TFT_VER_RES   240
+#define TFT_ROTATION  0
 
 /*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
 #define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
@@ -58,6 +59,15 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
 
     if(!touched) {
         data->state = LV_INDEV_STATE_RELEASED;
+        
+        // initially, data->point.x == hor. res and data->point.y == ver. res,
+        // which would lead to continous warnings from lv_indev.c until first touch
+        if((data->point.x < 0) || (data->point.x >= TFT_HOR_RES)) {
+            data->point.x = 0;
+        }
+        if((data->point.y < 0) || (data->point.y >= TFT_VER_RES)) {
+            data->point.y = 0;
+        }
     } else {
         data->state = LV_INDEV_STATE_PRESSED;
 
@@ -66,6 +76,11 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
     }
      */
 }
+
+// would be better to have this in lv_tft_espi.h
+typedef struct {
+    TFT_eSPI * tft;
+} lv_tft_espi_t;
 
 void setup()
 {
@@ -89,6 +104,8 @@ void setup()
 #if LV_USE_TFT_ESPI
     /*TFT_eSPI can be enabled lv_conf.h to initialize the display in a simple way*/
     disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
+    ((lv_tft_espi_t *)(lv_display_get_driver_data(disp)))->tft->setRotation(TFT_ROTATION);
+
 #else
     /*Else create a display yourself*/
     disp = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
