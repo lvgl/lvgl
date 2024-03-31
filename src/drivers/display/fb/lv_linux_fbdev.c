@@ -312,8 +312,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         return;
     }
 
-    uint32_t color_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * dsc->finfo.line_length;
-    uint32_t fb_pos = color_pos + dsc->vinfo.yoffset * dsc->finfo.line_length;
+    uint32_t color_stride = disp->hor_res * px_size;
+    uint32_t color_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * color_stride;
+    uint32_t fb_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * dsc->finfo.line_length + dsc->vinfo.yoffset *
+                      dsc->finfo.line_length;
 
     uint8_t * fbp = (uint8_t *)dsc->fbp;
     int32_t y;
@@ -321,7 +323,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         for(y = area->y1; y <= area->y2; y++) {
             lv_memcpy(&fbp[fb_pos], &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
-            color_pos += dsc->finfo.line_length;
+            color_pos += color_stride;
         }
     }
     else {
