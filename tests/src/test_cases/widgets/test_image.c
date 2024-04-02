@@ -21,6 +21,7 @@ static lv_obj_t * img_create(void)
     lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, &test_img_lvgl_logo_png);
     lv_obj_set_style_bg_opa(img, LV_OPA_20, 0);
+    lv_obj_set_style_bg_color(img, lv_color_hex(0x000000), 0);
     lv_obj_set_style_shadow_width(img, 10, 0);
     lv_obj_set_style_shadow_color(img, lv_color_hex(0xff0000), 0);
     return img;

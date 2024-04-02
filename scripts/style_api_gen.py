@@ -390,8 +390,12 @@ props = [
  'dsc': "Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
 
 {'name': 'BITMAP_MASK_SRC',
- 'style_type': 'ptr',   'var_type': 'const lv_image_dsc_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'ptr',   'var_type': 'const void *', 'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "If set a layer will be created for the widget and the layer will be masked with this A8 bitmap mask."},
+
+{'name': 'ROTARY_SENSITIVITY',
+ 'style_type': 'num',   'var_type': 'uint32_t', 'default':'`256`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Adjust the sensitivity for rotary encoders in 1/256 unit. It means, 128: slow down the rotary to half, 512: speeds up to double, 256: no change"},
 
 {'section': 'Flex', 'dsc':'Flex layout properties.',  'guard':'LV_USE_FLEX'},
 
@@ -631,6 +635,11 @@ print(HEADING)
 print('#ifndef LV_OBJ_STYLE_GEN_H')
 print('#define LV_OBJ_STYLE_GEN_H')
 print()
+print('''\
+#ifdef __cplusplus
+extern "C" {
+#endif
+''')
 print("#include \"../misc/lv_area.h\"")
 print("#include \"../misc/lv_style.h\"")
 print("#include \"../core/lv_obj_style.h\"")
@@ -648,6 +657,12 @@ for p in props:
 guard_close()
 
 print()
+print('''\
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+''')
+
 print('#endif /* LV_OBJ_STYLE_GEN_H */')
 
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.c', 'w')
@@ -678,6 +693,11 @@ print(HEADING)
 print('#ifndef LV_STYLE_GEN_H')
 print('#define LV_STYLE_GEN_H')
 print()
+print('''\
+#ifdef __cplusplus
+extern "C" {
+#endif
+''')
 
 for p in props:
   guard_proc(p)
@@ -690,6 +710,11 @@ for p in props:
 guard_close()
 
 print()
+print('''\
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+''')
 print('#endif /* LV_STYLE_GEN_H */')
 
 sys.stdout = open(base_dir + '/../docs/overview/style-props.rst', 'w')

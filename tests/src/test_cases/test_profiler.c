@@ -2,6 +2,7 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+#include <string.h>
 
 #define OUTPUT_LINE_MAX 8
 #define OUTPUT_BUF_MAX 128

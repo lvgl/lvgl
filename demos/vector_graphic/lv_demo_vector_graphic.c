@@ -264,6 +264,8 @@ static void delete_event_cb(lv_event_t * e)
 void lv_demo_vector_graphic(void)
 {
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(WIDTH, HEIGHT, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    lv_draw_buf_clear(draw_buf, NULL);
+
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
     lv_canvas_set_draw_buf(canvas, draw_buf);
     lv_obj_add_event_cb(canvas, delete_event_cb, LV_EVENT_DELETE, NULL);

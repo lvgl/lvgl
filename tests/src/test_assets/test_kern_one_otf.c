@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <stddef.h>
-
 #if LV_BUILD_TEST
 
 /*TestKERNOne.otf from https://github.com/unicode-org/text-rendering-tests*/

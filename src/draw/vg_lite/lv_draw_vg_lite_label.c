@@ -9,7 +9,7 @@
 
 #include "lv_draw_vg_lite.h"
 
-#include "../../libs/freetype/lv_freetype.h"
+#include "../../lvgl.h"
 
 #if LV_USE_DRAW_VG_LITE
 
@@ -63,8 +63,6 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
 void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
                            const lv_area_t * coords)
 {
-    if(dsc->opa <= LV_OPA_MIN) return;
-
     LV_PROFILER_BEGIN;
 
 #if LV_USE_FREETYPE

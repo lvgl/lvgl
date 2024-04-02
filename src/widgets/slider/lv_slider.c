@@ -224,6 +224,15 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RESULT_OK) return;
     }
+    else if(code == LV_EVENT_ROTARY) {
+        int32_t r = lv_event_get_rotary_diff(e);
+
+        if(!slider->left_knob_focus) lv_slider_set_value(obj, lv_slider_get_value(obj) + r, LV_ANIM_ON);
+        else lv_slider_set_left_value(obj, lv_slider_get_left_value(obj) + 1, LV_ANIM_ON);
+
+        res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+        if(res != LV_RESULT_OK) return;
+    }
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_knob(e);
     }

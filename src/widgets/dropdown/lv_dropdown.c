@@ -20,7 +20,6 @@
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../stdlib/lv_string.h"
-#include <string.h>
 
 /*********************
  *      DEFINES
@@ -246,7 +245,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 #else
     _lv_text_ap_proc(option, ins_buf);
 #endif
-    if(pos < dropdown->option_cnt) strcat(ins_buf, "\n");
+    if(pos < dropdown->option_cnt) lv_strcat(ins_buf, "\n");
 
     _lv_text_ins(dropdown->options, _lv_text_encoded_get_char_id(dropdown->options, insert_pos), ins_buf);
     lv_free(ins_buf);
@@ -412,7 +411,7 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
     while(start[0] != '\0') {
         for(char_i = 0; (start[char_i] != '\n') && (start[char_i] != '\0'); char_i++);
 
-        if(option_len == char_i && memcmp(start, option, LV_MIN(option_len, char_i)) == 0) {
+        if(option_len == char_i && lv_memcmp(start, option, LV_MIN(option_len, char_i)) == 0) {
             return opt_i;
         }
 
@@ -736,6 +735,19 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 res = btn_release_handler(obj);
                 if(res != LV_RESULT_OK) return;
             }
+        }
+    }
+    else if(code == LV_EVENT_ROTARY) {
+        if(!lv_dropdown_is_open(obj)) {
+            lv_dropdown_open(obj);
+        }
+        else {
+            int32_t r = lv_event_get_rotary_diff(e);
+            int32_t new_id = dropdown->sel_opt_id + r;
+            new_id = LV_CLAMP(0, new_id, (int32_t)dropdown->option_cnt - 1);
+
+            dropdown->sel_opt_id = new_id;
+            position_to_selected(obj);
         }
     }
     else if(code == LV_EVENT_DRAW_MAIN) {

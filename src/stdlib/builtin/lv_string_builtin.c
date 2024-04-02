@@ -171,6 +171,17 @@ void * LV_ATTRIBUTE_FAST_MEM lv_memmove(void * dst, const void * src, size_t len
     return dst;
 }
 
+int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
+{
+    const char * s1 = (const char *) p1;
+    const char * s2 = (const char *) p2;
+    while(--len > 0 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return *s1 - *s2;
+}
+
 /* See https://en.cppreference.com/w/c/string/byte/strlen for reference */
 size_t lv_strlen(const char * str)
 {
@@ -212,8 +223,28 @@ char * lv_strdup(const char * src)
     char * dst = lv_malloc(len);
     if(dst == NULL) return NULL;
 
-    lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy when length is known*/
+    lv_memcpy(dst, src, len); /*memcpy is faster than strncpy when length is known*/
     return dst;
+}
+
+char * lv_strcat(char * dst, const char * src)
+{
+    lv_strcpy(dst + lv_strlen(dst), src);
+    return dst;
+}
+
+char * lv_strncat(char * dst, const char * src, size_t src_len)
+{
+    char * tmp = dst;
+    while(*dst != '\0') {
+        dst++;
+    }
+    while(src_len != 0 && *src != '\0') {
+        src_len--;
+        *dst++ = *src++;
+    }
+    *dst = '\0';
+    return tmp;
 }
 
 /**********************

@@ -83,7 +83,7 @@ static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
         dev->dummy_read = true;
         data->state = LV_INDEV_STATE_PRESSED;
         data->key = dev->buf[0];
-        memmove(dev->buf, dev->buf + 1, len);
+        lv_memmove(dev->buf, dev->buf + 1, len);
     }
 }
 

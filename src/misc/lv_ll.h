@@ -13,9 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
+#include "../lv_conf_internal.h"
+#include "lv_types.h"
 
 /*********************
  *      DEFINES

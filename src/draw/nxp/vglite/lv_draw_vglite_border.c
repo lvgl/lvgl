@@ -30,6 +30,9 @@
  *      DEFINES
  *********************/
 
+/*** Define maximum numbers of rectangles needed to clip partial borders ***/
+#define MAX_NUM_RECTANGLES 4
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -132,6 +135,49 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
     vg_lite_identity(&matrix);
 
     int32_t line_width = dsc->width;
+    lv_border_side_t border_side = dsc->side;
+
+    if(border_side == LV_BORDER_SIDE_FULL)
+        border_side = LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT;
+
+    uint32_t num_rect = 0;
+    vg_lite_rectangle_t rect[MAX_NUM_RECTANGLES];
+
+    if(border_side & LV_BORDER_SIDE_TOP) {
+        rect[num_rect].x = coords->x1 - ceil(line_width / 2.0f);
+        rect[num_rect].y = coords->y1 - ceil(line_width / 2.0f);
+        rect[num_rect].width = coords->x2 - coords->x1 + line_width;
+        rect[num_rect].height = line_width;
+        num_rect++;
+    }
+
+    if(border_side & LV_BORDER_SIDE_LEFT) {
+        rect[num_rect].x = coords->x1 - ceil(line_width / 2.0f);
+        rect[num_rect].y = coords->y1 - ceil(line_width / 2.0f);
+        rect[num_rect].width = line_width;
+        rect[num_rect].height = coords->y2 - coords->y1 + line_width;
+        num_rect++;
+    }
+
+    if(border_side & LV_BORDER_SIDE_RIGHT) {
+        rect[num_rect].x = coords->x2 - ceil(line_width / 2.0f);
+        rect[num_rect].y = coords->y1 - ceil(line_width / 2.0f);
+        rect[num_rect].width = line_width;
+        rect[num_rect].height = coords->y2 - coords->y1 + line_width;
+        num_rect++;
+    }
+
+    if(border_side & LV_BORDER_SIDE_BOTTOM) {
+        rect[num_rect].x = coords->x1 - ceil(line_width / 2.0f);
+        rect[num_rect].y = coords->y2 - ceil(line_width / 2.0f);
+        rect[num_rect].width = coords->x2 - coords->x1 + line_width;
+        rect[num_rect].height = line_width;
+        num_rect++;
+    }
+
+    /*** Enable scissor and apply scissor rects ***/
+    VGLITE_CHECK_ERROR(vg_lite_enable_scissor());
+    VGLITE_CHECK_ERROR(vg_lite_scissor_rects(vgbuf, num_rect, rect));
 
     /*** Draw border ***/
     VGLITE_CHECK_ERROR(vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH));
@@ -145,6 +191,9 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
     vglite_run();
 
     VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
+
+    /*** Disable scissor ***/
+    VGLITE_CHECK_ERROR(vg_lite_disable_scissor());
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

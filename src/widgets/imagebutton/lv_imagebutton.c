@@ -225,18 +225,18 @@ static void draw_main(lv_event_t * e)
 
     src_info = &imagebutton->src_mid[state];
     if(src_info->img_src) {
-        lv_area_t clip_area_center;
-        clip_area_center.x1 = coords.x1 + left_w;
-        clip_area_center.x2 = coords.x2 - right_w;
-        clip_area_center.y1 = coords.y1;
-        clip_area_center.y2 = coords.y2;
+        coords_part.x1 = coords.x1 + left_w;
+        coords_part.x2 = coords.x2 - right_w;
+        coords_part.y1 = coords.y1;
+        coords_part.y2 = coords.y2;
 
-        if(_lv_area_intersect(&clip_area_center, &clip_area_center, &layer->_clip_area)) {
+        lv_area_t clip_area_center;
+        if(_lv_area_intersect(&clip_area_center, &coords_part, &layer->_clip_area)) {
             lv_area_t clip_area_ori = layer->_clip_area;
             layer->_clip_area = clip_area_center;
             img_dsc.src = src_info->img_src;
             img_dsc.tile = 1;
-            lv_draw_image(layer, &img_dsc, &clip_area_center);
+            lv_draw_image(layer, &img_dsc, &coords_part);
             layer->_clip_area = clip_area_ori;
         }
 

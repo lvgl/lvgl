@@ -13,8 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
-#include <stdbool.h>
 #include "../misc/lv_types.h"
 #include "../misc/lv_area.h"
 #include "lv_obj_property.h"
