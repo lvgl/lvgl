@@ -319,12 +319,25 @@ void lv_obj_align(lv_obj_t * obj, lv_align_t align, int32_t x_ofs, int32_t y_ofs
     lv_obj_set_pos(obj, x_ofs, y_ofs);
 }
 
+static void add_anchored_children(lv_obj_t * obj, const lv_obj_t * base)
+{
+    base->spec_attr->anchored_child_count++;
+
+    base->spec_attr->anchored_children =
+        lv_realloc(base->spec_attr->anchored_children,
+                   base->spec_attr->anchored_child_count * sizeof(lv_obj_t *));
+    base->spec_attr->anchored_children[base->spec_attr->anchored_child_count - 1] = obj;
+}
+
 void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, int32_t x_ofs, int32_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_update_layout(obj);
     if(base == NULL) base = lv_obj_get_parent(obj);
+
+    obj->anchor_parent = (lv_obj_t *) base;
+    add_anchored_children(obj, base);
 
     LV_ASSERT_OBJ(base, MY_CLASS);
 
@@ -681,8 +694,21 @@ void lv_obj_move_to(lv_obj_t * obj, int32_t x, int32_t y)
 {
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * parent = obj->parent;
+    lv_obj_t * anchor_parent = obj->anchor_parent;
 
-    if(parent) {
+    /* Keep padding and border only if this object is a normal child; ignore
+     * if it's anchored to another object. */
+    if(anchor_parent != NULL) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_FLOATING)) {
+            x += anchor_parent->coords.x1;
+            y += anchor_parent->coords.y1;
+        }
+        else {
+            x += anchor_parent->coords.x1 - lv_obj_get_scroll_x(anchor_parent);
+            y += anchor_parent->coords.y1 - lv_obj_get_scroll_y(anchor_parent);
+        }
+    }
+    else if(parent) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_FLOATING)) {
             x += parent->coords.x1;
             y += parent->coords.y1;

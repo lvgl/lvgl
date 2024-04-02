@@ -198,8 +198,10 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
  */
 typedef struct {
     lv_obj_t ** children;   /**< Store the pointer of the children in an array.*/
+    lv_obj_t ** anchored_children; /**< Array of pointers to anchored children. */
     lv_group_t * group_p;
     lv_event_list_t event_list;
+
 
     lv_point_t scroll;              /**< The current X/Y scroll offset*/
 
@@ -207,6 +209,7 @@ typedef struct {
     int32_t ext_draw_size;          /**< EXTend the size in every direction for drawing.*/
 
     uint16_t child_cnt;             /**< Number of children*/
+    uint32_t anchored_child_count;  /**< Number of anchored children. */
     uint16_t scrollbar_mode : 2;    /**< How to display scrollbars, see `lv_scrollbar_mode_t`*/
     uint16_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally, see `lv_scroll_snap_t`*/
     uint16_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
@@ -217,6 +220,7 @@ typedef struct {
 struct _lv_obj_t {
     const lv_obj_class_t * class_p;
     lv_obj_t * parent;
+    lv_obj_t * anchor_parent;
     _lv_obj_spec_attr_t * spec_attr;
     _lv_obj_style_t * styles;
 #if LV_OBJ_STYLE_CACHE

@@ -54,6 +54,7 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t se
                                     lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
+static void refresh_anchored_children(lv_obj_t * obj);
 static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
 static void trans_anim_cb(void * _tr, int32_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
@@ -296,6 +297,9 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || is_layout_refr)) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
         if(parent) lv_obj_mark_layout_as_dirty(parent);
+    }
+    if((part == LV_PART_ANY || part == LV_PART_MAIN) && is_layout_refr) {
+        refresh_anchored_children(obj);
     }
 
     /*Cache the layer type*/
@@ -779,6 +783,22 @@ static void refresh_children_style(lv_obj_t * obj)
         lv_obj_invalidate(child);
 
         refresh_children_style(child); /*Check children too*/
+    }
+}
+
+/**
+ * Mark anchored objects as dirty.
+ * @param obj pointer to an object.
+ */
+static void refresh_anchored_children(lv_obj_t * obj)
+{
+    uint32_t i;
+
+    if(obj->spec_attr == NULL) return;
+
+    for(i = 0; i < obj->spec_attr->anchored_child_count; i++) {
+        lv_obj_t * child = obj->spec_attr->anchored_children[i];
+        lv_obj_mark_layout_as_dirty(child);
     }
 }
 
