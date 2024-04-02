@@ -289,12 +289,13 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         int32_t blend_h = lv_area_get_height(&blend_area);
 
         lv_color_format_t cf_final = cf;
-        if(cf == LV_COLOR_FORMAT_L8) {
-            cf_final = LV_COLOR_FORMAT_RGB888;
+        if((cf == LV_COLOR_FORMAT_L8) && (draw_dsc->recolor_opa > LV_OPA_MIN)) {
+            cf_final = LV_COLOR_FORMAT_ARGB8888;
         }
         if(transformed) {
             if(cf_final == LV_COLOR_FORMAT_RGB888 || cf_final == LV_COLOR_FORMAT_XRGB8888) cf_final = LV_COLOR_FORMAT_ARGB8888;
             else if(cf_final == LV_COLOR_FORMAT_RGB565) cf_final = LV_COLOR_FORMAT_RGB565A8;
+            else if(cf_final == LV_COLOR_FORMAT_L8) cf_final = LV_COLOR_FORMAT_AL88;
         }
 
         uint8_t * tmp_buf;
@@ -352,21 +353,40 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                                      draw_dsc, sup, cf, tmp_buf);
             }
             else if(draw_dsc->recolor_opa >= LV_OPA_MIN) {
-                /* copy L8 image into RGB888 temporary buffer */
                 int32_t h = lv_area_get_height(&relative_area);
-                if(cf == LV_COLOR_FORMAT_L8) {
-                    const uint8_t * src_buf_tmp = src_buf + img_stride * relative_area.y1 + relative_area.x1 * 1;
-                    uint8_t * dest_buf_tmp = tmp_buf;
-                    int32_t i, x, dest_x;
-                    for(i = 0; i < h; i++) {
-                        for(x = 0, dest_x = 0; x < blend_w; x++, dest_x += 3) {
-                            dest_buf_tmp[dest_x + 0] = src_buf_tmp[x];
-                            dest_buf_tmp[dest_x + 1] = src_buf_tmp[x];
-                            dest_buf_tmp[dest_x + 2] = src_buf_tmp[x];
+                if (cf == LV_COLOR_FORMAT_L8) {
+#if 0
+                    if (cf_final == LV_COLOR_FORMAT_ARGB8888) {     
+#endif
+                        /* L8 is recolored, but not transformed: copy L8 image into ARGB8888 temporary buffer */
+                        const uint8_t* src_buf_tmp = src_buf + img_stride * relative_area.y1 + relative_area.x1 * 1;
+                        lv_color32_t* dest_buf_tmp = (lv_color32_t*)tmp_buf;
+                        int32_t i, x, dest_x;
+                        for (i = 0; i < h; i++) {
+                            for (x = 0; x < blend_w; x++) {
+                                dest_buf_tmp[x].red = src_buf_tmp[x];
+                                dest_buf_tmp[x].green = src_buf_tmp[x];
+                                dest_buf_tmp[x].blue = src_buf_tmp[x];
+                                dest_buf_tmp[x].alpha = 255;
+                            }
+                            dest_buf_tmp += blend_w;
+                            src_buf_tmp += img_stride;
                         }
-                        dest_buf_tmp += blend_w * px_size;
-                        src_buf_tmp += img_stride;
+#if 0 }
+                    else {  /* L8 is neither transformed, nor recolored: copy L8 image into AL88 temporary buffer */
+                        const uint8_t* src_buf_tmp = src_buf + img_stride * relative_area.y1 + relative_area.x1 * 1;
+                        lv_color16a_t* dest_buf_tmp = tmp_buf;
+                        int32_t i, x, dest_x;
+                        for (i = 0; i < h; i++) {
+                            for (x = 0; x < blend_w; x++) {
+                                dest_buf_tmp[x].lumi = src_buf_tmp[x];
+                                dest_buf_tmp[x].alpha = 255;
+                            }
+                            dest_buf_tmp += blend_w;
+                            src_buf_tmp += img_stride;
+                        }
                     }
+#endif
                 }
                 else if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
                     uint32_t stride_px = img_stride / 2;
