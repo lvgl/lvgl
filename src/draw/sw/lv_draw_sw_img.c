@@ -355,13 +355,10 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             else if(draw_dsc->recolor_opa >= LV_OPA_MIN) {
                 int32_t h = lv_area_get_height(&relative_area);
                 if(cf == LV_COLOR_FORMAT_L8) {
-#if 0
-                    if(cf_final == LV_COLOR_FORMAT_ARGB8888) {
-#endif
                         /* L8 is recolored, but not transformed: copy L8 image into ARGB8888 temporary buffer */
                         const uint8_t * src_buf_tmp = src_buf + img_stride * relative_area.y1 + relative_area.x1 * 1;
                         lv_color32_t * dest_buf_tmp = (lv_color32_t *)tmp_buf;
-                        int32_t i, x, dest_x;
+                        int32_t i, x;
                         for(i = 0; i < h; i++) {
                             for(x = 0; x < blend_w; x++) {
                                 dest_buf_tmp[x].red = src_buf_tmp[x];
@@ -372,21 +369,6 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                             dest_buf_tmp += blend_w;
                             src_buf_tmp += img_stride;
                         }
-#if 0 }
-                        else {  /* L8 is neither transformed, nor recolored: copy L8 image into AL88 temporary buffer */
-                            const uint8_t * src_buf_tmp = src_buf + img_stride * relative_area.y1 + relative_area.x1 * 1;
-                            lv_color16a_t * dest_buf_tmp = tmp_buf;
-                            int32_t i, x, dest_x;
-                            for(i = 0; i < h; i++) {
-                                for(x = 0; x < blend_w; x++) {
-                                    dest_buf_tmp[x].lumi = src_buf_tmp[x];
-                                    dest_buf_tmp[x].alpha = 255;
-                                }
-                                dest_buf_tmp += blend_w;
-                                src_buf_tmp += img_stride;
-                            }
-                        }
-#endif
                     }
                     else if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
                         uint32_t stride_px = img_stride / 2;
