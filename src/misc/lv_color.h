@@ -74,6 +74,7 @@ typedef uint8_t lv_opa_t;
                                             (cf) == LV_COLOR_FORMAT_L8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_A8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_AL88 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
                                             (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \
                                             (cf) == LV_COLOR_FORMAT_ARGB8565 ? 24 : \
@@ -112,6 +113,11 @@ typedef struct {
     uint8_t v;
 } lv_color_hsv_t;
 
+typedef struct {
+    uint8_t lumi;
+    uint8_t alpha;
+} lv_color16a_t;
+
 enum _lv_color_format_t {
     LV_COLOR_FORMAT_UNKNOWN           = 0,
 
@@ -129,7 +135,8 @@ enum _lv_color_format_t {
     /*2 byte (+alpha) formats*/
     LV_COLOR_FORMAT_RGB565            = 0x12,
     LV_COLOR_FORMAT_ARGB8565          = 0x13,   /**< Not supported by sw renderer yet. */
-    LV_COLOR_FORMAT_RGB565A8          = 0x14    /**< Color array followed by Alpha array*/,
+    LV_COLOR_FORMAT_RGB565A8          = 0x14,   /**< Color array followed by Alpha array*/
+    LV_COLOR_FORMAT_AL88              = 0x15,   /**< L8 with alpha >*/
 
     /*3 byte (+alpha) formats*/
     LV_COLOR_FORMAT_RGB888            = 0x0F,
@@ -160,6 +167,7 @@ enum _lv_color_format_t {
     /*Color formats in which LVGL can render*/
 #if LV_COLOR_DEPTH == 8
     LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_L8,
+    LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_AL88,
 #elif LV_COLOR_DEPTH == 16
     LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_RGB565,
     LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_RGB565A8,

@@ -32,14 +32,6 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    lv_color32_t fg_saved;
-    lv_color32_t bg_saved;
-    lv_color32_t res_saved;
-    lv_opa_t res_alpha_saved;
-    lv_opa_t ratio_saved;
-} lv_color_mix_alpha_cache_t;
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -195,7 +187,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_l8(_lv_draw_sw_blend_fill_d
     /*Opacity only*/
     else if(mask == NULL && opa < LV_OPA_MAX) {
         if(LV_RESULT_INVALID == LV_DRAW_SW_COLOR_BLEND_TO_L8_WITH_OPA(dsc)) {
-            uint32_t color8 = lv_color_luminance(dsc->color);
+            uint8_t color8 = lv_color_luminance(dsc->color);
             uint8_t * dest_buf = dsc->dest_buf;
 
             for(y = 0; y < h; y++) {
