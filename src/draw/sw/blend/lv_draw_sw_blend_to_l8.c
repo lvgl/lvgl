@@ -278,7 +278,7 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(_lv_draw_sw_blend_image_dsc_t *
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {
             if(LV_RESULT_INVALID == LV_DRAW_SW_L8_BLEND_NORMAL_TO_L8(dsc)) {
                 for(y = 0; y < h; y++) {
-                    memcpy(dest_buf_l8, src_buf_l8, w);
+                    lv_memcpy(dest_buf_l8, src_buf_l8, w);
                     dest_buf_l8 = drawbuf_next_row(dest_buf_l8, dest_stride);
                     src_buf_l8 = drawbuf_next_row(src_buf_l8, src_stride);
                 }
