@@ -3,60 +3,89 @@
 
 #include "unity/unity.h"
 
-static lv_obj_t * active_screen = NULL;
-
 void setUp(void)
 {
-    active_screen = lv_screen_active();
+    /* Function run before every test */
 }
 
 void tearDown(void)
 {
-    lv_obj_clean(active_screen);
+    lv_obj_clean(lv_screen_active());
 }
 
-void test_bin_decoder_get_area_handles_width_change(void)
+static void create_image(const void * src)
 {
-    size_t start_mem = lv_test_get_free_mem();
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, src);
+    lv_obj_center(img);
+}
 
-    lv_result_t res;
-    lv_image_decoder_dsc_t dsc;
-    lv_memzero(&dsc, sizeof(dsc));
-    lv_image_decoder_t * decoder = NULL;
-    do {
-        decoder = lv_image_decoder_get_next(decoder);
-        TEST_ASSERT_NOT_NULL(decoder);
-    } while(decoder->info_cb != lv_bin_decoder_info);
-    LV_IMAGE_DECLARE(test_I1_NONE_align1);
+static void bin_decoder(const void * src, const char * screenshot)
+{
+    create_image(src);
+    TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
+    lv_obj_clean(lv_screen_active());
 
-    res = lv_bin_decoder_info(decoder, &test_I1_NONE_align1, &dsc.header);
-    TEST_ASSERT(res == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_MEMORY(&test_I1_NONE_align1.header, &dsc.header, sizeof(lv_image_header_t));
-    dsc.src = &test_I1_NONE_align1;
-    dsc.src_type = LV_IMAGE_SRC_VARIABLE;
-    dsc.decoder = decoder;
+    size_t mem_before = lv_test_get_free_mem();
+    for(uint32_t i = 0; i < 20; i++) {
+        lv_obj_clean(lv_screen_active());
+        create_image(src);
 
-    res = lv_bin_decoder_open(decoder, &dsc);
-    TEST_ASSERT(res == LV_RESULT_OK);
+        lv_obj_invalidate(lv_screen_active());
+        lv_refr_now(NULL);
+    }
+    TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
+    lv_obj_clean(lv_screen_active());
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+}
 
-    lv_area_t full_area = {0, 0, dsc.header.w - 1, dsc.header.h - 1};
-    TEST_ASSERT(lv_area_get_width(&full_area) > 0);
-    TEST_ASSERT(lv_area_get_height(&full_area) > 0);
-    lv_area_t decoded_area;
+static void create_image_tile(const void * src)
+{
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    lv_image_set_src(img, src);
+    lv_obj_center(img);
+    lv_obj_set_size(img, 275, 175);
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TILE);
+}
 
-    lv_area_set(&decoded_area, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MAX, LV_COORD_MAX);
-    res = lv_bin_decoder_get_area(decoder, &dsc, &full_area, &decoded_area);
-    TEST_ASSERT(res == LV_RESULT_OK);
+void bin_decoder_tile(const void * src, const char * screenshot)
+{
+    create_image_tile(src);
+    TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
+    lv_obj_clean(lv_screen_active());
 
-    full_area.x2--;
-    TEST_ASSERT(lv_area_get_width(&full_area) > 0);
-    lv_area_set(&decoded_area, LV_COORD_MIN, LV_COORD_MIN, LV_COORD_MAX, LV_COORD_MAX);
-    res = lv_bin_decoder_get_area(decoder, &dsc, &full_area, &decoded_area);
-    TEST_ASSERT(res == LV_RESULT_OK);
+    size_t mem_before = lv_test_get_free_mem();
+    for(uint32_t i = 0; i < 20; i++) {
+        lv_obj_clean(lv_screen_active());
+        create_image_tile(src);
 
-    lv_bin_decoder_close(decoder, &dsc);
+        lv_obj_invalidate(lv_screen_active());
+        lv_refr_now(NULL);
+    }
+    TEST_ASSERT_EQUAL_SCREENSHOT(screenshot);
+    lv_obj_clean(lv_screen_active());
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 0);
+}
 
-    TEST_ASSERT_MEM_LEAK_LESS_THAN(start_mem, 0);
+void test_bin_decoder_i4(void)
+{
+    LV_IMAGE_DECLARE(test_image_cogwheel_i4);
+    bin_decoder(&test_image_cogwheel_i4, "libs/bin_decoder_1.png");
+}
+void test_bin_decoder_i4_tile(void)
+{
+    LV_IMAGE_DECLARE(test_image_cogwheel_i4);
+    bin_decoder_tile(&test_image_cogwheel_i4, "libs/bin_decoder_2.png");
+}
+void test_bin_decoder_argb8888(void)
+{
+    LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
+    bin_decoder(&test_image_cogwheel_argb8888, "libs/bin_decoder_3.png");
+}
+void test_bin_decoder_argb8888_tile(void)
+{
+    LV_IMAGE_DECLARE(test_image_cogwheel_argb8888);
+    bin_decoder_tile(&test_image_cogwheel_argb8888, "libs/bin_decoder_4.png");
 }
 
 #endif

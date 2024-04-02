@@ -197,12 +197,19 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         *decoded_area = *full_area;
         decoded_area->y2 = decoded_area->y1;
         int32_t w_px = lv_area_get_width(full_area);
-        if(decoded && decoded->header.w != w_px) {
-            lv_draw_buf_destroy(decoded);
-            decoded = NULL;
+        lv_draw_buf_t * reshaped = lv_draw_buf_reshape(decoded, dsc->header.cf, w_px, 1, LV_STRIDE_AUTO);
+        if(reshaped == NULL) {
+            if(decoded != NULL) {
+                lv_draw_buf_destroy(decoded);
+                decoded = NULL;
+                dsc->decoded = NULL;
+            }
+            decoded = lv_draw_buf_create(w_px, 1, dsc->header.cf, LV_STRIDE_AUTO);
+            if(decoded == NULL) return LV_RESULT_INVALID;
         }
-        if(decoded == NULL) decoded = lv_draw_buf_create(w_px, 1, dsc->header.cf, LV_STRIDE_AUTO);
-        if(decoded == NULL) return LV_RESULT_INVALID;
+        else {
+            decoded = reshaped;
+        }
         dsc->decoded = decoded;
     }
     else {

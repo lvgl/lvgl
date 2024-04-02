@@ -405,17 +405,18 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         /*Indexed image is converted to ARGB888*/
         lv_color_format_t cf_decoded = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
 
-        decoded = decoder_data->decoded_partial;
-        if(decoded && decoded->header.w != w_px) {
-            lv_draw_buf_destroy(decoded);
-            decoded = NULL;
+        decoded = lv_draw_buf_reshape(decoder_data->decoded_partial, cf_decoded, w_px, 1, LV_STRIDE_AUTO);
+        if(decoded == NULL) {
+            if(decoder_data->decoded_partial != NULL) {
+                lv_draw_buf_destroy(decoder_data->decoded_partial);
+                decoder_data->decoded_partial = NULL;
+            }
+            decoded = lv_draw_buf_create(w_px, 1, cf_decoded, LV_STRIDE_AUTO);
+            if(decoded == NULL) return LV_RESULT_INVALID;
+            decoder_data->decoded_partial = decoded; /*Free on decoder close*/
         }
-        if(decoded == NULL) decoded = lv_draw_buf_create(w_px, 1, cf_decoded, LV_STRIDE_AUTO);
-        if(decoded == NULL) return LV_RESULT_INVALID;
-
         *decoded_area = *full_area;
         decoded_area->y2 = decoded_area->y1;
-        decoder_data->decoded_partial = decoded; /*Free on decoder close*/
     }
     else {
         decoded_area->y1++;
