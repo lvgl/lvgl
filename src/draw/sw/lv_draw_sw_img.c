@@ -236,22 +236,38 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     }
     /*Handle masked RGB565, RGB888, XRGB888, or ARGB8888 images*/
     else if(!transformed && masked && draw_dsc->recolor_opa <= LV_OPA_MIN) {
+        lv_image_decoder_dsc_t mask_decoder_dsc;
+        lv_area_t mask_area;
+        lv_result_t decoder_res = lv_image_decoder_open(&mask_decoder_dsc, draw_dsc->bitmap_mask_src, NULL);
+        if(decoder_res == LV_RESULT_OK && mask_decoder_dsc.decoded) {
+            if(mask_decoder_dsc.decoded->header.cf == LV_COLOR_FORMAT_A8) {
+                const lv_draw_buf_t * mask_img = mask_decoder_dsc.decoded;
+                blend_dsc.mask_buf = mask_img->data;
+                blend_dsc.mask_stride = mask_img->header.stride;
+
+                const lv_area_t * original_area;
+                if(lv_area_get_width(&draw_dsc->original_area) < 0) original_area = img_coords;
+                else original_area = &draw_dsc->original_area;
+                lv_area_set(&mask_area, 0, 0, mask_img->header.w - 1, mask_img->header.h - 1);
+                lv_area_align(original_area, &mask_area, LV_ALIGN_CENTER, 0, 0);
+                blend_dsc.mask_area = &mask_area;
+                blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+            }
+            else {
+                LV_LOG_WARN("The mask image doesn'thave A8 format. Drawing the image without mask.");
+            }
+        }
+        else {
+            LV_LOG_WARN("Couldn't decode the mask image. Drawing the image without mask.");
+        }
+
         blend_dsc.src_area = img_coords;
         blend_dsc.src_buf = src_buf;
         blend_dsc.blend_area = img_coords;
         blend_dsc.src_color_format = cf;
-        blend_dsc.mask_buf = draw_dsc->bitmap_mask_src->data;
-        blend_dsc.mask_stride = draw_dsc->bitmap_mask_src->header.stride;
-
-        const lv_area_t * original_area;
-        if(lv_area_get_width(&draw_dsc->original_area) < 0) original_area = img_coords;
-        else original_area = &draw_dsc->original_area;
-
-        lv_area_t a = {0, 0, draw_dsc->bitmap_mask_src->header.w - 1, draw_dsc->bitmap_mask_src->header.h - 1};
-        lv_area_align(original_area, &a, LV_ALIGN_CENTER, 0, 0);
-        blend_dsc.mask_area = &a;
-        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
         lv_draw_sw_blend(draw_unit, &blend_dsc);
+
+        if(decoder_res == LV_RESULT_OK) lv_image_decoder_close(&mask_decoder_dsc);
     }
     /* check whether it is possible to accelerate the operation in synchronouse mode */
     else if(LV_RESULT_INVALID == LV_DRAW_SW_IMAGE(transformed,      /* whether require transform */

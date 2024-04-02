@@ -100,6 +100,7 @@ typedef struct _lv_global_t {
     lv_tick_state_t tick_state;
 
     lv_draw_buf_handlers_t draw_buf_handlers;
+    lv_draw_buf_handlers_t font_draw_buf_handlers;
 
     lv_ll_t img_decoder_ll;
 

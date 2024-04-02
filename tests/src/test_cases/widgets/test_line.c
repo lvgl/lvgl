@@ -23,9 +23,8 @@ void tearDown(void)
 
 void test_line_should_have_valid_documented_default_values(void)
 {
-    lv_line_t * line_ptr = (lv_line_t *) line;
-    TEST_ASSERT_EQUAL_UINT16(default_point_num, line_ptr->point_num);
-    TEST_ASSERT_NULL(line_ptr->point_array);
+    TEST_ASSERT_EQUAL_UINT16(default_point_num, lv_line_get_point_count(line));
+    TEST_ASSERT_NULL(lv_line_get_points(line));
     TEST_ASSERT_FALSE(lv_line_get_y_invert(line));
     TEST_ASSERT_FALSE(lv_obj_has_flag(line, LV_OBJ_FLAG_CLICKABLE));
     /* line doesn't have any points, so it's 0,0 in size */
@@ -143,6 +142,23 @@ void test_line_dash_gap(void)
     lv_obj_align(line3, LV_ALIGN_RIGHT_MID, 0, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/line_2.png");
+}
+
+void test_line_point_array_getters_and_setters(void)
+{
+    const lv_point_precise_t points[3] = {{10, 20}, {30, 40}, {50, 60}};
+    lv_line_set_points(line, points, 3);
+    TEST_ASSERT_EQUAL_UINT32(3, lv_line_get_point_count(line));
+    TEST_ASSERT_FALSE(lv_line_is_point_array_mutable(line));
+    TEST_ASSERT_EQUAL_PTR(points, lv_line_get_points(line));
+    TEST_ASSERT_NULL(lv_line_get_points_mutable(line));
+
+    lv_point_precise_t points_mutable[2] = {{10, 20}, {30, 40}};
+    lv_line_set_points_mutable(line, points_mutable, 2);
+    TEST_ASSERT_EQUAL_UINT32(2, lv_line_get_point_count(line));
+    TEST_ASSERT_TRUE(lv_line_is_point_array_mutable(line));
+    TEST_ASSERT_EQUAL_PTR(points_mutable, lv_line_get_points(line));
+    TEST_ASSERT_EQUAL_PTR(points_mutable, lv_line_get_points_mutable(line));
 }
 
 #endif

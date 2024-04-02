@@ -644,7 +644,7 @@ static bool lv_text_get_snippet(const char * txt, const lv_font_t * font,
     uint32_t ofs = _lv_text_get_next_line(txt, font, letter_space, real_max_width, use_width, flag);
     *end_ofs = ofs;
 
-    if(txt[ofs] == '\0' && *use_width < max_width) {
+    if(txt[ofs] == '\0' && *use_width < max_width && !(ofs && (txt[ofs - 1] == '\n' || txt[ofs - 1] == '\r'))) {
         return false;
     }
     else {

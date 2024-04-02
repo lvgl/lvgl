@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.1.0
+ * Configuration file for v9.1.1-dev
  */
 
 /*
@@ -204,7 +204,7 @@
 /* VG-Lite linear gradient image maximum cache number.
  * NOTE: The memory usage of a single gradient image is 4K bytes.
  */
-#define LV_VG_LITE_LINEAER_GRAD_CACHE_CNT 32
+#define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT 32
 
 /* VG-Lite radial gradient image maximum cache size.
  * NOTE: The memory usage of a single gradient image is radial grad radius * 4 bytes.
