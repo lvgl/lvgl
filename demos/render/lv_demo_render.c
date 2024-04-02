@@ -353,10 +353,10 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         "L8",
     };
 
-    uint32_t stopAt = startAt + LV_MIN(sizeof(srcs) / sizeof(void*) - startAt, 4);
+    uint32_t stopAt = startAt + LV_MIN(sizeof(srcs) / sizeof(void *) - startAt, 4);
     uint32_t i;
-    for (i = startAt; i < stopAt; i++) {
-        lv_obj_t* obj;
+    for(i = startAt; i < stopAt; i++) {
+        lv_obj_t * obj;
         uint32_t row = i - startAt;
 
         obj = lv_label_create(parent);
@@ -410,12 +410,12 @@ static void image_recolored_1_cb(lv_obj_t * parent)
     image_core_cb(parent, true, 0);
 }
 
-static void image_normal_2_cb(lv_obj_t* parent)
+static void image_normal_2_cb(lv_obj_t * parent)
 {
     image_core_cb(parent, false, 4);
 }
 
-static void image_recolored_2_cb(lv_obj_t* parent)
+static void image_recolored_2_cb(lv_obj_t * parent)
 {
     image_core_cb(parent, true, 4);
 }

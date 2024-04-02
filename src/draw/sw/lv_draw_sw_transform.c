@@ -67,13 +67,13 @@ static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int3
                          int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                          int32_t x_end, uint8_t * abuf, bool aa);
 
-static void transform_l8_to_al88(const uint8_t* src, int32_t src_w, int32_t src_h, int32_t src_stride,
-                         int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                         int32_t x_end, uint8_t* abuf, bool aa);
+static void transform_l8_to_al88(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                                 int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                                 int32_t x_end, uint8_t * abuf, bool aa);
 
-static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t src_h, int32_t src_stride,
-                        int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                        int32_t x_end, uint8_t* abuf, bool aa);
+static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                                     int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                                     int32_t x_end, uint8_t * abuf, bool aa);
 
 /**********************
  *  STATIC VARIABLES
@@ -122,7 +122,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
     int32_t dest_stride_a8 = dest_w;
     int32_t dest_stride;
-    if (src_cf == LV_COLOR_FORMAT_L8) {
+    if(src_cf == LV_COLOR_FORMAT_L8) {
         dest_stride = dest_w * ((draw_dsc->recolor_opa >= LV_OPA_MIN) ? 4 : 2);
     }
     else if(src_cf == LV_COLOR_FORMAT_RGB888) {
@@ -240,8 +240,9 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                                    alpha_buf, true, aa);
                 break;
             case LV_COLOR_FORMAT_L8:
-                if (draw_dsc->recolor_opa >= LV_OPA_MIN)
-                    transform_l8_to_argb8888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
+                if(draw_dsc->recolor_opa >= LV_OPA_MIN)
+                    transform_l8_to_argb8888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
+                                             aa);
                 else
                     transform_l8_to_al88(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
                 break;
@@ -629,16 +630,16 @@ static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int3
 }
 
 /* L8 will be transformed into an AL88 buffer, because it will not be recolored */
-static void transform_l8_to_al88(const uint8_t* src, int32_t src_w, int32_t src_h, int32_t src_stride,
-    int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-    int32_t x_end, uint8_t* dest_buf, bool aa)
+static void transform_l8_to_al88(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                                 int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                                 int32_t x_end, uint8_t * dest_buf, bool aa)
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
-    lv_color16a_t* dest_al88 = (lv_color16a_t*)dest_buf;
+    lv_color16a_t * dest_al88 = (lv_color16a_t *)dest_buf;
 
     int32_t x;
-    for (x = 0; x < x_end; x++) {
+    for(x = 0; x < x_end; x++) {
         xs_ups = xs_ups_start + ((xs_step * x) >> 8);
         ys_ups = ys_ups_start + ((ys_step * x) >> 8);
 
@@ -646,7 +647,7 @@ static void transform_l8_to_al88(const uint8_t* src, int32_t src_w, int32_t src_
         int32_t ys_int = ys_ups >> 8;
 
         /*Fully out of the image*/
-        if (xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
             dest_al88[x].lumi = 0x00;
             dest_al88[x].alpha = 0x00;
             continue;
@@ -659,7 +660,7 @@ static void transform_l8_to_al88(const uint8_t* src, int32_t src_w, int32_t src_
 
         int32_t x_next;
         int32_t y_next;
-        if (xs_fract < 0x80) {
+        if(xs_fract < 0x80) {
             x_next = -1;
             xs_fract = (0x7F - xs_fract) * 2;
         }
@@ -667,7 +668,7 @@ static void transform_l8_to_al88(const uint8_t* src, int32_t src_w, int32_t src_
             x_next = 1;
             xs_fract = (xs_fract - 0x80) * 2;
         }
-        if (ys_fract < 0x80) {
+        if(ys_fract < 0x80) {
             y_next = -1;
             ys_fract = (0x7F - ys_fract) * 2;
         }
@@ -676,29 +677,29 @@ static void transform_l8_to_al88(const uint8_t* src, int32_t src_w, int32_t src_
             ys_fract = (ys_fract - 0x80) * 2;
         }
 
-        const uint8_t* src_tmp = src;
+        const uint8_t * src_tmp = src;
         src_tmp += ys_int * src_stride + xs_int;
         dest_al88[x].lumi = src_tmp[0];
         dest_al88[x].alpha = 255;
-        if (aa &&
-            xs_int + x_next >= 0 &&
-            xs_int + x_next <= src_w - 1 &&
-            ys_int + y_next >= 0 &&
-            ys_int + y_next <= src_h - 1) {
+        if(aa &&
+           xs_int + x_next >= 0 &&
+           xs_int + x_next <= src_w - 1 &&
+           ys_int + y_next >= 0 &&
+           ys_int + y_next <= src_h - 1) {
 
             lv_opa_t a_ver = src_tmp[x_next];
             lv_opa_t a_hor = src_tmp[y_next * src_stride];
 
-            if (a_ver != dest_al88[x].lumi) a_ver = ((a_ver * ys_fract) + (dest_al88[x].lumi * (0x100 - ys_fract))) >> 8;
-            if (a_hor != dest_al88[x].lumi) a_hor = ((a_hor * xs_fract) + (dest_al88[x].lumi * (0x100 - xs_fract))) >> 8;
+            if(a_ver != dest_al88[x].lumi) a_ver = ((a_ver * ys_fract) + (dest_al88[x].lumi * (0x100 - ys_fract))) >> 8;
+            if(a_hor != dest_al88[x].lumi) a_hor = ((a_hor * xs_fract) + (dest_al88[x].lumi * (0x100 - xs_fract))) >> 8;
             dest_al88[x].lumi = (a_ver + a_hor) >> 1;
         }
         else {
             /*Partially out of the image*/
-            if ((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
+            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
                 dest_al88[x].alpha = (src_tmp[0] * (0xFF - xs_fract)) >> 8;
             }
-            else if ((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
+            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
                 dest_al88[x].alpha = (src_tmp[0] * (0xFF - ys_fract)) >> 8;
             }
         }
@@ -707,16 +708,16 @@ static void transform_l8_to_al88(const uint8_t* src, int32_t src_w, int32_t src_
 
 /* L8 has to be transformed into an ARGB8888 buffer, because it will be recolored as well */
 #if 1
-static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t src_h, int32_t src_stride,
-    int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-    int32_t x_end, uint8_t* dest_buf, bool aa)
+static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                                     int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                                     int32_t x_end, uint8_t * dest_buf, bool aa)
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
-    lv_color32_t* dest_c32 = (lv_color32_t*)dest_buf;
+    lv_color32_t * dest_c32 = (lv_color32_t *)dest_buf;
 
     int32_t x;
-    for (x = 0; x < x_end; x++) {
+    for(x = 0; x < x_end; x++) {
         xs_ups = xs_ups_start + ((xs_step * x) >> 8);
         ys_ups = ys_ups_start + ((ys_step * x) >> 8);
 
@@ -724,8 +725,8 @@ static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t 
         int32_t ys_int = ys_ups >> 8;
 
         /*Fully out of the image*/
-        if (xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
-            *((uint32_t*)&dest_c32[x]) = 0L;
+        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+            *((uint32_t *)&dest_c32[x]) = 0L;
             continue;
         }
 
@@ -736,7 +737,7 @@ static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t 
 
         int32_t x_next;
         int32_t y_next;
-        if (xs_fract < 0x80) {
+        if(xs_fract < 0x80) {
             x_next = -1;
             xs_fract = (0x7F - xs_fract) * 2;
         }
@@ -744,7 +745,7 @@ static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t 
             x_next = 1;
             xs_fract = (xs_fract - 0x80) * 2;
         }
-        if (ys_fract < 0x80) {
+        if(ys_fract < 0x80) {
             y_next = -1;
             ys_fract = (0x7F - ys_fract) * 2;
         }
@@ -753,45 +754,45 @@ static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t 
             ys_fract = (ys_fract - 0x80) * 2;
         }
 
-        const uint8_t* src_tmp = src;
+        const uint8_t * src_tmp = src;
         src_tmp += ys_int * src_stride + xs_int;
         dest_c32[x].red = dest_c32[x].green = dest_c32[x].blue = src_tmp[0];
         dest_c32[x].alpha = 255;
-        if (aa &&
-            xs_int + x_next >= 0 &&
-            xs_int + x_next <= src_w - 1 &&
-            ys_int + y_next >= 0 &&
-            ys_int + y_next <= src_h - 1) {
+        if(aa &&
+           xs_int + x_next >= 0 &&
+           xs_int + x_next <= src_w - 1 &&
+           ys_int + y_next >= 0 &&
+           ys_int + y_next <= src_h - 1) {
 
             lv_opa_t a_ver = src_tmp[x_next];
             lv_opa_t a_hor = src_tmp[y_next * src_stride];
 
-            if (a_ver != src_tmp[0]) a_ver = ((a_ver * ys_fract) + (src_tmp[0] * (0x100 - ys_fract))) >> 8;
-            if (a_hor != src_tmp[0]) a_hor = ((a_hor * xs_fract) + (src_tmp[0] * (0x100 - xs_fract))) >> 8;
+            if(a_ver != src_tmp[0]) a_ver = ((a_ver * ys_fract) + (src_tmp[0] * (0x100 - ys_fract))) >> 8;
+            if(a_hor != src_tmp[0]) a_hor = ((a_hor * xs_fract) + (src_tmp[0] * (0x100 - xs_fract))) >> 8;
             dest_c32[x].red = dest_c32[x].green = dest_c32[x].blue = (a_ver + a_hor) >> 1;
         }
         else {
             /*Partially out of the image*/
-            if ((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
+            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
                 dest_c32[x].alpha = (src_tmp[0] * (0xFF - xs_fract)) >> 8;
             }
-            else if ((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
+            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
                 dest_c32[x].alpha = (src_tmp[0] * (0xFF - ys_fract)) >> 8;
             }
         }
     }
 }
 #else
-static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t src_h, int32_t src_stride,
-    int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-    int32_t x_end, uint8_t* dest_buf, bool aa)
+static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
+                                     int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                                     int32_t x_end, uint8_t * dest_buf, bool aa)
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
-    lv_color32_t* dest_c32 = (lv_color32_t*)dest_buf;
+    lv_color32_t * dest_c32 = (lv_color32_t *)dest_buf;
 
     int32_t x;
-    for (x = 0; x < x_end; x++) {
+    for(x = 0; x < x_end; x++) {
         xs_ups = xs_ups_start + ((xs_step * x) >> 8);
         ys_ups = ys_ups_start + ((ys_step * x) >> 8);
 
@@ -799,7 +800,7 @@ static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t 
         int32_t ys_int = ys_ups >> 8;
 
         /*Fully out of the image*/
-        if (xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
             dest_c32[x].alpha = 0x00;
             continue;
         }
@@ -811,7 +812,7 @@ static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t 
 
         int32_t x_next;
         int32_t y_next;
-        if (xs_fract < 0x80) {
+        if(xs_fract < 0x80) {
             x_next = -1;
             xs_fract = 0x7F - xs_fract;
         }
@@ -819,7 +820,7 @@ static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t 
             x_next = 1;
             xs_fract = xs_fract - 0x80;
         }
-        if (ys_fract < 0x80) {
+        if(ys_fract < 0x80) {
             y_next = -1;
             ys_fract = 0x7F - ys_fract;
         }
@@ -828,38 +829,38 @@ static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t 
             ys_fract = ys_fract - 0x80;
         }
 
-        const uint8_t* src_u8 = &src[ys_int * src_stride + xs_int];
+        const uint8_t * src_u8 = &src[ys_int * src_stride + xs_int];
 
         dest_c32[x].red = src_u8[0];
         dest_c32[x].green = src_u8[0];
         dest_c32[x].blue = src_u8[0];
         dest_c32[x].alpha = 0xff;
 
-        if (aa &&
-            xs_int + x_next >= 0 &&
-            xs_int + x_next <= src_w - 1 &&
-            ys_int + y_next >= 0 &&
-            ys_int + y_next <= src_h - 1) {
-            const uint8_t* px_hor_u8 = src_u8 + (int32_t)(x_next);
+        if(aa &&
+           xs_int + x_next >= 0 &&
+           xs_int + x_next <= src_w - 1 &&
+           ys_int + y_next >= 0 &&
+           ys_int + y_next <= src_h - 1) {
+            const uint8_t * px_hor_u8 = src_u8 + (int32_t)(x_next);
             lv_color32_t px_hor;
             px_hor.red = px_hor_u8[0];
             px_hor.green = px_hor_u8[0];
             px_hor.blue = px_hor_u8[0];
             px_hor.alpha = 0xff;
 
-            const uint8_t* px_ver_u8 = src_u8 + (int32_t)(y_next * src_stride);
+            const uint8_t * px_ver_u8 = src_u8 + (int32_t)(y_next * src_stride);
             lv_color32_t px_ver;
             px_ver.red = px_ver_u8[0];
             px_ver.green = px_ver_u8[0];
             px_ver.blue = px_ver_u8[0];
             px_ver.alpha = 0xff;
 
-            if (!lv_color32_eq(dest_c32[x], px_ver)) {
+            if(!lv_color32_eq(dest_c32[x], px_ver)) {
                 px_ver.alpha = ys_fract;
                 dest_c32[x] = lv_color_mix32(px_ver, dest_c32[x]);
             }
 
-            if (!lv_color32_eq(dest_c32[x], px_hor)) {
+            if(!lv_color32_eq(dest_c32[x], px_hor)) {
                 px_hor.alpha = xs_fract;
                 dest_c32[x] = lv_color_mix32(px_hor, dest_c32[x]);
             }
@@ -868,10 +869,10 @@ static void transform_l8_to_argb8888(const uint8_t* src, int32_t src_w, int32_t 
         else {
             lv_opa_t a = 0xff;
 
-            if ((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
+            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
                 dest_c32[x].alpha = (a * (0xFF - xs_fract)) >> 8;
             }
-            else if ((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
+            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
                 dest_c32[x].alpha = (a * (0xFF - ys_fract)) >> 8;
             }
         }
