@@ -463,7 +463,11 @@ extern "C" {
         vg_lite_uint32_t stride = VG_LITE_ALIGN((buffer->width * mul / div), align);
 
         buffer->stride = stride;
+#ifndef _WIN32
         buffer->memory = aligned_alloc(LV_VG_LITE_THORVG_BUF_ADDR_ALIGN, stride * buffer->height);
+#else
+        buffer->memory = _aligned_malloc(stride * buffer->height, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN);
+#endif
         LV_ASSERT(buffer->memory);
         buffer->address = (vg_lite_uint32_t)(uintptr_t)buffer->memory;
         buffer->handle = buffer->memory;
@@ -473,7 +477,11 @@ extern "C" {
     vg_lite_error_t vg_lite_free(vg_lite_buffer_t * buffer)
     {
         LV_ASSERT(buffer->memory);
+#ifndef _WIN32
         free(buffer->memory);
+#else
+        _aligned_free(buffer->memory);
+#endif
         memset(buffer, 0, sizeof(vg_lite_buffer_t));
         return VG_LITE_SUCCESS;
     }

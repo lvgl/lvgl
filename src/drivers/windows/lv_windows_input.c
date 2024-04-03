@@ -9,6 +9,7 @@
 
 #include "lv_windows_input.h"
 #if LV_USE_WINDOWS
+#pragma GCC diagnostic ignored "-Wcast-function-type"
 
 #include "lv_windows_context.h"
 #include "lv_windows_display.h"
@@ -557,6 +558,8 @@ bool lv_windows_keypad_device_window_message_handler(
     LPARAM lParam,
     LRESULT * plResult)
 {
+    LV_UNUSED(lParam);
+
     switch(uMsg) {
         case WM_KEYDOWN:
         case WM_KEYUP: {
@@ -791,6 +794,8 @@ bool lv_windows_encoder_device_window_message_handler(
     LPARAM lParam,
     LRESULT * plResult)
 {
+    LV_UNUSED(lParam);
+
     switch(uMsg) {
         case WM_MBUTTONDOWN:
         case WM_MBUTTONUP: {

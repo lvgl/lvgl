@@ -27,6 +27,17 @@ jobs:
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build
 
+  build-windows:
+    runs-on: windows-latest
+    name: Build Windows
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ammaraskar/gcc-problem-matcher@master # remove after switching to MSVC
+    - name: Install prerequisites
+      run: scripts\install-prerequisites.bat
+    - name: Build
+      run: python tests/main.py build
+
   test-native:
     runs-on: ubuntu-latest
     name: amd64 Executable Tests

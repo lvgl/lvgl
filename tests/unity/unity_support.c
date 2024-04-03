@@ -437,7 +437,11 @@ static void create_folders_if_needed(const char * path)
 
         if(stat(current_path, &st) != 0) {
             // Folder doesn't exist, create it
+#ifndef _WIN32
             if(mkdir(current_path, 0777) != 0) {
+#else
+            if(mkdir(current_path) != 0) {
+#endif
                 perror("Error creating folder");
                 free(pathCopy);
                 exit(EXIT_FAILURE);

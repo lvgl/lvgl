@@ -7,6 +7,12 @@ if(ESP_PLATFORM)
 else()
 
 cmake_minimum_required(VERSION 3.16)
+
+if(WIN32)
+    set(VCPKG_TARGET_TRIPLET "x64-windows")
+    include($ENV{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake)
+endif()
+
 project(lvgl_tests LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 99)
@@ -244,9 +250,11 @@ set(generate_test_runner_rb
     ${CMAKE_CURRENT_SOURCE_DIR}/unity/generate_test_runner.rb)
 set(generate_test_runner_config ${CMAKE_CURRENT_SOURCE_DIR}/config.yml)
 
-# libjpeg is required for the jpeg test case
-find_package(JPEG REQUIRED)
-include_directories(${JPEG_INCLUDE_DIR})
+if(NOT WIN32)
+    # libjpeg is required for the jpeg test case
+    find_package(JPEG REQUIRED)
+    include_directories(${JPEG_INCLUDE_DIR})
+endif()
 
 # libpng is required for the png test case
 find_package(PNG REQUIRED)
@@ -285,6 +293,11 @@ endif()
 # If we are running on mac, set LV_USE_LINUX_FBDEV to 0
 if(APPLE)
     add_definitions(-DLV_USE_LINUX_FBDEV=0)
+endif()
+
+if(WIN32)
+    add_definitions(-DLV_USE_LINUX_FBDEV=0)
+    add_definitions(-DLV_USE_WINDOWS=1)
 endif()
 
 # disable test targets for build only tests

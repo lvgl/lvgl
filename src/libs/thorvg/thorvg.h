@@ -13,6 +13,7 @@
 
 #include "../../lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
+#define TVG_BUILD 1
 
 
 #ifndef _THORVG_H_
