@@ -51,7 +51,40 @@ category.
      }
    }
 
+
+Mouse cursor
+~~~~~~~~~~~~
+
 To set a mouse cursor use :cpp:expr:`lv_indev_set_cursor(indev, &img_cursor)`.
+
+Crown behavior
+~~~~~~~~~~~~~~
+
+The "Crown" is a rotary device typically found on smart watches.
+
+When the user clicks somewhere and after that turns the rotary
+the last clicked widget will be either scrolled or it's value will be incremented/decremented
+(e.g. in case of a slider).
+
+As this behavior is tightly related to the last clicked widget, the crown support is
+an extension of the pointer input device.  Just set ``data->diff`` to the number of
+turned steps and LVGL will automatically send :cpp:enum:`LV_EVENT_ROTARY` or scroll the widget based on the
+``editable`` flag in the widget's class. Non-editable widgets are scrolled and for editable widgets the event is sent.
+
+To get the steps in an event callback use :cpp:func:`int32_t diff = lv_event_get_rotary_diff(e)`
+
+The rotary sensitivity can be adjusted on 2 levels:
+
+1. In the input device by the `indev->rotary_sensitvity` element (1/256 unit)
+2. By the `rotary_sensitivity` style property in the widget (1/256 unit)
+
+The final diff is calculated like this:
+
+``diff_final = diff_in * (indev_sensitivity / 256) +  (widget_sensitivity / 256); ``
+
+For example, if both the indev and widget sensitivity is set to 128 (0.5), the input diff. will be
+multiplied by 0.25 (divided by 4). The value of the widget will be incremented by this value or
+the widget will be scrolled this amount of pixels.
 
 Keypad or keyboard
 ------------------

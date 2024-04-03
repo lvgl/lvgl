@@ -9,7 +9,6 @@
 #include "lv_ime_pinyin.h"
 #if LV_USE_IME_PINYIN != 0
 
-#include <stdio.h>
 #include "../../lvgl.h"
 
 /*********************
@@ -627,7 +626,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
             uint16_t tmp_button_str_len = lv_strlen(pinyin_ime->input_char);
             if((btn_id >= 16) && (tmp_button_str_len > 0) && (btn_id < (16 + LV_IME_PINYIN_K9_CAND_TEXT_NUM))) {
                 lv_memzero(pinyin_ime->input_char, sizeof(pinyin_ime->input_char));
-                strcat(pinyin_ime->input_char, txt);
+                lv_strcat(pinyin_ime->input_char, txt);
                 pinyin_input_proc(obj);
 
                 for(int index = 0; index < (pinyin_ime->ta_count + tmp_button_str_len); index++) {
@@ -706,7 +705,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
         }
         else if((pinyin_ime->mode == LV_IME_PINYIN_MODE_K26) && ((txt[0] >= 'a' && txt[0] <= 'z') || (txt[0] >= 'A' &&
                                                                                                       txt[0] <= 'Z'))) {
-            strcat(pinyin_ime->input_char, txt);
+            lv_strcat(pinyin_ime->input_char, txt);
             pinyin_input_proc(obj);
             pinyin_ime->ta_count++;
         }

@@ -1,5 +1,6 @@
 #define LV_MEM_SIZE                     (32 * 1024 * 1024)
 #define LV_DRAW_SW_SHADOW_CACHE_SIZE    8
+#define LV_DRAW_THREAD_STACKSIZE    (128 * 1024) /*Increase stack size to 128kB in order to run Thorvg*/
 #define LV_USE_LOG              1
 #define LV_LOG_LEVEL            LV_LOG_LEVEL_TRACE
 #define LV_LOG_PRINTF           1
@@ -56,6 +57,7 @@
 #define LV_USE_FS_MEMFS     1
 #define LV_FS_MEMFS_LETTER  'M'
 
+#define LV_USE_MONKEY       1
 #define LV_USE_RLE          1
 #define LV_USE_LODEPNG      1
 #define LV_USE_LIBPNG       1

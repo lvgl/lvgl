@@ -536,6 +536,13 @@ void * lv_display_get_user_data(lv_display_t * disp);
 void * lv_display_get_driver_data(lv_display_t * disp);
 lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp);
 
+/**
+ * Rotate an area in-place according to the display's rotation
+ * @param disp      pointer to a display
+ * @param area      pointer to an area to rotate
+ */
+void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
+
 /**********************
  *      MACROS
  **********************/

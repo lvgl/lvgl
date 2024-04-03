@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.0.0
+# Kconfig file for LVGL v9.1.0
 
 menu "LVGL configuration"
 
@@ -197,6 +197,11 @@ menu "LVGL configuration"
 				> 1 requires an operating system enabled in `LV_USE_OS`
 				> 1 means multiply threads will render the screen in parallel
 
+		config LV_DRAW_THREAD_STACKSIZE
+			int "stack size of draw thread in byte"
+			default 32768
+			depends on LV_USE_OS > 0
+			
 		config LV_USE_DRAW_ARM2D_SYNC
 			bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors"
 			default n
@@ -206,7 +211,7 @@ menu "LVGL configuration"
 
 		config LV_USE_NATIVE_HELIUM_ASM
 			bool "Enable native helium assembly"
-			default y
+			default n
 			depends on LV_USE_DRAW_SW
 			help
 				Disabling this allows arm2d to work on its own (for testing only)
@@ -334,6 +339,20 @@ menu "LVGL configuration"
 			help
 				which usually improves performance,
 				but does not guarantee the same rendering quality as the software.
+
+		config LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+			int "VG-Lite linear gradient image maximum cache number."
+			default 32
+			depends on LV_USE_DRAW_VG_LITE
+			help
+				The memory usage of a single gradient image is 4K bytes.
+
+		config LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
+			int "VG-Lite radial gradient image maximum cache number."
+			default 32
+			depends on LV_USE_DRAW_VG_LITE
+			help
+				The memory usage of a single gradient image is radial grad radius * 4 bytes.
 
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
@@ -914,9 +933,6 @@ menu "LVGL configuration"
 		config LV_USE_MSGBOX
 			bool "Msgbox"
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_OBSERVER
-			bool "Observer"
-			default n
 		config LV_USE_ROLLER
 			bool "Roller. Requires: lv_label"
 			imply LV_USE_LABEL
@@ -1066,6 +1082,13 @@ menu "LVGL configuration"
 			default 0
 			depends on LV_USE_FS_LITTLEFS
 
+		config LV_USE_FS_ARDUINO_ESP_LITTLEFS
+			bool "File system on top of Arduino ESP littlefs API"
+		config LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			default 0
+			depends on LV_USE_FS_ARDUINO_ESP_LITTLEFS
+
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
 
@@ -1122,6 +1145,7 @@ menu "LVGL configuration"
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
+	
 		config LV_USE_THORVG
 			bool "ThorVG library"
 			choice
@@ -1227,10 +1251,6 @@ menu "LVGL configuration"
 				bool "Center"
 		endchoice
 
-		config LV_USE_MONKEY
-			bool "Enable Monkey test"
-			default n
-
 		config LV_USE_PROFILER
 			bool "Runtime performance profiler"
 		config LV_USE_PROFILER_BUILTIN
@@ -1246,6 +1266,10 @@ menu "LVGL configuration"
 			depends on LV_USE_PROFILER
 			default "lvgl/src/misc/lv_profiler_builtin.h"
 
+		config LV_USE_MONKEY
+			bool "Enable Monkey test"
+			default n
+
 		config LV_USE_GRIDNAV
 			bool "Enable grid navigation"
 			default n
@@ -1255,8 +1279,12 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_IMGFONT
-			bool "draw image in label or span obj"
+			bool "Support using images as font in label or span widgets"
 			default n
+
+		config LV_USE_OBSERVER
+			bool "Observer"
+			default y
 
 		config LV_USE_IME_PINYIN
 			bool "Enable Pinyin input method"
@@ -1356,6 +1384,24 @@ menu "LVGL configuration"
 			bool "Exit the application when all SDL windows are closed"
 			depends on LV_USE_SDL
 			default y
+
+		choice
+			prompt "SDL mousewheel mode"
+			depends on LV_USE_SDL
+			default LV_SDL_MOUSEWHEEL_MODE_ENCODER
+
+			config LV_SDL_MOUSEWHEEL_MODE_ENCODER
+				bool "The mousewheel emulates an encoder input device"
+
+			config LV_SDL_MOUSEWHEEL_MODE_CROWN
+				bool "The mousewheel emulates a smart watch crown"
+		endchoice
+
+		config LV_SDL_MOUSEWHEEL_MODE
+			int
+			depends on LV_USE_SDL
+			default 0 if LV_SDL_MOUSEWHEEL_MODE_ENCODER
+			default 1 if LV_SDL_MOUSEWHEEL_MODE_CROWN
 
 		config LV_USE_X11
 			bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"

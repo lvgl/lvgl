@@ -69,6 +69,9 @@ struct _lv_indev_t {
     /**< Repeated trigger period in long press [ms]*/
     uint16_t long_press_repeat_time;
 
+    /**< Rotary diff count will be multiplied by this value and divided by 256*/
+    int32_t rotary_sensitvity;
+
     struct {
         /*Pointer and button data*/
         lv_point_t act_point; /**< Current point of input device.*/
@@ -84,6 +87,7 @@ struct _lv_indev_t {
         lv_obj_t * last_pressed; /*The lastly pressed object*/
         lv_area_t scroll_area;
         lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
+        int32_t diff;
 
         /*Flags*/
         lv_dir_t scroll_dir : 4;
@@ -100,13 +104,21 @@ struct _lv_indev_t {
     lv_group_t * group;   /**< Keypad destination group*/
     const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
                                       here by the buttons*/
-
     lv_event_list_t event_list;
     lv_anim_t * scroll_throw_anim;
 };
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Find a scrollable object based on the current scroll vector in the indev.
+ * In handles scroll propagation to the parent if needed, and scroll directions too.
+ * @param indev     pointer to an indev
+ * @return          the found scrollable object or NULL if not found.
+ */
+lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev);
 
 /**********************
  *      MACROS

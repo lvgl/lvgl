@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
 #include "lv_bidi.h"
 #include "lv_text_private.h"
+#include "lv_types.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
 

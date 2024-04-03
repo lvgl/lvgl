@@ -16,8 +16,6 @@ extern "C" {
 #include "../../osal/lv_os.h"
 #include "../lv_types.h"
 #include "lv_cache_private.h"
-#include <stdbool.h>
-#include <stdlib.h>
 /*********************
  *      DEFINES
  *********************/

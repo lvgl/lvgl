@@ -200,7 +200,7 @@ void lv_init(void)
     _lv_sysmon_builtin_init();
 #endif
 
-    _lv_image_decoder_init();
+    _lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
 #if LV_USE_DRAW_VG_LITE
@@ -266,6 +266,10 @@ void lv_init(void)
 
 #if LV_USE_FS_LITTLEFS
     lv_fs_littlefs_init();
+#endif
+
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    lv_fs_arduino_esp_littlefs_init();
 #endif
 
 #if LV_USE_LODEPNG

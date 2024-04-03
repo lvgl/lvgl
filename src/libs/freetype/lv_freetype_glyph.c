@@ -170,7 +170,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
     }
 
     dsc_out->is_placeholder = glyph_index == 0;
-    dsc_out->glyph_index = glyph_index;
+    dsc_out->gid.index = (uint32_t)glyph_index;
 
     return true;
 }

@@ -1019,7 +1019,7 @@ static size_t get_cell_txt_len(const char * txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     retval = sizeof(lv_table_cell_t) + _lv_text_ap_calc_bytes_count(txt) + 1;
 #else
-    retval = sizeof(lv_table_cell_t) + strlen(txt) + 1;
+    retval = sizeof(lv_table_cell_t) + lv_strlen(txt) + 1;
 #endif
 
     return retval;
@@ -1031,7 +1031,7 @@ static void copy_cell_txt(lv_table_cell_t * dst, const char * txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_text_ap_proc(txt, dst->txt);
 #else
-    strcpy(dst->txt, txt);
+    lv_strcpy(dst->txt, txt);
 #endif
 }
 

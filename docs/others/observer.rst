@@ -272,14 +272,11 @@ Set an object state if an integer subject's value is not equal to a reference va
 
     observer = lv_obj_bind_state_if_not_eq(obj, &subject, LV_STATE_*, ref_value);
 
-Button
-------
-
-Set an integer subject to 1 when a button is checked and set it 0 when unchecked.
+Set an integer subject to 1 when an object is checked and set it 0 when unchecked.
 
 .. code:: c
 
-    observer = lv_button_bind_checked(obj, &subject);
+    observer = lv_obj_bind_checked(obj, &subject);
 
 Label
 -----
