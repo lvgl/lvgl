@@ -2,6 +2,7 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+#include "../../../src/misc/lv_text_private.h"
 #include <string.h>
 
 void test_txt_should_insert_string_into_another(void)
