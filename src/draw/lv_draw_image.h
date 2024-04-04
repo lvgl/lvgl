@@ -102,6 +102,9 @@ lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task);
  * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the image
+ * @note                `coords` can be small than the real image area
+ *                      (if only a part of the image is rendered)
+ *                      or can be larger (in case of tiled images).   .
  */
 void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
@@ -109,7 +112,9 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
  * Create a draw task to blend a layer to an other layer
  * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized draw descriptor
- * @param coords        the coordinates of the layer
+ * @param coords        the coordinates of the layer.
+ * @note                `coords` can be small than the total widget area from which the layer is created
+ *                      (if only a part of the widget was rendered to a layer)
  */
 void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
