@@ -399,7 +399,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     char * bidi_txt;
 
 #if LV_USE_BIDI
-    uint32_t txt_len;
+    uint32_t txt_len = 0;
     if(bidi) {
         bidi_txt = lv_malloc(new_line_start - line_start + 1);
         txt_len = new_line_start - line_start;
