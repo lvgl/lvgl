@@ -245,11 +245,11 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                 blend_dsc.mask_buf = mask_img->data;
                 blend_dsc.mask_stride = mask_img->header.stride;
 
-                const lv_area_t * original_area;
-                if(lv_area_get_width(&draw_dsc->original_area) < 0) original_area = img_coords;
-                else original_area = &draw_dsc->original_area;
+                const lv_area_t * image_area;
+                if(lv_area_get_width(&draw_dsc->image_area) < 0) image_area = img_coords;
+                else image_area = &draw_dsc->image_area;
                 lv_area_set(&mask_area, 0, 0, mask_img->header.w - 1, mask_img->header.h - 1);
-                lv_area_align(original_area, &mask_area, LV_ALIGN_CENTER, 0, 0);
+                lv_area_align(image_area, &mask_area, LV_ALIGN_CENTER, 0, 0);
                 blend_dsc.mask_area = &mask_area;
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             }

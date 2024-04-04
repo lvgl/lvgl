@@ -59,9 +59,11 @@ typedef struct _lv_draw_image_dsc_t {
     uint16_t tile               : 1;
     lv_draw_image_sup_t * sup;
 
-    /** Might be used to indicate the original size of the image if only a small portion is rendered now.
-     * Used when a part of a layer is rendered to show the total layer size*/
-    lv_area_t original_area;
+    /** Used to indicate the original position size of the image.
+     * It's important for
+     *  1. layer rendering where it might happen the only a smaller area of the layer is rendered.
+     *  2. tiled images where the target draw area is larger then the image to tile.*/
+    lv_area_t image_area;
     const lv_image_dsc_t * bitmap_mask_src;
 } lv_draw_image_dsc_t;
 
