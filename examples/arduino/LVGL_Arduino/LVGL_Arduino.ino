@@ -59,15 +59,6 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
 
     if(!touched) {
         data->state = LV_INDEV_STATE_RELEASED;
-        
-        // initially, data->point.x == hor. res and data->point.y == ver. res,
-        // which would lead to continous warnings from lv_indev.c until first touch
-        if((data->point.x < 0) || (data->point.x >= TFT_HOR_RES)) {
-            data->point.x = 0;
-        }
-        if((data->point.y < 0) || (data->point.y >= TFT_VER_RES)) {
-            data->point.y = 0;
-        }
     } else {
         data->state = LV_INDEV_STATE_PRESSED;
 
