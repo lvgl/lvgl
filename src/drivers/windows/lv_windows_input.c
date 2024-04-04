@@ -13,6 +13,7 @@
 
 #include "lv_windows_context.h"
 #include "lv_windows_display.h"
+#include "lv_windows_input_private.h"
 
 #include <windowsx.h>
 

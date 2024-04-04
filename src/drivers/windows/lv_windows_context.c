@@ -12,7 +12,7 @@
 #pragma GCC diagnostic ignored "-Wcast-function-type"
 
 #include "lv_windows_display.h"
-#include "lv_windows_input.h"
+#include "lv_windows_input_private.h"
 
 /*********************
  *      DEFINES

@@ -70,27 +70,6 @@ lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display);
 */
 lv_indev_t * lv_windows_acquire_encoder_indev(lv_display_t * display);
 
-bool lv_windows_pointer_device_window_message_handler(
-    HWND hWnd,
-    UINT uMsg,
-    WPARAM wParam,
-    LPARAM lParam,
-    LRESULT * plResult);
-
-bool lv_windows_keypad_device_window_message_handler(
-    HWND hWnd,
-    UINT uMsg,
-    WPARAM wParam,
-    LPARAM lParam,
-    LRESULT * plResult);
-
-bool lv_windows_encoder_device_window_message_handler(
-    HWND hWnd,
-    UINT uMsg,
-    WPARAM wParam,
-    LPARAM lParam,
-    LRESULT * plResult);
-
 /**********************
  *      MACROS
  **********************/
