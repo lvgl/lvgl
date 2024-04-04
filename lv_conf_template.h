@@ -114,7 +114,7 @@
 #define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)   /*[bytes]*/
 
 /* The stack size of the drawing thread.
- * NOTE: FreeType req. stack size >= 24KB.
+ * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
  */
 #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /*[bytes]*/
 

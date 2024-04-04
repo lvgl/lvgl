@@ -306,7 +306,7 @@
 #endif
 
 /* The stack size of the drawing thread.
- * NOTE: FreeType req. stack size >= 24KB.
+ * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
  */
 #ifndef LV_DRAW_THREAD_STACK_SIZE
     #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
@@ -3303,8 +3303,8 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
 #if LV_USE_OS
-    #if LV_USE_FREETYPE && LV_DRAW_THREAD_STACK_SIZE < (24 * 1024)
-        #warning "LV_DRAW_THREAD_STACK_SIZE is too small for FreeType. Please increase it to at least 24KB"
+    #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (24 * 1024)
+        #warning "LV_DRAW_THREAD_STACK_SIZE is too small for FreeType or ThorVG. It recommended to set it to 32KB or more."
     #endif
 #endif
 

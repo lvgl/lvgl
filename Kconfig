@@ -188,7 +188,7 @@ menu "LVGL configuration"
 			default 8192
 			depends on LV_USE_OS > 0
 			help
-				FreeType req. stack size >= 24KB.
+				If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
 
 		config LV_USE_DRAW_SW
 			bool "Enable software rendering"
