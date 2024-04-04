@@ -51,6 +51,8 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     target_link_libraries(lvgl_thorvg PUBLIC lvgl)
 endif()
 
+set_source_files_properties(${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/vg_lite_tvg.cpp PROPERTIES COMPILE_FLAGS -Wunused-parameter)
+
 # Build LVGL example library
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
     add_library(lvgl_examples ${EXAMPLE_SOURCES})
