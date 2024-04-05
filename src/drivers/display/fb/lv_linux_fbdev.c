@@ -314,7 +314,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
     uint32_t color_pos =
         area->x1 * px_size +
-        area->y1 * dsc->vinfo.xres * px_size;
+        area->y1 * disp->hor_res * px_size;
     uint32_t fb_pos =
         (area->x1 + dsc->vinfo.xoffset) * px_size +
         (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
@@ -325,7 +325,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         for(y = area->y1; y <= area->y2; y++) {
             lv_memcpy(&fbp[fb_pos], &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
-            color_pos += dsc->vinfo.xres * px_size;
+            color_pos += disp->hor_res * px_size;
         }
     }
     else {
