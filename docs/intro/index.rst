@@ -193,7 +193,6 @@ LVGL doesn't start, randomly crashes or nothing is drawn on the display. What ca
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Try increasing :c:macro:`LV_MEM_SIZE`.
-* Be sure :cpp:type:`lv_display_t`, :cpp:type:`lv_indev_t` and :cpp:type:`lv_fs_drv_t` are global or `static`.
 * Be sure your display works without LVGL. E.g. paint it to red on start up.
 * Enable :ref:`logging`
 * Enable asserts in ``lv_conf.h`` (`LV_USE_ASSERT_...`)
