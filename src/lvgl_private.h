@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
+#include "drivers/windows/lv_windows_input_private.h"
 
 /*********************
  *      DEFINES
