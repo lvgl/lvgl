@@ -18,7 +18,7 @@
 /*Set to your screen resolution and rotation*/
 #define TFT_HOR_RES   320
 #define TFT_VER_RES   240
-#define TFT_ROTATION  0
+#define TFT_ROTATION  LV_DISPLAY_ROTATION_0
 
 /*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
 #define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
@@ -68,11 +68,6 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
      */
 }
 
-// would be better to have this in lv_tft_espi.h
-typedef struct {
-    TFT_eSPI * tft;
-} lv_tft_espi_t;
-
 void setup()
 {
     String LVGL_Arduino = "Hello Arduino! ";
@@ -95,7 +90,7 @@ void setup()
 #if LV_USE_TFT_ESPI
     /*TFT_eSPI can be enabled lv_conf.h to initialize the display in a simple way*/
     disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
-    ((lv_tft_espi_t *)(lv_display_get_driver_data(disp)))->tft->setRotation(TFT_ROTATION);
+    lv_display_set_rotation(disp, TFT_ROTATION);
 
 #else
     /*Else create a display yourself*/
