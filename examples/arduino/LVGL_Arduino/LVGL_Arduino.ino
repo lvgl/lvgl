@@ -68,7 +68,7 @@ void my_touchpad_read( lv_indev_t * indev, lv_indev_data_t * data )
 }
 
 /*use Arduinos millis() as tick source*/
-uint32_t my_tick(void)
+static uint32_t my_tick(void)
 {
     return millis();
 }
