@@ -45,7 +45,6 @@ static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, l
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-#include <stdio.h>
 
 void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
 {
@@ -206,7 +205,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
 
             int32_t i;
             for(i = 0; i < blend_w; i++) {
-                mask_buf[i] = (uint32_t)((uint32_t)mask_buf[i] * img_mask_tmp[i]) >> 8;
+                mask_buf[i] = LV_OPA_MIX2(mask_buf[i], img_mask_tmp[i]);
             }
             if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) {
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
