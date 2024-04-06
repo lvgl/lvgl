@@ -1252,12 +1252,12 @@ static void indev_proc_release(lv_indev_t * indev)
         lv_obj_t ** last = &indev->pointer.last_hovered;
         lv_obj_t * hovered = NULL;
         uint8_t layers = 4;
-        while(!hved && layers) {
-            hved = lv_indev_search_obj(*layer++, &indev->pointer.act_point);
-            if(*last != hved) {
-                if(lv_obj_is_valid(hved)) lv_obj_send_event(hved, LV_EVENT_HOVER_OVER, indev_act);
-                if(lv_obj_is_valid(*last)) lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev_act);
-                *last = hved;
+        while(!hovered && layers) {
+            hovered = lv_indev_search_obj(*layer++, &indev->pointer.act_point);
+            if(*last != hovered) {
+                lv_obj_send_event(hovered, LV_EVENT_HOVER_OVER, indev_act);
+                lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev_act);
+                *last = hovered;
             }
             layers--;
         }
@@ -1401,7 +1401,8 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
     if(indev->reset_query) {
         indev->pointer.act_obj           = NULL;
         indev->pointer.last_obj          = NULL;
-        indev->pointer.scroll_obj          = NULL;
+        indev->pointer.scroll_obj        = NULL;
+        indev->pointer.last_hovered      = NULL;
         indev->long_pr_sent                    = 0;
         indev->pr_timestamp                    = 0;
         indev->longpr_rep_timestamp            = 0;
@@ -1592,6 +1593,9 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj)
                 lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
                 scroll_obj = NULL;
             }
+        }
+        if(obj == NULL || indev->pointer.last_hovered == obj) {
+            indev->pointer.last_hovered = NULL;
         }
     }
 }
