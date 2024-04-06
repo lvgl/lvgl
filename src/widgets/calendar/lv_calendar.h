@@ -53,9 +53,9 @@ typedef struct {
     char nums [7 * 6][20];
 #else
     /* 7 * 6: A week has 7 days, and the calendar displays 6 weeks in total.
-       20: Including the number of dates, and reserving several spaces for
+       6: Including the number of dates, and reserving several spaces for
        addresses.*/
-    char nums [7 * 6][4];/**/
+    char nums [7 * 6][4];
 #endif
 } lv_calendar_t;
 
