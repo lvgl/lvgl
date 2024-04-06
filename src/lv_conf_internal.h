@@ -576,17 +576,6 @@
  *=======================*/
 
 /*-------------
- * Hover
- *-----------*/
-#ifndef LV_USE_HOVER
-    #ifdef CONFIG_LV_USE_HOVER
-        #define LV_USE_HOVER CONFIG_LV_USE_HOVER
-    #else
-        #define LV_USE_HOVER 0
-    #endif
-#endif
-
-/*-------------
  * Logging
  *-----------*/
 

@@ -657,32 +657,12 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         LV_LOG_WARN("Y is %d which is greater than ver. res", (int)data->point.y);
     }
 
-#if LV_USE_HOVER
-    if((i->pointer.last_point.x != data->point.x || i->pointer.last_point.y != data->point.y)) {
-        /*Move the cursor if set and moved*/
-        if(i->cursor != NULL) lv_obj_set_pos(i->cursor, data->point.x, data->point.y);
-        /*Hover detection*/
-        lv_obj_t * layer[3];   //except layer bottom
-        layer[0] = lv_layer_sys();
-        layer[1] = lv_layer_top();
-        layer[2] = lv_screen_active();
-        lv_obj_t ** last = lv_global.hv_last;
-        for(uint8_t h = 0; h < 3; h++, last++) {
-            lv_obj_t * hv = lv_indev_search_obj(layer[h], &data->point);
-            if(*last != hv) {
-                if(lv_obj_is_valid(hv)) lv_obj_send_event(hv, LV_EVENT_HOVERED, i);
-                if(lv_obj_is_valid(*last)) lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, i);
-                *last = hv;
-            }
-        }
-    }
-#else
     /*Move the cursor if set and moved*/
     if(i->cursor != NULL &&
        (i->pointer.last_point.x != data->point.x || i->pointer.last_point.y != data->point.y)) {
         lv_obj_set_pos(i->cursor, data->point.x, data->point.y);
     }
-#endif
+
     i->pointer.act_point.x = data->point.x;
     i->pointer.act_point.y = data->point.y;
     i->pointer.diff = data->enc_diff;
@@ -699,7 +679,6 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     i->pointer.last_point.x = i->pointer.act_point.x;
     i->pointer.last_point.y = i->pointer.act_point.y;
-
 }
 
 /**
@@ -1267,6 +1246,23 @@ static void indev_proc_press(lv_indev_t * indev)
  */
 static void indev_proc_release(lv_indev_t * indev)
 {
+    if((indev->pointer.last_point.x != indev->pointer.act_point.x ||
+        indev->pointer.last_point.y != indev->pointer.act_point.y)) {
+        lv_obj_t ** layer = &indev->disp->sys_layer;
+        lv_obj_t ** last = &indev->pointer.last_hovered;
+        lv_obj_t * hved = NULL;
+        uint8_t layers = 4;
+        while(!hved && layers) {
+            hved = lv_indev_search_obj(*layer++, &indev->pointer.act_point);
+            if(*last != hved) {
+                if(lv_obj_is_valid(hved)) lv_obj_send_event(hved, LV_EVENT_HOVER_OVER, indev_act);
+                if(lv_obj_is_valid(*last)) lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev_act);
+                *last = hved;
+            }
+            layers--;
+        }
+    }
+
     if(indev->wait_until_release) {
         lv_obj_send_event(indev->pointer.act_obj, LV_EVENT_PRESS_LOST, indev_act);
         if(indev_reset_check(indev)) return;

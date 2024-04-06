@@ -194,7 +194,7 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
        e->code == LV_EVENT_FOCUSED ||
        e->code == LV_EVENT_DEFOCUSED ||
        e->code == LV_EVENT_LEAVE ||
-       e->code == LV_EVENT_HOVERED ||
+       e->code == LV_EVENT_HOVER_OVER ||
        e->code == LV_EVENT_HOVER_LEAVE) {
         return lv_event_get_param(e);
     }

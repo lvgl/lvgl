@@ -712,7 +712,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
         lv_obj_remove_state(obj, LV_STATE_SCROLLED);
     }
-    else if(code == LV_EVENT_HOVERED) {
+    else if(code == LV_EVENT_HOVER_OVER) {
         lv_obj_add_state(obj, LV_STATE_HOVERED);
     }
     else if(code == LV_EVENT_HOVER_LEAVE) {
