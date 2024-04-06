@@ -1250,7 +1250,7 @@ static void indev_proc_release(lv_indev_t * indev)
         indev->pointer.last_point.y != indev->pointer.act_point.y)) {
         lv_obj_t ** layer = &indev->disp->sys_layer;
         lv_obj_t ** last = &indev->pointer.last_hovered;
-        lv_obj_t * hved = NULL;
+        lv_obj_t * hovered = NULL;
         uint8_t layers = 4;
         while(!hved && layers) {
             hved = lv_indev_search_obj(*layer++, &indev->pointer.act_point);
