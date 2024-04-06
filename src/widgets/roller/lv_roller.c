@@ -10,6 +10,7 @@
 #if LV_USE_ROLLER != 0
 
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_text_private.h"
 #include "../../draw/lv_draw.h"
 #include "../../core/lv_group.h"
 #include "../../indev/lv_indev.h"
@@ -678,7 +679,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
 
             uint32_t letter_cnt = 0;
             for(letter_cnt = 0; letter_cnt < letter_i; letter_cnt++) {
-                uint32_t letter = _lv_text_encoded_next(txt, &i);
+                uint32_t letter = lv_text_encoded_next(txt, &i);
                 /*Count he lines to reach the clicked letter. But ignore the last '\n' because it
                  * still belongs to the clicked line*/
                 if(letter == '\n' && i_prev != letter_i) new_opt++;
