@@ -1248,18 +1248,12 @@ static void indev_proc_release(lv_indev_t * indev)
 {
     if((indev->pointer.last_point.x != indev->pointer.act_point.x ||
         indev->pointer.last_point.y != indev->pointer.act_point.y)) {
-        lv_obj_t ** layer = &indev->disp->sys_layer;
         lv_obj_t ** last = &indev->pointer.last_hovered;
-        lv_obj_t * hovered = NULL;
-        uint8_t layers = 4;
-        while(!hovered && layers) {
-            hovered = lv_indev_search_obj(*layer++, &indev->pointer.act_point);
-            if(*last != hovered) {
-                lv_obj_send_event(hovered, LV_EVENT_HOVER_OVER, indev_act);
-                lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev_act);
-                *last = hovered;
-            }
-            layers--;
+        lv_obj_t * hovered = pointer_search_obj(lv_display_get_default(), &indev->pointer.act_point);
+        if(*last != hovered) {
+            lv_obj_send_event(hovered, LV_EVENT_HOVER_OVER, indev_act);
+            lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev_act);
+            *last = hovered;
         }
     }
 
