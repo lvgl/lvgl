@@ -185,6 +185,6 @@ if __name__ == "__main__":
 			
 	if func_over_threshold > 0:
 		print(f'Performance check failed: {func_over_threshold} functions over set threshold')		
-		sys.exit(1)
+		sys.exit(5)
 
 	sys.exit(0)

@@ -51,7 +51,7 @@ jobs:
           python3 lvgl/scripts/perf_report.py perf_check*.txt lvgl/tests/perf/func_thresholds.txt prev_performance_data/perf_check*.txt | tee perf_report.txt
           python_return=$?
           echo "Python script returned $python_return"
-          if [ $python_return ]; then exit 1; fi
+          exit $python_return
 
       - name: Store performance report as artifact
         if: success() || failure()
@@ -59,4 +59,3 @@ jobs:
         with:
           name: performance_report
           path: perf_report.txt
-
