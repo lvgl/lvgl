@@ -49,17 +49,11 @@ jobs:
         id: perf_report
         run: |
           python3 lvgl/scripts/perf_report.py perf_check*.txt lvgl/tests/perf/func_thresholds.txt prev_performance_data/perf_check*.txt | tee perf_report.txt
-        continue-on-error: true
 
       - name: Store performance report as artifact
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: performance_report
           path: perf_report.txt
-      
-      - name: Fail if functions over threshold
-        if: ${{ steps.perf_report.outcome != 'success' }}
-        run: |
-          echo "Performance report found some functions over threshold. Failing workflow run"
-          core.setFailed('At least one function is over its set threshold')
 
