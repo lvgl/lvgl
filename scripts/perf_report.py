@@ -184,6 +184,7 @@ if __name__ == "__main__":
 				check_prev_exec(exec_times, prev_exec_times, func, parent)
 			
 	if func_over_threshold > 0:
-		print(f'Performance check failed: {func_over_threshold} functions over set threshold')
-			
-	sys.exit(func_over_threshold)
+		print(f'Performance check failed: {func_over_threshold} functions over set threshold')		
+		sys.exit(1)
+
+	sys.exit(0)
