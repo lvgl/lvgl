@@ -154,36 +154,36 @@ def check_prev_exec(exec_times: dict[dict[float]],
 
 
 
-if len(sys.argv) < 3 or len(sys.argv) > 4:
-	print(f'Usage: python3 {sys.argv[0]} <execution_time_file> <threshold_file> [previous_execution_time_file]')
-	exit(-1)
+if __name__ == "__main__":
+	if len(sys.argv) < 3 or len(sys.argv) > 4:
+		print(f'Usage: python3 {sys.argv[0]} <execution_time_file> <threshold_file> [previous_execution_time_file]')
+		exit(-1)
+	
+	EXEC_TIME_FILE = sys.argv[1]
+	THRESHOLD_FILE = sys.argv[2]
+	PREV_EXEC_TIME_FILE = "" if len(sys.argv) < 4 else sys.argv[3]
+	prev_perf_exists = os.path.exists(PREV_EXEC_TIME_FILE)
+	if len(sys.argv) < 4 or not prev_perf_exists:
+		print("INFO: No previous performance data provided. Only threshold overshoot will be tested")
 
-EXEC_TIME_FILE = sys.argv[1]
-THRESHOLD_FILE = sys.argv[2]
-PREV_EXEC_TIME_FILE = "" if len(sys.argv) < 4 else sys.argv[3]
-prev_perf_exists = os.path.exists(PREV_EXEC_TIME_FILE)
-if len(sys.argv) < 4 or not prev_perf_exists:
-	print("INFO: No previous performance data provided. Only threshold overshoot will be tested")
+	func_over_threshold = 0
 
-func_over_threshold = 0
+	thresholds = get_func_data_from_file(THRESHOLD_FILE)
+	exec_times = get_func_data_from_file(EXEC_TIME_FILE)
+	if prev_perf_exists:
+		prev_exec_times = get_func_data_from_file(PREV_EXEC_TIME_FILE)
 
-thresholds = get_func_data_from_file(THRESHOLD_FILE)
-exec_times = get_func_data_from_file(EXEC_TIME_FILE)
-if prev_perf_exists:
-	prev_exec_times = get_func_data_from_file(PREV_EXEC_TIME_FILE)
+	for func in exec_times.keys():
+		for parent in exec_times[func].keys():
+			
+			if not check_threshold(exec_times, thresholds, func, parent):
+				func_over_threshold += 1
+				continue
 
-for func in exec_times.keys():
-	for parent in exec_times[func].keys():
-		
-		if not check_threshold(exec_times, thresholds, func, parent):
-			func_over_threshold += 1
-			continue
+			if prev_perf_exists:
+				check_prev_exec(exec_times, prev_exec_times, func, parent)
+			
+	if func_over_threshold > 0:
+		print(f'Performance check failed: {func_over_threshold} functions over set threshold')		
 
-		if prev_perf_exists:
-			check_prev_exec(exec_times, prev_exec_times, func, parent)
-		
-if func_over_threshold > 0:
-	print(f'Performance check failed: {func_over_threshold} functions over set threshold')		
-	sys.exit(5)
-
-sys.exit(0)
+	sys.exit(func_over_threshold)

@@ -49,7 +49,7 @@ jobs:
         id: perf_report
         run: |
           python3 lvgl/scripts/perf_report.py perf_check*.txt lvgl/tests/perf/func_thresholds.txt prev_performance_data/perf_check*.txt | tee perf_report.txt
-          python_return=$?
+          python_return=${PIPESTATUS[0]}
           echo "Python script returned $python_return"
           exit $python_return
 
