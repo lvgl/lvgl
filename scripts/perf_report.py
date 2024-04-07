@@ -163,6 +163,8 @@ if __name__ == "__main__":
 	THRESHOLD_FILE = sys.argv[2]
 	PREV_EXEC_TIME_FILE = "" if len(sys.argv) < 4 else sys.argv[3]
 	prev_perf_exists = os.path.exists(PREV_EXEC_TIME_FILE)
+	if len(sys.argv) < 4 or not prev_perf_exists:
+		print("INFO: No previous performance data provided. Only threshold overshoot will be tested")
 
 	func_over_threshold = 0
 
