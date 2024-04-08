@@ -41,21 +41,19 @@ void test_canvas_functions_invalidate(void)
     lv_refr_now(NULL);
     TEST_ASSERT(draw_counter == 3);
 
-    {
-        lv_layer_t layer;
-        lv_canvas_init_layer(canvas, &layer);
-        lv_draw_line_dsc_t line_dsc;
-        lv_draw_line_dsc_init(&line_dsc);
-        line_dsc.p1.x = 10;
-        line_dsc.p1.y = 10;
-        line_dsc.p2.x = 20;
-        line_dsc.p2.y = 20;
-        line_dsc.width = 5;
-        lv_draw_line(&layer, &line_dsc);
-        lv_canvas_finish_layer(canvas, &layer);
-        lv_refr_now(NULL);
-        TEST_ASSERT(draw_counter == 4);
-    }
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    line_dsc.p1.x = 10;
+    line_dsc.p1.y = 10;
+    line_dsc.p2.x = 20;
+    line_dsc.p2.y = 20;
+    line_dsc.width = 5;
+    lv_draw_line(&layer, &line_dsc);
+    lv_canvas_finish_layer(canvas, &layer);
+    lv_refr_now(NULL);
+    TEST_ASSERT(draw_counter == 4);
 
     lv_refr_now(NULL);
     TEST_ASSERT(draw_counter == 4);
