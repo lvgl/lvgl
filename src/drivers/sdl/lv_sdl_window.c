@@ -446,15 +446,15 @@ static void texture_resize(lv_display_t * disp)
             px_format = SDL_PIXELFORMAT_RGBA8888;
             break;
         default:
-            switch (lv_display_get_color_format(disp)) {
+            switch(lv_display_get_color_format(disp)) {
 #define CASE(x) case x:  LV_LOG_ERROR("Color Format '" #x "' is not supported with the SDL display driver"); break
 
-                CASE(LV_COLOR_FORMAT_L8);
-                CASE(LV_COLOR_FORMAT_I2);
-                CASE(LV_COLOR_FORMAT_A8);
-                CASE(LV_COLOR_FORMAT_ARGB8565);
-                CASE(LV_COLOR_FORMAT_RGB565A8);
-                CASE(LV_COLOR_FORMAT_UNKNOWN);
+                    CASE(LV_COLOR_FORMAT_L8);
+                    CASE(LV_COLOR_FORMAT_I2);
+                    CASE(LV_COLOR_FORMAT_A8);
+                    CASE(LV_COLOR_FORMAT_ARGB8565);
+                    CASE(LV_COLOR_FORMAT_RGB565A8);
+                    CASE(LV_COLOR_FORMAT_UNKNOWN);
             }
             return;
     }
