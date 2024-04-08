@@ -59,11 +59,11 @@ typedef struct _lv_draw_image_dsc_t {
     uint16_t tile               : 1;
     lv_draw_image_sup_t * sup;
 
-/** Used to indicate the entire original, non-clipped area where the image is to be drawn.
- * This is important for:
- *  1. Layer rendering, where it might happen that only a smaller area of the layer is rendered.
- *  2. Tiled images, where the target draw area is larger than the image to be tiled.
- */
+    /** Used to indicate the entire original, non-clipped area where the image is to be drawn.
+     * This is important for:
+     *  1. Layer rendering, where it might happen that only a smaller area of the layer is rendered.
+     *  2. Tiled images, where the target draw area is larger than the image to be tiled.
+     */
     lv_area_t image_area;
     const lv_image_dsc_t * bitmap_mask_src;
 } lv_draw_image_dsc_t;
