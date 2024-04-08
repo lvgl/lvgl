@@ -19,6 +19,7 @@
 #include LV_SDL_INCLUDE_PATH
 
 #if LV_USE_DRAW_SDL
+    /* TODO: This include needs to be fixed */
     #include <SDL2/SDL_image.h>
 #endif
 
@@ -390,6 +391,73 @@ static void texture_resize(lv_display_t * disp)
 {
     uint32_t stride = lv_draw_buf_width_to_stride(disp->hor_res, lv_display_get_color_format(disp));
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    SDL_PixelFormatEnum px_format;
+
+    switch(lv_display_get_color_format(disp)) {
+        case LV_COLOR_FORMAT_I1:
+            px_format = SDL_PIXELFORMAT_INDEX1MSB;
+            break;
+        case LV_COLOR_FORMAT_I4:
+            px_format = SDL_PIXELFORMAT_INDEX4MSB;
+            break;
+        case LV_COLOR_FORMAT_I8:
+            px_format = SDL_PIXELFORMAT_INDEX8;
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+            px_format = SDL_PIXELFORMAT_RGB565;
+            break;
+        case LV_COLOR_FORMAT_RGB888:
+            px_format = SDL_PIXELFORMAT_RGB24;
+            break;
+        case LV_COLOR_FORMAT_ARGB8888:
+            px_format = SDL_PIXELFORMAT_ARGB8888;
+            break;
+        case LV_COLOR_FORMAT_XRGB8888:
+            px_format = SDL_PIXELFORMAT_RGB888;
+            break;
+        case LV_COLOR_FORMAT_I420:
+            px_format = SDL_PIXELFORMAT_IYUV; /* Alias for I420 */
+            break;
+        case LV_COLOR_FORMAT_I422:
+            px_format = SDL_DEFINE_PIXELFOURCC('I', '4', '2', '2'); /* not sure if this will work */
+            break;
+        case LV_COLOR_FORMAT_I444:
+            px_format = SDL_DEFINE_PIXELFOURCC('I', '4', '4', '4'); /* not sure if this will work */
+            break;
+        case LV_COLOR_FORMAT_I400:
+            px_format = SDL_DEFINE_PIXELFOURCC('I', '4', '0', '0'); /* not sure if this will work */
+            break;
+        case LV_COLOR_FORMAT_NV21:
+            px_format = SDL_PIXELFORMAT_NV21;
+            break;
+        case LV_COLOR_FORMAT_NV12:
+            px_format = SDL_PIXELFORMAT_NV12;
+            break;
+        case LV_COLOR_FORMAT_YUY2:
+            px_format = SDL_PIXELFORMAT_YUY2;
+            break;
+        case LV_COLOR_FORMAT_UYVY:
+            px_format = SDL_PIXELFORMAT_UYVY;
+            break;
+        case LV_COLOR_FORMAT_RAW:
+            px_format = SDL_PIXELFORMAT_RGB24;
+            break;
+        case LV_COLOR_FORMAT_RAW_ALPHA:
+            px_format = SDL_PIXELFORMAT_RGBA8888;
+            break;
+        default:
+            switch (lv_display_get_color_format(disp)) {
+                #define CASE(x) case x:  LV_LOG_ERROR("Color Format '" #x "' is not supported with the SDL display driver"); break
+
+                CASE(LV_COLOR_FORMAT_L8);
+                CASE(LV_COLOR_FORMAT_I2);
+                CASE(LV_COLOR_FORMAT_A8);
+                CASE(LV_COLOR_FORMAT_ARGB8565);
+                CASE(LV_COLOR_FORMAT_RGB565A8);
+                CASE(LV_COLOR_FORMAT_UNKNOWN);
+            }
+            return;
+    }
 
     dsc->fb1 = realloc(dsc->fb1, stride * disp->ver_res);
     lv_memzero(dsc->fb1, stride * disp->ver_res);
@@ -405,32 +473,6 @@ static void texture_resize(lv_display_t * disp)
         lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
     }
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
-
-    SDL_PixelFormatEnum px_format;
-
-    switch(lv_display_get_color_format(disp)) {
-        case LV_COLOR_FORMAT_RGB888:
-            /* SDL_PIXELFORMAT_RGB888 is set as SDL_PIXELFORMAT_XRGB8888 in
-               SDL so to get RGB888 we use the RGB24 format instead */
-            px_format = SDL_PIXELFORMAT_RGB24;
-            break;
-        case LV_COLOR_FORMAT_ARGB8888:
-            px_format = SDL_PIXELFORMAT_ARGB8888;
-            break;
-        case LV_COLOR_FORMAT_XRGB8888:
-            px_format = SDL_PIXELFORMAT_XRGB8888;
-            break;
-        case LV_COLOR_FORMAT_RGB565:
-            px_format = SDL_PIXELFORMAT_RGB565;
-            break;
-        default:
-            /*
-             * unsopported pixel formats
-             * LV_COLOR_FORMAT_ARGB8565
-             * LV_COLOR_FORMAT_RGB565A8
-             */
-            return;
-    }
 
     dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
                                      SDL_TEXTUREACCESS_STATIC, disp->hor_res, disp->ver_res);
