@@ -336,6 +336,7 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
     while(layer->draw_task_head) {
         lv_draw_dispatch_wait_for_request();
         lv_draw_dispatch_layer(lv_obj_get_display(canvas), layer);
+        lv_obj_invalidate(canvas);
     }
 }
 
