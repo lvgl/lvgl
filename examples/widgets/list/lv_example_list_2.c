@@ -1,6 +1,5 @@
 #include "../../lv_examples.h"
 #if LV_USE_LIST && LV_BUILD_EXAMPLES
-#include <stdlib.h>
 
 static lv_obj_t * list1;
 static lv_obj_t * list2;
@@ -101,8 +100,8 @@ static void event_handler_swap(lv_event_t * e)
         uint32_t cnt = lv_obj_get_child_count(list1);
         for(int i = 0; i < 100; i++)
             if(cnt > 1) {
-                lv_obj_t * obj = lv_obj_get_child(list1, rand() % cnt);
-                lv_obj_move_to_index(obj, rand() % cnt);
+                lv_obj_t * obj = lv_obj_get_child(list1, lv_rand(0, cnt));
+                lv_obj_move_to_index(obj, lv_rand(0, cnt));
                 if(currentButton != NULL) {
                     lv_obj_scroll_to_view(currentButton, LV_ANIM_ON);
                 }
