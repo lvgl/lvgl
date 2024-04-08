@@ -1115,7 +1115,7 @@ static void indev_proc_press(lv_indev_t * indev)
         indev_obj_act = pointer_search_obj(disp, &indev->pointer.act_point);
         new_obj_searched = true;
     }
-    /*If there is an active object it's not scrolled and not protected also search*/
+    /*If there is an active object it's not scrolled and not press locked also search*/
     else if(indev->pointer.scroll_obj == NULL &&
             lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_PRESS_LOCK) == false) {
         indev_obj_act = pointer_search_obj(disp, &indev->pointer.act_point);
@@ -1124,7 +1124,6 @@ static void indev_proc_press(lv_indev_t * indev)
 
     /*The scroll object might have scroll throw. Stop it manually*/
     if(new_obj_searched && indev->pointer.scroll_obj) {
-
         /*Attempt to stop scroll throw animation firstly*/
         if(indev->scroll_throw_anim) {
             lv_anim_delete(indev, indev_scroll_throw_anim_cb);
@@ -1139,6 +1138,17 @@ static void indev_proc_press(lv_indev_t * indev)
     if(indev_obj_act != indev->pointer.act_obj) {
         indev->pointer.last_point.x = indev->pointer.act_point.x;
         indev->pointer.last_point.y = indev->pointer.act_point.y;
+
+        /*Without `LV_OBJ_FLAG_PRESS_LOCK` new widget can be found while pressing.*/
+        if(indev->pointer.last_hovered && indev->pointer.last_hovered != indev_obj_act) {
+            lv_obj_send_event(indev->pointer.last_hovered, LV_EVENT_HOVER_LEAVE, indev);
+            if(indev_reset_check(indev)) return;
+
+            lv_indev_send_event(indev, LV_EVENT_HOVER_LEAVE, indev->pointer.last_hovered);
+            if(indev_reset_check(indev)) return;
+
+            indev->pointer.last_hovered = indev_obj_act;
+        }
 
         /*If a new object found the previous was lost, so send a PRESS_LOST event*/
         if(indev->pointer.act_obj != NULL) {
@@ -1175,6 +1185,9 @@ static void indev_proc_press(lv_indev_t * indev)
 
             const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
             if(is_enabled) {
+                if(indev->pointer.last_hovered != indev_obj_act) {
+                    if(send_event(LV_EVENT_HOVER_OVER, indev_act) == LV_RESULT_INVALID) return;
+                }
                 if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
             }
 
@@ -1246,13 +1259,21 @@ static void indev_proc_press(lv_indev_t * indev)
  */
 static void indev_proc_release(lv_indev_t * indev)
 {
-    if((indev->pointer.last_point.x != indev->pointer.act_point.x ||
+    if(indev->wait_until_release || /*Hover the new widget even if the coordinates didn't changed*/
+       (indev->pointer.last_point.x != indev->pointer.act_point.x ||
         indev->pointer.last_point.y != indev->pointer.act_point.y)) {
         lv_obj_t ** last = &indev->pointer.last_hovered;
         lv_obj_t * hovered = pointer_search_obj(lv_display_get_default(), &indev->pointer.act_point);
         if(*last != hovered) {
-            lv_obj_send_event(hovered, LV_EVENT_HOVER_OVER, indev_act);
-            lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev_act);
+            lv_obj_send_event(hovered, LV_EVENT_HOVER_OVER, indev);
+            if(indev_reset_check(indev)) return;
+            lv_indev_send_event(indev, LV_EVENT_HOVER_OVER, hovered);
+            if(indev_reset_check(indev)) return;
+
+            lv_obj_send_event(*last, LV_EVENT_HOVER_LEAVE, indev);
+            if(indev_reset_check(indev)) return;
+            lv_indev_send_event(indev, LV_EVENT_HOVER_LEAVE, *last);
+            if(indev_reset_check(indev)) return;
             *last = hovered;
         }
     }
