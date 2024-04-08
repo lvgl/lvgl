@@ -86,8 +86,9 @@ typedef lv_result_t (*lv_image_decoder_open_f_t)(lv_image_decoder_t * decoder, l
  * Required only if the "open" function can't return with the whole decoded pixel array.
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor
- * @param full_area the full area to decode after enough subsequent calls
- * @param decoded_area the decoded area is stored here. set the values to `LV_COORD_MIN` to reset decoding
+ * @param full_area input parameter. the full area to decode after enough subsequent calls
+ * @param decoded_area input+output parameter. set the values to `LV_COORD_MIN` for the first call and to reset decoding.
+ *                     the decoded area is stored here after each call.
  * @return LV_RESULT_OK: ok; LV_RESULT_INVALID: failed or there is nothing left to decode
  */
 typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(lv_image_decoder_t * decoder,
@@ -216,9 +217,10 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
 /***
  * Decode `full_area` pixels incrementally by calling in a loop. Set `decoded_area` to `LV_COORD_MIN` on first call.
  * @param dsc           image decoder descriptor
- * @param full_area     the full area to decode after enough subsequent calls
- * @param decoded_area  the decoded area is stored here. set the values to `LV_COORD_MIN` to reset decoding
- * @return              LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred
+ * @param full_area     input parameter. the full area to decode after enough subsequent calls
+ * @param decoded_area  input+output parameter. set the values to `LV_COORD_MIN` for the first call and to reset decoding.
+ *                      the decoded area is stored here after each call.
+ * @return              LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred or there is nothing left to decode
  */
 lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area,
                                       lv_area_t * decoded_area);
