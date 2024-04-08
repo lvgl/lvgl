@@ -16,7 +16,12 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 #ifndef __ASSEMBLY__
-#include <stdint.h>
+#include LV_STDINT_INCLUDE
+#include LV_STDDEF_INCLUDE
+#include LV_STDBOOL_INCLUDE
+#include LV_INTTYPES_INCLUDE
+#include LV_LIMITS_INCLUDE
+#include LV_STDARG_INCLUDE
 #endif
 
 /*********************

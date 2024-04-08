@@ -130,7 +130,7 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[])
         uint32_t unit_cnt = 0;           /*Number of units in a row*/
         uint32_t btn_cnt = 0;            /*Number of buttons in a row*/
         /*Count the buttons and units in this row*/
-        while(map_row[btn_cnt] && strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
+        while(map_row[btn_cnt] && lv_strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
             unit_cnt += get_button_width(btnm->ctrl_bits[btn_tot_i + btn_cnt]);
             btn_cnt++;
         }
@@ -325,7 +325,7 @@ const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_
     while(btn_i != btn_id) {
         btn_i++;
         txt_i++;
-        if(strcmp(btnm->map_p[txt_i], "\n") == 0) txt_i++;
+        if(lv_strcmp(btnm->map_p[txt_i], "\n") == 0) txt_i++;
     }
 
     if(btn_i == btnm->btn_cnt) return NULL;
@@ -703,7 +703,7 @@ static void draw_main(lv_event_t * e)
 
     for(btn_i = 0; btn_i < btnm->btn_cnt; btn_i++, txt_i++) {
         /*Search the next valid text in the map*/
-        while(strcmp(btnm->map_p[txt_i], "\n") == 0) {
+        while(lv_strcmp(btnm->map_p[txt_i], "\n") == 0) {
             txt_i++;
         }
 
@@ -818,7 +818,7 @@ static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char 
     uint32_t btn_cnt = 0;
     uint32_t i       = 0;
     while(map[i] && map[i][0] != '\0') {
-        if(strcmp(map[i], "\n") != 0) { /*Do not count line breaks*/
+        if(lv_strcmp(map[i], "\n") != 0) { /*Do not count line breaks*/
             btn_cnt++;
         }
         else {
@@ -1029,7 +1029,7 @@ static bool has_popovers_in_top_row(lv_obj_t * obj)
     const char ** map_row = btnm->map_p;
     uint32_t btn_cnt = 0;
 
-    while(map_row[btn_cnt] && strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
+    while(map_row[btn_cnt] && lv_strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
         if(button_is_popover(btnm->ctrl_bits[btn_cnt])) {
             return true;
         }

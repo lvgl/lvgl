@@ -11,15 +11,19 @@
 #include "../misc/lv_math.h"
 #include "../core/lv_obj_event.h"
 #include "../misc/lv_bidi.h"
+#include "../misc/lv_text_private.h"
 #include "../misc/lv_assert.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LABEL_RECOLOR_PAR_LENGTH 6
 #define LV_LABEL_HINT_UPDATE_TH 1024 /*Update the "hint" if the label's y coordinates have changed more then this*/
+
+#define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
 
 /**********************
  *      TYPEDEFS
@@ -107,7 +111,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
         return;
     }
 
-    if(_lv_text_is_marker(unicode_letter)) return;
+    if(lv_text_is_marker(unicode_letter)) return;
 
     LV_PROFILER_BEGIN;
 
@@ -122,7 +126,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
 
     /*lv_draw_label needs UTF8 text so convert the Unicode character to an UTF8 string */
     uint32_t letter_buf[2];
-    letter_buf[0] = _lv_text_unicode_to_encoded(unicode_letter);
+    letter_buf[0] = lv_text_unicode_to_encoded(unicode_letter);
     letter_buf[1] = '\0';
 
     const char * letter_buf_char = (const char *)letter_buf;
@@ -198,14 +202,14 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
         pos.y += dsc->hint->y;
     }
 
-    uint32_t line_end = line_start + _lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL,
-                                                            dsc->flag);
+    uint32_t line_end = line_start + lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL,
+                                                           dsc->flag);
 
     /*Go the first visible line*/
     while(pos.y + line_height_font < draw_unit->clip_area->y1) {
         /*Go to next line*/
         line_start = line_end;
-        line_end += _lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
+        line_end += lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
         pos.y += line_height;
 
         /*Save at the threshold coordinate*/
@@ -273,17 +277,17 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
             uint32_t logical_char_pos = 0;
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
 #if LV_USE_BIDI
-                logical_char_pos = _lv_text_encoded_get_char_id(dsc->text, line_start);
-                uint32_t t = _lv_text_encoded_get_char_id(bidi_txt, i);
+                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
+                uint32_t t = lv_text_encoded_get_char_id(bidi_txt, i);
                 logical_char_pos += _lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, t, NULL);
 #else
-                logical_char_pos = _lv_text_encoded_get_char_id(dsc->text, line_start + i);
+                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + i);
 #endif
             }
 
             uint32_t letter;
             uint32_t letter_next;
-            _lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
+            lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
@@ -338,7 +342,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
 #endif
         /*Go to next line*/
         line_start = line_end;
-        line_end += _lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
+        line_end += lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
 
         pos.x = coords->x1;
         /*Align to middle*/
@@ -361,7 +365,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
         if(pos.y > draw_unit->clip_area->y2) break;
     }
 
-    if(draw_letter_dsc._draw_buf) lv_draw_buf_destroy(draw_letter_dsc._draw_buf);
+    if(draw_letter_dsc._draw_buf) lv_draw_buf_destroy_user(font_draw_buf_handlers, draw_letter_dsc._draw_buf);
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -375,7 +379,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
 {
     lv_font_glyph_dsc_t g;
 
-    if(_lv_text_is_marker(letter)) /*Markers are valid letters but should not be rendered.*/
+    if(lv_text_is_marker(letter)) /*Markers are valid letters but should not be rendered.*/
         return;
 
     LV_PROFILER_BEGIN;
@@ -410,18 +414,18 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
             /*Only check draw buf for bitmap glyph*/
             draw_buf = lv_draw_buf_reshape(dsc->_draw_buf, 0, g.box_w, g.box_h, LV_STRIDE_AUTO);
             if(draw_buf == NULL) {
-                if(dsc->_draw_buf) lv_draw_buf_destroy(dsc->_draw_buf);
+                if(dsc->_draw_buf) lv_draw_buf_destroy_user(font_draw_buf_handlers, dsc->_draw_buf);
 
                 uint32_t h = g.box_h;
                 if(h * g.box_w < 64) h *= 2; /*Alloc a slightly larger buffer*/
-                draw_buf = lv_draw_buf_create(g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
+                draw_buf = lv_draw_buf_create_user(font_draw_buf_handlers, g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
                 LV_ASSERT_MALLOC(draw_buf);
                 draw_buf->header.h = g.box_h;
                 dsc->_draw_buf = draw_buf;
             }
         }
 
-        dsc->glyph_data = (void *)lv_font_get_glyph_bitmap(&g, letter, draw_buf);
+        dsc->glyph_data = (void *) lv_font_get_glyph_bitmap(&g, draw_buf);
         dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
     }
     else {
@@ -432,8 +436,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     dsc->g = &g;
     cb(draw_unit, dsc, NULL, NULL);
 
-    if(g.resolved_font && font->release_glyph) {
-        font->release_glyph(font, &g);
-    }
+    lv_font_glyph_release_draw_data(&g);
+
     LV_PROFILER_END;
 }

@@ -16,7 +16,6 @@
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_grad.h"
-#include "lv_vg_lite_math.h"
 
 /*********************
  *      DEFINES
@@ -33,10 +32,10 @@
 static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
 static void lv_matrix_to_vg(vg_lite_matrix_t * desy, const lv_matrix_t * src);
 static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src);
+static void lv_path_opa_to_vg(lv_vg_lite_path_t * dest, const lv_vector_draw_dsc_t * dsc);
 static void lv_stroke_to_vg(lv_vg_lite_path_t * dest, const lv_vector_stroke_dsc_t * dsc);
 static vg_lite_blend_t lv_blend_to_vg(lv_vector_blend_t blend);
 static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule);
-static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread);
 static vg_lite_cap_style_t lv_stroke_cap_to_vg(lv_vector_stroke_cap_t cap);
 static vg_lite_join_style_t lv_stroke_join_to_vg(lv_vector_stroke_join_t join);
 
@@ -113,6 +112,9 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     lv_path_to_vg(lv_vg_path, path);
     vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(lv_vg_path);
     LV_VG_LITE_ASSERT_PATH(vg_path);
+
+    /* convert path type */
+    lv_path_opa_to_vg(lv_vg_path, dsc);
 
     /* convert blend mode and fill rule */
     vg_lite_blend_t blend = lv_blend_to_vg(dsc->blend_mode);
@@ -202,8 +204,6 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
                 /* draw gradient */
                 lv_vector_gradient_style_t style = dsc->fill_dsc.gradient.style;
-                vg_lite_gradient_spreadmode_t spreadmode = lv_spread_to_vg(dsc->fill_dsc.gradient.spread);
-                LV_UNUSED(spreadmode);
 
                 if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
                     vg_lite_matrix_t grad_matrix, fill_matrix;
@@ -226,12 +226,23 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                         blend);
                 }
                 else if(style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
-                    if(vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {
-                        /* TODO: radial gradient */
-                    }
-                    else {
-                        LV_LOG_WARN("radial gradient is not supported");
-                    }
+                    vg_lite_matrix_t grad_matrix;
+                    lv_matrix_to_vg(&grad_matrix, &dsc->fill_dsc.matrix);
+
+                    /* add min_x, min_y to gradient center */
+                    lv_vector_gradient_t new_grad = dsc->fill_dsc.gradient;
+                    new_grad.cx += min_x;
+                    new_grad.cy += min_y;
+
+                    lv_vg_lite_draw_radial_grad(
+                        u,
+                        &u->target_buffer,
+                        vg_path,
+                        &new_grad,
+                        &grad_matrix,
+                        &matrix,
+                        fill,
+                        blend);
                 }
             }
             break;
@@ -343,19 +354,36 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
     LV_PROFILER_END;
 }
 
+static void lv_path_opa_to_vg(lv_vg_lite_path_t * dest, const lv_vector_draw_dsc_t * dsc)
+{
+    vg_lite_path_type_t path_type = VG_LITE_DRAW_ZERO;
+    lv_opa_t fill_opa = dsc->fill_dsc.opa;
+    lv_opa_t stroke_opa = dsc->stroke_dsc.opa;
+
+    if(fill_opa > LV_OPA_0 && stroke_opa > LV_OPA_0) {
+        path_type = VG_LITE_DRAW_FILL_STROKE_PATH;
+    }
+    else if(fill_opa == LV_OPA_0 && stroke_opa > LV_OPA_0) {
+        path_type = VG_LITE_DRAW_STROKE_PATH;
+    }
+    else if(fill_opa > LV_OPA_0) {
+        path_type = VG_LITE_DRAW_FILL_PATH;
+    }
+
+    LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(lv_vg_lite_path_get_path(dest), path_type));
+}
+
 static void lv_stroke_to_vg(lv_vg_lite_path_t * dest, const lv_vector_stroke_dsc_t * dsc)
 {
     LV_ASSERT_NULL(dest);
     LV_ASSERT_NULL(dsc);
 
-    /* if width is 0, no need to set stroke */
-    if(math_zero(dsc->width)) {
+    /* if stroke opa is 0, no need to set stroke */
+    if(dsc->opa == LV_OPA_0) {
         return;
     }
 
     vg_lite_path_t * path = lv_vg_lite_path_get_path(dest);
-
-    LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(path, VG_LITE_DRAW_STROKE_PATH));
 
     LV_VG_LITE_CHECK_ERROR(
         vg_lite_set_stroke(
@@ -408,20 +436,6 @@ static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule)
             return VG_LITE_FILL_EVEN_ODD;
         default:
             return VG_LITE_FILL_NON_ZERO;
-    }
-}
-
-static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread)
-{
-    switch(spread) {
-        case LV_VECTOR_GRADIENT_SPREAD_PAD:
-            return VG_LITE_GRADIENT_SPREAD_PAD;
-        case LV_VECTOR_GRADIENT_SPREAD_REPEAT:
-            return VG_LITE_GRADIENT_SPREAD_REPEAT;
-        case LV_VECTOR_GRADIENT_SPREAD_REFLECT:
-            return VG_LITE_GRADIENT_SPREAD_REFLECT;
-        default:
-            return VG_LITE_GRADIENT_SPREAD_FILL;
     }
 }
 

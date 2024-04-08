@@ -9,6 +9,7 @@
 #include "lv_file_explorer.h"
 #if LV_USE_FILE_EXPLORER != 0
 
+#include "../../lvgl.h"
 #include "../../core/lv_global.h"
 
 /*********************

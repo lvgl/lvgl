@@ -3,6 +3,7 @@
 
 #include "unity/unity.h"
 #include "lv_test_indev.h"
+#include <string.h>
 
 void setUp(void)
 {

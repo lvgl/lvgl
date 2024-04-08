@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <errno.h>
 
 /*********************
  *      DEFINES
@@ -104,7 +105,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
     LV_UNUSED(drv);
 
-    uint32_t flags = 0;
+    int flags = 0;
     if(mode == LV_FS_MODE_WR) flags = O_WRONLY | O_CREAT;
     else if(mode == LV_FS_MODE_RD) flags = O_RDONLY;
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = O_RDWR | O_CREAT;
@@ -113,10 +114,13 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     char buf[256];
     lv_snprintf(buf, sizeof(buf), LV_FS_POSIX_PATH "%s", path);
 
-    int f = open(buf, flags, 0666);
-    if(f < 0) return NULL;
+    int fd = open(buf, flags, 0666);
+    if(fd < 0) {
+        LV_LOG_WARN("Could not open file: %s, flags: 0x%x, errno: %d", buf, flags, errno);
+        return NULL;
+    }
 
-    return FD2FILEP(f);
+    return FD2FILEP(fd);
 }
 
 /**
@@ -129,7 +133,14 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
     LV_UNUSED(drv);
-    close(FILEP2FD(file_p));
+
+    int fd = FILEP2FD(file_p);
+    int ret = close(fd);
+    if(ret < 0) {
+        LV_LOG_WARN("Could not close file: %d, errno: %d", fd, errno);
+        return LV_FS_RES_FS_ERR;
+    }
+
     return LV_FS_RES_OK;
 }
 
@@ -146,8 +157,16 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
     LV_UNUSED(drv);
-    *br = read(FILEP2FD(file_p), buf, btr);
-    return (int32_t)(*br) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
+
+    int fd = FILEP2FD(file_p);
+    ssize_t ret = read(fd, buf, btr);
+    if(ret < 0) {
+        LV_LOG_WARN("Could not read file: %d, errno: %d", fd, errno);
+        return LV_FS_RES_FS_ERR;
+    }
+
+    *br = (uint32_t)ret;
+    return LV_FS_RES_OK;
 }
 
 /**
@@ -162,8 +181,16 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
     LV_UNUSED(drv);
-    *bw = write(FILEP2FD(file_p), buf, btw);
-    return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
+
+    int fd = FILEP2FD(file_p);
+    ssize_t ret = write(fd, buf, btw);
+    if(ret < 0) {
+        LV_LOG_WARN("Could not write file: %d, errno: %d", fd, errno);
+        return LV_FS_RES_FS_ERR;
+    }
+
+    *bw = (uint32_t)ret;
+    return LV_FS_RES_OK;
 }
 
 /**
@@ -192,8 +219,14 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
             return LV_FS_RES_INV_PARAM;
     }
 
-    off_t offset = lseek(FILEP2FD(file_p), pos, w);
-    return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
+    int fd = FILEP2FD(file_p);
+    off_t offset = lseek(fd, pos, w);
+    if(offset < 0) {
+        LV_LOG_WARN("Could not seek file: %d, errno: %d", fd, errno);
+        return LV_FS_RES_FS_ERR;
+    }
+
+    return LV_FS_RES_OK;
 }
 
 /**
@@ -207,9 +240,16 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
-    off_t offset = lseek(FILEP2FD(file_p), 0, SEEK_CUR);
-    *pos_p = offset;
-    return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
+
+    int fd = FILEP2FD(file_p);
+    off_t offset = lseek(fd, 0, SEEK_CUR);
+    if(offset < 0) {
+        LV_LOG_WARN("Could not get position of file: %d, errno: %d", fd, errno);
+        return LV_FS_RES_FS_ERR;
+    }
+
+    *pos_p = (uint32_t)offset;
+    return LV_FS_RES_OK;
 }
 
 /**
@@ -225,7 +265,14 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[256];
     lv_snprintf(buf, sizeof(buf), LV_FS_POSIX_PATH "%s", path);
-    return opendir(buf);
+
+    void * dir = opendir(buf);
+    if(!dir) {
+        LV_LOG_WARN("Could not open directory: %s, errno: %d", buf, errno);
+        return NULL;
+    }
+
+    return dir;
 }
 
 /**
@@ -266,7 +313,12 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
     LV_UNUSED(drv);
 
-    closedir(dir_p);
+    int ret = closedir(dir_p);
+    if(ret < 0) {
+        LV_LOG_WARN("Could not close directory: %p, errno: %d", dir_p, errno);
+        return LV_FS_RES_FS_ERR;
+    }
+
     return LV_FS_RES_OK;
 }
 #else /*LV_USE_FS_POSIX == 0*/

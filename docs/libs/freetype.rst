@@ -69,10 +69,7 @@ Enable :c:macro:`LV_USE_FREETYPE` in ``lv_conf.h``.
 
 Cache configuration:
 
-- :c:macro:`LV_FREETYPE_CACHE_SIZE` Maximum memory(Bytes) used to cache font bitmap, outline, character maps, etc.
-  :Note: This value does not include the memory used by ``FT_Face`` and ``FT_Size`` objects
-- :c:macro:`LV_FREETYPE_CACHE_FT_FACES`: Maximum open number of ``FT_Face`` objects.
-- :c:macro:`LV_FREETYPE_CACHE_FT_SIZES`: Maximum open number of ``FT_Size`` objects.
+- :c:macro:`LV_FREETYPE_CACHE_FT_GLYPH_CNT` Maximum number of cached glyphs., etc.
 
 By default, the FreeType extension doesn't use LVGL's file system. You
 can simply pass the path to the font as usual on your operating system

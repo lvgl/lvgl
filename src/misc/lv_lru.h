@@ -18,9 +18,6 @@ extern "C" {
 
 #include "lv_types.h"
 
-#include <stdint.h>
-#include <stddef.h>
-
 /*********************
  *      DEFINES
  *********************/

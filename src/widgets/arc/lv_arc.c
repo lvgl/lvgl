@@ -605,7 +605,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_KEY) {
         uint32_t c = lv_event_get_key(e);
 
-        int16_t old_value = arc->value;
+        int32_t old_value = arc->value;
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             lv_arc_set_value(obj, lv_arc_get_value(obj) + 1);
         }
@@ -613,6 +613,16 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_arc_set_value(obj, lv_arc_get_value(obj) - 1);
         }
 
+        if(old_value != arc->value) {
+            res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            if(res != LV_RESULT_OK) return;
+        }
+    }
+    else if(code == LV_EVENT_ROTARY) {
+        int32_t r = lv_event_get_rotary_diff(e);
+
+        int32_t old_value = arc->value;
+        lv_arc_set_value(obj, lv_arc_get_value(obj) + r);
         if(old_value != arc->value) {
             res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RESULT_OK) return;

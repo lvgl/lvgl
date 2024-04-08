@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
 #include "lv_draw_mask.h"
 #include "../core/lv_refr.h"
 #include "../misc/lv_math.h"
+#include "../misc/lv_types.h"
 #include "../stdlib/lv_string.h"
 
 /*********************

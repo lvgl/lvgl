@@ -165,7 +165,9 @@ void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation);
 /**
  * Point the needle to the corresponding value through the line
  * @param obj              pointer to a scale object
- * @param needle_line      needle_line of the scale
+ * @param needle_line      needle_line of the scale. The line points will be allocated and
+ *                         managed by the scale unless the line point array was previously set
+ *                         using `lv_line_set_points_mutable`.
  * @param needle_length    length of the needle
  *                         needle_length>0 needle_length=needle_length;
  *                         needle_length<0 needle_length=radius-|needle_length|;

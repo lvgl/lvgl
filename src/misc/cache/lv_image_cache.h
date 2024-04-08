@@ -13,7 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_cache_private.h"
+
+#include "../../lv_conf_internal.h"
+#include "../lv_types.h"
 
 /*********************
  *      DEFINES
@@ -28,31 +30,31 @@ extern "C" {
  **********************/
 
 /**
- * Invalidate image cache. Use NULL to invalidate all images.
- * @param src pointer to an image source.
+ * Initialize image cache.
+ * @param  size size of the cache in bytes.
+ * @return LV_RESULT_OK: initialization succeeded, LV_RESULT_INVALID: failed.
  */
-void lv_image_cache_drop(const void * src);
+lv_result_t lv_image_cache_init(uint32_t size);
 
 /**
  * Resize image cache.
+ * If set to 0, the cache will be disabled.
  * @param new_size  new size of the cache in bytes.
  * @param evict_now true: evict the images should be removed by the eviction policy, false: wait for the next cache cleanup.
  */
 void lv_image_cache_resize(uint32_t new_size, bool evict_now);
 
 /**
- * Invalidate image header cache. Use NULL to invalidate all image headers.
- * It's also automatically called when an image is invalidated.
+ * Invalidate image cache. Use NULL to invalidate all images.
  * @param src pointer to an image source.
  */
-void lv_image_header_cache_drop(const void * src);
+void lv_image_cache_drop(const void * src);
 
 /**
- * Resize image header cache.
- * @param new_size  new size of the cache in count of image headers.
- * @param evict_now true: evict the image headers should be removed by the eviction policy, false: wait for the next cache cleanup.
+ * Return true if the image cache is enabled.
+ * @return true: enabled, false: disabled.
  */
-void lv_image_header_cache_resize(uint32_t new_size, bool evict_now);
+bool lv_image_cache_is_enabled(void);
 
 /*************************
  *    GLOBAL VARIABLES

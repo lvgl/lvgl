@@ -573,8 +573,7 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     bool donut = ((end_angle - start_angle) % 360 == 0) ? true : false;
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
-    /* path: max size = 16 cubic bezier (7 words each) */
-    int32_t arc_path[16 * 7];
+    int32_t arc_path[ARC_PATH_DATA_MAX_SIZE];
     lv_memzero(arc_path, sizeof(arc_path));
 
     /*** Init path ***/

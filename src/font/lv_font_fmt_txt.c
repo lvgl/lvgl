@@ -75,16 +75,13 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
  *   GLOBAL FUNCTIONS
  **********************/
 
-const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
-                                        lv_draw_buf_t * draw_buf)
+const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     const lv_font_t * font = g_dsc->resolved_font;
     uint8_t * bitmap_out = draw_buf->data;
 
-    if(unicode_letter == '\t') unicode_letter = ' ';
-
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-    uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
+    uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
@@ -206,6 +203,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->ofs_y = gdsc->ofs_y;
     dsc_out->format = (uint8_t)fdsc->bpp;
     dsc_out->is_placeholder = false;
+    dsc_out->gid.index = gid;
 
     if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
 
@@ -243,7 +241,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 
             if(p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
-                glyph_id = fdsc->cmaps[i].glyph_id_start + ofs;
+                glyph_id = fdsc->cmaps[i].glyph_id_start + (uint32_t) ofs;
             }
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {

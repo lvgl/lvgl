@@ -15,6 +15,7 @@ LVG has built in support for:
 - WIN32 (Windows using Win32 API function .e.g ``CreateFileA``, ``ReadFile``)
 - MEMFS (read a file from a memory buffer)
 - LITTLEFS (a little fail-safe filesystem designed for microcontrollers)
+- Arduino ESP LITTLEFS (a little fail-safe filesystem designed for Arduino ESP)
 
 You still need to provide the drivers and libraries, this extension
 provides only the bridge between FATFS, STDIO, POSIX, WIN32 and LVGL.

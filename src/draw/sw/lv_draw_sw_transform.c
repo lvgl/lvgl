@@ -133,7 +133,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
         alpha_buf = NULL;
     }
 
-    bool aa = draw_dsc->antialias;
+    bool aa = (bool) draw_dsc->antialias;
     bool is_rotated = draw_dsc->rotation;
 
     int32_t xs_ups = 0, ys_ups = 0, ys_ups_start = 0, ys_step_256_original = 0;

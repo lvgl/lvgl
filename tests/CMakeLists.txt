@@ -340,6 +340,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             m
+            pthread
             ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})

@@ -14,14 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
+#include "../misc/lv_types.h"
 
 #include "lv_symbol_def.h"
 #include "../draw/lv_draw_buf.h"
 #include "../misc/lv_area.h"
-#include "../misc/lv_types.h"
 #include "../misc/cache/lv_cache.h"
 
 /*********************
@@ -63,16 +60,19 @@ typedef uint8_t lv_font_glyph_format_t;
 /** Describes the properties of a glyph.*/
 typedef struct {
     const lv_font_t *
-    resolved_font; /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
+    resolved_font;  /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
     uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width.*/
     uint16_t box_w; /**< Width of the glyph's bounding box*/
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
     lv_font_glyph_format_t format;  /**< Font format of the glyph see @lv_font_glyph_format_t*/
-    uint8_t is_placeholder: 1; /**< Glyph is missing. But placeholder will still be displayed*/
+    uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
 
-    uint32_t glyph_index; /**< The index of the glyph in the font file. Used by the font cache*/
+    union {
+        uint32_t index;       /**< Unicode code point*/
+        const void * src;     /**< Pointer to the source data used by image fonts*/
+    } gid;                    /**< The index of the glyph in the font file. Used by the font cache*/
     lv_cache_entry_t * entry; /**< The cache entry of the glyph draw data. Used by the font cache*/
 } lv_font_glyph_dsc_t;
 
@@ -108,7 +108,7 @@ struct _lv_font_t {
     bool (*get_glyph_dsc)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /** Get a glyph's bitmap from a font*/
-    const void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, uint32_t, lv_draw_buf_t *);
+    const void * (*get_glyph_bitmap)(lv_font_glyph_dsc_t *, lv_draw_buf_t *);
 
     /** Release a glyph*/
     void (*release_glyph)(const lv_font_t *, lv_font_glyph_dsc_t *);
@@ -133,13 +133,12 @@ struct _lv_font_t {
 
 /**
  * Return with the bitmap of a font.
- * @param g_dsc         the glyph descriptor including which font to use etc.
- * @param letter        a UNICODE character code
+ * @note You must call @lv_font_get_glyph_dsc to get @g_dsc (@lv_font_glyph_dsc_t) before you can call this function.
+ * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
  * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
  * @return pointer to the glyph's data. It can be a draw buffer for bitmap fonts or an image source for imgfonts.
  */
-const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, uint32_t letter,
-                                      lv_draw_buf_t * draw_buf);
+const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /**
  * Get the descriptor of a glyph
@@ -152,6 +151,13 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, uint32_t lett
  */
 bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
                            uint32_t letter_next);
+
+/**
+ * Release the bitmap of a font.
+ * @note You must call @lv_font_get_glyph_dsc to get @g_dsc (@lv_font_glyph_dsc_t) before you can call this function.
+ * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
+ */
+void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc);
 
 /**
  * Get the width of a glyph with kerning
@@ -275,6 +281,10 @@ LV_FONT_DECLARE(lv_font_montserrat_28_compressed)
 
 #if LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 LV_FONT_DECLARE(lv_font_dejavu_16_persian_hebrew)
+#endif
+
+#if LV_FONT_SIMSUN_14_CJK
+LV_FONT_DECLARE(lv_font_simsun_14_cjk)
 #endif
 
 #if LV_FONT_SIMSUN_16_CJK

@@ -56,6 +56,8 @@ lv_draw_triangle_dsc_t * lv_draw_task_get_triangle_dsc(lv_draw_task_t * task)
 
 void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
 {
+    if(dsc->bg_opa <= LV_OPA_MIN) return;
+
     LV_PROFILER_BEGIN;
     lv_area_t a;
     a.x1 = (int32_t)LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);

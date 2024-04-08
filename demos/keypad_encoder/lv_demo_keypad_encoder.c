@@ -203,7 +203,7 @@ static void ta_event_cb(lv_event_t * e)
         lv_keyboard_set_textarea(kb, ta);
         lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
         lv_group_focus_obj(kb);
-        lv_group_set_editing(lv_obj_get_group(kb), kb);
+        lv_group_set_editing(lv_obj_get_group(kb), kb != NULL);
         lv_obj_set_height(tv, LV_VER_RES / 2);
         lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
     }
