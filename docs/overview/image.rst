@@ -309,6 +309,8 @@ open/close the PNG files. It should look like this:
      * If `dsc->decoded` is always set in `decoder_open` then `decoder_get_area` does not need to be implemented.
      * If `dsc->decoded` is only sometimes set or never set in `decoder_open` then `decoder_get_area` is used to
      * incrementally decode the image by calling it repeatedly until it returns `LV_RESULT_INVALID`.
+     * In the example below the image is decoded line-by-line but the decoded area can have any shape and size
+     * depending on the requirements and capabilities of the image decoder.
      */
 
      my_decoder_data_t * my_decoder_data = dsc->user_data;
