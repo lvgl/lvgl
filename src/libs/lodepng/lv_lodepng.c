@@ -12,6 +12,7 @@
 #include "lv_lodepng.h"
 #include "lodepng.h"
 #include <stdlib.h>
+#include <string.h>
 
 /*********************
  *      DEFINES
