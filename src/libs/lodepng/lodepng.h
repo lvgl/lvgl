@@ -32,7 +32,7 @@ extern "C" {
 
 #include "../../../lvgl.h"
 #if LV_USE_LODEPNG
-#include <string.h> /*for size_t*/
+#include LV_STDDEF_INCLUDE /*for size_t*/
 LV_ATTRIBUTE_EXTERN_DATA extern const char * LODEPNG_VERSION_STRING;
 
 /*
