@@ -17,6 +17,8 @@
  *      DEFINES
  *********************/
 
+#define DECODER_NAME    "PNG"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -50,6 +52,8 @@ void lv_libpng_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+
+    dec->name = DECODER_NAME;
 }
 
 void lv_libpng_deinit(void)

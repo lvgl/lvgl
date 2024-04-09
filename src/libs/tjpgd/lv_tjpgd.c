@@ -18,6 +18,9 @@
 /*********************
  *      DEFINES
  *********************/
+
+#define DECODER_NAME    "TJPGD"
+
 #define TJPGD_WORKBUFF_SIZE             4096    //Recommended by TJPGD library
 
 /**********************
@@ -55,6 +58,8 @@ void lv_tjpgd_init(void)
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_get_area_cb(dec, decoder_get_area);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+
+    dec->name = DECODER_NAME;
 }
 
 void lv_tjpgd_deinit(void)

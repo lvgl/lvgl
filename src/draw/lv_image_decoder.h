@@ -109,6 +109,8 @@ struct _lv_image_decoder_t {
     lv_image_decoder_get_area_cb_t get_area_cb;
     lv_image_decoder_close_f_t close_cb;
 
+    const char * name;
+
     void * user_data;
 };
 
