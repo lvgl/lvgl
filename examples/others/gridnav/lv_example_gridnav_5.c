@@ -6,7 +6,7 @@ static const char * opts_0_to_5 = "0\n1\n2\n3\n4\n5";
 static const char * opts_time_units = "s\nm\nh";
 
 /**
- * Simple navigation on a list widget
+ * Grid navigation for only one axis
  */
 void lv_example_gridnav_5(void)
 {
