@@ -202,7 +202,7 @@ void   lv_cache_set_create_cb(lv_cache_t * cache, lv_cache_create_cb_t alloc_cb,
 void   lv_cache_set_free_cb(lv_cache_t * cache, lv_cache_free_cb_t free_cb, void * user_data);
 
 /**
- * Give a name for a cache object.
+ * Give a name for a cache object. Only the pointer of the string is saved.
  * @param cache         The cache object pointer to set the name.
  * @param name          The name of the cache.
  */
