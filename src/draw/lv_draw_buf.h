@@ -76,7 +76,7 @@ typedef void (*lv_draw_buf_free_cb)(void * draw_buf);
 
 typedef void * (*lv_draw_buf_align_cb)(void * buf, lv_color_format_t color_format);
 
-typedef void (*lv_draw_buf_invalidate_cache_cb)(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+typedef void (*lv_draw_buf_cache_operation_cb)(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
@@ -84,7 +84,8 @@ typedef struct {
     lv_draw_buf_malloc_cb buf_malloc_cb;
     lv_draw_buf_free_cb buf_free_cb;
     lv_draw_buf_align_cb align_pointer_cb;
-    lv_draw_buf_invalidate_cache_cb invalidate_cache_cb;
+    lv_draw_buf_cache_operation_cb invalidate_cache_cb;
+    lv_draw_buf_cache_operation_cb flush_cache_cb;
     lv_draw_buf_width_to_stride_cb width_to_stride_cb;
 } lv_draw_buf_handlers_t;
 
@@ -118,7 +119,8 @@ void lv_draw_buf_init_handlers(lv_draw_buf_handlers_t * handlers,
                                lv_draw_buf_malloc_cb buf_malloc_cb,
                                lv_draw_buf_free_cb buf_free_cb,
                                lv_draw_buf_align_cb align_pointer_cb,
-                               lv_draw_buf_invalidate_cache_cb invalidate_cache_cb,
+                               lv_draw_buf_cache_operation_cb invalidate_cache_cb,
+                               lv_draw_buf_cache_operation_cb flush_cache_cb,
                                lv_draw_buf_width_to_stride_cb width_to_stride_cb);
 
 /**
@@ -161,6 +163,23 @@ void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_
  */
 void lv_draw_buf_invalidate_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
                                        const lv_area_t * area);
+
+/**
+ * Flush the cache of the buffer
+ * @param draw_buf     the draw buffer needs to be flushed
+ * @param area         the area to flush in the buffer,
+ *                     use NULL to flush the whole draw buffer address range
+ */
+void lv_draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+
+/**
+ * Flush the cache of the buffer using the user-defined callback
+ * @param handlers     the draw buffer handlers
+ * @param draw_buf     the draw buffer needs to be flushed
+ * @param area         the area to flush in the buffer,
+ */
+void lv_draw_buf_flush_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
+                                  const lv_area_t * area);
 
 /**
  * Calculate the stride in bytes based on a width and color format
