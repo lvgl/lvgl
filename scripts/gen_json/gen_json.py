@@ -134,13 +134,13 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
             include_path_env_key = 'C_INCLUDE_PATH'
             cpp_cmd = [
                 'clang', '-std=c11', '-E', '-DINT32_MIN=0x80000000',
-                f'-o "{pp_file}"'
+                f'"-o {pp_file}"'
             ]
         else:
             include_path_env_key = 'C_INCLUDE_PATH'
             cpp_cmd = [
                 'gcc', '-std=c11', '-E', '-Wno-incompatible-pointer-types',
-                f'-o "{pp_file}"'
+                f'"-o {pp_file}"'
             ]
 
         fake_libc_path = create_fake_lib_c.run(temp_directory)
@@ -166,18 +166,18 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
             '-DLV_USE_DEV_VERSION'
         ])
 
-        cpp_cmd.extend(['-DPYCPARSER', f'-I"{fake_libc_path}"'])
-        cpp_cmd.extend([f'-I"{item}"' for item in include_dirs])
+        cpp_cmd.extend(['-DPYCPARSER', f'"-I{fake_libc_path}"'])
+        cpp_cmd.extend([f'"-I{item}"' for item in include_dirs])
         cpp_cmd.append(f'"{lvgl_header_path}"')
 
-        if not sys.platform.startswith('darwin'):
-            cpp_cmd = ' '.join(cpp_cmd)
+        cpp_cmd = ' '.join(cpp_cmd)
 
         p = subprocess.Popen(
             cpp_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            env=os.environ
+            env=os.environ,
+            shell=True
         )
         out, err = p.communicate()
         exit_code = p.returncode
@@ -275,7 +275,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
 
         print()
         try:
-            print(cpp_cmd)
+            print(cpp_cmd)  # NOQA
             print()
         except:  # NOQA
             pass
