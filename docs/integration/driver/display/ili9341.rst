@@ -66,3 +66,8 @@ To create an ILI9341-based display use the function
 
 
 For additional details and a working example see the `generic MIPI driver documentation <https://github.com/lvgl/lvgl/doc/integration/drivers/display/gen_mipi.rst>`__.
+
+.. note::
+
+	You can find a step-by-step guide and the actual implementation of the callbacks on an STM32F746 using STM32CubeIDE and the ST HAL libraries here: :ref:`lcd_stm32_guide`
+	

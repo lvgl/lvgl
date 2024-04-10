@@ -6,7 +6,9 @@
  **********************************************************************
  */
 
+
 #include "lv_style.h"
+
 
 void lv_style_set_width(lv_style_t * style, int32_t value)
 {
@@ -938,7 +940,7 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_BASE_DIR = LV_STYLE_BASE_DIR;
 
-void lv_style_set_bitmap_mask_src(lv_style_t * style, const lv_image_dsc_t * value)
+void lv_style_set_bitmap_mask_src(lv_style_t * style, const void * value)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -947,6 +949,16 @@ void lv_style_set_bitmap_mask_src(lv_style_t * style, const lv_image_dsc_t * val
 }
 
 const lv_style_prop_t _lv_style_const_prop_id_BITMAP_MASK_SRC = LV_STYLE_BITMAP_MASK_SRC;
+
+void lv_style_set_rotary_sensitivity(lv_style_t * style, uint32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_ROTARY_SENSITIVITY, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_ROTARY_SENSITIVITY = LV_STYLE_ROTARY_SENSITIVITY;
 #if LV_USE_FLEX
 
 void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value)
@@ -1102,3 +1114,4 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN = LV_STYLE_GRID_CELL_ROW_SPAN;
 #endif /*LV_USE_GRID*/
+

@@ -47,6 +47,14 @@ void lv_fs_win32_init(void);
 void lv_fs_memfs_init(void);
 #endif
 
+#if LV_USE_FS_LITTLEFS
+void lv_fs_littlefs_init(void);
+#endif
+
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+void lv_fs_arduino_esp_littlefs_init(void);
+#endif
+
 /**********************
  *      MACROS
  **********************/

@@ -59,7 +59,7 @@ static lv_subject_t auth_state_subject;
 static void textarea_event_cb(lv_event_t * e)
 {
     lv_obj_t * ta = lv_event_get_target(e);
-    if(strcmp(lv_textarea_get_text(ta), "hello") == 0) {
+    if(lv_strcmp(lv_textarea_get_text(ta), "hello") == 0) {
         lv_subject_set_int(&auth_state_subject, LOGGED_IN);
     }
     else {

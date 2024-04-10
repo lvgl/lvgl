@@ -13,7 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl.h"
+
+#include "misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -50,6 +51,8 @@ typedef lv_display_t                lv_disp_t;
 typedef lv_display_rotation_t       lv_disp_rotation_t;
 typedef lv_display_render_mode_t    lv_disp_render_t;
 typedef lv_anim_completed_cb_t      lv_anim_ready_cb_t;
+typedef lv_screen_load_anim_t       lv_scr_load_anim_t;
+typedef lv_buttonmatrix_ctrl_t      lv_btnmatrix_ctrl_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -124,6 +127,8 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_get_scr_act              lv_display_get_screen_active
 #define lv_disp_get_scr_prev             lv_display_get_screen_prev
 #define lv_disp_load_scr                 lv_screen_load
+#define lv_scr_load                      lv_screen_load
+#define lv_scr_load_anim                 lv_screen_load_anim
 #define lv_disp_get_layer_top            lv_display_get_layer_top
 #define lv_disp_get_layer_sys            lv_display_get_layer_sys
 #define lv_disp_send_event               lv_display_send_event
@@ -181,7 +186,7 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_btnmatrix_set_one_checked         lv_buttonmatrix_set_one_checked
 #define lv_btnmatrix_get_map                 lv_buttonmatrix_get_map
 #define lv_btnmatrix_get_selected_btn        lv_buttonmatrix_get_selected_button
-#define lv_btnmatrix_get_button_text         lv_buttonmatrix_get_button_text
+#define lv_btnmatrix_get_btn_text            lv_buttonmatrix_get_button_text
 #define lv_btnmatrix_has_button_ctrl         lv_buttonmatrix_has_button_ctrl
 #define lv_btnmatrix_get_one_checked         lv_buttonmatrix_get_one_checked
 
@@ -217,32 +222,41 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define LV_STYLE_SHADOW_OFS_Y         LV_STYLE_SHADOW_OFFSET_Y
 #define LV_STYLE_TRANSFORM_ANGLE      LV_STYLE_TRANSFORM_ROTATION
 
-#define lv_obj_get_style_anim_time            lv_obj_get_style_anim_duration
-#define lv_obj_get_style_img_opa              lv_obj_get_style_image_opa
-#define lv_obj_get_style_img_recolor          lv_obj_get_style_image_recolor
-#define lv_obj_get_style_img_recolor_filtered lv_obj_get_style_image_recolor_filtered
-#define lv_obj_get_style_img_recolor_opa      lv_obj_get_style_image_recolor_opa
-#define lv_obj_get_style_shadow_ofs_x         lv_obj_get_style_shadow_offset_x
-#define lv_obj_get_style_shadow_ofs_y         lv_obj_get_style_shadow_offset_y
-#define lv_obj_get_style_transform_angle      lv_obj_get_style_transform_rotation
+#define lv_obj_get_style_anim_time               lv_obj_get_style_anim_duration
+#define lv_obj_get_style_img_opa                 lv_obj_get_style_image_opa
+#define lv_obj_get_style_img_recolor             lv_obj_get_style_image_recolor
+#define lv_obj_get_style_img_recolor_filtered    lv_obj_get_style_image_recolor_filtered
+#define lv_obj_get_style_img_recolor_opa         lv_obj_get_style_image_recolor_opa
+#define lv_obj_get_style_shadow_ofs_x            lv_obj_get_style_shadow_offset_x
+#define lv_obj_get_style_shadow_ofs_y            lv_obj_get_style_shadow_offset_y
+#define lv_obj_get_style_transform_angle         lv_obj_get_style_transform_rotation
+#define lv_obj_get_style_bg_img_src              lv_obj_get_style_bg_image_src
+#define lv_obj_get_style_bg_img_recolor          lv_obj_get_style_bg_image_recolor
+#define lv_obj_get_style_bg_img_recolor_opa      lv_obj_get_style_bg_image_recolor_opa
 
-#define lv_obj_set_style_anim_time          lv_obj_set_style_anim_duration
-#define lv_obj_set_style_img_opa            lv_obj_set_style_image_opa
-#define lv_obj_set_style_img_recolor        lv_obj_set_style_image_recolor
-#define lv_obj_set_style_img_recolor_opa    lv_obj_set_style_image_recolor_opa
-#define lv_obj_set_style_shadow_ofs_x       lv_obj_set_style_shadow_offset_x
-#define lv_obj_set_style_shadow_ofs_y       lv_obj_set_style_shadow_offset_y
-#define lv_obj_set_style_transform_zoom     lv_obj_set_style_transform_scale
-#define lv_obj_set_style_transform_angle    lv_obj_set_style_transform_rotation
+#define lv_obj_set_style_anim_time               lv_obj_set_style_anim_duration
+#define lv_obj_set_style_img_opa                 lv_obj_set_style_image_opa
+#define lv_obj_set_style_img_recolor             lv_obj_set_style_image_recolor
+#define lv_obj_set_style_img_recolor_opa         lv_obj_set_style_image_recolor_opa
+#define lv_obj_set_style_shadow_ofs_x            lv_obj_set_style_shadow_offset_x
+#define lv_obj_set_style_shadow_ofs_y            lv_obj_set_style_shadow_offset_y
+#define lv_obj_set_style_transform_zoom          lv_obj_set_style_transform_scale
+#define lv_obj_set_style_transform_angle         lv_obj_set_style_transform_rotation
+#define lv_obj_set_style_bg_img_src              lv_obj_set_style_bg_image_src
+#define lv_obj_set_style_bg_img_recolor          lv_obj_set_style_bg_image_recolor
+#define lv_obj_set_style_bg_img_recolor_opa      lv_obj_set_style_bg_image_recolor_opa
 
-#define lv_style_set_anim_time              lv_style_set_anim_duration
-#define lv_style_set_img_opa                lv_style_set_image_opa
-#define lv_style_set_img_recolor            lv_style_set_image_recolor
-#define lv_style_set_img_recolor_opa        lv_style_set_image_recolor_opa
-#define lv_style_set_shadow_ofs_x           lv_style_set_shadow_offset_x
-#define lv_style_set_shadow_ofs_y           lv_style_set_shadow_offset_y
-#define lv_style_set_transform_angle        lv_style_set_transform_rotation
-#define lv_style_set_transform_zoom         lv_style_set_transform_scale
+#define lv_style_set_anim_time                   lv_style_set_anim_duration
+#define lv_style_set_img_opa                     lv_style_set_image_opa
+#define lv_style_set_img_recolor                 lv_style_set_image_recolor
+#define lv_style_set_img_recolor_opa             lv_style_set_image_recolor_opa
+#define lv_style_set_shadow_ofs_x                lv_style_set_shadow_offset_x
+#define lv_style_set_shadow_ofs_y                lv_style_set_shadow_offset_y
+#define lv_style_set_transform_angle             lv_style_set_transform_rotation
+#define lv_style_set_transform_zoom              lv_style_set_transform_scale
+#define lv_style_set_bg_img_src                  lv_style_set_bg_image_src
+#define lv_style_set_bg_img_recolor              lv_style_set_bg_image_recolor
+#define lv_style_set_bg_img_recolor_opa          lv_style_set_bg_image_recolor_opa
 
 #define LV_ZOOM_NONE                        LV_SCALE_NONE
 

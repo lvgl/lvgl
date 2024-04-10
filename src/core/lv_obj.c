@@ -17,10 +17,9 @@
 #include "../misc/lv_assert.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
+#include "../misc/lv_types.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
-#include <stdint.h>
-#include <string.h>
 
 /*********************
  *      DEFINES
@@ -740,7 +739,7 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     lv_obj_invalidate(obj);
 
     obj->state = new_state;
-
+    _lv_obj_update_layer_type(obj);
     _lv_obj_style_transition_dsc_t * ts = lv_malloc_zeroed(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     uint32_t tsi = 0;
     uint32_t i;

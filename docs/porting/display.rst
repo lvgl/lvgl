@@ -152,6 +152,17 @@ reconfiguring the hardware. In lack of hardware display rotation support
 :cpp:expr:`lv_draw_sw_rotate` can be used to rotate the buffer in the
 ``flush_cb``.
 
+:cpp:expr:`lv_display_rotate_area(display, &area)` rotates the rendered area
+according to the current rotation settings of the display.
+
+Note that in :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_DIRECT` the small changed areas
+are rendered directly in the frame buffer so they cannot be
+rotated later. Therefore in direct mode only the whole frame buffer can be rotated.
+The same is true for :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_FULL`.
+
+In the case of :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL`the small rendered areas
+can be rotated on their own before flushing to the frame buffer.
+
 Color format
 ------------
 
@@ -214,9 +225,7 @@ You can do this in the following way:
 .. code:: c
 
    /*Delete the original display refresh timer*/
-   lv_timer_delete(disp->refr_timer);
-   disp->refr_timer = NULL;
-
+   lv_display_delete_refr_timer(disp);
 
    /*Call this anywhere you want to refresh the dirty areas*/
    _lv_display_refr_timer(NULL);

@@ -162,12 +162,12 @@ set(COMPILE_OPTIONS
     ${BUILD_TARGET_DEF}
 )
 
-filter_compiler_options(C LVGL_COMPILE_OPTIONS ${COMPILE_OPTIONS})
+filter_compiler_options(C LVGL_C_COMPILE_OPTIONS ${COMPILE_OPTIONS})
 
 # Options test cases are compiled with.
-filter_compiler_options(C LVGL_TESTFILE_COMPILE_OPTIONS ${LVGL_COMPILE_OPTIONS} -Wno-missing-prototypes)
+filter_compiler_options(C LVGL_TESTFILE_COMPILE_OPTIONS ${LVGL_C_COMPILE_OPTIONS} -Wno-missing-prototypes)
 
-filter_compiler_options(CXX LVGL_THORVG_COMPILE_OPTIONS
+filter_compiler_options(CXX LVGL_CXX_COMPILE_OPTIONS
         ${COMPILE_OPTIONS}
         -Wno-shadow
         -Wno-unused-parameter
@@ -182,10 +182,11 @@ get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 
 # Include lvgl project file.
 include(${LVGL_DIR}/CMakeLists.txt)
-target_compile_options(lvgl PUBLIC ${LVGL_COMPILE_OPTIONS})
-target_compile_options(lvgl_thorvg PUBLIC ${LVGL_THORVG_COMPILE_OPTIONS})
+target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:C>: ${LVGL_C_COMPILE_OPTIONS}>)
+target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:ASM>: ${LVGL_C_COMPILE_OPTIONS}>)
+target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:CXX>: ${LVGL_CXX_COMPILE_OPTIONS}>)
 if (TARGET lvgl_examples)
-  target_compile_options(lvgl_examples PUBLIC ${LVGL_COMPILE_OPTIONS})
+  target_compile_options(lvgl_examples PUBLIC ${LVGL_C_COMPILE_OPTIONS})
 endif()
 
 
@@ -288,9 +289,19 @@ endif()
 
 # disable test targets for build only tests
 if (ENABLE_TESTS)
-    file( GLOB_RECURSE TEST_CASE_FILES src/test_cases/*.c )
+    file(GLOB_RECURSE TEST_CASE_FILES src/test_cases/*.c)
+    file(GLOB_RECURSE TEST_LIBS_FILES src/test_libs/*.c)
 else()
     set(TEST_CASE_FILES)
+    set(TEST_LIBS_FILES)
+endif()
+
+# build a test libs target
+if (TEST_LIBS_FILES)
+    add_library(test_libs STATIC ${TEST_LIBS_FILES})
+    target_include_directories(test_libs PUBLIC ${TEST_INCLUDE_DIRS} "src/test_libs")
+    target_compile_options(test_libs PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
+    list(APPEND TEST_LIBS test_libs)
 endif()
 
 foreach( test_case_fname ${TEST_CASE_FILES} )
@@ -329,6 +340,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
             m
+            pthread
             ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})

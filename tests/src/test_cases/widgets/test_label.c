@@ -2,6 +2,7 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+#include <string.h>
 
 static const char * long_text =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada ultrices magna in rutrum.";
@@ -570,7 +571,7 @@ void test_label_rtl_dot_long_mode(void)
     const char * message =
         "מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).";
 
-    lv_obj_t * screen = lv_obj_create(lv_scr_act());
+    lv_obj_t * screen = lv_obj_create(lv_screen_active());
     lv_obj_remove_style_all(screen);
     lv_obj_set_size(screen, 800, 480);
     lv_obj_center(screen);

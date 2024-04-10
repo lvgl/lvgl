@@ -10,6 +10,11 @@
 
 #if LV_USE_MONKEY != 0
 
+#include "../../misc/lv_math.h"
+#include "../../misc/lv_assert.h"
+#include "../../stdlib/lv_mem.h"
+#include "../../display/lv_display.h"
+
 /*********************
  *      DEFINES
  *********************/

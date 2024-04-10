@@ -25,6 +25,8 @@
  *      DEFINES
  *********************/
 
+#define DECODER_NAME    "BIN"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -101,7 +103,8 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_set_open_cb(decoder, lv_bin_decoder_open);
     lv_image_decoder_set_get_area_cb(decoder, lv_bin_decoder_get_area);
     lv_image_decoder_set_close_cb(decoder, lv_bin_decoder_close);
-    lv_image_decoder_set_cache_free_cb(decoder, NULL); /*Use general cache free method*/
+
+    decoder->name = DECODER_NAME;
 }
 
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
@@ -327,7 +330,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     if(use_directly || dsc->args.no_cache) return LV_RESULT_OK; /*Do not put image to cache if it can be used directly.*/
 
-#if LV_CACHE_DEF_SIZE > 0
+    /*If the image cache is disabled, just return the decoded image*/
+    if(!lv_image_cache_is_enabled()) return LV_RESULT_OK;
 
     /*Add it to cache*/
     lv_image_cache_data_t search_key;
@@ -343,7 +347,6 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     dsc->cache_entry = cache_entry;
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     decoder_data->decoded = NULL; /*Cache will take care of it*/
-#endif
 
     return LV_RESULT_OK;
 }
@@ -399,7 +402,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     int32_t w_px = lv_area_get_width(full_area);
     uint8_t * img_data = NULL;
     lv_draw_buf_t * decoded = NULL;
-    uint32_t offset = 0;
+    uint32_t offset = dsc->src_type == LV_IMAGE_SRC_FILE ? sizeof(lv_image_header_t) : 0;   /*Skip the image header*/
 
     /*We only support read line by line for now*/
     if(decoded_area->y1 == LV_COORD_MIN) {
@@ -443,7 +446,6 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         offset += decoded_area->y1 * dsc->header.stride;
         offset += decoded_area->x1 * bpp / 8; /*Move to x1*/
         if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-            offset += sizeof(lv_image_header_t); /*File image starts with image header*/
             buf = lv_malloc(len);
             LV_ASSERT_NULL(buf);
             if(buf == NULL)
@@ -884,6 +886,7 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
 
 static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
+#if LV_BIN_DECODER_RAM_LOAD
     uint32_t rn;
     uint32_t len;
     uint32_t compressed_len;
@@ -989,6 +992,13 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     }
 
     return res;
+#else
+    LV_UNUSED(decompress_image);
+    LV_UNUSED(decoder);
+    LV_UNUSED(dsc);
+    LV_LOG_ERROR("Need LV_BIN_DECODER_RAM_LOAD to be enabled");
+    return LV_RESULT_INVALID;
+#endif
 }
 
 static lv_result_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, int32_t x,

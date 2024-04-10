@@ -11,8 +11,8 @@
 #if LV_USE_VECTOR_GRAPHIC
 
 #include "../misc/lv_ll.h"
+#include "../misc/lv_types.h"
 #include "../stdlib/lv_string.h"
-#include <stdbool.h>
 #include <math.h>
 #include <float.h>
 

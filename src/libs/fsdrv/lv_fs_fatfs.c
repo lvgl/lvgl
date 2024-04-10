@@ -256,6 +256,8 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         res = f_readdir(dir_p, &fno);
         if(res != FR_OK) return LV_FS_RES_UNKNOWN;
 
+        if(fno.fname[0] == 0) break; /* End of the directory */
+
         if(fno.fattrib & AM_DIR) {
             lv_snprintf(fn, fn_len, "/%s", fno.fname);
         }

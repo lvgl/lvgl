@@ -42,13 +42,6 @@
 void lv_draw_vg_lite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_t * dsc,
                             const lv_area_t * coords)
 {
-    if(dsc->opa <= LV_OPA_MIN)
-        return;
-    if(dsc->width == 0)
-        return;
-    if(dsc->side == LV_BORDER_SIDE_NONE)
-        return;
-
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     lv_area_t clip_area;
@@ -98,6 +91,7 @@ void lv_draw_vg_lite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
+    LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     LV_PROFILER_BEGIN_TAG("vg_lite_draw");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(

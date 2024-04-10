@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
 #include "lv_refr.h"
 #include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
@@ -14,6 +13,7 @@
 #include "../misc/lv_timer.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_profiler.h"
+#include "../misc/lv_types.h"
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
 #include "../stdlib/lv_string.h"
@@ -837,7 +837,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
          *This area needs to be updated on the screen.*/
         lv_area_t clip_coords_for_obj;
         lv_area_t tranf_coords = *obj_draw_size_out;
-        lv_obj_get_transformed_area(obj, &tranf_coords, false, false);
+        lv_obj_get_transformed_area(obj, &tranf_coords, LV_OBJ_POINT_TRANSFORM_FLAG_NONE);
         if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &tranf_coords)) {
             return LV_RESULT_INVALID;
         }
@@ -846,7 +846,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
          *It will tell which area of the non-transformed widget needs to be redrawn
          *in order to cover transformed area after transformation.*/
         lv_area_t inverse_clip_coords_for_obj = clip_coords_for_obj;
-        lv_obj_get_transformed_area(obj, &inverse_clip_coords_for_obj, false, true);
+        lv_obj_get_transformed_area(obj, &inverse_clip_coords_for_obj, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE);
         if(!_lv_area_intersect(&inverse_clip_coords_for_obj, &inverse_clip_coords_for_obj, obj_draw_size_out)) {
             return LV_RESULT_INVALID;
         }
@@ -906,8 +906,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         if(layer_type == LV_LAYER_TYPE_SIMPLE) {
             int32_t w = lv_area_get_width(&layer_area_full);
             uint8_t px_size = lv_color_format_get_size(disp_refr->color_format);
-            max_rgb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / px_size;
-            max_argb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color32_t);
+            max_rgb_row_height = LV_DRAW_LAYER_SIMPLE_BUF_SIZE / w / px_size;
+            max_argb_row_height = LV_DRAW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color32_t);
         }
 
         lv_area_t layer_area_act;
@@ -931,10 +931,22 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
                                                           area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE, &layer_area_act);
             lv_obj_redraw(new_layer, obj);
 
+            lv_point_t pivot = {
+                .x = lv_obj_get_style_transform_pivot_x(obj, 0),
+                .y = lv_obj_get_style_transform_pivot_y(obj, 0)
+            };
+
+            if(LV_COORD_IS_PCT(pivot.x)) {
+                pivot.x = (LV_COORD_GET_PCT(pivot.x) * lv_area_get_width(&obj->coords)) / 100;
+            }
+            if(LV_COORD_IS_PCT(pivot.y)) {
+                pivot.y = (LV_COORD_GET_PCT(pivot.y) * lv_area_get_height(&obj->coords)) / 100;
+            }
+
             lv_draw_image_dsc_t layer_draw_dsc;
             lv_draw_image_dsc_init(&layer_draw_dsc);
-            layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->buf_area.x1;
-            layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->buf_area.y1;
+            layer_draw_dsc.pivot.x = obj->coords.x1 + pivot.x - new_layer->buf_area.x1;
+            layer_draw_dsc.pivot.y = obj->coords.y1 + pivot.y - new_layer->buf_area.y1;
 
             layer_draw_dsc.opa = opa;
             layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, 0);

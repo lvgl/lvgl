@@ -12,10 +12,14 @@
 #if LV_USE_DRAW_VG_LITE
 
 #include "lv_vg_lite_utils.h"
+#include <stdlib.h>
+#include <string.h>
 
 /*********************
  *      DEFINES
  *********************/
+
+#define DECODER_NAME    "VG_LITE"
 
 /* VG_LITE_INDEX1, 2, and 4 require endian flipping + bit flipping,
  * so for simplicity, they are uniformly converted to I8 for display.
@@ -63,7 +67,8 @@ void lv_vg_lite_decoder_init(void)
     lv_image_decoder_set_info_cb(decoder, decoder_info);
     lv_image_decoder_set_open_cb(decoder, decoder_open);
     lv_image_decoder_set_close_cb(decoder, decoder_close);
-    lv_image_decoder_set_cache_free_cb(decoder, NULL); /*Use general cache free method*/
+
+    decoder->name = DECODER_NAME;
 }
 
 void lv_vg_lite_decoder_deinit(void)
@@ -392,7 +397,10 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     if(dsc->args.no_cache) return res;
 
-#if LV_CACHE_DEF_SIZE > 0
+    /*If the image cache is disabled, just return the decoded image*/
+    if(!lv_image_cache_is_enabled()) return res;
+
+    /*Add the decoded image to the cache*/
     if(res == LV_RESULT_OK) {
         lv_image_cache_data_t search_key;
         search_key.src_type = dsc->src_type;
@@ -408,7 +416,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         }
         dsc->cache_entry = entry;
     }
-#endif
 
     return res;
 }
@@ -417,7 +424,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    if(dsc->args.no_cache || LV_CACHE_DEF_SIZE == 0)
+    if(dsc->args.no_cache || !lv_image_cache_is_enabled())
         decoder_draw_buf_free((lv_draw_buf_t *)dsc->decoded);
     else
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);

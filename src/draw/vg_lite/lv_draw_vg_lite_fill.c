@@ -46,10 +46,6 @@
 
 void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
-    if(dsc->opa <= LV_OPA_MIN) {
-        return;
-    }
-
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     lv_area_t clip_area;
@@ -82,6 +78,7 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
+    LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     if(dsc->grad.dir != LV_GRAD_DIR_NONE) {
         vg_lite_matrix_t grad_matrix;

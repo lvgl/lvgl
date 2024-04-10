@@ -24,6 +24,7 @@ lvgl_cwd = cwd + '/../../'
 
 lvgl_src_cwd = lvgl_cwd + 'src/'
 inc = inc + [lvgl_src_cwd]
+src = src + Glob(os.path.join(lvgl_src_cwd,'*.c'))
 for root, dirs, files in os.walk(lvgl_src_cwd):
     for dir in dirs:
         current_path = os.path.join(root, dir)

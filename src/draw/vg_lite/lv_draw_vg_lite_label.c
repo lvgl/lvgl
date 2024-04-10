@@ -9,7 +9,7 @@
 
 #include "lv_draw_vg_lite.h"
 
-#include "../../libs/freetype/lv_freetype.h"
+#include "../../lvgl.h"
 
 #if LV_USE_DRAW_VG_LITE
 
@@ -63,8 +63,6 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
 void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
                            const lv_area_t * coords)
 {
-    if(dsc->opa <= LV_OPA_MIN) return;
-
     LV_PROFILER_BEGIN;
 
 #if LV_USE_FREETYPE
@@ -107,11 +105,11 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 #endif /* LV_USE_FREETYPE */
 
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
-                    lv_draw_image_dsc_t img_dsc;
-                    lv_draw_image_dsc_init(&img_dsc);
-                    img_dsc.opa = glyph_draw_dsc->opa;
-                    img_dsc.src = glyph_draw_dsc->glyph_data;
-                    lv_draw_vg_lite_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords, false);
+                    lv_draw_image_dsc_t image_dsc;
+                    lv_draw_image_dsc_init(&image_dsc);
+                    image_dsc.opa = glyph_draw_dsc->opa;
+                    image_dsc.src = glyph_draw_dsc->glyph_data;
+                    lv_draw_vg_lite_img(draw_unit, &image_dsc, glyph_draw_dsc->letter_coords, false);
                 }
                 break;
 
@@ -285,6 +283,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
+    LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     LV_PROFILER_BEGIN_TAG("vg_lite_draw");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(

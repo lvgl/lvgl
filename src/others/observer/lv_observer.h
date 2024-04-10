@@ -329,15 +329,14 @@ lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, 
 lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state,
                                             int32_t ref_value);
 
-#if LV_USE_BUTTON
 /**
- * Set an integer subject to 1 when a button is checked and set it 0 when unchecked.
- * @param obj       pointer to a button
+ * Set an integer subject to 1 when an object is checked and set it 0 when unchecked.
+ * @param obj       pointer to an object
  * @param subject   pointer to a subject
  * @return          pointer to the created observer
+ * @note            Ensure the object's `LV_OBJ_FLAG_CHECKABLE` flag is set
  */
-lv_observer_t * lv_button_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
-#endif
+lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
 
 #if LV_USE_LABEL
 /**

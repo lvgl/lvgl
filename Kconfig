@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.0.0
+# Kconfig file for LVGL v9.1.0
 
 menu "LVGL configuration"
 
@@ -10,17 +10,17 @@ menu "LVGL configuration"
 		default y
 
 	config LV_CONF_MINIMAL
-		bool "LVGL minimal configuration."
+		bool "LVGL minimal configuration"
 
-	menu "Color settings"
+	menu "Color Settings"
 		choice LV_COLOR_DEPTH
-			prompt "Color depth."
+			prompt "Color depth"
 			default LV_COLOR_DEPTH_16
 			help
 				Color depth to be used.
 
 			config LV_COLOR_DEPTH_32
-				bool "32: ARGB8888"
+				bool "32: XRGB8888"
 			config LV_COLOR_DEPTH_24
 				bool "24: RGB888"
 			config LV_COLOR_DEPTH_16
@@ -38,38 +38,9 @@ menu "LVGL configuration"
 			default 16 if LV_COLOR_DEPTH_16
 			default 24 if LV_COLOR_DEPTH_24
 			default 32 if LV_COLOR_DEPTH_32
-
-		config LV_COLOR_MIX_ROUND_OFS
-			int "Adjust color mix functions rounding"
-			default 128 if !LV_COLOR_DEPTH_32
-			default 0 if LV_COLOR_DEPTH_32
-			range 0 254
-			help
-				0: no adjustment, get the integer part of the result (round down)
-				64: round up from x.75
-				128: round up from half
-				192: round up from x.25
-				254: round up
-
-		config LV_OBJ_STYLE_CACHE
-			bool "Use cache to speed up getting object style properties"
-			default y
-
-		config LV_USE_OBJ_ID
-			bool "Add id field to obj."
-			default n
-
-		config LV_USE_OBJ_ID_BUILTIN
-			bool "Use builtin method to deal with obj ID"
-			default n
-
-		config LV_USE_OBJ_PROPERTY
-			bool "Use obj property set/get API"
-			default n
-
 	endmenu
 
-	menu "Memory settings"
+	menu "Memory Settings"
 		choice
 			prompt "Malloc functions source"
 			default LV_USE_BUILTIN_MALLOC
@@ -123,7 +94,7 @@ menu "LVGL configuration"
 
 		config LV_MEM_SIZE_KILOBYTES
 			int "Size of the memory used by `lv_malloc()` in kilobytes (>= 2kB)"
-			default 32
+			default 64
 			depends on LV_USE_BUILTIN_MALLOC
 
 		config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
@@ -140,270 +111,259 @@ menu "LVGL configuration"
 
 	menu "HAL Settings"
 		config LV_DEF_REFR_PERIOD
-			int "Default refresh period (ms)."
+			int "Default refresh period (ms)"
 			default 33
+			help
+				Default display refresh, input device read and animation step period.
 
 		config LV_DPI_DEF
-			int "Default Dots Per Inch (in px)."
+			int "Default Dots Per Inch (in px/inch)"
 			default 130
 			help
 				Used to initialize default sizes such as widgets sized, style paddings.
 				(Not so important, you can adjust it to modify default sizes and spaces)
 	endmenu
 
-	menu "Feature configuration"
+	menu "Operating System (OS)"
+		choice LV_USE_OS
+			prompt "Default operating system to use"
+			default LV_OS_NONE
 
-		menu "Drawing"
-			config LV_DRAW_BUF_STRIDE_ALIGN
-				int "Buffer stride alignment"
-				default 1
+			config LV_OS_NONE
+				bool "0: NONE"
+			config LV_OS_PTHREAD
+				bool "1: PTHREAD"
+			config LV_OS_FREERTOS
+				bool "2: FREERTOS"
+			config LV_OS_CMSIS_RTOS2
+				bool "3: CMSIS_RTOS2"
+			config LV_OS_RTTHREAD
+				bool "4: RTTHREAD"
+			config LV_OS_WINDOWS
+				bool "5: WINDOWS"
+			config LV_OS_CUSTOM
+				bool "255: CUSTOM"
+		endchoice
+
+		config LV_USE_OS
+			int
+			default 0 if LV_OS_NONE
+			default 1 if LV_OS_PTHREAD
+			default 2 if LV_OS_FREERTOS
+			default 3 if LV_OS_CMSIS_RTOS2
+			default 4 if LV_OS_RTTHREAD
+			default 5 if LV_OS_WINDOWS
+			default 255 if LV_OS_CUSTOM
+
+		config LV_OS_CUSTOM_INCLUDE
+			string "Custom OS include header"
+			default "stdint.h"
+			depends on LV_OS_CUSTOM
+	endmenu
+
+	menu "Rendering Configuration"
+		config LV_DRAW_BUF_STRIDE_ALIGN
+			int "Buffer stride alignment"
+			default 1
+		help
+			Align the stride of all layers and images to this bytes.
+
+		config LV_DRAW_BUF_ALIGN
+			int "Buffer address alignment"
+			default 4
+		help
+			Align the start address of draw_buf addresses to this bytes.
+
+		config LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+			int "Optimal size to buffer the widget with opacity"
+			default 24576
+			depends on LV_USE_DRAW_SW
 			help
-				Align the stride of all layers and images to this bytes.
+				If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
+				it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+				"Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be drawn in chunks.
 
-			config LV_DRAW_BUF_ALIGN
-				int "Buffer address alignment"
-				default 4
+		config LV_DRAW_THREAD_STACK_SIZE
+			int "Stack size of draw thread in bytes"
+			default 8192
+			depends on LV_USE_OS > 0
 			help
-				Align the start address of draw_buf addresses to this bytes.
+				If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
 
-			config LV_USE_OS
-				int "Default operating system to use"
-				default 0
+		config LV_USE_DRAW_SW
+			bool "Enable software rendering"
+			default y
+		help
+			Required to draw anything on the screen.
+
+		config LV_DRAW_SW_DRAW_UNIT_CNT
+			int "Number of draw units"
+			default 1
+			depends on LV_USE_DRAW_SW
 			help
-				"Select an operating system to use. Possible options:"
-				0:LV_OS_NONE
-				1:LV_OS_PTHREAD
-				2:LV_OS_FREERTOS
-				3:LV_OS_CMSIS_RTOS2
-				4:LV_OS_RTTHREAD
-				5:LV_OS_WINDOWS
-				255:LV_OS_CUSTOM
+				> 1 requires an operating system enabled in `LV_USE_OS`
+				> 1 means multiply threads will render the screen in parallel
 
-			config LV_USE_DRAW_SW
-				bool "Enable software rendering"
-				default y
+		config LV_USE_DRAW_ARM2D_SYNC
+			bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors"
+			default n
+			depends on LV_USE_DRAW_SW
 			help
-				Required to draw anything on the screen.
+				Must deploy arm-2d library to your project and add include PATH for "arm_2d.h".
 
-			config LV_DRAW_SW_DRAW_UNIT_CNT
-				int "Number of draw units"
-				default 1
-				help
-					> 1 requires an operating system enabled in `LV_USE_OS`
-					> 1 means multiply threads will render the screen in parallel
+		config LV_USE_NATIVE_HELIUM_ASM
+			bool "Enable native helium assembly"
+			default n
+			depends on LV_USE_DRAW_SW
+			help
+				Disabling this allows arm2d to work on its own (for testing only)
 
-			config LV_DRAW_SW_COMPLEX
-				bool "Enable complex draw engine"
-				default y
-				depends on LV_USE_DRAW_SW
-				help
-					Required to draw shadow, gradient, rounded corners, circles, arc, skew lines,
-					image transformations or any masks.
+		config LV_DRAW_SW_COMPLEX
+			bool "Enable complex draw engine"
+			default y
+			depends on LV_USE_DRAW_SW
+			help
+				0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only,
+				1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too.
 
-			config LV_DRAW_SW_SHADOW_CACHE_SIZE
-				int "Allow buffering some shadow calculation"
-				depends on LV_DRAW_SW_COMPLEX
-				default 0
-				help
-					LV_DRAW_SW_SHADOW_CACHE_SIZE is the max shadow size to buffer, where
-					shadow size is `shadow_width + radius`.
-					Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost.
+		config LV_DRAW_SW_SHADOW_CACHE_SIZE
+			int "Allow buffering some shadow calculation"
+			depends on LV_DRAW_SW_COMPLEX
+			default 0
+			help
+				LV_DRAW_SW_SHADOW_CACHE_SIZE is the max shadow size to buffer, where
+				shadow size is `shadow_width + radius`.
+				Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost.
 
-			config LV_DRAW_SW_CIRCLE_CACHE_SIZE
-				int "Set number of maximally cached circle data"
-				depends on LV_DRAW_SW_COMPLEX
-				default 4
-				help
-					The circumference of 1/4 circle are saved for anti-aliasing
-					radius * 4 bytes are used per circle (the most often used
-					radiuses are saved).
-					Set to 0 to disable caching.
+		config LV_DRAW_SW_CIRCLE_CACHE_SIZE
+			int "Set number of maximally cached circle data"
+			depends on LV_DRAW_SW_COMPLEX
+			default 4
+			help
+				The circumference of 1/4 circle are saved for anti-aliasing
+				radius * 4 bytes are used per circle (the most often used
+				radiuses are saved).
+				Set to 0 to disable caching.
 
-			config LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
-				int "Optimal size to buffer the widget with opacity"
-				default 24576
-				depends on LV_USE_DRAW_SW
-				help
-					"Simple layers" are used when a widget has `style_opa < 255`
-					to buffer the widget into a layer and blend it as an image
-					with the given opacity. Note that `bg_opa`, `text_opa` etc
-					don't require buffering into layer.
+		choice LV_USE_DRAW_SW_ASM
+			prompt "Asm mode in sw draw"
+			default LV_DRAW_SW_ASM_NONE
+			depends on LV_USE_DRAW_SW
+			help
+				ASM mode to be used
 
-			choice LV_USE_DRAW_SW_ASM
-				prompt "Asm mode in sw draw"
-				default LV_DRAW_SW_ASM_NONE
-				help
-					ASM mode to be used.
+			config LV_DRAW_SW_ASM_NONE
+				bool "0: NONE"
+			config LV_DRAW_SW_ASM_NEON
+				bool "1: NEON"
+			config LV_DRAW_SW_ASM_HELIUM
+				bool "2: HELIUM"
+			config LV_DRAW_SW_ASM_CUSTOM
+				bool "255: CUSTOM"
+		endchoice
 
-				config LV_DRAW_SW_ASM_NONE
-					bool "0: NONE"
-				config LV_DRAW_SW_ASM_NEON
-					bool "1: NEON"
-				config LV_DRAW_SW_ASM_HELIUM
-					bool "2: HELIUM"
-				config LV_DRAW_SW_ASM_CUSTOM
-					bool "255: CUSTOM"
-			endchoice
+		config LV_USE_DRAW_SW_ASM
+			int
+			default 0 if LV_DRAW_SW_ASM_NONE
+			default 1 if LV_DRAW_SW_ASM_NEON
+			default 2 if LV_DRAW_SW_ASM_HELIUM
+			default 255 if LV_DRAW_SW_ASM_CUSTOM
 
-			config LV_USE_DRAW_SW_ASM
-				int
-				default 0 if LV_DRAW_SW_ASM_NONE
-				default 1 if LV_DRAW_SW_ASM_NEON
-				default 2 if LV_DRAW_SW_ASM_HELIUM
-				default 255 if LV_DRAW_SW_ASM_CUSTOM
+		config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+			string "Set the custom asm include file"
+			default ""
+			depends on LV_DRAW_SW_ASM_CUSTOM
 
-			config LV_USE_NATIVE_HELIUM_ASM
-				bool	"Enable native helium assembly"
-				default y
-				depends on LV_DRAW_SW_ASM_HELIUM
-				help
-					Disabling this allows arm2d to work on its own (for testing only)
+		config LV_USE_DRAW_VGLITE
+			bool "Use NXP's VG-Lite GPU on iMX RTxxx platforms"
+			default n
 
-			config LV_DRAW_SW_ASM_CUSTOM_INCLUDE
-				string "Set the custom asm include file"
-				default ""
-				depends on LV_DRAW_SW_ASM_CUSTOM
+		config LV_USE_VGLITE_BLIT_SPLIT
+			bool "Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels"
+			depends on LV_USE_DRAW_VGLITE
+			default n
 
-			config LV_CACHE_DEF_SIZE
-				int "Default image cache size. 0 to disable caching."
-				default 0
-				depends on LV_USE_DRAW_SW
-				help
-					If only the built-in image formats are used there is no real advantage of caching.
-					(I.e. no new image decoder is added).
+		config LV_USE_VGLITE_DRAW_ASYNC
+			bool "Enable VGLite draw async"
+			depends on LV_USE_DRAW_VGLITE && LV_USE_OS > 0
+			default y
+			help
+				Queue multiple tasks and flash them once to the GPU.
 
-					With complex image decoders (e.g. PNG or JPG) caching can
-					save the continuous open/decode of images.
-					However the opened images might consume additional RAM.
+		config LV_USE_VGLITE_ASSERT
+			bool "Enable VGLite asserts"
+			default n
+			depends on LV_USE_DRAW_VGLITE
 
-			config LV_IMAGE_HEADER_CACHE_DEF_CNT
-				int "Default image header cache count. 0 to disable caching."
-				default 0
-				depends on LV_USE_DRAW_SW
-				help
-					If only the built-in image formats are used there is no real advantage of caching.
-					(I.e. no new image decoder is added).
+		config LV_USE_DRAW_PXP
+			bool "Use NXP's PXP on iMX RTxxx platforms"
+			default n
 
-					With complex image decoders (e.g. PNG or JPG) caching can
-					save the continuous getting header information of images.
-					However the records of opened images headers might consume additional RAM.
+		config LV_USE_PXP_ASSERT
+			bool "Enable PXP asserts"
+			default n
+			depends on LV_USE_DRAW_PXP
 
-			config LV_GRADIENT_MAX_STOPS
-				int "Number of stops allowed per gradient."
-				default 2
-				depends on LV_USE_DRAW_SW
-				help
-					Increase this to allow more stops.
-					This adds (sizeof(lv_color_t) + 1) bytes per additional stop
+		config LV_USE_DRAW_DAVE2D
+			bool "Use Renesas Dave2D on RA platforms"
+			default n
 
-			config LV_GRAD_CACHE_DEF_SIZE
-				int "Default gradient buffer size."
-				default 0
-				depends on LV_USE_DRAW_SW
-				help
-					When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
-					LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
-					If the cache is too small the map will be allocated only while it's required for the drawing.
-					0 mean no caching.
+		config LV_USE_DRAW_SDL
+			bool "Draw using cached SDL textures"
+			default n
+			help
+				Uses SDL renderer API
 
-			config LV_DITHER_GRADIENT
-				bool "Allow dithering the gradients"
-				depends on LV_USE_DRAW_SW
-				help
-					Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
-					LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
-					The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion
+		config LV_USE_DRAW_VG_LITE
+			bool "Use VG-Lite GPU"
 
-			config LV_DITHER_ERROR_DIFFUSION
-				bool "Add support for error diffusion dithering"
-				depends on LV_DITHER_GRADIENT
-				help
-					Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
-					The increase in memory consumption is (24 bits * object's width)
+		config LV_VG_LITE_USE_GPU_INIT
+			bool "Enable VG-Lite custom external 'gpu_init()' function"
+			default n
+			depends on LV_USE_DRAW_VG_LITE
 
-			config LV_USE_VECTOR_GRAPHIC
-				bool "Use Vector Graphic APIs"
-				default n
-				help
-					Enable drawing support vector graphic APIs.
-		endmenu
+		config LV_VG_LITE_USE_ASSERT
+			bool "Enable VG-Lite assert"
+			default n
+			depends on LV_USE_DRAW_VG_LITE
 
-		menu "GPU"
-			config LV_USE_DRAW_ARM2D_SYNC
-				bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors."
-				default n
-				help
-					Must deploy arm-2d library to your project and add include PATH for "arm_2d.h".
+		config LV_VG_LITE_FLUSH_MAX_COUNT
+			int "VG-Lite flush commit trigger threshold"
+			default 8
+			depends on LV_USE_DRAW_VG_LITE
+			help
+				GPU will try to batch these many draw tasks
 
-			config LV_USE_GPU_STM32_DMA2D
-				bool "Enable STM32 DMA2D (aka Chrom Art) GPU."
-			config LV_GPU_DMA2D_CMSIS_INCLUDE
-				string "include path of CMSIS header of target processor"
-				depends on LV_USE_GPU_STM32_DMA2D
-				default ""
-				help
-					Must be defined to include path of CMSIS header of target processor
-					e.g. "stm32f769xx.h" or "stm32f429xx.h"
+		config LV_VG_LITE_USE_BOX_SHADOW
+			bool "Enable border to simulate shadow"
+			default n
+			depends on LV_USE_DRAW_VG_LITE
+			help
+				which usually improves performance,
+				but does not guarantee the same rendering quality as the software.
 
-			config LV_USE_GPU_SWM341_DMA2D
-				bool "Enable SWM341 DMA2D GPU."
-			config LV_GPU_SWM341_DMA2D_INCLUDE
-				string "include path of CMSIS header of target processor"
-				depends on LV_USE_GPU_SWM341_DMA2D
-				default "SWM341.h"
-				help
-					Must be defined to include path of CMSIS header of target processor
-					e.g. "SWM341.h"
+		config LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+			int "VG-Lite linear gradient image maximum cache number."
+			default 32
+			depends on LV_USE_DRAW_VG_LITE
+			help
+				The memory usage of a single gradient image is 4K bytes.
 
-			config LV_USE_DRAW_VGLITE
-				bool "Use NXP's VG-Lite GPU on iMX RTxxx platforms."
+		config LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
+			int "VG-Lite radial gradient image maximum cache number."
+			default 32
+			depends on LV_USE_DRAW_VG_LITE
+			help
+				The memory usage of a single gradient image is radial grad radius * 4 bytes.
 
-			config LV_USE_DRAW_PXP
-				bool "Use NXP's PXP on iMX RTxxx platforms."
+		config LV_USE_VECTOR_GRAPHIC
+			bool "Use Vector Graphic APIs"
+			default n
+			help
+				Enable drawing support vector graphic APIs.
+	endmenu
 
-			config LV_USE_DRAW_VG_LITE
-				bool "Use VG-Lite GPU."
-
-			config LV_VG_LITE_USE_GPU_INIT
-				bool "Enable VG-Lite custom external 'gpu_init()' function."
-				default n
-				depends on LV_USE_DRAW_VG_LITE
-
-			config LV_VG_LITE_USE_ASSERT
-				bool "Enable VG-Lite assert."
-				default n
-				depends on LV_USE_DRAW_VG_LITE
-
-			config LV_VG_LITE_FLUSH_MAX_COUNT
-				int "VG-Lite flush commit trigger threshold."
-				default 8
-				depends on LV_USE_DRAW_VG_LITE
-				help
-					GPU will try to batch these many draw tasks.
-
-			config LV_VG_LITE_USE_BOX_SHADOW
-				bool "Enable border to simulate shadow."
-				default n
-				depends on LV_USE_DRAW_VG_LITE
-				help
-					which usually improves performance,
-					but does not guarantee the same rendering quality as the software.
-
-			config LV_USE_GPU_SDL
-				bool "Use SDL renderer API"
-				default n
-			config LV_GPU_SDL_INCLUDE_PATH
-				string "include path of SDL header"
-				depends on LV_USE_GPU_SDL
-				default "SDL2/SDL.h"
-			config LV_GPU_SDL_LRU_SIZE
-				int "Maximum buffer size to allocate for rotation"
-				depends on LV_USE_GPU_SDL
-				default 8388608
-				help
-					Texture cache size, 8MB by default.
-		endmenu
-
+	menu "Feature Configuration"
 		menu "Logging"
 			config LV_USE_LOG
 				bool "Enable the log module"
@@ -493,8 +453,8 @@ menu "LVGL configuration"
 				default y
 				depends on LV_USE_LOG
 
-			config LV_LOG_TRACE_MSG
-				bool "Enable/Disable LV_LOG_TRACE in msg module"
+			config LV_LOG_TRACE_CACHE
+				bool "Enable/Disable LV_LOG_TRACE in cache module"
 				default y
 				depends on LV_USE_LOG
 		endmenu
@@ -515,35 +475,30 @@ menu "LVGL configuration"
 				bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
 
 			config LV_USE_ASSERT_OBJ
-				bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)."
+				bool "Check NULL, the object's type and existence (e.g. not deleted). (Slow)"
 
 			config LV_ASSERT_HANDLER_INCLUDE
 				string "Header to include for the custom assert function"
 				default "assert.h"
+				help
+					Add a custom handler when assert happens e.g. to restart the MCU
 		endmenu
 
-		menu "Others"
-			config LV_USE_FLOAT
-				bool "Use float as lv_value_precise_t."
-				default n
-
+		menu "Debug"
 			config LV_USE_REFR_DEBUG
-				bool "Draw random colored rectangles over the redrawn areas."
+				bool "Draw random colored rectangles over the redrawn areas"
 
 			config LV_USE_LAYER_DEBUG
 				bool "Draw a red overlay for ARGB layers and a green overlay for RGB layers"
 
 			config LV_USE_PARALLEL_DRAW_DEBUG
-				bool "Draw overlays with different colors for each draw_unit's tasks."
+				bool "Draw overlays with different colors for each draw_unit's tasks"
+				help
+					Also add the index number of the draw unit on white background.
+					For layers add the index number of the draw unit on black background.
+		endmenu
 
-			config LV_USE_BUILTIN_SNPRINTF
-				bool "Use the built-in (v)snprintf functions"
-				default y
-
-			config LV_SPRINTF_USE_FLOAT
-				bool "Enable float in built-in (v)snprintf functions"
-				depends on LV_USE_BUILTIN_SNPRINTF
-
+		menu "Others"
 			config LV_ENABLE_GLOBAL_CUSTOM
 				bool "Enable 'lv_global' customization"
 
@@ -552,28 +507,123 @@ menu "LVGL configuration"
 				depends on LV_ENABLE_GLOBAL_CUSTOM
 				default "lv_global.h"
 
-			config LV_BIN_DECODER_RAM_LOAD
-				bool "Decode whole image to RAM for bin decoder"
+			config LV_CACHE_DEF_SIZE
+				int "Default image cache size. 0 to disable caching"
+				default 0
+				depends on LV_USE_DRAW_SW
+				help
+					If only the built-in image formats are used there is no real advantage of caching.
+					(I.e. no new image decoder is added).
+
+					With complex image decoders (e.g. PNG or JPG) caching can
+					save the continuous open/decode of images.
+					However the opened images might consume additional RAM.
+
+			config LV_IMAGE_HEADER_CACHE_DEF_CNT
+				int "Default image header cache count. 0 to disable caching"
+				default 0
+				depends on LV_USE_DRAW_SW
+				help
+					If only the built-in image formats are used there is no real advantage of caching.
+					(I.e. no new image decoder is added).
+
+					With complex image decoders (e.g. PNG or JPG) caching can
+					save the continuous getting header information of images.
+					However the records of opened images headers might consume additional RAM.
+
+			config LV_GRADIENT_MAX_STOPS
+				int "Number of stops allowed per gradient"
+				default 2
+				depends on LV_USE_DRAW_SW
+				help
+					Increase this to allow more stops.
+					This adds (sizeof(lv_color_t) + 1) bytes per additional stop
+
+			config LV_COLOR_MIX_ROUND_OFS
+				int "Adjust color mix functions rounding"
+				default 128 if !LV_COLOR_DEPTH_32
+				default 0 if LV_COLOR_DEPTH_32
+				range 0 254
+				help
+					0: no adjustment, get the integer part of the result (round down)
+					64: round up from x.75
+					128: round up from half
+					192: round up from x.25
+					254: round up
+
+			config LV_OBJ_STYLE_CACHE
+				bool "Use cache to speed up getting object style properties"
+				default n
+				help
+					Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties
+
+			config LV_USE_OBJ_ID
+				bool "Add id field to obj"
 				default n
 
-		endmenu
+			config LV_USE_OBJ_ID_BUILTIN
+				bool "Use builtin method to deal with obj ID"
+				default n
 
-		menu "Compiler settings"
-			config LV_BIG_ENDIAN_SYSTEM
-				bool "For big endian systems set to 1"
+			config LV_USE_OBJ_PROPERTY
+				bool "Use obj property set/get API"
+				default n
 
-			config LV_ATTRIBUTE_MEM_ALIGN_SIZE
-				int "Required alignment size for buffers"
-				default 1
-
-			config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
-				bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
+			config LV_USE_VG_LITE_THORVG
+				bool "VG-Lite Simulator"
+				default n
+				depends on LV_USE_THORVG
 				help
-					Set this option to configure IRAM as LV_ATTRIBUTE_FAST_MEM
+					Use thorvg to simulate VG-Lite hardware behavior, it's useful
+					for debugging and testing on PC simulator. Enable LV_USE_THORVG,
+					Either internal ThorVG or external ThorVG library is required.
+
+			config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+				bool "Enable LVGL blend mode support"
+				default n
+				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_VG_LITE_THORVG_YUV_SUPPORT
+				bool "Enable YUV color format support"
+				default n
+				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_VG_LITE_THORVG_16PIXELS_ALIGN
+				bool "Enable 16 pixels alignment"
+				default y
+				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+				int "Buffer address alignment"
+				default 64
+				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_VG_LITE_THORVG_THREAD_RENDER
+				bool "Enable multi-thread render"
+				default n
+				depends on LV_USE_VG_LITE_THORVG
 		endmenu
 	endmenu
 
-	menu "Font usage"
+	menu "Compiler Settings"
+		config LV_BIG_ENDIAN_SYSTEM
+			bool "For big endian systems set to 1"
+
+		config LV_ATTRIBUTE_MEM_ALIGN_SIZE
+			int "Required alignment size for buffers"
+			default 1
+
+		config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
+			bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
+			help
+				Set this option to configure IRAM as LV_ATTRIBUTE_FAST_MEM
+
+		config LV_USE_FLOAT
+			bool "Use float as lv_value_precise_t"
+			default n
+	endmenu
+
+	menu "Font Usage"
 		menu "Enable built-in fonts"
 			config LV_FONT_MONTSERRAT_8
 				bool "Enable Montserrat 8"
@@ -619,12 +669,12 @@ menu "LVGL configuration"
 			config LV_FONT_MONTSERRAT_48
 				bool "Enable Montserrat 48"
 
-			config LV_FONT_MONTSERRAT_12_SUBPX
-				bool "Enable Montserrat 12 sub-pixel"
 			config LV_FONT_MONTSERRAT_28_COMPRESSED
 				bool "Enable Montserrat 28 compressed"
 			config LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 				bool "Enable Dejavu 16 Persian, Hebrew, Arabic letters"
+			config LV_FONT_SIMSUN_14_CJK
+				bool "Enable Simsun 14 CJK"
 			config LV_FONT_SIMSUN_16_CJK
 				bool "Enable Simsun 16 CJK"
 
@@ -702,15 +752,15 @@ menu "LVGL configuration"
 			config LV_FONT_DEFAULT_MONTSERRAT_48
 				bool "Montserrat 48"
 				select LV_FONT_MONTSERRAT_48
-			config LV_FONT_DEFAULT_MONTSERRAT_12_SUBPX
-				bool "Montserrat 12 sub-pixel"
-				select LV_FONT_MONTSERRAT_12_SUBPX
 			config LV_FONT_DEFAULT_MONTSERRAT_28_COMPRESSED
 				bool "Montserrat 28 compressed"
 				select LV_FONT_MONTSERRAT_28_COMPRESSED
 			config LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW
 				bool "Dejavu 16 Persian, Hebrew, Arabic letters"
 				select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+			config LV_FONT_DEFAULT_SIMSUN_14_CJK
+				bool "Simsun 14 CJK"
+				select LV_FONT_SIMSUN_14_CJK
 			config LV_FONT_DEFAULT_SIMSUN_16_CJK
 				bool "Simsun 16 CJK"
 				select LV_FONT_SIMSUN_16_CJK
@@ -723,28 +773,17 @@ menu "LVGL configuration"
 		endchoice
 
 		config LV_FONT_FMT_TXT_LARGE
-			bool "Enable it if you have fonts with a lot of characters."
+			bool "Enable it if you have fonts with a lot of characters"
 			help
 				The limit depends on the font size, font face and format
 				but with > 10,000 characters if you see issues probably you
 				need to enable it.
 
 		config LV_USE_FONT_COMPRESSED
-			bool "Sets support for compressed fonts."
-
-		config LV_USE_FONT_SUBPX
-			bool "Enable subpixel rendering."
-
-		config LV_FONT_SUBPX_BGR
-			bool "Use BGR instead RGB for sub-pixel rendering."
-			depends on LV_USE_FONT_SUBPX
-			help
-				Set the pixel order of the display.
-				Important only if "subpx fonts" are used.
-				With "normal" font it doesn't matter.
+			bool "Sets support for compressed fonts"
 
 		config LV_USE_FONT_PLACEHOLDER
-			bool "Enable drawing placeholders when glyph dsc is not found."
+			bool "Enable drawing placeholders when glyph dsc is not found"
 			default y
 	endmenu
 
@@ -785,11 +824,7 @@ menu "LVGL configuration"
 			default 3
 			depends on LV_TXT_LINE_BREAK_LONG_LEN > 0
 			help
-				Minimum number of characters in a long word to put on a line after a break.
-
-		config LV_TXT_COLOR_CMD
-			string "The control character to use for signalling text recoloring"
-			default "#"
+				Minimum number of characters in a long word to put on a line after a break
 
 		config LV_USE_BIDI
 			bool "Support bidirectional texts"
@@ -818,95 +853,30 @@ menu "LVGL configuration"
 				an other form based on their position in the text.
 	endmenu
 
-	menu "Widget usage"
+	menu "Widget Usage"
 		config LV_WIDGETS_HAS_DEFAULT_VALUE
-			bool "Widgets has default value."
+			bool "Widgets has default value"
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_ANIMIMG
+			bool "Anim image"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_ARC
-			bool "Arc."
+			bool "Arc"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_BAR
-			bool "Bar."
+			bool "Bar"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_BUTTON
-			bool "Button."
+			bool "Button"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_BUTTONMATRIX
-			bool "Button matrix."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_CANVAS
-			bool "Canvas. Dependencies: lv_image."
-			select LV_USE_IMAGE
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_CHECKBOX
-			bool "Check Box"
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_DROPDOWN
-			bool "Drop down list. Requires: lv_label."
-			select LV_USE_LABEL
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_IMAGE
-			bool "Image. Requires: lv_label."
-			select LV_USE_LABEL
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_LABEL
-			bool "Label."
-			default y if !LV_CONF_MINIMAL
-		config LV_LABEL_TEXT_SELECTION
-			bool "Enable selecting text of the label."
-			depends on LV_USE_LABEL
-			default y
-		config LV_LABEL_LONG_TXT_HINT
-			bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
-			depends on LV_USE_LABEL
-			default y
-		config LV_LABEL_WAIT_CHAR_COUNT
-			int "The count of wait chart."
-			depends on LV_USE_LABEL
-			default 3
-		config LV_USE_LINE
-			bool "Line."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_ROLLER
-			bool "Roller. Requires: lv_label."
-			select LV_USE_LABEL
-			default y if !LV_CONF_MINIMAL
-		config LV_ROLLER_INF_PAGES
-			int "Number of extra 'pages' when the controller is infinite."
-			default 7
-			depends on LV_USE_ROLLER
-		config LV_USE_SCALE
-			bool "Scale."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_SLIDER
-			bool "Slider. Requires: lv_bar."
-			select LV_USE_BAR
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_SWITCH
-			bool "Switch."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_TEXTAREA
-			bool "Text area. Requires: lv_label."
-			select LV_USE_LABEL
-			default y if !LV_CONF_MINIMAL
-		config LV_TEXTAREA_DEF_PWD_SHOW_TIME
-			int "Text area def. pwd show time [ms]."
-			default 1500
-			depends on LV_USE_TEXTAREA
-		config LV_USE_TABLE
-			bool "Table."
-			default y if !LV_CONF_MINIMAL
-	endmenu
-
-	menu "Extra Widgets"
-		config LV_USE_ANIMIMAGE
-			bool "Anim image."
+			bool "Button matrix"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_CALENDAR
-			bool "Calendar."
+			bool "Calendar"
 			default y if !LV_CONF_MINIMAL
 		config LV_CALENDAR_WEEK_STARTS_MONDAY
-			bool "Calendar week starts monday."
+			bool "Calendar week starts monday"
 			depends on LV_USE_CALENDAR
 		config LV_USE_CALENDAR_HEADER_ARROW
 			bool "Use calendar header arrow"
@@ -916,45 +886,103 @@ menu "LVGL configuration"
 			bool "Use calendar header dropdown"
 			depends on LV_USE_CALENDAR
 			default y
+		config LV_USE_CALENDAR_CHINESE
+			bool "Use chinese calendar"
+			depends on LV_USE_CALENDAR
+		config LV_USE_CANVAS
+			bool "Canvas. Requires: lv_image"
+			imply LV_USE_IMAGE
+			default y if !LV_CONF_MINIMAL
 		config LV_USE_CHART
-			bool "Chart."
+			bool "Chart"
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_CHECKBOX
+			bool "Check Box"
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_DROPDOWN
+			bool "Drop down list. Requires: lv_label"
+			imply LV_USE_LABEL
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_IMAGE
+			bool "Image. Requires: lv_label"
+			imply LV_USE_LABEL
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_IMAGEBUTTON
-			bool "ImageButton."
+			bool "ImageButton"
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_OBSERVER
-			bool "Observer."
-			default n
 		config LV_USE_KEYBOARD
-			bool "Keyboard."
+			bool "Keyboard"
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_LABEL
+			bool "Label"
+			default y if !LV_CONF_MINIMAL
+		config LV_LABEL_TEXT_SELECTION
+			bool "Enable selecting text of the label"
+			depends on LV_USE_LABEL
+			default y
+		config LV_LABEL_LONG_TXT_HINT
+			bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts"
+			depends on LV_USE_LABEL
+			default y
+		config LV_LABEL_WAIT_CHAR_COUNT
+			int "The count of wait chart"
+			depends on LV_USE_LABEL
+			default 3
 		config LV_USE_LED
-			bool "LED."
+			bool "LED"
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_LINE
+			bool "Line"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_LIST
-			bool "List."
+			bool "List"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_MENU
-			bool "Menu."
+			bool "Menu"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_MSGBOX
-			bool "Msgbox."
+			bool "Msgbox"
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_ROLLER
+			bool "Roller. Requires: lv_label"
+			imply LV_USE_LABEL
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_SCALE
+			bool "Scale"
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_SLIDER
+			bool "Slider. Requires: lv_bar"
+			imply LV_USE_BAR
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_SPAN
-			bool "span"
+			bool "Span"
 			default y if !LV_CONF_MINIMAL
 		config LV_SPAN_SNIPPET_STACK_SIZE
 			int "Maximum number of span descriptor"
 			default 64
 			depends on LV_USE_SPAN
 		config LV_USE_SPINBOX
-			bool "Spinbox."
+			bool "Spinbox"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_SPINNER
-			bool "Spinner."
+			bool "Spinner"
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_SWITCH
+			bool "Switch"
+			default y if !LV_CONF_MINIMAL
+		config LV_USE_TEXTAREA
+			bool "Text area. Requires: lv_label"
+			select LV_USE_LABEL
+			default y if !LV_CONF_MINIMAL
+		config LV_TEXTAREA_DEF_PWD_SHOW_TIME
+			int "Text area def. pwd show time [ms]"
+			default 1500
+			depends on LV_USE_TEXTAREA
+		config LV_USE_TABLE
+			bool "Table"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_TABVIEW
-			bool "Tabview."
+			bool "Tabview"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_TILEVIEW
 			bool "Tileview"
@@ -989,10 +1017,10 @@ menu "LVGL configuration"
 
 	menu "Layouts"
 		config LV_USE_FLEX
-			bool "A layout similar to Flexbox in CSS."
+			bool "A layout similar to Flexbox in CSS"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_GRID
-			bool "A layout similar to Grid in CSS."
+			bool "A layout similar to Grid in CSS"
 			default y if !LV_CONF_MINIMAL
 	endmenu
 
@@ -1064,6 +1092,13 @@ menu "LVGL configuration"
 			default 0
 			depends on LV_USE_FS_LITTLEFS
 
+		config LV_USE_FS_ARDUINO_ESP_LITTLEFS
+			bool "File system on top of Arduino ESP littlefs API"
+		config LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			default 0
+			depends on LV_USE_FS_ARDUINO_ESP_LITTLEFS
+
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
 
@@ -1082,10 +1117,13 @@ menu "LVGL configuration"
 		config LV_USE_GIF
 			bool "GIF decoder library"
 
-		if LV_USE_GIF
-			config LV_GIF_CACHE_DECODE_DATA
-				bool "Use extra 16KB RAM to cache decoded data to accerlate"
-		endif
+		config LV_GIF_CACHE_DECODE_DATA
+			bool "Use extra 16KB RAM to cache decoded data to accerlate"
+			depends on LV_USE_GIF
+
+		config LV_BIN_DECODER_RAM_LOAD
+			bool "Decode whole image to RAM for bin decoder"
+			default n
 
 		config LV_USE_RLE
 			bool "LVGL's version of RLE compression method"
@@ -1098,24 +1136,14 @@ menu "LVGL configuration"
 
 		config LV_USE_FREETYPE
 			bool "FreeType library"
-		if LV_USE_FREETYPE
-			menu "FreeType config"
-				config LV_FREETYPE_CACHE_SIZE
-				int "Memory used by FreeType to cache characters in kilobytes"
-				default 768
-			config LV_FREETYPE_USE_LVGL_PORT
-				bool "Let FreeType to use LVGL memory and file porting"
-				default n
-			config LV_FREETYPE_CACHE_FT_FACES
-				int "The maximum number of FT_Face"
-				default 8
-			config LV_FREETYPE_CACHE_FT_SIZES
-				int "The maximum number of FT_Size"
-				default 8
-			config LV_FREETYPE_CACHE_FT_GLYPH_CNT
-				int "The maximum number of Glyph in count"
-				default 256
-			endmenu
+		config LV_FREETYPE_USE_LVGL_PORT
+			bool "Let FreeType to use LVGL memory and file porting"
+			default n
+			depends on LV_USE_FREETYPE
+		config LV_FREETYPE_CACHE_FT_GLYPH_CNT
+			int "The maximum number of Glyph in count"
+			default 256
+			depends on LV_USE_FREETYPE
 
 		config LV_USE_TINY_TTF
 			bool "Enable Tiny TTF decoder"
@@ -1124,10 +1152,10 @@ menu "LVGL configuration"
 			bool "Enable loading Tiny TTF data from files"
 			default n
 			depends on LV_USE_TINY_TTF
-		endif
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
+	
 		config LV_USE_THORVG
 			bool "ThorVG library"
 			choice
@@ -1163,18 +1191,18 @@ menu "LVGL configuration"
 	menu "Others"
 		config LV_USE_SNAPSHOT
 			bool "Enable API to take snapshot"
-			default y if !LV_CONF_MINIMAL
+			default n if !LV_CONF_MINIMAL
 
 		config LV_USE_SYSMON
 			bool "Enable system monitor component"
 			default n
 
 		config LV_USE_PERF_MONITOR
-			bool "Show CPU usage and FPS count."
+			bool "Show CPU usage and FPS count"
 			depends on LV_USE_SYSMON
 
 		choice
-			prompt "Performance monitor position."
+			prompt "Performance monitor position"
 			depends on LV_USE_PERF_MONITOR
 			default LV_PERF_MONITOR_ALIGN_BOTTOM_RIGHT
 
@@ -1204,12 +1232,12 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_MEM_MONITOR
-			bool "Show the used memory and the memory fragmentation."
-			depends on !LV_MEM_CUSTOM
-			depends on LV_USE_SYSMON
+			bool "Show the used memory and the memory fragmentation"
+			default n
+			depends on LV_STDLIB_BUILTIN && LV_USE_SYSMON
 
 		choice
-			prompt "Memory monitor position."
+			prompt "Memory monitor position"
 			depends on LV_USE_MEM_MONITOR
 			default LV_MEM_MONITOR_ALIGN_BOTTOM_LEFT
 
@@ -1233,12 +1261,8 @@ menu "LVGL configuration"
 				bool "Center"
 		endchoice
 
-		config LV_USE_MONKEY
-			bool "Enable Monkey test"
-			default n
-
 		config LV_USE_PROFILER
-			bool "Runtime performance profiler."
+			bool "Runtime performance profiler"
 		config LV_USE_PROFILER_BUILTIN
 			bool "Enable the built-in profiler"
 			depends on LV_USE_PROFILER
@@ -1252,6 +1276,10 @@ menu "LVGL configuration"
 			depends on LV_USE_PROFILER
 			default "lvgl/src/misc/lv_profiler_builtin.h"
 
+		config LV_USE_MONKEY
+			bool "Enable Monkey test"
+			default n
+
 		config LV_USE_GRIDNAV
 			bool "Enable grid navigation"
 			default n
@@ -1261,8 +1289,12 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_IMGFONT
-			bool "draw image in label or span obj"
+			bool "Support using images as font in label or span widgets"
 			default n
+
+		config LV_USE_OBSERVER
+			bool "Observer"
+			default y
 
 		config LV_USE_IME_PINYIN
 			bool "Enable Pinyin input method"
@@ -1302,40 +1334,6 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
-
-		menuconfig LV_USE_VG_LITE_THORVG
-			bool "VG-Lite Simulator"
-			default n
-			depends on LV_USE_THORVG
-			help
-				Use thorvg to simulate VG-Lite hardware behavior, it's useful
-				for debugging and testing on PC simulator. Enable LV_USE_THORVG,
-				Either internal ThorVG or external ThorVG library is required.
-
-		config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-			bool "Enable LVGL blend mode support"
-			default n
-			depends on LV_USE_VG_LITE_THORVG
-
-		config LV_VG_LITE_THORVG_YUV_SUPPORT
-			bool "Enable YUV color format support"
-			default n
-			depends on LV_USE_VG_LITE_THORVG
-
-		config LV_VG_LITE_THORVG_16PIXELS_ALIGN
-			bool "Enable 16 pixels alignment"
-			default y
-			depends on LV_USE_VG_LITE_THORVG
-
-		config LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
-			int "Buffer address alignment"
-			default 64
-			depends on LV_USE_VG_LITE_THORVG
-
-		config LV_VG_LITE_THORVG_THREAD_RENDER
-			bool "Enable multi-thread render"
-			default n
-			depends on LV_USE_VG_LITE_THORVG
 	endmenu
 
 	menu "Devices"
@@ -1345,11 +1343,49 @@ menu "LVGL configuration"
 		config LV_SDL_INCLUDE_PATH
 			string "SDL include path"
 			depends on LV_USE_SDL
-			default "SDL/SDL2.h"
-		config LV_SDL_PARTIAL_MODE
-			bool "SDL partial mode"
+			default "SDL2/SDL.h"
+
+		choice
+			prompt "SDL rendering mode"
 			depends on LV_USE_SDL
-			default n
+			default LV_SDL_RENDER_MODE_DIRECT
+			help
+				LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance
+
+			config LV_SDL_RENDER_MODE_PARTIAL
+				bool "Use the buffer(s) to render the screen is smaller parts"
+
+			config LV_SDL_RENDER_MODE_DIRECT
+				bool "Only the changed areas will be updated with 2 screen sized buffers"
+
+			config LV_SDL_RENDER_MODE_FULL
+				bool "Always redraw the whole screen even if only one pixel has been changed with 2 screen sized buffers"
+		endchoice
+
+		choice
+			prompt "SDL buffer size"
+			depends on LV_USE_SDL
+			default LV_SDL_SINGLE_BUFFER
+
+			config LV_SDL_SINGLE_BUFFER
+				bool "One screen-sized buffer"
+
+			config LV_SDL_DOUBLE_BUFFER
+				bool "Two screen-sized buffer"
+				depends on !LV_SDL_RENDER_MODE_PARTIAL
+
+			config LV_SDL_CUSTOM_BUFFER
+				bool "Custom-sized buffer"
+				depends on LV_SDL_RENDER_MODE_PARTIAL
+		endchoice
+
+		config LV_SDL_BUFFER_COUNT
+			int
+			depends on LV_USE_SDL
+			default 0 if LV_SDL_CUSTOM_BUFFER
+			default 1 if LV_SDL_SINGLE_BUFFER
+			default 2 if LV_SDL_DOUBLE_BUFFER
+
 		config LV_SDL_FULLSCREEN
 			bool "SDL fullscreen"
 			depends on LV_USE_SDL
@@ -1358,6 +1394,24 @@ menu "LVGL configuration"
 			bool "Exit the application when all SDL windows are closed"
 			depends on LV_USE_SDL
 			default y
+
+		choice
+			prompt "SDL mousewheel mode"
+			depends on LV_USE_SDL
+			default LV_SDL_MOUSEWHEEL_MODE_ENCODER
+
+			config LV_SDL_MOUSEWHEEL_MODE_ENCODER
+				bool "The mousewheel emulates an encoder input device"
+
+			config LV_SDL_MOUSEWHEEL_MODE_CROWN
+				bool "The mousewheel emulates a smart watch crown"
+		endchoice
+
+		config LV_SDL_MOUSEWHEEL_MODE
+			int
+			depends on LV_USE_SDL
+			default 0 if LV_SDL_MOUSEWHEEL_MODE_ENCODER
+			default 1 if LV_SDL_MOUSEWHEEL_MODE_CROWN
 
 		config LV_USE_X11
 			bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"
@@ -1546,6 +1600,10 @@ menu "LVGL configuration"
 			bool "Use ILI9341 LCD driver"
 			default n
 
+		config LV_USE_GENERIC_MIPI
+			bool "Generic MIPI driver"
+			default y if LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341
+
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
 			default n
@@ -1569,12 +1627,7 @@ menu "LVGL configuration"
 		config LV_USE_DEMO_BENCHMARK
 			bool "Benchmark your system"
 			default n
-			depends on LV_FONT_MONTSERRAT_14 && LV_FONT_MONTSERRAT_24
-		config LV_DEMO_BENCHMARK_RGB565A8
-			bool "Use RGB565A8 images with 16 bit color depth instead of ARGB8565"
-			depends on LV_USE_DEMO_BENCHMARK
-			default n
-
+			depends on LV_FONT_MONTSERRAT_14 && LV_FONT_MONTSERRAT_24 && LV_USE_DEMO_WIDGETS
 		config LV_USE_DEMO_RENDER
 			bool "Render test for each primitives. Requires at least 480x272 display"
 			default n

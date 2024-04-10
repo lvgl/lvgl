@@ -6,8 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdlib.h>
-
 #include "lv_obj.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
@@ -484,6 +482,20 @@ static void lv_obj_delete_async_cb(void * obj)
     lv_obj_delete(obj);
 }
 
+static void obj_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
+{
+    /* If the input device is already in the release state,
+     * there is no need to wait for the input device to be released
+     */
+    if(lv_indev_get_state(indev) != LV_INDEV_STATE_RELEASED) {
+        /*Wait for release to avoid accidentally triggering other obj to be clicked*/
+        lv_indev_wait_release(indev);
+    }
+
+    /*Reset the input device*/
+    lv_indev_reset(indev, obj);
+}
+
 static void obj_delete_core(lv_obj_t * obj)
 {
     if(obj->is_deleting)
@@ -516,7 +528,7 @@ static void obj_delete_core(lv_obj_t * obj)
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
             if(indev->pointer.act_obj == obj || indev->pointer.last_obj == obj || indev->pointer.scroll_obj == obj) {
-                lv_indev_reset(indev, obj);
+                obj_indev_reset(indev, obj);
             }
             if(indev->pointer.last_pressed == obj) {
                 indev->pointer.last_pressed = NULL;
@@ -524,7 +536,7 @@ static void obj_delete_core(lv_obj_t * obj)
         }
 
         if(indev->group == group && obj == lv_indev_get_active_obj()) {
-            lv_indev_reset(indev, obj);
+            obj_indev_reset(indev, obj);
         }
         indev = lv_indev_get_next(indev);
     }

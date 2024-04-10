@@ -22,7 +22,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_obj_t * find_scroll_obj(lv_indev_t * indev);
 static void init_scroll_limits(lv_indev_t * indev);
 static int32_t find_snap_point_x(const lv_obj_t * obj, int32_t min, int32_t max, int32_t ofs);
 static int32_t find_snap_point_y(const lv_obj_t * obj, int32_t min, int32_t max, int32_t ofs);
@@ -51,7 +50,7 @@ void _lv_indev_scroll_handler(lv_indev_t * indev)
     lv_obj_t * scroll_obj = indev->pointer.scroll_obj;
     /*If there is no scroll object yet try to find one*/
     if(scroll_obj == NULL) {
-        scroll_obj = find_scroll_obj(indev);
+        scroll_obj = lv_indev_find_scroll_obj(indev);
         if(scroll_obj == NULL) return;
 
         init_scroll_limits(indev);
@@ -254,11 +253,7 @@ void lv_indev_scroll_get_snap_dist(lv_obj_t * obj, lv_point_t * p)
     p->y = find_snap_point_y(obj, obj->coords.y1, obj->coords.y2, 0);
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static lv_obj_t * find_scroll_obj(lv_indev_t * indev)
+lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
 {
     lv_obj_t * obj_candidate = NULL;
     lv_dir_t dir_candidate = LV_DIR_NONE;
@@ -388,6 +383,10 @@ static lv_obj_t * find_scroll_obj(lv_indev_t * indev)
 
     return obj_candidate;
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void init_scroll_limits(lv_indev_t * indev)
 {

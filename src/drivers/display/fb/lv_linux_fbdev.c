@@ -26,6 +26,9 @@
     #include <linux/fb.h>
 #endif /* LV_LINUX_FBDEV_BSD */
 
+#include "../../../display/lv_display_private.h"
+#include "../../../draw/sw/lv_draw_sw.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -57,6 +60,8 @@ typedef struct {
     struct fb_fix_screeninfo finfo;
 #endif /* LV_LINUX_FBDEV_BSD */
     char * fbp;
+    uint8_t * rotated_buf;
+    size_t rotated_buf_size;
     long int screensize;
     int fbfd;
     bool force_refresh;
@@ -228,8 +233,8 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
         draw_buf_2 = malloc(draw_buf_size);
     }
 
-    lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
     lv_display_set_resolution(disp, hor_res, ver_res);
+    lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
 
     if(width > 0) {
         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));
@@ -253,28 +258,79 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 {
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
 
-    if(dsc->fbp == NULL ||
-       area->x2 < 0 || area->y2 < 0 ||
-       area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
+    if(dsc->fbp == NULL) {
         lv_display_flush_ready(disp);
         return;
     }
 
     int32_t w = lv_area_get_width(area);
-    uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
-    uint32_t color_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * dsc->finfo.line_length;
-    uint32_t fb_pos = color_pos + dsc->vinfo.yoffset * dsc->finfo.line_length;
+    int32_t h = lv_area_get_height(area);
+    lv_color_format_t cf = lv_display_get_color_format(disp);
+    uint32_t px_size = lv_color_format_get_size(cf);
+
+    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+
+    /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
+    if(rotation != LV_DISPLAY_ROTATION_0 && LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        /* (Re)allocate temporary buffer if needed */
+        size_t buf_size = w * h * px_size;
+        if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
+            dsc->rotated_buf = realloc(dsc->rotated_buf, buf_size);
+            dsc->rotated_buf_size = buf_size;
+        }
+
+        /* Rotate the pixel buffer */
+        uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
+        uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
+
+        switch(rotation) {
+            case LV_DISPLAY_ROTATION_0:
+                break;
+            case LV_DISPLAY_ROTATION_90:
+                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+                break;
+            case LV_DISPLAY_ROTATION_180:
+                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
+                break;
+            case LV_DISPLAY_ROTATION_270:
+                lv_draw_sw_rotate(color_p, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
+                break;
+        }
+        color_p = dsc->rotated_buf;
+
+        /* Rotate the area */
+        lv_display_rotate_area(disp, (lv_area_t *)area);
+        if(rotation != LV_DISPLAY_ROTATION_180) {
+            w = lv_area_get_width(area);
+            h = lv_area_get_height(area);
+        }
+    }
+
+    /* Ensure that we're within the framebuffer's bounds */
+    if(area->x2 < 0 || area->y2 < 0 || area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
+        lv_display_flush_ready(disp);
+        return;
+    }
+
+    uint32_t fb_pos =
+        (area->x1 + dsc->vinfo.xoffset) * px_size +
+        (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
 
     uint8_t * fbp = (uint8_t *)dsc->fbp;
     int32_t y;
     if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
+        uint32_t color_pos =
+            area->x1 * px_size +
+            area->y1 * disp->hor_res * px_size;
+
         for(y = area->y1; y <= area->y2; y++) {
             lv_memcpy(&fbp[fb_pos], &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
-            color_pos += dsc->finfo.line_length;
+            color_pos += disp->hor_res * px_size;
         }
     }
     else {
+        w = lv_area_get_width(area);
         for(y = area->y1; y <= area->y2; y++) {
             lv_memcpy(&fbp[fb_pos], color_p, w * px_size);
             fb_pos += dsc->finfo.line_length;

@@ -13,10 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
-#include <stdbool.h>
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_style.h"
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -351,6 +350,13 @@ static inline int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * o
  * @return          the final opacity considering the parents' opacity too
  */
 lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part);
+
+/**
+ * Update the layer type of a widget bayed on its current styles.
+ * The result will be stored in `obj->spec_attr->layer_type`
+ * @param obj       the object whose layer should be updated
+ */
+void _lv_obj_update_layer_type(lv_obj_t * obj);
 
 /**********************
  *      MACROS

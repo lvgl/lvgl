@@ -22,6 +22,10 @@
     #error "LV_USE_DEMO_WIDGETS needs to be enabled"
 #endif
 
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < 128 * 1024
+    #warning "It's recommended to have at least 128kB RAM for the benchmark"
+#endif
+
 #include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 
@@ -73,9 +77,9 @@ static void empty_screen_cb(void)
 static void moving_wallpaper_cb(void)
 {
     lv_obj_set_style_pad_all(lv_screen_active(), 0, 0);
-    LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
 
-    lv_obj_t * img = lv_img_create(lv_screen_active());
+    lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_obj_set_size(img, lv_pct(150), lv_pct(150));
     lv_image_set_src(img, &img_benchmark_cogwheel_rgb);
     lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TILE);
@@ -116,7 +120,7 @@ static void multiple_rgb_images_cb(void)
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
 
-    LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
     int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 116;
     int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 116) / 116;
 
@@ -127,7 +131,7 @@ static void multiple_rgb_images_cb(void)
     for(y = 0; y < ver_cnt; y++) {
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
-            lv_obj_t * obj = lv_img_create(lv_screen_active());
+            lv_obj_t * obj = lv_image_create(lv_screen_active());
             lv_image_set_src(obj, &img_benchmark_cogwheel_rgb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
@@ -142,7 +146,7 @@ static void multiple_argb_images_cb(void)
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
 
-    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
     int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 116;
     int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 116) / 116;
 
@@ -153,7 +157,7 @@ static void multiple_argb_images_cb(void)
     for(y = 0; y < ver_cnt; y++) {
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
-            lv_obj_t * obj = lv_img_create(lv_screen_active());
+            lv_obj_t * obj = lv_image_create(lv_screen_active());
             lv_image_set_src(obj, &img_benchmark_cogwheel_argb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
@@ -168,7 +172,7 @@ static void rotated_argb_image_cb(void)
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
 
-    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
     int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 116;
     int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 116) / 116;
 
@@ -179,7 +183,7 @@ static void rotated_argb_image_cb(void)
     for(y = 0; y < ver_cnt; y++) {
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
-            lv_obj_t * obj = lv_img_create(lv_screen_active());
+            lv_obj_t * obj = lv_image_create(lv_screen_active());
             lv_image_set_src(obj, &img_benchmark_cogwheel_argb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
@@ -237,7 +241,7 @@ static void multiple_arcs_cb(void)
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
-    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
     int32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / lv_dpx(160);
     int32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / lv_dpx(160);
 
@@ -757,7 +761,7 @@ static lv_obj_t * card_create(void)
     lv_obj_set_size(panel, 270, 120);
     lv_obj_set_style_pad_all(panel, 8, 0);
 
-    LV_IMG_DECLARE(img_transform_avatar_15);
+    LV_IMAGE_DECLARE(img_transform_avatar_15);
     lv_obj_t * child = lv_image_create(panel);
     lv_obj_align(child, LV_ALIGN_LEFT_MID, 0, 0);
     lv_image_set_src(child, &img_transform_avatar_15);

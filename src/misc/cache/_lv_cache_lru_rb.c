@@ -198,8 +198,7 @@ static bool init_cnt_cb(lv_cache_t * cache)
     LV_ASSERT_NULL(lru->cache.ops.free_cb);
     LV_ASSERT(lru->cache.node_size > 0);
 
-    if(lru->cache.node_size <= 0 || lru->cache.max_size <= 0
-       || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
+    if(lru->cache.node_size <= 0 || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
         return false;
     }
 
@@ -222,8 +221,7 @@ static bool init_size_cb(lv_cache_t * cache)
     LV_ASSERT_NULL(lru->cache.ops.free_cb);
     LV_ASSERT(lru->cache.node_size > 0);
 
-    if(lru->cache.node_size <= 0 || lru->cache.max_size <= 0
-       || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
+    if(lru->cache.node_size <= 0 || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
         return false;
     }
 

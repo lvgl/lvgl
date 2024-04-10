@@ -89,8 +89,8 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent if a date is clicked.
    :cpp:expr:`lv_calendar_get_pressed_date(calendar, &date)` set ``date`` to the
-   date currently being pressed. Returns :cpp:enumerator:`LV_RES_OK` if there is a
-   valid pressed date, else :cpp:enumerator:`LV_RES_INVALID`.
+   date currently being pressed. Returns :cpp:enumerator:`LV_RESULT_OK` if there is a
+   valid pressed date, else :cpp:enumerator:`LV_RESULT_INVALID`.
 
 Learn more about :ref:`events`.
 
@@ -124,6 +124,21 @@ Drop-down
 
 :cpp:expr:`lv_calendar_header_dropdown_create(calendar)` creates a header that
 contains 2 drop-drown lists: one for the year and another for the month.
+
+Chinese calendar
+--------------
+
+The Chinese calendar is a traditional cultural tool that integrates elements 
+such as the lunar calendar, solar terms, and traditional festivals. It is 
+widely used in Chinese social life, helping people understand the dates of 
+the lunar calendar, arrange festival activities, and inherit the excellent 
+traditional culture of the Chinese nation. Whether in families, businesses, 
+or education, the Chinese calendar plays an irreplaceable role, enabling 
+people to better understand and appreciate the charm of Chinese traditional 
+culture.
+
+If you want to use the Chinese calendar, please 
+use :cpp:expr:`lv_calendar_set_chinese_mode(calendar, true)` to enable it.
 
 .. _lv_calendar_example:
 

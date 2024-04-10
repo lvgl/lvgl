@@ -14,6 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#if defined(_RTE_)
+#include "Pre_Include_Global.h"
+#include "lv_conf_cmsis.h"
+#endif
+
 #include "../../../../lv_conf_internal.h"
 
 /* detect whether helium is available based on arm compilers' standard */

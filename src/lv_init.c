@@ -93,7 +93,6 @@ static inline void lv_global_init(lv_global_t * global)
     global->style_refresh = true;
     global->layout_count = _LV_LAYOUT_LAST;
     global->style_last_custom_prop_id = (uint32_t)_LV_STYLE_LAST_BUILT_IN_PROP;
-    global->area_trans_cache.angle_prev = INT32_MIN;
     global->event_last_register_id = _LV_EVENT_LAST;
     lv_rand_set_seed(0x1234ABCD);
 
@@ -201,7 +200,7 @@ void lv_init(void)
     _lv_sysmon_builtin_init();
 #endif
 
-    _lv_image_decoder_init();
+    _lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
 #if LV_USE_DRAW_VG_LITE
@@ -269,6 +268,10 @@ void lv_init(void)
     lv_fs_littlefs_init();
 #endif
 
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    lv_fs_arduino_esp_littlefs_init();
+#endif
+
 #if LV_USE_LODEPNG
     lv_lodepng_init();
 #endif
@@ -297,11 +300,7 @@ void lv_init(void)
 
 #if LV_USE_FREETYPE
     /*Init freetype library*/
-#  if LV_FREETYPE_CACHE_SIZE >= 0
-    lv_freetype_init(LV_FREETYPE_CACHE_FT_FACES, LV_FREETYPE_CACHE_FT_SIZES, LV_FREETYPE_CACHE_SIZE);
-#  else
-    lv_freetype_init(0, 0, 0);
-#  endif
+    lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
 #endif
 
 #if LV_USE_TINY_TTF

@@ -73,6 +73,11 @@
  * Start parsing lv_conf_template.h
  -----------------------------------*/
 
+/*If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
+#if  0 && defined(__ASSEMBLY__)
+#include "my_include.h"
+#endif
+
 /*====================
    COLOR SETTINGS
  *====================*/
@@ -119,6 +124,48 @@
     #endif
 #endif
 
+#ifndef LV_STDINT_INCLUDE
+    #ifdef CONFIG_LV_STDINT_INCLUDE
+        #define LV_STDINT_INCLUDE CONFIG_LV_STDINT_INCLUDE
+    #else
+        #define LV_STDINT_INCLUDE       <stdint.h>
+    #endif
+#endif
+#ifndef LV_STDDEF_INCLUDE
+    #ifdef CONFIG_LV_STDDEF_INCLUDE
+        #define LV_STDDEF_INCLUDE CONFIG_LV_STDDEF_INCLUDE
+    #else
+        #define LV_STDDEF_INCLUDE       <stddef.h>
+    #endif
+#endif
+#ifndef LV_STDBOOL_INCLUDE
+    #ifdef CONFIG_LV_STDBOOL_INCLUDE
+        #define LV_STDBOOL_INCLUDE CONFIG_LV_STDBOOL_INCLUDE
+    #else
+        #define LV_STDBOOL_INCLUDE      <stdbool.h>
+    #endif
+#endif
+#ifndef LV_INTTYPES_INCLUDE
+    #ifdef CONFIG_LV_INTTYPES_INCLUDE
+        #define LV_INTTYPES_INCLUDE CONFIG_LV_INTTYPES_INCLUDE
+    #else
+        #define LV_INTTYPES_INCLUDE     <inttypes.h>
+    #endif
+#endif
+#ifndef LV_LIMITS_INCLUDE
+    #ifdef CONFIG_LV_LIMITS_INCLUDE
+        #define LV_LIMITS_INCLUDE CONFIG_LV_LIMITS_INCLUDE
+    #else
+        #define LV_LIMITS_INCLUDE       <limits.h>
+    #endif
+#endif
+#ifndef LV_STDARG_INCLUDE
+    #ifdef CONFIG_LV_STDARG_INCLUDE
+        #define LV_STDARG_INCLUDE CONFIG_LV_STDARG_INCLUDE
+    #else
+        #define LV_STDARG_INCLUDE       <stdarg.h>
+    #endif
+#endif
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
@@ -244,6 +291,31 @@
     #endif
 #endif
 
+/* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
+ * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+ * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
+ * and can't be drawn in chunks. */
+
+/*The target buffer size for simple layer chunks.*/
+#ifndef LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+    #ifdef CONFIG_LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+        #define LV_DRAW_LAYER_SIMPLE_BUF_SIZE CONFIG_LV_DRAW_LAYER_SIMPLE_BUF_SIZE
+    #else
+        #define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)   /*[bytes]*/
+    #endif
+#endif
+
+/* The stack size of the drawing thread.
+ * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
+ */
+#ifndef LV_DRAW_THREAD_STACK_SIZE
+    #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
+        #define LV_DRAW_THREAD_STACK_SIZE CONFIG_LV_DRAW_THREAD_STACK_SIZE
+    #else
+        #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /*[bytes]*/
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
@@ -282,31 +354,13 @@
 
     /* Enable native helium assembly to be compiled */
     #ifndef LV_USE_NATIVE_HELIUM_ASM
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_NATIVE_HELIUM_ASM
-                #define LV_USE_NATIVE_HELIUM_ASM CONFIG_LV_USE_NATIVE_HELIUM_ASM
-            #else
-                #define LV_USE_NATIVE_HELIUM_ASM 0
-            #endif
+        #ifdef CONFIG_LV_USE_NATIVE_HELIUM_ASM
+            #define LV_USE_NATIVE_HELIUM_ASM CONFIG_LV_USE_NATIVE_HELIUM_ASM
         #else
-            #define LV_USE_NATIVE_HELIUM_ASM    1
+            #define LV_USE_NATIVE_HELIUM_ASM    0
         #endif
     #endif
-
-    /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
-     * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
-     * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
-     * and can't be drawn in chunks. */
-
-    /*The target buffer size for simple layer chunks.*/
-    #ifndef LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
-        #ifdef CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
-            #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
-        #else
-            #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)   /*[bytes]*/
-        #endif
-    #endif
-
+    
     /* 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only
      * 1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too */
     #ifndef LV_DRAW_SW_COMPLEX
@@ -492,6 +546,28 @@
         #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
     #else
         #define LV_VG_LITE_USE_BOX_SHADOW 0
+    #endif
+#endif
+
+/* VG-Lite linear gradient image maximum cache number.
+ * NOTE: The memory usage of a single gradient image is 4K bytes.
+ */
+#ifndef LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+    #ifdef CONFIG_LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+        #define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+    #else
+        #define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT 32
+    #endif
+#endif
+
+/* VG-Lite radial gradient image maximum cache size.
+ * NOTE: The memory usage of a single gradient image is radial grad radius * 4 bytes.
+ */
+#ifndef LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
+    #ifdef CONFIG_LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
+        #define LV_VG_LITE_RADIAL_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
+    #else
+        #define LV_VG_LITE_RADIAL_GRAD_CACHE_CNT 32
     #endif
 #endif
 
@@ -1224,6 +1300,13 @@
         #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Persian letters and all their forms*/
     #endif
 #endif
+#ifndef LV_FONT_SIMSUN_14_CJK
+    #ifdef CONFIG_LV_FONT_SIMSUN_14_CJK
+        #define LV_FONT_SIMSUN_14_CJK CONFIG_LV_FONT_SIMSUN_14_CJK
+    #else
+        #define LV_FONT_SIMSUN_14_CJK            0  /*1000 most common CJK radicals*/
+    #endif
+#endif
 #ifndef LV_FONT_SIMSUN_16_CJK
     #ifdef CONFIG_LV_FONT_SIMSUN_16_CJK
         #define LV_FONT_SIMSUN_16_CJK CONFIG_LV_FONT_SIMSUN_16_CJK
@@ -1534,6 +1617,13 @@
             #endif
         #else
             #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
+        #endif
+    #endif
+    #ifndef LV_USE_CALENDAR_CHINESE
+        #ifdef CONFIG_LV_USE_CALENDAR_CHINESE
+            #define LV_USE_CALENDAR_CHINESE CONFIG_LV_USE_CALENDAR_CHINESE
+        #else
+            #define LV_USE_CALENDAR_CHINESE 0
         #endif
     #endif
 #endif  /*LV_USE_CALENDAR*/
@@ -2157,6 +2247,24 @@
     #endif
 #endif
 
+/*API for Arduino LittleFs. */
+#ifndef LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    #ifdef CONFIG_LV_USE_FS_ARDUINO_ESP_LITTLEFS
+        #define LV_USE_FS_ARDUINO_ESP_LITTLEFS CONFIG_LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    #else
+        #define LV_USE_FS_ARDUINO_ESP_LITTLEFS 0
+    #endif
+#endif
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    #ifndef LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
+        #ifdef CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
+            #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
+        #else
+            #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+#endif
+
 /*LODEPNG decoder library*/
 #ifndef LV_USE_LODEPNG
     #ifdef CONFIG_LV_USE_LODEPNG
@@ -2269,15 +2377,6 @@
     #endif
 #endif
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters in kilobytes*/
-    #ifndef LV_FREETYPE_CACHE_SIZE
-        #ifdef CONFIG_LV_FREETYPE_CACHE_SIZE
-            #define LV_FREETYPE_CACHE_SIZE CONFIG_LV_FREETYPE_CACHE_SIZE
-        #else
-            #define LV_FREETYPE_CACHE_SIZE 768
-        #endif
-    #endif
-
     /*Let FreeType to use LVGL memory and file porting*/
     #ifndef LV_FREETYPE_USE_LVGL_PORT
         #ifdef CONFIG_LV_FREETYPE_USE_LVGL_PORT
@@ -2287,22 +2386,8 @@
         #endif
     #endif
 
-    /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
-    /* (0:use system defaults) */
-    #ifndef LV_FREETYPE_CACHE_FT_FACES
-        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_FACES
-            #define LV_FREETYPE_CACHE_FT_FACES CONFIG_LV_FREETYPE_CACHE_FT_FACES
-        #else
-            #define LV_FREETYPE_CACHE_FT_FACES 8
-        #endif
-    #endif
-    #ifndef LV_FREETYPE_CACHE_FT_SIZES
-        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-            #define LV_FREETYPE_CACHE_FT_SIZES CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-        #else
-            #define LV_FREETYPE_CACHE_FT_SIZES 8
-        #endif
-    #endif
+    /*Cache count of the glyphs in FreeType. It means the number of glyphs that can be cached.
+     *The higher the value, the more memory will be used.*/
     #ifndef LV_FREETYPE_CACHE_FT_GLYPH_CNT
         #ifdef CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
             #define LV_FREETYPE_CACHE_FT_GLYPH_CNT CONFIG_LV_FREETYPE_CACHE_FT_GLYPH_CNT
@@ -2719,14 +2804,14 @@
         #ifdef CONFIG_LV_SDL_INCLUDE_PATH
             #define LV_SDL_INCLUDE_PATH CONFIG_LV_SDL_INCLUDE_PATH
         #else
-            #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
+            #define LV_SDL_INCLUDE_PATH     <SDL2/SDL.h>
         #endif
     #endif
     #ifndef LV_SDL_RENDER_MODE
         #ifdef CONFIG_LV_SDL_RENDER_MODE
             #define LV_SDL_RENDER_MODE CONFIG_LV_SDL_RENDER_MODE
         #else
-            #define LV_SDL_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
+            #define LV_SDL_RENDER_MODE      LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
         #endif
     #endif
     #ifndef LV_SDL_BUF_COUNT
@@ -2737,14 +2822,14 @@
                 #define LV_SDL_BUF_COUNT 0
             #endif
         #else
-            #define LV_SDL_BUF_COUNT       1    /*1 or 2*/
+            #define LV_SDL_BUF_COUNT        1    /*1 or 2*/
         #endif
     #endif
     #ifndef LV_SDL_FULLSCREEN
         #ifdef CONFIG_LV_SDL_FULLSCREEN
             #define LV_SDL_FULLSCREEN CONFIG_LV_SDL_FULLSCREEN
         #else
-            #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
+            #define LV_SDL_FULLSCREEN       0    /*1: Make the window full screen by default*/
         #endif
     #endif
     #ifndef LV_SDL_DIRECT_EXIT
@@ -2755,7 +2840,14 @@
                 #define LV_SDL_DIRECT_EXIT 0
             #endif
         #else
-            #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL windows are closed*/
+            #define LV_SDL_DIRECT_EXIT      1    /*1: Exit the application when all SDL windows are closed*/
+        #endif
+    #endif
+    #ifndef LV_SDL_MOUSEWHEEL_MODE
+        #ifdef CONFIG_LV_SDL_MOUSEWHEEL_MODE
+            #define LV_SDL_MOUSEWHEEL_MODE CONFIG_LV_SDL_MOUSEWHEEL_MODE
+        #else
+            #define LV_SDL_MOUSEWHEEL_MODE  LV_SDL_MOUSEWHEEL_MODE_ENCODER  /*LV_SDL_MOUSEWHEEL_MODE_ENCODER/CROWN*/
         #endif
     #endif
 #endif
@@ -3221,7 +3313,18 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
 #ifndef LV_USE_THORVG
-    #define LV_USE_THORVG  (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)
+    #define LV_USE_THORVG  (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+#endif
+
+#if LV_USE_OS
+    #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
+        #warning "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
+    #endif
+
+    #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)
+        #warning "LV_DRAW_THREAD_STACKSIZE was renamed to LV_DRAW_THREAD_STACK_SIZE. Please update lv_conf.h or run menuconfig again."
+        #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
+    #endif
 #endif
 
 /*If running without lv_conf.h add typedefs with default value*/

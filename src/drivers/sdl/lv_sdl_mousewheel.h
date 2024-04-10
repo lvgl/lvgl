@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_sdl_window.h"
-#if LV_USE_SDL
+#if LV_USE_SDL && LV_SDL_MOUSEWHEEL_MODE == LV_SDL_MOUSEWHEEL_MODE_ENCODER
 
 /*********************
  *      DEFINES

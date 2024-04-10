@@ -88,8 +88,8 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
     point_transform_dsc_t tr_dsc;
     tr_dsc.angle = -draw_dsc->rotation;
-    tr_dsc.scale_x = (256 * 256) / draw_dsc->scale_x;
-    tr_dsc.scale_y = (256 * 256) / draw_dsc->scale_y;
+    tr_dsc.scale_x = draw_dsc->scale_x;
+    tr_dsc.scale_y = draw_dsc->scale_y;
     tr_dsc.pivot = draw_dsc->pivot;
 
     int32_t angle_low = tr_dsc.angle / 10;
@@ -133,7 +133,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
         alpha_buf = NULL;
     }
 
-    bool aa = draw_dsc->antialias;
+    bool aa = (bool) draw_dsc->antialias;
     bool is_rotated = draw_dsc->rotation;
 
     int32_t xs_ups = 0, ys_ups = 0, ys_ups_start = 0, ys_step_256_original = 0;
@@ -341,7 +341,6 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                int32_t x_end, uint8_t * dest_buf, bool aa)
 {
-    //    lv_memzero(dest_buf, x_end * 4);
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
     lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf;
@@ -531,6 +530,9 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
             else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
                 abuf[x] = (a * (0xFF - ys_fract)) >> 8;
             }
+            else {
+                abuf[x] = a;
+            }
         }
     }
 }
@@ -622,16 +624,16 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
     yin -= t->pivot.y;
 
     if(t->angle == 0) {
-        *xout = ((int32_t)(xin * t->scale_x)) + (t->pivot_x_256);
-        *yout = ((int32_t)(yin * t->scale_y)) + (t->pivot_y_256);
+        *xout = ((int32_t)(xin * 256 * 256 / t->scale_x)) + (t->pivot_x_256);
+        *yout = ((int32_t)(yin * 256 * 256 / t->scale_y)) + (t->pivot_y_256);
     }
     else if(t->scale_x == LV_SCALE_NONE && t->scale_y == LV_SCALE_NONE) {
         *xout = ((t->cosma * xin - t->sinma * yin) >> 2) + (t->pivot_x_256);
         *yout = ((t->sinma * xin + t->cosma * yin) >> 2) + (t->pivot_y_256);
     }
     else {
-        *xout = (((t->cosma * xin - t->sinma * yin) * t->scale_x) >> 10) + (t->pivot_x_256);
-        *yout = (((t->sinma * xin + t->cosma * yin) * t->scale_y) >> 10) + (t->pivot_y_256);
+        *xout = (((t->cosma * xin - t->sinma * yin) * 256 / t->scale_x) >> 2) + (t->pivot_x_256);
+        *yout = (((t->sinma * xin + t->cosma * yin) * 256 / t->scale_y) >> 2) + (t->pivot_y_256);
     }
 }
 

@@ -121,7 +121,7 @@ static void x11_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
                                         .y2 = 0
                                       };
 
-    /* build display update area until lv_disp_flush_is_last */
+    /* build display update area until lv_display_flush_is_last */
     xd->flush_area.x1 = MIN(xd->flush_area.x1, area->x1);
     xd->flush_area.x2 = MAX(xd->flush_area.x2, area->x2);
     xd->flush_area.y1 = MIN(xd->flush_area.y1, area->y1);
@@ -199,7 +199,6 @@ static void x11_disp_delete_evt_cb(lv_event_t * e)
 
     lv_timer_delete(xd->timer);
 
-    lv_display_set_buffers(disp, NULL, NULL, 0, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_free(xd->buffer[0]);
     if(LV_X11_DOUBLE_BUFFER) {
         lv_free(xd->buffer[1]);

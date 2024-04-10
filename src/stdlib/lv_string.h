@@ -14,8 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include <stdint.h>
-#include <stddef.h>
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -56,6 +55,15 @@ void lv_memset(void * dst, uint8_t v, size_t len);
  * @return Pointer to the destination array.
  */
 void * lv_memmove(void * dst, const void * src, size_t len);
+
+/**
+ * @brief This function will compare two memory blocks
+ * @param p1 Pointer to the first memory block
+ * @param p2 Pointer to the second memory block
+ * @param len Number of bytes to compare
+ * @return The difference between the value of the first unmatching byte.
+ */
+int32_t lv_memcmp(const void * p1, const void * p2, size_t len);
 
 /**
  * Same as `memset(dst, 0x00, len)`.
@@ -108,11 +116,25 @@ int32_t lv_strcmp(const char * s1, const char * s2);
 char * lv_strdup(const char * src);
 
 /**
- * @brief Duplicate a string by allocating a new one and copying the content.
+ * @brief Copies the string pointed to by src, including the terminating null character,
+ *        to the end of the string pointed to by dst.
+ * @param dst Pointer to the destination string where the content is to be appended.
  * @param src Pointer to the source of data to be copied.
- * @return A pointer to the new allocated string. NULL if failed.
+ * @return A pointer to the destination string, which is dst.
  */
-char * lv_strdup(const char * src);
+char * lv_strcat(char * dst, const char * src);
+
+/**
+ * @brief Copies up to src_len characters from the string pointed to by src
+ *        to the end of the string pointed to by dst.
+ *        A terminating null character is appended to dst even if no null character
+ *        was encountered in src after src_len characters were copied.
+ * @param dst Pointer to the destination string where the content is to be appended.
+ * @param src Pointer to the source of data to be copied.
+ * @param src_len Maximum number of characters from src to be copied to the end of dst.
+ * @return A pointer to the destination string, which is dst.
+ */
+char * lv_strncat(char * dst, const char * src, size_t src_len);
 
 /**********************
  *      MACROS

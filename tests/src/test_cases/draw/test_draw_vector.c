@@ -234,6 +234,7 @@ static void draw_lines(lv_layer_t * layer)
 
 static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 {
+    LV_UNUSED(name);
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     uint32_t stride = 640 * 4 + 128; /*Test non-default stride*/
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(640, 480, LV_COLOR_FORMAT_ARGB8888, stride);
@@ -254,7 +255,7 @@ static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 #endif
     lv_image_cache_drop(draw_buf);
     lv_draw_buf_destroy(draw_buf);
-    lv_obj_del(canvas);
+    lv_obj_delete(canvas);
 }
 
 void test_transform(void)

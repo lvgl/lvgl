@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.0.1-dev
+ * Configuration file for v9.1.1-dev
  */
 
 /* clang-format off */
@@ -9,7 +9,14 @@
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
-#include "RTE_Components.h"
+#if defined(_RTE_)
+    #include "RTE_Components.h"
+#endif
+
+/*If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
+#if  0 && defined(__ASSEMBLY__)
+#include "my_include.h"
+#endif
 
 /*====================
    COLOR SETTINGS
@@ -36,7 +43,7 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (96 * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (128 * 1024U)          /*[bytes]*/
 
     /*Size of the memory expand for `lv_malloc()` in bytes*/
     #define LV_MEM_POOL_EXPAND_SIZE 0
@@ -87,7 +94,15 @@
 #define LV_DRAW_BUF_STRIDE_ALIGN                1
 
 /*Align the start address of draw_buf addresses to this bytes*/
-#define LV_DRAW_BUF_ALIGN                       1
+#define LV_DRAW_BUF_ALIGN                       4
+
+/* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
+ * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+ * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
+ * and can't be drawn in chunks. */
+
+/*The target buffer size for simple layer chunks.*/
+#define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)   /*[bytes]*/
 
 #define LV_USE_DRAW_SW 1
 #if LV_USE_DRAW_SW == 1
@@ -96,13 +111,8 @@
      * > 1 means multiply threads will render the screen in parallel */
     #define LV_DRAW_SW_DRAW_UNIT_CNT    1
 
-    /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
-     * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
-     * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
-     * and can't be drawn in chunks. */
-
-    /*The target buffer size for simple layer chunks.*/
-    #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)   /*[bytes]*/
+    /* Enable native helium assembly to be compiled */
+    #define LV_USE_NATIVE_HELIUM_ASM    0
 
     /* 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only
      * 1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too */
@@ -137,6 +147,9 @@
         #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
     #endif
 #endif
+
+/* Set stack size of drawing thread. Unit is byte. If Thorvg is enabled, 128kB is required tested on simulator.*/
+#define LV_DRAW_THREAD_STACKSIZE 32768
 
 #if LV_USE_DRAW_VGLITE
     /* Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
@@ -173,6 +186,16 @@
  * NOTE: which usually improves performance,
  * but does not guarantee the same rendering quality as the software. */
 #define LV_VG_LITE_USE_BOX_SHADOW 0
+
+/* VG-Lite linear gradient image maximum cache number.
+ * NOTE: The memory usage of a single gradient image is 4K bytes.
+ */
+#define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT 32
+
+/* VG-Lite radial gradient image maximum cache size.
+ * NOTE: The memory usage of a single gradient image is radial grad radius * 4 bytes.
+ */
+#define LV_VG_LITE_RADIAL_GRAD_CACHE_CNT 32
 
 #endif
 
@@ -623,6 +646,15 @@
     #define LV_FS_MEMFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
 #endif
 
+/*API for LittleFs. */
+#if LV_USE_FS_LITTLEFS
+    #define LV_FS_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+#endif
+
+/*API for Arduino LittleFs. */
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+#endif
 
 /*GIF decoder library*/
 #if LV_USE_GIF
@@ -637,23 +669,12 @@
 
 /*FreeType library*/
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters in kilobytes*/
-    #define LV_FREETYPE_CACHE_SIZE 768
-
     /*Let FreeType to use LVGL memory and file porting*/
     #define LV_FREETYPE_USE_LVGL_PORT 0
 
-    /*FreeType cache type:
-     * LV_FREETYPE_CACHE_TYPE_IMAGE    - Image cache
-     * LV_FREETYPE_CACHE_TYPE_SBIT     - Sbit cache
-     * LV_FREETYPE_CACHE_TYPE_OUTLINE  - Outline cache*/
-    #define LV_FREETYPE_CACHE_TYPE LV_FREETYPE_CACHE_TYPE_IMAGE
-
-    /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
-    /* (0:use system defaults) */
-    #define LV_FREETYPE_CACHE_FT_FACES 8
-    #define LV_FREETYPE_CACHE_FT_SIZES 8
-    #define LV_FREETYPE_CACHE_FT_OUTLINES 256
+    /*Cache count of the glyphs in FreeType. It means the number of glyphs that can be cached.
+     *The higher the value, the more memory will be used.*/
+    #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
 #endif
 
 /* Built-in TTF decoder */
@@ -782,11 +803,12 @@
 /*Use SDL to open window on PC and handle mouse and keyboard*/
 #define LV_USE_SDL              0
 #if LV_USE_SDL
-    #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
-    #define LV_SDL_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
-    #define LV_SDL_BUF_COUNT       1    /*1 or 2*/
-    #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
-    #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL windows are closed*/
+    #define LV_SDL_INCLUDE_PATH     <SDL2/SDL.h>
+    #define LV_SDL_RENDER_MODE      LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
+    #define LV_SDL_BUF_COUNT        1    /*1 or 2*/
+    #define LV_SDL_FULLSCREEN       0    /*1: Make the window full screen by default*/
+    #define LV_SDL_DIRECT_EXIT      1    /*1: Exit the application when all SDL windows are closed*/
+    #define LV_SDL_MOUSEWHEEL_MODE  LV_SDL_MOUSEWHEEL_MODE_ENCODER  /*LV_SDL_MOUSEWHEEL_MODE_ENCODER/CROWN*/
 #endif
 
 /*Use X11 to open window on Linux desktop and handle mouse and keyboard*/
@@ -832,6 +854,20 @@
 
 /*Driver for evdev input devices*/
 #define LV_USE_EVDEV    0
+
+/*Driver for libinput input devices*/
+#define LV_USE_LIBINPUT    0
+
+#if LV_USE_LIBINPUT
+    #define LV_LIBINPUT_BSD    0
+
+    /*Full keyboard support*/
+    #define LV_LIBINPUT_XKB             0
+    #if LV_LIBINPUT_XKB
+        /*"setxkbmap -query" can help find the right values for your keyboard*/
+        #define LV_LIBINPUT_XKB_KEY_MAP { .rules = NULL, .model = "pc101", .layout = "us", .variant = NULL, .options = NULL }
+    #endif
+#endif
 
 #define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
 

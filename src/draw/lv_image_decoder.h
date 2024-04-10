@@ -15,7 +15,6 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#include <stdint.h>
 #include "lv_draw_buf.h"
 #include "../misc/lv_fs.h"
 #include "../misc/lv_types.h"
@@ -110,7 +109,8 @@ struct _lv_image_decoder_t {
     lv_image_decoder_get_area_cb_t get_area_cb;
     lv_image_decoder_close_f_t close_cb;
 
-    lv_cache_free_cb_t cache_free_cb;
+    const char * name;
+
     void * user_data;
 };
 
@@ -180,8 +180,10 @@ struct _lv_image_decoder_dsc_t {
 
 /**
  * Initialize the image decoder module
+ * @param image_cache_size    Image cache size in bytes. 0 to disable cache.
+ * @param image_header_count  Number of header cache entries. 0 to disable header cache.
  */
-void _lv_image_decoder_init(void);
+void _lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_count);
 
 /**
  * Deinitialize the image decoder module
@@ -278,22 +280,9 @@ void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_dec
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
 
-/**
- * Set a custom method to free cache data.
- * Normally this is not needed. If the custom decoder allocates additional memory other than dsc->decoded
- * draw buffer, then you need to register your own method to free it. By default the cache entry is free'ed
- * in `image_decoder_cache_free_cb`.
- *
- * @param decoder pointer to the image decoder
- * @param cache_free_cb the custom callback to free cache data. Refer to `image_decoder_cache_free_cb`.
- */
-void lv_image_decoder_set_cache_free_cb(lv_image_decoder_t * decoder, lv_cache_free_cb_t cache_free_cb);
-
-#if LV_CACHE_DEF_SIZE > 0
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data);
-#endif
 
 /**
  * Check the decoded image, make any modification if decoder `args` requires.
