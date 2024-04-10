@@ -438,8 +438,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     dsc->g = &g;
     cb(draw_unit, dsc, NULL, NULL);
 
-    if(g.resolved_font && font->release_glyph) {
-        font->release_glyph(font, &g);
-    }
+    lv_font_glyph_release_draw_data(&g);
+
     LV_PROFILER_END;
 }
