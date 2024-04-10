@@ -1,0 +1,46 @@
+name: Test API JSON generator
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+    if: github.repository == 'lvgl/lvgl'
+    runs-on: ubuntu-22.04
+    name: Test API JSON
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cache Python packages
+          uses: actions/cache@v4
+          with:
+            # Cache the Python package environment, excluding pip and setuptools installed by setup-python
+            path: |
+              ~/.cache/pip
+              ${{ env.pythonLocation }}/bin/*
+              ${{ env.pythonLocation }}/include
+              ${{ env.pythonLocation }}/lib/python*/site-packages/*
+              !${{ env.pythonLocation }}/bin/pip*
+              !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
+              !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
+            key: ${{ env.pythonLocation }}-${{ hashFiles('scripts/gen_json/requirements.txt') }}
+
+      - name: Install Doxygen and Latex dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install doxygen texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
+
+      - name: Install requirements
+        run: pip install -r scripts/gen_json/requirements.txt
+
+      - name: Run test
+        working-directory: tests/gen_json
+        run: tests/gen_json/test_gen_json.py
