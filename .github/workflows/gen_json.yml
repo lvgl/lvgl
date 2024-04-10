@@ -1,12 +1,11 @@
 name: Test API JSON generator
-
 on:
   push:
   pull_request:
 
 jobs:
-  build:
-    # if: github.repository == 'lvgl/lvgl'
+  test_api_json:
+    if: github.repository == 'lvgl/lvgl'
     runs-on: ubuntu-22.04
     name: Test API JSON
     steps:
@@ -14,20 +13,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: Cache Python packages
-          uses: actions/cache@v4
-          with:
-            # Cache the Python package environment, excluding pip and setuptools installed by setup-python
-            path: |
-              ~/.cache/pip
-              ${{ env.pythonLocation }}/bin/*
-              ${{ env.pythonLocation }}/include
-              ${{ env.pythonLocation }}/lib/python*/site-packages/*
-              !${{ env.pythonLocation }}/bin/pip*
-              !${{ env.pythonLocation }}/lib/python*/site-packages/pip*
-              !${{ env.pythonLocation }}/lib/python*/site-packages/setuptools*
-            key: ${{ env.pythonLocation }}-${{ hashFiles('scripts/gen_json/requirements.txt') }}
 
       - name: Install Doxygen and Latex dependencies
         run: |
@@ -38,5 +23,4 @@ jobs:
         run: pip install -r scripts/gen_json/requirements.txt
 
       - name: Run test
-        working-directory: tests/gen_json
-        run: tests/gen_json/test_gen_json.py
+        run: python3 tests/gen_json/test_gen_json.py
