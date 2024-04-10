@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    if: github.repository == 'lvgl/lvgl'
+    # if: github.repository == 'lvgl/lvgl'
     runs-on: ubuntu-22.04
     name: Test API JSON
     steps:
