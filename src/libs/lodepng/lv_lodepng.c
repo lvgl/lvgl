@@ -201,7 +201,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     dsc->decoded = decoded;
 
-    if(dsc->args.no_cache) return LV_RES_OK;
+    if(dsc->args.no_cache) return LV_RESULT_OK;
 
     /*If the image cache is disabled, just return the decoded image*/
     if(!lv_image_cache_is_enabled()) return LV_RESULT_OK;

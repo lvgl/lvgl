@@ -255,7 +255,7 @@ static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 #endif
     lv_image_cache_drop(draw_buf);
     lv_draw_buf_destroy(draw_buf);
-    lv_obj_del(canvas);
+    lv_obj_delete(canvas);
 }
 
 void test_transform(void)

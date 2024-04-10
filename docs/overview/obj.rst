@@ -154,7 +154,7 @@ the object and all of its children.
 
    void lv_obj_delete(lv_obj_t * obj);
 
-:cpp:func:`lv_obj_del` will delete the object immediately. If for any reason you
+:cpp:func:`lv_obj_delete` will delete the object immediately. If for any reason you
 can't delete the object immediately you can use
 :cpp:expr:`lv_obj_delete_async(obj)` which will perform the deletion on the next
 call of :cpp:func:`lv_timer_handler`. This is useful e.g. if you want to

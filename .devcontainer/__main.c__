@@ -40,7 +40,7 @@ static void memory_monitor(lv_timer_t * param);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_disp_t  * disp1;
+static lv_display_t  * disp1;
 
 int monitor_hor_res, monitor_ver_res;
 
@@ -77,9 +77,9 @@ int main(int argc, char ** argv)
 
 void do_loop(void *arg)
 {
-    /* Periodically call the lv_task handler.
+    /* Periodically call the lv_timer handler.
      * It could be done in a timer interrupt or an OS task too.*/
-    lv_task_handler();
+    lv_timer_handler();
 }
 
 /**********************
@@ -92,7 +92,7 @@ void do_loop(void *arg)
  */
 static void hal_init(void)
 {
-    lv_disp_t * disp = lv_sdl_window_create(monitor_hor_res, monitor_ver_res);
+    lv_display_t * disp = lv_sdl_window_create(monitor_hor_res, monitor_ver_res);
 
     lv_group_t * g = lv_group_create();
     lv_group_set_default(g);
