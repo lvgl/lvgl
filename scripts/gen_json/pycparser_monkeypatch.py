@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from pycparser import c_ast  # NOQA
+
+try:
+    from pycparser import c_ast  # NOQA
+except ImportError:
+    sys.stderr.write(
+        '\nThe pycparser library is missing, '
+        'please run "pip install pycparser" to install it.\n'
+    )
+    sys.stderr.flush()
+    sys.exit(-500)
+
 from pycparser.c_generator import CGenerator
 from collections import OrderedDict
 

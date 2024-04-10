@@ -54,6 +54,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
                 event.wait(1)
                 sys.stdout.write('.')
                 sys.stdout.flush()
+
             print()
 
         t = threading.Thread(target=_do)
@@ -122,7 +123,16 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
 
         if sys.platform.startswith('win'):
             import get_sdl2
-            import pyMSVC  # NOQA
+
+            try:
+                import pyMSVC  # NOQA
+            except ImportError:
+                sys.stderr.write(
+                    '\nThe pyMSVC library is missing, '
+                    'please run "pip install pyMSVC" to install it.\n'
+                )
+                sys.stderr.flush()
+                sys.exit(-500)
 
             env = pyMSVC.setup_environment()  # NOQA
             cpp_cmd = ['cl', '/std:c11', '/nologo', '/P', f'/Fi"{pp_file}"']
