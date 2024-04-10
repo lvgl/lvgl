@@ -695,6 +695,9 @@ menu "LVGL configuration"
 			config LV_FONT_DEFAULT_MONTSERRAT_8
 				bool "Montserrat 8"
 				select LV_FONT_MONTSERRAT_8
+			config LV_FONT_DEFAULT_MONTSERRAT_10
+				bool "Montserrat 10"
+				select LV_FONT_MONTSERRAT_10
 			config LV_FONT_DEFAULT_MONTSERRAT_12
 				bool "Montserrat 12"
 				select LV_FONT_MONTSERRAT_12
