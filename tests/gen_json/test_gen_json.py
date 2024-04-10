@@ -5,7 +5,7 @@
 import os
 import sys
 
-BASE_PATH = abs(os.path.dirname(__file__))
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 SCRIPT_PATH = os.path.join(
     BASE_PATH, '..', '..', 'scripts',
     'gen_json', 'gen_json.py'
