@@ -103,8 +103,18 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
 
     if(!_lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext)) return;
+
+    bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
+
+    int32_t radius = 0;
+    if(clip_corner) {
+        radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+        if(radius == 0) clip_corner = false;
+    }
+
     /*If the object is visible on the current clip area*/
     layer->_clip_area = clip_coords_for_obj;
+    layer->clip_radius = radius;
 
     lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_BEGIN, layer);
     lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN, layer);
@@ -147,13 +157,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
         }
         else {
             layer->_clip_area = clip_coords_for_children;
-            bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
-
-            int32_t radius = 0;
-            if(clip_corner) {
-                radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-                if(radius == 0) clip_corner = false;
-            }
 
             if(clip_corner == false) {
                 for(i = 0; i < child_cnt; i++) {

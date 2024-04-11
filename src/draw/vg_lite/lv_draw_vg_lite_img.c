@@ -89,6 +89,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
 
     bool has_trasform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
+    int32_t clip_radius = draw_unit->target_layer->clip_radius;
 
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
@@ -99,7 +100,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
     /* If clipping is not required, blit directly */
-    if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false)) {
+    if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && clip_radius <= 0) {
         /* The image area is the coordinates relative to the image itself */
         lv_area_t src_area = *coords;
         lv_area_move(&src_area, -coords->x1, -coords->y1);
@@ -123,9 +124,9 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
         lv_vg_lite_path_append_rect(
             path,
-            clip_area.x1, clip_area.y1,
-            lv_area_get_width(&clip_area), lv_area_get_height(&clip_area),
-            0, 0);
+            coords->x1, coords->y1,
+            lv_area_get_width(coords), lv_area_get_height(coords),
+            clip_radius, clip_radius);
         lv_vg_lite_path_set_bonding_box_area(path, &clip_area);
         lv_vg_lite_path_end(path);
 

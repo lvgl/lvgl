@@ -165,6 +165,9 @@ struct _lv_layer_t  {
      */
     lv_area_t _clip_area;
 
+    /** Clip radius of the layer. Used for rounded corners */
+    int32_t clip_radius;
+
     /** Linked list of draw tasks */
     lv_draw_task_t * draw_task_head;
 
