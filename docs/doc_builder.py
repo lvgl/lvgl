@@ -1162,7 +1162,7 @@ def get_includes(name1, name2, obj, includes):
     if not is_name_match(name1, name2):
         return
 
-    if obj.parent is not None:
+    if obj.parent is not None and hasattr(obj.parent, 'header_file'):
         header_file = obj.parent.header_file
     elif hasattr(obj, 'header_file'):
         header_file = obj.header_file
