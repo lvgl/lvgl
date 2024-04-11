@@ -135,7 +135,8 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
                 sys.exit(-500)
 
             env = pyMSVC.setup_environment()  # NOQA
-            cpp_cmd = ['cl', '/std:c11', '/nologo', '/P', f'/Fi"{pp_file}"']
+            cpp_cmd = ['cl', '/std:c11', '/nologo', '/P']
+            output_pp = f'/Fi"{pp_file}"'
             sdl2_include, _ = get_sdl2.get_sdl2(temp_directory)
             include_dirs.append(sdl2_include)
             include_path_env_key = 'INCLUDE'
@@ -144,14 +145,14 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
             include_path_env_key = 'C_INCLUDE_PATH'
             cpp_cmd = [
                 'clang', '-std=c11', '-E', '-DINT32_MIN=0x80000000',
-                f' >> "{pp_file}"'
             ]
+            output_pp = f' >> "{pp_file}"'
         else:
             include_path_env_key = 'C_INCLUDE_PATH'
             cpp_cmd = [
                 'gcc', '-std=c11', '-E', '-Wno-incompatible-pointer-types',
-                f' >> "{pp_file}"'
             ]
+            output_pp = f' >> "{pp_file}"'
 
         fake_libc_path = create_fake_lib_c.run(temp_directory)
 
@@ -179,6 +180,11 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
         cpp_cmd.extend(['-DPYCPARSER', f'"-I{fake_libc_path}"'])
         cpp_cmd.extend([f'"-I{item}"' for item in include_dirs])
         cpp_cmd.append(f'"{lvgl_header_path}"')
+
+        if sys.platform.startswith('win'):
+            cpp_cmd.insert(len(cpp_cmd) - 2, output_pp)
+        else:
+            cpp_cmd.append(output_pp)
 
         cpp_cmd = ' '.join(cpp_cmd)
 
