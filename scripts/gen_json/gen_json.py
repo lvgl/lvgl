@@ -73,7 +73,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
         shutil.copyfile(lvgl_header_path, os.path.join(temp_lvgl, 'lvgl.h'))
 
         lvgl_header_path = os.path.join(temp_lvgl, 'lvgl.h')
-        pp_file = os.path.join(base_path, 'lvgl.pp')
+        pp_file = os.path.join(temp_directory, 'lvgl.pp')
 
         if lvgl_config_path is None:
             lvgl_config_path = os.path.join(lvgl_path, 'lv_conf_template.h')
@@ -144,13 +144,13 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
             include_path_env_key = 'C_INCLUDE_PATH'
             cpp_cmd = [
                 'clang', '-std=c11', '-E', '-DINT32_MIN=0x80000000',
-                f'"-o {pp_file}"'
+                f' >> "{pp_file}"'
             ]
         else:
             include_path_env_key = 'C_INCLUDE_PATH'
             cpp_cmd = [
                 'gcc', '-std=c11', '-E', '-Wno-incompatible-pointer-types',
-                f'"-o {pp_file}"'
+                f' >> "{pp_file}"'
             ]
 
         fake_libc_path = create_fake_lib_c.run(temp_directory)

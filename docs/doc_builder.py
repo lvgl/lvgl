@@ -1214,7 +1214,23 @@ class XMLSearch(object):
         os.environ['LVGL_URLPATH'] = urlpath
         os.environ['LVGL_GITCOMMIT'] = gitcommit
 
-        subprocess.getoutput(f'cd "{temp_directory}" && doxygen Doxyfile')
+        p = subprocess.Popen(
+            f'cd "{temp_directory}" && doxygen Doxyfile',
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True
+        )
+
+        out, err = p.communicate()
+        if p.returncode:
+            if out:
+                sys.stdout.write(out)
+                sys.stdout.flush()
+            if err:
+                sys.stderr.write(err)
+                sys.stdout.flush()
+
+            sys.exit(p.returncode)
 
         xml_path = os.path.join(temp_directory, 'xml')
 
