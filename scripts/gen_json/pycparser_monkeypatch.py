@@ -1175,6 +1175,12 @@ class Typedef(c_ast.Typedef):
         if isinstance(self.type, TypeDecl):
             type_dict = self.type.type.to_dict()
 
+            if type_dict['name'] is None:
+                if self.name is not None:
+                    type_dict['name'] = self.name
+                else:
+                    raise RuntimeError(str(type_dict))
+
             if 'quals' in type_dict:
                 type_dict['quals'].extend(self.quals)
             else:
