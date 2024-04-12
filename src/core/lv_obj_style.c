@@ -429,6 +429,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
 
     _lv_obj_style_t * style_trans = get_trans_style(obj, part);
     lv_style_set_prop((lv_style_t *)style_trans->style, tr_dsc->prop, v1);  /*Be sure `trans_style` has a valid value*/
+    lv_obj_refresh_style(obj, tr_dsc->selector, tr_dsc->prop);
 
     if(tr_dsc->prop == LV_STYLE_RADIUS) {
         if(v1.num == LV_RADIUS_CIRCLE || v2.num == LV_RADIUS_CIRCLE) {
@@ -906,8 +907,9 @@ static void trans_anim_start_cb(lv_anim_t * a)
     tr->prop = prop_tmp;
 
     _lv_obj_style_t * style_trans = get_trans_style(tr->obj, tr->selector);
-    lv_style_set_prop((lv_style_t *)style_trans->style, tr->prop,
-                      tr->start_value);  /*Be sure `trans_style` has a valid value*/
+    /*Be sure `trans_style` has a valid value*/
+    lv_style_set_prop((lv_style_t *)style_trans->style, tr->prop, tr->start_value);
+    lv_obj_refresh_style(tr->obj, tr->selector, tr->prop);
 
 }
 
