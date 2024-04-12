@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 
 try:
     from pycparser import c_ast  # NOQA
@@ -614,6 +615,8 @@ class FileAST(c_ast.FileAST):
         function_pointers = []
         forward_decl = []
 
+        no_enum_name_count = 1
+
         for itm in items:
             itm.process()
             item = itm.to_dict()
@@ -638,6 +641,11 @@ class FileAST(c_ast.FileAST):
                 _unions[item['name']] = item
             elif is_type(item, 'enum'):
                 enums.append(item)
+
+                if item['name'] is None:
+                    item['name'] = f'NO_NAME_{no_enum_name_count}'
+                    no_enum_name_count += 1
+
                 _enums[item['name']] = item
             elif is_type(item, 'variable'):
                 variables.append(item)
@@ -655,6 +663,39 @@ class FileAST(c_ast.FileAST):
                 enum_dict = _enums['_' + tdef_name]
                 for member in enum_dict['members']:
                     member['type']['name'] = tdef_name
+                    member['type']['json_type'] = 'lvgl_type'
+            else:
+                if tdef_name.endswith('_t'):
+                    td_name = tdef_name[:-2].upper()
+                else:
+                    td_name = tdef_name.upper()
+
+                for en_name, enum_dict in _enums.items():
+                    if not en_name.startswith('NO_NAME_'):
+                        continue
+
+                    member_names = [
+                        member['name']
+                        for member in enum_dict['members']
+                        if not member['name'].startswith('_')
+                    ]
+
+                    if not member_names:
+                        continue
+
+                    c_name = os.path.commonprefix(member_names)
+                    c_name = "_".join(c_name.split("_")[:-1])
+                    if c_name != td_name:
+                        continue
+
+                    for member in enum_dict['members']:
+                        member['type']['name'] = tdef_name
+                        member['type']['json_type'] = 'lvgl_type'
+                    break
+
+        for enm in enums:
+            if enm['name'].startswith('NO_NAME_'):
+                enm['name'] = None
 
         res = {
             'enums': enums,
@@ -755,6 +796,11 @@ class FuncDecl(c_ast.FuncDecl):
                 docstring = doc_search.description
                 ret_docstring = doc_search.res_description
 
+                if docstring is None:
+                    docstring = ''
+                if ret_docstring is None:
+                    ret_docstring = ''
+
         else:
             doc_search = None
             docstring = ''
@@ -767,7 +813,10 @@ class FuncDecl(c_ast.FuncDecl):
             if arg['name'] and doc_search is not None:
                 for doc_arg in doc_search.args:
                     if doc_arg.name == arg['name']:
-                        arg['docstring'] = doc_arg.description
+                        if doc_arg.description is None:
+                            arg['docstring'] = ''
+                        else:
+                            arg['docstring'] = doc_arg.description
                         break
                 else:
                     arg['docstring'] = ''
@@ -1102,6 +1151,9 @@ class TypeDecl(c_ast.TypeDecl):
 class Typedef(c_ast.Typedef):
 
     def process(self):
+        if self._parent is None:
+            self.type.parent = self
+
         self.type.process()
 
         if self.name and self.name not in collected_types:
@@ -1235,7 +1287,19 @@ class Typedef(c_ast.Typedef):
                 return None
 
             if type_dict['name'] in _enums:
-                _enums[type_dict['name']]['name'] = self.name
+                if self.name is not None:
+                    type_dict = self.type.to_dict()
+
+                    res = OrderedDict(
+                        [
+                            ('name', self.name),
+                            ('type', type_dict),
+                            ('json_type', 'typedef'),
+                            ('docstring', docstring),
+                            ('quals', self.quals)
+                        ]
+                    )
+                    return res
 
                 if 'quals' in _enums[type_dict['name']]:
                     _enums[type_dict['name']]['quals'].extend(
