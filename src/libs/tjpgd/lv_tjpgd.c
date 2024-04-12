@@ -216,8 +216,6 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
 
     JDEC * jd = dsc->user_data;
     lv_draw_buf_t * decoded = (void *)dsc->decoded;
-    if(decoded == NULL) decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
-    dsc->decoded = decoded;
 
     uint32_t  mx, my;
     mx = jd->msx * 8;
@@ -231,6 +229,15 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         jd->dcv[2] = jd->dcv[1] = jd->dcv[0] = 0;   /* Initialize DC values */
         jd->rst = 0;
         jd->rsc = 0;
+        if(decoded == NULL) {
+            decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+            dsc->decoded = decoded;
+        }
+        else {
+            lv_fs_seek(jd->device, 0, LV_FS_SEEK_SET);
+            JRESULT rc = jd_prepare(jd, input_func, jd->pool_original, (size_t)TJPGD_WORKBUFF_SIZE, jd->device);
+            if(rc) return rc;
+        }
         decoded->data = jd->workbuf;
         decoded->header = dsc->header;
         decoded->header.stride = mx * 3;

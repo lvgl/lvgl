@@ -82,15 +82,14 @@ typedef lv_result_t (*lv_image_decoder_info_f_t)(lv_image_decoder_t * decoder, c
 typedef lv_result_t (*lv_image_decoder_open_f_t)(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 /**
- * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
+ * Decode `full_area` pixels incrementally by calling in a loop. Set `decoded_area` values to `LV_COORD_MIN` on first call.
  * Required only if the "open" function can't return with the whole decoded pixel array.
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor
- * @param x start x coordinate
- * @param y start y coordinate
- * @param len number of pixels to decode
- * @param buf a buffer to store the decoded pixels
- * @return LV_RESULT_OK: ok; LV_RESULT_INVALID: failed
+ * @param full_area input parameter. the full area to decode after enough subsequent calls
+ * @param decoded_area input+output parameter. set the values to `LV_COORD_MIN` for the first call and to reset decoding.
+ *                     the decoded area is stored here after each call.
+ * @return LV_RESULT_OK: ok; LV_RESULT_INVALID: failed or there is nothing left to decode
  */
 typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(lv_image_decoder_t * decoder,
                                                       lv_image_decoder_dsc_t * dsc,
@@ -217,12 +216,13 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  */
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args);
 
-/**
- * Decode an area of the opened image
+/***
+ * Decode `full_area` pixels incrementally by calling in a loop. Set `decoded_area` to `LV_COORD_MIN` on first call.
  * @param dsc           image decoder descriptor
- * @param full_area     start X coordinate (from left)
- * @param decoded_area  start Y coordinate (from top)
- * @return              LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred
+ * @param full_area     input parameter. the full area to decode after enough subsequent calls
+ * @param decoded_area  input+output parameter. set the values to `LV_COORD_MIN` for the first call and to reset decoding.
+ *                      the decoded area is stored here after each call.
+ * @return              LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred or there is nothing left to decode
  */
 lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area,
                                       lv_area_t * decoded_area);
