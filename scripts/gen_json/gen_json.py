@@ -108,7 +108,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
                         'LV_USE_SNAPSHOT',
                         'LV_USE_FREETYPE'
                     ):
-                        if line.startswith(f'#define {item}'):
+                        if line.startswith(f'#define {item} '):
                             data[i] = f'#define {item} 1'
                             break
 
