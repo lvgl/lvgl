@@ -277,6 +277,9 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         if(img_dsc->data == NULL) return NULL;
     }
 
+    if(src_type == LV_IMAGE_SRC_FILE) LV_LOG_INFO("Try to find decoder for %s", (const char *)src);
+    else LV_LOG_INFO("Try to find decoder for %p", src);
+
     lv_image_decoder_t * decoder;
     bool is_header_cache_enabled = lv_image_header_cache_is_enabled();
 
@@ -292,14 +295,21 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
             *header = cached_data->header;
             decoder = cached_data->decoder;
             lv_cache_release(img_header_cache_p, entry, NULL);
+
+            LV_LOG_INFO("Found decoder %s in header cache", decoder->name);
             return decoder;
         }
     }
 
+    /*Search the decoders*/
+    lv_image_decoder_t * decoder_prev = NULL;
     _LV_LL_READ(img_decoder_ll_p, decoder) {
         /*Info and Open callbacks are required*/
         if(decoder->info_cb && decoder->open_cb) {
             lv_result_t res = decoder->info_cb(decoder, src, header);
+
+            if(decoder_prev) LV_LOG_INFO("Can't open image with decoder %s. Trying next decoder.", decoder_prev->name);
+
             if(res == LV_RESULT_OK) {
                 if(header->stride == 0) {
                     LV_LOG_INFO("Image decoder didn't set stride. Calculate it from width.");
@@ -307,8 +317,13 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
                 }
                 break;
             }
+
+            decoder_prev = decoder;
         }
     }
+
+    if(decoder == NULL) LV_LOG_INFO("No decoder found");
+    else LV_LOG_INFO("Found decoder %s", decoder->name);
 
     if(is_header_cache_enabled && src_type == LV_IMAGE_SRC_FILE && decoder) {
         lv_cache_entry_t * entry;

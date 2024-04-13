@@ -121,7 +121,7 @@ static void x11_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
                                         .y2 = 0
                                       };
 
-    /* build display update area until lv_disp_flush_is_last */
+    /* build display update area until lv_display_flush_is_last */
     xd->flush_area.x1 = MIN(xd->flush_area.x1, area->x1);
     xd->flush_area.x2 = MAX(xd->flush_area.x2, area->x2);
     xd->flush_area.y1 = MIN(xd->flush_area.y1, area->y1);

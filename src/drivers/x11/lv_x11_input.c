@@ -10,12 +10,11 @@
 
 #if LV_USE_X11
 
+#include <string.h>
 #include <stdbool.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include "../../stdlib/lv_string.h"
 #include "../../widgets/image/lv_image.h"
-#include "../../core/lv_obj.h"
 
 /*********************
  *      DEFINES
@@ -274,7 +273,6 @@ static lv_indev_t * lv_x11_keyboard_create(lv_display_t * disp)
 static lv_indev_t * lv_x11_mouse_create(lv_display_t * disp, lv_image_dsc_t const * symb)
 {
     lv_indev_t * indev = lv_indev_create();
-    LV_ASSERT_OBJ(indev, MY_CLASS);
     if(NULL != indev) {
         lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
         lv_indev_set_read_cb(indev, x11_mouse_read_cb);
@@ -293,7 +291,6 @@ static lv_indev_t * lv_x11_mouse_create(lv_display_t * disp, lv_image_dsc_t cons
 static lv_indev_t * lv_x11_mousewheel_create(lv_display_t * disp)
 {
     lv_indev_t * indev = lv_indev_create();
-    LV_ASSERT_OBJ(indev, MY_CLASS);
     if(NULL != indev) {
         lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
         lv_indev_set_read_cb(indev, x11_mousewheel_read_cb);

@@ -18,6 +18,9 @@
 /*********************
  *      DEFINES
  *********************/
+
+#define DECODER_NAME    "JPEG_TURBO"
+
 #define JPEG_PIXEL_SIZE 3 /* RGB888 */
 #define JPEG_SIGNATURE 0xFFD8FF
 #define IS_JPEG_SIGNATURE(x) (((x) & 0x00FFFFFF) == JPEG_SIGNATURE)
@@ -72,6 +75,8 @@ void lv_libjpeg_turbo_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+
+    dec->name = DECODER_NAME;
 }
 
 void lv_libjpeg_turbo_deinit(void)
@@ -171,7 +176,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
         dsc->decoded = decoded;
 
-        if(dsc->args.no_cache) return LV_RES_OK;
+        if(dsc->args.no_cache) return LV_RESULT_OK;
 
         /*If the image cache is disabled, just return the decoded image*/
         if(!lv_image_cache_is_enabled()) return LV_RESULT_OK;
