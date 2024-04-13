@@ -205,14 +205,14 @@ uint8_t test_ARGB8888_LZ4_align64_map[] = {
 
 };
 
-const lv_img_dsc_t test_ARGB8888_LZ4_align64 = {
+const lv_image_dsc_t test_ARGB8888_LZ4_align64 = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_ARGB8888,
   .header.flags = 0 | LV_IMAGE_FLAGS_COMPRESSED,
   .header.w = 71,
   .header.h = 60,
   .header.stride = 288,
-  .data_size = 2897,
+  .data_size = sizeof(test_ARGB8888_LZ4_align64_map),
   .data = test_ARGB8888_LZ4_align64_map,
 };
 

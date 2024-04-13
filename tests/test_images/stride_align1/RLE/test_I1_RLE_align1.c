@@ -84,14 +84,14 @@ uint8_t test_I1_RLE_align1_map[] = {
 
 };
 
-const lv_img_dsc_t test_I1_RLE_align1 = {
+const lv_image_dsc_t test_I1_RLE_align1 = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_I1,
   .header.flags = 0 | LV_IMAGE_FLAGS_COMPRESSED,
   .header.w = 71,
   .header.h = 60,
   .header.stride = 16,
-  .data_size = 968,
+  .data_size = sizeof(test_I1_RLE_align1_map),
   .data = test_I1_RLE_align1_map,
 };
 

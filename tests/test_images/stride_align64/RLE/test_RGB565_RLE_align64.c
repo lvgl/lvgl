@@ -411,14 +411,14 @@ uint8_t test_RGB565_RLE_align64_map[] = {
 
 };
 
-const lv_img_dsc_t test_RGB565_RLE_align64 = {
+const lv_image_dsc_t test_RGB565_RLE_align64 = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_RGB565,
   .header.flags = 0 | LV_IMAGE_FLAGS_COMPRESSED,
   .header.w = 71,
   .header.h = 60,
   .header.stride = 144,
-  .data_size = 6200,
+  .data_size = sizeof(test_RGB565_RLE_align64_map),
   .data = test_RGB565_RLE_align64_map,
 };
 
