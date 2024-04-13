@@ -457,6 +457,8 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
 
     disp->color_format = color_format;
     disp->layer_head->color_format = color_format;
+    if(disp->buf_1) disp->buf_1->header.cf = color_format;
+    if(disp->buf_2) disp->buf_2->header.cf = color_format;
 
     lv_display_send_event(disp, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
 }

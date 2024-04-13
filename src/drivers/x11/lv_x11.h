@@ -60,7 +60,7 @@ void lv_x11_inputs_create(lv_display_t * disp, lv_image_dsc_t const * mouse_img)
  * @endcode
  * or with mouse cursor icon:
  * @code
- * lv_img_dsc_t mouse_symbol = {.....};
+ * lv_image_dsc_t mouse_symbol = {.....};
  * lv_display_t* disp = lv_x11_window_create("My Window Title", window_width, window_width);
  * lv_x11_inputs_create(disp, &mouse_symbol);
  * @endcode
