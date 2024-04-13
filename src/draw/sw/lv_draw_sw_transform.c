@@ -707,7 +707,6 @@ static void transform_l8_to_al88(const uint8_t * src, int32_t src_w, int32_t src
 }
 
 /* L8 has to be transformed into an ARGB8888 buffer, because it will be recolored as well */
-#if 1
 static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                      int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                      int32_t x_end, uint8_t * dest_buf, bool aa)
@@ -727,6 +726,7 @@ static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t
         /*Fully out of the image*/
         if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
             *((uint32_t *)&dest_c32[x]) = 0L;
+            dest_c32[x].alpha = 255;
             continue;
         }
 
@@ -782,103 +782,6 @@ static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t
         }
     }
 }
-#else
-static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
-                                     int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                                     int32_t x_end, uint8_t * dest_buf, bool aa)
-{
-    int32_t xs_ups_start = xs_ups;
-    int32_t ys_ups_start = ys_ups;
-    lv_color32_t * dest_c32 = (lv_color32_t *)dest_buf;
-
-    int32_t x;
-    for(x = 0; x < x_end; x++) {
-        xs_ups = xs_ups_start + ((xs_step * x) >> 8);
-        ys_ups = ys_ups_start + ((ys_step * x) >> 8);
-
-        int32_t xs_int = xs_ups >> 8;
-        int32_t ys_int = ys_ups >> 8;
-
-        /*Fully out of the image*/
-        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
-            dest_c32[x].alpha = 0x00;
-            continue;
-        }
-
-        /*Get the direction the hor and ver neighbor
-         *`fract` will be in range of 0x00..0xFF and `next` (+/-1) indicates the direction*/
-        int32_t xs_fract = xs_ups & 0xFF;
-        int32_t ys_fract = ys_ups & 0xFF;
-
-        int32_t x_next;
-        int32_t y_next;
-        if(xs_fract < 0x80) {
-            x_next = -1;
-            xs_fract = 0x7F - xs_fract;
-        }
-        else {
-            x_next = 1;
-            xs_fract = xs_fract - 0x80;
-        }
-        if(ys_fract < 0x80) {
-            y_next = -1;
-            ys_fract = 0x7F - ys_fract;
-        }
-        else {
-            y_next = 1;
-            ys_fract = ys_fract - 0x80;
-        }
-
-        const uint8_t * src_u8 = &src[ys_int * src_stride + xs_int];
-
-        dest_c32[x].red = src_u8[0];
-        dest_c32[x].green = src_u8[0];
-        dest_c32[x].blue = src_u8[0];
-        dest_c32[x].alpha = 0xff;
-
-        if(aa &&
-           xs_int + x_next >= 0 &&
-           xs_int + x_next <= src_w - 1 &&
-           ys_int + y_next >= 0 &&
-           ys_int + y_next <= src_h - 1) {
-            const uint8_t * px_hor_u8 = src_u8 + (int32_t)(x_next);
-            lv_color32_t px_hor;
-            px_hor.red = px_hor_u8[0];
-            px_hor.green = px_hor_u8[0];
-            px_hor.blue = px_hor_u8[0];
-            px_hor.alpha = 0xff;
-
-            const uint8_t * px_ver_u8 = src_u8 + (int32_t)(y_next * src_stride);
-            lv_color32_t px_ver;
-            px_ver.red = px_ver_u8[0];
-            px_ver.green = px_ver_u8[0];
-            px_ver.blue = px_ver_u8[0];
-            px_ver.alpha = 0xff;
-
-            if(!lv_color32_eq(dest_c32[x], px_ver)) {
-                px_ver.alpha = ys_fract;
-                dest_c32[x] = lv_color_mix32(px_ver, dest_c32[x]);
-            }
-
-            if(!lv_color32_eq(dest_c32[x], px_hor)) {
-                px_hor.alpha = xs_fract;
-                dest_c32[x] = lv_color_mix32(px_hor, dest_c32[x]);
-            }
-        }
-        /*Partially out of the image*/
-        else {
-            lv_opa_t a = 0xff;
-
-            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0)) {
-                dest_c32[x].alpha = (a * (0xFF - xs_fract)) >> 8;
-            }
-            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0)) {
-                dest_c32[x].alpha = (a * (0xFF - ys_fract)) >> 8;
-            }
-        }
-    }
-}
-#endif
 
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout)
