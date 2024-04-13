@@ -726,7 +726,6 @@ static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t
         /*Fully out of the image*/
         if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
             *((uint32_t *)&dest_c32[x]) = 0L;
-            dest_c32[x].alpha = 255;
             continue;
         }
 
