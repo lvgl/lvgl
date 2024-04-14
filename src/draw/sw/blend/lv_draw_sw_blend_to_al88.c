@@ -694,8 +694,10 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(_lv_draw_sw_blend_image_d
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_AL88(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
-                        dest_buf_al88[x].lumi = lv_color32_luminance(src_buf_c32[x]);
-                        dest_buf_al88[x].alpha = src_buf_c32[x].alpha;
+                        lv_color16a_t src_color;
+                        src_color.lumi = lv_color32_luminance(src_buf_c32[x]);
+                        src_color.alpha = src_buf_c32[x].alpha;
+                        lv_color_16a_16a_mix(src_color, &dest_buf_al88[x], &cache);
                     }
                     dest_buf_al88 = drawbuf_next_row(dest_buf_al88, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
@@ -775,13 +777,6 @@ static inline bool lv_color16a_eq(lv_color16a_t c1, lv_color16a_t c2)
     return *((uint16_t *)&c1) == *((uint16_t *)&c2);
 }
 
-/*
-    alpha = alpha1 + (1 - alpha1) * alpha2
-    lumi = ((lumi1 * alpha1 + lumi2 * alpha2 * (1 - alpha1)) / alpha
-
-    ha pl egy ARGB kép egyik pixelének 30% alpha-ja van és a képet 40%-os opa-val kell kirakni, akkor, szerintem ezeket simán össze kell szorozni és az alpha2 12%-lesz
-*/
-
 static inline lv_color16a_t LV_ATTRIBUTE_FAST_MEM lv_color_mix16a(lv_color16a_t fg, lv_color16a_t bg)
 {
 #if 0
@@ -809,7 +804,7 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_16a_16a_mix(lv_color16a_t fg, 
         /* no need to copy */
     }
     /*Opaque background: use simple mix*/
-    else if(fg.alpha == 255) {
+    else if(bg->alpha == 255) {
         *bg = lv_color_mix16a(fg, *bg);
     }
     /*Both colors have alpha. Expensive calculation needs to be applied*/
@@ -821,7 +816,7 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_16a_16a_mix(lv_color16a_t fg, 
             /*Info:
              * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
             cache->res_alpha_saved = 255 - LV_OPA_MIX2(255 - fg.alpha, 255 - bg->alpha);
-            LV_ASSERT(cache->ratio_saved != 0);
+            LV_ASSERT(cache->res_alpha_saved != 0);
             cache->ratio_saved = (uint32_t)((uint32_t)fg.alpha * 255) / cache->res_alpha_saved;
         }
 
