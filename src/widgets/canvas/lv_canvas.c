@@ -152,6 +152,11 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
         buf->blue = color.blue;
         buf->alpha = opa;
     }
+    else if(cf == LV_COLOR_FORMAT_AL88) {
+        lv_color16a_t * buf = (lv_color16a_t *)data;
+        buf->lumi = lv_color_luminance(color);
+        buf->alpha = 255;
+    }
     lv_obj_invalidate(obj);
 }
 
@@ -322,6 +327,18 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
             }
         }
     }
+    else if(header->cf == LV_COLOR_FORMAT_AL88) {
+        lv_color16a_t c;
+        c.lumi = lv_color_luminance(color);
+        c.alpha = 255;
+        for(y = 0; y < header->h; y++) {
+            lv_color16a_t * buf = (lv_color16a_t *)(data + y * stride);
+            for(x = 0; x < header->w; x++) {
+                buf[x] = c;
+            }
+        }
+    }
+
     else {
         for(y = 0; y < header->h; y++) {
             for(x = 0; x < header->w; x++) {
