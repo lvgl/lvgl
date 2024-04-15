@@ -24,7 +24,7 @@ Simple navigation on a list widget
   :language: c
 
 Grid navigation for only one axis
-----------------------------------
+---------------------------------
 
 .. lv_example:: others/gridnav/lv_example_gridnav_5
   :language: c
