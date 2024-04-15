@@ -35,15 +35,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
+struct _lv_sysmon_backend_data_t {
     lv_subject_t subject;
     lv_timer_t * timer;
-    lv_obj_t * label;
-    bool inited;
-} lv_sysmon_backend_data_t;
+};
 
 #if LV_USE_PERF_MONITOR
-typedef struct {
+struct _lv_sysmon_perf_info_t {
     struct {
         bool inited;
         uint32_t refr_start;
@@ -72,7 +70,7 @@ typedef struct {
         uint32_t run_cnt;
     } calculated;
 
-} lv_sysmon_perf_info_t;
+};
 #endif
 
 /**********************
@@ -80,17 +78,26 @@ typedef struct {
  **********************/
 #if LV_USE_SYSMON
 
+/**
+ * Create a new system monitor label
+ * @param disp      create the sys. mon. on this display's system layer
+ * @return          the create label
+ */
+lv_obj_t * lv_sysmon_create(lv_display_t * disp);
+
 #if LV_USE_PERF_MONITOR
 
 /**
  * Show system performance monitor: CPU usage and FPS count
+ * @param disp      target display, NULL for all displays
  */
-void lv_sysmon_show_performance(void);
+void lv_sysmon_show_performance(lv_display_t * disp);
 
 /**
  * Hide system performance monitor
+ * @param disp      target display, NULL for all displays
  */
-void lv_sysmon_hide_performance(void);
+void lv_sysmon_hide_performance(lv_display_t * disp);
 
 #endif /*LV_USE_PERF_MONITOR*/
 
@@ -98,13 +105,15 @@ void lv_sysmon_hide_performance(void);
 
 /**
  * Show system memory monitor: used memory and the memory fragmentation
+ * @param disp      target display, NULL for all displays
  */
-void lv_sysmon_show_memory(void);
+void lv_sysmon_show_memory(lv_display_t * disp);
 
 /**
  * Hide system memory monitor
+ * @param disp      target display, NULL for all displays
  */
-void lv_sysmon_hide_memory(void);
+void lv_sysmon_hide_memory(lv_display_t * disp);
 
 #endif /*LV_USE_MEM_MONITOR*/
 

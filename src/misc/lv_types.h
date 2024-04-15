@@ -148,6 +148,18 @@ typedef struct _lv_font_t lv_font_t;
 struct _lv_image_decoder_t;
 typedef struct _lv_image_decoder_t lv_image_decoder_t;
 
+#if LV_USE_SYSMON
+
+struct _lv_sysmon_backend_data_t;
+typedef struct _lv_sysmon_backend_data_t lv_sysmon_backend_data_t;
+
+#if LV_USE_PERF_MONITOR
+struct _lv_sysmon_perf_info_t;
+typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
+#endif /*LV_USE_PERF_MONITOR*/
+
+#endif /*LV_USE_SYSMON*/
+
 #endif /*__ASSEMBLY__*/
 
 /**********************

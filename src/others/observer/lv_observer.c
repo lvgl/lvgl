@@ -265,6 +265,24 @@ void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32
     }
 }
 
+void lv_subject_deinit(lv_subject_t * subject)
+{
+    lv_observer_t * observer = _lv_ll_get_head(&subject->subs_ll);
+    while(observer) {
+        lv_observer_t * observer_next = _lv_ll_get_next(&subject->subs_ll, observer);
+
+        if(observer->for_obj) {
+            lv_obj_remove_event_cb(observer->target, unsubscribe_on_delete_cb);
+            lv_obj_remove_event_cb_with_user_data(observer->target, NULL, subject);
+        }
+
+        lv_observer_remove(observer);
+        observer = observer_next;
+    }
+
+    _lv_ll_clear(&subject->subs_ll);
+}
+
 lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index)
 {
     if(subject->type != LV_SUBJECT_TYPE_GROUP) {
@@ -280,6 +298,9 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
 lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t cb, void * user_data)
 {
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, cb, NULL, user_data);
+    if(observer == NULL) return NULL;
+
+    observer->for_obj = 0;
     return observer;
 }
 
@@ -301,6 +322,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     observer->cb = cb;
     observer->user_data = user_data;
     observer->target = obj;
+    observer->for_obj = 1;
     /* subscribe to delete event of the object */
     if(obj != NULL) {
         lv_obj_add_event_cb(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
