@@ -51,7 +51,8 @@ static void gridnav_one_axis_move_only(uint32_t key_grid_axis_next,
     lv_group_add_obj(g_group, cont);
     lv_obj_t * objs[3];
     for(uint32_t i = 0; i < 3; i++) {
-        lv_obj_t * obj = lv_roller_create(cont);
+        lv_obj_t * obj = lv_obj_create(cont);
+        lv_obj_create(obj); /* the obj needs a child to be focusable by gridnav */
         lv_group_remove_obj(obj);
         lv_obj_add_event_cb(obj, key_event_cb, LV_EVENT_KEY, NULL);
         objs[i] = obj;
