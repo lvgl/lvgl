@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -92,6 +92,7 @@ static char* _skipSpace(const char* str, const char* end)
 static char* _copyId(const char* str)
 {
     if (!str) return nullptr;
+    if (strlen(str) == 0) return nullptr;
 
     return strdup(str);
 }
@@ -173,14 +174,14 @@ static float _toFloat(const SvgParser* svgParse, const char* str, SvgParserLengt
     else if (strstr(str, "pc")) parsedValue *= PX_PER_PC;
     else if (strstr(str, "in")) parsedValue *= PX_PER_IN;
     else if (strstr(str, "%")) {
-        if (type == SvgParserLengthType::Vertical) parsedValue = (parsedValue / 100.0f) * svgParse->global.h;
-        else if (type == SvgParserLengthType::Horizontal) parsedValue = (parsedValue / 100.0f) * svgParse->global.w;
+        if (type == SvgParserLengthType::Vertical) parsedValue = (parsedValue / 100.0) * svgParse->global.h;
+        else if (type == SvgParserLengthType::Horizontal) parsedValue = (parsedValue / 100.0) * svgParse->global.w;
         else //if other then it's radius
         {
             float max = svgParse->global.w;
             if (max < svgParse->global.h)
                 max = svgParse->global.h;
-            parsedValue = (parsedValue / 100.0f) * max;
+            parsedValue = (parsedValue / 100.0) * max;
         }
     }
     //TODO: Implement 'em', 'ex' attributes
@@ -197,7 +198,7 @@ static float _gradientToFloat(const SvgParser* svgParse, const char* str, bool& 
     isPercentage = false;
 
     if (strstr(str, "%")) {
-        parsedValue = parsedValue / 100.0f;
+        parsedValue = parsedValue / 100.0;
         isPercentage = true;
     }
     else if (strstr(str, "cm")) parsedValue *= PX_PER_CM;
@@ -222,7 +223,7 @@ static float _toOffset(const char* str)
     auto ptr = strstr(str, "%");
 
     if (ptr) {
-        parsedValue = parsedValue / 100.0f;
+        parsedValue = parsedValue / 100.0;
         if (end != ptr || (end + 1) != strEnd) return 0;
     } else if (end != strEnd) return 0;
 
@@ -380,19 +381,25 @@ static void _parseDashArray(SvgLoaderData* loader, const char *str, SvgDash* das
 
 static char* _idFromUrl(const char* url)
 {
-    url = _skipSpace(url, nullptr);
-    if ((*url) == '(') {
-        ++url;
-        url = _skipSpace(url, nullptr);
+    auto open = strchr(url, '(');
+    auto close = strchr(url, ')');
+    if (!open || !close || open >= close) return nullptr;
+
+    open = strchr(url, '#');
+    if (!open || open >= close) return nullptr;
+
+    ++open;
+    --close;
+
+    //trim the rest of the spaces if any
+    while (open < close && *close == ' ') --close;
+
+    //quick verification
+    for (auto id = open; id < close; id++) {
+        if (*id == ' ' || *id == '\'') return nullptr;
     }
 
-    if ((*url) == '\'') ++url;
-    if ((*url) == '#') ++url;
-
-    int i = 0;
-    while (url[i] > ' ' && url[i] != ')' && url[i] != '\'') ++i;
-
-    return strDuplicate(url, i);
+    return strDuplicate(open, (close - open + 1));
 }
 
 
@@ -686,32 +693,6 @@ static constexpr struct
 };
 
 
-static void _matrixCompose(const Matrix* m1, const Matrix* m2, Matrix* dst)
-{
-    auto a11 = (m1->e11 * m2->e11) + (m1->e12 * m2->e21) + (m1->e13 * m2->e31);
-    auto a12 = (m1->e11 * m2->e12) + (m1->e12 * m2->e22) + (m1->e13 * m2->e32);
-    auto a13 = (m1->e11 * m2->e13) + (m1->e12 * m2->e23) + (m1->e13 * m2->e33);
-
-    auto a21 = (m1->e21 * m2->e11) + (m1->e22 * m2->e21) + (m1->e23 * m2->e31);
-    auto a22 = (m1->e21 * m2->e12) + (m1->e22 * m2->e22) + (m1->e23 * m2->e32);
-    auto a23 = (m1->e21 * m2->e13) + (m1->e22 * m2->e23) + (m1->e23 * m2->e33);
-
-    auto a31 = (m1->e31 * m2->e11) + (m1->e32 * m2->e21) + (m1->e33 * m2->e31);
-    auto a32 = (m1->e31 * m2->e12) + (m1->e32 * m2->e22) + (m1->e33 * m2->e32);
-    auto a33 = (m1->e31 * m2->e13) + (m1->e32 * m2->e23) + (m1->e33 * m2->e33);
-
-    dst->e11 = a11;
-    dst->e12 = a12;
-    dst->e13 = a13;
-    dst->e21 = a21;
-    dst->e22 = a22;
-    dst->e23 = a23;
-    dst->e31 = a31;
-    dst->e32 = a32;
-    dst->e33 = a33;
-}
-
-
 /* parse transform attribute
  * https://www.w3.org/TR/SVG/coords.html#TransformAttribute
  */
@@ -754,31 +735,31 @@ static Matrix* _parseTransformationMatrix(const char* value)
         if (state == MatrixState::Matrix) {
             if (ptCount != 6) goto error;
             Matrix tmp = {points[0], points[2], points[4], points[1], points[3], points[5], 0, 0, 1};
-            _matrixCompose(matrix, &tmp, matrix);
+            *matrix = mathMultiply(matrix, &tmp);
         } else if (state == MatrixState::Translate) {
             if (ptCount == 1) {
                 Matrix tmp = {1, 0, points[0], 0, 1, 0, 0, 0, 1};
-                _matrixCompose(matrix, &tmp, matrix);
+                *matrix = mathMultiply(matrix, &tmp);
             } else if (ptCount == 2) {
                 Matrix tmp = {1, 0, points[0], 0, 1, points[1], 0, 0, 1};
-                _matrixCompose(matrix, &tmp, matrix);
+                *matrix = mathMultiply(matrix, &tmp);
             } else goto error;
         } else if (state == MatrixState::Rotate) {
             //Transform to signed.
-            points[0] = fmod(points[0], (float)360);
+            points[0] = fmod(points[0], 360);
             if (points[0] < 0) points[0] += 360;
-            auto c = cosf(points[0] * (float)(M_PI / 180.0));
-            auto s = sinf(points[0] * (float)(M_PI / 180.0));
+            auto c = cosf(points[0] * (M_PI / 180.0));
+            auto s = sinf(points[0] * (M_PI / 180.0));
             if (ptCount == 1) {
                 Matrix tmp = { c, -s, 0, s, c, 0, 0, 0, 1 };
-                _matrixCompose(matrix, &tmp, matrix);
+                *matrix = mathMultiply(matrix, &tmp);
             } else if (ptCount == 3) {
                 Matrix tmp = { 1, 0, points[1], 0, 1, points[2], 0, 0, 1 };
-                _matrixCompose(matrix, &tmp, matrix);
+                *matrix = mathMultiply(matrix, &tmp);
                 tmp = { c, -s, 0, s, c, 0, 0, 0, 1 };
-                _matrixCompose(matrix, &tmp, matrix);
+                *matrix = mathMultiply(matrix, &tmp);
                 tmp = { 1, 0, -points[1], 0, 1, -points[2], 0, 0, 1 };
-                _matrixCompose(matrix, &tmp, matrix);
+                *matrix = mathMultiply(matrix, &tmp);
             } else {
                 goto error;
             }
@@ -786,9 +767,19 @@ static Matrix* _parseTransformationMatrix(const char* value)
             if (ptCount < 1 || ptCount > 2) goto error;
             auto sx = points[0];
             auto sy = sx;
-            if (ptCount == 2) sy = (float)points[1];
+            if (ptCount == 2) sy = points[1];
             Matrix tmp = { sx, 0, 0, 0, sy, 0, 0, 0, 1 };
-            _matrixCompose(matrix, &tmp, matrix);
+            *matrix = mathMultiply(matrix, &tmp);
+        } else if (state == MatrixState::SkewX) {
+            if (ptCount != 1) goto error;
+            auto deg = tanf(points[0] * (M_PI / 180.0));
+            Matrix tmp = { 1, deg, 0, 0, 1, 0, 0, 0, 1 };
+            *matrix = mathMultiply(matrix, &tmp);
+        } else if (state == MatrixState::SkewY) {
+            if (ptCount != 1) goto error;
+            auto deg = tanf(points[0] * (M_PI / 180.0));
+            Matrix tmp = { 1, 0, 0, deg, 1, 0, 0, 0, 1 };
+            *matrix = mathMultiply(matrix, &tmp);
         }
     }
     return matrix;
@@ -3513,7 +3504,7 @@ void SvgLoader::clear(bool all)
     free(loaderData.svgParse);
     loaderData.svgParse = nullptr;
 
-    for (auto gradient = loaderData.gradients.data; gradient < loaderData.gradients.end(); ++gradient) {
+    for (auto gradient = loaderData.gradients.begin(); gradient < loaderData.gradients.end(); ++gradient) {
         (*gradient)->clear();
         free(*gradient);
     }
@@ -3525,12 +3516,16 @@ void SvgLoader::clear(bool all)
 
     if (!all) return;
 
-    for (auto p = loaderData.images.data; p < loaderData.images.end(); ++p) {
+    for (auto p = loaderData.images.begin(); p < loaderData.images.end(); ++p) {
         free(*p);
     }
     loaderData.images.reset();
 
     if (copy) free((char*)content);
+
+    delete(root);
+    root = nullptr;
+
     size = 0;
     content = nullptr;
     copy = false;
@@ -3541,14 +3536,15 @@ void SvgLoader::clear(bool all)
 /* External Class Implementation                                        */
 /************************************************************************/
 
-SvgLoader::SvgLoader()
+SvgLoader::SvgLoader() : ImageLoader(FileType::Svg)
 {
 }
 
 
 SvgLoader::~SvgLoader()
 {
-    close();
+    this->done();
+    clear();
 }
 
 
@@ -3557,7 +3553,7 @@ void SvgLoader::run(unsigned tid)
     //According to the SVG standard the value of the width/height of the viewbox set to 0 disables rendering
     if ((viewFlag & SvgViewFlag::Viewbox) && (fabsf(vw) <= FLT_EPSILON || fabsf(vh) <= FLT_EPSILON)) {
         TVGLOG("SVG", "The <viewBox> width and/or height set to 0 - rendering disabled.");
-        root = Scene::gen();
+        root = Scene::gen().release();
         return;
     }
 
@@ -3731,7 +3727,7 @@ bool SvgLoader::read()
     if (!content || size == 0) return false;
 
     //the loading has been already completed in header()
-    if (root) return true;
+    if (root || !LoadModule::read()) return true;
 
     TaskScheduler::request(this);
 
@@ -3741,18 +3737,19 @@ bool SvgLoader::read()
 
 bool SvgLoader::close()
 {
+    if (!LoadModule::close()) return false;
     this->done();
-
     clear();
-
     return true;
 }
 
 
-unique_ptr<Paint> SvgLoader::paint()
+Paint* SvgLoader::paint()
 {
     this->done();
-    return std::move(root);
+    auto ret = root;
+    root = nullptr;
+    return ret;
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
