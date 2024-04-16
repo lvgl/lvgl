@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,8 +54,9 @@
 #define _USE_MATH_DEFINES       //Math Constants are not defined in Standard C/C++.
 
 #include <cstring>
-#include <math.h>
 #include <ctype.h>
+#include "tvgMath.h"
+#include "tvgShape.h"
 #include "tvgSvgLoaderCommon.h"
 #include "tvgSvgPath.h"
 #include "tvgStr.h"
@@ -131,7 +132,7 @@ void _pathAppendArcTo(Array<PathCommand>* cmds, Array<Point>* pts, Point* cur, P
     rx = fabsf(rx);
     ry = fabsf(ry);
 
-    angle = angle * (float)M_PI / 180.0f;
+    angle = angle * M_PI / 180.0f;
     cosPhi = cosf(angle);
     sinPhi = sinf(angle);
     dx2 = (sx - x) / 2.0f;
@@ -200,17 +201,17 @@ void _pathAppendArcTo(Array<PathCommand>* cmds, Array<Point>* pts, Point* cur, P
     //http://www.euclideanspace.com/maths/algebra/vectors/angleBetween/index.htm
     //Note: atan2 (0.0, 1.0) == 0.0
     at = atan2(((y1p - cyp) / ry), ((x1p - cxp) / rx));
-    theta1 = (at < 0.0f) ? 2.0f * (float)M_PI + at : at;
+    theta1 = (at < 0.0f) ? 2.0f * M_PI + at : at;
 
     nat = atan2(((-y1p - cyp) / ry), ((-x1p - cxp) / rx));
-    deltaTheta = (nat < at) ? 2.0f * (float)M_PI - at + nat : nat - at;
+    deltaTheta = (nat < at) ? 2.0f * M_PI - at + nat : nat - at;
 
     if (sweep) {
         //Ensure delta theta < 0 or else add 360 degrees
-        if (deltaTheta < 0.0f) deltaTheta += (float)(2.0f * (float)M_PI);
+        if (deltaTheta < 0.0f) deltaTheta += (float)(2.0f * M_PI);
     } else {
         //Ensure delta theta > 0 or else substract 360 degrees
-        if (deltaTheta > 0.0f) deltaTheta -= (float)(2.0f * (float)M_PI);
+        if (deltaTheta > 0.0f) deltaTheta -= (float)(2.0f * M_PI);
     }
 
     //Add several cubic bezier to approximate the arc
@@ -407,10 +408,10 @@ static bool _processCommand(Array<PathCommand>* cmds, Array<Point>* pts, char cm
         case 'q':
         case 'Q': {
             Point p[3];
-            float ctrl_x0 = (cur->x + 2 * arr[0]) * (1.0f / 3.0f);
-            float ctrl_y0 = (cur->y + 2 * arr[1]) * (1.0f / 3.0f);
-            float ctrl_x1 = (arr[2] + 2 * arr[0]) * (1.0f / 3.0f);
-            float ctrl_y1 = (arr[3] + 2 * arr[1]) * (1.0f / 3.0f);
+            float ctrl_x0 = (cur->x + 2 * arr[0]) * (1.0 / 3.0);
+            float ctrl_y0 = (cur->y + 2 * arr[1]) * (1.0 / 3.0);
+            float ctrl_x1 = (arr[2] + 2 * arr[0]) * (1.0 / 3.0);
+            float ctrl_y1 = (arr[3] + 2 * arr[1]) * (1.0 / 3.0);
             cmds->push(PathCommand::CubicTo);
             p[0] = {ctrl_x0, ctrl_y0};
             p[1] = {ctrl_x1, ctrl_y1};
@@ -433,10 +434,10 @@ static bool _processCommand(Array<PathCommand>* cmds, Array<Point>* pts, char cm
             } else {
                 ctrl = *cur;
             }
-            float ctrl_x0 = (cur->x + 2 * ctrl.x) * (1.0f / 3.0f);
-            float ctrl_y0 = (cur->y + 2 * ctrl.y) * (1.0f / 3.0f);
-            float ctrl_x1 = (arr[0] + 2 * ctrl.x) * (1.0f / 3.0f);
-            float ctrl_y1 = (arr[1] + 2 * ctrl.y) * (1.0f / 3.0f);
+            float ctrl_x0 = (cur->x + 2 * ctrl.x) * (1.0 / 3.0);
+            float ctrl_y0 = (cur->y + 2 * ctrl.y) * (1.0 / 3.0);
+            float ctrl_x1 = (arr[0] + 2 * ctrl.x) * (1.0 / 3.0);
+            float ctrl_y1 = (arr[1] + 2 * ctrl.y) * (1.0 / 3.0);
             cmds->push(PathCommand::CubicTo);
             p[0] = {ctrl_x0, ctrl_y0};
             p[1] = {ctrl_x1, ctrl_y1};
@@ -473,9 +474,16 @@ static bool _processCommand(Array<PathCommand>* cmds, Array<Point>* pts, char cm
         }
         case 'a':
         case 'A': {
-            _pathAppendArcTo(cmds, pts, cur, curCtl, arr[5], arr[6], arr[0], arr[1], arr[2], arr[3], arr[4]);
-            *cur = *curCtl = {arr[5], arr[6]};
-            *isQuadratic = false;
+            if (mathZero(arr[0]) || mathZero(arr[1])) {
+                Point p = {arr[5], arr[6]};
+                cmds->push(PathCommand::LineTo);
+                pts->push(p);
+                *cur = {arr[5], arr[6]};
+            } else if (!mathEqual(cur->x, arr[5]) || !mathEqual(cur->y, arr[6])) {
+                _pathAppendArcTo(cmds, pts, cur, curCtl, arr[5], arr[6], fabsf(arr[0]), fabsf(arr[1]), arr[2], arr[3], arr[4]);
+                *cur = *curCtl = {arr[5], arr[6]};
+                *isQuadratic = false;
+            }
             break;
         }
         default: {
@@ -537,7 +545,7 @@ static char* _nextCommand(char* path, char* cmd, float* arr, int* count)
 /************************************************************************/
 
 
-bool svgPathToTvgPath(const char* svgPath, Array<PathCommand>& cmds, Array<Point>& pts)
+bool svgPathToShape(const char* svgPath, Shape* shape)
 {
     float numberArray[7];
     int numberCount = 0;
@@ -548,12 +556,17 @@ bool svgPathToTvgPath(const char* svgPath, Array<PathCommand>& cmds, Array<Point
     bool isQuadratic = false;
     char* path = (char*)svgPath;
 
+    auto& pts = P(shape)->rs.path.pts;
+    auto& cmds = P(shape)->rs.path.cmds;
+    auto lastCmds = cmds.count;
+
     while ((path[0] != '\0')) {
         path = _nextCommand(path, &cmd, numberArray, &numberCount);
         if (!path) break;
         if (!_processCommand(&cmds, &pts, cmd, numberArray, numberCount, &cur, &curCtl, &startPoint, &isQuadratic)) break;
     }
 
+    if (cmds.count > lastCmds && cmds[lastCmds] != PathCommand::MoveTo) return false;
     return true;
 }
 

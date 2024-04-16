@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,10 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
 
+#include "config.h"
 #include <string>
 #include "thorvg.h"
+#include "thorvg_lottie.h"
 #include "thorvg_capi.h"
 
 using namespace std;
@@ -33,6 +35,7 @@ using namespace tvg;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 /************************************************************************/
 /* Engine API                                                           */
@@ -730,15 +733,14 @@ TVG_API Tvg_Animation* tvg_animation_new()
 }
 
 
-TVG_API Tvg_Result tvg_animation_set_frame(Tvg_Animation* animation, uint32_t no)
+TVG_API Tvg_Result tvg_animation_set_frame(Tvg_Animation* animation, float no)
 {
-    return TVG_RESULT_INVALID_ARGUMENT;
-//    if (!animation) return TVG_RESULT_INVALID_ARGUMENT;
-//    return (Tvg_Result) reinterpret_cast<Animation*>(animation)->frame(no);
+    if (!animation) return TVG_RESULT_INVALID_ARGUMENT;
+    return (Tvg_Result) reinterpret_cast<Animation*>(animation)->frame(no);
 }
 
 
-TVG_API Tvg_Result tvg_animation_get_frame(Tvg_Animation* animation, uint32_t* no)
+TVG_API Tvg_Result tvg_animation_get_frame(Tvg_Animation* animation, float* no)
 {
     if (!animation || !no) return TVG_RESULT_INVALID_ARGUMENT;
     *no = reinterpret_cast<Animation*>(animation)->curFrame();
@@ -746,7 +748,7 @@ TVG_API Tvg_Result tvg_animation_get_frame(Tvg_Animation* animation, uint32_t* n
 }
 
 
-TVG_API Tvg_Result tvg_animation_get_total_frame(Tvg_Animation* animation, uint32_t* cnt)
+TVG_API Tvg_Result tvg_animation_get_total_frame(Tvg_Animation* animation, float* cnt)
 {
     if (!animation || !cnt) return TVG_RESULT_INVALID_ARGUMENT;
     *cnt = reinterpret_cast<Animation*>(animation)->totalFrame();
@@ -774,6 +776,29 @@ TVG_API Tvg_Result tvg_animation_del(Tvg_Animation* animation)
     if (!animation) return TVG_RESULT_INVALID_ARGUMENT;
     delete(reinterpret_cast<Animation*>(animation));
     return TVG_RESULT_SUCCESS;
+}
+
+
+/************************************************************************/
+/* Lottie Animation API                                                 */
+/************************************************************************/
+
+TVG_API Tvg_Animation* tvg_lottie_animation_new()
+{
+#ifdef THORVG_LOTTIE_LOADER_SUPPORT
+    return (Tvg_Animation*) LottieAnimation::gen().release();
+#endif
+    return nullptr;
+}
+
+
+TVG_API Tvg_Result tvg_lottie_animation_override(Tvg_Animation* animation, const char* slot)
+{
+#ifdef THORVG_LOTTIE_LOADER_SUPPORT
+    if (!animation) return TVG_RESULT_INVALID_ARGUMENT;
+    return (Tvg_Result) reinterpret_cast<LottieAnimation*>(animation)->override(slot);
+#endif
+    return TVG_RESULT_NOT_SUPPORTED;
 }
 
 #ifdef __cplusplus

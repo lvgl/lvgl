@@ -19,6 +19,8 @@
 #if LV_USE_THORVG_INTERNAL
 #define TVG_BUILD 1
 
+#define TVG_BUILD 1
+
 #ifndef __THORVG_CAPI_H__
 #define __THORVG_CAPI_H__
 
@@ -101,7 +103,7 @@ typedef struct _Tvg_Gradient Tvg_Gradient;
 typedef struct _Tvg_Saver Tvg_Saver;
 
 /**
-* \brief A structure representing an animation controller object. (BETA_API)
+* \brief A structure representing an animation controller object. (Experimental API)
 */
 typedef struct _Tvg_Animation Tvg_Animation;
 
@@ -142,7 +144,7 @@ typedef enum {
     TVG_COMPOSITE_METHOD_ALPHA_MASK,         ///< The pixels of the source and the target are alpha blended. As a result, only the part of the source, which intersects with the target is visible.
     TVG_COMPOSITE_METHOD_INVERSE_ALPHA_MASK, ///< The pixels of the source and the complement to the target's pixels are alpha blended. As a result, only the part of the source which is not covered by the target is visible.
     TVG_COMPOSITE_METHOD_LUMA_MASK,          ///< The source pixels are converted to grayscale (luma value) and alpha blended with the target. As a result, only the part of the source which intersects with the target is visible. \since 0.9
-    TVG_COMPOSITE_METHOD_INVERSE_LUMA_MASK   ///< The source pixels are converted to grayscale (luma value) and complement to the target's pixels are alpha blended. As a result, only the part of the source which is not covered by the target is visible. \BETA_API
+    TVG_COMPOSITE_METHOD_INVERSE_LUMA_MASK   ///< The source pixels are converted to grayscale (luma value) and complement to the target's pixels are alpha blended. As a result, only the part of the source which is not covered by the target is visible. \Experimental API
 } Tvg_Composite_Method;
 
 /**
@@ -150,7 +152,7 @@ typedef enum {
  *
  * \ingroup ThorVGCapi_Paint
  *
- * @BETA_API
+ * @note Experimental API
  */
 typedef enum {
     TVG_BLEND_METHOD_NORMAL = 0,        ///< Perform the alpha blending(default). S if (Sa == 255), otherwise (Sa * S) + (255 - Sa) * D
@@ -431,7 +433,7 @@ typedef enum {
 *
 * \return A new Tvg_Canvas object.
 */
-TVG_API Tvg_Canvas* tvg_swcanvas_create(void);
+TVG_API Tvg_Canvas* tvg_swcanvas_create();
 
 
 /*!
@@ -987,7 +989,7 @@ TVG_API Tvg_Result tvg_paint_get_identifier(const Tvg_Paint* paint, Tvg_Identifi
  * \return Tvg_Result enumeration.
  * \retval TVG_RESULT_INVALID_ARGUMENT In case a @c nullptr is passed as the argument.
  *
- * @BETA_API
+ * @note Experimental API
  */
 TVG_API Tvg_Result tvg_paint_set_blend_method(const Tvg_Paint* paint, Tvg_Blend_Method method);
 
@@ -1005,7 +1007,7 @@ TVG_API Tvg_Result tvg_paint_set_blend_method(const Tvg_Paint* paint, Tvg_Blend_
  * \return Tvg_Result enumeration.
  * \retval TVG_RESULT_INVALID_ARGUMENT In case a @c nullptr is passed as the argument.
  *
- * @BETA_API
+ * @note Experimental API
  */
 TVG_API Tvg_Result tvg_paint_get_blend_method(const Tvg_Paint* paint, Tvg_Blend_Method* method);
 
@@ -1035,7 +1037,7 @@ TVG_API Tvg_Result tvg_paint_get_blend_method(const Tvg_Paint* paint, Tvg_Blend_
 *
 * \return A new shape object.
 */
-TVG_API Tvg_Paint* tvg_shape_new(void);
+TVG_API Tvg_Paint* tvg_shape_new();
 
 
 /*!
@@ -1710,7 +1712,7 @@ TVG_API Tvg_Result tvg_shape_get_gradient(const Tvg_Paint* paint, Tvg_Gradient**
 *
 * \return A new linear gradient object.
 */
-TVG_API Tvg_Gradient* tvg_linear_gradient_new(void);
+TVG_API Tvg_Gradient* tvg_linear_gradient_new();
 
 
 /*!
@@ -1732,7 +1734,7 @@ TVG_API Tvg_Gradient* tvg_linear_gradient_new(void);
 *
 * \return A new radial gradient object.
 */
-TVG_API Tvg_Gradient* tvg_radial_gradient_new(void);
+TVG_API Tvg_Gradient* tvg_radial_gradient_new();
 
 
 /*!
@@ -1954,11 +1956,15 @@ TVG_API Tvg_Result tvg_gradient_del(Tvg_Gradient* grad);
 *
 * \return A new picture object.
 */
-TVG_API Tvg_Paint* tvg_picture_new(void);
+TVG_API Tvg_Paint* tvg_picture_new();
 
 
 /*!
 * \brief Loads a picture data directly from a file.
+*
+* ThorVG efficiently caches the loaded data using the specified @p path as a key.
+* This means that loading the same file again will not result in duplicate operations;
+* instead, ThorVG will reuse the previously loaded picture data.
 *
 * \param[in] paint A Tvg_Paint pointer to the picture object.
 * \param[in] path The absolute path to the image file.
@@ -1975,6 +1981,17 @@ TVG_API Tvg_Result tvg_picture_load(Tvg_Paint* paint, const char* path);
 /*!
 * \brief Loads a picture data from a memory block of a given size.
 *
+* ThorVG efficiently caches the loaded data using the specified @p data address as a key
+* when the @p copy has @c false. This means that loading the same data again will not result in duplicate operations
+* for the sharable @p data. Instead, ThorVG will reuse the previously loaded picture data.
+*
+* \param[in] paint A Tvg_Paint pointer to the picture object.
+* \param[in] data A pointer to a memory location where the content of the picture raw data is stored.
+* \param[in] w The width of the image @p data in pixels.
+* \param[in] h The height of the image @p data in pixels.
+* \param[in] premultiplied If @c true, the given image data is alpha-premultiplied.
+* \param[in] copy If @c true the data are copied into the engine local buffer, otherwise they are not.
+*
 * \return Tvg_Result enumeration.
 * \retval TVG_RESULT_SUCCESS Succeed.
 * \retval TVG_RESULT_INVALID_ARGUMENT An invalid Tvg_Paint pointer or no data are provided or the @p width or @p height value is zero or less.
@@ -1988,6 +2005,10 @@ TVG_API Tvg_Result tvg_picture_load_raw(Tvg_Paint* paint, uint32_t *data, uint32
 
 /*!
 * \brief Loads a picture data from a memory block of a given size.
+*
+* ThorVG efficiently caches the loaded data using the specified @p data address as a key
+* when the @p copy has @c false. This means that loading the same data again will not result in duplicate operations
+* for the sharable @p data. Instead, ThorVG will reuse the previously loaded picture data.
 *
 * \param[in] paint A Tvg_Paint pointer to the picture object.
 * \param[in] data A pointer to a memory location where the content of the picture file is stored.
@@ -2061,7 +2082,7 @@ TVG_API Tvg_Result tvg_picture_get_size(const Tvg_Paint* paint, float* w, float*
 *
 * \return A new scene object.
 */
-TVG_API Tvg_Paint* tvg_scene_new(void);
+TVG_API Tvg_Paint* tvg_scene_new();
 
 
 /*!
@@ -2139,7 +2160,7 @@ TVG_API Tvg_Result tvg_scene_clear(Tvg_Paint* scene, bool free);
 *
 * \return A new Tvg_Saver object.
 */
-TVG_API Tvg_Saver* tvg_saver_new(void);
+TVG_API Tvg_Saver* tvg_saver_new();
 
 
 /*!
@@ -2217,15 +2238,15 @@ TVG_API Tvg_Result tvg_saver_del(Tvg_Saver* saver);
 /************************************************************************/
 
 /*!
-* \brief Creates a new Animation object. (BETA_API)
+* \brief Creates a new Animation object. (Experimental API)
 *
 * \return Tvg_Animation A new Tvg_Animation object.
 */
-TVG_API Tvg_Animation* tvg_animation_new(void);
+TVG_API Tvg_Animation* tvg_animation_new();
 
 
 /*!
-* \brief Specifies the current frame in the animation. (BETA_API)
+* \brief Specifies the current frame in the animation. (Experimental API)
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
 * \param[in] no The index of the animation frame to be displayed. The index should be less than the tvg_animatio_total_frame().
@@ -2238,11 +2259,11 @@ TVG_API Tvg_Animation* tvg_animation_new(void);
 *
 * \see tvg_animation_get_total_frame()
 */
-TVG_API Tvg_Result tvg_animation_set_frame(Tvg_Animation* animation, uint32_t no);
+TVG_API Tvg_Result tvg_animation_set_frame(Tvg_Animation* animation, float no);
 
 
 /*!
-* \brief Retrieves a picture instance associated with this animation instance. (BETA_API)
+* \brief Retrieves a picture instance associated with this animation instance. (Experimental API)
 *
 * This function provides access to the picture instance that can be used to load animation formats, such as Lottie(json).
 * After setting up the picture, it can be pushed to the designated canvas, enabling control over animation frames
@@ -2258,7 +2279,7 @@ TVG_API Tvg_Paint* tvg_animation_get_picture(Tvg_Animation* animation);
 
 
 /*!
-* \brief Retrieves the current frame number of the animation. (BETA_API)
+* \brief Retrieves the current frame number of the animation. (Experimental API)
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
 * \param[in] no The current frame number of the animation, between 0 and totalFrame() - 1.
@@ -2270,11 +2291,11 @@ TVG_API Tvg_Paint* tvg_animation_get_picture(Tvg_Animation* animation);
 * \see tvg_animation_get_total_frame()
 * \see tvg_animation_set_frame()
 */
-TVG_API Tvg_Result tvg_animation_get_frame(Tvg_Animation* animation, uint32_t* no);
+TVG_API Tvg_Result tvg_animation_get_frame(Tvg_Animation* animation, float* no);
 
 
 /*!
-* \brief Retrieves the total number of frames in the animation. (BETA_API)
+* \brief Retrieves the total number of frames in the animation. (Experimental API)
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
 * \param[in] cnt The total number of frames in the animation.
@@ -2286,11 +2307,11 @@ TVG_API Tvg_Result tvg_animation_get_frame(Tvg_Animation* animation, uint32_t* n
 * \note Frame numbering starts from 0.
 * \note If the Picture is not properly configured, this function will return 0.
 */
-TVG_API Tvg_Result tvg_animation_get_total_frame(Tvg_Animation* animation, uint32_t* cnt);
+TVG_API Tvg_Result tvg_animation_get_total_frame(Tvg_Animation* animation, float* cnt);
 
 
 /*!
-* \brief Retrieves the duration of the animation in seconds. (BETA_API)
+* \brief Retrieves the duration of the animation in seconds. (Experimental API)
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
 * \param[in] duration The duration of the animation in seconds.
@@ -2316,7 +2337,48 @@ TVG_API Tvg_Result tvg_animation_get_duration(Tvg_Animation* animation, float* d
 TVG_API Tvg_Result tvg_animation_del(Tvg_Animation* animation);
 
 
-/** \} */   // end defgroup ThorVG_CAPI
+/** \} */   // end defgroup ThorVGCapi_Animation
+
+
+/**
+* \defgroup ThorVGCapi_LottieAnimation LottieAnimation
+* \brief A module for manipulation of lottie extension features.
+*
+* The module enables control of advanced Lottie features.
+* \{
+*/
+
+/************************************************************************/
+/* LottieAnimation Extension API                                        */
+/************************************************************************/
+
+/*!
+* \brief Creates a new LottieAnimation object. (Experimental API)
+*
+* \return Tvg_Animation A new Tvg_LottieAnimation object.
+*/
+TVG_API Tvg_Animation* tvg_lottie_animation_new();
+
+
+/*!
+* \brief Override the lottie properties through the slot data. (Experimental API)
+*
+* \param[in] animation The Tvg_Animation object to override the property with the slot.
+* \param[in] slot The lottie slot data in json.
+*
+* \return Tvg_Animation A new Tvg_LottieAnimation object.
+* \retval TVG_RESULT_SUCCESS Succeed.
+* \retval TVG_RESULT_INSUFFICIENT_CONDITION In case the animation is not loaded.
+* \retval TVG_RESULT_INVALID_ARGUMENT When the given @p slot is invalid
+* \retval TVG_RESULT_NOT_SUPPORTED The Lottie Animation is not supported.
+*/
+TVG_API Tvg_Result tvg_lottie_animation_override(Tvg_Animation* animation, const char* slot);
+
+
+/** \} */   // end addtogroup ThorVGCapi_LottieAnimation
+
+
+/** \} */   // end defgroup ThorVGCapi
 
 
 #ifdef __cplusplus
@@ -2324,7 +2386,6 @@ TVG_API Tvg_Result tvg_animation_del(Tvg_Animation* animation);
 #endif
 
 #endif //_THORVG_CAPI_H_
-
 
 #endif /* LV_USE_THORVG_INTERNAL */
 

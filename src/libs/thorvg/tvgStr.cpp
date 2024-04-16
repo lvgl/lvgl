@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -185,7 +185,7 @@ float strToFloat(const char *nPtr, char **endPtr)
         auto scale = 1.0f;
 
         while (exponentPart >= 8U) {
-            scale *= (float)1E8;
+            scale *= 1E8;
             exponentPart -= 8U;
         }
         while (exponentPart > 0U) {

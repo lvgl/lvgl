@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 /************************************************************************/
 /* Internal Class Implementation                                        */
 /************************************************************************/
-constexpr auto PATH_KAPPA = 0.552284f;
+
 
 /************************************************************************/
 /* External Class Implementation                                        */
@@ -38,7 +38,6 @@ constexpr auto PATH_KAPPA = 0.552284f;
 Shape :: Shape() : pImpl(new Impl(this))
 {
     Paint::pImpl->id = TVG_CLASS_ID_SHAPE;
-    Paint::pImpl->method(new PaintMethod<Shape::Impl>(pImpl));
 }
 
 
@@ -65,7 +64,7 @@ Result Shape::reset() noexcept
     pImpl->rs.path.cmds.clear();
     pImpl->rs.path.pts.clear();
 
-    pImpl->flag = RenderUpdateFlag::Path;
+    pImpl->flag |= RenderUpdateFlag::Path;
 
     return Result::Success;
 }
@@ -73,18 +72,14 @@ Result Shape::reset() noexcept
 
 uint32_t Shape::pathCommands(const PathCommand** cmds) const noexcept
 {
-    if (!cmds) return 0;
-
-    *cmds = pImpl->rs.path.cmds.data;
+    if (cmds) *cmds = pImpl->rs.path.cmds.data;
     return pImpl->rs.path.cmds.count;
 }
 
 
 uint32_t Shape::pathCoords(const Point** pts) const noexcept
 {
-    if (!pts) return 0;
-
-    *pts = pImpl->rs.path.pts.data;
+    if (pts) *pts = pImpl->rs.path.pts.data;
     return pImpl->rs.path.pts.count;
 }
 
@@ -138,11 +133,11 @@ Result Shape::appendCircle(float cx, float cy, float rx, float ry) noexcept
     auto ryKappa = ry * PATH_KAPPA;
 
     pImpl->grow(6, 13);
-    pImpl->moveTo(cx, cy - ry);
-    pImpl->cubicTo(cx + rxKappa, cy - ry, cx + rx, cy - ryKappa, cx + rx, cy);
+    pImpl->moveTo(cx + rx, cy);
     pImpl->cubicTo(cx + rx, cy + ryKappa, cx + rxKappa, cy + ry, cx, cy + ry);
     pImpl->cubicTo(cx - rxKappa, cy + ry, cx - rx, cy + ryKappa, cx - rx, cy);
     pImpl->cubicTo(cx - rx, cy - ryKappa, cx - rxKappa, cy - ry, cx, cy - ry);
+    pImpl->cubicTo(cx + rxKappa, cy - ry, cx + rx, cy - ryKappa, cx + rx, cy);
     pImpl->close();
 
     return Result::Success;
@@ -223,12 +218,10 @@ Result Shape::appendRect(float x, float y, float w, float h, float rx, float ry)
         pImpl->lineTo(x + w, y + h);
         pImpl->lineTo(x, y + h);
         pImpl->close();
-    //circle
-    } else if (mathEqual(rx, halfW) && mathEqual(ry, halfH)) {
-        return appendCircle(x + (w * 0.5f), y + (h * 0.5f), rx, ry);
+    //rounded rectangle or circle
     } else {
-        auto hrx = rx * 0.5f;
-        auto hry = ry * 0.5f;
+        auto hrx = rx * PATH_KAPPA;
+        auto hry = ry * PATH_KAPPA;
         pImpl->grow(10, 17);
         pImpl->moveTo(x + rx, y);
         pImpl->lineTo(x + w - rx, y);
