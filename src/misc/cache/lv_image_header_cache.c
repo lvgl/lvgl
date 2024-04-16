@@ -6,12 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "../lv_assert.h"
-#include "lv_image_header_cache.h"
-
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
-
 #include "../../core/lv_global.h"
+
+#include "lv_image_header_cache.h"
 
 /*********************
  *      DEFINES
@@ -47,14 +46,14 @@ static void image_header_cache_free_cb(lv_image_header_cache_data_t * entry, voi
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_image_header_cache_init(void)
+lv_result_t lv_image_header_cache_init(uint32_t count)
 {
     if(img_header_cache_p != NULL) {
         return LV_RESULT_OK;
     }
 
     img_header_cache_p = lv_cache_create(&lv_cache_class_lru_rb_count,
-    sizeof(lv_image_header_cache_data_t), LV_IMAGE_HEADER_CACHE_DEF_CNT, (lv_cache_ops_t) {
+    sizeof(lv_image_header_cache_data_t), count, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t) image_header_cache_compare_cb,
         .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t) image_header_cache_free_cb
@@ -63,19 +62,16 @@ lv_result_t lv_image_header_cache_init(void)
     return img_header_cache_p != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
-void lv_image_header_cache_resize(uint32_t new_size, bool evict_now)
+void lv_image_header_cache_resize(uint32_t count, bool evict_now)
 {
-    lv_cache_set_max_size(img_header_cache_p, new_size, NULL);
+    lv_cache_set_max_size(img_header_cache_p, count, NULL);
     if(evict_now) {
-        lv_cache_reserve(img_header_cache_p, new_size, NULL);
+        lv_cache_reserve(img_header_cache_p, count, NULL);
     }
 }
 
-#endif
-
 void lv_image_header_cache_drop(const void * src)
 {
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
     if(src == NULL) {
         lv_cache_drop_all(img_header_cache_p, NULL);
         return;
@@ -87,17 +83,16 @@ void lv_image_header_cache_drop(const void * src)
     };
 
     lv_cache_drop(img_header_cache_p, &search_key, NULL);
-#else
-    LV_UNUSED(src);
-#endif
+}
+
+bool lv_image_header_cache_is_enabled(void)
+{
+    return lv_cache_is_enabled(img_header_cache_p);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-
-#if LV_IMAGE_HEADER_CACHE_DEF_CNT > 0
 
 inline static lv_cache_compare_res_t image_cache_common_compare(const void * lhs_src, lv_image_src_t lhs_src_type,
                                                                 const void * rhs_src, lv_image_src_t rhs_src_type)
@@ -132,5 +127,3 @@ static void image_header_cache_free_cb(lv_image_header_cache_data_t * entry, voi
 
     if(entry->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)entry->src);
 }
-
-#endif

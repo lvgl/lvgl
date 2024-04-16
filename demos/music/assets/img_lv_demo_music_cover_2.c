@@ -185,7 +185,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_cover_2_map[] = {
 
 };
 
-lv_img_dsc_t img_lv_demo_music_cover_2 = {
+const lv_image_dsc_t img_lv_demo_music_cover_2 = {
     .header.w = 176,
     .header.h = 175,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,

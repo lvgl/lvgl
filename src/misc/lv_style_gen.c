@@ -940,7 +940,7 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_BASE_DIR = LV_STYLE_BASE_DIR;
 
-void lv_style_set_bitmap_mask_src(lv_style_t * style, const lv_image_dsc_t * value)
+void lv_style_set_bitmap_mask_src(lv_style_t * style, const void * value)
 {
     lv_style_value_t v = {
         .ptr = value

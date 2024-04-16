@@ -146,7 +146,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             obj = lv_button_create(main_page);
             lv_obj_set_size(obj, 100, 70);
             lv_obj_set_style_bg_image_src(obj, LV_SYMBOL_DUMMY"Text from\nstyle", 0);
-            lv_obj_delete_async(obj);  /*Delete on next call of `lv_task_handler` (so not now)*/
+            lv_obj_delete_async(obj);  /*Delete on next call of `lv_timer_handler` (so not now)*/
             break;
 
         case 5:
@@ -299,7 +299,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             obj = lv_table_create(main_page);
             lv_table_set_cell_value(obj, 0, 0, "0,0");
             lv_table_set_cell_value_fmt(obj, 3, 0, "%d,%d", 5, 0);
-            lv_table_set_row_cnt(obj, 5);
+            lv_table_set_row_count(obj, 5);
             lv_table_set_cell_value_fmt(obj, 1, 0, "%s", "1,0");
             lv_table_set_cell_value(obj, 1, 3, "1,3");
             break;

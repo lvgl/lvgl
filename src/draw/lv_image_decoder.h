@@ -82,15 +82,14 @@ typedef lv_result_t (*lv_image_decoder_info_f_t)(lv_image_decoder_t * decoder, c
 typedef lv_result_t (*lv_image_decoder_open_f_t)(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 /**
- * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
+ * Decode `full_area` pixels incrementally by calling in a loop. Set `decoded_area` values to `LV_COORD_MIN` on first call.
  * Required only if the "open" function can't return with the whole decoded pixel array.
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor
- * @param x start x coordinate
- * @param y start y coordinate
- * @param len number of pixels to decode
- * @param buf a buffer to store the decoded pixels
- * @return LV_RESULT_OK: ok; LV_RESULT_INVALID: failed
+ * @param full_area input parameter. the full area to decode after enough subsequent calls
+ * @param decoded_area input+output parameter. set the values to `LV_COORD_MIN` for the first call and to reset decoding.
+ *                     the decoded area is stored here after each call.
+ * @return LV_RESULT_OK: ok; LV_RESULT_INVALID: failed or there is nothing left to decode
  */
 typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(lv_image_decoder_t * decoder,
                                                       lv_image_decoder_dsc_t * dsc,
@@ -108,6 +107,8 @@ struct _lv_image_decoder_t {
     lv_image_decoder_open_f_t open_cb;
     lv_image_decoder_get_area_cb_t get_area_cb;
     lv_image_decoder_close_f_t close_cb;
+
+    const char * name;
 
     void * user_data;
 };
@@ -178,8 +179,10 @@ struct _lv_image_decoder_dsc_t {
 
 /**
  * Initialize the image decoder module
+ * @param image_cache_size    Image cache size in bytes. 0 to disable cache.
+ * @param image_header_count  Number of header cache entries. 0 to disable header cache.
  */
-void _lv_image_decoder_init(void);
+void _lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_count);
 
 /**
  * Deinitialize the image decoder module
@@ -213,12 +216,13 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  */
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args);
 
-/**
- * Decode an area of the opened image
+/***
+ * Decode `full_area` pixels incrementally by calling in a loop. Set `decoded_area` to `LV_COORD_MIN` on first call.
  * @param dsc           image decoder descriptor
- * @param full_area     start X coordinate (from left)
- * @param decoded_area  start Y coordinate (from top)
- * @return              LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred
+ * @param full_area     input parameter. the full area to decode after enough subsequent calls
+ * @param decoded_area  input+output parameter. set the values to `LV_COORD_MIN` for the first call and to reset decoding.
+ *                      the decoded area is stored here after each call.
+ * @return              LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred or there is nothing left to decode
  */
 lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area,
                                       lv_area_t * decoded_area);
@@ -276,11 +280,9 @@ void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_dec
  */
 void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decoder_close_f_t close_cb);
 
-#if LV_CACHE_DEF_SIZE > 0
 lv_cache_entry_t * lv_image_decoder_add_to_cache(lv_image_decoder_t * decoder,
                                                  lv_image_cache_data_t * search_key,
                                                  const lv_draw_buf_t * decoded, void * user_data);
-#endif
 
 /**
  * Check the decoded image, make any modification if decoder `args` requires.

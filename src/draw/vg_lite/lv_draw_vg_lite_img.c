@@ -44,10 +44,6 @@
 void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
                          const lv_area_t * coords, bool no_cache)
 {
-    if(dsc->opa <= LV_OPA_MIN) {
-        return;
-    }
-
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     /* The coordinates passed in by coords are not transformed,

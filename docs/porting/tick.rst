@@ -12,7 +12,7 @@ There are two ways to provide the tick to LVGL:
 1. Call ``lv_tick_set_cb(my_get_milliseconds_function);``: `my_get_milliseconds_function` needs to tell how many milliseconds have elapsed since start up. Most of the platforms have built-in functions that can be used as they are. For example
 
    - SDL: ``lv_tick_set_cb(SDL_GetTicks);``
-   - Arduino: ``lv_tick_set_cb(millis);``
+   - Arduino: ``lv_tick_set_cb(my_tick_get_cb);``, where ``my_tick_get_cb`` is: ``static uint32_t my_tick_get_cb(void) { return millis(); }``
    - FreeRTOS: ``lv_tick_set_cb(xTaskGetTickCount);``
    - STM32: ``lv_tick_set_cb(HAL_GetTick);``
    - ESP32: ``lv_tick_set_cb(my_tick_get_cb);``, where ``my_tick_get_cb`` is a wrapper for ``esp_timer_get_time() / 1000;``

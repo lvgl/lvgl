@@ -47,6 +47,7 @@ void lv_example_buttonmatrix_2(void);
 void lv_example_buttonmatrix_3(void);
 
 void lv_example_calendar_1(void);
+void lv_example_calendar_2(void);
 
 void lv_example_canvas_1(void);
 void lv_example_canvas_2(void);
@@ -116,6 +117,7 @@ void lv_example_scale_2(void);
 void lv_example_scale_3(void);
 void lv_example_scale_4(void);
 void lv_example_scale_5(void);
+void lv_example_scale_6(void);
 
 void lv_example_slider_1(void);
 void lv_example_slider_2(void);

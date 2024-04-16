@@ -36,6 +36,9 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
+    <release date="2024-03-24" version="9.1.1-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.1.1-dev1.pack">
+      - LVGL 9.1.1-dev
+    </release>
     <release date="2024-03-19" version="9.1.0" url="https://github.com/lvgl/lvgl/raw/v9.1.0/env_support/cmsis-pack/LVGL.lvgl.9.1.0.pack">
       - LVGL 9.1.0
       - See Change Log
@@ -1291,6 +1294,21 @@
 
 /*! \brief enable LittleFs file access */
 #define LV_USE_FS_LITTLEFS      1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="Arduino LittleFs" condition="LVGL-Essential">
+              <description>Add API for file access via Arduino LittleFs</description>
+              <files>
+                <!-- src/libs/fsdrv -->
+                <file category="sourceCpp"    name="src/libs/fsdrv/lv_fs_arduino_esp_littlefs.cpp" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable Arduino LittleFs file access */
+#define LV_USE_FS_ARDUINO_ESP_LITTLEFS       1
               </RTE_Components_h>
 
             </component>

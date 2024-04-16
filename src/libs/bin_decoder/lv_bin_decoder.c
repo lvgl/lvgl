@@ -25,6 +25,8 @@
  *      DEFINES
  *********************/
 
+#define DECODER_NAME    "BIN"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -101,6 +103,8 @@ void lv_bin_decoder_init(void)
     lv_image_decoder_set_open_cb(decoder, lv_bin_decoder_open);
     lv_image_decoder_set_get_area_cb(decoder, lv_bin_decoder_get_area);
     lv_image_decoder_set_close_cb(decoder, lv_bin_decoder_close);
+
+    decoder->name = DECODER_NAME;
 }
 
 lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
@@ -326,7 +330,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     if(use_directly || dsc->args.no_cache) return LV_RESULT_OK; /*Do not put image to cache if it can be used directly.*/
 
-#if LV_CACHE_DEF_SIZE > 0
+    /*If the image cache is disabled, just return the decoded image*/
+    if(!lv_image_cache_is_enabled()) return LV_RESULT_OK;
 
     /*Add it to cache*/
     lv_image_cache_data_t search_key;
@@ -342,7 +347,6 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     dsc->cache_entry = cache_entry;
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     decoder_data->decoded = NULL; /*Cache will take care of it*/
-#endif
 
     return LV_RESULT_OK;
 }
@@ -359,7 +363,7 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
     free_decoder_data(dsc);
 
-    if(dsc->cache_entry) {
+    if(dsc->cache && dsc->cache_entry) {
         /*Decoded data is in cache, release it from cache's callback*/
         lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
     }
@@ -403,23 +407,20 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     /*We only support read line by line for now*/
     if(decoded_area->y1 == LV_COORD_MIN) {
         /*Indexed image is converted to ARGB888*/
-        uint32_t len = LV_COLOR_FORMAT_IS_INDEXED(cf) ? sizeof(lv_color32_t) * 8 : bpp;
         lv_color_format_t cf_decoded = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf;
 
-        len = (len * w_px) / 8;
-        decoded = decoder_data->decoded_partial;
-        if(decoded && decoded->header.w == w_px) {
-            /*Use existing one directly*/
-        }
-        else {
+        decoded = lv_draw_buf_reshape(decoder_data->decoded_partial, cf_decoded, w_px, 1, LV_STRIDE_AUTO);
+        if(decoded == NULL) {
+            if(decoder_data->decoded_partial != NULL) {
+                lv_draw_buf_destroy(decoder_data->decoded_partial);
+                decoder_data->decoded_partial = NULL;
+            }
             decoded = lv_draw_buf_create(w_px, 1, cf_decoded, LV_STRIDE_AUTO);
-            if(decoded == NULL)
-                return LV_RESULT_INVALID;
+            if(decoded == NULL) return LV_RESULT_INVALID;
+            decoder_data->decoded_partial = decoded; /*Free on decoder close*/
         }
-
         *decoded_area = *full_area;
         decoded_area->y2 = decoded_area->y1;
-        decoder_data->decoded_partial = decoded; /*Free on decoder close*/
     }
     else {
         decoded_area->y1++;

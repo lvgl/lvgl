@@ -286,12 +286,12 @@ void test_observer_button_checked(void)
     /*Can bind only to int*/
     static lv_subject_t subject_wrong;
     lv_subject_init_pointer(&subject_wrong, NULL);
-    lv_observer_t * observer = lv_button_bind_checked(obj, &subject_wrong);
+    lv_observer_t * observer = lv_obj_bind_checked(obj, &subject_wrong);
     TEST_ASSERT_EQUAL_PTR(NULL, observer);
 
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
-    lv_button_bind_checked(obj, &subject);
+    lv_obj_bind_checked(obj, &subject);
 
     TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
 

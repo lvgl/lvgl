@@ -279,4 +279,34 @@ void test_spangroup_get_expand_width(void)
                           lv_spangroup_get_expand_width(spangroup, experimental_size));
 }
 
+void test_spangroup_newlines(void)
+{
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+    lv_obj_set_size(spangroup, LV_PCT(100), LV_PCT(100));
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "Lorem\n");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "ipsum");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\n\n");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "dolor");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\nsit");
+
+    /* carriage return is treated as equivalent to line feed */
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\r");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "amet,\n consectetur");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), " adipiscing");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\n");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\relit, sed\n");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "do eiusmod");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_06.png");
+}
+
 #endif

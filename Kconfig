@@ -183,6 +183,13 @@ menu "LVGL configuration"
 				it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
 				"Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be drawn in chunks.
 
+		config LV_DRAW_THREAD_STACK_SIZE
+			int "Stack size of draw thread in bytes"
+			default 8192
+			depends on LV_USE_OS > 0
+			help
+				If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
+
 		config LV_USE_DRAW_SW
 			bool "Enable software rendering"
 			default y
@@ -206,7 +213,7 @@ menu "LVGL configuration"
 
 		config LV_USE_NATIVE_HELIUM_ASM
 			bool "Enable native helium assembly"
-			default y
+			default n
 			depends on LV_USE_DRAW_SW
 			help
 				Disabling this allows arm2d to work on its own (for testing only)
@@ -335,7 +342,7 @@ menu "LVGL configuration"
 				which usually improves performance,
 				but does not guarantee the same rendering quality as the software.
 
-		config LV_VG_LITE_LINEAER_GRAD_CACHE_CNT
+		config LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
 			int "VG-Lite linear gradient image maximum cache number."
 			default 32
 			depends on LV_USE_DRAW_VG_LITE
@@ -666,6 +673,8 @@ menu "LVGL configuration"
 				bool "Enable Montserrat 28 compressed"
 			config LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 				bool "Enable Dejavu 16 Persian, Hebrew, Arabic letters"
+			config LV_FONT_SIMSUN_14_CJK
+				bool "Enable Simsun 14 CJK"
 			config LV_FONT_SIMSUN_16_CJK
 				bool "Enable Simsun 16 CJK"
 
@@ -686,6 +695,9 @@ menu "LVGL configuration"
 			config LV_FONT_DEFAULT_MONTSERRAT_8
 				bool "Montserrat 8"
 				select LV_FONT_MONTSERRAT_8
+			config LV_FONT_DEFAULT_MONTSERRAT_10
+				bool "Montserrat 10"
+				select LV_FONT_MONTSERRAT_10
 			config LV_FONT_DEFAULT_MONTSERRAT_12
 				bool "Montserrat 12"
 				select LV_FONT_MONTSERRAT_12
@@ -749,6 +761,9 @@ menu "LVGL configuration"
 			config LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW
 				bool "Dejavu 16 Persian, Hebrew, Arabic letters"
 				select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+			config LV_FONT_DEFAULT_SIMSUN_14_CJK
+				bool "Simsun 14 CJK"
+				select LV_FONT_SIMSUN_14_CJK
 			config LV_FONT_DEFAULT_SIMSUN_16_CJK
 				bool "Simsun 16 CJK"
 				select LV_FONT_SIMSUN_16_CJK
@@ -874,6 +889,9 @@ menu "LVGL configuration"
 			bool "Use calendar header dropdown"
 			depends on LV_USE_CALENDAR
 			default y
+		config LV_USE_CALENDAR_CHINESE
+			bool "Use chinese calendar"
+			depends on LV_USE_CALENDAR
 		config LV_USE_CANVAS
 			bool "Canvas. Requires: lv_image"
 			imply LV_USE_IMAGE
@@ -928,9 +946,6 @@ menu "LVGL configuration"
 		config LV_USE_MSGBOX
 			bool "Msgbox"
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_OBSERVER
-			bool "Observer"
-			default n
 		config LV_USE_ROLLER
 			bool "Roller. Requires: lv_label"
 			imply LV_USE_LABEL
@@ -1143,6 +1158,7 @@ menu "LVGL configuration"
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
+	
 		config LV_USE_THORVG
 			bool "ThorVG library"
 			choice
@@ -1248,10 +1264,6 @@ menu "LVGL configuration"
 				bool "Center"
 		endchoice
 
-		config LV_USE_MONKEY
-			bool "Enable Monkey test"
-			default n
-
 		config LV_USE_PROFILER
 			bool "Runtime performance profiler"
 		config LV_USE_PROFILER_BUILTIN
@@ -1267,6 +1279,10 @@ menu "LVGL configuration"
 			depends on LV_USE_PROFILER
 			default "lvgl/src/misc/lv_profiler_builtin.h"
 
+		config LV_USE_MONKEY
+			bool "Enable Monkey test"
+			default n
+
 		config LV_USE_GRIDNAV
 			bool "Enable grid navigation"
 			default n
@@ -1276,8 +1292,12 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_IMGFONT
-			bool "draw image in label or span obj"
+			bool "Support using images as font in label or span widgets"
 			default n
+
+		config LV_USE_OBSERVER
+			bool "Observer"
+			default y
 
 		config LV_USE_IME_PINYIN
 			bool "Enable Pinyin input method"
@@ -1377,6 +1397,24 @@ menu "LVGL configuration"
 			bool "Exit the application when all SDL windows are closed"
 			depends on LV_USE_SDL
 			default y
+
+		choice
+			prompt "SDL mousewheel mode"
+			depends on LV_USE_SDL
+			default LV_SDL_MOUSEWHEEL_MODE_ENCODER
+
+			config LV_SDL_MOUSEWHEEL_MODE_ENCODER
+				bool "The mousewheel emulates an encoder input device"
+
+			config LV_SDL_MOUSEWHEEL_MODE_CROWN
+				bool "The mousewheel emulates a smart watch crown"
+		endchoice
+
+		config LV_SDL_MOUSEWHEEL_MODE
+			int
+			depends on LV_USE_SDL
+			default 0 if LV_SDL_MOUSEWHEEL_MODE_ENCODER
+			default 1 if LV_SDL_MOUSEWHEEL_MODE_CROWN
 
 		config LV_USE_X11
 			bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"

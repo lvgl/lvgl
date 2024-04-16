@@ -233,8 +233,8 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
         draw_buf_2 = malloc(draw_buf_size);
     }
 
-    lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
     lv_display_set_resolution(disp, hor_res, ver_res);
+    lv_display_set_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
 
     if(width > 0) {
         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));
@@ -312,16 +312,21 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         return;
     }
 
-    uint32_t color_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * dsc->finfo.line_length;
-    uint32_t fb_pos = color_pos + dsc->vinfo.yoffset * dsc->finfo.line_length;
+    uint32_t fb_pos =
+        (area->x1 + dsc->vinfo.xoffset) * px_size +
+        (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
 
     uint8_t * fbp = (uint8_t *)dsc->fbp;
     int32_t y;
     if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
+        uint32_t color_pos =
+            area->x1 * px_size +
+            area->y1 * disp->hor_res * px_size;
+
         for(y = area->y1; y <= area->y2; y++) {
             lv_memcpy(&fbp[fb_pos], &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
-            color_pos += dsc->finfo.line_length;
+            color_pos += disp->hor_res * px_size;
         }
     }
     else {

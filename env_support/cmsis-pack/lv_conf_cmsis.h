@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.1.0
+ * Configuration file for v9.1.1-dev
  */
 
 /* clang-format off */
@@ -148,6 +148,9 @@
     #endif
 #endif
 
+/* Set stack size of drawing thread. Unit is byte. If Thorvg is enabled, 128kB is required tested on simulator.*/
+#define LV_DRAW_THREAD_STACKSIZE 32768
+
 #if LV_USE_DRAW_VGLITE
     /* Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
     #define LV_USE_VGLITE_BLIT_SPLIT 0
@@ -187,7 +190,7 @@
 /* VG-Lite linear gradient image maximum cache number.
  * NOTE: The memory usage of a single gradient image is 4K bytes.
  */
-#define LV_VG_LITE_LINEAER_GRAD_CACHE_CNT 32
+#define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT 32
 
 /* VG-Lite radial gradient image maximum cache size.
  * NOTE: The memory usage of a single gradient image is radial grad radius * 4 bytes.
@@ -646,6 +649,11 @@
 /*API for LittleFs. */
 #if LV_USE_FS_LITTLEFS
     #define LV_FS_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+#endif
+
+/*API for Arduino LittleFs. */
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
 #endif
 
 /*GIF decoder library*/

@@ -17,7 +17,6 @@ reciprocal:
 
 .text
 .syntax unified
-.altmacro
 .p2align 2
 
 TMP         .req r0
@@ -32,118 +31,158 @@ MASK_STRIDE .req r8
 H           .req r9
 OPA         .req r10
 RCP         .req r11
-S_B         .qn  q0
-S_G         .qn  q1
-S_R         .qn  q2
-S_A         .qn  q3
-D_B         .qn  q4
-D_G         .qn  q5
-D_R         .qn  q6
-D_A         .qn  q7
-N           .qn  q0
-V           .qn  q1
-R           .qn  q2
-L           .qn  q4
 
-.macro conv_888_to_565 reg
-    vsri.8          reg&_R, reg&_G, #5
-    vshr.u8         reg&_G, reg&_G, #2
-    vshr.u8         reg&_B, reg&_B, #3
-    vsli.8          reg&_B, reg&_G, #5
-.endm
+S_B         .req q0
+S_G         .req q1
+S_R         .req q2
+S_A         .req q3
+D_B         .req q4
+D_G         .req q5
+D_R         .req q6
+D_A         .req q7
+N           .req q0
+V           .req q1
+R           .req q2
+L           .req q4
+S_565       .req q0
+D_565       .req q1
+S_L         .req q2
+D_L         .req q4
+D_T         .req q5
+BITMASK     .req q6
 
-@ 16bpp is stored on R & B
-.macro ldst op, bpp, mem, reg, areg, cvt, alt_index, wb
-.if bpp == 0
-.if (reg == S) || (wb&1)  @ exclude reg == D and !
-    ldr             TMP, [mem&_ADDR]
-    vdup.8          reg&_B, TMP
+.macro ldst st, op, bpp, mem, reg, areg, cvt, alt_index, wb, aligned
+.if \bpp == 0
+.if \cvt
+    ldr             TMP, [\mem\()_ADDR]
+    bfi             TMP, TMP, #2, #8
+    bfi             TMP, TMP, #3, #16
+    lsr             TMP, TMP, #8
+    vdup.16         \reg\()_565, TMP
+.else
+    ldr             TMP, [\mem\()_ADDR]
+    vdup.8          \reg\()_B, TMP
     lsr             TMP, #8
-    vdup.8          reg&_G, TMP
+    vdup.8          \reg\()_G, TMP
     lsr             TMP, #8
-    vdup.8          reg&_R, TMP
-.if cvt && (wb&1)
-    conv_888_to_565 reg
+    vdup.8          \reg\()_R, TMP
 .endif
-.endif
-.elseif bpp == 8
-    v&op&rb.8       reg&_A, [mem&_ADDR], #16
-.elseif bpp == 16
-.if cvt && (op == st)
-    conv_888_to_565 reg
-.endif
-.if alt_index
-    v&op&rb.8       reg&_B, [mem&_ADDR, areg&_A]
-    add             mem&_ADDR, #1
-    v&op&rb.8       reg&_R, [mem&_ADDR, areg&_A]
+.elseif \bpp == 8
+.if \cvt
+    v\op\()rb.u16   \reg\()_A, [\mem\()_ADDR], #8
 .else
-    v&op&rb.8       reg&_B, [mem&_ADDR, reg&_A]
-    add             mem&_ADDR, #1
-    v&op&rb.8       reg&_R, [mem&_ADDR, reg&_A]
+    v\op\()rb.8     \reg\()_A, [\mem\()_ADDR], #16
 .endif
-.if cvt && (op == ld)
-    vshl.u8         reg&_G, reg&_R, #5
-    vsri.u8         reg&_G, reg&_B, #3
-    vshl.u8         reg&_B, reg&_B, #3
-    vsri.u8         reg&_R, reg&_R, #5
-    vsri.u8         reg&_G, reg&_G, #6
-    vsri.u8         reg&_B, reg&_B, #5
+.elseif \bpp == 16
+.if \cvt
+.if \st
+    vsri.8          \reg\()_R, \reg\()_G, #5
+    vshr.u8         \reg\()_G, \reg\()_G, #2
+    vshr.u8         \reg\()_B, \reg\()_B, #3
+    vsli.8          \reg\()_B, \reg\()_G, #5
 .endif
-.if wb&0
-    add             mem&_ADDR, #31
+.if \alt_index
+    v\op\()rb.8     \reg\()_B, [\mem\()_ADDR, S_B]
+    v\op\()rb.8     \reg\()_R, [\mem\()_ADDR, S_G]
 .else
-    sub             mem&_ADDR, #1
+    v\op\()rb.8     \reg\()_B, [\mem\()_ADDR, \reg\()_A]
+    add             \mem\()_ADDR, #1
+    v\op\()rb.8     \reg\()_R, [\mem\()_ADDR, \reg\()_A]
 .endif
-.elseif bpp >= 24
-.if alt_index || (bpp >= 31)
-    v&op&rb.8       reg&_B, [mem&_ADDR, areg&_A]
-    add             mem&_ADDR, #1
-    v&op&rb.8       reg&_G, [mem&_ADDR, areg&_A]
-    add             mem&_ADDR, #1
-    v&op&rb.8       reg&_R, [mem&_ADDR, areg&_A]
+.if \st == 0
+    vshl.u8         \reg\()_G, \reg\()_R, #5
+    vsri.u8         \reg\()_G, \reg\()_B, #3
+    vshl.u8         \reg\()_B, \reg\()_B, #3
+    vsri.u8         \reg\()_R, \reg\()_R, #5
+    vsri.u8         \reg\()_G, \reg\()_G, #6
+    vsri.u8         \reg\()_B, \reg\()_B, #5
+.endif
+.ifc \wb, !
+.if \alt_index
+    add             \mem\()_ADDR, #32
 .else
-    v&op&rb.8       reg&_B, [mem&_ADDR, reg&_A]
-    add             mem&_ADDR, #1
-    v&op&rb.8       reg&_G, [mem&_ADDR, reg&_A]
-    add             mem&_ADDR, #1
-    v&op&rb.8       reg&_R, [mem&_ADDR, reg&_A]
+    add             \mem\()_ADDR, #31
 .endif
-.if (bpp == 32) || (bpp == 31) && (op == st)
-    add             mem&_ADDR, #1
-    v&op&rb.8       reg&_A, [mem&_ADDR, areg&_A]
+.elseif \alt_index == 0
+    sub             \mem\()_ADDR, #1
 .endif
-.if wb&0
-    .if bpp == 24
-        add         mem&_ADDR, #46
-    .elseif (bpp == 32) || (bpp == 31) && (op == st)
-        add         mem&_ADDR, #61
+.else @ cvt
+.ifc \wb, !
+    v\op\()rh.16    \reg\()_565, [\mem\()_ADDR], #16
+.else
+    v\op\()rh.16    \reg\()_565, [\mem\()_ADDR]
+.endif
+.endif
+.elseif \bpp == 24
+.if \alt_index == 1
+    v\op\()rb.8     \reg\()_B, [\mem\()_ADDR, S_B]
+    v\op\()rb.8     \reg\()_G, [\mem\()_ADDR, S_G]
+    v\op\()rb.8     \reg\()_R, [\mem\()_ADDR, S_R]
+.elseif \alt_index == 2
+    v\op\()rb.8     \reg\()_B, [\mem\()_ADDR, S_R]
+    v\op\()rb.8     \reg\()_G, [\mem\()_ADDR, S_A]
+    v\op\()rb.8     \reg\()_R, [\mem\()_ADDR, D_A]
+.else
+    v\op\()rb.8     \reg\()_B, [\mem\()_ADDR, \reg\()_A]
+    add             \mem\()_ADDR, #1
+    v\op\()rb.8     \reg\()_G, [\mem\()_ADDR, \reg\()_A]
+    add             \mem\()_ADDR, #1
+    v\op\()rb.8     \reg\()_R, [\mem\()_ADDR, \reg\()_A]
+.endif
+.ifc \wb, !
+.if \alt_index
+    add             \mem\()_ADDR, #48
+.else
+    add             \mem\()_ADDR, #46
+.endif
+.elseif \alt_index == 0
+    sub             \mem\()_ADDR, #2
+.endif
+.elseif \aligned
+    v\op\()40.8     {\reg\()_B, \reg\()_G, \reg\()_R, \reg\()_A}, [\mem\()_ADDR]
+    v\op\()41.8     {\reg\()_B, \reg\()_G, \reg\()_R, \reg\()_A}, [\mem\()_ADDR]
+    v\op\()42.8     {\reg\()_B, \reg\()_G, \reg\()_R, \reg\()_A}, [\mem\()_ADDR]
+    v\op\()43.8     {\reg\()_B, \reg\()_G, \reg\()_R, \reg\()_A}, [\mem\()_ADDR]\wb
+.else
+    v\op\()rb.8     \reg\()_B, [\mem\()_ADDR, \areg\()_A]
+    add             \mem\()_ADDR, #1
+    v\op\()rb.8     \reg\()_G, [\mem\()_ADDR, \areg\()_A]
+    add             \mem\()_ADDR, #1
+    v\op\()rb.8     \reg\()_R, [\mem\()_ADDR, \areg\()_A]
+.if (\bpp == 32) || (\bpp == 31) && \st
+    add             \mem\()_ADDR, #1
+    v\op\()rb.8     \reg\()_A, [\mem\()_ADDR, \areg\()_A]
+.endif
+.ifc \wb, !
+    .if (\bpp == 32) || (\bpp == 31) && \st
+        add         \mem\()_ADDR, #61
     .else
-        add         mem&_ADDR, #62
+        add         \mem\()_ADDR, #62
     .endif
 .else
-    .if (bpp == 32) || (bpp == 31) && (op == st)
-        sub         mem&_ADDR, #3
+    .if (\bpp == 32) || (\bpp == 31) && \st
+        sub         \mem\()_ADDR, #3
     .else
-        sub         mem&_ADDR, #2
+        sub         \mem\()_ADDR, #2
     .endif
 .endif
 .endif
 .endm
 
-.macro load_index bpp, reg, areg
-.if bpp > 0
+.macro load_index bpp, reg, areg, aligned
+.if (\bpp > 0) && ((\bpp < 31) || (\aligned == 0))
     mov             TMP, #0
-.endif
-.if bpp == 8
-    vidup.u8        reg&_A, TMP, #1
-.elseif bpp == 16
-    vidup.u8        reg&_A, TMP, #2
-.elseif bpp == 24
-    vidup.u8        reg&_A, TMP, #1
+.if \bpp == 8
+    vidup.u8        \reg\()_A, TMP, #1
+.elseif \bpp == 16
+    vidup.u8        \reg\()_A, TMP, #2
+.elseif \bpp == 24
+    vidup.u8        \reg\()_A, TMP, #1
     mov             TMP, #3
-    vmul.i8         reg&_A, reg&_A, TMP
-.elseif bpp >= 31
-    vidup.u8        areg&_A, TMP, #4
+    vmul.u8         \reg\()_A, \reg\()_A, TMP
+.else
+    vidup.u8        \areg\()_A, TMP, #4
+.endif
 .endif
 .endm
 
@@ -153,89 +192,227 @@ L           .qn  q4
     ldr             DST_H, [r0, #12]
     ldr             DST_STRIDE, [r0, #16]
     ldr             SRC_ADDR, [r0, #20]
-.if src_bpp > 0
+.if \src_bpp > 0
     ldr             SRC_STRIDE, [r0, #24]
 .endif
-.if mask
+.if \mask
     ldr             MASK_ADDR, [r0, #28]
     ldr             MASK_STRIDE, [r0, #32]
 .endif
-.if opa
+.if \opa
     ldr             OPA, [r0]
-.else
-    mov             OPA, #0xFF
 .endif
+.if (\src_bpp <= 16) && (\dst_bpp == 16)
+.if \opa || \mask
+    mov             TMP, #0xF81F
+    movt            TMP, #0x7E0
+    vdup.32         BITMASK, TMP
+.endif
+    add             TMP, DST_W, #0x7
+    bic             TMP, TMP, #0x7
+.else
     add             TMP, DST_W, #0xF
     bic             TMP, TMP, #0xF
-.if dst_bpp == 32
+.endif
+.if \dst_bpp == 32
     ldr             RCP, =(reciprocal - 8)
 .endif
 
-.if dst_bpp == 16
+.if \dst_bpp == 16
     sub             DST_STRIDE, DST_STRIDE, TMP, lsl #1
-.elseif dst_bpp == 24
+.elseif \dst_bpp == 24
     sub             DST_STRIDE, DST_STRIDE, TMP
     sub             DST_STRIDE, DST_STRIDE, TMP, lsl #1
-.elseif dst_bpp >= 31
+.elseif \dst_bpp >= 31
     sub             DST_STRIDE, DST_STRIDE, TMP, lsl #2
 .endif
-.if mask
+.if \mask
     sub             MASK_STRIDE, MASK_STRIDE, TMP
 .endif
-.if src_bpp == 0
-    .if mask || opa
-        ldst        ld, src_bpp, SRC, S, D, 0, 0
+.if \src_bpp == 0
+.if \mask || \opa
+    .if \dst_bpp > 16
+        ldst        0, ld, \src_bpp, SRC, S, D, 0, 0
         vmov.u8     S_A, #0xFF
     .else
-        ldst        ld, src_bpp, SRC, D, S, (dst_bpp == 16), 0
-        vmov.u8     D_A, #0xFF
+        ldst        0, ld, \src_bpp, SRC, S, D, 1, 0
+        vmovlb.u16  S_L, S_565
+        vsli.32     S_L, S_L, #16
+        vand        S_L, S_L, BITMASK
     .endif
 .else
-    .if src_bpp == 16
+    .if \dst_bpp > 16
+        ldst        0, ld, \src_bpp, SRC, D, S, 0, 0
+    .else
+        ldst        0, ld, \src_bpp, SRC, D, S, 1, 0
+    .endif
+.endif
+.else
+    .if \src_bpp == 16
         sub         SRC_STRIDE, SRC_STRIDE, TMP, lsl #1
-    .elseif src_bpp == 24
+    .elseif \src_bpp == 24
         sub         SRC_STRIDE, SRC_STRIDE, TMP
         sub         SRC_STRIDE, SRC_STRIDE, TMP, lsl #1
-    .elseif src_bpp >= 31
+    .elseif \src_bpp >= 31
         sub         SRC_STRIDE, SRC_STRIDE, TMP, lsl #2
     .endif
 .endif
-.if (src_bpp < 32) && (mask == 0) && (opa == 0)
-    .if (src_bpp == 31) || (dst_bpp < 31)
-        load_index  src_bpp, S, S
-    .endif
-    .if (dst_bpp < 31) && (dst_bpp != src_bpp)
-        load_index  dst_bpp, D, D
-    .else
-        load_index  dst_bpp, S, S
-        vmov.u8     D_A, #0xFF
-    .endif
+.if (\src_bpp < 32) && (\mask == 0) && (\opa == 0) && !((\src_bpp <= 16) && (\dst_bpp == 16))
+@ 16 to 31/32 or reverse: index @ q0, q1
+@ 24 to 31/32 or reverse: index @ q0, q1, q2
+@ 16 to 24 or reverse: 16 index @ q0, q1, 24 index @ q2, q3, q7
+@ 31 to 31/32: index @ q3 (tail only)
+    mov         TMP, #0
+.if (\src_bpp == 16) || (\dst_bpp == 16)
+    vidup.u8    S_B, TMP, #2
+    mov         TMP, #1
+    vadd.u8     S_G, S_B, TMP
+.if (\src_bpp == 24) || (\dst_bpp == 24)
+    vshl.u8     S_R, S_B, #1
+    vadd.u8     S_R, S_R, S_B
+    vshr.u8     S_R, S_R, #1
+    vadd.u8     S_A, S_R, TMP
+    vadd.u8     D_A, S_A, TMP
+.endif
+.elseif (\src_bpp == 24) || (\dst_bpp == 24)
+    vidup.u8    S_B, TMP, #1
+    mov         TMP, #3
+    vmul.u8     S_B, S_B, TMP
+    mov         TMP, #1
+    vadd.u8     S_G, S_B, TMP
+    vadd.u8     S_R, S_G, TMP
+.endif
+.if \dst_bpp >= 31
+    load_index  \dst_bpp, D, S, 0
+    vmov.u8     D_A, #0xFF
+.endif
 .endif
 .endm
 
 .macro vqrdmulh_u8 Qd, Qn, Qm      @ 1 bit precision loss
-    vmulh.u8        Qd, Qn, Qm
-    vqshl.u8        Qd, Qd, #1
+    vmulh.u8       \Qd, \Qn, \Qm
+    vqshl.u8       \Qd, \Qd, #1
 .endm
 
 .macro premult mem, alpha
-    vrmulh.u8       mem&_B, mem&_B, alpha
-    vrmulh.u8       mem&_G, mem&_G, alpha
-    vrmulh.u8       mem&_R, mem&_R, alpha
+    vrmulh.u8       \mem\()_B, \mem\()_B, \alpha
+    vrmulh.u8       \mem\()_G, \mem\()_G, \alpha
+    vrmulh.u8       \mem\()_R, \mem\()_R, \alpha
+.endm
+
+.macro blend_565 p
+    vmovl\p\().u16  D_L, D_565
+    vsli.32         D_L, D_L, #16
+    vand            D_L, D_L, BITMASK
+    vsub.u32        D_T, S_L, D_L
+    vmovl\p\().u16  D_A, S_A
+    vmul.u32        D_T, D_T, D_A
+    vshr.u32        D_T, D_T, #5
+    vadd.u32        D_L, D_L, D_T
+    vand            D_L, D_L, BITMASK
+    vshr.u32        D_T, D_L, #16
+    vorr            D_L, D_L, D_T
+    vmovn\p\().u32  D_565, D_L
+.endm
+
+.macro late_init src_bpp, dst_bpp, mask, opa, mode
+.if (\src_bpp <= 16) && (\dst_bpp == 16) && (\mask == 0)
+.if \opa == 2
+    mov             TMP, #0x7BEF
+    vdup.16         BITMASK, TMP
+.if \src_bpp == 0
+    vshr.u16        S_L, S_565, #1
+    vand            S_L, S_L, BITMASK
+.endif
+.elseif \opa == 1
+    vdup.16         S_A, OPA
+    mov             TMP, #4
+    vadd.u16        S_A, S_A, TMP
+    vshr.u16        S_A, S_A, #3
+.endif
+.endif
 .endm
 
 .macro blend src_bpp, dst_bpp, mask, opa, mode
-.if (mask == 0) && (opa == 2) && (dst_bpp < 32)
+.if (\mask == 0) && (\opa == 2)
+.if (\src_bpp <= 16) && (\dst_bpp == 16)
+.if \src_bpp > 0
+    vshr.u16        S_L, S_565, #1
+    vand            S_L, S_L, BITMASK
+.endif
+    vshr.u16        D_L, D_565, #1
+    vand            D_L, D_L, BITMASK
+    vadd.u16        D_565, S_L, D_L
+.else
     vhadd.u8        D_B, D_B, S_B
     vhadd.u8        D_G, D_G, S_G
     vhadd.u8        D_R, D_R, S_R
+.endif
+.elseif (\src_bpp <= 16) && (\dst_bpp == 16)
+    lsl             lr, #1
+.if \src_bpp > 0
+    vmovlb.u16      S_L, S_565
+    vsli.32         S_L, S_L, #16
+    vand            S_L, S_L, BITMASK
+.endif
+    blend_565       b
+.if \src_bpp > 0
+    vmovlt.u16      S_L, S_565
+    vsli.32         S_L, S_L, #16
+    vand            S_L, S_L, BITMASK
+.endif
+    blend_565       t
+    lsr             lr, #1
 .else
-.if dst_bpp < 32
+.if \dst_bpp < 32
+.if (\opa == 0) && (\mask == 0)
+    vmov.u8         D_A, #0xFF
+    mov             TMP, #0
+    vabav.u8        TMP, S_A, D_A
+    cbnz            TMP, 91f
+    vmov            D_B, S_B
+    vmov            D_G, S_G
+    vmov            D_R, S_R
+    b               88f
+91:
+.endif
     vmvn            D_A, S_A
     premult         S, S_A
     premult         D, D_A
 .else
     vpush           {d0-d5}
+    vmov.u8         S_B, #0xFF
+    vmov.u8         S_G, #0
+    mov             TMP, #0
+    vabav.u8        TMP, S_A, S_B
+    cbz             TMP, 91f        @ if(fg.alpha == 255
+    mov             TMP, #0
+    vabav.u8        TMP, D_A, S_G
+    cbnz            TMP, 90f        @    || bg.alpha == 0)
+91:
+    vpop            {d8-d13}        @   return fg;
+    vmov.u8         D_A, #0xFF
+    b               88f
+90:
+    mov             TMP, #0
+    vabav.u8        TMP, S_A, S_G
+    cmp             TMP, #2         @ if(fg.alpha <= LV_OPA_MIN)
+    itt             le              @   return bg;
+    vpople          {d0-d5}
+    ble             88f
+    mov             TMP, #0
+    vabav.u8        TMP, D_A, S_B   @ if (bg.alpha == 255)
+    cbnz            TMP, 89f        @   return lv_color_mix32(fg, bg);
+    vpop            {d0-d5}
+    vmvn            D_A, S_A
+    premult         S, S_A
+    premult         D, D_A
+    vqadd.u8        D_B, D_B, S_B
+    vqadd.u8        D_G, D_G, S_G
+    vqadd.u8        D_R, D_R, S_R
+    vmov.u8         D_A, #0xFF
+    b               88f
+89:
     vmvn            N, S_A
     vmvn            D_A, D_A
     vrmulh.u8       D_A, N, D_A
@@ -261,191 +438,242 @@ L           .qn  q4
     vqadd.u8        D_G, D_G, S_G
     vqadd.u8        D_R, D_R, S_R
 .endif
-.if dst_bpp == 31
+.if \dst_bpp == 31
     vmov.u8         D_A, #0xFF
 .endif
+88:
 .endm
 
 .macro blend_line src_bpp, dst_bpp, mask, opa, mode
-    wlstp.8             lr, DST_W, 1f
+.if (\src_bpp < 31) && (\dst_bpp < 31)
+    blend_block     \src_bpp, \dst_bpp, \mask, \opa, \mode, DST_W, 0
+.else
+    bics            TMP, DST_W, #0xF
+    beq             87f
+    blend_block     \src_bpp, \dst_bpp, \mask, \opa, \mode, TMP, 1
+87:
+    ands            TMP, DST_W, #0xF
+    beq             86f
+    blend_block     \src_bpp, \dst_bpp, \mask, \opa, \mode, TMP, 0
+86:
+.endif
+.endm
+
+.macro blend_block src_bpp, dst_bpp, mask, opa, mode, w, aligned
+.if (\src_bpp <= 16) && (\dst_bpp == 16)
+    wlstp.16            lr, \w, 1f
+.else
+    wlstp.8             lr, \w, 1f
+.endif
 2:
-.if (src_bpp < 32) && (mask == 0) && (opa == 0)
+.if (\src_bpp < 32) && (\mask == 0) && (\opa == 0)
 @ no blend
-@ dst index: db < 31 ? (db == sb ? S : D) : S
-@ src index: sb < 31 && db >= 31 ? D(reload) : S
-    .if (src_bpp < 31) && (dst_bpp >= 31)
-        load_index      src_bpp, D, D
-    .endif
-    .if src_bpp == 0
-        ldst            st, dst_bpp, DST, D, S, 0, 0, !
-    .elseif (src_bpp == dst_bpp) || (src_bpp == 31) && (dst_bpp == 32)
-        .if dst_bpp < 31
-            .if src_bpp < 31
-                ldst    ld, src_bpp, SRC, D, S, 0, 1, !
+    .if \src_bpp == 0
+        ldst            1, st, \dst_bpp, DST, D, S, 0, 1, !, \aligned
+    .elseif (\src_bpp == \dst_bpp) || (\src_bpp == 31) && (\dst_bpp == 32)
+        .if \dst_bpp < 31
+            .if \src_bpp < 31
+                ldst    0, ld, \src_bpp, SRC, D, S, 0, 1, !, \aligned
             .else
-                ldst    ld, src_bpp, SRC, D, S, 0, 0, !
+                ldst    0, ld, \src_bpp, SRC, D, S, 0, 1, !, \aligned
             .endif
-            ldst        st, dst_bpp, DST, D, S, 0, 1, !
+            ldst        1, st, \dst_bpp, DST, D, S, 0, 1, !, \aligned
         .else
-            ldst        ld, src_bpp, SRC, D, S, 0, 0, !
-            ldst        st, dst_bpp, DST, D, S, 0, 0, !
+            ldst        0, ld, \src_bpp, SRC, D, S, 0, 1, !, \aligned
+            ldst        1, st, \dst_bpp, DST, D, S, 0, 1, !, \aligned
         .endif
     .else
-        .if (dst_bpp < 31) && (src_bpp < 31)
-            ldst        ld, src_bpp, SRC, D, S, 1, 1, !
+        .if (\dst_bpp < 31) && (\src_bpp < 31)
+            ldst        0, ld, \src_bpp, SRC, D, S, 1, 2, !, \aligned
+            ldst        1, st, \dst_bpp, DST, D, S, 1, 2, !, \aligned
         .else
-            ldst        ld, src_bpp, SRC, D, S, 1, 0, !
+            ldst        0, ld, \src_bpp, SRC, D, S, 1, 1, !, \aligned
+            ldst        1, st, \dst_bpp, DST, D, S, 1, 1, !, \aligned
         .endif
-        .if (src_bpp < 31) && (dst_bpp >= 31)
-            vmov.u8     D_A, #0xFF
-        .endif
-        ldst            st, dst_bpp, DST, D, S, 1, 0, !
     .endif
-.elseif src_bpp < 32
+.elseif (\src_bpp <= 16) && (\dst_bpp == 16)
+    .if \src_bpp > 0
+        ldst            0, ld, \src_bpp, SRC, S, D, 0, 0, !, \aligned
+    .endif
+        ldst            0, ld, \dst_bpp, DST, D, S, 0, 0, , \aligned
+    .if \mask
+        ldst            0, ld, 8, MASK, S, D, 1, 0, !
+        .if \opa == 2
+            vshr.u16    S_A, S_A, #1
+        .elseif \opa == 1
+            vmul.u16    S_A, S_A, OPA
+            vshr.u16    S_A, S_A, #8
+        .endif
+        mov             TMP, #4
+        vadd.u16        S_A, S_A, TMP
+        vshr.u16        S_A, S_A, #3
+    .endif
+    blend               \src_bpp, \dst_bpp, \mask, \opa, \mode
+    ldst                1, st, \dst_bpp, DST, D, S, 0, 0, !, \aligned
+.elseif \src_bpp < 32
 @ no src_a
-    load_index          src_bpp, S, D
-    ldst                ld, src_bpp, SRC, S, D, 1, 0, !
-    load_index          dst_bpp, D, S
-    ldst                ld, dst_bpp, DST, D, S, 1, 0
-    .if mask
-        ldst            ld, 8, MASK, S, D, 1, 0, !
-        .if opa == 2
+.if \src_bpp > 0
+    load_index          \src_bpp, S, D, \aligned
+    ldst                0, ld, \src_bpp, SRC, S, D, 1, 0, !, \aligned
+.elseif (\opa == 1) || \mask
+    vpush               {d0-d5}
+.endif
+    load_index          \dst_bpp, D, S, \aligned
+    ldst                0, ld, \dst_bpp, DST, D, S, 1, 0, , \aligned
+    .if \mask
+        ldst            0, ld, 8, MASK, S, D, 0, 0, !, \aligned
+        .if \opa == 2
             vshr.u8     S_A, S_A, #1
-        .elseif opa == 1
-        .if dst_bpp == 32
+        .elseif \opa == 1
+        .if \dst_bpp == 32
             vpush       {d14-d15}
         .endif
             vdup.8      D_A, OPA
             vrmulh.u8   S_A, S_A, D_A
-        .if dst_bpp == 32
+        .if \dst_bpp == 32
             vpop        {d14-d15}
         .endif
         .endif
-    .elseif opa == 1
+    .elseif \opa == 1
         vdup.8          S_A, OPA
     .endif
-    blend               src_bpp, dst_bpp, mask, opa, mode
-    .if (dst_bpp == 32) || mask || (opa == 1)
-        load_index      dst_bpp, D, S
+    blend               \src_bpp, \dst_bpp, \mask, \opa, \mode
+.if (\src_bpp == 0) && ((\opa == 1) || \mask)
+    vpop                {d0-d5}
+.endif
+    .if (\dst_bpp == 32) || \mask || (\opa == 1)
+        load_index      \dst_bpp, D, S, \aligned
     .endif
-    ldst                st, dst_bpp, DST, D, S, 1, 0, !
+    ldst                1, st, \dst_bpp, DST, D, S, 1, 0, !, \aligned
 .else
-@ src_a (+mask) (+opa)
-    load_index          dst_bpp, D, S
-    ldst                ld, dst_bpp, DST, D, S, 1, 0
-    .if dst_bpp == 32
+@ src_a (+\mask) (+\opa)
+    load_index          \dst_bpp, D, S, \aligned
+    ldst                0, ld, \dst_bpp, DST, D, S, 1, 0, , \aligned
+    .if (\dst_bpp == 32) && (\mask || \opa || (\aligned == 0))
         vpush           {d14-d15}
     .endif
-    load_index          src_bpp, S, D
-    ldst                ld, src_bpp, SRC, S, D, 1, 0, !
-    .if mask == 0
-        .if opa
+    load_index          \src_bpp, S, D, \aligned
+    ldst                0, ld, \src_bpp, SRC, S, D, 1, 0, !, \aligned
+    .if \mask == 0
+        .if \opa
             vdup.8      D_A, OPA
             vrmulh.u8   S_A, S_A, D_A
         .endif
     .else
-        ldst            ld, 8, MASK, D, S, 1, 0, !
+        ldst            0, ld, 8, MASK, D, S, 0, 0, !, \aligned
         vrmulh.u8       S_A, S_A, D_A
-        .if opa
+        .if \opa
             vdup.8      D_A, OPA
             vrmulh.u8   S_A, S_A, D_A
         .endif
     .endif
-    .if dst_bpp == 32
+    .if (\dst_bpp == 32) && (\mask || \opa || (\aligned == 0))
         vpop            {d14-d15}
     .endif
-    blend               src_bpp, dst_bpp, mask, opa, mode
-    load_index          dst_bpp, D, S
-    ldst                st, dst_bpp, DST, D, S, 1, 0, !
+    blend               \src_bpp, \dst_bpp, \mask, \opa, \mode
+    load_index          \dst_bpp, D, S, \aligned
+    ldst                1, st, \dst_bpp, DST, D, S, 1, 0, !, \aligned
 .endif
     letp                lr, 2b
 1:
 .endm
 
-.macro enter
+.macro enter complex
     push        {r4-r11, lr}
+.if \complex
     vpush       {d8-d15}
+.endif
 .endm
 
-.macro exit
+.macro exit complex
+.if \complex
     vpop        {d8-d15}
+.endif
     pop         {r4-r11, pc}
 .endm
 
 .macro preload mem, bpp
-.if bpp >= 31
-    pld         [mem&_ADDR, DST_W, lsl #2]
-.elseif bpp == 24
+.if \bpp >= 31
+    pld         [\mem\()_ADDR, DST_W, lsl #2]
+.elseif \bpp == 24
     add         TMP, DST_W, DST_W, lsl #1
-    pld         [mem&_ADDR, TMP]
-.elseif bpp == 16
-    pld         [mem&_ADDR, DST_W, lsl #1]
-.elseif bpp == 8
-    pld         [mem&_ADDR, DST_W]
+    pld         [\mem\()_ADDR, TMP]
+.elseif \bpp == 16
+    pld         [\mem\()_ADDR, DST_W, lsl #1]
+.elseif \bpp == 8
+    pld         [\mem\()_ADDR, DST_W]
 .endif
 .endm
 
 .macro next src_bpp, mask
     add         DST_ADDR, DST_ADDR, DST_STRIDE
-.if src_bpp > 0
+.if \src_bpp > 0
     add         SRC_ADDR, SRC_ADDR, SRC_STRIDE
 .endif
-.if mask
+.if \mask
     add         MASK_ADDR, MASK_ADDR, MASK_STRIDE
 .endif
 .endm
 
 .macro blender src_bpp, dst_bpp, mask, opa, mode
-    enter
-    init        src_bpp, dst_bpp, mask, opa
+.if (\src_bpp <= 16) && (\dst_bpp == 16) && (\opa == 0) && (\mask == 0)
+    enter       0
+.else
+    enter       1
+.endif
+    init        \src_bpp, \dst_bpp, \mask, \opa
     movs        H, DST_H
     beq         0f
-    preload     SRC, src_bpp
-.if mask || opa || (src_bpp == 32)
-    preload     DST, dst_bpp
+    preload     SRC, \src_bpp
+.if \mask || \opa || (\src_bpp == 32)
+    preload     DST, \dst_bpp
 .endif
-.if opa && (src_bpp < 32) && (dst_bpp < 32)
+.if \opa && (\src_bpp < 32) && (\dst_bpp < 32)
 4:
 @ 50% OPA can be accelerated (OPA == 0x7F/0x80)
     add         TMP, OPA, #1
     tst         TMP, #0x7E
     bne         3f
-    blend_line  src_bpp, dst_bpp, mask, 2, mode
-    next        src_bpp, mask
+    late_init   \src_bpp, \dst_bpp, \mask, 2, \mode
+    blend_line  \src_bpp, \dst_bpp, \mask, 2, \mode
+    next        \src_bpp, \mask
     subs        H, #1
     bne         4b
     b           0f
 .endif
 3:
-    blend_line  src_bpp, dst_bpp, mask, opa, mode
-    next        src_bpp, mask
+    late_init   \src_bpp, \dst_bpp, \mask, \opa, \mode
+    blend_line  \src_bpp, \dst_bpp, \mask, \opa, \mode
+    next        \src_bpp, \mask
     subs        H, #1
     bne         3b
 0:
-    exit
+.if (\src_bpp <= 16) && (\dst_bpp == 16) && (\opa == 0) && (\mask == 0)
+    exit        0
+.else
+    exit        1
+.endif
 .ltorg
 .endm
 
 .macro export name, src_bpp, dst_bpp, mask, opa, mode
 .thumb_func
-.func name
-.global name
-name&:
-    blender     src_bpp, dst_bpp, mask, opa, mode
-.endfunc
+.global \name
+\name\():
+    blender     \src_bpp, \dst_bpp, \mask, \opa, \mode
 .endm
 
 .macro export_set src, dst, src_bpp, dst_bpp, mode
-.if src == color
-    export lv_&src&_blend_to_&dst&_helium, src_bpp, dst_bpp, 0, 0, mode
-    export lv_&src&_blend_to_&dst&_with_opa_helium, src_bpp, dst_bpp, 0, 1, mode
-    export lv_&src&_blend_to_&dst&_with_mask_helium, src_bpp, dst_bpp, 1, 0, mode
-    export lv_&src&_blend_to_&dst&_mix_mask_opa_helium, src_bpp, dst_bpp, 1, 1, mode
+.ifc \src, color
+    export lv_\src\()_blend_to_\dst\()_helium, \src_bpp, \dst_bpp, 0, 0, \mode
+    export lv_\src\()_blend_to_\dst\()_with_opa_helium, \src_bpp, \dst_bpp, 0, 1, \mode
+    export lv_\src\()_blend_to_\dst\()_with_mask_helium, \src_bpp, \dst_bpp, 1, 0, \mode
+    export lv_\src\()_blend_to_\dst\()_mix_mask_opa_helium, \src_bpp, \dst_bpp, 1, 1, \mode
 .else
-    export lv_&src&_blend_&mode&_to_&dst&_helium, src_bpp, dst_bpp, 0, 0, mode
-    export lv_&src&_blend_&mode&_to_&dst&_with_opa_helium, src_bpp, dst_bpp, 0, 1, mode
-    export lv_&src&_blend_&mode&_to_&dst&_with_mask_helium, src_bpp, dst_bpp, 1, 0, mode
-    export lv_&src&_blend_&mode&_to_&dst&_mix_mask_opa_helium, src_bpp, dst_bpp, 1, 1, mode
+    export lv_\src\()_blend_\mode\()_to_\dst\()_helium, \src_bpp, \dst_bpp, 0, 0, \mode
+    export lv_\src\()_blend_\mode\()_to_\dst\()_with_opa_helium, \src_bpp, \dst_bpp, 0, 1, \mode
+    export lv_\src\()_blend_\mode\()_to_\dst\()_with_mask_helium, \src_bpp, \dst_bpp, 1, 0, \mode
+    export lv_\src\()_blend_\mode\()_to_\dst\()_mix_mask_opa_helium, \src_bpp, \dst_bpp, 1, 1, \mode
 .endif
 .endm
 
