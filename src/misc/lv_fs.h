@@ -114,7 +114,7 @@ typedef struct {
 typedef struct {
     char path[4];   /* This is needed to make it compatible with a normal path */
     const void * buffer;
-    uint32_t size;
+    size_t size;
 } lv_fs_path_ex_t;
 
 typedef struct {
@@ -183,7 +183,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
  * @param buf       address of the memory buffer
  * @param size      size of the memory buffer in bytes
  */
-void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size);
+void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, size_t size);
 
 /**
  * Close an already opened file

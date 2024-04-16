@@ -130,7 +130,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
     return LV_FS_RES_OK;
 }
 
-void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, uint32_t size)
+void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, const void * buf, size_t size)
 {
     path->path[0] = letter;
     path->path[1] = ':';
