@@ -1,25 +1,29 @@
+#ifdef __has_include
+    #if __has_include("lvgl.h")
+        #ifndef LV_LVGL_H_INCLUDE_SIMPLE
+            #define LV_LVGL_H_INCLUDE_SIMPLE
+        #endif
+    #endif
+#endif
 
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
-#include "lvgl.h"
-#elif defined(LV_BUILD_TEST)
-#include "../lvgl.h"
+    #include "lvgl.h"
 #else
-#include "lvgl/lvgl.h"
+    #include "lvgl/lvgl.h"
 #endif
 
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
-#define LV_ATTRIBUTE_MEM_ALIGN
+    #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_DUST
-#define LV_ATTRIBUTE_IMG_DUST
+#ifndef LV_ATTRIBUTE_IMG_IMG_RENDER_LVGL_LOGO_L8
+    #define LV_ATTRIBUTE_IMG_IMG_RENDER_LVGL_LOGO_L8
 #endif
 
-static const
-LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST
-uint8_t img_render_lvgl_logo_l8_map[] = {
-
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_RENDER_LVGL_LOGO_L8 uint8_t
+img_render_lvgl_logo_l8_map[] = {
+    /*Pixel format: Grayscale 8 bit*/
     0xfd,0xfd,0xdf,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xcb,0xed,0xfd,0xfd,
     0xfd,0xa8,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x22,0xcf,0xfd,
     0xdf,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x46,0xfc,
@@ -54,13 +58,10 @@ uint8_t img_render_lvgl_logo_l8_map[] = {
 };
 
 const lv_image_dsc_t img_render_lvgl_logo_l8 = {
-  .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_L8,
-  .header.flags = 0,
   .header.w = 30,
   .header.h = 30,
-  .header.stride = 30,
-  .data_size = sizeof(img_render_lvgl_logo_l8_map),
   .data = img_render_lvgl_logo_l8_map,
+  .data_size = sizeof(img_render_lvgl_logo_l8_map),
 };
 
