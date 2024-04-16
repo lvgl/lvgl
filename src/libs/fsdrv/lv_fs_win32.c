@@ -260,7 +260,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, size_t btr, size_t * br)
 {
     LV_UNUSED(drv);
-    return ReadFile((HANDLE)file_p, buf, btr, (LPDWORD)br, NULL)
+    return ReadFile((HANDLE)file_p, buf, (DWORD)btr, (LPDWORD)br, NULL)
            ? LV_FS_RES_OK
            : fs_error_from_win32(GetLastError());
 }
@@ -277,7 +277,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, size_t 
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, size_t btw, size_t * bw)
 {
     LV_UNUSED(drv);
-    return WriteFile((HANDLE)file_p, buf, btw, (LPDWORD)bw, NULL)
+    return WriteFile((HANDLE)file_p, buf, (DWORD)btw, (LPDWORD)bw, NULL)
            ? LV_FS_RES_OK
            : fs_error_from_win32(GetLastError());
 }

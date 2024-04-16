@@ -33,7 +33,7 @@ extern "C" {
  * @param node_size     The size of the node in the cache.
  * @return              The size of the cache entry.
  */
-uint32_t lv_cache_entry_get_size(const uint32_t node_size);
+size_t lv_cache_entry_get_size(const size_t node_size);
 
 /**
  * Get the reference count of a cache entry.
@@ -47,7 +47,7 @@ int32_t  lv_cache_entry_get_ref(lv_cache_entry_t * entry);
  * @param entry        The cache entry to get the node size of.
  * @return             The node size of the cache entry.
  */
-uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t * entry);
+size_t lv_cache_entry_get_node_size(lv_cache_entry_t * entry);
 
 /**
  * Check if a cache entry is invalid.
@@ -76,7 +76,7 @@ const lv_cache_t * lv_cache_entry_get_cache(const lv_cache_entry_t * entry);
  * @param node_size    The size of the node in the cache.
  * @return             The pointer to the cache entry of the data.
  */
-lv_cache_entry_t * lv_cache_entry_get_entry(void * data, const uint32_t node_size);
+lv_cache_entry_t * lv_cache_entry_get_entry(void * data, const size_t node_size);
 
 /**
  * Allocate a cache entry.
@@ -92,7 +92,7 @@ lv_cache_entry_t * lv_cache_entry_alloc(const uint32_t node_size, const lv_cache
  * @param cache        The cache instance to allocate the cache entry from.
  * @param node_size    The size of the node in the cache.
  */
-void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, const uint32_t node_size);
+void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, const size_t node_size);
 
 /**
  * Deallocate a cache entry. And the data of the cache entry will be freed.

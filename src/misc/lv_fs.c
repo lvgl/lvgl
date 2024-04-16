@@ -176,16 +176,16 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, size_t b
     LV_PROFILER_BEGIN;
 
     lv_fs_res_t res = LV_FS_RES_OK;
-    uint32_t file_position = file_p->cache->file_position;
-    uint32_t start = file_p->cache->start;
-    uint32_t end = file_p->cache->end;
+    size_t file_position = file_p->cache->file_position;
+    size_t start = file_p->cache->start;
+    size_t end = file_p->cache->end;
     char * buffer = file_p->cache->buffer;
     size_t buffer_size = file_p->drv->cache_size;
 
     if(start <= file_position && file_position <= end) {
         /* Data can be read from cache buffer */
-        uint32_t buffer_remaining_length = (uint32_t)end - file_position + 1;
-        uint32_t buffer_offset = (end - start) - buffer_remaining_length + 1;
+        size_t buffer_remaining_length = (uint32_t)end - file_position + 1;
+        size_t buffer_offset = (end - start) - buffer_remaining_length + 1;
 
         /* Do not allow reading beyond the actual memory block for memory-mapped files */
         if(file_p->drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {

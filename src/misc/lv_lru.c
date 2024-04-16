@@ -41,10 +41,10 @@ struct _lv_lru_item_t {
  * @author Austin Appleby
  * @see http://sites.google.com/site/murmurhash/
  */
-static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, uint32_t key_length);
+static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, size_t key_length);
 
 /** compare a key against an existing item's key */
-static int lv_lru_cmp_keys(lv_lru_item_t * item, const void * key, uint32_t key_length);
+static int lv_lru_cmp_keys(lv_lru_item_t * item, const void * key, size_t key_length);
 
 /** remove an item and push it to the free items queue */
 static void lv_lru_remove_item(lv_lru_t * cache, lv_lru_item_t * prev, lv_lru_item_t * item, uint32_t hash_index);
@@ -262,11 +262,11 @@ void lv_lru_remove_lru_item(lv_lru_t * cache)
  *   STATIC FUNCTIONS
  **********************/
 
-static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, uint32_t key_length)
+static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, size_t key_length)
 {
     uint32_t m = 0x5bd1e995;
     uint32_t r = 24;
-    uint32_t h = cache->seed ^ key_length;
+    uint32_t h = cache->seed ^ (uint32_t) key_length;
     char * data = (char *) key;
 
     while(key_length >= 4) {
@@ -297,7 +297,7 @@ static uint32_t lv_lru_hash(lv_lru_t * cache, const void * key, uint32_t key_len
     return h % cache->hash_table_size;
 }
 
-static int lv_lru_cmp_keys(lv_lru_item_t * item, const void * key, uint32_t key_length)
+static int lv_lru_cmp_keys(lv_lru_item_t * item, const void * key, size_t key_length)
 {
     if(key_length != item->key_length) {
         return 1;

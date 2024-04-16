@@ -124,10 +124,10 @@ struct _lv_cache_t {
                                        * @lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
                                        * @lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy. */
 
-    uint32_t node_size;               /**< The size of a node */
+    size_t node_size;                 /**< The size of a node */
 
-    uint32_t max_size;                /**< The maximum size of the cache */
-    uint32_t size;                    /**< The current size of the cache */
+    size_t max_size;                  /**< The maximum size of the cache */
+    size_t size;                      /**< The current size of the cache */
 
     lv_cache_ops_t ops;               /**< The cache operations struct @lv_cache_ops_t */
 

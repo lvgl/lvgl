@@ -22,7 +22,7 @@
 struct _lv_cache_entry_t {
     const lv_cache_t * cache;
     int32_t ref_cnt;
-    uint32_t node_size;
+    size_t node_size;
 
     bool is_invalid;
 };
@@ -70,7 +70,7 @@ int32_t lv_cache_entry_get_ref(lv_cache_entry_t * entry)
     LV_ASSERT_NULL(entry);
     return entry->ref_cnt;
 }
-uint32_t lv_cache_entry_get_node_size(lv_cache_entry_t * entry)
+size_t lv_cache_entry_get_node_size(lv_cache_entry_t * entry)
 {
     return entry->node_size;
 }
@@ -113,7 +113,7 @@ void lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data)
 
     lv_cache_entry_dec_ref(entry);
 }
-lv_cache_entry_t * lv_cache_entry_get_entry(void * data, const uint32_t node_size)
+lv_cache_entry_t * lv_cache_entry_get_entry(void * data, const size_t node_size)
 {
     LV_ASSERT_NULL(data);
     return (lv_cache_entry_t *)((uint8_t *)data + node_size);
@@ -129,7 +129,7 @@ const lv_cache_t * lv_cache_entry_get_cache(const lv_cache_entry_t * entry)
     return entry->cache;
 }
 
-uint32_t lv_cache_entry_get_size(const uint32_t node_size)
+size_t lv_cache_entry_get_size(const size_t node_size)
 {
     return node_size + sizeof(lv_cache_entry_t);
 }
@@ -145,7 +145,7 @@ lv_cache_entry_t * lv_cache_entry_alloc(const uint32_t node_size, const lv_cache
     lv_cache_entry_init(entry, cache, node_size);
     return (lv_cache_entry_t *)((uint8_t *)entry + node_size);
 }
-void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, const uint32_t node_size)
+void lv_cache_entry_init(lv_cache_entry_t * entry, const lv_cache_t * cache, const size_t node_size)
 {
     LV_ASSERT_NULL(entry);
     LV_ASSERT_NULL(cache);
