@@ -33,11 +33,11 @@ static uint32_t img_width_to_stride(lv_image_header_t * header);
 
 /**
  * Get the header info of an image source, and return the a pointer to the decoder that can open it.
- * @param src       The image source (e.g. a filename or a pointer to a C array)
+ * @param dsc       Image descriptor containing the source and type of the image and other info.
  * @param header    The header of the image
  * @return The decoder that can open the image source or NULL if not found (or can't open it).
  */
-static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_header_t * header);
+static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc, lv_image_header_t * header);
 
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
 
@@ -78,7 +78,12 @@ void _lv_image_decoder_deinit(void)
 
 lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
 {
-    lv_image_decoder_t * decoder = image_decoder_get_info(src, header);
+    lv_image_decoder_dsc_t dsc;
+    lv_memzero(&dsc, sizeof(lv_image_decoder_dsc_t));
+    dsc.src = src;
+    dsc.src_type = lv_image_src_get_type(src);
+
+    lv_image_decoder_t * decoder = image_decoder_get_info(&dsc, header);
     if(decoder == NULL) return LV_RESULT_INVALID;
 
     return LV_RESULT_OK;
@@ -104,7 +109,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     }
 
     /*Find the decoder that can open the image source, and get the header info in the same time.*/
-    dsc->decoder = image_decoder_get_info(src, &dsc->header);
+    dsc->decoder = image_decoder_get_info(dsc, &dsc->header);
     if(dsc->decoder == NULL) return LV_RESULT_INVALID;
 
     /*Make a copy of args*/
@@ -285,13 +290,13 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_header_t * header)
+static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     lv_memzero(header, sizeof(lv_image_header_t));
 
-    if(src == NULL) return NULL;
+    const void * src = dsc->src;
+    lv_image_src_t src_type = dsc->src_type;
 
-    lv_image_src_t src_type = lv_image_src_get_type(src);
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
         if(img_dsc->data == NULL) return NULL;
@@ -321,12 +326,21 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         }
     }
 
+    if(src_type == LV_IMAGE_SRC_FILE) {
+        lv_fs_res_t fs_res = lv_fs_open(&dsc->file, src, LV_FS_MODE_RD);
+        if(fs_res != LV_FS_RES_OK) {
+            LV_LOG_ERROR("File open failed: %" LV_PRIu32, (uint32_t)fs_res);
+            return NULL;
+        }
+    }
+
     /*Search the decoders*/
     lv_image_decoder_t * decoder_prev = NULL;
     _LV_LL_READ(img_decoder_ll_p, decoder) {
         /*Info and Open callbacks are required*/
         if(decoder->info_cb && decoder->open_cb) {
-            lv_result_t res = decoder->info_cb(decoder, src, header);
+            lv_fs_seek(&dsc->file, 0, LV_FS_SEEK_SET);
+            lv_result_t res = decoder->info_cb(decoder, dsc, header);
 
             if(decoder_prev) LV_LOG_TRACE("Can't open image with decoder %s. Trying next decoder.", decoder_prev->name);
 
@@ -344,6 +358,10 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
 
     if(decoder == NULL) LV_LOG_TRACE("No decoder found");
     else LV_LOG_TRACE("Found decoder %s", decoder->name);
+
+    if(src_type == LV_IMAGE_SRC_FILE) {
+        lv_fs_close(&dsc->file);
+    }
 
     if(is_header_cache_enabled && src_type == LV_IMAGE_SRC_FILE && decoder) {
         lv_cache_entry_t * entry;
