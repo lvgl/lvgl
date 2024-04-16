@@ -60,7 +60,7 @@ static void gridnav_one_axis_move_only(uint32_t key_grid_axis_next,
 
     TEST_ASSERT(lv_obj_get_state(objs[0]) & LV_STATE_FOCUSED);
 
-    /* gridnav direction key key moves the focus */
+    /* gridnav direction key moves the focus */
     lv_test_key_hit(key_grid_axis_next);
     TEST_ASSERT(lv_obj_get_state(objs[1]) & LV_STATE_FOCUSED);
     TEST_ASSERT_FALSE(g_key_data.press_happened);
@@ -85,7 +85,7 @@ static void gridnav_one_axis_move_only(uint32_t key_grid_axis_next,
     lv_test_key_hit(key_grid_axis_prev);
     TEST_ASSERT(lv_obj_get_state(objs[0]) & LV_STATE_FOCUSED);
     TEST_ASSERT_FALSE(g_key_data.press_happened);
-    /* at the beginning, can't further back */
+    /* at the beginning, can't move further back */
     lv_test_key_hit(key_grid_axis_prev);
     TEST_ASSERT(lv_obj_get_state(objs[0]) & LV_STATE_FOCUSED);
     TEST_ASSERT_FALSE(g_key_data.press_happened);

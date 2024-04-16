@@ -7,12 +7,12 @@ static const int32_t opts_counts[] = {6, 10, 3};
 static lv_obj_t * sliders[3];
 static lv_obj_t * rollers[3];
 
-static void slider_value_changed_cb(lv_event_t * e)
+static void slider_key_cb(lv_event_t * e)
 {
     uint8_t i = (uint32_t)(uintptr_t)lv_event_get_user_data(e);
     lv_roller_set_selected(rollers[i], lv_slider_get_value(sliders[i]), LV_ANIM_ON);
 }
-static void roller_value_changed_cb(lv_event_t * e)
+static void roller_key_cb(lv_event_t * e)
 {
     uint8_t i = (uint32_t)(uintptr_t)lv_event_get_user_data(e);
     lv_slider_set_value(sliders[i], lv_roller_get_selected(rollers[i]), LV_ANIM_ON);
@@ -44,7 +44,7 @@ void lv_example_gridnav_5(void)
         lv_group_remove_obj(slider);
         lv_obj_set_width(slider, lv_pct(85));
         sliders[i] = slider;
-        lv_obj_add_event_cb(slider, slider_value_changed_cb, LV_EVENT_VALUE_CHANGED, (void *)(uintptr_t)i);
+        lv_obj_add_event_cb(slider, slider_key_cb, LV_EVENT_KEY, (void *)(uintptr_t)i);
     }
 
     cont = lv_obj_create(lv_screen_active());
@@ -62,7 +62,7 @@ void lv_example_gridnav_5(void)
         lv_obj_set_size(roller, lv_pct(30), lv_pct(100));
         lv_group_remove_obj(roller);
         rollers[i] = roller;
-        lv_obj_add_event_cb(roller, roller_value_changed_cb, LV_EVENT_VALUE_CHANGED, (void *)(uintptr_t)i);
+        lv_obj_add_event_cb(roller, roller_key_cb, LV_EVENT_KEY, (void *)(uintptr_t)i);
     }
 }
 

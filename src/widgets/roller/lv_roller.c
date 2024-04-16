@@ -371,8 +371,6 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 uint32_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
                 lv_roller_set_selected(obj, roller->sel_opt_id + 1, LV_ANIM_ON);
                 roller->sel_opt_id_ori = ori_id;
-                uint32_t id  = roller->sel_opt_id;
-                lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &id);
             }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
@@ -380,8 +378,6 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 uint32_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
                 lv_roller_set_selected(obj, roller->sel_opt_id - 1, LV_ANIM_ON);
                 roller->sel_opt_id_ori = ori_id;
-                uint32_t id  = roller->sel_opt_id;
-                lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &id);
             }
         }
     }
@@ -393,8 +389,6 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
             uint32_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
             lv_roller_set_selected(obj, new_id, LV_ANIM_ON);
             roller->sel_opt_id_ori = ori_id;
-            uint32_t id  = roller->sel_opt_id;
-            lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &id);
         }
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
