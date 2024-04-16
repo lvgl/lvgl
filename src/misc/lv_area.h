@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "lv_types.h"
+#include "lv_math.h"
 
 /*********************
  *      DEFINES
@@ -354,7 +355,7 @@ static inline void lv_point_precise_swap(lv_point_precise_t * p1, lv_point_preci
 #error _LV_PCT_STORED_MAX should be an even number
 #endif
 #define _LV_PCT_POS_MAX         (_LV_PCT_STORED_MAX / 2)
-#define LV_PCT(x)               (LV_COORD_SET_SPEC(((x) < 0 ? ((_LV_PCT_POS_MAX - (x))  % (_LV_PCT_STORED_MAX + 1)) : ((x) % (_LV_PCT_POS_MAX + 1)))))
+#define LV_PCT(x)               (LV_COORD_SET_SPEC(((x) < 0 ? (_LV_PCT_POS_MAX - LV_MAX((x), -_LV_PCT_POS_MAX)) : LV_MIN((x), _LV_PCT_POS_MAX))))
 #define LV_COORD_IS_PCT(x)      ((LV_COORD_IS_SPEC(x) && _LV_COORD_PLAIN(x) <= _LV_PCT_STORED_MAX))
 #define LV_COORD_GET_PCT(x)     (_LV_COORD_PLAIN(x) > _LV_PCT_POS_MAX ? _LV_PCT_POS_MAX - _LV_COORD_PLAIN(x) : _LV_COORD_PLAIN(x))
 
