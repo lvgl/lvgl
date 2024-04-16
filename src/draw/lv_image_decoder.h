@@ -72,7 +72,7 @@ typedef struct _lv_image_decoder_args_t {
  * @param header store the info here
  * @return LV_RESULT_OK: info written correctly; LV_RESULT_INVALID: failed
  */
-typedef lv_result_t (*lv_image_decoder_info_f_t)(lv_image_decoder_t * decoder, const void * src,
+typedef lv_result_t (*lv_image_decoder_info_f_t)(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                                  lv_image_header_t * header);
 
 /**
@@ -147,7 +147,7 @@ struct _lv_image_decoder_dsc_t {
     /**Type of the source: file or variable. Can be set in `open` function if required*/
     lv_image_src_t src_type;
 
-    lv_fs_file_t * fp;
+    lv_fs_file_t file;
 
     /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
     lv_image_header_t header;

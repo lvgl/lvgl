@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static lv_draw_buf_t * decode_png_file(lv_image_decoder_dsc_t * dsc, const char * filename);
@@ -75,31 +75,25 @@ void lv_libpng_deinit(void)
 
 /**
  * Get info about a PNG image
- * @param src can be file name or pointer to a C array
+ * @param dsc can be file name or pointer to a C array
  * @param header store the info here
  * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
  */
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     LV_UNUSED(decoder); /*Unused*/
-    lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
+
+    lv_image_src_t src_type = dsc->src_type;          /*Get the source type*/
 
     /*If it's a PNG file...*/
     if(src_type == LV_IMAGE_SRC_FILE) {
-        const char * fn = src;
-
-        lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
-        if(res != LV_FS_RES_OK) return LV_RESULT_INVALID;
-
         /* Read the width and height from the file. They have a constant location:
          * [16..19]: width
          * [20..23]: height
          */
         uint8_t buf[24];
         uint32_t rn;
-        lv_fs_read(&f, buf, sizeof(buf), &rn);
-        lv_fs_close(&f);
+        lv_fs_read(&dsc->file, buf, sizeof(buf), &rn);
 
         if(rn != sizeof(buf)) return LV_RESULT_INVALID;
 
