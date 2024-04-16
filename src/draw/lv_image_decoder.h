@@ -147,6 +147,8 @@ struct _lv_image_decoder_dsc_t {
     /**Type of the source: file or variable. Can be set in `open` function if required*/
     lv_image_src_t src_type;
 
+    lv_fs_file_t * fp;
+
     /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
     lv_image_header_t header;
 
