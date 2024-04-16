@@ -487,15 +487,9 @@ static void draw_main(lv_event_t * e)
             label_y_prop = (label_y_prop * 16384) / lv_obj_get_height(
                                label); /*Proportional position from the middle line (upscaled by << 14)*/
 
-            /*Apply a correction with different line heights*/
-            const lv_font_t * normal_label_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-            lv_coord_t corr = (label_dsc.font->line_height - normal_label_font->line_height) / 2;
-
             /*Apply the proportional position to the selected text*/
-            res_p.y -= corr;
             int32_t label_sel_y = roller_h / 2 + obj->coords.y1;
             label_sel_y += (label_y_prop * res_p.y) >> 14;
-            label_sel_y -= corr;
 
             lv_coord_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
             lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
