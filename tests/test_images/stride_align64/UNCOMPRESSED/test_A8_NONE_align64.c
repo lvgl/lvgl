@@ -83,14 +83,14 @@ uint8_t test_A8_NONE_align64_map[] = {
 
 };
 
-const lv_image_dsc_t test_A8_NONE_align64 = {
+const lv_img_dsc_t test_A8_NONE_align64 = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_A8,
   .header.flags = 0,
   .header.w = 71,
   .header.h = 60,
   .header.stride = 80,
-  .data_size = sizeof(test_A8_NONE_align64_map),
+  .data_size = 4800,
   .data = test_A8_NONE_align64_map,
 };
 

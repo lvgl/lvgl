@@ -635,14 +635,14 @@ uint8_t test_RGB888_RLE_align1_map[] = {
 
 };
 
-const lv_image_dsc_t test_RGB888_RLE_align1 = {
+const lv_img_dsc_t test_RGB888_RLE_align1 = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_RGB888,
   .header.flags = 0 | LV_IMAGE_FLAGS_COMPRESSED,
   .header.w = 71,
   .header.h = 60,
   .header.stride = 224,
-  .data_size = sizeof(test_RGB888_RLE_align1_map),
+  .data_size = 9792,
   .data = test_RGB888_RLE_align1_map,
 };
 
