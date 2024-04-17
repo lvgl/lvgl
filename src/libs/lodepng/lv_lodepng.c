@@ -80,7 +80,7 @@ void lv_lodepng_deinit(void)
  */
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
-    (void) decoder; /*Unused*/
+    LV_UNUSED(decoder); /*Unused*/
     lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
 
     /*If it's a PNG file...*/
