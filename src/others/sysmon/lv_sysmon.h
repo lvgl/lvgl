@@ -89,13 +89,13 @@ lv_obj_t * lv_sysmon_create(lv_display_t * disp);
 
 /**
  * Show system performance monitor: CPU usage and FPS count
- * @param disp      target display, NULL for all displays
+ * @param disp      target display, NULL: use the default displays
  */
 void lv_sysmon_show_performance(lv_display_t * disp);
 
 /**
  * Hide system performance monitor
- * @param disp      target display, NULL for all displays
+ * @param disp      target display, NULL: use the default
  */
 void lv_sysmon_hide_performance(lv_display_t * disp);
 
@@ -105,13 +105,13 @@ void lv_sysmon_hide_performance(lv_display_t * disp);
 
 /**
  * Show system memory monitor: used memory and the memory fragmentation
- * @param disp      target display, NULL for all displays
+ * @param disp      target display, NULL: use the default displays
  */
 void lv_sysmon_show_memory(lv_display_t * disp);
 
 /**
  * Hide system memory monitor
- * @param disp      target display, NULL for all displays
+ * @param disp      target display, NULL: use the default displays
  */
 void lv_sysmon_hide_memory(lv_display_t * disp);
 

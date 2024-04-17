@@ -87,6 +87,7 @@ void _lv_sysmon_builtin_deinit(void)
 lv_obj_t * lv_sysmon_create(lv_display_t * disp)
 {
     LV_LOG_INFO("begin");
+    if(disp == NULL) disp = lv_display_get_default();
     lv_obj_t * label = lv_label_create(lv_display_get_layer_sys(disp));
     lv_obj_set_style_bg_opa(label, LV_OPA_50, 0);
     lv_obj_set_style_bg_color(label, lv_color_black(), 0);
@@ -100,6 +101,7 @@ lv_obj_t * lv_sysmon_create(lv_display_t * disp)
 
 void lv_sysmon_show_performance(lv_display_t * disp)
 {
+    if(disp == NULL) disp = lv_display_get_default();
     disp->perf_label = lv_sysmon_create(disp);
     lv_subject_init_pointer(&disp->perf_sysmon_backend.subject, &disp->perf_sysmon_info);
     lv_obj_align(disp->perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
@@ -116,6 +118,7 @@ void lv_sysmon_show_performance(lv_display_t * disp)
 
 void lv_sysmon_hide_performance(lv_display_t * disp)
 {
+    if(disp == NULL) disp = lv_display_get_default();
     lv_obj_add_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
 }
 
@@ -125,6 +128,7 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
 
 void lv_sysmon_show_memory(lv_display_t * disp)
 {
+    if(disp == NULL) disp = lv_display_get_default();
     disp->mem_label = lv_sysmon_create(disp);
     lv_obj_align(disp->mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
     lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
@@ -134,6 +138,7 @@ void lv_sysmon_show_memory(lv_display_t * disp)
 
 void lv_sysmon_hide_memory(lv_display_t * disp)
 {
+    if(disp == NULL) disp = lv_display_get_default();
     lv_obj_add_flag(disp->mem_label, LV_OBJ_FLAG_HIDDEN);
 }
 

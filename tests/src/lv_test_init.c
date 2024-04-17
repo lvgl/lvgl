@@ -21,6 +21,8 @@ void lv_test_init(void)
 {
     lv_init();
     hal_init();
+    lv_sysmon_hide_memory(NULL);
+    lv_sysmon_hide_performance(NULL);
 }
 
 void lv_test_deinit(void)
