@@ -22,6 +22,7 @@
 typedef struct {
     lv_anim_t anim;
     uint32_t start_time;
+    bool flag_completed;
 } lv_anim_timeline_dsc_t;
 
 /*Data of anim_timeline*/
@@ -185,6 +186,20 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
             value = a->end_value;
             if(a->exec_cb) a->exec_cb(a->var, value);
             if(a->custom_exec_cb) a->custom_exec_cb(a, value);
+        }
+ 
+        if(at->reverse) {
+            if(value > a->start_value) at->anim_dsc[i].flag_completed = false;
+            else if (value == a->start_value) {
+                if(! at->anim_dsc[i].flag_completed && a->completed_cb) a->completed_cb(a); 
+                at->anim_dsc[i].flag_completed = true;
+            }
+        }else{
+            if(value < a->end_value) at->anim_dsc[i].flag_completed = false;
+            else if (value == a->end_value) {
+                if(! at->anim_dsc[i].flag_completed && a->completed_cb) a->completed_cb(a); 
+                at->anim_dsc[i].flag_completed = true;
+            }
         }
     }
 }
