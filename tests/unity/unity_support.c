@@ -26,6 +26,8 @@
 #include <direct.h>
 #define mkdir(pathname, mode) _mkdir(pathname)
 #define strtok_r strtok_s
+#else
+#include <sys/stat.h>
 #endif
 
 /*********************
