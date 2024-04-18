@@ -20,6 +20,8 @@
  *      DEFINES
  *********************/
 
+#define CACHE_NAME "FREETYPE_IMAGE"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -64,6 +66,7 @@ lv_cache_t * lv_freetype_create_draw_data_image(uint32_t cache_size)
 
     lv_cache_t * draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_image_cache_data_t),
                                                    cache_size, ops);
+    lv_cache_set_name(draw_data_cache, CACHE_NAME);
 
     return draw_data_cache;
 }

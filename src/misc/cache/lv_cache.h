@@ -200,6 +200,21 @@ void   lv_cache_set_create_cb(lv_cache_t * cache, lv_cache_create_cb_t alloc_cb,
  * @param user_data     A user data pointer.
  */
 void   lv_cache_set_free_cb(lv_cache_t * cache, lv_cache_free_cb_t free_cb, void * user_data);
+
+/**
+ * Give a name for a cache object. Only the pointer of the string is saved.
+ * @param cache         The cache object pointer to set the name.
+ * @param name          The name of the cache.
+ */
+void lv_cache_set_name(lv_cache_t * cache, const char * name);
+
+/**
+ * Get the name of a cache object.
+ * @param cache         The cache object pointer to get the name.
+ * @return              Returns the name of the cache.
+ */
+const char * lv_cache_get_name(lv_cache_t * cache);
+
 /*************************
  *    GLOBAL VARIABLES
  *************************/

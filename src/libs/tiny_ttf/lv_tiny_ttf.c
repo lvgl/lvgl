@@ -17,6 +17,9 @@
 /*********************
  *      DEFINES
  *********************/
+
+#define CACHE_NAME  "TINY_TTF"
+
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
 #define STBTT_STATIC
@@ -144,6 +147,7 @@ void lv_tiny_ttf_init(void)
     };
 
     tiny_ttf_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_cache_data_t), 128, ops);
+    lv_cache_set_name(tiny_ttf_cache, CACHE_NAME);
 }
 
 void lv_tiny_ttf_deinit(void)

@@ -282,6 +282,15 @@ void lv_cache_set_free_cb(lv_cache_t * cache, lv_cache_free_cb_t free_cb, void *
     LV_UNUSED(user_data);
     cache->ops.free_cb = free_cb;
 }
+void lv_cache_set_name(lv_cache_t * cache, const char * name)
+{
+    if(cache == NULL) return;
+    cache->name = name;
+}
+const char * lv_cache_get_name(lv_cache_t * cache)
+{
+    return cache->name;
+}
 
 /**********************
  *   STATIC FUNCTIONS

@@ -96,6 +96,7 @@ lv_result_t lv_freetype_init(uint32_t max_glyph_cnt)
         .free_cb = (lv_cache_free_cb_t)cache_node_cache_free_cb,
     };
     ctx->cache_node_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_cache_node_t), INT32_MAX, ops);
+    lv_cache_set_name(ctx->cache_node_cache, "FREETYPE_CACHE_NODE");
 
     return LV_RESULT_OK;
 }

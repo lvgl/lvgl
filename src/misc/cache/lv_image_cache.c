@@ -17,6 +17,8 @@
  *      DEFINES
  *********************/
 
+#define CACHE_NAME  "IMAGE"
+
 #define img_cache_p (LV_GLOBAL_DEFAULT()->img_cache)
 
 /**********************
@@ -59,6 +61,8 @@ lv_result_t lv_image_cache_init(uint32_t size)
         .create_cb = NULL,
         .free_cb = (lv_cache_free_cb_t) image_cache_free_cb,
     });
+
+    lv_cache_set_name(img_cache_p, CACHE_NAME);
     return img_cache_p != NULL ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
