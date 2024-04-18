@@ -16,6 +16,7 @@ LVG has built in support for:
 - MEMFS (read a file from a memory buffer)
 - LITTLEFS (a little fail-safe filesystem designed for microcontrollers)
 - Arduino ESP LITTLEFS (a little fail-safe filesystem designed for Arduino ESP)
+- Arduino SD (allows for reading from and writing to SD cards)
 
 You still need to provide the drivers and libraries, this extension
 provides only the bridge between FATFS, STDIO, POSIX, WIN32 and LVGL.
