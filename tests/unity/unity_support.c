@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <errno.h>
 #include "unity.h"
 #define PNG_DEBUG 3
 #include <png.h>
