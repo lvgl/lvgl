@@ -822,7 +822,7 @@ const lv_image_dsc_t {varname} = {{
     
     def sRGB_to_linear(self, x):
         if x < 0.04045:
-            return x/12.92
+            return x / 12.92
         return pow((x + 0.055) / 1.055, 2.4)
 
     def linear_to_sRGB(self, y):
