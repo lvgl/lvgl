@@ -17,6 +17,7 @@
 #include "lv_windows_context.h"
 #include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
+#include "../../misc/lv_text_private.h"
 
 #include <windowsx.h>
 

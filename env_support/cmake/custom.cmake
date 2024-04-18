@@ -57,7 +57,9 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     target_link_libraries(lvgl_thorvg PUBLIC lvgl)
 endif()
 
-set_source_files_properties(${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/vg_lite_tvg.cpp PROPERTIES COMPILE_FLAGS -Wunused-parameter)
+if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+  set_source_files_properties(${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/vg_lite_tvg.cpp PROPERTIES COMPILE_FLAGS -Wunused-parameter)
+endif()
 
 # Build LVGL example library
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
