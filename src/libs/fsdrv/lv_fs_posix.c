@@ -165,7 +165,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, size_t 
         return LV_FS_RES_FS_ERR;
     }
 
-    *br = (uint32_t)ret;
+    *br = ret;
     return LV_FS_RES_OK;
 }
 
@@ -189,7 +189,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
         return LV_FS_RES_FS_ERR;
     }
 
-    *bw = (uint32_t)ret;
+    *bw = ret;
     return LV_FS_RES_OK;
 }
 
@@ -248,7 +248,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, size_t * pos_p)
         return LV_FS_RES_FS_ERR;
     }
 
-    *pos_p = (uint32_t)offset;
+    *pos_p = offset;
     return LV_FS_RES_OK;
 }
 

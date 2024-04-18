@@ -440,8 +440,7 @@ static lv_cache_reserve_cond_res_t reserve_cond_cb(lv_cache_t * cache, const voi
 
     uint32_t data_size = key ? lru->get_data_size_cb(key) : 0;
     if(data_size > lru->cache.max_size) {
-        LV_LOG_ERROR("data size (%" LV_PRIu32 ") is larger than max size (%" LV_PRIu32 ")", data_size,
-                     (uint32_t)lru->cache.max_size);
+        LV_LOG_ERROR("data size (%" LV_PRIu32 ") is larger than max size (%zu)", data_size, lru->cache.max_size);
         return LV_CACHE_RESERVE_COND_TOO_LARGE;
     }
 
