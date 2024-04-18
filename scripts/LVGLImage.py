@@ -828,7 +828,7 @@ const lv_image_dsc_t {varname} = {{
     def linear_to_sRGB(self, y):
         if y <= 0.0031308:
             return 12.92 * y
-        return 1.055 * pow(y, 1/2.4) - 0.055
+        return 1.055 * pow(y, 1 / 2.4) - 0.055
 
     def _png_to_luma_only(self, cf: ColorFormat, filename: str):
         reader = png.Reader(str(filename))
