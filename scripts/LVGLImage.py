@@ -606,7 +606,7 @@ class LVGLImage:
             flags += " | LV_IMAGE_FLAGS_COMPRESSED"
 
         compressed = LVGLCompressData(self.cf, compress, self.data)
-
+        macro = "LV_ATTRIBUTE_" + varname.upper()
         header = f'''
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
@@ -621,12 +621,12 @@ class LVGLImage:
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_DUST
-#define LV_ATTRIBUTE_IMG_DUST
+#ifndef {macro}
+#define {macro}
 #endif
 
 static const
-LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST
+LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST {macro}
 uint8_t {varname}_map[] = {{
 '''
 
