@@ -17,6 +17,8 @@
  *      DEFINES
  *********************/
 
+#define DECODER_NAME    "LODEPNG"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -50,6 +52,8 @@ void lv_lodepng_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+
+    dec->name = DECODER_NAME;
 }
 
 void lv_lodepng_deinit(void)
@@ -76,7 +80,7 @@ void lv_lodepng_deinit(void)
  */
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
-    (void) decoder; /*Unused*/
+    LV_UNUSED(decoder); /*Unused*/
     lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
 
     /*If it's a PNG file...*/
@@ -199,7 +203,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     dsc->decoded = decoded;
 
-    if(dsc->args.no_cache) return LV_RES_OK;
+    if(dsc->args.no_cache) return LV_RESULT_OK;
 
     /*If the image cache is disabled, just return the decoded image*/
     if(!lv_image_cache_is_enabled()) return LV_RESULT_OK;

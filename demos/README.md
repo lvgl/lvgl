@@ -71,9 +71,9 @@ For example:
 #include "demos/lv_demos.h"
 
 ...
-static lv_disp_t* hal_init(void)
+static lv_display_t* hal_init(void)
 {
-  lv_disp_t* disp = NULL;
+  lv_display_t* disp = NULL;
 
   ...
   /* TODO: init display and indev */
@@ -86,7 +86,7 @@ int main(int argc, char ** argv)
 {
   lv_init();
 
-  lv_disp_t* disp = hal_init();
+  lv_display_t* disp = hal_init();
   if (disp == NULL) {
     LV_LOG_ERROR("lv_demos initialization failure!");
     return 1;

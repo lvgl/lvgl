@@ -745,23 +745,30 @@ static void draw_image(lv_event_t * e)
             draw_dsc.bitmap_mask_src = img->bitmap_mask_src;
             draw_dsc.src = img->src;
 
-            lv_area_t img_area = {obj->coords.x1, obj->coords.y1,
-                                  obj->coords.x1 + img->w - 1, obj->coords.y1 + img->h - 1
-                                 };
+            lv_area_set(&draw_dsc.image_area, obj->coords.x1,
+                        obj->coords.y1,
+                        obj->coords.x1 + img->w - 1,
+                        obj->coords.y1 + img->h - 1);
+            lv_area_t coords;
             if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
-                lv_area_align(&obj->coords, &img_area, img->align, img->offset.x, img->offset.y);
+                lv_area_align(&obj->coords, &draw_dsc.image_area, img->align, img->offset.x, img->offset.y);
+                coords = draw_dsc.image_area;
             }
             else if(img->align == LV_IMAGE_ALIGN_TILE) {
                 _lv_area_intersect(&layer->_clip_area, &layer->_clip_area, &obj->coords);
-                lv_area_move(&img_area, img->offset.x, img->offset.y);
+                lv_area_move(&draw_dsc.image_area, img->offset.x, img->offset.y);
 
-                lv_area_move(&img_area,
-                             ((layer->_clip_area.x1 - img_area.x1 - (img->w - 1)) / img->w) * img->w,
-                             ((layer->_clip_area.y1 - img_area.y1 - (img->h - 1)) / img->h) * img->h);
+                lv_area_move(&draw_dsc.image_area,
+                             ((layer->_clip_area.x1 - draw_dsc.image_area.x1 - (img->w - 1)) / img->w) * img->w,
+                             ((layer->_clip_area.y1 - draw_dsc.image_area.y1 - (img->h - 1)) / img->h) * img->h);
+                coords = layer->_clip_area;
                 draw_dsc.tile = 1;
             }
+            else {
+                coords = draw_dsc.image_area;
+            }
 
-            lv_draw_image(layer, &draw_dsc, &img_area);
+            lv_draw_image(layer, &draw_dsc, &coords);
             layer->_clip_area = clip_area_ori;
 
         }

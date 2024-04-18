@@ -258,14 +258,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent);
 /**
  * Set one or more flags
  * @param obj   pointer to an object
- * @param f     R-ed values from `lv_obj_flag_t` to set.
+ * @param f     OR-ed values from `lv_obj_flag_t` to set.
  */
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Remove one or more flags
  * @param obj   pointer to an object
- * @param f     OR-ed values from `lv_obj_flag_t` to set.
+ * @param f     OR-ed values from `lv_obj_flag_t` to clear.
  */
 void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
 

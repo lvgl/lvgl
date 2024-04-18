@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_bidi.h"
-#include "lv_text.h"
+#include "lv_text_private.h"
 #include "lv_types.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
@@ -109,7 +109,7 @@ lv_base_dir_t _lv_bidi_detect_base_dir(const char * txt)
     uint32_t i = 0;
     uint32_t letter;
     while(txt[i] != '\0') {
-        letter = _lv_text_encoded_next(txt, &i);
+        letter = lv_text_encoded_next(txt, &i);
 
         lv_base_dir_t dir;
         dir = lv_bidi_get_letter_dir(letter);
@@ -209,7 +209,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
 
     /*Process neutral chars in the beginning*/
     while(rd < len) {
-        uint32_t letter = _lv_text_encoded_next(str_in, &rd);
+        uint32_t letter = lv_text_encoded_next(str_in, &rd);
         pos_conv_rd++;
         dir = lv_bidi_get_letter_dir(letter);
         if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(&ctx, str_in, rd, len, letter, base_dir);
@@ -217,7 +217,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
     }
 
     if(rd && str_in[rd] != '\0' && rd < len) {
-        _lv_text_encoded_prev(str_in, &rd);
+        lv_text_encoded_prev(str_in, &rd);
         pos_conv_rd--;
     }
 
@@ -294,10 +294,10 @@ static uint32_t lv_bidi_get_next_paragraph(const char * txt)
 {
     uint32_t i = 0;
 
-    _lv_text_encoded_next(txt, &i);
+    lv_text_encoded_next(txt, &i);
 
     while(txt[i] != '\0' && txt[i] != '\n' && txt[i] != '\r') {
-        _lv_text_encoded_next(txt, &i);
+        lv_text_encoded_next(txt, &i);
     }
 
     return i;
@@ -327,7 +327,7 @@ static bool lv_bidi_letter_is_weak(uint32_t letter)
     static const char weaks[] = "0123456789";
 
     do {
-        uint32_t x = _lv_text_encoded_next(weaks, &i);
+        uint32_t x = lv_text_encoded_next(weaks, &i);
         if(letter == x) {
             return true;
         }
@@ -378,7 +378,7 @@ static uint32_t get_txt_len(const char * txt, uint32_t max_len)
     uint32_t i   = 0;
 
     while(i < max_len && txt[i] != '\0') {
-        _lv_text_encoded_next(txt, &i);
+        lv_text_encoded_next(txt, &i);
         len++;
     }
 
@@ -403,13 +403,13 @@ static lv_base_dir_t get_next_run(lv_bidi_ctx_t * ctx, const char * txt, lv_base
 
     uint16_t pos_conv_i = 0;
 
-    letter = _lv_text_encoded_next(txt, NULL);
+    letter = lv_text_encoded_next(txt, NULL);
     lv_base_dir_t dir = lv_bidi_get_letter_dir(letter);
     if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(ctx, txt, 0, max_len, letter, base_dir);
 
     /*Find the first strong char. Skip the neutrals*/
     while(dir == LV_BASE_DIR_NEUTRAL || dir == LV_BASE_DIR_WEAK) {
-        letter = _lv_text_encoded_next(txt, &i);
+        letter = lv_text_encoded_next(txt, &i);
 
         pos_conv_i++;
         dir = lv_bidi_get_letter_dir(letter);
@@ -434,7 +434,7 @@ static lv_base_dir_t get_next_run(lv_bidi_ctx_t * ctx, const char * txt, lv_base
     /*Find the next char which has different direction*/
     lv_base_dir_t next_dir = base_dir;
     while(i_prev < max_len && txt[i] != '\0' && txt[i] != '\n' && txt[i] != '\r') {
-        letter = _lv_text_encoded_next(txt, &i);
+        letter = lv_text_encoded_next(txt, &i);
         pos_conv_i++;
         next_dir  = lv_bidi_get_letter_dir(letter);
         if(next_dir == LV_BASE_DIR_NEUTRAL)  next_dir = bracket_process(ctx, txt, i, max_len, letter, base_dir);
@@ -497,7 +497,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
     uint16_t pos_conv_wr = 0;
 
     while(i) {
-        uint32_t letter = _lv_text_encoded_prev(src, &i);
+        uint32_t letter = lv_text_encoded_prev(src, &i);
         uint16_t pos_conv_letter = --pos_conv_i;
 
         /*Keep weak letters (numbers) as LTR*/
@@ -507,7 +507,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
             uint16_t pos_conv_last_weak = pos_conv_i;
             uint16_t pos_conv_first_weak = pos_conv_i;
             while(i) {
-                letter = _lv_text_encoded_prev(src, &i);
+                letter = lv_text_encoded_prev(src, &i);
                 pos_conv_letter = --pos_conv_i;
 
                 /*No need to call `char_change_to_pair` because there not such chars here*/
@@ -515,7 +515,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
                 /*Finish on non-weak char*/
                 /*but treat number and currency related chars as weak*/
                 if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$' && letter != '%') {
-                    _lv_text_encoded_next(src, &i);   /*Rewind one letter*/
+                    lv_text_encoded_next(src, &i);   /*Rewind one letter*/
                     pos_conv_i++;
                     first_weak = i;
                     pos_conv_first_weak = pos_conv_i;
@@ -536,7 +536,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * 
 
         /*Simply store in reversed order*/
         else {
-            uint32_t letter_size = _lv_text_encoded_size((const char *)&src[i]);
+            uint32_t letter_size = lv_text_encoded_size((const char *)&src[i]);
             /*Swap arithmetical symbols*/
             if(letter_size == 1) {
                 uint32_t new_letter = letter = char_change_to_pair(letter);
@@ -585,7 +585,7 @@ static lv_base_dir_t bracket_process(lv_bidi_ctx_t * ctx, const char * txt, uint
              *If a char with base dir. direction is found then the brackets will have `base_dir` direction*/
             uint32_t txt_i = next_pos;
             while(txt_i < len) {
-                uint32_t letter_next = _lv_text_encoded_next(txt, &txt_i);
+                uint32_t letter_next = lv_text_encoded_next(txt, &txt_i);
                 if(letter_next == bracket_right[i]) {
                     /*Closing bracket found*/
                     break;
@@ -607,9 +607,9 @@ static lv_base_dir_t bracket_process(lv_bidi_ctx_t * ctx, const char * txt, uint
 
             /*If there were no matching strong chars in the brackets then check the previous chars*/
             txt_i = next_pos;
-            if(txt_i) _lv_text_encoded_prev(txt, &txt_i);
+            if(txt_i) lv_text_encoded_prev(txt, &txt_i);
             while(txt_i > 0) {
-                uint32_t letter_next = _lv_text_encoded_prev(txt, &txt_i);
+                uint32_t letter_next = lv_text_encoded_prev(txt, &txt_i);
                 lv_base_dir_t letter_dir = lv_bidi_get_letter_dir(letter_next);
                 if(letter_dir == LV_BASE_DIR_LTR || letter_dir == LV_BASE_DIR_RTL) {
                     bracket_dir = letter_dir;

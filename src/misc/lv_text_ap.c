@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_bidi.h"
-#include "lv_text.h"
+#include "lv_text_private.h"
 #include "lv_text_ap.h"
 #include "lv_types.h"
 #include "../stdlib/lv_mem.h"
@@ -114,12 +114,12 @@ uint32_t _lv_text_ap_calc_bytes_count(const char * txt)
     uint32_t i, j;
     uint32_t ch_enc;
 
-    txt_length = _lv_text_get_encoded_length(txt);
+    txt_length = lv_text_get_encoded_length(txt);
 
     i = 0;
     j = 0;
     while(i < txt_length) {
-        ch_enc = _lv_text_encoded_next(txt, &j);
+        ch_enc = lv_text_encoded_next(txt, &j);
         current_ap_idx = lv_ap_get_char_index(ch_enc);
 
         if(current_ap_idx != LV_UNDEF_ARABIC_PERSIAN_CHARS)
@@ -148,7 +148,7 @@ void _lv_text_ap_proc(const char * txt, char * txt_out)
     uint32_t * ch_fin;
     char * txt_out_temp;
 
-    txt_length = _lv_text_get_encoded_length(txt);
+    txt_length = lv_text_get_encoded_length(txt);
 
     ch_enc = (uint32_t *)lv_malloc(sizeof(uint32_t) * (txt_length + 1));
     ch_fin = (uint32_t *)lv_malloc(sizeof(uint32_t) * (txt_length + 1));
@@ -156,7 +156,7 @@ void _lv_text_ap_proc(const char * txt, char * txt_out)
     i = 0;
     j = 0;
     while(j < txt_length)
-        ch_enc[j++] = _lv_text_encoded_next(txt, &i);
+        ch_enc[j++] = lv_text_encoded_next(txt, &i);
 
     ch_enc[j] = 0;
 

@@ -252,7 +252,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
-    LV_ASSERT_MSG(canvas->draw_buf->header.cf != dest_buf->header.cf, "Color formats must be the same");
+    LV_ASSERT_MSG(canvas->draw_buf->header.cf == dest_buf->header.cf, "Color formats must be the same");
 
     lv_draw_buf_copy(canvas->draw_buf, canvas_area, dest_buf, dest_area);
 }
@@ -333,10 +333,12 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
+    if(layer->draw_task_head == NULL) return;
     while(layer->draw_task_head) {
         lv_draw_dispatch_wait_for_request();
         lv_draw_dispatch_layer(lv_obj_get_display(canvas), layer);
     }
+    lv_obj_invalidate(canvas);
 }
 
 /**********************

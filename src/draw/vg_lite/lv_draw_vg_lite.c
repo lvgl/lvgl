@@ -173,13 +173,13 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return -1;
     }
 
-    void * buf = lv_draw_layer_alloc_buf(layer);
-    if(!buf) {
+    /* Return if target buffer format is not supported. */
+    if(!lv_vg_lite_is_dest_cf_supported(layer->color_format)) {
         return -1;
     }
 
-    /* Return if target buffer format is not supported. */
-    if(!lv_vg_lite_is_dest_cf_supported(layer->draw_buf->header.cf)) {
+    void * buf = lv_draw_layer_alloc_buf(layer);
+    if(!buf) {
         return -1;
     }
 

@@ -19,6 +19,7 @@
 #include "../../misc/lv_anim.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_text_ap.h"
+#include "../../misc/lv_text_private.h"
 #include "../../stdlib/lv_string.h"
 
 /*********************
@@ -234,7 +235,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 
     /*Add delimiter to existing options*/
     if((insert_pos > 0) && (pos >= dropdown->option_cnt))
-        _lv_text_ins(dropdown->options, _lv_text_encoded_get_char_id(dropdown->options, insert_pos++), "\n");
+        lv_text_ins(dropdown->options, lv_text_encoded_get_char_id(dropdown->options, insert_pos++), "\n");
 
     /*Insert the new option, adding \n if necessary*/
     char * ins_buf = lv_malloc(ins_len + 2); /*+ 2 for terminating NULL and possible \n*/
@@ -247,7 +248,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 #endif
     if(pos < dropdown->option_cnt) lv_strcat(ins_buf, "\n");
 
-    _lv_text_ins(dropdown->options, _lv_text_encoded_get_char_id(dropdown->options, insert_pos), ins_buf);
+    lv_text_ins(dropdown->options, lv_text_encoded_get_char_id(dropdown->options, insert_pos), ins_buf);
     lv_free(ins_buf);
 
     dropdown->option_cnt++;

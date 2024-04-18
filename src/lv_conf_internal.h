@@ -305,6 +305,17 @@
     #endif
 #endif
 
+/* The stack size of the drawing thread.
+ * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
+ */
+#ifndef LV_DRAW_THREAD_STACK_SIZE
+    #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
+        #define LV_DRAW_THREAD_STACK_SIZE CONFIG_LV_DRAW_THREAD_STACK_SIZE
+    #else
+        #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /*[bytes]*/
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
@@ -405,15 +416,6 @@
                 #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
             #endif
         #endif
-    #endif
-#endif
-
-/* Set stack size of drawing thread. Unit is byte. If Thorvg is enabled, 128kB is required tested on simulator.*/
-#ifndef LV_DRAW_THREAD_STACKSIZE
-    #ifdef CONFIG_LV_DRAW_THREAD_STACKSIZE
-        #define LV_DRAW_THREAD_STACKSIZE CONFIG_LV_DRAW_THREAD_STACKSIZE
-    #else
-        #define LV_DRAW_THREAD_STACKSIZE 32768
     #endif
 #endif
 
@@ -1298,6 +1300,13 @@
         #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Persian letters and all their forms*/
     #endif
 #endif
+#ifndef LV_FONT_SIMSUN_14_CJK
+    #ifdef CONFIG_LV_FONT_SIMSUN_14_CJK
+        #define LV_FONT_SIMSUN_14_CJK CONFIG_LV_FONT_SIMSUN_14_CJK
+    #else
+        #define LV_FONT_SIMSUN_14_CJK            0  /*1000 most common CJK radicals*/
+    #endif
+#endif
 #ifndef LV_FONT_SIMSUN_16_CJK
     #ifdef CONFIG_LV_FONT_SIMSUN_16_CJK
         #define LV_FONT_SIMSUN_16_CJK CONFIG_LV_FONT_SIMSUN_16_CJK
@@ -1608,6 +1617,13 @@
             #endif
         #else
             #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
+        #endif
+    #endif
+    #ifndef LV_USE_CALENDAR_CHINESE
+        #ifdef CONFIG_LV_USE_CALENDAR_CHINESE
+            #define LV_USE_CALENDAR_CHINESE CONFIG_LV_USE_CALENDAR_CHINESE
+        #else
+            #define LV_USE_CALENDAR_CHINESE 0
         #endif
     #endif
 #endif  /*LV_USE_CALENDAR*/
@@ -3298,6 +3314,17 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #ifndef LV_USE_THORVG
     #define LV_USE_THORVG  (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+#endif
+
+#if LV_USE_OS
+    #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
+        #warning "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
+    #endif
+
+    #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)
+        #warning "LV_DRAW_THREAD_STACKSIZE was renamed to LV_DRAW_THREAD_STACK_SIZE. Please update lv_conf.h or run menuconfig again."
+        #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
+    #endif
 #endif
 
 /*If running without lv_conf.h add typedefs with default value*/

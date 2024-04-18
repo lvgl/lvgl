@@ -16,7 +16,7 @@ void setUp(void)
 
 void tearDown(void)
 {
-    /* Function run after every test */
+    lv_obj_clean(active_screen);
 }
 
 void test_textarea_should_have_valid_documented_default_values(void)
@@ -102,6 +102,35 @@ void test_textarea_in_one_line_mode_should_ignore_line_break_characters(void)
 
     lv_textarea_add_char(textarea, '\r');
     TEST_ASSERT_EQUAL_STRING(textarea_default_text, lv_textarea_get_text(textarea));
+}
+
+void test_textarea_should_hide_password_characters(void)
+{
+    lv_textarea_set_password_mode(textarea, true);
+    lv_textarea_set_text(textarea, "12345");
+
+    /* setting bullet hides characters */
+    lv_textarea_set_password_bullet(textarea, "O");
+    TEST_ASSERT_EQUAL_STRING("OOOOO", lv_label_get_text(lv_textarea_get_label(textarea)));
+
+    /* setting text hides characters */
+    lv_textarea_set_text(textarea, "A");
+    TEST_ASSERT_EQUAL_STRING("O", lv_label_get_text(lv_textarea_get_label(textarea)));
+
+    lv_textarea_add_char(textarea, 'B');
+    TEST_ASSERT_EQUAL_STRING("OB", lv_label_get_text(lv_textarea_get_label(textarea)));
+
+    /* setting show time hides characters */
+    /* current behavior is to hide the characters upon setting the show time regardless of the value */
+    lv_textarea_set_password_show_time(textarea, lv_textarea_get_password_show_time(textarea));
+    TEST_ASSERT_EQUAL_STRING("OO", lv_label_get_text(lv_textarea_get_label(textarea)));
+
+    lv_textarea_set_password_mode(textarea, false);
+    TEST_ASSERT_EQUAL_STRING("AB", lv_label_get_text(lv_textarea_get_label(textarea)));
+
+    /* enabling password mode hides characters */
+    lv_textarea_set_password_mode(textarea, true);
+    TEST_ASSERT_EQUAL_STRING("OO", lv_label_get_text(lv_textarea_get_label(textarea)));
 }
 
 #endif

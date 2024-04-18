@@ -19,6 +19,9 @@
 /*********************
  *      DEFINES
  *********************/
+
+#define DECODER_NAME    "FFMPEG"
+
 #if LV_COLOR_DEPTH == 8
     #define AV_PIX_FMT_TRUE_COLOR AV_PIX_FMT_RGB8
 #elif LV_COLOR_DEPTH == 16
@@ -112,6 +115,8 @@ void lv_ffmpeg_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+
+    dec->name = DECODER_NAME;
 
 #if LV_FFMPEG_AV_DUMP_FORMAT == 0
     av_log_set_level(AV_LOG_QUIET);

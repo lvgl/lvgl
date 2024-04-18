@@ -907,6 +907,10 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->longpr_rep_timestamp = lv_tick_get();
 
             if(data->key == LV_KEY_ENTER) {
+                /* Always send event to indev callbacks*/
+                lv_indev_send_event(indev_act, LV_EVENT_LONG_PRESSED, indev_obj_act);
+                if(indev_reset_check(indev_act)) return;
+
                 bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
                                               lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -922,7 +926,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 /*If not editable then just send a long press event*/
                 else {
                     if(is_enabled) {
-                        if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
+                        lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED, indev_act);
+                        if(indev_reset_check(indev_act)) return;
                     }
                 }
             }

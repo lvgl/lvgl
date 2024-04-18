@@ -81,7 +81,7 @@ void lv_example_scale_3(void)
     lv_scale_set_rotation(scale_img, 135);
 
     /* image must point to the right. E.g. -O------>*/
-    needle_img = lv_img_create(scale_img);
+    needle_img = lv_image_create(scale_img);
     lv_image_set_src(needle_img, &img_hand);
     lv_obj_align(needle_img, LV_ALIGN_CENTER, 47, -2);
     lv_image_set_pivot(needle_img, 3, 4);
