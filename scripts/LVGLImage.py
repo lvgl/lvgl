@@ -841,9 +841,9 @@ const lv_image_dsc_t {varname} = {{
             A = row[3::4]
             for r, g, b, a in zip(R, G, B, A):
                 r, g, b, a = color_pre_multiply(r, g, b, a, self.background)
-                r = self.sRGB_to_linear(r/255.0)
-                g = self.sRGB_to_linear(g/255.0)
-                b = self.sRGB_to_linear(b/255.0)
+                r = self.sRGB_to_linear(r / 255.0)
+                g = self.sRGB_to_linear(g / 255.0)
+                b = self.sRGB_to_linear(b / 255.0)
                 luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
                 rawdata += uint8_t(int(self.linear_to_sRGB(luma)*255))
 
