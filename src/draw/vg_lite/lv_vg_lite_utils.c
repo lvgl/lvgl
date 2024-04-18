@@ -714,7 +714,7 @@ vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
 
 vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode)
 {
-    if(lv_vg_lite_support_blend_normal()) {
+    if(vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
                 return VG_LITE_BLEND_NORMAL_LVGL;
@@ -735,6 +735,9 @@ vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode)
 
     switch(blend_mode) {
         case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
+            if(vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
+                return VG_LITE_BLEND_PREMULTIPLY_SRC_OVER;
+            }
             return VG_LITE_BLEND_SRC_OVER;
 
         case LV_BLEND_MODE_ADDITIVE: /**< Add the respective color channels*/
@@ -915,7 +918,15 @@ bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix)
 
 bool lv_vg_lite_support_blend_normal(void)
 {
-    return vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT);
+    if(vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
+        return true;
+    }
+
+    if(vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
+        return true;
+    }
+
+    return false;
 }
 
 bool lv_vg_lite_16px_align(void)
