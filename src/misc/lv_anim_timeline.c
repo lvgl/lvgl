@@ -92,7 +92,7 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     uint32_t end = at->reverse ? 0 : playtime;
     uint32_t duration = end > start ? end - start : start - end;
 
-    if( (!at->reverse && at->act_time == 0) || (at->reverse && at->act_time== playtime ) )
+    if((!at->reverse && at->act_time == 0) || (at->reverse && at->act_time== playtime) )
     {
         for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
             at->anim_dsc[i].is_started   = false;
@@ -180,12 +180,15 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
 
         uint32_t start_time = at->anim_dsc[i].start_time;
         int32_t value = 0;
-        
+
         if(act_time < start_time && a->early_apply) {
-            if(at->reverse){
-                if(!at->anim_dsc[i].is_started && a->start_cb) a->start_cb(a);
+            if(at->reverse) {
+                if(!at->anim_dsc[i].is_started && a->start_cb) {
+                    a->start_cb(a);
+                }
                 at->anim_dsc[i].is_started   = true;
-            }else{
+            } 
+            else {
                 at->anim_dsc[i].is_started   = false;
             }
 
@@ -193,45 +196,56 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
             if(a->exec_cb) a->exec_cb(a->var, value);
             if(a->custom_exec_cb) a->custom_exec_cb(a, value);
 
-            if(at->reverse){
-                if(!at->anim_dsc[i].is_completed && a->completed_cb) a->completed_cb(a);
+            if(at->reverse) {
+                if(!at->anim_dsc[i].is_completed && a->completed_cb) {
+                    a->completed_cb(a);
+                }
                 at->anim_dsc[i].is_completed = true;
-            }else{
+            }
+            else {
                 at->anim_dsc[i].is_completed = false;
             }
         }
         else if(act_time >= start_time && act_time <= (start_time + a->duration)) {
-
-            if(!at->anim_dsc[i].is_started &&  a->start_cb ) a->start_cb(a);
+            if(!at->anim_dsc[i].is_started &&  a->start_cb ) {
+                a->start_cb(a);
+            }
             at->anim_dsc[i].is_started = true;
-
 
             a->act_time = act_time - start_time;
             value = a->path_cb(a);
             if(a->exec_cb) a->exec_cb(a->var, value);
             if(a->custom_exec_cb) a->custom_exec_cb(a, value);
 
-            if(at->reverse){
+            if(at->reverse) {
                 if(act_time == start_time) {
-                    if(!at->anim_dsc[i].is_completed && a->completed_cb) a->completed_cb(a);
+                    if(!at->anim_dsc[i].is_completed && a->completed_cb) {
+                        a->completed_cb(a);
+                    }
                     at->anim_dsc[i].is_completed = true;
-                }else{
+                } else {
                     at->anim_dsc[i].is_completed = false;
                 }
-            }else{
+            }
+            else {
                 if(act_time == (start_time + a->duration)) {
-                    if(!at->anim_dsc[i].is_completed && a->completed_cb) a->completed_cb(a);
+                    if(!at->anim_dsc[i].is_completed && a->completed_cb) {
+                        a->completed_cb(a);
+                    }
                     at->anim_dsc[i].is_completed = true;
-                }else{
+                } else {
                     at->anim_dsc[i].is_completed = false;
                 }
             }
         }
         else if(act_time > start_time + a->duration) {
-            if(at->reverse){
+            if(at->reverse) {
                 at->anim_dsc[i].is_started   = false;
-            }else{
-                if(!at->anim_dsc[i].is_started   && a->start_cb)     a->start_cb(a);
+            }
+            else {
+                if(!at->anim_dsc[i].is_started && a->start_cb) {
+                    a->start_cb(a);
+                }
                 at->anim_dsc[i].is_started   = true;
             }
 
@@ -239,10 +253,13 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
             if(a->exec_cb) a->exec_cb(a->var, value);
             if(a->custom_exec_cb) a->custom_exec_cb(a, value);
 
-            if(at->reverse){
+            if(at->reverse) {
                 at->anim_dsc[i].is_completed = false;
-            }else{
-                if(!at->anim_dsc[i].is_completed && a->completed_cb) a->completed_cb(a);
+            }
+            else {
+                if(!at->anim_dsc[i].is_completed && a->completed_cb) {
+                    a->completed_cb(a);
+                }
                 at->anim_dsc[i].is_completed = true;
             }
         }
