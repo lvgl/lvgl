@@ -3,7 +3,7 @@ Renesas
 =======
 
 `Renesas <https://renesas.com/>`__ is an official partner of LVGL.
-Therefore, LVGL contains built-in support for `Dave2D <https://lpccs-docs.renesas.com/DA1470x/UM-B-157_DA1470x-GPU-API-Manual/files/doc/overview-txt.html>`__ (the GPU of Renesas)
+Therefore, LVGL contains built-in support for `Dave2D <https://www.renesas.com/document/mas/tes-dave2d-driver-documentation>`__ (the GPU of Renesas)
 and LVGL also hosts ready-to-use Renesas projects.
 
 Dave2D
@@ -46,7 +46,7 @@ LVGL provides a ready-to-use project for the `EK-RA8D1 <https://www.renesas.com/
 - 4.5 Inch backlit TFT display, 16.7M display colors
 - 480x854 pixels resolution
 
-To get a ready-to-use project, clone the [lv_renesas](https://github.com/lvgl/lv_renesas.git) repository:
+To get a ready-to-use project, clone the `lv_renesas <https://github.com/lvgl/lv_renesas.git>`__ repository:
 
 .. code:: shell
   git clone https://github.com/lvgl/lv_renesas.git --recurse-submodules
