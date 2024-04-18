@@ -25,10 +25,16 @@ file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_R
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
-target_compile_definitions(
-  lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
-              $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>
-              $<$<COMPILE_LANGUAGE:ASM>:__ASSEMBLY__>)
+if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+  target_compile_definitions(
+    lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
+                $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>
+                $<$<COMPILE_LANGUAGE:ASM>:__ASSEMBLY__>)
+else()
+  target_compile_definitions(
+    lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
+                $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>)
+endif()
 
 # Add definition of LV_CONF_PATH only if needed
 if(LV_CONF_PATH)
@@ -51,7 +57,9 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     target_link_libraries(lvgl_thorvg PUBLIC lvgl)
 endif()
 
-set_source_files_properties(${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/vg_lite_tvg.cpp PROPERTIES COMPILE_FLAGS -Wunused-parameter)
+if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+  set_source_files_properties(${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/vg_lite_tvg.cpp PROPERTIES COMPILE_FLAGS -Wunused-parameter)
+endif()
 
 # Build LVGL example library
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)

@@ -19,6 +19,7 @@ extern "C" {
 #include "libs/freetype/lv_freetype_private.h"
 #include "misc/cache/lv_cache_entry_private.h"
 #include "misc/cache/lv_cache_private.h"
+#include "drivers/windows/lv_windows_input_private.h"
 
 /*********************
  *      DEFINES

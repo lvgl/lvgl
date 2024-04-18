@@ -16,6 +16,7 @@
 #include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_grad.h"
+#include <float.h>
 
 /*********************
  *      DEFINES
@@ -290,10 +291,10 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
     lv_vg_lite_path_set_quality(dest, lv_quality_to_vg(src->quality));
 
     /* init bounds */
-    float min_x = __FLT_MAX__;
-    float min_y = __FLT_MAX__;
-    float max_x = __FLT_MIN__;
-    float max_y = __FLT_MIN__;
+    float min_x = FLT_MAX;
+    float min_y = FLT_MAX;
+    float max_x = FLT_MIN;
+    float max_y = FLT_MIN;
 
 #define CMP_BOUNDS(point)                           \
     do {                                            \

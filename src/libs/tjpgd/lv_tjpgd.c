@@ -223,7 +223,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     if(decoded_area->y1 == LV_COORD_MIN) {
         decoded_area->y1 = 0;
         decoded_area->y2 = my - 1;
-        decoded_area->x1 = -mx;
+        decoded_area->x1 = -((int32_t)mx);
         decoded_area->x2 = -1;
         jd->scale = 0;
         jd->dcv[2] = jd->dcv[1] = jd->dcv[0] = 0;   /* Initialize DC values */
