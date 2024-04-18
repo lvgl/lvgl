@@ -136,44 +136,60 @@ endif()
 set(COMPILE_OPTIONS
     -DLV_CONF_PATH=${LVGL_TEST_DIR}/src/lv_test_conf.h
     -DLV_BUILD_TEST
-    -pedantic-errors
-    -Wall
-    -Wclobbered
-    -Wdeprecated
-    -Wdouble-promotion
-    -Wempty-body
-    -Werror
-    -Wextra
-    -Wformat-security
-    -Wmaybe-uninitialized
-    -Wmissing-prototypes
-    -Wpointer-arith
-    -Wmultichar
-    -Wpedantic
-    -Wreturn-type
-    -Wshadow
-    -Wshift-negative-value
-    -Wsizeof-pointer-memaccess
-    #-Wstack-usage=6000
-    -Wtype-limits
-    -Wundef
-    -Wuninitialized
-    -Wunreachable-code
-    -Werror=float-conversion
-    -Werror=strict-aliasing
-    -Wno-double-promotion
-    -Wno-unused-but-set-parameter
-    -Wno-unreachable-code
+    ${BUILD_OPTIONS}
+    ${BUILD_TARGET_DEF}
+)
+
+if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+    list(APPEND COMPILE_OPTIONS
+        -pedantic-errors
+        -Wall
+        -Wclobbered
+        -Wdeprecated
+        -Wdouble-promotion
+        -Wempty-body
+        -Werror
+        -Wextra
+        -Wformat-security
+        -Wmaybe-uninitialized
+        -Wmissing-prototypes
+        -Wpointer-arith
+        -Wmultichar
+        -Wpedantic
+        -Wreturn-type
+        -Wshadow
+        -Wshift-negative-value
+        -Wsizeof-pointer-memaccess
+        #-Wstack-usage=6000
+        -Wtype-limits
+        -Wundef
+        -Wuninitialized
+        -Wunreachable-code
+        -Werror=float-conversion
+        -Werror=strict-aliasing
+        -Wno-double-promotion
+        -Wno-unused-but-set-parameter
+        -Wno-unreachable-code
+    )
+else()
+    list(APPEND COMPILE_OPTIONS
+        /W3         # enable all "production quality" warnings
+        /we4013     # treat function undefined as error
+    )
+endif()
+
+list(APPEND COMPILE_OPTIONS
     ${BUILD_OPTIONS}
     ${BUILD_TARGET_DEF}
 )
 
 filter_compiler_options(C LVGL_C_COMPILE_OPTIONS ${COMPILE_OPTIONS})
 
-# Options test cases are compiled with.
-filter_compiler_options(C LVGL_TESTFILE_COMPILE_OPTIONS ${LVGL_C_COMPILE_OPTIONS} -Wno-missing-prototypes)
+if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+    # Options test cases are compiled with.
+    filter_compiler_options(C LVGL_TESTFILE_COMPILE_OPTIONS ${LVGL_C_COMPILE_OPTIONS} -Wno-missing-prototypes)
 
-filter_compiler_options(CXX LVGL_CXX_COMPILE_OPTIONS
+    filter_compiler_options(CXX LVGL_CXX_COMPILE_OPTIONS
         ${COMPILE_OPTIONS}
         -Wno-shadow
         -Wno-unused-parameter
@@ -182,14 +198,24 @@ filter_compiler_options(CXX LVGL_CXX_COMPILE_OPTIONS
         -Wno-deprecated-copy-with-user-provided-dtor
         -Wno-float-conversion
         -Wno-pedantic
-)
+    )
+else()
+    # Options test cases are compiled with.
+    filter_compiler_options(C LVGL_TESTFILE_COMPILE_OPTIONS ${LVGL_C_COMPILE_OPTIONS})
+
+    filter_compiler_options(CXX LVGL_CXX_COMPILE_OPTIONS
+        ${COMPILE_OPTIONS}
+    )
+endif()
 
 get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 
 # Include lvgl project file.
 include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:C>: ${LVGL_C_COMPILE_OPTIONS}>)
-target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:ASM>: ${LVGL_C_COMPILE_OPTIONS}>)
+if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+    target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:ASM>: ${LVGL_C_COMPILE_OPTIONS}>)
+endif()
 target_compile_options(lvgl PUBLIC $<$<COMPILE_LANGUAGE:CXX>: ${LVGL_CXX_COMPILE_OPTIONS}>)
 if (TARGET lvgl_examples)
   target_compile_options(lvgl_examples PUBLIC ${LVGL_C_COMPILE_OPTIONS})

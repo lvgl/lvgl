@@ -218,10 +218,10 @@ bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path)
     lv_vg_lite_path_bounds_t bounds;
 
     /* init bounds */
-    bounds.min_x = __FLT_MAX__;
-    bounds.min_y = __FLT_MAX__;
-    bounds.max_x = __FLT_MIN__;
-    bounds.max_y = __FLT_MIN__;
+    bounds.min_x = FLT_MAX;
+    bounds.min_y = FLT_MAX;
+    bounds.max_x = FLT_MIN;
+    bounds.max_y = FLT_MIN;
 
     /* calc bounds */
     lv_vg_lite_path_for_each_data(lv_vg_lite_path_get_path(path), path_bounds_iter_cb, &bounds);

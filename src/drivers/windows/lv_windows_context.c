@@ -9,7 +9,10 @@
 
 #include "lv_windows_context.h"
 #if LV_USE_WINDOWS
+
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
 
 #include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
@@ -257,7 +260,7 @@ static void lv_windows_display_timer_callback(lv_timer_t * timer)
                 context->display_device_object,
                 context->display_framebuffer_base,
                 NULL,
-                context->display_framebuffer_size,
+                (uint32_t)context->display_framebuffer_size,
                 LV_DISPLAY_RENDER_MODE_DIRECT);
         }
     }

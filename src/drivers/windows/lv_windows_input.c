@@ -9,7 +9,10 @@
 
 #include "lv_windows_input.h"
 #if LV_USE_WINDOWS
+
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
 
 #include "lv_windows_context.h"
 #include "lv_windows_display.h"
