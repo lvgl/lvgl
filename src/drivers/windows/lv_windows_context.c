@@ -11,7 +11,7 @@
 #if LV_USE_WINDOWS
 
 #ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wcast-function-type"
+    #pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif
 
 #include "lv_windows_display.h"
