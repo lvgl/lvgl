@@ -171,7 +171,6 @@ uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
 static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_time)
 {
     at->act_time = act_time;
-    uint32_t playtime = lv_anim_timeline_get_playtime(at);
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_t * a = &(at->anim_dsc[i].anim);
 
