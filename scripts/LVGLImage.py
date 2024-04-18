@@ -845,7 +845,7 @@ const lv_image_dsc_t {varname} = {{
                 g = self.sRGB_to_linear(g / 255.0)
                 b = self.sRGB_to_linear(b / 255.0)
                 luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
-                rawdata += uint8_t(int(self.linear_to_sRGB(luma)*255))
+                rawdata += uint8_t(int(self.linear_to_sRGB(luma) * 255))
 
         self.set_data(ColorFormat.L8, w, h, rawdata)
 
