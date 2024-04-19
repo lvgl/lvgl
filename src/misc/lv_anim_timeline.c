@@ -92,8 +92,7 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     uint32_t end = at->reverse ? 0 : playtime;
     uint32_t duration = end > start ? end - start : start - end;
 
-    if((!at->reverse && at->act_time == 0) || (at->reverse && at->act_time == playtime))
-    {
+    if((!at->reverse && at->act_time == 0) || (at->reverse && at->act_time == playtime)) {
         for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
             at->anim_dsc[i].is_started   = 0;
             at->anim_dsc[i].is_completed = 0;
@@ -171,7 +170,7 @@ uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
 static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_time)
 {
     at->act_time = act_time;
-    bool anim_timeline_is_started = (lv_anim_get(at, anim_timeline_exec_cb)!=NULL);
+    bool anim_timeline_is_started = (lv_anim_get(at, anim_timeline_exec_cb) != NULL);
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_timeline_dsc_t * anim_dsc = &(at->anim_dsc[i]);
         lv_anim_t * a = &(anim_dsc->anim);
@@ -188,7 +187,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
                 if(at->reverse) {
                     if(!anim_dsc->is_started && a->start_cb)  a->start_cb(a);
                     anim_dsc->is_started = 1;
-                } 
+                }
                 else {
                     anim_dsc->is_started = 0;
                 }
@@ -224,7 +223,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
                     if(act_time == start_time) {
                         if(!anim_dsc->is_completed && a->completed_cb) a->completed_cb(a);
                         anim_dsc->is_completed = 1;
-                    } 
+                    }
                     else {
                         anim_dsc->is_completed = 0;
                     }
@@ -233,7 +232,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
                     if(act_time == (start_time + a->duration)) {
                         if(!anim_dsc->is_completed && a->completed_cb) a->completed_cb(a);
                         anim_dsc->is_completed = 1;
-                    } 
+                    }
                     else {
                         anim_dsc->is_completed = 0;
                     }
