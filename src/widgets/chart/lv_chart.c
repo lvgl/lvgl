@@ -455,15 +455,25 @@ void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t val
     lv_chart_refresh(obj);
 }
 
-void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
+void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value,int32_t space_len)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     ser->y_points[ser->start_point] = value;
+    // If optimization isn't enabled or chart data series aren't updated synchronously, this part makes disturbances.  
+    for (int32_t i = 1; i < space_len; i++)
+    {
+        if(ser->start_point+i < chart->point_cnt)
+        	ser->y_points[ser->start_point + i] = LV_CHART_POINT_NONE;
+        else
+            ser->y_points[ser->start_point + i - chart->point_cnt] = LV_CHART_POINT_NONE;
+    }
     invalidate_point(obj, ser->start_point);
-    ser->start_point = (ser->start_point + 1) % chart->point_cnt;
+    ser->start_point++;
+    if(ser->start_point >= chart->point_cnt)
+        ser->start_point = 0;
     invalidate_point(obj, ser->start_point);
 }
 
@@ -869,6 +879,10 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                             y_min = y_cur;  /*Start the line of the next x from the current last y*/
                             y_max = y_cur;
                         }
+                    }
+                    else if(ser->y_points[p_prev] == LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE){
+                    	y_min = p2.y;
+                    	y_max = p2.y;
                     }
                 }
                 else {
