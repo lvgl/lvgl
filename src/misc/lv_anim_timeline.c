@@ -95,8 +95,8 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     if((!at->reverse && at->act_time == 0) || (at->reverse && at->act_time == playtime))
     {
         for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
-            at->anim_dsc[i].is_started   = false;
-            at->anim_dsc[i].is_completed = false;
+            at->anim_dsc[i].is_started   = 0;
+            at->anim_dsc[i].is_completed = 0;
         }
     }
 
@@ -201,10 +201,10 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
             if(anim_timeline_is_started) {
                 if(at->reverse) {
                     if(!anim_dsc->is_completed && a->completed_cb) a->completed_cb(a);
-                    anim_dsc->is_completed = true;
+                    anim_dsc->is_completed = 1;
                 }
                 else {
-                    anim_dsc->is_completed = false;
+                    anim_dsc->is_completed = 0;
                 }
             }
         }
@@ -223,19 +223,19 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
                 if(at->reverse) {
                     if(act_time == start_time) {
                         if(!anim_dsc->is_completed && a->completed_cb) a->completed_cb(a);
-                        anim_dsc->is_completed = true;
+                        anim_dsc->is_completed = 1;
                     } 
                     else {
-                        anim_dsc->is_completed = false;
+                        anim_dsc->is_completed = 0;
                     }
                 }
                 else {
                     if(act_time == (start_time + a->duration)) {
                         if(!anim_dsc->is_completed && a->completed_cb) a->completed_cb(a);
-                        anim_dsc->is_completed = true;
+                        anim_dsc->is_completed = 1;
                     } 
                     else {
-                        anim_dsc->is_completed = false;
+                        anim_dsc->is_completed = 0;
                     }
                 }
             }
@@ -243,11 +243,11 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
         else if(act_time > start_time + a->duration) {
             if(anim_timeline_is_started) {
                 if(at->reverse) {
-                    anim_dsc->is_started = false;
+                    anim_dsc->is_started = 0;
                 }
                 else {
                     if(!anim_dsc->is_started && a->start_cb) a->start_cb(a);
-                    anim_dsc->is_started = true;
+                    anim_dsc->is_started = 1;
                 }
             }
 
@@ -257,11 +257,11 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
 
             if(anim_timeline_is_started) {
                 if(at->reverse) {
-                    anim_dsc->is_completed = false;
+                    anim_dsc->is_completed = 0;
                 }
                 else {
                     if(!anim_dsc->is_completed && a->completed_cb) a->completed_cb(a);
-                    anim_dsc->is_completed = true;
+                    anim_dsc->is_completed = 1;
                 }
             }
         }
