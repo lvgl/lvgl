@@ -246,4 +246,41 @@ void test_roller_with_overlay_and_bubble_events_enabled(void)
 //    TEST_ASSERT_NOT_EQUAL(0, lv_roller_get_selected(roller_mouse));
 //}
 
+void test_roller_appearance(void)
+{
+    /* use a number, a symbol, a high letter, a low letter */
+    const char * opts = "0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n";
+
+    lv_obj_add_flag(roller_mouse, LV_OBJ_FLAG_HIDDEN);
+
+    lv_obj_t * rollers[4] = {roller, roller_infinite};
+    int i = 2;
+
+    /* main part and selected part same size font */
+    lv_obj_set_pos(roller, 20, 20);
+    lv_roller_set_options(roller, opts, LV_ROLLER_MODE_NORMAL);
+    lv_obj_set_pos(roller_infinite, 20, 200);
+    lv_roller_set_options(roller_infinite, opts, LV_ROLLER_MODE_INFINITE);
+
+    lv_obj_t * r = lv_roller_create(active_screen);
+    lv_obj_set_pos(r, 150, 20);
+    lv_roller_set_options(r, opts, LV_ROLLER_MODE_NORMAL);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_8, LV_PART_SELECTED);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_48, LV_PART_SELECTED);
+    rollers[i++] = r;
+    r = lv_roller_create(active_screen);
+    lv_obj_set_pos(r, 150, 200);
+    lv_roller_set_options(r, opts, LV_ROLLER_MODE_INFINITE);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_8, LV_PART_SELECTED);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_48, LV_PART_SELECTED);
+    rollers[i++] = r;
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_2.png");
+
+    // lv_roller_set_selected(roller, lv_roller_get_option_count(roller) - 1, LV_ANIM_OFF);
+    // lv_roller_set_selected(roller_infinite, lv_roller_get_option_count(roller_infinite) - 1, LV_ANIM_OFF);
+
+    // TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_3.png");
+}
+
 #endif
