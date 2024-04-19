@@ -463,8 +463,7 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t va
     lv_chart_t * chart  = (lv_chart_t *)obj;
     ser->y_points[ser->start_point] = value;
     // If optimization isn't enabled or chart data series aren't updated synchronously, this part makes disturbances.  
-    for (int32_t i = 1; i < 10; i++)
-    {
+    for (int32_t i = 1; i < 10; i++) {
         if(ser->start_point+i < chart->point_cnt)
         	ser->y_points[ser->start_point + i] = LV_CHART_POINT_NONE;
         else
@@ -881,8 +880,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                         }
                     }
                     else if(ser->y_points[p_prev] == LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                    	y_min = line_dsc.p2.y;
-                    	y_max = line_dsc.p2.y;
+                    	 y_min = line_dsc.p2.y;
+                    	 y_max = line_dsc.p2.y;
                     }
                 }
                 else {
