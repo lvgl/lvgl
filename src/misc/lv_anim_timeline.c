@@ -211,7 +211,7 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
         else if(act_time >= start_time && act_time <= (start_time + a->duration)) {
             if(anim_timeline_is_started) {
                 if(!anim_dsc->is_started && a->start_cb) a->start_cb(a);
-                anim_dsc->is_started = true;
+                anim_dsc->is_started = 1;
             }
 
             a->act_time = act_time - start_time;
