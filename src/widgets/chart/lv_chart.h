@@ -314,7 +314,7 @@ void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t val
  * @param ser       pointer to a data series on 'chart'
  * @param value     the new value of the next data
  */
-void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value,int32_t space_len);
+void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value);
 
 /**
  * Set the next point's X and Y value according to the update mode policy.
