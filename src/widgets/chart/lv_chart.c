@@ -881,8 +881,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                         }
                     }
                     else if(ser->y_points[p_prev] == LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE){
-                    	y_min = p2.y;
-                    	y_max = p2.y;
+                    	y_min = line_dsc.p2.y;
+                    	y_max = line_dsc.p2.y;
                     }
                 }
                 else {
