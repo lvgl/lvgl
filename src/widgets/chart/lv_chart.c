@@ -455,7 +455,7 @@ void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t val
     lv_chart_refresh(obj);
 }
 
-void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value,int32_t space_len)
+void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
@@ -463,7 +463,7 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t va
     lv_chart_t * chart  = (lv_chart_t *)obj;
     ser->y_points[ser->start_point] = value;
     // If optimization isn't enabled or chart data series aren't updated synchronously, this part makes disturbances.  
-    for (int32_t i = 1; i < space_len; i++)
+    for (int32_t i = 1; i < 10; i++)
     {
         if(ser->start_point+i < chart->point_cnt)
         	ser->y_points[ser->start_point + i] = LV_CHART_POINT_NONE;
