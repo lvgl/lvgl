@@ -96,6 +96,11 @@ static inline void lv_global_init(lv_global_t * global)
     global->event_last_register_id = _LV_EVENT_LAST;
     lv_rand_set_seed(0x1234ABCD);
 
+#ifdef LV_LOG_PRINT_CB
+    void LV_LOG_PRINT_CB(lv_log_level_t, const char * txt);
+    global->custom_log_print_cb = LV_LOG_PRINT_CB;
+#endif
+
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     global->sw_shadow_cache.cache_size = -1;
     global->sw_shadow_cache.cache_r = -1;
