@@ -121,7 +121,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
         const uint32_t * size = ((uint32_t *)img_dsc->data) + 4;
         const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
         if(data_size < sizeof(magic)) return LV_RESULT_INVALID;
-        if(memcmp(magic, img_dsc->data, sizeof(magic))) return LV_RESULT_INVALID;
+        if(lv_memcmp(magic, img_dsc->data, sizeof(magic))) return LV_RESULT_INVALID;
 
         header->cf = LV_COLOR_FORMAT_ARGB8888;
 
