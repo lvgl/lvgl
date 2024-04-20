@@ -819,6 +819,16 @@ const lv_image_dsc_t {varname} = {{
                 rawdata += row
 
         self.set_data(cf, w, h, rawdata)
+    
+    def sRGB_to_linear(self, x):
+        if x < 0.04045:
+            return x / 12.92
+        return pow((x + 0.055) / 1.055, 2.4)
+
+    def linear_to_sRGB(self, y):
+        if y <= 0.0031308:
+            return 12.92 * y
+        return 1.055 * pow(y, 1 / 2.4) - 0.055
 
     def _png_to_luma_only(self, cf: ColorFormat, filename: str):
         reader = png.Reader(str(filename))
@@ -831,8 +841,11 @@ const lv_image_dsc_t {varname} = {{
             A = row[3::4]
             for r, g, b, a in zip(R, G, B, A):
                 r, g, b, a = color_pre_multiply(r, g, b, a, self.background)
+                r = self.sRGB_to_linear(r / 255.0)
+                g = self.sRGB_to_linear(g / 255.0)
+                b = self.sRGB_to_linear(b / 255.0)
                 luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
-                rawdata += uint8_t(int(luma))
+                rawdata += uint8_t(int(self.linear_to_sRGB(luma) * 255))
 
         self.set_data(ColorFormat.L8, w, h, rawdata)
 
