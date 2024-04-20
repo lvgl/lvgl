@@ -137,7 +137,7 @@ struct _lv_image_decoder_dsc_t {
     /**The decoder which was able to open the image source*/
     lv_image_decoder_t * decoder;
 
-    /*A copy of parameters of how this image is decoded*/
+    /**A copy of parameters of how this image is decoded*/
     lv_image_decoder_args_t args;
 
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_image_dsc_t` variable*/
@@ -151,7 +151,7 @@ struct _lv_image_decoder_dsc_t {
 
     /** Pointer to a draw buffer where the image's data (pixels) are stored in a decoded, plain format.
      *  MUST be set in `open` or `get_area_cb`function*/
-    const lv_draw_buf_t * decoded;    /*A draw buffer to described decoded image.*/
+    const lv_draw_buf_t * decoded;
 
     const lv_color32_t * palette;
     uint32_t palette_size;
