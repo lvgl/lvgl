@@ -388,13 +388,13 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     lv_anim_set_duration(&anim2, 100);
     lv_anim_set_path_cb(&anim2, lv_anim_path_ease_in);
     lv_anim_set_exec_cb(&anim2, anim2_exec_cb);
-    lv_anim_set_start_cb(&anim1, anim2_start);
+    lv_anim_set_start_cb(&anim2, anim2_start);
     lv_anim_set_completed_cb(&anim2, anim2_completed);
 
     lv_memcpy(&anim3, &anim1, sizeof(anim1));
     lv_anim_set_duration(&anim3, 200);
     lv_anim_set_exec_cb(&anim3, anim3_exec_cb);
-    lv_anim_set_start_cb(&anim1, anim3_start);
+    lv_anim_set_start_cb(&anim3, anim3_start);
     lv_anim_set_completed_cb(&anim3, anim3_completed);
 
     lv_anim_timeline_t * timeline = lv_anim_timeline_create();
