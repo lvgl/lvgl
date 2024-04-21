@@ -43,9 +43,9 @@ static void test_move_mouse(lv_point_t * point, uint8_t size)
 {
     lv_point_t * p = point;
 
-    for(uint8_t j = 0; i < TEST_HOVER_COUNTS; j++) {
+    for(uint8_t j = 0; j < TEST_HOVER_COUNTS; j++) {
         for(uint8_t i = 0; i < size; i++) {
-            lv_test_mouse_move_to(p[i]->x, p[i]->y);
+            lv_test_mouse_move_to(p[i].x, p[i].y);
             lv_test_indev_wait(50);
         }
     }
@@ -54,24 +54,24 @@ static void test_move_mouse(lv_point_t * point, uint8_t size)
 void test_hover(void)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_obj_set_size(btn, 200, 20);
+    lv_obj_set_size(label, 200, 20);
     lv_label_set_text(label, "Clickable text can be hovered!");
     lv_obj_set_pos(label, 100, 20);
     lv_obj_add_flag(label, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_style_text_color(label, lv_color_hex(0x5be1b6), LV_PART_MAIN | LV_STATE_HOVERED);
     //Set hover callback
-    label_hovered.id = (uint32_t)label->id;
+    label_hovered.id = (int32_t)label->id;
     label_hovered.counts = 0;
-    lv_obj_add_event_cb(label, hovered_event_cb, LV_EVENT_HOVERED, &label_hovered);
+    lv_obj_add_event_cb(label, hovered_event_cb, LV_EVENT_HOVER_OVER, &label_hovered);
 
     lv_obj_t * btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(btn, 64, 100);
     lv_obj_set_size(btn, 128, 48);
     lv_obj_set_style_bg_opa(btn, 128, LV_PART_MAIN | LV_STATE_HOVERED);
     //Set hover callback
-    btn_hovered.id = (uint32_t)btn->id;
+    btn_hovered.id = (int32_t)btn->id;
     btn_hovered.counts = 0;
-    lv_obj_add_event_cb(btn, hovered_event_cb, LV_EVENT_HOVERED, &btn_hovered);
+    lv_obj_add_event_cb(btn, hovered_event_cb, LV_EVENT_HOVER_OVER, &btn_hovered);
 
     test_move_mouse((lv_point_t *)pointer1, 5);
     test_move_mouse((lv_point_t *)pointer2, 5);
