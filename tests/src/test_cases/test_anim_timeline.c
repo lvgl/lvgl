@@ -322,4 +322,77 @@ void test_anim_timeline_reverse(void)
     TEST_ASSERT_EQUAL(20, lv_obj_get_x(obj));
 }
 
+
+void anim1_exec_cb(void * var, int32_t v)
+{
+    printf("[anim1] %d\n", v);
+}
+void anim1_start(lv_anim_t * a)
+{
+    printf("[anim1] start\n");
+}
+void anim1_completed(lv_anim_t * a)
+{
+    printf("[anim1] completed\n");
+}
+
+void anim2_exec_cb(void * var, int32_t v)
+{
+    printf("                    [anim2] %d\n", v);
+}
+void anim2_start(lv_anim_t * a)
+{
+    printf("                    [anim2] start\n");
+}
+void anim2_completed(lv_anim_t * a)
+{
+    printf("                    [anim2] completed\n");
+}
+
+void anim3_exec_cb(void * var, int32_t v)
+{
+    printf("                                        [anim3] %d\n", v);
+}
+void anim3_start(lv_anim_t * a)
+{
+    printf("                                        [anim3] start\n");
+}
+void anim3_completed(lv_anim_t * a)
+{
+    printf("                                        [anim3] completed\n");
+}
+
+void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
+{
+    lv_anim_t anim1;
+    lv_anim_t anim2;
+    lv_anim_t anim3;
+
+    lv_anim_init(&anim1);
+    lv_anim_set_values(&anim1, 0, 1024);
+    lv_anim_set_duration(&anim1, 300);
+    lv_anim_set_exec_cb(&anim1, anim1_exec_cb);
+    lv_anim_set_start_cb(&anim1, anim1_start);
+    lv_anim_set_completed_cb(&anim1, anim1_completed);
+
+    lv_memcpy(&anim2, &anim1, sizeof(anim1));
+    lv_anim_set_duration(&anim2, 100);
+    lv_anim_set_path_cb(&anim2, lv_anim_path_ease_in);
+    lv_anim_set_exec_cb(&anim2, anim2_exec_cb);
+    lv_anim_set_start_cb(&anim1, anim2_start);
+    lv_anim_set_completed_cb(&anim2, anim2_completed);
+
+    lv_memcpy(&anim3, &anim1, sizeof(anim1));
+    lv_anim_set_duration(&anim3, 200);
+    lv_anim_set_exec_cb(&anim3, anim3_exec_cb);
+    lv_anim_set_start_cb(&anim1, anim3_start);
+    lv_anim_set_completed_cb(&anim3, anim3_completed);
+
+    lv_anim_timeline_t * timeline = lv_anim_timeline_create();
+    lv_anim_timeline_add(timeline,   0, &anim1);
+    lv_anim_timeline_add(timeline, 200, &anim2);
+    lv_anim_timeline_add(timeline, 400, &anim3);
+    lv_anim_timeline_start(timeline);
+}
+
 #endif
