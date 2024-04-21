@@ -325,40 +325,49 @@ void test_anim_timeline_reverse(void)
 
 void anim1_exec_cb(void * var, int32_t v)
 {
+    LV_UNUSED(var);
     printf("[anim1] %d\n", v);
 }
 void anim1_start(lv_anim_t * a)
 {
+    LV_UNUSED(a);
     printf("[anim1] start\n");
 }
 void anim1_completed(lv_anim_t * a)
 {
+    LV_UNUSED(a);
     printf("[anim1] completed\n");
 }
 
 void anim2_exec_cb(void * var, int32_t v)
 {
+    LV_UNUSED(var);
     printf("                    [anim2] %d\n", v);
 }
 void anim2_start(lv_anim_t * a)
 {
+    LV_UNUSED(a);
     printf("                    [anim2] start\n");
 }
 void anim2_completed(lv_anim_t * a)
 {
+    LV_UNUSED(a);
     printf("                    [anim2] completed\n");
 }
 
 void anim3_exec_cb(void * var, int32_t v)
 {
+    LV_UNUSED(var);
     printf("                                        [anim3] %d\n", v);
 }
 void anim3_start(lv_anim_t * a)
 {
+    LV_UNUSED(a);
     printf("                                        [anim3] start\n");
 }
 void anim3_completed(lv_anim_t * a)
 {
+    LV_UNUSED(a);
     printf("                                        [anim3] completed\n");
 }
 
