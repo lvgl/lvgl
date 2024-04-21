@@ -73,8 +73,8 @@ void test_hover(void)
     btn_hovered.counts = 0;
     lv_obj_add_event_cb(btn, hovered_event_cb, LV_EVENT_HOVERED, &btn_hovered);
 
-    test_move_mouse((lv_point_t *)pointer1);
-    test_move_mouse((lv_point_t *)pointer2);
+    test_move_mouse((lv_point_t *)pointer1, 5);
+    test_move_mouse((lv_point_t *)pointer2, 5);
 
     TEST_ASSERT_EQUAL_INT32(TEST_HOVER_COUNTS, label_hovered.counts);
     TEST_ASSERT_EQUAL_INT32(TEST_HOVER_COUNTS, btn_hovered.counts);
