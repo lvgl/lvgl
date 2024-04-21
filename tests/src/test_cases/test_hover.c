@@ -16,11 +16,11 @@ static test_hover_t btn_hovered;
 
 static const lv_point_t pointer1[] = {
     {0, 0}, {110, 20}, {150, 26}, {120, 19}, {0, 0},
-}
+};
 
 static const lv_point_t pointer2[] = {
     {0, 0}, {60, 100}, {80, 100}, {120, 120}, {0, 0},
-}
+};
 
 void setUp(void)
 {
