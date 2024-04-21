@@ -463,11 +463,13 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t va
     lv_chart_t * chart  = (lv_chart_t *)obj;
     ser->y_points[ser->start_point] = value;
     // If optimization isn't enabled or chart data series aren't updated synchronously, this part makes disturbances.
-    for(int32_t i = 1; i < 10; i++) {
-        if(ser->start_point + i < chart->point_cnt)
-            ser->y_points[ser->start_point + i] = LV_CHART_POINT_NONE;
-        else
-            ser->y_points[ser->start_point + i - chart->point_cnt] = LV_CHART_POINT_NONE;
+    if(chart->type == LV_CHART_TYPE_LINE) {
+        for(int32_t i = 1; i < 10; i++) {
+            if(ser->start_point + i < chart->point_cnt)
+                ser->y_points[ser->start_point + i] = LV_CHART_POINT_NONE;
+            else
+                ser->y_points[ser->start_point + i - chart->point_cnt] = LV_CHART_POINT_NONE;
+        }
     }
     invalidate_point(obj, ser->start_point);
     ser->start_point++;
