@@ -64,6 +64,8 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 {
     LV_TRACE_TIMER("begin");
 
+    lv_lock();
+
     lv_timer_state_t * state_p = &state;
     /*Avoid concurrent running of the timer handler*/
     if(state_p->already_running) {
@@ -140,6 +142,8 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
     LV_TRACE_TIMER("finished (%" LV_PRIu32 " ms until the next timer call)", time_until_next);
     LV_PROFILER_END;
+
+    lv_unlock();
     return time_until_next;
 }
 
