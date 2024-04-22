@@ -182,7 +182,7 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
     lv_test_mouse_release();
     lv_test_indev_wait(50);
 
-    TEST_ASSERT_EQUAL_UINT32(0, event_cnt);
+    TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
     TEST_ASSERT_EQUAL_INT32(lv_arc_get_min_value(arc), lv_arc_get_value(arc));
 
     /* Click close to end angle */

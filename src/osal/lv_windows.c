@@ -197,6 +197,7 @@ lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
     return LV_RESULT_OK;
 }
 
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -76,7 +76,6 @@ struct _lv_sysmon_perf_info_t {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-#if LV_USE_SYSMON
 
 /**
  * Create a new system monitor label
@@ -116,8 +115,6 @@ void lv_sysmon_show_memory(lv_display_t * disp);
 void lv_sysmon_hide_memory(lv_display_t * disp);
 
 #endif /*LV_USE_MEM_MONITOR*/
-
-#endif /*LV_USE_SYSMON*/
 
 /**
  * Initialize built-in system monitor, such as performance and memory monitor.

@@ -23,17 +23,8 @@
 
 #define SYSMON_REFR_PERIOD_DEF 300 /* ms */
 
-#if defined(LV_USE_PERF_MONITOR) && LV_USE_PERF_MONITOR
-    #define _USE_PERF_MONITOR   1
-#else
-    #define _USE_PERF_MONITOR   0
-#endif
-
 #if defined(LV_USE_MEM_MONITOR) && LV_USE_MEM_MONITOR
     #define sysmon_mem LV_GLOBAL_DEFAULT()->sysmon_mem
-    #define _USE_MEM_MONITOR   1
-#else
-    #define _USE_MEM_MONITOR   0
 #endif
 
 /**********************
@@ -44,13 +35,13 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#if _USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR
     static void perf_update_timer_cb(lv_timer_t * t);
     static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void perf_monitor_disp_event_cb(lv_event_t * e);
 #endif
 
-#if _USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
     static void mem_update_timer_cb(lv_timer_t * t);
     static void mem_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
@@ -70,7 +61,7 @@
 void _lv_sysmon_builtin_init(void)
 {
 
-#if _USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
     static lv_mem_monitor_t mem_info;
     lv_subject_init_pointer(&sysmon_mem.subject, &mem_info);
     sysmon_mem.timer = lv_timer_create(mem_update_timer_cb, SYSMON_REFR_PERIOD_DEF, &mem_info);
@@ -79,7 +70,7 @@ void _lv_sysmon_builtin_init(void)
 
 void _lv_sysmon_builtin_deinit(void)
 {
-#if _USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
     lv_timer_delete(sysmon_mem.timer);
 #endif
 }
@@ -97,7 +88,7 @@ lv_obj_t * lv_sysmon_create(lv_display_t * disp)
     return label;
 }
 
-#if _USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR
 
 void lv_sysmon_show_performance(lv_display_t * disp)
 {
@@ -124,7 +115,7 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
 
 #endif
 
-#if _USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
 
 void lv_sysmon_show_memory(lv_display_t * disp)
 {
@@ -148,7 +139,7 @@ void lv_sysmon_hide_memory(lv_display_t * disp)
  *   STATIC FUNCTIONS
  **********************/
 
-#if _USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR
 
 static void perf_monitor_disp_event_cb(lv_event_t * e)
 {
@@ -275,7 +266,7 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 #endif
 
-#if _USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
 
 static void mem_update_timer_cb(lv_timer_t * t)
 {

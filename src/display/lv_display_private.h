@@ -18,7 +18,7 @@ extern "C" {
 #include "../draw/lv_draw.h"
 #include "lv_display.h"
 
-#if defined(LV_USE_PERF_MONITOR) && LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR
 #include "../others/sysmon/lv_sysmon.h"
 #endif
 
@@ -153,13 +153,13 @@ struct _lv_display_t {
     /** The area being refreshed*/
     lv_area_t refreshed_area;
 
-#if defined(LV_USE_PERF_MONITOR) && LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR
     lv_obj_t * perf_label;
     lv_sysmon_backend_data_t perf_sysmon_backend;
     lv_sysmon_perf_info_t perf_sysmon_info;
 #endif
 
-#if defined(LV_USE_MEM_MONITOR) && LV_USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
     lv_obj_t * mem_label;
 #endif
 

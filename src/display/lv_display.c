@@ -140,11 +140,11 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 
     lv_timer_ready(disp->refr_timer); /*Be sure the screen will be refreshed immediately on start up*/
 
-#if defined(LV_USE_PERF_MONITOR) && LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR
     lv_sysmon_show_performance(disp);
 #endif
 
-#if defined(LV_USE_MEM_MONITOR) && LV_USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
     lv_sysmon_show_memory(disp);
 #endif
 

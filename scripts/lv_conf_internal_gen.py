@@ -189,6 +189,11 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
+#if LV_USE_SYSMON == 0
+    #define LV_USE_PERF_MONITOR 0
+    #define LV_USE_MEM_MONITOR 0
+#endif /*LV_USE_SYSMON*/
+
 #ifndef LV_USE_LZ4
     #define LV_USE_LZ4  (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)
 #endif
