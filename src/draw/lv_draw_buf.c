@@ -10,6 +10,7 @@
 #include "lv_draw_buf.h"
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
+#include "../misc/lv_math.h"
 
 /*********************
  *      DEFINES
@@ -522,8 +523,7 @@ static void * buf_align(void * buf, lv_color_format_t color_format)
 
     uint8_t * buf_u8 = buf;
     if(buf_u8) {
-        buf_u8 += LV_DRAW_BUF_ALIGN - 1;
-        buf_u8 = (uint8_t *)((lv_uintptr_t) buf_u8 & ~(LV_DRAW_BUF_ALIGN - 1));
+        buf_u8 = (uint8_t *)LV_ROUND_UP((lv_uintptr_t)buf_u8, LV_DRAW_BUF_ALIGN);
     }
     return buf_u8;
 }
