@@ -313,6 +313,15 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
             return;
         }
 
+        static bool recursive_lock = false;
+
+        if(!recursive_lock) {
+            recursive_lock = true;
+        }
+        else {
+            return;
+        }
+
         lv_point_t p;
         lv_obj_get_scroll_end(cont, &p);
 
@@ -340,6 +349,8 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
         }
 
         if(new_tab) lv_obj_send_event(tv, LV_EVENT_VALUE_CHANGED, NULL);
+
+        recursive_lock = false;
     }
 }
 #endif /*LV_USE_TABVIEW*/
