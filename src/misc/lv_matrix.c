@@ -12,6 +12,7 @@
 #if LV_USE_MATRIX
 
 #include "../stdlib/lv_string.h"
+#include "lv_math.h"
 #include <math.h>
 #include <stdbool.h>
 
