@@ -20,14 +20,21 @@ Main Actions
 LVGL Performance Test
 ---------------------
 
-SO3 is used to check the performance of LVGL. LVGL's repo provides a "check_perf" workflow that 
+SO3 is used to check the performance of LVGL. This workflow behaves as shown in this diagram:
 
-#. Retrieves LVGL 8.3 and stores it in a "lvgl_base" folder for the dockerfile to use
-#. Retrieves "Dockerfile.lvgl" from the SO3 repository and builds the docker image
-#. Runs the docker image
-#. Creates an artifact in the form of a log file that shows the output of the perf test 
+.. image:: LvglCheckPerfAction.png
+	
+The actions are described below
 
-The image is ran using two volumes: One that redirects the container's "/host" folder to the workflow's working directory and one that allows the container to access the workflow's devices (in the /dev folder) as his own (NOTE: is it really necessary ?)
+#. Retrieve the LVGL commit that triggered the action and store it in a "lvgl_base" folder for the dockerfile to use
+#. Retrieve "Dockerfile.lvgl" from the SO3 repository and build the docker image
+#. Run the docker image to generate the performance data (function execution times)
+#. Store the performance data as an artifact for future reference
+#. Find previous successful action run and recover the performance data from it
+#. Process the performance data and compare it to previous executions and set thresholds to detect performance issues
+#. Create an artifact in the form of a log file that shows the output of the regression test
+
+The image is ran using two volumes: One that redirects the container's "/host" folder to the workflow's working directory and one that allows the container to access the workflow's devices (in the /dev folder) as his own
 
 The workflow is setup to run when
 * Commits are pushed to LVGL's repo 
@@ -42,11 +49,24 @@ LVGL's check_perf workflow uses the Dockerfile.lvgl found at the root of this re
 #. Creates an Alpine image and installs all the necessary tools (like gcc and qemu)
 #. Recovers SO3's main branch in the root ("/") folder 
 #. Empties the "*/so3/usr/lib/lvgl*" folder and replaces its content with the LVGL repo to be tested (The LVGL code should be in a "lvgl_base" folder)
-#. (Finds and removes all files related to "thumb")
-#. Patches SO3 so it executes the *stress* application instead of the shell at launch
+#. Patches SO3 so it executes the *prof_test* application instead of the shell at launch
 #. Builds U-boot and the SO3 kernel
-#. Imports the stress project into SO3's userspace and builds the userspace
+#. Imports the *prof_test* (*test/perf* folder from LVGL) application into SO3's userspace and builds the userspace
 #. Sets up the image so it exposes the port 1234 when ran and executes "./st"
+
+Performance data files
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The files used to report on the execution times of the profiled functions and  have the same format:
+
+* 1 header line with no defined format (ignored by the script)
+* N lines with function data following the "[parent/]<name> [(info)] | <time>" format
+	
+Parent and info are optionnal (thus marked with []).
+Only one time is supported per function-parent pair
+Time is expected to be a single value convertible to float. Eventual excess values will be discarded
+
+Functions execution times are always identified by a parent-function pair (in case the function may have different behaviour depending from where it is called).Thresholds can be set for a function or a parent-function pair. parent-function thresholds are used only with exact matches in the performance data file and function thresholds are used as default for any corresponding function that does not have or does not match with a parent (for example a "main/func1" threshold is only used with "main/func1" execution times but "func2" thresholds are used for "main/func2" or "otherFunc/func2" execution times. If only "main/func1" threshold is set, no threshold is considered to be set for "otherFunc/func1" execution times)
 
 Constraints and Guidelines
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -60,6 +80,7 @@ The best way to profile some code is to create a new test application with 2 kin
 * Setup: Those files define functions that prepare the resources necessary for the execution of the profiled functions. For example, if a profiled function needs to provide a configuration structure to one of its dependencies, the structure can be initialised and configured in it and then passed to the profiling function to be given to the function that requires it. Those files are compiled normally
 * Profiling: Those files contain functions whose entry and exit time will be timestamped. They use the functions that should be profiled with the parameters given to them by the Setup functions. Those files are compiled using the "-p flag"
 * The main of the application should be in a Setup file but may also be in a Profiling file if one wants to calculate the overall execution time. Please note however that whatever time is reported also measures the execution time of all the timestamping functions calls
+* It is recommended to call the profiled functions from the main function as it allows the profiling data analyzer to lookup way less code to find the names of the profiled functions. This can be the difference between waiting for some seconds and waiting for minutes
 
 Known Limitations
 ^^^^^^^^^^^^^^^^^^
