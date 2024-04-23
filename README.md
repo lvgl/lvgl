@@ -25,7 +25,6 @@ LVGL provides everything you need to create an embedded GUI with easy-to-use gra
 - [Services](#services)
 - [Contributing](#contributing)
 
-
 ## Overview
 ### Features
 * Powerful [building blocks](https://docs.lvgl.io/master/widgets/index.html): buttons, charts, lists, sliders, images, etc.
