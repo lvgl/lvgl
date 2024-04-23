@@ -16,9 +16,7 @@ LVGL provides everything you need to create an embedded GUI with easy-to-use gra
 <a href="https://docs.lvgl.io/master/examples.html">Interactive examples</a>
 </h4>
 
-
 **English** | [中文](./README_zh.md) | [Português do Brasil](./README_pt_BR.md)
-
 
 ---
 
