@@ -102,7 +102,6 @@ LVGL is available as:
 - CMSIS-Pack
 - [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 
-
 ## :robot: Examples
 
 See some examples of creating widgets, using layouts and applying styles. You will find C and MicroPython code, and links to try out or edit the examples in an online MicroPython editor.
