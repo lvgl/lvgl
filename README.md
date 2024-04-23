@@ -9,7 +9,7 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 </p>
 
 <h4 align="center">
-<a href="https://lvgl.io">Website </a> &middot;
+<a href="https://lvgl.io">Website </a> &middot;Update README.md
 <a href="https://lvgl.io/demos">Online demo</a> &middot;
 <a href="https://lvgl.github.io/lv_examples/">Nightly demos</a> &middot;
 <a href="https://docs.lvgl.io/">Docs</a> &middot;
@@ -139,6 +139,7 @@ void btn_event_cb(lv_obj_t * btn, lv_event_t event)
     }
 }
 ```
+
 ![LVGL button with label example](https://raw.githubusercontent.com/lvgl/docs/latest/misc/simple_button_example.gif)
 
 ### LVGL from Micropython
