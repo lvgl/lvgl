@@ -240,10 +240,10 @@
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
     #define LV_LOG_PRINTF 0
 
-	/*Set callback to print the logs.
-	 *E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`
-	 *Can be overwritten by `lv_log_register_print_cb`*/
-	//#define LV_LOG_PRINT_CB
+    /*Set callback to print the logs.
+     *E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`
+     *Can be overwritten by `lv_log_register_print_cb`*/
+    //#define LV_LOG_PRINT_CB
 
     /*1: Enable print timestamp;
      *0: Disable print timestamp*/
@@ -959,10 +959,10 @@
 #endif
 
 /*Drivers for LCD devices connected via SPI/parallel port*/
-#define LV_USE_ST7735		0
-#define LV_USE_ST7789		0
-#define LV_USE_ST7796		0
-#define LV_USE_ILI9341		0
+#define LV_USE_ST7735        0
+#define LV_USE_ST7789        0
+#define LV_USE_ST7796        0
+#define LV_USE_ILI9341       0
 
 #define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
 
