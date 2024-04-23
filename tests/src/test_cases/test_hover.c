@@ -60,7 +60,7 @@ void test_hover(void)
     lv_obj_add_flag(label, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_style_text_color(label, lv_color_hex(0x5be1b6), LV_PART_MAIN | LV_STATE_HOVERED);
     //Set hover callback
-    label_hovered.id = (int32_t)label->id;
+    label_hovered.id = * (int32_t *)label->id;
     label_hovered.counts = 0;
     lv_obj_add_event_cb(label, hovered_event_cb, LV_EVENT_HOVER_OVER, &label_hovered);
 
@@ -69,7 +69,7 @@ void test_hover(void)
     lv_obj_set_size(btn, 128, 48);
     lv_obj_set_style_bg_opa(btn, 128, LV_PART_MAIN | LV_STATE_HOVERED);
     //Set hover callback
-    btn_hovered.id = (int32_t)btn->id;
+    btn_hovered.id = * (int32_t *)btn->id;
     btn_hovered.counts = 0;
     lv_obj_add_event_cb(btn, hovered_event_cb, LV_EVENT_HOVER_OVER, &btn_hovered);
 
