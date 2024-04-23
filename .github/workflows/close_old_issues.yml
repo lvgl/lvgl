@@ -30,5 +30,5 @@ jobs:
             So feel free to comment if you have remarks or ideas on this topic.
           days-before-stale: 14
           days-before-close: 7
-          exempt-issue-labels: 'pinned, next major, next minor'
+          exempt-issue-labels: 'pinned, next major, next minor, shaping, ready for development'
           exempt-pr-labels: 'pinned, next major, next minor'
