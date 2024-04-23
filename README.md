@@ -114,7 +114,6 @@ See some examples of creating widgets, using layouts and applying styles. You wi
 
 For more examples check out the [Examples](https://github.com/lvgl/lvgl/tree/master/examples) folder.
 
-
 ### Hello world label
 
 ![Simple Hello world label example in LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_1.png)
