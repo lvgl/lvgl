@@ -23,7 +23,7 @@ endif( LV_CONF_PATH )
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # Set sources used for LVGL components
-file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.S)
+file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/*.cpp)
@@ -32,7 +32,7 @@ file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_R
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
-if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+if(NOT MSVC)
   target_compile_definitions(
     lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
                 $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>
@@ -53,6 +53,16 @@ if(LV_CONF_SKIP)
   target_compile_definitions(lvgl PUBLIC LV_CONF_SKIP=1)
 endif()
 
+# Add defintion of LV_USE_DEMO_WIDGETS only if needed
+if(CONFIG_LV_USE_DEMO_WIDGETS)
+  target_compile_definitions(lvgl PUBLIC LV_USE_DEMO_WIDGETS=1)
+endif()
+
+# Add defintion of LV_BUILD_EXAMPLES only if needed
+if(CONFIG_LV_BUILD_EXAMPLES)
+   target_compile_definitions(lvgl PUBLIC LV_BUILD_EXAMPLES=1)
+endif()
+
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -64,7 +74,7 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     target_link_libraries(lvgl_thorvg PUBLIC lvgl)
 endif()
 
-if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+if(NOT MSVC)
   set_source_files_properties(${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/vg_lite_tvg.cpp PROPERTIES COMPILE_FLAGS -Wunused-parameter)
 endif()
 
