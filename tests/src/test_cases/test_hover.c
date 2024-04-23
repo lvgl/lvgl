@@ -1,4 +1,4 @@
-//#if LV_BUILD_TEST
+#if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "../lv_test_indev.h"
 #include "unity/unity.h"
@@ -51,7 +51,7 @@ static void test_move_mouse(lv_point_t * point, uint8_t size)
     }
 }
 
-void test_hover(void)
+void test_hover_basic(void)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_size(label, 200, 20);
@@ -59,8 +59,9 @@ void test_hover(void)
     lv_obj_set_pos(label, 100, 20);
     lv_obj_add_flag(label, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_style_text_color(label, lv_color_hex(0x5be1b6), LV_PART_MAIN | LV_STATE_HOVERED);
-    //Set hover callback
-    label_hovered.id = * (int32_t *)label->id;
+
+    /*Set hover callback*/
+    label_hovered.id = (lv_uintptr_t)label->id;
     label_hovered.counts = 0;
     lv_obj_add_event_cb(label, hovered_event_cb, LV_EVENT_HOVER_OVER, &label_hovered);
 
@@ -68,8 +69,9 @@ void test_hover(void)
     lv_obj_set_pos(btn, 64, 100);
     lv_obj_set_size(btn, 128, 48);
     lv_obj_set_style_bg_opa(btn, 128, LV_PART_MAIN | LV_STATE_HOVERED);
-    //Set hover callback
-    btn_hovered.id = * (int32_t *)btn->id;
+
+    /*Set hover callback*/
+    btn_hovered.id = (lv_uintptr_t)btn->id;
     btn_hovered.counts = 0;
     lv_obj_add_event_cb(btn, hovered_event_cb, LV_EVENT_HOVER_OVER, &btn_hovered);
 
@@ -80,4 +82,17 @@ void test_hover(void)
     TEST_ASSERT_EQUAL_INT32(TEST_HOVER_COUNTS, btn_hovered.counts);
 }
 
-//#endif
+void test_hover_delete(void)
+{
+    lv_obj_t * button = lv_button_create(lv_screen_active());
+    lv_obj_set_size(button, 200, 100);
+
+    lv_test_indev_wait(50);
+    lv_test_mouse_move_to(50, 50);
+    lv_test_indev_wait(50);
+    lv_obj_delete(button);  /*No crash while deleting the hovered button*/
+    lv_test_indev_wait(50);
+}
+
+
+#endif
