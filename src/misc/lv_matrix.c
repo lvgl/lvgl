@@ -13,12 +13,16 @@
 
 #include "../stdlib/lv_string.h"
 #include "lv_math.h"
+
 #include <math.h>
 #include <stdbool.h>
 
 /*********************
  *      DEFINES
  *********************/
+#ifndef M_PI
+    #define M_PI 3.1415926f
+#endif
 
 /**********************
  *      TYPEDEFS
