@@ -20,10 +20,11 @@
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_SYSMON_REFR_PERIOD_DEF
+    #define LV_SYSMON_REFR_PERIOD_DEF 300 /* ms */
+#endif
 
-#define SYSMON_REFR_PERIOD_DEF 300 /* ms */
-
-#if defined(LV_USE_MEM_MONITOR) && LV_USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
     #define sysmon_mem LV_GLOBAL_DEFAULT()->sysmon_mem
 #endif
 
@@ -64,7 +65,7 @@ void _lv_sysmon_builtin_init(void)
 #if LV_USE_MEM_MONITOR
     static lv_mem_monitor_t mem_info;
     lv_subject_init_pointer(&sysmon_mem.subject, &mem_info);
-    sysmon_mem.timer = lv_timer_create(mem_update_timer_cb, SYSMON_REFR_PERIOD_DEF, &mem_info);
+    sysmon_mem.timer = lv_timer_create(mem_update_timer_cb, LV_SYSMON_REFR_PERIOD_DEF, &mem_info);
 #endif
 }
 
@@ -79,6 +80,11 @@ lv_obj_t * lv_sysmon_create(lv_display_t * disp)
 {
     LV_LOG_INFO("begin");
     if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LV_LOG_WARN("There is no default display");
+        return NULL;
+    }
+
     lv_obj_t * label = lv_label_create(lv_display_get_layer_sys(disp));
     lv_obj_set_style_bg_opa(label, LV_OPA_50, 0);
     lv_obj_set_style_bg_color(label, lv_color_black(), 0);
@@ -93,11 +99,16 @@ lv_obj_t * lv_sysmon_create(lv_display_t * disp)
 void lv_sysmon_show_performance(lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LV_LOG_WARN("There is no default display");
+        return;
+    }
+
     disp->perf_label = lv_sysmon_create(disp);
     lv_subject_init_pointer(&disp->perf_sysmon_backend.subject, &disp->perf_sysmon_info);
     lv_obj_align(disp->perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
     lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, perf_observer_cb, disp->perf_label, NULL);
-    disp->perf_sysmon_backend.timer = lv_timer_create(perf_update_timer_cb, SYSMON_REFR_PERIOD_DEF, disp);
+    disp->perf_sysmon_backend.timer = lv_timer_create(perf_update_timer_cb, LV_SYSMON_REFR_PERIOD_DEF, disp);
     lv_display_add_event_cb(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
@@ -110,6 +121,11 @@ void lv_sysmon_show_performance(lv_display_t * disp)
 void lv_sysmon_hide_performance(lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LV_LOG_WARN("There is no default display");
+        return;
+    }
+
     lv_obj_add_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
 }
 
@@ -120,6 +136,11 @@ void lv_sysmon_hide_performance(lv_display_t * disp)
 void lv_sysmon_show_memory(lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LV_LOG_WARN("There is no default display");
+        return;
+    }
+
     disp->mem_label = lv_sysmon_create(disp);
     lv_obj_align(disp->mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
     lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
@@ -130,6 +151,11 @@ void lv_sysmon_show_memory(lv_display_t * disp)
 void lv_sysmon_hide_memory(lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        LV_LOG_WARN("There is no default display");
+        return;
+    }
+
     lv_obj_add_flag(disp->mem_label, LV_OBJ_FLAG_HIDDEN);
 }
 
