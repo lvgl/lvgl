@@ -391,7 +391,6 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
         }
     }
 
-refr_clean_up:
     lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
     lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
     disp_refr->inv_p = 0;
