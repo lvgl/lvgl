@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "lv_types.h"
+#include "lv_math.h"
 
 /*********************
  *      DEFINES
@@ -343,20 +344,24 @@ static inline void lv_point_precise_swap(lv_point_precise_t * p1, lv_point_preci
 
 #define LV_COORD_SET_SPEC(x)    ((x) | _LV_COORD_TYPE_SPEC)
 
-/*Special coordinates*/
-#define LV_PCT(x)               (x < 0 ? LV_COORD_SET_SPEC(1000 - (x)) : LV_COORD_SET_SPEC(x))
-#define LV_COORD_IS_PCT(x)      ((LV_COORD_IS_SPEC(x) && _LV_COORD_PLAIN(x) <= 2000))
-#define LV_COORD_GET_PCT(x)     (_LV_COORD_PLAIN(x) > 1000 ? 1000 - _LV_COORD_PLAIN(x) : _LV_COORD_PLAIN(x))
-#define LV_SIZE_CONTENT         LV_COORD_SET_SPEC(2001)
-
-LV_EXPORT_CONST_INT(LV_SIZE_CONTENT);
-
 /*Max coordinate value*/
 #define LV_COORD_MAX            ((1 << _LV_COORD_TYPE_SHIFT) - 1)
 #define LV_COORD_MIN            (-LV_COORD_MAX)
 
+/*Special coordinates*/
+#define LV_SIZE_CONTENT         LV_COORD_SET_SPEC(LV_COORD_MAX)
+#define _LV_PCT_STORED_MAX      (LV_COORD_MAX - 1)
+#if _LV_PCT_STORED_MAX % 2 != 0
+#error _LV_PCT_STORED_MAX should be an even number
+#endif
+#define _LV_PCT_POS_MAX         (_LV_PCT_STORED_MAX / 2)
+#define LV_PCT(x)               (LV_COORD_SET_SPEC(((x) < 0 ? (_LV_PCT_POS_MAX - LV_MAX((x), -_LV_PCT_POS_MAX)) : LV_MIN((x), _LV_PCT_POS_MAX))))
+#define LV_COORD_IS_PCT(x)      ((LV_COORD_IS_SPEC(x) && _LV_COORD_PLAIN(x) <= _LV_PCT_STORED_MAX))
+#define LV_COORD_GET_PCT(x)     (_LV_COORD_PLAIN(x) > _LV_PCT_POS_MAX ? _LV_PCT_POS_MAX - _LV_COORD_PLAIN(x) : _LV_COORD_PLAIN(x))
+
 LV_EXPORT_CONST_INT(LV_COORD_MAX);
 LV_EXPORT_CONST_INT(LV_COORD_MIN);
+LV_EXPORT_CONST_INT(LV_SIZE_CONTENT);
 
 /**
  * Convert a percentage value to `int32_t`.

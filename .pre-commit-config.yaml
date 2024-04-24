@@ -27,7 +27,8 @@ repos:
         exclude: |
           (?x)^(
               src/libs/ |
-              src/lv_conf_internal.h
+              src/lv_conf_internal.h |
+              tests/test_images
            )
         types_or: ["c", "header"]
 -   repo: https://github.com/crate-ci/typos

@@ -606,7 +606,7 @@ class LVGLImage:
             flags += " | LV_IMAGE_FLAGS_COMPRESSED"
 
         compressed = LVGLCompressData(self.cf, compress, self.data)
-
+        macro = "LV_ATTRIBUTE_" + varname.upper()
         header = f'''
 #if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
@@ -621,12 +621,12 @@ class LVGLImage:
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_DUST
-#define LV_ATTRIBUTE_IMG_DUST
+#ifndef {macro}
+#define {macro}
 #endif
 
 static const
-LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST
+LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST {macro}
 uint8_t {varname}_map[] = {{
 '''
 
@@ -819,6 +819,16 @@ const lv_image_dsc_t {varname} = {{
                 rawdata += row
 
         self.set_data(cf, w, h, rawdata)
+    
+    def sRGB_to_linear(self, x):
+        if x < 0.04045:
+            return x / 12.92
+        return pow((x + 0.055) / 1.055, 2.4)
+
+    def linear_to_sRGB(self, y):
+        if y <= 0.0031308:
+            return 12.92 * y
+        return 1.055 * pow(y, 1 / 2.4) - 0.055
 
     def _png_to_luma_only(self, cf: ColorFormat, filename: str):
         reader = png.Reader(str(filename))
@@ -831,8 +841,11 @@ const lv_image_dsc_t {varname} = {{
             A = row[3::4]
             for r, g, b, a in zip(R, G, B, A):
                 r, g, b, a = color_pre_multiply(r, g, b, a, self.background)
+                r = self.sRGB_to_linear(r / 255.0)
+                g = self.sRGB_to_linear(g / 255.0)
+                b = self.sRGB_to_linear(b / 255.0)
                 luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
-                rawdata += uint8_t(int(luma))
+                rawdata += uint8_t(int(self.linear_to_sRGB(luma) * 255))
 
         self.set_data(ColorFormat.L8, w, h, rawdata)
 

@@ -1,5 +1,4 @@
 #include "../../lv_examples.h"
-#include <stdio.h>
 
 #if LV_BUILD_EXAMPLES
 #if LV_USE_IMGFONT

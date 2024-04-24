@@ -1,4 +1,4 @@
-/**
+﻿/**
 * @file lv_test_assert.c
 *
 * Copyright 2002-2010 Guillaume Cottenceau.
@@ -417,6 +417,36 @@ static void buf_to_xrgb8888(const uint8_t * buf_in, uint8_t * buf_out, lv_color_
                 buf_out[x * 4 + 2] = buf_in[x * 3 + 0];
                 buf_out[x * 4 + 1] = buf_in[x * 3 + 1];
                 buf_out[x * 4 + 0] = buf_in[x * 3 + 2];
+            }
+
+            buf_in += stride;
+            buf_out += 800 * 4;
+        }
+    }
+    else if(cf_in == LV_COLOR_FORMAT_L8) {
+        uint32_t y;
+        for(y = 0; y < 480; y++) {
+            uint32_t x;
+            for(x = 0; x < 800; x++) {
+                buf_out[x * 4 + 3] = 0xff;
+                buf_out[x * 4 + 2] = buf_in[x];
+                buf_out[x * 4 + 1] = buf_in[x];
+                buf_out[x * 4 + 0] = buf_in[x];
+            }
+
+            buf_in += stride;
+            buf_out += 800 * 4;
+        }
+    }
+    else if (cf_in == LV_COLOR_FORMAT_AL88) {
+        uint32_t y;
+        for (y = 0; y < 480; y++) {
+            uint32_t x;
+            for (x = 0; x < 800; x++) {
+                buf_out[x * 4 + 3] = buf_in[x * 2 + 1];
+                buf_out[x * 4 + 2] = buf_in[x * 2 + 0];
+                buf_out[x * 4 + 1] = buf_in[x * 2 + 0];
+                buf_out[x * 4 + 0] = buf_in[x * 2 + 0];
             }
 
             buf_in += stride;
