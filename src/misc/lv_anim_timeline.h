@@ -72,6 +72,13 @@ void lv_anim_timeline_pause(lv_anim_timeline_t * at);
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse);
 
 /**
+ * Make the animation timeline repeat itself.
+ * @param at        pointer to the animation timeline.
+ * @param reverse   repeat count or `LV_ANIM_REPEAT_INFINITE` for infinite repetition. 0: to disable repetition.
+ */
+void lv_anim_timeline_set_repeat_count(lv_anim_timeline_t * at, uint32_t cnt);
+
+/**
  * Set the progress of the animation timeline.
  * @param at        pointer to the animation timeline.
  * @param progress  set value 0~65535 to map 0~100% animation progress.
