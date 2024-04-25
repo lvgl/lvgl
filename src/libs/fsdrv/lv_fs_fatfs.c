@@ -9,6 +9,9 @@
 #include "../../../lvgl.h"
 
 #if LV_USE_FS_FATFS
+
+#define FF_DIR DIR    /* ESP IDF typedefs `DIR` as `FF_DIR`. Rename to `DIR` for use with this source file */
+#define FATFS_DIR DIR /* Mbed OS typedefs `DIR` as `FATFS_DIR`. Rename to `DIR` for use with this source file */
 #include "ff.h"
 
 #include "../../core/lv_global.h"
