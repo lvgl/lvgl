@@ -126,6 +126,12 @@ void lv_anim_timeline_set_repeat_count(lv_anim_timeline_t * at, uint32_t cnt)
     at->repeat_count = cnt;
 }
 
+void lv_anim_timeline_set_repeat_delay(lv_anim_timeline_t * at, uint32_t delay)
+{
+    LV_ASSERT_NULL(at);
+    at->repeat_delay = delay;
+}
+
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
 {
     LV_ASSERT_NULL(at);
