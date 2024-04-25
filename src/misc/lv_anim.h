@@ -398,9 +398,9 @@ static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t 
 }
 
 /**
- * Create an animation
+ * Start the animation
  * @param a         an initialized 'anim_t' variable. Not required after call.
- * @return          pointer to the created animation (different from the `a` parameter)
+ * @return          pointer to the internal animation structure (different from the `a` parameter)
  */
 lv_anim_t * lv_anim_start(const lv_anim_t * a);
 

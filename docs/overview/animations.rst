@@ -18,6 +18,10 @@ This prototype is compatible with the majority of the property *set*
 functions in LVGL. For example :cpp:expr:`lv_obj_set_x(obj, value)` or
 :cpp:expr:`lv_obj_set_width(obj, value)`
 
+This signature promotes a pattern with one layer of abstraction,
+where the "var" parameter is not directly pointing to the memory location we want to change,
+but rather to the object who's member we are interested in.
+
 .. _animations_create:
 
 Create an animation
@@ -87,7 +91,7 @@ and configured with ``lv_anim_set_...()`` functions.
     *------------------*/
    lv_anim_start(&a);                             /*Start the animation*/
 
-You can apply multiple different animations on the same variable at the
+You can apply multiple different animations on the same variable (object) at the
 same time. For example, animate the x and y coordinates with
 :cpp:func:`lv_obj_set_x` and :cpp:func:`lv_obj_set_y`. However, only one animation can
 exist with a given variable and function pair and :cpp:func:`lv_anim_start`
