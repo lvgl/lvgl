@@ -79,6 +79,13 @@ void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse);
 void lv_anim_timeline_set_repeat_count(lv_anim_timeline_t * at, uint32_t cnt);
 
 /**
+ * Set a delay before repeating the animation timeline.
+ * @param at        pointer to the animation timeline.
+ * @param delay     delay in milliseconds before repeating the animation timeline.
+ */
+void lv_anim_timeline_set_repeat_delay(lv_anim_timeline_t * at, uint32_t delay);
+
+/**
  * Set the progress of the animation timeline.
  * @param at        pointer to the animation timeline.
  * @param progress  set value 0~65535 to map 0~100% animation progress.
