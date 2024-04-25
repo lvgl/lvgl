@@ -360,7 +360,7 @@
             #define LV_USE_NATIVE_HELIUM_ASM    0
         #endif
     #endif
-    
+
     /* 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only
      * 1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too */
     #ifndef LV_DRAW_SW_COMPLEX
@@ -616,6 +616,11 @@
         #endif
     #endif
 
+    /*Set callback to print the logs.
+     *E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`
+     *Can be overwritten by `lv_log_register_print_cb`*/
+    //#define LV_LOG_PRINT_CB
+
     /*1: Enable print timestamp;
      *0: Disable print timestamp*/
     #ifndef LV_LOG_USE_TIMESTAMP
@@ -643,6 +648,7 @@
             #define LV_LOG_USE_FILE_LINE 1
         #endif
     #endif
+
 
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #ifndef LV_LOG_TRACE_MEM
@@ -3115,28 +3121,28 @@
     #ifdef CONFIG_LV_USE_ST7735
         #define LV_USE_ST7735 CONFIG_LV_USE_ST7735
     #else
-        #define LV_USE_ST7735		0
+        #define LV_USE_ST7735        0
     #endif
 #endif
 #ifndef LV_USE_ST7789
     #ifdef CONFIG_LV_USE_ST7789
         #define LV_USE_ST7789 CONFIG_LV_USE_ST7789
     #else
-        #define LV_USE_ST7789		0
+        #define LV_USE_ST7789        0
     #endif
 #endif
 #ifndef LV_USE_ST7796
     #ifdef CONFIG_LV_USE_ST7796
         #define LV_USE_ST7796 CONFIG_LV_USE_ST7796
     #else
-        #define LV_USE_ST7796		0
+        #define LV_USE_ST7796        0
     #endif
 #endif
 #ifndef LV_USE_ILI9341
     #ifdef CONFIG_LV_USE_ILI9341
         #define LV_USE_ILI9341 CONFIG_LV_USE_ILI9341
     #else
-        #define LV_USE_ILI9341		0
+        #define LV_USE_ILI9341       0
     #endif
 #endif
 
