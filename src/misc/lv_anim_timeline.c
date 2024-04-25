@@ -30,6 +30,7 @@ struct _lv_anim_timeline_t {
     uint32_t anim_dsc_cnt;              /**< The length of anim dsc array*/
     uint32_t act_time;                  /**< Current time of the animation*/
     bool reverse;                       /**< Reverse playback*/
+    uint32_t repeat_count;              /**< Repeat count*/
 };
 
 /**********************
@@ -86,6 +87,7 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     LV_ASSERT_NULL(at);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
+    uint32_t repeat = at->repeat_count;
     uint32_t start = at->act_time;
     uint32_t end = at->reverse ? 0 : playtime;
     uint32_t duration = end > start ? end - start : start - end;
@@ -97,6 +99,7 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     lv_anim_set_values(&a, start, end);
     lv_anim_set_time(&a, duration);
     lv_anim_set_path_cb(&a, anim_timeline_path_cb);
+    lv_anim_set_repeat_count(&a, repeat);
     lv_anim_start(&a);
     return playtime;
 }
@@ -112,6 +115,12 @@ void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse)
 {
     LV_ASSERT_NULL(at);
     at->reverse = reverse;
+}
+
+void lv_anim_timeline_set_repeat_count(lv_anim_timeline_t * at, uint32_t cnt)
+{
+    LV_ASSERT_NULL(at);
+    at->repeat_count = cnt;
 }
 
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
