@@ -179,7 +179,7 @@ uint32_t lv_anim_timeline_get_repeat_count(lv_anim_timeline_t * at)
 }
 
 uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at)
-{   
+{
     LV_ASSERT_NULL(at);
     return  at->repeat_delay;
 }
