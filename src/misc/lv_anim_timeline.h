@@ -106,6 +106,18 @@ bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at);
  */
 uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at);
 
+/**
+ * Get repeat count of the animation timeline.
+ * @param at    pointer to the animation timeline.
+ */
+uint32_t lv_anim_timeline_get_repeat_count(lv_anim_timeline_t * at);
+
+/**
+ * Get repeat delay of the animation timeline.
+ * @param at    pointer to the animation timeline.
+ */
+uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at);
+
 /**********************
  *      MACROS
  **********************/
