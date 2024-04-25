@@ -207,27 +207,7 @@ else:
 
 
 def get_version():
-    path = os.path.join(project_path, 'lvgl.h')
-    with open(path, 'rb') as f:
-        d = f.read().decode('utf-8')
-
-    d = d.split('#define LVGL_VERSION_MAJOR', 1)[-1]
-    major, d = d.split('\n', 1)
-    d = d.split('#define LVGL_VERSION_MINOR', 1)[-1]
-    minor, d = d.split('\n', 1)
-    # d = d.split('#define LVGL_VERSION_PATCH', 1)[-1]
-    # patch, d = d.split('\n', 1)
-
-    ver = '{0}.{1}'.format(major.strip(), minor.strip())
-
-    # ver = '{0}.{1}.{2}'.format(major.strip(), minor.strip(), patch.strip())
-
-    # if '#define LVGL_VERSION_INFO' in d:
-    #     d = d.split('#define LVGL_VERSION_INFO', 1)[-1]
-    #     info, d = d.split('\n', 1)
-    #     info = info.strip().replace('"', '')
-    #     ver += '-' + info
-
+    _, ver = subprocess.getstatusoutput("../scripts/find_version.sh")
     return ver
 
 cmd('sphinx-build -b html "{src}" "{dst}" -D version="{version}" -E -j {cpu}'.format(
