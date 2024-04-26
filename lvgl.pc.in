@@ -5,6 +5,6 @@ libdir=${prefix}/lib
 Name: lvgl
 Description: Light and Versatile Graphics Library
 URL: https://lvgl.io/
-Version: 9.1.0
+Version: @LVGL_VERSION@
 Cflags: -I${includedir}
 Libs: -L${libdir} -llvgl

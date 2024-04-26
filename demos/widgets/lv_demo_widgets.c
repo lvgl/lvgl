@@ -841,7 +841,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section3_indicator_style);
     lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section3_tick_style);
 
-    LV_IMG_DECLARE(img_demo_widgets_needle);
+    LV_IMAGE_DECLARE(img_demo_widgets_needle);
     lv_obj_t * needle = lv_image_create(scale3);
     lv_image_set_src(needle, &img_demo_widgets_needle);
     lv_image_set_pivot(needle, 3, 4);

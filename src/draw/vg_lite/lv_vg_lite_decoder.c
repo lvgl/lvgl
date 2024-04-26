@@ -19,6 +19,8 @@
  *      DEFINES
  *********************/
 
+#define DECODER_NAME    "VG_LITE"
+
 /* VG_LITE_INDEX1, 2, and 4 require endian flipping + bit flipping,
  * so for simplicity, they are uniformly converted to I8 for display.
  */
@@ -65,6 +67,8 @@ void lv_vg_lite_decoder_init(void)
     lv_image_decoder_set_info_cb(decoder, decoder_info);
     lv_image_decoder_set_open_cb(decoder, decoder_open);
     lv_image_decoder_set_close_cb(decoder, decoder_close);
+
+    decoder->name = DECODER_NAME;
 }
 
 void lv_vg_lite_decoder_deinit(void)

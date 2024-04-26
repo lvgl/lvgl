@@ -20,8 +20,9 @@ How to Use
 **********
 
 In general:
-- you can set the macro :c:macro:`LV_USE_DRAW_ARM2D_SYNC` to ``1`` in
-  ``lv_conf.h`` to enable Arm-2D synchronous acceleration for LVGL. 
+- you can set the macro :c:macro:`LV_USE_DRAW_ARM2D_SYNC` to ``1`` and 
+  :c:macro:`LV_DRAW_SW_ASM` to ``LV_DRAW_SW_ASM_HELIUM`` in ``lv_conf.h`` to 
+  enable Arm-2D synchronous acceleration for LVGL. 
 - You can set 
   the macro :c:macro:`LV_USE_DRAW_ARM2D_ASYNC` to ``1`` in ``lv_conf.h`` to enable 
   Arm-2D Asynchronous acceleration for LVGL. 

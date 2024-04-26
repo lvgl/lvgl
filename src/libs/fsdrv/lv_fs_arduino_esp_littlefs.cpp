@@ -94,7 +94,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
     LV_UNUSED(drv);
     ArduinoEspLittleFile * lf = (ArduinoEspLittleFile *)file_p;
     lf->file.close();
-    lv_free(lf);
+    delete lf;
 
     return LV_FS_RES_OK;
 }

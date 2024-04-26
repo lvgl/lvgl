@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <string.h>
 #include <sys/param.h> /*To detect BSD*/
 #ifdef BSD
     #include <dev/evdev/input.h>
@@ -177,6 +178,26 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
     if(fcntl(dsc->fd, F_SETFL, O_NONBLOCK) < 0) {
         LV_LOG_ERROR("fcntl failed: %s", strerror(errno));
         goto err_after_open;
+    }
+
+    /* Detect the minimum and maximum values of the input device for calibration. */
+
+    if(indev_type == LV_INDEV_TYPE_POINTER) {
+        struct input_absinfo absinfo;
+        if(ioctl(dsc->fd, EVIOCGABS(ABS_X), &absinfo) == 0) {
+            dsc->min_x = absinfo.minimum;
+            dsc->max_x = absinfo.maximum;
+        }
+        else {
+            LV_LOG_ERROR("ioctl EVIOCGABS(ABS_X) failed: %s", strerror(errno));
+        }
+        if(ioctl(dsc->fd, EVIOCGABS(ABS_Y), &absinfo) == 0) {
+            dsc->min_y = absinfo.minimum;
+            dsc->max_y = absinfo.maximum;
+        }
+        else {
+            LV_LOG_ERROR("ioctl EVIOCGABS(ABS_Y) failed: %s", strerror(errno));
+        }
     }
 
     lv_indev_t * indev = lv_indev_create();

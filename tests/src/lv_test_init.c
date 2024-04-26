@@ -1,7 +1,6 @@
 #if LV_BUILD_TEST
 #include "lv_test_init.h"
 #include "lv_test_indev.h"
-#include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "../unity/unity.h"

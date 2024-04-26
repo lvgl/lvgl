@@ -112,6 +112,7 @@ void lv_draw_sdl_init(void)
         .create_cb = (lv_cache_create_cb_t)sdl_texture_cache_create_cb,
         .free_cb = (lv_cache_free_cb_t)sdl_texture_cache_free_cb,
     });
+    lv_cache_set_name(draw_sdl_unit->texture_cache, "SDL_TEXTURE");
 }
 
 /**********************
@@ -224,10 +225,41 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
             break;
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * image_dsc = task->draw_dsc;
-                const char * path = image_dsc->src;
-                SDL_Surface * surface = IMG_Load(&path[2]);
-                if(surface == NULL) {
-                    fprintf(stderr, "could not load image: %s\n", IMG_GetError());
+                lv_image_src_t type = lv_image_src_get_type(image_dsc->src);
+                SDL_Surface * surface = NULL;
+                if(type == LV_IMAGE_SRC_FILE) {
+                    const char * path = image_dsc->src;
+                    surface = IMG_Load(&path[2]);
+                    if(surface == NULL) {
+                        LV_LOG_ERROR("could not load image from file: %s", IMG_GetError());
+                        return false;
+                    }
+                }
+                else if(type == LV_IMAGE_SRC_VARIABLE) {
+                    lv_image_dsc_t * lvd = image_dsc->src;
+                    surface = SDL_CreateRGBSurfaceFrom(lvd->data,
+                                                       lvd->header.w, lvd->header.h,
+                                                       LV_COLOR_FORMAT_GET_BPP(lvd->header.cf),
+                                                       lvd->header.stride,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+                                                       0x00FF0000,
+                                                       0x0000FF00,
+                                                       0x000000FF,
+                                                       0xFF000000
+#else
+                                                       0x0000FF00,
+                                                       0x00FF0000,
+                                                       0xFF000000,
+                                                       0x000000FF
+#endif
+                                                      );
+                    if(surface == NULL) {
+                        LV_LOG_ERROR("could not load image from variable");
+                        return false;
+                    }
+                }
+                else {
+                    LV_LOG_WARN("image source type unknown");
                     return false;
                 }
 

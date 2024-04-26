@@ -10,9 +10,16 @@
 
 #if LV_USE_TINY_TTF
 
+#include "../../core/lv_global.h"
+
+#define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
+
 /*********************
  *      DEFINES
  *********************/
+
+#define CACHE_NAME  "TINY_TTF"
+
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
 #define STBTT_STATIC
@@ -140,6 +147,7 @@ void lv_tiny_ttf_init(void)
     };
 
     tiny_ttf_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_cache_data_t), 128, ops);
+    lv_cache_set_name(tiny_ttf_cache, CACHE_NAME);
 }
 
 void lv_tiny_ttf_deinit(void)
@@ -352,7 +360,7 @@ static bool tiny_ttf_cache_create_cb(tiny_ttf_cache_data_t * node, void * user_d
     int w, h;
     w = x2 - x1 + 1;
     h = y2 - y1 + 1;
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_user(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
     if(NULL == draw_buf) {
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
         return false;
@@ -371,7 +379,7 @@ static void tiny_ttf_cache_free_cb(tiny_ttf_cache_data_t * node, void * user_dat
 {
     LV_UNUSED(user_data);
 
-    lv_draw_buf_destroy(node->draw_buf);
+    lv_draw_buf_destroy_user(font_draw_buf_handlers, node->draw_buf);
 }
 
 static lv_cache_compare_res_t tiny_ttf_cache_compare_cb(const tiny_ttf_cache_data_t * lhs,

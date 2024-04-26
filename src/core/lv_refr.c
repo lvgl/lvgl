@@ -959,7 +959,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
             layer_draw_dsc.antialias = disp_refr->antialiasing;
             layer_draw_dsc.bitmap_mask_src = lv_obj_get_style_bitmap_mask_src(obj, 0);
-            layer_draw_dsc.original_area = obj_draw_size;
+            layer_draw_dsc.image_area = obj_draw_size;
             layer_draw_dsc.src = new_layer;
 
             lv_draw_layer(layer, &layer_draw_dsc, &layer_area_act);

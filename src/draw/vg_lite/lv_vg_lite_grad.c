@@ -98,6 +98,7 @@ void lv_vg_lite_grad_init(
         u->linear_grad_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(linear_grad_item_t),
                                                linear_grad_cache_cnt,
                                                ops);
+        lv_cache_set_name(u->linear_grad_cache, "LINEAR_GRAD");
         u->linear_grad_pending = lv_vg_lite_pending_create(sizeof(lv_cache_entry_t *), 4);
         lv_vg_lite_pending_set_free_cb(u->linear_grad_pending, grad_cache_release_cb, u->linear_grad_cache);
     }

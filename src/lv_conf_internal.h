@@ -305,6 +305,17 @@
     #endif
 #endif
 
+/* The stack size of the drawing thread.
+ * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
+ */
+#ifndef LV_DRAW_THREAD_STACK_SIZE
+    #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
+        #define LV_DRAW_THREAD_STACK_SIZE CONFIG_LV_DRAW_THREAD_STACK_SIZE
+    #else
+        #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /*[bytes]*/
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
@@ -349,7 +360,7 @@
             #define LV_USE_NATIVE_HELIUM_ASM    0
         #endif
     #endif
-    
+
     /* 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only
      * 1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too */
     #ifndef LV_DRAW_SW_COMPLEX
@@ -405,15 +416,6 @@
                 #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
             #endif
         #endif
-    #endif
-#endif
-
-/* Set stack size of drawing thread. Unit is byte. If Thorvg is enabled, 128kB is required tested on simulator.*/
-#ifndef LV_DRAW_THREAD_STACKSIZE
-    #ifdef CONFIG_LV_DRAW_THREAD_STACKSIZE
-        #define LV_DRAW_THREAD_STACKSIZE CONFIG_LV_DRAW_THREAD_STACKSIZE
-    #else
-        #define LV_DRAW_THREAD_STACKSIZE 32768
     #endif
 #endif
 
@@ -550,11 +552,11 @@
 /* VG-Lite linear gradient image maximum cache number.
  * NOTE: The memory usage of a single gradient image is 4K bytes.
  */
-#ifndef LV_VG_LITE_LINEAER_GRAD_CACHE_CNT
-    #ifdef CONFIG_LV_VG_LITE_LINEAER_GRAD_CACHE_CNT
-        #define LV_VG_LITE_LINEAER_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_LINEAER_GRAD_CACHE_CNT
+#ifndef LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+    #ifdef CONFIG_LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+        #define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
     #else
-        #define LV_VG_LITE_LINEAER_GRAD_CACHE_CNT 32
+        #define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT 32
     #endif
 #endif
 
@@ -614,6 +616,11 @@
         #endif
     #endif
 
+    /*Set callback to print the logs.
+     *E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`
+     *Can be overwritten by `lv_log_register_print_cb`*/
+    //#define LV_LOG_PRINT_CB
+
     /*1: Enable print timestamp;
      *0: Disable print timestamp*/
     #ifndef LV_LOG_USE_TIMESTAMP
@@ -641,6 +648,7 @@
             #define LV_LOG_USE_FILE_LINE 1
         #endif
     #endif
+
 
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #ifndef LV_LOG_TRACE_MEM
@@ -1298,6 +1306,13 @@
         #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, Persian letters and all their forms*/
     #endif
 #endif
+#ifndef LV_FONT_SIMSUN_14_CJK
+    #ifdef CONFIG_LV_FONT_SIMSUN_14_CJK
+        #define LV_FONT_SIMSUN_14_CJK CONFIG_LV_FONT_SIMSUN_14_CJK
+    #else
+        #define LV_FONT_SIMSUN_14_CJK            0  /*1000 most common CJK radicals*/
+    #endif
+#endif
 #ifndef LV_FONT_SIMSUN_16_CJK
     #ifdef CONFIG_LV_FONT_SIMSUN_16_CJK
         #define LV_FONT_SIMSUN_16_CJK CONFIG_LV_FONT_SIMSUN_16_CJK
@@ -1608,6 +1623,13 @@
             #endif
         #else
             #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
+        #endif
+    #endif
+    #ifndef LV_USE_CALENDAR_CHINESE
+        #ifdef CONFIG_LV_USE_CALENDAR_CHINESE
+            #define LV_USE_CALENDAR_CHINESE CONFIG_LV_USE_CALENDAR_CHINESE
+        #else
+            #define LV_USE_CALENDAR_CHINESE 0
         #endif
     #endif
 #endif  /*LV_USE_CALENDAR*/
@@ -2245,6 +2267,38 @@
             #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
         #else
             #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+#endif
+
+/*API for Arduino Sd. */
+#ifndef LV_USE_FS_ARDUINO_SD
+    #ifdef CONFIG_LV_USE_FS_ARDUINO_SD
+        #define LV_USE_FS_ARDUINO_SD CONFIG_LV_USE_FS_ARDUINO_SD
+    #else
+        #define LV_USE_FS_ARDUINO_SD 0
+    #endif
+#endif
+#if LV_USE_FS_ARDUINO_SD
+    #ifndef LV_FS_ARDUINO_SD_LETTER
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_LETTER
+            #define LV_FS_ARDUINO_SD_LETTER CONFIG_LV_FS_ARDUINO_SD_LETTER
+        #else
+            #define LV_FS_ARDUINO_SD_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+    #ifndef LV_FS_ARDUINO_SD_CS_PIN
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_CS_PIN
+            #define LV_FS_ARDUINO_SD_CS_PIN CONFIG_LV_FS_ARDUINO_SD_CS_PIN
+        #else
+            #define LV_FS_ARDUINO_SD_CS_PIN 0     /*Set the pin connected to the chip select line of the SD card */
+        #endif
+    #endif
+    #ifndef LV_FS_ARDUINO_SD_FREQUENCY
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_FREQUENCY
+            #define LV_FS_ARDUINO_SD_FREQUENCY CONFIG_LV_FS_ARDUINO_SD_FREQUENCY
+        #else
+            #define LV_FS_ARDUINO_SD_FREQUENCY 40000000     /*Set the frequency used by the chip of the SD CARD */
         #endif
     #endif
 #endif
@@ -3067,28 +3121,28 @@
     #ifdef CONFIG_LV_USE_ST7735
         #define LV_USE_ST7735 CONFIG_LV_USE_ST7735
     #else
-        #define LV_USE_ST7735		0
+        #define LV_USE_ST7735        0
     #endif
 #endif
 #ifndef LV_USE_ST7789
     #ifdef CONFIG_LV_USE_ST7789
         #define LV_USE_ST7789 CONFIG_LV_USE_ST7789
     #else
-        #define LV_USE_ST7789		0
+        #define LV_USE_ST7789        0
     #endif
 #endif
 #ifndef LV_USE_ST7796
     #ifdef CONFIG_LV_USE_ST7796
         #define LV_USE_ST7796 CONFIG_LV_USE_ST7796
     #else
-        #define LV_USE_ST7796		0
+        #define LV_USE_ST7796        0
     #endif
 #endif
 #ifndef LV_USE_ILI9341
     #ifdef CONFIG_LV_USE_ILI9341
         #define LV_USE_ILI9341 CONFIG_LV_USE_ILI9341
     #else
-        #define LV_USE_ILI9341		0
+        #define LV_USE_ILI9341       0
     #endif
 #endif
 
@@ -3298,6 +3352,17 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 
 #ifndef LV_USE_THORVG
     #define LV_USE_THORVG  (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+#endif
+
+#if LV_USE_OS
+    #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
+        #warning "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
+    #endif
+
+    #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)
+        #warning "LV_DRAW_THREAD_STACKSIZE was renamed to LV_DRAW_THREAD_STACK_SIZE. Please update lv_conf.h or run menuconfig again."
+        #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
+    #endif
 #endif
 
 /*If running without lv_conf.h add typedefs with default value*/

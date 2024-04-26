@@ -100,6 +100,7 @@ typedef struct _lv_global_t {
     lv_tick_state_t tick_state;
 
     lv_draw_buf_handlers_t draw_buf_handlers;
+    lv_draw_buf_handlers_t font_draw_buf_handlers;
 
     lv_ll_t img_decoder_ll;
 
@@ -160,6 +161,10 @@ typedef struct _lv_global_t {
 
 #if LV_USE_FS_ARDUINO_ESP_LITTLEFS
     lv_fs_drv_t arduino_esp_littlefs_fs_drv;
+#endif
+
+#if LV_USE_FS_ARDUINO_SD
+    lv_fs_drv_t arduino_sd_fs_drv;
 #endif
 
 #if LV_USE_FREETYPE

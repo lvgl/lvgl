@@ -1,6 +1,6 @@
 #define LV_MEM_SIZE                     (32 * 1024 * 1024)
 #define LV_DRAW_SW_SHADOW_CACHE_SIZE    8
-#define LV_DRAW_THREAD_STACKSIZE    (128 * 1024) /*Increase stack size to 128kB in order to run Thorvg*/
+#define LV_DRAW_THREAD_STACK_SIZE    (64 * 1024) /*Increase stack size to 64KB in order to run ThorVG*/
 #define LV_USE_LOG              1
 #define LV_LOG_LEVEL            LV_LOG_LEVEL_TRACE
 #define LV_LOG_PRINTF           1
@@ -34,6 +34,7 @@
 #define LV_FONT_MONTSERRAT_48   1
 #define LV_FONT_MONTSERRAT_28_COMPRESSED    1
 #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW    1
+#define LV_FONT_SIMSUN_14_CJK   1
 #define LV_FONT_SIMSUN_16_CJK   1
 #define LV_FONT_UNSCII_8        1
 #define LV_FONT_UNSCII_16       1
@@ -46,14 +47,21 @@
 #define LV_USE_MEM_MONITOR          1
 #define LV_LABEL_TEXT_SELECTION     1
 
+#define LV_USE_CALENDAR_CHINESE 1
+
 #define LV_USE_FLEX 1
 #define LV_USE_GRID 1
 
 #define LV_USE_FS_STDIO     1
 #define LV_FS_STDIO_LETTER  'A'
 #define LV_FS_STDIO_CACHE_SIZE 512
-#define LV_USE_FS_POSIX     1
-#define LV_FS_POSIX_LETTER  'B'
+#ifndef _WIN32
+    #define LV_USE_FS_POSIX     1
+    #define LV_FS_POSIX_LETTER  'B'
+#else
+    #define LV_USE_FS_WIN32 1
+    #define LV_FS_WIN32_LETTER 'C'
+#endif
 #define LV_USE_FS_MEMFS     1
 #define LV_FS_MEMFS_LETTER  'M'
 
@@ -63,7 +71,9 @@
 #define LV_USE_LIBPNG       1
 #define LV_USE_BMP          1
 #define LV_USE_TJPGD        1
-#define LV_USE_LIBJPEG_TURBO   1
+#ifndef _WIN32
+    #define LV_USE_LIBJPEG_TURBO   1
+#endif
 #define LV_USE_GIF          1
 #define LV_USE_QRCODE       1
 #define LV_USE_BARCODE      1

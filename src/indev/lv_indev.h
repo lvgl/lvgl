@@ -54,7 +54,7 @@ typedef struct {
     uint32_t btn_id;  /**< For LV_INDEV_TYPE_BUTTON the currently pressed button*/
     int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
 
-    lv_indev_state_t state; /**< LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
+    lv_indev_state_t state; /**< LV_INDEV_STATE_RELEASED or LV_INDEV_STATE_PRESSED*/
     bool continue_reading;  /**< If set to true, the read callback is invoked again, unless the device is in event-driven mode*/
 } lv_indev_data_t;
 

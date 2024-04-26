@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_canvas.c
  *
  */
@@ -122,6 +122,9 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
         *buf &= ~(1 << bit);
         *buf |= c_int << bit;
     }
+    else if(cf == LV_COLOR_FORMAT_L8) {
+        *data = lv_color_luminance(color);
+    }
     else if(cf == LV_COLOR_FORMAT_A8) {
         *data = opa;
     }
@@ -148,6 +151,11 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
         buf->green = color.green;
         buf->blue = color.blue;
         buf->alpha = opa;
+    }
+    else if(cf == LV_COLOR_FORMAT_AL88) {
+        lv_color16a_t * buf = (lv_color16a_t *)data;
+        buf->lumi = lv_color_luminance(color);
+        buf->alpha = 255;
     }
     lv_obj_invalidate(obj);
 }
@@ -212,6 +220,13 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y)
                 ret.alpha = px[0];
                 break;
             }
+        case LV_COLOR_FORMAT_L8: {
+                ret.red = *px;
+                ret.green = *px;
+                ret.blue = *px;
+                ret.alpha = 0xFF;
+                break;
+            }
         default:
             lv_memzero(&ret, sizeof(lv_color32_t));
             break;
@@ -252,7 +267,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     if(canvas->draw_buf == NULL) return;
 
-    LV_ASSERT_MSG(canvas->draw_buf->header.cf != dest_buf->header.cf, "Color formats must be the same");
+    LV_ASSERT_MSG(canvas->draw_buf->header.cf == dest_buf->header.cf, "Color formats must be the same");
 
     lv_draw_buf_copy(canvas->draw_buf, canvas_area, dest_buf, dest_area);
 }
@@ -303,6 +318,27 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
             }
         }
     }
+    else if(header->cf == LV_COLOR_FORMAT_L8) {
+        uint8_t c8 = lv_color_luminance(color);
+        for(y = 0; y < header->h; y++) {
+            uint8_t * buf = (uint8_t *)(data + y * stride);
+            for(x = 0; x < header->w; x++) {
+                buf[x] = c8;
+            }
+        }
+    }
+    else if(header->cf == LV_COLOR_FORMAT_AL88) {
+        lv_color16a_t c;
+        c.lumi = lv_color_luminance(color);
+        c.alpha = 255;
+        for(y = 0; y < header->h; y++) {
+            lv_color16a_t * buf = (lv_color16a_t *)(data + y * stride);
+            for(x = 0; x < header->w; x++) {
+                buf[x] = c;
+            }
+        }
+    }
+
     else {
         for(y = 0; y < header->h; y++) {
             for(x = 0; x < header->w; x++) {
@@ -333,10 +369,12 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
+    if(layer->draw_task_head == NULL) return;
     while(layer->draw_task_head) {
         lv_draw_dispatch_wait_for_request();
         lv_draw_dispatch_layer(lv_obj_get_display(canvas), layer);
     }
+    lv_obj_invalidate(canvas);
 }
 
 /**********************

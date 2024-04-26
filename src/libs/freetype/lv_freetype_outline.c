@@ -16,6 +16,8 @@
  *      DEFINES
  *********************/
 
+#define CACHE_NAME "FREETYPE_OUTLINE"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -66,6 +68,7 @@ lv_cache_t * lv_freetype_create_draw_data_outline(uint32_t cache_size)
     lv_cache_t * draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(lv_freetype_outline_node_t),
                                                    cache_size,
                                                    glyph_outline_cache_ops);
+    lv_cache_set_name(draw_data_cache, CACHE_NAME);
 
     return draw_data_cache;
 }

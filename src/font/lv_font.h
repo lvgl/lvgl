@@ -153,6 +153,13 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out
                            uint32_t letter_next);
 
 /**
+ * Release the bitmap of a font.
+ * @note You must call @lv_font_get_glyph_dsc to get @g_dsc (@lv_font_glyph_dsc_t) before you can call this function.
+ * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
+ */
+void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc);
+
+/**
  * Get the width of a glyph with kerning
  * @param font          pointer to a font
  * @param letter        a UNICODE letter
@@ -274,6 +281,10 @@ LV_FONT_DECLARE(lv_font_montserrat_28_compressed)
 
 #if LV_FONT_DEJAVU_16_PERSIAN_HEBREW
 LV_FONT_DECLARE(lv_font_dejavu_16_persian_hebrew)
+#endif
+
+#if LV_FONT_SIMSUN_14_CJK
+LV_FONT_DECLARE(lv_font_simsun_14_cjk)
 #endif
 
 #if LV_FONT_SIMSUN_16_CJK
