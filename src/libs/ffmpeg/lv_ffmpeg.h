@@ -40,7 +40,7 @@ typedef enum {
     LV_FFMPEG_PLAYER_CMD_STOP,
     LV_FFMPEG_PLAYER_CMD_PAUSE,
     LV_FFMPEG_PLAYER_CMD_RESUME,
-    _LV_FFMPEG_PLAYER_CMD_LAST
+    LV_FFMPEG_PLAYER_CMD_LAST
 } lv_ffmpeg_player_cmd_t;
 
 /**********************

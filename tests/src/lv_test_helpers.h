@@ -1,3 +1,4 @@
+#include "../../src/stdlib/lv_mem_private.h"
 #ifndef LV_TEST_HELPERS_H
 #define LV_TEST_HELPERS_H
 

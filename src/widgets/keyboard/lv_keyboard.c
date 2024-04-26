@@ -7,7 +7,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_keyboard.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_keyboard_private.h"
 #if LV_USE_KEYBOARD
 
 #include "../textarea/lv_textarea.h"
@@ -371,6 +372,21 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
     else {
         lv_textarea_add_text(keyboard->ta, txt);
     }
+}
+
+const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
+{
+    return lv_buttonmatrix_get_map(kb);
+}
+
+uint32_t lv_keyboard_get_selected_button(const lv_obj_t * obj)
+{
+    return lv_buttonmatrix_get_selected_button(obj);
+}
+
+const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
+{
+    return lv_buttonmatrix_get_button_text(obj, btn_id);
 }
 
 /**********************

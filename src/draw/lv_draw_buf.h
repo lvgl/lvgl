@@ -43,11 +43,11 @@ typedef struct {
  * Refine it to suit your needs.
  */
 
-#define _LV_DRAW_BUF_STRIDE(w, cf) \
+#define LV_DRAW_BUF_STRIDE(w, cf) \
     LV_ROUND_UP(((w) * LV_COLOR_FORMAT_GET_BPP(cf) + 7) / 8, LV_DRAW_BUF_STRIDE_ALIGN)
 
 /* Allocate a slightly larger buffer, so we can adjust the start address to meet alignment */
-#define _LV_DRAW_BUF_SIZE(w, h, cf) (_LV_DRAW_BUF_STRIDE(w, cf) * (h) + LV_DRAW_BUF_ALIGN)
+#define LV_DRAW_BUF_SIZE(w, h, cf) (LV_DRAW_BUF_STRIDE(w, cf) * (h) + LV_DRAW_BUF_ALIGN)
 
 /**
  * Define a static draw buffer with the given width, height, and color format.
@@ -56,7 +56,7 @@ typedef struct {
  * For platform that needs special buffer alignment, call LV_DRAW_BUF_INIT_STATIC.
  */
 #define LV_DRAW_BUF_DEFINE_STATIC(name, _w, _h, _cf) \
-    static uint8_t buf_##name[_LV_DRAW_BUF_SIZE(_w, _h, _cf)]; \
+    static uint8_t buf_##name[LV_DRAW_BUF_SIZE(_w, _h, _cf)]; \
     static lv_draw_buf_t name = { \
                                   .header = { \
                                               .magic = LV_IMAGE_HEADER_MAGIC, \
@@ -64,7 +64,7 @@ typedef struct {
                                               .flags = LV_IMAGE_FLAGS_MODIFIABLE, \
                                               .w = (_w), \
                                               .h = (_h), \
-                                              .stride = _LV_DRAW_BUF_STRIDE(_w, _cf), \
+                                              .stride = LV_DRAW_BUF_STRIDE(_w, _cf), \
                                               .reserved_2 = 0, \
                                             }, \
                                   .data_size = sizeof(buf_##name), \
@@ -103,11 +103,6 @@ typedef struct {
  **********************/
 
 /**
- * Called internally to initialize the draw_buf_handlers in lv_global
- */
-void _lv_draw_buf_init_handlers(void);
-
-/**
  * Initialize the draw buffer with the default handlers.
  *
  * @param handlers  the draw buffer handlers to set
@@ -124,7 +119,7 @@ void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers);
  * @param invalidate_cache_cb the callback to invalidate the cache of the buffer
  * @param width_to_stride_cb the callback to calculate the stride based on the width and color format
  */
-void lv_draw_buf_init_handlers(lv_draw_buf_handlers_t * handlers,
+void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
                                lv_draw_buf_malloc_cb buf_malloc_cb,
                                lv_draw_buf_free_cb buf_free_cb,
                                lv_draw_buf_align_cb align_pointer_cb,
@@ -339,36 +334,20 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride);
  */
 lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
 
-static inline bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    return draw_buf->header.flags & flag;
-}
+bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 
-static inline void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    draw_buf->header.flags |= flag;
-}
+void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 
-static inline void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
-{
-    draw_buf->header.flags &= ~flag;
-}
+void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 
 /**
  * As of now, draw buf share same definition as `lv_image_dsc_t`.
  * And is interchangeable with `lv_image_dsc_t`.
  */
 
-static inline void lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)
-{
-    lv_memcpy(buf, img, sizeof(lv_image_dsc_t));
-    buf->unaligned_data = buf->data;
-}
+void lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img);
 
-static inline void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
-{
-    lv_memcpy((void *)img, buf, sizeof(lv_image_dsc_t));
-}
+void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img);
 
 /**
  * Set the palette color of an indexed image. Valid only for `LV_COLOR_FORMAT_I1/2/4/8`
@@ -385,26 +364,13 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
 /**
  * @deprecated Use lv_draw_buf_set_palette instead.
  */
-static inline void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
-{
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
-    lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
-}
+void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c);
 
 /**
  * @deprecated Use lv_draw_buffer_create/destroy instead.
  * Free the data pointer and dsc struct of an image.
  */
-static inline void lv_image_buf_free(lv_image_dsc_t * dsc)
-{
-    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
-    if(dsc != NULL) {
-        if(dsc->data != NULL)
-            lv_free((void *)dsc->data);
-
-        lv_free((void *)dsc);
-    }
-}
+void lv_image_buf_free(lv_image_dsc_t * dsc);
 
 /**********************
  *      MACROS

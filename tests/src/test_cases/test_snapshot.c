@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #if LV_USE_SNAPSHOT
 
@@ -34,7 +35,7 @@ void test_snapshot_should_not_leak_memory(void)
     TEST_ASSERT_EQUAL(initial_available_memory, final_available_memory);
 }
 
-void test_snapshot_take_snapshot_immidiately_after_obj_create(void)
+void test_snapshot_take_snapshot_immediately_after_obj_create(void)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_style_text_font(label, &lv_font_montserrat_28, 0);

@@ -1,3 +1,4 @@
+#include "../../../src/widgets/chart/lv_chart_private.h"
 #include "../../lv_examples.h"
 #if LV_USE_CHART && LV_BUILD_EXAMPLES
 

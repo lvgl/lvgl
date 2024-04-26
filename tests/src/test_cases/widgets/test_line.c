@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 
@@ -75,7 +76,7 @@ void test_line_should_update_extra_draw_size_based_on_style(void)
     /* Trigger the extra draw size event */
     lv_obj_refresh_ext_draw_size(line);
 
-    TEST_ASSERT_EQUAL(initial_extra_draw_size, _lv_obj_get_ext_draw_size(line));
+    TEST_ASSERT_EQUAL(initial_extra_draw_size, lv_obj_get_ext_draw_size(line));
 
     /* Update line width style, the event handler should set the extra draw size
      * to the line width */
@@ -84,7 +85,7 @@ void test_line_should_update_extra_draw_size_based_on_style(void)
     /* Trigger the extra draw size event */
     lv_obj_refresh_ext_draw_size(line);
 
-    TEST_ASSERT_EQUAL(final_extra_draw_size, _lv_obj_get_ext_draw_size(line));
+    TEST_ASSERT_EQUAL(final_extra_draw_size, lv_obj_get_ext_draw_size(line));
 }
 
 void test_line_basic_render(void)

@@ -1,3 +1,4 @@
+#include "../../../src/others/monkey/lv_monkey_private.h"
 #include "../../lv_examples.h"
 #if LV_USE_MONKEY && LV_BUILD_EXAMPLES
 

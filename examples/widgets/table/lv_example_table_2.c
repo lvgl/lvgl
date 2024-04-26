@@ -1,3 +1,5 @@
+#include "../../../src/stdlib/lv_mem_private.h"
+#include "../../../src/draw/lv_draw_private.h"
 #include "../../lv_examples.h"
 #if LV_USE_TABLE && LV_BUILD_EXAMPLES
 

@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 
@@ -139,7 +140,7 @@ void test_spangroup_set_overflow(void)
 void test_spangroup_set_overflow_invalid_parameters_overflow_not_changed(void)
 {
     lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_ELLIPSIS);
-    lv_spangroup_set_overflow(spangroup, _LV_SPAN_OVERFLOW_LAST);
+    lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_LAST);
 
     TEST_ASSERT_EQUAL(LV_SPAN_OVERFLOW_ELLIPSIS, lv_spangroup_get_overflow(spangroup));
 }
@@ -168,7 +169,7 @@ void test_spangroup_set_mode(void)
 void test_spangroup_set_mode_invalid_parameter_mode_not_changed(void)
 {
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
-    lv_spangroup_set_mode(spangroup, _LV_SPAN_MODE_LAST);
+    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_LAST);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_EXPAND, lv_spangroup_get_mode(spangroup));
 }
 

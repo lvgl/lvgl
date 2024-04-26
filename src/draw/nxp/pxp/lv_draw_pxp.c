@@ -373,7 +373,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &t->area, draw_unit->clip_area))
+    if(!lv_area_intersect(&draw_area, &t->area, draw_unit->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /* Make area relative to the buffer */
@@ -400,7 +400,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
-        if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area))
+        if(!lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area))
             return;
 
         int32_t idx = 0;
@@ -411,7 +411,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
         }
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
+        rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);
         rect_dsc.border_color = rect_dsc.bg_color;
         rect_dsc.bg_opa = LV_OPA_10;
         rect_dsc.border_opa = LV_OPA_80;

@@ -33,8 +33,8 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-uint32_t _lv_text_ap_calc_bytes_count(const char * txt);
-void _lv_text_ap_proc(const char * txt, char * txt_out);
+uint32_t lv_text_ap_calc_bytes_count(const char * txt);
+void lv_text_ap_proc(const char * txt, char * txt_out);
 
 /**********************
  *      MACROS

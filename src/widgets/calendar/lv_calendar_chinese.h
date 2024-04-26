@@ -14,20 +14,12 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../core/lv_obj.h"
+#include "lv_calendar.h"
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_CHINESE
 
 /*********************
  *      DEFINES
  *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    lv_calendar_date_t today;
-    bool leep_month;
-} lv_calendar_chinese_t;
 
 /**********************
  * GLOBAL PROTOTYPES

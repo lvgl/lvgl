@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "../lv_draw_private.h"
 #if LV_USE_DRAW_SW
 
 #include "../../core/lv_refr.h"
-#include "lv_draw_sw.h"
+#include "lv_draw_sw_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
@@ -447,7 +447,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
-        if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
+        if(!lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
 
         int32_t idx = 0;
         lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
@@ -457,7 +457,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         }
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
+        rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);
         rect_dsc.border_color = rect_dsc.bg_color;
         rect_dsc.bg_opa = LV_OPA_10;
         rect_dsc.border_opa = LV_OPA_80;

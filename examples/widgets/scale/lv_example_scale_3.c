@@ -1,3 +1,4 @@
+#include "../../../src/misc/lv_anim_private.h"
 #include "../../lv_examples.h"
 #if LV_USE_SCALE && LV_BUILD_EXAMPLES
 

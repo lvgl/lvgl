@@ -26,7 +26,7 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_freetype_image_cache_data_t {
+typedef struct lv_freetype_image_cache_data_t {
     FT_UInt glyph_index;
     uint32_t size;
 

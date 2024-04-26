@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_event.h"
+#include "lv_event_private.h"
 #include "../core/lv_global.h"
 #include "../stdlib/lv_mem.h"
 #include "lv_assert.h"
@@ -45,7 +45,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_event_push(lv_event_t * e)
+void lv_event_push(lv_event_t * e)
 {
     /*Build a simple linked list from the objects used in the events
      *It's important to know if this object was deleted by a nested event
@@ -55,7 +55,7 @@ void _lv_event_push(lv_event_t * e)
 
 }
 
-void _lv_event_pop(lv_event_t * e)
+void lv_event_pop(lv_event_t * e)
 {
     event_head = e->prev;
 }
@@ -209,7 +209,7 @@ uint32_t lv_event_register_id(void)
     return event_last_id;
 }
 
-void _lv_event_mark_deleted(void * target)
+void lv_event_mark_deleted(void * target)
 {
     lv_event_t * e = event_head;
 

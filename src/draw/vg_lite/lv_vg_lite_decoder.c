@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../lv_image_decoder_private.h"
 #include "lv_vg_lite_decoder.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -201,7 +202,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
         uint32_t stride = lv_draw_buf_width_to_stride(width, src_cf);
         lv_draw_buf_init(draw_buf, width, height, src_cf, stride, (void *)image_data, image_data_size);
 
-        /* Use alloced bit to indicate we should not free the memory */
+        /* Use allocated bit to indicate we should not free the memory */
         draw_buf->header.flags &= ~LV_IMAGE_FLAGS_ALLOCATED;
 
         /* Do not add this kind of image to cache, since its life is managed by user. */

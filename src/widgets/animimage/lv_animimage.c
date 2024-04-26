@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_animimage.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_animimage_private.h"
 #if LV_USE_ANIMIMG != 0
 
 /*Testing of dependencies*/

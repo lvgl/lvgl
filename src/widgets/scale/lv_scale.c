@@ -6,7 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_scale.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_scale_private.h"
 #if LV_USE_SCALE != 0
 
 #include "../../core/lv_group.h"
@@ -312,7 +314,7 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_scale_t * scale = (lv_scale_t *)obj;
-    lv_scale_section_t * section = _lv_ll_ins_head(&scale->section_ll);
+    lv_scale_section_t * section = lv_ll_ins_head(&scale->section_ll);
     LV_ASSERT_MALLOC(section);
     if(section == NULL) return NULL;
 
@@ -421,7 +423,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_scale_t * scale = (lv_scale_t *)obj;
 
-    _lv_ll_init(&scale->section_ll, sizeof(lv_scale_section_t));
+    lv_ll_init(&scale->section_ll, sizeof(lv_scale_section_t));
 
     scale->total_tick_count = LV_SCALE_TOTAL_TICK_COUNT_DEFAULT;
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
@@ -448,11 +450,11 @@ static void lv_scale_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_scale_t * scale = (lv_scale_t *)obj;
     lv_scale_section_t * section;
     while(scale->section_ll.head) {
-        section = _lv_ll_get_head(&scale->section_ll);
-        _lv_ll_remove(&scale->section_ll, section);
+        section = lv_ll_get_head(&scale->section_ll);
+        lv_ll_remove(&scale->section_ll, section);
         lv_free(section);
     }
-    _lv_ll_clear(&scale->section_ll);
+    lv_ll_clear(&scale->section_ll);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -538,7 +540,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
             /* Overwrite label and tick properties if tick value is within section range */
             lv_scale_section_t * section;
-            _LV_LL_READ_BACK(&scale->section_ll, section) {
+            LV_LL_READ_BACK(&scale->section_ll, section) {
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
                     if(is_major_tick) {
                         scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
@@ -627,7 +629,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
             /* Overwrite label and tick properties if tick value is within section range */
             lv_scale_section_t * section;
-            _LV_LL_READ_BACK(&scale->section_ll, section) {
+            LV_LL_READ_BACK(&scale->section_ll, section) {
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
                     if(is_major_tick) {
                         scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
@@ -781,7 +783,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         lv_draw_line(layer, &line_dsc);
 
         lv_scale_section_t * section;
-        _LV_LL_READ_BACK(&scale->section_ll, section) {
+        LV_LL_READ_BACK(&scale->section_ll, section) {
             lv_draw_line_dsc_t main_line_section_dsc;
             lv_draw_line_dsc_init(&main_line_section_dsc);
             lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_section_dsc);
@@ -847,7 +849,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         lv_draw_arc(layer, &arc_dsc);
 
         lv_scale_section_t * section;
-        _LV_LL_READ_BACK(&scale->section_ll, section) {
+        LV_LL_READ_BACK(&scale->section_ll, section) {
             lv_draw_arc_dsc_t main_arc_section_dsc;
             lv_draw_arc_dsc_init(&main_arc_section_dsc);
             lv_obj_init_draw_arc_dsc(obj, LV_PART_MAIN, &main_arc_section_dsc);
@@ -1295,7 +1297,7 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
         const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, min_out, max_out);
 
         lv_scale_section_t * section;
-        _LV_LL_READ_BACK(&scale->section_ll, section) {
+        LV_LL_READ_BACK(&scale->section_ll, section) {
             if(section->minor_range <= tick_value && section->major_range >= tick_value) {
                 if(LV_SCALE_TICK_IDX_DEFAULT_ID == section->first_tick_idx_in_section) {
                     section->first_tick_idx_in_section = tick_idx;
@@ -1409,7 +1411,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
     lv_scale_t * scale = (lv_scale_t *) obj;
     lv_scale_section_t * section;
 
-    _LV_LL_READ_BACK(&scale->section_ll, section) {
+    LV_LL_READ_BACK(&scale->section_ll, section) {
         if(section->minor_range <= tick_value && section->major_range >= tick_value) {
             if(is_major_tick) {
                 scale_set_indicator_label_properties(obj, label_dsc, section->indicator_style);

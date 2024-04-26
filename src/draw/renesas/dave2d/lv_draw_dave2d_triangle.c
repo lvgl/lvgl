@@ -15,7 +15,7 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
     tri_area.x2 = LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
     tri_area.y2 = LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
-    if(!_lv_area_intersect(&clipped_area, &tri_area, u->base_unit.clip_area)) return;
+    if(!lv_area_intersect(&clipped_area, &tri_area, u->base_unit.clip_area)) return;
 
 #if LV_USE_OS
     lv_result_t  status;

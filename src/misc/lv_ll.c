@@ -39,7 +39,7 @@ static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * nex
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
+void lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
 {
     ll_p->head = NULL;
     ll_p->tail = NULL;
@@ -54,7 +54,7 @@ void _lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
     ll_p->n_size = node_size;
 }
 
-void * _lv_ll_ins_head(lv_ll_t * ll_p)
+void * lv_ll_ins_head(lv_ll_t * ll_p)
 {
     lv_ll_node_t * n_new;
 
@@ -77,14 +77,14 @@ void * _lv_ll_ins_head(lv_ll_t * ll_p)
     return n_new;
 }
 
-void * _lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
+void * lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
 {
     lv_ll_node_t * n_new;
 
     if(NULL == ll_p || NULL == n_act) return NULL;
 
-    if(_lv_ll_get_head(ll_p) == n_act) {
-        n_new = _lv_ll_ins_head(ll_p);
+    if(lv_ll_get_head(ll_p) == n_act) {
+        n_new = lv_ll_ins_head(ll_p);
         if(n_new == NULL) return NULL;
     }
     else {
@@ -92,7 +92,7 @@ void * _lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
         if(n_new == NULL) return NULL;
 
         lv_ll_node_t * n_prev;
-        n_prev = _lv_ll_get_prev(ll_p, n_act);
+        n_prev = lv_ll_get_prev(ll_p, n_act);
         node_set_next(ll_p, n_prev, n_new);
         node_set_prev(ll_p, n_new, n_prev);
         node_set_prev(ll_p, n_act, n_new);
@@ -102,7 +102,7 @@ void * _lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
     return n_new;
 }
 
-void * _lv_ll_ins_tail(lv_ll_t * ll_p)
+void * lv_ll_ins_tail(lv_ll_t * ll_p)
 {
     lv_ll_node_t * n_new;
 
@@ -124,13 +124,13 @@ void * _lv_ll_ins_tail(lv_ll_t * ll_p)
     return n_new;
 }
 
-void _lv_ll_remove(lv_ll_t * ll_p, void * node_p)
+void lv_ll_remove(lv_ll_t * ll_p, void * node_p)
 {
     if(ll_p == NULL) return;
 
-    if(_lv_ll_get_head(ll_p) == node_p) {
+    if(lv_ll_get_head(ll_p) == node_p) {
         /*The new head will be the node after 'n_act'*/
-        ll_p->head = _lv_ll_get_next(ll_p, node_p);
+        ll_p->head = lv_ll_get_next(ll_p, node_p);
         if(ll_p->head == NULL) {
             ll_p->tail = NULL;
         }
@@ -138,9 +138,9 @@ void _lv_ll_remove(lv_ll_t * ll_p, void * node_p)
             node_set_prev(ll_p, ll_p->head, NULL);
         }
     }
-    else if(_lv_ll_get_tail(ll_p) == node_p) {
+    else if(lv_ll_get_tail(ll_p) == node_p) {
         /*The new tail will be the node before 'n_act'*/
-        ll_p->tail = _lv_ll_get_prev(ll_p, node_p);
+        ll_p->tail = lv_ll_get_prev(ll_p, node_p);
         if(ll_p->tail == NULL) {
             ll_p->head = NULL;
         }
@@ -149,26 +149,26 @@ void _lv_ll_remove(lv_ll_t * ll_p, void * node_p)
         }
     }
     else {
-        lv_ll_node_t * n_prev = _lv_ll_get_prev(ll_p, node_p);
-        lv_ll_node_t * n_next = _lv_ll_get_next(ll_p, node_p);
+        lv_ll_node_t * n_prev = lv_ll_get_prev(ll_p, node_p);
+        lv_ll_node_t * n_next = lv_ll_get_next(ll_p, node_p);
 
         node_set_next(ll_p, n_prev, n_next);
         node_set_prev(ll_p, n_next, n_prev);
     }
 }
 
-void _lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *))
+void lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *))
 {
     void * i;
     void * i_next;
 
-    i      = _lv_ll_get_head(ll_p);
+    i      = lv_ll_get_head(ll_p);
     i_next = NULL;
 
     while(i != NULL) {
-        i_next = _lv_ll_get_next(ll_p, i);
+        i_next = lv_ll_get_next(ll_p, i);
         if(cleanup == NULL) {
-            _lv_ll_remove(ll_p, i);
+            lv_ll_remove(ll_p, i);
             lv_free(i);
         }
         else {
@@ -178,9 +178,9 @@ void _lv_ll_clear_custom(lv_ll_t * ll_p, void(*cleanup)(void *))
     }
 }
 
-void _lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool head)
+void lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool head)
 {
-    _lv_ll_remove(ll_ori_p, node);
+    lv_ll_remove(ll_ori_p, node);
 
     if(head) {
         /*Set node as head*/
@@ -212,19 +212,19 @@ void _lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool h
     }
 }
 
-void * _lv_ll_get_head(const lv_ll_t * ll_p)
+void * lv_ll_get_head(const lv_ll_t * ll_p)
 {
     if(ll_p == NULL) return NULL;
     return ll_p->head;
 }
 
-void * _lv_ll_get_tail(const lv_ll_t * ll_p)
+void * lv_ll_get_tail(const lv_ll_t * ll_p)
 {
     if(ll_p == NULL) return NULL;
     return ll_p->tail;
 }
 
-void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
+void * lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
 {
     /*Pointer to the next node is stored in the end of this node.
      *Go there and return the address found there*/
@@ -233,7 +233,7 @@ void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
     return *((lv_ll_node_t **)n_act_d);
 }
 
-void * _lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
+void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
 {
     /*Pointer to the prev. node is stored in the end of this node.
      *Go there and return the address found there*/
@@ -242,32 +242,32 @@ void * _lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
     return *((lv_ll_node_t **)n_act_d);
 }
 
-uint32_t _lv_ll_get_len(const lv_ll_t * ll_p)
+uint32_t lv_ll_get_len(const lv_ll_t * ll_p)
 {
     uint32_t len = 0;
     void * node;
 
-    for(node = _lv_ll_get_head(ll_p); node != NULL; node = _lv_ll_get_next(ll_p, node)) {
+    for(node = lv_ll_get_head(ll_p); node != NULL; node = lv_ll_get_next(ll_p, node)) {
         len++;
     }
 
     return len;
 }
 
-void _lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
+void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
 {
     if(n_act == n_after) return; /*Can't move before itself*/
 
     void * n_before;
     if(n_after != NULL)
-        n_before = _lv_ll_get_prev(ll_p, n_after);
+        n_before = lv_ll_get_prev(ll_p, n_after);
     else
-        n_before = _lv_ll_get_tail(ll_p); /*if `n_after` is NULL `n_act` should be the new tail*/
+        n_before = lv_ll_get_tail(ll_p); /*if `n_after` is NULL `n_act` should be the new tail*/
 
     if(n_act == n_before) return; /*Already before `n_after`*/
 
     /*It's much easier to remove from the list and add again*/
-    _lv_ll_remove(ll_p, n_act);
+    lv_ll_remove(ll_p, n_act);
 
     /*Add again by setting the prev. and next nodes*/
     node_set_next(ll_p, n_before, n_act);
@@ -282,13 +282,18 @@ void _lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
     if(n_before == NULL) ll_p->head = n_act;
 }
 
-bool _lv_ll_is_empty(lv_ll_t * ll_p)
+bool lv_ll_is_empty(lv_ll_t * ll_p)
 {
     if(ll_p == NULL) return true;
 
     if(ll_p->head == NULL && ll_p->tail == NULL) return true;
 
     return false;
+}
+
+void lv_ll_clear(lv_ll_t * ll_p)
+{
+    lv_ll_clear_custom(ll_p, NULL);
 }
 
 /**********************

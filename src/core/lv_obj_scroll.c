@@ -6,11 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj_scroll.h"
-#include "lv_obj.h"
+#include "../misc/lv_anim_private.h"
+#include "lv_obj_scroll_private.h"
+#include "lv_obj_private.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_scroll.h"
 #include "../display/lv_display.h"
+#include "../misc/lv_area.h"
 
 /*********************
  *      DEFINES
@@ -350,7 +352,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
         res = lv_obj_send_event(obj, LV_EVENT_SCROLL_BEGIN, NULL);
         if(res != LV_RESULT_OK) return;
 
-        res = _lv_obj_scroll_by_raw(obj, dx, dy);
+        res = lv_obj_scroll_by_raw(obj, dx, dy);
         if(res != LV_RESULT_OK) return;
 
         res = lv_obj_send_event(obj, LV_EVENT_SCROLL_END, NULL);
@@ -408,7 +410,7 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
     }
 }
 
-lv_result_t _lv_obj_scroll_by_raw(lv_obj_t * obj, int32_t x, int32_t y)
+lv_result_t lv_obj_scroll_by_raw(lv_obj_t * obj, int32_t x, int32_t y)
 {
     if(x == 0 && y == 0) return LV_RESULT_OK;
 
@@ -450,7 +452,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
 
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
 
-    lv_dir_t sm = lv_obj_get_scrollbar_mode(obj);
+    lv_scrollbar_mode_t sm = lv_obj_get_scrollbar_mode(obj);
     if(sm == LV_SCROLLBAR_MODE_OFF)  return;
 
     /*If there is no indev scrolling this object but `mode==active` return*/
@@ -667,12 +669,12 @@ void lv_obj_readjust_scroll(lv_obj_t * obj, lv_anim_enable_t anim_en)
 
 static void scroll_x_anim(void * obj, int32_t v)
 {
-    _lv_obj_scroll_by_raw(obj, v + lv_obj_get_scroll_x(obj), 0);
+    lv_obj_scroll_by_raw(obj, v + lv_obj_get_scroll_x(obj), 0);
 }
 
 static void scroll_y_anim(void * obj, int32_t v)
 {
-    _lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
+    lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
 }
 
 static void scroll_end_cb(lv_anim_t * a)
@@ -732,6 +734,8 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
             act = lv_area_get_height(area_tmp) / 2 + area_tmp->y1 + y_scroll;
             y_scroll += snap_goal - act;
             break;
+        case LV_SCROLL_SNAP_NONE:
+            break;
     }
 
     int32_t x_scroll = 0;
@@ -773,6 +777,8 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
             snap_goal = parent->coords.x1 + sleft + parent_w / 2;
             act = lv_area_get_width(area_tmp) / 2 + area_tmp->x1 + x_scroll;
             x_scroll += snap_goal - act;
+            break;
+        case LV_SCROLL_SNAP_NONE:
             break;
     }
 

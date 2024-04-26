@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_async.h"
-#include "lv_timer.h"
+#include "lv_timer_private.h"
 #include "../stdlib/lv_mem.h"
 
 /*********************
@@ -19,7 +19,7 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_async_info_t {
+typedef struct lv_async_info_t {
     lv_async_cb_t cb;
     void * user_data;
 } lv_async_info_t;

@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_area_private.h"
+#include "../lv_draw_rect_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -60,7 +62,7 @@ void lv_draw_vg_lite_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_sh
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `shadow_area`*/
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &shadow_area, draw_unit->clip_area)) return;
+    if(!lv_area_intersect(&draw_area, &shadow_area, draw_unit->clip_area)) return;
 
     LV_PROFILER_BEGIN;
 

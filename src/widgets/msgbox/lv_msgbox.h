@@ -30,18 +30,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    lv_obj_t obj;
-    lv_obj_t * header;
-    lv_obj_t * content;
-    lv_obj_t * footer;
-    lv_obj_t * title;
-} lv_msgbox_t;
-
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_msgbox_class;
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_msgbox_header_class;
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_msgbox_content_class;

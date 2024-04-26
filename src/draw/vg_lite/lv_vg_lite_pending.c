@@ -19,7 +19,7 @@
  *      TYPEDEFS
  **********************/
 
-struct _lv_vg_lite_pending_t {
+struct lv_vg_lite_pending_t {
     lv_array_t objs;
     lv_vg_lite_pending_free_cb_t free_cb;
     void * user_data;

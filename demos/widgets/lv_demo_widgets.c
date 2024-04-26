@@ -6,6 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../src/widgets/chart/lv_chart_private.h"
+#include "../../src/misc/lv_anim_private.h"
+#include "../../src/draw/lv_draw_triangle_private.h"
+#include "../../src/draw/lv_draw_rect_private.h"
+#include "../../src/draw/lv_draw_private.h"
+#include "../../src/core/lv_obj_private.h"
 #include "lv_demo_widgets.h"
 
 #if LV_USE_DEMO_WIDGETS
@@ -1043,7 +1049,7 @@ static void color_changer_create(lv_obj_t * parent)
 {
     static lv_palette_t palette[] = {
         LV_PALETTE_BLUE, LV_PALETTE_GREEN, LV_PALETTE_BLUE_GREY,  LV_PALETTE_ORANGE,
-        LV_PALETTE_RED, LV_PALETTE_PURPLE, LV_PALETTE_TEAL, _LV_PALETTE_LAST
+        LV_PALETTE_RED, LV_PALETTE_PURPLE, LV_PALETTE_TEAL, LV_PALETTE_LAST
     };
 
     lv_obj_t * color_cont = lv_obj_create(parent);
@@ -1063,7 +1069,7 @@ static void color_changer_create(lv_obj_t * parent)
     lv_obj_align(color_cont, LV_ALIGN_BOTTOM_RIGHT, - LV_DPX(10),  - LV_DPX(10));
 
     uint32_t i;
-    for(i = 0; palette[i] != _LV_PALETTE_LAST; i++) {
+    for(i = 0; palette[i] != LV_PALETTE_LAST; i++) {
         lv_obj_t * c = lv_button_create(color_cont);
         lv_obj_set_style_bg_color(c, lv_palette_main(palette[i]), 0);
         lv_obj_set_style_radius(c, LV_RADIUS_CIRCLE, 0);
@@ -1162,7 +1168,7 @@ static void color_event_cb(lv_event_t * e)
     else if(code == LV_EVENT_CLICKED) {
         lv_palette_t * palette_primary = lv_event_get_user_data(e);
         lv_palette_t palette_secondary = (*palette_primary) + 3; /*Use another palette as secondary*/
-        if(palette_secondary >= _LV_PALETTE_LAST) palette_secondary = 0;
+        if(palette_secondary >= LV_PALETTE_LAST) palette_secondary = 0;
 #if LV_USE_THEME_DEFAULT
         lv_theme_default_init(NULL, lv_palette_main(*palette_primary), lv_palette_main(palette_secondary),
                               LV_THEME_DEFAULT_DARK, font_normal);

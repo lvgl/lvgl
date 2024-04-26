@@ -6,7 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
+#include "../misc/lv_event_private.h"
+#include "lv_obj_event_private.h"
+#include "lv_obj_class_private.h"
+#include "lv_obj_private.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
 
@@ -58,13 +61,13 @@ lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void *
     e.stop_bubbling = 0;
     e.stop_processing = 0;
 
-    _lv_event_push(&e);
+    lv_event_push(&e);
 
     /*Send the event*/
     lv_result_t res = event_send_core(&e);
 
     /*Remove this element from the list*/
-    _lv_event_pop(&e);
+    lv_event_pop(&e);
 
     return res;
 }

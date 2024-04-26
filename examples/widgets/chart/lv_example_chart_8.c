@@ -1,3 +1,4 @@
+#include "../../../src/misc/lv_timer_private.h"
 #include "../../lv_examples.h"
 #if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES
 

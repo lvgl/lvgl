@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../lv_draw_vector_private.h"
 #include "lv_vg_lite_grad.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -47,7 +48,7 @@ static void grad_cache_release_cb(void * entry, void * user_data);
 
 /* Linear gradient */
 
-static vg_lite_linear_gradient_t * linear_grad_get(struct _lv_draw_vg_lite_unit_t * u,
+static vg_lite_linear_gradient_t * linear_grad_get(struct lv_draw_vg_lite_unit_t * u,
                                                    const lv_grad_dsc_t * grad);
 static bool linear_grad_create_cb(linear_grad_item_t * item, void * user_data);
 static void linear_grad_free_cb(linear_grad_item_t * item, void * user_data);
@@ -57,7 +58,7 @@ static lv_cache_compare_res_t linear_grad_compare_cb(const linear_grad_item_t * 
 
 /* Radial gradient */
 
-static vg_lite_radial_gradient_t * radial_grad_get(struct _lv_draw_vg_lite_unit_t * u,
+static vg_lite_radial_gradient_t * radial_grad_get(struct lv_draw_vg_lite_unit_t * u,
                                                    const lv_vector_gradient_t * grad);
 static bool radial_grad_create_cb(radial_grad_item_t * item, void * user_data);
 static void radial_grad_free_cb(radial_grad_item_t * item, void * user_data);
@@ -80,7 +81,7 @@ static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t
  **********************/
 
 void lv_vg_lite_grad_init(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct lv_draw_vg_lite_unit_t * u,
     uint32_t linear_grad_cache_cnt,
     uint32_t radial_grad_cache_cnt)
 {
@@ -123,7 +124,7 @@ void lv_vg_lite_grad_init(
 #endif /* LV_USE_VECTOR_GRAPHIC */
 }
 
-void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u)
+void lv_vg_lite_grad_deinit(struct lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
     lv_vg_lite_pending_destroy(u->linear_grad_pending);
@@ -163,7 +164,7 @@ void lv_vg_lite_grad_area_to_matrix(vg_lite_matrix_t * grad_matrix, const lv_are
 }
 
 void lv_vg_lite_draw_linear_grad(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_grad_dsc_t * grad,
@@ -215,7 +216,7 @@ void lv_vg_lite_draw_linear_grad(
 #if LV_USE_VECTOR_GRAPHIC
 
 void lv_vg_lite_draw_radial_grad(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_vector_gradient_t * grad,
@@ -280,7 +281,7 @@ void lv_vg_lite_draw_radial_grad(
  **********************/
 
 static void * grad_get(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct lv_draw_vg_lite_unit_t * u,
     lv_cache_t * cache,
     lv_vg_lite_pending_t * pending,
     const void * key)
@@ -321,7 +322,7 @@ static void grad_cache_release_cb(void * entry, void * user_data)
 
 /* Linear gradient */
 
-static vg_lite_linear_gradient_t * linear_grad_get(struct _lv_draw_vg_lite_unit_t * u,
+static vg_lite_linear_gradient_t * linear_grad_get(struct lv_draw_vg_lite_unit_t * u,
                                                    const lv_grad_dsc_t * grad)
 {
     linear_grad_item_t search_key;
@@ -400,7 +401,7 @@ static lv_cache_compare_res_t linear_grad_compare_cb(const linear_grad_item_t * 
 
 /* Radial gradient */
 
-static vg_lite_radial_gradient_t * radial_grad_get(struct _lv_draw_vg_lite_unit_t * u,
+static vg_lite_radial_gradient_t * radial_grad_get(struct lv_draw_vg_lite_unit_t * u,
                                                    const lv_vector_gradient_t * grad)
 {
     radial_grad_item_t search_key;

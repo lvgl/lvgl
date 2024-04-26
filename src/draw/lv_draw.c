@@ -6,11 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw.h"
+#include "../misc/lv_area_private.h"
+#include "lv_draw_private.h"
 #include "sw/lv_draw_sw.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
-#include "../core/lv_refr.h"
+#include "../core/lv_refr_private.h"
 #include "../stdlib/lv_string.h"
 
 /*********************
@@ -286,8 +287,8 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     LV_PROFILER_BEGIN;
     /*If the first task is screen sized, there cannot be independent areas*/
     if(layer->draw_task_head) {
-        int32_t hor_res = lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
-        int32_t ver_res = lv_display_get_vertical_resolution(_lv_refr_get_disp_refreshing());
+        int32_t hor_res = lv_display_get_horizontal_resolution(lv_refr_get_disp_refreshing());
+        int32_t ver_res = lv_display_get_vertical_resolution(lv_refr_get_disp_refreshing());
         lv_draw_task_t * t = layer->draw_task_head;
         if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
            t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
@@ -324,7 +325,7 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
     lv_draw_task_t * t = t_check->next;
     while(t) {
         if((t->state == LV_DRAW_TASK_STATE_QUEUED || t->state == LV_DRAW_TASK_STATE_WAITING) &&
-           _lv_area_is_on(&t_check->area, &t->area)) {
+           lv_area_is_on(&t_check->area, &t->area)) {
             cnt++;
         }
 
@@ -336,7 +337,7 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
 
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
-    lv_display_t * disp = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
     lv_layer_t * new_layer = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
     if(new_layer == NULL) return NULL;
@@ -411,7 +412,7 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
     while(t && t != t_check) {
         if(t->state != LV_DRAW_TASK_STATE_READY) {
             lv_area_t a;
-            if(_lv_area_intersect(&a, &t->_real_area, &t_check->_real_area)) {
+            if(lv_area_intersect(&a, &t->_real_area, &t_check->_real_area)) {
                 LV_PROFILER_END;
                 return false;
             }

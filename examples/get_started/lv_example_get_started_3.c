@@ -1,3 +1,4 @@
+#include "../../src/misc/lv_color_op_private.h"
 #include "../lv_examples.h"
 #if LV_USE_BUTTON && LV_BUILD_EXAMPLES
 

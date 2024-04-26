@@ -372,7 +372,7 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp);
  * Load a screen on the default display
  * @param scr       pointer to a screen
  */
-void lv_screen_load(struct _lv_obj_t * scr);
+void lv_screen_load(struct lv_obj_t * scr);
 
 /**
  * Switch screen with animation
@@ -389,37 +389,25 @@ void lv_screen_load_anim(lv_obj_t * scr, lv_screen_load_anim_t anim_type, uint32
  * Get the active screen of the default display
  * @return          pointer to the active screen
  */
-static inline lv_obj_t * lv_screen_active(void)
-{
-    return lv_display_get_screen_active(lv_display_get_default());
-}
+lv_obj_t * lv_screen_active(void);
 
 /**
  * Get the top layer  of the default display
  * @return          pointer to the top layer
  */
-static inline lv_obj_t * lv_layer_top(void)
-{
-    return lv_display_get_layer_top(lv_display_get_default());
-}
+lv_obj_t * lv_layer_top(void);
 
 /**
  * Get the system layer  of the default display
  * @return          pointer to the sys layer
  */
-static inline lv_obj_t * lv_layer_sys(void)
-{
-    return lv_display_get_layer_sys(lv_display_get_default());
-}
+lv_obj_t * lv_layer_sys(void);
 
 /**
  * Get the bottom layer  of the default display
  * @return          pointer to the bottom layer
  */
-static inline lv_obj_t * lv_layer_bottom(void)
-{
-    return lv_display_get_layer_bottom(lv_display_get_default());
-}
+lv_obj_t * lv_layer_bottom(void);
 
 /*---------------------
  * OTHERS
@@ -572,8 +560,8 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
  * 1 dip is 2 px on a 320 DPI screen
  * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
  */
-#define _LV_DPX_CALC(dpi, n)   ((n) == 0 ? 0 :LV_MAX((( (dpi) * (n) + 80) / 160), 1)) /*+80 for rounding*/
-#define LV_DPX(n)   _LV_DPX_CALC(lv_display_get_dpi(NULL), n)
+#define LV_DPX_CALC(dpi, n)   ((n) == 0 ? 0 :LV_MAX((( (dpi) * (n) + 80) / 160), 1)) /*+80 for rounding*/
+#define LV_DPX(n)   LV_DPX_CALC(lv_display_get_dpi(NULL), n)
 
 /**
  * Scale the given number of pixels (a distance or size) relative to a 160 DPI display
@@ -583,10 +571,7 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
  * @param n     the number of pixels to scale
  * @return      `n x current_dpi/160`
  */
-static inline int32_t lv_dpx(int32_t n)
-{
-    return LV_DPX(n);
-}
+int32_t lv_dpx(int32_t n);
 
 /**
  * Scale the given number of pixels (a distance or size) relative to a 160 DPI display
@@ -597,10 +582,7 @@ static inline int32_t lv_dpx(int32_t n)
  * @param n     the number of pixels to scale
  * @return      `n x current_dpi/160`
  */
-static inline int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
-{
-    return _LV_DPX_CALC(lv_display_get_dpi(disp), n);
-}
+int32_t lv_display_dpx(const lv_display_t * disp, int32_t n);
 
 #ifdef __cplusplus
 } /*extern "C"*/

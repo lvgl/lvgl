@@ -15,7 +15,7 @@ extern "C" {
 #include "../../lv_conf_internal.h"
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_event.h"
-#include <stdbool.h>
+#include LV_STDBOOL_INCLUDE
 
 #if LV_USE_FREETYPE
 
@@ -59,19 +59,6 @@ typedef enum {
     LV_FREETYPE_OUTLINE_CUBIC_TO,
     LV_FREETYPE_OUTLINE_CONIC_TO,
 } lv_freetype_outline_type_t;
-
-typedef struct {
-    int32_t x;
-    int32_t y;
-} lv_freetype_outline_vector_t;
-
-typedef struct {
-    lv_freetype_outline_t outline;
-    lv_freetype_outline_type_t type;
-    lv_freetype_outline_vector_t to;
-    lv_freetype_outline_vector_t control1;
-    lv_freetype_outline_vector_t control2;
-} lv_freetype_outline_event_param_t;
 
 /**********************
  * GLOBAL PROTOTYPES

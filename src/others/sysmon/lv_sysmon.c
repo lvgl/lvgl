@@ -7,7 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_sysmon.h"
+#include "../../stdlib/lv_mem_private.h"
+#include "../../misc/lv_timer_private.h"
+#include "lv_sysmon_private.h"
 
 #if LV_USE_SYSMON
 
@@ -59,7 +61,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_sysmon_builtin_init(void)
+void lv_sysmon_builtin_init(void)
 {
 
 #if LV_USE_MEM_MONITOR
@@ -69,7 +71,7 @@ void _lv_sysmon_builtin_init(void)
 #endif
 }
 
-void _lv_sysmon_builtin_deinit(void)
+void lv_sysmon_builtin_deinit(void)
 {
 #if LV_USE_MEM_MONITOR
     lv_timer_delete(sysmon_mem.timer);

@@ -4,9 +4,11 @@
  */
 
 /*********************
-*      INCLUDES
+ *      INCLUDES
  *********************/
-#include "lv_draw_vector.h"
+#include "../misc/lv_area_private.h"
+#include "lv_draw_private.h"
+#include "lv_draw_vector_private.h"
 
 #if LV_USE_VECTOR_GRAPHIC
 
@@ -26,7 +28,7 @@
 #define MATH_DEGRESS(rad) ((rad) * RAD_TO_DEG)
 
 /*********************
-*      DEFINES
+ *      DEFINES
  *********************/
 
 #ifndef M_PI
@@ -44,16 +46,16 @@
     } while(0)
 
 /**********************
-*      TYPEDEFS
+ *      TYPEDEFS
  **********************/
 
 typedef struct {
     lv_vector_path_t * path;
     lv_vector_draw_dsc_t dsc;
-} _lv_vector_draw_task;
+} lv_vector_draw_task;
 
 /**********************
-*  STATIC PROTOTYPES
+ *  STATIC PROTOTYPES
  **********************/
 
 static bool _is_identity_or_translation(const lv_matrix_t * matrix)
@@ -119,7 +121,7 @@ static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_
     lv_area_copy(&(dst->scissor_area), &(src->scissor_area));
 }
 /**********************
-*   GLOBAL FUNCTIONS
+ *   GLOBAL FUNCTIONS
  **********************/
 
 /* matrix functions */
@@ -621,7 +623,7 @@ void lv_vector_dsc_delete(lv_vector_dsc_t * dsc)
 {
     if(dsc->tasks.task_list) {
         lv_ll_t * task_list = dsc->tasks.task_list;
-        _lv_vector_for_each_destroy_tasks(task_list, NULL, NULL);
+        lv_vector_for_each_destroy_tasks(task_list, NULL, NULL);
         dsc->tasks.task_list = NULL;
     }
     lv_array_deinit(&(dsc->current_dsc.stroke_dsc.dash_pattern));
@@ -779,7 +781,7 @@ void lv_vector_dsc_set_stroke_radial_gradient(lv_vector_dsc_t * dsc, const lv_gr
 void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path)
 {
     lv_area_t rect;
-    if(!_lv_area_intersect(&rect, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
+    if(!lv_area_intersect(&rect, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
         return;
     }
 
@@ -791,11 +793,11 @@ void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path
     if(!dsc->tasks.task_list) {
         dsc->tasks.task_list = lv_malloc(sizeof(lv_ll_t));
         LV_ASSERT_MALLOC(dsc->tasks.task_list);
-        _lv_ll_init(dsc->tasks.task_list, sizeof(_lv_vector_draw_task));
+        lv_ll_init(dsc->tasks.task_list, sizeof(lv_vector_draw_task));
     }
 
-    _lv_vector_draw_task * new_task = (_lv_vector_draw_task *)_lv_ll_ins_tail(dsc->tasks.task_list);
-    lv_memset(new_task, 0, sizeof(_lv_vector_draw_task));
+    lv_vector_draw_task * new_task = (lv_vector_draw_task *)lv_ll_ins_tail(dsc->tasks.task_list);
+    lv_memset(new_task, 0, sizeof(lv_vector_draw_task));
 
     new_task->path = lv_vector_path_create(0);
 
@@ -807,18 +809,18 @@ void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path
 void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
 {
     lv_area_t r;
-    if(!_lv_area_intersect(&r, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
+    if(!lv_area_intersect(&r, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
         return;
     }
 
     if(!dsc->tasks.task_list) {
         dsc->tasks.task_list = lv_malloc(sizeof(lv_ll_t));
         LV_ASSERT_MALLOC(dsc->tasks.task_list);
-        _lv_ll_init(dsc->tasks.task_list, sizeof(_lv_vector_draw_task));
+        lv_ll_init(dsc->tasks.task_list, sizeof(lv_vector_draw_task));
     }
 
-    _lv_vector_draw_task * new_task = (_lv_vector_draw_task *)_lv_ll_ins_tail(dsc->tasks.task_list);
-    lv_memset(new_task, 0, sizeof(_lv_vector_draw_task));
+    lv_vector_draw_task * new_task = (lv_vector_draw_task *)lv_ll_ins_tail(dsc->tasks.task_list);
+    lv_memset(new_task, 0, sizeof(lv_vector_draw_task));
 
     new_task->dsc.fill_dsc.color = dsc->current_dsc.fill_dsc.color;
     new_task->dsc.fill_dsc.opa = dsc->current_dsc.fill_dsc.opa;
@@ -867,14 +869,14 @@ void lv_vector_dsc_skew(lv_vector_dsc_t * dsc, float skew_x, float skew_y)
     lv_matrix_skew(&(dsc->current_dsc.matrix), skew_x, skew_y);
 }
 
-void _lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data)
+void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data)
 {
-    _lv_vector_draw_task * task = _lv_ll_get_head(task_list);
-    _lv_vector_draw_task * next_task = NULL;
+    lv_vector_draw_task * task = lv_ll_get_head(task_list);
+    lv_vector_draw_task * next_task = NULL;
 
     while(task != NULL) {
-        next_task = _lv_ll_get_next(task_list, task);
-        _lv_ll_remove(task_list, task);
+        next_task = lv_ll_get_next(task_list, task);
+        lv_ll_remove(task_list, task);
 
         if(cb) {
             cb(data, task->path, &(task->dsc));

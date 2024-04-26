@@ -34,33 +34,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/**
- * Data of image
- */
-typedef struct {
-    lv_obj_t obj;
-    const void * src;   /**< Image source: Pointer to an array or a file or a symbol*/
-    const lv_image_dsc_t * bitmap_mask_src; /**< Pointer to an A8 bitmap mask */
-    lv_point_t offset;
-    int32_t w;          /**< Width of the image (Handled by the library)*/
-    int32_t h;          /**< Height of the image (Handled by the library)*/
-    uint32_t rotation;    /**< Rotation angle of the image*/
-    uint32_t scale_x;      /**< 256 means no zoom, 512 double size, 128 half size*/
-    uint32_t scale_y;      /**< 256 means no zoom, 512 double size, 128 half size*/
-    lv_point_t pivot;     /**< Rotation center of the image*/
-    uint32_t src_type : 2;  /**< See: lv_image_src_t*/
-    uint32_t cf : 5;        /**< Color format from `lv_color_format_t`*/
-    uint32_t antialias : 1; /**< Apply anti-aliasing in transformations (rotate, zoom)*/
-    uint32_t align: 4;   /**< Image size mode when image size and object size is different. See `lv_image_align_t`*/
-    uint32_t blend_mode: 4;   /**< Element of `lv_blend_mode_t`*/
-} lv_image_t;
-
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_image_class;
 
 /**
  * Image size mode, when image size and object size is different
  */
-enum _lv_image_align_t {
+typedef enum {
     LV_IMAGE_ALIGN_DEFAULT = 0,
     LV_IMAGE_ALIGN_TOP_LEFT,
     LV_IMAGE_ALIGN_TOP_MID,
@@ -71,16 +50,10 @@ enum _lv_image_align_t {
     LV_IMAGE_ALIGN_LEFT_MID,
     LV_IMAGE_ALIGN_RIGHT_MID,
     LV_IMAGE_ALIGN_CENTER,
-    _LV_IMAGE_ALIGN_AUTO_TRANSFORM,
+    LV_IMAGE_ALIGN_AUTO_TRANSFORM,
     LV_IMAGE_ALIGN_STRETCH,
     LV_IMAGE_ALIGN_TILE,
-};
-
-#ifdef DOXYGEN
-typedef _lv_image_align_t lv_image_align_t;
-#else
-typedef uint8_t lv_image_align_t;
-#endif /*DOXYGEN*/
+} lv_image_align_t;
 
 #if LV_USE_OBJ_PROPERTY
 enum {
@@ -163,10 +136,7 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y);
 /**
  * Set pivot similar to get_pivot
  */
-static inline void _lv_image_set_pivot(lv_obj_t * obj, lv_point_t * pivot)
-{
-    lv_image_set_pivot(obj, pivot->x, pivot->y);
-}
+void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot);
 
 /**
  * Set the zoom factor of the image.

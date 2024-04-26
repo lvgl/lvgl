@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 
@@ -89,7 +90,7 @@ void test_switch_animation(void)
 
 void test_switch_should_not_have_extra_draw_size_at_creation(void)
 {
-    int32_t extra_size = _lv_obj_get_ext_draw_size(sw);
+    int32_t extra_size = lv_obj_get_ext_draw_size(sw);
 
     TEST_ASSERT_EQUAL(0, extra_size);
 }
@@ -98,7 +99,7 @@ void test_switch_should_update_extra_draw_size_after_editing_padding(void)
 {
     int32_t pad = 6;
     int32_t actual = 0;
-    int32_t expected = pad + _LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
+    int32_t expected = pad + LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
 
     static lv_style_t style_knob;
     lv_style_init(&style_knob);
@@ -109,7 +110,7 @@ void test_switch_should_update_extra_draw_size_after_editing_padding(void)
     lv_obj_center(sw);
 
     /* Get extra draw size */
-    actual = _lv_obj_get_ext_draw_size(sw);
+    actual = lv_obj_get_ext_draw_size(sw);
 
     TEST_ASSERT_EQUAL(expected, actual);
 }

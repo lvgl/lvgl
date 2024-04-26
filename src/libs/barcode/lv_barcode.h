@@ -28,15 +28,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of barcode*/
-typedef struct {
-    lv_canvas_t canvas;
-    lv_color_t dark_color;
-    lv_color_t light_color;
-    uint16_t scale;
-    lv_dir_t direction;
-} lv_barcode_t;
-
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_barcode_class;
 
 /**********************

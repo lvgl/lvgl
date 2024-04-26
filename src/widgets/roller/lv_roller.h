@@ -33,26 +33,10 @@ extern "C" {
  **********************/
 
 /** Roller mode.*/
-enum _lv_roller_mode_t {
+typedef enum {
     LV_ROLLER_MODE_NORMAL, /**< Normal mode (roller ends at the end of the options).*/
     LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever).*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_roller_mode_t lv_roller_mode_t;
-#else
-typedef uint8_t lv_roller_mode_t;
-#endif /*DOXYGEN*/
-
-typedef struct {
-    lv_obj_t obj;
-    uint32_t option_cnt;          /**< Number of options*/
-    uint32_t sel_opt_id;          /**< Index of the current option*/
-    uint32_t sel_opt_id_ori;      /**< Store the original index on focus*/
-    uint32_t inf_page_cnt;        /**< Number of extra pages added to make the roller look infinite */
-    lv_roller_mode_t mode : 1;
-    uint32_t moved : 1;
-} lv_roller_t;
+} lv_roller_mode_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_roller_class;
 

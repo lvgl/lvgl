@@ -98,15 +98,6 @@ int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part);
  */
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj);
 
-/**
- * Get the extended draw area of an object.
- * @param obj       pointer to an object
- * @return          the size extended draw area around the real coordinates
- */
-int32_t _lv_obj_get_ext_draw_size(const lv_obj_t * obj);
-
-lv_layer_type_t _lv_obj_get_layer_type(const lv_obj_t * obj);
-
 /**********************
  *      MACROS
  **********************/

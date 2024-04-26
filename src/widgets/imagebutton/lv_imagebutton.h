@@ -27,25 +27,12 @@ typedef enum {
     LV_IMAGEBUTTON_STATE_CHECKED_RELEASED,
     LV_IMAGEBUTTON_STATE_CHECKED_PRESSED,
     LV_IMAGEBUTTON_STATE_CHECKED_DISABLED,
-    _LV_IMAGEBUTTON_STATE_NUM,
+    LV_IMAGEBUTTON_STATE_NUM,
 } lv_imagebutton_state_t;
-
-typedef struct {
-    const void * img_src;
-    lv_image_header_t header;
-} lv_imagebutton_src_info_t;
 
 /**********************
  *      TYPEDEFS
  **********************/
-/*Data of image button*/
-typedef struct {
-    lv_obj_t obj;
-    lv_imagebutton_src_info_t src_mid[_LV_IMAGEBUTTON_STATE_NUM];   /*Store center images to each state*/
-    lv_imagebutton_src_info_t src_left[_LV_IMAGEBUTTON_STATE_NUM];  /*Store left side images to each state*/
-    lv_imagebutton_src_info_t src_right[_LV_IMAGEBUTTON_STATE_NUM]; /*Store right side images to each state*/
-} lv_imagebutton_t;
-
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_imagebutton_class;
 
 /**********************

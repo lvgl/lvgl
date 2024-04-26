@@ -6,6 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../../misc/lv_area_private.h"
+#include "lv_draw_sw_blend_private.h"
+#include "../../lv_draw_private.h"
 #include "../lv_draw_sw.h"
 #include "lv_draw_sw_blend_to_l8.h"
 #include "lv_draw_sw_blend_to_al88.h"
@@ -45,14 +48,14 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
     if(blend_dsc->mask_buf && blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_TRANSP) return;
 
     lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, blend_dsc->blend_area, draw_unit->clip_area)) return;
+    if(!lv_area_intersect(&blend_area, blend_dsc->blend_area, draw_unit->clip_area)) return;
 
     LV_PROFILER_BEGIN;
     lv_layer_t * layer = draw_unit->target_layer;
     uint32_t layer_stride_byte = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
 
     if(blend_dsc->src_buf == NULL) {
-        _lv_draw_sw_blend_fill_dsc_t fill_dsc;
+        lv_draw_sw_blend_fill_dsc_t fill_dsc;
         fill_dsc.dest_w = lv_area_get_width(&blend_area);
         fill_dsc.dest_h = lv_area_get_height(&blend_area);
         fill_dsc.dest_stride = layer_stride_byte;
@@ -96,17 +99,17 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         }
     }
     else {
-        if(!_lv_area_intersect(&blend_area, &blend_area, blend_dsc->src_area)) {
+        if(!lv_area_intersect(&blend_area, &blend_area, blend_dsc->src_area)) {
             LV_PROFILER_END;
             return;
         }
 
-        if(blend_dsc->mask_area && !_lv_area_intersect(&blend_area, &blend_area, blend_dsc->mask_area)) {
+        if(blend_dsc->mask_area && !lv_area_intersect(&blend_area, &blend_area, blend_dsc->mask_area)) {
             LV_PROFILER_END;
             return;
         }
 
-        _lv_draw_sw_blend_image_dsc_t image_dsc;
+        lv_draw_sw_blend_image_dsc_t image_dsc;
         image_dsc.dest_w = lv_area_get_width(&blend_area);
         image_dsc.dest_h = lv_area_get_height(&blend_area);
         image_dsc.dest_stride = layer_stride_byte;

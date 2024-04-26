@@ -8,7 +8,7 @@ void lv_draw_dave2d_mask_rect(lv_draw_dave2d_unit_t * u, const lv_draw_mask_rect
     int32_t x;
     int32_t y;
 
-    if(!_lv_area_intersect(&clipped_area, coords, u->base_unit.clip_area)) return;
+    if(!lv_area_intersect(&clipped_area, coords, u->base_unit.clip_area)) return;
 
     x = 0 - u->base_unit.target_layer->buf_area.x1;
     y = 0 - u->base_unit.target_layer->buf_area.y1;

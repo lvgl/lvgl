@@ -1,3 +1,4 @@
+#include "../../../src/others/fragment/lv_fragment_private.h"
 /**
  * @file lv_example_fragment_1.c
  * @brief Basic usage of obj fragment

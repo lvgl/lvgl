@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_observer.h"
+#include "lv_observer_private.h"
 #if LV_USE_OBSERVER
 
 #include "../../lvgl.h"
@@ -78,7 +78,7 @@ void lv_subject_init_int(lv_subject_t * subject, int32_t value)
     subject->type = LV_SUBJECT_TYPE_INT;
     subject->value.num = value;
     subject->prev_value.num = value;
-    _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
+    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
 void lv_subject_set_int(lv_subject_t * subject, int32_t value)
@@ -124,7 +124,7 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
     subject->value.pointer = buf;
     subject->prev_value.pointer = prev_buf;
 
-    _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
+    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
 void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
@@ -171,7 +171,7 @@ void lv_subject_init_pointer(lv_subject_t * subject, void * value)
     subject->type = LV_SUBJECT_TYPE_POINTER;
     subject->value.pointer = value;
     subject->prev_value.pointer = value;
-    _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
+    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
 void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)
@@ -212,7 +212,7 @@ void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)
     subject->type = LV_SUBJECT_TYPE_COLOR;
     subject->value.color = color;
     subject->prev_value.color = color;
-    _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
+    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
 void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)
@@ -251,7 +251,7 @@ void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32
 {
     subject->type = LV_SUBJECT_TYPE_GROUP;
     subject->size = list_len;
-    _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
+    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
     subject->value.pointer = list;
 
     /* bind all subjects to this subject */
@@ -309,7 +309,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
         LV_LOG_WARN("Subject not initialized yet");
         return NULL;
     }
-    lv_observer_t * observer = _lv_ll_ins_tail(&(subject->subs_ll));
+    lv_observer_t * observer = lv_ll_ins_tail(&(subject->subs_ll));
     LV_ASSERT_MALLOC(observer);
     if(observer == NULL) return NULL;
 
@@ -339,7 +339,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
         LV_LOG_WARN("Subject not initialized yet");
         return NULL;
     }
-    lv_observer_t * observer = _lv_ll_ins_tail(&(subject->subs_ll));
+    lv_observer_t * observer = lv_ll_ins_tail(&(subject->subs_ll));
     LV_ASSERT_MALLOC(observer);
     if(observer == NULL) return NULL;
 
@@ -362,7 +362,7 @@ void lv_observer_remove(lv_observer_t * observer)
 
     observer->subject->notify_restart_query = 1;
 
-    _lv_ll_remove(&(observer->subject->subs_ll), observer);
+    lv_ll_remove(&(observer->subject->subs_ll), observer);
 
     if(observer->auto_free_user_data) {
         lv_free(observer->user_data);
@@ -393,9 +393,9 @@ void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
     while(lv_obj_remove_event_cb(obj, dropdown_value_changed_event_cb));
 #endif /*LV_USE_DROPDOWN*/
 
-    lv_observer_t * observer = _lv_ll_get_head(&subject->subs_ll);
+    lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {
-        lv_observer_t * observer_next = _lv_ll_get_next(&subject->subs_ll, observer);
+        lv_observer_t * observer_next = lv_ll_get_next(&subject->subs_ll, observer);
         if(observer->target == obj) {
             lv_observer_remove(observer);
         }
@@ -415,13 +415,13 @@ void lv_subject_notify(lv_subject_t * subject)
     LV_ASSERT_NULL(subject);
 
     lv_observer_t * observer;
-    _LV_LL_READ(&(subject->subs_ll), observer) {
+    LV_LL_READ(&(subject->subs_ll), observer) {
         observer->notified = 0;
     }
 
     do {
         subject->notify_restart_query = 0;
-        _LV_LL_READ(&(subject->subs_ll), observer) {
+        LV_LL_READ(&(subject->subs_ll), observer) {
             if(observer->cb && observer->notified == 0) {
                 observer->cb(observer, subject);
                 if(subject->notify_restart_query) break;
@@ -549,6 +549,11 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 }
 
 #endif /*LV_USE_DROPDOWN*/
+
+lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
+{
+    return (lv_obj_t *)lv_observer_get_target(observer);
+}
 
 /**********************
  *   STATIC FUNCTIONS

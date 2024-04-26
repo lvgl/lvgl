@@ -8,7 +8,7 @@
  *********************/
 #include "lv_flex.h"
 #include "../lv_layout.h"
-#include "../../core/lv_obj.h"
+#include "../../core/lv_obj_private.h"
 
 #if LV_USE_FLEX
 
@@ -130,9 +130,9 @@ static void flex_update(lv_obj_t * cont, void * user_data)
 
     flex_t f;
     lv_flex_flow_t flow = lv_obj_get_style_flex_flow(cont, LV_PART_MAIN);
-    f.row = flow & _LV_FLEX_COLUMN ? 0 : 1;
-    f.wrap = flow & _LV_FLEX_WRAP ? 1 : 0;
-    f.rev = flow & _LV_FLEX_REVERSE ? 1 : 0;
+    f.row = flow & LV_FLEX_COLUMN ? 0 : 1;
+    f.wrap = flow & LV_FLEX_WRAP ? 1 : 0;
+    f.rev = flow & LV_FLEX_REVERSE ? 1 : 0;
     f.main_place = lv_obj_get_style_flex_main_place(cont, LV_PART_MAIN);
     f.cross_place = lv_obj_get_style_flex_cross_place(cont, LV_PART_MAIN);
     f.track_place = lv_obj_get_style_flex_track_place(cont, LV_PART_MAIN);

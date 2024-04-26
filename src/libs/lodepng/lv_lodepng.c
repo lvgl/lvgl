@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../draw/lv_image_decoder_private.h"
 #include "../../../lvgl.h"
 #if LV_USE_LODEPNG
 

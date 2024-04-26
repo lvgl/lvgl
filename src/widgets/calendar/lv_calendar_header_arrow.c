@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../core/lv_obj_class_private.h"
 #include "lv_calendar_header_arrow.h"
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_ARROW
 

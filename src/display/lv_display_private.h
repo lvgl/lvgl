@@ -33,7 +33,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_display_t {
+struct lv_display_t {
 
     /*---------------------
      * Resolution

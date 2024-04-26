@@ -1,3 +1,6 @@
+#include "../../../src/widgets/chart/lv_chart_private.h"
+#include "../../../src/draw/lv_draw_triangle_private.h"
+#include "../../../src/draw/lv_draw_private.h"
 #include "../../lv_examples.h"
 
 #if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES

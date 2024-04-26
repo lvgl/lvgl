@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_style.h"
+#include "lv_style_private.h"
 #include "../core/lv_global.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
@@ -16,8 +16,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define _lv_style_custom_prop_flag_lookup_table_size LV_GLOBAL_DEFAULT()->style_custom_table_size
-#define _lv_style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
+#define lv_style_custom_prop_flag_lookup_table_size LV_GLOBAL_DEFAULT()->style_custom_table_size
+#define lv_style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
 #define last_custom_prop_id LV_GLOBAL_DEFAULT()->style_last_custom_prop_id
 
 /**********************
@@ -34,7 +34,7 @@
 
 const lv_style_prop_t lv_style_const_prop_id_inv = LV_STYLE_PROP_INV;
 
-const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PROPS] = {
+const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROPS] = {
     [LV_STYLE_WIDTH] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_MIN_WIDTH] =                LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_MAX_WIDTH] =                LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
@@ -200,9 +200,9 @@ void lv_style_reset(lv_style_t * style)
 
 lv_style_prop_t lv_style_register_prop(uint8_t flag)
 {
-    if(_lv_style_custom_prop_flag_lookup_table == NULL) {
-        _lv_style_custom_prop_flag_lookup_table_size = 0;
-        last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
+    if(lv_style_custom_prop_flag_lookup_table == NULL) {
+        lv_style_custom_prop_flag_lookup_table_size = 0;
+        last_custom_prop_id = (uint16_t)LV_STYLE_LAST_BUILT_IN_PROP;
     }
 
     //    if((last_custom_prop_id + 1) != 0) {
@@ -213,30 +213,30 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
     /*
      * Allocate the lookup table if it's not yet available.
      */
-    size_t required_size = (last_custom_prop_id + 1 - _LV_STYLE_LAST_BUILT_IN_PROP);
-    if(_lv_style_custom_prop_flag_lookup_table_size < required_size) {
+    size_t required_size = (last_custom_prop_id + 1 - LV_STYLE_LAST_BUILT_IN_PROP);
+    if(lv_style_custom_prop_flag_lookup_table_size < required_size) {
         /* Round required_size up to the nearest 32-byte value */
         required_size = (required_size + 31) & ~31;
         LV_ASSERT_MSG(required_size > 0, "required size has become 0?");
-        uint8_t * old_p = _lv_style_custom_prop_flag_lookup_table;
+        uint8_t * old_p = lv_style_custom_prop_flag_lookup_table;
         uint8_t * new_p = lv_realloc(old_p, required_size * sizeof(uint8_t));
         if(new_p == NULL) {
             LV_LOG_ERROR("Unable to allocate space for custom property lookup table");
             return LV_STYLE_PROP_INV;
         }
-        _lv_style_custom_prop_flag_lookup_table = new_p;
-        _lv_style_custom_prop_flag_lookup_table_size = required_size;
+        lv_style_custom_prop_flag_lookup_table = new_p;
+        lv_style_custom_prop_flag_lookup_table_size = required_size;
     }
     last_custom_prop_id++;
     /* This should never happen - we should bail out above */
-    LV_ASSERT_NULL(_lv_style_custom_prop_flag_lookup_table);
-    _lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
+    LV_ASSERT_NULL(lv_style_custom_prop_flag_lookup_table);
+    lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
     return last_custom_prop_id;
 }
 
 lv_style_prop_t lv_style_get_num_custom_props(void)
 {
-    return last_custom_prop_id - _LV_STYLE_LAST_BUILT_IN_PROP;
+    return last_custom_prop_id - LV_STYLE_LAST_BUILT_IN_PROP;
 }
 
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
@@ -329,7 +329,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
     props[style->prop_cnt - 1] = prop;
     values[style->prop_cnt - 1] = value;
 
-    uint32_t group = _lv_style_get_prop_group(prop);
+    uint32_t group = lv_style_get_prop_group(prop);
     style->has_group |= (uint32_t)1 << group;
 }
 
@@ -424,16 +424,16 @@ bool lv_style_is_empty(const lv_style_t * style)
     return style->prop_cnt == 0;
 }
 
-uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
+uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop)
 {
     if(prop == LV_STYLE_PROP_ANY) return LV_STYLE_PROP_FLAG_ALL; /*Any prop can have any flags*/
     if(prop == LV_STYLE_PROP_INV) return 0;
 
-    if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS)
-        return _lv_style_builtin_prop_flag_lookup_table[prop];
-    prop -= _LV_STYLE_NUM_BUILT_IN_PROPS;
-    if(_lv_style_custom_prop_flag_lookup_table != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
-        return _lv_style_custom_prop_flag_lookup_table[prop];
+    if(prop < LV_STYLE_NUM_BUILT_IN_PROPS)
+        return lv_style_builtin_prop_flag_lookup_table[prop];
+    prop -= LV_STYLE_NUM_BUILT_IN_PROPS;
+    if(lv_style_custom_prop_flag_lookup_table != NULL && prop < lv_style_custom_prop_flag_lookup_table_size)
+        return lv_style_custom_prop_flag_lookup_table[prop];
     return 0;
 }
 

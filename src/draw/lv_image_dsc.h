@@ -29,7 +29,7 @@ LV_EXPORT_CONST_INT(LV_IMAGE_HEADER_MAGIC);
  *      TYPEDEFS
  **********************/
 
-typedef enum _lv_image_flags_t {
+typedef enum lv_image_flags_t {
     /**
      * For RGB map of the image data, mark if it's pre-multiplied with alpha.
      * For indexed image, this bit indicated palette data is pre-multiplied with alpha.

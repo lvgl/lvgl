@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_profiler_builtin.h"
+#include "lv_profiler_builtin_private.h"
 #include "../lvgl.h"
 #include "../core/lv_global.h"
 
@@ -54,7 +54,7 @@ typedef struct {
 /**
  * @brief Structure representing a context for the LVGL built-in profiler
  */
-typedef struct _lv_profiler_builtin_ctx_t {
+typedef struct lv_profiler_builtin_ctx_t {
     lv_profiler_builtin_item_t * item_arr; /**< Pointer to an array of profiler items */
     uint32_t item_num;                     /**< Number of profiler items in the array */
     uint32_t cur_index;                    /**< Index of the current profiler item */

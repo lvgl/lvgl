@@ -29,13 +29,6 @@ extern "C" {
  **********************/
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_canvas_class;
 
-/*Data of canvas*/
-typedef struct {
-    lv_image_t img;
-    lv_draw_buf_t * draw_buf;
-    lv_draw_buf_t static_buf;
-} lv_canvas_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -179,10 +172,7 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer);
 /**
  * Just a wrapper to `LV_CANVAS_BUF_SIZE` for bindings.
  */
-static inline uint32_t lv_canvas_buf_size(int32_t w, int32_t h, uint8_t bpp, uint8_t stride)
-{
-    return (uint32_t)LV_CANVAS_BUF_SIZE(w, h, bpp, stride);
-}
+uint32_t lv_canvas_buf_size(int32_t w, int32_t h, uint8_t bpp, uint8_t stride);
 
 #endif /*LV_USE_CANVAS*/
 

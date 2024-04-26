@@ -186,7 +186,7 @@ static void display_refr_timer_cb(lv_timer_t * tmr)
     }
 
     if(pfds[0].revents & POLLOUT) {
-        _lv_display_refr_timer(tmr);
+        lv_display_refr_timer(tmr);
     }
 }
 

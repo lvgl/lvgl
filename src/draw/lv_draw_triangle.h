@@ -20,19 +20,6 @@ extern "C" {
  *********************/
 
 /**********************
- *      TYPEDEFS
- **********************/
-typedef struct {
-    lv_draw_dsc_base_t base;
-
-    lv_opa_t bg_opa;
-    lv_color_t bg_color;
-    lv_grad_dsc_t bg_grad;
-
-    lv_point_precise_t p[3];
-} lv_draw_triangle_dsc_t;
-
-/**********************
  * GLOBAL PROTOTYPES
  **********************/
 

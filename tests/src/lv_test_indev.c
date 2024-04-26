@@ -1,3 +1,4 @@
+#include "../../src/indev/lv_indev_private.h"
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 #include <stdio.h>

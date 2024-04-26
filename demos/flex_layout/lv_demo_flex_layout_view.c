@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../../src/misc/lv_style_private.h"
 #include "lv_demo_flex_layout_main.h"
 
 #if LV_USE_DEMO_FLEX_LAYOUT

@@ -40,6 +40,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_fs_private.h"
 #include "../../../lvgl.h"
 #if LV_USE_FS_MEMFS
 

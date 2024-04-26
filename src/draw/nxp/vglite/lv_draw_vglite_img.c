@@ -146,7 +146,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     if(has_transform)
         lv_area_copy(&blend_area, &relative_coords);
-    else if(!_lv_area_intersect(&blend_area, &relative_coords, &clip_area))
+    else if(!lv_area_intersect(&blend_area, &relative_coords, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
     const void * src_buf = img_dsc->data;
@@ -407,8 +407,8 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     vg_lite_color_t vgcol = _vglite_recolor(dsc);
 
     /* Filter */
-    bool has_trasform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
-    vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
+    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
+    vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     /* Draw Pattern */
     VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, &path_matrix,

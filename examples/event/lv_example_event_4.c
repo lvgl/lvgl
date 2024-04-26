@@ -1,3 +1,6 @@
+#include "../../src/misc/lv_timer_private.h"
+#include "../../src/draw/lv_draw_private.h"
+#include "../../src/core/lv_obj_private.h"
 #include "../lv_examples.h"
 
 #if LV_BUILD_EXAMPLES

@@ -6,7 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_gif.h"
+#include "../../misc/lv_timer_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_gif_private.h"
 #if LV_USE_GIF
 
 #include "gifdec.h"
@@ -169,7 +171,7 @@ static void next_frame_task_cb(lv_timer_t * t)
         /*It was the last repeat*/
         lv_result_t res = lv_obj_send_event(obj, LV_EVENT_READY, NULL);
         lv_timer_pause(t);
-        if(res != LV_FS_RES_OK) return;
+        if(res != LV_RESULT_OK) return;
     }
 
     gd_render_frame(gifobj->gif, (uint8_t *)gifobj->imgdsc.data);

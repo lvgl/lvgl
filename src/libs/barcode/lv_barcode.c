@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_barcode.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_barcode_private.h"
 #include "../../lvgl.h"
 
 #if LV_USE_BARCODE

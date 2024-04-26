@@ -46,8 +46,8 @@ extern "C" {
  *
  * @return a pointer to a matching item, or NULL if none exists.
  */
-void * _lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
-                         int32_t (*cmp)(const void * pRef, const void * pElement));
+void * lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
+                        int32_t (*cmp)(const void * pRef, const void * pElement));
 
 /**
  * Save a draw buf to a file

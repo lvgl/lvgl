@@ -6,6 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../src/draw/lv_draw_triangle_private.h"
+#include "../../src/draw/lv_draw_private.h"
+#include "../../src/core/lv_obj_private.h"
 #include "lv_demo_render.h"
 
 #if LV_USE_DEMO_RENDER
@@ -891,7 +894,7 @@ void lv_demo_render(lv_demo_render_scene_t id, lv_opa_t opa)
 
 const char * lv_demo_render_get_scene_name(lv_demo_render_scene_t id)
 {
-    if(id > _LV_DEMO_RENDER_SCENE_NUM) return NULL;
+    if(id > LV_DEMO_RENDER_SCENE_NUM) return NULL;
     return scenes[id].name;
 }
 

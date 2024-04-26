@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_layout.h"
+#include "lv_layout_private.h"
 #include "../core/lv_global.h"
 #include "../core/lv_obj.h"
 
@@ -36,7 +36,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_layout_init(void)
+void lv_layout_init(void)
 {
     /*Malloc a list for the built in layouts*/
     layout_list_def = lv_malloc(layout_cnt * sizeof(lv_layout_dsc_t));
@@ -50,7 +50,7 @@ void _lv_layout_init(void)
 #endif
 }
 
-void _lv_layout_deinit(void)
+void lv_layout_deinit(void)
 {
     lv_free(layout_list_def);
 }
@@ -65,7 +65,7 @@ uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
     return layout_cnt++;
 }
 
-void _lv_layout_apply(lv_obj_t * obj)
+void lv_layout_apply(lv_obj_t * obj)
 {
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id <= layout_cnt) {

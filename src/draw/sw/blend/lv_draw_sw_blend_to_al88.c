@@ -9,7 +9,7 @@
 #include "lv_draw_sw_blend_to_al88.h"
 #if LV_USE_DRAW_SW
 
-#include "lv_draw_sw_blend.h"
+#include "lv_draw_sw_blend_private.h"
 #include "../../../misc/lv_math.h"
 #include "../../../display/lv_display.h"
 #include "../../../core/lv_refr.h"
@@ -44,16 +44,16 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void /* LV_ATTRIBUTE_FAST_MEM */ l8_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ l8_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
 
-static void /* LV_ATTRIBUTE_FAST_MEM */ al88_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ al88_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
 
-static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
 
-static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc,
+static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc,
                                                            const uint8_t src_px_size);
 
-static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
 
 static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache);
 
@@ -162,7 +162,7 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_16a_16a_mix(lv_color16a_t src,
  *   GLOBAL FUNCTIONS
  **********************/
 
-void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_al88(_lv_draw_sw_blend_fill_dsc_t * dsc)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_al88(lv_draw_sw_blend_fill_dsc_t * dsc)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
@@ -274,7 +274,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_al88(_lv_draw_sw_blend_fill
     }
 }
 
-void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_al88(_lv_draw_sw_blend_image_dsc_t * dsc)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_al88(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     switch(dsc->src_color_format) {
         case LV_COLOR_FORMAT_RGB565:
@@ -305,7 +305,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_al88(_lv_draw_sw_blend_imag
  *   STATIC FUNCTIONS
  **********************/
 
-static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
@@ -396,7 +396,7 @@ static void LV_ATTRIBUTE_FAST_MEM l8_image_blend(_lv_draw_sw_blend_image_dsc_t *
     }
 }
 
-static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
@@ -482,7 +482,7 @@ static void LV_ATTRIBUTE_FAST_MEM al88_image_blend(_lv_draw_sw_blend_image_dsc_t
     }
 }
 
-static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
@@ -573,7 +573,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(_lv_draw_sw_blend_image_dsc
     }
 }
 
-static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc,
+static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc,
                                                      const uint8_t src_px_size)
 {
     int32_t w = dsc->dest_w;
@@ -671,7 +671,7 @@ static void LV_ATTRIBUTE_FAST_MEM rgb888_image_blend(_lv_draw_sw_blend_image_dsc
     }
 }
 
-static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;

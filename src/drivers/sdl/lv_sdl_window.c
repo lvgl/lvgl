@@ -62,10 +62,10 @@ static void release_disp_cb(lv_event_t * e);
 /***********************
  *   GLOBAL PROTOTYPES
  ***********************/
-lv_display_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id);
-void _lv_sdl_mouse_handler(SDL_Event * event);
-void _lv_sdl_mousewheel_handler(SDL_Event * event);
-void _lv_sdl_keyboard_handler(SDL_Event * event);
+lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id);
+void lv_sdl_mouse_handler(SDL_Event * event);
+void lv_sdl_mousewheel_handler(SDL_Event * event);
+void lv_sdl_keyboard_handler(SDL_Event * event);
 static void res_chg_event_cb(lv_event_t * e);
 
 static bool inited = false;
@@ -167,7 +167,7 @@ uint8_t lv_sdl_window_get_zoom(lv_display_t * disp)
     return dsc->zoom;
 }
 
-lv_display_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id)
+lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id)
 {
     lv_display_t * disp = lv_display_get_next(NULL);
     if(win_id == UINT32_MAX) return disp;
@@ -300,14 +300,14 @@ static void sdl_event_handler(lv_timer_t * t)
     /*Refresh handling*/
     SDL_Event event;
     while(SDL_PollEvent(&event)) {
-        _lv_sdl_mouse_handler(&event);
+        lv_sdl_mouse_handler(&event);
 #if LV_SDL_MOUSEWHEEL_MODE == LV_SDL_MOUSEWHEEL_MODE_ENCODER
-        _lv_sdl_mousewheel_handler(&event);
+        lv_sdl_mousewheel_handler(&event);
 #endif
-        _lv_sdl_keyboard_handler(&event);
+        lv_sdl_keyboard_handler(&event);
 
         if(event.type == SDL_WINDOWEVENT) {
-            lv_display_t * disp = _lv_sdl_get_disp_from_win_id(event.window.windowID);
+            lv_display_t * disp = lv_sdl_get_disp_from_win_id(event.window.windowID);
             if(disp == NULL) continue;
             lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
 

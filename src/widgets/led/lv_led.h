@@ -34,13 +34,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of led*/
-typedef struct {
-    lv_obj_t obj;
-    lv_color_t color;
-    uint8_t bright;     /**< Current brightness of the LED (0..255)*/
-} lv_led_t;
-
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_led_class;
 
 /**********************

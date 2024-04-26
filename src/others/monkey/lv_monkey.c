@@ -6,7 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_monkey.h"
+#include "../../misc/lv_timer_private.h"
+#include "../../indev/lv_indev_private.h"
+#include "lv_monkey_private.h"
 
 #if LV_USE_MONKEY != 0
 
@@ -24,7 +26,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_monkey {
+struct lv_monkey {
     lv_monkey_config_t config;
     lv_indev_data_t indev_data;
     lv_indev_t * indev;

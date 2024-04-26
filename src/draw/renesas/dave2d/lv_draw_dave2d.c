@@ -97,7 +97,7 @@ void lv_draw_dave2d_init(void)
 
     draw_dave2d_unit->d2_handle = _d2_handle;
     draw_dave2d_unit->renderbuffer = _renderbuffer;
-    _lv_ll_init(&_ll_Dave2D_Tasks, 4);
+    lv_ll_init(&_ll_Dave2D_Tasks, 4);
 
 #if LV_USE_OS
     lv_thread_init(&draw_dave2d_unit->thread, LV_THREAD_PRIO_HIGH, _dave2d_render_thread_cb, 8 * 1024, draw_dave2d_unit);
@@ -377,7 +377,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     /* Return 0 is no selection, some tasks can be supported by other units. */
     if(t == NULL) {
 #if  (0 == D2_RENDER_EACH_OPERATION)
-        if(false == _lv_ll_is_empty(&_ll_Dave2D_Tasks)) {
+        if(false == lv_ll_is_empty(&_ll_Dave2D_Tasks)) {
             ref_count = 0;
             dave2d_execute_dlist_and_flush();
         }
@@ -403,7 +403,7 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     }
 
     lv_draw_task_t ** p_new_list_entry;
-    p_new_list_entry = _lv_ll_ins_tail(&_ll_Dave2D_Tasks);
+    p_new_list_entry = lv_ll_ins_tail(&_ll_Dave2D_Tasks);
     *p_new_list_entry = t;
 #endif
 
@@ -467,7 +467,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     int32_t x;
     int32_t y;
 
-    _lv_area_intersect(&clipped_area,  &t->area, u->base_unit.clip_area);
+    lv_area_intersect(&clipped_area,  &t->area, u->base_unit.clip_area);
 
     x = 0 - u->base_unit.target_layer->buf_area.x1;
     y = 0 - u->base_unit.target_layer->buf_area.y1;
@@ -616,11 +616,11 @@ void dave2d_execute_dlist_and_flush(void)
         __BKPT(0);
     }
 
-    while(false == _lv_ll_is_empty(&_ll_Dave2D_Tasks)) {
-        p_list_entry = _lv_ll_get_tail(&_ll_Dave2D_Tasks);
+    while(false == lv_ll_is_empty(&_ll_Dave2D_Tasks)) {
+        p_list_entry = lv_ll_get_tail(&_ll_Dave2D_Tasks);
         p_list_entry1 = *p_list_entry;
         p_list_entry1->state = LV_DRAW_TASK_STATE_READY;
-        _lv_ll_remove(&_ll_Dave2D_Tasks, p_list_entry);
+        lv_ll_remove(&_ll_Dave2D_Tasks, p_list_entry);
         lv_free(p_list_entry);
     }
 

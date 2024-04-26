@@ -43,7 +43,7 @@ typedef enum {
     LV_DEMO_RENDER_SCENE_TRIANGLE,
     LV_DEMO_RENDER_SCENE_LAYER_NORMAL,
     LV_DEMO_RENDER_SCENE_BLEND_MODE,
-    _LV_DEMO_RENDER_SCENE_NUM,
+    LV_DEMO_RENDER_SCENE_NUM,
 } lv_demo_render_scene_t;
 
 /**********************

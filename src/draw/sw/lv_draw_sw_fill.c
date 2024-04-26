@@ -6,11 +6,15 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_area_private.h"
+#include "lv_draw_sw_mask_private.h"
+#include "../lv_draw_rect_private.h"
+#include "../lv_draw_private.h"
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "blend/lv_draw_sw_blend.h"
-#include "lv_draw_sw_gradient.h"
+#include "blend/lv_draw_sw_blend_private.h"
+#include "lv_draw_sw_gradient_private.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../core/lv_refr.h"
@@ -50,7 +54,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
     lv_area_copy(&bg_coords, coords);
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &bg_coords, draw_unit->clip_area)) return;
+    if(!lv_area_intersect(&clipped_coords, &bg_coords, draw_unit->clip_area)) return;
 
     lv_grad_dir_t grad_dir = dsc->grad.dir;
     lv_color_t bg_color    = grad_dir == LV_GRAD_DIR_NONE ? dsc->color : dsc->grad.stops[0].color;

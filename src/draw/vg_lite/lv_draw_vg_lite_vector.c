@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 
+#include "../lv_image_decoder_private.h"
+#include "../lv_draw_vector_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC
@@ -62,7 +64,7 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_tas
         return;
 
     LV_PROFILER_BEGIN;
-    _lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, draw_unit);
+    lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, draw_unit);
     LV_PROFILER_END;
 }
 

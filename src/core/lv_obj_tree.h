@@ -1,5 +1,5 @@
 /**
- * @file struct _lv_obj_tree.h
+ * @file struct lv_obj_tree.h
  *
  */
 

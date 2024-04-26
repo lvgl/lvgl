@@ -33,16 +33,16 @@ extern "C" {
  **********************/
 
 void lv_vg_lite_grad_init(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct lv_draw_vg_lite_unit_t * u,
     uint32_t linear_grad_cache_cnt,
     uint32_t radial_grad_cache_cnt);
 
-void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u);
+void lv_vg_lite_grad_deinit(struct lv_draw_vg_lite_unit_t * u);
 
 void lv_vg_lite_grad_area_to_matrix(vg_lite_matrix_t * grad_matrix, const lv_area_t * area, lv_grad_dir_t dir);
 
 void lv_vg_lite_draw_linear_grad(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_grad_dsc_t * grad,
@@ -54,7 +54,7 @@ void lv_vg_lite_draw_linear_grad(
 #if LV_USE_VECTOR_GRAPHIC
 
 void lv_vg_lite_draw_radial_grad(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_vector_gradient_t * grad,

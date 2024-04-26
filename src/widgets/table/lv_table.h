@@ -33,39 +33,14 @@ LV_EXPORT_CONST_INT(LV_TABLE_CELL_NONE);
  *      TYPEDEFS
  **********************/
 
-enum _lv_table_cell_ctrl_t {
+typedef enum {
     LV_TABLE_CELL_CTRL_MERGE_RIGHT = 1 << 0,
     LV_TABLE_CELL_CTRL_TEXT_CROP   = 1 << 1,
     LV_TABLE_CELL_CTRL_CUSTOM_1    = 1 << 4,
     LV_TABLE_CELL_CTRL_CUSTOM_2    = 1 << 5,
     LV_TABLE_CELL_CTRL_CUSTOM_3    = 1 << 6,
     LV_TABLE_CELL_CTRL_CUSTOM_4    = 1 << 7,
-};
-
-#ifdef DOXYGEN
-typedef _lv_table_cell_ctrl_t lv_table_cell_ctrl_t;
-#else
-typedef uint32_t lv_table_cell_ctrl_t;
-#endif /*DOXYGEN*/
-
-/*Data of cell*/
-typedef struct {
-    lv_table_cell_ctrl_t ctrl;
-    void * user_data; /**< Custom user data*/
-    char txt[1]; /**< Variable length array*/
-} lv_table_cell_t;
-
-/*Data of table*/
-typedef struct {
-    lv_obj_t obj;
-    uint32_t col_cnt;
-    uint32_t row_cnt;
-    lv_table_cell_t ** cell_data;
-    int32_t * row_h;
-    int32_t * col_w;
-    uint32_t col_act;
-    uint32_t row_act;
-} lv_table_t;
+} lv_table_cell_ctrl_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_table_class;
 

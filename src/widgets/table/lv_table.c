@@ -6,7 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_table.h"
+#include "../../misc/lv_area_private.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_table_private.h"
 #if LV_USE_TABLE != 0
 
 #include "../../indev/lv_indev.h"
@@ -15,7 +18,7 @@
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_math.h"
 #include "../../stdlib/lv_sprintf.h"
-#include "../../draw/lv_draw.h"
+#include "../../draw/lv_draw_private.h"
 #include "../../stdlib/lv_string.h"
 
 /*********************
@@ -166,14 +169,14 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint32_t row, uint32_t col, con
     lv_vsnprintf(raw_txt, len + 1, fmt, ap2);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = _lv_text_ap_calc_bytes_count(raw_txt);
+    size_t len_ap = lv_text_ap_calc_bytes_count(raw_txt);
     table->cell_data[cell] = lv_realloc(table->cell_data[cell], sizeof(lv_table_cell_t) + len_ap + 1);
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) {
         va_end(ap2);
         return;
     }
-    _lv_text_ap_proc(raw_txt, table->cell_data[cell]->txt);
+    lv_text_ap_proc(raw_txt, table->cell_data[cell]->txt);
 
     lv_free(raw_txt);
 #else
@@ -671,7 +674,7 @@ static void draw_main(lv_event_t * e)
     lv_table_t * table = (lv_table_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, &obj->coords, &layer->_clip_area)) return;
+    if(!lv_area_intersect(&clip_area, &obj->coords, &layer->_clip_area)) return;
 
     const lv_area_t clip_area_ori = layer->_clip_area;
     layer->_clip_area = clip_area;
@@ -837,7 +840,7 @@ static void draw_main(lv_event_t * e)
 
                 lv_area_t label_clip_area;
                 bool label_mask_ok;
-                label_mask_ok = _lv_area_intersect(&label_clip_area, &clip_area, &cell_area);
+                label_mask_ok = lv_area_intersect(&label_clip_area, &clip_area, &cell_area);
                 if(label_mask_ok) {
                     layer->_clip_area = label_clip_area;
                     label_dsc_act.text = table->cell_data[cell]->txt;
@@ -1037,7 +1040,7 @@ static size_t get_cell_txt_len(const char * txt)
     size_t retval = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    retval = sizeof(lv_table_cell_t) + _lv_text_ap_calc_bytes_count(txt) + 1;
+    retval = sizeof(lv_table_cell_t) + lv_text_ap_calc_bytes_count(txt) + 1;
 #else
     retval = sizeof(lv_table_cell_t) + lv_strlen(txt) + 1;
 #endif
@@ -1049,7 +1052,7 @@ static size_t get_cell_txt_len(const char * txt)
 static void copy_cell_txt(lv_table_cell_t * dst, const char * txt)
 {
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    _lv_text_ap_proc(txt, dst->txt);
+    lv_text_ap_proc(txt, dst->txt);
 #else
     lv_strcpy(dst->txt, txt);
 #endif

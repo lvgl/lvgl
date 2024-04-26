@@ -6,6 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../src/stdlib/lv_mem_private.h"
+#include "../../src/misc/lv_timer_private.h"
+#include "../../src/misc/lv_anim_private.h"
 #include "lv_demo_stress.h"
 
 #if LV_USE_DEMO_STRESS

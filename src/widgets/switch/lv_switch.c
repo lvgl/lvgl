@@ -6,13 +6,15 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_switch.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_switch_private.h"
 
 #if LV_USE_SWITCH != 0
 
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
-#include "../../misc/lv_anim.h"
+#include "../../misc/lv_anim_private.h"
 #include "../../indev/lv_indev.h"
 #include "../../display/lv_display.h"
 
@@ -127,7 +129,7 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         /*The smaller size is the knob diameter*/
         int32_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
-        knob_size += _LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
+        knob_size += LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
         int32_t * s = lv_event_get_param(e);

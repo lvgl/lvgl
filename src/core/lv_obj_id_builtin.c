@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
+#include "lv_obj_class_private.h"
+#include "lv_obj_private.h"
 #include "lv_global.h"
 #include "../osal/lv_os.h"
 #include "../stdlib/lv_sprintf.h"
