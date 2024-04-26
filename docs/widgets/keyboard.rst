@@ -33,7 +33,7 @@ The Keyboards have the following modes:
 
 - :cpp:enumerator:`LV_KEYBOARD_MODE_TEXT_LOWER` Display lower case letters
 - :cpp:enumerator:`LV_KEYBOARD_MODE_TEXT_UPPER` Display upper case letters
-- :cpp:enumerator:`LV_KEYBOARD_MODE_TEXT_SPECIAL` Display special characters
+- :cpp:enumerator:`LV_KEYBOARD_MODE_SPECIAL` Display special characters
 - :cpp:enumerator:`LV_KEYBOARD_MODE_NUMBER` Display numbers, +/- sign, and decimal dot
 - :cpp:enumerator:`LV_KEYBOARD_MODE_USER_1` through :cpp:enumerator:`LV_KEYBOARD_MODE_USER_4` User-defined modes.
 
