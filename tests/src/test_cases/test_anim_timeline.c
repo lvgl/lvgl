@@ -9,11 +9,8 @@ static lv_anim_timeline_t * anim_timeline;
 
 static uint32_t anim1_start_called;
 static uint32_t anim2_start_called;
-static uint32_t anim3_start_called;
-
 static uint32_t anim1_completed_called;
 static uint32_t anim2_completed_called;
-static uint32_t anim3_completed_called;
 
 void setUp(void)
 {
@@ -367,29 +364,11 @@ void anim2_completed(lv_anim_t * a)
     anim2_completed_called++;
 }
 
-void anim3_exec_cb(void * var, int32_t v)
-{
-    LV_UNUSED(var);
-    printf("                                        [anim3] %d\n", v);
-}
-void anim3_start(lv_anim_t * a)
-{
-    LV_UNUSED(a);
-    printf("                                        [anim3] start\n");
-    anim3_start_called++;
-}
-void anim3_completed(lv_anim_t * a)
-{
-    LV_UNUSED(a);
-    printf("                                        [anim3] completed\n");
-    anim3_completed_called++;
-}
 
 void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
 {
     lv_anim_t anim1;
     lv_anim_t anim2;
-    lv_anim_t anim3;
 
     lv_anim_init(&anim1);
     lv_anim_set_values(&anim1, 0, 1024);
@@ -409,14 +388,6 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     anim2_start_called = 0;
     anim2_completed_called = 0;
 
-    lv_memcpy(&anim3, &anim1, sizeof(anim1));
-    lv_anim_set_duration(&anim3, 200);
-    lv_anim_set_exec_cb(&anim3, anim3_exec_cb);
-    lv_anim_set_start_cb(&anim3, anim3_start);
-    lv_anim_set_completed_cb(&anim3, anim3_completed);
-    anim3_start_called = 0;
-    anim3_completed_called = 0;
-
     lv_anim_timeline_t * timeline = lv_anim_timeline_create();
     lv_anim_timeline_add(timeline,   0, &anim1);
     lv_anim_timeline_add(timeline, 200, &anim2);
@@ -427,8 +398,8 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     /*
      *   |-----anim1-----|
      *           |-anim2-|
-     *                       |--anim3---|
-     *   0       200   300  400  500  600
+     *                    
+     *   0       200   300
      */
 
     lv_test_wait(20); /*Wait 20 ms*/
@@ -436,24 +407,18 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     TEST_ASSERT_EQUAL(0, anim1_completed_called);
     TEST_ASSERT_EQUAL(0, anim2_start_called);
     TEST_ASSERT_EQUAL(0, anim2_completed_called);
-    TEST_ASSERT_EQUAL(0, anim3_start_called);
-    TEST_ASSERT_EQUAL(0, anim3_completed_called);
 
     lv_test_wait(200); /*Now we are at 220ms */
     TEST_ASSERT_EQUAL(1, anim1_start_called);
     TEST_ASSERT_EQUAL(0, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
     TEST_ASSERT_EQUAL(0, anim2_completed_called);
-    TEST_ASSERT_EQUAL(0, anim3_start_called);
-    TEST_ASSERT_EQUAL(0, anim3_completed_called);
 
     lv_test_wait(100); /*Now we are at 320ms */
     TEST_ASSERT_EQUAL(1, anim1_start_called);
     TEST_ASSERT_EQUAL(1, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
     TEST_ASSERT_EQUAL(1, anim2_completed_called);
-    TEST_ASSERT_EQUAL(0, anim3_start_called);
-    TEST_ASSERT_EQUAL(0, anim3_completed_called);
 }
 
 #endif
