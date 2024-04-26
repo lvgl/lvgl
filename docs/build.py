@@ -207,7 +207,7 @@ else:
 
 
 def get_version():
-    path = os.path.join(project_path, 'lvgl.h')
+    path = os.path.join(project_path, 'lv_version.h')
     with open(path, 'rb') as f:
         d = f.read().decode('utf-8')
 
