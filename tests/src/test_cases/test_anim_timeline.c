@@ -433,51 +433,51 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
 
     lv_test_wait(10); /*Wait 10 ms*/
     TEST_ASSERT_EQUAL(1, anim1_start_called);
-    TEST_ASSERT_EQUAL(0, anim1_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim1_completed_called);
     TEST_ASSERT_EQUAL(0, anim2_start_called);
-    TEST_ASSERT_EQUAL(0, anim2_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim2_completed_called);
     TEST_ASSERT_EQUAL(0, anim3_start_called);
-    TEST_ASSERT_EQUAL(0, anim3_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim3_completed_called);
 
-    lv_test_wait(200); /*Now we are at 210ms */ 
+    lv_test_wait(200); /*Now we are at 210ms */
     TEST_ASSERT_EQUAL(1, anim1_start_called);
-    TEST_ASSERT_EQUAL(0, anim1_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
-    TEST_ASSERT_EQUAL(0, anim2_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim2_completed_called);
     TEST_ASSERT_EQUAL(0, anim3_start_called);
-    TEST_ASSERT_EQUAL(0, anim3_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim3_completed_called);
 
-    lv_test_wait(88); /*Now we are at 298ms */ 
+    lv_test_wait(88); /*Now we are at 298ms */
     TEST_ASSERT_EQUAL(1, anim1_start_called);
-    TEST_ASSERT_EQUAL(0, anim1_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
-    TEST_ASSERT_EQUAL(0, anim2_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim2_completed_called);
     TEST_ASSERT_EQUAL(0, anim3_start_called);
-    TEST_ASSERT_EQUAL(0, anim3_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim3_completed_called);
 
-    lv_test_wait(7); /*Now we are at 305ms */ 
+    lv_test_wait(7); /*Now we are at 305ms */
     TEST_ASSERT_EQUAL(1, anim1_start_called);
-    TEST_ASSERT_EQUAL(1, anim1_completed_called); 
+    TEST_ASSERT_EQUAL(1, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
-    TEST_ASSERT_EQUAL(1, anim2_completed_called); 
+    TEST_ASSERT_EQUAL(1, anim2_completed_called);
     TEST_ASSERT_EQUAL(0, anim3_start_called);
-    TEST_ASSERT_EQUAL(0, anim3_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim3_completed_called);
 
-    lv_test_wait(105); /*Now we are at 410ms */ 
+    lv_test_wait(105); /*Now we are at 410ms */
     TEST_ASSERT_EQUAL(1, anim1_start_called);
-    TEST_ASSERT_EQUAL(1, anim1_completed_called); 
+    TEST_ASSERT_EQUAL(1, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
-    TEST_ASSERT_EQUAL(1, anim2_completed_called); 
+    TEST_ASSERT_EQUAL(1, anim2_completed_called);
     TEST_ASSERT_EQUAL(1, anim3_start_called);
-    TEST_ASSERT_EQUAL(0, anim3_completed_called); 
+    TEST_ASSERT_EQUAL(0, anim3_completed_called);
 
-    lv_test_wait(200); /*Now we are at 610ms */ 
+    lv_test_wait(200); /*Now we are at 610ms */
     TEST_ASSERT_EQUAL(1, anim1_start_called);
-    TEST_ASSERT_EQUAL(1, anim1_completed_called); 
+    TEST_ASSERT_EQUAL(1, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
-    TEST_ASSERT_EQUAL(1, anim2_completed_called); 
+    TEST_ASSERT_EQUAL(1, anim2_completed_called);
     TEST_ASSERT_EQUAL(1, anim3_start_called);
-    TEST_ASSERT_EQUAL(1, anim3_completed_called); 
+    TEST_ASSERT_EQUAL(1, anim3_completed_called);
 }
 
 #endif
