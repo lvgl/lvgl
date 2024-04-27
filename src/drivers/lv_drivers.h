@@ -37,6 +37,9 @@ extern "C" {
 #include "windows/lv_windows_input.h"
 #include "windows/lv_windows_display.h"
 
+#include "opengles/lv_opengles_window.h"
+#include "opengles/lv_opengles_mouse.h"
+
 /*********************
  *      DEFINES
  *********************/
