@@ -3163,6 +3163,15 @@
     #endif
 #endif
 
+/* Use OpenGL to open window on PC and handle mouse and keyboard */
+#ifndef LV_USE_OPENGLES
+    #ifdef CONFIG_LV_USE_OPENGLES
+        #define LV_USE_OPENGLES CONFIG_LV_USE_OPENGLES
+    #else
+        #define LV_USE_OPENGLES   0
+    #endif
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/

@@ -969,6 +969,9 @@
 /* LVGL Windows backend */
 #define LV_USE_WINDOWS    0
 
+/* Use OpenGL to open window on PC and handle mouse and keyboard */
+#define LV_USE_OPENGLES   0
+
 /*==================
 * EXAMPLES
 *==================*/

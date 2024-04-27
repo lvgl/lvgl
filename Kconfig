@@ -1625,6 +1625,15 @@ menu "LVGL configuration"
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
 			default n
+
+		config LV_USE_OPENGLES
+			bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
+			default n
+
+		config LV_USE_OPENGLES_DEBUG
+			bool "Enable debug mode for OpenGL"
+			depends on LV_USE_OPENGLES
+			default n
 	endmenu
 
 	menu "Examples"
