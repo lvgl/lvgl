@@ -391,7 +391,6 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     lv_anim_timeline_t * timeline = lv_anim_timeline_create();
     lv_anim_timeline_add(timeline,   0, &anim1);
     lv_anim_timeline_add(timeline, 200, &anim2);
-    lv_anim_timeline_add(timeline, 400, &anim3);
     lv_anim_timeline_start(timeline);
 
 
@@ -414,6 +413,11 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     TEST_ASSERT_EQUAL(1, anim2_start_called);
     TEST_ASSERT_EQUAL(0, anim2_completed_called);
 
+    lv_test_wait(100); /*Now we are at 320ms */
+    TEST_ASSERT_EQUAL(1, anim1_start_called);
+    TEST_ASSERT_EQUAL(1, anim1_completed_called);
+    TEST_ASSERT_EQUAL(1, anim2_start_called);
+    TEST_ASSERT_EQUAL(0, anim2_completed_called);
 }
 
 #endif
