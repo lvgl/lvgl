@@ -380,7 +380,7 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     anim1_completed_called = 0;
 
     lv_memcpy(&anim2, &anim1, sizeof(anim1));
-    lv_anim_set_duration(&anim2, 100);
+    lv_anim_set_duration(&anim2, 300);
     lv_anim_set_path_cb(&anim2, lv_anim_path_ease_in);
     lv_anim_set_exec_cb(&anim2, anim2_exec_cb);
     lv_anim_set_start_cb(&anim2, anim2_start);
@@ -397,9 +397,9 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
 
     /*
      *   |-----anim1-----|
-     *           |-anim2-|
+     *           |----anim2----|
      *                    
-     *   0       200   300
+     *   0       200   300    500
      */
 
     lv_test_wait(20); /*Wait 20 ms*/
@@ -414,11 +414,11 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     TEST_ASSERT_EQUAL(1, anim2_start_called);
     TEST_ASSERT_EQUAL(0, anim2_completed_called);
 
-    lv_test_wait(90); /*Now we are at 310ms */
+    lv_test_wait(100); /*Now we are at 320ms */
     TEST_ASSERT_EQUAL(1, anim1_start_called);
     TEST_ASSERT_EQUAL(1, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
-    TEST_ASSERT_EQUAL(1, anim2_completed_called);
+    TEST_ASSERT_EQUAL(0, anim2_completed_called);
 }
 
 #endif
