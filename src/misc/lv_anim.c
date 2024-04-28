@@ -34,8 +34,6 @@
 static void anim_timer(lv_timer_t * param);
 static void anim_mark_list_change(void);
 static void anim_completed_handler(lv_anim_t * a);
-static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
-                                         int32_t y1, int32_t x2, int32_t y2);
 static uint32_t convert_speed_to_time(uint32_t speed, int32_t start, int32_t end);
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(lv_anim_t * a_current);
@@ -44,6 +42,7 @@ static void anim_list_remove(lv_anim_t * a, bool call_completed, bool is_in_the_
 static lv_anim_t * anim_list_allocate(void);
 static void anim_list_add(lv_anim_t * a);
 static void anim_init(lv_anim_t * a);
+static void anim_toggle_playback_state(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -128,6 +127,50 @@ void lv_anim_trigger(lv_anim_t * a)
 {
     anim_set_start_values(a);
     anim_list_add(a);
+}
+
+void lv_anim_pause(lv_anim_t * a)
+{
+    if((a->pause_cb != NULL) && a->is_running) a->pause_cb(a);
+    a->is_running = false;
+}
+
+void lv_anim_resume(lv_anim_t * a)
+{
+    if((a->resume_cb != NULL) && !a->is_running) a->resume_cb(a);
+    a->is_running = true;
+}
+
+bool lv_anim_toggle_running(lv_anim_t * a)
+{
+    if(a->is_running) {
+        if(a->pause_cb != NULL) a->pause_cb(a);
+        a->is_running = false;
+    }
+    else {
+        if(a->resume_cb != NULL) a->resume_cb(a);
+        a->is_running = true;
+    }
+
+    return a->is_running;
+}
+
+void lv_anim_set_act_time(lv_anim_t * a, uint32_t act_time)
+{
+    int32_t value = 0;
+
+    if(a->playback_now) anim_toggle_playback_state(a);
+
+    if(act_time <= (uint32_t)a->duration) {
+        a->act_time = act_time;
+        value = a->path_cb(a);
+    }
+    else { // act_time > duration
+        value = a->end_value;
+    }
+
+    if(a->exec_cb) a->exec_cb(a->var, value);
+    if(a->custom_exec_cb) a->custom_exec_cb(a, value);
 }
 
 uint32_t lv_anim_get_playtime(const lv_anim_t * a)
@@ -336,6 +379,20 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
         return a->start_value;
 }
 
+int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    /*Calculate the current step*/
+    uint32_t t = lv_map(a->act_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_cubic_bezier(t, x1, y1, x2, y2);
+
+    int32_t new_value;
+    new_value = step * (a->end_value - a->start_value);
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
+    new_value += a->start_value;
+
+    return new_value;
+}
+
 int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a)
 {
     const struct _lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
@@ -360,8 +417,6 @@ static void anim_timer(lv_timer_t * param)
 
     while(a != NULL) {
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
-        a->act_time += elaps;
-
         a->last_timer_run = lv_tick_get();
 
         /*It can be set by `lv_anim_delete()` typically in `end_cb`. If set then an animation delete
@@ -369,6 +424,11 @@ static void anim_timer(lv_timer_t * param)
          * because the list is changed meanwhile
          */
         state.anim_list_changed = false;
+
+        if(!a->is_running)
+            goto get_next_element;
+
+        a->act_time += elaps;
 
         if(a->run_round != state.anim_run_round) {
             a->run_round = state.anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
@@ -411,6 +471,7 @@ static void anim_timer(lv_timer_t * param)
             }
         }
 
+get_next_element:
         /*If the linked list changed due to anim. delete then it's not safe to continue
          *the reading of the list from here -> start from the head*/
         if(state.anim_list_changed)
@@ -446,17 +507,7 @@ static void anim_completed_handler(lv_anim_t * a)
         if(a->playback_duration != 0) {
             /*If now turning back use the 'playback_pause*/
             if(a->playback_now == 0) a->act_time = -(int32_t)(a->playback_delay);
-
-            /*Toggle the play back state*/
-            a->playback_now = a->playback_now == 0 ? 1 : 0;
-            /*Swap the start and end values*/
-            int32_t tmp    = a->start_value;
-            a->start_value = a->end_value;
-            a->end_value   = tmp;
-            /*Swap the time and playback_duration*/
-            tmp = a->duration;
-            a->duration = a->playback_duration;
-            a->playback_duration = tmp;
+            anim_toggle_playback_state(a);
         }
     }
 }
@@ -468,20 +519,6 @@ static void anim_mark_list_change(void)
         lv_timer_pause(state.timer);
     else
         lv_timer_resume(state.timer);
-}
-
-static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
-{
-    /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
-    int32_t step = lv_cubic_bezier(t, x1, y1, x2, y2);
-
-    int32_t new_value;
-    new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
-    new_value += a->start_value;
-
-    return new_value;
 }
 
 static uint32_t convert_speed_to_time(uint32_t speed_or_time, int32_t start, int32_t end)
@@ -614,4 +651,18 @@ static void anim_init(lv_anim_t * a)
     a->repeat_cnt = 1;
     a->path_cb = lv_anim_path_linear;
     a->early_apply = 1;
+    a->is_running = 1;
+}
+
+static void anim_toggle_playback_state(lv_anim_t * a)
+{
+    a->playback_now = a->playback_now == 0 ? 1 : 0;
+    /*Swap the start and end values*/
+    int32_t tmp    = a->start_value;
+    a->start_value = a->end_value;
+    a->end_value   = tmp;
+    /*Swap the time and playback_duration*/
+    tmp = a->duration;
+    a->duration = a->playback_duration;
+    a->playback_duration = tmp;
 }

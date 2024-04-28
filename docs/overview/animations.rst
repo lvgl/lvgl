@@ -95,6 +95,21 @@ then configure it with ``lv_anim_set_...()`` functions, finally call :cpp:func:`
     *------------------*/
    lv_anim_trigger(a);                             /*Start the animation*/
 
+   /* PLAYBACK CONTROL
+    *------------------*/
+
+   /*Pause the animation */
+   lv_anim_pause(a);
+
+   /*Resume the animation */
+   lv_anim_resume(a);
+
+   /*Pause / resume the animation */
+   lv_anim_toggle_running(a);
+
+   /*Set the progress of the animation manually (aka seek). */
+   lv_anim_set_act_time(a, act_time);
+
 You can apply multiple different animations on the same variable (object) at the
 same time. For example, animate the x and y coordinates with
 :cpp:func:`lv_obj_set_x` and :cpp:func:`lv_obj_set_y`. However, only one animation can

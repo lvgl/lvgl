@@ -113,6 +113,12 @@ typedef void (*lv_anim_completed_cb_t)(lv_anim_t *);
 /** Callback to call when the animation really stars (considering `delay`)*/
 typedef void (*lv_anim_start_cb_t)(lv_anim_t *);
 
+/** Callback to call when the animation is being paused */
+typedef void (*lv_anim_pause_cb_t)(lv_anim_t *);
+
+/** Callback to call when the animation is being resumed */
+typedef void (*lv_anim_resume_cb_t)(lv_anim_t *);
+
 /** Callback used when the animation values are relative to get the current value*/
 typedef int32_t (*lv_anim_get_value_cb_t)(lv_anim_t *);
 
@@ -133,6 +139,8 @@ struct _lv_anim_t {
     lv_anim_custom_exec_cb_t custom_exec_cb;/**< Function to execute to animate,
                                                  same purpose as exec_cb but different parameters*/
     lv_anim_start_cb_t start_cb;         /**< Call it when the animation is starts (considering `delay`)*/
+    lv_anim_pause_cb_t pause_cb;    /**< Call it when the animation is paused */
+    lv_anim_resume_cb_t resume_cb;  /**< Call it when the animation is resumed */
     lv_anim_completed_cb_t completed_cb; /**< Call it when the animation is fully completed*/
     lv_anim_deleted_cb_t deleted_cb;     /**< Call it when the animation is deleted*/
     lv_anim_get_value_cb_t get_value_cb; /**< Get the current value in relative mode*/
@@ -157,6 +165,7 @@ struct _lv_anim_t {
     uint8_t run_round : 1;    /**< Indicates the animation has run in this round*/
     uint8_t start_cb_called : 1;    /**< Indicates that the `start_cb` was already called*/
     uint8_t early_apply  : 1;    /**< 1: Apply start value immediately even is there is `delay`*/
+    uint8_t is_running  : 1;    /**< 1: Indicates if the animation is running (rather than being paused) */
 };
 
 /**********************
@@ -309,6 +318,26 @@ static inline void lv_anim_set_start_cb(lv_anim_t * a, lv_anim_start_cb_t start_
 }
 
 /**
+ * Set a function call when the animation is being paused
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @param pause_cb  a function call when the animation is being paused
+ */
+static inline void lv_anim_set_pause_cb(lv_anim_t * a, lv_anim_pause_cb_t pause_cb)
+{
+    a->pause_cb = pause_cb;
+}
+
+/**
+ * Set a function call when the animation is being resumed
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @param pause_cb  a function call when the animation is being resumed
+ */
+static inline void lv_anim_set_resume_cb(lv_anim_t * a, lv_anim_resume_cb_t resume_cb)
+{
+    a->resume_cb = resume_cb;
+}
+
+/**
  * Set a function to use the current value of the variable and make start and end value
  * relative to the returned current value.
  * @param a             pointer to an initialized `lv_anim_t` variable
@@ -432,6 +461,34 @@ static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t 
  * \deprecated      Use `lv_anim_trigger()` instead.
  */
 lv_anim_t * lv_anim_start(const lv_anim_t * a);
+
+/**
+ * Pause the animation
+ * @param a pointer to an initialized `lv_anim_t` variable
+ */
+void lv_anim_pause(lv_anim_t * a);
+
+/**
+ * Resume the animation
+ * @param a pointer to an initialized `lv_anim_t` variable
+ */
+void lv_anim_resume(lv_anim_t * a);
+
+/**
+ * Pause / resume the animation
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @return  true for started, false for paused
+ */
+bool lv_anim_toggle_running(lv_anim_t * a);
+
+/**
+ * Set the progress of the animation manually.
+ * This mechanism does not take playback mode into account.
+ * If the animation is playing backwards at the time of invoking, it will be forced back to forward phase.
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @param act_time  elapsed time, min 0, may a->duration
+ */
+void lv_anim_set_act_time(lv_anim_t * a, uint32_t act_time);
 
 /**
  * Get a delay before starting the animation
@@ -628,6 +685,17 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a);
  * @return      the current value to set
  */
 int32_t lv_anim_path_step(const lv_anim_t * a);
+
+/**
+ * A custom cubic bezier animation path, need to specify cubic-parameters manually
+ * @param a     pointer to an animation
+ * @param x1    x1 parameter of cubic bezier
+ * @param y1    y1 parameter of cubic bezier
+ * @param x2    x2 parameter of cubic bezier
+ * @param y2    y2 parameter of cubic bezier
+ * @return      the current value to set
+ */
+int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 
 /**
  * A custom cubic bezier animation path, need to specify cubic-parameters in a->parameter.bezier3
