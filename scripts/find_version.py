@@ -31,4 +31,9 @@ def get_version():
 
 
 if __name__ == '__main__':
-    print(get_version())
+    import sys
+
+    if '--only_major_minor' in sys.argv:
+        print('.'.join(get_version().split('.')[:-2]))
+    else:
+        print(get_version())
