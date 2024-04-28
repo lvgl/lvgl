@@ -50,12 +50,16 @@ html_dst_path = os.path.join(project_path, 'out_html')
 
 os.chdir(base_path)
 
+sys.path.insert(0, os.path.join(project_path, 'scripts'))
+
+import find_version  # NOQA
 
 clean = 0
 trans = 0
 skip_latex = False
 develop = False
 args = sys.argv[1:]
+
 
 if len(args) >= 1:
     if "clean" in args:
@@ -206,14 +210,11 @@ else:
 # BUILD HTML
 
 
-def get_version():
-    _, ver = subprocess.getstatusoutput("../scripts/find_version.sh")
-    return ver
 
 cmd('sphinx-build -b html "{src}" "{dst}" -D version="{version}" -E -j {cpu}'.format(
     src=html_src_path,
     dst=html_dst_path,
-    version=get_version(),
+    version=find_version.get_version().rsplit('.', 1)[0],
     cpu=os.cpu_count()
 ))
 

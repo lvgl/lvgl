@@ -62,7 +62,7 @@ jobs:
         run: rm -rf out_html/.doctrees
       - name: Retrieve version
         run: |
-          echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
+          echo "::set-output name=VERSION_NAME::$(scripts/find_version.py)"
         id: version
       - name: Deploy to subfolder
         uses: JamesIves/github-pages-deploy-action@v4.5.0

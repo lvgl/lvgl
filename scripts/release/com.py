@@ -36,43 +36,31 @@ def define_set(fn, name, value):
     f.write(new_content)
     f.close()
 
+
 def ver_format(ver):
     s = "v" + str(ver[0]) + "."  + str(ver[1]) + "."  + str(ver[2])
     if(ver[3] != ""): s = s + "-" + ver[3]
     return s
 
+
 def get_lvgl_version():
     print("Get lvgl's version ")
+    import sys
 
-    ver = [0, 0, 0, ""]
+    sys.path.insert(0, os.path.abspath(os.path.join('..', os.path.dirname(__file__))))
 
-    f = open("./lvgl.h", "r")
+    import find_version
 
-    lastNum = re.compile(r'(?:[^\d]*(\d+)[^\d]*)+')
-    for i in f.read().splitlines():
-        r = re.search(r'^#define LVGL_VERSION_MAJOR ', i)
-        if r:
-            m = lastNum.search(i)
-            if m: ver[0] = m.group(1)
-
-        r = re.search(r'^#define LVGL_VERSION_MINOR ', i)
-        if r:
-            m = lastNum.search(i)
-            if m: ver[1] = m.group(1)
-
-        r = re.search(r'^#define LVGL_VERSION_PATCH ', i)
-        if r:
-            m = lastNum.search(i)
-            if m: ver[2] = m.group(1)
-
-    f.close()
+    ver = find_version.get_version().split('.')
 
     print("Version found: " + ver_format(ver))
 
     return ver
 
+
 def push(c):
     cmd("git push " + c)
+
 
 def update_version(ver):
   ver_str = ver_format(ver)

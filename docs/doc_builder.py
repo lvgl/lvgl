@@ -294,17 +294,20 @@ class FILE(object):
             if member.tag != 'member':
                 continue
 
-            cls = globals()[member.attrib['kind'].upper()]
-            if cls == ENUM:
-                member.attrib['name'] = member[0].text.strip()
-                enums_.append(cls(self, **member.attrib))
-            elif cls == ENUMVALUE:
-                if enums_[-1].is_member(member):
-                    enums_[-1].add_member(member)
+            try:
+                cls = globals()[member.attrib['kind'].upper()]
 
-            else:
-                member.attrib['name'] = member[0].text.strip()
-                cls(self, **member.attrib)
+                if cls == ENUM:
+                    member.attrib['name'] = member[0].text.strip()
+                    enums_.append(cls(self, **member.attrib))
+                elif cls == ENUMVALUE:
+                    if enums_[-1].is_member(member):
+                        enums_[-1].add_member(member)
+                else:
+                    member.attrib['name'] = member[0].text.strip()
+                    cls(self, **member.attrib)
+            except:  # NOQA
+                print('ERROR:', self.name, ':', member.attrib)
 
 
 class ENUM(object):
@@ -656,15 +659,20 @@ def run(project_path, temp_directory, *doc_paths):
     index = load_xml('index')
 
     for compound in index:
-        compound.attrib['name'] = compound[0].text.strip()
-        if compound.attrib['kind'] in ('example', 'page', 'dir'):
-            continue
+        try:
+            compound.attrib['name'] = compound[0].text.strip()
+            if compound.attrib['kind'] in ('example', 'page', 'dir'):
+                continue
 
-        globals()[compound.attrib['kind'].upper()](
-            None,
-            node=compound,
-            **compound.attrib
-        )
+            globals()[compound.attrib['kind'].upper()](
+                None,
+                node=compound,
+                **compound.attrib
+            )
+        except:  # NOQA
+            import traceback
+            traceback.print_exc()
+            print()
 
     for folder in doc_paths:
         items = list(
