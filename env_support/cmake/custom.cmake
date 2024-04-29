@@ -1,9 +1,9 @@
 find_package(Python COMPONENTS Interpreter REQUIRED)
 
-message("OUTPUT: ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/../../scripts/find_version.py")
+message("OUTPUT: ${Python_EXECUTABLE} ../../scripts/find_version.py")
 
 execute_process(
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/../../scripts/find_version.py
+    COMMAND ${Python_EXECUTABLE} ../../scripts/find_version.py
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     RESULT_VARIABLE VERSION_RESULT
     OUTPUT_VARIABLE VERSION_STRING
