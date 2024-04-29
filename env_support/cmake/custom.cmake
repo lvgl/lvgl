@@ -1,7 +1,5 @@
 find_package(Python COMPONENTS Interpreter REQUIRED)
 
-message("OUTPUT: ${Python_EXECUTABLE} ../../scripts/find_version.py")
-
 execute_process(
     COMMAND ${Python_EXECUTABLE} ../../scripts/find_version.py
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
@@ -15,7 +13,6 @@ if(${VERSION_RESULT} GREATER "0")
     message( FATAL_ERROR "Failed to collect version informat from lv_version.h" )
 endif()
 
-message("OUTPUT: ${VERSION_STRING}")
 string(REPLACE "." ";" VERSION_LIST ${VERSION_STRING})
 
 list(GET VERSION_LIST 0 LVGL_VERSION_MAJOR)
