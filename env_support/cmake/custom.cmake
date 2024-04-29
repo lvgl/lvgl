@@ -23,7 +23,7 @@ endif( LV_CONF_PATH )
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # Set sources used for LVGL components
-file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.S)
+file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
 file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/*.cpp)
@@ -53,15 +53,8 @@ if(LV_CONF_SKIP)
   target_compile_definitions(lvgl PUBLIC LV_CONF_SKIP=1)
 endif()
 
-# Add defintion of LV_USE_DEMO_WIDGETS only if needed
-if(CONFIG_LV_USE_DEMO_WIDGETS)
-  target_compile_definitions(lvgl PUBLIC LV_USE_DEMO_WIDGETS=1)
-endif()
 
-# Add defintion of LV_BUILD_EXAMPLES only if needed
-if(CONFIG_LV_BUILD_EXAMPLES)
-   target_compile_definitions(lvgl PUBLIC LV_BUILD_EXAMPLES=1)
-endif()
+
 
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR} ${CMAKE_CURRENT_BINARY_DIR})
@@ -85,6 +78,7 @@ if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
 
     target_include_directories(lvgl_examples SYSTEM PUBLIC ${LVGL_ROOT_DIR}/examples)
     target_link_libraries(lvgl_examples PUBLIC lvgl)
+    target_compile_definitions(lvgl_examples PUBLIC LV_BUILD_EXAMPLES=1)
 endif()
 
 # Build LVGL demos library
@@ -94,6 +88,7 @@ if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
 
     target_include_directories(lvgl_demos SYSTEM PUBLIC ${LVGL_ROOT_DIR}/demos)
     target_link_libraries(lvgl_demos PUBLIC lvgl)
+    target_compile_definitions(lvgl PUBLIC LV_USE_DEMO_WIDGETS=1)
 endif()
 
 # Lbrary and headers can be installed to system using make install
