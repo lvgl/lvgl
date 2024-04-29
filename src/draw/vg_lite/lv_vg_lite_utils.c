@@ -629,6 +629,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     args.stride_align = true;
     args.use_indexed = true;
     args.no_cache = no_cache;
+    args.flush_cache = true;
 
     lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
     if(res != LV_RESULT_OK) {
