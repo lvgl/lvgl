@@ -34,6 +34,9 @@ if __name__ == '__main__':
     import sys
 
     if '--only_major_minor' in sys.argv:
-        print('.'.join(get_version().split('.')[:-2]))
+        sys.stdout.write('.'.join(get_version().split('.')[:-2]) + '\n')
     else:
-        print(get_version())
+        sys.stdout.write(get_version() + '\n')
+
+    sys.stdout.flush()
+    sys.exit(0)

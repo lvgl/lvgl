@@ -12,7 +12,7 @@ if(${VERSION_RESULT} GREATER "0")
     message( FATAL_ERROR "Failed to collect version informat from lv_version.h" )
 endif()
 
-
+message("OUTPUT: ${VERSION_STRING}")
 string(REPLACE "." ";" VERSION_LIST ${VERSION_STRING})
 
 list(GET VERSION_LIST 0 LVGL_VERSION_MAJOR)
