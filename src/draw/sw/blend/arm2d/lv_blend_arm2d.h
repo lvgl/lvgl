@@ -461,7 +461,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb565_arm2d(_lv_draw_sw_
                                      des_stride,
                                      &draw_size);
 
-#else 
+#else
     uint16_t * tmp_buf = (uint16_t *)lv_malloc(dsc->dest_stride * dsc->dest_h);
     if(NULL == tmp_buf) {
         return LV_RESULT_INVALID;
