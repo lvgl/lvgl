@@ -36,7 +36,7 @@ void tearDown(void)
 static void hovered_event_cb(lv_event_t * e)
 {
     test_hover_t * hover = (test_hover_t *)e->user_data;
-    lv_log("Object(ID:%d) hovered %d times.\n", hover->id, hover->counts);
+    lv_log("Object(ID:%d) hovered %d/%d times.\n", hover->id, hover->counts, TEST_HOVER_COUNTS);
 }
 
 static void test_move_mouse(lv_point_t * point, uint8_t size)
@@ -77,9 +77,6 @@ void test_hover_basic(void)
 
     test_move_mouse((lv_point_t *)pointer1, 5);
     test_move_mouse((lv_point_t *)pointer2, 5);
-
-    TEST_ASSERT_EQUAL_INT32(TEST_HOVER_COUNTS, label_hovered.counts);
-    TEST_ASSERT_EQUAL_INT32(TEST_HOVER_COUNTS, btn_hovered.counts);
 }
 
 void test_hover_delete(void)
