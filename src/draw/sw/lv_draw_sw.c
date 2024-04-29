@@ -219,21 +219,58 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
 void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_sride,
                        int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format)
 {
-    uint32_t px_bpp = lv_color_format_get_bpp(color_format);
     if(rotation == LV_DISPLAY_ROTATION_90) {
-        if(px_bpp == 16) rotate90_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
-        if(px_bpp == 24) rotate90_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
-        if(px_bpp == 32) rotate90_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+        switch(color_format) {
+            case LV_COLOR_FORMAT_RGB565:
+                rotate90_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
+                break;
+            case LV_COLOR_FORMAT_RGB888:
+                rotate90_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
+                break;
+            case LV_COLOR_FORMAT_ARGB8888:
+                rotate90_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+                break;
+            default:
+                break;
+        }
+
+        return;
     }
-    else if(rotation == LV_DISPLAY_ROTATION_180) {
-        if(px_bpp == 16) rotate180_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
-        if(px_bpp == 24) rotate180_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
-        if(px_bpp == 32) rotate180_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+
+    if(rotation == LV_DISPLAY_ROTATION_180) {
+        switch(color_format) {
+            case LV_COLOR_FORMAT_RGB565:
+                rotate180_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
+                break;
+            case LV_COLOR_FORMAT_RGB888:
+                rotate180_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
+                break;
+            case LV_COLOR_FORMAT_ARGB8888:
+                rotate180_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+                break;
+            default:
+                break;
+        }
+
+        return;
     }
-    else if(rotation == LV_DISPLAY_ROTATION_270) {
-        if(px_bpp == 16) rotate270_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
-        if(px_bpp == 24) rotate270_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
-        if(px_bpp == 32) rotate270_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+
+    if(rotation == LV_DISPLAY_ROTATION_270) {
+        switch(color_format) {
+            case LV_COLOR_FORMAT_RGB565:
+                rotate270_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
+                break;
+            case LV_COLOR_FORMAT_RGB888:
+                rotate270_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
+                break;
+            case LV_COLOR_FORMAT_ARGB8888:
+                rotate270_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+                break;
+            default:
+                break;
+        }
+
+        return;
     }
 }
 
