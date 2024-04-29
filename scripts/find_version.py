@@ -3,7 +3,7 @@
 import os
 
 
-project_path = os.path.abspath(os.path.join('..', os.path.dirname(__file__)))
+project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 
 def get_version():

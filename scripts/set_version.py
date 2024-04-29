@@ -5,7 +5,7 @@ import sys
 
 
 major, minor, patch, info = sys.argv[1].split('.')
-project_path = os.path.abspath(os.path.join('..', os.path.dirname(__file__)))
+project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 
 library_properties_path = os.path.join(project_path, 'library.json')

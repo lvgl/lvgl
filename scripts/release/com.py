@@ -47,7 +47,7 @@ def get_lvgl_version():
     print("Get lvgl's version ")
     import sys
 
-    sys.path.insert(0, os.path.abspath(os.path.join('..', os.path.dirname(__file__))))
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
     import find_version
 
