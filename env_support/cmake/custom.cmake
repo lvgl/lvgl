@@ -1,6 +1,6 @@
 
 execute_process(
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/../../scripys/find_version.py
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/../../scripts/find_version.py
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     RESULT_VARIABLE VERSION_RESULT
     OUTPUT_VARIABLE VERSION_STRING
