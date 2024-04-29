@@ -249,38 +249,79 @@ void test_roller_with_overlay_and_bubble_events_enabled(void)
 void test_roller_appearance(void)
 {
     /* use a number, a symbol, a high letter, a low letter */
-    const char * opts = "0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n";
+    const char * opts =
+        "0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg\n0@Tg";
 
     lv_obj_add_flag(roller_mouse, LV_OBJ_FLAG_HIDDEN);
 
-    lv_obj_t * rollers[4] = {roller, roller_infinite};
-    int i = 2;
+    lv_obj_t * rollers[10] = {roller, roller_infinite};
+    unsigned i = 2;
 
     /* main part and selected part same size font */
     lv_obj_set_pos(roller, 20, 20);
-    lv_roller_set_options(roller, opts, LV_ROLLER_MODE_NORMAL);
+    lv_roller_set_options(roller, opts, LV_PART_MAIN);
     lv_obj_set_pos(roller_infinite, 20, 200);
     lv_roller_set_options(roller_infinite, opts, LV_ROLLER_MODE_INFINITE);
 
     lv_obj_t * r = lv_roller_create(active_screen);
-    lv_obj_set_pos(r, 150, 20);
+    lv_obj_set_pos(r, 130, 20);
     lv_roller_set_options(r, opts, LV_ROLLER_MODE_NORMAL);
-    lv_obj_set_style_text_font(r, &lv_font_montserrat_8, LV_PART_SELECTED);
-    lv_obj_set_style_text_font(r, &lv_font_montserrat_48, LV_PART_SELECTED);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_16, LV_PART_MAIN);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_24, LV_PART_SELECTED);
     rollers[i++] = r;
     r = lv_roller_create(active_screen);
-    lv_obj_set_pos(r, 150, 200);
+    lv_obj_set_pos(r, 130, 200);
     lv_roller_set_options(r, opts, LV_ROLLER_MODE_INFINITE);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_16, LV_PART_MAIN);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_24, LV_PART_SELECTED);
+    rollers[i++] = r;
+
+    r = lv_roller_create(active_screen);
+    lv_obj_set_pos(r, 270, 20);
+    lv_roller_set_options(r, opts, LV_ROLLER_MODE_NORMAL);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_24, LV_PART_MAIN);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_16, LV_PART_SELECTED);
+    rollers[i++] = r;
+    r = lv_roller_create(active_screen);
+    lv_obj_set_pos(r, 270, 200);
+    lv_roller_set_options(r, opts, LV_ROLLER_MODE_INFINITE);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_24, LV_PART_MAIN);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_16, LV_PART_SELECTED);
+    rollers[i++] = r;
+
+    r = lv_roller_create(active_screen);
+    lv_obj_set_pos(r, 410, 20);
+    lv_roller_set_options(r, opts, LV_ROLLER_MODE_NORMAL);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_8, LV_PART_MAIN);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_36, LV_PART_SELECTED);
+    rollers[i++] = r;
+    r = lv_roller_create(active_screen);
+    lv_obj_set_pos(r, 410, 200);
+    lv_roller_set_options(r, opts, LV_ROLLER_MODE_INFINITE);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_8, LV_PART_MAIN);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_36, LV_PART_SELECTED);
+    rollers[i++] = r;
+
+    r = lv_roller_create(active_screen);
+    lv_obj_set_pos(r, 580, 20);
+    lv_roller_set_options(r, opts, LV_ROLLER_MODE_NORMAL);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_36, LV_PART_MAIN);
     lv_obj_set_style_text_font(r, &lv_font_montserrat_8, LV_PART_SELECTED);
-    lv_obj_set_style_text_font(r, &lv_font_montserrat_48, LV_PART_SELECTED);
+    rollers[i++] = r;
+    r = lv_roller_create(active_screen);
+    lv_obj_set_pos(r, 580, 200);
+    lv_roller_set_options(r, opts, LV_ROLLER_MODE_INFINITE);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_36, LV_PART_MAIN);
+    lv_obj_set_style_text_font(r, &lv_font_montserrat_8, LV_PART_SELECTED);
     rollers[i++] = r;
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_2.png");
 
-    // lv_roller_set_selected(roller, lv_roller_get_option_count(roller) - 1, LV_ANIM_OFF);
-    // lv_roller_set_selected(roller_infinite, lv_roller_get_option_count(roller_infinite) - 1, LV_ANIM_OFF);
+    for(i = 0; i < (sizeof(rollers) / sizeof(*rollers)); i++) {
+        lv_roller_set_selected(rollers[i], lv_roller_get_option_count(rollers[i]) - 1, LV_ANIM_OFF);
+    }
 
-    // TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_3.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_3.png");
 }
 
 #endif
