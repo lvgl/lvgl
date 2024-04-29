@@ -94,6 +94,14 @@ void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction)
     barcode->direction = direction;
 }
 
+void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
+    barcode->tiled = tiled;
+}
+
 lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -123,8 +131,18 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     LV_ASSERT(barcode->scale > 0);
     uint16_t scale = barcode->scale;
 
-    int32_t buf_w = (barcode->direction == LV_DIR_HOR) ? barcode_w * scale : 1;
-    int32_t buf_h = (barcode->direction == LV_DIR_VER) ? barcode_w * scale : 1;
+    int32_t buf_w;
+    int32_t buf_h;
+
+    if(barcode->tiled) {
+        buf_w = (barcode->direction == LV_DIR_HOR) ? barcode_w * scale : 1;
+        buf_h = (barcode->direction == LV_DIR_VER) ? barcode_w * scale : 1;
+    }
+    else {
+        lv_obj_update_layout(obj);
+        buf_w = (barcode->direction == LV_DIR_HOR) ? barcode_w * scale : lv_obj_get_width(obj);
+        buf_h = (barcode->direction == LV_DIR_VER) ? barcode_w * scale : lv_obj_get_height(obj);
+    }
 
     if(!lv_barcode_change_buf_size(obj, buf_w, buf_h)) {
         goto failed;
@@ -133,16 +151,38 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     lv_canvas_set_palette(obj, 0, lv_color_to_32(barcode->dark_color, 0xff));
     lv_canvas_set_palette(obj, 1, lv_color_to_32(barcode->light_color, 0xff));
 
+    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
+    uint8_t * src = draw_buf->data + LV_COLOR_INDEXED_PALETTE_SIZE(draw_buf->header.cf) * sizeof(lv_color32_t);
+    uint32_t stride = draw_buf->header.stride;
+    uint8_t * dest = src;
+
     for(int32_t x = 0; x < barcode_w; x++) {
-        lv_color_t color;
-        color = lv_color_hex(out_buf[x] ? 0 : 1);
+        lv_color_t color = lv_color_hex(out_buf[x] ? 0 : 1);
+
         for(uint16_t i = 0; i < scale; i++) {
             if(barcode->direction == LV_DIR_HOR) {
                 lv_canvas_set_px(obj, x * scale + i, 0, color, LV_OPA_COVER);
             }
             else {
-                lv_canvas_set_px(obj, 0, x * scale + i, color, LV_OPA_COVER);
+                if(barcode->tiled) {
+                    lv_canvas_set_px(obj, 0, x * scale + i, color, LV_OPA_COVER);
+                }
+                else {
+                    lv_memset(dest, lv_color_to_int(color) ? 0xFF : 0x00, stride);
+                    dest += stride;
+                }
             }
+        }
+    }
+
+    /* Copy pixels by row */
+    if(!barcode->tiled && barcode->direction == LV_DIR_HOR && buf_h > 1) {
+        /* Skip the first row */
+        int32_t h = buf_h - 1;
+        dest = src + stride;
+        while(h--) {
+            lv_memcpy(dest, src, stride);
+            dest += stride;
         }
     }
 
