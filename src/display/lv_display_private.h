@@ -18,7 +18,7 @@ extern "C" {
 #include "../draw/lv_draw.h"
 #include "lv_display.h"
 
-#if LV_USE_PERF_MONITOR
+#if LV_USE_SYSMON
 #include "../others/sysmon/lv_sysmon.h"
 #endif
 
