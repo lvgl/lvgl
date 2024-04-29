@@ -749,6 +749,11 @@ static void draw_image(lv_event_t * e)
                         obj->coords.y1,
                         obj->coords.x1 + img->w - 1,
                         obj->coords.y1 + img->h - 1);
+
+            if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
+                draw_dsc.clip_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+            }
+
             lv_area_t coords;
             if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
                 lv_area_align(&obj->coords, &draw_dsc.image_area, img->align, img->offset.x, img->offset.y);

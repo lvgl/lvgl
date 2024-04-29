@@ -89,7 +89,6 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
 
     bool has_trasform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
-    int32_t clip_radius = draw_unit->target_layer->clip_radius;
 
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
@@ -100,7 +99,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
     /* If clipping is not required, blit directly */
-    if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && clip_radius <= 0) {
+    if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && dsc->clip_radius <= 0) {
         /* The image area is the coordinates relative to the image itself */
         lv_area_t src_area = *coords;
         lv_area_move(&src_area, -coords->x1, -coords->y1);
@@ -121,12 +120,20 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         LV_PROFILER_END_TAG("vg_lite_blit_rect");
     }
     else {
+        int32_t width = lv_area_get_width(coords);
+        int32_t height = lv_area_get_height(coords);
+        float radius = dsc->clip_radius;
+        if(dsc->clip_radius) {
+            float r_short = LV_MIN(width, height) / 2.0f;
+            radius = LV_MIN(radius, r_short);
+        }
+
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
         lv_vg_lite_path_append_rect(
             path,
             coords->x1, coords->y1,
-            lv_area_get_width(coords), lv_area_get_height(coords),
-            clip_radius, clip_radius);
+            width, height,
+            radius, radius);
         lv_vg_lite_path_set_bonding_box_area(path, &clip_area);
         lv_vg_lite_path_end(path);
 
