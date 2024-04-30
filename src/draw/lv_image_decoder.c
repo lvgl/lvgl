@@ -112,6 +112,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         .premultiply = false,
         .no_cache = false,
         .use_indexed = false,
+        .flush_cache = false,
     };
 
     /*
@@ -120,6 +121,18 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
      * If decoder open succeed, add the image to cache if enabled.
      * */
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
+
+    /* Flush the D-Cache if enabled and the image was successfully opened */
+    if(dsc->args.flush_cache && res == LV_RESULT_OK) {
+        lv_draw_buf_flush_cache(dsc->decoded, NULL);
+        LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%" LV_PRId32 " x H%" LV_PRId32 ", data: %p cf: %d)",
+                    src,
+                    dsc->src_type == LV_IMAGE_SRC_FILE ? (const char *)src : "c-array",
+                    dsc->decoded->header.w,
+                    dsc->decoded->header.h,
+                    dsc->decoded->data,
+                    dsc->decoded->header.cf);
+    }
 
     return res;
 }
