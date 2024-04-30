@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_draw_sw_fill.c
  *
  */
@@ -120,6 +120,20 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
         blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB888;
     }
 
+#if LV_DRAW_SW_COMPLEX_GRADIENTS
+    lv_grad_t * cgrad = NULL;
+
+    /*Prepare radial gradient*/
+    if (grad_dir == LV_GRAD_DIR_RADIAL) {
+        lv_gradient_radial_setup(&dsc->grad);
+        cgrad = lv_gradient_get(&dsc->grad, 256, 0);           /* Create buffer for the gradient: the actual data will be calculated line by line */
+        blend_dsc.src_area = &blend_area;
+        blend_dsc.src_buf = grad->color_map;                   /* Use this buffer for the pixel data, instead of the gradient table */
+        grad_opa_map = grad->opa_map;
+        blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB888;
+    }
+#endif
+
     /* Draw the top of the rectangle line by line and mirror it to the bottom. */
     for(h = 0; h < rout; h++) {
         int32_t top_y = bg_coords.y1 + h;
@@ -151,6 +165,12 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
             }
+#if LV_DRAW_SW_COMPLEX_GRADIENTS
+            /* Calculate radial gradient */
+            else if(grad_dir == LV_GRAD_DIR_RADIAL) {
+                lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1, h, coords_bg_w, grad);
+            }
+#endif
             lv_draw_sw_blend(draw_unit, &blend_dsc);
         }
 
@@ -171,6 +191,12 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
             }
+#if LV_DRAW_SW_COMPLEX_GRADIENTS
+            /* Calculate radial gradient */
+            else if (grad_dir == LV_GRAD_DIR_RADIAL) {
+                lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1, h, coords_bg_w, grad);
+            }
+#endif
             lv_draw_sw_blend(draw_unit, &blend_dsc);
         }
     }
@@ -191,7 +217,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
         if(grad_dir == LV_GRAD_DIR_VER) {
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_FULL_COVER;
         }
-        else if(grad_dir == LV_GRAD_DIR_HOR) {
+        else {//if(grad_dir == LV_GRAD_DIR_HOR) {
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             blend_dsc.mask_buf = grad_opa_map;
         }
@@ -206,6 +232,12 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                 if(opa >= LV_OPA_MAX) blend_dsc.opa = grad->opa_map[h - bg_coords.y1];
                 else blend_dsc.opa = LV_OPA_MIX2(grad->opa_map[h - bg_coords.y1], opa);
             }
+#if LV_DRAW_SW_COMPLEX_GRADIENTS
+            /* Calculate radial gradient */
+            else if (grad_dir == LV_GRAD_DIR_RADIAL) {
+                lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1, h, coords_bg_w, grad);
+            }
+#endif
             lv_draw_sw_blend(draw_unit, &blend_dsc);
         }
     }
@@ -217,6 +249,14 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
     if(grad) {
         lv_gradient_cleanup(grad);
     }
+#if LV_DRAW_SW_COMPLEX_GRADIENTS
+    if (cgrad) {
+        lv_gradient_cleanup(cgrad);
+    }
+    if (grad_dir == LV_GRAD_DIR_RADIAL) {
+        lv_gradient_radial_cleanup(&dsc->grad);
+    }
+#endif
 
 #endif
 }

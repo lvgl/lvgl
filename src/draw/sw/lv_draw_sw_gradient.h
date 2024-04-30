@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_draw_sw_gradient.h
  *
  */
@@ -57,6 +57,18 @@ lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * gradient, int32_t w, int32_t h
  * @param grad      pointer to a gradient
  */
 void lv_gradient_cleanup(lv_grad_t * grad);
+
+#if LV_DRAW_SW_COMPLEX_GRADIENTS
+
+void lv_gradient_radial_setup(lv_grad_dsc_t* dsc);
+
+void lv_gradient_radial_cleanup(lv_grad_dsc_t* dsc);
+
+int32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_gradient_radial_get_w(lv_grad_dsc_t* dsc, int32_t xp, int32_t yp);
+
+int32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_gradient_radial_get_line(lv_grad_dsc_t* dsc, lv_grad_t* grad, int32_t xp, int32_t yp, int32_t width, lv_grad_t* result);
+
+#endif /*LV_DRAW_SW_COMPLEX_GRADIENTS*/
 
 #endif /*LV_USE_DRAW_SW*/
 
