@@ -59,20 +59,21 @@ endif()
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-
-if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+# LV_CONF_BUILD_DISABLE_THORVG_INTERNAL is just kept for backwards compatibility, prefer CONFIG_LV_USE_THORVG_INTERNAL
+if(LV_CONF_BUILD_THORVG_INTERNAL OR (NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL))
     add_library(lvgl_thorvg ${THORVG_SOURCES})
     add_library(lvgl::thorvg ALIAS lvgl_thorvg)
     target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
     target_link_libraries(lvgl_thorvg PUBLIC lvgl)
+    target_compile_definitions(lvgl_thorvg PUBLIC LV_USE_THORVG_INTERNAL=1 LV_USE_THORVG_EXTERNAL=0)
 endif()
 
 if(NOT MSVC)
   set_source_files_properties(${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/vg_lite_tvg.cpp PROPERTIES COMPILE_FLAGS -Wunused-parameter)
 endif()
 
-# Build LVGL example library
-if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
+# Build LVGL example library (LV_CONF_BUILD_DISABLE_EXAMPLES ist just kept for backwards compatibility, prefer CONFIG_LV_USE_DEMO_WIDGETS)
+if(CONFIG_LV_BUILD_EXAMPLES OR (NOT LV_CONF_BUILD_DISABLE_EXAMPLES))
     add_library(lvgl_examples ${EXAMPLE_SOURCES})
     add_library(lvgl::examples ALIAS lvgl_examples)
 
@@ -81,14 +82,14 @@ if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
     target_compile_definitions(lvgl_examples PUBLIC LV_BUILD_EXAMPLES=1)
 endif()
 
-# Build LVGL demos library
-if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
+# Build LVGL demos library (LV_CONF_BUILD_DISABLE_DEMOS ist just kept for backwards compatibility, prefer CONFIG_LV_USE_DEMO_WIDGETS)
+if(CONFIG_LV_USE_DEMO_WIDGETS OR (NOT LV_CONF_BUILD_DISABLE_DEMOS))
     add_library(lvgl_demos ${DEMO_SOURCES})
     add_library(lvgl::demos ALIAS lvgl_demos)
 
     target_include_directories(lvgl_demos SYSTEM PUBLIC ${LVGL_ROOT_DIR}/demos)
     target_link_libraries(lvgl_demos PUBLIC lvgl)
-    target_compile_definitions(lvgl PUBLIC LV_USE_DEMO_WIDGETS=1)
+    target_compile_definitions(lvgl_demos PUBLIC LV_USE_DEMO_WIDGETS=1)
 endif()
 
 # Lbrary and headers can be installed to system using make install
