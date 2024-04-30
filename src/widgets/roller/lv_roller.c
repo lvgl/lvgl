@@ -472,7 +472,8 @@ static void draw_main(lv_event_t * e)
             /*label offset from the middle line of the roller*/
             int32_t label_y_prop = (label->coords.y1 + normal_label_font->line_height / 2) - (roller_h / 2 + obj->coords.y1);
 
-            /*Proportional position from the middle line (upscaled by << 14)*/
+            /*Proportional position from the middle line.
+             *Will be 0 for the first option, and 1 for the last option (upscaled by << 14)*/
             label_y_prop = (label_y_prop << 14) / (lv_obj_get_height(label) - normal_label_font->line_height);
 
             /*We don't want the selected label start and end exactly where the normal label is as
