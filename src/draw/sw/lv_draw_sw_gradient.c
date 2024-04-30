@@ -323,7 +323,7 @@ int32_t LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_w(lv_grad_dsc_t *dsc, int32
 #endif
         a4 = grad_r->a4;
         if (a4 == 0) {  // solve linear equation: w = -c/b
-            w = b == 0 ? 0x7fffffff : -(c << 8) / b;
+            w = b == 0 ? 0 /*0x7fffffff*/ : -(c << 8) / b;
         }
         else {                  // solve quadratical equation: w = (-b + sqrt(b^2 - 4ac))/2a
             int32_t sqrb = lv_sqr(b >> 4);                      // b^2 shifted down by 2*4=8
@@ -339,7 +339,7 @@ int32_t LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_w(lv_grad_dsc_t *dsc, int32
 #endif
             }
             else {
-                return 0x7fffffff;
+                return 0; // 0x7fffffff;
             }
         }
     }
