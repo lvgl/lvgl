@@ -418,6 +418,8 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     TEST_ASSERT_EQUAL(1, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
     TEST_ASSERT_EQUAL(0, anim2_completed_called);
+
+    lv_test_wait(200); /*Now we are at 520ms */
 }
 
 #endif
