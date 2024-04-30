@@ -258,6 +258,9 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_style_set_bg_img_recolor              lv_style_set_bg_image_recolor
 #define lv_style_set_bg_img_recolor_opa          lv_style_set_bg_image_recolor_opa
 
+#define lv_keyboard_get_selected_btn             lv_keyboard_get_selected_button
+#define lv_keyboard_get_btn_text                 lv_keyboard_get_button_text
+
 #define LV_ZOOM_NONE                        LV_SCALE_NONE
 
 #define lv_image_decoder_built_in_open      lv_bin_decoder_open

@@ -248,11 +248,6 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
         dest += dest_stride;
     }
 
-    /* invalidate D-Cache */
-    lv_draw_buf_invalidate_cache(draw_buf, NULL);
-    LV_LOG_INFO("image %p (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p, cf: %d) decode finish",
-                image_data, width, height, draw_buf->data, src_cf);
-
     return LV_RESULT_OK;
 }
 
@@ -345,12 +340,6 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
     lv_free(src_temp);
 
     lv_fs_close(&file);
-
-    /* invalidate D-Cache */
-    lv_draw_buf_invalidate_cache(draw_buf, NULL);
-
-    LV_LOG_INFO("image %s (W%" LV_PRId32 " x H%" LV_PRId32 ", buffer: %p cf: %d) decode finish",
-                path, width, height, draw_buf->data, src_header.cf);
     return LV_RESULT_OK;
 
 failed:
