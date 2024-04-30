@@ -468,24 +468,21 @@ static void draw_main(lv_event_t * e)
 
             /*Move the selected label proportionally with the background label*/
             int32_t roller_h = lv_obj_get_height(obj);
-            int32_t label_y_prop = label->coords.y1 - (roller_h / 2 +
-                                                       obj->coords.y1); /*label offset from the middle line of the roller*/
+            const lv_font_t * normal_label_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+            /*label offset from the middle line of the roller*/
+            int32_t label_y_prop = (label->coords.y1 + normal_label_font->line_height / 2) - (roller_h / 2 + obj->coords.y1);
 
             /*Proportional position from the middle line (upscaled by << 14)*/
-            label_y_prop = (label_y_prop << 14) / lv_obj_get_height(label);
-
-            /*Apply a correction with different line heights*/
-            const lv_font_t * normal_label_font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+            label_y_prop = (label_y_prop << 14) / (lv_obj_get_height(label) - normal_label_font->line_height);
 
             /*We don't want the selected label start and end exactly where the normal label is as
              *a larger font won't centered on selected area.*/
-            int32_t corr = (label_dsc.font->line_height - normal_label_font->line_height) / 4;
+            int32_t corr = label_dsc.font->line_height;
 
             /*Apply the proportional position to the selected text*/
-            label_sel_size.y -= 2 * corr;
             int32_t label_sel_y = roller_h / 2 + obj->coords.y1;
-            label_sel_y += (label_sel_size.y * label_y_prop) >> 14;
-            label_sel_y -= corr;
+            label_sel_y += ((label_sel_size.y - corr) * label_y_prop) >> 14;
+            label_sel_y -= corr / 2;
 
             int32_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
             int32_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
