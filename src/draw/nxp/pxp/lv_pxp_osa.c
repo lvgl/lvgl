@@ -25,6 +25,11 @@
     #include "semphr.h"
 #endif
 
+#if defined(__ZEPHYR__)
+    #include <zephyr/kernel.h>
+    #include <zephyr/irq.h>
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -64,6 +69,9 @@ static void _pxp_wait(void);
 #if defined(SDK_OS_FREE_RTOS)
     static SemaphoreHandle_t xPXPIdleSemaphore;
 #endif
+#if defined(__ZEPHYR__)
+    static K_SEM_DEFINE(s_pxpIdleSem, 0, 1);
+#endif
 static volatile bool ucPXPIdle;
 
 static pxp_cfg_t _pxp_default_cfg = {
@@ -97,11 +105,20 @@ void PXP_IRQHandler(void)
         priority task.  The macro used for this purpose is dependent on the port in
         use and may be called portEND_SWITCHING_ISR(). */
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+#elif defined(__ZEPHYR__)
+        k_sem_give(&s_pxpIdleSem);
 #else
         ucPXPIdle = true;
 #endif
     }
 }
+
+#if defined(__ZEPHYR__)
+static void PXP_ZephyrIRQHandler(void *)
+{
+    PXP_IRQHandler();
+}
+#endif
 
 pxp_cfg_t * pxp_get_default_cfg(void)
 {
@@ -119,17 +136,22 @@ static void _pxp_interrupt_init(void)
     PXP_ASSERT_MSG(xPXPIdleSemaphore, "xSemaphoreCreateBinary failed!");
 
     NVIC_SetPriority(PXP_IRQ_ID, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1);
+    NVIC_EnableIRQ(PXP_IRQ_ID);
+#elif defined(__ZEPHYR__)
+    IRQ_CONNECT(DT_IRQN(DT_NODELABEL(pxp)), CONFIG_LV_Z_PXP_INTERRUPT_PRIORITY, PXP_ZephyrIRQHandler, NULL, 0);
+    irq_enable(DT_IRQN(DT_NODELABEL(pxp)));
 #endif
     ucPXPIdle = true;
-
-    NVIC_EnableIRQ(PXP_IRQ_ID);
 }
 
 static void _pxp_interrupt_deinit(void)
 {
-    NVIC_DisableIRQ(PXP_IRQ_ID);
 #if defined(SDK_OS_FREE_RTOS)
+    NVIC_DisableIRQ(PXP_IRQ_ID);
     vSemaphoreDelete(xPXPIdleSemaphore);
+#elif defined(__ZEPHYR__)
+    irq_disable(DT_IRQN(DT_NODELABEL(pxp)));
+    k_sem_reset(&s_pxpIdleSem);
 #endif
 }
 
@@ -156,6 +178,9 @@ static void _pxp_wait(void)
 
     if(xSemaphoreTake(xPXPIdleSemaphore, portMAX_DELAY) == pdTRUE)
         ucPXPIdle = true;
+#elif defined(__ZEPHYR__)
+    if(k_sem_take(&s_pxpIdleSem, K_FOREVER) == 0)
+        s_pxpIdle = true;
 #else
     while(ucPXPIdle == false) {
     }
