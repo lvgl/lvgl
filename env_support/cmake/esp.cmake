@@ -48,6 +48,14 @@ endif()
 
 target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
 
+if(CONFIG_LV_USE_DEMO_WIDGETS)
+  target_compile_definitions(${COMPONENT_LIB} PUBLIC LV_USE_DEMO_WIDGETS=1)
+endif()
+
+if(CONFIG_LV_BUILD_EXAMPLES)
+   target_compile_definitions(${COMPONENT_LIB} PUBLIC LV_BUILD_EXAMPLES=1)
+endif()
+
 if(CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
   target_compile_definitions(${COMPONENT_LIB}
                              PUBLIC "-DLV_ATTRIBUTE_FAST_MEM=IRAM_ATTR")
