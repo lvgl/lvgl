@@ -44,6 +44,7 @@
 
 #if defined(__ZEPHYR__)
     #include <zephyr/kernel.h>
+    #include <zephyr/irq.h>
 #endif
 
 /*********************
@@ -124,6 +125,13 @@ void PXP_IRQHandler(void)
     }
 }
 
+#if defined(__ZEPHYR__)
+static void PXP_ZephyrIRQHandler(void *)
+{
+    PXP_IRQHandler();
+}
+#endif
+
 lv_nxp_pxp_cfg_t * lv_gpu_nxp_pxp_get_cfg(void)
 {
     return &pxp_default_cfg;
@@ -141,21 +149,30 @@ static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void)
         return LV_RES_INV;
 
     NVIC_SetPriority(LV_GPU_NXP_PXP_IRQ_ID, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1);
-#endif
-    s_pxpIdle = true;
-
     NVIC_EnableIRQ(LV_GPU_NXP_PXP_IRQ_ID);
+
+#elif defined(__ZEPHYR__)
+    IRQ_CONNECT(DT_IRQN(DT_NODELABEL(pxp)), CONFIG_LV_Z_PXP_INTERRUPT_PRIORITY, PXP_ZephyrIRQHandler, NULL, 0);
+    irq_enable(DT_IRQN(DT_NODELABEL(pxp)));
+#else
+    NVIC_EnableIRQ(LV_GPU_NXP_PXP_IRQ_ID);
+#endif
+
+    s_pxpIdle = true;
 
     return LV_RES_OK;
 }
 
 static void _lv_gpu_nxp_pxp_interrupt_deinit(void)
 {
-    NVIC_DisableIRQ(LV_GPU_NXP_PXP_IRQ_ID);
 #if defined(SDK_OS_FREE_RTOS)
+    NVIC_DisableIRQ(LV_GPU_NXP_PXP_IRQ_ID);
     vSemaphoreDelete(s_pxpIdleSem);
 #elif defined(__ZEPHYR__)
+    irq_disable(DT_IRQN(DT_NODELABEL(pxp)));
     k_sem_reset(&s_pxpIdleSem);
+#else
+    NVIC_DisableIRQ(LV_GPU_NXP_PXP_IRQ_ID);
 #endif
 }
 
