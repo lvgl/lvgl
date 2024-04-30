@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-04-26" version="9.1.1-dev2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.1.1-dev2.pack">
+    <release date="2024-04-30" version="9.1.1-dev2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.1.1-dev2.pack">
       - LVGL 9.1.1-dev
     </release>
     <release date="2024-03-19" version="9.1.0" url="https://github.com/lvgl/lvgl/raw/v9.1.0/env_support/cmsis-pack/LVGL.lvgl.9.1.0.pack">
