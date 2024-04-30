@@ -70,7 +70,7 @@ typedef struct _lv_font_t {
 
     /*Pointer to the font in a font pack (must have the same line height)*/
     lv_coord_t line_height;         /**< The real line height where any text fits*/
-    lv_coord_t base_line;           /**< Base line measured from the top of the line_height*/
+    lv_coord_t base_line;           /**< Base line measured from the bottom of the line_height*/
     uint8_t subpx  : 2;             /**< An element of `lv_font_subpx_t`*/
 
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
