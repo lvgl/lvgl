@@ -181,7 +181,6 @@ void lv_freetype_font_delete(lv_font_t * font)
     LV_ASSERT_NULL(font);
     lv_freetype_context_t * ctx = lv_freetype_get_context();
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)(font->dsc);
-    LV_ASSERT_NULL(dsc);
     LV_ASSERT_FREETYPE_FONT_DSC(dsc);
 
     lv_cache_release(ctx->cache_node_cache, dsc->cache_node_entry, NULL);
