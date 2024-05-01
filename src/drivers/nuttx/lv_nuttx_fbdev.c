@@ -150,6 +150,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     }
 
     lv_display_set_draw_buffers(disp, &dsc->buf1, double_buffer ? &dsc->buf2 : NULL);
+    lv_display_set_color_format(disp, color_format);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
@@ -247,6 +248,7 @@ static lv_color_format_t fb_fmt_to_color_format(int fmt)
         case FB_FMT_RGB24:
             return LV_COLOR_FORMAT_RGB888;
         case FB_FMT_RGB32:
+            return LV_COLOR_FORMAT_XRGB8888;
         case FB_FMT_RGBA32:
             return LV_COLOR_FORMAT_ARGB8888;
         default:
