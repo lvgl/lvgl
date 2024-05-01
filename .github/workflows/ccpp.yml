@@ -113,7 +113,7 @@ jobs:
           key: lvgl_ci_cross_test_ccache_${{ matrix.arch }}_${{ github.sha }}
           restore-keys: |
             lvgl_ci_cross_test_ccache_${{ matrix.arch }}
-      - uses: uraimo/run-on-arch-action@v2.7.1
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run tests
         id: build
         with:
