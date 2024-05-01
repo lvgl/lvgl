@@ -353,9 +353,6 @@ static void anim_timer(lv_timer_t * param)
     lv_anim_t * a = _lv_ll_get_head(anim_ll_p);
 
     while(a != NULL) {
-
-        //        printf("%p, %d\n", a, a->start_value);
-
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
         a->act_time += elaps;
 
