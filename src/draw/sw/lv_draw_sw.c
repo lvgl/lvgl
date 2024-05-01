@@ -227,6 +227,7 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
             case LV_COLOR_FORMAT_RGB888:
                 rotate90_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
                 break;
+            case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
                 rotate90_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
                 break;
@@ -245,6 +246,7 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
             case LV_COLOR_FORMAT_RGB888:
                 rotate180_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
                 break;
+            case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
                 rotate180_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
                 break;
@@ -263,6 +265,7 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
             case LV_COLOR_FORMAT_RGB888:
                 rotate270_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
                 break;
+            case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
                 rotate270_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
                 break;
