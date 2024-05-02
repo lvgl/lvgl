@@ -7,4 +7,6 @@ Drivers
 
     display/index
     touchpad/index
+    libinput
     X11
+    windows

@@ -2,7 +2,7 @@
 
 <!--
 /****************************************************************************
-*  Copyright 2022 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)       *
+*  Copyright 2024 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)       *
 *                                                                           *
 *  Licensed under the Apache License, Version 2.0 (the "License");          *
 *  you may not use this file except in compliance with the License.         *
@@ -20,7 +20,7 @@
 -->
 
 
-<package schemaVersion="1.7.28" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.28/schema/PACK.xsd">
+<package schemaVersion="1.7.31" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.31/schema/PACK.xsd">
   <vendor>LVGL</vendor>
   <name>lvgl</name>
   <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
@@ -36,12 +36,27 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-01-02" version="9.0.0-dev3" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev3.pack">
-      - LVGL 9.0.0-dev
-      - New Driver Architecture
-      - Adds Helium support
+    <release date="2024-03-24" version="9.1.1-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.1.1-dev1.pack">
+      - LVGL 9.1.1-dev
+    </release>
+    <release date="2024-03-19" version="9.1.0" url="https://github.com/lvgl/lvgl/raw/v9.1.0/env_support/cmsis-pack/LVGL.lvgl.9.1.0.pack">
+      - LVGL 9.1.0
+      - See Change Log
+    </release>
+    <release date="2024-03-19" version="8.4.0" url="https://github.com/lvgl/lvgl/raw/v8.4.0/env_support/cmsis-pack/LVGL.lvgl.8.4.0.pack">
+      - LVGL 8.4.0
+      - Some minor fixes
+    </release>
+    <release date="2024-01-24" version="9.0.0" url="https://github.com/lvgl/lvgl/raw/v9.0.0/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
+      - LVGL 9.0.0
+      - Implements a New Render Architecture that enables parallel processing
+      - Accelerates SW-Render with NEON and Helium technology for Cortex architectures. 
+      - Adds supports for GPUs: VG-Lite, PXP, Dave2D and etc.
+      - Adds display drivers
+      - Adds Demos for benchmarks, render test etc,
       - Other fixes
     </release>
+    
     <release date="2023-12-05" version="8.3.11" url="https://github.com/lvgl/lvgl/raw/8194d83226c27c84f12dd51e16f5add9939215a5/env_support/cmsis-pack/LVGL.lvgl.8.3.11.pack">
       - LVGL 8.3.11
       - Add LittleFS Library to LVGL8
@@ -77,10 +92,6 @@
       - Fix GPU support for NXP PXP and NXP VGLite
       - Rework stm32 DMA2D support
       - Various fixes
-    </release>
-    <release date="2023-01-15" version="1.1.0-alpha" url="https://github.com/lvgl/lvgl/raw/4e3f341b882e0453d3da5cce6bb1b6357e52e3e7/env_support/cmsis-pack/LVGL.lvgl.1.1.0-alpha.pack">
-      - LVGL 9.0.0-dev
-      - Monthly update for January
     </release>
     <release date="2022-12-31" version="1.0.12" url="https://github.com/lvgl/lvgl/raw/7d0de1aabeabd4c71231895df7a503a3313b4619/env_support/cmsis-pack/LVGL.lvgl.1.0.12.pack">
       - LVGL 9.0.0-dev
@@ -231,7 +242,7 @@
         </condition>
         
         <condition id="NEON">
-            <description>Support All Cortex-M based processors</description>
+            <description>Support NEON based processors</description>
             <accept  Dcore="Cortex-A8"/>
             <accept  Dcore="Cortex-A9"/>
             <accept  Dcore="Cortex-A15"/>
@@ -246,19 +257,22 @@
             <accept  Dcore="Cortex-A73"/>
         </condition>
         
-        <condition id="Helium GNU Assembler">
-            <require condition="NEON" />
-            <require condition="GNU Assembler" />
-        </condition>
-
         <condition id="Helium">
-            <description>Support All Cortex-M based processors</description>
-            <!--
+            <description>Support Helium based processors</description>
             <accept  Dcore="Cortex-M52"/>
-            -->
             <accept  Dcore="Cortex-M55"/>
             <accept  Dcore="Cortex-M85"/>
             <accept  Dcore="ARMV81MML"/>
+        </condition>
+        
+        <condition id="NEON GNU Assembler">
+            <require condition="NEON" />
+            <require condition="GNU Assembler" />
+        </condition>
+        
+        <condition id="Helium GNU Assembler">
+            <require condition="Helium" />
+            <require condition="GNU Assembler" />
         </condition>
 
         <condition id="LVGL-Essential">
@@ -268,8 +282,14 @@
 
         <condition id="LVGL-Essential-Assets">
             <description>Require LVGL Essential Service and Demo Assets </description>
-            <require Cclass="LVGL" Cgroup="Essential" />
+            <require condition="LVGL-Essential"/>
             <require Cclass="LVGL" Cgroup="Demos" Csub="Assets" />
+        </condition>
+        
+        <condition id="Demo-Benchmark">
+            <description>Dependency of Benchmark</description>
+            <require condition="LVGL-Essential-Assets"/>
+            <require Cclass="LVGL" Cgroup="Demos" Csub="Widgets" />
         </condition>
 
         <condition id="Arm-2D">
@@ -277,64 +297,76 @@
             <require Cclass="Acceleration" Cgroup="Arm-2D"/>
         </condition>
 
-        <condition id="LVGL-GPU-Arm-2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
-        </condition>
-
         <condition id="LVGL-GPU-STM32-DMA2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for STM32-DMA2D</description>
+            <require condition="LVGL-Essential"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-SWM341-DMA2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for SWM341-DMA2D</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-PXP">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for NXP-PXP</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>-->
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-VGLite">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for NXP-VGLite</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>-->
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
         </condition>
 
         <condition id="LVGL-GPU-GD32-IPA">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="LVGL9" Csub="Essential"/>
+            <description>Condition for GD32-IPA</description>
+            <require condition="LVGL-Essential"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
+        </condition>
+        
+        <condition id="LVGL-GPU-Renesas-Dave2D">
+            <description>Condition for Renesas-Dave2D</description>
+            <require condition="LVGL-Essential"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>-->
         </condition>
 
     </conditions>
@@ -369,7 +401,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.0.0">
+        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.1.0">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="Essential">
@@ -396,27 +428,31 @@
                 <file category="sourceC"            name="src/core/lv_refr.c" />
                 
                 
-                <!-- src/dev -->
-                <file category="sourceC"            name="src/dev/display/drm/lv_linux_drm.c" />
-                <file category="sourceC"            name="src/dev/display/fb/lv_linux_fbdev.c" />
-                <file category="sourceCpp"          name="src/dev/display/tft_espi/lv_tft_espi.cpp" />
-                <file category="sourceC"            name="src/dev/evdev/lv_evdev.c" />
+                <!-- src/drivers -->
+                <file category="sourceC"            name="src/drivers/evdev/lv_evdev.c" />
                 
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_entry.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_fbdev.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_lcd.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_libuv.c" />
-                <file category="sourceC"            name="src/dev/nuttx/lv_nuttx_touchscreen.c" />
+                <file category="sourceC"            name="src/drivers/display/lcd/lv_lcd_generic_mipi.c" />
                 
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_keyboard.c" />
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_mouse.c" />
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_mousewheel.c" />
-                <file category="sourceC"            name="src/dev/sdl/lv_sdl_window.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_entry.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_cache.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_fbdev.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_lcd.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_libuv.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_touchscreen.c" />
+                <file category="sourceC"            name="src/drivers/nuttx/lv_nuttx_image_cache.c" />
                 
-                <file category="sourceC"            name="src/dev/x11/lv_x11_display.c" />
-                <file category="sourceC"            name="src/dev/x11/lv_x11_input.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_keyboard.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_mouse.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_mousewheel.c" />
+                <file category="sourceC"            name="src/drivers/sdl/lv_sdl_window.c" />
                 
-                <!-- src/dev -->
+                <file category="sourceC"            name="src/drivers/x11/lv_x11_display.c" />
+                <file category="sourceC"            name="src/drivers/x11/lv_x11_input.c" />
+                
+                <file category="sourceC"            name="src/drivers/libinput/lv_libinput.c" />
+                <file category="sourceC"            name="src/drivers/libinput/lv_xkb.c" />
+
+                <!-- src/drivers -->
                 <file category="sourceC"            name="src/display/lv_display.c" />
                 
 
@@ -431,7 +467,6 @@
                 <file category="sourceC"            name="src/draw/lv_draw_rect.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_triangle.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_vector.c" />
-                <file category="sourceC"            name="src/draw/lv_image_buf.c" />
                 <file category="sourceC"            name="src/draw/lv_image_decoder.c" />
                 
                 <!-- src/draw/sw -->
@@ -455,9 +490,8 @@
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_argb8888.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c" />
-                <file category="sourceAsm"          name="src/draw/sw/blend/neon/lv_blend_neon.S"  condition="Helium GNU Assembler"/>
-                <!--file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.c" condition="Helium" /-->
-                
+                <file category="sourceAsm"          name="src/draw/sw/blend/neon/lv_blend_neon.S"  condition="NEON GNU Assembler"/>
+                <file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.S"  condition="Helium GNU Assembler"/>
 
                 <!-- src/font -->
                 <file category="sourceC"            name="src/font/lv_binfont_loader.c" />
@@ -600,6 +634,8 @@
                 <!-- src/others -->
                 <file category="sourceC"            name="src/others/sysmon/lv_sysmon.c" />
                 <file category="sourceC"            name="src/others/observer/lv_observer.c" />
+                <file category="sourceC"            name="src/others/vg_lite_tvg/vg_lite_matrix.c" />
+                <file category="sourceCpp"          name="src/others/vg_lite_tvg/vg_lite_tvg.cpp" />
                 
                 <!-- src/demons -->
                 <file category="sourceC"            name="demos/lv_demos.c" />
@@ -608,7 +644,7 @@
                 <file category="sourceC"            name="src/osal/lv_os_none.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.0" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.5" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -636,7 +672,114 @@
                </RTE_Components_h>
 
             </component>
-            
+
+            <component Cgroup="Display" Cvariant="Windows Backend" condition="LVGL-Essential">
+              <description>Add the display driver for Windows backend  </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/windows/lv_windows_context.c" />
+                <file category="sourceC"            name="src/drivers/windows/lv_windows_display.c" />
+                <file category="sourceC"            name="src/drivers/windows/lv_windows_input.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for Windows backend*/ */
+#define LV_USE_WINDOWS    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="Linux DRM" condition="LVGL-Essential">
+              <description>Add the display driver for Linux /dev/dri/card*/  </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/drm/lv_linux_drm.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for Linux /dev/dri/card*/ */
+#define LV_USE_LINUX_DRM    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="Linux FBDEV" condition="LVGL-Essential">
+              <description>Add the display driver for Linux /dev/fb </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/fb/lv_linux_fbdev.c" />
+                <file category="sourceCpp"          name="src/drivers/display/tft_espi/lv_tft_espi.cpp" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for Linux /dev/fb */
+#define LV_USE_LINUX_FBDEV    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="TFT_eSPI" condition="LVGL-Essential">
+              <description>Add the display driver for TFT_eSPI </description>
+              <files>
+                <file category="sourceCpp"          name="src/drivers/display/tft_espi/lv_tft_espi.cpp" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for TFT_eSPI */
+#define LV_USE_TFT_ESPI    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="ILI9341" condition="LVGL-Essential">
+              <description>Add the display driver for ILI9341 </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/ili9341/lv_ili9341.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for ILI9341 */
+#define LV_USE_ILI9341	    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="st7735" condition="LVGL-Essential">
+              <description>Add the display driver for st7735 </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/st7735/lv_st7735.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for st7735 */
+#define LV_USE_ST7735	    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="st7789" condition="LVGL-Essential">
+              <description>Add the display driver for st7789 </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/st7789/lv_st7789.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for st7789 */
+#define LV_USE_ST7789	    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="st7796" condition="LVGL-Essential">
+              <description>Add the display driver for st7796 </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/st7796/lv_st7796.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for st7796 */
+#define LV_USE_ST7796	    1
+
+              </RTE_Components_h>
+            </component>
+
             <component Cgroup="OS Abstraction Layer" Cvariant="pthreads" condition="LVGL-Essential">
               <description>Add the support for pthreads</description>
               <files>
@@ -652,7 +795,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_PTHREAD
 
@@ -675,7 +818,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_FREERTOS
 
@@ -698,7 +841,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_CMSIS_RTOS2
 
@@ -721,7 +864,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_RTTHREAD
 
@@ -744,7 +887,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_WINDOWS
 
@@ -768,7 +911,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
- * - LV_OS_CUSTOM 
+ * - LV_OS_CUSTOM
  */
 #define LV_USE_OS               LV_OS_CUSTOM
 #define LV_OS_CUSTOM_INCLUDE    "lv_os_custom.h"
@@ -777,27 +920,66 @@
 
             </component>
 
-            <component Cgroup="Porting"  condition="LVGL-Essential">
-              <description>Porting Templates</description>
+            <component Cgroup="Porting"  Csub="Display" Cvariant="Generic" isDefaultVariant="true" condition="LVGL-Essential">
+              <description>Porting Templates for display devices.</description>
               <files>
                 <file category="header"     name="examples/porting/lv_port_disp_template.h" attr="config" version="2.1.0" />
                 <file category="sourceC"    name="examples/porting/lv_port_disp_template.c" attr="config" version="2.1.0" />
-
+              </files>
+            </component>
+            
+            <component Cgroup="Porting"  Csub="Display" Cvariant="STM32" condition="LVGL-Essential">
+              <description>Porting Templates for STM32 devices.</description>
+              <files>
+                <file category="header"     name="examples/porting/lv_port_lcd_stm32_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"    name="examples/porting/lv_port_lcd_stm32_template.c" attr="config" version="1.0.0" />
+              </files>
+            </component>
+            
+            <component Cgroup="Porting"  Csub="Input" Cvariant="Generic" isDefaultVariant="true" condition="LVGL-Essential">
+              <description>Porting Templates for input devices.</description>
+              <files>
                 <file category="header"     name="examples/porting/lv_port_indev_template.h" attr="config" version="2.1.0" />
                 <file category="sourceC"    name="examples/porting/lv_port_indev_template.c" attr="config" version="2.1.0" />
-
+              </files>
+            </component>
+            
+            <component Cgroup="Porting"  Csub="File System" Cvariant="Generic" isDefaultVariant="true" condition="LVGL-Essential">
+              <description>Porting Templates for the file system.</description>
+              <files>
                 <file category="header"     name="examples/porting/lv_port_fs_template.h" attr="config" version="2.1.0" />
                 <file category="sourceC"    name="examples/porting/lv_port_fs_template.c" attr="config" version="2.1.0" />
               </files>
             </component>
 
+            <component Cgroup="Acceleration" Csub="GPU Renesas-Dave2D"  condition="LVGL-GPU-Renesas-Dave2D">
+              <description>An hardware acceleration from Renesas Dave2D</description>
+              <files>
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_arc.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_border.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_fill.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_image.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_label.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_line.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_mask_rectangle.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_triangle.c" />
+                <file category="sourceC"      name="src/draw/renesas/dave2d/lv_draw_dave2d_utils.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable Renesas Dave2D */
+#define LV_USE_DRAW_DAVE2D  1
+              </RTE_Components_h>
+
+            </component>
 
             <component Cgroup="Acceleration" Csub="GPU NXP-PXP"  condition="LVGL-GPU-NXP-PXP">
               <description>An hardware acceleration from NXP-PXP</description>
               <files>
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_buf_pxp.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp.c" />
-                <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_bg_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_fill.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_layer.c" />
@@ -820,17 +1002,16 @@
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_buf_vglite.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
-                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_bg_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_border.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_fill.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_img.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_label.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_layer.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_line.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_triangle.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_buf.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_matrix.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_path.c" />
-                <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_buf.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_utils.c" />
               </files>
 
@@ -838,6 +1019,38 @@
 
 /*! \brief enable NXP VGLite */
 #define LV_USE_DRAW_VGLITE          1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Acceleration" Csub="GPU VG-Lite">
+              <description>An hardware acceleration from VG-Lite GPU</description>
+              <files>
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_buf_vg_lite.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_arc.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_border.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_box_shadow.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_fill.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_img.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_label.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_layer.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_line.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_mask_rect.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_triangle.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_draw_vg_lite_vector.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_decoder.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_math.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_path.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_grad.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_pending.c" />
+                <file category="sourceC"      name="src/draw/vg_lite/lv_vg_lite_utils.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable VG-Lite GPU */
+#define LV_USE_DRAW_VG_LITE          1
               </RTE_Components_h>
 
             </component>
@@ -1066,6 +1279,36 @@
 
 /*! \brief enable STDIO file access */
 #define LV_USE_FS_STDIO         1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="LittleFs" condition="LVGL-Essential">
+              <description>Add API for file access via LittleFs</description>
+              <files>
+                <!-- src/libs/fsdrv -->
+                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_littlefs.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable LittleFs file access */
+#define LV_USE_FS_LITTLEFS      1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Libraries and Others" Csub="Lib Filesystem" Cvariant="Arduino LittleFs" condition="LVGL-Essential">
+              <description>Add API for file access via Arduino LittleFs</description>
+              <files>
+                <!-- src/libs/fsdrv -->
+                <file category="sourceCpp"    name="src/libs/fsdrv/lv_fs_arduino_esp_littlefs.cpp" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable Arduino LittleFs file access */
+#define LV_USE_FS_ARDUINO_ESP_LITTLEFS       1
               </RTE_Components_h>
 
             </component>
@@ -1524,12 +1767,12 @@
 
             </component>
 
-            <component Cgroup="Demos" Csub="Benchmark"  condition="LVGL-Essential-Assets">
+            <component Cgroup="Demos" Csub="Benchmark"  condition="Demo-Benchmark">
               <description>Add the official benchmark.</description>
               <files>
                 <!-- demos/benchmark -->
                 <file category="sourceC"    name="demos/benchmark/lv_demo_benchmark.c" />
-                <file category="doc"        name="demos/benchmark/README.md" />
+                <file category="doc"        name="demos/README.md" />
               </files>
 
               <RTE_Components_h>
@@ -1582,7 +1825,6 @@
               <files>
                 <!-- demos/multilang -->
                 <file category="sourceC"    name="demos/multilang/lv_demo_multilang.c" />
-                <file category="doc"        name="demos/multilang/README.md" />
               </files>
 
               <RTE_Components_h>
@@ -1600,7 +1842,7 @@
                 <file category="sourceC"    name="demos/music/lv_demo_music.c" />
                 <file category="sourceC"    name="demos/music/lv_demo_music_list.c" />
                 <file category="sourceC"    name="demos/music/lv_demo_music_main.c" />
-                <file category="doc"        name="demos/music/README.md" />
+                <file category="doc"        name="demos/README.md" />
               </files>
 
               <RTE_Components_h>
@@ -1691,7 +1933,7 @@
               <files>
                 <!-- demos/render -->
                 <file category="sourceC"    name="demos/render/lv_demo_render.c" />
-                <file category="doc"        name="demos/render/README.md" />
+                <file category="doc"        name="demos/README.md" />
               </files>
 
               <RTE_Components_h>

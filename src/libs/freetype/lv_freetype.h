@@ -12,16 +12,16 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../misc/lv_types.h"
+#include "../../misc/lv_event.h"
+#include <stdbool.h>
 
 #if LV_USE_FREETYPE
 
 /*********************
  *      DEFINES
  *********************/
-
-#define LV_FREETYPE_CACHE_TYPE_IMAGE    0
-#define LV_FREETYPE_CACHE_TYPE_OUTLINE  1
 
 #define LV_FREETYPE_F26DOT6_TO_INT(x)   ((x) >> 6)
 #define LV_FREETYPE_F26DOT6_TO_FLOAT(x) ((float)(x) / 64)
@@ -43,7 +43,12 @@ enum {
 typedef uint16_t lv_freetype_font_style_t;
 typedef lv_freetype_font_style_t LV_FT_FONT_STYLE;
 
-#if LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_OUTLINE
+enum {
+    LV_FREETYPE_FONT_RENDER_MODE_BITMAP = 0,
+    LV_FREETYPE_FONT_RENDER_MODE_OUTLINE = 1,
+};
+
+typedef uint16_t lv_freetype_font_render_mode_t;
 
 typedef void * lv_freetype_outline_t;
 
@@ -68,21 +73,15 @@ typedef struct {
     lv_freetype_outline_vector_t control2;
 } lv_freetype_outline_event_param_t;
 
-#endif /*LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_OUTLINE*/
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 /**
  * Initialize the freetype library.
- * @param max_faces Maximum number of opened FT_Face objects managed by this cache instance. Use 0 for defaults.
- * @param max_sizes Maximum number of opened FT_Size objects managed by this cache instance. Use 0 for defaults.
- * @param max_kilobytes Maximum number of kilobytes to use for cached data nodes. Use 0 for defaults.
- *                  Note that this value does not account for managed FT_Face and FT_Size objects.
  * @return LV_RESULT_OK on success, otherwise LV_RESULT_INVALID.
  */
-lv_result_t lv_freetype_init(uint32_t max_faces, uint32_t max_sizes, uint32_t max_kilobytes);
+lv_result_t lv_freetype_init(uint32_t max_glyph_cnt);
 
 /**
  * Uninitialize the freetype library
@@ -92,19 +91,19 @@ void lv_freetype_uninit(void);
 /**
  * Create a freetype font.
  * @param pathname font file path.
+ * @param render_mode font render mode(see @lv_freetype_font_render_mode_t for details).
  * @param size font size.
  * @param style font style(see lv_freetype_font_style_t for details).
  * @return Created font, or NULL on failure.
  */
-lv_font_t * lv_freetype_font_create(const char * pathname, uint32_t size, lv_freetype_font_style_t style);
+lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
+                                    lv_freetype_font_style_t style);
 
 /**
  * Delete a freetype font.
  * @param font freetype font to be deleted.
  */
 void lv_freetype_font_delete(lv_font_t * font);
-
-#if LV_FREETYPE_CACHE_TYPE == LV_FREETYPE_CACHE_TYPE_OUTLINE
 
 /**
  * Register a callback function to generate outlines for FreeType fonts.
@@ -114,10 +113,6 @@ void lv_freetype_font_delete(lv_font_t * font);
  * @return The ID of the registered callback function, or a negative value on failure.
  */
 void lv_freetype_outline_add_event(lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
-
-void lv_freetype_outline_set_ref_size(uint32_t size);
-
-uint32_t lv_freetype_outline_get_ref_size(void);
 
 /**
  * Get the scale of a FreeType font.
@@ -134,8 +129,6 @@ uint32_t lv_freetype_outline_get_scale(const lv_font_t * font);
  * @return Is outline font on success, otherwise false.
  */
 bool lv_freetype_is_outline_font(const lv_font_t * font);
-
-#endif
 
 /**********************
  *      MACROS

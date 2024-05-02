@@ -73,6 +73,8 @@ remove the misleading guide above this code segment.
    
    - LV_USE_DRAW_VGLITE
    
+   - LV_USE_DRAW_VG_LITE
+   
    - LV_USE_DRAW_PXP
    
    - LV_USE_DRAW_SDL
@@ -89,6 +91,18 @@ remove the misleading guide above this code segment.
    
    - LV_USE_IMGFONT
    
+   - LV_USE_LINUX_DRM
+   
+   - LV_USE_TFT_ESPI
+   
+   - LV_USE_ST7735
+   
+   - LV_USE_ST7789
+   
+   - LV_USE_ST7796
+   
+   - LV_USE_ILI9341
+   
      
    
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
@@ -103,7 +117,7 @@ remove the misleading guide above this code segment.
 #define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
-Make sure `LV_MEM_SIZE` is no less than `(256*1024U)`.
+Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
 
 8. Remove following macro definitions in the `3rd party libraries` section:
 
@@ -111,6 +125,9 @@ Make sure `LV_MEM_SIZE` is no less than `(256*1024U)`.
     - \#define LV_USE_FS_POSIX 0
     - \#define LV_USE_FS_WIN32 0
     - \#define LV_USE_FS_FATFS 0
+    - #define LV_USE_FS_LITTLEFS 0
+    - #define LV_USE_FS_ARDUINO_ESP_LITTLEFS 0
+    - #define LV_USE_FS_ARDUINO_SD 0
     - #define LV_USE_FS_MEMFS 0
     - \#define LV_USE_LODEPNG 0
     - #define LV_USE_LIBPNG 0
@@ -195,9 +212,15 @@ with:
     #endif
 ```
 
+13. Update macro `LV_PROFILER_INCLUDE`:
+
+```c
+#define LV_PROFILER_INCLUDE "src/misc/lv_profiler_builtin.h"
+```
 
 
-13. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+
+14. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 

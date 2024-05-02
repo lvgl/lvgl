@@ -1,3 +1,5 @@
+.. _color:
+
 ======
 Colors
 ======
@@ -7,8 +9,9 @@ depth, creating colors from hex code, converting between color depths,
 mixing colors, etc.
 
 The type :cpp:type:`lv_color_t` is used to store a color in RGB888 format.
-This type and format is used in almost all APIs regardless to
-:cpp:expr`LV_COLOR_DEPTH`.
+This type and format is used in almost all APIs regardless to :cpp:expr:`LV_COLOR_DEPTH`.
+
+.. _color_create:
 
 Creating colors
 ***************
@@ -50,6 +53,8 @@ Create colors from Hue, Saturation and Value values:
    //From lv_color_t variable
    lv_color_hsv_t c_hsv = lv_color_to_hsv(color);
 
+.. _color_palette:
+
 Palette
 -------
 
@@ -88,6 +93,8 @@ For the lighter variants of a palette color use
 ``lv_color_t c = lv_palette_darken(LV_PALETTE_..., v)``. ``v`` can be
 1..4.
 
+.. _color_modify_and_mix:
+
 Modify and mix colors
 ---------------------
 
@@ -108,11 +115,15 @@ The following functions can modify a color:
    // Mix two colors with a given ratio 0: full c2, 255: full c1, 128: half c1 and half c2
    lv_color_t c = lv_color_mix(c1, c2, ratio);
 
+.. _color_builtin:
+
 Built-in colors
 ---------------
 
 :cpp:func:`lv_color_white` and :cpp:func:`lv_color_black` return ``0xFFFFFF`` and
 ``0x000000`` respectively.
+
+.. _color_opacity:
 
 Opacity
 *******
@@ -131,7 +142,7 @@ Some special purpose defines are also introduced:
 You can also use the ``LV_OPA_*`` defines in :cpp:func:`lv_color_mix` as a
 mixing *ratio*.
 
-
+.. _color_api:
 
 API
 ***

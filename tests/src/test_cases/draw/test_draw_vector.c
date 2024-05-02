@@ -94,6 +94,38 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_dsc_set_fill_rule(ctx, LV_VECTOR_FILL_EVENODD);
     lv_vector_dsc_add_path(ctx, path);
 
+    lv_vector_path_clear(path);
+    lv_vector_dsc_identity(ctx);
+    lv_vector_dsc_set_blend_mode(ctx, LV_VECTOR_BLEND_SRC_OVER);
+
+    rect = (lv_area_t) {
+        500, 50, 550, 100
+    };
+    lv_vector_dsc_set_fill_color(ctx, lv_color_lighten(lv_color_black(), 50));
+    lv_vector_clear_area(ctx, &rect); // clear screen
+
+    lv_fpoint_t p = {500, 100}; /* Center */
+    lv_vector_dsc_set_stroke_color(ctx, lv_color_make(0x00, 0xff, 0xff));
+    lv_vector_dsc_set_stroke_opa(ctx, LV_OPA_COVER);
+    lv_vector_dsc_set_stroke_width(ctx, 2.0f);
+    lv_vector_dsc_set_stroke_dash(ctx, NULL, 0);
+    lv_vector_dsc_set_fill_opa(ctx, LV_OPA_TRANSP);
+    lv_vector_path_move_to(path, &p);
+    lv_fpoint_t temp = {p.x + 50, p.y};
+    lv_vector_path_line_to(path, &temp);
+    lv_vector_path_append_arc(path, &p, 50, 0, -90, false);
+    lv_vector_path_line_to(path, &p);
+    lv_vector_path_close(path);
+
+    lv_vector_dsc_add_path(ctx, path);
+
+    /* Below code has same effect as above one but with solid fill */
+    lv_vector_dsc_set_fill_color(ctx, lv_color_make(0xFF, 0x00, 0x00));
+    lv_vector_dsc_set_fill_opa(ctx, LV_OPA_COVER);
+    lv_vector_path_clear(path);
+    lv_vector_path_append_arc(path, &p, 50, 45, 45, true);
+    lv_vector_dsc_add_path(ctx, path); // draw a path
+
     lv_draw_vector(ctx);
     lv_vector_path_delete(path);
     lv_vector_dsc_delete(ctx);
@@ -202,6 +234,7 @@ static void draw_lines(lv_layer_t * layer)
 
 static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 {
+    LV_UNUSED(name);
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     uint32_t stride = 640 * 4 + 128; /*Test non-default stride*/
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(640, 480, LV_COLOR_FORMAT_ARGB8888, stride);
@@ -222,7 +255,36 @@ static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 #endif
     lv_image_cache_drop(draw_buf);
     lv_draw_buf_destroy(draw_buf);
-    lv_obj_del(canvas);
+    lv_obj_delete(canvas);
+}
+
+void test_transform(void)
+{
+    lv_matrix_t matrix;
+    lv_matrix_identity(&matrix);
+    lv_matrix_translate(&matrix, 100, 100);
+
+    lv_fpoint_t p = {10, 10};
+    lv_matrix_transform_point(&matrix, &p);
+
+    TEST_ASSERT_EQUAL_FLOAT(110.0f, p.x);
+    TEST_ASSERT_EQUAL_FLOAT(110.0f, p.y);
+
+    lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
+    lv_vector_path_move_to(path, &p);
+
+    lv_fpoint_t p2 = {20, 20};
+    lv_vector_path_line_to(path, &p2);
+    lv_matrix_transform_path(&matrix, path);
+
+    lv_fpoint_t * pt = lv_array_at(&path->points, 0);
+
+    TEST_ASSERT_EQUAL_FLOAT(210.0f, pt[0].x);
+    TEST_ASSERT_EQUAL_FLOAT(210.0f, pt[0].y);
+    TEST_ASSERT_EQUAL_FLOAT(120.0f, pt[1].x);
+    TEST_ASSERT_EQUAL_FLOAT(120.0f, pt[1].y);
+
+    lv_vector_path_delete(path);
 }
 
 void test_draw_lines(void)

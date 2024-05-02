@@ -14,6 +14,7 @@
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_path.h"
 #include "lv_vg_lite_utils.h"
+#include "lv_vg_lite_grad.h"
 
 /*********************
  *      DEFINES
@@ -45,10 +46,6 @@
 
 void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
-    if(dsc->opa <= LV_OPA_MIN) {
-        return;
-    }
-
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     lv_area_t clip_area;
@@ -57,19 +54,21 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
         return;
     }
 
+    LV_PROFILER_BEGIN;
+
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
     lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
 
     int32_t w = lv_area_get_width(coords);
     int32_t h = lv_area_get_height(coords);
-    int32_t r = dsc->radius;
-    if(r) {
-        int32_t r_short = LV_MIN(w, h) / 2;
+    float r = dsc->radius;
+    if(dsc->radius) {
+        float r_short = LV_MIN(w, h) / 2.0f;
         r = LV_MIN(r, r_short);
     }
 
-    lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_S16);
+    lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
     lv_vg_lite_path_set_quality(path, dsc->radius == 0 ? VG_LITE_LOW : VG_LITE_HIGH);
     lv_vg_lite_path_set_bonding_box_area(path, &clip_area);
     lv_vg_lite_path_append_rect(path, coords->x1, coords->y1, w, h, r, r);
@@ -79,19 +78,24 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
+    LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     if(dsc->grad.dir != LV_GRAD_DIR_NONE) {
+        vg_lite_matrix_t grad_matrix;
+        lv_vg_lite_grad_area_to_matrix(&grad_matrix, coords, dsc->grad.dir);
         lv_vg_lite_draw_linear_grad(
+            u,
             &u->target_buffer,
             vg_lite_path,
-            coords,
             &dsc->grad,
+            &grad_matrix,
             &matrix,
             VG_LITE_FILL_EVEN_ODD,
             VG_LITE_BLEND_SRC_OVER);
     }
     else { /* normal fill */
         vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
+        LV_PROFILER_BEGIN_TAG("vg_lite_draw");
         LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                    &u->target_buffer,
                                    vg_lite_path,
@@ -99,9 +103,12 @@ void lv_draw_vg_lite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t *
                                    &matrix,
                                    VG_LITE_BLEND_SRC_OVER,
                                    color));
+        LV_PROFILER_END_TAG("vg_lite_draw");
     }
 
     lv_vg_lite_path_drop(u, path);
+
+    LV_PROFILER_END;
 }
 
 /**********************

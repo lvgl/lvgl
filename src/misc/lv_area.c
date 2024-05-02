@@ -15,7 +15,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define trans_cache LV_GLOBAL_DEFAULT()->area_trans_cache
 
 /**********************
  *      TYPEDEFS
@@ -440,61 +439,73 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
 }
 
 #define _LV_TRANSFORM_TRIGO_SHIFT 10
-void lv_point_transform(lv_point_t * p, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
+
+void lv_point_transform(lv_point_t * point, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
                         bool zoom_first)
+{
+    lv_point_array_transform(point, 1, angle, scale_x, scale_y, pivot, zoom_first);
+}
+
+void lv_point_array_transform(lv_point_t * points, size_t count, int32_t angle, int32_t scale_x, int32_t scale_y,
+                              const lv_point_t * pivot,
+                              bool zoom_first)
 {
     if(angle == 0 && scale_x == 256 && scale_y == 256) {
         return;
     }
+    uint32_t i;
+    for(i = 0; i < count; i++) {
+        points[i].x -= pivot->x;
+        points[i].y -= pivot->y;
 
-    p->x -= pivot->x;
-    p->y -= pivot->y;
+    }
 
     if(angle == 0) {
-        p->x = (((int32_t)(p->x) * scale_x) >> 8) + pivot->x;
-        p->y = (((int32_t)(p->y) * scale_y) >> 8) + pivot->y;
+        for(i = 0; i < count; i++) {
+            points[i].x = (((int32_t)(points[i].x) * scale_x) >> 8) + pivot->x;
+            points[i].y = (((int32_t)(points[i].y) * scale_y) >> 8) + pivot->y;
+        }
         return;
     }
-    lv_area_transform_cache_t * cache = &trans_cache;
-    if(cache->angle_prev != angle) {
-        int32_t angle_limited = angle;
-        if(angle_limited > 3600) angle_limited -= 3600;
-        if(angle_limited < 0) angle_limited += 3600;
 
-        int32_t angle_low = angle_limited / 10;
-        int32_t angle_high = angle_low + 1;
-        int32_t angle_rem = angle_limited  - (angle_low * 10);
+    int32_t angle_limited = angle;
+    if(angle_limited > 3600) angle_limited -= 3600;
+    if(angle_limited < 0) angle_limited += 3600;
 
-        int32_t s1 = lv_trigo_sin(angle_low);
-        int32_t s2 = lv_trigo_sin(angle_high);
+    int32_t angle_low = angle_limited / 10;
+    int32_t angle_high = angle_low + 1;
+    int32_t angle_rem = angle_limited  - (angle_low * 10);
 
-        int32_t c1 = lv_trigo_sin(angle_low + 90);
-        int32_t c2 = lv_trigo_sin(angle_high + 90);
+    int32_t s1 = lv_trigo_sin(angle_low);
+    int32_t s2 = lv_trigo_sin(angle_high);
 
-        cache->sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
-        cache->cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
-        cache->sinma = cache->sinma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
-        cache->cosma = cache->cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
-        cache->angle_prev = angle;
-    }
-    int32_t x = p->x;
-    int32_t y = p->y;
-    if(scale_x == 256 && scale_y == 256) {
-        p->x = ((cache->cosma * x - cache->sinma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
-        p->y = ((cache->sinma * x + cache->cosma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
-    }
-    else {
-        if(zoom_first) {
-            x *= scale_x;
-            y *= scale_y;
-            p->x = (((cache->cosma * x - cache->sinma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
-            p->y = (((cache->sinma * x + cache->cosma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
+    int32_t c1 = lv_trigo_sin(angle_low + 90);
+    int32_t c2 = lv_trigo_sin(angle_high + 90);
+
+    int32_t sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
+    sinma = sinma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+    int32_t cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
+    cosma = cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+
+    for(i = 0; i < count; i++) {
+        int32_t x = points[i].x;
+        int32_t y = points[i].y;
+        if(scale_x == 256 && scale_y == 256) {
+            points[i].x = ((cosma * x - sinma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+            points[i].y = ((sinma * x + cosma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
         }
         else {
-            p->x = (((cache->cosma * x - cache->sinma * y) * scale_x) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
-            p->y = (((cache->sinma * x + cache->cosma * y) * scale_y) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
+            if(zoom_first) {
+                x *= scale_x;
+                y *= scale_y;
+                points[i].x = (((cosma * x - sinma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
+                points[i].y = (((sinma * x + cosma * y)) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
+            }
+            else {
+                points[i].x = (((cosma * x - sinma * y) * scale_x) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
+                points[i].y = (((sinma * x + cosma * y) * scale_y) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
+            }
         }
-
     }
 }
 

@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include <stdint.h>
 #include "lv_types.h"
 
 /*********************
@@ -29,6 +28,9 @@ extern "C" {
 
 /*Align up value x to align, align must be a power of two*/
 #define LV_ALIGN_UP(x, align) (((x) + ((align) - 1)) & ~((align) - 1))
+
+/*Round up value x to round, round can be any integer number*/
+#define LV_ROUND_UP(x, round) ((((x) + ((round) - 1)) / (round)) * (round))
 
 /**********************
  *      TYPEDEFS
@@ -49,9 +51,9 @@ typedef struct {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_sin(int16_t angle);
+int32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_trigo_sin(int16_t angle);
 
-static inline LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_cos(int16_t angle)
+static inline int32_t LV_ATTRIBUTE_FAST_MEM lv_trigo_cos(int16_t angle)
 {
     return lv_trigo_sin(angle + 90);
 }
@@ -105,7 +107,7 @@ uint16_t lv_atan2(int x, int y);
  * If root < 256: mask = 0x800
  * Else: mask = 0x8000
  */
-LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
 
 //! @endcond
 

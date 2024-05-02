@@ -1,10 +1,14 @@
 #ifndef GIFDEC_H
 #define GIFDEC_H
 
-#include <stdint.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "../../misc/lv_fs.h"
 
 #if LV_USE_GIF
+#include <stdint.h>
 
 typedef struct _gd_Palette {
     int size;
@@ -59,5 +63,9 @@ void gd_rewind(gd_GIF * gif);
 void gd_close_gif(gd_GIF * gif);
 
 #endif /*LV_USE_GIF*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* GIFDEC_H */

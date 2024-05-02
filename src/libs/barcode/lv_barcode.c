@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_barcode.h"
+#include "../../lvgl.h"
+
 #if LV_USE_BARCODE
 
 #include "code128.h"
@@ -14,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_barcode_class
+#define MY_CLASS (&lv_barcode_class)
 
 /**********************
  *      TYPEDEFS
@@ -115,7 +117,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
         return LV_RESULT_INVALID;
     }
 
-    int32_t barcode_w = code128_encode_gs1(data, out_buf, len);
+    int32_t barcode_w = (int32_t) code128_encode_gs1(data, out_buf, len);
     LV_LOG_INFO("barcode width = %d", (int)barcode_w);
 
     LV_ASSERT(barcode->scale > 0);
@@ -188,7 +190,7 @@ static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     barcode->light_color = lv_color_white();
     barcode->scale = 1;
     barcode->direction = LV_DIR_HOR;
-    lv_image_set_align(obj, LV_IMAGE_ALIGN_TILE);
+    lv_image_set_inner_align(obj, LV_IMAGE_ALIGN_TILE);
 }
 
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
@@ -209,14 +211,14 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
     LV_ASSERT(w > 0);
 
     lv_draw_buf_t * old_buf = lv_canvas_get_draw_buf(obj);
-    lv_draw_buf_t * new_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_I1, 0);
+    lv_draw_buf_t * new_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_I1, LV_STRIDE_AUTO);
     if(new_buf == NULL) {
         LV_LOG_ERROR("malloc failed for canvas buffer");
         return false;
     }
 
     lv_canvas_set_draw_buf(obj, new_buf);
-    LV_LOG_INFO("set canvas buffer: %p, width = %d", new_buf, (int)w);
+    LV_LOG_INFO("set canvas buffer: %p, width = %d", (void *)new_buf, (int)w);
 
     if(old_buf != NULL) lv_draw_buf_destroy(old_buf);
     return true;

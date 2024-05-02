@@ -16,7 +16,10 @@
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (LV_GLOBAL_DEFAULT()->theme_mono)
+struct _my_theme_t;
+typedef struct _my_theme_t my_theme_t;
+
+#define theme_def (*(my_theme_t **)(&LV_GLOBAL_DEFAULT()->theme_mono))
 
 #define COLOR_FG      dark_bg ? lv_color_white() : lv_color_black()
 #define COLOR_BG      dark_bg ? lv_color_black() : lv_color_white()
@@ -108,7 +111,7 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
     lv_style_set_arc_width(&theme->styles.card, 2);
     lv_style_set_arc_color(&theme->styles.card, COLOR_FG);
     lv_style_set_outline_color(&theme->styles.card, COLOR_FG);
-    lv_style_set_anim_time(&theme->styles.card, 300);
+    lv_style_set_anim_duration(&theme->styles.card, 300);
 
     style_init_reset(&theme->styles.pr);
     lv_style_set_border_width(&theme->styles.pr, BORDER_W_PR);
@@ -160,7 +163,7 @@ static void style_init(my_theme_t * theme, bool dark_bg, const lv_font_t * font)
     lv_style_set_border_color(&theme->styles.ta_cursor, COLOR_FG);
     lv_style_set_border_width(&theme->styles.ta_cursor, 2);
     lv_style_set_bg_opa(&theme->styles.ta_cursor, LV_OPA_TRANSP);
-    lv_style_set_anim_time(&theme->styles.ta_cursor, 500);
+    lv_style_set_anim_duration(&theme->styles.ta_cursor, 500);
 #endif
 
 #if LV_USE_CHART
@@ -230,8 +233,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     LV_UNUSED(th);
 
     my_theme_t * theme = theme_def;
+    lv_obj_t * parent = lv_obj_get_parent(obj);
 
-    if(lv_obj_get_parent(obj) == NULL) {
+    if(parent == NULL) {
         lv_obj_add_style(obj, &theme->styles.scr, 0);
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
         return;
@@ -239,7 +243,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
     if(lv_obj_check_type(obj, &lv_obj_class)) {
 #if LV_USE_TABVIEW
-        lv_obj_t * parent = lv_obj_get_parent(obj);
         /*Tabview content area*/
         if(lv_obj_check_type(parent, &lv_tabview_class)) {
             return;
@@ -255,13 +258,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_WIN
         /*Header*/
-        if(lv_obj_get_index(obj) == 0 && lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class)) {
+        if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 0) == 0) {
             lv_obj_add_style(obj, &theme->styles.card, 0);
             lv_obj_add_style(obj, &theme->styles.no_radius, 0);
             return;
         }
         /*Content*/
-        else if(lv_obj_get_index(obj) == 1 && lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class)) {
+        else if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 1) == obj) {
             lv_obj_add_style(obj, &theme->styles.card, 0);
             lv_obj_add_style(obj, &theme->styles.no_radius, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
@@ -285,7 +288,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_BUTTONMATRIX
     else if(lv_obj_check_type(obj, &lv_buttonmatrix_class)) {
 #if LV_USE_MSGBOX
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
+        if(lv_obj_check_type(parent, &lv_msgbox_class)) {
             lv_obj_add_style(obj, &theme->styles.pad_gap, 0);
             lv_obj_add_style(obj, &theme->styles.card, LV_PART_ITEMS);
             lv_obj_add_style(obj, &theme->styles.pr, LV_PART_ITEMS | LV_STATE_PRESSED);
@@ -296,7 +299,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         }
 #endif
 #if LV_USE_TABVIEW
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_tabview_class)) {
+        if(lv_obj_check_type(parent, &lv_tabview_class)) {
             lv_obj_add_style(obj, &theme->styles.pad_gap, 0);
             lv_obj_add_style(obj, &theme->styles.card, LV_PART_ITEMS);
             lv_obj_add_style(obj, &theme->styles.pr, LV_PART_ITEMS | LV_STATE_PRESSED);
@@ -429,12 +432,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.edit, LV_STATE_EDITED);
     }
 #endif
-
-    //#if LV_USE_METER
-    //    else if(lv_obj_check_type(obj, &lv_meter_class)) {
-    //        lv_obj_add_style(obj, &theme->styles.card, 0);
-    //    }
-    //#endif
 
 #if LV_USE_TEXTAREA
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {

@@ -8,7 +8,7 @@ LVGL is **not thread-safe** by default.
 
 However, in the following conditions it's valid to call LVGL related
 functions: - In *events*. Learn more in :ref:`events`. -
-In *lv_timer*. Learn more in `Timers </overview/timer>`__.
+In *lv_timer*. Learn more in :ref:`timer`.
 
 Tasks and threads
 -----------------
@@ -31,7 +31,7 @@ Here is some pseudocode to illustrate the concept:
        while(1) {
            uint32_t time_till_next;
            mutex_lock(&lvgl_mutex);
-           time_till_next = lv_task_handler();
+           time_till_next = lv_timer_handler();
            mutex_unlock(&lvgl_mutex);
            thread_sleep(time_till_next); /* sleep for a while */
        }
@@ -57,7 +57,7 @@ Interrupts
 ----------
 
 Try to avoid calling LVGL functions from interrupt handlers (except
-:cpp:func:`lv_tick_inc` and :cpp:func:`lv_disp_flush_ready`). But if you need to do
+:cpp:func:`lv_tick_inc` and :cpp:func:`lv_display_flush_ready`). But if you need to do
 this you have to disable the interrupt which uses LVGL functions while
 :cpp:func:`lv_timer_handler` is running.
 

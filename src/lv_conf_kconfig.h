@@ -194,6 +194,8 @@ extern "C" {
 #  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_28_compressed
 #elif defined(CONFIG_LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW)
 #  define CONFIG_LV_FONT_DEFAULT &lv_font_dejavu_16_persian_hebrew
+#elif defined(CONFIG_LV_FONT_DEFAULT_SIMSUN_14_CJK)
+#  define CONFIG_LV_FONT_DEFAULT &lv_font_simsun_14_cjk
 #elif defined(CONFIG_LV_FONT_DEFAULT_SIMSUN_16_CJK)
 #  define CONFIG_LV_FONT_DEFAULT &lv_font_simsun_16_cjk
 #elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_8)
@@ -224,6 +226,18 @@ extern "C" {
 #endif
 
 /*------------------
+ * SDL
+ *-----------------*/
+
+#ifdef CONFIG_LV_SDL_RENDER_MODE_PARTIAL
+#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_PARTIAL
+#elif defined(CONFIG_LV_SDL_RENDER_MODE_DIRECT)
+#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
+#elif defined(CONFIG_LV_SDL_RENDER_MODE_FULL)
+#  define CONFIG_LV_SDL_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
+#endif
+
+/*------------------
  * LINUX FBDEV
  *-----------------*/
 
@@ -233,18 +247,6 @@ extern "C" {
 #  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_DIRECT
 #elif defined(CONFIG_LV_LINUX_FBDEV_RENDER_MODE_FULL)
 #  define CONFIG_LV_LINUX_FBDEV_RENDER_MODE LV_DISPLAY_RENDER_MODE_FULL
-#endif
-
-/*------------------
- * FREETYPE
- *-----------------*/
-
-#ifdef CONFIG_LV_FREETYPE_CACHE_TYPE_IMAGE
-#  define CONFIG_LV_FREETYPE_CACHE_TYPE LV_FREETYPE_CACHE_TYPE_IMAGE
-#elif defined(CONFIG_LV_FREETYPE_CACHE_TYPE_SBIT)
-#  define CONFIG_LV_FREETYPE_CACHE_TYPE LV_FREETYPE_CACHE_TYPE_SBIT
-#elif defined(CONFIG_LV_FREETYPE_CACHE_TYPE_OUTLINE)
-#  define CONFIG_LV_FREETYPE_CACHE_TYPE LV_FREETYPE_CACHE_TYPE_OUTLINE
 #endif
 
 #ifdef __cplusplus

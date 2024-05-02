@@ -1,4 +1,4 @@
-.. _file-system:
+.. _overview_file_system:
 
 ===========
 File system
@@ -14,7 +14,7 @@ Ready to use drivers
 
 LVGL contains prepared drivers for the API of POSIX, standard C,
 Windows, and `FATFS <http://elm-chan.org/fsw/ff/00index_e.html>`__.
-Learn more `here </libs/fsdrv>`__.
+Learn more :ref:`here <libs_filesystem>`.
 
 Adding a driver
 ***************
@@ -109,8 +109,8 @@ The example below shows how to read from a file:
 
    lv_fs_close(&f);
 
-*The mode in :cpp:func:`lv_fs_open` can be :cpp:enumerator:`LV_FS_MODE_WR` to open for writes
-only or :cpp:enumerator:`LV_FS_MODE_RD` ``|`` :cpp:enumerator:`LV_FS_MODE_WR` for both*
+The mode in :cpp:func:`lv_fs_open` can be :cpp:enumerator:`LV_FS_MODE_WR` to open for writes
+only or :cpp:enumerator:`LV_FS_MODE_RD` ``|`` :cpp:enumerator:`LV_FS_MODE_WR` for both
 
 This example shows how to read a directory's content. It's up to the
 driver how to mark directories in the result but it can be a good
@@ -125,7 +125,7 @@ practice to insert a ``'/'`` in front of each directory name.
 
    char fn[256];
    while(1) {
-       res = lv_fs_dir_read(&dir, fn);
+       res = lv_fs_dir_read(&dir, fn, sizeof(fn));
        if(res != LV_FS_RES_OK) {
            my_error_handling();
            break;
@@ -144,7 +144,7 @@ practice to insert a ``'/'`` in front of each directory name.
 Use drives for images
 *********************
 
-`Image </widgets/img>`__ objects can be opened from files too (besides
+:ref:`Image <lv_image>` objects can be opened from files too (besides
 variables stored in the compiled program).
 
 To use files in image widgets the following callbacks are required:
@@ -154,6 +154,8 @@ To use files in image widgets the following callbacks are required:
 - read
 - seek
 - tell
+
+.. _overview_file_system_api:
 
 API
 ***

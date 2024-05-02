@@ -1,5 +1,5 @@
 /**
- * @file lv_blend_to_neon.S
+ * @file lv_blend_neon.S
  *
  */
 
@@ -335,14 +335,14 @@ TMP_Q1      .qn  q14
     vmov.u8         OPA, #0xFF
 .endif
 
-    sub             DST_STRIDE, DST_STRIDE, DST_W
     vmvn            D_A, OPA
 .if dst_bpp == 16
-    lsl             DST_STRIDE, DST_STRIDE, #1
+    sub             DST_STRIDE, DST_STRIDE, DST_W, lsl #1
 .elseif dst_bpp == 24
-    add             DST_STRIDE, DST_STRIDE, DST_STRIDE, lsl #1
+    sub             DST_STRIDE, DST_STRIDE, DST_W
+    sub             DST_STRIDE, DST_STRIDE, DST_W, lsl #1
 .elseif dst_bpp >= 31
-    lsl             DST_STRIDE, DST_STRIDE, #2
+    sub             DST_STRIDE, DST_STRIDE, DST_W, lsl #2
 .endif
 .if src_bpp == 0
     .if mask || opa
@@ -355,14 +355,14 @@ TMP_Q1      .qn  q14
         convert     D, dst_bpp, 1
     .endif
 .else
+.if src_bpp == 16
+    sub             SRC_STRIDE, SRC_STRIDE, DST_W, lsl #1
+.elseif src_bpp == 24
     sub             SRC_STRIDE, SRC_STRIDE, DST_W
-    .if src_bpp == 16
-        lsl         SRC_STRIDE, SRC_STRIDE, #1
-    .elseif src_bpp == 24
-        add         SRC_STRIDE, SRC_STRIDE, SRC_STRIDE, lsl #1
-    .elseif src_bpp >= 31
-        lsl         SRC_STRIDE, SRC_STRIDE, #2
-    .endif
+    sub             SRC_STRIDE, SRC_STRIDE, DST_W, lsl #1
+.elseif src_bpp >= 31
+    sub             SRC_STRIDE, SRC_STRIDE, DST_W, lsl #2
+.endif
 .endif
     mvn             FG_MASK, #0
     mvn             BG_MASK, #0

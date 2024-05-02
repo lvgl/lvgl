@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+﻿#include "../../lv_examples.h"
 #if LV_USE_CANVAS && LV_BUILD_EXAMPLES
 
 #define CANVAS_WIDTH  50
@@ -29,5 +29,7 @@ void lv_example_canvas_6(void)
     lv_area_t coords = {10, 10, 10 + img_star.header.w - 1, 10 + img_star.header.h - 1};
 
     lv_draw_image(&layer, &dsc, &coords);
+
+    lv_canvas_finish_layer(canvas, &layer);
 }
 #endif

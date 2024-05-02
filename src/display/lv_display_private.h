@@ -58,12 +58,11 @@ struct _lv_display_t {
     /*---------------------
      * Buffering
      *--------------------*/
-    uint8_t * buf_1;
-    uint8_t * buf_2;
+    lv_draw_buf_t * buf_1;
+    lv_draw_buf_t * buf_2;
 
     /** Internal, used by the library*/
-    uint8_t * buf_act;
-    uint32_t buf_size_in_bytes;
+    lv_draw_buf_t * buf_act;
 
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_display_flush_ready()' has to be
      * called when finished*/
@@ -100,6 +99,8 @@ struct _lv_display_t {
     /** Double buffer sync areas (redrawn during last refresh) */
     lv_ll_t sync_areas;
 
+    lv_draw_buf_t _static_buf1; /*Used when user pass in a raw buffer as display draw buffer*/
+    lv_draw_buf_t _static_buf2;
     /*---------------------
      * Layer
      *--------------------*/
@@ -113,12 +114,12 @@ struct _lv_display_t {
 
     /** Screens of the display*/
     lv_obj_t ** screens;    /**< Array of screen objects.*/
+    lv_obj_t * sys_layer;   /**< @see lv_display_get_layer_sys*/
+    lv_obj_t * top_layer;   /**< @see lv_display_get_layer_top*/
     lv_obj_t * act_scr;     /**< Currently active screen on this display*/
+    lv_obj_t * bottom_layer;/**< @see lv_display_get_layer_bottom*/
     lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
     lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_screen_load_anim*/
-    lv_obj_t * bottom_layer;    /**< @see lv_display_get_layer_bottom*/
-    lv_obj_t * top_layer;       /**< @see lv_display_get_layer_top*/
-    lv_obj_t * sys_layer;       /**< @see lv_display_get_layer_sys*/
     uint32_t screen_cnt;
     uint8_t draw_prev_over_act  : 1;/** 1: Draw previous screen over active screen*/
     uint8_t del_prev  : 1; /** 1: Automatically delete the previous screen when the screen load animation is ready*/

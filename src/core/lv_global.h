@@ -15,8 +15,6 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#include <stdbool.h>
-
 #include "../misc/lv_types.h"
 #include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
@@ -27,7 +25,6 @@ extern "C" {
 #include "../misc/lv_color_op.h"
 #include "../misc/lv_ll.h"
 #include "../misc/lv_log.h"
-#include "../misc/lv_profiler_builtin.h"
 #include "../misc/lv_style.h"
 #include "../misc/lv_timer.h"
 #include "../others/sysmon/lv_sysmon.h"
@@ -39,6 +36,8 @@ extern "C" {
 
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
+
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -55,6 +54,14 @@ struct _snippet_stack;
 
 #if LV_USE_FREETYPE
 struct _lv_freetype_context_t;
+#endif
+
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+struct _lv_profiler_builtin_ctx_t;
+#endif
+
+#if LV_USE_NUTTX
+struct _lv_nuttx_ctx_t;
 #endif
 
 typedef struct _lv_global_t {
@@ -84,7 +91,6 @@ typedef struct _lv_global_t {
 
     uint32_t memory_zero;
     uint32_t math_rand_seed;
-    lv_area_transform_cache_t area_trans_cache;
 
     lv_event_t * event_header;
     uint32_t event_last_register_id;
@@ -94,13 +100,12 @@ typedef struct _lv_global_t {
     lv_tick_state_t tick_state;
 
     lv_draw_buf_handlers_t draw_buf_handlers;
+    lv_draw_buf_handlers_t font_draw_buf_handlers;
 
     lv_ll_t img_decoder_ll;
 
-#if LV_CACHE_DEF_SIZE > 0
     lv_cache_t * img_cache;
-    size_t cache_builtin_max_size;
-#endif
+    lv_cache_t * img_header_cache;
 
     lv_draw_global_info_t draw_info;
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
@@ -119,15 +124,15 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_THEME_SIMPLE
-    my_theme_t * theme_simple;
+    void * theme_simple;
 #endif
 
 #if LV_USE_THEME_DEFAULT
-    my_theme_t * theme_default;
+    void * theme_default;
 #endif
 
 #if LV_USE_THEME_MONO
-    my_theme_t * theme_mono;
+    void * theme_mono;
 #endif
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
@@ -150,6 +155,18 @@ typedef struct _lv_global_t {
     lv_fs_drv_t win32_fs_drv;
 #endif
 
+#if LV_USE_FS_LITTLEFS
+    lv_fs_drv_t littlefs_fs_drv;
+#endif
+
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    lv_fs_drv_t arduino_esp_littlefs_fs_drv;
+#endif
+
+#if LV_USE_FS_ARDUINO_SD
+    lv_fs_drv_t arduino_sd_fs_drv;
+#endif
+
 #if LV_USE_FREETYPE
     struct _lv_freetype_context_t * ft_context;
 #endif
@@ -167,7 +184,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
-    lv_profiler_builtin_ctx_t profiler_context;
+    struct _lv_profiler_builtin_ctx_t * profiler_context;
 #endif
 
 #if LV_USE_FILE_EXPLORER != 0
@@ -190,6 +207,11 @@ typedef struct _lv_global_t {
     void * objid_array;
     uint32_t objid_count;
 #endif
+
+#if LV_USE_NUTTX
+    struct _lv_nuttx_ctx_t * nuttx_ctx;
+#endif
+
     void * user_data;
 } lv_global_t;
 
@@ -205,7 +227,7 @@ typedef struct _lv_global_t {
 #endif
 #define LV_GLOBAL_DEFAULT() LV_GLOBAL_CUSTOM()
 #else
-extern lv_global_t lv_global;
+LV_ATTRIBUTE_EXTERN_DATA extern lv_global_t lv_global;
 #define LV_GLOBAL_DEFAULT() (&lv_global)
 #endif
 

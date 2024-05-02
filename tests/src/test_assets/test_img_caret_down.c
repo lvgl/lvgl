@@ -1,6 +1,6 @@
 #include "../../../lvgl.h"
 
-#if LV_BUILD_EXAMPLES
+#if LV_BUILD_TEST
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
@@ -27,8 +27,9 @@ test_image_caret_down_map[]
 const lv_image_dsc_t test_image_caret_down = {
     .header.w = 13,
     .header.h = 8,
+    .header.stride = 52,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = test_image_caret_down_map,
 };
 
-#endif /* LV_BUILD_EXAMPLES */
+#endif /* LV_BUILD_TEST */

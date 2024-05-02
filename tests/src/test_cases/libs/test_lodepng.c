@@ -22,7 +22,7 @@ static void create_images(void)
     lv_obj_t * label;
 
     /* PNG array */
-    LV_IMG_DECLARE(test_img_lvgl_logo_png);
+    LV_IMAGE_DECLARE(test_img_lvgl_logo_png);
     img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, &test_img_lvgl_logo_png);
     lv_obj_align(img, LV_ALIGN_CENTER, -100, -20);
@@ -59,7 +59,7 @@ void test_lodepng_1(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/png_1.png");
 
-    uint32_t mem_before = lv_test_get_free_mem();
+    size_t mem_before = lv_test_get_free_mem();
     for(uint32_t i = 0; i < 20; i++) {
         create_images();
 

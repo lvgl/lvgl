@@ -49,7 +49,7 @@ static const uint16_t sin0_90_table[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_sin(int16_t angle)
+int32_t LV_ATTRIBUTE_FAST_MEM lv_trigo_sin(int16_t angle)
 {
     int32_t ret = 0;
     while(angle < 0) angle += 360;
@@ -205,7 +205,7 @@ found:
 #endif
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
+void LV_ATTRIBUTE_FAST_MEM lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
 {
     x = x << 8; /*To get 4 bit precision. (sqrt(256) = 16 = 4 bit)*/
 

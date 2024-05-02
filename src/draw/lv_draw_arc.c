@@ -43,6 +43,11 @@ void lv_draw_arc_dsc_init(lv_draw_arc_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
+lv_draw_arc_dsc_t * lv_draw_task_get_arc_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_ARC ? (lv_draw_arc_dsc_t *)task->draw_dsc : NULL;
+}
+
 void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
 {
     if(dsc->opa <= LV_OPA_MIN) return;

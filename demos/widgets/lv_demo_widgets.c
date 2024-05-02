@@ -54,7 +54,7 @@ static void scale3_anim_cb(void * var, int32_t v);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void delete_timer_event_cb(lv_event_t * e);
-static void slideshow_anim_ready_cb(lv_anim_t * a_old);
+static void slideshow_anim_completed_cb(lv_anim_t * a_old);
 static void scale3_delete_event_cb(lv_event_t * e);
 static void tabview_delete_event_cb(lv_event_t * e);
 
@@ -233,7 +233,7 @@ void lv_demo_widgets_start_slideshow(void)
     lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
-    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);
     lv_anim_start(&a);
 }
 
@@ -841,7 +841,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section3_indicator_style);
     lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section3_tick_style);
 
-    LV_IMG_DECLARE(img_demo_widgets_needle);
+    LV_IMAGE_DECLARE(img_demo_widgets_needle);
     lv_obj_t * needle = lv_image_create(scale3);
     lv_image_set_src(needle, &img_demo_widgets_needle);
     lv_image_set_pivot(needle, 3, 4);
@@ -1412,13 +1412,12 @@ static void chart_event_cb(lv_event_t * e)
         lv_draw_task_t * draw_task = lv_event_get_param(e);
         lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
 
-        if(base_dsc->part == LV_PART_ITEMS && draw_task->type == LV_DRAW_TASK_TYPE_LINE) {
+        lv_draw_line_dsc_t * draw_line_dsc = lv_draw_task_get_line_dsc(draw_task);
+        if(base_dsc->part == LV_PART_ITEMS && draw_line_dsc) {
             const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
             if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
 
-            lv_draw_line_dsc_t * draw_line_dsc = draw_task->draw_dsc;
             lv_draw_triangle_dsc_t tri_dsc;
-
             lv_draw_triangle_dsc_init(&tri_dsc);
             tri_dsc.p[0].x = (int32_t)draw_line_dsc->p1.x;
             tri_dsc.p[0].y = (int32_t)draw_line_dsc->p1.y;
@@ -1501,24 +1500,10 @@ static void chart_event_cb(lv_event_t * e)
             lv_text_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
             lv_area_t txt_area;
-            if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
-                txt_area.y2 = draw_task->area.y1 - LV_DPX(15);
-                txt_area.y1 = txt_area.y2 - text_size.y;
-                if(ser == lv_chart_get_series_next(obj, NULL)) {
-                    txt_area.x1 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2;
-                    txt_area.x2 = txt_area.x1 + text_size.x;
-                }
-                else {
-                    txt_area.x2 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2;
-                    txt_area.x1 = txt_area.x2 - text_size.x;
-                }
-            }
-            else {
-                txt_area.x1 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2 - text_size.x / 2;
-                txt_area.x2 = txt_area.x1 + text_size.x;
-                txt_area.y2 = draw_task->area.y1 - LV_DPX(15);
-                txt_area.y1 = txt_area.y2 - text_size.y;
-            }
+            txt_area.y2 = draw_task->area.y1 - LV_DPX(15);
+            txt_area.y1 = txt_area.y2 - text_size.y;
+            txt_area.x1 = draw_task->area.x1 + (lv_area_get_width(&draw_task->area) - text_size.x) / 2;
+            txt_area.x2 = txt_area.x1 + text_size.x;
 
             lv_area_t bg_area;
             bg_area.x1 = txt_area.x1 - LV_DPX(8);
@@ -1637,7 +1622,7 @@ static void delete_timer_event_cb(lv_event_t * e)
     }
 }
 
-static void slideshow_anim_ready_cb(lv_anim_t * a_old)
+static void slideshow_anim_completed_cb(lv_anim_t * a_old)
 {
     LV_UNUSED(a_old);
 
@@ -1661,7 +1646,7 @@ static void slideshow_anim_ready_cb(lv_anim_t * a_old)
     lv_anim_set_playback_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
-    lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);
     lv_anim_start(&a);
 }
 

@@ -22,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_slider_class
+#define MY_CLASS (&lv_slider_class)
 
 #define LV_SLIDER_KNOB_COORD(is_reversed, area) (is_reversed ? area.x1 : area.x2)
 #define LV_SLIDER_KNOB_COORD_VERTICAL(is_reversed, area) (is_reversed ? area.y2 : area.y1)
@@ -110,7 +110,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
     lv_slider_mode_t type = lv_slider_get_mode(obj);
 
@@ -135,7 +135,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_PRESSED) {
         /*Save the pressed coordinates*/
         lv_indev_get_point(lv_indev_active(), &slider->pressed_point);
-        lv_obj_transform_point(obj, &slider->pressed_point, true, true);
+        lv_obj_transform_point(obj, &slider->pressed_point, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE_RECURSIVE);
     }
     else if(code == LV_EVENT_PRESSING) {
         update_knob_pos(obj, true);
@@ -207,7 +207,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     }
     else if(code == LV_EVENT_KEY) {
-        char c = *((char *)lv_event_get_param(e));
+        uint32_t c = lv_event_get_key(e);
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             if(!slider->left_knob_focus) lv_slider_set_value(obj, lv_slider_get_value(obj) + 1, LV_ANIM_ON);
@@ -224,6 +224,15 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RESULT_OK) return;
     }
+    else if(code == LV_EVENT_ROTARY) {
+        int32_t r = lv_event_get_rotary_diff(e);
+
+        if(!slider->left_knob_focus) lv_slider_set_value(obj, lv_slider_get_value(obj) + r, LV_ANIM_ON);
+        else lv_slider_set_left_value(obj, lv_slider_get_left_value(obj) + 1, LV_ANIM_ON);
+
+        res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+        if(res != LV_RESULT_OK) return;
+    }
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_knob(e);
     }
@@ -231,7 +240,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_knob(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
 
@@ -336,7 +345,7 @@ static void drag_start(lv_obj_t * obj)
     }
     else if(mode == LV_SLIDER_MODE_RANGE) {
         lv_indev_get_point(lv_indev_active(), &p);
-        lv_obj_transform_point(obj, &p, true, true);
+        lv_obj_transform_point(obj, &p, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE_RECURSIVE);
         const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
         const bool is_horizontal = is_slider_horizontal(obj);
         const bool is_reversed = slider->bar.val_reversed ^ (is_rtl && is_horizontal);
@@ -400,7 +409,7 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
 
     lv_point_t p;
     lv_indev_get_point(indev, &p);
-    lv_obj_transform_point(obj, &p, true, true);
+    lv_obj_transform_point(obj, &p, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE_RECURSIVE);
 
     bool is_hor = is_slider_horizontal(obj);
 

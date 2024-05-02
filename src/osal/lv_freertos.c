@@ -16,9 +16,13 @@
 
 #if LV_USE_OS == LV_OS_FREERTOS
 
-#include "atomic.h"
-#include "../misc/lv_log.h"
+#if (ESP_PLATFORM)
+    #include "freertos/atomic.h"
+#else
+    #include "atomic.h"
+#endif
 
+#include "../misc/lv_log.h"
 /*********************
  *      DEFINES
  *********************/
@@ -55,9 +59,21 @@ static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
  *  STATIC VARIABLES
  **********************/
 
+#if (ESP_PLATFORM)
+    static portMUX_TYPE critSectionMux = portMUX_INITIALIZER_UNLOCKED;
+#endif
+
 /**********************
  *      MACROS
  **********************/
+
+#if (ESP_PLATFORM)
+    #define _enter_critical()   taskENTER_CRITICAL(&critSectionMux);
+    #define _exit_critical()    taskEXIT_CRITICAL(&critSectionMux);
+#else
+    #define _enter_critical()   taskENTER_CRITICAL();
+    #define _exit_critical()    taskEXIT_CRITICAL();
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -73,7 +89,7 @@ lv_result_t lv_thread_init(lv_thread_t * pxThread, lv_thread_prio_t xSchedPriori
     BaseType_t xTaskCreateStatus = xTaskCreate(
                                        prvRunThread,
                                        pcTASK_NAME,
-                                       (uint16_t)usStackSize,
+                                       (configSTACK_DEPTH_TYPE)(usStackSize / sizeof(StackType_t)),
                                        (void *)pxThread,
                                        tskIDLE_PRIORITY + xSchedPriority,
                                        &pxThread->xTaskHandle);
@@ -336,7 +352,7 @@ static void prvCheckMutexInit(lv_mutex_t * pxMutex)
     if(pxMutex->xIsInitialized == pdFALSE) {
         /* Mutex initialization must be in a critical section to prevent two threads
          * from initializing it at the same time. */
-        taskENTER_CRITICAL();
+        _enter_critical();
 
         /* Check again that the mutex is still uninitialized, i.e. it wasn't
          * initialized while this function was waiting to enter the critical
@@ -346,7 +362,7 @@ static void prvCheckMutexInit(lv_mutex_t * pxMutex)
         }
 
         /* Exit the critical section. */
-        taskEXIT_CRITICAL();
+        _exit_critical();
     }
 }
 
@@ -385,7 +401,7 @@ static void prvCheckCondInit(lv_thread_sync_t * pxCond)
     if(pxCond->xIsInitialized == pdFALSE) {
         /* Cond initialization must be in a critical section to prevent two
          * threads from initializing it at the same time. */
-        taskENTER_CRITICAL();
+        _enter_critical();
 
         /* Check again that the condition is still uninitialized, i.e. it wasn't
          * initialized while this function was waiting to enter the critical
@@ -395,7 +411,7 @@ static void prvCheckCondInit(lv_thread_sync_t * pxCond)
         }
 
         /* Exit the critical section. */
-        taskEXIT_CRITICAL();
+        _exit_critical();
     }
 }
 

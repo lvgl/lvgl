@@ -42,8 +42,9 @@ typedef enum {
 } lv_indev_state_t;
 
 typedef enum {
-    LV_INDEV_MODE_TIMER = 0,
-    LV_INDEV_MODE_EVENT = 1
+    LV_INDEV_MODE_NONE = 0,
+    LV_INDEV_MODE_TIMER,
+    LV_INDEV_MODE_EVENT,
 } lv_indev_mode_t;
 
 /** Data structure passed to an input driver to fill*/
@@ -53,8 +54,8 @@ typedef struct {
     uint32_t btn_id;  /**< For LV_INDEV_TYPE_BUTTON the currently pressed button*/
     int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
 
-    lv_indev_state_t state; /**< LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
-    bool continue_reading;  /**< If set to true, the read callback is invoked again*/
+    lv_indev_state_t state; /**< LV_INDEV_STATE_RELEASED or LV_INDEV_STATE_PRESSED*/
+    bool continue_reading;  /**< If set to true, the read callback is invoked again, unless the device is in event-driven mode*/
 } lv_indev_data_t;
 
 typedef void (*lv_indev_read_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
@@ -63,6 +64,10 @@ typedef void (*lv_indev_read_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Create an indev
+ * @return Pointer to the created indev or NULL when allocation failed
+ */
 lv_indev_t * lv_indev_create(void);
 
 /**
@@ -94,9 +99,9 @@ void lv_indev_read_timer_cb(lv_timer_t * timer);
 /**
  * Enable or disable one or all input devices (default enabled)
  * @param indev pointer to an input device or NULL to enable/disable all of them
- * @param en true to enable, false to disable
+ * @param enable true to enable, false to disable
  */
-void lv_indev_enable(lv_indev_t * indev, bool en);
+void lv_indev_enable(lv_indev_t * indev, bool enable);
 
 /**
  * Get the currently processed input device. Can be used in action functions too.
@@ -112,11 +117,33 @@ lv_indev_t * lv_indev_active(void);
  */
 void lv_indev_set_type(lv_indev_t * indev, lv_indev_type_t indev_type);
 
+/**
+ * Set a callback function to read input device data to the indev
+ * @param indev pointer to an input device
+ * @param read_cb pointer to callback function to read input device data
+ */
 void lv_indev_set_read_cb(lv_indev_t * indev,  lv_indev_read_cb_t read_cb);
 
+/**
+ * Set user data to the indev
+ * @param indev pointer to an input device
+ * @param user_data pointer to user data
+ */
 void lv_indev_set_user_data(lv_indev_t * indev, void * user_data);
 
+/**
+ * Set driver data to the indev
+ * @param indev pointer to an input device
+ * @param driver_data pointer to driver data
+ */
 void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data);
+
+/**
+ * Assign a display to the indev
+ * @param indev pointer to an input device
+ * @param disp pointer to an display
+ */
+void lv_indev_set_display(lv_indev_t * indev, struct _lv_display_t * disp);
 
 /**
  * Get the type of an input device
@@ -125,18 +152,46 @@ void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data);
  */
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev);
 
+/**
+ * Get the callback function to read input device data to the indev
+ * @param indev pointer to an input device
+ * @return Pointer to callback function to read input device data or NULL if indev is NULL
+ */
 lv_indev_read_cb_t lv_indev_get_read_cb(lv_indev_t * indev);
 
+/**
+ * Get the indev state
+ * @param indev pointer to an input device
+ * @return Indev state or LV_INDEV_STATE_RELEASED if indev is NULL
+ */
 lv_indev_state_t lv_indev_get_state(const lv_indev_t * indev);
 
+/**
+ * Get the indev assigned group
+ * @param indev pointer to an input device
+ * @return Pointer to indev assigned group or NULL if indev is NULL
+ */
 lv_group_t * lv_indev_get_group(const lv_indev_t * indev);
 
-lv_display_t * lv_indev_get_disp(const lv_indev_t * indev);
+/**
+ * Get a pointer to the assigned display of the indev
+ * @param indev pointer to an input device
+ * @return pointer to the assigned display or NULL if indev is NULL
+ */
+lv_display_t * lv_indev_get_display(const lv_indev_t * indev);
 
-void lv_indev_set_disp(lv_indev_t * indev, lv_display_t * disp);
-
+/**
+ * Get a pointer to the user data of the indev
+ * @param indev pointer to an input device
+ * @return pointer to the user data or NULL if indev is NULL
+ */
 void * lv_indev_get_user_data(const lv_indev_t * indev);
 
+/**
+ * Get a pointer to the driver data of the indev
+ * @param indev pointer to an input device
+ * @return pointer to the driver data or NULL if indev is NULL
+ */
 void * lv_indev_get_driver_data(const lv_indev_t * indev);
 
 /**
@@ -246,6 +301,13 @@ lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev);
 * @param mode the mode of input device
 */
 void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode);
+
+/**
+ * Get the input device's running mode.
+ * @param indev pointer to an input device
+ * @return the running mode for the specified input device.
+ */
+lv_indev_mode_t lv_indev_get_mode(lv_indev_t * indev);
 
 /**
  * Search the most top, clickable object by a point

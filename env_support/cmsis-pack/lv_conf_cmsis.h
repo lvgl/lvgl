@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v9.0.0-dev
+ * Configuration file for v9.1.1-dev
  */
 
 /* clang-format off */
@@ -9,7 +9,14 @@
 #ifndef LV_CONF_H
 #define LV_CONF_H
 
-#include "RTE_Components.h"
+#if defined(_RTE_)
+    #include "RTE_Components.h"
+#endif
+
+/*If you need to include anything here, do it inside the `__ASSEMBLY__` guard */
+#if  0 && defined(__ASSEMBLY__)
+#include "my_include.h"
+#endif
 
 /*====================
    COLOR SETTINGS
@@ -36,7 +43,7 @@
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (256 * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (128 * 1024U)          /*[bytes]*/
 
     /*Size of the memory expand for `lv_malloc()` in bytes*/
     #define LV_MEM_POOL_EXPAND_SIZE 0
@@ -48,7 +55,7 @@
         #undef LV_MEM_POOL_INCLUDE
         #undef LV_MEM_POOL_ALLOC
     #endif
-#endif  /*LV_USE_MALLOC == LV_STDLIB_BUILTIN*/
+#endif  /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
 /*====================
    HAL SETTINGS
@@ -71,6 +78,14 @@
             } while(0)
 #endif
 
+/*=================
+ * OPERATING SYSTEM
+ *=================*/
+
+#if LV_USE_OS == LV_OS_CUSTOM
+    #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+#endif
+
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
@@ -81,6 +96,14 @@
 /*Align the start address of draw_buf addresses to this bytes*/
 #define LV_DRAW_BUF_ALIGN                       4
 
+/* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
+ * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+ * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
+ * and can't be drawn in chunks. */
+
+/*The target buffer size for simple layer chunks.*/
+#define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)   /*[bytes]*/
+
 #define LV_USE_DRAW_SW 1
 #if LV_USE_DRAW_SW == 1
     /* Set the number of draw unit.
@@ -88,13 +111,8 @@
      * > 1 means multiply threads will render the screen in parallel */
     #define LV_DRAW_SW_DRAW_UNIT_CNT    1
 
-    /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
-     * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
-     * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
-     * and can't be drawn in chunks. */
-
-    /*The target buffer size for simple layer chunks.*/
-    #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)   /*[bytes]*/
+    /* Enable native helium assembly to be compiled */
+    #define LV_USE_NATIVE_HELIUM_ASM    0
 
     /* 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only
      * 1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too */
@@ -117,7 +135,7 @@
         /*turn-on helium acceleration when Arm-2D and the Helium-powered device are detected */
         #if defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
             #define LV_USE_DRAW_SW_ASM  LV_DRAW_SW_ASM_HELIUM
-            #define LV_USE_DRAW_ARM2D   1
+            #define LV_USE_DRAW_ARM2D_SYNC  1
         #endif
     #endif
 
@@ -130,13 +148,55 @@
     #endif
 #endif
 
+/* Set stack size of drawing thread. Unit is byte. If Thorvg is enabled, 128kB is required tested on simulator.*/
+#define LV_DRAW_THREAD_STACKSIZE 32768
 
-/*=================
- * OPERATING SYSTEM
- *=================*/
+#if LV_USE_DRAW_VGLITE
+    /* Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels. */
+    #define LV_USE_VGLITE_BLIT_SPLIT 0
 
-#if LV_USE_OS == LV_OS_CUSTOM
-    #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+    #if LV_USE_OS
+        /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
+        #define LV_USE_VGLITE_DRAW_ASYNC 1
+    #endif
+
+    /* Enable VGLite asserts. */
+    #define LV_USE_VGLITE_ASSERT 0
+#endif
+
+#if LV_USE_DRAW_PXP
+    /* Enable PXP asserts. */
+    #define LV_USE_PXP_ASSERT 0
+#endif
+
+/* Use VG-Lite GPU. */
+#define LV_USE_DRAW_VG_LITE 0
+
+#if LV_USE_DRAW_VG_LITE
+/* Enable VG-Lite custom external 'gpu_init()' function */
+#define LV_VG_LITE_USE_GPU_INIT 0
+
+/* Enable VG-Lite assert. */
+#define LV_VG_LITE_USE_ASSERT 0
+
+/* VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
+#define LV_VG_LITE_FLUSH_MAX_COUNT 8
+
+/* Enable border to simulate shadow
+ * NOTE: which usually improves performance,
+ * but does not guarantee the same rendering quality as the software. */
+#define LV_VG_LITE_USE_BOX_SHADOW 0
+
+/* VG-Lite linear gradient image maximum cache number.
+ * NOTE: The memory usage of a single gradient image is 4K bytes.
+ */
+#define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT 32
+
+/* VG-Lite radial gradient image maximum cache size.
+ * NOTE: The memory usage of a single gradient image is radial grad radius * 4 bytes.
+ */
+#define LV_VG_LITE_RADIAL_GRAD_CACHE_CNT 32
+
 #endif
 
 /*=======================
@@ -216,35 +276,9 @@
  *For layers add the index number of the draw unit on black background.*/
 #define LV_USE_PARALLEL_DRAW_DEBUG 0
 
-/*------------------
- * STATUS MONITORING
- *------------------*/
-
-/*1: Show CPU usage and FPS count
- * Requires `LV_USE_SYSMON = 1`*/
-#define LV_USE_PERF_MONITOR 0
-#if LV_USE_PERF_MONITOR
-    #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
-
-    /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
-    #define LV_USE_PERF_MONITOR_LOG_MODE 0
-#endif
-
-/*1: Show the used memory and the memory fragmentation
- * Requires `LV_USE_BUILTIN_MALLOC = 1`
- * Requires `LV_USE_SYSMON = 1`*/
-#define LV_USE_MEM_MONITOR 0
-#if LV_USE_MEM_MONITOR
-    #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
-#endif
-
 /*-------------
  * Others
  *-----------*/
-
-/*Maximum buffer size to allocate for rotation.
- *Only used if software rotation is enabled in the display driver.*/
-#define LV_DISPLAY_ROT_MAX_BUF (10*1024)
 
 #define LV_ENABLE_GLOBAL_CUSTOM 0
 #if LV_ENABLE_GLOBAL_CUSTOM
@@ -257,6 +291,10 @@
  *Data larger than the size of the cache also can be allocated but
  *will be dropped immediately after usage.*/
 #define LV_CACHE_DEF_SIZE       0
+
+/*Default number of image header cache entries. The cache is used to store the headers of images
+ *The main logic is like `LV_CACHE_DEF_SIZE` but for image headers.*/
+#define LV_IMAGE_HEADER_CACHE_DEF_CNT 0
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
@@ -277,6 +315,29 @@
 
 /*Use obj property set/get API*/
 #define LV_USE_OBJ_PROPERTY 0
+
+/* VG-Lite Simulator */
+/*Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
+#define LV_USE_VG_LITE_THORVG  0
+
+#if LV_USE_VG_LITE_THORVG
+
+    /*Enable LVGL's blend mode support*/
+    #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
+
+    /*Enable YUV color format support*/
+    #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+
+    /*Enable 16 pixels alignment*/
+    #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
+
+    /*Buffer address alignment*/
+    #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
+
+    /*Enable multi-thread render*/
+    #define LV_VG_LITE_THORVG_THREAD_RENDER 0
+
+#endif
 
 /*=====================
  *  COMPILER SETTINGS
@@ -334,7 +395,7 @@
 #define LV_FONT_MONTSERRAT_18 0
 #define LV_FONT_MONTSERRAT_20 0
 #define LV_FONT_MONTSERRAT_22 0
-#define LV_FONT_MONTSERRAT_24 0
+#define LV_FONT_MONTSERRAT_24 1
 #define LV_FONT_MONTSERRAT_26 0
 #define LV_FONT_MONTSERRAT_28 0
 #define LV_FONT_MONTSERRAT_30 0
@@ -480,8 +541,6 @@
 
 #define LV_USE_MENU       1
 
-#define LV_USE_METER      1
-
 #define LV_USE_MSGBOX     1
 
 #define LV_USE_ROLLER     1   /*Requires: lv_label*/
@@ -587,6 +646,22 @@
     #define LV_FS_MEMFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
 #endif
 
+/*API for LittleFs. */
+#if LV_USE_FS_LITTLEFS
+    #define LV_FS_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+#endif
+
+/*API for Arduino LittleFs. */
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+#endif
+
+/*API for Arduino Sd. */
+#if LV_USE_FS_ARDUINO_SD
+    #define LV_FS_ARDUINO_SD_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_ARDUINO_SD_CS_PIN 0     /*Set the pin connected to the chip select line of the SD card */
+    #define LV_FS_ARDUINO_SD_FREQUENCY 40000000     /*Set the frequency used by the chip of the SD CARD */
+#endif
 
 /*GIF decoder library*/
 #if LV_USE_GIF
@@ -601,23 +676,12 @@
 
 /*FreeType library*/
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters in kilobytes*/
-    #define LV_FREETYPE_CACHE_SIZE 768
-
     /*Let FreeType to use LVGL memory and file porting*/
     #define LV_FREETYPE_USE_LVGL_PORT 0
 
-    /*FreeType cache type:
-     * LV_FREETYPE_CACHE_TYPE_IMAGE    - Image cache
-     * LV_FREETYPE_CACHE_TYPE_SBIT     - Sbit cache
-     * LV_FREETYPE_CACHE_TYPE_OUTLINE  - Outline cache*/
-    #define LV_FREETYPE_CACHE_TYPE LV_FREETYPE_CACHE_TYPE_IMAGE
-
-    /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
-    /* (0:use system defaults) */
-    #define LV_FREETYPE_CACHE_FT_FACES 8
-    #define LV_FREETYPE_CACHE_FT_SIZES 8
-    #define LV_FREETYPE_CACHE_FT_OUTLINES 256
+    /*Cache count of the glyphs in FreeType. It means the number of glyphs that can be cached.
+     *The higher the value, the more memory will be used.*/
+    #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 256
 #endif
 
 /* Built-in TTF decoder */
@@ -640,8 +704,6 @@
 
 /*Enable LZ4 compress/decompress lib*/
 #ifndef LV_USE_LZ4
-#   define LV_USE_LZ4  0
-
 /*Use lvgl built-in LZ4 lib*/
 #   define LV_USE_LZ4_INTERNAL  0
 
@@ -660,9 +722,30 @@
  * OTHERS
  *==================*/
 
-
 /*1: Enable system monitor component*/
-#define LV_USE_SYSMON   (LV_USE_MEM_MONITOR | LV_USE_PERF_MONITOR)
+#define LV_USE_SYSMON   0
+
+#if LV_USE_SYSMON
+
+    /*1: Show CPU usage and FPS count
+     * Requires `LV_USE_SYSMON = 1`*/
+    #define LV_USE_PERF_MONITOR 0
+    #if LV_USE_PERF_MONITOR
+        #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+
+        /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
+        #define LV_USE_PERF_MONITOR_LOG_MODE 0
+    #endif
+
+    /*1: Show the used memory and the memory fragmentation
+     * Requires `LV_USE_STDLIB_MALLOC = LV_STDLIB_BUILTIN`
+     * Requires `LV_USE_SYSMON = 1`*/
+    #define LV_USE_MEM_MONITOR 0
+    #if LV_USE_MEM_MONITOR
+        #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
+    #endif
+
+#endif /*LV_USE_SYSMON*/
 
 /*1: Enable the runtime performance profiler*/
 #define LV_USE_PROFILER 0
@@ -675,7 +758,7 @@
     #endif
 
     /*Header to include for the profiler*/
-    #define LV_PROFILER_INCLUDE "lvgl/src/misc/lv_profiler_builtin.h"
+    #define LV_PROFILER_INCLUDE "src/misc/lv_profiler_builtin.h"
 
     /*Profiler start point function*/
     #define LV_PROFILER_BEGIN    LV_PROFILER_BUILTIN_BEGIN
@@ -688,16 +771,6 @@
 
     /*Profiler end point function with custom tag*/
     #define LV_PROFILER_END_TAG   LV_PROFILER_BUILTIN_END_TAG
-#endif
-
-
-/*1: Support using images as font in label or span widgets */
-#if LV_USE_IMGFONT
-    /*Imgfont image file path maximum length*/
-    #define LV_IMGFONT_PATH_MAX_LEN 64
-
-    /*1: Use img cache to buffer header information*/
-    #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
 #endif
 
 /*1: Enable an observer pattern implementation*/
@@ -737,11 +810,12 @@
 /*Use SDL to open window on PC and handle mouse and keyboard*/
 #define LV_USE_SDL              0
 #if LV_USE_SDL
-    #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
-    #define LV_SDL_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
-    #define LV_SDL_BUF_COUNT       1    /*1 or 2*/
-    #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
-    #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL windows are closed*/
+    #define LV_SDL_INCLUDE_PATH     <SDL2/SDL.h>
+    #define LV_SDL_RENDER_MODE      LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
+    #define LV_SDL_BUF_COUNT        1    /*1 or 2*/
+    #define LV_SDL_FULLSCREEN       0    /*1: Make the window full screen by default*/
+    #define LV_SDL_DIRECT_EXIT      1    /*1: Exit the application when all SDL windows are closed*/
+    #define LV_SDL_MOUSEWHEEL_MODE  LV_SDL_MOUSEWHEEL_MODE_ENCODER  /*LV_SDL_MOUSEWHEEL_MODE_ENCODER/CROWN*/
 #endif
 
 /*Use X11 to open window on Linux desktop and handle mouse and keyboard*/
@@ -785,14 +859,24 @@
 
 #endif
 
-/*Driver for /dev/dri/card*/
-#define LV_USE_LINUX_DRM        0
-
-/*Interface for TFT_eSPI*/
-#define LV_USE_TFT_ESPI         0
-
 /*Driver for evdev input devices*/
 #define LV_USE_EVDEV    0
+
+/*Driver for libinput input devices*/
+#define LV_USE_LIBINPUT    0
+
+#if LV_USE_LIBINPUT
+    #define LV_LIBINPUT_BSD    0
+
+    /*Full keyboard support*/
+    #define LV_LIBINPUT_XKB             0
+    #if LV_LIBINPUT_XKB
+        /*"setxkbmap -query" can help find the right values for your keyboard*/
+        #define LV_LIBINPUT_XKB_KEY_MAP { .rules = NULL, .model = "pc101", .layout = "us", .variant = NULL, .options = NULL }
+    #endif
+#endif
+
+#define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
 
 /*==================
 * EXAMPLES
@@ -804,11 +888,6 @@
 /*===================
  * DEMO USAGE
  ====================*/
-
-/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
-#if LV_USE_DEMO_WIDGETS
-    #define LV_DEMO_WIDGETS_SLIDESHOW 0
-#endif
 
 /*Music player demo*/
 #if LV_USE_DEMO_MUSIC

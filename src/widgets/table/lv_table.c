@@ -21,7 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_table_class
+#define MY_CLASS (&lv_table_class)
 
 /**********************
  *      TYPEDEFS
@@ -535,7 +535,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_table_t * table = (lv_table_t *)obj;
 
     if(code == LV_EVENT_STYLE_CHANGED) {
@@ -647,7 +647,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_main(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_table_t * table = (lv_table_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
     lv_area_t clip_area;
@@ -1019,7 +1019,7 @@ static size_t get_cell_txt_len(const char * txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     retval = sizeof(lv_table_cell_t) + _lv_text_ap_calc_bytes_count(txt) + 1;
 #else
-    retval = sizeof(lv_table_cell_t) + strlen(txt) + 1;
+    retval = sizeof(lv_table_cell_t) + lv_strlen(txt) + 1;
 #endif
 
     return retval;
@@ -1031,7 +1031,7 @@ static void copy_cell_txt(lv_table_cell_t * dst, const char * txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_text_ap_proc(txt, dst->txt);
 #else
-    strcpy(dst->txt, txt);
+    lv_strcpy(dst->txt, txt);
 #endif
 }
 

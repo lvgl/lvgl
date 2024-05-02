@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_draw_sw_blend.c
  *
  */
@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "../lv_draw_sw.h"
+#include "lv_draw_sw_blend_to_l8.h"
+#include "lv_draw_sw_blend_to_al88.h"
 #include "lv_draw_sw_blend_to_rgb565.h"
 #include "lv_draw_sw_blend_to_argb8888.h"
 #include "lv_draw_sw_blend_to_rgb888.h"
@@ -83,12 +85,23 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
             case LV_COLOR_FORMAT_XRGB8888:
                 lv_draw_sw_blend_color_to_rgb888(&fill_dsc, 4);
                 break;
+            case LV_COLOR_FORMAT_L8:
+                lv_draw_sw_blend_color_to_l8(&fill_dsc);
+                break;
+            case LV_COLOR_FORMAT_AL88:
+                lv_draw_sw_blend_color_to_al88(&fill_dsc);
+                break;
             default:
                 break;
         }
     }
     else {
         if(!_lv_area_intersect(&blend_area, &blend_area, blend_dsc->src_area)) {
+            LV_PROFILER_END;
+            return;
+        }
+
+        if(blend_dsc->mask_area && !_lv_area_intersect(&blend_area, &blend_area, blend_dsc->mask_area)) {
             LV_PROFILER_END;
             return;
         }
@@ -137,6 +150,12 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
             case LV_COLOR_FORMAT_XRGB8888:
                 lv_draw_sw_blend_image_to_rgb888(&image_dsc, 4);
                 break;
+            case LV_COLOR_FORMAT_L8:
+                lv_draw_sw_blend_image_to_l8(&image_dsc);
+                break;
+            case LV_COLOR_FORMAT_AL88:
+                lv_draw_sw_blend_image_to_al88(&image_dsc);
+                break;
             default:
                 break;
         }
@@ -149,4 +168,3 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
  **********************/
 
 #endif
-

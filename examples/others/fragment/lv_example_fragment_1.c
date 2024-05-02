@@ -22,8 +22,8 @@ struct sample_fragment_t {
 static const lv_fragment_class_t sample_cls = {
     .constructor_cb = sample_fragment_ctor,
     .create_obj_cb = sample_fragment_create_obj,
-    .instance_size = sizeof(struct sample_fragment_t)
-};
+    .instance_size = sizeof(struct sample_fragment_t),
+    };
 
 void lv_example_fragment_1(void)
 {

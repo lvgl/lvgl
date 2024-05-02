@@ -60,9 +60,14 @@ struct _lv_draw_task_t {
     lv_draw_task_type_t type;
 
     /**
-     * The bounding box of the thing to draw
+     * The area where to draw
      */
     lv_area_t area;
+
+    /**
+     * The real draw area. E.g. for shadow, outline, or transformed images it's different from `area`
+     */
+    lv_area_t _real_area;
 
     /** The original area which is updated*/
     lv_area_t clip_area_original;
@@ -141,13 +146,8 @@ struct _lv_draw_unit_t {
 
 struct _lv_layer_t  {
 
-    /** The unaligned buffer where drawing will happen*/
-    void * buf_unaligned;
-
-    /** The aligned buffer, result of lv_draw_buf_align(layer->buf_unaligned)*/
-    void * buf;
-
-    uint32_t buf_stride;
+    /** Target draw buffer of the layer*/
+    lv_draw_buf_t * draw_buf;
 
     /** The absolute coordinates of the buffer */
     lv_area_t buf_area;
@@ -176,7 +176,7 @@ struct _lv_layer_t  {
 
 typedef struct {
     lv_obj_t * obj;
-    uint32_t part;
+    lv_part_t part;
     uint32_t id1;
     uint32_t id2;
     lv_layer_t * layer;

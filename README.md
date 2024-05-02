@@ -1,12 +1,8 @@
-**IMPORTANT NOTE** The next major version (v9.0.0) is developed in the master branch.
-The last stable version is available in the [release/v8.3](https://github.com/lvgl/lvgl/tree/release/v8.3) branch.
-
----
 
 <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
 
 <p align="right">
-  <b>English</b> | <a href="./docs/README_zh.md">中文</a> | <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a>
+  <b>English</b> | <a href="./docs/README_zh.rst">中文</a> | <a href="./docs/README_pt_BR.rst">Português do Brasil</a> | <a href="./docs/README_jp.rst">日本語</a>
 </p>
 
 <br>
@@ -28,8 +24,7 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
 <a href="https://forum.lvgl.io" title="Get help and help others">Forum</a> |
 <a href="https://lvgl.io/demos" title="Demos running in your browser">Demos</a> |
-<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> |
-<a href="https://squareline.io/" title="UI Editor for LVGL">SquareLine Studio</a>
+<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> 
 </p>
 <br>
 
@@ -40,9 +35,6 @@ LVGL is the most popular free and open source embedded graphics library to creat
 
 **Feature Rich**<br>
 It has all the features to create modern and beautiful GUIs: 30+ built-in widgets, a powerful style system, web inspired layout managers, and a typography system supporting many languages. To integrate LVGL into your platform, all you need is at least 32kB RAM and 128 kB Flash, a C compiler, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
-
-**UI Editor**<br>
-SquareLine Studio is a professional yet affordable drag and drop UI editor for LVGL. It runs on Windows, Linux and MacOS too and you can try it out even without registering to the website.
 
 **Services**<br>
 Our team is ready to help you with graphics design, UI implementation and consulting services. Contact us if you need some support during the development of your next GUI project.
@@ -77,7 +69,6 @@ Our team is ready to help you with graphics design, UI implementation and consul
 
 **Docs, Tools, and Services**
   - Detailed [Documentation](https://docs.lvgl.io/) with [100+ simple examples](https://docs.lvgl.io/master/index.html)
-  - [SquareLine Studio](https://squareline.io/) - A professional and easy-to-use UI editor software to speed up and simplify the UI development.
   - [Services](https://lvgl.io/services) such as User interface design, Implementation and Consulting to make UI development simpler and faster.
 
 ## :heart: Sponsor
@@ -448,11 +439,6 @@ This list will guide you to get started with LVGL step-by-step.
   9. If you have questions go to the [Forum](http://forum.lvgl.io/)
   10. Read the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) guide to see how you can help to improve LVGL (15 minutes)
 
-**Go for More**
-
-  11. Download and try out [SquareLine Studio](https://squareline.io/).
-  12. Contact us for [Services](https://lvgl.io/services).
-
 
 ## :handshake: Services
 LVGL LLC was established to provide a solid background for LVGL library and to offer several type of services to help you in UI development. With 15+ years of experience in the user interface and graphics industry we can help you the bring your UI to the next level.
@@ -473,7 +459,7 @@ LVGL is an open project and contribution is very welcome. There are many ways to
 
 For a detailed description of contribution opportunities visit the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) section of the documentation.
 
-More than 300 people already left their fingerprint in LVGL. Be one them! See your here! :slightly_smiling_face:
+More than 300 people already left their fingerprint in LVGL. Be one them! See you here! :slightly_smiling_face:
 
 <a href="https://github.com/lvgl/lvgl/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=lvgl/lvgl&max=48" />

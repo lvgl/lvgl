@@ -80,15 +80,12 @@ void lv_gridnav_remove(lv_obj_t * obj)
     for(i = 0; i < event_cnt; i++) {
         event_dsc = lv_obj_get_event_dsc(obj, i);
         if(lv_event_dsc_get_cb(event_dsc) == gridnav_event_cb) {
+            lv_free(lv_event_dsc_get_user_data(event_dsc));
+            lv_obj_remove_event(obj, i);
             break;
         }
     }
 
-    if(event_dsc) {
-        lv_free(lv_event_dsc_get_user_data(event_dsc));
-        lv_obj_remove_event(obj, i);
-
-    }
 }
 
 void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable_t anim_en)
@@ -132,7 +129,7 @@ void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable
 
 static void gridnav_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_gridnav_dsc_t * dsc = lv_event_get_user_data(e);
     lv_event_code_t code = lv_event_get_code(e);
 
@@ -146,7 +143,7 @@ static void gridnav_event_cb(lv_event_t * e)
         uint32_t key = lv_event_get_key(e);
         lv_obj_t * guess = NULL;
 
-        if(key == LV_KEY_RIGHT) {
+        if(key == LV_KEY_RIGHT && !(dsc->ctrl & LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY)) {
             if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_right(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_width(dsc->focused_obj) / 4;
@@ -166,7 +163,7 @@ static void gridnav_event_cb(lv_event_t * e)
                 }
             }
         }
-        else if(key == LV_KEY_LEFT) {
+        else if(key == LV_KEY_LEFT && !(dsc->ctrl & LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY)) {
             if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_left(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_width(dsc->focused_obj) / 4;
@@ -186,7 +183,7 @@ static void gridnav_event_cb(lv_event_t * e)
                 }
             }
         }
-        else if(key == LV_KEY_DOWN) {
+        else if(key == LV_KEY_DOWN && !(dsc->ctrl & LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY)) {
             if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_bottom(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_height(dsc->focused_obj) / 4;
@@ -205,7 +202,7 @@ static void gridnav_event_cb(lv_event_t * e)
                 }
             }
         }
-        else if(key == LV_KEY_UP) {
+        else if(key == LV_KEY_UP && !(dsc->ctrl & LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY)) {
             if((dsc->ctrl & LV_GRIDNAV_CTRL_SCROLL_FIRST) && lv_obj_has_flag(dsc->focused_obj, LV_OBJ_FLAG_SCROLLABLE) &&
                lv_obj_get_scroll_top(dsc->focused_obj) > 0) {
                 int32_t d = lv_obj_get_height(dsc->focused_obj) / 4;

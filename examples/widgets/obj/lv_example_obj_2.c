@@ -11,8 +11,8 @@ static void drag_event_handler(lv_event_t * e)
     lv_point_t vect;
     lv_indev_get_vect(indev, &vect);
 
-    int32_t x = lv_obj_get_x(obj) + vect.x;
-    int32_t y = lv_obj_get_y(obj) + vect.y;
+    int32_t x = lv_obj_get_x_aligned(obj) + vect.x;
+    int32_t y = lv_obj_get_y_aligned(obj) + vect.y;
     lv_obj_set_pos(obj, x, y);
 }
 

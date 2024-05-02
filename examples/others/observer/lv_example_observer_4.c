@@ -87,7 +87,7 @@ static void cont_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
     lv_anim_set_exec_cb(&a, anim_set_x_cb);
     lv_anim_set_get_value_cb(&a, anim_get_x_cb);
-    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
+    lv_anim_set_completed_cb(&a, lv_obj_delete_anim_completed_cb);
 
     uint32_t i;
     uint32_t delay = 0;
@@ -131,7 +131,7 @@ static void cont_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     }
 
     /*Animate in the new widgets*/
-    lv_anim_set_ready_cb(&a, NULL);
+    lv_anim_set_completed_cb(&a, NULL);
     for(i = child_cnt_prev; i < lv_obj_get_child_count(cont); i++) {
         lv_obj_t * child = lv_obj_get_child(cont, i);
         lv_anim_set_var(&a, child);

@@ -14,6 +14,7 @@
 #include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_path.h"
+#include "lv_vg_lite_pending.h"
 #include "lv_vg_lite_utils.h"
 
 /*********************
@@ -41,12 +42,8 @@
  **********************/
 
 void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
-                         const lv_area_t * coords)
+                         const lv_area_t * coords, bool no_cache)
 {
-    if(dsc->opa <= LV_OPA_MIN) {
-        return;
-    }
-
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     /* The coordinates passed in by coords are not transformed,
@@ -69,14 +66,17 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         return;
     }
 
+    LV_PROFILER_BEGIN;
+
     vg_lite_buffer_t src_buf;
     lv_image_decoder_dsc_t decoder_dsc;
-    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src)) {
+    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache)) {
+        LV_PROFILER_END;
         return;
     }
 
     vg_lite_color_t color = 0;
-    if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(decoder_dsc.header.cf) || dsc->recolor_opa > LV_OPA_MIN) {
+    if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(decoder_dsc.decoded->header.cf) || dsc->recolor_opa > LV_OPA_MIN) {
         /* alpha image and image recolor */
         src_buf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
         color = lv_vg_lite_color(dsc->recolor, LV_OPA_MIX2(dsc->opa, dsc->recolor_opa), true);
@@ -107,6 +107,8 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         /* rect is used to crop the pixel-aligned padding area */
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, &src_area);
+
+        LV_PROFILER_BEGIN_TAG("vg_lite_blit_rect");
         LV_VG_LITE_CHECK_ERROR(vg_lite_blit_rect(
                                    &u->target_buffer,
                                    &src_buf,
@@ -115,9 +117,10 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    lv_vg_lite_blend_mode(dsc->blend_mode),
                                    color,
                                    filter));
+        LV_PROFILER_END_TAG("vg_lite_blit_rect");
     }
     else {
-        lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_S16);
+        lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
         lv_vg_lite_path_append_rect(
             path,
             clip_area.x1, clip_area.y1,
@@ -131,7 +134,9 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
 
         vg_lite_matrix_t path_matrix;
         vg_lite_identity(&path_matrix);
+        lv_vg_lite_matrix_multiply(&path_matrix, &u->global_matrix);
 
+        LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
         LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
                                    &u->target_buffer,
                                    vg_lite_path,
@@ -144,11 +149,13 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    0,
                                    color,
                                    filter));
+        LV_PROFILER_END_TAG("vg_lite_draw_pattern");
 
         lv_vg_lite_path_drop(u, path);
     }
 
-    lv_image_decoder_close(&decoder_dsc);
+    lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
+    LV_PROFILER_END;
 }
 
 /**********************

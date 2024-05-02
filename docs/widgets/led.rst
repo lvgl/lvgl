@@ -1,3 +1,6 @@
+.. _lv_led:
+
+============
 LED (lv_led)
 ============
 
@@ -7,11 +10,14 @@ Overview
 The LEDs are rectangle-like (or circle) object whose brightness can be
 adjusted. With lower brightness the colors of the LED become darker.
 
+.. _lv_led_parts_and_styles:
+
 Parts and Styles
 ****************
 
-The LEDs have only one main part, called :cpp:enumerator:`LV_LED_PART_MAIN` and it
-uses all the typical background style properties.
+-  :cpp:enumerator:`LV_LED_PART_MAIN` uses all the typical background style properties.
+
+.. _lv_led_usage:
 
 Usage
 *****
@@ -36,12 +42,16 @@ Use :cpp:expr:`lv_led_on(led)` and :cpp:expr:`lv_led_off(led)` to set the bright
 a predefined ON or OFF value. The :cpp:expr:`lv_led_toggle(led)` toggles between
 the ON and OFF state.
 
+.. _lv_led_events:
+
 Events
 ******
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_led_keys:
 
 Keys
 ****
@@ -50,10 +60,14 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_led_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/led/index.rst
+
+.. _lv_led_api:
 
 API
 ***

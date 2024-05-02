@@ -11,6 +11,7 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
+    lv_obj_clean(lv_screen_active());
 }
 
 void test_func_1(void)

@@ -15,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj_class
+#define MY_CLASS (&lv_obj_class)
 
 /**********************
  *      TYPEDEFS
@@ -37,7 +37,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t * draw_dsc)
+void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -142,7 +142,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
     }
 }
 
-void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc_t * draw_dsc)
+void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_dsc_t * draw_dsc)
 {
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -171,7 +171,7 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc
     draw_dsc->align = lv_obj_get_style_text_align(obj, part);
 }
 
-void lv_obj_init_draw_image_dsc(lv_obj_t * obj, uint32_t part, lv_draw_image_dsc_t * draw_dsc)
+void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_dsc_t * draw_dsc)
 {
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -197,7 +197,7 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, uint32_t part, lv_draw_image_dsc
     if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 }
 
-void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t * draw_dsc)
+void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_t * draw_dsc)
 {
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -227,7 +227,7 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t
     if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 }
 
-void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t * draw_dsc)
+void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t * draw_dsc)
 {
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
@@ -250,7 +250,7 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t *
     draw_dsc->rounded = lv_obj_get_style_arc_rounded(obj, part);
 }
 
-int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
+int32_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, lv_part_t part)
 {
     int32_t s = 0;
 
@@ -291,8 +291,6 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
     int32_t s_old = _lv_obj_get_ext_draw_size(obj);
     int32_t s_new = 0;
     lv_obj_send_event(obj, LV_EVENT_REFR_EXT_DRAW_SIZE, &s_new);
-
-    if(s_new != s_old) lv_obj_invalidate(obj);
 
     /*Store the result if the special attrs already allocated*/
     if(obj->spec_attr) {

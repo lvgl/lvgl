@@ -23,4 +23,23 @@ void test_event_object_deletion(void)
     lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
+/* Add and then remove event should not memory leak */
+void test_event_should_not_memory_lean(void)
+{
+    lv_mem_monitor_t monitor;
+    lv_mem_monitor(&monitor);
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    size_t initial_free_size = monitor.free_size;
+
+    for(int i = 0; i < 10; i++) {
+        lv_obj_add_event_cb(obj, NULL, LV_EVENT_ALL, NULL);
+    }
+
+    lv_obj_delete(obj);
+
+    lv_mem_monitor_t m2;
+    lv_mem_monitor(&m2);
+    TEST_ASSERT_LESS_OR_EQUAL_CHAR(initial_free_size, m2.free_size);
+}
+
 #endif

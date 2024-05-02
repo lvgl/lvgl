@@ -32,6 +32,8 @@ d2_s32 lv_draw_dave2d_cf_fb_get(void);
 
 d2_u32 lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(lv_color_format_t colour_format);
 
+void d2_framebuffer_from_layer(d2_device * handle, lv_layer_t * layer);
+
 /**********************
  *      MACROS
  **********************/

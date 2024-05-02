@@ -41,7 +41,8 @@ extensions = [
     'breathe',
     'sphinx_sitemap',
     'lv_example',
-    'sphinx_rtd_dark_mode'
+    'sphinx_rtd_dark_mode',
+    'link_roles'
 ]
 
 default_dark_mode = False
@@ -66,7 +67,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'LVGL'
-copyright = '2023, LVGL Kft'
+copyright = '2024, LVGL Kft'
 author = 'LVGL community'
 
 
@@ -90,7 +91,7 @@ language = 'en'
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['_build', 'doxygen_html', 'Thumbs.db', '.DS_Store',
-                    'README.md', 'lv_examples', 'out_html', 'env', '_ext', 'examples']
+                    'README.md', 'README_*', 'lv_examples', 'out_html', 'env', '_ext', 'examples']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -130,7 +131,7 @@ html_theme_options = {
 
 
 # For site map generation
-html_baseurl = f"https://docs.lvgl.io/{os.environ['LVGL_URLPATH']}/en/html/"
+html_baseurl = f"https://docs.lvgl.io/{os.environ['LVGL_URLPATH']}/"
 
 sitemap_url_scheme = "{link}"
 

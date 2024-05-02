@@ -13,10 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
-#include <stdint.h>
 #include "lv_types.h"
 #include "../lv_conf_internal.h"
+
+#include "lv_array.h"
 
 /*********************
  *      DEFINES
@@ -55,11 +55,14 @@ typedef enum {
     LV_EVENT_SCROLL,              /**< Scrolling*/
     LV_EVENT_GESTURE,             /**< A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_active());` */
     LV_EVENT_KEY,                 /**< A key is sent to the object. Get the key with `lv_indev_get_key(lv_indev_active());`*/
+    LV_EVENT_ROTARY,              /**< An encoder or wheel was rotated. Get the rotation count with `lv_event_get_rotary_diff(e);`*/
     LV_EVENT_FOCUSED,             /**< The object is focused*/
     LV_EVENT_DEFOCUSED,           /**< The object is defocused*/
     LV_EVENT_LEAVE,               /**< The object is defocused but still selected*/
     LV_EVENT_HIT_TEST,            /**< Perform advanced hit-testing*/
     LV_EVENT_INDEV_RESET,         /**< Indev has been reset*/
+    LV_EVENT_HOVER_OVER,          /**< Indev hover over object*/
+    LV_EVENT_HOVER_LEAVE,         /**< Indev hover leave object*/
 
     /** Drawing events*/
     LV_EVENT_COVER_CHECK,        /**< Check if the object fully covers an area. The event parameter is `lv_cover_check_info_t *`.*/
@@ -105,6 +108,8 @@ typedef enum {
     LV_EVENT_RENDER_READY,
     LV_EVENT_FLUSH_START,
     LV_EVENT_FLUSH_FINISH,
+    LV_EVENT_FLUSH_WAIT_START,
+    LV_EVENT_FLUSH_WAIT_FINISH,
 
     LV_EVENT_VSYNC,
 
@@ -114,12 +119,9 @@ typedef enum {
                                       before the class default event processing */
 } lv_event_code_t;
 
-typedef struct {
-    lv_event_dsc_t * dsc;
-    uint32_t cnt;
-} lv_event_list_t;
+typedef lv_array_t lv_event_list_t;
 
-typedef struct _lv_event_t {
+struct _lv_event_t {
     void * current_target;
     void * original_target;
     lv_event_code_t code;
@@ -129,7 +131,7 @@ typedef struct _lv_event_t {
     uint8_t deleted : 1;
     uint8_t stop_processing : 1;
     uint8_t stop_bubbling : 1;
-} lv_event_t;
+};
 
 /**
  * @brief Event callback.
@@ -147,7 +149,8 @@ void _lv_event_pop(lv_event_t * e);
 
 lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
 
-void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
+lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
+bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc);
 
 uint32_t lv_event_get_count(lv_event_list_t * list);
 

@@ -13,10 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
-#include <stdbool.h>
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_style.h"
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -188,7 +187,7 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_sty
 /**
  * Used internally for color filtering
  */
-lv_style_value_t _lv_obj_style_apply_color_filter(const lv_obj_t * obj, uint32_t part, lv_style_value_t v);
+lv_style_value_t _lv_obj_style_apply_color_filter(const lv_obj_t * obj, lv_part_t part, lv_style_value_t v);
 
 /**
  * Used internally to create a style transition
@@ -298,7 +297,7 @@ static inline void lv_obj_set_style_transform_scale(lv_obj_t * obj, int32_t valu
     lv_obj_set_style_transform_scale_y(obj, value, selector);
 }
 
-static inline int32_t lv_obj_get_style_space_left(const lv_obj_t * obj, uint32_t part)
+static inline int32_t lv_obj_get_style_space_left(const lv_obj_t * obj, lv_part_t part)
 {
     int32_t padding = lv_obj_get_style_pad_left(obj, part);
     int32_t border_width = lv_obj_get_style_border_width(obj, part);
@@ -306,7 +305,7 @@ static inline int32_t lv_obj_get_style_space_left(const lv_obj_t * obj, uint32_t
     return (border_side & LV_BORDER_SIDE_LEFT) ? padding + border_width : padding;
 }
 
-static inline int32_t lv_obj_get_style_space_right(const lv_obj_t * obj, uint32_t part)
+static inline int32_t lv_obj_get_style_space_right(const lv_obj_t * obj, lv_part_t part)
 {
     int32_t padding = lv_obj_get_style_pad_right(obj, part);
     int32_t border_width = lv_obj_get_style_border_width(obj, part);
@@ -314,7 +313,7 @@ static inline int32_t lv_obj_get_style_space_right(const lv_obj_t * obj, uint32_
     return (border_side & LV_BORDER_SIDE_RIGHT) ? padding + border_width : padding;
 }
 
-static inline int32_t lv_obj_get_style_space_top(const lv_obj_t * obj, uint32_t part)
+static inline int32_t lv_obj_get_style_space_top(const lv_obj_t * obj, lv_part_t part)
 {
     int32_t padding = lv_obj_get_style_pad_top(obj, part);
     int32_t border_width = lv_obj_get_style_border_width(obj, part);
@@ -322,7 +321,7 @@ static inline int32_t lv_obj_get_style_space_top(const lv_obj_t * obj, uint32_t 
     return (border_side & LV_BORDER_SIDE_TOP) ? padding + border_width : padding;
 }
 
-static inline int32_t lv_obj_get_style_space_bottom(const lv_obj_t * obj, uint32_t part)
+static inline int32_t lv_obj_get_style_space_bottom(const lv_obj_t * obj, lv_part_t part)
 {
     int32_t padding = lv_obj_get_style_pad_bottom(obj, part);
     int32_t border_width = lv_obj_get_style_border_width(obj, part);
@@ -332,13 +331,13 @@ static inline int32_t lv_obj_get_style_space_bottom(const lv_obj_t * obj, uint32
 
 lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_t part, const char * txt);
 
-static inline int32_t lv_obj_get_style_transform_scale_x_safe(const lv_obj_t * obj, uint32_t part)
+static inline int32_t lv_obj_get_style_transform_scale_x_safe(const lv_obj_t * obj, lv_part_t part)
 {
     int16_t zoom = lv_obj_get_style_transform_scale_x(obj, part);
     return zoom != 0 ? zoom : 1;
 }
 
-static inline int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * obj, uint32_t part)
+static inline int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * obj, lv_part_t part)
 {
     int16_t zoom = lv_obj_get_style_transform_scale_y(obj, part);
     return zoom != 0 ? zoom : 1;
@@ -351,6 +350,13 @@ static inline int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * o
  * @return          the final opacity considering the parents' opacity too
  */
 lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part);
+
+/**
+ * Update the layer type of a widget bayed on its current styles.
+ * The result will be stored in `obj->spec_attr->layer_type`
+ * @param obj       the object whose layer should be updated
+ */
+void _lv_obj_update_layer_type(lv_obj_t * obj);
 
 /**********************
  *      MACROS

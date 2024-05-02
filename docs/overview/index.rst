@@ -16,14 +16,13 @@ Overview
     layer
     event
     indev
-    disp
+    display
     color
     font
-    img
+    image
     fs
-    anim
+    animations
     timer
-    draw
     profiler
     renderers/index
     new_widget

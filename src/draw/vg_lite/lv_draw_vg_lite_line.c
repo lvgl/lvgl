@@ -44,11 +44,6 @@
 
 void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
 {
-    if(dsc->opa <= LV_OPA_MIN)
-        return;
-    if(dsc->width == 0)
-        return;
-
     float p1_x = dsc->p1.x;
     float p1_y = dsc->p1.y;
     float p2_x = dsc->p2.x;
@@ -60,14 +55,16 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     float half_w = dsc->width * 0.5f;
 
     lv_area_t rel_clip_area;
-    rel_clip_area.x1 = LV_MIN(p1_x, p2_x) - half_w;
-    rel_clip_area.x2 = LV_MAX(p1_x, p2_x) + half_w;
-    rel_clip_area.y1 = LV_MIN(p1_y, p2_y) - half_w;
-    rel_clip_area.y2 = LV_MAX(p1_y, p2_y) + half_w;
+    rel_clip_area.x1 = (int32_t)(LV_MIN(p1_x, p2_x) - half_w);
+    rel_clip_area.x2 = (int32_t)(LV_MAX(p1_x, p2_x) + half_w);
+    rel_clip_area.y1 = (int32_t)(LV_MIN(p1_y, p2_y) - half_w);
+    rel_clip_area.y2 = (int32_t)(LV_MAX(p1_y, p2_y) + half_w);
 
     if(!_lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_unit->clip_area)) {
         return; /*Fully clipped, nothing to do*/
     }
+
+    LV_PROFILER_BEGIN;
 
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
@@ -85,7 +82,7 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
 
     int32_t ndash = 0;
     if(dash_width && dash_l * inv_dl < 1.0f) {
-        ndash = (1.0f / inv_dl + dash_l - 1) / dash_l;
+        ndash = (int32_t)((1.0f / inv_dl + dash_l - 1) / dash_l);
     }
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
@@ -98,14 +95,14 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     float head_end_x = p1_x - w2_dx;
     float head_end_y = p1_y + w2_dy;
 
-    /* tali point */
-    float tali_start_x = p2_x - w2_dx;
-    float tali_start_y = p2_y + w2_dy;
-    float tali_end_x = p2_x + w2_dx;
-    float tali_end_y = p2_y - w2_dy;
+    /* tail point */
+    float tail_start_x = p2_x - w2_dx;
+    float tail_start_y = p2_y + w2_dy;
+    float tail_end_x = p2_x + w2_dx;
+    float tail_end_y = p2_y - w2_dy;
 
     /*
-          head_start        tali_end
+          head_start        tail_end
               *-----------------*
              /|                 |\
             / |                 | \
@@ -113,7 +110,7 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
             \ |                 | /
              \|                 |/
               *-----------------*
-          head_end          tali_start
+          head_end          tail_start
     */
 
     /* move to start point */
@@ -141,23 +138,23 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     }
 
     /* draw line body */
-    lv_vg_lite_path_line_to(path, tali_start_x, tali_start_y);
+    lv_vg_lite_path_line_to(path, tail_start_x, tail_start_y);
 
     /* draw line tail */
     if(dsc->round_end) {
         float arc_cx = p2_x + w2_dy;
         float arc_cy = p2_y + w2_dx;
         lv_vg_lite_path_append_arc_right_angle(path,
-                                               tali_start_x, tali_start_y,
+                                               tail_start_x, tail_start_y,
                                                p2_x, p2_y,
                                                arc_cx, arc_cy);
         lv_vg_lite_path_append_arc_right_angle(path,
                                                arc_cx, arc_cy,
                                                p2_x, p2_y,
-                                               tali_end_x, tali_end_y);
+                                               tail_end_x, tail_end_y);
     }
     else {
-        lv_vg_lite_path_line_to(path, tali_end_x, tali_end_y);
+        lv_vg_lite_path_line_to(path, tail_end_x, tail_end_y);
     }
 
     /* close draw line body */
@@ -192,7 +189,9 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
+    LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
+    LV_PROFILER_BEGIN_TAG("vg_lite_draw");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                &u->target_buffer,
                                vg_lite_path,
@@ -200,8 +199,11 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
                                &matrix,
                                VG_LITE_BLEND_SRC_OVER,
                                color));
+    LV_PROFILER_END_TAG("vg_lite_draw");
 
     lv_vg_lite_path_drop(u, path);
+
+    LV_PROFILER_END;
 }
 
 /**********************

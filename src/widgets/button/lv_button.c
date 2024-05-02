@@ -13,7 +13,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_button_class
+#define MY_CLASS (&lv_button_class)
 
 /**********************
  *      TYPEDEFS

@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_qrcode.h"
+#include "../../lvgl.h"
+
 #if LV_USE_QRCODE
 
 #include "qrcodegen.h"
@@ -14,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_qrcode_class
+#define MY_CLASS (&lv_qrcode_class)
 
 /**********************
  *      TYPEDEFS
@@ -59,14 +60,14 @@ void lv_qrcode_set_size(lv_obj_t * obj, int32_t size)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_draw_buf_t * old_buf = lv_canvas_get_draw_buf(obj);
-    lv_draw_buf_t * new_buf = lv_draw_buf_create(size, size, LV_COLOR_FORMAT_I1, 0);
+    lv_draw_buf_t * new_buf = lv_draw_buf_create(size, size, LV_COLOR_FORMAT_I1, LV_STRIDE_AUTO);
     if(new_buf == NULL) {
         LV_LOG_ERROR("malloc failed for canvas buffer");
         return;
     }
 
     lv_canvas_set_draw_buf(obj, new_buf);
-    LV_LOG_INFO("set canvas buffer: %p, size = %d", new_buf, (int)size);
+    LV_LOG_INFO("set canvas buffer: %p, size = %d", (void *)new_buf, (int)size);
 
     /*Clear canvas buffer*/
     lv_canvas_fill_bg(obj, lv_color_white(), LV_OPA_COVER);

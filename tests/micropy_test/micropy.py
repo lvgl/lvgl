@@ -83,15 +83,10 @@ disp_drv = lv.display_create(WIDTH, HEIGHT)
 disp_drv.set_flush_cb(flush)
 disp_drv.set_color_format(lv.COLOR_FORMAT.RGB888)
 
+buf = lv.draw_buf_create(WIDTH, HEIGHT, lv.COLOR_FORMAT.RGB888, 0)
 color_size = lv.color_format_get_size(disp_drv.get_color_format())
-
-buf = bytearray(WIDTH * HEIGHT * color_size)
-disp_drv.set_draw_buffers(
-    buf,
-    None,
-    WIDTH * HEIGHT * color_size,
-    lv.DISPLAY_RENDER_MODE.FULL
-    )
+disp_drv.set_draw_buffers(buf, None)
+disp_drv.set_render_mode(lv.DISPLAY_RENDER_MODE.FULL)
 
 
 @test_func_wrapper
@@ -103,6 +98,27 @@ def GRID_FR(x):
 def CANVAS_BUF_SIZE(w, h, bpp, stride):
     return ((((w * bpp + 7) >> 3) + stride - 1) & ~(
             stride - 1)) * h + lv.DRAW_BUF_ALIGN
+
+
+event_flag = False
+
+
+@test_func_wrapper
+def event_callback(e):
+    global event_flag
+    event_flag = True
+
+
+@test_func_wrapper
+def test_event():
+    scr = lv.screen_active()
+
+    scr.add_event_cb(event_callback, lv.EVENT.CLICKED, None)
+
+    scr.send_event(lv.EVENT.CLICKED, None)
+
+    if not event_flag:
+        raise RuntimeError('Event failure')
 
 
 @test_func_wrapper
@@ -120,8 +136,7 @@ def create_ui():
     try:
         font_montserrat_24 = lv.font_montserrat_24
     except AttributeError:
-        font_montserrat_24 = lv.font_t()
-        lv.tiny_ttf_create_file(font_montserrat_24, 'A:font_montserrat_24.ttf', 32)
+        font_montserrat_24 = lv.tiny_ttf_create_file('A:font_montserrat_24.ttf', 32)
 
     style_big_font.set_text_font(font_montserrat_24)
 
@@ -427,6 +442,7 @@ def main():
     lv.refr_now(None)
 
 
+test_event()
 create_ui()
 main()
 # end

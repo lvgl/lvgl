@@ -18,6 +18,14 @@
     #error "LV_FONT_MONTSERRAT_24 is required for lv_demo_benchmark. Enable it in lv_conf.h."
 #endif
 
+#if LV_USE_DEMO_WIDGETS == 0
+    #error "LV_USE_DEMO_WIDGETS needs to be enabled"
+#endif
+
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < 128 * 1024
+    #warning "It's recommended to have at least 128kB RAM for the benchmark"
+#endif
+
 #include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 
@@ -69,12 +77,12 @@ static void empty_screen_cb(void)
 static void moving_wallpaper_cb(void)
 {
     lv_obj_set_style_pad_all(lv_screen_active(), 0, 0);
-    LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
 
-    lv_obj_t * img = lv_img_create(lv_screen_active());
+    lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_obj_set_size(img, lv_pct(150), lv_pct(150));
     lv_image_set_src(img, &img_benchmark_cogwheel_rgb);
-    lv_image_set_align(img, LV_IMAGE_ALIGN_TILE);
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TILE);
     shake_anim(img, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
@@ -112,15 +120,18 @@ static void multiple_rgb_images_cb(void)
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
 
-    LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
-    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 116;
-    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 116) / 116;
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
+    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 116;
+    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 116) / 116;
 
-    uint32_t y;
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
+    int32_t y;
     for(y = 0; y < ver_cnt; y++) {
-        uint32_t x;
+        int32_t x;
         for(x = 0; x < hor_cnt; x++) {
-            lv_obj_t * obj = lv_img_create(lv_screen_active());
+            lv_obj_t * obj = lv_image_create(lv_screen_active());
             lv_image_set_src(obj, &img_benchmark_cogwheel_rgb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
@@ -135,15 +146,18 @@ static void multiple_argb_images_cb(void)
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
 
-    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
-    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 116;
-    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 116) / 116;
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
+    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 116;
+    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 116) / 116;
 
-    uint32_t y;
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
+    int32_t y;
     for(y = 0; y < ver_cnt; y++) {
-        uint32_t x;
+        int32_t x;
         for(x = 0; x < hor_cnt; x++) {
-            lv_obj_t * obj = lv_img_create(lv_screen_active());
+            lv_obj_t * obj = lv_image_create(lv_screen_active());
             lv_image_set_src(obj, &img_benchmark_cogwheel_argb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
@@ -158,15 +172,18 @@ static void rotated_argb_image_cb(void)
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
 
-    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
-    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 116;
-    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 116) / 116;
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
+    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 116;
+    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 116) / 116;
 
-    uint32_t y;
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
+    int32_t y;
     for(y = 0; y < ver_cnt; y++) {
-        uint32_t x;
+        int32_t x;
         for(x = 0; x < hor_cnt; x++) {
-            lv_obj_t * obj = lv_img_create(lv_screen_active());
+            lv_obj_t * obj = lv_image_create(lv_screen_active());
             lv_image_set_src(obj, &img_benchmark_cogwheel_argb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
@@ -186,10 +203,12 @@ static void multiple_labels_cb(void)
     lv_text_get_size(&s, "Hello LVGL!", lv_obj_get_style_text_font(lv_screen_active(), 0), 0, 0, LV_COORD_MAX,
                      LV_TEXT_FLAG_NONE);
 
-    uint32_t cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / (s.x + 30);
+    int32_t cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / (s.x + 30);
     cnt = cnt * ((lv_display_get_vertical_resolution(NULL) - 200) / (s.y + 50));
 
-    uint32_t i;
+    if(cnt < 1) cnt = 1;
+
+    int32_t i;
     for(i = 0; i < cnt; i++) {
         lv_obj_t * obj = lv_label_create(lv_screen_active());
         lv_label_set_text(obj, "Hello LVGL!");
@@ -222,13 +241,16 @@ static void multiple_arcs_cb(void)
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
-    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
-    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / lv_dpx(160);
-    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / lv_dpx(160);
+    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
+    int32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / lv_dpx(160);
+    int32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / lv_dpx(160);
 
-    uint32_t y;
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
+    int32_t y;
     for(y = 0; y < ver_cnt; y++) {
-        uint32_t x;
+        int32_t x;
         for(x = 0; x < hor_cnt; x++) {
 
             lv_obj_t * obj = lv_arc_create(lv_screen_active());
@@ -255,12 +277,15 @@ static void containers_cb(void)
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
-    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 300;
-    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / 150;
+    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 300;
+    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 16) / 150;
 
-    uint32_t y;
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
+    int32_t y;
     for(y = 0; y < ver_cnt; y++) {
-        uint32_t x;
+        int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
@@ -274,12 +299,15 @@ static void containers_with_overlay_cb(void)
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
-    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 300;
-    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / 150;
+    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 300;
+    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 16) / 150;
 
-    uint32_t y;
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
+    int32_t y;
     for(y = 0; y < ver_cnt; y++) {
-        uint32_t x;
+        int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
@@ -296,12 +324,15 @@ static void containers_with_opa_cb(void)
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
-    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 300;
-    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / 150;
+    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 300;
+    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 16) / 150;
 
-    uint32_t y;
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
+    int32_t y;
     for(y = 0; y < ver_cnt; y++) {
-        uint32_t x;
+        int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
@@ -316,12 +347,15 @@ static void containers_with_opa_layer_cb(void)
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
-    uint32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / 300;
-    uint32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / 150;
+    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 300;
+    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 16) / 150;
 
-    uint32_t y;
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
+    int32_t y;
     for(y = 0; y < ver_cnt; y++) {
-        uint32_t x;
+        int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
             lv_obj_set_style_opa_layered(card, LV_OPA_50, 0);
@@ -476,11 +510,19 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
     const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(subject);
     lv_obj_t * label = lv_observer_get_target(observer);
 
+    char scene_name[64];
+    if(scenes[scene_act].name[0] != '\0') {
+        lv_snprintf(scene_name, sizeof(scene_name), "%s: ", scenes[scene_act].name);
+    }
+    else {
+        scene_name[0] = '\0';
+    }
+
     lv_label_set_text_fmt(label,
-                          "%s: "
+                          "%s"
                           "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
                           "refr. %" LV_PRIu32" ms = %" LV_PRIu32 "ms render + %" LV_PRIu32" ms flush",
-                          scenes[scene_act].name,
+                          scene_name,
                           info->calculated.fps, info->calculated.cpu,
                           info->calculated.render_avg_time + info->calculated.flush_avg_time,
                           info->calculated.render_avg_time, info->calculated.flush_avg_time);
@@ -505,24 +547,24 @@ static void table_draw_task_event_cb(lv_event_t * e)
 
     int32_t row = draw_dsc_base->id1;
     if(row == 0) {
-        if(t->type == LV_DRAW_TASK_TYPE_FILL) {
-            lv_draw_fill_dsc_t * draw_dsc_fill = t->draw_dsc;
+        lv_draw_fill_dsc_t * draw_dsc_fill = lv_draw_task_get_fill_dsc(t);
+        if(draw_dsc_fill) {
             draw_dsc_fill->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
         }
-        else if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
-            lv_draw_label_dsc_t * draw_dsc_label = t->draw_dsc;
+        lv_draw_label_dsc_t * draw_dsc_label = lv_draw_task_get_label_dsc(t);
+        if(draw_dsc_label) {
             draw_dsc_label->color = lv_color_white();
         }
     }
     else if(row == 1) {
-        if(t->type == LV_DRAW_TASK_TYPE_BORDER) {
-            lv_draw_border_dsc_t * draw_dsc_border = t->draw_dsc;
+        lv_draw_border_dsc_t * draw_dsc_border = lv_draw_task_get_border_dsc(t);
+        if(draw_dsc_border) {
             draw_dsc_border->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
             draw_dsc_border->width = 2;
             draw_dsc_border->side = LV_BORDER_SIDE_BOTTOM;
         }
-        else if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
-            lv_draw_label_dsc_t * draw_dsc_label = t->draw_dsc;
+        lv_draw_label_dsc_t * draw_dsc_label = lv_draw_task_get_label_dsc(t);
+        if(draw_dsc_label) {
             draw_dsc_label->color = lv_palette_darken(LV_PALETTE_BLUE_GREY, 4);
         }
     }
@@ -544,17 +586,23 @@ static void summary_create(void)
     lv_table_set_cell_value(table, 0, 0, "Name");
     lv_table_set_cell_value(table, 0, 1, "Avg. CPU");
     lv_table_set_cell_value(table, 0, 2, "Avg. FPS");
-    lv_table_set_cell_value(table, 0, 3, "Avg. render time");
-    lv_table_set_cell_value(table, 0, 4, "Avg. flush time");
+    lv_table_set_cell_value(table, 0, 3, "Avg. time (render + flush)");
+
+    /* csv log */
+    LV_LOG("Benchmark Summary (%"LV_PRIu32".%"LV_PRIu32".%"LV_PRIu32" %s)\r\n",
+           LVGL_VERSION_MAJOR,
+           LVGL_VERSION_MINOR,
+           LVGL_VERSION_PATCH,
+           LVGL_VERSION_INFO);
+    LV_LOG("Name, Avg. CPU, Avg. FPS, Avg. time, render time, flush time\r\n");
 
     lv_obj_update_layout(table);
-    int32_t col_w = lv_obj_get_content_width(table) / 5;
+    int32_t col_w = lv_obj_get_content_width(table) / 4;
 
     lv_table_set_column_width(table, 0, col_w);
     lv_table_set_column_width(table, 1, col_w);
     lv_table_set_column_width(table, 2, col_w);
     lv_table_set_column_width(table, 3, col_w);
-    lv_table_set_column_width(table, 4, col_w);
 
     uint32_t i;
     int32_t total_avg_fps = 0;
@@ -570,14 +618,25 @@ static void summary_create(void)
             lv_table_set_cell_value(table, i + 2, 1, "N/A");
             lv_table_set_cell_value(table, i + 2, 2, "N/A");
             lv_table_set_cell_value(table, i + 2, 3, "N/A");
-            lv_table_set_cell_value(table, i + 2, 4, "N/A");
         }
         else {
             int32_t cnt = scenes[i].measurement_cnt - 1;
             lv_table_set_cell_value_fmt(table, i + 2, 1, "%"LV_PRIu32" %%", scenes[i].cpu_avg_usage / cnt);
             lv_table_set_cell_value_fmt(table, i + 2, 2, "%"LV_PRIu32" FPS", scenes[i].fps_avg / cnt);
-            lv_table_set_cell_value_fmt(table, i + 2, 3, "%"LV_PRIu32" ms", scenes[i].render_avg_time / cnt);
-            lv_table_set_cell_value_fmt(table, i + 2, 4, "%"LV_PRIu32" ms", scenes[i].flush_avg_time / cnt);
+
+            uint32_t render_time = scenes[i].render_avg_time / cnt;
+            uint32_t flush_time = scenes[i].flush_avg_time / cnt;
+            lv_table_set_cell_value_fmt(table, i + 2, 3, "%"LV_PRIu32" ms (%"LV_PRIu32" + %"LV_PRIu32")",
+                                        render_time + flush_time, render_time, flush_time);
+
+            /* csv log */
+            LV_LOG("%s, %"LV_PRIu32"%%, %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32"\r\n",
+                   scenes[i].name,
+                   scenes[i].cpu_avg_usage / cnt,
+                   scenes[i].fps_avg / cnt,
+                   render_time + flush_time,
+                   render_time,
+                   flush_time);
 
             valid_scene_cnt++;
             total_avg_cpu += scenes[i].cpu_avg_usage / cnt;
@@ -593,13 +652,22 @@ static void summary_create(void)
         lv_table_set_cell_value(table, 1, 1, "N/A");
         lv_table_set_cell_value(table, 1, 2, "N/A");
         lv_table_set_cell_value(table, 1, 3, "N/A");
-        lv_table_set_cell_value(table, 1, 4, "N/A");
     }
     else {
         lv_table_set_cell_value_fmt(table, 1, 1, "%"LV_PRIu32" %%", total_avg_cpu / valid_scene_cnt);
         lv_table_set_cell_value_fmt(table, 1, 2, "%"LV_PRIu32" FPS", total_avg_fps / valid_scene_cnt);
-        lv_table_set_cell_value_fmt(table, 1, 3, "%"LV_PRIu32" ms", total_avg_render_time / valid_scene_cnt);
-        lv_table_set_cell_value_fmt(table, 1, 4, "%"LV_PRIu32" ms", total_avg_flush_time / valid_scene_cnt);
+
+        uint32_t render_time = total_avg_render_time / valid_scene_cnt;
+        uint32_t flush_time = total_avg_flush_time / valid_scene_cnt;
+        lv_table_set_cell_value_fmt(table, 1, 3, "%"LV_PRIu32" ms (%"LV_PRIu32" + %"LV_PRIu32")",
+                                    render_time + flush_time, render_time, flush_time);
+        /* csv log */
+        LV_LOG("All scenes avg.,%"LV_PRIu32"%%, %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32"\r\n",
+               total_avg_cpu / valid_scene_cnt,
+               total_avg_fps / valid_scene_cnt,
+               render_time + flush_time,
+               render_time,
+               flush_time);
     }
 }
 
@@ -693,7 +761,7 @@ static lv_obj_t * card_create(void)
     lv_obj_set_size(panel, 270, 120);
     lv_obj_set_style_pad_all(panel, 8, 0);
 
-    LV_IMG_DECLARE(img_transform_avatar_15);
+    LV_IMAGE_DECLARE(img_transform_avatar_15);
     lv_obj_t * child = lv_image_create(panel);
     lv_obj_align(child, LV_ALIGN_LEFT_MID, 0, 0);
     lv_image_set_src(child, &img_transform_avatar_15);

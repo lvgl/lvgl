@@ -8,8 +8,8 @@
  *********************/
 #include "lv_fs.h"
 
-#include <string.h>
 #include "../misc/lv_assert.h"
+#include "../misc/lv_profiler.h"
 #include "../stdlib/lv_string.h"
 #include "lv_ll.h"
 #include "../core/lv_global.h"
@@ -88,6 +88,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     file_p->drv = drv;
 
     /* For memory-mapped files we set the file handle to our file descriptor so that we can access the cache from the file operations */
@@ -98,6 +100,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         const char * real_path = lv_fs_get_real_path(path);
         void * file_d = drv->open_cb(drv, real_path, mode);
         if(file_d == NULL || file_d == (void *)(-1)) {
+            LV_PROFILER_END;
             return LV_FS_RES_UNKNOWN;
         }
         file_p->file_d = file_d;
@@ -122,6 +125,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         }
     }
 
+    LV_PROFILER_END;
+
     return LV_FS_RES_OK;
 }
 
@@ -144,6 +149,8 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_fs_res_t res = file_p->drv->close_cb(file_p->drv, file_p->file_d);
 
     if(file_p->drv->cache_size && file_p->cache) {
@@ -159,11 +166,15 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
     file_p->drv    = NULL;
     file_p->cache  = NULL;
 
+    LV_PROFILER_END;
+
     return res;
 }
 
 static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t btr, uint32_t * br)
 {
+    LV_PROFILER_BEGIN;
+
     lv_fs_res_t res = LV_FS_RES_OK;
     uint32_t file_position = file_p->cache->file_position;
     uint32_t start = file_p->cache->start;
@@ -244,6 +255,8 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
         file_p->cache->file_position += *br;
     }
 
+    LV_PROFILER_END;
+
     return res;
 }
 
@@ -252,6 +265,8 @@ lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t
     if(br != NULL) *br = 0;
     if(file_p->drv == NULL) return LV_FS_RES_INV_PARAM;
     if(file_p->drv->read_cb == NULL) return LV_FS_RES_NOT_IMP;
+
+    LV_PROFILER_BEGIN;
 
     uint32_t br_tmp = 0;
     lv_fs_res_t res;
@@ -264,6 +279,8 @@ lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t
     }
 
     if(br != NULL) *br = br_tmp;
+
+    LV_PROFILER_END;
 
     return res;
 }
@@ -280,12 +297,17 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_fs_res_t res = LV_FS_RES_OK;
 
     /*Need to do FS seek before writing data to FS*/
     if(file_p->drv->cache_size) {
         res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
-        if(res != LV_FS_RES_OK) return res;
+        if(res != LV_FS_RES_OK) {
+            LV_PROFILER_END;
+            return res;
+        }
     }
 
     uint32_t bw_tmp = 0;
@@ -323,6 +345,8 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
         file_p->cache->file_position += bw_tmp;
     }
 
+    LV_PROFILER_END;
+
     return res;
 }
 
@@ -335,6 +359,8 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
     if(file_p->drv->seek_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
+
+    LV_PROFILER_BEGIN;
 
     lv_fs_res_t res = LV_FS_RES_OK;
     if(file_p->drv->cache_size) {
@@ -378,6 +404,8 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
         res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos, whence);
     }
 
+    LV_PROFILER_END;
+
     return res;
 }
 
@@ -393,6 +421,8 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_fs_res_t res;
     if(file_p->drv->cache_size) {
         *pos = file_p->cache->file_position;
@@ -401,6 +431,8 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
     else {
         res = file_p->drv->tell_cb(file_p->drv, file_p->file_d, pos);
     }
+
+    LV_PROFILER_END;
 
     return res;
 }
@@ -426,21 +458,30 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     const char * real_path = lv_fs_get_real_path(path);
     void * dir_d = drv->dir_open_cb(drv, real_path);
 
     if(dir_d == NULL || dir_d == (void *)(-1)) {
+        LV_PROFILER_END;
         return LV_FS_RES_UNKNOWN;
     }
 
     rddir_p->drv = drv;
     rddir_p->dir_d = dir_d;
 
+    LV_PROFILER_END;
+
     return LV_FS_RES_OK;
 }
 
-lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn)
+lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn, uint32_t fn_len)
 {
+    if(fn_len == 0) {
+        return LV_FS_RES_INV_PARAM;
+    }
+
     if(rddir_p->drv == NULL || rddir_p->dir_d == NULL) {
         fn[0] = '\0';
         return LV_FS_RES_INV_PARAM;
@@ -451,7 +492,11 @@ lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn)
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = rddir_p->drv->dir_read_cb(rddir_p->drv, rddir_p->dir_d, fn);
+    LV_PROFILER_BEGIN;
+
+    lv_fs_res_t res = rddir_p->drv->dir_read_cb(rddir_p->drv, rddir_p->dir_d, fn, fn_len);
+
+    LV_PROFILER_END;
 
     return res;
 }
@@ -466,10 +511,14 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_fs_res_t res = rddir_p->drv->dir_close_cb(rddir_p->drv, rddir_p->dir_d);
 
     rddir_p->dir_d = NULL;
     rddir_p->drv   = NULL;
+
+    LV_PROFILER_END;
 
     return res;
 }

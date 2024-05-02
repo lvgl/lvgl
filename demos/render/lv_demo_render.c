@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_demo_render.c
  *
  */
@@ -9,6 +9,7 @@
 #include "lv_demo_render.h"
 
 #if LV_USE_DEMO_RENDER
+
 #include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 
@@ -213,6 +214,7 @@ static lv_obj_t * box_shadow_obj_create(lv_obj_t * parent, int32_t col, int32_t 
     lv_obj_t * obj = lv_obj_create(parent);
     lv_obj_remove_style_all(obj);
     lv_obj_set_style_bg_opa(obj, LV_OPA_20, 0);
+    lv_obj_set_style_bg_color(obj, lv_color_black(), 0);
     lv_obj_set_style_shadow_color(obj, lv_color_hex3(0xf00), 0);
     lv_obj_set_style_opa(obj, opa_saved, 0);
     lv_obj_set_size(obj, DEF_WIDTH - 20, DEF_HEIGHT - 5);
@@ -327,17 +329,20 @@ static lv_obj_t * image_obj_create(lv_obj_t * parent, int32_t col, int32_t row, 
 
 }
 
-static void image_core_cb(lv_obj_t * parent, bool recolor)
+static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
 {
-    LV_IMG_DECLARE(img_render_lvgl_logo_xrgb8888);
-    LV_IMG_DECLARE(img_render_lvgl_logo_rgb888);
-    LV_IMG_DECLARE(img_render_lvgl_logo_rgb565);
-    LV_IMG_DECLARE(img_render_lvgl_logo_argb8888);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_xrgb8888);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb888);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_l8);
+
     const void * srcs[] = {
         &img_render_lvgl_logo_argb8888,
         &img_render_lvgl_logo_xrgb8888,
         &img_render_lvgl_logo_rgb888,
         &img_render_lvgl_logo_rgb565,
+        &img_render_lvgl_logo_l8,
     };
 
     const void * names[] = {
@@ -345,46 +350,49 @@ static void image_core_cb(lv_obj_t * parent, bool recolor)
         "XRGB\n8888",
         "RGB\n888",
         "RGB\n565",
+        "L8",
     };
 
+    uint32_t stopAt = startAt + LV_MIN(sizeof(srcs) / sizeof(void *) - startAt, 4);
     uint32_t i;
-    for(i = 0; i < 4; i++) {
+    for(i = startAt; i < stopAt; i++) {
         lv_obj_t * obj;
+        uint32_t row = i - startAt;
 
         obj = lv_label_create(parent);
         lv_label_set_text(obj, names[i]);
-        add_to_cell(obj, 0, i * 2);
+        add_to_cell(obj, 0, row * 2);
 
-        obj = image_obj_create(parent, 1, i * 2, recolor);
+        obj = image_obj_create(parent, 1, row * 2, recolor);
         lv_image_set_src(obj, srcs[i]);
 
-        obj = image_obj_create(parent, 2, i * 2, recolor);
+        obj = image_obj_create(parent, 2, row * 2, recolor);
         lv_image_set_src(obj, srcs[i]);
         lv_image_set_rotation(obj, 300);
         lv_image_set_pivot(obj, 0, 0);
 
-        obj = image_obj_create(parent, 3, i * 2, recolor);
+        obj = image_obj_create(parent, 3, row * 2, recolor);
         lv_image_set_src(obj, srcs[i]);
         lv_image_set_scale(obj, 400);
         lv_image_set_pivot(obj, 0, 0);
 
-        obj = image_obj_create(parent, 4, i * 2, recolor);
+        obj = image_obj_create(parent, 4, row * 2, recolor);
         lv_image_set_src(obj, srcs[i]);
         lv_image_set_scale_x(obj, 400);
         lv_image_set_pivot(obj, 0, 0);
 
-        obj = image_obj_create(parent, 5, i * 2, recolor);
+        obj = image_obj_create(parent, 5, row * 2, recolor);
         lv_image_set_src(obj, srcs[i]);
         lv_image_set_scale_y(obj, 400);
         lv_image_set_pivot(obj, 0, 0);
 
-        obj = image_obj_create(parent, 6, i * 2, recolor);
+        obj = image_obj_create(parent, 6, row * 2, recolor);
         lv_image_set_src(obj, srcs[i]);
         lv_image_set_rotation(obj, 300);
         lv_image_set_scale(obj, 400);
         lv_image_set_pivot(obj, 0, 0);
 
-        obj = image_obj_create(parent, 7, i * 2, recolor);
+        obj = image_obj_create(parent, 7, row * 2, recolor);
         lv_image_set_src(obj, srcs[i]);
         lv_image_set_scale_y(obj, 400);
         lv_image_set_rotation(obj, 300);
@@ -392,14 +400,24 @@ static void image_core_cb(lv_obj_t * parent, bool recolor)
     }
 }
 
-static void image_normal_cb(lv_obj_t * parent)
+static void image_normal_1_cb(lv_obj_t * parent)
 {
-    image_core_cb(parent, false);
+    image_core_cb(parent, false, 0);
 }
 
-static void image_recolored_cb(lv_obj_t * parent)
+static void image_recolored_1_cb(lv_obj_t * parent)
 {
-    image_core_cb(parent, true);
+    image_core_cb(parent, true, 0);
+}
+
+static void image_normal_2_cb(lv_obj_t * parent)
+{
+    image_core_cb(parent, false, 4);
+}
+
+static void image_recolored_2_cb(lv_obj_t * parent)
+{
+    image_core_cb(parent, true, 4);
 }
 
 static lv_obj_t * line_obj_create(lv_obj_t * parent, int32_t col, int32_t row, lv_point_precise_t p[])
@@ -451,6 +469,7 @@ static lv_obj_t * arc_obj_create(lv_obj_t * parent, int32_t col, int32_t row, in
     lv_obj_t * obj = lv_arc_create(parent);
     lv_obj_remove_style_all(obj);
     lv_obj_set_style_arc_width(obj, w, 0);
+    lv_obj_set_style_arc_color(obj, lv_color_white(), 0);
     lv_obj_set_style_opa(obj, opa_saved, 0);
     lv_arc_set_bg_angles(obj, start, end);
     lv_obj_set_size(obj, DEF_HEIGHT, DEF_HEIGHT);
@@ -766,7 +785,7 @@ static void blend_mode_cb(lv_obj_t * parent)
     const char * cf_txt[] = {"RGB565", "RGB888.", "XRGB8888", "ARGB8888"};
     lv_color_format_t cf_values[] = {LV_COLOR_FORMAT_RGB565, LV_COLOR_FORMAT_RGB888, LV_COLOR_FORMAT_XRGB8888, LV_COLOR_FORMAT_ARGB8888};
     uint8_t * cf_bufs[] = {buf_rgb565, buf_rgb888, buf_xrgb8888, buf_argb8888};
-    static lv_image_dsc_t image_dscs[4];
+    static lv_draw_buf_t image_dscs[4];
 
     const char * mode_txt[] = {"Add.", "Sub.", "Mul."};
     lv_blend_mode_t mode_values[] = {LV_BLEND_MODE_ADDITIVE, LV_BLEND_MODE_SUBTRACTIVE, LV_BLEND_MODE_MULTIPLY};
@@ -786,7 +805,7 @@ static void blend_mode_cb(lv_obj_t * parent)
 
         lv_canvas_set_buffer(canvas, cf_bufs[cf], 36, 30, cf_values[cf]);
         create_blend_mode_image_buffer(canvas);
-        lv_img_dsc_t * img_src = lv_canvas_get_image(canvas);
+        lv_draw_buf_t * img_src = lv_canvas_get_draw_buf(canvas);
         image_dscs[cf] = *img_src;
 
         for(m = 0; m < 3; m++) {
@@ -824,8 +843,10 @@ static scene_dsc_t scenes[] = {
     {.name = "border",              .create_cb = border_cb},
     {.name = "box_shadow",          .create_cb = box_shadow_cb},
     {.name = "text",                .create_cb = text_cb},
-    {.name = "image_normal",        .create_cb = image_normal_cb},
-    {.name = "image_recolor",       .create_cb = image_recolored_cb},
+    {.name = "image_normal_1",      .create_cb = image_normal_1_cb},
+    {.name = "image_recolor_1",     .create_cb = image_recolored_1_cb},
+    {.name = "image_normal_2",      .create_cb = image_normal_2_cb},
+    {.name = "image_recolor_2",     .create_cb = image_recolored_2_cb},
     {.name = "line",                .create_cb = line_cb},
     {.name = "arc_normal",          .create_cb = arc_normal_cb},
     {.name = "arc_image",           .create_cb = arc_image_cb},

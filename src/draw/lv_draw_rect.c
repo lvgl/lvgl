@@ -36,7 +36,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(lv_draw_rect_dsc_t));
     dsc->bg_color = lv_color_white();
@@ -62,6 +62,11 @@ void lv_draw_fill_dsc_init(lv_draw_fill_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_fill_dsc_t);
 }
 
+lv_draw_fill_dsc_t * lv_draw_task_get_fill_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_FILL ? (lv_draw_fill_dsc_t *)task->draw_dsc : NULL;
+}
+
 void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(*dsc));
@@ -70,11 +75,21 @@ void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc)
     dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
 }
 
+lv_draw_border_dsc_t * lv_draw_task_get_border_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_BORDER ? (lv_draw_border_dsc_t *)task->draw_dsc : NULL;
+}
+
 void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(*dsc));
     dsc->opa = LV_OPA_COVER;
     dsc->base.dsc_size = sizeof(lv_draw_box_shadow_dsc_t);
+}
+
+lv_draw_box_shadow_dsc_t * lv_draw_task_get_box_shadow_dsc(lv_draw_task_t * task)
+{
+    return task->type == LV_DRAW_TASK_TYPE_BOX_SHADOW ? (lv_draw_box_shadow_dsc_t *)task->draw_dsc : NULL;
 }
 
 void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
@@ -103,7 +118,10 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     if(dsc->bg_image_opa <= LV_OPA_MIN || dsc->bg_image_src == NULL) has_bg_img = false;
     else has_bg_img = true;
 
-    if(dsc->border_opa <= LV_OPA_MIN || dsc->border_width == 0 || dsc->border_post == true) has_border = false;
+    if(dsc->border_opa <= LV_OPA_MIN
+       || dsc->border_width == 0
+       || dsc->border_post == true
+       || dsc->border_side == LV_BORDER_SIDE_NONE) has_border = false;
     else has_border = true;
 
     if(dsc->outline_opa <= LV_OPA_MIN || dsc->outline_width == 0) has_outline = false;
@@ -129,6 +147,9 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         t = lv_draw_add_task(layer, coords);
         lv_draw_box_shadow_dsc_t * shadow_dsc = lv_malloc(sizeof(lv_draw_box_shadow_dsc_t));
         t->draw_dsc = shadow_dsc;
+        lv_area_increase(&t->_real_area, dsc->shadow_spread, dsc->shadow_spread);
+        lv_area_increase(&t->_real_area, dsc->shadow_width, dsc->shadow_width);
+        lv_area_move(&t->_real_area, dsc->shadow_offset_x, dsc->shadow_offset_y);
         shadow_dsc->base = dsc->base;
         shadow_dsc->base.dsc_size = sizeof(lv_draw_box_shadow_dsc_t);
         shadow_dsc->radius = dsc->radius;
@@ -255,6 +276,8 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         t = lv_draw_add_task(layer, &outline_coords);
         lv_draw_border_dsc_t * outline_dsc = lv_malloc(sizeof(lv_draw_border_dsc_t));
         t->draw_dsc = outline_dsc;
+        lv_area_increase(&t->_real_area, dsc->outline_width, dsc->outline_width);
+        lv_area_increase(&t->_real_area, dsc->outline_pad, dsc->outline_pad);
         outline_dsc->base = dsc->base;
         outline_dsc->base.dsc_size = sizeof(lv_draw_border_dsc_t);
         outline_dsc->radius = dsc->radius == LV_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->radius + dsc->outline_width +

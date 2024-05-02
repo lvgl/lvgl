@@ -13,11 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
 #include "../lv_conf_internal.h"
 
-#include <stdint.h>
-#include <stdbool.h>
 #include "../misc/lv_types.h"
 #include "../misc/lv_ll.h"
 
@@ -80,13 +77,13 @@ typedef enum {
  **********************/
 
 /**
- * Init. the group module
+ * Init the group module
  * @remarks Internal function, do not call directly.
  */
 void _lv_group_init(void);
 
 /**
- * Deinit. the group module
+ * Deinit the group module
  * @remarks Internal function, do not call directly.
  */
 void _lv_group_deinit(void);

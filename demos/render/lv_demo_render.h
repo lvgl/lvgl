@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_demo_render.h
  *
  */
@@ -17,6 +17,10 @@ extern "C" {
 
 #if LV_USE_DEMO_RENDER
 
+#if LV_USE_GRID == 0
+#error "LV_USE_GRID needs to be enabled"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -29,8 +33,10 @@ typedef enum {
     LV_DEMO_RENDER_SCENE_BORDER,
     LV_DEMO_RENDER_SCENE_BOX_SHADOW,
     LV_DEMO_RENDER_SCENE_TEXT,
-    LV_DEMO_RENDER_SCENE_IMAGE_NORMAL,
-    LV_DEMO_RENDER_SCENE_IMAGE_RECOLOR,
+    LV_DEMO_RENDER_SCENE_IMAGE_NORMAL_1,
+    LV_DEMO_RENDER_SCENE_IMAGE_RECOLOR_1,
+    LV_DEMO_RENDER_SCENE_IMAGE_NORMAL_2,
+    LV_DEMO_RENDER_SCENE_IMAGE_RECOLOR_2,
     LV_DEMO_RENDER_SCENE_LINE,
     LV_DEMO_RENDER_SCENE_ARC_NORMAL,
     LV_DEMO_RENDER_SCENE_ARC_IMAGE,

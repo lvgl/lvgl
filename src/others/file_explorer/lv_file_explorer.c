@@ -9,12 +9,13 @@
 #include "lv_file_explorer.h"
 #if LV_USE_FILE_EXPLORER != 0
 
+#include "../../lvgl.h"
 #include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_file_explorer_class
+#define MY_CLASS (&lv_file_explorer_class)
 
 #define FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH       (22)
 #define FILE_EXPLORER_BROWSER_AREA_WIDTH            (100 - FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH)
@@ -174,15 +175,6 @@ lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
     return explorer->head_area;
 }
 
-lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
-
-    return explorer->quick_access_area;
-}
-
 lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -193,6 +185,15 @@ lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 }
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
+lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
+
+    return explorer->quick_access_area;
+}
+
 lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -420,7 +421,7 @@ static void init_style(lv_obj_t * obj)
 static void quick_access_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_current_target(e);
     lv_obj_t * obj = lv_event_get_user_data(e);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
@@ -457,7 +458,7 @@ static void quick_access_event_handler(lv_event_t * e)
 static void quick_access_area_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * area = lv_event_get_target(e);
+    lv_obj_t * area = lv_event_get_current_target(e);
     lv_obj_t * obj = lv_event_get_user_data(e);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
@@ -544,7 +545,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
     lv_table_set_cell_value(explorer->file_table, 1, 1, "0");
 
     while(1) {
-        res = lv_fs_dir_read(&dir, fn);
+        res = lv_fs_dir_read(&dir, fn, sizeof(fn));
         if(res != LV_FS_RES_OK) {
             LV_LOG_USER("Driver, file or directory is not exists %d!", res);
             break;
@@ -563,7 +564,8 @@ static void show_dir(lv_obj_t * obj, const char * path)
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_IMAGE "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "1");
         }
-        else if((is_end_with(fn, ".mp3") == true) || (is_end_with(fn, ".MP3") == true)) {
+        else if((is_end_with(fn, ".mp3") == true) || (is_end_with(fn, ".MP3") == true) || \
+                (is_end_with(fn, ".wav") == true) || (is_end_with(fn, ".WAV") == true)) {
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_AUDIO "  %s", fn);
             lv_table_set_cell_value(explorer->file_table, index, 1, "2");
         }

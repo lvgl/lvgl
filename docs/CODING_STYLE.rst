@@ -108,7 +108,7 @@ follow some coding conventions:
   argument which is a pointer to widget object itself.
 - ``struct`` APIs should follow the widgets' conventions. That is to receive a pointer to the ``struct`` as the
   first argument, and the prefix of the ``struct`` name should be used as the prefix of the
-  function name too (e.g. :cpp:expr:`lv_disp_set_default(lv_disp_t * disp)`)
+  function name too (e.g. :cpp:expr:`lv_display_set_default(lv_display_t * disp)`)
 - Functions and ``struct``\ s which are not part of the public API must begin with underscore in order to mark them as "private".
 - Argument must be named in H files too.
 - Do not ``malloc`` into a static or global variables. Instead declare the variable in ``lv_global_t``

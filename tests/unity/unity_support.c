@@ -1,26 +1,34 @@
-/**
- * @file lv_test_assert.c
- *
- * Copyright 2002-2010 Guillaume Cottenceau.
- *
- * This software may be freely redistributed under the terms
- * of the X11 license.
- *
- */
+﻿/**
+* @file lv_test_assert.c
+*
+* Copyright 2002-2010 Guillaume Cottenceau.
+*
+* This software may be freely redistributed under the terms
+* of the X11 license.
+*
+*/
 
 /*********************
  *      INCLUDES
  *********************/
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <errno.h>
 #include "unity.h"
 #define PNG_DEBUG 3
 #include <png.h>
+
+#ifdef _WIN32
+#include <direct.h>
+#define mkdir(pathname, mode) _mkdir(pathname)
+#define strtok_r strtok_s
+#else
+#include <sys/stat.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -52,6 +60,7 @@ static int read_png_file(png_image_t * p, const char * file_name);
 static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
 static void png_release(png_image_t * p);
 static void buf_to_xrgb8888(const uint8_t * buf_in, uint8_t * buf_out, lv_color_format_t cf_in);
+static void create_folders_if_needed(const char * path) ;
 
 /**********************
  *  STATIC VARIABLES
@@ -129,7 +138,9 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
 {
 
     char fn_ref_full[256];
-    sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
+    lv_snprintf(fn_ref_full, sizeof(fn_ref_full), "%s%s", REF_IMGS_PATH, fn_ref);
+
+    create_folders_if_needed(fn_ref_full);
 
     lv_refr_now(NULL);
 
@@ -191,7 +202,7 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
         fn_ref_no_ext[strlen(fn_ref_no_ext) - 4] = '\0';
 
         char fn_err_full[256];
-        sprintf(fn_err_full, "%s%s_err.png", REF_IMGS_PATH, fn_ref_no_ext);
+        lv_snprintf(fn_err_full, sizeof(fn_err_full), "%s%s_err.png", REF_IMGS_PATH, fn_ref_no_ext);
 
         write_png_file(screen_buf_xrgb8888, 800, 480, fn_err_full);
     }
@@ -412,6 +423,68 @@ static void buf_to_xrgb8888(const uint8_t * buf_in, uint8_t * buf_out, lv_color_
             buf_out += 800 * 4;
         }
     }
+    else if(cf_in == LV_COLOR_FORMAT_L8) {
+        uint32_t y;
+        for(y = 0; y < 480; y++) {
+            uint32_t x;
+            for(x = 0; x < 800; x++) {
+                buf_out[x * 4 + 3] = 0xff;
+                buf_out[x * 4 + 2] = buf_in[x];
+                buf_out[x * 4 + 1] = buf_in[x];
+                buf_out[x * 4 + 0] = buf_in[x];
+            }
+
+            buf_in += stride;
+            buf_out += 800 * 4;
+        }
+    }
+    else if (cf_in == LV_COLOR_FORMAT_AL88) {
+        uint32_t y;
+        for (y = 0; y < 480; y++) {
+            uint32_t x;
+            for (x = 0; x < 800; x++) {
+                buf_out[x * 4 + 3] = buf_in[x * 2 + 1];
+                buf_out[x * 4 + 2] = buf_in[x * 2 + 0];
+                buf_out[x * 4 + 1] = buf_in[x * 2 + 0];
+                buf_out[x * 4 + 0] = buf_in[x * 2 + 0];
+            }
+
+            buf_in += stride;
+            buf_out += 800 * 4;
+        }
+    }
+}
+
+static void create_folders_if_needed(const char * path)
+{
+    char * ptr;
+    char * pathCopy = strdup(path);
+    if(pathCopy == NULL) {
+        perror("Error duplicating path");
+        exit(EXIT_FAILURE);
+    }
+
+    char * token = strtok_r(pathCopy, "/", &ptr);
+    char current_path[1024] = {'\0'}; // Adjust the size as needed
+
+    while(token && ptr && *ptr != '\0') {
+        strcat(current_path, token);
+        strcat(current_path, "/");
+
+        int mkdir_retval = mkdir(current_path, 0777);
+        if (mkdir_retval == 0) {
+            printf("Created folder: %s\n", current_path);
+        }
+        else if (errno != EEXIST) {
+            perror("Error creating folder");
+            free(pathCopy);
+            exit(EXIT_FAILURE);
+        }
+
+        token = strtok_r(NULL, "/", &ptr);
+    }
+
+    free(pathCopy);
 }
 
 #endif

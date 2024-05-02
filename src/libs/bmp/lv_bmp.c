@@ -15,6 +15,8 @@
  *      DEFINES
  *********************/
 
+#define DECODER_NAME    "BMP"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -32,8 +34,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area);
@@ -58,6 +59,8 @@ void lv_bmp_init(void)
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_get_area_cb(dec, decoder_get_area);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+
+    dec->name = DECODER_NAME;
 }
 
 void lv_bmp_deinit(void)
@@ -136,15 +139,13 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 
 /**
  * Open a BMP image and return the decided image
- * @param src can be file name or pointer to a C array
- * @param style style of the image object (unused now but certain formats might use it)
- * @return pointer to the decoded image or `LV_IMAGE_DECODER_OPEN_FAIL` if failed
+ * @param decoder pointer to the decoder
+ * @param dsc     pointer to the decoder descriptor
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
  */
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(args);
 
     /*If it's a BMP file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -199,7 +200,20 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     if(decoded_area->y1 == LV_COORD_MIN) {
         *decoded_area = *full_area;
         decoded_area->y2 = decoded_area->y1;
-        if(decoded == NULL) decoded = lv_draw_buf_create(lv_area_get_width(full_area), 1, dsc->header.cf, 0);
+        int32_t w_px = lv_area_get_width(full_area);
+        lv_draw_buf_t * reshaped = lv_draw_buf_reshape(decoded, dsc->header.cf, w_px, 1, LV_STRIDE_AUTO);
+        if(reshaped == NULL) {
+            if(decoded != NULL) {
+                lv_draw_buf_destroy(decoded);
+                decoded = NULL;
+                dsc->decoded = NULL;
+            }
+            decoded = lv_draw_buf_create(w_px, 1, dsc->header.cf, LV_STRIDE_AUTO);
+            if(decoded == NULL) return LV_RESULT_INVALID;
+        }
+        else {
+            decoded = reshaped;
+        }
         dsc->decoded = decoded;
     }
     else {

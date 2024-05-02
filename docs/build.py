@@ -15,6 +15,7 @@ import doc_builder
 import shutil
 import tempfile
 import config_builder
+import add_translation
 
 # due to the modifications that take place to the documentation files
 # when the documentaation builds it is better to copy the source files to a
@@ -76,7 +77,7 @@ def cmd(s):
 
 
 # Get the current branch name
-status, br = subprocess.getstatusoutput("git branch")
+status, br = subprocess.getstatusoutput("git branch --show-current")
 _, gitcommit = subprocess.getstatusoutput("git rev-parse HEAD")
 br = re.sub('\* ', '', br)
 
@@ -134,6 +135,9 @@ with open(os.path.join(temp_directory, 'Doxyfile'), 'wb') as f:
 
 print("Generate the list of examples")
 ex.exec(temp_directory)
+
+print("Add translation")
+add_translation.exec(temp_directory)
 
 print("Running doxygen")
 cmd('cd "{0}" && doxygen Doxyfile'.format(temp_directory))
@@ -203,27 +207,7 @@ else:
 
 
 def get_version():
-    path = os.path.join(project_path, 'lvgl.h')
-    with open(path, 'rb') as f:
-        d = f.read().decode('utf-8')
-
-    d = d.split('#define LVGL_VERSION_MAJOR', 1)[-1]
-    major, d = d.split('\n', 1)
-    d = d.split('#define LVGL_VERSION_MINOR', 1)[-1]
-    minor, d = d.split('\n', 1)
-    # d = d.split('#define LVGL_VERSION_PATCH', 1)[-1]
-    # patch, d = d.split('\n', 1)
-
-    ver = '{0}.{1}'.format(major.strip(), minor.strip())
-
-    # ver = '{0}.{1}.{2}'.format(major.strip(), minor.strip(), patch.strip())
-
-    # if '#define LVGL_VERSION_INFO' in d:
-    #     d = d.split('#define LVGL_VERSION_INFO', 1)[-1]
-    #     info, d = d.split('\n', 1)
-    #     info = info.strip().replace('"', '')
-    #     ver += '-' + info
-
+    _, ver = subprocess.getstatusoutput("../scripts/find_version.sh")
     return ver
 
 cmd('sphinx-build -b html "{src}" "{dst}" -D version="{version}" -E -j {cpu}'.format(

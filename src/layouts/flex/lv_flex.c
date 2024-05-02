@@ -96,7 +96,6 @@ void lv_flex_init(void)
 {
     layout_list_def[LV_LAYOUT_FLEX].cb = flex_update;
     layout_list_def[LV_LAYOUT_FLEX].user_data = NULL;
-
 }
 
 void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow)
@@ -472,7 +471,6 @@ static void place_content(lv_flex_align_t place, int32_t max_size, int32_t conte
 {
     if(item_cnt <= 1) {
         switch(place) {
-            case LV_FLEX_ALIGN_SPACE_BETWEEN:
             case LV_FLEX_ALIGN_SPACE_AROUND:
             case LV_FLEX_ALIGN_SPACE_EVENLY:
                 place = LV_FLEX_ALIGN_CENTER;
@@ -492,7 +490,7 @@ static void place_content(lv_flex_align_t place, int32_t max_size, int32_t conte
             *start_pos += max_size - content_size;
             break;
         case LV_FLEX_ALIGN_SPACE_BETWEEN:
-            *gap = (int32_t)(max_size - content_size) / (int32_t)(item_cnt - 1);
+            if(item_cnt > 1) *gap = (int32_t)(max_size - content_size) / (int32_t)(item_cnt - 1);
             break;
         case LV_FLEX_ALIGN_SPACE_AROUND:
             *gap += (int32_t)(max_size - content_size) / (int32_t)(item_cnt);

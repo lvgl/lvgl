@@ -13,8 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
-#include <stdint.h>
 #include "../font/lv_font.h"
 #include "lv_color.h"
 #include "lv_area.h"
@@ -284,7 +282,7 @@ enum _lv_style_prop_t {
     LV_STYLE_COLOR_FILTER_DSC       = 97,
     LV_STYLE_COLOR_FILTER_OPA       = 98,
     LV_STYLE_ANIM                   = 99,
-    LV_STYLE_ANIM_TIME              = 100,
+    LV_STYLE_ANIM_DURATION          = 100,
     LV_STYLE_TRANSITION             = 102,
     LV_STYLE_BLEND_MODE             = 103,
     LV_STYLE_TRANSFORM_WIDTH        = 104,
@@ -298,29 +296,31 @@ enum _lv_style_prop_t {
     LV_STYLE_TRANSFORM_PIVOT_Y      = 112,
     LV_STYLE_TRANSFORM_SKEW_X       = 113,
     LV_STYLE_TRANSFORM_SKEW_Y       = 114,
+    LV_STYLE_BITMAP_MASK_SRC        = 115,
+    LV_STYLE_ROTARY_SENSITIVITY     = 116,
 
 #if LV_USE_FLEX
-    LV_STYLE_FLEX_FLOW              = 115,
-    LV_STYLE_FLEX_MAIN_PLACE        = 116,
-    LV_STYLE_FLEX_CROSS_PLACE       = 117,
-    LV_STYLE_FLEX_TRACK_PLACE       = 118,
-    LV_STYLE_FLEX_GROW              = 119,
+    LV_STYLE_FLEX_FLOW              = 125,
+    LV_STYLE_FLEX_MAIN_PLACE        = 126,
+    LV_STYLE_FLEX_CROSS_PLACE       = 127,
+    LV_STYLE_FLEX_TRACK_PLACE       = 128,
+    LV_STYLE_FLEX_GROW              = 129,
 #endif
 
 #if LV_USE_GRID
-    LV_STYLE_GRID_COLUMN_ALIGN      = 120,
-    LV_STYLE_GRID_ROW_ALIGN         = 121,
-    LV_STYLE_GRID_ROW_DSC_ARRAY     = 122,
-    LV_STYLE_GRID_COLUMN_DSC_ARRAY  = 123,
-    LV_STYLE_GRID_CELL_COLUMN_POS   = 124,
-    LV_STYLE_GRID_CELL_COLUMN_SPAN  = 125,
-    LV_STYLE_GRID_CELL_X_ALIGN      = 126,
-    LV_STYLE_GRID_CELL_ROW_POS      = 127,
-    LV_STYLE_GRID_CELL_ROW_SPAN     = 128,
-    LV_STYLE_GRID_CELL_Y_ALIGN      = 129,
+    LV_STYLE_GRID_COLUMN_ALIGN      = 130,
+    LV_STYLE_GRID_ROW_ALIGN         = 131,
+    LV_STYLE_GRID_ROW_DSC_ARRAY     = 132,
+    LV_STYLE_GRID_COLUMN_DSC_ARRAY  = 133,
+    LV_STYLE_GRID_CELL_COLUMN_POS   = 134,
+    LV_STYLE_GRID_CELL_COLUMN_SPAN  = 135,
+    LV_STYLE_GRID_CELL_X_ALIGN      = 136,
+    LV_STYLE_GRID_CELL_ROW_POS      = 137,
+    LV_STYLE_GRID_CELL_ROW_SPAN     = 138,
+    LV_STYLE_GRID_CELL_Y_ALIGN      = 139,
 #endif
 
-    _LV_STYLE_LAST_BUILT_IN_PROP     = 130,
+    _LV_STYLE_LAST_BUILT_IN_PROP     = 140,
 
     _LV_STYLE_NUM_BUILT_IN_PROPS     = _LV_STYLE_LAST_BUILT_IN_PROP + 1,
 
@@ -606,7 +606,7 @@ static inline bool lv_style_prop_has_flag(lv_style_prop_t prop, uint8_t flag)
  *    GLOBAL VARIABLES
  *************************/
 
-extern const lv_style_prop_t lv_style_const_prop_id_inv;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t lv_style_const_prop_id_inv;
 
 /**********************
  *      MACROS

@@ -13,10 +13,7 @@ extern "C" {
 /***************************
  * CURRENT VERSION OF LVGL
  ***************************/
-#define LVGL_VERSION_MAJOR 9
-#define LVGL_VERSION_MINOR 0
-#define LVGL_VERSION_PATCH 0
-#define LVGL_VERSION_INFO "dev"
+#include "lv_version.h"
 
 /*********************
  *      INCLUDES
@@ -109,37 +106,20 @@ extern "C" {
 #include "src/layouts/lv_layout.h"
 
 #include "src/draw/lv_draw.h"
+#include "src/draw/lv_draw_buf.h"
 #include "src/draw/lv_draw_vector.h"
 
 #include "src/themes/lv_theme.h"
 
-#include "src/lv_api_map.h"
+#include "src/drivers/lv_drivers.h"
 
-#include "src/dev/sdl/lv_sdl_window.h"
-#include "src/dev/sdl/lv_sdl_mouse.h"
-#include "src/dev/sdl/lv_sdl_mousewheel.h"
-#include "src/dev/sdl/lv_sdl_keyboard.h"
-
-#include "src/dev/x11/lv_x11.h"
-
-#include "src/dev/display/drm/lv_linux_drm.h"
-#include "src/dev/display/fb/lv_linux_fbdev.h"
-
-#include "src/dev/nuttx/lv_nuttx_entry.h"
-#include "src/dev/nuttx/lv_nuttx_fbdev.h"
-#include "src/dev/nuttx/lv_nuttx_touchscreen.h"
-#include "src/dev/nuttx/lv_nuttx_lcd.h"
-#include "src/dev/nuttx/lv_nuttx_libuv.h"
-
-#include "src/dev/evdev/lv_evdev.h"
+#include "src/lv_api_map_v8.h"
+#include "src/lv_api_map_v9_0.h"
 
 #include "src/core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_USE_DEV_VERSION
-#warning "You are using the development version of LVGL which is not stable at this moment. For production use the release/v8.3 branch. To silence this warning add #define LV_USE_DEV_VERSION to lv_conf.h"
-#endif
 
 /**********************
  *      TYPEDEFS

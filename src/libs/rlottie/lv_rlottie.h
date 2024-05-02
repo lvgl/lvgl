@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
 #if LV_USE_RLOTTIE
 
 /*********************
@@ -48,7 +48,7 @@ typedef struct {
     size_t dest_frame;
 } lv_rlottie_t;
 
-extern const lv_obj_class_t lv_rlottie_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_rlottie_class;
 
 /**********************
  * GLOBAL PROTOTYPES

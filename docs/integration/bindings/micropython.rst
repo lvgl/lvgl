@@ -81,10 +81,13 @@ A simple example
 
 .. code:: python
 
+   # Initialize
+   import display_driver
    import lvgl as lv
-   lv.init()
+
+   # Create a button with a label
    scr = lv.obj()
-   btn = lv.btn(scr)
+   btn = lv.button(scr)
    btn.align(lv.ALIGN.CENTER, 0, 0)
    label = lv.label(btn)
    label.set_text('Hello World!')

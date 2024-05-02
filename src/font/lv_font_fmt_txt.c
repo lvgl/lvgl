@@ -25,6 +25,10 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    uint32_t gid_left;
+    uint32_t gid_right;
+} kern_pair_ref_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -71,15 +75,13 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
  *   GLOBAL FUNCTIONS
  **********************/
 
-const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc, uint32_t unicode_letter,
-                                           uint8_t * bitmap_out)
+const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
-    LV_UNUSED(g_dsc);
-
-    if(unicode_letter == '\t') unicode_letter = ' ';
+    const lv_font_t * font = g_dsc->resolved_font;
+    uint8_t * bitmap_out = draw_buf->data;
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-    uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
+    uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
@@ -144,7 +146,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, lv_font_glyph
                 bitmap_out_tmp += stride;
             }
         }
-        return bitmap_out;
+        return draw_buf;
     }
     /*Handle compressed bitmap*/
     else {
@@ -152,7 +154,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, lv_font_glyph
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
         decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
-        return bitmap_out;
+        return draw_buf;
 #else /*!LV_USE_FONT_COMPRESSED*/
         LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
         return NULL;
@@ -199,8 +201,9 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->box_w = gdsc->box_w;
     dsc_out->ofs_x = gdsc->ofs_x;
     dsc_out->ofs_y = gdsc->ofs_y;
-    dsc_out->bpp   = (uint8_t)fdsc->bpp;
+    dsc_out->format = (uint8_t)fdsc->bpp;
     dsc_out->is_placeholder = false;
+    dsc_out->gid.index = gid;
 
     if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
 
@@ -238,7 +241,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 
             if(p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
-                glyph_id = fdsc->cmaps[i].glyph_id_start + ofs;
+                glyph_id = fdsc->cmaps[i].glyph_id_start + (uint32_t) ofs;
             }
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
@@ -273,7 +276,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
             /*Use binary search to find the kern value.
              *The pairs are ordered left_id first, then right_id secondly.*/
             const uint16_t * g_ids = kdsc->glyph_ids;
-            uint16_t g_id_both = (gid_right << 8) + gid_left; /*Create one number from the ids*/
+            kern_pair_ref_t g_id_both = {gid_left, gid_right};
             uint16_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, kern_pair_8_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
@@ -286,7 +289,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
             /*Use binary search to find the kern value.
              *The pairs are ordered left_id first, then right_id secondly.*/
             const uint32_t * g_ids = kdsc->glyph_ids;
-            uint32_t g_id_both = (gid_right << 16) + gid_left; /*Create one number from the ids*/
+            kern_pair_ref_t g_id_both = {gid_left, gid_right};
             uint32_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, kern_pair_16_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
@@ -318,23 +321,23 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
 
 static int32_t kern_pair_8_compare(const void * ref, const void * element)
 {
-    const uint8_t * ref8_p = ref;
+    const kern_pair_ref_t * ref8_p = ref;
     const uint8_t * element8_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref8_p[0] != element8_p[0]) return (int32_t)ref8_p[0] - element8_p[0];
-    else return (int32_t) ref8_p[1] - element8_p[1];
+    if(ref8_p->gid_left != element8_p[0]) return (int32_t) ref8_p->gid_left - element8_p[0];
+    else return (int32_t) ref8_p->gid_right - element8_p[1];
 
 }
 
 static int32_t kern_pair_16_compare(const void * ref, const void * element)
 {
-    const uint16_t * ref16_p = ref;
+    const kern_pair_ref_t * ref16_p = ref;
     const uint16_t * element16_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref16_p[0] != element16_p[0]) return (int32_t)ref16_p[0] - element16_p[0];
-    else return (int32_t) ref16_p[1] - element16_p[1];
+    if(ref16_p->gid_left != element16_p[0]) return (int32_t) ref16_p->gid_left - element16_p[0];
+    else return (int32_t) ref16_p->gid_right - element16_p[1];
 }
 
 #if LV_USE_FONT_COMPRESSED

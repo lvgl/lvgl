@@ -19,6 +19,9 @@
 /*********************
  *      DEFINES
  *********************/
+
+#define DECODER_NAME    "FFMPEG"
+
 #if LV_COLOR_DEPTH == 8
     #define AV_PIX_FMT_TRUE_COLOR AV_PIX_FMT_RGB8
 #elif LV_COLOR_DEPTH == 16
@@ -29,7 +32,7 @@
     #error Unsupported  LV_COLOR_DEPTH
 #endif
 
-#define MY_CLASS &lv_ffmpeg_player_class
+#define MY_CLASS (&lv_ffmpeg_player_class)
 
 #define FRAME_DEF_REFR_PERIOD   33  /*[ms]*/
 
@@ -67,8 +70,7 @@ struct lv_image_pixel_color_s {
  **********************/
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
@@ -113,6 +115,8 @@ void lv_ffmpeg_init(void)
     lv_image_decoder_set_info_cb(dec, decoder_info);
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+
+    dec->name = DECODER_NAME;
 
 #if LV_FFMPEG_AV_DUMP_FORMAT == 0
     av_log_set_level(AV_LOG_QUIET);
@@ -177,6 +181,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     player->imgdsc.header.h = height;
     player->imgdsc.data_size = data_size;
     player->imgdsc.header.cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+    player->imgdsc.header.stride = width * lv_color_format_get_size(player->imgdsc.header.cf);
     player->imgdsc.data = ffmpeg_get_image_data(player->ffmpeg_ctx);
 
     lv_image_set_src(&player->img.obj, &(player->imgdsc));
@@ -270,11 +275,15 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_INVALID;
 }
 
-static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                const lv_image_decoder_args_t * args)
+/**
+ * Decode an image using ffmpeg library
+ * @param decoder pointer to the decoder
+ * @param dsc     pointer to the decoder descriptor
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
+ */
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    LV_UNUSED(args);
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * path = dsc->src;

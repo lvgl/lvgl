@@ -13,7 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
 #include "../misc/lv_types.h"
 #include "../misc/lv_event.h"
 #include "../indev/lv_indev.h"
@@ -99,9 +98,9 @@ lv_obj_t * lv_event_get_target_obj(lv_event_t * e);
  * @param filter    an event code (e.g. `LV_EVENT_CLICKED`) on which the event should be called. `LV_EVENT_ALL` can be used to receive all the events.
  * @param event_cb  the new event function
  * @param           user_data custom data data will be available in `event_cb`
+ * @return          handler to the event. It can be used in `lv_obj_remove_event_dsc`.
  */
-void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
-                         void * user_data);
+lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 
 uint32_t lv_obj_get_event_count(lv_obj_t * obj);
 
@@ -110,6 +109,8 @@ lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index);
 bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index);
 
 bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
+
+bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc);
 
 /**
  * Remove an event_cb with user_data
@@ -148,6 +149,13 @@ const lv_area_t * lv_event_get_old_size(lv_event_t * e);
  * @return      the triggering key or NULL if called on an unrelated event
  */
 uint32_t lv_event_get_key(lv_event_t * e);
+
+/**
+ * Get the signed rotary encoder diff. passed as parameter to an event. Can be used in `LV_EVENT_ROTARY`
+ * @param e     pointer to an event
+ * @return      the triggering key or NULL if called on an unrelated event
+ */
+int32_t lv_event_get_rotary_diff(lv_event_t * e);
 
 /**
  * Get the animation descriptor of a scrolling. Can be used in `LV_EVENT_SCROLL_BEGIN`

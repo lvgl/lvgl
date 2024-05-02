@@ -12,7 +12,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../core/lv_obj.h"
 
 #if LV_USE_IME_PINYIN != 0
 

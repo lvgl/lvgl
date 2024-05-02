@@ -227,14 +227,32 @@ int32_t lv_display_get_dpi(const lv_display_t * disp);
  *--------------------*/
 
 /**
- * Set the buffers for a display
+ * Set the buffers for a display, similarly to `lv_display_set_draw_buffers`, but accept the raw buffer pointers.
  * @param disp              pointer to a display
  * @param buf1              first buffer
  * @param buf2              second buffer (can be `NULL`)
+ * @param buf_size          buffer size in byte
  * @param render_mode       LV_DISPLAY_RENDER_MODE_PARTIAL/DIRECT/FULL
  */
-void lv_display_set_draw_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size_in_bytes,
-                                 lv_display_render_mode_t render_mode);
+void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
+                            lv_display_render_mode_t render_mode);
+
+/**
+ * Set the buffers for a display, accept a draw buffer pointer.
+ * Normally use `lv_display_set_buffers` is enough for most cases.
+ * Use this function when an existing lv_draw_buf_t is available.
+ * @param disp              pointer to a display
+ * @param buf1              first buffer
+ * @param buf2              second buffer (can be `NULL`)
+ */
+void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_draw_buf_t * buf2);
+
+/**
+ * Set display render mode
+ * @param disp              pointer to a display
+ * @param render_mode       LV_DISPLAY_RENDER_MODE_PARTIAL/DIRECT/FULL
+ */
+void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t render_mode);
 
 /**
  * Set the flush callback which will be called to copy the rendered image to the display.
@@ -329,12 +347,6 @@ lv_obj_t * lv_display_get_screen_active(lv_display_t * disp);
 lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp);
 
 /**
- * Make a screen active
- * @param scr       pointer to a screen
- */
-void lv_display_load_scr(lv_obj_t * scr);
-
-/**
  * Return the top layer. The top layer is the same on all screens and it is above the normal screen layer.
  * @param disp      pointer to display which top layer should be get. (NULL to use the default screen)
  * @return          pointer to the top layer object
@@ -355,6 +367,12 @@ lv_obj_t * lv_display_get_layer_sys(lv_display_t * disp);
  * @return          pointer to the bottom layer object
  */
 lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp);
+
+/**
+ * Load a screen on the default display
+ * @param scr       pointer to a screen
+ */
+void lv_screen_load(struct _lv_obj_t * scr);
 
 /**
  * Switch screen with animation
@@ -401,15 +419,6 @@ static inline lv_obj_t * lv_layer_sys(void)
 static inline lv_obj_t * lv_layer_bottom(void)
 {
     return lv_display_get_layer_bottom(lv_display_get_default());
-}
-
-/**
- * Load a screen on the default display
- * @param scr       pointer to a screen
- */
-static inline void lv_screen_load(lv_obj_t * scr)
-{
-    lv_display_load_scr(scr);
 }
 
 /*---------------------
@@ -491,7 +500,7 @@ uint32_t lv_display_get_inactive_time(const lv_display_t * disp);
  * Manually trigger an activity on a display
  * @param disp      pointer to a display (NULL to use the default display)
  */
-void lv_display_trig_activity(lv_display_t * disp);
+void lv_display_trigger_activity(lv_display_t * disp);
 
 /**
  * Temporarily enable and disable the invalidation of the display.
@@ -513,12 +522,26 @@ bool lv_display_is_invalidation_enabled(lv_display_t * disp);
  * @param disp      pointer to a display
  * @return          pointer to the display refresher timer. (NULL on error)
  */
-lv_timer_t * _lv_display_get_refr_timer(lv_display_t * disp);
+lv_timer_t * lv_display_get_refr_timer(lv_display_t * disp);
+
+/**
+ * Delete screen refresher timer
+ * @param disp      pointer to a display
+ */
+void lv_display_delete_refr_timer(lv_display_t * disp);
 
 void lv_display_set_user_data(lv_display_t * disp, void * user_data);
 void lv_display_set_driver_data(lv_display_t * disp, void * driver_data);
 void * lv_display_get_user_data(lv_display_t * disp);
 void * lv_display_get_driver_data(lv_display_t * disp);
+lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp);
+
+/**
+ * Rotate an area in-place according to the display's rotation
+ * @param disp      pointer to a display
+ * @param area      pointer to an area to rotate
+ */
+void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
 
 /**********************
  *      MACROS

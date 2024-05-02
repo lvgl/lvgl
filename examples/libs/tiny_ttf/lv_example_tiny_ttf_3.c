@@ -4,7 +4,7 @@
 static void font_size_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static lv_subject_t subject_font;
-static lv_font_t font;
+
 /**
  * Change font size with Tiny_TTF
  */
@@ -18,9 +18,8 @@ void lv_example_tiny_ttf_3(void)
     /*Create style with the new font*/
     static lv_style_t style;
     lv_style_init(&style);
-    lv_result_t res = lv_tiny_ttf_create_data(&font, ubuntu_font, ubuntu_font_size, 25);
-    if(res == LV_RESULT_INVALID) return;
-    lv_style_set_text_font(&style, &font);
+    lv_font_t * font = lv_tiny_ttf_create_data(ubuntu_font, ubuntu_font_size, 25);
+    lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
 
     lv_obj_t * slider = lv_slider_create(lv_screen_active());
@@ -46,9 +45,12 @@ void lv_example_tiny_ttf_3(void)
 static void font_size_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_style_t * style = observer->user_data;
+    lv_style_value_t v;
+    lv_style_get_prop(style, LV_STYLE_TEXT_FONT, &v);
+    lv_font_t * font = (lv_font_t *) v.ptr;
     int32_t size = lv_subject_get_int(subject);
 
-    lv_tiny_ttf_set_size(&font, size);
+    lv_tiny_ttf_set_size(font, size);
 
     lv_obj_report_style_change(style);
 }

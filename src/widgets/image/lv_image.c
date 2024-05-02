@@ -14,7 +14,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_image_class
+#define MY_CLASS (&lv_image_class)
 
 /**********************
  *      TYPEDEFS
@@ -84,8 +84,8 @@ static const lv_property_ops_t properties[] = {
     },
     {
         .id = LV_PROPERTY_IMAGE_ALIGN,
-        .setter = lv_image_set_align,
-        .getter = lv_image_get_align,
+        .setter = lv_image_set_inner_align,
+        .getter = lv_image_get_inner_align,
     },
 };
 #endif
@@ -139,7 +139,7 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     lv_image_src_t src_type = lv_image_src_get_type(src);
     lv_image_t * img = (lv_image_t *)obj;
 
-#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
+#if LV_USE_LOG && LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
     switch(src_type) {
         case LV_IMAGE_SRC_FILE:
             LV_LOG_TRACE("`LV_IMAGE_SRC_FILE` type found");
@@ -284,7 +284,7 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
-    lv_display_t * disp = lv_obj_get_disp(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
@@ -326,7 +326,7 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y)
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
-    lv_display_t * disp = lv_obj_get_disp(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);
@@ -413,7 +413,7 @@ void lv_image_set_antialias(lv_obj_t * obj, bool antialias)
     lv_obj_invalidate(obj);
 }
 
-void lv_image_set_align(lv_obj_t * obj, lv_image_align_t align)
+void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -421,9 +421,16 @@ void lv_image_set_align(lv_obj_t * obj, lv_image_align_t align)
     if(align == img->align) return;
 
     img->align = align;
-
     update_align(obj);
 
+    lv_obj_invalidate(obj);
+}
+
+void lv_image_set_bitmap_map_src(lv_obj_t * obj, const lv_image_dsc_t * src)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_image_t * img = (lv_image_t *)obj;
+    img->bitmap_mask_src = src;
     lv_obj_invalidate(obj);
 }
 
@@ -522,13 +529,22 @@ bool lv_image_get_antialias(lv_obj_t * obj)
     return img->antialias ? true : false;
 }
 
-lv_image_align_t lv_image_get_align(lv_obj_t * obj)
+lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_image_t * img = (lv_image_t *)obj;
 
     return img->align;
+}
+
+const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_image_t * img = (lv_image_t *)obj;
+
+    return img->bitmap_mask_src;
 }
 
 /**********************
@@ -582,7 +598,7 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_result_t res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RESULT_OK) return;
 
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_image_t * img = (lv_image_t *)obj;
     lv_point_t pivot_px;
     lv_image_get_pivot(obj, &pivot_px);
@@ -652,7 +668,7 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
 static void draw_image(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_image_t * img = (lv_image_t *)obj;
     if(code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
@@ -701,6 +717,10 @@ static void draw_image(lv_event_t * e)
                 return;
             }
         }
+        if(img->bitmap_mask_src) {
+            info->res = LV_COVER_RES_NOT_COVER;
+            return;
+        }
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
 
@@ -722,25 +742,33 @@ static void draw_image(lv_event_t * e)
             draw_dsc.rotation = img->rotation;
             draw_dsc.antialias = img->antialias;
             draw_dsc.blend_mode = img->blend_mode;
+            draw_dsc.bitmap_mask_src = img->bitmap_mask_src;
             draw_dsc.src = img->src;
 
-            lv_area_t img_area = {obj->coords.x1, obj->coords.y1,
-                                  obj->coords.x1 + img->w - 1, obj->coords.y1 + img->h - 1
-                                 };
+            lv_area_set(&draw_dsc.image_area, obj->coords.x1,
+                        obj->coords.y1,
+                        obj->coords.x1 + img->w - 1,
+                        obj->coords.y1 + img->h - 1);
+            lv_area_t coords;
             if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
-                lv_area_align(&obj->coords, &img_area, img->align, img->offset.x, img->offset.y);
+                lv_area_align(&obj->coords, &draw_dsc.image_area, img->align, img->offset.x, img->offset.y);
+                coords = draw_dsc.image_area;
             }
             else if(img->align == LV_IMAGE_ALIGN_TILE) {
                 _lv_area_intersect(&layer->_clip_area, &layer->_clip_area, &obj->coords);
-                lv_area_move(&img_area, img->offset.x, img->offset.y);
+                lv_area_move(&draw_dsc.image_area, img->offset.x, img->offset.y);
 
-                lv_area_move(&img_area,
-                             ((layer->_clip_area.x1 - img_area.x1 - (img->w - 1)) / img->w) * img->w,
-                             ((layer->_clip_area.y1 - img_area.y1 - (img->h - 1)) / img->h) * img->h);
+                lv_area_move(&draw_dsc.image_area,
+                             ((layer->_clip_area.x1 - draw_dsc.image_area.x1 - (img->w - 1)) / img->w) * img->w,
+                             ((layer->_clip_area.y1 - draw_dsc.image_area.y1 - (img->h - 1)) / img->h) * img->h);
+                coords = layer->_clip_area;
                 draw_dsc.tile = 1;
             }
+            else {
+                coords = draw_dsc.image_area;
+            }
 
-            lv_draw_image(layer, &draw_dsc, &img_area);
+            lv_draw_image(layer, &draw_dsc, &coords);
             layer->_clip_area = clip_area_ori;
 
         }
@@ -784,7 +812,7 @@ static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y)
 
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
-    lv_display_t * disp = lv_obj_get_disp(obj);
+    lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
     lv_display_enable_invalidation(disp, true);

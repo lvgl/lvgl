@@ -218,8 +218,11 @@ void test_spangroup_draw(void)
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
     lv_obj_set_width(spangroup, 100);
     lv_span_t * span_1 = lv_spangroup_new_span(spangroup);
-    lv_span_t * span_2 = lv_spangroup_new_span(spangroup);
     lv_span_set_text(span_1, "This text is over 100 pixels width");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_01.png");
+
+    lv_span_t * span_2 = lv_spangroup_new_span(spangroup);
     lv_span_set_text(span_2, "This text is also over 100 pixels width");
     lv_style_set_text_decor(&span_2->style, LV_TEXT_DECOR_STRIKETHROUGH);
 
@@ -274,6 +277,36 @@ void test_spangroup_get_expand_width(void)
 
     TEST_ASSERT_EQUAL_INT(constrained_size,
                           lv_spangroup_get_expand_width(spangroup, experimental_size));
+}
+
+void test_spangroup_newlines(void)
+{
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+    lv_obj_set_size(spangroup, LV_PCT(100), LV_PCT(100));
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "Lorem\n");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "ipsum");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\n\n");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "dolor");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\nsit");
+
+    /* carriage return is treated as equivalent to line feed */
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\r");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "amet,\n consectetur");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), " adipiscing");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\n");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "");
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "\relit, sed\n");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "do eiusmod");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_06.png");
 }
 
 #endif

@@ -4,7 +4,7 @@
  */
 
 /**
- * Copyright 2020-2023 NXP
+ * Copyright 2020-2024 NXP
  *
  * SPDX-License-Identifier: MIT
  */
@@ -67,18 +67,19 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
     const lv_image_dsc_t * img_dsc = dsc->src;
 
     lv_area_t rel_coords;
     lv_area_copy(&rel_coords, coords);
-    lv_area_move(&rel_coords, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
+    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
+    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
-    bool has_transform = dsc->rotation != 0 || dsc->zoom != LV_SCALE_NONE;
+    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     if(has_transform)
         lv_area_copy(&blend_area, &rel_coords);
     else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
@@ -87,17 +88,17 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     const uint8_t * src_buf = img_dsc->data;
 
     lv_area_t src_area;
-    src_area.x1 = blend_area.x1 - (coords->x1 - layer->draw_buf_ofs.x);
-    src_area.y1 = blend_area.y1 - (coords->y1 - layer->draw_buf_ofs.y);
+    src_area.x1 = blend_area.x1 - (coords->x1 - layer->buf_area.x1);
+    src_area.y1 = blend_area.y1 - (coords->y1 - layer->buf_area.y1);
     src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
     src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
     int32_t src_stride = img_dsc->header.stride;
     lv_color_format_t src_cf = img_dsc->header.cf;
 
-    uint8_t * dest_buf = layer->draw_buf.buf;
-    int32_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
-    lv_color_format_t dest_cf = layer->draw_buf.color_format;
-    bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
+    uint8_t * dest_buf = draw_buf->data;
+    int32_t dest_stride = draw_buf->header.stride;
+    lv_color_format_t dest_cf = draw_buf->header.cf;
+    bool has_recolor = (dsc->recolor_opa > LV_OPA_MIN);
 
     if(has_recolor && !has_transform)
         _pxp_blit_recolor(dest_buf, &blend_area, dest_stride, dest_cf,
@@ -194,10 +195,11 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
     int32_t piv_offset_x = 0;
     int32_t piv_offset_y = 0;
 
-    int32_t trim_size = 0;
+    int32_t trim_x = 0;
+    int32_t trim_y = 0;
 
     bool has_rotation = (dsc->rotation != 0);
-    bool has_scale = (dsc->zoom != LV_SCALE_NONE);
+    bool has_scale = (dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     uint8_t src_px_size = lv_color_format_get_size(src_cf);
     uint8_t dest_px_size = lv_color_format_get_size(dest_cf);
 
@@ -237,21 +239,21 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
     }
 
     if(has_scale) {
-        float scale_factor_fp = (float)dsc->zoom / LV_SCALE_NONE;
-        int32_t scale_factor_int = (int32_t)scale_factor_fp;
+        float fp_scale_x = (float)dsc->scale_x / LV_SCALE_NONE;
+        float fp_scale_y = (float)dsc->scale_y / LV_SCALE_NONE;
+        int32_t int_scale_x = (int32_t)fp_scale_x;
+        int32_t int_scale_y = (int32_t)fp_scale_y;
 
         /*Any scale_factor in (k, k + 1] will result in a trim equal to k*/
-        if(scale_factor_fp == scale_factor_int)
-            trim_size = scale_factor_int - 1;
-        else
-            trim_size = scale_factor_int;
+        trim_x = (fp_scale_x == int_scale_x) ? int_scale_x - 1 : int_scale_x;
+        trim_y = (fp_scale_y == int_scale_y) ? int_scale_y - 1 : int_scale_y;
 
-        dest_w = src_w * scale_factor_fp + trim_size;
-        dest_h = src_h * scale_factor_fp + trim_size;
+        dest_w = src_w * fp_scale_x + trim_x;
+        dest_h = src_h * fp_scale_y + trim_y;
 
         /*Final pivot offset = scale_factor * rotation_pivot_offset + scaling_pivot_offset*/
-        piv_offset_x = floor(scale_factor_fp * piv_offset_x) - floor((scale_factor_fp - 1) * pivot.x);
-        piv_offset_y = floor(scale_factor_fp * piv_offset_y) - floor((scale_factor_fp - 1) * pivot.y);
+        piv_offset_x = floor(fp_scale_x * piv_offset_x) - floor((fp_scale_x - 1) * pivot.x);
+        piv_offset_y = floor(fp_scale_y * piv_offset_y) - floor((fp_scale_y - 1) * pivot.y);
     }
 
     /*PS buffer - source image*/
@@ -264,7 +266,7 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
         .pitchBytes = src_stride
     };
     PXP_SetProcessSurfaceBufferConfig(PXP_ID, &psBufferConfig);
-    PXP_SetProcessSurfacePosition(PXP_ID, 0U, 0U, dest_w - trim_size - 1U, dest_h - trim_size - 1U);
+    PXP_SetProcessSurfacePosition(PXP_ID, 0U, 0U, dest_w - trim_x - 1U, dest_h - trim_y - 1U);
 
     if(has_scale)
         PXP_SetProcessSurfaceScaler(PXP_ID, src_w, src_h, dest_w, dest_h);
@@ -279,8 +281,8 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
         .buffer0Addr = (uint32_t)(dest_buf + dest_stride * (dest_area->y1 + piv_offset_y) + dest_px_size * (dest_area->x1 + piv_offset_x)),
         .buffer1Addr = (uint32_t)0U,
         .pitchBytes = dest_stride,
-        .width = dest_w - trim_size,
-        .height = dest_h - trim_size
+        .width = dest_w - trim_x,
+        .height = dest_h - trim_y
     };
     PXP_SetOutputBufferConfig(PXP_ID, &outputBufferConfig);
 

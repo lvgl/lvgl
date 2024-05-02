@@ -19,7 +19,6 @@ void lv_example_barcode_1(void)
 
     /*Add a border with bg_color*/
     lv_obj_set_style_border_color(barcode, bg_color, 0);
-    lv_obj_set_style_border_width(barcode, 5, 0);
 
     /*Set data*/
     lv_barcode_update(barcode, "https://lvgl.io");

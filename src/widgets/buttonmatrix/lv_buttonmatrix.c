@@ -21,7 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_buttonmatrix_class
+#define MY_CLASS (&lv_buttonmatrix_class)
 
 #define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI_DEF / 10)
 #define LV_BUTTONMATRIX_WIDTH_MASK 0x000F
@@ -130,7 +130,7 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[])
         uint32_t unit_cnt = 0;           /*Number of units in a row*/
         uint32_t btn_cnt = 0;            /*Number of buttons in a row*/
         /*Count the buttons and units in this row*/
-        while(map_row[btn_cnt] && strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
+        while(map_row[btn_cnt] && lv_strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
             unit_cnt += get_button_width(btnm->ctrl_bits[btn_tot_i + btn_cnt]);
             btn_cnt++;
         }
@@ -325,7 +325,7 @@ const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_
     while(btn_i != btn_id) {
         btn_i++;
         txt_i++;
-        if(strcmp(btnm->map_p[txt_i], "\n") == 0) txt_i++;
+        if(lv_strcmp(btnm->map_p[txt_i], "\n") == 0) txt_i++;
     }
 
     if(btn_i == btnm->btn_cnt) return NULL;
@@ -399,7 +399,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     lv_point_t p;
 
@@ -555,7 +555,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
 
         invalidate_button_area(obj, btnm->btn_id_sel);
 
-        char c = *((char *)lv_event_get_param(e));
+        uint32_t c = lv_event_get_key(e);
         if(c == LV_KEY_RIGHT) {
             if(btnm->btn_id_sel == LV_BUTTONMATRIX_BUTTON_NONE)  btnm->btn_id_sel = 0;
             else btnm->btn_id_sel++;
@@ -661,7 +661,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
 
 static void draw_main(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     if(btnm->btn_cnt == 0) return;
 
@@ -703,7 +703,7 @@ static void draw_main(lv_event_t * e)
 
     for(btn_i = 0; btn_i < btnm->btn_cnt; btn_i++, txt_i++) {
         /*Search the next valid text in the map*/
-        while(strcmp(btnm->map_p[txt_i], "\n") == 0) {
+        while(lv_strcmp(btnm->map_p[txt_i], "\n") == 0) {
             txt_i++;
         }
 
@@ -818,7 +818,7 @@ static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char 
     uint32_t btn_cnt = 0;
     uint32_t i       = 0;
     while(map[i] && map[i][0] != '\0') {
-        if(strcmp(map[i], "\n") != 0) { /*Do not count line breaks*/
+        if(lv_strcmp(map[i], "\n") != 0) { /*Do not count line breaks*/
             btn_cnt++;
         }
         else {
@@ -979,7 +979,7 @@ static void invalidate_button_area(const lv_obj_t * obj, uint32_t btn_idx)
     int32_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
     /*Be sure to have a minimal extra space if row/col_gap is small*/
-    int32_t dpi = lv_display_get_dpi(lv_obj_get_disp(obj));
+    int32_t dpi = lv_display_get_dpi(lv_obj_get_display(obj));
     row_gap = LV_MAX(row_gap, dpi / 10);
     col_gap = LV_MAX(col_gap, dpi / 10);
 
@@ -1029,7 +1029,7 @@ static bool has_popovers_in_top_row(lv_obj_t * obj)
     const char ** map_row = btnm->map_p;
     uint32_t btn_cnt = 0;
 
-    while(map_row[btn_cnt] && strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
+    while(map_row[btn_cnt] && lv_strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
         if(button_is_popover(btnm->ctrl_bits[btn_cnt])) {
             return true;
         }

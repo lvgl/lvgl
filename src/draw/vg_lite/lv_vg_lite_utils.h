@@ -18,14 +18,18 @@ extern "C" {
 
 #if LV_USE_DRAW_VG_LITE
 
+#include "../../misc/lv_profiler.h"
+
 #include <stdbool.h>
+#if LV_USE_VG_LITE_THORVG
+#include "../../others/vg_lite_tvg/vg_lite.h"
+#else
 #include <vg_lite.h>
+#endif
 
 /*********************
  *      DEFINES
  *********************/
-
-#define LV_VG_LITE_BUF_ALIGN 64
 
 #define LV_VG_LITE_IS_ERROR(err) (err > 0)
 
@@ -50,6 +54,7 @@ extern "C" {
 #define LV_VG_LITE_ASSERT_PATH(path) LV_VG_LITE_ASSERT(lv_vg_lite_path_check(path))
 #define LV_VG_LITE_ASSERT_SRC_BUFFER(buffer) LV_VG_LITE_ASSERT(lv_vg_lite_buffer_check(buffer, true))
 #define LV_VG_LITE_ASSERT_DEST_BUFFER(buffer) LV_VG_LITE_ASSERT(lv_vg_lite_buffer_check(buffer, false))
+#define LV_VG_LITE_ASSERT_MATRIX(matrix) LV_VG_LITE_ASSERT(lv_vg_lite_matrix_check(matrix))
 
 #define LV_VG_LITE_ALIGN(number, align_bytes) \
     (((number) + ((align_bytes)-1)) & ~((align_bytes)-1))
@@ -65,6 +70,8 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+struct _lv_draw_vg_lite_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -118,7 +125,14 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
 
 void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
 
-bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src);
+void lv_vg_lite_image_dec_init(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
+
+bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
+                                  bool no_cache);
+
+void lv_vg_lite_image_dsc_init(struct _lv_draw_vg_lite_unit_t * unit);
+
+void lv_vg_lite_image_dsc_deinit(struct _lv_draw_vg_lite_unit_t * unit);
 
 vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode);
 
@@ -134,20 +148,13 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src);
 
 bool lv_vg_lite_path_check(const vg_lite_path_t * path);
 
+bool lv_vg_lite_matrix_check(const vg_lite_matrix_t * matrix);
+
 /* Wrapper */
 
 bool lv_vg_lite_support_blend_normal(void);
 
 bool lv_vg_lite_16px_align(void);
-
-void lv_vg_lite_draw_linear_grad(
-    vg_lite_buffer_t * buffer,
-    vg_lite_path_t * path,
-    const lv_area_t * area,
-    const lv_grad_dsc_t * grad,
-    const vg_lite_matrix_t * matrix,
-    vg_lite_fill_t fill,
-    vg_lite_blend_t blend);
 
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 
@@ -160,6 +167,10 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 void lv_vg_lite_set_scissor_area(const lv_area_t * area);
 
 void lv_vg_lite_disable_scissor(void);
+
+void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u);
+
+void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u);
 
 /**********************
  *      MACROS

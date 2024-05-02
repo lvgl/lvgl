@@ -5,7 +5,7 @@ X11 Display/Inputs driver
 Overview
 -------------
 
-| The **X11** display/input `driver <https://github.com/lvgl/lvgl/src/dev/x11>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in an X11 desktop window.
+| The **X11** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/x11>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in an X11 desktop window.
 | It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
 
 The main purpose for this driver is for testing/debugging the LVGL application in a **Linux** simulation window.
@@ -66,7 +66,7 @@ Usage
         ...
 
         /* initialize X11 display driver */
-        lv_disp_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+        lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
 
         /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
         lv_x11_inputs_create(disp, NULL);
@@ -77,8 +77,8 @@ Usage
         {
             ...
 
-            /* Periodically call the lv_task handler */
-            lv_task_handler();
+            /* Periodically call the lv_timer handler */
+            lv_timer_handler();
         }
     }
 
@@ -103,11 +103,11 @@ Usage
         ...
 
         /* initialize X11 display driver */
-        lv_disp_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
+        lv_display_t * disp = lv_x11_window_create("LVGL X11 Simulation", monitor_hor_res, monitor_ver_res);
         lv_display_add_event_cb(disp, on_close_cb, LV_EVENT_DELETE, disp);
 
         /* initialize X11 input drivers (for keyboard, mouse & mousewheel) */
-        LV_IMG_DECLARE(my_mouse_cursor_icon);
+        LV_IMAGE_DECLARE(my_mouse_cursor_icon);
         lv_x11_inputs_create(disp, &my_mouse_cursor_icon);
 
         #if !LV_X11_DIRECT_EXIT
@@ -121,7 +121,7 @@ Usage
         {
             ...
 
-            /* Periodically call the lv_task handler */
-            lv_task_handler();
+            /* Periodically call the lv_timer handler */
+            lv_timer_handler();
         }
     }

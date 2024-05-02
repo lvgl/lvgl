@@ -39,6 +39,9 @@
 #if LV_USE_DRAW_VG_LITE
     #include "draw/vg_lite/lv_draw_vg_lite.h"
 #endif
+#if LV_USE_WINDOWS
+    #include "drivers/windows/lv_windows_context.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -90,9 +93,13 @@ static inline void lv_global_init(lv_global_t * global)
     global->style_refresh = true;
     global->layout_count = _LV_LAYOUT_LAST;
     global->style_last_custom_prop_id = (uint32_t)_LV_STYLE_LAST_BUILT_IN_PROP;
-    global->area_trans_cache.angle_prev = INT32_MIN;
     global->event_last_register_id = _LV_EVENT_LAST;
     lv_rand_set_seed(0x1234ABCD);
+
+#ifdef LV_LOG_PRINT_CB
+    void LV_LOG_PRINT_CB(lv_log_level_t, const char * txt);
+    global->custom_log_print_cb = LV_LOG_PRINT_CB;
+#endif
 
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     global->sw_shadow_cache.cache_size = -1;
@@ -185,6 +192,10 @@ void lv_init(void)
     lv_draw_sdl_init();
 #endif
 
+#if LV_USE_WINDOWS
+    lv_windows_platform_init();
+#endif
+
     _lv_obj_style_init();
 
     /*Initialize the screen refresh system*/
@@ -194,7 +205,7 @@ void lv_init(void)
     _lv_sysmon_builtin_init();
 #endif
 
-    _lv_image_decoder_init();
+    _lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
 #if LV_USE_DRAW_VG_LITE
@@ -258,6 +269,18 @@ void lv_init(void)
     lv_fs_memfs_init();
 #endif
 
+#if LV_USE_FS_LITTLEFS
+    lv_fs_littlefs_init();
+#endif
+
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    lv_fs_arduino_esp_littlefs_init();
+#endif
+
+#if LV_USE_FS_ARDUINO_SD
+    lv_fs_arduino_sd_init();
+#endif
+
 #if LV_USE_LODEPNG
     lv_lodepng_init();
 #endif
@@ -286,11 +309,7 @@ void lv_init(void)
 
 #if LV_USE_FREETYPE
     /*Init freetype library*/
-#  if LV_FREETYPE_CACHE_SIZE >= 0
-    lv_freetype_init(LV_FREETYPE_CACHE_FT_FACES, LV_FREETYPE_CACHE_FT_SIZES, LV_FREETYPE_CACHE_SIZE);
-#  else
-    lv_freetype_init(0, 0, 0);
-#  endif
+    lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
 #endif
 
 #if LV_USE_TINY_TTF

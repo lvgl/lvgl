@@ -6,12 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include <stdint.h>
-#include <stdbool.h>
-
 #include "../lvgl.h"
 #include "../misc/lv_fs.h"
+#include "../misc/lv_types.h"
+#include "../stdlib/lv_string.h"
 #include "lv_binfont_loader.h"
 
 /**********************
@@ -78,47 +76,44 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_binfont_load(lv_font_t * font, const char * path)
+lv_font_t * lv_binfont_create(const char * path)
 {
-    LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(path);
-
-    lv_result_t result = LV_RESULT_INVALID;
 
     lv_fs_file_t file;
     lv_fs_res_t fs_res = lv_fs_open(&file, path, LV_FS_MODE_RD);
-    if(fs_res != LV_FS_RES_OK) return result;
+    if(fs_res != LV_FS_RES_OK) return NULL;
 
-    lv_memzero(font, sizeof(lv_font_t));
-    if(lvgl_load_font(&file, font)) {
-        result = LV_RESULT_OK;
-    }
-    else {
-        LV_LOG_WARN("Error loading font file: %s\n", path);
+    lv_font_t * font = lv_malloc_zeroed(sizeof(lv_font_t));
+    LV_ASSERT_MALLOC(font);
+
+    if(!lvgl_load_font(&file, font)) {
+        LV_LOG_WARN("Error loading font file: %s", path);
         /*
         * When `lvgl_load_font` fails it can leak some pointers.
         * All non-null pointers can be assumed as allocated and
-        * `lv_font_free` should free them correctly.
+        * `lv_binfont_destroy` should free them correctly.
         */
-        lv_font_free(font);
+        lv_binfont_destroy(font);
+        font = NULL;
     }
 
     lv_fs_close(&file);
 
-    return result;
+    return font;
 }
 
 #if LV_USE_FS_MEMFS
-lv_result_t lv_binfont_load_from_buffer(lv_font_t * font, void * buffer, uint32_t size)
+lv_font_t * lv_binfont_create_from_buffer(void * buffer, uint32_t size)
 {
     lv_fs_path_ex_t mempath;
 
     lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, buffer, size);
-    return lv_binfont_load(font, (const char *)&mempath);
+    return lv_binfont_create((const char *)&mempath);
 }
 #endif
 
-void lv_font_free(lv_font_t * font)
+void lv_binfont_destroy(lv_font_t * font)
 {
     if(font == NULL) return;
 
@@ -155,6 +150,7 @@ void lv_font_free(lv_font_t * font)
     lv_free((void *)dsc->glyph_bitmap);
     lv_free((void *)dsc->glyph_dsc);
     lv_free((void *)dsc);
+    lv_free(font);
 }
 
 /**********************
@@ -210,7 +206,7 @@ static int read_label(lv_fs_file_t * fp, int start, const char * label)
 
     if(lv_fs_read(fp, &length, 4, NULL) != LV_FS_RES_OK
        || lv_fs_read(fp, buf, 4, NULL) != LV_FS_RES_OK
-       || memcmp(label, buf, 4) != 0) {
+       || lv_memcmp(label, buf, 4) != 0) {
         LV_LOG_WARN("Error reading '%s' label.", label);
         return -1;
     }
@@ -240,7 +236,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
 
         switch(cmap_table[i].format_type) {
             case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL: {
-                    uint8_t ids_size = sizeof(uint8_t) * cmap_table[i].data_entries_count;
+                    uint8_t ids_size = (uint8_t)(sizeof(uint8_t) * cmap_table[i].data_entries_count);
                     uint8_t * glyph_id_ofs_list = lv_malloc(ids_size);
 
                     cmap->glyph_id_ofs_list = glyph_id_ofs_list;
@@ -300,7 +296,7 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
     lv_font_fmt_txt_cmap_t * cmaps =
         lv_malloc(cmaps_subtables_count * sizeof(lv_font_fmt_txt_cmap_t));
 
-    memset(cmaps, 0, cmaps_subtables_count * sizeof(lv_font_fmt_txt_cmap_t));
+    lv_memset(cmaps, 0, cmaps_subtables_count * sizeof(lv_font_fmt_txt_cmap_t));
 
     font_dsc->cmaps = cmaps;
     font_dsc->cmap_num = cmaps_subtables_count;
@@ -325,7 +321,7 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     lv_font_fmt_txt_glyph_dsc_t * glyph_dsc = (lv_font_fmt_txt_glyph_dsc_t *)
                                               lv_malloc(loca_count * sizeof(lv_font_fmt_txt_glyph_dsc_t));
 
-    memset(glyph_dsc, 0, loca_count * sizeof(lv_font_fmt_txt_glyph_dsc_t));
+    lv_memset(glyph_dsc, 0, loca_count * sizeof(lv_font_fmt_txt_glyph_dsc_t));
 
     font_dsc->glyph_dsc = glyph_dsc;
 
@@ -454,9 +450,9 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
  * the pointer should be set on the `lv_font_t` data before any possible return.
  *
  * When something fails, it returns `false` and the memory on the `lv_font_t`
- * still needs to be freed using `lv_font_free`.
+ * still needs to be freed using `lv_binfont_destroy`.
  *
- * `lv_font_free` will assume that all non-null pointers are allocated and
+ * `lv_binfont_destroy` will assume that all non-null pointers are allocated and
  * should be freed.
  */
 static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
@@ -464,7 +460,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *)
                                        lv_malloc(sizeof(lv_font_fmt_txt_dsc_t));
 
-    memset(font_dsc, 0, sizeof(lv_font_fmt_txt_dsc_t));
+    lv_memset(font_dsc, 0, sizeof(lv_font_fmt_txt_dsc_t));
 
     font->dsc = font_dsc;
 
@@ -484,8 +480,8 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     font->get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt;
     font->get_glyph_bitmap = lv_font_get_bitmap_fmt_txt;
     font->subpx = font_header.subpixels_mode;
-    font->underline_position = font_header.underline_position;
-    font->underline_thickness = font_header.underline_thickness;
+    font->underline_position = (int8_t) font_header.underline_position;
+    font->underline_thickness = (int8_t) font_header.underline_thickness;
 
     font_dsc->bpp = font_header.bits_per_pixel;
     font_dsc->kern_scale = font_header.kerning_scale;
@@ -581,7 +577,7 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
     if(0 == kern_format_type) { /*sorted pairs*/
         lv_font_fmt_txt_kern_pair_t * kern_pair = lv_malloc(sizeof(lv_font_fmt_txt_kern_pair_t));
 
-        memset(kern_pair, 0, sizeof(lv_font_fmt_txt_kern_pair_t));
+        lv_memset(kern_pair, 0, sizeof(lv_font_fmt_txt_kern_pair_t));
 
         font_dsc->kern_dsc = kern_pair;
         font_dsc->kern_classes = 0;
@@ -619,7 +615,7 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
 
         lv_font_fmt_txt_kern_classes_t * kern_classes = lv_malloc(sizeof(lv_font_fmt_txt_kern_classes_t));
 
-        memset(kern_classes, 0, sizeof(lv_font_fmt_txt_kern_classes_t));
+        lv_memset(kern_classes, 0, sizeof(lv_font_fmt_txt_kern_classes_t));
 
         font_dsc->kern_dsc = kern_classes;
         font_dsc->kern_classes = 1;

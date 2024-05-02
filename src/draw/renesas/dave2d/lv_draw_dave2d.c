@@ -28,10 +28,9 @@
 static void execute_drawing(lv_draw_dave2d_unit_t * u);
 
 #if defined(RENESAS_CORTEX_M85)
-#if (BSP_CFG_DCACHE_ENABLED)
-static void _dave2d_buf_invalidate_cache_cb(void * buf, uint32_t stride, lv_color_format_t color_format,
-                                            const lv_area_t * area);
-#endif
+    #if (BSP_CFG_DCACHE_ENABLED)
+        static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+    #endif
 #endif
 
 static int32_t _dave2d_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
@@ -123,12 +122,15 @@ static void lv_draw_buf_dave2d_init_handlers(void)
 
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
-static void _dave2d_buf_invalidate_cache_cb(void * buf, uint32_t stride, lv_color_format_t color_format,
-                                            const lv_area_t * area)
+static void _dave2d_buf_invalidate_cache_cb(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
-    uint8_t * address = buf;
+    const lv_image_header_t * header = &draw_buf->header;
+    uint32_t stride = header->stride;
+    lv_color_format_t cf = header->cf;
+
+    uint8_t * address = draw_buf->data;
     int32_t i = 0;
-    uint32_t bytes_per_pixel = lv_color_format_get_size(color_format);
+    uint32_t bytes_per_pixel = lv_color_format_get_size(cf);
     int32_t width = lv_area_get_width(area);
     int32_t lines = lv_area_get_height(area);
     int32_t bytes_to_flush_per_line = (int32_t)width * (int32_t)bytes_per_pixel;
@@ -269,11 +271,8 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
 #if USE_D2
-                lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
-                if(draw_dsc->header.cf != LV_COLOR_FORMAT_RGB565A8) {
-                    t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
-                    t->preference_score = 0;
-                }
+                t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
+                t->preference_score = 0;
 #endif
                 ret = 0;
                 break;
@@ -476,7 +475,7 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     lv_area_move(&clipped_area, x, y);
 
     /* Invalidate cache */
-    lv_draw_buf_invalidate_cache(layer->buf, layer->buf_stride, layer->color_format, &clipped_area);
+    lv_draw_buf_invalidate_cache(layer->draw_buf, &clipped_area);
 #endif
 #endif
 

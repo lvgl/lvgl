@@ -13,7 +13,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj_class
+#define MY_CLASS (&lv_obj_class)
 
 /**********************
  *      TYPEDEFS
@@ -92,13 +92,12 @@ lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
     return res;
 }
 
-void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
-                         void * user_data)
+lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_allocate_spec_attr(obj);
 
-    lv_event_add(&obj->spec_attr->event_list, event_cb, filter, user_data);
+    return lv_event_add(&obj->spec_attr->event_list, event_cb, filter, user_data);
 }
 
 uint32_t lv_obj_get_event_count(lv_obj_t * obj)
@@ -137,6 +136,14 @@ bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
     }
 
     return false;
+}
+
+bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc)
+{
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NULL(dsc);
+    if(obj->spec_attr == NULL) return false;
+    return lv_event_remove_dsc(&obj->spec_attr->event_list, dsc);
 }
 
 uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data)
@@ -186,7 +193,9 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
        e->code == LV_EVENT_KEY ||
        e->code == LV_EVENT_FOCUSED ||
        e->code == LV_EVENT_DEFOCUSED ||
-       e->code == LV_EVENT_LEAVE) {
+       e->code == LV_EVENT_LEAVE ||
+       e->code == LV_EVENT_HOVER_OVER ||
+       e->code == LV_EVENT_HOVER_LEAVE) {
         return lv_event_get_param(e);
     }
     else {
@@ -227,6 +236,19 @@ uint32_t lv_event_get_key(lv_event_t * e)
     if(e->code == LV_EVENT_KEY) {
         uint32_t * k = lv_event_get_param(e);
         if(k) return *k;
+        else return 0;
+    }
+    else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
+}
+
+int32_t lv_event_get_rotary_diff(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_ROTARY) {
+        int32_t * r = lv_event_get_param(e);
+        if(r) return *r;
         else return 0;
     }
     else {

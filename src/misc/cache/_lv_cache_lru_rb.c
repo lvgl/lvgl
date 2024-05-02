@@ -3,6 +3,43 @@
 *
 */
 
+/***************************************************************************\
+*                                                                           *
+*                                             ┏ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ┓ *
+* ┏ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━          ┌ ─ ─ ─ ┐                *
+*             ┌ ─ ─ ─ ─ ─ ─ ─            ┃    ┃      Cache   insert       ┃ *
+* ┃               RB Tree    │                     │Hitting│  head          *
+*             └ ─ ─ ─ ─ ─ ─ ─            ┃    ┃     ─ ─ ─ ─               ┃ *
+* ┃      ┌─┬─┬─┬─┐                                  ┌─────┐                 *
+*     ┌──│◄│B│►│ │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┃─ ─ ╋ ─ ─▶│  B  │               ┃ *
+* ┃   │  └─┴─┴─┴─┘                                  └──▲──┘                 *
+*     │       │                          ┃    ┃        │                  ┃ *
+* ┃   │       │                                     ┌──┴──┐                 *
+*     │       └──────┐                ┌ ─┃─ ─ ╋ ─ ─▶│  E  │               ┃ *
+* ┃   ▼         ┌ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐   └──▲──┘                 *
+*  ┌─┬─┬─┬─┐         ▼                │  ┃    ┃        │                  ┃ *
+* ┃│◄│A│►│ │─ ─ ┘ ┌─┬─┬─┬─┐                     │   ┌──┴──┐                 *
+*  └─┴─┴─┴─┘  ┌───│◄│D│►│ │─ ─ ─ ─ ─ ─│─ ╋ ┐  ┃  ─ ▶│  A  │ ┌ ─ ─ ─ ─ ─ ┐ ┃ *
+* ┃           │   └─┴─┴─┴─┘                         └──▲──┘      LRU        *
+*             │        │              │  ┃ │  ┃        │    │   Cache   │ ┃ *
+* ┃           ▼        └──────┐                     ┌──┴──┐  ─ ─ ─ ─ ─ ─    *
+*          ┌─┬─┬─┬─┐          ▼       │  ┃ └ ─┃─ ─ ▶│  D  │               ┃ *
+* ┃        │◄│C│►│ │─ ─    ┌─┬─┬─┬─┐                └──▲──┘                 *
+*          └─┴─┴─┴─┘   │   │◄│E│►│ │─ ┘  ┃    ┃        │                  ┃ *
+* ┃                        └─┴─┴─┴─┘                ┌──┴──┐                 *
+*                      │        │      ─ ╋ ─ ─┃─ ─ ▶│  C  │               ┃ *
+* ┃                     ─ ─ ─ ─ ┼ ─ ─ ┘             └──▲──┘                 *
+*                               ▼        ┃    ┃   ┌ ─ ─│─ ─ ┐             ┃ *
+* ┃                          ┌─┬─┬─┬─┐              ┌──┴──┐                 *
+*                            │◄│F│►│ │─ ─┃─ ─ ╋ ─ ┼▶│  F  │ │             ┃ *
+* ┃                          └─┴─┴─┴─┘              └─────┘                 *
+*                                        ┃    ┃   └ ─ ─ ─ ─ ┘             ┃ *
+* ┃                                                 remove                  *
+*                                        ┃    ┃      tail                 ┃ *
+* ┗ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━      ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━ ━  *
+*                                                                           *
+\***************************************************************************/
+
 /*********************
  *      INCLUDES
  *********************/
@@ -44,6 +81,9 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
 static void remove_cb(lv_cache_t * cache, lv_cache_entry_t * entry, void * user_data);
 static void drop_cb(lv_cache_t * cache, const void * key, void * user_data);
 static void drop_all_cb(lv_cache_t * cache, void * user_data);
+static lv_cache_entry_t * get_victim_cb(lv_cache_t * cache, void * user_data);
+static lv_cache_reserve_cond_res_t reserve_cond_cb(lv_cache_t * cache, const void * key, size_t reserved_size,
+                                                   void * user_data);
 
 static void * alloc_new_node(lv_lru_rb_t_ * lru, void * key, void * user_data);
 inline static void ** get_lru_node(lv_lru_rb_t_ * lru, lv_rb_node_t * node);
@@ -63,7 +103,9 @@ const lv_cache_class_t lv_cache_class_lru_rb_count = {
     .add_cb = add_cb,
     .remove_cb = remove_cb,
     .drop_cb = drop_cb,
-    .drop_all_cb = drop_all_cb
+    .drop_all_cb = drop_all_cb,
+    .get_victim_cb = get_victim_cb,
+    .reserve_cond_cb = reserve_cond_cb
 };
 
 const lv_cache_class_t lv_cache_class_lru_rb_size = {
@@ -75,7 +117,9 @@ const lv_cache_class_t lv_cache_class_lru_rb_size = {
     .add_cb = add_cb,
     .remove_cb = remove_cb,
     .drop_cb = drop_cb,
-    .drop_all_cb = drop_all_cb
+    .drop_all_cb = drop_all_cb,
+    .get_victim_cb = get_victim_cb,
+    .reserve_cond_cb = reserve_cond_cb
 };
 /**********************
  *  STATIC VARIABLES
@@ -154,20 +198,19 @@ static bool init_cnt_cb(lv_cache_t * cache)
     LV_ASSERT_NULL(lru->cache.ops.free_cb);
     LV_ASSERT(lru->cache.node_size > 0);
 
-    if(lru->cache.node_size <= 0 || lru->cache.max_size <= 0
-       || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
+    if(lru->cache.node_size <= 0 || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
         return false;
     }
 
     /*add void* to store the ll node pointer*/
     if(!lv_rb_init(&lru->rb, lru->cache.ops.compare_cb, lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
-        return NULL;
+        return false;
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
 
     lru->get_data_size_cb = cnt_get_data_size_cb;
 
-    return lru;
+    return true;
 }
 
 static bool init_size_cb(lv_cache_t * cache)
@@ -178,20 +221,19 @@ static bool init_size_cb(lv_cache_t * cache)
     LV_ASSERT_NULL(lru->cache.ops.free_cb);
     LV_ASSERT(lru->cache.node_size > 0);
 
-    if(lru->cache.node_size <= 0 || lru->cache.max_size <= 0
-       || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
+    if(lru->cache.node_size <= 0 || lru->cache.ops.compare_cb == NULL || lru->cache.ops.free_cb == NULL) {
         return false;
     }
 
     /*add void* to store the ll node pointer*/
     if(!lv_rb_init(&lru->rb, lru->cache.ops.compare_cb, lv_cache_entry_get_size(lru->cache.node_size) + sizeof(void *))) {
-        return NULL;
+        return false;
     }
     _lv_ll_init(&lru->ll, sizeof(void *));
 
     lru->get_data_size_cb = size_get_data_size_cb;
 
-    return lru;
+    return true;
 }
 
 static void destroy_cb(lv_cache_t * cache, void * user_data)
@@ -259,34 +301,6 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
         return NULL;
     }
 
-    uint32_t data_size = lru->get_data_size_cb(key);
-    if(data_size > lru->cache.max_size) {
-        LV_LOG_ERROR("data size (%" LV_PRIu32 ") is larger than max size (%" LV_PRIu32 ")", data_size,
-                     (uint32_t)lru->cache.max_size);
-        return NULL;
-    }
-
-    void * tail = _lv_ll_get_tail(&lru->ll);
-    void * curr = tail;
-    while(cache->size + data_size > lru->cache.max_size) {
-        if(curr == NULL) {
-            LV_LOG_ERROR("failed to drop cache");
-            return NULL;
-        }
-
-        lv_rb_node_t * tail_node = *(lv_rb_node_t **)curr;
-        void * search_key = tail_node->data;
-        lv_cache_entry_t * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
-        if(lv_cache_entry_get_ref(entry) == 0) {
-            cache->clz->drop_cb(cache, search_key, user_data);
-            curr = _lv_ll_get_tail(&lru->ll);
-            continue;
-        }
-
-        curr = _lv_ll_get_prev(&lru->ll, curr);
-    }
-
-    /*cache miss*/
     lv_rb_node_t * new_node = alloc_new_node(lru, (void *)key, user_data);
     if(new_node == NULL) {
         return NULL;
@@ -294,7 +308,7 @@ static lv_cache_entry_t * add_cb(lv_cache_t * cache, const void * key, void * us
 
     lv_cache_entry_t * entry = lv_cache_entry_get_entry(new_node->data, cache->node_size);
 
-    cache->size += data_size;
+    cache->size += lru->get_data_size_cb(key);
 
     return entry;
 }
@@ -377,7 +391,7 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
             lru->cache.ops.free_cb(search_key, user_data);
         }
         else {
-            LV_LOG_WARN("entry (%p) is still referenced (%" LV_PRId32 ")", entry, lv_cache_entry_get_ref(entry));
+            LV_LOG_WARN("entry (%p) is still referenced (%" LV_PRId32 ")", (void *)entry, lv_cache_entry_get_ref(entry));
             used_cnt++;
         }
     }
@@ -389,6 +403,50 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
     _lv_ll_clear(&lru->ll);
 
     cache->size = 0;
+}
+
+static lv_cache_entry_t * get_victim_cb(lv_cache_t * cache, void * user_data)
+{
+    LV_UNUSED(user_data);
+
+    lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
+
+    LV_ASSERT_NULL(lru);
+
+    lv_rb_node_t ** tail;
+    _LV_LL_READ_BACK(&lru->ll, tail) {
+        lv_rb_node_t * tail_node = *tail;
+        lv_cache_entry_t * entry = lv_cache_entry_get_entry(tail_node->data, cache->node_size);
+        if(lv_cache_entry_get_ref(entry) == 0) {
+            return entry;
+        }
+    }
+
+    return NULL;
+}
+
+static lv_cache_reserve_cond_res_t reserve_cond_cb(lv_cache_t * cache, const void * key, size_t reserved_size,
+                                                   void * user_data)
+{
+    LV_UNUSED(user_data);
+
+    lv_lru_rb_t_ * lru = (lv_lru_rb_t_ *)cache;
+
+    LV_ASSERT_NULL(lru);
+
+    if(lru == NULL) {
+        return LV_CACHE_RESERVE_COND_ERROR;
+    }
+
+    uint32_t data_size = key ? lru->get_data_size_cb(key) : 0;
+    if(data_size > lru->cache.max_size) {
+        LV_LOG_ERROR("data size (%" LV_PRIu32 ") is larger than max size (%" LV_PRIu32 ")", data_size, lru->cache.max_size);
+        return LV_CACHE_RESERVE_COND_TOO_LARGE;
+    }
+
+    return cache->size + reserved_size + data_size > lru->cache.max_size
+           ? LV_CACHE_RESERVE_COND_NEED_VICTIM
+           : LV_CACHE_RESERVE_COND_OK;
 }
 
 static uint32_t cnt_get_data_size_cb(const void * data)

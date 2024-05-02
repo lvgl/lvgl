@@ -34,6 +34,7 @@ static lv_cache_compare_res_t compare_cb(const test_data * lhs, const test_data 
 
 static void free_cb(test_data * node, void * user_data)
 {
+    LV_UNUSED(user_data);
     lv_free(node->data);
 }
 
@@ -127,7 +128,7 @@ void test_cache_1(void)
      * Now drop the cache {key1 = 32, key2 = 33}. However, this entry is acquired once without release, so `drop`
      * will not release the memory allocated by this entry.
      */
-    uint32_t mem_curr_free = lv_test_get_free_mem();
+    size_t mem_curr_free = lv_test_get_free_mem();
     lv_cache_drop(cache, &search_key32, NULL);
     /*
      * Though it doesn't release the data, the entry and other structure has been freed.

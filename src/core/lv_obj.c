@@ -17,15 +17,14 @@
 #include "../misc/lv_assert.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
+#include "../misc/lv_types.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
-#include <stdint.h>
-#include <string.h>
 
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_obj_class
+#define MY_CLASS (&lv_obj_class)
 #define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
 #define STYLE_TRANSITION_MAX 32
@@ -372,11 +371,8 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
             lv_free(obj->spec_attr->children);
             obj->spec_attr->children = NULL;
         }
-        if(obj->spec_attr->event_list.dsc) {
-            lv_free(obj->spec_attr->event_list.dsc);
-            obj->spec_attr->event_list.dsc = NULL;
-            obj->spec_attr->event_list.cnt = 0;
-        }
+
+        lv_event_remove_all(&obj->spec_attr->event_list);
 
         lv_free(obj->spec_attr);
         obj->spec_attr = NULL;
@@ -390,7 +386,7 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 static void lv_obj_draw(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     if(code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res == LV_COVER_RES_MASKED) return;
@@ -427,19 +423,18 @@ static void lv_obj_draw(lv_event_t * e)
                 info->res = LV_COVER_RES_NOT_COVER;
                 return;
             }
-            const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad(obj, 0);
-            if(grad_dsc) {
-                uint32_t i;
-                for(i = 0; i < grad_dsc->stops_count; i++) {
-                    if(grad_dsc->stops[i].opa < LV_OPA_MAX) {
-                        info->res = LV_COVER_RES_NOT_COVER;
-                        return;
-                    }
+        }
+        const lv_grad_dsc_t * grad_dsc = lv_obj_get_style_bg_grad(obj, 0);
+        if(grad_dsc) {
+            uint32_t i;
+            for(i = 0; i < grad_dsc->stops_count; i++) {
+                if(grad_dsc->stops[i].opa < LV_OPA_MAX) {
+                    info->res = LV_COVER_RES_NOT_COVER;
+                    return;
                 }
             }
         }
         info->res = LV_COVER_RES_COVER;
-
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_layer_t * layer = lv_event_get_layer(e);
@@ -595,7 +590,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_KEY) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
-            char c = *((char *)lv_event_get_param(e));
+            uint32_t c = lv_event_get_key(e);
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
             }
@@ -614,7 +609,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_anim_enable_t anim_enable = LV_ANIM_OFF;
             int32_t sl = lv_obj_get_scroll_left(obj);
             int32_t sr = lv_obj_get_scroll_right(obj);
-            char c = *((char *)lv_event_get_param(e));
+            uint32_t c = lv_event_get_key(e);
             if(c == LV_KEY_DOWN) {
                 /*use scroll_to_x/y functions to enforce scroll limits*/
                 lv_obj_scroll_to_y(obj, lv_obj_get_scroll_y(obj) + lv_obj_get_height(obj) / 4, anim_enable);
@@ -717,6 +712,12 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
         lv_obj_remove_state(obj, LV_STATE_SCROLLED);
     }
+    else if(code == LV_EVENT_HOVER_OVER) {
+        lv_obj_add_state(obj, LV_STATE_HOVERED);
+    }
+    else if(code == LV_EVENT_HOVER_LEAVE) {
+        lv_obj_remove_state(obj, LV_STATE_HOVERED);
+    }
 }
 
 /**
@@ -744,7 +745,7 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     lv_obj_invalidate(obj);
 
     obj->state = new_state;
-
+    _lv_obj_update_layer_type(obj);
     _lv_obj_style_transition_dsc_t * ts = lv_malloc_zeroed(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     uint32_t tsi = 0;
     uint32_t i;

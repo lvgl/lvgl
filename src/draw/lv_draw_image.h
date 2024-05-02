@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_draw.h"
 #include "lv_image_decoder.h"
-#include "lv_image_buf.h"
+#include "lv_draw_buf.h"
 #include "../misc/lv_style.h"
 
 /*********************
@@ -55,9 +55,17 @@ typedef struct _lv_draw_image_dsc_t {
     lv_opa_t opa;
     lv_blend_mode_t blend_mode : 4;
 
-    uint16_t antialias      : 1;
-    uint16_t tile           : 1;
+    uint16_t antialias          : 1;
+    uint16_t tile               : 1;
     lv_draw_image_sup_t * sup;
+
+    /** Used to indicate the entire original, non-clipped area where the image is to be drawn.
+     * This is important for:
+     *  1. Layer rendering, where it might happen that only a smaller area of the layer is rendered.
+     *  2. Tiled images, where the target draw area is larger than the image to be tiled.
+     */
+    lv_area_t image_area;
+    const lv_image_dsc_t * bitmap_mask_src;
 } lv_draw_image_dsc_t;
 
 /**
@@ -84,10 +92,20 @@ typedef void (*lv_draw_image_core_cb)(lv_draw_unit_t * draw_unit, const lv_draw_
 void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc);
 
 /**
+ * Try to get an image draw descriptor from a draw task.
+ * @param task      draw task
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_IMAGE
+ */
+lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task);
+
+/**
  * Create an image draw task
  * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the image
+ * @note                `coords` can be small than the real image area
+ *                      (if only a part of the image is rendered)
+ *                      or can be larger (in case of tiled images).   .
  */
 void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
@@ -95,7 +113,9 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
  * Create a draw task to blend a layer to an other layer
  * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized draw descriptor
- * @param coords        the coordinates of the layer
+ * @param coords        the coordinates of the layer.
+ * @note                `coords` can be small than the total widget area from which the layer is created
+ *                      (if only a part of the widget was rendered to a layer)
  */
 void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
@@ -130,6 +150,19 @@ void _lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_imag
  */
 void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb);
+
+/**
+ * Get the area of a rectangle if its rotated and scaled
+ * @param res store the coordinates here
+ * @param w width of the rectangle to transform
+ * @param h height of the rectangle to transform
+ * @param angle angle of rotation
+ * @param scale_x zoom in x direction, (256 no zoom)
+ * @param scale_y zoom in y direction, (256 no zoom)
+ * @param pivot x,y pivot coordinates of rotation
+ */
+void _lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, int32_t angle,
+                                        uint16_t scale_x, uint16_t scale_y, const lv_point_t * pivot);
 
 #ifdef __cplusplus
 } /*extern "C"*/

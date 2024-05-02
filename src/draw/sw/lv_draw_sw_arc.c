@@ -118,22 +118,34 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     blend_dsc.opa = dsc->opa;
     blend_dsc.blend_area = &blend_area;
     blend_dsc.mask_area = &blend_area;
+
+    const uint8_t * img_mask = NULL;
+    lv_image_decoder_dsc_t decoder_dsc;
     if(dsc->img_src == NULL) {
         blend_dsc.color = dsc->color;
     }
     else {
-        lv_image_decoder_dsc_t decoder_dsc;
-        lv_image_decoder_open(&decoder_dsc, dsc->img_src, NULL);
-        img_area.x1 = 0;
-        img_area.y1 = 0;
-        img_area.x2 = decoder_dsc.header.w - 1;
-        img_area.y2 = decoder_dsc.header.h - 1;
-        int32_t ofs = decoder_dsc.header.w / 2;
-        lv_area_move(&img_area, dsc->center.x - ofs, dsc->center.y - ofs);
-        blend_dsc.src_area = &img_area;
-        blend_dsc.src_buf = decoder_dsc.decoded->data;
-        blend_dsc.src_color_format = decoder_dsc.decoded->header.cf;
-        blend_dsc.src_stride = decoder_dsc.decoded->header.stride;
+        lv_result_t res = lv_image_decoder_open(&decoder_dsc, dsc->img_src, NULL);
+        if(res == LV_RESULT_INVALID || decoder_dsc.decoded == NULL) {
+            LV_LOG_WARN("Can't decode the background image");
+            blend_dsc.color = dsc->color;
+        }
+        else {
+            img_area.x1 = 0;
+            img_area.y1 = 0;
+            img_area.x2 = decoder_dsc.decoded->header.w - 1;
+            img_area.y2 = decoder_dsc.decoded->header.h - 1;
+            int32_t ofs = decoder_dsc.decoded->header.w / 2;
+            lv_area_move(&img_area, dsc->center.x - ofs, dsc->center.y - ofs);
+            blend_dsc.src_area = &img_area;
+            blend_dsc.src_buf = decoder_dsc.decoded->data;
+            blend_dsc.src_stride = decoder_dsc.decoded->header.stride;
+            blend_dsc.src_color_format = decoder_dsc.decoded->header.cf;
+            if(blend_dsc.src_color_format == LV_COLOR_FORMAT_RGB565A8) {
+                blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
+                img_mask = (uint8_t *)blend_dsc.src_buf + blend_dsc.src_stride * lv_area_get_height(blend_dsc.src_area);
+            }
+        }
     }
 
     lv_opa_t * circle_mask = NULL;
@@ -171,17 +183,32 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         if(dsc->rounded) {
             if(blend_area.y1 >= round_area_1.y1 && blend_area.y1 <= round_area_1.y2) {
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
-                    lv_memset(mask_buf, 0x00, blend_w);
+                    lv_memzero(mask_buf, blend_w);
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 add_circle(circle_mask, &blend_area, &round_area_1, mask_buf, width);
             }
             if(blend_area.y1 >= round_area_2.y1 && blend_area.y1 <= round_area_2.y2) {
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
-                    lv_memset(mask_buf, 0x00, blend_w);
+                    lv_memzero(mask_buf, blend_w);
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 add_circle(circle_mask, &blend_area, &round_area_2, mask_buf, width);
+            }
+        }
+
+        /*If it was an RGB565A8 image use consider its A8 part on the mask*/
+        if(img_mask && blend_dsc.mask_res != LV_DRAW_SW_MASK_RES_TRANSP) {
+            const uint8_t * img_mask_tmp = img_mask;
+            img_mask_tmp += blend_dsc.src_stride / 2 * (blend_area.y1 - blend_dsc.src_area->y1);
+            img_mask_tmp += blend_area.x1 - blend_dsc.src_area->x1;
+
+            int32_t i;
+            for(i = 0; i < blend_w; i++) {
+                mask_buf[i] = LV_OPA_MIX2(mask_buf[i], img_mask_tmp[i]);
+            }
+            if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) {
+                blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             }
         }
 
@@ -198,6 +225,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     }
 
     lv_free(mask_buf);
+    if(dsc->img_src) lv_image_decoder_close(&decoder_dsc);
     if(circle_mask) lv_free(circle_mask);
 #else
     LV_LOG_WARN("Can't draw arc with LV_DRAW_SW_COMPLEX == 0");
@@ -267,6 +295,17 @@ static void get_rounded_area(int16_t angle, int32_t radius, uint8_t thickness, l
         res_area->y1 = cir_y - thick_half;
         res_area->y2 = cir_y + thick_half - thick_corr;
     }
+}
+
+#else /*LV_DRAW_SW_COMPLEX*/
+
+void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords)
+{
+    LV_UNUSED(draw_unit);
+    LV_UNUSED(dsc);
+    LV_UNUSED(coords);
+
+    LV_LOG_WARN("LV_DRAW_SW_COMPLEX needs to be enabled");
 }
 
 #endif /*LV_DRAW_SW_COMPLEX*/
