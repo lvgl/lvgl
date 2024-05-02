@@ -124,11 +124,13 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
     lv_grad_t * cgrad = NULL;
 
     /*Prepare radial gradient*/
-    if (grad_dir == LV_GRAD_DIR_RADIAL) {
+    if(grad_dir == LV_GRAD_DIR_RADIAL) {
         lv_gradient_radial_setup(&dsc->grad);
-        cgrad = lv_gradient_get(&dsc->grad, 256, 0);           /* Create buffer for the gradient: the actual data will be calculated line by line */
+        cgrad = lv_gradient_get(&dsc->grad, 256,
+                                0);           /* Create buffer for the gradient: the actual data will be calculated line by line */
         blend_dsc.src_area = &blend_area;
-        blend_dsc.src_buf = grad->color_map;                   /* Use this buffer for the pixel data, instead of the gradient table */
+        blend_dsc.src_buf =
+            grad->color_map;                   /* Use this buffer for the pixel data, instead of the gradient table */
         grad_opa_map = grad->opa_map;
         blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB888;
     }
@@ -168,7 +170,8 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
 #if LV_DRAW_SW_COMPLEX_GRADIENTS
             /* Calculate radial gradient */
             else if(grad_dir == LV_GRAD_DIR_RADIAL) {
-                lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
+                lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w,
+                                            grad);
             }
 #endif
             lv_draw_sw_blend(draw_unit, &blend_dsc);
@@ -193,8 +196,9 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
             }
 #if LV_DRAW_SW_COMPLEX_GRADIENTS
             /* Calculate radial gradient */
-            else if (grad_dir == LV_GRAD_DIR_RADIAL) {
-                lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w, grad);
+            else if(grad_dir == LV_GRAD_DIR_RADIAL) {
+                lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w,
+                                            grad);
             }
 #endif
             lv_draw_sw_blend(draw_unit, &blend_dsc);
@@ -234,7 +238,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
             }
 #if LV_DRAW_SW_COMPLEX_GRADIENTS
             /* Calculate radial gradient */
-            else if (grad_dir == LV_GRAD_DIR_RADIAL) {
+            else if(grad_dir == LV_GRAD_DIR_RADIAL) {
                 lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
             }
 #endif
@@ -250,10 +254,10 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
         lv_gradient_cleanup(grad);
     }
 #if LV_DRAW_SW_COMPLEX_GRADIENTS
-    if (cgrad) {
+    if(cgrad) {
         lv_gradient_cleanup(cgrad);
     }
-    if (grad_dir == LV_GRAD_DIR_RADIAL) {
+    if(grad_dir == LV_GRAD_DIR_RADIAL) {
         lv_gradient_radial_cleanup(&dsc->grad);
     }
 #endif
