@@ -105,6 +105,11 @@ void lv_sysmon_show_performance(lv_display_t * disp)
     }
 
     disp->perf_label = lv_sysmon_create(disp);
+    if(disp->perf_label == NULL) {
+        LV_LOG_WARN("Couldn't create sysmon");
+        return;
+    }
+
     lv_subject_init_pointer(&disp->perf_sysmon_backend.subject, &disp->perf_sysmon_info);
     lv_obj_align(disp->perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
     lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, perf_observer_cb, disp->perf_label, NULL);
@@ -142,6 +147,11 @@ void lv_sysmon_show_memory(lv_display_t * disp)
     }
 
     disp->mem_label = lv_sysmon_create(disp);
+    if(disp->mem_label == NULL) {
+        LV_LOG_WARN("Couldn't create sysmon");
+        return;
+    }
+
     lv_obj_align(disp->mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
     lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
 
