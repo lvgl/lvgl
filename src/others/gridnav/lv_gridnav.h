@@ -80,6 +80,18 @@ typedef enum {
      * If there is no more room for scrolling the next/previous object will be focused normally */
     LV_GRIDNAV_CTRL_SCROLL_FIRST = 0x2,
 
+    /**
+     * Only use left/right keys for grid navigation. Up/down key events will be sent to the
+     * focused object.
+    */
+    LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY = 0x4,
+
+    /**
+     * Only use up/down keys for grid navigation. Left/right key events will be sent to the
+     * focused object.
+    */
+    LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY = 0x8
+
 } lv_gridnav_ctrl_t;
 
 /**********************
