@@ -89,7 +89,7 @@ fout.write(
 #endif
 
 #ifdef CONFIG_LV_COLOR_DEPTH
-    #define _LV_KCONFIG_PRESENT
+    #define LV_KCONFIG_PRESENT
 #endif
 
 /*----------------------------------
@@ -131,7 +131,7 @@ for line in fin.read().splitlines():
 
       fout.write(
         f'{indent}#ifndef {name}\n'
-        f'{indent}    #ifdef _LV_KCONFIG_PRESENT\n'
+        f'{indent}    #ifdef LV_KCONFIG_PRESENT\n'
         f'{indent}        #ifdef CONFIG_{name.upper()}\n'
         f'{indent}            #define {name} CONFIG_{name.upper()}\n'
         f'{indent}        #else\n'
@@ -175,7 +175,7 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_STRIDE_ALIGN);
 LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
-#undef _LV_KCONFIG_PRESENT
+#undef LV_KCONFIG_PRESENT
 
 /*Set some defines if a dependency is disabled*/
 #if LV_USE_LOG == 0
