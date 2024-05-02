@@ -33,7 +33,7 @@
  *      TYPEDEFS
  **********************/
 
-#if LV_DRAW_SW_COMPLEX_GRADIENTS
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 typedef struct {
     /* w = (-b(xp, yp) + sqrt(sqr(b(xp, yp)) - 4 * a * c(xp, yp))) / (2 * a) */
@@ -67,7 +67,7 @@ typedef struct {
 typedef lv_result_t (*op_cache_t)(lv_grad_t * c, void * ctx);
 static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h);
 
-#if LV_DRAW_SW_COMPLEX_GRADIENTS
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
     static inline uint32_t bsr(uint32_t a);
     static inline uint16_t fast_sqrt32(uint32_t val);
@@ -192,12 +192,12 @@ void lv_gradient_cleanup(lv_grad_t * grad)
     lv_free(grad);
 }
 
-#ifdef LV_DRAW_SW_COMPLEX_GRADIENTS
+#ifdef LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 /*bit scan reverse*/
 static inline uint32_t bsr(uint32_t a)
 {
-#ifdef __GNUC_
+#ifdef __GNUC__
     return __builtin_clz(a) ^ 31;
 #elif _WIN32
     unsigned long r = 0;
@@ -370,8 +370,8 @@ int32_t LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_w(lv_grad_dsc_t * dsc, int3
     return w;
 }
 
-int32_t LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, lv_grad_t * grad, int32_t x, int32_t y,
-                                                          int32_t width, lv_grad_t * result)
+void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, lv_grad_t * grad, int32_t x, int32_t y,
+                                                       int32_t width, lv_grad_t * result)
 {
     int32_t end = x + width;
     lv_color_t * buf = result->color_map;
@@ -391,6 +391,6 @@ int32_t LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, l
     }
 }
 
-#endif /* LV_DRAW_SW_COMPLEX_GRADIENTS */
+#endif /* LV_USE_DRAW_SW_COMPLEX_GRADIENTS */
 
 #endif /*LV_USE_DRAW_SW*/

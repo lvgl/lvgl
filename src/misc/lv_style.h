@@ -175,7 +175,7 @@ typedef struct {
                                                            LV_GRAD_TYPE_LINEAR, LV_GRAD_TYPE_RADIAL, LV_GRAD_TYPE_CONICAL */
     lv_grad_extend_t     extend : 2;                    /**< Behaviour outside the defined range.
                                                          * LV_GRAD_EXTEND_NONE, LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT */
-#if LV_DRAW_SW_COMPLEX_GRADIENTS
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
     union {
         /*Linear gradient parameters*/
         struct {

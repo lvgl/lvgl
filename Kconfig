@@ -229,6 +229,14 @@ menu "LVGL configuration"
 				0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only,
 				1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too.
 
+		config LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+			bool "Enable drawing complex gradients in software"
+			default n
+			depends on LV_USE_DRAW_SW
+			help
+				0: do not enable complex gradients
+				1: enable complex gradients (linear at an angle, radial or conical)
+
 		config LV_DRAW_SW_SHADOW_CACHE_SIZE
 			int "Allow buffering some shadow calculation"
 			depends on LV_DRAW_SW_COMPLEX

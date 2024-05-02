@@ -120,7 +120,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
         blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB888;
     }
 
-#if LV_DRAW_SW_COMPLEX_GRADIENTS
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
     lv_grad_t * cgrad = NULL;
 
     /*Prepare radial gradient*/
@@ -167,7 +167,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
             }
-#if LV_DRAW_SW_COMPLEX_GRADIENTS
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
             /* Calculate radial gradient */
             else if(grad_dir == LV_GRAD_DIR_RADIAL) {
                 lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w,
@@ -194,7 +194,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                     blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
             }
-#if LV_DRAW_SW_COMPLEX_GRADIENTS
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
             /* Calculate radial gradient */
             else if(grad_dir == LV_GRAD_DIR_RADIAL) {
                 lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w,
@@ -236,7 +236,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                 if(opa >= LV_OPA_MAX) blend_dsc.opa = grad->opa_map[h - bg_coords.y1];
                 else blend_dsc.opa = LV_OPA_MIX2(grad->opa_map[h - bg_coords.y1], opa);
             }
-#if LV_DRAW_SW_COMPLEX_GRADIENTS
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
             /* Calculate radial gradient */
             else if(grad_dir == LV_GRAD_DIR_RADIAL) {
                 lv_gradient_radial_get_line(&dsc->grad, cgrad, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
@@ -253,7 +253,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
     if(grad) {
         lv_gradient_cleanup(grad);
     }
-#if LV_DRAW_SW_COMPLEX_GRADIENTS
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
     if(cgrad) {
         lv_gradient_cleanup(cgrad);
     }
