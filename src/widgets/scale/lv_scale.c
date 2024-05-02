@@ -472,16 +472,16 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
 
     if(event_code == LV_EVENT_DRAW_MAIN) {
         if(scale->post_draw == false) {
+            scale_draw_main(obj, event);
             scale_find_section_tick_idx(obj);
             scale_draw_indicator(obj, event);
-            scale_draw_main(obj, event);
         }
     }
     if(event_code == LV_EVENT_DRAW_POST) {
         if(scale->post_draw == true) {
+            scale_draw_main(obj, event);
             scale_find_section_tick_idx(obj);
             scale_draw_indicator(obj, event);
-            scale_draw_main(obj, event);
         }
     }
     else if(event_code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
