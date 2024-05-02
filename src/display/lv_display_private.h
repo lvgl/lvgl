@@ -114,12 +114,12 @@ struct _lv_display_t {
 
     /** Screens of the display*/
     lv_obj_t ** screens;    /**< Array of screen objects.*/
+    lv_obj_t * sys_layer;   /**< @see lv_display_get_layer_sys*/
+    lv_obj_t * top_layer;   /**< @see lv_display_get_layer_top*/
     lv_obj_t * act_scr;     /**< Currently active screen on this display*/
+    lv_obj_t * bottom_layer;/**< @see lv_display_get_layer_bottom*/
     lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
     lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_screen_load_anim*/
-    lv_obj_t * bottom_layer;    /**< @see lv_display_get_layer_bottom*/
-    lv_obj_t * top_layer;       /**< @see lv_display_get_layer_top*/
-    lv_obj_t * sys_layer;       /**< @see lv_display_get_layer_sys*/
     uint32_t screen_cnt;
     uint8_t draw_prev_over_act  : 1;/** 1: Draw previous screen over active screen*/
     uint8_t del_prev  : 1; /** 1: Automatically delete the previous screen when the screen load animation is ready*/
