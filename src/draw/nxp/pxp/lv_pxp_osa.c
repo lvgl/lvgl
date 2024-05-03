@@ -66,11 +66,8 @@ static void _pxp_wait(void);
  *  STATIC VARIABLES
  **********************/
 
-#if defined(SDK_OS_FREE_RTOS)
-    static SemaphoreHandle_t xPXPIdleSemaphore;
-#endif
-#if defined(__ZEPHYR__)
-    static K_SEM_DEFINE(s_pxpIdleSem, 0, 1);
+#if LV_USE_OS
+    static lv_thread_sync_t pxp_sync;
 #endif
 static volatile bool ucPXPIdle;
 
@@ -91,22 +88,10 @@ static pxp_cfg_t _pxp_default_cfg = {
 
 void PXP_IRQHandler(void)
 {
-#if defined(SDK_OS_FREE_RTOS)
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-#endif
-
     if(kPXP_CompleteFlag & PXP_GetStatusFlags(PXP_ID)) {
         PXP_ClearStatusFlags(PXP_ID, kPXP_CompleteFlag);
-#if defined(SDK_OS_FREE_RTOS)
-        xSemaphoreGiveFromISR(xPXPIdleSemaphore, &xHigherPriorityTaskWoken);
-
-        /* If xHigherPriorityTaskWoken is now set to pdTRUE then a context switch
-        should be performed to ensure the interrupt returns directly to the highest
-        priority task.  The macro used for this purpose is dependent on the port in
-        use and may be called portEND_SWITCHING_ISR(). */
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-#elif defined(__ZEPHYR__)
-        k_sem_give(&s_pxpIdleSem);
+#if LV_USE_OS
+        lv_thread_sync_signal(&pxp_sync);
 #else
         ucPXPIdle = true;
 #endif
@@ -131,10 +116,13 @@ pxp_cfg_t * pxp_get_default_cfg(void)
 
 static void _pxp_interrupt_init(void)
 {
-#if defined(SDK_OS_FREE_RTOS)
-    xPXPIdleSemaphore = xSemaphoreCreateBinary();
-    PXP_ASSERT_MSG(xPXPIdleSemaphore, "xSemaphoreCreateBinary failed!");
+#if LV_USE_OS
+    if(lv_thread_sync_init(&pxp_sync) != LV_RESULT_OK) {
+        PXP_ASSERT_MSG(false, "Failed to init thread_sync.");
+    }
+#endif
 
+#if defined(SDK_OS_FREE_RTOS)
     NVIC_SetPriority(PXP_IRQ_ID, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1);
     NVIC_EnableIRQ(PXP_IRQ_ID);
 #elif defined(__ZEPHYR__)
@@ -148,10 +136,12 @@ static void _pxp_interrupt_deinit(void)
 {
 #if defined(SDK_OS_FREE_RTOS)
     NVIC_DisableIRQ(PXP_IRQ_ID);
-    vSemaphoreDelete(xPXPIdleSemaphore);
 #elif defined(__ZEPHYR__)
     irq_disable(DT_IRQN(DT_NODELABEL(pxp)));
-    k_sem_reset(&s_pxpIdleSem);
+#endif
+
+#if LV_USE_OS
+    lv_thread_sync_delete(&pxp_sync);
 #endif
 }
 
@@ -171,16 +161,11 @@ static void _pxp_run(void)
  */
 static void _pxp_wait(void)
 {
-#if defined(SDK_OS_FREE_RTOS)
-    /* Return if PXP was never started, otherwise the semaphore will lock forever. */
     if(ucPXPIdle == true)
         return;
-
-    if(xSemaphoreTake(xPXPIdleSemaphore, portMAX_DELAY) == pdTRUE)
+#if LV_USE_OS
+    if(lv_thread_sync_wait(&pxp_sync) == LV_RESULT_OK)
         ucPXPIdle = true;
-#elif defined(__ZEPHYR__)
-    if(k_sem_take(&s_pxpIdleSem, K_FOREVER) == 0)
-        s_pxpIdle = true;
 #else
     while(ucPXPIdle == false) {
     }
