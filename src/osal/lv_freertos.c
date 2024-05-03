@@ -329,40 +329,19 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
     /* If the cond is uninitialized, perform initialization. */
     prvCheckCondInit(pxCond);
 
-    /* Acquire the mutex. */
-    if(pdFALSE == xSemaphoreTakeFromISR(pxCond->xSyncMutex, NULL)) {
-        return LV_RESULT_INVALID;
-    }
+    /* Enter critical section to prevent preemption. */
+    _enter_critical();
 
     pxCond->xSyncSignal = pdTRUE;
-
-    /* Local copy of number of threads waiting. */
-    uint32_t ulLocalWaitingThreads = pxCond->ulWaitingThreads;
     BaseType_t xAnyHigherPriorityTaskWoken = pdFALSE;
 
-    /* Test local copy of threads waiting is larger than zero. */
-    while(ulLocalWaitingThreads > 0) {
-        /* Atomically check whether the copy in memory has changed.
-         * If not, set the copy of threads waiting in memory to zero. */
-        if(ATOMIC_COMPARE_AND_SWAP_SUCCESS == Atomic_CompareAndSwap_u32(
-               &pxCond->ulWaitingThreads,
-               0,
-               ulLocalWaitingThreads)) {
-            /* Unblock all. */
-            for(uint32_t i = 0; i < ulLocalWaitingThreads; i++) {
-                xSemaphoreGiveFromISR(pxCond->xCondWaitSemaphore, &xAnyHigherPriorityTaskWoken);
-                xHigherPriorityTaskWoken |= xAnyHigherPriorityTaskWoken;
-            }
-
-            break;
-        }
-
-        /* Local copy is out dated. Reload from memory and retry. */
-        ulLocalWaitingThreads = pxCond->ulWaitingThreads;
+    /* Unblock all. */
+    for(uint32_t i = 0; i < pxCond->ulWaitingThreads; i++) {
+        xSemaphoreGiveFromISR(pxCond->xCondWaitSemaphore, &xAnyHigherPriorityTaskWoken);
+        xHigherPriorityTaskWoken |= xAnyHigherPriorityTaskWoken;
     }
 
-    /* Release the mutex. */
-    xSemaphoreGiveFromISR(pxCond->xSyncMutex, NULL);
+    _exit_critical();
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 #endif
 
