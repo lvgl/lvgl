@@ -103,10 +103,10 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
     /*Get gradient if appropriate*/
     lv_grad_t * grad = lv_gradient_get(&dsc->grad, coords_bg_w, coords_bg_h);
     lv_opa_t * grad_opa_map = NULL;
+    bool transp = false;
     if(grad && grad_dir == LV_GRAD_DIR_HOR) {
         blend_dsc.src_area = &blend_area;
         blend_dsc.src_buf = grad->color_map + clipped_coords.x1 - bg_coords.x1;
-        bool transp = false;
         uint32_t s;
         for(s = 0; s < dsc->grad.stops_count; s++) {
             if(dsc->grad.stops[s].opa != LV_OPA_COVER) {
@@ -221,13 +221,18 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
         if(grad_dir == LV_GRAD_DIR_VER) {
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_FULL_COVER;
         }
-        else {//if(grad_dir == LV_GRAD_DIR_HOR) {
+        else if(grad_dir == LV_GRAD_DIR_HOR) {
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             blend_dsc.mask_buf = grad_opa_map;
         }
+        else {	/* complex gradients*/
+            blend_dsc.mask_res = transp ? LV_DRAW_SW_MASK_RES_CHANGED : LV_DRAW_SW_MASK_RES_FULL_COVER;
+            blend_dsc.mask_buf = grad_opa_map;
+        }
 
-        int32_t h_end = bg_coords.y2 - rout;
-        for(h = bg_coords.y1 + rout; h <= h_end; h++) {
+        int32_t h_start = LV_MAX(bg_coords.y1 + rout, clipped_coords.y1);
+        int32_t h_end = LV_MIN(bg_coords.y2 - rout, clipped_coords.y2);
+        for(h = h_start; h <= h_end; h++) {
             blend_area.y1 = h;
             blend_area.y2 = h;
 
