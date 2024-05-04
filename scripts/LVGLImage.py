@@ -174,7 +174,7 @@ class ColorFormat(Enum):
 
     @property
     def has_alpha(self) -> bool:
-        return self.is_alpha_only or self in (
+        return self.is_alpha_only or self.is_indexed or self in (
             ColorFormat.ARGB8888,
             ColorFormat.XRGB8888,  # const alpha: 0xff
             ColorFormat.ARGB8565,
@@ -412,12 +412,14 @@ class LVGLImage:
                  h: int = 0,
                  data: bytes = b'') -> None:
         self.stride = 0  # default no valid stride value
+        self.premulitplied = False
         self.set_data(cf, w, h, data)
 
     def __repr__(self) -> str:
-        return (
-            f"'LVGL image {self.w}x{self.h}, {self.cf.name}, stride: {self.stride}"
-            f" (12+{self.data_len})Byte'")
+        return (f"'LVGL image {self.w}x{self.h}, {self.cf.name}, "
+                f"{'Pre-multiplied, ' if self.premultiplied else ''}"
+                f"stride: {self.stride} "
+                f"(12+{self.data_len})Byte'")
 
     def adjust_stride(self, stride: int = 0, align: int = 1):
         """
@@ -484,7 +486,98 @@ class LVGLImage:
                               stride // 2))
 
         self.stride = stride
-        self.data = b''.join(data_out)
+        self.data = bytearray(b''.join(data_out))
+
+    def premulitply(self):
+        """
+        Pre-multiply image RGB data with alpha, set corresponding image header flags
+        """
+        if self.premulitplied:
+            raise ParameterError("Image already pre-mulitplied")
+
+        if not self.cf.has_alpha:
+            raise ParameterError(f"Image has no alpha channel: {self.cf.name}")
+
+        if self.cf.is_indexed:
+
+            def multiply(r, g, b, a):
+                r, g, b = (r * a) >> 8, (g * a) >> 8, (b * a) >> 8
+                return uint8_t(b) + uint8_t(g) + uint8_t(r) + uint8_t(a)
+
+            # process the palette only.
+            palette_size = self.cf.ncolors * 4
+            palette = self.data[:palette_size]
+            palette = [
+                multiply(palette[i], palette[i + 1], palette[i + 2],
+                         palette[i + 3]) for i in range(0, len(palette), 4)
+            ]
+            palette = b''.join(palette)
+            self.data = palette + self.data[palette_size:]
+        elif self.cf is ColorFormat.ARGB8888:
+
+            def multiply(b, g, r, a):
+                r, g, b = (r * a) >> 8, (g * a) >> 8, (b * a) >> 8
+                return uint32_t((a << 24) | (r << 16) | (g << 8) | (b << 0))
+
+            line_width = self.w * 4
+            for h in range(self.h):
+                offset = h * self.stride
+                map = self.data[offset:offset + self.stride]
+
+                processed = b''.join([
+                    multiply(map[i], map[i + 1], map[i + 2], map[i + 3])
+                    for i in range(0, line_width, 4)
+                ])
+                self.data[offset:offset + line_width] = processed
+        elif self.cf is ColorFormat.RGB565A8:
+
+            def multiply(data, a):
+                r = (data >> 11) & 0x1f
+                g = (data >> 5) & 0x3f
+                b = (data >> 0) & 0x1f
+
+                r, g, b = (r * a) // 255, (g * a) // 255, (b * a) // 255
+                return uint16_t((r << 11) | (g << 5) | (b << 0))
+
+            line_width = self.w * 2
+            for h in range(self.h):
+                # alpha map offset for this line
+                offset = self.h * self.stride + h * (self.stride // 2)
+                a = self.data[offset:offset + self.stride // 2]
+
+                # RGB map offset
+                offset = h * self.stride
+                rgb = self.data[offset:offset + self.stride]
+
+                processed = b''.join([
+                    multiply((rgb[i + 1] << 8) | rgb[i], a[i // 2])
+                    for i in range(0, line_width, 2)
+                ])
+                self.data[offset:offset + line_width] = processed
+        elif self.cf is ColorFormat.ARGB8565:
+
+            def multiply(data, a):
+                r = (data >> 11) & 0x1f
+                g = (data >> 5) & 0x3f
+                b = (data >> 0) & 0x1f
+
+                r, g, b = (r * a) // 255, (g * a) // 255, (b * a) // 255
+                return uint24_t((a << 16) | (r << 11) | (g << 5) | (b << 0))
+
+            line_width = self.w * 3
+            for h in range(self.h):
+                offset = h * self.stride
+                map = self.data[offset:offset + self.stride]
+
+                processed = b''.join([
+                    multiply((map[i + 1] << 8) | map[i], map[i + 2])
+                    for i in range(0, line_width, 3)
+                ])
+                self.data[offset:offset + line_width] = processed
+        else:
+            raise ParameterError(f"Not supported yet: {self.cf.name}")
+
+        self.premulitplied = True
 
     @property
     def data_len(self) -> int:
@@ -577,6 +670,7 @@ class LVGLImage:
             bin = bytearray()
             flags = 0
             flags |= 0x08 if compress != CompressMethod.NONE else 0
+            flags |= 0x01 if self.premulitplied else 0
 
             header = LVGLImageHeader(self.cf,
                                      self.w,
@@ -604,6 +698,8 @@ class LVGLImage:
         flags = "0"
         if compress is not CompressMethod.NONE:
             flags += " | LV_IMAGE_FLAGS_COMPRESSED"
+        if self.premulitplied:
+            flags += " | LV_IMAGE_FLAGS_PREMULTIPLIED"
 
         compressed = LVGLCompressData(self.cf, compress, self.data)
         macro = "LV_ATTRIBUTE_" + varname.upper()
@@ -819,7 +915,7 @@ const lv_image_dsc_t {varname} = {{
                 rawdata += row
 
         self.set_data(cf, w, h, rawdata)
-    
+
     def sRGB_to_linear(self, x):
         if x < 0.04045:
             return x / 12.92
@@ -1051,6 +1147,7 @@ class PNGConverter:
                  odir: str,
                  background: int = 0x00,
                  align: int = 1,
+                 premultiply: bool = False,
                  compress: CompressMethod = CompressMethod.NONE,
                  keep_folder=True) -> None:
         self.files = files
@@ -1060,6 +1157,7 @@ class PNGConverter:
         self.pngquant = None
         self.keep_folder = keep_folder
         self.align = align
+        self.premultiply = premultiply
         self.compress = compress
         self.background = background
 
@@ -1077,6 +1175,8 @@ class PNGConverter:
         for f in self.files:
             img = LVGLImage().from_png(f, self.cf, background=self.background)
             img.adjust_stride(align=self.align)
+            if self.premultiply:
+                img.premulitply()
             output.append((f, img))
             if self.ofmt == OutputFormat.BIN_FILE:
                 img.to_bin(self._replace_ext(f, ".bin"),
@@ -1105,6 +1205,9 @@ def main():
             "L8", "I1", "I2", "I4", "I8", "A1", "A2", "A4", "A8", "ARGB8888",
             "XRGB8888", "RGB565", "RGB565A8", "ARGB8565", "RGB888", "AUTO"
         ])
+
+    parser.add_argument('--premultiply', action='store_true',
+                        help="pre-multiply color with alpha", default=False)
 
     parser.add_argument('--compress',
                         help=("Binary data compress method, default to NONE"),
@@ -1159,6 +1262,7 @@ def main():
                              args.output,
                              background=args.background,
                              align=args.align,
+                             premultiply=args.premultiply,
                              compress=compress,
                              keep_folder=False)
     output = converter.convert()
@@ -1175,6 +1279,7 @@ def test():
                                cf=ColorFormat.ARGB8565,
                                background=0xFF_FF_00)
     img.adjust_stride(align=16)
+    img.premulitply()
     img.to_bin("output/cogwheel.ARGB8565.bin")
     img.to_c_array("output/cogwheel-abc.c")  # file name is used as c var name
     img.to_png("output/cogwheel.ARGB8565.png.png")  # convert back to png
