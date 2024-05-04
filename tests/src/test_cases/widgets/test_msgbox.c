@@ -44,7 +44,7 @@ void test_msgbox_creation_successful_with_close_button(void)
 
     TEST_ASSERT_NOT_NULL(msgbox);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/msgbox_ok_with_close_btn.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("ref_imgs/widgets/msgbox_ok_with_close_btn.png");
 }
 
 void test_msgbox_creation_successful_no_close_button(void)
@@ -58,7 +58,7 @@ void test_msgbox_creation_successful_no_close_button(void)
 
     TEST_ASSERT_NOT_NULL(msgbox);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/msgbox_ok_no_close_btn.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("ref_imgs/widgets/msgbox_ok_no_close_btn.png");
 }
 
 void test_msgbox_creation_successful_modal(void)
@@ -142,6 +142,40 @@ void test_msgbox_close_async_modal(void)
 
     // lv_msgbox_close deletes the message box
     TEST_ASSERT_NOT_NULL(msgbox);
+}
+
+void test_msgbox_content_auto_height(void)
+{
+    // If parent is NULL the message box will be modal
+    msgbox = lv_msgbox_create(NULL);
+    lv_msgbox_add_title(msgbox, "The title");
+    lv_msgbox_add_text(msgbox, "The text");
+    lv_msgbox_add_footer_button(msgbox, "Apply");
+    lv_msgbox_add_footer_button(msgbox, "Close");
+    lv_msgbox_add_header_button(msgbox, LV_SYMBOL_AUDIO);
+    lv_msgbox_add_close_button(msgbox);
+
+    /*change size of msgbox*/
+    lv_obj_set_size(msgbox, lv_pct(80), lv_pct(80));
+
+    lv_obj_update_layout(msgbox);
+    lv_obj_t * header = lv_msgbox_get_header(msgbox);
+    lv_obj_t * footer = lv_msgbox_get_footer(msgbox);
+    lv_obj_t * content = lv_msgbox_get_content(msgbox);
+
+    int32_t h_header = (header == NULL) ? 0 : lv_obj_get_height(header);
+    int32_t h_footer = (footer == NULL) ? 0 : lv_obj_get_height(footer);
+    int32_t h_content = lv_obj_get_height(content);
+
+    int32_t h_obj_content = lv_obj_get_content_height(msgbox);
+    int32_t h_msgbox_element_sum  = h_header + h_footer + h_content;
+
+    TEST_ASSERT_NOT_NULL(msgbox);
+
+    TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
+
+    // Since msgbox has no parent, it won´t be clean up at tearDown()
+    lv_obj_clean(msgbox);
 }
 
 #endif
