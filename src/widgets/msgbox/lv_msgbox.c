@@ -128,6 +128,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent)
     if(mbox->content == NULL) return NULL;
     lv_obj_class_init_obj(mbox->content);
     lv_obj_set_flex_flow(mbox->content, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_grow(mbox->content, 1);
 
     lv_obj_center(obj);
     return obj;
@@ -145,6 +146,7 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title)
         lv_obj_set_size(mbox->header, lv_pct(100), lv_display_get_dpi(lv_obj_get_display(obj)) / 3);
         lv_obj_set_flex_flow(mbox->header, LV_FLEX_FLOW_ROW);
         lv_obj_set_flex_align(mbox->header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+        lv_obj_remove_flag(mbox->header, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_move_to_index(mbox->header, 0);
     }
 
@@ -169,6 +171,7 @@ lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon)
     LV_ASSERT_MALLOC(obj);
     if(btn == NULL) return NULL;
     lv_obj_class_init_obj(btn);
+    lv_obj_remove_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
 
     if(icon) {
         lv_obj_t * img = lv_image_create(btn);
@@ -201,12 +204,14 @@ lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text)
 
         lv_obj_set_flex_flow(mbox->footer, LV_FLEX_FLOW_ROW);
         lv_obj_set_flex_align(mbox->footer, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+        lv_obj_remove_flag(mbox->footer, LV_OBJ_FLAG_SCROLLABLE);
     }
 
     lv_obj_t * btn = lv_obj_class_create_obj(&lv_msgbox_footer_button_class, mbox->footer);
     LV_ASSERT_MALLOC(obj);
     if(btn == NULL) return NULL;
     lv_obj_class_init_obj(btn);
+    lv_obj_remove_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
 
     if(text) {
         lv_obj_t * label = lv_label_create(btn);
