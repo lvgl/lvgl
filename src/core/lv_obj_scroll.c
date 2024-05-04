@@ -677,7 +677,8 @@ static void scroll_y_anim(void * obj, int32_t v)
 
 static void scroll_end_cb(lv_anim_t * a)
 {
-    lv_obj_send_event(a->var, LV_EVENT_SCROLL_END, NULL);
+    /*Do not sent END event if there wasn't a BEGIN*/
+    if(a->start_cb_called) lv_obj_send_event(a->var, LV_EVENT_SCROLL_END, NULL);
 }
 
 static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_point_t * scroll_value,

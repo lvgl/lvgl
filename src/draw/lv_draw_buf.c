@@ -33,6 +33,7 @@ static void * draw_buf_malloc(const lv_draw_buf_handlers_t * handler, size_t siz
 static void draw_buf_free(const lv_draw_buf_handlers_t * handler, void * buf);
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format);
 static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride);
+static void draw_buf_get_full_area(const lv_draw_buf_t * draw_buf, lv_area_t * full_area);
 
 /**********************
  *  STATIC VARIABLES
@@ -54,14 +55,15 @@ void _lv_draw_buf_init_handlers(void)
 
 void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers)
 {
-    lv_draw_buf_init_handlers(handlers, buf_malloc, buf_free, buf_align, NULL, width_to_stride);
+    lv_draw_buf_init_handlers(handlers, buf_malloc, buf_free, buf_align, NULL, NULL, width_to_stride);
 }
 
 void lv_draw_buf_init_handlers(lv_draw_buf_handlers_t * handlers,
                                lv_draw_buf_malloc_cb buf_malloc_cb,
                                lv_draw_buf_free_cb buf_free_cb,
                                lv_draw_buf_align_cb align_pointer_cb,
-                               lv_draw_buf_invalidate_cache_cb invalidate_cache_cb,
+                               lv_draw_buf_cache_operation_cb invalidate_cache_cb,
+                               lv_draw_buf_cache_operation_cb flush_cache_cb,
                                lv_draw_buf_width_to_stride_cb width_to_stride_cb)
 {
     lv_memzero(handlers, sizeof(lv_draw_buf_handlers_t));
@@ -69,6 +71,7 @@ void lv_draw_buf_init_handlers(lv_draw_buf_handlers_t * handlers,
     handlers->buf_free_cb = buf_free_cb;
     handlers->align_pointer_cb = align_pointer_cb;
     handlers->invalidate_cache_cb = invalidate_cache_cb;
+    handlers->flush_cache_cb = flush_cache_cb;
     handlers->width_to_stride_cb = width_to_stride_cb;
 }
 
@@ -108,18 +111,42 @@ void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_
 void lv_draw_buf_invalidate_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
                                        const lv_area_t * area)
 {
-    if(handlers->invalidate_cache_cb) {
-        LV_ASSERT_NULL(draw_buf);
-        const lv_image_header_t * header = &draw_buf->header;
-        lv_area_t full;
-        if(area == NULL) {
-            full = (lv_area_t) {
-                0, 0, header->w - 1, header->h - 1
-            };
-            area = &full;
-        }
-        handlers->invalidate_cache_cb(draw_buf, area);
+    LV_ASSERT_NULL(draw_buf);
+
+    if(!handlers->invalidate_cache_cb) {
+        return;
     }
+
+    lv_area_t full;
+    if(area == NULL) {
+        draw_buf_get_full_area(draw_buf, &full);
+        area = &full;
+    }
+
+    handlers->invalidate_cache_cb(draw_buf, area);
+}
+
+void lv_draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
+{
+    lv_draw_buf_flush_cache_user(&default_handlers, draw_buf, area);
+}
+
+void lv_draw_buf_flush_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
+                                  const lv_area_t * area)
+{
+    LV_ASSERT_NULL(draw_buf);
+
+    if(!handlers->flush_cache_cb) {
+        return;
+    }
+
+    lv_area_t full;
+    if(area == NULL) {
+        draw_buf_get_full_area(draw_buf, &full);
+        area = &full;
+    }
+
+    handlers->flush_cache_cb(draw_buf, area);
 }
 
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
@@ -568,4 +595,10 @@ static uint32_t _calculate_draw_buf_size(uint32_t w, uint32_t h, lv_color_format
     }
 
     return size;
+}
+
+static void draw_buf_get_full_area(const lv_draw_buf_t * draw_buf, lv_area_t * full_area)
+{
+    const lv_image_header_t * header = &draw_buf->header;
+    lv_area_set(full_area, 0, 0, header->w - 1, header->h - 1);
 }

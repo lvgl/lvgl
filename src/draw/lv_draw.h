@@ -176,7 +176,7 @@ struct _lv_layer_t  {
 
 typedef struct {
     lv_obj_t * obj;
-    uint32_t part;
+    lv_part_t part;
     uint32_t id1;
     uint32_t id2;
     lv_layer_t * layer;

@@ -12,14 +12,14 @@ coordinates was inspired by CSS. LVGL has by no means a complete
 implementation of CSS but a comparable subset is implemented (sometimes
 with minor adjustments).
 
-In short this means: - Explicitly set coordinates are stored in styles
-(size, position, layouts, etc.)
+In short this means: 
 
+- Explicitly set coordinates are stored in styles (size, position, layouts, etc.)
 - support min-width, max-width, min-height, max-height
 - have pixel, percentage, and "content" units
 - x=0; y=0 coordinate means the top-left corner of the parent plus the left/top padding plus border width
-- width/height means the full size, the "content area" is smaller with padding and border width - a subset
-  of flexbox and grid layouts are supported
+- width/height means the full size, the "content area" is smaller with padding and border width
+- a subset of flexbox and grid layouts are supported
 
 .. _coord_unites:
 

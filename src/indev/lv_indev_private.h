@@ -85,6 +85,7 @@ struct _lv_indev_t {
         lv_obj_t * last_obj;     /*The last object which was pressed*/
         lv_obj_t * scroll_obj;   /*The object being scrolled*/
         lv_obj_t * last_pressed; /*The lastly pressed object*/
+        lv_obj_t * last_hovered; /*The lastly hovered object*/
         lv_area_t scroll_area;
         lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
         int32_t diff;
