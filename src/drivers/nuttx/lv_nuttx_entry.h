@@ -64,6 +64,12 @@ void lv_nuttx_dsc_init(lv_nuttx_dsc_t * dsc);
  */
 void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result);
 
+/**
+ * Deinitialize the LVGL display driver for NuttX.
+ * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler.
+ */
+void lv_nuttx_deinit(lv_nuttx_result_t * result);
+
 #if LV_USE_NUTTX_CUSTOM_INIT
 /**
  * Initialize the LVGL display driver for NuttX using the provided custom configuration information.
@@ -72,6 +78,11 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result);
  */
 void lv_nuttx_init_custom(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result);
 
+/**
+ * Deinitialize the LVGL display driver for NuttX using the provided custom configuration information.
+ * @param result Pointer to the lv_nuttx_result_t structure containing display and input device handler.
+ */
+void lv_nuttx_deinit_custom(lv_nuttx_result_t * result);
 #endif /* LV_USE_NUTTX_CUSTOM_INIT */
 
 /**
