@@ -19,6 +19,7 @@
 #define img_decoder_ll_p &(LV_GLOBAL_DEFAULT()->img_decoder_ll)
 #define img_cache_p (LV_GLOBAL_DEFAULT()->img_cache)
 #define img_header_cache_p (LV_GLOBAL_DEFAULT()->img_header_cache)
+#define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
 
 /**********************
  *      TYPEDEFS
@@ -237,7 +238,8 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
             LV_LOG_TRACE("Stride mismatch");
             lv_result_t res = lv_draw_buf_adjust_stride(decoded, stride_expect);
             if(res != LV_RESULT_OK) {
-                lv_draw_buf_t * aligned = lv_draw_buf_create(decoded->header.w, decoded->header.h, decoded->header.cf, stride_expect);
+                lv_draw_buf_t * aligned = lv_draw_buf_create_user(image_cache_draw_buf_handlers, decoded->header.w, decoded->header.h,
+                                                                  decoded->header.cf, stride_expect);
                 if(aligned == NULL) {
                     LV_LOG_ERROR("No memory for Stride adjust.");
                     return NULL;
@@ -261,7 +263,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
             lv_draw_buf_premultiply(decoded);
         }
         else {
-            decoded = lv_draw_buf_dup(decoded);
+            decoded = lv_draw_buf_dup_user(image_cache_draw_buf_handlers, decoded);
             if(decoded == NULL) {
                 LV_LOG_ERROR("No memory for premulitplying.");
                 return NULL;
