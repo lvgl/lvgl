@@ -48,6 +48,13 @@ void lv_nuttx_cache_init(void)
     handlers->flush_cache_cb = flush_cache;
 }
 
+void lv_nuttx_cache_deinit(void)
+{
+    lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    handlers->invalidate_cache_cb = NULL;
+    handlers->flush_cache_cb = NULL;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

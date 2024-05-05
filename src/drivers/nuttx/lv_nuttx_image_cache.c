@@ -66,6 +66,19 @@ void lv_nuttx_image_cache_init(void)
     ctx->initialized = false;
 }
 
+void lv_nuttx_image_cache_deinit(void)
+{
+    if(ctx->initialized == false) goto FREE_CONTEXT;
+
+    mm_uninitialize(ctx->heap);
+    free(ctx->mem);
+
+FREE_CONTEXT:
+    lv_free(ctx);
+
+    ctx = NULL;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -76,7 +89,7 @@ static bool defer_init(void)
         return true;
     }
 
-    if(img_cache_p->max_size == 0) {
+    if(lv_image_cache_is_enabled() == false) {
         LV_LOG_INFO("Image cache is not initialized yet. Skipping deferred initialization. Because max_size is 0.");
         return false;
     }
