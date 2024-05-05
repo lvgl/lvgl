@@ -31,6 +31,8 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 #include "lodepng.h"
 #if LV_USE_LODEPNG
 
+#define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
+
 #ifdef LODEPNG_COMPILE_DISK
     #include <limits.h> /* LONG_MAX */
 #endif /* LODEPNG_COMPILE_DISK */
@@ -5307,7 +5309,7 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
     lodepng_free(idat);
 
     if(!state->error) {
-        lv_draw_buf_t * decoded = lv_draw_buf_create(*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
+        lv_draw_buf_t * decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, *w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
         if(decoded) {
             *out = (unsigned char*)decoded;
             outsize = decoded->data_size;
