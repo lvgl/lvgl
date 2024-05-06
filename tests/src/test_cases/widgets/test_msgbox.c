@@ -1,4 +1,4 @@
-#if LV_BUILD_TEST
+// #if LV_BUILD_TEST
 #include "../lvgl.h"
 
 #include "unity/unity.h"
@@ -44,7 +44,7 @@ void test_msgbox_creation_successful_with_close_button(void)
 
     TEST_ASSERT_NOT_NULL(msgbox);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("ref_imgs/widgets/msgbox_ok_with_close_btn.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/msgbox_ok_with_close_btn.png");
 }
 
 void test_msgbox_creation_successful_no_close_button(void)
@@ -58,7 +58,7 @@ void test_msgbox_creation_successful_no_close_button(void)
 
     TEST_ASSERT_NOT_NULL(msgbox);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("ref_imgs/widgets/msgbox_ok_no_close_btn.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/msgbox_ok_no_close_btn.png");
 }
 
 void test_msgbox_creation_successful_modal(void)
@@ -146,7 +146,7 @@ void test_msgbox_close_async_modal(void)
 
 void test_msgbox_content_auto_height(void)
 {
-    // If parent is NULL the message box will be modal
+    /* If parent is NULL the message box will be modal*/
     msgbox = lv_msgbox_create(NULL);
     lv_msgbox_add_title(msgbox, "The title");
     lv_msgbox_add_text(msgbox, "The text");
@@ -155,7 +155,10 @@ void test_msgbox_content_auto_height(void)
     lv_msgbox_add_header_button(msgbox, LV_SYMBOL_AUDIO);
     lv_msgbox_add_close_button(msgbox);
 
-    /*change size of msgbox*/
+    /* Now msgbox's height is LV_SIZE_CONTENT by default */
+    TEST_ASSERT_EQUAL(lv_obj_get_style_height(msgbox), LV_SIZE_CONTENT);
+
+    /* Now change size of msgbox manually*/
     lv_obj_set_size(msgbox, lv_pct(80), lv_pct(80));
 
     lv_obj_update_layout(msgbox);
@@ -174,7 +177,7 @@ void test_msgbox_content_auto_height(void)
 
     TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
 
-    // Since msgbox has no parent, it won´t be clean up at tearDown()
+    /* Since msgbox has no parent, it won´t be clean up at tearDown()*/
     lv_obj_clean(msgbox);
 }
 
