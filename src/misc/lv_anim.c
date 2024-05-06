@@ -39,6 +39,8 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
 static uint32_t convert_speed_to_time(uint32_t speed, int32_t start, int32_t end);
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(lv_anim_t * a_current);
+static void anim_set_start_values(lv_anim_t * a);
+static void anim_list_remove(lv_anim_t * a, bool call_completed);
 
 /**********************
  *  STATIC VARIABLES
@@ -94,30 +96,8 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     /*Initialize the animation descriptor*/
     lv_memcpy(new_anim, a, sizeof(lv_anim_t));
     if(a->var == a) new_anim->var = new_anim;
-    new_anim->run_round = state.anim_run_round;
-    new_anim->last_timer_run = lv_tick_get();
 
-    /*Set the start value*/
-    if(new_anim->early_apply) {
-        if(new_anim->get_value_cb) {
-            int32_t v_ofs = new_anim->get_value_cb(new_anim);
-            new_anim->start_value += v_ofs;
-            new_anim->end_value += v_ofs;
-
-        }
-
-        resolve_time(new_anim);
-
-        /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
-        if(a->exec_cb || a->custom_exec_cb) remove_concurrent_anims(new_anim);
-
-        if(new_anim->exec_cb) {
-            new_anim->exec_cb(new_anim->var, new_anim->start_value);
-        }
-        if(new_anim->custom_exec_cb) {
-            new_anim->custom_exec_cb(new_anim, new_anim->start_value);
-        }
-    }
+    anim_set_start_values(new_anim);
 
     /*Creating an animation changed the linked list.
      *It's important if it happens in a ready callback. (see `anim_timer`)*/
@@ -149,11 +129,7 @@ bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
     while(a != NULL) {
         bool del = false;
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
-            _lv_ll_remove(anim_ll_p, a);
-            if(a->deleted_cb != NULL) a->deleted_cb(a);
-            lv_free(a);
-            anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
-                                       the linked list*/
+            anim_list_remove(a, false);
             del_any = true;
             del = true;
         }
@@ -431,17 +407,7 @@ static void anim_completed_handler(lv_anim_t * a)
      * - no repeat left and no play back (simple one shot animation)
      * - no repeat, play back is enabled and play back is ready*/
     if(a->repeat_cnt == 0 && (a->playback_duration == 0 || a->playback_now == 1)) {
-
-        /*Delete the animation from the list.
-         * This way the `completed_cb` will see the animations like it's animation is already deleted*/
-        _lv_ll_remove(anim_ll_p, a);
-        /*Flag that the list has changed*/
-        anim_mark_list_change();
-
-        /*Call the callback function at the end*/
-        if(a->completed_cb != NULL) a->completed_cb(a);
-        if(a->deleted_cb != NULL) a->deleted_cb(a);
-        lv_free(a);
+        anim_list_remove(a, true);
     }
     /*If the animation is not deleted then restart it*/
     else {
@@ -533,12 +499,7 @@ static bool remove_concurrent_anims(lv_anim_t * a_current)
            (a->var == a_current->var) &&
            ((a->exec_cb && a->exec_cb == a_current->exec_cb)
             /*|| (a->custom_exec_cb && a->custom_exec_cb == a_current->custom_exec_cb)*/)) {
-            _lv_ll_remove(anim_ll_p, a);
-            if(a->deleted_cb != NULL) a->deleted_cb(a);
-            lv_free(a);
-            /*Read by `anim_timer`. It need to know if a delete occurred in the linked list*/
-            anim_mark_list_change();
-
+            anim_list_remove(a, false);
             del_any = true;
             del = true;
         }
@@ -549,4 +510,47 @@ static bool remove_concurrent_anims(lv_anim_t * a_current)
     }
 
     return del_any;
+}
+
+static void anim_set_start_values(lv_anim_t * a)
+{
+    a->run_round = state.anim_run_round;
+    a->last_timer_run = lv_tick_get();
+
+    if(a->early_apply) {
+        if(a->get_value_cb) {
+            int32_t v_ofs = a->get_value_cb(a);
+            a->start_value += v_ofs;
+            a->end_value += v_ofs;
+
+        }
+
+        resolve_time(a);
+
+        /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
+        if(a->exec_cb || a->custom_exec_cb) remove_concurrent_anims(a);
+
+        if(a->exec_cb) {
+            a->exec_cb(a->var, a->start_value);
+        }
+        if(a->custom_exec_cb) {
+            a->custom_exec_cb(a, a->start_value);
+        }
+    }
+}
+
+static void anim_list_remove(lv_anim_t * a, bool call_completed)
+{
+    /*Delete the animation from the list first.
+     * This way callbacks will see the animations like it's animation is already deleted*/
+    _lv_ll_remove(anim_ll_p, a);
+
+    /*Flag that the list has changed*/
+    anim_mark_list_change();
+
+    /*Call the callback function at the end*/
+    if(call_completed && a->completed_cb) a->completed_cb(a);
+    if(a->deleted_cb) a->deleted_cb(a);
+
+    lv_free(a);
 }
