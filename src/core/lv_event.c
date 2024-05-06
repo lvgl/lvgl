@@ -20,7 +20,7 @@
 typedef struct _lv_event_dsc_t {
     lv_event_cb_t cb;
     void * user_data;
-    lv_event_code_t filter : 8;
+    uint8_t filter;
 } lv_event_dsc_t;
 
 /**********************
