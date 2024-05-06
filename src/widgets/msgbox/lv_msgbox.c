@@ -31,6 +31,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void msgbox_close_click_event_cb(lv_event_t * e);
+static void msgbox_size_changed_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -128,7 +129,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent)
     if(mbox->content == NULL) return NULL;
     lv_obj_class_init_obj(mbox->content);
     lv_obj_set_flex_flow(mbox->content, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_grow(mbox->content, 1);
+    lv_obj_add_event_cb(obj, msgbox_size_changed_event_cb, LV_EVENT_SIZE_CHANGED, 0);
 
     lv_obj_center(obj);
     return obj;
@@ -278,6 +279,14 @@ static void msgbox_close_click_event_cb(lv_event_t * e)
     lv_obj_t * btn = lv_event_get_current_target(e);
     lv_obj_t * mbox = lv_obj_get_parent(lv_obj_get_parent(btn));
     lv_msgbox_close(mbox);
+}
+
+static void msgbox_size_changed_event_cb(lv_event_t * e)
+{
+    lv_obj_t * mbox = lv_event_get_target(e);
+    lv_obj_t * content = lv_msgbox_get_content(mbox);
+    bool is_msgbox_height_size_content = (lv_obj_get_style_height(mbox, 0) == LV_SIZE_CONTENT);
+    lv_obj_set_flex_grow(content, !is_msgbox_height_size_content);
 }
 
 #endif /*LV_USE_MSGBOX*/
