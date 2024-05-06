@@ -156,12 +156,12 @@ void test_msgbox_content_auto_height(void)
     lv_msgbox_add_close_button(msgbox);
 
     /* Now msgbox's height is LV_SIZE_CONTENT by default */
-    int8_t is_height_size_content = (lv_obj_get_style_height(msgbox) == LV_SIZE_CONTENT);
+    int8_t is_height_size_content = (lv_obj_get_style_height(msgbox, 0) == LV_SIZE_CONTENT);
     TEST_ASSERT_EQUAL(is_height_size_content, 1);
 
     /* Now change size of msgbox manually*/
     lv_obj_set_size(msgbox, lv_pct(80), lv_pct(80));
-    is_height_size_content = (lv_obj_get_style_height(msgbox) == LV_SIZE_CONTENT);
+    is_height_size_content = (lv_obj_get_style_height(msgbox, 0) == LV_SIZE_CONTENT);
     TEST_ASSERT_EQUAL(is_height_size_content, 0);
 
     lv_obj_update_layout(msgbox);
