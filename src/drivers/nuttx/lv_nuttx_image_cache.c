@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_nuttx_cache.h"
+#include "lv_nuttx_image_cache.h"
 #include "../../../lvgl.h"
 
 #if LV_CACHE_DEF_SIZE > 0
