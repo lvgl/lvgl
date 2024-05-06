@@ -90,7 +90,10 @@ struct _lv_indev_t {
         lv_area_t scroll_area;
         lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
         int32_t diff;
-
+        /*Short click streaks*/
+        uint8_t short_click_streak;
+        lv_point_t last_short_click_point;
+        uint32_t last_short_click_timestamp;
         /*Flags*/
         uint8_t scroll_dir : 4;
         uint8_t gesture_dir : 4;
