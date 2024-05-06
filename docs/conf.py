@@ -42,7 +42,8 @@ extensions = [
     'sphinx_sitemap',
     'lv_example',
     'sphinx_rtd_dark_mode',
-    'link_roles'
+    'link_roles',
+    'sphinxcontrib.mermaid'
 ]
 
 default_dark_mode = False
