@@ -308,6 +308,16 @@ void lv_scale_set_post_draw(lv_obj_t * obj, bool en)
     lv_obj_invalidate(obj);
 }
 
+void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+
+    scale->draw_ticks_on_top = en;
+
+    lv_obj_invalidate(obj);
+}
+
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -435,6 +445,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->last_tick_width = 0U;
     scale->first_tick_width = 0U;
     scale->post_draw = false;
+    scale->draw_ticks_on_top = false;
     scale->custom_label_cnt = 0U;
     scale->txt_src = NULL;
 

@@ -82,6 +82,7 @@ typedef struct {
     uint32_t major_tick_every   : 15;
     uint32_t label_enabled      : 1;
     uint32_t post_draw          : 1;
+    uint32_t draw_ticks_on_top  : 1;
     /* Round scale */
     uint32_t angle_range;
     int32_t rotation;
@@ -198,6 +199,13 @@ void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[]);
  * @param en        true: enable post draw
  */
 void lv_scale_set_post_draw(lv_obj_t * obj, bool en);
+
+/**
+ * Draw the scale ticks on top of all parts
+ * @param obj       pointer to a scale object
+ * @param en        true: enable draw ticks on top of all parts
+ */
+void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en);
 
 /**
  * Add a section to the given scale
