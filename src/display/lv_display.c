@@ -1031,7 +1031,7 @@ static void scr_load_anim_start(lv_anim_t * a)
 {
     lv_display_t * d = lv_obj_get_display(a->var);
 
-    d->prev_scr = lv_screen_active();
+    d->prev_scr = lv_display_get_screen_active(d);
     d->act_scr = a->var;
 
     lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOAD_START, NULL);
