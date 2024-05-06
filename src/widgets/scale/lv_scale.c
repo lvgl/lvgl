@@ -487,12 +487,13 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
             scale_find_section_tick_idx(obj);
             scale_calculate_main_compensation(obj);
 
-            if (scale->draw_ticks_on_top) {
-				scale_draw_main(obj, event);
-            	scale_draw_indicator(obj, event);
-            } else {
-            	scale_draw_indicator(obj, event);
-            	scale_draw_main(obj, event);
+            if(scale->draw_ticks_on_top) {
+                scale_draw_main(obj, event);
+                scale_draw_indicator(obj, event);
+            }
+            else {
+                scale_draw_indicator(obj, event);
+                scale_draw_main(obj, event);
             }
         }
     }
@@ -501,12 +502,13 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
             scale_find_section_tick_idx(obj);
             scale_calculate_main_compensation(obj);
 
-            if (scale->draw_ticks_on_top) {
-				scale_draw_main(obj, event);
-            	scale_draw_indicator(obj, event);
-            } else {
-            	scale_draw_indicator(obj, event);
-            	scale_draw_main(obj, event);
+            if(scale->draw_ticks_on_top) {
+                scale_draw_main(obj, event);
+                scale_draw_indicator(obj, event);
+            }
+            else {
+                scale_draw_indicator(obj, event);
+                scale_draw_main(obj, event);
             }
         }
     }
