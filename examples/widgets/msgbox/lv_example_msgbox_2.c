@@ -51,11 +51,13 @@ void lv_example_msgbox_2(void)
     lv_slider_set_value(slider_speed, 80, LV_ANIM_OFF);
 
     /* footer */
-    lv_msgbox_add_footer_button(setting, "Apply");
-    lv_msgbox_add_footer_button(setting, "Cancel");
+    lv_obj_t * apply_button = lv_msgbox_add_footer_button(setting, "Apply");
+    lv_obj_t * cancel_button = lv_msgbox_add_footer_button(setting, "Cancel");
 
     lv_obj_t * footer = lv_msgbox_get_footer(setting);
     lv_obj_set_style_bg_color(footer, lv_palette_main(LV_PALETTE_INDIGO), 0);
     lv_obj_set_style_bg_opa(footer, LV_OPA_100, 0);
+    lv_obj_set_flex_grow(apply_button, 1);
+    lv_obj_set_flex_grow(cancel_button, 1);
 }
 #endif
