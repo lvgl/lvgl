@@ -11,9 +11,10 @@ static void minimize_button_event_cb(lv_event_t * e)
 void lv_example_msgbox_2(void)
 {
     lv_obj_t * setting = lv_msgbox_create(lv_screen_active());
+    lv_obj_set_style_clip_corner(setting, true, 0);
 
     /* setting fixed size */
-    lv_obj_set_size(setting, 300, 220);
+    lv_obj_set_size(setting, 300, 200);
 
     /* setting's titlebar/header */
     lv_msgbox_add_title(setting, "Setting");
@@ -52,12 +53,13 @@ void lv_example_msgbox_2(void)
 
     /* footer */
     lv_obj_t * apply_button = lv_msgbox_add_footer_button(setting, "Apply");
+    lv_obj_set_flex_grow(apply_button, 1);
+
     lv_obj_t * cancel_button = lv_msgbox_add_footer_button(setting, "Cancel");
+    lv_obj_set_flex_grow(cancel_button, 1);
 
     lv_obj_t * footer = lv_msgbox_get_footer(setting);
     lv_obj_set_style_bg_color(footer, lv_palette_main(LV_PALETTE_INDIGO), 0);
     lv_obj_set_style_bg_opa(footer, LV_OPA_100, 0);
-    lv_obj_set_flex_grow(apply_button, 1);
-    lv_obj_set_flex_grow(cancel_button, 1);
 }
 #endif

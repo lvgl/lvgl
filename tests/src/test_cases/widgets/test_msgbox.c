@@ -30,6 +30,7 @@ void setUp(void)
 void tearDown(void)
 {
     lv_obj_clean(active_screen);
+    lv_obj_clean(lv_layer_top()); /*Modal message boxes are created on the top layer*/
 }
 
 void test_msgbox_creation_successful_with_close_button(void)
@@ -156,7 +157,7 @@ void test_msgbox_content_auto_height(void)
     lv_msgbox_add_close_button(msgbox);
 
     /* Test1 : msgbox's height is LV_SIZE_CONTENT by default */
-    int8_t is_height_size_content = (lv_obj_get_style_height(msgbox, 0) == LV_SIZE_CONTENT);
+    bool is_height_size_content = (lv_obj_get_style_height(msgbox, 0) == LV_SIZE_CONTENT);
     TEST_ASSERT_EQUAL(is_height_size_content, 1);
 
     lv_obj_update_layout(msgbox);

@@ -1124,6 +1124,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
         lv_obj_add_style(obj, &theme->styles.pad_zero, 0);
+        lv_obj_add_style(obj, &theme->styles.clip_corner, 0);
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_backdrop_class)) {
@@ -1139,6 +1140,12 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
         return;
     }
+    else if(lv_obj_check_type(obj, &lv_msgbox_content_class)) {
+        lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
+        lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        return;
+    }
     else if(lv_obj_check_type(obj, &lv_msgbox_header_button_class) ||
             lv_obj_check_type(obj, &lv_msgbox_footer_button_class)) {
         lv_obj_add_style(obj, &theme->styles.btn, 0);
@@ -1149,11 +1156,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &theme->styles.bg_color_secondary, LV_STATE_CHECKED);
         lv_obj_add_style(obj, &theme->styles.disabled, LV_STATE_DISABLED);
-        return;
-    }
-
-    if(lv_obj_check_type(parent, &lv_msgbox_class)) {
-        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
         return;
     }
 
