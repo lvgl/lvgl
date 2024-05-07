@@ -170,8 +170,7 @@ void test_msgbox_content_auto_height(void)
     // int32_t h_content = lv_obj_get_height(content);
 
     // int32_t h_obj_content = lv_obj_get_content_height(msgbox);
-    // int32_t h_msgbox_element_sum  = h_header + h_footer + h_content;
-    
+    // int32_t h_msgbox_element_sum  = h_header + h_footer + h_content;    
     // TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
 
     // /* Test2 : Now change size of msgbox manually*/
@@ -187,7 +186,6 @@ void test_msgbox_content_auto_height(void)
 
     // h_obj_content = lv_obj_get_content_height(msgbox);
     // h_msgbox_element_sum  = h_header + h_footer + h_content;
-    
     // TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
 }
 
