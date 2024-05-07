@@ -44,13 +44,7 @@ typedef struct {
 } lv_nuttx_result_t;
 
 typedef struct _lv_nuttx_ctx_t {
-
-#if LV_CACHE_DEF_SIZE > 0
     void * image_cache;
-#else
-    void * dummy;
-#endif
-
 } lv_nuttx_ctx_t;
 
 /**********************

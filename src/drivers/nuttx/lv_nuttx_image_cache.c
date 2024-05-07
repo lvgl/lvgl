@@ -10,8 +10,6 @@
 #include "lv_nuttx_image_cache.h"
 #include "../../../lvgl.h"
 
-#if LV_CACHE_DEF_SIZE > 0
-
 #if LV_USE_NUTTX
 
 #include <nuttx/mm/mm.h>
@@ -76,6 +74,11 @@ static bool defer_init(void)
 {
     if(ctx->mem != NULL && ctx->heap != NULL) {
         return true;
+    }
+
+    if(img_cache_p->max_size == 0) {
+        LV_LOG_INFO("Image cache is not initialized yet. Skipping deferred initialization. Because max_size is 0.");
+        return false;
     }
 
     ctx->mem_size = img_cache_p->max_size;
@@ -150,4 +153,3 @@ static void free_cb(void * draw_buf)
 }
 
 #endif /* LV_USE_NUTTX */
-#endif /* LV_CACHE_DEF_SIZE > 0 */
