@@ -52,7 +52,7 @@ typedef struct {
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom user data*/
 #endif
-    char txt[];
+    char txt[1];
 } lv_table_cell_t;
 
 /*Data of table*/
