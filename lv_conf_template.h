@@ -88,6 +88,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM */
 #define LV_USE_OS   LV_OS_NONE
 
