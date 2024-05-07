@@ -9,15 +9,16 @@
 #include "../../../lvgl.h"
 
 #if LV_USE_FS_FATFS
-
-#define FF_DIR DIR    /* ESP IDF typedefs `DIR` as `FF_DIR`. Rename to `DIR` for use with this source file */
-#define FATFS_DIR DIR /* Mbed OS typedefs `DIR` as `FATFS_DIR`. Rename to `DIR` for use with this source file */
 #include "ff.h"
 
 #include "../../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
+
+#ifdef ESP_PLATFORM
+#define DIR FF_DIR  /* ESP IDF typedefs `DIR` as `FF_DIR` in its version of ff.h. Use `FF_DIR` in LVGL too */
+#endif
 
 #if LV_FS_FATFS_LETTER == '\0'
     #error "LV_FS_FATFS_LETTER must be an upper case ASCII letter"
