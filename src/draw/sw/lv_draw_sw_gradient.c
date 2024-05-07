@@ -107,7 +107,7 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h)
 // Lawrence Kirby for the rearrangement, improvments and range optimization
 // and Paul Hsieh for the round-then-adjust idea.
 */
-static inline uint32_t fast_sqrt32(uint32_t x)
+static inline int32_t fast_sqrt32(uint32_t x)
 {
     static const unsigned char sqq_table[] = {
         0,  16,  22,  27,  32,  35,  39,  42,  45,  48,  50,  53,  55,  57,
@@ -131,7 +131,7 @@ static inline uint32_t fast_sqrt32(uint32_t x)
         253, 254, 254, 255
     };
 
-    unsigned long xn;
+    int32_t xn;
 
     if(x >= 0x10000)
         if(x >= 0x1000000)
@@ -364,6 +364,7 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc)
     int32_t dr = r_end - r_start;
 #endif
     if(end.x == start.x && end.y == start.y) {
+        LV_ASSERT(dr != 0);
         grad_r->a4 = sqr32(dr) << 2;
         grad_r->bpx = 0;
         grad_r->bpy = 0;
@@ -420,7 +421,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, lv_g
 
     /* check for possible clipping */
     if(grad_r->clip_area.x1 != -0x7fffffff) {
-        /* fill line with starting color for pixels outside the clipped region */
+        /* fill line with end color for pixels outside the clipped region */
         lv_color_t * _buf = buf;
         lv_opa_t * _opa = opa;
         lv_color_t _c = grad->color_map[255];
