@@ -225,7 +225,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             blend_dsc.mask_buf = grad_opa_map;
         }
-        else {	/* complex gradients*/
+        else {  /* complex gradients*/
             blend_dsc.mask_res = transp ? LV_DRAW_SW_MASK_RES_CHANGED : LV_DRAW_SW_MASK_RES_FULL_COVER;
             blend_dsc.mask_buf = grad_opa_map;
         }
