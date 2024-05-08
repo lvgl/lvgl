@@ -161,6 +161,36 @@ void test_msgbox_content_auto_height(void)
     TEST_ASSERT_EQUAL(is_height_size_content, 1);
 
     lv_obj_update_layout(msgbox);
+    lv_obj_t * header = lv_msgbox_get_header(msgbox);
+    lv_obj_t * footer = lv_msgbox_get_footer(msgbox);
+    lv_obj_t * content = lv_msgbox_get_content(msgbox);
+
+    int32_t h_header = (header == NULL) ? 0 : lv_obj_get_height(header);
+    int32_t h_footer = (footer == NULL) ? 0 : lv_obj_get_height(footer);
+    int32_t h_content = lv_obj_get_height(content);
+
+    int32_t h_obj_content = lv_obj_get_content_height(msgbox);
+    int32_t h_msgbox_element_sum  = h_header + h_footer + h_content;
+    
+    /* Default Size : The height of the msgbox's obj-content should be equal to the total height of the msgbox's element. */
+    TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
+
+    /* Test2 : Now change size of msgbox manually*/
+    lv_obj_set_size(msgbox, lv_pct(80), lv_pct(80));
+
+    is_height_size_content = (lv_obj_get_style_height(msgbox, 0) == LV_SIZE_CONTENT);
+    TEST_ASSERT_EQUAL(is_height_size_content, 0);
+
+    lv_obj_update_layout(msgbox);
+    h_header = (header == NULL) ? 0 : lv_obj_get_height(header);
+    h_footer = (footer == NULL) ? 0 : lv_obj_get_height(footer);
+    h_content = lv_obj_get_height(content);
+
+    h_obj_content = lv_obj_get_content_height(msgbox);
+    h_msgbox_element_sum  = h_header + h_footer + h_content;
+    
+    /* Manual Size : The height of the msgbox's obj-content should also be equal to the total height of the msgbox's element. */
+    TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
 }
 
 #endif
