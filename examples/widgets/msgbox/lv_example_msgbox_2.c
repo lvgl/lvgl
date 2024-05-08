@@ -1,7 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_MSGBOX && LV_BUILD_EXAMPLES
 
-
 static void minimize_button_event_cb(lv_event_t * e)
 {
     lv_obj_t * mbox = (lv_obj_t *) lv_event_get_user_data(e);
@@ -26,12 +25,12 @@ void lv_example_msgbox_2(void)
     lv_obj_t * content = lv_msgbox_get_content(setting);
     lv_obj_set_flex_flow(content, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(content, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_right(content, -1, LV_PART_SCROLLBAR);
 
     lv_obj_t * cont_brightness = lv_obj_create(content);
     lv_obj_set_size(cont_brightness, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(cont_brightness, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(cont_brightness, LV_FLEX_ALIGN_CENTER,  LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_top(cont_brightness, 0, 0);
 
     lv_obj_t * lb_brightness = lv_label_create(cont_brightness);
     lv_label_set_text(lb_brightness, "Brightness : ");
@@ -43,7 +42,6 @@ void lv_example_msgbox_2(void)
     lv_obj_set_size(cont_speed, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(cont_speed, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(cont_speed, LV_FLEX_ALIGN_CENTER,  LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_top(cont_speed, 0, 0);
 
     lv_obj_t * lb_speed = lv_label_create(cont_speed);
     lv_label_set_text(lb_speed, "Speed : ");
