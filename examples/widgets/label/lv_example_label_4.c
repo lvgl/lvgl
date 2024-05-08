@@ -5,11 +5,11 @@
 #define MASK_WIDTH 150
 #define MASK_HEIGHT 60
 
-static void generate_mask(uint8_t * mask, int32_t w, int32_t h, const char * txt)
+static void generate_mask(lv_draw_buf_t * mask, int32_t w, int32_t h, const char * txt)
 {
     /*Create a "8 bit alpha" canvas and clear it*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas, mask, w, h, LV_COLOR_FORMAT_L8);
+    lv_canvas_set_draw_buf(canvas, mask);
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_TRANSP);
 
     lv_layer_t layer;
@@ -36,11 +36,10 @@ static void generate_mask(uint8_t * mask, int32_t w, int32_t h, const char * txt
 void lv_example_label_4(void)
 {
     /* Create the mask of a text by drawing it to a canvas*/
-    static uint8_t mask[MASK_WIDTH * MASK_HEIGHT];
-    generate_mask(mask, MASK_WIDTH, MASK_HEIGHT, "Text with gradient");
+    LV_DRAW_BUF_DEFINE_STATIC(mask, MASK_WIDTH, MASK_HEIGHT, LV_COLOR_FORMAT_L8);
+    LV_DRAW_BUF_INIT_STATIC(mask);
 
-    static lv_draw_buf_t draw_buf;
-    lv_draw_buf_init(&draw_buf, MASK_WIDTH, MASK_HEIGHT, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO, mask, sizeof(mask));
+    generate_mask(&mask, MASK_WIDTH, MASK_HEIGHT, "Text with gradient");
 
     /* Create an object from where the text will be masked out.
      * Now it's a rectangle with a gradient but it could be an image too*/
@@ -50,7 +49,7 @@ void lv_example_label_4(void)
     lv_obj_set_style_bg_color(grad, lv_color_hex(0xff0000), 0);
     lv_obj_set_style_bg_grad_color(grad, lv_color_hex(0x0000ff), 0);
     lv_obj_set_style_bg_grad_dir(grad, LV_GRAD_DIR_HOR, 0);
-    lv_obj_set_style_bitmap_mask_src(grad, &draw_buf, 0);
+    lv_obj_set_style_bitmap_mask_src(grad, &mask, 0);
 }
 
 #endif

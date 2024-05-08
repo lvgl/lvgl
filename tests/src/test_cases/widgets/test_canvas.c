@@ -28,7 +28,9 @@ void test_canvas_functions_invalidate(void)
     lv_refr_now(NULL);
     TEST_ASSERT(draw_counter == 0);
 
-    LV_DRAW_BUF_DEFINE(draw_buf, 100, 100, LV_COLOR_FORMAT_NATIVE);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, 100, 100, LV_COLOR_FORMAT_NATIVE);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf);
+
     lv_canvas_set_draw_buf(canvas, &draw_buf);
     lv_refr_now(NULL);
     TEST_ASSERT(draw_counter == 1);

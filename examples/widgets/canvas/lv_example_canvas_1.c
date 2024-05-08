@@ -27,7 +27,8 @@ void lv_example_canvas_1(void)
     label_dsc.color = lv_palette_main(LV_PALETTE_ORANGE);
     label_dsc.text = "Some text on text canvas";
     /*Create a buffer for the canvas*/
-    LV_DRAW_BUF_DEFINE(draw_buf_16bpp, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_RGB565);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf_16bpp, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_RGB565);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf_16bpp);
 
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_draw_buf(canvas, &draw_buf_16bpp);
@@ -47,7 +48,9 @@ void lv_example_canvas_1(void)
 
     /*Test the rotation. It requires another buffer where the original image is stored.
      *So use previous canvas as image and rotate it to the new canvas*/
-    LV_DRAW_BUF_DEFINE(draw_buf_32bpp, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf_32bpp, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf_32bpp);
+
     /*Create a canvas and initialize its palette*/
     canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_draw_buf(canvas, &draw_buf_32bpp);
