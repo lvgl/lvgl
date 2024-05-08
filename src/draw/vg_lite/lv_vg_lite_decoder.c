@@ -21,6 +21,8 @@
 
 #define DECODER_NAME    "VG_LITE"
 
+#define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
+
 /* VG_LITE_INDEX1, 2, and 4 require endian flipping + bit flipping,
  * so for simplicity, they are uniformly converted to I8 for display.
  */
@@ -210,7 +212,8 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     }
 
     /* create draw buf */
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, DEST_IMG_FORMAT, LV_STRIDE_AUTO);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_user(image_cache_draw_buf_handlers, width, height, DEST_IMG_FORMAT,
+                                                       LV_STRIDE_AUTO);
     if(draw_buf == NULL) {
         return LV_RESULT_INVALID;
     }
@@ -277,7 +280,8 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
         return LV_RESULT_INVALID;
     }
 
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(width, height, DEST_IMG_FORMAT, LV_STRIDE_AUTO);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_user(image_cache_draw_buf_handlers, width, height, DEST_IMG_FORMAT,
+                                                       LV_STRIDE_AUTO);
     if(draw_buf == NULL) {
         lv_fs_close(&file);
         return LV_RESULT_INVALID;

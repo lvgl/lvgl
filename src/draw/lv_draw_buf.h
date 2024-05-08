@@ -251,6 +251,21 @@ lv_draw_buf_t * lv_draw_buf_create_user(const lv_draw_buf_handlers_t * handlers,
                                         lv_color_format_t cf, uint32_t stride);
 
 /**
+ * Duplicate a draw buf with same image size, stride and color format. Copy the image data too.
+ * @param draw_buf  the draw buf to duplicate
+ * @return          the duplicated draw buf on success, NULL if failed
+ */
+lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf);
+
+/**
+ * Duplicate a draw buf with same image size, stride and color format. Copy the image data too.
+ * @param handlers  the draw buffer handlers
+ * @param draw_buf  the draw buf to duplicate
+ * @return          the duplicated draw buf on success, NULL if failed
+ */
+lv_draw_buf_t * lv_draw_buf_dup_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf);
+
+/**
  * Initialize a draw buf with the given buffer and parameters.
  * @param draw_buf  the draw buf to initialize
  * @param w         the buffer width in pixels
@@ -263,13 +278,6 @@ lv_draw_buf_t * lv_draw_buf_create_user(const lv_draw_buf_handlers_t * handlers,
  */
 lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride,
                              void * data, uint32_t data_size);
-
-/**
- * Duplicate a draw buf with same image size, stride and color format. Copy the image data too.
- * @param draw_buf  the draw buf to duplicate
- * @return          the duplicated draw buf on success, NULL if failed
- */
-lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf);
 
 /**
  * Keep using the existing memory, reshape the draw buffer to the given width and height.

@@ -17,6 +17,7 @@
  *********************/
 #define default_handlers LV_GLOBAL_DEFAULT()->draw_buf_handlers
 #define font_draw_buf_handlers LV_GLOBAL_DEFAULT()->font_draw_buf_handlers
+#define image_cache_draw_buf_handlers LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers
 
 /**********************
  *      TYPEDEFS
@@ -51,6 +52,7 @@ void _lv_draw_buf_init_handlers(void)
 {
     lv_draw_buf_init_with_default_handlers(&default_handlers);
     lv_draw_buf_init_with_default_handlers(&font_draw_buf_handlers);
+    lv_draw_buf_init_with_default_handlers(&image_cache_draw_buf_handlers);
 }
 
 void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers)
@@ -301,8 +303,13 @@ lv_draw_buf_t * lv_draw_buf_create_user(const lv_draw_buf_handlers_t * handlers,
 
 lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf)
 {
+    return lv_draw_buf_dup_user(&default_handlers, draw_buf);
+}
+
+lv_draw_buf_t * lv_draw_buf_dup_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf)
+{
     const lv_image_header_t * header = &draw_buf->header;
-    lv_draw_buf_t * new_buf = lv_draw_buf_create(header->w, header->h, header->cf, header->stride);
+    lv_draw_buf_t * new_buf = lv_draw_buf_create_user(handlers, header->w, header->h, header->cf, header->stride);
     if(new_buf == NULL) return NULL;
 
     new_buf->header.flags = draw_buf->header.flags;

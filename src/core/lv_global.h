@@ -101,6 +101,8 @@ typedef struct _lv_global_t {
 
     lv_draw_buf_handlers_t draw_buf_handlers;
     lv_draw_buf_handlers_t font_draw_buf_handlers;
+    lv_draw_buf_handlers_t image_cache_draw_buf_handlers;  /**< Ensure that all assigned draw buffers
+                                                            * can be managed by image cache. */
 
     lv_ll_t img_decoder_ll;
 
