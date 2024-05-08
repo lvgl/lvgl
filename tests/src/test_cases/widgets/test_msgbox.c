@@ -171,7 +171,6 @@ void test_msgbox_content_auto_height(void)
 
     int32_t h_obj_content = lv_obj_get_content_height(msgbox);
     int32_t h_msgbox_element_sum  = h_header + h_footer + h_content;
-    
     /* Default Size : The height of the msgbox's obj-content should be equal to the total height of the msgbox's element. */
     TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
 
@@ -188,7 +187,6 @@ void test_msgbox_content_auto_height(void)
 
     h_obj_content = lv_obj_get_content_height(msgbox);
     h_msgbox_element_sum  = h_header + h_footer + h_content;
-    
     /* Manual Size : The height of the msgbox's obj-content should also be equal to the total height of the msgbox's element. */
     TEST_ASSERT_EQUAL(h_obj_content, h_msgbox_element_sum);
 }
