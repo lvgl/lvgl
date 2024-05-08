@@ -117,7 +117,11 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
 {
     lv_memzero(subject, sizeof(lv_subject_t));
     lv_strncpy(buf, value, size);
-    if(prev_buf) lv_strncpy(prev_buf, value, size);
+    if(size) buf[size - 1] = '\0';
+    if(prev_buf) {
+        lv_strncpy(prev_buf, value, size);
+        if(size) prev_buf[size - 1] = '\0';
+    }
 
     subject->type = LV_SUBJECT_TYPE_STRING;
     subject->size = size;
@@ -137,9 +141,11 @@ void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
     if(subject->size < 1) return;
     if(subject->prev_value.pointer) {
         lv_strncpy((char *)subject->prev_value.pointer, subject->value.pointer, subject->size - 1);
+        ((char *)subject->prev_value.pointer)[subject->size - 1] = '\0';
     }
 
     lv_strncpy((char *)subject->value.pointer, buf, subject->size - 1);
+    ((char *)subject->value.pointer)[subject->size - 1] = '\0';
 
     lv_subject_notify(subject);
 

@@ -62,12 +62,7 @@ size_t lv_strlen(const char * str)
 
 char * lv_strncpy(char * dst, const char * src, size_t dest_size)
 {
-    if(dest_size > 0) {
-        dst[0] = '\0';
-        strncat(dst, src, dest_size - 1);
-    }
-
-    return dst;
+    return strncpy(dst, src, dest_size);
 }
 
 char * lv_strcpy(char * dst, const char * src)
