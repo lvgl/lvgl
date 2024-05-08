@@ -54,9 +54,7 @@ lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*c
         LV_LOG_WARN("_task_create failed!");
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_thread_delete(lv_thread_t * thread)
@@ -66,9 +64,7 @@ lv_result_t lv_thread_delete(lv_thread_t * thread)
         LV_LOG_WARN("_task_destroy failed!");
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_mutex_init(lv_mutex_t * mutex)
@@ -77,9 +73,7 @@ lv_result_t lv_mutex_init(lv_mutex_t * mutex)
         LV_LOG_WARN("create mutex failed");
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_mutex_lock(lv_mutex_t * mutex)
@@ -89,9 +83,7 @@ lv_result_t lv_mutex_lock(lv_mutex_t * mutex)
         LV_LOG_WARN("Error: %x", ret);
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_mutex_lock_isr(lv_mutex_t * mutex)
@@ -101,9 +93,7 @@ lv_result_t lv_mutex_lock_isr(lv_mutex_t * mutex)
         LV_LOG_WARN("Error: %x", ret);
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_mutex_unlock(lv_mutex_t * mutex)
@@ -113,9 +103,7 @@ lv_result_t lv_mutex_unlock(lv_mutex_t * mutex)
         LV_LOG_WARN("Error: %x", ret);
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_mutex_delete(lv_mutex_t * mutex)
@@ -125,9 +113,7 @@ lv_result_t lv_mutex_delete(lv_mutex_t * mutex)
         LV_LOG_WARN("Error: %x", ret);
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_thread_sync_init(lv_thread_sync_t * sync)
@@ -136,9 +122,7 @@ lv_result_t lv_thread_sync_init(lv_thread_sync_t * sync)
         LV_LOG_WARN("create semaphore failed");
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_thread_sync_wait(lv_thread_sync_t * sync)
@@ -148,9 +132,7 @@ lv_result_t lv_thread_sync_wait(lv_thread_sync_t * sync)
         LV_LOG_WARN("Error: %x", ret);
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_thread_sync_signal(lv_thread_sync_t * sync)
@@ -160,9 +142,7 @@ lv_result_t lv_thread_sync_signal(lv_thread_sync_t * sync)
         LV_LOG_WARN("Error: %x", ret);
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
@@ -172,9 +152,7 @@ lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
         LV_LOG_WARN("Error: %x", ret);
         return LV_RESULT_INVALID;
     }
-    else {
-        return LV_RESULT_OK;
-    }
+    return LV_RESULT_OK;
 }
 
 /**********************
