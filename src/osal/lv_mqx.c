@@ -11,6 +11,7 @@
 #if LV_USE_OS == LV_OS_MQX
 
 #include "../misc/lv_log.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -41,7 +42,7 @@ lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*c
 {
     TASK_TEMPLATE_STRUCT task_template;
 
-    memset(&task_template, 0, sizeof(task_template));
+    lv_memzero(&task_template, sizeof(task_template));
 
     task_template.TASK_ADDRESS = (TASK_FPTR)callback;
     task_template.TASK_STACKSIZE = stack_size;
