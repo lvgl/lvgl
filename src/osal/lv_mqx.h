@@ -28,17 +28,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    _task_id tid;                         /**< MQX task id. */
-} lv_thread_t;
+typedef _task_id lv_thread_t;
 
-typedef struct {
-    MUTEX_STRUCT mutex;                   /**< MQX mutex. */
-} lv_mutex_t;
+typedef MUTEX_STRUCT lv_mutex_t;
 
-typedef struct {
-    LWSEM_STRUCT sem;                     /**< MQX semaphore. */
-} lv_thread_sync_t;
+typedef LWSEM_STRUCT lv_thread_sync_t;
 
 /**********************
  * GLOBAL PROTOTYPES
