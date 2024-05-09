@@ -45,7 +45,16 @@ typedef struct {
     int32_t bpy;
     int32_t bc;
     lv_area_t clip_area;
+    lv_grad_t * cgrad;  /*256 element cache buffer containing the gradient color map*/
 } lv_grad_radial_state_t;
+
+typedef struct {
+    /* w = a * xp + b * yp + c */
+    int32_t a;
+    int32_t b;
+    int32_t c;
+    lv_grad_t * cgrad; /*256 element cache buffer containing the gradient color map*/
+} lv_grad_linear_state_t;
 
 #endif
 
@@ -75,8 +84,10 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h)
 {
     int32_t size;
     switch(g->dir) {
-        case LV_GRAD_DIR_RADIAL:
         case LV_GRAD_DIR_HOR:
+        case LV_GRAD_DIR_LINEAR:
+        case LV_GRAD_DIR_RADIAL:
+        case LV_GRAD_DIR_CONICAL:
             size = w;
             break;
         case LV_GRAD_DIR_VER:
@@ -301,9 +312,9 @@ void lv_gradient_cleanup(lv_grad_t * grad)
 
     | P - (C1 - C0)w - C0 | = (r1 - r0)w + r0, where
 
-        P is the point of interest
-        C0 is the center of the start circle
-        C1 is the center of the end circle
+        P: {xp, yp} is the point of interest
+        C0: {x0, y0} is the center of the start circle
+        C1: {x1, y1} is the center of the end circle
         r0 is the radius of the start circle
         r1 is the radius of the end circle
         w is the unknown variable
@@ -317,9 +328,6 @@ void lv_gradient_cleanup(lv_grad_t * grad)
     We only need the more positive root.
 
     Let's denote
-        P = {xp, yp}
-        C0 = {x0, y0}
-        C1 = {x1, y1}
         dx = x1 - x0
         dy = y1 - y0
         dr = r1 - r0
@@ -350,27 +358,31 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc)
     int16_t r_start = dsc->radial.start_radius;
     int16_t r_end = dsc->radial.end_radius;
     LV_ASSERT(r_end != 0);
-    lv_grad_radial_state_t * grad_r = lv_malloc(sizeof(lv_grad_radial_state_t));
-    dsc->state = grad_r;
+    lv_grad_radial_state_t * state = lv_malloc(sizeof(lv_grad_radial_state_t));
+    dsc->state = state;
+
+    /* Create gradient color map */
+    state->cgrad = lv_gradient_get(dsc, 256, 0);
+
 #ifdef SCALING_SUPPORT
-    grad_r->x0 = (float)start.x * GRAD_SCALE_X;
-    grad_r->y0 = (float)start.y * GRAD_SCALE_Y;
-    grad_r->r0 = (float)r_start * GRAD_SCALE_X;
+    state->x0 = (float)start.x * GRAD_SCALE_X;
+    state->y0 = (float)start.y * GRAD_SCALE_Y;
+    state->r0 = (float)r_start * GRAD_SCALE_X;
     float dr = (float)(r_end - r_start) * GRAD_SCALE_X;
 #else
-    grad_r->x0 = start.x;
-    grad_r->y0 = start.y;
-    grad_r->r0 = r_start;
+    state->x0 = start.x;
+    state->y0 = start.y;
+    state->r0 = r_start;
     int32_t dr = r_end - r_start;
 #endif
     if(end.x == start.x && end.y == start.y) {
         LV_ASSERT(dr != 0);
-        grad_r->a4 = sqr32(dr) << 2;
-        grad_r->bpx = 0;
-        grad_r->bpy = 0;
-        grad_r->bc = (grad_r->r0 * dr) << 1;
-        grad_r->dx = 0;
-        grad_r->inv_dr = (1 << (8 + 16)) / dr;
+        state->a4 = sqr32(dr) << 2;
+        state->bpx = 0;
+        state->bpy = 0;
+        state->bc = (state->r0 * dr) << 1;
+        state->dx = 0;
+        state->inv_dr = (1 << (8 + 16)) / dr;
     }
     else {
 #ifdef SCALING_SUPPORT
@@ -380,47 +392,53 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc)
         int32_t dx = end.x - start.x;
         int32_t dy = end.y - start.y;
 #endif
-        grad_r->dx = dx;    /* needed for incremental calculation */
-        grad_r->a4 = (sqr32(dr) - sqr32(dx) - sqr32(dy)) << 2;
+        state->dx = dx;    /* needed for incremental calculation */
+        state->a4 = (sqr32(dr) - sqr32(dx) - sqr32(dy)) << 2;
         /* b(xp, yp) = xp * bpx + yp * bpy + bc */
-        grad_r->bpx = dx << 1;
-        grad_r->bpy = dy << 1;
-        grad_r->bc = (grad_r->r0 * dr - grad_r->x0 * dx - grad_r->y0 * dy) << 1;
+        state->bpx = dx << 1;
+        state->bpy = dy << 1;
+        state->bc = (state->r0 * dr - state->x0 * dx - state->y0 * dy) << 1;
     }
-    grad_r->inv_a4 = grad_r->a4 != 0 ? (1 << (13 + 16)) / grad_r->a4 : 0;
+    state->inv_a4 = state->a4 != 0 ? (1 << (13 + 16)) / state->a4 : 0;
     /* check for possible clipping */
     if(dsc->extend == LV_GRAD_EXTEND_PAD &&
        /* if extend mode is 'pad', then we can clip to the end circle's bounding box, if the start circle is entirely within the end circle */
        (sqr32(start.x - end.x) + sqr32(start.y - end.y) < sqr32(r_end - r_start))) {
         if(r_end > r_start) {
-            lv_area_set(&grad_r->clip_area, end.x - r_end, end.y - r_end, end.x  + r_end, end.y + r_end);
+            lv_area_set(&state->clip_area, end.x - r_end, end.y - r_end, end.x  + r_end, end.y + r_end);
         }
         else {
-            lv_area_set(&grad_r->clip_area, start.x - r_start, start.y - r_start, start.x  + r_start, start.y + r_start);
+            lv_area_set(&state->clip_area, start.x - r_start, start.y - r_start, start.x  + r_start, start.y + r_start);
         }
     }
     else {
-        grad_r->clip_area.x1 = -0x7fffffff;
+        state->clip_area.x1 = -0x7fffffff;
     }
 }
 
 void lv_gradient_radial_cleanup(lv_grad_dsc_t * dsc)
 {
-    lv_free(dsc->state);
+    lv_grad_radial_state_t * state = dsc->state;
+    if(state == NULL)
+        return;
+    if(state->cgrad)
+        lv_gradient_cleanup(state->cgrad);
+    lv_free(state);
 }
 
-void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, lv_grad_t * grad, int32_t xp, int32_t yp,
+void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, int32_t xp, int32_t yp,
                                                        int32_t width, lv_grad_t * result)
 {
-    lv_grad_radial_state_t * grad_r = (lv_grad_radial_state_t *)dsc->state;
+    lv_grad_radial_state_t * state = (lv_grad_radial_state_t *)dsc->state;
     lv_color_t * buf = result->color_map;
     lv_opa_t * opa = result->opa_map;
+    lv_grad_t * grad = state->cgrad;
 
     int32_t w;  /* the result: this is an offset into the 256 element gradient color table */
     int32_t b, db, c, dc;
 
     /* check for possible clipping */
-    if(grad_r->clip_area.x1 != -0x7fffffff) {
+    if(state->clip_area.x1 != -0x7fffffff) {
         /* fill line with end color for pixels outside the clipped region */
         lv_color_t * _buf = buf;
         lv_opa_t * _opa = opa;
@@ -432,15 +450,15 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, lv_g
             *_opa++ = _o;
         }
         /* is this line fully outside the clip area? */
-        if(yp < grad_r->clip_area.y1 ||
-           yp >= grad_r->clip_area.y2 ||
-           xp >= grad_r->clip_area.x2 ||
-           xp + width < grad_r->clip_area.x1) {
+        if(yp < state->clip_area.y1 ||
+           yp >= state->clip_area.y2 ||
+           xp >= state->clip_area.x2 ||
+           xp + width < state->clip_area.x1) {
             return;
         }
         else {      /* not fully outside: clip line to the bounding box */
-            int32_t _x1 = LV_MAX(xp, grad_r->clip_area.x1);
-            int32_t _x2 = LV_MIN(xp + width, grad_r->clip_area.x2);
+            int32_t _x1 = LV_MAX(xp, state->clip_area.x1);
+            int32_t _x2 = LV_MIN(xp + width, state->clip_area.x2);
             buf += _x1 - xp;
             opa += _x1 - xp;
             xp = _x1;
@@ -448,13 +466,13 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, lv_g
         }
     }
 
-    b = xp * grad_r->bpx + yp * grad_r->bpy + grad_r->bc;
-    c = sqr32(grad_r->r0) - sqr32(xp - grad_r->x0) - sqr32(yp - grad_r->y0);
+    b = xp * state->bpx + yp * state->bpy + state->bc;
+    c = sqr32(state->r0) - sqr32(xp - state->x0) - sqr32(yp - state->y0);
     /* We can save some calculations by using the previous values of b and c */
-    db = grad_r->dx << 1;
-    dc = ((xp - grad_r->x0) << 1) + 1;
+    db = state->dx << 1;
+    dc = ((xp - state->x0) << 1) + 1;
 
-    if(grad_r->a4 == 0) {   /* not a quadratic equation: solve linear equation: w = -c/b */
+    if(state->a4 == 0) {   /* not a quadratic equation: solve linear equation: w = -c/b */
         for(; width > 0; width--) {
             w = extend_w(b == 0 ? 0 : -(c << 8) / b, dsc->extend);
             *buf++ = grad->color_map[w];
@@ -465,13 +483,13 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, lv_g
         }
     }
     else {                  /* solve quadratical equation */
-        if(grad_r->bpx ||
-           grad_r->bpy) {    /* general case (circles are not concentric): w = (-b + sqrt(b^2 - 4ac))/2a (we only need the more positive root)*/
-            int32_t a4 = grad_r->a4 >> 4;
+        if(state->bpx ||
+           state->bpy) {    /* general case (circles are not concentric): w = (-b + sqrt(b^2 - 4ac))/2a (we only need the more positive root)*/
+            int32_t a4 = state->a4 >> 4;
             for(; width > 0; width--) {
                 int32_t det = sqr32(b >> 4) - (a4 * (c >> 4));     /* b^2 shifted down by 2*4=8, 4ac shifted down by 8 */
                 /* check determinant: if negative, then there is no solution: use starting color */
-                w = det < 0 ? 0 : extend_w(((fast_sqrt32(det) - (b >> 4)) * grad_r->inv_a4) >>  16,
+                w = det < 0 ? 0 : extend_w(((fast_sqrt32(det) - (b >> 4)) * state->inv_a4) >>  16,
                                            dsc->extend);        /* square root shifted down by 4 (includes *256 to set output range) */
                 *buf++ = grad->color_map[w];
                 *opa++ = grad->opa_map[w];
@@ -481,15 +499,91 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, lv_g
             }
         }
         else {              /* special case: concentric circles: w = (sqrt((xp-x0)^2 + (yx-y0)^2)-r0)/(r1-r0) */
-            c = sqr32(xp - grad_r->x0) + sqr32(yp - grad_r->y0);
+            c = sqr32(xp - state->x0) + sqr32(yp - state->y0);
             for(; width > 0; width--) {
-                w = extend_w((((fast_sqrt32(c) - grad_r->r0)) * grad_r->inv_dr) >> 16, dsc->extend);
+                w = extend_w((((fast_sqrt32(c) - state->r0)) * state->inv_dr) >> 16, dsc->extend);
                 *buf++ = grad->color_map[w];
                 *opa++ = grad->opa_map[w];
                 c += dc;
                 dc += 2;
             }
         }
+    }
+}
+
+/*
+    Calculate linear gradient based on the following equation:
+
+    w = ((P - C0) x (C1 - C0)) / | C1 - C0 |^2, where
+
+        P: {xp, yp} is the point of interest
+        C0: {x0, y0} is the start point of the gradient vector
+        C1: {x1, y1} is the end point of the gradient vector
+        w is the unknown variable
+
+        || is the length of the vector
+        x is a dot product
+
+    The above equation can be rewritten as:
+
+    w = xp * (dx / (dx^2 + dy^2)) + yp * (dy / (dx^2 + dy^2)) - (x0 * dx + y0 * dy) / (dx^2 + dy^2), where
+
+        dx = x1 - x0
+        dy = y1 - y0
+
+    We can pre-calculate the constants, because they do not depend on the pixel coordinates.
+
+*/
+
+void lv_gradient_linear_setup(lv_grad_dsc_t * dsc)
+{
+    lv_point_t start = dsc->linear.start;
+    lv_point_t end = dsc->linear.end;
+    lv_grad_linear_state_t * state = lv_malloc(sizeof(lv_grad_linear_state_t));
+    dsc->state = state;
+
+    /* Create gradient color map */
+    state->cgrad = lv_gradient_get(dsc, 256, 0);
+
+    /* Precalculate constants */
+    int32_t dx = end.x - start.x;
+    int32_t dy = end.y - start.y;
+
+    int32_t l2 = sqr32(dx) + sqr32(dy);
+    state->a = (dx << 16) / l2;
+    state->b = (dy << 16) / l2;
+    state->c = -(((start.x * dx + start.y * dy) << 16) / l2);
+}
+
+void lv_gradient_linear_cleanup(lv_grad_dsc_t * dsc)
+{
+    lv_grad_linear_state_t * state = dsc->state;
+    if(state == NULL)
+        return;
+    if(state->cgrad)
+        lv_free(state->cgrad);
+    lv_free(state);
+}
+
+void LV_ATTRIBUTE_FAST_MEM lv_gradient_linear_get_line(lv_grad_dsc_t * dsc, int32_t xp, int32_t yp,
+                                                       int32_t width, lv_grad_t * result)
+{
+    lv_grad_linear_state_t * state = (lv_grad_linear_state_t *)dsc->state;
+    lv_color_t * buf = result->color_map;
+    lv_opa_t * opa = result->opa_map;
+    lv_grad_t * grad = state->cgrad;
+
+    int32_t w;  /* the result: this is an offset into the 256 element gradient color table */
+    int32_t x, d;
+
+    x = xp * state->a + yp * state->b - state->c;
+    d = state->a;
+
+    for(; width > 0; width--) {
+        w = extend_w(x >> 8, dsc->extend);
+        *buf++ = grad->color_map[w];
+        *opa++ = grad->opa_map[w];
+        x += d;
     }
 }
 
