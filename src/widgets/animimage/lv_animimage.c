@@ -72,7 +72,7 @@ void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num)
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     animimg->dsc = dsc;
     animimg->pic_count = num;
-    lv_anim_set_values(&animimg->anim, 0, (int32_t)num - 1);
+    lv_anim_set_values(&animimg->anim, 0, (int32_t)num);
 }
 
 void lv_animimg_start(lv_obj_t * obj)
