@@ -33,6 +33,8 @@ extern "C" {
 #include "lv_rtthread.h"
 #elif LV_USE_OS == LV_OS_WINDOWS
 #include "lv_windows.h"
+#elif LV_USE_OS == LV_OS_MQX
+#include "lv_mqx.h"
 #elif LV_USE_OS == LV_OS_CUSTOM
 #include LV_OS_CUSTOM_INCLUDE
 #endif

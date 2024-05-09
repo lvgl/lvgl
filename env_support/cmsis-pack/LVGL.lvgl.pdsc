@@ -800,6 +800,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_PTHREAD
@@ -823,6 +824,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_FREERTOS
@@ -846,6 +848,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_CMSIS_RTOS2
@@ -869,6 +872,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_RTTHREAD
@@ -892,9 +896,34 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_WINDOWS
+
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="OS Abstraction Layer" Cvariant="MQX" condition="LVGL-Essential">
+              <description>Add the support for MQX APIs</description>
+              <files>
+                <file category="sourceC"      name="src/osal/lv_mqx.c"/>
+              </files>
+
+              <RTE_Components_h>
+
+/*   Select an operating system to use. Possible options:
+ * - LV_OS_NONE
+ * - LV_OS_PTHREAD
+ * - LV_OS_FREERTOS
+ * - LV_OS_CMSIS_RTOS2
+ * - LV_OS_RTTHREAD
+ * - LV_OS_WINDOWS
+ * - LV_OS_MQX
+ * - LV_OS_CUSTOM
+ */
+#define LV_USE_OS   LV_OS_MQX
 
               </RTE_Components_h>
 
