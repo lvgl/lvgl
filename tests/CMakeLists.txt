@@ -145,6 +145,7 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
     list(APPEND COMPILE_OPTIONS
         -pedantic-errors
         -Wall
+        -Wformat-security
         -Wclobbered
         -Wdeprecated
         -Wdouble-promotion
