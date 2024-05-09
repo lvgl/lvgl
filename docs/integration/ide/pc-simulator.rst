@@ -30,7 +30,7 @@ Choose your favorite IDE, read its README on GitHub, download the project, and l
 - `VSCode with SDL driver <https://github.com/lvgl/lv_port_pc_vscode>`__: Recommended on Linux (SDL) and Mac (SDL)
 - `CodeBlocks <https://github.com/lvgl/lv_sim_codeblocks_win>`__: Recommended on Windows
 - `PlatformIO with SDL driver <https://github.com/lvgl/lv_platformio>`__: Recommended on Linux and Mac but has an STM32 environment too
-- `Generic Linux <https://github.com/lvgl/lv_port_linux`__: CMake based project where you can easily switch between fbdev, DRM, and SDL.
+- `Generic Linux <https://github.com/lvgl/lv_port_linux>`__: CMake based project where you can easily switch between fbdev, DRM, and SDL.
 - `MDK with FastModel <https://github.com/lvgl/lv_port_an547_cm55_sim>`__: For Windows
 
 External project not maintained by the LVGL organization:
