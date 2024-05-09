@@ -181,7 +181,7 @@ typedef struct {
         struct {
             lv_point_t  start;                          /**< Linear gradient vector start point */
             lv_point_t  end;                            /**< Linear gradient vector end point */
-        } l;
+        } linear;
         /*Radial gradient parameters*/
         struct {
             lv_point_t
@@ -190,13 +190,13 @@ typedef struct {
             int16_t     start_radius;                   /**< Starting radius (must be >= 0) */
             int16_t
             end_radius;                     /**< Ending radius (this will determine the "size" of the gradient, must be > 0) */
-        } r;
+        } radial;
         /*Conical gradient parameters*/
         struct {
             lv_point_t  center;                         /**< Conical gradient center point */
             int16_t     start_angle;                    /**< Start angle 0..3600 */
             int16_t     end_angle;                      /**< End angle 0..3600 */
-        } c;
+        } conical;
     };
     void * state;
 #endif

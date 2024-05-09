@@ -57,7 +57,7 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h);
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
-    static inline uint32_t fast_sqrt32(uint32_t val);
+    static inline int32_t fast_sqrt32(uint32_t val);
     static inline int32_t sqr32(int32_t x);
     static inline int32_t extend_w(int32_t w, lv_grad_extend_t extend);
 
@@ -345,10 +345,10 @@ void lv_gradient_cleanup(lv_grad_t * grad)
 
 void lv_gradient_radial_setup(lv_grad_dsc_t * dsc)
 {
-    lv_point_t start = dsc->r.start;
-    lv_point_t end = dsc->r.end;
-    int16_t r_start = dsc->r.start_radius;
-    int16_t r_end = dsc->r.end_radius;
+    lv_point_t start = dsc->radial.start;
+    lv_point_t end = dsc->radial.end;
+    int16_t r_start = dsc->radial.start_radius;
+    int16_t r_end = dsc->radial.end_radius;
     LV_ASSERT(r_end != 0);
     lv_grad_radial_state_t * grad_r = lv_malloc(sizeof(lv_grad_radial_state_t));
     dsc->state = grad_r;
