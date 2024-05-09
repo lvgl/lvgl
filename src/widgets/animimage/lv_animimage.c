@@ -161,6 +161,11 @@ static void index_change(lv_obj_t * obj, int32_t index)
     int32_t idx;
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
 
+    if(animimg->dsc == NULL) {
+        LV_LOG_ERROR("dsc is null");
+        return;
+    }
+
     idx = index % animimg->pic_count;
 
     lv_image_set_src(obj, animimg->dsc[idx]);
