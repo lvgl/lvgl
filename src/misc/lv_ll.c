@@ -54,27 +54,45 @@ void _lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
     ll_p->n_size = node_size;
 }
 
+void * _lv_ll_node_allocate(lv_ll_t * ll_p)
+{
+    lv_ll_node_t * n_new;
+
+    n_new = lv_malloc(ll_p->n_size + LL_NODE_META_SIZE);
+
+    /* Not part of any list yet, so clear fields*/
+    node_set_next(ll_p, n_new, NULL);
+    node_set_prev(ll_p, n_new, NULL);
+
+    return n_new;
+}
+
+void * _lv_ll_node_ins_head(lv_ll_t * ll_p, void * node_p)
+{
+    if(node_p != NULL) {
+        node_set_prev(ll_p, node_p, NULL);       /*No prev. before the new head*/
+        node_set_next(ll_p, node_p, ll_p->head); /*After new comes the old head*/
+
+        if(ll_p->head != NULL) { /*If there is old head then before it goes the new*/
+            node_set_prev(ll_p, ll_p->head, node_p);
+        }
+
+        ll_p->head = node_p;      /*Set the new head in the dsc.*/
+        if(ll_p->tail == NULL) { /*If there is no tail (1. node) set the tail too*/
+            ll_p->tail = node_p;
+        }
+    }
+
+    return node_p;
+}
+
 void * _lv_ll_ins_head(lv_ll_t * ll_p)
 {
     lv_ll_node_t * n_new;
 
     n_new = lv_malloc(ll_p->n_size + LL_NODE_META_SIZE);
 
-    if(n_new != NULL) {
-        node_set_prev(ll_p, n_new, NULL);       /*No prev. before the new head*/
-        node_set_next(ll_p, n_new, ll_p->head); /*After new comes the old head*/
-
-        if(ll_p->head != NULL) { /*If there is old head then before it goes the new*/
-            node_set_prev(ll_p, ll_p->head, n_new);
-        }
-
-        ll_p->head = n_new;      /*Set the new head in the dsc.*/
-        if(ll_p->tail == NULL) { /*If there is no tail (1. node) set the tail too*/
-            ll_p->tail = n_new;
-        }
-    }
-
-    return n_new;
+    return _lv_ll_node_ins_head(ll_p, n_new);
 }
 
 void * _lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)

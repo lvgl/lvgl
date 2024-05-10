@@ -40,7 +40,10 @@ static uint32_t convert_speed_to_time(uint32_t speed, int32_t start, int32_t end
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(lv_anim_t * a_current);
 static void anim_set_start_values(lv_anim_t * a);
-static void anim_list_remove(lv_anim_t * a, bool call_completed);
+static void anim_list_remove(lv_anim_t * a, bool call_completed, bool is_in_the_list);
+static lv_anim_t * anim_list_allocate(void);
+static void anim_list_add(lv_anim_t * a);
+static void anim_init(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -75,22 +78,18 @@ void _lv_anim_core_deinit(void)
 
 void lv_anim_init(lv_anim_t * a)
 {
-    lv_memzero(a, sizeof(lv_anim_t));
-    a->duration = 500;
-    a->start_value = 0;
-    a->end_value = 100;
-    a->repeat_cnt = 1;
-    a->path_cb = lv_anim_path_linear;
-    a->early_apply = 1;
+    LV_LOG_WARN("`lv_anim_init()` is deprecated. Please use `lv_anim_create()` instead.");
+
+    anim_init(a);
 }
 
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
 {
+    LV_LOG_WARN("`lv_anim_start()` is deprecated. Please use `lv_anim_trigger()` instead.");
+
     LV_TRACE_ANIM("begin");
 
-    /*Add the new animation to the animation linked list*/
-    lv_anim_t * new_anim = _lv_ll_ins_head(anim_ll_p);
-    LV_ASSERT_MALLOC(new_anim);
+    lv_anim_t * new_anim = anim_list_allocate();
     if(new_anim == NULL) return NULL;
 
     /*Initialize the animation descriptor*/
@@ -98,13 +97,37 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     if(a->var == a) new_anim->var = new_anim;
 
     anim_set_start_values(new_anim);
-
-    /*Creating an animation changed the linked list.
-     *It's important if it happens in a ready callback. (see `anim_timer`)*/
-    anim_mark_list_change();
+    anim_list_add(new_anim);
 
     LV_TRACE_ANIM("finished");
     return new_anim;
+}
+
+lv_anim_t * lv_anim_create(void)
+{
+    lv_anim_t * new_anim = anim_list_allocate();
+    if(new_anim == NULL) return NULL;
+
+    anim_init(new_anim);
+
+    return new_anim;
+}
+
+lv_anim_t * lv_anim_dup(const lv_anim_t * other)
+{
+    lv_anim_t * new_anim = anim_list_allocate();
+    if(new_anim == NULL) return NULL;
+
+    /* Initialize with the other animation */
+    lv_memcpy(new_anim, other, sizeof(lv_anim_t));
+
+    return new_anim;
+}
+
+void lv_anim_trigger(lv_anim_t * a)
+{
+    anim_set_start_values(a);
+    anim_list_add(a);
 }
 
 uint32_t lv_anim_get_playtime(const lv_anim_t * a)
@@ -129,7 +152,7 @@ bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
     while(a != NULL) {
         bool del = false;
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
-            anim_list_remove(a, false);
+            anim_list_remove(a, false, true);
             del_any = true;
             del = true;
         }
@@ -140,6 +163,13 @@ bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
     }
 
     return del_any;
+}
+
+void lv_anim_delete_by_ptr(lv_anim_t * a)
+{
+    bool is_in_the_list = _lv_ll_get_next(anim_ll_p, a) || _lv_ll_get_prev(anim_ll_p, a);
+
+    anim_list_remove(a, false, is_in_the_list);
 }
 
 void lv_anim_delete_all(void)
@@ -407,7 +437,7 @@ static void anim_completed_handler(lv_anim_t * a)
      * - no repeat left and no play back (simple one shot animation)
      * - no repeat, play back is enabled and play back is ready*/
     if(a->repeat_cnt == 0 && (a->playback_duration == 0 || a->playback_now == 1)) {
-        anim_list_remove(a, true);
+        anim_list_remove(a, true, true);
     }
     /*If the animation is not deleted then restart it*/
     else {
@@ -499,7 +529,7 @@ static bool remove_concurrent_anims(lv_anim_t * a_current)
            (a->var == a_current->var) &&
            ((a->exec_cb && a->exec_cb == a_current->exec_cb)
             /*|| (a->custom_exec_cb && a->custom_exec_cb == a_current->custom_exec_cb)*/)) {
-            anim_list_remove(a, false);
+            anim_list_remove(a, false, true);
             del_any = true;
             del = true;
         }
@@ -539,18 +569,49 @@ static void anim_set_start_values(lv_anim_t * a)
     }
 }
 
-static void anim_list_remove(lv_anim_t * a, bool call_completed)
+static void anim_list_remove(lv_anim_t * a, bool call_completed, bool is_in_the_list)
 {
-    /*Delete the animation from the list first.
-     * This way callbacks will see the animations like it's animation is already deleted*/
-    _lv_ll_remove(anim_ll_p, a);
+    /* Might not be part of the list (was never triggered)*/
+    if(is_in_the_list) {
+        /*Delete the animation from the list first.
+        * This way the callback will see the animation like it's animation is already deleted*/
+        _lv_ll_remove(anim_ll_p, a);
 
-    /*Flag that the list has changed*/
-    anim_mark_list_change();
+        /*Flag that the list has changed*/
+        anim_mark_list_change();
+    }
 
     /*Call the callback function at the end*/
     if(call_completed && a->completed_cb) a->completed_cb(a);
     if(a->deleted_cb) a->deleted_cb(a);
 
     lv_free(a);
+}
+
+static lv_anim_t * anim_list_allocate(void)
+{
+    lv_anim_t * new_anim = _lv_ll_node_allocate(anim_ll_p);
+    LV_ASSERT_MALLOC(new_anim);
+
+    return new_anim;
+}
+
+static void anim_list_add(lv_anim_t * a)
+{
+    _lv_ll_node_ins_head(anim_ll_p, a);
+
+    /*Creating an animation changed the linked list.
+     *It's important if it happens in a ready callback. (see `anim_timer`)*/
+    anim_mark_list_change();
+}
+
+static void anim_init(lv_anim_t * a)
+{
+    lv_memzero(a, sizeof(lv_anim_t));
+    a->duration = 500;
+    a->start_value = 0;
+    a->end_value = 100;
+    a->repeat_cnt = 1;
+    a->path_cb = lv_anim_path_linear;
+    a->early_apply = 1;
 }

@@ -174,15 +174,43 @@ void _lv_anim_core_init(void);
 void _lv_anim_core_deinit(void);
 
 /**
- * Initialize an animation variable.
+ * Initialize an animation variable allocated on the stack.
  * E.g.:
  * lv_anim_t a;
  * lv_anim_init(&a);
  * lv_anim_set_...(&a);
  * lv_anim_start(&a);
- * @param a     pointer to an `lv_anim_t` variable to initialize
+ * @param a     pointer to a local `lv_anim_t` variable to initialize
+ * \deprecated  Use `lv_anim_create()` instead.
  */
 void lv_anim_init(lv_anim_t * a);
+
+/**
+ * Dynamically allocate and initialize an animation variable.
+ * E.g.:
+ * lv_anim_t* a = lv_anim_create();
+ * lv_anim_set_...(a);
+ * lv_anim_trigger(a);
+ * @return  pointer to the new animation structure (lifecycle is managed by anim module)
+ */
+lv_anim_t * lv_anim_create(void);
+
+/**
+ * Dynamically allocate and initialize with an existing animation variable.
+ * @param other pointer to the other `lv_anim_t` variable to clone
+ * @return      pointer to the new animation structure (lifecycle is managed by anim module)
+ */
+lv_anim_t * lv_anim_dup(const lv_anim_t * other);
+
+/**
+ * Start a dynamically allocated animation.
+ * E.g.:
+ * lv_anim_t* a = lv_anim_create();
+ * lv_anim_set_...(a);
+ * lv_anim_trigger(a);
+ * @param a     pointer to an `lv_anim_t` variable, created by `lv_anim_create()`.
+ */
+void lv_anim_trigger(lv_anim_t * a);
 
 /**
  * Set a variable to animate
@@ -401,6 +429,7 @@ static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t 
  * Start the animation
  * @param a         an initialized 'anim_t' variable. Not required after call.
  * @return          pointer to the internal animation structure (different from the `a` parameter)
+ * \deprecated      Use `lv_anim_trigger()` instead.
  */
 lv_anim_t * lv_anim_start(const lv_anim_t * a);
 
@@ -459,6 +488,12 @@ static inline void * lv_anim_get_user_data(const lv_anim_t * a)
  * @return          true: at least 1 animation is deleted, false: no animation is deleted
  */
 bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb);
+
+/**
+ * Delete a dynamically allocated animation
+ * @param   a pointer to an `lv_anim_t` variable, created by `lv_anim_create()`.
+ */
+void lv_anim_delete_by_ptr(lv_anim_t * a);
 
 /**
  * Delete all the animations

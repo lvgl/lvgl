@@ -46,6 +46,21 @@ typedef struct {
 void _lv_ll_init(lv_ll_t * ll_p, uint32_t node_size);
 
 /**
+ * Allocates a new node without adding it to the list
+ * @param ll_p pointer to linked list
+ * @return pointer to the node
+ */
+void * _lv_ll_node_allocate(lv_ll_t * ll_p);
+
+/**
+ * Inserts a pre-allocated node as the new head of the linked list
+ * @param ll_p      pointer to linked list
+ * @param node_p    pointer to node
+ * @return pointer to the new head
+ */
+void * _lv_ll_node_ins_head(lv_ll_t * ll_p, void * node_p);
+
+/**
  * Add a new head to a linked list
  * @param ll_p pointer to linked list
  * @return pointer to the new head
