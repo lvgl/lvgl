@@ -126,13 +126,13 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
     if(grad_dir >= LV_GRAD_DIR_LINEAR) {
         switch(grad_dir) {
             case LV_GRAD_DIR_LINEAR:
-                lv_gradient_linear_setup(&dsc->grad, &clipped_coords);
+                lv_gradient_linear_setup(&dsc->grad, coords);
                 break;
             case LV_GRAD_DIR_RADIAL:
-                lv_gradient_radial_setup(&dsc->grad, &clipped_coords);
+                lv_gradient_radial_setup(&dsc->grad, coords);
                 break;
             case LV_GRAD_DIR_CONICAL:
-                lv_gradient_conical_setup(&dsc->grad, &clipped_coords);
+                lv_gradient_conical_setup(&dsc->grad, coords);
                 break;
             default:
                 LV_LOG_WARN("Gradient type is not supported");
