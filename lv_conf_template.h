@@ -1239,7 +1239,7 @@
     /** Driver for /dev/input */
     #define LV_USE_NUTTX_TOUCHSCREEN    0
 
-    /*Touchscreen cursor size in pixels(<=0: disable cursor)*/
+    /** Touchscreen cursor size in pixels(<=0: disable cursor) */
     #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE    0
 #endif
 
