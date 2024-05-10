@@ -379,8 +379,8 @@ static void draw_indic(lv_event_t * e)
             (int32_t)((int32_t)anim_length * (bar->cur_value_anim.anim_end - bar->min_value)) / range;
 
         anim_cur_value_x = anim_cur_value_start_x + (((anim_cur_value_end_x - anim_cur_value_start_x) *
-                           bar->cur_value_anim.anim_state) /
-                           LV_BAR_ANIM_STATE_END);
+                                                      bar->cur_value_anim.anim_state) /
+                                                     LV_BAR_ANIM_STATE_END);
     }
     else {
         anim_cur_value_x = (int32_t)((int32_t)anim_length * (bar->cur_value - bar->min_value)) / range;
