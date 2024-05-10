@@ -217,14 +217,13 @@ static inline int32_t sqr32(int32_t x)
 
 static inline int32_t extend_w(int32_t w, lv_grad_extend_t extend)
 {
-    if(w < 0)
-        return 0;
     if(extend == LV_GRAD_EXTEND_PAD) {                  /**< Repeat the same color*/
-        return LV_MIN(w, 255);
+        return w < 0 ? 0 : LV_MIN(w, 255);
     }
     if(extend == LV_GRAD_EXTEND_REPEAT) {       /**< Repeat the pattern*/
         return w & 255;
     }
+    /*LV_GRAD_EXTEND_REFLECT*/
     w &= 511;
     if(w > 255)
         w ^= 511;   /* 511 - w */
