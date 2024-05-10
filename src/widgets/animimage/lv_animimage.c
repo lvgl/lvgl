@@ -162,7 +162,7 @@ static void index_change(lv_obj_t * obj, int32_t index)
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
 
     if(animimg->dsc == NULL) {
-        LV_LOG_ERROR("dsc is null");
+        LV_LOG_WARN("dsc is null");
         return;
     }
 
