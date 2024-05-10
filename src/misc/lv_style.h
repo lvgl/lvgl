@@ -184,12 +184,11 @@ typedef struct {
         } linear;
         /*Radial gradient parameters*/
         struct {
-            lv_point_t
-            start;                          /**< Center of the focal (starting) circle in local coordinates (can be the same as the ending circle to create concentric circles */
+            lv_point_t  focal;                          /**< Center of the focal (starting) circle in local coordinates */
+                                                        /* (can be the same as the ending circle to create concentric circles) */
+            lv_point_t  focal_extent;                   /**< Point on the circle (can be the same as the center) */
             lv_point_t  end;                            /**< Center of the ending circle in local coordinates */
-            int16_t     start_radius;                   /**< Starting radius (must be >= 0) */
-            int16_t
-            end_radius;                     /**< Ending radius (this will determine the "size" of the gradient, must be > 0) */
+            lv_point_t  end_extent;                     /**< Point on the circle determining the radius of the gradient */
         } radial;
         /*Conical gradient parameters*/
         struct {

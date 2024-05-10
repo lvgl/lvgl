@@ -33,13 +33,15 @@ void lv_example_style_16(void)
 
     /*Define radial gradient by the start and end limit circles. Here we use concentric limit circles with the center in the top left corner (all coordinates are relative to the object)*/
     grad.dir = LV_GRAD_DIR_RADIAL;
-    grad.radial.start.x = 0;                             /*start circle center x position*/
-    grad.radial.start.y = 0;                             /*start circle center y position*/
-    grad.radial.start_radius = 0;                        /*start circle radius*/
-    grad.radial.end.x = 0;                               /*end circle center x position*/
-    grad.radial.end.y = 0;                               /*end circle center y position*/
-    grad.radial.end_radius = width;                      /*end circle radius*/
-    grad.extend = LV_GRAD_EXTEND_PAD;               /*do not repeat color pattern outside the end circle*/
+    grad.radial.focal.x = lv_pct(50);                    /*start circle center x position*/
+    grad.radial.focal.y = lv_pct(50);                    /*start circle center y position*/
+    grad.radial.focal_extent.x = grad.radial.focal.x;    /*start circle point x coordinate*/
+    grad.radial.focal_extent.y = grad.radial.focal.y;    /*start circle point y coordinate*/
+    grad.radial.end.x = grad.radial.focal.x;             /*end circle center x position*/
+    grad.radial.end.y = grad.radial.focal.y;             /*end circle center y position*/
+    grad.radial.end_extent.x = lv_pct(100);              /*end circle point x coordinate*/
+    grad.radial.end_extent.y = lv_pct(100);              /*end circle point y coordinate*/
+    grad.extend = LV_GRAD_EXTEND_PAD;                    /*do not repeat color pattern outside the end circle*/
 
     /*Set gradient as background*/
     lv_style_set_bg_grad(&style, &grad);

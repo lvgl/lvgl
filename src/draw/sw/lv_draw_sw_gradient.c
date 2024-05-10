@@ -362,11 +362,10 @@ void lv_gradient_cleanup(lv_grad_t * grad)
 
 void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
 {
-    lv_point_t start = dsc->radial.start;
+    lv_point_t start = dsc->radial.focal;
     lv_point_t end = dsc->radial.end;
-    int16_t r_start = dsc->radial.start_radius;
-    int16_t r_end = dsc->radial.end_radius;
-    LV_ASSERT(r_end != 0);
+    lv_point_t start_extent = dsc->radial.focal_extent;
+    lv_point_t end_extent = dsc->radial.end_extent;
     lv_grad_radial_state_t * state = lv_malloc(sizeof(lv_grad_radial_state_t));
     dsc->state = state;
 
@@ -377,6 +376,15 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
     if (LV_COORD_IS_PCT(end.x)) end.x = (wdt * LV_COORD_GET_PCT(end.x)) / 100;
     if (LV_COORD_IS_PCT(start.y)) start.y = (hgt * LV_COORD_GET_PCT(start.y)) / 100;
     if (LV_COORD_IS_PCT(end.y)) end.y = (hgt * LV_COORD_GET_PCT(end.y)) / 100;
+    if (LV_COORD_IS_PCT(start_extent.x)) start_extent.x = (wdt * LV_COORD_GET_PCT(start_extent.x)) / 100;
+    if (LV_COORD_IS_PCT(end_extent.x)) end_extent.x = (wdt * LV_COORD_GET_PCT(end_extent.x)) / 100;
+    if (LV_COORD_IS_PCT(start_extent.y)) start_extent.y = (hgt * LV_COORD_GET_PCT(start_extent.y)) / 100;
+    if (LV_COORD_IS_PCT(end_extent.y)) end_extent.y = (hgt * LV_COORD_GET_PCT(end_extent.y)) / 100;
+
+    /* Calculate radii */
+    int16_t r_start = fast_sqrt32(sqr32(start_extent.x - start.x) + sqr32(start_extent.y - start.y));
+    int16_t r_end = fast_sqrt32(sqr32(end_extent.x - end.x) + sqr32(end_extent.y - end.y));
+    LV_ASSERT(r_end != 0);
 
     /* Create gradient color map */
     state->cgrad = lv_gradient_get(dsc, 256, 0);
