@@ -1078,7 +1078,10 @@ static void wait_for_flushing(lv_display_t * disp)
     lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
 
     if(disp->flush_wait_cb) {
-        disp->flush_wait_cb(disp);
+        if(disp->flushing) {
+            disp->flush_wait_cb(disp);
+        }
+        disp->flushing = 0;
     }
     else {
         while(disp->flushing);
