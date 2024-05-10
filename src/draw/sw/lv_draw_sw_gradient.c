@@ -707,7 +707,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_conical_get_line(lv_grad_dsc_t * dsc, int
     }
 }
 
-void lv_grad_linear_init(lv_grad_dsc_t* dsc, int32_t from_x, int32_t from_y, int32_t to_x, int32_t to_y, lv_grad_extend_t extend)
+void lv_grad_linear_init(lv_grad_dsc_t * dsc, int32_t from_x, int32_t from_y, int32_t to_x, int32_t to_y,
+                         lv_grad_extend_t extend)
 {
     dsc->dir = LV_GRAD_DIR_LINEAR;
     dsc->linear.start.x = from_x;
@@ -717,7 +718,8 @@ void lv_grad_linear_init(lv_grad_dsc_t* dsc, int32_t from_x, int32_t from_y, int
     dsc->extend = extend;
 }
 
-void lv_grad_radial_init(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y, int32_t to_x, int32_t to_y, lv_grad_extend_t extend)
+void lv_grad_radial_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t to_x, int32_t to_y,
+                         lv_grad_extend_t extend)
 {
     dsc->dir = LV_GRAD_DIR_RADIAL;
     dsc->radial.focal.x = center_x;
@@ -731,7 +733,8 @@ void lv_grad_radial_init(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y,
     dsc->extend = extend;
 }
 
-void lv_grad_conical_init(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y, int32_t start_angle, int32_t end_angle, lv_grad_extend_t extend)
+void lv_grad_conical_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t start_angle,
+                          int32_t end_angle, lv_grad_extend_t extend)
 {
     dsc->dir = LV_GRAD_DIR_CONICAL;
     dsc->conical.center.x = center_x;
@@ -741,7 +744,7 @@ void lv_grad_conical_init(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y
     dsc->extend = extend;
 }
 
-void lv_grad_radial_set_focal(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y, int32_t radius)
+void lv_grad_radial_set_focal(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t radius)
 {
     dsc->radial.focal.x = center_x;
     dsc->radial.focal.y = center_y;
