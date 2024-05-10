@@ -146,6 +146,9 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
 
                     vg_lite_color_t recolor = lv_vg_lite_image_recolor(&image_buffer, img_dsc);
 
+                    if(ctx->fill_dsc.img_dsc.colorkey) {
+                        lv_vg_lite_set_color_key(ctx->fill_dsc.img_dsc.colorkey);
+                    }
                     lv_vg_lite_draw_pattern(
                         &u->target_buffer,
                         vg_path,
@@ -158,6 +161,10 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
                         0,
                         recolor,
                         VG_LITE_FILTER_BI_LINEAR);
+
+                    if(ctx->fill_dsc.img_dsc.colorkey) {
+                        lv_vg_lite_set_color_key(NULL);
+                    }
 
                     lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
                 }

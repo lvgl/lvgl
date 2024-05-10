@@ -18,7 +18,7 @@
     extern const lv_property_name_t lv_obj_property_names[75];
     extern const lv_property_name_t lv_roller_property_names[3];
     extern const lv_property_name_t lv_slider_property_names[8];
-    extern const lv_property_name_t lv_style_property_names[120];
+    extern const lv_property_name_t lv_style_property_names[121];
     extern const lv_property_name_t lv_textarea_property_names[15];
 #endif
 #endif
