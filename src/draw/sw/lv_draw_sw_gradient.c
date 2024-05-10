@@ -653,7 +653,7 @@ void lv_gradient_conical_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
     c0.y = lv_pct_to_px(c0.y, hgt);
 
     /* Precalculate constants */
-    if(beta == alpha)   /* avoid division by zero */
+    if (beta <= alpha)
         beta += 360;
     state->x0 = c0.x;
     state->y0 = c0.y;
@@ -690,7 +690,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_conical_get_line(lv_grad_dsc_t * dsc, int
                 w = 0;
             }
             else {
-                w = extend_w(((lv_atan2(dy, dx) - state->a) * state->inv_da) >> 8, dsc->extend);
+                int32_t d = lv_atan2(dy, dx) - state->a;
+                if (d < 0)
+                    d += 360;
+                w = extend_w((d * state->inv_da) >> 8, dsc->extend);
             }
             *buf++ = grad->color_map[w];
             *opa++ = grad->opa_map[w];
@@ -699,7 +702,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_conical_get_line(lv_grad_dsc_t * dsc, int
     }
     else {
         for(; width > 0; width--) {
-            w = extend_w(((lv_atan2(dy, dx) - state->a) * state->inv_da) >> 8, dsc->extend);
+            int32_t d = lv_atan2(dy, dx) - state->a;
+            if (d < 0)
+                d += 360;
+            w = extend_w((d * state->inv_da) >> 8, dsc->extend);
             *buf++ = grad->color_map[w];
             *opa++ = grad->opa_map[w];
             dx++;
