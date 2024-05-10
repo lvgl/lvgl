@@ -954,6 +954,20 @@ Set intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means full
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
+image_colorkey
+~~~~~~~~~~~~~~
+
+Set image colorkey definition. The lv_image_colorkey_t contains two color values: `high_color` and `low_color`. the color of pixels ranging from `low_color` to `high_color` will be transparent.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
 Line
 ----
 
@@ -1356,6 +1370,34 @@ color_filter_opa
 ~~~~~~~~~~~~~~~~
 
 The intensity of mixing of color filter.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_TRANSP`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
+recolor
+~~~~~~~
+
+Set a color to mix to the obj.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
+recolor_opa
+~~~~~~~~~~~
+
+Set intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 
 .. raw:: html
 
