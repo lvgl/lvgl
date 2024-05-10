@@ -59,7 +59,7 @@ jobs:
         CC: cl
 
   test-native:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: amd64 Executable Tests
     steps:
     - uses: actions/checkout@v4
@@ -89,7 +89,7 @@ jobs:
 #        verbose: true
   test-cross:
     # The host should always be linux
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: ${{ matrix.arch }} Executable Tests
 
     # Run steps on a matrix of 3 arch/distro combinations
