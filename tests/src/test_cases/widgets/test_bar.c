@@ -7,11 +7,15 @@
 
 static lv_obj_t * g_active_screen = NULL;
 static lv_obj_t * g_bar = NULL;
+static lv_obj_t * bar1_orient_auto = NULL;
+static lv_obj_t * bar2_orient_ver = NULL;
 
 void setUp(void)
 {
     g_active_screen = lv_screen_active();
     g_bar = lv_bar_create(g_active_screen);
+    bar1_orient_auto = lv_bar_create(g_active_screen);
+    bar2_orient_ver = lv_bar_create(g_active_screen);
 }
 
 void tearDown(void)
@@ -397,6 +401,94 @@ void test_bar_render_corner(void)
     render_test_screen_create(true, LV_GRAD_DIR_NONE, "widgets/bar_corner_4.png");
     render_test_screen_create(true, LV_GRAD_DIR_HOR, "widgets/bar_corner_5.png");
     render_test_screen_create(true, LV_GRAD_DIR_VER, "widgets/bar_corner_6.png");
+}
+
+void test_bar_orientation(void)
+{
+    lv_obj_set_size(bar1_orient_auto, 100, 60);
+    lv_obj_set_style_pad_all(bar1_orient_auto, 3, 0);
+    lv_obj_set_style_radius(bar1_orient_auto, 5, 0);
+    lv_obj_set_style_radius(bar1_orient_auto, 5, LV_PART_INDICATOR);
+    lv_bar_set_range(bar1_orient_auto, 0, 100);
+    lv_bar_set_value(bar1_orient_auto, 80, LV_ANIM_OFF);
+    lv_obj_align(bar1_orient_auto, LV_ALIGN_CENTER, -60, 0);
+
+
+    /* same size and design as `bar1_orient_auto`, but forced to `LV_BAR_ORIENTATION_VERTICAL` */
+
+    lv_obj_set_size(bar2_orient_ver, 100, 60);
+    lv_obj_center(bar2_orient_ver);
+    lv_obj_set_style_pad_all(bar2_orient_ver, 3, 0);
+    lv_obj_set_style_radius(bar2_orient_ver, 5, 0);
+    lv_obj_set_style_radius(bar2_orient_ver, 5, LV_PART_INDICATOR);
+    lv_bar_set_range(bar2_orient_ver, 0, 100);
+    lv_bar_set_value(bar2_orient_ver, 80, LV_ANIM_OFF);
+    lv_bar_set_orientation(bar2_orient_ver, LV_BAR_ORIENTATION_VERTICAL);
+    lv_obj_align(bar2_orient_ver, LV_ALIGN_CENTER, 60, 0);
+
+    lv_refr_now(lv_display_get_default());
+
+    lv_bar_t * _bar1_orient_auto = (lv_bar_t *) bar1_orient_auto;
+    lv_area_t bar1_coords = bar1_orient_auto->coords;
+    lv_area_t bar1_indic_area = _bar1_orient_auto->indic_area;
+
+    lv_area_t bar1_indic_area_calc;
+    /*Calculate the indicator area*/
+    int32_t bg_left = lv_obj_get_style_pad_left(bar1_orient_auto,     LV_PART_MAIN);
+    int32_t bg_right = lv_obj_get_style_pad_right(bar1_orient_auto,   LV_PART_MAIN);
+    int32_t bg_top = lv_obj_get_style_pad_top(bar1_orient_auto,       LV_PART_MAIN);
+    int32_t bg_bottom = lv_obj_get_style_pad_bottom(bar1_orient_auto, LV_PART_MAIN);
+
+    /*Respect padding and minimum width/height too*/
+    lv_area_copy(&bar1_indic_area_calc, &bar1_coords);
+    bar1_indic_area_calc.x1 += bg_left;
+    bar1_indic_area_calc.x2 -= bg_right;
+    bar1_indic_area_calc.y1 += bg_top;
+    bar1_indic_area_calc.y2 -= bg_bottom;
+
+    int32_t w_bar1_indic_area_calc = lv_area_get_width(&bar1_indic_area_calc);
+    int32_t h_bar1_indic_area_calc = lv_area_get_height(&bar1_indic_area_calc);
+    int32_t w_bar1_indic_area = lv_area_get_width(&bar1_indic_area);
+    int32_t h_bar1_indic_area = lv_area_get_height(&bar1_indic_area);
+
+    bool bar1_is_hor = (h_bar1_indic_area == h_bar1_indic_area_calc);
+    bool bar1_is_ver = (w_bar1_indic_area == w_bar1_indic_area_calc);
+
+    lv_bar_orientation_t bar1_orient = lv_bar_get_orientation(bar1_orient_auto);
+    TEST_ASSERT_EQUAL(bar1_orient, LV_BAR_ORIENTATION_AUTO);
+    TEST_ASSERT_EQUAL(bar1_is_hor, 1);  /* shoud be : 1 */
+    TEST_ASSERT_EQUAL(bar1_is_ver, 0);  /* shoud be : 0 */
+
+    lv_bar_t * _bar2_orient_ver = (lv_bar_t *) bar2_orient_ver;
+    lv_area_t bar2_coords = bar2_orient_ver->coords;
+    lv_area_t bar2_indic_area = _bar2_orient_ver->indic_area;
+
+    lv_area_t bar2_indic_area_calc;
+    /*Calculate the indicator area*/
+    bg_left = lv_obj_get_style_pad_left(bar2_orient_ver,     LV_PART_MAIN);
+    bg_right = lv_obj_get_style_pad_right(bar2_orient_ver,   LV_PART_MAIN);
+    bg_top = lv_obj_get_style_pad_top(bar2_orient_ver,       LV_PART_MAIN);
+    bg_bottom = lv_obj_get_style_pad_bottom(bar2_orient_ver, LV_PART_MAIN);
+
+    /*Respect padding and minimum width/height too*/
+    lv_area_copy(&bar2_indic_area_calc, &bar2_coords);
+    bar2_indic_area_calc.x1 += bg_left;
+    bar2_indic_area_calc.x2 -= bg_right;
+    bar2_indic_area_calc.y1 += bg_top;
+    bar2_indic_area_calc.y2 -= bg_bottom;
+
+    int32_t w_bar2_indic_area_calc = lv_area_get_width(&bar2_indic_area_calc);
+    int32_t h_bar2_indic_area_calc = lv_area_get_height(&bar2_indic_area_calc);
+    int32_t w_bar2_indic_area = lv_area_get_width(&bar2_indic_area);
+    int32_t h_bar2_indic_area = lv_area_get_height(&bar2_indic_area);
+
+    bool bar2_is_hor = (h_bar2_indic_area == h_bar2_indic_area_calc);
+    bool bar2_is_ver = (w_bar2_indic_area == w_bar2_indic_area_calc);
+
+    lv_bar_orientation_t bar2_orient = lv_bar_get_orientation(bar2_orient_ver);
+    TEST_ASSERT_EQUAL(bar2_orient, LV_BAR_ORIENTATION_VERTICAL);
+    TEST_ASSERT_EQUAL(bar2_is_hor, 0);  /* shoud be : 0 */
+    TEST_ASSERT_EQUAL(bar2_is_ver, 1);  /* shoud be : 1 */
 }
 
 #endif
