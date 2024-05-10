@@ -360,7 +360,7 @@ void lv_gradient_cleanup(lv_grad_t * grad)
 
 */
 
-void lv_gradient_radial_setup(lv_grad_dsc_t * dsc)
+void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
 {
     lv_point_t start = dsc->radial.start;
     lv_point_t end = dsc->radial.end;
@@ -369,6 +369,14 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc)
     LV_ASSERT(r_end != 0);
     lv_grad_radial_state_t * state = lv_malloc(sizeof(lv_grad_radial_state_t));
     dsc->state = state;
+
+    /* Convert from percentage coordinates */
+    int32_t wdt = lv_area_get_width(coords);
+    int32_t hgt = lv_area_get_height(coords);
+    if (LV_COORD_IS_PCT(start.x)) start.x = (wdt * LV_COORD_GET_PCT(start.x)) / 100;
+    if (LV_COORD_IS_PCT(end.x)) end.x = (wdt * LV_COORD_GET_PCT(end.x)) / 100;
+    if (LV_COORD_IS_PCT(start.y)) start.y = (hgt * LV_COORD_GET_PCT(start.y)) / 100;
+    if (LV_COORD_IS_PCT(end.y)) end.y = (hgt * LV_COORD_GET_PCT(end.y)) / 100;
 
     /* Create gradient color map */
     state->cgrad = lv_gradient_get(dsc, 256, 0);
@@ -544,7 +552,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, int3
 
 */
 
-void lv_gradient_linear_setup(lv_grad_dsc_t * dsc)
+void lv_gradient_linear_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
 {
     lv_point_t start = dsc->linear.start;
     lv_point_t end = dsc->linear.end;
@@ -554,6 +562,14 @@ void lv_gradient_linear_setup(lv_grad_dsc_t * dsc)
     /* Create gradient color map */
     state->cgrad = lv_gradient_get(dsc, 256, 0);
 
+    /* Convert from percentage coordinates */
+    int32_t wdt = lv_area_get_width(coords);
+    int32_t hgt = lv_area_get_height(coords);
+    if(LV_COORD_IS_PCT(start.x)) start.x = (wdt * LV_COORD_GET_PCT(start.x)) / 100;
+    if(LV_COORD_IS_PCT(end.x)) end.x = (wdt * LV_COORD_GET_PCT(end.x)) / 100;
+    if(LV_COORD_IS_PCT(start.y)) start.y = (hgt * LV_COORD_GET_PCT(start.y)) / 100;
+    if(LV_COORD_IS_PCT(end.y)) end.y = (hgt * LV_COORD_GET_PCT(end.y)) / 100;
+
     /* Precalculate constants */
     int32_t dx = end.x - start.x;
     int32_t dy = end.y - start.y;
@@ -561,7 +577,7 @@ void lv_gradient_linear_setup(lv_grad_dsc_t * dsc)
     int32_t l2 = sqr32(dx) + sqr32(dy);
     state->a = (dx << 16) / l2;
     state->b = (dy << 16) / l2;
-    state->c = -(((start.x * dx + start.y * dy) << 16) / l2);
+    state->c = ((start.x * dx + start.y * dy) << 16) / l2;
 }
 
 void lv_gradient_linear_cleanup(lv_grad_dsc_t * dsc)
@@ -608,7 +624,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_linear_get_line(lv_grad_dsc_t * dsc, int3
         w is the unknown variable
 */
 
-void lv_gradient_conical_setup(lv_grad_dsc_t * dsc)
+void lv_gradient_conical_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
 {
     lv_point_t c0 = dsc->conical.center;
     int32_t alpha = dsc->conical.start_angle % 360;
@@ -618,6 +634,12 @@ void lv_gradient_conical_setup(lv_grad_dsc_t * dsc)
 
     /* Create gradient color map */
     state->cgrad = lv_gradient_get(dsc, 256, 0);
+
+    /* Convert from percentage coordinates */
+    int32_t wdt = lv_area_get_width(coords);
+    int32_t hgt = lv_area_get_height(coords);
+    if (LV_COORD_IS_PCT(c0.x)) c0.x = (wdt * LV_COORD_GET_PCT(c0.x)) / 100;
+    if (LV_COORD_IS_PCT(c0.y)) c0.y = (hgt * LV_COORD_GET_PCT(c0.y)) / 100;
 
     /* Precalculate constants */
     if(beta == alpha)   /* avoid division by zero */
