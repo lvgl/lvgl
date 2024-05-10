@@ -64,6 +64,17 @@ lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * gradient, int32_t w, int32_t h
  */
 void lv_gradient_cleanup(lv_grad_t * grad);
 
+/**
+ * Initialize gradient color map from a table
+ * @param grad      pointer to a gradient descriptor
+ * @param colors    color array
+ * @param fracs     position array (0..255): if NULL, then colors are distributed evenly
+ * @param opa       opacity array: if NULL, then LV_OPA_COVER is assumed
+ * @param num_stops number of gradient stops (1..LV_GRADIENT_MAX_STOPS)
+ */
+void lv_gradient_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const uint8_t fracs[],
+                            const lv_opa_t opa[], int num_stops);
+
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 /**

@@ -314,6 +314,18 @@ void lv_gradient_cleanup(lv_grad_t * grad)
     lv_free(grad);
 }
 
+void lv_gradient_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const uint8_t fracs[],
+                            const lv_opa_t opa[], int num_stops)
+{
+    LV_ASSERT(num_stops <= LV_GRADIENT_MAX_STOPS);
+    grad->stops_count = num_stops;
+    for(int i = 0; i < num_stops; i++) {
+        grad->stops[i].color = colors[i];
+        grad->stops[i].opa = opa != NULL ? opa[i] : LV_OPA_COVER;
+        grad->stops[i].frac = fracs != NULL ? fracs[i] : 255 * i / (num_stops - 1);
+    }
+}
+
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 /*
