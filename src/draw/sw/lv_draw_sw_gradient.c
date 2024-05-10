@@ -372,14 +372,15 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
     /* Convert from percentage coordinates */
     int32_t wdt = lv_area_get_width(coords);
     int32_t hgt = lv_area_get_height(coords);
-    if (LV_COORD_IS_PCT(start.x)) start.x = (wdt * LV_COORD_GET_PCT(start.x)) / 100;
-    if (LV_COORD_IS_PCT(end.x)) end.x = (wdt * LV_COORD_GET_PCT(end.x)) / 100;
-    if (LV_COORD_IS_PCT(start.y)) start.y = (hgt * LV_COORD_GET_PCT(start.y)) / 100;
-    if (LV_COORD_IS_PCT(end.y)) end.y = (hgt * LV_COORD_GET_PCT(end.y)) / 100;
-    if (LV_COORD_IS_PCT(start_extent.x)) start_extent.x = (wdt * LV_COORD_GET_PCT(start_extent.x)) / 100;
-    if (LV_COORD_IS_PCT(end_extent.x)) end_extent.x = (wdt * LV_COORD_GET_PCT(end_extent.x)) / 100;
-    if (LV_COORD_IS_PCT(start_extent.y)) start_extent.y = (hgt * LV_COORD_GET_PCT(start_extent.y)) / 100;
-    if (LV_COORD_IS_PCT(end_extent.y)) end_extent.y = (hgt * LV_COORD_GET_PCT(end_extent.y)) / 100;
+
+    start.x = lv_pct_to_px(start.x, wdt);
+    end.x = lv_pct_to_px(end.x, wdt);
+    start_extent.x = lv_pct_to_px(start_extent.x, wdt);
+    end_extent.x = lv_pct_to_px(end_extent.x, wdt);
+    start.y = lv_pct_to_px(start.y, hgt);
+    end.y = lv_pct_to_px(end.y, hgt);
+    start_extent.y = lv_pct_to_px(start_extent.y, hgt);
+    end_extent.y = lv_pct_to_px(end_extent.y, hgt);
 
     /* Calculate radii */
     int16_t r_start = fast_sqrt32(sqr32(start_extent.x - start.x) + sqr32(start_extent.y - start.y));
@@ -573,10 +574,11 @@ void lv_gradient_linear_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
     /* Convert from percentage coordinates */
     int32_t wdt = lv_area_get_width(coords);
     int32_t hgt = lv_area_get_height(coords);
-    if(LV_COORD_IS_PCT(start.x)) start.x = (wdt * LV_COORD_GET_PCT(start.x)) / 100;
-    if(LV_COORD_IS_PCT(end.x)) end.x = (wdt * LV_COORD_GET_PCT(end.x)) / 100;
-    if(LV_COORD_IS_PCT(start.y)) start.y = (hgt * LV_COORD_GET_PCT(start.y)) / 100;
-    if(LV_COORD_IS_PCT(end.y)) end.y = (hgt * LV_COORD_GET_PCT(end.y)) / 100;
+
+    start.x = lv_pct_to_px(start.x, wdt);
+    end.x = lv_pct_to_px(end.x, wdt);
+    start.y = lv_pct_to_px(start.y, hgt);
+    end.y = lv_pct_to_px(end.y, hgt);
 
     /* Precalculate constants */
     int32_t dx = end.x - start.x;
@@ -646,8 +648,9 @@ void lv_gradient_conical_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
     /* Convert from percentage coordinates */
     int32_t wdt = lv_area_get_width(coords);
     int32_t hgt = lv_area_get_height(coords);
-    if (LV_COORD_IS_PCT(c0.x)) c0.x = (wdt * LV_COORD_GET_PCT(c0.x)) / 100;
-    if (LV_COORD_IS_PCT(c0.y)) c0.y = (hgt * LV_COORD_GET_PCT(c0.y)) / 100;
+
+    c0.x = lv_pct_to_px(c0.x, wdt);
+    c0.y = lv_pct_to_px(c0.y, hgt);
 
     /* Precalculate constants */
     if(beta == alpha)   /* avoid division by zero */
@@ -702,6 +705,48 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_conical_get_line(lv_grad_dsc_t * dsc, int
             dx++;
         }
     }
+}
+
+void lv_grad_linear_init(lv_grad_dsc_t* dsc, int32_t from_x, int32_t from_y, int32_t to_x, int32_t to_y, lv_grad_extend_t extend)
+{
+    dsc->dir = LV_GRAD_DIR_LINEAR;
+    dsc->linear.start.x = from_x;
+    dsc->linear.start.y = from_y;
+    dsc->linear.end.x = to_x;
+    dsc->linear.end.y = to_y;
+    dsc->extend = extend;
+}
+
+void lv_grad_radial_init(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y, int32_t to_x, int32_t to_y, lv_grad_extend_t extend)
+{
+    dsc->dir = LV_GRAD_DIR_RADIAL;
+    dsc->radial.focal.x = center_x;
+    dsc->radial.focal.y = center_y;
+    dsc->radial.focal_extent.x = center_x;
+    dsc->radial.focal_extent.y = center_y;
+    dsc->radial.end.x = center_x;
+    dsc->radial.end.y = center_y;
+    dsc->radial.end_extent.x = to_x;
+    dsc->radial.end_extent.y = to_y;
+    dsc->extend = extend;
+}
+
+void lv_grad_conical_init(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y, int32_t start_angle, int32_t end_angle, lv_grad_extend_t extend)
+{
+    dsc->dir = LV_GRAD_DIR_CONICAL;
+    dsc->conical.center.x = center_x;
+    dsc->conical.center.y = center_y;
+    dsc->conical.start_angle = start_angle;
+    dsc->conical.end_angle = end_angle;
+    dsc->extend = extend;
+}
+
+void lv_grad_radial_set_focal(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y, int32_t radius)
+{
+    dsc->radial.focal.x = center_x;
+    dsc->radial.focal.y = center_y;
+    dsc->radial.focal_extent.x = center_x + radius;
+    dsc->radial.focal_extent.y = center_y;
 }
 
 #endif /* LV_USE_DRAW_SW_COMPLEX_GRADIENTS */

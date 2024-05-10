@@ -25,6 +25,12 @@ extern "C" {
 #error LVGL needs at least 2 stops for gradients. Please increase the LV_GRADIENT_MAX_STOPS
 #endif
 
+#define LV_GRAD_LEFT    LV_PCT(0)
+#define LV_GRAD_RIGHT   LV_PCT(100)
+#define LV_GRAD_TOP     LV_PCT(0)
+#define LV_GRAD_BOTTOM  LV_PCT(100)
+#define LV_GRAD_CENTER  LV_PCT(50)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -59,6 +65,52 @@ lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * gradient, int32_t w, int32_t h
 void lv_gradient_cleanup(lv_grad_t * grad);
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+
+/**
+ * Helper function to initialize linear gradient
+ * @param dsc      gradient descriptor
+ * @param from_x   start x position: can be a coordinate or an lv_pct() value
+ *                 predefined constants LV_GRAD_LEFT, LV_GRAD_RIGHT, LV_GRAD_TOP, LV_GRAD_BOTTOM, LV_GRAD_CENTER can be used as well
+ * @param from_y   start y position
+ * @param to_x     end x position
+ * @param to_y     end y position
+ * @param extend   one of LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT or LV_GRAD_EXTEND_REFLECT
+ */
+void lv_grad_linear_init(lv_grad_dsc_t* dsc, int32_t from_x, int32_t from_y, int32_t to_x, int32_t to_y, lv_grad_extend_t extend);
+
+/**
+ * Helper function to initialize radial gradient
+ * @param dsc      gradient descriptor
+ * @param center_x center x position: can be a coordinate or an lv_pct() value
+ *                 predefined constants LV_GRAD_LEFT, LV_GRAD_RIGHT, LV_GRAD_TOP, LV_GRAD_BOTTOM, LV_GRAD_CENTER can be used as well
+ * @param center_y center y position
+ * @param to_x     point on the end circle x position
+ * @param to_y     point on the end circle y position
+ * @param extend   one of LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT or LV_GRAD_EXTEND_REFLECT
+ */
+void lv_grad_radial_init(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y, int32_t to_x, int32_t to_y, lv_grad_extend_t extend);
+
+/**
+ * Set focal (starting) circle of a radial gradient
+ * @param dsc      gradient descriptor
+ * @param center_x center x position: can be a coordinate or an lv_pct() value
+ *                 predefined constants LV_GRAD_LEFT, LV_GRAD_RIGHT, LV_GRAD_TOP, LV_GRAD_BOTTOM, LV_GRAD_CENTER can be used as well
+ * @param center_y center y position
+ * @param radius   radius of the starting circle (NOTE: this must be a scalar number, not percentage)
+ */
+void lv_grad_radial_set_focal(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y, int32_t radius);
+
+/**
+ * Helper function to initialize conical gradient
+ * @param dsc      gradient descriptor
+ * @param center_x center x position: can be a coordinate or an lv_pct() value
+ *                 predefined constants LV_GRAD_LEFT, LV_GRAD_RIGHT, LV_GRAD_TOP, LV_GRAD_BOTTOM, LV_GRAD_CENTER can be used as well
+ * @param center_y center y position
+ * @param start_angle   start angle in degrees
+ * @param end_angle     end angle in degrees
+ * @param extend   one of LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT or LV_GRAD_EXTEND_REFLECT
+ */
+void lv_grad_conical_init(lv_grad_dsc_t* dsc, int32_t center_x, int32_t center_y, int32_t start_angle, int32_t end_angle, lv_grad_extend_t extend);
 
 /**
  * Calculate constants from the given parameters that are used during rendering
