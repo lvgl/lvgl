@@ -1250,8 +1250,14 @@
     /** Driver for /dev/input */
     #define LV_USE_NUTTX_TOUCHSCREEN    0
 
-    /*Touchscreen cursor size in pixels(<=0: disable cursor)*/
+    /** Touchscreen cursor size in pixels(<=0: disable cursor) */
     #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE    0
+
+    /** Driver for /dev/mouse */
+    #define LV_USE_NUTTX_MOUSE    0
+
+    /** Mouse movement step (pixels) */
+    #define LV_USE_NUTTX_MOUSE_MOVE_STEP    1
 #endif
 
 /** Driver for /dev/dri/card */

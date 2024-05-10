@@ -4061,12 +4061,34 @@
         #endif
     #endif
 
-    /*Touchscreen cursor size in pixels(<=0: disable cursor)*/
+    /** Touchscreen cursor size in pixels(<=0: disable cursor) */
     #ifndef LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
         #ifdef CONFIG_LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
             #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE CONFIG_LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
         #else
             #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE    0
+        #endif
+    #endif
+
+    /** Driver for /dev/mouse */
+    #ifndef LV_USE_NUTTX_MOUSE
+        #ifdef CONFIG_LV_USE_NUTTX_MOUSE
+            #define LV_USE_NUTTX_MOUSE CONFIG_LV_USE_NUTTX_MOUSE
+        #else
+            #define LV_USE_NUTTX_MOUSE    0
+        #endif
+    #endif
+
+    /** Mouse movement step (pixels) */
+    #ifndef LV_USE_NUTTX_MOUSE_MOVE_STEP
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_NUTTX_MOUSE_MOVE_STEP
+                #define LV_USE_NUTTX_MOUSE_MOVE_STEP CONFIG_LV_USE_NUTTX_MOUSE_MOVE_STEP
+            #else
+                #define LV_USE_NUTTX_MOUSE_MOVE_STEP 0
+            #endif
+        #else
+            #define LV_USE_NUTTX_MOUSE_MOVE_STEP    1
         #endif
     #endif
 #endif

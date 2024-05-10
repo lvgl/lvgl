@@ -2033,6 +2033,19 @@ menu "LVGL configuration"
 			help
 				Set to 0 to disable cursor, or set to a value greater than 0 to set the cursor size in pixels.
 
+		config LV_USE_NUTTX_MOUSE
+			bool "Use NuttX mouse driver"
+			depends on LV_USE_NUTTX
+			default n
+
+		config LV_USE_NUTTX_MOUSE_MOVE_STEP
+			int "Mouse movement step (pixels)"
+			depends on LV_USE_NUTTX_MOUSE
+			range 1 10
+			default 1
+			help
+				Set the step size of the mouse movement in pixels.
+
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"
 			default n
