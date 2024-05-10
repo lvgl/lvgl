@@ -56,6 +56,16 @@ typedef struct {
     lv_grad_t * cgrad; /*256 element cache buffer containing the gradient color map*/
 } lv_grad_linear_state_t;
 
+typedef struct {
+    /* w = a * xp + b * yp + c */
+    int32_t x0;
+    int32_t y0;
+    int32_t a;
+    int32_t da;
+    int32_t inv_da;
+    lv_grad_t * cgrad; /*256 element cache buffer containing the gradient color map*/
+} lv_grad_conical_state_t;
+
 #endif
 
 /**********************
@@ -584,6 +594,84 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_linear_get_line(lv_grad_dsc_t * dsc, int3
         *buf++ = grad->color_map[w];
         *opa++ = grad->opa_map[w];
         x += d;
+    }
+}
+
+/*
+    Calculate conical gradient based on the following equation:
+
+    w = (atan((yp - y0)/(xp - x0)) - alpha) / (beta - alpha), where
+
+        P: {xp, yp} is the point of interest
+        C0: {x0, y0} is the center of the gradient
+        alpha is the start angle
+        beta is the end angle
+        w is the unknown variable
+*/
+
+void lv_gradient_conical_setup(lv_grad_dsc_t * dsc)
+{
+    lv_point_t c0 = dsc->conical.center;
+    int32_t alpha = dsc->conical.start_angle % 360;
+    int32_t beta = dsc->conical.end_angle % 360;
+    lv_grad_conical_state_t * state = lv_malloc(sizeof(lv_grad_conical_state_t));
+    dsc->state = state;
+
+    /* Create gradient color map */
+    state->cgrad = lv_gradient_get(dsc, 256, 0);
+
+    /* Precalculate constants */
+    if(beta == alpha)   /* avoid division by zero */
+        beta += 360;
+    state->x0 = c0.x;
+    state->y0 = c0.y;
+    state->a = alpha;
+    state->da = beta - alpha;
+    state->inv_da = (1 << 16) / (beta - alpha);
+}
+
+void lv_gradient_conical_cleanup(lv_grad_dsc_t * dsc)
+{
+    lv_grad_conical_state_t * state = dsc->state;
+    if(state == NULL)
+        return;
+    if(state->cgrad)
+        lv_free(state->cgrad);
+    lv_free(state);
+}
+
+void LV_ATTRIBUTE_FAST_MEM lv_gradient_conical_get_line(lv_grad_dsc_t * dsc, int32_t xp, int32_t yp,
+                                                        int32_t width, lv_grad_t * result)
+{
+    lv_grad_conical_state_t * state = (lv_grad_conical_state_t *)dsc->state;
+    lv_color_t * buf = result->color_map;
+    lv_opa_t * opa = result->opa_map;
+    lv_grad_t * grad = state->cgrad;
+
+    int32_t w;  /* the result: this is an offset into the 256 element gradient color table */
+    int32_t dx = xp - state->x0;
+    int32_t dy = yp - state->y0;
+
+    if(dy == 0) {   /* we will eventually go through the center of the conical: need an extra test in the loop to avoid both dx and dy being zero in atan2 */
+        for(; width > 0; width--) {
+            if(dx == 0) {
+                w = 0;
+            }
+            else {
+                w = extend_w(((lv_atan2(dy, dx) - state->a) * state->inv_da) >> 8, dsc->extend);
+            }
+            *buf++ = grad->color_map[w];
+            *opa++ = grad->opa_map[w];
+            dx++;
+        }
+    }
+    else {
+        for(; width > 0; width--) {
+            w = extend_w(((lv_atan2(dy, dx) - state->a) * state->inv_da) >> 8, dsc->extend);
+            *buf++ = grad->color_map[w];
+            *opa++ = grad->opa_map[w];
+            dx++;
+        }
     }
 }
 

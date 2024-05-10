@@ -131,6 +131,9 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
             case LV_GRAD_DIR_RADIAL:
                 lv_gradient_radial_setup(&dsc->grad);
                 break;
+            case LV_GRAD_DIR_CONICAL:
+                lv_gradient_conical_setup(&dsc->grad);
+                break;
             default:
                 LV_LOG_WARN("Gradient type is not supported");
                 return;
@@ -179,6 +182,10 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                     lv_gradient_radial_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
                     preblend = true;
                     break;
+                case LV_GRAD_DIR_CONICAL:
+                    lv_gradient_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
+                    preblend = true;
+                    break;
             }
             /* pre-blend the mask */
             if(preblend) {
@@ -210,6 +217,9 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                     break;
                 case LV_GRAD_DIR_RADIAL:
                     lv_gradient_radial_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w, grad);
+                    break;
+                case LV_GRAD_DIR_CONICAL:
+                    lv_gradient_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w, grad);
                     break;
             }
             /* pre-blend the mask */
@@ -277,6 +287,9 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                     break;
                 case LV_GRAD_DIR_RADIAL:
                     lv_gradient_radial_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
+                    break;
+                case LV_GRAD_DIR_CONICAL:
+                    lv_gradient_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
                     break;
             }
 #endif
