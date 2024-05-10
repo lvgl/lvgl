@@ -313,6 +313,9 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
             case LV_GRAD_DIR_RADIAL:
                 lv_gradient_radial_cleanup(&dsc->grad);
                 break;
+            case LV_GRAD_DIR_CONICAL:
+                lv_gradient_conical_cleanup(&dsc->grad);
+                break;
         }
     }
 #endif
