@@ -155,17 +155,17 @@ bool lv_anim_toggle_running(lv_anim_t * a)
     return a->is_running;
 }
 
-void lv_anim_set_act_time(lv_anim_t * a, uint32_t act_time)
+void lv_anim_set_current_time(lv_anim_t * a, uint32_t current_time)
 {
     int32_t value = 0;
 
     if(a->playback_now) anim_toggle_playback_state(a);
 
-    if(act_time <= (uint32_t)a->duration) {
-        a->act_time = act_time;
+    if(current_time <= (uint32_t)a->duration) {
+        a->current_time = current_time;
         value = a->path_cb(a);
     }
-    else { // act_time > duration
+    else { // current_time > duration
         value = a->end_value;
     }
 
@@ -285,7 +285,7 @@ void lv_anim_refr_now(void)
 int32_t lv_anim_path_linear(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    int32_t step = lv_map(a->act_time, 0, a->duration, 0, LV_ANIM_RESOLUTION);
+    int32_t step = lv_map(a->current_time, 0, a->duration, 0, LV_ANIM_RESOLUTION);
 
     /*Get the new value which will be proportional to `step`
      *and the `start` and `end` values*/
@@ -323,7 +323,7 @@ int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 int32_t lv_anim_path_bounce(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    int32_t t = lv_map(a->act_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
+    int32_t t = lv_map(a->current_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
     int32_t diff = (a->end_value - a->start_value);
 
     /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
@@ -373,7 +373,7 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
 
 int32_t lv_anim_path_step(const lv_anim_t * a)
 {
-    if(a->act_time >= a->duration)
+    if(a->current_time >= a->duration)
         return a->end_value;
     else
         return a->start_value;
@@ -382,7 +382,7 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
 int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
     /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
+    uint32_t t = lv_map(a->current_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
     int32_t step = lv_cubic_bezier(t, x1, y1, x2, y2);
 
     int32_t new_value;
@@ -428,13 +428,13 @@ static void anim_timer(lv_timer_t * param)
         if(!a->is_running)
             goto get_next_element;
 
-        a->act_time += elaps;
+        a->current_time += elaps;
 
         if(a->run_round != state.anim_run_round) {
             a->run_round = state.anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
 
             /*The animation will run now for the first time. Call `start_cb`*/
-            if(!a->start_cb_called && a->act_time >= 0) {
+            if(!a->start_cb_called && a->current_time >= 0) {
 
                 if(a->early_apply == 0 && a->get_value_cb) {
                     int32_t v_ofs = a->get_value_cb(a);
@@ -451,8 +451,8 @@ static void anim_timer(lv_timer_t * param)
                 remove_concurrent_anims(a);
             }
 
-            if(a->act_time >= 0) {
-                if(a->act_time > a->duration) a->act_time = a->duration;
+            if(a->current_time >= 0) {
+                if(a->current_time > a->duration) a->current_time = a->duration;
 
                 int32_t new_value;
                 new_value = a->path_cb(a);
@@ -465,7 +465,7 @@ static void anim_timer(lv_timer_t * param)
                 }
 
                 /*If the time is elapsed the animation is ready*/
-                if(!state.anim_list_changed && a->act_time >= a->duration) {
+                if(!state.anim_list_changed && a->current_time >= a->duration) {
                     anim_completed_handler(a);
                 }
             }
@@ -502,11 +502,11 @@ static void anim_completed_handler(lv_anim_t * a)
     }
     /*If the animation is not deleted then restart it*/
     else {
-        a->act_time = -(int32_t)(a->repeat_delay); /*Restart the animation*/
+        a->current_time = -(int32_t)(a->repeat_delay); /*Restart the animation*/
         /*Swap the start and end values in play back mode*/
         if(a->playback_duration != 0) {
             /*If now turning back use the 'playback_pause*/
-            if(a->playback_now == 0) a->act_time = -(int32_t)(a->playback_delay);
+            if(a->playback_now == 0) a->current_time = -(int32_t)(a->playback_delay);
             anim_toggle_playback_state(a);
         }
     }
@@ -562,7 +562,7 @@ static bool remove_concurrent_anims(lv_anim_t * a_current)
          *a wrapper callback is used here an the real callback data is stored in the `user_data`.
          *Therefore equality check would remove all animations.*/
         if(a != a_current &&
-           (a->act_time >= 0 || a->early_apply) &&
+           (a->current_time >= 0 || a->early_apply) &&
            (a->var == a_current->var) &&
            ((a->exec_cb && a->exec_cb == a_current->exec_cb)
             /*|| (a->custom_exec_cb && a->custom_exec_cb == a_current->custom_exec_cb)*/)) {

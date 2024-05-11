@@ -71,20 +71,20 @@ static uint32_t tick_get_cb(void)
 {
     static uint32_t prev_tick = 0;
     static uint32_t cur_tick_us = 0;
-    uint32_t act_time = up_perf_gettime();
+    uint32_t current_tick = up_perf_gettime();
     uint32_t elaps;
 
     /*If there is no overflow in sys_time simple subtract*/
-    if(act_time >= prev_tick) {
-        elaps = act_time - prev_tick;
+    if(current_tick >= prev_tick) {
+        elaps = current_tick - prev_tick;
     }
     else {
         elaps = UINT32_MAX - prev_tick + 1;
-        elaps += act_time;
+        elaps += current_tick;
     }
 
     cur_tick_us += TICK_TO_USEC(elaps);
-    prev_tick = act_time;
+    prev_tick = current_tick;
     return cur_tick_us;
 }
 

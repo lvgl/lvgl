@@ -45,7 +45,7 @@ static void on_animation_resume(lv_anim_t * a)
 static void on_slider_value_change(lv_event_t * e)
 {
     LV_UNUSED(e);
-    lv_anim_set_act_time(g.animation, lv_slider_get_value(g.slider));
+    lv_anim_set_current_time(g.animation, lv_slider_get_value(g.slider));
 }
 
 static void on_slider_pressed(lv_event_t * e)

@@ -108,7 +108,7 @@ then configure it with ``lv_anim_set_...()`` functions, finally call :cpp:func:`
    lv_anim_toggle_running(a);
 
    /*Set the progress of the animation manually (aka seek). */
-   lv_anim_set_act_time(a, act_time);
+   lv_anim_set_current_time(a, current_time);
 
 You can apply multiple different animations on the same variable (object) at the
 same time. For example, animate the x and y coordinates with

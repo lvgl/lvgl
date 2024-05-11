@@ -150,7 +150,7 @@ struct _lv_anim_t {
     int32_t current_value;             /**< Current value*/
     int32_t end_value;                 /**< End value*/
     int32_t duration;                /**< Animation time in ms*/
-    int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
+    int32_t current_time;            /**< Current time in animation. Set to negative to make delay.*/
     uint32_t playback_delay;     /**< Wait before play back*/
     uint32_t playback_duration;      /**< Duration of playback animation*/
     uint32_t repeat_delay;       /**< Wait before repeat*/
@@ -268,7 +268,7 @@ static inline void lv_anim_set_time(lv_anim_t * a, uint32_t duration)
  */
 static inline void lv_anim_set_delay(lv_anim_t * a, uint32_t delay)
 {
-    a->act_time = -(int32_t)(delay);
+    a->current_time = -(int32_t)(delay);
 }
 
 /**
@@ -485,10 +485,10 @@ bool lv_anim_toggle_running(lv_anim_t * a);
  * Set the progress of the animation manually.
  * This mechanism does not take playback mode into account.
  * If the animation is playing backwards at the time of invoking, it will be forced back to forward phase.
- * @param a         pointer to an initialized `lv_anim_t` variable
- * @param act_time  elapsed time, min 0, may a->duration
+ * @param a             pointer to an initialized `lv_anim_t` variable
+ * @param current_time  elapsed time, min 0, may a->duration
  */
-void lv_anim_set_act_time(lv_anim_t * a, uint32_t act_time);
+void lv_anim_set_current_time(lv_anim_t * a, uint32_t current_time);
 
 /**
  * Get a delay before starting the animation
@@ -497,7 +497,7 @@ void lv_anim_set_act_time(lv_anim_t * a, uint32_t act_time);
  */
 static inline uint32_t lv_anim_get_delay(const lv_anim_t * a)
 {
-    return -a->act_time;
+    return -a->current_time;
 }
 
 /**
