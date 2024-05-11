@@ -1,9 +1,9 @@
-=============================
+============================
 ST7735 LCD Controller driver
-=============================
+============================
 
 Overview
--------------
+--------
 
 The `ST7735S <https://www.buydisplay.com/download/ic/ST7735S.pdf>`__ is a single-chip controller/driver for 262K-color, graphic type TFT-LCD. It consists of 396
 source line and 162 gate line driving circuits. This chip is capable of connecting directly to an external

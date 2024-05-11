@@ -3,7 +3,7 @@ Generic MIPI DCS compatible LCD Controller driver
 =================================================
 
 Overview
--------------
+--------
 
 From the `Wikipedia <https://en.wikipedia.org/wiki/MIPI_Alliance>`__:
 
