@@ -1,5 +1,5 @@
 /**
- * @file lv_tft_espi.c
+ * @file lv_tft_espi.cpp
  *
  */
 

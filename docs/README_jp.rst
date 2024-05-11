@@ -12,19 +12,13 @@
 
    </p>
 
- 
-
 .. raw:: html
 
    <p align="center">
 
- 
-
 .. raw:: html
 
    </p>
-
- 
 
 .. raw:: html
 
@@ -35,11 +29,6 @@ Light and Versatile Graphics Library
 .. raw:: html
 
    </h1>
-
- 
-
-
-      
 
 .. raw:: html
 
@@ -54,7 +43,7 @@ Website \| Docs \| Forum :gb: \| Demos \| Services \| SquareLine Studio
 
 :ledger:
 Overview
------------------
+--------
 
 **実績**\  LVGL
 は、フリー＆オープンソースの組み込み用グラフィックスライブラリです。
