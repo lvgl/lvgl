@@ -11,6 +11,7 @@
 #if LV_USE_IME_PINYIN != 0
 
 #include "../../lvgl.h"
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES

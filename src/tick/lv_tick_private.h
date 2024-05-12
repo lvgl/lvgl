@@ -1,10 +1,10 @@
 /**
- * @file lv_anim_private.h
+ * @file lv_tick_private.h
  *
  */
 
-#ifndef LV_ANIM_PRIVATE_H
-#define LV_ANIM_PRIVATE_H
+#ifndef LV_TICK_PRIVATE_H
+#define LV_TICK_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_anim.h"
+#include "lv_tick.h"
 
 /*********************
  *      DEFINES
@@ -25,25 +25,15 @@ extern "C" {
  **********************/
 
 typedef struct {
-    bool anim_list_changed;
-    bool anim_run_round;
-    lv_timer_t * timer;
-    lv_ll_t anim_ll;
-} lv_anim_state_t;
+    uint32_t sys_time;
+    volatile uint8_t sys_irq_flag;
+    lv_tick_get_cb_t tick_get_cb;
+    lv_delay_cb_t delay_cb;
+} lv_tick_state_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * Init the animation module
- */
-void lv_anim_core_init(void);
-
-/**
- * Deinit the animation module
- */
-void lv_anim_core_deinit(void);
 
 /**********************
  *      MACROS
@@ -53,4 +43,4 @@ void lv_anim_core_deinit(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_ANIM_PRIVATE_H*/
+#endif /*LV_TICK_PRIVATE_H*/

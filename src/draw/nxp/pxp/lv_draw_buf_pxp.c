@@ -16,6 +16,7 @@
 #include "lv_draw_pxp.h"
 
 #if LV_USE_DRAW_PXP
+#include "../../lv_draw_buf_private.h"
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
 

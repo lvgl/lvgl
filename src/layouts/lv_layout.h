@@ -25,10 +25,6 @@ extern "C" {
  **********************/
 
 typedef void (*lv_layout_update_cb_t)(lv_obj_t *, void * user_data);
-typedef struct {
-    lv_layout_update_cb_t cb;
-    void * user_data;
-} lv_layout_dsc_t;
 
 typedef enum {
     LV_LAYOUT_NONE = 0,

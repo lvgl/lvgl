@@ -116,7 +116,6 @@ extern "C" {
 #include "src/lv_api_map_v8.h"
 #include "src/lv_api_map_v9_0.h"
 
-#include "src/core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/

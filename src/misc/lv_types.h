@@ -132,8 +132,6 @@ typedef struct lv_fragment_managed_states_t lv_fragment_managed_states_t;
 
 typedef struct lv_mem_monitor_t lv_mem_monitor_t;
 
-typedef struct lv_anim_bezier3_para_t lv_anim_bezier3_para_t;
-
 typedef struct lv_profiler_builtin_config_t lv_profiler_builtin_config_t;
 
 typedef struct lv_rb_node_t lv_rb_node_t;

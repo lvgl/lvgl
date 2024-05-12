@@ -11,6 +11,7 @@
 #if LV_USE_BMP
 
 #include <string.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES

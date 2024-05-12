@@ -31,13 +31,24 @@ extern "C" {
 #include "../stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED
-#include "../font/lv_font_fmt_txt.h"
+#include "../font/lv_font_fmt_txt_private.h"
 #endif
 
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
 
 #include "../misc/lv_types.h"
+
+#include "../misc/lv_timer_private.h"
+#include "../misc/lv_anim_private.h"
+#include "../tick/lv_tick_private.h"
+#include "../draw/lv_draw_buf_private.h"
+#include "../draw/lv_draw_private.h"
+#include "../draw/sw/lv_draw_sw_private.h"
+#include "../draw/sw/lv_draw_sw_mask_private.h"
+#include "../stdlib/builtin/lv_tlsf_private.h"
+#include "../others/sysmon/lv_sysmon_private.h"
+#include "../layouts/lv_layout_private.h"
 
 /*********************
  *      DEFINES

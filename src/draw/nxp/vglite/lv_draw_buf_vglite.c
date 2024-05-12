@@ -16,6 +16,7 @@
 #include "lv_draw_vglite.h"
 
 #if LV_USE_DRAW_VGLITE
+#include "../../lv_draw_buf_private.h"
 #include "lv_vglite_buf.h"
 #include "lv_vglite_utils.h"
 

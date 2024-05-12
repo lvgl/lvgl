@@ -37,6 +37,24 @@ struct lv_timer_t {
     uint32_t auto_delete : 1;
 };
 
+typedef struct {
+    lv_ll_t timer_ll; /*Linked list to store the lv_timers*/
+
+    bool lv_timer_run;
+    uint8_t idle_last;
+    bool timer_deleted;
+    bool timer_created;
+    uint32_t timer_time_until_next;
+
+    bool already_running;
+    uint32_t periodic_last_tick;
+    uint32_t busy_time;
+    uint32_t idle_period_start;
+    uint32_t run_cnt;
+
+    lv_timer_handler_resume_cb_t resume_cb;
+    void * resume_data;
+} lv_timer_state_t;
 
 /**********************
  * GLOBAL PROTOTYPES

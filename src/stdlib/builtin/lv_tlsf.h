@@ -54,16 +54,6 @@ extern "C" {
 typedef void * lv_tlsf_t;
 typedef void * lv_pool_t;
 
-typedef struct {
-#if LV_USE_OS
-    lv_mutex_t mutex;
-#endif
-    lv_tlsf_t tlsf;
-    size_t cur_used;
-    size_t max_used;
-    lv_ll_t  pool_ll;
-} lv_tlsf_state_t;
-
 /* Create/destroy a memory pool. */
 lv_tlsf_t lv_tlsf_create(void * mem);
 lv_tlsf_t lv_tlsf_create_with_pool(void * mem, size_t bytes);

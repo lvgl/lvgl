@@ -12,6 +12,7 @@
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
 #include "../../indev/lv_indev.h"
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES

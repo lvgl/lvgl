@@ -15,6 +15,7 @@
 #include "lv_vg_lite_utils.h"
 #include <stdlib.h>
 #include <string.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES

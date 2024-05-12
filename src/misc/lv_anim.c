@@ -332,7 +332,7 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
 
 int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a)
 {
-    const struct lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
+    const lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
     return lv_anim_path_cubic_bezier(a, para->x1, para->y1, para->x2, para->y2);
 }
 
@@ -435,7 +435,7 @@ void lv_anim_set_user_data(lv_anim_t * a, void * user_data)
 
 void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {
-    struct lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
+    lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
 
     para->x1 = x1;
     para->x2 = x2;

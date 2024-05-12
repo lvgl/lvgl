@@ -39,6 +39,22 @@ struct lv_font_fmt_txt_kern_pair_t {
     uint32_t glyph_ids_size : 2;    /*0: `glyph_ids` is stored as `uint8_t`; 1: as `uint16_t`*/
 };
 
+#if LV_USE_FONT_COMPRESSED
+typedef enum {
+    RLE_STATE_SINGLE = 0,
+    RLE_STATE_REPEATE,
+    RLE_STATE_COUNTER,
+} lv_font_fmt_rle_state_t;
+
+typedef struct {
+    uint32_t rdp;
+    const uint8_t * in;
+    uint8_t bpp;
+    uint8_t prev_v;
+    uint8_t count;
+    lv_font_fmt_rle_state_t state;
+} lv_font_fmt_rle_t;
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES

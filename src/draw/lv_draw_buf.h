@@ -89,15 +89,6 @@ typedef void (*lv_draw_buf_cache_operation_cb)(const lv_draw_buf_t * draw_buf, c
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
-typedef struct {
-    lv_draw_buf_malloc_cb buf_malloc_cb;
-    lv_draw_buf_free_cb buf_free_cb;
-    lv_draw_buf_align_cb align_pointer_cb;
-    lv_draw_buf_cache_operation_cb invalidate_cache_cb;
-    lv_draw_buf_cache_operation_cb flush_cache_cb;
-    lv_draw_buf_width_to_stride_cb width_to_stride_cb;
-} lv_draw_buf_handlers_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

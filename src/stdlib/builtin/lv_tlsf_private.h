@@ -1,10 +1,10 @@
 /**
- * @file lv_anim_private.h
+ * @file lv_tlsf_private.h
  *
  */
 
-#ifndef LV_ANIM_PRIVATE_H
-#define LV_ANIM_PRIVATE_H
+#ifndef LV_TLSF_PRIVATE_H
+#define LV_TLSF_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_anim.h"
+#include "lv_tlsf.h"
 
 /*********************
  *      DEFINES
@@ -25,25 +25,18 @@ extern "C" {
  **********************/
 
 typedef struct {
-    bool anim_list_changed;
-    bool anim_run_round;
-    lv_timer_t * timer;
-    lv_ll_t anim_ll;
-} lv_anim_state_t;
+#if LV_USE_OS
+    lv_mutex_t mutex;
+#endif
+    lv_tlsf_t tlsf;
+    size_t cur_used;
+    size_t max_used;
+    lv_ll_t  pool_ll;
+} lv_tlsf_state_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * Init the animation module
- */
-void lv_anim_core_init(void);
-
-/**
- * Deinit the animation module
- */
-void lv_anim_core_deinit(void);
 
 /**********************
  *      MACROS
@@ -53,4 +46,4 @@ void lv_anim_core_deinit(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_ANIM_PRIVATE_H*/
+#endif /*LV_TLSF_PRIVATE_H*/

@@ -13,6 +13,7 @@
 #include "lv_libpng.h"
 #include <png.h>
 #include <string.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES

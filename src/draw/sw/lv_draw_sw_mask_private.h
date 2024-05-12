@@ -24,6 +24,15 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct  {
+    uint8_t * buf;
+    lv_opa_t * cir_opa;         /*Opacity of values on the circumference of an 1/4 circle*/
+    uint16_t * x_start_on_y;        /*The x coordinate of the circle for each y value*/
+    uint16_t * opa_start_on_y;      /*The index of `cir_opa` for each y value*/
+    int32_t life;               /*How many times the entry way used*/
+    uint32_t used_cnt;          /*Like a semaphore to count the referencing masks*/
+    int32_t radius;          /*The radius of the entry*/
+} lv_draw_sw_mask_radius_circle_dsc_t;
 struct lv_draw_sw_mask_common_dsc_t {
     lv_draw_sw_mask_xcb_t cb;
     lv_draw_sw_mask_type_t type;
@@ -120,6 +129,7 @@ struct lv_draw_sw_mask_map_param_t {
     } cfg;
 };
 
+typedef lv_draw_sw_mask_radius_circle_dsc_t lv_draw_sw_mask_radius_circle_dsc_arr_t[LV_DRAW_SW_CIRCLE_CACHE_SIZE];
 
 /**********************
  * GLOBAL PROTOTYPES
