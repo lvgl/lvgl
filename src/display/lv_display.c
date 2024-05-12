@@ -570,7 +570,7 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
                          bool auto_del)
 {
     lv_display_t * d = lv_obj_get_display(new_scr);
-    lv_obj_t * act_scr = lv_screen_active();
+    lv_obj_t * act_scr = d->act_scr;
 
     if(act_scr == new_scr || d->scr_to_load == new_scr) {
         return;
@@ -586,7 +586,7 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
         if(d->del_prev) {
             lv_obj_delete(act_scr);
         }
-        act_scr = lv_screen_active(); /*Active screen changed.*/
+        act_scr = d->act_scr; /*Active screen changed.*/
 
         scr_load_internal(d->scr_to_load);
     }
@@ -1031,7 +1031,7 @@ static void scr_load_anim_start(lv_anim_t * a)
 {
     lv_display_t * d = lv_obj_get_display(a->var);
 
-    d->prev_scr = lv_display_get_screen_active(d);
+    d->prev_scr = d->act_scr;
     d->act_scr = a->var;
 
     lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOAD_START, NULL);
