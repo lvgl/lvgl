@@ -48,6 +48,7 @@
 #define LV_LABEL_TEXT_SELECTION     1
 
 #define LV_USE_CALENDAR_CHINESE 1
+#define LV_USE_LOTTIE 1
 
 #define LV_USE_FLEX 1
 #define LV_USE_GRID 1
