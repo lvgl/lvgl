@@ -3156,6 +3156,15 @@
     #endif
 #endif
 
+/*Driver for Renesas GLCD*/
+#ifndef LV_USE_RENESAS_GLCDC
+    #ifdef CONFIG_LV_USE_RENESAS_GLCDC
+        #define LV_USE_RENESAS_GLCDC CONFIG_LV_USE_RENESAS_GLCDC
+    #else
+        #define LV_USE_RENESAS_GLCDC    0
+    #endif
+#endif
+
 /* LVGL Windows backend */
 #ifndef LV_USE_WINDOWS
     #ifdef CONFIG_LV_USE_WINDOWS
