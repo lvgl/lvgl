@@ -1799,6 +1799,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_LOTTIE
+    #ifdef CONFIG_LV_USE_LOTTIE
+        #define LV_USE_LOTTIE CONFIG_LV_USE_LOTTIE
+    #else
+        #define LV_USE_LOTTIE     0  /*Requires: lv_canvas, thorvg */
+    #endif
+#endif
+
 #ifndef LV_USE_MENU
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_MENU

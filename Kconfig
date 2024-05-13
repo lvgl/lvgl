@@ -943,6 +943,12 @@ menu "LVGL configuration"
 		config LV_USE_LIST
 			bool "List"
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_LOTTIE
+			bool "Lottie"
+			default n
+			depends on LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+			help
+				Enable Lottie animations. Requires LV_USE_VECTOR_GRAPHIC and LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL.
 		config LV_USE_MENU
 			bool "Menu"
 			default y if !LV_CONF_MINIMAL
@@ -1176,7 +1182,7 @@ menu "LVGL configuration"
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
-	
+
 		config LV_USE_THORVG
 			bool "ThorVG library"
 			choice
