@@ -293,6 +293,7 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
 {
     lv_image_decoder_dsc_t decoder_dsc;
     lv_image_decoder_args_t args = { 0 };
+    args.premultiply = 1;
     lv_result_t res = lv_image_decoder_open(&decoder_dsc, p->src, &args);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
