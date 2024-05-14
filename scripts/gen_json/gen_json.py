@@ -345,7 +345,7 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        '--filter_private',
+        '--filter-private',
         dest='filter_private',
         help='Internal Use',
         action='store_true',
