@@ -40,8 +40,10 @@ class STDOut:
         sys.stdout = self._stdout
 
 
-def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
+def run(output_path, lvgl_config_path, output_to_stdout, filter_private, *compiler_args):
     # stdout = STDOut()
+
+    pycparser_monkeypatch.FILTER_PRIVATE = filter_private
 
     # The thread is to provide an indication that things are being processed.
     # There are long periods where nothing gets output to the screen and this
@@ -213,50 +215,6 @@ def run(output_path, lvgl_config_path, output_to_stdout, *compiler_args):
         cparser = pycparser.CParser()
         ast = cparser.parse(pp_data, lvgl_header_path)
 
-        # This code block is to handle how pycparser handles forward
-        # declarations and combining the forward declarations with the actual
-        # types so any information that is contained in the type gets properly
-        # attached to the forward declaration
-
-        forward_struct_decls = {}
-
-        for item in ast.ext[:]:
-            if (
-                isinstance(item, pycparser_monkeypatch.Decl) and
-                item.name is None and
-                isinstance(
-                    item.type,
-                    (pycparser_monkeypatch.Struct, pycparser_monkeypatch.Union)
-                ) and
-                item.type.name is not None
-            ):
-                if item.type.decls is None:
-                    forward_struct_decls[item.type.name] = [item]
-                else:
-                    if item.type.name in forward_struct_decls:
-                        decs = forward_struct_decls[item.type.name]
-                        if len(decs) == 2:
-                            decl, td = decs
-
-                            td.type.type.decls = item.type.decls[:]
-
-                            ast.ext.remove(decl)
-                            ast.ext.remove(item)
-            elif (
-                isinstance(item, pycparser_monkeypatch.Typedef) and
-                isinstance(item.type, pycparser_monkeypatch.TypeDecl) and
-                item.name and
-                item.type.declname and
-                item.name == item.type.declname and
-                isinstance(
-                    item.type.type,
-                    (pycparser_monkeypatch.Struct, pycparser_monkeypatch.Union)
-                ) and
-                item.type.type.decls is None
-            ):
-                if item.type.type.name in forward_struct_decls:
-                    forward_struct_decls[item.type.type.name].append(item)
-
         ast.setup_docs(temp_directory)
 
         if not output_to_stdout and output_path is None:
@@ -386,8 +344,15 @@ if __name__ == '__main__':
         action='store_true',
     )
 
+    parser.add_argument(
+        '--filter_private',
+        dest='filter_private',
+        help='Internal Use',
+        action='store_true',
+    )
+
     args, extra_args = parser.parse_known_args()
 
     DEVELOP = args.develop
 
-    run(args.output_path, args.lv_conf, args.output_path is None, *extra_args)
+    run(args.output_path, args.lv_conf, args.output_path is None, args.filter_private, *extra_args)

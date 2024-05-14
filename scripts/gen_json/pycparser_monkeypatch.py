@@ -77,11 +77,16 @@ unions = {}
 typedefs = {}
 macros = {}
 
+FILTER_PRIVATE = False
 
-def is_lib_c_node(n):
+
+def filter_node(n):
     if hasattr(n, 'coord') and n.coord is not None:
         if 'fake_libc_include' in n.coord.file:
             return True
+        if FILTER_PRIVATE and '_private.h' not in n.coord.file:
+            return True
+
     return False
 
 
@@ -108,6 +113,9 @@ class ArrayDecl(c_ast.ArrayDecl):
         self.type.parent = self
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         if self.dim is None:
             dim = None
         else:
@@ -149,7 +157,7 @@ class Constant(c_ast.Constant):
         self.type.parent = self
 
     def to_dict(self):
-        if is_lib_c_node(self):
+        if filter_node(self):
             return None
 
         return self.value
@@ -179,6 +187,9 @@ class Decl(c_ast.Decl):
         self.type.parent = self
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         if self.name and self.name == '_silence_gcc_warning':
             return None
 
@@ -296,7 +307,7 @@ class EllipsisParam(c_ast.EllipsisParam):
         self._parent = value
 
     def to_dict(self):
-        if is_lib_c_node(self):
+        if filter_node(self):
             return None
 
         res = OrderedDict([
@@ -354,6 +365,8 @@ class Enum(c_ast.Enum):
             self.values.parent = self
 
     def to_dict(self):
+        if filter_node(self):
+            return None
 
         if self.name:
             doc_search = get_enum_docs(self.name)  # NOQA
@@ -440,6 +453,9 @@ class Enumerator(c_ast.Enumerator):
         self._parent = value
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         parent_name = self.parent.name
         parent = self.parent
 
@@ -517,6 +533,9 @@ class EnumeratorList(c_ast.EnumeratorList):
             item.parent = value
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         pass
 
 
@@ -592,13 +611,54 @@ class FileAST(c_ast.FileAST):
         self._parent = value
 
     def to_dict(self):
-        if is_lib_c_node(self):
-            return None
-
         items = []
 
+        # This code block is to handle how pycparser handles forward
+        # declarations and combining the forward declarations with the actual
+        # types so any information that is contained in the type gets properly
+        # attached to the forward declaration
+        forward_struct_decls = {}
+
+        for item in self.ext[:]:
+            if (
+                isinstance(item, Decl) and
+                item.name is None and
+                isinstance(
+                    item.type,
+                    (Struct, Union)
+                ) and
+                item.type.name is not None
+            ):
+                if item.type.decls is None:
+                    forward_struct_decls[item.type.name] = [item]
+                else:
+                    if item.type.name in forward_struct_decls:
+                        decs = forward_struct_decls[item.type.name]
+                        if len(decs) == 2:
+                            decl, td = decs
+
+                            td.type.type.decls = item.type.decls[:]
+
+                            self.ext.remove(decl)
+                            self.ext.remove(item)
+            elif (
+                isinstance(item, Typedef) and
+                isinstance(item.type, TypeDecl) and
+                item.name and
+                item.type.declname and
+                item.name == item.type.declname and
+                isinstance(
+                    item.type.type,
+                    (Struct, Union)
+                ) and
+                item.type.type.decls is None
+            ):
+                if item.type.type.name in forward_struct_decls:
+                    forward_struct_decls[item.type.type.name].append(item)
+        ############################
+
         for item in self.ext:
-            if is_lib_c_node(item):
+            if filter_node(item):
                 continue
             try:
                 item.parent = self
@@ -786,6 +846,8 @@ class FuncDecl(c_ast.FuncDecl):
         self.type.parent = self
 
     def to_dict(self):
+        if filter_node(self):
+            return None
 
         if self.name:
             doc_search = get_func_docs(self.name)  # NOQA
@@ -865,6 +927,9 @@ class FuncDef(c_ast.FuncDef):
         self.decl.parent = value
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         return self.decl.to_dict()
 
 
@@ -890,7 +955,7 @@ class IdentifierType(c_ast.IdentifierType):
         self._parent = value
 
     def to_dict(self):
-        if is_lib_c_node(self):
+        if filter_node(self):
             return None
 
         name = ' '.join(self.names)
@@ -937,6 +1002,9 @@ class ParamList(c_ast.ParamList):
             param.parent = value
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         pass
 
 
@@ -963,6 +1031,9 @@ class PtrDecl(c_ast.PtrDecl):
         self.type.parent = self
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         if isinstance(self.type, FuncDecl):
             type_dict = self.type.to_dict()
             type_dict['json_type'] = 'function_pointer'
@@ -1012,6 +1083,9 @@ class Struct(c_ast.Struct):
             decl.parent = self
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         if not self.decls:
             name = self.name
             if not name:
@@ -1126,6 +1200,9 @@ class TypeDecl(c_ast.TypeDecl):
             self.type.parent = parent
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         if self.parent is None:
             res = self.type.to_dict()
             if self.declname is not None and not self.type.name:
@@ -1165,6 +1242,9 @@ class Typedef(c_ast.Typedef):
 
     @property
     def parent(self):
+        if filter_node(self):
+            return None
+
         return self._parent
 
     @parent.setter
@@ -1424,6 +1504,9 @@ class Typename(c_ast.Typename):
         self.type.parent = self
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         if not self.name and isinstance(self.type, IdentifierType):
             res = self.type.to_dict()
             res['quals'] = self.quals
@@ -1497,6 +1580,9 @@ class Union(c_ast.Union):
             decl.parent = self
 
     def to_dict(self):
+        if filter_node(self):
+            return None
+
         if not self.decls:
             name = self.name
             if not name:
