@@ -878,7 +878,8 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                     }
                     uint32_t tmp_ofs = next_ofs;
                     uint32_t letter = lv_text_encoded_prev(&cur_txt[cur_txt_ofs], &tmp_ofs);
-                    if(!(letter == '\0' || letter == '\n' || letter == '\r' || lv_text_is_break_char(letter))) {
+                    if(!(letter == '\0' || letter == '\n' || letter == '\r' || lv_text_is_break_char(letter) ||
+                         lv_text_is_a_word(letter))) {
                         tmp_ofs = 0;
                         letter = lv_text_encoded_next(&cur_txt[cur_txt_ofs + next_ofs], &tmp_ofs);
                         if(!(letter == '\0' || letter == '\n'  || letter == '\r' || lv_text_is_break_char(letter))) {
