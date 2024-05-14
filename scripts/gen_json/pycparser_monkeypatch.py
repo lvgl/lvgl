@@ -637,10 +637,27 @@ class FileAST(c_ast.FileAST):
                         if len(decs) == 2:
                             decl, td = decs
 
-                            td.type.type.decls = item.type.decls[:]
+                            if FILTER_PRIVATE:
+                                if (
+                                    '_private.h' not in decl.coord.file and
+                                    '_private.h' not in td.coord.file and
+                                    '_private.h' not in item.coord.file
+                                ):
+                                    continue
 
-                            self.ext.remove(decl)
-                            self.ext.remove(item)
+                                if decl.type.decls and '_private.h' in decl.coord.file:
+                                    decl.name = decl.type.name
+                                    self.ext.remove(item)
+                                elif item.type.decls and '_private.h' in item.coord.file:
+                                    item.name = item.type.name
+                                    self.ext.remove(decl)
+
+                                self.ext.remove(td)
+                            else:
+                                td.type.type.decls = item.type.decls[:]
+
+                                self.ext.remove(decl)
+                                self.ext.remove(item)
             elif (
                 isinstance(item, Typedef) and
                 isinstance(item.type, TypeDecl) and

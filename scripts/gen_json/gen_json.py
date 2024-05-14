@@ -40,7 +40,10 @@ class STDOut:
         sys.stdout = self._stdout
 
 
-def run(output_path, lvgl_config_path, output_to_stdout, filter_private, *compiler_args):
+temp_directory = tempfile.mkdtemp(suffix='.lvgl_json')
+
+
+def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_private, *compiler_args):
     # stdout = STDOut()
 
     pycparser_monkeypatch.FILTER_PRIVATE = filter_private
@@ -63,19 +66,19 @@ def run(output_path, lvgl_config_path, output_to_stdout, filter_private, *compil
         t.daemon = True
         t.start()
 
-    temp_directory = tempfile.mkdtemp(suffix='.lvgl_json')
     lvgl_path = project_path
     lvgl_src_path = os.path.join(lvgl_path, 'src')
-    lvgl_header_path = os.path.join(lvgl_path, 'lvgl.h')
     temp_lvgl = os.path.join(temp_directory, 'lvgl')
+    target_header_base_name = (
+        os.path.splitext(os.path.split(target_header)[-1])[0]
+    )
 
     try:
         os.mkdir(temp_lvgl)
         shutil.copytree(lvgl_src_path, os.path.join(temp_lvgl, 'src'))
-        shutil.copyfile(lvgl_header_path, os.path.join(temp_lvgl, 'lvgl.h'))
+        shutil.copyfile(os.path.join(lvgl_path, 'lvgl.h'), os.path.join(temp_lvgl, 'lvgl.h'))
 
-        lvgl_header_path = os.path.join(temp_lvgl, 'lvgl.h')
-        pp_file = os.path.join(temp_directory, 'lvgl.pp')
+        pp_file = os.path.join(temp_directory, target_header_base_name + '.pp')
 
         if lvgl_config_path is None:
             lvgl_config_path = os.path.join(lvgl_path, 'lv_conf_template.h')
@@ -181,7 +184,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, filter_private, *compil
 
         cpp_cmd.extend(['-DPYCPARSER', f'"-I{fake_libc_path}"'])
         cpp_cmd.extend([f'"-I{item}"' for item in include_dirs])
-        cpp_cmd.append(f'"{lvgl_header_path}"')
+        cpp_cmd.append(f'"{target_header}"')
 
         if sys.platform.startswith('win'):
             cpp_cmd.insert(len(cpp_cmd) - 2, output_pp)
@@ -213,7 +216,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, filter_private, *compil
             pp_data = f.read()
 
         cparser = pycparser.CParser()
-        ast = cparser.parse(pp_data, lvgl_header_path)
+        ast = cparser.parse(pp_data, target_header)
 
         ast.setup_docs(temp_directory)
 
@@ -232,7 +235,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, filter_private, *compil
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
 
-            output_path = os.path.join(output_path, 'lvgl.json')
+            output_path = os.path.join(output_path, target_header_base_name + '.json')
 
             with open(output_path, 'w') as f:
                 f.write(json.dumps(ast.to_dict(), indent=4))
@@ -343,7 +346,24 @@ if __name__ == '__main__':
         help='this option leaves the temporary folder in place.',
         action='store_true',
     )
-
+    parser.add_argument(
+        "--target-header",
+        dest="target_header",
+        help=(
+            "path to a custom header file. When using this to supply a custom"
+            "header file you MUST insure that any LVGL includes are done so "
+            "they are relitive to the LVGL repository root folder.\n\n"
+            '#include "src/lvgl_private.h"\n\n'
+            "If you have includes to header files that are not LVGL then you "
+            "will need to add the include locations for those header files "
+            "when running this script. It is done using the same manner that "
+            "is used when calling a C compiler\n\n"
+            "You need to provide the absolute path to the header file when "
+            "using this feature."
+        ),
+        action="store",
+        default=os.path.join(temp_directory, "lvgl.h")
+    )
     parser.add_argument(
         '--filter-private',
         dest='filter_private',
@@ -355,4 +375,4 @@ if __name__ == '__main__':
 
     DEVELOP = args.develop
 
-    run(args.output_path, args.lv_conf, args.output_path is None, args.filter_private, *extra_args)
+    run(args.output_path, args.lv_conf, args.output_path is None, args.target_header, args.filter_private, *extra_args)
