@@ -49,7 +49,7 @@ typedef enum {
  *  STATIC PROTOTYPES
  **********************/
 static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector);
-static _lv_obj_style_t * get_trans_style(lv_obj_t * obj, uint32_t part);
+static _lv_obj_style_t * get_trans_style(lv_obj_t * obj, lv_part_t part);
 static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
                                     lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
@@ -429,6 +429,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
 
     _lv_obj_style_t * style_trans = get_trans_style(obj, part);
     lv_style_set_prop((lv_style_t *)style_trans->style, tr_dsc->prop, v1);  /*Be sure `trans_style` has a valid value*/
+    lv_obj_refresh_style(obj, tr_dsc->selector, tr_dsc->prop);
 
     if(tr_dsc->prop == LV_STYLE_RADIUS) {
         if(v1.num == LV_RADIUS_CIRCLE || v2.num == LV_RADIUS_CIRCLE) {
@@ -463,7 +464,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     lv_anim_start(&a);
 }
 
-lv_style_value_t _lv_obj_style_apply_color_filter(const lv_obj_t * obj, uint32_t part, lv_style_value_t v)
+lv_style_value_t _lv_obj_style_apply_color_filter(const lv_obj_t * obj, lv_part_t part, lv_style_value_t v)
 {
     if(obj == NULL) return v;
     const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc(obj, part);
@@ -906,8 +907,9 @@ static void trans_anim_start_cb(lv_anim_t * a)
     tr->prop = prop_tmp;
 
     _lv_obj_style_t * style_trans = get_trans_style(tr->obj, tr->selector);
-    lv_style_set_prop((lv_style_t *)style_trans->style, tr->prop,
-                      tr->start_value);  /*Be sure `trans_style` has a valid value*/
+    /*Be sure `trans_style` has a valid value*/
+    lv_style_set_prop((lv_style_t *)style_trans->style, tr->prop, tr->start_value);
+    lv_obj_refresh_style(tr->obj, tr->selector, tr->prop);
 
 }
 

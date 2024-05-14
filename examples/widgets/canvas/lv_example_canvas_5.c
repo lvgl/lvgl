@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+﻿#include "../../lv_examples.h"
 #if LV_USE_CANVAS && LV_BUILD_EXAMPLES
 
 #define CANVAS_WIDTH  50
@@ -10,7 +10,8 @@
 void lv_example_canvas_5(void)
 {
     /*Create a buffer for the canvas*/
-    LV_DRAW_BUF_DEFINE(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf);
 
     /*Create a canvas and initialize its palette*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());

@@ -141,6 +141,8 @@ menu "LVGL configuration"
 				bool "4: RTTHREAD"
 			config LV_OS_WINDOWS
 				bool "5: WINDOWS"
+			config LV_OS_MQX
+				bool "6: MQX"
 			config LV_OS_CUSTOM
 				bool "255: CUSTOM"
 		endchoice
@@ -153,6 +155,7 @@ menu "LVGL configuration"
 			default 3 if LV_OS_CMSIS_RTOS2
 			default 4 if LV_OS_RTTHREAD
 			default 5 if LV_OS_WINDOWS
+			default 6 if LV_OS_MQX
 			default 255 if LV_OS_CUSTOM
 
 		config LV_OS_CUSTOM_INCLUDE
@@ -695,6 +698,9 @@ menu "LVGL configuration"
 			config LV_FONT_DEFAULT_MONTSERRAT_8
 				bool "Montserrat 8"
 				select LV_FONT_MONTSERRAT_8
+			config LV_FONT_DEFAULT_MONTSERRAT_10
+				bool "Montserrat 10"
+				select LV_FONT_MONTSERRAT_10
 			config LV_FONT_DEFAULT_MONTSERRAT_12
 				bool "Montserrat 12"
 				select LV_FONT_MONTSERRAT_12
@@ -1098,6 +1104,21 @@ menu "LVGL configuration"
 			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
 			default 0
 			depends on LV_USE_FS_ARDUINO_ESP_LITTLEFS
+
+		config LV_USE_FS_ARDUINO_SD
+			bool "File system on top of Arduino SD API"
+		config LV_FS_ARDUINO_SD_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			default 0
+			depends on LV_USE_FS_ARDUINO_SD
+		config LV_FS_ARDUINO_SD_CS_PIN
+			int "Set the pin connected to the chip select line of the SD card"
+			default 0
+			depends on LV_USE_FS_ARDUINO_SD
+		config LV_FS_ARDUINO_SD_FREQUENCY
+			int "Set the frequency used by the chip of the SD CARD"
+			default 40000000
+			depends on LV_USE_FS_ARDUINO_SD
 
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"

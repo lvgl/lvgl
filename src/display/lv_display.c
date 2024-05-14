@@ -13,6 +13,7 @@
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
 #include "../core/lv_global.h"
+#include "../others/sysmon/lv_sysmon.h"
 
 #if LV_USE_DRAW_SW
     #include "../draw/sw/lv_draw_sw.h"
@@ -138,6 +139,14 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     lv_display_add_event_cb(disp, disp_event_cb, LV_EVENT_REFR_REQUEST, NULL);
 
     lv_timer_ready(disp->refr_timer); /*Be sure the screen will be refreshed immediately on start up*/
+
+#if LV_USE_PERF_MONITOR
+    lv_sysmon_show_performance(disp);
+#endif
+
+#if LV_USE_MEM_MONITOR
+    lv_sysmon_show_memory(disp);
+#endif
 
     return disp;
 }
@@ -457,6 +466,8 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
 
     disp->color_format = color_format;
     disp->layer_head->color_format = color_format;
+    if(disp->buf_1) disp->buf_1->header.cf = color_format;
+    if(disp->buf_2) disp->buf_2->header.cf = color_format;
 
     lv_display_send_event(disp, LV_EVENT_COLOR_FORMAT_CHANGED, NULL);
 }

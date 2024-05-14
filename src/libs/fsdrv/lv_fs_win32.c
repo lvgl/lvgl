@@ -413,6 +413,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len)
 {
     LV_UNUSED(drv);
+    LV_UNUSED(fn_len);
     dir_handle_t * handle = (dir_handle_t *)dir_p;
     lv_strcpy(fn, handle->next_fn);
     lv_fs_res_t current_error = handle->next_error;

@@ -49,6 +49,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static inline int sdl_render_mode(void);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static void window_create(lv_display_t * disp);
 static void window_update(lv_display_t * disp);
@@ -118,7 +119,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     lv_display_set_flush_cb(disp, flush_cb);
 
 #if LV_USE_DRAW_SDL == 0
-    if(LV_SDL_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         dsc->buf1 = malloc(32 * 1024);
 #if LV_SDL_BUF_COUNT == 2
         dsc->buf2 = malloc(32 * 1024);
@@ -207,13 +208,18 @@ void lv_sdl_quit()
  *   STATIC FUNCTIONS
  **********************/
 
+static inline int sdl_render_mode(void)
+{
+    return LV_SDL_RENDER_MODE;
+}
+
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
 #if LV_USE_DRAW_SDL == 0
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     lv_color_format_t cf = lv_display_get_color_format(disp);
 
-    if(LV_SDL_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         lv_display_rotation_t rotation = lv_display_get_rotation(disp);
         uint32_t px_size = lv_color_format_get_size(cf);
 
@@ -268,7 +274,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     /* TYPICALLY YOU DO NOT NEED THIS
      * If it was the last part to refresh update the texture of the window.*/
     if(lv_display_flush_is_last(disp)) {
-        if(LV_SDL_RENDER_MODE != LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        if(sdl_render_mode() != LV_DISPLAY_RENDER_MODE_PARTIAL) {
             dsc->fb_act = px_map;
         }
         window_update(disp);
@@ -394,7 +400,7 @@ static void texture_resize(lv_display_t * disp)
     dsc->fb1 = realloc(dsc->fb1, stride * disp->ver_res);
     lv_memzero(dsc->fb1, stride * disp->ver_res);
 
-    if(LV_SDL_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         dsc->fb_act = dsc->fb1;
     }
     else {

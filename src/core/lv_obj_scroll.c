@@ -33,7 +33,7 @@
  **********************/
 static void scroll_x_anim(void * obj, int32_t v);
 static void scroll_y_anim(void * obj, int32_t v);
-static void scroll_completed_completed_cb(lv_anim_t * a);
+static void scroll_end_cb(lv_anim_t * a);
 static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_point_t * scroll_value,
                                   lv_anim_enable_t anim_en);
 
@@ -309,7 +309,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t a
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
-        lv_anim_set_completed_cb(&a, scroll_completed_completed_cb);
+        lv_anim_set_deleted_cb(&a, scroll_end_cb);
 
         if(dx) {
             uint32_t t = lv_anim_speed_clamped((lv_display_get_horizontal_resolution(d)) >> 1, SCROLL_ANIM_TIME_MIN,
@@ -675,9 +675,10 @@ static void scroll_y_anim(void * obj, int32_t v)
     _lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
 }
 
-static void scroll_completed_completed_cb(lv_anim_t * a)
+static void scroll_end_cb(lv_anim_t * a)
 {
-    lv_obj_send_event(a->var, LV_EVENT_SCROLL_END, NULL);
+    /*Do not sent END event if there wasn't a BEGIN*/
+    if(a->start_cb_called) lv_obj_send_event(a->var, LV_EVENT_SCROLL_END, NULL);
 }
 
 static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_point_t * scroll_value,
@@ -776,13 +777,8 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
     }
 
     /*Remove any pending scroll animations.*/
-    bool y_del = lv_anim_delete(parent, scroll_y_anim);
-    bool x_del = lv_anim_delete(parent, scroll_x_anim);
-    if(y_del || x_del) {
-        lv_result_t res;
-        res = lv_obj_send_event(parent, LV_EVENT_SCROLL_END, NULL);
-        if(res != LV_RESULT_OK) return;
-    }
+    lv_anim_delete(parent, scroll_y_anim);
+    lv_anim_delete(parent, scroll_x_anim);
 
     if((scroll_dir & LV_DIR_LEFT) == 0 && x_scroll < 0) x_scroll = 0;
     if((scroll_dir & LV_DIR_RIGHT) == 0 && x_scroll > 0) x_scroll = 0;

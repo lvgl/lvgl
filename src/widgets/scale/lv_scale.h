@@ -220,7 +220,7 @@ void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_rang
  * @param part      the part for the section, e.g. LV_PART_INDICATOR
  * @param section_part_style Pointer to the section part style
  */
-void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_style_t * section_part_style);
+void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style);
 
 /*=====================
  * Getter functions

@@ -116,8 +116,6 @@ typedef void * lv_user_data_t;
 #define LV_DRAW_BUF_ALIGN                       852
 
 /*For screenshots*/
-#undef LV_USE_PERF_MONITOR
-#undef LV_USE_MEM_MONITOR
 #undef LV_DPI_DEF
 #define  LV_DPI_DEF         130
 #endif

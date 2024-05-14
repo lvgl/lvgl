@@ -23,7 +23,6 @@ Overview
     fs
     animations
     timer
-    draw
     profiler
     renderers/index
     new_widget

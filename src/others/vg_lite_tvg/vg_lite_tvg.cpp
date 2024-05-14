@@ -463,7 +463,11 @@ extern "C" {
         vg_lite_uint32_t stride = VG_LITE_ALIGN((buffer->width * mul / div), align);
 
         buffer->stride = stride;
+#ifndef _WIN32
         buffer->memory = aligned_alloc(LV_VG_LITE_THORVG_BUF_ADDR_ALIGN, stride * buffer->height);
+#else
+        buffer->memory = _aligned_malloc(stride * buffer->height, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN);
+#endif
         LV_ASSERT(buffer->memory);
         buffer->address = (vg_lite_uint32_t)(uintptr_t)buffer->memory;
         buffer->handle = buffer->memory;
@@ -473,7 +477,11 @@ extern "C" {
     vg_lite_error_t vg_lite_free(vg_lite_buffer_t * buffer)
     {
         LV_ASSERT(buffer->memory);
+#ifndef _WIN32
         free(buffer->memory);
+#else
+        _aligned_free(buffer->memory);
+#endif
         memset(buffer, 0, sizeof(vg_lite_buffer_t));
         return VG_LITE_SUCCESS;
     }
@@ -2190,8 +2198,8 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
     float x_max = path->bounding_box[2];
     float y_max = path->bounding_box[3];
 
-    if(math_equal(x_min, __FLT_MIN__) && math_equal(y_min, __FLT_MIN__)
-       && math_equal(x_max, __FLT_MAX__) && math_equal(y_max, __FLT_MAX__)) {
+    if(math_equal(x_min, FLT_MIN) && math_equal(y_min, FLT_MIN)
+       && math_equal(x_max, FLT_MAX) && math_equal(y_max, FLT_MAX)) {
         return Result::Success;
     }
 

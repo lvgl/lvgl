@@ -16,6 +16,7 @@ LVG has built in support for:
 - MEMFS (read a file from a memory buffer)
 - LITTLEFS (a little fail-safe filesystem designed for microcontrollers)
 - Arduino ESP LITTLEFS (a little fail-safe filesystem designed for Arduino ESP)
+- Arduino SD (allows for reading from and writing to SD cards)
 
 You still need to provide the drivers and libraries, this extension
 provides only the bridge between FATFS, STDIO, POSIX, WIN32 and LVGL.
@@ -33,7 +34,7 @@ The work directory can be set with ``LV_FS_..._PATH``. E.g.
 ``"/home/joe/projects/"`` The actual file/directory paths will be
 appended to it.
 
-Cached reading is also supported if ``LV_FS_..._CACHE_SIZE`` is set to
+:ref:`Cached reading <overview_file_system_cache>` is also supported if ``LV_FS_..._CACHE_SIZE`` is set to
 not ``0`` value. :cpp:func:`lv_fs_read` caches this size of data to lower the
 number of actual reads from the storage.
 

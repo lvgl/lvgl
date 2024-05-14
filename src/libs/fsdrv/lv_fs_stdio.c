@@ -27,7 +27,7 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
-#ifdef WIN32
+#ifdef _WIN32
     HANDLE dir_p;
     char next_fn[MAX_PATH_LEN];
 #else

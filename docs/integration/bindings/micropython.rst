@@ -182,7 +182,7 @@ The Micropython Binding is auto generated!
 LVGL C API Coding Conventions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For a summary of coding conventions to follow see the `CODING STYLE <CODING_STYLE>`__.
+For a summary of coding conventions to follow see the :ref:`coding-style`.
 
 .. _memory_management:
 

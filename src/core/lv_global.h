@@ -101,6 +101,8 @@ typedef struct _lv_global_t {
 
     lv_draw_buf_handlers_t draw_buf_handlers;
     lv_draw_buf_handlers_t font_draw_buf_handlers;
+    lv_draw_buf_handlers_t image_cache_draw_buf_handlers;  /**< Ensure that all assigned draw buffers
+                                                            * can be managed by image cache. */
 
     lv_ll_t img_decoder_ll;
 
@@ -163,6 +165,10 @@ typedef struct _lv_global_t {
     lv_fs_drv_t arduino_esp_littlefs_fs_drv;
 #endif
 
+#if LV_USE_FS_ARDUINO_SD
+    lv_fs_drv_t arduino_sd_fs_drv;
+#endif
+
 #if LV_USE_FREETYPE
     struct _lv_freetype_context_t * ft_context;
 #endif
@@ -187,11 +193,11 @@ typedef struct _lv_global_t {
     lv_style_t fe_list_button_style;
 #endif
 
-#if LV_USE_SYSMON && LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR
     lv_sysmon_backend_data_t sysmon_perf;
 #endif
 
-#if LV_USE_SYSMON && LV_USE_MEM_MONITOR
+#if LV_USE_MEM_MONITOR
     lv_sysmon_backend_data_t sysmon_mem;
 #endif
 

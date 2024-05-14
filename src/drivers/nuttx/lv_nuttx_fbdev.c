@@ -50,6 +50,7 @@ typedef struct {
  **********************/
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
+static lv_color_format_t fb_fmt_to_color_format(int fmt);
 static int fbdev_get_pinfo(int fd, struct fb_planeinfo_s * pinfo);
 static int fbdev_init_mem2(lv_nuttx_fb_t * dsc);
 static void display_refr_timer_cb(lv_timer_t * tmr);
@@ -118,6 +119,11 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         goto errout;
     }
 
+    lv_color_format_t color_format = fb_fmt_to_color_format(dsc->vinfo.fmt);
+    if(color_format == LV_COLOR_FORMAT_UNKNOWN) {
+        goto errout;
+    }
+
     dsc->mem = mmap(NULL, dsc->pinfo.fblen, PROT_READ | PROT_WRITE,
                     MAP_SHARED | MAP_FILE, dsc->fd, 0);
     if(dsc->mem == MAP_FAILED) {
@@ -130,7 +136,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     uint32_t h = dsc->vinfo.yres;
     uint32_t stride = dsc->pinfo.stride;
     uint32_t data_size = h * stride;
-    lv_draw_buf_init(&dsc->buf1, w, h, LV_COLOR_FORMAT_NATIVE, stride, dsc->mem, data_size);
+    lv_draw_buf_init(&dsc->buf1, w, h, color_format, stride, dsc->mem, data_size);
 
     /* double buffer mode */
 
@@ -140,10 +146,11 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
             goto errout;
         }
 
-        lv_draw_buf_init(&dsc->buf2, w, h, LV_COLOR_FORMAT_NATIVE, stride, dsc->mem2, data_size);
+        lv_draw_buf_init(&dsc->buf2, w, h, color_format, stride, dsc->mem2, data_size);
     }
 
     lv_display_set_draw_buffers(disp, &dsc->buf1, double_buffer ? &dsc->buf2 : NULL);
+    lv_display_set_color_format(disp, color_format);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
@@ -233,6 +240,26 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     lv_display_flush_ready(disp);
 }
 
+static lv_color_format_t fb_fmt_to_color_format(int fmt)
+{
+    switch(fmt) {
+        case FB_FMT_RGB16_565:
+            return LV_COLOR_FORMAT_RGB565;
+        case FB_FMT_RGB24:
+            return LV_COLOR_FORMAT_RGB888;
+        case FB_FMT_RGB32:
+            return LV_COLOR_FORMAT_XRGB8888;
+        case FB_FMT_RGBA32:
+            return LV_COLOR_FORMAT_ARGB8888;
+        default:
+            break;
+    }
+
+    LV_LOG_ERROR("Unsupported color format: %d", fmt);
+
+    return LV_COLOR_FORMAT_UNKNOWN;
+}
+
 static int fbdev_get_pinfo(int fd, FAR struct fb_planeinfo_s * pinfo)
 {
     if(ioctl(fd, FBIOGET_PLANEINFO, (unsigned long)((uintptr_t)pinfo)) < 0) {
@@ -246,16 +273,6 @@ static int fbdev_get_pinfo(int fd, FAR struct fb_planeinfo_s * pinfo)
     LV_LOG_USER("   stride: %u", pinfo->stride);
     LV_LOG_USER("  display: %u", pinfo->display);
     LV_LOG_USER("      bpp: %u", pinfo->bpp);
-
-    /* Only these pixel depths are supported.  vinfo.fmt is ignored, only
-     * certain color formats are supported.
-     */
-
-    if(pinfo->bpp != 32 && pinfo->bpp != 16 &&
-       pinfo->bpp != 8  && pinfo->bpp != 1) {
-        LV_LOG_ERROR("bpp = %u not supported", pinfo->bpp);
-        return -EINVAL;
-    }
 
     return 0;
 }

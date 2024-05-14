@@ -15,6 +15,7 @@
 #define LV_OS_CMSIS_RTOS2   3
 #define LV_OS_RTTHREAD      4
 #define LV_OS_WINDOWS       5
+#define LV_OS_MQX           6
 #define LV_OS_CUSTOM        255
 
 #define LV_STDLIB_BUILTIN           0
@@ -246,6 +247,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM */
 #ifndef LV_USE_OS
     #ifdef CONFIG_LV_USE_OS
@@ -360,7 +362,7 @@
             #define LV_USE_NATIVE_HELIUM_ASM    0
         #endif
     #endif
-    
+
     /* 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only
      * 1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too */
     #ifndef LV_DRAW_SW_COMPLEX
@@ -616,6 +618,11 @@
         #endif
     #endif
 
+    /*Set callback to print the logs.
+     *E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`
+     *Can be overwritten by `lv_log_register_print_cb`*/
+    //#define LV_LOG_PRINT_CB
+
     /*1: Enable print timestamp;
      *0: Disable print timestamp*/
     #ifndef LV_LOG_USE_TIMESTAMP
@@ -643,6 +650,7 @@
             #define LV_LOG_USE_FILE_LINE 1
         #endif
     #endif
+
 
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #ifndef LV_LOG_TRACE_MEM
@@ -2265,6 +2273,38 @@
     #endif
 #endif
 
+/*API for Arduino Sd. */
+#ifndef LV_USE_FS_ARDUINO_SD
+    #ifdef CONFIG_LV_USE_FS_ARDUINO_SD
+        #define LV_USE_FS_ARDUINO_SD CONFIG_LV_USE_FS_ARDUINO_SD
+    #else
+        #define LV_USE_FS_ARDUINO_SD 0
+    #endif
+#endif
+#if LV_USE_FS_ARDUINO_SD
+    #ifndef LV_FS_ARDUINO_SD_LETTER
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_LETTER
+            #define LV_FS_ARDUINO_SD_LETTER CONFIG_LV_FS_ARDUINO_SD_LETTER
+        #else
+            #define LV_FS_ARDUINO_SD_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+        #endif
+    #endif
+    #ifndef LV_FS_ARDUINO_SD_CS_PIN
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_CS_PIN
+            #define LV_FS_ARDUINO_SD_CS_PIN CONFIG_LV_FS_ARDUINO_SD_CS_PIN
+        #else
+            #define LV_FS_ARDUINO_SD_CS_PIN 0     /*Set the pin connected to the chip select line of the SD card */
+        #endif
+    #endif
+    #ifndef LV_FS_ARDUINO_SD_FREQUENCY
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_FREQUENCY
+            #define LV_FS_ARDUINO_SD_FREQUENCY CONFIG_LV_FS_ARDUINO_SD_FREQUENCY
+        #else
+            #define LV_FS_ARDUINO_SD_FREQUENCY 40000000     /*Set the frequency used by the chip of the SD CARD */
+        #endif
+    #endif
+#endif
+
 /*LODEPNG decoder library*/
 #ifndef LV_USE_LODEPNG
     #ifdef CONFIG_LV_USE_LODEPNG
@@ -3083,28 +3123,28 @@
     #ifdef CONFIG_LV_USE_ST7735
         #define LV_USE_ST7735 CONFIG_LV_USE_ST7735
     #else
-        #define LV_USE_ST7735		0
+        #define LV_USE_ST7735        0
     #endif
 #endif
 #ifndef LV_USE_ST7789
     #ifdef CONFIG_LV_USE_ST7789
         #define LV_USE_ST7789 CONFIG_LV_USE_ST7789
     #else
-        #define LV_USE_ST7789		0
+        #define LV_USE_ST7789        0
     #endif
 #endif
 #ifndef LV_USE_ST7796
     #ifdef CONFIG_LV_USE_ST7796
         #define LV_USE_ST7796 CONFIG_LV_USE_ST7796
     #else
-        #define LV_USE_ST7796		0
+        #define LV_USE_ST7796        0
     #endif
 #endif
 #ifndef LV_USE_ILI9341
     #ifdef CONFIG_LV_USE_ILI9341
         #define LV_USE_ILI9341 CONFIG_LV_USE_ILI9341
     #else
-        #define LV_USE_ILI9341		0
+        #define LV_USE_ILI9341       0
     #endif
 #endif
 
@@ -3307,6 +3347,11 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LOG_TRACE_LAYOUT     0
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
+
+#if LV_USE_SYSMON == 0
+    #define LV_USE_PERF_MONITOR 0
+    #define LV_USE_MEM_MONITOR 0
+#endif /*LV_USE_SYSMON*/
 
 #ifndef LV_USE_LZ4
     #define LV_USE_LZ4  (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)

@@ -112,6 +112,7 @@ void lv_draw_sdl_init(void)
         .create_cb = (lv_cache_create_cb_t)sdl_texture_cache_create_cb,
         .free_cb = (lv_cache_free_cb_t)sdl_texture_cache_free_cb,
     });
+    lv_cache_set_name(draw_sdl_unit->texture_cache, "SDL_TEXTURE");
 }
 
 /**********************

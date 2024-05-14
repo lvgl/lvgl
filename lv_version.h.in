@@ -1,0 +1,14 @@
+/**
+ * @file version.h
+ * The current version of LVGL
+ */
+
+#ifndef LVGL_VERSION_H
+#define LVGL_VERSION_H
+
+#define LVGL_VERSION_MAJOR @LVGL_VERSION_MAJOR@
+#define LVGL_VERSION_MINOR @LVGL_VERSION_MINOR@
+#define LVGL_VERSION_PATCH @LVGL_VERSION_PATCH@
+#define LVGL_VERSION_INFO "@LVGL_VERSION_INFO@"
+
+#endif /*LVGL_VERSION_H*/

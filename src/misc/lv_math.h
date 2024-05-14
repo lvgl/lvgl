@@ -29,6 +29,9 @@ extern "C" {
 /*Align up value x to align, align must be a power of two*/
 #define LV_ALIGN_UP(x, align) (((x) + ((align) - 1)) & ~((align) - 1))
 
+/*Round up value x to round, round can be any integer number*/
+#define LV_ROUND_UP(x, round) ((((x) + ((round) - 1)) / (round)) * (round))
+
 /**********************
  *      TYPEDEFS
  **********************/

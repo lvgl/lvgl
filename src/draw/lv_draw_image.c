@@ -51,7 +51,7 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
     dsc->scale_x = LV_SCALE_NONE;
     dsc->scale_y = LV_SCALE_NONE;
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
-    dsc->original_area.x2 = LV_COORD_MIN;   /*Indicate invalid area by default by setting a negative size*/
+    dsc->image_area.x2 = LV_COORD_MIN;   /*Indicate invalid area by default by setting a negative size*/
     dsc->base.dsc_size = sizeof(lv_draw_image_dsc_t);
 }
 
@@ -185,7 +185,13 @@ void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
     int32_t img_w = draw_dsc->header.w;
     int32_t img_h = draw_dsc->header.h;
 
-    lv_area_t tile_area = *coords;
+    lv_area_t tile_area;
+    if(lv_area_get_width(&draw_dsc->image_area) >= 0) {
+        tile_area = draw_dsc->image_area;
+    }
+    else {
+        tile_area = *coords;
+    }
     lv_area_set_width(&tile_area, img_w);
     lv_area_set_height(&tile_area, img_h);
 
@@ -198,11 +204,11 @@ void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
         .y2 = LV_COORD_MIN,
     };
 
-    while(tile_area.y1 <= draw_unit->clip_area->y2) {
-        while(tile_area.x1 <= draw_unit->clip_area->x2) {
+    while(tile_area.y1 <= coords->y2) {
+        while(tile_area.x1 <= coords->x2) {
 
             lv_area_t clipped_img_area;
-            if(_lv_area_intersect(&clipped_img_area, &tile_area, draw_unit->clip_area)) {
+            if(_lv_area_intersect(&clipped_img_area, &tile_area, coords)) {
                 img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, &relative_decoded_area, &tile_area, &clipped_img_area,
                                     draw_core_cb);
             }

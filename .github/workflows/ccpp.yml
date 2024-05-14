@@ -27,8 +27,39 @@ jobs:
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build
 
+  build-windows-GCC:
+    runs-on: windows-2022
+    name: Build Windows GCC
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install prerequisites
+      run: scripts\install-prerequisites.bat
+    - name: Build
+      run: python tests/main.py build
+      env:
+        CC: gcc
+
+  build-windows-MSVC:
+    runs-on: windows-2022
+    name: Build Windows MSVC
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install prerequisites
+      run: scripts\install-prerequisites.bat
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 'mswin'
+    - name: Build
+      run: python tests/main.py build
+      env:
+        CC: cl
+
   test-native:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: amd64 Executable Tests
     steps:
     - uses: actions/checkout@v4
@@ -58,7 +89,7 @@ jobs:
 #        verbose: true
   test-cross:
     # The host should always be linux
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: ${{ matrix.arch }} Executable Tests
 
     # Run steps on a matrix of 3 arch/distro combinations
@@ -82,7 +113,7 @@ jobs:
           key: lvgl_ci_cross_test_ccache_${{ matrix.arch }}_${{ github.sha }}
           restore-keys: |
             lvgl_ci_cross_test_ccache_${{ matrix.arch }}
-      - uses: uraimo/run-on-arch-action@v2.7.1
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run tests
         id: build
         with:

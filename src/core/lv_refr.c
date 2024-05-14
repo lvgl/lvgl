@@ -331,7 +331,7 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
         /* Ensure the timer does not run again automatically.
          * This is done before refreshing in case refreshing invalidates something else.
          * However if the performance monitor is enabled keep the timer running to count the FPS.*/
-#if !(defined(LV_USE_PERF_MONITOR) && LV_USE_PERF_MONITOR)
+#if LV_USE_PERF_MONITOR
         lv_timer_pause(tmr);
 #endif
     }
@@ -959,7 +959,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
             layer_draw_dsc.antialias = disp_refr->antialiasing;
             layer_draw_dsc.bitmap_mask_src = lv_obj_get_style_bitmap_mask_src(obj, 0);
-            layer_draw_dsc.original_area = obj_draw_size;
+            layer_draw_dsc.image_area = obj_draw_size;
             layer_draw_dsc.src = new_layer;
 
             lv_draw_layer(layer, &layer_draw_dsc, &layer_area_act);
@@ -1078,7 +1078,10 @@ static void wait_for_flushing(lv_display_t * disp)
     lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
 
     if(disp->flush_wait_cb) {
-        disp->flush_wait_cb(disp);
+        if(disp->flushing) {
+            disp->flush_wait_cb(disp);
+        }
+        disp->flushing = 0;
     }
     else {
         while(disp->flushing);
