@@ -41,7 +41,7 @@ struct lv_dropdown_t {
     uint32_t sel_opt_id;            /**< Index of the currently selected option*/
     uint32_t sel_opt_id_orig;       /**< Store the original index on focus*/
     uint32_t pr_opt_id;             /**< Index of the currently pressed option*/
-    lv_dir_t dir              : 4;  /**< Direction in which the list should open*/
+    uint8_t dir               : 4;  /**< Direction in which the list should open*/
     uint8_t static_txt        : 1;  /**< 1: Only a pointer is saved in `options`*/
     uint8_t selected_highlight: 1;  /**< 1: Make the selected option highlighted in the list*/
 };

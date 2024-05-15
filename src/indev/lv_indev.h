@@ -47,6 +47,17 @@ typedef enum {
     LV_INDEV_MODE_EVENT,
 } lv_indev_mode_t;
 
+/** Data structure passed to an input driver to fill*/
+typedef struct {
+    lv_point_t point; /**< For LV_INDEV_TYPE_POINTER the currently pressed point*/
+    uint32_t key;     /**< For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
+    uint32_t btn_id;  /**< For LV_INDEV_TYPE_BUTTON the currently pressed button*/
+    int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
+
+    lv_indev_state_t state; /**< LV_INDEV_STATE_RELEASED or LV_INDEV_STATE_PRESSED*/
+    bool continue_reading;  /**< If set to true, the read callback is invoked again, unless the device is in event-driven mode*/
+} lv_indev_data_t;
+
 typedef void (*lv_indev_read_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************

@@ -374,6 +374,7 @@ lv_color_t lv_chart_get_series_color(lv_obj_t * chart, const lv_chart_series_t *
 {
     LV_ASSERT_OBJ(chart, MY_CLASS);
     LV_ASSERT_NULL(series);
+    LV_UNUSED(chart);
 
     return series->color;
 }

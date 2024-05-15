@@ -6,8 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../misc/lv_timer_private.h"
-#include "../../indev/lv_indev_private.h"
 #include "lv_monkey_private.h"
 
 #if LV_USE_MONKEY != 0
@@ -100,7 +98,7 @@ void lv_monkey_set_enable(lv_monkey_t * monkey, bool en)
 bool lv_monkey_get_enable(lv_monkey_t * monkey)
 {
     LV_ASSERT_NULL(monkey);
-    return !monkey->timer->paused;
+    return !lv_timer_get_paused(monkey->timer);
 }
 
 void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data)
@@ -149,7 +147,7 @@ static int32_t lv_monkey_random(int32_t howsmall, int32_t howbig)
 
 static void lv_monkey_timer_cb(lv_timer_t * timer)
 {
-    lv_monkey_t * monkey = timer->user_data;
+    lv_monkey_t * monkey = lv_timer_get_user_data(timer);
     lv_indev_data_t * data = &monkey->indev_data;
 
     switch(lv_indev_get_type(monkey->indev)) {

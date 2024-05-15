@@ -18,10 +18,11 @@
 #include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
 #include "../../misc/lv_text_private.h"
+#include "../../core/lv_obj_private.h"
 
 #include <windowsx.h>
 
-#include "../../widgets/textarea/lv_textarea.h"
+#include "../../widgets/textarea/lv_textarea_private.h"
 #include "../../widgets/keyboard/lv_keyboard.h"
 
 /*********************

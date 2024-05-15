@@ -168,8 +168,6 @@ typedef struct lv_obj_style_t lv_obj_style_t;
 
 typedef struct lv_obj_style_transition_dsc_t lv_obj_style_transition_dsc_t;
 
-typedef struct lv_indev_data_t lv_indev_data_t;
-
 typedef struct lv_hit_test_info_t lv_hit_test_info_t;
 
 typedef struct lv_cover_check_info_t lv_cover_check_info_t;
