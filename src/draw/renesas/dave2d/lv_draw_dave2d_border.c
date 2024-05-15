@@ -61,9 +61,7 @@ static void dave2d_draw_border_simple(lv_draw_dave2d_unit_t * u, const lv_area_t
 #if LV_USE_OS
     lv_result_t  status;
     status = lv_mutex_lock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
     local_outer_area = *outer_area;
@@ -151,9 +149,7 @@ static void dave2d_draw_border_simple(lv_draw_dave2d_unit_t * u, const lv_area_t
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 }
 
@@ -180,9 +176,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
 #if LV_USE_OS
     lv_result_t  status;
     status = lv_mutex_lock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
     x = 0 - u->base_unit.target_layer->buf_area.x1;
@@ -305,9 +299,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                                         (d2_s32)  D2_FIX16((int16_t) -1),//( 270 Degrees
                                         (d2_s32) D2_FIX16(0),
                                         flags);
-                if(D2_OK != result) {
-                    __BKPT(0);
-                }
+                LV_ASSERT(D2_OK == result);
             }
 
         }
@@ -335,9 +327,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                                         (d2_s32)  D2_FIX16(0), //180 degrees
                                         (d2_s32) D2_FIX16(1),
                                         flags);
-                if(D2_OK != result) {
-                    __BKPT(0);
-                }
+                LV_ASSERT(D2_OK == result);
             }
         }
 
@@ -373,9 +363,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                                             (d2_s32)  D2_FIX16(0),// 0 degrees
                                             (d2_s32) D2_FIX16(-1),
                                             flags);
-                    if(D2_OK != result) {
-                        __BKPT(0);
-                    }
+                    LV_ASSERT(D2_OK == result);
                 }
 
             }
@@ -403,9 +391,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                                             (d2_s32)  D2_FIX16(1),// 90 degrees
                                             (d2_s32) D2_FIX16(0),
                                             flags);
-                    if(D2_OK != result) {
-                        __BKPT(0);
-                    }
+                    LV_ASSERT(D2_OK == result);
                 }
             }
         }
@@ -422,9 +408,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
 #endif /*LV_DRAW_SW_COMPLEX*/
