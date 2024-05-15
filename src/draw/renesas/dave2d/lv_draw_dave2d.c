@@ -259,7 +259,6 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 else
 #endif
                 {
-                    __NOP();
                 }
                 ret =  0;
                 break;
