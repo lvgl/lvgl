@@ -264,9 +264,9 @@ void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32
 
 void lv_subject_deinit(lv_subject_t * subject)
 {
-    lv_observer_t * observer = _lv_ll_get_head(&subject->subs_ll);
+    lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
     while(observer) {
-        lv_observer_t * observer_next = _lv_ll_get_next(&subject->subs_ll, observer);
+        lv_observer_t * observer_next = lv_ll_get_next(&subject->subs_ll, observer);
 
         if(observer->for_obj) {
             lv_obj_remove_event_cb(observer->target, unsubscribe_on_delete_cb);
@@ -277,7 +277,7 @@ void lv_subject_deinit(lv_subject_t * subject)
         observer = observer_next;
     }
 
-    _lv_ll_clear(&subject->subs_ll);
+    lv_ll_clear(&subject->subs_ll);
 }
 
 lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index)

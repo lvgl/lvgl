@@ -326,6 +326,8 @@ typedef struct lv_draw_sw_blend_fill_dsc_t lv_draw_sw_blend_fill_dsc_t;
 
 typedef struct lv_draw_sw_blend_image_dsc_t lv_draw_sw_blend_image_dsc_t;
 
+typedef struct lv_draw_buf_handlers_t lv_draw_buf_handlers_t;
+
 #if LV_USE_SYSMON
 
 typedef struct lv_sysmon_backend_data_t lv_sysmon_backend_data_t;
