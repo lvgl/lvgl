@@ -5,7 +5,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_mem_private.h"
+#include "../lv_mem.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #include "lv_tlsf.h"

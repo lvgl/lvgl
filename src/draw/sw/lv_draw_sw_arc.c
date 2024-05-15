@@ -10,7 +10,6 @@
 #include "lv_draw_sw_mask_private.h"
 #include "blend/lv_draw_sw_blend_private.h"
 #include "../lv_image_decoder_private.h"
-#include "../lv_draw_rect_private.h"
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 #if LV_DRAW_SW_COMPLEX

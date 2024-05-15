@@ -393,6 +393,21 @@ void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
     return lv_draw_buf_goto_xy(layer->draw_buf, x, y);
 }
 
+lv_draw_task_type_t lv_draw_task_get_type(const lv_draw_task_t * t)
+{
+    return t->type;
+}
+
+void * lv_draw_task_get_draw_dsc(const lv_draw_task_t * t)
+{
+    return t->draw_dsc;
+}
+
+void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area)
+{
+    *area = t->area;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -7,9 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_color_op_private.h"
-#include "lv_color.h"
 #include "lv_log.h"
-#include "../misc/lv_color.h"
 
 /*********************
  *      DEFINES

@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 
-#include "../../stdlib/lv_mem_private.h"
 #include "../../misc/lv_timer_private.h"
 #include "lv_sysmon_private.h"
 

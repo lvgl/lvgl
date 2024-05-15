@@ -6,8 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../misc/lv_style_private.h"
-#include "../../misc/lv_color_op_private.h"
 #include "../../../lvgl.h" /*To see all the widgets*/
 
 #if LV_USE_THEME_DEFAULT

@@ -24,8 +24,27 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-struct lv_monkey;
-typedef struct lv_monkey lv_monkey_t;
+
+typedef struct lv_monkey_t lv_monkey_t;
+
+typedef struct {
+    /**< Input device type*/
+    lv_indev_type_t type;
+
+    /**< Monkey execution period*/
+    struct {
+        //! @cond Doxygen_Suppress
+        uint32_t min;
+        uint32_t max;
+        //! @endcond
+    } period_range;
+
+    /**< The range of input value*/
+    struct {
+        int32_t min;
+        int32_t max;
+    } input_range;
+} lv_monkey_config_t;
 
 /**********************
  * GLOBAL PROTOTYPES

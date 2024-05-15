@@ -555,6 +555,13 @@ lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
     return (lv_obj_t *)lv_observer_get_target(observer);
 }
 
+void * lv_observer_get_user_data(const lv_observer_t * observer)
+{
+    LV_ASSERT_NULL(observer);
+
+    return observer->user_data;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

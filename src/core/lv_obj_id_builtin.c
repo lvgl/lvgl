@@ -93,7 +93,7 @@ const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len)
     name = obj->class_p->name;
     if(name == NULL) name = "nameless";
 
-    lv_snprintf(buf, len, "%s%" LV_PRId32 "", name, (uint32_t)(lv_uintptr_t)obj->id);
+    lv_snprintf(buf, len, "%s%" LV_PRIu32 "", name, (uint32_t)(lv_uintptr_t)obj->id);
     return buf;
 }
 

@@ -90,6 +90,15 @@ enum {
 };
 typedef uint8_t lv_vector_gradient_style_t;
 
+struct lv_fpoint_t {
+    float x;
+    float y;
+};
+
+struct lv_matrix_t {
+    float m[3][3];
+};
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

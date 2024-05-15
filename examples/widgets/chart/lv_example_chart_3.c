@@ -1,4 +1,3 @@
-#include "../../../src/core/lv_obj_private.h"
 #include "../../lv_examples.h"
 #if LV_USE_CHART && LV_BUILD_EXAMPLES
 
@@ -39,11 +38,13 @@ static void event_cb(lv_event_t * e)
             draw_rect_dsc.bg_image_src = buf;
             draw_rect_dsc.bg_image_recolor = lv_color_white();
 
+            lv_area_t chart_obj_coords;
+            lv_obj_get_coords(chart, &chart_obj_coords);
             lv_area_t a;
-            a.x1 = chart->coords.x1 + p.x - 20;
-            a.x2 = chart->coords.x1 + p.x + 20;
-            a.y1 = chart->coords.y1 + p.y - 30;
-            a.y2 = chart->coords.y1 + p.y - 10;
+            a.x1 = chart_obj_coords.x1 + p.x - 20;
+            a.x2 = chart_obj_coords.x1 + p.x + 20;
+            a.y1 = chart_obj_coords.y1 + p.y - 30;
+            a.y2 = chart_obj_coords.y1 + p.y - 10;
 
             lv_layer_t * layer = lv_event_get_layer(e);
             lv_draw_rect(layer, &draw_rect_dsc, &a);

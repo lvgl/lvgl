@@ -8,7 +8,6 @@
  *********************/
 
 #include "../../misc/lv_area_private.h"
-#include "../lv_draw_rect_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE

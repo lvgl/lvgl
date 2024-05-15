@@ -29,6 +29,20 @@ extern "C" {
 
 typedef void * lv_mem_pool_t;
 
+/**
+ * Heap information structure.
+ */
+typedef struct {
+    size_t total_size; /**< Total heap size*/
+    size_t free_cnt;
+    size_t free_size; /**< Size of available memory*/
+    size_t free_biggest_size;
+    size_t used_cnt;
+    size_t max_used; /**< Max size of Heap memory used*/
+    uint8_t used_pct; /**< Percentage used*/
+    uint8_t frag_pct; /**< Amount of fragmentation*/
+} lv_mem_monitor_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

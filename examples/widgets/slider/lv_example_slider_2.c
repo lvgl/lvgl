@@ -1,5 +1,3 @@
-#include "../../../src/widgets/slider/lv_slider_private.h"
-#include "../../../src/misc/lv_style_private.h"
 #include "../../lv_examples.h"
 #if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 

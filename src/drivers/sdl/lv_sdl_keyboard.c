@@ -9,7 +9,7 @@
 #include "lv_sdl_keyboard.h"
 #if LV_USE_SDL
 
-#include "../../indev/lv_indev.h"
+#include "../../indev/lv_indev_private.h"
 #include "../../core/lv_group.h"
 #include "../../stdlib/lv_string.h"
 #include LV_SDL_INCLUDE_PATH

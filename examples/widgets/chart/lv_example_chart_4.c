@@ -1,5 +1,3 @@
-#include "../../../src/draw/lv_draw_rect_private.h"
-#include "../../../src/draw/lv_draw_private.h"
 #include "../../lv_examples.h"
 
 #if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES
@@ -7,7 +5,7 @@
 static void draw_event_cb(lv_event_t * e)
 {
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
+    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
 
     if(base_dsc->part != LV_PART_ITEMS) {
         return;

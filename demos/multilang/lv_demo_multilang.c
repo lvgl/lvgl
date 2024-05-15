@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../src/misc/lv_anim_private.h"
 #include "lv_demo_multilang.h"
 
 #if LV_USE_DEMO_MULTILANG

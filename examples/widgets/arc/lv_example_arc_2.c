@@ -1,4 +1,3 @@
-#include "../../../src/misc/lv_anim_private.h"
 #include "../../lv_examples.h"
 
 #if LV_USE_ARC && LV_BUILD_EXAMPLES

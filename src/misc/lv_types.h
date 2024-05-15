@@ -130,8 +130,6 @@ typedef struct lv_fragment_t lv_fragment_t;
 typedef struct lv_fragment_class_t lv_fragment_class_t;
 typedef struct lv_fragment_managed_states_t lv_fragment_managed_states_t;
 
-typedef struct lv_mem_monitor_t lv_mem_monitor_t;
-
 typedef struct lv_profiler_builtin_config_t lv_profiler_builtin_config_t;
 
 typedef struct lv_rb_node_t lv_rb_node_t;
@@ -139,8 +137,6 @@ typedef struct lv_rb_node_t lv_rb_node_t;
 typedef struct lv_rb_t lv_rb_t;
 
 typedef struct lv_color_filter_dsc_t lv_color_filter_dsc_t;
-
-typedef struct lv_style_transition_dsc_t lv_style_transition_dsc_t;
 
 typedef struct lv_event_dsc_t lv_event_dsc_t;
 
@@ -160,19 +156,11 @@ typedef struct lv_draw_mask_t lv_draw_mask_t;
 
 typedef struct lv_grad_t lv_grad_t;
 
-typedef struct lv_draw_fill_dsc_t lv_draw_fill_dsc_t;
-
-typedef struct lv_draw_border_dsc_t lv_draw_border_dsc_t;
-
-typedef struct lv_draw_box_shadow_dsc_t lv_draw_box_shadow_dsc_t;
-
 typedef struct lv_draw_label_hint_t lv_draw_label_hint_t;
 
 typedef struct lv_draw_glyph_dsc_t lv_draw_glyph_dsc_t;
 
 typedef struct lv_draw_image_sup_t lv_draw_image_sup_t;
-
-typedef struct lv_draw_triangle_dsc_t lv_draw_triangle_dsc_t;
 
 typedef struct lv_draw_mask_rect_dsc_t lv_draw_mask_rect_dsc_t;
 

@@ -1,4 +1,3 @@
-#include "../../src/stdlib/lv_mem_private.h"
 #if LV_BUILD_TEST
 
 #include "lv_test_helpers.h"

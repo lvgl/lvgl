@@ -1,4 +1,3 @@
-#include "../../../src/others/fragment/lv_fragment_private.h"
 /**
  * @file lv_example_fragment_2.c
  * @brief Navigation stack using obj fragment

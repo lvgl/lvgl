@@ -26,99 +26,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_fragment_t {
-    /**
-     * Class of this fragment
-     */
-    const lv_fragment_class_t * cls;
-    /**
-     * Managed fragment states. If not null, then this fragment is managed.
-     *
-     * @warning Don't modify values inside this struct!
-     */
-    lv_fragment_managed_states_t * managed;
-    /**
-     * Child fragment manager
-     */
-    lv_fragment_manager_t * child_manager;
-    /**
-     * lv_obj returned by create_obj_cb
-     */
-    lv_obj_t * obj;
-
-};
-
-struct lv_fragment_class_t {
-    /**
-     * Constructor function for fragment class
-     * @param self Fragment instance
-     * @param args Arguments assigned by fragment manager
-     */
-    void (*constructor_cb)(lv_fragment_t * self, void * args);
-
-    /**
-     * Destructor function for fragment class
-     * @param self Fragment instance, will be freed after this call
-     */
-    void (*destructor_cb)(lv_fragment_t * self);
-
-    /**
-     * Fragment attached to manager
-     * @param self Fragment instance
-     */
-    void (*attached_cb)(lv_fragment_t * self);
-
-    /**
-     * Fragment detached from manager
-     * @param self Fragment instance
-     */
-    void (*detached_cb)(lv_fragment_t * self);
-
-    /**
-     * Create objects
-     * @param self Fragment instance
-     * @param container Container of the objects should be created upon
-     * @return Created object, NULL if multiple objects has been created
-     */
-    lv_obj_t * (*create_obj_cb)(lv_fragment_t * self, lv_obj_t * container);
-
-    /**
-     *
-     * @param self Fragment instance
-     * @param obj lv_obj returned by create_obj_cb
-     */
-    void (*obj_created_cb)(lv_fragment_t * self, lv_obj_t * obj);
-
-    /**
-     * Called before objects in the fragment will be deleted.
-     *
-     * @param self Fragment instance
-     * @param obj object with this fragment
-     */
-    void (*obj_will_delete_cb)(lv_fragment_t * self, lv_obj_t * obj);
-
-    /**
-     * Called when the object created by fragment received `LV_EVENT_DELETE` event
-     * @param self Fragment instance
-     * @param obj object with this fragment
-     */
-    void (*obj_deleted_cb)(lv_fragment_t * self, lv_obj_t * obj);
-
-    /**
-     * Handle event
-     * @param self Fragment instance
-     * @param which User-defined ID of event
-     * @param data1 User-defined data
-     * @param data2 User-defined data
-     */
-    bool (*event_cb)(lv_fragment_t * self, int code, void * userdata);
-
-    /**
-     * *REQUIRED*: Allocation size of fragment
-     */
-    size_t instance_size;
-};
-
 /**
  * Fragment states
  */
@@ -152,7 +59,6 @@ struct lv_fragment_managed_states_t  {
      */
     bool in_stack;
 };
-
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -114,36 +114,6 @@ struct lv_draw_unit_t {
     int32_t (*delete_cb)(lv_draw_unit_t * draw_unit);
 };
 
-struct lv_layer_t  {
-
-    /** Target draw buffer of the layer*/
-    lv_draw_buf_t * draw_buf;
-
-    /** The absolute coordinates of the buffer */
-    lv_area_t buf_area;
-
-    /** The color format of the layer. LV_COLOR_FORMAT_...  */
-    lv_color_format_t color_format;
-
-    /**
-     * NEVER USE IT DRAW UNITS. USED INTERNALLY DURING DRAW TASK CREATION.
-     * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
-     * Can be set before new draw tasks are added to indicate the clip area of the draw tasks.
-     * Therefore `lv_draw_add_task()` always saves it in the new draw task to know the clip area when the draw task was added.
-     * During drawing the draw units also sees the saved clip_area and should use it during drawing.
-     * During drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
-     */
-    lv_area_t _clip_area;
-
-    /** Linked list of draw tasks */
-    lv_draw_task_t * draw_task_head;
-
-    lv_layer_t * parent;
-    lv_layer_t * next;
-    bool all_tasks_added;
-    void * user_data;
-};
-
 typedef struct {
     lv_draw_unit_t * unit_head;
     uint32_t used_memory_for_layers_kb;

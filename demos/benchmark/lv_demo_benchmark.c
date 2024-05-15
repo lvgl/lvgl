@@ -6,10 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../src/others/sysmon/lv_sysmon_private.h"
-#include "../../src/misc/lv_anim_private.h"
-#include "../../src/draw/lv_draw_rect_private.h"
-#include "../../src/draw/lv_draw_private.h"
 #include "lv_demo_benchmark.h"
 
 #if LV_USE_DEMO_BENCHMARK
@@ -30,7 +26,6 @@
     #warning "It's recommended to have at least 128kB RAM for the benchmark"
 #endif
 
-#include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 
 /**********************

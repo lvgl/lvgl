@@ -370,6 +370,14 @@ void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_
     lv_chart_refresh(chart);
 }
 
+lv_color_t lv_chart_get_series_color(lv_obj_t * chart, const lv_chart_series_t * series)
+{
+    LV_ASSERT_OBJ(chart, MY_CLASS);
+    LV_ASSERT_NULL(series);
+
+    return series->color;
+}
+
 void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

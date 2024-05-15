@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../misc/lv_style_private.h"
 #include "../misc/lv_event_private.h"
 #include "../misc/lv_area_private.h"
 #include "lv_obj_style_private.h"

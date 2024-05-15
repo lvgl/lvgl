@@ -6,8 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../src/draw/lv_draw_vector_private.h"
-#include "../../src/draw/lv_draw_private.h"
 #include "lv_demo_vector_graphic.h"
 
 #if LV_USE_DEMO_VECTOR_GRAPHIC

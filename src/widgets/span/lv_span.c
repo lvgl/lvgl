@@ -253,6 +253,11 @@ void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines)
  * Getter functions
  *====================*/
 
+lv_style_t * lv_span_get_style(lv_span_t * span)
+{
+    return &span->style;
+}
+
 lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
 {
     if(obj == NULL) {

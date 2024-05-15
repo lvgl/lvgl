@@ -13,6 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "core/lv_global.h"
+
 #include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
 #include "misc/lv_text_private.h"

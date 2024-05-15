@@ -33,6 +33,7 @@ extern "C" {
  **********************/
 
 typedef enum {
+    LV_DRAW_TASK_TYPE_NONE = 0,
     LV_DRAW_TASK_TYPE_FILL,
     LV_DRAW_TASK_TYPE_BORDER,
     LV_DRAW_TASK_TYPE_BOX_SHADOW,
@@ -53,6 +54,36 @@ typedef enum {
     LV_DRAW_TASK_STATE_IN_PROGRESS,
     LV_DRAW_TASK_STATE_READY,
 } lv_draw_task_state_t;
+
+struct lv_layer_t  {
+
+    /** Target draw buffer of the layer*/
+    lv_draw_buf_t * draw_buf;
+
+    /** The absolute coordinates of the buffer */
+    lv_area_t buf_area;
+
+    /** The color format of the layer. LV_COLOR_FORMAT_...  */
+    lv_color_format_t color_format;
+
+    /**
+     * NEVER USE IT DRAW UNITS. USED INTERNALLY DURING DRAW TASK CREATION.
+     * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
+     * Can be set before new draw tasks are added to indicate the clip area of the draw tasks.
+     * Therefore `lv_draw_add_task()` always saves it in the new draw task to know the clip area when the draw task was added.
+     * During drawing the draw units also sees the saved clip_area and should use it during drawing.
+     * During drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
+     */
+    lv_area_t _clip_area;
+
+    /** Linked list of draw tasks */
+    lv_draw_task_t * draw_task_head;
+
+    lv_layer_t * parent;
+    lv_layer_t * next;
+    bool all_tasks_added;
+    void * user_data;
+};
 
 typedef struct {
     lv_obj_t * obj;
@@ -171,6 +202,27 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
  * @return                  `buf` offset to point to the given X and Y coordinate
  */
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y);
+
+/**
+ * Get the type of a draw task
+ * @param t   the draw task to get the type of
+ * @return    the draw task type
+*/
+lv_draw_task_type_t lv_draw_task_get_type(const lv_draw_task_t * t);
+
+/**
+ * Get the draw descriptor of a draw task
+ * @param t   the draw task to get the draw descriptor of
+ * @return    a void pointer to the draw descriptor
+*/
+void * lv_draw_task_get_draw_dsc(const lv_draw_task_t * t);
+
+/**
+ * Get the draw area of a draw task
+ * @param t      the draw task to get the draw area of
+ * @param area   the destination where the draw area will be stored
+*/
+void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area);
 
 /**********************
  *  GLOBAL VARIABLES

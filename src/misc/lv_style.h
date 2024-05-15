@@ -310,6 +310,17 @@ typedef enum {
 } lv_style_res_t;
 
 /**
+ * Descriptor for style transitions
+ */
+typedef struct {
+    const lv_style_prop_t * props; /**< An array with the properties to animate.*/
+    void * user_data;              /**< A custom user data that will be passed to the animation's user_data */
+    lv_anim_path_cb_t path_xcb;     /**< A path for the animation.*/
+    uint32_t time;                 /**< Duration of the transition in [ms]*/
+    uint32_t delay;                /**< Delay before the transition in [ms]*/
+} lv_style_transition_dsc_t;
+
+/**
  * Descriptor of a constant style property.
  */
 typedef struct {

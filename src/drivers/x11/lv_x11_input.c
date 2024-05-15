@@ -15,6 +15,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include "../../widgets/image/lv_image.h"
+#include "../../indev/lv_indev_private.h"
 
 /*********************
  *      DEFINES

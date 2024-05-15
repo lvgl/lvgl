@@ -6,9 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../src/misc/lv_anim_private.h"
-#include "../../src/draw/lv_draw_triangle_private.h"
-#include "../../src/core/lv_obj_private.h"
 #include "lv_demo_music_main.h"
 #if LV_USE_DEMO_MUSIC
 
@@ -795,8 +792,10 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         if(opa < LV_OPA_MIN) return;
 
         lv_point_t center;
-        center.x = obj->coords.x1 + lv_obj_get_width(obj) / 2;
-        center.y = obj->coords.y1 + lv_obj_get_height(obj) / 2;
+        lv_area_t obj_coords;
+        lv_obj_get_coords(obj, &obj_coords);
+        center.x = obj_coords.x1 + lv_obj_get_width(obj) / 2;
+        center.y = obj_coords.y1 + lv_obj_get_height(obj) / 2;
 
         lv_draw_triangle_dsc_t draw_dsc;
         lv_draw_triangle_dsc_init(&draw_dsc);

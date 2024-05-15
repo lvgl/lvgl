@@ -1,5 +1,4 @@
 #include "../../lv_examples.h"
-#include "../../../src/draw/lv_draw_private.h"
 
 #if LV_USE_LABEL && LV_FONT_MONTSERRAT_24 && LV_USE_CANVAS && LV_BUILD_EXAMPLES && LV_DRAW_SW_COMPLEX
 

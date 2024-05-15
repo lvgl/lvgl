@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../misc/lv_style_private.h"
 #include "lv_obj_draw_private.h"
 #include "lv_obj_private.h"
 #include "lv_obj_style.h"

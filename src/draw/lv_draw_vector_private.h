@@ -26,15 +26,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_fpoint_t {
-    float x;
-    float y;
-};
-
-struct lv_matrix_t {
-    float m[3][3];
-};
-
 struct lv_vector_path_t {
     lv_vector_path_quality_t quality;
     lv_array_t ops;

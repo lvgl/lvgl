@@ -8,7 +8,6 @@
  *********************/
 #include "others/sysmon/lv_sysmon_private.h"
 #include "misc/lv_timer_private.h"
-#include "misc/lv_style_private.h"
 #include "misc/lv_profiler_builtin_private.h"
 #include "misc/lv_anim_private.h"
 #include "draw/lv_image_decoder_private.h"

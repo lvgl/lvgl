@@ -6,14 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../src/draw/lv_draw_triangle_private.h"
-#include "../../src/draw/lv_draw_private.h"
-#include "../../src/core/lv_obj_private.h"
 #include "lv_demo_render.h"
 
 #if LV_USE_DEMO_RENDER
 
-#include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 
 /*********************
@@ -531,12 +527,14 @@ static void triangle_draw_event_cb(lv_event_t * e)
 
     lv_point_t * p_rel = lv_event_get_user_data(e);
 
-    dsc.p[0].x = p_rel[0].x + obj->coords.x1 + 8;
-    dsc.p[0].y = p_rel[0].y + obj->coords.y1 + 2;
-    dsc.p[1].x = p_rel[1].x + obj->coords.x1 + 8;
-    dsc.p[1].y = p_rel[1].y + obj->coords.y1 + 2;
-    dsc.p[2].x = p_rel[2].x + obj->coords.x1 + 8;
-    dsc.p[2].y = p_rel[2].y + obj->coords.y1 + 2;
+    lv_area_t coords;
+    lv_obj_get_coords(obj, &coords);
+    dsc.p[0].x = p_rel[0].x + coords.x1 + 8;
+    dsc.p[0].y = p_rel[0].y + coords.y1 + 2;
+    dsc.p[1].x = p_rel[1].x + coords.x1 + 8;
+    dsc.p[1].y = p_rel[1].y + coords.y1 + 2;
+    dsc.p[2].x = p_rel[2].x + coords.x1 + 8;
+    dsc.p[2].y = p_rel[2].y + coords.y1 + 2;
 
     lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
     dsc.bg_grad.dir = lv_obj_get_style_bg_grad_dir(obj, 0);

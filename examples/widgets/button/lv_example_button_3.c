@@ -1,4 +1,3 @@
-#include "../../../src/misc/lv_style_private.h"
 #include "../../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_BUTTON
 

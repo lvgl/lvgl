@@ -12,7 +12,6 @@
 
 #include "lv_demo_music_main.h"
 #include "lv_demo_music_list.h"
-#include "../../src/core/lv_global.h"
 
 /*********************
  *      DEFINES

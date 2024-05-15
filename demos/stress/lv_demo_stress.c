@@ -6,9 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../src/stdlib/lv_mem_private.h"
-#include "../../src/misc/lv_timer_private.h"
-#include "../../src/misc/lv_anim_private.h"
 #include "lv_demo_stress.h"
 
 #if LV_USE_DEMO_STRESS
@@ -441,7 +438,7 @@ static void auto_delete(lv_obj_t * obj, uint32_t delay)
 
 static void msgbox_delete(lv_timer_t * tmr)
 {
-    lv_msgbox_close(tmr->user_data);
+    lv_msgbox_close(lv_timer_get_user_data(tmr));
 }
 
 static void set_y_anim(void * obj, int32_t v)

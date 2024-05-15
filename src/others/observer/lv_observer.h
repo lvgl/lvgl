@@ -272,6 +272,13 @@ void * lv_observer_get_target(lv_observer_t * observer);
 lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer);
 
 /**
+ * Get the user data of the observer.
+ * @param observer      pointer to an observer
+ * @return              void pointer to the saved user data
+*/
+void * lv_observer_get_user_data(const lv_observer_t * observer);
+
+/**
  * Notify all observers of subject
  * @param subject       pointer to a subject
  */

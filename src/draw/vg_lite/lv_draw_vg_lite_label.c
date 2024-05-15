@@ -9,7 +9,6 @@
 
 #include "../../misc/lv_area_private.h"
 #include "../../libs/freetype/lv_freetype_private.h"
-#include "../lv_draw_rect_private.h"
 #include "../lv_draw_label_private.h"
 #include "lv_draw_vg_lite.h"
 

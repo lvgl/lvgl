@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../draw/lv_draw_rect_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "lv_calendar_private.h"

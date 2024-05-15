@@ -9,7 +9,6 @@
 #include "../../misc/lv_area_private.h"
 #include "lv_draw_sw_mask_private.h"
 #include "blend/lv_draw_sw_blend_private.h"
-#include "../lv_draw_rect_private.h"
 #include "../lv_draw_private.h"
 #include "lv_draw_sw.h"
 
