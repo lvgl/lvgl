@@ -837,7 +837,7 @@ static void blend_mode_cb(lv_obj_t * parent)
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 static lv_obj_t * create_linear_gradient_obj(lv_obj_t * parent, int32_t col, int32_t row, lv_grad_dsc_t * grad,
-                                             int32_t x1, int32_t y1, lv_grad_extend_t extend, bool use_opa_map, lv_opa_t opa)
+                                             int32_t x1, int32_t y1, lv_grad_extend_t extend, bool use_opa_map, int32_t radius)
 {
     const lv_color_t grad_color[2] = {
         LV_COLOR_MAKE(0xd5, 0x03, 0x47),
@@ -861,9 +861,11 @@ static lv_obj_t * create_linear_gradient_obj(lv_obj_t * parent, int32_t col, int
 
     /*create rectangle*/
     lv_obj_t * obj = lv_obj_create(parent);
+    lv_obj_remove_style_all(obj);
     lv_obj_set_size(obj, 70, 50);
+    lv_obj_set_style_radius(obj, radius, 0);
     lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
-    lv_obj_set_style_opa(obj, opa, 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
 
     /*set gradient as background*/
     lv_obj_set_style_bg_grad(obj, grad, 0);
@@ -879,8 +881,8 @@ static void linear_gradient_cb(lv_obj_t * parent)
     static const int32_t grid_rows[] = { 32, 40, 40, 40, 40, 40, 40, LV_GRID_TEMPLATE_LAST };
     lv_obj_set_grid_dsc_array(parent, grid_cols, grid_rows);
 
-    const char * opa_txt[] = { "no", "bg opa", "stop opa", "bg+stop" };
-    lv_opa_t opa_values[] = { LV_OPA_COVER, LV_OPA_50, LV_OPA_COVER, LV_OPA_50 };
+    const char * opa_txt[] = { "no opa", "no opa round", "stop opa", "stop opa round" };
+    int32_t radius_values[] = { 0, 20, 0, 20 };
     bool opa_map_values[] = { false, false, true, true };
 
     const char * offs_txt[] = { "map", "repeat", "reflect" };
@@ -905,13 +907,13 @@ static void linear_gradient_cb(lv_obj_t * parent)
 
         for(y = 0; y < 3; y++) {
             create_linear_gradient_obj(parent, 1 + x * 2, 1 + y * 2, &grad_values[y][x], x1_values[y], y1_values[y],
-                                       extend_values[y], opa_map_values[x], opa_values[x]);
+                                       extend_values[y], opa_map_values[x], radius_values[x]);
         }
     }
 }
 
 static lv_obj_t * create_radial_gradient_obj(lv_obj_t * parent, int32_t col, int32_t row, lv_grad_dsc_t * grad,
-                                             int32_t offs, int32_t r0, lv_grad_extend_t extend, bool use_opa_map, lv_opa_t opa)
+                                             int32_t offs, int32_t r0, lv_grad_extend_t extend, bool use_opa_map, int32_t radius)
 {
     const lv_color_t grad_color[2] = {
         LV_COLOR_MAKE(0xd5, 0x03, 0x47),
@@ -933,15 +935,17 @@ static lv_obj_t * create_radial_gradient_obj(lv_obj_t * parent, int32_t col, int
     grad->params.radial.focal_extent.y = grad->params.radial.focal.y;         /*start circle point y coordinate*/
     grad->params.radial.end.x = grad->params.radial.focal.x + offs;           /*end circle center x position*/
     grad->params.radial.end.y = grad->params.radial.focal.y + offs;           /*end circle center y position*/
-    grad->params.radial.end_extent.x = lv_pct(100);                    /*end circle point x coordinate*/
-    grad->params.radial.end_extent.y = lv_pct(100);                    /*end circle point y coordinate*/
+    grad->params.radial.end_extent.x = grad->params.radial.end.x;             /*end circle point x coordinate*/
+    grad->params.radial.end_extent.y = lv_pct(85);                    /*end circle point y coordinate*/
     grad->extend = extend;                                      /*color pattern outside the border circles*/
 
     /*create rectangle*/
     lv_obj_t * obj = lv_obj_create(parent);
+    lv_obj_remove_style_all(obj);
     lv_obj_set_size(obj, 70, 50);
+    lv_obj_set_style_radius(obj, radius, 0);
     lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
-    lv_obj_set_style_opa(obj, opa, 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
 
     /*set gradient as background*/
     lv_obj_set_style_bg_grad(obj, grad, 0);
@@ -957,11 +961,11 @@ static void radial_gradient_cb(lv_obj_t * parent)
     static const int32_t grid_rows[] = { 32, 40, 40, 40, 40, 40, 40, LV_GRID_TEMPLATE_LAST };
     lv_obj_set_grid_dsc_array(parent, grid_cols, grid_rows);
 
-    const char * opa_txt[] = { "no", "bg opa", "stop opa", "bg+stop" };
-    lv_opa_t opa_values[] = { LV_OPA_COVER, LV_OPA_50, LV_OPA_COVER, LV_OPA_50};
+    const char * opa_txt[] = { "no opa", "no opa round", "stop opa", "stop opa round" };
+    int32_t radius_values[] = { 0, 20, 0, 20 };
     bool opa_map_values[] = { false, false, true, true };
 
-    const char * offs_txt[] = { "conc", "int", "ext" };
+    const char * offs_txt[] = { "map", "repeat", "reflect" };
     lv_grad_extend_t extend_values[] = { LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT};
 
     static lv_grad_dsc_t grad_values[3][4];
@@ -980,14 +984,14 @@ static void radial_gradient_cb(lv_obj_t * parent)
         lv_obj_set_grid_cell(op_label, LV_GRID_ALIGN_CENTER, 1 + x * 2, 2, LV_GRID_ALIGN_CENTER, 0, 1);
 
         for(y = 0; y < 3; y++) {
-            create_radial_gradient_obj(parent, 1 + x * 2, 1 + y * 2, &grad_values[y][x], y * 18, 0, extend_values[y],
-                                       opa_map_values[x], opa_values[x]);
+            create_radial_gradient_obj(parent, 1 + x * 2, 1 + y * 2, &grad_values[y][x], y * 5, 0, extend_values[y],
+                                       opa_map_values[x], radius_values[x]);
         }
     }
 }
 
 static lv_obj_t * create_conical_gradient_obj(lv_obj_t * parent, int32_t col, int32_t row, lv_grad_dsc_t * grad,
-                                              int32_t a0, int32_t a1, lv_grad_extend_t extend, bool use_opa_map, lv_opa_t opa)
+                                              int32_t a0, int32_t a1, lv_grad_extend_t extend, bool use_opa_map, int32_t radius)
 {
     const lv_color_t grad_color[2] = {
         LV_COLOR_MAKE(0xd5, 0x03, 0x47),
@@ -1011,9 +1015,11 @@ static lv_obj_t * create_conical_gradient_obj(lv_obj_t * parent, int32_t col, in
 
     /*create rectangle*/
     lv_obj_t * obj = lv_obj_create(parent);
+    lv_obj_remove_style_all(obj);
     lv_obj_set_size(obj, 70, 50);
+    lv_obj_set_style_radius(obj, radius, 0);
     lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
-    lv_obj_set_style_opa(obj, opa, 0);
+    lv_obj_set_style_opa(obj, opa_saved, 0);
 
     /*set gradient as background*/
     lv_obj_set_style_bg_grad(obj, grad, 0);
@@ -1029,8 +1035,8 @@ static void conical_gradient_cb(lv_obj_t * parent)
     static const int32_t grid_rows[] = { 32, 40, 40, 40, 40, 40, 40, LV_GRID_TEMPLATE_LAST };
     lv_obj_set_grid_dsc_array(parent, grid_cols, grid_rows);
 
-    const char * opa_txt[] = { "no", "bg opa", "stop opa", "bg+stop" };
-    lv_opa_t opa_values[] = { LV_OPA_COVER, LV_OPA_50, LV_OPA_COVER, LV_OPA_50 };
+    const char * opa_txt[] = { "no opa", "no opa round", "stop opa", "stop opa round" };
+    int32_t radius_values[] = { 0, 20, 0, 20 };
     bool opa_map_values[] = { false, false, true, true };
 
     const char * offs_txt[] = { "map", "repeat", "reflect" };
@@ -1053,7 +1059,7 @@ static void conical_gradient_cb(lv_obj_t * parent)
 
         for(y = 0; y < 3; y++) {
             create_conical_gradient_obj(parent, 1 + x * 2, 1 + y * 2, &grad_values[y][x], 10, 100, extend_values[y],
-                                        opa_map_values[x], opa_values[x]);
+                                        opa_map_values[x], radius_values[x]);
         }
     }
 }
