@@ -327,11 +327,58 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
         if((scroll_dir & LV_DIR_TOP) == 0) up_en = false;
         if((scroll_dir & LV_DIR_BOTTOM) == 0) down_en = false;
 
-        /*The object is scrollable to a direction if its content overflow in that direction.*/
-        int32_t st = lv_obj_get_scroll_top(obj_act);
-        int32_t sb = lv_obj_get_scroll_bottom(obj_act);
-        int32_t sl = lv_obj_get_scroll_left(obj_act);
-        int32_t sr = lv_obj_get_scroll_right(obj_act);
+        /*The object is scrollable to a direction if its content overflow in that direction.
+         *If there are at least 2 snapable children always assume
+         *scrolling to allow scrolling to the other child*/
+        uint32_t snap_cnt = 0;
+
+        /*Horizontal scroll*/
+        int32_t sl = 0;
+        int32_t sr = 0;
+        lv_scroll_snap_t snap_x = lv_obj_get_scroll_snap_x(obj_act);
+        if(snap_x != LV_SCROLL_SNAP_NONE) {
+            uint32_t child_cnt = lv_obj_get_child_count(obj_act);
+            uint32_t i;
+            for(i = 0; i < child_cnt; i++) {
+                if(lv_obj_has_flag(lv_obj_get_child(obj_act, i), LV_OBJ_FLAG_SNAPPABLE)) {
+                    snap_cnt++;
+                    if(snap_cnt == 2) {
+                        sl = 1; /*Assume scrolling*/
+                        sr = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        if(snap_x == LV_SCROLL_SNAP_NONE || snap_cnt < 2) {
+            sl = lv_obj_get_scroll_left(obj_act);
+            sr = lv_obj_get_scroll_right(obj_act);
+        }
+
+        /*Vertical scroll*/
+        snap_cnt = 0;
+        int32_t st = 0;
+        int32_t sb = 0;
+        lv_scroll_snap_t snap_y = lv_obj_get_scroll_snap_y(obj_act);
+        if(snap_y != LV_SCROLL_SNAP_NONE) {
+            uint32_t child_cnt = lv_obj_get_child_count(obj_act);
+            uint32_t i;
+            for(i = 0; i < child_cnt; i++) {
+                if(lv_obj_has_flag(lv_obj_get_child(obj_act, i), LV_OBJ_FLAG_SNAPPABLE)) {
+                    snap_cnt++;
+                    if(snap_cnt == 2) {
+                        st = 1; /*Assume scrolling*/
+                        sb = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        if(snap_y == LV_SCROLL_SNAP_NONE || snap_cnt < 2) {
+            st = lv_obj_get_scroll_top(obj_act);
+            sb = lv_obj_get_scroll_bottom(obj_act);
+        }
+
 
         /*If this object is scrollable into the current scroll direction then save it as a candidate.
          *It's important only to be scrollable on the current axis (hor/ver) because if the scroll
