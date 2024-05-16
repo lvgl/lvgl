@@ -107,20 +107,32 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
     lv_draw_buf_t * draw_buf = canvas->draw_buf;
 
     lv_color_format_t cf = draw_buf->header.cf;
-    uint32_t stride = draw_buf->header.stride;
     uint8_t * data = lv_draw_buf_goto_xy(draw_buf, x, y);
 
     if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-        /*Indexed image bpp could be less than 8, calculate again*/
-        uint8_t * buf = (uint8_t *)canvas->draw_buf->data;
-        buf += 8;
-        buf += y * stride;
-        buf += x >> 3;
-        uint32_t bit = 7 - (x & 0x7);
-        uint32_t c_int = color.blue;
+        uint8_t shift;
+        uint8_t c_int = color.blue;
+        switch(cf) {
+            case LV_COLOR_FORMAT_I1:
+                shift = 7 - (x & 0x7);
+                break;
+            case LV_COLOR_FORMAT_I2:
+                shift = 6 - 2 * (x & 0x3);
+                break;
+            case LV_COLOR_FORMAT_I4:
+                shift = 4 - 4 * (x & 0x1);
+                break;
+            case LV_COLOR_FORMAT_I8:
+                /*Indexed8 format is a easy case, process and return.*/
+                *data = c_int;
+            default:
+                return;
+        }
 
-        *buf &= ~(1 << bit);
-        *buf |= c_int << bit;
+        uint8_t bpp = lv_color_format_get_bpp(cf);
+        uint8_t mask = (1 << bpp) - 1;
+        c_int &= mask;
+        *data = (*data & ~(mask << shift)) | (c_int << shift);
     }
     else if(cf == LV_COLOR_FORMAT_L8) {
         *data = lv_color_luminance(color);
