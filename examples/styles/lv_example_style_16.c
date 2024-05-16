@@ -9,47 +9,30 @@
     #error Increase LV_GRADIENT_MAX_STOPS
 #endif
 
-#if 0
-static const lv_color_t rainbow[8] = {
-    LV_COLOR_MAKE(0xe8, 0x14, 0x16),   /*Red*/
-    LV_COLOR_MAKE(0xff, 0xa5, 0x00),   /*Orange*/
-    LV_COLOR_MAKE(0xfa, 0xeb, 0x36),   /*Yellow*/
-    LV_COLOR_MAKE(0x79, 0xc3, 0x14),   /*Green*/
-    LV_COLOR_MAKE(0x48, 0x7d, 0xe7),   /*Blue*/
-    LV_COLOR_MAKE(0x4b, 0x36, 0x9d),   /*Indigo*/
-    LV_COLOR_MAKE(0x70, 0x36, 0x9d),    /*Violet*/
-    LV_COLOR_MAKE(0xe8, 0x14, 0x16),   /*Red*/
-};
-#endif
-#if NUM_STOPS == 8
-static const lv_color_t grad_colors[8] = {
-    LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
-    LV_COLOR_MAKE(0xff, 0xff, 0xff),
-    LV_COLOR_MAKE(0xfa, 0xfa, 0xfa),
-    LV_COLOR_MAKE(0x79, 0x79, 0x79),
-    LV_COLOR_MAKE(0x48, 0x48, 0x48),
-    LV_COLOR_MAKE(0x4b, 0x4b, 0x4b),
-    LV_COLOR_MAKE(0x70, 0x70, 0x70),
-    LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
-};
-#elif NUM_STOPS == 3
-static const lv_color_t grad_colors[3] = {
-    LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
-    LV_COLOR_MAKE(0xff, 0xff, 0xff),
-    //    LV_COLOR_MAKE(0xfa, 0xfa, 0xfa),
-    LV_COLOR_MAKE(0x79, 0x79, 0x79),
-    //    LV_COLOR_MAKE(0x48, 0x48, 0x48),
-    //    LV_COLOR_MAKE(0x4b, 0x4b, 0x4b),
-    //    LV_COLOR_MAKE(0x70, 0x70, 0x70),
-    //    LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
-};
-#endif
-
 /**
  * Simulate metallic knob using conical gradient
  */
 void lv_example_style_16(void)
 {
+#if NUM_STOPS == 8
+    static const lv_color_t grad_colors[8] = {
+        LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
+        LV_COLOR_MAKE(0xff, 0xff, 0xff),
+        LV_COLOR_MAKE(0xfa, 0xfa, 0xfa),
+        LV_COLOR_MAKE(0x79, 0x79, 0x79),
+        LV_COLOR_MAKE(0x48, 0x48, 0x48),
+        LV_COLOR_MAKE(0x4b, 0x4b, 0x4b),
+        LV_COLOR_MAKE(0x70, 0x70, 0x70),
+        LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
+    };
+#elif NUM_STOPS == 3
+    static const lv_color_t grad_colors[3] = {
+        LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
+        LV_COLOR_MAKE(0xff, 0xff, 0xff),
+        LV_COLOR_MAKE(0x79, 0x79, 0x79),
+    };
+#endif
+
     int32_t width = lv_display_get_horizontal_resolution(NULL);
     int32_t height = lv_display_get_vertical_resolution(NULL);
 

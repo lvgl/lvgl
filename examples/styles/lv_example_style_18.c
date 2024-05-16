@@ -4,12 +4,12 @@
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
 /**
- * Using radial gradient as background
+ * Using radial gradient as an effect
  */
-void lv_example_style_17(void)
+void lv_example_style_18(void)
 {
     static const lv_color_t grad_colors[2] = {
-        LV_COLOR_MAKE(0x9B, 0x18, 0x42),
+        LV_COLOR_MAKE(0x1C, 0x8D, 0x87),
         LV_COLOR_MAKE(0x00, 0x00, 0x00),
     };
 
@@ -25,7 +25,9 @@ void lv_example_style_17(void)
     lv_gradient_init_stops(&grad, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
 
     /*Make a radial gradient with the center in the middle of the object, extending to the farthest corner*/
-    lv_grad_radial_init(&grad, LV_GRAD_CENTER, LV_GRAD_CENTER, LV_GRAD_RIGHT, LV_GRAD_BOTTOM, LV_GRAD_EXTEND_PAD);
+    lv_grad_radial_init(&grad, LV_GRAD_CENTER, LV_GRAD_CENTER, lv_pct(60), lv_pct(60), LV_GRAD_EXTEND_REPEAT);
+    /*Offset focal point*/
+    lv_grad_radial_set_focal(&grad, lv_pct(45), lv_pct(45), 0);
 
     /*Set gradient as background*/
     lv_style_set_bg_grad(&style, &grad);
