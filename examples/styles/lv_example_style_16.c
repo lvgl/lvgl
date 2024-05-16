@@ -33,9 +33,6 @@ void lv_example_style_16(void)
     };
 #endif
 
-    int32_t width = lv_display_get_horizontal_resolution(NULL);
-    int32_t height = lv_display_get_vertical_resolution(NULL);
-
     /*Create a style with gradient background and shadow*/
     static lv_style_t style;
     lv_style_init(&style);
