@@ -42,7 +42,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
@@ -186,6 +186,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                     lv_gradient_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, top_y - bg_coords.y1, coords_bg_w, grad);
                     preblend = true;
                     break;
+#endif
             }
             /* pre-blend the mask */
             if(preblend) {
@@ -195,7 +196,6 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                 }
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             }
-#endif
             lv_draw_sw_blend(draw_unit, &blend_dsc);
         }
 
@@ -224,6 +224,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                     lv_gradient_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w, grad);
                     preblend = true;
                     break;
+#endif
             }
             /* pre-blend the mask */
             if(preblend) {
@@ -239,7 +240,6 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                 }
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             }
-#endif
             lv_draw_sw_blend(draw_unit, &blend_dsc);
         }
     }
@@ -294,8 +294,8 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
                 case LV_GRAD_DIR_CONICAL:
                     lv_gradient_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, h - bg_coords.y1, coords_bg_w, grad);
                     break;
-            }
 #endif
+            }
             lv_draw_sw_blend(draw_unit, &blend_dsc);
         }
     }

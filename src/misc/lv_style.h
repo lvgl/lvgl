@@ -196,7 +196,7 @@ typedef struct {
             int16_t     start_angle;                    /**< Start angle 0..3600 */
             int16_t     end_angle;                      /**< End angle 0..3600 */
         } conical;
-    };
+    } params;
     void * state;
 #endif
     struct _lv_grad_dsc_t * next;                       /**< Next gradient to render more gradients*/

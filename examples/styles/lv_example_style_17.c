@@ -33,14 +33,14 @@ void lv_example_style_17(void)
 
     /*Define radial gradient by the start and end limit circles. Here we use two limit circles with the start circle being within the end circle, but at an offset, and repeating the gradient outside the end circle (all coordinates are relative to the object)*/
     grad.dir = LV_GRAD_DIR_RADIAL;
-    grad.radial.focal.x = lv_pct(50);                    /*start circle center x position*/
-    grad.radial.focal.y = lv_pct(50);                    /*start circle center y position*/
-    grad.radial.focal_extent.x = grad.radial.focal.x + 10;    /*start circle point x coordinate*/
-    grad.radial.focal_extent.y = grad.radial.focal.y;    /*start circle point y coordinate*/
-    grad.radial.end.x = grad.radial.focal.x - 20;             /*end circle center x position*/
-    grad.radial.end.y = grad.radial.focal.y - 20;             /*end circle center y position*/
-    grad.radial.end_extent.x = grad.radial.focal.x + 70;       /*end circle point x coordinate*/
-    grad.radial.end_extent.y = grad.radial.focal.y;           /*end circle point y coordinate*/
+    grad.params.radial.focal.x = lv_pct(50);                    /*start circle center x position*/
+    grad.params.radial.focal.y = lv_pct(50);                    /*start circle center y position*/
+    grad.params.radial.focal_extent.x = grad.params.radial.focal.x + 10;    /*start circle point x coordinate*/
+    grad.params.radial.focal_extent.y = grad.params.radial.focal.y;    /*start circle point y coordinate*/
+    grad.params.radial.end.x = grad.params.radial.focal.x - 20;             /*end circle center x position*/
+    grad.params.radial.end.y = grad.params.radial.focal.y - 20;             /*end circle center y position*/
+    grad.params.radial.end_extent.x = grad.params.radial.focal.x + 70;       /*end circle point x coordinate*/
+    grad.params.radial.end_extent.y = grad.params.radial.focal.y;           /*end circle point y coordinate*/
     grad.extend = LV_GRAD_EXTEND_REPEAT;            /*repeat color pattern outside the end circle*/
 
     /*Set gradient as background*/

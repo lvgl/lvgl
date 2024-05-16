@@ -372,12 +372,12 @@ void lv_gradient_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], con
 
 */
 
-void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
+void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
 {
-    lv_point_t start = dsc->radial.focal;
-    lv_point_t end = dsc->radial.end;
-    lv_point_t start_extent = dsc->radial.focal_extent;
-    lv_point_t end_extent = dsc->radial.end_extent;
+    lv_point_t start = dsc->params.radial.focal;
+    lv_point_t end = dsc->params.radial.end;
+    lv_point_t start_extent = dsc->params.radial.focal_extent;
+    lv_point_t end_extent = dsc->params.radial.end_extent;
     lv_grad_radial_state_t * state = lv_malloc(sizeof(lv_grad_radial_state_t));
     dsc->state = state;
 
@@ -573,10 +573,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, int3
 
 */
 
-void lv_gradient_linear_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
+void lv_gradient_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
 {
-    lv_point_t start = dsc->linear.start;
-    lv_point_t end = dsc->linear.end;
+    lv_point_t start = dsc->params.linear.start;
+    lv_point_t end = dsc->params.linear.end;
     lv_grad_linear_state_t * state = lv_malloc(sizeof(lv_grad_linear_state_t));
     dsc->state = state;
 
@@ -646,11 +646,11 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_linear_get_line(lv_grad_dsc_t * dsc, int3
         w is the unknown variable
 */
 
-void lv_gradient_conical_setup(lv_grad_dsc_t * dsc, lv_area_t * coords)
+void lv_gradient_conical_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
 {
-    lv_point_t c0 = dsc->conical.center;
-    int32_t alpha = dsc->conical.start_angle % 360;
-    int32_t beta = dsc->conical.end_angle % 360;
+    lv_point_t c0 = dsc->params.conical.center;
+    int32_t alpha = dsc->params.conical.start_angle % 360;
+    int32_t beta = dsc->params.conical.end_angle % 360;
     lv_grad_conical_state_t * state = lv_malloc(sizeof(lv_grad_conical_state_t));
     dsc->state = state;
 
@@ -729,10 +729,10 @@ void lv_grad_linear_init(lv_grad_dsc_t * dsc, int32_t from_x, int32_t from_y, in
                          lv_grad_extend_t extend)
 {
     dsc->dir = LV_GRAD_DIR_LINEAR;
-    dsc->linear.start.x = from_x;
-    dsc->linear.start.y = from_y;
-    dsc->linear.end.x = to_x;
-    dsc->linear.end.y = to_y;
+    dsc->params.linear.start.x = from_x;
+    dsc->params.linear.start.y = from_y;
+    dsc->params.linear.end.x = to_x;
+    dsc->params.linear.end.y = to_y;
     dsc->extend = extend;
 }
 
@@ -740,14 +740,14 @@ void lv_grad_radial_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y
                          lv_grad_extend_t extend)
 {
     dsc->dir = LV_GRAD_DIR_RADIAL;
-    dsc->radial.focal.x = center_x;
-    dsc->radial.focal.y = center_y;
-    dsc->radial.focal_extent.x = center_x;
-    dsc->radial.focal_extent.y = center_y;
-    dsc->radial.end.x = center_x;
-    dsc->radial.end.y = center_y;
-    dsc->radial.end_extent.x = to_x;
-    dsc->radial.end_extent.y = to_y;
+    dsc->params.radial.focal.x = center_x;
+    dsc->params.radial.focal.y = center_y;
+    dsc->params.radial.focal_extent.x = center_x;
+    dsc->params.radial.focal_extent.y = center_y;
+    dsc->params.radial.end.x = center_x;
+    dsc->params.radial.end.y = center_y;
+    dsc->params.radial.end_extent.x = to_x;
+    dsc->params.radial.end_extent.y = to_y;
     dsc->extend = extend;
 }
 
@@ -755,19 +755,19 @@ void lv_grad_conical_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_
                           int32_t end_angle, lv_grad_extend_t extend)
 {
     dsc->dir = LV_GRAD_DIR_CONICAL;
-    dsc->conical.center.x = center_x;
-    dsc->conical.center.y = center_y;
-    dsc->conical.start_angle = start_angle;
-    dsc->conical.end_angle = end_angle;
+    dsc->params.conical.center.x = center_x;
+    dsc->params.conical.center.y = center_y;
+    dsc->params.conical.start_angle = start_angle;
+    dsc->params.conical.end_angle = end_angle;
     dsc->extend = extend;
 }
 
 void lv_grad_radial_set_focal(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t radius)
 {
-    dsc->radial.focal.x = center_x;
-    dsc->radial.focal.y = center_y;
-    dsc->radial.focal_extent.x = center_x + radius;
-    dsc->radial.focal_extent.y = center_y;
+    dsc->params.radial.focal.x = center_x;
+    dsc->params.radial.focal.y = center_y;
+    dsc->params.radial.focal_extent.x = center_x + radius;
+    dsc->params.radial.focal_extent.y = center_y;
 }
 
 #endif /* LV_USE_DRAW_SW_COMPLEX_GRADIENTS */

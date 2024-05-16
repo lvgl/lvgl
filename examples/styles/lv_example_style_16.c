@@ -3,45 +3,79 @@
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
+#define NUM_STOPS 3
+
+#if LV_GRADIENT_MAX_STOPS < NUM_STOPS
+    #error Increase LV_GRADIENT_MAX_STOPS
+#endif
+
+#if 0
+static const lv_color_t rainbow[8] = {
+    LV_COLOR_MAKE(0xe8, 0x14, 0x16),   /*Red*/
+    LV_COLOR_MAKE(0xff, 0xa5, 0x00),   /*Orange*/
+    LV_COLOR_MAKE(0xfa, 0xeb, 0x36),   /*Yellow*/
+    LV_COLOR_MAKE(0x79, 0xc3, 0x14),   /*Green*/
+    LV_COLOR_MAKE(0x48, 0x7d, 0xe7),   /*Blue*/
+    LV_COLOR_MAKE(0x4b, 0x36, 0x9d),   /*Indigo*/
+    LV_COLOR_MAKE(0x70, 0x36, 0x9d),    /*Violet*/
+    LV_COLOR_MAKE(0xe8, 0x14, 0x16),   /*Red*/
+};
+#endif
+#if NUM_STOPS == 8
+static const lv_color_t grad_colors[8] = {
+    LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
+    LV_COLOR_MAKE(0xff, 0xff, 0xff),
+    LV_COLOR_MAKE(0xfa, 0xfa, 0xfa),
+    LV_COLOR_MAKE(0x79, 0x79, 0x79),
+    LV_COLOR_MAKE(0x48, 0x48, 0x48),
+    LV_COLOR_MAKE(0x4b, 0x4b, 0x4b),
+    LV_COLOR_MAKE(0x70, 0x70, 0x70),
+    LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
+};
+#elif NUM_STOPS == 3
+static const lv_color_t grad_colors[3] = {
+    LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
+    LV_COLOR_MAKE(0xff, 0xff, 0xff),
+    //    LV_COLOR_MAKE(0xfa, 0xfa, 0xfa),
+    LV_COLOR_MAKE(0x79, 0x79, 0x79),
+    //    LV_COLOR_MAKE(0x48, 0x48, 0x48),
+    //    LV_COLOR_MAKE(0x4b, 0x4b, 0x4b),
+    //    LV_COLOR_MAKE(0x70, 0x70, 0x70),
+    //    LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
+};
+#endif
+
 /**
- * Using radial gradient as background
+ * Simulate metallic knob using conical gradient
  */
 void lv_example_style_16(void)
 {
     int32_t width = lv_display_get_horizontal_resolution(NULL);
     int32_t height = lv_display_get_vertical_resolution(NULL);
 
+    /*Create a style with gradient background and shadow*/
     static lv_style_t style;
     lv_style_init(&style);
-    lv_style_set_radius(&style, 5);
-
-    /*Make a radial gradient*/
+    lv_style_set_radius(&style, 500);
     lv_style_set_bg_opa(&style, LV_OPA_COVER);
+    lv_style_set_shadow_color(&style, lv_color_black());
+    lv_style_set_shadow_width(&style, 50);
+    lv_style_set_shadow_offset_x(&style, 20);
+    lv_style_set_shadow_offset_y(&style, 20);
+    lv_style_set_shadow_opa(&style, LV_OPA_50);
 
-    /*First define a color gradient*/
+    /*First define a color gradient. In this example we use a gray color map with random values.*/
     static lv_grad_dsc_t grad;
-    grad.stops_count =
-        2;                           /*two stops (to increase the number of stops you have to change LV_GRADIENT_MAX_STOPS in lv_conf.h)*/
-    grad.stops[0].color = lv_color_hex(0x189B42);   /*green color*/
-    grad.stops[0].opa = LV_OPA_COVER;               /*opaque*/
-    grad.stops[0].frac =
-        0;                         /*gradient stop at offset 0 sets the color at the border of the start circle*/
-    grad.stops[1].color = lv_color_hex(0x184D9B);   /*blue color*/
-    grad.stops[1].opa = LV_OPA_COVER;               /*opaque*/
-    grad.stops[1].frac =
-        255;                       /*gradient stop at offset 255 sets the color at the border of the end circle*/
 
-    /*Define radial gradient by the start and end limit circles. Here we use concentric limit circles with the center in the top left corner (all coordinates are relative to the object)*/
-    grad.dir = LV_GRAD_DIR_RADIAL;
-    grad.radial.focal.x = lv_pct(50);                    /*start circle center x position*/
-    grad.radial.focal.y = lv_pct(50);                    /*start circle center y position*/
-    grad.radial.focal_extent.x = grad.radial.focal.x;    /*start circle point x coordinate*/
-    grad.radial.focal_extent.y = grad.radial.focal.y;    /*start circle point y coordinate*/
-    grad.radial.end.x = grad.radial.focal.x;             /*end circle center x position*/
-    grad.radial.end.y = grad.radial.focal.y;             /*end circle center y position*/
-    grad.radial.end_extent.x = lv_pct(100);              /*end circle point x coordinate*/
-    grad.radial.end_extent.y = lv_pct(100);              /*end circle point y coordinate*/
-    grad.extend = LV_GRAD_EXTEND_PAD;                    /*do not repeat color pattern outside the end circle*/
+    lv_gradient_init_stops(&grad, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
+
+    /*Make a conical gradient with the center in the middle of the object*/
+#if NUM_STOPS == 3
+    lv_grad_conical_init(&grad, LV_GRAD_CENTER, LV_GRAD_CENTER, 0, 80, LV_GRAD_EXTEND_REFLECT);
+#endif
+#if NUM_STOPS == 8
+    lv_grad_conical_init(&grad, LV_GRAD_CENTER, LV_GRAD_CENTER, 0, 120, LV_GRAD_EXTEND_REFLECT);
+#endif
 
     /*Set gradient as background*/
     lv_style_set_bg_grad(&style, &grad);
@@ -49,7 +83,7 @@ void lv_example_style_16(void)
     /*Create an object with the new style*/
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_add_style(obj, &style, 0);
-    lv_obj_set_size(obj, width, height);
+    lv_obj_set_size(obj, 200, 200);
     lv_obj_center(obj);
 }
 
