@@ -214,12 +214,15 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
                 case LV_GRAD_DIR_LINEAR:
                     lv_gradient_linear_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w, grad);
+                    preblend = true;
                     break;
                 case LV_GRAD_DIR_RADIAL:
                     lv_gradient_radial_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w, grad);
+                    preblend = true;
                     break;
                 case LV_GRAD_DIR_CONICAL:
                     lv_gradient_conical_get_line(&dsc->grad, clipped_coords.x1 - bg_coords.x1, bottom_y - bg_coords.y1, coords_bg_w, grad);
+                    preblend = true;
                     break;
             }
             /* pre-blend the mask */
