@@ -3,18 +3,13 @@
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
-#define NUM_STOPS 3
-
-#if LV_GRADIENT_MAX_STOPS < NUM_STOPS
-    #error Increase LV_GRADIENT_MAX_STOPS
-#endif
-
 /**
  * Simulate metallic knob using conical gradient
+ * For best effect set LV_GRADIENT_MAX_STOPS to 8 or at least 3
  */
 void lv_example_style_16(void)
 {
-#if NUM_STOPS == 8
+#if LV_GRADIENT_MAX_STOPS >= 8
     static const lv_color_t grad_colors[8] = {
         LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
         LV_COLOR_MAKE(0xff, 0xff, 0xff),
@@ -25,10 +20,15 @@ void lv_example_style_16(void)
         LV_COLOR_MAKE(0x70, 0x70, 0x70),
         LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
     };
-#elif NUM_STOPS == 3
+#elif LV_GRADIENT_MAX_STOPS >= 3
     static const lv_color_t grad_colors[3] = {
         LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
         LV_COLOR_MAKE(0xff, 0xff, 0xff),
+        LV_COLOR_MAKE(0x79, 0x79, 0x79),
+    };
+#else
+    static const lv_color_t grad_colors[2] = {
+        LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
         LV_COLOR_MAKE(0x79, 0x79, 0x79),
     };
 #endif
@@ -53,11 +53,12 @@ void lv_example_style_16(void)
     lv_gradient_init_stops(&grad, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
 
     /*Make a conical gradient with the center in the middle of the object*/
-#if NUM_STOPS == 3
-    lv_grad_conical_init(&grad, LV_GRAD_CENTER, LV_GRAD_CENTER, 0, 80, LV_GRAD_EXTEND_REFLECT);
-#endif
-#if NUM_STOPS == 8
+#if LV_GRADIENT_MAX_STOPS >= 8
     lv_grad_conical_init(&grad, LV_GRAD_CENTER, LV_GRAD_CENTER, 0, 120, LV_GRAD_EXTEND_REFLECT);
+#elif LV_GRADIENT_MAX_STOPS >= 3
+    lv_grad_conical_init(&grad, LV_GRAD_CENTER, LV_GRAD_CENTER, 45, 125, LV_GRAD_EXTEND_REFLECT);
+#else
+    lv_grad_conical_init(&grad, LV_GRAD_CENTER, LV_GRAD_CENTER, 45, 110, LV_GRAD_EXTEND_REFLECT);
 #endif
 
     /*Set gradient as background*/
