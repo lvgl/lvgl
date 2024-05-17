@@ -21,34 +21,30 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+typedef enum {
     LV_VECTOR_FILL_NONZERO = 0,
     LV_VECTOR_FILL_EVENODD,
-};
-typedef uint8_t lv_vector_fill_t;
+} lv_vector_fill_t;
 
-enum {
+typedef enum {
     LV_VECTOR_STROKE_CAP_BUTT = 0,
     LV_VECTOR_STROKE_CAP_SQUARE,
     LV_VECTOR_STROKE_CAP_ROUND,
-};
-typedef uint8_t lv_vector_stroke_cap_t;
+} lv_vector_stroke_cap_t;
 
-enum {
+typedef enum {
     LV_VECTOR_STROKE_JOIN_MITER = 0,
     LV_VECTOR_STROKE_JOIN_BEVEL,
     LV_VECTOR_STROKE_JOIN_ROUND,
-};
-typedef uint8_t lv_vector_stroke_join_t;
+} lv_vector_stroke_join_t;
 
-enum {
+typedef enum {
     LV_VECTOR_PATH_QUALITY_MEDIUM = 0, /* default*/
     LV_VECTOR_PATH_QUALITY_HIGH,
     LV_VECTOR_PATH_QUALITY_LOW,
-};
-typedef uint8_t lv_vector_path_quality_t;
+} lv_vector_path_quality_t;
 
-enum {
+typedef enum {
     LV_VECTOR_BLEND_SRC_OVER = 0,
     LV_VECTOR_BLEND_SRC_IN,
     LV_VECTOR_BLEND_DST_OVER,
@@ -58,37 +54,32 @@ enum {
     LV_VECTOR_BLEND_NONE,
     LV_VECTOR_BLEND_ADDITIVE,
     LV_VECTOR_BLEND_SUBTRACTIVE,
-};
-typedef uint8_t lv_vector_blend_t;
+} lv_vector_blend_t;
 
-enum {
+typedef enum {
     LV_VECTOR_PATH_OP_MOVE_TO = 0,
     LV_VECTOR_PATH_OP_LINE_TO,
     LV_VECTOR_PATH_OP_QUAD_TO,
     LV_VECTOR_PATH_OP_CUBIC_TO,
     LV_VECTOR_PATH_OP_CLOSE,
-};
-typedef uint8_t lv_vector_path_op_t;
+} lv_vector_path_op_t;
 
-enum {
+typedef enum {
     LV_VECTOR_DRAW_STYLE_SOLID = 0,
     LV_VECTOR_DRAW_STYLE_PATTERN,
     LV_VECTOR_DRAW_STYLE_GRADIENT,
-};
-typedef uint8_t lv_vector_draw_style_t;
+} lv_vector_draw_style_t;
 
-enum {
+typedef enum {
     LV_VECTOR_GRADIENT_SPREAD_PAD = 0,
     LV_VECTOR_GRADIENT_SPREAD_REPEAT,
     LV_VECTOR_GRADIENT_SPREAD_REFLECT,
-};
-typedef uint8_t lv_vector_gradient_spread_t;
+} lv_vector_gradient_spread_t;
 
-enum {
+typedef enum {
     LV_VECTOR_GRADIENT_STYLE_LINEAR = 0,
     LV_VECTOR_GRADIENT_STYLE_RADIAL,
-};
-typedef uint8_t lv_vector_gradient_style_t;
+} lv_vector_gradient_style_t;
 
 struct lv_fpoint_t {
     float x;

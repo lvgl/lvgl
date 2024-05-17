@@ -232,7 +232,7 @@ lv_vector_path_t * lv_vector_path_create(lv_vector_path_quality_t quality)
     LV_ASSERT_MALLOC(path);
     lv_memzero(path, sizeof(lv_vector_path_t));
     path->quality = quality;
-    lv_array_init(&path->ops, 8, sizeof(uint8_t));
+    lv_array_init(&path->ops, 8, sizeof(lv_vector_path_op_t));
     lv_array_init(&path->points, 8, sizeof(lv_fpoint_t));
     return path;
 }
@@ -261,7 +261,7 @@ void lv_vector_path_move_to(lv_vector_path_t * path, const lv_fpoint_t * p)
 {
     CHECK_AND_RESIZE_PATH_CONTAINER(path, 1);
 
-    uint8_t op = LV_VECTOR_PATH_OP_MOVE_TO;
+    lv_vector_path_op_t op = LV_VECTOR_PATH_OP_MOVE_TO;
     lv_array_push_back(&path->ops, &op);
     lv_array_push_back(&path->points, p);
 }
@@ -275,7 +275,7 @@ void lv_vector_path_line_to(lv_vector_path_t * path, const lv_fpoint_t * p)
 
     CHECK_AND_RESIZE_PATH_CONTAINER(path, 1);
 
-    uint8_t op = LV_VECTOR_PATH_OP_LINE_TO;
+    lv_vector_path_op_t op = LV_VECTOR_PATH_OP_LINE_TO;
     lv_array_push_back(&path->ops, &op);
     lv_array_push_back(&path->points, p);
 }
@@ -289,7 +289,7 @@ void lv_vector_path_quad_to(lv_vector_path_t * path, const lv_fpoint_t * p1, con
 
     CHECK_AND_RESIZE_PATH_CONTAINER(path, 2);
 
-    uint8_t op = LV_VECTOR_PATH_OP_QUAD_TO;
+    lv_vector_path_op_t op = LV_VECTOR_PATH_OP_QUAD_TO;
     lv_array_push_back(&path->ops, &op);
     lv_array_push_back(&path->points, p1);
     lv_array_push_back(&path->points, p2);
@@ -305,7 +305,7 @@ void lv_vector_path_cubic_to(lv_vector_path_t * path, const lv_fpoint_t * p1, co
 
     CHECK_AND_RESIZE_PATH_CONTAINER(path, 3);
 
-    uint8_t op = LV_VECTOR_PATH_OP_CUBIC_TO;
+    lv_vector_path_op_t op = LV_VECTOR_PATH_OP_CUBIC_TO;
     lv_array_push_back(&path->ops, &op);
     lv_array_push_back(&path->points, p1);
     lv_array_push_back(&path->points, p2);
@@ -321,7 +321,7 @@ void lv_vector_path_close(lv_vector_path_t * path)
 
     CHECK_AND_RESIZE_PATH_CONTAINER(path, 1);
 
-    uint8_t op = LV_VECTOR_PATH_OP_CLOSE;
+    lv_vector_path_op_t op = LV_VECTOR_PATH_OP_CLOSE;
     lv_array_push_back(&path->ops, &op);
 }
 

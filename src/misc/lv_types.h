@@ -51,13 +51,11 @@ extern "C" {
 /**
  * LVGL error codes.
  */
-enum lv_result_t {
+typedef enum {
     LV_RESULT_INVALID = 0, /*Typically indicates that the object is deleted (become invalid) in the action
                       function or an operation was failed*/
     LV_RESULT_OK,      /*The object is valid (no deleted) after the action*/
-};
-
-typedef enum lv_result_t lv_result_t;
+} lv_result_t;
 
 #if defined(__cplusplus) || __STDC_VERSION__ >= 199901L
 /*If c99 or newer,  use the definition of uintptr_t directly from <stdint.h>*/
@@ -92,7 +90,6 @@ typedef struct lv_obj_t lv_obj_t;
 
 typedef uint16_t lv_state_t;
 typedef uint32_t lv_part_t;
-typedef uint32_t lv_obj_flag_t;
 
 typedef uint8_t lv_opa_t;
 
@@ -101,8 +98,6 @@ typedef uint8_t lv_style_prop_t;
 typedef struct lv_obj_class_t lv_obj_class_t;
 
 typedef struct lv_group_t lv_group_t;
-
-typedef uint8_t lv_key_t;
 
 typedef struct lv_display_t lv_display_t;
 

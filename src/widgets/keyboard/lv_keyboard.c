@@ -207,7 +207,7 @@ void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
 
     /*Show the cursor of the new Text area if cursor management is enabled*/
     if(keyboard->ta) {
-        lv_obj_add_flag(obj, LV_STATE_FOCUSED);
+        lv_obj_add_state(obj, LV_STATE_FOCUSED);
     }
 }
 

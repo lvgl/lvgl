@@ -45,7 +45,7 @@ extern "C" {
 /**
  * Group of predefined widget ID start value.
  */
-enum {
+typedef enum {
     LV_PROPERTY_ID_INVALID = 0,
 
     /*ID 0 to 0xff are style ID, check lv_style_prop_t*/
@@ -61,9 +61,7 @@ enum {
     LV_PROPERTY_ID_BUILTIN_LAST, /*Use it to extend ID and make sure it's unique and compile time determinant*/
 
     LV_PROPERTY_ID_ANY = 0x7ffffffe, /*Special ID used by lvgl to intercept all setter/getter call.*/
-};
-
-typedef uint32_t lv_prop_id_t;
+} lv_prop_id_t;
 
 typedef struct {
     lv_prop_id_t id;

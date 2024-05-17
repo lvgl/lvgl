@@ -34,21 +34,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-enum {
+typedef enum {
     LV_FREETYPE_FONT_STYLE_NORMAL = 0,
     LV_FREETYPE_FONT_STYLE_ITALIC = 1 << 0,
     LV_FREETYPE_FONT_STYLE_BOLD = 1 << 1,
-};
+} lv_freetype_font_style_t;
 
-typedef uint16_t lv_freetype_font_style_t;
 typedef lv_freetype_font_style_t LV_FT_FONT_STYLE;
 
-enum {
+typedef enum {
     LV_FREETYPE_FONT_RENDER_MODE_BITMAP = 0,
     LV_FREETYPE_FONT_RENDER_MODE_OUTLINE = 1,
-};
-
-typedef uint16_t lv_freetype_font_render_mode_t;
+} lv_freetype_font_render_mode_t;
 
 typedef void * lv_freetype_outline_t;
 

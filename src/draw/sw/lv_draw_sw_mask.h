@@ -32,33 +32,29 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-enum {
+typedef enum {
     LV_DRAW_SW_MASK_RES_TRANSP,
     LV_DRAW_SW_MASK_RES_FULL_COVER,
     LV_DRAW_SW_MASK_RES_CHANGED,
     LV_DRAW_SW_MASK_RES_UNKNOWN
-};
-
-typedef uint8_t lv_draw_sw_mask_res_t;
+} lv_draw_sw_mask_res_t;
 
 #if LV_DRAW_SW_COMPLEX
 
-enum {
+typedef enum {
     LV_DRAW_SW_MASK_TYPE_LINE,
     LV_DRAW_SW_MASK_TYPE_ANGLE,
     LV_DRAW_SW_MASK_TYPE_RADIUS,
     LV_DRAW_SW_MASK_TYPE_FADE,
     LV_DRAW_SW_MASK_TYPE_MAP,
-};
+} lv_draw_sw_mask_type_t;
 
-typedef uint8_t lv_draw_sw_mask_type_t;
-
-enum {
+typedef enum {
     LV_DRAW_SW_MASK_LINE_SIDE_LEFT = 0,
     LV_DRAW_SW_MASK_LINE_SIDE_RIGHT,
     LV_DRAW_SW_MASK_LINE_SIDE_TOP,
     LV_DRAW_SW_MASK_LINE_SIDE_BOTTOM,
-};
+} lv_draw_sw_mask_line_side_t;
 
 /**
  * A common callback type for every mask type.
@@ -67,8 +63,6 @@ enum {
 typedef lv_draw_sw_mask_res_t (*lv_draw_sw_mask_xcb_t)(lv_opa_t * mask_buf, int32_t abs_x, int32_t abs_y,
                                                        int32_t len,
                                                        void * p);
-
-typedef uint8_t lv_draw_sw_mask_line_side_t;
 
 /**********************
  * GLOBAL PROTOTYPES
