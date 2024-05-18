@@ -286,18 +286,14 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         if(entry) {
             /*Note, DT_DIR is not defined in C99*/
             if(entry->d_type == DT_DIR) lv_snprintf(fn, fn_len, "/%s", entry->d_name);
-            else {
-                lv_strncpy(fn, entry->d_name, fn_len - 1);
-                fn[fn_len - 1] = '\0';
-            }
+            else lv_strlcpy(fn, entry->d_name, fn_len);
         }
         else {
-            lv_strncpy(fn, "", fn_len);
+            lv_strlcpy(fn, "", fn_len);
         }
     } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
 #else
-    lv_strncpy(fn, handle->next_fn, fn_len - 1);
-    fn[fn_len - 1] = '\0';
+    lv_strlcpy(fn, handle->next_fn, fn_len);
 
     lv_strcpy(handle->next_fn, "");
     WIN32_FIND_DATAA fdata;

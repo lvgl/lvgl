@@ -263,10 +263,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         if(fno.fattrib & AM_DIR) {
             lv_snprintf(fn, fn_len, "/%s", fno.fname);
         }
-        else {
-            lv_strncpy(fn, fno.fname, fn_len - 1);
-            fn[fn_len - 1] = '\0';
-        }
+        else lv_strlcpy(fn, fno.fname, fn_len);
 
     } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
 

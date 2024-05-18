@@ -191,6 +191,19 @@ size_t lv_strlen(const char * str)
     return i;
 }
 
+size_t lv_strlcpy(char * dst, const char * src, size_t dst_size)
+{
+    size_t i = 0;
+    if(dst_size > 0) {
+        for(; i < dst_size - 1 && src[i]; i++) {
+            dst[i] = src[i];
+        }
+        dst[i] = '\0';
+    }
+    while(src[i]) i++;
+    return i;
+}
+
 char * lv_strncpy(char * dst, const char * src, size_t dst_size)
 {
     size_t i;

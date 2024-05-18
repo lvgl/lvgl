@@ -294,13 +294,10 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         entry = readdir(dir_p);
         if(entry) {
             if(entry->d_type == DT_DIR) lv_snprintf(fn, fn_len, "/%s", entry->d_name);
-            else {
-                lv_strncpy(fn, entry->d_name, fn_len - 1);
-                fn[fn_len - 1] = '\0';
-            }
+            else lv_strlcpy(fn, entry->d_name, fn_len);
         }
         else {
-            lv_strncpy(fn, "", fn_len);
+            lv_strlcpy(fn, "", fn_len);
         }
     } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
 

@@ -60,6 +60,17 @@ size_t lv_strlen(const char * str)
     return strlen(str);
 }
 
+size_t lv_strlcpy(char * dst, const char * src, size_t dst_size)
+{
+    size_t src_len = strlen(src);
+    if(dst_size > 0) {
+        size_t copy_size = src_len < dst_size ? src_len : dst_size - 1;
+        memcpy(dst, src, copy_size);
+        dst[copy_size] = '\0';
+    }
+    return src_len;
+}
+
 char * lv_strncpy(char * dst, const char * src, size_t dest_size)
 {
     return strncpy(dst, src, dest_size);
