@@ -110,7 +110,7 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
 
             if(a1 < a2) {
                 /* TODO */
-                LV_ASSERT(1 == 0);
+                LV_ASSERT(0);
                 y0 = 0.0f;//silence the compiler warning
                 y3 = 0.0f;
 
@@ -127,7 +127,7 @@ void lv_draw_dave2d_triangle(lv_draw_dave2d_unit_t * u, const lv_draw_triangle_d
         }
         else if(LV_GRAD_DIR_HOR == dsc->bg_grad.dir) {
             /* TODO */
-            LV_ASSERT(1 == 0);
+            LV_ASSERT(0);
         }
 
         d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(dsc->bg_grad.stops[0].color));

@@ -47,7 +47,7 @@ void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * d
 
     if(dashed) {
         /* TODO */
-        LV_ASSERT(1 == 0);
+        LV_ASSERT(0);
     }
 
 #if D2_RENDER_EACH_OPERATION
