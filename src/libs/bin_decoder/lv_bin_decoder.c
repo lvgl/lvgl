@@ -365,12 +365,6 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     }
 
     free_decoder_data(dsc);
-
-    if(dsc->cache && dsc->cache_entry) {
-        /*Decoded data is in cache, release it from cache's callback*/
-        lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
-    }
-
 }
 
 lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
