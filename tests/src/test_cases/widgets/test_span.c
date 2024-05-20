@@ -344,6 +344,7 @@ void test_spangroup_chinese_break_line(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_07.png");
 
+    lv_obj_set_style_text_font(spangroup, LV_FONT_DEFAULT, 0);
     lv_freetype_font_delete(font);
 }
 
