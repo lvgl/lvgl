@@ -127,10 +127,19 @@ else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
 
-
 if ($ENV{NON_AMD64_BUILD})
     set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
     message("Non AMD64 target is specified")
+
+    # Ensure 32-bit build
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -m32")
+endif()
+
+if ($ENV{NON_AMD64_BUILD})
+    set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu" CACHE PATH "search 32bit lib path firstly")
 endif()
 
 # Options lvgl and examples are compiled with.
@@ -299,7 +308,9 @@ include_directories(${FREETYPE_INCLUDE_DIRS})
 
 # libinput is required for the libinput device driver test case
 find_package(Libinput OPTIONAL_COMPONENTS)
-include_directories(${LIBINPUT_INCLUDE_DIRS})
+if ($ENV{NON_AMD64_BUILD})
+    include_directories(${LIBINPUT_INCLUDE_DIRS})
+endif()
 
 if (NOT LIBINPUT_FOUND)
     message("libinput not found, defaulting to 0")
