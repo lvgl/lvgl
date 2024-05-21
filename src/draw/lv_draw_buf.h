@@ -47,7 +47,9 @@ typedef struct {
     LV_ROUND_UP(((w) * LV_COLOR_FORMAT_GET_BPP(cf) + 7) / 8, LV_DRAW_BUF_STRIDE_ALIGN)
 
 /* Allocate a slightly larger buffer, so we can adjust the start address to meet alignment */
-#define _LV_DRAW_BUF_SIZE(w, h, cf) (_LV_DRAW_BUF_STRIDE(w, cf) * (h) + LV_DRAW_BUF_ALIGN)
+#define _LV_DRAW_BUF_SIZE(w, h, cf) \
+    (_LV_DRAW_BUF_STRIDE(w, cf) * (h) + LV_DRAW_BUF_ALIGN + \
+     LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t))
 
 /**
  * Define a static draw buffer with the given width, height, and color format.
