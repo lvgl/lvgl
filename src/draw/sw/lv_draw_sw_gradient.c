@@ -76,8 +76,6 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h);
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
-    static inline int32_t fast_sqrt32(uint32_t val);
-    static inline int32_t sqr32(int32_t x);
     static inline int32_t extend_w(int32_t w, lv_grad_extend_t extend);
 
 #endif
@@ -120,100 +118,6 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h)
 }
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
-
-/*
-// Integer Square Root function
-// Contributors include Arne Steinarson for the basic approximation idea,
-// Dann Corbit and Mathew Hendry for the first cut at the algorithm,
-// Lawrence Kirby for the rearrangement, improvments and range optimization
-// and Paul Hsieh for the round-then-adjust idea.
-*/
-static inline int32_t fast_sqrt32(uint32_t x)
-{
-    static const unsigned char sqq_table[] = {
-        0,  16,  22,  27,  32,  35,  39,  42,  45,  48,  50,  53,  55,  57,
-        59,  61,  64,  65,  67,  69,  71,  73,  75,  76,  78,  80,  81,  83,
-        84,  86,  87,  89,  90,  91,  93,  94,  96,  97,  98,  99, 101, 102,
-        103, 104, 106, 107, 108, 109, 110, 112, 113, 114, 115, 116, 117, 118,
-        119, 120, 121, 122, 123, 124, 125, 126, 128, 128, 129, 130, 131, 132,
-        133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 144, 145,
-        146, 147, 148, 149, 150, 150, 151, 152, 153, 154, 155, 155, 156, 157,
-        158, 159, 160, 160, 161, 162, 163, 163, 164, 165, 166, 167, 167, 168,
-        169, 170, 170, 171, 172, 173, 173, 174, 175, 176, 176, 177, 178, 178,
-        179, 180, 181, 181, 182, 183, 183, 184, 185, 185, 186, 187, 187, 188,
-        189, 189, 190, 191, 192, 192, 193, 193, 194, 195, 195, 196, 197, 197,
-        198, 199, 199, 200, 201, 201, 202, 203, 203, 204, 204, 205, 206, 206,
-        207, 208, 208, 209, 209, 210, 211, 211, 212, 212, 213, 214, 214, 215,
-        215, 216, 217, 217, 218, 218, 219, 219, 220, 221, 221, 222, 222, 223,
-        224, 224, 225, 225, 226, 226, 227, 227, 228, 229, 229, 230, 230, 231,
-        231, 232, 232, 233, 234, 234, 235, 235, 236, 236, 237, 237, 238, 238,
-        239, 240, 240, 241, 241, 242, 242, 243, 243, 244, 244, 245, 245, 246,
-        246, 247, 247, 248, 248, 249, 249, 250, 250, 251, 251, 252, 252, 253,
-        253, 254, 254, 255
-    };
-
-    int32_t xn;
-
-    if(x >= 0x10000)
-        if(x >= 0x1000000)
-            if(x >= 0x10000000)
-                if(x >= 0x40000000) {
-                    if(x >= 65535UL * 65535UL)
-                        return 65535;
-                    xn = sqq_table[x >> 24] << 8;
-                }
-                else
-                    xn = sqq_table[x >> 22] << 7;
-            else if(x >= 0x4000000)
-                xn = sqq_table[x >> 20] << 6;
-            else
-                xn = sqq_table[x >> 18] << 5;
-        else {
-            if(x >= 0x100000)
-                if(x >= 0x400000)
-                    xn = sqq_table[x >> 16] << 4;
-                else
-                    xn = sqq_table[x >> 14] << 3;
-            else if(x >= 0x40000)
-                xn = sqq_table[x >> 12] << 2;
-            else
-                xn = sqq_table[x >> 10] << 1;
-
-            goto nr1;
-        }
-    else if(x >= 0x100) {
-        if(x >= 0x1000)
-            if(x >= 0x4000)
-                xn = (sqq_table[x >> 8] >> 0) + 1;
-            else
-                xn = (sqq_table[x >> 6] >> 1) + 1;
-        else if(x >= 0x400)
-            xn = (sqq_table[x >> 4] >> 2) + 1;
-        else
-            xn = (sqq_table[x >> 2] >> 3) + 1;
-
-        goto adj;
-    }
-    else
-        return sqq_table[x] >> 4;
-
-    /* Run two iterations of the standard convergence formula */
-
-    xn = (xn + 1 + x / xn) / 2;
-nr1:
-    xn = (xn + 1 + x / xn) / 2;
-adj:
-
-    if(xn * xn > x)  /* Correct rounding if necessary */
-        xn--;
-
-    return xn;
-}
-
-static inline int32_t sqr32(int32_t x)
-{
-    return x * x;
-}
 
 static inline int32_t extend_w(int32_t w, lv_grad_extend_t extend)
 {
@@ -395,8 +299,8 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     end_extent.y = lv_pct_to_px(end_extent.y, hgt);
 
     /* Calculate radii */
-    int16_t r_start = fast_sqrt32(sqr32(start_extent.x - start.x) + sqr32(start_extent.y - start.y));
-    int16_t r_end = fast_sqrt32(sqr32(end_extent.x - end.x) + sqr32(end_extent.y - end.y));
+    int16_t r_start = lv_sqrt32(lv_sqr(start_extent.x - start.x) + lv_sqr(start_extent.y - start.y));
+    int16_t r_end = lv_sqrt32(lv_sqr(end_extent.x - end.x) + lv_sqr(end_extent.y - end.y));
     LV_ASSERT(r_end != 0);
 
     /* Create gradient color map */
@@ -415,7 +319,7 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
 #endif
     if(end.x == start.x && end.y == start.y) {
         LV_ASSERT(dr != 0);
-        state->a4 = sqr32(dr) << 2;
+        state->a4 = lv_sqr(dr) << 2;
         state->bpx = 0;
         state->bpy = 0;
         state->bc = (state->r0 * dr) << 1;
@@ -431,7 +335,7 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
         int32_t dy = end.y - start.y;
 #endif
         state->dx = dx;    /* needed for incremental calculation */
-        state->a4 = (sqr32(dr) - sqr32(dx) - sqr32(dy)) << 2;
+        state->a4 = (lv_sqr(dr) - lv_sqr(dx) - lv_sqr(dy)) << 2;
         /* b(xp, yp) = xp * bpx + yp * bpy + bc */
         state->bpx = dx << 1;
         state->bpy = dy << 1;
@@ -441,7 +345,7 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     /* check for possible clipping */
     if(dsc->extend == LV_GRAD_EXTEND_PAD &&
        /* if extend mode is 'pad', then we can clip to the end circle's bounding box, if the start circle is entirely within the end circle */
-       (sqr32(start.x - end.x) + sqr32(start.y - end.y) < sqr32(r_end - r_start))) {
+       (lv_sqr(start.x - end.x) + lv_sqr(start.y - end.y) < lv_sqr(r_end - r_start))) {
         if(r_end > r_start) {
             lv_area_set(&state->clip_area, end.x - r_end, end.y - r_end, end.x  + r_end, end.y + r_end);
         }
@@ -505,7 +409,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, int3
     }
 
     b = xp * state->bpx + yp * state->bpy + state->bc;
-    c = sqr32(state->r0) - sqr32(xp - state->x0) - sqr32(yp - state->y0);
+    c = lv_sqr(state->r0) - lv_sqr(xp - state->x0) - lv_sqr(yp - state->y0);
     /* We can save some calculations by using the previous values of b and c */
     db = state->dx << 1;
     dc = ((xp - state->x0) << 1) + 1;
@@ -525,9 +429,9 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, int3
            state->bpy) {    /* general case (circles are not concentric): w = (-b + sqrt(b^2 - 4ac))/2a (we only need the more positive root)*/
             int32_t a4 = state->a4 >> 4;
             for(; width > 0; width--) {
-                int32_t det = sqr32(b >> 4) - (a4 * (c >> 4));     /* b^2 shifted down by 2*4=8, 4ac shifted down by 8 */
+                int32_t det = lv_sqr(b >> 4) - (a4 * (c >> 4));     /* b^2 shifted down by 2*4=8, 4ac shifted down by 8 */
                 /* check determinant: if negative, then there is no solution: use starting color */
-                w = det < 0 ? 0 : extend_w(((fast_sqrt32(det) - (b >> 4)) * state->inv_a4) >>  16,
+                w = det < 0 ? 0 : extend_w(((lv_sqrt32(det) - (b >> 4)) * state->inv_a4) >>  16,
                                            dsc->extend);        /* square root shifted down by 4 (includes *256 to set output range) */
                 *buf++ = grad->color_map[w];
                 *opa++ = grad->opa_map[w];
@@ -537,9 +441,9 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, int3
             }
         }
         else {              /* special case: concentric circles: w = (sqrt((xp-x0)^2 + (yx-y0)^2)-r0)/(r1-r0) */
-            c = sqr32(xp - state->x0) + sqr32(yp - state->y0);
+            c = lv_sqr(xp - state->x0) + lv_sqr(yp - state->y0);
             for(; width > 0; width--) {
-                w = extend_w((((fast_sqrt32(c) - state->r0)) * state->inv_dr) >> 16, dsc->extend);
+                w = extend_w((((lv_sqrt32(c) - state->r0)) * state->inv_dr) >> 16, dsc->extend);
                 *buf++ = grad->color_map[w];
                 *opa++ = grad->opa_map[w];
                 c += dc;
@@ -596,7 +500,7 @@ void lv_gradient_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     int32_t dx = end.x - start.x;
     int32_t dy = end.y - start.y;
 
-    int32_t l2 = sqr32(dx) + sqr32(dy);
+    int32_t l2 = lv_sqr(dx) + lv_sqr(dy);
     state->a = (dx << 16) / l2;
     state->b = (dy << 16) / l2;
     state->c = ((start.x * dx + start.y * dy) << 16) / l2;
