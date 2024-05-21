@@ -122,7 +122,7 @@ int32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_sqrt32(uint32_t x);
  * @param x input
  * @return square
  */
-inline int32_t lv_sqr(int32_t x)
+static inline int32_t lv_sqr(int32_t x)
 {
     return x * x;
 }
