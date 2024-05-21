@@ -115,7 +115,7 @@ struct _lv_font_t {
 
     /*Pointer to the font in a font pack (must have the same line height)*/
     int32_t line_height;         /**< The real line height where any text fits*/
-    int32_t base_line;           /**< Base line measured from the top of the line_height*/
+    int32_t base_line;           /**< Base line measured from the bottom of the line_height*/
     uint8_t subpx   : 2;            /**< An element of `lv_font_subpx_t`*/
     uint8_t kerning : 1;            /**< An element of `lv_font_kerning_t`*/
 

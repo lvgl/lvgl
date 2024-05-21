@@ -44,16 +44,20 @@ typedef struct {
  */
 
 #define _LV_DRAW_BUF_STRIDE(w, cf) \
-    ((((w) * LV_COLOR_FORMAT_GET_BPP(cf) + 7) / 8 + (LV_DRAW_BUF_STRIDE_ALIGN) - 1) & ~((LV_DRAW_BUF_STRIDE_ALIGN) - 1))
+    LV_ROUND_UP(((w) * LV_COLOR_FORMAT_GET_BPP(cf) + 7) / 8, LV_DRAW_BUF_STRIDE_ALIGN)
 
+/* Allocate a slightly larger buffer, so we can adjust the start address to meet alignment */
 #define _LV_DRAW_BUF_SIZE(w, h, cf) \
-    (_LV_DRAW_BUF_STRIDE(w, cf) * (h))
+    (_LV_DRAW_BUF_STRIDE(w, cf) * (h) + LV_DRAW_BUF_ALIGN + \
+     LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t))
 
 /**
  * Define a static draw buffer with the given width, height, and color format.
  * Stride alignment is set to LV_DRAW_BUF_STRIDE_ALIGN.
+ *
+ * For platform that needs special buffer alignment, call LV_DRAW_BUF_INIT_STATIC.
  */
-#define LV_DRAW_BUF_DEFINE(name, _w, _h, _cf) \
+#define LV_DRAW_BUF_DEFINE_STATIC(name, _w, _h, _cf) \
     static uint8_t buf_##name[_LV_DRAW_BUF_SIZE(_w, _h, _cf)]; \
     static lv_draw_buf_t name = { \
                                   .header = { \
@@ -70,13 +74,20 @@ typedef struct {
                                   .unaligned_data = buf_##name, \
                                 }
 
+#define LV_DRAW_BUF_INIT_STATIC(name) \
+    do { \
+        lv_image_header_t * header = &name.header; \
+        lv_draw_buf_init(&name, header->w, header->h, header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
+        lv_draw_buf_set_flag(&name, LV_IMAGE_FLAGS_MODIFIABLE); \
+    } while(0)
+
 typedef void * (*lv_draw_buf_malloc_cb)(size_t size, lv_color_format_t color_format);
 
 typedef void (*lv_draw_buf_free_cb)(void * draw_buf);
 
 typedef void * (*lv_draw_buf_align_cb)(void * buf, lv_color_format_t color_format);
 
-typedef void (*lv_draw_buf_invalidate_cache_cb)(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+typedef void (*lv_draw_buf_cache_operation_cb)(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
@@ -84,7 +95,8 @@ typedef struct {
     lv_draw_buf_malloc_cb buf_malloc_cb;
     lv_draw_buf_free_cb buf_free_cb;
     lv_draw_buf_align_cb align_pointer_cb;
-    lv_draw_buf_invalidate_cache_cb invalidate_cache_cb;
+    lv_draw_buf_cache_operation_cb invalidate_cache_cb;
+    lv_draw_buf_cache_operation_cb flush_cache_cb;
     lv_draw_buf_width_to_stride_cb width_to_stride_cb;
 } lv_draw_buf_handlers_t;
 
@@ -118,7 +130,8 @@ void lv_draw_buf_init_handlers(lv_draw_buf_handlers_t * handlers,
                                lv_draw_buf_malloc_cb buf_malloc_cb,
                                lv_draw_buf_free_cb buf_free_cb,
                                lv_draw_buf_align_cb align_pointer_cb,
-                               lv_draw_buf_invalidate_cache_cb invalidate_cache_cb,
+                               lv_draw_buf_cache_operation_cb invalidate_cache_cb,
+                               lv_draw_buf_cache_operation_cb flush_cache_cb,
                                lv_draw_buf_width_to_stride_cb width_to_stride_cb);
 
 /**
@@ -161,6 +174,23 @@ void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_
  */
 void lv_draw_buf_invalidate_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
                                        const lv_area_t * area);
+
+/**
+ * Flush the cache of the buffer
+ * @param draw_buf     the draw buffer needs to be flushed
+ * @param area         the area to flush in the buffer,
+ *                     use NULL to flush the whole draw buffer address range
+ */
+void lv_draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+
+/**
+ * Flush the cache of the buffer using the user-defined callback
+ * @param handlers     the draw buffer handlers
+ * @param draw_buf     the draw buffer needs to be flushed
+ * @param area         the area to flush in the buffer,
+ */
+void lv_draw_buf_flush_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
+                                  const lv_area_t * area);
 
 /**
  * Calculate the stride in bytes based on a width and color format
@@ -232,7 +262,22 @@ lv_draw_buf_t * lv_draw_buf_create_user(const lv_draw_buf_handlers_t * handlers,
                                         lv_color_format_t cf, uint32_t stride);
 
 /**
- * Initialize a draw buf with the given buffer and parameters.
+ * Duplicate a draw buf with same image size, stride and color format. Copy the image data too.
+ * @param draw_buf  the draw buf to duplicate
+ * @return          the duplicated draw buf on success, NULL if failed
+ */
+lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf);
+
+/**
+ * Duplicate a draw buf with same image size, stride and color format. Copy the image data too.
+ * @param handlers  the draw buffer handlers
+ * @param draw_buf  the draw buf to duplicate
+ * @return          the duplicated draw buf on success, NULL if failed
+ */
+lv_draw_buf_t * lv_draw_buf_dup_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf);
+
+/**
+ * Initialize a draw buf with the given buffer and parameters. Clear draw buffer flag to zero.
  * @param draw_buf  the draw buf to initialize
  * @param w         the buffer width in pixels
  * @param h         the buffer height in pixels
@@ -244,13 +289,6 @@ lv_draw_buf_t * lv_draw_buf_create_user(const lv_draw_buf_handlers_t * handlers,
  */
 lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride,
                              void * data, uint32_t data_size);
-
-/**
- * Duplicate a draw buf with same image size, stride and color format. Copy the image data too.
- * @param draw_buf  the draw buf to duplicate
- * @return          the duplicated draw buf on success, NULL if failed
- */
-lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf);
 
 /**
  * Keep using the existing memory, reshape the draw buffer to the given width and height.

@@ -21,6 +21,8 @@
 
 #define DECODER_NAME    "JPEG_TURBO"
 
+#define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
+
 #define JPEG_PIXEL_SIZE 3 /* RGB888 */
 #define JPEG_SIGNATURE 0xFFD8FF
 #define IS_JPEG_SIGNATURE(x) (((x) & 0x00FFFFFF) == JPEG_SIGNATURE)
@@ -207,10 +209,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    if(dsc->args.no_cache || !lv_image_cache_is_enabled())
-        lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
-    else
-        lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
+    if(dsc->args.no_cache || !lv_image_cache_is_enabled()) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
 }
 
 static uint8_t * read_file(const char * filename, uint32_t * size)
@@ -374,7 +373,8 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
              ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
     uint32_t buf_width = (image_angle % 180) ? cinfo.output_height : cinfo.output_width;
     uint32_t buf_height = (image_angle % 180) ? cinfo.output_width : cinfo.output_height;
-    decoded = lv_draw_buf_create(buf_width, buf_height, LV_COLOR_FORMAT_RGB888, LV_STRIDE_AUTO);
+    decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, buf_width, buf_height, LV_COLOR_FORMAT_RGB888,
+                                      LV_STRIDE_AUTO);
     if(decoded != NULL) {
         uint32_t line_index = 0;
         /* while (scan lines remain to be read) */

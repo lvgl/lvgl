@@ -101,7 +101,8 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
                lvl_prefix[level], LOG_TIMESTAMP_EXPR func);
         vprintf(format, args);
         printf(LOG_FILE_LINE_FMT "\n" LOG_FILE_LINE_EXPR);
-#else
+        fflush(stdout);
+#endif
         if(custom_print_cb) {
             char buf[512];
             char msg[256];
@@ -110,7 +111,6 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
                         lvl_prefix[level], LOG_TIMESTAMP_EXPR func, msg LOG_FILE_LINE_EXPR);
             custom_print_cb(level, buf);
         }
-#endif
 
 #if LV_LOG_USE_TIMESTAMP
         last_log_time = t;

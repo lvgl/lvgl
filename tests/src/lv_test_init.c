@@ -20,6 +20,14 @@ void lv_test_init(void)
 {
     lv_init();
     hal_init();
+#if LV_USE_SYSMON
+#if LV_USE_MEM_MONITOR
+    lv_sysmon_hide_memory(NULL);
+#endif
+#if LV_USE_PERF_MONITOR
+    lv_sysmon_hide_performance(NULL);
+#endif
+#endif
 }
 
 void lv_test_deinit(void)

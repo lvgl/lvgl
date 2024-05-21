@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-03-24" version="9.1.1-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.1.1-dev1.pack">
+    <release date="2024-04-30" version="9.1.1-dev2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.1.1-dev2.pack">
       - LVGL 9.1.1-dev
     </release>
     <release date="2024-03-19" version="9.1.0" url="https://github.com/lvgl/lvgl/raw/v9.1.0/env_support/cmsis-pack/LVGL.lvgl.9.1.0.pack">
@@ -488,6 +488,8 @@
                 <!-- src/draw/sw/blend -->
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_argb8888.c" />
+                <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_l8.c" />
+                <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_al88.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.c" />
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c" />
                 <file category="sourceAsm"          name="src/draw/sw/blend/neon/lv_blend_neon.S"  condition="NEON GNU Assembler"/>
@@ -521,6 +523,7 @@
                 <file category="sourceC"            name="src/font/lv_font_montserrat_46.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_48.c" />
                 <file category="sourceC"            name="src/font/lv_font_simsun_16_cjk.c" />
+                <file category="sourceC"            name="src/font/lv_font_simsun_14_cjk.c" />
                 <file category="sourceC"            name="src/font/lv_font_unscii_8.c" />
                 <file category="sourceC"            name="src/font/lv_font_unscii_16.c" />
 
@@ -566,6 +569,7 @@
                 <file category="sourceC"            name="src/misc/cache/lv_cache.c" />
                 <file category="sourceC"            name="src/misc/cache/lv_cache_entry.c" />
                 <file category="sourceC"            name="src/misc/cache/lv_image_cache.c" />
+                <file category="sourceC"            name="src/misc/cache/lv_image_header_cache.c" />
 
                 <!-- src/stdlib-->
                 <file category="sourceC"            name="src/stdlib/lv_mem.c" />
@@ -598,6 +602,7 @@
                 <file category="sourceC"            name="src/widgets/button/lv_button.c" />
                 <file category="sourceC"            name="src/widgets/buttonmatrix/lv_buttonmatrix.c" />
                 <file category="sourceC"            name="src/widgets/calendar/lv_calendar.c" />
+                <file category="sourceC"            name="src/widgets/calendar/lv_calendar_chinese.c" />
                 <file category="sourceC"            name="src/widgets/calendar/lv_calendar_header_arrow.c" />
                 <file category="sourceC"            name="src/widgets/calendar/lv_calendar_header_dropdown.c" />
                 <file category="sourceC"            name="src/widgets/canvas/lv_canvas.c" />
@@ -644,18 +649,18 @@
                 <file category="sourceC"            name="src/osal/lv_os_none.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.5" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.6" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
 
                 <!-- code template -->
-                <file category="header"       name="examples/porting/lv_port_disp_template.h" attr="template" select="Display port template" version="2.1.0"/>
-                <file category="sourceC"      name="examples/porting/lv_port_disp_template.c" attr="template" select="Display port template" version="2.1.0"/>
-                <file category="header"       name="examples/porting/lv_port_indev_template.h" attr="template" select="Input devices port template" version="2.1.0"/>
-                <file category="sourceC"      name="examples/porting/lv_port_indev_template.c" attr="template" select="Input devices port template" version="2.1.0"/>
-                <file category="header"       name="examples/porting/lv_port_fs_template.h" attr="template" select="File system port template" version="2.1.0"/>
-                <file category="sourceC"      name="examples/porting/lv_port_fs_template.c" attr="template" select="File system port template" version="2.1.0"/>
+                <file category="header"       name="examples/porting/lv_port_disp_template.h" attr="template" select="Display port template" version="2.2.0"/>
+                <file category="sourceC"      name="examples/porting/lv_port_disp_template.c" attr="template" select="Display port template" version="2.2.0"/>
+                <file category="header"       name="examples/porting/lv_port_indev_template.h" attr="template" select="Input devices port template" version="2.2.0"/>
+                <file category="sourceC"      name="examples/porting/lv_port_indev_template.c" attr="template" select="Input devices port template" version="2.2.0"/>
+                <file category="header"       name="examples/porting/lv_port_fs_template.h" attr="template" select="File system port template" version="2.2.0"/>
+                <file category="sourceC"      name="examples/porting/lv_port_fs_template.c" attr="template" select="File system port template" version="2.2.0"/>
               </files>
 
               <Pre_Include_Global_h>
@@ -795,6 +800,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_PTHREAD
@@ -818,6 +824,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_FREERTOS
@@ -841,6 +848,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_CMSIS_RTOS2
@@ -864,6 +872,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_RTTHREAD
@@ -887,9 +896,34 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM
  */
 #define LV_USE_OS   LV_OS_WINDOWS
+
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="OS Abstraction Layer" Cvariant="MQX" condition="LVGL-Essential">
+              <description>Add the support for MQX APIs</description>
+              <files>
+                <file category="sourceC"      name="src/osal/lv_mqx.c"/>
+              </files>
+
+              <RTE_Components_h>
+
+/*   Select an operating system to use. Possible options:
+ * - LV_OS_NONE
+ * - LV_OS_PTHREAD
+ * - LV_OS_FREERTOS
+ * - LV_OS_CMSIS_RTOS2
+ * - LV_OS_RTTHREAD
+ * - LV_OS_WINDOWS
+ * - LV_OS_MQX
+ * - LV_OS_CUSTOM
+ */
+#define LV_USE_OS   LV_OS_MQX
 
               </RTE_Components_h>
 
@@ -1303,6 +1337,7 @@
               <files>
                 <!-- src/libs/fsdrv -->
                 <file category="sourceCpp"    name="src/libs/fsdrv/lv_fs_arduino_esp_littlefs.cpp" />
+                <file category="sourceCpp"    name="src/libs/fsdrv/lv_fs_arduino_sd.cpp" />
               </files>
 
               <RTE_Components_h>
@@ -1760,9 +1795,11 @@
                 <!-- demos/render -->
                 <file category="sourceC"    name="demos/render/assets/img_render_arc_bg.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_argb8888.c" />
+                <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_l8.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb565.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_rgb888.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_xrgb8888.c" />
+                
               </files>
 
             </component>

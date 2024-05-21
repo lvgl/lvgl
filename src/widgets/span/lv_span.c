@@ -485,10 +485,10 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 
                 uint32_t tmp_ofs = next_ofs;
                 uint32_t letter = lv_text_encoded_prev(&cur_txt[cur_txt_ofs], &tmp_ofs);
-                if(!(letter == '\0' || letter == '\n' || letter == '\r' || lv_text_is_break_char(letter))) {
-                    tmp_ofs = 0;
-                    letter = lv_text_encoded_next(&cur_txt[cur_txt_ofs + next_ofs], &tmp_ofs);
-                    if(!(letter == '\0' || letter == '\n'  || letter == '\r' || lv_text_is_break_char(letter))) {
+                uint32_t letter_next = lv_text_encoded_next(&cur_txt[cur_txt_ofs + next_ofs], NULL);
+                if(!(letter == '\0' || letter == '\n' || letter == '\r' || lv_text_is_break_char(letter) ||
+                     lv_text_is_a_word(letter) || lv_text_is_a_word(letter_next))) {
+                    if(!(letter_next == '\0' || letter_next == '\n'  || letter_next == '\r' || lv_text_is_break_char(letter_next))) {
                         break;
                     }
                 }
@@ -878,10 +878,10 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                     }
                     uint32_t tmp_ofs = next_ofs;
                     uint32_t letter = lv_text_encoded_prev(&cur_txt[cur_txt_ofs], &tmp_ofs);
-                    if(!(letter == '\0' || letter == '\n' || letter == '\r' || lv_text_is_break_char(letter))) {
-                        tmp_ofs = 0;
-                        letter = lv_text_encoded_next(&cur_txt[cur_txt_ofs + next_ofs], &tmp_ofs);
-                        if(!(letter == '\0' || letter == '\n'  || letter == '\r' || lv_text_is_break_char(letter))) {
+                    uint32_t letter_next = lv_text_encoded_next(&cur_txt[cur_txt_ofs + next_ofs], NULL);
+                    if(!(letter == '\0' || letter == '\n' || letter == '\r' || lv_text_is_break_char(letter) ||
+                         lv_text_is_a_word(letter) || lv_text_is_a_word(letter_next))) {
+                        if(!(letter_next == '\0' || letter_next == '\n'  || letter_next == '\r' || lv_text_is_break_char(letter_next))) {
                             break;
                         }
                     }

@@ -88,6 +88,7 @@
  * - LV_OS_CMSIS_RTOS2
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
+ * - LV_OS_MQX
  * - LV_OS_CUSTOM */
 #define LV_USE_OS   LV_OS_NONE
 
@@ -130,7 +131,7 @@
 
     /* Enable native helium assembly to be compiled */
     #define LV_USE_NATIVE_HELIUM_ASM    0
-    
+
     /* 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only
      * 1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too */
     #define LV_DRAW_SW_COMPLEX          1
@@ -240,6 +241,11 @@
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
     #define LV_LOG_PRINTF 0
 
+    /*Set callback to print the logs.
+     *E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`
+     *Can be overwritten by `lv_log_register_print_cb`*/
+    //#define LV_LOG_PRINT_CB
+
     /*1: Enable print timestamp;
      *0: Disable print timestamp*/
     #define LV_LOG_USE_TIMESTAMP 1
@@ -247,6 +253,7 @@
     /*1: Print file and line number of the log;
      *0: Do not print file and line number of the log*/
     #define LV_LOG_USE_FILE_LINE 1
+
 
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #define LV_LOG_TRACE_MEM        1
@@ -953,10 +960,10 @@
 #endif
 
 /*Drivers for LCD devices connected via SPI/parallel port*/
-#define LV_USE_ST7735		0
-#define LV_USE_ST7789		0
-#define LV_USE_ST7796		0
-#define LV_USE_ILI9341		0
+#define LV_USE_ST7735        0
+#define LV_USE_ST7789        0
+#define LV_USE_ST7796        0
+#define LV_USE_ILI9341       0
 
 #define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
 

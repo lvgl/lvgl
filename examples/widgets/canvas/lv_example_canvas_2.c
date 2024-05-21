@@ -12,7 +12,9 @@ void lv_example_canvas_2(void)
     lv_obj_set_style_bg_color(lv_screen_active(), lv_palette_lighten(LV_PALETTE_RED, 5), 0);
 
     /*Create a buffer for the canvas*/
-    LV_DRAW_BUF_DEFINE(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf);
+
     /*Create a canvas and initialize its palette*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_draw_buf(canvas, &draw_buf);

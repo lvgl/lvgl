@@ -31,6 +31,7 @@ function(filter_compiler_options lang options_out)
 
         string(TOUPPER FLAG_SUPPORTED_FOR_${lang}_${option} option_var_name)
         string(REPLACE "-" "_" option_var_name ${option_var_name})
+        string(REPLACE "+" "_" option_var_name ${option_var_name})
 
         if (${lang} STREQUAL C)
             check_c_compiler_flag(${option} ${option_var_name})
@@ -144,6 +145,7 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
     list(APPEND COMPILE_OPTIONS
         -pedantic-errors
         -Wall
+        -Wformat-security
         -Wclobbered
         -Wdeprecated
         -Wdouble-promotion
@@ -261,6 +263,10 @@ add_library(test_common
         src/test_assets/test_img_emoji_F617.c
         src/test_assets/test_ubuntu_font.c
         src/test_assets/test_kern_one_otf.c
+        src/test_assets/test_imagebutton_left.c
+        src/test_assets/test_imagebutton_mid.c
+        src/test_assets/test_imagebutton_right.c
+        src/test_assets/test_music_button_play.c
         unity/unity_support.c
         unity/unity.c
         ${TEST_IMAGES_SRC}

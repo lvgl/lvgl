@@ -96,7 +96,6 @@ void lv_flex_init(void)
 {
     layout_list_def[LV_LAYOUT_FLEX].cb = flex_update;
     layout_list_def[LV_LAYOUT_FLEX].user_data = NULL;
-
 }
 
 void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow)

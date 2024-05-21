@@ -19,6 +19,7 @@
 #define img_decoder_ll_p &(LV_GLOBAL_DEFAULT()->img_decoder_ll)
 #define img_cache_p (LV_GLOBAL_DEFAULT()->img_cache)
 #define img_header_cache_p (LV_GLOBAL_DEFAULT()->img_header_cache)
+#define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
 
 /**********************
  *      TYPEDEFS
@@ -112,6 +113,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         .premultiply = false,
         .no_cache = false,
         .use_indexed = false,
+        .flush_cache = false,
     };
 
     /*
@@ -120,6 +122,18 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
      * If decoder open succeed, add the image to cache if enabled.
      * */
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
+
+    /* Flush the D-Cache if enabled and the image was successfully opened */
+    if(dsc->args.flush_cache && res == LV_RESULT_OK) {
+        lv_draw_buf_flush_cache(dsc->decoded, NULL);
+        LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%" LV_PRId32 " x H%" LV_PRId32 ", data: %p cf: %d)",
+                    src,
+                    dsc->src_type == LV_IMAGE_SRC_FILE ? (const char *)src : "c-array",
+                    dsc->decoded->header.w,
+                    dsc->decoded->header.h,
+                    (void *)dsc->decoded->data,
+                    dsc->decoded->header.cf);
+    }
 
     return res;
 }
@@ -137,6 +151,11 @@ void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
     if(dsc->decoder) {
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+
+        if(lv_image_cache_is_enabled() && dsc->cache && dsc->cache_entry) {
+            /*Decoded data is in cache, release it from cache's callback*/
+            lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
+        }
     }
 }
 
@@ -224,7 +243,8 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
             LV_LOG_TRACE("Stride mismatch");
             lv_result_t res = lv_draw_buf_adjust_stride(decoded, stride_expect);
             if(res != LV_RESULT_OK) {
-                lv_draw_buf_t * aligned = lv_draw_buf_create(decoded->header.w, decoded->header.h, decoded->header.cf, stride_expect);
+                lv_draw_buf_t * aligned = lv_draw_buf_create_user(image_cache_draw_buf_handlers, decoded->header.w, decoded->header.h,
+                                                                  decoded->header.cf, stride_expect);
                 if(aligned == NULL) {
                     LV_LOG_ERROR("No memory for Stride adjust.");
                     return NULL;
@@ -248,7 +268,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
             lv_draw_buf_premultiply(decoded);
         }
         else {
-            decoded = lv_draw_buf_dup(decoded);
+            decoded = lv_draw_buf_dup_user(image_cache_draw_buf_handlers, decoded);
             if(decoded == NULL) {
                 LV_LOG_ERROR("No memory for premulitplying.");
                 return NULL;

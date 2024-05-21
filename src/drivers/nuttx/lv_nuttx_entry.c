@@ -104,9 +104,7 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 
     lv_nuttx_cache_init();
 
-#if LV_CACHE_DEF_SIZE > 0
     lv_nuttx_image_cache_init();
-#endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
     lv_nuttx_profiler_init();
@@ -178,6 +176,38 @@ uint32_t lv_nuttx_get_idle(void)
 }
 
 #endif
+
+void lv_nuttx_deinit(lv_nuttx_result_t * result)
+{
+#if !LV_USE_NUTTX_CUSTOM_INIT
+    if(result) {
+        if(result->disp) {
+            lv_display_delete(result->disp);
+            result->disp = NULL;
+        }
+
+        if(result->indev) {
+            lv_indev_delete(result->indev);
+            result->indev = NULL;
+        }
+
+        if(result->utouch_indev) {
+            lv_indev_delete(result->utouch_indev);
+            result->utouch_indev = NULL;
+        }
+    }
+#else
+    lv_nuttx_deinit_custom(result);
+#endif
+
+    if(nuttx_ctx_p) {
+        lv_nuttx_cache_deinit();
+        lv_nuttx_image_cache_deinit();
+
+        lv_free(nuttx_ctx_p);
+        nuttx_ctx_p = NULL;
+    }
+}
 
 /**********************
  *   STATIC FUNCTIONS

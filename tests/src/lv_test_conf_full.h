@@ -84,12 +84,15 @@
 #define LV_USE_FILE_EXPLORER    1
 #define LV_USE_TINY_TTF         1
 #define LV_USE_SYSMON           1
+#define LV_USE_MEM_MONITOR      1
+#define LV_USE_PERF_MONITOR     1
 #define LV_USE_SNAPSHOT         1
 #define LV_USE_THORVG_INTERNAL  1
 #define LV_USE_LZ4_INTERNAL     1
 #define LV_USE_VECTOR_GRAPHIC   1
 #define LV_USE_PROFILER         1
 #define LV_PROFILER_INCLUDE     "lv_profiler_builtin.h"
+#define LV_USE_GRIDNAV          1
 
 #define LV_BUILD_EXAMPLES       1
 #define LV_USE_DEMO_WIDGETS     1

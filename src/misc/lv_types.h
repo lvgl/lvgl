@@ -148,6 +148,18 @@ typedef struct _lv_font_t lv_font_t;
 struct _lv_image_decoder_t;
 typedef struct _lv_image_decoder_t lv_image_decoder_t;
 
+#if LV_USE_SYSMON
+
+struct _lv_sysmon_backend_data_t;
+typedef struct _lv_sysmon_backend_data_t lv_sysmon_backend_data_t;
+
+#if LV_USE_PERF_MONITOR
+struct _lv_sysmon_perf_info_t;
+typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
+#endif /*LV_USE_PERF_MONITOR*/
+
+#endif /*LV_USE_SYSMON*/
+
 #endif /*__ASSEMBLY__*/
 
 /**********************
@@ -170,7 +182,7 @@ typedef struct _lv_image_decoder_t lv_image_decoder_t;
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)
 #elif defined(__GNUC__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 4) || __GNUC__ > 4)
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__((format(gnu_printf, fmtstr, vararg)))
-#elif (defined(__clang__) || defined(__GNUC__) || defined(__GNUG__))
+#elif (defined(__clang__) || defined(__GNUC__) || defined(__GNUG__) || defined(__IAR_SYSTEMS_ICC__))
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__((format(printf, fmtstr, vararg)))
 #else
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)

@@ -68,7 +68,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_c
 
 /**
  * Set a draw buffer for the canvas. A draw buffer either can be allocated by `lv_draw_buf_create()`
- * or defined statically by `LV_DRAW_BUF_DEFINE`. When buffer start address and stride has alignment
+ * or defined statically by `LV_DRAW_BUF_DEFINE_STATIC`. When buffer start address and stride has alignment
  * requirement, it's recommended to use `lv_draw_buf_create`.
  * @param obj       pointer to a canvas object
  * @param draw_buf  pointer to a draw buffer

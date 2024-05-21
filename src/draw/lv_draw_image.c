@@ -185,7 +185,13 @@ void _lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
     int32_t img_w = draw_dsc->header.w;
     int32_t img_h = draw_dsc->header.h;
 
-    lv_area_t tile_area = draw_dsc->image_area;
+    lv_area_t tile_area;
+    if(lv_area_get_width(&draw_dsc->image_area) >= 0) {
+        tile_area = draw_dsc->image_area;
+    }
+    else {
+        tile_area = *coords;
+    }
     lv_area_set_width(&tile_area, img_w);
     lv_area_set_height(&tile_area, img_h);
 
