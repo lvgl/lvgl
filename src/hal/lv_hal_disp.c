@@ -26,6 +26,7 @@
 #include "../draw/nxp/vglite/lv_draw_vglite.h"
 #include "../draw/nxp/pxp/lv_draw_pxp.h"
 #include "../draw/renesas/lv_gpu_d2_ra6m3.h"
+#include "../draw/nema_gfx/lv_draw_nema_gfx.h"
 
 #if LV_USE_THEME_DEFAULT
     #include "../extra/themes/default/lv_theme_default.h"
@@ -124,6 +125,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_init = lv_draw_arm2d_ctx_init;
     driver->draw_ctx_deinit = lv_draw_arm2d_ctx_init;
     driver->draw_ctx_size = sizeof(lv_draw_arm2d_ctx_t);
+#elif LV_USE_NEMA_GFX
+    driver->draw_ctx_init = lv_draw_nema_gfx_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_nema_gfx_ctx_deinit;
+    driver->draw_ctx_size = sizeof(lv_draw_nema_gfx_ctx_t);
 #else
     driver->draw_ctx_init = lv_draw_sw_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sw_init_ctx;

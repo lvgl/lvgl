@@ -23,3 +23,4 @@ include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/sdl/lv_draw_sdl.mk
 include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/stm32_dma2d/lv_draw_stm32_dma2d.mk
 include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/sw/lv_draw_sw.mk
 include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/swm341_dma2d/lv_draw_swm341_dma2d.mk
+include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/nema_gfx/lv_draw_nema_gfx.mk
