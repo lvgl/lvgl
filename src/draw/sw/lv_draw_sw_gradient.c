@@ -306,17 +306,10 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     /* Create gradient color map */
     state->cgrad = lv_gradient_get(dsc, 256, 0);
 
-#ifdef SCALING_SUPPORT
-    state->x0 = (float)start.x * GRAD_SCALE_X;
-    state->y0 = (float)start.y * GRAD_SCALE_Y;
-    state->r0 = (float)r_start * GRAD_SCALE_X;
-    float dr = (float)(r_end - r_start) * GRAD_SCALE_X;
-#else
     state->x0 = start.x;
     state->y0 = start.y;
     state->r0 = r_start;
     int32_t dr = r_end - r_start;
-#endif
     if(end.x == start.x && end.y == start.y) {
         LV_ASSERT(dr != 0);
         state->a4 = lv_sqr(dr) << 2;
@@ -327,13 +320,8 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
         state->inv_dr = (1 << (8 + 16)) / dr;
     }
     else {
-#ifdef SCALING_SUPPORT
-        float dx = (float)(end.x - start.x) * GRAD_SCALE_X;
-        float dy = (float)(end.y - start.y) * GRAD_SCALE_Y;
-#else
         int32_t dx = end.x - start.x;
         int32_t dy = end.y - start.y;
-#endif
         state->dx = dx;    /* needed for incremental calculation */
         state->a4 = (lv_sqr(dr) - lv_sqr(dx) - lv_sqr(dy)) << 2;
         /* b(xp, yp) = xp * bpx + yp * bpy + bc */
