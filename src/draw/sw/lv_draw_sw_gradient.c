@@ -11,6 +11,7 @@
 
 #include "../../misc/lv_types.h"
 #include "../../osal/lv_os.h"
+#include "../../misc/lv_math.h"
 
 /*********************
  *      DEFINES
