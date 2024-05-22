@@ -287,16 +287,17 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len)
 {
     LV_UNUSED(drv);
+    if(fn_len == 0) return LV_FS_RES_INV_PARAM;
 
     struct dirent * entry;
     do {
         entry = readdir(dir_p);
         if(entry) {
             if(entry->d_type == DT_DIR) lv_snprintf(fn, fn_len, "/%s", entry->d_name);
-            else lv_strncpy(fn, entry->d_name, fn_len);
+            else lv_strlcpy(fn, entry->d_name, fn_len);
         }
         else {
-            lv_strncpy(fn, "", fn_len);
+            lv_strlcpy(fn, "", fn_len);
         }
     } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
 
