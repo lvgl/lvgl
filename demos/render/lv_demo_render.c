@@ -849,7 +849,7 @@ static lv_obj_t * create_linear_gradient_obj(lv_obj_t * parent, int32_t col, int
     };
 
     /*init gradient color map*/
-    lv_gradient_init_stops(grad, grad_color, NULL, use_opa_map ? grad_opa : NULL, sizeof(grad_color) / sizeof(lv_color_t));
+    lv_gradient_init_stops(grad, grad_color, use_opa_map ? grad_opa : NULL, NULL, sizeof(grad_color) / sizeof(lv_color_t));
 
     /*init gradient parameters*/
     grad->dir = LV_GRAD_DIR_LINEAR;
@@ -925,7 +925,7 @@ static lv_obj_t * create_radial_gradient_obj(lv_obj_t * parent, int32_t col, int
     };
 
     /*init gradient color map*/
-    lv_gradient_init_stops(grad, grad_color, NULL, use_opa_map ? grad_opa : NULL, sizeof(grad_color) / sizeof(lv_color_t));
+    lv_gradient_init_stops(grad, grad_color, use_opa_map ? grad_opa : NULL, NULL, sizeof(grad_color) / sizeof(lv_color_t));
 
     /*init gradient parameters*/
     grad->dir = LV_GRAD_DIR_RADIAL;
@@ -1003,7 +1003,7 @@ static lv_obj_t * create_conical_gradient_obj(lv_obj_t * parent, int32_t col, in
     };
 
     /*init gradient color map*/
-    lv_gradient_init_stops(grad, grad_color, NULL, use_opa_map ? grad_opa : NULL, sizeof(grad_color) / sizeof(lv_color_t));
+    lv_gradient_init_stops(grad, grad_color, use_opa_map ? grad_opa : NULL, NULL, sizeof(grad_color) / sizeof(lv_color_t));
 
     /*init gradient parameters*/
     grad->dir = LV_GRAD_DIR_CONICAL;

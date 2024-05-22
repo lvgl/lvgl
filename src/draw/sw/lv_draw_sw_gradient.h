@@ -72,8 +72,8 @@ void lv_gradient_cleanup(lv_grad_t * grad);
  * @param opa       opacity array: if NULL, then LV_OPA_COVER is assumed
  * @param num_stops number of gradient stops (1..LV_GRADIENT_MAX_STOPS)
  */
-void lv_gradient_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const uint8_t fracs[],
-                            const lv_opa_t opa[], int num_stops);
+void lv_gradient_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const lv_opa_t opa[],
+                            const uint8_t fracs[], int num_stops);
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
