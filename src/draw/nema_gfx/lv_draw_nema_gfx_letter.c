@@ -8,7 +8,6 @@
  *
  * -----------------------------------------------------------------------------
  * Copyright (c) 2008-24 Think Silicon Single Member PC
- * Think Silicon Single Member PC Confidential Proprietary
  * -----------------------------------------------------------------------------
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
