@@ -27,7 +27,8 @@ If you would rather try LVGL on your own project follow these steps:
 
 -  `Download <https://github.com/lvgl/lvgl/archive/master.zip>`__ or
    clone the library from GitHub with ``git clone https://github.com/lvgl/lvgl.git``.
--  Copy the ``lvgl`` folder into your project.
+-  Copy the ``lvgl`` folder into your project. If you wish you can add only ``lvgl/src``
+   for LVGL itself, and ``lvgl/examples`` and ``lvgl/demos`` for the eaxmples and demos respectively.
 -  Copy ``lvgl/lv_conf_template.h`` as ``lv_conf.h`` next to the
    ``lvgl`` folder, change the first ``#if 0`` to ``1`` to enable the
    file's content and set the :c:macro:`LV_COLOR_DEPTH` defines.
