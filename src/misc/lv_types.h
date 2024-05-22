@@ -321,6 +321,10 @@ typedef struct lv_draw_sw_blend_image_dsc_t lv_draw_sw_blend_image_dsc_t;
 
 typedef struct lv_draw_buf_handlers_t lv_draw_buf_handlers_t;
 
+typedef struct lv_rlottie_t lv_rlottie_t;
+
+typedef struct lv_ffmpeg_player_t lv_ffmpeg_player_t;
+
 #if LV_USE_SYSMON
 
 typedef struct lv_sysmon_backend_data_t lv_sysmon_backend_data_t;

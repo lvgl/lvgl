@@ -29,6 +29,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_qrcode_class;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

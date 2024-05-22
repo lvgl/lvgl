@@ -6,8 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_ffmpeg.h"
+#include "lv_ffmpeg_private.h"
 #if LV_USE_FFMPEG != 0
+#include "../../draw/lv_image_decoder_private.h"
+#include "../../core/lv_obj_class_private.h"
 
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -803,7 +805,7 @@ static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx)
 
 static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
 {
-    lv_obj_t * obj = (lv_obj_t *)timer->user_data;
+    lv_obj_t * obj = (lv_obj_t *)lv_timer_get_user_data(timer);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
     if(!player->ffmpeg_ctx) {

@@ -100,6 +100,8 @@ extern "C" {
 #include "widgets/tabview/lv_tabview_private.h"
 #include "tick/lv_tick_private.h"
 #include "stdlib/builtin/lv_tlsf_private.h"
+#include "libs/rlottie/lv_rlottie_private.h"
+#include "libs/ffmpeg/lv_ffmpeg_private.h"
 
 /*********************
  *      DEFINES
