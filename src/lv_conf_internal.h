@@ -227,6 +227,22 @@
     #endif
 #endif
 
+/* This is used to control what LVGL does if it has to wait for a buffer
+ * to finish flushing. Instead of just spinning the wheels this sets the
+ * refresh timer to 1 millisecond and then exist the refresh should it have to
+ * wait for the buffer to finish flushing. This only happen with double
+ * buffering. If DMA memory is being used it allows the processor to complete
+ * ther tasks instead of just sitting there spinning it's wheels.
+ */
+#ifndef LV_RETURN_FROM_FLUSH_WAIT
+    #ifdef CONFIG_LV_RETURN_FROM_FLUSH_WAIT
+        #define LV_RETURN_FROM_FLUSH_WAIT CONFIG_LV_RETURN_FROM_FLUSH_WAIT
+    #else
+        #define LV_RETURN_FROM_FLUSH_WAIT 0
+    #endif
+#endif
+
+
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #ifndef LV_DPI_DEF
