@@ -81,9 +81,10 @@ bool lv_refr_now(lv_display_t * disp)
     if(disp && disp->refr_timer) {
         _lv_display_refr_timer(disp->refr_timer);
 #if LV_RETURN_FROM_FLUSH_WAIT
-        if(lv_display_is_double_buffered(disp) && !(disp->refresh_skipped)) ret = false}
+        if(lv_display_is_double_buffered(disp) && !(disp->refresh_skipped)) ret = false
 #endif
-    } else {
+    }
+    else {
         lv_display_t * d;
         d = lv_display_get_next(NULL);
         while(d) {
@@ -336,7 +337,8 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
 
     if(tmr) {
         disp_refr = tmr->user_data;
-    } else {
+    }
+    else {
         disp_refr = lv_display_get_default();
     }
 
@@ -351,7 +353,7 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-     /* In double buffered mode wait until the other buffer is freed
+    /* In double buffered mode wait until the other buffer is freed
      * and driver is ready to receive the new buffer.
      * If we need to wait here it means that the content of one buffer is being sent to display
      * and other buffer already contains the new rendered image.
@@ -362,15 +364,17 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
     if(lv_display_is_double_buffered(disp_refr)) {
 #if LV_RETURN_FROM_FLUSH_WAIT
         if(tmr) {
-            if (disp_refr->flushing == 1) {
+            if(disp_refr->flushing == 1) {
                 lv_timer_set_period(tmr, 1);
                 disp_refr->refresh_skipped = true;
                 return;
-            } else {
+            }
+            else {
                 lv_timer_set_period(tmr, LV_DEF_REFR_PERIOD);
                 disp_refr->refresh_skipped = false;
             }
-        } else {
+        }
+        else {
             wait_for_flushing(disp_refr);
         }
 #else
