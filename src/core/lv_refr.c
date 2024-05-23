@@ -88,7 +88,7 @@ bool lv_refr_now(lv_display_t * disp)
         lv_display_t * d;
         d = lv_display_get_next(NULL);
         while(d) {
-            if (d->refr_timer) {
+            if(d->refr_timer) {
                 _lv_display_refr_timer(d->refr_timer);
 #if LV_RETURN_FROM_FLUSH_WAIT
                 if(lv_display_is_double_buffered(d) && !(d->refresh_skipped)) ret = false;
