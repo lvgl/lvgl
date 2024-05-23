@@ -199,7 +199,6 @@ typedef struct {
     } params;
     void * state;
 #endif
-    struct _lv_grad_dsc_t * next;                       /**< Next gradient to render more gradients*/
 } lv_grad_dsc_t;
 
 /**
