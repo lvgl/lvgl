@@ -78,25 +78,21 @@ bool lv_refr_now(lv_display_t * disp)
 {
     lv_anim_refr_now();
     bool ret = true;
-    if(disp) {
+    if(disp && disp->refr_timer) {
         _lv_display_refr_timer(disp->refr_timer);
 #if LV_RETURN_FROM_FLUSH_WAIT
-        if(lv_display_is_double_buffered(disp) && !(disp->refresh_skipped)) {
-            ret = false;
-        }
+        if(lv_display_is_double_buffered(disp) && !(disp->refresh_skipped)) ret = false}
 #endif
-    }
-    else {
-
+    } else {
         lv_display_t * d;
         d = lv_display_get_next(NULL);
         while(d) {
-            _lv_display_refr_timer(d->refr_timer);
+            if (d->refr_timer) {
+                _lv_display_refr_timer(d->refr_timer);
 #if LV_RETURN_FROM_FLUSH_WAIT
-            if(lv_display_is_double_buffered(d) && !(d->refresh_skipped)) {
-                ret = false;
-            }
+                if(lv_display_is_double_buffered(d) && !(d->refresh_skipped)) ret = false;
 #endif
+            }
             d = lv_display_get_next(d);
         }
     }
