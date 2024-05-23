@@ -23,23 +23,20 @@ extern "C" {
  *    TYPEDEFS
  **********************/
 
-struct _lv_theme_t;
-struct _lv_display_t;
+typedef void (*lv_theme_apply_cb_t)(lv_theme_t *, lv_obj_t *);
 
-typedef void (*lv_theme_apply_cb_t)(struct _lv_theme_t *, lv_obj_t *);
-
-typedef struct _lv_theme_t {
+struct _lv_theme_t {
     lv_theme_apply_cb_t apply_cb;
-    struct _lv_theme_t * parent;    /**< Apply the current theme's style on top of this theme.*/
+    lv_theme_t * parent;   /**< Apply the current theme's style on top of this theme.*/
     void * user_data;
-    struct _lv_display_t * disp;
+    lv_display_t * disp;
     lv_color_t color_primary;
     lv_color_t color_secondary;
     const lv_font_t * font_small;
     const lv_font_t * font_normal;
     const lv_font_t * font_large;
     uint32_t flags;                 /*Any custom flag used by the theme*/
-} lv_theme_t;
+};
 
 /**********************
  *  GLOBAL PROTOTYPES
@@ -113,10 +110,9 @@ lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);
  *    MACROS
  **********************/
 
-
 #include "default/lv_theme_default.h"
 #include "mono/lv_theme_mono.h"
-#include "basic/lv_theme_basic.h"
+#include "simple/lv_theme_simple.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

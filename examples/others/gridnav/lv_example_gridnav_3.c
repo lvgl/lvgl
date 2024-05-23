@@ -46,7 +46,6 @@ void lv_example_gridnav_3(void)
     label = lv_label_create(btn);
     lv_label_set_text(label, "Button 2");
 
-
     /*Create an other container with long text to show how LV_GRIDNAV_CTRL_SCROLL_FIRST works*/
     lv_obj_t * cont_sub1 = lv_obj_create(cont_main);
     lv_obj_set_size(cont_sub1, lv_pct(100), 100);
@@ -72,7 +71,7 @@ void lv_example_gridnav_3(void)
     /*Only the container needs to be in a group*/
     lv_group_add_obj(lv_group_get_default(), cont_sub2);
 
-    lv_obj_add_event(cont_sub2, cont_sub_event_cb, LV_EVENT_KEY, NULL);
+    lv_obj_add_event_cb(cont_sub2, cont_sub_event_cb, LV_EVENT_KEY, NULL);
 
     /*Use flex here, but works with grid or manually placed objects as well*/
     lv_obj_set_flex_flow(cont_sub2, LV_FLEX_FLOW_ROW_WRAP);
@@ -92,9 +91,6 @@ void lv_example_gridnav_3(void)
     lv_group_remove_obj(btn);
     label = lv_label_create(btn);
     lv_label_set_text(label, "Button 4");
-
-
-
 
 }
 

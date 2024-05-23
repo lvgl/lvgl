@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_demo_flex_layout_flex_loader.c
  *
  */
@@ -41,11 +41,11 @@
 
 #define FLEX_ALIGN_EVENT_ATTACH(item)                                               \
     do {                                                                            \
-        lv_obj_add_event(ui->ctrl_pad.tab.align.ddlist_align_##item,             \
-                         flex_align_##item##_event_handler,                      \
-                         LV_EVENT_VALUE_CHANGED,                                 \
-                         ui                                                      \
-                        );                                                       \
+        lv_obj_add_event_cb(ui->ctrl_pad.tab.align.ddlist_align_##item,             \
+                            flex_align_##item##_event_handler,                      \
+                            LV_EVENT_VALUE_CHANGED,                                 \
+                            ui                                                      \
+                           );                                                       \
     } while(0)
 
 /**********************
@@ -96,7 +96,7 @@ FLEX_ALIGN_EVENT_DEF(track)
 
 void flex_loader_attach(view_t * ui)
 {
-    lv_obj_add_event(
+    lv_obj_add_event_cb(
         ui->ctrl_pad.tab.flex.ddlist_flow,
         flex_flow_event_handler,
         LV_EVENT_VALUE_CHANGED,

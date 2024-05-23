@@ -1,6 +1,6 @@
 #include "../../lvgl.h"
 
-#if LV_BUILD_EXAMPLES || 1
+#if LV_BUILD_EXAMPLES
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
@@ -115,12 +115,12 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMAGE_IMG_COGWHEEL_ARGB uint8_t img_co
 };
 
 const lv_image_dsc_t img_cogwheel_argb = {
-    .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
-    .data_size = 10000 * 4,
+    .header.stride = 400,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_cogwheel_argb_map,
+    .data_size = sizeof(img_cogwheel_argb_map),
 };
 
 #endif /* LV_BUILD_EXAMPLES */

@@ -1,3 +1,6 @@
+.. _lv_obj:
+
+====================
 Base object (lv_obj)
 ====================
 
@@ -22,12 +25,16 @@ other widgets too. For example :cpp:expr:`lv_obj_set_width(slider, 100)`
 The Base object can be directly used as a simple widget: it's nothing
 more than a rectangle. In HTML terms, think of it as a ``<div>``.
 
+.. _lv_obj_coordinates:
+
 Coordinates
 -----------
 
 Only a small subset of coordinate settings is described here. To see all
 the features of LVGL (padding, coordinates in styles, layouts, etc)
-visit the `Coordinates </overview/coords>`__ page.
+visit the :ref:`Coordinates <coord>` page.
+
+.. _lv_obj_size:
 
 Size
 ^^^^
@@ -37,12 +44,16 @@ The object size can be modified on individual axes with
 :cpp:expr:`lv_obj_set_height(obj, new_height)`, or both axes can be modified at
 the same time with :cpp:expr:`lv_obj_set_size(obj, new_width, new_height)`.
 
+.. _lv_obj_position:
+
 Position
 ^^^^^^^^
 
 You can set the position relative to the parent with
 :cpp:expr:`lv_obj_set_x(obj, new_x)` and :cpp:expr:`lv_obj_set_y(obj, new_y)`, or both
 axes at the same time with :cpp:expr:`lv_obj_set_pos(obj, new_x, new_y)`.
+
+.. _lv_obj_alignment:
 
 Alignment
 ^^^^^^^^^
@@ -68,6 +79,8 @@ For example, to align a text below an image:
 
 The following align types exist: |image1|
 
+.. _lv_obj_parents_and_children:
+
 Parents and children
 --------------------
 
@@ -86,7 +99,7 @@ The children can be iterated like this:
 .. code:: c
 
    uint32_t i;
-   for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
+   for(i = 0; i < lv_obj_get_child_count(parent); i++) {
      lv_obj_t * child = lv_obj_get_child(parent, i);
      /*Do something with child*/
    }
@@ -104,6 +117,8 @@ You can change the index of an object in its parent using
 You can swap the position of two objects with
 :cpp:expr:`lv_obj_swap(obj1, obj2)`.
 
+.. _lv_obj_display_and_screens:
+
 Display and Screens
 -------------------
 
@@ -120,26 +135,30 @@ pointer to the active screen.
 
 If you have multiple displays, it's important to know that the screen
 functions operate on the most recently created display or the one
-explicitly selected with :cpp:func:`lv_disp_set_default`.
+explicitly selected with :cpp:func:`lv_display_set_default`.
 
 To get an object's screen use the :cpp:expr:`lv_obj_get_screen(obj)` function.
+
+.. _lv_obj_overview_events:
 
 Events
 ------
 
 To set an event callback for an object, use
-:cpp:expr:`lv_obj_add_event(obj, event_cb, LV_EVENT_..., user_data)`,
+:cpp:expr:`lv_obj_add_event_cb(obj, event_cb, LV_EVENT_..., user_data)`,
 
 To manually send an event to an object, use
 :cpp:expr:`lv_event_send(obj, LV_EVENT_..., param)`
 
-Read the `Event overview </overview/event>`__ to learn more about
+Read the :ref:`Event overview <events>` to learn more about
 events.
+
+.. _lv_obj_styles:
 
 Styles
 ------
 
-Be sure to read the `Style overview </overview/style>`__. Here only the
+Be sure to read the :ref:`Style overview <styles>`. Here only the
 most essential functions are described.
 
 A new style can be added to an object with the
@@ -150,11 +169,13 @@ is an ORed combination of part and state(s). E.g.
 The base objects use :cpp:enumerator:`LV_PART_MAIN` style properties and
 :cpp:enumerator:`LV_PART_SCROLLBAR` with the typical background style properties.
 
+.. _lv_obj_flags:
+
 Flags
 -----
 
 There are some attributes which can be enabled/disabled by
-``lv_obj_add/remove_flag(obj, LV_OBJ_FLAG_...)``:
+``lv_obj_add/remove_flag(obj, LV_OBJ_FLAG_...)`` and ``lv_obj_set_flag(obj, LV_OBJ_FLAG_..., true/false)``
 
 -  :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` Make the object hidden. (Like it wasn't there at all)
 -  :cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` Make the object clickable by input devices
@@ -176,7 +197,9 @@ There are some attributes which can be enabled/disabled by
 -  :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` Allow performing more accurate hit (click) test. E.g. accounting for rounded corners
 -  :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` Make the object positionable by the layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` Do not scroll the object when the parent scrolls and ignore layout
+-  :cpp:enumerator:`LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` Enable sending ``LV_EVENT_DRAW_TASK_ADDED`` events
 -  :cpp:enumerator:`LV_OBJ_FLAG_OVERFLOW_VISIBLE` Do not clip the children's content to the parent's boundary
+-  :cpp:enumerator:`LV_OBJ_FLAG_FLEX_IN_NEW_TRACK` Start a new flex track on this item
 -  :cpp:enumerator:`LV_OBJ_FLAG_LAYOUT_1` Custom flag, free to use by layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_LAYOUT_2` Custom flag, free to use by layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_WIDGET_1` Custom flag, free to use by widget
@@ -196,10 +219,12 @@ Some examples:
    /*Make an object non-clickable*/
    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
+.. _lv_obj_groups:
+
 Groups
 ------
 
-Read the `Input devices overview </overview/indev>`__ to learn more
+Read the :ref:`Input devices overview <indev>` to learn more
 about *Groups*.
 
 Objects are added to a *group* with :cpp:expr:`lv_group_add_obj(group, obj)`,
@@ -210,6 +235,8 @@ belongs to.
 its group or not. If the object is not added to a group, ``false`` will
 be returned.
 
+.. _lv_obj_extended_click_area:
+
 Extended click area
 -------------------
 
@@ -219,34 +246,17 @@ However, this can be extended with
 
 .. _events-1:
 
+.. _lv_obj_events:
+
 Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` when the :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` flag is
    enabled and the object clicked (on transition to/from the checked state)
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` is sent
-   for the following types:
-
-   -  :cpp:enumerator:`LV_OBJ_DRAW_PART_RECTANGLE` The main rectangle
-
-      -  ``part``: :cpp:enumerator:`LV_PART_MAIN`
-      -  ``rect_dsc``
-      -  ``draw_area``: the area of the rectangle
-
-   -  :cpp:enumerator:`LV_OBJ_DRAW_PART_BORDER_POST` The border if the ``border_post``
-      style property is ``true``
-
-      -  ``part``: :cpp:enumerator:`LV_PART_MAIN`
-      -  ``rect_dsc``
-      -  ``draw_area``: the area of the rectangle
-
-   -  :cpp:enumerator:`LV_OBJ_DRAW_PART_SCROLLBAR` the scrollbars
-
-      -  ``part``: :cpp:enumerator:`LV_PART_SCROLLBAR`
-      -  ``rect_dsc``
-      -  ``draw_area``: the area of the rectangle
 
 Learn more about :ref:`events`.
+
+.. _lv_obj_keys:
 
 Keys
 ****
@@ -260,18 +270,21 @@ If :cpp:enumerator:`LV_OBJ_FLAG_SCROLLABLE` is enabled, but the object is not ed
 :cpp:enumerator:`LV_KEY_DOWN`, :cpp:enumerator:`LV_KEY_LEFT`, :cpp:enumerator:`LV_KEY_RIGHT`) scroll the object.
 If the object can only scroll vertically, :cpp:enumerator:`LV_KEY_LEFT` and
 :cpp:enumerator:`LV_KEY_RIGHT` will scroll up/down instead, making it compatible with
-an encoder input device. See `Input devices overview </overview/indev>`__ for
+an encoder input device. See :ref:`Input devices overview <indev>` for
 more on encoder behaviors and the edit mode.
 
 Learn more about :ref:`indev_keys`.
 
 .. |image1| image:: /misc/align.png
 
+.. _lv_obj_example:
 
 Example
 *******
 
 .. include:: ../examples/widgets/obj/index.rst
+
+.. _lv_obj_api:
 
 API
 ***

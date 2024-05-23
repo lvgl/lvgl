@@ -1,3 +1,6 @@
+.. _lv_chart:
+
+================
 Chart (lv_chart)
 ================
 
@@ -11,6 +14,8 @@ charts are supported.
 Charts can have: - division lines - 2 y axis - axis ticks and texts on
 ticks - cursors - scrolling and zooming
 
+.. _lv_chart_parts_and_styles:
+
 Parts and Styles
 ****************
 
@@ -20,7 +25,7 @@ Parts and Styles
    charts ``pad_column`` sets the space between the columns of the
    adjacent indices.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar used if the chart is zoomed. See
-   the `Base object </widgets/obj>`__\ 's documentation for details.
+   the :ref:`Base object <lv_obj>`\ 's documentation for details.
 -  :cpp:enumerator:`LV_PART_ITEMS` Refers to the line or bar series.
 
    -  Line chart: The *line* properties are used by the lines.
@@ -36,6 +41,8 @@ Parts and Styles
    ``width``, ``height``, ``bg_color`` and ``radius`` are used to set
    the appearance of points.
 
+.. _lv_chart_usage:
+
 Usage
 *****
 
@@ -44,8 +51,8 @@ Chart type
 
 The following data display types exist:
 
-- :cpp:enumerator:`LV_CHART_TYPE_NONE`:  Do not display any data. Can be used to hide the series.
-- :cpp:enumerator:`LV_CHART_TYPE_LINE`:  Draw lines between the data points and/or points (rectangles or circles) on the data points.
+- :cpp:enumerator:`LV_CHART_TYPE_NONE`: Do not display any data. Can be used to hide the series.
+- :cpp:enumerator:`LV_CHART_TYPE_LINE`: Draw lines between the data points and/or points (rectangles or circles) on the data points.
 - :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw bars.
 - :cpp:enumerator:`LV_CHART_TYPE_SCATTER`: X/Y chart drawing point's and lines between the points. .
 
@@ -60,16 +67,16 @@ You can add any number of series to the charts by
 :cpp:struct:`lv_chart_series_t` structure which contains the chosen ``color`` and
 an array for the data points. ``axis`` can have the following values:
 
-- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_Y` Left axis
-- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_Y` Right axis
-- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_X` Bottom axis
-- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_X` Top axis
+- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_Y`: Left axis
+- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_Y`: Right axis
+- :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_X`: Bottom axis
+- :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_X`: Top axis
 
 ``axis`` tells which axis's range should be used to scale the values.
 
 :cpp:expr:`lv_chart_set_ext_y_array(chart, ser, value_array)` makes the chart
 use an external array for the given series. ``value_array`` should look
-like this: ``lv_coord_t * value_array[num_points]``. The array size
+like this: ``int32_t * value_array[num_points]``. The array size
 needs to be large enough to hold all the points of that series. The
 array's pointer will be saved in the chart so it needs to be global,
 static or dynamically allocated. Note: you should call
@@ -166,24 +173,14 @@ Note that :cpp:enumerator:`LV_CHART_UPDATE_MODE_SHIFT` also changes the
 Tick marks and labels
 ---------------------
 
-Ticks and labels can be added to the axis with
-:cpp:expr:`lv_chart_set_axis_tick(chart, axis, major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)`.
-
-- ``axis`` can be ``LV_CHART_AXIS_X/PRIMARY_Y/SECONDARY_Y``
-- ``major_len`` is the length of major ticks - ``minor_len`` is the length of minor ticks
-- ``major_cnt`` is the number of major ticks on the axis
-- ``minor_cnt`` in the number of minor ticks between two major ticks
-- ``label_en`` ``true``: enable label drawing on major ticks
-- ``draw_size`` extra size required to draw the tick and labels (start with 20 px and increase if the ticks/labels are clipped)
+With the help of `Scale </widgets/scale>`__, vertical and horizontal scales can be added in a very flexible way.
+See the example below to learn more.
 
 Zoom
 ----
 
-The chart can be zoomed independently in x and y directions with
-:cpp:expr:`lv_chart_set_zoom_x(chart, factor)` and
-:cpp:expr:`lv_chart_set_zoom_y(chart, factor)`. If ``factor`` is 256 there is no
-zoom. 512 means double zoom, etc. Fractional values are also possible
-but < 256 value is not allowed.
+To zoom the chart all you need to is wrapping it into a parent container and set the chart's width or height
+to larger value. This way the chart will be scrollable on its parent.
 
 Cursor
 ------
@@ -205,73 +202,20 @@ point.
 the cursor at a point. If the point's position changes (new value or
 scrolling) the cursor will move with the point.
 
+.. _lv_chart_events:
+
 Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new point is clicked pressed.
    :cpp:expr:`lv_chart_get_pressed_point(chart)` returns the zero-based index of
    the pressed point.
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   with the following types:
 
-   -  :cpp:enumerator:`LV_CHART_DRAW_PART_DIV_LINE_INIT` Used before/after drawn the
-      div lines to add masks to any extra drawings. The following fields
-      are set:
-
-      -  ``part``: :cpp:enumerator:`LV_PART_MAIN`
-      -  ``line_dsc``
-
-   -  :cpp:enumerator:`LV_CHART_DRAW_PART_DIV_LINE_HOR`,
-      :cpp:enumerator:`LV_CHART_DRAW_PART_DIV_LINE_VER` Used for each horizontal and
-      vertical division lines.
-
-      -  ``part``: :cpp:enumerator:`LV_PART_MAIN`
-      -  ``id``: index of the line
-      -  ``p1``, ``p2``: points of the line
-      -  ``line_dsc``
-
-   -  :cpp:enumerator:`LV_CHART_DRAW_PART_LINE_AND_POINT` Used on line and scatter
-      charts for lines and points.
-
-      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
-      -  ``id``: index of the point
-      -  ``value``: value of ``id``\ th point
-      -  ``p1``, ``p2``: points of the line
-      -  ``draw_area``: area of the point
-      -  ``line_dsc``
-      -  ``rect_dsc``
-      -  ``sub_part_ptr``: pointer to the series
-
-   -  :cpp:enumerator:`LV_CHART_DRAW_PART_BAR` Used on bar charts for the rectangles.
-
-      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
-      -  ``id``: index of the point
-      -  ``value``: value of ``id``\ th point
-      -  ``draw_area``: area of the point
-      -  ``rect_dsc``:
-      -  ``sub_part_ptr``: pointer to the series
-
-   -  :cpp:enumerator:`LV_CHART_DRAW_PART_CURSOR` Used on cursor lines and points.
-
-      -  ``part``: :cpp:enumerator:`LV_PART_CURSOR`
-      -  ``p1``, ``p2``: points of the line
-      -  ``line_dsc``
-      -  ``rect_dsc``
-      -  ``draw_area``: area of the points
-
-   -  :cpp:enumerator:`LV_CHART_DRAW_PART_TICK_LABEL` Used on tick lines and labels.
-
-      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
-      -  ``id``: axis
-      -  ``value``: value of the tick
-      -  ``text``: ``value`` converted to decimal or ``NULL`` for minor
-         ticks
-      -  ``line_dsc``,
-      -  ``label_dsc``,
-
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_chart_keys:
 
 Keys
 ****
@@ -280,10 +224,14 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_chart_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/chart/index.rst
+
+.. _lv_chart_api:
 
 API
 ***

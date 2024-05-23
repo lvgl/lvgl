@@ -14,8 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include <stdint.h>
-#include <stddef.h>
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -49,6 +48,24 @@ void * lv_memcpy(void * dst, const void * src, size_t len);
 void lv_memset(void * dst, uint8_t v, size_t len);
 
 /**
+ * @brief Move a block of memory from source to destination
+ * @param dst Pointer to the destination array where the content is to be copied.
+ * @param src Pointer to the source of data to be copied.
+ * @param len Number of bytes to copy
+ * @return Pointer to the destination array.
+ */
+void * lv_memmove(void * dst, const void * src, size_t len);
+
+/**
+ * @brief This function will compare two memory blocks
+ * @param p1 Pointer to the first memory block
+ * @param p2 Pointer to the second memory block
+ * @param len Number of bytes to compare
+ * @return The difference between the value of the first unmatching byte.
+ */
+int32_t lv_memcmp(const void * p1, const void * p2, size_t len);
+
+/**
  * Same as `memset(dst, 0x00, len)`.
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
@@ -66,11 +83,22 @@ static inline void lv_memzero(void * dst, size_t len)
 size_t lv_strlen(const char * str);
 
 /**
- * @brief Copies up to dest_size characters from the string pointed to by src to the character array pointed to by dst.
+ * @brief Copies up to dst_size-1 (non-null) characters from src to dst. A null terminator is always added.
  * @param dst Pointer to the destination array where the content is to be copied.
  * @param src Pointer to the source of data to be copied.
- * @param dest_size Maximum number of characters to be copied to dst, including the null character.
+ * @param dst_size Maximum number of characters to be copied to dst, including the null character.
+ * @return The length of src. The return value is equivalent to the value returned by lv_strlen(src)
+ */
+size_t lv_strlcpy(char * dst, const char * src, size_t dst_size);
+
+/**
+ * @brief Copies up to dest_size characters from the string pointed to by src to the character array pointed to by dst
+ *        and fills the remaining length with null bytes.
+ * @param dst Pointer to the destination array where the content is to be copied.
+ * @param src Pointer to the source of data to be copied.
+ * @param dest_size Maximum number of characters to be copied to dst.
  * @return A pointer to the destination array, which is dst.
+ * @note dst will not be null terminated if dest_size bytes were copied from src before the end of src was reached.
  */
 char * lv_strncpy(char * dst, const char * src, size_t dest_size);
 
@@ -84,11 +112,40 @@ char * lv_strncpy(char * dst, const char * src, size_t dest_size);
 char * lv_strcpy(char * dst, const char * src);
 
 /**
+ * @brief  This function will compare two strings without specified length.
+ * @param s1    pointer to the first string
+ * @param s2    pointer to the second string
+ * @return      the difference between the value of the first unmatching character.
+ */
+int32_t lv_strcmp(const char * s1, const char * s2);
+
+/**
  * @brief Duplicate a string by allocating a new one and copying the content.
  * @param src Pointer to the source of data to be copied.
  * @return A pointer to the new allocated string. NULL if failed.
  */
 char * lv_strdup(const char * src);
+
+/**
+ * @brief Copies the string pointed to by src, including the terminating null character,
+ *        to the end of the string pointed to by dst.
+ * @param dst Pointer to the destination string where the content is to be appended.
+ * @param src Pointer to the source of data to be copied.
+ * @return A pointer to the destination string, which is dst.
+ */
+char * lv_strcat(char * dst, const char * src);
+
+/**
+ * @brief Copies up to src_len characters from the string pointed to by src
+ *        to the end of the string pointed to by dst.
+ *        A terminating null character is appended to dst even if no null character
+ *        was encountered in src after src_len characters were copied.
+ * @param dst Pointer to the destination string where the content is to be appended.
+ * @param src Pointer to the source of data to be copied.
+ * @param src_len Maximum number of characters from src to be copied to the end of dst.
+ * @return A pointer to the destination string, which is dst.
+ */
+char * lv_strncat(char * dst, const char * src, size_t src_len);
 
 /**********************
  *      MACROS

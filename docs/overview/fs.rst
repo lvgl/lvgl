@@ -1,4 +1,4 @@
-.. _file-system:
+.. _overview_file_system:
 
 ===========
 File system
@@ -14,7 +14,7 @@ Ready to use drivers
 
 LVGL contains prepared drivers for the API of POSIX, standard C,
 Windows, and `FATFS <http://elm-chan.org/fsw/ff/00index_e.html>`__.
-Learn more `here </libs/fsdrv>`__.
+Learn more :ref:`here <libs_filesystem>`.
 
 Adding a driver
 ***************
@@ -109,8 +109,8 @@ The example below shows how to read from a file:
 
    lv_fs_close(&f);
 
-*The mode in :cpp:func:`lv_fs_open` can be :cpp:enumerator:`LV_FS_MODE_WR` to open for writes
-only or :cpp:enumerator:`LV_FS_MODE_RD` ``|`` :cpp:enumerator:`LV_FS_MODE_WR` for both*
+The mode in :cpp:func:`lv_fs_open` can be :cpp:enumerator:`LV_FS_MODE_WR` to open for writes
+only or :cpp:enumerator:`LV_FS_MODE_RD` ``|`` :cpp:enumerator:`LV_FS_MODE_WR` for both
 
 This example shows how to read a directory's content. It's up to the
 driver how to mark directories in the result but it can be a good
@@ -125,7 +125,7 @@ practice to insert a ``'/'`` in front of each directory name.
 
    char fn[256];
    while(1) {
-       res = lv_fs_dir_read(&dir, fn);
+       res = lv_fs_dir_read(&dir, fn, sizeof(fn));
        if(res != LV_FS_RES_OK) {
            my_error_handling();
            break;
@@ -144,7 +144,7 @@ practice to insert a ``'/'`` in front of each directory name.
 Use drives for images
 *********************
 
-`Image </widgets/img>`__ objects can be opened from files too (besides
+:ref:`Image <lv_image>` objects can be opened from files too (besides
 variables stored in the compiled program).
 
 To use files in image widgets the following callbacks are required:
@@ -154,6 +154,97 @@ To use files in image widgets the following callbacks are required:
 - read
 - seek
 - tell
+
+.. _overview_file_system_cache:
+
+Optional file buffering/caching
+*******************************
+
+Files will buffer their reads if the corresponding ``LV_FS_*_CACHE_SIZE``
+config option is set to a value greater than zero. Each open file will
+buffer up to that many bytes to reduce the number of FS driver calls.
+
+Generally speaking, file buffering can be optimized for different kinds
+of access patterns. The one implemented here is optimal for reading large
+files in chunks, which is what the image decoder does.
+It has the potential to call the driver's ``read`` fewer
+times than ``lv_fs_read`` is called. In the best case where the cache size is
+\>= the size of the file, ``read`` will only be called once. This strategy is good
+for linear reading of large files but less helpful for short random reads across a file bigger than the buffer
+since data will be buffered that will be discarded after the next seek and read.
+The cache should be sufficiently large or disabled in that case. Another case where the cache should be disabled
+is if the file contents are expected to change by an external factor like with special OS files.
+
+The implementation is documented below. Note that the FS functions make calls
+to other driver FS functions when the cache is enabled. i.e., ``lv_fs_read`` may call the driver's ``seek``
+so the driver needs to implement more callbacks when the cache is enabled.
+
+``lv_fs_read`` :sub:`(behavior when the cache is enabled)`
+-------------------------------------------------
+
+.. mermaid::
+   :zoom:
+
+   %%{init: {'theme':'neutral'}}%%
+   flowchart LR
+       A["call lv_fs_read and
+          the cache is enabled"] --> B{{"is there cached data
+                                         at the file position?"}}
+       B -->|yes| C{{"does the cache have
+                      all required bytes available?"}}
+       C -->|yes| D["copy all required bytes from
+                     the cache to the destination
+                     buffer"]
+       C -->|no| F["copy the available
+                    required bytes
+                    until the end of the cache
+                    into the destination buffer"]
+             --> G["seek the real file to the end
+                    of what the cache had available"]
+             --> H{{"is the number of remaining bytes
+                     larger than the size of the whole cache?"}}
+       H -->|yes| I["read the remaining bytes
+                     from the real file to the
+                     destination buffer"]
+       H -->|no| J["eagerly read the real file
+                    to fill the whole cache
+                    or as many bytes as the
+                    read call can"]
+             --> O["copy the required bytes
+                    to the destination buffer"]
+       B -->|no| K["seek the real file to
+                    the file position"]
+             --> L{{"is the number of required
+                     bytes greater than the
+                     size of the entire cache?"}}
+       L -->|yes| M["read the real file to
+                     the destination buffer"]
+       L -->|no| N["eagerly read the real file
+                    to fill the whole cache
+                    or as many bytes as the
+                    read call can"]
+             --> P["copy the required bytes
+                    to the destination buffer"]
+
+``lv_fs_write`` :sub:`(behavior when the cache is enabled)`
+--------------------------------------------------
+
+The part of the cache that coincides with the written content
+will be updated to reflect the written content.
+
+``lv_fs_seek`` :sub:`(behavior when the cache is enabled)`
+-------------------------------------------------
+
+The driver's ``seek`` will not actually be called unless the ``whence``
+is ``LV_FS_SEEK_END``, in which case ``seek`` and ``tell`` will be called
+to determine where the end of the file is.
+
+``lv_fs_tell`` :sub:`(behavior when the cache is enabled)`
+-------------------------------------------------
+
+The driver's ``tell`` will not actually be called.
+
+.. _overview_file_system_api:
 
 API
 ***

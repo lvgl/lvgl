@@ -27,8 +27,7 @@ lv_fragment_t * lv_fragment_create(const lv_fragment_class_t * cls, void * args)
     LV_ASSERT_NULL(cls);
     LV_ASSERT_NULL(cls->create_obj_cb);
     LV_ASSERT(cls->instance_size >= sizeof(lv_fragment_t));
-    lv_fragment_t * instance = lv_malloc(cls->instance_size);
-    lv_memzero(instance, cls->instance_size);
+    lv_fragment_t * instance = lv_malloc_zeroed(cls->instance_size);
     instance->cls = cls;
     instance->child_manager = lv_fragment_manager_create(instance);
     if(cls->constructor_cb) {
@@ -90,7 +89,7 @@ lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container
     lv_fragment_manager_create_obj(fragment->child_manager);
     if(states) {
         states->obj_created = true;
-        lv_obj_add_event(obj, cb_delete_assertion, LV_EVENT_DELETE, NULL);
+        lv_obj_add_event_cb(obj, cb_delete_assertion, LV_EVENT_DELETE, NULL);
     }
     if(cls->obj_created_cb) {
         cls->obj_created_cb(fragment, obj);

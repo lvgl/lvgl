@@ -44,7 +44,7 @@ typedef struct {
     uint32_t max_length;         /*The max. number of characters. 0: no limit*/
     uint32_t pwd_show_time;      /*Time to show characters in password mode before change them to '*'*/
     struct {
-        lv_coord_t valid_x;        /*Used when stepping up/down to a shorter line.
+        int32_t valid_x;        /*Used when stepping up/down to a shorter line.
                                     *(Used by the library)*/
         uint32_t pos;              /*The current cursor position
                                     *(0: before 1st letter; 1: before 2nd letter ...)*/
@@ -63,7 +63,7 @@ typedef struct {
     uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
 } lv_textarea_t;
 
-extern const lv_obj_class_t lv_textarea_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_textarea_class;
 
 enum {
     LV_PART_TEXTAREA_PLACEHOLDER = LV_PART_CUSTOM_FIRST,
@@ -86,7 +86,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * parent);
 
 /**
  * Insert a character to the current cursor position.
- * To add a wide char, e.g. 'Á' use `_lv_text_encoded_conv_wc('Á')`
+ * To add a wide char, e.g. 'Á' use `lv_text_encoded_conv_wc('Á')`
  * @param obj       pointer to a text area object
  * @param c         a character (e.g. 'a')
  */
@@ -204,7 +204,7 @@ void lv_textarea_set_text_selection(lv_obj_t * obj, bool en);
 void lv_textarea_set_password_show_time(lv_obj_t * obj, uint32_t time);
 
 /**
- * Deprecated: use the normal text_align style property instead
+ * @deprecated Use the normal text_align style property instead
  * Set the label's alignment.
  * It sets where the label is aligned (in one line mode it can be smaller than the text area)
  * and how the lines of the area align in case of multiline text area

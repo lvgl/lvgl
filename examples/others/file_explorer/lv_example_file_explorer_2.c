@@ -1,7 +1,7 @@
 
 #include "../../lv_examples.h"
 
-#if LV_USE_TABLE && LV_USE_FILE_EXPLORER && (LV_USE_FS_STDIO || LV_USE_FS_POSIX || LV_USE_FS_WIN32 || LV_USE_FS_FATFS) && LV_BUILD_EXAMPLES
+#if LV_USE_TABLE && LV_USE_DROPDOWN && LV_USE_FILE_EXPLORER && (LV_USE_FS_STDIO || LV_USE_FS_POSIX || LV_USE_FS_WIN32 || LV_USE_FS_FATFS) && LV_BUILD_EXAMPLES
 
 #include <stdlib.h>
 #include <string.h>
@@ -14,18 +14,8 @@ static void file_explorer_event_handler(lv_event_t * e)
     if(code == LV_EVENT_VALUE_CHANGED) {
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
         const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
-        uint16_t path_len = strlen(cur_path);
-        uint16_t fn_len = strlen(sel_fn);
 
-        if((path_len + fn_len) <= LV_FILE_EXPLORER_PATH_MAX_LEN) {
-            char file_info[LV_FILE_EXPLORER_PATH_MAX_LEN];
-
-            strcpy(file_info, cur_path);
-            strcat(file_info, sel_fn);
-
-            LV_LOG_USER("%s", file_info);
-        }
-        else    LV_LOG_USER("%s%s", cur_path, sel_fn);
+        LV_LOG_USER("%s%s", cur_path, sel_fn);
     }
 }
 
@@ -108,7 +98,7 @@ void lv_example_file_explorer_2(void)
 #endif
 #endif
 
-    lv_obj_add_event(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
 
     /*Quick access status control button*/
     lv_obj_t * fe_quick_access_obj = lv_file_explorer_get_quick_access_area(file_explorer);
@@ -123,7 +113,7 @@ void lv_example_file_explorer_2(void)
     lv_label_set_text(label, LV_SYMBOL_LIST);
     lv_obj_center(label);
 
-    lv_obj_add_event(btn, btn_event_handler, LV_EVENT_VALUE_CHANGED, fe_quick_access_obj);
+    lv_obj_add_event_cb(btn, btn_event_handler, LV_EVENT_VALUE_CHANGED, fe_quick_access_obj);
 
     /*Sort control*/
     static const char * opts = "NONE\n"
@@ -136,7 +126,7 @@ void lv_example_file_explorer_2(void)
     lv_dropdown_set_options_static(dd, opts);
     lv_obj_align(dd, LV_ALIGN_RIGHT_MID, 0, 0);
 
-    lv_obj_add_event(dd, dd_event_handler, LV_EVENT_VALUE_CHANGED, file_explorer);
+    lv_obj_add_event_cb(dd, dd_event_handler, LV_EVENT_VALUE_CHANGED, file_explorer);
 }
 
 #endif

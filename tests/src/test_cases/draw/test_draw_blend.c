@@ -41,7 +41,6 @@ static void canvas_basic_render(uint8_t * canvas_buf, lv_color_format_t render_c
     area.y2 = 25;
     lv_draw_label(&layer, &label_dsc, &area);
 
-
     lv_draw_rect_dsc_t rect_dsc;
     lv_draw_rect_dsc_init(&rect_dsc);
     rect_dsc.radius = 10;
@@ -53,8 +52,8 @@ static void canvas_basic_render(uint8_t * canvas_buf, lv_color_format_t render_c
     rect_dsc.outline_opa = LV_OPA_60;
     rect_dsc.shadow_color = lv_palette_main(LV_PALETTE_ORANGE);
     rect_dsc.shadow_width = 10;
-    rect_dsc.shadow_ofs_x = 5;
-    rect_dsc.shadow_ofs_y = 10;
+    rect_dsc.shadow_offset_x = 5;
+    rect_dsc.shadow_offset_y = 10;
 
     area.x1 = 10;
     area.x2 = 170;
@@ -88,11 +87,10 @@ static void canvas_basic_render(uint8_t * canvas_buf, lv_color_format_t render_c
     lv_obj_delete(canvas);
 }
 
-
 void canvas_blend_test(lv_obj_t  * canvas_large, lv_draw_image_dsc_t * img_dsc, const char * name_main,
                        const char * name_sub, lv_color_format_t small_render_cf, uint32_t idx)
 {
-    lv_image_dsc_t * img = (lv_image_dsc_t *)img_dsc->src;
+    lv_draw_buf_t * img = (lv_draw_buf_t *)img_dsc->src;
     img->header.cf = small_render_cf;
     img->header.stride = lv_draw_buf_width_to_stride(180, small_render_cf);
     canvas_basic_render((uint8_t *)img->data, small_render_cf, name_main, name_sub);
@@ -116,6 +114,8 @@ void canvas_blend_test(lv_obj_t  * canvas_large, lv_draw_image_dsc_t * img_dsc, 
     lv_canvas_init_layer(canvas_large, &layer);
     lv_draw_image(&layer, img_dsc, &area);
     lv_canvas_finish_layer(canvas_large, &layer);
+
+    lv_image_cache_drop(img);
 }
 
 static void canvas_draw(const char * name, lv_color_format_t large_render_cf)
@@ -124,17 +124,13 @@ static void canvas_draw(const char * name, lv_color_format_t large_render_cf)
 
     static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(180, 4) * 180 + LV_DRAW_BUF_ALIGN];
 
-
     static uint8_t canvas2_buf[CANVAS_WIDTH_TO_STRIDE(768, 4) * 390 + LV_DRAW_BUF_ALIGN];
     lv_obj_t * canvas2 = lv_canvas_create(lv_screen_active());
     lv_canvas_set_buffer(canvas2, lv_draw_buf_align(canvas2_buf, large_render_cf), 768, 390, large_render_cf);
     lv_canvas_fill_bg(canvas2, lv_palette_lighten(LV_PALETTE_BLUE_GREY, 2), LV_OPA_COVER);
 
-    lv_image_dsc_t img = { 0 };
-    img.header.w = 180;
-    img.header.h = 180;
-    img.header.always_zero = 0;
-    img.data = lv_draw_buf_align(canvas_buf, LV_COLOR_FORMAT_ARGB8888);
+    lv_draw_buf_t img;
+    lv_draw_buf_init(&img, 180, 180, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO, canvas_buf, sizeof(canvas_buf));
 
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);
@@ -155,18 +151,15 @@ void test_xrgb8888(void)
     canvas_draw("xrgb8888", LV_COLOR_FORMAT_XRGB8888);
 }
 
-
 void test_argb8888(void)
 {
     canvas_draw("argb8888", LV_COLOR_FORMAT_ARGB8888);
 }
 
-
 void test_rgb888(void)
 {
     canvas_draw("rgb888", LV_COLOR_FORMAT_RGB888);
 }
-
 
 void test_rgb565(void)
 {

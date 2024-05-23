@@ -1,0 +1,34 @@
+name: 'Close stale issues and PRs'
+on:
+  schedule:
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  stale:
+    if: github.repository == 'lvgl/lvgl'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.LVGL_BOT_TOKEN }}
+          stale-issue-message: |
+            We need some feedback on this issue.
+
+            Now we mark this as "stale" because there was no activity here for 14 days.
+
+            Remove the "stale" label or comment else this will be closed in 7 days.
+          stale-pr-message: |
+            We need some feedback on this pull request.
+
+            Now we mark this as "stale" because there was no activity here for 14 days.
+
+            Remove the "stale" label or comment else this will be closed in 7 days.
+          close-issue-message: |
+            As there was no activity here for a while we close this issue. But don't worry, the conversation is still here and you can get back to it at any time.
+
+            So feel free to comment if you have remarks or ideas on this topic.
+          days-before-stale: 14
+          days-before-close: 7
+          exempt-issue-labels: 'pinned, next major, next minor, shaping, ready for development'
+          exempt-pr-labels: 'pinned, next major, next minor'

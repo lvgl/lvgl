@@ -26,11 +26,14 @@ freely, subject to the following restrictions:
 #ifndef LODEPNG_H
 #define LODEPNG_H
 
-#include <string.h> /*for size_t*/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "../../../lvgl.h"
 #if LV_USE_LODEPNG
-extern const char * LODEPNG_VERSION_STRING;
+#include LV_STDDEF_INCLUDE /*for size_t*/
+LV_ATTRIBUTE_EXTERN_DATA extern const char * LODEPNG_VERSION_STRING;
 
 /*
 The following #defines are used to create code sections. They can be disabled
@@ -295,7 +298,7 @@ struct _LodePNGDecompressSettings {
     const void * custom_context; /*optional custom settings for custom functions*/
 };
 
-extern const LodePNGDecompressSettings lodepng_default_decompress_settings;
+LV_ATTRIBUTE_EXTERN_DATA extern const LodePNGDecompressSettings lodepng_default_decompress_settings;
 void lodepng_decompress_settings_init(LodePNGDecompressSettings * settings);
 #endif /*LODEPNG_COMPILE_DECODER*/
 
@@ -328,7 +331,7 @@ struct _LodePNGCompressSettings { /*deflate = compress*/
     const void * custom_context; /*optional custom settings for custom functions*/
 };
 
-extern const LodePNGCompressSettings lodepng_default_compress_settings;
+LV_ATTRIBUTE_EXTERN_DATA extern const LodePNGCompressSettings lodepng_default_compress_settings;
 void lodepng_compress_settings_init(LodePNGCompressSettings * settings);
 #endif /*LODEPNG_COMPILE_ENCODER*/
 
@@ -1091,6 +1094,10 @@ TODO:
 */
 
 #endif /*LV_USE_LODEPNG*/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /*LODEPNG_H inclusion guard*/
 

@@ -1,3 +1,6 @@
+.. _lv_checkbox:
+
+======================
 Checkbox (lv_checkbox)
 ======================
 
@@ -6,6 +9,8 @@ Overview
 
 The Checkbox object is created from a "tick box" and a label. When the
 Checkbox is clicked the tick box is toggled.
+
+.. _lv_checkbox_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -19,6 +24,8 @@ Parts and Styles
    box larger in the respective directions.
 
 The Checkbox is added to the default group (if it is set).
+
+.. _lv_checkbox_usage:
 
 Usage
 *****
@@ -43,28 +50,24 @@ common state add/clear function:
 .. code:: c
 
    lv_obj_add_state(cb, LV_STATE_CHECKED);   /*Make the checkbox checked*/
-   lv_obj_remove_state(cb, LV_STATE_CHECKED); /*MAke the checkbox unchecked*/
+   lv_obj_remove_state(cb, LV_STATE_CHECKED); /*Make the checkbox unchecked*/
    lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /*Make the checkbox checked and disabled*/
 
 To get whether the checkbox is checked or not use:
 :cpp:expr:`lv_obj_has_state(cb, LV_STATE_CHECKED)`.
 
+.. _lv_checkbox_events:
+
 Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the checkbox is toggled.
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following types:
 
-   -  :cpp:enumerator:`LV_CHECKBOX_DRAW_PART_BOX` The tickbox of the checkbox
-
-      -  ``part``: :cpp:enumerator:`LV_PART_INDICATOR`
-      -  ``draw_area``: the area of the tickbox
-      -  ``rect_dsc``
-
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_checkbox_keys:
 
 Keys
 ****
@@ -79,10 +82,14 @@ Note that, as usual, the state of :cpp:enumerator:`LV_KEY_ENTER` is translated t
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_checkbox_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/checkbox/index.rst
+
+.. _lv_checkboxapi:
 
 API
 ***

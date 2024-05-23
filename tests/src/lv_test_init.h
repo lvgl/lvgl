@@ -17,4 +17,3 @@ void lv_test_deinit(void);
 #endif
 
 #endif /*LV_TEST_INIT_H*/
-

@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
+#include "../misc/lv_types.h"
 #include "../misc/lv_event.h"
 #include "../indev/lv_indev.h"
 
@@ -24,9 +24,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-struct _lv_obj_t;
-struct _lv_obj_class_t;
 
 /**
  * Used as the event parameter of ::LV_EVENT_HIT_TEST to check if an `point` can click the object or not.
@@ -39,7 +36,6 @@ typedef struct {
     const lv_point_t * point;   /**< A point relative to screen to check if it can click the object or not*/
     bool res;                   /**< true: `point` can click the object; false: it cannot*/
 } lv_hit_test_info_t;
-
 
 /** Cover check results.*/
 typedef enum {
@@ -69,7 +65,7 @@ typedef struct {
  * @param param         arbitrary data depending on the widget type and the event. (Usually `NULL`)
  * @return LV_RESULT_OK: `obj` was not deleted in the event; LV_RESULT_INVALID: `obj` was deleted in the event_code
  */
-lv_result_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code, void * param);
+lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param);
 
 /**
  * Used by the widgets internally to call the ancestor widget types's event handler
@@ -77,7 +73,7 @@ lv_result_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code
  * @param e         pointer to the event descriptor
  * @return          LV_RESULT_OK: the target object was not deleted in the event; LV_RESULT_INVALID: it was deleted in the event_code
  */
-lv_result_t lv_obj_event_base(const struct _lv_obj_class_t * class_p, lv_event_t * e);
+lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e);
 
 /**
  * Get the current target of the event. It's the object which event handler being called.
@@ -85,34 +81,45 @@ lv_result_t lv_obj_event_base(const struct _lv_obj_class_t * class_p, lv_event_t
  * @param e     pointer to the event descriptor
  * @return      the target of the event_code
  */
-struct _lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e);
+lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e);
 
 /**
  * Get the object originally targeted by the event. It's the same even if the event is bubbled.
  * @param e     pointer to the event descriptor
  * @return      pointer to the original target of the event_code
  */
-struct _lv_obj_t * lv_event_get_target_obj(lv_event_t * e);
+lv_obj_t * lv_event_get_target_obj(lv_event_t * e);
 
 /**
  * Add an event handler function for an object.
  * Used by the user to react on event which happens with the object.
  * An object can have multiple event handler. They will be called in the same order as they were added.
  * @param obj       pointer to an object
- * @param filter    and event code (e.g. `LV_EVENT_CLICKED`) on which the event should be called. `LV_EVENT_ALL` can be sued the receive all the events.
+ * @param filter    an event code (e.g. `LV_EVENT_CLICKED`) on which the event should be called. `LV_EVENT_ALL` can be used to receive all the events.
  * @param event_cb  the new event function
  * @param           user_data custom data data will be available in `event_cb`
+ * @return          handler to the event. It can be used in `lv_obj_remove_event_dsc`.
  */
-void lv_obj_add_event(struct _lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
-                      void * user_data);
+lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 
-uint32_t lv_obj_get_event_count(struct _lv_obj_t * obj);
+uint32_t lv_obj_get_event_count(lv_obj_t * obj);
 
-lv_event_dsc_t * lv_obj_get_event_dsc(struct _lv_obj_t * obj, uint32_t index);
+lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index);
 
-bool lv_obj_remove_event(struct _lv_obj_t * obj, uint32_t index);
+bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index);
 
-bool lv_obj_remove_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb);
+bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
+
+bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc);
+
+/**
+ * Remove an event_cb with user_data
+ * @param obj           pointer to a obj
+ * @param event_cb      the event_cb of the event to remove
+ * @param user_data     user_data
+ * @return              the count of the event removed
+ */
+uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, void * user_data);
 
 /**
  * Get the input device passed as parameter to indev related events.
@@ -144,6 +151,13 @@ const lv_area_t * lv_event_get_old_size(lv_event_t * e);
 uint32_t lv_event_get_key(lv_event_t * e);
 
 /**
+ * Get the signed rotary encoder diff. passed as parameter to an event. Can be used in `LV_EVENT_ROTARY`
+ * @param e     pointer to an event
+ * @return      the triggering key or NULL if called on an unrelated event
+ */
+int32_t lv_event_get_rotary_diff(lv_event_t * e);
+
+/**
  * Get the animation descriptor of a scrolling. Can be used in `LV_EVENT_SCROLL_BEGIN`
  * @param e     pointer to an event
  * @return      the animation that will scroll the object. (can be modified as required)
@@ -155,7 +169,7 @@ lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e);
  * @param e     pointer to an event
  * @param size  The new extra draw size
  */
-void lv_event_set_ext_draw_size(lv_event_t * e, lv_coord_t size);
+void lv_event_set_ext_draw_size(lv_event_t * e, int32_t size);
 
 /**
  * Get a pointer to an `lv_point_t` variable in which the self size should be saved (width in `point->x` and height `point->y`).

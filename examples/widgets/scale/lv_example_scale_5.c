@@ -13,8 +13,8 @@ void lv_example_scale_5(void)
     lv_scale_set_total_tick_count(scale, 10);
     lv_scale_set_major_tick_every(scale, 5);
 
-    lv_scale_set_major_tick_length(scale, 10);
-    lv_scale_set_minor_tick_length(scale, 5);
+    lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);
+    lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 25, 35);
 
     static const char * custom_labels[3] = {"One", "Two", NULL};
@@ -23,7 +23,7 @@ void lv_example_scale_5(void)
     static lv_style_t indicator_style;
     lv_style_init(&indicator_style);
     /* Label style properties */
-    lv_style_set_text_font(&indicator_style, &lv_font_montserrat_14);
+    lv_style_set_text_font(&indicator_style, LV_FONT_DEFAULT);
     lv_style_set_text_color(&indicator_style, lv_color_hex(0xff00ff));
     /* Major tick properties */
     lv_style_set_line_color(&indicator_style, lv_color_hex(0x00ff00));
@@ -55,7 +55,7 @@ void lv_example_scale_5(void)
     lv_style_init(&section_minor_tick_style);
 
     /* Label style properties */
-    lv_style_set_text_font(&section_label_style, &lv_font_montserrat_14);
+    lv_style_set_text_font(&section_label_style, LV_FONT_DEFAULT);
     lv_style_set_text_color(&section_label_style, lv_color_hex(0xff0000));
     lv_style_set_text_letter_space(&section_label_style, 10);
     lv_style_set_text_opa(&section_label_style, LV_OPA_50);

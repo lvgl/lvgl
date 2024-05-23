@@ -13,10 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
 #include "lv_font.h"
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -58,7 +56,6 @@ typedef _lv_font_fmt_txt_cmap_type_t lv_font_fmt_txt_cmap_type_t;
 #else
 typedef uint8_t lv_font_fmt_txt_cmap_type_t;
 #endif /*DOXYGEN*/
-
 
 /**
  * Map codepoints to a `glyph_dsc`s
@@ -122,8 +119,8 @@ typedef struct {
     /*To get a kern value of two code points:
        1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
        2. for(i = 0; i < pair_cnt * 2; i += 2)
-             if(gylph_ids[i] == glyph_id_left &&
-                gylph_ids[i+1] == glyph_id_right)
+             if(glyph_ids[i] == glyph_id_left &&
+                glyph_ids[i+1] == glyph_id_right)
                  return values[i / 2];
      */
     const void * glyph_ids;
@@ -217,13 +214,11 @@ typedef struct {
 
 /**
  * Used as `get_glyph_bitmap` callback in lvgl's native font format if the font is uncompressed.
- * @param font              pointer to font
- * @param unicode_letter    a unicode letter whose bitmap should be get
- * @param bitmap_out        pointer to an array to store the output A8 bitmap
+ * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and format.
+ * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
  * @return pointer to an A8 bitmap (not necessarily bitmap_out) or NULL if `unicode_letter` not found
  */
-const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out);
-
+const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /**
  * Used as `get_glyph_dsc` callback in lvgl's native font format if the font is uncompressed.
@@ -236,7 +231,6 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
  */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next);
-
 
 /**********************
  *      MACROS

@@ -8,9 +8,11 @@
  *********************/
 
 #include "lv_font.h"
+#include "../misc/lv_text_private.h"
 #include "../misc/lv_utils.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_assert.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -40,10 +42,20 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter, uint8_t * buf_out)
+const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
+    const lv_font_t * font_p = g_dsc->resolved_font;
     LV_ASSERT_NULL(font_p);
-    return font_p->get_glyph_bitmap(font_p, letter, buf_out);
+    return font_p->get_glyph_bitmap(g_dsc, draw_buf);
+}
+
+void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
+{
+    const lv_font_t * font = g_dsc->resolved_font;
+
+    if(font != NULL && font->release_glyph) {
+        font->release_glyph(font, g_dsc);
+    }
 }
 
 bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
@@ -62,7 +74,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     dsc_out->resolved_font = NULL;
 
     while(f) {
-        bool found = f->get_glyph_dsc(f, dsc_out, letter, letter_next);
+        bool found = f->get_glyph_dsc(f, dsc_out, letter, f->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
         if(found) {
             if(!dsc_out->is_placeholder) {
                 dsc_out->resolved_font = f;
@@ -79,33 +91,26 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 
 #if LV_USE_FONT_PLACEHOLDER
     if(placeholder_font != NULL) {
-        placeholder_font->get_glyph_dsc(placeholder_font, dsc_out, letter, letter_next);
+        placeholder_font->get_glyph_dsc(placeholder_font, dsc_out, letter,
+                                        placeholder_font->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
         dsc_out->resolved_font = placeholder_font;
         return true;
     }
 #endif
 
-    if(letter < 0x20 ||
-       letter == 0xf8ff || /*LV_SYMBOL_DUMMY*/
-       letter == 0x200c) { /*ZERO WIDTH NON-JOINER*/
-        dsc_out->box_w = 0;
-        dsc_out->adv_w = 0;
-    }
-    else {
 #if LV_USE_FONT_PLACEHOLDER
-        dsc_out->box_w = font_p->line_height / 2;
-        dsc_out->adv_w = dsc_out->box_w + 2;
+    dsc_out->box_w = font_p->line_height / 2;
+    dsc_out->adv_w = dsc_out->box_w + 2;
 #else
-        dsc_out->box_w = 0;
-        dsc_out->adv_w = 0;
+    dsc_out->box_w = 0;
+    dsc_out->adv_w = 0;
 #endif
-    }
 
     dsc_out->resolved_font = NULL;
     dsc_out->box_h = font_p->line_height;
     dsc_out->ofs_x = 0;
     dsc_out->ofs_y = 0;
-    dsc_out->bpp   = 1;
+    dsc_out->format = LV_FONT_GLYPH_FORMAT_A1;
     dsc_out->is_placeholder = true;
 
     return false;
@@ -115,8 +120,18 @@ uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32
 {
     LV_ASSERT_NULL(font);
     lv_font_glyph_dsc_t g;
+
+    /*Return zero if letter is marker*/
+    if(lv_text_is_marker(letter)) return 0;
+
     lv_font_get_glyph_dsc(font, &g, letter, letter_next);
     return g.adv_w;
+}
+
+void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning)
+{
+    LV_ASSERT_NULL(font);
+    font->kerning = kerning;
 }
 
 /**********************

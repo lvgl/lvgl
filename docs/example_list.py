@@ -51,7 +51,7 @@ widgets = {
     "colorwheel": "Colorwheel",
     "dropdown": "Dropdown",
     "img": "Image",
-    "imgbtn": "Image button",
+    "imagebutton": "Image button",
     "keyboard": "Keyboard",
     "label": "Label",
     "led": "LED",
@@ -70,7 +70,7 @@ widgets = {
     "table": "Table",
     "tabview": "Tabview",
     "textarea": "Textarea",
-    "tileview": "Tabview",
+    "tileview": "Tileview",
     "win": "Window",
 }
 

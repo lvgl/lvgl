@@ -55,8 +55,8 @@ typedef struct {
     lv_obj_t * dropdown;
 } lv_dropdown_list_t;
 
-extern const  lv_obj_class_t lv_dropdown_class;
-extern const  lv_obj_class_t lv_dropdownlist_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdown_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdownlist_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -179,7 +179,7 @@ uint32_t lv_dropdown_get_selected(const lv_obj_t * obj);
  * @param obj       pointer to drop-down list object
  * @return          the total number of options in the list
  */
-uint32_t lv_dropdown_get_option_cnt(const lv_obj_t * obj);
+uint32_t lv_dropdown_get_option_count(const lv_obj_t * obj);
 
 /**
  * Get the current selected option as a string

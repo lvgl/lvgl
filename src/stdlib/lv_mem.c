@@ -42,7 +42,6 @@ void lv_free_core(void * p);
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p);
 lv_result_t lv_mem_test_core(void);
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -60,11 +59,6 @@ lv_result_t lv_mem_test_core(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Allocate a memory dynamically
- * @param size size of the memory to allocate in bytes
- * @return pointer to the allocated memory
- */
 void * lv_malloc(size_t size)
 {
     LV_TRACE_MEM("allocating %lu bytes", (unsigned long)size);
@@ -80,11 +74,11 @@ void * lv_malloc(size_t size)
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
         lv_mem_monitor_t mon;
         lv_mem_monitor(&mon);
-        LV_LOG_INFO("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d",
-                    (int)(mon.total_size - mon.free_size), mon.used_pct, mon.frag_pct,
-                    (int)mon.free_biggest_size);
-        return NULL;
+        LV_LOG_INFO("used: %zu (%3d %%), frag: %3d %%, biggest free: %zu",
+                    mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+                    mon.free_biggest_size);
 #endif
+        return NULL;
     }
 
 #if LV_MEM_ADD_JUNK
@@ -92,14 +86,36 @@ void * lv_malloc(size_t size)
 #endif
 
     LV_TRACE_MEM("allocated at %p", alloc);
-
     return alloc;
 }
 
-/**
- * Free an allocated data
- * @param data pointer to an allocated memory
- */
+void * lv_malloc_zeroed(size_t size)
+{
+    LV_TRACE_MEM("allocating %lu bytes", (unsigned long)size);
+    if(size == 0) {
+        LV_TRACE_MEM("using zero_mem");
+        return &zero_mem;
+    }
+
+    void * alloc = lv_malloc_core(size);
+    if(alloc == NULL) {
+        LV_LOG_INFO("couldn't allocate memory (%lu bytes)", (unsigned long)size);
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
+        lv_mem_monitor_t mon;
+        lv_mem_monitor(&mon);
+        LV_LOG_INFO("used: %zu (%3d %%), frag: %3d %%, biggest free: %zu",
+                    mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+                    mon.free_biggest_size);
+#endif
+        return NULL;
+    }
+
+    lv_memzero(alloc, size);
+
+    LV_TRACE_MEM("allocated at %p", alloc);
+    return alloc;
+}
+
 void lv_free(void * data)
 {
     LV_TRACE_MEM("freeing %p", data);
@@ -107,16 +123,8 @@ void lv_free(void * data)
     if(data == NULL) return;
 
     lv_free_core(data);
-
 }
 
-/**
- * Reallocate a memory with a new size. The old content will be kept.
- * @param data pointer to an allocated memory.
- * Its content will be copied to the new memory block and freed
- * @param new_size the desired new size in byte
- * @return pointer to the new memory
- */
 void * lv_realloc(void * data_p, size_t new_size)
 {
     LV_TRACE_MEM("reallocating %p with %lu size", data_p, (unsigned long)new_size);
@@ -151,7 +159,7 @@ lv_result_t lv_mem_test(void)
 
 void lv_mem_monitor(lv_mem_monitor_t * mon_p)
 {
-    lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
+    lv_memzero(mon_p, sizeof(lv_mem_monitor_t));
     lv_mem_monitor_core(mon_p);
 }
 

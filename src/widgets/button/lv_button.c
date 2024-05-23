@@ -8,12 +8,12 @@
  *********************/
 
 #include "lv_button.h"
-#if LV_USE_BTN != 0
+#if LV_USE_BUTTON != 0
 
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_button_class
+#define MY_CLASS (&lv_button_class)
 
 /**********************
  *      TYPEDEFS

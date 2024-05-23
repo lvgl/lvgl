@@ -13,10 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
-#include <stdint.h>
 #include "lv_types.h"
 #include "../lv_conf_internal.h"
+
+#include "lv_array.h"
 
 /*********************
  *      DEFINES
@@ -25,17 +25,14 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_event_t;
 
-typedef void (*lv_event_cb_t)(struct _lv_event_t * e);
-
+typedef void (*lv_event_cb_t)(lv_event_t * e);
 
 typedef struct {
     lv_event_cb_t cb;
     void * user_data;
     uint32_t filter;
 } lv_event_dsc_t;
-
 
 /**
  * Type of event being sent to the object.
@@ -56,17 +53,20 @@ typedef enum {
     LV_EVENT_SCROLL_THROW_BEGIN,
     LV_EVENT_SCROLL_END,          /**< Scrolling ends*/
     LV_EVENT_SCROLL,              /**< Scrolling*/
-    LV_EVENT_GESTURE,             /**< A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_get_act());` */
-    LV_EVENT_KEY,                 /**< A key is sent to the object. Get the key with `lv_indev_get_key(lv_indev_get_act());`*/
+    LV_EVENT_GESTURE,             /**< A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_active());` */
+    LV_EVENT_KEY,                 /**< A key is sent to the object. Get the key with `lv_indev_get_key(lv_indev_active());`*/
+    LV_EVENT_ROTARY,              /**< An encoder or wheel was rotated. Get the rotation count with `lv_event_get_rotary_diff(e);`*/
     LV_EVENT_FOCUSED,             /**< The object is focused*/
     LV_EVENT_DEFOCUSED,           /**< The object is defocused*/
     LV_EVENT_LEAVE,               /**< The object is defocused but still selected*/
     LV_EVENT_HIT_TEST,            /**< Perform advanced hit-testing*/
-    LV_EVENT_INDEV_RESET,         /**< Indev has been reseted*/
+    LV_EVENT_INDEV_RESET,         /**< Indev has been reset*/
+    LV_EVENT_HOVER_OVER,          /**< Indev hover over object*/
+    LV_EVENT_HOVER_LEAVE,         /**< Indev hover leave object*/
 
     /** Drawing events*/
     LV_EVENT_COVER_CHECK,        /**< Check if the object fully covers an area. The event parameter is `lv_cover_check_info_t *`.*/
-    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow). The event parameter is `lv_coord_t *` to store the size.*/
+    LV_EVENT_REFR_EXT_DRAW_SIZE, /**< Get the required extra draw area around the object (e.g. for shadow). The event parameter is `int32_t *` to store the size.*/
     LV_EVENT_DRAW_MAIN_BEGIN,    /**< Starting the main drawing phase*/
     LV_EVENT_DRAW_MAIN,          /**< Perform the main drawing*/
     LV_EVENT_DRAW_MAIN_END,      /**< Finishing the main drawing phase*/
@@ -83,6 +83,7 @@ typedef enum {
     LV_EVENT_CANCEL,              /**< A process has been cancelled */
 
     /** Other events*/
+    LV_EVENT_CREATE,              /**< Object is being created*/
     LV_EVENT_DELETE,              /**< Object is being deleted*/
     LV_EVENT_CHILD_CHANGED,       /**< Child was removed, added, or its size, position were changed */
     LV_EVENT_CHILD_CREATED,       /**< Child was created, always bubbles up to all parents*/
@@ -97,44 +98,40 @@ typedef enum {
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
     /** Events of optional LVGL components*/
-#if LV_USE_MSG
-    LV_EVENT_MSG_RECEIVED,
-#endif
-
     LV_EVENT_INVALIDATE_AREA,
-    LV_EVENT_RENDER_START,
-    LV_EVENT_RENDER_READY,
     LV_EVENT_RESOLUTION_CHANGED,
+    LV_EVENT_COLOR_FORMAT_CHANGED,
     LV_EVENT_REFR_REQUEST,
     LV_EVENT_REFR_START,
-    LV_EVENT_REFR_FINISH,
+    LV_EVENT_REFR_READY,
+    LV_EVENT_RENDER_START,
+    LV_EVENT_RENDER_READY,
     LV_EVENT_FLUSH_START,
     LV_EVENT_FLUSH_FINISH,
+    LV_EVENT_FLUSH_WAIT_START,
+    LV_EVENT_FLUSH_WAIT_FINISH,
 
-    _LV_EVENT_LAST,               /** Number of default events*/
+    LV_EVENT_VSYNC,
 
+    _LV_EVENT_LAST,                 /** Number of default events*/
 
-    LV_EVENT_PREPROCESS = 0x80,   /** This is a flag that can be set with an event so it's processed
+    LV_EVENT_PREPROCESS = 0x8000,   /** This is a flag that can be set with an event so it's processed
                                       before the class default event processing */
 } lv_event_code_t;
 
+typedef lv_array_t lv_event_list_t;
 
-typedef struct {
-    lv_event_dsc_t * dsc;
-    uint32_t cnt;
-} lv_event_list_t;
-
-typedef struct _lv_event_t {
+struct _lv_event_t {
     void * current_target;
     void * original_target;
     lv_event_code_t code;
     void * user_data;
     void * param;
-    struct _lv_event_t * prev;
+    lv_event_t * prev;
     uint8_t deleted : 1;
     uint8_t stop_processing : 1;
     uint8_t stop_bubbling : 1;
-} lv_event_t;
+};
 
 /**
  * @brief Event callback.
@@ -152,7 +149,8 @@ void _lv_event_pop(lv_event_t * e);
 
 lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
 
-void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
+lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
+bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc);
 
 uint32_t lv_event_get_count(lv_event_list_t * list);
 

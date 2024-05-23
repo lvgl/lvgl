@@ -6,7 +6,7 @@
 
 static void obj_set_height_helper(void * obj, int32_t height)
 {
-    lv_obj_set_height((lv_obj_t *)obj, (lv_coord_t)height);
+    lv_obj_set_height((lv_obj_t *)obj, (int32_t)height);
 }
 
 void test_gradient_vertical_misalignment(void)
@@ -27,8 +27,8 @@ void test_gradient_vertical_misalignment(void)
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
     lv_anim_set_exec_cb(&a, obj_set_height_helper);
-    lv_anim_set_time(&a, 1000);
-    lv_anim_set_playback_time(&a, 1000);
+    lv_anim_set_duration(&a, 1000);
+    lv_anim_set_playback_duration(&a, 1000);
     lv_anim_set_repeat_count(&a, 100);
     lv_anim_set_values(&a, 0, 300);
     lv_anim_start(&a);
@@ -115,6 +115,29 @@ void test_style_replacement(void)
 
     lv_style_reset(&style_red);
     lv_style_reset(&style_blue);
+}
+
+void test_style_has_prop(void)
+{
+    lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_outline_color(&style, lv_color_white());
+
+    /*Create object with style*/
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+
+    TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_COLOR));
+    TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_WIDTH));
+    TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_INDICATOR, LV_STYLE_OUTLINE_COLOR));
+
+    lv_obj_add_style(obj, &style, LV_PART_MAIN);
+    lv_obj_set_style_outline_width(obj, 2, LV_PART_MAIN);
+
+    TEST_ASSERT_EQUAL(true, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_COLOR));
+    TEST_ASSERT_EQUAL(true, lv_obj_has_style_prop(obj, LV_PART_MAIN, LV_STYLE_OUTLINE_WIDTH));
+    TEST_ASSERT_EQUAL(false, lv_obj_has_style_prop(obj, LV_PART_INDICATOR, LV_STYLE_OUTLINE_COLOR));
+
+    lv_style_reset(&style);
 }
 
 #endif

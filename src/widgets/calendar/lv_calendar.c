@@ -18,7 +18,7 @@
 #define LV_CALENDAR_CTRL_TODAY      LV_BUTTONMATRIX_CTRL_CUSTOM_1
 #define LV_CALENDAR_CTRL_HIGHLIGHT  LV_BUTTONMATRIX_CTRL_CUSTOM_2
 
-#define MY_CLASS &lv_calendar_class
+#define MY_CLASS (&lv_calendar_class)
 
 /**********************
  *      TYPEDEFS
@@ -28,12 +28,19 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void draw_part_begin_event_cb(lv_event_t * e);
+static void draw_task_added_event_cb(lv_event_t * e);
 
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
 static uint8_t get_month_length(int32_t year, int32_t month);
 static uint8_t is_leap_year(uint32_t year);
 static void highlight_update(lv_obj_t * calendar);
+
+#if LV_USE_CALENDAR_CHINESE
+static lv_calendar_date_t gregorian_get_last_month_time(lv_calendar_date_t * time);
+static lv_calendar_date_t gregorian_get_next_month_time(lv_calendar_date_t * time);
+static void chinese_calendar_set_day_name(lv_obj_t * calendar, uint8_t index, uint8_t day,
+                                          lv_calendar_date_t * gregorian_time);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -133,18 +140,54 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
     uint8_t act_mo_len = get_month_length(d.year, d.month);
     uint8_t day_first = get_day_of_week(d.year, d.month, 1);
     uint8_t c;
+
+#if LV_USE_CALENDAR_CHINESE
+    lv_calendar_date_t gregorian_time;
+    gregorian_time = d;
+#endif
+
     for(i = day_first, c = 1; i < act_mo_len + day_first; i++, c++) {
-        lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
+#if LV_USE_CALENDAR_CHINESE
+        if(calendar->use_chinese_calendar) {
+            gregorian_time.day = c;
+            chinese_calendar_set_day_name(obj, i, c, &gregorian_time);
+        }
+        else
+#endif
+            lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
     }
 
     uint8_t prev_mo_len = get_month_length(d.year, d.month - 1);
+
+#if LV_USE_CALENDAR_CHINESE
+    gregorian_time = gregorian_get_last_month_time(&d);
+#endif
+
     for(i = 0, c = prev_mo_len - day_first + 1; i < day_first; i++, c++) {
-        lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
+#if LV_USE_CALENDAR_CHINESE
+        if(calendar->use_chinese_calendar) {
+            gregorian_time.day = c;
+            chinese_calendar_set_day_name(obj, i, c, &gregorian_time);
+        }
+        else
+#endif
+            lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
         lv_buttonmatrix_set_button_ctrl(calendar->btnm, i + 7, LV_BUTTONMATRIX_CTRL_DISABLED);
     }
 
+#if LV_USE_CALENDAR_CHINESE
+    gregorian_time = gregorian_get_next_month_time(&d);
+#endif
+
     for(i = day_first + act_mo_len, c = 1; i < 6 * 7; i++, c++) {
-        lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
+#if LV_USE_CALENDAR_CHINESE
+        if(calendar->use_chinese_calendar) {
+            gregorian_time.day = c;
+            chinese_calendar_set_day_name(obj, i, c, &gregorian_time);
+        }
+        else
+#endif
+            lv_snprintf(calendar->nums[i], sizeof(calendar->nums[0]), "%d", c);
         lv_buttonmatrix_set_button_ctrl(calendar->btnm, i + 7, LV_BUTTONMATRIX_CTRL_DISABLED);
     }
 
@@ -159,7 +202,7 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
 
     /* The children of the calendar are probably headers.
      * Notify them to let the headers updated to the new date*/
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(child == calendar->btnm) continue;
@@ -234,7 +277,6 @@ lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_
     return LV_RESULT_OK;
 }
 
-
 /**********************
  *  STATIC FUNCTIONS
  **********************/
@@ -246,15 +288,13 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     /*Initialize the allocated 'ext'*/
 
-#if LV_WIDGETS_HAS_DEFAULT_VALUE
-    calendar->today.year  = 2020;
+    calendar->today.year  = 2024;
     calendar->today.month = 1;
     calendar->today.day   = 1;
 
-    calendar->showed_date.year  = 2020;
+    calendar->showed_date.year  = 2024;
     calendar->showed_date.month = 1;
     calendar->showed_date.day   = 1;
-#endif
 
     calendar->highlighted_dates      = NULL;
     calendar->highlighted_dates_num  = 0;
@@ -281,53 +321,57 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     calendar->btnm = lv_buttonmatrix_create(obj);
     lv_buttonmatrix_set_map(calendar->btnm, calendar->map);
     lv_buttonmatrix_set_button_ctrl_all(calendar->btnm, LV_BUTTONMATRIX_CTRL_CLICK_TRIG | LV_BUTTONMATRIX_CTRL_NO_REPEAT);
-    lv_obj_add_event(calendar->btnm, draw_part_begin_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(calendar->btnm, draw_task_added_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_set_width(calendar->btnm, lv_pct(100));
+    lv_obj_add_flag(calendar->btnm, LV_OBJ_FLAG_EVENT_BUBBLE | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);
 
-#if LV_WIDGETS_HAS_DEFAULT_VALUE
+    lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+
     lv_calendar_set_showed_date(obj, calendar->showed_date.year, calendar->showed_date.month);
     lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, calendar->today.day);
-#endif
-
-    lv_obj_add_flag(calendar->btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 }
 
-static void draw_part_begin_event_cb(lv_event_t * e)
+static void draw_task_added_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_draw_task_t * draw_task = lv_event_get_param(e);
-    if(draw_task->type != LV_DRAW_TASK_TYPE_FILL) return;
+    if(((lv_draw_dsc_base_t *)draw_task->draw_dsc)->part != LV_PART_ITEMS) return;
 
-    lv_draw_rect_dsc_t * rect_draw_dsc;
-    rect_draw_dsc = draw_task->draw_dsc;
+    lv_draw_fill_dsc_t * fill_draw_dsc = lv_draw_task_get_fill_dsc(draw_task);
+    lv_draw_border_dsc_t * border_draw_dsc = lv_draw_task_get_border_dsc(draw_task);
 
-    if(rect_draw_dsc->base.part == LV_PART_ITEMS) {
-        /*Day name styles*/
-        if(rect_draw_dsc->base.id1 < 7) {
-            rect_draw_dsc->bg_opa = LV_OPA_TRANSP;
-            rect_draw_dsc->border_opa = LV_OPA_TRANSP;
-        }
-        else if(lv_buttonmatrix_has_button_ctrl(obj, rect_draw_dsc->base.id1, LV_BUTTONMATRIX_CTRL_DISABLED)) {
-            rect_draw_dsc->bg_opa = LV_OPA_TRANSP;
-            rect_draw_dsc->border_opa = LV_OPA_TRANSP;
-        }
+    if(!fill_draw_dsc && !border_draw_dsc) {
+        return;
+    }
 
-        if(lv_buttonmatrix_has_button_ctrl(obj, rect_draw_dsc->base.id1, LV_CALENDAR_CTRL_HIGHLIGHT)) {
-            rect_draw_dsc->bg_opa = LV_OPA_40;
-            rect_draw_dsc->bg_color = lv_theme_get_color_primary(obj);
-            if(lv_buttonmatrix_get_selected_button(obj) == rect_draw_dsc->base.id1) {
-                rect_draw_dsc->bg_opa = LV_OPA_70;
-            }
-        }
+    int32_t id = ((lv_draw_dsc_base_t *)draw_task->draw_dsc)->id1;
 
-        if(lv_buttonmatrix_has_button_ctrl(obj, rect_draw_dsc->base.id1, LV_CALENDAR_CTRL_TODAY)) {
-            rect_draw_dsc->border_opa = LV_OPA_COVER;
-            rect_draw_dsc->border_color = lv_theme_get_color_primary(obj);
-            rect_draw_dsc->border_width += 1;
+    /*Day name styles*/
+    if(id < 7) {
+        if(fill_draw_dsc) fill_draw_dsc->opa = LV_OPA_TRANSP;
+        if(border_draw_dsc) border_draw_dsc->opa = LV_OPA_TRANSP;
+    }
+    else if(lv_buttonmatrix_has_button_ctrl(obj, id, LV_BUTTONMATRIX_CTRL_DISABLED)) {
+        if(fill_draw_dsc) fill_draw_dsc->opa = LV_OPA_TRANSP;
+        if(border_draw_dsc) border_draw_dsc->opa = LV_OPA_TRANSP;
+    }
+
+    if(lv_buttonmatrix_has_button_ctrl(obj, id, LV_CALENDAR_CTRL_HIGHLIGHT)) {
+        if(border_draw_dsc) border_draw_dsc->color = lv_theme_get_color_primary(obj);
+        if(fill_draw_dsc) fill_draw_dsc->opa = LV_OPA_40;
+        if(fill_draw_dsc) fill_draw_dsc->color = lv_theme_get_color_primary(obj);
+        if(lv_buttonmatrix_get_selected_button(obj) == (uint32_t)id) {
+            if(fill_draw_dsc) fill_draw_dsc->opa = LV_OPA_70;
         }
+    }
+
+    if(lv_buttonmatrix_has_button_ctrl(obj, id, LV_CALENDAR_CTRL_TODAY)) {
+        if(border_draw_dsc) border_draw_dsc->opa = LV_OPA_COVER;
+        if(border_draw_dsc) border_draw_dsc->color = lv_theme_get_color_primary(obj);
+        if(border_draw_dsc) border_draw_dsc->width += 1;
     }
 }
 
@@ -408,5 +452,50 @@ static void highlight_update(lv_obj_t * obj)
         lv_buttonmatrix_set_button_ctrl(calendar->btnm, calendar->today.day - 1 + day_first + 7, LV_CALENDAR_CTRL_TODAY);
     }
 }
+
+#if LV_USE_CALENDAR_CHINESE
+
+static lv_calendar_date_t gregorian_get_last_month_time(lv_calendar_date_t * time)
+{
+    lv_calendar_date_t last_month_time;
+    if(time->month == 1) {
+        last_month_time.month = 12;
+        last_month_time.year = time->year - 1;
+    }
+    else {
+        last_month_time.month = time->month - 1;
+        last_month_time.year = time->year;
+    }
+    return last_month_time;
+}
+
+static lv_calendar_date_t gregorian_get_next_month_time(lv_calendar_date_t * time)
+{
+    lv_calendar_date_t next_month_time;
+    if(time->month == 12) {
+        next_month_time.month = 1;
+        next_month_time.year = time->year + 1;
+    }
+    else {
+        next_month_time.month = time->month + 1;
+        next_month_time.year = time->year;
+    }
+    return next_month_time;
+}
+
+static void chinese_calendar_set_day_name(lv_obj_t * obj, uint8_t index, uint8_t day,
+                                          lv_calendar_date_t * gregorian_time)
+{
+    lv_calendar_t * calendar = (lv_calendar_t *)obj;
+    const char * day_name = lv_calendar_get_day_name(gregorian_time);
+    if(day_name != NULL)
+        lv_snprintf(calendar->nums[index], sizeof(calendar->nums[0]),
+                    "%d\n%s",
+                    day,
+                    day_name);
+    else
+        lv_snprintf(calendar->nums[index], sizeof(calendar->nums[0]), "%d", day);
+}
+#endif
 
 #endif  /*LV_USE_CALENDAR*/

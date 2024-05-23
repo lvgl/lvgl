@@ -7,35 +7,39 @@ import sys
 props = [
 {'section': 'Size and position', 'dsc':'Properties related to size, position, alignment and layout of the objects.' },
 {'name': 'WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':'Widget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' , 'default':'Widget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the width of object. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'MIN_WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets a minimal width. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'MAX_WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':'LV_COORD_MAX', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' , 'default':'LV_COORD_MAX', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets a maximal width. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'HEIGHT',
- 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':'Widget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' , 'default':'Widget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the height of object. Pixel, percentage and `LV_SIZE_CONTENT` can be used. Percentage values are relative to the height of the parent's content area."},
 
 {'name': 'MIN_HEIGHT',
- 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets a minimal height. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'MAX_HEIGHT',
- 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':'LV_COORD_MAX', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' , 'default':'LV_COORD_MAX', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets a maximal height. Pixel and percentage values can be used. Percentage values are relative to the height of the parent's content area."},
 
+{'name': 'LENGTH',
+ 'style_type': 'num',   'var_type': 'int32_t' , 'default':'0', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'dsc': "Its meaning depends on the type of the widget. For example in case of lv_scale it means the length of the ticks."},
+
 {'name': 'X',
- 'style_type': 'num',   'var_type': 'lv_coord_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the X coordinate of the object considering the set `align`. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'Y',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the Y coordinate of the object considering the set `align`. Pixel and percentage values can be used. Percentage values are relative to the height of the parent's content area."},
 
 {'name': 'ALIGN',
@@ -43,77 +47,89 @@ props = [
  'dsc': "Set the alignment which tells from which point of the parent the X and Y coordinates should be interpreted. The possible values are: `LV_ALIGN_DEFAULT`, `LV_ALIGN_TOP_LEFT/MID/RIGHT`, `LV_ALIGN_BOTTOM_LEFT/MID/RIGHT`, `LV_ALIGN_LEFT/RIGHT_MID`, `LV_ALIGN_CENTER`. `LV_ALIGN_DEFAULT` means `LV_ALIGN_TOP_LEFT` with LTR base direction and `LV_ALIGN_TOP_RIGHT` with RTL base direction."},
 
 {'name': 'TRANSFORM_WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Make the object wider on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
 
 {'name': 'TRANSFORM_HEIGHT',
-  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Make the object higher on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
 
 {'name': 'TRANSLATE_X',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Move the object with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
 
 {'name': 'TRANSLATE_Y',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
 
-{'name': 'TRANSFORM_SCALE',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom an objects. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+{'name': 'TRANSFORM_SCALE_X',
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
+ 'dsc': "Zoom an objects horizontally. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+
+{'name': 'TRANSFORM_SCALE_Y',
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
+ 'dsc': "Zoom an objects vertically. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
 
 {'name': 'TRANSFORM_ROTATION',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
  'dsc': "Rotate an objects. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
 
 {'name': 'TRANSFORM_PIVOT_X',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the pivot point's X coordinate for transformations. Relative to the object's top left corner'"},
 
 {'name': 'TRANSFORM_PIVOT_Y',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the pivot point's Y coordinate for transformations. Relative to the object's top left corner'"},
+
+{'name': 'TRANSFORM_SKEW_X',
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
+ 'dsc': "Skew an object horizontally. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
+
+{'name': 'TRANSFORM_SKEW_Y',
+  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
+  'dsc': "Skew an object vertically. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
 
 {'section': 'Padding', 'dsc' : "Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML."},
 {'name': 'PAD_TOP',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding on the top. It makes the content area smaller in this direction."},
 
 {'name': 'PAD_BOTTOM',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding on the bottom. It makes the content area smaller in this direction."},
 
 {'name': 'PAD_LEFT',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding on the left. It makes the content area smaller in this direction."},
 
 {'name': 'PAD_RIGHT',
-  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+  'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding on the right. It makes the content area smaller in this direction."},
 
 {'name': 'PAD_ROW',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding between the rows. Used by the layouts."},
 
 {'name': 'PAD_COLUMN',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding between the columns. Used by the layouts."},
 
 {'section': 'Margin', 'dsc' : "Properties to describe spacing around an object. Very similar to the margin properties in HTML."},
 {'name': 'MARGIN_TOP',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the margin on the top. The object will keep this space from its siblings in layouts. "},
 
 {'name': 'MARGIN_BOTTOM',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the margin on the bottom. The object will keep this space from its siblings in layouts."},
 
 {'name': 'MARGIN_LEFT',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the margin on the left. The object will keep this space from its siblings in layouts."},
 
 {'name': 'MARGIN_RIGHT',
-  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+  'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the margin on the right. The object will keep this space from its siblings in layouts."},
 
 {'section': 'Background', 'dsc':'Properties to describe the background color and image of the objects.' },
@@ -134,20 +150,24 @@ props = [
  'dsc': "Set the direction of the gradient of the background. The possible values are `LV_GRAD_DIR_NONE/HOR/VER`."},
 
 {'name': 'BG_MAIN_STOP',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the point from which the background color should start for gradients. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
 
 {'name': 'BG_GRAD_STOP',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the point from which the background's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
+
+{'name': 'BG_MAIN_OPA',
+ 'style_type': 'num',   'var_type': 'lv_opa_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the opacity of the first gradient color"},
+
+{'name': 'BG_GRAD_OPA',
+ 'style_type': 'num',   'var_type': 'lv_opa_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the opacity of the second gradient color"},
 
 {'name': 'BG_GRAD',
  'style_type': 'ptr',   'var_type': 'const lv_grad_dsc_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the gradient definition. The pointed instance must exist while the object is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors too."},
-
-{'name': 'BG_DITHER_MODE',
- 'style_type': 'num',   'var_type': 'lv_dither_mode_t',  'default':'`LV_DITHER_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the dithering mode of the gradient of the background. The possible values are `LV_DITHER_NONE/ORDERED/ERR_DIFF`."},
+ 'dsc': "Set the gradient definition. The pointed instance must exist while the object is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors too. If it's set other gradient related properties will be ignored'"},
 
 {'name': 'BG_IMAGE_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
@@ -179,7 +199,7 @@ props = [
  'dsc': "Set the opacity of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'BORDER_WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the width of the border. Only pixel values can be used."},
 
 {'name': 'BORDER_SIDE',
@@ -192,7 +212,7 @@ props = [
 
 {'section': 'Outline', 'dsc':'Properties to describe the outline. It\'s like a border but drawn outside of the rectangles.' },
 {'name': 'OUTLINE_WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set the width of the outline in pixels. "},
 
 {'name': 'OUTLINE_COLOR',
@@ -204,24 +224,24 @@ props = [
  'dsc': "Set the opacity of the outline. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'OUTLINE_PAD',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set the padding of the outline, i.e. the gap between object and the outline."},
 
 {'section': 'Shadow', 'dsc':'Properties to describe the shadow drawn under the rectangles.' },
 {'name': 'SHADOW_WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set the width of the shadow in pixels. The value should be >= 0."},
 
-{'name': 'SHADOW_OFS_X',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+{'name': 'SHADOW_OFFSET_X',
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set an offset on the shadow in pixels in X direction. "},
 
-{'name': 'SHADOW_OFS_Y',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+{'name': 'SHADOW_OFFSET_Y',
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set an offset on the shadow in pixels in Y direction. "},
 
 {'name': 'SHADOW_SPREAD',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Make the shadow calculation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller"},
 
 {'name': 'SHADOW_COLOR',
@@ -247,15 +267,15 @@ props = [
 
 {'section': 'Line', 'dsc':'Properties to describe line-like objects' },
 {'name': 'LINE_WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set the width of the lines in pixel."},
 
 {'name': 'LINE_DASH_WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the width of dashes in pixel. Note that dash works only on horizontal and vertical lines"},
 
 {'name': 'LINE_DASH_GAP',
- 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the gap between dashes in pixel. Note that dash works only on horizontal and vertical lines"},
 
 {'name': 'LINE_ROUNDED',
@@ -272,7 +292,7 @@ props = [
 
 {'section': 'Arc', 'dsc':'TODO' },
 {'name': 'ARC_WIDTH',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set the width (thickness) of the arcs in pixel."},
 
 {'name': 'ARC_ROUNDED',
@@ -305,11 +325,11 @@ props = [
  'dsc': "Set the font of the text (a pointer `lv_font_t *`). "},
 
 {'name': 'TEXT_LETTER_SPACE',
-'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
+'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the letter space in pixels"},
 
 {'name': 'TEXT_LINE_SPACE',
- 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the line space in pixels."},
 
 {'name': 'TEXT_DECOR',
@@ -322,7 +342,7 @@ props = [
 
 {'section': 'Miscellaneous', 'dsc':'Mixed properties for various purposes.' },
 {'name': 'RADIUS',
- 'style_type': 'num', 'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'num', 'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius"},
 
 {'name': 'CLIP_CORNER',
@@ -349,13 +369,9 @@ props = [
  'style_type': 'ptr',   'var_type': 'const lv_anim_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "The animation template for the object's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
 
-{'name': 'ANIM_TIME',
+{'name': 'ANIM_DURATION',
  'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
-
-{'name': 'ANIM_SPEED',
- 'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "The animation speed in pixel/sec. Its meaning is widget specific. E.g. scroll speed of label. See the widgets' documentation to learn more."},
+ 'dsc': "The animation duration in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
 
 {'name': 'TRANSITION',
  'style_type': 'ptr',   'var_type': 'const lv_style_transition_dsc_t *' ,  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -373,9 +389,15 @@ props = [
  'style_type': 'num',   'var_type': 'lv_base_dir_t', 'default':'`LV_BASE_DIR_AUTO`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
 
+{'name': 'BITMAP_MASK_SRC',
+ 'style_type': 'ptr',   'var_type': 'const void *', 'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "If set a layer will be created for the widget and the layer will be masked with this A8 bitmap mask."},
 
+{'name': 'ROTARY_SENSITIVITY',
+ 'style_type': 'num',   'var_type': 'uint32_t', 'default':'`256`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Adjust the sensitivity for rotary encoders in 1/256 unit. It means, 128: slow down the rotary to half, 512: speeds up to double, 256: no change"},
 
-{'section': 'Flex', 'dsc':'Flex layout properties.' },
+{'section': 'Flex', 'dsc':'Flex layout properties.',  'guard':'LV_USE_FLEX'},
 
 
 {'name': 'FLEX_FLOW',
@@ -403,11 +425,11 @@ props = [
 
 
 
-{'section': 'Grid', 'dsc':'Grid layout properties.' },
+{'section': 'Grid', 'dsc':'Grid layout properties.', 'guard':'LV_USE_GRID'},
 
 
 {'name': 'GRID_COLUMN_DSC_ARRAY',
- 'style_type': 'ptr',   'var_type': 'const lv_coord_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'ptr',   'var_type': 'const int32_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "An array to describe the columns of the grid. Should be LV_GRID_TEMPLATE_LAST terminated"},
 
 {'name': 'GRID_COLUMN_ALIGN',
@@ -416,7 +438,7 @@ props = [
 
 
 {'name': 'GRID_ROW_DSC_ARRAY',
- 'style_type': 'ptr',   'var_type': 'const lv_coord_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'ptr',   'var_type': 'const int32_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "An array to describe the rows of the grid. Should be LV_GRID_TEMPLATE_LAST terminated"},
 
 {'name': 'GRID_ROW_ALIGN',
@@ -424,7 +446,7 @@ props = [
  'dsc': "Defines how to distribute the rows."},
 
 {'name': 'GRID_CELL_COLUMN_POS',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the column in which the object should be placed"},
 
 {'name': 'GRID_CELL_X_ALIGN',
@@ -432,11 +454,11 @@ props = [
  'dsc': "Set how to align the object horizontally."},
 
 {'name': 'GRID_CELL_COLUMN_SPAN',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set how many columns the object should span. Needs to be >= 1"},
 
 {'name': 'GRID_CELL_ROW_POS',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the row in which the object should be placed"},
 
 {'name': 'GRID_CELL_Y_ALIGN',
@@ -444,7 +466,7 @@ props = [
  'dsc': "Set how to align the object vertically."},
 
 {'name': 'GRID_CELL_ROW_SPAN',
- 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'style_type': 'num',   'var_type': 'int32_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set how many rows the object should span. Needs to be >= 1"},
 ]
 
@@ -460,7 +482,7 @@ def obj_style_get(p):
   if 'section' in p: return
 
   cast = style_get_cast(p['style_type'], p['var_type'])
-  print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const struct _lv_obj_t * obj, uint32_t part)")
+  print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const lv_obj_t * obj, lv_part_t part)")
   print("{")
   print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
   print("    return " + cast + "v." + p['style_type'] + ";")
@@ -468,7 +490,7 @@ def obj_style_get(p):
   print("")
 
   if 'filtered' in p and p['filtered']:
-    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const struct _lv_obj_t * obj, uint32_t part)")
+    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const lv_obj_t * obj, lv_part_t part)")
     print("{")
     print("    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
     print("    return " + cast + "v." + p['style_type'] + ";")
@@ -504,7 +526,7 @@ def style_set_h(p):
   if 'section' in p: return
 
   print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value);")
-  print("extern const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + ";")
+  print("LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + ";")
 
 
 def local_style_set_c(p):
@@ -512,7 +534,7 @@ def local_style_set_c(p):
 
   cast = style_set_cast(p['style_type'])
   print("")
-  print("void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
+  print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector)")
   print("{")
   print("    lv_style_value_t v = {")
   print("        ." + p['style_type'] +" = " + cast + "value")
@@ -523,7 +545,7 @@ def local_style_set_c(p):
 
 def local_style_set_h(p):
   if 'section' in p: return
-  print("void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector);")
+  print("void lv_obj_set_style_" + p['name'].lower() + "(lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector);")
 
 
 def style_const_set(p):
@@ -540,7 +562,9 @@ def style_const_set(p):
 def docs(p):
   if "section" in p:
     print("")
-    print("## " + p['section'])
+    print(p['section'])
+    print("-" * len(p['section']))
+    print("")
     print(p['dsc'])
     return
 
@@ -557,21 +581,41 @@ def docs(p):
   e = "No"
   if p["ext_draw"]: e = "Yes"
 
-  li_style = "style='display:inline; margin-right: 20px; margin-left: 0px"
+  li_style = "style='display:inline-block; margin-right: 20px; margin-left: 0px"
 
   dsc = p['dsc']
 
   print("")
-  print("### " + p["name"].lower())
+  print(p["name"].lower())
+  print("~" * len(p["name"].lower()))
+  print("")
   print(dsc)
 
-  print("<ul>")
-  print("<li " + li_style + "'><strong>Default</strong> " + d + "</li>")
-  print("<li " + li_style + "'><strong>Inherited</strong> " + i + "</li>")
-  print("<li " + li_style + "'><strong>Layout</strong> " + l + "</li>")
-  print("<li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
-  print("</ul>")
 
+  print("")
+  print(".. raw:: html")
+  print("")
+  print("  <ul>")
+  print("  <li " + li_style + "'><strong>Default</strong> " + d + "</li>")
+  print("  <li " + li_style + "'><strong>Inherited</strong> " + i + "</li>")
+  print("  <li " + li_style + "'><strong>Layout</strong> " + l + "</li>")
+  print("  <li " + li_style + "'><strong>Ext. draw</strong> " + e + "</li>")
+  print("  </ul>")
+
+def guard_proc(p):
+  global guard
+  if 'section' in p:
+    if guard:
+      guard_close()
+    if 'guard' in p:
+      guard = p['guard']
+      print(f"#if {guard}")
+
+def guard_close():
+  global guard
+  if guard:
+    print(f"#endif /*{guard}*/\n")
+  guard = ""
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.h', 'w')
@@ -591,17 +635,34 @@ print(HEADING)
 print('#ifndef LV_OBJ_STYLE_GEN_H')
 print('#define LV_OBJ_STYLE_GEN_H')
 print()
+print('''\
+#ifdef __cplusplus
+extern "C" {
+#endif
+''')
 print("#include \"../misc/lv_area.h\"")
 print("#include \"../misc/lv_style.h\"")
 print("#include \"../core/lv_obj_style.h\"")
 print()
+
+guard = ""
 for p in props:
+  guard_proc(p)
   obj_style_get(p)
+guard_close()
 
 for p in props:
+  guard_proc(p)
   local_style_set_h(p)
+guard_close()
 
 print()
+print('''\
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+''')
+
 print('#endif /* LV_OBJ_STYLE_GEN_H */')
 
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.c', 'w')
@@ -609,16 +670,22 @@ sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.c', 'w')
 print(HEADING)
 print("#include \"lv_obj.h\"")
 print()
+
 for p in props:
+  guard_proc(p)
   local_style_set_c(p)
+guard_close()
 
 sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.c', 'w')
 
 print(HEADING)
 print("#include \"lv_style.h\"")
 print()
+
 for p in props:
+  guard_proc(p)
   style_set_c(p)
+guard_close()
 
 sys.stdout = open(base_dir + '/../src/misc/lv_style_gen.h', 'w')
 
@@ -626,17 +693,35 @@ print(HEADING)
 print('#ifndef LV_STYLE_GEN_H')
 print('#define LV_STYLE_GEN_H')
 print()
-for p in props:
-  style_set_h(p)
+print('''\
+#ifdef __cplusplus
+extern "C" {
+#endif
+''')
 
 for p in props:
+  guard_proc(p)
+  style_set_h(p)
+guard_close()
+
+for p in props:
+  guard_proc(p)
   style_const_set(p)
+guard_close()
+
 print()
+print('''\
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+''')
 print('#endif /* LV_STYLE_GEN_H */')
 
+sys.stdout = open(base_dir + '/../docs/overview/style-props.rst', 'w')
 
-sys.stdout = open(base_dir + '/../docs/overview/style-props.md', 'w')
+print('================')
+print('Style properties')
+print('================')
 
-print('# Style properties')
 for p in props:
   docs(p)

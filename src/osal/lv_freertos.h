@@ -19,11 +19,19 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_os.h"
+
 #if LV_USE_OS == LV_OS_FREERTOS
 
+#if (ESP_PLATFORM)
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#else
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#endif
 
 /*********************
  *      DEFINES

@@ -10,11 +10,13 @@
 void lv_example_canvas_3(void)
 {
     /*Create a buffer for the canvas*/
-    static uint8_t cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, CANVAS_HEIGHT)];
+    LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_INIT_STATIC(draw_buf);
 
     /*Create a canvas and initialize its palette*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_NATIVE);
+    lv_canvas_set_draw_buf(canvas, &draw_buf);
+
     lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
     lv_obj_center(canvas);
 

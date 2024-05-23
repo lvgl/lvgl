@@ -6,9 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_win.h"
+#include "../../lvgl.h"
 #if LV_USE_WIN
-
 
 /*********************
  *      DEFINES
@@ -60,15 +59,17 @@ lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt)
     return title;
 }
 
-lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, lv_coord_t btn_w)
+lv_obj_t * lv_win_add_button(lv_obj_t * win, const void * icon, int32_t btn_w)
 {
     lv_obj_t * header = lv_win_get_header(win);
     lv_obj_t * btn = lv_button_create(header);
     lv_obj_set_size(btn, btn_w, LV_PCT(100));
 
-    lv_obj_t * img = lv_image_create(btn);
-    lv_image_set_src(img, icon);
-    lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
+    if(icon) {
+        lv_obj_t * img = lv_image_create(btn);
+        lv_image_set_src(img, icon);
+        lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
+    }
 
     return btn;
 }
@@ -95,7 +96,7 @@ static void lv_win_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
 
     lv_obj_t * header = lv_obj_create(obj);
-    lv_obj_set_size(header, LV_PCT(100), lv_display_get_dpi(lv_obj_get_disp(obj)) / 2);
+    lv_obj_set_size(header, LV_PCT(100), lv_display_get_dpi(lv_obj_get_display(obj)) / 2);
     lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
@@ -105,4 +106,3 @@ static void lv_win_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 }
 
 #endif
-

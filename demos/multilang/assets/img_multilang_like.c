@@ -12,7 +12,7 @@
     #include "lvgl/lvgl.h"
 #endif
 
-#if LV_USE_DEMO_MULTILANG
+#if defined(LV_USE_DEMO_MULTILANG) || defined(LV_USE_DEMO_TRANSFORM)
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
@@ -45,10 +45,11 @@ img_multilang_like_map[] = {
 
 const lv_image_dsc_t img_multilang_like = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .header.always_zero = 0,
     .header.w = 20,
     .header.h = 17,
+    .header.stride = 80,
     .data = img_multilang_like_map,
+    .data_size = sizeof(img_multilang_like_map),
 };
 
 #endif

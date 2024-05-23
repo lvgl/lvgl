@@ -13,7 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../core/lv_obj.h"
 
 #if LV_USE_FILE_EXPLORER != 0
 
@@ -90,7 +91,6 @@ lv_obj_t * lv_file_explorer_create(lv_obj_t * parent);
  */
 void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir_t dir, const char * path);
 #endif
-
 
 /**
  * Set file_explorer sort

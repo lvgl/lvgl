@@ -7,7 +7,7 @@
 /* This function runs before each test */
 void setUp(void);
 
-void test_arc_creation_successfull(void);
+void test_arc_creation_successful(void);
 void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void);
 void test_arc_should_truncate_to_min_range_when_new_value_is_inferior(void);
 void test_arc_should_update_value_after_updating_range(void);
@@ -28,14 +28,43 @@ void setUp(void)
 
 void tearDown(void)
 {
-    lv_obj_clean(lv_screen_active());
+    lv_obj_clean(active_screen);
+    lv_obj_set_style_layout(active_screen, LV_LAYOUT_NONE, 0);
 }
 
-void test_arc_creation_successfull(void)
+void test_arc_creation_successful(void)
 {
     arc = lv_arc_create(active_screen);
 
     TEST_ASSERT_NOT_NULL(arc);
+}
+
+void test_arc_basic_render(void)
+{
+    arc = lv_arc_create(active_screen);
+    lv_obj_set_size(arc, 100, 100);
+    lv_obj_center(arc);
+    lv_arc_set_value(arc, 70);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_1.png");
+}
+
+void test_arc_rgb565a8_image(void)
+{
+#if LV_BIN_DECODER_RAM_LOAD
+    /*RGB565A8 image rendering requires special handling*/
+    arc = lv_arc_create(active_screen);
+    lv_obj_set_size(arc, 100, 100);
+    lv_obj_center(arc);
+    lv_arc_set_value(arc, 70);
+    lv_obj_set_style_arc_width(arc, 30, 0);
+    lv_obj_set_style_arc_width(arc, 30, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_image_src(arc, "A:src/test_files/binimages/cogwheel.RGB565A8.bin", LV_PART_INDICATOR);
+    lv_obj_set_style_arc_opa(arc, 150, LV_PART_INDICATOR);
+    lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_2.png");
+#endif
 }
 
 void test_arc_should_truncate_to_max_range_when_new_value_exceeds_it(void)
@@ -134,7 +163,7 @@ void test_arc_click_area_with_adv_hittest(void)
     lv_obj_set_size(arc, 100, 100);
     lv_obj_set_style_arc_width(arc, 10, 0);
     lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_add_event(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
     lv_obj_set_ext_click_area(arc, 5);
 
     /*No click detected at the middle*/
@@ -166,48 +195,40 @@ void test_arc_click_area_with_adv_hittest(void)
 /* Check value doesn't go to max when clicking on the other side of the arc */
 void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
 {
-    arc = lv_arc_create(lv_scr_act());
+    arc = lv_arc_create(lv_screen_active());
     lv_arc_set_value(arc, 0);
 
     lv_obj_set_size(arc, 100, 100);
     lv_obj_center(arc);
-    lv_obj_add_event(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
     event_cnt = 0;
 
     /* Click close to start angle */
     event_cnt = 0;
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
-    lv_test_indev_wait(50);
+    lv_test_indev_wait(500);
     lv_test_mouse_release();
     lv_test_indev_wait(50);
 
     TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
-    TEST_ASSERT_EQUAL_UINT32(lv_arc_get_value(arc), lv_arc_get_min_value(arc));
+    TEST_ASSERT_EQUAL_INT32(lv_arc_get_min_value(arc), lv_arc_get_value(arc));
 
     /* Click close to end angle */
     event_cnt = 0;
 
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
-    lv_test_indev_wait(50);
+    lv_test_indev_wait(500);
     lv_test_mouse_move_to(415, 281);
-    lv_test_indev_wait(50);
+    lv_test_indev_wait(500);
     lv_test_mouse_release();
     lv_test_indev_wait(50);
 
     TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
-    TEST_ASSERT_NOT_EQUAL_UINT32(lv_arc_get_value(arc), lv_arc_get_max_value(arc));
+    TEST_ASSERT_EQUAL_INT32(lv_arc_get_min_value(arc), lv_arc_get_value(arc));
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("arc_2.png");
-}
-
-void test_arc_basic_render(void)
-{
-    arc = lv_arc_create(lv_screen_active());
-    lv_obj_set_size(arc, 100, 100);
-    lv_obj_center(arc);
-    TEST_ASSERT_EQUAL_SCREENSHOT("arc_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_3.png");
 }
 
 static void dummy_event_cb(lv_event_t * e)

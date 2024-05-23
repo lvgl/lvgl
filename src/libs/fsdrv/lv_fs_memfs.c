@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_fs_memfs.c
  *
  * File System Interface driver for memory-mapped files
@@ -33,10 +33,9 @@
  *
  * The path object can be used at any place where a file path is required, e.g.:
  *
- * lv_font_t* my_font = lv_font_load((const char *) & mempath);
+ * lv_font_t* my_font = lv_binfont_create((const char *) & mempath);
  *
  */
-
 
 /*********************
  *      INCLUDES
@@ -85,7 +84,6 @@ void lv_fs_memfs_init(void)
      * Register the file system interface in LVGL
      *--------------------------------------------------*/
 
-    /*Add a simple drive to open images*/
     lv_fs_drv_init(&fs_drv);
 
     /*Set up fields...*/
@@ -112,9 +110,9 @@ void lv_fs_memfs_init(void)
 
 /**
  * Open a file
- * @param drv pointer to a driver where this function belongs
- * @param path pointer to an extended path object containing the memory buffer address and size
- * @param mode read: FS_MODE_RD (currently only reading from the buffer is supported)
+ * @param drv   pointer to a driver where this function belongs
+ * @param path  pointer to an extended path object containing the memory buffer address and size
+ * @param mode  read: FS_MODE_RD (currently only reading from the buffer is supported)
  * @return pointer to FIL struct or NULL in case of fail
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
@@ -126,8 +124,8 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
 /**
  * Close an opened file
- * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a FILE variable. (opened with fs_open)
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    pointer to a FILE variable. (opened with fs_open)
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
@@ -140,11 +138,11 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 
 /**
  * Read data from an opened file
- * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a FILE variable.
- * @param buf pointer to a memory block where to store the read data
- * @param btr number of Bytes To Read
- * @param br the real number of read bytes (Byte Read)
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    pointer to a FILE variable.
+ * @param buf       pointer to a memory block where to store the read data
+ * @param btr       number of Bytes To Read
+ * @param br        the real number of read bytes (Byte Read)
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
@@ -160,9 +158,9 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 
 /**
  * Set the read pointer.
- * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a FILE variable. (opened with fs_open )
- * @param pos the new position of read pointer
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    pointer to a FILE variable. (opened with fs_open )
+ * @param pos       the new position of read pointer
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
@@ -194,9 +192,9 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 
 /**
  * Give the position of the read write pointer
- * @param drv pointer to a driver where this function belongs
- * @param file_p pointer to a FILE variable.
- * @param pos_p pointer to to store the result
+ * @param drv       pointer to a driver where this function belongs
+ * @param file_p    pointer to a FILE variable
+ * @param pos_p     pointer to store the result
  * @return LV_FS_RES_OK: no error, the file is read
  *         any error from lv_fs_res_t enum
  */
@@ -207,7 +205,6 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     return LV_FS_RES_OK;
 }
 
-
 #else /*LV_USE_FS_MEMFS == 0*/
 
 #if defined(LV_FS_MEMFS_LETTER) && LV_FS_MEMFS_LETTER != '\0'
@@ -215,4 +212,3 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 #endif
 
 #endif /*LV_USE_FS_MEMFS*/
-

@@ -17,7 +17,11 @@
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (LV_GLOBAL_DEFAULT()->theme_default)
+
+struct _my_theme_t;
+typedef struct _my_theme_t my_theme_t;
+
+#define theme_def (*(my_theme_t **)(&LV_GLOBAL_DEFAULT()->theme_default))
 
 #define MODE_DARK 1
 #define RADIUS_DEFAULT _LV_DPX_CALC(theme->disp_dpi, theme->disp_size == DISP_LARGE ? 12 : 8)
@@ -71,6 +75,7 @@ typedef struct {
     lv_style_t circle;
     lv_style_t no_radius;
     lv_style_t clip_corner;
+    lv_style_t rotary_scroll;
 #if LV_THEME_DEFAULT_GROW
     lv_style_t grow;
 #endif
@@ -81,7 +86,6 @@ typedef struct {
 
     /*Parts*/
     lv_style_t knob;
-    lv_style_t indic;
 
 #if LV_USE_ARC
     lv_style_t arc_indic;
@@ -112,10 +116,6 @@ typedef struct {
     lv_style_t table_cell;
 #endif
 
-#if LV_USE_METER
-    lv_style_t meter_marker, meter_indic;
-#endif
-
 #if LV_USE_TEXTAREA
     lv_style_t ta_cursor, ta_placeholder;
 #endif
@@ -130,7 +130,7 @@ typedef struct {
 #endif
 
 #if LV_USE_MSGBOX
-    lv_style_t msgbox_bg, msgbox_button_bg, msgbox_backdrop_bg;
+    lv_style_t msgbox_backdrop_bg;
 #endif
 
 #if LV_USE_KEYBOARD
@@ -138,7 +138,7 @@ typedef struct {
 #endif
 
 #if LV_USE_LIST
-    lv_style_t list_bg, list_btn, list_item_grow, list_label;
+    lv_style_t list_bg, list_btn, list_item_grow;
 #endif
 
 #if LV_USE_TABVIEW
@@ -159,10 +159,10 @@ typedef enum {
     DISP_LARGE = 1,
 } disp_size_t;
 
-typedef struct _my_theme_t {
+struct _my_theme_t {
     lv_theme_t base;
     disp_size_t disp_size;
-    lv_coord_t disp_dpi;
+    int32_t disp_dpi;
     lv_color_t color_scr;
     lv_color_t color_text;
     lv_color_t color_card;
@@ -177,8 +177,7 @@ typedef struct _my_theme_t {
     lv_style_transition_dsc_t trans_delayed;
     lv_style_transition_dsc_t trans_normal;
 #endif
-} my_theme_t;
-
+};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -198,7 +197,6 @@ static void style_init_reset(lv_style_t * style);
  *   STATIC FUNCTIONS
  **********************/
 
-
 static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t c, lv_opa_t opa)
 {
     LV_UNUSED(f);
@@ -212,14 +210,15 @@ static lv_color_t grey_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t col
     else return lv_color_mix(lv_palette_lighten(LV_PALETTE_GREY, 2), color, opa);
 }
 
-static void style_init(struct _my_theme_t * theme)
+static void style_init(my_theme_t * theme)
 {
 #if TRANSITION_TIME
     static const lv_style_prop_t trans_props[] = {
         LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
         LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
         LV_STYLE_TRANSLATE_Y, LV_STYLE_TRANSLATE_X,
-        LV_STYLE_TRANSFORM_SCALE, LV_STYLE_TRANSFORM_ROTATION,
+        LV_STYLE_TRANSFORM_ROTATION,
+        LV_STYLE_TRANSFORM_SCALE_X, LV_STYLE_TRANSFORM_SCALE_Y,
         LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_DSC,
         0
     };
@@ -265,6 +264,7 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_text_font(&theme->styles.scr, theme->base.font_normal);
     lv_style_set_pad_row(&theme->styles.scr, PAD_SMALL);
     lv_style_set_pad_column(&theme->styles.scr, PAD_SMALL);
+    lv_style_set_rotary_sensitivity(&theme->styles.scr, theme->disp_dpi / 4 * 256);
 
     style_init_reset(&theme->styles.card);
     lv_style_set_radius(&theme->styles.card, RADIUS_DEFAULT);
@@ -300,7 +300,7 @@ static void style_init(struct _my_theme_t * theme)
         lv_style_set_shadow_color(&theme->styles.btn, lv_palette_main(LV_PALETTE_GREY));
         lv_style_set_shadow_width(&theme->styles.btn, LV_DPX(3));
         lv_style_set_shadow_opa(&theme->styles.btn, LV_OPA_50);
-        lv_style_set_shadow_ofs_y(&theme->styles.btn, _LV_DPX_CALC(theme->disp_dpi, LV_DPX(4)));
+        lv_style_set_shadow_offset_y(&theme->styles.btn, _LV_DPX_CALC(theme->disp_dpi, LV_DPX(4)));
     }
     lv_style_set_text_color(&theme->styles.btn, theme->color_text);
     lv_style_set_pad_hor(&theme->styles.btn, PAD_DEF);
@@ -388,6 +388,9 @@ static void style_init(struct _my_theme_t * theme)
     style_init_reset(&theme->styles.no_radius);
     lv_style_set_radius(&theme->styles.no_radius, 0);
 
+    style_init_reset(&theme->styles.rotary_scroll);
+    lv_style_set_rotary_sensitivity(&theme->styles.rotary_scroll, theme->disp_dpi / 4 * 256);
+
 #if LV_THEME_DEFAULT_GROW
     style_init_reset(&theme->styles.grow);
     lv_style_set_transform_width(&theme->styles.grow, _LV_DPX_CALC(theme->disp_dpi, 3));
@@ -401,10 +404,10 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_radius(&theme->styles.knob, LV_RADIUS_CIRCLE);
 
     style_init_reset(&theme->styles.anim);
-    lv_style_set_anim_time(&theme->styles.anim, 200);
+    lv_style_set_anim_duration(&theme->styles.anim, 200);
 
     style_init_reset(&theme->styles.anim_fast);
-    lv_style_set_anim_time(&theme->styles.anim_fast, 120);
+    lv_style_set_anim_duration(&theme->styles.anim_fast, 120);
 
 #if LV_USE_ARC
     style_init_reset(&theme->styles.arc_indic);
@@ -457,7 +460,7 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_line_width(&theme->styles.chart_series, _LV_DPX_CALC(theme->disp_dpi, 3));
     lv_style_set_radius(&theme->styles.chart_series, _LV_DPX_CALC(theme->disp_dpi, 3));
 
-    lv_coord_t chart_size = _LV_DPX_CALC(theme->disp_dpi, 8);
+    int32_t chart_size = _LV_DPX_CALC(theme->disp_dpi, 8);
     lv_style_set_size(&theme->styles.chart_series, chart_size, chart_size);
     lv_style_set_pad_column(&theme->styles.chart_series, _LV_DPX_CALC(theme->disp_dpi, 2));
 
@@ -529,24 +532,6 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_pad_ver(&theme->styles.menu_separator, PAD_TINY);
 #endif
 
-#if LV_USE_METER
-    style_init_reset(&theme->styles.meter_marker);
-    lv_style_set_line_width(&theme->styles.meter_marker, _LV_DPX_CALC(theme->disp_dpi, 5));
-    lv_style_set_line_color(&theme->styles.meter_marker, theme->color_text);
-
-    lv_coord_t meter_size = _LV_DPX_CALC(theme->disp_dpi, 20);
-    lv_style_set_size(&theme->styles.meter_marker, meter_size, meter_size);
-
-    meter_size = _LV_DPX_CALC(theme->disp_dpi, 15);
-    lv_style_set_pad_left(&theme->styles.meter_marker, meter_size);
-
-    style_init_reset(&theme->styles.meter_indic);
-    lv_style_set_radius(&theme->styles.meter_indic, LV_RADIUS_CIRCLE);
-    lv_style_set_bg_color(&theme->styles.meter_indic, theme->color_text);
-    lv_style_set_bg_opa(&theme->styles.meter_indic, LV_OPA_COVER);
-    lv_style_set_size(&theme->styles.meter_indic, meter_size, meter_size);
-#endif
-
 #if LV_USE_TABLE
     style_init_reset(&theme->styles.table_cell);
     lv_style_set_border_width(&theme->styles.table_cell, _LV_DPX_CALC(theme->disp_dpi, 1));
@@ -560,7 +545,7 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_border_width(&theme->styles.ta_cursor, _LV_DPX_CALC(theme->disp_dpi, 2));
     lv_style_set_pad_left(&theme->styles.ta_cursor, - _LV_DPX_CALC(theme->disp_dpi, 1));
     lv_style_set_border_side(&theme->styles.ta_cursor, LV_BORDER_SIDE_LEFT);
-    lv_style_set_anim_time(&theme->styles.ta_cursor, 400);
+    lv_style_set_anim_duration(&theme->styles.ta_cursor, 400);
 
     style_init_reset(&theme->styles.ta_placeholder);
     lv_style_set_text_color(&theme->styles.ta_placeholder,
@@ -587,16 +572,9 @@ static void style_init(struct _my_theme_t * theme)
 #endif
 
 #if LV_USE_MSGBOX
-    /*To add space for for the button shadow*/
-    style_init_reset(&theme->styles.msgbox_button_bg);
-    lv_style_set_pad_all(&theme->styles.msgbox_button_bg, _LV_DPX_CALC(theme->disp_dpi, 4));
-
-    style_init_reset(&theme->styles.msgbox_bg);
-    lv_style_set_max_width(&theme->styles.msgbox_bg, lv_pct(100));
-
     style_init_reset(&theme->styles.msgbox_backdrop_bg);
     lv_style_set_bg_color(&theme->styles.msgbox_backdrop_bg, lv_palette_main(LV_PALETTE_GREY));
-    lv_style_set_bg_opa(&theme->styles.msgbox_backdrop_bg, LV_OPA_100);
+    lv_style_set_bg_opa(&theme->styles.msgbox_backdrop_bg, LV_OPA_50);
 #endif
 #if LV_USE_KEYBOARD
     style_init_reset(&theme->styles.keyboard_button_bg);
@@ -610,6 +588,7 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_border_color(&theme->styles.tab_btn, theme->base.color_primary);
     lv_style_set_border_width(&theme->styles.tab_btn, BORDER_WIDTH * 2);
     lv_style_set_border_side(&theme->styles.tab_btn, LV_BORDER_SIDE_BOTTOM);
+    lv_style_set_pad_top(&theme->styles.tab_btn, BORDER_WIDTH * 2);
 
     style_init_reset(&theme->styles.tab_bg_focus);
     lv_style_set_outline_pad(&theme->styles.tab_bg_focus, -BORDER_WIDTH);
@@ -632,7 +611,6 @@ static void style_init(struct _my_theme_t * theme)
     style_init_reset(&theme->styles.list_item_grow);
     lv_style_set_transform_width(&theme->styles.list_item_grow, PAD_DEF);
 #endif
-
 
 #if LV_USE_LED
     style_init_reset(&theme->styles.led);
@@ -666,15 +644,14 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
 
     if(!lv_theme_default_is_inited()) {
-        theme_def = (my_theme_t *)lv_malloc(sizeof(my_theme_t));
-        lv_memzero(theme_def, sizeof(my_theme_t));
+        theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
 
     lv_display_t * new_disp = disp == NULL ? lv_display_get_default() : disp;
-    lv_coord_t new_dpi = lv_display_get_dpi(new_disp);
-    lv_coord_t hor_res = lv_display_get_horizontal_resolution(new_disp);
+    int32_t new_dpi = lv_display_get_dpi(new_disp);
+    int32_t hor_res = lv_display_get_horizontal_resolution(new_disp);
     disp_size_t new_size;
 
     if(hor_res <= 320) new_size = DISP_SMALL;
@@ -686,7 +663,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
        theme->disp_size == new_size &&
        lv_color_eq(theme->base.color_primary, color_primary) &&
        lv_color_eq(theme->base.color_secondary, color_secondary) &&
-       theme->base.flags == dark ? MODE_DARK : 0 &&
+       (theme->base.flags == dark ? MODE_DARK : 0) &&
        theme->base.font_small == font) {
         return (lv_theme_t *) theme;
 
@@ -714,7 +691,16 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
 void lv_theme_default_deinit(void)
 {
-    if(theme_def) {
+    my_theme_t * theme = theme_def;
+    if(theme) {
+        if(theme->inited) {
+            lv_style_t * theme_styles = (lv_style_t *)(&(theme->styles));
+            uint32_t i;
+            for(i = 0; i < sizeof(my_theme_styles_t) / sizeof(lv_style_t); i++) {
+                lv_style_reset(theme_styles + i);
+            }
+
+        }
         lv_free(theme_def);
         theme_def = NULL;
     }
@@ -731,19 +717,19 @@ lv_theme_t * lv_theme_default_get(void)
 
 bool lv_theme_default_is_inited(void)
 {
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
     if(theme == NULL) return false;
     return theme->inited;
 }
-
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
 
-    struct _my_theme_t * theme = theme_def;
+    my_theme_t * theme = theme_def;
+    lv_obj_t * parent = lv_obj_get_parent(obj);
 
-    if(lv_obj_get_parent(obj) == NULL) {
+    if(parent == NULL) {
         lv_obj_add_style(obj, &theme->styles.scr, 0);
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
@@ -752,14 +738,21 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
     if(lv_obj_check_type(obj, &lv_obj_class)) {
 #if LV_USE_TABVIEW
-        lv_obj_t * parent = lv_obj_get_parent(obj);
         /*Tabview content area*/
-        if(lv_obj_check_type(parent, &lv_tabview_class)) {
+        if(lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_child(parent, 1) == obj) {
+            return;
+        }
+        /*Tabview button container*/
+        else if(lv_obj_check_type(parent, &lv_tabview_class) && lv_obj_get_child(parent, 0) == obj) {
+            lv_obj_add_style(obj, &theme->styles.bg_color_white, 0);
+            lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
+            lv_obj_add_style(obj, &theme->styles.tab_bg_focus, LV_STATE_FOCUS_KEY);
             return;
         }
         /*Tabview pages*/
         else if(lv_obj_check_type(lv_obj_get_parent(parent), &lv_tabview_class)) {
             lv_obj_add_style(obj, &theme->styles.pad_normal, 0);
+            lv_obj_add_style(obj, &theme->styles.rotary_scroll, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
             lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
             return;
@@ -768,13 +761,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_WIN
         /*Header*/
-        if(lv_obj_get_index(obj) == 0 && lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class)) {
+        if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 0) == obj) {
             lv_obj_add_style(obj, &theme->styles.bg_color_grey, 0);
             lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
             return;
         }
         /*Content*/
-        else if(lv_obj_get_index(obj) == 1 && lv_obj_check_type(lv_obj_get_parent(obj), &lv_win_class)) {
+        else if(lv_obj_check_type(parent, &lv_win_class) && lv_obj_get_child(parent, 1) == obj) {
             lv_obj_add_style(obj, &theme->styles.scr, 0);
             lv_obj_add_style(obj, &theme->styles.pad_normal, 0);
             lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
@@ -783,9 +776,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         }
 #endif
 
-
 #if LV_USE_CALENDAR
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
+        if(lv_obj_check_type(parent, &lv_calendar_class)) {
             /*No style*/
             return;
         }
@@ -795,8 +787,24 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
         lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
     }
-#if LV_USE_BTN
+#if LV_USE_BUTTON
     else if(lv_obj_check_type(obj, &lv_button_class)) {
+
+#if LV_USE_TABVIEW
+        lv_obj_t * tv = lv_obj_get_parent(parent); /*parent is the tabview header*/
+        if(tv && lv_obj_get_child(tv, 0) == parent) { /*The button is on the tab view header*/
+            if(lv_obj_check_type(tv, &lv_tabview_class)) {
+                lv_obj_add_style(obj, &theme->styles.pressed, LV_STATE_PRESSED);
+                lv_obj_add_style(obj, &theme->styles.bg_color_primary_muted, LV_STATE_CHECKED);
+                lv_obj_add_style(obj, &theme->styles.tab_btn, LV_STATE_CHECKED);
+                lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
+                lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
+                lv_obj_add_style(obj, &theme->styles.tab_bg_focus, LV_STATE_FOCUS_KEY);
+                return;
+            }
+        }
+
+#endif
         lv_obj_add_style(obj, &theme->styles.btn, 0);
         lv_obj_add_style(obj, &theme->styles.bg_color_primary, 0);
         lv_obj_add_style(obj, &theme->styles.transition_delayed, 0);
@@ -810,8 +818,8 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.disabled, LV_STATE_DISABLED);
 
 #if LV_USE_MENU
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_sidebar_header_cont_class) ||
-           lv_obj_check_type(lv_obj_get_parent(obj), &lv_menu_main_header_cont_class)) {
+        if(lv_obj_check_type(parent, &lv_menu_sidebar_header_cont_class) ||
+           lv_obj_check_type(parent, &lv_menu_main_header_cont_class)) {
             lv_obj_add_style(obj, &theme->styles.menu_header_btn, 0);
             lv_obj_add_style(obj, &theme->styles.menu_pressed, LV_STATE_PRESSED);
         }
@@ -825,38 +833,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_BTNMATRIX
+#if LV_USE_BUTTONMATRIX
     else if(lv_obj_check_type(obj, &lv_buttonmatrix_class)) {
-#if LV_USE_MSGBOX
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
-            lv_obj_add_style(obj, &theme->styles.msgbox_button_bg, 0);
-            lv_obj_add_style(obj, &theme->styles.pad_gap, 0);
-            lv_obj_add_style(obj, &theme->styles.btn, LV_PART_ITEMS);
-            lv_obj_add_style(obj, &theme->styles.pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
-            lv_obj_add_style(obj, &theme->styles.disabled, LV_PART_ITEMS | LV_STATE_DISABLED);
-            lv_obj_add_style(obj, &theme->styles.bg_color_primary, LV_PART_ITEMS | LV_STATE_CHECKED);
-            lv_obj_add_style(obj, &theme->styles.bg_color_primary_muted, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
-            lv_obj_add_style(obj, &theme->styles.bg_color_secondary_muted, LV_PART_ITEMS | LV_STATE_EDITED);
-            return;
-        }
-#endif
-#if LV_USE_TABVIEW
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_tabview_class)) {
-            lv_obj_add_style(obj, &theme->styles.bg_color_white, 0);
-            lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
-            lv_obj_add_style(obj, &theme->styles.tab_bg_focus, LV_STATE_FOCUS_KEY);
-            lv_obj_add_style(obj, &theme->styles.pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
-            lv_obj_add_style(obj, &theme->styles.bg_color_primary_muted, LV_PART_ITEMS | LV_STATE_CHECKED);
-            lv_obj_add_style(obj, &theme->styles.tab_btn, LV_PART_ITEMS | LV_STATE_CHECKED);
-            lv_obj_add_style(obj, &theme->styles.outline_primary, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
-            lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_PART_ITEMS | LV_STATE_EDITED);
-            lv_obj_add_style(obj, &theme->styles.tab_bg_focus, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
-            return;
-        }
-#endif
 
 #if LV_USE_CALENDAR
-        if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
+        if(lv_obj_check_type(parent, &lv_calendar_class)) {
             lv_obj_add_style(obj, &theme->styles.calendar_btnm_bg, 0);
             lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
             lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
@@ -1022,7 +1003,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-
 #if LV_USE_SPINNER
     else if(lv_obj_check_type(obj, &lv_spinner_class)) {
         lv_obj_add_style(obj, &theme->styles.arc_indic, 0);
@@ -1030,14 +1010,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.arc_indic_primary, LV_PART_INDICATOR);
     }
 #endif
-
-    //#if LV_USE_METER
-    //    else if(lv_obj_check_type(obj, &lv_meter_class)) {
-    //        lv_obj_add_style(obj, &theme->styles.card, 0);
-    //        lv_obj_add_style(obj, &theme->styles.circle, 0);
-    //        lv_obj_add_style(obj, &theme->styles.meter_indic, LV_PART_INDICATOR);
-    //    }
-    //#endif
 
 #if LV_USE_TEXTAREA
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {
@@ -1151,13 +1123,44 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_MSGBOX
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
-        lv_obj_add_style(obj, &theme->styles.msgbox_bg, 0);
+        lv_obj_add_style(obj, &theme->styles.pad_zero, 0);
+        lv_obj_add_style(obj, &theme->styles.clip_corner, 0);
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_backdrop_class)) {
         lv_obj_add_style(obj, &theme->styles.msgbox_backdrop_bg, 0);
+        return;
     }
+    else if(lv_obj_check_type(obj, &lv_msgbox_header_class)) {
+        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        lv_obj_add_style(obj, &theme->styles.bg_color_grey, 0);
+        return;
+    }
+    else if(lv_obj_check_type(obj, &lv_msgbox_footer_class)) {
+        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        return;
+    }
+    else if(lv_obj_check_type(obj, &lv_msgbox_content_class)) {
+        lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
+        lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        return;
+    }
+    else if(lv_obj_check_type(obj, &lv_msgbox_header_button_class) ||
+            lv_obj_check_type(obj, &lv_msgbox_footer_button_class)) {
+        lv_obj_add_style(obj, &theme->styles.btn, 0);
+        lv_obj_add_style(obj, &theme->styles.bg_color_primary, 0);
+        lv_obj_add_style(obj, &theme->styles.transition_delayed, 0);
+        lv_obj_add_style(obj, &theme->styles.pressed, LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &theme->styles.transition_normal, LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
+        lv_obj_add_style(obj, &theme->styles.bg_color_secondary, LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &theme->styles.disabled, LV_STATE_DISABLED);
+        return;
+    }
+
 #endif
+
 #if LV_USE_SPINBOX
     else if(lv_obj_check_type(obj, &lv_spinbox_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);

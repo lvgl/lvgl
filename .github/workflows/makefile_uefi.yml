@@ -1,0 +1,23 @@
+name: Check Makefile for UEFI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-22.04
+    name: Build using Makefile for UEFI
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install prerequisites
+      run: scripts/install-prerequisites.sh
+    - name: Install clang
+      run: sudo apt-get install clang lld
+    - name: Build
+      working-directory: tests/makefile_uefi
+      run: make -j

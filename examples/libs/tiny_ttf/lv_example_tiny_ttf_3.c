@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
 #if LV_USE_TINY_TTF && LV_BUILD_EXAMPLES && LV_USE_OBSERVER
 
-static void font_size_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void font_size_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static lv_subject_t subject_font;
 
@@ -32,7 +32,6 @@ void lv_example_tiny_ttf_3(void)
     lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
     lv_label_bind_text(slider_label, &subject_font, "%d");
 
-
     /*Create a label with the new style*/
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_add_style(label, &style, 0);
@@ -40,11 +39,10 @@ void lv_example_tiny_ttf_3(void)
     lv_label_set_text(label, "Hello world!");
     lv_obj_center(label);
 
-
     lv_subject_add_observer(&subject_font, font_size_observer_cb, &style);
 }
 
-static void font_size_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void font_size_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_style_t * style = observer->user_data;
     lv_style_value_t v;

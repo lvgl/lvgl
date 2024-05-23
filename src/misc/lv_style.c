@@ -41,6 +41,7 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_HEIGHT] =                   LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_MIN_HEIGHT] =               LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_MAX_HEIGHT] =               LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_LENGTH] =                   LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
     [LV_STYLE_X] =                        LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_Y] =                        LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_ALIGN] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
@@ -48,7 +49,10 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_TRANSFORM_HEIGHT] =          LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_TRANSFORM,
     [LV_STYLE_TRANSLATE_X] =               LV_STYLE_PROP_FLAG_LAYOUT_UPDATE | LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE,
     [LV_STYLE_TRANSLATE_Y] =               LV_STYLE_PROP_FLAG_LAYOUT_UPDATE | LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE,
-    [LV_STYLE_TRANSFORM_SCALE] =           LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE | LV_STYLE_PROP_FLAG_TRANSFORM,
+    [LV_STYLE_TRANSFORM_SCALE_X] =           LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE | LV_STYLE_PROP_FLAG_TRANSFORM,
+    [LV_STYLE_TRANSFORM_SCALE_Y] =           LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE | LV_STYLE_PROP_FLAG_TRANSFORM,
+    [LV_STYLE_TRANSFORM_SKEW_X] =          LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE | LV_STYLE_PROP_FLAG_TRANSFORM,
+    [LV_STYLE_TRANSFORM_SKEW_Y] =          LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE | LV_STYLE_PROP_FLAG_TRANSFORM,
     [LV_STYLE_TRANSFORM_ROTATION] =        LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE | LV_STYLE_PROP_FLAG_TRANSFORM,
 
     [LV_STYLE_PAD_TOP] =                   LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
@@ -68,8 +72,9 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_BG_GRAD_DIR] = 0,
     [LV_STYLE_BG_MAIN_STOP] = 0,
     [LV_STYLE_BG_GRAD_STOP] = 0,
+    [LV_STYLE_BG_MAIN_OPA] = 0,
+    [LV_STYLE_BG_GRAD_OPA] = 0,
     [LV_STYLE_BG_GRAD] = 0,
-    [LV_STYLE_BG_DITHER_MODE] = 0,
 
     [LV_STYLE_BG_IMAGE_SRC] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
     [LV_STYLE_BG_IMAGE_OPA] = 0,
@@ -89,8 +94,8 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_OUTLINE_PAD] =               LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
 
     [LV_STYLE_SHADOW_WIDTH] =              LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    [LV_STYLE_SHADOW_OFS_X] =              LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    [LV_STYLE_SHADOW_OFS_Y] =              LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_SHADOW_OFFSET_X] =           LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_SHADOW_OFFSET_Y] =           LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
     [LV_STYLE_SHADOW_SPREAD] =             LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
     [LV_STYLE_SHADOW_COLOR] = 0,
     [LV_STYLE_SHADOW_OPA] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
@@ -126,19 +131,22 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_OPA_LAYERED] =               LV_STYLE_PROP_FLAG_LAYER_UPDATE,
     [LV_STYLE_COLOR_FILTER_DSC] =          LV_STYLE_PROP_FLAG_INHERITABLE,
     [LV_STYLE_COLOR_FILTER_OPA] =          LV_STYLE_PROP_FLAG_INHERITABLE,
-    [LV_STYLE_ANIM_TIME] = 0,
-    [LV_STYLE_ANIM_SPEED] = 0,
+    [LV_STYLE_ANIM_DURATION] = 0,
     [LV_STYLE_TRANSITION] = 0,
     [LV_STYLE_BLEND_MODE] =                LV_STYLE_PROP_FLAG_LAYER_UPDATE,
     [LV_STYLE_LAYOUT] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_BASE_DIR] =                  LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_BITMAP_MASK_SRC] =           LV_STYLE_PROP_FLAG_LAYER_UPDATE,
 
+#if LV_USE_FLEX
     [LV_STYLE_FLEX_FLOW] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_FLEX_MAIN_PLACE] =              LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_FLEX_CROSS_PLACE] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_FLEX_TRACK_PLACE] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_FLEX_GROW] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+#endif
 
+#if LV_USE_GRID
     [LV_STYLE_GRID_COLUMN_DSC_ARRAY] =      LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_GRID_ROW_DSC_ARRAY] =         LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_GRID_COLUMN_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
@@ -149,6 +157,7 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_GRID_CELL_COLUMN_POS] =       LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_GRID_CELL_X_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_GRID_CELL_Y_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+#endif
 
 };
 
@@ -345,13 +354,14 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
     const lv_color_t black = LV_COLOR_MAKE(0x00, 0x00, 0x00);
     const lv_color_t white = LV_COLOR_MAKE(0xff, 0xff, 0xff);
     switch(prop) {
-        case LV_STYLE_TRANSFORM_SCALE:
+        case LV_STYLE_TRANSFORM_SCALE_X:
+        case LV_STYLE_TRANSFORM_SCALE_Y:
             return (lv_style_value_t) {
                 .num = LV_SCALE_NONE
             };
         case LV_STYLE_BG_COLOR:
             return (lv_style_value_t) {
-                .color = black
+                .color = white
             };
         case LV_STYLE_BG_GRAD_COLOR:
         case LV_STYLE_BORDER_COLOR:
@@ -362,13 +372,15 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_TEXT_COLOR:
         case LV_STYLE_IMAGE_RECOLOR:
             return (lv_style_value_t) {
-                .color = white
+                .color = black
             };
         case LV_STYLE_OPA:
         case LV_STYLE_OPA_LAYERED:
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_TEXT_OPA:
         case LV_STYLE_IMAGE_OPA:
+        case LV_STYLE_BG_GRAD_OPA:
+        case LV_STYLE_BG_MAIN_OPA:
         case LV_STYLE_BG_IMAGE_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:
@@ -394,9 +406,13 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             return (lv_style_value_t) {
                 .num = LV_COORD_MAX
             };
+        case LV_STYLE_ROTARY_SENSITIVITY:
+            return (lv_style_value_t) {
+                .num = 256
+            };
         default:
             return (lv_style_value_t) {
-                .ptr = 0
+                .ptr = NULL
             };
     }
 }

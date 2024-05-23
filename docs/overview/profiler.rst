@@ -8,6 +8,8 @@ As the complexity of the application increases, performance issues such as low F
 causing lag may arise. LVGL has internally set up some hooks for performance measurement to help developers 
 analyze and locate performance issues.
 
+.. _profiler_introduction:
+
 Introduction
 ************
 
@@ -19,6 +21,8 @@ When the buffer is full, the trace system prints the log information through the
 
 The output trace logs are formatted according to Android's `systrace <https://developer.android.com/topic/performance/tracing>`_
 format and can be visualized using `Perfetto <https://ui.perfetto.dev>`_.
+
+.. _profiler_usage:
 
 Usage
 *****
@@ -38,6 +42,8 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
     .. code:: c
 
+        #include <sys/syscall.h>
+        #include <sys/types.h>
         #include <time.h>
 
         static uint32_t my_get_tick_us_cb(void)
@@ -47,12 +53,26 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
             return ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
         }
 
+        static int my_get_tid_cb(void)
+        {
+            return (int)syscall(SYS_gettid);
+        }
+
+        static int my_get_cpu_cb(void)
+        {
+            int cpu_id = 0;
+            syscall(SYS_getcpu, &cpu_id, NULL);
+            return cpu_id;
+        }
+
         void my_profiler_init(void)
         {
             lv_profiler_builtin_config_t config;
             lv_profiler_builtin_config_init(&config);
             config.tick_per_sec = 1000000; /* One second is equal to 1000000 microseconds */
             config.tick_get_cb = my_get_tick_us_cb;
+            config.tid_get_cb = my_get_tid_cb;
+            config.cpu_get_cb = my_get_cpu_cb;
             lv_profiler_builtin_init(&config);
         }
 
@@ -114,7 +134,7 @@ You will obtain a processed text file named `trace.systrace`, which roughly cont
         # tracer: nop
         #
         LVGL-1 [0] 2892.002993: tracing_mark_write: B|1|lv_timer_handler
-        LVGL-1 [0] 2892.002993: tracing_mark_write: B|1|_lv_disp_refr_timer
+        LVGL-1 [0] 2892.002993: tracing_mark_write: B|1|_lv_display_refr_timer
         LVGL-1 [0] 2892.003459: tracing_mark_write: B|1|refr_invalid_areas
         LVGL-1 [0] 2892.003461: tracing_mark_write: B|1|lv_draw_rect
         LVGL-1 [0] 2892.003550: tracing_mark_write: E|1|lv_draw_rect
@@ -144,12 +164,25 @@ Users can add their own measured functions:
 
 .. code:: c
 
-    void my_function(void)
+    void my_function_1(void)
     {
         LV_PROFILER_BEGIN;
         do_something();
         LV_PROFILER_END;
     }
+
+    void my_function_2(void)
+    {
+        LV_PROFILER_BEGIN_TAG("do_something_1");
+        do_something_1();
+        LV_PROFILER_END_TAG("do_something_1");
+
+        LV_PROFILER_BEGIN_TAG("do_something_2");
+        do_something_2();
+        LV_PROFILER_END_TAG("do_something_2");
+    }
+
+.. _profiler_custom_implementation:
 
 Custom profiler implementation
 ******************************
@@ -159,14 +192,21 @@ If you wish to use a profiler method provided by your operating system, you can 
 - :c:macro:`LV_PROFILER_INCLUDE`: Provides a header file for the profiler function.
 - :c:macro:`LV_PROFILER_BEGIN`: Profiler start point function.
 - :c:macro:`LV_PROFILER_END`: Profiler end point function.
+- :c:macro:`LV_PROFILER_BEGIN_TAG`: Profiler start point function with custom tag.
+- :c:macro:`LV_PROFILER_END_TAG`: Profiler end point function with custom tag.
+
 
 Taking `NuttX <https://github.com/apache/nuttx>`_ RTOS as an example:
 
 .. code:: c
 
     #define LV_PROFILER_INCLUDE "nuttx/sched_note.h"
-    #define LV_PROFILER_BEGIN   sched_note_begin(NOTE_TAG_ALWAYS)
-    #define LV_PROFILER_END     sched_note_end(NOTE_TAG_ALWAYS)
+    #define LV_PROFILER_BEGIN          sched_note_begin(NOTE_TAG_ALWAYS)
+    #define LV_PROFILER_END            sched_note_end(NOTE_TAG_ALWAYS)
+    #define LV_PROFILER_BEGIN_TAG(str) sched_note_beginex(NOTE_TAG_ALWAYS, str)
+    #define LV_PROFILER_END_TAG(str)   sched_note_endex(NOTE_TAG_ALWAYS, str)
+
+.. _profiler_faq:
 
 FAQ
 ***
@@ -178,7 +218,7 @@ Please check the completeness of the logs. If the logs are incomplete, it may be
 
 1. Serial port reception errors caused by a high baud rate. You need to reduce the baud rate.
 2. Data corruption caused by other thread logs inserted during the printing of trace logs. You need to disable the log output of other threads or refer to the configuration above to use a separate log output interface.
-3. Cross-thread calling of :c:macro:`LV_PROFILER_BEGIN/END`.The built-in LVGL profiler is designed for single-threaded use, so calling it from multiple threads can lead to thread safety issues. If you need to use it in a multi-threaded environment, you can use profiler interfaces provided by your operating system that ensure thread safety.
+3. Make sure that the string passed in by :c:macro:`LV_PROFILER_BEGIN_TAG/END_TAG` is not a local variable on the stack or a string in shared memory, because currently only the string address is recorded and the content is not copied.
 
 Function execution time displayed as 0s in Perfetto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -23,10 +23,10 @@ void test_spinner_spinning(void)
 {
     for(int i = 0; i < 10; ++i) {
         lv_tick_inc(50);
-        lv_task_handler();
+        lv_timer_handler();
 
-        char filename[15];
-        snprintf(filename, 15, "spinner_%02d.png", i);
+        char filename[32];
+        lv_snprintf(filename, sizeof(filename), "widgets/spinner_%02d.png", i);
         TEST_ASSERT_EQUAL_SCREENSHOT(filename);
     }
 }

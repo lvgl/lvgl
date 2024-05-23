@@ -16,7 +16,6 @@ extern "C" {
 #include "../lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -25,14 +24,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_argb8888(_lv_draw_sw_blend_fill_dsc_t * dsc);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_color_to_argb8888(_lv_draw_sw_blend_fill_dsc_t * dsc);
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_image_to_argb8888(_lv_draw_sw_blend_image_dsc_t * dsc);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image_to_argb8888(_lv_draw_sw_blend_image_dsc_t * dsc);
 
 /**********************
  *      MACROS

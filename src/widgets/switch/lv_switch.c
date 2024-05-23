@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_switch_class
+#define MY_CLASS (&lv_switch_class)
 
 #define LV_SWITCH_IS_ANIMATING(sw) (((sw)->anim_state) != LV_SWITCH_ANIM_STATE_INV)
 
@@ -46,7 +46,7 @@ static void draw_main(lv_event_t * e);
 
 static void lv_switch_anim_exec_cb(void * sw, int32_t value);
 static void lv_switch_trigger_anim(lv_obj_t * obj);
-static void lv_switch_anim_ready(lv_anim_t * a);
+static void lv_switch_anim_completed(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -117,20 +117,20 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
-        lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
-        lv_coord_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
-        lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+        int32_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
+        int32_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
+        int32_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
+        int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         /*The smaller size is the knob diameter*/
-        lv_coord_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
+        int32_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
         knob_size += _LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
-        lv_coord_t * s = lv_event_get_param(e);
+        int32_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, knob_size);
         *s = LV_MAX(*s, lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR));
     }
@@ -145,7 +145,7 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void draw_main(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     lv_layer_t * layer = lv_event_get_layer(e);
@@ -161,9 +161,9 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect(layer, &draw_indic_dsc, &indic_area);
 
     /*Draw the knob*/
-    lv_coord_t anim_value_x = 0;
-    lv_coord_t knob_size = lv_obj_get_height(obj);
-    lv_coord_t anim_length = lv_area_get_width(&obj->coords) - knob_size;
+    int32_t anim_value_x = 0;
+    int32_t knob_size = lv_obj_get_height(obj);
+    int32_t anim_length = lv_area_get_width(&obj->coords) - knob_size;
 
     if(LV_SWITCH_IS_ANIMATING(sw)) {
         /* Use the animation's coordinate */
@@ -184,10 +184,10 @@ static void draw_main(lv_event_t * e)
     knob_area.x1 += anim_value_x;
     knob_area.x2 = knob_area.x1 + (knob_size > 0 ? knob_size - 1 : 0);
 
-    lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
-    lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
-    lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
-    lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
+    int32_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
+    int32_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
+    int32_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
+    int32_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
     /*Apply the paddings on the knob area*/
     knob_area.x1 -= knob_left;
@@ -212,7 +212,7 @@ static void lv_switch_anim_exec_cb(void * var, int32_t value)
 /**
  * Resets the switch's animation state to "no animation in progress".
  */
-static void lv_switch_anim_ready(lv_anim_t * a)
+static void lv_switch_anim_completed(lv_anim_t * a)
 {
     lv_switch_t * sw = a->var;
     sw->anim_state = LV_SWITCH_ANIM_STATE_INV;
@@ -228,7 +228,7 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    uint32_t anim_dur_full = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+    uint32_t anim_dur_full = lv_obj_get_style_anim_duration(obj, LV_PART_MAIN);
 
     if(anim_dur_full > 0) {
         bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
@@ -255,11 +255,10 @@ static void lv_switch_trigger_anim(lv_obj_t * obj)
         lv_anim_set_var(&a, sw);
         lv_anim_set_exec_cb(&a, lv_switch_anim_exec_cb);
         lv_anim_set_values(&a, anim_start, anim_end);
-        lv_anim_set_ready_cb(&a, lv_switch_anim_ready);
-        lv_anim_set_time(&a, anim_dur);
+        lv_anim_set_completed_cb(&a, lv_switch_anim_completed);
+        lv_anim_set_duration(&a, anim_dur);
         lv_anim_start(&a);
     }
 }
-
 
 #endif

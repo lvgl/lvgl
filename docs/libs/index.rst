@@ -1,3 +1,5 @@
+.. _3rd_party_libraries:
+
 ===================
 3rd party libraries
 ===================
@@ -19,3 +21,7 @@
     barcode
     rlottie
     ffmpeg
+    rle
+    arduino_esp_littlefs
+    arduino_sd
+    lfs

@@ -37,30 +37,29 @@ If you would rather try LVGL on your own project follow these steps:
    timing of LVGL. Alternatively, register a ``tick_get_cb`` with
    :cpp:func:`lv_tick_set_cb` so that LVGL can retrieve the current time directly.
 -  Call :cpp:func:`lv_init`
+-  Create a display.
+
+.. code:: c
+
+   lv_display_t *display = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
+
 -  Create a draw buffer: LVGL will render the graphics here first, and
    send the rendered image to the display. The buffer size can be set
    freely but 1/10 screen size is a good starting point.
 
 .. code:: c
 
-   static lv_disp_draw_buf_t draw_buf;
    static lv_color_t buf1[MY_DISP_HOR_RES * MY_DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
-   lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_RES / 10);  /*Initialize the display buffer.*/
+   lv_display_set_buffers(display, buf1, NULL, sizeof(buf1));  /*Initialize the display buffer.*/
 
 -  Implement and register a function which can copy the rendered image
    to an area of your display:
 
 .. code:: c
 
-   static lv_disp_t disp_drv;        /*Descriptor of a display driver*/
-   lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
-   disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
-   disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
-   disp_drv.hor_res = MY_DISP_HOR_RES;   /*Set the horizontal resolution of the display*/
-   disp_drv.ver_res = MY_DISP_VER_RES;   /*Set the vertical resolution of the display*/
-   lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+   lv_display_set_flush_cb(display, my_disp_flush);
 
-   void my_disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
+   void my_disp_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p)
    {
        int32_t x, y;
        /*It's a very slow but simple implementation.
@@ -72,7 +71,7 @@ If you would rather try LVGL on your own project follow these steps:
            }
        }
 
-       lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
+       lv_display_flush_ready(disp);         /* Indicate you are ready with the flushing*/
    }
 
 -  Implement and register a function which can read an input device.
@@ -107,6 +106,8 @@ section.
 
 Learn the basics
 ----------------
+
+.. _quick-overview_widgets:
 
 Widgets
 ~~~~~~~
@@ -160,6 +161,8 @@ To see the full API visit the documentation of the widgets or the
 related header file
 (e.g. `lvgl/src/widgets/slider/lv_slider.h <https://github.com/lvgl/lvgl/blob/master/src/widgets/slider/lv_slider.h>`__).
 
+.. _quick-overview_events:
+
 Events
 ~~~~~~
 
@@ -171,7 +174,7 @@ A callback is assigned like this:
 
 .. code:: c
 
-   lv_obj_add_event(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
+   lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
 
    ...
 
@@ -197,18 +200,22 @@ The object that triggered the event can be retrieved with:
 
 To learn all features of the events go to the :ref:`events` section.
 
+.. _quick-overview_parts:
+
 Parts
 ~~~~~
 
 Widgets might be built from one or more *parts*. For example, a button
 has only one part called :cpp:enumerator:`LV_PART_MAIN`. However, a
-:ref:`slider` has :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_INDICATOR`
+:ref:`lv_slider` has :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_INDICATOR`
 and :cpp:enumerator:`LV_PART_KNOB`.
 
 By using parts you can apply different styles to sub-elements of a
 widget. (See below)
 
 Read the widgets' documentation to learn which parts each uses.
+
+.. _quick-overview_states:
 
 States
 ~~~~~~
@@ -241,6 +248,8 @@ To manually add or remove states use:
    lv_obj_add_state(obj, LV_STATE_...);
    lv_obj_remove_state(obj, LV_STATE_...);
 
+.. _quick-overview_styles:
+
 Styles
 ~~~~~~
 
@@ -260,7 +269,7 @@ configure the style. For example:
    lv_style_set_bg_color(&style1, lv_color_hex(0xa03080))
    lv_style_set_border_width(&style1, 2))
 
-See the full list of properties here :ref:`style_properties`.
+See the full list of properties here :ref:`styles_properties`.
 
 Styles are assigned using the ORed combination of an object's part and
 state. For example to use this style on the slider's indicator when the
@@ -316,6 +325,8 @@ style which resides inside the object and is used only by the object:
 
 To learn all the features of styles see the :ref:`styles` section.
 
+.. _quick-overview_themes:
+
 Themes
 ~~~~~~
 
@@ -325,10 +336,14 @@ applied automatically when objects are created.
 The theme for your application is a compile time configuration set in
 ``lv_conf.h``.
 
+.. _quick-overview_examples:
+
 Examples
 --------
 
 .. include:: ../examples/get_started/index.rst
+
+.. _quick-overview_micropython:
 
 Micropython
 -----------
@@ -337,14 +352,14 @@ Learn more about :ref:`micropython`.
 
 .. code:: python
 
+   # Initialize
+   import display_driver
    import lvgl as lv
 
-   # Create a Button and a Label
+   # Create a button with a label
    scr = lv.obj()
-   btn = lv.btn(scr)
-   btn.align(lv.screen_active(), lv.ALIGN.CENTER, 0, 0)
+   btn = lv.button(scr)
+   btn.align(lv.ALIGN.CENTER, 0, 0)
    label = lv.label(btn)
-   label.set_text("Button")
-
-   # Load the screen
+   label.set_text('Hello World!')
    lv.screen_load(scr)

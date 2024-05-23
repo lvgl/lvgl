@@ -26,6 +26,7 @@ tests/build_*/
 tests/report/
 .DS_Store
 .vscode
+.idea
 *.bak
-
-
+tests/test_images/
+.vs/

@@ -22,8 +22,8 @@ struct sample_fragment_t {
 static const lv_fragment_class_t sample_cls = {
     .constructor_cb = sample_fragment_ctor,
     .create_obj_cb = sample_fragment_create_obj,
-    .instance_size = sizeof(struct sample_fragment_t)
-};
+    .instance_size = sizeof(struct sample_fragment_t),
+    };
 
 void lv_example_fragment_1(void)
 {
@@ -31,12 +31,11 @@ void lv_example_fragment_1(void)
     lv_obj_set_size(root, LV_PCT(100), LV_PCT(100));
     lv_fragment_manager_t * manager = lv_fragment_manager_create(NULL);
     /* Clean up the fragment manager before objects in containers got deleted */
-    lv_obj_add_event(root, sample_container_delete, LV_EVENT_DELETE, manager);
+    lv_obj_add_event_cb(root, sample_container_delete, LV_EVENT_DELETE, manager);
 
     lv_fragment_t * fragment = lv_fragment_create(&sample_cls, "Fragment");
     lv_fragment_manager_replace(manager, fragment, &root);
 }
-
 
 static void sample_fragment_ctor(lv_fragment_t * self, void * args)
 {

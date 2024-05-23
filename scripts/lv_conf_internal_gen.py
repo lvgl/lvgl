@@ -30,7 +30,26 @@ fout.write(
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
-#include "misc/lv_types.h"
+/*Config options*/
+#define LV_OS_NONE          0
+#define LV_OS_PTHREAD       1
+#define LV_OS_FREERTOS      2
+#define LV_OS_CMSIS_RTOS2   3
+#define LV_OS_RTTHREAD      4
+#define LV_OS_WINDOWS       5
+#define LV_OS_MQX           6
+#define LV_OS_CUSTOM        255
+
+#define LV_STDLIB_BUILTIN           0
+#define LV_STDLIB_CLIB              1
+#define LV_STDLIB_MICROPYTHON       2
+#define LV_STDLIB_RTTHREAD          3
+#define LV_STDLIB_CUSTOM            255
+
+#define LV_DRAW_SW_ASM_NONE         0
+#define LV_DRAW_SW_ASM_NEON         1
+#define LV_DRAW_SW_ASM_HELIUM       2
+#define LV_DRAW_SW_ASM_CUSTOM       255
 
 /* Handle special Kconfig options */
 #ifndef LV_KCONFIG_IGNORE
@@ -150,10 +169,13 @@ fout.write(
  * End of parsing lv_conf_template.h
  -----------------------------------*/
 
+#ifndef __ASSEMBLY__
 LV_EXPORT_CONST_INT(LV_DPI_DEF);
+LV_EXPORT_CONST_INT(LV_DRAW_BUF_STRIDE_ALIGN);
+LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
+#endif
 
 #undef _LV_KCONFIG_PRESENT
-
 
 /*Set some defines if a dependency is disabled*/
 #if LV_USE_LOG == 0
@@ -168,6 +190,29 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
 
+#if LV_USE_SYSMON == 0
+    #define LV_USE_PERF_MONITOR 0
+    #define LV_USE_MEM_MONITOR 0
+#endif /*LV_USE_SYSMON*/
+
+#ifndef LV_USE_LZ4
+    #define LV_USE_LZ4  (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)
+#endif
+
+#ifndef LV_USE_THORVG
+    #define LV_USE_THORVG  (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+#endif
+
+#if LV_USE_OS
+    #if (LV_USE_FREETYPE || LV_USE_THORVG) && LV_DRAW_THREAD_STACK_SIZE < (32 * 1024)
+        #warning "Increase LV_DRAW_THREAD_STACK_SIZE to at least 32KB for FreeType or ThorVG."
+    #endif
+
+    #if defined(LV_DRAW_THREAD_STACKSIZE) && !defined(LV_DRAW_THREAD_STACK_SIZE)
+        #warning "LV_DRAW_THREAD_STACKSIZE was renamed to LV_DRAW_THREAD_STACK_SIZE. Please update lv_conf.h or run menuconfig again."
+        #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
+    #endif
+#endif
 
 /*If running without lv_conf.h add typedefs with default value*/
 #ifdef LV_CONF_SKIP

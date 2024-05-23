@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_color.c
  *
  */
@@ -44,22 +44,26 @@ const lv_color_filter_dsc_t lv_color_filter_shade = {.filter_cb = lv_color_filte
 uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
 {
     switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE_REVERSED:
-            return LV_COLOR_DEPTH / 8;
         case LV_COLOR_FORMAT_I1:
+        case LV_COLOR_FORMAT_A1:
             return 1;
         case LV_COLOR_FORMAT_I2:
+        case LV_COLOR_FORMAT_A2:
             return 2;
         case LV_COLOR_FORMAT_I4:
+        case LV_COLOR_FORMAT_A4:
             return 4;
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_I8:
             return 8;
-        case LV_COLOR_FORMAT_RGB565:
-            return 16;
 
         case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_AL88:
+            return 16;
+
+        case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_RGB888:
             return 24;
         case LV_COLOR_FORMAT_ARGB8888:
@@ -75,10 +79,17 @@ uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
 bool lv_color_format_has_alpha(lv_color_format_t cf)
 {
     switch(cf) {
+        case LV_COLOR_FORMAT_A1:
+        case LV_COLOR_FORMAT_A2:
+        case LV_COLOR_FORMAT_A4:
         case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_I1:
+        case LV_COLOR_FORMAT_I2:
+        case LV_COLOR_FORMAT_I4:
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_AL88:
             return true;
         default:
             return false;
@@ -116,13 +127,6 @@ lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl)
     return lv_color_mix(lv_color_black(), c, lvl);
 }
 
-/**
- * Convert a HSV color to RGB
- * @param h hue [0..359]
- * @param s saturation [0..100]
- * @param v value [0..100]
- * @return the given RGB color in RGB (with LV_COLOR_DEPTH depth)
- */
 lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
 {
     h = (uint32_t)((uint32_t)h * 255) / 360;
@@ -181,13 +185,6 @@ lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
     return result;
 }
 
-/**
- * Convert a 32-bit RGB color to HSV
- * @param r8 8-bit red
- * @param g8 8-bit green
- * @param b8 8-bit blue
- * @return the given RGB color in HSV
- */
 lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
 {
     uint16_t r = ((uint32_t)r8 << 10) / 255;
@@ -244,7 +241,6 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t c)
     return lv_color_rgb_to_hsv(c.red, c.green, c.blue);
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -268,4 +264,3 @@ static lv_color_t lv_color_filter_shade_cb(const lv_color_filter_dsc_t * dsc, lv
     if(opa < LV_OPA_50) return lv_color_lighten(c, (LV_OPA_50 - opa) * 2);
     else return lv_color_darken(c, (opa - LV_OPA_50 * LV_OPA_50) * 2);
 }
-

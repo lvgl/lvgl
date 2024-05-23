@@ -13,9 +13,14 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../misc/lv_types.h"
 #include "../core/lv_obj.h"
 #include "../draw/lv_draw.h"
 #include "lv_display.h"
+
+#if LV_USE_SYSMON
+#include "../others/sysmon/lv_sysmon.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -28,8 +33,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_display_t;
-
 struct _lv_display_t {
 
     /*---------------------
@@ -37,38 +40,43 @@ struct _lv_display_t {
      *--------------------*/
 
     /** Horizontal resolution.*/
-    lv_coord_t hor_res;
+    int32_t hor_res;
 
     /** Vertical resolution.*/
-    lv_coord_t ver_res;
+    int32_t ver_res;
 
     /** Horizontal resolution of the full / physical display. Set to -1 for fullscreen mode.*/
-    lv_coord_t physical_hor_res;
+    int32_t physical_hor_res;
 
     /** Vertical resolution of the full / physical display. Set to -1 for fullscreen mode.*/
-    lv_coord_t physical_ver_res;
+    int32_t physical_ver_res;
 
     /** Horizontal offset from the full / physical display. Set to 0 for fullscreen mode.*/
-    lv_coord_t offset_x;
+    int32_t offset_x;
 
     /** Vertical offset from the full / physical display. Set to 0 for fullscreen mode.*/
-    lv_coord_t offset_y;
+    int32_t offset_y;
 
     uint32_t dpi;              /** DPI (dot per inch) of the display. Default value is `LV_DPI_DEF`.*/
 
     /*---------------------
      * Buffering
      *--------------------*/
-    uint8_t * buf_1;
-    uint8_t * buf_2;
+    lv_draw_buf_t * buf_1;
+    lv_draw_buf_t * buf_2;
 
     /** Internal, used by the library*/
-    uint8_t * buf_act;
-    uint32_t buf_size_in_bytes;
+    lv_draw_buf_t * buf_act;
 
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_display_flush_ready()' has to be
      * called when finished*/
     lv_display_flush_cb_t flush_cb;
+
+    /**
+     * Used to wait while flushing is ready.
+     * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
+     * If not set `flushing` flag is used which can be cleared with `lv_display_flush_ready()`*/
+    lv_display_flush_wait_cb_t flush_wait_cb;
 
     /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing;
@@ -95,25 +103,27 @@ struct _lv_display_t {
     /** Double buffer sync areas (redrawn during last refresh) */
     lv_ll_t sync_areas;
 
+    lv_draw_buf_t _static_buf1; /*Used when user pass in a raw buffer as display draw buffer*/
+    lv_draw_buf_t _static_buf2;
     /*---------------------
      * Layer
      *--------------------*/
     lv_layer_t * layer_head;
-    void (*layer_init)(struct _lv_display_t * disp, lv_layer_t * layer);
-    void (*layer_deinit)(struct _lv_display_t * disp, lv_layer_t * layer);
+    void (*layer_init)(lv_display_t * disp, lv_layer_t * layer);
+    void (*layer_deinit)(lv_display_t * disp, lv_layer_t * layer);
 
     /*---------------------
      * Screens
      *--------------------*/
 
     /** Screens of the display*/
-    struct _lv_obj_t ** screens;    /**< Array of screen objects.*/
-    struct _lv_obj_t * act_scr;     /**< Currently active screen on this display*/
-    struct _lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
-    struct _lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_screen_load_anim*/
-    struct _lv_obj_t * bottom_layer;    /**< @see lv_display_get_layer_bottom*/
-    struct _lv_obj_t * top_layer;       /**< @see lv_display_get_layer_top*/
-    struct _lv_obj_t * sys_layer;       /**< @see lv_display_get_layer_sys*/
+    lv_obj_t ** screens;    /**< Array of screen objects.*/
+    lv_obj_t * sys_layer;   /**< @see lv_display_get_layer_sys*/
+    lv_obj_t * top_layer;   /**< @see lv_display_get_layer_top*/
+    lv_obj_t * act_scr;     /**< Currently active screen on this display*/
+    lv_obj_t * bottom_layer;/**< @see lv_display_get_layer_bottom*/
+    lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
+    lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_screen_load_anim*/
     uint32_t screen_cnt;
     uint8_t draw_prev_over_act  : 1;/** 1: Draw previous screen over active screen*/
     uint8_t del_prev  : 1; /** 1: Automatically delete the previous screen when the screen load animation is ready*/
@@ -132,7 +142,7 @@ struct _lv_display_t {
     uint32_t rotation  : 2; /**< Element of  @lv_display_rotation_t*/
 
     /**< The theme assigned to the screen*/
-    struct _lv_theme_t * theme;
+    lv_theme_t * theme;
 
     /** A timer which periodically checks the dirty areas and refreshes them*/
     lv_timer_t * refr_timer;
@@ -142,6 +152,17 @@ struct _lv_display_t {
 
     /** The area being refreshed*/
     lv_area_t refreshed_area;
+
+#if LV_USE_PERF_MONITOR
+    lv_obj_t * perf_label;
+    lv_sysmon_backend_data_t perf_sysmon_backend;
+    lv_sysmon_perf_info_t perf_sysmon_info;
+#endif
+
+#if LV_USE_MEM_MONITOR
+    lv_obj_t * mem_label;
+#endif
+
 };
 
 /**********************

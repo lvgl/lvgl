@@ -6,15 +6,16 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_rlottie.h"
+#include "../../lvgl.h"
 #if LV_USE_RLOTTIE
 
 #include <rlottie_capi.h>
+#include <string.h>
 
 /*********************
 *      DEFINES
 *********************/
-#define MY_CLASS &lv_rlottie_class
+#define MY_CLASS (&lv_rlottie_class)
 #define LV_ARGB32   32
 
 /**********************
@@ -42,13 +43,13 @@ const lv_obj_class_t lv_rlottie_class = {
 };
 
 typedef struct {
-    lv_coord_t width;
-    lv_coord_t height;
+    int32_t width;
+    int32_t height;
     const char * rlottie_desc;
     const char * path;
 } lv_rlottie_create_info_t;
 
-// only used in lv_obj_class_create_obj, no affect multiple instances
+/*Only used in lv_obj_class_create_obj, no affect multiple instances*/
 static lv_rlottie_create_info_t create_info;
 
 /**********************
@@ -59,7 +60,7 @@ static lv_rlottie_create_info_t create_info;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * path)
+lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t height, const char * path)
 {
     create_info.width = width;
     create_info.height = height;
@@ -73,7 +74,7 @@ lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_c
     return obj;
 }
 
-lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * rlottie_desc)
+lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, int32_t width, int32_t height, const char * rlottie_desc)
 {
     create_info.width = width;
     create_info.height = height;
@@ -137,7 +138,6 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         memset(rlottie->allocated_buf, 0, allocaled_buf_size);
     }
 
-    rlottie->imgdsc.header.always_zero = 0;
     rlottie->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
     rlottie->imgdsc.header.h = create_info.height;
     rlottie->imgdsc.header.w = create_info.width;
@@ -153,7 +153,6 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     lv_obj_update_layout(obj);
 }
-
 
 static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -176,9 +175,7 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
         rlottie->dest_frame = 0;
     }
 
-    lv_cache_lock();
-    lv_cache_invalidate(lv_cache_find(&rlottie->imgdsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
-    lv_cache_unlock();
+    lv_image_cache_drop(&rlottie->imgdsc);
 
     if(rlottie->allocated_buf) {
         lv_free(rlottie->allocated_buf);

@@ -1,4 +1,4 @@
-#include "../../lv_conf_internal.h"
+﻿#include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #ifndef LV_TLSF_H
@@ -41,10 +41,9 @@
 ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <stddef.h>
-
 #include "../../osal/lv_os.h"
 #include "../../misc/lv_ll.h"
+#include "../../misc/lv_types.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -60,8 +59,8 @@ typedef struct {
     lv_mutex_t mutex;
 #endif
     lv_tlsf_t tlsf;
-    uint32_t cur_used;
-    uint32_t max_used;
+    size_t cur_used;
+    size_t max_used;
     lv_ll_t  pool_ll;
 } lv_tlsf_state_t;
 
@@ -105,4 +104,4 @@ int lv_tlsf_check_pool(lv_pool_t pool);
 
 #endif /*LV_TLSF_H*/
 
-#endif /* LV_USE_BUILTIN_MALLOC */
+#endif /*LV_STDLIB_BUILTIN*/

@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 #ifndef LV_VGLITE_MATRIX_H
 #define LV_VGLITE_MATRIX_H
 

@@ -15,6 +15,8 @@ extern "C" {
  *********************/
 #include "../lv_demos.h"
 
+#if LV_USE_DEMO_BENCHMARK
+
 /*********************
  *      DEFINES
  *********************/
@@ -22,38 +24,37 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
-    /**Render the scenes and show them on the display.
-     * Measure rendering time but it might contain extra time when LVGL waits for the driver.
-     * Run each scenes for a few seconds so the performance can be seen by eye too.
-     * As only the rendering time is measured and converted to FPS, really high values (e.g. 1000 FPS)
-     * are possible.*/
-    LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER,
-
-    /**Similar to RENDER_AND_DRIVER but instead of measuring the rendering time only measure the real FPS of the system.
-     * E.g. even if a scene was rendered in 1 ms, but the screen is redrawn only in every 100 ms, the result will be 10 FPS.*/
-    LV_DEMO_BENCHMARK_MODE_REAL,
-
-    /**Temporarily display the `flush_cb` so the pure rendering time will be measured.
-     * The display is not updated during the benchmark, only at the end when the summary table is shown.
-     * Render a given number of frames from each scene and calculate the FPS from them.*/
-    LV_DEMO_BENCHMARK_MODE_RENDER_ONLY,
-} lv_demo_benchmark_mode_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-/** Run all test scenes in the LVGL benchmark with a given mode
- */
-void lv_demo_benchmark(lv_demo_benchmark_mode_t mode);
 
-/** Run a specific test scene in the LVGL benchmark with a given mode
+/**
+ * Run all benchmark scenes.
+ *
+ * On the summary end screen the values shall be interpreted according to the followings:
+ * - CPU usage:
+ *    - If `LV_SYSMON_GET_IDLE` is not modified it's measured based on the time spent in
+ *      `lv_timer_handler`.
+ *    - If an (RT)OS is used `LV_SYSMON_GET_IDLE` can be changed to a custom function
+ *      which returns the idle percentage of idle task.
+ *
+ * - FPS: LVGL attempted to render this many times in a second. It's limited based on `LV_DEF_REFR_PERIOD`
+ *
+ * - Render time: LVGL spent this much time with rendering only. It's not aware of task yielding,
+ *   but simply the time difference between the start and end of the rendering is measured
+ *
+ * - Flush time: It's the sum of
+ *     - the time spent in the `fluch_cb` and
+ *     - the time spent with waiting for flush ready.
  */
-void lv_demo_benchmark_run_scene(lv_demo_benchmark_mode_t mode, uint16_t scene_no);
+void lv_demo_benchmark(void);
 
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_DEMO_BENCHMARK*/
 
 #ifdef __cplusplus
 } /* extern "C" */

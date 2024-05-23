@@ -1,5 +1,6 @@
-.. _slider:
+.. _lv_slider:
 
+==================
 Slider (lv_slider)
 ==================
 
@@ -9,6 +10,8 @@ Overview
 The Slider object looks like a `Bar </widgets/bar>`__ supplemented with
 a knob. The knob can be dragged to set a value. Just like Bar, Slider
 can be vertical or horizontal.
+
+.. _lv_slider_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -25,6 +28,8 @@ Parts and Styles
    knob can be made larger with the ``padding`` values. Padding values
    can be asymmetric too.
 
+.. _lv_slider_usage:
+
 Usage
 *****
 
@@ -35,6 +40,9 @@ To set an initial value use :cpp:expr:`lv_slider_set_value(slider, new_value, LV
 animation time is set by the styles' ``anim_time`` property.
 
 To specify the range (min, max values), :cpp:expr:`lv_slider_set_range(slider, min , max)` can be used.
+The default range is 0..100, and the default drawing direction is from left to right in horizontal mode and
+bottom to top in vertical mode. If the minimum value is greater than the maximum value, like
+100..0, the drawing direction changes to the opposite direction.
 
 Modes
 -----
@@ -62,6 +70,8 @@ feature is enabled by adding the :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST`:
 
 The extended click area (set by :cpp:expr:`lv_obj_set_ext_click_area(slider, value)`) increases to knob's click area.
 
+.. _lv_slider_events:
+
 Events
 ******
 
@@ -69,26 +79,12 @@ Events
    changed with keys. The event is sent continuously while the slider is
    being dragged.
 -  :cpp:enumerator:`LV_EVENT_RELEASED` Sent when the slider has just been released.
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following parts.
-
-   -  :cpp:enumerator:`LV_SLIDER_DRAW_PART_KNOB` The main (right) knob of the slider
-
-      -  ``part``: :cpp:enumerator:`LV_PART_KNOB`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-      -  ``id``: 0
-
-   -  :cpp:enumerator:`LV_SLIDER_DRAW_PART_KNOB` The left knob of the slider
-
-      -  ``part``: :cpp:enumerator:`LV_PART_KNOB`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-      -  ``id``: 1
 
 See the events of the `Bar </widgets/bar>`__ too.
 
 Learn more about :ref:`events`.
+
+.. _lv_slider_keys:
 
 Keys
 ****
@@ -98,10 +94,14 @@ Keys
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_slider_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/slider/index.rst
+
+.. _lv_slider_api:
 
 API
 ***

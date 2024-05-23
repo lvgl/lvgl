@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-
+#if LV_BUILD_TEST
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN
@@ -132,9 +132,11 @@ test_image_cogwheel_i4_map[] = {
 
 const lv_image_dsc_t test_image_cogwheel_i4 = {
     .header.cf = LV_COLOR_FORMAT_I4,
-    .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
-    .data_size = 5064,
+    .header.stride = 50,
+    .data_size = sizeof(test_image_cogwheel_i4_map),
     .data = test_image_cogwheel_i4_map,
 };
+
+#endif /*LV_BUILD_TEST*/

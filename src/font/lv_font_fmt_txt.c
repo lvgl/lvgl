@@ -25,6 +25,10 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    uint32_t gid_left;
+    uint32_t gid_right;
+} kern_pair_ref_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -36,8 +40,8 @@ static int32_t kern_pair_8_compare(const void * ref, const void * element);
 static int32_t kern_pair_16_compare(const void * ref, const void * element);
 
 #if LV_USE_FONT_COMPRESSED
-    static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter);
-    static inline void decompress_line(uint8_t * out, lv_coord_t w);
+    static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter);
+    static inline void decompress_line(uint8_t * out, int32_t w);
     static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
     static inline void rle_init(const uint8_t * in,  uint8_t bpp);
     static inline uint8_t rle_next(void);
@@ -59,7 +63,6 @@ static const uint8_t opa3_table[8] = {0, 36, 73, 109, 146, 182, 218, 255};
 
 static const uint8_t opa2_table[4] = {0, 85, 170, 255};
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -72,13 +75,13 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
  *   GLOBAL FUNCTIONS
  **********************/
 
-
-const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out)
+const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
-    if(unicode_letter == '\t') unicode_letter = ' ';
+    const lv_font_t * font = g_dsc->resolved_font;
+    uint8_t * bitmap_out = draw_buf->data;
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-    uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
+    uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
@@ -143,7 +146,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
                 bitmap_out_tmp += stride;
             }
         }
-        return bitmap_out;
+        return draw_buf;
     }
     /*Handle compressed bitmap*/
     else {
@@ -151,7 +154,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
         decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
-        return bitmap_out;
+        return draw_buf;
 #else /*!LV_USE_FONT_COMPRESSED*/
         LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
         return NULL;
@@ -162,15 +165,6 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
     return NULL;
 }
 
-/**
- * Used as `get_glyph_dsc` callback in lvgl's native font format if the font is uncompressed.
- * @param font pointer to font
- * @param dsc_out store the result descriptor here
- * @param unicode_letter a UNICODE letter code
- * @param unicode_letter_next the unicode letter succeeding the letter under test
- * @return true: descriptor is successfully loaded into `dsc_out`.
- *         false: the letter was not found, no data is loaded to `dsc_out`
- */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next)
 {
@@ -207,8 +201,9 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->box_w = gdsc->box_w;
     dsc_out->ofs_x = gdsc->ofs_x;
     dsc_out->ofs_y = gdsc->ofs_y;
-    dsc_out->bpp   = (uint8_t)fdsc->bpp;
+    dsc_out->format = (uint8_t)fdsc->bpp;
     dsc_out->is_placeholder = false;
+    dsc_out->gid.index = gid;
 
     if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
 
@@ -246,7 +241,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 
             if(p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
-                glyph_id = fdsc->cmaps[i].glyph_id_start + ofs;
+                glyph_id = fdsc->cmaps[i].glyph_id_start + (uint32_t) ofs;
             }
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
@@ -281,7 +276,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
             /*Use binary search to find the kern value.
              *The pairs are ordered left_id first, then right_id secondly.*/
             const uint16_t * g_ids = kdsc->glyph_ids;
-            uint16_t g_id_both = (gid_right << 8) + gid_left; /*Create one number from the ids*/
+            kern_pair_ref_t g_id_both = {gid_left, gid_right};
             uint16_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, kern_pair_8_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
@@ -294,7 +289,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
             /*Use binary search to find the kern value.
              *The pairs are ordered left_id first, then right_id secondly.*/
             const uint32_t * g_ids = kdsc->glyph_ids;
-            uint32_t g_id_both = (gid_right << 16) + gid_left; /*Create one number from the ids*/
+            kern_pair_ref_t g_id_both = {gid_left, gid_right};
             uint32_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, kern_pair_16_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
@@ -326,26 +321,27 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
 
 static int32_t kern_pair_8_compare(const void * ref, const void * element)
 {
-    const uint8_t * ref8_p = ref;
+    const kern_pair_ref_t * ref8_p = ref;
     const uint8_t * element8_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref8_p[0] != element8_p[0]) return (int32_t)ref8_p[0] - element8_p[0];
-    else return (int32_t) ref8_p[1] - element8_p[1];
+    if(ref8_p->gid_left != element8_p[0]) return (int32_t) ref8_p->gid_left - element8_p[0];
+    else return (int32_t) ref8_p->gid_right - element8_p[1];
 
 }
 
 static int32_t kern_pair_16_compare(const void * ref, const void * element)
 {
-    const uint16_t * ref16_p = ref;
+    const kern_pair_ref_t * ref16_p = ref;
     const uint16_t * element16_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref16_p[0] != element16_p[0]) return (int32_t)ref16_p[0] - element16_p[0];
-    else return (int32_t) ref16_p[1] - element16_p[1];
+    if(ref16_p->gid_left != element16_p[0]) return (int32_t) ref16_p->gid_left - element16_p[0];
+    else return (int32_t) ref16_p->gid_right - element16_p[1];
 }
 
 #if LV_USE_FONT_COMPRESSED
+
 /**
  * The compress a glyph's bitmap
  * @param in the compressed bitmap
@@ -354,7 +350,7 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
  * @param bpp bit per pixel (bpp = 3 will be converted to bpp = 4)
  * @param prefilter true: the lines are XORed
  */
-static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter)
+static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter)
 {
     const lv_opa_t * opa_table;
     switch(bpp) {
@@ -384,8 +380,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
     decompress_line(line_buf1, w);
 
-    lv_coord_t y;
-    lv_coord_t x;
+    int32_t y;
+    int32_t x;
     uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
 
     for(x = 0; x < w; x++) {
@@ -421,9 +417,9 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
  * @param out output buffer
  * @param w width of the line in pixel count
  */
-static inline void decompress_line(uint8_t * out, lv_coord_t w)
+static inline void decompress_line(uint8_t * out, int32_t w)
 {
-    lv_coord_t i;
+    int32_t i;
     for(i = 0; i < w; i++) {
         out[i] = rle_next();
     }

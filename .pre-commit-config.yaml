@@ -10,23 +10,32 @@ repos:
     hooks:
     # Run astyle over the staged files with c and h extension found in the directories
     # listed in the files regex pattern. Ignoring the files in the exclude pattern.
-    - id: format-source
-      name: Formatting source files
-      entry: astyle --options=scripts/code-format.cfg --ignore-exclude-errors
-      stages: [ commit ]
-      language: system
-      pass_filenames: true
-      verbose: true
-      files: |
-        (?x)^(
-            demos/ |
-            examples/ |
-            src/ |
-            tests/
-        )
-      exclude: |
-        (?x)^(
-            src/libs/ |
-            src/lv_conf_internal.h
-         )
-      types_or: ["c", "header"]
+    -   id: format-source
+        name: Formatting source files
+        entry: astyle --options=scripts/code-format.cfg --ignore-exclude-errors
+        stages: [ commit ]
+        language: system
+        pass_filenames: true
+        verbose: true
+        files: |
+          (?x)^(
+              demos/ |
+              examples/ |
+              src/ |
+              tests/
+          )
+        exclude: |
+          (?x)^(
+              src/libs/ |
+              src/lv_conf_internal.h |
+              tests/test_images
+           )
+        types_or: ["c", "header"]
+-   repo: https://github.com/crate-ci/typos
+    rev: v1.16.20
+    hooks:
+    -   id: typos
+        exclude: |
+            (?x)^(
+                src/libs/
+             )

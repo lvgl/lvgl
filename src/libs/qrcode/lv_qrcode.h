@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
 #if LV_USE_QRCODE
 
 /*********************
@@ -31,7 +31,7 @@ typedef struct {
     lv_color_t light_color;
 } lv_qrcode_t;
 
-extern const lv_obj_class_t lv_qrcode_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_qrcode_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -49,7 +49,7 @@ lv_obj_t * lv_qrcode_create(lv_obj_t * parent);
  * @param obj pointer to a QR code object
  * @param size width and height of the QR code
  */
-void lv_qrcode_set_size(lv_obj_t * obj, lv_coord_t size);
+void lv_qrcode_set_size(lv_obj_t * obj, int32_t size);
 
 /**
  * Set QR code dark color.

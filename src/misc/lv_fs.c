@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_fs.c
  *
  */
@@ -8,8 +8,8 @@
  *********************/
 #include "lv_fs.h"
 
-#include <string.h>
 #include "../misc/lv_assert.h"
+#include "../misc/lv_profiler.h"
 #include "../stdlib/lv_string.h"
 #include "lv_ll.h"
 #include "../core/lv_global.h"
@@ -27,6 +27,9 @@
  *  STATIC PROTOTYPES
  **********************/
 static const char * lv_fs_get_real_path(const char * path);
+static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t * br);
+static lv_fs_res_t lv_fs_write_cached(lv_fs_file_t * file_p, const void * buf, uint32_t btw, uint32_t * bw);
+static lv_fs_res_t lv_fs_seek_cached(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whence);
 
 /**********************
  *  STATIC VARIABLES
@@ -43,6 +46,11 @@ static const char * lv_fs_get_real_path(const char * path);
 void _lv_fs_init(void)
 {
     _lv_ll_init(fsdrv_ll_p, sizeof(lv_fs_drv_t *));
+}
+
+void _lv_fs_deinit(void)
+{
+    _lv_ll_clear(fsdrv_ll_p);
 }
 
 bool lv_fs_is_ready(char letter)
@@ -83,6 +91,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     file_p->drv = drv;
 
     /* For memory-mapped files we set the file handle to our file descriptor so that we can access the cache from the file operations */
@@ -93,15 +103,15 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         const char * real_path = lv_fs_get_real_path(path);
         void * file_d = drv->open_cb(drv, real_path, mode);
         if(file_d == NULL || file_d == (void *)(-1)) {
+            LV_PROFILER_END;
             return LV_FS_RES_UNKNOWN;
         }
         file_p->file_d = file_d;
     }
 
     if(drv->cache_size) {
-        file_p->cache = lv_malloc(sizeof(lv_fs_file_cache_t));
+        file_p->cache = lv_malloc_zeroed(sizeof(lv_fs_file_cache_t));
         LV_ASSERT_MALLOC(file_p->cache);
-        lv_memzero(file_p->cache, sizeof(lv_fs_file_cache_t));
 
         /* If this is a memory-mapped file, then set "cache" to the memory buffer */
         if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
@@ -117,6 +127,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
             file_p->cache->end = UINT32_MAX - 1;
         }
     }
+
+    LV_PROFILER_END;
 
     return LV_FS_RES_OK;
 }
@@ -140,6 +152,8 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_fs_res_t res = file_p->drv->close_cb(file_p->drv, file_p->file_d);
 
     if(file_p->drv->cache_size && file_p->cache) {
@@ -155,92 +169,7 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
     file_p->drv    = NULL;
     file_p->cache  = NULL;
 
-    return res;
-}
-
-static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t btr, uint32_t * br)
-{
-    lv_fs_res_t res = LV_FS_RES_OK;
-    uint32_t file_position = file_p->cache->file_position;
-    uint32_t start = file_p->cache->start;
-    uint32_t end = file_p->cache->end;
-    char * buffer = file_p->cache->buffer;
-    uint32_t buffer_size = file_p->drv->cache_size;
-
-    if(start <= file_position && file_position <= end) {
-        /* Data can be read from cache buffer */
-        uint32_t buffer_remaining_length = (uint32_t)end - file_position + 1;
-        uint32_t buffer_offset = (end - start) - buffer_remaining_length + 1;
-
-        /* Do not allow reading beyond the actual memory block for memory-mapped files */
-        if(file_p->drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
-            if(btr > buffer_remaining_length)
-                btr = buffer_remaining_length - 1;
-        }
-
-        if(btr <= buffer_remaining_length) {
-            /*Data is in cache buffer, and buffer end not reached, no need to read from FS*/
-            lv_memcpy(buf, buffer + buffer_offset, btr);
-            *br = btr;
-        }
-        else {
-            /*First part of data is in cache buffer, but we need to read rest of data from FS*/
-            lv_memcpy(buf, buffer + buffer_offset, buffer_remaining_length);
-
-            file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->end + 1,
-                                 LV_FS_SEEK_SET);
-
-            uint32_t bytes_read_to_buffer = 0;
-            if(btr - buffer_remaining_length > buffer_size) {
-                /*If remaining data chuck is bigger than buffer size, then do not use cache, instead read it directly from FS*/
-                res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)(buf + buffer_remaining_length),
-                                           btr - buffer_remaining_length, &bytes_read_to_buffer);
-            }
-            else {
-                /*If remaining data chunk is smaller than buffer size, then read into cache buffer*/
-                res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buffer, buffer_size, &bytes_read_to_buffer);
-                file_p->cache->start = file_p->cache->end + 1;
-                file_p->cache->end = file_p->cache->start + bytes_read_to_buffer - 1;
-
-                uint16_t data_chunk_remaining = LV_MIN(btr - buffer_remaining_length, bytes_read_to_buffer);
-                lv_memcpy(buf + buffer_remaining_length, buffer, data_chunk_remaining);
-            }
-            *br = LV_MIN(buffer_remaining_length + bytes_read_to_buffer, btr);
-        }
-    }
-    else {
-        file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position,
-                             LV_FS_SEEK_SET);
-
-        /*Data is not in cache buffer*/
-        if(btr > buffer_size) {
-            /*If bigger data is requested, then do not use cache, instead read it directly*/
-            res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buf, btr, br);
-        }
-        else {
-            /*If small data is requested, then read from FS into cache buffer*/
-            if(buffer == NULL) {
-                file_p->cache->buffer = lv_malloc(buffer_size);
-                LV_ASSERT_MALLOC(file_p->cache->buffer);
-                buffer = file_p->cache->buffer;
-            }
-
-
-
-            uint32_t bytes_read_to_buffer = 0;
-            res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buffer, buffer_size, &bytes_read_to_buffer);
-            file_p->cache->start = file_position;
-            file_p->cache->end = file_p->cache->start + bytes_read_to_buffer - 1;
-
-            *br = LV_MIN(btr, bytes_read_to_buffer);
-            lv_memcpy(buf, buffer, *br);
-
-        }
-    }
-
-    if(res == LV_FS_RES_OK) {
-        file_p->cache->file_position += *br;
-    }
+    LV_PROFILER_END;
 
     return res;
 }
@@ -249,19 +178,29 @@ lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t
 {
     if(br != NULL) *br = 0;
     if(file_p->drv == NULL) return LV_FS_RES_INV_PARAM;
-    if(file_p->drv->read_cb == NULL) return LV_FS_RES_NOT_IMP;
+
+    if(file_p->drv->cache_size) {
+        if(file_p->drv->read_cb == NULL || file_p->drv->seek_cb == NULL) return LV_FS_RES_NOT_IMP;
+    }
+    else {
+        if(file_p->drv->read_cb == NULL) return LV_FS_RES_NOT_IMP;
+    }
+
+    LV_PROFILER_BEGIN;
 
     uint32_t br_tmp = 0;
     lv_fs_res_t res;
 
     if(file_p->drv->cache_size) {
-        res = lv_fs_read_cached(file_p, (char *)buf, btr, &br_tmp);
+        res = lv_fs_read_cached(file_p, buf, btr, &br_tmp);
     }
     else {
         res = file_p->drv->read_cb(file_p->drv, file_p->file_d, buf, btr, &br_tmp);
     }
 
     if(br != NULL) *br = br_tmp;
+
+    LV_PROFILER_END;
 
     return res;
 }
@@ -274,13 +213,26 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->write_cb == NULL) {
-        return LV_FS_RES_NOT_IMP;
+    if(file_p->drv->cache_size) {
+        if(file_p->drv->write_cb == NULL || file_p->drv->seek_cb == NULL) return LV_FS_RES_NOT_IMP;
+    }
+    else {
+        if(file_p->drv->write_cb == NULL) return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
+    lv_fs_res_t res;
     uint32_t bw_tmp = 0;
-    lv_fs_res_t res = file_p->drv->write_cb(file_p->drv, file_p->file_d, buf, btw, &bw_tmp);
+    if(file_p->drv->cache_size) {
+        res = lv_fs_write_cached(file_p, buf, btw, &bw_tmp);
+    }
+    else {
+        res = file_p->drv->write_cb(file_p->drv, file_p->file_d, buf, btw, &bw_tmp);
+    }
     if(bw != NULL) *bw = bw_tmp;
+
+    LV_PROFILER_END;
 
     return res;
 }
@@ -291,51 +243,24 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->seek_cb == NULL) {
-        return LV_FS_RES_NOT_IMP;
+    if(file_p->drv->cache_size) {
+        if(file_p->drv->seek_cb == NULL || file_p->drv->tell_cb == NULL) return LV_FS_RES_NOT_IMP;
+    }
+    else {
+        if(file_p->drv->seek_cb == NULL) return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = LV_FS_RES_OK;
+    LV_PROFILER_BEGIN;
+
+    lv_fs_res_t res;
     if(file_p->drv->cache_size) {
-        switch(whence) {
-            case LV_FS_SEEK_SET: {
-                    file_p->cache->file_position = pos;
-
-                    /*FS seek if new position is outside cache buffer*/
-                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position > file_p->cache->end) {
-                        res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
-                    }
-
-                    break;
-                }
-            case LV_FS_SEEK_CUR: {
-                    file_p->cache->file_position += pos;
-
-                    /*FS seek if new position is outside cache buffer*/
-                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position > file_p->cache->end) {
-                        res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
-                    }
-
-                    break;
-                }
-            case LV_FS_SEEK_END: {
-                    /*Because we don't know the file size, we do a little trick: do a FS seek, then get the new file position from FS*/
-                    res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos, whence);
-                    if(res == LV_FS_RES_OK) {
-                        uint32_t tmp_position;
-                        res = file_p->drv->tell_cb(file_p->drv, file_p->file_d, &tmp_position);
-
-                        if(res == LV_FS_RES_OK) {
-                            file_p->cache->file_position = tmp_position;
-                        }
-                    }
-                    break;
-                }
-        }
+        res = lv_fs_seek_cached(file_p, pos, whence);
     }
     else {
         res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos, whence);
     }
+
+    LV_PROFILER_END;
 
     return res;
 }
@@ -347,10 +272,12 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->tell_cb == NULL) {
+    if(file_p->drv->cache_size == 0 && file_p->drv->tell_cb == NULL) {
         *pos = 0;
         return LV_FS_RES_NOT_IMP;
     }
+
+    LV_PROFILER_BEGIN;
 
     lv_fs_res_t res;
     if(file_p->drv->cache_size) {
@@ -360,6 +287,8 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
     else {
         res = file_p->drv->tell_cb(file_p->drv, file_p->file_d, pos);
     }
+
+    LV_PROFILER_END;
 
     return res;
 }
@@ -385,21 +314,30 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     const char * real_path = lv_fs_get_real_path(path);
     void * dir_d = drv->dir_open_cb(drv, real_path);
 
     if(dir_d == NULL || dir_d == (void *)(-1)) {
+        LV_PROFILER_END;
         return LV_FS_RES_UNKNOWN;
     }
 
     rddir_p->drv = drv;
     rddir_p->dir_d = dir_d;
 
+    LV_PROFILER_END;
+
     return LV_FS_RES_OK;
 }
 
-lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn)
+lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn, uint32_t fn_len)
 {
+    if(fn_len == 0) {
+        return LV_FS_RES_INV_PARAM;
+    }
+
     if(rddir_p->drv == NULL || rddir_p->dir_d == NULL) {
         fn[0] = '\0';
         return LV_FS_RES_INV_PARAM;
@@ -410,7 +348,11 @@ lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn)
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = rddir_p->drv->dir_read_cb(rddir_p->drv, rddir_p->dir_d, fn);
+    LV_PROFILER_BEGIN;
+
+    lv_fs_res_t res = rddir_p->drv->dir_read_cb(rddir_p->drv, rddir_p->dir_d, fn, fn_len);
+
+    LV_PROFILER_END;
 
     return res;
 }
@@ -425,10 +367,14 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
         return LV_FS_RES_NOT_IMP;
     }
 
+    LV_PROFILER_BEGIN;
+
     lv_fs_res_t res = rddir_p->drv->dir_close_cb(rddir_p->drv, rddir_p->dir_d);
 
     rddir_p->dir_d = NULL;
     rddir_p->drv   = NULL;
+
+    LV_PROFILER_END;
 
     return res;
 }
@@ -558,4 +504,163 @@ static const char * lv_fs_get_real_path(const char * path)
     if(*path == ':') path++;
 
     return path;
+}
+
+static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t * br)
+{
+    lv_fs_res_t res = LV_FS_RES_OK;
+    uint32_t file_position = file_p->cache->file_position;
+    uint32_t start = file_p->cache->start;
+    uint32_t end = file_p->cache->end;
+    char * buffer = file_p->cache->buffer;
+    uint32_t buffer_size = file_p->drv->cache_size;
+
+    if(start <= file_position && file_position <= end) {
+        /* Data can be read from cache buffer */
+        uint32_t buffer_remaining_length = (uint32_t)end - file_position + 1;
+        uint32_t buffer_offset = (end - start) - buffer_remaining_length + 1;
+
+        /* Do not allow reading beyond the actual memory block for memory-mapped files */
+        if(file_p->drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
+            if(btr > buffer_remaining_length)
+                btr = buffer_remaining_length - 1;
+        }
+
+        if(btr <= buffer_remaining_length) {
+            /*Data is in cache buffer, and buffer end not reached, no need to read from FS*/
+            lv_memcpy(buf, buffer + buffer_offset, btr);
+            *br = btr;
+        }
+        else {
+            /*First part of data is in cache buffer, but we need to read rest of data from FS*/
+            lv_memcpy(buf, buffer + buffer_offset, buffer_remaining_length);
+
+            file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->end + 1,
+                                 LV_FS_SEEK_SET);
+
+            uint32_t bytes_read_to_buffer = 0;
+            if(btr - buffer_remaining_length > buffer_size) {
+                /*If remaining data chuck is bigger than buffer size, then do not use cache, instead read it directly from FS*/
+                res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (char *)buf + buffer_remaining_length,
+                                           btr - buffer_remaining_length, &bytes_read_to_buffer);
+            }
+            else {
+                /*If remaining data chunk is smaller than buffer size, then read into cache buffer*/
+                res = file_p->drv->read_cb(file_p->drv, file_p->file_d, buffer, buffer_size, &bytes_read_to_buffer);
+                file_p->cache->start = file_p->cache->end + 1;
+                file_p->cache->end = file_p->cache->start + bytes_read_to_buffer - 1;
+
+                uint16_t data_chunk_remaining = LV_MIN(btr - buffer_remaining_length, bytes_read_to_buffer);
+                lv_memcpy((char *)buf + buffer_remaining_length, buffer, data_chunk_remaining);
+            }
+            *br = LV_MIN(buffer_remaining_length + bytes_read_to_buffer, btr);
+        }
+    }
+    else {
+        file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position,
+                             LV_FS_SEEK_SET);
+
+        /*Data is not in cache buffer*/
+        if(btr > buffer_size) {
+            /*If bigger data is requested, then do not use cache, instead read it directly*/
+            res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buf, btr, br);
+        }
+        else {
+            /*If small data is requested, then read from FS into cache buffer*/
+            if(buffer == NULL) {
+                file_p->cache->buffer = lv_malloc(buffer_size);
+                LV_ASSERT_MALLOC(file_p->cache->buffer);
+                buffer = file_p->cache->buffer;
+            }
+
+            uint32_t bytes_read_to_buffer = 0;
+            res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buffer, buffer_size, &bytes_read_to_buffer);
+            file_p->cache->start = file_position;
+            file_p->cache->end = file_p->cache->start + bytes_read_to_buffer - 1;
+
+            *br = LV_MIN(btr, bytes_read_to_buffer);
+            lv_memcpy(buf, buffer, *br);
+
+        }
+    }
+
+    if(res == LV_FS_RES_OK) {
+        file_p->cache->file_position += *br;
+    }
+
+    return res;
+}
+
+static lv_fs_res_t lv_fs_write_cached(lv_fs_file_t * file_p, const void * buf, uint32_t btw, uint32_t * bw)
+{
+    lv_fs_res_t res = LV_FS_RES_OK;
+
+    /*Need to do FS seek before writing data to FS*/
+    res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
+    if(res != LV_FS_RES_OK) return res;
+
+    res = file_p->drv->write_cb(file_p->drv, file_p->file_d, buf, btw, bw);
+    if(res != LV_FS_RES_OK) return res;
+
+    if(file_p->cache->end >= file_p->cache->start) {
+        uint32_t start_position = file_p->cache->file_position;
+        uint32_t end_position = file_p->cache->file_position + *bw - 1;
+        char * cache_buffer = file_p->cache->buffer;
+        const char * write_buffer = buf;
+
+        if(start_position <= file_p->cache->start && end_position >= file_p->cache->end) {
+            lv_memcpy(cache_buffer,
+                      write_buffer + (file_p->cache->start - start_position),
+                      file_p->cache->end + 1 - file_p->cache->start);
+        }
+        else if(start_position >= file_p->cache->start && end_position <= file_p->cache->end) {
+            lv_memcpy(cache_buffer + (start_position - file_p->cache->start),
+                      write_buffer,
+                      end_position + 1 - start_position);
+        }
+        else if(end_position >= file_p->cache->start && end_position <= file_p->cache->end) {
+            lv_memcpy(cache_buffer,
+                      write_buffer + (file_p->cache->start - start_position),
+                      end_position + 1 - file_p->cache->start);
+        }
+        else if(start_position >= file_p->cache->start && start_position <= file_p->cache->end) {
+            lv_memcpy(cache_buffer + (start_position - file_p->cache->start),
+                      write_buffer,
+                      file_p->cache->end + 1 - start_position);
+        }
+    }
+
+    file_p->cache->file_position += *bw;
+
+    return res;
+}
+
+static lv_fs_res_t lv_fs_seek_cached(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whence)
+{
+    lv_fs_res_t res = LV_FS_RES_OK;
+    switch(whence) {
+        case LV_FS_SEEK_SET: {
+                file_p->cache->file_position = pos;
+                break;
+            }
+        case LV_FS_SEEK_CUR: {
+                file_p->cache->file_position += pos;
+                break;
+            }
+        case LV_FS_SEEK_END: {
+                /*Because we don't know the file size, we do a little trick: do a FS seek, then get the new file position from FS*/
+                res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos, whence);
+                if(res == LV_FS_RES_OK) {
+                    uint32_t tmp_position;
+                    res = file_p->drv->tell_cb(file_p->drv, file_p->file_d, &tmp_position);
+
+                    if(res == LV_FS_RES_OK) {
+                        file_p->cache->file_position = tmp_position;
+                    }
+                }
+                break;
+            }
+    }
+
+    return res;
 }

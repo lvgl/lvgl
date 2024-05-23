@@ -1,3 +1,6 @@
+.. _lv_roller:
+
+==================
 Roller (lv_roller)
 ==================
 
@@ -5,6 +8,8 @@ Overview
 ********
 
 Roller allows you to simply select one option from a list by scrolling.
+
+.. _lv_roller_parts_and_styles:
 
 Parts and Styles
 ****************
@@ -18,6 +23,8 @@ Parts and Styles
 -  :cpp:enumerator:`LV_PART_SELECTED` The selected option in the middle. Besides the
    typical background properties it uses the text style properties to
    change the appearance of the text in the selected area.
+
+.. _lv_roller_usage:
 
 Usage
 *****
@@ -52,14 +59,18 @@ This function calculates the height with the current style. If the font,
 line space, border width, etc. of the roller changes this function needs
 to be called again.
 
+.. _lv_roller_events:
+
 Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new option is selected.
 
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_roller_keys:
 
 Keys
 ****
@@ -68,10 +79,14 @@ Keys
 -  ``LV_KEY_LEFT/UP`` Select the previous option
 -  :cpp:enumerator:`LY_KEY_ENTER` Apply the selected option (Send :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` event)
 
+.. _lv_roller_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/roller/index.rst
+
+.. _lv_roller_api:
 
 API
 ***

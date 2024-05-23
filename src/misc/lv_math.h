@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include <stdint.h>
 #include "lv_types.h"
 
 /*********************
@@ -26,6 +25,12 @@ extern "C" {
 #define LV_BEZIER_VAL_SHIFT 10 /**< log2(LV_BEZIER_VAL_MAX): used to normalize up scaled values*/
 #define LV_BEZIER_VAL_MAX (1L << LV_BEZIER_VAL_SHIFT) /**< Max time in Bezier functions (not [0..1] to use integers)*/
 #define LV_BEZIER_VAL_FLOAT(f) ((int32_t)((f) * LV_BEZIER_VAL_MAX)) /**< Convert const float number cubic-bezier values to fix-point value*/
+
+/*Align up value x to align, align must be a power of two*/
+#define LV_ALIGN_UP(x, align) (((x) + ((align) - 1)) & ~((align) - 1))
+
+/*Round up value x to round, round can be any integer number*/
+#define LV_ROUND_UP(x, round) ((((x) + ((round) - 1)) / (round)) * (round))
 
 /**********************
  *      TYPEDEFS
@@ -46,9 +51,9 @@ typedef struct {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_sin(int16_t angle);
+int32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_trigo_sin(int16_t angle);
 
-static inline LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_cos(int16_t angle)
+static inline int32_t LV_ATTRIBUTE_FAST_MEM lv_trigo_cos(int16_t angle)
 {
     return lv_trigo_sin(angle + 90);
 }
@@ -102,7 +107,7 @@ uint16_t lv_atan2(int x, int y);
  * If root < 256: mask = 0x800
  * Else: mask = 0x8000
  */
-LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
 
 //! @endcond
 
@@ -124,6 +129,12 @@ int64_t lv_pow(int64_t base, int8_t exp);
  * @return the mapped number
  */
 int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out);
+
+/**
+ * Set the seed of the pseudo random number generator
+ * @param seed a number to initialize the random generator
+ */
+void lv_rand_set_seed(uint32_t seed);
 
 /**
  * Get a pseudo random number in the given range

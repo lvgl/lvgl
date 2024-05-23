@@ -18,7 +18,6 @@ void lv_example_observer_2(void)
     ui_init();
 }
 
-
 /*--------------------------------------------------
  * APPLICATION
  *
@@ -26,13 +25,14 @@ void lv_example_observer_2(void)
  * It doesn't know anything about the internals of the UI
  * and uses any the `engine_subject` as an interface.
  * -------------------------------------------------*/
-static void engine_state_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void engine_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(observer);
 
     int32_t v = lv_subject_get_int(subject);
+    LV_UNUSED(v);
     /*In a real application set/clear a pin here*/
-    LV_LOG_USER("Engine state: %d", v);
+    LV_LOG_USER("Engine state: %" LV_PRId32, v);
 }
 
 static void app_init(void)
@@ -59,7 +59,7 @@ static lv_subject_t auth_state_subject;
 static void textarea_event_cb(lv_event_t * e)
 {
     lv_obj_t * ta = lv_event_get_target(e);
-    if(strcmp(lv_textarea_get_text(ta), "hello") == 0) {
+    if(lv_strcmp(lv_textarea_get_text(ta), "hello") == 0) {
         lv_subject_set_int(&auth_state_subject, LOGGED_IN);
     }
     else {
@@ -67,7 +67,7 @@ static void textarea_event_cb(lv_event_t * e)
     }
 }
 
-static void info_label_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void info_label_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * label = lv_observer_get_target(observer);
     switch(lv_subject_get_int(subject)) {
@@ -100,7 +100,7 @@ static void ui_init(void)
     lv_textarea_set_one_line(ta, true);
     lv_textarea_set_password_mode(ta, true);
     lv_textarea_set_placeholder_text(ta, "The password is: hello");
-    lv_obj_add_event(ta, textarea_event_cb, LV_EVENT_READY, NULL);
+    lv_obj_add_event_cb(ta, textarea_event_cb, LV_EVENT_READY, NULL);
     lv_obj_bind_state_if_eq(ta, &auth_state_subject, LV_STATE_DISABLED, LOGGED_IN);
 
     lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
@@ -112,7 +112,7 @@ static void ui_init(void)
     /*Create a log out button which will be active only when logged in*/
     btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(btn, 220, 10);
-    lv_obj_add_event(btn, log_out_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, log_out_click_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_bind_state_if_not_eq(btn, &auth_state_subject, LV_STATE_DISABLED, LOGGED_IN);
 
     label = lv_label_create(btn);

@@ -4,14 +4,14 @@
 #include "unity/unity.h"
 #include "lv_test_indev.h"
 
-LV_IMAGE_DECLARE(test_animimg001)
-LV_IMAGE_DECLARE(test_animimg002)
-LV_IMAGE_DECLARE(test_animimg003)
+LV_IMAGE_DECLARE(test_animimg001);
+LV_IMAGE_DECLARE(test_animimg002);
+LV_IMAGE_DECLARE(test_animimg003);
 
 static const lv_image_dsc_t * anim_imgs[3] = {
     &test_animimg001,
-    & test_animimg002,
-    & test_animimg003,
+    &test_animimg002,
+    &test_animimg003,
 };
 
 static lv_obj_t * active_screen = NULL;
@@ -59,7 +59,6 @@ void test_animimg_get_src(void)
     TEST_ASSERT_EQUAL_PTR(actual_dsc, anim_imgs);
 }
 
-
 void test_animimg_get_src_count(void)
 {
     uint8_t expected_count = 3;
@@ -86,9 +85,9 @@ void test_animimg_set_repeat_count_infinite(void)
 {
     lv_animimg_set_repeat_count(animimg, LV_ANIM_REPEAT_INFINITE);
 
-    uint16_t actual_count = lv_animimg_get_repeat_count(animimg);
+    uint32_t actual_count = lv_animimg_get_repeat_count(animimg);
 
-    TEST_ASSERT_EQUAL_UINT16(actual_count, LV_ANIM_REPEAT_INFINITE);
+    TEST_ASSERT_EQUAL_UINT32(actual_count, LV_ANIM_REPEAT_INFINITE);
 }
 
 void test_animimg_start(void)
@@ -105,4 +104,3 @@ void test_animimg_start(void)
 }
 
 #endif
-

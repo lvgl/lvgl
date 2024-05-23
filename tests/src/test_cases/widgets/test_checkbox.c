@@ -6,10 +6,10 @@
 #include "lv_test_helpers.h"
 #include "lv_test_indev.h"
 
-void test_checkbox_creation_successfull(void);
+void test_checkbox_creation_successful(void);
 void test_checkbox_should_call_event_handler_on_click_when_enabled(void);
 void test_checkbox_should_have_default_text_when_created(void);
-void test_checkbox_should_return_dinamically_allocated_text(void);
+void test_checkbox_should_return_dynamically_allocated_text(void);
 void test_checkbox_should_allocate_memory_for_static_text(void);
 
 static lv_obj_t * active_screen = NULL;
@@ -26,7 +26,7 @@ static void event_handler(lv_event_t * e)
     }
 }
 
-void test_checkbox_creation_successfull(void)
+void test_checkbox_creation_successful(void)
 {
     active_screen = lv_screen_active();
     checkbox = lv_checkbox_create(active_screen);
@@ -40,7 +40,7 @@ void test_checkbox_should_call_event_handler_on_click_when_enabled(void)
     checkbox = lv_checkbox_create(active_screen);
 
     lv_obj_add_state(checkbox, LV_STATE_CHECKED);
-    lv_obj_add_event(checkbox, event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(checkbox, event_handler, LV_EVENT_ALL, NULL);
 
     lv_test_mouse_click_at(checkbox->coords.x1, checkbox->coords.y1);
 
@@ -60,7 +60,7 @@ void test_checkbox_should_have_default_text_when_created(void)
     TEST_ASSERT_NOT_NULL(lv_checkbox_get_text(checkbox));
 }
 
-void test_checkbox_should_return_dinamically_allocated_text(void)
+void test_checkbox_should_return_dynamically_allocated_text(void)
 {
     const char * message = "Hello World!";
 
@@ -75,7 +75,7 @@ void test_checkbox_should_return_dinamically_allocated_text(void)
 
 void test_checkbox_should_allocate_memory_for_static_text(void)
 {
-    uint32_t initial_available_memory = 0;
+    size_t initial_available_memory = 0;
     const char * static_text = "Keep me while you exist";
 
     lv_mem_monitor_t m1;
@@ -90,6 +90,7 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
 
     lv_mem_monitor(&m1);
 
+    LV_UNUSED(initial_available_memory);
     LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size));
 }
 
@@ -113,7 +114,7 @@ void test_checkbox_rtl(void)
     lv_obj_center(test_checkbox);
     lv_obj_set_style_base_dir(test_checkbox, LV_BASE_DIR_RTL, 0);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("checkbox_rtl_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/checkbox_rtl_1.png");
 }
 
 #endif

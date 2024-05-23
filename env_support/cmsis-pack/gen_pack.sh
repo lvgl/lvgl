@@ -44,7 +44,6 @@ PACK_BUILD=build/
 # alternative: specify directory names to be added to pack base directory
 PACK_DIRS="
   ../../src
-  ../../docs
   ../../demos
   ../../env_support/pikascript
 "
@@ -55,6 +54,7 @@ PACK_BASE_FILES="
   ../../LICENCE.txt
   ../../README.md
   ../../lvgl.h
+  ../../lv_version.h
   lv_conf_cmsis.h
   lv_cmsis_pack.txt
 "
@@ -138,10 +138,6 @@ fi
 mkdir -p ${PACK_BUILD}/examples
 mkdir -p ${PACK_BUILD}/examples/porting
 
-# Copy files into build base directory: $PACK_BUILD
-# pdsc file is mandatory in base directory:
-cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc ${PACK_BUILD}
-cp -f ../../examples/porting/* ${PACK_BUILD}/examples/porting
 
 
 # directories
@@ -161,6 +157,13 @@ for f in $PACK_BASE_FILES
 do
   cp -f  "$f" $PACK_BUILD/
 done
+
+# Copy files into build base directory: $PACK_BUILD
+# pdsc file is mandatory in base directory:
+cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc ${PACK_BUILD}
+cp -f ../../examples/porting/* ${PACK_BUILD}/examples/porting
+cp -f ./lv_os_custom_c.txt ${PACK_BUILD}/src/osal/lv_os_custom.c
+cp -f ./lv_os_custom_h.txt ${PACK_BUILD}/src/osal/lv_os_custom.h
 
 mv "${PACK_BUILD}/lv_cmsis_pack.txt" "${PACK_BUILD}/lv_cmsis_pack.c"
 
@@ -188,15 +191,18 @@ fi
 PACKNAME=`cat PackName.txt`
 rm -rf PackName.txt
 
-echo remove unrequired files and folders...
-rm -rf $PACK_BUILD/demos/keypad_encoder
-rm -rf $PACK_BUILD/demos/music
-rm -rf $PACK_BUILD/demos/stress
-rm -rf $PACK_BUILD/demos/widgets/screenshot1.gif
-
 # echo apply patches...
 # rm -rf $PACK_BUILD/demos/lv_demos.h
 # cp -f ./lv_demos.h $PACK_BUILD/demos/
+
+echo delete files...
+find $PACK_BUILD/demos/ -type f -name "*.png" -delete
+find $PACK_BUILD/demos/ -type f -name "*.gif" -delete
+find $PACK_BUILD/demos/ -type f -name "*.gif" -delete
+find $PACK_BUILD/demos/ -type f -name "*.ttf" -delete
+find $PACK_BUILD/demos/ -type f -name "*.otf" -delete
+find $PACK_BUILD/demos/ -type f -name "*.jpg" -delete
+find $PACK_BUILD/demos/ -type f -name "*.fnt" -delete
 
 # Archiving
 # $ZIP a $PACKNAME

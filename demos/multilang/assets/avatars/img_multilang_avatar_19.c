@@ -156,10 +156,11 @@ img_multilang_avatar_19_map[] = {
 
 const lv_image_dsc_t img_multilang_avatar_19 = {
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
-    .header.always_zero = 0,
     .header.w = 128,
     .header.h = 128,
+    .header.stride = 512,
     .data = img_multilang_avatar_19_map,
+    .data_size = sizeof(img_multilang_avatar_19_map),
 };
 
 #endif

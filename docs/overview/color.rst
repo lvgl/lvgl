@@ -1,3 +1,5 @@
+.. _color:
+
 ======
 Colors
 ======
@@ -6,8 +8,10 @@ The color module handles all color-related functions like changing color
 depth, creating colors from hex code, converting between color depths,
 mixing colors, etc.
 
-The type :cpp:type:`lv_color_t` is used to store a color. Its fields are set
-according to :c:macro:`LV_COLOR_DEPTH` in ``lv_conf.h``. (See below)
+The type :cpp:type:`lv_color_t` is used to store a color in RGB888 format.
+This type and format is used in almost all APIs regardless to :cpp:expr:`LV_COLOR_DEPTH`.
+
+.. _color_create:
 
 Creating colors
 ***************
@@ -19,13 +23,17 @@ Create colors from Red, Green and Blue channel values:
 
 .. code:: c
 
-   //All channels are 0-255
+   /*All channels are 0-255*/
    lv_color_t c = lv_color_make(red, green, blue);
 
-   //From hex code 0x000000..0xFFFFFF interpreted as RED + GREEN + BLUE
+
+   /*Same but can be used for const initialization too */
+   lv_color_t c = LV_COLOR_MAKE(red, green, blue);
+
+   /*From hex code 0x000000..0xFFFFFF interpreted as RED + GREEN + BLUE*/
    lv_color_t c = lv_color_hex(0x123456);
 
-   //From 3 digits. Same as lv_color_hex(0x112233)
+   /*From 3 digits. Same as lv_color_hex(0x112233)*/
    lv_color_t c = lv_color_hex3(0x123);
 
 HSV
@@ -45,6 +53,8 @@ Create colors from Hue, Saturation and Value values:
    //From lv_color_t variable
    lv_color_hsv_t c_hsv = lv_color_to_hsv(color);
 
+.. _color_palette:
+
 Palette
 -------
 
@@ -52,7 +62,7 @@ LVGL includes `Material Design's palette <https://vuetifyjs.com/en/styles/colors
 colors. In this system all named colors have a nominal main color as
 well as four darker and five lighter variants.
 
-The names of the colors are as follows: 
+The names of the colors are as follows:
 
 - :c:macro:`LV_PALETTE_RED`
 - :c:macro:`LV_PALETTE_PINK`
@@ -83,6 +93,8 @@ For the lighter variants of a palette color use
 ``lv_color_t c = lv_palette_darken(LV_PALETTE_..., v)``. ``v`` can be
 1..4.
 
+.. _color_modify_and_mix:
+
 Modify and mix colors
 ---------------------
 
@@ -103,11 +115,15 @@ The following functions can modify a color:
    // Mix two colors with a given ratio 0: full c2, 255: full c1, 128: half c1 and half c2
    lv_color_t c = lv_color_mix(c1, c2, ratio);
 
+.. _color_builtin:
+
 Built-in colors
 ---------------
 
 :cpp:func:`lv_color_white` and :cpp:func:`lv_color_black` return ``0xFFFFFF`` and
 ``0x000000`` respectively.
+
+.. _color_opacity:
 
 Opacity
 *******
@@ -126,62 +142,7 @@ Some special purpose defines are also introduced:
 You can also use the ``LV_OPA_*`` defines in :cpp:func:`lv_color_mix` as a
 mixing *ratio*.
 
-Color types
-***********
-
-The following variable types are defined by the color module:
-
--  :cpp:union:`lv_color1_t` Monochrome color. Also has R, G, B fields for
-   compatibility but they are always the same value (1 byte)
--  :cpp:union:`lv_color8_t` A structure to store R (3 bit),G (3 bit),B (2 bit)
-   components for 8-bit colors (1 byte)
--  :cpp:class:`lv_color16_t` A structure to store R (5 bit),G (6 bit),B (5 bit)
-   components for 16-bit colors (2 byte)
--  :cpp:class:`lv_color32_t` A structure to store R (8 bit),G (8 bit), B (8 bit)
-   components for 24-bit colors (4 byte)
--  :cpp:type:`lv_color_t` Equal to ``lv_color1/8/16/24_t`` depending on the
-   configured color depth setting
--  :cpp:type:`lv_color_int_t` ``uint8_t``, ``uint16_t`` or ``uint32_t``
-   depending on the color depth setting. Used to build color arrays from
-   plain numbers.
--  :cpp:type:`lv_opa_t` A simple ``uint8_t`` type to describe opacity.
-
-The :cpp:type:`lv_color_t`, :cpp:union:`lv_color1_t`, :cpp:union:`lv_color8_t`, :cpp:class:`lv_color16_t`
-and :cpp:class:`lv_color32_t` types have four fields:
-
--  :cpp:member:`red` red channel
--  :cpp:member:`green` green channel
--  :cpp:member:`blue` blue channel
--  :cpp:member:`full` red + green + blue as one number
-
-You can set the current color depth in *lv_conf.h*, by setting the
-:c:macro:`LV_COLOR_DEPTH` define to 1 (monochrome), 8, 16 or 32.
-
-Convert color
--------------
-
-You can convert a color from the current color depth to another. The
-converter functions return with a number, so you have to use the
-:cpp:member:`full` field to map a converted color back into a structure:
-
-.. code:: c
-
-   lv_color_t c;
-   c.red   = 0x38;
-   c.green = 0x70;
-   c.blue  = 0xCC;
-
-   lv_color1_t c1;
-   c1.full = lv_color_to1(c);  /*Return 1 for light colors, 0 for dark colors*/
-
-   lv_color8_t c8;
-   c8.full = lv_color_to8(c);  /*Give a 8 bit number with the converted color*/
-
-   lv_color16_t c16;
-   c16.full = lv_color_to16(c); /*Give a 16 bit number with the converted color*/
-
-   lv_color32_t c24;
-   c32.full = lv_color_to32(c);    /*Give a 32 bit number with the converted color*/
+.. _color_api:
 
 API
 ***

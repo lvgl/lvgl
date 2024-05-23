@@ -11,15 +11,13 @@
 #if LV_USE_LINE != 0
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
+#include "../../misc/lv_types.h"
 #include "../../draw/lv_draw.h"
-#include <stdbool.h>
-#include <stdint.h>
-#include <string.h>
 
 /*********************
  *      DEFINES
  *********************/
-#define MY_CLASS &lv_line_class
+#define MY_CLASS (&lv_line_class)
 
 /**********************
  *      TYPEDEFS
@@ -29,6 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num, bool mut);
 static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e);
 
 /**********************
@@ -64,17 +63,14 @@ lv_obj_t * lv_line_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint32_t point_num)
+void lv_line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    line_set_points(obj, points, point_num, false);
+}
 
-    lv_line_t * line = (lv_line_t *)obj;
-    line->point_array    = points;
-    line->point_num      = point_num;
-
-    lv_obj_refresh_self_size(obj);
-
-    lv_obj_invalidate(obj);
+void lv_line_set_points_mutable(lv_obj_t * obj, lv_point_precise_t points[], uint32_t point_num)
+{
+    line_set_points(obj, points, point_num, true);
 }
 
 void lv_line_set_y_invert(lv_obj_t * obj, bool en)
@@ -92,6 +88,42 @@ void lv_line_set_y_invert(lv_obj_t * obj, bool en)
 /*=====================
  * Getter functions
  *====================*/
+
+const lv_point_precise_t * lv_line_get_points(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_line_t * line = (lv_line_t *)obj;
+    return line->point_array.constant;
+}
+
+uint32_t lv_line_get_point_count(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_line_t * line = (lv_line_t *)obj;
+    return line->point_num;
+}
+
+bool lv_line_is_point_array_mutable(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_line_t * line = (lv_line_t *)obj;
+    return line->point_array_is_mutable;
+}
+
+lv_point_precise_t * lv_line_get_points_mutable(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_line_t * line = (lv_line_t *)obj;
+    if(!line->point_array_is_mutable) {
+        LV_LOG_WARN("the line point array is not mutable");
+        return NULL;
+    }
+    return line->point_array.mut;
+}
 
 bool lv_line_get_y_invert(const lv_obj_t * obj)
 {
@@ -114,18 +146,33 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_line_t * line = (lv_line_t *)obj;
 
     line->point_num   = 0;
-    line->point_array = NULL;
+    line->point_array.constant = NULL;
     line->y_inv       = 0;
+    line->point_array_is_mutable = 0;
 
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static inline lv_coord_t resolve_point_coord(lv_coord_t coord, lv_coord_t max)
+static void line_set_points(lv_obj_t * obj, const lv_point_precise_t points[], uint32_t point_num, bool mut)
 {
-    if(LV_COORD_IS_PCT(coord)) {
-        return LV_CLAMP(0, max * LV_COORD_GET_PCT(coord) / 100, max);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_line_t * line = (lv_line_t *)obj;
+    line->point_array.constant = points;
+    line->point_num      = point_num;
+    line->point_array_is_mutable = mut;
+
+    lv_obj_refresh_self_size(obj);
+
+    lv_obj_invalidate(obj);
+}
+
+static inline lv_value_precise_t resolve_point_coord(lv_value_precise_t coord, int32_t max)
+{
+    if(LV_COORD_IS_PCT((int32_t)coord)) {
+        return LV_CLAMP(0, max * LV_COORD_GET_PCT((int32_t)coord) / 100, max);
     }
     else {
         return coord;
@@ -143,31 +190,31 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /*The corner of the skew lines is out of the intended area*/
-        lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-        lv_coord_t * s = lv_event_get_param(e);
+        int32_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+        int32_t * s = lv_event_get_param(e);
         if(*s < line_width) *s = line_width;
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_line_t * line = (lv_line_t *)obj;
 
-        if(line->point_num == 0 || line->point_array == NULL) return;
+        if(line->point_num == 0 || line->point_array.constant == NULL) return;
 
         lv_point_t * p = lv_event_get_param(e);
-        lv_coord_t w = 0;
-        lv_coord_t h = 0;
+        int32_t w = 0;
+        int32_t h = 0;
 
         uint32_t i;
         for(i = 0; i < line->point_num; i++) {
-            if(!LV_COORD_IS_PCT(line->point_array[i].x)) {
-                w = LV_MAX(line->point_array[i].x, w);
+            if(!LV_COORD_IS_PCT((int32_t)line->point_array.constant[i].x)) {
+                w = (int32_t)LV_MAX(line->point_array.constant[i].x, w);
             }
 
-            if(!LV_COORD_IS_PCT(line->point_array[i].y)) {
-                h = LV_MAX(line->point_array[i].y, h);
+            if(!LV_COORD_IS_PCT((int32_t)line->point_array.constant[i].y)) {
+                h = (int32_t)LV_MAX(line->point_array.constant[i].y, h);
             }
         }
 
@@ -178,12 +225,12 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_line_t * line = (lv_line_t *)obj;
         lv_layer_t * layer = lv_event_get_layer(e);
 
-        if(line->point_num == 0 || line->point_array == NULL) return;
+        if(line->point_num == 0 || line->point_array.constant == NULL) return;
 
         lv_area_t area;
         lv_obj_get_coords(obj, &area);
-        lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
-        lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
+        int32_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
+        int32_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
 
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
@@ -192,14 +239,14 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Read all points and draw the lines*/
         uint32_t i;
         for(i = 0; i < line->point_num - 1; i++) {
-            lv_coord_t w = lv_obj_get_width(obj);
-            lv_coord_t h = lv_obj_get_height(obj);
+            int32_t w = lv_obj_get_width(obj);
+            int32_t h = lv_obj_get_height(obj);
 
-            line_dsc.p1.x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
-            line_dsc.p1.y = resolve_point_coord(line->point_array[i].y, h);
+            line_dsc.p1.x = resolve_point_coord(line->point_array.constant[i].x, w) + x_ofs;
+            line_dsc.p1.y = resolve_point_coord(line->point_array.constant[i].y, h);
 
-            line_dsc.p2.x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
-            line_dsc.p2.y = resolve_point_coord(line->point_array[i + 1].y, h);
+            line_dsc.p2.x = resolve_point_coord(line->point_array.constant[i + 1].x, w) + x_ofs;
+            line_dsc.p2.y = resolve_point_coord(line->point_array.constant[i + 1].y, h);
 
             if(line->y_inv == 0) {
                 line_dsc.p1.y = line_dsc.p1.y + y_ofs;

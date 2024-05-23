@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_indev.h"
+#include "../misc/lv_anim.h"
 /*********************
  *      DEFINES
  *********************/
@@ -22,9 +23,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_indev_t;
-struct _lv_event_t;
-
 struct _lv_indev_t {
     /**< Input device type*/
     lv_indev_type_t type;
@@ -32,16 +30,13 @@ struct _lv_indev_t {
     /**< Function pointer to read input device data.*/
     lv_indev_read_cb_t read_cb;
 
-    /** Called when an action happened on the input device.
-     * The second parameter is the event structure pointer*/
-    void (*feedback_cb)(struct _lv_indev_t * indev, struct _lv_event_t * e);
-
     lv_indev_state_t state; /**< Current state of the input device.*/
+    lv_indev_mode_t mode;
 
     /*Flags*/
     uint8_t long_pr_sent : 1;
     uint8_t reset_query : 1;
-    uint8_t disabled : 1;
+    uint8_t enabled : 1;
     uint8_t wait_until_release : 1;
 
     uint32_t pr_timestamp;         /**< Pressed time stamp*/
@@ -51,7 +46,7 @@ struct _lv_indev_t {
     void * user_data;
 
     /**< Pointer to the assigned display*/
-    struct _lv_display_t * disp;
+    lv_display_t * disp;
 
     /**< Timer to periodically read the input device*/
     lv_timer_t * read_timer;
@@ -74,6 +69,9 @@ struct _lv_indev_t {
     /**< Repeated trigger period in long press [ms]*/
     uint16_t long_press_repeat_time;
 
+    /**< Rotary diff count will be multiplied by this value and divided by 256*/
+    int32_t rotary_sensitvity;
+
     struct {
         /*Pointer and button data*/
         lv_point_t act_point; /**< Current point of input device.*/
@@ -83,12 +81,14 @@ struct _lv_indev_t {
         lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_SCROLL_LIMIT*/
         lv_point_t scroll_throw_vect;
         lv_point_t scroll_throw_vect_ori;
-        struct _lv_obj_t * act_obj;      /*The object being pressed*/
-        struct _lv_obj_t * last_obj;     /*The last object which was pressed*/
-        struct _lv_obj_t * scroll_obj;   /*The object being scrolled*/
-        struct _lv_obj_t * last_pressed; /*The lastly pressed object*/
+        lv_obj_t * act_obj;      /*The object being pressed*/
+        lv_obj_t * last_obj;     /*The last object which was pressed*/
+        lv_obj_t * scroll_obj;   /*The object being scrolled*/
+        lv_obj_t * last_pressed; /*The lastly pressed object*/
+        lv_obj_t * last_hovered; /*The lastly hovered object*/
         lv_area_t scroll_area;
         lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
+        int32_t diff;
 
         /*Flags*/
         lv_dir_t scroll_dir : 4;
@@ -101,14 +101,25 @@ struct _lv_indev_t {
         uint32_t last_key;
     } keypad;
 
-    struct _lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
-    struct _lv_group_t * group;    /**< Keypad destination group*/
+    lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
+    lv_group_t * group;   /**< Keypad destination group*/
     const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
                                       here by the buttons*/
+    lv_event_list_t event_list;
+    lv_anim_t * scroll_throw_anim;
 };
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Find a scrollable object based on the current scroll vector in the indev.
+ * In handles scroll propagation to the parent if needed, and scroll directions too.
+ * @param indev     pointer to an indev
+ * @return          the found scrollable object or NULL if not found.
+ */
+lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev);
 
 /**********************
  *      MACROS

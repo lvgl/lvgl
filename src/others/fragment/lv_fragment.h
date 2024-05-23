@@ -17,7 +17,6 @@ extern "C" {
 
 #if LV_USE_FRAGMENT
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -128,7 +127,7 @@ struct _lv_fragment_class_t {
 /**
  * Fragment states
  */
-typedef struct _lv_fragment_managed_states_t  {
+struct _lv_fragment_managed_states_t  {
     /**
      * Class of the fragment
      */
@@ -157,7 +156,7 @@ typedef struct _lv_fragment_managed_states_t  {
      * true if this fragment is in navigation stack that can be popped
      */
     bool in_stack;
-} lv_fragment_managed_states_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -265,7 +264,6 @@ lv_fragment_t * lv_fragment_manager_find_by_container(lv_fragment_manager_t * ma
  */
 lv_fragment_t * lv_fragment_manager_get_parent_fragment(lv_fragment_manager_t * manager);
 
-
 /**
  * Create a fragment instance.
  *
@@ -323,7 +321,6 @@ void lv_fragment_delete_obj(lv_fragment_t * fragment);
  * @param fragment Fragment instance
  */
 void lv_fragment_recreate_obj(lv_fragment_t * fragment);
-
 
 /**********************
  *      MACROS

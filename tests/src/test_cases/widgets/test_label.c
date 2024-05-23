@@ -2,6 +2,7 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+#include <string.h>
 
 static const char * long_text =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada ultrices magna in rutrum.";
@@ -30,25 +31,13 @@ void setUp(void)
 
 void tearDown(void)
 {
-    lv_obj_delete(label);
-    lv_obj_delete(long_label);
-    lv_obj_delete(long_label_multiline);
-    lv_obj_delete(empty_label);
+    lv_obj_clean(lv_screen_active());
 }
 
 void test_label_creation(void)
 {
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), LV_LABEL_DEFAULT_TEXT);
     TEST_ASSERT_EQUAL(lv_label_get_long_mode(label), LV_LABEL_LONG_WRAP);
-}
-
-void test_label_recolor(void)
-{
-    lv_label_set_recolor(label, true);
-    TEST_ASSERT(lv_label_get_recolor(label));
-
-    lv_label_set_recolor(label, false);
-    TEST_ASSERT_FALSE(lv_label_get_recolor(label));
 }
 
 void test_label_set_text(void)
@@ -531,7 +520,7 @@ void test_label_get_letter_on_left(void)
     const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
     lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
 
-    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point);
+    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point, true);
 
     TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
 }
@@ -544,7 +533,7 @@ void test_label_get_letter_on_center(void)
     const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
     lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
 
-    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point);
+    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point, true);
 
     TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
 }
@@ -557,7 +546,7 @@ void test_label_get_letter_on_right(void)
     const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
     lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
 
-    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point);
+    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point, true);
 
     TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
 }
@@ -575,6 +564,50 @@ void test_label_text_selection(void)
 
     TEST_ASSERT_EQUAL(selection_start, start);
     TEST_ASSERT_EQUAL(selection_end, end);
+}
+
+void test_label_rtl_dot_long_mode(void)
+{
+    const char * message =
+        "מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).";
+
+    lv_obj_t * screen = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(screen);
+    lv_obj_set_size(screen, 800, 480);
+    lv_obj_center(screen);
+    lv_obj_set_style_bg_color(screen, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(screen, LV_OPA_100, 0);
+    lv_obj_set_style_pad_all(screen, 0, 0);
+
+    lv_obj_t * test_label = lv_label_create(screen);
+    lv_obj_set_style_text_font(test_label, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_label_set_long_mode(test_label, LV_LABEL_LONG_DOT);
+    lv_obj_set_style_base_dir(test_label, LV_BASE_DIR_RTL, 0);
+    lv_obj_set_size(test_label, 300, lv_font_dejavu_16_persian_hebrew.line_height);
+    lv_label_set_text(test_label, message);
+    lv_obj_center(test_label);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_rtl_dot_long_mode.png");
+}
+
+void test_label_max_width(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * test_label1 = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label1, long_text);
+    lv_obj_set_width(test_label1, 600);
+    lv_obj_set_style_max_width(test_label1, 200, LV_PART_MAIN);
+
+    lv_obj_t * test_label2 = lv_label_create(lv_screen_active());
+    lv_label_set_text(test_label2, long_text);
+    lv_obj_set_width(test_label2, 600);
+    lv_obj_set_height(test_label2, 50);
+    lv_obj_set_x(test_label2, 300);
+    lv_obj_set_style_max_width(test_label2, 200, LV_PART_MAIN);
+    lv_label_set_long_mode(test_label2, LV_LABEL_LONG_DOT);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_max_width.png");
 }
 
 #endif

@@ -14,10 +14,8 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "../tick/lv_tick.h"
+#include "lv_types.h"
 #include "lv_ll.h"
-
-#include <stdint.h>
-#include <stdbool.h>
 
 /*********************
  *      DEFINES
@@ -32,24 +30,28 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_timer_t;
-
 /**
  * Timers execute this type of functions.
  */
-typedef void (*lv_timer_cb_t)(struct _lv_timer_t *);
+typedef void (*lv_timer_cb_t)(lv_timer_t *);
+
+/**
+ * Timer handler resume this type of function.
+ */
+typedef void (*lv_timer_handler_resume_cb_t)(void * data);
 
 /**
  * Descriptor of a lv_timer
  */
-typedef struct _lv_timer_t {
+struct _lv_timer_t {
     uint32_t period; /**< How often the timer should run*/
     uint32_t last_run; /**< Last time the timer ran*/
     lv_timer_cb_t timer_cb; /**< Timer function*/
     void * user_data; /**< Custom user data*/
     int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
     uint32_t paused : 1;
-} lv_timer_t;
+    uint32_t auto_delete : 1;
+};
 
 typedef struct {
     lv_ll_t timer_ll; /*Linked list to store the lv_timers*/
@@ -65,6 +67,9 @@ typedef struct {
     uint32_t busy_time;
     uint32_t idle_period_start;
     uint32_t run_cnt;
+
+    lv_timer_handler_resume_cb_t resume_cb;
+    void * resume_data;
 } lv_timer_state_t;
 
 /**********************
@@ -75,6 +80,11 @@ typedef struct {
  * Init the lv_timer module
  */
 void _lv_timer_core_init(void);
+
+/**
+ * Deinit the lv_timer module
+ */
+void _lv_timer_core_deinit(void);
 
 //! @cond Doxygen_Suppress
 
@@ -111,6 +121,13 @@ static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period
 LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void);
 
 /**
+ * Set the resume callback to the timer handler
+ * @param cb the function to call when timer handler is resumed
+ * @param data pointer to a resume data
+ */
+void lv_timer_handler_set_resume_cb(lv_timer_handler_resume_cb_t cb, void * data);
+
+/**
  * Create an "empty" timer. It needs to be initialized with at least
  * `lv_timer_set_cb` and `lv_timer_set_period`
  * @return pointer to the created timer
@@ -135,11 +152,15 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
 void lv_timer_delete(lv_timer_t * timer);
 
 /**
- * Pause/resume a timer.
+ * Pause a timer.
  * @param timer pointer to an lv_timer
  */
 void lv_timer_pause(lv_timer_t * timer);
 
+/**
+ * Resume a timer.
+ * @param timer pointer to an lv_timer
+ */
 void lv_timer_resume(lv_timer_t * timer);
 
 /**
@@ -170,6 +191,13 @@ void lv_timer_ready(lv_timer_t * timer);
 void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count);
 
 /**
+ * Set whether a lv_timer will be deleted automatically when it is called `repeat_count` times.
+ * @param timer pointer to a lv_timer.
+ * @param auto_delete true: auto delete; false: timer will be paused when it is called `repeat_count` times.
+ */
+void lv_timer_set_auto_delete(lv_timer_t * timer, bool auto_delete);
+
+/**
  * Set custom parameter to the lv_timer.
  * @param timer pointer to a lv_timer.
  * @param user_data custom parameter
@@ -193,7 +221,7 @@ void lv_timer_enable(bool en);
  * Get idle percentage
  * @return the lv_timer idle in percentage
  */
-uint8_t lv_timer_get_idle(void);
+uint32_t lv_timer_get_idle(void);
 
 /**
  * Get the time remaining until the next timer will run
@@ -216,6 +244,16 @@ lv_timer_t * lv_timer_get_next(lv_timer_t * timer);
 static inline void * lv_timer_get_user_data(lv_timer_t * timer)
 {
     return timer->user_data;
+}
+
+/**
+ * Get the pause state of a timer
+ * @param timer pointer to a lv_timer
+ * @return true: timer is paused; false: timer is running
+ */
+static inline bool lv_timer_get_paused(lv_timer_t * timer)
+{
+    return timer->paused;
 }
 
 /**********************

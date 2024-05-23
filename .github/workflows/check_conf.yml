@@ -1,0 +1,24 @@
+name: Verify that lv_conf_internal.h matches repository state
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify-conf-internal:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.7
+      - name: Generate lv_conf_internal.h
+        run: python lv_conf_internal_gen.py
+        working-directory: scripts
+      - name: Check that repository is clean
+        run: git diff --exit-code >/dev/null 2>&1 || (echo "Please regenerate lv_conf_internal.h using scripts/lv_conf_internal_gen.py"; false)

@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
 #include "lv_text.h"
+#include "lv_types.h"
 #include "../draw/lv_draw.h"
 
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
@@ -33,7 +33,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-uint32_t _lv_text_ap_calc_bytes_cnt(const char * txt);
+uint32_t _lv_text_ap_calc_bytes_count(const char * txt);
 void _lv_text_ap_proc(const char * txt, char * txt_out);
 
 /**********************

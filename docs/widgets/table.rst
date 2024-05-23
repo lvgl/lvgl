@@ -1,3 +1,6 @@
+.. _lv_table:
+
+================
 Table (lv_table)
 ================
 
@@ -15,6 +18,8 @@ The Table is added to the default group (if it is set). Besides the
 Table is an editable object to allow selecting a cell with encoder
 navigation too.
 
+.. _lv_table_parts_and_styles:
+
 Parts and Styles
 ****************
 
@@ -22,6 +27,8 @@ Parts and Styles
    background style properties.
 -  :cpp:enumerator:`LV_PART_ITEMS` The cells of the table also use all the typical
    background style properties and the text properties.
+
+.. _lv_table_usage:
 
 Usage
 *****
@@ -43,14 +50,14 @@ Rows and Columns
 ----------------
 
 To explicitly set number of rows and columns use
-:cpp:expr:`lv_table_set_row_cnt(table, row_cnt)` and
-:cpp:expr:`lv_table_set_col_cnt(table, col_cnt)`
+:cpp:expr:`lv_table_set_row_count(table, row_cnt)` and
+:cpp:expr:`lv_table_set_column_count(table, col_cnt)`
 
 Width and Height
 ----------------
 
 The width of the columns can be set with
-:cpp:expr:`lv_table_set_col_width(table, col_id, width)`. The overall width of
+:cpp:expr:`lv_table_set_column_width(table, col_id, width)`. The overall width of
 the Table object will be set to the sum of columns widths.
 
 The height is calculated automatically from the cell styles (font,
@@ -74,25 +81,19 @@ automatically sets the table size to show all the columns and rows.
 If the width or height is set to a smaller number than the "intrinsic"
 size then the table becomes scrollable.
 
+.. _lv_table_events:
+
 Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new cell is selected with
    keys.
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following types:
 
-   -  :cpp:enumerator:`LV_TABLE_DRAW_PART_CELL` The individual cells of the table
-
-      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-      -  ``label_dsc``
-      -  ``id``: current row × col count + current column
-
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_table_keys:
 
 Keys
 ****
@@ -109,6 +110,8 @@ currently selected cell. Row and column will be set to
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_table_example:
+
 Example
 *******
 
@@ -118,6 +121,8 @@ MicroPython
 -----------
 
 No examples yet.
+
+.. _lv_table_api:
 
 API
 ***

@@ -13,6 +13,7 @@
 #include "../button/lv_button.h"
 #include "../label/lv_label.h"
 #include "../../layouts/flex/lv_flex.h"
+#include "../../misc/lv_assert.h"
 
 /*********************
  *      DEFINES
@@ -77,10 +78,10 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_style_bg_image_src(mo_prev, LV_SYMBOL_LEFT, 0);
     lv_obj_set_height(mo_prev, lv_pct(100));
     lv_obj_update_layout(mo_prev);
-    lv_coord_t btn_size = lv_obj_get_height(mo_prev);
+    int32_t btn_size = lv_obj_get_height(mo_prev);
     lv_obj_set_width(mo_prev, btn_size);
 
-    lv_obj_add_event(mo_prev, month_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(mo_prev, month_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_remove_flag(mo_prev, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_obj_t * label = lv_label_create(obj);
@@ -92,17 +93,17 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_style_bg_image_src(mo_next, LV_SYMBOL_RIGHT, 0);
     lv_obj_set_size(mo_next, btn_size, btn_size);
 
-    lv_obj_add_event(mo_next, month_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(mo_next, month_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_remove_flag(mo_next, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
-    lv_obj_add_event(obj, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(obj, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     /*Refresh the drop downs*/
     lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 static void month_event_cb(lv_event_t * e)
 {
-    lv_obj_t * btn = lv_event_get_target(e);
+    lv_obj_t * btn = lv_event_get_current_target(e);
 
     lv_obj_t * header = lv_obj_get_parent(btn);
     lv_obj_t * calendar = lv_obj_get_parent(header);
@@ -110,6 +111,9 @@ static void month_event_cb(lv_event_t * e)
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);
     lv_calendar_date_t newd = *d;
+
+    LV_ASSERT_FORMAT_MSG(newd.year >= 0 && newd.month >= 1 && newd.month <= 12,
+                         "Invalid date: %d-%d", newd.year, newd.month);
 
     /*The last child is the right button*/
     if(lv_obj_get_child(header, 0) == btn) {
@@ -139,13 +143,15 @@ static void month_event_cb(lv_event_t * e)
 
 static void value_changed_event_cb(lv_event_t * e)
 {
-    lv_obj_t * header = lv_event_get_target(e);
+    lv_obj_t * header = lv_event_get_current_target(e);
     lv_obj_t * calendar = lv_obj_get_parent(header);
 
-    const lv_calendar_date_t * cur_date = lv_calendar_get_showed_date(calendar);
+    const lv_calendar_date_t * date = lv_calendar_get_showed_date(calendar);
+    LV_ASSERT_FORMAT_MSG(date->year >= 0 && date->month >= 1 && date->month <= 12,
+                         "Invalid date: %d-%d", date->year, date->month);
+
     lv_obj_t * label = lv_obj_get_child(header, 1);
-    lv_label_set_text_fmt(label, "%d %s", cur_date->year, month_names_def[cur_date->month - 1]);
+    lv_label_set_text_fmt(label, "%d %s", date->year, month_names_def[date->month - 1]);
 }
 
 #endif /*LV_USE_CALENDAR_HEADER_ARROW*/
-

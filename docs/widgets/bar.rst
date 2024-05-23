@@ -1,3 +1,6 @@
+.. _lv_bar:
+
+============
 Bar (lv_bar)
 ============
 
@@ -13,6 +16,8 @@ its height.
 Not only the end, but also the start value of the bar can be set, which
 changes the start position of the indicator.
 
+.. _lv_bar_parts_and_styles:
+
 Parts and Styles
 ****************
 
@@ -22,6 +27,8 @@ Parts and Styles
    animation time if the values set with :cpp:enumerator:`LV_ANIM_ON`.
 -  :cpp:enumerator:`LV_PART_INDICATOR` The indicator itself; also uses all the typical
    background properties.
+
+.. _lv_bar_usage:
 
 Usage
 *****
@@ -33,7 +40,9 @@ A new value can be set by
 ``lv_bar_set_value(bar, new_value, LV_ANIM_ON/OFF)``. The value is
 interpreted in a range (minimum and maximum values) which can be
 modified with :cpp:expr:`lv_bar_set_range(bar, min, max)`. The default range is
-0..100.
+0..100, and the default drawing direction is from left to right in horizontal mode and
+bottom to top in vertical mode. If the minimum value is greater than the maximum value, like
+100..0, the drawing direction changes to the opposite direction.
 
 The new value in :cpp:func:`lv_bar_set_value` can be set with or without an
 animation depending on the last parameter (``LV_ANIM_ON/OFF``).
@@ -50,21 +59,15 @@ The bar can be one of the following modes:
   ``lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)``. The start
   value always has to be smaller than the end value.
 
+.. _lv_bar_events:
+
 Events
 ******
-
--  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
-   for the following parts:
-
-   -  :cpp:enumerator:`LV_BAR_DRAW_PART_INDICATOR` The indicator of the bar
-
-      -  ``part``: :cpp:enumerator:`LV_PART_INDICATOR`
-      -  ``draw_area``: area of the indicator
-      -  ``rect_dsc``
-
-See the events of the `Base object </widgets/obj>`__ too.
+See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
+
+.. _lv_bar_keys:
 
 Keys
 ****
@@ -73,12 +76,14 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
+.. _lv_bar_example:
+
 Example
 *******
 
 .. include:: ../examples/widgets/bar/index.rst
 
+.. _lv_bar_api:
+
 API
 ***
-
-:ref:`lv_bar`

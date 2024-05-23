@@ -1,3 +1,5 @@
+.. _fonts:
+
 =====
 Fonts
 =====
@@ -11,15 +13,18 @@ For example:
 
    lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /*Set a larger font*/
 
-Fonts have a **bpp (bits per pixel)** property. It shows how many bits
-are used to describe a pixel in a font. The value stored for a pixel
-determines the pixel's opacity. This way, with higher *bpp*, the edges
-of the letter can be smoother. The possible *bpp* values are 1, 2, 4 and
-8 (higher values mean better quality).
+Fonts have a **format** property. It describes how the glyph draw data is stored.
+It has *2* categories: `Legacy simple format` and `Advanced format`.
+In the legacy simple format, the font is stored in a simple array of bitmaps.
+In the advanced format, the font is stored in a different way like `Vector`, `SVG`, etc.
 
-The *bpp* property also affects the amount of memory needed to store a
-font. For example, *bpp = 4* makes a font nearly four times larger
-compared to *bpp = 1*.
+In the legacy simple format, the value stored for a pixel determines the pixel's opacity.
+This way, with higher *bpp (bit per pixel)*, the edges of the letter can be smoother.
+The possible *bpp* values are 1, 2, 4 and 8 (higher values mean better quality).
+
+The *format* property also affects the amount of memory needed to store a
+font. For example, *format = LV_FONT_GLYPH_FORMAT_A4* makes a font nearly four times larger
+compared to *format = LV_FONT_GLYPH_FORMAT_A1*.
 
 Unicode support
 ***************
@@ -42,7 +47,11 @@ Built-in fonts
 **************
 
 There are several built-in fonts in different sizes, which can be
-enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. ### Normal fonts
+enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. 
+
+Normal fonts
+------------
+
 Containing all the ASCII characters, the degree symbol (U+00B0), the
 bullet symbol (U+2022) and the built-in symbols (see below).
 
@@ -69,7 +78,7 @@ bullet symbol (U+2022) and the built-in symbols (see below).
 Special fonts
 -------------
 
--  :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a `compressed font <#compress-fonts>`__ with 3 bpp
+-  :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a :ref:`fonts_compressed` with 3 bpp
 -  :c:macro:`LV_FONT_DEJAVU_16_PERSIAN_HEBREW`: 16 px font with normal range + Hebrew, Arabic, Persian letters and all their forms
 -  :c:macro:`LV_FONT_SIMSUN_16_CJK`: 16 px font with normal range plus 1000 of the most common CJK radicals
 -  :c:macro:`LV_FONT_UNSCII_8`: 8 px pixel perfect font with only ASCII characters
@@ -85,6 +94,8 @@ the `Montserrat <https://fonts.google.com/specimen/Montserrat>`__ font.
 In addition to the ASCII range, the following symbols are also added to
 the built-in fonts from the `FontAwesome <https://fontawesome.com/>`__
 font.
+
+.. _fonts_symbols:
 
 .. image:: /misc/symbols.png
 
@@ -134,7 +145,7 @@ The default base direction for screens can be set by
 :c:macro:`LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other objects inherit the
 base direction from their parent.
 
-To set an object's base direction use :cpp:expr:`lv_obj_set_base_dir(obj, base_dir)`.
+To set an object's base direction use :cpp:expr:`lv_obj_set_style_base_dir(obj, base_dir, selector)`.
 The possible base directions are:
 
 - :cpp:enumerator:`LV_BASE_DIR_LTR`: Left to Right base direction
@@ -146,10 +157,10 @@ This list summarizes the effect of RTL base direction on objects:
 - Create objects by default on the right
 - ``lv_tabview``: Displays tabs from right to left
 - ``lv_checkbox``: Shows the box on the right
-- ``lv_btnmatrix``: Shows buttons from right to left
+- ``lv_buttonmatrix``: Shows buttons from right to left
 - ``lv_list``: Shows icons on the right
 - ``lv_dropdown``: Aligns options to the right
-- The texts in ``lv_table``, ``lv_btnmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
+- The texts in ``lv_table``, ``lv_buttonmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
 
 Arabic and Persian support
 --------------------------
@@ -191,6 +202,8 @@ match with the library settings. By default, LVGL assumes ``RGB`` order,
 however this can be swapped by setting :c:macro:`LV_SUBPX_BGR`  ``1`` in
 *lv_conf.h*.
 
+.. _fonts_compressed:
+
 Compressed fonts
 ----------------
 
@@ -207,6 +220,20 @@ because
 - they need the most memory
 - they can be compressed better
 - and probably they are used less frequently then the medium-sized fonts, so the performance cost is smaller.
+
+Kerning
+-------
+
+Fonts may provide kerning information to adjust the spacing between specific
+characters.
+
+- The online converter generates kerning tables.
+- The offline converter generates kerning tables unless ``--no-kerning`` is
+  specified.
+- FreeType integration does not currently support kerning.
+- The Tiny TTF font engine supports GPOS and Kern tables.
+
+To configure kerning at runtime, use :cpp:func:`lv_font_set_kerning`.
 
 .. _add_font:
 
@@ -266,41 +293,41 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
 Load a font at run-time
 ***********************
 
-:cpp:func:`lv_font_load` can be used to load a font from a file. The font needs
+:cpp:func:`lv_binfont_create` can be used to load a font from a file. The font needs
 to have a special binary format. (Not TTF or WOFF). Use
 `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ with the
 ``--format bin`` option to generate an LVGL compatible font file.
 
-:note: To load a font `LVGL's filesystem </overview/file-system>`__
+:note: To load a font :ref:`LVGL's filesystem <overview_file_system>`
        needs to be enabled and a driver must be added.
 
 Example
 
 .. code:: c
 
-   lv_font_t * my_font;
-   my_font = lv_font_load(X/path/to/my_font.bin);
+   lv_font_t *my_font = lv_binfont_create("X:/path/to/my_font.bin");
+   if(my_font == NULL) return;
 
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(my_font);
+   lv_binfont_destroy(my_font);
 
 Load a font from a memory buffer at run-time
 ******************************************
 
-:cpp:func:`lv_font_load_from_buffer` can be used to load a font from a memory buffer.
+:cpp:func:`lv_binfont_create_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not
 supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
 
-:note: To load a font from a buffer `LVGL's filesystem </overview/file-system>`__
+:note: To load a font from a buffer :ref:`LVGL's filesystem <overview_file_system>`
        needs to be enabled and the MEMFS driver must be added.
 
 Example
 
 .. code:: c
 
-   lv_font_t * my_font;
+   lv_font_t *my_font;
    uint8_t *buf;
    uint32_t bufsize;
 
@@ -308,12 +335,12 @@ Example
    ...
 
    /*Load font from the buffer*/
-   my_font = lv_font_load_from_buffer((void *)buf, buf));
-
+   my_font = lv_binfont_create_from_buffer((void *)buf, buf));
+   if(my_font == NULL) return;
    /*Use the font*/
 
    /*Free the font if not required anymore*/
-   lv_font_free(my_font);
+   lv_binfont_destroy(my_font);
 
 Add a new font engine
 *********************
@@ -358,7 +385,7 @@ To do this, a custom :cpp:type:`lv_font_t` variable needs to be created:
        dsc_out->box_w = 6;         /*Width of the bitmap in [px]*/
        dsc_out->ofs_x = 0;         /*X offset of the bitmap in [pf]*/
        dsc_out->ofs_y = 3;         /*Y offset of the bitmap measured from the as line*/
-       dsc_out->bpp   = 2;         /*Bits per pixel: 1/2/4/8*/
+       dsc_out->format= LV_FONT_GLYPH_FORMAT_A2;
 
        return true;                /*true: glyph found; false: glyph was not found*/
    }
@@ -392,6 +419,8 @@ font from ``fallback`` to handle.
    lv_font_t *droid_sans_fallback = my_font_load_function();
    /* So now we can display Roboto for supported characters while having wider characters set support */
    roboto->fallback = droid_sans_fallback;
+
+.. _fonts_api:
 
 API
 ***

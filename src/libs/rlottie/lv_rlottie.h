@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
 #if LV_USE_RLOTTIE
 
 /*********************
@@ -48,15 +48,15 @@ typedef struct {
     size_t dest_frame;
 } lv_rlottie_t;
 
-extern const lv_obj_class_t lv_rlottie_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_rlottie_class;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * path);
+lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, int32_t width, int32_t height, const char * path);
 
-lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height,
+lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, int32_t width, int32_t height,
                                       const char * rlottie_desc);
 
 void lv_rlottie_set_play_mode(lv_obj_t * rlottie, const lv_rlottie_ctrl_t ctrl);

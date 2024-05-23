@@ -29,26 +29,32 @@ typedef struct {
     lv_draw_dsc_base_t base;
 
     lv_area_t area;
-    lv_coord_t radius;
+    int32_t radius;
 } lv_draw_mask_rect_dsc_t;
-
-struct _lv_layer_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * dsc);
+/**
+ * Initialize a rectangle mask draw descriptor.
+ * @param dsc       pointer to a draw descriptor
+ */
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * dsc);
 
 /**
- * Draw a line
- * @param point1 first point of the line
- * @param point2 second point of the line
- * @param clip the line will be drawn only in this area
- * @param dsc pointer to an initialized `lv_draw_line_dsc_t` variable
+ * Try to get a rectangle mask draw descriptor from a draw task.
+ * @param task      draw task
+ * @return          the task's draw descriptor or NULL if the task is not of type LV_DRAW_TASK_TYPE_MASK_RECTANGLE
  */
-void lv_draw_mask_rect(struct _lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
+lv_draw_mask_rect_dsc_t * lv_draw_task_get_mask_rect_dsc(lv_draw_task_t * task);
 
+/**
+ * Create a draw task to mask a rectangle from the buffer
+ * @param layer     pointer to a layer
+ * @param dsc       pointer to a draw descriptor
+ */
+void lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
 
 /**********************
  *      MACROS

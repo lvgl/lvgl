@@ -13,10 +13,14 @@
 #include "tjpgd.h"
 #include "lv_tjpgd.h"
 #include "../../misc/lv_fs.h"
+#include <string.h>
 
 /*********************
  *      DEFINES
  *********************/
+
+#define DECODER_NAME    "TJPGD"
+
 #define TJPGD_WORKBUFF_SIZE             4096    //Recommended by TJPGD library
 
 /**********************
@@ -54,6 +58,8 @@ void lv_tjpgd_init(void)
     lv_image_decoder_set_open_cb(dec, decoder_open);
     lv_image_decoder_set_get_area_cb(dec, decoder_get_area);
     lv_image_decoder_set_close_cb(dec, decoder_close);
+
+    dec->name = DECODER_NAME;
 }
 
 void lv_tjpgd_deinit(void)
@@ -80,11 +86,10 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
         uint8_t * raw_data = (uint8_t *)img_dsc->data;
-        const uint32_t raw_sjpeg_data_size = img_dsc->data_size;
+        const uint32_t raw_data_size = img_dsc->data_size;
 
-        if(is_jpg(raw_data, raw_sjpeg_data_size) == true) {
+        if(is_jpg(raw_data, raw_data_size) == true) {
 #if LV_USE_FS_MEMFS
-            header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = img_dsc->header.w;
             header->h = img_dsc->header.h;
@@ -98,7 +103,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     }
     else if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
-        if((strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
+        if((lv_strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (lv_strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
             lv_fs_file_t f;
             lv_fs_res_t res;
             res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
@@ -112,7 +117,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
                 lv_fs_close(&f);
                 return LV_RESULT_INVALID;
             }
-            header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = jd.width;
             header->h = jd.height;
@@ -144,6 +148,12 @@ static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
     return 0;
 }
 
+/**
+ * Decode a JPG image and return the decoded data.
+ * @param decoder pointer to the decoder
+ * @param dsc     pointer to the decoder descriptor
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
+ */
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
@@ -168,7 +178,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     }
     else if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
-        if((strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
+        if((lv_strcmp(lv_fs_get_ext(fn), "jpg") == 0) || (lv_strcmp(lv_fs_get_ext(fn), "jpeg") == 0)) {
             lv_fs_res_t res;
             res = lv_fs_open(f, fn, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
@@ -184,7 +194,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     JRESULT rc = jd_prepare(jd, input_func, workb_temp, (size_t)TJPGD_WORKBUFF_SIZE, f);
     if(rc) return rc;
 
-    dsc->header.always_zero = 0;
     dsc->header.cf = LV_COLOR_FORMAT_RGB888;
     dsc->header.w = jd->width;
     dsc->header.h = jd->height;
@@ -206,6 +215,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     LV_UNUSED(full_area);
 
     JDEC * jd = dsc->user_data;
+    lv_draw_buf_t * decoded = (void *)dsc->decoded;
 
     uint32_t  mx, my;
     mx = jd->msx * 8;
@@ -213,14 +223,24 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     if(decoded_area->y1 == LV_COORD_MIN) {
         decoded_area->y1 = 0;
         decoded_area->y2 = my - 1;
-        decoded_area->x1 = -mx;
+        decoded_area->x1 = -((int32_t)mx);
         decoded_area->x2 = -1;
         jd->scale = 0;
         jd->dcv[2] = jd->dcv[1] = jd->dcv[0] = 0;   /* Initialize DC values */
-        dsc->img_data = jd->workbuf;
         jd->rst = 0;
         jd->rsc = 0;
-        dsc->header.stride = mx * 3;
+        if(decoded == NULL) {
+            decoded = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
+            dsc->decoded = decoded;
+        }
+        else {
+            lv_fs_seek(jd->device, 0, LV_FS_SEEK_SET);
+            JRESULT rc = jd_prepare(jd, input_func, jd->pool_original, (size_t)TJPGD_WORKBUFF_SIZE, jd->device);
+            if(rc) return rc;
+        }
+        decoded->data = jd->workbuf;
+        decoded->header = dsc->header;
+        decoded->header.stride = mx * 3;
     }
 
     decoded_area->x1 += mx;
@@ -232,6 +252,10 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded_area->y1 += my;
         decoded_area->y2 += my;
     }
+
+    decoded->header.w = mx;
+    decoded->header.h = my;
+    decoded->data_size = decoded->header.stride * decoded->header.h;
 
     /* Process restart interval if enabled */
     JRESULT rc;
@@ -265,6 +289,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     lv_free(jd->device);
     lv_free(jd->pool_original);
     lv_free(jd);
+    lv_free((void *)dsc->decoded);
 }
 
 static int is_jpg(const uint8_t * raw_data, size_t len)

@@ -17,12 +17,12 @@ index 38a9862..ee6d2cd 100644
  endif()
  
 -if (LOTTIE_MODULE)
--    # for dlopen, dlsym and dlclose dependancy
+-    # for dlopen, dlsym and dlclose dependency
 -    target_link_libraries(rlottie PRIVATE ${CMAKE_DL_LIBS})
 -endif()
 +# No Sym links in ESP-IDF
 +# if (LOTTIE_MODULE)
-+#     # for dlopen, dlsym and dlclose dependancy
++#     # for dlopen, dlsym and dlclose dependency
 +#     target_link_libraries(rlottie PRIVATE ${CMAKE_DL_LIBS})
 +# endif()
  

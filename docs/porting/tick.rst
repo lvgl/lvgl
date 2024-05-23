@@ -4,42 +4,30 @@
 Tick interface
 ==============
 
-LVGL needs a system tick to know elapsed time for animations and other
+LVGL needs a system tick to know the elapsed time for animations and other
 tasks.
 
-If you want to use a custom function to :cpp:func:`lv_tick_get`, you can
-register a "tick_get_cb" with :cpp:func:`lv_tick_set_cb`.
+There are two ways to provide the tick to LVGL:
 
-For example:
+1. Call ``lv_tick_set_cb(my_get_milliseconds_function);``: `my_get_milliseconds_function` needs to tell how many milliseconds have elapsed since start up. Most of the platforms have built-in functions that can be used as they are. For example
 
-.. code:: c
+   - SDL: ``lv_tick_set_cb(SDL_GetTicks);``
+   - Arduino: ``lv_tick_set_cb(my_tick_get_cb);``, where ``my_tick_get_cb`` is: ``static uint32_t my_tick_get_cb(void) { return millis(); }``
+   - FreeRTOS: ``lv_tick_set_cb(xTaskGetTickCount);``
+   - STM32: ``lv_tick_set_cb(HAL_GetTick);``
+   - ESP32: ``lv_tick_set_cb(my_tick_get_cb);``, where ``my_tick_get_cb`` is a wrapper for ``esp_timer_get_time() / 1000;``
 
-   lv_tick_set_cb(SDL_GetTicks);
+2. Call ``lv_tick_inc(x)`` periodically, where ``x`` is the elapsed milliseconds since the last call. ``lv_tick_inc`` should be called from a high priority interrupt.
 
+The ticks (milliseconds)  should be independent from any other activities of the MCU.
 
-You need to call the :cpp:expr:`lv_tick_inc(tick_period)` function periodically
-and provide the call period in milliseconds. For example,
-:cpp:expr:`lv_tick_inc(1)` when calling every millisecond.
-
-:cpp:func:`lv_tick_inc` should be called in a higher priority routine than
-:cpp:func:`lv_task_handler` (e.g. in an interrupt) to precisely know the
-elapsed milliseconds even if the execution of :cpp:func:`lv_task_handler` takes
-more time.
-
-With FreeRTOS :cpp:func:`lv_tick_inc` can be called in ``vApplicationTickHook``.
-
-On Linux based operating systems (e.g. on Raspberry Pi) :cpp:func:`lv_tick_inc`
-can be called in a thread like below:
+For example this works, but LVGL's timing will be incorrect as the execution time of ``lv_timer_handler`` is not considered:
 
 .. code:: c
-
-   void * tick_thread (void *args)
-   {
-         while(1) {
-           usleep(5*1000);   /*Sleep for 5 millisecond*/
-           lv_tick_inc(5);      /*Tell LVGL that 5 milliseconds were elapsed*/
-       }
-   }
+   // Bad idea
+   lv_timer_handler();
+   lv_tick_inc(5);
+   my_delay_ms(5);
 
 API
 ---

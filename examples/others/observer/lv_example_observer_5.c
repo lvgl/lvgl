@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_OBSERVER && LV_USE_ARC && LV_USE_LABEL && LV_USE_BTN && LV_USE_SPINNER && LV_BUILD_EXAMPLES
+#if LV_USE_OBSERVER && LV_USE_ARC && LV_USE_LABEL && LV_USE_BUTTON && LV_USE_SPINNER && LV_BUILD_EXAMPLES
 
 typedef enum {
     FW_UPDATE_STATE_IDLE,
@@ -10,10 +10,10 @@ typedef enum {
     FW_UPDATE_STATE_READY,
 } fw_update_state_t;
 
-static void fw_upload_manager_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void fw_update_btn_clicked_event_cb(lv_event_t * e);
 static void fw_update_close_event_cb(lv_event_t * e);
-static void fw_update_win_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 static lv_subject_t fw_download_percent_subject;
 static lv_subject_t fw_update_status_subject;
@@ -33,8 +33,8 @@ void lv_example_observer_5(void)
     lv_subject_add_observer(&fw_update_status_subject, fw_upload_manager_observer_cb, NULL);
 
     /*Create start FW update button*/
-    lv_obj_t * btn = lv_btn_create(lv_screen_active());
-    lv_obj_add_event(btn, fw_update_btn_clicked_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
+    lv_obj_add_event_cb(btn, fw_update_btn_clicked_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_center(btn);
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, "Firmware update");
@@ -48,12 +48,12 @@ static void fw_update_btn_clicked_event_cb(lv_event_t * e)
     lv_obj_set_height(lv_win_get_header(win), 40);
     lv_obj_set_style_radius(win, 8, 0);
     lv_obj_set_style_shadow_width(win, 24, 0);
-    lv_obj_set_style_shadow_ofs_x(win, 2, 0);
-    lv_obj_set_style_shadow_ofs_y(win, 3, 0);
+    lv_obj_set_style_shadow_offset_x(win, 2, 0);
+    lv_obj_set_style_shadow_offset_y(win, 3, 0);
     lv_obj_set_style_shadow_color(win, lv_color_hex3(0x888), 0);
     lv_win_add_title(win, "Firmware update");
     lv_obj_t * btn = lv_win_add_button(win, LV_SYMBOL_CLOSE, 40);
-    lv_obj_add_event(btn, fw_update_close_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btn, fw_update_close_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_center(win);
 
     lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_IDLE);
@@ -73,7 +73,7 @@ static void restart_btn_click_event_cb(lv_event_t * e)
     lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_IDLE);
 }
 
-static void fw_update_win_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void fw_update_win_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * win = lv_observer_get_target(observer);
     lv_obj_t * cont = lv_win_get_content(win);
@@ -110,7 +110,7 @@ static void fw_update_win_observer_cb(lv_subject_t * subject, lv_observer_t * ob
 
         lv_obj_t * btn = lv_button_create(cont);
         lv_obj_align(btn, LV_ALIGN_CENTER, 0, 20);
-        lv_obj_add_event(btn, restart_btn_click_event_cb, LV_EVENT_CLICKED, win);
+        lv_obj_add_event_cb(btn, restart_btn_click_event_cb, LV_EVENT_CLICKED, win);
 
         label = lv_label_create(btn);
         lv_label_set_text(label, "Restart");
@@ -148,7 +148,7 @@ static void download_timer_cb(lv_timer_t * t)
 /**
  * Emulate connection and FW dowlading by timers
  */
-static void fw_upload_manager_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
     LV_UNUSED(observer);

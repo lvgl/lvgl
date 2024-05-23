@@ -143,3 +143,11 @@ div.body {
     min-width: 360px;
     max-width: 1920px;
 }
+
+.cpp-expr {
+  font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,Courier,monospace;
+  color: #e74c3c;
+  padding: 2px 5px;
+  border: 1px solid #e1e4e5;
+  font-size: 75%;
+}

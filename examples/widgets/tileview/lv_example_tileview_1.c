@@ -16,7 +16,6 @@ void lv_example_tileview_1(void)
     lv_label_set_text(label, "Scroll down");
     lv_obj_center(label);
 
-
     /*Tile2: a button*/
     lv_obj_t * tile2 = lv_tileview_add_tile(tv, 0, 1, LV_DIR_TOP | LV_DIR_RIGHT);
 

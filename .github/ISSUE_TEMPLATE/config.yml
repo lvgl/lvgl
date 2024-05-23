@@ -6,9 +6,9 @@ contact_links:
   - name: Forum
     url: https://forum.lvgl.io
     about: For topics like How-to, Getting started, Feature request
-  - name: CONTIBUTING.md
-    url: https://github.com/lvgl/lvgl/blob/master/docs/CONTRIBUTING.md#faq-about-contributing
+  - name: CONTRIBUTING.rst
+    url: https://github.com/lvgl/lvgl/blob/master/docs/CONTRIBUTING.rst
     about: The basic rules of contributing
-  - name: CODING_STYLE.md
-    url: https://github.com/lvgl/lvgl/blob/master/docs/CODING_STYLE.md
+  - name: CODING_STYLE.rst
+    url: https://github.com/lvgl/lvgl/blob/master/docs/CODING_STYLE.rst
     about: Quick summary of LVGL's code style

@@ -14,7 +14,7 @@ void lv_example_textarea_2(void)
     lv_textarea_set_one_line(pwd_ta, true);
     lv_obj_set_width(pwd_ta, lv_pct(40));
     lv_obj_set_pos(pwd_ta, 5, 20);
-    lv_obj_add_event(pwd_ta, ta_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(pwd_ta, ta_event_cb, LV_EVENT_ALL, NULL);
 
     /*Create a label and position it above the text box*/
     lv_obj_t * pwd_label = lv_label_create(lv_screen_active());
@@ -26,9 +26,8 @@ void lv_example_textarea_2(void)
     lv_textarea_set_one_line(text_ta, true);
     lv_textarea_set_password_mode(text_ta, false);
     lv_obj_set_width(text_ta, lv_pct(40));
-    lv_obj_add_event(text_ta, ta_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(text_ta, ta_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_align(text_ta, LV_ALIGN_TOP_RIGHT, -5, 20);
-
 
     /*Create a label and position it above the text box*/
     lv_obj_t * oneline_label = lv_label_create(lv_screen_active());
@@ -40,6 +39,14 @@ void lv_example_textarea_2(void)
     lv_obj_set_size(kb,  LV_HOR_RES, LV_VER_RES / 2);
 
     lv_keyboard_set_textarea(kb, pwd_ta); /*Focus it on one of the text areas to start*/
+
+    /*The keyboard will show Arabic characters if they are enabled */
+#if LV_USE_ARABIC_PERSIAN_CHARS && LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+    lv_obj_set_style_text_font(kb, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_set_style_text_font(text_ta, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_set_style_text_font(pwd_ta, &lv_font_dejavu_16_persian_hebrew, 0);
+#endif
+
 }
 
 static void ta_event_cb(lv_event_t * e)

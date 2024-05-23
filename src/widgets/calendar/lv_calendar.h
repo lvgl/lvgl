@@ -44,15 +44,32 @@ typedef struct {
     lv_calendar_date_t * highlighted_dates; /**< Apply different style on these days (pointer to user-defined array)*/
     size_t highlighted_dates_num;          /**< Number of elements in `highlighted_days`*/
     const char * map[8 * 7];
+#ifdef LV_USE_CALENDAR_CHINESE
+    bool use_chinese_calendar;
+
+    /* 7 * 6: A week has 7 days, and the calendar displays 6 weeks in total.
+       20: Including the number of dates, line breaks, names for each day,
+       and reserving several spaces for addresses.*/
+    char nums [7 * 6][20];
+#else
+    /* 7 * 6: A week has 7 days, and the calendar displays 6 weeks in total.
+       6: Including the number of dates, and reserving several spaces for
+       addresses.*/
     char nums [7 * 6][4];
+#endif
 } lv_calendar_t;
 
-extern const lv_obj_class_t lv_calendar_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_class;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Create a calendar widget
+ * @param parent    pointer to an object, it will be the parent of the new calendar
+ * @return          pointer the created calendar
+ */
 lv_obj_t * lv_calendar_create(lv_obj_t * parent);
 
 /*======================
@@ -105,44 +122,45 @@ void lv_calendar_set_day_names(lv_obj_t * obj, const char ** day_names);
 /**
  * Get the button matrix object of the calendar.
  * It shows the dates and day names.
- * @param obj   pointer to a calendar object
- * @return      pointer to a the button matrix
+ * @param obj       pointer to a calendar object
+ * @return          pointer to a the button matrix
  */
 lv_obj_t * lv_calendar_get_btnmatrix(const lv_obj_t * obj);
 
 /**
  * Get the today's date
- * @param calendar pointer to a calendar object
- * @return return pointer to an `lv_calendar_date_t` variable containing the date of today.
+ * @param calendar  pointer to a calendar object
+ * @return          return pointer to an `lv_calendar_date_t` variable containing the date of today.
  */
 const lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar);
 
 /**
  * Get the currently showed
- * @param calendar pointer to a calendar object
- * @return pointer to an `lv_calendar_date_t` variable containing the date is being shown.
+ * @param calendar  pointer to a calendar object
+ * @return          pointer to an `lv_calendar_date_t` variable containing the date is being shown.
  */
 const lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
 
 /**
  * Get the highlighted dates
- * @param calendar pointer to a calendar object
- * @return pointer to an `lv_calendar_date_t` array containing the dates.
+ * @param calendar  pointer to a calendar object
+ * @return          pointer to an `lv_calendar_date_t` array containing the dates.
  */
 lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * calendar);
 
 /**
  * Get the number of the highlighted dates
- * @param calendar pointer to a calendar object
- * @return number of highlighted days
+ * @param calendar  pointer to a calendar object
+ * @return          number of highlighted days
  */
 size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar);
 
 /**
  * Get the currently pressed day
- * @param calendar pointer to a calendar object
- * @param date store the pressed date here
- * @return LV_RESULT_OK: there is a valid pressed date; LV_RESULT_INVALID: there is no pressed data
+ * @param calendar  pointer to a calendar object
+ * @param date      store the pressed date here
+ * @return          LV_RESULT_OK: there is a valid pressed date
+ *                  LV_RESULT_INVALID: there is no pressed data
  */
 lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_date_t * date);
 
@@ -156,6 +174,7 @@ lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_
 
 #include "lv_calendar_header_arrow.h"
 #include "lv_calendar_header_dropdown.h"
+#include "lv_calendar_chinese.h"
 
 #endif  /*LV_USE_CALENDAR*/
 

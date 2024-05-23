@@ -1,11 +1,11 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
-#include <limits.h>
 #include "lv_tlsf.h"
 #include "../../stdlib/lv_string.h"
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_assert.h"
+#include "../../misc/lv_types.h"
 
 #undef  printf
 #define printf LV_LOG_ERROR
@@ -357,7 +357,6 @@ static const size_t block_start_offset =
 static const size_t block_size_min =
     sizeof(block_header_t) - sizeof(block_header_t *);
 static const size_t block_size_max = tlsf_cast(size_t, 1) << FL_INDEX_MAX;
-
 
 /* The TLSF control structure. */
 typedef struct control_t {
@@ -1243,4 +1242,4 @@ void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size)
     return p;
 }
 
-#endif /* LV_USE_BUILTIN_MALLOC */
+#endif /*LV_STDLIB_BUILTIN*/

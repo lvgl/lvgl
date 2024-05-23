@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 #include "../display/lv_display.h"
-#include <stdbool.h>
+#include "../misc/lv_types.h"
 
 /*********************
  *      DEFINES
@@ -47,6 +47,11 @@ extern "C" {
 void _lv_refr_init(void);
 
 /**
+ * Deinitialize the screen refresh subsystem
+ */
+void _lv_refr_deinit(void);
+
+/**
  * Redraw the invalidated areas now.
  * Normally the redrawing is periodically executed in `lv_timer_handler` but a long blocking process
  * can prevent the call of `lv_timer_handler`. In this case if the GUI is updated in the process
@@ -56,8 +61,8 @@ void _lv_refr_init(void);
 void lv_refr_now(lv_display_t * disp);
 
 /**
- * Redrawn on object an all its children using the passed draw context
- * @param draw_ctx  pointer to an initialized draw context
+ * Redrawn on object and all its children using the passed draw context
+ * @param layer pointer to a layer where to draw.
  * @param obj   the start object from the redraw should start
  */
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj);
@@ -75,6 +80,12 @@ void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p);
  * @return the display being refreshed
  */
 lv_display_t * _lv_refr_get_disp_refreshing(void);
+
+/**
+ * Set the display which is being refreshed
+ * @param disp the display being refreshed
+ */
+void _lv_refr_set_disp_refreshing(lv_display_t * disp);
 
 /**
  * Called periodically to handle the refreshing

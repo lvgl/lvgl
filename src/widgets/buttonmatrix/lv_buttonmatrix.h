@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_BTNMATRIX != 0
+#if LV_USE_BUTTONMATRIX != 0
 
 #include "../../core/lv_obj.h"
 
@@ -40,9 +40,9 @@ enum _lv_buttonmatrix_ctrl_t {
     LV_BUTTONMATRIX_CTRL_CHECKED      = 0x0100, /**< Button is currently toggled (e.g. checked).*/
     LV_BUTTONMATRIX_CTRL_CLICK_TRIG   = 0x0200, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
     LV_BUTTONMATRIX_CTRL_POPOVER      = 0x0400, /**< Show a popover when pressing this key*/
-    LV_BUTTONMATRIX_CTRL_RECOLOR      = 0x0800, /**< Enable text recoloring with `#color`*/
-    _LV_BUTTONMATRIX_CTRL_RESERVED_1  = 0x1000, /**< Reserved for later use*/
-    _LV_BUTTONMATRIX_CTRL_RESERVED_2  = 0x2000, /**< Reserved for later use*/
+    _LV_BUTTONMATRIX_CTRL_RESERVED_1  = 0x0800, /**< Reserved for later use*/
+    _LV_BUTTONMATRIX_CTRL_RESERVED_2  = 0x1000, /**< Reserved for later use*/
+    _LV_BUTTONMATRIX_CTRL_RESERVED_3  = 0x2000, /**< Reserved for later use*/
     LV_BUTTONMATRIX_CTRL_CUSTOM_1     = 0x4000, /**< Custom free to use flag*/
     LV_BUTTONMATRIX_CTRL_CUSTOM_2     = 0x8000, /**< Custom free to use flag*/
 };
@@ -52,7 +52,6 @@ typedef _lv_buttonmatrix_ctrl_t lv_buttonmatrix_ctrl_t;
 #else
 typedef uint32_t lv_buttonmatrix_ctrl_t;
 #endif /*DOXYGEN*/
-
 
 typedef bool (*lv_buttonmatrix_button_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area,
                                                  const lv_area_t * clip_area);
@@ -69,8 +68,7 @@ typedef struct {
     uint32_t one_check : 1;  /*Single button toggled at once*/
 } lv_buttonmatrix_t;
 
-extern const lv_obj_class_t lv_buttonmatrix_class;
-
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_buttonmatrix_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -113,7 +111,7 @@ void lv_buttonmatrix_set_ctrl_map(lv_obj_t * obj, const lv_buttonmatrix_ctrl_t c
 /**
  * Set the selected buttons
  * @param obj        pointer to button matrix object
- * @param btn_id         0 based index of the button to modify. (Not counting new lines)
+ * @param btn_id     0 based index of the button to modify. (Not counting new lines)
  */
 void lv_buttonmatrix_set_selected_button(lv_obj_t * obj, uint32_t btn_id);
 
@@ -215,7 +213,7 @@ bool lv_buttonmatrix_get_one_checked(const lv_obj_t * obj);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_BTNMATRIX*/
+#endif /*LV_USE_BUTTONMATRIX*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

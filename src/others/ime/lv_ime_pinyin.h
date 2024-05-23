@@ -12,7 +12,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../core/lv_obj.h"
 
 #if LV_USE_IME_PINYIN != 0
 
@@ -101,7 +102,6 @@ void lv_ime_pinyin_set_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict);
  */
 void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode);
 
-
 /*=====================
  * Getter functions
  *====================*/
@@ -113,14 +113,12 @@ void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode);
  */
 lv_obj_t * lv_ime_pinyin_get_kb(lv_obj_t * obj);
 
-
 /**
  * Set the dictionary of Pinyin input method.
  * @param obj  pointer to a Pinyin input method object
  * @return     pointer to the Pinyin input method candidate panel
  */
 lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj);
-
 
 /**
  * Set the dictionary of Pinyin input method.

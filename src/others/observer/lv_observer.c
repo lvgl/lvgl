@@ -29,26 +29,36 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void unsubscribe_on_delete_cb(lv_event_t * e);
-static void group_notify_cb(lv_subject_t * subject, lv_observer_t * observer);
+static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
                                         int32_t ref_value, bool inv);
-static void obj_flag_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
-static void obj_state_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
-static void btn_value_changed_event_cb(lv_event_t * e);
+static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void obj_value_changed_event_cb(lv_event_t * e);
 
-static void label_text_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+#if LV_USE_LABEL
+    static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
 
-static void arc_value_changed_event_cb(lv_event_t * e);
-static void arc_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+#if LV_USE_ARC
+    static void arc_value_changed_event_cb(lv_event_t * e);
+    static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
 
-static void slider_value_changed_event_cb(lv_event_t * e);
-static void slider_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+#if LV_USE_SLIDER
+    static void slider_value_changed_event_cb(lv_event_t * e);
+    static void slider_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
 
-static void roller_value_changed_event_cb(lv_event_t * e);
-static void roller_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+#if LV_USE_ROLLER
+    static void roller_value_changed_event_cb(lv_event_t * e);
+    static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
 
-static void dropdown_value_changed_event_cb(lv_event_t * e);
-static void dropdown_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
+#if LV_USE_DROPDOWN
+    static void dropdown_value_changed_event_cb(lv_event_t * e);
+    static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -70,7 +80,6 @@ void lv_subject_init_int(lv_subject_t * subject, int32_t value)
     subject->prev_value.num = value;
     _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
-
 
 void lv_subject_set_int(lv_subject_t * subject, int32_t value)
 {
@@ -107,8 +116,8 @@ int32_t lv_subject_get_previous_int(lv_subject_t * subject)
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
 {
     lv_memzero(subject, sizeof(lv_subject_t));
-    lv_strncpy(buf, value, size);
-    if(prev_buf) lv_strncpy(prev_buf, value, size);
+    lv_strlcpy(buf, value, size);
+    if(prev_buf) lv_strlcpy(prev_buf, value, size);
 
     subject->type = LV_SUBJECT_TYPE_STRING;
     subject->size = size;
@@ -127,10 +136,10 @@ void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 
     if(subject->size < 1) return;
     if(subject->prev_value.pointer) {
-        lv_strncpy((char *)subject->prev_value.pointer, subject->value.pointer, subject->size - 1);
+        lv_strlcpy((char *)subject->prev_value.pointer, subject->value.pointer, subject->size);
     }
 
-    lv_strncpy((char *)subject->value.pointer, buf, subject->size - 1);
+    lv_strlcpy((char *)subject->value.pointer, buf, subject->size);
 
     lv_subject_notify(subject);
 
@@ -206,7 +215,6 @@ void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)
     _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
-
 void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)
 {
     if(subject->type != LV_SUBJECT_TYPE_COLOR) {
@@ -254,6 +262,24 @@ void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32
     }
 }
 
+void lv_subject_deinit(lv_subject_t * subject)
+{
+    lv_observer_t * observer = _lv_ll_get_head(&subject->subs_ll);
+    while(observer) {
+        lv_observer_t * observer_next = _lv_ll_get_next(&subject->subs_ll, observer);
+
+        if(observer->for_obj) {
+            lv_obj_remove_event_cb(observer->target, unsubscribe_on_delete_cb);
+            lv_obj_remove_event_cb_with_user_data(observer->target, NULL, subject);
+        }
+
+        lv_observer_remove(observer);
+        observer = observer_next;
+    }
+
+    _lv_ll_clear(&subject->subs_ll);
+}
+
 lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index)
 {
     if(subject->type != LV_SUBJECT_TYPE_GROUP) {
@@ -266,16 +292,23 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
     return ((lv_subject_t **)(subject->value.pointer))[index];
 }
 
-
 lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t cb, void * user_data)
 {
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, cb, NULL, user_data);
+    if(observer == NULL) return NULL;
+
+    observer->for_obj = 0;
     return observer;
 }
 
 lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t cb, lv_obj_t * obj,
                                             void * user_data)
 {
+    LV_ASSERT_NULL(subject);
+    if(subject->type == LV_SUBJECT_TYPE_INVALID) {
+        LV_LOG_WARN("Subject not initialized yet");
+        return NULL;
+    }
     lv_observer_t * observer = _lv_ll_ins_tail(&(subject->subs_ll));
     LV_ASSERT_MALLOC(observer);
     if(observer == NULL) return NULL;
@@ -286,21 +319,26 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     observer->cb = cb;
     observer->user_data = user_data;
     observer->target = obj;
+    observer->for_obj = 1;
     /* subscribe to delete event of the object */
     if(obj != NULL) {
-        lv_obj_add_event(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
+        lv_obj_add_event_cb(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
     }
 
     /* update object immediately */
-    if(observer->cb) observer->cb(subject, observer);
+    if(observer->cb) observer->cb(observer, subject);
 
     return observer;
 }
 
-
 lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t cb, void * target,
                                                     void * user_data)
 {
+    LV_ASSERT_NULL(subject);
+    if(subject->type == LV_SUBJECT_TYPE_INVALID) {
+        LV_LOG_WARN("Subject not initialized yet");
+        return NULL;
+    }
     lv_observer_t * observer = _lv_ll_ins_tail(&(subject->subs_ll));
     LV_ASSERT_MALLOC(observer);
     if(observer == NULL) return NULL;
@@ -313,7 +351,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
     observer->target = target;
 
     /* update object immediately */
-    if(observer->cb) observer->cb(subject, observer);
+    if(observer->cb) observer->cb(observer, subject);
 
     return observer;
 }
@@ -334,11 +372,26 @@ void lv_observer_remove(lv_observer_t * observer)
 
 void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
 {
+    LV_ASSERT_NULL(subject);
+    if(subject->type == LV_SUBJECT_TYPE_INVALID) {
+        LV_LOG_WARN("Subject not initialized yet");
+        return;
+    }
+
     while(lv_obj_remove_event_cb(obj, unsubscribe_on_delete_cb));
-    while(lv_obj_remove_event_cb(obj, btn_value_changed_event_cb));
+    while(lv_obj_remove_event_cb(obj, obj_value_changed_event_cb));
+
+#if LV_USE_ARC
     while(lv_obj_remove_event_cb(obj, arc_value_changed_event_cb));
+#endif /*LV_USE_ARC*/
+
+#if LV_USE_ROLLER
     while(lv_obj_remove_event_cb(obj, roller_value_changed_event_cb));
+#endif /*LV_USE_ROLLER*/
+
+#if LV_USE_DROPDOWN
     while(lv_obj_remove_event_cb(obj, dropdown_value_changed_event_cb));
+#endif /*LV_USE_DROPDOWN*/
 
     lv_observer_t * observer = _lv_ll_get_head(&subject->subs_ll);
     while(observer) {
@@ -370,14 +423,13 @@ void lv_subject_notify(lv_subject_t * subject)
         subject->notify_restart_query = 0;
         _LV_LL_READ(&(subject->subs_ll), observer) {
             if(observer->cb && observer->notified == 0) {
-                observer->cb(subject, observer);
+                observer->cb(observer, subject);
                 if(subject->notify_restart_query) break;
                 observer->notified = 1;
             }
         }
     } while(subject->notify_restart_query);
 }
-
 
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
@@ -404,12 +456,14 @@ lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subje
     return observable;
 }
 
-lv_observer_t * lv_button_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
+lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 {
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 1, false);
-    lv_obj_add_event(obj, btn_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, obj_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
     return observable;
 }
+
+#if LV_USE_LABEL
 lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
 {
     if(fmt == NULL) {
@@ -429,7 +483,9 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, label_text_observer_cb, obj, (void *)fmt);
     return observer;
 }
+#endif /*LV_USE_LABEL*/
 
+#if LV_USE_ARC
 lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
     if(subject->type != LV_SUBJECT_TYPE_INT) {
@@ -437,13 +493,14 @@ lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         return NULL;
     }
 
-    lv_obj_add_event(obj, arc_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, arc_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, arc_value_observer_cb, obj, NULL);
     return observer;
 }
+#endif /*LV_USE_ARC*/
 
-
+#if LV_USE_SLIDER
 lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
     if(subject->type != LV_SUBJECT_TYPE_INT) {
@@ -451,11 +508,14 @@ lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         return NULL;
     }
 
-    lv_obj_add_event(obj, slider_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, slider_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, slider_value_observer_cb, obj, NULL);
     return observer;
 }
+#endif /*LV_USE_SLIDER*/
+
+#if LV_USE_ROLLER
 
 lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
@@ -464,12 +524,15 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         return NULL;
     }
 
-    lv_obj_add_event(obj, roller_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, roller_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, roller_value_observer_cb, obj, NULL);
     return observer;
 
 }
+#endif /*LV_USE_ROLLER*/
+
+#if LV_USE_DROPDOWN
 
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
@@ -478,18 +541,20 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
         return NULL;
     }
 
-    lv_obj_add_event(obj, dropdown_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+    lv_obj_add_event_cb(obj, dropdown_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, dropdown_value_observer_cb, obj, NULL);
     return observer;
 
 }
 
+#endif /*LV_USE_DROPDOWN*/
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void group_notify_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(subject);
     lv_subject_t * subject_group = observer->user_data;
@@ -525,7 +590,7 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
     return observable;
 }
 
-static void obj_flag_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     flag_and_cond_t * p = observer->user_data;
 
@@ -540,7 +605,7 @@ static void obj_flag_observer_cb(lv_subject_t * subject, lv_observer_t * observe
     }
 }
 
-static void obj_state_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     flag_and_cond_t * p = observer->user_data;
 
@@ -555,8 +620,7 @@ static void obj_state_observer_cb(lv_subject_t * subject, lv_observer_t * observ
     }
 }
 
-
-static void btn_value_changed_event_cb(lv_event_t * e)
+static void obj_value_changed_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_current_target(e);
     lv_subject_t * subject = lv_event_get_user_data(e);
@@ -564,7 +628,9 @@ static void btn_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_obj_has_state(obj, LV_STATE_CHECKED));
 }
 
-static void label_text_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+#if LV_USE_LABEL
+
+static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     const char * fmt = observer->user_data;
 
@@ -586,6 +652,10 @@ static void label_text_observer_cb(lv_subject_t * subject, lv_observer_t * obser
     }
 }
 
+#endif /*LV_USE_LABEL*/
+
+#if LV_USE_ARC
+
 static void arc_value_changed_event_cb(lv_event_t * e)
 {
     lv_obj_t * arc = lv_event_get_current_target(e);
@@ -594,10 +664,14 @@ static void arc_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_arc_get_value(arc));
 }
 
-static void arc_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void arc_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_arc_set_value(observer->target, subject->value.num);
 }
+
+#endif /*LV_USE_ARC*/
+
+#if LV_USE_SLIDER
 
 static void slider_value_changed_event_cb(lv_event_t * e)
 {
@@ -607,10 +681,14 @@ static void slider_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_slider_get_value(slider));
 }
 
-static void slider_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void slider_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_slider_set_value(observer->target, subject->value.num, LV_ANIM_OFF);
 }
+
+#endif /*LV_USE_SLIDER*/
+
+#if LV_USE_ROLLER
 
 static void roller_value_changed_event_cb(lv_event_t * e)
 {
@@ -620,12 +698,16 @@ static void roller_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_roller_get_selected(roller));
 }
 
-static void roller_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void roller_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     if((int32_t)lv_roller_get_selected(observer->target) != subject->value.num) {
         lv_roller_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
     }
 }
+
+#endif /*LV_USE_ROLLER*/
+
+#if LV_USE_DROPDOWN
 
 static void dropdown_value_changed_event_cb(lv_event_t * e)
 {
@@ -635,9 +717,11 @@ static void dropdown_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_dropdown_get_selected(dropdown));
 }
 
-static void dropdown_value_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_dropdown_set_selected(observer->target, subject->value.num);
 }
+
+#endif /*LV_USE_DROPDOWN*/
 
 #endif /*LV_USE_OBSERVER*/

@@ -11,6 +11,7 @@
 #include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
 #include "layouts/lv_layout.h"
+#include "libs/bin_decoder/lv_bin_decoder.h"
 #include "libs/bmp/lv_bmp.h"
 #include "libs/ffmpeg/lv_ffmpeg.h"
 #include "libs/freetype/lv_freetype.h"
@@ -21,8 +22,6 @@
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
 #include "draw/lv_draw.h"
-#include "misc/lv_cache.h"
-#include "misc/lv_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
 #if LV_USE_DRAW_VGLITE
@@ -31,11 +30,24 @@
 #if LV_USE_DRAW_PXP
     #include "draw/nxp/pxp/lv_draw_pxp.h"
 #endif
+#if LV_USE_DRAW_DAVE2D
+    #include "draw/renesas/dave2d/lv_draw_dave2d.h"
+#endif
+#if LV_USE_DRAW_SDL
+    #include "draw/sdl/lv_draw_sdl.h"
+#endif
+#if LV_USE_DRAW_VG_LITE
+    #include "draw/vg_lite/lv_draw_vg_lite.h"
+#endif
+#if LV_USE_WINDOWS
+    #include "drivers/windows/lv_windows_context.h"
+#endif
 
 /*********************
  *      DEFINES
  *********************/
 #define lv_initialized  LV_GLOBAL_DEFAULT()->inited
+#define lv_deinit_in_progress  LV_GLOBAL_DEFAULT()->deinit_in_progress
 
 /**********************
  *      TYPEDEFS
@@ -56,6 +68,10 @@
  *      MACROS
  **********************/
 
+#ifndef LV_GLOBAL_INIT
+    #define LV_GLOBAL_INIT(__GLOBAL_PTR)    lv_global_init((lv_global_t *)(__GLOBAL_PTR))
+#endif
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -68,7 +84,7 @@ static inline void lv_global_init(lv_global_t * global)
         return;
     }
 
-    lv_memset(global, 0, sizeof(lv_global_t));
+    lv_memzero(global, sizeof(lv_global_t));
 
     _lv_ll_init(&(global->disp_ll), sizeof(lv_display_t));
     _lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));
@@ -77,14 +93,29 @@ static inline void lv_global_init(lv_global_t * global)
     global->style_refresh = true;
     global->layout_count = _LV_LAYOUT_LAST;
     global->style_last_custom_prop_id = (uint32_t)_LV_STYLE_LAST_BUILT_IN_PROP;
-    global->area_trans_cache.angle_prev = INT32_MIN;
     global->event_last_register_id = _LV_EVENT_LAST;
-    global->math_rand_seed = 0x1234ABCD;
+    lv_rand_set_seed(0x1234ABCD);
+
+#ifdef LV_LOG_PRINT_CB
+    void LV_LOG_PRINT_CB(lv_log_level_t, const char * txt);
+    global->custom_log_print_cb = LV_LOG_PRINT_CB;
+#endif
 
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     global->sw_shadow_cache.cache_size = -1;
     global->sw_shadow_cache.cache_r = -1;
 #endif
+}
+
+static inline void _lv_cleanup_devices(lv_global_t * global)
+{
+    LV_ASSERT_NULL(global);
+
+    if(global) {
+        /* cleanup indev and display */
+        _lv_ll_clear_custom(&(global->indev_ll), (void (*)(void *)) lv_indev_delete);
+        _lv_ll_clear_custom(&(global->disp_ll), (void (*)(void *)) lv_display_delete);
+    }
 }
 
 bool lv_is_initialized(void)
@@ -113,7 +144,7 @@ void lv_init(void)
     LV_LOG_INFO("begin");
 
     /*Initialize members of static variable lv_global */
-    lv_global_init(LV_GLOBAL_DEFAULT());
+    LV_GLOBAL_INIT(LV_GLOBAL_DEFAULT());
 
     lv_mem_init();
 
@@ -153,6 +184,18 @@ void lv_init(void)
     lv_draw_pxp_init();
 #endif
 
+#if LV_USE_DRAW_DAVE2D
+    lv_draw_dave2d_init();
+#endif
+
+#if LV_USE_DRAW_SDL
+    lv_draw_sdl_init();
+#endif
+
+#if LV_USE_WINDOWS
+    lv_windows_platform_init();
+#endif
+
     _lv_obj_style_init();
 
     /*Initialize the screen refresh system*/
@@ -162,13 +205,12 @@ void lv_init(void)
     _lv_sysmon_builtin_init();
 #endif
 
-    _lv_image_decoder_init();
+    _lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
+    lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
-    _lv_cache_init();
-    _lv_cache_builtin_init();
-    lv_cache_lock();
-    lv_cache_set_max_size(LV_CACHE_DEF_SIZE);
-    lv_cache_unlock();
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_init();
+#endif
 
     /*Test if the IDE has UTF-8 encoding*/
     const char * txt = "Á";
@@ -178,9 +220,9 @@ void lv_init(void)
         LV_LOG_WARN("The strings have no UTF-8 encoding. Non-ASCII characters won't be displayed.");
     }
 
-    uint32_t endianess_test = 0x11223344;
-    uint8_t * endianess_test_p = (uint8_t *) &endianess_test;
-    bool big_endian = endianess_test_p[0] == 0x11;
+    uint32_t endianness_test = 0x11223344;
+    uint8_t * endianness_test_p = (uint8_t *) &endianness_test;
+    bool big_endian = endianness_test_p[0] == 0x11;
 
     if(big_endian) {
         LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 1,
@@ -227,6 +269,18 @@ void lv_init(void)
     lv_fs_memfs_init();
 #endif
 
+#if LV_USE_FS_LITTLEFS
+    lv_fs_littlefs_init();
+#endif
+
+#if LV_USE_FS_ARDUINO_ESP_LITTLEFS
+    lv_fs_arduino_esp_littlefs_init();
+#endif
+
+#if LV_USE_FS_ARDUINO_SD
+    lv_fs_arduino_sd_init();
+#endif
+
 #if LV_USE_LODEPNG
     lv_lodepng_init();
 #endif
@@ -255,11 +309,11 @@ void lv_init(void)
 
 #if LV_USE_FREETYPE
     /*Init freetype library*/
-#  if LV_FREETYPE_CACHE_SIZE >= 0
-    lv_freetype_init(LV_FREETYPE_CACHE_FT_FACES, LV_FREETYPE_CACHE_FT_SIZES, LV_FREETYPE_CACHE_SIZE);
-#  else
-    lv_freetype_init(0, 0, 0);
-#  endif
+    lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
+#endif
+
+#if LV_USE_TINY_TTF
+    lv_tiny_ttf_init();
 #endif
 
     lv_initialized = true;
@@ -274,7 +328,10 @@ void lv_deinit(void)
         LV_LOG_WARN("lv_deinit: already deinit!");
         return;
     }
-#if LV_ENABLE_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+
+    if(lv_deinit_in_progress) return;
+
+    lv_deinit_in_progress = true;
 
 #if LV_USE_SYSMON
     _lv_sysmon_builtin_deinit();
@@ -282,40 +339,88 @@ void lv_deinit(void)
 
     lv_display_set_default(NULL);
 
+    _lv_cleanup_devices(LV_GLOBAL_DEFAULT());
+
 #if LV_USE_SPAN != 0
     lv_span_stack_deinit();
+#endif
+
+#if LV_USE_DRAW_SW
+    lv_draw_sw_deinit();
 #endif
 
 #if LV_USE_FREETYPE
     lv_freetype_uninit();
 #endif
 
+#if LV_USE_TINY_TTF
+    lv_tiny_ttf_deinit();
+#endif
+
 #if LV_USE_THEME_DEFAULT
     lv_theme_default_deinit();
 #endif
 
-#if LV_USE_THEME_BASIC
-    lv_theme_basic_deinit();
+#if LV_USE_THEME_SIMPLE
+    lv_theme_simple_deinit();
 #endif
 
 #if LV_USE_THEME_MONO
     lv_theme_mono_deinit();
 #endif
 
-    lv_mem_deinit();
+    _lv_image_decoder_deinit();
 
-#if LV_USE_LOG
-    lv_log_register_print_cb(NULL);
+    _lv_refr_deinit();
+
+    _lv_obj_style_deinit();
+
+#if LV_USE_DRAW_PXP
+    lv_draw_pxp_deinit();
+#endif
+
+#if LV_USE_DRAW_VGLITE
+    lv_draw_vglite_deinit();
+#endif
+
+#if LV_USE_DRAW_VG_LITE
+    lv_draw_vg_lite_deinit();
+#endif
+
+#if LV_USE_DRAW_SW
+    lv_draw_sw_deinit();
+#endif
+
+    lv_draw_deinit();
+
+    _lv_group_deinit();
+
+    _lv_anim_core_deinit();
+
+    _lv_layout_deinit();
+
+    _lv_fs_deinit();
+
+    _lv_timer_core_deinit();
+
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+    lv_profiler_builtin_uninit();
 #endif
 
 #if LV_USE_OBJ_ID_BUILTIN
     lv_objid_builtin_destroy();
 #endif
-#endif
+
+    lv_mem_deinit();
 
     lv_initialized = false;
 
     LV_LOG_INFO("lv_deinit done");
+
+#if LV_USE_LOG
+    lv_log_register_print_cb(NULL);
+#endif
+
 }
 
 /**********************

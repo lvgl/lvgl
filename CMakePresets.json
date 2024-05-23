@@ -1,0 +1,116 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "_base",
+      "hidden": true,
+      "cacheVariables": {
+        "LV_CONF_SKIP": true
+      }
+    },
+    {
+      "name": "windows-base",
+      "inherits": "_base",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/build/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "BUILD_SHARED_LIBS": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "linux-base",
+      "inherits": "_base",
+      "displayName": "Linux",
+      "description": "Setup WSL or native linux",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/build/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+        }
+      },
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "_base",
+      "hidden": true,
+      "jobs": 12
+    },
+    {
+      "name": "windows-base_dbg",
+      "inherits": "_base",
+      "displayName": "Debug",
+      "configurePreset": "windows-base",
+      "configuration": "Debug"
+    },
+    {
+      "name": "windows-base_rel",
+      "inherits": "_base",
+      "displayName": "Release",
+      "configurePreset": "windows-base",
+      "configuration": "Release"
+    },
+    {
+      "name": "linux-base_dbg",
+      "inherits": "_base",
+      "displayName": "Debug",
+      "configurePreset": "linux-base",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux-base_rel",
+      "inherits": "_base",
+      "displayName": "Release",
+      "configurePreset": "linux-base",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "windows-base_dbg",
+      "displayName": "Debug",
+      "configurePreset": "windows-base",
+      "configuration": "Debug"
+    },
+    {
+      "name": "windows-base_rel",
+      "displayName": "Release",
+      "configurePreset": "windows-base",
+      "configuration": "Release"
+    },
+    {
+      "name": "linux-base_dbg",
+      "displayName": "Debug",
+      "configurePreset": "linux-base",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux-base_rel",
+      "displayName": "Release",
+      "configurePreset": "linux-base",
+      "configuration": "Release"
+    }
+  ]
+}

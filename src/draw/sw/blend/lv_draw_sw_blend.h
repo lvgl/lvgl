@@ -40,32 +40,30 @@ typedef struct {
     const lv_opa_t * mask_buf;      /**< NULL if ignored, or an alpha mask to apply on `blend_area`*/
     lv_draw_sw_mask_res_t mask_res;    /**< The result of the previous mask operation */
     const lv_area_t * mask_area;    /**< The area of `mask_buf` with absolute coordinates*/
+    int32_t mask_stride;
     lv_blend_mode_t blend_mode;     /**< E.g. LV_BLEND_MODE_ADDITIVE*/
 } lv_draw_sw_blend_dsc_t;
 
-struct _lv_draw_unit_t;
-
-
 typedef struct {
     void * dest_buf;
-    lv_coord_t dest_w;
-    lv_coord_t dest_h;
-    lv_coord_t dest_stride;
+    int32_t dest_w;
+    int32_t dest_h;
+    int32_t dest_stride;
     const lv_opa_t * mask_buf;
-    lv_coord_t mask_stride;
+    int32_t mask_stride;
     lv_color_t color;
     lv_opa_t opa;
 } _lv_draw_sw_blend_fill_dsc_t;
 
 typedef struct {
     void * dest_buf;
-    lv_coord_t dest_w;
-    lv_coord_t dest_h;
-    lv_coord_t dest_stride;
+    int32_t dest_w;
+    int32_t dest_h;
+    int32_t dest_stride;
     const lv_opa_t * mask_buf;
-    lv_coord_t mask_stride;
+    int32_t mask_stride;
     const void * src_buf;
-    lv_coord_t src_stride;
+    int32_t src_stride;
     lv_color_format_t src_color_format;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode;
@@ -77,10 +75,10 @@ typedef struct {
 
 /**
  * Call the blend function of the `layer`.
- * @param layer      pointer to a draw context
+ * @param draw_unit     pointer to a draw unit
  * @param dsc           pointer to an initialized blend descriptor
  */
-void lv_draw_sw_blend(struct _lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t * dsc);
+void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t * dsc);
 
 /**********************
  *      MACROS

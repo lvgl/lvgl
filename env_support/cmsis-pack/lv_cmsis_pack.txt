@@ -27,9 +27,18 @@
 #include "RTE_Components.h"
 #include <time.h>
 
- /*********************
+#if defined(__PERF_COUNTER__) && __PERF_COUNTER__
+#   include "perf_counter.h"
+#endif
+
+#include <stdint.h>
+#include <stddef.h>
+#include "lv_global.h"
+
+/*********************
  *      DEFINES
  *********************/
+#define state LV_GLOBAL_DEFAULT()->tick_state
 
  /**********************
  *      TYPEDEFS
@@ -102,12 +111,29 @@
  * time() which is not included in the MicroLib 
  */
 #if defined(__IS_COMPILER_ARM_COMPILER__) && __IS_COMPILER_ARM_COMPILER__
-#	if defined(__MICROLIB)
+#   if defined(__MICROLIB)
 __attribute__((weak))
 _ARMABI time_t time(time_t * time)
 {
     return (time_t)(-1);
 }
-#	endif
+#   endif
+
+
+
+#   if defined(__PERF_COUNTER__) && __PERF_COUNTER__
+/**
+ * Get the elapsed milliseconds since start up from perf_counter
+ * @return the elapsed milliseconds
+ */
+uint32_t perfc_tick_get(void)
+{
+    return (uint32_t)get_system_ms();
+}
+
+#   endif
+
 #endif
+
+
 
