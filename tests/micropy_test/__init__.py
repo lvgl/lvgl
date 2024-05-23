@@ -36,12 +36,14 @@ DEBUG = 0
 
 debug_log = None
 
+saved_test_data = []
 
-def log(*args):
+
+def log(*args, error=False):
     args = ' '.join(repr(arg) for arg in args)
     debug_log.write(args + '\n')
 
-    if DEBUG:
+    if DEBUG or error:
         sys.stdout.write('\033[31;1m' + args + '\033[0m\n')
         sys.stdout.flush()
 
@@ -109,23 +111,34 @@ class MicroPython_Test(unittest.TestCase):
                 logged = True
                 log('--->', micropy_data)
 
-            if micropy_data.endswith(b'\nERROR END\n'):
+            if b'\nERROR END\n' in micropy_data:
                 error_data = micropy_data.split(b'\nERROR START\n')[-1].split(b'\nERROR END\n')[0]
                 micropy_data = b''
-                log('---> ERROR: ', error_data)
+                try:
+                    log('---> ERROR: ', error_data.decode('utf-8'))
+                except UnicodeDecodeError:
+                    log('---> ERROR: ', error_data)
+
                 logged = True
                 break
 
         if not logged:
             log('--->', micropy_data)
 
+        if b'\nERROR END\n' in micropy_data:
+            error_data = micropy_data.split(b'\nERROR START\n')[-1].split(b'\nERROR END\n')[0]
+            micropy_data = b''
+            try:
+                log('---> ERROR: ', error_data.decode('utf-8'))
+            except UnicodeDecodeError:
+                log('---> ERROR: ', error_data)
+
         if cls.exit_event.is_set():
             log('--EXIT EVENT SET')
 
-        if micropy_data:
-            return micropy_data.replace(marker, b''), error_data
+        saved_test_data.append((micropy_data, error_data))
 
-        return micropy_data, error_data
+        return micropy_data.replace(marker, b''), error_data
 
     @classmethod
     def setUpClass(cls):
@@ -312,6 +325,11 @@ class MicroPython_Test(unittest.TestCase):
                     for item in sublist
                 ])))
 
+        except binascii.Error:
+            for line, err in saved_test_data:
+                log(line, err, error=True)
+
+            self.fail(b'\n'.join(test_data.result))
         except:  # NOQA
             import traceback
 
