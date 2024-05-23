@@ -340,14 +340,7 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
 
     if(tmr) {
         disp_refr = tmr->user_data;
-        /* Ensure the timer does not run again automatically.
-         * This is done before refreshing in case refreshing invalidates something else.
-         * However if the performance monitor is enabled keep the timer running to count the FPS.*/
-#if LV_USE_PERF_MONITOR
-        lv_timer_pause(tmr);
-#endif
-    }
-    else {
+    } else {
         disp_refr = lv_display_get_default();
     }
 
