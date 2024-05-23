@@ -67,7 +67,7 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
         }
 
         lv_obj_t ** screens = lv_realloc(disp->screens, sizeof(lv_obj_t *) * (disp->screen_cnt + 1));
-        LV_ASSERT_NULL(disp->screens);
+        LV_ASSERT_NULL(screens);
         if(screens == NULL) return NULL;
 
         disp->screen_cnt++;
