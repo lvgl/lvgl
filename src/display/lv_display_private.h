@@ -163,6 +163,9 @@ struct _lv_display_t {
     lv_obj_t * mem_label;
 #endif
 
+#if LV_RETURN_FROM_FLUSH_WAIT
+    bool refresh_skipped;
+#endif
 };
 
 /**********************

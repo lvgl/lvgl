@@ -74,21 +74,33 @@ void _lv_refr_deinit(void)
 {
 }
 
-void lv_refr_now(lv_display_t * disp)
+bool lv_refr_now(lv_display_t * disp)
 {
     lv_anim_refr_now();
-
+    bool ret = true;
     if(disp) {
-        if(disp->refr_timer) _lv_display_refr_timer(disp->refr_timer);
+        _lv_display_refr_timer(disp->refr_timer);
+#if LV_RETURN_FROM_FLUSH_WAIT
+        if(lv_display_is_double_buffered(disp) && !(disp->refresh_skipped)) {
+            ret = false;
+        }
+#endif
     }
     else {
+
         lv_display_t * d;
         d = lv_display_get_next(NULL);
         while(d) {
-            if(d->refr_timer) _lv_display_refr_timer(d->refr_timer);
+            _lv_display_refr_timer(d->refr_timer);
+#if LV_RETURN_FROM_FLUSH_WAIT
+            if(lv_display_is_double_buffered(d) && !(d->refresh_skipped)) {
+                ret = false;
+            }
+#endif
             d = lv_display_get_next(d);
         }
     }
+    return ret;
 }
 
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
@@ -350,6 +362,33 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
         return;
     }
 
+     /* In double buffered mode wait until the other buffer is freed
+     * and driver is ready to receive the new buffer.
+     * If we need to wait here it means that the content of one buffer is being sent to display
+     * and other buffer already contains the new rendered image.
+     * This needs to be done right at the beginning of the refresh so the buffers
+     * do not get modified until the flush is done.
+     */
+
+    if(lv_display_is_double_buffered(disp_refr)) {
+#if LV_RETURN_FROM_FLUSH_WAIT
+        if(tmr) {
+            if (disp_refr->flushing == 1) {
+                lv_timer_set_period(tmr, 1);
+                disp_refr->refresh_skipped = true;
+                return;
+            } else {
+                lv_timer_set_period(tmr, LV_DEF_REFR_PERIOD);
+                disp_refr->refresh_skipped = false;
+            }
+        } else {
+            wait_for_flushing(disp_refr);
+        }
+#else
+        wait_for_flushing(disp_refr);
+#endif /* LV_RETURN_FROM_FLUSH_WAIT */
+    }
+
     lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
 
     /*Refresh the screen's layout if required*/
@@ -465,9 +504,6 @@ static void refr_sync_areas(void)
     if(_lv_ll_is_empty(&disp_refr->sync_areas)) return;
 
     LV_PROFILER_BEGIN;
-    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
-    /*We need to wait for ready here to not mess up the active screen*/
-    wait_for_flushing(disp_refr);
 
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
@@ -668,11 +704,6 @@ static void refr_area_part(lv_layer_t * layer)
     LV_PROFILER_BEGIN;
     disp_refr->refreshed_area = layer->_clip_area;
 
-    /* In single buffered mode wait here until the buffer is freed.
-     * Else we would draw into the buffer while it's still being transferred to the display*/
-    if(!lv_display_is_double_buffered(disp_refr)) {
-        wait_for_flushing(disp_refr);
-    }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
         lv_area_t a = disp_refr->refreshed_area;
@@ -1017,14 +1048,6 @@ static void draw_buf_flush(lv_display_t * disp)
         lv_draw_dispatch();
     }
 
-    /* In double buffered mode wait until the other buffer is freed
-     * and driver is ready to receive the new buffer.
-     * If we need to wait here it means that the content of one buffer is being sent to display
-     * and other buffer already contains the new rendered image. */
-    if(lv_display_is_double_buffered(disp)) {
-        wait_for_flushing(disp_refr);
-    }
-
     disp->flushing = 1;
 
     if(disp->last_area && disp->last_part) disp->flushing_last = 1;
@@ -1073,15 +1096,12 @@ static void wait_for_flushing(lv_display_t * disp)
 
     lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
 
-    if(disp->flush_wait_cb) {
-        if(disp->flushing) {
-            disp->flush_wait_cb(disp);
-        }
-        disp->flushing = 0;
+    if(disp->flush_wait_cb && disp->flushing) {
+        disp->flush_wait_cb(disp);
     }
-    else {
-        while(disp->flushing);
-    }
+
+    while(disp->flushing);
+
     disp->flushing_last = 0;
 
     lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_FINISH, NULL);

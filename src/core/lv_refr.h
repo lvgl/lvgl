@@ -57,8 +57,9 @@ void _lv_refr_deinit(void);
  * can prevent the call of `lv_timer_handler`. In this case if the GUI is updated in the process
  * (e.g. progress bar) this function can be called when the screen should be updated.
  * @param disp pointer to display to refresh. NULL to refresh all displays.
+ * @return false if double buffering and refresh doesn't completes, else true
  */
-void lv_refr_now(lv_display_t * disp);
+bool lv_refr_now(lv_display_t * disp);
 
 /**
  * Redrawn on object and all its children using the passed draw context
