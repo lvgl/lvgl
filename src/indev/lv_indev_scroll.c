@@ -507,7 +507,7 @@ static void init_scroll_limits(lv_indev_t * indev)
 static int32_t find_snap_point_x(const lv_obj_t * obj, int32_t min, int32_t max, int32_t ofs)
 {
     lv_scroll_snap_t align = lv_obj_get_scroll_snap_x(obj);
-    if(align == LV_SCROLL_SNAP_NONE) return 0;
+    if(align == LV_SCROLL_SNAP_NONE) return LV_COORD_MAX;
 
     int32_t dist = LV_COORD_MAX;
 
@@ -563,7 +563,7 @@ static int32_t find_snap_point_x(const lv_obj_t * obj, int32_t min, int32_t max,
 static int32_t find_snap_point_y(const lv_obj_t * obj, int32_t min, int32_t max, int32_t ofs)
 {
     lv_scroll_snap_t align = lv_obj_get_scroll_snap_y(obj);
-    if(align == LV_SCROLL_SNAP_NONE) return 0;
+    if(align == LV_SCROLL_SNAP_NONE) return LV_COORD_MAX;
 
     int32_t dist = LV_COORD_MAX;
 
