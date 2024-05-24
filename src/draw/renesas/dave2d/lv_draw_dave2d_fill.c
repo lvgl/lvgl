@@ -97,7 +97,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
 
             if(a1 < a2) {
                 /* TODO */
-                LV_ASSERT(1 == 0);
+                LV_ASSERT(0);
                 x0 = 0.0f;//silence the compiler warning
                 x3 = 0.0f;
 
