@@ -9,6 +9,8 @@ sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install gcc gcc-multilib g++-multilib ninja-build \
 libpng-dev libjpeg-turbo8-dev libfreetype6-dev \
+libglew-dev libglfw3-dev \
 libpng-dev:i386 libjpeg-dev:i386 libfreetype6-dev:i386 \
+libglew-dev:i386 libglfw3-dev:i386 libgl1-mesa-dev:i386 \
 ruby-full gcovr cmake  python3 pngquant libinput-dev libxkbcommon-dev libdrm-dev pkg-config
 pip3 install pypng lz4
