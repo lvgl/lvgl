@@ -164,7 +164,7 @@ def create_ui():
         1,
         lv.GRID_ALIGN.CENTER,
         0,
-    #     1
+        1
     )
 
     # Bind to a subject
