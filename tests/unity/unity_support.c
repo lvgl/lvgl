@@ -33,8 +33,10 @@
 /*********************
  *      DEFINES
  *********************/
-//#define REF_IMGS_PATH "lvgl/tests/lv_test_ref_imgs/"
+
+#ifndef REF_IMGS_PATH
 #define REF_IMGS_PATH "ref_imgs/"
+#endif
 #define ERR_FILE_NOT_FOUND  -1
 #define ERR_PNG             -2
 

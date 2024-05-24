@@ -60,6 +60,8 @@ set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(LVGL_TEST_OPTIONS_VG_LITE
     -DLV_TEST_OPTION=6
+    -DLVGL_CI_USING_SYS_HEAP
+    -Wno-dangling-pointer # workaround for thorvg dangling-pointer warning
 )
 
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
@@ -97,9 +99,7 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     --coverage
 )
 
-if (OPTIONS_VG_LITE)
-    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE})
-elseif (OPTIONS_NORMAL_8BIT)
+if (OPTIONS_NORMAL_8BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_NORMAL_8BIT})
 elseif (OPTIONS_16BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_16BIT})
@@ -123,6 +123,11 @@ elseif (OPTIONS_TEST_MEMORYCHECK)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
+elseif (OPTIONS_VG_LITE)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE})
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs_vg_lite/")
+    add_definitions(-DLV_TEST_DRAW_BUF_STRIDE_DIASBLED=1)
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()

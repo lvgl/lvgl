@@ -203,11 +203,13 @@ static void anim_exec_cb(void * var, int32_t v)
 
 static void lottie_update(lv_lottie_t * lottie, int32_t v)
 {
+    lv_obj_t * obj = (lv_obj_t *) lottie;
     tvg_animation_set_frame(lottie->tvg_anim, v);
     tvg_canvas_update(lottie->tvg_canvas);
     tvg_canvas_draw(lottie->tvg_canvas);
     tvg_canvas_sync(lottie->tvg_canvas);
-    lv_obj_invalidate((lv_obj_t *)lottie);
+    lv_image_cache_drop(lv_image_get_src(obj));
+    lv_obj_invalidate(obj);
 }
 
 #endif /*LV_USE_LOTTIE*/

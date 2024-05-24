@@ -2,6 +2,8 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+
+
 #include "lv_test_helpers.h"
 
 void setUp(void)
@@ -16,6 +18,11 @@ void tearDown(void)
 
 void test_draw_buf_stride_adjust(void)
 {
+#ifdef LV_TEST_DRAW_BUF_STRIDE_DIASBLED
+    /* Skip test if disabled */
+    return;
+#endif
+
 #if LV_BIN_DECODER_RAM_LOAD == 1
     const char * color_formats[] = {
         "I1",
@@ -113,4 +120,4 @@ void test_draw_buf_stride_adjust(void)
 #endif
 }
 
-#endif
+#endif /* LV_BUILD_TEST */
