@@ -81,16 +81,12 @@ void lv_draw_dave2d_init(void)
     draw_dave2d_unit->idx = DRAW_UNIT_ID_DAVE2D;
 
     result = lv_dave2d_init();
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
 #if LV_USE_OS
     lv_result_t res;
     res =  lv_mutex_init(&xd2Semaphore);
-    if(LV_RESULT_OK != res) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == res);
 
     draw_dave2d_unit->pd2Mutex    = &xd2Semaphore;
 #endif
@@ -160,76 +156,52 @@ static void _dave2d_buf_copy(void * dest_buf, uint32_t dest_w, uint32_t dest_h, 
     lv_result_t  status;
 
     status = lv_mutex_lock(&xd2Semaphore);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
     d2_u32 src_blend_mode = d2_getblendmodesrc(_d2_handle);
     d2_u32 dst_blend_mode = d2_getblendmodedst(_d2_handle);
 
     result = d2_selectrenderbuffer(_d2_handle, _blit_renderbuffer);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     result = d2_setblendmode(_d2_handle, d2_bm_one, d2_bm_zero);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     // Generate render operations
     result = d2_framebuffer(_d2_handle, (uint16_t *)dest_buf, DISPLAY_HSIZE_INPUT0, DISPLAY_BUFFER_STRIDE_PIXELS_INPUT0,
                             DISPLAY_VSIZE_INPUT0, lv_draw_dave2d_cf_fb_get());
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     result = d2_cliprect(_d2_handle, (d2_border)dest_area->x1, (d2_border)dest_area->y1, (d2_border)dest_area->x2,
                          (d2_border)dest_area->y2);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     result = d2_setblitsrc(_d2_handle, (void *) src_buf, (d2_s32)src_w, (d2_s32)src_w, (d2_s32)src_h,
                            lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(color_format));
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     result = d2_blitcopy(_d2_handle, (d2_s32)src_w, (d2_s32)src_h, (d2_blitpos)src_area->x1, (d2_blitpos)src_area->y1,
                          D2_FIX4(dest_w), D2_FIX4(dest_h),
                          D2_FIX4(dest_area->x1), D2_FIX4(dest_area->y1), 0);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     // Execute render operations
     result = d2_executerenderbuffer(_d2_handle, _blit_renderbuffer, 0);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result) ;
 
     result = d2_flushframe(_d2_handle);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     result = d2_selectrenderbuffer(_d2_handle, _renderbuffer);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     result = d2_setblendmode(_d2_handle, src_blend_mode, dst_blend_mode);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK != result);
 
 #if LV_USE_OS
     status = lv_mutex_unlock(&xd2Semaphore);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
 }
@@ -259,7 +231,6 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 else
 #endif
                 {
-                    __NOP();
                 }
                 ret =  0;
                 break;
@@ -591,9 +562,7 @@ void dave2d_execute_dlist_and_flush(void)
     lv_result_t  status;
 
     status = lv_mutex_lock(&xd2Semaphore);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
     d2_s32     result;
@@ -602,19 +571,13 @@ void dave2d_execute_dlist_and_flush(void)
 
     // Execute render operations
     result = d2_executerenderbuffer(_d2_handle, _renderbuffer, 0);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     result = d2_flushframe(_d2_handle);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     result = d2_selectrenderbuffer(_d2_handle, _renderbuffer);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     while(false == _lv_ll_is_empty(&_ll_Dave2D_Tasks)) {
         p_list_entry = _lv_ll_get_tail(&_ll_Dave2D_Tasks);
@@ -626,9 +589,7 @@ void dave2d_execute_dlist_and_flush(void)
 
 #if LV_USE_OS
     status = lv_mutex_unlock(&xd2Semaphore);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 }
 

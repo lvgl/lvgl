@@ -28,9 +28,7 @@ void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * d
 #if LV_USE_OS
     lv_result_t  status;
     status = lv_mutex_lock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
     buffer_area = u->base_unit.target_layer->buf_area;
@@ -49,7 +47,7 @@ void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * d
 
     if(dashed) {
         /* TODO */
-        __BKPT(0);
+        LV_ASSERT(0);
     }
 
 #if D2_RENDER_EACH_OPERATION
@@ -88,9 +86,7 @@ void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * d
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 }
 
