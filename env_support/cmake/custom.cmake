@@ -68,6 +68,25 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
   set_source_files_properties(${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/vg_lite_tvg.cpp PROPERTIES COMPILE_FLAGS -Wunused-parameter)
 endif()
 
+# Add build-time dependencies
+if(LV_CONF_USE_LIBINPUT)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(libinput REQUIRED IMPORTED_TARGET libinput)
+    target_link_libraries(lvgl PUBLIC PkgConfig::libinput)
+endif()
+
+if(LV_CONF_USE_LINUX_DRM)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(libdrm REQUIRED IMPORTED_TARGET libdrm)
+    target_link_libraries(lvgl PUBLIC PkgConfig::libdrm)
+endif()
+
+if(LV_CONF_USE_SDL2)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(sdl2 REQUIRED IMPORTED_TARGET sdl2)
+    target_link_libraries(lvgl PUBLIC PkgConfig::sdl2)
+endif()
+
 # Build LVGL example library
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
     add_library(lvgl_examples ${EXAMPLE_SOURCES})
