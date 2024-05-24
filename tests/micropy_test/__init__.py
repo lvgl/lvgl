@@ -39,19 +39,20 @@ debug_log = None
 saved_test_data = []
 
 
-def log(*args, error=False):
-    if error:
-        for item in args:
-            sys.stdout.write('\033[31;1m' + item + '\033[0m\n')
-            sys.stdout.flush()
-            debug_log.write(item + '\n')
-    else:
-        args = ' '.join(repr(arg) for arg in args)
-        debug_log.write(args + '\n')
+def format_error_data(data):
+    output = ''
+    for line in data.split('\n'):
+        output += f'\033[31;1m{line}\033[0m\n'
+    return output
 
-        if DEBUG or error:
-            sys.stdout.write('\033[31;1m' + args + '\033[0m\n')
-            sys.stdout.flush()
+
+def log(*args):
+    args = ' '.join(repr(arg) for arg in args)
+    debug_log.write(args + '\n')
+
+    if DEBUG:
+        sys.stdout.write('\033[31;1m' + args + '\033[0m\n')
+        sys.stdout.flush()
 
 
 BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__)))
@@ -342,8 +343,7 @@ class MicroPython_Test(unittest.TestCase):
 
             error = '\n'.join(error)
             if error:
-                log(error, error=True)
-                self.fail(error)
+                self.fail(format_error_data(error))
             else:
                 self.fail(b'\n'.join(test_data.result))
 
