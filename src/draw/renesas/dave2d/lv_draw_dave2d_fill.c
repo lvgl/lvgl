@@ -79,7 +79,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
         }
         else if(LV_GRAD_DIR_HOR == dsc->grad.dir) {
             /* TODO */
-            LV_ASSERT(1 == 0);
+            LV_ASSERT(0);
 
             float x1;
             float x2;
