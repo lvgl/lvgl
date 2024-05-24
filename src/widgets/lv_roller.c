@@ -488,7 +488,10 @@ static void draw_main(lv_event_t * e)
 
             /*Proportional position from the middle line.
              *Will be 0 for the first option, and 1 for the last option (upscaled by << 14)*/
-            label_y_prop = (label_y_prop << 14) / (lv_obj_get_height(label) - normal_label_font->line_height);
+            lv_coord_t label_h = lv_obj_get_height(label);
+            if ((label_h - normal_label_font->line_height) > 0) {
+                label_y_prop = (label_y_prop << 14) / (label_h - normal_label_font->line_height);
+            }
 
             /*We don't want the selected label start and end exactly where the normal label is as
              *a larger font won't centered on selected area.*/
