@@ -64,6 +64,7 @@ static uint32_t get_txt_len(const char * txt, uint32_t max_len);
  **********************/
 static const uint8_t bracket_left[] = {"<({["};
 static const uint8_t bracket_right[] = {">)}]"};
+static const char * custom_neutrals = NULL;
 
 /**********************
  *      MACROS
@@ -281,6 +282,11 @@ void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, 
     }
 }
 
+void lv_bidi_set_custom_neutrals_static(const char * neutrals)
+{
+    custom_neutrals = neutrals;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -364,7 +370,11 @@ static bool lv_bidi_letter_is_rtl(uint32_t letter)
 static bool lv_bidi_letter_is_neutral(uint32_t letter)
 {
     uint16_t i;
-    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\-=()[]{}<>@#&$|";
+    const char * neutrals = " \t\n\r.,:;'\"`!?%/\\-=()[]{}<>@#&$|";
+    if(custom_neutrals) {
+        neutrals = custom_neutrals;
+    }
+
     for(i = 0; neutrals[i] != '\0'; i++) {
         if(letter == (uint32_t)neutrals[i]) return true;
     }

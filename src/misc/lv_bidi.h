@@ -115,6 +115,12 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
  */
 void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, const char * txt);
 
+/**
+ * Set custom neutrals string
+ * @param neutrals  default " \t\n\r.,:;'\"`!?%/\\-=()[]{}<>@#&$|"
+ */
+void lv_bidi_set_custom_neutrals_static(const char * neutrals);
+
 /**********************
  *      MACROS
  **********************/
