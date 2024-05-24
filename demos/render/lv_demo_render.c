@@ -885,7 +885,7 @@ static void linear_gradient_cb(lv_obj_t * parent)
     int32_t radius_values[] = { 0, 20, 0, 20 };
     bool opa_map_values[] = { false, false, true, true };
 
-    const char * offs_txt[] = { "map", "repeat", "reflect" };
+    const char * offs_txt[] = { "pad", "repeat", "reflect" };
     int32_t x1_values[] = { lv_pct(100), lv_pct(15), lv_pct(30)};
     int32_t y1_values[] = { lv_pct(100), lv_pct(30), lv_pct(15) };
     lv_grad_extend_t extend_values[] = { LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT };
@@ -965,7 +965,7 @@ static void radial_gradient_cb(lv_obj_t * parent)
     int32_t radius_values[] = { 0, 20, 0, 20 };
     bool opa_map_values[] = { false, false, true, true };
 
-    const char * offs_txt[] = { "map", "repeat", "reflect" };
+    const char * offs_txt[] = { "pad", "repeat", "reflect" };
     lv_grad_extend_t extend_values[] = { LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT};
 
     static lv_grad_dsc_t grad_values[3][4];
