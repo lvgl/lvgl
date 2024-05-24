@@ -326,10 +326,21 @@ class MicroPython_Test(unittest.TestCase):
                 ])))
 
         except binascii.Error:
+            error = []
             for line, err in saved_test_data:
-                log(line, err, error=True)
+                if err:
+                    try:
+                        error.append(err.decode('utf-8'))
+                    except UnicodeDecodeError:
+                        error.append(str(err))
 
-            self.fail(b'\n'.join(test_data.result))
+            error = '\n'.join(error)
+            if error:
+                log(error, error=True)
+                self.fail(error)
+            else:
+                self.fail(b'\n'.join(test_data.result))
+
         except:  # NOQA
             import traceback
 
