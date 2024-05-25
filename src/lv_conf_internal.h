@@ -936,12 +936,29 @@
     #endif
 #endif
 
+/* Automatically assign an ID when obj is created */
+#ifndef LV_USE_OBJ_ID_ASSIGN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_OBJ_ID_ASSIGN
+            #define LV_USE_OBJ_ID_ASSIGN CONFIG_LV_USE_OBJ_ID_ASSIGN
+        #else
+            #define LV_USE_OBJ_ID_ASSIGN 0
+        #endif
+    #else
+        #define LV_USE_OBJ_ID_ASSIGN    1
+    #endif
+#endif
+
 /* Use lvgl builtin method for obj ID */
 #ifndef LV_USE_OBJ_ID_BUILTIN
-    #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
-        #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
+            #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+        #else
+            #define LV_USE_OBJ_ID_BUILTIN 0
+        #endif
     #else
-        #define LV_USE_OBJ_ID_BUILTIN   0
+        #define LV_USE_OBJ_ID_BUILTIN   1
     #endif
 #endif
 

@@ -40,7 +40,7 @@ typedef struct _class_info_t {
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if LV_USE_OBJ_ID_BUILTIN
+#if LV_USE_OBJ_ID && LV_USE_OBJ_ID_BUILTIN
 
 void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
@@ -103,6 +103,11 @@ void lv_objid_builtin_destroy(void)
 
     lv_free(global->objid_array);
     global->objid_count = 0;
+}
+
+int lv_obj_id_compare(void * id1, void * id2)
+{
+    return id1 == id2 ? 0 : 1;
 }
 
 #endif /*LV_USE_OBJ_ID_BUILTIN*/
