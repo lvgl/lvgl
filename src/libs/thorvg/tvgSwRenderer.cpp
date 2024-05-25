@@ -437,21 +437,13 @@ bool SwRenderer::target(pixel_t* data, uint32_t stride, uint32_t w, uint32_t h, 
     surface->channelSize = CHANNEL_SIZE(cs);
     surface->premultiplied = true;
 
-    vport.x = vport.y = 0;
-    vport.w = surface->w;
-    vport.h = surface->h;
-
     return rasterCompositor(surface);
 }
 
 
 bool SwRenderer::preRender()
 {
-#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
-	return true;
-#else
     return rasterClear(surface, 0, 0, surface->w, surface->h);
-#endif
 }
 
 
@@ -611,6 +603,12 @@ bool SwRenderer::mempool(bool shared)
 
     if (mpool) return true;
     return false;
+}
+
+
+const Surface* SwRenderer::mainSurface()
+{
+    return surface;
 }
 
 

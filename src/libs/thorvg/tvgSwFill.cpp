@@ -20,9 +20,6 @@
  * SOFTWARE.
  */
 
-#include "../../lv_conf_internal.h"
-#if LV_USE_THORVG_INTERNAL
-
 #include "tvgMath.h"
 #include "tvgSwCommon.h"
 #include "tvgFill.h"
@@ -143,7 +140,7 @@ bool _prepareLinear(SwFill* fill, const LinearGradient* linear, const Matrix* tr
     fill->linear.dy = y2 - y1;
     fill->linear.len = fill->linear.dx * fill->linear.dx + fill->linear.dy * fill->linear.dy;
 
-    if (fill->linear.len < FLT_EPSILON) return true;
+    if (fill->linear.len < FLOAT_EPSILON) return true;
 
     fill->linear.dx /= fill->linear.len;
     fill->linear.dy /= fill->linear.len;
@@ -185,7 +182,7 @@ bool _prepareRadial(SwFill* fill, const RadialGradient* radial, const Matrix* tr
     auto fy = P(radial)->fy;
     auto fr = P(radial)->fr;
 
-    if (r < FLT_EPSILON) return true;
+    if (r < FLOAT_EPSILON) return true;
 
     fill->radial.dr = r - fr;
     fill->radial.dx = cx - fx;
@@ -785,6 +782,3 @@ void fillFree(SwFill* fill)
 
     free(fill);
 }
-
-#endif /* LV_USE_THORVG_INTERNAL */
-

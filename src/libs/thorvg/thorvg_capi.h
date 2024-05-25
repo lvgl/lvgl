@@ -103,7 +103,7 @@ typedef struct _Tvg_Gradient Tvg_Gradient;
 typedef struct _Tvg_Saver Tvg_Saver;
 
 /**
-* \brief A structure representing an animation controller object. (Experimental API)
+* \brief A structure representing an animation controller object.
 */
 typedef struct _Tvg_Animation Tvg_Animation;
 
@@ -404,8 +404,10 @@ typedef enum {
  * \brief Enumeration specifying the methods of combining the 8-bit color channels into 32-bit color.
  */
 typedef enum {
-    TVG_COLORSPACE_ABGR8888 = 0, ///< The 8-bit color channels are combined into 32-bit color in the order: alpha, blue, green, red.
-    TVG_COLORSPACE_ARGB8888      ///< The 8-bit color channels are combined into 32-bit color in the order: alpha, red, green, blue.
+    TVG_COLORSPACE_ABGR8888 = 0, ///< The channels are joined in the order: alpha, blue, green, red. Colors are alpha-premultiplied. (a << 24 | b << 16 | g << 8 | r)
+    TVG_COLORSPACE_ARGB8888,     ///< The channels are joined in the order: alpha, red, green, blue. Colors are alpha-premultiplied. (a << 24 | r << 16 | g << 8 | b)
+    TVG_COLORSPACE_ABGR8888S,    ///< The channels are joined in the order: alpha, blue, green, red. Colors are un-alpha-premultiplied. @since 0.13
+    TVG_COLORSPACE_ARGB8888S     ///< The channels are joined in the order: alpha, red, green, blue. Colors are un-alpha-premultiplied. @since 0.13
 } Tvg_Colorspace;
 
 
@@ -433,7 +435,7 @@ typedef enum {
 *
 * \return A new Tvg_Canvas object.
 */
-TVG_API Tvg_Canvas* tvg_swcanvas_create(void);
+TVG_API Tvg_Canvas* tvg_swcanvas_create();
 
 
 /*!
@@ -457,7 +459,7 @@ TVG_API Tvg_Canvas* tvg_swcanvas_create(void);
 * \retval TVG_RESULT_INVALID_ARGUMENTS An invalid canvas or buffer pointer passed or one of the @p stride, @p w or @p h being zero.
 * \retval TVG_RESULT_NOT_SUPPORTED The software engine is not supported.
 *
-* \warning Do not access @p buffer during tvg_canvas_draw() - tvg_canvas_sync(). It should not be accessed while TVG is writing on it.
+* \warning Do not access @p buffer during tvg_canvas_draw() - tvg_canvas_sync(). It should not be accessed while the engine is writing on it.
 *
 * \see Tvg_Colorspace
 */
@@ -746,6 +748,30 @@ TVG_API Tvg_Result tvg_canvas_draw(Tvg_Canvas* canvas);
 */
 TVG_API Tvg_Result tvg_canvas_sync(Tvg_Canvas* canvas);
 
+
+/*!
+* \brief Sets the drawing region in the canvas.
+*
+* This function defines the rectangular area of the canvas that will be used for drawing operations.
+* The specified viewport is used to clip the rendering output to the boundaries of the rectangle.
+*
+* \param[in] canvas The Tvg_Canvas object containing elements which were drawn.
+* \param[in] x The x-coordinate of the upper-left corner of the rectangle.
+* \param[in] y The y-coordinate of the upper-left corner of the rectangle.
+* \param[in] w The width of the rectangle.
+* \param[in] h The height of the rectangle.
+*
+* \return Tvg_Result enumeration.
+* \retval TVG_RESULT_SUCCESS Succeed.
+* \retval TVG_RESULT_INSUFFICIENT_CONDITION An internal error.
+*
+* \warning It's not allowed to change the viewport during tvg_canvas_update() - tvg_canvas_sync() or tvg_canvas_push() - tvg_canvas_sync().
+*
+* \note When resetting the target, the viewport will also be reset to the target size.
+* \note Experimental API
+* \see tvg_swcanvas_set_target()
+*/
+TVG_API Tvg_Result tvg_canvas_set_viewport(Tvg_Canvas* canvas, int32_t x, int32_t y, int32_t w, int32_t h);
 
 /** \} */   // end defgroup ThorVGCapi_Canvas
 
@@ -1037,7 +1063,7 @@ TVG_API Tvg_Result tvg_paint_get_blend_method(const Tvg_Paint* paint, Tvg_Blend_
 *
 * \return A new shape object.
 */
-TVG_API Tvg_Paint* tvg_shape_new(void);
+TVG_API Tvg_Paint* tvg_shape_new();
 
 
 /*!
@@ -1712,7 +1738,7 @@ TVG_API Tvg_Result tvg_shape_get_gradient(const Tvg_Paint* paint, Tvg_Gradient**
 *
 * \return A new linear gradient object.
 */
-TVG_API Tvg_Gradient* tvg_linear_gradient_new(void);
+TVG_API Tvg_Gradient* tvg_linear_gradient_new();
 
 
 /*!
@@ -1734,7 +1760,7 @@ TVG_API Tvg_Gradient* tvg_linear_gradient_new(void);
 *
 * \return A new radial gradient object.
 */
-TVG_API Tvg_Gradient* tvg_radial_gradient_new(void);
+TVG_API Tvg_Gradient* tvg_radial_gradient_new();
 
 
 /*!
@@ -1956,7 +1982,7 @@ TVG_API Tvg_Result tvg_gradient_del(Tvg_Gradient* grad);
 *
 * \return A new picture object.
 */
-TVG_API Tvg_Paint* tvg_picture_new(void);
+TVG_API Tvg_Paint* tvg_picture_new();
 
 
 /*!
@@ -2082,7 +2108,7 @@ TVG_API Tvg_Result tvg_picture_get_size(const Tvg_Paint* paint, float* w, float*
 *
 * \return A new scene object.
 */
-TVG_API Tvg_Paint* tvg_scene_new(void);
+TVG_API Tvg_Paint* tvg_scene_new();
 
 
 /*!
@@ -2160,7 +2186,7 @@ TVG_API Tvg_Result tvg_scene_clear(Tvg_Paint* scene, bool free);
 *
 * \return A new Tvg_Saver object.
 */
-TVG_API Tvg_Saver* tvg_saver_new(void);
+TVG_API Tvg_Saver* tvg_saver_new();
 
 
 /*!
@@ -2238,15 +2264,17 @@ TVG_API Tvg_Result tvg_saver_del(Tvg_Saver* saver);
 /************************************************************************/
 
 /*!
-* \brief Creates a new Animation object. (Experimental API)
+* \brief Creates a new Animation object.
 *
 * \return Tvg_Animation A new Tvg_Animation object.
+*
+* \since 0.13
 */
-TVG_API Tvg_Animation* tvg_animation_new(void);
+TVG_API Tvg_Animation* tvg_animation_new();
 
 
 /*!
-* \brief Specifies the current frame in the animation. (Experimental API)
+* \brief Specifies the current frame in the animation.
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
 * \param[in] no The index of the animation frame to be displayed. The index should be less than the tvg_animatio_total_frame().
@@ -2257,13 +2285,18 @@ TVG_API Tvg_Animation* tvg_animation_new(void);
 * \retval TVG_RESULT_INSUFFICIENT_CONDITION No animatable data loaded from the Picture.
 * \retval TVG_RESULT_NOT_SUPPORTED The picture data does not support animations.
 *
+* \note For efficiency, ThorVG ignores updates to the new frame value if the difference from the current frame value
+*       is less than 0.001. In such cases, it returns @c Result::InsufficientCondition.
+*       Values less than 0.001 may be disregarded and may not be accurately retained by the Animation.
 * \see tvg_animation_get_total_frame()
+*
+* \since 0.13
 */
 TVG_API Tvg_Result tvg_animation_set_frame(Tvg_Animation* animation, float no);
 
 
 /*!
-* \brief Retrieves a picture instance associated with this animation instance. (Experimental API)
+* \brief Retrieves a picture instance associated with this animation instance.
 *
 * This function provides access to the picture instance that can be used to load animation formats, such as Lottie(json).
 * After setting up the picture, it can be pushed to the designated canvas, enabling control over animation frames
@@ -2274,12 +2307,14 @@ TVG_API Tvg_Result tvg_animation_set_frame(Tvg_Animation* animation, float no);
 * \return A picture instance that is tied to this animation.
 *
 * \warning The picture instance is owned by Animation. It should not be deleted manually.
+*
+* \since 0.13
 */
 TVG_API Tvg_Paint* tvg_animation_get_picture(Tvg_Animation* animation);
 
 
 /*!
-* \brief Retrieves the current frame number of the animation. (Experimental API)
+* \brief Retrieves the current frame number of the animation.
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
 * \param[in] no The current frame number of the animation, between 0 and totalFrame() - 1.
@@ -2290,12 +2325,14 @@ TVG_API Tvg_Paint* tvg_animation_get_picture(Tvg_Animation* animation);
 *
 * \see tvg_animation_get_total_frame()
 * \see tvg_animation_set_frame()
+*
+* \since 0.13
 */
 TVG_API Tvg_Result tvg_animation_get_frame(Tvg_Animation* animation, float* no);
 
 
 /*!
-* \brief Retrieves the total number of frames in the animation. (Experimental API)
+* \brief Retrieves the total number of frames in the animation.
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
 * \param[in] cnt The total number of frames in the animation.
@@ -2306,12 +2343,14 @@ TVG_API Tvg_Result tvg_animation_get_frame(Tvg_Animation* animation, float* no);
 *
 * \note Frame numbering starts from 0.
 * \note If the Picture is not properly configured, this function will return 0.
+*
+* \since 0.13
 */
 TVG_API Tvg_Result tvg_animation_get_total_frame(Tvg_Animation* animation, float* cnt);
 
 
 /*!
-* \brief Retrieves the duration of the animation in seconds. (Experimental API)
+* \brief Retrieves the duration of the animation in seconds.
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
 * \param[in] duration The duration of the animation in seconds.
@@ -2321,8 +2360,42 @@ TVG_API Tvg_Result tvg_animation_get_total_frame(Tvg_Animation* animation, float
 * \retval TVG_RESULT_INVALID_ARGUMENT An invalid Tvg_Animation pointer or @p duration.
 *
 * \note If the Picture is not properly configured, this function will return 0.
+*
+* \since 0.13
 */
 TVG_API Tvg_Result tvg_animation_get_duration(Tvg_Animation* animation, float* duration);
+
+
+/*!
+* \brief Specifies the playback segment of the animation. (Experimental API)
+*
+* \param[in] animation The Tvg_Animation pointer to the animation object.
+* \param[in] begin segment begin.
+* \param[in] end segment end.
+*
+* \return Tvg_Result enumeration.
+* \retval TVG_RESULT_SUCCESS Succeed.
+* \retval TVG_RESULT_INSUFFICIENT_CONDITION In case the animation is not loaded.
+* \retval TVG_RESULT_INVALID_ARGUMENT When the given parameters are out of range.
+*
+* \since 0.13
+*/
+TVG_API Tvg_Result tvg_animation_set_segment(Tvg_Animation* animation, float begin, float end);
+
+
+/*!
+* \brief Gets the current segment. (Experimental API)
+*
+* \param[in] animation The Tvg_Animation pointer to the animation object.
+* \param[out] begin segment begin.
+* \param[out] end segment end.
+*
+* \return Tvg_Result enumeration.
+* \retval TVG_RESULT_SUCCESS Succeed.
+* \retval TVG_RESULT_INSUFFICIENT_CONDITION In case the animation is not loaded.
+* \retval TVG_RESULT_INVALID_ARGUMENT When the given parameters are @c nullptr.
+*/
+TVG_API Tvg_Result tvg_animation_get_segment(Tvg_Animation* animation, float* begin, float* end);
 
 
 /*!
@@ -2333,6 +2406,8 @@ TVG_API Tvg_Result tvg_animation_get_duration(Tvg_Animation* animation, float* d
 * \return Tvg_Result enumeration.
 * \retval TVG_RESULT_SUCCESS Succeed.
 * \retval TVG_RESULT_INVALID_ARGUMENT An invalid Tvg_Animation pointer.
+*
+* \since 0.13
 */
 TVG_API Tvg_Result tvg_animation_del(Tvg_Animation* animation);
 
@@ -2357,22 +2432,64 @@ TVG_API Tvg_Result tvg_animation_del(Tvg_Animation* animation);
 *
 * \return Tvg_Animation A new Tvg_LottieAnimation object.
 */
-TVG_API Tvg_Animation* tvg_lottie_animation_new(void);
+TVG_API Tvg_Animation* tvg_lottie_animation_new();
 
 
 /*!
 * \brief Override the lottie properties through the slot data. (Experimental API)
 *
 * \param[in] animation The Tvg_Animation object to override the property with the slot.
-* \param[in] slot The lottie slot data in json.
+* \param[in] slot The Lottie slot data in json, or @c nullptr to reset.
 *
-* \return Tvg_Animation A new Tvg_LottieAnimation object.
+* \return Tvg_Result enumeration.
 * \retval TVG_RESULT_SUCCESS Succeed.
 * \retval TVG_RESULT_INSUFFICIENT_CONDITION In case the animation is not loaded.
 * \retval TVG_RESULT_INVALID_ARGUMENT When the given @p slot is invalid
 * \retval TVG_RESULT_NOT_SUPPORTED The Lottie Animation is not supported.
 */
 TVG_API Tvg_Result tvg_lottie_animation_override(Tvg_Animation* animation, const char* slot);
+
+
+/*!
+* \brief Specifies a segment by marker. (Experimental API)
+*
+* \param[in] animation The Tvg_Animation pointer to the Lottie animation object.
+* \param[in] marker The name of the segment marker.
+*
+* \return Tvg_Result enumeration.
+* \retval TVG_RESULT_SUCCESS Succeed.
+* \retval TVG_RESULT_INSUFFICIENT_CONDITION In case the animation is not loaded.
+* \retval TVG_RESULT_INVALID_ARGUMENT When the given @p marker is invalid.
+* \retval TVG_RESULT_NOT_SUPPORTED The Lottie Animation is not supported.
+*/
+TVG_API Tvg_Result tvg_lottie_animation_set_marker(Tvg_Animation* animation, const char* marker);
+
+
+/*!
+* \brief Gets the marker count of the animation. (Experimental API)
+*
+* \param[in] animation The Tvg_Animation pointer to the Lottie animation object.
+* \param[out] cnt The count value of the merkers.
+*
+* \return Tvg_Result enumeration.
+* \retval TVG_RESULT_SUCCESS Succeed.
+* \retval TVG_RESULT_INVALID_ARGUMENT In case a @c nullptr is passed as the argument.
+*/
+TVG_API Tvg_Result tvg_lottie_animation_get_markers_cnt(Tvg_Animation* animation, uint32_t* cnt);
+
+
+/*!
+* \brief Gets the marker name by a given index. (Experimental API)
+*
+* \param[in] animation The Tvg_Animation pointer to the Lottie animation object.
+* \param[in] idx The index of the animation marker, starts from 0.
+* \param[out] name The name of marker when succeed.
+*
+* \return Tvg_Result enumeration.
+* \retval TVG_RESULT_SUCCESS Succeed.
+* \retval TVG_RESULT_INVALID_ARGUMENT In case @c nullptr is passed as the argument or @c idx is out of range.
+*/
+TVG_API Tvg_Result tvg_lottie_animation_get_marker(Tvg_Animation* animation, uint32_t idx, const char** name);
 
 
 /** \} */   // end addtogroup ThorVGCapi_LottieAnimation

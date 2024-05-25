@@ -63,14 +63,16 @@ GlCanvas::~GlCanvas()
 }
 
 
-Result GlCanvas::target(uint32_t* buffer, uint32_t stride, uint32_t w, uint32_t h) noexcept
+Result GlCanvas::target(int32_t id, uint32_t w, uint32_t h) noexcept
 {
 #ifdef THORVG_GL_RASTER_SUPPORT
     //We know renderer type, avoid dynamic_cast for performance.
     auto renderer = static_cast<GlRenderer*>(Canvas::pImpl->renderer);
     if (!renderer) return Result::MemoryCorruption;
 
-    if (!renderer->target(buffer, stride, w, h)) return Result::Unknown;
+    if (!renderer->target(id, w, h)) return Result::Unknown;
+    Canvas::pImpl->vport = {0, 0, (int32_t)w, (int32_t)h};
+    renderer->viewport(Canvas::pImpl->vport);
 
     //Paints must be updated again with this new target.
     Canvas::pImpl->needRefresh();
