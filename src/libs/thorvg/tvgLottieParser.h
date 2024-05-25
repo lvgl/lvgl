@@ -39,8 +39,8 @@ public:
     }
 
     bool parse();
-    bool parse(LottieSlot* slot);
-    const char* sid();
+    bool apply(LottieSlot* slot);
+    const char* sid(bool first = false);
 
     LottieComposition* comp = nullptr;
     const char* dirName = nullptr;       //base resource directory
@@ -58,7 +58,7 @@ private:
 
     void getInperpolatorPoint(Point& pt);
     void getPathSet(LottiePathSet& path);
-    void getLayerSize(uint32_t& val);
+    void getLayerSize(float& val);
     void getValue(TextDocument& doc);
     void getValue(PathSet& path);
     void getValue(Array<Point>& pts);
@@ -73,7 +73,7 @@ private:
     template<typename T> void parseKeyFrame(T& prop);
     template<typename T> void parsePropertyInternal(T& prop);
     template<LottieProperty::Type type = LottieProperty::Type::Invalid, typename T> void parseProperty(T& prop, LottieObject* obj = nullptr);
-    template<typename T> void parseSlotProperty(T& prop);
+    template<LottieProperty::Type type = LottieProperty::Type::Invalid, typename T> void parseSlotProperty(T& prop);
 
     LottieObject* parseObject();
     LottieObject* parseAsset();
@@ -95,6 +95,7 @@ private:
     LottieTrimpath* parseTrimpath();
     LottieRepeater* parseRepeater();
     LottieFont* parseFont();
+    LottieMarker* parseMarker();
 
     void parseObject(Array<LottieObject*>& parent);
     void parseShapes(Array<LottieObject*>& parent);
@@ -107,13 +108,14 @@ private:
     void parseAssets();
     void parseFonts();
     void parseChars(Array<LottieGlyph*>& glyphes);
+    void parseMarkers();
     void postProcess(Array<LottieGlyph*>& glyphes);
 
     //Current parsing context
     struct Context {
         LottieLayer* layer = nullptr;
-        LottieGradient* gradient = nullptr;
-    } *context;
+        LottieObject* parent = nullptr;
+    } context;
 };
 
 #endif //_TVG_LOTTIE_PARSER_H_

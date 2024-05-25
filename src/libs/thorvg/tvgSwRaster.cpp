@@ -377,7 +377,7 @@ static bool _rasterMattedRect(SwSurface* surface, const SwBBox& region, uint8_t 
     auto alpha = surface->alpha(surface->compositor->method);
 
     TVGLOG("SW_ENGINE", "Matted(%d) Rect [Region: %lu %lu %u %u]", (int)surface->compositor->method, region.min.x, region.min.y, w, h);
-
+    
     //32bits channels
     if (surface->channelSize == sizeof(uint32_t)) {
         auto color = surface->join(r, g, b, a);
@@ -719,7 +719,7 @@ static bool _rasterDirectScaledMaskedRleImage(SwSurface* surface, const SwImage*
     auto span = image->rle->spans;
     int32_t miny = 0, maxy = 0;
 
-    for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {
+    for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {        
         SCALED_IMAGE_RANGE_Y(span->y)
         auto cmp = &surface->compositor->image.buf8[span->y * surface->compositor->image.stride + span->x];
         auto dst = &surface->buf8[span->y * surface->stride + span->x];
@@ -1556,7 +1556,7 @@ static bool _rasterSolidGradientRect(SwSurface* surface, const SwBBox& region, c
 
 static bool _rasterLinearGradientRect(SwSurface* surface, const SwBBox& region, const SwFill* fill)
 {
-    if (fill->linear.len < FLT_EPSILON) return false;
+    if (fill->linear.len < FLOAT_EPSILON) return false;
 
     if (_compositing(surface)) {
         if (_matting(surface)) return _rasterGradientMattedRect<FillLinear>(surface, region, fill);
@@ -1758,8 +1758,13 @@ static bool _rasterRadialGradientRle(SwSurface* surface, const SwRleData* rle, c
 
 void rasterGrayscale8(uint8_t *dst, uint8_t val, uint32_t offset, int32_t len)
 {
-    //OPTIMIZE_ME: Support SIMD
+#if defined(THORVG_AVX_VECTOR_SUPPORT)
+    avxRasterGrayscale8(dst, val, offset, len);
+#elif defined(THORVG_NEON_VECTOR_SUPPORT)
+    neonRasterGrayscale8(dst, val, offset, len);
+#else
     cRasterPixels(dst, val, offset, len);
+#endif
 }
 
 
