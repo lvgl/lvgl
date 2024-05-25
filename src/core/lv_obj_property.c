@@ -53,12 +53,12 @@ lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
     LV_ASSERT(obj && value);
 
     if(value->id == LV_PROPERTY_ID_INVALID) {
-        LV_LOG_WARN("invalid property id set to %p\n", obj);
+        LV_LOG_WARN("Invalid property id set to %p", obj);
         return LV_RESULT_INVALID;
     }
 
     if(value->id < LV_PROPERTY_ID_START) {
-        lv_obj_set_local_style_prop(obj, value->id, value->_style, 0);
+        lv_obj_set_local_style_prop(obj, value->id, value->style, value->selector);
         return LV_RESULT_OK;
     }
 
@@ -83,22 +83,40 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
     lv_property_t value;
 
     if(id == LV_PROPERTY_ID_INVALID) {
-        LV_LOG_WARN("invalid property id to get from %p\n", obj);
-        value.id = 0;
+        LV_LOG_WARN("Invalid property id to get from %p", obj);
+        value.id = LV_PROPERTY_ID_INVALID;
         value.num = 0;
         return value;
     }
 
     if(id < LV_PROPERTY_ID_START) {
-        lv_obj_get_local_style_prop(obj, id, &value._style, 0);
+        lv_obj_get_local_style_prop(obj, id, &value.style, 0);
         value.id = id;
+        value.selector = 0;
         return value;
     }
 
     result = obj_property(obj, id, &value, false);
     if(result != LV_RESULT_OK)
-        value.id = 0;
+        value.id = LV_PROPERTY_ID_INVALID;
 
+    return value;
+}
+
+lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector)
+{
+    lv_property_t value;
+
+    if(id == LV_PROPERTY_ID_INVALID || id >= LV_PROPERTY_ID_START) {
+        LV_LOG_WARN("invalid style property id %d", id);
+        value.id = LV_PROPERTY_ID_INVALID;
+        value.num = 0;
+        return value;
+    }
+
+    lv_obj_get_local_style_prop(obj, id, &value.style, selector);
+    value.id = id;
+    value.selector = selector;
     return value;
 }
 
@@ -139,7 +157,7 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
 
             /*id matched but we got null pointer to functions*/
             if(set ? prop->setter == NULL : prop->getter == NULL) {
-                LV_LOG_WARN("null %s provided, id: %d\n", set ? "setter" : "getter", id);
+                LV_LOG_WARN("NULL %s provided, id: %d", set ? "setter" : "getter", id);
                 return LV_RESULT_INVALID;
             }
 
@@ -161,7 +179,7 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
                     else value->color = ((lv_property_get_color_t)(prop->getter))(obj);
                     break;
                 default:
-                    LV_LOG_WARN("unknown property id: 0x%08x\n", prop->id);
+                    LV_LOG_WARN("Unknown property id: 0x%08x", prop->id);
                     return LV_RESULT_INVALID;
                     break;
             }
@@ -172,7 +190,7 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
         /*If no setter found, try base class then*/
     }
 
-    LV_LOG_WARN("unknown property id: 0x%08x\n", id);
+    LV_LOG_WARN("Unknown property id: 0x%08x", id);
     return LV_RESULT_INVALID;
 }
 

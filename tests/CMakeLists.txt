@@ -90,6 +90,7 @@ set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
 
 set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLV_TEST_OPTION=5
+    -DLV_USE_OBJ_PROPERTY=1      # add obj property test and disable pedantic
     -DLVGL_CI_USING_DEF_HEAP
     -fsanitize=address
     -fsanitize=leak
@@ -126,7 +127,6 @@ elseif (OPTIONS_TEST_MEMORYCHECK)
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
-
 
 if ($ENV{NON_AMD64_BUILD})
     set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
@@ -184,6 +184,12 @@ list(APPEND COMPILE_OPTIONS
     ${BUILD_OPTIONS}
     ${BUILD_TARGET_DEF}
 )
+
+# LV_USE_OBJ_PROPERTY is enabled in option OPTIONS_TEST_DEFHEAP
+# It relies on C11 anonymous struct/union support, thus disable warnings.
+if(OPTIONS_TEST_DEFHEAP)
+    list(REMOVE_ITEM COMPILE_OPTIONS -pedantic-errors -Wpedantic)
+endif()
 
 filter_compiler_options(C LVGL_C_COMPILE_OPTIONS ${COMPILE_OPTIONS})
 
