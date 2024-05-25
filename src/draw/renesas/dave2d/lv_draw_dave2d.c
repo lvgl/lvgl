@@ -537,7 +537,7 @@ static d2_s32 lv_dave2d_init(void)
     /* bind the hardware */
     result = d2_inithw(_d2_handle, 0);
     if(result != D2_OK) {
-        LV_LOG_ERROR("Could NOT d2_inithw\n");
+        LV_LOG_ERROR("Could NOT d2_inithw");
         d2_closedevice(_d2_handle);
         return result;
     }
@@ -555,14 +555,14 @@ static d2_s32 lv_dave2d_init(void)
     /* set blocksize for default displaylist */
     result = d2_setdlistblocksize(_d2_handle, 25);
     if(D2_OK != result) {
-        LV_LOG_ERROR("Could NOT d2_setdlistblocksize\n");
+        LV_LOG_ERROR("Could NOT d2_setdlistblocksize");
         d2_closedevice(_d2_handle);
         return result;
     }
 
     _blit_renderbuffer = d2_newrenderbuffer(_d2_handle, 20, 20);
     if(!_blit_renderbuffer) {
-        LV_LOG_ERROR("NO renderbuffer\n");
+        LV_LOG_ERROR("NO renderbuffer");
         d2_closedevice(_d2_handle);
 
         return D2_NOMEMORY;
@@ -570,7 +570,7 @@ static d2_s32 lv_dave2d_init(void)
 
     _renderbuffer = d2_newrenderbuffer(_d2_handle, 20, 20);
     if(!_renderbuffer) {
-        LV_LOG_ERROR("NO renderbuffer\n");
+        LV_LOG_ERROR("NO renderbuffer");
         d2_closedevice(_d2_handle);
 
         return D2_NOMEMORY;
@@ -578,7 +578,7 @@ static d2_s32 lv_dave2d_init(void)
 
     result = d2_selectrenderbuffer(_d2_handle, _renderbuffer);
     if(D2_OK != result) {
-        LV_LOG_ERROR("Could NOT d2_selectrenderbuffer\n");
+        LV_LOG_ERROR("Could NOT d2_selectrenderbuffer");
         d2_closedevice(_d2_handle);
     }
 

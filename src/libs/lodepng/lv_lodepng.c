@@ -185,7 +185,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)png_data);
 
     if(!decoded) {
-        LV_LOG_WARN("Error decoding PNG\n");
+        LV_LOG_WARN("Error decoding PNG");
         return LV_RESULT_INVALID;
     }
 
