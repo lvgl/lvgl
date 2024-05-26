@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_style.h
  *
  */
@@ -130,15 +130,31 @@ typedef uint8_t lv_border_side_t;
  * The direction of the gradient.
  */
 enum _lv_grad_dir_t {
-    LV_GRAD_DIR_NONE, /**< No gradient (the `grad_color` property is ignored)*/
-    LV_GRAD_DIR_VER,  /**< Vertical (top to bottom) gradient*/
-    LV_GRAD_DIR_HOR,  /**< Horizontal (left to right) gradient*/
+    LV_GRAD_DIR_NONE,       /**< No gradient (the `grad_color` property is ignored)*/
+    LV_GRAD_DIR_VER,        /**< Simple vertical (top to bottom) gradient*/
+    LV_GRAD_DIR_HOR,        /**< Simple horizontal (left to right) gradient*/
+    LV_GRAD_DIR_LINEAR,     /**< Linear gradient defined by start and end points. Can be at any angle.*/
+    LV_GRAD_DIR_RADIAL,     /**< Radial gradient defined by start and end circles*/
+    LV_GRAD_DIR_CONICAL,    /**< Conical gradient defined by center point, start and end angles*/
+};
+
+/**
+ * Gradient behavior outside the defined range.
+*/
+enum _lv_grad_extend_t {
+    LV_GRAD_EXTEND_PAD,     /**< Repeat the same color*/
+    LV_GRAD_EXTEND_REPEAT,  /**< Repeat the pattern*/
+    LV_GRAD_EXTEND_REFLECT, /**< Repeat the pattern mirrored*/
 };
 
 #ifdef DOXYGEN
 typedef _lv_grad_dir_t lv_grad_dir_t;
+typedef _lv_grad_type_t lv_grad_type_t;
+typedef _lv_grad_extend_t lv_grad_extend_t;
 #else
 typedef uint8_t lv_grad_dir_t;
+typedef uint8_t lv_grad_type_t;
+typedef uint8_t lv_grad_extend_t;
 #endif /*DOXYGEN*/
 
 /** A gradient stop definition.
@@ -152,10 +168,37 @@ typedef struct {
 
 /** A descriptor of a gradient. */
 typedef struct {
-    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS]; /**< A gradient stop array */
-    uint8_t              stops_count;                  /**< The number of used stops in the array */
-    lv_grad_dir_t        dir : 3;                      /**< The gradient direction.
-                                                        * Any of LV_GRAD_DIR_HOR, LV_GRAD_DIR_VER, LV_GRAD_DIR_NONE */
+    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS];  /**< A gradient stop array */
+    uint8_t              stops_count;                   /**< The number of used stops in the array */
+    lv_grad_dir_t        dir : 3;                       /**< The gradient direction.
+                                                         * Any of LV_GRAD_DIR_NONE, LV_GRAD_DIR_VER, LV_GRAD_DIR_HOR,
+                                                           LV_GRAD_TYPE_LINEAR, LV_GRAD_TYPE_RADIAL, LV_GRAD_TYPE_CONICAL */
+    lv_grad_extend_t     extend : 2;                    /**< Behaviour outside the defined range.
+                                                         * LV_GRAD_EXTEND_NONE, LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT */
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+    union {
+        /*Linear gradient parameters*/
+        struct {
+            lv_point_t  start;                          /**< Linear gradient vector start point */
+            lv_point_t  end;                            /**< Linear gradient vector end point */
+        } linear;
+        /*Radial gradient parameters*/
+        struct {
+            lv_point_t  focal;                          /**< Center of the focal (starting) circle in local coordinates */
+            /* (can be the same as the ending circle to create concentric circles) */
+            lv_point_t  focal_extent;                   /**< Point on the circle (can be the same as the center) */
+            lv_point_t  end;                            /**< Center of the ending circle in local coordinates */
+            lv_point_t  end_extent;                     /**< Point on the circle determining the radius of the gradient */
+        } radial;
+        /*Conical gradient parameters*/
+        struct {
+            lv_point_t  center;                         /**< Conical gradient center point */
+            int16_t     start_angle;                    /**< Start angle 0..3600 */
+            int16_t     end_angle;                      /**< End angle 0..3600 */
+        } conical;
+    } params;
+    void * state;
+#endif
 } lv_grad_dsc_t;
 
 /**

@@ -419,6 +419,15 @@
             #endif
         #endif
     #endif
+
+    /* Enable drawing complex gradients in software: linear at an angle, radial or conical */
+    #ifndef LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+        #ifdef CONFIG_LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+            #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS CONFIG_LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+        #else
+            #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
+        #endif
+    #endif
 #endif
 
 /* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_math.h
  *
  */
@@ -110,6 +110,22 @@ uint16_t lv_atan2(int x, int y);
 void /* LV_ATTRIBUTE_FAST_MEM */ lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
 
 //! @endcond
+
+/**
+ * Alternative (fast, approximate) implementation for getting the square root of an integer.
+ * @param x integer which square root should be calculated
+ */
+int32_t /* LV_ATTRIBUTE_FAST_MEM */ lv_sqrt32(uint32_t x);
+
+/**
+ * Calculate the square of an integer (input range is 0..32767).
+ * @param x input
+ * @return square
+ */
+static inline int32_t lv_sqr(int32_t x)
+{
+    return x * x;
+}
 
 /**
  * Calculate the integer exponents.
