@@ -98,6 +98,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
+    LV_ASSERT_NULL(obj);
+    if(obj == NULL) return NULL;
     lv_obj_class_init_obj(obj);
     return obj;
 }
