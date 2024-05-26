@@ -154,6 +154,10 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
         return;
     }
 
+    if(parent == obj->parent) {
+        return;
+    }
+
     lv_obj_invalidate(obj);
 
     lv_obj_allocate_spec_attr(parent);
