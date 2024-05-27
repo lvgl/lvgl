@@ -418,8 +418,6 @@ static scene_dsc_t scenes[] = {
     {.name = "", .create_cb = NULL}
 };
 
-#define sysmon_perf LV_GLOBAL_DEFAULT()->sysmon_perf
-
 static uint32_t scene_act;
 static uint32_t rnd_act;
 
@@ -455,7 +453,8 @@ void lv_demo_benchmark(void)
     lv_timer_create(next_scene_timer_cb, scenes[0].scene_time, NULL);
 
 #if LV_USE_PERF_MONITOR
-    lv_subject_add_observer_obj(&sysmon_perf.subject, sysmon_perf_observer_cb, title, NULL);
+    lv_display_t * disp = lv_display_get_default();
+    lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, sysmon_perf_observer_cb, title, NULL);
 #else
     lv_label_set_text(title, "LV_USE_PERF_MONITOR is not enabled");
 #endif
