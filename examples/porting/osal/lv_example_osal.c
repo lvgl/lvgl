@@ -59,7 +59,7 @@ void lv_example_osal(void)
  *   STATIC FUNCTIONS
  **********************/
 
-void counter_button_event_cb(lv_event_t * e)
+static void counter_button_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
     if(lv_thread_sync_signal(&press_sync) != LV_RESULT_OK) {
@@ -67,22 +67,27 @@ void counter_button_event_cb(lv_event_t * e)
     }
 }
 
-void increment_thread_entry(void * user_data)
+static void increment_thread_entry(void * user_data)
 {
     LV_UNUSED(user_data);
     lv_obj_t * counter_label;
     uint32_t press_count = 0;
 
+    lv_lock();
     counter_label = lv_label_create(lv_scr_act());
     lv_obj_align(counter_label, LV_ALIGN_CENTER, 0, 0);
     lv_label_set_text_fmt(counter_label, "Pressed %u times", press_count);
+    lv_unlock();
 
     while(true) {
         if(lv_thread_sync_wait(&press_sync) != LV_RESULT_OK) {
             LV_LOG_ERROR("Error awaiting thread sync");
         }
         press_count += 1;
+
+        lv_lock();
         lv_label_set_text_fmt(counter_label, "Pressed %u times", press_count);
+        lv_unlock();
     }
 }
 
