@@ -36,6 +36,7 @@ Below APIs needed to be implemented and linked to lvgl.
     void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj);
     void lv_obj_free_id(lv_obj_t * obj);
     const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len);
+    int lv_obj_id_compare(void * id1, void * id2);
 
 
 :cpp:func:`lv_obj_assign_id` is called when an object is created. The object final class is passed from
@@ -60,6 +61,5 @@ From the dump log we can clearly see that the obj does not exist.
 Find child by ID
 ~~~~~~~~~~~~~~~~
 
-Use API :cpp:expr:`lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id, bool (compare)(lv_obj_t *, void * id));` to find a child by ID.
+Use API :cpp:expr:`lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);` to find a child by ID.
 It will walk through all children and return the first child with the given ID.
-If the ``compare`` callback is NULL, the ID is determined solely by its pointer. Alternatively, you can provide your own callback function to customize the evaluation.
