@@ -474,7 +474,7 @@ static void draw_main(lv_event_t * e)
 
             /*Proportional position from the middle line.
              *Will be 0 for the first option, and 1 for the last option (upscaled by << 14)*/
-            lv_coord_t remain_h = lv_obj_get_height(label) - normal_label_font->line_height;
+            int32_t remain_h = lv_obj_get_height(label) - normal_label_font->line_height;
             if(remain_h > 0) {
                 label_y_prop = (label_y_prop << 14) / remain_h;
             }
