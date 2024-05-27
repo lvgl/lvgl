@@ -31,9 +31,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_display_t * lv_opengles_window_create(int32_t hor_res, int32_t ver_res);
-
-void lv_opengles_quit();
+lv_display_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res);
 
 /**********************
  *      MACROS

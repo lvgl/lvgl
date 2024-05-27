@@ -3190,6 +3190,19 @@
         #define LV_USE_OPENGLES   0
     #endif
 #endif
+#if LV_USE_OPENGLES
+    #ifndef LV_USE_OPENGLES_DEBUG
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_OPENGLES_DEBUG
+                #define LV_USE_OPENGLES_DEBUG CONFIG_LV_USE_OPENGLES_DEBUG
+            #else
+                #define LV_USE_OPENGLES_DEBUG 0
+            #endif
+        #else
+            #define LV_USE_OPENGLES_DEBUG        1    /* Enable or disable debug for opengles */
+        #endif
+    #endif
+#endif
 
 /*==================
 * EXAMPLES

@@ -3,9 +3,9 @@ OpenGL ES Display/Inputs driver
 ===============================
 
 Overview
--------------
+--------
 
-| The **OpenGL ES** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/opengles>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in an OpenGL desktop window.
+| The **OpenGL ES** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/opengles>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in an desktop window created via GLFW.
 | It is an alternative to **Wayland**, **XCB**, **SDL** or **Qt**.
 
 The main purpose for this driver is for testing/debugging the LVGL application in an **OpenGL** simulation window.
@@ -15,13 +15,13 @@ Prerequisites
 
 The OpenGL driver uses GLEW GLFW to access the OpenGL window manager.
 
-1. Install GLEW: ``sudo apt-get install libglew-dev``
-2. Install GLFW: ``sudo apt-get install libglfw3-dev``
+1. Install GLEW and GLFW: ``sudo apt-get install libglew-dev libglfw3-dev``
 
 Configure OpenGL driver
 -----------------------
 
-Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig
+1. Required linked libraries: -lGL -lGLEW -lglfw
+2. Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig
     .. code:: c
 
         #define LV_USE_OPENGLES  1
@@ -39,9 +39,9 @@ Usage
     {
         lv_init();
 
-        lv_display_t * disp = lv_opengles_window_create(480, 272);
+        lv_display_t * disp = lv_glfw_window_create(480, 272);
 
-        lv_indev_t * mouse = lv_opengles_mouse_create();
+        lv_indev_t * mouse = lv_glfw_mouse_create();
         lv_indev_set_group(mouse, lv_group_get_default());
         lv_indev_set_display(mouse, disp);
 
