@@ -91,9 +91,7 @@ void lv_vg_lite_decoder_deinit(void)
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size)
 {
     while(px_size--) {
-        img_data->red = LV_UDIV255(img_data->red * img_data->alpha);
-        img_data->green = LV_UDIV255(img_data->green * img_data->alpha);
-        img_data->blue = LV_UDIV255(img_data->blue * img_data->alpha);
+        lv_color_premultiply(img_data);
         img_data++;
     }
 }
