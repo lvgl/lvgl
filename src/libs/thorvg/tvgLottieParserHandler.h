@@ -51,8 +51,6 @@
 #include "rapidjson/document.h"
 #include "tvgCommon.h"
 
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(effc++)
 
 using namespace rapidjson;
 
@@ -133,7 +131,7 @@ struct LookaheadParserHandler
     }
 
     bool RawNumber(const char *, SizeType, TVG_UNUSED bool)
-    {
+    { 
         return false;
     }
 

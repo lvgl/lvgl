@@ -136,7 +136,6 @@ struct Scene::Impl
         if (needComp) {
             cmp = renderer->target(bounds(renderer), renderer->colorSpace());
             renderer->beginComposite(cmp, CompositeMethod::None, opacity);
-            needComp = false;
         }
 
         for (auto paint : paints) {

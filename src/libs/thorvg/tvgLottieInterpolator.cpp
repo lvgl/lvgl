@@ -43,20 +43,20 @@
 #define SUBDIVISION_MAX_ITERATIONS 10
 
 
-static inline float tvg_A(float aA1, float aA2) { return 1.0f - 3.0f * aA2 + 3.0f * aA1; }
-static inline float tvg_B(float aA1, float aA2) { return 3.0f * aA2 - 6.0f * aA1; }
-static inline float tvg_C(float aA1) { return 3.0f * aA1; }
+static inline float _constA(float aA1, float aA2) { return 1.0f - 3.0f * aA2 + 3.0f * aA1; }
+static inline float _constB(float aA1, float aA2) { return 3.0f * aA2 - 6.0f * aA1; }
+static inline float _constC(float aA1) { return 3.0f * aA1; }
 
 
 static inline float _getSlope(float t, float aA1, float aA2)
 {
-    return 3.0f * tvg_A(aA1, aA2) * t * t + 2.0f * tvg_B(aA1, aA2) * t + tvg_C(aA1);
+    return 3.0f * _constA(aA1, aA2) * t * t + 2.0f * _constB(aA1, aA2) * t + _constC(aA1);
 }
 
 
 static inline float _calcBezier(float t, float aA1, float aA2)
 {
-    return ((tvg_A(aA1, aA2) * t + tvg_B(aA1, aA2)) * t + tvg_C(aA1)) * t;
+    return ((_constA(aA1, aA2) * t + _constB(aA1, aA2)) * t + _constC(aA1)) * t;
 }
 
 

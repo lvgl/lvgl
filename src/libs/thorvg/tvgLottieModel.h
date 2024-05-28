@@ -54,27 +54,21 @@ struct LottieStroke
         return dashattr->value[no];
     }
 
-    float dashOffset(float frameNo)
+    float dashOffset(float frameNo, LottieExpressions* exps)
     {
-        return dash(0)(frameNo);
+        return dash(0)(frameNo, exps);
     }
 
-    float dashGap(float frameNo)
+    float dashGap(float frameNo, LottieExpressions* exps)
     {
-        return dash(2)(frameNo);
+        return dash(2)(frameNo, exps);
     }
 
-    float dashSize(float frameNo)
+    float dashSize(float frameNo, LottieExpressions* exps)
     {
-        auto d = dash(1)(frameNo);
+        auto d = dash(1)(frameNo, exps);
         if (d == 0.0f) return 0.1f;
         else return d;
-    }
-
-    bool dynamic()
-    {
-        if (width.frames || dashattr) return true;
-        return false;
     }
 
     LottieFloat width = 0.0f;
@@ -91,12 +85,6 @@ struct LottieMask
     LottieOpacity opacity = 255;
     CompositeMethod method;
     bool inverse = false;
-
-    bool dynamic()
-    {
-        if (opacity.frames || pathset.frames) return true;
-        return false;
-    }
 };
 
 
@@ -128,14 +116,15 @@ struct LottieObject
         free(name);
     }
 
-    virtual void override(LottieObject* prop)
+    virtual void override(LottieProperty* prop)
     {
         TVGERR("LOTTIE", "Unsupported slot type");
     }
 
+    virtual bool mergeable() { return false; }
+
     char* name = nullptr;
     Type type;
-    bool statical = true;      //no keyframes
     bool hidden = false;       //remove?
 };
 
@@ -183,6 +172,17 @@ struct LottieFont
     Origin origin = Embedded;
 };
 
+struct LottieMarker
+{
+    char* name = nullptr;
+    float time = 0.0f;
+    float duration = 0.0f;
+    
+    ~LottieMarker()
+    {
+        free(name);
+    }
+};
 
 struct LottieText : LottieObject
 {
@@ -191,9 +191,9 @@ struct LottieText : LottieObject
         LottieObject::type = LottieObject::Text;
     }
 
-    void override(LottieObject* prop) override
+    void override(LottieProperty* prop) override
     {
-        this->doc = static_cast<LottieText*>(prop)->doc;
+        this->doc = *static_cast<LottieTextDoc*>(prop);
         this->prepare();
     }
 
@@ -205,18 +205,23 @@ struct LottieText : LottieObject
 
 struct LottieTrimpath : LottieObject
 {
-    enum Type : uint8_t { Individual = 1, Simultaneous = 2 };
+    enum Type : uint8_t { Simultaneous = 1, Individual = 2 };
 
     void prepare()
     {
         LottieObject::type = LottieObject::Trimpath;
-        if (start.frames || end.frames || offset.frames) statical = false;
     }
 
-    void segment(float frameNo, float& start, float& end);
+    bool mergeable() override
+    {
+        if (!start.frames && start.value == 0.0f && !end.frames && end.value == 100.0f && !offset.frames && offset.value == 0.0f) return true;
+        return false;
+    }
+
+    void segment(float frameNo, float& start, float& end, LottieExpressions* exps);
 
     LottieFloat start = 0.0f;
-    LottieFloat end = 0.0f;
+    LottieFloat end = 100.0f;
     LottieFloat offset = 0.0f;
     Type type = Simultaneous;
 };
@@ -226,6 +231,11 @@ struct LottieShape : LottieObject
 {
     virtual ~LottieShape() {}
     uint8_t direction = 0;   //0: clockwise, 2: counter-clockwise, 3: xor(?)
+
+    bool mergeable() override
+    {
+        return true;
+    }
 };
 
 
@@ -234,7 +244,6 @@ struct LottieRoundedCorner : LottieObject
     void prepare()
     {
         LottieObject::type = LottieObject::RoundedCorner;
-        if (radius.frames) statical = false;
     }
     LottieFloat radius = 0.0f;
 };
@@ -245,7 +254,6 @@ struct LottiePath : LottieShape
     void prepare()
     {
         LottieObject::type = LottieObject::Path;
-        if (pathset.frames) statical = false;
     }
 
     LottiePathSet pathset;
@@ -257,7 +265,6 @@ struct LottieRect : LottieShape
     void prepare()
     {
         LottieObject::type = LottieObject::Rect;
-        if (position.frames || size.frames || radius.frames) statical = false;
     }
 
     LottiePosition position = Point{0.0f, 0.0f};
@@ -273,7 +280,6 @@ struct LottiePolyStar : LottieShape
     void prepare()
     {
         LottieObject::type = LottieObject::Polystar;
-        if (position.frames || innerRadius.frames || outerRadius.frames || innerRoundness.frames || outerRoundness.frames || rotation.frames || ptsCnt.frames) statical = false;
     }
 
     LottiePosition position = Point{0.0f, 0.0f};
@@ -292,7 +298,6 @@ struct LottieEllipse : LottieShape
     void prepare()
     {
         LottieObject::type = LottieObject::Ellipse;
-        if (position.frames || size.frames) statical = false;
     }
 
     LottiePosition position = Point{0.0f, 0.0f};
@@ -323,9 +328,12 @@ struct LottieTransform : LottieObject
     void prepare()
     {
         LottieObject::type = LottieObject::Transform;
-        if (position.frames || rotation.frames || scale.frames || anchor.frames || opacity.frames || (coords && (coords->x.frames || coords->y.frames)) || (rotationEx && (rotationEx->x.frames || rotationEx->y.frames))) {
-            statical = false;
-        }
+    }
+
+    bool mergeable() override
+    {
+        if (!opacity.frames && opacity.value == 255) return true;
+        return false;
     }
 
     LottiePosition position = Point{0.0f, 0.0f};
@@ -333,13 +341,15 @@ struct LottieTransform : LottieObject
     LottiePoint scale = Point{100.0f, 100.0f};
     LottiePoint anchor = Point{0.0f, 0.0f};
     LottieOpacity opacity = 255;
+    LottieFloat skewAngle = 0.0f;
+    LottieFloat skewAxis = 0.0f;
 
     SeparateCoord* coords = nullptr;       //either a position or separate coordinates
     RotationEx* rotationEx = nullptr;      //extension for 3d rotation
 };
 
 
-struct LottieSolid : LottieObject
+struct LottieSolid : LottieObject 
 {
     LottieColor color = RGB24{255, 255, 255};
     LottieOpacity opacity = 255;
@@ -351,12 +361,11 @@ struct LottieSolidStroke : LottieSolid, LottieStroke
     void prepare()
     {
         LottieObject::type = LottieObject::SolidStroke;
-        if (color.frames || opacity.frames || LottieStroke::dynamic()) statical = false;
     }
 
-    void override(LottieObject* prop) override
+    void override(LottieProperty* prop) override
     {
-        this->color = static_cast<LottieSolid*>(prop)->color;
+        this->color = *static_cast<LottieColor*>(prop);
         this->prepare();
     }
 };
@@ -367,12 +376,11 @@ struct LottieSolidFill : LottieSolid
     void prepare()
     {
         LottieObject::type = LottieObject::SolidFill;
-        if (color.frames || opacity.frames) statical = false;
     }
 
-    void override(LottieObject* prop) override
+    void override(LottieProperty* prop) override
     {
-        this->color = static_cast<LottieSolid*>(prop)->color;
+        this->color = *static_cast<LottieColor*>(prop);
         this->prepare();
     }
 
@@ -382,99 +390,23 @@ struct LottieSolidFill : LottieSolid
 
 struct LottieGradient : LottieObject
 {
-    uint32_t populate(ColorStop& color)
-    {
-        uint32_t alphaCnt = (color.input->count - (colorStops.count * 4)) / 2;
-        Array<Fill::ColorStop> output(colorStops.count + alphaCnt);
-        uint32_t cidx = 0;               //color count
-        uint32_t clast = colorStops.count * 4;
-        uint32_t aidx = clast;           //alpha count
-        Fill::ColorStop cs;
-
-        //merge color stops.
-        for (uint32_t i = 0; i < color.input->count; ++i) {
-            if (cidx == clast || aidx == color.input->count) break;
-            if ((*color.input)[cidx] == (*color.input)[aidx]) {
-                cs.offset = (*color.input)[cidx];
-                cs.r = lroundf((*color.input)[cidx + 1] * 255.0f);
-                cs.g = lroundf((*color.input)[cidx + 2] * 255.0f);
-                cs.b = lroundf((*color.input)[cidx + 3] * 255.0f);
-                cs.a = lroundf((*color.input)[aidx + 1] * 255.0f);
-                cidx += 4;
-                aidx += 2;
-            } else if ((*color.input)[cidx] < (*color.input)[aidx]) {
-                cs.offset = (*color.input)[cidx];
-                cs.r = lroundf((*color.input)[cidx + 1] * 255.0f);
-                cs.g = lroundf((*color.input)[cidx + 2] * 255.0f);
-                cs.b = lroundf((*color.input)[cidx + 3] * 255.0f);
-                //generate alpha value
-                if (output.count > 0) {
-                    auto p = ((*color.input)[cidx] - output.last().offset) / ((*color.input)[aidx] - output.last().offset);
-                    cs.a = mathLerp<uint8_t>(output.last().a, lroundf((*color.input)[aidx + 1] * 255.0f), p);
-                } else cs.a = 255;
-                cidx += 4;
-            } else {
-                cs.offset = (*color.input)[aidx];
-                cs.a = lroundf((*color.input)[aidx + 1] * 255.0f);
-                //generate color value
-                if (output.count > 0) {
-                    auto p = ((*color.input)[aidx] - output.last().offset) / ((*color.input)[cidx] - output.last().offset);
-                    cs.r = mathLerp<uint8_t>(output.last().r, lroundf((*color.input)[cidx + 1] * 255.0f), p);
-                    cs.g = mathLerp<uint8_t>(output.last().g, lroundf((*color.input)[cidx + 2] * 255.0f), p);
-                    cs.b = mathLerp<uint8_t>(output.last().b, lroundf((*color.input)[cidx + 3] * 255.0f), p);
-                } else cs.r = cs.g = cs.b = 255;
-                aidx += 2;
-            }
-            output.push(cs);
-        }
-
-        //color remains
-        while (cidx < clast) {
-            cs.offset = (*color.input)[cidx];
-            cs.r = lroundf((*color.input)[cidx + 1] * 255.0f);
-            cs.g = lroundf((*color.input)[cidx + 2] * 255.0f);
-            cs.b = lroundf((*color.input)[cidx + 3] * 255.0f);
-            cs.a = (output.count > 0) ? output.last().a : 255;
-            output.push(cs);
-            cidx += 4;
-        }
-
-        //alpha remains
-        while (aidx < color.input->count) {
-            cs.offset = (*color.input)[aidx];
-            cs.a = lroundf((*color.input)[aidx + 1] * 255.0f);
-            if (output.count > 0) {
-                cs.r = output.last().r;
-                cs.g = output.last().g;
-                cs.b = output.last().b;
-            } else cs.r = cs.g = cs.b = 255;
-            output.push(cs);
-            aidx += 2;
-        }
-
-        color.data = output.data;
-        output.data = nullptr;
-
-        color.input->reset();
-        delete(color.input);
-
-        return output.count;
-    }
-
     bool prepare()
     {
-        if (colorStops.frames) {
-            for (auto v = colorStops.frames->begin(); v < colorStops.frames->end(); ++v) {
-                colorStops.count = populate(v->value);
+        if (!colorStops.populated) {
+            if (colorStops.frames) {
+                for (auto v = colorStops.frames->begin(); v < colorStops.frames->end(); ++v) {
+                    colorStops.count = populate(v->value);
+                }
+            } else {
+                colorStops.count = populate(colorStops.value);
             }
-        } else {
-            colorStops.count = populate(colorStops.value);
         }
         if (start.frames || end.frames || height.frames || angle.frames || opacity.frames || colorStops.frames) return true;
         return false;
     }
 
-    Fill* fill(float frameNo);
+    uint32_t populate(ColorStop& color);
+    Fill* fill(float frameNo, LottieExpressions* exps);
 
     LottiePoint start = Point{0.0f, 0.0f};
     LottiePoint end = Point{0.0f, 0.0f};
@@ -491,12 +423,12 @@ struct LottieGradientFill : LottieGradient
     void prepare()
     {
         LottieObject::type = LottieObject::GradientFill;
-        if (LottieGradient::prepare()) statical = false;
+        LottieGradient::prepare();
     }
 
-    void override(LottieObject* prop) override
+    void override(LottieProperty* prop) override
     {
-        this->colorStops = static_cast<LottieGradient*>(prop)->colorStops;
+        this->colorStops = *static_cast<LottieColorStop*>(prop);
         this->prepare();
     }
 
@@ -509,12 +441,12 @@ struct LottieGradientStroke : LottieGradient, LottieStroke
     void prepare()
     {
         LottieObject::type = LottieObject::GradientStroke;
-        if (LottieGradient::prepare() || LottieStroke::dynamic()) statical = false;
+        LottieGradient::prepare();
     }
 
-    void override(LottieObject* prop) override
+    void override(LottieProperty* prop) override
     {
-        this->colorStops = static_cast<LottieGradient*>(prop)->colorStops;
+        this->colorStops = *static_cast<LottieColorStop*>(prop);
         this->prepare();
     }
 };
@@ -545,7 +477,6 @@ struct LottieRepeater : LottieObject
     void prepare()
     {
         LottieObject::type = LottieObject::Repeater;
-        if (copies.frames || offset.frames || position.frames || rotation.frames || scale.frames || anchor.frames || startOpacity.frames || endOpacity.frames) statical = false;
     }
 
     LottieFloat copies = 0.0f;
@@ -570,12 +501,29 @@ struct LottieGroup : LottieObject
     }
 
     void prepare(LottieObject::Type type = LottieObject::Group);
+    bool mergeable() override { return allowMerge; }
+
+    LottieObject* content(const char* id)
+    {
+        if (name && !strcmp(name, id)) return this;
+
+        //source has children, find recursively.
+        for (auto c = children.begin(); c < children.end(); ++c) {
+            auto child = *c;
+            if (child->type == LottieObject::Type::Group || child->type == LottieObject::Type::Layer) {
+                if (auto ret = static_cast<LottieGroup*>(child)->content(id)) return ret;
+            } else if (child->name && !strcmp(child->name, id)) return child;
+        }
+        return nullptr;
+    }
 
     Scene* scene = nullptr;               //tvg render data
     Array<LottieObject*> children;
 
     bool reqFragment = false;   //requirment to fragment the render context
     bool buildDone = false;     //completed in building the composition.
+    bool allowMerge = true;     //if this group is consisted of simple (transformed) shapes.
+    bool trimpath = false;      //this group has a trimpath.
 };
 
 
@@ -592,8 +540,10 @@ struct LottieLayer : LottieGroup
         return transform->opacity(frameNo);
     }
 
+    bool mergeable() override { return false; }
+
     void prepare();
-    float remap(float frameNo);
+    float remap(float frameNo, LottieExpressions* exp);
 
     struct {
         CompositeMethod type = CompositeMethod::None;
@@ -609,7 +559,7 @@ struct LottieLayer : LottieGroup
     RGB24 color;  //used by Solid layer
 
     float timeStretch = 1.0f;
-    uint32_t w = 0, h = 0;
+    float w = 0.0f, h = 0.0f;
     float inFrame = 0.0f;
     float outFrame = 0.0f;
     float startFrame = 0.0f;
@@ -632,19 +582,32 @@ struct LottieLayer : LottieGroup
 
 struct LottieSlot
 {
-    char* sid;
-    Array<LottieObject*> objs;
-    LottieProperty::Type type;
+    struct Pair {
+        LottieObject* obj;
+        LottieProperty* prop;
+    };
+
+    void assign(LottieObject* target);
+    void reset();
 
     LottieSlot(char* sid, LottieObject* obj, LottieProperty::Type type) : sid(sid), type(type)
     {
-        objs.push(obj);
+        pairs.push({obj, 0});
     }
 
     ~LottieSlot()
     {
         free(sid);
+        if (!overriden) return;
+        for (auto pair = pairs.begin(); pair < pairs.end(); ++pair) {
+            delete(pair->prop);
+        }
     }
+
+    char* sid;
+    Array<Pair> pairs;
+    LottieProperty::Type type;
+    bool overriden = false;
 };
 
 
@@ -664,21 +627,55 @@ struct LottieComposition
         return p * frameCnt();
     }
 
+    float timeAtFrame(float frameNo)
+    {
+        return (frameNo - startFrame) / frameRate;
+    }
+
     float frameCnt() const
     {
         return endFrame - startFrame;
     }
 
+    LottieLayer* layer(const char* name)
+    {
+        for (auto child = root->children.begin(); child < root->children.end(); ++child) {
+            auto layer = static_cast<LottieLayer*>(*child);
+            if (layer->name && !strcmp(layer->name, name)) return layer;
+        }
+        return nullptr;
+    }
+
+    LottieLayer* layer(int16_t id)
+    {
+        for (auto child = root->children.begin(); child < root->children.end(); ++child) {
+            auto layer = static_cast<LottieLayer*>(*child);
+            if (layer->id == id) return layer;
+        }
+        return nullptr;
+    }
+
+    LottieLayer* asset(const char* name)
+    {
+        for (auto asset = assets.begin(); asset < assets.end(); ++asset) {
+            auto layer = static_cast<LottieLayer*>(*asset);
+            if (layer->name && !strcmp(layer->name, name)) return layer;
+        }
+        return nullptr;
+    }
+
     LottieLayer* root = nullptr;
     char* version = nullptr;
     char* name = nullptr;
-    uint32_t w, h;
+    float w, h;
     float startFrame, endFrame;
     float frameRate;
     Array<LottieObject*> assets;
     Array<LottieInterpolator*> interpolators;
     Array<LottieFont*> fonts;
     Array<LottieSlot*> slots;
+    Array<LottieMarker*> markers;
+    bool expressions = false;
     bool initiated = false;
 };
 

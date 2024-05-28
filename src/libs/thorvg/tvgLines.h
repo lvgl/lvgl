@@ -23,13 +23,23 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
 
-#ifndef _TVG_BEZIER_H_
-#define _TVG_BEZIER_H_
+#ifndef _TVG_LINES_H_
+#define _TVG_LINES_H_
 
 #include "tvgCommon.h"
 
 namespace tvg
 {
+
+struct Line
+{
+    Point pt1;
+    Point pt2;
+};
+
+float lineLength(const Point& pt1, const Point& pt2);
+void lineSplitAt(const Line& cur, float at, Line& left, Line& right);
+
 
 struct Bezier
 {
@@ -51,7 +61,6 @@ float bezLengthApprox(const Bezier& cur);
 float bezAtApprox(const Bezier& bz, float at, float length);
 }
 
-#endif //_TVG_BEZIER_H_
+#endif //_TVG_LINES_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

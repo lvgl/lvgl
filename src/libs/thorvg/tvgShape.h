@@ -59,7 +59,6 @@ struct Shape::Impl
         if (needComp) {
             cmp = renderer->target(bounds(renderer), renderer->colorSpace());
             renderer->beginComposite(cmp, CompositeMethod::None, opacity);
-            needComp = false;
         }
         ret = renderer->renderShape(rd);
         if (cmp) renderer->endComposite(cmp);
@@ -71,7 +70,7 @@ struct Shape::Impl
         if (opacity == 0) return false;
 
         //Shape composition is only necessary when stroking & fill are valid.
-        if (!rs.stroke || rs.stroke->width < FLT_EPSILON || (!rs.stroke->fill && rs.stroke->color[3] == 0)) return false;
+        if (!rs.stroke || rs.stroke->width < FLOAT_EPSILON || (!rs.stroke->fill && rs.stroke->color[3] == 0)) return false;
         if (!rs.fill && rs.color[3] == 0) return false;
 
         //translucent fill & stroke
@@ -80,17 +79,30 @@ struct Shape::Impl
         //Composition test
         const Paint* target;
         auto method = shape->composite(&target);
-        if (!target || method == tvg::CompositeMethod::ClipPath) return false;
-        if (target->pImpl->opacity == 255 || target->pImpl->opacity == 0) return false;
+        if (!target || method == CompositeMethod::ClipPath) return false;
+        if (target->pImpl->opacity == 255 || target->pImpl->opacity == 0) {
+            if (target->identifier() == TVG_CLASS_ID_SHAPE) {
+                auto shape = static_cast<const Shape*>(target);
+                if (!shape->fill()) {
+                    uint8_t r, g, b, a;
+                    shape->fillColor(&r, &g, &b, &a);
+                    if (a == 0 || a == 255) {
+                        if (method == CompositeMethod::LumaMask || method == CompositeMethod::InvLumaMask) {
+                            if ((r == 255 && g == 255 && b == 255) || (r == 0 && g == 0 && b == 0)) return false;
+                        } else return false;
+                    }
+                }
+            }
+        }
 
         return true;
     }
 
     RenderData update(RenderMethod* renderer, const RenderTransform* transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag pFlag, bool clipper)
-    {
+    {     
         if ((needComp = needComposition(opacity))) {
             /* Overriding opacity value. If this scene is half-translucent,
-               It must do intermeidate composition with that opacity value. */
+               It must do intermeidate composition with that opacity value. */ 
             this->opacity = opacity;
             opacity = 255;
         }
@@ -207,7 +219,7 @@ struct Shape::Impl
         return true;
     }
 
-    bool strokeTrim(float begin, float end)
+    bool strokeTrim(float begin, float end, bool individual)
     {
         if (!rs.stroke) {
             if (begin == 0.0f && end == 1.0f) return true;
@@ -218,6 +230,7 @@ struct Shape::Impl
 
         rs.stroke->trim.begin = begin;
         rs.stroke->trim.end = end;
+        rs.stroke->trim.individual = individual;
         flag |= RenderUpdateFlag::Stroke;
 
         return true;
@@ -291,7 +304,7 @@ struct Shape::Impl
         }
 
         for (uint32_t i = 0; i < cnt; i++) {
-            if (pattern[i] < FLT_EPSILON) return Result::InvalidArguments;
+            if (pattern[i] < FLOAT_EPSILON) return Result::InvalidArguments;
         }
 
         //Reset dash

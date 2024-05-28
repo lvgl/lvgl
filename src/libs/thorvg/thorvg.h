@@ -1,16 +1,3 @@
-/*!
- * @file thorvg.h
- *
- * The main APIs enabling the TVG initialization, preparation of the canvas and provisioning of its content:
- * - drawing shapes: line, arc, curve, path, polygon...
- * - drawing pictures: tvg, svg, png, jpg, bitmap...
- * - drawing fillings: solid, linear and radial gradient...
- * - drawing stroking: continuous stroking with arbitrary width, join, cap, dash styles.
- * - drawing composition: blending, masking, path clipping...
- * - drawing scene graph & affine transformation (translation, rotation, scale, ...)
- * and finally drawing the canvas and TVG termination.
- */
-
 #ifndef _THORVG_H_
 #define _THORVG_H_
 
@@ -674,6 +661,30 @@ public:
     virtual Result draw() noexcept;
 
     /**
+     * @brief Sets the drawing region in the canvas.
+     *
+     * This function defines the rectangular area of the canvas that will be used for drawing operations.
+     * The specified viewport is used to clip the rendering output to the boundaries of the rectangle.
+     *
+     * @param[in] x The x-coordinate of the upper-left corner of the rectangle.
+     * @param[in] y The y-coordinate of the upper-left corner of the rectangle.
+     * @param[in] w The width of the rectangle.
+     * @param[in] h The height of the rectangle.
+     *
+     * @retval Result::Success when succeed, Result::InsufficientCondition otherwise.
+     *
+     * @see SwCanvas::target()
+     * @see GlCanvas::target()
+     * @see WgCanvas::target()
+     *
+     * @warning It's not allowed to change the viewport during Canvas::push() - Canvas::sync() or Canvas::update() - Canvas::sync().
+     *
+     * @note When resetting the target, the viewport will also be reset to the target size.
+     * @note Experimental API
+     */
+    virtual Result viewport(int32_t x, int32_t y, int32_t w, int32_t h) noexcept;
+
+    /**
      * @brief Guarantees that drawing task is finished.
      *
      * The Canvas rendering can be performed asynchronously. To make sure that rendering is finished,
@@ -1051,7 +1062,7 @@ public:
      * @param[in] miterlimit The miterlimit imposes a limit on the extent of the stroke join, when the @c StrokeJoin::Miter join style is set. The default value is 4.
      *
      * @retval Result::Success when succeed, Result::NonSupport unsupported value, Result::FailedAllocation otherwise.
-     *
+     * 
      * @since 0.11
      */
     Result strokeMiterlimit(float miterlimit) noexcept;
@@ -1669,7 +1680,7 @@ public:
     };
 
     /**
-     * @brief Sets the target buffer for the rasterization.
+     * @brief Sets the drawing target for the rasterization.
      *
      * The buffer of a desirable size should be allocated and owned by the caller.
      *
@@ -1684,7 +1695,9 @@ public:
      * @retval Result::InvalidArguments In case no valid pointer is provided or the width, or the height or the stride is zero.
      * @retval Result::NonSupport In case the software engine is not supported.
      *
-     * @warning Do not access @p buffer during Canvas::draw() - Canvas::sync(). It should not be accessed while TVG is writing on it.
+     * @warning Do not access @p buffer during Canvas::push() - Canvas::sync(). It should not be accessed while the engine is writing on it.
+     *
+     * @see Canvas::viewport()
     */
     Result target(uint32_t* buffer, uint32_t stride, uint32_t w, uint32_t h, Colorspace cs) noexcept;
 
@@ -1738,13 +1751,24 @@ public:
     ~GlCanvas();
 
     /**
-     * @brief Sets the target buffer for the rasterization.
+     * @brief Sets the drawing target for rasterization.
      *
-     * @warning Please do not use it, this API is not official one. It could be modified in the next version.
+     * This function specifies the drawing target where the rasterization will occur. It can target
+     * a specific framebuffer object (FBO) or the main surface.
      *
+     * @param[in] id The GL target ID, usually indicating the FBO ID. A value of @c 0 specifies the main surface.
+     * @param[in] w The width (in pixels) of the raster image.
+     * @param[in] h The height (in pixels) of the raster image.
+     *
+     * @warning This API is experimental and not officially supported. It may be modified or removed in future versions.
+     * @warning Drawing on the main surface is currently not permitted. If the identifier (@p id) is set to @c 0, the operation will be aborted.
+     *
+     * @see Canvas::viewport()
+     *
+     * @note Currently, this only allows the GL_RGBA8 color space format.
      * @note Experimental API
-     */
-    Result target(uint32_t* buffer, uint32_t stride, uint32_t w, uint32_t h) noexcept;
+    */
+    Result target(int32_t id, uint32_t w, uint32_t h) noexcept;
 
     /**
      * @brief Creates a new GlCanvas object.
@@ -1779,6 +1803,7 @@ public:
      * @warning Please do not use it, this API is not official one. It could be modified in the next version.
      *
      * @note Experimental API
+     * @see Canvas::viewport()
      */
     Result target(void* window, uint32_t w, uint32_t h) noexcept;
 
@@ -1852,7 +1877,7 @@ public:
  *
  * This class supports the display and control of animation frames.
  *
- * @note Experimental API
+ * @since 0.13
  */
 
 class TVG_API Animation
@@ -1869,9 +1894,12 @@ public:
      * @retval Result::InsufficientCondition if the given @p no is the same as the current frame value.
      * @retval Result::NonSupport The current Picture data does not support animations.
      *
+     * @note For efficiency, ThorVG ignores updates to the new frame value if the difference from the current frame value
+     *       is less than 0.001. In such cases, it returns @c Result::InsufficientCondition.
+     *       Values less than 0.001 may be disregarded and may not be accurately retained by the Animation.
+     *
      * @see totalFrame()
      *
-     * @note Experimental API
      */
     Result frame(float no) noexcept;
 
@@ -1886,7 +1914,6 @@ public:
      *
      * @warning The picture instance is owned by Animation. It should not be deleted manually.
      *
-     * @note Experimental API
      */
     Picture* picture() const noexcept;
 
@@ -1900,7 +1927,6 @@ public:
      * @see Animation::frame(float no)
      * @see Animation::totalFrame()
      *
-     * @note Experimental API
      */
     float curFrame() const noexcept;
 
@@ -1912,7 +1938,6 @@ public:
      * @note Frame numbering starts from 0.
      * @note If the Picture is not properly configured, this function will return 0.
      *
-     * @note Experimental API
      */
     float totalFrame() const noexcept;
 
@@ -1923,16 +1948,52 @@ public:
      *
      * @note If the Picture is not properly configured, this function will return 0.
      *
-     * @% Experimental API
      */
     float duration() const noexcept;
+
+    /**
+     * @brief Specifies the playback segment of the animation.
+     *
+     * The set segment is designated as the play area of the animation.
+     * This is useful for playing a specific segment within the entire animation.
+     * After setting, the number of animation frames and the playback time are calculated
+     * by mapping the playback segment as the entire range.
+     *
+     * @param[in] begin segment start.
+     * @param[in] end segment end.
+     *
+     * @retval Result::Success When succeed.
+     * @retval Result::InsufficientCondition In case the animation is not loaded.
+     * @retval Result::InvalidArguments When the given parameter is invalid.
+     * @retval Result::NonSupport When it's not animatable.
+     *
+     * @note Range from 0.0~1.0
+     * @note If a marker has been specified, its range will be disregarded.
+     * @see LottieAnimation::segment(const char* marker)
+     * @note Experimental API
+     */
+    Result segment(float begin, float end) noexcept;
+
+    /**
+     * @brief Gets the current segment.
+     *
+     * @param[out] begin segment start.
+     * @param[out] end segment end.
+     *
+     * @retval Result::Success When succeed.
+     * @retval Result::InsufficientCondition In case the animation is not loaded.
+     * @retval Result::InvalidArguments When the given parameter is invalid.
+     * @retval Result::NonSupport When it's not animatable.
+     *
+     * @note Experimental API
+     */
+    Result segment(float* begin, float* end = nullptr) noexcept;
 
     /**
      * @brief Creates a new Animation object.
      *
      * @return A new Animation object.
      *
-     * @note Experimental API
      */
     static std::unique_ptr<Animation> gen() noexcept;
 
