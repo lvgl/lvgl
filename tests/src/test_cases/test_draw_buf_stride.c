@@ -2,8 +2,6 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
-
-
 #include "lv_test_helpers.h"
 
 void setUp(void)
@@ -115,4 +113,4 @@ void test_draw_buf_stride_adjust(void)
 #endif
 }
 
-#endif /* LV_BUILD_TEST */
+#endif
