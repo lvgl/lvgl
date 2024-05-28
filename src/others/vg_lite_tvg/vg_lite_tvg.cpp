@@ -515,6 +515,7 @@ extern "C" {
 
         auto shape = Shape::gen();
         TVG_CHECK_RETURN_VG_ERROR(shape_append_rect(shape, target, rectangle));
+        TVG_CHECK_RETURN_VG_ERROR(shape->blend(BlendMethod::SrcOver));
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_COLOR(color)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
