@@ -234,7 +234,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     /* copy palette */
     lv_memcpy(dest, src, palette_size_bytes);
 
-    if(!dsc->args.premultiply) {
+    if(dsc->args.premultiply) {
         /* pre-multiply palette */
         image_color32_pre_mul((lv_color32_t *)dest, palette_size);
         draw_buf->header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
