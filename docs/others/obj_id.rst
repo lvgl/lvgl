@@ -15,10 +15,10 @@ Usage
 
 Enable this feature by setting :c:macro:`LV_USE_OBJ_ID` to `1` in ``lv_conf.h``.
 
-Enable :c:macro:`LV_USE_OBJ_ID_ASSIGN` to automatically assign an ID to object when it's created.
+Enable :c:macro:`LV_OBJ_ID_AUTO_ASSIGN` to automatically assign an ID to object when it's created.
 It's done by calling function :cpp:func:`lv_obj_assign_id` from :cpp:func:`lv_obj_constructor`.
 
-You can either use you own ID generator by defining the function :cpp:func:`lv_obj_assign_id` or you can utilize the built-in one.
+You can either use your own ID generator by defining the function :cpp:func:`lv_obj_assign_id` or you can utilize the built-in one.
 To use the builtin ID generator, set :c:macro:`LV_USE_OBJ_ID_BUILTIN` to `1`.
 
 You can directly access the ID by :cpp:expr:`lv_obj_get_id(obj)` or use API :cpp:expr:`lv_obj_stringify_id(obj, buf, len)`

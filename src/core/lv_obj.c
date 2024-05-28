@@ -376,7 +376,7 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     obj->flags |= LV_OBJ_FLAG_SCROLL_WITH_ARROW;
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
 
-#if LV_USE_OBJ_ID && LV_USE_OBJ_ID_ASSIGN
+#if LV_OBJ_ID_AUTO_ASSIGN
     lv_obj_assign_id(class_p, obj);
 #endif
 
@@ -413,7 +413,7 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         obj->spec_attr = NULL;
     }
 
-#if LV_USE_OBJ_ID && LV_USE_OBJ_ID_ASSIGN
+#if LV_OBJ_ID_AUTO_ASSIGN
     lv_obj_free_id(obj);
 #endif
 }

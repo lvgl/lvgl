@@ -313,7 +313,7 @@
 #define LV_USE_OBJ_ID           0
 
 /* Automatically assign an ID when obj is created */
-#define LV_USE_OBJ_ID_ASSIGN   1
+#define LV_OBJ_ID_AUTO_ASSIGN   1
 
 /* Use lvgl builtin method for obj ID */
 #define LV_USE_OBJ_ID_BUILTIN   0

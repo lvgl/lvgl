@@ -564,7 +564,7 @@ menu "LVGL configuration"
 				bool "Add id field to obj"
 				default n
 
-			config LV_USE_OBJ_ID_ASSIGN
+			config LV_OBJ_ID_AUTO_ASSIGN
 				bool "Automatically assign an ID when obj is created"
 				default y
 				depends on LV_USE_OBJ_ID

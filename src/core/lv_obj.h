@@ -430,10 +430,10 @@ void * lv_obj_get_id(const lv_obj_t * obj);
  */
 lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);
 
-#if LV_USE_OBJ_ID_ASSIGN
+#if LV_OBJ_ID_AUTO_ASSIGN
 /**
  * Assign d to object if not previously assigned.
- * This function gets called automatically when LV_USE_OBJ_ID_ASSIGN is enabled.
+ * This function gets called automatically when LV_OBJ_ID_AUTO_ASSIGN is enabled.
  *
  * Set `LV_USE_OBJ_ID_BUILTIN` to use the builtin method to generate object ID.
  * Otherwise, these functions including `lv_obj_[assign|free|stringify]_id` and
