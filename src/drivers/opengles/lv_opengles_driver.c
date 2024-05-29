@@ -388,7 +388,21 @@ static void lv_opengles_texture_init(void * buffer, int width, int height)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+
+    /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
+#if LV_COLOR_DEPTH == 8
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer));
+#elif LV_COLOR_DEPTH == 16
     GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer));
+#elif LV_COLOR_DEPTH == 24
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, buffer));
+#elif LV_COLOR_DEPTH == 32
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer));
+#else
+#error("Unsupported color format")
+#endif
+
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
@@ -407,7 +421,20 @@ static void lv_opengles_texture_bind(unsigned int slot)
 static void lv_opengles_texture_update(void * buffer, int width, int height)
 {
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture_id));
+
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+    /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
+#if LV_COLOR_DEPTH == 8
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer));
+#elif LV_COLOR_DEPTH == 16
     GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer));
+#elif LV_COLOR_DEPTH == 24
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, buffer));
+#elif LV_COLOR_DEPTH == 32
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer));
+#else
+#error("Unsupported color format")
+#endif
 }
 
 #endif /* LV_USE_OPENGLES */
