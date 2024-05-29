@@ -70,7 +70,10 @@ enum {
     LV_PROPERTY_ID_ANY          = 0x7ffffffe,
 };
 
-typedef uint32_t lv_prop_id_t;
+struct _lv_property_name_t {
+    const char * name;
+    lv_prop_id_t id;
+};
 
 typedef struct {
     lv_prop_id_t id;
@@ -110,8 +113,8 @@ typedef struct {
 typedef struct {
     lv_prop_id_t id;
 
-    void * setter;
-    void * getter;
+    void * setter;      /**< Callback used to set property. */
+    void * getter;      /**< Callback used to get property. */
 } lv_property_ops_t;
 
 /**********************
@@ -162,9 +165,20 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
  */
 lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector);
 
+/**
+ * Get the property ID by name. Requires to enable `LV_USE_OBJ_PROPERTY_NAME`.
+ * @param obj       pointer to an object that has specified property or base class has.
+ * @param name      property name
+ * @return          property ID found or `LV_PROPERTY_ID_INVALID` if not found.
+ */
+lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name);
+
 /**********************
  *      MACROS
  **********************/
+
+#include "../widgets/property/lv_obj_property_names.h"
+#include "../widgets/property/lv_style_properties.h"
 
 #endif /*LV_USE_OBJ_PROPERTY*/
 

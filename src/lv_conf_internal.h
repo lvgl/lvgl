@@ -963,6 +963,19 @@
     #endif
 #endif
 
+/*Enable property name support*/
+#ifndef LV_USE_OBJ_PROPERTY_NAME
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_OBJ_PROPERTY_NAME
+            #define LV_USE_OBJ_PROPERTY_NAME CONFIG_LV_USE_OBJ_PROPERTY_NAME
+        #else
+            #define LV_USE_OBJ_PROPERTY_NAME 0
+        #endif
+    #else
+        #define LV_USE_OBJ_PROPERTY_NAME 1
+    #endif
+#endif
+
 /* VG-Lite Simulator */
 /*Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
 #ifndef LV_USE_VG_LITE_THORVG

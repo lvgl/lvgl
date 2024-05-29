@@ -8,6 +8,7 @@
  *********************/
 #include "../core/lv_obj.h"
 #include "../stdlib/lv_string.h"
+#include "../misc/lv_utils.h"
 #include "lv_obj_property.h"
 
 #if LV_USE_OBJ_PROPERTY
@@ -39,6 +40,7 @@ typedef lv_result_t (*lv_property_getter_t)(const lv_obj_t *, lv_prop_id_t, lv_p
  **********************/
 
 static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t * value, bool set);
+static int32_t property_name_compare(const void * ref, const void * element);
 
 /**********************
  *  STATIC VARIABLES
@@ -125,6 +127,40 @@ lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_
     value.selector = selector;
     return value;
 }
+
+lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name)
+{
+#if LV_USE_OBJ_PROPERTY_NAME
+    const lv_obj_class_t * clz;
+    const lv_property_name_t * names;
+    lv_property_name_t * found;
+
+    for(clz = obj->class_p; clz; clz = clz->base_class) {
+        names = clz->property_names;
+        if(names == NULL) {
+            /* try base class*/
+            continue;
+        }
+
+        found = _lv_utils_bsearch(name, names, clz->names_count, sizeof(lv_property_name_t), property_name_compare);
+        if(found) return found->id;
+    }
+
+    /*Check style property*/
+    found = _lv_utils_bsearch(name, lv_style_property_names, sizeof(lv_style_property_names) / sizeof(lv_property_name_t),
+                              sizeof(lv_property_name_t), property_name_compare);
+    if(found) return found->id;
+#else
+    LV_UNUSED(obj);
+    LV_UNUSED(name);
+    LV_UNUSED(property_name_compare);
+#endif
+    return LV_PROPERTY_ID_INVALID;
+}
+
+/**********************
+ *  STATIC FUNCTIONS
+ **********************/
 
 static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t * value, bool set)
 {
@@ -216,6 +252,12 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
 
     LV_LOG_WARN("Unknown property id: 0x%08x", id);
     return LV_RESULT_INVALID;
+}
+
+static int32_t property_name_compare(const void * ref, const void * element)
+{
+    const lv_property_name_t * prop = element;
+    return lv_strcmp(ref, prop->name);
 }
 
 #endif /*LV_USE_OBJ_PROPERTY*/

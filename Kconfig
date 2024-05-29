@@ -580,6 +580,14 @@ menu "LVGL configuration"
 				bool "Use obj property set/get API"
 				default n
 
+			config LV_USE_OBJ_PROPERTY_NAME
+				bool "Use name to access property"
+				default n
+				depends on LV_USE_OBJ_PROPERTY
+				help
+					Add a name table to every widget class, so the property can be accessed by name.
+					Note, the const table will increase flash usage.
+
 			config LV_USE_VG_LITE_THORVG
 				bool "VG-Lite Simulator"
 				default n

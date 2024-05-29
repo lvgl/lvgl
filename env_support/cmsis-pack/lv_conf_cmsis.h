@@ -318,6 +318,9 @@
 /*Use obj property set/get API*/
 #define LV_USE_OBJ_PROPERTY 0
 
+/*Enable property name support*/
+#define LV_USE_OBJ_PROPERTY_NAME 1
+
 /* VG-Lite Simulator */
 /*Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
 #define LV_USE_VG_LITE_THORVG  0
