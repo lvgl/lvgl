@@ -127,6 +127,12 @@ elseif (OPTIONS_VG_LITE)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE})
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs_vg_lite/")
+
+    # In 32-bit systems, the output of ThorVG's anti-aliasing algorithm has a slight deviation.
+    if ($ENV{NON_AMD64_BUILD})
+        # Set a tolerance value for the VG-Lite tests.
+        add_definitions(-DREF_IMG_TOLERANCE=9)
+    endif()
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
