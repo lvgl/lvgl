@@ -274,7 +274,7 @@ int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 int32_t lv_anim_path_bounce(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    int32_t t = lv_map(a->act_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
+    int32_t t = lv_map(a->act_time, 0, a->duration, 0, 1024);
     int32_t diff = (a->end_value - a->start_value);
 
     /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
@@ -282,37 +282,38 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
     if(t < 408) {
         /*Go down*/
         t = (t * 2500) >> LV_BEZIER_VAL_SHIFT; /*[0..1024] range*/
+        t = LV_BEZIER_VAL_MAX - t;
     }
     else if(t >= 408 && t < 614) {
         /*First bounce back*/
         t -= 408;
         t    = t * 5; /*to [0..1024] range*/
-        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 20;
     }
     else if(t >= 614 && t < 819) {
         /*Fall back*/
         t -= 614;
         t    = t * 5; /*to [0..1024] range*/
+        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 20;
     }
     else if(t >= 819 && t < 921) {
         /*Second bounce back*/
         t -= 819;
         t    = t * 10; /*to [0..1024] range*/
-        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 40;
     }
     else if(t >= 921 && t <= LV_BEZIER_VAL_MAX) {
         /*Fall back*/
         t -= 921;
         t    = t * 10; /*to [0..1024] range*/
+        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 40;
     }
 
     if(t > LV_BEZIER_VAL_MAX) t = LV_BEZIER_VAL_MAX;
     if(t < 0) t = 0;
-    int32_t step = lv_bezier3(t, LV_BEZIER_VAL_MAX, 800, 500, 0);
+    int32_t step = lv_bezier3(t, 0, 500, 800, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * diff;
