@@ -81,7 +81,6 @@ static lv_obj_t * slider_obj;
 static uint32_t spectrum_i = 0;
 static uint32_t spectrum_i_pause = 0;
 static uint32_t bar_ofs = 0;
-static uint32_t spectrum_lane_ofs_start = 0;
 static uint32_t bar_rot = 0;
 static uint32_t time_act;
 static lv_timer_t  * stop_start_anim_timer;
@@ -255,7 +254,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
 
     start_anim = true;
 
-    stop_start_anim_timer = lv_timer_create(stop_start_anim, INTRO_TIME + 6000, NULL);
+    stop_start_anim_timer = lv_timer_create(stop_start_anim, INTRO_TIME + 2000, NULL);
     lv_timer_set_repeat_count(stop_start_anim_timer, 1);
 
     lv_anim_init(&a);
@@ -852,7 +851,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         }
 
         const int32_t amax = 20;
-        int32_t animv = spectrum_i - spectrum_lane_ofs_start;
+        int32_t animv = spectrum_i - 0;
         if(animv > amax) animv = amax;
         for(i = 0; i < BAR_CNT; i++) {
             uint32_t deg_space = 1;
@@ -861,6 +860,10 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             uint32_t k = (i + bar_rot + rnd_array[(bar_ofs + 1) % 10]) % BAR_CNT;
 
             uint32_t v = (r[k] * animv + r[j] * (amax - animv)) / amax;
+            if(v > 250) {
+                printf("aaa\n");
+            }
+
             if(start_anim) {
                 v = r_in + 77 + start_anim_values[i];
                 deg_space = v >> 7;
@@ -924,7 +927,6 @@ static void spectrum_anim_cb(void * a, int32_t v)
             last_bass = spectrum_i;
             if(bass_cnt >= 2) {
                 bass_cnt = 0;
-                spectrum_lane_ofs_start = spectrum_i;
                 bar_ofs++;
             }
         }
