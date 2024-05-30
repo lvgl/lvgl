@@ -92,6 +92,8 @@ static int drm_setup_buffers(drm_dev_t * drm_dev);
 static void drm_flush_wait(lv_display_t * drm_dev);
 static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 
+static uint32_t tick_get_cb(void);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -109,6 +111,13 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
 
 lv_display_t * lv_linux_drm_create(void)
 {
+    static bool inited = false;
+
+    if(!inited) {
+        lv_tick_set_cb(tick_get_cb);
+        inited = true;
+    }
+
     drm_dev_t * drm_dev = lv_malloc_zeroed(sizeof(drm_dev_t));
     LV_ASSERT_MALLOC(drm_dev);
     if(drm_dev == NULL) return NULL;
@@ -834,6 +843,15 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
                 LV_LOG_TRACE("Flush done");
         }
     }
+}
+
+static uint32_t tick_get_cb(void)
+{
+    struct timeval tv_now;
+    gettimeofday(&tv_now, NULL);
+    uint64_t time_ms;
+    time_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
+    return time_ms;
 }
 
 #endif /*LV_USE_LINUX_DRM*/
