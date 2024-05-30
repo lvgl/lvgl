@@ -408,10 +408,16 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBDRM_LIBRARIES}
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
-            ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw
             m
             pthread
             ${TEST_LIBS})
+
+	if (NOT $ENV{NON_AMD64_BUILD})
+	    target_link_libraries(${test_name} PRIVATE
+    	        ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+	endif()
+
+
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
