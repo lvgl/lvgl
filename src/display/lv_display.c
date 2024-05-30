@@ -602,10 +602,8 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
 
     d->scr_to_load = new_scr;
 
-    if(d->prev_scr && d->del_prev) {
-        lv_obj_delete(d->prev_scr);
-        d->prev_scr = NULL;
-    }
+    if(d->prev_scr && d->del_prev) lv_obj_delete(d->prev_scr);
+    d->prev_scr = NULL;
 
     d->draw_prev_over_act = is_out_anim(anim_type);
     d->del_prev = auto_del;
