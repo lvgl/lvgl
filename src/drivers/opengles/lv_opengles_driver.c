@@ -341,7 +341,7 @@ static void lv_opengles_shader_unbind()
 static int lv_opengles_shader_get_uniform_location(const char * name)
 {
     int id = -1;
-    for(size_t i = 0; i < sizeof(shader_location)/sizeof(int); i++) {
+    for(size_t i = 0; i < sizeof(shader_location) / sizeof(int); i++) {
         if(strcmp(shader_names[i], name) == 0) {
             id = i;
         }

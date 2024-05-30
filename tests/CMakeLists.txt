@@ -313,7 +313,7 @@ if ($ENV{NON_AMD64_BUILD})
 endif()
 
 # OpenGL ES is required for its driver
-if ($ENV{NON_AMD64_BUILD})
+if (NOT $ENV{NON_AMD64_BUILD})
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
     find_package(glfw3 REQUIRED)
