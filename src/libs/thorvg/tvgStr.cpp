@@ -186,7 +186,7 @@ float strToFloat(const char *nPtr, char **endPtr)
         auto scale = 1.0f;
 
         while (exponentPart >= 8U) {
-            scale *= 1E8;
+            scale *= (float)1E8;
             exponentPart -= 8U;
         }
         while (exponentPart > 0U) {

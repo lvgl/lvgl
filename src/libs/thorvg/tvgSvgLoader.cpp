@@ -178,14 +178,14 @@ static float _toFloat(const SvgParser* svgParse, const char* str, SvgParserLengt
     else if (strstr(str, "pc")) parsedValue *= PX_PER_PC;
     else if (strstr(str, "in")) parsedValue *= PX_PER_IN;
     else if (strstr(str, "%")) {
-        if (type == SvgParserLengthType::Vertical) parsedValue = (parsedValue / 100.0) * svgParse->global.h;
-        else if (type == SvgParserLengthType::Horizontal) parsedValue = (parsedValue / 100.0) * svgParse->global.w;
+        if (type == SvgParserLengthType::Vertical) parsedValue = (parsedValue / 100.0f) * svgParse->global.h;
+        else if (type == SvgParserLengthType::Horizontal) parsedValue = (parsedValue / 100.0f) * svgParse->global.w;
         else //if other then it's radius
         {
             float max = svgParse->global.w;
             if (max < svgParse->global.h)
                 max = svgParse->global.h;
-            parsedValue = (parsedValue / 100.0) * max;
+            parsedValue = (parsedValue / 100.0f) * max;
         }
     }
     //TODO: Implement 'em', 'ex' attributes
@@ -202,7 +202,7 @@ static float _gradientToFloat(const SvgParser* svgParse, const char* str, bool& 
     isPercentage = false;
 
     if (strstr(str, "%")) {
-        parsedValue = parsedValue / 100.0;
+        parsedValue = parsedValue / 100.0f;
         isPercentage = true;
     }
     else if (strstr(str, "cm")) parsedValue *= PX_PER_CM;
@@ -227,7 +227,7 @@ static float _toOffset(const char* str)
     auto ptr = strstr(str, "%");
 
     if (ptr) {
-        parsedValue = parsedValue / 100.0;
+        parsedValue = parsedValue / 100.0f;
         if (end != ptr || (end + 1) != strEnd) return 0;
     } else if (end != strEnd) return 0;
 
