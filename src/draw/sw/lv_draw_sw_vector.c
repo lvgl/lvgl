@@ -449,6 +449,10 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
     Tvg_Canvas * canvas = tvg_swcanvas_create();
     tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
 
+    _tvg_rect rc;
+    _lv_area_to_tvg(&rc, &layer->_clip_area);
+    tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)rc.y, (int32_t)rc.w, (int32_t)rc.h);
+
     lv_ll_t * task_list = dsc->task_list;
     _lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, canvas);
 
