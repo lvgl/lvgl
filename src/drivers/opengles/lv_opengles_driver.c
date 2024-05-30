@@ -76,8 +76,8 @@ static unsigned int texture_id = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Color", "u_Texture" };
-static int shader_location[2] = { 0, 0 };
+static const char * shader_names[] = { "u_Color", "u_Texture", "u_ColorDepth" };
+static int shader_location[] = { 0, 0, 0 };
 
 static const char * vertex_shader =
     "#version 300 es\n"
@@ -104,11 +104,17 @@ static const char * fragment_shader =
     "\n"
     "uniform vec4 u_Color;\n"
     "uniform sampler2D u_Texture;\n"
+    "uniform int u_ColorDepth;\n"
     "\n"
     "void main()\n"
     "{\n"
     "    vec4 texColor = texture(u_Texture, v_TexCoord);\n"
-    "    color = texColor;\n"
+    "    if (u_ColorDepth == 8) {\n"
+    "        float gray = texColor.r;\n"
+    "        color = vec4(gray, gray, gray, 1.0);\n"
+    "    } else {\n"
+    "        color = texColor;\n"
+    "    }\n"
     "};\n";
 
 /**********************
@@ -142,6 +148,7 @@ void lv_opengles_init(uint8_t * frame_buffer, int32_t hor, int32_t ver)
 
     lv_opengles_shader_init();
     lv_opengles_shader_bind();
+    lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
 
     int slot = 0;
@@ -172,6 +179,7 @@ void lv_opengles_update(uint8_t * frame_buffer, int32_t hor, int32_t ver)
     lv_opengles_texture_update(frame_buffer, hor, ver);
 
     lv_opengles_shader_bind();
+    lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform4f("u_Color", 0.0f, 0.3f, 0.8f, 1.0f);
     lv_opengles_render_draw();
 }
@@ -333,13 +341,12 @@ static void lv_opengles_shader_unbind()
 static int lv_opengles_shader_get_uniform_location(const char * name)
 {
     int id = -1;
-    if(strcmp(shader_names[0], name) == 0) {
-        id = 0;
+    for(size_t i = 0; i < sizeof(shader_location)/sizeof(int); i++) {
+        if(strcmp(shader_names[i], name) == 0) {
+            id = i;
+        }
     }
-    else if(strcmp(shader_names[1], name) == 0) {
-        id = 1;
-    }
-    else {
+    if(id == -1) {
         return -1;
     }
 
