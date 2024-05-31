@@ -9,8 +9,13 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_LOTTIE
 
+#if LV_USE_THORVG_EXTERNAL
+    #include <thorvg_capi.h>
+#else
+    #include "../../libs/thorvg/thorvg_capi.h"
+#endif
+
 #include "../../misc/lv_timer.h"
-#include "../../libs/thorvg/thorvg_capi.h"
 #include "lv_lottie.h"
 
 /*********************
