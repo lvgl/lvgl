@@ -1,5 +1,5 @@
 /**
- * @file lv_opengles_mouse.c
+ * @file lv_glfw_mouse_private.c
  *
  */
 
@@ -9,7 +9,7 @@
 #include "../../display/lv_display.h"
 #include "../../indev/lv_indev.h"
 
-#include "lv_opengles_mouse_private.h"
+#include "lv_glfw_mouse_private.h"
 #if LV_USE_OPENGLES
 
 #include <stdint.h>

@@ -1,10 +1,10 @@
 /**
- * @file Lv_opengles_mouse.h
+ * @file lv_glfw_mouse.h
  *
  */
 
-#ifndef LV_OPENGLES_MOUSE_H
-#define LV_OPENGLES_MOUSE_H
+#ifndef LV_GLFW_MOUSE_H
+#define LV_GLFW_MOUSE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_opengles_window.h"
+#include "lv_glfw_window.h"
 #if LV_USE_OPENGLES
 
 /*********************
@@ -40,4 +40,4 @@ lv_indev_t * lv_glfw_mouse_create(void);
 } /* extern "C" */
 #endif
 
-#endif /* LV_OPENGLES_MOUSE_H */
+#endif /* LV_GLFW_MOUSE_H */

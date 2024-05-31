@@ -1,10 +1,10 @@
 /**
- * @file Lv_opengles_private.h
+ * @file lv_glfw_window.h
  *
  */
 
-#ifndef LV_OPENGLES_MOUSE_PRIVATE_H
-#define LV_OPENGLES_MOUSE_PRIVATE_H
+#ifndef LV_GLFW_WINDOW_H
+#define LV_GLFW_WINDOW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+
+#include "../../display/lv_display.h"
+#include "../../indev/lv_indev.h"
 
 #if LV_USE_OPENGLES
 
@@ -24,29 +27,20 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    int16_t last_x;
-    int16_t last_y;
-    bool left_button_down;
-    int32_t diff;
-} lv_glfw_mouse_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_glfw_mouse_move_handler(lv_display_t * disp, int x, int y);
-
-void lv_glfw_mouse_btn_handler(lv_display_t * disp, int btn_down);
+lv_display_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_OPENGLES*/
+#endif /* LV_USE_OPENGLES */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /* LV_OPENGLES_MOUSE_PRIVATE_H */
+#endif /* LV_GLFW_WINDOW_H */

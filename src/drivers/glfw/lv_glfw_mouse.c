@@ -1,13 +1,13 @@
 /**
- * @file lv_opengles_mouse.c
+ * @file lv_glfw_mouse.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_opengles_mouse.h"
-#include "lv_opengles_mouse_private.h"
+#include "lv_glfw_mouse.h"
+#include "lv_glfw_mouse_private.h"
 #if LV_USE_OPENGLES
 
 #include <stdint.h>
