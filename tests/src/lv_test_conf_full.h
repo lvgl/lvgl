@@ -110,7 +110,6 @@
 
 #define LV_USE_OBJ_ID           1
 #define LV_USE_OBJ_ID_BUILTIN   1
-#define LV_USE_OBJ_PROPERTY     0
 
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
 
