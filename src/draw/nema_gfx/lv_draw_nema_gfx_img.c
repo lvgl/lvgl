@@ -162,7 +162,7 @@ lv_res_t lv_draw_nema_gfx_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_im
 
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip_com;
-        uint8_t *img_data = cdsc->dec_dsc.img_data ? cdsc->dec_dsc.img_data : ((lv_img_dsc_t *)src)->data;
+        uint8_t *img_data = (uint8_t *)(cdsc->dec_dsc.img_data) ? (uint8_t *)(cdsc->dec_dsc.img_data) : (uint8_t *)(((lv_img_dsc_t *)src)->data);
         lv_draw_img_decoded(draw_ctx, draw_dsc, coords, img_data, cf);
         draw_ctx->clip_area = clip_area_ori;
     }
