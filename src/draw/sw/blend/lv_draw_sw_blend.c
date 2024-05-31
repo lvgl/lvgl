@@ -106,7 +106,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
                 lv_draw_sw_blend_color_to_l8(&fill_dsc);
                 break;
 #endif
-#if LV_DRAW_SW_SUPPORT_AL8
+#if LV_DRAW_SW_SUPPORT_AL88
             case LV_COLOR_FORMAT_AL88:
                 lv_draw_sw_blend_color_to_al88(&fill_dsc);
                 break;
