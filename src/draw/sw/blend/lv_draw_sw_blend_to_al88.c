@@ -47,13 +47,13 @@ typedef struct {
  **********************/
 
 #if LV_DRAW_SW_SUPPORT_L8
-static void /* LV_ATTRIBUTE_FAST_MEM */ l8_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
+    static void /* LV_ATTRIBUTE_FAST_MEM */ l8_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
 #endif
 
 static void /* LV_ATTRIBUTE_FAST_MEM */ al88_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
 
 #if LV_DRAW_SW_SUPPORT_RGB565
-static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
+    static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
 #endif
 
 #if LV_DRAW_SW_SUPPORT_RGB888
@@ -62,7 +62,7 @@ static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(_lv_draw_sw_blend_ima
 #endif
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888
-static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
+    static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc);
 #endif
 
 static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache);
@@ -77,7 +77,7 @@ static inline bool lv_color16a_eq(lv_color16a_t c1, lv_color16a_t c2);
 static inline lv_color16a_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color_mix16a(lv_color16a_t fg, lv_color16a_t bg);
 
 static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_color_16a_16a_mix(lv_color16a_t src, lv_color16a_t * dest,
-                                                              lv_color_mix_alpha_cache_t * cache);
+                                                                    lv_color_mix_alpha_cache_t * cache);
 
 /**********************
  *  STATIC VARIABLES

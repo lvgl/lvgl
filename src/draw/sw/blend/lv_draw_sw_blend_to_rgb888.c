@@ -39,15 +39,15 @@
  **********************/
 
 #if LV_DRAW_SW_SUPPORT_AL88
-static void /* LV_ATTRIBUTE_FAST_MEM */ al88_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
+    static void /* LV_ATTRIBUTE_FAST_MEM */ al88_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
 #endif
 
 #if LV_DRAW_SW_SUPPORT_L8
-static void /* LV_ATTRIBUTE_FAST_MEM */ l8_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
+    static void /* LV_ATTRIBUTE_FAST_MEM */ l8_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
 #endif
 
 #if LV_DRAW_SW_SUPPORT_RGB565
-static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
+    static void /* LV_ATTRIBUTE_FAST_MEM */ rgb565_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size);
 #endif
 
 static void /* LV_ATTRIBUTE_FAST_MEM */ rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc,
