@@ -215,30 +215,43 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
         }
 
         switch(src_cf) {
+#if LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
                 transform_rgb888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
                                  4);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
             case LV_COLOR_FORMAT_RGB888:
                 transform_rgb888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
                                  3);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_A8
             case LV_COLOR_FORMAT_A8:
                 transform_a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888
             case LV_COLOR_FORMAT_ARGB8888:
                 transform_argb8888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
                                    aa);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
                 transform_rgb565a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
                                    alpha_buf, false, aa);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB565A8
             case LV_COLOR_FORMAT_RGB565A8:
                 transform_rgb565a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w,
                                    (uint16_t *)dest_buf,
                                    alpha_buf, true, aa);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_L8
             case LV_COLOR_FORMAT_L8:
                 if(draw_dsc->recolor_opa >= LV_OPA_MIN)
                     transform_l8_to_argb8888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
@@ -246,6 +259,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                 else
                     transform_l8_to_al88(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
                 break;
+#endif
             default:
                 break;
         }

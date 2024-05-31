@@ -330,7 +330,93 @@
     #endif
 #endif
 #if LV_USE_DRAW_SW == 1
-    /* Set the number of draw unit.
+
+	/*
+	 * Selectively disable color format support in order to reduce code size.
+	 * NOTE: some features use certain color formats internally, e.g.
+	 * - gradients use RGB888
+	 * - bitmaps with transparency may use ARGB8888
+	 */
+
+	#ifndef LV_DRAW_SW_SUPPORT_RGB565
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565
+	            #define LV_DRAW_SW_SUPPORT_RGB565 CONFIG_LV_DRAW_SW_SUPPORT_RGB565
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_RGB565 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_RGB565		1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_RGB888
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB888
+	            #define LV_DRAW_SW_SUPPORT_RGB888 CONFIG_LV_DRAW_SW_SUPPORT_RGB888
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_RGB888 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_RGB888		1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_XRGB8888
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_XRGB8888
+	            #define LV_DRAW_SW_SUPPORT_XRGB8888 CONFIG_LV_DRAW_SW_SUPPORT_XRGB8888
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_XRGB8888 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_XRGB8888		1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_ARGB8888
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888
+	            #define LV_DRAW_SW_SUPPORT_ARGB8888 CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_ARGB8888 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_ARGB8888		1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_L8
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_L8
+	            #define LV_DRAW_SW_SUPPORT_L8 CONFIG_LV_DRAW_SW_SUPPORT_L8
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_L8 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_L8			1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_AL88
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_AL88
+	            #define LV_DRAW_SW_SUPPORT_AL88 CONFIG_LV_DRAW_SW_SUPPORT_AL88
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_AL88 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_AL88			1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_A8
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_A8
+	            #define LV_DRAW_SW_SUPPORT_A8 CONFIG_LV_DRAW_SW_SUPPORT_A8
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_A8 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_A8			1
+	    #endif
+	#endif
+
+	/* Set the number of draw unit.
      * > 1 requires an operating system enabled in `LV_USE_OS`
      * > 1 means multiply threads will render the screen in parallel */
     #ifndef LV_DRAW_SW_DRAW_UNIT_CNT

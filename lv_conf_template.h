@@ -121,7 +121,23 @@
 
 #define LV_USE_DRAW_SW 1
 #if LV_USE_DRAW_SW == 1
-    /* Set the number of draw unit.
+
+	/*
+	 * Selectively disable color format support in order to reduce code size.
+	 * NOTE: some features use certain color formats internally, e.g.
+	 * - gradients use RGB888
+	 * - bitmaps with transparency may use ARGB8888
+	 */
+
+	#define LV_DRAW_SW_SUPPORT_RGB565		1
+	#define LV_DRAW_SW_SUPPORT_RGB888		1
+	#define LV_DRAW_SW_SUPPORT_XRGB8888		1
+	#define LV_DRAW_SW_SUPPORT_ARGB8888		1
+	#define LV_DRAW_SW_SUPPORT_L8			1
+	#define LV_DRAW_SW_SUPPORT_AL88			1
+	#define LV_DRAW_SW_SUPPORT_A8			1
+
+	/* Set the number of draw unit.
      * > 1 requires an operating system enabled in `LV_USE_OS`
      * > 1 means multiply threads will render the screen in parallel */
     #define LV_DRAW_SW_DRAW_UNIT_CNT    1
