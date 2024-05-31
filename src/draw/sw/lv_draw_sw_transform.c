@@ -51,22 +51,31 @@ typedef struct {
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout);
 
+#if LV_DRAW_SW_SUPPORT_RGB888
 static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                              int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size);
+#endif
 
+#if LV_DRAW_SW_SUPPORT_ARGB8888
 static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                int32_t x_end, uint8_t * dest_buf, bool aa);
+#endif
 
+#if LV_DRAW_SW_SUPPORT_RGB565A8
 static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                int32_t x_end, uint16_t * cbuf, uint8_t * abuf, bool src_has_a8, bool aa);
+#endif
 
+#if LV_DRAW_SW_SUPPORT_A8
 static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                          int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                          int32_t x_end, uint8_t * abuf, bool aa);
+#endif
 
+#if LV_DRAW_SW_SUPPORT_L8
 static void transform_l8_to_al88(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                  int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                  int32_t x_end, uint8_t * abuf, bool aa);
@@ -74,6 +83,7 @@ static void transform_l8_to_al88(const uint8_t * src, int32_t src_w, int32_t src
 static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                      int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                      int32_t x_end, uint8_t * abuf, bool aa);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -238,7 +248,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                                    aa);
                 break;
 #endif
-#if LV_DRAW_SW_SUPPORT_RGB565
+#if LV_DRAW_SW_SUPPORT_RGB565 && LV_DRAW_SW_SUPPORT_RGB565A8
             case LV_COLOR_FORMAT_RGB565:
                 transform_rgb565a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
                                    alpha_buf, false, aa);
@@ -272,6 +282,8 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#if LV_DRAW_SW_SUPPORT_RGB888
 
 static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -369,6 +381,10 @@ static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, 
     }
 }
 
+#endif
+
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+
 static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                int32_t x_end, uint8_t * dest_buf, bool aa)
@@ -457,6 +473,10 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
         }
     }
 }
+
+#endif
+
+#if LV_DRAW_SW_SUPPORT_RGB565A8
 
 static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -569,6 +589,10 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
     }
 }
 
+#endif
+
+#if LV_DRAW_SW_SUPPORT_A8
+
 static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                          int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                          int32_t x_end, uint8_t * abuf, bool aa)
@@ -642,6 +666,12 @@ static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int3
         }
     }
 }
+
+#endif
+
+#if LV_DRAW_SW_SUPPORT_L8
+
+#if LV_DRAW_SW_SUPPORT_AL88
 
 /* L8 will be transformed into an AL88 buffer, because it will not be recolored */
 static void transform_l8_to_al88(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
@@ -720,6 +750,10 @@ static void transform_l8_to_al88(const uint8_t * src, int32_t src_w, int32_t src
     }
 }
 
+#endif
+
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+
 /* L8 has to be transformed into an ARGB8888 buffer, because it will be recolored as well */
 static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                      int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -795,6 +829,10 @@ static void transform_l8_to_argb8888(const uint8_t * src, int32_t src_w, int32_t
         }
     }
 }
+
+#endif
+
+#endif
 
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout)

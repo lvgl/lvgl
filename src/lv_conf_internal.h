@@ -349,6 +349,17 @@
 	        #define LV_DRAW_SW_SUPPORT_RGB565		1
 	    #endif
 	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_RGB565A8
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
+	            #define LV_DRAW_SW_SUPPORT_RGB565A8 CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_RGB565A8 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_RGB565A8		1
+	    #endif
+	#endif
 	#ifndef LV_DRAW_SW_SUPPORT_RGB888
 	    #ifdef _LV_KCONFIG_PRESENT
 	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB888
