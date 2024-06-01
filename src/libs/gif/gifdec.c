@@ -84,13 +84,13 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     /* Header */
     f_gif_read(gif_base, sigver, 3);
     if(memcmp(sigver, "GIF", 3) != 0) {
-        LV_LOG_WARN("invalid signature\n");
+        LV_LOG_WARN("invalid signature");
         goto fail;
     }
     /* Version */
     f_gif_read(gif_base, sigver, 3);
     if(memcmp(sigver, "89a", 3) != 0) {
-        LV_LOG_WARN("invalid version\n");
+        LV_LOG_WARN("invalid version");
         goto fail;
     }
     /* Width x Height */
@@ -100,7 +100,7 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     f_gif_read(gif_base, &fdsz, 1);
     /* Presence of GCT */
     if(!(fdsz & 0x80)) {
-        LV_LOG_WARN("no global color table\n");
+        LV_LOG_WARN("no global color table");
         goto fail;
     }
     /* Color Space's Depth */

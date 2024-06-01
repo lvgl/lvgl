@@ -198,7 +198,7 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
 
     if(err) {
         char fn_ref_no_ext[128];
-        strcpy(fn_ref_no_ext, fn_ref);
+        lv_strlcpy(fn_ref_no_ext, fn_ref, sizeof(fn_ref_no_ext));
         fn_ref_no_ext[strlen(fn_ref_no_ext) - 4] = '\0';
 
         char fn_err_full[256];

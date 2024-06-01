@@ -24,7 +24,11 @@ Two APIs are provided to get/set widget properties. It can be enabled by setting
             int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
             const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
             lv_color_t color;           /**< Colors*/
-            lv_style_value_t _style;    /**< A place holder for style value which is same as property value.*/
+            lv_value_precise_t precise; /**< float or int for precise value*/
+            struct {
+                lv_style_value_t style; /**< Make sure it's the first element in struct. */
+                uint32_t selector;      /**< Style selector, lv_part_t | lv_state_t */
+            };
         };
     } lv_property_t;
 

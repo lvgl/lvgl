@@ -37,6 +37,9 @@
 #include "misc/lv_fs_private.h"
 #include "widgets/span/lv_span.h"
 #include "themes/simple/lv_theme_simple.h"
+#include "misc/lv_fs.h"
+#include "osal/lv_os_private.h"
+
 #if LV_USE_DRAW_VGLITE
     #include "draw/nxp/vglite/lv_draw_vglite.h"
 #endif
@@ -172,6 +175,8 @@ void lv_init(void)
     lv_profiler_builtin_config_init(&profiler_config);
     lv_profiler_builtin_init(&profiler_config);
 #endif
+
+    lv_os_init();
 
     lv_timer_core_init();
 

@@ -90,6 +90,7 @@ set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
 
 set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLV_TEST_OPTION=5
+    -DLV_USE_OBJ_PROPERTY=1      # add obj property test and disable pedantic
     -DLVGL_CI_USING_DEF_HEAP
     -fsanitize=address
     -fsanitize=leak
@@ -127,10 +128,19 @@ else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
 
-
 if ($ENV{NON_AMD64_BUILD})
     set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
     message("Non AMD64 target is specified")
+
+    # Ensure 32-bit build
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -m32")
+endif()
+
+if ($ENV{NON_AMD64_BUILD})
+    set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu" CACHE PATH "search 32bit lib path firstly")
 endif()
 
 # Options lvgl and examples are compiled with.
@@ -184,6 +194,12 @@ list(APPEND COMPILE_OPTIONS
     ${BUILD_OPTIONS}
     ${BUILD_TARGET_DEF}
 )
+
+# LV_USE_OBJ_PROPERTY is enabled in option OPTIONS_TEST_DEFHEAP
+# It relies on C11 anonymous struct/union support, thus disable warnings.
+if(OPTIONS_TEST_DEFHEAP)
+    list(REMOVE_ITEM COMPILE_OPTIONS -pedantic-errors -Wpedantic)
+endif()
 
 filter_compiler_options(C LVGL_C_COMPILE_OPTIONS ${COMPILE_OPTIONS})
 
@@ -267,6 +283,7 @@ add_library(test_common
         src/test_assets/test_imagebutton_mid.c
         src/test_assets/test_imagebutton_right.c
         src/test_assets/test_music_button_play.c
+        src/test_assets/test_lottie_approve.c
         unity/unity_support.c
         unity/unity.c
         ${TEST_IMAGES_SRC}
@@ -298,7 +315,9 @@ include_directories(${FREETYPE_INCLUDE_DIRS})
 
 # libinput is required for the libinput device driver test case
 find_package(Libinput OPTIONAL_COMPONENTS)
-include_directories(${LIBINPUT_INCLUDE_DIRS})
+if ($ENV{NON_AMD64_BUILD})
+    include_directories(${LIBINPUT_INCLUDE_DIRS})
+endif()
 
 if (NOT LIBINPUT_FOUND)
     message("libinput not found, defaulting to 0")

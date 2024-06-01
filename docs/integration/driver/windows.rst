@@ -3,7 +3,7 @@ Windows Display/Inputs driver
 =============================
 
 Overview
--------------
+--------
 
 The **Windows** display/input `driver <https://github.com/lvgl/lvgl/src/drivers/windows>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in a Windows Win32 window.
 

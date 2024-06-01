@@ -1,9 +1,9 @@
-=============================
+============================
 ST7789 LCD Controller driver
-=============================
+============================
 
 Overview
--------------
+--------
 
 The `ST7789 <https://www.buydisplay.com/download/ic/ST7789.pdf>`__ is a single-chip controller/driver for 262K-color, graphic type TFT-LCD. It consists of 720
 source line and 320 gate line driving circuits. This chip is capable of connecting directly to an external

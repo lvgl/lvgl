@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2023 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,34 +22,33 @@
 
 #include "../../lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
-
-#ifndef _TVG_BEZIER_H_
-#define _TVG_BEZIER_H_
+#ifndef _TVG_LOTTIE_BUILDER_H_
+#define _TVG_LOTTIE_BUILDER_H_
 
 #include "tvgCommon.h"
+#include "tvgLottieExpressions.h"
 
-namespace tvg
-{
+struct LottieComposition;
 
-struct Bezier
+struct LottieBuilder
 {
-    Point start;
-    Point ctrl1;
-    Point ctrl2;
-    Point end;
+    LottieExpressions* exps = nullptr;
+
+    LottieBuilder()
+    {
+        exps = LottieExpressions::instance();
+    }
+
+    ~LottieBuilder()
+    {
+        LottieExpressions::retrieve(exps);
+    }
+
+    bool update(LottieComposition* comp, float progress);
+    void build(LottieComposition* comp);
 };
 
-void bezSplit(const Bezier&cur, Bezier& left, Bezier& right);
-float bezLength(const Bezier& cur);
-void bezSplitLeft(Bezier& cur, float at, Bezier& left);
-float bezAt(const Bezier& bz, float at, float length);
-void bezSplitAt(const Bezier& cur, float at, Bezier& left, Bezier& right);
-Point bezPointAt(const Bezier& bz, float t);
-float bezAngleAt(const Bezier& bz, float t);
-
-}
-
-#endif //_TVG_BEZIER_H_
+#endif //_TVG_LOTTIE_BUILDER_H
 
 #endif /* LV_USE_THORVG_INTERNAL */
 

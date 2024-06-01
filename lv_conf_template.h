@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_conf.h
  * Configuration file for v9.1.1-dev
  */
@@ -154,6 +154,9 @@
     #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
         #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
     #endif
+
+    /* Enable drawing complex gradients in software: linear at an angle, radial or conical */
+    #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
 #endif
 
 /* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
@@ -564,6 +567,8 @@
 
 #define LV_USE_LIST       1
 
+#define LV_USE_LOTTIE     0  /*Requires: lv_canvas, thorvg */
+
 #define LV_USE_MENU       1
 
 #define LV_USE_MSGBOX     1
@@ -967,6 +972,9 @@
 
 #define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
 
+/*Driver for Renesas GLCD*/
+#define LV_USE_RENESAS_GLCDC    0
+
 /* LVGL Windows backend */
 #define LV_USE_WINDOWS    0
 
@@ -1020,6 +1028,7 @@
 
 /*Vector graphic demo*/
 #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+
 /*--END OF LV_CONF_H--*/
 
 #endif /*LV_CONF_H*/
