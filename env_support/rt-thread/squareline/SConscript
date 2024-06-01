@@ -20,6 +20,6 @@ for root, dirs, files in os.walk(sls_src_cwd):
         if check_h_hpp_exists(current_path): # add .h and .hpp path
             inc = inc + [current_path]
  
-group = DefineGroup('LVGL-SquareLine', src, depend = ['PKG_USING_LVGL_SQUARELINE'], CPPPATH = inc)
+group = DefineGroup('LVGL-SquareLine', src, depend = ['PKG_LVGL_USING_SQUARELINE'], CPPPATH = inc)
  
 Return('group')
