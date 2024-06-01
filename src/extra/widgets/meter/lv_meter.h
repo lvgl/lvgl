@@ -245,7 +245,7 @@ void lv_meter_set_indicator_value(lv_obj_t * obj, lv_meter_indicator_t * indic, 
 void lv_meter_set_indicator_start_value(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value);
 
 /**
- * Set the start value of the indicator.
+ * Set the end value of the indicator.
  * @param obj           pointer to a meter object
  * @param indic         pointer to an indicator
  * @param value         the new value
