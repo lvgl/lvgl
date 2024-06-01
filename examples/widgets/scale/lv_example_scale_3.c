@@ -80,6 +80,9 @@ void lv_example_scale_3(void)
     lv_scale_set_angle_range(scale_img, 270);
     lv_scale_set_rotation(scale_img, 135);
 
+    /* so the needle image cannot be scrolled*/
+    lv_obj_remove_flag(scale_img, LV_OBJ_FLAG_SCROLLABLE);
+
     /* image must point to the right. E.g. -O------>*/
     needle_img = lv_image_create(scale_img);
     lv_image_set_src(needle_img, &img_hand);
