@@ -107,10 +107,10 @@ void lv_draw_dave2d_init(void)
 
 static void lv_draw_buf_dave2d_init_handlers(void)
 {
-    lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
 
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
+    lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
     handlers->invalidate_cache_cb = _dave2d_buf_invalidate_cache_cb;
 #endif
 #endif
@@ -430,10 +430,10 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
 {
     /*Render the draw task*/
     lv_draw_task_t * t = u->task_act;
-    lv_layer_t * layer = u->base_unit.target_layer;
 
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
+    lv_layer_t * layer = u->base_unit.target_layer;
     lv_area_t clipped_area;
     int32_t x;
     int32_t y;

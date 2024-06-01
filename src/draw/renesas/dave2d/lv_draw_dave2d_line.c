@@ -6,9 +6,7 @@ void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * d
 
     lv_area_t clip_line;
     d2_u32     mode;
-    d2_s32 result;
     lv_area_t buffer_area;
-    uint32_t res;
     lv_value_precise_t p1_x;
     lv_value_precise_t p1_y;
     lv_value_precise_t p2_x;
