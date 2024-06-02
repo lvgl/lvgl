@@ -305,7 +305,7 @@ nr1:
     xn = (xn + 1 + x / xn) / 2;
 adj:
 
-    if(xn * xn > x)   /* Correct rounding if necessary */
+    if(xn * xn > (int32_t)x)   /* Correct rounding if necessary */
         xn--;
 
     return xn;
