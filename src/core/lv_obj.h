@@ -422,7 +422,7 @@ void * lv_obj_get_id(const lv_obj_t * obj);
 /**
  * Get the child object by its id.
  * It will check children and grandchildren recursively.
- * Compare is done by pointer comparison if `match` is NULL.
+ * Function `lv_obj_id_compare` is used to matched obj id with given id.
  *
  * @param obj       pointer to an object
  * @param id        the id of the child object
@@ -430,9 +430,8 @@ void * lv_obj_get_id(const lv_obj_t * obj);
  */
 lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);
 
-#if LV_OBJ_ID_AUTO_ASSIGN
 /**
- * Assign d to object if not previously assigned.
+ * Assign id to object if not previously assigned.
  * This function gets called automatically when LV_OBJ_ID_AUTO_ASSIGN is enabled.
  *
  * Set `LV_USE_OBJ_ID_BUILTIN` to use the builtin method to generate object ID.
@@ -476,8 +475,6 @@ const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len);
  * Free resources used by builtin ID generator.
  */
 void lv_objid_builtin_destroy(void);
-#endif
-
 #endif
 
 #endif /*LV_USE_OBJ_ID*/
