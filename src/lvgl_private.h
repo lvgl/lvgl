@@ -102,6 +102,8 @@ extern "C" {
 #include "stdlib/builtin/lv_tlsf_private.h"
 #include "libs/rlottie/lv_rlottie_private.h"
 #include "libs/ffmpeg/lv_ffmpeg_private.h"
+#include "widgets/lottie/lv_lottie_private.h"
+#include "osal/lv_os_private.h"
 
 /*********************
  *      DEFINES

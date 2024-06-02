@@ -25,7 +25,7 @@ extern "C" {
 #error "lv_lottie: ThorVG is required. Enable it in lv_conf.h (LV_USE_THORVG_INTERNAL/EXTERNAL 1)"
 #endif
 
-#include "../../widgets/canvas/lv_canvas.h"
+#include "../../draw/lv_draw_buf.h"
 
 /*********************
  *      DEFINES
@@ -34,21 +34,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-#ifndef __THORVG_CAPI_H__ /*To avoid redefinition of typedef warning*/
-typedef struct _Tvg_Paint Tvg_Paint;
-typedef struct _Tvg_Canvas Tvg_Canvas;
-typedef struct _Tvg_Animation Tvg_Animation;
-#endif
-
-typedef struct {
-    lv_canvas_t canvas;
-    Tvg_Paint * tvg_paint;
-    Tvg_Canvas * tvg_canvas;
-    Tvg_Animation * tvg_anim;
-    lv_anim_t * anim;
-    int32_t last_rendered_time;
-} lv_lottie_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -15,8 +15,9 @@
     #include "../../libs/thorvg/thorvg_capi.h"
 #endif
 
+#include "lv_lottie_private.h"
 #include "../../misc/lv_timer.h"
-#include "lv_lottie.h"
+#include "../../core/lv_obj_class_private.h"
 
 /*********************
  *      DEFINES
