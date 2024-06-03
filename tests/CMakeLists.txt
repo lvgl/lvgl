@@ -57,10 +57,15 @@ include(CTest)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(SANITIZE_AND_COVERAGE_OPTIONS
+    -fsanitize=address
+    -fsanitize=leak
+    -fsanitize=undefined
+    --coverage
+)
 
 set(LVGL_TEST_OPTIONS_VG_LITE
     -DLV_TEST_OPTION=6
-    -DLVGL_CI_USING_SYS_HEAP
     -Wno-dangling-pointer # workaround for thorvg dangling-pointer warning
 )
 
@@ -88,18 +93,18 @@ set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
     -DLV_TEST_OPTION=5
     -DLVGL_CI_USING_SYS_HEAP
     -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
+    ${SANITIZE_AND_COVERAGE_OPTIONS}
 )
 
 set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLV_TEST_OPTION=5
     -DLVGL_CI_USING_DEF_HEAP
-    -fsanitize=address
-    -fsanitize=leak
-    -fsanitize=undefined
-    --coverage
+    ${SANITIZE_AND_COVERAGE_OPTIONS}
 )
 
-if (OPTIONS_NORMAL_8BIT)
+if (OPTIONS_VG_LITE)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE})
+elseif (OPTIONS_NORMAL_8BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_NORMAL_8BIT})
 elseif (OPTIONS_16BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_16BIT})
@@ -108,13 +113,13 @@ elseif (OPTIONS_24BIT)
 elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST_SYSHEAP)
-    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address -fsanitize=leak -fsanitize=undefined --coverage)
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
@@ -123,8 +128,10 @@ elseif (OPTIONS_TEST_MEMORYCHECK)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
-elseif (OPTIONS_VG_LITE)
-    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE})
+elseif (OPTIONS_TEST_VG_LITE)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE} -DLVGL_CI_USING_SYS_HEAP ${SANITIZE_AND_COVERAGE_OPTIONS})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs_vg_lite/")
 
