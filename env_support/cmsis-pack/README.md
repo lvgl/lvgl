@@ -103,6 +103,7 @@ remove the misleading guide above this code segment.
    
    - LV_USE_ILI9341
    
+   - LV_USE_RENESAS_GLCDC   
      
    
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`

@@ -229,6 +229,14 @@ menu "LVGL configuration"
 				0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only,
 				1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too.
 
+		config LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+			bool "Enable drawing complex gradients in software"
+			default n
+			depends on LV_USE_DRAW_SW
+			help
+				0: do not enable complex gradients
+				1: enable complex gradients (linear at an angle, radial or conical)
+
 		config LV_DRAW_SW_SHADOW_CACHE_SIZE
 			int "Allow buffering some shadow calculation"
 			depends on LV_DRAW_SW_COMPLEX
@@ -943,6 +951,12 @@ menu "LVGL configuration"
 		config LV_USE_LIST
 			bool "List"
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_LOTTIE
+			bool "Lottie"
+			default n
+			depends on LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+			help
+				Enable Lottie animations. Requires LV_USE_VECTOR_GRAPHIC and LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL.
 		config LV_USE_MENU
 			bool "Menu"
 			default y if !LV_CONF_MINIMAL
@@ -1176,7 +1190,7 @@ menu "LVGL configuration"
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
-	
+
 		config LV_USE_THORVG
 			bool "ThorVG library"
 			choice
@@ -1624,6 +1638,10 @@ menu "LVGL configuration"
 		config LV_USE_GENERIC_MIPI
 			bool "Generic MIPI driver"
 			default y if LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341
+
+		config LV_USE_RENESAS_GLCDC
+			bool "Use Renesas GLCDC driver"
+			default n
 
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"

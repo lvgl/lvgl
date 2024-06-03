@@ -517,6 +517,7 @@ void lv_vg_lite_buffer_init(
     const void * ptr,
     int32_t width,
     int32_t height,
+    uint32_t stride,
     vg_lite_buffer_format_t format,
     bool tiled)
 {
@@ -539,8 +540,13 @@ void lv_vg_lite_buffer_init(
     buffer->transparency_mode = VG_LITE_IMAGE_OPAQUE;
     buffer->width = width;
     buffer->height = height;
-    lv_vg_lite_buffer_format_bytes(buffer->format, &mul, &div, &align);
-    buffer->stride = LV_VG_LITE_ALIGN((buffer->width * mul / div), align);
+    if(stride == LV_STRIDE_AUTO) {
+        lv_vg_lite_buffer_format_bytes(buffer->format, &mul, &div, &align);
+        buffer->stride = LV_VG_LITE_ALIGN((buffer->width * mul / div), align);
+    }
+    else {
+        buffer->stride = stride;
+    }
 
     if(format == VG_LITE_NV12) {
         lv_yuv_buf_t * frame_p = (lv_yuv_buf_t *)ptr;
@@ -567,6 +573,7 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     const uint8_t * ptr = draw_buf->data;
     int32_t width = draw_buf->header.w;
     int32_t height = draw_buf->header.h;
+    uint32_t stride = draw_buf->header.stride;
     vg_lite_buffer_format_t format = lv_vg_lite_vg_fmt(draw_buf->header.cf);
 
     if(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {
@@ -578,7 +585,7 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
 
     width = lv_vg_lite_width_align(width);
 
-    lv_vg_lite_buffer_init(buffer, ptr, width, height, format, false);
+    lv_vg_lite_buffer_init(buffer, ptr, width, height, stride, format, false);
 
     /* Alpha image need to be multiplied by color */
     if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(draw_buf->header.cf)) {

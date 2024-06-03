@@ -118,6 +118,7 @@ void lv_vg_lite_buffer_init(
     const void * ptr,
     int32_t width,
     int32_t height,
+    uint32_t stride,
     vg_lite_buffer_format_t format,
     bool tiled);
 

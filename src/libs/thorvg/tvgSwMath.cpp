@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,12 +52,6 @@ bool mathSmallCubic(const SwPoint* base, SwFixed& angleIn, SwFixed& angleMid, Sw
     auto d1 = base[2] - base[3];
     auto d2 = base[1] - base[2];
     auto d3 = base[0] - base[1];
-
-    if (d1 == d2 || d2 == d3) {
-        if (d3.small()) angleIn = angleMid = angleOut = 0;
-        else angleIn = angleMid = angleOut = mathAtan(d3);
-        return true;
-    }
 
     if (d1.small()) {
         if (d2.small()) {
@@ -221,7 +215,7 @@ SwFixed mathLength(const SwPoint& pt)
        than 7% compared to the exact value. */
     if (v.x < 0) v.x = -v.x;
     if (v.y < 0) v.y = -v.y;
-    return (SwFixed)((v.x > v.y) ? (v.x + v.y * 0.375f) : (v.y + v.x * 0.375f));
+    return static_cast<SwFixed>((v.x > v.y) ? (v.x + v.y * 0.375f) : (v.y + v.x * 0.375f));
 }
 
 
@@ -296,12 +290,12 @@ bool mathUpdateOutlineBBox(const SwOutline* outline, const SwBBox& clipRegion, S
 {
     if (!outline) return false;
 
-    auto pt = outline->pts.data;
-
     if (outline->pts.empty() || outline->cntrs.empty()) {
         renderRegion.reset();
         return false;
     }
+
+    auto pt = outline->pts.begin();
 
     auto xMin = pt->x;
     auto xMax = pt->x;

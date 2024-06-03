@@ -419,6 +419,15 @@
             #endif
         #endif
     #endif
+
+    /* Enable drawing complex gradients in software: linear at an angle, radial or conical */
+    #ifndef LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+        #ifdef CONFIG_LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+            #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS CONFIG_LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+        #else
+            #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
+        #endif
+    #endif
 #endif
 
 /* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
@@ -1799,6 +1808,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_LOTTIE
+    #ifdef CONFIG_LV_USE_LOTTIE
+        #define LV_USE_LOTTIE CONFIG_LV_USE_LOTTIE
+    #else
+        #define LV_USE_LOTTIE     0  /*Requires: lv_canvas, thorvg */
+    #endif
+#endif
+
 #ifndef LV_USE_MENU
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_MENU
@@ -3156,6 +3173,15 @@
     #endif
 #endif
 
+/*Driver for Renesas GLCD*/
+#ifndef LV_USE_RENESAS_GLCDC
+    #ifdef CONFIG_LV_USE_RENESAS_GLCDC
+        #define LV_USE_RENESAS_GLCDC CONFIG_LV_USE_RENESAS_GLCDC
+    #else
+        #define LV_USE_RENESAS_GLCDC    0
+    #endif
+#endif
+
 /* LVGL Windows backend */
 #ifndef LV_USE_WINDOWS
     #ifdef CONFIG_LV_USE_WINDOWS
@@ -3321,6 +3347,7 @@
         #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #endif
 #endif
+
 
 
 /*----------------------------------

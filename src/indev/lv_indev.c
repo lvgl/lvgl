@@ -211,8 +211,11 @@ void lv_indev_read(lv_indev_t * indev)
     /*Handle reset query before processing the point*/
     indev_proc_reset_query_handler(indev);
 
-    if((indev->enabled == 0) ||
-       (indev->disp->prev_scr != NULL)) return; /*Input disabled or screen animation active*/
+    if(indev->enabled == 0) return;
+    if(indev->disp->prev_scr != NULL) {
+        LV_TRACE_INDEV("input blocked while screen animation active");
+        return;
+    }
 
     LV_PROFILER_BEGIN;
 

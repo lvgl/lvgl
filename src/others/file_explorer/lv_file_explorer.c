@@ -598,8 +598,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
     /*Move the table to the top*/
     lv_obj_scroll_to_y(explorer->file_table, 0, LV_ANIM_OFF);
 
-    lv_memzero(explorer->current_path, sizeof(explorer->current_path));
-    lv_strncpy(explorer->current_path, path, sizeof(explorer->current_path) - 1);
+    lv_strlcpy(explorer->current_path, path, sizeof(explorer->current_path));
     lv_label_set_text_fmt(explorer->path_label, LV_SYMBOL_EYE_OPEN" %s", path);
 
     size_t current_path_len = lv_strlen(explorer->current_path);

@@ -165,7 +165,7 @@ def create_ui():
         lv.GRID_ALIGN.CENTER,
         0,
         1
-        )
+    )
 
     # Bind to a subject
     dropdown.bind_value(chart_type_subject)
