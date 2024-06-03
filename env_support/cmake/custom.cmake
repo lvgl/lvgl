@@ -59,8 +59,11 @@ endif()
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-# LV_CONF_BUILD_DISABLE_THORVG_INTERNAL is just kept for backwards compatibility, prefer CONFIG_LV_USE_THORVG_INTERNAL
-if(LV_CONF_BUILD_THORVG_INTERNAL OR (NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL))
+if(LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+  message(FATAL_ERROR "LV_CONF_BUILD_DISABLE_THORVG_INTERNAL is deprecated, use CONFIG_LV_USE_THORVG_INTERNAL instead")
+endif()
+
+if(LV_CONF_BUILD_THORVG_INTERNAL)
     add_library(lvgl_thorvg ${THORVG_SOURCES})
     add_library(lvgl::thorvg ALIAS lvgl_thorvg)
     target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
@@ -72,8 +75,12 @@ if(NOT MSVC)
   set_source_files_properties(${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/vg_lite_tvg.cpp PROPERTIES COMPILE_FLAGS -Wunused-parameter)
 endif()
 
-# Build LVGL example library (LV_CONF_BUILD_DISABLE_EXAMPLES ist just kept for backwards compatibility, prefer CONFIG_LV_USE_DEMO_WIDGETS)
-if(CONFIG_LV_BUILD_EXAMPLES OR (NOT LV_CONF_BUILD_DISABLE_EXAMPLES))
+if(LV_CONF_BUILD_DISABLE_EXAMPLES)
+  message(FATAL_ERROR "LV_CONF_BUILD_DISABLE_EXAMPLES is deprecated, use CONFIG_LV_BUILD_EXAMPLES instead")
+endif()
+
+# Build LVGL example library
+if(CONFIG_LV_BUILD_EXAMPLES)
     add_library(lvgl_examples ${EXAMPLE_SOURCES})
     add_library(lvgl::examples ALIAS lvgl_examples)
 
@@ -82,8 +89,12 @@ if(CONFIG_LV_BUILD_EXAMPLES OR (NOT LV_CONF_BUILD_DISABLE_EXAMPLES))
     target_compile_definitions(lvgl_examples PUBLIC LV_BUILD_EXAMPLES=1)
 endif()
 
-# Build LVGL demos library (LV_CONF_BUILD_DISABLE_DEMOS ist just kept for backwards compatibility, prefer CONFIG_LV_USE_DEMO_WIDGETS)
-if(CONFIG_LV_USE_DEMO_WIDGETS OR (NOT LV_CONF_BUILD_DISABLE_DEMOS))
+if(LV_CONF_BUILD_DISABLE_DEMOS)
+  message(FATAL_ERROR "LV_CONF_BUILD_DISABLE_DEMOS is deprecated, use CONFIG_LV_USE_DEMO_WIDGETS instead")
+endif()
+
+# Build LVGL demos library
+if(CONFIG_LV_USE_DEMO_WIDGETS)
     add_library(lvgl_demos ${DEMO_SOURCES})
     add_library(lvgl::demos ALIAS lvgl_demos)
 
@@ -114,7 +125,7 @@ install(
   PATTERN "*.h")
 
 # install example headers
-if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
+if(CONFIG_LV_BUILD_EXAMPLES)
   install(
     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples"
     DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
@@ -123,7 +134,7 @@ if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
 endif()
 
 # install demo headers
-if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
+if(CONFIG_LV_USE_DEMO_WIDGETS)
   install(
     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/demos"
     DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
@@ -159,7 +170,7 @@ install(
 
 
 # Install library thorvg
-if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+if(CONFIG_LV_USE_THORVG_INTERNAL)
   set_target_properties(
     lvgl_thorvg
     PROPERTIES OUTPUT_NAME lvgl_thorvg
@@ -179,7 +190,7 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
 endif()
 
 # Install library demos
-if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
+if(CONFIG_LV_USE_DEMO_WIDGETS)
   set_target_properties(
     lvgl_demos
     PROPERTIES OUTPUT_NAME lvgl_demos
@@ -199,7 +210,7 @@ if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
 endif()
 
 #install library examples
-if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
+if(CONFIG_LV_BUILD_EXAMPLES)
   set_target_properties(
     lvgl_examples
     PROPERTIES OUTPUT_NAME lvgl_examples
