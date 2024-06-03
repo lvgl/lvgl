@@ -51,6 +51,7 @@ static void shop_chart_event_cb(lv_event_t * e);
 static void scale1_indic1_anim_cb(void * var, int32_t v);
 static void scale2_timer_cb(lv_timer_t * timer);
 static void scale3_anim_cb(void * var, int32_t v);
+static void scale3_size_changed_event_cb(lv_event_t * e);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void delete_timer_event_cb(lv_event_t * e);
@@ -99,6 +100,9 @@ static lv_style_t scale3_section2_tick_style;
 static lv_style_t scale3_section3_main_style;
 static lv_style_t scale3_section3_indicator_style;
 static lv_style_t scale3_section3_tick_style;
+
+static lv_obj_t * scale3_needle;
+static lv_obj_t * scale3_mbps_label;
 
 /**********************
  *      MACROS
@@ -842,14 +846,14 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section3_tick_style);
 
     LV_IMAGE_DECLARE(img_demo_widgets_needle);
-    lv_obj_t * needle = lv_image_create(scale3);
-    lv_image_set_src(needle, &img_demo_widgets_needle);
-    lv_image_set_pivot(needle, 3, 4);
-    lv_obj_align(needle, LV_ALIGN_CENTER, 47, -2);
+    scale3_needle = lv_image_create(scale3);
+    lv_image_set_src(scale3_needle, &img_demo_widgets_needle);
+    lv_image_set_pivot(scale3_needle, 3, 4);
+    lv_obj_align(scale3_needle, LV_ALIGN_CENTER, 47, -2);
 
-    lv_obj_t * mbps_label = lv_label_create(scale3);
-    lv_label_set_text(mbps_label, "-");
-    lv_obj_add_style(mbps_label, &style_title, 0);
+    scale3_mbps_label = lv_label_create(scale3);
+    lv_label_set_text(scale3_mbps_label, "-");
+    lv_obj_add_style(scale3_mbps_label, &style_title, 0);
 
     lv_obj_t * mbps_unit_label = lv_label_create(scale3);
     lv_label_set_text(mbps_unit_label, "Mbps");
@@ -863,8 +867,10 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_playback_duration(&a, 800);
     lv_anim_start(&a);
 
-    lv_obj_align(mbps_label, LV_ALIGN_TOP_MID, 10, lv_pct(55));
-    lv_obj_align_to(mbps_unit_label, mbps_label, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
+    lv_obj_align(scale3_mbps_label, LV_ALIGN_TOP_MID, 10, lv_pct(55));
+    lv_obj_align_to(mbps_unit_label, scale3_mbps_label, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
+
+    lv_obj_add_event_cb(scale3, scale3_size_changed_event_cb, LV_EVENT_SIZE_CHANGED, NULL);
 }
 
 void shop_create(lv_obj_t * parent)
@@ -1606,6 +1612,23 @@ static void scale3_anim_cb(void * var, int32_t v)
 
     lv_obj_t * label = lv_obj_get_child(var, 1);
     lv_label_set_text_fmt(label, "%"LV_PRId32, v);
+}
+
+static void scale3_size_changed_event_cb(lv_event_t * e)
+{
+    LV_UNUSED(e);
+
+    /* the center of the scale is half of the smaller dimension */
+    int32_t width = lv_obj_get_width(scale3);
+    int32_t height = lv_obj_get_height(scale3);
+    int32_t minor_dim = LV_MIN(width, height);
+    int32_t minor_dim_half = minor_dim / 2;
+
+    /* Update needle position */
+    lv_obj_align(scale3_needle, LV_ALIGN_TOP_LEFT, minor_dim_half, minor_dim_half);
+
+    /* Update labels position */
+    lv_obj_align(scale3_mbps_label, LV_ALIGN_TOP_LEFT, minor_dim_half, minor_dim * 55 / 100);
 }
 
 static void scroll_anim_y_cb(void * var, int32_t v)
