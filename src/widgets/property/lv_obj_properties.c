@@ -14,7 +14,14 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_obj_property_names[48] = {
+const lv_property_name_t lv_obj_property_names[73] = {
+    {"align",                  LV_PROPERTY_OBJ_ALIGN,},
+    {"child_count",            LV_PROPERTY_OBJ_CHILD_COUNT,},
+    {"content_height",         LV_PROPERTY_OBJ_CONTENT_HEIGHT,},
+    {"content_width",          LV_PROPERTY_OBJ_CONTENT_WIDTH,},
+    {"display",                LV_PROPERTY_OBJ_DISPLAY,},
+    {"event_count",            LV_PROPERTY_OBJ_EVENT_COUNT,},
+    {"ext_draw_size",          LV_PROPERTY_OBJ_EXT_DRAW_SIZE,},
     {"flag_adv_hittest",       LV_PROPERTY_OBJ_FLAG_ADV_HITTEST,},
     {"flag_checkable",         LV_PROPERTY_OBJ_FLAG_CHECKABLE,},
     {"flag_click_focusable",   LV_PROPERTY_OBJ_FLAG_CLICK_FOCUSABLE,},
@@ -47,7 +54,22 @@ const lv_property_name_t lv_obj_property_names[48] = {
     {"flag_user_4",            LV_PROPERTY_OBJ_FLAG_USER_4,},
     {"flag_widget_1",          LV_PROPERTY_OBJ_FLAG_WIDGET_1,},
     {"flag_widget_2",          LV_PROPERTY_OBJ_FLAG_WIDGET_2,},
+    {"h",                      LV_PROPERTY_OBJ_H,},
+    {"index",                  LV_PROPERTY_OBJ_INDEX,},
+    {"layout",                 LV_PROPERTY_OBJ_LAYOUT,},
     {"parent",                 LV_PROPERTY_OBJ_PARENT,},
+    {"screen",                 LV_PROPERTY_OBJ_SCREEN,},
+    {"scroll_bottom",          LV_PROPERTY_OBJ_SCROLL_BOTTOM,},
+    {"scroll_dir",             LV_PROPERTY_OBJ_SCROLL_DIR,},
+    {"scroll_end",             LV_PROPERTY_OBJ_SCROLL_END,},
+    {"scroll_left",            LV_PROPERTY_OBJ_SCROLL_LEFT,},
+    {"scroll_right",           LV_PROPERTY_OBJ_SCROLL_RIGHT,},
+    {"scroll_snap_x",          LV_PROPERTY_OBJ_SCROLL_SNAP_X,},
+    {"scroll_snap_y",          LV_PROPERTY_OBJ_SCROLL_SNAP_Y,},
+    {"scroll_top",             LV_PROPERTY_OBJ_SCROLL_TOP,},
+    {"scroll_x",               LV_PROPERTY_OBJ_SCROLL_X,},
+    {"scroll_y",               LV_PROPERTY_OBJ_SCROLL_Y,},
+    {"scrollbar_mode",         LV_PROPERTY_OBJ_SCROLLBAR_MODE,},
     {"state_any",              LV_PROPERTY_OBJ_STATE_ANY,},
     {"state_checked",          LV_PROPERTY_OBJ_STATE_CHECKED,},
     {"state_disabled",         LV_PROPERTY_OBJ_STATE_DISABLED,},
@@ -63,6 +85,9 @@ const lv_property_name_t lv_obj_property_names[48] = {
     {"state_user_2",           LV_PROPERTY_OBJ_STATE_USER_2,},
     {"state_user_3",           LV_PROPERTY_OBJ_STATE_USER_3,},
     {"state_user_4",           LV_PROPERTY_OBJ_STATE_USER_4,},
+    {"w",                      LV_PROPERTY_OBJ_W,},
+    {"x",                      LV_PROPERTY_OBJ_X,},
+    {"y",                      LV_PROPERTY_OBJ_Y,},
 };
 /* *INDENT-ON* */
 #endif
