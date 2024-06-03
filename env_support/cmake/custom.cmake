@@ -170,7 +170,7 @@ install(
 
 
 # Install library thorvg
-if(CONFIG_LV_USE_THORVG_INTERNAL)
+if(LV_CONF_BUILD_THORVG_INTERNAL)
   set_target_properties(
     lvgl_thorvg
     PROPERTIES OUTPUT_NAME lvgl_thorvg
