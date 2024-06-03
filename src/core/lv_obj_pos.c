@@ -781,6 +781,12 @@ void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive
 void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive,
                                  bool inv)
 {
+    int32_t angle = lv_obj_get_style_transform_rotation(obj, 0);
+    int32_t scale_x = lv_obj_get_style_transform_scale_x_safe(obj, 0);
+    int32_t scale_y = lv_obj_get_style_transform_scale_y_safe(obj, 0);
+
+    if(angle == 0 && scale_x == LV_SCALE_NONE && scale_y == LV_SCALE_NONE) return;
+
     lv_point_t p[4] = {
         {area->x1, area->y1},
         {area->x1, area->y2},
