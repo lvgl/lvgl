@@ -98,6 +98,8 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     --coverage
 )
 
+set(CONFIG_LV_BUILD_EXAMPLES ON)
+
 if (OPTIONS_VG_LITE)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE})
 elseif (OPTIONS_NORMAL_8BIT)
@@ -111,18 +113,18 @@ elseif (OPTIONS_FULL_32BIT)
 elseif (OPTIONS_TEST_SYSHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address -fsanitize=leak -fsanitize=undefined --coverage)
     filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
-    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
+    set (CONFIG_LV_BUILD_EXAMPLES OFF)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
     filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
-    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
+    set (CONFIG_LV_BUILD_EXAMPLES OFF)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
     # sanitizer is disabled because valgrind uses LD_PRELOAD and the
     # sanitizer lib needs to load first
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
-    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
+    set (CONFIG_LV_BUILD_EXAMPLES OFF)
     set (ENABLE_TESTS ON)
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
