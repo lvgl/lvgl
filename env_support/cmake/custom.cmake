@@ -86,9 +86,15 @@ if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
     target_link_libraries(lvgl_demos PUBLIC lvgl)
 endif()
 
-# Lbrary and headers can be installed to system using make install
-file(GLOB LVGL_PUBLIC_HEADERS "${CMAKE_SOURCE_DIR}/lv_conf.h"
-     "${CMAKE_SOURCE_DIR}/lvgl.h")
+# Library and headers can be installed to system using make install
+file(GLOB LVGL_PUBLIC_HEADERS
+    "${CMAKE_SOURCE_DIR}/lvgl.h"
+    "${CMAKE_SOURCE_DIR}/lv_version.h")
+
+if(NOT LV_CONF_SKIP)
+file(GLOB LVGL_PUBLIC_HEADERS
+	"${CMAKE_SOURCE_DIR}/lv_conf.h")
+endif()
 
 if("${LIB_INSTALL_DIR}" STREQUAL "")
   set(LIB_INSTALL_DIR "lib")
