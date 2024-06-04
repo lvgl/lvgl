@@ -860,9 +860,6 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             uint32_t k = (i + bar_rot + rnd_array[(bar_ofs + 1) % 10]) % BAR_CNT;
 
             uint32_t v = (r[k] * animv + r[j] * (amax - animv)) / amax;
-            if(v > 250) {
-                printf("aaa\n");
-            }
 
             if(start_anim) {
                 v = r_in + 77 + start_anim_values[i];
