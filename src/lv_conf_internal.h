@@ -2597,6 +2597,13 @@
             #define LV_TINY_TTF_FILE_SUPPORT 0
         #endif
     #endif
+    #ifndef LV_TINY_TTF_CACHE_GLYPH_CNT
+        #ifdef CONFIG_LV_TINY_TTF_CACHE_GLYPH_CNT
+            #define LV_TINY_TTF_CACHE_GLYPH_CNT CONFIG_LV_TINY_TTF_CACHE_GLYPH_CNT
+        #else
+            #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
+        #endif
+    #endif
 #endif
 
 /*Rlottie library*/

@@ -1241,6 +1241,10 @@ menu "LVGL configuration"
 			bool "Enable loading Tiny TTF data from files"
 			default n
 			depends on LV_USE_TINY_TTF
+		config LV_TINY_TTF_CACHE_GLYPH_CNT
+			bool "Tiny ttf cache entries count"
+			default 256
+			depends on LV_USE_TINY_TTF
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
