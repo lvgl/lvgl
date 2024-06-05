@@ -50,10 +50,10 @@
  *  STATIC PROTOTYPES
  **********************/
 
- static lv_res_t draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
- static inline bool Isargb8565(lv_img_cf_t cf);
- static uint32_t lv_cf_to_nema(lv_img_cf_t cf);
- static uint32_t skip_pallete(lv_img_cf_t cf);
+static lv_res_t draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static inline bool Isargb8565(lv_img_cf_t cf);
+static uint32_t lv_cf_to_nema(lv_img_cf_t cf);
+static uint32_t skip_pallete(lv_img_cf_t cf);
 
 /**********************
  *  STATIC VARIABLES
@@ -76,7 +76,7 @@ void lv_draw_nema_gfx_init(void)
 static inline bool Isargb8565(lv_img_cf_t cf)
 {
 #if LV_COLOR_DEPTH != 32
-        if(cf == LV_IMG_CF_TRUE_COLOR_ALPHA)
+    if(cf == LV_IMG_CF_TRUE_COLOR_ALPHA)
         return true;
 #endif
     return false;
@@ -120,9 +120,11 @@ static uint32_t skip_pallete(lv_img_cf_t cf)
     }
 }
 
-void lv_draw_nema_gfx_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf){
+void lv_draw_nema_gfx_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
+                                  const uint8_t * map_p, lv_img_cf_t cf)
+{
 
-/*Use the clip area as draw area*/
+    /*Use the clip area as draw area*/
     lv_area_t draw_area;
     lv_area_copy(&draw_area, draw_ctx->clip_area);
     bool mask_any = lv_draw_mask_is_any(&draw_area);
@@ -160,38 +162,43 @@ void lv_draw_nema_gfx_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_ds
     uint32_t color_format = lv_cf_to_nema(cf);
 
     nema_buffer_t Shuffle_pallete_bo;
-    if(color_format == NEMA_L8){
-        Shuffle_pallete_bo = nema_buffer_create(256*4);
-        uint32_t *Shuffle_pallete = Shuffle_pallete_bo.base_virt;
-        for(int i=0; i<256;i++){
-            int idx = ((i>>4) | ((i&0xfU) << 4));
-            lv_color32_t col32 = {.full = lv_color_to32(*(lv_color_t *)((uint32_t*)src_buf+idx))};
+    if(color_format == NEMA_L8) {
+        Shuffle_pallete_bo = nema_buffer_create(256 * 4);
+        uint32_t * Shuffle_pallete = Shuffle_pallete_bo.base_virt;
+        for(int i = 0; i < 256; i++) {
+            int idx = ((i >> 4) | ((i & 0xfU) << 4));
+            lv_color32_t col32 = {.full = lv_color_to32(*(lv_color_t *)((uint32_t *)src_buf + idx))};
             Shuffle_pallete[i] = col32.full;
         }
     }
 
     if(!mask_any) {
-        nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(draw_ctx->buf), lv_area_get_width(draw_ctx->buf_area), lv_area_get_height(draw_ctx->buf_area), LV_NEMA_GFX_COLOR_FORMAT, lv_area_get_width(draw_ctx->buf_area)*LV_NEMA_GFX_FORMAT_MULTIPLIER);
-        nema_set_clip(clip_area.x1,clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
-        if(color_format == NEMA_L1 || color_format == NEMA_L2 || color_format == NEMA_L4){
+        nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(draw_ctx->buf), lv_area_get_width(draw_ctx->buf_area),
+                          lv_area_get_height(draw_ctx->buf_area), LV_NEMA_GFX_COLOR_FORMAT,
+                          lv_area_get_width(draw_ctx->buf_area)*LV_NEMA_GFX_FORMAT_MULTIPLIER);
+        nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
+        if(color_format == NEMA_L1 || color_format == NEMA_L2 || color_format == NEMA_L4) {
             blending_mode |= NEMA_BLOP_LUT;
-            nema_bind_lut_tex((uintptr_t)((uint32_t*)src_buf+(skip_pallete(cf))),tex_w,tex_h,color_format,-1,0,(uintptr_t)(src_buf),NEMA_BGRA8888);
+            nema_bind_lut_tex((uintptr_t)((uint32_t *)src_buf + (skip_pallete(cf))), tex_w, tex_h, color_format, -1, 0,
+                              (uintptr_t)(src_buf), NEMA_BGRA8888);
         }
-        else if(color_format == NEMA_L8){
+        else if(color_format == NEMA_L8) {
             blending_mode |= NEMA_BLOP_LUT;
-            nema_bind_lut_tex((uintptr_t)((uint32_t*)src_buf+(skip_pallete(cf))),tex_w,tex_h,color_format,-1,0,Shuffle_pallete_bo.base_phys,NEMA_BGRA8888);
+            nema_bind_lut_tex((uintptr_t)((uint32_t *)src_buf + (skip_pallete(cf))), tex_w, tex_h, color_format, -1, 0,
+                              Shuffle_pallete_bo.base_phys, NEMA_BGRA8888);
         }
         else
-		    nema_bind_src_tex((uintptr_t)(src_buf),tex_w,tex_h,color_format,-1, (dsc->antialias == true)? NEMA_FILTER_BL : NEMA_FILTER_PS);
+            nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, color_format, -1,
+                              (dsc->antialias == true) ? NEMA_FILTER_BL : NEMA_FILTER_PS);
 
-        if(recolor){
+        if(recolor) {
             lv_color32_t col32 = {.full = lv_color_to32(dsc->recolor)};
             uint32_t color = nema_rgba(col32.ch.red, col32.ch.green, col32.ch.blue, dsc->recolor_opa);
             nema_set_recolor_color(color);
             blending_mode |= NEMA_BLOP_RECOLOR;
         }
 
-        if(lv_img_cf_is_chroma_keyed(cf)){
+        if(lv_img_cf_is_chroma_keyed(cf)) {
             blending_mode |= NEMA_BLOP_SRC_CKEY;
             lv_color_t ckey = LV_COLOR_CHROMA_KEY;
             lv_color32_t col32 = {.full = lv_color_to32(ckey)};
@@ -199,18 +206,20 @@ void lv_draw_nema_gfx_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_ds
             nema_set_src_color_key(src_color_key);
         }
 
-        if(dsc->opa < 255){
-            uint32_t rgba = ((uint32_t)dsc->opa << 24U) | ((uint32_t)dsc->opa << 16U) | ((uint32_t)dsc->opa << 8U) | ((uint32_t)dsc->opa);
+        if(dsc->opa < 255) {
+            uint32_t rgba = ((uint32_t)dsc->opa << 24U) | ((uint32_t)dsc->opa << 16U) | ((uint32_t)dsc->opa << 8U) | ((
+                                                                                                                          uint32_t)dsc->opa);
             nema_set_const_color(rgba);
             blending_mode |= NEMA_BLOP_MODULATE_A;
         }
 
         nema_set_blend_blit(blending_mode);
 
-        if(!transform){
-            nema_blit_rect( (coords->x1 - draw_ctx->buf_area->x1),
-                            (coords->y1 - draw_ctx->buf_area->y1),tex_w,tex_h);
-        }else{
+        if(!transform) {
+            nema_blit_rect((coords->x1 - draw_ctx->buf_area->x1),
+                           (coords->y1 - draw_ctx->buf_area->y1), tex_w, tex_h);
+        }
+        else {
 
             /*Calculate the transformed points*/
             float x0 = (coords->x1 - draw_ctx->buf_area->x1);
@@ -224,19 +233,19 @@ void lv_draw_nema_gfx_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_ds
 
             nema_matrix3x3_t m;
             nema_mat3x3_load_identity(m);
-            nema_mat3x3_translate(m,-x0,-y0);
-            nema_mat3x3_translate(m,-(float)dsc->pivot.x, -(float)dsc->pivot.y);
-            nema_mat3x3_rotate(m,(dsc->angle / 10.0f));  /* angle is 1/10 degree */
+            nema_mat3x3_translate(m, -x0, -y0);
+            nema_mat3x3_translate(m, -(float)dsc->pivot.x, -(float)dsc->pivot.y);
+            nema_mat3x3_rotate(m, (dsc->angle / 10.0f)); /* angle is 1/10 degree */
             float scale = 1.f * dsc->zoom / LV_IMG_ZOOM_NONE;
             nema_mat3x3_scale(m, (float)scale, (float)scale);
-            nema_mat3x3_translate(m,(float)dsc->pivot.x, (float)dsc->pivot.y);
-            nema_mat3x3_translate(m,x0,y0);
+            nema_mat3x3_translate(m, (float)dsc->pivot.x, (float)dsc->pivot.y);
+            nema_mat3x3_translate(m, x0, y0);
 
             /*Apply Transformation Matrix to Vertices*/
-            nema_mat3x3_mul_vec(m,&x0,&y0);
-            nema_mat3x3_mul_vec(m,&x1,&y1);
-            nema_mat3x3_mul_vec(m,&x2,&y2);
-            nema_mat3x3_mul_vec(m,&x3,&y3);
+            nema_mat3x3_mul_vec(m, &x0, &y0);
+            nema_mat3x3_mul_vec(m, &x1, &y1);
+            nema_mat3x3_mul_vec(m, &x2, &y2);
+            nema_mat3x3_mul_vec(m, &x3, &y3);
 
             nema_blit_quad_fit(x0, y0,
                                x1, y1,
@@ -244,7 +253,7 @@ void lv_draw_nema_gfx_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_ds
                                x3, y3);
         }
         nema_cl_submit(&(nema_gfx_draw_ctx->cl));
-        if(color_format == NEMA_L8){
+        if(color_format == NEMA_L8) {
             nema_cl_wait(&(nema_gfx_draw_ctx->cl));
             nema_buffer_destroy(&Shuffle_pallete_bo);
         }
@@ -253,7 +262,7 @@ void lv_draw_nema_gfx_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_ds
     /*Wait for GPU to finish previous jobs in case of failure and call SW rendering*/
     nema_cl_wait(&(nema_gfx_draw_ctx->cl));
     lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
-	return;
+    return;
 }
 
 
@@ -316,26 +325,28 @@ void lv_draw_nema_gfx_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc
 
         const lv_color_t * src_buf = dsc->src_buf;
 
-        nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(draw_ctx->buf), lv_area_get_width(draw_ctx->buf_area), lv_area_get_height(draw_ctx->buf_area), LV_NEMA_GFX_COLOR_FORMAT, lv_area_get_width(draw_ctx->buf_area)*LV_NEMA_GFX_FORMAT_MULTIPLIER);
+        nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(draw_ctx->buf), lv_area_get_width(draw_ctx->buf_area),
+                          lv_area_get_height(draw_ctx->buf_area), LV_NEMA_GFX_COLOR_FORMAT,
+                          lv_area_get_width(draw_ctx->buf_area)*LV_NEMA_GFX_FORMAT_MULTIPLIER);
 
         //Set Clipping Area
         lv_area_t clip_area;
         lv_area_copy(&clip_area, draw_ctx->clip_area);
         lv_area_move(&clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-        nema_set_clip(clip_area.x1,clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
+        nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
 
         lv_coord_t coords_bg_w = lv_area_get_width(&blend_area);
         lv_coord_t coords_bg_h = lv_area_get_height(&blend_area);
 
-        if(src_buf == NULL){
+        if(src_buf == NULL) {
             //Simple Fill
             uint8_t opacity;
             lv_color32_t col32 = {.full = lv_color_to32(dsc->color)};
-            if(dsc->opa < LV_OPA_MAX && dsc->opa > LV_OPA_MIN){
+            if(dsc->opa < LV_OPA_MAX && dsc->opa > LV_OPA_MIN) {
                 opacity = (uint8_t)(((uint16_t)col32.ch.alpha * dsc->opa) >> 8);
             }
-            else if (dsc->opa >= LV_OPA_MAX){
+            else if(dsc->opa >= LV_OPA_MAX) {
                 opacity = col32.ch.alpha;
             }
 
@@ -346,25 +357,27 @@ void lv_draw_nema_gfx_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc
             else
                 nema_set_blend_fill(NEMA_BL_SRC_OVER);
 
-            nema_fill_rect(blend_area.x1,blend_area.y1,coords_bg_w,coords_bg_h,color);
+            nema_fill_rect(blend_area.x1, blend_area.y1, coords_bg_w, coords_bg_h, color);
             render_on_gpu = true;
         }
-        else{//Full Opaque mask
-            nema_bind_src_tex((uintptr_t)(src_buf),coords_bg_w,coords_bg_h,LV_NEMA_GFX_COLOR_FORMAT,coords_bg_w*LV_NEMA_GFX_FORMAT_MULTIPLIER, NEMA_FILTER_PS);
-            if(dsc->opa < 255){
-                uint32_t rgba = ((uint32_t)dsc->opa << 24U) | ((uint32_t)dsc->opa << 16U) | ((uint32_t)dsc->opa << 8U) | ((uint32_t)dsc->opa);
+        else { //Full Opaque mask
+            nema_bind_src_tex((uintptr_t)(src_buf), coords_bg_w, coords_bg_h, LV_NEMA_GFX_COLOR_FORMAT,
+                              coords_bg_w * LV_NEMA_GFX_FORMAT_MULTIPLIER, NEMA_FILTER_PS);
+            if(dsc->opa < 255) {
+                uint32_t rgba = ((uint32_t)dsc->opa << 24U) | ((uint32_t)dsc->opa << 16U) | ((uint32_t)dsc->opa << 8U) | ((
+                                                                                                                              uint32_t)dsc->opa);
                 nema_set_const_color(rgba);
                 nema_set_blend_blit(NEMA_BL_SIMPLE | NEMA_BLOP_MODULATE_A);
             }
             else
                 nema_set_blend_blit(NEMA_BL_SIMPLE);
 
-            nema_blit_rect(blend_area.x1,blend_area.y1,coords_bg_w,coords_bg_h);
+            nema_blit_rect(blend_area.x1, blend_area.y1, coords_bg_w, coords_bg_h);
             render_on_gpu = true;
         }
     }
 
-    if(render_on_gpu){
+    if(render_on_gpu) {
         nema_cl_submit(&(nema_gfx_draw_ctx->cl));
     }
     else {
@@ -372,7 +385,7 @@ void lv_draw_nema_gfx_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc
         lv_draw_sw_blend_basic(draw_ctx, dsc);
     }
 
-	return;
+    return;
 }
 
 void lv_draw_nema_gfx_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
@@ -395,7 +408,7 @@ void lv_draw_nema_gfx_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
     /* Draw the background */
     nema_dsc.shadow_opa = 0;
     nema_dsc.bg_opa = dsc->bg_opa;
-    if(draw_nema_gfx_bg(draw_ctx, &nema_dsc, coords) == LV_RES_OK){
+    if(draw_nema_gfx_bg(draw_ctx, &nema_dsc, coords) == LV_RES_OK) {
         nema_dsc.bg_opa = 0;
     }
 #endif /*LV_DRAW_COMPLEX*/
@@ -409,7 +422,8 @@ void lv_draw_nema_gfx_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
 
 }
 
-void lv_draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords){
+void lv_draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+{
 
     bool rendered_by_gpu = false;
     lv_draw_rect_dsc_t nema_dsc;
@@ -418,14 +432,15 @@ void lv_draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * ds
     // try to render with GPU
     rendered_by_gpu = (draw_nema_gfx_bg(draw_ctx, &nema_dsc, coords) == LV_RES_OK);
 
-    if(rendered_by_gpu){
+    if(rendered_by_gpu) {
         // rendered with gpu
         // continuew with the rest
         nema_dsc.bg_opa = 0;
-        lv_draw_sw_bg(draw_ctx,&nema_dsc,coords);
-    }else{
+        lv_draw_sw_bg(draw_ctx, &nema_dsc, coords);
+    }
+    else {
         // couldn't draw with gpu
-        lv_draw_sw_bg(draw_ctx,dsc,coords);
+        lv_draw_sw_bg(draw_ctx, dsc, coords);
     }
 }
 
@@ -458,14 +473,16 @@ lv_res_t draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * d
 
     lv_draw_nema_gfx_ctx_t * nema_gfx_draw_ctx = (lv_draw_nema_gfx_ctx_t *)draw_ctx;
 
-    nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(draw_ctx->buf), lv_area_get_width(draw_ctx->buf_area), lv_area_get_height(draw_ctx->buf_area), LV_NEMA_GFX_COLOR_FORMAT, lv_area_get_width(draw_ctx->buf_area)*LV_NEMA_GFX_FORMAT_MULTIPLIER);
+    nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(draw_ctx->buf), lv_area_get_width(draw_ctx->buf_area),
+                      lv_area_get_height(draw_ctx->buf_area), LV_NEMA_GFX_COLOR_FORMAT,
+                      lv_area_get_width(draw_ctx->buf_area)*LV_NEMA_GFX_FORMAT_MULTIPLIER);
     //Set Clipping Area
 
     lv_area_t clip_area;
     lv_area_copy(&clip_area, draw_ctx->clip_area);
     lv_area_move(&clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    nema_set_clip(clip_area.x1,clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
+    nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
 
     lv_coord_t coords_bg_w = lv_area_get_width(&bg_coords);
     lv_coord_t coords_bg_h = lv_area_get_height(&bg_coords);
@@ -478,10 +495,10 @@ lv_res_t draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * d
 
         uint8_t opacity;
         lv_color32_t bg_col32 = {.full = lv_color_to32(dsc->bg_color)};
-        if(dsc->bg_opa < LV_OPA_MAX && dsc->bg_opa > LV_OPA_MIN){
+        if(dsc->bg_opa < LV_OPA_MAX && dsc->bg_opa > LV_OPA_MIN) {
             opacity = (uint8_t)(((uint16_t)bg_col32.ch.alpha * dsc->bg_opa) >> 8);
         }
-        else if (dsc->bg_opa >= LV_OPA_MAX){
+        else if(dsc->bg_opa >= LV_OPA_MAX) {
             opacity = bg_col32.ch.alpha;
         }
 
@@ -495,9 +512,9 @@ lv_res_t draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * d
         uint32_t bg_color = nema_rgba(bg_col32.ch.red, bg_col32.ch.green, bg_col32.ch.blue, opacity);
 
         if(dsc->radius != 0)
-            nema_fill_rounded_rect_aa(bg_coords.x1,bg_coords.y1,coords_bg_w,coords_bg_h,radius,bg_color);
+            nema_fill_rounded_rect_aa(bg_coords.x1, bg_coords.y1, coords_bg_w, coords_bg_h, radius, bg_color);
         else
-            nema_fill_rect(bg_coords.x1,bg_coords.y1,coords_bg_w,coords_bg_h,bg_color);
+            nema_fill_rect(bg_coords.x1, bg_coords.y1, coords_bg_w, coords_bg_h, bg_color);
 
         nema_cl_submit(&(nema_gfx_draw_ctx->cl));
         nema_cl_wait(&(nema_gfx_draw_ctx->cl));
@@ -507,25 +524,31 @@ lv_res_t draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * d
     return LV_RES_INV;
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_nema_gfx_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,const lv_point_t * point1, const lv_point_t * point2){
-    lv_draw_nema_gfx_ctx_t * nema_gfx_draw_ctx = (lv_draw_nema_gfx_ctx_t*)draw_ctx;
+LV_ATTRIBUTE_FAST_MEM void lv_draw_nema_gfx_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+                                                 const lv_point_t * point1, const lv_point_t * point2)
+{
+    lv_draw_nema_gfx_ctx_t * nema_gfx_draw_ctx = (lv_draw_nema_gfx_ctx_t *)draw_ctx;
     //Ensure that GPU has no unfinished workload
     nema_cl_wait(&(nema_gfx_draw_ctx->cl));
-    lv_draw_sw_line(draw_ctx,dsc,point1,point2);
+    lv_draw_sw_line(draw_ctx, dsc, point1, point2);
 }
 
-void lv_draw_nema_gfx_polygon(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t * points, uint16_t point_cnt){
-    lv_draw_nema_gfx_ctx_t * nema_gfx_draw_ctx = (lv_draw_nema_gfx_ctx_t*)draw_ctx;
+void lv_draw_nema_gfx_polygon(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc,
+                              const lv_point_t * points, uint16_t point_cnt)
+{
+    lv_draw_nema_gfx_ctx_t * nema_gfx_draw_ctx = (lv_draw_nema_gfx_ctx_t *)draw_ctx;
     //Ensure that GPU has no unfinished workload
     nema_cl_wait(&(nema_gfx_draw_ctx->cl));
-    lv_draw_sw_polygon(draw_ctx,draw_dsc,points,point_cnt);
+    lv_draw_sw_polygon(draw_ctx, draw_dsc, points, point_cnt);
 }
 
-void lv_draw_nema_gfx_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius, uint16_t start_angle, uint16_t end_angle){
-    lv_draw_nema_gfx_ctx_t * nema_gfx_draw_ctx = (lv_draw_nema_gfx_ctx_t*)draw_ctx;
+void lv_draw_nema_gfx_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
+                          uint16_t radius, uint16_t start_angle, uint16_t end_angle)
+{
+    lv_draw_nema_gfx_ctx_t * nema_gfx_draw_ctx = (lv_draw_nema_gfx_ctx_t *)draw_ctx;
     //Ensure that GPU has no unfinished workload
     nema_cl_wait(&(nema_gfx_draw_ctx->cl));
-    lv_draw_sw_arc(draw_ctx,dsc,center,radius,start_angle,end_angle);
+    lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
 }
 
 #endif

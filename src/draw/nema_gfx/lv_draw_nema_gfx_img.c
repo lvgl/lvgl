@@ -96,7 +96,9 @@ bool lv_img_cf_lut_format(lv_img_cf_t cf)
     return is_lut_format;
 }
 
-lv_res_t lv_draw_nema_gfx_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords,const void * src){
+lv_res_t lv_draw_nema_gfx_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+                              const lv_area_t * coords, const void * src)
+{
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
     _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
@@ -125,7 +127,8 @@ lv_res_t lv_draw_nema_gfx_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_im
     }
     /*The decoder could open the image and gave the entire uncompressed image.
      *Just draw it!*/
-    else if(cdsc->dec_dsc.img_data || (lv_img_cf_alpha_only_format(cdsc->dec_dsc.header.cf)) || lv_img_cf_lut_format(cdsc->dec_dsc.header.cf)) {
+    else if(cdsc->dec_dsc.img_data || (lv_img_cf_alpha_only_format(cdsc->dec_dsc.header.cf)) ||
+            lv_img_cf_lut_format(cdsc->dec_dsc.header.cf)) {
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
         if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
@@ -149,20 +152,21 @@ lv_res_t lv_draw_nema_gfx_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_im
             return LV_RES_OK;
         }
 
-        if(lv_img_cf_alpha_only_format(cdsc->dec_dsc.header.cf)){
+        if(lv_img_cf_alpha_only_format(cdsc->dec_dsc.header.cf)) {
             lv_color32_t tex_col32 = {.full = lv_color_to32(cdsc->dec_dsc.color)};
             uint32_t tex_color = nema_rgba(tex_col32.ch.red, tex_col32.ch.green, tex_col32.ch.blue, 0);
             nema_set_tex_color(tex_color);
             cf = cdsc->dec_dsc.header.cf;
         }
 
-        if(lv_img_cf_lut_format(cdsc->dec_dsc.header.cf)){
+        if(lv_img_cf_lut_format(cdsc->dec_dsc.header.cf)) {
             cf = cdsc->dec_dsc.header.cf;
         }
 
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip_com;
-        uint8_t *img_data = (uint8_t *)(cdsc->dec_dsc.img_data) ? (uint8_t *)(cdsc->dec_dsc.img_data) : (uint8_t *)(((lv_img_dsc_t *)src)->data);
+        uint8_t * img_data = (uint8_t *)(cdsc->dec_dsc.img_data) ? (uint8_t *)(cdsc->dec_dsc.img_data) : (uint8_t *)(((
+                                                                                                                          lv_img_dsc_t *)src)->data);
         lv_draw_img_decoded(draw_ctx, draw_dsc, coords, img_data, cf);
         draw_ctx->clip_area = clip_area_ori;
     }

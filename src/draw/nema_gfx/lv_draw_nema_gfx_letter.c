@@ -62,10 +62,12 @@ void nema_set_matrix(nema_matrix3x3_t m);
  *  STATIC PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
-                                                     const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
+LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_normal(lv_draw_ctx_t * draw_ctx,
+                                                                  const lv_draw_label_dsc_t * dsc,
+                                                                  const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc, lv_font_glyph_dsc_t * g);
+LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_blend(lv_draw_ctx_t * draw_ctx,
+                                                                 const lv_draw_sw_blend_dsc_t * dsc, lv_font_glyph_dsc_t * g);
 
 /**********************
  *  STATIC VARIABLES
@@ -93,7 +95,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_blend(lv_draw_ctx_t *
  * @param opa opacity of letter (0..255)
  */
 void lv_draw_nema_gfx_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
-                       uint32_t letter)
+                             uint32_t letter)
 {
     lv_font_glyph_dsc_t g;
     bool g_ret = lv_font_get_glyph_dsc(dsc->font, &g, letter, '\0');
@@ -155,7 +157,7 @@ void lv_draw_nema_gfx_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
         return;
     }
 
-    if (draw_nema_gfx_letter_normal(draw_ctx, dsc, &gpos, &g, map_p) != LV_RES_OK)
+    if(draw_nema_gfx_letter_normal(draw_ctx, dsc, &gpos, &g, map_p) != LV_RES_OK)
         return lv_draw_sw_letter(draw_ctx, dsc, pos_p, letter);
 }
 
@@ -163,8 +165,9 @@ void lv_draw_nema_gfx_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
-                                                     const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
+LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_normal(lv_draw_ctx_t * draw_ctx,
+                                                                  const lv_draw_label_dsc_t * dsc,
+                                                                  const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
 {
 
     uint32_t bpp = g->bpp;
@@ -213,7 +216,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_normal(lv_draw_ctx_t 
     fill_area.x1 = col_start + pos->x;
     fill_area.x2 = col_end  + pos->x - 1;
     fill_area.y1 = row_start + pos->y;
-	fill_area.y2 = row_end + pos->y - 1;
+    fill_area.y2 = row_end + pos->y - 1;
 
 #if LV_DRAW_COMPLEX
     lv_coord_t fill_w = lv_area_get_width(&fill_area);
@@ -230,33 +233,36 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_normal(lv_draw_ctx_t 
     blend_dsc.mask_area = &fill_area;
 
 #if LV_DRAW_COMPLEX
-        /*Apply masks if any*/
-        if(mask_any) {
-            return LV_RES_INV;
-        }
+    /*Apply masks if any*/
+    if(mask_any) {
+        return LV_RES_INV;
+    }
 #endif
-		lv_res_t result = draw_nema_gfx_letter_blend(draw_ctx, &blend_dsc,g);
-        return result;
+    lv_res_t result = draw_nema_gfx_letter_blend(draw_ctx, &blend_dsc, g);
+    return result;
 }
 
-static inline uint8_t _bpp_nema_gfx_format(lv_font_glyph_dsc_t * g){
+static inline uint8_t _bpp_nema_gfx_format(lv_font_glyph_dsc_t * g)
+{
 
     uint32_t bpp = g->bpp ;
     if(bpp == 3) bpp = 4;
 
-    switch(bpp){
+    switch(bpp) {
         case 1:
             return NEMA_A1;
         case 2:
             return NEMA_A2;
         case 4:
             return NEMA_A4;
-		default:
-			return NEMA_A8;
+        default:
+            return NEMA_A8;
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc, lv_font_glyph_dsc_t * g) {
+LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_blend(lv_draw_ctx_t * draw_ctx,
+                                                                 const lv_draw_sw_blend_dsc_t * dsc, lv_font_glyph_dsc_t * g)
+{
     lv_draw_nema_gfx_ctx_t * nema_gfx_draw_ctx = (lv_draw_nema_gfx_ctx_t *)draw_ctx;
 
     lv_area_t blend_area;
@@ -268,21 +274,23 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_blend(lv_draw_ctx_t *
     /*Make the blend area relative to the buffer*/
     lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(draw_ctx->buf), lv_area_get_width(draw_ctx->buf_area), lv_area_get_height(draw_ctx->buf_area), LV_NEMA_GFX_COLOR_FORMAT, lv_area_get_width(draw_ctx->buf_area)*LV_NEMA_GFX_FORMAT_MULTIPLIER);
+    nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(draw_ctx->buf), lv_area_get_width(draw_ctx->buf_area),
+                      lv_area_get_height(draw_ctx->buf_area), LV_NEMA_GFX_COLOR_FORMAT,
+                      lv_area_get_width(draw_ctx->buf_area)*LV_NEMA_GFX_FORMAT_MULTIPLIER);
 
     //Set Clipping Area
     lv_area_t clip_area;
     lv_area_copy(&clip_area, draw_ctx->clip_area);
     lv_area_move(&clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    nema_set_clip(clip_area.x1,clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
+    nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
 
     uint8_t opacity;
     lv_color32_t col32 = {.full = lv_color_to32(dsc->color)};
-    if(dsc->opa < LV_OPA_MAX && dsc->opa > LV_OPA_MIN){
+    if(dsc->opa < LV_OPA_MAX && dsc->opa > LV_OPA_MIN) {
         opacity = (uint8_t)(((uint16_t)col32.ch.alpha * dsc->opa) >> 8);
     }
-    else if (dsc->opa >= LV_OPA_MAX){
+    else if(dsc->opa >= LV_OPA_MAX) {
         opacity = col32.ch.alpha;
     }
 
@@ -295,23 +303,24 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t draw_nema_gfx_letter_blend(lv_draw_ctx_t *
     lv_coord_t w = g->box_w;
     lv_coord_t h = g->box_h;
 
-    nema_bind_src_tex((uintptr_t)(dsc->mask_buf),w*h,1,_bpp_nema_gfx_format(g),-1,1);
+    nema_bind_src_tex((uintptr_t)(dsc->mask_buf), w * h, 1, _bpp_nema_gfx_format(g), -1, 1);
 
-    if(opacity < 255U){
+    if(opacity < 255U) {
         nema_set_blend_blit(NEMA_BL_SIMPLE | NEMA_BLOP_MODULATE_A);
         nema_set_const_color(color);
     }
-    else{
+    else {
         nema_set_blend_blit(NEMA_BL_SIMPLE);
     }
 
-    nema_matrix3x3_t m =
-    {1,    w,   -x-(y*w) -(0.5*w),
-     0,    1,                   0,
-     0,    0,                   1};
+    nema_matrix3x3_t m = {
+        1,    w,   -x - (y * w) - (0.5 * w),
+        0,    1,                   0,
+        0,    0,                   1
+    };
 
     nema_set_matrix(m);
-    nema_raster_rect(x,y,w,h);
+    nema_raster_rect(x, y, w, h);
 
     nema_cl_submit(&(nema_gfx_draw_ctx->cl));
 

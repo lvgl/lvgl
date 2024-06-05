@@ -55,29 +55,29 @@ extern "C" {
  *      DEFINES
  *********************/
 
- #ifndef NEMA_VIRT2PHYS
- #define NEMA_VIRT2PHYS
- #endif
+#ifndef NEMA_VIRT2PHYS
+#define NEMA_VIRT2PHYS
+#endif
 
- /*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
+/*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
 #if LV_COLOR_DEPTH == 8
-    #define LV_NEMA_GFX_COLOR_FORMAT NEMA_RGB332
-    #define LV_NEMA_GFX_FORMAT_MULTIPLIER 1
+#define LV_NEMA_GFX_COLOR_FORMAT NEMA_RGB332
+#define LV_NEMA_GFX_FORMAT_MULTIPLIER 1
 #elif LV_COLOR_DEPTH == 16
-    #define LV_NEMA_GFX_COLOR_FORMAT NEMA_RGB565
-    #define LV_NEMA_GFX_FORMAT_MULTIPLIER 2
+#define LV_NEMA_GFX_COLOR_FORMAT NEMA_RGB565
+#define LV_NEMA_GFX_FORMAT_MULTIPLIER 2
 #elif LV_COLOR_DEPTH == 32
-    #define LV_NEMA_GFX_COLOR_FORMAT NEMA_BGRA8888
-    #define LV_NEMA_GFX_FORMAT_MULTIPLIER 4
+#define LV_NEMA_GFX_COLOR_FORMAT NEMA_BGRA8888
+#define LV_NEMA_GFX_FORMAT_MULTIPLIER 4
 #else
-    /*Can't use GPU with other formats*/
+/*Can't use GPU with other formats*/
 #endif
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-typedef struct{
+typedef struct {
     lv_draw_sw_ctx_t base_sw_ctx;
     /*Add other needed fields here*/
     nema_cmdlist_t cl;
@@ -102,22 +102,24 @@ void lv_draw_nema_gfx_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * ds
 void lv_draw_nema_gfx_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_nema_gfx_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                                    const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf);
+                                  const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf);
 
 void lv_draw_nema_gfx_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
-                       uint32_t letter);
+                             uint32_t letter);
 
-void lv_draw_nema_gfx_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,
-                    uint16_t start_angle, uint16_t end_angle);
+void lv_draw_nema_gfx_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
+                          uint16_t radius,
+                          uint16_t start_angle, uint16_t end_angle);
 
 void lv_draw_nema_gfx_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
-                                           const lv_point_t * point1, const lv_point_t * point2);
+                           const lv_point_t * point1, const lv_point_t * point2);
 
 void lv_draw_nema_gfx_polygon(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc,
-                        const lv_point_t * points, uint16_t point_cnt);
+                              const lv_point_t * points, uint16_t point_cnt);
 
-lv_res_t  lv_draw_nema_gfx_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                 const void * src);
+lv_res_t  lv_draw_nema_gfx_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+                               const lv_area_t * coords,
+                               const void * src);
 
 /**********************
  *      MACROS
