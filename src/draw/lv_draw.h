@@ -26,7 +26,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_DRAW_UNIT_ID_ANY  0
+#define LV_DRAW_UNIT_NONE  0
 
 /**********************
  *      TYPEDEFS
@@ -264,7 +264,7 @@ void lv_draw_dispatch_request(void);
  * Find and available draw task
  * @param layer             the draw ctx to search in
  * @param t_prev            continue searching from this task
- * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_ID_ANY`
+ * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
  * @return                  tan available draw task or NULL if there is no any
  */
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
