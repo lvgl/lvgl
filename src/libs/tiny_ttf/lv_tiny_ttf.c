@@ -308,7 +308,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
 #endif
 
     /*Init cache*/
-    dsc->glyph_cache = lv_cache_create(& lv_cache_class_lru_rb_count, sizeof(tiny_ttf_cache_data_t), cache_size,
+    dsc->glyph_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_glyph_cache_data_t), cache_size,
     (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_glyph_cache_compare_cb,
         .create_cb = (lv_cache_create_cb_t)tiny_ttf_glyph_cache_create_cb,
@@ -316,7 +316,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     });
     lv_cache_set_name(dsc->glyph_cache, "TINY_TTF_GLYPH");
 
-    dsc->draw_data_cache = lv_cache_create(& lv_cache_class_lru_rb_count, sizeof(tiny_ttf_cache_data_t), cache_size,
+    dsc->draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_cache_data_t), cache_size,
     (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_draw_data_cache_compare_cb,
         .create_cb = (lv_cache_create_cb_t)tiny_ttf_draw_data_cache_create_cb,
