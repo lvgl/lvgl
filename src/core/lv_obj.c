@@ -42,6 +42,10 @@
     #include "../draw/nxp/pxp/lv_gpu_nxp_pxp.h"
 #endif
 
+#if LV_USE_NEMA_GFX
+    #include "../draw/nema_gfx/lv_draw_nema_gfx.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -135,6 +139,11 @@ void lv_init(void)
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
     PXP_COND_STOP(!lv_gpu_nxp_pxp_init(), "PXP init failed.");
+#endif
+
+#if LV_USE_NEMA_GFX
+    /*Initialize NEMA GPU*/
+    lv_draw_nema_gfx_init();
 #endif
 
     _lv_obj_style_init();

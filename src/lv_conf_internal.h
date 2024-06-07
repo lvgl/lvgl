@@ -416,6 +416,15 @@
  * GPU
  *-----------*/
 
+/*Use TSi's (aka Think Silicon) acceleration library NemaGFX */
+#ifndef LV_USE_NEMA_GFX
+    #ifdef CONFIG_LV_USE_NEMA_GFX
+        #define LV_USE_NEMA_GFX CONFIG_LV_USE_NEMA_GFX
+    #else
+        #define LV_USE_NEMA_GFX 0
+    #endif
+#endif
+
 /*Use Arm's 2D acceleration library Arm-2D */
 #ifndef LV_USE_GPU_ARM2D
     #ifdef CONFIG_LV_USE_GPU_ARM2D
