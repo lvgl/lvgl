@@ -27,6 +27,7 @@
  * so for simplicity, they are uniformly converted to I8 for display.
  */
 #define DEST_IMG_FORMAT LV_COLOR_FORMAT_I8
+#define IS_CONV_INDEX_FORMAT(cf) (cf == LV_COLOR_FORMAT_I1 || cf == LV_COLOR_FORMAT_I2 || cf == LV_COLOR_FORMAT_I4)
 
 /* Since the palette and index image are next to each other,
  * the palette size needs to be aligned to ensure that the image is aligned.
@@ -162,12 +163,17 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
         return LV_RESULT_OK;
     }
 
-    if(LV_COLOR_FORMAT_IS_INDEXED(header->cf)) {
-        header->cf = DEST_IMG_FORMAT;
-        return LV_RESULT_OK;
+    if(!IS_CONV_INDEX_FORMAT(header->cf)) {
+        return LV_RESULT_INVALID;
     }
 
-    return LV_RESULT_INVALID;
+    if(header->flags & LV_IMAGE_FLAGS_COMPRESSED) {
+        LV_LOG_WARN("NOT Supported compressed index format: %d", header->cf);
+        return LV_RESULT_INVALID;
+    }
+
+    header->cf = DEST_IMG_FORMAT;
+    return LV_RESULT_OK;
 }
 
 static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
@@ -234,7 +240,7 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     /* copy palette */
     lv_memcpy(dest, src, palette_size_bytes);
 
-    if(!dsc->args.premultiply) {
+    if(dsc->args.premultiply) {
         /* pre-multiply palette */
         image_color32_pre_mul((lv_color32_t *)dest, palette_size);
         draw_buf->header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
