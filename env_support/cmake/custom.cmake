@@ -88,12 +88,12 @@ endif()
 
 # Library and headers can be installed to system using make install
 file(GLOB LVGL_PUBLIC_HEADERS
-    "${CMAKE_SOURCE_DIR}/lvgl.h"
-    "${CMAKE_SOURCE_DIR}/lv_version.h")
+    "${LVGL_ROOT_DIR}/lvgl.h"
+    "${LVGL_ROOT_DIR}/lv_version.h")
 
 if(NOT LV_CONF_SKIP)
-file(GLOB LVGL_PUBLIC_HEADERS
-	"${CMAKE_SOURCE_DIR}/lv_conf.h")
+	list(APPEND LVGL_PUBLIC_HEADERS
+		"${CMAKE_SOURCE_DIR}/lv_conf.h")
 endif()
 
 if("${LIB_INSTALL_DIR}" STREQUAL "")
@@ -112,6 +112,12 @@ install(
   DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
   FILES_MATCHING
   PATTERN "*.h")
+
+# Install headers from the LVGL_PUBLIC_HEADERS variable
+install(
+  FILES ${LVGL_PUBLIC_HEADERS}
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+)
 
 # install example headers
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
