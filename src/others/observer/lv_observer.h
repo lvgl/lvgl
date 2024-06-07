@@ -272,6 +272,13 @@ void lv_observer_remove(lv_observer_t * observer);
 void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj);
 
 /**
+ * Remove the observers of an object from a subject
+ * @param obj       the object whose observers should be removed
+ * @param subject   the subject to remove the object from, or `NULL` to remove from all subjects
+ */
+void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject);
+
+/**
  * Get the target of an observer
  * @param observer      pointer to an observer
  * @return              pointer to the saved target
