@@ -75,10 +75,10 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD))
         flags = LFS_O_RDWR;
 
-    LittleFile * lf = (LittleFile *)lv_malloc(sizeof(LittleFile));
+    LittleFile * lf = lv_malloc(sizeof(LittleFile));
     LV_ASSERT_MALLOC(lf);
 
-    lfs_t * lfs = (lfs_t *)drv->user_data;
+    lfs_t * lfs = drv->user_data;
     int err = lfs_file_open(lfs, &lf->file, path, flags);
     if(err) {
         return NULL;
@@ -95,9 +95,9 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
  */
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
-    LittleFile * lf = (LittleFile *)file_p;
+    LittleFile * lf = file_p;
 
-    lfs_t * lfs = (lfs_t *)drv->user_data;
+    lfs_t * lfs = drv->user_data;
     lfs_file_close(lfs, &lf->file);
     lv_free(lf);
 
@@ -115,9 +115,9 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
-    LittleFile * lf = (LittleFile *)file_p;
+    LittleFile * lf = file_p;
 
-    lfs_t * lfs = (lfs_t *)drv->user_data;
+    lfs_t * lfs = drv->user_data;
     *br = lfs_file_read(lfs, &lf->file, (uint8_t *)buf, btr);
 
     return (int32_t)(*br) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -134,9 +134,9 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
-    LittleFile * lf = (LittleFile *)file_p;
+    LittleFile * lf = file_p;
 
-    lfs_t * lfs = (lfs_t *)drv->user_data;
+    lfs_t * lfs = drv->user_data;
     *bw = lfs_file_write(lfs, &lf->file, (uint8_t *)buf, btw);
 
     return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -160,9 +160,9 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
     else if(whence == LV_FS_SEEK_END)
         mode = LFS_SEEK_END;
 
-    LittleFile * lf = (LittleFile *)file_p;
+    LittleFile * lf = file_p;
 
-    lfs_t * lfs = (lfs_t *)drv->user_data;
+    lfs_t * lfs = drv->user_data;
     int rc = lfs_file_seek(lfs, &lf->file, pos, mode);
 
     return rc < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -177,9 +177,9 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
-    LittleFile * lf = (LittleFile *)file_p;
+    LittleFile * lf = file_p;
 
-    lfs_t * lfs = (lfs_t *)drv->user_data;
+    lfs_t * lfs = drv->user_data;
     *pos_p = lfs_file_tell(lfs, &lf->file);
 
     return (int32_t)(*pos_p) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
@@ -193,12 +193,13 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
  */
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
-    LittleDirectory * ld = (LittleDirectory *)lv_malloc(sizeof(LittleDirectory));
+    LittleDirectory * ld = lv_malloc(sizeof(LittleDirectory));
     LV_ASSERT_MALLOC(ld);
 
-    lfs_t * lfs = (lfs_t *)drv->user_data;
+    lfs_t * lfs = drv->user_data;
     int err = lfs_dir_open(lfs, &ld->dir, path);
     if(err != LFS_ERR_OK) {
+        lv_free(ld);
         return NULL;
     }
 
@@ -213,9 +214,9 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
  */
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
-    LittleDirectory * ld = (LittleDirectory *)dir_p;
+    LittleDirectory * ld = dir_p;
 
-    lfs_t * lfs = (lfs_t *)drv->user_data;
+    lfs_t * lfs = drv->user_data;
     int rc = lfs_dir_close(lfs, &ld->dir);
 
     if(rc < 0) return LV_FS_RES_UNKNOWN;
@@ -236,17 +237,14 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
 {
     if(fn_len == 0) return LV_FS_RES_INV_PARAM;
 
-    LittleDirectory * lf = (LittleDirectory *)dir_p;
+    LittleDirectory * lf = dir_p;
 
-    lfs_t * lfs = (lfs_t *)drv->user_data;
-
-    LV_UNUSED(drv);
-    int res;
-    struct lfs_info info;
+    lfs_t * lfs = drv->user_data;
 
     fn[0] = '\0';
     do {
-        res = lfs_dir_read(lfs, &lf->dir, &info);
+        struct lfs_info info;
+        int res = lfs_dir_read(lfs, &lf->dir, &info);
 
         if(res < 0) return LV_FS_RES_UNKNOWN;
         if(res == 0) { /* End of the directory */
@@ -255,8 +253,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         }
 
         if(info.type != LFS_TYPE_DIR) {
-            lv_strncpy(fn, info.name, fn_len - 1);
-            fn[fn_len - 1] = '\0';
+            lv_strlcpy(fn, info.name, fn_len);
         }
         else {
             lv_snprintf(fn, fn_len, "/%s", info.name);

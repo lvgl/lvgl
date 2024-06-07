@@ -48,8 +48,8 @@ void lv_fs_memfs_init(void);
 #endif
 
 #if LV_USE_FS_LITTLEFS
-#include "lfs.h"
-void lv_littlefs_set_handler(lfs_t *);
+struct lfs;
+void lv_littlefs_set_handler(struct lfs *);
 void lv_fs_littlefs_init(void);
 #endif
 
