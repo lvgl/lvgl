@@ -336,6 +336,18 @@ if ($ENV{NON_AMD64_BUILD})
     include_directories(${LIBINPUT_INCLUDE_DIRS})
 endif()
 
+# OpenGL ES is required for its driver
+if (NOT $ENV{NON_AMD64_BUILD})
+    find_package(OpenGL REQUIRED)
+    find_package(GLEW REQUIRED)
+    find_package(glfw3 REQUIRED)
+
+    # Include directories
+    include_directories(${OPENGL_INCLUDE_DIR})
+    include_directories(${GLEW_INCLUDE_DIRS})
+    include_directories(${GLFW_INCLUDE_DIRS})
+endif()
+
 if (NOT LIBINPUT_FOUND)
     message("libinput not found, defaulting to 0")
     add_definitions(-DLV_USE_LIBINPUT=0)
@@ -423,6 +435,13 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             m
             pthread
             ${TEST_LIBS})
+
+	if (NOT $ENV{NON_AMD64_BUILD})
+	    target_link_libraries(${test_name} PRIVATE
+    	        ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+	endif()
+
+
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
