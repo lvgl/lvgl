@@ -30,13 +30,15 @@ extern "C" {
 #define LV_PROPERTY_TYPE_POINTER        4   /*void * pointer*/
 #define LV_PROPERTY_TYPE_IMGSRC         5   /*Special pointer for image*/
 
-#define LV_PROPERTY_ID(clz, name, type, index)    LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << 28)
+#define LV_PROPERTY_TYPE_SHIFT          28
+#define LV_PROPERTY_ID(clz, name, type, index)    LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << LV_PROPERTY_TYPE_SHIFT)
 
-#define LV_PROPERTY_ID_TYPE(id) ((id) >> 28)
+#define LV_PROPERTY_ID_TYPE(id) ((id) >> LV_PROPERTY_TYPE_SHIFT)
 #define LV_PROPERTY_ID_INDEX(id) ((id) & 0xfffffff)
 
 /*Set properties from an array of lv_property_t*/
 #define LV_OBJ_SET_PROPERTY_ARRAY(obj, array) lv_obj_set_properties(obj, array, sizeof(array)/sizeof(array[0]))
+
 
 /**********************
  *      TYPEDEFS
@@ -48,9 +50,10 @@ extern "C" {
 enum {
     LV_PROPERTY_ID_INVALID      = 0,
 
-    /*ID 0 to 0xff are style ID, check lv_style_prop_t*/
-    LV_PROPERTY_ID_START        = 0x100, /*ID little than 0xff is style ID*/
+    /*ID 0x01 to 0xff are style ID, check lv_style_prop_t*/
+    LV_PROPERTY_STYLE_START     = 0x01,
 
+    LV_PROPERTY_ID_START        = 0x100, /*ID little than 0xff is style ID*/
     /*Define the property ID for every widget here. */
     LV_PROPERTY_OBJ_START       = 0x100, /* lv_obj.c */
     LV_PROPERTY_IMAGE_START     = 0x200, /* lv_image.c */

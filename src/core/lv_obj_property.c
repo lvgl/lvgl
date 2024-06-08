@@ -52,13 +52,14 @@ lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
 {
     LV_ASSERT(obj && value);
 
-    if(value->id == LV_PROPERTY_ID_INVALID) {
+    uint32_t index = LV_PROPERTY_ID_INDEX(value->id);
+    if(value->id == LV_PROPERTY_ID_INVALID || index < LV_PROPERTY_STYLE_START || index >= LV_PROPERTY_ID_BUILTIN_LAST) {
         LV_LOG_WARN("Invalid property id set to %p", obj);
         return LV_RESULT_INVALID;
     }
 
-    if(value->id < LV_PROPERTY_ID_START) {
-        lv_obj_set_local_style_prop(obj, value->id, value->style, value->selector);
+    if(index < LV_PROPERTY_ID_START) {
+        lv_obj_set_local_style_prop(obj, index, value->style, value->selector);
         return LV_RESULT_OK;
     }
 
@@ -82,15 +83,16 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
     lv_result_t result;
     lv_property_t value;
 
-    if(id == LV_PROPERTY_ID_INVALID) {
+    uint32_t index = LV_PROPERTY_ID_INDEX(id);
+    if(id == LV_PROPERTY_ID_INVALID || index < LV_PROPERTY_STYLE_START || index >= LV_PROPERTY_ID_BUILTIN_LAST) {
         LV_LOG_WARN("Invalid property id to get from %p", obj);
         value.id = LV_PROPERTY_ID_INVALID;
         value.num = 0;
         return value;
     }
 
-    if(id < LV_PROPERTY_ID_START) {
-        lv_obj_get_local_style_prop(obj, id, &value.style, 0);
+    if(index < LV_PROPERTY_ID_START) {
+        lv_obj_get_local_style_prop(obj, index, &value.style, 0);
         value.id = id;
         value.selector = 0;
         return value;
