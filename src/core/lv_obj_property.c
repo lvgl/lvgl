@@ -21,13 +21,17 @@
  **********************/
 
 typedef void (*lv_property_set_int_t)(lv_obj_t *, int32_t);
-typedef void (*lv_property_set_pointer_t)(lv_obj_t *, const void *);
+typedef void (*lv_property_set_precise_t)(lv_obj_t *, lv_value_precise_t);
 typedef void (*lv_property_set_color_t)(lv_obj_t *, lv_color_t);
+typedef void (*lv_property_set_point_t)(lv_obj_t *, lv_point_t *);
+typedef void (*lv_property_set_pointer_t)(lv_obj_t *, const void *);
 typedef lv_result_t (*lv_property_setter_t)(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
 
 typedef int32_t (*lv_property_get_int_t)(const lv_obj_t *);
-typedef void * (*lv_property_get_pointer_t)(const lv_obj_t *);
+typedef lv_value_precise_t (*lv_property_get_precise_t)(const lv_obj_t *);
 typedef lv_color_t (*lv_property_get_color_t)(const lv_obj_t *);
+typedef lv_point_t (*lv_property_get_point_t)(lv_obj_t *);
+typedef void * (*lv_property_get_pointer_t)(const lv_obj_t *);
 typedef lv_result_t (*lv_property_getter_t)(const lv_obj_t *, lv_prop_id_t, lv_property_t *);
 
 /**********************
@@ -167,23 +171,41 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
             if(!set) value->id = prop->id;
 
             switch(LV_PROPERTY_ID_TYPE(prop->id)) {
-                case LV_PROPERTY_TYPE_INT:
-                    if(set)((lv_property_set_int_t)(prop->setter))(obj, value->num);
-                    else value->num = ((lv_property_get_int_t)(prop->getter))(obj);
-                    break;
+                case LV_PROPERTY_TYPE_INT: {
+                        if(set)((lv_property_set_int_t)(prop->setter))(obj, value->num);
+                        else value->num = ((lv_property_get_int_t)(prop->getter))(obj);
+                        break;
+                    }
+                case LV_PROPERTY_TYPE_PRECISE: {
+                        if(set)((lv_property_set_precise_t)(prop->setter))(obj, value->precise);
+                        else value->precise = ((lv_property_get_precise_t)(prop->getter))(obj);
+                        break;
+                    }
+                case LV_PROPERTY_TYPE_COLOR: {
+                        if(set)((lv_property_set_color_t)prop->setter)(obj, value->color);
+                        else value->color = ((lv_property_get_color_t)(prop->getter))(obj);
+                        break;
+                    }
+                case LV_PROPERTY_TYPE_POINT: {
+                        lv_point_t * point = &value->point;
+                        if(set)((lv_property_set_point_t)(prop->setter))(obj, point);
+                        else *point = ((lv_property_get_point_t)(prop->getter))(obj);
+                        break;
+                    }
                 case LV_PROPERTY_TYPE_POINTER:
                 case LV_PROPERTY_TYPE_IMGSRC:
-                    if(set)((lv_property_set_pointer_t)(prop->setter))(obj, value->ptr);
-                    else value->ptr = ((lv_property_get_pointer_t)(prop->getter))(obj);
-                    break;
-                case LV_PROPERTY_TYPE_COLOR:
-                    if(set)((lv_property_set_color_t)prop->setter)(obj, value->color);
-                    else value->color = ((lv_property_get_color_t)(prop->getter))(obj);
-                    break;
-                default:
-                    LV_LOG_WARN("Unknown property id: 0x%08x", prop->id);
-                    return LV_RESULT_INVALID;
-                    break;
+                case LV_PROPERTY_TYPE_TEXT:
+                case LV_PROPERTY_TYPE_OBJ:
+                case LV_PROPERTY_TYPE_DISPLAY:
+                case LV_PROPERTY_TYPE_FONT: {
+                        if(set)((lv_property_set_pointer_t)(prop->setter))(obj, value->ptr);
+                        else value->ptr = ((lv_property_get_pointer_t)(prop->getter))(obj);
+                        break;
+                    }
+                default: {
+                        LV_LOG_WARN("Unknown property id: 0x%08x", prop->id);
+                        return LV_RESULT_INVALID;
+                    }
             }
 
             return LV_RESULT_OK;
