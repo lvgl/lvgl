@@ -199,6 +199,46 @@ menu "LVGL configuration"
 		help
 			Required to draw anything on the screen.
 
+		config LV_DRAW_SW_SUPPORT_RGB565
+			bool "Enable support for RGB565 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_RGB565A8
+			bool "Enable support for RGB565A8 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_RGB888
+			bool "Enable support for RGB888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_XRGB8888
+			bool "Enable support for XRGB8888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_ARGB8888
+			bool "Enable support for ARGB8888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_L8
+			bool "Enable support for L8 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_AL88
+			bool "Enable support for AL88 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_A8
+			bool "Enable support for A8 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+				
 		config LV_DRAW_SW_DRAW_UNIT_CNT
 			int "Number of draw units"
 			default 1
@@ -1645,6 +1685,15 @@ menu "LVGL configuration"
 
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
+			default n
+
+		config LV_USE_OPENGLES
+			bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
+			default n
+
+		config LV_USE_OPENGLES_DEBUG
+			bool "Enable debug mode for OpenGL"
+			depends on LV_USE_OPENGLES
 			default n
 	endmenu
 

@@ -393,6 +393,10 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
     uint32_t w = header->w;
     uint32_t h = header->h;
 
+    if(!lv_draw_buf_has_flag(src, LV_IMAGE_FLAGS_MODIFIABLE)) {
+        return LV_RESULT_INVALID;
+    }
+
     /*Use global stride*/
     if(stride == 0) stride = lv_draw_buf_width_to_stride(w, header->cf);
 

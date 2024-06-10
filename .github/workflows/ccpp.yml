@@ -88,7 +88,7 @@ jobs:
       with:
         name: screenshot-errors-amd64
         path: |
-             tests/ref_imgs/**/*_err.png
+             tests/ref_imgs*/**/*_err.png
              test_screenshot_error.h
 #    - name: Upload coverage to Codecov
 #      uses: codecov/codecov-action@v4

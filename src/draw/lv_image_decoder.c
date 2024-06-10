@@ -124,7 +124,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
 
     /* Flush the D-Cache if enabled and the image was successfully opened */
-    if(dsc->args.flush_cache && res == LV_RESULT_OK) {
+    if(dsc->args.flush_cache && res == LV_RESULT_OK && dsc->decoded != NULL) {
         lv_draw_buf_flush_cache(dsc->decoded, NULL);
         LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%" LV_PRId32 " x H%" LV_PRId32 ", data: %p cf: %d)",
                     src,
