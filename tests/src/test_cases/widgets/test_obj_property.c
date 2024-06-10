@@ -232,4 +232,21 @@ void test_obj_property_state(void)
 #endif
 }
 
+void test_obj_property_type_point(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_image_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_IMAGE_PIVOT;
+    prop.point.x = 0x1234;
+    prop.point.y = 0x5678;
+
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    lv_property_t prop_get = lv_obj_get_property(obj, LV_PROPERTY_IMAGE_PIVOT);
+    TEST_ASSERT_EQUAL_UINT16(0x1234, prop_get.point.x);
+    TEST_ASSERT_EQUAL_UINT16(0x5678, prop_get.point.y);
+#endif
+}
+
 #endif
