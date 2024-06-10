@@ -38,7 +38,7 @@ Tick drawing order
 You can set the drawing of the ticks on top of the main line with :cpp:expr:`lv_scale_set_draw_ticks_on_top(scale, true)`. The default
 drawing order is below the main line.
 
-This is an scale with the ticks being drawn below of the main line (default):
+This is a scale with the ticks being drawn below of the main line (default):
 
 .. image:: /misc/scale_ticks_below.png
 
