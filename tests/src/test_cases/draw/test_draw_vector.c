@@ -59,7 +59,7 @@ static void draw_shapes(lv_layer_t * layer)
     lv_matrix_t mt;
     lv_matrix_identity(&mt);
     lv_vector_dsc_set_fill_transform(ctx, &mt);
-    lv_vector_dsc_set_fill_radial_gradient(ctx, 99.5, 99.5, 50);
+    lv_vector_dsc_set_fill_radial_gradient(ctx, 100, 100, 50);
     lv_vector_dsc_set_fill_gradient_color_stops(ctx, stops, 2);
     lv_vector_dsc_set_fill_gradient_spread(ctx, LV_VECTOR_GRADIENT_SPREAD_PAD);
     lv_vector_dsc_add_path(ctx, path);
