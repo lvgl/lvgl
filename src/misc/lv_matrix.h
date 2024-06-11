@@ -79,7 +79,7 @@ void lv_matrix_skew(lv_matrix_t * matrix, float skew_x, float skew_y);
  * @param matrix           pointer to a matrix
  * @param matrix2          pointer to another matrix
  */
-void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * matrix2);
+void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * mul);
 
 /**
  * Invert the matrix
@@ -104,6 +104,13 @@ lv_point_precise_t lv_matrix_transform_precise_point(const lv_matrix_t * matrix,
  * @return the transformed area
  */
 lv_area_t lv_matrix_transform_area(const lv_matrix_t * matrix, const lv_area_t * area);
+
+/**
+ * Check if the matrix is identity or translation matrix
+ * @param matrix           pointer to a matrix
+ * @return true: the matrix is identity or translation matrix, false: the matrix is not identity or translation matrix
+ */
+bool lv_matrix_is_identity_or_translation(const lv_matrix_t * matrix);
 
 /**********************
  *      MACROS

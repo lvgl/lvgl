@@ -953,8 +953,12 @@ static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
     lv_area_t clip_area = layer->_clip_area;
     lv_area_t clip_area_ori = layer->_clip_area;
     clip_area = lv_matrix_transform_area(&matrix_reverse, &clip_area);
+
     /* increase the clip area by 1 pixel to avoid rounding errors */
-    lv_area_increase(&clip_area, 1, 1);
+    if(!lv_matrix_is_identity_or_translation(&obj_matrix)) {
+        lv_area_increase(&clip_area, 1, 1);
+    }
+
     layer->_clip_area = clip_area;
 
     /* redraw obj */
