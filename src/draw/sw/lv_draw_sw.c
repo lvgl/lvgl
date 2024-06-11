@@ -29,6 +29,10 @@
     #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 #endif
 
+#if LV_DRAW_SW_DRAW_UNIT_CNT > 1 && LV_USE_OS == LV_OS_NONE
+    #error "OS support is required when more than one SW rendering units are enabled"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
