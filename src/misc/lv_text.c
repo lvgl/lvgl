@@ -164,12 +164,11 @@ void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid line breaks
  * @param flags settings for the text from 'txt_flag_type' enum
  * @param[out] word_w_ptr width (in pixels) of the parsed word. May be NULL.
- * @param force Force return the fraction of the word that can fit in the provided space.
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
  */
 static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
                                       int32_t letter_space, int32_t max_width,
-                                      lv_text_flag_t flag, uint32_t * word_w_ptr, bool force)
+                                      lv_text_flag_t flag, uint32_t * word_w_ptr)
 {
     if(txt == NULL || txt[0] == '\0') return 0;
     if(font == NULL) return 0;
@@ -239,14 +238,14 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
 #if LV_TXT_LINE_BREAK_LONG_LEN > 0
     /*Word doesn't fit in provided space, but isn't "long"*/
     if(word_len < LV_TXT_LINE_BREAK_LONG_LEN) {
-        if(force) return break_index;
+        if(flag & LV_TEXT_FLAG_BREAK_ALL) return break_index;
         if(word_w_ptr != NULL) *word_w_ptr = 0; /*Return no word*/
         return 0;
     }
 
     /*Word is "long," but insufficient amounts can fit in provided space*/
     if(break_letter_count < LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN) {
-        if(force) return break_index;
+        if(flag & LV_TEXT_FLAG_BREAK_ALL) return break_index;
         if(word_w_ptr != NULL) *word_w_ptr = 0;
         return 0;
     }
@@ -266,7 +265,7 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
     }
     return i;
 #else
-    if(force) return break_index;
+    if(flag & LV_TEXT_FLAG_BREAK_ALL) return break_index;
     if(word_w_ptr != NULL) *word_w_ptr = 0; /*Return no word*/
     (void) break_letter_count;
     return 0;
@@ -301,8 +300,11 @@ uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font,
     uint32_t i = 0;                                        /*Iterating index into txt*/
 
     while(txt[i] != '\0' && max_width > 0) {
+        lv_text_flag_t word_flag = flag;
+        if(i == 0) word_flag |= LV_TEXT_FLAG_BREAK_ALL;
+
         uint32_t word_w = 0;
-        uint32_t advance = lv_text_get_next_word(&txt[i], font, letter_space, max_width, flag, &word_w, i == 0);
+        uint32_t advance = lv_text_get_next_word(&txt[i], font, letter_space, max_width, word_flag, &word_w);
         max_width -= word_w;
         line_w += word_w;
 
