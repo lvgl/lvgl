@@ -21,6 +21,8 @@
  *      DEFINES
  *********************/
 
+#define SQUARE(x) ((x)*(x))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -53,6 +55,7 @@ static void grad_free_cb(grad_item_t * item, void * user_data);
 static lv_cache_compare_res_t grad_compare_cb(const grad_item_t * lhs, const grad_item_t * rhs);
 
 static grad_type_t lv_grad_style_to_type(lv_vector_gradient_style_t style);
+static void grad_point_to_matrix(vg_lite_matrix_t * grad_matrix, float x1, float y1, float x2, float y2);
 static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread);
 static bool check_radial_grad_is_supported(vg_lite_gradient_spreadmode_t spread);
 
@@ -132,7 +135,9 @@ bool lv_vg_lite_draw_grad(
                 vg_lite_linear_gradient_t * linear_grad = &grad_item->vg.linear;
                 vg_lite_matrix_t * grad_mat_p = vg_lite_get_grad_matrix(linear_grad);
                 LV_ASSERT_NULL(grad_mat_p);
-                *grad_mat_p = *grad_matrix;
+
+                grad_point_to_matrix(grad_mat_p, grad->x1, grad->y1, grad->x2, grad->y2);
+                lv_vg_lite_matrix_multiply(grad_mat_p, grad_matrix);
 
                 LV_VG_LITE_ASSERT_SRC_BUFFER(&linear_grad->image);
 
@@ -218,45 +223,26 @@ bool lv_vg_lite_draw_grad_helper(
     grad.stops_count = grad_dsc->stops_count;
     lv_memcpy(grad.stops, grad_dsc->stops, sizeof(lv_gradient_stop_t) * grad_dsc->stops_count);
 
+    switch(grad_dsc->dir) {
+        case LV_GRAD_DIR_VER:
+            grad.x1 = area->x1;
+            grad.y1 = area->y1;
+            grad.x2 = area->x1;
+            grad.y2 = area->y2;
+            break;
+
+        case LV_GRAD_DIR_HOR:
+            grad.x1 = area->x1;
+            grad.y1 = area->y1;
+            grad.x2 = area->x2;
+            grad.y2 = area->y1;
+            break;
+        default:
+            break;
+    }
+
     vg_lite_matrix_t grad_matrix;
     vg_lite_identity(&grad_matrix);
-
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT)) {
-        switch(grad_dsc->dir) {
-            case LV_GRAD_DIR_VER:
-                grad.x1 = area->x1;
-                grad.y1 = area->y1;
-                grad.x2 = area->x1;
-                grad.y2 = area->y2;
-                break;
-
-            case LV_GRAD_DIR_HOR:
-                grad.x1 = area->x1;
-                grad.y1 = area->y1;
-                grad.x2 = area->x2;
-                grad.y2 = area->y1;
-                break;
-            default:
-                break;
-        }
-    }
-    else {
-        vg_lite_translate(area->x1, area->y1, &grad_matrix);
-
-        switch(grad_dsc->dir) {
-            case LV_GRAD_DIR_VER:
-                vg_lite_scale(1, lv_area_get_height(area) / 256.0f, &grad_matrix);
-                vg_lite_rotate(90, &grad_matrix);
-                break;
-
-            case LV_GRAD_DIR_HOR:
-                vg_lite_scale(lv_area_get_width(area) / 256.0f, 1, &grad_matrix);
-                break;
-
-            default:
-                break;
-        }
-    }
 
     return lv_vg_lite_draw_grad(u, buffer, path, &grad, &grad_matrix, matrix, fill, blend);
 }
@@ -483,6 +469,17 @@ static grad_type_t lv_grad_style_to_type(lv_vector_gradient_style_t style)
 
     LV_LOG_WARN("unknown gradient style: %d", style);
     return GRAD_TYPE_UNKNOWN;
+}
+
+static void grad_point_to_matrix(vg_lite_matrix_t * grad_matrix, float x1, float y1, float x2, float y2)
+{
+    vg_lite_identity(grad_matrix);
+    vg_lite_translate(x1, y1, grad_matrix);
+
+    float angle = atan2f(y2 - y1, x2 - x1) * 180.0f / M_PI;
+    vg_lite_rotate(angle, grad_matrix);
+    float length = sqrtf(SQUARE(x2 - x1) + SQUARE(y2 - y1));
+    vg_lite_scale(length / 256.0f, 1, grad_matrix);
 }
 
 static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread)
