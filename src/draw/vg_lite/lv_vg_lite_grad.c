@@ -228,17 +228,19 @@ bool lv_vg_lite_draw_grad_helper(
             grad.x1 = area->x1;
             grad.y1 = area->y1;
             grad.x2 = area->x1;
-            grad.y2 = area->y2;
+            grad.y2 = area->y2 + 1;
             break;
 
         case LV_GRAD_DIR_HOR:
             grad.x1 = area->x1;
             grad.y1 = area->y1;
-            grad.x2 = area->x2;
+            grad.x2 = area->x2 + 1;
             grad.y2 = area->y1;
             break;
+
         default:
-            break;
+            LV_LOG_WARN("Unsupported gradient direction: %d", grad_dsc->dir);
+            return false;
     }
 
     vg_lite_matrix_t grad_matrix;
@@ -287,7 +289,7 @@ static void grad_cache_release_cb(void * entry, void * user_data)
 {
     lv_cache_entry_t ** entry_p = entry;
     lv_cache_t * cache = user_data;
-    lv_cache_release(cache, *entry_p, NULL);
+    lv_cache_release(cache, * entry_p, NULL);
 }
 
 static vg_lite_color_ramp_t * grad_create_color_ramp(const lv_vector_gradient_t * grad)
@@ -476,7 +478,7 @@ static void grad_point_to_matrix(vg_lite_matrix_t * grad_matrix, float x1, float
     vg_lite_identity(grad_matrix);
     vg_lite_translate(x1, y1, grad_matrix);
 
-    float angle = atan2f(y2 - y1, x2 - x1) * 180.0f / M_PI;
+    float angle = atan2f(y2 - y1, x2 - x1) * 180.0f / (float)M_PI;
     vg_lite_rotate(angle, grad_matrix);
     float length = sqrtf(SQUARE(x2 - x1) + SQUARE(y2 - y1));
     vg_lite_scale(length / 256.0f, 1, grad_matrix);
