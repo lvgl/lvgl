@@ -36,7 +36,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void index_change(lv_obj_t * obj, int32_t index);
+static void index_change(lv_obj_t * obj, int32_t idx);
 static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 /**********************
@@ -156,9 +156,8 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_anim_set_repeat_count(&animimg->anim, LV_ANIM_REPEAT_INFINITE);
 }
 
-static void index_change(lv_obj_t * obj, int32_t index)
+static void index_change(lv_obj_t * obj, int32_t idx)
 {
-    int32_t idx;
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
 
     if(animimg->dsc == NULL) {
@@ -166,7 +165,7 @@ static void index_change(lv_obj_t * obj, int32_t index)
         return;
     }
 
-    idx = index % animimg->pic_count;
+    if(idx >= animimg->pic_count) idx =  animimg->pic_count - 1;
 
     lv_image_set_src(obj, animimg->dsc[idx]);
 }
