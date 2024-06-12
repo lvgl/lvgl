@@ -8,7 +8,7 @@
  *********************/
 #include "../../lvgl.h"
 
-#if LV_USE_TINY_TTF
+#if LV_USE_TINY_TTF != 0
 
 #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
 
@@ -458,4 +458,4 @@ static lv_cache_compare_res_t tiny_ttf_draw_data_cache_compare_cb(const tiny_ttf
     return 0;
 }
 
-#endif
+#endif // LV_USE_TINY_TTF != 0
