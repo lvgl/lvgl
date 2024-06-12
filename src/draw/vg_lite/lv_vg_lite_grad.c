@@ -23,6 +23,10 @@
 
 #define SQUARE(x) ((x)*(x))
 
+#ifndef M_PI
+    #define M_PI 3.1415926f
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
