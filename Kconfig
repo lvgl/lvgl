@@ -612,9 +612,15 @@ menu "LVGL configuration"
 				bool "Add id field to obj"
 				default n
 
+			config LV_OBJ_ID_AUTO_ASSIGN
+				bool "Automatically assign an ID when obj is created"
+				default y
+				depends on LV_USE_OBJ_ID
+
 			config LV_USE_OBJ_ID_BUILTIN
 				bool "Use builtin method to deal with obj ID"
 				default n
+				depends on LV_USE_OBJ_ID
 
 			config LV_USE_OBJ_PROPERTY
 				bool "Use obj property set/get API"

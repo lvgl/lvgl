@@ -411,7 +411,7 @@ void lv_deinit(void)
     lv_profiler_builtin_uninit();
 #endif
 
-#if LV_USE_OBJ_ID_BUILTIN
+#if LV_USE_OBJ_ID && LV_USE_OBJ_ID_BUILTIN
     lv_objid_builtin_destroy();
 #endif
 

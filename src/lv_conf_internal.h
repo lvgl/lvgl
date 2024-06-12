@@ -1042,12 +1042,30 @@
     #endif
 #endif
 
-/* Use lvgl builtin method for obj ID */
-#ifndef LV_USE_OBJ_ID_BUILTIN
-    #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
-        #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+/* Automatically assign an ID when obj is created */
+#ifndef LV_OBJ_ID_AUTO_ASSIGN
+    #ifdef CONFIG_LV_OBJ_ID_AUTO_ASSIGN
+        #define LV_OBJ_ID_AUTO_ASSIGN CONFIG_LV_OBJ_ID_AUTO_ASSIGN
     #else
-        #define LV_USE_OBJ_ID_BUILTIN   0
+        #define LV_OBJ_ID_AUTO_ASSIGN   LV_USE_OBJ_ID
+    #endif
+#endif
+
+/*Use the builtin obj ID handler functions:
+* - lv_obj_assign_id:       Called when a widget is created. Use a separate counter for each widget class as an ID.
+* - lv_obj_id_compare:      Compare the ID to decide if it matches with a requested value.
+* - lv_obj_stringify_id:    Return e.g. "button3"
+* - lv_obj_free_id:         Does nothing, as there is no memory allocation  for the ID.
+* When disabled these functions needs to be implemented by the user.*/
+#ifndef LV_USE_OBJ_ID_BUILTIN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
+            #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+        #else
+            #define LV_USE_OBJ_ID_BUILTIN 0
+        #endif
+    #else
+        #define LV_USE_OBJ_ID_BUILTIN   1
     #endif
 #endif
 
