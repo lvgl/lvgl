@@ -374,6 +374,7 @@ static bool linear_ext_grad_create(grad_item_t * item)
 
     vg_lite_color_ramp_t * color_ramp = grad_create_color_ramp(&item->lv);
     if(!color_ramp) {
+        LV_PROFILER_END;
         return false;
     }
 
@@ -425,6 +426,7 @@ static bool radial_grad_create(grad_item_t * item)
 
     vg_lite_color_ramp_t * color_ramp = grad_create_color_ramp(&item->lv);
     if(!color_ramp) {
+        LV_PROFILER_END;
         return false;
     }
 
