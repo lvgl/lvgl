@@ -905,6 +905,32 @@
 /*==================
  * DEVICES
  *==================*/
+#  define LV_USE_WAYLAND       0
+
+#if LV_USE_WAYLAND
+
+#define LV_DISP_DEF_REFR_PERIOD  LV_DEF_REFR_PERIOD
+
+/* Support for client-side decorations */
+#  ifndef LV_WAYLAND_CLIENT_SIDE_DECORATIONS
+#    define LV_WAYLAND_CLIENT_SIDE_DECORATIONS 1
+#  endif
+
+/* Support for xdg-shell protocol */
+#  ifndef LV_WAYLAND_XDG_SHELL
+#    define LV_WAYLAND_XDG_SHELL 1
+#  endif
+
+#endif
+
+/*Driver for /dev/fb*/
+#define LV_USE_LINUX_FBDEV      0
+#if LV_USE_LINUX_FBDEV
+    #define LV_LINUX_FBDEV_BSD           0
+    #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
+    #define LV_LINUX_FBDEV_BUFFER_COUNT  1
+    #define LV_LINUX_FBDEV_BUFFER_SIZE   60
+#endif
 
 /*Use SDL to open window on PC and handle mouse and keyboard*/
 #define LV_USE_SDL              0
