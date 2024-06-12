@@ -679,7 +679,8 @@ void lv_vector_dsc_set_fill_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_gra
     dsc->current_dsc.fill_dsc.gradient.spread = spread;
 }
 
-void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops, uint8_t count)
+void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops,
+                                                 uint16_t count)
 {
     if(count > LV_GRADIENT_MAX_STOPS) {
         LV_LOG_WARN("Too many gradient stops. Truncating to %d", LV_GRADIENT_MAX_STOPS);
@@ -782,7 +783,7 @@ void lv_vector_dsc_set_stroke_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_g
 }
 
 void lv_vector_dsc_set_stroke_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops,
-                                                   uint8_t count)
+                                                   uint16_t count)
 {
     if(count > LV_GRADIENT_MAX_STOPS) {
         LV_LOG_WARN("Too many gradient stops. Truncating to %d", LV_GRADIENT_MAX_STOPS);

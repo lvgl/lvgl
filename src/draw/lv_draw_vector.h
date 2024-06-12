@@ -428,7 +428,7 @@ void lv_vector_dsc_set_fill_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_gra
  * @param count            the number of stops in the array
  */
 void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops,
-                                                 uint8_t count);
+                                                 uint16_t count);
 
 /**
  * Set a matrix to current fill transformation matrix
@@ -526,7 +526,7 @@ void lv_vector_dsc_set_stroke_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_g
  * @param count            the number of stops in the array
  */
 void lv_vector_dsc_set_stroke_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops,
-                                                   uint8_t count);
+                                                   uint16_t count);
 
 /**
  * Set a matrix to current stroke transformation matrix
