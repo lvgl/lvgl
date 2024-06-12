@@ -829,6 +829,10 @@ extern "C" {
             case gcFEATURE_BIT_VG_YUV_INPUT:
 #endif
 
+#if LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+            case gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT:
+#endif
+
 #if LV_VG_LITE_THORVG_16PIXELS_ALIGN
             case gcFEATURE_BIT_VG_16PIXELS_ALIGN:
 #endif
@@ -1273,15 +1277,38 @@ Empty_sequence_handler:
                                              vg_lite_blend_t blend,
                                              vg_lite_filter_t filter)
     {
-        LV_UNUSED(target);
-        LV_UNUSED(path);
-        LV_UNUSED(fill_rule);
-        LV_UNUSED(path_matrix);
-        LV_UNUSED(grad);
         LV_UNUSED(paint_color);
-        LV_UNUSED(blend);
         LV_UNUSED(filter);
-        return VG_LITE_NOT_SUPPORT;
+
+        auto ctx = vg_lite_ctx::get_instance();
+        TVG_CHECK_RETURN_VG_ERROR(canvas_set_target(ctx, target));
+
+        auto shape = Shape::gen();
+        TVG_CHECK_RETURN_VG_ERROR(shape_append_path(shape, path, path_matrix));
+        TVG_CHECK_RETURN_VG_ERROR(shape->transform(matrix_conv(path_matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(shape->fill(fill_rule_conv(fill_rule)););
+        TVG_CHECK_RETURN_VG_ERROR(shape->blend(blend_method_conv(blend)));
+
+        auto linearGrad = LinearGradient::gen();
+        TVG_CHECK_RETURN_VG_ERROR(linearGrad->linear(grad->linear_grad.X0, grad->linear_grad.Y0, grad->linear_grad.X1,
+                                                     grad->linear_grad.Y1));
+        TVG_CHECK_RETURN_VG_ERROR(linearGrad->transform(matrix_conv(&grad->matrix)));
+        TVG_CHECK_RETURN_VG_ERROR(linearGrad->spread(fill_spread_conv(grad->spread_mode)));
+
+        tvg::Fill::ColorStop colorStops[VLC_MAX_COLOR_RAMP_STOPS];
+        for(vg_lite_uint32_t i = 0; i < grad->ramp_length; i++) {
+            colorStops[i].offset = grad->color_ramp[i].stop;
+            colorStops[i].r = grad->color_ramp[i].red * 255.0f;
+            colorStops[i].g = grad->color_ramp[i].green * 255.0f;
+            colorStops[i].b = grad->color_ramp[i].blue * 255.0f;
+            colorStops[i].a = grad->color_ramp[i].alpha * 255.0f;
+        }
+        TVG_CHECK_RETURN_VG_ERROR(linearGrad->colorStops(colorStops, grad->ramp_length));
+
+        TVG_CHECK_RETURN_VG_ERROR(shape->fill(std::move(linearGrad)));
+        TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
+
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_set_radial_grad(vg_lite_radial_gradient_t * grad,
@@ -1740,8 +1767,8 @@ Empty_sequence_handler:
         float y_max = y_min + dlen * sinf(angle);
         LV_LOG_TRACE("linear gradient {%.2f, %.2f} ~ {%.2f, %.2f}", x_min, y_min, x_max, y_max);
         auto linearGrad = LinearGradient::gen();
-        linearGrad->linear(x_min, y_min, x_max, y_max);
-        linearGrad->spread(FillSpread::Pad);
+        TVG_CHECK_RETURN_VG_ERROR(linearGrad->linear(x_min, y_min, x_max, y_max));
+        TVG_CHECK_RETURN_VG_ERROR(linearGrad->spread(FillSpread::Pad));
 
         tvg::Fill::ColorStop colorStops[VLC_MAX_GRADIENT_STOPS];
         for(vg_lite_uint32_t i = 0; i < grad->count; i++) {

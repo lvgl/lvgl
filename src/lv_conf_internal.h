@@ -982,6 +982,15 @@
         #endif
     #endif
 
+    /*Enable Linear gradient extension support*/
+    #ifndef LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+        #ifdef CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+            #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+        #else
+            #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
+        #endif
+    #endif
+
     /*Enable 16 pixels alignment*/
     #ifndef LV_VG_LITE_THORVG_16PIXELS_ALIGN
         #ifdef _LV_KCONFIG_PRESENT

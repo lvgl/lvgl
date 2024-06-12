@@ -349,6 +349,9 @@
     /*Enable YUV color format support*/
     #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
 
+    /*Enable Linear gradient extension support*/
+    #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
+
     /*Enable 16 pixels alignment*/
     #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
 
