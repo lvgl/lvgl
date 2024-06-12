@@ -28,7 +28,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef unsigned char uint8_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -40,7 +40,7 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event);
 static void scale_draw_main(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_dsc_t * label_dsc,
-		const uint32_t major_tick_idx, const int32_t tick_value, lv_point_t * tick_point_b, const uint32_t tick_idx);
+                             const uint32_t major_tick_idx, const int32_t tick_value, lv_point_t * tick_point_b, const uint32_t tick_idx);
 static void scale_calculate_main_compensation(lv_obj_t * obj);
 
 static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, int32_t * arc_r);
@@ -540,7 +540,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_init(&major_tick_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
     if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-		major_tick_dsc.raw_end = 0;
+        major_tick_dsc.raw_end = 0;
     }
 
     /* Configure line draw descriptor for the minor tick drawing */
@@ -554,9 +554,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_dsc);
 
     const uint32_t total_tick_count = scale->total_tick_count;
-	uint32_t tick_idx = 0;
-	uint32_t major_tick_idx = 0;
-	for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
+    uint32_t tick_idx = 0;
+    uint32_t major_tick_idx = 0;
+    for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
         /* A major tick is the one which has a label in it */
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
@@ -592,7 +592,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
         /* Setup a label if they're enabled and we're drawing a major tick */
         if(scale->label_enabled && is_major_tick) {
-        	scale_draw_label(obj, event, &label_dsc, major_tick_idx, tick_value, &tick_point_b, tick_idx);
+            scale_draw_label(obj, event, &label_dsc, major_tick_idx, tick_value, &tick_point_b, tick_idx);
         }
 
         if(is_major_tick) {
@@ -605,19 +605,19 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             minor_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
             lv_draw_line(layer, &minor_tick_dsc);
         }
-	}
+    }
 }
 
 static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_dsc_t * label_dsc,
-		const uint32_t major_tick_idx, const int32_t tick_value, lv_point_t * tick_point_b,
-		const uint32_t tick_idx)
+                             const uint32_t major_tick_idx, const int32_t tick_value, lv_point_t * tick_point_b,
+                             const uint32_t tick_idx)
 {
-	lv_scale_t * scale = (lv_scale_t *)obj;
-	lv_layer_t * layer = lv_event_get_layer(event);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    lv_layer_t * layer = lv_event_get_layer(event);
 
-	/* Label text setup */
-	char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
-	lv_area_t label_coords;
+    /* Label text setup */
+    char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
+    lv_area_t label_coords;
 
     /* Check if the custom text array has element for this major tick index */
     if(scale->txt_src) {
@@ -629,12 +629,11 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         label_dsc->text_local = 1;
     }
 
-	if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
-	       || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode))
-	{
+    if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
+       || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
         scale_get_label_coords(obj, label_dsc, tick_point_b, &label_coords);
-	}
-	else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+    }
+    else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
         lv_area_t scale_area;
         lv_obj_get_content_coords(obj, &scale_area);
 
@@ -665,14 +664,13 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         point.y = center_point.y;
         lv_point_transform(&point, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);
         scale_get_label_coords(obj, label_dsc, &point, &label_coords);
-	}
-	/* Invalid mode */
-	else
-	{
-		return;
-	}
+    }
+    /* Invalid mode */
+    else {
+        return;
+    }
 
-	lv_draw_label(layer, label_dsc, &label_coords);
+    lv_draw_label(layer, label_dsc, &label_coords);
 }
 
 static void scale_calculate_main_compensation(lv_obj_t * obj)
