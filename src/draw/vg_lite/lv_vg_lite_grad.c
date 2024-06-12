@@ -220,20 +220,42 @@ bool lv_vg_lite_draw_grad_helper(
 
     vg_lite_matrix_t grad_matrix;
     vg_lite_identity(&grad_matrix);
-    vg_lite_translate(area->x1, area->y1, &grad_matrix);
 
-    switch(grad_dsc->dir) {
-        case LV_GRAD_DIR_VER:
-            vg_lite_scale(1, lv_area_get_height(area) / 256.0f, &grad_matrix);
-            vg_lite_rotate(90, &grad_matrix);
-            break;
+    if(vg_lite_query_feature(gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT)) {
+        switch(grad_dsc->dir) {
+            case LV_GRAD_DIR_VER:
+                grad.x1 = area->x1;
+                grad.y1 = area->y1;
+                grad.x2 = area->x1;
+                grad.y2 = area->y2;
+                break;
 
-        case LV_GRAD_DIR_HOR:
-            vg_lite_scale(lv_area_get_width(area) / 256.0f, 1, &grad_matrix);
-            break;
+            case LV_GRAD_DIR_HOR:
+                grad.x1 = area->x1;
+                grad.y1 = area->y1;
+                grad.x2 = area->x2;
+                grad.y2 = area->y1;
+                break;
+            default:
+                break;
+        }
+    }
+    else {
+        vg_lite_translate(area->x1, area->y1, &grad_matrix);
 
-        default:
-            break;
+        switch(grad_dsc->dir) {
+            case LV_GRAD_DIR_VER:
+                vg_lite_scale(1, lv_area_get_height(area) / 256.0f, &grad_matrix);
+                vg_lite_rotate(90, &grad_matrix);
+                break;
+
+            case LV_GRAD_DIR_HOR:
+                vg_lite_scale(lv_area_get_width(area) / 256.0f, 1, &grad_matrix);
+                break;
+
+            default:
+                break;
+        }
     }
 
     return lv_vg_lite_draw_grad(u, buffer, path, &grad, &grad_matrix, matrix, fill, blend);
