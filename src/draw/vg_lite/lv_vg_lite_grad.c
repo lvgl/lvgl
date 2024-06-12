@@ -303,7 +303,7 @@ static vg_lite_color_ramp_t * grad_create_color_ramp(const lv_vector_gradient_t 
         return NULL;
     }
 
-    for(uint8_t i = 0; i < grad->stops_count; i++) {
+    for(uint16_t i = 0; i < grad->stops_count; i++) {
         color_ramp[i].stop = grad->stops[i].frac / 255.0f;
         lv_color_t c = grad->stops[i].color;
 
@@ -336,7 +336,7 @@ static bool linear_grad_create(grad_item_t * item)
         item->lv.stops_count = VLC_MAX_GRADIENT_STOPS;
     }
 
-    for(uint8_t i = 0; i < item->lv.stops_count; i++) {
+    for(uint16_t i = 0; i < item->lv.stops_count; i++) {
         stops[i] = item->lv.stops[i].frac;
         const lv_color_t * c = &item->lv.stops[i].color;
         lv_opa_t opa = item->lv.stops[i].opa;

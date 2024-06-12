@@ -181,7 +181,8 @@ static void _setup_gradient(Tvg_Gradient * gradient, const lv_vector_gradient_t 
                             const lv_matrix_t * matrix)
 {
     Tvg_Color_Stop * stops = (Tvg_Color_Stop *)lv_malloc(sizeof(Tvg_Color_Stop) * grad->stops_count);
-    for(uint8_t i = 0; i < grad->stops_count; i++) {
+    LV_ASSERT_MALLOC(stops);
+    for(uint16_t i = 0; i < grad->stops_count; i++) {
         const lv_gradient_stop_t * s = &(grad->stops[i]);
 
         stops[i].offset = s->frac / 255.0f;
