@@ -80,7 +80,7 @@ void lv_lottie_set_buffer(lv_obj_t * obj, int32_t w, int32_t h, void * buf)
     tvg_picture_set_size(lottie->tvg_paint, w, h);
 
     /* Rendered output images are premultiplied */
-    lv_draw_buf_t* draw_buf = lv_canvas_get_draw_buf(obj);
+    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
 
     /*Force updating when the buffer changes*/
