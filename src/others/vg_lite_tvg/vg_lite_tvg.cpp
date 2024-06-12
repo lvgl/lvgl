@@ -1264,6 +1264,26 @@ Empty_sequence_handler:
         return VG_LITE_SUCCESS;
     }
 
+    vg_lite_error_t vg_lite_draw_linear_grad(vg_lite_buffer_t * target,
+                                             vg_lite_path_t * path,
+                                             vg_lite_fill_t fill_rule,
+                                             vg_lite_matrix_t * path_matrix,
+                                             vg_lite_ext_linear_gradient_t * grad,
+                                             vg_lite_color_t paint_color,
+                                             vg_lite_blend_t blend,
+                                             vg_lite_filter_t filter)
+    {
+        LV_UNUSED(target);
+        LV_UNUSED(path);
+        LV_UNUSED(fill_rule);
+        LV_UNUSED(path_matrix);
+        LV_UNUSED(grad);
+        LV_UNUSED(paint_color);
+        LV_UNUSED(blend);
+        LV_UNUSED(filter);
+        return VG_LITE_NOT_SUPPORT;
+    }
+
     vg_lite_error_t vg_lite_set_radial_grad(vg_lite_radial_gradient_t * grad,
                                             vg_lite_uint32_t count,
                                             vg_lite_color_ramp_t * color_ramp,

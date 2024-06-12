@@ -72,7 +72,7 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.delete_cb = draw_delete;
 
     lv_vg_lite_image_dsc_init(unit);
-    lv_vg_lite_grad_init(unit, LV_VG_LITE_LINEAR_GRAD_CACHE_CNT, LV_VG_LITE_RADIAL_GRAD_CACHE_CNT);
+    lv_vg_lite_grad_init(unit, LV_VG_LITE_GRAD_CACHE_CNT);
     lv_vg_lite_path_init(unit);
     lv_vg_lite_decoder_init();
 }
