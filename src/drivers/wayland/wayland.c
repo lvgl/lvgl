@@ -241,8 +241,8 @@ lv_global_t* lv_global_default(void)
 static struct lw_application application;
 
 static const struct wl_callback_listener wl_surface_frame_listener;
-static bool lw_resize_window(lw_window_t* window, int width, int height);
-static struct lw_surface_object* lw_create_surface_obj(struct lw_application* app,
+static bool resize_window(lw_window_t* window, int width, int height);
+static struct lw_surface_object* create_surface_obj(struct lw_application* app,
     lw_window_t* window,
     enum lw_object_type type,
     struct lw_surface_object* parent);
@@ -255,13 +255,13 @@ static struct lw_surface_object* lw_create_surface_obj(struct lw_application* ap
  *
  * NOTE: this function is invoked by the wayland-server library within the compositor
  * the event is added to the queue, and then upon the next timer call it's
- * called indirectly from lw_handle_wayland_input (via wl_display_dispatch_queue)
+ * called indirectly from handle_wayland_input (via wl_display_dispatch_queue)
  * @param void data the user object defined that was tied to this event during
  * the configuration of the callback
  * @param struct wl_callback The callback that needs to be destroyed and re-created
  * @param time Timestamp of the event (unused)
  */
-static void lw_frame_done_wl_cb(void* data, struct wl_callback* cb, uint32_t time)
+static void frame_done_wl_cb(void* data, struct wl_callback* cb, uint32_t time)
 {
     struct lw_surface_object* obj;
     lw_window_t* window;
@@ -279,10 +279,10 @@ static void lw_frame_done_wl_cb(void* data, struct wl_callback* cb, uint32_t tim
 }
 
 static const struct wl_callback_listener wl_surface_frame_listener = {
-    .done = lw_frame_done_wl_cb,
+    .done = frame_done_wl_cb,
 };
 
-static void lw_shm_format(void* data, struct wl_shm* wl_shm, uint32_t format)
+static void shm_format(void* data, struct wl_shm* wl_shm, uint32_t format)
 {
     struct lw_application* app = data;
 
@@ -314,10 +314,10 @@ static void lw_shm_format(void* data, struct wl_shm* wl_shm, uint32_t format)
     }
 }
 
-static const struct wl_shm_listener shm_listener = { lw_shm_format };
+static const struct wl_shm_listener shm_listener = { shm_format };
 
 #if LV_WAYLAND_CLIENT_SIDE_DECORATIONS
-static bool lw_attach_wl_decoration(lw_window_t* window, struct lw_surface_object* decoration,
+static bool attach_wl_decoration(lw_window_t* window, struct lw_surface_object* decoration,
     smm_buffer_t* decoration_buffer, struct lw_surface_object* parent)
 {
     struct wl_buffer* wl_buf = SMM_BUFFER_PROPERTIES(decoration_buffer)->tag[LW_TAG_LOCAL];
@@ -391,7 +391,7 @@ err_destroy_surface:
     return false;
 }
 
-static void lw_detach_wl_decoration(lw_window_t* window,
+static void detach_wl_decoration(lw_window_t* window,
     struct lw_surface_object* decoration)
 {
     if (decoration->subsurface) {
@@ -400,7 +400,7 @@ static void lw_detach_wl_decoration(lw_window_t* window,
     }
 }
 
-static void lw_color_fill(lv_color32_t* buf, lv_color32_t color, uint32_t px_num)
+static void fill_decoration_color(lv_color32_t* buf, lv_color32_t color, uint32_t px_num)
 {
     while (px_num > 16) {
         *buf = color;  buf++; *buf = color; buf++; *buf = color; buf++; *buf = color; buf++;
@@ -419,7 +419,7 @@ static void lw_color_fill(lv_color32_t* buf, lv_color32_t color, uint32_t px_num
 
 }
 
-static bool lw_create_wl_decoration(lw_window_t* window,
+static bool create_wl_decoration(lw_window_t* window,
     struct lw_surface_object* decoration,
     int window_width, int window_height, uint8_t color_alpha)
 {
@@ -475,7 +475,7 @@ static bool lw_create_wl_decoration(lw_window_t* window,
 
     switch (decoration->type) {
     case LW_OBJECT_TITLEBAR:
-        lw_color_fill((lv_color32_t*)buf_base, lv_color32_make(0x33, 0x33, 0x33, 0xff),
+        fill_decoration_color((lv_color32_t*)buf_base, lv_color32_make(0x33, 0x33, 0x33, 0xff),
             (decoration->width * decoration->height));
 
         break;
@@ -543,7 +543,7 @@ static bool lw_create_wl_decoration(lw_window_t* window,
     case LW_OBJECT_BORDER_LEFT:
         /* fallthrough */
     case LW_OBJECT_BORDER_RIGHT:
-        lw_color_fill((lv_color32_t*)buf_base,
+        fill_decoration_color((lv_color32_t*)buf_base,
             lv_color32_make(0x33, 0x33, 0x33, 0xff), (decoration->width * decoration->height));
         break;
     default:
@@ -551,11 +551,11 @@ static bool lw_create_wl_decoration(lw_window_t* window,
         return false;
     }
 
-    return lw_attach_wl_decoration(window, decoration, buf, window->body);
+    return attach_wl_decoration(window, decoration, buf, window->body);
 }
 #endif
 
-static void lw_handle_pointer_enter_wl_cb(void* data, struct wl_pointer* pointer,
+static void handle_pointer_enter_wl_cb(void* data, struct wl_pointer* pointer,
     uint32_t serial, struct wl_surface* surface,
     wl_fixed_t sx, wl_fixed_t sy)
 {
@@ -640,7 +640,7 @@ static void lw_handle_pointer_enter_wl_cb(void* data, struct wl_pointer* pointer
         break;
     case LW_OBJECT_BUTTON_CLOSE:
         // cursor = "bottom_right_corner";
-        if (!lw_create_wl_decoration(window, window->decoration[app->pointer_obj->type],
+        if (!create_wl_decoration(window, window->decoration[app->pointer_obj->type],
             window->body->width, window->body->height, 0x80)) {
             LV_LOG_ERROR("failed to create decoration %d", app->pointer_obj->type);
         }
@@ -648,7 +648,7 @@ static void lw_handle_pointer_enter_wl_cb(void* data, struct wl_pointer* pointer
     case LW_OBJECT_BUTTON_MAXIMIZE:
         // cursor = "top_right_corner";
     case LW_OBJECT_BUTTON_MINIMIZE:
-        if (!lw_create_wl_decoration(window, window->decoration[app->pointer_obj->type],
+        if (!create_wl_decoration(window, window->decoration[app->pointer_obj->type],
             window->body->width, window->body->height, 0x40)) {
             LV_LOG_ERROR("failed to create decoration %d", app->pointer_obj->type);
         }
@@ -668,7 +668,7 @@ static void lw_handle_pointer_enter_wl_cb(void* data, struct wl_pointer* pointer
     }
 }
 
-static void lw_handle_pointer_leave_wl_cb(void* data, struct wl_pointer* pointer,
+static void handle_pointer_leave_wl_cb(void* data, struct wl_pointer* pointer,
     uint32_t serial, struct wl_surface* surface)
 {
     struct lw_application* app = data;
@@ -683,7 +683,7 @@ static void lw_handle_pointer_leave_wl_cb(void* data, struct wl_pointer* pointer
         case LW_OBJECT_BUTTON_MAXIMIZE:
         case LW_OBJECT_BUTTON_MINIMIZE:
 #endif
-            if (!lw_create_wl_decoration(window, window->decoration[app->pointer_obj->type],
+            if (!create_wl_decoration(window, window->decoration[app->pointer_obj->type],
                 window->body->width, window->body->height, 0x00)) {
                 LV_LOG_ERROR("failed to create decoration %d", app->pointer_obj->type);
             }
@@ -699,7 +699,7 @@ static void lw_handle_pointer_leave_wl_cb(void* data, struct wl_pointer* pointer
     }
 }
 
-static void lw_handle_pointer_motion_wl_cb(void* data, struct wl_pointer* pointer,
+static void handle_pointer_motion_wl_cb(void* data, struct wl_pointer* pointer,
     uint32_t time, wl_fixed_t sx, wl_fixed_t sy)
 {
     struct lw_application* app = data;
@@ -712,7 +712,7 @@ static void lw_handle_pointer_motion_wl_cb(void* data, struct wl_pointer* pointe
     app->pointer_obj->input.pointer.y = LV_MAX(0, LV_MIN(wl_fixed_to_int(sy), app->pointer_obj->height - 1));
 }
 
-static void lw_handle_pointer_button_wl_cb(void* data, struct wl_pointer* wl_pointer,
+static void handle_pointer_button_wl_cb(void* data, struct wl_pointer* wl_pointer,
     uint32_t serial, uint32_t time, uint32_t button,
     uint32_t state)
 {
@@ -871,7 +871,7 @@ static void lw_handle_pointer_button_wl_cb(void* data, struct wl_pointer* wl_poi
     }
 }
 
-static void lw_handle_pointer_axis_wl_cb(void* data, struct wl_pointer* wl_pointer,
+static void handle_pointer_axis_wl_cb(void* data, struct wl_pointer* wl_pointer,
     uint32_t time, uint32_t axis, wl_fixed_t value)
 {
     struct lw_application* app = data;
@@ -892,11 +892,11 @@ static void lw_handle_pointer_axis_wl_cb(void* data, struct wl_pointer* wl_point
 }
 
 static const struct wl_pointer_listener pointer_listener = {
-    .enter = lw_handle_pointer_enter_wl_cb,
-    .leave = lw_handle_pointer_leave_wl_cb,
-    .motion = lw_handle_pointer_motion_wl_cb,
-    .button = lw_handle_pointer_button_wl_cb,
-    .axis = lw_handle_pointer_axis_wl_cb,
+    .enter = handle_pointer_enter_wl_cb,
+    .leave = handle_pointer_leave_wl_cb,
+    .motion = handle_pointer_motion_wl_cb,
+    .button = handle_pointer_button_wl_cb,
+    .axis = handle_pointer_axis_wl_cb,
 };
 
 static lv_key_t lw_keycode_xkb_to_lv(xkb_keysym_t xkb_key)
@@ -967,7 +967,7 @@ static lv_key_t lw_keycode_xkb_to_lv(xkb_keysym_t xkb_key)
     return key;
 }
 
-static void lw_handle_keyboard_keymap_wl_cb(void* data, struct wl_keyboard* keyboard,
+static void handle_keyboard_keymap_wl_cb(void* data, struct wl_keyboard* keyboard,
     uint32_t format, int fd, uint32_t size)
 {
     struct lw_application* app = data;
@@ -1012,7 +1012,7 @@ static void lw_handle_keyboard_keymap_wl_cb(void* data, struct wl_keyboard* keyb
     app->seat.xkb.state = state;
 }
 
-static void lw_handle_keyboard_enter_wl_cb(void* data, struct wl_keyboard* keyboard,
+static void handle_keyboard_enter_wl_cb(void* data, struct wl_keyboard* keyboard,
     uint32_t serial, struct wl_surface* surface,
     struct wl_array* keys)
 {
@@ -1026,7 +1026,7 @@ static void lw_handle_keyboard_enter_wl_cb(void* data, struct wl_keyboard* keybo
     }
 }
 
-static void lw_handle_keyboard_leave_wl_cb(void* data, struct wl_keyboard* keyboard,
+static void handle_keyboard_leave_wl_cb(void* data, struct wl_keyboard* keyboard,
     uint32_t serial, struct wl_surface* surface)
 {
     struct lw_application* app = data;
@@ -1036,7 +1036,7 @@ static void lw_handle_keyboard_leave_wl_cb(void* data, struct wl_keyboard* keybo
     }
 }
 
-static void lw_handle_keyboard_key_wl_cb(void* data, struct wl_keyboard* keyboard,
+static void handle_keyboard_key_wl_cb(void* data, struct wl_keyboard* keyboard,
     uint32_t serial, uint32_t time, uint32_t key,
     uint32_t state)
 {
@@ -1063,7 +1063,7 @@ static void lw_handle_keyboard_key_wl_cb(void* data, struct wl_keyboard* keyboar
     }
 }
 
-static void lw_handle_keyboard_modifiers_wl_cb(void* data, struct wl_keyboard* keyboard,
+static void handle_keyboard_modifiers_wl_cb(void* data, struct wl_keyboard* keyboard,
     uint32_t serial, uint32_t mods_depressed,
     uint32_t mods_latched, uint32_t mods_locked,
     uint32_t group)
@@ -1080,14 +1080,14 @@ static void lw_handle_keyboard_modifiers_wl_cb(void* data, struct wl_keyboard* k
 }
 
 static const struct wl_keyboard_listener keyboard_listener = {
-    .keymap = lw_handle_keyboard_keymap_wl_cb,
-    .enter = lw_handle_keyboard_enter_wl_cb,
-    .leave = lw_handle_keyboard_leave_wl_cb,
-    .key = lw_handle_keyboard_key_wl_cb,
-    .modifiers = lw_handle_keyboard_modifiers_wl_cb,
+    .keymap = handle_keyboard_keymap_wl_cb,
+    .enter = handle_keyboard_enter_wl_cb,
+    .leave = handle_keyboard_leave_wl_cb,
+    .key = handle_keyboard_key_wl_cb,
+    .modifiers = handle_keyboard_modifiers_wl_cb,
 };
 
-static void lw_handle_touch_down_wl_cb(void* data, struct wl_touch* wl_touch,
+static void handle_touch_down_wl_cb(void* data, struct wl_touch* wl_touch,
     uint32_t serial, uint32_t time, struct wl_surface* surface,
     int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
 {
@@ -1122,7 +1122,7 @@ static void lw_handle_touch_down_wl_cb(void* data, struct wl_touch* wl_touch,
 #endif
 }
 
-static void lw_handle_touch_up_wl_cb(void* data, struct wl_touch* wl_touch,
+static void handle_touch_up_wl_cb(void* data, struct wl_touch* wl_touch,
     uint32_t serial, uint32_t time, int32_t id)
 {
     struct lw_application* app = data;
@@ -1165,7 +1165,7 @@ static void lw_handle_touch_up_wl_cb(void* data, struct wl_touch* wl_touch,
     app->touch_obj = NULL;
 }
 
-static void lw_handle_touch_motion_wl_cb(void* data, struct wl_touch* wl_touch,
+static void handle_touch_motion_wl_cb(void* data, struct wl_touch* wl_touch,
     uint32_t time, int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
 {
     struct lw_application* app = data;
@@ -1178,23 +1178,23 @@ static void lw_handle_touch_motion_wl_cb(void* data, struct wl_touch* wl_touch,
     app->touch_obj->input.touch.y = wl_fixed_to_int(y_w);
 }
 
-static void lw_handle_touch_frame_wl_cb(void* data, struct wl_touch* wl_touch)
+static void handle_touch_frame_wl_cb(void* data, struct wl_touch* wl_touch)
 {
 }
 
-static void lw_handle_touch_cancel_wl_cb(void* data, struct wl_touch* wl_touch)
+static void handle_touch_cancel_wl_cb(void* data, struct wl_touch* wl_touch)
 {
 }
 
 static const struct wl_touch_listener touch_listener = {
-    .down = lw_handle_touch_down_wl_cb,
-    .up = lw_handle_touch_up_wl_cb,
-    .motion = lw_handle_touch_motion_wl_cb,
-    .frame = lw_handle_touch_frame_wl_cb,
-    .cancel = lw_handle_touch_cancel_wl_cb,
+    .down = handle_touch_down_wl_cb,
+    .up = handle_touch_up_wl_cb,
+    .motion = handle_touch_motion_wl_cb,
+    .frame = handle_touch_frame_wl_cb,
+    .cancel = handle_touch_cancel_wl_cb,
 };
 
-static void lw_handle_seat_capabilities_wl_cb(void* data, struct wl_seat* wl_seat, enum wl_seat_capability caps)
+static void handle_seat_capabilities_wl_cb(void* data, struct wl_seat* wl_seat, enum wl_seat_capability caps)
 {
     struct lw_application* app = data;
     struct lw_seat* seat = &app->seat;
@@ -1235,17 +1235,17 @@ static void lw_handle_seat_capabilities_wl_cb(void* data, struct wl_seat* wl_sea
 }
 
 static const struct wl_seat_listener seat_listener = {
-    .capabilities = lw_handle_seat_capabilities_wl_cb,
+    .capabilities = handle_seat_capabilities_wl_cb,
 };
 
-static void lw_draw_window(lw_window_t* window, uint32_t width, uint32_t height)
+static void draw_window(lw_window_t* window, uint32_t width, uint32_t height)
 {
 
 #if LV_WAYLAND_CLIENT_SIDE_DECORATIONS
     if (application.opt_disable_decorations == false) {
         int d;
         for (d = 0; d < LW_NUM_DECORATIONS; d++) {
-            window->decoration[d] = lw_create_surface_obj(&application, window, (LW_FIRST_DECORATION + d), window->body);
+            window->decoration[d] = create_surface_obj(&application, window, (LW_FIRST_DECORATION + d), window->body);
             if (!window->decoration[d]) {
                 LV_LOG_ERROR("Failed to create decoration %d", d);
             }
@@ -1254,7 +1254,7 @@ static void lw_draw_window(lw_window_t* window, uint32_t width, uint32_t height)
 #endif
 
     /* First resize */
-    if (!lw_resize_window(window, width, height)) {
+    if (!resize_window(window, width, height)) {
         LV_LOG_ERROR("Failed to resize window");
 #if LV_WAYLAND_XDG_SHELL
         if (window->xdg_toplevel) {
@@ -1268,7 +1268,7 @@ static void lw_draw_window(lw_window_t* window, uint32_t width, uint32_t height)
 }
 
 #if LV_WAYLAND_XDG_SHELL
-static void lw_handle_xdg_surface_configure_wl_cb(void* data, struct xdg_surface* xdg_surface, uint32_t serial)
+static void handle_xdg_surface_configure_wl_cb(void* data, struct xdg_surface* xdg_surface, uint32_t serial)
 {
     lw_window_t* window = (lw_window_t*)data;
     // struct wl_buffer *wl_buf;
@@ -1276,17 +1276,17 @@ static void lw_handle_xdg_surface_configure_wl_cb(void* data, struct xdg_surface
     xdg_surface_ack_configure(xdg_surface, serial);
 
     if (window->body->surface_configured == false) {
-        lw_draw_window(window, window->width, window->height);
+        draw_window(window, window->width, window->height);
     }
 
     window->body->surface_configured = true;
 }
 
 static const struct xdg_surface_listener xdg_surface_listener = {
-    .configure = lw_handle_xdg_surface_configure_wl_cb,
+    .configure = handle_xdg_surface_configure_wl_cb,
 };
 
-static void lw_handle_xdg_toplevel_configure_wl_cb(void* data, struct xdg_toplevel* xdg_toplevel,
+static void handle_xdg_toplevel_configure_wl_cb(void* data, struct xdg_toplevel* xdg_toplevel,
     int32_t width, int32_t height, struct wl_array* states)
 {
     lw_window_t* window = (lw_window_t*)data;
@@ -1307,7 +1307,7 @@ static void lw_handle_xdg_toplevel_configure_wl_cb(void* data, struct xdg_toplev
         if ( (sta && *sta == XDG_TOPLEVEL_STATE_MAXIMIZED) ||
              (width && width < window->width) || (height && height < window->height)) {
             
-            if (!lw_create_wl_decoration(window, window->decoration[LW_OBJECT_BUTTON_MAXIMIZE],
+            if (!create_wl_decoration(window, window->decoration[LW_OBJECT_BUTTON_MAXIMIZE],
                 window->body->width, window->body->height, 0x00)) {
                 LV_LOG_ERROR("config bound-failed to create decoration");
             }
@@ -1332,13 +1332,13 @@ static void lw_handle_xdg_toplevel_configure_wl_cb(void* data, struct xdg_toplev
     }
 }
 
-static void lw_handle_xdg_toplevel_close_wl_cb(void* data, struct xdg_toplevel* xdg_toplevel)
+static void handle_xdg_toplevel_close_wl_cb(void* data, struct xdg_toplevel* xdg_toplevel)
 {
     lw_window_t* window = (lw_window_t*)data;
     window->shall_close = true;
 }
 
-static void lw_handle_xdg_toplevel_configure_bounds_wl_cb(void* data, struct xdg_toplevel* xdg_toplevel,
+static void handle_xdg_toplevel_configure_bounds_wl_cb(void* data, struct xdg_toplevel* xdg_toplevel,
     int32_t width, int32_t height)
 {
     //lw_window_t *window = (lw_window_t *)data;
@@ -1348,7 +1348,7 @@ static void lw_handle_xdg_toplevel_configure_bounds_wl_cb(void* data, struct xdg
      */
 }
 
-static void lw_handle_xdg_toplevel_wm_capabilities_wl_cb(void* data, struct xdg_toplevel* xdg_toplevel,
+static void handle_xdg_toplevel_wm_capabilities_wl_cb(void* data, struct xdg_toplevel* xdg_toplevel,
     struct wl_array* capabilities)
 {
     uint32_t* cap;
@@ -1362,22 +1362,22 @@ static void lw_handle_xdg_toplevel_wm_capabilities_wl_cb(void* data, struct xdg_
 }
 
 static const struct xdg_toplevel_listener xdg_toplevel_listener = {
-    .configure = lw_handle_xdg_toplevel_configure_wl_cb,
-    .close = lw_handle_xdg_toplevel_close_wl_cb,
-    .configure_bounds = lw_handle_xdg_toplevel_configure_bounds_wl_cb,
-    .wm_capabilities = lw_handle_xdg_toplevel_wm_capabilities_wl_cb /* This requires newer wayland headers */
+    .configure = handle_xdg_toplevel_configure_wl_cb,
+    .close = handle_xdg_toplevel_close_wl_cb,
+    .configure_bounds = handle_xdg_toplevel_configure_bounds_wl_cb,
+    .wm_capabilities = handle_xdg_toplevel_wm_capabilities_wl_cb /* This requires newer wayland headers */
 };
 
-static void lw_xdg_wm_base_ping_cb(void* data, struct xdg_wm_base* xdg_wm_base, uint32_t serial)
+static void xdg_wm_base_ping_cb(void* data, struct xdg_wm_base* xdg_wm_base, uint32_t serial)
 {
     return xdg_wm_base_pong(xdg_wm_base, serial);
 }
 
 static const struct xdg_wm_base_listener xdg_wm_base_listener = {
-    .ping = lw_xdg_wm_base_ping_cb };
+    .ping = xdg_wm_base_ping_cb };
 #endif
 
-static void lw_handle_global_wl_cb(void* data, struct wl_registry* registry,
+static void handle_global_wl_cb(void* data, struct wl_registry* registry,
     uint32_t name, const char* interface, uint32_t version)
 {
     struct lw_application* app = data;
@@ -1406,15 +1406,15 @@ static void lw_handle_global_wl_cb(void* data, struct wl_registry* registry,
 #endif
 }
 
-static void lw_handle_global_remove_wl_cb(void* data, struct wl_registry* registry, uint32_t name)
+static void handle_global_remove_wl_cb(void* data, struct wl_registry* registry, uint32_t name)
 {
 }
 
 static const struct wl_registry_listener registry_listener = {
-    .global = lw_handle_global_wl_cb,
-    .global_remove = lw_handle_global_remove_wl_cb };
+    .global = handle_global_wl_cb,
+    .global_remove = handle_global_remove_wl_cb };
 
-static void lw_handle_buffer_release_wl_cb(void* data, struct wl_buffer* wl_buffer)
+static void handle_buffer_release_wl_cb(void* data, struct wl_buffer* wl_buffer)
 {
     // void *userdata;
     const struct smm_buffer_properties* props;
@@ -1432,23 +1432,23 @@ static void lw_handle_buffer_release_wl_cb(void* data, struct wl_buffer* wl_buff
 }
 
 static const struct wl_buffer_listener wl_buffer_listener = {
-    .release = lw_handle_buffer_release_wl_cb,
+    .release = handle_buffer_release_wl_cb,
 };
 
-static void lw_cache_clear(lw_window_t* window)
+static void cache_clear(lw_window_t* window)
 {
     window->dmg_cache.start = window->dmg_cache.end;
     window->dmg_cache.size = 0;
 }
 
-static void lw_cache_purge(lw_window_t* window, smm_buffer_t* buf)
+static void cache_purge(lw_window_t* window, smm_buffer_t* buf)
 {
     lv_area_t* next_dmg;
     smm_buffer_t* next_buf = smm_next(buf);
 
     /* Remove all damage areas up until start of next buffers damage */
     if (next_buf == NULL) {
-        lw_cache_clear(window);
+        cache_clear(window);
     }
     else {
         next_dmg = SMM_BUFFER_PROPERTIES(next_buf)->tag[LW_TAG_BUFFER_DAMAGE];
@@ -1460,7 +1460,7 @@ static void lw_cache_purge(lw_window_t* window, smm_buffer_t* buf)
     }
 }
 
-static void lw_cache_add_area(lw_window_t* window, smm_buffer_t* buf, const lv_area_t* area)
+static void cache_add_area(lw_window_t* window, smm_buffer_t* buf, const lv_area_t* area)
 {
     if (SMM_BUFFER_PROPERTIES(buf)->tag[LW_TAG_BUFFER_DAMAGE] == NULL) {
         /* Buffer damage beyond cache capacity */
@@ -1472,7 +1472,7 @@ static void lw_cache_add_area(lw_window_t* window, smm_buffer_t* buf, const lv_a
         /* This buffer has more damage then the cache's capacity, so
          * clear cache and leave buffer damage unrecorded
          */
-        lw_cache_clear(window);
+        cache_clear(window);
         SMM_TAG(buf, LW_TAG_BUFFER_DAMAGE, NULL);
         return;
     }
@@ -1486,7 +1486,7 @@ static void lw_cache_add_area(lw_window_t* window, smm_buffer_t* buf, const lv_a
     window->dmg_cache.size++;
 }
 
-static void lw_cache_apply_areas(lw_window_t* window, void* dest, void* src, smm_buffer_t* src_buf)
+static void cache_apply_areas(lw_window_t* window, void* dest, void* src, smm_buffer_t* src_buf)
 {
     unsigned long offset;
     unsigned char start;
@@ -1521,7 +1521,7 @@ static void lw_cache_apply_areas(lw_window_t* window, void* dest, void* src, smm
     }
 }
 
-static bool lw_sme_new_pool(void* ctx, smm_pool_t* pool)
+static bool sme_new_pool(void* ctx, smm_pool_t* pool)
 {
     struct wl_shm_pool* wl_pool;
     struct lw_application* app = ctx;
@@ -1535,20 +1535,20 @@ static bool lw_sme_new_pool(void* ctx, smm_pool_t* pool)
     return (wl_pool == NULL);
 }
 
-static void lw_sme_expand_pool(void* ctx, smm_pool_t* pool)
+static void sme_expand_pool(void* ctx, smm_pool_t* pool)
 {
     const struct smm_pool_properties* props = SMM_POOL_PROPERTIES(pool);
 
     wl_shm_pool_resize(props->tag[LW_TAG_LOCAL], props->size);
 }
 
-static void lw_sme_free_pool(void* ctx, smm_pool_t* pool)
+static void sme_free_pool(void* ctx, smm_pool_t* pool)
 {
     struct wl_shm_pool* wl_pool = SMM_POOL_PROPERTIES(pool)->tag[LW_TAG_LOCAL];
     wl_shm_pool_destroy(wl_pool);
 }
 
-static bool lw_sme_new_buffer(void* ctx, smm_buffer_t* buf)
+static bool sme_new_buffer(void* ctx, smm_buffer_t* buf)
 {
     struct wl_buffer* wl_buf;
     bool fail_alloc = true;
@@ -1574,7 +1574,7 @@ static bool lw_sme_new_buffer(void* ctx, smm_buffer_t* buf)
     return fail_alloc;
 }
 
-static bool lw_sme_init_buffer(void* ctx, smm_buffer_t* buf)
+static bool sme_init_buffer(void* ctx, smm_buffer_t* buf)
 {
     smm_buffer_t* src;
     void* src_base;
@@ -1628,13 +1628,13 @@ static bool lw_sme_init_buffer(void* ctx, smm_buffer_t* buf)
                 goto done;
             }
 
-            lw_cache_apply_areas(obj->window, buf_base, src_base, src);
+            cache_apply_areas(obj->window, buf_base, src_base, src);
         }
 
         /* Purge out-of-date cached damage (up to and including next buffer) */
         src = smm_next(buf);
         if (src == NULL) {
-            lw_cache_purge(obj->window, src);
+            cache_purge(obj->window, src);
         }
     }
 
@@ -1643,13 +1643,13 @@ done:
     return fail_init;
 }
 
-static void lw_sme_free_buffer(void* ctx, smm_buffer_t* buf)
+static void sme_free_buffer(void* ctx, smm_buffer_t* buf)
 {
     struct wl_buffer* wl_buf = SMM_BUFFER_PROPERTIES(buf)->tag[LW_TAG_LOCAL];
     wl_buffer_destroy(wl_buf);
 }
 
-static struct lw_surface_object* lw_create_surface_obj(struct lw_application* app, lw_window_t* window,
+static struct lw_surface_object* create_surface_obj(struct lw_application* app, lw_window_t* window,
     enum lw_object_type type,
     struct lw_surface_object* parent)
 {
@@ -1692,7 +1692,7 @@ err_out:
     return NULL;
 }
 
-static void lw_destroy_wl_surface_obj(struct lw_surface_object* obj)
+static void destroy_wl_surface_obj(struct lw_surface_object* obj)
 {
     if (obj->subsurface) {
         wl_subsurface_destroy(obj->subsurface);
@@ -1703,7 +1703,7 @@ static void lw_destroy_wl_surface_obj(struct lw_surface_object* obj)
     lv_free(obj);
 }
 
-static bool lw_resize_window(lw_window_t* window, int width, int height)
+static bool resize_window(lw_window_t* window, int width, int height)
 {
     lv_color32_t* buf1 = NULL;
     struct smm_buffer_t* body_buf1;
@@ -1739,7 +1739,7 @@ static bool lw_resize_window(lw_window_t* window, int width, int height)
 #if LV_WAYLAND_CLIENT_SIDE_DECORATIONS
     if (!window->application->opt_disable_decorations && !window->fullscreen) {
         for (b = 0; b < LW_NUM_DECORATIONS; b++) {
-            if (!lw_create_wl_decoration(window, window->decoration[b],
+            if (!create_wl_decoration(window, window->decoration[b],
                 window->body->width, window->body->height, 0x00)) {
                 LV_LOG_ERROR("failed to create decoration %d", b);
             }
@@ -1749,7 +1749,7 @@ static bool lw_resize_window(lw_window_t* window, int width, int height)
         /* Entering fullscreen, detach decorations to prevent xdg_wm_base error 4 */
         /* requested geometry larger than the configured fullscreen state */
         for (b = 0; b < LW_NUM_DECORATIONS; b++) {
-            lw_detach_wl_decoration(window, window->decoration[b]);
+            detach_wl_decoration(window, window->decoration[b]);
         }
     }
 #endif
@@ -1779,7 +1779,7 @@ static bool lw_resize_window(lw_window_t* window, int width, int height)
     return true;
 }
 
-static lw_window_t* lw_create_wl_window(struct lw_application* app, int width, int height, const char* title)
+static lw_window_t* create_wl_window(struct lw_application* app, int width, int height, const char* title)
 {
     lw_window_t* window = _lv_ll_ins_tail(&app->window_ll);
     LV_ASSERT_MALLOC(window);
@@ -1793,7 +1793,7 @@ static lw_window_t* lw_create_wl_window(struct lw_application* app, int width, i
     window->width = width;
     window->height = height;
     // Create wayland buffer and surface
-    window->body = lw_create_surface_obj(app, window, LW_OBJECT_WINDOW, NULL);
+    window->body = create_surface_obj(app, window, LW_OBJECT_WINDOW, NULL);
     if (!window->body) {
         LV_LOG_ERROR("cannot create window body");
         goto err_free_window;
@@ -1856,7 +1856,7 @@ err_free_window:
     return NULL;
 }
 
-static void lw_destroy_wl_window(lw_window_t* window)
+static void destroy_wl_window(lw_window_t* window)
 {
     if (!window) {
         return;
@@ -1873,16 +1873,16 @@ static void lw_destroy_wl_window(lw_window_t* window)
     int b;
     for (b = 0; b < LW_NUM_DECORATIONS; b++) {
         if (window->decoration[b]) {
-            lw_destroy_wl_surface_obj(window->decoration[b]);
+            destroy_wl_surface_obj(window->decoration[b]);
             window->decoration[b] = NULL;
         }
     }
 #endif
 
-    lw_destroy_wl_surface_obj(window->body);
+    destroy_wl_surface_obj(window->body);
 }
 
-static void lw_flush_lv_cb(lv_display_t* display, const lv_area_t* area, uint8_t* px_map)
+static void flush_lv_cb(lv_display_t* display, const lv_area_t* area, uint8_t* px_map)
 {
     unsigned long offset = 0;
 
@@ -1949,7 +1949,7 @@ static void lw_flush_lv_cb(lv_display_t* display, const lv_area_t* area, uint8_t
         src_height);
 
 /* Cache buffer damage for future buffer initializations */
-    lw_cache_add_area(window, buf, area);
+    cache_add_area(window, buf, area);
 
     if (lv_disp_flush_is_last(display)) {
 
@@ -1974,14 +1974,14 @@ skip:
         /* Cleanup any intermediate state (in the event that this flush being
          * skipped is in the middle of a flush sequence)
          */
-        lw_cache_clear(window);
+        cache_clear(window);
         SMM_TAG(buf, LW_TAG_BUFFER_DAMAGE, NULL);
         smm_release(buf);
         window->body->pending_buffer = NULL;
     }
 }
 
-static void lw_handle_wayland_input(void)
+static void handle_wayland_input(void)
 {
     while (wl_display_prepare_read(application.wl_disp) != 0) {
         wl_display_dispatch_pending(application.wl_disp);
@@ -1993,7 +1993,7 @@ static void lw_handle_wayland_input(void)
     wl_display_dispatch_pending(application.wl_disp);
 }
 
-static void lw_handle_wayland_output(void)
+static void handle_wayland_output(void)
 {
     lw_window_t* window;
     bool shall_flush = application.cursor_flush_pending;
@@ -2034,7 +2034,7 @@ static void lw_handle_wayland_output(void)
             if (window->application->keyboard_obj == window->body) {
                 window->application->keyboard_obj = NULL;
             }
-            lw_destroy_wl_window(window);
+            destroy_wl_window(window);
         }
 
         shall_flush |= window->flush_pending;
@@ -2057,14 +2057,14 @@ static void lw_handle_wayland_output(void)
     }
 }
 
-static void lw_handle_io_lv_cb(lv_timer_t* tmr)
+static void handle_io_lv_cb(lv_timer_t* tmr)
 {
     lw_window_t* window;
     lv_timer_t* input_timer[4];
 
     LV_UNUSED(tmr);
 
-    lw_handle_wayland_input();
+    handle_wayland_input();
 
     /* Ready input timers (to probe for any input recieved) */
     _LV_LL_READ(&application.window_ll, window)
@@ -2077,7 +2077,7 @@ static void lw_handle_io_lv_cb(lv_timer_t* tmr)
         }
         else if (window != NULL &&
             window->resize_pending && window->frame_counter > 0) {
-            if (lw_resize_window(window, window->resize_width, window->resize_height)) {
+            if (resize_window(window, window->resize_width, window->resize_height)) {
                 window->resize_width = window->width;
                 window->resize_height = window->height;
                 window->resize_pending = false;
@@ -2102,10 +2102,10 @@ static void lw_handle_io_lv_cb(lv_timer_t* tmr)
         }
     }
 
-    lw_handle_wayland_output();
+    handle_wayland_output();
 }
 
-static void lw_read_pointer_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
+static void read_pointer_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
 {
     lw_window_t* window = lv_display_get_user_data(lv_indev_get_display(indev));
     ;
@@ -2118,7 +2118,7 @@ static void lw_read_pointer_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
     data->state = window->body->input.pointer.left_button;
 }
 
-static void lw_read_pointeraxis_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
+static void read_pointeraxis_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
 {
     lw_window_t* window = lv_display_get_user_data(lv_indev_get_display(indev));
     ;
@@ -2132,7 +2132,7 @@ static void lw_read_pointeraxis_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
     window->body->input.pointer.wheel_diff = 0;
 }
 
-static void lw_read_keyboard_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
+static void read_keyboard_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
 {
     lw_window_t* window = lv_display_get_user_data(lv_indev_get_display(indev));
     ;
@@ -2144,7 +2144,7 @@ static void lw_read_keyboard_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
     data->state = window->body->input.keyboard.state;
 }
 
-static void lw_read_touch_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
+static void read_touch_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
 {
     lw_window_t* window = lv_display_get_user_data(lv_indev_get_display(indev));
     if (!window || window->closed) {
@@ -2154,6 +2154,64 @@ static void lw_read_touch_lv_cb(lv_indev_t* indev, lv_indev_data_t* data)
     data->point.x = window->body->input.touch.x;
     data->point.y = window->body->input.touch.y;
     data->state = window->body->input.touch.state;
+}
+
+static void create_lv_input_devices(lw_window_t* window)
+{
+    /* for keyboard */
+    lv_group_t* group = lv_group_get_default();
+    if (!group) {
+        group = lv_group_create();
+        if (group) {
+            lv_group_set_default(group);
+        }
+    }
+    /* Register input */
+    window->indev_pointer_p = lv_indev_create();
+    if (window->indev_pointer_p) {
+        lv_indev_set_type(window->indev_pointer_p, LV_INDEV_TYPE_POINTER);
+        lv_indev_set_read_cb(window->indev_pointer_p, read_pointer_lv_cb);
+        lv_indev_set_display(window->indev_pointer_p, window->display);
+
+        lv_indev_set_group(window->indev_pointer_p, group);
+    }
+    else {
+        LV_LOG_ERROR("failed to register pointer indev");
+    }
+
+    window->indev_pointeraxis_p = lv_indev_create();
+    if (window->indev_pointeraxis_p) {
+        lv_indev_set_type(window->indev_pointeraxis_p, LV_INDEV_TYPE_ENCODER);
+        lv_indev_set_read_cb(window->indev_pointeraxis_p, read_pointeraxis_lv_cb);
+        lv_indev_set_display(window->indev_pointeraxis_p, window->display);
+
+        // lv_indev_set_group(window->indev_pointeraxis_p, group);
+    }
+    else {
+        LV_LOG_ERROR("failed to register pointeraxis indev");
+    }
+
+    window->indev_touch_p = lv_indev_create();
+    if (window->indev_touch_p) {
+        lv_indev_set_type(window->indev_touch_p, LV_INDEV_TYPE_POINTER);
+        lv_indev_set_read_cb(window->indev_touch_p, read_touch_lv_cb);
+        lv_indev_set_display(window->indev_touch_p, window->display);
+    }
+    else {
+        LV_LOG_ERROR("failed to register touch indev");
+    }
+
+    window->indev_keyboard_p = lv_indev_create();
+    if (window->indev_keyboard_p) {
+        lv_indev_set_type(window->indev_keyboard_p, LV_INDEV_TYPE_KEYPAD);
+        lv_indev_set_read_cb(window->indev_keyboard_p, read_keyboard_lv_cb);
+        lv_indev_set_display(window->indev_keyboard_p, window->display);
+        /* the keyboard must be set to the group.*/
+        lv_indev_set_group(window->indev_keyboard_p, group);
+    }
+    else {
+        LV_LOG_ERROR("failed to register keyboard indev");
+    }
 }
 
 /**********************
@@ -2169,69 +2227,11 @@ int lw_get_wayland_fd(void)
     return wl_display_get_fd(application.wl_disp);
 }
 
-static void lw_create_lv_input_devices(lw_window_t* window)
-{
-    /* for keyboard */
-    lv_group_t* group = lv_group_get_default();
-    if (!group) {
-        group = lv_group_create();
-        if (group) {
-            lv_group_set_default(group);
-        }
-    }
-    /* Register input */
-    window->indev_pointer_p = lv_indev_create();
-    if (window->indev_pointer_p) {
-        lv_indev_set_type(window->indev_pointer_p, LV_INDEV_TYPE_POINTER);
-        lv_indev_set_read_cb(window->indev_pointer_p, lw_read_pointer_lv_cb);
-        lv_indev_set_display(window->indev_pointer_p, window->display);
-
-        lv_indev_set_group(window->indev_pointer_p, group);
-    }
-    else {
-        LV_LOG_ERROR("failed to register pointer indev");
-    }
-
-    window->indev_pointeraxis_p = lv_indev_create();
-    if (window->indev_pointeraxis_p) {
-        lv_indev_set_type(window->indev_pointeraxis_p, LV_INDEV_TYPE_ENCODER);
-        lv_indev_set_read_cb(window->indev_pointeraxis_p, lw_read_pointeraxis_lv_cb);
-        lv_indev_set_display(window->indev_pointeraxis_p, window->display);
-
-        // lv_indev_set_group(window->indev_pointeraxis_p, group);
-    }
-    else {
-        LV_LOG_ERROR("failed to register pointeraxis indev");
-    }
-
-    window->indev_touch_p = lv_indev_create();
-    if (window->indev_touch_p) {
-        lv_indev_set_type(window->indev_touch_p, LV_INDEV_TYPE_POINTER);
-        lv_indev_set_read_cb(window->indev_touch_p, lw_read_touch_lv_cb);
-        lv_indev_set_display(window->indev_touch_p, window->display);
-    }
-    else {
-        LV_LOG_ERROR("failed to register touch indev");
-    }
-
-    window->indev_keyboard_p = lv_indev_create();
-    if (window->indev_keyboard_p) {
-        lv_indev_set_type(window->indev_keyboard_p, LV_INDEV_TYPE_KEYPAD);
-        lv_indev_set_read_cb(window->indev_keyboard_p, lw_read_keyboard_lv_cb);
-        lv_indev_set_display(window->indev_keyboard_p, window->display);
-        /* the keyboard must be set to the group.*/
-        lv_indev_set_group(window->indev_keyboard_p, group);
-    }
-    else {
-        LV_LOG_ERROR("failed to register keyboard indev");
-    }
-}
-
 /**
  * Close wayland window
  * @param disp LVGL display using window to be closed
  */
-void lw_close_wayland_window(lv_display_t* disp)
+void lw_close_window(lv_display_t* disp)
 {
     lw_window_t* window = lv_display_get_user_data(disp);
     if (!window || window->closed) {
@@ -2274,7 +2274,7 @@ bool lw_window_is_open(lv_display_t* disp)
  * @param disp LVGL display using window to be set/unset fullscreen
  * @param fullscreen requested status (true = fullscreen)
  */
-void lw_set_wayland_window_fullscreen(lv_display_t* disp, bool fullscreen)
+void lw_set_window_fullscreen(lv_display_t* disp, bool fullscreen)
 {
     lw_window_t* window = lv_display_get_user_data(disp);
     if (!window || window->closed) {
@@ -2309,7 +2309,7 @@ void lw_set_wayland_window_fullscreen(lv_display_t* disp, bool fullscreen)
  * @param disp LVGL display
  * @return input device connected to pointer events, or NULL on error
  */
-lv_indev_t* lw_lvgl_get_pointer(lv_display_t* disp)
+lv_indev_t* lw_get_lv_pointer(lv_display_t* disp)
 {
     lw_window_t* window = lv_display_get_user_data(disp);
     if (!window) {
@@ -2323,7 +2323,7 @@ lv_indev_t* lw_lvgl_get_pointer(lv_display_t* disp)
  * @param disp LVGL display
  * @return input device connected to pointer axis events, or NULL on error
  */
-lv_indev_t* lw_lvgl_get_pointeraxis(lv_display_t* disp)
+lv_indev_t* lw_get_lv_pointeraxis(lv_display_t* disp)
 {
     lw_window_t* window = lv_display_get_user_data(disp);
     if (!window) {
@@ -2337,7 +2337,7 @@ lv_indev_t* lw_lvgl_get_pointeraxis(lv_display_t* disp)
  * @param disp LVGL display
  * @return input device connected to keyboard, or NULL on error
  */
-lv_indev_t* lw_lvgl_get_keyboard(lv_display_t* disp)
+lv_indev_t* lw_get_lv_keyboard(lv_display_t* disp)
 {
     lw_window_t* window = lv_display_get_user_data(disp);
     if (!window) {
@@ -2351,7 +2351,7 @@ lv_indev_t* lw_lvgl_get_keyboard(lv_display_t* disp)
  * @param disp LVGL display
  * @return input device connected to touchscreen, or NULL on error
  */
-lv_indev_t* lw_lvgl_get_touchscreen(lv_display_t* disp)
+lv_indev_t* lw_get_lv_touchscreen(lv_display_t* disp)
 {
     lw_window_t* window = lv_display_get_user_data(disp);
     if (!window) {
@@ -2398,7 +2398,7 @@ lv_display_t* lw_create_window(lv_coord_t hor_res, lv_coord_t ver_res, char* tit
     lv_wayland_display_close_f_t close_cb)
 {
 
-    lw_window_t* window = lw_create_wl_window(&application, hor_res, ver_res, title);
+    lw_window_t* window = create_wl_window(&application, hor_res, ver_res, title);
     if (!window) {
         LV_LOG_ERROR("failed to create wayland window");
         return NULL;
@@ -2410,17 +2410,17 @@ lv_display_t* lw_create_window(lv_coord_t hor_res, lv_coord_t ver_res, char* tit
     window->display = lv_display_create(hor_res, ver_res);
     if (!window->display) {
         LV_LOG_ERROR("failed to crating display");
-        lw_destroy_wl_window(window);
+        destroy_wl_window(window);
         return NULL;
     }
-    lw_create_lv_input_devices(window);
+    create_lv_input_devices(window);
 
     /* Initialize draw buffer */
     uint32_t data_size = ((hor_res * ver_res) / LW_DRAW_BUFFER_DIV) * sizeof(lv_color32_t);
     void* buf1 = lv_malloc(data_size);
     if (!buf1) {
         LV_LOG_ERROR("failed to allocate draw buffer");
-        lw_destroy_wl_window(window);
+        destroy_wl_window(window);
         return NULL;
     }
 
@@ -2432,7 +2432,7 @@ lv_display_t* lw_create_window(lv_coord_t hor_res, lv_coord_t ver_res, char* tit
 
     window->render_mode = LV_DISPLAY_RENDER_MODE_PARTIAL;
     lv_display_set_buffers(window->display, buf1, NULL, data_size, window->render_mode);
-    lv_display_set_flush_cb(window->display, lw_flush_lv_cb);
+    lv_display_set_flush_cb(window->display, flush_lv_cb);
     lv_display_set_resolution(window->display, hor_res, ver_res);
 
     lv_display_set_user_data(window->display, window);
@@ -2463,12 +2463,12 @@ bool lw_wayland_init(void)
 
     struct smm_events evs = {
         NULL,
-        lw_sme_new_pool,
-        lw_sme_expand_pool,
-        lw_sme_free_pool,
-        lw_sme_new_buffer,
-        lw_sme_init_buffer,
-        lw_sme_free_buffer };
+        sme_new_pool,
+        sme_expand_pool,
+        sme_free_pool,
+        sme_new_buffer,
+        sme_init_buffer,
+        sme_free_buffer };
 
     LV_ASSERT_MSG(getenv("XDG_RUNTIME_DIR"), "cannot get XDG_RUNTIME_DIR");
 
@@ -2508,7 +2508,7 @@ bool lw_wayland_init(void)
 
     _lv_ll_init(&application.window_ll, sizeof(lw_window_t));
 
-    application.cycle_timer = lv_timer_create(lw_handle_io_lv_cb, LV_WAYLAND_CYCLE_PERIOD, NULL);
+    application.cycle_timer = lv_timer_create(handle_io_lv_cb, LV_WAYLAND_CYCLE_PERIOD, NULL);
     LV_ASSERT_MSG(application.cycle_timer, "failed to create cycle timer");
     if (!application.cycle_timer) {
         return false;
@@ -2528,7 +2528,7 @@ void lw_wayland_deinit(void)
     {
         if (!window->closed) {
             lv_display_delete(window->display);
-            lw_destroy_wl_window(window);
+            destroy_wl_window(window);
         }
     }
 

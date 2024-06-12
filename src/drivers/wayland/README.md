@@ -74,13 +74,12 @@ In "Project properties > C/C++ Build > Settings" set the followings:
 
 ## Init Wayland in LVGL
 
-1. In `main.c` `#incude "lv_drivers/wayland/wayland.h"`
-2. Enable the Wayland driver in `lv_drv_conf.h` with `LV_USE_WAYLAND 1` and
+1. In `main.c` `#incude "drivers/wayland/wayland.h"`
+2. Enable the Wayland driver in `lv_conf.h` with `LV_USE_WAYLAND 1` and
    configure its features below, enabling at least support for one shell.
-3. `LV_COLOR_DEPTH` should be set either to `32` or `16` in `lv_conf.h`;
-   support for `8` and `1` depends on target platform.
+3. `LV_COLOR_DEPTH` should be set either to `32` in `lv_conf.h`;(ensure LV_MEM_SIZE enough)
 4. After `lv_init()` call `lw_wayland_init()`.
-5. Add a display (or more than one) using `lw_create_window()`,
+5. Add a display (or more than one) using `lw_create_window(...)`,
    possibly with a close callback to track the status of each display:
 ```c
   #define H_RES (800)
@@ -96,8 +95,8 @@ In "Project properties > C/C++ Build > Settings" set the followings:
   - a POINTER connected to Wayland pointer events
   - a ENCODER connected to Wayland pointer axis events
   Handles for input devices of each display can be get using respectively
-  `lv_wayland_get_indev_keyboard()`, `lv_wayland_get_indev_touchscreen()`,
-  `lv_wayland_get_indev_pointer()` and `lv_wayland_get_indev_pointeraxis()`, using
+  `lw_get_lv_indev_keyboard()`, `lw_get_lv_indev_touchscreen()`,
+  `lw_get_lv_indev_pointer()` and `lw_get_lv_indev_pointeraxis()`, using
   `disp` as argument.
 5. After `lv_deinit()` (if used), or in any case during de-initialization, call
   `lw_wayland_deinit()`.
@@ -105,7 +104,7 @@ In "Project properties > C/C++ Build > Settings" set the followings:
 ### Fullscreen mode
 
 In order to set one window as fullscreen or restore it as a normal one,
-call the `lw_set_wayland_window_fullscreen()` function respectively with `true`
+call the `lw_set_window_fullscreen()` function respectively with `true`
 or `false` as `fullscreen` argument.
 
 ### Disable window client-side decoration at runtime
@@ -121,36 +120,35 @@ in your timer loop (in place of `lv_timer_handler()`).
 
 You can now sleep/wait until the next timer/event is ready, e.g.:
 ```
-/* [After initialization and display creation] */
-#include <limits.h>
-#include <errno.h>
-#include <poll.h>
+    /* [After initialization and display creation] */
+    #include <limits.h>
+    #include <errno.h>
+    #include <poll.h>
 
-struct pollfd pfd;
-uint32_t time_till_next;
-int sleep;
+    struct pollfd pfd;
+    uint32_t time_till_next;
+    int sleep;
 
-pfd.fd = lw_get_wayland_fd();
-pfd.events = POLLIN;
+    pfd.fd = lw_get_wayland_fd();
+    pfd.events = POLLIN;
 
-while (1) {
-    /* Handle any Wayland/LVGL timers/events */
-    time_till_next = lw_timer_handler();
+    while (true) {
+        usleep(LV_DEF_REFR_PERIOD * 1000); /* 5 recommended for LV_DEF_REFR_PERIOD*/
 
-    /* Run until the last window closes */
-    if (!lv_wayland_window_is_open(NULL)) {
-        break;
-    }
+        if ((poll(&pfd, 1, sleep_time) < 0) && (errno == EINTR)) continue;
 
-    /* Wait for something interesting to happen */
-    if (time_till_next == LV_NO_TIMER_READY) {
-        sleep = -1;
-    } else if (time_till_next > INT_MAX) {
-        sleep = INT_MAX;
-    } else {
-       sleep = time_till_next;
-    }
+        time_till_next = lw_timer_handler();
+        /* Wait for something interesting to happen */
+        if (time_till_next == LV_NO_TIMER_READY) {
+            sleep_time = -1;
+            break;
+        }
+        else if (time_till_next > INT_MAX) {
+            sleep_time = INT_MAX;
+        }
+        else {
+            sleep_time = time_till_next;
+        }
 
-    while ((poll(&pfd, 1, sleep) < 0) && (errno == EINTR));
-}
+    };
 ```
