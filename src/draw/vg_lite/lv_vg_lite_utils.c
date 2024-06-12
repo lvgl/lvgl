@@ -1084,7 +1084,9 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
     /* Clear all gradient caches reference */
-    lv_vg_lite_pending_remove_all(u->grad_pending);
+    if(u->grad_pending) {
+        lv_vg_lite_pending_remove_all(u->grad_pending);
+    }
 
     /* Clear image decoder dsc reference */
     lv_vg_lite_pending_remove_all(u->image_dsc_pending);
