@@ -169,7 +169,7 @@ bool lv_vg_lite_draw_grad(
                                            linear_grad,
                                            0,
                                            blend,
-                                           VG_LITE_FILTER_BI_LINEAR));
+                                           VG_LITE_FILTER_LINEAR));
                 LV_PROFILER_END_TAG("vg_lite_draw_linear_grad");
             }
             break;
