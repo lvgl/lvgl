@@ -356,4 +356,22 @@ void test_spangroup_chinese_break_line(void)
 
 #endif
 
+void test_spangroup_style_text_letter_space(void)
+{
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+
+    lv_obj_set_style_outline_width(spangroup, 1, 0);
+    lv_obj_set_style_text_letter_space(spangroup, 20, 0);
+
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "A");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "B");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "C");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "D");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "E");
+    lv_span_set_text(lv_spangroup_new_span(spangroup), "F");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_08.png");
+}
+
 #endif
