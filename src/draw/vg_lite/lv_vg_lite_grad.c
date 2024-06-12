@@ -215,6 +215,13 @@ bool lv_vg_lite_draw_grad_helper(
     vg_lite_fill_t fill,
     vg_lite_blend_t blend)
 {
+    LV_ASSERT_NULL(u);
+    LV_VG_LITE_ASSERT_DEST_BUFFER(buffer);
+    LV_VG_LITE_ASSERT_PATH(path);
+    LV_ASSERT_NULL(area);
+    LV_ASSERT_NULL(grad_dsc);
+    LV_VG_LITE_ASSERT_MATRIX(matrix);
+
     lv_vector_gradient_t grad;
     lv_memzero(&grad, sizeof(grad));
 
