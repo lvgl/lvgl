@@ -539,6 +539,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_t major_tick_dsc;
     lv_draw_line_dsc_init(&major_tick_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
+    if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+		major_tick_dsc.raw_end = 0;
+    }
 
     /* Configure line draw descriptor for the minor tick drawing */
     lv_draw_line_dsc_t minor_tick_dsc;
@@ -550,121 +553,59 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_init(&main_line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_dsc);
 
-    if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
-       || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
+    const uint32_t total_tick_count = scale->total_tick_count;
+	uint32_t tick_idx = 0;
+	uint32_t major_tick_idx = 0;
+	for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
+        /* A major tick is the one which has a label in it */
+        bool is_major_tick = false;
+        if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
+        if(is_major_tick) major_tick_idx++;
 
-        uint32_t total_tick_count = scale->total_tick_count;
-        uint32_t tick_idx = 0;
-        uint32_t major_tick_idx = 0;
-        for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
-            /* A major tick is the one which has a label in it */
-            bool is_major_tick = false;
-            if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
-            if(is_major_tick) major_tick_idx++;
+        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
 
-            const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
-
-            /* Overwrite label and tick properties if tick value is within section range */
-            lv_scale_section_t * section;
-            _LV_LL_READ_BACK(&scale->section_ll, section) {
-                if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-                    if(is_major_tick) {
-                        scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                        scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
-                    }
-                    else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
-                    }
-                    break;
+        /* Overwrite label and tick properties if tick value is within section range */
+        lv_scale_section_t * section;
+        _LV_LL_READ_BACK(&scale->section_ll, section) {
+            if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+                if(is_major_tick) {
+                    scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
+                    scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                 }
                 else {
-                    /* Tick is not in section, get the proper styles */
-                    lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
+                    scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                 }
-            }
-
-            /* The tick is represented by a line. We need two points to draw it */
-            lv_point_t tick_point_a;
-            lv_point_t tick_point_b;
-            scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
-
-            /* Setup a label if they're enabled and we're drawing a major tick */
-            if(scale->label_enabled && is_major_tick) {
-            	scale_draw_label(obj, event, &label_dsc, major_tick_idx, tick_value, &tick_point_b, tick_idx);
-            }
-
-            if(is_major_tick) {
-                major_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
-                major_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
-                lv_draw_line(layer, &major_tick_dsc);
+                break;
             }
             else {
-                minor_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
-                minor_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
-                lv_draw_line(layer, &minor_tick_dsc);
+                /* Tick is not in section, get the proper styles */
+                lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
+                lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
+                lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
             }
         }
-    }
-    else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-        /* Major tick */
-        major_tick_dsc.raw_end = 0;
 
-        uint32_t tick_idx = 0;
-        uint32_t major_tick_idx = 0;
-        for(tick_idx = 0; tick_idx < scale->total_tick_count; tick_idx++) {
-            /* A major tick is the one which has a label in it */
-            bool is_major_tick = false;
-            if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
-            if(is_major_tick) major_tick_idx++;
+        /* The tick is represented by a line. We need two points to draw it */
+        lv_point_t tick_point_a;
+        lv_point_t tick_point_b;
+        scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
 
-            const int32_t tick_value = lv_map(tick_idx, 0U, scale->total_tick_count - 1, scale->range_min, scale->range_max);
-
-            /* Overwrite label and tick properties if tick value is within section range */
-            lv_scale_section_t * section;
-            _LV_LL_READ_BACK(&scale->section_ll, section) {
-                if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-                    if(is_major_tick) {
-                        scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                        scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
-                    }
-                    else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
-                    }
-                    break;
-                }
-                else {
-                    /* Tick is not in section, get the proper styles */
-                    lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
-                }
-            }
-
-            /* The tick is represented by a line. We need two points to draw it */
-            lv_point_t tick_point_a;
-            lv_point_t tick_point_b;
-            scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
-
-            /* Setup a label if they're enabled and we're drawing a major tick */
-            if(scale->label_enabled && is_major_tick) {
-            	scale_draw_label(obj, event, &label_dsc, major_tick_idx, tick_value, &tick_point_b, tick_idx);
-            }
-
-            if(is_major_tick) {
-                major_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
-                major_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
-                lv_draw_line(layer, &major_tick_dsc);
-            }
-            else {
-                minor_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
-                minor_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
-                lv_draw_line(layer, &minor_tick_dsc);
-            }
+        /* Setup a label if they're enabled and we're drawing a major tick */
+        if(scale->label_enabled && is_major_tick) {
+        	scale_draw_label(obj, event, &label_dsc, major_tick_idx, tick_value, &tick_point_b, tick_idx);
         }
-    }
-    else { /* Nothing to do */ }
+
+        if(is_major_tick) {
+            major_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
+            major_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
+            lv_draw_line(layer, &major_tick_dsc);
+        }
+        else {
+            minor_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
+            minor_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
+            lv_draw_line(layer, &minor_tick_dsc);
+        }
+	}
 }
 
 static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_dsc_t * label_dsc,
