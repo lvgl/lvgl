@@ -2364,7 +2364,7 @@ lv_indev_t* lw_lvgl_get_touchscreen(lv_display_t* disp)
  * Wayland specific timer handler (use in place of LVGL lv_timer_handler)
  * @return time until next timer expiry in milliseconds
  */
-uint32_t lw_wayland_timer_handler(void)
+uint32_t lw_timer_handler(void)
 {
     lw_window_t* window;
     uint32_t time_until_next = lv_timer_get_time_until_next();

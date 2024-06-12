@@ -40,7 +40,7 @@ lv_indev_t * lw_lvgl_get_pointer(lv_display_t * disp);
 lv_indev_t * lw_lvgl_get_pointeraxis(lv_display_t * disp);
 lv_indev_t * lw_lvgl_get_keyboard(lv_display_t * disp);
 lv_indev_t * lw_lvgl_get_touchscreen(lv_display_t * disp);
-uint32_t lw_wayland_timer_handler(void);
+uint32_t lw_timer_handler(void);
 bool lw_window_is_open(lv_display_t *disp);
 
 /**********************

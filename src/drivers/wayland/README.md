@@ -5,7 +5,6 @@ Keyboard support is based on libxkbcommon.
 
 Following shell are supported:
 
-* wl_shell (deprecated)
 * xdg_shell
 
 > xdg_shell requires an extra build step; see section _Generate protocols_ below.
@@ -117,7 +116,7 @@ environment variable to `1`.
 
 ### Event-driven timer handler
 
-Set `lw_wayland_timer_handler` in `lv_drv_conf.h` and call `lw_wayland_timer_handler()`
+call `lw_timer_handler()`
 in your timer loop (in place of `lv_timer_handler()`).
 
 You can now sleep/wait until the next timer/event is ready, e.g.:
@@ -136,7 +135,7 @@ pfd.events = POLLIN;
 
 while (1) {
     /* Handle any Wayland/LVGL timers/events */
-    time_till_next = lw_wayland_timer_handler();
+    time_till_next = lw_timer_handler();
 
     /* Run until the last window closes */
     if (!lv_wayland_window_is_open(NULL)) {
