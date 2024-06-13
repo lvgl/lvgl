@@ -80,7 +80,7 @@ The rotary sensitivity can be adjusted on 2 levels:
 
 The final diff is calculated like this:
 
-``diff_final = diff_in * (indev_sensitivity / 256) +  (widget_sensitivity / 256); ``
+``diff_final = diff_in * (indev_sensitivity / 256) +  (widget_sensitivity / 256);``
 
 For example, if both the indev and widget sensitivity is set to 128 (0.5), the input diff. will be
 multiplied by 0.25 (divided by 4). The value of the widget will be incremented by this value or

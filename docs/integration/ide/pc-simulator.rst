@@ -16,7 +16,7 @@ Using the simulator on a PC has the following advantages:
 - Easy Validation: The simulator is also very useful to report bugs because it
   provides a common platform for every user.
 - Better developer experience: On PC Debuggers are usually faster and better, you can log to files,
-add a lot of ``printf``s, do profiling, and so on.
+  add a lot of ``printf``-s, do profiling, and so on.
 
 
 Select an IDE
