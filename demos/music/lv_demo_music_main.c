@@ -25,11 +25,13 @@
 #if LV_DEMO_MUSIC_LARGE
     #define BAR_COLOR1_STOP     160
     #define BAR_COLOR2_STOP     200
+    #define BAR_REST_RADIUS     165
 #else
     #define BAR_COLOR1_STOP     80
     #define BAR_COLOR2_STOP     100
+    #define BAR_REST_RADIUS     82
 #endif
-#define BAR_COLOR3_STOP     (2 * LV_HOR_RES / 3)
+#define BAR_COLOR3_STOP     (LV_MAX(LV_HOR_RES, LV_VER_RES) / 3)
 #define BAR_CNT             20
 #define DEG_STEP            (180/BAR_CNT)
 #define BAND_CNT            4
@@ -254,18 +256,18 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
 
     start_anim = true;
 
-    stop_start_anim_timer = lv_timer_create(stop_start_anim, INTRO_TIME + 2000, NULL);
+    stop_start_anim_timer = lv_timer_create(stop_start_anim, INTRO_TIME + 3000, NULL);
     lv_timer_set_repeat_count(stop_start_anim_timer, 1);
 
     lv_anim_init(&a);
 
     uint32_t i;
     lv_anim_set_exec_cb(&a, start_anim_cb);
-    lv_anim_set_values(&a, LV_HOR_RES, 5);
+    lv_anim_set_values(&a, LV_MAX(LV_HOR_RES, LV_VER_RES) / 2, 0);
     lv_anim_set_path_cb(&a, lv_anim_path_bounce);
     for(i = 0; i < BAR_CNT; i++) {
-        lv_anim_set_delay(&a, INTRO_TIME - 200 + rnd_array[i] % 200);
-        lv_anim_set_duration(&a, 2500 + rnd_array[i] % 500);
+        lv_anim_set_delay(&a, INTRO_TIME - 200 + (rnd_array[i] % 200));
+        lv_anim_set_duration(&a, 2500 + (rnd_array[i] % 500));
         lv_anim_set_var(&a, &start_anim_values[i]);
         lv_anim_start(&a);
     }
@@ -810,15 +812,9 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         uint16_t r[64];
         uint32_t i;
 
-        int32_t min_a = 5;
-#if LV_DEMO_MUSIC_LARGE == 0
-        int32_t r_in = 0;
-#else
-        int32_t r_in = 160;
-#endif
-        int32_t img_scale = lv_image_get_scale(album_image_obj);
-        r_in = (r_in * img_scale) >> 8;
-        for(i = 0; i < BAR_CNT; i++) r[i] = r_in + min_a + 77;
+        for(i = 0; i < BAR_CNT; i++) {
+            r[i] = BAR_REST_RADIUS;
+        }
 
         uint32_t s;
         for(s = 0; s < 4; s++) {
@@ -859,12 +855,12 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             uint32_t j = (i + bar_rot + rnd_array[bar_ofs % 10]) % BAR_CNT;
             uint32_t k = (i + bar_rot + rnd_array[(bar_ofs + 1) % 10]) % BAR_CNT;
 
-            uint32_t v = (r[k] * animv + r[j] * (amax - animv)) / amax;
-
+            uint32_t v;
             if(start_anim) {
-                v = r_in + 77 + start_anim_values[i];
-                deg_space = v >> 7;
-                if(deg_space < 1) deg_space = 1;
+                v = BAR_REST_RADIUS + start_anim_values[i];
+            }
+            else {
+                v = (r[k] * animv + r[j] * (amax - animv)) / amax;
             }
 
             if(v < BAR_COLOR1_STOP) draw_dsc.bg_color = BAR_COLOR1;
@@ -886,9 +882,9 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             draw_dsc.p[1].x = center.x + x2_out;
             draw_dsc.p[1].y = center.y + get_sin(di, v);
 
-            int32_t x2_in = get_cos(di, r_in);
+            int32_t x2_in = get_cos(di, 0);
             draw_dsc.p[2].x = center.x + x2_in;
-            draw_dsc.p[2].y = center.y + get_sin(di, r_in);
+            draw_dsc.p[2].y = center.y + get_sin(di, 0);
             lv_draw_triangle(layer, &draw_dsc);
 
             draw_dsc.p[0].x = center.x - x1_out;
