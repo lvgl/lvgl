@@ -178,6 +178,11 @@ void lv_draw_dispatch_wait_for_request(void);
 void lv_draw_dispatch_request(void);
 
 /**
+ * Get the total number of draw units.
+  */
+uint32_t lv_draw_get_unit_count(void);
+
+/**
  * Find and available draw task
  * @param layer             the draw ctx to search in
  * @param t_prev            continue searching from this task
